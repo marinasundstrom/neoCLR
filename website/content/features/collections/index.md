@@ -19,6 +19,20 @@ The full sample reads both arrays and lists, replaces elements through MutableSe
 
 <a id="query-names"></a>
 
+## Indexing and slices (development)
+
+Import `System.Collections.*` for Sequence Index/Range access, `Get(int/Index)`
+returning Option, and `Slice(Range)` returning Result. Bracket access can fault on
+invalid bounds. Slices contain shallow copies in independent array storage.
+
+List declares its own directional read/write and range-read indexers; ArrayList
+uses Count and copies its backing storage directly. Raven prefers these instance
+members over extension indexers. Through a Sequence view, slicing delegates to
+List when available and otherwise uses one iterator. No concurrent snapshot is
+promised, and arbitrary Iterable values do not gain random access.
+
+[API contracts →](../../docs/sequence-access.html)
+
 ## Filtering and mapping
 
 Import `System.Linq.*` for the query operators. Filter keeps matching elements; Map transforms them. This sample prints `10`, then `30`. Neither operator invokes its callback until iteration begins.

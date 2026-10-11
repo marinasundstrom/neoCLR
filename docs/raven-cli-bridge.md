@@ -8211,3 +8211,37 @@ and field contracts. The eventual native metadata/backend path must preserve the
 semantic identities without relying on CLI projection. No ordinary .NET capability
 setting changes. Native support is on the integration branch, not Raven main.
 See [design, comparison, limitations and test evidence](design/index-range.md).
+
+
+## Extension indexers and sequence slices (2026-10-11)
+
+Native intent is logical extension indexers on a receiver type, with ordinary
+instance members preferred. Raven shared main implements parsing, binding,
+semantic/operation symbols and .NET execution (`32f2a35b8`). The native integration
+line additionally admits static accessor declaration/calls and reconstructs
+indexer properties from native extension-container methods. No Runtime Contract
+switch is added. Native feature support remains on Raven's
+`codex/source-object-metadata-resolution` branch; main language support alone does
+not qualify that backend.
+
+The CLI representation uses static generic get_Item/set_Item methods, a leading
+receiver and accessor signatures, not CLR properties added to the receiver.
+Generic extension type parameters become accessor method parameters. The native
+metadata writer currently uses the same accessor convention in an ExtensionAttribute
+container. Raven's native symbol importer groups full receiver/index/value
+signatures and generic arity; runtime introspection still sees those static methods.
+A future explicit extension contract in native metadata can replace recognition by
+name/marker while retaining receiver identity and overload substitution. Binding,
+import and portable lowering are Raven-owned; library dispatch/copy semantics are
+neoCLR-owned. Static indexers, native constrained extension containers, property-level
+custom annotations and init-only extension setters are outside this native slice.
+
+The aggregate documentation bridge declares special-name static accessor methods;
+its internal SpecialNameAttribute is a C# reference-generation helper, not a public
+runtime API. Both reference paths retain logical Index/Range overloads. See
+[sequence API](../api-docs/sequence-access.md) and [qualification](design/index-range.md).
+
+Final bundle qualification also exposed candidate merging that collapsed native
+int/Index property overloads. Raven now deduplicates repeated property instances
+by identity. The ArrayList Index setter in the index-range suite covers this
+regression; it does not alter the Runtime Contract or temporary encoding.

@@ -504,3 +504,17 @@ repairs the native portable for cleanup omitted by b939cd696. Explicit iterator
 control remains where it better represents the operation or guarantees disposal
 before a deliberate terminal Fault; see the [source audit](raven-conventions.md#runtime-source-audit).
 Terminal Faults do not unwind scopes.
+
+
+## Index/Range access — 2026-10-11 development
+
+List<T> now requires Index read/write and Range read indexers in addition to its
+integer indexer and Add. A Range result is an independent shallow array copy.
+ArrayList provides direct implementations against Count, ignoring spare capacity.
+SequenceAccess supplies read-only Index/Range extension indexers plus validated
+Get/Slice alternatives. Slice delegates to List<T> when available, otherwise uses
+one bounded iterator traversal. This is not a concurrency/snapshot guarantee or a
+promise that Sequence indexing is constant time. Custom List implementers must add
+the new contracts; arrays retain MutableSequence and use the sequence fallback when
+viewed through that interface. [API details](../api-docs/sequence-access.md) and
+[design/qualification](design/index-range.md) describe invalid bounds and copying.

@@ -1,21 +1,21 @@
 {
   "format": 1,
   "archive": "native-reference.zip",
-  "sha256": "8a64e2f1b238fa8d823d8aa5537a847b4b49fde02174b4d221a81593f8f55203",
-  "librarySourceRevision": "11fbf884afe532b902a51bca57f819bf7e0ff79d",
-  "compilerRevision": "ad3409e06910bdb33bccd0cfdb1431401f248349",
-  "rendererRevision": "ad3409e06910bdb33bccd0cfdb1431401f248349",
+  "sha256": "240bbea542c250715073685fdb0fb0a4216b04a40cc288cdc21426aa03bffa2c",
+  "librarySourceRevision": "341df9ec1ceca96ee4df4eca21eb02e5e11895e0",
+  "compilerRevision": "9e542200d",
+  "rendererRevision": "9e542200d7560b819d75c7fdd9eb6064b78f5f3c",
   "libraryArtifacts": {
-    "System.Runtime.dll": "4ffc931e83d658b5f316e1b8048dde0cc2b7d5c4ac0a41d811bb53b418162169",
-    "System.Data.dll": "524daceca704008b76d75394ee987b125d724155369f595ef33a3fe0f19b7107",
-    "System.Networking.dll": "0bce734bd43ba5512c2d303c87bdb4821bfb7b3bc32da121710e3abfdb7e58db",
-    "System.Web.dll": "86f7121f44bae55965ff1f4097a24f945b56c69fb490589b1259c0fee7f2f4c7",
+    "System.Runtime.dll": "818e0147dd0a6fb4946a9ddca0b672e19902b9b6138cdee6ac9b9c07e25bf746",
+    "System.Data.dll": "7cfad8f6ca5e0cfc0cc13c15bdb8fc623280aa72fd6aad73a7aacdd586a9c150",
+    "System.Networking.dll": "ec3b383eee5f202f0badeb48ad775df16de1b2a81d94843caf2391c21fa9e2e3",
+    "System.Web.dll": "edcae392b0cd0a4562680408830a931ad2bf92e5280157da16afd8967103474c",
     "System.runtime.neox": "98a1ae1da85387c87746957e83a4015eb59d0566539a915c69f168d2b511b190",
     "Core.dll": "3d4a676d379067c18a65a9beb8257ed40bf3196fc643a9ba1d559c619ec73fad"
   },
   "renderingEvidence": {
-    "normalized-sidecars.json": "bd359f088de4dbd1922f65934b20aae2a9bcdee10ea9d36d348641c9dd0d86f5",
-    "restored-xml-comments.json": "040530a55219be51bbfd9fa08ac896430c384858598fdd07eb4422dd4838a330"
+    "normalized-sidecars.json": "eb098802e45414e1a3909d08e06aef7ad20d15fc6d13f2d0c783e953b5bd6f3f",
+    "restored-xml-comments.json": "f86ee17c69a3a26737ad55199627d097a55a6f7d1037edfdaf2478862d2597cd"
   },
   "scope": "Reviewed native API rendering; legacy coverage gaps remain explicitly marked by the website overlay."
 }

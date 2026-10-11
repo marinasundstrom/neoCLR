@@ -1,0 +1,68 @@
+module System.Collections
+
+import System.*
+
+import System.Option.*
+import System.Result.*
+
+/// Indexing, slicing and validated access to counted, ordered sequences. Import System.Collections.* to use these extensions.
+public extension SequenceAccess<T> for Sequence<T> {
+    /// Gets an element using a directional index. Invalid bounds fault.
+    val self[index: Index]: T => self[index.GetOffset(self.Count)]
+
+    /// Copies a range into independent storage. Invalid bounds fault.
+    val self[range: Range]: T[] {
+        get {
+            if self.Slice(range) is Ok(let result) {
+                return result
+            }
+            System.Fail("Range is outside the value")
+        }
+    }
+
+    /// Returns the indexed element, or None for invalid bounds. Does not provide a concurrent snapshot.
+    func Get(index: int) -> Option<T> {
+        if index < 0 {
+            return None
+        }
+        if index >= self.Count {
+            return None
+        }
+        return Some(self[index])
+    }
+
+    /// Resolves a directional index against Count, returning None for invalid bounds.
+    func Get(index: Index) -> Option<T> => self.Get(index.GetOffset(self.Count))
+
+    /// Copies a half-open range in enumeration order, or returns InvalidRangeError for invalid bounds.
+    /// Uses one iterator and does not require constant-time indexed access. No concurrent snapshot guarantee.
+    func Slice(range: Range) -> Result<T[], InvalidRangeError> {
+        if range.TryGetOffsetAndLength(self.Count) is Ok(let bounds) {
+            if self is List<T> list {
+                return Ok(list[range])
+            }
+            let result = System.Runtime.CompilerServices.CheckedStorage.Reserve<T>(bounds.Item2)
+            if bounds.Item2 == 0 {
+                return Ok(result)
+            }
+            use iterator = self.GetIterator()
+            var skipped = 0
+            while skipped < bounds.Item1 {
+                if !iterator.MoveNext() {
+                    return Error(InvalidRangeError())
+                }
+                skipped += 1
+            }
+            var copied = 0
+            while copied < bounds.Item2 {
+                if !iterator.MoveNext() {
+                    return Error(InvalidRangeError())
+                }
+                result[copied] = iterator.Current
+                copied += 1
+            }
+            return Ok(result)
+        }
+        return Error(InvalidRangeError())
+    }
+}

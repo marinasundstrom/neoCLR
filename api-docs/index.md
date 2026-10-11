@@ -72,3 +72,6 @@ These references are for runtime control, host integration and compiler tooling:
 
 Development API migration annotations use [ObsoleteAttribute](xref:System.ObsoleteAttribute),
 with nullable migration messages and compiler warning/error severity.
+
+[Sequence indexing and slicing](sequence-access.md) documents the development
+Index/Range extension and list contracts, copy semantics and safe alternatives.

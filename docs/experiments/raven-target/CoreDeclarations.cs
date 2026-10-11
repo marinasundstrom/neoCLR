@@ -219,6 +219,7 @@ static class CoreDeclarations
                 public TupleElementNamesAttribute(string[] transformNames) { }
             }
             public sealed class ExtensionAttribute : System.Attribute { }
+            internal sealed class SpecialNameAttribute : System.Attribute { }
             public sealed class RefSafetyRulesAttribute : System.Attribute {
                 public RefSafetyRulesAttribute(int version) { }
             }

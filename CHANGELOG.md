@@ -20,7 +20,13 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   and copy the selected text without materializing character arrays. Qualify combining
   accents, emoji, empty/bad ranges and evaluation order; the suite now has 12 cases
   and eight guards per mode. Native kernel checks include single-allocation accounting
-  under UBSan. Sequence slicing and comparative performance measurements remain open.
+  under UBSan. Add Sequence Index/Range extension indexers, Option-returning Get and
+  Result-returning Slice, with one-iterator fallback and List-specific dispatch.
+  List now requires Index read/write and Range copy indexers; ArrayList implements
+  both against Count with direct backing-storage copying. Custom List implementers
+  must add these members. Qualify 20 interpreter/macOS AOT cases and 10 fault guards
+  per mode, refresh API references, and record memory-view alternatives as a research
+  follow-up. Comparative performance measurements and Windows execution remain open.
 
 - Add Disposable HttpClient lifetime and an abstract HttpHandler base, owned and borrowed handler
   constructors, idempotent disposal and linked pending-request cancellation. Preserve

@@ -3190,6 +3190,37 @@
 <member name="P:System.String.Item(System.Range)">
       <summary>Copies a half-open grapheme range; invalid bounds fault.</summary>
     </member>
+<member name="P:System.Collections.ArrayList`1.Item(System.Index)">
+      <summary>Applies a directional index against Count; invalid element bounds fault.</summary>
+    </member>
+<member name="P:System.Collections.ArrayList`1.Item(System.Range)">
+      <summary>Returns an independent shallow array copy; invalid bounds fault.</summary>
+    </member>
+<member name="P:System.Collections.List`1.Item(System.Index)">
+      <summary>Gets or replaces an element using a directional index. Invalid bounds fault.</summary>
+    </member>
+<member name="P:System.Collections.List`1.Item(System.Range)">
+      <summary>Copies a range into independent storage. Invalid bounds fault.</summary>
+    </member>
 
+<member name="M:System.Collections.SequenceAccess.Get``1(System.Collections.Sequence{``0},System.Index)">
+      <summary>Resolves a directional index against Count, returning None for invalid bounds.</summary>
+    </member>
+<member name="M:System.Collections.SequenceAccess.Get``1(System.Collections.Sequence{``0},System.Int32)">
+      <summary>Returns the indexed element, or None for invalid bounds. Does not provide a concurrent snapshot.</summary>
+    </member>
+<member name="M:System.Collections.SequenceAccess.Slice``1(System.Collections.Sequence{``0},System.Range)">
+      <summary>Copies a half-open range in enumeration order, or returns InvalidRangeError for invalid bounds.
+Uses one iterator and does not require constant-time indexed access. No concurrent snapshot guarantee.</summary>
+    </member>
+<member name="P:System.Collections.SequenceAccess.Item(System.Index)">
+      <summary>Gets an element using a directional index. Invalid bounds fault.</summary>
+    </member>
+<member name="P:System.Collections.SequenceAccess.Item(System.Range)">
+      <summary>Copies a range into independent storage. Invalid bounds fault.</summary>
+    </member>
+<member name="T:System.Collections.SequenceAccess">
+      <summary>Indexing, slicing and validated access to counted, ordered sequences. Import System.Collections.* to use these extensions.</summary>
+    </member>
 </members>
 </doc>

@@ -1,6 +1,7 @@
 module NeoClr.RuntimeTests
 
 import System.*
+import System.Collections.*
 import System.Result.*
 import System.Option.*
 import NeoClr.Testing.*
@@ -230,4 +231,195 @@ class ObservedText {
         Calls = Calls * 10 + 2
         return 1
     }
+}
+
+[Test("ArrayList supports directional mutation and independent range copies")]
+func MListRanges() -> Result<unit, TestFailure> {
+    let list = System.Collections.ArrayList<int>(8)
+    list.Add(10)
+    list.Add(20)
+    list.Add(30)
+    list[^1] = 40
+    _ = Assert.Equal(40, list[^1])?
+    let copy = list[1..^0]
+    _ = Assert.Equal(2, copy.Length)?
+    copy[0] = 99
+    _ = Assert.Equal(20, list[1])?
+    _ = Assert.Equal(0, list[^0..].Length)?
+    _ = Assert.True(list.Get(Index.End) is None, "Count rather than capacity")?
+    return Assert.True(list.Slice(0..4) is Error(_), "Range excludes spare capacity")
+}
+
+[Test("Sequence slicing consumes one iterator without indexed reads")]
+func NSequenceSlices() -> Result<unit, TestFailure> {
+    let observed = ObservedSequence(5)
+    let sequence: System.Collections.Sequence<int> = observed
+    if sequence.Slice(1..^1) is Ok(let copy) {
+        _ = Assert.Equal(3, copy.Length)?
+        _ = Assert.Equal(2, copy[0])?
+        _ = Assert.Equal(4, copy[2])?
+    } else {
+        return Assert.True(false, "Missing sequence slice")
+    }
+    _ = Assert.Equal(1, observed.Acquired)?
+    _ = Assert.Equal(4, observed.Advanced)?
+    _ = Assert.Equal(3, observed.Reads)?
+    return Assert.Equal(1, observed.Disposed)
+}
+
+[Test("Sequence invalid and empty slices do not acquire iterators")]
+func OSequenceBoundaries() -> Result<unit, TestFailure> {
+    let observed = ObservedSequence(5)
+    let sequence: System.Collections.Sequence<int> = observed
+    _ = Assert.True(sequence.Slice(4..2) is Error(_), "Reversed")?
+    _ = Assert.True(sequence.Slice(..6) is Error(_), "Past end")?
+    _ = Assert.True(sequence.Get(5) is None, "Invalid index")?
+    if sequence.Slice(^0..) is Ok(let copy) {
+        _ = Assert.Equal(0, copy.Length)?
+    } else {
+        return Assert.True(false, "Missing empty slice")
+    }
+    return Assert.Equal(0, observed.Acquired)
+}
+
+[Test("Sequence slicing disposes when enumeration ends before Count")]
+func PSequenceShortSource() -> Result<unit, TestFailure> {
+    let observed = ObservedSequence(2)
+    let sequence: System.Collections.Sequence<int> = observed
+    _ = Assert.True(sequence.Slice(1..4) is Error(_), "Short source")?
+    _ = Assert.Equal(1, observed.Reads)?
+    return Assert.Equal(1, observed.Disposed)
+}
+
+[Test("Sequence safe indexing and slicing work through array aliases")]
+func QSequenceAliases() -> Result<unit, TestFailure> {
+    let values: int[] = [10, 20, 30]
+    let sequence: System.Collections.Sequence<int> = values
+    if sequence.Get(^1) is Some(let last) {
+        _ = Assert.Equal(30, last)?
+    } else {
+        return Assert.True(false, "Last element")
+    }
+    if sequence.Slice(..2) is Ok(let copy) {
+        copy[0] = 99
+        return Assert.Equal(10, values[0])
+    }
+    return Assert.True(false, "Missing slice")
+}
+
+class ObservedSequence : System.Collections.Sequence<int> {
+    private val available: int
+    var Acquired: int = 0
+    var Advanced: int = 0
+    var Reads: int = 0
+    var Disposed: int = 0
+    init(available: int) { self.available = available }
+    val Count: int => 5
+    val self[index: int]: int {
+        get {
+            System.Fail("Slice must not read the sequence indexer")
+            return 0
+        }
+    }
+    func GetIterator() -> System.Collections.Iterator<int> {
+        Acquired += 1
+        return ObservedSequenceIterator(self, available)
+    }
+}
+
+class ObservedSequenceIterator : System.Collections.Iterator<int> {
+    private val owner: ObservedSequence
+    private val available: int
+    private var position: int = 0
+    init(owner: ObservedSequence, available: int) {
+        self.owner = owner
+        self.available = available
+    }
+    func MoveNext() -> bool {
+        owner.Advanced += 1
+        position += 1
+        return position <= available
+    }
+    val Current: int {
+        get {
+            owner.Reads += 1
+            return position
+        }
+    }
+    func Dispose() { owner.Disposed += 1 }
+}
+
+
+[Test("Sequence extension indexers provide default access and independent slices")]
+func RSequenceSyntax() -> Result<unit, TestFailure> {
+    let values: int[] = [10, 20, 30]
+    let sequence: Sequence<int> = values
+    _ = Assert.Equal(30, sequence[^1])?
+    let copy = sequence[1..]
+    _ = Assert.Equal(2, copy.Length)?
+    copy[0] = 99
+    _ = Assert.Equal(20, values[1])?
+    let observed: Sequence<int> = ObservedSequence(5)
+    let fallback = observed[1..^1]
+    return Assert.Equal(3, fallback.Length)
+}
+
+[Test("Sequence slicing delegates to the list range contract")]
+func SListDispatch() -> Result<unit, TestFailure> {
+    let observed = DirectList()
+    let list: List<int> = observed
+    list[^1] = 30
+    _ = Assert.Equal(30, list[^1])?
+    let sequence: Sequence<int> = list
+    if sequence.Slice(1..) is Ok(let copy) {
+        _ = Assert.Equal(1, observed.Slices)?
+        _ = Assert.Equal(2, copy.Length)?
+        copy[0] = 99
+        _ = Assert.Equal(20, list[1])?
+    } else {
+        return Assert.True(false, "Expected list slice")
+    }
+    let fullCopy = sequence[..]
+    _ = Assert.Equal(2, observed.Slices)?
+    return Assert.Equal(3, fullCopy.Length)
+}
+
+class DirectList : List<int> {
+    private val values: int[] = [10, 20, 3]
+    var Slices: int = 0
+    val Count: int => values.Length
+    var self[index: int]: int {
+        get => values[index]
+        set { values[index] = value }
+    }
+    var self[index: Index]: int {
+        get => values[index]
+        set { values[index] = value }
+    }
+    val self[range: Range]: int[] {
+        get {
+            Slices += 1
+            return values[range]
+        }
+    }
+    func Add(value: int) { System.Fail("Fixed test list") }
+    func GetIterator() -> Iterator<int> {
+        System.Fail("List slicing must use the range indexer")
+    }
+}
+
+extension TestListAccess for ArrayList<int> {
+    var self[index: bool]: int {
+        get => self[0]
+        set { self[0] = value }
+    }
+}
+
+[Test("Native extension indexers support writes and compound assignment")]
+func TExtensionWrites() -> Result<unit, TestFailure> {
+    let values = ArrayList<int>()
+    values.Add(1)
+    values[true] = 2
+    values[true] += 40
+    return Assert.Equal(42, values[true])
 }

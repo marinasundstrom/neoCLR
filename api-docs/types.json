@@ -37,6 +37,7 @@
   "System.Collections.MutableSequence`1",
   "System.Collections.MutableSet`1",
   "System.Collections.Queue`1",
+  "System.Collections.SequenceAccess",
   "System.Collections.Sequence`1",
   "System.Collections.Set`1",
   "System.Collections.Stack`1",

@@ -1,5 +1,12 @@
 module System.Collections
 
+import System.*
+
 public interface List<T> : MutableSequence<T> {
+    /// Gets or replaces an element using a directional index. Invalid bounds fault.
+    var self[index: Index]: T { get; set }
+    /// Copies a range into independent storage. Invalid bounds fault.
+    val self[range: Range]: T[] { get }
+
     func Add(value: T)
 }

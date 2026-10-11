@@ -14277,3 +14277,29 @@ claim completion of in-process test discovery.
   each of interpreter and macOS AOT. Compiler changes committed as Raven `ad3409e06`;
   both API references refreshed. Windows runner is pinned to that compiler, with
   Windows execution pending. String/sequence slicing is still open.
+
+
+## 2026-10-11 — Extension indexers, specialized lists and future memory views
+
+- **Author:** directed implementation of extension indexers in Raven, then clarified
+  that list interfaces and ArrayList should provide their own efficient indexing
+  and slicing. Sequence extensions supply default slicing and may dispatch to
+  implementing types with better access.
+- **Assistant action:** implemented the shared Raven language feature on main
+  (`32f2a35b8`), with 159 focused tests passing, and began native integration.
+  Instance indexers take precedence; the collection slice adds list contracts and
+  a sequence fallback. Native qualification is in progress at this entry.
+- **Author follow-up:** investigate Span, ReadOnlySpan, Memory and ReadOnlyMemory
+  after this slice, including alternatives made possible by control over neoCLR's
+  experimental allocation and reference model and its intentional CLI differences.
+- **Assistant proposal:** compare owner/offset views, runtime-managed slice
+  references and explicit borrowing against .NET's APIs. Assess moving-GC safety,
+  retention, aliasing, async lifetimes, interop and allocation/copy costs. These are
+  alternatives to research, not selected APIs or implementation commitments.
+  Current slicing remains an independent shallow copy.
+
+- **Subsequent outcome:** the native library/consumer path passes 20 framework
+  cases and ten fault guards in interpreter and macOS ARM64 AOT. List-specific
+  dispatch and the sequence fallback have separate executable checks. The shared
+  Raven implementation is committed; native/API completion is recorded with the
+  slice's final changelog and [Index/Range evidence](design/index-range.md).

@@ -141,3 +141,53 @@ same library/kernel through the existing CI runner; execution remains pending.
 
 Suitable sequence APIs and performance comparison remain next. No compiler change
 was required beyond the preceding Index/Range lowering commit.
+
+
+## Sequence and list contracts — 2026-10-11
+
+`SequenceAccess<T>` supplies Index/Range extension indexers, Get(int/Index) returning
+Option, and Slice(Range) returning Result<T[], InvalidRangeError>. The default
+slice validates against Count, skips to the start with one iterator and copies
+exactly the requested elements. It disposes on normal completion and early
+exhaustion; invalid and empty default slices acquire no iterator. A provider that
+ends before Count produces InvalidRangeError. Provider faults remain terminal.
+
+`List<T>` declares Index get/set and Range get contracts; ArrayList implements them
+using its logical Count, never its spare capacity. Range access returns independent
+shallow storage using the existing linear copy helper. Sequence.Slice checks for
+List<T> after bounds validation and delegates to that interface's Range indexer.
+Other sequence implementations retain the iterator fallback. This avoids assuming
+constant-time indexed access for an arbitrary sequence. There is no concurrent
+snapshot guarantee, and list implementations must honor the copy contract.
+
+Raven prefers applicable instance indexers to extension indexers. A read-only
+instance indexer cannot be bypassed by a writable extension. A list-typed expression
+therefore selects its declared contract; an expression typed as Sequence uses the
+extension fallback, whose Slice method dispatches to a List when available.
+
+Compared with .NET List.GetRange, the result is likewise a shallow independent copy,
+but neoCLR returns an array and exposes a Range member in its List interface. The
+benefit is a common slice contract and provider-specific copying; the cost is an
+additional member required of every List implementer. Unlike IEnumerable, Sequence
+requires Count and indexed read capability. Arbitrary Iterable slicing is excluded.
+Primary comparisons: [List<T> implementation](https://github.com/dotnet/runtime/blob/v10.0.0/src/libraries/System.Private.CoreLib/src/System/Collections/Generic/List.cs)
+and [C# indices/ranges](https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/operators/member-access-operators#indices-and-ranges).
+
+After this slice, investigate view/buffer APIs against .NET Span, ReadOnlySpan,
+Memory and ReadOnlyMemory. Candidate designs may change neoCLR allocation and
+reference representation: owner-plus-offset views, runtime-managed slice references
+and explicit borrowing. Evaluate relocation/GC roots, retention, aliasing, async
+lifetimes, native/CLI interop and measured copy/allocation costs before selecting
+public types. No representation or zero-copy API is committed by this plan.
+
+
+Sequence qualification: [retained report](../../runtime/raven/tests/sequence-access-validation.json),
+from `target/extension-indexer-final-tests-fixed/report.json`, using
+`target/extension-indexer-final-bundle` and `target/extension-indexer-libraries-v4`.
+Libraries use Raven 9e542200d; the consumer compiler includes the subsequent
+reference-identity candidate-deduplication fix at Raven `163050da2`. Twenty cases and ten
+fault guards pass in each of interpreter and macOS ARM64 AOT. The tests prove one
+iterator/no indexed reads for the fallback, List dispatch/no iterator on the fast
+path, independent copies, generic metadata import, writes and compound assignment.
+They establish behavior and algorithm shape, not comparative throughput. Windows
+execution remains pending; existing collections CI uses the matching compiler pin.

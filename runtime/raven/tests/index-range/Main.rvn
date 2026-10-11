@@ -31,6 +31,16 @@ func Main(arguments: string[]) -> int {
         if name == "string-past-end" {
             _ = "é🙂"[..3]
         }
+        if name == "list-capacity" {
+            let list = System.Collections.ArrayList<int>(8)
+            list.Add(1)
+            _ = list[..2]
+        }
+        if name == "list-end" {
+            let list = System.Collections.ArrayList<int>()
+            list.Add(1)
+            _ = list[^0]
+        }
         Console.WriteLine("ERROR guard did not fault")
         return 0
     }

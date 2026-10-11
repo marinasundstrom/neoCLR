@@ -1742,3 +1742,14 @@ Index/Range development snapshots. Grapheme boundaries match Length; Get returns
 Option<char>, Slice returns Result<string, InvalidRangeError>, and indexers may fault.
 Slices contain copied immutable text; no view or encoding API is implied. The private
 StringSliceGraphemes runtime service is internal and is not a public API omission.
+
+
+### Sequence/list Index and Range access
+
+SequenceAccess is selected in both reference paths. Its two extension indexers,
+Get overloads and Slice method are covered alongside List/ArrayList Index/Range
+members. [The manual contract](sequence-access.md) supplies copy, error, dispatch
+and iterator semantics. The CLI facade uses special-name static accessors; native
+import reconstructs indexers from native methods. System.Collections is an extension
+namespace for receiver-page browsing. No public type or member is excluded for this
+slice; the internal SpecialNameAttribute exists only in the aggregate C# facade.

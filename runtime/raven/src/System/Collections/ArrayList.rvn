@@ -1,5 +1,7 @@
 module System.Collections
 
+import System.*
+
 import System.Option.*
 
 public open class ArrayList<T> : List<T> {
@@ -45,6 +47,20 @@ public open class ArrayList<T> : List<T> {
                 System.Fail("ArrayList index out of range")
             }
             data[index] = value
+        }
+    }
+
+    /// Applies a directional index against Count; invalid element bounds fault.
+    var self[index: Index]: T {
+        get => self[index.GetOffset(count)]
+        set { self[index.GetOffset(count)] = value }
+    }
+
+    /// Returns an independent shallow array copy; invalid bounds fault.
+    val self[range: Range]: T[] {
+        get {
+            let bounds = range.GetOffsetAndLength(count)
+            return System.Runtime.CompilerServices.RuntimeHelpers.CopyRange<T>(data, bounds.Item1, bounds.Item2)
         }
     }
 

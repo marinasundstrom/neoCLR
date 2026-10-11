@@ -117,9 +117,22 @@ static class CollectionDeclarations
                 new T this[int index] { get; set; }
             }
             public interface List<T> : MutableSequence<T> {
+                T this[Index index] { get; set; }
+                T[] this[Range range] { get; }
                 void Add(T value);
             }
+            public static class SequenceAccess {
+                [System.Runtime.CompilerServices.SpecialName]
+                public static T get_Item<T>(this Sequence<T> source, Index index) => default;
+                [System.Runtime.CompilerServices.SpecialName]
+                public static T[] get_Item<T>(this Sequence<T> source, Range range) => default;
+                public static Option<T> Get<T>(this Sequence<T> source, int index) => default;
+                public static Option<T> Get<T>(this Sequence<T> source, Index index) => default;
+                public static Result<T[], InvalidRangeError> Slice<T>(this Sequence<T> source, Range range) => default;
+            }
             public class ArrayList<T> : List<T> {
+                public T this[Index index] { get => default; set { } }
+                public T[] this[Range range] => default;
                 public ArrayList() { }
                 public ArrayList(int capacity) { }
                 public ArrayList(Iterable<T> items) { }

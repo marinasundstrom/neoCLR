@@ -263,6 +263,14 @@ INDEX_RANGE_NAMES = [
     'String ranges preserve graphemes and half-open boundaries',
     'String safe access rejects invalid grapheme bounds',
     'String slicing evaluates receiver and bounds once',
+    'ArrayList supports directional mutation and independent range copies',
+    'Sequence slicing consumes one iterator without indexed reads',
+    'Sequence invalid and empty slices do not acquire iterators',
+    'Sequence slicing disposes when enumeration ends before Count',
+    'Sequence safe indexing and slicing work through array aliases',
+    'Sequence extension indexers provide default access and independent slices',
+    'Sequence slicing delegates to the list range contract',
+    'Native extension indexers support writes and compound assignment',
 ]
 HTTP_METHOD_VALUES_NAMES = [
     'HTTP custom method construction and parsing preserve spelling',
@@ -431,6 +439,8 @@ def main():
                     'negative-index': 'Index value must be nonnegative',
                     'negative-conversion': 'Index value must be nonnegative',
                     'negative-length': 'Range length must be nonnegative',
+                    'list-capacity': 'Range is outside the value',
+                    'list-end': 'ArrayList index out of range',
                     'string-reversed': 'Range is outside the value',
                     'string-past-end': 'Range is outside the value',
                     'reversed': 'Range is outside the value',

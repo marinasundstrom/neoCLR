@@ -53,7 +53,8 @@
     "System",
     "System.Linq",
     "System.Runtime.Reflection",
-    "System.Tasks"
+    "System.Tasks",
+    "System.Collections"
   ],
   "search": true,
   "copyCode": true,

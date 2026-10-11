@@ -437,8 +437,13 @@ slice is implemented locally: Index/Range values, from-end read/write, half-open
 copies, Option-returning Get and Result-returning Slice. Nine framework cases and six
 fault guards pass in interpreter and macOS AOT. The author clarified that consuming
 APIs may fault; Index/Range describe positions. String Index/Range access and safe Get/Slice now pass locally with grapheme boundaries;
-sequence slicing remains next;
-arbitrary Iterable indexing and borrowed views remain outside this slice. See the
+sequence Index/Range extensions, List contracts and ArrayList direct copying now pass
+20 framework cases and 10 guards per mode in local interpreter/macOS AOT;
+arbitrary Iterable indexing and borrowed views remain outside this slice. The author additionally
+requested a memory-view design investigation after this slice (2026-10-11): compare
+.NET Span/ReadOnlySpan/Memory/ReadOnlyMemory with alternatives enabled by neoCLR's
+allocation/reference model, including lifetime, GC, async and CLI tradeoffs. This
+is a research follow-up, not a commitment to four matching types. See the
 [contract and evidence](design/index-range.md). Windows execution is pending.
 The host metadata model and native manifests now preserve assembly annotations through
 CLI/native snapshots and CLI reference projection. Loader checks validate constructor
