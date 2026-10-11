@@ -37,10 +37,13 @@ module SchedulerContinuations {
         }
 
         func Publish() -> System.Void {
-            if !source.Complete(42) {
+            if IsCompleted {
                 System.Fail("Duplicate completion")
             }
             Dispatch()
+            if !source.Complete(42) {
+                System.Fail("Duplicate completion")
+            }
             return ()
         }
 
@@ -51,19 +54,20 @@ module SchedulerContinuations {
         }
 
         func Cancel() -> System.Void {
-            if !source.Cancel() {
+            if IsCompleted {
                 System.Fail("Duplicate cancellation")
             }
             Dispatch()
+            if !source.Cancel() {
+                System.Fail("Duplicate cancellation")
+            }
             return ()
         }
 
         private func Dispatch() {
             let pending = callbacks
+            Continuation.SubmitBatch(pending)
             callbacks = ArrayList<Continuation>()
-            for registration in pending {
-                _ = registration.TrySubmit()
-            }
         }
 
         // Explicit OnCompleted below tests deferred outcome observation, not await.

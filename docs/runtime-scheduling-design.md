@@ -1222,3 +1222,33 @@ settled. No benchmark conclusion follows from this correctness experiment.
 
 No public signatures, compiler lowering, bridge encoding or Runtime Contract settings
 change. Website/API capability statements remain unchanged; this is internal evidence.
+
+
+## Completion batch adapter — 2026-10-11
+
+Following the architecture discussion, the assistant recommended managed Task/Promise
+state and pending relationships, a managed Scheduler projection, and runtime-owned
+runnable work. The author directed continuation. The first implementation step is a
+source-included managed batch adapter over the existing runtime submission service.
+The runtime roots one batch graph, rather than separately admitting each waiting callback.
+
+The adapter validates destinations, submits once, marks active observers admitted, then
+allows the operation to publish completion or cancellation. Under the existing serial
+owner-thread contract callbacks cannot run until publication finishes. An admission fault
+therefore does not publish an outcome or admit only a prefix of the waiters. Successful
+admission prevents subsequent observer disposal from retracting work. Explicit registration
+after completion still uses individual deferred submission.
+
+[Evidence and reproduction](experiments/scheduler-continuations/README.md#completion-batch-admission--2026-10-11)
+cover 128 generated awaiters with only one free runtime slot, deferred observation,
+cancellation publication and terminal in-batch faults. The managed ownership experiment
+still reclaims abandoned cycles in interpreter GC. Existing .NET managed pending storage
+comparison applies; batching is an internal ownership choice, not a new Task semantic.
+
+This step does not yet deliver the proposed incremental runtime batch dispatcher. It
+runs the batch in one turn, trading fewer admission slots for potentially longer turns.
+No throughput/fairness improvement is claimed. A completely full runtime queue still
+faults before outcome publication; define a runtime-owned backlog/draining policy before
+production migration. Races, native explicit-GC parity and cross-invocation routing remain
+gates. The public library is unchanged and needs no API snapshot or website capability
+update. No new bridge ABI, metadata or compiler lowering is introduced.

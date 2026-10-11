@@ -1,0 +1,26 @@
+module SchedulerContinuations {
+    import System.*
+    import System.Tasks.*
+
+    func FailInBatch() -> System.Void {
+        System.Fail("batch callback fault")
+        return ()
+    }
+
+    func MustNotRun() -> System.Void {
+        Console.WriteLine("Unexpected callback after batch fault")
+        return ()
+    }
+
+    async func Main() -> Task<int> {
+        let operation = Completion(UnpumpedProducer())
+        // Explicit observers exercise a fault inside the dispatch adapter.
+        operation.OnCompleted(FailInBatch)
+        operation.OnCompleted(MustNotRun)
+        operation.Publish()
+        // Keep the entry waiting until the submitted batch produces its fault.
+        let neverCompleted = Promise<int>()
+        _ = await neverCompleted.Task
+        return 0
+    }
+}

@@ -167,11 +167,48 @@ GC service binding/diagnostic qualification remains a next gate, alongside socke
 completion-source coverage. Existing native lifecycle runs establish execution behavior,
 not the bounded retained-object assertion from this consumer. Windows was not run.
 
-The simpler ownership model avoids dormant runtime slots and conditional collector edges,
-but loses registration-time capacity reservation. Completion can now fault while admitting
+The initial managed ownership evidence above predates batch admission. That version
+avoids dormant runtime slots and conditional collector edges, but loses registration-time
+capacity reservation. In that version, completion can fault while admitting
 a large fan-out, after publishing its outcome and possibly admitting earlier waiters.
 The fixed 64-slot submission budget therefore needs a deliberate bulk-admission/draining
 policy before public migration. Cross-thread completion, races and cross-invocation
 routing remain open. Per-registration ArrayList storage is intentionally provisional;
 no allocation or performance advantage is claimed. See the
 [design comparison](../../runtime-scheduling-design.md#managed-pending-callbacks--ownership-comparison-2026-10-11).
+
+
+## Completion batch admission — 2026-10-11
+
+The managed variant now submits one rooted `ContinuationBatch.Run` callable for all
+pending waiters. It first validates their captured destinations, then makes one runtime
+admission, and only on success marks registrations submitted and detaches the operation's
+pending list. Completion/cancellation publishes its outcome after that admission. Dispatch
+is deferred on the same owner thread, so callbacks see the published outcome. Cancelling
+or disposing an admitted observer cannot retract it, even before the batch begins.
+Already-withdrawn observers are skipped; an entirely inactive list needs no queue slot.
+The runtime-owned dormant-registration variant still activates its pre-reserved slots.
+
+This closes partial fan-out admission caused by the 64-slot limit: 128 generated awaiters
+and one explicit observer complete with 63 existing submissions occupying the queue.
+The test awaits a separate signal for existing runnable work rather than assuming its
+ordering relative to the batch. Another case delivers 128 cancellation observers after
+outcome publication. A fault in a batch remains terminal: later callbacks do not execute,
+and the existing host teardown checks release rooted batch state.
+
+[Batch evidence](batch-validation.json) contains twelve interpreter/JIT/AOT executions
+(shared lifecycle/fault, large fan-out/cancellation, in-batch fault) and the interpreter
+explicit-GC ownership case. [Reserved-registration regression](batch-runtime-validation.json)
+contains six executions of the original variant through the common completion adapter.
+Use the same `--managed-continuations` and `--continuations` commands above. Native
+reclamation counters and Windows remain unqualified. Await inside `for` is rejected by
+the current compiler cancellation protocol; the fan-out test uses an explicit index loop.
+
+This is a transitional managed adapter for runtime-owned runnable work, not a new native
+batch ABI. The existing runtime root owns the batch's managed graph. All callbacks run in
+one dispatch turn; incremental draining, fairness and admission when *every* runtime slot
+is occupied remain open. A full queue rejects the single admission before the operation
+publishes its outcome; this is not an infallible completion contract. Allocation failure
+or terminal callback faults are not transactional rollback. Cross-thread publication is
+unsupported; publishing after admission relies on owner-thread deferred dispatch.
+No public Task/Promise/Scheduler API, Runtime Contract or compiler emission changes.

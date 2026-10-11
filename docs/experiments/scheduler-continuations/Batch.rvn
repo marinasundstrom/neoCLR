@@ -1,0 +1,95 @@
+module SchedulerContinuations {
+    import System.*
+    import System.Collections.*
+    import System.Tasks.*
+
+    class Counter {
+        var Count = 0
+        val Done = Promise<int>()
+
+        func Increment() -> System.Void {
+            Count += 1
+            if Count == 64 {
+                Done.Complete(Count)
+            }
+            return ()
+        }
+    }
+
+    async func Wait(operation: Completion) -> Task<int> {
+        return await operation
+    }
+
+    class CancellationCounter {
+        private val operation: Completion
+        var Count = 0
+        val Done = Promise<int>()
+
+        init(operation: Completion) {
+            self.operation = operation
+        }
+
+        func Observe() -> System.Void {
+            if !operation.IsCancelled {
+                System.Fail("Cancellation batch ran before outcome publication")
+            }
+            Count += 1
+            if Count == 128 {
+                Done.Complete(Count)
+            }
+            return ()
+        }
+    }
+
+    async func Main() -> Task<int> {
+        let operation = Completion(UnpumpedProducer())
+        let waiters = ArrayList<Task<int>>()
+        var index = 0
+        while index < 128 {
+            waiters.Add(Wait(operation))
+            index += 1
+        }
+        let counter = Counter()
+        let observer = operation.Subscribe(counter.Increment)
+        // Leave exactly one of the private runtime's 64 submission slots free.
+        index = 0
+        while index < 63 {
+            _ = neoCLR.Runtime.SchedulerSubmit(counter.Increment)
+            index += 1
+        }
+        operation.Publish()
+        observer.Dispose()
+        if counter.Count != 0 || observer.Cancel() {
+            System.Fail("Batch ran inline or disposal retracted admitted observer")
+        }
+        // Await inside for is not admitted by the current cancellation lowering.
+        index = 0
+        while index < waiters.Count {
+            let value = await waiters[index]
+            if value != 42 {
+                System.Fail("Batch lost an await result")
+            }
+            index += 1
+        }
+        _ = await counter.Done.Task
+        if counter.Count != 64 {
+            System.Fail("Batch observer or existing runnable work was lost")
+        }
+        Console.WriteLine("PASS 128 awaiters and observer admitted with one available slot")
+        let cancelled = Completion(UnpumpedProducer())
+        let cancellations = CancellationCounter(cancelled)
+        index = 0
+        while index < 128 {
+            // Explicit observation checks cancellation without awaiting its value.
+            cancelled.OnCompleted(cancellations.Observe)
+            index += 1
+        }
+        cancelled.Cancel()
+        let count = await cancellations.Done.Task
+        if count != 128 || cancellations.Count != 128 {
+            System.Fail("Cancellation batch lost an observer")
+        }
+        Console.WriteLine("PASS cancellation batch publishes outcome before observation")
+        return 0
+    }
+}

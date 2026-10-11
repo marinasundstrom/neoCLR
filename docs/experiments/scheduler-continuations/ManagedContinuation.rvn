@@ -15,6 +15,50 @@ module SchedulerContinuations {
             callbacks.Add(callback)
         }
 
+        static func SubmitBatch(pending: ArrayList<Continuation>) {
+            let destination = neoCLR.Runtime.SchedulerCapture()
+            var count = 0
+            for registration in pending {
+                if registration.ValidatePending(destination) {
+                    count += 1
+                }
+            }
+            if count == 0 {
+                return
+            }
+            let batch = ContinuationBatch(pending)
+            // No managed registration changes until this single admission succeeds.
+            _ = neoCLR.Runtime.SchedulerSubmitTo(destination, batch.Run)
+            for registration in pending {
+                registration.Admit()
+            }
+        }
+
+        func ValidatePending(current: long) -> bool {
+            if submitted || withdrawn {
+                return false
+            }
+            if destination != current {
+                System.Fail("Scheduler destination is not current")
+            }
+            return true
+        }
+
+        func Admit() {
+            if !withdrawn {
+                submitted = true
+            }
+        }
+
+        func InvokeAdmitted() {
+            if withdrawn || callbacks.Count == 0 {
+                return
+            }
+            let callback = callbacks[0]
+            callbacks = ArrayList<() -> System.Void>()
+            callback()
+        }
+
         func TrySubmit() -> bool {
             if submitted || withdrawn {
                 return false
@@ -42,6 +86,23 @@ module SchedulerContinuations {
 
         func Dispose() {
             _ = Cancel()
+        }
+    }
+
+    // Transitional adapter: one runtime-owned callable roots the entire batch.
+    // It drains in one turn; incremental runtime dispatch remains future work.
+    class ContinuationBatch {
+        private val pending: ArrayList<Continuation>
+
+        init(pending: ArrayList<Continuation>) {
+            self.pending = pending
+        }
+
+        func Run() -> System.Void {
+            for registration in pending {
+                registration.InvokeAdmitted()
+            }
+            return ()
         }
     }
 }

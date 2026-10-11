@@ -14830,3 +14830,20 @@ outside benchmark measurement. Implementation follows the configuration slice.
   completion-time fan-out can exhaust the fixed submission budget. Both are recorded in
   the [comparison](runtime-scheduling-design.md#managed-pending-callbacks--ownership-comparison-2026-10-11).
   No public migration or performance improvement is claimed.
+
+
+### 2026-10-11 — Task, Promise, Scheduler and runtime ownership
+
+- **Author:** asks for the best architecture given Task, Promise and Scheduler, with
+  the actual Scheduler implementation in the runtime, then directs continuation.
+- **Assistant recommendation:** managed Task consumer state, Promise producer authority
+  and pending continuation relationships; managed Scheduler projects runtime destinations.
+  Runtime owns runnable work, wakeups and execution. Compiler state-machine callbacks
+  and future suspended executions should share this scheduling boundary.
+- **Action:** added a managed completion batch adapter over runtime submission. One
+  admission owns the pending graph, preventing queue capacity from accepting only part
+  of a completion's waiters. Tests cover large fan-out, cancellation and in-batch faults.
+- **Limits:** this adapter drains in one turn and still needs a free runtime slot.
+  Incremental runtime dispatch, full-queue admission policy, native reclamation and
+  race semantics remain open; public Task migration has not occurred. See the
+  [design](runtime-scheduling-design.md#completion-batch-adapter--2026-10-11).

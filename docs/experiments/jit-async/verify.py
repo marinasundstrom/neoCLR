@@ -100,6 +100,10 @@ def main():
                  ('continuation-fault', ROOT/'docs/experiments/scheduler-continuations/Fault.rvn', [], 1,
                   '', 'fault after continuation submission')]
     if args.managed_continuations:
+        cases += [('continuation-batch', ROOT/'docs/experiments/scheduler-continuations/Batch.rvn', [], 0,
+                   'PASS 128 awaiters and observer admitted with one available slot\n'
+                   'PASS cancellation batch publishes outcome before observation\n', None),
+                  ('batch-fault', ROOT/'docs/experiments/scheduler-continuations/BatchFault.rvn', [], 1, '', 'batch callback fault')]
         cases += [('managed-ownership', ROOT/'docs/experiments/scheduler-continuations/ManagedOwnership.rvn', [], 0,
                    'PASS abandoned await cycles reclaimed\n'
                    'PASS live operation retains unobserved waiter across collection\n'

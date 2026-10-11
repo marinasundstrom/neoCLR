@@ -8,6 +8,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-11
 
+- Admit pending continuations as one runtime-rooted managed batch in the internal
+  scheduler experiment, before publishing completion/cancellation. Qualify 128 awaiters
+  with one free submission slot, observer disposal after admission, cancellation and
+  terminal in-batch faults in interpreter/JIT/AOT. Public Task routing remains unchanged;
+  incremental dispatch, full-queue policy and native reclamation diagnostics remain open.
+
 - Compare managed pending-continuation ownership with dormant runtime registrations.
   Shared lifecycle/fault cases pass in interpreter/JIT/AOT; explicit interpreter GC
   reclaims abandoned generated awaits while preserving live operation, runnable and

@@ -66,7 +66,11 @@ heap. A [managed-storage alternative](experiments/scheduler-continuations/README
 now proves reclamation of abandoned Raven awaits and preservation of live operation,
 submission and timer roots under interpreter collection. Shared lifecycle cases pass in
 all three local modes. Prefer this simpler ownership provisionally; native reclamation,
-completion-capacity policy and production migration remain open. The original runtime
+completion-capacity policy and production migration remain open. A
+[batch adapter](experiments/scheduler-continuations/README.md#completion-batch-admission--2026-10-11)
+now admits 128 awaiters using one runnable slot in all three modes, before outcome
+publication. It drains in one turn; incremental fairness and full-queue policy remain
+open. The original runtime
 registration service still retains strong roots. The interpreter readiness query now includes
 submitted work and keeps source/submission arbitration private;
 [quiescence contract and validation](runtime-scheduling-design.md#unified-interpreter-readiness--2026-10-11).

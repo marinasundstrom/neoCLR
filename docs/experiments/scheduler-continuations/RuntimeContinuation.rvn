@@ -1,5 +1,6 @@
 module SchedulerContinuations {
     import System.*
+    import System.Collections.*
 
     class Continuation : Disposable {
         private val registration: long
@@ -9,6 +10,12 @@ module SchedulerContinuations {
         init(callback: () -> System.Void) {
             let destination = neoCLR.Runtime.SchedulerCapture()
             registration = neoCLR.Runtime.SchedulerRegister(destination, callback)
+        }
+
+        static func SubmitBatch(pending: ArrayList<Continuation>) {
+            for registration in pending {
+                _ = registration.TrySubmit()
+            }
         }
 
         func TrySubmit() -> bool {
