@@ -226,7 +226,7 @@ internal class HttpResponseDecoder {
             } else {
                 expected = length
                 if expected == -3 {
-                    chunks = HttpChunkDecoder(body, statusCode == 205)
+                    chunks = HttpChunkDecoder(body, statusCode == 205, HttpWireLimits.BodyBytes)
                 }
             }
         }

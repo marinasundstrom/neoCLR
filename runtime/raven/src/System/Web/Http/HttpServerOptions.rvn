@@ -1,0 +1,72 @@
+module System.Web.Http
+
+import System.*
+import System.Result.*
+import System.Time.*
+
+/// <summary>Configures buffered request admission and exchange deadlines.</summary>
+/// <remarks>Listen validates and snapshots these values before opening a socket. Later mutation has no effect on an existing server. These limits do not reserve host memory.</remarks>
+public class HttpServerOptions {
+    init() { }
+
+    /// <summary>Maximum decoded request body bytes, from zero through 1,048,576. Defaults to 1,048,576.</summary>
+    var MaxRequestBodySize: int { get; set; } = 1048576
+
+    /// <summary>Maximum request-line and header bytes, including delimiters, from one through 32,768. Defaults to 32,768.</summary>
+    var MaxRequestHeadersTotalSize: int { get; set; } = 32768
+
+    /// <summary>Maximum request header fields, including Host, from one through 100. Defaults to 100.</summary>
+    var MaxRequestHeaderCount: int { get; set; } = 100
+
+    /// <summary>Total header/body read budget after accepting a connection. Defaults to 15 seconds.</summary>
+    /// <remarks>Must be positive and at most 60 seconds. Fractional milliseconds round upward. Does not limit waiting for a connection or handler execution.</remarks>
+    var RequestReadTimeout: Duration { get; set; } = Duration.FromTicks(150000000L)
+
+    /// <summary>Total response write budget after encoding. Defaults to 15 seconds.</summary>
+    /// <remarks>Must be positive and at most 60 seconds. Fractional milliseconds round upward. The deadline is not renewed per write.</remarks>
+    var ResponseWriteTimeout: Duration { get; set; } = Duration.FromTicks(150000000L)
+}
+
+internal class HttpServerSettings {
+    private val bodyBytes: int
+    private val headerBytes: int
+    private val headerCount: int
+    private val readMilliseconds: int
+    private val writeMilliseconds: int
+
+    private init(bodyBytes: int, headerBytes: int, headerCount: int, readMilliseconds: int, writeMilliseconds: int) {
+        self.bodyBytes = bodyBytes
+        self.headerBytes = headerBytes
+        self.headerCount = headerCount
+        self.readMilliseconds = readMilliseconds
+        self.writeMilliseconds = writeMilliseconds
+    }
+
+    internal val BodyBytes: int => bodyBytes
+    internal val HeaderBytes: int => headerBytes
+    internal val HeaderCount: int => headerCount
+    internal val ReadMilliseconds: int => readMilliseconds
+    internal val WriteMilliseconds: int => writeMilliseconds
+
+    internal static func Create(options: HttpServerOptions) -> Result<HttpServerSettings, HttpError> {
+        let body = options.MaxRequestBodySize
+        let headers = options.MaxRequestHeadersTotalSize
+        let count = options.MaxRequestHeaderCount
+        let read = options.RequestReadTimeout
+        let write = options.ResponseWriteTimeout
+        if !(body >= 0 && body <= HttpWireLimits.BodyBytes) {
+            return Error(HttpError.InvalidRequest("MaxRequestBodySize is outside the supported range"))
+        }
+        if !(headers >= 1 && headers <= HttpWireLimits.HeaderBytes) {
+            return Error(HttpError.InvalidRequest("MaxRequestHeadersTotalSize is outside the supported range"))
+        }
+        if !(count >= 1 && count <= HttpWireLimits.HeaderCount) {
+            return Error(HttpError.InvalidRequest("MaxRequestHeaderCount is outside the supported range"))
+        }
+        if read.Ticks <= 0L || read.Ticks > 600000000L || write.Ticks <= 0L || write.Ticks > 600000000L {
+            return Error(HttpError.InvalidRequest("HTTP read/write timeouts must be positive and at most 60 seconds"))
+        }
+        return Ok(HttpServerSettings(body, headers, count,
+            (int)((read.Ticks + 9999L) / 10000L), (int)((write.Ticks + 9999L) / 10000L)))
+    }
+}

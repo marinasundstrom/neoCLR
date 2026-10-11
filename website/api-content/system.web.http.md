@@ -34,3 +34,9 @@ The 1 MiB admission ceiling is not a qualified transfer guarantee: the native
 stress-GC host currently exceeds its network deadline at that size. See the
 HTTP foundation evidence in `docs/http-foundation.md`
 for host budgets and validation limitations.
+
+`HttpServerOptions` configures smaller request body/header limits and read/write
+budgets. Pass it to the four-argument `HttpServer.Listen`; validation occurs before
+binding and later option mutations do not affect the server. Existing defaults
+remain 1 MiB bodies, 32 KiB/100 headers and 15-second phase deadlines. Positive
+timeouts through 60 seconds are supported; no infinite deadline is admitted.

@@ -15440,3 +15440,15 @@ or runtime-await default switch was performed.
   integration commit `2c8204d5`, rebased HTTP onto that baseline, rebuilt libraries
   and combined references, and added an HTTP JSON consumer of JsonArray indexing
   and iteration. Converter/options support remains an experiment outside runtime.
+- Author: “After this: Keep working on the HTTP support. Stay up to date with the
+  "platform priority" thread and branch.” The assistant continues in the HTTP
+  worktree, checks the platform chat/main baseline, and selects per-server admission
+  and explicit phase deadlines as the next bounded increment. Runtime ownership
+  and GC-policy implementation remain with the platform workstream.
+- Assistant outcome: the follow-up implements snapshotted request limits and phase
+  deadlines. All 18 configuration checks, 41 default-server framing checks and
+  four integrated JSON checks pass locally in macOS ARM64 interpreter/native modes.
+  All 35 client framing checks also pass; qualification is
+  recorded with the [HTTP evidence](experiments/http-foundation/README.md). The
+  platform chat continues its own runtime ownership work; no dirty changes were
+  imported from its main checkout.

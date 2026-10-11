@@ -6,7 +6,10 @@ by better HttpContent/JSON ergonomics. The [bounded foundation](http-foundation.
 adds practical buffered limits, shared request/response chunk parsing, informational
 response handling and content-oriented JSON helpers. Streaming, TLS, persistence and
 upgrade ownership remain subsequent gates; this does not qualify a production host
-or permanently reorder the runtime-async milestone.
+or permanently reorder the runtime-async milestone. The follow-up adds validated
+[per-server admission and deadline options](http-server-options.md) within the
+existing ceilings. Runtime ownership/GC changes remain coordinated with the
+platform workstream; the 1 MiB transfer boundary remains unqualified.
 
 **Concurrency ambition (2026-10-11):** the author aims for concurrency support
 beyond .NET and at least on par with Go. This is a target, not a measured claim.

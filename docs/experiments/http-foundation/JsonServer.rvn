@@ -30,9 +30,12 @@ func ConfigureJson(context: HttpContext) {
         System.Fail("Default JSON response failed")
     }
     let before = context.Response.Content
-    let unsupported = HttpContent.FromText("unsupported model")
-    if !(context.RespondJson(HttpStatusCode.BadRequest, unsupported) is Error(_)) {
-        System.Fail("Unsupported mapping accepted")
+    var oversized = "0123456789abcdef"
+    while oversized.Length < 1024 {
+        oversized = oversized + oversized
+    }
+    if !(context.RespondJson(HttpStatusCode.BadRequest, JsonString(oversized)) is Error(JsonError.LimitExceeded(_))) {
+        System.Fail("Oversized JSON accepted")
     }
     if context.Response.Content.Length != before.Length || context.Response.StatusCode != HttpStatusCode.OK {
         System.Fail("Serialization failure changed response")

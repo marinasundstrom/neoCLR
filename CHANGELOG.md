@@ -19,7 +19,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   allow explicit HTTP heap sizing. The 1 MiB wire test still exceeds deadlines
   under safepoint-stress collection and remains a qualification gap. Fix native
   reflection descriptors for closed function arguments and compact TypeShape
-  dispatch without increasing backend limits. See `docs/http-foundation.md`.
+  dispatch without increasing backend limits. Add validated, snapshotted
+  HttpServerOptions for smaller request admission and explicit read/write deadlines,
+  preserving existing Listen defaults. Allow an explicit native build command timeout
+  while retaining the existing default. See `docs/http-foundation.md` and
+  `docs/http-server-options.md`.
 
 - Add a read-only Sequence<JsonValue> view to JsonArray, with original-node indexing
   and ordered shallow snapshot iteration. Invalid indexer accesses terminate with a

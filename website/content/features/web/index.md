@@ -600,3 +600,13 @@ remains available when constructing explicit requests or responses.
 [Content JSON API](/docs/api/System/Web/Http/Json/HttpContentJsonExtensions/) ·
 [Response JSON API](/docs/api/System/Web/Http/Json/HttpContextJsonExtensions/).
 The existing JSON document/mapping limits still apply.
+
+### Server configuration (development)
+
+Pass [HttpServerOptions](/docs/api/System/Web/Http/HttpServerOptions/) to
+`HttpServer.Listen` to lower request body/header limits or select read/write
+deadlines. Listen validates and snapshots the settings; later changes to the
+options object do not affect the server. Existing defaults remain unchanged.
+The read budget covers headers and body after acceptance; the write budget starts
+after encoding. Both accept positive durations through 60 seconds. Host memory,
+stress-GC costs and the 1 MiB transfer qualification gap remain independent limits.

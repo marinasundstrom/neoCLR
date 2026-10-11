@@ -399,6 +399,7 @@
   "System.Web.Http.HttpRequest",
   "System.Web.Http.HttpResponse",
   "System.Web.Http.HttpServer",
+  "System.Web.Http.HttpServerOptions",
   "System.Web.Http.HttpSocketHandler",
   "System.Web.Http.HttpStatusCode",
   "System.Web.Http.Json.HttpClientJsonExtensions",

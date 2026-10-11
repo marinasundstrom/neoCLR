@@ -21,7 +21,11 @@ internal class HttpRequestDecoder {
     private var expected: int = -1
     private var body: ArrayList<byte> = ArrayList<byte>()
 
-    internal init() { }
+    private val settings: HttpServerSettings
+
+    internal init(settings: HttpServerSettings) {
+        self.settings = settings
+    }
     internal val Complete: bool => complete && !failed
 
     internal func Push(value: byte) -> Result<bool, HttpError> {
@@ -48,7 +52,7 @@ internal class HttpRequestDecoder {
             complete = body.Count == expected
             return Ok(complete)
         }
-        if head.Count >= HttpWireLimits.HeaderBytes {
+        if head.Count >= settings.HeaderBytes {
             return Error(HttpError.LimitExceeded("Request header limit exceeded"))
         }
         let count = head.Count
@@ -156,12 +160,12 @@ internal class HttpRequestDecoder {
                     return Error(HttpError.Protocol("Ambiguous request framing"))
                 }
                 if chunked {
-                    chunks = HttpChunkDecoder(body, method == "GET" || method == "DELETE" || method == "HEAD")
+                    chunks = HttpChunkDecoder(body, method == "GET" || method == "DELETE" || method == "HEAD", settings.BodyBytes)
                 }
                 expected = length
                 return HttpRequest.FromIncoming(method, target, host, headers, body)
             } else {
-                if headers.Count >= HttpWireLimits.HeaderCount {
+                if headers.Count >= settings.HeaderCount {
                     return Error(HttpError.LimitExceeded("Request header count exceeded"))
                 }
                 var colon = start
@@ -219,7 +223,7 @@ internal class HttpRequestDecoder {
                         if !(digit >= 0 && digit <= 9) {
                             return Error(HttpError.Protocol("Invalid request Content-Length"))
                         }
-                        if length > (HttpWireLimits.BodyBytes - digit) / 10 {
+                        if digit > settings.BodyBytes || length > (settings.BodyBytes - digit) / 10 {
                             return Error(HttpError.LimitExceeded("Request body limit exceeded"))
                         }
                         length = length * 10 + digit
@@ -237,6 +241,8 @@ internal class HttpRequestDecoder {
 }
 
 public class HttpServer {
+    private val settings: HttpServerSettings
+    internal val Settings: HttpServerSettings => settings
     private var listener: Socket
     private var shutdown: CancellationTokenSource = CancellationTokenSource()
     private var active: int = 0
@@ -248,14 +254,22 @@ public class HttpServer {
         active -= 1
     }
 
-    internal init(listener: Socket) {
+    internal init(listener: Socket, settings: HttpServerSettings) {
         self.listener = listener
+        self.settings = settings
     }
 
     static func Listen(address: string, port: int, backlog: int) -> Result<HttpServer, HttpError> {
+        return Listen(address, port, backlog, HttpServerOptions())
+    }
+
+    /// <summary>Validates and snapshots options before opening the listener.</summary>
+    /// <returns>A listening server, an InvalidRequest for unsupported options, or a transport error.</returns>
+    static func Listen(address: string, port: int, backlog: int, options: HttpServerOptions) -> Result<HttpServer, HttpError> {
+        let settings = HttpServerSettings.Create(options)?
         let result = Socket.Listen(address, port, backlog)
         if let Ok(listener) = result {
-            return Ok(HttpServer(listener))
+            return Ok(HttpServer(listener, settings))
         }
         if let Error(reason) = result {
             return Error(HttpError.Transport(reason))
@@ -493,7 +507,7 @@ public class HttpContext : Disposable {
         let encoded = HttpServer.EncodeResponse(response, if request.Method.Method == "HEAD" { 1 } else { 0 })
         if let Ok(bytes) = encoded {
             outgoing = bytes
-            deadline = NetworkDeadline.AfterMilliseconds(15000)
+            deadline = NetworkDeadline.AfterMilliseconds(owner.Settings.WriteMilliseconds)
             SendNext()
         } else if let Error(reason) = encoded {
             Finish(Error(reason))
@@ -589,11 +603,12 @@ internal class HttpServerExchange {
     private var socket: Option<Socket> = None()
     private var accepting: Option<Task<Result<Socket, SocketError>>> = None()
     private var transfer: Option<Task<Result<int, SocketError>>> = None()
-    private var decoder: HttpRequestDecoder = HttpRequestDecoder()
+    private val decoder: HttpRequestDecoder
     private var buffer: byte[] = CheckedStorage.Reserve<byte>(256)
     private var deadline = NetworkDeadline.Expired
 
     internal init(owner: HttpServer, listener: Socket, token: CancellationToken) {
+        decoder = HttpRequestDecoder(owner.Settings)
         self.owner = owner
         self.listener = listener
         callerRegistration = token.Register(self.RequestCancellation)
@@ -651,7 +666,7 @@ internal class HttpServerExchange {
             }
             if let Ok(connection) = pending.GetResult() {
                 socket = Some(connection)
-                deadline = NetworkDeadline.AfterMilliseconds(15000)
+                deadline = NetworkDeadline.AfterMilliseconds(owner.Settings.ReadMilliseconds)
                 ReceiveNext()
             } else if let Error(reason) = pending.GetResult() {
                 Fail(HttpError.Transport(reason))

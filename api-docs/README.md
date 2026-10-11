@@ -1799,3 +1799,7 @@ GetFromJson/PostAsJson and JSON size/mapping policies remain.
 HTTP wire limits and informational/chunked reception change behavior without changing
 existing signatures. The Web and HTTP/JSON namespace guides document the new bounds,
 independent host budgets and unsupported modern-hosting capabilities.
+
+HttpServerOptions and the four-argument Listen overload are included in both
+reference paths, with validation ranges, snapshot ownership and phase semantics.
+No public API is excluded. See [server options](../docs/http-server-options.md).

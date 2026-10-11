@@ -67,7 +67,9 @@ def sha(path):
     return hashlib.sha256(path.read_bytes()).hexdigest()
 
 
-def build(project, bundle, aot, output, profile=PROFILE, bootstrap_root=None, reflection_roots=None, byte_array_limit=65536, http_heap_bytes=1048576):
+def build(project, bundle, aot, output, profile=PROFILE, bootstrap_root=None, reflection_roots=None, byte_array_limit=65536, http_heap_bytes=1048576, command_timeout=180):
+    if not 0 < command_timeout <= 3600:
+        raise ValueError("Command timeout must be between 1 and 3600 seconds")
     if not 0 < byte_array_limit <= 2147483647:
         raise ValueError("Byte array limit must be a positive Int32")
     if not 8 <= http_heap_bytes <= 2147483640 or http_heap_bytes % 8:
@@ -94,7 +96,7 @@ def build(project, bundle, aot, output, profile=PROFILE, bootstrap_root=None, re
             raise ValueError('Required build tool is missing: ' + tool)
     output.mkdir(parents=True, exist_ok=False)
     report = dict(profile=profile, passed=False, project=str(project),
-                  host=platform.platform(), byteArrayLimit=byte_array_limit, httpHeapBytes=http_heap_bytes, bootstrapRoot=bootstrap_root, commands=[], inputs={})
+                  host=platform.platform(), byteArrayLimit=byte_array_limit, httpHeapBytes=http_heap_bytes, commandTimeoutSeconds=command_timeout, bootstrapRoot=bootstrap_root, commands=[], inputs={})
 
     def save():
         (output / 'build.json').write_text(json.dumps(report, indent=2) + '\n')
@@ -104,7 +106,7 @@ def build(project, bundle, aot, output, profile=PROFILE, bootstrap_root=None, re
     def run(command, phase="toolchain"):
         command = list(map(str, command))
         started = time.perf_counter()
-        result = subprocess.run(command, cwd=project.parent, capture_output=True, text=True, encoding="utf-8", errors="replace", timeout=180,
+        result = subprocess.run(command, cwd=project.parent, capture_output=True, text=True, encoding="utf-8", errors="replace", timeout=command_timeout,
                                 env=build_env)
         report['commands'].append(dict(command=command, phase=phase, elapsedSeconds=round(time.perf_counter() - started, 6), exitCode=result.returncode,
                                        stdout=result.stdout, stderr=result.stderr))
@@ -298,13 +300,14 @@ def main():
     packaged = (ROOT / 'native-build-kit.json').is_file()
     parser.add_argument('--bundle', type=Path, required=not packaged, default=ROOT / 'bundle' if packaged else None)
     parser.add_argument('--aot', type=Path, required=not packaged, default=ROOT / 'bin/neoclr-aot-poc' if packaged else None)
+    parser.add_argument('--command-timeout', type=int, default=180, help='Per-build-command timeout in seconds, from 1 through 3600')
     parser.add_argument('--http-heap-bytes', type=int, default=1048576, help='HTTP native host managed heap capacity, in bytes (multiple of eight)')
     args = parser.parse_args()
     try:
         print(build(*(getattr(args, name).resolve() for name in ('project', 'bundle', 'aot', 'output')),
                     profile=PROFILES[args.profile], bootstrap_root=args.bootstrap_root,
                     reflection_roots=args.reflection_roots.resolve() if args.reflection_roots else None,
-                    byte_array_limit=args.byte_array_limit, http_heap_bytes=args.http_heap_bytes))
+                    byte_array_limit=args.byte_array_limit, http_heap_bytes=args.http_heap_bytes, command_timeout=args.command_timeout))
     except (OSError, ValueError, KeyError, TypeError, RuntimeError, subprocess.SubprocessError) as error:
         print('native build: ' + str(error), file=sys.stderr)
         return 1

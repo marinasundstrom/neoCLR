@@ -37,7 +37,7 @@ def main():
     parser.add_argument('--aot', type=Path, required=True)
     parser.add_argument('--mode', action='append', choices=('interpreter', 'native'), default=None)
     parser.add_argument('--large-bodies', action='store_true', help='Also attempt 1 MiB native transfers; currently limited by stress-GC/deadline interaction')
-    parser.add_argument('--part', choices=('all', 'transport', 'json'), default='all')
+    parser.add_argument('--part', choices=('all', 'transport', 'json', 'client', 'server'), default='all')
     parser.add_argument('--reuse-builds', type=Path, help='Reuse source/hash-verified builds from a prior validation directory')
     args = parser.parse_args()
     modes = args.mode or ['interpreter', 'native']
@@ -65,7 +65,7 @@ def main():
             raise RuntimeError(str(item))
 
     try:
-        projects = (['Client', 'Server'] if args.part == 'transport' else ['Json', 'JsonServer'] if args.part == 'json' else ['Client', 'Server', 'Json', 'JsonServer'])
+        projects = ([args.part.title()] if args.part in ('client', 'server') else ['Client', 'Server'] if args.part == 'transport' else ['Json', 'JsonServer'] if args.part == 'json' else ['Client', 'Server', 'Json', 'JsonServer'])
         for project in projects:
             build = out / project
             if args.reuse_builds:
@@ -87,9 +87,9 @@ def main():
                 result = subprocess.run([sys.executable, str(ROOT / 'scripts/build-native-project.py'), '--profile',
                                          'windows-http' if os.name == 'nt' else 'http', '--project', str(fixture / (project + '.rvnproj')),
                                          '--bundle', str(bundle), '--aot', str(args.aot.resolve()), '--output', str(build),
-                                         '--byte-array-limit', '4194304', '--http-heap-bytes', '33554432',
+                                         '--command-timeout', '600', '--byte-array-limit', '4194304', '--http-heap-bytes', '33554432',
                                          *(['--reflection-roots', str(fixture / (project + '.reflection-roots.json'))] if project.startswith('Json') else [])],
-                                        cwd=ROOT, capture_output=True, text=True, timeout=600)
+                                        cwd=ROOT, capture_output=True, text=True, timeout=900)
                 (out / (project + '.stdout.log')).write_text(result.stdout)
                 (out / (project + '.stderr.log')).write_text(result.stderr)
                 if result.returncode:
@@ -103,13 +103,13 @@ def main():
             commands[project] = {'interpreter': interpreter, 'native': [str(build / ('app.exe' if os.name == 'nt' else 'app'))]}
 
         for mode in modes:
-            if args.part != 'transport':
+            if args.part in ('all', 'json'):
                 result = subprocess.run(command('Json', mode, []), cwd=ROOT, capture_output=True, text=True, timeout=60)
                 record('json-content', mode, result)
                 process = subprocess.Popen(command('JsonServer', mode, []), cwd=ROOT,
                                            stdout=subprocess.PIPE, stderr=subprocess.PIPE, bufsize=0)
                 try:
-                    port = int(http_json.read_port(process.stdout, timeout=30))
+                    port = int(http_json.read_port(process.stdout, timeout=120))
                     with socket.create_connection(('127.0.0.1', port), timeout=30) as connection:
                         body = b'{"message":"hello"}'
                         connection.sendall(f'POST / HTTP/1.1\r\nHost: localhost:{port}\r\nContent-Length: {len(body)}\r\n\r\n'.encode() + body)
@@ -154,7 +154,7 @@ def main():
                 ('invalid-chunk-crlf', 0, b'HTTP/1.1 200 OK\r\nTransfer-Encoding: chunked\r\n\r\n1\r\naX', 'protocol'),
                 ('header-limit', 0, b'HTTP/1.1 200 OK\r\nX: ' + b'a' * 32768, 'limit'),
             ]
-            for name, size, response, expected in client_cases:
+            for name, size, response, expected in ([] if args.part == 'server' else client_cases):
                 if mode == 'interpreter' and name == 'header-limit':
                     report['skips'].append(dict(case='client-' + name, mode=mode, reason='32 KiB parsing exceeds fixed transport deadline; covered in native mode'))
                     continue
@@ -220,14 +220,14 @@ def main():
                 ('header-count-limit', b'X: a\r\n' * 100 + b'\r\n', b'', 'limit'),
                 ('header-byte-limit', b'X: ' + b'a' * 32768, b'', 'limit'),
             ]
-            for name, message, body, expected in server_cases:
+            for name, message, body, expected in ([] if args.part == 'client' else server_cases):
                 if mode == 'interpreter' and name == 'header-byte-limit':
                     report['skips'].append(dict(case='server-' + name, mode=mode, reason='32 KiB parsing exceeds fixed transport deadline; covered in native mode'))
                     continue
                 process = subprocess.Popen(command('Server', mode, [expected]), cwd=ROOT,
                                            stdout=subprocess.PIPE, stderr=subprocess.PIPE, bufsize=0)
                 try:
-                    port = int(http_json.read_port(process.stdout, timeout=30))
+                    port = int(http_json.read_port(process.stdout, timeout=120))
                     with socket.create_connection(('127.0.0.1', port), timeout=30) as connection:
                         wire = f'POST /echo HTTP/1.1\r\nHost: 127.0.0.1:{port}\r\n'.encode() + message
                         try:

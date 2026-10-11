@@ -1,0 +1,175 @@
+{
+  "passed": true,
+  "platform": "macOS-27.0-arm64-arm-64bit",
+  "cases": [
+    {
+      "case": "fixed-boundary-and-snapshot",
+      "mode": "interpreter",
+      "passed": true,
+      "exitCode": 0,
+      "stdout": "PASS server options\n",
+      "stderr": "",
+      "responseBytes": 61
+    },
+    {
+      "case": "chunked-boundary",
+      "mode": "interpreter",
+      "passed": true,
+      "exitCode": 0,
+      "stdout": "PASS server options\n",
+      "stderr": "",
+      "responseBytes": 61
+    },
+    {
+      "case": "fixed-over-limit",
+      "mode": "interpreter",
+      "passed": true,
+      "exitCode": 0,
+      "stdout": "PASS server options\n",
+      "stderr": "",
+      "responseBytes": 0
+    },
+    {
+      "case": "chunked-cumulative-limit",
+      "mode": "interpreter",
+      "passed": true,
+      "exitCode": 0,
+      "stdout": "PASS server options\n",
+      "stderr": "",
+      "responseBytes": 0
+    },
+    {
+      "case": "header-count",
+      "mode": "interpreter",
+      "passed": true,
+      "exitCode": 0,
+      "stdout": "PASS server options\n",
+      "stderr": "",
+      "responseBytes": 0
+    },
+    {
+      "case": "header-bytes",
+      "mode": "interpreter",
+      "passed": true,
+      "exitCode": 0,
+      "stdout": "PASS server options\n",
+      "stderr": "",
+      "responseBytes": 0
+    },
+    {
+      "case": "zero-empty",
+      "mode": "interpreter",
+      "passed": true,
+      "exitCode": 0,
+      "stdout": "PASS server options\n",
+      "stderr": "",
+      "responseBytes": 57
+    },
+    {
+      "case": "zero-body",
+      "mode": "interpreter",
+      "passed": true,
+      "exitCode": 0,
+      "stdout": "PASS server options\n",
+      "stderr": "",
+      "responseBytes": 0
+    },
+    {
+      "case": "read-deadline",
+      "mode": "interpreter",
+      "passed": true,
+      "exitCode": 0,
+      "stdout": "PASS server options\n",
+      "stderr": "",
+      "responseBytes": 0
+    },
+    {
+      "case": "fixed-boundary-and-snapshot",
+      "mode": "native",
+      "passed": true,
+      "exitCode": 0,
+      "stdout": "PASS server options\n",
+      "stderr": "",
+      "responseBytes": 61
+    },
+    {
+      "case": "chunked-boundary",
+      "mode": "native",
+      "passed": true,
+      "exitCode": 0,
+      "stdout": "PASS server options\n",
+      "stderr": "",
+      "responseBytes": 61
+    },
+    {
+      "case": "fixed-over-limit",
+      "mode": "native",
+      "passed": true,
+      "exitCode": 0,
+      "stdout": "PASS server options\n",
+      "stderr": "",
+      "responseBytes": 0
+    },
+    {
+      "case": "chunked-cumulative-limit",
+      "mode": "native",
+      "passed": true,
+      "exitCode": 0,
+      "stdout": "PASS server options\n",
+      "stderr": "",
+      "responseBytes": 0
+    },
+    {
+      "case": "header-count",
+      "mode": "native",
+      "passed": true,
+      "exitCode": 0,
+      "stdout": "PASS server options\n",
+      "stderr": "",
+      "responseBytes": 0
+    },
+    {
+      "case": "header-bytes",
+      "mode": "native",
+      "passed": true,
+      "exitCode": 0,
+      "stdout": "PASS server options\n",
+      "stderr": "",
+      "responseBytes": 0
+    },
+    {
+      "case": "zero-empty",
+      "mode": "native",
+      "passed": true,
+      "exitCode": 0,
+      "stdout": "PASS server options\n",
+      "stderr": "",
+      "responseBytes": 57
+    },
+    {
+      "case": "zero-body",
+      "mode": "native",
+      "passed": true,
+      "exitCode": 0,
+      "stdout": "PASS server options\n",
+      "stderr": "",
+      "responseBytes": 0
+    },
+    {
+      "case": "read-deadline",
+      "mode": "native",
+      "passed": true,
+      "exitCode": 0,
+      "stdout": "PASS server options\n",
+      "stderr": "",
+      "responseBytes": 0
+    }
+  ],
+  "runtimeSha256": "b0849d2ae3a6bdcbfc22a7ec4b76e08858d016923cfc1760ef062336215a85bd",
+  "bundleManifestSha256": "2179d902bec24852711c09df14261869ab57732f64a761d54ef9d74aa19ae22f",
+  "buildEvidenceSha256": "45c94f59240954b3241784ce3d34c2a1cc26bd75cbfed54986d05ba69142b29c",
+  "sources": {
+    "docs/experiments/http-server-options/verify.py": "d6b837a303d96563c99d5a3496f345a3ff179a4190e428f3086de57cb9f0703e",
+    "docs/experiments/http-server-options/Main.rvn": "3aaa04c067f0fda1492a6b9f37c585c34b08cf47acb0b982252f1c493c3a6769"
+  }
+}

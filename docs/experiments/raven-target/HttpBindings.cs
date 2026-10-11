@@ -166,9 +166,18 @@ static class HttpBindings
                 public Collections.Sequence<byte> Bytes => default;
                 public Tasks.Task<Result<string, string>> ReadText() => default;
             }
+            public sealed class HttpServerOptions {
+                public HttpServerOptions() { }
+                public int MaxRequestBodySize { get; set; }
+                public int MaxRequestHeadersTotalSize { get; set; }
+                public int MaxRequestHeaderCount { get; set; }
+                public Time.Duration RequestReadTimeout { get; set; }
+                public Time.Duration ResponseWriteTimeout { get; set; }
+            }
             public sealed class HttpServer {
                 public HttpServer(Networking.Sockets.Socket listener) { }
                 public static Result<HttpServer, HttpError> Listen(string address, int port, int backlog) => default;
+                public static Result<HttpServer, HttpError> Listen(string address, int port, int backlog, HttpServerOptions options) => default;
                 public Result<int, HttpError> GetLocalPort() => default;
                 public Tasks.Task<Result<HttpContext, HttpError>> Accept() => default;
                 public Tasks.Task<Result<HttpContext, HttpError>> Accept(Concurrency.CancellationToken cancellationToken) => default;

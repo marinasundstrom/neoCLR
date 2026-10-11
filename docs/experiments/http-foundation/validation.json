@@ -1,0 +1,971 @@
+{
+  "date": "2026-10-11",
+  "passed": true,
+  "baseline": "2c8204d5310cf8a15e00b3da15d05ab73d818b7f",
+  "runs": [
+    {
+      "reportSha256": "9a0e6094b3d8f3db3f8d07c2e86c8f110082a7aa6ac0b8be02b3366dd8018915",
+      "passed": true,
+      "platform": "macOS-27.0-arm64-arm-64bit",
+      "cases": [
+        {
+          "case": "client-fixed-0",
+          "mode": "interpreter",
+          "exitCode": 0,
+          "stdout": "PASS client\n",
+          "stderr": "",
+          "peer": {
+            "validated": true
+          }
+        },
+        {
+          "case": "client-chunked-0",
+          "mode": "interpreter",
+          "exitCode": 0,
+          "stdout": "PASS client\n",
+          "stderr": "",
+          "peer": {
+            "validated": true
+          }
+        },
+        {
+          "case": "client-fixed-2049",
+          "mode": "interpreter",
+          "exitCode": 0,
+          "stdout": "PASS client\n",
+          "stderr": "",
+          "peer": {
+            "validated": true
+          }
+        },
+        {
+          "case": "client-chunked-2049",
+          "mode": "interpreter",
+          "exitCode": 0,
+          "stdout": "PASS client\n",
+          "stderr": "",
+          "peer": {
+            "validated": true
+          }
+        },
+        {
+          "case": "client-close-delimited",
+          "mode": "interpreter",
+          "exitCode": 0,
+          "stdout": "PASS client\n",
+          "stderr": "",
+          "peer": {
+            "validated": true
+          }
+        },
+        {
+          "case": "client-large-headers",
+          "mode": "interpreter",
+          "exitCode": 0,
+          "stdout": "PASS client\n",
+          "stderr": "",
+          "peer": {
+            "validated": true
+          }
+        },
+        {
+          "case": "client-header-count-limit",
+          "mode": "interpreter",
+          "exitCode": 0,
+          "stdout": "PASS client\n",
+          "stderr": "",
+          "peer": {
+            "validated": true
+          }
+        },
+        {
+          "case": "client-informational",
+          "mode": "interpreter",
+          "exitCode": 0,
+          "stdout": "PASS client\n",
+          "stderr": "",
+          "peer": {
+            "validated": true
+          }
+        },
+        {
+          "case": "client-too-many-informational",
+          "mode": "interpreter",
+          "exitCode": 0,
+          "stdout": "PASS client\n",
+          "stderr": "",
+          "peer": {
+            "validated": true
+          }
+        },
+        {
+          "case": "client-informational-framing",
+          "mode": "interpreter",
+          "exitCode": 0,
+          "stdout": "PASS client\n",
+          "stderr": "",
+          "peer": {
+            "validated": true
+          }
+        },
+        {
+          "case": "client-upgrade",
+          "mode": "interpreter",
+          "exitCode": 0,
+          "stdout": "PASS client\n",
+          "stderr": "",
+          "peer": {
+            "validated": true
+          }
+        },
+        {
+          "case": "client-ambiguous",
+          "mode": "interpreter",
+          "exitCode": 0,
+          "stdout": "PASS client\n",
+          "stderr": "",
+          "peer": {
+            "validated": true
+          }
+        },
+        {
+          "case": "client-length-limit",
+          "mode": "interpreter",
+          "exitCode": 0,
+          "stdout": "PASS client\n",
+          "stderr": "",
+          "peer": {
+            "validated": true
+          }
+        },
+        {
+          "case": "client-chunk-limit",
+          "mode": "interpreter",
+          "exitCode": 0,
+          "stdout": "PASS client\n",
+          "stderr": "",
+          "peer": {
+            "validated": true
+          }
+        },
+        {
+          "case": "client-truncated",
+          "mode": "interpreter",
+          "exitCode": 0,
+          "stdout": "PASS client\n",
+          "stderr": "",
+          "peer": {
+            "validated": true
+          }
+        },
+        {
+          "case": "client-invalid-chunk-crlf",
+          "mode": "interpreter",
+          "exitCode": 0,
+          "stdout": "PASS client\n",
+          "stderr": "",
+          "peer": {
+            "validated": true
+          }
+        }
+      ],
+      "skips": [
+        {
+          "case": "client-header-limit",
+          "mode": "interpreter",
+          "reason": "32 KiB parsing exceeds fixed transport deadline; covered in native mode"
+        }
+      ],
+      "sources": {
+        "scripts/validate-http-foundation.py": "ea89d9c07a765dfd31e985e630aaed91d29e5ac8e345f2d4b449bc143d025afa",
+        "docs/experiments/http-foundation/JsonServer.rvn": "5adb1e0ab65f45bffe218673b41fce883cd6704170d6d3d3f17ad853b4be643e",
+        "docs/experiments/http-foundation/Client.rvn": "47bd7850964e6286180613de1600611ab3864382656f2d740559e2901a70a9b9",
+        "docs/experiments/http-foundation/Json.rvn": "bbb07515c8be051052d6c6781e84ddd2c36f8e5e8499f0c18a7a6551f04103b0",
+        "docs/experiments/http-foundation/Server.rvn": "87aa1da566cef75a188a5a75bd9b43ef57260b1cf074a9921b42822bb83dc791",
+        "docs/experiments/http-foundation/Errors.rvn": "ec06d05d0fc0a0e1d3fc8cda08ea76c2fd22055eec6506c963c8b998f5224f14",
+        "docs/experiments/http-foundation/Json.rvnproj": "d9b5119b093e76dbb1bb383ba232a7e6004672d25264002b29ff0ac3b7c5f064",
+        "docs/experiments/http-foundation/Server.rvnproj": "fa233e9ab7540a5370553d31b5aa90e9edc2d727e8bc041e73ea33b5cdabbaaf",
+        "docs/experiments/http-foundation/Client.rvnproj": "a19bdddb0cbccf66327fc651f86de73b088e2ca62255f5484d8d1be7745b4665",
+        "docs/experiments/http-foundation/JsonServer.rvnproj": "f9a6099652450f2018c24bc305c4b86d643ae21954037c4db6a1d4453fd35cf1",
+        "docs/experiments/http-foundation/JsonServer.reflection-roots.json": "44f7d8c8a5f2fd45480dd14f827a7299c1ae4f44a9315f1461297c10f4f60fef",
+        "docs/experiments/http-foundation/Json.reflection-roots.json": "21cf65dd6bad728f078c050dc4dd3ca8376fed9a7eeaee3ae1ef5a8529574fda",
+        "runtime/raven/src/System/Web/Http/HttpServer.rvn": "940bcbaa4825a16df0cc23956a8349af9e4f228401d808aa8aada87f1846fac8",
+        "runtime/raven/src/System/Web/Http/Routes.rvn": "38450212ad033a17a95575379f4f30b1340ef801caaef7ef6f42084bf75a9c94",
+        "runtime/raven/src/System/Web/Http/HttpMethod.rvn": "90efa846555dc2f4b4077aa3d3648592347410deadfc88476da1169ec36874ae",
+        "runtime/raven/src/System/Web/Http/HttpError.rvn": "58341b8593bd2a23bf4b25f68ac8c0f0fee9b39e584f3fb9efa2609033db0848",
+        "runtime/raven/src/System/Web/Http/HttpStatusCode.rvn": "793a7145655e008ed29d1245205504e5e0333964320e4a036e5a857c111201dd",
+        "runtime/raven/src/System/Web/Http/HttpText.rvn": "58a1736096c902f63112dd6cc0c914b0026a7120c8dcadcddfe6e09bf77dd19d",
+        "runtime/raven/src/System/Web/Http/HttpClient.rvn": "be3ace916eb9796742b777e77d75aa2698ba7ca240bad77d58df37b432610cb0",
+        "runtime/raven/src/System/Web/Http/HttpWire.rvn": "dbe8fc07c031951bb81f5b9a153c98ef8d9f8024ed351785b0dd291e3c0df870",
+        "runtime/raven/src/System/Web/Http/HttpServerOptions.rvn": "9a2f53eceed937f564a6a9fbe81a9385369d041cd5f77891c39908cd9f3ce5c4",
+        "runtime/raven/src/System/Web/Http/Json/HttpContentJsonExtensions.rvn": "5019a5aea6b36f17eb96f0cd8e8c5d6e8f3055abb6a748f7402fce73f8b40fd3",
+        "runtime/raven/src/System/Web/Http/Json/JsonContent.rvn": "513f7ef9e6ab9168b9b4903a29fc75d38efd0c429c299c071534e748ce916472",
+        "runtime/raven/src/System/Web/Http/Json/HttpClientJsonExtensions.rvn": "714bc6417e1437f9c71eabaf0fc7133ab39c9f49298c9a71c6f7feda3e01bf34",
+        "runtime/raven/src/System/Web/Http/Json/JsonClientOperations.rvn": "3885090ad6061f498eef55b5d460e9c464651c1b2ab6a520a30fbb4c777c6bd5",
+        "runtime/raven/src/System/Web/Http/Json/HttpJsonError.rvn": "0dc519f713f6e3cdd5e7418b4dd50105ef7d124398520ec7ac551a62d158ca99",
+        "runtime/raven/src/System/Web/Http/Json/HttpContextJsonExtensions.rvn": "4a4554c50be5d3b5fb930de113b122fa3e2c4f66a1ef0108b1ece3d1e432727e"
+      },
+      "runtimeSha256": "b0849d2ae3a6bdcbfc22a7ec4b76e08858d016923cfc1760ef062336215a85bd",
+      "aotSha256": "f9537793d2d1a8aec3842fae5ec01440da6fd3d166f97b8b8b3296918e432744",
+      "bundleManifestSha256": "2179d902bec24852711c09df14261869ab57732f64a761d54ef9d74aa19ae22f"
+    },
+    {
+      "reportSha256": "1c850843103012ffc25a90bc3be6f3cb0f4628bc323dccfac5091d39a5bbb14b",
+      "passed": true,
+      "platform": "macOS-27.0-arm64-arm-64bit",
+      "cases": [
+        {
+          "case": "client-fixed-0",
+          "mode": "native",
+          "exitCode": 0,
+          "stdout": "PASS client\n",
+          "stderr": "",
+          "peer": {
+            "validated": true
+          }
+        },
+        {
+          "case": "client-chunked-0",
+          "mode": "native",
+          "exitCode": 0,
+          "stdout": "PASS client\n",
+          "stderr": "",
+          "peer": {
+            "validated": true
+          }
+        },
+        {
+          "case": "client-fixed-8193",
+          "mode": "native",
+          "exitCode": 0,
+          "stdout": "PASS client\n",
+          "stderr": "",
+          "peer": {
+            "validated": true
+          }
+        },
+        {
+          "case": "client-chunked-8193",
+          "mode": "native",
+          "exitCode": 0,
+          "stdout": "PASS client\n",
+          "stderr": "",
+          "peer": {
+            "validated": true
+          }
+        },
+        {
+          "case": "client-fixed-32769",
+          "mode": "native",
+          "exitCode": 0,
+          "stdout": "PASS client\n",
+          "stderr": "",
+          "peer": {
+            "validated": true
+          }
+        },
+        {
+          "case": "client-chunked-32769",
+          "mode": "native",
+          "exitCode": 0,
+          "stdout": "PASS client\n",
+          "stderr": "",
+          "peer": {
+            "validated": true
+          }
+        },
+        {
+          "case": "client-close-delimited",
+          "mode": "native",
+          "exitCode": 0,
+          "stdout": "PASS client\n",
+          "stderr": "",
+          "peer": {
+            "validated": true
+          }
+        },
+        {
+          "case": "client-large-headers",
+          "mode": "native",
+          "exitCode": 0,
+          "stdout": "PASS client\n",
+          "stderr": "",
+          "peer": {
+            "validated": true
+          }
+        },
+        {
+          "case": "client-header-count-limit",
+          "mode": "native",
+          "exitCode": 0,
+          "stdout": "PASS client\n",
+          "stderr": "",
+          "peer": {
+            "validated": true
+          }
+        },
+        {
+          "case": "client-informational",
+          "mode": "native",
+          "exitCode": 0,
+          "stdout": "PASS client\n",
+          "stderr": "",
+          "peer": {
+            "validated": true
+          }
+        },
+        {
+          "case": "client-too-many-informational",
+          "mode": "native",
+          "exitCode": 0,
+          "stdout": "PASS client\n",
+          "stderr": "",
+          "peer": {
+            "validated": true
+          }
+        },
+        {
+          "case": "client-informational-framing",
+          "mode": "native",
+          "exitCode": 0,
+          "stdout": "PASS client\n",
+          "stderr": "",
+          "peer": {
+            "validated": true
+          }
+        },
+        {
+          "case": "client-upgrade",
+          "mode": "native",
+          "exitCode": 0,
+          "stdout": "PASS client\n",
+          "stderr": "",
+          "peer": {
+            "validated": true
+          }
+        },
+        {
+          "case": "client-ambiguous",
+          "mode": "native",
+          "exitCode": 0,
+          "stdout": "PASS client\n",
+          "stderr": "",
+          "peer": {
+            "validated": true
+          }
+        },
+        {
+          "case": "client-length-limit",
+          "mode": "native",
+          "exitCode": 0,
+          "stdout": "PASS client\n",
+          "stderr": "",
+          "peer": {
+            "validated": true
+          }
+        },
+        {
+          "case": "client-chunk-limit",
+          "mode": "native",
+          "exitCode": 0,
+          "stdout": "PASS client\n",
+          "stderr": "",
+          "peer": {
+            "validated": true
+          }
+        },
+        {
+          "case": "client-truncated",
+          "mode": "native",
+          "exitCode": 0,
+          "stdout": "PASS client\n",
+          "stderr": "",
+          "peer": {
+            "validated": true
+          }
+        },
+        {
+          "case": "client-invalid-chunk-crlf",
+          "mode": "native",
+          "exitCode": 0,
+          "stdout": "PASS client\n",
+          "stderr": "",
+          "peer": {
+            "validated": true
+          }
+        },
+        {
+          "case": "client-header-limit",
+          "mode": "native",
+          "exitCode": 0,
+          "stdout": "PASS client\n",
+          "stderr": "",
+          "peer": {
+            "validated": true
+          }
+        }
+      ],
+      "skips": [],
+      "sources": {
+        "scripts/validate-http-foundation.py": "ea89d9c07a765dfd31e985e630aaed91d29e5ac8e345f2d4b449bc143d025afa",
+        "docs/experiments/http-foundation/JsonServer.rvn": "5de9a44cd9b1399294a2bce18cdcca033ade6ea7ca8ba235b6400db155a841de",
+        "docs/experiments/http-foundation/Client.rvn": "47bd7850964e6286180613de1600611ab3864382656f2d740559e2901a70a9b9",
+        "docs/experiments/http-foundation/Json.rvn": "bbb07515c8be051052d6c6781e84ddd2c36f8e5e8499f0c18a7a6551f04103b0",
+        "docs/experiments/http-foundation/Server.rvn": "87aa1da566cef75a188a5a75bd9b43ef57260b1cf074a9921b42822bb83dc791",
+        "docs/experiments/http-foundation/Errors.rvn": "ec06d05d0fc0a0e1d3fc8cda08ea76c2fd22055eec6506c963c8b998f5224f14",
+        "docs/experiments/http-foundation/Json.rvnproj": "d9b5119b093e76dbb1bb383ba232a7e6004672d25264002b29ff0ac3b7c5f064",
+        "docs/experiments/http-foundation/Server.rvnproj": "fa233e9ab7540a5370553d31b5aa90e9edc2d727e8bc041e73ea33b5cdabbaaf",
+        "docs/experiments/http-foundation/Client.rvnproj": "a19bdddb0cbccf66327fc651f86de73b088e2ca62255f5484d8d1be7745b4665",
+        "docs/experiments/http-foundation/JsonServer.rvnproj": "f9a6099652450f2018c24bc305c4b86d643ae21954037c4db6a1d4453fd35cf1",
+        "docs/experiments/http-foundation/JsonServer.reflection-roots.json": "44f7d8c8a5f2fd45480dd14f827a7299c1ae4f44a9315f1461297c10f4f60fef",
+        "docs/experiments/http-foundation/Json.reflection-roots.json": "21cf65dd6bad728f078c050dc4dd3ca8376fed9a7eeaee3ae1ef5a8529574fda",
+        "runtime/raven/src/System/Web/Http/HttpServer.rvn": "940bcbaa4825a16df0cc23956a8349af9e4f228401d808aa8aada87f1846fac8",
+        "runtime/raven/src/System/Web/Http/Routes.rvn": "38450212ad033a17a95575379f4f30b1340ef801caaef7ef6f42084bf75a9c94",
+        "runtime/raven/src/System/Web/Http/HttpMethod.rvn": "90efa846555dc2f4b4077aa3d3648592347410deadfc88476da1169ec36874ae",
+        "runtime/raven/src/System/Web/Http/HttpError.rvn": "58341b8593bd2a23bf4b25f68ac8c0f0fee9b39e584f3fb9efa2609033db0848",
+        "runtime/raven/src/System/Web/Http/HttpStatusCode.rvn": "793a7145655e008ed29d1245205504e5e0333964320e4a036e5a857c111201dd",
+        "runtime/raven/src/System/Web/Http/HttpText.rvn": "58a1736096c902f63112dd6cc0c914b0026a7120c8dcadcddfe6e09bf77dd19d",
+        "runtime/raven/src/System/Web/Http/HttpClient.rvn": "be3ace916eb9796742b777e77d75aa2698ba7ca240bad77d58df37b432610cb0",
+        "runtime/raven/src/System/Web/Http/HttpWire.rvn": "dbe8fc07c031951bb81f5b9a153c98ef8d9f8024ed351785b0dd291e3c0df870",
+        "runtime/raven/src/System/Web/Http/HttpServerOptions.rvn": "9a2f53eceed937f564a6a9fbe81a9385369d041cd5f77891c39908cd9f3ce5c4",
+        "runtime/raven/src/System/Web/Http/Json/HttpContentJsonExtensions.rvn": "5019a5aea6b36f17eb96f0cd8e8c5d6e8f3055abb6a748f7402fce73f8b40fd3",
+        "runtime/raven/src/System/Web/Http/Json/JsonContent.rvn": "513f7ef9e6ab9168b9b4903a29fc75d38efd0c429c299c071534e748ce916472",
+        "runtime/raven/src/System/Web/Http/Json/HttpClientJsonExtensions.rvn": "714bc6417e1437f9c71eabaf0fc7133ab39c9f49298c9a71c6f7feda3e01bf34",
+        "runtime/raven/src/System/Web/Http/Json/JsonClientOperations.rvn": "3885090ad6061f498eef55b5d460e9c464651c1b2ab6a520a30fbb4c777c6bd5",
+        "runtime/raven/src/System/Web/Http/Json/HttpJsonError.rvn": "0dc519f713f6e3cdd5e7418b4dd50105ef7d124398520ec7ac551a62d158ca99",
+        "runtime/raven/src/System/Web/Http/Json/HttpContextJsonExtensions.rvn": "4a4554c50be5d3b5fb930de113b122fa3e2c4f66a1ef0108b1ece3d1e432727e"
+      },
+      "runtimeSha256": "b0849d2ae3a6bdcbfc22a7ec4b76e08858d016923cfc1760ef062336215a85bd",
+      "aotSha256": "f9537793d2d1a8aec3842fae5ec01440da6fd3d166f97b8b8b3296918e432744",
+      "bundleManifestSha256": "2179d902bec24852711c09df14261869ab57732f64a761d54ef9d74aa19ae22f"
+    },
+    {
+      "reportSha256": "7adf9fc480c697f64fc5aa7daa3dff89a589c94605a5c79a18e37cc2b2429066",
+      "passed": true,
+      "platform": "macOS-27.0-arm64-arm-64bit",
+      "cases": [
+        {
+          "case": "server-fixed-0",
+          "mode": "interpreter",
+          "exitCode": 0,
+          "stdout": "PASS server\n",
+          "stderr": "",
+          "responseBytes": 57,
+          "responseSha256": "44ad2a18185d8a6504b531521ce4a9608a2ab2941568aaaf03111df87ffee6b9"
+        },
+        {
+          "case": "server-chunked-0",
+          "mode": "interpreter",
+          "exitCode": 0,
+          "stdout": "PASS server\n",
+          "stderr": "",
+          "responseBytes": 57,
+          "responseSha256": "44ad2a18185d8a6504b531521ce4a9608a2ab2941568aaaf03111df87ffee6b9"
+        },
+        {
+          "case": "server-fixed-2049",
+          "mode": "interpreter",
+          "exitCode": 0,
+          "stdout": "PASS server\n",
+          "stderr": "",
+          "responseBytes": 2109,
+          "responseSha256": "c2a99a8675700e604c81915251119539f9400870ecaa22c0d60f72d298f5adf4"
+        },
+        {
+          "case": "server-chunked-2049",
+          "mode": "interpreter",
+          "exitCode": 0,
+          "stdout": "PASS server\n",
+          "stderr": "",
+          "responseBytes": 2109,
+          "responseSha256": "c2a99a8675700e604c81915251119539f9400870ecaa22c0d60f72d298f5adf4"
+        },
+        {
+          "case": "server-many-headers",
+          "mode": "interpreter",
+          "exitCode": 0,
+          "stdout": "PASS server\n",
+          "stderr": "",
+          "responseBytes": 57,
+          "responseSha256": "44ad2a18185d8a6504b531521ce4a9608a2ab2941568aaaf03111df87ffee6b9"
+        },
+        {
+          "case": "server-large-header",
+          "mode": "interpreter",
+          "exitCode": 0,
+          "stdout": "PASS server\n",
+          "stderr": "",
+          "responseBytes": 57,
+          "responseSha256": "44ad2a18185d8a6504b531521ce4a9608a2ab2941568aaaf03111df87ffee6b9"
+        },
+        {
+          "case": "server-ambiguous",
+          "mode": "interpreter",
+          "exitCode": 0,
+          "stdout": "PASS server\n",
+          "stderr": "",
+          "responseBytes": 0,
+          "responseSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "case": "server-ambiguous-reverse",
+          "mode": "interpreter",
+          "exitCode": 0,
+          "stdout": "PASS server\n",
+          "stderr": "",
+          "responseBytes": 0,
+          "responseSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "case": "server-duplicate-transfer",
+          "mode": "interpreter",
+          "exitCode": 0,
+          "stdout": "PASS server\n",
+          "stderr": "",
+          "responseBytes": 0,
+          "responseSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "case": "server-duplicate-length",
+          "mode": "interpreter",
+          "exitCode": 0,
+          "stdout": "PASS server\n",
+          "stderr": "",
+          "responseBytes": 0,
+          "responseSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "case": "server-length-limit",
+          "mode": "interpreter",
+          "exitCode": 0,
+          "stdout": "PASS server\n",
+          "stderr": "",
+          "responseBytes": 0,
+          "responseSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "case": "server-chunk-limit",
+          "mode": "interpreter",
+          "exitCode": 0,
+          "stdout": "PASS server\n",
+          "stderr": "",
+          "responseBytes": 0,
+          "responseSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "case": "server-chunk-overflow",
+          "mode": "interpreter",
+          "exitCode": 0,
+          "stdout": "PASS server\n",
+          "stderr": "",
+          "responseBytes": 0,
+          "responseSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "case": "server-truncated",
+          "mode": "interpreter",
+          "exitCode": 0,
+          "stdout": "PASS server\n",
+          "stderr": "",
+          "responseBytes": 0,
+          "responseSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "case": "server-invalid-crlf",
+          "mode": "interpreter",
+          "exitCode": 0,
+          "stdout": "PASS server\n",
+          "stderr": "",
+          "responseBytes": 0,
+          "responseSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "case": "server-empty-size",
+          "mode": "interpreter",
+          "exitCode": 0,
+          "stdout": "PASS server\n",
+          "stderr": "",
+          "responseBytes": 0,
+          "responseSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "case": "server-unsupported-coding",
+          "mode": "interpreter",
+          "exitCode": 0,
+          "stdout": "PASS server\n",
+          "stderr": "",
+          "responseBytes": 0,
+          "responseSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "case": "server-unsupported-trailer",
+          "mode": "interpreter",
+          "exitCode": 0,
+          "stdout": "PASS server\n",
+          "stderr": "",
+          "responseBytes": 0,
+          "responseSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "case": "server-header-count-limit",
+          "mode": "interpreter",
+          "exitCode": 0,
+          "stdout": "PASS server\n",
+          "stderr": "",
+          "responseBytes": 0,
+          "responseSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "case": "server-fixed-0",
+          "mode": "native",
+          "exitCode": 0,
+          "stdout": "PASS server\n",
+          "stderr": "",
+          "responseBytes": 57,
+          "responseSha256": "44ad2a18185d8a6504b531521ce4a9608a2ab2941568aaaf03111df87ffee6b9"
+        },
+        {
+          "case": "server-chunked-0",
+          "mode": "native",
+          "exitCode": 0,
+          "stdout": "PASS server\n",
+          "stderr": "",
+          "responseBytes": 57,
+          "responseSha256": "44ad2a18185d8a6504b531521ce4a9608a2ab2941568aaaf03111df87ffee6b9"
+        },
+        {
+          "case": "server-fixed-8193",
+          "mode": "native",
+          "exitCode": 0,
+          "stdout": "PASS server\n",
+          "stderr": "",
+          "responseBytes": 8253,
+          "responseSha256": "1267d1d7a0e4e27fd5d1654c9cfa4deb05191e3bbd8eeb98885c66f7af0c2605"
+        },
+        {
+          "case": "server-chunked-8193",
+          "mode": "native",
+          "exitCode": 0,
+          "stdout": "PASS server\n",
+          "stderr": "",
+          "responseBytes": 8253,
+          "responseSha256": "1267d1d7a0e4e27fd5d1654c9cfa4deb05191e3bbd8eeb98885c66f7af0c2605"
+        },
+        {
+          "case": "server-fixed-32769",
+          "mode": "native",
+          "exitCode": 0,
+          "stdout": "PASS server\n",
+          "stderr": "",
+          "responseBytes": 32830,
+          "responseSha256": "d857af0ca2ade43d4c496c7aadd002e2737ef24a770d63b34c6cb17de4d5dfa9"
+        },
+        {
+          "case": "server-chunked-32769",
+          "mode": "native",
+          "exitCode": 0,
+          "stdout": "PASS server\n",
+          "stderr": "",
+          "responseBytes": 32830,
+          "responseSha256": "d857af0ca2ade43d4c496c7aadd002e2737ef24a770d63b34c6cb17de4d5dfa9"
+        },
+        {
+          "case": "server-many-headers",
+          "mode": "native",
+          "exitCode": 0,
+          "stdout": "PASS server\n",
+          "stderr": "",
+          "responseBytes": 57,
+          "responseSha256": "44ad2a18185d8a6504b531521ce4a9608a2ab2941568aaaf03111df87ffee6b9"
+        },
+        {
+          "case": "server-large-header",
+          "mode": "native",
+          "exitCode": 0,
+          "stdout": "PASS server\n",
+          "stderr": "",
+          "responseBytes": 57,
+          "responseSha256": "44ad2a18185d8a6504b531521ce4a9608a2ab2941568aaaf03111df87ffee6b9"
+        },
+        {
+          "case": "server-ambiguous",
+          "mode": "native",
+          "exitCode": 0,
+          "stdout": "PASS server\n",
+          "stderr": "",
+          "responseBytes": 0,
+          "responseSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "case": "server-ambiguous-reverse",
+          "mode": "native",
+          "exitCode": 0,
+          "stdout": "PASS server\n",
+          "stderr": "",
+          "responseBytes": 0,
+          "responseSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "case": "server-duplicate-transfer",
+          "mode": "native",
+          "exitCode": 0,
+          "stdout": "PASS server\n",
+          "stderr": "",
+          "responseBytes": 0,
+          "responseSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "case": "server-duplicate-length",
+          "mode": "native",
+          "exitCode": 0,
+          "stdout": "PASS server\n",
+          "stderr": "",
+          "responseBytes": 0,
+          "responseSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "case": "server-length-limit",
+          "mode": "native",
+          "exitCode": 0,
+          "stdout": "PASS server\n",
+          "stderr": "",
+          "responseBytes": 0,
+          "responseSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "case": "server-chunk-limit",
+          "mode": "native",
+          "exitCode": 0,
+          "stdout": "PASS server\n",
+          "stderr": "",
+          "responseBytes": 0,
+          "responseSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "case": "server-chunk-overflow",
+          "mode": "native",
+          "exitCode": 0,
+          "stdout": "PASS server\n",
+          "stderr": "",
+          "responseBytes": 0,
+          "responseSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "case": "server-truncated",
+          "mode": "native",
+          "exitCode": 0,
+          "stdout": "PASS server\n",
+          "stderr": "",
+          "responseBytes": 0,
+          "responseSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "case": "server-invalid-crlf",
+          "mode": "native",
+          "exitCode": 0,
+          "stdout": "PASS server\n",
+          "stderr": "",
+          "responseBytes": 0,
+          "responseSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "case": "server-empty-size",
+          "mode": "native",
+          "exitCode": 0,
+          "stdout": "PASS server\n",
+          "stderr": "",
+          "responseBytes": 0,
+          "responseSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "case": "server-unsupported-coding",
+          "mode": "native",
+          "exitCode": 0,
+          "stdout": "PASS server\n",
+          "stderr": "",
+          "responseBytes": 0,
+          "responseSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "case": "server-unsupported-trailer",
+          "mode": "native",
+          "exitCode": 0,
+          "stdout": "PASS server\n",
+          "stderr": "",
+          "responseBytes": 0,
+          "responseSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "case": "server-header-count-limit",
+          "mode": "native",
+          "exitCode": 0,
+          "stdout": "PASS server\n",
+          "stderr": "",
+          "responseBytes": 0,
+          "responseSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "case": "server-header-byte-limit",
+          "mode": "native",
+          "exitCode": 0,
+          "stdout": "PASS server\n",
+          "stderr": "",
+          "responseBytes": 0,
+          "responseSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      ],
+      "skips": [
+        {
+          "case": "server-header-byte-limit",
+          "mode": "interpreter",
+          "reason": "32 KiB parsing exceeds fixed transport deadline; covered in native mode"
+        }
+      ],
+      "sources": {
+        "scripts/validate-http-foundation.py": "ea89d9c07a765dfd31e985e630aaed91d29e5ac8e345f2d4b449bc143d025afa",
+        "docs/experiments/http-foundation/JsonServer.rvn": "5de9a44cd9b1399294a2bce18cdcca033ade6ea7ca8ba235b6400db155a841de",
+        "docs/experiments/http-foundation/Client.rvn": "47bd7850964e6286180613de1600611ab3864382656f2d740559e2901a70a9b9",
+        "docs/experiments/http-foundation/Json.rvn": "bbb07515c8be051052d6c6781e84ddd2c36f8e5e8499f0c18a7a6551f04103b0",
+        "docs/experiments/http-foundation/Server.rvn": "87aa1da566cef75a188a5a75bd9b43ef57260b1cf074a9921b42822bb83dc791",
+        "docs/experiments/http-foundation/Errors.rvn": "ec06d05d0fc0a0e1d3fc8cda08ea76c2fd22055eec6506c963c8b998f5224f14",
+        "docs/experiments/http-foundation/Json.rvnproj": "d9b5119b093e76dbb1bb383ba232a7e6004672d25264002b29ff0ac3b7c5f064",
+        "docs/experiments/http-foundation/Server.rvnproj": "fa233e9ab7540a5370553d31b5aa90e9edc2d727e8bc041e73ea33b5cdabbaaf",
+        "docs/experiments/http-foundation/Client.rvnproj": "a19bdddb0cbccf66327fc651f86de73b088e2ca62255f5484d8d1be7745b4665",
+        "docs/experiments/http-foundation/JsonServer.rvnproj": "f9a6099652450f2018c24bc305c4b86d643ae21954037c4db6a1d4453fd35cf1",
+        "docs/experiments/http-foundation/JsonServer.reflection-roots.json": "44f7d8c8a5f2fd45480dd14f827a7299c1ae4f44a9315f1461297c10f4f60fef",
+        "docs/experiments/http-foundation/Json.reflection-roots.json": "21cf65dd6bad728f078c050dc4dd3ca8376fed9a7eeaee3ae1ef5a8529574fda",
+        "runtime/raven/src/System/Web/Http/HttpServer.rvn": "940bcbaa4825a16df0cc23956a8349af9e4f228401d808aa8aada87f1846fac8",
+        "runtime/raven/src/System/Web/Http/Routes.rvn": "38450212ad033a17a95575379f4f30b1340ef801caaef7ef6f42084bf75a9c94",
+        "runtime/raven/src/System/Web/Http/HttpMethod.rvn": "90efa846555dc2f4b4077aa3d3648592347410deadfc88476da1169ec36874ae",
+        "runtime/raven/src/System/Web/Http/HttpError.rvn": "58341b8593bd2a23bf4b25f68ac8c0f0fee9b39e584f3fb9efa2609033db0848",
+        "runtime/raven/src/System/Web/Http/HttpStatusCode.rvn": "793a7145655e008ed29d1245205504e5e0333964320e4a036e5a857c111201dd",
+        "runtime/raven/src/System/Web/Http/HttpText.rvn": "58a1736096c902f63112dd6cc0c914b0026a7120c8dcadcddfe6e09bf77dd19d",
+        "runtime/raven/src/System/Web/Http/HttpClient.rvn": "be3ace916eb9796742b777e77d75aa2698ba7ca240bad77d58df37b432610cb0",
+        "runtime/raven/src/System/Web/Http/HttpWire.rvn": "dbe8fc07c031951bb81f5b9a153c98ef8d9f8024ed351785b0dd291e3c0df870",
+        "runtime/raven/src/System/Web/Http/HttpServerOptions.rvn": "9a2f53eceed937f564a6a9fbe81a9385369d041cd5f77891c39908cd9f3ce5c4",
+        "runtime/raven/src/System/Web/Http/Json/HttpContentJsonExtensions.rvn": "5019a5aea6b36f17eb96f0cd8e8c5d6e8f3055abb6a748f7402fce73f8b40fd3",
+        "runtime/raven/src/System/Web/Http/Json/JsonContent.rvn": "513f7ef9e6ab9168b9b4903a29fc75d38efd0c429c299c071534e748ce916472",
+        "runtime/raven/src/System/Web/Http/Json/HttpClientJsonExtensions.rvn": "714bc6417e1437f9c71eabaf0fc7133ab39c9f49298c9a71c6f7feda3e01bf34",
+        "runtime/raven/src/System/Web/Http/Json/JsonClientOperations.rvn": "3885090ad6061f498eef55b5d460e9c464651c1b2ab6a520a30fbb4c777c6bd5",
+        "runtime/raven/src/System/Web/Http/Json/HttpJsonError.rvn": "0dc519f713f6e3cdd5e7418b4dd50105ef7d124398520ec7ac551a62d158ca99",
+        "runtime/raven/src/System/Web/Http/Json/HttpContextJsonExtensions.rvn": "4a4554c50be5d3b5fb930de113b122fa3e2c4f66a1ef0108b1ece3d1e432727e"
+      },
+      "runtimeSha256": "b0849d2ae3a6bdcbfc22a7ec4b76e08858d016923cfc1760ef062336215a85bd",
+      "aotSha256": "f9537793d2d1a8aec3842fae5ec01440da6fd3d166f97b8b8b3296918e432744",
+      "bundleManifestSha256": "2179d902bec24852711c09df14261869ab57732f64a761d54ef9d74aa19ae22f"
+    },
+    {
+      "reportSha256": "8eca8addbbec8ee500d3415faea868f10dcc72965f0ed4a4e62c1abe0d6db6ac",
+      "passed": true,
+      "platform": "macOS-27.0-arm64-arm-64bit",
+      "cases": [
+        {
+          "case": "json-content",
+          "mode": "interpreter",
+          "exitCode": 0,
+          "stdout": "PASS JSON content reads, typed errors, repeatability and cancellation\n",
+          "stderr": ""
+        },
+        {
+          "case": "json-server",
+          "mode": "interpreter",
+          "exitCode": 0,
+          "stdout": "PASS atomic JSON response configuration\n",
+          "stderr": ""
+        },
+        {
+          "case": "json-content",
+          "mode": "native",
+          "exitCode": 0,
+          "stdout": "PASS JSON content reads, typed errors, repeatability and cancellation\n",
+          "stderr": ""
+        },
+        {
+          "case": "json-server",
+          "mode": "native",
+          "exitCode": 0,
+          "stdout": "PASS atomic JSON response configuration\n",
+          "stderr": ""
+        }
+      ],
+      "skips": [],
+      "sources": {
+        "scripts/validate-http-foundation.py": "ea89d9c07a765dfd31e985e630aaed91d29e5ac8e345f2d4b449bc143d025afa",
+        "docs/experiments/http-foundation/JsonServer.rvn": "5adb1e0ab65f45bffe218673b41fce883cd6704170d6d3d3f17ad853b4be643e",
+        "docs/experiments/http-foundation/Client.rvn": "47bd7850964e6286180613de1600611ab3864382656f2d740559e2901a70a9b9",
+        "docs/experiments/http-foundation/Json.rvn": "bbb07515c8be051052d6c6781e84ddd2c36f8e5e8499f0c18a7a6551f04103b0",
+        "docs/experiments/http-foundation/Server.rvn": "87aa1da566cef75a188a5a75bd9b43ef57260b1cf074a9921b42822bb83dc791",
+        "docs/experiments/http-foundation/Errors.rvn": "ec06d05d0fc0a0e1d3fc8cda08ea76c2fd22055eec6506c963c8b998f5224f14",
+        "docs/experiments/http-foundation/Json.rvnproj": "d9b5119b093e76dbb1bb383ba232a7e6004672d25264002b29ff0ac3b7c5f064",
+        "docs/experiments/http-foundation/Server.rvnproj": "fa233e9ab7540a5370553d31b5aa90e9edc2d727e8bc041e73ea33b5cdabbaaf",
+        "docs/experiments/http-foundation/Client.rvnproj": "a19bdddb0cbccf66327fc651f86de73b088e2ca62255f5484d8d1be7745b4665",
+        "docs/experiments/http-foundation/JsonServer.rvnproj": "f9a6099652450f2018c24bc305c4b86d643ae21954037c4db6a1d4453fd35cf1",
+        "docs/experiments/http-foundation/JsonServer.reflection-roots.json": "44f7d8c8a5f2fd45480dd14f827a7299c1ae4f44a9315f1461297c10f4f60fef",
+        "docs/experiments/http-foundation/Json.reflection-roots.json": "21cf65dd6bad728f078c050dc4dd3ca8376fed9a7eeaee3ae1ef5a8529574fda",
+        "runtime/raven/src/System/Web/Http/HttpServer.rvn": "940bcbaa4825a16df0cc23956a8349af9e4f228401d808aa8aada87f1846fac8",
+        "runtime/raven/src/System/Web/Http/Routes.rvn": "38450212ad033a17a95575379f4f30b1340ef801caaef7ef6f42084bf75a9c94",
+        "runtime/raven/src/System/Web/Http/HttpMethod.rvn": "90efa846555dc2f4b4077aa3d3648592347410deadfc88476da1169ec36874ae",
+        "runtime/raven/src/System/Web/Http/HttpError.rvn": "58341b8593bd2a23bf4b25f68ac8c0f0fee9b39e584f3fb9efa2609033db0848",
+        "runtime/raven/src/System/Web/Http/HttpStatusCode.rvn": "793a7145655e008ed29d1245205504e5e0333964320e4a036e5a857c111201dd",
+        "runtime/raven/src/System/Web/Http/HttpText.rvn": "58a1736096c902f63112dd6cc0c914b0026a7120c8dcadcddfe6e09bf77dd19d",
+        "runtime/raven/src/System/Web/Http/HttpClient.rvn": "be3ace916eb9796742b777e77d75aa2698ba7ca240bad77d58df37b432610cb0",
+        "runtime/raven/src/System/Web/Http/HttpWire.rvn": "dbe8fc07c031951bb81f5b9a153c98ef8d9f8024ed351785b0dd291e3c0df870",
+        "runtime/raven/src/System/Web/Http/HttpServerOptions.rvn": "9a2f53eceed937f564a6a9fbe81a9385369d041cd5f77891c39908cd9f3ce5c4",
+        "runtime/raven/src/System/Web/Http/Json/HttpContentJsonExtensions.rvn": "5019a5aea6b36f17eb96f0cd8e8c5d6e8f3055abb6a748f7402fce73f8b40fd3",
+        "runtime/raven/src/System/Web/Http/Json/JsonContent.rvn": "513f7ef9e6ab9168b9b4903a29fc75d38efd0c429c299c071534e748ce916472",
+        "runtime/raven/src/System/Web/Http/Json/HttpClientJsonExtensions.rvn": "714bc6417e1437f9c71eabaf0fc7133ab39c9f49298c9a71c6f7feda3e01bf34",
+        "runtime/raven/src/System/Web/Http/Json/JsonClientOperations.rvn": "3885090ad6061f498eef55b5d460e9c464651c1b2ab6a520a30fbb4c777c6bd5",
+        "runtime/raven/src/System/Web/Http/Json/HttpJsonError.rvn": "0dc519f713f6e3cdd5e7418b4dd50105ef7d124398520ec7ac551a62d158ca99",
+        "runtime/raven/src/System/Web/Http/Json/HttpContextJsonExtensions.rvn": "4a4554c50be5d3b5fb930de113b122fa3e2c4f66a1ef0108b1ece3d1e432727e"
+      },
+      "runtimeSha256": "b0849d2ae3a6bdcbfc22a7ec4b76e08858d016923cfc1760ef062336215a85bd",
+      "aotSha256": "f9537793d2d1a8aec3842fae5ec01440da6fd3d166f97b8b8b3296918e432744",
+      "bundleManifestSha256": "2179d902bec24852711c09df14261869ab57732f64a761d54ef9d74aa19ae22f"
+    }
+  ],
+  "limits": [
+    "Interpreter skips two 32 KiB header-byte-limit wire cases; both pass natively.",
+    "1 MiB admission ceiling is not qualified on the wire: stress-GC native execution exceeded the transport deadline.",
+    "No Windows, TLS, persistence, streaming, upgrade, load or write-backpressure qualification."
+  ],
+  "caseCount": 80,
+  "nativeMetadataChecks": {
+    "reflectionUnitTests": 4,
+    "selectorParityAndFaultTest": 1,
+    "logs": {
+      "http-reflection-tests.log": "b07e0c62027e6a9933398bf308479eef54c275013c4301a4b8125cadfd684c10",
+      "http-shape-tests.log": "9c3413e15b1b8afd8f4ff05ce3f16782fc026b1c9ce1cc3dc75e4fb13646547e"
+    }
+  },
+  "webBuildEvidence": {
+    "originalManifestSha256": "198f123c22f7a86ab15296ff28e9242ca6c4d3685fd5144a3112ee31845f1a82",
+    "compilerRevision": "8b917fbcb4182f639deb830f32c84f810e727898",
+    "originalLibraryManifestSha256": null,
+    "compilerSha256": "e72d0d7bf66fccefd1b23a878373e199bf10f4bcc6c994bf1d763ccda0d81c48",
+    "command": [
+      "dotnet",
+      "/Users/robert/.codex/worktrees/http-foundation/neoclr/target/http-options-v3/bundle/sdk/tools/rvnc/rvnc.dll",
+      "neoclr",
+      "--project",
+      "/Users/robert/.codex/worktrees/http-foundation/neoclr/target/http-options-v3/Web.rvnproj"
+    ],
+    "exitCode": 0,
+    "sources": {
+      "runtime/raven/src/System/Web/Http/HttpServer.rvn": "940bcbaa4825a16df0cc23956a8349af9e4f228401d808aa8aada87f1846fac8",
+      "runtime/raven/src/System/Web/Http/Routes.rvn": "38450212ad033a17a95575379f4f30b1340ef801caaef7ef6f42084bf75a9c94",
+      "runtime/raven/src/System/Web/Http/HttpMethod.rvn": "90efa846555dc2f4b4077aa3d3648592347410deadfc88476da1169ec36874ae",
+      "runtime/raven/src/System/Web/Http/HttpError.rvn": "58341b8593bd2a23bf4b25f68ac8c0f0fee9b39e584f3fb9efa2609033db0848",
+      "runtime/raven/src/System/Web/Http/HttpStatusCode.rvn": "793a7145655e008ed29d1245205504e5e0333964320e4a036e5a857c111201dd",
+      "runtime/raven/src/System/Web/Http/HttpText.rvn": "58a1736096c902f63112dd6cc0c914b0026a7120c8dcadcddfe6e09bf77dd19d",
+      "runtime/raven/src/System/Web/Http/HttpClient.rvn": "be3ace916eb9796742b777e77d75aa2698ba7ca240bad77d58df37b432610cb0",
+      "runtime/raven/src/System/Web/Http/HttpWire.rvn": "dbe8fc07c031951bb81f5b9a153c98ef8d9f8024ed351785b0dd291e3c0df870",
+      "runtime/raven/src/System/Web/Http/HttpServerOptions.rvn": "9a2f53eceed937f564a6a9fbe81a9385369d041cd5f77891c39908cd9f3ce5c4",
+      "runtime/raven/src/System/Web/Http/Json/HttpContentJsonExtensions.rvn": "5019a5aea6b36f17eb96f0cd8e8c5d6e8f3055abb6a748f7402fce73f8b40fd3",
+      "runtime/raven/src/System/Web/Http/Json/JsonContent.rvn": "513f7ef9e6ab9168b9b4903a29fc75d38efd0c429c299c071534e748ce916472",
+      "runtime/raven/src/System/Web/Http/Json/HttpClientJsonExtensions.rvn": "714bc6417e1437f9c71eabaf0fc7133ab39c9f49298c9a71c6f7feda3e01bf34",
+      "runtime/raven/src/System/Web/Http/Json/JsonClientOperations.rvn": "3885090ad6061f498eef55b5d460e9c464651c1b2ab6a520a30fbb4c777c6bd5",
+      "runtime/raven/src/System/Web/Http/Json/HttpJsonError.rvn": "0dc519f713f6e3cdd5e7418b4dd50105ef7d124398520ec7ac551a62d158ca99",
+      "runtime/raven/src/System/Web/Http/Json/HttpContextJsonExtensions.rvn": "4a4554c50be5d3b5fb930de113b122fa3e2c4f66a1ef0108b1ece3d1e432727e"
+    }
+  }
+}

@@ -1,7 +1,7 @@
 {
   "format": 1,
   "archive": "native-reference.zip",
-  "sha256": "0571c5a562a1412f470b4750a793d9a1d1435a6b0a2c793842fa78e2c61f8c52",
+  "sha256": "e8a1c7f75a89838ec3a845453328e748e2939ff1883c04531e300aab856b6311",
   "librarySourceRevision": "2c8204d5310cf8a15e00b3da15d05ab73d818b7f",
   "compilerRevision": "8b917fbcb4182f639deb830f32c84f810e727898",
   "rendererRevision": "e349f4783cb7534979ac36b31e81c0ffad3d13ef",
@@ -10,12 +10,12 @@
     "System.Data.dll": "052add250d91413454eb1a2255c7365092f3ba5c5be596a942a206cf0b08103f",
     "System.Networking.dll": "8e772e0ed65ad5d400f938ede520d91b0ceb3a44afe020ed68e4521d5a650024",
     "System.Runtime.dll": "0cfe4c1da8accd073602e73df0aa4c9f4d93aa16dcb2cb5e84f273bf6fab186d",
-    "System.Web.dll": "6b4404a7d1a4c2c6e781c25f2dbdfc87432fb3972d907f7a270fbaebf7f4118d",
+    "System.Web.dll": "6325517a9e3fcb5d63b20451000263a471076c6f0a242c511110984d310b8616",
     "System.runtime.neox": "98a1ae1da85387c87746957e83a4015eb59d0566539a915c69f168d2b511b190"
   },
   "renderingEvidence": {
-    "normalized-sidecars.json": "4cafef26b90570febb53b846a84746c8194a6484bdbf4f24cb5b9c421d6e8e2d",
-    "restored-xml-comments.json": "db3c563ebf81a4b207c68658892c01de34f48da73ee91a6d6f525c45060920ef"
+    "normalized-sidecars.json": "bc9e3ef17efc0a7bf6e5c89425aefe088bb622a701fbf6153ee20841ea0341d3",
+    "restored-xml-comments.json": "a391d34270d57e8fc11ae8ad30aa70c75eb4d37373688cda2f8170dbf62d7e6c"
   },
   "scope": "Reviewed native API rendering; legacy coverage gaps remain explicitly marked by the website overlay.",
   "rendererArtifacts": {
@@ -26,11 +26,12 @@
     "NeoCLR.Metadata.Experimental.dll": "642e9caaf83a06411757e62df9c74e6175903a4dbd6183ba3586e125c3748e92"
   },
   "httpFoundation": {
-    "sourceRevision": "2c8204d5310cf8a15e00b3da15d05ab73d818b7f",
+    "sourceRevision": "084c451f55a22360d3e97ee3a353ef9b3db118c0",
     "sourceDirty": true,
     "compilerRevision": "8b917fbcb4182f639deb830f32c84f810e727898",
-    "buildEvidenceSha256": "23d4a3c06edeabd9c77b78451eca977173e47a79dc76a344a19d4f065226ac92",
-    "scope": "All libraries rebuilt from integrated JSON baseline and HTTP sources; System.Web rebuilt with matching pinned compiler in the executable bundle."
+    "buildEvidenceSha256": "1df1a67e46ced0fe930be63248cd20a9bc26668fc4b9a1bcc27cf4b5eb8570b7",
+    "scope": "Integrated class libraries and rebuilt HTTP library including HttpServerOptions; executable and reference library hashes match.",
+    "integratedBaselineRevision": "2c8204d5310cf8a15e00b3da15d05ab73d818b7f"
   },
   "rendererProvenance": "Renderer rebuilt against Raven e349f4783 outputs; compiler libraries built with pinned 8b917fb binaries. Exact binary hashes retained."
 }

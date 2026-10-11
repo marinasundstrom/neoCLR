@@ -39,6 +39,13 @@ safepoint: a 1 MiB wire test exceeded the existing network deadline. Therefore
 host. Smaller executable transfers and rejection at the admission ceiling are
 validated separately. The runtime thread owns collection-policy follow-up.
 
+## Per-server configuration
+
+[HttpServerOptions](http-server-options.md) now configures smaller request body,
+header-byte and field-count limits, plus read/write deadlines. Listen snapshots
+validated settings; its original overload preserves defaults. Hard buffer ceilings
+and native stress-GC limitations remain unchanged.
+
 ## Content-oriented JSON APIs
 
 Import `System.Web.Http.Json.*` and use:
@@ -117,7 +124,9 @@ preserves function signature identity/visibility and validates the shape selecto
 once before emitting true-flag cases with a false default. It does not increase the
 backend budget or introduce new reflection admission. Explicit fixture retention
 keeps the model constructor/properties available; DOM-only requests use a module
-catalog. These are native binder changes, not Raven compiler/CLI bridge changes.
+catalog. Missing model retention can raise a native runtime fault before JsonError;
+HTTP helpers preserve that existing serializer requirement. The atomic-response
+probe uses an oversized DOM string to exercise a recoverable serialization error. These are native binder changes, not Raven compiler/CLI bridge changes.
 
 ## Validation
 

@@ -1,0 +1,97 @@
+import System.*
+import System.Collections.*
+import System.Networking.*
+import System.Networking.Sockets.*
+import System.Result.*
+import System.Tasks.*
+import System.Time.*
+import System.Web.Http.*
+
+func CheckInvalid(options: HttpServerOptions) {
+    // Invalid configuration must be rejected before attempting this invalid bind.
+    if !(HttpServer.Listen("invalid address", -1, 0, options) is Error(HttpError.InvalidRequest(_))) {
+        System.Fail("Invalid server options were not rejected first")
+    }
+}
+
+func CheckConfiguration() {
+    let options = HttpServerOptions()
+    options.MaxRequestBodySize = -1
+    CheckInvalid(options)
+    options.MaxRequestBodySize = 1048577
+    CheckInvalid(options)
+    options.MaxRequestBodySize = 0
+    options.MaxRequestHeadersTotalSize = 0
+    CheckInvalid(options)
+    options.MaxRequestHeadersTotalSize = 32769
+    CheckInvalid(options)
+    options.MaxRequestHeadersTotalSize = 256
+    options.MaxRequestHeaderCount = 0
+    CheckInvalid(options)
+    options.MaxRequestHeaderCount = 101
+    CheckInvalid(options)
+    options.MaxRequestHeaderCount = 3
+    options.RequestReadTimeout = Duration.FromTicks(0L)
+    CheckInvalid(options)
+    options.RequestReadTimeout = Duration.FromTicks(600000001L)
+    CheckInvalid(options)
+    options.RequestReadTimeout = Duration.FromTicks(1L)
+    options.ResponseWriteTimeout = Duration.FromTicks(-1L)
+    CheckInvalid(options)
+    options.ResponseWriteTimeout = Duration.FromTicks(600000001L)
+    CheckInvalid(options)
+}
+
+func OpenServer(mode: string) -> HttpServer {
+    CheckConfiguration()
+    let options = HttpServerOptions()
+    options.MaxRequestBodySize = if mode == "zero" { 0 } else { 4 }
+    options.MaxRequestHeadersTotalSize = 256
+    options.MaxRequestHeaderCount = 3
+    options.RequestReadTimeout = Duration.FromTicks(if mode == "timeout" { 10000L } else { 150000000L })
+    options.ResponseWriteTimeout = Duration.FromTicks(600000000L)
+    let Ok(server) = HttpServer.Listen("127.0.0.1", 0, 4, options) else {
+        System.Fail("Configured listen failed")
+    }
+    // The running server owns an immutable snapshot, including timeout values.
+    options.MaxRequestBodySize = 0
+    options.MaxRequestHeadersTotalSize = 0
+    options.MaxRequestHeaderCount = 0
+    options.RequestReadTimeout = Duration.FromTicks(0L)
+    options.ResponseWriteTimeout = Duration.FromTicks(0L)
+    let Ok(port) = server.GetLocalPort() else {
+        System.Fail("Port unavailable")
+    }
+    Console.WriteLine(port)
+    return server
+}
+
+func Echo(request: HttpRequest) -> Task<Result<HttpResponse, HttpError>> {
+    return Task.FromResult<Result<HttpResponse, HttpError>>(System.Result<HttpResponse, HttpError>.Ok(HttpResponse(200, ArrayList<HttpHeader>(), request.Content.Bytes)))
+}
+
+func Validate(result: Result<System.Void, HttpError>, expected: string) {
+    if let Ok(_) = result {
+        if expected != "ok" {
+            System.Fail("Configured limit was ignored")
+        }
+    } else if let Error(reason) = result {
+        let kind = match reason {
+            HttpError.LimitExceeded(_) => "limit"
+            HttpError.TimedOut => "timeout"
+            _ => "other"
+        }
+        if kind != expected {
+            Console.WriteLine(reason.ToString())
+            System.Fail("Unexpected configured HTTP failure")
+        }
+    }
+    Console.WriteLine("PASS server options")
+}
+
+async func Main(arguments: string[]) -> Task<()> {
+    let server = OpenServer(arguments[0])
+    let result = await server.ServeOne(Echo)
+    server.Close()
+    Validate(result, arguments[1])
+}

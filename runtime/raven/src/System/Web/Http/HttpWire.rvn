@@ -17,15 +17,17 @@ internal static class HttpWireLimits {
 internal class HttpChunkDecoder {
     private val body: ArrayList<byte>
     private val emptyOnly: bool
+    private val bodyLimit: int
     private var chunkState = 0
     private var chunkSize = 0
     private var chunkDigits = 0
     private var framingBytes = 0
     private var ended = false
 
-    internal init(body: ArrayList<byte>, emptyOnly: bool) {
+    internal init(body: ArrayList<byte>, emptyOnly: bool, bodyLimit: int) {
         self.body = body
         self.emptyOnly = emptyOnly
+        self.bodyLimit = bodyLimit
     }
 
     // Chunk metadata is bounded separately from decoded content. This first
@@ -58,7 +60,7 @@ internal class HttpChunkDecoder {
             if digit < 0 {
                 return Error(HttpError.Protocol("Invalid chunk size"))
             }
-            if chunkSize > (HttpWireLimits.BodyBytes - body.Count - digit) / 16 || digit > HttpWireLimits.BodyBytes - body.Count {
+            if chunkSize > (bodyLimit - body.Count - digit) / 16 || digit > bodyLimit - body.Count {
                 return Error(HttpError.LimitExceeded("Body limit exceeded"))
             }
             chunkSize = chunkSize * 16 + digit

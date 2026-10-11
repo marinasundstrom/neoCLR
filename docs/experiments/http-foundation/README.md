@@ -55,3 +55,17 @@ consumer also checks JsonArray indexing and iteration after reading HTTP content
 The interpreter skips only the two 32 KiB header-byte-limit socket cases, which
 can expire the fixed transport deadline; native mode covers those cases. Size
 admission and deadlines remain independent constraints.
+
+Use `--part client`, `--part server` or `--part json` for focused qualification.
+`--reuse-builds` verifies saved build inputs, fixture sources and the bundle before
+reusing executables. Server startup has a separate 120-second harness allowance;
+this does not change the HTTP read/write deadlines. Native compilation can use
+the explicit `--command-timeout` override in the build script (default 180 seconds).
+
+Qualification on 2026-10-11 passes **80 peer/consumer checks**: 35 client cases
+(16 interpreter, 19 native), 41 server cases (19 interpreter, 22 native), and four
+JSON cases (two per mode). [Recorded results](validation.json) retain exact source,
+bundle, runtime and AOT hashes. The two interpreter header-byte-limit skips are
+covered natively. Four native reflection unit tests and the interpreter/native
+TypeShape selector/fault comparison also pass. The separate
+[server-options probe](../http-server-options/) adds 18 passing checks.
