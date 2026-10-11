@@ -225,3 +225,8 @@ mapping, suspended-operation identities and logical async stacks are shared need
 for profiling and debugger integration. GC snapshots/retention paths and pause
 histograms remain follow-up work; aggregate collector timing is available now in
 that diagnostic host.
+
+Managed programs can also capture and print an owned [StackTrace](stack-traces.md)
+without entering the debugger. The profiler now annotates native generated symbols
+with method names from its matching compilation inventory. This provides names,
+not native stepping or a complete causal stack across suspended operations.

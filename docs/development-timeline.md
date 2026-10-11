@@ -15543,3 +15543,11 @@ or runtime-await default switch was performed.
   wrapper initially leaked the constructor frame; adjusted wrapper skip semantics
   restore caller-first behavior. Async bodies still expose generated names and do
   not reconstruct suspended parents. [Recorded validation](experiments/stack-trace/validation.json).
+
+- **Follow-through on tools:** extend the separate native profiler with a matching
+  guest symbol inventory, readable annotations, transitive host-source pinning and
+  warmup-excluded GC summaries. A 200-invocation pending-await run passes resource
+  checks and still attributes about two thirds of diagnostic time to collection.
+  This guides the next investigation; it is not a claim that the async performance
+  gap is closed or that native debugger stepping has been implemented.
+  [Profiler evidence](experiments/runtime-async/readable-native-profile.json).

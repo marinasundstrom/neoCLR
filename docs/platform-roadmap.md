@@ -5,8 +5,10 @@ for printing the current call stack, then continued work on separate debugger an
 profiler tools to understand the runtime. The bounded
 [StackTrace slice](experiments/stack-trace/README.md) captures owned current-stack
 text; structured frames, source mapping and causal async stitching remain follow-ups.
-Continue diagnostic tooling with readable native profile symbols and GC cost
-summaries before choosing another runtime optimization.
+Readable native profile symbols and warmup-excluded GC summaries now pass a
+200-invocation diagnostic run. Collection remains about two thirds of measured
+diagnostic time; investigate collection work/pacing next with stress-GC validation
+retained. Native debugger stepping, retention paths and causal stacks remain open.
 
 **Runtime diagnostics direction (2026-10-11):** the author requests profiling the
 remaining native runtime-async gap and building useful profiler/GC/debugger tools.

@@ -8,6 +8,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-12
 
+- Extend the separate native profiler with a freshly compiled, hash-bound guest
+  symbol map, readable sample annotations and warmup-excluded collector summaries.
+  Pin transitive local host sources and retain raw samples. A 200-invocation check
+  confirms reclamation; source-line maps, pause distributions and native stepping
+  remain open. Instrumented timings are diagnostic, not new benchmark speedups.
+
 - Add development System.Diagnostics.StackTrace with constructor-time capture and
   stable ToString output after return/GC. The contextual service captures active
   logical guest frames in interpreter and root-published JIT/AOT, with bounded text
