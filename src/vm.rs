@@ -1558,6 +1558,8 @@ fn restrict_reference_arguments(
 struct Frame {
     queue_callback: bool,
     runtime_callback: bool,
+    // Travels with this frame when its activation is parked or restored.
+    entry_drain_wait: bool,
     async_result: Option<i64>,
     permit: Option<crate::invocation_budget::FramePermit>,
     function: std::rc::Rc<crate::metadata::Function>,
@@ -1634,6 +1636,7 @@ impl Frame {
             permit: None,
             queue_callback: false,
             runtime_callback: false,
+            entry_drain_wait: false,
             async_result: None,
             constructing: false,
             construction_object: None,
@@ -2124,7 +2127,14 @@ struct RuntimeAsyncBoundary {
     no_result: bool,
     operation: Option<i64>,
     started: Option<i64>,
-    completion_only: bool,
+    observation: RuntimeAsyncObservation,
+}
+
+#[derive(Clone, Copy, PartialEq, Eq)]
+enum RuntimeAsyncObservation {
+    Int32,
+    Unit,
+    Completion,
 }
 
 /// State that survives an instruction-boundary suspension. File handles, interning
@@ -2134,7 +2144,7 @@ struct InstructionState {
     arrays_used: bool,
     invocation: std::sync::Arc<crate::invocation::Invocation>,
     invocation_result: Option<Value>,
-    entry_drain_depth: Option<usize>,
+    entry_drain_active: bool,
     yield_boundaries: Vec<RuntimeAsyncBoundary>,
     async_operations: crate::runtime_async::Operations,
     parked_activations: Vec<ParkedActivation>,
@@ -2162,7 +2172,7 @@ impl InstructionState {
             arrays_used: false,
             invocation,
             invocation_result: None,
-            entry_drain_depth: None,
+            entry_drain_active: false,
             yield_boundaries: Vec::new(),
             async_operations: Default::default(),
             parked_activations: Vec::new(),
@@ -2347,7 +2357,7 @@ fn interpret_instructions_with_dispatch(
         arrays_used,
         invocation,
         invocation_result,
-        entry_drain_depth,
+        entry_drain_active,
         yield_boundaries,
         async_operations,
         parked_activations,
@@ -2422,7 +2432,7 @@ fn interpret_instructions_with_dispatch(
                 no_result,
                 operation,
                 started,
-                completion_only,
+                observation,
             }) = yield_boundaries.last()
             {
                 options.check_cancellation(
@@ -2448,8 +2458,11 @@ fn interpret_instructions_with_dispatch(
                     return Err(Fault::new("Invalid runtime yield boundary"));
                 }
                 let resumed = match operation {
-                    Some(id) if completion_only => {
+                    Some(id) if observation == RuntimeAsyncObservation::Completion => {
                         async_operations.read_completion(id)?.map(Value::Boolean)
+                    }
+                    Some(id) if observation == RuntimeAsyncObservation::Unit => {
+                        async_operations.read_unit(id)?.map(|()| Value::Void)
                     }
                     Some(id) => async_operations.read_ready(id)?.map(Value::Int32),
                     None if dispatched => Some(started.map_or(Value::Void, Value::Int64)),
@@ -2508,7 +2521,7 @@ fn interpret_instructions_with_dispatch(
             if frames.is_empty() && active_callback.take() == Some(true) && invocation_result.is_none() {
                 return Err(Fault::new("Runtime async callback lost entry activation"));
             }
-            if work_control.is_some() && entry_drain_depth.is_none() {
+            if work_control.is_some() && !*entry_drain_active {
                 let mut roots = Vec::new();
                 crate::gc::trace(&value, &mut roots);
                 heap.publish(roots)?;
@@ -2536,7 +2549,7 @@ fn interpret_instructions_with_dispatch(
             // Run ready default-queue work before waiting for registered host
             // results. A notification is transferred directly into a traced
             // Post frame, then drained on this invocation and instruction budget.
-            if entry_drain_depth.is_none() && invocation_result.is_none() {
+            if !*entry_drain_active && invocation_result.is_none() {
                 *invocation_result = Some(value.clone());
             }
             if *drain_required {
@@ -2614,7 +2627,9 @@ fn interpret_instructions_with_dispatch(
                 *completion_boundary = Some(value);
                 continue;
             }
-            if entry_drain_depth.take().is_some() {
+            if *entry_drain_active && frames.last().is_some_and(|frame| frame.entry_drain_wait) {
+                *entry_drain_active = false;
+                frames.last_mut().unwrap().entry_drain_wait = false;
                 *owner = std::sync::Weak::new();
                 frames
                     .last_mut()
@@ -4108,7 +4123,7 @@ fn interpret_instructions_with_dispatch(
                                 no_result: false,
                                 operation: None,
                                 started: Some(operation),
-                                completion_only: false,
+                                observation: RuntimeAsyncObservation::Int32,
                             });
                             frames.push(body);
                             return Ok(None);
@@ -4118,6 +4133,8 @@ fn interpret_instructions_with_dispatch(
                             crate::native::Binding::RuntimeAsyncCreate
                                 | crate::native::Binding::RuntimeAsyncDelay
                                 | crate::native::Binding::RuntimeAsyncComplete
+                                | crate::native::Binding::RuntimeAsyncCompleteUnit
+                                | crate::native::Binding::RuntimeAsyncAwaitUnit
                                 | crate::native::Binding::RuntimeAsyncCancel
                                 | crate::native::Binding::RuntimeAsyncRelease
                                 | crate::native::Binding::RuntimeAsyncIsCancelled
@@ -4141,6 +4158,9 @@ fn interpret_instructions_with_dispatch(
                                     crate::native::Binding::RuntimeAsyncComplete,
                                     [Value::Int64(id), Value::Int32(value)],
                                 ) => Value::Boolean(async_operations.complete(*id, *value)),
+                                (crate::native::Binding::RuntimeAsyncCompleteUnit, [Value::Int64(id)]) => {
+                                    Value::Boolean(async_operations.complete_unit(*id))
+                                }
                                 (crate::native::Binding::RuntimeAsyncCancel, [Value::Int64(id)]) => {
                                     Value::Boolean(async_operations.cancel(*id))
                                 }
@@ -4158,7 +4178,12 @@ fn interpret_instructions_with_dispatch(
                                 (crate::native::Binding::RuntimeAsyncIsCancelled, [Value::Int64(id)]) => {
                                     Value::Boolean(async_operations.is_cancelled(*id)?)
                                 }
-                                (wait @ (crate::native::Binding::RuntimeAsyncAwait | crate::native::Binding::RuntimeAsyncWaitCompletion), [Value::Int64(id)]) => {
+                                (
+                                    wait @ (crate::native::Binding::RuntimeAsyncAwait
+                                        | crate::native::Binding::RuntimeAsyncAwaitUnit
+                                        | crate::native::Binding::RuntimeAsyncWaitCompletion),
+                                    [Value::Int64(id)],
+                                ) => {
                                     async_operations.validate(*id)?;
                                     // Ordinary calls inherit their runtime body's operation;
                                     // independently dispatched callbacks do not. A pending
@@ -4174,10 +4199,14 @@ fn interpret_instructions_with_dispatch(
                                     yield_boundaries.push(RuntimeAsyncBoundary {
                                         depth: frames.len(),
                                         dispatched: false,
-                                        no_result: false,
+                                        no_result: callee.no_result,
                                         operation: Some(*id),
                                         started: None,
-                                        completion_only: matches!(wait, crate::native::Binding::RuntimeAsyncWaitCompletion),
+                                        observation: match wait {
+                                            crate::native::Binding::RuntimeAsyncAwaitUnit => RuntimeAsyncObservation::Unit,
+                                            crate::native::Binding::RuntimeAsyncWaitCompletion => RuntimeAsyncObservation::Completion,
+                                            _ => RuntimeAsyncObservation::Int32,
+                                        },
                                     });
                                     return Ok(Some(Value::Void));
                                 }
@@ -4199,17 +4228,18 @@ fn interpret_instructions_with_dispatch(
                                 no_result: callee.no_result,
                                 operation: None,
                                 started: None,
-                                completion_only: false,
+                                observation: RuntimeAsyncObservation::Int32,
                             });
                             return Ok(Some(Value::Void));
                         }
                         if matches!(binding, crate::native::Binding::DrainEntryTasks) {
-                            if entry_drain_depth.is_some() || work_control.is_some() || !yield_boundaries.is_empty() {
+                            if *entry_drain_active || work_control.is_some() || !yield_boundaries.is_empty() {
                                 return Err(Fault::new(
                                     "Entry task dispatch cannot be nested or run by a task callback",
                                 ));
                             }
-                            *entry_drain_depth = Some(frames.len());
+                            *entry_drain_active = true;
+                            frame.entry_drain_wait = true;
                             *drain_required = true;
                             return Ok(Some(Value::Void));
                         }
@@ -4607,10 +4637,11 @@ fn interpret_instructions_with_dispatch(
                     let value = constructed_object.map_or(value, Value::ObjectReference);
                     let runtime_callback = frame.runtime_callback;
                     if let Some(operation) = frame.async_result {
-                        let Value::Int32(result) = value else {
-                            return Err(Fault::new("Runtime async body must return Int32"));
-                        };
-                        async_operations.complete_body(operation, result);
+                        match value {
+                            Value::Int32(result) => async_operations.complete_body(operation, result),
+                            Value::Void => async_operations.complete_body_unit(operation),
+                            _ => return Err(Fault::new("Runtime async body must return Int32 or unit")),
+                        }
                     }
                     frames.pop();
                     if runtime_callback {
@@ -5235,7 +5266,7 @@ fn interpret_instructions_with_dispatch(
         // Queue/host completion frames run above it on the same instruction budget.
         let step = if matches!(step, Ok(None))
             && matches!(op, Op::Return)
-            && *entry_drain_depth == Some(frames.len())
+            && frames.last().is_some_and(|frame| frame.entry_drain_wait)
         {
             Ok(Some(Value::Void))
         } else {

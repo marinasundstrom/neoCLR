@@ -14998,3 +14998,15 @@ or runtime-await default switch was performed.
   async tests now pass, including independent callback waits and terminal cancellation
   observation. Indirect cycles and compiler-native await remain open. See the
   [experiment](experiments/runtime-async/README.md#pending-self-await-diagnostic-2026-10-11).
+
+
+## 2026-10-11 — Runtime async as the canonical model
+
+- **Author:** runtime async will be canonical, eventually making generated state
+  machines obsolete; generating state machines has helped reveal bugs in Raven.
+- **Assistant:** accepted that direction, distinguishing the current migration and
+  regression-testing role of state machines from the long-term model. Default
+  switching still requires runtime-path qualification. The unit-result POC now
+  passes its compiled Task<()> adapter consumer and 54 focused runtime checks.
+  That consumer exposed a runtime entry-drain frame-identity bug, which was fixed;
+  this is not reported as a Raven compiler fix. Compiler-native await remains open.

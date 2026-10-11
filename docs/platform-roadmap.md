@@ -27,7 +27,9 @@ moving toward green threads. The interpreter POC now resumes detached callbacks 
 this is groundwork, not a completed green-thread implementation. The immediate
 author-directed goal is runtime await as Raven’s default, with stability and
 measured improvement. The POC now includes eager body invocation and runtime-owned integer-result
-completion, plus retained outcomes for repeated/shared waits. Managed lifetime
+completion, plus retained outcomes for repeated/shared waits. Unit-result bodies
+and ordinary `Task<()>` adapter consumption now pass the interpreter POC
+([evidence](experiments/runtime-async/unit-validation.json)). Managed lifetime
 projection remains open. Ordinary Raven await now passes through a source-local
 compatibility adapter retaining generated state machines. The same-file attributed
 intrinsic binder fix is now qualified on the separate native compiler line
@@ -37,6 +39,9 @@ invocation ([evidence](experiments/runtime-async/cancellation-validation.json)).
 Pending self-await now faults promptly; independent callback waits remain valid
 ([qualification](experiments/runtime-async/README.md#pending-self-await-diagnostic-2026-10-11)).
 The author reaffirms that Fault remains non-recoverable and invocation-terminal.
+Runtime async is the canonical model; compiler-generated state machines are a
+migration path and a useful compiler regression oracle, with eventual retirement
+as the goal. Qualification still precedes default switching.
 Next are compiler-native
 await/managed Task integration and equivalent state-machine
 comparisons before switching supported defaults. Native stack representation, preemption and

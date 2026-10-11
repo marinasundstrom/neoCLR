@@ -55,8 +55,10 @@ pub(crate) enum Binding {
     RuntimeAsyncStart,
     RuntimeAsyncDelay,
     RuntimeAsyncComplete,
+    RuntimeAsyncCompleteUnit,
     RuntimeAsyncCancel,
     RuntimeAsyncAwait,
+    RuntimeAsyncAwaitUnit,
     RuntimeAsyncIsCompleted,
     RuntimeAsyncIsCancelled,
     RuntimeAsyncWaitCompletion,
@@ -235,6 +237,7 @@ pub(crate) fn bind(function: &Function) -> Result<Binding, Fault> {
         && !matches!(
             function.name.as_str(),
             "neoCLR.Runtime.RuntimeAsyncYield"
+                | "neoCLR.Runtime.RuntimeAsyncAwaitUnit"
                 | "neoCLR.Runtime.ReflectionPropertySet"
                 | "neoCLR.Runtime.GCCollect"
                 | "neoCLR.Runtime.GCKeepAlive"
@@ -951,13 +954,16 @@ pub(crate) fn bind(function: &Function) -> Result<Binding, Fault> {
             (Binding::ScheduleTask, Type::Void)
         }
         ("neoCLR.Runtime.RuntimeAsyncStart", [body])
-            if *body == crate::assembler::parse_type("fn<Int32>")? =>
+            if *body == crate::assembler::parse_type("fn<Int32>")?
+                || *body == crate::assembler::parse_type("fn<Void>")? =>
         {
             (Binding::RuntimeAsyncStart, Type::Int64)
         }
         ("neoCLR.Runtime.RuntimeAsyncCreate", []) => (Binding::RuntimeAsyncCreate, Type::Int64),
         ("neoCLR.Runtime.RuntimeAsyncDelay", [Type::Int32]) => (Binding::RuntimeAsyncDelay, Type::Int64),
         ("neoCLR.Runtime.RuntimeAsyncComplete", [Type::Int64, Type::Int32]) => (Binding::RuntimeAsyncComplete, Type::Boolean),
+        ("neoCLR.Runtime.RuntimeAsyncCompleteUnit", [Type::Int64]) => (Binding::RuntimeAsyncCompleteUnit, Type::Boolean),
+        ("neoCLR.Runtime.RuntimeAsyncAwaitUnit", [Type::Int64]) => (Binding::RuntimeAsyncAwaitUnit, Type::Void),
         ("neoCLR.Runtime.RuntimeAsyncCancel", [Type::Int64]) => (Binding::RuntimeAsyncCancel, Type::Boolean),
         ("neoCLR.Runtime.RuntimeAsyncRelease", [Type::Int64]) => (Binding::RuntimeAsyncRelease, Type::Boolean),
         ("neoCLR.Runtime.RuntimeAsyncIsCompleted", [Type::Int64]) => (Binding::RuntimeAsyncIsCompleted, Type::Boolean),

@@ -1507,3 +1507,24 @@ The pending-self-await diagnostic follows that boundary: it terminates the invoc
 instead of indefinitely parking a body on its own pending operation. Independent
 callback waits and terminal cancellation observation remain valid; general cycle
 detection remains open. See [validation and costs](experiments/runtime-async/README.md#pending-self-await-diagnostic-2026-10-11).
+
+
+### Unit-result projection groundwork — 2026-10-11
+
+Private runtime operations now distinguish unit from Int32 outcomes, supporting
+unit-returning retained-frame bodies and a `Task<()>` consumer through the existing
+awaiter adapter. This covers non-value completion analogous to .NET Task, without
+adding a new public Task type or treating unit as integer zero. The CLI no-result
+bridge has explicit stack behavior; mismatched result retrieval faults. See
+[scope and evidence](experiments/runtime-async/README.md#unit-result-runtime-async-poc-2026-10-11).
+Generic/reference results, managed lifetime, compiler-native await and native
+execution remain open; Fault is still invocation-terminal.
+
+
+### Canonical model clarification — 2026-10-11
+
+The author selects runtime async as the canonical model and eventual retirement of
+compiler-generated state machines. During migration, state machines remain both an
+execution path and a useful way to expose Raven bugs. This is not a commitment to
+permanent equal-status async implementations. Default switching still follows
+stability and comparative qualification of the runtime path.

@@ -9,6 +9,15 @@ fn program(main: &str, extra: &str) -> LoadedProgram {
 .function neoCLR.Runtime.RuntimeAsyncStart(fn<Int32> body) -> Int64
 .methodimpl InternalCall
 .end
+.function neoCLR.Runtime.RuntimeAsyncStart(fn<Void> body) -> Int64
+.methodimpl InternalCall
+.end
+.function neoCLR.Runtime.RuntimeAsyncAwaitUnit(Int64 id) -> Void
+.methodimpl InternalCall
+.end
+.function neoCLR.Runtime.RuntimeAsyncCompleteUnit(Int64 id) -> Boolean
+.methodimpl InternalCall
+.end
 .function neoCLR.Runtime.RuntimeAsyncCreate() -> Int64
 .methodimpl InternalCall
 .end
@@ -747,5 +756,179 @@ fault "independent observer lost body result"
         "stloc operation\nldloc body\nldloc operation\nstfld AsyncBody::OwnOperation",
     );
     let extra = format!(".function neoCLR.Runtime.RuntimeAsyncYield() -> Void\n.methodimpl InternalCall\n.end\n{extra}");
+    assert_eq!(bounded_run(program(&main, &extra)).value, Value::Int32(42));
+}
+
+#[test]
+fn unit_body_suspends_and_repeated_awaits_preserve_unit_result() {
+    let body = BODY
+        .replace("Run() -> Int32", "Run() -> Void")
+        .replace("ldc.i4 42\nret", "ldvoid\nret");
+    let main = START_BODY.replace("fn<Int32>", "fn<Void>")
+        .replace("call neoCLR.Runtime.RuntimeAsyncAwait(Int64)\nret", "call neoCLR.Runtime.RuntimeAsyncAwaitUnit(Int64)\npop\nldloc operation\ncall neoCLR.Runtime.RuntimeAsyncAwaitUnit(Int64)\npop\nldloc operation\ncall neoCLR.Runtime.RuntimeAsyncRelease(Int64)\nbrfalse Bad\nldloc body\nldfld AsyncBody::Phase\nret");
+    assert_eq!(bounded_run(program(&main, &body)).value, Value::Int32(2));
+}
+
+#[test]
+fn unit_body_can_complete_eagerly() {
+    let body = BODY
+        .replace("Run() -> Int32", "Run() -> Void")
+        .replace(
+            "ldarg 0\nldfld AsyncBody::Gate\ncall neoCLR.Runtime.RuntimeAsyncAwait(Int64)\npop",
+            "",
+        )
+        .replace("ldc.i4 42\nret", "ldvoid\nret");
+    let main = r#"
+.local AsyncBody body
+newobj instance AsyncBody::.ctor()
+stloc body
+ldloc body
+function.bind fn<Void> = instance AsyncBody::Run()
+call neoCLR.Runtime.RuntimeAsyncStart(fn<Void>)
+stloc operation
+ldloc operation
+call neoCLR.Runtime.RuntimeAsyncIsCompleted(Int64)
+brfalse Bad
+ldloc operation
+call neoCLR.Runtime.RuntimeAsyncAwaitUnit(Int64)
+pop
+ldloc body
+ldfld AsyncBody::Phase
+ret
+Bad:
+fault "unit body did not complete eagerly"
+"#;
+    assert_eq!(bounded_run(program(main, &body)).value, Value::Int32(2));
+}
+
+#[test]
+fn unit_and_integer_results_cannot_be_confused() {
+    let unit = BODY
+        .replace("Run() -> Int32", "Run() -> Void")
+        .replace("ldc.i4 42\nret", "ldvoid\nret");
+    let fault = program(&START_BODY.replace("fn<Int32>", "fn<Void>"), &unit)
+        .run(Limits::default())
+        .unwrap_err();
+    assert!(fault.message.contains("Int32 result"));
+    let main = START_BODY.replace(
+        "call neoCLR.Runtime.RuntimeAsyncAwait(Int64)\nret",
+        "call neoCLR.Runtime.RuntimeAsyncAwaitUnit(Int64)\npop\nldc.i4 0\nret",
+    );
+    let fault = program(&main, BODY).run(Limits::default()).unwrap_err();
+    assert!(fault.message.contains("unit result"));
+}
+
+#[test]
+fn manual_unit_completion_is_retained_and_one_shot() {
+    let main = r#"
+call neoCLR.Runtime.RuntimeAsyncCreate()
+stloc operation
+ldloc operation
+call neoCLR.Runtime.RuntimeAsyncCompleteUnit(Int64)
+brfalse Bad
+ldloc operation
+ldc.i4 42
+call neoCLR.Runtime.RuntimeAsyncComplete(Int64, Int32)
+brtrue Bad
+ldloc operation
+call neoCLR.Runtime.RuntimeAsyncAwaitUnit(Int64)
+pop
+ldloc operation
+call neoCLR.Runtime.RuntimeAsyncAwaitUnit(Int64)
+pop
+ldc.i4 7
+ret
+Bad:
+fault "unit completion was not one-shot"
+"#;
+    assert_eq!(bounded_run(program(main, "")).value, Value::Int32(7));
+}
+
+#[test]
+fn cli_no_result_unit_await_does_not_push_a_value() {
+    let module = neoclr::assemble(
+        r#"
+.module UnitAwait
+.entry Main
+.function neoCLR.Runtime.RuntimeAsyncCreate() -> Int64
+.methodimpl InternalCall
+.end
+.function neoCLR.Runtime.RuntimeAsyncCompleteUnit(Int64 id) -> Boolean
+.methodimpl InternalCall
+.end
+.function neoCLR.Runtime.RuntimeAsyncAwaitUnit(Int64 id) -> noresult
+.methodimpl InternalCall
+.end
+.function Main() -> Int32
+.local Int64 operation
+call neoCLR.Runtime.RuntimeAsyncCreate()
+stloc operation
+ldloc operation
+call neoCLR.Runtime.RuntimeAsyncCompleteUnit(Int64)
+pop
+ldc.i4 42
+ldloc operation
+call neoCLR.Runtime.RuntimeAsyncAwaitUnit(Int64)
+ret
+.end
+"#,
+    )
+    .unwrap();
+    let p = LoadedProgram::new(&module).unwrap();
+    p.verify().unwrap();
+    assert_eq!(bounded_run(p).value, Value::Int32(42));
+}
+
+#[test]
+fn entry_drain_tracks_its_frame_across_detached_unit_body_calls() {
+    let body = BODY
+        .replace("Run() -> Int32", "Run() -> Void")
+        .replace("ldc.i4 42\nret", "call Helper()\nldvoid\nret");
+    let extra = format!(
+        r#"{body}
+.function Helper() -> noresult
+ret
+.end
+.function neoCLR.Runtime.DrainEntryTasks() -> Void
+.methodimpl InternalCall
+.end
+.type class Observer
+.field Handle Int64
+.method instance .ctor() -> noresult
+ret
+.end
+.method instance Run() -> Void
+ldarg 0
+ldfld Observer::Handle
+call neoCLR.Runtime.RuntimeAsyncAwaitUnit(Int64)
+pop
+ldvoid
+ret
+.end
+.end
+"#
+    );
+    let tail = r#"
+newobj instance Observer::.ctor()
+stloc observer
+ldloc observer
+ldloc operation
+stfld Observer::Handle
+ldloc observer
+function.bind fn<Void> = instance Observer::Run()
+call neoCLR.Runtime.SchedulerSubmit(fn<Void>)
+pop
+call neoCLR.Runtime.DrainEntryTasks()
+pop
+ldloc operation
+call neoCLR.Runtime.RuntimeAsyncAwaitUnit(Int64)
+pop
+ldc.i4 42
+ret
+"#;
+    let main = START_BODY.replace(".local AsyncBody body", ".local AsyncBody body\n.local Observer observer").replace("fn<Int32>", "fn<Void>").replace(
+        "ldloc operation\ncall neoCLR.Runtime.RuntimeAsyncAwait(Int64)\nret",
+        tail,
+    );
     assert_eq!(bounded_run(program(&main, &extra)).value, Value::Int32(42));
 }

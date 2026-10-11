@@ -69,6 +69,43 @@ module RuntimeAwaitLanguage {
         }
     }
 
+    class UnitBody {
+        val Gate: long
+        var Phase = 0
+        init(gate: long) {
+            Gate = gate
+        }
+        // Deliberate direct boundary: tests retained frames, not compiler lowering.
+        func Run() -> System.Void {
+            Phase = 1
+            neoCLR.Runtime.RuntimeAsyncAwaitUnit(Gate)
+            System.Runtime.GC.Collect()
+            Phase = 2
+            return ()
+        }
+    }
+
+    // Source-local protocol adapter for the unit-result runtime POC.
+    class UnitOperation : TaskAwaiter {
+        private val handle: long
+        init(operation: long) {
+            handle = operation
+        }
+        val IsCompleted: bool => neoCLR.Runtime.RuntimeAsyncIsCompleted(handle)
+        val IsCancelled: bool => neoCLR.Runtime.RuntimeAsyncIsCancelled(handle)
+        func GetAwaiter() -> UnitOperation => self
+        func GetResult() -> System.Void => neoCLR.Runtime.RuntimeAsyncAwaitUnit(handle)
+        func OnCompleted(callback: () -> System.Void) {
+            let continuation = Continuation(handle, callback)
+            _ = neoCLR.Runtime.SchedulerSubmit(continuation.Run)
+        }
+    }
+
+    async func ReadUnit(operation: UnitOperation) -> Task<()> {
+        await operation
+        return ()
+    }
+
     // Deliberate outcome-observation adapter: awaiting a cancelled task would
     // cancel this observer instead of letting Main assert the terminal outcome.
     class CancellationObserver {
@@ -140,6 +177,24 @@ module RuntimeAwaitLanguage {
         if stillWorks != 17 {
             System.Fail("Cancellation corrupted an independent operation")
         }
+        let unitBody = UnitBody(neoCLR.Runtime.RuntimeAsyncCreate())
+        let unitHandle = neoCLR.Runtime.RuntimeAsyncStart(unitBody.Run)
+        if unitBody.Phase != 1 {
+            System.Fail("Unit body did not run until suspension")
+        }
+        let unitOperation = UnitOperation(unitHandle)
+        let unitTask = ReadUnit(unitOperation)
+        if !neoCLR.Runtime.RuntimeAsyncCompleteUnit(unitBody.Gate) {
+            System.Fail("Unit gate completion failed")
+        }
+        await unitTask
+        await unitOperation
+        if unitBody.Phase != 2 {
+            System.Fail("Unit body did not resume")
+        }
+        if !neoCLR.Runtime.RuntimeAsyncRelease(unitHandle) {
+            System.Fail("Unit operation could not be released after observation")
+        }
         Console.WriteLine("PASS ordinary Raven await through runtime suspension adapter")
         return 0
     }
@@ -150,6 +205,14 @@ module neoCLR.Runtime {
 
     [MethodImpl(MethodImplOptions.InternalCall)]
     internal extern func RuntimeAsyncCreate() -> long;
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    internal extern func RuntimeAsyncStart(body: () -> System.Void) -> long;
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    internal extern func RuntimeAsyncCompleteUnit(operation: long) -> bool;
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    internal extern func RuntimeAsyncAwaitUnit(operation: long) -> System.Void;
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    internal extern func RuntimeAsyncRelease(operation: long) -> bool;
     [MethodImpl(MethodImplOptions.InternalCall)]
     internal extern func RuntimeAsyncIsCompleted(operation: long) -> bool;
     [MethodImpl(MethodImplOptions.InternalCall)]

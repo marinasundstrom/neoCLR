@@ -13,6 +13,7 @@ enum Operation {
     Body,
     Timer(Instant),
     Completed(i32),
+    CompletedUnit,
     Cancelled,
 }
 
@@ -59,6 +60,36 @@ impl Operations {
         true
     }
 
+    pub(crate) fn complete_unit(&mut self, id: i64) -> bool {
+        let Some(operation @ Operation::Pending) = self.0.get_mut(&id) else {
+            return false;
+        };
+        *operation = Operation::CompletedUnit;
+        true
+    }
+
+    pub(crate) fn complete_body_unit(&mut self, id: i64) {
+        if let Some(operation @ Operation::Body) = self.0.get_mut(&id) {
+            *operation = Operation::CompletedUnit;
+        }
+    }
+
+    pub(crate) fn read_unit(&mut self, id: i64) -> Result<Option<()>, Fault> {
+        if !self.is_completed(id)? {
+            return Ok(None);
+        }
+        match self.0.get(&id) {
+            Some(Operation::CompletedUnit) => Ok(Some(())),
+            Some(Operation::Cancelled) => Err(Fault::coded(
+                crate::FaultCode::ExecutionCancelled,
+                "Runtime async operation cancelled",
+            )),
+            _ => Err(Fault::new(
+                "Runtime async operation does not have a unit result",
+            )),
+        }
+    }
+
     pub(crate) fn cancel(&mut self, id: i64) -> bool {
         match self.0.get_mut(&id) {
             Some(operation @ (Operation::Pending | Operation::Body | Operation::Timer(_))) => {
@@ -96,7 +127,7 @@ impl Operations {
         }
         Ok(matches!(
             self.0.get(&id),
-            Some(Operation::Completed(_) | Operation::Cancelled)
+            Some(Operation::Completed(_) | Operation::CompletedUnit | Operation::Cancelled)
         ))
     }
 
@@ -127,7 +158,7 @@ impl Operations {
     pub(crate) fn release(&mut self, id: i64) -> bool {
         if !matches!(
             self.0.get(&id),
-            Some(Operation::Completed(_) | Operation::Cancelled)
+            Some(Operation::Completed(_) | Operation::CompletedUnit | Operation::Cancelled)
         ) {
             return false;
         }
@@ -143,6 +174,9 @@ impl Operations {
             Some(Operation::Timer(deadline)) if Instant::now() < *deadline => return Ok(None),
             Some(Operation::Timer(_)) => Ok(Some(0)),
             Some(Operation::Completed(value)) => Ok(Some(*value)),
+            Some(Operation::CompletedUnit) => Err(Fault::new(
+                "Runtime async operation does not have an Int32 result",
+            )),
             Some(Operation::Cancelled) => Err(Fault::coded(
                 crate::FaultCode::ExecutionCancelled,
                 "Runtime async operation cancelled",
@@ -160,6 +194,31 @@ impl Operations {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn unit_results_preserve_producer_authority_and_cancellation() {
+        let mut operations = Operations::default();
+        let body = operations.start().unwrap();
+        assert_eq!(operations.read_unit(body).unwrap(), None);
+        assert!(!operations.complete_unit(body));
+        operations.complete_body_unit(body);
+        assert_eq!(operations.read_unit(body).unwrap(), Some(()));
+        assert_eq!(operations.read_unit(body).unwrap(), Some(()));
+        assert_eq!(operations.read_completion(body).unwrap(), Some(true));
+        assert!(operations.read_ready(body).is_err());
+        assert!(operations.release(body));
+        assert!(operations.read_unit(body).is_err());
+
+        let cancelled = operations.start().unwrap();
+        assert!(operations.cancel(cancelled));
+        operations.complete_body_unit(cancelled);
+        assert_eq!(operations.read_completion(cancelled).unwrap(), Some(false));
+        assert_eq!(
+            operations.read_unit(cancelled).unwrap_err().code,
+            crate::FaultCode::ExecutionCancelled
+        );
+        assert!(operations.release(cancelled));
+    }
 
     #[test]
     fn completion_observation_preserves_cancelled_and_successful_outcomes() {

@@ -8,6 +8,15 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-11
 
+- Add unit-result bodies, manual completion and unit awaiting to the private
+  interpreter runtime-async POC. Retain outcomes, reject result-kind mismatches and
+  preserve CLI no-result stack behavior. An ordinary Raven Task<()> adapter consumer
+  covers suspension, GC, repeated awaits and release; compiler-native await, general
+  result types, managed lifetime and JIT/AOT support remain open. Fix entry-drain
+  ownership across detached activations so unrelated helper returns cannot acquire
+  a spurious unit value. Record runtime async as canonical and generated state
+  machines as a migration/testing path intended for eventual retirement.
+
 - Reject a runtime-async POC body's wait on its own pending operation with a terminal
   Fault instead of hanging, including through helper calls. Independent callbacks
   may still await the body, and terminal cancellation remains observable. General
