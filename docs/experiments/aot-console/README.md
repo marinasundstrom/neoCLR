@@ -2087,3 +2087,14 @@ String-unicode-test.c verifies combining text, empty/end bounds and a single all
 bounds. The check passes on macOS ARM64 with UBSan and warnings-as-errors; Windows
 execution is pending. Public String range access additionally validates its bounds
 and preserves neoCLR's grapheme semantics, unlike .NET UTF-16 code-unit slicing.
+
+### Reference field admission — 2026-10-12
+
+Reference records now use the existing 32-slot/264-byte flattened object bound
+without an additional sixteen-declared-field restriction. Async state machines
+with retained cleanup scopes exposed the redundant restriction. Inline value
+records retain their separate sixteen-field and 64-lane bounds. This changes
+admission only, not allocation layout, GC descriptors or collection policy.
+Focused tests admit 17 and 32 scalar fields, reject 33 before object emission, and
+check allocation canaries plus the one-byte-too-small arena failure. Unlike the
+CLR, native object layouts remain explicitly bounded in this experimental host.

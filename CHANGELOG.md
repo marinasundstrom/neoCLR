@@ -8,6 +8,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-12
 
+- Admit native reference records with more than sixteen declared fields when their
+  flattened layout fits the existing 32-slot/264-byte object bound. This removes
+  a redundant rejection of async state machines without changing storage or GC
+  limits. Verify 17/32-field admission, 33-slot rejection and allocation canaries.
+
 - Make JIT the development `run` default on macOS ARM64 and Windows x64, with
   installed compiler/helper/library discovery, explicit errors rather than fallback,
   and configurable packaged heap/byte-array limits. Enable macOS runtime suspension

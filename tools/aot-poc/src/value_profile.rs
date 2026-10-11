@@ -140,7 +140,7 @@ impl<'a> Profile<'a> {
                 || !t.generic_constraints.is_empty()
                 || t.packing.is_some()
                 || t.minimum_size.is_some()
-                || t.fields.len() > 16
+                || (!t.is_reference_type && t.fields.len() > 16)
                 || t.fields.iter().any(|f| {
                     f.deferred
                         || !(matches!(f.ty, Type::Single | Type::Double | Type::Int32 | Type::Byte | Type::SByte | Type::Int16 | Type::UInt16 | Type::UInt32 | Type::Int64 | Type::UInt64 | Type::IntPtr | Type::UIntPtr | Type::RuntimeTypeHandle | Type::Boolean | Type::Void | Type::String | Type::Char | Type::Named(_))
@@ -148,7 +148,7 @@ impl<'a> Profile<'a> {
                             || (references && matches!(&f.ty, Type::ArrayRef(t) if matches!(**t, Type::Byte | Type::String | Type::Char | Type::Function(_) | Type::Named(_)) || crate::selection::scalar_array_element(t))))
                 })
             {
-                return Err(format!("{}: value profile requires nongeneric records with at most sixteen supported scalar/reference/local-record fields", t.name).into());
+                return Err(format!("{}: value profile requires supported closed records (inline values have at most sixteen fields)", t.name).into());
             }
         }
         let mut p = Self {

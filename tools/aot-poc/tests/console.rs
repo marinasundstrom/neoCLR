@@ -1353,6 +1353,37 @@ int main(void) {
 
 #[test]
 #[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+fn thirty_two_field_reference_allocation_respects_arena_canaries() {
+    let dir=Temp::new();
+    let seed=neoclr::assemble(".module System\n.references ()\n").unwrap();
+    let fields=(0..32).map(|i| format!(".field F{i} Int32\n")).collect::<String>();
+    let source=format!(".module WideObject\n.type Pair\n.field X Int32\n.field Y Int32\n.end\n.type class Wide\n{fields}.method instance .ctor() -> noresult\nldarg 0\nldc.i4 42\nstfld 31\nret\n.end\n.end\n.function Calculate() -> Int32\n.local Wide value\nnewobj.ctor instance Wide::.ctor()\nstloc value\nldloc value\nldfld 0\nldloc value\nldfld 31\nadd\nret\n.end");
+    let r=compile_source(&dir,&seed,&source,&["--compile-system","--reference-arena"],false);
+    assert!(r.status.success(),"{}",String::from_utf8_lossy(&r.stderr));
+    let base=PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../docs/experiments/aot-console");
+    fs::write(dir.0.join("host.c"),r#"
+#include "text-arena.h"
+#include <string.h>
+int main(void) {
+    uint64_t storage[34];memset(storage,0xa5,sizeof(storage));
+    neoclr_aot_context ctx={.text={(unsigned char*)storage,264,0}};
+    int32_t result=-99;
+    if (neoclr_entry_v4(0,&result,&ctx) || result!=42 || ctx.text.used!=264) return 1;
+    for (unsigned i=264;i<sizeof(storage);i++) if (((unsigned char*)storage)[i]!=0xa5) return 2;
+    ctx.text.capacity=263;result=-99;
+    if (neoclr_entry_v4(0,&result,&ctx)!=5 || result!=-99 || ctx.text.used!=0) return 3;
+    return 0;
+}
+"#).unwrap();
+    let r=Command::new("clang").args(["-arch","arm64","-std=c11","-Wall","-Wextra","-Werror","-I"])
+        .arg(&base).arg(dir.0.join("host.c")).arg(base.join("text-arena.c")).arg(dir.0.join("app.o"))
+        .arg("-o").arg(dir.0.join("app")).output().unwrap();
+    assert!(r.status.success(),"{}",String::from_utf8_lossy(&r.stderr));
+    assert!(Command::new(dir.0.join("app")).env_clear().status().unwrap().success());
+}
+
+#[test]
+#[cfg(all(target_os = "macos", target_arch = "aarch64"))]
 fn erased_text_preserves_pointer_payloads_nulls_lifetime_and_faults() {
     let dir = Temp::new();
     let seed = neoclr::assemble(TEXT_SEED).unwrap();
@@ -6489,4 +6520,20 @@ int main(void) {
     assert!(r.status.success(), "{}", String::from_utf8_lossy(&r.stderr));
     let r = Command::new(dir.0.join("host")).env_clear().output().unwrap();
     assert!(r.status.success(), "{r:?}");
+}
+
+#[test]
+fn reference_field_admission_uses_the_flattened_storage_bound() {
+    for count in [17, 32, 33] {
+        let dir = Temp::new();
+        let seed = neoclr::assemble(".module System\n.references ()\n").unwrap();
+        let fields = (0..count).map(|i| format!(".field F{i} Int32\n")).collect::<String>();
+        let source = format!(".module WideObject\n.type class Wide\n{fields}.method instance .ctor() -> noresult\nret\n.end\n.end\n.function Calculate() -> Int32\nnewobj.ctor instance Wide::.ctor()\nldfld {}\nret\n.end\n", count - 1);
+        let result = compile_source(&dir, &seed, &source, &["--compile-system", "--reference-arena"], false);
+        assert_eq!(result.status.success(), count <= 32, "{}", String::from_utf8_lossy(&result.stderr));
+        if count > 32 {
+            assert!(String::from_utf8_lossy(&result.stderr).contains("264-byte native object bound"));
+            assert!(!dir.0.join("app.o").exists());
+        }
+    }
 }
