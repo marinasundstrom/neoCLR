@@ -2409,22 +2409,9 @@ fn interpret_instructions_with_dispatch(
                     *completion_boundary = Some(Value::Void);
                     continue;
                 }
-                if scheduler.install_submission(|callback| {
-                    frames.push(runtime_submission_frame(module, callback)?);
-                    Ok(())
-                })? {
-                    *active_callback = Some(true);
-                    continue;
-                }
-                heap.publish(execution_roots(
-                    frames,
-                    parked_activations,
-                    scheduler,
-                    default_task_queue.as_ref(),
-                    invocation_result.as_ref(),
-                ))?;
-                *completion_boundary = Some(value);
-                return Ok(InstructionProgress::Waiting);
+                // No ready retained activation: continue through the shared dispatcher.
+                // Managed Promise notifications and host completions can make these
+                // operations ready; waiting here would starve both sources.
             }
             if let Some(&RuntimeAsyncBoundary {
                 depth,
@@ -2549,10 +2536,24 @@ fn interpret_instructions_with_dispatch(
             // Run ready default-queue work before waiting for registered host
             // results. A notification is transferred directly into a traced
             // Post frame, then drained on this invocation and instruction budget.
-            if !*entry_drain_active && invocation_result.is_none() {
+            if !*entry_drain_active
+                && invocation_result.is_none()
+                && !parked_activations.iter().any(|activation| !activation.callback)
+            {
                 *invocation_result = Some(value.clone());
             }
-            if *drain_required {
+            // A legacy queue can itself be suspended inside a callback. Do not
+            // recursively enter it; retain the request until its Drain returns.
+            let queue_is_draining = default_task_queue.as_ref().is_some_and(|queue| {
+                frames
+                    .iter()
+                    .chain(parked_activations.iter().flat_map(|activation| &activation.frames))
+                    .any(|frame| {
+                        frame.function.owner.as_ref() == Some(&queue.ty())
+                            && task_queue::member(&frame.function) == "Drain"
+                    })
+            });
+            if *drain_required && !queue_is_draining {
                 *drain_required = false;
                 if let Some(queue) = &default_task_queue {
                     let drain = task_queue::method(module, &queue.ty(), "Drain", &[])?;
@@ -2626,6 +2627,17 @@ fn interpret_instructions_with_dispatch(
             if work_control.is_none() && revision != *work_revision {
                 *completion_boundary = Some(value);
                 continue;
+            }
+            if !parked_activations.is_empty() {
+                heap.publish(execution_roots(
+                    frames,
+                    parked_activations,
+                    scheduler,
+                    default_task_queue.as_ref(),
+                    invocation_result.as_ref(),
+                ))?;
+                *completion_boundary = Some(value);
+                return Ok(InstructionProgress::Waiting);
             }
             if *entry_drain_active && frames.last().is_some_and(|frame| frame.entry_drain_wait) {
                 *entry_drain_active = false;
@@ -4645,6 +4657,9 @@ fn interpret_instructions_with_dispatch(
                     }
                     frames.pop();
                     if runtime_callback {
+                        // A retained body can complete a managed Promise just as a
+                        // scheduler submission can. Observe its queued continuations.
+                        *drain_required = true;
                         return Ok(Some(Value::Void));
                     }
                     if let Some(caller) = frames.last_mut() {

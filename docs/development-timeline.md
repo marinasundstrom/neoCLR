@@ -15010,3 +15010,21 @@ or runtime-await default switch was performed.
   passes its compiled Task<()> adapter consumer and 54 focused runtime checks.
   That consumer exposed a runtime entry-drain frame-identity bug, which was fixed;
   this is not reported as a Raven compiler fix. Compiler-native await remains open.
+
+
+### Canonical runtime async: managed boundary qualification — 2026-10-11
+
+- **Author direction:** continue toward canonical runtime async, retaining generated
+  state machines as a migration/regression mechanism; Fault stays non-recoverable.
+- **Assistant investigation:** the current native compiler lowers async bodies before
+  emission. Its existing .NET runtime-async flag does not supply neoCLR's Task/body
+  ownership contract. Proposed qualifying an explicit managed boundary first.
+- **Performed:** compiled a source-local retained-body adapter returning ordinary
+  Task<T> results, including reference values and cancellation. Fixed interpreter
+  starvation while all activations are parked and a portable-emitter rejection of
+  inline await in a short-circuit condition. Generated Main exercised the new body
+  path and again exposed an integration gap.
+- **Outcome:** the [consumer and focused regressions](experiments/runtime-async/README.md#managed-task-boundary-and-idle-dispatch-2026-10-11)
+  pass. Body methods are ordinary retained frames; the wrapper is hand-written.
+  Automatic compiler lowering, production lifetime/notification routing and measured
+  comparison remain open. No default switch or performance claim was made.

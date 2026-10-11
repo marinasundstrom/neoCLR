@@ -1,0 +1,76 @@
+{
+  "passed": true,
+  "commands": [
+    {
+      "command": [
+        "dotnet",
+        "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+        "neoclr",
+        "--core-reference",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/Core.dll",
+        "--runtime-seed",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/System.runtime.neox",
+        "--bootstrap-intrinsics",
+        "--bootstrap-ownership",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/ownership.json",
+        "--object-library",
+        "System.Runtime",
+        "--async-library",
+        "System.Runtime",
+        "--reference",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/System.Runtime.dll",
+        "--reference",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/System.Data.dll",
+        "--reference",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/System.Networking.dll",
+        "--reference",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/System.Web.dll",
+        "-o",
+        "/Users/robert/Projects/neoclr/target/runtime-async-managed-task/app.dll",
+        "/Users/robert/Projects/neoclr/docs/experiments/runtime-async/ManagedTask.rvn"
+      ],
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/scheduler-wait-validation/debug/neoclr",
+        "run",
+        "/Users/robert/Projects/neoclr/target/runtime-async-managed-task/app.dll",
+        "--system",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/System.runtime.neox",
+        "--instructions",
+        "100000000",
+        "--object-root",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/System.Runtime.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/System.Runtime.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/System.Data.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/System.Networking.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/System.Web.dll"
+      ],
+      "exitCode": 0,
+      "stdout": "PASS managed Tasks through retained runtime bodies\n",
+      "stderr": ""
+    }
+  ],
+  "sha256": {
+    "/Users/robert/Projects/neoclr/docs/experiments/runtime-async/ManagedTask.rvn": "413f52ff46f79e10e8f4013e8a67a99f1501e90c54aa0debe4e4516e4419fd32",
+    "/Users/robert/Projects/neoclr/target/scheduler-wait-validation/debug/neoclr": "5e38245afa66f0034b9c5361c0ec69ae2fa2e257f585a5691b9996236f87f178",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll": "8b3b6243be7eb8a03c2b025183dbc857dd49d01aaee022bbcae3541385783c7e",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/Raven.CodeAnalysis.dll": "6e2ba8a69496acdcf8924b2b6c17c1af071d3e2dca368a0f933906216933e624",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/Raven.CodeAnalysis.NeoClr.dll": "e4dbae3380c2605d2f27dbaed074be7ca11aa57eeeb4ccc376656519633df5cb",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/NeoCLR.Metadata.Experimental.dll": "e033999194866b550d3fa34a1d1a25d303f1ff30f0a265027cb45219e8b44a4a",
+    "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/ownership.json": "b6776991106e1682db4b9ddd2e16b938b965433f59f6f39d98ef0e2d93fc6527",
+    "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/Core.dll": "3d4a676d379067c18a65a9beb8257ed40bf3196fc643a9ba1d559c619ec73fad",
+    "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/System.runtime.neox": "98a1ae1da85387c87746957e83a4015eb59d0566539a915c69f168d2b511b190",
+    "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/System.Runtime.dll": "818e0147dd0a6fb4946a9ddca0b672e19902b9b6138cdee6ac9b9c07e25bf746",
+    "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/System.Data.dll": "7cfad8f6ca5e0cfc0cc13c15bdb8fc623280aa72fd6aad73a7aacdd586a9c150",
+    "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/System.Networking.dll": "ec3b383eee5f202f0badeb48ad775df16de1b2a81d94843caf2391c21fa9e2e3",
+    "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/System.Web.dll": "edcae392b0cd0a4562680408830a931ad2bf92e5280157da16afd8967103474c"
+  }
+}

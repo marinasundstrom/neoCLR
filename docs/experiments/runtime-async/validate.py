@@ -11,12 +11,16 @@ parser.add_argument('--bundle', type=Path, required=True)
 parser.add_argument('--compiler', type=Path, help='Override bundled rvnc.dll for compiler integration validation')
 parser.add_argument('--runtime', type=Path, required=True)
 parser.add_argument('--output', type=Path, required=True)
-parser.add_argument('--language-await', action='store_true', help='Validate ordinary await via the compatibility adapter')
+mode = parser.add_mutually_exclusive_group()
+mode.add_argument('--language-await', action='store_true', help='Validate ordinary await via the compatibility adapter')
+mode.add_argument('--managed-task', action='store_true', help='Validate retained bodies producing ordinary managed Tasks')
 args = parser.parse_args()
 bundle, runtime, output = args.bundle.resolve(), args.runtime.resolve(), args.output.resolve()
 output.mkdir(parents=True, exist_ok=True)
-source = Path(__file__).with_name('AwaitLanguage.rvn' if args.language_await else 'Await.rvn').resolve()
-expected = ('PASS ordinary Raven await through runtime suspension adapter' if args.language_await
+source = Path(__file__).with_name('ManagedTask.rvn' if args.managed_task else
+                                'AwaitLanguage.rvn' if args.language_await else 'Await.rvn').resolve()
+expected = ('PASS managed Tasks through retained runtime bodies' if args.managed_task else
+            'PASS ordinary Raven await through runtime suspension adapter' if args.language_await
             else 'PASS runtime-owned operation suspension and resumption')
 sources = [source]
 compiler = args.compiler.resolve() if args.compiler else bundle / 'sdk/tools/rvnc/rvnc.dll'

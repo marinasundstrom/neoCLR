@@ -1,0 +1,227 @@
+module RuntimeManagedTask {
+    import System.*
+    import System.Tasks.*
+    import System.Tasks.TaskOutcome.*
+
+    // Private, hand-written candidate lowering boundary. These are not public APIs.
+    // A normal managed Promise owns T; the runtime retains only the unit body.
+    class Body<T> {
+        private val callback: () -> TaskOutcome<T>
+        private val source = Promise<T>()
+
+        init(action: () -> TaskOutcome<T>) {
+            callback = action
+        }
+
+        val Task: Task<T> => source.Task
+
+        func Run() -> System.Void {
+            match callback() {
+                Completed(let value) => { _ = source.Complete(value) }
+                Cancelled => { _ = source.Cancel() }
+            }
+        }
+    }
+
+    class BodyLifetime {
+        private val handle: long
+        init(handle: long) {
+            self.handle = handle
+        }
+
+        // Runtime ownership ends after Body.Run returns, not when its Promise completes.
+        func Release() -> System.Void {
+            _ = neoCLR.Runtime.RuntimeAsyncWaitCompletion(handle)
+            if !neoCLR.Runtime.RuntimeAsyncRelease(handle) {
+                System.Fail("Completed body still has an owner")
+            }
+        }
+    }
+
+    func Start<T>(callback: () -> TaskOutcome<T>) -> Task<T> {
+        let body = Body<T>(callback)
+        let handle = neoCLR.Runtime.RuntimeAsyncStart(body.Run)
+        let lifetime = BodyLifetime(handle)
+        if neoCLR.Runtime.RuntimeAsyncIsCompleted(handle) {
+            lifetime.Release()
+        } else {
+            _ = neoCLR.Runtime.SchedulerSubmit(lifetime.Release)
+        }
+        return body.Task
+    }
+
+    class CompletionSignal {
+        val Handle = neoCLR.Runtime.RuntimeAsyncCreate()
+
+        // Deliberate managed-task notification adapter, including cancellation.
+        func Complete() -> System.Void {
+            if !neoCLR.Runtime.RuntimeAsyncCompleteUnit(Handle) {
+                System.Fail("Completion signal was delivered twice")
+            }
+        }
+    }
+
+    // Candidate compiler boundary: false means return cancellation from this body.
+    // It never reads a cancelled result or converts a terminal Fault into an outcome.
+    func Wait<T>(task: Task<T>) -> bool {
+        if !task.IsCompleted {
+            let signal = CompletionSignal()
+            task.OnCompleted(signal.Complete)
+            neoCLR.Runtime.RuntimeAsyncAwaitUnit(signal.Handle)
+            if !neoCLR.Runtime.RuntimeAsyncRelease(signal.Handle) {
+                System.Fail("Completion signal still has a waiter")
+            }
+        }
+        return !task.IsCancelled
+    }
+
+    class Payload {
+        val Value: int
+        init(value: int) {
+            Value = value
+        }
+    }
+
+    class Reader {
+        private val input: Task<Payload>
+        var Phase = 0
+        init(input: Task<Payload>) {
+            self.input = input
+        }
+
+        // Deliberate hand-lowered await: ordinary frames, no generated state machine.
+        func Run() -> TaskOutcome<Payload> {
+            let retained = Payload(25)
+            Phase = 1
+            if !Wait(input) {
+                return Cancelled
+            }
+            System.Runtime.GC.Collect()
+            let value = input.GetResult()
+            Phase = 2
+            return Completed(Payload(retained.Value + value.Value))
+        }
+    }
+
+    // Observe cancellation through a managed continuation so the legacy TaskQueue
+    // can finish its current callback; retained bodies run outside that queue.
+    class CancellationObserver {
+        private val task: Task<Payload>
+        private val source = Promise<bool>()
+        init(task: Task<Payload>) {
+            self.task = task
+        }
+        val Task: Task<bool> => source.Task
+        func Complete() -> System.Void {
+            _ = source.Complete(task.IsCompleted && task.IsCancelled)
+        }
+    }
+
+    class UnitReader {
+        private val input: Task<()>
+        init(input: Task<()>) {
+            self.input = input
+        }
+        func Run() -> TaskOutcome<()> {
+            if !Wait(input) {
+                return Cancelled
+            }
+            input.GetResult()
+            return Completed(())
+        }
+    }
+
+    func IntegerBody() -> TaskOutcome<int> => Completed(42)
+    func UnitBody() -> TaskOutcome<()> => Completed(())
+
+    async func Main() -> Task<int> {
+        let source = Promise<Payload>()
+        let first = Reader(source.Task)
+        let second = Reader(source.Task)
+        let firstTask = Start(first.Run)
+        let secondTask = Start(second.Run)
+        if first.Phase != 1 || second.Phase != 1 || firstTask.IsCompleted || secondTask.IsCompleted {
+            System.Fail("Bodies did not run eagerly to their first suspension")
+        }
+        System.Runtime.GC.Collect()
+        _ = source.Complete(Payload(17))
+        let firstResult = await firstTask
+        let secondResult = await secondTask
+        let repeated = await firstTask
+        if firstResult.Value != 42 || secondResult.Value != 42 || repeated.Value != 42 {
+            System.Fail("Managed results or retained reference locals were lost")
+        }
+        if first.Phase != 2 || second.Phase != 2 {
+            System.Fail("Shared managed input did not resume both bodies")
+        }
+
+        let cancelled = Promise<Payload>()
+        let cancelledReader = Reader(cancelled.Task)
+        let cancelledTask = Start(cancelledReader.Run)
+        _ = cancelled.Cancel()
+        // Explicit outcome observation: awaiting this Task would cancel Main.
+        let observer = CancellationObserver(cancelledTask)
+        cancelledTask.OnCompleted(observer.Complete)
+        let observedCancellation = await observer.Task
+        if !observedCancellation || cancelledReader.Phase != 1 {
+            System.Fail("Cancellation was not propagated without reading the result")
+        }
+        let alreadyCancelled = Reader(cancelled.Task)
+        let alreadyCancelledTask = Start(alreadyCancelled.Run)
+        if !alreadyCancelledTask.IsCompleted || !alreadyCancelledTask.IsCancelled || alreadyCancelled.Phase != 1 {
+            System.Fail("Completed cancellation fast path failed")
+        }
+
+        let unitSource = Promise<()>()
+        let unitReader = UnitReader(unitSource.Task)
+        let unitTask = Start(unitReader.Run)
+        if unitTask.IsCompleted {
+            System.Fail("Pending unit task completed early")
+        }
+        _ = unitSource.Complete(())
+        await unitTask
+
+        // More than the private 64-handle budget: both eager and suspended bodies
+        // must release ownership, independently of retained managed Task outcomes.
+        var index = 0
+        while index < 80 {
+            let integer = Start(IntegerBody)
+            if !integer.IsCompleted || await integer != 42 {
+                System.Fail("Eager integer body did not publish synchronously")
+            }
+            await Start(UnitBody)
+            let pending = Promise<Payload>()
+            let reader = Reader(pending.Task)
+            let result = Start(reader.Run)
+            _ = pending.Complete(Payload(17))
+            let payload = await result
+            if payload.Value != 42 {
+                System.Fail("Repeated suspension lost its managed result")
+            }
+            index = index + 1
+        }
+        Console.WriteLine("PASS managed Tasks through retained runtime bodies")
+        return 0
+    }
+}
+
+module neoCLR.Runtime {
+    import System.Runtime.CompilerServices.*
+
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    internal extern func RuntimeAsyncCreate() -> long;
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    internal extern func RuntimeAsyncStart(body: () -> System.Void) -> long;
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    internal extern func RuntimeAsyncCompleteUnit(operation: long) -> bool;
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    internal extern func RuntimeAsyncAwaitUnit(operation: long) -> System.Void;
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    internal extern func RuntimeAsyncRelease(operation: long) -> bool;
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    internal extern func RuntimeAsyncIsCompleted(operation: long) -> bool;
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    internal extern func RuntimeAsyncWaitCompletion(operation: long) -> bool;
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    internal extern func SchedulerSubmit(callback: () -> System.Void) -> int;
+}

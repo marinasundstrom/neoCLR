@@ -389,3 +389,68 @@ Author clarification: runtime async is canonical; generated state machines are a
 migration/testing mechanism with eventual retirement intended. They remain useful
 for finding compiler/runtime integration bugs. Defaults remain unchanged until the
 runtime path is qualified; no performance improvement is claimed here.
+
+
+## Managed Task boundary and idle dispatch (2026-10-11)
+
+[ManagedTask.rvn](ManagedTask.rvn) is an executable, source-local candidate for
+compiler lowering. `Start<T>` invokes an ordinary body eagerly through the private
+unit-result runtime service and returns the body's existing managed `Task<T>`.
+`Promise<T>` retains the result; the runtime retains the executing frames. The
+body and its helpers contain no generated state machine. Async Main remains a
+state-machine consumer, including an inline await in a short-circuit condition.
+This is **not yet compiler-native lowering** or a public Task implementation change.
+
+The candidate separates three responsibilities:
+
+- A managed producer owns reference, value or unit results and cancellation.
+- A private runtime operation owns the retained body's execution until it returns.
+- A temporary notification adapter turns managed Task completion into a unit
+  signal that can resume a retained frame. `OnCompleted` is used only at that
+  protocol boundary and for explicit cancellation observation.
+
+`Wait<T>` returns false on cancellation; the hand-written body immediately returns
+`Cancelled`, without calling GetResult or treating a Fault as an outcome. The
+compiler would need to generate that control transfer, including scope cleanup.
+Fault stays invocation-terminal. The successful path releases the temporary signal
+before reading the managed result. Body ownership is released after the runtime
+publishes completion, not merely when the Promise becomes observable. Eager bodies
+release immediately; suspended bodies currently need a separate cleanup callback.
+References remain rooted by ordinary retained frames and managed Promise storage;
+this does not add generic/reference values to the runtime's private handle table.
+
+Compared with .NET's Task/TaskCompletionSource and generated async builder, this
+keeps the managed operation/producer split while replacing body state fields with
+retained runtime frames. Compared with introducing a generic runtime result ABI,
+it reuses existing managed generic storage and tracing. Costs include a temporary
+signal, callback and cleanup activation, plus dependence on the legacy TaskQueue
+notification adapter. No allocation or speed improvement is claimed. Production
+lowering must resolve lifetimes, cancellation cleanup, entry support and notification
+routing before adopting this as a contract. A callback that itself suspends inside
+legacy TaskQueue.Drain cannot depend on later work in that same serial queue; the
+runtime prevents recursive draining, but does not turn that queue into concurrent
+execution. This consumer's retained bodies run outside its queue callbacks.
+
+The first run exposed starvation: when every activation was parked, the POC waited
+before servicing managed notifications or host completions. Idle parked activations
+now fall through the shared dispatcher. Completing a retained callback also marks
+managed notifications for draining. A suspended legacy Drain is never entered
+recursively; its outstanding drain request remains pending. Focused regressions
+cover a managed completion waking a retained body and a queue callback that itself
+suspends on a timer. Runtime Faults are not captured.
+
+Validation: 32 runtime-operation tests, eight yield tests, five entry-result tests,
+two scheduler-submission tests and three timer tests pass (50 focused checks).
+The compiled consumer covers two bodies awaiting one managed reference Task, a
+reference local retained across suspension/GC, repeated result reads, pending and
+pre-existing cancellation, pending unit completion, eager integer/unit completion,
+and 80 iterations of both eager and suspended bodies (beyond the 64-handle limit).
+[Exact compiler/runtime/source hashes and commands](managed-task-validation.json).
+The portable compiler fix `0c9a8881f` has 65 focused tests passing on the native
+compiler line (`codex/source-object-metadata-resolution`); Raven main is unchanged.
+
+Run with `validate.py --managed-task --bundle <bundle> --compiler <rvnc.dll>
+--runtime <neoclr> --output <dedicated-directory>`. The compiler override is required
+for this consumer until the selected bundle includes the portable condition fix.
+No public reference snapshot or website capability claim changes. Interpreter-only;
+JIT/AOT, automatic lowering/default selection and comparative benchmarks remain open.

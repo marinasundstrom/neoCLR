@@ -1528,3 +1528,16 @@ compiler-generated state machines. During migration, state machines remain both 
 execution path and a useful way to expose Raven bugs. This is not a commitment to
 permanent equal-status async implementations. Default switching still follows
 stability and comparative qualification of the runtime path.
+
+
+### Retained bodies producing managed Tasks — 2026-10-11
+
+The [managed boundary experiment](experiments/runtime-async/README.md#managed-task-boundary-and-idle-dispatch-2026-10-11)
+now returns existing Task<T> values from retained unit bodies, with reference results
+rooted in managed Promise storage. This qualifies a candidate compiler boundary,
+not automatic lowering or a selected generic native result ABI. Cancellation remains
+an explicit managed outcome and Fault remains terminal. Idle retained activations
+must continue servicing the shared completion dispatcher; their presence cannot
+short-circuit managed notifications or native host delivery. Suspended legacy queues
+are not drained recursively. The experiment records the adapter's allocation,
+lifetime and serial-queue costs; no performance gain is claimed.

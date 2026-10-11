@@ -932,3 +932,114 @@ ret
     );
     assert_eq!(bounded_run(program(&main, &extra)).value, Value::Int32(42));
 }
+
+#[test]
+fn parked_activations_keep_managed_completion_dispatch_alive() {
+    assert_managed_dispatch_while_parked("");
+}
+
+#[test]
+fn suspended_managed_queue_callback_is_not_drained_recursively() {
+    assert_managed_dispatch_while_parked(
+        "ldc.i4 1\ncall neoCLR.Runtime.RuntimeAsyncDelay(Int32)\ncall neoCLR.Runtime.RuntimeAsyncAwait(Int64)\npop",
+    );
+}
+
+fn assert_managed_dispatch_while_parked(pause: &str) {
+    let source = r#".module App
+.entry Main
+.function Main() -> Int32
+.local Int64 operation
+.local System.Tasks.TaskQueue queue
+.local Int64 body
+newobj instance System.Tasks.TaskQueue::.ctor()
+stloc queue
+ldloc queue
+call neoCLR.Runtime.RegisterDefaultTaskQueue(System.Tasks.TaskQueue)
+pop
+call neoCLR.Runtime.RuntimeAsyncCreate()
+stloc operation
+ldloc queue
+ldloc operation
+stfld System.Tasks.TaskQueue::Gate
+ldloc queue
+function.bind fn<Int32> = instance System.Tasks.TaskQueue::Body()
+call neoCLR.Runtime.RuntimeAsyncStart(fn<Int32>)
+stloc body
+ldloc body
+call neoCLR.Runtime.RuntimeAsyncAwait(Int64)
+ret
+.end
+"#;
+    let system = neoclr::assemble(&format!(
+        r#".module System
+.function neoCLR.Runtime.RuntimeAsyncDelay(Int32 ms) -> Int64
+.methodimpl InternalCall
+.end
+.function neoCLR.Runtime.RuntimeAsyncCreate() -> Int64
+.methodimpl InternalCall
+.end
+.function neoCLR.Runtime.RuntimeAsyncStart(fn<Int32> body) -> Int64
+.methodimpl InternalCall
+.end
+.function neoCLR.Runtime.RuntimeAsyncAwait(Int64 id) -> Int32
+.methodimpl InternalCall
+.end
+.function neoCLR.Runtime.RuntimeAsyncComplete(Int64 id, Int32 value) -> Boolean
+.methodimpl InternalCall
+.end
+.function neoCLR.Runtime.RegisterDefaultTaskQueue(System.Tasks.TaskQueue queue) -> Void
+.methodimpl InternalCall
+.end
+.type class System.Tasks.TaskQueue
+.field Gate Int64
+.field Running Boolean
+.method instance .ctor() -> noresult
+ret
+.end
+.method instance Drain() -> noresult
+ldarg 0
+ldfld System.Tasks.TaskQueue::Running
+brfalse Begin
+fault "queue was drained recursively"
+Begin:
+ldarg 0
+ldc.bool true
+stfld System.Tasks.TaskQueue::Running
+ldarg 0
+function.bind fn<Void> = instance System.Tasks.TaskQueue::Signal()
+call instance fn<Void>::Invoke()
+pop
+ldarg 0
+ldc.bool false
+stfld System.Tasks.TaskQueue::Running
+ret
+.end
+.method instance Signal() -> Void
+{pause}
+ldarg 0
+ldfld System.Tasks.TaskQueue::Gate
+ldc.i4 42
+call neoCLR.Runtime.RuntimeAsyncComplete(Int64, Int32)
+pop
+ldvoid
+ret
+.end
+.method instance Body() -> Int32
+ldarg 0
+ldfld System.Tasks.TaskQueue::Gate
+call neoCLR.Runtime.RuntimeAsyncAwait(Int64)
+ret
+.end
+.end
+"#,
+    ))
+    .unwrap();
+    let app =
+        neoclr::assembler::read_modules(&[neoclr::assembler::ModuleInput::Source(source)], &system)
+            .unwrap()
+            .remove(0);
+    let p = LoadedProgram::with_library(&app, &system).unwrap();
+    p.verify().unwrap();
+    assert_eq!(bounded_run(p).value, Value::Int32(42));
+}

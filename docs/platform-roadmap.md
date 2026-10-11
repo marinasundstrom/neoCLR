@@ -42,8 +42,12 @@ The author reaffirms that Fault remains non-recoverable and invocation-terminal.
 Runtime async is the canonical model; compiler-generated state machines are a
 migration path and a useful compiler regression oracle, with eventual retirement
 as the goal. Qualification still precedes default switching.
-Next are compiler-native
-await/managed Task integration and equivalent state-machine
+A source-local managed Task boundary now qualifies retained bodies producing
+reference, integer and unit results, cancellation and bounded handle reuse
+([evidence](experiments/runtime-async/managed-task-validation.json)). It also fixes
+idle retained-activation dispatch starvation; it is hand-written candidate lowering,
+not compiler-native await. Next are compiler-native
+await integration and equivalent state-machine
 comparisons before switching supported defaults. Native stack representation, preemption and
 multi-core scheduling remain open. Task/Promise keep operation/producer roles.
 

@@ -8,6 +8,14 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-11
 
+- Keep managed notifications and host-completion dispatch active when interpreter
+  runtime-async activations are all parked; avoid recursive legacy queue draining
+  and drain continuations posted by completed retained bodies. Add a compiled
+  managed Task projection POC with reference/int/unit results, shared/repeated
+  waits, cancellation and handle reuse. Its body boundary is hand-written, not
+  compiler-native await or a new public API. Qualify Raven's portable-emitter fix
+  for inline await in short-circuit conditions; generated Main remains the consumer.
+
 - Add unit-result bodies, manual completion and unit awaiting to the private
   interpreter runtime-async POC. Retain outcomes, reject result-kind mismatches and
   preserve CLI no-result stack behavior. An ordinary Raven Task<()> adapter consumer

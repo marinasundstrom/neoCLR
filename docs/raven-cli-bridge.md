@@ -8656,3 +8656,33 @@ for finding compiler/runtime integration bugs. Defaults remain unchanged until t
 runtime path is qualified; no performance improvement is claimed here.
 
 Companion native compiler documentation: `f3dddbca8` (documentation only).
+
+
+## Managed Task retained-body qualification (2026-10-11)
+
+The runtime-async experiment now qualifies a hand-written candidate invocation
+boundary producing ordinary managed Task<T> values from retained unit bodies.
+Reference/int/unit results remain in managed Promise<T> storage; private runtime
+handles carry only execution completion and temporary unit notifications. The
+compiler still generates Main's state machine; no runtime-async compiler switch
+has been enabled. Use the existing explicit native `--async-library System.Runtime`
+configuration, with the matching native references and runtime.
+
+The consumer exposed two gaps: parked interpreter activations bypassed ordinary
+notification dispatch, and the portable compiler dropped empty-stack context in
+short-circuit conditions containing an inline await. The runtime now reuses its
+shared dispatcher while parked. Raven native commit `0c9a8881f` propagates the known empty-stack boundary
+through conditions/short-circuit operands and the first numeric operand, preserving
+restrictions with earlier operands still on the stack. Semantic binding, ordinary
+.NET defaults and metadata signatures are unchanged. This portable emitter is not
+present on Raven main; the fix stays on the native compiler line with focused
+shared-emitter tests, to accompany any future promotion of that infrastructure.
+
+Temporary encoding remains source-local exact InternalCall services and structural
+function objects. Native metadata/backend await lowering must replace the explicit
+wrapper/notification/cleanup code; integer handle lifetime, legacy queue callbacks
+and hand-written cancellation returns are not permanent platform contracts.
+The runtime owns retention/dispatch, the managed layer owns Task/Promise outcomes,
+and Raven owns eventual method/await lowering. Fault remains invocation-terminal.
+See [qualification and tradeoffs](experiments/runtime-async/README.md#managed-task-boundary-and-idle-dispatch-2026-10-11)
+and [matched evidence](experiments/runtime-async/managed-task-validation.json).
