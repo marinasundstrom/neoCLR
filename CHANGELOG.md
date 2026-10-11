@@ -12,7 +12,9 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   Qualify lazy demand-driven production, closed integer/string element types,
   direct iterators, nested disposal, cancellation and live-yield GC in interpreter,
   macOS ARM64 JIT and AOT. Generic source methods, abandoned-generator collection,
-  performance qualification and Windows retained suspension remain open.
+  performance qualification and Windows retained suspension remain open. Qualify
+  pending nested producer cleanup on exhaustion, early stop, body cancellation and
+  cleanup cancellation, including GC at both disposal suspension points.
 
 - Add a source-local async-generator prototype using managed iteration contracts
   and retained runtime bodies. Qualify lazy start, demand-driven yield/resume,

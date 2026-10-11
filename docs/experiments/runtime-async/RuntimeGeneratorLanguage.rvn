@@ -171,7 +171,74 @@ async func CheckDelegation(stop: bool) -> Task<()> {
     }
 }
 
+// A deliberately pending disposable iterator makes producer cleanup observable.
+class CleanupProbe : AsyncIterable<int>, AsyncIterator<int> {
+    val Disposing = Promise<bool>()
+    val Release = Promise<()>()
+    var Disposals = 0
+    private var started = false
+
+    func GetAsyncIterator() -> AsyncIterator<int> => self
+    func MoveNextAsync() -> Task<bool> {
+        if started { return Task.FromResult(false) }
+        started = true
+        return Task.FromResult(true)
+    }
+    val Current: int => 7
+    func DisposeAsync() -> Task<()> {
+        Disposals = Disposals + 1
+        _ = Disposing.Complete(true)
+        return Release.Task
+    }
+}
+
+async func PendingCleanup(outer: CleanupProbe, inner: CleanupProbe, gate: Task<()>, counters: Counters) -> AsyncIterable<int> {
+    use lifetime = Lifetime(counters)
+    await for first in outer {
+        await for second in inner {
+            await gate
+            yield first + second
+        }
+    }
+}
+
+async func CheckPendingCleanup(exit: int) -> Task<()> {
+    let outer = CleanupProbe()
+    let inner = CleanupProbe()
+    let counters = Counters()
+    let gate = Promise<()>()
+    if exit != 2 { _ = gate.Complete(()) }
+    let result = Read(PendingCleanup(outer, inner, gate.Task, counters), exit == 1 || exit == 3)
+    let observer = Observer(result)
+    result.OnCompleted(observer.Complete)
+    if exit == 2 { _ = gate.Cancel() }
+    _ = await inner.Disposing.Task
+    if result.IsCompleted || inner.Disposals != 1 || outer.Disposals != 0 || counters.Disposals != 0 {
+        System.Fail("Producer failed to retain nested cleanup")
+    }
+    System.Runtime.GC.Collect()
+    if exit == 3 { _ = inner.Release.Cancel() }
+    else { _ = inner.Release.Complete(()) }
+    _ = await outer.Disposing.Task
+    if result.IsCompleted || outer.Disposals != 1 || counters.Disposals != 0 {
+        System.Fail("Producer cleanup bypassed outer suspension")
+    }
+    System.Runtime.GC.Collect()
+    _ = outer.Release.Complete(())
+    let cancelled = await observer.Done.Task
+    if cancelled != (exit == 2 || exit == 3) || counters.Disposals != 1 || inner.Disposals != 1 || outer.Disposals != 1 {
+        System.Fail("Producer cleanup lost cancellation or disposed twice")
+    }
+    if !cancelled {
+        let value = await result
+        if value != 14 { System.Fail("Producer cleanup lost the yielded value") }
+    }
+}
+
 async func Main() -> Task<int> {
+    for scenario in 0..4 {
+        await CheckPendingCleanup(scenario)
+    }
     await CheckShapes()
     await CheckDelegation(false)
     await CheckDelegation(true)

@@ -4,8 +4,9 @@
 managed AsyncIterable/AsyncIterator contract and await-for consumption, followed by
 generator yield/resume. The interface and retained-body await-for slices pass all three local execution modes.
 Native Raven `yield` and delegation now pass them using a source-local generic
-producer helper. Generic source methods, awaited producer cleanup qualification,
-abandoned-generator collection and performance gates remain open. See
+producer helper. Nested producer cleanup also passes with pending disposal and
+cancellation. Generic source methods, abandoned-generator collection and performance
+gates remain open. See
 [scope, evidence and remaining work](experiments/runtime-async/async-generators.md).
 
 **Compiler lines (2026-10-11):** the author directs keeping Raven main and the

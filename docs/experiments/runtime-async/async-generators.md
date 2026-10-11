@@ -197,7 +197,7 @@ three modes on this macOS ARM64 host. It covers integer/string items, input wait
 no producer run-ahead, independent iterators, normal exhaustion, unstarted disposal,
 early consumer exits, delegated producer cleanup, input cancellation, repeated runs
 and GC while yielded. No application AsyncStateMachine carrier is emitted.
-This does not yet qualify producer cleanup which itself suspends or abandoned GC.
+The follow-up below qualifies pending producer cleanup; abandoned GC remains open.
 
 Reproduce with the matching Raven native compiler and async-iteration library bundle:
 
@@ -223,6 +223,25 @@ runtime stacks and allocates Task/Promise handshakes per item. It makes suspensi
 runtime-owned but is not inherently faster or smaller. Existing cached runtime-await
 measurements still take 1.31–1.91 times the native state-machine time; they are not
 measurements of these generators. The next gates are generic source generators,
-awaited cleanup and abandoned lifetime, followed by matched JIT/AOT throughput,
+abandoned lifetime, followed by matched JIT/AOT throughput,
 allocation, retained-memory and latency measurements. Keep state-machine controls.
 Do not change defaults on the strength of functional evidence alone.
+
+### Pending producer cleanup qualification (2026-10-11)
+
+The native language fixture now nests two explicitly gated async iterators inside a
+generator, with a synchronous `use` outside both. Four cases cover exhaustion,
+early consumer break, cancellation before yielding, and cancellation of inner
+disposal after early stop. Each asserts that the consumer remains incomplete while
+inner disposal is pending, outer disposal starts only after inner completion or
+cancellation, and the synchronous resource is disposed exactly once after outer
+disposal finishes. Both suspension points include a GC collection. Successful
+consumers retain the yielded value; cancelled cases publish cancellation only after
+cleanup completes.
+
+[Refreshed three-mode evidence](async-generator-language-validation.json) passes
+interpreter, macOS ARM64 JIT and AOT using the unchanged native compiler `36a4fd711`.
+The existing lowering already satisfies these cases; no compiler/runtime behavior
+change was necessary. This validates awaited disposal ordering analogous to .NET
+async iteration, while preserving neoCLR's nonrecoverable terminal Fault contract.
+It is not an abandoned-generator reclamation test or a performance measurement.

@@ -344,5 +344,6 @@ state-machine path remains incomplete.
 
 Native Raven `yield` and `yield from` now demonstrate lazy, demand-driven yield/resume
 and early-stop cleanup on these interfaces in the opt-in retained-runtime POC.
+Nested producer disposal can suspend; cancellation still waits for outer cleanup.
 Collection of abandoned suspended generators, generic source generator methods and
 performance qualification remain development work.
