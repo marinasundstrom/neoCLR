@@ -8995,3 +8995,11 @@ existing native nested generic classes, not a new format. The temporary CLI brid
 projects lexical nesting and constructed signatures; direct native metadata/codegen
 owns the eventual replacement. Ordinary Raven/.NET behavior and main are unchanged.
 See [design, limitations and exact validation](experiments/runtime-async/generic-cleanup/README.md).
+
+
+Project loading now applies the same cleanup opt-in through RavenNeoClrAsyncLibrary;
+RavenNeoClrRuntimeAsyncHelper selects runtime lowering, not cleanup admission.
+The Windows project gate exposed the missed provider path; macOS project consumers
+now pass both lowerings and all execution modes. A general generic readonly `self`
+initializer fix was implemented on Raven main (`3bfdf9b92`) and deliberately carried
+into the native branch (`201d1c090`). No full branch merge or format change occurred.

@@ -49,3 +49,29 @@ python3 docs/experiments/runtime-async/validate_generic_cleanup.py \
 Windows qualification uses the state-machine path. Windows runtime suspension and
 Windows ARM64 JIT remain unsupported. The installed default-JIT gate before this
 compiler slice has [separate evidence](../../jit-cli/default/README.md).
+
+## Producer, constructor and project follow-through
+
+The compiler rebuilt Runtime/Data/Networking/Web from clean neoCLR sources at
+`4778c5ac`: [build evidence](library-build.json), [bundle preparation](bundle-preparation.json).
+All 32 checks pass again with those freshly produced libraries:
+[consumer evidence](mac-fresh-libraries.json). The compiler/library files in that
+bundle remain pinned to the original async fix, rather than being silently replaced.
+
+The fixture exposed a general Raven bug in explicit `self.value` initialization of
+generic readonly storage. Main commit `3bfdf9b92` fixes it with 35 passing property
+binding/execution tests. Native commit `201d1c090` carries that focused fix without
+merging compiler branches; [native evidence](mac-readonly-integration.json) uses
+an explicit initializer with both async lowerings and all three execution modes.
+
+The first expanded Windows [run 38184041599](https://github.com/marinasundstrom/neoCLR/actions/runs/38184041599)
+passed HTTP/framework checks but rejected project-based async `use` with RAVT006:
+[gate](windows-first-gate.json), [project failure](windows-first-project.json).
+Its report stays failed. Project loading still restricted cleanup to runtime bodies,
+while the direct CLI path had already enabled it for the selected async library.
+
+Native compiler `c1a938ccdc473dda6a7dfb2dbde4710855d5b5db` aligns `RavenNeoClrAsyncLibrary` project configuration
+with `--async-library`. [Project evidence](mac-project-validation.json) passes
+32 checks across both lowerings, interpreter/JIT/AOT and repeated native invocations.
+Use `--project` with the runner to exercise this path, and `--case generic-use`
+for only the generic fixture. The Windows gate now pins this corrected compiler.

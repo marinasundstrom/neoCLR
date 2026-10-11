@@ -15597,6 +15597,12 @@ or runtime-await default switch was performed.
   interpreter/JIT/AOT and four same-heap native invocations on macOS; 37 focused
   Raven regressions pass. Windows project checks are added with the corrected pin.
   [Design and evidence](experiments/runtime-async/generic-cleanup/README.md).
+- **Compiler follow-through:** the assistant found a general readonly initializer
+  bug while writing the generic fixture, fixed it on Raven main with 35 property
+  tests, and carried that change separately to the native line. Clean library
+  producers and direct consumers pass. Windows then exposed a project-provider
+  cleanup opt-in missed by direct-source tests; both project lowerings now pass
+  macOS interpreter/JIT/AOT, with a corrected Windows run pending.
 - **Open boundaries:** eager compilation, interpreted debugging, Windows runtime
   suspension and Windows ARM64 remain separate gaps. No interpreter fallback hides
   unsupported native programs. See [the execution contract](jit-execution.md).

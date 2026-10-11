@@ -3,6 +3,8 @@
 import argparse
 import hashlib
 import json
+import os
+import shutil
 from pathlib import Path
 import platform
 import subprocess
@@ -22,6 +24,8 @@ def main():
     p.add_argument('--backend', type=Path, default=ROOT / 'tools/aot-poc/target/release/neoclr-aot-poc')
     p.add_argument('--recipe', type=Path, default=HERE / 'collector-walk-showcase.json')
     p.add_argument('--output', type=Path, required=True)
+    p.add_argument('--case', action='append', choices=('use', 'generic-use'), help='Run only selected fixtures')
+    p.add_argument('--project', action='store_true', help='Use rvnproj compilation instead of the direct source driver')
     a = p.parse_args()
     if platform.system() != 'Darwin' or platform.machine() != 'arm64':
         raise RuntimeError('Runtime suspension qualification currently requires macOS ARM64')
@@ -59,11 +63,11 @@ def main():
     for directory in (HERE, ROOT / 'docs/experiments/aot-console', ROOT / 'tools/native'):
         for path in directory.glob('*.h'):
             inputs[str(path)] = sha(path)
-    report = dict(passed=False, platform=platform.platform(), inputsSha256=inputs, commands=[], assemblies={})
+    report = dict(passed=False, platform=platform.platform(), inputsSha256=inputs, commands=[], assemblies={}, selectedCases=a.case or ['use', 'generic-use'], projectCompilation=a.project)
 
-    def run(command, label, expected=None, repetitions=1):
+    def run(command, label, expected=None, repetitions=1, env=None):
         command = list(map(str, command))
-        result = subprocess.run(command, capture_output=True, text=True, timeout=300)
+        result = subprocess.run(command, capture_output=True, text=True, timeout=300, env=env)
         report['commands'].append(dict(label=label, command=command, exitCode=result.returncode,
                                        stdout=result.stdout, stderr=result.stderr))
         if result.returncode or (expected is not None and (result.stdout != (expected + '\n') * repetitions or result.stderr)):
@@ -75,6 +79,8 @@ def main():
             ('use', 'RuntimeUse.rvn', 'PASS runtime async scoped cleanup'),
             ('generic-use', 'RuntimeGenericUse.rvn', 'PASS generic async methods owners and scoped cleanup'),
         ]:
+            if a.case and name not in a.case:
+                continue
             fixture = HERE / filename
             inputs[str(fixture)] = sha(fixture)
             inputs[str(HERE / 'RuntimeAsyncBridge.rvn')] = sha(HERE / 'RuntimeAsyncBridge.rvn')
@@ -88,7 +94,22 @@ def main():
                 compile_source += ['-o', assembly, fixture]
                 if lowering == 'runtime':
                     compile_source += [HERE / 'RuntimeAsyncBridge.rvn']
-                run(compile_source, key + '-source')
+                if a.project:
+                    project_dir = out / (key + '-project')
+                    project_dir.mkdir()
+                    project = project_dir / 'App.rvnproj'
+                    project.write_text('<Project Sdk="Microsoft.NET.Sdk"><Import Project="$(NeoClrBundleRoot)/lib/NeoCLR.ClassLibrary.props"/><PropertyGroup><TargetFramework>net10.0</TargetFramework><OutputType>Exe</OutputType><AssemblyName>AsyncContract</AssemblyName></PropertyGroup></Project>')
+                    shutil.copyfile(fixture, project_dir / 'Main.rvn')
+                    env = dict(os.environ, NeoClrBundleRoot=str(bundle), RavenNeoClrRuntimeAsyncHelper='')
+                    if lowering == 'runtime':
+                        shutil.copyfile(HERE / 'RuntimeAsyncBridge.rvn', project_dir / 'RuntimeAsyncBridge.rvn')
+                        env['RavenNeoClrRuntimeAsyncHelper'] = 'RuntimeAwaitProvider.Bridge'
+                    inputs[str(project)] = sha(project)
+                    run(['dotnet', compiler, 'neoclr', '--project', project], key + '-project-source', env=env)
+                    report['commands'][-1]['environment'] = {name: env[name] for name in ('NeoClrBundleRoot', 'RavenNeoClrRuntimeAsyncHelper')}
+                    shutil.copyfile(project_dir / 'bin/neoclr/AsyncContract.dll', assembly)
+                else:
+                    run(compile_source, key + '-source')
                 report['assemblies'][key] = sha(assembly)
                 interpreted = interpreter.copy()
                 interpreted[2] = str(assembly)

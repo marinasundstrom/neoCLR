@@ -14,6 +14,10 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   cancellation. Qualify both lowerings with interpreter/JIT/AOT and repeated native
   invocations. Pin the corrected compiler and add Windows project checks; Windows
   runtime suspension and awaited state-machine disposal remain separate gaps.
+  Align project and direct-source cleanup admission after the Windows project gate
+  exposed a missed provider path. Rebuild clean libraries and verify both project
+  lowerings. Carry the general generic readonly-initializer fix from Raven main
+  with separate .NET and native execution evidence.
 
 - Admit native reference records with more than sixteen declared fields when their
   flattened layout fits the existing 32-slot/264-byte object bound. This removes

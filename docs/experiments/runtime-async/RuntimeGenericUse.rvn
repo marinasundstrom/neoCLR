@@ -37,8 +37,8 @@ module RuntimeGenericUse {
 
     class Store<T> {
         private val value: T
-        init(initial: T) {
-            value = initial
+        init(value: T) {
+            self.value = value
         }
         async func Read(gate: Task<()>, log: Log) -> Task<T> {
             use resource = Resource(log, 3)
