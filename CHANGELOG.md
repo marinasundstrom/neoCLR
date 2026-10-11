@@ -8,6 +8,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-11
 
+- Reuse scope-local metadata candidate indexes during structural validation, reference
+  checking and typed verification, preserving full semantic checks while reducing shared
+  JIT/interpreter startup work. Add managed JIT metadata-load and selection/verification
+  timings and an interleaved before/after benchmark with retained binary hashes.
+
 - Add a private macOS ARM64 scalar JIT probe to the native compiler tool, sharing
   verified scalar lowering with AOT and owning generated code through each call.
   Report loading, compilation/finalization and invocation timings plus native fault

@@ -24,7 +24,12 @@ Index/Range framework assembly with filtering/fault parity. Socket workloads, as
 execution, Windows JIT and production integration remain open. A nine-run local
 benchmark records median process times of 2.346s JIT, 2.962s interpreted and 9.00ms
 prebuilt AOT for that same assembly; JIT includes compilation, AOT excludes its build.
-This is test-run evidence, not HTTP throughput. Memory views and suspension remain related design work.
+This is test-run evidence, not HTTP throughput. The subsequent
+[shared startup optimization](experiments/jit-managed/startup-optimization.md) reuses
+immutable candidate indexes during validation and verification, with a balanced
+before/after comparison for both JIT and interpreter. Continued interpreter improvement
+remains part of the direction; sustained-workload and size-scaling evidence are still open.
+Memory views and suspension remain related design work.
 
 **Module story closure (2026-10-10):** the author requests closing the namespace/module
 authoring and metadata story so work can move on. The accepted model and implemented

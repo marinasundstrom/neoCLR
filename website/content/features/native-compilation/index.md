@@ -195,6 +195,10 @@ including filtering and bounds faults, with interpreter/AOT parity. Async/HTTP a
 Windows JIT and normal runtime integration remain open.
 [Contracts, validation and local benchmark](https://github.com/marinasundstrom/neoCLR/blob/main/docs/experiments/jit-managed/README.md).
 
+A subsequent shared metadata lookup optimization reduces startup work in both the JIT
+and interpreter; [before/after evidence](https://github.com/marinasundstrom/neoCLR/blob/main/docs/experiments/jit-managed/startup-optimization.md)
+keeps process timing separate from execution speed.
+
 The intended direction is JIT by default where supported, AOT for deployment, and a fully
 supported interpreter for constrained environments. Current execution defaults are unchanged.
 Cross-target hot reload and explicit AOT/interpreter hybrid execution remain future work.

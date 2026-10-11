@@ -34,6 +34,10 @@ pub fn verify_with_library(module: &Module, library: &Module) -> Result<Verifica
 }
 
 pub(crate) fn analyze(module: &Module) -> Result<Verification, Fault> {
+    crate::runtime_lookup::with_module(module, || analyze_indexed(module))
+}
+
+fn analyze_indexed(module: &Module) -> Result<Verification, Fault> {
     let mut constructors = std::collections::HashSet::new();
     for function in &module.functions {
         for op in &function.body {

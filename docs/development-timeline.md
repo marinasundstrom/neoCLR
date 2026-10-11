@@ -14360,3 +14360,24 @@ its build. The benchmark does not establish HTTP
 throughput, cross-platform performance or a .NET comparison. Async/HTTP JIT, Windows JIT,
 production integration, default switching, microcontrollers, hybrid execution and hot reload
 remain open. This updates earlier JIT deferral; it does not select a green-thread design.
+
+## 2026-10-11 — optimize the JIT experience and retain interpreter investment
+
+**Author:** continuing JIT work will require optimization for a good development
+experience. The author expects larger applications to expose execution differences,
+and regards an interpreter approaching JIT speed as an achievement too.
+
+**Assistant:** distinguishes application size from sustained CPU work, and profiles
+startup before optimizing generated code. A diagnostic probe attributes roughly 1.3s
+to metadata loading/linking and 0.34s to typed verification, against about 0.43s for
+managed lowering/finalization. These are single diagnostic observations, not benchmark
+medians. Reuses the existing immutable metadata candidate indexes during structural
+validation, reference-use checks and typed verification. All existing semantic checks
+remain; no cross-run cache or lazy validation is introduced.
+
+**Outcome:** the [startup comparison](experiments/jit-managed/startup-optimization.md)
+records focused conformance checks and repeated before/after measurements for both
+JIT and interpreter: local median process times fall from 3.217s to 2.531s and
+3.919s to 2.697s respectively, with substantial host variability retained in the evidence.
+This is shared startup work, not evidence that interpreter dispatch
+now approaches native speed. Sustained-workload comparisons and async/HTTP JIT remain open.

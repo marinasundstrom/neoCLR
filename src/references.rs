@@ -133,6 +133,10 @@ fn check_attributes(
 }
 
 pub(crate) fn validate_uses(linked: &Module, source: &Module) -> Result<(), Fault> {
+    crate::runtime_lookup::with_module(linked, || validate_uses_indexed(linked, source))
+}
+
+fn validate_uses_indexed(linked: &Module, source: &Module) -> Result<(), Fault> {
     if source.references.is_none() {
         return Ok(());
     }

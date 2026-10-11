@@ -1,6 +1,7 @@
-//! Execution-scoped candidate indexes for an immutably borrowed module.
+//! Scope-local candidate indexes for an immutably borrowed module.
 //! Indexes only narrow the search; signature, identity and access checks stay in
-//! their existing callers. Mutable metadata outside execution uses linear lookup.
+//! their existing callers. Loading/verification and execution each hold immutable
+//! scopes; mutation between scopes rebuilds indexes rather than retaining stale rows.
 use crate::metadata::Module;
 use std::{cell::RefCell, collections::HashMap, rc::Rc};
 

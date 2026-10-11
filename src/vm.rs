@@ -329,6 +329,10 @@ pub(crate) fn validate(module: &Module) -> Result<(), Fault> {
 }
 
 pub(crate) fn validate_linked(module: &Module) -> Result<(), Fault> {
+    crate::runtime_lookup::with_module(module, || validate_linked_indexed(module))
+}
+
+fn validate_linked_indexed(module: &Module) -> Result<(), Fault> {
     crate::metadata_origin::validate(module)?;
     crate::object_root::validate(module)?;
     if module.name.is_empty() {

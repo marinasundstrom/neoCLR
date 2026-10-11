@@ -109,3 +109,10 @@ The next execution milestone is async/HTTP support with explicit runtime/code li
 next performance work should isolate metadata startup and measure a sustained workload.
 The author's [execution direction](../../platform-direction.md#execution-direction-clarified-2026-10-11)
 selects eventual JIT defaults, preferred AOT deployment and full interpreter support.
+
+## Startup follow-up
+
+The [shared metadata optimization](startup-optimization.md) retains the original result
+above and adds a balanced before/after comparison for JIT and interpreter. Both continue
+to perform all semantic checks. The private result now reports metadata loading and
+selection/verification separately from lowering/finalization and invocation.

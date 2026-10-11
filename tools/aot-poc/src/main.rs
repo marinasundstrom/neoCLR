@@ -347,6 +347,7 @@ fn run() -> Result<(), Box<dyn std::error::Error>> {
     if !dependency_args.is_empty() && !(closed || inspect_closed) {
         return Err("--module requires explicit closed-world emission or inspection".into());
     }
+    let load_started = std::time::Instant::now();
     let input = read_module(Path::new(input_path))?;
     let dependencies = module_paths
         .iter()
@@ -415,6 +416,7 @@ fn run() -> Result<(), Box<dyn std::error::Error>> {
             })
         })
         .transpose()?;
+    let load_seconds = load_started.elapsed().as_secs_f64();
     let root = args[1 + usize::from(shifted)]
         .to_str()
         .ok_or("root name must be UTF-8")?;
@@ -437,6 +439,7 @@ fn run() -> Result<(), Box<dyn std::error::Error>> {
         );
         return Ok(());
     }
+    let selection_started = std::time::Instant::now();
     let selection = if closed {
         Some(if dependencies.is_empty() {
             selection::prepare(&input, root)?
@@ -446,6 +449,7 @@ fn run() -> Result<(), Box<dyn std::error::Error>> {
     } else {
         None
     };
+    let selection_seconds = selection_started.elapsed().as_secs_f64();
     let compile_input = selection.as_ref().map_or(&input, |(module, _)| module);
     let details = fault_details.then(|| fault_details::Options::from_report(selection.as_ref().map(|(_, r)| r)));
     let details = details.map(|mut d| {
@@ -465,7 +469,9 @@ fn run() -> Result<(), Box<dyn std::error::Error>> {
             return Err("--jit-managed requires closed-world macOS synchronous console compilation".into());
         }
         let details = details.as_ref().ok_or("--jit-managed requires explicit GC/context bindings")?;
-        let result = jit::execute_managed(compile_input, root, details, Path::new(&args[3]), &jit_arguments)?;
+        let mut result = jit::execute_managed(compile_input, root, details, Path::new(&args[3]), &jit_arguments)?;
+        result["metadataLoadSeconds"] = serde_json::json!(load_seconds);
+        result["selectionAndVerificationSeconds"] = serde_json::json!(selection_seconds);
         eprintln!("JIT_RESULT {result}");
         return Ok(());
     }

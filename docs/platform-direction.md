@@ -62,6 +62,10 @@ and maintaining semantic and lifecycle parity across three backends. No speed ad
 over .NET is established. Switching the default requires useful workload coverage,
 macOS/Windows qualification, diagnostics, ownership and reproducible iteration evidence.
 The private synchronous macOS ARM64 probe is an implementation step, not that switch.
+The author also emphasizes continuing interpreter optimization: approaching JIT speed
+where practical would be valuable. Measure startup and sustained execution separately;
+neither application size nor a short test process establishes steady-state convergence.
+Prefer shared loading/runtime improvements where they benefit both engines.
 
 ## Foundations to retain
 
