@@ -997,7 +997,7 @@ notification adapters and GC costs remains the next performance investigation;
 a maintained carrier, Windows and resident-memory measurements remain open.
 
 The new fan-out consumer initially hit existing compiler diagnostic RAV2712 for
-await inside `for`. This slice uses explicit indexed iteration to isolate stack
+await inside `for`. The initial slice used explicit indexed iteration to isolate stack
 reuse. The author explicitly requests fixing that restriction next, with cancellation
 and iterator-disposal qualification in both async lowerings; it is not a platform
 semantic rule or an accepted permanent workaround.
@@ -1007,3 +1007,46 @@ including both HTTP projects, timeout/cancellation/protocol recovery, terminal F
 retained-object fan-out and native GC/stack contracts. The fan-out consumer also passes
 four consecutive invocations using the same native host heap. Existing guards and
 root/operation teardown checks remain enforced.
+
+
+## Await inside for: both lowering paths — 2026-10-11
+
+The blanket cancellation-policy rejection is removed in the Raven compiler, with
+iteration lifetime fixed rather than merely disabling the diagnostic. General
+fixes are on Raven main (`a23705567`, `262109b7f`, `0845f8db9`) and deliberately
+carried to the separate native compiler line (`e914a4c6d`, `b4b998648`). Arrays/ranges retain position; saved
+value-type iterators are mutated by address; .NET protected cleanup distinguishes
+suspension from source-scope exit. Hoisted scoped resources are disposed and cleared
+when a jump leaves their scope. Native state machines select the existing explicit
+scope-disposal contract; retained bodies retain their existing cleanup path.
+
+[Qualification](for-validation.json) passes **12 runs**: `RuntimeForAwait.rvn` and
+`RuntimeStackReuse.rvn`, both with generated state machines and with runtime await,
+in interpreter, macOS ARM64 JIT and AOT. The first covers pending awaits, ordinary
+completion, break/continue/return, labeled outward exits to both `for` and `while`,
+cancellation and GC. The
+second replaces the indexed workaround with `for` and exercises three waves of
+24 retained readers. Runtime-body disassembly must contain no application state
+machines; the control builds must contain them. Source/compiler/runtime/bundle and
+binary hashes accompany the commands. The existing bundle is unchanged.
+
+```sh
+python3 docs/experiments/runtime-async/validate_for.py \
+  --recipe target/runtime-stack-cache-validation-v2/validation.json \
+  --interpreter-recipe target/runtime-http-use-final/validation.json \
+  --output target/runtime-for-await
+```
+
+Shared .NET tests cover reference/value iterators, arrays, ascending/descending
+ranges, pending waits, cancellation/exceptions, nested exits, and disposal before
+another await. The final shared regression run passes 74 loop/resource-lifetime,
+runtime-async and generator-delegation cases, including hoisted-resource exits to
+both `for` and `while`. Earlier adjacent label/goto and ref-safety selections also
+passed; unaffected evidence is reused.
+
+This restores familiar .NET loop lifetime; it does not introduce a new public API,
+change awaiter/ref-safety checks, or make terminal neoCLR Fault recoverable. Fault
+still has no managed-unwind guarantee. Native qualification uses the existing
+bounded compiler/backend profile and macOS stack carrier, not Windows runtime
+suspension. HTTP behavior and performance code were unchanged; prior HTTP and
+benchmark evidence is reused rather than rerunning that matrix.

@@ -8800,3 +8800,26 @@ macOS ucontext carrier is experiment scaffolding, not the final native backend A
 Windows, CLI/build-kit integration, native Task.Run, managed GC metric parity, full
 library migration and default readiness remain open. General .NET lowering and
 Raven main remain separate and unchanged.
+
+
+### Await in synchronous for loops (2026-10-11)
+
+Raven main fixes `a23705567`, `262109b7f` and `0845f8db9` normalize iteration before async capture,
+preserve value-type iterator receiver addresses, distinguish suspension from finally
+cleanup, and dispose/clear hoisted resources on outward branches. The native line
+carries them as `e914a4c6d` and `b4b998648`, selecting existing
+`RuntimeDisposalContract.UseExceptionHandling = false` for explicit scope cleanup.
+No new Runtime Contract option or awaitable API is introduced. Ordinary .NET remains
+the default; its exception-unwinding behavior does not change neoCLR terminal Fault.
+
+[Evidence](experiments/runtime-async/for-validation.json) records twelve passing
+consumer runs in interpreter, macOS ARM64 JIT and AOT, covering generated state
+machines and explicit retained runtime bodies. The unchanged `data-cases-bundle`,
+source-included RuntimeAsyncHelper provider, compiler binaries and runtime binaries
+are hashed in the report. `--runtime-async-poc RuntimeAwaitProvider.Bridge` remains
+opt-in; omitting it selects the state-machine control. Source constructs still pass
+through temporary bound/CLI representations before native import/codegen. A native
+semantic representation of iteration lifetime and suspension remains the replacement.
+Raven owns binding/lowering; neoCLR owns cross-mode and GC qualification. No branch
+merge, execution-default change, Windows runtime-suspension or async-generator
+qualification is implied. The retained-stack consumer now uses ordinary `for`.

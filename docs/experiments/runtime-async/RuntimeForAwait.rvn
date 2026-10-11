@@ -1,0 +1,169 @@
+module RuntimeForAwait
+
+import System.*
+import System.Collections.*
+import System.Tasks.*
+
+class Probe : Iterable<int>, Iterator<int> {
+    var Acquisitions = 0
+    var Disposals = 0
+    var Reads = 0
+    private var index = 0
+
+    func GetIterator() -> Iterator<int> {
+        Acquisitions = Acquisitions + 1
+        index = 0
+        return self
+    }
+    func MoveNext() -> bool {
+        index = index + 1
+        return index <= 2
+    }
+    val Current: int {
+        get {
+            Reads = Reads + 1
+            return index
+        }
+    }
+    func Dispose() {
+        Disposals = Disposals + 1
+    }
+}
+
+async func Read(values: Probe, gate: Task<int>, exit: int) -> Task<int> {
+    var sum = 0
+    for item in values {
+        let value = await gate
+        System.Runtime.GC.Collect()
+        sum = sum + item + value
+        if exit == 1 {
+            break
+        }
+        if exit == 2 {
+            return sum
+        }
+        if exit == 3 {
+            continue
+        }
+    }
+    return sum
+}
+
+async func Nested(values: Probe, gate: Task<int>, stop: bool) -> Task<int> {
+    var sum = 0
+    outer: for index in 1..2 {
+        for item in values {
+            let value = await gate
+            sum = sum + value
+            if stop {
+                break outer
+            }
+            continue outer
+        }
+    }
+    return sum
+}
+
+async func NestedWhile(values: Probe, gate: Task<int>, stop: bool) -> Task<int> {
+    var sum = 0
+    var index = 0
+    outer: while index < 2 {
+        index = index + 1
+        for item in values {
+            let value = await gate
+            sum = sum + value
+            if stop {
+                break outer
+            }
+            continue outer
+        }
+    }
+    return sum
+}
+
+class Observer {
+    private val task: Task<int>
+    private val source = Promise<bool>()
+    init(task: Task<int>) {
+        self.task = task
+    }
+    val Task: Task<bool> => source.Task
+    // Observe cancellation without propagating it to the test entry point.
+    func Complete() -> System.Void {
+        _ = source.Complete(task.IsCancelled)
+    }
+}
+
+async func CheckExit(exit: int) -> Task<()> {
+    let values = Probe()
+    let source = Promise<int>()
+    let pending = Read(values, source.Task, exit)
+    if pending.IsCompleted || values.Disposals != 0 || values.Reads != 1 {
+        System.Fail("Loop did not retain its iterator at suspension")
+    }
+    _ = source.Complete(40)
+    let result = await pending
+    var expected = 83
+    if exit == 1 || exit == 2 {
+        expected = 41
+    }
+    if result != expected || values.Acquisitions != 1 || values.Disposals != 1 {
+        System.Fail("Loop lost state or disposed incorrectly")
+    }
+}
+
+async func CheckNested(mode: int) -> Task<()> {
+    let values = Probe()
+    let source = Promise<int>()
+    let pending = Nested(values, source.Task, mode == 1)
+    if pending.IsCompleted || values.Disposals != 0 {
+        System.Fail("Nested loop failed to suspend")
+    }
+    _ = source.Complete(40)
+    let result = await pending
+    let count = 2 - mode
+    if result != count * 40 || values.Acquisitions != count || values.Disposals != count {
+        System.Fail("Outward loop exit bypassed cleanup")
+    }
+}
+
+async func CheckNestedWhile(mode: int) -> Task<()> {
+    let values = Probe()
+    let source = Promise<int>()
+    let pending = NestedWhile(values, source.Task, mode == 1)
+    if pending.IsCompleted || values.Disposals != 0 {
+        System.Fail("Nested loop failed to suspend")
+    }
+    _ = source.Complete(40)
+    let result = await pending
+    let count = 2 - mode
+    if result != count * 40 || values.Acquisitions != count || values.Disposals != count {
+        System.Fail("Outward loop exit bypassed cleanup")
+    }
+}
+
+async func CheckCancellation() -> Task<()> {
+    let values = Probe()
+    let cancelled = Promise<int>()
+    let pending = Read(values, cancelled.Task, 0)
+    let observer = Observer(pending)
+    pending.OnCompleted(observer.Complete)
+    _ = cancelled.Cancel()
+    let observed = await observer.Task
+    if !observed || values.Disposals != 1 {
+        System.Fail("Cancelled loop did not dispose its iterator")
+    }
+}
+
+async func Main() -> Task<int> {
+    for exit in 0..3 {
+        await CheckExit(exit)
+    }
+    for mode in 0..1 {
+        await CheckNested(mode)
+        await CheckNestedWhile(mode)
+    }
+    await CheckCancellation()
+    Console.WriteLine("PASS await in for state and lifetime")
+    return 0
+}

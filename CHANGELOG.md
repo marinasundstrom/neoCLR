@@ -8,6 +8,13 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-11
 
+- Qualify Raven's await-in-for compiler fixes in interpreter, macOS ARM64 JIT and
+  AOT with both state-machine and retained-body lowering. Cover pending waits,
+  cancellation, iterator disposal, early/outward exits and GC; replace the retained
+  stack consumer's indexed workaround with `for`. General Raven fixes remain on
+  main and are deliberately carried to its separate native branch. Ref-safety,
+  terminal Fault semantics and execution defaults are unchanged.
+
 - Bound native runtime-async stack reuse to eight idle guarded mappings per
   invocation; release cached and active stacks at normal or terminal-Fault teardown.
   Add private mapping/reservation diagnostics, alternating cache-on/off benchmarks

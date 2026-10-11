@@ -267,6 +267,10 @@ including a combined loopback consumer and synchronous `use` across awaits. GC a
 cancellation cleanup checks pass. Both native HTTP projects now support explicit
 runtime-await selection. Both projects and timeout/cancellation/fault cases now pass
 macOS ARM64 JIT/AOT qualification with explicit parked GC roots and terminal teardown.
+The development compiler also supports `await` inside ordinary `for` loops, with
+iteration state and cleanup preserved across suspension, cancellation and early
+exits. Both async lowerings pass interpreter and macOS ARM64 JIT/AOT
+[loop-lifetime qualification](https://github.com/marinasundstrom/neoCLR/blob/main/docs/experiments/runtime-async/README.md#await-inside-for-both-lowering-paths--2026-10-11).
 The native stack carrier remains temporary POC scaffolding; Windows, production
 integration and default readiness remain open.
 Explicit await mappings also qualify an independent runtime-backed manual operation

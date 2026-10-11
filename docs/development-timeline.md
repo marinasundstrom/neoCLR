@@ -15218,3 +15218,23 @@ or runtime-await default switch was performed.
   fix that?” The assistant agreed to finish this runtime slice, then fix and qualify
   normal completion, cancellation and early exits in both async lowerings. That
   compiler follow-up is required work, not a permanent language restriction.
+
+
+### 2026-10-11 — Await-in-for compiler fix qualified
+
+- Following the author's question above, the assistant fixed the shared Raven
+  compiler on main, then deliberately carried the fixes to its separate neoCLR
+  branch. The fixes retain iteration state, preserve value-type receiver mutation,
+  and run iterator/scoped-resource cleanup on actual exits rather than suspension.
+- Native qualification exposed another bug: an outward branch could bypass a
+  hoisted resource's cleanup. The assistant fixed this on main as well, adding
+  labeled-exit regressions and clearing disposed fields before terminal cleanup.
+- Outcome: [twelve consumer runs](experiments/runtime-async/for-validation.json)
+  pass across interpreter, JIT and AOT, with both state machines and retained
+  runtime bodies. The retained-stack consumer now uses `for`. Main commits are
+  `a23705567`, `262109b7f` and `0845f8db9`; native carries are `e914a4c6d` and
+  `b4b998648`. A final mixed-loop regression exposed skipped scoped cleanup when
+  continuing an outer `while`; normalizing those exits fixed it, with 74 focused
+  shared tests and the expanded twelve-run native qualification passing.
+  Ref-safety restrictions,
+  opt-in runtime-await selection and terminal Fault semantics remain unchanged.

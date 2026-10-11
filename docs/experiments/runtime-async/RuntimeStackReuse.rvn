@@ -35,13 +35,9 @@ async func Main() -> Task<int> {
         System.Runtime.GC.Collect()
         _ = source.Complete(25)
         var sum = 0
-        // RAV2712 still rejects await inside for, including retained-body mode.
-        // Use explicit indexing until suspension-aware for cleanup is qualified.
-        index = 0
-        while index < 24 {
-            let value = await readers[index]
+        for reader in readers {
+            let value = await reader
             sum = sum + value
-            index = index + 1
         }
         if sum != 24 * 42 {
             System.Fail("Stack reuse lost a retained object or result")

@@ -82,8 +82,10 @@ POC is slower than state machines. [Bounded stack reuse](experiments/runtime-asy
 now cuts about 41–45% from the uncached AOT microbenchmark time and records reserved
 stack bytes with zero reservation after teardown. Native suspension remains slower
 than state machines; context-switch/notification/GC costs and resident memory remain
-open. The author next directs fixing the compiler's await-in-for restriction;
-qualify cancellation and iterator disposal in both async lowerings.
+open. The author-directed await-in-for compiler fix now passes
+[loop lifetime qualification](experiments/runtime-async/README.md#await-inside-for-both-lowering-paths--2026-10-11)
+in both async lowerings and all three local execution modes, including cancellation
+and outward loop exits. Shared Raven fixes remain separate from native integration.
 Retain cancellation, terminal Fault, GC and benchmark checks. Broaden
 platform coverage and measure costs before considering defaults. This is explicit
 POC support, not a default-mode or native build-kit change. General native interoperability, runtime interface recognition,
