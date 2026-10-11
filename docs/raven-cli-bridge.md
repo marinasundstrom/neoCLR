@@ -8823,3 +8823,13 @@ semantic representation of iteration lifetime and suspension remains the replace
 Raven owns binding/lowering; neoCLR owns cross-mode and GC qualification. No branch
 merge, execution-default change, Windows runtime-suspension or async-generator
 qualification is implied. The retained-stack consumer now uses ordinary `for`.
+
+### Managed async iteration contract (2026-10-11)
+
+The source runtime now owns System.Collections.AsyncIterable<T>, AsyncIterator<T>
+and System.AsyncDisposable. Their native metadata is ordinary interfaces returning
+Task<bool>/Task<()>; no runtime opcode or generator carrier is introduced. The
+aggregate CLI documentation bridge represents unit as PropagationUnit, rewritten
+to the owned System.Void contract using the existing bridge machinery. Runtime
+sources and the native emitter own executable behavior; the bridge is signatures
+only. [Contract evidence and remaining compiler work](experiments/runtime-async/async-generators.md#managed-contract-checkpoint-2026-10-11).

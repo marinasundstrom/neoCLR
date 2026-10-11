@@ -1,0 +1,14 @@
+module System.Collections
+
+import System.Tasks.*
+
+/// A single-consumer asynchronous cursor. Do not overlap advancement or disposal.
+public interface AsyncIterator<T> : System.AsyncDisposable {
+    /// Advances to the next item, completing with false at the end of the source.
+    /// Await completion before reading Current or starting another operation.
+    func MoveNextAsync() -> Task<bool>
+
+    /// The current item, valid only after advancement completes successfully with true
+    /// and before the next advancement or disposal starts.
+    val Current: T { get }
+}

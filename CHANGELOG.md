@@ -8,6 +8,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-11
 
+- Add the managed AsyncIterable<T>, AsyncIterator<T> and AsyncDisposable contracts,
+  with Task-based advancement/disposal and documented single-consumer lifetime.
+  Refresh the API reference and qualify pending operations plus GC in interpreter,
+  macOS ARM64 JIT and AOT under both async lowerings. This interface slice does not
+  yet enable native await-for cleanup or yield/resume production.
+
 - Investigate async generators separately from await inside synchronous loops.
   Record Raven/.NET lifecycle and delegation test evidence, missing neoCLR
   async-iteration contracts, and provisional pull-protocol/yield-lifetime work.

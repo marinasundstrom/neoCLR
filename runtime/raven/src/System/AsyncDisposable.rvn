@@ -1,0 +1,9 @@
+module System
+
+import System.Tasks.*
+
+/// A resource whose cleanup may suspend. Await disposal before releasing its owner.
+public interface AsyncDisposable {
+    /// Completes after cleanup has finished. Call only when no other operation is pending.
+    func DisposeAsync() -> Task<()>
+}

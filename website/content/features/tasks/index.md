@@ -331,3 +331,11 @@ round upward. This is invocation-local scheduling, not thread-pool execution.
 
 See the [Timer API](/docs/api/System/Concurrency/Timer/index.html) and the
 [tested async scenarios](https://github.com/marinasundstrom/neoCLR/blob/main/docs/experiments/timers/Main.rvn).
+
+### Asynchronous iteration (development)
+
+`System.Collections.AsyncIterable<T>` acquires an `AsyncIterator<T>` with
+`GetAsyncIterator()`. Advance with `await iterator.MoveNextAsync()`, read `Current`
+after a true result, and await `iterator.DisposeAsync()` when finished. Operations
+must not overlap. The managed interfaces are implemented; native `await for`
+cleanup and generator `yield`/resume are being integrated separately.

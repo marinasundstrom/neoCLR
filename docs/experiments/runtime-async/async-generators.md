@@ -1,7 +1,8 @@
 # Async-generator investigation — 2026-10-11
 
-Status: investigation requested by the author while fixing `await` inside ordinary
-`for` loops. This does not select a new public API or claim native generator support.
+Status: implementation underway following the author's explicit direction to add
+managed async iteration and await-for consumption before yield/resume. The first
+contract slice is implemented; native generator production remains open.
 
 ## What works in Raven
 
@@ -30,9 +31,9 @@ Compiler implementation evidence (Raven repository):
 
 ## What neoCLR lacks
 
-The runtime library currently exposes synchronous `Iterable<T>`/`Iterator<T>`.
-Raven's alternative-runtime `RuntimeIterationContract` selects only synchronous
-acquisition/advancement/current members. The neoCLR retained-body POC explicitly
+The runtime library now also exposes `AsyncIterable<T>`, `AsyncIterator<T>` and
+`AsyncDisposable`. Raven main's optional `RuntimeIterationContract.Async` selects
+asynchronous acquisition/advancement/current/disposal members. The neoCLR retained-body POC explicitly
 rejects iterator methods and requires a nongeneric `Task<T>` result. The .NET
 iterator recognizer and generated helpers depend on .NET async iterator types.
 Consequently, removing the ordinary-loop diagnostic does **not** enable native
@@ -88,3 +89,29 @@ stack representation or performance.
 
 This follow-up belongs to managed runtime-async qualification. It does not require
 finalizing foreign awaitable interfaces or the native interop ABI first.
+
+## Managed contract checkpoint (2026-10-11)
+
+`AsyncIterable<T>.GetAsyncIterator()` returns `AsyncIterator<T>`, whose
+`MoveNextAsync()` returns `Task<bool>` and `Current` returns `T`. Its inherited
+`AsyncDisposable.DisposeAsync()` returns `Task<()>`. The consumer serializes
+advancement and disposal; Current is valid only between a successful advancement
+and the next operation. Acquisition does not take a cancellation token in this
+first contract: source construction owns cancellation policy for now. Automatic
+token forwarding is a gap, not a permanent divergence.
+
+This follows .NET's pull-based IAsyncEnumerable/IAsyncEnumerator/IAsyncDisposable
+structure. neoCLR keeps its existing Iterable/Iterator names and Task result
+contract rather than introducing ValueTask solely for enumeration. This simplifies
+initial integration but may allocate more on repeated synchronous advancement;
+performance comparison is still needed. No overlapping operations are promised.
+
+[Executable contract consumer](RuntimeAsyncIteration.rvn) forces pending advancement
+and disposal, checks Current timing and exactly-once cleanup, and collects GC at
+both suspension points. It passes interpreter, macOS ARM64 JIT and AOT with both
+state-machine and retained-body lowering: [six-run evidence](async-iteration-contract-validation.json).
+This consumer uses explicit protocol calls to isolate the library contract; it is
+not evidence for native await-for lowering or yield production. Raven main
+`da0596cf7` separately qualifies selected-contract await-for with pending disposal
+on completion/break/return/cancellation in .NET 11 (61 focused tests; final contract
+recheck eight tests). Native await-for cleanup is the next integration slice.

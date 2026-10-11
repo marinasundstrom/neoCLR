@@ -15258,3 +15258,16 @@ or runtime-await default switch was performed.
   no public API or foreign ABI was selected or implemented.
 - [Investigation, source references and validation](experiments/runtime-async/async-generators.md).
   This records an exploratory follow-up, not a permanent roadmap reprioritization.
+
+## 2026-10-11 — Implement async iteration before generator production
+
+- Author: requested managed async iteration and `await for` first, then yield/resume,
+  with each slice committed. Subsequently clarified: “We will have an AsyncIterable
+  interface in neoCLR, I think”.
+- Assistant: selected AsyncIterable<T>/AsyncIterator<T> to match existing collection
+  names, with asynchronous disposal. Added an explicit optional Raven runtime
+  contract while keeping .NET defaults. Main and native compiler lines remain separate.
+- Outcome: managed interfaces and explicit pending-advancement/disposal consumer pass
+  interpreter, macOS ARM64 JIT and AOT with both lowerings. Raven main contract tests
+  pass including cancellation with pending disposal. Native loop cleanup and generator
+  production remain in progress. [Evidence](experiments/runtime-async/async-generators.md).

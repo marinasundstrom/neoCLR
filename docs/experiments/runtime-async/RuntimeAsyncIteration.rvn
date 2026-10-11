@@ -1,0 +1,71 @@
+module RuntimeAsyncIteration
+
+import System.*
+import System.Collections.*
+import System.Tasks.*
+
+class Probe : AsyncIterable<int>, AsyncIterator<int> {
+    val Next = Promise<bool>()
+    val Disposing = Promise<bool>()
+    val Release = Promise<()>()
+    var Disposals = 0
+    var Acquisitions = 0
+    var Reads = 0
+    private var started = false
+
+    func GetAsyncIterator() -> AsyncIterator<int> {
+        Acquisitions = Acquisitions + 1
+        return self
+    }
+    func MoveNextAsync() -> Task<bool> {
+        if started {
+            return Task.FromResult(false)
+        }
+        started = true
+        return Next.Task
+    }
+    val Current: int {
+        get {
+            Reads = Reads + 1
+            return 42
+        }
+    }
+    func DisposeAsync() -> Task<()> {
+        Disposals = Disposals + 1
+        _ = Disposing.Complete(true)
+        return Release.Task
+    }
+}
+
+// Explicit protocol calls qualify the interfaces independently of loop lowering.
+async func Read(source: AsyncIterable<int>) -> Task<int> {
+    let iterator = source.GetAsyncIterator()
+    var sum = 0
+    while await iterator.MoveNextAsync() {
+        sum = sum + iterator.Current
+    }
+    await iterator.DisposeAsync()
+    return sum
+}
+
+async func Main() -> Task<int> {
+    let probe = Probe()
+    let result = Read(probe)
+    if result.IsCompleted || probe.Reads != 0 || probe.Acquisitions != 1 {
+        System.Fail("Async iterator failed to suspend before reading Current")
+    }
+    System.Runtime.GC.Collect()
+    _ = probe.Next.Complete(true)
+    _ = await probe.Disposing.Task
+    if result.IsCompleted || probe.Disposals != 1 || probe.Reads != 1 {
+        System.Fail("Async disposal did not retain the consumer")
+    }
+    System.Runtime.GC.Collect()
+    _ = probe.Release.Complete(())
+    let sum = await result
+    if sum != 42 || probe.Disposals != 1 {
+        System.Fail("Async iterator lost its result or disposed twice")
+    }
+    Console.WriteLine("PASS managed async iteration contract")
+    return 0
+}

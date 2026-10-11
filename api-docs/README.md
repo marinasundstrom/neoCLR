@@ -1762,3 +1762,11 @@ of the distributed runtime reference assembly. Their manual references are
 [testing](testing.md) and [benchmarking](benchmarking.md), linked from the API index.
 They cover public attribute constructors and the assembly-internal suite/runner
 contracts. No runtime type is silently excluded from RavenDoc for this tooling.
+
+## Managed async iteration contract (2026-10-11)
+
+AsyncDisposable, AsyncIterable<T> and AsyncIterator<T> are selected in the reference
+with source summaries for acquisition, pending advancement, Current validity and
+asynchronous disposal. The aggregate reference and native source libraries include
+the interfaces. These are development APIs; native await-for and generator production
+are qualified separately in the runtime-async experiment. No API is excluded.
