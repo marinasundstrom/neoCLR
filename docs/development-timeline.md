@@ -15349,3 +15349,61 @@ or runtime-await default switch was performed.
   Raven native `e349f4783` retains lexical private access and cancellation cleanup;
   Raven main remains separate. Forty-seven compiler, seven specialization and 24
   runtime tests pass. [Evidence and remaining gates](experiments/runtime-async/async-generators.md#generic-owner-and-lexical-metadata-checkpoint-2026-10-11).
+
+
+## 2026-10-11 — JSON API ergonomics and converter review
+
+- **Author request:** “Improve the JSON API. You may use your own work tree”.
+- **Assistant proposal and action:** review the roadmap and existing DOM, then add
+  JsonArray's missing read-only Sequence<JsonValue> integration in an isolated
+  worktree. This includes a faulting integer indexer and ordered shallow snapshot
+  iteration; Item and quota-aware Add retain their Result contracts.
+- **Author follow-up:** “Also consider any feature needed like converters”. The
+  assistant expanded the review to options, converter registration and nested use,
+  nulls, diagnostics, numeric coverage and later wire/streaming contracts. The
+  [assessment](json-converter-design.md) records alternatives and primary sources;
+  it does not claim that converter APIs have been implemented.
+- **Author clarification:** developer experience should match .NET's JSON API,
+  without requiring it to be exactly the same. The assistant adopted familiar
+  workflows and behavior as the target, allowing justified differences such as
+  Result errors and potentially a bounded DOM converter adapter. Literal .NET
+  reader/writer signature parity is not an independent requirement.
+- **Validation outcome:** all 20 JSON DOM cases pass in native macOS ARM64 and
+  interpreted execution ([evidence](../runtime/raven/tests/json-sequence-validation.json)).
+  Eight isolated concrete/interface negative/past-end index checks pass
+  ([evidence](experiments/json-sequence/validation.json)). No Windows run is claimed.
+  Public reference refresh is tracked with this change. The earlier converter
+  deferral remains in the record; this request reopens design review, not an
+  implicit approval of every proposed feature or permanent platform reprioritization.
+
+
+## 2026-10-11 — .NET 11 union JSON contract clarified
+
+- **Author direction:** build a JSON serializer for union types matching .NET.
+  In response to the assistant's clarification question, the author initially
+  selected System.Text.Json polymorphic discriminator conventions, then challenged
+  that premise: “I don't even think that .NET 11 unions use polymorphic discriminators?”
+- **Assistant correction:** the polymorphism suggestion conflated class hierarchies
+  with C# unions. The [official .NET 11 union documentation](https://learn.microsoft.com/en-us/dotnet/standard/serialization/system-text-json/union-types)
+  specifies direct active-payload JSON without a wrapper or discriminator, default
+  token-kind classification, and explicit classifiers for ambiguous shapes.
+  This is the union compatibility target; the earlier discriminator answer is
+  superseded by this clarification, not retained as a separate requirement.
+- **Work in progress:** an uncommitted explicit converter/union prototype compiles
+  as a native library. A .NET 11 comparison consumer confirms number/string/default
+  wire values and ambiguity/unknown-shape rejection. The neoCLR interpreter reaches
+  the matching root assertions but fails when constructing a reflected union array.
+  Native compilation rejects union arrays under its current reflection element
+  profile; native value boxing also requires investigation. This is incomplete
+  qualification, not a claim of native union serialization support. Automatic union
+  metadata discovery, structural classifiers and nullable case selection remain open.
+- **Representation difference under investigation:** Raven rejects supplying a known
+  inactive default union in ordinary code. The prototype supplies an explicit empty
+  case for JSON null; this must be documented as a gap from .NET 11 default-union
+  semantics, not silently described as equivalent.
+
+- **Integration request:** the author subsequently requested integration into main
+  and removal of the worktree and branch. The validated JsonArray sequence change
+  is integrated as runtime code; the unfinished converter changes are preserved as
+  an [explicit experiment patch](experiments/json-converters/README.md), with their
+  consumer and .NET comparison. Converter APIs are not enabled on main.

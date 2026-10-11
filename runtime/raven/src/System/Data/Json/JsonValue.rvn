@@ -100,12 +100,32 @@ public class JsonObject : JsonValue, Map<string, JsonValue> {
     }
 }
 
-public class JsonArray : JsonValue {
+/// <summary>A JSON array with a read-only sequence view.</summary>
+/// <remarks>Indexing faults on invalid indices; Item returns a recoverable error. Iteration captures a shallow ordered snapshot; node contents remain shared. Mutation uses quota-aware Add.</remarks>
+public class JsonArray : JsonValue, Sequence<JsonValue> {
     private var values: ArrayList<JsonValue> = ArrayList<JsonValue>()
 
     init(): base() { }
 
     val Count: int => values.Count
+
+    /// <summary>Gets the original node at a zero-based index, including JsonNull.</summary>
+    /// <param name="index">The zero-based element index.</param>
+    /// <remarks>Invalid indices cause a terminal Fault. Prefer Item when an invalid index is expected.</remarks>
+    val self[index: int]: JsonValue {
+        get {
+            if index < 0 || index >= values.Count {
+                System.Fail("JsonArray index out of range")
+            }
+            return values[index]
+        }
+    }
+
+    /// <summary>Returns a shallow snapshot iterator in element order.</summary>
+    /// <returns>An owned iterator retaining original node references. Later additions do not alter the snapshot.</returns>
+    func GetIterator() -> Iterator<JsonValue> {
+        return values.Copy().GetIterator()
+    }
 
     func Item(index: int) -> Result<JsonValue, JsonError> {
         if index < 0 || index >= values.Count {

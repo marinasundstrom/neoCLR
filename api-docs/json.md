@@ -199,3 +199,21 @@ The managed report sample gets a typed report, posts it back, then reads the
 acknowledgement from the response. Application-owned implicit error converters
 allow `?` to propagate either cause into its AppError union. The response's Request
 property identifies the effective POST, including client default headers.
+
+## DOM collection views (development)
+
+JsonObject implements `Map<string, JsonValue>`; JsonArray implements
+`Sequence<JsonValue>`. Object indexing uses exact field names and array indexing
+uses zero-based integers. Indexers return the original node, including JsonNull;
+a missing field or invalid index causes a terminal Fault. Use object `Find`/`Field`
+or array `Item` when absence or invalid bounds should be recoverable.
+
+Both support ordinary `for` iteration. Object keys/pairs and array elements are
+shallow ordered snapshots: later additions do not extend an existing iterator,
+while child contents remain shared. Count and indexers read the current container.
+Mutation continues through quota-aware Add; mutable collection interfaces are not
+implemented. Typed Serialize still recognizes nodes through these interface views.
+
+Converter registration, serializer options and configurable property naming remain
+future work. Their developer experience should follow familiar .NET JSON workflows,
+with justified neoCLR differences rather than exact API duplication.

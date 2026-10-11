@@ -668,6 +668,19 @@ project also passes Windows action
 [37993153131](https://github.com/marinasundstrom/neoCLR/actions/runs/37993153131);
 that earlier action does not include this embedded-node mapper change.
 
+## JSON API review follow-up — 2026-10-11
+
+The author asks to improve the JSON API and to consider needed features such as
+converters. The bounded implementation closes JsonArray's missing Sequence view;
+see [DOM contract](json-dom-design.md#read-only-array-sequence-view-development-2026-10-11).
+The author clarifies that JSON developer experience should match .NET without being
+exactly the same: familiar workflows and semantics, with justified neoCLR differences.
+The [converter assessment](json-converter-design.md) reopens the earlier deferral as
+an evaluated follow-up: options plus typed converters are recommended, with explicit
+validation/callback semantics before implementation. This is not approval of a
+particular signature, a claim that converters ship, or a permanent reprioritization
+of the broader platform milestone.
+
 ## Converter and wire-contract follow-up — 2026-10-09
 
 The author requests eventual System.Text.Json-style converters, inheritance

@@ -1,0 +1,21 @@
+module JsonSequenceFaults
+
+import System.Collections.*
+import System.Data.Json.*
+import System.Result.*
+
+func Main(args: string[]) -> int {
+    let array = JsonArray()
+    _ = array.Add(JsonNull())
+    var index = -1
+    if args.Length > 0 && args[0] == "end" {
+        index = array.Count
+    }
+    if args.Length > 1 {
+        let sequence: Sequence<JsonValue> = array
+        _ = sequence[index]
+    } else {
+        _ = array[index]
+    }
+    return 99
+}

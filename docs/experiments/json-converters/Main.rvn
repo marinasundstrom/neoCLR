@@ -1,0 +1,188 @@
+import System.*
+import System.Collections.*
+import System.Data.Json.*
+import System.IO.*
+import System.Option.*
+import System.Result.*
+
+public union Reading {
+    case Empty
+    case Number(value: int)
+    case Text(value: string)
+}
+
+func IsEmpty(value: Reading) -> bool {
+    return match value {
+        Reading.Number(_) => false
+        Reading.Text(_) => false
+        Reading.Empty => true
+        _ => false
+    }
+}
+
+func ReadNumber(value: int) -> Reading {
+    return Reading.Number(value)
+}
+
+func GetNumber(value: Reading) -> Option<int> {
+    return match value {
+        Reading.Number(let number) => Some(number)
+        _ => None
+    }
+}
+
+func ReadText(value: string) -> Reading {
+    return Reading.Text(value)
+}
+
+func GetText(value: Reading) -> Option<string> {
+    return match value {
+        Reading.Text(let text) => Some(text)
+        _ => None
+    }
+}
+
+func Converter() -> JsonUnionConverter<Reading> {
+    let converter = JsonUnionConverter<Reading>(Reading.Empty, value => IsEmpty(value))
+    converter.AddCase<int>(JsonUnionCaseKind.Number, value => ReadNumber(value), value => GetNumber(value))
+    converter.AddCase<string>(JsonUnionCaseKind.String, value => ReadText(value), value => GetText(value))
+    return converter
+}
+
+func Check(condition: bool, message: string) {
+    if !condition {
+        System.Fail(message)
+    }
+}
+
+class IntTextConverter : JsonConverter<int> {
+    private var reads = 0
+    private var writes = 0
+
+    init() { }
+
+    val Reads: int => reads
+    val Writes: int => writes
+
+    func Read(value: JsonValue) -> Result<int, JsonError> {
+        reads += 1
+        if value is JsonNull {
+            return Ok(-1)
+        }
+        if value is JsonString text {
+            if Int32.Parse(text.Value) is Ok(let number) {
+                return Ok(number)
+            }
+            return Error(JsonError.InvalidNumber)
+        }
+        return Error(JsonError.TypeMismatch("numeric string"))
+    }
+
+    func Write(value: int) -> Result<JsonValue, JsonError> {
+        writes += 1
+        return Ok(JsonString(value.ToString()))
+    }
+}
+
+class RejectInt : JsonConverter<int> {
+    init() { }
+
+    func Read(value: JsonValue) -> Result<int, JsonError> {
+        return Error(JsonError.Syntax("second converter should not run"))
+    }
+
+    func Write(value: int) -> Result<JsonValue, JsonError> {
+        return Error(JsonError.Syntax("second converter should not run"))
+    }
+}
+
+class CyclicInt : JsonConverter<int> {
+    init() { }
+
+    func Read(value: JsonValue) -> Result<int, JsonError> {
+        return Ok(0)
+    }
+
+    func Write(value: int) -> Result<JsonValue, JsonError> {
+        let array = JsonArray()
+        _ = array.Add(array)?
+        return Ok(array)
+    }
+}
+
+func CheckConverters() -> Result<unit, JsonError> {
+    let converter = IntTextConverter()
+    let options = JsonSerializerOptions()
+    options.Converters.Add<int>(converter)
+    options.Converters.Add<int>(RejectInt())
+    Check(options.Converters.Count == 2, "Registration count")
+    Check(JsonSerializer.Deserialize<int>("\"17\"", options)? == 17, "Custom scalar read")
+    Check(converter.Reads == 1, "Read converter called once")
+    Check(JsonSerializer.Deserialize<int>("null", options)? == -1, "Explicit null callback")
+    Check(JsonSerializer.Serialize(17, options)? == "\"17\"", "Custom scalar write")
+    Check(converter.Writes == 1, "Write converter called once")
+    let values = JsonSerializer.Deserialize<int[]>("[\"1\",\"2\"]", options)?
+    Check(values.Length == 2 && values[0] == 1 && values[1] == 2, "Converted array")
+    Check(converter.Reads == 4, "Each array element read exactly once")
+    Check(JsonSerializer.Serialize(values, options)? == "[\"1\",\"2\"]", "Array write")
+    let list = JsonSerializer.Deserialize<ArrayList<int>>("[\"3\",\"4\"]", options)?
+    Check(list.Count == 2 && list[1] == 4, "Converted list")
+    let map = JsonSerializer.Deserialize<HashMap<string, int>>("{\"x\":\"5\"}", options)?
+    Check(map["x"] == 5, "Converted map")
+    Check(JsonSerializer.Deserialize<int>("\"bad\"", options) is Error(JsonError.InvalidNumber), "Original converter error")
+    let stream = MemoryStream()
+    _ = JsonSerializer.Serialize(stream, 9, options)?
+    Check(stream.GetLength() is Ok(3L), "Converter stream output")
+    Check(stream.Seek(0L) is Ok(_), "Borrowed stream stays open")
+    Check(JsonSerializer.Deserialize<int>(stream, options)? == 9, "Converter stream input")
+    Check(stream.GetPosition() is Ok(3L), "Reader leaves borrowed stream open")
+    stream.Close()
+    let cyclicOptions = JsonSerializerOptions()
+    cyclicOptions.Converters.Add<int>(CyclicInt())
+    let output = MemoryStream()
+    Check(JsonSerializer.Serialize(output, 1, cyclicOptions) is Error(JsonError.LimitExceeded(_)), "Cycle rejected")
+    Check(output.GetLength() is Ok(0L), "No output before validation")
+    output.Close()
+    Console.WriteLine("PASS converters root arrays lists maps and borrowed streams")
+    Console.WriteLine("PASS converter precedence counts errors null and output validation")
+    return Ok(())
+}
+
+func Run() -> Result<unit, JsonError> {
+    let options = JsonSerializerOptions()
+    let converter = Converter()
+    options.Converters.Add<Reading>(converter)
+    let number: Reading = Reading.Number(42)
+    let text: Reading = Reading.Text("hello")
+    Check(JsonSerializer.Serialize(number, options)? == "42", "Number wire format")
+    Check(JsonSerializer.Serialize(text, options)? == "\"hello\"", "String wire format")
+    Check(JsonSerializer.Serialize(Reading.Empty, options)? == "null", "Empty wire format")
+    Check(JsonSerializer.Deserialize<Reading>("42", options)? is Reading.Number(42), "Number read")
+    Check(JsonSerializer.Deserialize<Reading>("\"hello\"", options)? is Reading.Text("hello"), "String read")
+    Check(IsEmpty(JsonSerializer.Deserialize<Reading>("null", options)?), "Null read")
+    Check(JsonSerializer.Deserialize<Reading>("true", options) is Error(JsonError.TypeMismatch(_)), "Unknown shape")
+    let ambiguous = Converter()
+    ambiguous.AddCase<int>(JsonUnionCaseKind.Number, value => ReadNumber(value), value => GetNumber(value))
+    let ambiguousOptions = JsonSerializerOptions()
+    ambiguousOptions.Converters.Add<Reading>(ambiguous)
+    Check(JsonSerializer.Deserialize<Reading>("1", ambiguousOptions) is Error(JsonError.UnsupportedMapping(_)), "Ambiguous shape")
+    let readings = JsonSerializer.Deserialize<Reading[]>("[42,\"hello\",null]", options)?
+    Check(readings.Length == 3 && readings[0] is Reading.Number(42), "Union array read")
+    Check(JsonSerializer.Serialize(readings, options)? == "[42,\"hello\",null]", "Union array write")
+    let readingList = JsonSerializer.Deserialize<ArrayList<Reading>>("[42,\"hello\"]", options)?
+    Check(readingList.Count == 2 && readingList[1] is Reading.Text("hello"), "Union list read")
+    let readingMap = JsonSerializer.Deserialize<HashMap<string, Reading>>("{\"x\":42}", options)?
+    Check(readingMap["x"] is Reading.Number(42), "Union map read")
+    _ = CheckConverters()?
+    Console.WriteLine("PASS union scalar and empty round trips")
+    Console.WriteLine("PASS union ambiguous and unknown shapes")
+    return Ok(())
+}
+
+func Main() -> int {
+    if Run() is Error(let error) {
+        Console.WriteLine(error.ToString())
+        return 1
+    }
+    return 0
+}

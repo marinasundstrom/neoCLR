@@ -1776,3 +1776,13 @@ Nested generic class authoring and generic enclosing identities (2026-10-11) rem
 host-only APIs under the exclusion above; see the
 [complete contract](experimental-metadata.md#nested-generic-lexical-owners-development-2026-10-11).
 The guest reference inputs/snapshot are unchanged.
+
+## JSON array sequence view (development, 2026-10-11)
+
+JsonArray implements Sequence<JsonValue>, including its getter indexer and owned
+snapshot GetIterator. Source and sidecar XML describe bounds faults, recoverable
+Item errors and shallow snapshot ownership. JsonArray remains in automatic public
+type selection. The CLI facade renames its positional helper to Item after C#
+compilation to coexist with the indexer's Item metadata name, as for JsonObject.
+Refresh aggregate reference and native rendered snapshots together; no exclusion
+or compiler Runtime Contract option is introduced.

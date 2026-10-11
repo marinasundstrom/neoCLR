@@ -1,7 +1,7 @@
 {
-  "assemblySha256": "e1379887cdc76d3e406ca1193dc05c33e6d381789854e35eddca270a19b366f5",
+  "assemblySha256": "78727657744b4426ee57b0b003cd837746ceacd8ee3043460e4e400a22bb3cd8",
   "inputs": {
-    "api-docs/NeoCLR.CoreProbe.xml": "740c7b548f0480f325e30d5ffc90cce474d18806de7f470776c57adfdff65f4f",
+    "api-docs/NeoCLR.CoreProbe.xml": "a8049935ae0dde37cc9f8728aca44d7f333ef4d324e37d506cc2da1fb6f922a6",
     "api-docs/exclusions.json": "dfbbab53935ec02fec642d8b5281a5bb01f12ff30d27d2fe47900430c26e642a",
     "api-docs/manual-members.json": "0e873d90c2e2b1a78b111265459ff9998aa0b8a6ef1eb8aca2b393d6fc277ecf",
     "api-docs/manual-types.json": "7d7f9b3611c9a42f7b05df0a24f9f58b297705eefdcd316a0947feafba49228b",
@@ -65,7 +65,7 @@
     "docs/experiments/raven-target/InterfaceBindings.cs": "84dd0e2adf6afdb0d1d467779f6f082b7ca8b7e1dc80f04076b3de45c3938cb0",
     "docs/experiments/raven-target/InterfaceProbe.cs": "0b34f95158a95abf3e1928cd80012c929f32d25d3aea3bc7d29babb876dfaa4d",
     "docs/experiments/raven-target/IntrospectionHierarchy.cs": "479e6c50a68c13d89391ed16ee0e77a24f528179fc5ee63394fa3fd93a8d5e7a",
-    "docs/experiments/raven-target/JsonBindings.cs": "280410182ca355cc7464a12634127ebb26f646579ef35c629da96b384f911220",
+    "docs/experiments/raven-target/JsonBindings.cs": "c0103a6a0a5431e0e612b71ba016faf34964e03e6d75313252a7d1259c34d2ea",
     "docs/experiments/raven-target/LibraryImplementation.cs": "9210efd7ead438799b8d0a75e6ecc52eedf875b0150114dc74302710c5a2c1f3",
     "docs/experiments/raven-target/LibrarySignatureChecks.cs": "8f2efb17ad25b15b2ca67a91fcb3e298a7d06a0a32414cb0bec569bbfa5582b1",
     "docs/experiments/raven-target/ManagedArrayBindings.cs": "d4721dbee5f1124fc833661ef7e5035147fe8fb43f7ca0c904d33a5b2b6c3409",
@@ -191,7 +191,7 @@
     "runtime/raven/src/System/Data/Json/JsonError.rvn": "e289fc6887c5043b7292517fb552e0297c2998a1c53a39eb2d537524fce5e50b",
     "runtime/raven/src/System/Data/Json/JsonSerializer.rvn": "6dd2cc3f431c5e3d393a83f4cb347e8700075eec95b8f7bd0f1460cfad8ca8a6",
     "runtime/raven/src/System/Data/Json/JsonSyntax.rvn": "4080b007156c89ac11bbdfc81e1c8985a3e931eae8753e849479c3541063af92",
-    "runtime/raven/src/System/Data/Json/JsonValue.rvn": "9ae93427d7a64609806ed7a656e361b61c0ea1f4d756001ea4e8052eb0e9da2e",
+    "runtime/raven/src/System/Data/Json/JsonValue.rvn": "d1112cffe6cd8bf1eb39313061af276979a38b9a59b4f7507f60c2ee3d0f97e1",
     "runtime/raven/src/System/Data/Json/ObjectMapper.rvn": "298db0a19e8d88549e6ef5f3ca39e1ece2dd4ce38e385b92991912dcaa50fc75",
     "runtime/raven/src/System/Disposable.rvn": "c25420ff01885d43e81c874bc6bb9e908a1ce8d03071ceb2e51073e236702bbb",
     "runtime/raven/src/System/Double.rvn": "4dbbb92acdfe541595392edde7b1ccc61459d3b8290ea3c22ff368f0a9af83ed",

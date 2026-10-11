@@ -185,6 +185,10 @@ JSON_NAMES = [
     'JSON object indexed access preserves insertion order',
     'JSON documents support every root node kind',
     'JSON scalar nodes expose their typed values',
+    'JSON sequence indexing retains node identity and explicit null',
+    'Empty JSON arrays expose empty sequence snapshots',
+    'JSON sequence views retain node serialization precedence',
+    'JSON sequence snapshots preserve order and shared child contents',
 ]
 JSON_STREAM_NAMES = [
     'JSON stream serialization detects cycles before writing',

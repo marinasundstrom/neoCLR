@@ -1,0 +1,186 @@
+{
+  "passed": true,
+  "platform": "macOS-27.0-arm64-arm-64bit",
+  "cases": [
+    {
+      "mode": "native",
+      "boundary": "negative",
+      "view": "concrete",
+      "passed": true,
+      "command": [
+        "/Users/robert/.codex/worktrees/json-api/neoclr/target/json-sequence-bounds/app",
+        "negative"
+      ],
+      "exitCode": 1,
+      "stdout": "",
+      "stderr": "UserFault: JsonArray index out of range\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E52756E74696D652E436F6D70696C65725365727669636573_52756E74696D654661696C757265.M_5465726D696E617465 [instruction 1]\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.F_3C4E656F46756E6374696F6E3E3533373937333734363536445F3436363136393643 [instruction 1]\n   at NeoMetadata_CD738A2D7DCA60E4D4E297C1A5F51ADBB9955A4C07CA843CD3A4C34A2EE03564.T_53797374656D2E446174612E4A736F6E_4A736F6E4172726179.M_6765745F4974656D [instruction 13]\n   at NeoMetadata_6E873A4EE87DA3443E16FCDAB80F790FE230FB63D0E5BE6E03B5A84C1446C609.F_3C4E656F46756E6374696F6E3E3441373336463645353336353731373536353645363336353436363137353643373437335F3444363136393645 [instruction 40]\n"
+    },
+    {
+      "mode": "native",
+      "boundary": "negative",
+      "view": "sequence",
+      "passed": true,
+      "command": [
+        "/Users/robert/.codex/worktrees/json-api/neoclr/target/json-sequence-bounds/app",
+        "negative",
+        "sequence"
+      ],
+      "exitCode": 1,
+      "stdout": "",
+      "stderr": "UserFault: JsonArray index out of range\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E52756E74696D652E436F6D70696C65725365727669636573_52756E74696D654661696C757265.M_5465726D696E617465 [instruction 1]\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.F_3C4E656F46756E6374696F6E3E3533373937333734363536445F3436363136393643 [instruction 1]\n   at NeoMetadata_CD738A2D7DCA60E4D4E297C1A5F51ADBB9955A4C07CA843CD3A4C34A2EE03564.T_53797374656D2E446174612E4A736F6E_4A736F6E4172726179.M_6765745F4974656D [instruction 13]\n   at NeoMetadata_6E873A4EE87DA3443E16FCDAB80F790FE230FB63D0E5BE6E03B5A84C1446C609.F_3C4E656F46756E6374696F6E3E3441373336463645353336353731373536353645363336353436363137353643373437335F3444363136393645 [instruction 35]\n"
+    },
+    {
+      "mode": "native",
+      "boundary": "end",
+      "view": "concrete",
+      "passed": true,
+      "command": [
+        "/Users/robert/.codex/worktrees/json-api/neoclr/target/json-sequence-bounds/app",
+        "end"
+      ],
+      "exitCode": 1,
+      "stdout": "",
+      "stderr": "UserFault: JsonArray index out of range\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E52756E74696D652E436F6D70696C65725365727669636573_52756E74696D654661696C757265.M_5465726D696E617465 [instruction 1]\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.F_3C4E656F46756E6374696F6E3E3533373937333734363536445F3436363136393643 [instruction 1]\n   at NeoMetadata_CD738A2D7DCA60E4D4E297C1A5F51ADBB9955A4C07CA843CD3A4C34A2EE03564.T_53797374656D2E446174612E4A736F6E_4A736F6E4172726179.M_6765745F4974656D [instruction 13]\n   at NeoMetadata_6E873A4EE87DA3443E16FCDAB80F790FE230FB63D0E5BE6E03B5A84C1446C609.F_3C4E656F46756E6374696F6E3E3441373336463645353336353731373536353645363336353436363137353643373437335F3444363136393645 [instruction 40]\n"
+    },
+    {
+      "mode": "native",
+      "boundary": "end",
+      "view": "sequence",
+      "passed": true,
+      "command": [
+        "/Users/robert/.codex/worktrees/json-api/neoclr/target/json-sequence-bounds/app",
+        "end",
+        "sequence"
+      ],
+      "exitCode": 1,
+      "stdout": "",
+      "stderr": "UserFault: JsonArray index out of range\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E52756E74696D652E436F6D70696C65725365727669636573_52756E74696D654661696C757265.M_5465726D696E617465 [instruction 1]\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.F_3C4E656F46756E6374696F6E3E3533373937333734363536445F3436363136393643 [instruction 1]\n   at NeoMetadata_CD738A2D7DCA60E4D4E297C1A5F51ADBB9955A4C07CA843CD3A4C34A2EE03564.T_53797374656D2E446174612E4A736F6E_4A736F6E4172726179.M_6765745F4974656D [instruction 13]\n   at NeoMetadata_6E873A4EE87DA3443E16FCDAB80F790FE230FB63D0E5BE6E03B5A84C1446C609.F_3C4E656F46756E6374696F6E3E3441373336463645353336353731373536353645363336353436363137353643373437335F3444363136393645 [instruction 35]\n"
+    },
+    {
+      "mode": "interpreter",
+      "boundary": "negative",
+      "view": "concrete",
+      "passed": true,
+      "command": [
+        "/Users/robert/Projects/neoclr/target/release/neoclr",
+        "run",
+        "/Users/robert/.codex/worktrees/json-api/neoclr/target/json-sequence-bounds/app.dll",
+        "--system",
+        "/Users/robert/.codex/worktrees/json-api/neoclr/target/json-bundle/lib/System.runtime.neox",
+        "--module",
+        "/Users/robert/.codex/worktrees/json-api/neoclr/target/json-bundle/lib/System.Runtime.dll",
+        "--module",
+        "/Users/robert/.codex/worktrees/json-api/neoclr/target/json-bundle/lib/System.Data.dll",
+        "--module",
+        "/Users/robert/.codex/worktrees/json-api/neoclr/target/json-bundle/lib/System.Networking.dll",
+        "--module",
+        "/Users/robert/.codex/worktrees/json-api/neoclr/target/json-bundle/lib/System.Web.dll",
+        "--object-root",
+        "/Users/robert/.codex/worktrees/json-api/neoclr/target/json-bundle/lib/System.Runtime.dll",
+        "--",
+        "negative"
+      ],
+      "exitCode": 1,
+      "stdout": "",
+      "stderr": "UserFault: JsonArray index out of range\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E52756E74696D652E436F6D70696C65725365727669636573_52756E74696D654661696C757265.M_5465726D696E617465 [instruction 1]\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.F_3C4E656F46756E6374696F6E3E3533373937333734363536445F3436363136393643 [instruction 1]\n   at NeoMetadata_CD738A2D7DCA60E4D4E297C1A5F51ADBB9955A4C07CA843CD3A4C34A2EE03564.T_53797374656D2E446174612E4A736F6E_4A736F6E4172726179.M_6765745F4974656D [instruction 13]\n   at NeoMetadata_6E873A4EE87DA3443E16FCDAB80F790FE230FB63D0E5BE6E03B5A84C1446C609.F_3C4E656F46756E6374696F6E3E3441373336463645353336353731373536353645363336353436363137353643373437335F3444363136393645 [instruction 40]\n"
+    },
+    {
+      "mode": "interpreter",
+      "boundary": "negative",
+      "view": "sequence",
+      "passed": true,
+      "command": [
+        "/Users/robert/Projects/neoclr/target/release/neoclr",
+        "run",
+        "/Users/robert/.codex/worktrees/json-api/neoclr/target/json-sequence-bounds/app.dll",
+        "--system",
+        "/Users/robert/.codex/worktrees/json-api/neoclr/target/json-bundle/lib/System.runtime.neox",
+        "--module",
+        "/Users/robert/.codex/worktrees/json-api/neoclr/target/json-bundle/lib/System.Runtime.dll",
+        "--module",
+        "/Users/robert/.codex/worktrees/json-api/neoclr/target/json-bundle/lib/System.Data.dll",
+        "--module",
+        "/Users/robert/.codex/worktrees/json-api/neoclr/target/json-bundle/lib/System.Networking.dll",
+        "--module",
+        "/Users/robert/.codex/worktrees/json-api/neoclr/target/json-bundle/lib/System.Web.dll",
+        "--object-root",
+        "/Users/robert/.codex/worktrees/json-api/neoclr/target/json-bundle/lib/System.Runtime.dll",
+        "--",
+        "negative",
+        "sequence"
+      ],
+      "exitCode": 1,
+      "stdout": "",
+      "stderr": "UserFault: JsonArray index out of range\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E52756E74696D652E436F6D70696C65725365727669636573_52756E74696D654661696C757265.M_5465726D696E617465 [instruction 1]\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.F_3C4E656F46756E6374696F6E3E3533373937333734363536445F3436363136393643 [instruction 1]\n   at NeoMetadata_CD738A2D7DCA60E4D4E297C1A5F51ADBB9955A4C07CA843CD3A4C34A2EE03564.T_53797374656D2E446174612E4A736F6E_4A736F6E4172726179.M_6765745F4974656D [instruction 13]\n   at NeoMetadata_6E873A4EE87DA3443E16FCDAB80F790FE230FB63D0E5BE6E03B5A84C1446C609.F_3C4E656F46756E6374696F6E3E3441373336463645353336353731373536353645363336353436363137353643373437335F3444363136393645 [instruction 35]\n"
+    },
+    {
+      "mode": "interpreter",
+      "boundary": "end",
+      "view": "concrete",
+      "passed": true,
+      "command": [
+        "/Users/robert/Projects/neoclr/target/release/neoclr",
+        "run",
+        "/Users/robert/.codex/worktrees/json-api/neoclr/target/json-sequence-bounds/app.dll",
+        "--system",
+        "/Users/robert/.codex/worktrees/json-api/neoclr/target/json-bundle/lib/System.runtime.neox",
+        "--module",
+        "/Users/robert/.codex/worktrees/json-api/neoclr/target/json-bundle/lib/System.Runtime.dll",
+        "--module",
+        "/Users/robert/.codex/worktrees/json-api/neoclr/target/json-bundle/lib/System.Data.dll",
+        "--module",
+        "/Users/robert/.codex/worktrees/json-api/neoclr/target/json-bundle/lib/System.Networking.dll",
+        "--module",
+        "/Users/robert/.codex/worktrees/json-api/neoclr/target/json-bundle/lib/System.Web.dll",
+        "--object-root",
+        "/Users/robert/.codex/worktrees/json-api/neoclr/target/json-bundle/lib/System.Runtime.dll",
+        "--",
+        "end"
+      ],
+      "exitCode": 1,
+      "stdout": "",
+      "stderr": "UserFault: JsonArray index out of range\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E52756E74696D652E436F6D70696C65725365727669636573_52756E74696D654661696C757265.M_5465726D696E617465 [instruction 1]\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.F_3C4E656F46756E6374696F6E3E3533373937333734363536445F3436363136393643 [instruction 1]\n   at NeoMetadata_CD738A2D7DCA60E4D4E297C1A5F51ADBB9955A4C07CA843CD3A4C34A2EE03564.T_53797374656D2E446174612E4A736F6E_4A736F6E4172726179.M_6765745F4974656D [instruction 13]\n   at NeoMetadata_6E873A4EE87DA3443E16FCDAB80F790FE230FB63D0E5BE6E03B5A84C1446C609.F_3C4E656F46756E6374696F6E3E3441373336463645353336353731373536353645363336353436363137353643373437335F3444363136393645 [instruction 40]\n"
+    },
+    {
+      "mode": "interpreter",
+      "boundary": "end",
+      "view": "sequence",
+      "passed": true,
+      "command": [
+        "/Users/robert/Projects/neoclr/target/release/neoclr",
+        "run",
+        "/Users/robert/.codex/worktrees/json-api/neoclr/target/json-sequence-bounds/app.dll",
+        "--system",
+        "/Users/robert/.codex/worktrees/json-api/neoclr/target/json-bundle/lib/System.runtime.neox",
+        "--module",
+        "/Users/robert/.codex/worktrees/json-api/neoclr/target/json-bundle/lib/System.Runtime.dll",
+        "--module",
+        "/Users/robert/.codex/worktrees/json-api/neoclr/target/json-bundle/lib/System.Data.dll",
+        "--module",
+        "/Users/robert/.codex/worktrees/json-api/neoclr/target/json-bundle/lib/System.Networking.dll",
+        "--module",
+        "/Users/robert/.codex/worktrees/json-api/neoclr/target/json-bundle/lib/System.Web.dll",
+        "--object-root",
+        "/Users/robert/.codex/worktrees/json-api/neoclr/target/json-bundle/lib/System.Runtime.dll",
+        "--",
+        "end",
+        "sequence"
+      ],
+      "exitCode": 1,
+      "stdout": "",
+      "stderr": "UserFault: JsonArray index out of range\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E52756E74696D652E436F6D70696C65725365727669636573_52756E74696D654661696C757265.M_5465726D696E617465 [instruction 1]\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.F_3C4E656F46756E6374696F6E3E3533373937333734363536445F3436363136393643 [instruction 1]\n   at NeoMetadata_CD738A2D7DCA60E4D4E297C1A5F51ADBB9955A4C07CA843CD3A4C34A2EE03564.T_53797374656D2E446174612E4A736F6E_4A736F6E4172726179.M_6765745F4974656D [instruction 13]\n   at NeoMetadata_6E873A4EE87DA3443E16FCDAB80F790FE230FB63D0E5BE6E03B5A84C1446C609.F_3C4E656F46756E6374696F6E3E3441373336463645353336353731373536353645363336353436363137353643373437335F3444363136393645 [instruction 35]\n"
+    }
+  ],
+  "inputs": {
+    "docs/experiments/json-sequence/verify.py": "c556bf75b5c5db8d63104a9901e2f0b10802e2d8d6e3d3c6761e3734acf3c149",
+    "docs/experiments/json-sequence/Bounds.rvn": "7192f8727c233ea4c2ab449b48f07a3fa8b12e97ff607600db301975ca863a07",
+    "docs/experiments/json-sequence/Bounds.rvnproj": "6db9ef00023515775eb19198240a8eece823b2fcea11f1798bc9d84efcdd6e39",
+    "runtime/raven/src/System/Data/Json/JsonValue.rvn": "d1112cffe6cd8bf1eb39313061af276979a38b9a59b4f7507f60c2ee3d0f97e1"
+  },
+  "artifacts": {
+    "/Users/robert/.codex/worktrees/json-api/neoclr/target/json-bundle/manifest.json": "c31dd48fba02d79ff060dce9bb5a4c28959758f85e5ba919a812aea6f570d469",
+    "/Users/robert/Projects/neoclr/target/release/neoclr": "b0849d2ae3a6bdcbfc22a7ec4b76e08858d016923cfc1760ef062336215a85bd",
+    "/Users/robert/.codex/worktrees/json-api/neoclr/target/json-sequence-bounds/app": "ff10a0afe7e85faf6cf90fa4e61c950bbaedc84b6d9b012e221088014206bfe0",
+    "/Users/robert/.codex/worktrees/json-api/neoclr/target/json-sequence-bounds/app.dll": "e26127e50b8f3168666d01a06cd74cc98bbd650009ec91a6e467712d5589b280"
+  }
+}

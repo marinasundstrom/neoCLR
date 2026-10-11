@@ -8,6 +8,14 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-11
 
+- Add a read-only Sequence<JsonValue> view to JsonArray, with original-node indexing
+  and ordered shallow snapshot iteration. Invalid indexer accesses terminate with a
+  Fault; Item retains recoverable InvalidIndex errors, and Add retains its quota.
+  Update public API documentation and assess options, typed converters and related
+  JSON gaps as follow-up proposals. Preserve the incomplete .NET 11-style union
+  converter prototype as an opt-in experiment, with native runtime blockers recorded;
+  converter/options APIs are not enabled in the runtime library.
+
 - Add source-local runtime-async ownership adapters so pending result, generator
   advancement and disposal tasks retain their producer or cursor. New task-only
   consumers force GC and check completion/cleanup in interpreter, JIT and AOT.

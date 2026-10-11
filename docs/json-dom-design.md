@@ -583,3 +583,35 @@ JsonSerializer's existing JsonValue branch precedes generic object mapping, so
 adding Map conformance must not reinterpret JSON nodes as ordinary objects. The
 framework tests exercise that boundary through an Object holding the map view.
 See [map tests and terminal-fault probe](experiments/json-map/README.md) for evidence.
+
+### Read-only array sequence view (development, 2026-10-11)
+
+The author requested JSON API improvements and a review of needed features including
+converters. JsonArray now implements `Sequence<JsonValue>`: Count and integer indexing
+read the current array, while GetIterator captures an ordered shallow snapshot. The
+indexer returns the original node, including JsonNull, and faults for negative or
+past-end indices. Item retains its recoverable InvalidIndex result. Ordinary `for`
+and interface consumers work without manually counting and unwrapping Item results.
+
+.NET 10's [JsonArray](https://learn.microsoft.com/en-us/dotnet/api/system.text.json.nodes.jsonarray?view=net-10.0)
+provides indexed access and collection enumeration (primary API documentation reviewed
+2026-10-11). This adopts the collection integration, using neoCLR's existing Sequence
+contract. The read-only interface is an incremental gap closure, not full IList
+parity: quota-aware Result-returning Add remains the mutation contract. Explicit
+JsonNull and terminal Faults follow the existing neoCLR DOM and collection contracts.
+
+Snapshot iteration follows the existing JsonObject policy. Copying up to 31 references
+costs O(n) storage and avoids dependence on backing-list mutation behavior; node
+contents remain shared, with no deep-copy or concurrency guarantee. Retaining only
+indexed access would avoid that copy but leave ordinary collection consumers unable
+to enumerate JSON arrays. Live/fail-fast enumeration is an alternative for a future
+coordinated DOM review. No throughput improvement is claimed.
+
+The compiled [JSON DOM suite](../runtime/raven/tests/json-dom/JsonDom.rvn) covers empty
+snapshots, interface/concrete indexing, original node identity, shared child mutation,
+append-after-capture, for iteration, and serializer precedence. The separate
+[bounds consumer](experiments/json-sequence/README.md) covers terminal faults, which
+cannot be caught by the test framework. Compiler Runtime Contract settings and wire
+format are unchanged; native interfaces are emitted normally. The CLI documentation
+facade uses ordinary Sequence implementation and getter metadata; it is not the
+executable runtime implementation.

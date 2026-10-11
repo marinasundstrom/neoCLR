@@ -1,0 +1,678 @@
+--- a/runtime/raven/src/System/Data/Json/JsonSerializer.rvn
++++ b/runtime/raven/src/System/Data/Json/JsonSerializer.rvn
+@@ -77,4 +77,46 @@
+         let mapped = ObjectMapper.Write(value)?
+         return SerializeNode(output, mapped)
+     }
++
++    /// <summary>Reads a typed value using a snapshot of converter registrations.</summary>
++    static func Deserialize<T>(text: string, options: JsonSerializerOptions) -> Result<T, JsonError> {
++        let instance = Deserialize(text, typeof(T), options)?
++        return Ok((T)instance)
++    }
++
++    /// <summary>Reads a typed value from a borrowed stream using converter registrations.</summary>
++    static func Deserialize<T>(input: InputStream, options: JsonSerializerOptions) -> Result<T, JsonError> {
++        let instance = Deserialize(input, typeof(T), options)?
++        return Ok((T)instance)
++    }
++
++    /// <summary>Reads a value using the exact target type and converter registrations.</summary>
++    static func Deserialize(text: string, type: TypeInfo, options: JsonSerializerOptions) -> Result<Object, JsonError> {
++        let state = JsonConverterState(options)
++        let document = DeserializeNode(text)?
++        return ObjectMapper.Read(document, type, state)
++    }
++
++    /// <summary>Reads a value from a borrowed stream using the target type and converters.</summary>
++    static func Deserialize(input: InputStream, type: TypeInfo, options: JsonSerializerOptions) -> Result<Object, JsonError> {
++        let state = JsonConverterState(options)
++        let document = DeserializeNode(input)?
++        return ObjectMapper.Read(document, type, state)
++    }
++
++    /// <summary>Writes a value using a snapshot of converter registrations.</summary>
++    /// <remarks>The root uses its actual type; nested values use declared types. Custom converters precede built-in mapping, including nodes, for their exact target type.</remarks>
++    static func Serialize(value: Object, options: JsonSerializerOptions) -> Result<string, JsonError> {
++        let state = JsonConverterState(options)
++        let mapped = ObjectMapper.Write(value, state)?
++        return SerializeNode(mapped)
++    }
++
++    /// <summary>Writes a value to a borrowed stream using converter registrations.</summary>
++    /// <remarks>All conversion and document validation complete before any output bytes are written.</remarks>
++    static func Serialize(output: OutputStream, value: Object, options: JsonSerializerOptions) -> Result<unit, JsonError> {
++        let state = JsonConverterState(options)
++        let mapped = ObjectMapper.Write(value, state)?
++        return SerializeNode(output, mapped)
++    }
+ }
+--- a/runtime/raven/src/System/Data/Json/ObjectMapper.rvn
++++ b/runtime/raven/src/System/Data/Json/ObjectMapper.rvn
+@@ -23,17 +23,20 @@
+         return type.Equals(typeof(JsonValue)) || instance.GetType().Equals(type)
+     }
+
+-    private static func CheckType(type: TypeInfo) -> Result<unit, JsonError> {
++    private static func CheckType(type: TypeInfo, state: JsonConverterState) -> Result<unit, JsonError> {
++        if state.Find(type) is Some(_) {
++            return Ok(())
++        }
+         if IsNodeType(type) || type.Equals(typeof(string)) || type.Equals(typeof(int)) || type.Equals(typeof(bool)) {
+             return Ok(())
+         }
+         let collection = neoCLR.Runtime.ReflectionCollectionKind(type)
+         if collection != 0 {
+-            return CheckType(type.GetGenericArgument(collection - 1))
++            return CheckType(type.GetGenericArgument(collection - 1), state)
+         }
+         if type.IsArray {
+             if let Some(element) = type.GetElementType() {
+-                return CheckType(element)
++                return CheckType(element, state)
+             }
+         }
+         if type.IsValueType || type.IsInterface || type.IsArray || type.IsByRef || type.IsPointer || type.IsOpen || type.GenericArgumentCount != 0 {
+@@ -42,20 +45,31 @@
+         return Ok(())
+     }
+
+-    private static func CheckProperty(property: PropertyInfo) -> Result<unit, JsonError> {
++    private static func CheckProperty(property: PropertyInfo, state: JsonConverterState) -> Result<unit, JsonError> {
+         if property.GetIndexParameters().Count != 0 {
+             return Error(JsonError.UnsupportedMapping("Indexed property: " + property.Name))
+         }
+-        return CheckType(property.PropertyType)
++        return CheckType(property.PropertyType, state)
+     }
+
+     static func Write(value: Object) -> Result<JsonValue, JsonError> {
+-        return WriteValue(value, value.GetType(), 0)
+-    }
+-
+-    private static func WriteValue(value: Object?, type: TypeInfo, depth: int) -> Result<JsonValue, JsonError> {
+-        _ = CheckType(type)?
++        return Write(value, JsonConverterState(JsonSerializerOptions()))
++    }
++
++    static func Write(value: Object, state: JsonConverterState) -> Result<JsonValue, JsonError> {
++        return WriteValue(value, value.GetType(), 0, state)
++    }
++
++    internal static func WriteDeclared(value: Object, type: TypeInfo, state: JsonConverterState) -> Result<JsonValue, JsonError> {
++        return WriteValue(value, type, 0, state)
++    }
++
++    private static func WriteValue(value: Object?, type: TypeInfo, depth: int, state: JsonConverterState) -> Result<JsonValue, JsonError> {
++        _ = CheckType(type, state)?
+         let present: Object = value ?? return Error(JsonError.UnsupportedMapping("Null mapped value"))
++        if state.Find(type) is Some(let converter) {
++            return converter.WriteObject(present, state)
++        }
+         if IsNodeType(type) {
+             if present is JsonValue node {
+                 if MatchesNode(node, type) {
+@@ -99,7 +113,7 @@
+                 let sequence = JsonArray()
+                 for index in 0..<count {
+                     let item = neoCLR.Runtime.ReflectionCollectionGet(type, present, index)
+-                    let child = WriteValue(item, element, depth + 1)?
++                    let child = WriteValue(item, element, depth + 1, state)?
+                     _ = sequence.Add(child)?
+                 }
+                 return Ok(sequence)
+@@ -108,7 +122,7 @@
+             for index in 0..<count {
+                 let key = neoCLR.Runtime.ReflectionCollectionKey(type, present, index)
+                 let item = neoCLR.Runtime.ReflectionCollectionGet(type, present, index)
+-                let child = WriteValue(item, element, depth + 1)?
++                let child = WriteValue(item, element, depth + 1, state)?
+                 _ = map.Add(key, child)?
+             }
+             return Ok(map)
+@@ -124,7 +138,7 @@
+             let array = JsonArray()
+             for index in 0..<count {
+                 let child = ArrayReflection.GetValue(present, index)
+-                let node = WriteValue(child, element, depth + 1)?
++                let node = WriteValue(child, element, depth + 1, state)?
+                 _ = array.Add(node)?
+             }
+             return Ok(array)
+@@ -132,12 +146,12 @@
+         let document = JsonObject()
+         for property in type.GetProperties() {
+             if !property.IsStatic && property.GetGetMethod() is Some(_) {
+-                _ = CheckProperty(property)?
++                _ = CheckProperty(property, state)?
+                 let item: Object? = match property.GetValue(present) {
+                     Ok(let content) => content
+                     Error(let reason) => return Error(JsonError.Reflection(reason))
+                 }
+-                let node = WriteValue(item, property.PropertyType, depth + 1)?
++                let node = WriteValue(item, property.PropertyType, depth + 1, state)?
+                 _ = document.Add(property.Name, node)?
+             }
+         }
+@@ -145,15 +159,34 @@
+     }
+
+     static func Read(value: JsonValue, type: TypeInfo) -> Result<Object, JsonError> {
+-        // Validate the entire input tree before executing any model user code.
+-        _ = ReadValue(value, type, 0, 0)?
+-        return ReadValue(value, type, 0, 1)
+-    }
+-
+-    // Pass 0 validates; pass 1 constructs. Integer mode avoids the current bridge
++        let state = JsonConverterState(JsonSerializerOptions())
++        _ = ReadValue(value, type, 0, 0, state)?
++        return ReadValue(value, type, 0, 1, state)
++    }
++
++    static func Read(value: JsonValue, type: TypeInfo, state: JsonConverterState) -> Result<Object, JsonError> {
++        // Validate built-in structure, prepare each converter once, then construct.
++        // Converted subtrees are opaque in all passes. Cached results are per occurrence.
++        _ = ReadValue(value, type, 0, 0, state)?
++        _ = ReadValue(value, type, 0, 2, state)?
++        return ReadValue(value, type, 0, 1, state)
++    }
++
++    // Pass 0 validates; pass 2 prepares converters; pass 1 constructs. Integer mode avoids the current bridge
+     // limitation on Boolean conversions at multi-argument private calls.
+-    private static func ReadValue(value: JsonValue, type: TypeInfo, depth: int, construct: int) -> Result<Object, JsonError> {
+-        _ = CheckType(type)?
++    private static func ReadValue(value: JsonValue, type: TypeInfo, depth: int, construct: int, state: JsonConverterState) -> Result<Object, JsonError> {
++        _ = CheckType(type, state)?
++        if state.Find(type) is Some(let converter) {
++            if construct == 0 {
++                return Ok(value)
++            }
++            if construct == 2 {
++                let converted = converter.ReadObject(value, state)?
++                state.Save(converted)
++                return Ok(converted)
++            }
++            return Ok(state.Take())
++        }
+         if IsNodeType(type) {
+             if MatchesNode(value, type) {
+                 return Ok(value)
+@@ -190,10 +223,10 @@
+                     let items = CheckedStorage.Reserve<Object>(sequence.Count)
+                     for index in 0..<sequence.Count {
+                         let child = sequence.Item(index)?
+-                        let mapped = ReadValue(child, element, depth + 1, construct)?
++                        let mapped = ReadValue(child, element, depth + 1, construct, state)?
+                         items[index] = mapped
+                     }
+-                    if construct == 0 {
++                    if construct != 1 {
+                         return Ok(sequence)
+                     }
+                     return Ok(neoCLR.Runtime.ReflectionCollectionCreate(type, items, []))
+@@ -206,11 +239,11 @@
+                 for index in 0..<map.Count {
+                     let key = map.Name(index)?
+                     let child = map.Item(index)?
+-                    let mapped = ReadValue(child, element, depth + 1, construct)?
++                    let mapped = ReadValue(child, element, depth + 1, construct, state)?
+                     keys[index] = key
+                     items[index] = mapped
+                 }
+-                if construct == 0 {
++                if construct != 1 {
+                     return Ok(map)
+                 }
+                 return Ok(neoCLR.Runtime.ReflectionCollectionCreate(type, items, keys))
+@@ -225,10 +258,10 @@
+                 let items = CheckedStorage.Reserve<Object>(array.Count)
+                 for index in 0..<array.Count {
+                     let child = array.Item(index)?
+-                    let mapped = ReadValue(child, element, depth + 1, construct)?
++                    let mapped = ReadValue(child, element, depth + 1, construct, state)?
+                     items[index] = mapped
+                 }
+-                if construct == 0 {
++                if construct != 1 {
+                     return Ok(array)
+                 }
+                 return Ok(ArrayReflection.Create(type, items))
+@@ -240,14 +273,14 @@
+             let values = ArrayList<Object>()
+             for property in type.GetProperties() {
+                 if !property.IsStatic && property.GetSetMethod() is Some(_) {
+-                    _ = CheckProperty(property)?
++                    _ = CheckProperty(property, state)?
+                     let item = document.Field(property.Name)?
+-                    let mapped = ReadValue(item, property.PropertyType, depth + 1, construct)?
++                    let mapped = ReadValue(item, property.PropertyType, depth + 1, construct, state)?
+                     values.Add(mapped)
+                     properties.Add(property)
+                 }
+             }
+-            if construct == 0 {
++            if construct != 1 {
+                 return Ok(document)
+             }
+             let instance = match type.CreateInstance() {
+--- a/api-docs/NeoCLR.CoreProbe.xml
++++ b/api-docs/NeoCLR.CoreProbe.xml
+@@ -2342,6 +2342,34 @@
+     <member name="M:System.IO.MemoryStream.Close">
+       <summary>Closes all capabilities and releases the backing storage. Repeated calls have no effect.</summary>
+     </member>
++<member name="T:System.Data.Json.JsonConverter`1"><summary>Converts a complete JSON node to and from a typed value.</summary><typeparam name="T">The exact registered target type.</typeparam><remarks>Development DOM callback contract. Read receives explicit JsonNull. Results propagate converter errors unchanged. Callbacks may have user effects and run once per occurrence. Unlike .NET's abstract converter class this is an interface; native generic virtual classes are not yet supported.</remarks></member>
++<member name="M:System.Data.Json.JsonConverter`1.Read(System.Data.Json.JsonValue)"><summary>Reads one complete node into a typed value.</summary><param name="value">The node, including JsonNull.</param><returns>A value or JsonError.</returns></member>
++<member name="M:System.Data.Json.JsonConverter`1.Write(`0)"><summary>Writes a typed value as a JSON node.</summary><param name="value">The value.</param><returns>A node or JsonError; the full document is validated before stream output.</returns></member>
++<member name="T:System.Data.Json.JsonSerializerOptions"><summary>Configures ordered, exact-type JSON converters.</summary><remarks>Operations snapshot registrations before reading or mapping. Converter instances remain shared. The first exact-type registration wins; factories, attributes and naming policy options are not implemented.</remarks></member>
++<member name="M:System.Data.Json.JsonSerializerOptions.#ctor"><summary>Creates options with no custom converters.</summary></member>
++<member name="P:System.Data.Json.JsonSerializerOptions.Converters"><summary>Gets the append-only converter collection.</summary></member>
++<member name="T:System.Data.Json.JsonConverterCollection"><summary>Ordered converter registrations.</summary><remarks>Obtain from JsonSerializerOptions.Converters. Use the Add extension from System.Data.Json. No removal or replacement API is implemented.</remarks></member>
++<member name="P:System.Data.Json.JsonConverterCollection.Count"><summary>Gets the number of registrations, including duplicates.</summary></member>
++<member name="T:System.Data.Json.JsonConverterRegistrationExtensions"><summary>Typed converter registration.</summary></member>
++<member name="M:System.Data.Json.JsonConverterRegistrationExtensions.Add``1(System.Data.Json.JsonConverterCollection,System.Data.Json.JsonConverter{``0})"><summary>Appends a converter for exactly T.</summary><typeparam name="T">The target type.</typeparam><param name="self">The options collection.</param><param name="converter">The retained converter instance.</param><remarks>First registration wins. Changes during callbacks affect later operations.</remarks></member>
++<member name="T:System.Data.Json.JsonUnionCaseKind"><summary>JSON token shapes used by explicit union case contracts.</summary><remarks>Boolean covers both true and false. Null is reserved for the supplied empty union value; nullable payload cases are not yet supported.</remarks></member>
++<member name="T:System.Data.Json.JsonUnionConverter`1"><summary>Writes active union payloads directly, without wrappers or discriminators.</summary><typeparam name="T">The union value type.</typeparam><remarks>Explicit typed case registrations adapt Raven union construction and patterns to a .NET 11-style JSON shape contract. Exactly one matching shape is required on read. Null maps to the supplied empty value. Structural classifiers, automatic metadata discovery and nullable cases remain gaps. Converter state and callbacks are user-owned, not transactional.</remarks></member>
++<member name="M:System.Data.Json.JsonUnionConverter`1.#ctor(`0,System.Func{`0,System.Boolean})"><summary>Creates a union contract with its explicit no-active-case state.</summary><param name="empty">The value returned for JSON null.</param><param name="isEmpty">The predicate identifying that state when writing.</param></member>
++<member name="M:System.Data.Json.JsonUnionConverter`1.Read(System.Data.Json.JsonValue)"><summary>Reads a union using built-in payload mapping.</summary><param name="value">The node to classify.</param><returns>The union or an error for unmatched or ambiguous shapes and invalid payloads.</returns><remarks>Use JsonSerializer with options for custom payload converters. Reading freezes case registrations.</remarks></member>
++<member name="M:System.Data.Json.JsonUnionConverter`1.Write(`0)"><summary>Writes the active union payload using built-in mapping.</summary><param name="value">The union.</param><returns>The payload node or an error for unregistered or multiply matched cases or a shape mismatch.</returns><remarks>Use JsonSerializer with options for custom payload converters. Writing freezes case registrations.</remarks></member>
++<member name="T:System.Data.Json.JsonUnionCaseExtensions"><summary>Typed union case registration.</summary></member>
++<member name="M:System.Data.Json.JsonUnionCaseExtensions.AddCase``2(System.Data.Json.JsonUnionConverter{``0},System.Data.Json.JsonUnionCaseKind,System.Func{``1,``0},System.Func{``0,System.Option{``1}})"><summary>Registers a JSON shape and typed union case adapters.</summary><typeparam name="T">The union.</typeparam><typeparam name="TCase">The payload type.</typeparam><param name="self">The union contract.</param><param name="kind">The accepted and produced shape.</param><param name="create">Constructs the union from its payload.</param><param name="extract">Returns Some for this case and None otherwise.</param><remarks>Invalid kinds or registration after first use cause a terminal Fault. Overlapping shapes are rejected on read before payload conversion. Payload mapping uses the active options snapshot and a bounded nesting budget.</remarks></member>
++<member name="F:System.Data.Json.JsonUnionCaseKind.String"><summary>The JSON string shape.</summary></member>
++<member name="F:System.Data.Json.JsonUnionCaseKind.Number"><summary>The JSON number shape.</summary></member>
++<member name="F:System.Data.Json.JsonUnionCaseKind.Boolean"><summary>The JSON boolean shape.</summary></member>
++<member name="F:System.Data.Json.JsonUnionCaseKind.Array"><summary>The JSON array shape.</summary></member>
++<member name="F:System.Data.Json.JsonUnionCaseKind.Object"><summary>The JSON object shape.</summary></member>
++<member name="M:System.Data.Json.JsonSerializer.Deserialize``1(System.String,System.Data.Json.JsonSerializerOptions)"><summary>Deserializes a typed value with a snapshot of converter registrations.</summary><typeparam name="T">The target type.</typeparam><param name="text">JSON text.</param><param name="options">Converter registrations.</param><returns>The value or JsonError.</returns><remarks>Built-in structure is checked before callbacks; converted values are retained before ordinary mapper construction. Converter callbacks and union adapters can have effects; those effects are not rolled back.</remarks></member>
++<member name="M:System.Data.Json.JsonSerializer.Deserialize(System.String,System.Introspection.TypeInfo,System.Data.Json.JsonSerializerOptions)"><summary>Deserializes using an explicit target type and converters.</summary><param name="text">JSON text.</param><param name="type">The declared target type.</param><param name="options">Converter registrations.</param><returns>The value or JsonError.</returns></member>
++<member name="M:System.Data.Json.JsonSerializer.Deserialize``1(System.IO.InputStream,System.Data.Json.JsonSerializerOptions)"><summary>Deserializes a typed value with a snapshot of converter registrations.</summary><typeparam name="T">The target type.</typeparam><param name="input">Borrowed UTF-8 input stream.</param><param name="options">Converter registrations.</param><returns>The value or JsonError.</returns><remarks>Built-in structure is checked before callbacks; converted values are retained before ordinary mapper construction. Converter callbacks and union adapters can have effects; those effects are not rolled back.</remarks></member>
++<member name="M:System.Data.Json.JsonSerializer.Deserialize(System.IO.InputStream,System.Introspection.TypeInfo,System.Data.Json.JsonSerializerOptions)"><summary>Deserializes using an explicit target type and converters.</summary><param name="input">Borrowed UTF-8 input stream.</param><param name="type">The declared target type.</param><param name="options">Converter registrations.</param><returns>The value or JsonError.</returns></member>
++<member name="M:System.Data.Json.JsonSerializer.Serialize(System.Object,System.Data.Json.JsonSerializerOptions)"><summary>Serializes using a snapshot of exact-type converter registrations.</summary><param name="value">The root value, selected by actual type.</param><param name="options">Converter registrations.</param><returns>JSON text or JsonError.</returns><remarks>Nested values use declared types. Custom converters precede built-ins, including DOM nodes. Output limits remain enforced.</remarks></member>
++<member name="M:System.Data.Json.JsonSerializer.Serialize(System.IO.OutputStream,System.Object,System.Data.Json.JsonSerializerOptions)"><summary>Serializes to a borrowed output stream using converters.</summary><param name="output">Borrowed output stream.</param><param name="value">The root value.</param><param name="options">Converter registrations.</param><returns>Success or JsonError.</returns><remarks>Conversion and document validation finish before any output bytes. The stream remains open.</remarks></member>
+ <member name="T:System.Data.Json.JsonValue"><summary>Closed abstract root of the provisional JSON DOM.</summary><remarks>Development after Preview 9. The six kinds are JsonObject, JsonArray, JsonString, JsonNumber, JsonBoolean and JsonNull. External subclasses are not supported. Nodes use ordinary reference identity, not deep equality; use JsonSerializer to write JSON. Containers may share child references. Mutation and scalar access are kind-specific.</remarks></member>
+ <member name="T:System.Data.Json.JsonObject"><summary>Mutable insertion-ordered JSON object with a read-only Map&lt;string, JsonValue&gt; view. Names compare ordinally after JSON decoding; duplicate names are rejected.</summary><remarks>Development map conformance. Field and Find support safe lookup; indexing faults on absence. JsonNull is an explicit present node. Mutation remains quota-aware, duplicate-rejecting Add; MutableMap is not implemented.</remarks></member>
+ <member name="P:System.Data.Json.JsonObject.Item(System.String)"><summary>Gets the node associated with an exact ordinal field name.</summary><param name="name">The field name.</param><value>The original node reference, including a present JsonNull.</value><remarks>Missing fields cause a terminal Fault. Prefer Field or Find for safe lookup.</remarks></member>
+--- a/docs/experiments/raven-target/JsonBindings.cs
++++ b/docs/experiments/raven-target/JsonBindings.cs
+@@ -57,8 +57,40 @@
+ public sealed class JsonNull : JsonValue {
+     public JsonNull() { }
+ }
++public interface JsonConverter<T> {
++    Result<T, JsonError> Read(JsonValue value);
++    Result<JsonValue, JsonError> Write(T value);
++}
++public sealed class JsonSerializerOptions {
++    public JsonSerializerOptions() { }
++    public JsonConverterCollection Converters => default;
++}
++public sealed class JsonConverterCollection {
++    internal JsonConverterCollection() { }
++    public int Count => default;
++
++}
++public static class JsonConverterRegistrationExtensions {
++    public static void Add<T>(this JsonConverterCollection self, JsonConverter<T> converter) { }
++}
++public static class JsonUnionCaseExtensions {
++    public static void AddCase<T, TCase>(this JsonUnionConverter<T> self, JsonUnionCaseKind kind, Func<TCase, T> create, Func<T, Option<TCase>> extract) { }
++}
++public enum JsonUnionCaseKind { String = 1, Number = 2, Boolean = 3, Array = 4, Object = 5 }
++public sealed class JsonUnionConverter<T> : JsonConverter<T> {
++    public JsonUnionConverter(T empty, Func<T, bool> isEmpty) { }
++
++    public Result<T, JsonError> Read(JsonValue value) => default;
++    public Result<JsonValue, JsonError> Write(T value) => default;
++}
+ public sealed class JsonSerializer {
+     private JsonSerializer() { }
++    public static Result<T, JsonError> Deserialize<T>(string text, JsonSerializerOptions options) => default;
++    public static Result<T, JsonError> Deserialize<T>(IO.InputStream input, JsonSerializerOptions options) => default;
++    public static Result<object, JsonError> Deserialize(string text, Introspection.TypeInfo type, JsonSerializerOptions options) => default;
++    public static Result<object, JsonError> Deserialize(IO.InputStream input, Introspection.TypeInfo type, JsonSerializerOptions options) => default;
++    public static Result<string, JsonError> Serialize(object value, JsonSerializerOptions options) => default;
++    public static Result<PropagationUnit, JsonError> Serialize(IO.OutputStream output, object value, JsonSerializerOptions options) => default;
+     public static Result<T, JsonError> Deserialize<T>(string text) => default;
+     public static Result<T, JsonError> Deserialize<T>(IO.InputStream input) => default;
+     public static Result<object, JsonError> Deserialize(string text, Introspection.TypeInfo type) => default;
+--- /dev/null
++++ b/runtime/raven/src/System/Data/Json/JsonConverter.rvn
+@@ -0,0 +1,54 @@
++module System.Data.Json
++
++import System.*
++import System.Introspection.*
++import System.Result.*
++
++/// <summary>Converts a complete JSON node to and from a typed value.</summary>
++/// <remarks>Register with JsonSerializerOptions.Converters.Add. Callbacks receive explicit JsonNull nodes; return an error to reject null or invalid content. Callbacks run once per converted occurrence and may have user effects. This is a DOM contract, not a streaming reader or writer.</remarks>
++public interface JsonConverter<T> {
++    /// <summary>Reads a typed value from a complete node, including explicit JsonNull.</summary>
++    /// <param name="value">The parsed node for this occurrence.</param>
++    /// <returns>The converted value or a JSON error.</returns>
++    func Read(value: JsonValue) -> Result<T, JsonError>
++
++    /// <summary>Converts a typed value into a JSON node.</summary>
++    /// <param name="value">The value to represent.</param>
++    /// <returns>A node or a JSON error. The complete output document is checked for size, depth and cycles before stream output.</returns>
++    func Write(value: T) -> Result<JsonValue, JsonError>
++}
++
++internal interface JsonConverterRegistration {
++    func GetTargetType() -> TypeInfo
++    func ReadObject(value: JsonValue, state: JsonConverterState) -> Result<Object, JsonError>
++    func WriteObject(value: Object, state: JsonConverterState) -> Result<JsonValue, JsonError>
++}
++
++internal class TypedJsonConverter<T> : JsonConverterRegistration {
++    // Temporary compiler constraint: generic constructor assignment requires explicit storage.
++    private field converter: JsonConverter<T>
++
++    init(converter: JsonConverter<T>) {
++        self.converter = converter
++    }
++
++    func GetTargetType() -> TypeInfo {
++        return typeof(T)
++    }
++
++    func ReadObject(value: JsonValue, state: JsonConverterState) -> Result<Object, JsonError> {
++        if converter is JsonUnionConverter<T> unionConverter {
++            let convertedUnion = unionConverter.ReadCore(value, state)?
++            return Ok(convertedUnion)
++        }
++        let converted = converter.Read(value)?
++        return Ok(converted)
++    }
++
++    func WriteObject(value: Object, state: JsonConverterState) -> Result<JsonValue, JsonError> {
++        if converter is JsonUnionConverter<T> unionConverter {
++            return unionConverter.WriteCore((T)value, state)
++        }
++        return converter.Write((T)value)
++    }
++}
+--- /dev/null
++++ b/runtime/raven/src/System/Data/Json/JsonSerializerOptions.rvn
+@@ -0,0 +1,95 @@
++module System.Data.Json
++
++import System.*
++import System.Collections.*
++import System.Introspection.*
++import System.Option.*
++import System.Result.*
++
++/// <summary>Configures explicitly registered JSON converters.</summary>
++/// <remarks>Each serialization operation snapshots registrations before reading or mapping. The first exact-type registration wins. Instances and callback state remain shared; concurrent mutation is not supported.</remarks>
++public class JsonSerializerOptions {
++    private val converters = JsonConverterCollection()
++
++    init() { }
++
++    /// <summary>Gets the ordered converter registrations.</summary>
++    /// <remarks>Add converters before use. Mutations during a callback affect later operations, not the active operation. No converter factories or attribute precedence are implemented.</remarks>
++    val Converters: JsonConverterCollection => converters
++
++    internal func Snapshot() -> ArrayList<JsonConverterRegistration> {
++        return converters.Snapshot()
++    }
++}
++
++/// <summary>Ordered exact-type converter registrations.</summary>
++/// <remarks>The first registration for a type wins. Registration is append-only in this development API.</remarks>
++public class JsonConverterCollection {
++    private val registrations = ArrayList<JsonConverterRegistration>()
++
++    internal init() { }
++
++    /// <summary>Gets the number of registered converters, including duplicates.</summary>
++    val Count: int => registrations.Count
++
++    internal func AddRegistration(converter: JsonConverterRegistration) {
++        registrations.Add(converter)
++    }
++
++    internal func Snapshot() -> ArrayList<JsonConverterRegistration> {
++        return registrations.Copy()
++    }
++}
++
++/// <summary>Typed converter registration using native static generic dispatch.</summary>
++public extension JsonConverterRegistrationExtensions for JsonConverterCollection {
++    /// <summary>Appends a converter for the exact closed type T.</summary>
++    /// <param name="converter">The converter instance, retained by reference.</param>
++    /// <remarks>Register before using the options. A duplicate does not replace the first registration.</remarks>
++    func Add<T>(converter: JsonConverter<T>) {
++        self.AddRegistration(TypedJsonConverter<T>(converter))
++    }
++
++}
++
++internal class JsonConverterState {
++    private val converters: ArrayList<JsonConverterRegistration>
++    private val results = ArrayList<Object>()
++    private var cursor = 0
++    private var nesting = 0
++
++    init(options: JsonSerializerOptions) {
++        converters = options.Snapshot()
++    }
++
++    private init(converters: ArrayList<JsonConverterRegistration>, nesting: int) {
++        self.converters = converters
++        self.nesting = nesting
++    }
++
++    func Child() -> Result<JsonConverterState, JsonError> {
++        if nesting >= 16 {
++            return Error(JsonError.LimitExceeded("JSON union conversion nesting exceeds sixteen"))
++        }
++        return Ok(JsonConverterState(converters, nesting + 1))
++    }
++
++    func Find(type: TypeInfo) -> Option<JsonConverterRegistration> {
++        for converter in converters {
++            if converter.GetTargetType().Equals(type) {
++                return Some(converter)
++            }
++        }
++        return None
++    }
++
++    func Save(value: Object) {
++        results.Add(value)
++    }
++
++    func Take() -> Object {
++        let result = results[cursor]
++        cursor += 1
++        return result
++    }
++}
+--- /dev/null
++++ b/runtime/raven/src/System/Data/Json/JsonUnionConverter.rvn
+@@ -0,0 +1,183 @@
++module System.Data.Json
++
++import System.*
++import System.Collections.*
++import System.Introspection.*
++import System.Option.*
++import System.Result.*
++
++/// <summary>The JSON shape used to classify a union case.</summary>
++public enum JsonUnionCaseKind {
++    String = 1
++    Number = 2
++    Boolean = 3
++    Array = 4
++    Object = 5
++}
++
++/// <summary>Serializes registered union payloads directly, without a discriminator.</summary>
++/// <remarks>Development explicit union contract. Reads select exactly one case by JSON shape before invoking case code. Null represents the supplied empty union value. Case adapters use ordinary Raven construction and patterns; metadata-driven discovery, nullable payload cases and structural classifiers are not implemented.</remarks>
++public class JsonUnionConverter<T> : JsonConverter<T> {
++    // Generic constructor callback/value storage requires explicit fields in the current compiler.
++    private field empty: T
++    private field isEmpty: (T) -> bool
++    private val cases = ArrayList<JsonUnionCase<T>>()
++    private var started = false
++
++    /// <summary>Creates an explicit union contract with its empty state.</summary>
++    /// <param name="empty">The no-active-case value returned for JSON null.</param>
++    /// <param name="isEmpty">Tests whether a union has no active case.</param>
++    init(empty: T, isEmpty: (T) -> bool) {
++        self.empty = empty
++        self.isEmpty = isEmpty
++    }
++
++    internal func AddRegisteredCase(value: JsonUnionCase<T>) {
++        if started {
++            System.Fail("JSON union contract is already in use")
++        }
++        cases.Add(value)
++    }
++
++    /// <summary>Reads a union using built-in payload mapping.</summary>
++    /// <remarks>Use JsonSerializer with options to include registered payload converters.</remarks>
++    func Read(value: JsonValue) -> Result<T, JsonError> {
++        return ReadCore(value, JsonConverterState(JsonSerializerOptions()))
++    }
++
++    /// <summary>Writes the active union payload using built-in mapping.</summary>
++    /// <remarks>Use JsonSerializer with options to include registered payload converters.</remarks>
++    func Write(value: T) -> Result<JsonValue, JsonError> {
++        return WriteCore(value, JsonConverterState(JsonSerializerOptions()))
++    }
++
++    internal func ReadCore(value: JsonValue, state: JsonConverterState) -> Result<T, JsonError> {
++        started = true
++        if value is JsonNull {
++            return Ok(empty)
++        }
++        let kind = JsonUnionShapes.Kind(value)
++        var selected: JsonUnionCase<T>? = null
++        for candidate in cases {
++            if candidate.Kind == kind {
++                if selected is JsonUnionCase<T> {
++                    return Error(JsonError.UnsupportedMapping("Ambiguous JSON union case"))
++                }
++                selected = candidate
++            }
++        }
++        if selected is JsonUnionCase<T> found {
++            let child = state.Child()?
++            return found.Read(value, child)
++        }
++        return Error(JsonError.TypeMismatch("registered union case shape"))
++    }
++
++    internal func WriteCore(value: T, state: JsonConverterState) -> Result<JsonValue, JsonError> {
++        started = true
++        if isEmpty(value) {
++            return Ok(JsonNull())
++        }
++        var selected: JsonUnionCase<T>? = null
++        var payload: Object? = null
++        for candidate in cases {
++            if candidate.Extract(value) is Some(let extracted) {
++                if selected is JsonUnionCase<T> {
++                    return Error(JsonError.UnsupportedMapping("Multiple JSON union cases matched"))
++                }
++                selected = candidate
++                payload = extracted
++            }
++        }
++        if selected is JsonUnionCase<T> found && payload is Object content {
++            let child = state.Child()?
++            let node = found.Write(content, child)?
++            if JsonUnionShapes.Kind(node) != found.Kind {
++                return Error(JsonError.TypeMismatch("registered union case shape"))
++            }
++            return Ok(node)
++        }
++        return Error(JsonError.UnsupportedMapping("Unregistered active JSON union case"))
++    }
++}
++
++/// <summary>Typed case registration for explicit union contracts.</summary>
++public extension JsonUnionCaseExtensions<T> for JsonUnionConverter<T> {
++    /// <summary>Registers a payload type, its JSON shape and typed union adapters.</summary>
++    /// <param name="kind">The JSON shape accepted and produced by this case.</param>
++    /// <param name="create">Constructs the union from its payload.</param>
++    /// <param name="extract">Returns Some(payload) for this case and None otherwise.</param>
++    /// <remarks>Configure before first use; later registration or invalid kinds cause a terminal Fault. Two cases with the same shape make that shape ambiguous on read. Payload conversion uses the active serializer's converter snapshot.</remarks>
++    func AddCase<TCase>(kind: JsonUnionCaseKind, create: (TCase) -> T, extract: (T) -> Option<TCase>) {
++        let kindValue = (int)kind
++        if kindValue < 1 {
++            System.Fail("Invalid JSON union case kind")
++        }
++        if kindValue > 5 {
++            System.Fail("Invalid JSON union case kind")
++        }
++        self.AddRegisteredCase(TypedJsonUnionCase<T, TCase>(kindValue, create, extract))
++    }
++
++}
++
++internal interface JsonUnionCase<T> {
++    val Kind: int { get }
++    func Extract(value: T) -> Option<Object>
++    func Read(value: JsonValue, state: JsonConverterState) -> Result<T, JsonError>
++    func Write(value: Object, state: JsonConverterState) -> Result<JsonValue, JsonError>
++}
++
++internal class TypedJsonUnionCase<T, TCase> : JsonUnionCase<T> {
++    // Same generic callback-storage compiler constraint as TypedJsonConverter.
++    private field kind: int
++    private field create: (TCase) -> T
++    private field extract: (T) -> Option<TCase>
++
++    init(kind: int, create: (TCase) -> T, extract: (T) -> Option<TCase>) {
++        self.kind = kind
++        self.create = create
++        self.extract = extract
++    }
++
++    val Kind: int => kind
++
++    func Extract(value: T) -> Option<Object> {
++        if extract(value) is Some(let payload) {
++            return Some(payload)
++        }
++        return None
++    }
++
++    func Read(value: JsonValue, state: JsonConverterState) -> Result<T, JsonError> {
++        let payload = ObjectMapper.Read(value, typeof(TCase), state)?
++        return Ok(create((TCase)payload))
++    }
++
++    func Write(value: Object, state: JsonConverterState) -> Result<JsonValue, JsonError> {
++        return ObjectMapper.WriteDeclared(value, typeof(TCase), state)
++    }
++}
++
++internal class JsonUnionShapes {
++    private init() { }
++
++    static func Kind(value: JsonValue) -> int {
++        if value is JsonString {
++            return 1
++        }
++        if value is JsonNumber {
++            return 2
++        }
++        if value is JsonBoolean {
++            return 3
++        }
++        if value is JsonArray {
++            return 4
++        }
++        if value is JsonObject {
++            return 5
++        }
++        return 0
++    }
++}

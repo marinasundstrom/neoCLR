@@ -594,6 +594,15 @@ is ready; see the [follow-up](native-json-plan.md#converter-and-wire-contract-fo
 Evaluate the Introspection/Reflection API alongside implementation before stability,
 preserving its overall structure while keeping details revisable; see the
 [pre-stable review](introspection-design.md#pre-stable-api-evaluation--2026-10-09).
+
+**Author JSON API review (2026-10-11):** improve the API and consider features such
+as converters. The bounded development slice adds JsonArray Sequence conformance,
+indexing and snapshot iteration ([contract and evidence](json-dom-design.md#read-only-array-sequence-view-development-2026-10-11)).
+The [converter assessment](json-converter-design.md) recommends options and typed
+converters next within JSON, while retaining explicit decisions about callback effects,
+nulls and nested dispatch. Converter support remains unimplemented; this one-off
+review does not replace the active platform milestone.
+
 **Author follow-up (2026-10-10):** once basic JSON serialization is good enough,
 review the collection API and identify useful additions. A queue interface and
 implementation are the first named candidate, not yet a settled API. Evaluate

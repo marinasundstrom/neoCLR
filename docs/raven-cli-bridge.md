@@ -8901,3 +8901,16 @@ and the [host metadata contract](../api-docs/experimental-metadata.md#nested-gen
 Source-local async provider/InternalCall encoding remains temporary; production
 native operation metadata/carriers remain the replacement. Lexical nesting itself
 uses the native model and needs no temporary compiler representation.
+
+### JsonArray sequence documentation facade (2026-10-11)
+
+JsonArray now implements Sequence<JsonValue> with native getter/indexer and iterator
+metadata. Like JsonObject above, the aggregate C# reference temporarily names its
+recoverable Item(int) method PositionalItem and restores Item with Cecil so it can
+coexist with the Item indexer property. This is neoCLR-owned, declaration-only
+encoding: executable behavior is absent from that reference. Native library metadata
+already retains both members and is the replacement when the aggregate reference is
+retired. No compiler support change, Runtime Contract option or new runtime mapping
+is introduced. The [matching libraries and tests](experiments/json-sequence/README.md)
+validate concrete/interface dispatch and terminal bounds faults in both local modes;
+public aggregate and native API snapshots include the new members.

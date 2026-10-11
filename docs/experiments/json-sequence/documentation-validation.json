@@ -1,0 +1,47 @@
+{
+  "sourceRevision": "8b917fbcb4182f639deb830f32c84f810e727898",
+  "sourceState": "Raven checkout contained unrelated async working changes. This task made no compiler source changes. Metadata project built from primary neoCLR checkout with ongoing nested-generic work.",
+  "passed": true,
+  "pages": [
+    "method_Item.html",
+    "index.html",
+    "method_Add.html",
+    "method_GetIterator.html",
+    "method__ctor.html",
+    "property_Count.html",
+    "indexer_Item.html"
+  ],
+  "tools": {
+    "docs/experiments/native-library-documentation-audit/bin/Debug/net10.0/Audit.dll": "11274c12a99ebdc902e4bcd8dfaf8ddfa2ed57ad73335cde1aef1c110d8f46da",
+    "docs/experiments/native-library-documentation-audit/bin/Debug/net10.0/RavenDoc.dll": "df93474b617d7652bb323f5e7a601e08b3c742cea4c70967c576d6e178a47fce",
+    "docs/experiments/native-library-documentation-audit/bin/Debug/net10.0/Raven.CodeAnalysis.dll": "9084242b7f93eebb165bbc8c94d97b46443d60b7d8139b1ce06bb1aca251af4b",
+    "docs/experiments/native-library-documentation-audit/bin/Debug/net10.0/Raven.CodeAnalysis.NeoClr.dll": "d67b07545a0af978386195689515a2d6ef7fb59eb1604fe4240828a967542216",
+    "docs/experiments/native-library-documentation-audit/bin/Debug/net10.0/NeoCLR.Metadata.Experimental.dll": "642e9caaf83a06411757e62df9c74e6175903a4dbd6183ba3586e125c3748e92"
+  },
+  "checks": {
+    "index.html": [
+      "Sequence",
+      "JsonValue",
+      "GetIterator"
+    ],
+    "indexer_Item.html": [
+      "val self[index: int]: JsonValue",
+      "terminal Fault"
+    ],
+    "method_Item.html": [
+      "func Item(index: int) -> Result<JsonValue, JsonError>",
+      "InvalidIndex"
+    ],
+    "method_GetIterator.html": [
+      "func GetIterator() -> Iterator<JsonValue>",
+      "Later additions do not alter the snapshot"
+    ]
+  },
+  "pageHashes": {
+    "index.html": "30fe8315dc5c58d3bb2f76a71f45db4ce2cd275920160a32ea36ff05a083af0a",
+    "indexer_Item.html": "67de55fcae1bba18cbdaa06100d0ca7129cc0b586db60685da6e39e3761de3a0",
+    "method_Item.html": "6db7bd68b4b95f11974fdc6dcd96536faab60f23f5921fb6f026f7e63bf65ba9",
+    "method_GetIterator.html": "dfca05f899d941d84c2ccdac8181c1d16f8db377e972266b0fe1162e54ddc9ac"
+  },
+  "snapshotSha256": "e18e0dc9b1880d4707090d236fab0404901f80a9355813a1d3d7d8112ee55587"
+}

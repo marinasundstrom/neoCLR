@@ -1,21 +1,22 @@
 {
   "format": 1,
   "archive": "native-reference.zip",
-  "sha256": "240bbea542c250715073685fdb0fb0a4216b04a40cc288cdc21426aa03bffa2c",
-  "librarySourceRevision": "341df9ec1ceca96ee4df4eca21eb02e5e11895e0",
-  "compilerRevision": "9e542200d",
-  "rendererRevision": "9e542200d7560b819d75c7fdd9eb6064b78f5f3c",
+  "sha256": "e18e0dc9b1880d4707090d236fab0404901f80a9355813a1d3d7d8112ee55587",
+  "librarySourceRevision": "7b33eb84bf3696880e833386c86d378d6fb8b517",
+  "compilerRevision": "8b917fbcb4182f639deb830f32c84f810e727898",
+  "rendererRevision": "8b917fbcb4182f639deb830f32c84f810e727898",
   "libraryArtifacts": {
-    "System.Runtime.dll": "818e0147dd0a6fb4946a9ddca0b672e19902b9b6138cdee6ac9b9c07e25bf746",
-    "System.Data.dll": "7cfad8f6ca5e0cfc0cc13c15bdb8fc623280aa72fd6aad73a7aacdd586a9c150",
-    "System.Networking.dll": "ec3b383eee5f202f0badeb48ad775df16de1b2a81d94843caf2391c21fa9e2e3",
-    "System.Web.dll": "edcae392b0cd0a4562680408830a931ad2bf92e5280157da16afd8967103474c",
+    "System.Runtime.dll": "1eefe723b92012fbc4e6eb7e82725b98f3efcef4737343c8927de4df8a3e0bf3",
+    "System.Data.dll": "411c9d03516344c4f44d99c63b755c7762daf6566a5c9b3b162f6d178068749f",
+    "System.Networking.dll": "eb40ed6d730886462bb69b39296429bc8968c640ed80367cc4f55bb2685284c6",
+    "System.Web.dll": "ff9ffe64fbbfee4d2d0663639438f2a15e3c4bc1c41335ad4e9200cbdfcee0d9",
     "System.runtime.neox": "98a1ae1da85387c87746957e83a4015eb59d0566539a915c69f168d2b511b190",
     "Core.dll": "3d4a676d379067c18a65a9beb8257ed40bf3196fc643a9ba1d559c619ec73fad"
   },
   "renderingEvidence": {
-    "normalized-sidecars.json": "eb098802e45414e1a3909d08e06aef7ad20d15fc6d13f2d0c783e953b5bd6f3f",
-    "restored-xml-comments.json": "f86ee17c69a3a26737ad55199627d097a55a6f7d1037edfdaf2478862d2597cd"
+    "normalized-sidecars.json": "4cafef26b90570febb53b846a84746c8194a6484bdbf4f24cb5b9c421d6e8e2d",
+    "restored-xml-comments.json": "910a88e2b9a618b777693e922de3346d5e9b6f140223cb0710303f6e36871e4e"
   },
-  "scope": "Reviewed native API rendering; legacy coverage gaps remain explicitly marked by the website overlay."
+  "scope": "Reviewed native API rendering; legacy coverage gaps remain explicitly marked by the website overlay.",
+  "rendererProvenance": "Built from Raven checkout at the recorded revision with unrelated async working changes; exact tool hashes retained in JSON sequence documentation evidence."
 }

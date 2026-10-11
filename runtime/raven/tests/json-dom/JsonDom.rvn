@@ -207,3 +207,73 @@ func JsonMapEmpty() -> Result<unit, TestFailure> {
     _ = Assert.True(!map.ContainsKey("missing"), "Empty membership")?
     return Assert.True(map.Find("missing") is System.Option<JsonValue>.None, "Empty safe lookup")
 }
+
+[Test("JSON sequence indexing retains node identity and explicit null")]
+func JsonSequenceAccess() -> Result<unit, TestFailure> {
+    let array = JsonArray()
+    let first = JsonNull()
+    let second = JsonString("雪")
+    _ = Assert.True(array.Add(first) is Ok(_), "Add null")?
+    _ = Assert.True(array.Add(second) is Ok(_), "Add string")?
+    let sequence: System.Collections.Sequence<JsonValue> = array
+    _ = Assert.Equal(2, sequence.Count)?
+    _ = Assert.True(Object.ReferenceEquals(first, sequence[0]), "Interface indexer retains null identity")?
+    return Assert.True(Object.ReferenceEquals(second, array[1]), "Concrete indexer retains string identity")
+}
+
+[Test("JSON sequence snapshots preserve order and shared child contents")]
+func JsonSequenceSnapshot() -> Result<unit, TestFailure> {
+    let array = JsonArray()
+    let child = JsonArray()
+    let last = JsonNull()
+    _ = Assert.True(array.Add(child) is Ok(_), "Add child")?
+    _ = Assert.True(array.Add(last) is Ok(_), "Add null")?
+    let sequence: System.Collections.Sequence<JsonValue> = array
+    use items = sequence.GetIterator()
+    _ = Assert.True(array.Add(JsonBoolean(true)) is Ok(_), "Append after snapshot")?
+    _ = Assert.True(child.Add(JsonBoolean(false)) is Ok(_), "Mutate shared child")?
+    _ = Assert.True(items.MoveNext(), "First item")?
+    _ = Assert.True(Object.ReferenceEquals(child, items.Current), "Child identity")?
+    if items.Current is JsonArray captured {
+        _ = Assert.Equal(1, captured.Count)?
+    } else {
+        return Assert.True(false, "Snapshot preserves node kind")
+    }
+    _ = Assert.True(items.MoveNext(), "Second item")?
+    _ = Assert.True(Object.ReferenceEquals(last, items.Current), "Null identity")?
+    _ = Assert.True(!items.MoveNext(), "Snapshot excludes later append")?
+    var count = 0
+    for node in sequence {
+        count += 1
+    }
+    return Assert.Equal(3, count)
+}
+
+[Test("Empty JSON arrays expose empty sequence snapshots")]
+func JsonSequenceEmpty() -> Result<unit, TestFailure> {
+    let array = JsonArray()
+    let sequence: System.Collections.Sequence<JsonValue> = array
+    use items = sequence.GetIterator()
+    _ = Assert.Equal(0, sequence.Count)?
+    _ = Assert.True(array.Add(JsonNull()) is Ok(_), "Append after empty snapshot")?
+    _ = Assert.True(!items.MoveNext(), "Empty snapshot stays empty")?
+    return Assert.Equal(1, sequence.Count)
+}
+
+[Test("JSON sequence views retain node serialization precedence")]
+func JsonSequenceSerialization() -> Result<unit, TestFailure> {
+    let input = "[null,{\"name\":\"雪\"},[true],1.25e2]"
+    let Ok(node) = JsonSerializer.DeserializeNode(input) else {
+        return Assert.True(false, "Parse array")
+    }
+    if node is JsonArray array {
+        let sequence: System.Collections.Sequence<JsonValue> = array
+        _ = Assert.Equal(4, sequence.Count)?
+        let boxed: Object = sequence
+        let Ok(text) = JsonSerializer.Serialize(boxed) else {
+            return Assert.True(false, "Serialize sequence as JSON DOM")
+        }
+        return Assert.Equal(input, text)
+    }
+    return Assert.True(false, "Expected array root")
+}

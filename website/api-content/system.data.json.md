@@ -18,3 +18,10 @@ for an existing field; a missing field causes a terminal Fault. Prefer `Find`
 insertion-ordered snapshots retaining original node references. Mutation still uses
 `Add`, which rejects duplicates and reports the container quota through Result;
 `JsonObject` does not implement `MutableMap` yet.
+
+Development `JsonArray` implements `Sequence<JsonValue>`. Use `array[index]` for
+known valid indices, or `Item(index)` for a recoverable `InvalidIndex` result.
+Negative and past-end indexer accesses cause a terminal Fault. `for` iteration
+captures a shallow ordered snapshot: later additions are excluded, while child
+nodes remain shared. Count and indexing read the current array. Mutation continues
+to use quota-aware `Add`; `MutableSequence` is not implemented.
