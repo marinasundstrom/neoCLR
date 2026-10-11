@@ -395,12 +395,12 @@ static int32_t socket_poll(neoclr_aot_context *context, uint64_t *callback) {
             unsigned slot = 0;
             while (slot < 64 && scope->slots[slot].id != scope->operations[i].listener) slot++;
             if (slot == 64) return -3;
-            uint64_t now = monotonic_ns();
-            if (!now) return -3;
+            uint64_t transfer_now = monotonic_ns();
+            if (!transfer_now) return -3;
             uint32_t count = scope->operations[i].count;
             int sending = scope->operations[i].kind == 3;
             uint64_t tag = 1, value = 0;
-            if (count && now >= scope->operations[i].deadline) { tag = 2; value = 10; }
+            if (count && transfer_now >= scope->operations[i].deadline) { tag = 2; value = 10; }
             else if (count) {
                 neoclr_socket_descriptor fd = scope->slots[slot].descriptor;
                 int64_t transferred = neoclr_os_transfer(fd, scope->operations[i].buffer, count, sending);

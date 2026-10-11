@@ -25,7 +25,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   AOT objects and executable links; interpreter-only runs need no native compiler.
   Preserve library catalog checks when bypassing native builds, and export the Rust
   kernel’s private helper symbols as well as C symbols from the Windows DLL.
-  SDK helper packaging and Windows ARM64 remain open.
+  Fix an MSVC warning-as-error from shadowed timer/transfer clock locals found by
+  the Windows gate. SDK helper packaging and Windows ARM64 remain open.
 
 - Admit queued async entry points in the private macOS ARM64 managed JIT. Keep code and
   helpers alive through the existing rooted entry drain; release the task scope and
