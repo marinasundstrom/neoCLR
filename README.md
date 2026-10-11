@@ -14,6 +14,10 @@ competitive with Go and modern JavaScript runtimes in simplicity, productivity a
 speed. These are goals to validate; Raven is the current frontend, with other languages
 and workloads intended later. See the [product direction](docs/platform-direction.md#product-direction-clarified-2026-10-11).
 
+Development builds offer [explicit JIT execution](docs/jit-execution.md) through
+`neoclr run --execution jit` with a matching compiler and native helper library.
+The default remains interpreted while JIT readiness is assessed.
+
 neoCLR is a managed, type-safe virtual machine with garbage-collected heap storage.
 The current Raven target follows familiar CLR value/reference type categories:
 classes and arrays have reference semantics, while values are copied. Managed byrefs

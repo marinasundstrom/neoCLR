@@ -5,6 +5,10 @@ use cranelift_module::{FuncOrDataId, Module};
 use std::time::Instant;
 
 type Error = Box<dyn std::error::Error>;
+#[cfg(windows)]
+type EntryChar = u16;
+#[cfg(not(windows))]
+type EntryChar = std::ffi::c_char;
 
 // JITModule requires explicit memory reclamation. This owner never exposes a callable
 // outside execute(), including when compilation or finalization returns an error.
@@ -19,15 +23,23 @@ impl Drop for CodeOwner {
     }
 }
 
+pub(super) fn host_target() -> Result<crate::compiler::Target, Error> {
+    if cfg!(all(target_os = "macos", target_arch = "aarch64")) {
+        Ok(crate::compiler::Target::MacosArm64)
+    } else if cfg!(all(target_os = "windows", target_arch = "x86_64")) {
+        Ok(crate::compiler::Target::WindowsX64)
+    } else {
+        Err("JIT requires a macOS ARM64 or Windows x64 host".into())
+    }
+}
+
 pub(super) fn execute(
     input: &neoclr::Module,
     root: &str,
     argument: i32,
     repetitions: usize,
 ) -> Result<serde_json::Value, Error> {
-    if !cfg!(all(target_os = "macos", target_arch = "aarch64")) {
-        return Err("scalar JIT probe currently requires a macOS ARM64 host".into());
-    }
+    let target = host_target()?;
     if input.functions.iter().any(|function| {
         function
             .body
@@ -42,10 +54,8 @@ pub(super) fn execute(
     let mut settings = settings::builder();
     settings.set("is_pic", "false")?;
     settings.set("use_colocated_libcalls", "false")?;
-    let target = "aarch64-apple-darwin"
-        .parse()
-        .expect("fixed valid target triple");
-    let isa = isa::lookup(target)?.finish(settings::Flags::new(settings))?;
+    target.configure_stack(&mut settings)?;
+    let isa = isa::lookup(target.triple().parse().expect("fixed target triple"))?.finish(settings::Flags::new(settings))?;
     let builder = JITBuilder::with_isa(isa, cranelift_module::default_libcall_names());
     // Shared scalar validation rejects all external calls before finalization.
     let mut owner = CodeOwner(Some(JITModule::new(builder)));
@@ -75,7 +85,7 @@ pub(super) fn execute(
         .first()
         .ok_or("at least one invocation is required")?;
     Ok(serde_json::json!({
-        "profile": "macos-arm64-jit-scalar-v1",
+        "profile": match target { crate::compiler::Target::MacosArm64 => "macos-arm64-jit-scalar-v1", crate::compiler::Target::WindowsX64 => "windows-x64-jit-scalar-v1" },
         "status": first["status"], "value": first["value"],
         "compileAndFinalizeSeconds": compile_seconds,
         "invocationSeconds": first["invocationSeconds"],
@@ -91,9 +101,10 @@ pub(super) fn execute_managed(
     details: &crate::fault_details::Options,
     host: &std::path::Path,
     arguments: &[std::ffi::CString],
+    target: crate::compiler::Target,
 ) -> Result<serde_json::Value, Error> {
-    if !cfg!(all(target_os = "macos", target_arch = "aarch64")) {
-        return Err("managed JIT probe currently requires macOS ARM64".into());
+    if target != host_target()? {
+        return Err("JIT target must match the executing host".into());
     }
     if !details.native_gc
         || !details.reference_arena
@@ -110,12 +121,13 @@ pub(super) fn execute_managed(
     // SAFETY: this explicit development host path is trusted native code, like a
     // statically linked AOT adapter. Keep the library alive longer than JIT code.
     let library = std::sync::Arc::new(unsafe { libloading::Library::new(host) }?);
-    type Host = unsafe extern "C" fn(*const u8, i32, i32, *const *const std::ffi::c_char) -> i32;
+    type Host = unsafe extern "C" fn(*const u8, i32, i32, *const *const EntryChar) -> i32;
     let run: libloading::Symbol<Host> = unsafe { library.get(b"neoclr_jit_run_v1") }?;
     let mut flags = settings::builder();
     flags.set("is_pic", "false")?;
     flags.set("use_colocated_libcalls", "false")?;
-    let isa = isa::lookup("aarch64-apple-darwin".parse().expect("fixed triple"))?
+    target.configure_stack(&mut flags)?;
+    let isa = isa::lookup(target.triple().parse().expect("fixed triple"))?
         .finish(settings::Flags::new(flags))?;
     let mut builder = JITBuilder::with_isa(isa, cranelift_module::default_libcall_names());
     let symbols = library.clone();
@@ -131,7 +143,7 @@ pub(super) fn execute_managed(
         input,
         root,
         Some(details),
-        crate::compiler::Target::MacosArm64,
+        target,
         module,
         true,
     )?;
@@ -161,6 +173,15 @@ pub(super) fn execute_managed(
     };
     let entry = module.get_finalized_function(entry);
     let compile_seconds = started.elapsed().as_secs_f64();
+    // The Windows AOT argument helper consumes UTF-16; other hosts consume UTF-8.
+    // Keep backing storage alive through the synchronous host invocation.
+    #[cfg(windows)]
+    let wide_arguments: Vec<Vec<u16>> = arguments.iter()
+        .map(|arg| Ok(arg.to_str()?.encode_utf16().chain([0]).collect()))
+        .collect::<Result<_, std::str::Utf8Error>>()?;
+    #[cfg(windows)]
+    let argv: Vec<_> = wide_arguments.iter().map(|arg| arg.as_ptr()).collect();
+    #[cfg(not(windows))]
     let argv: Vec<_> = arguments.iter().map(|arg| arg.as_ptr()).collect();
     let argc = i32::try_from(argv.len())?;
     let started = Instant::now();
@@ -168,7 +189,7 @@ pub(super) fn execute_managed(
     // remain alive; the synchronous host must complete cleanup before returning.
     let exit_code = unsafe { run(entry, with_args, argc, argv.as_ptr()) };
     Ok(
-        serde_json::json!({"profile": "macos-arm64-jit-managed-v1", "guestExitCode": exit_code,
+        serde_json::json!({"profile": match target { crate::compiler::Target::MacosArm64 => "macos-arm64-jit-managed-v1", crate::compiler::Target::WindowsX64 => "windows-x64-jit-managed-v1" }, "guestExitCode": exit_code,
         "compileAndFinalizeSeconds": compile_seconds, "invocationSeconds": started.elapsed().as_secs_f64()}),
     )
 }

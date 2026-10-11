@@ -6,7 +6,11 @@ and concurrency as a core capability. Evaluate suspension and green threads with
 scheduling and memory ownership. The author selects JIT as the eventual default on
 supported platforms, AOT as the preferred deployment target, and a fully supported
 interpreter for constrained devices and explicitly supported dynamic-code scenarios.
-Current execution defaults remain unchanged pending qualification.
+Current execution defaults remain unchanged pending qualification. The author authorizes
+switching to JIT when ready, with JIT as the routine test mode and selective relevant
+interpreter/AOT checks. [CLI integration and readiness](jit-execution.md) now provide
+explicit mode selection and test-harness selectors. Windows x64 backend/host support
+has an execution gate; a Windows run is still required before claiming qualification.
 Prior JIT deferral below is historical context, not a prohibition on this evaluation.
 With the Index/Range slice complete locally, assess memory views and shared execution
 requirements without treating any proposed API or backend as selected. See
@@ -26,7 +30,7 @@ consecutive awaits, cancellation, pending-task and callback faults in all three 
 [Timer completion/cancellation](experiments/jit-timers/README.md) is also qualified.
 [HTTP client/server qualification](experiments/jit-http/README.md) now passes with
 DNS/connect, accept/read/write, timeouts and fault cleanup. Windows JIT and production
-integration remain open. A nine-run local
+integration remain open beyond the explicit development CLI path. A nine-run local
 benchmark records median process times of 2.346s JIT, 2.962s interpreted and 9.00ms
 prebuilt AOT for that same assembly; JIT includes compilation, AOT excludes its build.
 This is test-run evidence, not HTTP throughput. The subsequent

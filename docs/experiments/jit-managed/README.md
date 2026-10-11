@@ -6,7 +6,9 @@ classes, generics, arrays, strings, list interfaces, extension indexers and iter
 disposal. No-match filtering and a bounds fault agree with AOT and interpretation.
 Registration is discovered/generated at build time using TestAttribute; this does
 not claim JIT-time reflection discovery. There are no Raven bridge or public runtime
-API changes. Normal runtime execution defaults are unchanged.
+API changes. Normal runtime execution defaults are unchanged. A subsequent
+[development CLI adapter](../../jit-execution.md) exposes explicit JIT selection;
+Windows x64 implementation has a qualification gate pending execution.
 
 ## Contract and implementation
 

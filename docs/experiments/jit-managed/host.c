@@ -3,9 +3,17 @@
 #include "task-queue.h"
 #include "socket-listener.h"
 #include <stdlib.h>
+#include <string.h>
+#ifdef _WIN32
+#include <fcntl.h>
+#include <io.h>
+typedef wchar_t entry_char;
+#else
+typedef char entry_char;
+#endif
 
 typedef int32_t (*entry_v4)(int32_t, int32_t *, neoclr_aot_context *);
-typedef int32_t (*entry_args)(int32_t, int32_t *, neoclr_aot_context *, const char **);
+typedef int32_t (*entry_args)(int32_t, int32_t *, neoclr_aot_context *, const entry_char **);
 
 /* Timer operations currently share the native I/O table. The generated entry
    consumes each delivered callback before polling again, retaining its root. */
@@ -21,7 +29,7 @@ static int32_t poll_entry(neoclr_aot_context *context, uint64_t *callback,
     return 2;
 }
 
-int32_t neoclr_jit_run_v1(const void *entry, int32_t with_args, int32_t argc, const char **argv) {
+static int32_t run_entry(const void *entry, int32_t with_args, int32_t argc, const entry_char **argv) {
     if (!entry || argc < 1 || !argv || (with_args != 0 && with_args != 1)) return 2;
     const size_t heap_bytes = 1024 * 1024;
     unsigned char *heap = calloc(1, heap_bytes);
@@ -38,9 +46,15 @@ int32_t neoclr_jit_run_v1(const void *entry, int32_t with_args, int32_t argc, co
     tasks.poll = poll_entry;
     tasks.poll_state = &operations;
     int32_t result = 0;
+    entry_args args_function;
+    entry_v4 plain_function;
+    _Static_assert(sizeof(args_function) == sizeof(entry), "native entry pointer size");
+    _Static_assert(sizeof(plain_function) == sizeof(entry), "native entry pointer size");
+    memcpy(&args_function, &entry, sizeof(entry));
+    memcpy(&plain_function, &entry, sizeof(entry));
     int32_t status = with_args
-        ? ((entry_args)entry)(argc, &result, &context, argv)
-        : ((entry_v4)entry)(0, &result, &context);
+        ? args_function(argc, &result, &context, argv)
+        : plain_function(0, &result, &context);
     int render_error = status && neoclr_aot_render_fault(stderr, &context.fault);
     /* Cleanup must not return to a caller about to unload JIT code while any
        frame/handle still owns its descriptors. Treat a broken invariant as fatal. */
@@ -51,4 +65,28 @@ int32_t neoclr_jit_run_v1(const void *entry, int32_t with_args, int32_t argc, co
         neoclr_gc_collect_v1(&context, NULL)) abort();
     free(heap);
     return render_error ? 2 : status ? 1 : result;
+}
+
+/* Windows CRT translation must not change the platform's UTF-8 byte contract.
+   Restore the caller's modes after this invocation, including admission failures. */
+int32_t neoclr_jit_run_v1(const void *entry, int32_t with_args, int32_t argc, const entry_char **argv) {
+#ifdef _WIN32
+    FILE *streams[] = {stdin, stdout, stderr};
+    int modes[3];
+    for (int i = 0; i < 3; ++i) {
+        modes[i] = _setmode(_fileno(streams[i]), _O_BINARY);
+        if (modes[i] == -1) {
+            while (i > 0) { --i; (void)_setmode(_fileno(streams[i]), modes[i]); }
+            return 2;
+        }
+    }
+#endif
+    int32_t status = run_entry(entry, with_args, argc, argv);
+#ifdef _WIN32
+    for (int i = 0; i < 3; ++i) {
+        if (i && fflush(streams[i])) status = 2;
+        if (_setmode(_fileno(streams[i]), modes[i]) == -1) status = 2;
+    }
+#endif
+    return status;
 }

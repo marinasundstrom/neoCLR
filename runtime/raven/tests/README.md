@@ -610,3 +610,15 @@ the interpreter stress run is slow and is not a throughput benchmark. Ordinary
 transport/JSON bounds remain unchanged. Windows checks are configured, not locally
 qualified. [Obsolete annotations](../../../docs/experiments/obsolete-runtime/README.md)
 have separate compiler/interpreter/native evidence.
+
+## Selecting execution modes during JIT qualification
+
+Use repeatable `--mode jit`, `--mode interpreter` and `--mode native` options on
+`scripts/test-runtime-library.py`. JIT requires a matching `--jit-host` library and
+uses the `--aot` compiler through `neoclr run --execution jit`. Filtering, guard cases
+and runner failures execute in the selected modes. See [JIT readiness and commands](../../../docs/jit-execution.md).
+
+The intended routine mode is JIT once ready; interpreter and AOT checks remain
+selective and relevant to the change. Defaults have not switched yet. JIT-only runs
+still use the native project build for assembly preparation, which must be separated
+before this becomes the routine fast development path.

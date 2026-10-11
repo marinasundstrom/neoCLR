@@ -49,17 +49,18 @@ fn run() -> Result<(), Box<dyn std::error::Error>> {
         println!("{result}");
         return Ok(());
     }
-    let managed_jit = args.iter().filter(|a| *a == "--jit-managed").count();
-    if managed_jit > 1 { return Err("duplicate --jit-managed".into()); }
-    args.retain(|a| a != "--jit-managed");
     let mut jit_arguments = vec![std::ffi::CString::new("neoclr-jit")?];
     while let Some(index) = args.iter().position(|a| a == "--jit-entry-argument") {
         let value = args.get(index + 1).and_then(|v| v.to_str()).ok_or("--jit-entry-argument requires UTF-8 text")?;
         jit_arguments.push(std::ffi::CString::new(value)?);
         args.drain(index..=index + 1);
     }
+    let jit_run = args.iter().any(|a| a == "--jit-run");
+    let managed_jit = args.iter().filter(|a| *a == "--jit-managed" || *a == "--jit-run").count();
+    if managed_jit > 1 { return Err("duplicate --jit-managed".into()); }
+    args.retain(|a| a != "--jit-managed" && *a != "--jit-run");
     if managed_jit == 0 && jit_arguments.len() != 1 { return Err("entry arguments require --jit-managed".into()); }
-    let mut target = compiler::Target::MacosArm64;
+    let mut target = if managed_jit == 1 { jit::host_target()? } else { compiler::Target::MacosArm64 };
     if args.iter().filter(|a| *a == "--target").count() > 1 {
         return Err("duplicate --target option".into());
     }
@@ -68,6 +69,9 @@ fn run() -> Result<(), Box<dyn std::error::Error>> {
             .ok_or("--target requires a target triple")?;
         target = compiler::Target::parse(value)?;
         args.drain(index..=index + 1);
+    }
+    if managed_jit == 1 && target != jit::host_target()? {
+        return Err("JIT target must match the executing host".into());
     }
     let windows_stack_count = args.iter().filter(|a| *a == "--windows-stack-experiment").count();
     if windows_stack_count > 1 { return Err("duplicate --windows-stack-experiment option".into()); }
@@ -467,11 +471,15 @@ fn run() -> Result<(), Box<dyn std::error::Error>> {
         d
     });
     if managed_jit == 1 {
-        if !closed || target != compiler::Target::MacosArm64 || native_host_bootstrap {
-            return Err("--jit-managed requires closed-world macOS compilation without bootstrap bindings".into());
+        if !closed || native_host_bootstrap {
+            return Err("--jit-managed requires closed-world compilation without bootstrap bindings".into());
         }
         let details = details.as_ref().ok_or("--jit-managed requires explicit GC/context bindings")?;
-        let mut result = jit::execute_managed(compile_input, root, details, Path::new(&args[3]), &jit_arguments)?;
+        let mut result = jit::execute_managed(compile_input, root, details, Path::new(&args[3]), &jit_arguments, target)?;
+        if jit_run {
+            // execute_managed has released all native resources before returning.
+            std::process::exit(result["guestExitCode"].as_i64().ok_or("missing JIT guest status")? as i32);
+        }
         result["metadataLoadSeconds"] = serde_json::json!(load_seconds);
         result["selectionAndVerificationSeconds"] = serde_json::json!(selection_seconds);
         eprintln!("JIT_RESULT {result}");

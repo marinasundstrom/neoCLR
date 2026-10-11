@@ -874,7 +874,7 @@ fn scalar_boolean_values_do_not_become_int32_operands() {
 }
 
 #[test]
-#[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+#[cfg(any(all(target_os = "macos", target_arch = "aarch64"), all(target_os = "windows", target_arch = "x86_64")))]
 fn jit_parameterless_entry_and_argument_validation() {
     let temp = Temp::new();
     let input = temp.0.join("main.neoil");
@@ -894,7 +894,7 @@ fn jit_parameterless_entry_and_argument_validation() {
 }
 
 #[test]
-#[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+#[cfg(any(all(target_os = "macos", target_arch = "aarch64"), all(target_os = "windows", target_arch = "x86_64")))]
 fn jit_rejects_expanded_aot_features_and_external_services() {
     let temp = Temp::new();
     let input = temp.0.join("unsupported.neoil");
@@ -912,7 +912,7 @@ fn jit_rejects_expanded_aot_features_and_external_services() {
 }
 
 #[test]
-#[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+#[cfg(any(all(target_os = "macos", target_arch = "aarch64"), all(target_os = "windows", target_arch = "x86_64")))]
 fn jit_native_container_matches_source_and_rejects_corruption() {
     let temp = Temp::new();
     let input = temp.0.join("scalar.neox");
@@ -933,7 +933,7 @@ fn jit_native_container_matches_source_and_rejects_corruption() {
 }
 
 #[test]
-#[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+#[cfg(any(all(target_os = "macos", target_arch = "aarch64"), all(target_os = "windows", target_arch = "x86_64")))]
 fn jit_reuses_owned_code_for_successful_and_faulting_invocations() {
     let temp = Temp::new();
     let input = temp.0.join("repeat.neoil");
@@ -959,4 +959,16 @@ fn jit_reuses_owned_code_for_successful_and_faulting_invocations() {
         assert!(result.stdout.is_empty());
         assert!(String::from_utf8_lossy(&result.stderr).contains("repetitions must be"));
     }
+}
+
+#[test]
+#[cfg(any(all(target_os = "macos", target_arch = "aarch64"), all(target_os = "windows", target_arch = "x86_64")))]
+fn jit_rejects_a_foreign_target_before_loading_inputs() {
+    let target = if cfg!(windows) { "aarch64-apple-darwin" } else { "x86_64-pc-windows-msvc" };
+    let output = Command::new(env!("CARGO_BIN_EXE_neoclr-aot-poc"))
+        .args(["--jit-managed", "--target", target, "--closed-world", "missing.dll", "@entry", "missing-host"])
+        .output().unwrap();
+    assert!(!output.status.success());
+    assert!(output.stdout.is_empty());
+    assert!(String::from_utf8_lossy(&output.stderr).contains("JIT target must match the executing host"));
 }

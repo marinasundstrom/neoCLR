@@ -14425,3 +14425,24 @@ it does not change execution defaults or establish a production JIT.
 with independent client/server measurements, supported-mode qualification, equivalent
 wire behavior and separate startup/build versus steady-state results. No benchmark is
 run or comparative performance outcome inferred from this request.
+
+### 2026-10-11 — Windows JIT, CLI integration and test defaults
+
+**Author:** requests Windows JIT support and CLI integration, eventually making JIT
+the default. Clarifies that the assistant may switch when it judges JIT ready, using
+our tests through JIT as the assessment, and that interpreter/AOT testing should
+continue selectively when relevant rather than as an automatic matrix.
+**Assistant action:** implements explicit CLI selection and runtime-test mode selectors;
+adds Windows x64 host selection, matching stack probes, UTF-16 entry arguments and a
+Windows DLL/HTTP/framework execution gate. Preserves explicit interpreted execution,
+visible unsupported-program errors and existing defaults during qualification.
+**Evidence/status:** [CLI contract and readiness](jit-execution.md),
+[Windows gate](experiments/jit-windows/README.md). Windows execution remains pending;
+macOS validation does not establish a Windows result. Ordinary helper packaging and
+removing the test harness's redundant AOT build are next readiness work.
+
+**Local outcome:** eight HTTP scenarios pass through the runtime CLI. JIT-only
+framework execution passes Index/Range tests and bounds guards, filtering, expected
+failures, Unicode/empty arguments and compiler-option-like guest text. Five Windows
+AOT stack/profile tests pass locally, including generated inline page probes; these
+are cross-compilation checks, not Windows JIT execution evidence.

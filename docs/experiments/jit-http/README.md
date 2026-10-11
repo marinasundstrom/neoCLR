@@ -73,3 +73,10 @@ and matching libraries. Local port selection is ephemeral and test processes are
 cleaned up on failure. This is functional evidence, not sustained-service or HTTP
 performance evidence. The [later cross-platform benchmark plan](../../native-execution-investigation.md#later-benchmarking-against-net-and-other-platforms)
 tracks equivalent client and server comparisons with .NET, Go and JavaScript.
+
+Follow-up: `--cli` qualifies JIT via `neoclr run --execution jit`; repeatable `--mode`
+selects relevant execution modes. The [CLI HTTP evidence](../jit-cli/http-validation.json)
+contains all eight JIT scenarios through that public command path. `--windows-build`
+accepts a successful Windows native build recipe in place of `--console-qualification`;
+see the [Windows gate](../jit-windows/README.md). Windows pipe readiness uses a bounded
+reader thread because Unix `select` on subprocess pipes is not portable.

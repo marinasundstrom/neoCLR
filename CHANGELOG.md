@@ -8,6 +8,17 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-11
 
+- Add explicit development `neoclr run --execution jit|interpreter` selection and
+  JIT-only runtime-library test execution, preserving output, entry arguments and
+  guest exit status without silent interpreter fallback. Defaults remain unchanged
+  until JIT readiness; interpreter/AOT checks remain selective and relevant.
+  Implement Windows x64 JIT target selection, shared AOT/JIT stack probing, UTF-16
+  entry arguments and helper DLL qualification tooling. Add a Windows HTTP/framework
+  execution workflow; Windows runtime qualification remains pending its execution.
+  Local macOS CLI HTTP, Index/Range guards and runner filtering/argument checks pass.
+  SDK helper packaging, JIT-only test preparation without an AOT build, and Windows
+  ARM64 remain open.
+
 - Admit queued async entry points in the private macOS ARM64 managed JIT. Keep code and
   helpers alive through the existing rooted entry drain; release the task scope and
   default-queue root before heap/code teardown. Qualify integer/unit completion, successive

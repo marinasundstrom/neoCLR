@@ -33,6 +33,16 @@ impl Target {
         }
     }
 
+    pub(super) fn configure_stack(self, flags: &mut settings::Builder) -> Result<(), Error> {
+        if self == Self::WindowsX64 {
+            // AOT and JIT must both touch each Windows stack guard page.
+            flags.set("enable_probestack", "true")?;
+            flags.set("probestack_strategy", "inline")?;
+            flags.set("probestack_size_log2", "12")?;
+        }
+        Ok(())
+    }
+
     pub(super) fn triple(self) -> &'static str {
         match self {
             Self::MacosArm64 => "aarch64-apple-darwin",

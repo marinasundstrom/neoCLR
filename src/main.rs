@@ -1,5 +1,6 @@
 mod debug_terminal;
 mod disassembler;
+mod jit_cli;
 use neoclr::{ExecutionOptions, StdioConsole, assemble, load};
 use std::{
     env, fs,
@@ -11,7 +12,7 @@ const USAGE: &str = "Usage:
   neoclr disassemble <metadata-input> [output]
   neoclr emit-il <source.neo> [output.neoil]
   neoclr assemble <source.neoil> <output> [--format json|neox] [--module <input>]... [--system <input>]
-  neoclr run <input> [System.neo.json] [--module <input>]... [--system <input>] [--gc-stats] [--gc-events] [--show-result] [--instructions <positive-count>] [--array-elements <positive-count>] [--array-bytes <positive-count>] [-- <guest-argument>...]
+  neoclr run <input> [--execution interpreter|jit] [--jit-host <library>] [--jit-compiler <tool>] [System.neo.json] [--module <input>]... [--system <input>] [--gc-stats] [--gc-events] [--show-result] [--instructions <positive-count>] [--array-elements <positive-count>] [--array-bytes <positive-count>] [-- <guest-argument>...]
   neoclr debug <input> [--module <input>]... [--system <input>] [-- <guest-argument>...]
   neoclr check <input> [--module <input>]... [--system <input>]
   neoclr verify <input> [--module <input>]... [--system <input>]
@@ -133,6 +134,9 @@ fn execute(args: &[String], exit_status: &mut i32) -> Result<Vec<String>, String
     let mut gc_stats = false;
     let mut gc_events = false;
     let mut show_result = false;
+    let mut execution_mode = None;
+    let mut jit_host = None;
+    let mut jit_compiler = None;
     let mut output_format = None;
     let mut instruction_limit = None;
     let mut array_element_limit = None;
@@ -143,6 +147,33 @@ fn execute(args: &[String], exit_status: &mut i32) -> Result<Vec<String>, String
             "--" if matches!(command, "run" | "debug") => {
                 guest_arguments.extend(options.cloned());
                 break;
+            }
+            "--execution" if command == "run" && execution_mode.is_none() => {
+                execution_mode = Some(
+                    options
+                        .next()
+                        .filter(|value| matches!(value.as_str(), "interpreter" | "jit"))
+                        .ok_or("Expected --execution interpreter or jit")?
+                        .as_str(),
+                );
+            }
+            "--jit-host" if command == "run" && jit_host.is_none() => {
+                jit_host = Some(
+                    options
+                        .next()
+                        .filter(|value| !value.starts_with("--"))
+                        .ok_or("Missing native helper library for --jit-host")?
+                        .as_str(),
+                );
+            }
+            "--jit-compiler" if command == "run" && jit_compiler.is_none() => {
+                jit_compiler = Some(
+                    options
+                        .next()
+                        .filter(|value| !value.starts_with("--"))
+                        .ok_or("Missing compiler executable for --jit-compiler")?
+                        .as_str(),
+                );
             }
             "--format" if command == "assemble" && output_format.is_none() => {
                 let format = options
@@ -217,6 +248,30 @@ fn execute(args: &[String], exit_status: &mut i32) -> Result<Vec<String>, String
         }
     }
 
+    if execution_mode == Some("jit") {
+        if gc_stats
+            || gc_events
+            || show_result
+            || instruction_limit.is_some()
+            || array_element_limit.is_some()
+            || array_byte_limit.is_some()
+        {
+            return Err("JIT does not support interpreter diagnostics or instruction/array limits; select --execution interpreter for these options".into());
+        }
+        *exit_status = jit_cli::run(
+            &args[1],
+            &paths[1..],
+            system_path,
+            object_root_path.map(String::as_str),
+            jit_host,
+            jit_compiler,
+            &guest_arguments[1..],
+        )?;
+        return Ok(Vec::new());
+    }
+    if jit_host.is_some() || jit_compiler.is_some() {
+        return Err("--jit-host and --jit-compiler require --execution jit".into());
+    }
     let root_input_index = if let Some(root_path) = object_root_path {
         if system_path.is_none() {
             return Err("--object-root requires an explicit --system seed".into());

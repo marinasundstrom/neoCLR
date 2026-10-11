@@ -242,13 +242,7 @@ fn check_value_array_replacement(b: &mut FunctionBuilder<'_>, address: ir::Value
 pub(super) fn compile(input: &neoclr::Module, root: &str, details: Option<&crate::fault_details::Options>, platform_target: super::Target) -> Result<Vec<u8>, Error> {
     let mut flags = settings::builder();
     flags.set("is_pic", "true")?;
-    if platform_target == super::Target::WindowsX64 {
-        // Windows grows the committed stack a guard page at a time. The pinned
-        // x64 backend probes each 4 KiB page before installing a large frame.
-        flags.set("enable_probestack", "true")?;
-        flags.set("probestack_strategy", "inline")?;
-        flags.set("probestack_size_log2", "12")?;
-    }
+    platform_target.configure_stack(&mut flags)?;
     let isa = isa::lookup(platform_target.triple().parse().unwrap())?
         .finish(settings::Flags::new(flags))?;
     let mut module = ObjectModule::new(ObjectBuilder::new(

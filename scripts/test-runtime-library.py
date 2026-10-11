@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Build and run the Raven runtime-library suite and runner contract in both modes."""
+"""Build and run the Raven runtime-library suite and runner contract in selected execution modes."""
 import argparse
 import hashlib
 import importlib.util
@@ -339,7 +339,13 @@ def main():
     parser.add_argument('--suite', action='append', choices=('collections', 'collection-construction', 'collection-iteration', 'json-dom', 'json-streams', 'memory-stream', 'string-construction', 'unicode-casing', 'encoding', 'encoding-streams', 'encoding-boundaries', 'encoding-buffer-limits', 'int64-parsing', 'primitive-parsing', 'path-values', 'http-header-values', 'http-method-values', 'index-range', 'http-text', 'http-lifetime', 'http-route-matching', 'ip-address-values', 'uri-resolution', 'time-parsing', 'duration-offset-parsing', 'instant-parsing', 'zoned-time-parsing', 'discovery-contract', 'runner-contract'),
                         help='Run only this suite (repeatable); default runs all suites')
     parser.add_argument("--execution-repetitions", type=int, default=1, help="Repeat the full suite process in each mode for timing; guards/selectors still run once")
+    parser.add_argument('--mode', action='append', choices=('native', 'interpreter', 'jit'),
+                        help='Execution modes to qualify (repeatable); defaults to native and interpreter until JIT readiness')
+    parser.add_argument('--jit-host', type=Path, help='Matching trusted native helper library for JIT')
     args = parser.parse_args()
+    modes = args.mode or ['native', 'interpreter']
+    if 'jit' in modes and not args.jit_host:
+        parser.error('--mode jit requires --jit-host')
     if args.execution_repetitions < 1:
         parser.error("--execution-repetitions must be positive")
     run_started = time.perf_counter()
@@ -349,7 +355,7 @@ def main():
               *sorted((ROOT / 'tools/testing/NeoCLR.TestDiscovery').glob('*.cs')),
               *sorted((ROOT / 'tools/testing/NeoCLR.TestDiscovery').glob('*.csproj')),
               *sorted(TESTS.rglob('*.rvn')), *sorted(TESTS.rglob('*.rvnproj'))]
-    report = dict(passed=False, platform=platform.platform(), cases=[], phases=[], executionRepetitions=args.execution_repetitions,
+    report = dict(passed=False, modes=modes, jitHostSha256=sha(args.jit_host.resolve()) if args.jit_host else None, platform=platform.platform(), cases=[], phases=[], executionRepetitions=args.execution_repetitions,
                   inputs={str(p.relative_to(ROOT)): sha(p) for p in inputs},
                   bundleManifestSha256=sha(bundle / 'manifest.json'),
                   aotSha256=sha(args.aot.resolve()), interpreterSha256=sha(args.runtime.resolve()))
@@ -433,7 +439,17 @@ def main():
                 interpreter += ["--array-elements", "1048576", "--array-bytes", "268435456"]
                 report["encodingBufferBudgets"] = dict(nativeByteArrayElements=131072, interpretedLiveArrayElements=1048576, interpretedLogicalArrayBytes=268435456)
             env = {k: v for k, v in os.environ.items() if k.upper() in ('SYSTEMROOT', 'WINDIR', 'TEMP', 'TMP')}
-            executions = [('native', [exe], isolated, env), ('interpreter', interpreter, ROOT, None)]
+            executions = []
+            for mode in modes:
+                if mode == 'native':
+                    executions.append((mode, [exe], isolated, env))
+                elif mode == 'interpreter':
+                    executions.append((mode, interpreter, ROOT, None))
+                else:
+                    jit = interpreter[:interpreter.index('--instructions')] + [
+                        '--execution', 'jit', '--jit-host', args.jit_host.resolve(),
+                        '--jit-compiler', args.aot.resolve()]
+                    executions.append((mode, jit, ROOT, None))
             repeated_executions = [(repetition, *execution) for repetition in range(1, args.execution_repetitions + 1) for execution in executions]
             for repetition, mode, command, cwd, environment in repeated_executions:
                 started = time.perf_counter()
@@ -461,7 +477,7 @@ def main():
                 }
                 for guard, message in guards.items():
                     for mode, command, cwd, environment in executions:
-                        arguments = [*command, *(['--'] if mode == 'interpreter' else []), '--guard', guard]
+                        arguments = [*command, *(['--'] if mode in ('interpreter', 'jit') else []), '--guard', guard]
                         started = time.perf_counter()
                         result = subprocess.run(list(map(str, arguments)), cwd=cwd, env=environment, capture_output=True, timeout=30)
                         record = dict(suite=name, mode=mode, guard=guard, exitCode=result.returncode, elapsedSeconds=round(time.perf_counter() - started, 6),
@@ -469,7 +485,7 @@ def main():
                         report['cases'].append(record)
                         if not record['exitCode'] or message not in record['stderr'] or record['stdout']:
                             raise RuntimeError('Index/Range guard did not fault as expected: ' + repr(record))
-                print('index-range: bounds guards passed in both modes', flush=True)
+                print('index-range: bounds guards passed in selected modes', flush=True)
             selections = {
                 'collections': [(['--filter', 'ArrayQueue'], 0, 'PASS ArrayQueue preserves FIFO\nTests: 1, passed: 1, failed: 0, skipped: 0\n'),
                                 (['--filter', 'Map'], 0, ''.join('PASS ' + n + '\n' for n in MAP_NAMES) + f'Tests: {len(MAP_NAMES)}, passed: {len(MAP_NAMES)}, failed: 0, skipped: 0\n')],
@@ -485,12 +501,13 @@ def main():
                     (['--filter'], 2, 'ERROR Expected --filter <text> or --id <id>\n'),
                     (['--filter', ''], 2, 'ERROR Expected --filter <text> or --id <id>\n'),
                     (['--unknown', 'after'], 2, 'ERROR Expected --filter <text> or --id <id>\n'),
+                    (['--jit-managed', '--jit-run', '--target', '--jit-entry-argument'], 2, 'ERROR Expected --filter <text> or --id <id>\n'),
                     (['--id', 'runner.after', '--filter', 'after'], 2, 'ERROR Expected --filter <text> or --id <id>\n'),
                 ],
             }.get(name, [])
             for arguments, selected_exit, selected_stdout in selections:
-                for mode, command, cwd, environment in [('native', [exe, *arguments], isolated, env),
-                                                        ('interpreter', [*interpreter, '--', *arguments], ROOT, None)]:
+                for mode, base_command, cwd, environment in executions:
+                    command = [*base_command, *(['--'] if mode in ('interpreter', 'jit') else []), *arguments]
                     started = time.perf_counter()
                     result = subprocess.run(list(map(str, command)), cwd=cwd, env=environment, capture_output=True, timeout=600 if name == "http-text" else 180)
                     record = dict(suite=name, mode=mode, arguments=arguments, exitCode=result.returncode, elapsedSeconds=round(time.perf_counter() - started, 6),
@@ -506,6 +523,8 @@ def main():
                 raise RuntimeError('Input changed during validation: ' + name)
         if sha(args.aot.resolve()) != report['aotSha256'] or sha(args.runtime.resolve()) != report['interpreterSha256']:
             raise RuntimeError('Execution tool changed during validation')
+        if args.jit_host and sha(args.jit_host.resolve()) != report['jitHostSha256']:
+            raise RuntimeError('JIT helper library changed during validation')
         report['passed'] = True
     finally:
         report['totalElapsedSeconds'] = round(time.perf_counter() - run_started, 6)

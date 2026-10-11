@@ -1,0 +1,31 @@
+# Windows x64 JIT qualification gate
+
+2026-10-11 development work. The backend now selects the executing Windows x64
+host and uses the existing native HTTP lowering and helper services. This gate is
+implemented; **Windows execution is not yet qualified by local macOS testing**.
+
+Run from an x64 MSVC developer environment with Rust, Python 3.12 and the matching
+.NET SDKs, or use [Windows JIT HTTP](../../../.github/workflows/windows-jit.yml):
+
+```powershell
+python docs/experiments/jit-windows/verify.py --output target/windows-jit-validation
+```
+
+The workflow pins and verifies the existing Preview 13 bootstrap bundle, rebuilds
+the recorded Raven revision and current runtime libraries, builds a native HTTP
+recipe, then exports its C helper symbols into a DLL. The JIT resolves every declared
+import before executing guest code. The host shares rooted task/I/O teardown with
+macOS; it restores the Windows CRT stream modes after each invocation. Generated
+code uses Windows calling conventions and inline guard-page probes. Guest arguments
+are converted to UTF-16 to match the existing Windows entry helper.
+
+Required evidence: scalar JIT results and faults; rejection of foreign execution
+targets; CLI mode validation; HTTP client/server, DNS, fragmentation, malformed headers,
+timeouts and handler-fault cleanup; and JIT-only Index/Range plus runner-contract
+suites, including Unicode/empty/option-like arguments, filtering and guest exit codes.
+The HTTP gate compares relevant interpreter/AOT behavior for this new target. It does
+not make a routine three-mode matrix mandatory for unrelated tests.
+
+Reports and logs are uploaded even on failure. A workflow file or successful macOS
+build is not a Windows pass. Windows ARM64, DLL packaging for the SDK and changing
+execution defaults remain separate work. See [CLI contract and readiness](../../jit-execution.md).

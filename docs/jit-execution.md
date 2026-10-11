@@ -1,0 +1,88 @@
+# Development JIT execution and readiness
+
+2026-10-11 development feature. `neoclr run` accepts an explicit execution mode:
+
+```sh
+neoclr run app.dll --execution jit \
+  --jit-compiler /absolute/path/to/neoclr-aot-poc \
+  --jit-host /absolute/path/to/host.dylib \
+  --system /absolute/path/to/System.runtime.neox \
+  --module /absolute/path/to/System.Runtime.dll \
+  --module /absolute/path/to/System.Data.dll \
+  --module /absolute/path/to/System.Networking.dll \
+  --module /absolute/path/to/System.Web.dll \
+  --object-root /absolute/path/to/System.Runtime.dll \
+  -- --filter collection
+```
+
+Use `host.dll` and `neoclr-aot-poc.exe` on Windows. The compiler defaults to a sibling
+of the runtime executable if `--jit-compiler` is omitted. The matching native helper
+library is still explicit and trusted. Build it using the
+[macOS HTTP qualification](experiments/jit-http/README.md) or
+[Windows gate](experiments/jit-windows/README.md). This is development integration,
+not an installed SDK default or stable host ABI.
+
+The runtime launches the optional compiler backend with inherited standard streams.
+The backend selects the executing host, compiles the verified closed-world assembly
+in memory and runs its entry. Guest output is streamed normally and its exit code is
+returned, without the private probe's JSON footer. Arguments after `--` reach the
+guest, including empty strings, Unicode and option-like text. JIT resources are
+released before backend exit. Compilation/host errors remain explicit; there is no
+silent fallback to interpretation. No guest AOT object is emitted by this run command.
+
+`--execution interpreter` selects existing interpretation. Omitting the option still
+selects interpretation. Debugging remains interpreted. Interpreter-only instruction
+budgets, array budgets, GC diagnostics and `--show-result` are rejected with JIT rather
+than ignored. Native execution retains the current host's bounded heap/operation
+limits and has no instruction quota. AOT project builds remain separate.
+
+## Target status
+
+macOS ARM64 has executable [CLI HTTP evidence](experiments/jit-cli/http-validation.json)
+and [JIT-only test-framework evidence](experiments/jit-cli/framework-validation.json). The Windows x64
+implementation uses the Windows calling convention, the same inline stack probes as
+AOT, a helper DLL with explicit native exports, and UTF-16 entry arguments. The shared
+host preserves the UTF-8 byte-stream contract by disabling CRT translation during the
+call and restoring the prior modes afterward. Windows execution must pass the new
+[GitHub Actions gate](../.github/workflows/windows-jit.yml); this checkout's local
+macOS results do not qualify Windows. Windows ARM64 remains a separate target gap.
+
+Like .NET, code generation and runtime services are separate concerns; see the
+[existing execution investigation](native-execution-investigation.md). Reusing the
+AOT libraries and rooted operation scope avoids a second HTTP implementation. The
+current optional compiler process keeps Cranelift out of interpreter-only builds,
+at the cost of process startup and an explicit host/tool installation. In-process
+integration, lazy compilation and tiering remain future work.
+
+## Test policy and the eventual default
+
+The author directs JIT to become the default when judged ready, assessed by running
+our tests routinely with JIT. Interpreter and AOT remain supported and tested
+selectively when relevant to the behavior or target being changed. This is not a
+requirement to run every test in every mode.
+
+The runtime-library harness now accepts repeatable `--mode jit`, `--mode interpreter`
+and `--mode native` selectors. JIT requires `--jit-host`; the existing `--aot` option
+selects the backend compiler for both native and JIT work. For example:
+
+```sh
+python3 scripts/test-runtime-library.py \
+  --bundle target/extension-indexer-final-bundle \
+  --aot tools/aot-poc/target/release/neoclr-aot-poc \
+  --mode jit --jit-host target/jit-cli-http-validation/host.dylib \
+  --suite index-range --suite runner-contract \
+  --output target/jit-cli-framework-validation
+```
+
+Selectors, intentional failures, bounds guards and entry arguments all use the
+selected modes. The harness still builds its AOT project as assembly preparation,
+even for JIT-only execution; removing that redundant native build is readiness work.
+Its omitted-mode default remains native plus interpreter during this transition.
+
+Before switching defaults, qualify representative library suites and HTTP/lifetime
+behavior on supported JIT targets, provide matching helpers through ordinary tooling,
+and remove the test harness's unnecessary AOT build in JIT-only runs. Keep explicit
+mode selection and visible unsupported-program diagnostics after the switch.
+Use focused interpreter/AOT parity checks for changes to shared lowering, GC, async
+lifetime, platform bindings or other mode-sensitive behavior. AOT remains the preferred
+deployment target. These criteria are implementation work, not a new approval step.
