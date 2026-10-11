@@ -1,6 +1,12 @@
 #include "native-gc.h"
 #include <string.h>
 #include <stdatomic.h>
+#ifdef NEOCLR_GC_PROFILE
+#include <time.h>
+#include <stdlib.h>
+#endif
+static _Thread_local neoclr_gc_profile profile;
+neoclr_gc_profile neoclr_gc_profile_v1(void) { return profile; }
 /* Allocation descriptors live in the same bounded buffer as payloads. Free
  * blocks coalesce; payload addresses never move. Object words are conservative
  * candidates; text/byte payloads are atomic, String arrays have explicit slots. */
@@ -250,7 +256,7 @@ static void mark_frames(neoclr_aot_context *context, const block_index *index,
 int32_t neoclr_gc_collect_v1(neoclr_aot_context *context, const neoclr_probe_frame *head) {
     return neoclr_gc_collect_conditional_v1(context, head, NULL, 0);
 }
-int32_t neoclr_gc_collect_conditional_v1(neoclr_aot_context *context,
+static int32_t collect_conditional(neoclr_aot_context *context,
     const neoclr_probe_frame *head, neoclr_gc_conditional_root *conditional, uint32_t conditional_count) {
     if (!context || !blocks_valid(&context->text)) return NEOCLR_AOT_FAULT_RUNTIME_ERROR;
     neoclr_aot_text_arena *a = &context->text;
@@ -402,6 +408,23 @@ invalid_descriptor:
         block *b = (void *)(a->data + at); b->state &= ALLOCATED; at += b->span;
     }
     return NEOCLR_AOT_FAULT_RUNTIME_ERROR;
+}
+int32_t neoclr_gc_collect_conditional_v1(neoclr_aot_context *context,
+    const neoclr_probe_frame *head, neoclr_gc_conditional_root *conditional, uint32_t count) {
+#ifdef NEOCLR_GC_PROFILE
+    struct timespec before, after;
+    if (clock_gettime(CLOCK_MONOTONIC, &before)) abort();
+#endif
+    int32_t status = collect_conditional(context, head, conditional, count);
+#ifdef NEOCLR_GC_PROFILE
+    if (clock_gettime(CLOCK_MONOTONIC, &after)) abort();
+    uint64_t ns = (uint64_t)((int64_t)(after.tv_sec - before.tv_sec) * INT64_C(1000000000)
+                           + after.tv_nsec - before.tv_nsec);
+    profile.attempts++;
+    profile.nanoseconds += ns;
+    if (ns > profile.maximum_nanoseconds) profile.maximum_nanoseconds = ns;
+#endif
+    return status;
 }
 neoclr_gc_statistics neoclr_gc_statistics_v1(void) { return statistics; }
 

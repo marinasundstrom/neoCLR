@@ -8,6 +8,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-11
 
+- Add a private native async profiling runner with symbolized macOS sampling,
+  pinned inputs and repeated guest/reclamation checks. Add opt-in collector
+  attempt/time diagnostics, compiled out of normal execution. Track native
+  profiler, GC diagnostics and debugger integration needs alongside performance work.
+
 - Extend development HTTP/1.1 with 1 MiB buffered bodies/known-length uploads,
   32 KiB/100-field headers, shared bounded chunk decoding for incoming requests
   and responses, and up to 16 informational responses before a final client reply.

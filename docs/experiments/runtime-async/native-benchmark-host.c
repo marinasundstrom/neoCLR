@@ -5,6 +5,10 @@
 #include <inttypes.h>
 #include <time.h>
 
+#ifndef NEOCLR_BENCH_REPETITIONS
+#define NEOCLR_BENCH_REPETITIONS 4
+#endif
+
 static double seconds(void) {
     struct timespec value;
     if (clock_gettime(CLOCK_MONOTONIC, &value)) abort();
@@ -13,12 +17,14 @@ static double seconds(void) {
 
 int32_t neoclr_jit_run_v1(const void *entry, int32_t with_args,
                          int32_t argc, const entry_char **argv) {
-    for (int i = 0; i < 4; ++i) {
+    for (int i = 0; i < NEOCLR_BENCH_REPETITIONS; ++i) {
         neoclr_gc_statistics before = neoclr_gc_statistics_v1();
         neoclr_async_statistics stacks_before = neoclr_runtime_async_statistics_v1();
+        neoclr_gc_profile gc_before = neoclr_gc_profile_v1();
         double start = seconds();
         int32_t status = neoclr_benchmark_run_once(entry, with_args, argc, argv);
         double elapsed = seconds() - start;
+        neoclr_gc_profile gc_after = neoclr_gc_profile_v1();
         neoclr_gc_statistics after = neoclr_gc_statistics_v1();
         if (status) return status;
         neoclr_async_statistics stacks = neoclr_runtime_async_statistics_v1();
@@ -30,11 +36,13 @@ int32_t neoclr_jit_run_v1(const void *entry, int32_t with_args,
                 ",\"reclaimedBlocks\":%" PRIu64 ",\"collections\":%" PRIu64
                 ",\"fibers\":%" PRIu64 ",\"resumes\":%" PRIu64
                 ",\"stackMappings\":%" PRIu64 ",\"stackUnmappings\":%" PRIu64
-                ",\"peakReservedStackBytes\":%" PRIu64 ",\"reservedStackBytes\":%" PRIu64 "}\n",
+                ",\"peakReservedStackBytes\":%" PRIu64 ",\"reservedStackBytes\":%" PRIu64
+                ",\"gcNanoseconds\":%" PRIu64 ",\"gcAttempts\":%" PRIu64 "}\n",
                 elapsed, allocated, reclaimed, after.collections - before.collections,
                 stacks.fibers - stacks_before.fibers, stacks.resumes - stacks_before.resumes,
                 stacks.mappings - stacks_before.mappings, stacks.unmappings - stacks_before.unmappings,
-                stacks.peak_reserved_bytes, stacks.reserved_bytes);
+                stacks.peak_reserved_bytes, stacks.reserved_bytes,
+                gc_after.nanoseconds - gc_before.nanoseconds, gc_after.attempts - gc_before.attempts);
     }
     return 0;
 }

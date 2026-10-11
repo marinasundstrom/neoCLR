@@ -8,6 +8,13 @@ enum { NEOCLR_GC_TEXT = 1, NEOCLR_GC_OBJECT = 2, NEOCLR_GC_BYTES = 3, NEOCLR_GC_
 typedef struct {
     uint64_t collections, allocations, reclaimed_allocations, reclaimed_bytes;
 } neoclr_gc_statistics;
+/* Opt-in collector diagnostics. Timers are compiled out unless NEOCLR_GC_PROFILE
+ * is defined; separate from the experimental heap/context layout. Cumulative,
+ * thread-local and inclusive of validation/mark/sweep, including failed attempts. */
+typedef struct {
+    uint64_t attempts, nanoseconds, maximum_nanoseconds;
+} neoclr_gc_profile;
+neoclr_gc_profile neoclr_gc_profile_v1(void);
 /* Private thread-affine strong handles for future host-held callbacks/buffers.
  * Context, buffer and creating thread must remain alive until every handle is released.
  * Only null or an untagged live allocation base in that context is admitted.

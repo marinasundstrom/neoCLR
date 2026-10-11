@@ -15489,3 +15489,18 @@ or runtime-await default switch was performed.
   about 9%/29% relative to state-machine controls, while native pending awaits remain
   about 1.8x slower. This completes the scoped ownership checkpoint, not the native
   performance/default gate. Raven's corresponding documentation is `7622d09e4`.
+
+
+## 2026-10-11 — Profile native async and restore tooling attention
+
+- **Author direction:** profile the remaining native runtime-async overhead, fix
+  bottlenecks, rerun benchmarks and commit each slice. The author asks whether
+  profiler tools are needed, notes debugger/GC tooling has received less attention,
+  and clarifies: “We should build these tools if they can help us understand and
+  optimize the runtime.”
+- **Assistant action:** add a repeatable native sampling runner and opt-in collector
+  timers with checked resource teardown, and record diagnostic follow-ups in the
+  roadmap. Native stepping, source mapping and async logical-stack inspection remain
+  open; sampling does not complete those capabilities.
+- **Evidence:** [profiling notes](experiments/runtime-async/native-profiling.md).
+  Performance conclusions require the uninstrumented matched benchmark after fixes.

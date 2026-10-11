@@ -1,5 +1,12 @@
 # neoCLR platform roadmap
 
+**Runtime diagnostics direction (2026-10-11):** the author requests profiling the
+remaining native runtime-async gap and building useful profiler/GC/debugger tools.
+Start with [native sampling and collector diagnostics](experiments/runtime-async/native-profiling.md),
+then measured bottleneck fixes and matched benchmarks. Keep native source mapping,
+suspended logical stacks and GC lifetime/pause inspection visible as follow-ups;
+this is not a claim that the interpreter debugger already supports native execution.
+
 **HTTP hosting direction (2026-10-11):** the author requests stronger HttpClient/
 HttpServer support toward modern web applications and eventual WebSockets, followed
 by better HttpContent/JSON ergonomics. The [bounded foundation](http-foundation.md)
