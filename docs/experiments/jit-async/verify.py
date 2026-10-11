@@ -19,9 +19,11 @@ def main():
     parser.add_argument('--bundle', type=Path, required=True)
     parser.add_argument('--console-qualification', type=Path, required=True)
     parser.add_argument('--case', action='append', help='Run only named cases in the selected profile')
-    parser.add_argument('--timers', action='store_true')
-    parser.add_argument('--scheduler', action='store_true')
-    parser.add_argument('--continuations', action='store_true')
+    profile = parser.add_mutually_exclusive_group()
+    profile.add_argument('--timers', action='store_true')
+    profile.add_argument('--scheduler', action='store_true')
+    profile.add_argument('--continuations', action='store_true')
+    profile.add_argument('--managed-continuations', action='store_true')
     parser.add_argument('--output', type=Path, required=True)
     args = parser.parse_args()
     out, bundle = args.output.resolve(), args.bundle.resolve()
@@ -87,7 +89,7 @@ def main():
         cases = [('scheduler', ROOT/'docs/experiments/scheduler-projection/Main.rvn', [], 0,
                   'PASS deferred submission and state-machine resume\n', None),
                  ('scheduler-fault', ROOT/'docs/experiments/scheduler-projection/Fault.rvn', [], 1, '', 'submitted callback fault')]
-    if args.continuations:
+    if args.continuations or args.managed_continuations:
         cases = [('continuations', ROOT/'docs/experiments/scheduler-continuations/Main.rvn', [], 0,
                   'PASS multiple pending awaits without producer pump\n'
                   'PASS completed await and deferred observer\n'
@@ -97,11 +99,18 @@ def main():
                   'PASS dormant registration does not keep invocation alive\n', None),
                  ('continuation-fault', ROOT/'docs/experiments/scheduler-continuations/Fault.rvn', [], 1,
                   '', 'fault after continuation submission')]
+    if args.managed_continuations:
+        cases += [('managed-ownership', ROOT/'docs/experiments/scheduler-continuations/ManagedOwnership.rvn', [], 0,
+                   'PASS abandoned await cycles reclaimed\n'
+                   'PASS live operation retains unobserved waiter across collection\n'
+                   'PASS runtime submission retains producer and waiting execution\n'
+                   'PASS pending timer retains producer and waiting execution\n', None)]
     if args.case:
         known = {case[0] for case in cases}
         if set(args.case) - known:
             raise ValueError('Unknown case for selected profile')
         cases = [case for case in cases if case[0] in args.case]
+    jit_command = None
     try:
         result = run(host_command)
         if result.returncode:
@@ -111,18 +120,37 @@ def main():
             case_out = out/name
             case_out.mkdir()
             assembly, obj, exe = (case_out/n for n in ['app.dll', 'app.o', 'app'])
-            extra_sources = [ROOT/'docs/experiments/scheduler-continuations/Completion.rvn'] if args.continuations else []
+            extra_sources = []
+            if args.continuations or args.managed_continuations:
+                directory = ROOT/'docs/experiments/scheduler-continuations'
+                extra_sources = [directory/'Completion.rvn', directory/('ManagedContinuation.rvn' if args.managed_continuations else 'RuntimeContinuation.rvn')]
             for extra in extra_sources:
                 report['inputs'][str(extra)] = sha(extra)
             result = run([*compile_base, '-o', assembly, source, *extra_sources])
             if result.returncode:
                 raise RuntimeError(name+' Raven compilation failed: '+result.stdout+result.stderr)
+            interpret = [runtime, 'run', assembly, '--system', seed, '--instructions', '100000000', '--object-root', refs[0]]
+            for ref in refs:
+                interpret += ['--module', ref]
+            if arguments:
+                interpret += ['--', *arguments]
+            if name == 'managed-ownership':
+                # Native GC diagnostic services are not bound by this backend.
+                # Keep the explicit-collection gate interpreter-only and report it.
+                result = run(interpret)
+                if result.returncode != code or result.stdout != stdout or result.stderr:
+                    raise RuntimeError(name+' interpreter outcome mismatch: '+result.stdout+result.stderr)
+                report['cases'].append(dict(name=name, sourceSha256=sha(source),
+                    assemblySha256=sha(assembly), limitation='Native GC diagnostic bindings unavailable; explicit collection qualified only in interpreter',
+                    outcomes=[dict(mode='interpreter', exitCode=result.returncode, stdout=result.stdout, stderr=result.stderr)]))
+                print('PASS '+name+' in interpreter (native GC diagnostic bindings unavailable)', flush=True)
+                continue
             native = [str(assembly) if p == old_input else str(obj) if p == old_host else p for p in native_base]
             if '--bind-task-queue' not in native:
                 native += ['--bind-task-queue']
-            if args.scheduler or args.continuations:
+            if args.scheduler or args.continuations or args.managed_continuations:
                 native += ['--bind-scheduler']
-            if args.timers:
+            if args.timers or args.managed_continuations:
                 native += ['--bind-timers']
             result = run([jit, *native])
             if result.returncode:
@@ -137,11 +165,6 @@ def main():
             result = run(link)
             if result.returncode:
                 raise RuntimeError(name+' AOT host failed: '+result.stderr)
-            interpret = [runtime, 'run', assembly, '--system', seed, '--instructions', '100000000', '--object-root', refs[0]]
-            for ref in refs:
-                interpret += ['--module', ref]
-            if arguments:
-                interpret += ['--', *arguments]
             jit_command = [jit, '--jit-managed', *[str(host) if p == str(obj) else p for p in native]]
             for argument in arguments:
                 jit_command += ['--jit-entry-argument', argument]
@@ -163,7 +186,7 @@ def main():
             report['cases'].append(dict(name=name, sourceSha256=sha(source), assemblySha256=sha(assembly), objectSha256=sha(obj), executableSha256=sha(exe), outcomes=outcomes))
             print('PASS '+name+' in interpreter/AOT/JIT', flush=True)
         report['rejectedBindings'] = []
-        for flag in ['--native-host-bootstrap']:
+        for flag in (['--native-host-bootstrap'] if jit_command is not None else []):
             result = run([*jit_command, flag])
             if result.returncode != 1 or result.stdout or 'JIT_RESULT ' in result.stderr or 'without bootstrap bindings' not in result.stderr:
                 raise RuntimeError('Unsupported binding was not rejected: '+flag)

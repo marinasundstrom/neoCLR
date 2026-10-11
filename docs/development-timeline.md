@@ -14812,3 +14812,21 @@ outside benchmark measurement. Implementation follows the configuration slice.
 - **Open:** select ownership using real await/source lifetimes, qualify native parity
   and slot cleanup, and measure costs before public Task migration. Current runtime
   registrations and Task/Promise behavior remain unchanged.
+
+
+### 2026-10-11 — Simpler managed continuation ownership comparison
+
+- **Assistant investigation:** after the author's continuation request, compared the
+  existing managed Promise callback list with the conditional-root proposal. Proposed
+  retaining pending callbacks in managed storage and admitting only runnable work.
+- **Action/outcome:** implemented a selectable source-included alternative. Shared
+  lifecycle cases pass across interpreter/JIT/AOT; the interpreter explicit-GC consumer
+  reclaims abandoned await cycles and preserves unobserved work rooted by a live
+  operation, runtime submission or pending timer.
+- **Assistant recommendation:** provisionally prefer ordinary managed ownership to avoid
+  new collector relationships, subject to native lifetime and completion-admission gates.
+  This revises the implementation hypothesis, not the author's Task/Promise direction.
+- **Open:** native GC diagnostic binding blocked the corresponding reclamation test;
+  completion-time fan-out can exhaust the fixed submission budget. Both are recorded in
+  the [comparison](runtime-scheduling-design.md#managed-pending-callbacks--ownership-comparison-2026-10-11).
+  No public migration or performance improvement is claimed.

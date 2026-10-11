@@ -1,0 +1,90 @@
+module SchedulerContinuations {
+    import System.*
+    import System.Tasks.*
+    import System.Runtime.*
+    import System.Concurrency.*
+    import System.Time.*
+
+    async func WaitForValue(operation: Completion) -> Task<int> {
+        return await operation
+    }
+
+    func AbandonBatch() {
+        var index = 0
+        while index < 128 {
+            let operation = Completion(UnpumpedProducer())
+            // Deliberately discard a pending consumer to test unreachable cycles.
+            _ = WaitForValue(operation)
+            index += 1
+        }
+    }
+
+    async func SignalAfterAwait(operation: Completion, done: Promise<int>) -> Task<int> {
+        let value = await operation
+        done.Complete(value)
+        return value
+    }
+
+    func StartUnobserved(operation: Completion, done: Promise<int>) {
+        // Discarding the returned Task must not cancel independently live work.
+        _ = SignalAfterAwait(operation, done)
+    }
+
+    func ScheduleUnobserved(done: Promise<int>) {
+        let operation = Completion(UnpumpedProducer())
+        StartUnobserved(operation, done)
+        _ = neoCLR.Runtime.SchedulerSubmit(operation.Publish)
+    }
+
+    func ScheduleTimerUnobserved(done: Promise<int>) {
+        let operation = Completion(UnpumpedProducer())
+        StartUnobserved(operation, done)
+        let timer = Timer(operation.Publish)
+        timer.Start(Duration.FromTicks(10000L))
+        // The pending runtime timer owns this one-shot callback. No caller keeps
+        // either the timer, the operation, or the consumer's returned Task.
+    }
+
+    async func Main() -> Task<int> {
+        AbandonBatch()
+        GC.Collect()
+        let baseline = GC.HeapObjectCount
+        AbandonBatch()
+        GC.Collect()
+        if GC.HeapObjectCount != baseline {
+            System.Fail("Abandoned awaits retained managed objects")
+        }
+        Console.WriteLine("PASS abandoned await cycles reclaimed")
+
+        let operation = Completion(UnpumpedProducer())
+        let done = Promise<int>()
+        StartUnobserved(operation, done)
+        GC.Collect()
+        operation.Publish()
+        GC.Collect()
+        let value = await done.Task
+        if value != 42 {
+            System.Fail("Live operation lost unobserved waiter")
+        }
+        Console.WriteLine("PASS live operation retains unobserved waiter across collection")
+
+        let scheduled = Promise<int>()
+        ScheduleUnobserved(scheduled)
+        GC.Collect()
+        let result = await scheduled.Task
+        if result != 42 {
+            System.Fail("Runnable producer lost unobserved operation")
+        }
+        Console.WriteLine("PASS runtime submission retains producer and waiting execution")
+
+        let timed = Promise<int>()
+        ScheduleTimerUnobserved(timed)
+        GC.Collect()
+        let timedResult = await timed.Task
+        if timedResult != 42 {
+            System.Fail("Pending timer lost unobserved operation")
+        }
+        Console.WriteLine("PASS pending timer retains producer and waiting execution")
+        return 0
+    }
+}

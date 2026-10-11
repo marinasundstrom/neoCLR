@@ -1,0 +1,47 @@
+module SchedulerContinuations {
+    import System.*
+    import System.Collections.*
+
+    // Alternative ownership experiment: pending callbacks are ordinary managed
+    // edges. Runtime admission happens only when the operation completes.
+    class Continuation : Disposable {
+        private val destination: long
+        private var callbacks = ArrayList<() -> System.Void>()
+        private var submitted = false
+        private var withdrawn = false
+
+        init(callback: () -> System.Void) {
+            destination = neoCLR.Runtime.SchedulerCapture()
+            callbacks.Add(callback)
+        }
+
+        func TrySubmit() -> bool {
+            if submitted || withdrawn {
+                return false
+            }
+            _ = neoCLR.Runtime.SchedulerSubmitTo(destination, callbacks[0])
+            callbacks = ArrayList<() -> System.Void>()
+            submitted = true
+            return true
+        }
+
+        func Submit() {
+            if !TrySubmit() {
+                System.Fail("Continuation registration already consumed")
+            }
+        }
+
+        func Cancel() -> bool {
+            if submitted || withdrawn {
+                return false
+            }
+            callbacks = ArrayList<() -> System.Void>()
+            withdrawn = true
+            return true
+        }
+
+        func Dispose() {
+            _ = Cancel()
+        }
+    }
+}

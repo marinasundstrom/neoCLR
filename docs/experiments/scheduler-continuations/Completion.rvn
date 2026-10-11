@@ -77,49 +77,6 @@ module SchedulerContinuations {
         }
     }
 
-    class Continuation : Disposable {
-        private val registration: long
-        private var submitted = false
-        private var withdrawn = false
-
-        init(callback: () -> System.Void) {
-            let destination = neoCLR.Runtime.SchedulerCapture()
-            registration = neoCLR.Runtime.SchedulerRegister(destination, callback)
-        }
-
-        func TrySubmit() -> bool {
-            if submitted || withdrawn {
-                return false
-            }
-            if !neoCLR.Runtime.SchedulerActivate(registration) {
-                System.Fail("Continuation registration unavailable")
-            }
-            submitted = true
-            return true
-        }
-
-        func Submit() {
-            if !TrySubmit() {
-                System.Fail("Continuation registration already consumed")
-            }
-        }
-
-        func Cancel() -> bool {
-            if submitted || withdrawn {
-                return false
-            }
-            if !neoCLR.Runtime.SchedulerCancel(registration) {
-                System.Fail("Continuation registration unavailable")
-            }
-            withdrawn = true
-            return true
-        }
-
-        func Dispose() {
-            _ = Cancel()
-        }
-    }
-
     func UnpumpedProducer() -> TaskQueue {
         let queue = TaskQueue()
         queue.Post(ProducerPumpForbidden)

@@ -1186,3 +1186,39 @@ CARGO_TARGET_DIR=target/scheduler-wait-validation cargo test --test runtime_gc -
 Website/API review: no public signatures or guest behavior change in this foundation;
 no API snapshot or website capability update is needed. There is no new compiler bridge
 encoding or Runtime Contract configuration.
+
+
+## Managed pending callbacks — ownership comparison, 2026-10-11
+
+The continuation experiment now compares the conditional-root direction with ordinary
+managed ownership. In [.NET 10 Task implementation](https://github.com/dotnet/runtime/blob/v10.0.0/src/libraries/System.Private.CoreLib/src/System/Threading/Tasks/Task.cs)
+(tag v10.0.0, reviewed 2026-10-11), Task stores pending continuations in its managed
+`m_continuationObject` field. This supports keeping pending operation relationships in
+managed storage; it does not require copying CLR scheduling, locking or state-machine
+layout. neoCLR's current Promise likewise already stores its pending callback list in
+managed memory, though it routes completion through its producer queue.
+
+The alternative retains that managed lifetime but captures the invocation destination
+per registration. Only runnable callbacks transfer to the runtime. Existing graph tracing
+then reclaims an unreachable operation/awaiter cycle without weak handles, finalizers,
+Task disposal or new conditional roots. Explicit observer disposal clears its callback.
+Runtime submissions and completion sources must still strongly root active work.
+
+[Executable evidence](experiments/scheduler-continuations/README.md#managed-pending-ownership-alternative--2026-10-11)
+now checks actual Raven-generated awaits, including discarded consumer Tasks with live
+operation, runtime-submission and pending-timer roots. Explicit collection and exact
+post-batch live-object equality pass in the interpreter. Six shared lifecycle/fault runs
+pass across interpreter/JIT/AOT. Native explicit-GC diagnostic bindings are missing, so
+native reclamation parity is not established. The runtime-owned implementation remains
+available and requalified; the prior conditional collector experiment remains unused.
+
+**Provisional preference:** use ordinary managed pending ownership if native lifetime and
+completion admission can be qualified. It preserves the Task/Promise responsibility split
+and avoids additional collector participation. Its cost is deferred admission failure:
+the private fixed-size runtime queue can fill during completion, unlike the reserved-slot
+prototype. Do not migrate public Task until a bounded draining/bulk-admission policy
+preserves all waiters, source ownership is qualified, and race/cross-invocation rules are
+settled. No benchmark conclusion follows from this correctness experiment.
+
+No public signatures, compiler lowering, bridge encoding or Runtime Contract settings
+change. Website/API capability statements remain unchanged; this is internal evidence.

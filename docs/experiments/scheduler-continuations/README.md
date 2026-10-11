@@ -132,3 +132,46 @@ The [conditional-root collector experiment](../../runtime-scheduling-design.md#c
 provides graph-level retention/reclamation tests for a possible abandonment policy.
 It is not connected to these registrations: the evidence above still uses strong
 runtime roots, explicit observer disposal and invocation teardown.
+
+
+## Managed pending ownership alternative — 2026-10-11
+
+`Completion.rvn` now contains the common awaitable. Select exactly one implementation:
+`RuntimeContinuation.rvn` preserves the existing runtime-owned dormant registrations;
+`ManagedContinuation.rvn` retains pending callbacks in ordinary managed storage and
+captures only the non-owning invocation destination. Submission transfers a callable to
+runtime-owned runnable work and releases the managed reference. Disposal releases an
+unsubmitted callback without changing the operation, and never retracts admitted work.
+This is a source-included comparison, not a change to public Task/Promise.
+
+Run the alternative with `--managed-continuations` in place of `--continuations` in the
+command above. [Managed ownership evidence](managed-ownership-validation.json) includes
+the same six lifecycle/fault executions in interpreter/JIT/AOT, plus one interpreter-only
+explicit-GC consumer. [Runtime ownership regression evidence](runtime-ownership-validation.json)
+confirms the original implementation still passes its six executions after source splitting.
+The verifier records both implementation and common-source hashes; profiles are mutually
+exclusive. These runs reuse the recorded development binaries; no collector changes are
+needed for the managed alternative.
+
+`ManagedOwnership.rvn` creates and abandons two batches of 128 pending generated awaits.
+After explicit collection the second batch leaves exactly the first batch's live object
+count. Separate cases prove that a reachable operation retains an unobserved state machine,
+that admitted runtime work roots an otherwise unobserved producer/awaiter graph, and that
+a pending one-shot Timer does the same. Explicit collection occurs before completion and
+also after continuation admission. Discarding a returned Task does not cancel live work.
+
+The explicit-GC consumer is **interpreter-only**: this backend rejects
+`neoCLR.Runtime.GCHeapObjectCount` as an unsupported value member contract. It is not
+silently replaced with a constant or described as native reclamation evidence. Native
+GC service binding/diagnostic qualification remains a next gate, alongside socket/DNS
+completion-source coverage. Existing native lifecycle runs establish execution behavior,
+not the bounded retained-object assertion from this consumer. Windows was not run.
+
+The simpler ownership model avoids dormant runtime slots and conditional collector edges,
+but loses registration-time capacity reservation. Completion can now fault while admitting
+a large fan-out, after publishing its outcome and possibly admitting earlier waiters.
+The fixed 64-slot submission budget therefore needs a deliberate bulk-admission/draining
+policy before public migration. Cross-thread completion, races and cross-invocation
+routing remain open. Per-registration ArrayList storage is intentionally provisional;
+no allocation or performance advantage is claimed. See the
+[design comparison](../../runtime-scheduling-design.md#managed-pending-callbacks--ownership-comparison-2026-10-11).

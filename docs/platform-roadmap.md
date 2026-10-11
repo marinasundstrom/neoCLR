@@ -62,8 +62,12 @@ capacity reuse, early return and no retraction after activation in all three mod
 Automatic await abandonment cleanup and race/lifetime rules remain production-migration gates. A
 [conditional-root collector experiment](runtime-scheduling-design.md#conditional-continuation-roots--collector-experiment-2026-10-11)
 now validates live-owner retention and abandoned-cycle reclamation in the interpreter
-heap. Scheduler integration, native parity and choosing conditional roots versus managed
-callback storage remain open; current registrations still retain strong roots. The interpreter readiness query now includes
+heap. A [managed-storage alternative](experiments/scheduler-continuations/README.md#managed-pending-ownership-alternative--2026-10-11)
+now proves reclamation of abandoned Raven awaits and preservation of live operation,
+submission and timer roots under interpreter collection. Shared lifecycle cases pass in
+all three local modes. Prefer this simpler ownership provisionally; native reclamation,
+completion-capacity policy and production migration remain open. The original runtime
+registration service still retains strong roots. The interpreter readiness query now includes
 submitted work and keeps source/submission arbitration private;
 [quiescence contract and validation](runtime-scheduling-design.md#unified-interpreter-readiness--2026-10-11).
 

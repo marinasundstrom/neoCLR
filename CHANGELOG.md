@@ -8,6 +8,13 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-11
 
+- Compare managed pending-continuation ownership with dormant runtime registrations.
+  Shared lifecycle/fault cases pass in interpreter/JIT/AOT; explicit interpreter GC
+  reclaims abandoned generated awaits while preserving live operation, runnable and
+  pending-timer ownership. Preserve the original prototype as a selectable variant.
+  Native reclamation diagnostics and completion-capacity handling remain open;
+  public Task/Promise behavior is unchanged.
+
 - Add an internal conditional-root collector experiment for continuation lifetime:
   reachable owners retain dependent graphs, while unreachable back-reference cycles
   are reclaimed. Validate heap provenance through the shared host-root validation
