@@ -550,6 +550,12 @@ List/map mapping remains under development.
 
 ## Method values in development
 
+Custom method and status values are already supported: `HttpMethod("BREW")`
+preserves the token, and responses can represent unnamed codes such as 418 or 471.
+The server accepts final response codes from 200 through 599. The development
+HTTP value tests exercise these cases through JIT; this does not add the `coffee:`
+transport scheme or claim full HTCPCP support.
+
 `HttpMethod` provides Get, Head, Post, Put, Patch, Delete, Options, Trace, Connect and
 Query. Its constructor accepts custom ASCII HTTP tokens and preserves spelling.
 `HttpMethod.Parse` returns a typed result, canonicalizing known names without changing

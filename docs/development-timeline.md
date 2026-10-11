@@ -25,6 +25,17 @@ available original wording; other text is a summary.
 
 See the [changelog](../CHANGELOG.md) and linked design documents for technical status.
 
+## 2026-10-11 — Custom HTTP methods and status values
+
+- **Author:** asks to consider custom HttpMethod names and custom status codes,
+  citing the [coffee-pot protocol](https://www.rfc-editor.org/rfc/rfc2324.txt).
+- **Assistant finding:** existing public constructors already preserve custom method
+  tokens and unnamed numeric status values. The server supports final response codes
+  from 200 through 599; full HTCPCP and coffee-scheme transport are not implemented.
+- **Action/outcome:** add a Raven regression for BREW, 418, custom 471 and success
+  classification of unnamed 299. All nine HTTP value tests pass through the development
+  JIT CLI on macOS ARM64. This checks API values, not an HTCPCP wire exchange.
+
 ## 2026-10-11 — Schedulers followed by runtime-managed suspension
 
 - **Author:** directs work after JIT toward replacing the TaskQueue concept with

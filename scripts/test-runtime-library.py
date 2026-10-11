@@ -273,6 +273,7 @@ INDEX_RANGE_NAMES = [
     'Native extension indexers support writes and compound assignment',
 ]
 HTTP_METHOD_VALUES_NAMES = [
+    'HTTP coffee requests retain BREW and unnamed status codes',
     'HTTP custom method construction and parsing preserve spelling',
     'HTTP method equality and hashes ignore ASCII case',
     'HTTP methods retain case-insensitive identity in a set',

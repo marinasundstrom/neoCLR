@@ -8,6 +8,10 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-11
 
+- Verify existing HTTP extension values with a BREW/418 regression plus unnamed
+  471 and 299 status codes. All nine HTTP method/value tests pass through the macOS
+  JIT CLI; no public API change or full coffee-pot protocol support is implied.
+
 - Record the author-directed plan after JIT integration: replace the TaskQueue
   concept with schedulers, then develop runtime-managed suspension in place of
   Raven-required async state machines. Implementation choices remain open; breaking

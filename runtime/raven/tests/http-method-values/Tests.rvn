@@ -121,3 +121,19 @@ func UriRequestMethods() -> Result<unit, TestFailure> {
     _ = Assert.Equal(0, empty.Content.Bytes.Count)?
     return Assert.Equal(4, withContent.Content.Bytes.Count)
 }
+
+[Test("HTTP coffee requests retain BREW and unnamed status codes")]
+func CoffeeExtensionValues() -> Result<unit, TestFailure> {
+    let Ok(request) = HttpRequest.Create(HttpMethod("BREW"), "http://example.test/pot-1", HttpContent.FromText("start")) else {
+        return Assert.True(false, "BREW request construction")
+    }
+    _ = Assert.Equal("BREW", request.Method.Method)?
+    let response = HttpResponse(418, ArrayList<HttpHeader>(), ArrayList<byte>())
+    _ = Assert.Equal(418, (int)response.StatusCode)?
+    _ = Assert.True(!response.IsSuccessStatusCode, "Teapot response is unsuccessful")?
+    response.Respond((HttpStatusCode)471, HttpContent.FromText("Custom failure"))
+    _ = Assert.Equal(471, (int)response.StatusCode)?
+    _ = Assert.True(!response.IsSuccessStatusCode, "Custom client error is unsuccessful")?
+    let extensionSuccess = HttpResponse((HttpStatusCode)299, ArrayList<HttpHeader>(), ArrayList<byte>())
+    return Assert.True(extensionSuccess.IsSuccessStatusCode, "Unnamed success follows its status class")
+}
