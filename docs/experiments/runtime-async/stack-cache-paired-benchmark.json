@@ -1,0 +1,1902 @@
+{
+  "passed": true,
+  "rounds": 8,
+  "discardedWarmupsPerProcess": 1,
+  "samples": [
+    {
+      "case": "completed-100",
+      "round": 0,
+      "stackCacheLimit": 0,
+      "command": [
+        "/Users/robert/Projects/neoclr/target/runtime-stack-cache-off/completed-100-runtime"
+      ],
+      "invocations": [
+        {
+          "seconds": 0.032056,
+          "allocatedBlocks": 4118,
+          "reclaimedBlocks": 4118,
+          "collections": 15967,
+          "fibers": 202,
+          "resumes": 202,
+          "stackMappings": 202,
+          "stackUnmappings": 202,
+          "peakReservedStackBytes": 3244032,
+          "reservedStackBytes": 0
+        },
+        {
+          "seconds": 0.030372,
+          "allocatedBlocks": 4118,
+          "reclaimedBlocks": 4118,
+          "collections": 15967,
+          "fibers": 202,
+          "resumes": 202,
+          "stackMappings": 202,
+          "stackUnmappings": 202,
+          "peakReservedStackBytes": 3244032,
+          "reservedStackBytes": 0
+        },
+        {
+          "seconds": 0.035637,
+          "allocatedBlocks": 4118,
+          "reclaimedBlocks": 4118,
+          "collections": 15967,
+          "fibers": 202,
+          "resumes": 202,
+          "stackMappings": 202,
+          "stackUnmappings": 202,
+          "peakReservedStackBytes": 3244032,
+          "reservedStackBytes": 0
+        },
+        {
+          "seconds": 0.034444,
+          "allocatedBlocks": 4118,
+          "reclaimedBlocks": 4118,
+          "collections": 15967,
+          "fibers": 202,
+          "resumes": 202,
+          "stackMappings": 202,
+          "stackUnmappings": 202,
+          "peakReservedStackBytes": 3244032,
+          "reservedStackBytes": 0
+        }
+      ]
+    },
+    {
+      "case": "completed-100",
+      "round": 0,
+      "stackCacheLimit": 8,
+      "command": [
+        "/Users/robert/Projects/neoclr/target/runtime-stack-cache-on/completed-100-runtime"
+      ],
+      "invocations": [
+        {
+          "seconds": 0.020733,
+          "allocatedBlocks": 4118,
+          "reclaimedBlocks": 4118,
+          "collections": 15967,
+          "fibers": 202,
+          "resumes": 202,
+          "stackMappings": 3,
+          "stackUnmappings": 3,
+          "peakReservedStackBytes": 3244032,
+          "reservedStackBytes": 0
+        },
+        {
+          "seconds": 0.018894,
+          "allocatedBlocks": 4118,
+          "reclaimedBlocks": 4118,
+          "collections": 15967,
+          "fibers": 202,
+          "resumes": 202,
+          "stackMappings": 3,
+          "stackUnmappings": 3,
+          "peakReservedStackBytes": 3244032,
+          "reservedStackBytes": 0
+        },
+        {
+          "seconds": 0.01988,
+          "allocatedBlocks": 4118,
+          "reclaimedBlocks": 4118,
+          "collections": 15967,
+          "fibers": 202,
+          "resumes": 202,
+          "stackMappings": 3,
+          "stackUnmappings": 3,
+          "peakReservedStackBytes": 3244032,
+          "reservedStackBytes": 0
+        },
+        {
+          "seconds": 0.018602,
+          "allocatedBlocks": 4118,
+          "reclaimedBlocks": 4118,
+          "collections": 15967,
+          "fibers": 202,
+          "resumes": 202,
+          "stackMappings": 3,
+          "stackUnmappings": 3,
+          "peakReservedStackBytes": 3244032,
+          "reservedStackBytes": 0
+        }
+      ]
+    },
+    {
+      "case": "completed-100",
+      "round": 1,
+      "stackCacheLimit": 8,
+      "command": [
+        "/Users/robert/Projects/neoclr/target/runtime-stack-cache-on/completed-100-runtime"
+      ],
+      "invocations": [
+        {
+          "seconds": 0.018806,
+          "allocatedBlocks": 4118,
+          "reclaimedBlocks": 4118,
+          "collections": 15967,
+          "fibers": 202,
+          "resumes": 202,
+          "stackMappings": 3,
+          "stackUnmappings": 3,
+          "peakReservedStackBytes": 3244032,
+          "reservedStackBytes": 0
+        },
+        {
+          "seconds": 0.018743,
+          "allocatedBlocks": 4118,
+          "reclaimedBlocks": 4118,
+          "collections": 15967,
+          "fibers": 202,
+          "resumes": 202,
+          "stackMappings": 3,
+          "stackUnmappings": 3,
+          "peakReservedStackBytes": 3244032,
+          "reservedStackBytes": 0
+        },
+        {
+          "seconds": 0.019058,
+          "allocatedBlocks": 4118,
+          "reclaimedBlocks": 4118,
+          "collections": 15967,
+          "fibers": 202,
+          "resumes": 202,
+          "stackMappings": 3,
+          "stackUnmappings": 3,
+          "peakReservedStackBytes": 3244032,
+          "reservedStackBytes": 0
+        },
+        {
+          "seconds": 0.019011,
+          "allocatedBlocks": 4118,
+          "reclaimedBlocks": 4118,
+          "collections": 15967,
+          "fibers": 202,
+          "resumes": 202,
+          "stackMappings": 3,
+          "stackUnmappings": 3,
+          "peakReservedStackBytes": 3244032,
+          "reservedStackBytes": 0
+        }
+      ]
+    },
+    {
+      "case": "completed-100",
+      "round": 1,
+      "stackCacheLimit": 0,
+      "command": [
+        "/Users/robert/Projects/neoclr/target/runtime-stack-cache-off/completed-100-runtime"
+      ],
+      "invocations": [
+        {
+          "seconds": 0.030519,
+          "allocatedBlocks": 4118,
+          "reclaimedBlocks": 4118,
+          "collections": 15967,
+          "fibers": 202,
+          "resumes": 202,
+          "stackMappings": 202,
+          "stackUnmappings": 202,
+          "peakReservedStackBytes": 3244032,
+          "reservedStackBytes": 0
+        },
+        {
+          "seconds": 0.032551,
+          "allocatedBlocks": 4118,
+          "reclaimedBlocks": 4118,
+          "collections": 15967,
+          "fibers": 202,
+          "resumes": 202,
+          "stackMappings": 202,
+          "stackUnmappings": 202,
+          "peakReservedStackBytes": 3244032,
+          "reservedStackBytes": 0
+        },
+        {
+          "seconds": 0.033471,
+          "allocatedBlocks": 4118,
+          "reclaimedBlocks": 4118,
+          "collections": 15967,
+          "fibers": 202,
+          "resumes": 202,
+          "stackMappings": 202,
+          "stackUnmappings": 202,
+          "peakReservedStackBytes": 3244032,
+          "reservedStackBytes": 0
+        },
+        {
+          "seconds": 0.033084,
+          "allocatedBlocks": 4118,
+          "reclaimedBlocks": 4118,
+          "collections": 15967,
+          "fibers": 202,
+          "resumes": 202,
+          "stackMappings": 202,
+          "stackUnmappings": 202,
+          "peakReservedStackBytes": 3244032,
+          "reservedStackBytes": 0
+        }
+      ]
+    },
+    {
+      "case": "completed-100",
+      "round": 2,
+      "stackCacheLimit": 0,
+      "command": [
+        "/Users/robert/Projects/neoclr/target/runtime-stack-cache-off/completed-100-runtime"
+      ],
+      "invocations": [
+        {
+          "seconds": 0.033417,
+          "allocatedBlocks": 4118,
+          "reclaimedBlocks": 4118,
+          "collections": 15967,
+          "fibers": 202,
+          "resumes": 202,
+          "stackMappings": 202,
+          "stackUnmappings": 202,
+          "peakReservedStackBytes": 3244032,
+          "reservedStackBytes": 0
+        },
+        {
+          "seconds": 0.032011,
+          "allocatedBlocks": 4118,
+          "reclaimedBlocks": 4118,
+          "collections": 15967,
+          "fibers": 202,
+          "resumes": 202,
+          "stackMappings": 202,
+          "stackUnmappings": 202,
+          "peakReservedStackBytes": 3244032,
+          "reservedStackBytes": 0
+        },
+        {
+          "seconds": 0.030931,
+          "allocatedBlocks": 4118,
+          "reclaimedBlocks": 4118,
+          "collections": 15967,
+          "fibers": 202,
+          "resumes": 202,
+          "stackMappings": 202,
+          "stackUnmappings": 202,
+          "peakReservedStackBytes": 3244032,
+          "reservedStackBytes": 0
+        },
+        {
+          "seconds": 0.030909,
+          "allocatedBlocks": 4118,
+          "reclaimedBlocks": 4118,
+          "collections": 15967,
+          "fibers": 202,
+          "resumes": 202,
+          "stackMappings": 202,
+          "stackUnmappings": 202,
+          "peakReservedStackBytes": 3244032,
+          "reservedStackBytes": 0
+        }
+      ]
+    },
+    {
+      "case": "completed-100",
+      "round": 2,
+      "stackCacheLimit": 8,
+      "command": [
+        "/Users/robert/Projects/neoclr/target/runtime-stack-cache-on/completed-100-runtime"
+      ],
+      "invocations": [
+        {
+          "seconds": 0.018617,
+          "allocatedBlocks": 4118,
+          "reclaimedBlocks": 4118,
+          "collections": 15967,
+          "fibers": 202,
+          "resumes": 202,
+          "stackMappings": 3,
+          "stackUnmappings": 3,
+          "peakReservedStackBytes": 3244032,
+          "reservedStackBytes": 0
+        },
+        {
+          "seconds": 0.018538,
+          "allocatedBlocks": 4118,
+          "reclaimedBlocks": 4118,
+          "collections": 15967,
+          "fibers": 202,
+          "resumes": 202,
+          "stackMappings": 3,
+          "stackUnmappings": 3,
+          "peakReservedStackBytes": 3244032,
+          "reservedStackBytes": 0
+        },
+        {
+          "seconds": 0.018631,
+          "allocatedBlocks": 4118,
+          "reclaimedBlocks": 4118,
+          "collections": 15967,
+          "fibers": 202,
+          "resumes": 202,
+          "stackMappings": 3,
+          "stackUnmappings": 3,
+          "peakReservedStackBytes": 3244032,
+          "reservedStackBytes": 0
+        },
+        {
+          "seconds": 0.019403,
+          "allocatedBlocks": 4118,
+          "reclaimedBlocks": 4118,
+          "collections": 15967,
+          "fibers": 202,
+          "resumes": 202,
+          "stackMappings": 3,
+          "stackUnmappings": 3,
+          "peakReservedStackBytes": 3244032,
+          "reservedStackBytes": 0
+        }
+      ]
+    },
+    {
+      "case": "completed-100",
+      "round": 3,
+      "stackCacheLimit": 8,
+      "command": [
+        "/Users/robert/Projects/neoclr/target/runtime-stack-cache-on/completed-100-runtime"
+      ],
+      "invocations": [
+        {
+          "seconds": 0.019058,
+          "allocatedBlocks": 4118,
+          "reclaimedBlocks": 4118,
+          "collections": 15967,
+          "fibers": 202,
+          "resumes": 202,
+          "stackMappings": 3,
+          "stackUnmappings": 3,
+          "peakReservedStackBytes": 3244032,
+          "reservedStackBytes": 0
+        },
+        {
+          "seconds": 0.018802,
+          "allocatedBlocks": 4118,
+          "reclaimedBlocks": 4118,
+          "collections": 15967,
+          "fibers": 202,
+          "resumes": 202,
+          "stackMappings": 3,
+          "stackUnmappings": 3,
+          "peakReservedStackBytes": 3244032,
+          "reservedStackBytes": 0
+        },
+        {
+          "seconds": 0.019001,
+          "allocatedBlocks": 4118,
+          "reclaimedBlocks": 4118,
+          "collections": 15967,
+          "fibers": 202,
+          "resumes": 202,
+          "stackMappings": 3,
+          "stackUnmappings": 3,
+          "peakReservedStackBytes": 3244032,
+          "reservedStackBytes": 0
+        },
+        {
+          "seconds": 0.018634,
+          "allocatedBlocks": 4118,
+          "reclaimedBlocks": 4118,
+          "collections": 15967,
+          "fibers": 202,
+          "resumes": 202,
+          "stackMappings": 3,
+          "stackUnmappings": 3,
+          "peakReservedStackBytes": 3244032,
+          "reservedStackBytes": 0
+        }
+      ]
+    },
+    {
+      "case": "completed-100",
+      "round": 3,
+      "stackCacheLimit": 0,
+      "command": [
+        "/Users/robert/Projects/neoclr/target/runtime-stack-cache-off/completed-100-runtime"
+      ],
+      "invocations": [
+        {
+          "seconds": 0.030973,
+          "allocatedBlocks": 4118,
+          "reclaimedBlocks": 4118,
+          "collections": 15967,
+          "fibers": 202,
+          "resumes": 202,
+          "stackMappings": 202,
+          "stackUnmappings": 202,
+          "peakReservedStackBytes": 3244032,
+          "reservedStackBytes": 0
+        },
+        {
+          "seconds": 0.032954,
+          "allocatedBlocks": 4118,
+          "reclaimedBlocks": 4118,
+          "collections": 15967,
+          "fibers": 202,
+          "resumes": 202,
+          "stackMappings": 202,
+          "stackUnmappings": 202,
+          "peakReservedStackBytes": 3244032,
+          "reservedStackBytes": 0
+        },
+        {
+          "seconds": 0.032181,
+          "allocatedBlocks": 4118,
+          "reclaimedBlocks": 4118,
+          "collections": 15967,
+          "fibers": 202,
+          "resumes": 202,
+          "stackMappings": 202,
+          "stackUnmappings": 202,
+          "peakReservedStackBytes": 3244032,
+          "reservedStackBytes": 0
+        },
+        {
+          "seconds": 0.032544,
+          "allocatedBlocks": 4118,
+          "reclaimedBlocks": 4118,
+          "collections": 15967,
+          "fibers": 202,
+          "resumes": 202,
+          "stackMappings": 202,
+          "stackUnmappings": 202,
+          "peakReservedStackBytes": 3244032,
+          "reservedStackBytes": 0
+        }
+      ]
+    },
+    {
+      "case": "completed-100",
+      "round": 4,
+      "stackCacheLimit": 0,
+      "command": [
+        "/Users/robert/Projects/neoclr/target/runtime-stack-cache-off/completed-100-runtime"
+      ],
+      "invocations": [
+        {
+          "seconds": 0.033787,
+          "allocatedBlocks": 4118,
+          "reclaimedBlocks": 4118,
+          "collections": 15967,
+          "fibers": 202,
+          "resumes": 202,
+          "stackMappings": 202,
+          "stackUnmappings": 202,
+          "peakReservedStackBytes": 3244032,
+          "reservedStackBytes": 0
+        },
+        {
+          "seconds": 0.032555,
+          "allocatedBlocks": 4118,
+          "reclaimedBlocks": 4118,
+          "collections": 15967,
+          "fibers": 202,
+          "resumes": 202,
+          "stackMappings": 202,
+          "stackUnmappings": 202,
+          "peakReservedStackBytes": 3244032,
+          "reservedStackBytes": 0
+        },
+        {
+          "seconds": 0.031087,
+          "allocatedBlocks": 4118,
+          "reclaimedBlocks": 4118,
+          "collections": 15967,
+          "fibers": 202,
+          "resumes": 202,
+          "stackMappings": 202,
+          "stackUnmappings": 202,
+          "peakReservedStackBytes": 3244032,
+          "reservedStackBytes": 0
+        },
+        {
+          "seconds": 0.032233,
+          "allocatedBlocks": 4118,
+          "reclaimedBlocks": 4118,
+          "collections": 15967,
+          "fibers": 202,
+          "resumes": 202,
+          "stackMappings": 202,
+          "stackUnmappings": 202,
+          "peakReservedStackBytes": 3244032,
+          "reservedStackBytes": 0
+        }
+      ]
+    },
+    {
+      "case": "completed-100",
+      "round": 4,
+      "stackCacheLimit": 8,
+      "command": [
+        "/Users/robert/Projects/neoclr/target/runtime-stack-cache-on/completed-100-runtime"
+      ],
+      "invocations": [
+        {
+          "seconds": 0.019604,
+          "allocatedBlocks": 4118,
+          "reclaimedBlocks": 4118,
+          "collections": 15967,
+          "fibers": 202,
+          "resumes": 202,
+          "stackMappings": 3,
+          "stackUnmappings": 3,
+          "peakReservedStackBytes": 3244032,
+          "reservedStackBytes": 0
+        },
+        {
+          "seconds": 0.019086,
+          "allocatedBlocks": 4118,
+          "reclaimedBlocks": 4118,
+          "collections": 15967,
+          "fibers": 202,
+          "resumes": 202,
+          "stackMappings": 3,
+          "stackUnmappings": 3,
+          "peakReservedStackBytes": 3244032,
+          "reservedStackBytes": 0
+        },
+        {
+          "seconds": 0.018489,
+          "allocatedBlocks": 4118,
+          "reclaimedBlocks": 4118,
+          "collections": 15967,
+          "fibers": 202,
+          "resumes": 202,
+          "stackMappings": 3,
+          "stackUnmappings": 3,
+          "peakReservedStackBytes": 3244032,
+          "reservedStackBytes": 0
+        },
+        {
+          "seconds": 0.018997,
+          "allocatedBlocks": 4118,
+          "reclaimedBlocks": 4118,
+          "collections": 15967,
+          "fibers": 202,
+          "resumes": 202,
+          "stackMappings": 3,
+          "stackUnmappings": 3,
+          "peakReservedStackBytes": 3244032,
+          "reservedStackBytes": 0
+        }
+      ]
+    },
+    {
+      "case": "completed-100",
+      "round": 5,
+      "stackCacheLimit": 8,
+      "command": [
+        "/Users/robert/Projects/neoclr/target/runtime-stack-cache-on/completed-100-runtime"
+      ],
+      "invocations": [
+        {
+          "seconds": 0.020016,
+          "allocatedBlocks": 4118,
+          "reclaimedBlocks": 4118,
+          "collections": 15967,
+          "fibers": 202,
+          "resumes": 202,
+          "stackMappings": 3,
+          "stackUnmappings": 3,
+          "peakReservedStackBytes": 3244032,
+          "reservedStackBytes": 0
+        },
+        {
+          "seconds": 0.019045,
+          "allocatedBlocks": 4118,
+          "reclaimedBlocks": 4118,
+          "collections": 15967,
+          "fibers": 202,
+          "resumes": 202,
+          "stackMappings": 3,
+          "stackUnmappings": 3,
+          "peakReservedStackBytes": 3244032,
+          "reservedStackBytes": 0
+        },
+        {
+          "seconds": 0.018448,
+          "allocatedBlocks": 4118,
+          "reclaimedBlocks": 4118,
+          "collections": 15967,
+          "fibers": 202,
+          "resumes": 202,
+          "stackMappings": 3,
+          "stackUnmappings": 3,
+          "peakReservedStackBytes": 3244032,
+          "reservedStackBytes": 0
+        },
+        {
+          "seconds": 0.019436,
+          "allocatedBlocks": 4118,
+          "reclaimedBlocks": 4118,
+          "collections": 15967,
+          "fibers": 202,
+          "resumes": 202,
+          "stackMappings": 3,
+          "stackUnmappings": 3,
+          "peakReservedStackBytes": 3244032,
+          "reservedStackBytes": 0
+        }
+      ]
+    },
+    {
+      "case": "completed-100",
+      "round": 5,
+      "stackCacheLimit": 0,
+      "command": [
+        "/Users/robert/Projects/neoclr/target/runtime-stack-cache-off/completed-100-runtime"
+      ],
+      "invocations": [
+        {
+          "seconds": 0.035069,
+          "allocatedBlocks": 4118,
+          "reclaimedBlocks": 4118,
+          "collections": 15967,
+          "fibers": 202,
+          "resumes": 202,
+          "stackMappings": 202,
+          "stackUnmappings": 202,
+          "peakReservedStackBytes": 3244032,
+          "reservedStackBytes": 0
+        },
+        {
+          "seconds": 0.031995,
+          "allocatedBlocks": 4118,
+          "reclaimedBlocks": 4118,
+          "collections": 15967,
+          "fibers": 202,
+          "resumes": 202,
+          "stackMappings": 202,
+          "stackUnmappings": 202,
+          "peakReservedStackBytes": 3244032,
+          "reservedStackBytes": 0
+        },
+        {
+          "seconds": 0.031512,
+          "allocatedBlocks": 4118,
+          "reclaimedBlocks": 4118,
+          "collections": 15967,
+          "fibers": 202,
+          "resumes": 202,
+          "stackMappings": 202,
+          "stackUnmappings": 202,
+          "peakReservedStackBytes": 3244032,
+          "reservedStackBytes": 0
+        },
+        {
+          "seconds": 0.030788,
+          "allocatedBlocks": 4118,
+          "reclaimedBlocks": 4118,
+          "collections": 15967,
+          "fibers": 202,
+          "resumes": 202,
+          "stackMappings": 202,
+          "stackUnmappings": 202,
+          "peakReservedStackBytes": 3244032,
+          "reservedStackBytes": 0
+        }
+      ]
+    },
+    {
+      "case": "completed-100",
+      "round": 6,
+      "stackCacheLimit": 0,
+      "command": [
+        "/Users/robert/Projects/neoclr/target/runtime-stack-cache-off/completed-100-runtime"
+      ],
+      "invocations": [
+        {
+          "seconds": 0.032729,
+          "allocatedBlocks": 4118,
+          "reclaimedBlocks": 4118,
+          "collections": 15967,
+          "fibers": 202,
+          "resumes": 202,
+          "stackMappings": 202,
+          "stackUnmappings": 202,
+          "peakReservedStackBytes": 3244032,
+          "reservedStackBytes": 0
+        },
+        {
+          "seconds": 0.03069,
+          "allocatedBlocks": 4118,
+          "reclaimedBlocks": 4118,
+          "collections": 15967,
+          "fibers": 202,
+          "resumes": 202,
+          "stackMappings": 202,
+          "stackUnmappings": 202,
+          "peakReservedStackBytes": 3244032,
+          "reservedStackBytes": 0
+        },
+        {
+          "seconds": 0.031743,
+          "allocatedBlocks": 4118,
+          "reclaimedBlocks": 4118,
+          "collections": 15967,
+          "fibers": 202,
+          "resumes": 202,
+          "stackMappings": 202,
+          "stackUnmappings": 202,
+          "peakReservedStackBytes": 3244032,
+          "reservedStackBytes": 0
+        },
+        {
+          "seconds": 0.035063,
+          "allocatedBlocks": 4118,
+          "reclaimedBlocks": 4118,
+          "collections": 15967,
+          "fibers": 202,
+          "resumes": 202,
+          "stackMappings": 202,
+          "stackUnmappings": 202,
+          "peakReservedStackBytes": 3244032,
+          "reservedStackBytes": 0
+        }
+      ]
+    },
+    {
+      "case": "completed-100",
+      "round": 6,
+      "stackCacheLimit": 8,
+      "command": [
+        "/Users/robert/Projects/neoclr/target/runtime-stack-cache-on/completed-100-runtime"
+      ],
+      "invocations": [
+        {
+          "seconds": 0.020019,
+          "allocatedBlocks": 4118,
+          "reclaimedBlocks": 4118,
+          "collections": 15967,
+          "fibers": 202,
+          "resumes": 202,
+          "stackMappings": 3,
+          "stackUnmappings": 3,
+          "peakReservedStackBytes": 3244032,
+          "reservedStackBytes": 0
+        },
+        {
+          "seconds": 0.018908,
+          "allocatedBlocks": 4118,
+          "reclaimedBlocks": 4118,
+          "collections": 15967,
+          "fibers": 202,
+          "resumes": 202,
+          "stackMappings": 3,
+          "stackUnmappings": 3,
+          "peakReservedStackBytes": 3244032,
+          "reservedStackBytes": 0
+        },
+        {
+          "seconds": 0.018302,
+          "allocatedBlocks": 4118,
+          "reclaimedBlocks": 4118,
+          "collections": 15967,
+          "fibers": 202,
+          "resumes": 202,
+          "stackMappings": 3,
+          "stackUnmappings": 3,
+          "peakReservedStackBytes": 3244032,
+          "reservedStackBytes": 0
+        },
+        {
+          "seconds": 0.018627,
+          "allocatedBlocks": 4118,
+          "reclaimedBlocks": 4118,
+          "collections": 15967,
+          "fibers": 202,
+          "resumes": 202,
+          "stackMappings": 3,
+          "stackUnmappings": 3,
+          "peakReservedStackBytes": 3244032,
+          "reservedStackBytes": 0
+        }
+      ]
+    },
+    {
+      "case": "completed-100",
+      "round": 7,
+      "stackCacheLimit": 8,
+      "command": [
+        "/Users/robert/Projects/neoclr/target/runtime-stack-cache-on/completed-100-runtime"
+      ],
+      "invocations": [
+        {
+          "seconds": 0.019381,
+          "allocatedBlocks": 4118,
+          "reclaimedBlocks": 4118,
+          "collections": 15967,
+          "fibers": 202,
+          "resumes": 202,
+          "stackMappings": 3,
+          "stackUnmappings": 3,
+          "peakReservedStackBytes": 3244032,
+          "reservedStackBytes": 0
+        },
+        {
+          "seconds": 0.018809,
+          "allocatedBlocks": 4118,
+          "reclaimedBlocks": 4118,
+          "collections": 15967,
+          "fibers": 202,
+          "resumes": 202,
+          "stackMappings": 3,
+          "stackUnmappings": 3,
+          "peakReservedStackBytes": 3244032,
+          "reservedStackBytes": 0
+        },
+        {
+          "seconds": 0.019261,
+          "allocatedBlocks": 4118,
+          "reclaimedBlocks": 4118,
+          "collections": 15967,
+          "fibers": 202,
+          "resumes": 202,
+          "stackMappings": 3,
+          "stackUnmappings": 3,
+          "peakReservedStackBytes": 3244032,
+          "reservedStackBytes": 0
+        },
+        {
+          "seconds": 0.019196,
+          "allocatedBlocks": 4118,
+          "reclaimedBlocks": 4118,
+          "collections": 15967,
+          "fibers": 202,
+          "resumes": 202,
+          "stackMappings": 3,
+          "stackUnmappings": 3,
+          "peakReservedStackBytes": 3244032,
+          "reservedStackBytes": 0
+        }
+      ]
+    },
+    {
+      "case": "completed-100",
+      "round": 7,
+      "stackCacheLimit": 0,
+      "command": [
+        "/Users/robert/Projects/neoclr/target/runtime-stack-cache-off/completed-100-runtime"
+      ],
+      "invocations": [
+        {
+          "seconds": 0.033088,
+          "allocatedBlocks": 4118,
+          "reclaimedBlocks": 4118,
+          "collections": 15967,
+          "fibers": 202,
+          "resumes": 202,
+          "stackMappings": 202,
+          "stackUnmappings": 202,
+          "peakReservedStackBytes": 3244032,
+          "reservedStackBytes": 0
+        },
+        {
+          "seconds": 0.031885,
+          "allocatedBlocks": 4118,
+          "reclaimedBlocks": 4118,
+          "collections": 15967,
+          "fibers": 202,
+          "resumes": 202,
+          "stackMappings": 202,
+          "stackUnmappings": 202,
+          "peakReservedStackBytes": 3244032,
+          "reservedStackBytes": 0
+        },
+        {
+          "seconds": 0.038052,
+          "allocatedBlocks": 4118,
+          "reclaimedBlocks": 4118,
+          "collections": 15967,
+          "fibers": 202,
+          "resumes": 202,
+          "stackMappings": 202,
+          "stackUnmappings": 202,
+          "peakReservedStackBytes": 3244032,
+          "reservedStackBytes": 0
+        },
+        {
+          "seconds": 0.034806,
+          "allocatedBlocks": 4118,
+          "reclaimedBlocks": 4118,
+          "collections": 15967,
+          "fibers": 202,
+          "resumes": 202,
+          "stackMappings": 202,
+          "stackUnmappings": 202,
+          "peakReservedStackBytes": 3244032,
+          "reservedStackBytes": 0
+        }
+      ]
+    },
+    {
+      "case": "pending-100",
+      "round": 0,
+      "stackCacheLimit": 0,
+      "command": [
+        "/Users/robert/Projects/neoclr/target/runtime-stack-cache-off/pending-100-runtime"
+      ],
+      "invocations": [
+        {
+          "seconds": 0.104763,
+          "allocatedBlocks": 7421,
+          "reclaimedBlocks": 7421,
+          "collections": 27771,
+          "fibers": 703,
+          "resumes": 1204,
+          "stackMappings": 703,
+          "stackUnmappings": 703,
+          "peakReservedStackBytes": 5406720,
+          "reservedStackBytes": 0
+        },
+        {
+          "seconds": 0.126515,
+          "allocatedBlocks": 7421,
+          "reclaimedBlocks": 7421,
+          "collections": 27771,
+          "fibers": 703,
+          "resumes": 1204,
+          "stackMappings": 703,
+          "stackUnmappings": 703,
+          "peakReservedStackBytes": 5406720,
+          "reservedStackBytes": 0
+        },
+        {
+          "seconds": 0.113867,
+          "allocatedBlocks": 7421,
+          "reclaimedBlocks": 7421,
+          "collections": 27771,
+          "fibers": 703,
+          "resumes": 1204,
+          "stackMappings": 703,
+          "stackUnmappings": 703,
+          "peakReservedStackBytes": 5406720,
+          "reservedStackBytes": 0
+        },
+        {
+          "seconds": 0.101306,
+          "allocatedBlocks": 7421,
+          "reclaimedBlocks": 7421,
+          "collections": 27771,
+          "fibers": 703,
+          "resumes": 1204,
+          "stackMappings": 703,
+          "stackUnmappings": 703,
+          "peakReservedStackBytes": 5406720,
+          "reservedStackBytes": 0
+        }
+      ]
+    },
+    {
+      "case": "pending-100",
+      "round": 0,
+      "stackCacheLimit": 8,
+      "command": [
+        "/Users/robert/Projects/neoclr/target/runtime-stack-cache-on/pending-100-runtime"
+      ],
+      "invocations": [
+        {
+          "seconds": 0.058139,
+          "allocatedBlocks": 7421,
+          "reclaimedBlocks": 7421,
+          "collections": 27771,
+          "fibers": 703,
+          "resumes": 1204,
+          "stackMappings": 5,
+          "stackUnmappings": 5,
+          "peakReservedStackBytes": 5406720,
+          "reservedStackBytes": 0
+        },
+        {
+          "seconds": 0.05889,
+          "allocatedBlocks": 7421,
+          "reclaimedBlocks": 7421,
+          "collections": 27771,
+          "fibers": 703,
+          "resumes": 1204,
+          "stackMappings": 5,
+          "stackUnmappings": 5,
+          "peakReservedStackBytes": 5406720,
+          "reservedStackBytes": 0
+        },
+        {
+          "seconds": 0.058231,
+          "allocatedBlocks": 7421,
+          "reclaimedBlocks": 7421,
+          "collections": 27771,
+          "fibers": 703,
+          "resumes": 1204,
+          "stackMappings": 5,
+          "stackUnmappings": 5,
+          "peakReservedStackBytes": 5406720,
+          "reservedStackBytes": 0
+        },
+        {
+          "seconds": 0.058573,
+          "allocatedBlocks": 7421,
+          "reclaimedBlocks": 7421,
+          "collections": 27771,
+          "fibers": 703,
+          "resumes": 1204,
+          "stackMappings": 5,
+          "stackUnmappings": 5,
+          "peakReservedStackBytes": 5406720,
+          "reservedStackBytes": 0
+        }
+      ]
+    },
+    {
+      "case": "pending-100",
+      "round": 1,
+      "stackCacheLimit": 8,
+      "command": [
+        "/Users/robert/Projects/neoclr/target/runtime-stack-cache-on/pending-100-runtime"
+      ],
+      "invocations": [
+        {
+          "seconds": 0.060523,
+          "allocatedBlocks": 7421,
+          "reclaimedBlocks": 7421,
+          "collections": 27771,
+          "fibers": 703,
+          "resumes": 1204,
+          "stackMappings": 5,
+          "stackUnmappings": 5,
+          "peakReservedStackBytes": 5406720,
+          "reservedStackBytes": 0
+        },
+        {
+          "seconds": 0.058999,
+          "allocatedBlocks": 7421,
+          "reclaimedBlocks": 7421,
+          "collections": 27771,
+          "fibers": 703,
+          "resumes": 1204,
+          "stackMappings": 5,
+          "stackUnmappings": 5,
+          "peakReservedStackBytes": 5406720,
+          "reservedStackBytes": 0
+        },
+        {
+          "seconds": 0.0575,
+          "allocatedBlocks": 7421,
+          "reclaimedBlocks": 7421,
+          "collections": 27771,
+          "fibers": 703,
+          "resumes": 1204,
+          "stackMappings": 5,
+          "stackUnmappings": 5,
+          "peakReservedStackBytes": 5406720,
+          "reservedStackBytes": 0
+        },
+        {
+          "seconds": 0.057644,
+          "allocatedBlocks": 7421,
+          "reclaimedBlocks": 7421,
+          "collections": 27771,
+          "fibers": 703,
+          "resumes": 1204,
+          "stackMappings": 5,
+          "stackUnmappings": 5,
+          "peakReservedStackBytes": 5406720,
+          "reservedStackBytes": 0
+        }
+      ]
+    },
+    {
+      "case": "pending-100",
+      "round": 1,
+      "stackCacheLimit": 0,
+      "command": [
+        "/Users/robert/Projects/neoclr/target/runtime-stack-cache-off/pending-100-runtime"
+      ],
+      "invocations": [
+        {
+          "seconds": 0.102809,
+          "allocatedBlocks": 7421,
+          "reclaimedBlocks": 7421,
+          "collections": 27771,
+          "fibers": 703,
+          "resumes": 1204,
+          "stackMappings": 703,
+          "stackUnmappings": 703,
+          "peakReservedStackBytes": 5406720,
+          "reservedStackBytes": 0
+        },
+        {
+          "seconds": 0.099119,
+          "allocatedBlocks": 7421,
+          "reclaimedBlocks": 7421,
+          "collections": 27771,
+          "fibers": 703,
+          "resumes": 1204,
+          "stackMappings": 703,
+          "stackUnmappings": 703,
+          "peakReservedStackBytes": 5406720,
+          "reservedStackBytes": 0
+        },
+        {
+          "seconds": 0.098735,
+          "allocatedBlocks": 7421,
+          "reclaimedBlocks": 7421,
+          "collections": 27771,
+          "fibers": 703,
+          "resumes": 1204,
+          "stackMappings": 703,
+          "stackUnmappings": 703,
+          "peakReservedStackBytes": 5406720,
+          "reservedStackBytes": 0
+        },
+        {
+          "seconds": 0.098652,
+          "allocatedBlocks": 7421,
+          "reclaimedBlocks": 7421,
+          "collections": 27771,
+          "fibers": 703,
+          "resumes": 1204,
+          "stackMappings": 703,
+          "stackUnmappings": 703,
+          "peakReservedStackBytes": 5406720,
+          "reservedStackBytes": 0
+        }
+      ]
+    },
+    {
+      "case": "pending-100",
+      "round": 2,
+      "stackCacheLimit": 0,
+      "command": [
+        "/Users/robert/Projects/neoclr/target/runtime-stack-cache-off/pending-100-runtime"
+      ],
+      "invocations": [
+        {
+          "seconds": 0.103595,
+          "allocatedBlocks": 7421,
+          "reclaimedBlocks": 7421,
+          "collections": 27771,
+          "fibers": 703,
+          "resumes": 1204,
+          "stackMappings": 703,
+          "stackUnmappings": 703,
+          "peakReservedStackBytes": 5406720,
+          "reservedStackBytes": 0
+        },
+        {
+          "seconds": 0.099241,
+          "allocatedBlocks": 7421,
+          "reclaimedBlocks": 7421,
+          "collections": 27771,
+          "fibers": 703,
+          "resumes": 1204,
+          "stackMappings": 703,
+          "stackUnmappings": 703,
+          "peakReservedStackBytes": 5406720,
+          "reservedStackBytes": 0
+        },
+        {
+          "seconds": 0.10025,
+          "allocatedBlocks": 7421,
+          "reclaimedBlocks": 7421,
+          "collections": 27771,
+          "fibers": 703,
+          "resumes": 1204,
+          "stackMappings": 703,
+          "stackUnmappings": 703,
+          "peakReservedStackBytes": 5406720,
+          "reservedStackBytes": 0
+        },
+        {
+          "seconds": 0.101081,
+          "allocatedBlocks": 7421,
+          "reclaimedBlocks": 7421,
+          "collections": 27771,
+          "fibers": 703,
+          "resumes": 1204,
+          "stackMappings": 703,
+          "stackUnmappings": 703,
+          "peakReservedStackBytes": 5406720,
+          "reservedStackBytes": 0
+        }
+      ]
+    },
+    {
+      "case": "pending-100",
+      "round": 2,
+      "stackCacheLimit": 8,
+      "command": [
+        "/Users/robert/Projects/neoclr/target/runtime-stack-cache-on/pending-100-runtime"
+      ],
+      "invocations": [
+        {
+          "seconds": 0.058093,
+          "allocatedBlocks": 7421,
+          "reclaimedBlocks": 7421,
+          "collections": 27771,
+          "fibers": 703,
+          "resumes": 1204,
+          "stackMappings": 5,
+          "stackUnmappings": 5,
+          "peakReservedStackBytes": 5406720,
+          "reservedStackBytes": 0
+        },
+        {
+          "seconds": 0.05761,
+          "allocatedBlocks": 7421,
+          "reclaimedBlocks": 7421,
+          "collections": 27771,
+          "fibers": 703,
+          "resumes": 1204,
+          "stackMappings": 5,
+          "stackUnmappings": 5,
+          "peakReservedStackBytes": 5406720,
+          "reservedStackBytes": 0
+        },
+        {
+          "seconds": 0.05749,
+          "allocatedBlocks": 7421,
+          "reclaimedBlocks": 7421,
+          "collections": 27771,
+          "fibers": 703,
+          "resumes": 1204,
+          "stackMappings": 5,
+          "stackUnmappings": 5,
+          "peakReservedStackBytes": 5406720,
+          "reservedStackBytes": 0
+        },
+        {
+          "seconds": 0.058091,
+          "allocatedBlocks": 7421,
+          "reclaimedBlocks": 7421,
+          "collections": 27771,
+          "fibers": 703,
+          "resumes": 1204,
+          "stackMappings": 5,
+          "stackUnmappings": 5,
+          "peakReservedStackBytes": 5406720,
+          "reservedStackBytes": 0
+        }
+      ]
+    },
+    {
+      "case": "pending-100",
+      "round": 3,
+      "stackCacheLimit": 8,
+      "command": [
+        "/Users/robert/Projects/neoclr/target/runtime-stack-cache-on/pending-100-runtime"
+      ],
+      "invocations": [
+        {
+          "seconds": 0.057895,
+          "allocatedBlocks": 7421,
+          "reclaimedBlocks": 7421,
+          "collections": 27771,
+          "fibers": 703,
+          "resumes": 1204,
+          "stackMappings": 5,
+          "stackUnmappings": 5,
+          "peakReservedStackBytes": 5406720,
+          "reservedStackBytes": 0
+        },
+        {
+          "seconds": 0.057651,
+          "allocatedBlocks": 7421,
+          "reclaimedBlocks": 7421,
+          "collections": 27771,
+          "fibers": 703,
+          "resumes": 1204,
+          "stackMappings": 5,
+          "stackUnmappings": 5,
+          "peakReservedStackBytes": 5406720,
+          "reservedStackBytes": 0
+        },
+        {
+          "seconds": 0.063889,
+          "allocatedBlocks": 7421,
+          "reclaimedBlocks": 7421,
+          "collections": 27771,
+          "fibers": 703,
+          "resumes": 1204,
+          "stackMappings": 5,
+          "stackUnmappings": 5,
+          "peakReservedStackBytes": 5406720,
+          "reservedStackBytes": 0
+        },
+        {
+          "seconds": 0.063558,
+          "allocatedBlocks": 7421,
+          "reclaimedBlocks": 7421,
+          "collections": 27771,
+          "fibers": 703,
+          "resumes": 1204,
+          "stackMappings": 5,
+          "stackUnmappings": 5,
+          "peakReservedStackBytes": 5406720,
+          "reservedStackBytes": 0
+        }
+      ]
+    },
+    {
+      "case": "pending-100",
+      "round": 3,
+      "stackCacheLimit": 0,
+      "command": [
+        "/Users/robert/Projects/neoclr/target/runtime-stack-cache-off/pending-100-runtime"
+      ],
+      "invocations": [
+        {
+          "seconds": 0.121001,
+          "allocatedBlocks": 7421,
+          "reclaimedBlocks": 7421,
+          "collections": 27771,
+          "fibers": 703,
+          "resumes": 1204,
+          "stackMappings": 703,
+          "stackUnmappings": 703,
+          "peakReservedStackBytes": 5406720,
+          "reservedStackBytes": 0
+        },
+        {
+          "seconds": 0.13119,
+          "allocatedBlocks": 7421,
+          "reclaimedBlocks": 7421,
+          "collections": 27771,
+          "fibers": 703,
+          "resumes": 1204,
+          "stackMappings": 703,
+          "stackUnmappings": 703,
+          "peakReservedStackBytes": 5406720,
+          "reservedStackBytes": 0
+        },
+        {
+          "seconds": 0.11101,
+          "allocatedBlocks": 7421,
+          "reclaimedBlocks": 7421,
+          "collections": 27771,
+          "fibers": 703,
+          "resumes": 1204,
+          "stackMappings": 703,
+          "stackUnmappings": 703,
+          "peakReservedStackBytes": 5406720,
+          "reservedStackBytes": 0
+        },
+        {
+          "seconds": 0.114125,
+          "allocatedBlocks": 7421,
+          "reclaimedBlocks": 7421,
+          "collections": 27771,
+          "fibers": 703,
+          "resumes": 1204,
+          "stackMappings": 703,
+          "stackUnmappings": 703,
+          "peakReservedStackBytes": 5406720,
+          "reservedStackBytes": 0
+        }
+      ]
+    },
+    {
+      "case": "pending-100",
+      "round": 4,
+      "stackCacheLimit": 0,
+      "command": [
+        "/Users/robert/Projects/neoclr/target/runtime-stack-cache-off/pending-100-runtime"
+      ],
+      "invocations": [
+        {
+          "seconds": 0.11648,
+          "allocatedBlocks": 7421,
+          "reclaimedBlocks": 7421,
+          "collections": 27771,
+          "fibers": 703,
+          "resumes": 1204,
+          "stackMappings": 703,
+          "stackUnmappings": 703,
+          "peakReservedStackBytes": 5406720,
+          "reservedStackBytes": 0
+        },
+        {
+          "seconds": 0.109108,
+          "allocatedBlocks": 7421,
+          "reclaimedBlocks": 7421,
+          "collections": 27771,
+          "fibers": 703,
+          "resumes": 1204,
+          "stackMappings": 703,
+          "stackUnmappings": 703,
+          "peakReservedStackBytes": 5406720,
+          "reservedStackBytes": 0
+        },
+        {
+          "seconds": 0.112389,
+          "allocatedBlocks": 7421,
+          "reclaimedBlocks": 7421,
+          "collections": 27771,
+          "fibers": 703,
+          "resumes": 1204,
+          "stackMappings": 703,
+          "stackUnmappings": 703,
+          "peakReservedStackBytes": 5406720,
+          "reservedStackBytes": 0
+        },
+        {
+          "seconds": 0.106576,
+          "allocatedBlocks": 7421,
+          "reclaimedBlocks": 7421,
+          "collections": 27771,
+          "fibers": 703,
+          "resumes": 1204,
+          "stackMappings": 703,
+          "stackUnmappings": 703,
+          "peakReservedStackBytes": 5406720,
+          "reservedStackBytes": 0
+        }
+      ]
+    },
+    {
+      "case": "pending-100",
+      "round": 4,
+      "stackCacheLimit": 8,
+      "command": [
+        "/Users/robert/Projects/neoclr/target/runtime-stack-cache-on/pending-100-runtime"
+      ],
+      "invocations": [
+        {
+          "seconds": 0.059025,
+          "allocatedBlocks": 7421,
+          "reclaimedBlocks": 7421,
+          "collections": 27771,
+          "fibers": 703,
+          "resumes": 1204,
+          "stackMappings": 5,
+          "stackUnmappings": 5,
+          "peakReservedStackBytes": 5406720,
+          "reservedStackBytes": 0
+        },
+        {
+          "seconds": 0.058248,
+          "allocatedBlocks": 7421,
+          "reclaimedBlocks": 7421,
+          "collections": 27771,
+          "fibers": 703,
+          "resumes": 1204,
+          "stackMappings": 5,
+          "stackUnmappings": 5,
+          "peakReservedStackBytes": 5406720,
+          "reservedStackBytes": 0
+        },
+        {
+          "seconds": 0.058127,
+          "allocatedBlocks": 7421,
+          "reclaimedBlocks": 7421,
+          "collections": 27771,
+          "fibers": 703,
+          "resumes": 1204,
+          "stackMappings": 5,
+          "stackUnmappings": 5,
+          "peakReservedStackBytes": 5406720,
+          "reservedStackBytes": 0
+        },
+        {
+          "seconds": 0.058675,
+          "allocatedBlocks": 7421,
+          "reclaimedBlocks": 7421,
+          "collections": 27771,
+          "fibers": 703,
+          "resumes": 1204,
+          "stackMappings": 5,
+          "stackUnmappings": 5,
+          "peakReservedStackBytes": 5406720,
+          "reservedStackBytes": 0
+        }
+      ]
+    },
+    {
+      "case": "pending-100",
+      "round": 5,
+      "stackCacheLimit": 8,
+      "command": [
+        "/Users/robert/Projects/neoclr/target/runtime-stack-cache-on/pending-100-runtime"
+      ],
+      "invocations": [
+        {
+          "seconds": 0.05957,
+          "allocatedBlocks": 7421,
+          "reclaimedBlocks": 7421,
+          "collections": 27771,
+          "fibers": 703,
+          "resumes": 1204,
+          "stackMappings": 5,
+          "stackUnmappings": 5,
+          "peakReservedStackBytes": 5406720,
+          "reservedStackBytes": 0
+        },
+        {
+          "seconds": 0.057798,
+          "allocatedBlocks": 7421,
+          "reclaimedBlocks": 7421,
+          "collections": 27771,
+          "fibers": 703,
+          "resumes": 1204,
+          "stackMappings": 5,
+          "stackUnmappings": 5,
+          "peakReservedStackBytes": 5406720,
+          "reservedStackBytes": 0
+        },
+        {
+          "seconds": 0.05812,
+          "allocatedBlocks": 7421,
+          "reclaimedBlocks": 7421,
+          "collections": 27771,
+          "fibers": 703,
+          "resumes": 1204,
+          "stackMappings": 5,
+          "stackUnmappings": 5,
+          "peakReservedStackBytes": 5406720,
+          "reservedStackBytes": 0
+        },
+        {
+          "seconds": 0.058206,
+          "allocatedBlocks": 7421,
+          "reclaimedBlocks": 7421,
+          "collections": 27771,
+          "fibers": 703,
+          "resumes": 1204,
+          "stackMappings": 5,
+          "stackUnmappings": 5,
+          "peakReservedStackBytes": 5406720,
+          "reservedStackBytes": 0
+        }
+      ]
+    },
+    {
+      "case": "pending-100",
+      "round": 5,
+      "stackCacheLimit": 0,
+      "command": [
+        "/Users/robert/Projects/neoclr/target/runtime-stack-cache-off/pending-100-runtime"
+      ],
+      "invocations": [
+        {
+          "seconds": 0.10011,
+          "allocatedBlocks": 7421,
+          "reclaimedBlocks": 7421,
+          "collections": 27771,
+          "fibers": 703,
+          "resumes": 1204,
+          "stackMappings": 703,
+          "stackUnmappings": 703,
+          "peakReservedStackBytes": 5406720,
+          "reservedStackBytes": 0
+        },
+        {
+          "seconds": 0.104397,
+          "allocatedBlocks": 7421,
+          "reclaimedBlocks": 7421,
+          "collections": 27771,
+          "fibers": 703,
+          "resumes": 1204,
+          "stackMappings": 703,
+          "stackUnmappings": 703,
+          "peakReservedStackBytes": 5406720,
+          "reservedStackBytes": 0
+        },
+        {
+          "seconds": 0.099639,
+          "allocatedBlocks": 7421,
+          "reclaimedBlocks": 7421,
+          "collections": 27771,
+          "fibers": 703,
+          "resumes": 1204,
+          "stackMappings": 703,
+          "stackUnmappings": 703,
+          "peakReservedStackBytes": 5406720,
+          "reservedStackBytes": 0
+        },
+        {
+          "seconds": 0.105589,
+          "allocatedBlocks": 7421,
+          "reclaimedBlocks": 7421,
+          "collections": 27771,
+          "fibers": 703,
+          "resumes": 1204,
+          "stackMappings": 703,
+          "stackUnmappings": 703,
+          "peakReservedStackBytes": 5406720,
+          "reservedStackBytes": 0
+        }
+      ]
+    },
+    {
+      "case": "pending-100",
+      "round": 6,
+      "stackCacheLimit": 0,
+      "command": [
+        "/Users/robert/Projects/neoclr/target/runtime-stack-cache-off/pending-100-runtime"
+      ],
+      "invocations": [
+        {
+          "seconds": 0.104372,
+          "allocatedBlocks": 7421,
+          "reclaimedBlocks": 7421,
+          "collections": 27771,
+          "fibers": 703,
+          "resumes": 1204,
+          "stackMappings": 703,
+          "stackUnmappings": 703,
+          "peakReservedStackBytes": 5406720,
+          "reservedStackBytes": 0
+        },
+        {
+          "seconds": 0.104488,
+          "allocatedBlocks": 7421,
+          "reclaimedBlocks": 7421,
+          "collections": 27771,
+          "fibers": 703,
+          "resumes": 1204,
+          "stackMappings": 703,
+          "stackUnmappings": 703,
+          "peakReservedStackBytes": 5406720,
+          "reservedStackBytes": 0
+        },
+        {
+          "seconds": 0.105487,
+          "allocatedBlocks": 7421,
+          "reclaimedBlocks": 7421,
+          "collections": 27771,
+          "fibers": 703,
+          "resumes": 1204,
+          "stackMappings": 703,
+          "stackUnmappings": 703,
+          "peakReservedStackBytes": 5406720,
+          "reservedStackBytes": 0
+        },
+        {
+          "seconds": 0.108693,
+          "allocatedBlocks": 7421,
+          "reclaimedBlocks": 7421,
+          "collections": 27771,
+          "fibers": 703,
+          "resumes": 1204,
+          "stackMappings": 703,
+          "stackUnmappings": 703,
+          "peakReservedStackBytes": 5406720,
+          "reservedStackBytes": 0
+        }
+      ]
+    },
+    {
+      "case": "pending-100",
+      "round": 6,
+      "stackCacheLimit": 8,
+      "command": [
+        "/Users/robert/Projects/neoclr/target/runtime-stack-cache-on/pending-100-runtime"
+      ],
+      "invocations": [
+        {
+          "seconds": 0.058841,
+          "allocatedBlocks": 7421,
+          "reclaimedBlocks": 7421,
+          "collections": 27771,
+          "fibers": 703,
+          "resumes": 1204,
+          "stackMappings": 5,
+          "stackUnmappings": 5,
+          "peakReservedStackBytes": 5406720,
+          "reservedStackBytes": 0
+        },
+        {
+          "seconds": 0.058091,
+          "allocatedBlocks": 7421,
+          "reclaimedBlocks": 7421,
+          "collections": 27771,
+          "fibers": 703,
+          "resumes": 1204,
+          "stackMappings": 5,
+          "stackUnmappings": 5,
+          "peakReservedStackBytes": 5406720,
+          "reservedStackBytes": 0
+        },
+        {
+          "seconds": 0.058492,
+          "allocatedBlocks": 7421,
+          "reclaimedBlocks": 7421,
+          "collections": 27771,
+          "fibers": 703,
+          "resumes": 1204,
+          "stackMappings": 5,
+          "stackUnmappings": 5,
+          "peakReservedStackBytes": 5406720,
+          "reservedStackBytes": 0
+        },
+        {
+          "seconds": 0.058288,
+          "allocatedBlocks": 7421,
+          "reclaimedBlocks": 7421,
+          "collections": 27771,
+          "fibers": 703,
+          "resumes": 1204,
+          "stackMappings": 5,
+          "stackUnmappings": 5,
+          "peakReservedStackBytes": 5406720,
+          "reservedStackBytes": 0
+        }
+      ]
+    },
+    {
+      "case": "pending-100",
+      "round": 7,
+      "stackCacheLimit": 8,
+      "command": [
+        "/Users/robert/Projects/neoclr/target/runtime-stack-cache-on/pending-100-runtime"
+      ],
+      "invocations": [
+        {
+          "seconds": 0.06034,
+          "allocatedBlocks": 7421,
+          "reclaimedBlocks": 7421,
+          "collections": 27771,
+          "fibers": 703,
+          "resumes": 1204,
+          "stackMappings": 5,
+          "stackUnmappings": 5,
+          "peakReservedStackBytes": 5406720,
+          "reservedStackBytes": 0
+        },
+        {
+          "seconds": 0.058007,
+          "allocatedBlocks": 7421,
+          "reclaimedBlocks": 7421,
+          "collections": 27771,
+          "fibers": 703,
+          "resumes": 1204,
+          "stackMappings": 5,
+          "stackUnmappings": 5,
+          "peakReservedStackBytes": 5406720,
+          "reservedStackBytes": 0
+        },
+        {
+          "seconds": 0.057785,
+          "allocatedBlocks": 7421,
+          "reclaimedBlocks": 7421,
+          "collections": 27771,
+          "fibers": 703,
+          "resumes": 1204,
+          "stackMappings": 5,
+          "stackUnmappings": 5,
+          "peakReservedStackBytes": 5406720,
+          "reservedStackBytes": 0
+        },
+        {
+          "seconds": 0.058329,
+          "allocatedBlocks": 7421,
+          "reclaimedBlocks": 7421,
+          "collections": 27771,
+          "fibers": 703,
+          "resumes": 1204,
+          "stackMappings": 5,
+          "stackUnmappings": 5,
+          "peakReservedStackBytes": 5406720,
+          "reservedStackBytes": 0
+        }
+      ]
+    },
+    {
+      "case": "pending-100",
+      "round": 7,
+      "stackCacheLimit": 0,
+      "command": [
+        "/Users/robert/Projects/neoclr/target/runtime-stack-cache-off/pending-100-runtime"
+      ],
+      "invocations": [
+        {
+          "seconds": 0.110327,
+          "allocatedBlocks": 7421,
+          "reclaimedBlocks": 7421,
+          "collections": 27771,
+          "fibers": 703,
+          "resumes": 1204,
+          "stackMappings": 703,
+          "stackUnmappings": 703,
+          "peakReservedStackBytes": 5406720,
+          "reservedStackBytes": 0
+        },
+        {
+          "seconds": 0.12249,
+          "allocatedBlocks": 7421,
+          "reclaimedBlocks": 7421,
+          "collections": 27771,
+          "fibers": 703,
+          "resumes": 1204,
+          "stackMappings": 703,
+          "stackUnmappings": 703,
+          "peakReservedStackBytes": 5406720,
+          "reservedStackBytes": 0
+        },
+        {
+          "seconds": 0.110934,
+          "allocatedBlocks": 7421,
+          "reclaimedBlocks": 7421,
+          "collections": 27771,
+          "fibers": 703,
+          "resumes": 1204,
+          "stackMappings": 703,
+          "stackUnmappings": 703,
+          "peakReservedStackBytes": 5406720,
+          "reservedStackBytes": 0
+        },
+        {
+          "seconds": 0.120431,
+          "allocatedBlocks": 7421,
+          "reclaimedBlocks": 7421,
+          "collections": 27771,
+          "fibers": 703,
+          "resumes": 1204,
+          "stackMappings": 703,
+          "stackUnmappings": 703,
+          "peakReservedStackBytes": 5406720,
+          "reservedStackBytes": 0
+        }
+      ]
+    }
+  ],
+  "summaries": [
+    {
+      "case": "completed-100",
+      "0": {
+        "median": 0.032207,
+        "minimum": 0.030372,
+        "maximum": 0.038052
+      },
+      "8": {
+        "median": 0.018901,
+        "minimum": 0.018302,
+        "maximum": 0.01988
+      },
+      "cachedOverUncached": 0.586859999379017
+    },
+    {
+      "case": "pending-100",
+      "0": {
+        "median": 0.1060825,
+        "minimum": 0.098652,
+        "maximum": 0.13119
+      },
+      "8": {
+        "median": 0.058166499999999996,
+        "minimum": 0.05749,
+        "maximum": 0.063889
+      },
+      "cachedOverUncached": 0.5483138123630193
+    }
+  ],
+  "runnerSha256": "d1e5f32f6bb4e6173bb5b323cec688f60aecc4cc0c3f2ab2d522f2e20929508d",
+  "inputsSha256": {
+    "target/runtime-stack-cache-off/results.json": "83a42cf1526a588dafc572207a6c1916e9f23f83e49778d71d1b9ce072f029fb",
+    "target/runtime-stack-cache-on/results.json": "0539824928d5c5bbe7b3dcba599621c60b62bbb6054b92fce0adc1c5a8418541",
+    "/Users/robert/Projects/neoclr/target/runtime-stack-cache-off/completed-100-runtime": "8f28295c1c7f7d0ac5969b29db953fd16376b5fe73d81790ac368a17dc8a9b9e",
+    "/Users/robert/Projects/neoclr/target/runtime-stack-cache-on/completed-100-runtime": "102db874d1c6b9bc6bfaaea4f978ada532db2f0a56f1eca795295180fd1e6d4f",
+    "/Users/robert/Projects/neoclr/target/runtime-stack-cache-off/pending-100-runtime": "27ecd4d5a000476187b45d2eee3c90e1564dcbb694cfd80971b05a2653af4912",
+    "/Users/robert/Projects/neoclr/target/runtime-stack-cache-on/pending-100-runtime": "cb6782b60048fa91fdf96d0f5fde735069332d77fa6797194d1e9cbd0da86e89"
+  }
+}

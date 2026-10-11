@@ -78,8 +78,12 @@ parked-stack GC roots and terminal teardown. Windows and a production stack carr
 remain open, as do native Task.Run and full library migration. A
 [matched three-mode benchmark](experiments/runtime-async/README.md#matched-interpreter-jit-and-aot-measurement--2026-10-11)
 now measures both lowerings: interpreter invocation time improves, but the native
-POC is slower than state machines. Profile carrier/notification/GC costs and measure
-retained stack memory before treating this as production performance qualification.
+POC is slower than state machines. [Bounded stack reuse](experiments/runtime-async/README.md#bounded-native-stack-reuse--2026-10-11)
+now cuts about 41–45% from the uncached AOT microbenchmark time and records reserved
+stack bytes with zero reservation after teardown. Native suspension remains slower
+than state machines; context-switch/notification/GC costs and resident memory remain
+open. The author next directs fixing the compiler's await-in-for restriction;
+qualify cancellation and iterator disposal in both async lowerings.
 Retain cancellation, terminal Fault, GC and benchmark checks. Broaden
 platform coverage and measure costs before considering defaults. This is explicit
 POC support, not a default-mode or native build-kit change. General native interoperability, runtime interface recognition,

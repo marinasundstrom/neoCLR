@@ -15201,3 +15201,20 @@ or runtime-await default switch was performed.
   selecting an optimization. These measurements do not isolate the bottleneck,
   measure retained stack memory, or justify changing defaults. Windows and the
   production carrier remain open; no new author design decision is inferred.
+
+
+### 2026-10-11 — Stack reuse measurement and await-in-for follow-up
+
+- Assistant action following continuation: added bounded invocation-local reuse of
+  completed guarded stacks, mapping/reservation counters and an alternating AOT
+  comparison. At 100 operations the paired run measures about 41% less time for
+  completed awaits and 45% less for pending awaits; all benchmark invocations reclaim
+  managed allocations and stack reservations. Native suspension still trails state
+  machines. [Method and limits](experiments/runtime-async/README.md#bounded-native-stack-reuse--2026-10-11).
+- Qualification exposed the existing RAV2712 rejection of await inside for loops.
+  The assistant temporarily used indexed iteration in the stack-lifetime consumer
+  and identified iterator cleanup under cancellation as the compiler gate.
+- Author: “What's the compiler's restrictions for await in for loops? shouldn't we
+  fix that?” The assistant agreed to finish this runtime slice, then fix and qualify
+  normal completion, cancellation and early exits in both async lowerings. That
+  compiler follow-up is required work, not a permanent language restriction.

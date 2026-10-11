@@ -1,0 +1,53 @@
+module RuntimeStackReuse
+
+import System.*
+import System.Collections.*
+import System.Tasks.*
+
+class Payload {
+    val Value: int
+    init(value: int) {
+        Value = value
+    }
+}
+
+async func Read(input: Task<int>) -> Task<int> {
+    let retained = Payload(17)
+    let value = await input
+    System.Runtime.GC.Collect()
+    return retained.Value + value
+}
+
+async func Main() -> Task<int> {
+    var round = 0
+    while round < 3 {
+        let source = Promise<int>()
+        let readers = ArrayList<Task<int>>()
+        var index = 0
+        while index < 24 {
+            let reader = Read(source.Task)
+            if reader.IsCompleted {
+                System.Fail("Reader did not suspend")
+            }
+            readers.Add(reader)
+            index = index + 1
+        }
+        System.Runtime.GC.Collect()
+        _ = source.Complete(25)
+        var sum = 0
+        // RAV2712 still rejects await inside for, including retained-body mode.
+        // Use explicit indexing until suspension-aware for cleanup is qualified.
+        index = 0
+        while index < 24 {
+            let value = await readers[index]
+            sum = sum + value
+            index = index + 1
+        }
+        if sum != 24 * 42 {
+            System.Fail("Stack reuse lost a retained object or result")
+        }
+        round = round + 1
+    }
+    Console.WriteLine("PASS retained stack cache overflow and reuse")
+    return 0
+}

@@ -931,3 +931,79 @@ not an attribution of the measured slowdown. GC collection frequency is recorded
 as another candidate. Measure these components and peak retained stack bytes before
 choosing pooling, fast paths or a replacement carrier. The canonical runtime-async
 direction remains intact, but the present native POC has not met the improvement gate.
+
+## Bounded native stack reuse — 2026-10-11
+
+The next experiment isolates stack-mapping churn. The private carrier caches up to
+8 completed guarded stack mappings **within one invocation**. A completed fiber's
+callback root and parked root chain are released before its mapping enters the cache;
+the machine context, operation and callback identity are cleared. Reuse initializes a
+fresh context and preserves guard pages. Excess mappings are unmapped immediately.
+Normal and terminal-Fault shutdown unmap both cached and active stacks before code
+can unload. No mapping survives into the next invocation.
+
+This does not change managed Task/Promise semantics or the comparison with .NET
+compiler-generated state machines described above. It is a bounded implementation
+experiment in the existing deprecated macOS carrier, not a production stack-pool API.
+Immediate unmapping remains available as the measurement baseline. The tradeoff is
+keeping otherwise-idle stack address space and touched pages until shutdown; eight
+cached 1 MiB stacks can retain 8 MiB plus guard pages. Reserved bytes are not RSS.
+
+Run `benchmark_modes.py` twice with distinct output directories and respectively
+`--stack-cache-limit 0` and `--stack-cache-limit 8`. Both configurations use identical
+instrumentation and source. Private counters report fiber starts, resumes, mappings,
+unmappings and reserved stack bytes. `peakReservedStackBytes` is the **thread's
+high-water mark across process invocations**, including guards and cached stacks;
+`reservedStackBytes` must be zero after every invocation. The managed allocation
+counters still exclude stack memory. These counters and the paired experiment
+isolate mapping reuse; they do not provide a sampled CPU profile or RSS measurement.
+
+`RuntimeStackReuse.rvn` starts 24 readers before completing their shared input, checks
+retained objects after collection, then repeats the wave three times. Qualification
+also repeats this consumer across four invocations in one process and retains HTTP,
+cancellation, scoped cleanup and terminal-Fault coverage.
+
+On the same Apple M1 host, [cache-off](stack-cache-off-benchmark.json) and
+[cache-on](stack-cache-on-benchmark.json) each pass 192 invocations across interpreter,
+JIT and AOT. For 100 operations, native mapping counts drop from **202 to 3**
+(completed) and **703 to 5** (pending). Fiber/resume counts, managed allocations,
+collection counts and peak reserved bytes are identical across the variants.
+Completed/pending peaks are 3,244,032 / 5,406,720 reserved bytes, including guards;
+every invocation ends with zero reserved stack bytes. This workload does not
+exercise the worst-case idle-retention cost of the cache.
+
+An additional [alternating AOT comparison](stack-cache-paired-benchmark.json) runs
+eight rounds in reversed order, four invocations per process, dropping the first.
+That gives 24 measured samples per workload/configuration and 128 teardown checks:
+
+| 100-operation workload | Cache off median | Cache on median | Time reduction |
+|---|---:|---:|---:|
+| Completed awaits | 32.21 ms | 18.90 ms | 41.3% |
+| Pending awaits | 106.08 ms | 58.17 ms | 45.2% |
+
+```sh
+python3 docs/experiments/runtime-async/compare_stack_cache.py \
+  --without-cache target/runtime-stack-cache-off/results.json \
+  --with-cache target/runtime-stack-cache-on/results.json \
+  --output target/runtime-stack-cache-paired.json
+```
+
+The fresh three-mode run puts cached runtime suspension at about **1.31–1.91×**
+native state-machine time for 100 operations. This narrows the gap; it does not
+meet the improvement gate over state machines. These remain local microbenchmarks,
+not HTTP throughput or a claim about .NET performance. The paired comparison
+supports keeping bounded mapping reuse in this POC. Profiling context switches,
+notification adapters and GC costs remains the next performance investigation;
+a maintained carrier, Windows and resident-memory measurements remain open.
+
+The new fan-out consumer initially hit existing compiler diagnostic RAV2712 for
+await inside `for`. This slice uses explicit indexed iteration to isolate stack
+reuse. The author explicitly requests fixing that restriction next, with cancellation
+and iterator-disposal qualification in both async lowerings; it is not a platform
+semantic rule or an accepted permanent workaround.
+
+[Cache-enabled qualification](stack-cache-validation.json) passes 24 JIT/AOT cases,
+including both HTTP projects, timeout/cancellation/protocol recovery, terminal Fault,
+retained-object fan-out and native GC/stack contracts. The fan-out consumer also passes
+four consecutive invocations using the same native host heap. Existing guards and
+root/operation teardown checks remain enforced.

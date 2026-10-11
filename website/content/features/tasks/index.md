@@ -292,8 +292,10 @@ measures lower execution time but more allocated objects in bounded nested-await
 workloads ([results and limitations](https://github.com/marinasundstrom/neoCLR/blob/main/docs/experiments/runtime-async/README.md#matched-language-benchmark--2026-10-11)).
 A [matched three-mode microbenchmark](https://github.com/marinasundstrom/neoCLR/blob/main/docs/experiments/runtime-async/README.md#matched-interpreter-jit-and-aot-measurement--2026-10-11)
 now also measures native suspension. The current native POC is slower than its
-state-machine baseline; production carrier optimization and retained-byte
-measurements remain open. A matched pending-await comparison also measures
+state-machine baseline. Bounded invocation-local stack reuse now reduces mapping
+churn and records reserved bytes, with zero reservation after teardown
+([measurement](https://github.com/marinasundstrom/neoCLR/blob/main/docs/experiments/runtime-async/README.md#bounded-native-stack-reuse--2026-10-11)).
+Production carrier optimization and resident-memory measurements remain open. A matched pending-await comparison also measures
 direct versus captured invocation registrations. These exploratory runs do not
 establish a general performance improvement.
 

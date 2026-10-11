@@ -16,6 +16,7 @@ p.add_argument('--recipe', type=Path, required=True)
 p.add_argument('--qualification', type=Path, default=HERE / 'native-validation.json')
 p.add_argument('--host', type=Path, required=True, help='runtime_async_interpreter release host')
 p.add_argument('--output', type=Path, required=True)
+p.add_argument('--stack-cache-limit', type=int, choices=range(129), default=8)
 a = p.parse_args()
 if platform.system() != 'Darwin' or platform.machine() != 'arm64':
     p.error('requires macOS ARM64 carrier')
@@ -29,10 +30,11 @@ base = r['commands'][0]['command']
 bundle = Path(base[base.index('--core-reference') + 1]).parent.parent
 commands = [item['command'] for item in q['commands']]
 link = next(c.copy() for c in commands if '-dynamiclib' in c)
+link.append(f'-DNEOCLR_ASYNC_STACK_CACHE_LIMIT={a.stack_cache_limit}')
 compile_native = next(c.copy() for c in commands if '--closed-world' in c and '--jit-run' not in c)
 report = dict(passed=False, platform=platform.platform(),
               processor=subprocess.check_output(['sysctl', '-n', 'machdep.cpu.brand_string'], text=True).strip(),
-              repetitions=4, rounds=2,
+              repetitions=4, rounds=2, stackCacheLimit=a.stack_cache_limit,
               measurement='fresh invocation including heap/scope teardown; load and compilation excluded',
               nativeAllocationUnit='GC blocks, excluding retained native stacks; not interpreter object counts',
               discardedWarmupsPerProcess=1, inputsSha256={}, commands=[], runs=[], summaries=[])
@@ -103,7 +105,7 @@ try:
                             data = json.loads(result.stdout)
                             samples = data['runs']
                             phases['prepareSeconds'] = data['prepareSeconds']
-                            if result.stderr or any(s['liveObjects'] for s in samples):
+                            if result.stderr or any(s['liveObjects'] or s['stdout'] for s in samples):
                                 raise RuntimeError('interpreter retained objects or diagnostics')
                         else:
                             lines = result.stderr.splitlines()

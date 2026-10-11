@@ -158,6 +158,7 @@ def main():
             ('language', HERE / 'RuntimeAwait.rvn'), ('use', HERE / 'RuntimeUse.rvn'),
             ('contract', HERE / 'RuntimeNativeContract.rvn'),
             ('stress', HERE / 'RuntimeAwaitBenchmark.rvn'),
+            ('stack-reuse', HERE / 'RuntimeStackReuse.rvn'),
             ('fault', HERE / 'RuntimeAwaitFault.rvn'), ('lifecycle', HERE / 'RuntimeHttpLifecycle.rvn'),
             ('client', ROOT / 'docs/experiments/native-http-client/Client.rvn'),
             ('server', ROOT / 'docs/experiments/http-server/Server.rvn'),
@@ -197,7 +198,7 @@ def main():
                 row = run(interpreted, 'contract-interpreter')
                 if row['stdout'].strip() != 'PASS runtime async operation lifetime contract' or row['stderr']:
                     raise RuntimeError('Interpreter lifetime contract differs')
-            if name in ('language', 'use'):
+            if name in ('language', 'use', 'stack-reuse'):
                 repeated = out / (name + '-repeat')
                 repeat_link = [str(repeated) if x == str(app) else x for x in app_link]
                 run([*repeat_link, '-DNEOCLR_HTTP_INVOCATIONS=4'], name + '-repeat-link')
@@ -208,7 +209,7 @@ def main():
             def invocation(name, arguments=()):
                 command = report['applications'][name][mode]
                 return command + (list(arguments) if mode == 'aot' else [x for a in arguments for x in ['--jit-entry-argument', a]])
-            for name in ('language', 'use', 'contract', 'stress', 'fault'):
+            for name in ('language', 'use', 'contract', 'stress', 'stack-reuse', 'fault'):
                 row = run(invocation(name), mode + '-' + name, expected=1 if name == 'fault' else 0)
                 good = not row['stdout'] and not row['stderr'] if name == 'stress' else ('UserFault: runtime async sample terminal fault' in row['stderr'] and not row['stdout'] if name == 'fault' else row['stdout'].startswith('PASS ') and not row['stderr'])
                 report['cases'].append(dict(mode=mode, case=name, passed=good))

@@ -15,17 +15,26 @@ int32_t neoclr_jit_run_v1(const void *entry, int32_t with_args,
                          int32_t argc, const entry_char **argv) {
     for (int i = 0; i < 4; ++i) {
         neoclr_gc_statistics before = neoclr_gc_statistics_v1();
+        neoclr_async_statistics stacks_before = neoclr_runtime_async_statistics_v1();
         double start = seconds();
         int32_t status = neoclr_benchmark_run_once(entry, with_args, argc, argv);
         double elapsed = seconds() - start;
         neoclr_gc_statistics after = neoclr_gc_statistics_v1();
         if (status) return status;
+        neoclr_async_statistics stacks = neoclr_runtime_async_statistics_v1();
+        if (stacks.reserved_bytes) abort();
         uint64_t allocated = after.allocations - before.allocations;
         uint64_t reclaimed = after.reclaimed_allocations - before.reclaimed_allocations;
         if (allocated != reclaimed) abort();
         fprintf(stderr, "NATIVE_SAMPLE {\"seconds\":%.9f,\"allocatedBlocks\":%" PRIu64
-                ",\"reclaimedBlocks\":%" PRIu64 ",\"collections\":%" PRIu64 "}\n",
-                elapsed, allocated, reclaimed, after.collections - before.collections);
+                ",\"reclaimedBlocks\":%" PRIu64 ",\"collections\":%" PRIu64
+                ",\"fibers\":%" PRIu64 ",\"resumes\":%" PRIu64
+                ",\"stackMappings\":%" PRIu64 ",\"stackUnmappings\":%" PRIu64
+                ",\"peakReservedStackBytes\":%" PRIu64 ",\"reservedStackBytes\":%" PRIu64 "}\n",
+                elapsed, allocated, reclaimed, after.collections - before.collections,
+                stacks.fibers - stacks_before.fibers, stacks.resumes - stacks_before.resumes,
+                stacks.mappings - stacks_before.mappings, stacks.unmappings - stacks_before.unmappings,
+                stacks.peak_reserved_bytes, stacks.reserved_bytes);
     }
     return 0;
 }

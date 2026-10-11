@@ -8,6 +8,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-11
 
+- Bound native runtime-async stack reuse to eight idle guarded mappings per
+  invocation; release cached and active stacks at normal or terminal-Fault teardown.
+  Add private mapping/reservation diagnostics, alternating cache-on/off benchmarks
+  and a retained-object fan-out consumer that exceeds the cache bound. This remains
+  macOS ARM64 POC support, with a memory-retention tradeoff and unchanged defaults.
+
 - Add a matched runtime-suspension/state-machine benchmark across interpreter, JIT
   and AOT, with shared native invocation timing, separate startup/JIT phases,
   allocation/reclamation checks and reproducible input hashes. Record the native

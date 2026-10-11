@@ -15,6 +15,20 @@
 #endif
 #define LIMIT 128
 #define STACK_BYTES (1024u * 1024u)
+#ifndef NEOCLR_ASYNC_STACK_CACHE_LIMIT
+#define NEOCLR_ASYNC_STACK_CACHE_LIMIT 8
+#endif
+#if NEOCLR_ASYNC_STACK_CACHE_LIMIT < 0 || NEOCLR_ASYNC_STACK_CACHE_LIMIT > LIMIT
+#error "invalid experimental stack cache bound"
+#endif
+typedef struct { void *mapping; size_t bytes; uintptr_t lower; } cached_stack;
+static _Thread_local neoclr_async_statistics statistics;
+neoclr_async_statistics neoclr_runtime_async_statistics_v1(void) { return statistics; }
+static void unmap_stack(void *mapping, size_t bytes) {
+    if (munmap(mapping, bytes)) abort();
+    ++statistics.unmappings;
+    statistics.reserved_bytes -= bytes;
+}
 typedef struct { uint64_t id; int complete, body; } operation;
 typedef struct fiber {
     ucontext_t machine;
@@ -33,6 +47,8 @@ static _Thread_local struct {
     operation operations[LIMIT];
     fiber fibers[LIMIT];
     fiber *current;
+    cached_stack cache[NEOCLR_ASYNC_STACK_CACHE_LIMIT + 1];
+    unsigned cached;
     int pumping;
 } state;
 static _Thread_local uint64_t next_id;
@@ -73,24 +89,41 @@ static fiber *allocate_fiber(uint64_t callback, uint64_t op, int drain) {
     for (unsigned i = 0; i < LIMIT; ++i)
         if (!state.fibers[i].mapping) { f = &state.fibers[i]; break; }
     if (!f) return NULL;
-    size_t page = (size_t)sysconf(_SC_PAGESIZE);
-    size_t bytes = STACK_BYTES + 2 * page;
-    void *mapping = mmap(NULL, bytes, PROT_NONE, MAP_PRIVATE | MAP_ANON, -1, 0);
-    if (mapping == MAP_FAILED) return NULL;
-    void *stack = (char *)mapping + page;
-    if (mprotect(stack, STACK_BYTES, PROT_READ | PROT_WRITE)) { munmap(mapping, bytes); return NULL; }
+    cached_stack stack;
+    if (state.cached) {
+        stack = state.cache[--state.cached];
+        memset(&state.cache[state.cached], 0, sizeof(stack));
+    } else {
+        long page_size = sysconf(_SC_PAGESIZE);
+        if (page_size <= 0) return NULL;
+        size_t bytes = STACK_BYTES + 2 * (size_t)page_size;
+        void *mapping = mmap(NULL, bytes, PROT_NONE, MAP_PRIVATE | MAP_ANON, -1, 0);
+        if (mapping == MAP_FAILED) return NULL;
+        ++statistics.mappings;
+        statistics.reserved_bytes += bytes;
+        if (statistics.reserved_bytes > statistics.peak_reserved_bytes)
+            statistics.peak_reserved_bytes = statistics.reserved_bytes;
+        void *lower = (char *)mapping + page_size;
+        if (mprotect(lower, STACK_BYTES, PROT_READ | PROT_WRITE)) {
+            unmap_stack(mapping, bytes);
+            return NULL;
+        }
+        stack = (cached_stack){mapping, bytes, (uintptr_t)lower};
+    }
     memset(f, 0, sizeof(*f));
-    f->mapping = mapping; f->mapping_bytes = bytes;
-    f->lower = (uintptr_t)stack; f->upper = f->lower + STACK_BYTES;
+    f->mapping = stack.mapping; f->mapping_bytes = stack.bytes;
+    f->lower = stack.lower; f->upper = f->lower + STACK_BYTES;
+    ++statistics.fibers;
     f->callback = callback; f->operation = op; f->drain = drain;
     if (getcontext(&f->machine)) abort();
-    f->machine.uc_stack.ss_sp = stack;
+    f->machine.uc_stack.ss_sp = (void *)f->lower;
     f->machine.uc_stack.ss_size = STACK_BYTES;
     f->machine.uc_link = NULL;
     makecontext(&f->machine, body, 0);
     return f;
 }
 static int resume(fiber *f) {
+    ++statistics.resumes;
     ucontext_t caller;
     neoclr_parked_roots caller_roots = {0};
     fiber *parent = state.current;
@@ -106,7 +139,14 @@ static int resume(fiber *f) {
     int status = f->status;
     if (f->done) {
         neoclr_roots_discard_v1(&f->roots);
-        if (munmap(f->mapping, f->mapping_bytes)) abort();
+        /* The callback root and parked root chain have ended. Cache only the
+         * raw guarded mapping, never a machine context or managed ownership. */
+#if NEOCLR_ASYNC_STACK_CACHE_LIMIT > 0
+        if (state.cached < NEOCLR_ASYNC_STACK_CACHE_LIMIT)
+            state.cache[state.cached++] = (cached_stack){f->mapping, f->mapping_bytes, f->lower};
+        else
+#endif
+            unmap_stack(f->mapping, f->mapping_bytes);
         memset(f, 0, sizeof(*f));
     }
     return status;
@@ -240,10 +280,13 @@ int32_t neoclr_runtime_async_shutdown_v1(neoclr_aot_context *c) {
             leaked = 1;
             if (f->parked) neoclr_roots_discard_v1(&f->roots);
             if (f->callback && neoclr_gc_host_root_release_v1(c, f->callback)) abort();
-            if (munmap(f->mapping, f->mapping_bytes)) abort();
+            unmap_stack(f->mapping, f->mapping_bytes);
         }
         leaked |= state.operations[i].id != 0;
     }
+    for (unsigned i = 0; i < state.cached; ++i)
+        unmap_stack(state.cache[i].mapping, state.cache[i].bytes);
+    if (statistics.reserved_bytes) abort();
     memset(&state, 0, sizeof(state));
     bounds(NULL);
     return leaked && !c->fault.code ? 3 : 0;
