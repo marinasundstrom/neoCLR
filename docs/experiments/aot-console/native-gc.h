@@ -51,6 +51,16 @@ typedef struct {
 } neoclr_gc_conditional_root;
 int32_t neoclr_gc_collect_conditional_v1(neoclr_aot_context *,
     const neoclr_probe_frame *, neoclr_gc_conditional_root *, uint32_t);
+/* Private conditional parked-stack registration. Park the active chain only if
+ * all frames belong to context and owner is a nonnull live allocation base.
+ * Record and frames remain native caller-owned until resume/discard; no collection
+ * or allocation here. Failure preserves both the record and active chain.
+ * Every collection traces these frames only after the owner becomes reachable.
+ * On expiration, the collector clears head/owner and sets expired before sweeping.
+ * Expired records cannot resume and still block entry reset until discarded.
+ * No cleanup callback runs: the caller must discard and release native resources.
+ * This neither weakens host callback handles nor changes ordinary parked stacks. */
+int32_t neoclr_gc_roots_park_owned_v1(neoclr_aot_context *, void *, neoclr_parked_roots *);
 /* Thread-local cumulative diagnostics across contexts/entries, not heap state. */
 neoclr_gc_statistics neoclr_gc_statistics_v1(void);
 /* Per-entry strong String pool: 4096 entries / 1 MiB UTF-8 payload, matching

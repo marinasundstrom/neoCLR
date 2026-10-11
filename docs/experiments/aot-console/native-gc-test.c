@@ -105,6 +105,100 @@ static int conditional_roots(void) {
     CHECK(!neoclr_gc_collect_v1(&foreign, NULL) && !foreign.text.used);
     return 0;
 }
+static int owned_parked_roots(void) {
+    uint64_t storage[256] = {0}, foreign_storage[64] = {0};
+    neoclr_aot_context c = {.text = {(unsigned char *)storage, sizeof(storage), 0}};
+    neoclr_aot_context foreign = {.text = {(unsigned char *)foreign_storage, sizeof(foreign_storage), 0}};
+    uint64_t *owner = allocate(&c, 16, NEOCLR_GC_OBJECT);
+    uint64_t *value = allocate(&c, 16, NEOCLR_GC_OBJECT);
+    uint64_t *alien = allocate(&foreign, 16, NEOCLR_GC_OBJECT);
+    CHECK(owner && value && alien);
+    value[1] = (uintptr_t)owner; /* A suspended stack's back reference cannot root itself. */
+    neoclr_probe_storage slots[] = {{&value, 8, 0}};
+    neoclr_probe_frame suspended, active, foreign_frame;
+    neoclr_parked_roots parked = {0};
+    neoclr_probe_enter_v3(&suspended, &c, 1, slots, 1, "{}", 2);
+    CHECK(neoclr_gc_roots_park_owned_v1(&c, NULL, &parked) == 3);
+    CHECK(neoclr_gc_roots_park_owned_v1(&c, alien, &parked) == 3);
+    CHECK(neoclr_gc_roots_park_owned_v1(&c, owner + 1, &parked) == 3);
+    neoclr_probe_enter_v3(&foreign_frame, &foreign, 2, slots, 0, "{}", 2);
+    CHECK(neoclr_gc_roots_park_owned_v1(&c, owner, &parked) == 3);
+    CHECK(neoclr_root_probe_head_v1() == &foreign_frame && !parked.owner_context);
+    neoclr_probe_leave_v1(&foreign_frame);
+    CHECK(!neoclr_gc_roots_park_owned_v1(&c, owner, &parked));
+    CHECK(!neoclr_root_probe_head_v1() && !neoclr_root_probe_depth_v1());
+    CHECK(neoclr_gc_roots_park_owned_v1(&c, owner, &parked) == 3);
+    CHECK(!neoclr_gc_collect_v1(&foreign, NULL) && !parked.expired);
+
+    void *root = owner;
+    neoclr_probe_storage active_slot = {&root, 8, 0};
+    neoclr_probe_enter_v3(&active, &c, 3, &active_slot, 1, "{}", 2);
+    uint64_t empty = 0;
+    const char *plan = "{\"requiredSpillLanes\":[]}";
+    /* Exercise the real automatic compiler snapshot collection path. */
+    neoclr_probe_stack_roots_v2(&active, 0, &empty, 0, plan, 25);
+    CHECK(!parked.expired && value[1] == (uintptr_t)owner);
+    neoclr_probe_leave_v1(&active);
+    neoclr_roots_resume_v1(&parked);
+    CHECK(neoclr_root_probe_head_v1() == &suspended && !parked.owner_context);
+    CHECK(!neoclr_gc_roots_park_owned_v1(&c, owner, &parked));
+    root = NULL;
+    neoclr_probe_enter_v3(&active, &c, 3, &active_slot, 1, "{}", 2);
+    neoclr_probe_stack_roots_v2(&active, 1, &empty, 0, plan, 25);
+    CHECK(parked.expired && !parked.owner && !parked.head && !c.text.used);
+    neoclr_probe_leave_v1(&active);
+    CHECK(neoclr_gc_entry_check_v1(&c) == 3);
+    CHECK(neoclr_gc_owned_roots_check_v1(&c, NULL, 0) == 3);
+    CHECK(allocate(&c, 16, NEOCLR_GC_OBJECT) == owner);
+    CHECK(!neoclr_gc_collect_v1(&c, NULL) && !c.text.used && parked.expired);
+    neoclr_roots_discard_v1(&parked);
+    CHECK(!parked.expired && !parked.owner_context && !neoclr_gc_entry_check_v1(&c));
+
+    /* A conditional edge activates one stack; that stack discovers the owner
+     * of another. Register in reverse dependency order to require a fixed point. */
+    void *a = allocate(&c, 16, NEOCLR_GC_OBJECT);
+    void *b = allocate(&c, 16, NEOCLR_GC_OBJECT);
+    void *key = allocate(&c, 16, NEOCLR_GC_OBJECT);
+    value = allocate(&c, 16, NEOCLR_GC_OBJECT);
+    CHECK(a && b && key && value);
+    value[1] = 77;
+    neoclr_probe_storage b_slot = {&b, 8, 0};
+    neoclr_probe_enter_v3(&suspended, &c, 1, &b_slot, 1, "{}", 2);
+    CHECK(!neoclr_gc_roots_park_owned_v1(&c, a, &parked));
+    neoclr_parked_roots second = {0};
+    neoclr_probe_frame second_frame;
+    neoclr_probe_enter_v3(&second_frame, &c, 2, slots, 1, "{}", 2);
+    CHECK(!neoclr_gc_roots_park_owned_v1(&c, b, &second));
+    neoclr_gc_conditional_root edge = {key, a, -1};
+    root = key;
+    active = (neoclr_probe_frame){.context = &c, .storage = &active_slot, .storage_count = 1};
+    CHECK(!neoclr_gc_collect_conditional_v1(&c, &active, &edge, 1));
+    CHECK(edge.retained && !parked.expired && !second.expired && value[1] == 77);
+    root = NULL;
+    CHECK(!neoclr_gc_collect_conditional_v1(&c, &active, &edge, 1));
+    CHECK(parked.expired && second.expired && !c.text.used);
+    neoclr_roots_discard_v1(&parked);
+    neoclr_roots_discard_v1(&second);
+
+    /* A trace failure must not expire another record before a successful retry. */
+    owner = allocate(&c, 16, NEOCLR_GC_OBJECT);
+    value = allocate(&c, 8, NEOCLR_GC_STRINGS);
+    CHECK(owner && value);
+    neoclr_probe_enter_v3(&suspended, &c, 1, slots, 1, "{}", 2);
+    CHECK(!neoclr_gc_roots_park_owned_v1(&c, owner, &parked));
+    a = allocate(&c, 16, NEOCLR_GC_OBJECT);
+    CHECK(a && !neoclr_gc_roots_park_owned_v1(&c, a, &second)); /* empty chain */
+    root = owner;
+    CHECK(neoclr_gc_collect_v1(&c, &active) == 3);
+    CHECK(!parked.expired && parked.head == &suspended && !second.expired && second.owner == a);
+    root = NULL;
+    CHECK(!neoclr_gc_collect_v1(&c, &active) && !c.text.used);
+    CHECK(parked.expired && second.expired);
+    neoclr_roots_discard_v1(&second);
+    neoclr_roots_discard_v1(&parked);
+    CHECK(!neoclr_roots_parked_v1() && !neoclr_gc_entry_check_v1(&c));
+    return 0;
+}
 int main(void) {
     uint64_t buffer[129];
     buffer[128] = UINT64_C(0x1122334455667788);
@@ -230,5 +324,7 @@ int main(void) {
     CHECK(buffer[128] == UINT64_C(0x1122334455667788));
     int conditional_status = conditional_roots();
     if (conditional_status) return conditional_status;
+    int owned_status = owned_parked_roots();
+    if (owned_status) return owned_status;
     return 0;
 }

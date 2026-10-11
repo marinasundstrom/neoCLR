@@ -68,6 +68,10 @@ uint32_t neoclr_root_probe_depth_v1(void);
 typedef struct neoclr_parked_roots {
     neoclr_probe_frame *head;
     struct neoclr_parked_roots *next;
+    /* Optional collector-owned lifetime. Never mutate while registered. */
+    const void *owner_context;
+    void *owner;
+    int32_t expired;
 } neoclr_parked_roots;
 void neoclr_roots_park_v1(neoclr_parked_roots *);
 void neoclr_roots_discard_v1(neoclr_parked_roots *);

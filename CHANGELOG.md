@@ -8,6 +8,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-11
 
+- Add private managed-owner registration for native parked frame chains. Automatic
+  safepoints trace frames only for reachable owners and expire abandoned registrations
+  before sweeping; expired records cannot resume and block reset until discarded.
+  Sanitized ownership tests and the three-mode generator regression pass. Generator
+  callbacks and operation ownership remain unchanged; end-to-end reclamation is open.
+
 - Add a private native conditional-root collector primitive as a prerequisite for
   abandoned-generator lifetime work. Preserve independently reachable dependents,
   collect abandoned owner/value cycles and clear dead entries before address reuse.

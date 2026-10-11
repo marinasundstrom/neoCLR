@@ -1697,3 +1697,11 @@ See [contract, costs and evidence](experiments/aot-console/native-gc.md#conditio
 This retains the provisional preference for managed callback storage. The immediate
 generator gap is connecting native parked stack roots and operation bookkeeping to
 managed reachability at every collection boundary.
+
+
+The subsequent [owned parked-frame checkpoint](experiments/aot-console/native-gc.md#managed-ownership-of-parked-frames--private-experiment-2026-10-11)
+adds persistent owner relationships at every native collector boundary. Reachable
+owners activate suspended frame roots; unreachable registrations expire before
+sweeping and cannot resume. Native storage release remains the scheduler's job.
+This is still opt-in collector machinery, not a change to the generator's callback,
+advancement-task or external-I/O ownership policy. No managed cleanup runs from GC.

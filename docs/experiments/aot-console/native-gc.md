@@ -317,3 +317,51 @@ is claimed for this revision. The [generator regression](../runtime-async/condit
 passes interpreter, macOS ARM64 JIT and AOT using ordinary strong roots.
 Reproduce the focused C checks with `runtime-async/validate_conditional_roots.py`
 and a passing async-iteration host recipe.
+
+
+## Managed ownership of parked frames — private experiment, 2026-10-11
+
+`neoclr_gc_roots_park_owned_v1(context, owner, record)` parks the current frame
+chain with a nonnull managed owner. The owner must be a live allocation base in
+that context, the record must be zero-initialized and unregistered, and every
+frame must belong to the same context. Invalid admission leaves the active chain
+and record unchanged. Empty chains are allowed. The record and its frame storage
+remain caller-owned native memory; neither may be placed in collectible storage.
+
+Unlike the borrowed owner/value entries above, this association persists until
+resume or discard and participates in **every** native collection, including
+compiler snapshot safepoints. A marked owner activates its frame storage, transient
+slots and spill lanes. Frames can discover further owners, so stack associations
+and owner/value entries share the marking fixed point. A suspended frame's reference
+back to its owner does not make an otherwise abandoned stack reachable.
+
+After successful tracing, an unreachable owner's registration becomes expired:
+its head and owner are cleared before sweeping. Expired registrations cannot resume
+(the private resume API aborts misuse), remain registered until explicitly discarded,
+and prevent context reset even though their frame chain is now empty. Address reuse
+does not reactivate them. Failed tracing leaves registration state unchanged. Another
+context's collection cannot expire the registration. Resume of a live registration
+restores the active chain and clears its ownership association.
+
+This extends the dependent-lifetime principle discussed above to native frame
+storage; it is not a .NET Task API or a claim about CLR suspended-stack implementation.
+The benefit is expressing reachability without making a suspended stack its own
+permanent root. Costs include scanning activated frame chains during marking waves,
+retaining native registration storage until its owner discards it, and requiring an
+explicit ownership model for pending operations. No speedup is claimed.
+
+[Sanitized tests](../runtime-async/owned-parked-roots-validation.json) cover automatic
+safepoints, live resume, abandoned back-references, allocation-address reuse,
+cross-context and mixed-frame rejection, empty chains, reverse-order dependencies
+between stacks and conditional values, and failure atomicity. The shared native
+collector test is also consumed by Windows validation; Windows was not run for this
+slice. [Generator regression](../runtime-async/owned-parked-generator-validation.json)
+passes interpreter, macOS ARM64 JIT and AOT with the existing strong-root behavior.
+
+**Integration remains open:** the runtime-async carrier still uses ordinary strong
+parking and strong callback handles. The collector does not release stack mappings,
+operation slots or callbacks, and does not run managed cleanup. The next integration
+must supply reachability from live iterators, outstanding advancement tasks and
+external completion owners, then discard expired native resources. Merely switching
+generator parking to this API would leave strong callback cycles or lose needed
+work; it is not yet an end-to-end abandoned-generator solution.

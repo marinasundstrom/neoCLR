@@ -26,7 +26,10 @@ producer helper. Nested producer cleanup also passes with pending disposal and
 cancellation. Generic generator methods now also work on generic reference owners,
 with nested generic metadata preserving lexical access in interpreter/JIT/AOT.
 A private [native conditional-root collector primitive](experiments/aot-console/native-gc.md#conditional-ownervalue-roots--private-experiment-2026-10-11)
-now passes sanitized ownership/cycle tests. Generator integration is still open:
+now passes sanitized ownership/cycle tests. An opt-in
+[owned parked-frame registration](experiments/aot-console/native-gc.md#managed-ownership-of-parked-frames--private-experiment-2026-10-11)
+also participates in automatic safepoints and expires unreachable stacks safely.
+Generator integration is still open:
 parked stacks/callbacks remain strong roots. Abandoned-generator collection and
 performance gates remain open. See
 [scope, evidence and remaining work](experiments/runtime-async/async-generators.md).

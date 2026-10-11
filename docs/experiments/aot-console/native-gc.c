@@ -110,11 +110,27 @@ int32_t neoclr_gc_callback_read_suspended_v1(neoclr_aot_context *context, uint64
     if (!boundary || neoclr_root_probe_head_v1() != boundary || boundary->context != context) return 3;
     return callback_read(context, handle, output);
 }
+int32_t neoclr_gc_roots_park_owned_v1(neoclr_aot_context *context, void *owner,
+    neoclr_parked_roots *record) {
+    if (!context || !owner || !record || !blocks_valid(&context->text) ||
+        !live_base(&context->text, owner) || record->head || record->next ||
+        record->owner_context || record->owner || record->expired) return 3;
+    for (const neoclr_parked_roots *p = neoclr_roots_parked_v1(); p; p = p->next)
+        if (p == record) return 3;
+    for (const neoclr_probe_frame *f = neoclr_root_probe_head_v1(); f; f = f->previous)
+        if (f->context != context) return 3;
+    neoclr_roots_park_v1(record);
+    record->owner_context = context;
+    record->owner = owner;
+    return 0;
+}
 int32_t neoclr_gc_entry_check_v1(neoclr_aot_context *context) {
     if (!context) return NEOCLR_AOT_FAULT_RUNTIME_ERROR;
-    for (const neoclr_parked_roots *p = neoclr_roots_parked_v1(); p; p = p->next)
+    for (const neoclr_parked_roots *p = neoclr_roots_parked_v1(); p; p = p->next) {
+        if (p->owner_context == context) return NEOCLR_AOT_FAULT_RUNTIME_ERROR;
         for (const neoclr_probe_frame *f = p->head; f; f = f->previous)
             if (f->context == context) return NEOCLR_AOT_FAULT_RUNTIME_ERROR;
+    }
 
     for (host_root *root = host_head; root; root = root->next)
         if (root->context == context) return NEOCLR_AOT_FAULT_RUNTIME_ERROR;
@@ -124,9 +140,11 @@ int32_t neoclr_gc_entry_check_v1(neoclr_aot_context *context) {
 }
 int32_t neoclr_gc_owned_roots_check_v1(neoclr_aot_context *context, const uint64_t *handles, uint32_t count) {
     if (!context || count > NEOCLR_GC_HOST_ROOT_LIMIT || (count && !handles)) return 3;
-    for (const neoclr_parked_roots *p = neoclr_roots_parked_v1(); p; p = p->next)
+    for (const neoclr_parked_roots *p = neoclr_roots_parked_v1(); p; p = p->next) {
+        if (p->owner_context == context) return 3;
         for (const neoclr_probe_frame *f = p->head; f; f = f->previous)
             if (f->context == context) return 3;
+    }
     for (const neoclr_probe_frame *f = neoclr_root_probe_head_v1(); f; f = f->previous)
         if (f->context == context) return 3;
     for (uint32_t i = 0; i < count; i++) {
@@ -208,6 +226,16 @@ static void mark_slots(neoclr_aot_text_arena *a, const block_index *index, const
         uint64_t word; memcpy(&word, slots[i].address, 8); mark(a, index, word, pending);
     }
 }
+static void mark_frames(neoclr_aot_context *context, const block_index *index,
+    const neoclr_probe_frame *head, block **pending) {
+    for (const neoclr_probe_frame *f = head; f; f = f->previous) {
+        if (f->context != context) continue;
+        mark_slots(&context->text, index, f->storage, f->storage_count, pending);
+        mark_slots(&context->text, index, f->transient, f->transient_count, pending);
+        for (uint32_t i = 0; i < f->lane_count; i++)
+            mark(&context->text, index, f->lanes[i], pending);
+    }
+}
 int32_t neoclr_gc_collect_v1(neoclr_aot_context *context, const neoclr_probe_frame *head) {
     return neoclr_gc_collect_conditional_v1(context, head, NULL, 0);
 }
@@ -223,6 +251,9 @@ int32_t neoclr_gc_collect_conditional_v1(neoclr_aot_context *context,
             return NEOCLR_AOT_FAULT_RUNTIME_ERROR;
     for (host_root *root = host_head; root; root = root->next)
         if (root->context == context && !live_base(a, root->value)) return NEOCLR_AOT_FAULT_RUNTIME_ERROR;
+    for (const neoclr_parked_roots *p = neoclr_roots_parked_v1(); p; p = p->next)
+        if (p->owner_context == context && !p->expired &&
+            (!p->owner || !live_base(a, p->owner))) return NEOCLR_AOT_FAULT_RUNTIME_ERROR;
     neoclr_probe_storage fault[65];
     int32_t count = neoclr_probe_fault_roots_v1(context, fault, 65);
     if (count < 0) return NEOCLR_AOT_FAULT_RUNTIME_ERROR;
@@ -242,18 +273,9 @@ int32_t neoclr_gc_collect_conditional_v1(neoclr_aot_context *context,
     mark_slots(a, &index, fault, (uint32_t)count, &pending);
     for (host_root *root = host_head; root; root = root->next)
         if (root->context == context) mark(a, &index, (uintptr_t)root->value, &pending);
-    const neoclr_parked_roots *parked = neoclr_roots_parked_v1();
-    for (;;) {
-        for (const neoclr_probe_frame *f = head; f; f = f->previous) {
-            if (f->context != context) continue;
-            mark_slots(a, &index, f->storage, f->storage_count, &pending);
-            mark_slots(a, &index, f->transient, f->transient_count, &pending);
-            for (uint32_t i = 0; i < f->lane_count; i++) mark(a, &index, f->lanes[i], &pending);
-        }
-        if (!parked) break;
-        head = parked->head;
-        parked = parked->next;
-    }
+    mark_frames(context, &index, head, &pending);
+    for (const neoclr_parked_roots *p = neoclr_roots_parked_v1(); p; p = p->next)
+        if (!p->owner_context) mark_frames(context, &index, p->head, &pending);
     /* Each newly marked allocation enters the intrusive worklist exactly once.
      * The sparse index bounds address searches to a bucket plus its crossing block. */
     for (;;) {
@@ -306,8 +328,19 @@ int32_t neoclr_gc_collect_conditional_v1(neoclr_aot_context *context,
             if (owner && (((const block *)owner - 1)->state & MARKED))
                 mark(a, &index, (uintptr_t)conditional[i].value, &pending);
         }
+        for (const neoclr_parked_roots *p = neoclr_roots_parked_v1(); p; p = p->next)
+            if (p->owner_context == context && !p->expired &&
+                (((const block *)p->owner - 1)->state & MARKED))
+                mark_frames(context, &index, p->head, &pending);
         if (!pending) break;
     }
+    for (neoclr_parked_roots *p = (neoclr_parked_roots *)neoclr_roots_parked_v1(); p; p = p->next)
+        if (p->owner_context == context && !p->expired &&
+            !(((const block *)p->owner - 1)->state & MARKED)) {
+            p->head = NULL;
+            p->owner = NULL;
+            p->expired = 1;
+        }
     for (uint32_t i = 0; i < conditional_count; i++) {
         void *owner = conditional[i].owner;
         conditional[i].retained = owner && (((const block *)owner - 1)->state & MARKED);

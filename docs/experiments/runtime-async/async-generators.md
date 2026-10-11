@@ -397,3 +397,16 @@ evidence that abandoned generators are collectible. No compiler or provider cont
 changed. Next: attach explicit managed reachability to parked frames/callbacks and
 operation handles, including pending advancement and external completion ownership.
 Do not make all pending tasks weak or execute asynchronous disposal during collection.
+
+
+### Owned native stack registration — 2026-10-11
+
+The collector now supports [persistent managed ownership of parked frame chains](../aot-console/native-gc.md#managed-ownership-of-parked-frames--private-experiment-2026-10-11).
+Unlike the earlier borrowed conditional-value list, these associations are observed
+at automatic compiler safepoints as well as explicit collection. Expired registrations
+cannot resume, clear managed pointers before sweeping, and block context reset until
+discarded. Sanitized tests qualify the lifetime transitions and mixed-context rejection.
+The [generator regression](owned-parked-generator-validation.json) remains green in
+all three local modes. Generator callback and pending-operation ownership is still
+unchanged, so abandoned generators are **not yet collectible**. Connecting those
+relationships and releasing expired native resources remains the next integration.
