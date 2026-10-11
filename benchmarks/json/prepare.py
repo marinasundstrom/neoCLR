@@ -105,6 +105,15 @@ def main():
                 if Path(part).is_absolute() and Path(part).is_file():
                     report['inputs'].setdefault(part,sha(part))
         cases = [item['name'] for item in discovered['benchmarks']] + args.manual_case if args.discover else ['json.nodes.serialize','json.nodes.deserialize']
+        if args.discover and any(item.get('dynamic') for item in discovered['benchmarks']):
+            # Runtime sources execute during registration, never metadata inspection.
+            listed = subprocess.run(commands['interpreter'] + ['--', '--list'], capture_output=True,
+                                    text=True, timeout=120)
+            lines = listed.stdout.splitlines()
+            if listed.returncode or listed.stderr or not lines or lines[0] != 'NEOBENCH/1 CASES' or lines[-1] != 'NEOBENCH/1 END':
+                raise RuntimeError('Invalid runtime case inventory: ' + listed.stdout + listed.stderr)
+            cases = lines[1:-1]
+            report['runtimeCases'] = cases
         if any(not name for name in cases) or len(cases) != len(set(cases)):
             raise ValueError('Empty or duplicate benchmark selector')
         manifest = dict(schemaVersion=1, commands=commands, inputs=report['inputs'], cases=cases)

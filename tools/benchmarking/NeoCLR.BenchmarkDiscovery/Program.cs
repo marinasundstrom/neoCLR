@@ -18,7 +18,7 @@ try
     var attribute = runtime.GetTypes().Single(t => t.FullName == "System.Attribute");
     if (!ReferenceEquals(marker.BaseType, attribute))
         throw new InvalidDataException("BenchmarkAttribute must derive from the catalog's System.Attribute");
-    var benchmarks = new List<(string Id, string Name, string Description)>();
+    var benchmarks = new List<(string Id, string Name, string Description, string Code, bool Dynamic)>();
     foreach (var definition in snapshot.MainModule.Methods)
     {
         // Filter before projecting signatures so unrelated unsupported methods do not
@@ -31,8 +31,8 @@ try
         if (matches.Length != 1 || matches[0].GetArguments().Count > 1 || matches[0].GetNamedArguments().Count > 1)
             throw new InvalidDataException(name + ": BenchmarkAttribute must occur once with an optional string description");
         if (method.DeclaringType is not null || !method.IsStatic || method.IsAbstract || method.IsGenericMethodDefinition ||
-            method.Accessibility is not (MetadataAccessibility.Public or MetadataAccessibility.Assembly) || method.GetParameters().Count != 0)
-            throw new InvalidDataException(name + ": benchmarks require accessible parameterless, nongeneric module functions");
+            method.Accessibility is not (MetadataAccessibility.Public or MetadataAccessibility.Assembly))
+            throw new InvalidDataException(name + ": benchmarks require accessible nongeneric module functions");
         if (method.ReturnType is not PrimitiveTypeInfo { Kind: PrimitiveType.Int32 })
             throw new InvalidDataException(name + ": benchmarks require int (the worker correctness token)");
         var arguments = matches[0].GetArguments();
@@ -55,15 +55,28 @@ try
         static string Part(string value) => value.Length + ":" + value;
         var id = Part(assembly.Name) + Part(method.Module.Name) + Part(name) + "()";
         if (benchmarks.Any(benchmark => benchmark.Id == id)) throw new InvalidDataException("Duplicate benchmark ID: " + id);
-        benchmarks.Add((id, name, description));
+        foreach (var row in DataAdapters.Read(definition, method, snapshot, context, "NeoClr.Benchmarking", "ArgumentsSourceAttribute"))
+        {
+            var rowName = name + row.Suffix;
+            var rowId = id + row.Suffix;
+            var display = description + row.Suffix;
+            var callback = row.Suffix.Length == 0 ? name : "() => " + name + "(" + row.Callback + ")";
+            string Registration(string suffix) => "suite.Add(" + Quote(rowName) + suffix + ", " + callback + ")";
+            var code = row.Provider is null ? "    " + Registration("") + "\n" :
+                "    if true {\n        let rows = " + row.Provider + "()\n" +
+                "        if rows.Length == 0 { System.Fail(\"Data source returned no rows\") }\n" +
+                "        if rows.Length > 10000 { System.Fail(\"Data source exceeded 10000 rows\") }\n" +
+                "        for index in 0..<rows.Length {\n            let value = rows[index]\n            " + Registration(" + \"[\" + index.ToString() + \"]\"") + "\n        }\n    }\n";
+            benchmarks.Add((rowId, rowName, display, code, row.Provider is not null));
+        }
     }
     if (benchmarks.Count == 0) throw new InvalidDataException("No benchmarks discovered");
     benchmarks.Sort((left, right) => StringComparer.Ordinal.Compare(left.Name, right.Name));
     static string Quote(string value) => JsonSerializer.Serialize(value);
     var source = "// Generated from native metadata. Do not edit.\nmodule NeoClr.Benchmarking\n\nfunc RegisterDiscoveredBenchmarks(suite: BenchmarkSuite) {\n" +
-        string.Concat(benchmarks.Select(benchmark => "    suite.Add(" + Quote(benchmark.Name) + ", " + benchmark.Name + ")\n")) + "}\n";
+        string.Concat(benchmarks.Select(item => item.Code)) + "}\n";
     File.WriteAllText(args[1], source);
-    File.WriteAllText(args[2], JsonSerializer.Serialize(new { assembly = assembly.Name, benchmarks = benchmarks.Select(t => new { id = t.Id, name = t.Name, description = t.Description }) }, new JsonSerializerOptions { WriteIndented = true }) + "\n");
+    File.WriteAllText(args[2], JsonSerializer.Serialize(new { assembly = assembly.Name, benchmarks = benchmarks.Select(t => new { id = t.Id, name = t.Name, description = t.Description, dynamic = t.Dynamic }) }, new JsonSerializerOptions { WriteIndented = true }) + "\n");
     Console.WriteLine("Discovered " + benchmarks.Count + " benchmarks");
     return 0;
 }

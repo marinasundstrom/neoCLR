@@ -33,3 +33,24 @@ func Main(arguments: string[]) {
     RegisterDiscoveredBenchmarks(suite)
     suite.Run(arguments)
 }
+
+[Benchmark]
+[Arguments(5)]
+[Arguments(9)]
+func Inline(value: int) -> int {
+    if value != 5 {
+        if value != 9 { System.Fail("Wrong inline argument") }
+    }
+    return 1
+}
+
+func Inputs() -> int[] => [3, 7]
+
+[Benchmark]
+[ArgumentsSource("Inputs")]
+func FromSource(value: int) -> int {
+    if value != 3 {
+        if value != 7 { System.Fail("Wrong source argument") }
+    }
+    return 1
+}

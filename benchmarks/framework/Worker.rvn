@@ -33,6 +33,16 @@ class BenchmarkSuite {
     }
 
     func Run(arguments: string[]) {
+        if arguments.Length == 1 {
+            if arguments[0] == "--list" {
+                Console.WriteLine("NEOBENCH/1 CASES")
+                for item in cases {
+                    Console.WriteLine(item.Name)
+                }
+                Console.WriteLine("NEOBENCH/1 END")
+                return
+            }
+        }
         if arguments.Length != 3 {
             System.Fail("Expected benchmark name, warmup count and operation count")
         }

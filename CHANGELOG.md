@@ -8,6 +8,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-11
 
+- Add benchmark-owned `Arguments` and `ArgumentsSource` attributes without a testing
+  dependency. Generate per-row callbacks/selectors and enumerate runtime source
+  rows before measurement. Inline scalar and typed array sources pass in interpreter,
+  JIT and AOT; 11 discovery checks cover invalid rows/providers and metadata-only
+  inspection. Source inputs are reused within a case; lifecycle/reset hooks remain open.
+
 - Add independent TUnit-style test data attributes: `Arguments` for supported scalar
   rows and `MethodDataSource` for typed array inputs. Generated adapters register
   each row separately for reporting/filtering and retain AOT reachability. Reject

@@ -1,0 +1,18 @@
+// Generated from native metadata. Do not edit.
+module NeoClr.Benchmarking
+
+func RegisterDiscoveredBenchmarks(suite: BenchmarkSuite) {
+    if true {
+        let rows = Benchmarks.Discovery.Inputs()
+        if rows.Length == 0 { System.Fail("Data source returned no rows") }
+        if rows.Length > 10000 { System.Fail("Data source exceeded 10000 rows") }
+        for index in 0..<rows.Length {
+            let value = rows[index]
+            suite.Add("Benchmarks.Discovery.FromSource/Benchmarks.Discovery.Inputs" + "[" + index.ToString() + "]", () => Benchmarks.Discovery.FromSource(value))
+        }
+    }
+    suite.Add("Benchmarks.Discovery.Inline(5)", () => Benchmarks.Discovery.Inline(5))
+    suite.Add("Benchmarks.Discovery.Inline(9)", () => Benchmarks.Discovery.Inline(9))
+    suite.Add("Benchmarks.Discovery.Multiply", Benchmarks.Discovery.Multiply)
+    suite.Add("Benchmarks.Discovery.Sum", Benchmarks.Discovery.Sum)
+}

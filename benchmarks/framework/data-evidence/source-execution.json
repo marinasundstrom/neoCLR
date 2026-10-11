@@ -1,0 +1,35 @@
+{
+  "passed": true,
+  "checks": [
+    {
+      "mode": "jit",
+      "case": "Benchmarks.Discovery.FromSource/Benchmarks.Discovery.Inputs[0]",
+      "passed": true
+    },
+    {
+      "mode": "jit",
+      "case": "Benchmarks.Discovery.FromSource/Benchmarks.Discovery.Inputs[1]",
+      "passed": true
+    },
+    {
+      "mode": "aot",
+      "case": "Benchmarks.Discovery.FromSource/Benchmarks.Discovery.Inputs[0]",
+      "passed": true
+    },
+    {
+      "mode": "aot",
+      "case": "Benchmarks.Discovery.FromSource/Benchmarks.Discovery.Inputs[1]",
+      "passed": true
+    },
+    {
+      "mode": "interpreter",
+      "case": "Benchmarks.Discovery.FromSource/Benchmarks.Discovery.Inputs[0]",
+      "passed": true
+    },
+    {
+      "mode": "interpreter",
+      "case": "Benchmarks.Discovery.FromSource/Benchmarks.Discovery.Inputs[1]",
+      "passed": true
+    }
+  ]
+}

@@ -32,7 +32,11 @@ Benchmark attributes now discover module functions through metadata and generate
 typed registrations, with final-assembly verification and AOT execution coverage.
 The JSON deserializer now uses discovery alongside manually registered serialization
 to preserve setup outside measurement; both pass all three modes.
-Typed-object/collection JSON and internal operation timing remain open.
+Independent testing and benchmarking data attributes now generate per-row cases:
+inline scalar arguments and typed array providers, with filtering and all-mode
+execution checks. Benchmark measurements are configurable; broader provider shapes
+and lifecycle hooks remain gaps. Typed-object/collection JSON and internal operation
+timing remain open.
 The author also requests a [BenchmarkDotNet-like framework](benchmarking-framework.md),
 combining external process orchestration with Raven workload measurement.
 Experimental API/compiler compatibility may be broken where justified. Compare the

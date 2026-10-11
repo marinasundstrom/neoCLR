@@ -74,3 +74,14 @@ every native boundary; production GC policy remains future work.
 The comparisons use different recorded builds. Do not combine their numbers into one
 current performance claim. Repository benchmark reports retain exact revisions,
 commands and validation details.
+
+
+## Development measurement tooling
+
+The repository's [benchmark worker and runner](https://github.com/marinasundstrom/neoCLR/tree/main/benchmarks/framework)
+support configurable external startup, batch latency/throughput, and first invocation
+after setup. `[Benchmark]` functions can use independent `[Arguments]` and
+`[ArgumentsSource]` attributes: each input row is a separate selectable case.
+Sources run during registration, before measurement. This is experimental tooling
+with scalar inline values and typed array sources, not full BenchmarkDotNet parity.
+These functional checks do not add performance claims to the historical results above.

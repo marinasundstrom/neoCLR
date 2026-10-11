@@ -1,0 +1,110 @@
+{
+  "passed": true,
+  "checks": [
+    {
+      "mode": "jit",
+      "case": "manual",
+      "passed": true
+    },
+    {
+      "mode": "jit",
+      "case": "Benchmarks.Discovery.FromSource/Benchmarks.Discovery.Inputs[0]",
+      "passed": true
+    },
+    {
+      "mode": "jit",
+      "case": "Benchmarks.Discovery.FromSource/Benchmarks.Discovery.Inputs[1]",
+      "passed": true
+    },
+    {
+      "mode": "jit",
+      "case": "Benchmarks.Discovery.Inline(5)",
+      "passed": true
+    },
+    {
+      "mode": "jit",
+      "case": "Benchmarks.Discovery.Inline(9)",
+      "passed": true
+    },
+    {
+      "mode": "jit",
+      "case": "Benchmarks.Discovery.Multiply",
+      "passed": true
+    },
+    {
+      "mode": "jit",
+      "case": "Benchmarks.Discovery.Sum",
+      "passed": true
+    },
+    {
+      "mode": "aot",
+      "case": "manual",
+      "passed": true
+    },
+    {
+      "mode": "aot",
+      "case": "Benchmarks.Discovery.FromSource/Benchmarks.Discovery.Inputs[0]",
+      "passed": true
+    },
+    {
+      "mode": "aot",
+      "case": "Benchmarks.Discovery.FromSource/Benchmarks.Discovery.Inputs[1]",
+      "passed": true
+    },
+    {
+      "mode": "aot",
+      "case": "Benchmarks.Discovery.Inline(5)",
+      "passed": true
+    },
+    {
+      "mode": "aot",
+      "case": "Benchmarks.Discovery.Inline(9)",
+      "passed": true
+    },
+    {
+      "mode": "aot",
+      "case": "Benchmarks.Discovery.Multiply",
+      "passed": true
+    },
+    {
+      "mode": "aot",
+      "case": "Benchmarks.Discovery.Sum",
+      "passed": true
+    },
+    {
+      "mode": "interpreter",
+      "case": "manual",
+      "passed": true
+    },
+    {
+      "mode": "interpreter",
+      "case": "Benchmarks.Discovery.FromSource/Benchmarks.Discovery.Inputs[0]",
+      "passed": true
+    },
+    {
+      "mode": "interpreter",
+      "case": "Benchmarks.Discovery.FromSource/Benchmarks.Discovery.Inputs[1]",
+      "passed": true
+    },
+    {
+      "mode": "interpreter",
+      "case": "Benchmarks.Discovery.Inline(5)",
+      "passed": true
+    },
+    {
+      "mode": "interpreter",
+      "case": "Benchmarks.Discovery.Inline(9)",
+      "passed": true
+    },
+    {
+      "mode": "interpreter",
+      "case": "Benchmarks.Discovery.Multiply",
+      "passed": true
+    },
+    {
+      "mode": "interpreter",
+      "case": "Benchmarks.Discovery.Sum",
+      "passed": true
+    }
+  ]
+}

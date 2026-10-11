@@ -49,7 +49,7 @@ statistical stability guarantee. Report median and range of raw batch samples.
 The native and interpreter collectors also differ, so do not isolate serializer
 or optimizer efficiency from these figures.
 
-Async callbacks, setup/cleanup hooks, parameter sets and internal high-resolution
+Async callbacks, setup/cleanup hooks and internal high-resolution
 timing remain pending. Attribute discovery and generated registration are described below. Do not use
 wall-clock `System.Time.Clock` as a substitute for a monotonic operation clock.
 See the [framework direction](../../docs/benchmarking-framework.md).
@@ -60,7 +60,7 @@ identify the historical script before this transport extraction.
 
 ## Attribute-driven function discovery
 
-`BenchmarkAttribute` marks accessible, parameterless, nongeneric module functions.
+`BenchmarkAttribute` marks accessible nongeneric module functions.
 Classes are not required. The current worker requires `int` with success token `1`;
 other return types and async functions remain unsupported, rather than silently
 omitted. For example, from the executable discovery sample:
@@ -167,3 +167,43 @@ python3 benchmarks/framework/runner.py \
 CLI flags override config values individually; repeated `--mode` replaces the
 mode list. The existing count/filter flags remain available. Attribute defaults
 and data parameters are subsequent layers; no unsupported settings are ignored.
+
+
+## Argument rows (development)
+
+The benchmark framework owns `NeoClr.Benchmarking.ArgumentsAttribute` and
+`ArgumentsSourceAttribute`, following [BenchmarkDotNet's naming](https://benchmarkdotnet.org/articles/features/parameterization.html).
+It has no dependency on the test framework, including its discovery implementation.
+
+Use repeated `[Arguments(5)]` annotations with `[Benchmark]` to register a separate
+case for each input row. The current constructor overloads accept one integer,
+string or Boolean; two or three integers; two strings; or a string and integer.
+Inline arguments must match parameter types and counts exactly. Native attribute
+array/Type/null support and arbitrary argument combinations remain gaps.
+
+`[ArgumentsSource("Inputs")]` names a public/internal parameterless nongeneric module
+function returning `T[]` for a benchmark accepting one `T`. Names may be qualified;
+unqualified names use the benchmark's module, within the same assembly. Sources run
+once during registration, outside warmup/measured batches (but included in startup).
+Each input is captured and reused for that case's invocations: mutable inputs must
+account for that reuse. Async sources, tuple spreading and setup/reset hooks remain
+unsupported. Empty sources or more than 10,000 rows fault registration.
+
+Inline selectors append `(values)`; source selectors append `/Qualified.Inputs[index]`.
+Every row can be filtered and reported independently. Source order must be deterministic:
+row IDs are positional. Metadata inspection generates typed registrations without
+running user code; its inventory marks source templates `dynamic: true`. Worker
+`--list` emits `NEOBENCH/1 CASES`, all registered selectors, then `NEOBENCH/1 END`.
+Preparation executes this outside measurement when runtime sources are present,
+including manual registrations in the inventory. No reflection invocation is needed
+in interpreter/JIT/AOT execution. See [the executable example](Discovery.rvn).
+
+Invalid arity/types, duplicate inline rows/sources and missing/incompatible providers
+fail discovery and remove stale output. This is a deliberately bounded subset;
+benchmark features will grow independently as workloads require them.
+
+Validation: [21 worker checks](data-evidence/execution.json) cover seven registered
+cases in all three modes; [six final source checks](data-evidence/source-execution.json)
+qualify the scoped adapter correction. [Eleven discovery checks](data-evidence/discovery.json)
+cover invalid signatures/data and metadata-only inspection. These macOS ARM64 checks
+establish behavior, not benchmark rankings or Windows qualification.

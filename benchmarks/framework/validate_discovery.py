@@ -20,9 +20,14 @@ def main():
     out.mkdir(parents=True, exist_ok=False)
     evidence = dict(passed=False, cases=[])
     cases = [
-        ('parameters', '[Benchmark]\nfunc Invalid(value: int) -> int => 1', 'parameterless, nongeneric module functions'),
-        ('instance', 'class Fixture {\n[Benchmark]\nfunc Invalid() -> int => 1\n}', 'parameterless, nongeneric module functions'),
-        ('generic', '[Benchmark]\nfunc Invalid<T>() -> int => 1', 'parameterless, nongeneric module functions'),
+        ('row-arity', '[Benchmark]\n[Arguments(5)]\nfunc Invalid() -> int => 1', 'wrong arity'),
+        ('row-type', '[Benchmark]\n[Arguments("five")]\nfunc Invalid(value: int) -> int => 1', 'wrong parameter type'),
+        ('missing-source', '[Benchmark]\n[ArgumentsSource("Missing")]\nfunc Invalid(value: int) -> int => 1', 'Missing or ambiguous data source'),
+        ('source-type', 'func Inputs() -> string[] => ["bad"]\n[Benchmark]\n[ArgumentsSource("Inputs")]\nfunc Invalid(value: int) -> int => 1', 'array of the input type'),
+        ('duplicate-row', '[Benchmark]\n[Arguments(5)]\n[Arguments(5)]\nfunc Invalid(value: int) -> int => 1', 'duplicate data row'),
+        ('parameters', '[Benchmark]\nfunc Invalid(value: int) -> int => 1', 'parameterized function needs a data attribute'),
+        ('instance', 'class Fixture {\n[Benchmark]\nfunc Invalid() -> int => 1\n}', 'nongeneric module functions'),
+        ('generic', '[Benchmark]\nfunc Invalid<T>() -> int => 1', 'nongeneric module functions'),
         ('result', '[Benchmark]\nfunc Invalid() -> bool => true', 'benchmarks require int'),
         ('empty', 'func NotABenchmark() -> int => 1', 'No benchmarks discovered'),
         ('named', '[Benchmark(Description: "Named description")]\nfunc Valid() -> int { System.Fail("Must not execute during discovery"); return 1 }', None),

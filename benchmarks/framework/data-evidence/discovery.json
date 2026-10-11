@@ -1,0 +1,71 @@
+{
+  "passed": true,
+  "cases": [
+    {
+      "name": "row-arity",
+      "exitCode": 2,
+      "stdout": "",
+      "stderr": "Benchmark discovery failed: Invalid: argument row has wrong arity\n"
+    },
+    {
+      "name": "row-type",
+      "exitCode": 2,
+      "stdout": "",
+      "stderr": "Benchmark discovery failed: Invalid: argument row has wrong parameter type\n"
+    },
+    {
+      "name": "missing-source",
+      "exitCode": 2,
+      "stdout": "",
+      "stderr": "Benchmark discovery failed: Missing or ambiguous data source: DiscoveryValidation.Missing\n"
+    },
+    {
+      "name": "source-type",
+      "exitCode": 2,
+      "stdout": "",
+      "stderr": "Benchmark discovery failed: DiscoveryValidation.Inputs: source must be an accessible parameterless module function returning an array of the input type\n"
+    },
+    {
+      "name": "duplicate-row",
+      "exitCode": 2,
+      "stdout": "",
+      "stderr": "Benchmark discovery failed: Invalid: duplicate data row or source\n"
+    },
+    {
+      "name": "parameters",
+      "exitCode": 2,
+      "stdout": "",
+      "stderr": "Benchmark discovery failed: Invalid: parameterized function needs a data attribute\n"
+    },
+    {
+      "name": "instance",
+      "exitCode": 2,
+      "stdout": "",
+      "stderr": "Benchmark discovery failed: DiscoveryValidation.Fixture.Invalid: benchmarks require accessible nongeneric module functions\n"
+    },
+    {
+      "name": "generic",
+      "exitCode": 2,
+      "stdout": "",
+      "stderr": "Benchmark discovery failed: DiscoveryValidation.Invalid: benchmarks require accessible nongeneric module functions\n"
+    },
+    {
+      "name": "result",
+      "exitCode": 2,
+      "stdout": "",
+      "stderr": "Benchmark discovery failed: DiscoveryValidation.Invalid: benchmarks require int (the worker correctness token)\n"
+    },
+    {
+      "name": "empty",
+      "exitCode": 2,
+      "stdout": "",
+      "stderr": "Benchmark discovery failed: No benchmarks discovered\n"
+    },
+    {
+      "name": "named",
+      "exitCode": 0,
+      "stdout": "Discovered 1 benchmarks\n",
+      "stderr": ""
+    }
+  ]
+}

@@ -2,7 +2,7 @@ module NeoClr.Benchmarking
 
 import System.*
 
-/// Marks a parameterless module function returning the worker correctness token.
+/// Marks a module function returning the worker correctness token.
 /// Discovery reads metadata without invoking the function or attribute constructor.
 [AttributeUsage(AttributeTargets.Method)]
 public class BenchmarkAttribute : Attribute {
@@ -16,4 +16,22 @@ public class BenchmarkAttribute : Attribute {
     init(description: string) {
         Description = description
     }
+}
+
+/// Supplies one inline argument row. Native metadata currently supports scalar values.
+[AttributeUsage(AttributeTargets.Method, AllowMultiple: true)]
+public class ArgumentsAttribute : Attribute {
+    init(value0: int) { }
+    init(value0: string) { }
+    init(value0: bool) { }
+    init(value0: int, value1: int) { }
+    init(value0: int, value1: int, value2: int) { }
+    init(value0: string, value1: string) { }
+    init(value0: string, value1: int) { }
+}
+
+/// Names an accessible, parameterless module function returning an array of inputs.
+[AttributeUsage(AttributeTargets.Method, AllowMultiple: true)]
+public class ArgumentsSourceAttribute : Attribute {
+    init(methodName: string) { }
 }
