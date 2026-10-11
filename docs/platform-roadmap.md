@@ -49,8 +49,12 @@ slots. The provider now adds
 for results, advancement and disposal. The subsequent
 [managed ownership integration](experiments/runtime-async/async-generators.md#managed-ownership-integration--2026-10-11)
 connects external completions, automatic body/signal release and interpreter parity.
-Runnable work retains strong ownership until dispatch; pending abandoned cycles can
-be reclaimed without executing cleanup. Platform and performance gates remain open. See
+The returned Task now directly owns its producer registration, avoiding a per-body
+lifetime notification. Runnable work retains strong ownership until dispatch; pending
+abandoned cycles can be reclaimed without executing cleanup. The
+[matched ownership benchmark](experiments/runtime-async/managed-ownership-benchmark.md)
+closes the large completed-path callback regression; native runtime async remains
+slower than the compiler-state-machine control. Platform and performance gates remain open. See
 [scope, evidence and remaining work](experiments/runtime-async/async-generators.md).
 
 **Compiler lines (2026-10-11):** the author directs keeping Raven main and the

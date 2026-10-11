@@ -43,11 +43,14 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   Native abandoned stacks are reclaimed outside GC without running managed cleanup.
   Qualify the Raven generator cases in interpreter/JIT/AOT, 60 focused Rust tests,
   320 sanitized native suspensions and the JIT/AOT HTTP/await showcase.
-  Measure the initial callback-based ownership adapter: at 100 completed awaits,
-  runtime async is 69–81x slower than compiler state machines in native modes;
-  pending awaits are about 12% faster interpreted but about 2.1x slower native.
-  Record this as a regression requiring a producer-retention fast-path correction,
-  not a performance qualification. Windows carrier and default switching remain open.
+  Use the returned Task directly as the runtime owner, removing per-body lifetime
+  notifications and their measured completed-await regression; requalify generator
+  and HTTP/await behavior. Matched 100-operation results reduce native completed-await
+  overhead from 69–81x to about 1.55x versus compiler state machines. Interpreted
+  completed/pending awaits are about 9%/29% faster than
+  compiler state machines, while native pending awaits remain about 1.8x slower.
+  Record full measurements and reclamation checks. This remains an opt-in POC;
+  Windows carrier and default switching remain open.
 
 - Connect owned parked frames and dependent callbacks in an opt-in macOS native
   runtime-async carrier entry. Reclaim expired stacks and body-operation slots

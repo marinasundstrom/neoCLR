@@ -1751,3 +1751,14 @@ storage. Conditional tables and bound lifetime callbacks are provisional impleme
 choices, not claims about CLR implementation or proven performance improvements.
 They add collector/dispatch bookkeeping and managed callback allocations; benchmark
 those costs against compiler state machines before choosing a production representation.
+
+
+The measured callback-adapter cost led to a narrower provider representation:
+the returned Task itself now owns the producer's conditional registration. A live
+Task therefore retains saved frames and the body callback without a per-body
+notification. External completion callbacks retain that same Task; runnable work
+retains it until dispatch. Completion removes the registration, so retaining a
+completed Task does not by itself retain producer state. Generator advancement and
+disposal still use their existing cursor ownership callbacks. This follows the
+operation-owned state principle without copying CLR state-machine storage or adding
+a public awaitable ABI. See the [qualified provider change](experiments/runtime-async/async-generators.md#returned-task-owns-the-producer).

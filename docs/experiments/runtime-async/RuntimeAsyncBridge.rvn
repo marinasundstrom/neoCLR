@@ -7,7 +7,9 @@ module RuntimeAwaitProvider {
     static class Bridge {
         static func Start<T>(callback: () -> TaskOutcome<T>) -> Task<T> {
             let body = Body<T>(callback)
-            _ = neoCLR.Runtime.RuntimeAsyncStartManaged(body, body.Run)
+            // The returned operation owns its retained callback/frame graph.
+            // No notification is needed just to keep its producer alive.
+            _ = neoCLR.Runtime.RuntimeAsyncStartManaged(body.Task, body.Run)
             return body.Task
         }
 
@@ -33,13 +35,7 @@ module RuntimeAwaitProvider {
 
         init(action: () -> TaskOutcome<T>) {
             callback = action
-            // Prototype ownership adapter: a pending result retains its producer.
-            // Promise clears the registration on completion/cancellation; the queued
-            // callback then owns the producer until notification has drained.
-            source.Task.OnCompleted(KeepAlive)
         }
-
-        private func KeepAlive() -> System.Void { }
 
         val Task: Task<T> => source.Task
 

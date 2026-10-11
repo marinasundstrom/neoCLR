@@ -15478,3 +15478,14 @@ or runtime-await default switch was performed.
   existing explicit Runtime Contract configuration and compiler lowering are unchanged.
   Source-local ownership callbacks, production carrier/metadata, Windows support and
   performance/default qualification remain provisional or open as recorded in the roadmap.
+
+- **Measured correction:** the first integrated provider's completed-100 native
+  benchmark regressed to 69–81x the compiler-state-machine time. The assistant
+  recorded that baseline (`85c11efe`) and changed the conditional owner from the
+  producer receiver to its returned Task, eliminating the per-body lifetime callback.
+  Generator and HTTP/await qualification pass again. The
+  [final matched measurement](experiments/runtime-async/managed-ownership-benchmark.md)
+  reduces that ratio to about 1.55x; interpreted completed/pending awaits improve by
+  about 9%/29% relative to state-machine controls, while native pending awaits remain
+  about 1.8x slower. This completes the scoped ownership checkpoint, not the native
+  performance/default gate. Raven's corresponding documentation is `7622d09e4`.

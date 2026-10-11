@@ -604,3 +604,29 @@ retaining producers until notification drains. The next bounded correction is to
 use the returned Task itself as the conditional runtime owner, removing that
 per-body callback while preserving advancement/disposal ownership adapters. Validate
 this with the same lifetime suite and matched benchmark before claiming improvement.
+
+
+### Returned Task owns the producer
+
+The provider now passes `body.Task` as `RuntimeAsyncStartManaged`'s owner instead
+of the `Body<T>` receiver. The collector's conditional relationship retains the
+callback and producer whenever that Task is reachable. `Body<T>` no longer registers
+a bound keep-alive callback. This avoids queuing a notification solely for ownership,
+including on the already-completed path. External completion signals retain that
+same Task owner, and readiness still promotes it until dispatch. Completion removes
+the runtime relationship, allowing producer state to die even if the completed
+Task remains reachable.
+
+[Three-mode lifetime qualification](task-owned-generator-validation.json) and
+[HTTP/await showcase qualification](task-owned-showcase-validation.json) pass
+with this ownership change. Advancement/disposal callbacks still retain their cursor; replacing those
+is separate work. The runtime ABI, compiler lowering and Runtime Contract settings
+are unchanged. This is a concrete use of operation-owned state, with no new public API
+or requirement for a future native awaitable contract.
+
+
+The [final matched benchmark](managed-ownership-benchmark.md) records the corrected
+provider: completed-100 native overhead falls from 69–81x to about 1.55x versus
+compiler state machines. Interpreted completed/pending cases are about 9%/29% faster;
+native pending awaits remain about 1.8x slower. Reclamation checks pass for every
+sample. Native performance and Windows/default qualification therefore remain open.
