@@ -5,6 +5,19 @@ typedef int32_t (*neoclr_async_callback)(uint64_t, neoclr_aot_context *);
 typedef int32_t (*neoclr_async_drain)(neoclr_aot_context *);
 int32_t neoclr_runtime_async_create_v1(neoclr_aot_context *, uint64_t *);
 int32_t neoclr_runtime_async_start_v1(void *, neoclr_aot_context *, uint64_t *, neoclr_async_callback);
+/* Private owner-bound carrier experiment, not a managed intrinsic yet.
+ * Caller must keep owner reachable for every consumer that needs the body,
+ * including pending result/advancement tasks and external completion callbacks.
+ * The invoke callback may use its handle for initial admission only; it must not
+ * read/release that handle after suspension. The generated dispatcher follows this.
+ * Running bodies have strong owner/callback handles; parked bodies use dependent
+ * roots. Expired bodies never resume. Quiescent reap (also pump/shutdown) releases
+ * their stack, callback handle and body-operation slot, without managed cleanup.
+ * Awaited external signal operations remain separately owned. Native ids alone
+ * do not retain managed owners. A completed body's normal release is unchanged. */
+int32_t neoclr_runtime_async_start_owned_v1(void *owner, void *callback,
+    neoclr_aot_context *, uint64_t *, neoclr_async_callback);
+int32_t neoclr_runtime_async_reap_v1(neoclr_aot_context *);
 int32_t neoclr_runtime_async_completeunit_v1(uint64_t, neoclr_aot_context *, int32_t *);
 int32_t neoclr_runtime_async_awaitunit_v1(uint64_t, neoclr_aot_context *, int32_t *);
 int32_t neoclr_runtime_async_release_v1(uint64_t, neoclr_aot_context *, int32_t *);

@@ -83,3 +83,9 @@ host handles participate in the same graph and require strong ownership for disp
 groundwork for suspended-operation lifetime support. Generator stacks still
 use strong roots; automatic abandoned-generator reclamation is not implemented.
 [Development contract and evidence](https://github.com/marinasundstrom/neoCLR/blob/main/docs/experiments/aot-console/native-gc.md#conditional-ownervalue-roots--private-experiment-2026-10-11).
+
+
+An opt-in macOS native carrier test now reclaims abandoned suspended bodies,
+including stack mappings and operation slots. The managed generator provider is
+not connected to this ownership model yet.
+[Carrier evidence and limitations](https://github.com/marinasundstrom/neoCLR/blob/main/docs/experiments/runtime-async/async-generators.md#owned-native-body-reclamation--2026-10-11).

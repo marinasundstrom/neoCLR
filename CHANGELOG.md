@@ -8,6 +8,13 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-11
 
+- Connect owned parked frames and dependent callbacks in an opt-in macOS native
+  runtime-async carrier entry. Reclaim expired stacks and body-operation slots
+  outside GC without resuming bodies or releasing external signals; roll back failed
+  activation. Sanitized tests cover 80 live resumptions, 80 abandonments and handle
+  exhaustion, with zero stack reservation after shutdown. Existing generator tests
+  pass in interpreter/JIT/AOT; managed-provider ownership integration remains open.
+
 - Add private dependent native host handles, traced with owned parked frames at
   automatic safepoints. Expired handles reject reads/replacement and remain releasable;
   callback dispatch requires strong ownership. Sanitized collector/handle tests and

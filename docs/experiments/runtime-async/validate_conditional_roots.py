@@ -14,6 +14,7 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--recipe', type=Path, required=True, help='Passing async iteration validation report')
     parser.add_argument('--output', type=Path, required=True)
+    parser.add_argument('--owned-bodies', action='store_true', help='Also test the macOS ARM64 retained carrier')
     args = parser.parse_args()
     recipe = json.loads(args.recipe.read_text())
     if not recipe['passed']:
@@ -28,6 +29,10 @@ def main():
               *[BASE / name for name in ('native-gc.c', 'native-gc.h', 'native-gc-test.c',
                 'host-roots-test.c', 'root-probe.c', 'root-probe.h', 'text-arena.h', 'native-stack.h')],
               ROOT / 'docs/experiments/aot-fault-details/fault-details.h']
+    if args.owned_bodies:
+        inputs += [ROOT / 'docs/experiments/runtime-async' / name for name in
+                   ('native-runtime.c', 'native-runtime.h', 'native-owned-body-test.c')]
+        inputs += [BASE / name for name in ('native-stack.c', 'socket-listener.h', 'socket-os.h')]
     report = {'passed': False, 'commands': [], 'inputsSha256': {
         str(path): hashlib.sha256(path.read_bytes()).hexdigest() for path in inputs}}
 
@@ -45,6 +50,13 @@ def main():
             run(name + '-build', [*cc, BASE / (name + '.c'), BASE / 'native-gc.c',
                                  BASE / 'root-probe.c', '-pthread', '-o', binary])
             run(name + '-execute', [binary])
+        if args.owned_bodies:
+            carrier = ROOT / 'docs/experiments/runtime-async'
+            binary = out / 'native-owned-body-test'
+            run('owned-body-build', [*cc, '-Wno-deprecated-declarations',
+                '-I', carrier, carrier / 'native-owned-body-test.c', carrier / 'native-runtime.c',
+                BASE / 'native-gc.c', BASE / 'root-probe.c', BASE / 'native-stack.c', '-o', binary])
+            run('owned-body-execute', [binary])
         report['passed'] = True
     finally:
         (out / 'validation.json').write_text(json.dumps(report, indent=2) + '\n')

@@ -31,8 +31,9 @@ now passes sanitized ownership/cycle tests. An opt-in
 also participates in automatic safepoints and expires unreachable stacks safely.
 [Dependent host handles](experiments/aot-console/native-gc.md#dependent-host-handles--private-experiment-2026-10-11)
 now share that marking fixed point, with explicit strong ownership required for
-dispatch. Generator integration is still open: its parked stacks/callbacks remain
-strong roots. Abandoned-generator collection and
+dispatch. The opt-in [native carrier now reclaims abandoned owned bodies](experiments/runtime-async/async-generators.md#owned-native-body-reclamation--2026-10-11)
+in a sanitized 160-suspension contract test, including stack mappings and operation
+slots. Managed generator integration is still open: its provider retains strong roots. Abandoned-generator collection and
 performance gates remain open. See
 [scope, evidence and remaining work](experiments/runtime-async/async-generators.md).
 

@@ -37,6 +37,8 @@ typedef struct fiber {
     size_t mapping_bytes;
     uintptr_t lower, upper;
     uint64_t callback, operation, waiting;
+    void *owner;
+    uint64_t active_owner, active_callback;
     int done, status, drain, parked;
     ucontext_t *caller;
 } fiber;
@@ -48,7 +50,7 @@ static _Thread_local struct {
     fiber fibers[LIMIT];
     fiber *current;
     cached_stack cache[NEOCLR_ASYNC_STACK_CACHE_LIMIT + 1];
-    unsigned cached;
+    unsigned cached, owned;
     int pumping;
 } state;
 static _Thread_local uint64_t next_id;
@@ -67,14 +69,19 @@ static void bounds(fiber *f) {
 }
 static void yield(void) {
     fiber *f = state.current;
-    neoclr_roots_park_v1(&f->roots);
+    if (f->active_callback && neoclr_gc_host_root_release_v1(state.context, f->active_callback)) abort();
+    if (f->active_owner && neoclr_gc_host_root_release_v1(state.context, f->active_owner)) abort();
+    f->active_callback = f->active_owner = 0;
+    if (f->owner && !f->done) {
+        if (neoclr_gc_roots_park_owned_v1(state.context, f->owner, &f->roots)) abort();
+    } else neoclr_roots_park_v1(&f->roots);
     f->parked = 1;
     if (swapcontext(&f->machine, f->caller)) abort();
 }
 static void body(void) {
     fiber *f = state.current;
     f->status = f->drain ? state.drain(state.context)
-        : state.invoke(f->callback, state.context);
+        : state.invoke(f->owner ? f->active_callback : f->callback, state.context);
     if (neoclr_root_probe_head_v1()) abort();
     if (f->callback && neoclr_gc_host_root_release_v1(state.context, f->callback)) abort();
     f->callback = 0;
@@ -122,7 +129,43 @@ static fiber *allocate_fiber(uint64_t callback, uint64_t op, int drain) {
     makecontext(&f->machine, body, 0);
     return f;
 }
+/* Called only on the owner thread outside collection, never from a GC callback.
+ * Only explicitly owned, expired parked bodies are eligible. Their externally
+ * owned completion signals are neither completed nor released here. */
+static void reap_expired(void) {
+    if (!state.owned) return;
+    for (unsigned i = 0; i < LIMIT; ++i) {
+        fiber *f = &state.fibers[i];
+        if (!f->mapping || !f->parked || !f->roots.expired) continue;
+        if (!f->owner || f == state.current || f->active_owner || f->active_callback) abort();
+        neoclr_roots_discard_v1(&f->roots);
+        if (neoclr_gc_host_root_release_v1(state.context, f->callback)) abort();
+        operation *op = find(f->operation);
+        if (op) memset(op, 0, sizeof(*op));
+        unmap_stack(f->mapping, f->mapping_bytes);
+        --state.owned;
+        memset(f, 0, sizeof(*f));
+    }
+}
+int32_t neoclr_runtime_async_reap_v1(neoclr_aot_context *c) {
+    if (!c || state.context != c || state.current || state.pumping || neoclr_root_probe_head_v1()) return 3;
+    reap_expired();
+    return 0;
+}
 static int resume(fiber *f) {
+    if (f->roots.expired) return 3;
+    if (f->owner) {
+        void *callback = NULL;
+        if (neoclr_gc_host_root_read_v1(state.context, f->callback, &callback)) return 3;
+        int status = neoclr_gc_host_root_create_v1(state.context, f->owner, &f->active_owner);
+        if (status) return status;
+        status = neoclr_gc_host_root_create_v1(state.context, callback, &f->active_callback);
+        if (status) {
+            if (neoclr_gc_host_root_release_v1(state.context, f->active_owner)) abort();
+            f->active_owner = 0;
+            return status;
+        }
+    }
     ++statistics.resumes;
     ucontext_t caller;
     neoclr_parked_roots caller_roots = {0};
@@ -138,6 +181,7 @@ static int resume(fiber *f) {
     neoclr_roots_resume_v1(&caller_roots);
     int status = f->status;
     if (f->done) {
+        if (f->owner) --state.owned;
         neoclr_roots_discard_v1(&f->roots);
         /* The callback root and parked root chain have ended. Cache only the
          * raw guarded mapping, never a machine context or managed ownership. */
@@ -160,19 +204,44 @@ int32_t neoclr_runtime_async_create_v1(neoclr_aot_context *c, uint64_t *out) {
     }
     return 5;
 }
-int32_t neoclr_runtime_async_start_v1(void *callback, neoclr_aot_context *c,
+static int32_t start(void *owner, void *callback, neoclr_aot_context *c,
     uint64_t *out, neoclr_async_callback invoke) {
     if (admit(c) || !out || !invoke || (state.invoke && state.invoke != invoke)) return 3;
     state.invoke = invoke;
     uint64_t root = 0, op = 0;
     int status = neoclr_runtime_async_create_v1(c, &op);
     if (status) return status;
-    if (neoclr_gc_host_root_create_v1(c, callback, &root)) { find(op)->id = 0; return 3; }
+    status = owner ? neoclr_gc_host_root_create_owned_v1(c, owner, callback, &root)
+        : neoclr_gc_host_root_create_v1(c, callback, &root);
+    if (status) { find(op)->id = 0; return status; }
     fiber *f = allocate_fiber(root, op, 0);
     if (!f) { neoclr_gc_host_root_release_v1(c, root); find(op)->id = 0; return 5; }
+    f->owner = owner;
+    if (owner) ++state.owned;
     find(op)->body = 1;
+    if (!owner) *out = op; /* Preserve the original strong-entry publication point. */
+    status = resume(f);
+    if (status && f->mapping && !f->parked) {
+        /* Admission failed before switching stacks (for example, handle quota).
+         * No callback ran, so roll back instead of leaving an unrooted owner. */
+        if (neoclr_gc_host_root_release_v1(c, f->callback)) abort();
+        unmap_stack(f->mapping, f->mapping_bytes);
+        if (f->owner) --state.owned;
+        memset(f, 0, sizeof(*f));
+        find(op)->id = 0;
+        return status;
+    }
     *out = op;
-    return resume(f);
+    return status;
+}
+int32_t neoclr_runtime_async_start_v1(void *callback, neoclr_aot_context *c,
+    uint64_t *out, neoclr_async_callback invoke) {
+    return start(NULL, callback, c, out, invoke);
+}
+int32_t neoclr_runtime_async_start_owned_v1(void *owner, void *callback, neoclr_aot_context *c,
+    uint64_t *out, neoclr_async_callback invoke) {
+    if (!owner) return 3;
+    return start(owner, callback, c, out, invoke);
 }
 int32_t neoclr_runtime_async_completeunit_v1(uint64_t id, neoclr_aot_context *c, int32_t *out) {
     if (admit(c) || !out) return 3;
@@ -221,12 +290,16 @@ int32_t neoclr_runtime_async_pump_v1(neoclr_aot_context *c, neoclr_async_callbac
     neoclr_roots_park_v1(&entry);
     int status = 0;
     while (!status) {
+        reap_expired();
         int draining = 0;
         for (unsigned i = 0; i < LIMIT; ++i) {
             fiber *f = &state.fibers[i];
             if (!f->mapping) continue;
             operation *op = find(f->waiting);
-            if (op && op->complete) status = resume(f);
+            if (op && op->complete) {
+                status = resume(f);
+                reap_expired();
+            }
             if (status) break;
             draining |= f->mapping && f->drain;
         }
@@ -237,6 +310,7 @@ int32_t neoclr_runtime_async_pump_v1(neoclr_aot_context *c, neoclr_async_callbac
             status = resume(f);
             if (status) break;
         }
+        reap_expired();
         int waiting = 0, ready = 0;
         for (unsigned i = 0; i < LIMIT; ++i) if (state.fibers[i].mapping) {
             waiting = 1;
@@ -273,6 +347,7 @@ int32_t neoclr_runtime_async_pump_v1(neoclr_aot_context *c, neoclr_async_callbac
 int32_t neoclr_runtime_async_shutdown_v1(neoclr_aot_context *c) {
     if (!state.context) return 0;
     if (state.context != c || state.current || state.pumping || neoclr_root_probe_head_v1()) return 3;
+    reap_expired();
     int leaked = 0;
     for (unsigned i = 0; i < LIMIT; ++i) {
         fiber *f = &state.fibers[i];

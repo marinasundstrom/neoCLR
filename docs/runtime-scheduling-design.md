@@ -1713,3 +1713,12 @@ and owned parked frames as one reachability graph. Dispatch must first establish
 strong handle; expiration never invokes managed cleanup or releases native ownership
 implicitly. Generator integration and the preference for managed callback storage
 remain unchanged.
+
+
+The [owned native body carrier](experiments/runtime-async/async-generators.md#owned-native-body-reclamation--2026-10-11)
+now connects those two collector primitives: strong ownership while executing,
+dependent ownership while parked, and explicit native resource reclamation outside
+GC. The sanitized host proves 80 resumptions and 80 abandonments without leaking
+operation slots or stack mappings. External signal ownership remains independent.
+The managed provider still needs to express result-task/iterator/completion reachability;
+no runtime-async default or general pending-task policy changes in this slice.

@@ -422,3 +422,54 @@ failure transitions. The [generator regression](owned-callback-generator-validat
 passes in all three local modes, using the existing strong roots. The managed
 provider, pending advancement/completion ownership and native resource reclamation
 are still to be connected; this is not yet abandoned-generator support.
+
+
+## Owned native body reclamation — 2026-10-11
+
+The macOS ARM64 retained-stack carrier now has a private, opt-in
+`neoclr_runtime_async_start_owned_v1(owner, callback, context, output, invoke)` entry.
+A managed owner controls both the parked frame chain and the dependent callback
+handle. While executing, the carrier holds strong owner/callback handles. On each
+suspension it releases those strong handles and parks the frames conditionally;
+resumption establishes fresh strong handles before restoring the stack. The invoke
+adapter's handle is for initial admission only, not for reuse after suspension.
+The generated native dispatcher already reads the handle only on entry.
+
+GC expires the dependent handles and frame registration before reclaiming their
+managed objects. Outside collection, explicit quiescent `neoclr_runtime_async_reap_v1`,
+the pump, or shutdown discards expired registrations, releases callback handles,
+unmaps abandoned stacks and frees body-operation slots. It never resumes abandoned
+frames or runs managed cleanup. An externally owned signal awaited by that body is
+not completed, cancelled or released by reclamation. A late signal completion
+cannot revive the discarded body. Completed bodies retain the existing release
+protocol. Admission failure while acquiring activation handles rolls back the
+body/stack/operation without publishing a result handle.
+
+[Sanitized native carrier evidence](owned-native-body-validation.json) executes
+160 actual suspensions: 80 resume with preserved frame data, and 80 abandon with
+owner/stack back-references. Both explicit reap and pump reclamation are exercised.
+Repetition exceeds the carrier's 128 operation slots, proving reuse rather than
+invocation-end cleanup. Late external completion never resumes an abandoned body;
+all mappings are unmapped at shutdown, with zero reserved stack bytes. Exhausting
+activation-handle capacity verifies startup rollback. The host supplies an idle
+scheduler stub; these are carrier/GC tests, not managed provider or HTTP tests.
+Reproduce with `validate_conditional_roots.py --owned-bodies` and a passing host recipe.
+The [generator regression](owned-native-body-generator-validation.json) passes
+interpreter, macOS ARM64 JIT and AOT using the existing provider's strong ownership.
+
+**Managed integration remains open.** No Raven intrinsic or compiler option selects
+this entry yet. Callers must keep the owner reachable from every live consumer,
+including result/advancement tasks and externally owned pending completions. Native
+operation ids alone do not retain it. The current provider's `BodyLifetime` callback
+and completion signals do not express these managed relationships. Switching it to
+the owned entry before connecting them would discard needed work or preserve cycles.
+The next step is that managed graph, with abandonment and live pending-task tests.
+
+Compared with the .NET managed state-machine object model, this experiment additionally
+owns a native stack mapping and must detach its registered roots before unmapping.
+The dependent-lifetime research in the scheduler design still applies; this does not
+claim CLR Task implementation equivalence. The benefit established here is reclamation
+of abandoned native resources; costs include two temporary strong handles per executing
+owned body, promotion/parking bookkeeping, and pump scans after resumptions that might
+collect. The macOS ucontext carrier remains scaffolding. Windows qualification,
+managed-generator reclamation and performance comparisons remain open.
