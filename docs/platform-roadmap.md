@@ -23,8 +23,10 @@ including their runners/APIs (completed), then continue scheduler work followed 
 The first resumed scheduler slice centralizes interpreter wait policy and timer
 deadline hints. Native JIT/AOT hosts now share a
 [completion-state boundary](experiments/native-scheduler/README.md), with explicit
-ready/pending/idle results and existing callback-root ownership. Await-site routing,
-explicit delivery acknowledgment and cross-mode wait policy remain open.
+ready/pending/idle results. Outer HTTP hosts now use
+[owned delivery tickets](experiments/native-scheduler/README.md#owned-dispatch-slice--2026-10-11)
+with explicit completion independent of operation-result consumption. Generated-entry
+acknowledgment, await-site routing and cross-mode wait policy remain open.
 Migrate more cases as needed; remaining benchmark/framework features are follow-ups,
 not prerequisites for beginning the scheduler slice. Parallel-by-default testing and
 class grouping are proposals to develop with scheduling, not enabled behavior.
@@ -32,7 +34,8 @@ class grouping are proposals to develop with scheduling, not enabled behavior.
 **Common language runtime clarification (2026-10-11):** the primary target is managed
 languages running bytecode through the interpreter or JIT, with native AOT as the
 publishing target. Runtime services should be opt-in through explicit contracts;
-future native-language/runtime integration points extend this foundation. The
+future native-language/runtime integration points extend this foundation, including
+managed-to-native calls and native-to-managed entry. The
 [runtime architecture proposal](proposals/runtime-architecture.md) remains exploratory,
 not a commitment to implement every participation model before managed execution.
 Opting into a service still requires its ownership, safety and lifetime rules.
@@ -41,7 +44,7 @@ Opting into a service still requires its ownership, safety and lifetime rules.
 with language implementations and eventually native languages/other runtimes able to
 project and integrate its lifecycle. Raven callbacks are a transitional projection,
 not the definition of suspension. The [design boundary](runtime-scheduling-design.md#runtime-owned-asynchrony-and-language-projections--2026-10-11)
-keeps completion, scheduling and retained execution ownership separate. Native
+keeps completion, scheduling and retained execution ownership separate. Generated-entry
 ownership acknowledgment remains the next bounded gate; foreign-runtime ABI and
 suspension representation are not yet selected or implemented.
 

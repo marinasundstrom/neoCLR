@@ -57,6 +57,29 @@ rebuilding unrelated runtime/compiler binaries. It validates input hashes before
 and after execution. The full retained-HTTP verifier remains available for a broader
 interpreter comparison.
 
-Next boundaries: explicit ready-to-active acknowledgment, awaiting execution's
+## Owned dispatch slice — 2026-10-11
+
+The outer HTTP and retained-session hosts now opt into `neoclr_scheduler_acquire_v1`
+and `neoclr_scheduler_complete_v1`. Acquisition retains an independent dispatch root;
+all polls reject advancement until the host completes that ticket. Completion requires
+the original boundary after callback return, including guest fault. Duplicate, stale,
+wrong-context and wrong-boundary tickets are rejected. Scope teardown releases an
+abandoned ticket. Operation-result consumption remains independent: either lifetime
+may finish first without invalidating the other.
+
+The additional root uses one slot in the bounded host-root registry, with no new
+managed allocation. Acquisition failure is terminal for the host and requires scope
+teardown; it is not retryable delivery. There is no parallel dispatch or throughput
+claim. The generated entry pump (including the JIT adapter) still uses the legacy
+step protocol; migrating it requires a separate entry-lifecycle adapter. This slice
+does not establish full cross-mode acknowledgment parity or a stable interop ABI.
+
+[Owned-delivery contracts](owned-contracts.json) pass all six native contract
+executables with bounds/undefined-behavior instrumentation on macOS ARM64.
+[Retained HTTP](owned-retained-http.json) passes normal, fragmented and terminal-fault
+cases. The HTTP-profile timer sample also passes its ten scenarios from
+`target/scheduler-owned-http/app`. Windows runs remain pending for this revision.
+
+Next boundaries: generated-entry delivery acknowledgment, awaiting execution's
 continuation destination, and wait policy alignment. See the
 [scheduler design](../../runtime-scheduling-design.md#native-completion-state-boundary--2026-10-11).

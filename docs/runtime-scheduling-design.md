@@ -631,3 +631,27 @@ completion and resumption integration without depending on Raven-generated layou
 These are validation requirements, not completed capabilities. Current native hosts
 still use synchronous published-frame boundaries and source-owned callback roots;
 existing instruction-step VM suspension does not implement runtime async/await.
+
+
+## Owned native dispatch — 2026-10-11
+
+The outer HTTP AOT and retained-session hosts now acquire a private dispatch ticket
+and explicitly complete it after invoking the callback, on success or guest fault.
+The ticket owns a separate strong root. Polling cannot advance while it is outstanding;
+completion validates the owning context, ticket and original published boundary.
+Operation outcomes and dispatch lifetimes can end in either order. Scope teardown
+abandons both safely. See [contracts and HTTP evidence](experiments/native-scheduler/README.md#owned-dispatch-slice--2026-10-11).
+
+This follows the existing .NET comparison's separation of outcome ownership and
+scheduled execution. Keeping only source-owned roots avoids another registry slot
+but couples dispatch lifetime to result consumption. The owned ticket costs one
+bounded host-root slot, not a managed allocation; allocation/registry exhaustion is a
+terminal host error with scope cleanup, not retryable delivery. No speedup is claimed.
+The mechanism is private and callback-based; it does not select a future activation
+representation or native interop ABI. Cancellation of a delivered source does not
+revoke dispatch ownership; consumers still observe the operation's existing outcome.
+
+The generated entry pump and JIT entry adapter retain their previous poll protocol.
+Next migrate that entry lifecycle with explicit completion on normal and fault exits,
+then resolve resumption destination and wait policy. This bounded outer-host slice
+must not be described as completed acknowledgment parity across execution modes.

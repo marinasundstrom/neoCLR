@@ -6,7 +6,9 @@
 
 **Author clarification (2026-10-11):** neoCLR's primary target is managed languages
 running bytecode, with interpreter and JIT support. Native AOT is the publishing
-target. The goal is a common language runtime with opt-in services; the native and
+target. Future interop should support both managed calls into native code and native
+calls into managed code, with explicit entry, lifetime and error contracts. The goal
+is a common language runtime with opt-in services; the native and
 foreign-runtime integration models below are future extension points, not an equal
 immediate implementation priority. Service selection does not waive a selected
 service's safety, ownership or lifetime requirements. The

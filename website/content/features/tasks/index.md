@@ -224,7 +224,10 @@ Both platforms expose awaitable completion. neoCLR uses Promise for producer com
 Raven emits state machines, with a private invocation scheduler delivering native
 completion through TaskQueue. Native JIT/AOT hosts now share a private completion
 step that distinguishes ready work, pending outcomes and idle sources; callback roots
-remain retained through dispatch. This is development infrastructure, not a public
+remain retained through dispatch. Outer native HTTP hosts now explicitly acquire and
+complete owned callback deliveries independently of operation-result consumption;
+the generated entry pump still uses the earlier poll protocol.
+This is development infrastructure, not a public
 Scheduler API or runtime-managed async suspension. Callbacks must return for other
 work to progress.
 A pending await currently resumes through the producer queue; custom queue and UI

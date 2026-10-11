@@ -40,9 +40,12 @@ static int invoke(neoclr_aot_context *context, int *failed, int argc, neoclr_pro
         status = neoclr_drain_default_queue_v1(context);
         if (status) break;
         uint64_t callback = 0;
-        int32_t progress = neoclr_scheduler_step_v1(context, &callback, NULL);
+        int32_t progress = neoclr_scheduler_acquire_v1(context, &callback, NULL);
         if (progress == NEOCLR_SCHEDULER_IDLE) break;
-        if (progress == NEOCLR_SCHEDULER_READY) status = neoclr_invoke_void_callback_v1(callback, context);
+        if (progress == NEOCLR_SCHEDULER_READY) {
+            status = neoclr_invoke_void_callback_v1(callback, context);
+            if (neoclr_scheduler_complete_v1(context, callback, NULL)) host_error = 1;
+        }
         else if (progress < 0) host_error = 1;
         else neoclr_os_pause();
     }

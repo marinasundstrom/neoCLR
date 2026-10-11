@@ -13,7 +13,7 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   contracts. Document proposed layers, tradeoffs and validation gates; this is design
   direction, not implemented suspension or a selected interoperability ABI. Clarify
   the primary path: managed bytecode with interpreter/JIT execution and native AOT
-  publishing, opt-in services and future native/foreign-runtime integration.
+  publishing, opt-in services and future bidirectional managed/native interop.
 
 - Begin the resumed scheduler work by moving interpreter invocation wait policy
   into the private scheduler. Bound owner waits by known timer deadlines, preserve
@@ -25,6 +25,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   step instead of inspecting operation tables. Preserve callback roots and pending
   result ownership; release final timer delivery at the next idle step. Native
   contracts, all-mode timer/fault cases and retained HTTP consumers pass on macOS ARM64.
+  Add private owned dispatch tickets to outer HTTP hosts, retaining callbacks
+  independently of result consumption and requiring explicit completion before the
+  next poll. Reject stale/duplicate/wrong-boundary completion; release abandoned
+  deliveries during teardown. Six native contracts, retained HTTP fault/fragmented
+  cases and ten HTTP-host timer scenarios pass locally. Generated-entry/JIT delivery
+  acknowledgment remains a follow-up; Windows has not been rerun for this slice.
 
 - Document testing and benchmarking as independent development projects, including
   ownership, APIs, runner commands, selection, configuration, reports and limitations.

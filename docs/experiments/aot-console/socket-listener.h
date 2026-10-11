@@ -25,6 +25,8 @@ typedef struct neoclr_socket_scope {
         uint64_t attempt_deadline;
     } operations[64];
     uint64_t timer_delivery; /* Root handed to host, retained until next poll/leave. */
+    uint64_t scheduler_delivery; /* Independent dispatch root, released by completion/leave. */
+    const struct neoclr_probe_frame *scheduler_boundary;
     uint64_t transfer_bytes;
     unsigned poll_cursor;
 } neoclr_socket_scope;
@@ -80,6 +82,14 @@ int32_t neoclr_socket_connect_addresses_until_v1(const void *, int32_t, int64_t,
  * still awaiting result consumption keep the scheduler pending. */
 enum { NEOCLR_SCHEDULER_IDLE = 0, NEOCLR_SCHEDULER_READY = 1, NEOCLR_SCHEDULER_PENDING = 2 };
 int32_t neoclr_scheduler_step_v1(neoclr_aot_context *, uint64_t *, const neoclr_probe_frame *);
+/* Opt-in owned delivery. Acquire returns the same states as step, but READY
+ * publishes an independent root/ticket. No poll may advance until complete.
+ * Complete at the acquiring boundary after callback return, including guest fault;
+ * it releases dispatch ownership, not the operation result. Stale/wrong tickets
+ * return 3; scope leave abandons an outstanding delivery. Acquisition failure is
+ * terminal: tear down the scope. These are private host contracts, not stable ABI. */
+int32_t neoclr_scheduler_acquire_v1(neoclr_aot_context *, uint64_t *, const neoclr_probe_frame *);
+int32_t neoclr_scheduler_complete_v1(neoclr_aot_context *, uint64_t, const neoclr_probe_frame *);
 /* Quiescent owner-thread poll: 0 no ready work, 1 publishes one retained callback
  * handle, -3 host misuse. Never invokes guest code. Consume result during dispatch;
  * scope teardown releases abandoned operations, roots and accepted sockets. */

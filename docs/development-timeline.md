@@ -14689,3 +14689,6 @@ outside benchmark measurement. Implementation follows the configuration slice.
   extension of the managed foundation, not a replacement or immediate parity gate.
 - **Boundary:** opting into a service requires its lifetime and safety contracts;
   this documentation does not implement service negotiation or an interoperability ABI.
+- **Further author clarification:** future support must include both managed code
+  calling native code and native code calling managed code. Recorded as bidirectional
+  interop direction; comprehensive support is not claimed by the current native hosts.

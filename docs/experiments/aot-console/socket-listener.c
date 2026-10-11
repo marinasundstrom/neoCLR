@@ -94,6 +94,9 @@ int32_t neoclr_socket_scope_leave_v1(neoclr_socket_scope *scope) {
 #ifdef NEOCLR_NATIVE_GC
     if (scope->timer_delivery && neoclr_gc_host_root_release_v1(scope->context, scope->timer_delivery)) status = 3;
     scope->timer_delivery = 0;
+    if (scope->scheduler_delivery && neoclr_gc_host_root_release_v1(scope->context, scope->scheduler_delivery)) status = 3;
+    scope->scheduler_delivery = 0;
+    scope->scheduler_boundary = NULL;
     for (unsigned i = 0; i < 64; i++) {
         if (scope->operations[i].callback && neoclr_gc_host_root_release_v1(scope->context, scope->operations[i].callback)) status = 3;
         release_client(scope, i);
@@ -380,9 +383,41 @@ int32_t neoclr_scheduler_step_v1(neoclr_aot_context *context, uint64_t *callback
     return NEOCLR_SCHEDULER_IDLE;
 }
 
+int32_t neoclr_scheduler_acquire_v1(neoclr_aot_context *context, uint64_t *delivery,
+    const neoclr_probe_frame *boundary) {
+    if (!delivery) return -3;
+    uint64_t source = 0, owned = 0;
+    int32_t progress = neoclr_scheduler_step_v1(context, &source, boundary);
+    if (progress != NEOCLR_SCHEDULER_READY) return progress;
+    void *callback = NULL;
+    if (neoclr_gc_host_root_read_v1(context, source, &callback) ||
+        neoclr_gc_host_root_create_v1(context, callback, &owned)) return -3;
+    neoclr_socket_scope *scope = find_scope(context);
+    scope->scheduler_delivery = owned;
+    scope->scheduler_boundary = boundary;
+    *delivery = owned;
+    return NEOCLR_SCHEDULER_READY;
+}
+int32_t neoclr_scheduler_complete_v1(neoclr_aot_context *context, uint64_t delivery,
+    const neoclr_probe_frame *boundary) {
+    neoclr_socket_scope *scope = find_scope(context);
+    if (!scope || !delivery || scope->scheduler_delivery != delivery ||
+        scope->scheduler_boundary != boundary) return 3;
+    if (boundary) {
+        if (neoclr_root_probe_head_v1() != boundary || boundary->context != context) return 3;
+    } else {
+        for (const neoclr_probe_frame *f = neoclr_root_probe_head_v1(); f; f = f->previous)
+            if (f->context == context) return 3;
+    }
+    if (neoclr_gc_host_root_release_v1(context, delivery)) return 3;
+    scope->scheduler_delivery = 0;
+    scope->scheduler_boundary = NULL;
+    return 0;
+}
+
 static int32_t socket_poll(neoclr_aot_context *context, uint64_t *callback) {
     neoclr_socket_scope *scope = find_scope(context);
-    if (!scope || !callback || context->fault.code) return -3;
+    if (!scope || !callback || context->fault.code || scope->scheduler_delivery) return -3;
     if (scope->timer_delivery) {
         if (neoclr_gc_host_root_release_v1(context, scope->timer_delivery)) return -3;
         scope->timer_delivery = 0;
