@@ -436,7 +436,8 @@ unit for strings rather than exposing UTF-8 storage through syntax. The first ar
 slice is implemented locally: Index/Range values, from-end read/write, half-open shallow
 copies, Option-returning Get and Result-returning Slice. Nine framework cases and six
 fault guards pass in interpreter and macOS AOT. The author clarified that consuming
-APIs may fault; Index/Range describe positions. String/sequence slicing remains next;
+APIs may fault; Index/Range describe positions. String Index/Range access and safe Get/Slice now pass locally with grapheme boundaries;
+sequence slicing remains next;
 arbitrary Iterable indexing and borrowed views remain outside this slice. See the
 [contract and evidence](design/index-range.md). Windows execution is pending.
 The host metadata model and native manifests now preserve assembly annotations through

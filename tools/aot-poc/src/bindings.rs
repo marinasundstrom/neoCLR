@@ -489,6 +489,7 @@ pub fn utf8_text(input: &mut neoclr::Module, selection: &Value) -> Result<Vec<Va
             "neoCLR.Runtime.Utf8Decode" => (vec![Type::ArrayRef(Box::new(Type::Byte))], Type::Value, "utf8-decode-v1", "neoclr_utf8_decode_v1"),
             "neoCLR.Runtime.Utf8Encode" => (vec![Type::String], Type::Array(Box::new(Type::Byte)), "utf8-encode-v1", "neoclr_utf8_encode_v1"),
             "neoCLR.Runtime.StringByteCount" => (vec![Type::String], Type::Int32, "string-byte-count-v1", "neoclr_string_byte_count_v1"),
+            "neoCLR.Runtime.StringSliceGraphemes" => (vec![Type::String, Type::Int32, Type::Int32], Type::String, "string-slice-graphemes-v1", "neoclr_string_slice_graphemes_v1"),
             "neoCLR.Runtime.StringSliceUtf8" => (vec![Type::String, Type::Int32, Type::Int32], Type::Value, "string-slice-utf8-v1", "neoclr_string_slice_utf8_v1"),
             _ => continue,
         };

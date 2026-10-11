@@ -2071,3 +2071,19 @@ behavior. Object/default-display and inherited-display tests cover the projectio
 with the interpreter. See [bridge details](../../raven-cli-bridge.md#object-value-dispatch-and-hashing-gaps-found-by-migration-2026-10-10)
 for remaining limits and [runtime tests](../../../runtime/raven/tests/README.md) for
 Path/IPAddress qualification. Windows execution remains pending.
+
+
+### Grapheme slicing (development, 2026-10-11)
+
+The private `neoclr_string_slice_graphemes_v1(text,start,count,arena,output)` adapter
+locates grapheme boundaries with the same pinned Unicode visitor as indexing, then
+allocates and copies one text value. Negative/past-end ranges report status 8 without
+publishing output; empty ranges at the end are valid. Invalid descriptors report 3,
+allocation exhaustion reports 5. The widened end calculation avoids Int32 addition
+overflow. The kernel never collects or reenters; AOT call sites are rooted allocation
+points. These matched symbols remain an experimental ABI, not public guest APIs.
+String-unicode-test.c verifies combining text, empty/end bounds and a single allocation
+(32-byte GC header plus aligned descriptor/payload), with no allocation on rejected
+bounds. The check passes on macOS ARM64 with UBSan and warnings-as-errors; Windows
+execution is pending. Public String range access additionally validates its bounds
+and preserves neoCLR's grapheme semantics, unlike .NET UTF-16 code-unit slicing.

@@ -226,7 +226,7 @@ def build(project, bundle, aot, output, profile=PROFILE, bootstrap_root=None, re
         text_services = {'neoclr_string_compare_ignore_case_v1', 'neoclr_string_hash_ordinal_v1',
                          'neoclr_string_hash_ignore_case_v1', 'neoclr_string_upper_v1',
                          'neoclr_string_lower_v1', 'neoclr_string_grapheme_count_v1',
-                         'neoclr_string_grapheme_at_v1', 'neoclr_string_graphemes_v1',
+                         'neoclr_string_slice_graphemes_v1', 'neoclr_string_grapheme_at_v1', 'neoclr_string_graphemes_v1',
                          'neoclr_string_scalars_v1', 'neoclr_string_from_chars_v1'}
         native_text = []
         if time_zone_rules or any(binding.get('nativePrimitiveParser') or binding.get('symbol') in text_services or binding.get('validationSymbol') == 'neoclr_is_single_grapheme_v1'

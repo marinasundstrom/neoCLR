@@ -22,6 +22,19 @@ int main(void) {
     assert(neoclr_string_grapheme_count_v1(T(invalid), &count) == 3 && count == 3);
     assert(neoclr_string_grapheme_at_v1(T(unicode), -1, &context.text, &result) == 8 && result == T(empty));
     assert(neoclr_string_grapheme_at_v1(T(unicode), 3, &context.text, &result) == 8 && result == T(empty));
+    uint64_t before = context.text.used;
+    assert(neoclr_string_slice_graphemes_v1(T(unicode), 1, 1, &context.text, &result) == 0);
+    assert(result->length == 4 && !memcmp(result->bytes, unicode.bytes + 3, 4));
+    /* One text allocation: 32-byte GC header plus aligned 8-byte length and 4-byte payload. */
+    assert(context.text.used == before + 48);
+    const neoclr_aot_text *saved = result;
+    before = context.text.used;
+    assert(neoclr_string_slice_graphemes_v1(T(unicode), 4, 0, &context.text, &result) == 8 && result == saved);
+    assert(neoclr_string_slice_graphemes_v1(T(unicode), 0, INT32_MAX, &context.text, &result) == 8 && result == saved);
+    assert(neoclr_string_slice_graphemes_v1(T(unicode), -1, 1, &context.text, &result) == 8 && result == saved);
+    assert(context.text.used == before);
+    assert(neoclr_string_slice_graphemes_v1(T(unicode), 3, 0, &context.text, &result) == 0 && result->length == 0);
+    assert(neoclr_string_slice_graphemes_v1(T(empty), 0, 0, &context.text, &result) == 0 && result->length == 0);
     assert(neoclr_string_upper_v1(T(word), &context.text, &result) == 0);
     assert(result->length == upper.length && !memcmp(result->bytes, upper.bytes, upper.length));
     const void *vector = NULL;

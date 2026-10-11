@@ -487,6 +487,7 @@ pub(super) fn compile(input: &neoclr::Module, root: &str, details: Option<&crate
             (&d.string_hash_ignore_case, "neoclr_string_hash_ignore_case_v1", vec![types::I64, types::I64]),
             (&d.string_intern, "neoclr_string_intern_v1", vec![types::I64, types::I64, types::I64]),
             (&d.string_byte_count, "neoclr_string_byte_count_v1", vec![types::I64, types::I64]),
+            (&d.string_slice_graphemes, "neoclr_string_slice_graphemes_v1", vec![types::I64, types::I32, types::I32, types::I64, types::I64]),
             (&d.string_slice_utf8, "neoclr_string_slice_utf8_v1", vec![types::I64, types::I32, types::I32, types::I64, types::I64]),
         ] {
             if indices.is_empty() { continue; }
@@ -1173,7 +1174,7 @@ pub(super) fn compile(input: &neoclr::Module, root: &str, details: Option<&crate
                 } else if details.unwrap().string_join_parts.contains(&i) {
                     let arena = b.ins().iadd_imm(fault_context.unwrap(), 1048);
                     vec![parameters[0], parameters[1], parameters[2], parameters[3], arena, output]
-                } else if details.unwrap().string_slice_utf8.contains(&i) || details.unwrap().string_replace_ordinal.contains(&i) {
+                } else if details.unwrap().string_slice_graphemes.contains(&i) || details.unwrap().string_slice_utf8.contains(&i) || details.unwrap().string_replace_ordinal.contains(&i) {
                     let arena = b.ins().iadd_imm(fault_context.unwrap(), 1048);
                     vec![parameters[0], parameters[1], parameters[2], arena, output]
                 } else if details.unwrap().system_culture.contains(&i) || details.unwrap().time_zone_version.contains(&i) {
@@ -1205,7 +1206,7 @@ pub(super) fn compile(input: &neoclr::Module, root: &str, details: Option<&crate
                     let array_limit = b.ins().iconst(types::I32, 7);
                     b.ins().select(limited, array_limit, status)
                 } else { status };
-                let status = if details.unwrap().string_grapheme_at.contains(&i) {
+                let status = if details.unwrap().string_grapheme_at.contains(&i) || details.unwrap().string_slice_graphemes.contains(&i) {
                     let bounded = b.ins().icmp_imm(IntCC::Equal, raw, 8);
                     let index = b.ins().iconst(types::I32, 8);
                     b.ins().select(bounded, index, status)

@@ -86,6 +86,7 @@ pub struct Options {
     pub string_byte_count: Vec<usize>,
     pub utf8_decode: Vec<usize>,
     pub utf8_encode: Vec<usize>,
+    pub string_slice_graphemes: Vec<usize>,
     pub string_slice_utf8: Vec<usize>,
     pub char_from_string: Vec<usize>,
     pub char_text: Vec<usize>,
@@ -382,6 +383,9 @@ impl Options {
                 .filter(|r| r["implementation"] == "string-byte-count-v1")
                 .filter_map(|r| r["compiledIndex"].as_u64().map(|i| i as usize))
                 .collect(),
+            string_slice_graphemes: report.and_then(|r| r["nativeBindings"].as_array()).into_iter().flatten()
+                .filter(|r| r["implementation"] == "string-slice-graphemes-v1")
+                .filter_map(|r| r["compiledIndex"].as_u64().map(|i| i as usize)).collect(),
             string_slice_utf8: report
                 .and_then(|r| r["nativeBindings"].as_array())
                 .into_iter().flatten()

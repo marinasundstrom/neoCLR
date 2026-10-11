@@ -15,8 +15,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   external value-field stores remain unsupported. Require matching Raven integration
   commit ad3409e06 and native libraries. Refresh both API references and add nine
   interpreter/macOS AOT tests plus six fault guards per mode. Windows CI uses the new
-  compiler pin; execution there is pending. String/sequence slicing and views remain
-  follow-up work.
+  compiler pin; execution there is pending. Add String Index/Range indexers and safe Get/Slice, preserving
+  extended grapheme boundaries. Interpreter and AOT use the shared Unicode segmenter
+  and copy the selected text without materializing character arrays. Qualify combining
+  accents, emoji, empty/bad ranges and evaluation order; the suite now has 12 cases
+  and eight guards per mode. Native kernel checks include single-allocation accounting
+  under UBSan. Sequence slicing and comparative performance measurements remain open.
 
 - Add Disposable HttpClient lifetime and an abstract HttpHandler base, owned and borrowed handler
   constructors, idempotent disposal and linked pending-request cancellation. Preserve

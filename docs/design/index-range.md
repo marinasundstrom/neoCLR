@@ -45,9 +45,9 @@ Index/Range are values, with no per-element wrapper objects. No throughput advan
 is claimed by choosing this implementation.
 
 String indexing already counts grapheme clusters, unlike .NET UTF-16 code units.
-String slicing must preserve that unit and avoid repeated scans from the beginning
-for each character. A bounded scan to locate the two byte boundaries followed by a
-single copy is the intended next layer; exposing raw storage bytes through string
+String slicing preserves that unit and avoids repeated scans from the beginning
+for each character. A bounded scan locates the two byte boundaries followed by a
+single payload copy; exposing raw storage bytes through string
 syntax is not the contract. Known-count Sequence does not imply contiguous storage
 or cheap indexing; arbitrary Iterable must not gain hidden eager enumeration.
 
@@ -106,5 +106,38 @@ remain unsupported. Runtime Contract configuration is unchanged.
 - Windows collections CI uses the new compiler pin and includes this suite through
   the runtime-library runner. Windows execution has not been performed locally.
 
-String/sequence support and performance measurements remain open. Array copying is
+String support is qualified below; sequence support and throughput measurements remain open. Array copying is
 one allocation plus a linear element loop; no timing claim is made by these checks.
+
+
+## String milestone — 2026-10-11
+
+String now has Index and Range indexers, Get(int/Index) returning Option<char>, and
+Slice(Range) returning Result<string, InvalidRangeError>. Boundaries count extended
+grapheme clusters, matching String.Length and the existing integer indexer. This is
+a deliberate difference from .NET UTF-16 indexing: complete user-perceived characters
+are retained, at the cost of segmentation work and different offsets from .NET APIs.
+The shared pinned Unicode segmentation implementation is used in interpreter and AOT.
+No normalization, byte indexing or borrowed view is introduced. Empty slices at the
+end are valid; ^0 is not an element index. Invalid range indexers fault, while Slice
+returns InvalidRangeError. Successful results contain immutable copied text.
+
+Implementation performs one length scan to resolve relative bounds, then a bounded
+scan to locate byte boundaries and one payload copy. It does not enumerate/materialize
+Char[] or repeatedly rescan for each grapheme. String.Get(Index) currently performs a
+second count via Get(int); this is a bounded extra linear pass, not constant-time
+access. The private StringSliceGraphemes service independently rejects invalid integer
+bounds and publishes no result on failure. Native execution roots allocating calls;
+the kernel does not collect or reenter. This is not a public interop ABI.
+
+Evidence: target/string-range-tests/report.json, using target/string-range-bundle
+and target/string-range-libraries-v2 with Raven ad3409e06. Twelve framework cases and
+eight fault guards run in both interpreter and macOS ARM64 AOT. String cases include
+combining accents, ZWJ emoji, regional-indicator flags, empty text and evaluation order.
+The standalone string-unicode-test.c passes UBSan and warnings-as-errors, including
+one-allocation accounting and unchanged output/allocation state for invalid bounds.
+These checks establish allocation shape, not comparative throughput. Windows uses the
+same library/kernel through the existing CI runner; execution remains pending.
+
+Suitable sequence APIs and performance comparison remain next. No compiler change
+was required beyond the preceding Index/Range lowering commit.

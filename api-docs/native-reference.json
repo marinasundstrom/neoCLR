@@ -1,21 +1,21 @@
 {
   "format": 1,
   "archive": "native-reference.zip",
-  "sha256": "af66562b314c830e0789855820aab412d04401fc590042f44705b6dd624e43a0",
-  "librarySourceRevision": "fa40be4039b41da2c7aab8a24295446a51e2a348",
-  "compilerRevision": "83b5ee2103ac3460072cd3d2989ef72170792327",
-  "rendererRevision": "ad3409e06",
+  "sha256": "8a64e2f1b238fa8d823d8aa5537a847b4b49fde02174b4d221a81593f8f55203",
+  "librarySourceRevision": "11fbf884afe532b902a51bca57f819bf7e0ff79d",
+  "compilerRevision": "ad3409e06910bdb33bccd0cfdb1431401f248349",
+  "rendererRevision": "ad3409e06910bdb33bccd0cfdb1431401f248349",
   "libraryArtifacts": {
-    "System.Runtime.dll": "5a843f6cb8715e6e95e209f40469246edef5b397fd74fb35e83d5e8110714166",
-    "System.Data.dll": "f38586c4e47e85d1a2288386ec39bf4dfef373505adf5cfe24383a8096772829",
-    "System.Networking.dll": "c96c1cb167579cffdb03e05fcb6c1410cf3c9fc6470845344ee081bb9fb9a580",
-    "System.Web.dll": "ea5757bdb0d3d2dd6848404d860db6648923f0a5a603611938dfb12eeddf3792",
+    "System.Runtime.dll": "4ffc931e83d658b5f316e1b8048dde0cc2b7d5c4ac0a41d811bb53b418162169",
+    "System.Data.dll": "524daceca704008b76d75394ee987b125d724155369f595ef33a3fe0f19b7107",
+    "System.Networking.dll": "0bce734bd43ba5512c2d303c87bdb4821bfb7b3bc32da121710e3abfdb7e58db",
+    "System.Web.dll": "86f7121f44bae55965ff1f4097a24f945b56c69fb490589b1259c0fee7f2f4c7",
     "System.runtime.neox": "98a1ae1da85387c87746957e83a4015eb59d0566539a915c69f168d2b511b190",
     "Core.dll": "3d4a676d379067c18a65a9beb8257ed40bf3196fc643a9ba1d559c619ec73fad"
   },
   "renderingEvidence": {
     "normalized-sidecars.json": "bd359f088de4dbd1922f65934b20aae2a9bcdee10ea9d36d348641c9dd0d86f5",
-    "restored-xml-comments.json": "f23e60161fac99174cb37808c1d5ac49ad1b6b683d9bfe304c4806a751cd4759"
+    "restored-xml-comments.json": "040530a55219be51bbfd9fa08ac896430c384858598fdd07eb4422dd4838a330"
   },
   "scope": "Reviewed native API rendering; legacy coverage gaps remain explicitly marked by the website overlay."
 }

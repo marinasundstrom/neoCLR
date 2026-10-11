@@ -260,6 +260,9 @@ INDEX_RANGE_NAMES = [
     'Array indexing and slicing evaluate operands once in source order',
     'Read-only value fields use defensive copies for method calls',
     'Array safe access returns options and results for invalid bounds',
+    'String ranges preserve graphemes and half-open boundaries',
+    'String safe access rejects invalid grapheme bounds',
+    'String slicing evaluates receiver and bounds once',
 ]
 HTTP_METHOD_VALUES_NAMES = [
     'HTTP custom method construction and parsing preserve spelling',
@@ -428,6 +431,8 @@ def main():
                     'negative-index': 'Index value must be nonnegative',
                     'negative-conversion': 'Index value must be nonnegative',
                     'negative-length': 'Range length must be nonnegative',
+                    'string-reversed': 'Range is outside the value',
+                    'string-past-end': 'Range is outside the value',
                     'reversed': 'Range is outside the value',
                     'past-end': 'Range is outside the value',
                     'before-start': 'Range is outside the value',
@@ -441,7 +446,7 @@ def main():
                         report['cases'].append(record)
                         if not record['exitCode'] or message not in record['stderr'] or record['stdout']:
                             raise RuntimeError('Index/Range guard did not fault as expected: ' + repr(record))
-                print('index-range: six guards passed in both modes', flush=True)
+                print('index-range: bounds guards passed in both modes', flush=True)
             selections = {
                 'collections': [(['--filter', 'ArrayQueue'], 0, 'PASS ArrayQueue preserves FIFO\nTests: 1, passed: 1, failed: 0, skipped: 0\n'),
                                 (['--filter', 'Map'], 0, ''.join('PASS ' + n + '\n' for n in MAP_NAMES) + f'Tests: {len(MAP_NAMES)}, passed: {len(MAP_NAMES)}, failed: 0, skipped: 0\n')],

@@ -3171,5 +3171,25 @@
       <summary>Resolves offset and count, returning InvalidRangeError for invalid bounds or a negative length.</summary>
     </member>
 
+<member name="M:System.String.Get(System.Index)">
+      <summary>Returns a grapheme at a directional index, or None when outside the text.</summary>
+    </member>
+
+<member name="M:System.String.Get(System.Int32)">
+      <summary>Returns a grapheme, or None when index is outside the text.</summary>
+    </member>
+
+<member name="M:System.String.Slice(System.Range)">
+      <summary>Copies a grapheme range, or returns InvalidRangeError for invalid bounds.</summary>
+    </member>
+
+<member name="P:System.String.Item(System.Index)">
+      <summary>Applies a directional grapheme index; invalid element bounds fault.</summary>
+    </member>
+
+<member name="P:System.String.Item(System.Range)">
+      <summary>Copies a half-open grapheme range; invalid bounds fault.</summary>
+    </member>
+
 </members>
 </doc>

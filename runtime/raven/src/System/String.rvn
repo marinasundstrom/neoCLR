@@ -2,6 +2,7 @@ module System
 
 import System.Runtime.CompilerServices.RuntimeServices
 import System.Result.*
+import System.Option.*
 import System.Text.Utf8SliceError
 
 public class String : EquatableTo<string>, Collections.Sequence<char> {
@@ -34,6 +35,41 @@ public class String : EquatableTo<string>, Collections.Sequence<char> {
 
     val self[index: int]: char {
         get => RuntimeServices.StringGraphemeAt(m_value, index)
+    }
+
+    /// Applies a directional grapheme index; invalid element bounds fault.
+    val self[index: Index]: char {
+        get => RuntimeServices.StringGraphemeAt(m_value, index.GetOffset(Length))
+    }
+
+    /// Copies a half-open grapheme range; invalid bounds fault.
+    val self[range: Range]: string {
+        get {
+            let bounds = range.GetOffsetAndLength(Length)
+            return neoCLR.Runtime.StringSliceGraphemes(m_value, bounds.Item1, bounds.Item2)
+        }
+    }
+
+    /// Returns a grapheme, or None when index is outside the text.
+    func Get(index: int) -> Option<char> {
+        if index < 0 {
+            return None
+        }
+        if index >= Length {
+            return None
+        }
+        return Some(RuntimeServices.StringGraphemeAt(m_value, index))
+    }
+
+    /// Returns a grapheme at a directional index, or None when outside the text.
+    func Get(index: Index) -> Option<char> => Get(index.GetOffset(Length))
+
+    /// Copies a grapheme range, or returns InvalidRangeError for invalid bounds.
+    func Slice(range: Range) -> Result<string, InvalidRangeError> {
+        if range.TryGetOffsetAndLength(Length) is Ok(let bounds) {
+            return Ok(neoCLR.Runtime.StringSliceGraphemes(m_value, bounds.Item1, bounds.Item2))
+        }
+        return Error(InvalidRangeError())
     }
 
     static func Intern(text: string) -> string {

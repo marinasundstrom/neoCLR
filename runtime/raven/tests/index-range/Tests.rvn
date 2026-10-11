@@ -176,3 +176,58 @@ func IValidatedAccess() -> Result<unit, TestFailure> {
     }
     return Assert.True(false, "Empty slice missing")
 }
+
+[Test("String ranges preserve graphemes and half-open boundaries")]
+func JStringSlices() -> Result<unit, TestFailure> {
+    let text = "Aé👩‍💻🇸🇪Z"
+    _ = Assert.Equal(5, text.Length)?
+    _ = Assert.Equal("é👩‍💻🇸🇪", text[1..^1])?
+    _ = Assert.Equal("Aé", text[..2])?
+    _ = Assert.Equal("🇸🇪Z", text[^2..])?
+    _ = Assert.Equal(text, text[..])?
+    _ = Assert.Equal("", text[^0..])?
+    _ = Assert.Equal("", ""[..])?
+    let last: Index = ^1
+    _ = Assert.Equal("Z", text[last].ToString())?
+    return Assert.Equal("👩‍💻", text[^3].ToString())
+}
+
+[Test("String safe access rejects invalid grapheme bounds")]
+func KStringSafeAccess() -> Result<unit, TestFailure> {
+    let text = "é🙂"
+    _ = Assert.True(text.Get(-1) is None, "Negative")?
+    _ = Assert.True(text.Get(2) is None, "End")?
+    _ = Assert.True(text.Get(Index.End) is None, "From end zero")?
+    _ = Assert.True(text.Slice(Range(2, 1)) is Error(_), "Reversed")?
+    _ = Assert.True(text.Slice(Range(0, 3)) is Error(_), "Past end")?
+    _ = Assert.True(text.Slice(Range.StartAt(^3)) is Error(_), "Before start")?
+    if text.Get(^1) is Some(let last) {
+        _ = Assert.Equal("🙂", last.ToString())?
+    } else {
+        return Assert.True(false, "Missing last grapheme")
+    }
+    if text.Slice(0..1) is Ok(let part) {
+        return Assert.Equal("é", part)
+    }
+    return Assert.True(false, "Missing slice")
+}
+
+[Test("String slicing evaluates receiver and bounds once")]
+func LStringEvaluation() -> Result<unit, TestFailure> {
+    let observed = ObservedText()
+    let part = observed.Read()[observed.Boundary()..^observed.Boundary()]
+    _ = Assert.Equal(122, observed.Calls)?
+    return Assert.Equal("é", part)
+}
+
+class ObservedText {
+    var Calls: int = 0
+    func Read() -> string {
+        Calls = Calls * 10 + 1
+        return "AéZ"
+    }
+    func Boundary() -> int {
+        Calls = Calls * 10 + 2
+        return 1
+    }
+}

@@ -302,3 +302,20 @@ display still requires explicit overrides for reachable constructed types; the
 Object-concatenation consumer is qualified separately. Matching development compiler,
 metadata and native host artifacts are required. See [native compilation](../native-compilation/)
 for the wider release scope.
+
+
+## Development: grapheme indexing and slicing
+
+String accepts Index and Range: `text[^1]` selects the last grapheme and
+`text[1..^1]` copies the text between the first and last graphemes. Boundaries are
+half-open and use the same units as Length. Combining accents, emoji sequences and
+flags remain intact. Empty ranges, including `text[^0..]`, produce empty text.
+
+Indexers may fault on invalid bounds. Use `text.Get(index)` for Option<char> or
+`text.Slice(range)` for Result<string, InvalidRangeError> when input needs validation.
+The text remains immutable. Slicing scans grapheme boundaries and copies the selected
+payload; it does not expose UTF-8 bytes or provide a borrowed view. This differs from
+.NET's UTF-16 indexing and is not constant-time random access.
+
+The development contract passes interpreter and macOS AOT tests. Windows execution
+is pending. [String API reference →](../../../docs/api/System/String/)

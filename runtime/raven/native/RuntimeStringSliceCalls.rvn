@@ -1,0 +1,6 @@
+module neoCLR.Runtime
+
+import System.Runtime.CompilerServices.*
+
+[MethodImpl(MethodImplOptions.InternalCall)]
+internal extern func StringSliceGraphemes(text: string, start: int, count: int) -> string;

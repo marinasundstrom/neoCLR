@@ -25,6 +25,12 @@ func Main(arguments: string[]) -> int {
         if name == "before-start" {
             _ = Range.StartAt(Index.FromEnd(4)).GetOffsetAndLength(3)
         }
+        if name == "string-reversed" {
+            _ = "é🙂"[2..1]
+        }
+        if name == "string-past-end" {
+            _ = "é🙂"[..3]
+        }
         Console.WriteLine("ERROR guard did not fault")
         return 0
     }

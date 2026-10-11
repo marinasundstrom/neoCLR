@@ -58,6 +58,33 @@ int32_t neoclr_string_grapheme_at_v1(const neoclr_aot_text *t, int32_t index, ne
     *output = result;
     return 0;
 }
+typedef struct { uint64_t position, start, end, offset, limit; } slice_state;
+static int32_t slice_boundary(size_t at, size_t length, void *state) {
+    (void)length;
+    slice_state *s = state;
+    if (s->position == s->start) s->offset = at;
+    if (s->position == s->end) { s->limit = at; return -1; }
+    ++s->position;
+    return 0;
+}
+int32_t neoclr_string_slice_graphemes_v1(const neoclr_aot_text *t, int32_t start, int32_t count, neoclr_aot_text_arena *a, const neoclr_aot_text **output) {
+    if (!t || !a || !output) return 3;
+    if (start < 0 || count < 0) return 8;
+    slice_state state = { .start = (uint32_t)start, .end = (uint64_t)(uint32_t)start + (uint32_t)count };
+    int32_t status = neoclr_unicode_visit_v1(t->bytes,t->length,0,slice_boundary,&state);
+    if (status && status != -1) return status;
+    if (!status) {
+        if (state.position != state.end) return 8;
+        state.limit = t->length;
+        if (state.position == state.start) state.offset = t->length;
+    }
+    neoclr_aot_text *result;
+    uint64_t length = state.limit - state.offset;
+    if ((status = neoclr_text_allocate_v1(a,length,&result))) return status;
+    memcpy(result->bytes,t->bytes+state.offset,length);
+    *output = result;
+    return 0;
+}
 typedef struct { const neoclr_aot_text *text; neoclr_aot_text_arena *arena; unsigned char *array; uint64_t count, index; int scalars; } vector_state;
 static int32_t store_part(size_t at, size_t value, void *state) {
     vector_state *s = state;

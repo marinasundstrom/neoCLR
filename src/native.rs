@@ -81,6 +81,7 @@ pub(crate) enum Binding {
     StringJoinParts,
     StringIntern,
     StringFromChars,
+    StringSliceGraphemes,
     StringGraphemeAt,
     StringGraphemeCount,
     CharFromString,
@@ -569,6 +570,9 @@ pub(crate) fn bind(function: &Function) -> Result<Binding, Fault> {
             if **element == Type::Char =>
         {
             (Binding::StringFromChars, Type::String)
+        }
+        ("neoCLR.Runtime.StringSliceGraphemes", [Type::String, Type::Int32, Type::Int32]) => {
+            (Binding::StringSliceGraphemes, Type::String)
         }
         ("neoCLR.Runtime.StringGraphemeAt", [Type::String, Type::Int32]) => {
             (Binding::StringGraphemeAt, Type::Char)
@@ -1348,6 +1352,42 @@ impl Binding {
                     text.push_str(&character);
                 }
                 Ok(Value::String(text.into()))
+            }
+            (
+                Self::StringSliceGraphemes,
+                [
+                    Value::String(text),
+                    Value::Int32(start),
+                    Value::Int32(count),
+                ],
+            ) => {
+                let invalid = || {
+                    Fault::coded(
+                        crate::FaultCode::IndexOutOfRange,
+                        "String range is out of bounds",
+                    )
+                };
+                let start = usize::try_from(*start).map_err(|_| invalid())?;
+                let count = usize::try_from(*count).map_err(|_| invalid())?;
+                let end = start.checked_add(count).ok_or_else(invalid)?;
+                let mut offset = None;
+                let mut limit = None;
+                for (position, at) in text
+                    .grapheme_indices(true)
+                    .map(|(at, _)| at)
+                    .chain(std::iter::once(text.len()))
+                    .enumerate()
+                {
+                    if position == start {
+                        offset = Some(at);
+                    }
+                    if position == end {
+                        limit = Some(at);
+                        break;
+                    }
+                }
+                let (offset, limit) = (offset.ok_or_else(invalid)?, limit.ok_or_else(invalid)?);
+                Ok(Value::String(text[offset..limit].to_owned().into()))
             }
             (Self::StringGraphemeAt, [Value::String(text), Value::Int32(index)]) => {
                 let index = usize::try_from(*index).map_err(|_| {

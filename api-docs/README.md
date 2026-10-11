@@ -1735,3 +1735,10 @@ result policy. These APIs require matching native libraries/compiler; aggregate
 CoreProbe is a documentation facade, not an added legacy runtime binding.
 Imported native value-field reads are host-only APIs documented in the manual
 experimental metadata reference; no public guest API is excluded from the snapshots.
+
+
+String Index/Range indexers and Get(int/Index)/Slice(Range) are included in both
+Index/Range development snapshots. Grapheme boundaries match Length; Get returns
+Option<char>, Slice returns Result<string, InvalidRangeError>, and indexers may fault.
+Slices contain copied immutable text; no view or encoding API is implied. The private
+StringSliceGraphemes runtime service is internal and is not a public API omission.

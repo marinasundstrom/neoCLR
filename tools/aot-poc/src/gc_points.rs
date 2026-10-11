@@ -72,6 +72,7 @@ pub(super) fn native_body(p: &Profile<'_>, i: usize, details: Option<&crate::fau
                 &d.string_byte_count,
                 &d.utf8_decode,
                 &d.utf8_encode,
+                &d.string_slice_graphemes,
                 &d.string_slice_utf8,
                 &d.char_from_string,
                 &d.char_text,

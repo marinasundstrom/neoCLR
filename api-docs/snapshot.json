@@ -1,7 +1,7 @@
 {
-  "assemblySha256": "ca555316ae930831029eb9b235a6306505cc329454fb64c1ad188447e7582a8f",
+  "assemblySha256": "e3a6d102c808996aa68de07b97b37ef0790b3a8618b4ffe5ce16e7ba15bcd11d",
   "inputs": {
-    "api-docs/NeoCLR.CoreProbe.xml": "ba7b9907c7b2a1e1fd5eca4cec20d5bd1b4ca2ca64e996310912ba4e95076bbd",
+    "api-docs/NeoCLR.CoreProbe.xml": "829239c1ed529f9c999265afd4def5d27ca21e799e2fe51491cff26857b029cf",
     "api-docs/exclusions.json": "dfbbab53935ec02fec642d8b5281a5bb01f12ff30d27d2fe47900430c26e642a",
     "api-docs/manual-members.json": "0e873d90c2e2b1a78b111265459ff9998aa0b8a6ef1eb8aca2b393d6fc277ecf",
     "api-docs/manual-types.json": "7d7f9b3611c9a42f7b05df0a24f9f58b297705eefdcd316a0947feafba49228b",
@@ -123,7 +123,7 @@
     "docs/experiments/raven-target/StorageItemBindings.cs": "255935ff513a89c4903a8a466f0b2ecfba445e86e74071c592ecb8cbda0dc90c",
     "docs/experiments/raven-target/StorageProviderBindings.cs": "54a8cdef0d0e35787d79debf0e25b44e9c09c3e1eacd32c58b13b0851c7d9d40",
     "docs/experiments/raven-target/StreamBindings.cs": "14483af2c6b0462706208b4c2bcf0660bc568f1e2870b0b953b41b5f04ff4662",
-    "docs/experiments/raven-target/StringBindings.cs": "36064637444d8afc107d9992bf2b0dda6f17e36570bce943498ffc28ad5dff0b",
+    "docs/experiments/raven-target/StringBindings.cs": "28793d53c301dfc5845f545cb955fc55434913aeb1bd52d8895845f9dad20189",
     "docs/experiments/raven-target/StringBuilderBindings.cs": "38a5be5bef5a37ab83345c1d6f2a3ed76c1d60e3b72c4713dc138befac32544f",
     "docs/experiments/raven-target/TargetSurface.cs": "6b4c8df2f65443dc0541aa6236bb2c4a162bc7b0295fa24cf61fc4926eab8c37",
     "docs/experiments/raven-target/TaskBindings.cs": "e49f7beb4e2ce79894521b99e6bb463aff4ade909a1528dd471e90a47d98ae0c",
@@ -275,7 +275,7 @@
     "runtime/raven/src/System/Storage/StorageItems.rvn": "8e05d749029725996c559811df628221f1b6bc4f73feb25ca097f469007f4d87",
     "runtime/raven/src/System/Storage/StorageLookupError.rvn": "0df62fd2cece07be009732764bfa67d876ea855d2cbdaaf35b51ac326dd91466",
     "runtime/raven/src/System/Storage/StorageProvider.rvn": "f2bf9dbfb1ea5d1fc58049acf2f75b96b6f9ee0d95864030f4ea805c74286598",
-    "runtime/raven/src/System/String.rvn": "c4d7d81077dab46ef3a146e745b676f563e5b198aff597e8e95e908a7cac1523",
+    "runtime/raven/src/System/String.rvn": "3ee847b555de399f7aef68f89faa35f05fbce3f39630d1bdb95feca2d9886f95",
     "runtime/raven/src/System/StringComparer.rvn": "afb4b9a30fa83275fae22c28906c3465ca4889c259d2cfc6cf48c769db99ae14",
     "runtime/raven/src/System/StringComparison.rvn": "eb6feb68328b17e388777ee22a3b70718b6c225055403f133873af133abc106f",
     "runtime/raven/src/System/StringHashCalls.rvn": "ab8e3ddc6c0eadadca4a755df36c45b5434e8c4993c05e0bb2dc6612c681933c",
