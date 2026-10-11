@@ -1,0 +1,10 @@
+import System.*
+import System.Tasks.*
+
+async func Main() -> Task<int> {
+    let result = Promise<int>()
+    TaskQueue.Default.Post(() => {
+        System.Fail("JIT callback fault")
+    })
+    return await result.Task
+}

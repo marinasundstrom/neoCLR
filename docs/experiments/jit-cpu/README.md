@@ -102,3 +102,6 @@ HTTP qualification. A functioning JIT needs those runtime services and productio
 not just a fast scalar kernel. Interpreter call/dispatch profiling is justified by this
 workload but should not displace that JIT milestone. Metadata-size scaling, allocations,
 GC and networking need separate evidence before generalizing these numbers.
+
+Follow-up: [queued managed async entry points](../jit-async/README.md) now pass focused
+parity and fault-cleanup checks. Timer/socket completion lifetimes and HTTP remain open.

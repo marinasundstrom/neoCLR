@@ -8,6 +8,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-11
 
+- Admit queued async entry points in the private macOS ARM64 managed JIT. Keep code and
+  helpers alive through the existing rooted entry drain; release the task scope and
+  default-queue root before heap/code teardown. Qualify integer/unit completion, successive
+  awaits, cancellation, pending tasks and callback faults against interpreter/AOT behavior.
+  Timer/socket completion sources, Windows JIT and production integration remain open.
+
 - Add bounded repeated invocation to the private scalar JIT probe, retaining one compiled
   code image through successful or faulting synchronous calls. Add a checksum-validated
   CPU-loop comparison with AOT and a retained interpreter function handle, separating
@@ -24,7 +30,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   status. Extend this with a synchronous managed probe using existing GC/stack/fault
   helpers: the real 20-test Index/Range assembly now runs with filtering and fault parity.
   Bind required helpers before invocation and use long-range ARM64 JIT calls while
-  preserving AOT object output. Async/HTTP and Windows JIT remain unsupported.
+  preserving AOT object output. Queued async entries are qualified in the follow-up above;
+  timer/HTTP completion and Windows JIT remain unsupported.
   Extend scalar parity checks to JIT and correct stale shift/negation rejection and
   selection-limit expectations. Add a reproducible three-mode test-run benchmark.
   Record eventual JIT defaults, preferred AOT deployment and full interpreter support;

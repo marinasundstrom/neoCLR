@@ -100,12 +100,10 @@ pub(super) fn execute_managed(
         || !details.probe_stack_roots
         || !details.native_stack_budget
         || details.native_host_bootstrap
-        || !details.entry_task_drain.is_empty()
-        || details.task_queue_drain.is_some()
         || !details.socket_listen.is_empty()
     {
         return Err(
-            "managed JIT requires a synchronous GC/stack host without task or socket services"
+            "managed JIT requires a GC/stack host without socket or bootstrap services"
                 .into(),
         );
     }

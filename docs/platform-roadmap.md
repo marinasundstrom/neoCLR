@@ -20,8 +20,10 @@ lifetime and Index/Range behavior. It recommends a bounded JIT shared-lowering p
 followed by real test-framework execution. The [scalar JIT probe](experiments/jit-scalar/README.md)
 now implements in-memory native invocation on macOS ARM64 with shared AOT lowering;
 the [managed JIT probe](experiments/jit-managed/README.md) now runs the real 20-test
-Index/Range framework assembly with filtering/fault parity. Socket workloads, async
-execution, Windows JIT and production integration remain open. A nine-run local
+Index/Range framework assembly with filtering/fault parity. The
+[async entry follow-up](experiments/jit-async/README.md) qualifies queued completion,
+consecutive awaits, cancellation, pending-task and callback faults in all three modes.
+Timer/socket completions, Windows JIT and production integration remain open. A nine-run local
 benchmark records median process times of 2.346s JIT, 2.962s interpreted and 9.00ms
 prebuilt AOT for that same assembly; JIT includes compilation, AOT excludes its build.
 This is test-run evidence, not HTTP throughput. The subsequent
@@ -32,7 +34,7 @@ remains part of the direction; sustained-workload and size-scaling evidence are 
 A subsequent [retained-code CPU experiment](experiments/jit-cpu/README.md) now
 checks repeated scalar invocations against AOT and the interpreter, separating
 computation from metadata size. Keep the next functional JIT milestone focused on
-managed async entry/callback lifetime and then HTTP qualification; these measurements
+polled timer completion/cancellation lifetime and then HTTP qualification; these measurements
 do not make the current private probe a production execution mode.
 Memory views and suspension remain related design work.
 

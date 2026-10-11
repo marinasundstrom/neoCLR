@@ -191,8 +191,10 @@ remain under development; no comparative benchmark results are published yet.
 
 Development-only macOS ARM64 JIT probes share verified lowering with AOT and execute
 generated code in memory. The managed probe runs the real 20-test Index/Range assembly,
-including filtering and bounds faults, with interpreter/AOT parity. Async/HTTP applications,
-Windows JIT and normal runtime integration remain open.
+including filtering and bounds faults, with interpreter/AOT parity. Queued async entry
+completion, consecutive awaits and fault cleanup now also pass a focused
+[three-mode qualification](https://github.com/marinasundstrom/neoCLR/blob/main/docs/experiments/jit-async/README.md).
+Timers, HTTP/socket completions, Windows JIT and normal runtime integration remain open.
 [Contracts, validation and local benchmark](https://github.com/marinasundstrom/neoCLR/blob/main/docs/experiments/jit-managed/README.md).
 
 A subsequent shared metadata lookup optimization reduces startup work in both the JIT

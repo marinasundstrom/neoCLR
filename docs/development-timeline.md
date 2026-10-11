@@ -14394,3 +14394,10 @@ distinguish this call-heavy synthetic result from application speed or service t
 **Remaining direction:** managed async entry/callback lifetime and then HTTP qualification
 are the next functional JIT milestones. Interpreter dispatch/call profiling remains useful;
 this measurement does not establish a production JIT or change execution defaults.
+
+**Subsequent implementation (2026-10-11):** queued async entry points now run through the
+managed JIT with the existing AOT entry-drain contract and an invocation-owned task scope.
+Fresh Raven integer/unit entries, successive awaits, cancellation, pending tasks and a
+callback fault pass in interpreter/AOT/JIT. The console/framework regression stays green.
+[Evidence and lifetime limits](experiments/jit-async/README.md). Timer/socket completions
+and the HTTP showcase remain open; the current JIT owner still ends at host-call return.

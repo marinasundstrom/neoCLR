@@ -1,0 +1,17 @@
+import System.*
+import System.Tasks.*
+
+async func Main() -> Task<()> {
+    let first = Promise<int>()
+    TaskQueue.Default.Post(() => {
+        Console.WriteLine("first callback")
+        _ = first.Complete(40)
+    })
+    let value = await first.Task
+    let second = Promise<int>()
+    TaskQueue.Default.Post(() => {
+        Console.WriteLine("second callback")
+        _ = second.Complete(value + 2)
+    })
+    Console.WriteLine(await second.Task)
+}

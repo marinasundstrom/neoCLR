@@ -1,6 +1,6 @@
 # Managed JIT and three-mode test benchmark
 
-2026-10-11 development experiment. A private **macOS ARM64 synchronous JIT** now
+2026-10-11 development experiment. A private **macOS ARM64 managed JIT** now
 executes the existing Raven Index/Range test assembly: all 20 tests pass, including
 classes, generics, arrays, strings, list interfaces, extension indexers and iterator
 disposal. No-match filtering and a bounds fault agree with AOT and interpretation.
@@ -31,14 +31,16 @@ non-colocated-libcall settings, rather than assuming all functions share an allo
 Every declared helper import must resolve before finalization/invocation. An incomplete
 host fails before its entry can execute. The host and generated code remain owned for
 the synchronous invocation. `host.c` uses a 1 MiB heap, renders faults before cleanup,
-checks that no stack roots/strong handles remain, collects, then frees the heap before
+leaves its invocation-owned task scope, checks that no stack roots/strong handles remain,
+collects, then frees the heap before
 code reclamation. Broken cleanup invariants abort. This private trusted adapter is not
 a general embedding ABI or an isolation boundary; native loops have no instruction budget.
 
-Async entries, timers, task queues, sockets and host bootstrap are rejected. Windows
+The [async follow-up](../jit-async/README.md) now admits queued async entries and task
+queues within one host invocation. Timers, sockets and host bootstrap remain rejected. Windows
 JIT, suspension, hot reload, concurrent invocations and retained callbacks remain
-unqualified. Future asynchronous code needs a longer-lived code owner and explicit
-quiescence before unload. AOT-only deployment remains independent of the JIT library.
+unqualified. Completion sources that outlive this host invocation need a longer-lived code owner
+and explicit quiescence before unload. AOT-only deployment remains independent of the JIT library.
 
 Guest output is unchanged. A final stderr line `JIT_RESULT {json}` supplies
 `guestExitCode`, `compileAndFinalizeSeconds` and `invocationSeconds`. Process exit 0
@@ -105,7 +107,8 @@ from its whole-process duration. This workload proves useful test execution and 
 process-time improvement. It does not establish steady-state HTTP/JSON throughput,
 long-running JIT/AOT parity, or a performance advantage over .NET or another framework.
 
-The next execution milestone is async/HTTP support with explicit runtime/code lifetime;
+Queued async entries are now qualified in the follow-up; the next execution milestone
+is timer/socket completion and HTTP support with explicit runtime/code lifetime;
 next performance work should isolate metadata startup and measure a sustained workload.
 The author's [execution direction](../../platform-direction.md#execution-direction-clarified-2026-10-11)
 selects eventual JIT defaults, preferred AOT deployment and full interpreter support.
