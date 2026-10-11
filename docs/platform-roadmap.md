@@ -25,8 +25,9 @@ deadline hints. Native JIT/AOT hosts now share a
 [completion-state boundary](experiments/native-scheduler/README.md), with explicit
 ready/pending/idle results. Outer HTTP hosts now use
 [owned delivery tickets](experiments/native-scheduler/README.md#owned-dispatch-slice--2026-10-11)
-with explicit completion independent of operation-result consumption. Generated-entry
-acknowledgment, await-site routing and cross-mode wait policy remain open.
+with explicit completion independent of operation-result consumption. [Generated-entry acknowledgment](experiments/native-scheduler/README.md#owned-entry-delivery--2026-10-11)
+now covers JIT and HTTP AOT entry adapters, including fault cleanup. Await-site routing
+and cross-mode wait policy remain open.
 Migrate more cases as needed; remaining benchmark/framework features are follow-ups,
 not prerequisites for beginning the scheduler slice. Parallel-by-default testing and
 class grouping are proposals to develop with scheduling, not enabled behavior.
@@ -44,8 +45,8 @@ Opting into a service still requires its ownership, safety and lifetime rules.
 with language implementations and eventually native languages/other runtimes able to
 project and integrate its lifecycle. Raven callbacks are a transitional projection,
 not the definition of suspension. The [design boundary](runtime-scheduling-design.md#runtime-owned-asynchrony-and-language-projections--2026-10-11)
-keeps completion, scheduling and retained execution ownership separate. Generated-entry
-ownership acknowledgment remains the next bounded gate; foreign-runtime ABI and
+keeps completion, scheduling and retained execution ownership separate. Continuation destination
+and cross-mode wait policy remain the next bounded gates; foreign-runtime ABI and
 suspension representation are not yet selected or implemented.
 
 **Author-directed sequence (2026-10-11):** finish JIT qualification and integrate

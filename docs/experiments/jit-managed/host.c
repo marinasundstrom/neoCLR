@@ -20,7 +20,7 @@ typedef int32_t (*entry_args)(int32_t, int32_t *, neoclr_aot_context *, const en
 static int32_t poll_entry(neoclr_aot_context *context, uint64_t *callback,
     const neoclr_probe_frame *boundary, void *state) {
     (void)state;
-    int32_t progress = neoclr_scheduler_step_v1(context, callback, boundary);
+    int32_t progress = neoclr_scheduler_acquire_v1(context, callback, boundary);
     if (progress == NEOCLR_SCHEDULER_PENDING) neoclr_os_pause();
     return progress;
 }
@@ -40,6 +40,7 @@ static int32_t run_entry(const void *entry, int32_t with_args, int32_t argc, con
         return 2;
     }
     tasks.poll = poll_entry;
+    tasks.complete = neoclr_scheduler_complete_v1;
     int32_t result = 0;
     entry_args args_function;
     entry_v4 plain_function;

@@ -83,3 +83,33 @@ cases. The HTTP-profile timer sample also passes its ten scenarios from
 Next boundaries: generated-entry delivery acknowledgment, awaiting execution's
 continuation destination, and wait policy alignment. See the
 [scheduler design](../../runtime-scheduling-design.md#native-completion-state-boundary--2026-10-11).
+
+
+## Owned entry delivery — 2026-10-11
+
+JIT and HTTP AOT entry adapters now opt into owned scheduler delivery. The private
+TaskQueue host scope accepts a completion hook alongside its poll hook. After a
+callback returns to the exact published entry boundary, the next poll acknowledges
+its ticket before acquiring more work. Entry end acknowledges the final ticket on
+normal or guest-fault exit. Reading a ticket twice, reading a different ticket, and
+advancing without first reading a delivery are rejected. Completion-hook failure is
+sticky, prevents a new entry, and is reported by scope leave; the guest fault remains
+unchanged and source teardown releases the abandoned root.
+
+This reuses the generated wrapper's existing poll/read/end calls; no compiler change
+or new generated-code import is required. Poll-only hosts remain supported. The
+completion adapter knows about entry lifecycle, while the TaskQueue host scope has
+no dependency on socket storage. A ticket may remain rooted until next poll/end after
+callback return; no earlier release or parallel dispatch guarantee is implied.
+
+[Six native contracts](entry-contracts.json) include entry lifecycle, nested-boundary
+rejection, single consumption, GC retention, fault cleanup and completion-hook failure.
+[Timer consumers](entry-timers.json) pass success and fault cases in interpreter,
+AOT and JIT (six executions). The existing task-queue C contract passes with bounds
+and undefined-behavior instrumentation. The HTTP-profile timer app in
+`target/entry-owned-http/app` passes ten scenarios. All evidence is macOS ARM64;
+Windows qualification remains pending. No performance claim is made.
+
+Next: continuation destination and cross-mode wait policy, followed by the retained
+activation boundary for runtime suspension. Owned callback dispatch does not itself
+implement runtime async suspension or select a public Scheduler API.

@@ -1,7 +1,87 @@
 #include "socket-listener.h"
 #include "native-gc.h"
+#include "task-queue.h"
 #define CHECK(x) do { if (!(x)) return __LINE__; } while (0)
+static int32_t acquire_entry(neoclr_aot_context *c, uint64_t *ticket,
+    const neoclr_probe_frame *boundary, void *state) {
+    (void)state;
+    return neoclr_scheduler_acquire_v1(c, ticket, boundary);
+}
+static int32_t reject_completion(neoclr_aot_context *c, uint64_t ticket,
+    const neoclr_probe_frame *boundary) {
+    (void)c; (void)ticket; (void)boundary;
+    return 3;
+}
+static int entry_delivery_contract(void) {
+    uint64_t buffer[128] = {0};
+    neoclr_aot_context c = {.text = {(unsigned char *)buffer, sizeof(buffer), 0}};
+    neoclr_socket_scope sockets;
+    neoclr_task_scope tasks;
+    CHECK(!neoclr_socket_scope_enter_v1(&sockets, &c));
+    CHECK(!neoclr_task_scope_enter_v1(&tasks, &c));
+    tasks.poll = acquire_entry;
+    tasks.complete = neoclr_scheduler_complete_v1;
+    void *callback = NULL, *read = NULL;
+    CHECK(!neoclr_allocate_object_v1(&c.text, UINT32_MAX, 24, &callback));
+    ((uint64_t *)callback)[1] = 1;
+    int64_t timer;
+    CHECK(!neoclr_timer_start_v1(0, callback, &c, &timer));
+    neoclr_probe_frame entry, child;
+    neoclr_probe_storage empty = {0};
+    neoclr_probe_enter_v3(&entry, &c, 7, &empty, 0, "", 0);
+    CHECK(!neoclr_entry_tasks_begin_v1(&c, 7, -1, -1, &read));
+    uint64_t ticket = 0;
+    CHECK(neoclr_entry_tasks_poll_v1(&c, 1, &ticket) == 1);
+    uint64_t first = ticket;
+    CHECK(neoclr_entry_tasks_poll_v1(&c, 1, &ticket) == -3 && ticket == first);
+    CHECK(neoclr_entry_callback_read_v1(&c, first + 1, &read) == 3);
+    CHECK(!neoclr_entry_callback_read_v1(&c, first, &read) && read == callback);
+    CHECK(neoclr_entry_callback_read_v1(&c, first, &read) == 3);
+    neoclr_probe_enter_v3(&child, &c, 8, &empty, 0, "", 0);
+    CHECK(neoclr_entry_tasks_poll_v1(&c, 1, &ticket) == -3);
+    CHECK(!neoclr_gc_collect_v1(&c, &child) && c.text.used);
+    neoclr_probe_leave_v1(&child);
+    CHECK(!neoclr_entry_tasks_poll_v1(&c, 0, &ticket));
+    CHECK(neoclr_gc_host_root_read_v1(&c, first, &read) == 3);
+    CHECK(!tasks.entry_delivery && !sockets.scheduler_delivery);
+    /* End, rather than another poll, acknowledges the final faulting callback. */
+    CHECK(!neoclr_timer_start_v1(0, callback, &c, &timer));
+    CHECK(neoclr_entry_tasks_poll_v1(&c, 1, &ticket) == 1);
+    CHECK(!neoclr_entry_callback_read_v1(&c, ticket, &read));
+    c.fault.code = 4;
+    neoclr_entry_tasks_end_v1(&c);
+    CHECK(!tasks.entry_delivery && !sockets.scheduler_delivery && c.fault.code == 4);
+    CHECK(neoclr_gc_host_root_read_v1(&c, ticket, &read) == 3);
+    neoclr_probe_leave_v1(&entry);
+    CHECK(!neoclr_socket_scope_leave_v1(&sockets));
+    CHECK(!neoclr_task_scope_leave_v1(&tasks));
+    c.fault.code = 0;
+    CHECK(!neoclr_gc_collect_v1(&c, NULL) && !c.text.used);
+    /* A failing completion hook is terminal and reported by scope leave. */
+    CHECK(!neoclr_socket_scope_enter_v1(&sockets, &c));
+    CHECK(!neoclr_task_scope_enter_v1(&tasks, &c));
+    tasks.poll = acquire_entry;
+    tasks.complete = reject_completion;
+    CHECK(!neoclr_allocate_object_v1(&c.text, UINT32_MAX, 24, &callback));
+    ((uint64_t *)callback)[1] = 1;
+    CHECK(!neoclr_timer_start_v1(0, callback, &c, &timer));
+    neoclr_probe_enter_v3(&entry, &c, 7, &empty, 0, "", 0);
+    CHECK(!neoclr_entry_tasks_begin_v1(&c, 7, -1, -1, &read));
+    CHECK(neoclr_entry_tasks_poll_v1(&c, 1, &ticket) == 1);
+    c.fault.code = 4;
+    neoclr_entry_tasks_end_v1(&c);
+    CHECK(tasks.completion_error && c.fault.code == 4);
+    c.fault.code = 0;
+    CHECK(neoclr_entry_tasks_begin_v1(&c, 7, -1, -1, &read) == 3);
+    neoclr_probe_leave_v1(&entry);
+    CHECK(!neoclr_socket_scope_leave_v1(&sockets));
+    CHECK(neoclr_task_scope_leave_v1(&tasks) == 3);
+    CHECK(neoclr_gc_host_root_read_v1(&c, ticket, &read) == 3);
+    CHECK(!neoclr_gc_collect_v1(&c, NULL) && !c.text.used);
+    return 0;
+}
 int main(void) {
+    CHECK(!entry_delivery_contract());
     uint64_t buffer[129] = {0}; buffer[128] = 1234567;
     neoclr_aot_context c = {.text = {(unsigned char *)buffer, 1024, 0}}, other = {0};
     neoclr_socket_scope scope;

@@ -30,7 +30,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   next poll. Reject stale/duplicate/wrong-boundary completion; release abandoned
   deliveries during teardown. Six native contracts, retained HTTP fault/fragmented
   cases and ten HTTP-host timer scenarios pass locally. Generated-entry/JIT delivery
-  acknowledgment remains a follow-up; Windows has not been rerun for this slice.
+  acknowledgment is now also implemented through an optional task-scope completion
+  hook using existing generated poll/read/end calls. Reject duplicate/unread entry
+  deliveries; preserve guest faults and report completion-hook failures on teardown.
+  Six native contracts, the legacy task-scope contract, timer success/fault consumers
+  in interpreter/AOT/JIT and ten HTTP-host timer scenarios pass. Windows has not been
+  rerun for these slices.
 
 - Document testing and benchmarking as independent development projects, including
   ownership, APIs, runner commands, selection, configuration, reports and limitations.

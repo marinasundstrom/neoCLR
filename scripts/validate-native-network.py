@@ -36,7 +36,7 @@ def main():
         base = ROOT / 'docs/experiments/aot-console'
         inputs = [base / name for name in ('socket-os.h', 'socket-client-internal.h', 'socket-client-test.c', 'socket-listener.h', 'socket-listener.c',
                   'socket-listener-test.c', 'socket-accept-test.c', 'socket-transfer-test.c', 'socket-timer-test.c', 'socket-scheduler-test.c',
-                  'native-gc.c', 'native-gc.h', 'root-probe.c', 'root-probe.h', 'text-arena.c', 'text-arena.h')]
+                  'task-queue.c', 'task-queue.h', 'native-gc.c', 'native-gc.h', 'root-probe.c', 'root-probe.h', 'text-arena.c', 'text-arena.h')]
         inputs += [base.parent / 'aot-fault-details/fault-details.h', Path(__file__).resolve()]
         report['inputs'] = {p.relative_to(ROOT).as_posix(): hashlib.sha256(p.read_bytes()).hexdigest() for p in inputs}
         if windows:
@@ -49,6 +49,8 @@ def main():
             binary = out / (name + ('.exe' if windows else ''))
             sources = [base / ('socket-' + name + '-test.c'), base / 'socket-listener.c',
                        base / 'native-gc.c', base / 'root-probe.c', base / 'text-arena.c']
+            if name == 'scheduler':
+                sources.append(base / 'task-queue.c')
             output = ['/Fe:' + str(binary), '/link', 'Ws2_32.lib'] if windows else ['-o', binary]
             run([*compiler, *sources, *output], name + '-build')
             result = run([binary], name + '-execute')

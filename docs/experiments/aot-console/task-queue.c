@@ -17,8 +17,9 @@ int32_t neoclr_task_scope_leave_v1(neoclr_task_scope *scope) {
     for (const neoclr_probe_frame *f = neoclr_root_probe_head_v1(); f; f = f->previous)
         if (f->context == scope->context) return 3;
     if (scope->default_root && neoclr_gc_host_root_release_v1(scope->context, scope->default_root)) return 3;
+    int32_t status = scope->completion_error ? 3 : 0;
     head = scope->previous; *scope = (neoclr_task_scope){0};
-    return 0;
+    return status;
 }
 int32_t neoclr_task_queue_register_v1(void *queue, neoclr_aot_context *context, int32_t *output) {
     neoclr_task_scope *scope = find(context);
@@ -57,7 +58,7 @@ int32_t neoclr_task_queue_host_read_v1(neoclr_aot_context *context, void **outpu
 int32_t neoclr_entry_tasks_begin_v1(neoclr_aot_context *context, int32_t entry,
     int32_t run, int32_t drain, void **output) {
     neoclr_task_scope *scope = find(context);
-    if (!scope || !context || context->fault.code || !output || scope->entry_draining || entry < 0) return 3;
+    if (!scope || !context || context->fault.code || !output || scope->entry_draining || scope->completion_error || entry < 0) return 3;
     int startup = 0;
     for (const neoclr_probe_frame *f = neoclr_root_probe_head_v1(); f; f = f->previous) {
         if (f->context != context) continue;
@@ -73,9 +74,21 @@ int32_t neoclr_entry_tasks_begin_v1(neoclr_aot_context *context, int32_t entry,
     }
     return status;
 }
+static int32_t complete_delivery(neoclr_task_scope *scope) {
+    if (scope->completion_error) return 3;
+    if (!scope->entry_delivery) return 0;
+    if (!scope->complete || scope->complete(scope->context, scope->entry_delivery, scope->entry_boundary)) {
+        scope->completion_error = 1;
+        return 3;
+    }
+    scope->entry_delivery = 0;
+    scope->delivery_read = 0;
+    return 0;
+}
 void neoclr_entry_tasks_end_v1(neoclr_aot_context *context) {
     neoclr_task_scope *scope = find(context);
     if (scope) {
+        (void)complete_delivery(scope);
         scope->entry_draining = 0;
         scope->entry_boundary = NULL;
     }
@@ -88,11 +101,22 @@ static int at_entry_boundary(neoclr_task_scope *scope) {
 int32_t neoclr_entry_tasks_poll_v1(neoclr_aot_context *context, int32_t required, uint64_t *callback) {
     neoclr_task_scope *scope = find(context);
     if (!callback || !at_entry_boundary(scope)) return -3;
+    if (scope->entry_delivery && !scope->delivery_read) return -3;
+    if (complete_delivery(scope)) return -3;
     if (!scope->poll) return required ? -3 : 0;
-    return scope->poll(context, callback, scope->entry_boundary, scope->poll_state);
+    int32_t progress = scope->poll(context, callback, scope->entry_boundary, scope->poll_state);
+    if (progress == 1 && scope->complete) {
+        if (!*callback) return -3;
+        scope->entry_delivery = *callback;
+        scope->delivery_read = 0;
+    }
+    return progress;
 }
 int32_t neoclr_entry_callback_read_v1(neoclr_aot_context *context, uint64_t handle, void **output) {
     neoclr_task_scope *scope = find(context);
     if (!at_entry_boundary(scope)) return 3;
-    return neoclr_gc_callback_read_suspended_v1(context, handle, output, scope->entry_boundary);
+    if (scope->complete && (scope->entry_delivery != handle || scope->delivery_read)) return 3;
+    int32_t status = neoclr_gc_callback_read_suspended_v1(context, handle, output, scope->entry_boundary);
+    if (!status && scope->complete) scope->delivery_read = 1;
+    return status;
 }

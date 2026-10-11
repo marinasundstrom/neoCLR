@@ -226,7 +226,8 @@ completion through TaskQueue. Native JIT/AOT hosts now share a private completio
 step that distinguishes ready work, pending outcomes and idle sources; callback roots
 remain retained through dispatch. Outer native HTTP hosts now explicitly acquire and
 complete owned callback deliveries independently of operation-result consumption;
-the generated entry pump still uses the earlier poll protocol.
+JIT and HTTP AOT entry pumps acknowledge their owned deliveries at the next poll or
+entry exit, including guest faults.
 This is development infrastructure, not a public
 Scheduler API or runtime-managed async suspension. Callbacks must return for other
 work to progress.

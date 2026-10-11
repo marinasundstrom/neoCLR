@@ -21,7 +21,7 @@
 static int32_t poll_entry(neoclr_aot_context *context, uint64_t *callback,
     const neoclr_probe_frame *boundary, void *state) {
     (void)state;
-    int32_t progress = neoclr_scheduler_step_v1(context, callback, boundary);
+    int32_t progress = neoclr_scheduler_acquire_v1(context, callback, boundary);
     if (progress == NEOCLR_SCHEDULER_PENDING) neoclr_os_pause();
     return progress;
 }
@@ -35,6 +35,7 @@ static int invoke(neoclr_aot_context *context, int *failed, int argc, neoclr_pro
         neoclr_socket_scope_leave_v1(&sockets); *failed = 1; return 2;
     }
     tasks.poll = poll_entry;
+    tasks.complete = neoclr_scheduler_complete_v1;
     status = neoclr_process_entry(argc, argv, &result, context);
     while (!status && !host_error) {
         status = neoclr_drain_default_queue_v1(context);

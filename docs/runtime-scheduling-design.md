@@ -655,3 +655,26 @@ The generated entry pump and JIT entry adapter retain their previous poll protoc
 Next migrate that entry lifecycle with explicit completion on normal and fault exits,
 then resolve resumption destination and wait policy. This bounded outer-host slice
 must not be described as completed acknowledgment parity across execution modes.
+
+
+## Entry adapter acknowledgment — 2026-10-11
+
+The JIT and HTTP AOT entry pumps now acquire owned deliveries, with completion routed
+through an optional hook on the private task scope. The next valid entry-boundary
+poll acknowledges the preceding callback, and entry end acknowledges the last one
+on success or fault. Single ticket reads prevent duplicate entry dispatch; polling
+before reading rejects skipped dispatch. Failure of the completion hook is sticky
+and reported during scope teardown without replacing the guest diagnostic.
+
+This extends the owned-dispatch lifetime contract above without compiler changes:
+existing generated poll/read/end calls already express the required lifecycle. The
+hook avoids coupling the task scope to socket storage and keeps poll-only adapters
+usable. Its cost is an indirect completion call and retaining one ticket until the
+next poll/end; no latency or throughput improvement is claimed. Source teardown owns
+abandoned-ticket cleanup when acknowledgment fails. The runtime still executes Raven
+state-machine callbacks, not retained async activations. See
+[entry evidence](experiments/native-scheduler/README.md#owned-entry-delivery--2026-10-11).
+
+Next settle continuation destination and shared wait policy. The interpreter and
+native adapters have distinct representations; these checks establish native entry
+ownership behavior, not identical scheduling or full suspension parity.

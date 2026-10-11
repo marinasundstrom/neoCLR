@@ -13,6 +13,12 @@ typedef struct neoclr_task_scope {
     /* Installed by the native host before entry; 0 idle, 1 callback, 2 pending, -3 fault. */
     int32_t (*poll)(neoclr_aot_context *, uint64_t *, const neoclr_probe_frame *, void *);
     void *poll_state;
+    /* Optional owned-delivery adapter, installed with poll before entry. Called
+     * at the next entry poll or entry end, including fault exit. Never mutated
+     * while entry is draining. Legacy poll-only hosts retain their old protocol. */
+    int32_t (*complete)(neoclr_aot_context *, uint64_t, const neoclr_probe_frame *);
+    uint64_t entry_delivery;
+    int delivery_read, completion_error;
 } neoclr_task_scope;
 int32_t neoclr_task_scope_enter_v1(neoclr_task_scope *scope, neoclr_aot_context *context);
 int32_t neoclr_task_scope_leave_v1(neoclr_task_scope *scope);
