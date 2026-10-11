@@ -1,0 +1,79 @@
+module System.Data.Sql
+
+import System.*
+import System.Collections.*
+import System.Introspection.*
+import System.Option.*
+import System.Result.*
+import System.Tasks.*
+import System.Runtime.Reflection.*
+
+/// SQL-first buffered mapping; no change tracking, SQL generation or dynamic code generation.
+public class SqlMapper {
+    private init() { }
+
+    /// Maps in row order and returns no partial collection on conversion failure.
+    static func Map<T>(result: SqlResult, map: (SqlRow) -> Result<T, SqlError>) -> Result<Sequence<T>, SqlError> {
+        let output = ArrayList<T>()
+        for index in 0..<result.Count {
+            let row = result.Row(index)
+            let value = map(row)?
+            output.Add(value)
+        }
+        return Ok(output)
+    }
+
+    /// Maps exact column names to public writable properties on a nongeneric reference class.
+    /// Requires a public parameterless constructor; supports string, Int32 and Boolean.
+    /// Missing/ambiguous columns, SQL NULL and unsupported property types are errors. Extra columns are ignored.
+    static func Map<T>(result: SqlResult) -> Result<Sequence<T>, SqlError> {
+        let type = typeof(T)
+        if type.IsValueType || type.IsInterface || type.IsArray || type.IsOpen || type.GenericArgumentCount != 0 {
+            return Error(SqlError.Mapping("Expected a nongeneric reference class"))
+        }
+        let properties = ArrayList<PropertyInfo>()
+        for property in type.GetProperties() {
+            if !property.IsStatic && property.GetSetMethod() is Some(_) {
+                let target = property.PropertyType
+                if property.GetIndexParameters().Count != 0 ||
+                   !(target.Equals(typeof(string)) || target.Equals(typeof(int)) ||
+                     target.Equals(typeof(bool))) {
+                    return Error(SqlError.Mapping("Unsupported property: " + property.Name))
+                }
+                properties.Add(property)
+            }
+        }
+        if properties.Count == 0 {
+            return Error(SqlError.Mapping("No writable scalar properties"))
+        }
+        let output = ArrayList<T>()
+        for index in 0..<result.Count {
+            let row = result.Row(index)
+            let instance = match type.CreateInstance() {
+                Ok(let created) => created
+                Error(_) => return Error(SqlError.Mapping("Public parameterless constructor required"))
+            }
+            for property in properties {
+                let value = Read(row, property.Name, property.PropertyType)?
+                if property.SetValue(instance, value) is Error(_) {
+                    return Error(SqlError.Mapping("Cannot assign property: " + property.Name))
+                }
+            }
+            output.Add((T)instance)
+        }
+        return Ok(output)
+    }
+
+    private static func Read(row: SqlRow, name: string, type: TypeInfo) -> Result<Object, SqlError> {
+        if type.Equals(typeof(int)) {
+            let value = row.Int32(name)?
+            return Ok(value)
+        }
+        if type.Equals(typeof(bool)) {
+            let value = row.Boolean(name)?
+            return Ok(value)
+        }
+        let text = row.RequiredText(name)?
+        return Ok(text)
+    }
+}

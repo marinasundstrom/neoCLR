@@ -1,0 +1,56 @@
+module System.Data.PostgreSql
+
+import System.*
+import System.Collections.*
+import System.Concurrency.*
+import System.Data.Sql.*
+import System.Networking.*
+import System.Networking.Sockets.*
+import System.Result.*
+import System.Tasks.*
+
+/// Development PostgreSQL protocol-v3 binding for local trust-authenticated servers.
+/// Connects only to 127.0.0.1. No TLS, password authentication, pooling or automatic retries.
+public class PostgresDatabase : SqlDatabase {
+    private val database: string
+    private val user: string
+    private val port: int
+    private val timeoutMilliseconds: int
+
+    /// Each Open and Execute gets one shared 1–60000 ms deadline, specified by the caller.
+    init(database: string, user: string, port: int, timeoutMilliseconds: int) {
+        self.database = database
+        self.user = user
+        self.port = port
+        self.timeoutMilliseconds = timeoutMilliseconds
+    }
+
+    async func Open() -> Task<Result<SqlConnection, SqlError>> {
+        if database == "" || user == "" || !(port >= 1) || port > 65535 ||
+           !(timeoutMilliseconds >= 1) || timeoutMilliseconds > 60000 {
+            return Error(SqlError.InvalidInput("Invalid database, user, port or deadline"))
+        }
+        let startup = Packet()
+        startup.PutInteger(196608)
+        if let Error(error) = startup.PutText("user", true) { return Error(error) }
+        if let Error(error) = startup.PutText(user, true) { return Error(error) }
+        if let Error(error) = startup.PutText("database", true) { return Error(error) }
+        if let Error(error) = startup.PutText(database, true) { return Error(error) }
+        if let Error(error) = startup.PutText("client_encoding", true) { return Error(error) }
+        if let Error(error) = startup.PutText("UTF8", true) { return Error(error) }
+        startup.Put(0)
+        let deadline = Budget(timeoutMilliseconds)
+        let addresses = ArrayList<string>()
+        addresses.Add("127.0.0.1")
+        let connected = await Socket.ConnectUntil(addresses, port, deadline.Value, CancellationToken.None)
+        if let Error(error) = connected { return Error(SqlError.Transport(error.ToString())) }
+        let Ok(socket) = connected else { System.Fail("Expected successful SQL result") }
+        let session = PostgresConnection(socket, timeoutMilliseconds)
+        let started = await session.Start(startup, deadline)
+        if let Error(error) = started {
+            session.Dispose()
+            return Error(error)
+        }
+        return Ok(session)
+    }
+}

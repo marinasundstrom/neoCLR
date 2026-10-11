@@ -1,0 +1,124 @@
+module System.Data.Sql
+
+import System.*
+import System.Collections.*
+import System.Option.*
+import System.Result.*
+import System.Tasks.*
+
+/// A statement and an owned snapshot of positional values; the provider defines placeholder syntax.
+public class SqlStatement {
+    private val parameters: ArrayList<SqlValue>
+    /// SQL is passed unchanged; identifiers and SQL fragments cannot be bound as values.
+    val Text: string
+    init(text: string) {
+        Text = text
+        parameters = ArrayList<SqlValue>()
+    }
+    init(text: string, values: Sequence<SqlValue>) {
+        Text = text
+        parameters = ArrayList<SqlValue>(values)
+    }
+    val ParameterCount: int => parameters.Count
+    /// Zero-based access. An invalid index is a programmer fault.
+    func Parameter(index: int) -> SqlValue => parameters[index]
+}
+
+/// Configured access to a SQL database; opening produces one independently owned session.
+public interface SqlDatabase {
+    func Open() -> Task<Result<SqlConnection, SqlError>>
+}
+
+/// One serial conversation with a database. Implementations reject overlapping operations.
+public interface SqlConnection : Disposable {
+    func Execute(statement: SqlStatement) -> Task<Result<SqlResult, SqlError>>
+    func Begin() -> Task<Result<SqlTransaction, SqlError>>
+}
+
+/// Explicit transaction lifetime. Disposal before completion abandons the session to guarantee rollback.
+public interface SqlTransaction : Disposable {
+    func Commit() -> Task<Result<unit, SqlError>>
+    func Rollback() -> Task<Result<unit, SqlError>>
+}
+
+/// An owned row snapshot. Names are ordinal and duplicate names are ambiguous.
+public class SqlRow {
+    private val names: ArrayList<string>
+    private val values: ArrayList<Option<string>>
+    init(columns: Sequence<string>, cells: Sequence<Option<string>>) {
+        if columns.Count != cells.Count {
+            System.Fail("SQL column/value count mismatch")
+        }
+        names = ArrayList<string>(columns)
+        values = ArrayList<Option<string>>(cells)
+    }
+    val Count: int => values.Count
+    func Column(index: int) -> Result<string, SqlError> {
+        if index < 0 || index >= Count {
+            return Error(SqlError.Mapping("Column index out of range"))
+        }
+        return Ok(names[index])
+    }
+    func Text(index: int) -> Result<Option<string>, SqlError> {
+        if index < 0 || index >= Count {
+            return Error(SqlError.Mapping("Column index out of range"))
+        }
+        return Ok(values[index])
+    }
+    func Text(name: string) -> Result<Option<string>, SqlError> {
+        var found = -1
+        for index in 0..<Count {
+            if names[index] == name {
+                if found >= 0 {
+                    return Error(SqlError.Mapping("Ambiguous column: " + name))
+                }
+                found = index
+            }
+        }
+        if found < 0 {
+            return Error(SqlError.Mapping("Missing column: " + name))
+        }
+        return Text(found)
+    }
+    /// Required text; SQL NULL is a mapping error. Use Text for optional values.
+    func RequiredText(name: string) -> Result<string, SqlError> {
+        let value = Text(name)?
+        return match value {
+            Some(let text) => Ok(text)
+            None => Error(SqlError.Mapping("SQL NULL: " + name))
+        }
+    }
+    func Int64(name: string) -> Result<long, SqlError> {
+        let text = RequiredText(name)?
+        return match System.Int64.Parse(text) {
+            Ok(let value) => Ok(value)
+            Error(_) => Error(SqlError.Mapping("Invalid Int64: " + name))
+        }
+    }
+    func Int32(name: string) -> Result<int, SqlError> {
+        let text = RequiredText(name)?
+        return match System.Int32.Parse(text) {
+            Ok(let value) => Ok(value)
+            Error(_) => Error(SqlError.Mapping("Invalid Int32: " + name))
+        }
+    }
+    func Boolean(name: string) -> Result<bool, SqlError> {
+        let text = RequiredText(name)?
+        if text == "t" || text == "true" { return Ok(true) }
+        if text == "f" || text == "false" { return Ok(false) }
+        return Error(SqlError.Mapping("Invalid Boolean: " + name))
+    }
+}
+
+/// Buffered results independent of the session. CommandTag retains the provider's completion tag.
+public class SqlResult {
+    private val rows: ArrayList<SqlRow>
+    val CommandTag: string
+    init(commandTag: string, values: Sequence<SqlRow>) {
+        CommandTag = commandTag
+        rows = ArrayList<SqlRow>(values)
+    }
+    val Count: int => rows.Count
+    /// Zero-based row access; an invalid index is a programmer fault.
+    func Row(index: int) -> SqlRow => rows[index]
+}

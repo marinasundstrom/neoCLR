@@ -25,6 +25,36 @@ available original wording; other text is a summary.
 
 See the [changelog](../CHANGELOG.md) and linked design documents for technical status.
 
+## 2026-10-12 — SQL domain abstraction and PostgreSQL
+
+- **Author:** “Let's implement a small SQL provider and a binding to Postgresql.”
+  Requests a simple Dapper-like mapper and explicitly directs building a SQL-domain
+  abstraction rather than imitating ADO.NET.
+- **Assistant:** finds the prior SQLite-first proposal and proposes a bounded
+  PostgreSQL-first implementation using existing async sockets, positional parameters,
+  buffered owned rows, explicit transactions and a small mapping layer. Selects local
+  trust authentication for the first binding; TLS/password support remains open.
+- **Author correction:** “A sub-module within the System.Data.* namespace is preferred”.
+- **Action:** common contracts use System.Data.Sql; the optional binding uses
+  System.Data.PostgreSql. Initial native compiler limitations lead to synchronous
+  mapping after async execution and explicit async result/cleanup handling.
+- **Author coordination:** “Adjacent thread is working on ‘use’”. The assistant leaves
+  that work separate and uses explicit cleanup in the SQL fixture against the tested
+  compiler revision. The author later reports “The use fix is in”; the assistant adopts
+  scoped session cleanup, introduced by Raven native `1f3cdda12`, and qualifies the
+  completed provider with its `c1a938ccd` follow-through.
+- **Author/modeling decision:** asks “Should we model sqlconnection as a concept?”
+  The assistant recommends renaming the owned live SqlSession role to SqlConnection
+  rather than adding a second lifetime object; the author selects “Use SqlConnection”.
+  Public contracts, provider implementation, fixtures and reference docs follow that name.
+- **Author follow-up:** requests a commit when complete and notes a possible later
+  sample using the provider. The executable qualification consumer is retained as a
+  tested starting point; a separate sample application is not yet selected.
+- **Outcome/evidence:** implementation, current qualification and limitations are
+  recorded in [SQL data access](sql-data-access.md) and its executable fixture. The
+  original proposal remains available; no permanent roadmap reprioritization, remote
+  authentication support or Dapper API compatibility is inferred.
+
 ## 2026-10-11 — Custom HTTP methods and status values
 
 - **Author:** asks to consider custom HttpMethod names and custom status codes,

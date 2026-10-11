@@ -1820,3 +1820,19 @@ name decoder are not guest RavenDoc types. The managed StackTrace class, constru
 and ToString have rendered native reference pages and aggregate reference entries.
 The native manifest pins the complete rebuilt bundle and renderer binaries, replacing
 older HTTP-only refresh provenance with the coherent current library build.
+
+## SQL and local PostgreSQL development (2026-10-12)
+
+System.Data.Sql and System.Data.PostgreSql are selected in the aggregate reference;
+SqlError/SqlValue are projected from standard Raven unions, not handwritten carriers.
+The native audit includes the optional System.Data.PostgreSql assembly when present.
+The [SQL reference](sql.md) covers every authored type/member, mapping, errors and
+local-only authentication limits. Generated native signatures retain real assembly
+ownership. The retained-async helper is internal and is not a SQL public API.
+Refresh both snapshots using a class-library build with `--with-postgresql`.
+
+SQL qualification rendered all 22 selected SQL/provider types and both SQL guide pages;
+the aggregate snapshot fingerprint check and native snapshot unit checks pass. The full
+website build currently stops at the existing documented `ModuleInfo.GetFunctions`
+member missing from the generated reference. This is a recorded non-SQL coverage gap,
+not an exclusion of that API or a successful full-site validation.

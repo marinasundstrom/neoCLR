@@ -23,7 +23,9 @@ def main():
     for name in ('compiler', 'core', 'bootstrap-directory', 'translator', 'output'):
         parser.add_argument('--' + name, type=Path, required=True)
     parser.add_argument('--compiler-revision', required=True)
+    parser.add_argument('--with-postgresql', action='store_true', help='Include the optional local PostgreSQL development provider')
     args = parser.parse_args()
+    names = NAMES + (('System.Data.PostgreSql',) if args.with_postgresql else ())
     bootstrap = args.bootstrap_directory.resolve()
     bootstrap_manifest = bootstrap / 'bootstrap.json'
     if bootstrap_manifest.is_file():
@@ -61,12 +63,12 @@ def main():
     run(['dotnet', args.translator.resolve(), bootstrap / 'System.retained.json', seed, '--reference', artifact('System.Runtime')])
     # Bootstrap orchestration owns build ordering; the project loader still resolves
     # the full native reference graph and validates every prebuilt artifact.
-    for name in NAMES[1:]:
+    for name in names[1:]:
         run(['dotnet', args.compiler.resolve(), 'neoclr', '--project', PROJECTS / name / (name + '.rvnproj'), '--no-build-references'])
     if sha(artifact('System.Runtime')) != runtime_hash:
         raise RuntimeError('Runtime changed during dependent project builds; finalized seed cannot be published')
     documentation = {}
-    for name in NAMES:
+    for name in names:
         shutil.copyfile(artifact(name), output / (name + '.dll'))
         xml = artifact(name).with_suffix('.xml')
         markdown = artifact(name).with_suffix('.docs')
@@ -90,19 +92,19 @@ def main():
                            RavenNeoClrSourceObjectRoot='false', RavenNeoClrBootstrapIntrinsics='false').items():
         ET.SubElement(properties, name).text = value
     references = ET.SubElement(configuration, 'ItemGroup')
-    for name in NAMES:
+    for name in names:
         reference = ET.SubElement(references, 'Reference', Include=name)
         ET.SubElement(reference, 'HintPath').text = '$(MSBuildThisFileDirectory)' + name + '.dll'
     configuration_path = output / 'NeoCLR.ClassLibrary.props'
     ET.indent(configuration)
     ET.ElementTree(configuration).write(configuration_path, encoding='unicode')
-    artifacts = [output / (name + '.dll') for name in NAMES] + [seed, output / 'Core.dll', output / 'ownership.json', configuration_path]
-    for name in NAMES:
+    artifacts = [output / (name + '.dll') for name in names] + [seed, output / 'Core.dll', output / 'ownership.json', configuration_path]
+    for name in names:
         artifacts.append(output / documentation[name]['xml'])
         artifacts.extend(sorted((output / documentation[name]['markdown']).rglob('*')))
     artifacts = [path for path in artifacts if path.is_file()]
     # Publish the manifest last. An interrupted/failed build directory is not a completed bundle.
-    manifest = dict(version=1, kind='explicit-bootstrap-native-class-library', assemblyNames=list(NAMES),
+    manifest = dict(version=1, kind='explicit-bootstrap-native-class-library', assemblyNames=list(names),
                     objectAssembly='System.Runtime', runtimeSeed=seed.name, projectConfiguration=configuration_path.name,
                     documentation=documentation,
                     files={path.relative_to(output).as_posix(): sha(path) for path in artifacts})
@@ -111,12 +113,15 @@ def main():
         inputs += [bootstrap_manifest, bootstrap / 'preparation-evidence.json']
     inputs += list(PROJECTS.glob('*/*.rvnproj')) + [PROJECTS / 'NativeLibrary.props', PROJECTS / 'System.Runtime/ownership.json']
     inputs += list((ROOT / 'runtime/raven/src/System').rglob('*.rvn')) + list((ROOT / 'runtime/raven/native').glob('*.rvn'))
+    if args.with_postgresql:
+        inputs += list((ROOT / 'runtime/raven/providers/System.Data.PostgreSql').glob('*.rvn'))
+        inputs += [ROOT / 'docs/experiments/runtime-async/RuntimeAsyncBridge.rvn']
     inputs += [args.translator.parent / 'NeoCLR.Metadata.Experimental.dll']
     inputs += [args.compiler.parent / name for name in ('Raven.CodeAnalysis.dll', 'Raven.CodeAnalysis.NeoClr.dll', 'NeoCLR.Metadata.Experimental.dll')]
     report['hashes'] = {str(path.resolve()): sha(path) for path in inputs + artifacts}
     (output / 'build-evidence.json').write_text(json.dumps(report, indent=2) + '\n')
     (output / 'bundle.json').write_text(json.dumps(manifest, indent=2) + '\n')
-    print('Built native Runtime/Data/Networking/Web bundle: ' + str(output))
+    print('Built native ' + '/'.join(names) + ' bundle: ' + str(output))
 
 
 if __name__ == '__main__':

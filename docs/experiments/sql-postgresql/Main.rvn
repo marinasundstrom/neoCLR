@@ -1,0 +1,116 @@
+import System.*
+import System.Collections.*
+import System.Data.Sql.*
+import System.Data.PostgreSql.*
+import System.Option.*
+import System.Result.*
+import System.Tasks.*
+
+public class Person {
+    init() { }
+    var id: int { get; set; } = 0
+    var name: string { get; set; } = ""
+    var active: bool { get; set; } = false
+}
+
+func Check(value: bool, message: string) {
+    if !value { System.Fail(message) }
+}
+
+async func Exercise(connection: SqlConnection) -> Task<Result<unit, SqlError>> {
+    let values = ArrayList<SqlValue>()
+    values.Add(SqlValue.Integer(42))
+    values.Add(SqlValue.Text("Café'; SELECT 999; --"))
+    values.Add(SqlValue.Boolean(true))
+    let statement = SqlStatement("SELECT $1::int AS id, $2::text AS name, $3::bool AS active", values)
+    let executed = await connection.Execute(statement)
+    if let Error(error) = executed { return Error(error) }
+    let Ok(mappedResult) = executed else { System.Fail("Expected successful SQL result") }
+    let peopleResult = SqlMapper.Map<Person>(mappedResult)
+    if let Error(error) = peopleResult { return Error(error) }
+    let Ok(people) = peopleResult else { System.Fail("Expected successful SQL result") }
+    Check(people.Count == 1 && people[0].id == 42 && people[0].name == "Café'; SELECT 999; --" && people[0].active, "Mapped row")
+    let selected = SqlMapper.Map<string>(mappedResult, row => row.RequiredText("name"))
+    Check(selected is Ok(_), "Callback mapping")
+    let nulls = ArrayList<SqlValue>()
+    nulls.Add(SqlValue.Null)
+    nulls.Add(SqlValue.Text(""))
+    let nullable = await connection.Execute(SqlStatement("SELECT $1::text AS missing, $2::text AS empty", nulls))
+    if let Error(error) = nullable { return Error(error) }
+    let Ok(result) = nullable else { System.Fail("Expected successful SQL result") }
+    Check(result.Row(0).Text("missing") is Ok(None), "NULL distinct from empty")
+    Check(result.Row(0).Text("empty") is Ok(Some("")), "Empty text")
+    Check(result.Row(0).RequiredText("missing") is Error(_), "Required NULL fails")
+    let emptyColumns = await connection.Execute(SqlStatement("SELECT FROM generate_series(1, 1)"))
+    let Ok(emptyColumnRows) = emptyColumns else { return Error(SqlError.Mapping("Zero-column SELECT failed")) }
+    Check(emptyColumnRows.Count == 1 && emptyColumnRows.Row(0).Count == 0, "Zero-column row")
+    let duplicate = await connection.Execute(SqlStatement("SELECT 1 AS id, 2 AS id"))
+    if let Error(error) = duplicate { return Error(error) }
+    let Ok(duplicateResult) = duplicate else { System.Fail("Expected successful SQL result") }
+    Check(duplicateResult.Row(0).Text("id") is Error(_), "Duplicate aliases")
+    let created = await connection.Execute(SqlStatement("CREATE TEMP TABLE neoclr_sql_test (id integer PRIMARY KEY)"))
+    if let Error(error) = created { return Error(error) }
+    let began = await connection.Begin()
+    if let Error(error) = began { return Error(error) }
+    let Ok(transaction) = began else { System.Fail("Expected successful SQL result") }
+    let nested = await connection.Begin()
+    Check(nested is Error(SqlError.InvalidState(_)), "Nested transaction rejected")
+    let inserted = await connection.Execute(SqlStatement("INSERT INTO neoclr_sql_test VALUES (1)"))
+    if let Error(error) = inserted { return Error(error) }
+    let Ok(insertedResult) = inserted else { System.Fail("Expected successful SQL result") }
+    Check(insertedResult.CommandTag == "INSERT 0 1", "Insert tag")
+    let failed = await connection.Execute(SqlStatement("INSERT INTO neoclr_sql_test VALUES (1)"))
+    Check(failed is Error(SqlError.Server("23505", _)), "SQLSTATE preserved")
+    let badCommit = await transaction.Commit()
+    Check(badCommit is Error(_), "Failed transaction cannot report commit")
+    let rolledBack = await transaction.Rollback()
+    if let Error(error) = rolledBack { return Error(error) }
+    let counts = await connection.Execute(SqlStatement("SELECT count(*) AS total FROM neoclr_sql_test"))
+    if let Error(error) = counts { return Error(error) }
+    let Ok(countResult) = counts else { System.Fail("Expected successful SQL result") }
+    let totalResult = countResult.Row(0).Int64("total")
+    if let Error(error) = totalResult { return Error(error) }
+    let Ok(total) = totalResult else { System.Fail("Expected successful SQL result") }
+    Check(total == 0, "Rollback restored table")
+    let syntax = await connection.Execute(SqlStatement("SELECT FROM"))
+    Check(syntax is Error(SqlError.Server("42601", _)), "Syntax SQLSTATE")
+    let recovered = await connection.Execute(statement)
+    if let Error(error) = recovered { return Error(error) }
+    let started = await connection.Begin()
+    if let Error(error) = started { return Error(error) }
+    let Ok(committed) = started else { System.Fail("Expected successful SQL result") }
+    let insertedAgain = await connection.Execute(SqlStatement("INSERT INTO neoclr_sql_test VALUES (2)"))
+    if let Error(error) = insertedAgain { return Error(error) }
+    let commit = await committed.Commit()
+    if let Error(error) = commit { return Error(error) }
+    let repeated = await committed.Commit()
+    Check(repeated is Error(_), "Completed transaction rejects reuse")
+    committed.Dispose()
+    let persisted = await connection.Execute(SqlStatement("SELECT count(*) AS total FROM neoclr_sql_test"))
+    let Ok(persistedRows) = persisted else { return Error(SqlError.Mapping("Commit count query failed")) }
+    Check(persistedRows.Row(0).Int64("total") is Ok(1L), "Commit retained row and handle disposal left connection open")
+    let invalid = await connection.Execute(SqlStatement("SELECT\u0000"))
+    Check(invalid is Error(SqlError.InvalidInput(_)), "NUL rejected before sending")
+    let afterInvalid = await connection.Execute(statement)
+    Check(afterInvalid is Ok(_), "Input rejection preserves connection")
+    let abandoned = await connection.Begin()
+    let Ok(abandon) = abandoned else { return Error(SqlError.Mapping("Abandon begin failed")) }
+    abandon.Dispose()
+    // Returned rows own their data independently of transaction/connection lifetime.
+    connection.Dispose()
+    Check(result.Row(0).Text("empty") is Ok(Some("")), "Snapshot survives close")
+    let afterClose = await connection.Execute(statement)
+    Check(afterClose is Error(_), "Closed connection rejects work")
+    return Ok(())
+}
+
+async func Main(arguments: string[]) -> Task<()> {
+    let Ok(port) = Int32.Parse(arguments[0]) else { System.Fail("Expected port") }
+    let opened = await PostgresDatabase("postgres", "postgres", port, 60000).Open()
+    if let Error(error) = opened { Console.WriteLine(error.ToString()) }
+    let Ok(openedConnection) = opened else { System.Fail("Open failed") }
+    use connection = openedConnection
+    let result = await Exercise(connection)
+    if let Error(error) = result { System.Fail(error.ToString()) }
+    Console.WriteLine("PASS SQL PostgreSQL")
+}

@@ -42,7 +42,9 @@ if (args.Length == 3)
     File.WriteAllText(Path.Combine(output, "normalized-sidecars.json"), JsonSerializer.Serialize(normalized));
     bundle = inputCopy;
 }
-var names = new[] { "System.Runtime", "System.Data", "System.Networking", "System.Web" };
+var names = new[] { "System.Runtime", "System.Data", "System.Networking", "System.Web" }
+    .Concat(File.Exists(Path.Combine(bundle, "System.Data.PostgreSql.dll"))
+        ? new[] { "System.Data.PostgreSql" } : Array.Empty<string>()).ToArray();
 var paths = names.Select(n => Path.Combine(bundle, n + ".dll")).ToArray();
 var provider = new NeoClrProjectMetadataProvider();
 var settings = new Dictionary<string, string>

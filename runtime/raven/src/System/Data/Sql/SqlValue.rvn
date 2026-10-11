@@ -1,0 +1,11 @@
+module System.Data.Sql
+
+import System.*
+
+/// Portable parameter values. Null is SQL NULL, distinct from empty text.
+public union SqlValue {
+    case Null
+    case Text(value: string)
+    case Integer(value: long)
+    case Boolean(value: bool)
+}

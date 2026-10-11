@@ -122,3 +122,10 @@ Use [GitHub issues](https://github.com/marinasundstrom/neoCLR/issues) to describ
 use case, suggest an alternative or discuss a limitation. Detailed proposals and
 implementation evidence belong in the repository, where their assumptions and
 history can be reviewed together.
+
+## SQL data access
+
+The [SQL development slice](../features/sql/) introduces a small session and row-mapping
+API with a local PostgreSQL provider. Password authentication, TLS, remote connections,
+streaming and more providers remain open work. The older SQLite-first proposal is
+historical input, not the current implementation specification.

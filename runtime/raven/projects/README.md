@@ -139,3 +139,14 @@ A native-enabled Raven language server uses the same project metadata provider.
 inputs, manifest hashes and ordinary project execution. The manifest records integrity;
 the project loader consumes the explicit reference catalog, not a package resolver.
 Headless workspace validation does not replace installed VS Code acceptance.
+
+## Optional PostgreSQL development provider
+
+Pass `--with-postgresql` to `build-native-class-library.py` to build and stage
+System.Data.PostgreSql after the ordinary four libraries. It references Runtime,
+Data and Networking; Data's common `System.Data.Sql` contracts do not depend on
+Networking. The provider uses the existing explicit retained-async helper from
+`docs/experiments/runtime-async/RuntimeAsyncBridge.rvn`. Its project selects
+`RavenNeoClrRuntimeAsyncHelper=RuntimeAwaitProvider.Bridge`; ordinary projects/.NET
+semantics are unchanged. It currently supports local trust authentication only.
+See [SQL data access](../../../docs/sql-data-access.md) for contracts and validation.

@@ -1,0 +1,29 @@
+module System.Data.Sql
+
+import System.*
+
+/// Recoverable SQL failures. Server preserves SQLSTATE; transport errors do not imply a safe retry.
+public union SqlError {
+    case InvalidInput(message: string)
+    case InvalidState(message: string)
+    case Transport(message: string)
+    case Protocol(message: string)
+    case Unsupported(message: string)
+    case LimitExceeded(message: string)
+    case Server(sqlState: string, message: string)
+    case Mapping(message: string)
+
+    /// Diagnostic category and detail; server messages may contain application data.
+    override func ToString() -> string {
+        return match self {
+            InvalidInput(let message) => "InvalidInput: " + message
+            InvalidState(let message) => "InvalidState: " + message
+            Transport(let message) => "Transport: " + message
+            Protocol(let message) => "Protocol: " + message
+            Unsupported(let message) => "Unsupported: " + message
+            LimitExceeded(let message) => "LimitExceeded: " + message
+            Server(let state, let message) => "Server " + state + ": " + message
+            Mapping(let message) => "Mapping: " + message
+        }
+    }
+}

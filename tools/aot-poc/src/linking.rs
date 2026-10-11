@@ -777,8 +777,19 @@ pub fn prepare(
     // System.Fail cannot collide with that context. Exact definition IDs still bind calls.
     let system_names: std::collections::BTreeSet<_> = neoclr::library::system()
         .map_err(|e| e.to_string())?.functions.iter().map(|f| f.name.as_str()).collect();
+    // An explicitly admitted service can also be declared independently by an
+    // application and a provider without appearing in the bundled System seed
+    // (for example the opt-in runtime-async adapter). After binding, its private
+    // placeholder is no longer InternalCall, so flattened scopes need unique names.
+    // Preserve both definitions and their original identities in the report; only
+    // exact, already-admitted free service bodies receive this private projection.
+    let admitted_services: std::collections::BTreeSet<_> = report["nativeBindings"]
+        .as_array().into_iter().flatten()
+        .filter_map(|row| row["compiledIndex"].as_u64().map(|i| i as usize))
+        .filter(|i| selected.functions[*i].owner.is_none())
+        .collect();
     let private_names: Vec<_> = selected.functions.iter().enumerate().map(|(i, f)| {
-        if f.name != root && system_names.contains(f.name.as_str()) {
+        if f.name != root && (system_names.contains(f.name.as_str()) || admitted_services.contains(&i)) {
             let mut name = format!("$aot_linked_{i}");
             while selected.functions.iter().any(|candidate| candidate.name == name) { name.push('_'); }
             name

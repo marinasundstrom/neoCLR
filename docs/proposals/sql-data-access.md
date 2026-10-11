@@ -2,7 +2,11 @@
 
 ## Status
 
-Proposal
+Proposal, partially superseded by the author-directed
+[SQL/PostgreSQL development slice](../sql-data-access.md) on 2026-10-12.
+PostgreSQL is the first implemented binding; System.Data.Sql uses statements,
+connections and owned buffered rows rather than the command/reader design below.
+The remaining proposal is exploratory, including SQLite and streaming.
 
 ## Summary
 

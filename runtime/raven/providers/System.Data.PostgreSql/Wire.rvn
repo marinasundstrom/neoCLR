@@ -1,0 +1,101 @@
+module System.Data.PostgreSql
+
+import System.*
+import System.Collections.*
+import System.Data.Sql.*
+import System.Result.*
+import System.Text.*
+import System.Runtime.CompilerServices.*
+
+// Protocol v3 network byte order. Invalid reads latch failure before indexing.
+internal class Packet {
+    val Bytes: ArrayList<byte> = ArrayList<byte>()
+    var Position: int = 0
+    var Valid: bool = true
+    val Remaining: int => Bytes.Count - Position
+    func Byte() -> int {
+        if Remaining < 1 {
+            Valid = false
+            return 0
+        }
+        let value = Bytes[Position]
+        Position += 1
+        return (int)value
+    }
+    func Short() -> int => Byte() * 256 + Byte()
+    func Integer() -> int {
+        let high = Short()
+        let low = Short()
+        // Signed wire lengths, including -1 for NULL; avoid checked overflow.
+        if high >= 32768 { return (high - 65536) * 65536 + low }
+        return high * 65536 + low
+    }
+    func Put(value: int) { Bytes.Add((byte)value) }
+    func PutShort(value: int) {
+        Put((value >> 8) & 255)
+        Put(value & 255)
+    }
+    func PutInteger(value: int) {
+        PutShort((value >> 16) & 65535)
+        PutShort(value & 65535)
+    }
+    func PutText(text: string, terminated: bool) -> Result<unit, SqlError> {
+        let encoded = match Encodings.Utf8.Encode(text) {
+            Ok(let value) => value
+            Error(_) => return Error(SqlError.LimitExceeded("Text exceeds 65536 UTF-8 bytes"))
+        }
+        if Bytes.Count + encoded.Count + 1 > 65536 {
+            return Error(SqlError.LimitExceeded("PostgreSQL packet exceeds 65536 bytes"))
+        }
+        for value in encoded {
+            if value == 0 { return Error(SqlError.InvalidInput("PostgreSQL text cannot contain NUL")) }
+        }
+        for value in encoded { Bytes.Add(value) }
+        if terminated { Put(0) }
+        return Ok(())
+    }
+    func Text(length: int) -> string {
+        if !(length >= 0) || length > Remaining {
+            Valid = false
+            return ""
+        }
+        let bytes = ArrayList<byte>()
+        for index in 0..<length { bytes.Add((byte)Byte()) }
+        return match Encodings.Utf8.Decode(bytes) {
+            Ok(let text) => text
+            Error(_) => {
+                Valid = false
+                ""
+            }
+        }
+    }
+    func CString() -> string {
+        var length = 0
+        while length < Remaining && Bytes[Position + length] != 0 { length += 1 }
+        if length == Remaining {
+            Valid = false
+            return ""
+        }
+        let text = Text(length)
+        _ = Byte()
+        return text
+    }
+    func Frame(kind: int) -> byte[] {
+        let prefix = if kind == 0 { 4 } else { 5 }
+        let result: byte[] = CheckedStorage.Reserve<byte>(Bytes.Count + prefix)
+        let header = Packet()
+        if kind != 0 { header.Put(kind) }
+        header.PutInteger(Bytes.Count + 4)
+        for index in 0..<prefix { result[index] = header.Bytes[index] }
+        for index in 0..<Bytes.Count { result[prefix + index] = Bytes[index] }
+        return result
+    }
+}
+
+// Reference owner keeps the deadline stable across native retained async bodies.
+internal class Budget {
+    val Value: System.Networking.NetworkDeadline
+    init(milliseconds: int) {
+        Value = System.Networking.NetworkDeadline.AfterMilliseconds(milliseconds)
+    }
+}

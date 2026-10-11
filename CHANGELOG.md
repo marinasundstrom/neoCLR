@@ -24,6 +24,20 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   a redundant rejection of async state machines without changing storage or GC
   limits. Verify 17/32-field admission, 33-slot rejection and allocation canaries.
 
+- Add development System.Data.Sql database/connection, statement/value, owned row/result,
+  transaction and SQL-first mapping contracts, with an optional System.Data.PostgreSql
+  protocol binding. Bind positional values separately from SQL, preserve SQLSTATE,
+  drain recoverable server errors, bound buffered results and enforce shared deadlines.
+  Coalesce reads in a bounded buffer and qualify scoped connection cleanup with the
+  updated native compiler.
+  The first provider is local IPv4 loopback/trust-only; TLS, passwords, remote access,
+  pooling and streaming remain gaps. Automatic mapping supports string/Int32/Boolean;
+  explicit row maps additionally support Int64 and optional text. Active transaction
+  disposal closes its connection to roll back. Add optional provider packaging, public
+  reference coverage and PostgreSQL/protocol fixtures. Fix native private naming for
+  independently declared, explicitly admitted runtime services across library boundaries,
+  preserving original verification and definition identities.
+
 - Make JIT the development `run` default on macOS ARM64 and Windows x64, with
   installed compiler/helper/library discovery, explicit errors rather than fallback,
   and configurable packaged heap/byte-array limits. Enable macOS runtime suspension

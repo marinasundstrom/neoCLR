@@ -1,5 +1,13 @@
 # neoCLR platform roadmap
 
+**SQL data access direction (2026-10-12):** the author requests a small SQL provider,
+PostgreSQL binding and Dapper-like mapper, explicitly avoiding an ADO.NET-shaped
+abstraction, and selects submodules under System.Data. The bounded
+[SQL connection slice](sql-data-access.md) defines common contracts in System.Data.Sql
+and an optional local PostgreSQL provider in System.Data.PostgreSql. Authentication/TLS,
+remote servers and streaming remain follow-ups; this one-off direction does not
+permanently reprioritize the active runtime milestone.
+
 **Collector and JIT follow-through (2026-10-12):** the author asks to reduce collector
 cost with profiles, correctness tests and benchmarks, and reiterates that JIT should
 become the default soon. The [collector traversal slice](experiments/runtime-async/native-profiling.md#fewer-collector-traversals--2026-10-12)

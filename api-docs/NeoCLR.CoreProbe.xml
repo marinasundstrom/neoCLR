@@ -3245,5 +3245,77 @@ Uses one iterator and does not require constant-time indexed access. No concurre
   <member name="T:System.Diagnostics.StackTrace"><summary>An owned snapshot of the current logical guest call stack, captured at construction. Development API: up to 64 frames and 64 KiB of UTF-8 text, with explicit truncation. No arguments, locals, native frames or suspended async callers are captured.</summary></member>
   <member name="M:System.Diagnostics.StackTrace.#ctor"><summary>Captures the caller's current logical stack, innermost first. Allocation exhaustion is a terminal Fault.</summary></member>
   <member name="M:System.Diagnostics.StackTrace.ToString"><summary>Returns the captured method names and IL instruction indexes. Repeated calls return the same snapshot after its original frames have returned. Source lines and structured StackFrame access are not yet supported.</summary><returns>The owned diagnostic text, with an explicit marker if truncated.</returns></member>
+  <member name="M:System.Data.Sql.SqlError.ToString">
+      <summary>Diagnostic category and detail; server messages may contain application data.</summary>
+    </member>
+  <member name="M:System.Data.Sql.SqlMapper.Map``1(System.Data.Sql.SqlResult)">
+      <summary>Maps exact column names to public writable properties on a nongeneric reference class.
+Requires a public parameterless constructor; supports string, Int32 and Boolean.
+Missing/ambiguous columns, SQL NULL and unsupported property types are errors. Extra columns are ignored.</summary>
+    </member>
+  <member name="M:System.Data.Sql.SqlMapper.Map``1(System.Data.Sql.SqlResult,System.Func{System.Data.Sql.SqlRow,System.Result{``0,System.Data.Sql.SqlError}})">
+      <summary>Maps in row order and returns no partial collection on conversion failure.</summary>
+    </member>
+  <member name="M:System.Data.Sql.SqlResult.Row(System.Int32)">
+      <summary>Zero-based row access; an invalid index is a programmer fault.</summary>
+    </member>
+  <member name="M:System.Data.Sql.SqlRow.RequiredText(System.String)">
+      <summary>Required text; SQL NULL is a mapping error. Use Text for optional values.</summary>
+    </member>
+  <member name="M:System.Data.Sql.SqlStatement.Parameter(System.Int32)">
+      <summary>Zero-based access. An invalid index is a programmer fault.</summary>
+    </member>
+  <member name="M:System.Data.Sql.SqlValue.ToString">
+      <summary>Portable parameter values. Null is SQL NULL, distinct from empty text.</summary>
+    </member>
+  <member name="P:System.Data.Sql.SqlError.HasValue">
+      <summary>Recoverable SQL failures. Server preserves SQLSTATE; transport errors do not imply a safe retry.</summary>
+    </member>
+  <member name="P:System.Data.Sql.SqlError.Value">
+      <summary>Recoverable SQL failures. Server preserves SQLSTATE; transport errors do not imply a safe retry.</summary>
+    </member>
+  <member name="P:System.Data.Sql.SqlStatement.Text">
+      <summary>SQL is passed unchanged; identifiers and SQL fragments cannot be bound as values.</summary>
+    </member>
+  <member name="P:System.Data.Sql.SqlValue.HasValue">
+      <summary>Portable parameter values. Null is SQL NULL, distinct from empty text.</summary>
+    </member>
+  <member name="P:System.Data.Sql.SqlValue.Value">
+      <summary>Portable parameter values. Null is SQL NULL, distinct from empty text.</summary>
+    </member>
+  <member name="T:System.Data.Sql.SqlDatabase">
+      <summary>Configured access to a SQL database; opening produces one independently owned session.</summary>
+    </member>
+  <member name="T:System.Data.Sql.SqlError">
+      <summary>Recoverable SQL failures. Server preserves SQLSTATE; transport errors do not imply a safe retry.</summary>
+    </member>
+  <member name="T:System.Data.Sql.SqlMapper">
+      <summary>SQL-first buffered mapping; no change tracking, SQL generation or dynamic code generation.</summary>
+    </member>
+  <member name="T:System.Data.Sql.SqlResult">
+      <summary>Buffered results independent of the session. CommandTag retains the provider's completion tag.</summary>
+    </member>
+  <member name="T:System.Data.Sql.SqlRow">
+      <summary>An owned row snapshot. Names are ordinal and duplicate names are ambiguous.</summary>
+    </member>
+  <member name="T:System.Data.Sql.SqlConnection">
+      <summary>One serial conversation with a database. Implementations reject overlapping operations.</summary>
+    </member>
+  <member name="T:System.Data.Sql.SqlStatement">
+      <summary>A statement and an owned snapshot of positional values; the provider defines placeholder syntax.</summary>
+    </member>
+  <member name="T:System.Data.Sql.SqlTransaction">
+      <summary>Explicit transaction lifetime. Disposal before completion abandons the session to guarantee rollback.</summary>
+    </member>
+  <member name="T:System.Data.Sql.SqlValue">
+      <summary>Portable parameter values. Null is SQL NULL, distinct from empty text.</summary>
+    </member>
+  <member name="M:System.Data.PostgreSql.PostgresDatabase.#ctor(System.String,System.String,System.Int32,System.Int32)">
+      <summary>Each Open and Execute gets one shared 1–60000 ms deadline, specified by the caller.</summary>
+    </member>
+  <member name="T:System.Data.PostgreSql.PostgresDatabase">
+      <summary>Development PostgreSQL protocol-v3 binding for local trust-authenticated servers.
+Connects only to 127.0.0.1. No TLS, password authentication, pooling or automatic retries.</summary>
+    </member>
 </members>
 </doc>

@@ -127,3 +127,16 @@ The [completed default-mode gate](experiments/jit-cli/default/README.md) validat
 supported host, and the current Windows scalar/CLI/framework checks. Preparation
 includes the complete text/time-zone helper. These results qualify the development
 default; the remaining platform and execution limits above still apply.
+
+### Shared runtime services in separately compiled libraries (2026-10-12)
+
+The SQL provider and its consumer can each include the existing opt-in async adapter.
+Original-scope verification already accepts their independently declared, exactly
+matched private InternalCalls. Native lowering now also gives explicitly admitted
+free service placeholders unique private names before re-verifying its flattened
+module. This extends the existing seed-service renaming to services absent from the
+bundled System seed; it neither merges source identities nor admits arbitrary host
+calls. Reports preserve each original definition/name and its private compiled name.
+The focused `sql_linking` native-tool test covers admitted and unadmitted variants;
+[SQL qualification](experiments/sql-postgresql/README.md) supplies the real consumer.
+The change is shared by JIT/AOT selection; it introduces no host ABI or compiler setting.

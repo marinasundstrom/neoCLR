@@ -79,7 +79,7 @@ static class StandardUnionReference
             if (types.TryGetValue(type.FullName, out var owned)) return owned;
             // Import primitive encodings without adding a host framework dependency.
             if (type.MetadataType is MetadataType.Void or MetadataType.Boolean or MetadataType.Byte
-                or MetadataType.Int32 or MetadataType.String or MetadataType.Object)
+                or MetadataType.Int32 or MetadataType.Int64 or MetadataType.String or MetadataType.Object)
                 return module.GetTypes().SelectMany(t => t.Methods)
                     .SelectMany(m => m.Parameters.Select(p => p.ParameterType).Append(m.ReturnType))
                     .First(t => t.MetadataType == type.MetadataType);

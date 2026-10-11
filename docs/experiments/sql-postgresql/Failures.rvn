@@ -1,0 +1,55 @@
+import System.*
+import System.Data.Sql.*
+import System.Data.PostgreSql.*
+import System.Option.*
+import System.Result.*
+import System.Tasks.*
+
+func Check(condition: bool, message: string) {
+    if !condition { System.Fail(message) }
+}
+
+async func CheckCase(port: int, mode: string) -> Task<()> {
+    let timeout = if mode == "timeout" { 100 } else { 60000 }
+    let opening = await PostgresDatabase("postgres", "postgres", port, timeout).Open()
+    if mode == "authentication" {
+        Check(opening is Error(SqlError.Unsupported(_)), "Unsupported authentication must fail")
+    } else if mode == "startup" {
+        Check(opening is Error(SqlError.Protocol(_)), "Malformed startup frame must fail")
+    } else if mode == "timeout" {
+        Check(opening is Error(SqlError.Transport(_)), "Opening must time out")
+    } else {
+        if let Error(error) = opening { System.Fail(error.ToString()) }
+        let Ok(openedConnection) = opening else { System.Fail("Expected connection") }
+        use connection = openedConnection
+        let query = await connection.Execute(SqlStatement("SELECT 1"))
+        if mode == "fragmented" {
+            let Ok(result) = query else { connection.Dispose(); System.Fail("Expected fragmented result") }
+            Check(result.Row(0).Int32("value") is Ok(42), "Fragmented row value")
+        } else {
+            if mode == "oversized" || mode == "rows" {
+                if !(query is Error(SqlError.LimitExceeded(_))) {
+                    if let Error(error) = query { Console.WriteLine(error.ToString()) }
+                }
+                Check(query is Error(SqlError.LimitExceeded(_)), "Oversized response must fail")
+            } else if mode == "copy" {
+                Check(query is Error(SqlError.Unsupported(_)), "COPY must fail")
+            } else {
+                Check(query is Error(SqlError.Protocol(_)), "Malformed response must fail")
+            }
+            let after = await connection.Execute(SqlStatement("SELECT 2"))
+            Check(after is Error(SqlError.InvalidState(_)), "Broken connection must be retired")
+            connection.Dispose()
+        }
+    }
+    Console.WriteLine("PASS SQL " + mode)
+}
+
+async func Main(arguments: string[]) -> Task<()> {
+    var index = 0
+    while index < arguments.Length {
+        let Ok(port) = Int32.Parse(arguments[index]) else { System.Fail("Expected port") }
+        await CheckCase(port, arguments[index + 1])
+        index += 2
+    }
+}

@@ -1,32 +1,22 @@
 {
   "format": 1,
   "archive": "native-reference.zip",
-  "sha256": "751a2f867455db3b3f3f39c463d2c61baa4239de94737eddbfeec4a3d0911249",
-  "librarySourceRevision": "a3ba2d9804d4551e37c6f10865d6b55c9c4383bc",
-  "compilerRevision": "e349f4783",
-  "rendererRevision": "7622d09e4",
+  "sha256": "0437fafb502f4442f675c1fef4626cf1ac6c8619c0e3641194ce9cb7290e249e",
+  "librarySourceRevision": "4778c5acb754df773c144bf8876b79e09d11dac5",
+  "compilerRevision": "c1a938ccdc473dda6a7dfb2dbde4710855d5b5db",
+  "rendererRevision": "c1a938ccd",
   "libraryArtifacts": {
-    "System.Runtime.dll": "e8fc407595408b17543788ae258e5973c7d48e8eafc7679eb6dd8188a7c6adfe",
-    "System.Data.dll": "655a7f9fe7c86f5ed9b26d944108bb1fcc599acbcda5d38f238bd30d692cb5fc",
-    "System.Networking.dll": "631c4f83553d96c7b81a7106f0c20efbf38f8511d3e4a34228db51581201b8e1",
-    "System.Web.dll": "ceb5bdc1fc1938badbd4416a65dcf6540f2095e78b6cd0f6c79f6244e391173b",
+    "System.Runtime.dll": "ae99a646e91fc5b1643b67b95a39eb98abb2651945e364f3db27ac48f0069f22",
+    "System.Data.dll": "690cb9f23b4b340b433eb7353eeeaba03183c7fccdd129c80089d62c49da6629",
+    "System.Networking.dll": "f1936e76bfa3a380ef23777636c58357323ae7e9e5e801b47151801bc620cffe",
+    "System.Web.dll": "5a5b1c0b607b5844f4c8ba2083efb403db4f1313094cee33dd79571aaa7a8c55",
+    "System.Data.PostgreSql.dll": "d5d60f9ab5f51e06ee6de39e6470ec8e84924074a77bf61ab78487decac27564",
     "System.runtime.neox": "98a1ae1da85387c87746957e83a4015eb59d0566539a915c69f168d2b511b190",
     "Core.dll": "3d4a676d379067c18a65a9beb8257ed40bf3196fc643a9ba1d559c619ec73fad"
   },
   "renderingEvidence": {
     "normalized-sidecars.json": "bc9e3ef17efc0a7bf6e5c89425aefe088bb622a701fbf6153ee20841ea0341d3",
-    "restored-xml-comments.json": "b930348eff08a18e4bef45eb072bd5be7c61976893ba24b30451195296fba373"
+    "restored-xml-comments.json": "7ed7befc7becb78f2f4f58131b52e975a714ae6226c9f2b8f6797c2fe6fa32b4"
   },
-  "scope": "Reviewed native API rendering; legacy coverage gaps remain explicitly marked by the website overlay.",
-  "rendererArtifacts": {
-    "Audit.dll": "d3e701466b1cb5919e137216c7f53f36f63b598068d871db5266d95775255494",
-    "RavenDoc.dll": "df93474b617d7652bb323f5e7a601e08b3c742cea4c70967c576d6e178a47fce",
-    "Raven.CodeAnalysis.dll": "9084242b7f93eebb165bbc8c94d97b46443d60b7d8139b1ce06bb1aca251af4b",
-    "Raven.CodeAnalysis.NeoClr.dll": "d67b07545a0af978386195689515a2d6ef7fb59eb1604fe4240828a967542216",
-    "NeoCLR.Metadata.Experimental.dll": "642e9caaf83a06411757e62df9c74e6175903a4dbd6183ba3586e125c3748e92"
-  },
-  "librarySourceDirty": true,
-  "libraryBuildEvidence": "docs/experiments/stack-trace/library-build.json",
-  "libraryBuildEvidenceSha256": "17fe22f1fd44bb57fbaf340a01e4c08f7d57a24186cb7097fbf89241f0ee11e6",
-  "rendererProvenance": "Audit rebuilt without rebuilding project dependencies, using the pinned Raven native compiler/renderer outputs. Exact binary hashes retained."
+  "scope": "Reviewed native API rendering; legacy coverage gaps remain explicitly marked by the website overlay."
 }

@@ -42,6 +42,8 @@
       href: features/files/index.md
     - name: "Console and streams"
       href: features/console/index.md
+    - name: "SQL databases"
+      href: features/sql/index.md
     - name: "Networking"
       href: features/networking/index.md
     - name: "Web and HTTP"
@@ -116,3 +118,13 @@
       href: docs/text-numbers.md
     - name: "Local time mapping payloads"
       href: docs/time-zone-mappings.md
+    - name: "SQL data access (development)"
+      href: docs/sql.md
+    - name: "Benchmarking"
+      href: docs/benchmarking.md
+    - name: "Testing"
+      href: docs/testing.md
+    - name: "Stack traces"
+      href: docs/stack-trace.md
+    - name: "Sequence access"
+      href: docs/sequence-access.md

@@ -1,0 +1,119 @@
+{
+  "compilerRevision": "c1a938ccdc473dda6a7dfb2dbde4710855d5b5db",
+  "sourceRevision": "4778c5acb754df773c144bf8876b79e09d11dac5",
+  "environment": {
+    "RavenNeoClrCoreReference": "/Users/robert/Projects/neoclr/target/encoding-array-bundle/bootstrap/Core.dll",
+    "RavenNeoClrBootstrapSeed": "/Users/robert/Projects/neoclr/target/encoding-array-bundle/bootstrap/System.neox",
+    "RavenNeoClrRuntimeSeed": "/Users/robert/Projects/neoclr/target/sql-postgresql-libraries-v5/System.runtime.neox"
+  },
+  "fullBuildEvidenceSha256": "fa554e31b77288e8e6c3ceb510d5bd9598e9b99c841c284a83ab230a3aaddea8",
+  "commands": [
+    {
+      "command": [
+        "dotnet",
+        "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+        "neoclr",
+        "--project",
+        "/Users/robert/Projects/neoclr/runtime/raven/projects/System.Runtime/System.Runtime.rvnproj"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "dotnet",
+        "/Users/robert/Projects/neoclr/tools/metadata/NeoCLR.Metadata.Translate/bin/Release/net10.0/NeoCLR.Metadata.Translate.dll",
+        "/Users/robert/Projects/neoclr/target/encoding-array-bundle/bootstrap/System.retained.json",
+        "/Users/robert/Projects/neoclr/target/sql-postgresql-libraries-v5/System.runtime.neox",
+        "--reference",
+        "/Users/robert/Projects/neoclr/runtime/raven/projects/System.Runtime/bin/neoclr/System.Runtime.dll"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "dotnet",
+        "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+        "neoclr",
+        "--project",
+        "/Users/robert/Projects/neoclr/runtime/raven/projects/System.Data/System.Data.rvnproj",
+        "--no-build-references"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "dotnet",
+        "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+        "neoclr",
+        "--project",
+        "/Users/robert/Projects/neoclr/runtime/raven/projects/System.Networking/System.Networking.rvnproj",
+        "--no-build-references"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "dotnet",
+        "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+        "neoclr",
+        "--project",
+        "/Users/robert/Projects/neoclr/runtime/raven/projects/System.Web/System.Web.rvnproj",
+        "--no-build-references"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "dotnet",
+        "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+        "neoclr",
+        "--project",
+        "/Users/robert/Projects/neoclr/runtime/raven/projects/System.Data.PostgreSql/System.Data.PostgreSql.rvnproj",
+        "--no-build-references"
+      ],
+      "exitCode": 0
+    }
+  ],
+  "selectedInputAndArtifactHashes": {
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll": "ac7597e4a227a9ffcb8ca94853508360ab754be4b92d9b100c53ceeb5b270390",
+    "/Users/robert/Projects/neoclr/runtime/raven/projects/System.Data.PostgreSql/System.Data.PostgreSql.rvnproj": "77abf2dfc3f13d3fcee266826cd20697165169a9a92be64f4da72557e96dacb8",
+    "/Users/robert/Projects/neoclr/runtime/raven/src/System/Data/Sql/SqlError.rvn": "1f886ce308149dbe0b9308ba7501ad352f60a46edaaa263f87af53fe581ba708",
+    "/Users/robert/Projects/neoclr/runtime/raven/src/System/Data/Sql/SqlMapper.rvn": "7f1fc4a6ad98f647788b3a0e2d7a85297b356bb59b5d1bdabdf185b196dec41d",
+    "/Users/robert/Projects/neoclr/runtime/raven/src/System/Data/Sql/Sql.rvn": "aa30da85f4689bc1672a91f84f023ebdf76ff350b5c35200632f84f2cbda73eb",
+    "/Users/robert/Projects/neoclr/runtime/raven/src/System/Data/Sql/SqlValue.rvn": "c7a2bbbfa6cf2dffd555f5f34dfc284a9034df772848cd4f3c14f2d813b5ec53",
+    "/Users/robert/Projects/neoclr/runtime/raven/providers/System.Data.PostgreSql/PostgresConnection.rvn": "4322c1ccfee08951c0b55cf2e661f7c994f2acd4d676819b3449b818427aeddc",
+    "/Users/robert/Projects/neoclr/runtime/raven/providers/System.Data.PostgreSql/Wire.rvn": "9d8197d8556cd14785c8cfc9287b10b599787f83bf2b9214cb015d2e49d31764",
+    "/Users/robert/Projects/neoclr/runtime/raven/providers/System.Data.PostgreSql/PostgresDatabase.rvn": "a13a4d125d8792758a1757fa7aca6198cab6d3f2bc7d852519fcb9a2846e0a43",
+    "/Users/robert/Projects/neoclr/docs/experiments/runtime-async/RuntimeAsyncBridge.rvn": "532eee430136873d23192a22d5d28037a32a27b4b39806cfd988a598816ab494",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/Raven.CodeAnalysis.dll": "4349861042c6a05482c4bef2291f3600a320c9bb3df9e44e5d9f885edbde8076",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/Raven.CodeAnalysis.NeoClr.dll": "b6d9399f2cb81274864d36a3cd55d69bda830500c57b5242fdfeb43a75100886",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/NeoCLR.Metadata.Experimental.dll": "e32f3b12386502991d72ed482905fcddb6292c9b837fd7506bcd97b4f9b20c0a",
+    "/Users/robert/Projects/neoclr/target/sql-postgresql-libraries-v5/System.Runtime.dll": "ae99a646e91fc5b1643b67b95a39eb98abb2651945e364f3db27ac48f0069f22",
+    "/Users/robert/Projects/neoclr/target/sql-postgresql-libraries-v5/System.Data.dll": "690cb9f23b4b340b433eb7353eeeaba03183c7fccdd129c80089d62c49da6629",
+    "/Users/robert/Projects/neoclr/target/sql-postgresql-libraries-v5/System.Networking.dll": "f1936e76bfa3a380ef23777636c58357323ae7e9e5e801b47151801bc620cffe",
+    "/Users/robert/Projects/neoclr/target/sql-postgresql-libraries-v5/System.Web.dll": "5a5b1c0b607b5844f4c8ba2083efb403db4f1313094cee33dd79571aaa7a8c55",
+    "/Users/robert/Projects/neoclr/target/sql-postgresql-libraries-v5/System.Data.PostgreSql.dll": "d5d60f9ab5f51e06ee6de39e6470ec8e84924074a77bf61ab78487decac27564",
+    "/Users/robert/Projects/neoclr/target/sql-postgresql-libraries-v5/System.runtime.neox": "98a1ae1da85387c87746957e83a4015eb59d0566539a915c69f168d2b511b190",
+    "/Users/robert/Projects/neoclr/target/sql-postgresql-libraries-v5/Core.dll": "3d4a676d379067c18a65a9beb8257ed40bf3196fc643a9ba1d559c619ec73fad",
+    "/Users/robert/Projects/neoclr/target/sql-postgresql-libraries-v5/ownership.json": "42c180c19dae1b37e1696e5cb3e00872def9059daf5469c1726f914595a261d4",
+    "/Users/robert/Projects/neoclr/target/sql-postgresql-libraries-v5/NeoCLR.ClassLibrary.props": "800cf7672995b5737b232802028dd288547c4130f8b466e2a5f64b14d8f2d4de",
+    "/Users/robert/Projects/neoclr/target/sql-postgresql-libraries-v5/System.Runtime.xml": "49f5fdc3d803e3758ec74b00416d9d112d7595013a8218363eae29b2e0d42e19",
+    "/Users/robert/Projects/neoclr/target/sql-postgresql-libraries-v5/System.Runtime.docs/manifest.json": "fdb0750ff9d7df4fe42815b2a0b5988077ec89c4e2874c3097ce149f6fb6ccf7",
+    "/Users/robert/Projects/neoclr/target/sql-postgresql-libraries-v5/System.Data.xml": "e342759677e08e570056db7fe0a67706fdeb43b9ae97559d1959ff98d289a7c5",
+    "/Users/robert/Projects/neoclr/target/sql-postgresql-libraries-v5/System.Data.docs/manifest.json": "0ed7d703b5d4f79269c507ee72cc5483c80d051a8558aaef58151deb453f45b2",
+    "/Users/robert/Projects/neoclr/target/sql-postgresql-libraries-v5/System.Networking.xml": "ef235d623bdc5763828dd9ae7f4ba934535ce1f5dbbb6428ff1d83fe93bd5fde",
+    "/Users/robert/Projects/neoclr/target/sql-postgresql-libraries-v5/System.Networking.docs/manifest.json": "7e0afaf5bc39a825ce73aadbc97b8505734141e1d88dd112930755203f2ee242",
+    "/Users/robert/Projects/neoclr/target/sql-postgresql-libraries-v5/System.Web.xml": "abc62c0b3db55fffbf1ed50aa0bdf3115cc4440958e2b9308d89df8d779eedc7",
+    "/Users/robert/Projects/neoclr/target/sql-postgresql-libraries-v5/System.Web.docs/manifest.json": "b6ecb52d0ba01f6ab47fe37f21a7fb5c5120111784ed98be76b82d78725dfaf2",
+    "/Users/robert/Projects/neoclr/target/sql-postgresql-libraries-v5/System.Data.PostgreSql.xml": "1c7d9c5709daedfae2428e13554c17e034f3410b45902c1110143a9ed8265bb6",
+    "/Users/robert/Projects/neoclr/target/sql-postgresql-libraries-v5/System.Data.PostgreSql.docs/manifest.json": "26446e413267d36627c50f3507890cecac9100d609c6140ba96cb265c714ed72"
+  },
+  "selectionNote": "Selected SQL sources, compiler binaries and bundle artifacts; full build-evidence.json also fingerprints other runtime sources and generated Markdown.",
+  "server": {
+    "version": "PostgreSQL 18.6 (Debian 18.6-1.pgdg13+2), aarch64 Linux",
+    "dockerImageId": "sha256:74935e72241653ca55e0414067e6d8763aceb8a810eb51b452253ec3dcfc4336",
+    "binding": "127.0.0.1, ephemeral port, disposable trust-authenticated server"
+  },
+  "requestedCompilerRevisionLabel": "1f3cdda12",
+  "provenanceNote": "The build command used the earlier use-fix revision label. Compiler binaries predate this library build and hash-match the final validation and clean c1a938ccd compiler checkout; this field records the corrected complete revision."
+}

@@ -44,4 +44,8 @@
 <ItemGroup><EmbeddedResource Include="../../../runtime/raven/src/System/Time/TimeZoneError.rvn" LogicalName="NeoCLR.TimeZoneError.rvn" /></ItemGroup>
 <ItemGroup><EmbeddedResource Include="../../../runtime/raven/src/System/Time/LocalTimeMapping.rvn" LogicalName="NeoCLR.LocalTimeMapping.rvn" /></ItemGroup>
 <ItemGroup><EmbeddedResource Include="../../../runtime/raven/src/System/Time/DateTime.rvn" LogicalName="NeoCLR.DateTime.rvn" /></ItemGroup>
+<ItemGroup>
+    <EmbeddedResource Include="../../../runtime/raven/src/System/Data/Sql/SqlError.rvn" LogicalName="NeoCLR.SqlError.rvn" />
+    <EmbeddedResource Include="../../../runtime/raven/src/System/Data/Sql/SqlValue.rvn" LogicalName="NeoCLR.SqlValue.rvn" />
+  </ItemGroup>
 </Project>
