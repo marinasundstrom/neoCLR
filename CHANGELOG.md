@@ -8,6 +8,13 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-11
 
+- Qualify generic native async generator methods on nongeneric owners, backed by
+  synthesized typed closure frames. Cover generic lambdas, locals/calls, pending
+  Task<T> inputs, delegation, early disposal and captured-object GC. Generic owners,
+  generic Task-returning methods, abandoned-generator lifetime and performance
+  qualification remain open; runtime/execution defaults are unchanged. Record the
+  author’s .NET/Go concurrency ambition as a target with explicit evidence gates.
+
 - Qualify the Raven diagnostic fix for selected runtime generators: yield-only
   bodies no longer claim synchronous execution. All three local execution modes
   still pass. Investigate generic generator rejection and identify native generic

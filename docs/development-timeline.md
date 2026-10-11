@@ -15298,3 +15298,20 @@ or runtime-await default switch was performed.
   reclamation and generator benchmarks. Existing runtime-await cache measurements
   remain slower than native state-machine controls; no default switch is made.
   [Implementation and evidence](experiments/runtime-async/async-generators.md#native-raven-yield-checkpoint-2026-10-11).
+
+## 2026-10-11 — Concurrency ambition and generic generator progress
+
+- Author: “We aim at having the best concurrency support - or at least better than
+  .NET and on par with Go”. This arrived during the generic closure/compiler slice.
+- Assistant: proposed treating that as an evidence-based target across usability,
+  cancellation/cleanup, memory per suspended operation, multicore throughput,
+  fairness and tail latency. Runtime-owned async provides design freedom but does
+  not itself establish an advantage. Keep the HTTP showcases and matched benchmarks
+  as evidence gates; no comparative performance claim is made.
+- Action: recorded this ambition on the roadmap without skipping the existing
+  lifetime/performance gates. Completed native generic closure synthesis and generic
+  generator methods on nongeneric owners. Forty-five focused compiler tests and six
+  executable runs (generator and await-for fixtures, each interpreter/JIT/AOT) pass.
+- Open: generic owners, generic retained Task methods, abandoned suspended-body
+  collection, production carrier/platform support and comparative benchmarks.
+  [Implementation/evidence](experiments/runtime-async/async-generators.md#generic-method-synthesis-checkpoint-2026-10-11).

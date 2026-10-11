@@ -301,3 +301,39 @@ These are compiler implementation steps, not new runtime contracts. The portable
 emission planner involved here currently exists only on the native compiler line;
 this is not a reason to copy that experimental subsystem wholesale into Raven main.
 Any independently applicable general compiler fix still belongs on main first.
+
+### Generic method synthesis checkpoint (2026-10-11)
+
+The compiler now implements typed generic closure synthesis for methods on nongeneric
+owners. `Echo<T>` and `EchoAfter<T>` in the language consumer execute ordinary Raven
+yield/delegation, including a pending Task<T> input, generic locals and calls, and early
+disposal after delegation. `Second<T,U>` checks distinct generic parameter ordinals.
+The fixture also exercises captured and capture-free generic lambdas, with the same
+generic identity call used in a factory and in its callback. That guards against
+reusing constructed call references across method and closure-owner parameter scopes.
+Integer, string and object cases plus GC at pending/yield boundaries pass in all three
+local modes. This closes the nongeneric-owner portion of the synthesis prerequisite
+above, without changing the historical results of the earlier probes.
+
+The native backend maps source method parameters into a synthetic generic owner,
+including capture fields, callback signatures, locals, Function shapes and constructed
+calls. Definition imports preserve their own scopes. Scoped callback reference caches
+are separate; ordinary methods retain shared caches. The explicit portable capability
+leaves other emitters unchanged. This subsystem is native-line work, since the portable
+planner is not on Raven main. It follows .NET typed generic display-class storage;
+no universal Object boxing convention is introduced.
+
+[Final generator evidence](async-generator-language-validation.json) and
+[await-for lifecycle regression](generic-closure-await-for-validation.json) each pass
+interpreter, macOS ARM64 JIT and AOT. Forty-five focused compiler tests pass on .NET 11,
+including generic capture capability rejection/acceptance and ordinary .NET execution.
+The reference remains the source-included POC provider and matching experimental
+library bundle; the reports hash those exact inputs.
+
+Generic containing types, generic Task-returning retained methods and mutable captures
+remain restricted. Generic callback frames currently allocate even when there are no
+captured values. No allocation, latency or throughput improvement is claimed. Abandoned
+suspended-generator collection and Windows retained suspension remain separate gates.
+
+Compiler implementation: Raven native `8b917fbcb` on
+`codex/source-object-metadata-resolution`. Raven main remains separate.

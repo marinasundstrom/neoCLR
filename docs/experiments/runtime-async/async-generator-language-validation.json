@@ -30,7 +30,7 @@
         "/Users/robert/Projects/neoclr/docs/experiments/aot-console/socket-listener.c",
         "/Users/robert/Projects/neoclr/tools/native/entry-arguments.c",
         "-o",
-        "/Users/robert/Projects/neoclr/target/generator-closure-storage-qualified/host.dylib",
+        "/Users/robert/Projects/neoclr/target/generic-generator-final/host.dylib",
         "-DNEOCLR_RUNTIME_ASYNC",
         "-I",
         "/Users/robert/Projects/neoclr/docs/experiments/runtime-async",
@@ -72,7 +72,7 @@
         "--reference",
         "/Users/robert/Projects/neoclr/target/async-iteration-libraries/System.Web.dll",
         "-o",
-        "/Users/robert/Projects/neoclr/target/generator-closure-storage-qualified/runtime-generator-language.dll",
+        "/Users/robert/Projects/neoclr/target/generic-generator-final/runtime-generator-language.dll",
         "/Users/robert/Projects/neoclr/docs/experiments/runtime-async/RuntimeGeneratorLanguage.rvn",
         "/Users/robert/Projects/neoclr/docs/experiments/runtime-async/RuntimeAsyncBridge.rvn",
         "/Users/robert/Projects/neoclr/docs/experiments/runtime-async/RuntimeGeneratorBridge.rvn"
@@ -86,11 +86,11 @@
       "command": [
         "/Users/robert/Projects/neoclr/target/scheduler-wait-validation/release/neoclr",
         "disassemble",
-        "/Users/robert/Projects/neoclr/target/generator-closure-storage-qualified/runtime-generator-language.dll",
-        "/Users/robert/Projects/neoclr/target/generator-closure-storage-qualified/runtime-generator-language.neoil"
+        "/Users/robert/Projects/neoclr/target/generic-generator-final/runtime-generator-language.dll",
+        "/Users/robert/Projects/neoclr/target/generic-generator-final/runtime-generator-language.neoil"
       ],
       "exitCode": 0,
-      "stdout": "Disassembled /Users/robert/Projects/neoclr/target/generator-closure-storage-qualified/runtime-generator-language.dll -> /Users/robert/Projects/neoclr/target/generator-closure-storage-qualified/runtime-generator-language.neoil\n",
+      "stdout": "Disassembled /Users/robert/Projects/neoclr/target/generic-generator-final/runtime-generator-language.dll -> /Users/robert/Projects/neoclr/target/generic-generator-final/runtime-generator-language.neoil\n",
       "stderr": ""
     },
     {
@@ -98,9 +98,9 @@
       "command": [
         "/Users/robert/Projects/neoclr/tools/aot-poc/target/release/neoclr-aot-poc",
         "--closed-world",
-        "/Users/robert/Projects/neoclr/target/generator-closure-storage-qualified/runtime-generator-language.dll",
+        "/Users/robert/Projects/neoclr/target/generic-generator-final/runtime-generator-language.dll",
         "@entry",
-        "/Users/robert/Projects/neoclr/target/generator-closure-storage-qualified/runtime-generator-language.o",
+        "/Users/robert/Projects/neoclr/target/generic-generator-final/runtime-generator-language.o",
         "--system",
         "/Users/robert/Projects/neoclr/target/async-iteration-libraries/System.runtime.neox",
         "--module",
@@ -138,8 +138,8 @@
       ],
       "exitCode": 0,
       "stderr": "",
-      "stdoutFile": "/Users/robert/Projects/neoclr/target/generator-closure-storage-qualified/runtime-generator-language-compile.json",
-      "stdoutSha256": "13c11fccb339f95389c13175c054ef4baebcfd7510e9d27d97c2798c153304db"
+      "stdoutFile": "/Users/robert/Projects/neoclr/target/generic-generator-final/runtime-generator-language-compile.json",
+      "stdoutSha256": "602f444f0e6c9914dd62697c65a3be8510c1f82dda3b313bdff566f1002c7ce9"
     },
     {
       "label": "runtime-generator-language-link",
@@ -169,9 +169,9 @@
         "/Users/robert/Projects/neoclr/docs/experiments/aot-console/task-queue.c",
         "/Users/robert/Projects/neoclr/docs/experiments/aot-console/socket-listener.c",
         "/Users/robert/Projects/neoclr/tools/native/entry-arguments.c",
-        "/Users/robert/Projects/neoclr/target/generator-closure-storage-qualified/runtime-generator-language.o",
+        "/Users/robert/Projects/neoclr/target/generic-generator-final/runtime-generator-language.o",
         "-o",
-        "/Users/robert/Projects/neoclr/target/generator-closure-storage-qualified/runtime-generator-language",
+        "/Users/robert/Projects/neoclr/target/generic-generator-final/runtime-generator-language",
         "-DNEOCLR_RUNTIME_ASYNC",
         "-I",
         "/Users/robert/Projects/neoclr/docs/experiments/runtime-async",
@@ -189,7 +189,7 @@
       "command": [
         "/Users/robert/Projects/neoclr/target/scheduler-wait-validation/release/neoclr",
         "run",
-        "/Users/robert/Projects/neoclr/target/generator-closure-storage-qualified/runtime-generator-language.dll",
+        "/Users/robert/Projects/neoclr/target/generic-generator-final/runtime-generator-language.dll",
         "--system",
         "/Users/robert/Projects/neoclr/target/async-iteration-libraries/System.runtime.neox",
         "--instructions",
@@ -215,9 +215,9 @@
         "/Users/robert/Projects/neoclr/tools/aot-poc/target/release/neoclr-aot-poc",
         "--jit-run",
         "--closed-world",
-        "/Users/robert/Projects/neoclr/target/generator-closure-storage-qualified/runtime-generator-language.dll",
+        "/Users/robert/Projects/neoclr/target/generic-generator-final/runtime-generator-language.dll",
         "@entry",
-        "/Users/robert/Projects/neoclr/target/generator-closure-storage-qualified/host.dylib",
+        "/Users/robert/Projects/neoclr/target/generic-generator-final/host.dylib",
         "--system",
         "/Users/robert/Projects/neoclr/target/async-iteration-libraries/System.runtime.neox",
         "--module",
@@ -260,7 +260,7 @@
     {
       "label": "runtime-generator-language-aot",
       "command": [
-        "/Users/robert/Projects/neoclr/target/generator-closure-storage-qualified/runtime-generator-language"
+        "/Users/robert/Projects/neoclr/target/generic-generator-final/runtime-generator-language"
       ],
       "exitCode": 0,
       "stdout": "PASS native Raven async generator language\n",
@@ -273,21 +273,21 @@
       "sample": "generator-language",
       "mode": "interpreter",
       "passed": true,
-      "assemblySha256": "b063188143be742349089e01a63bc23d80e63a51ce1ed2459465af1576452467"
+      "assemblySha256": "302757cc8a03498b74d9b08a761d3747dd92395161e78c99585edfc1036e8423"
     },
     {
       "lowering": "runtime",
       "sample": "generator-language",
       "mode": "jit",
       "passed": true,
-      "assemblySha256": "b063188143be742349089e01a63bc23d80e63a51ce1ed2459465af1576452467"
+      "assemblySha256": "302757cc8a03498b74d9b08a761d3747dd92395161e78c99585edfc1036e8423"
     },
     {
       "lowering": "runtime",
       "sample": "generator-language",
       "mode": "aot",
       "passed": true,
-      "assemblySha256": "b063188143be742349089e01a63bc23d80e63a51ce1ed2459465af1576452467"
+      "assemblySha256": "302757cc8a03498b74d9b08a761d3747dd92395161e78c99585edfc1036e8423"
     }
   ],
   "inputsSha256": {
@@ -297,18 +297,18 @@
     "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/Mono.Cecil.Rocks.dll": "bf992f3dce364ebcc3200fa7832ef07e20b4e2dbc3a8a6213ce44e3d239db984",
     "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/Microsoft.NET.HostModel.dll": "be876d9f53ad634fad4a61afd7e4aef99dbca8fe276bbf746d31270dbbe83163",
     "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/System.Reflection.MetadataLoadContext.dll": "8c0deb266f0a90c312770a3db68667d0fae3b30967c2bfa27e17d3668fcf9809",
-    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/RavenDoc.dll": "ee51010ab980b8bf2e61eee2cd2febac101eda09ec155a09ce5124ec24d29cd0",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/RavenDoc.dll": "564ec09fbf99ea2c146e15ae6f72ec1dfeb000f70c719f9b9131fc395d3232bb",
     "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/Microsoft.Build.Locator.dll": "fce7cf90fb4f26fe5a84adb24285d92be9a4285fdb314f775a258ba9de08bdcc",
     "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/Microsoft.CodeAnalysis.CSharp.dll": "cfb5f2785c30485eda803d58fb8330d737cb07d469cd3d7bc1113d58e8d8e4bb",
     "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/Spectre.Console.dll": "c97e65cb2d73dc4eb50bc372a0fbc4368ee60ed56e179d0466a606d5955f2118",
-    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/Raven.CodeAnalysis.Console.dll": "c71c870edfc0d8e7f759488f2512e7d49d7ece09e5ff77983462a6969ff68882",
-    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/NeoCLR.Metadata.Experimental.dll": "f581806c7f1891e6acd14db2fa6981fdce91cae3f1f24fecc66d41a895e0e277",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/Raven.CodeAnalysis.Console.dll": "15656337cdd19e17cc5894b185a04fb6bab43895c7f5977003a0abb14b457858",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/NeoCLR.Metadata.Experimental.dll": "d6f2faf4734f418b44df342232615fe81c9e33f1089a05295dcd64663c883d43",
     "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/test.dll": "f45312365076c080282997d42703848c7c1dbbfdb13e991b7059c6423a5ca4a2",
-    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll": "b99fbcfdb34d35dd00c371a75ee598fbb12d32727eda6f0cd01fed4656868d10",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll": "01e05ad0000f98d3b320dc4b6c20f9e3142ecd90c29a4fecdcce6fb7e15958f0",
     "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/Markdig.dll": "a4f94bc5f64010db760f063afc1c1ae7a9a67bb714d96eab2e2773fcc2670d18",
-    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/Raven.CodeAnalysis.NeoClr.dll": "d7486a37aa6af05dfc0ebc098b1582bb1448ff70b0a537eb90cedd6878eebdc8",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/Raven.CodeAnalysis.NeoClr.dll": "bfb9ec08e71ae4819e2fb034d34696d5c183a14b82393863d8e2801cd4d84e5b",
     "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/Mono.Cecil.dll": "831dca77470d85cb6ffbea3072daa7a3df5b7c9fcfd9c3f43674a9be99d4bfcf",
-    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/Raven.CodeAnalysis.dll": "047abe60855ed17a805345c82a5170aa9bbaacca2fa536c04c0a2460ff03d538",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/Raven.CodeAnalysis.dll": "b40aac90ad52a6ec5d4afe688550f86fda8ba3231ff58401eb33f32991f855e3",
     "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/YamlDotNet.dll": "86f873f682c619a0c24e263dcdd15fe027104666641c92f503516671d61edda6",
     "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/Microsoft.CodeAnalysis.dll": "0a7fb1d94e0e7f46798b138caa67e5d5fb8fb98fd31b5294c917def057ab3d80",
     "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/Mono.Cecil.Pdb.dll": "a332332633fbcb20e8d50e49b4db7bd1557721417122cf0c5f4c42f2332391d0",
@@ -351,12 +351,12 @@
     "/Users/robert/Projects/neoclr/target/async-iteration-libraries/System.Data.dll": "ff8e21e3bf914e40348b8c8f34b7e0cd156a116b1911ae0fd45453f38b77e81e",
     "/Users/robert/Projects/neoclr/target/async-iteration-libraries/System.Networking.dll": "57a2fde1fc07159aa2a285c016791d879d1cfb72e9a70145374ebbc97ca1601a",
     "/Users/robert/Projects/neoclr/target/async-iteration-libraries/System.Web.dll": "8dd03c3971f1cc703a99fa295c9e3e8cd335594b07f9b1778960ebfd3ff39c0d",
-    "/Users/robert/Projects/neoclr/docs/experiments/runtime-async/RuntimeGeneratorLanguage.rvn": "1fbf23d603d78b3d76c4f5e49e1bb69bcc2c2e1cf60d18118c4f20e47d668bce",
+    "/Users/robert/Projects/neoclr/docs/experiments/runtime-async/RuntimeGeneratorLanguage.rvn": "6b901476a60df88bd5370ddd725fbfd8cb7cdb40d04b8742ef63cbb14b73b74b",
     "/Users/robert/Projects/neoclr/docs/experiments/runtime-async/RuntimeAsyncBridge.rvn": "93efd51bf49da558079d798bc3f5a920ac4962010da85f275961494007ab6251",
     "/Users/robert/Projects/neoclr/docs/experiments/runtime-async/RuntimeGeneratorBridge.rvn": "9557a5ceb4ad480c556fa27a3452a653d31d7367e2558240d87f78457a23e145",
     "/Users/robert/Projects/neoclr/target/scheduler-wait-validation/release/neoclr": "e1ee04fc3df37898846db96926c91e9ad76d70eed4c78484fc3c7f4ff7360628",
     "/Users/robert/Projects/neoclr/tools/aot-poc/target/release/neoclr-aot-poc": "84cabe597f196fc9e1d08b4f8f889afbe131d1b0f3925d8e208a3576040720e6",
     "/Users/robert/Projects/neoclr/benchmarks/native-web/http-host.c": "57dc4da4325575b5ed132d0571d557c73b02bba793c399ac0ed5cc4c71c06fcd"
   },
-  "hostSha256": "fa3a7c67a197a9d9105a1f5adcb4c39de0d52060c352509bfaed995e7a8435f3"
+  "hostSha256": "fe40736b35900360431d0d6d5c7ee6df6dd190731dd145fe6d02c99b361f6bc3"
 }

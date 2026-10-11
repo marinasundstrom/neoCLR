@@ -161,6 +161,64 @@ func CheckGenericClosure() {
     }
 }
 
+func Identity<T>(value: T) -> T => value
+
+func CaptureLambda<T>(value: T) -> () -> T {
+    let copy = Identity(value)
+    return () => Identity(copy)
+}
+func IdentityLambda<T>() -> (T) -> T => (value: T) => value
+
+async func Echo<T>(value: T) -> AsyncIterable<T> {
+    let copy = Identity(value)
+    yield copy
+    yield copy
+}
+
+async func Second<T, U>(first: T, second: U) -> AsyncIterable<U> {
+    _ = Identity(first)
+    yield Identity(second)
+}
+
+async func EchoAfter<T>(gate: Task<T>, counters: Counters) -> AsyncIterable<T> {
+    use lifetime = Lifetime(counters)
+    let value = await gate
+    yield value
+    yield from Echo(value)
+}
+
+async func CheckGeneric() -> Task<()> {
+    var number = 0
+    await for value in Echo(42) { number = value }
+    var text = ""
+    await for value in Echo("generic") { text = value }
+    if number != 42 || text != "generic" { System.Fail("Generic generator lost its argument") }
+    var second = 0
+    await for value in Second("first", 63) { second = value }
+    if second != 63 { System.Fail("Generic producer confused parameter ordinals") }
+    let scalar = CaptureLambda(91)
+    let reference = CaptureLambda(Payload(73))
+    let identity = IdentityLambda<int>()
+    System.Runtime.GC.Collect()
+    if scalar() != 91 || reference().Value != 73 || identity(17) != 17 {
+        System.Fail("Generic closure lost its scoped type or capture")
+    }
+    let gate = Promise<Payload>()
+    let counters = Counters()
+    let iterator = EchoAfter(gate.Task, counters).GetAsyncIterator()
+    let pending = iterator.MoveNextAsync()
+    if pending.IsCompleted { System.Fail("Generic producer did not suspend") }
+    System.Runtime.GC.Collect()
+    _ = gate.Complete(Payload(29))
+    if !await pending || iterator.Current.Value != 29 { System.Fail("Generic await lost its result") }
+    System.Runtime.GC.Collect()
+    if !await iterator.MoveNextAsync() || iterator.Current.Value != 29 {
+        System.Fail("Generic delegation lost its value")
+    }
+    await iterator.DisposeAsync()
+    if counters.Disposals != 1 { System.Fail("Generic producer lost early cleanup") }
+}
+
 async func Words() -> AsyncIterable<string> {
     yield "alpha"
     yield "beta"
@@ -273,6 +331,7 @@ async func Main() -> Task<int> {
         await CheckPendingCleanup(scenario)
     }
     CheckGenericClosure()
+    await CheckGeneric()
     await CheckShapes()
     await CheckDelegation(false)
     await CheckDelegation(true)

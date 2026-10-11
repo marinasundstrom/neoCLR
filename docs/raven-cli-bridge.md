@@ -8865,3 +8865,17 @@ for RAV2706 reporting only; bound await flags and temporary metadata are unchang
 Generic source producer support remains blocked by native generic closure capture,
 not by an intended restriction of AsyncIterable. The investigation and prerequisite
 are recorded in the async-generator experiment, with refreshed three-mode evidence.
+
+### Generic producer closure synthesis (2026-10-11)
+
+Raven native `8b917fbcb` now emits typed generic closure frames for generic generator
+methods on nongeneric owners. Method parameters are remapped to synthetic owner
+parameters in callback storage/signatures, locals and constructed references. Scoped
+reference caches keep callback contexts distinct from their enclosing methods while
+normal emission keeps its shared caches. This is ordinary native generic metadata
+and structural Function binding through the existing temporary compiler bridge;
+there is no boxing-based capture convention or new runtime ABI. The portable planner
+opts in through an explicit backend capability; this subsystem is not yet on Raven
+main and is not carried wholesale there. Raven owns synthesis; neoCLR owns layout,
+binding and retained-body GC validation. Generic owners, generic Task methods and
+abandoned collection remain open. See the refreshed generator consumer and evidence.

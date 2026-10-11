@@ -1,12 +1,20 @@
 # neoCLR platform roadmap
 
+**Concurrency ambition (2026-10-11):** the author aims for concurrency support
+beyond .NET and at least on par with Go. This is a target, not a measured claim.
+Assess usability and cancellation/cleanup correctness alongside suspended-operation
+memory, multicore throughput, fairness and tail latency. Preserve matched .NET/Go
+comparisons and compiler-state-machine controls; runtime-owned async alone is not
+proof of an improvement. This reinforces the existing runtime-async milestone,
+without bypassing lifetime or performance gates.
+
 **Async iteration implementation (2026-10-11):** author-directed sequencing is the
 managed AsyncIterable/AsyncIterator contract and await-for consumption, followed by
 generator yield/resume. The interface and retained-body await-for slices pass all three local execution modes.
 Native Raven `yield` and delegation now pass them using a source-local generic
 producer helper. Nested producer cleanup also passes with pending disposal and
-cancellation. Generic source methods, abandoned-generator collection and performance
-gates remain open. See
+cancellation. Generic generator methods on nongeneric owners now work; generic owners,
+abandoned-generator collection and performance gates remain open. See
 [scope, evidence and remaining work](experiments/runtime-async/async-generators.md).
 
 **Compiler lines (2026-10-11):** the author directs keeping Raven main and the
