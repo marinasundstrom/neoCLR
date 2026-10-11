@@ -14549,3 +14549,27 @@ public wall-clock API is unsuitable for internal monotonic measurement; a clock
 contract, typed-object/collection workloads and discovery remain open. See
 [worker contract](../benchmarks/framework/README.md) and
 [JSON evidence](../benchmarks/json/README.md).
+
+
+### 2026-10-11 — Benchmark attributes on module functions
+
+**Author direction:** “Our benchmark framework can be attribute-driven like in
+benchmark.net. We define functions that are discovered”. The assistant follows
+existing test discovery conventions: a method-targeted `BenchmarkAttribute` with
+optional description, metadata-only discovery and generated typed registration.
+Classes are optional; manual registration remains available.
+
+**Implementation:** the discovery tool validates accessible parameterless,
+nongeneric module functions returning the current worker's `int` token, exports
+stable names/descriptions and verifies rediscovery after final compilation. Direct
+references retain discovered functions for AOT; no benchmark or attribute
+constructor is executed during discovery. This is build-time discovery, not a
+runtime reflection invocation layer. Async/results/setup hooks and typed JSON
+benchmarks remain open. See the [contract](../benchmarks/framework/README.md).
+
+**Validation outcome:** nine execution checks pass (two discovered functions and
+one manual case in interpreter/JIT/AOT). Six metadata discovery checks pass,
+including five rejections and a named-description function whose body would fail
+if executed during discovery. The final assembly's inventory and registration
+match the inspection build. This does not qualify Windows execution or new timing
+claims. [Evidence](../benchmarks/framework/discovery-evidence/validation.json).

@@ -69,8 +69,12 @@ serialization and deserialization of a nested Unicode document with arrays/nulls
 This first version measures external batch latency, including transport and
 correctness checks; it does not implement internal operation timing.
 
+Attribute-driven module-function discovery now uses native metadata introspection
+and generates typed registrations for AOT reachability. Final assembly rediscovery
+checks the generated contract; manual registration remains available. The current
+worker signature remains parameterless `int`, with token `1` for success.
+
 Typed JSON objects and collection mapping remain next, followed by a qualified
-monotonic clock and internal measurement, async callbacks, setup/cleanup and
-attribute discovery. These are still gaps relative to BenchmarkDotNet, not new
+monotonic clock and internal measurement, async callbacks and setup/cleanup. These are still gaps relative to BenchmarkDotNet, not new
 permanent semantics. This work stays within the benchmark gate before schedulers
 and runtime-managed suspension.

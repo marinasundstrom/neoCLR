@@ -1,0 +1,19 @@
+module NeoClr.Benchmarking
+
+import System.*
+
+/// Marks a parameterless module function returning the worker correctness token.
+/// Discovery reads metadata without invoking the function or attribute constructor.
+[AttributeUsage(AttributeTargets.Method)]
+public class BenchmarkAttribute : Attribute {
+    /// Optional display text. The qualified function name remains its selector.
+    var Description: string { get; set; }
+
+    init() {
+        Description = ""
+    }
+
+    init(description: string) {
+        Description = description
+    }
+}

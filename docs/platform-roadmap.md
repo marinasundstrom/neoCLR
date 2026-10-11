@@ -28,6 +28,8 @@ The [HTTP workbench](../benchmarks/jit-http/README.md) now passes 1,152 requests
 across all three modes; initial timing is provisional due to background contention.
 The [first benchmark runner](../benchmarks/framework/README.md) adds manually
 registered Raven workers and JSON node serialization/deserialization batches.
+Benchmark attributes now discover module functions through metadata and generate
+typed registrations, with final-assembly verification and AOT execution coverage.
 Typed-object/collection JSON and internal operation timing remain open.
 The author also requests a [BenchmarkDotNet-like framework](benchmarking-framework.md),
 combining external process orchestration with Raven workload measurement.

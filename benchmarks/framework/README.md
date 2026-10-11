@@ -49,11 +49,83 @@ statistical stability guarantee. Report median and range of raw batch samples.
 The native and interpreter collectors also differ, so do not isolate serializer
 or optimizer efficiency from these figures.
 
-Async callbacks, setup/cleanup hooks, attribute discovery, generated registration,
-parameter sets and internal high-resolution timing remain pending. Do not use
+Async callbacks, setup/cleanup hooks, parameter sets and internal high-resolution
+timing remain pending. Attribute discovery and generated registration are described below. Do not use
 wall-clock `System.Time.Clock` as a substitute for a monotonic operation clock.
 See the [framework direction](../../docs/benchmarking-framework.md).
 
 The HTTP workbench shares `process.py` but retains its external network peer;
 HTTP does not use the worker marker protocol. Its previously recorded source hashes
 identify the historical script before this transport extraction.
+
+## Attribute-driven function discovery
+
+`BenchmarkAttribute` marks accessible, parameterless, nongeneric module functions.
+Classes are not required. The current worker requires `int` with success token `1`;
+other return types and async functions remain unsupported, rather than silently
+omitted. For example, from the executable discovery sample:
+
+```raven
+[Benchmark("Sum a sequence of integers")]
+func Sum() -> int {
+    var total = 0
+    for value in 0..<100 {
+        total += value
+    }
+    if total != 4950 {
+        System.Fail("Sum changed")
+    }
+    return 1
+}
+```
+
+The marker derives from `System.Attribute` and uses
+`AttributeUsage(AttributeTargets.Method)`. Constructors are `init()` and
+`init(description: string)`; `var Description: string { get; set; }` also accepts
+`[Benchmark(Description: "text")]`. Empty descriptions use the qualified function
+name. Description is display metadata; exact filtering uses the qualified name.
+Manual `suite.Add` remains available alongside discovered functions.
+
+Preparation with `--discover` compiles an inspection assembly, reads native custom
+attributes through the metadata introspection API, writes a typed Raven registry,
+recompiles, and verifies that the final assembly has the same discovered contract.
+Neither benchmark bodies nor attribute constructors execute during discovery.
+Typed function references preserve AOT reachability without runtime reflection
+invocation or a separate reflection-retention file. This is build-time metadata
+discovery with generated registration; in-process dynamic discovery is not shipped.
+
+```sh
+python3 benchmarks/json/prepare.py \
+  --recipe target/jit-cli-http-final/validation.json \
+  --compiler /absolute/path/to/native-enabled/rvnc.dll \
+  --output target/benchmark-discovery \
+  --source benchmarks/framework/Discovery.rvn --discover
+python3 benchmarks/framework/runner.py \
+  --manifest target/benchmark-discovery/manifest.json \
+  --output target/benchmark-discovery/results.json \
+  --filter Benchmarks.Discovery.Sum
+python3 benchmarks/framework/validate_discovery.py \
+  --build target/benchmark-discovery/build.json \
+  --output target/benchmark-discovery-validation
+```
+
+Selectors are qualified names; the inventory additionally records a stable ID
+composed of assembly, module and function identity, excluding assembly version.
+Results are sorted by ordinal name. Invalid signatures, no discovered benchmarks,
+or unsupported identifiers fail preparation. Failed metadata discovery removes
+stale registry/inventory outputs. Generated adapters currently require plain ASCII
+Raven identifiers. The attribute and worker remain repository tooling, not a new
+public runtime-library assembly.
+
+Compared with BenchmarkDotNet's method attributes, module functions avoid compulsory
+fixture classes. This first contract has narrower return/setup/async support and
+uses generated direct calls instead of runtime reflective invocation. Those are
+current implementation limits, not permanent API choices.
+
+
+Qualification: [inventory](discovery-evidence/benchmarks.json),
+[generated registry](discovery-evidence/BenchmarkRegistry.rvn),
+[nine execution checks](discovery-evidence/execution.json) and
+[six discovery checks](discovery-evidence/validation.json). Execution covers two
+discovered functions plus one manual case in interpreter, JIT and AOT on macOS
+ARM64. These are functional checks, not benchmark performance measurements.

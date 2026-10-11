@@ -1,0 +1,15 @@
+{
+  "assembly": "app",
+  "benchmarks": [
+    {
+      "id": "3:app20:Benchmarks.Discovery29:Benchmarks.Discovery.Multiply()",
+      "name": "Benchmarks.Discovery.Multiply",
+      "description": "Benchmarks.Discovery.Multiply"
+    },
+    {
+      "id": "3:app20:Benchmarks.Discovery24:Benchmarks.Discovery.Sum()",
+      "name": "Benchmarks.Discovery.Sum",
+      "description": "Sum a sequence of integers"
+    }
+  ]
+}

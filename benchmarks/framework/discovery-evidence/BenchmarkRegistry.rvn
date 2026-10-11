@@ -1,0 +1,7 @@
+// Generated from native metadata. Do not edit.
+module NeoClr.Benchmarking
+
+func RegisterDiscoveredBenchmarks(suite: BenchmarkSuite) {
+    suite.Add("Benchmarks.Discovery.Multiply", Benchmarks.Discovery.Multiply)
+    suite.Add("Benchmarks.Discovery.Sum", Benchmarks.Discovery.Sum)
+}

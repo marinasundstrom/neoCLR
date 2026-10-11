@@ -208,8 +208,9 @@ separated from request timing. Its initial macOS ARM64 timing run had background
 CPU contention and is exploratory; it does not establish Windows performance or
 comparisons with other frameworks. An initial
 [JSON node workbench](https://github.com/marinasundstrom/neoCLR/blob/main/benchmarks/json/README.md)
-uses manually registered Raven workers and separate serialization/deserialization
-batches. It measures external batch latency including validation and protocol
+uses Raven workers and separate serialization/deserialization batches. The
+development framework also discovers `[Benchmark]` module functions from metadata
+and generates typed registrations for AOT; manual registration remains available. It measures external batch latency including validation and protocol
 costs; typed-object/collection benchmarks and internal operation timing remain open.
 [Contracts, validation and local benchmark](https://github.com/marinasundstrom/neoCLR/blob/main/docs/experiments/jit-managed/README.md).
 

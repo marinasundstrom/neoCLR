@@ -1,0 +1,35 @@
+module Benchmarks.Discovery
+
+import System.*
+import NeoClr.Benchmarking.*
+
+[Benchmark("Sum a sequence of integers")]
+func Sum() -> int {
+    var total = 0
+    for value in 0..<100 {
+        total += value
+    }
+    if total != 4950 {
+        System.Fail("Sum changed")
+    }
+    return 1
+}
+
+[Benchmark]
+func Multiply() -> int {
+    var total = 1
+    for value in 1..<6 {
+        total *= value
+    }
+    if total != 120 {
+        System.Fail("Product changed")
+    }
+    return 1
+}
+
+func Main(arguments: string[]) {
+    let suite = BenchmarkSuite()
+    suite.Add("manual", () => 1)
+    RegisterDiscoveredBenchmarks(suite)
+    suite.Run(arguments)
+}

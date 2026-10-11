@@ -51,6 +51,8 @@ stability. Startup includes setup and JIT compilation; AOT builds are excluded.
 
 See the [runner contract and limitations](../framework/README.md). Typed objects,
 arrays/lists/sequences/maps as mapped object properties, asynchronous workers,
-setup/cleanup hooks, attribute discovery and internal monotonic operation timing
+setup/cleanup hooks and internal monotonic operation timing
 remain follow-up work. Arrays in this node document do not qualify typed collection
 mapping benchmarks. No .NET/Go/JavaScript or Windows performance comparison is claimed.
+
+The framework now supports [attribute-driven function discovery](../framework/README.md#attribute-driven-function-discovery); the recorded JSON workload above uses manual callbacks.

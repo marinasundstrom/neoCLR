@@ -1,0 +1,41 @@
+{
+  "passed": true,
+  "cases": [
+    {
+      "name": "parameters",
+      "exitCode": 2,
+      "stdout": "",
+      "stderr": "Benchmark discovery failed: DiscoveryValidation.Invalid: benchmarks require accessible parameterless, nongeneric module functions\n"
+    },
+    {
+      "name": "instance",
+      "exitCode": 2,
+      "stdout": "",
+      "stderr": "Benchmark discovery failed: DiscoveryValidation.Fixture.Invalid: benchmarks require accessible parameterless, nongeneric module functions\n"
+    },
+    {
+      "name": "generic",
+      "exitCode": 2,
+      "stdout": "",
+      "stderr": "Benchmark discovery failed: DiscoveryValidation.Invalid: benchmarks require accessible parameterless, nongeneric module functions\n"
+    },
+    {
+      "name": "result",
+      "exitCode": 2,
+      "stdout": "",
+      "stderr": "Benchmark discovery failed: DiscoveryValidation.Invalid: benchmarks require int (the worker correctness token)\n"
+    },
+    {
+      "name": "empty",
+      "exitCode": 2,
+      "stdout": "",
+      "stderr": "Benchmark discovery failed: No benchmarks discovered\n"
+    },
+    {
+      "name": "named",
+      "exitCode": 0,
+      "stdout": "Discovered 1 benchmarks\n",
+      "stderr": ""
+    }
+  ]
+}

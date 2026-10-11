@@ -8,6 +8,13 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-11
 
+- Add attribute-driven benchmark module-function discovery with optional
+  descriptions. Native metadata introspection generates typed registrations and
+  verifies the final assembly contract for AOT reachability; manual registration
+  remains supported. Reject invalid signatures and stale discovery output.
+  The initial worker requires parameterless nongeneric functions returning the
+  `int` correctness token; async and arbitrary result types remain gaps.
+
 - Add an initial development benchmark runner with manually registered Raven
   callbacks, exact case filtering, warmup/operation counts, isolated mode jobs,
   raw samples and input-hash checks. JSON node serialization/deserialization use
