@@ -72,8 +72,11 @@ now admits 128 awaiters using one runnable slot in all three modes, before outco
 publication. The adapter now returns to runtime arbitration between callbacks;
 [incremental evidence](experiments/scheduler-continuations/README.md#incremental-batch-turns--2026-10-11)
 qualifies older-work progress in all three modes. Interpreter runnable storage now grows
-while preserving reserved activation slots. Native independent backlog/full-queue policy
-remains the next gate. The original runtime
+while preserving reserved activation slots. Native submissions now use an
+[independent rooted backlog](experiments/scheduler-continuations/README.md#independent-native-runnable-backlog--2026-10-11),
+qualified with a full timer table, 128 queued callbacks and root-budget saturation.
+Native resource budgets, explicit-GC diagnostics, concurrency and performance qualification
+remain gates before public migration. The original runtime
 registration service still retains strong roots. The interpreter readiness query now includes
 submitted work and keeps source/submission arbitration private;
 [quiescence contract and validation](runtime-scheduling-design.md#unified-interpreter-readiness--2026-10-11).

@@ -8,6 +8,13 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-11
 
+- Separate native runnable submissions from the bounded I/O table using runtime-owned
+  backlog nodes. Transfer runnable roots directly into dispatch tickets, alternate
+  ready sources with queued work, and release nodes/roots on terminal cleanup. Native
+  contracts cover a full timer table, 128 queued callbacks and root-budget saturation;
+  cross-mode batch consumers pass beyond the old 64-submission limit. Private host
+  layout requires matching rebuilt sources; native memory/root limits still apply.
+
 - Yield internal continuation batches between observers and fix native admission order
   when operation-table slots are reused. Grow interpreter runnable storage independently
   of dormant registrations while preserving allocation-free activation reservations.

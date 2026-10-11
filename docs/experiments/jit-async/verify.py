@@ -103,7 +103,7 @@ def main():
         cases += [('batch-yield', ROOT/'docs/experiments/scheduler-continuations/Yield.rvn', [], 0,
                    'PASS batch yields between observers to older runnable work\n', None)]
         cases += [('continuation-batch', ROOT/'docs/experiments/scheduler-continuations/Batch.rvn', [], 0,
-                   'PASS 128 awaiters and observer admitted with one available slot\n'
+                   'PASS 128 awaiters and observer admitted behind 128 runnable callbacks\n'
                    'PASS cancellation batch publishes outcome before observation\n', None),
                   ('batch-fault', ROOT/'docs/experiments/scheduler-continuations/BatchFault.rvn', [], 1, '', 'batch callback fault')]
         cases += [('managed-ownership', ROOT/'docs/experiments/scheduler-continuations/ManagedOwnership.rvn', [], 0,

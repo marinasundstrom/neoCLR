@@ -254,3 +254,45 @@ The yield fixture assigns the awaited result before comparing it: the current na
 emitter rejects the direct `if await task != value` expression with a value-block exit
 diagnostic. This source workaround does not change scheduling semantics; the general
 compiler expression gap remains separate from this runtime slice.
+
+
+## Independent native runnable backlog — 2026-10-11
+
+Native submissions now allocate owner-thread runnable nodes independently of the 64-entry
+I/O/timer/dormant-registration table. Each node owns one callback root. Admission validates
+the callback before allocating, and links the node only after root creation succeeds;
+failures preserve caller ownership. Polling frees the node and transfers its root to
+staged delivery. Acquire transfers that root into its owned dispatch ticket instead of
+cloning it, so an admitted runnable can dispatch even at host-root saturation. Complete
+releases that ticket; advancing an unacquired step or leaving the scope releases staged
+roots. Teardown also frees every queued node on success or fault.
+
+Ready source work and queued work alternate when both are available. Admission order
+still compares queued submissions with activated legacy registrations; their pre-reserved
+operation slots remain valid. This is private arbitration, not a public FIFO/latency
+contract. I/O results retain their separate source/dispatch ownership contract.
+
+The native contract now fills all 64 timer slots and adds 128 runnable callbacks. All
+192 dispatches survive forced collection, with source/runnable alternation while both
+remain ready. A separate test fills the 256-entry host-root budget (including the caller's
+root), rejects further admission, and drains all 255 queued callbacks without another
+root allocation. It also verifies stale-ticket rejection, submission with a full dormant
+registration table, and teardown with 128 queued callbacks including staged delivery.
+
+[Native evidence](backlog-native-contracts.json) covers six instrumented contracts;
+[address/leak sanitizer evidence](backlog-asan.json) additionally exercises the scheduler
+contract. [Raven execution evidence](backlog-validation.json) covers 15 local cross-mode
+executions plus interpreter explicit collection, with the batch now admitted behind 128
+already-runnable callbacks. [Reserved-registration regression](backlog-runtime-validation.json)
+covers six more executions. Reproduce with the verifier profiles above and
+`python3 scripts/validate-native-network.py --output target/native-backlog-fresh`.
+
+Native storage can still fail through malloc or the shared thread-local host-root budget;
+managed submission temporarily needs an additional root. These are resource failures,
+not a portable queue quota or infallible completion promise. Other source dispatch still
+needs its independent root and can fail at global root exhaustion. The interpreter uses
+fallible deque growth instead; configurable resource budgets and performance measurements
+remain work before selecting production policy. Native explicit-GC diagnostics, Windows
+execution and public Task migration remain open. Rebuild matching host sources together:
+the private scope layout changed, but no reserved managed signature or compiler lowering
+changed. No new public API/reference snapshot or website capability is implied.

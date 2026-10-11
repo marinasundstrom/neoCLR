@@ -1,0 +1,82 @@
+{
+  "passed": false,
+  "status": "sanitizer-runtime-initialization-blocked",
+  "inputs": {
+    "docs/experiments/aot-console/socket-os.h": "a01419c62fa8a1d3d9131282c5af182f200ba149a440d52c81104e2a156f7ef0",
+    "docs/experiments/aot-console/socket-client-internal.h": "e2771ecbe8b74c0e696af297651cd5158755c8ed6e6cc25b1d9bde837a57dddb",
+    "docs/experiments/aot-console/socket-client-test.c": "478fbb2a015d2cdda80491fefcc62f8f4681d9227097cf142bb92612cf709cd5",
+    "docs/experiments/aot-console/socket-listener.h": "095e624c5a5f5ce32669fa5602490ac44e6ab769327283b0dd71bae0d732d4fe",
+    "docs/experiments/aot-console/socket-listener.c": "c583578971511a75ba279ad2d1dc8103d4e98f3efdf19e7f1f7e287af8b8d461",
+    "docs/experiments/aot-console/socket-listener-test.c": "8927b76095201c45919610ff98c11c519ac10c7a67f430c999188d4704b0f9cb",
+    "docs/experiments/aot-console/socket-accept-test.c": "6bf34e5428e912c6b7b6c166c4d6caecc9cc6b0b6e6fc1c2743b6cb7da3bbd8d",
+    "docs/experiments/aot-console/socket-transfer-test.c": "cb5488f055fd1ec9a9547cd24cea58d0e16a04ba491969251c30e9cc6005bc23",
+    "docs/experiments/aot-console/socket-timer-test.c": "9915ead90ed265c1cb57aae184eea88289a03c912cd7c20574fdf3bb03ab64e4",
+    "docs/experiments/aot-console/socket-scheduler-test.c": "06006bc8796cd09e047208377d7d1e12ff2a3277debf0fafa6ed5504708adae8",
+    "docs/experiments/aot-console/task-queue.c": "84b7d3e7d0f635622c6b066b57868969e22170e6aea3c500fab7e06297a5f7f4",
+    "docs/experiments/aot-console/task-queue.h": "cf7d1ded7df30016c353fbb24bb40cb4771bb1c735352bd6bb56d5dea78fa738",
+    "docs/experiments/aot-console/native-gc.c": "dfe3e554913e625e86f2a260e96999934fcf55b980c7c9e1a8dbf26dae4c6f10",
+    "docs/experiments/aot-console/native-gc.h": "2710426be29f0e01061236dcc8dd82db92b0e92ef04633be07575cb4c53df721",
+    "docs/experiments/aot-console/root-probe.c": "0e1bcdb4f08228de74f4b97ea80e83190ed7bb55dc0c55a31f11b470bdb86a7a",
+    "docs/experiments/aot-console/root-probe.h": "45808ddae5d01eac0b242f160f1d3a13892a7c111d61e58ac1ee7075b15c36a1",
+    "docs/experiments/aot-console/text-arena.c": "1e845dc0c0622247ca8eb18c222c6cfcc7638e603551634a12493787026c77be",
+    "docs/experiments/aot-console/text-arena.h": "6101b22c4fd5eacc3849ad471de197564fca343f8b28345d80be93f20c2c8575",
+    "docs/experiments/aot-fault-details/fault-details.h": "8acf145dd10c8050c7d4c9266a73dec171009cea570aeb2f5473ac39cbfa4370",
+    "scripts/validate-native-network.py": "62d0cd465892379eb9fce8f274e717344d51fc3ef48d5c8f226967238ba6d8f4"
+  },
+  "compileCommand": [
+    "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang",
+    "-isysroot",
+    "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.2.sdk",
+    "-std=c11",
+    "-O2",
+    "-Wall",
+    "-Wextra",
+    "-Werror",
+    "-DNEOCLR_NATIVE_GC",
+    "-DNEOCLR_CLIENT_TEST",
+    "-fsanitize=address,undefined",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-console/socket-scheduler-test.c",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-console/socket-listener.c",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-gc.c",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-console/root-probe.c",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-console/text-arena.c",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-console/task-queue.c",
+    "-o",
+    "/Users/robert/Projects/neoclr/target/scheduler-native-backlog-final/scheduler-asan"
+  ],
+  "executableSha256": "f627c2e403633b76dee9c37049f5765af5893896b7db3947b32246bc5d00bfbd",
+  "attempts": [
+    {
+      "environment": {
+        "ASAN_OPTIONS": "detect_leaks=1"
+      },
+      "result": "AddressSanitizer reports detect_leaks is not supported on this platform"
+    },
+    {
+      "environment": {
+        "ASAN_OPTIONS": "detect_leaks=0"
+      },
+      "result": "Execution timed out after 60 seconds without test output"
+    },
+    {
+      "environment": {
+        "ASAN_OPTIONS": "detect_leaks=0:symbolize=0"
+      },
+      "result": "Same startup stall; sampled, then terminated"
+    }
+  ],
+  "sampleSha256": "0850c01d527fde2012f0a092af9604061fc2a096e41f8d3d402b727e04ee01e6",
+  "sampleFrames": [
+    "dyld4::APIs::runAllInitializersForMain",
+    "libSystem_initializer",
+    "__malloc_init",
+    "__asan::AsanInitInternal",
+    "__asan::InitializeShadowMemory",
+    "__sanitizer::MemoryMappingLayout::Next",
+    "_Block_copy",
+    "__sanitizer_mz_malloc",
+    "__asan::AsanInitFromRtl",
+    "__sanitizer::StaticSpinMutex::LockSlow"
+  ],
+  "limitation": "Sample shows sanitizer initialization reentering its allocator and waiting on its initialization lock, before application main. No AddressSanitizer or leak qualification claimed; ordinary undefined/bounds sanitizer contracts pass."
+}

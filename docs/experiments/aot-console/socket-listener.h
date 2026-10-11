@@ -10,6 +10,7 @@
  * Handles are opaque, process-unique positive Int64s, never file descriptors.
  * OS resources are separate from the managed heap's byte budget. */
 typedef struct neoclr_dns_work neoclr_dns_work;
+typedef struct neoclr_runnable neoclr_runnable;
 typedef struct neoclr_socket_scope {
     neoclr_aot_context *context;
     struct neoclr_socket_scope *previous;
@@ -24,6 +25,9 @@ typedef struct neoclr_socket_scope {
         uint16_t port;
         uint64_t attempt_deadline;
     } operations[64];
+    neoclr_runnable *runnable_head, *runnable_tail;
+    uint64_t runnable_delivery; /* Detached submission root until acquire/next poll. */
+    unsigned prefer_runnable;
     uint64_t timer_delivery; /* One-shot delivery root, retained until next poll/leave. */
     uint64_t scheduler_destination; /* Lazy, never-reused invocation identity. */
     uint64_t scheduler_delivery; /* Independent dispatch root, released by completion/leave. */
@@ -99,15 +103,16 @@ int32_t neoclr_scheduler_step_v1(neoclr_aot_context *, uint64_t *, const neoclr_
 /* Private runtime submission prototype. Clone a rooted image-local fn<Void>
  * into this owner-thread scope; success means admitted, never inline execution.
  * Caller retains its input handle. No Task/Promise or managed queue is required.
- * Exact published boundary or quiescence required. Shared operation-table capacity
- * is bounded; rejection leaves caller ownership unchanged. No FIFO/parallelism or
+ * Exact published boundary or quiescence required. Runnable nodes use independent
+ * native storage plus the shared host-root budget; rejection preserves caller ownership. No FIFO/parallelism or
  * cancellation ticket contract. Teardown abandons pending submissions. */
 int32_t neoclr_scheduler_submit_v1(neoclr_aot_context *, uint64_t, const neoclr_probe_frame *);
 /* Private compiled managed-call adapter; output is the private admission acknowledgment (Int32 zero).
  * Called on a published frame, converts a managed callable to an admission root. */
 int32_t neoclr_scheduler_submit_managed_v1(void *, neoclr_aot_context *, int32_t *);
 /* Opt-in owned delivery. Acquire returns the same states as step, but READY
- * publishes an independent root/ticket. No poll may advance until complete.
+ * publishes an owned root/ticket. Runnable roots transfer directly; I/O results
+ * retain separate source ownership. No poll may advance until complete.
  * Complete at the acquiring boundary after callback return, including guest fault;
  * it releases dispatch ownership, not the operation result. Stale/wrong tickets
  * return 3; scope leave abandons an outstanding delivery. Acquisition failure is

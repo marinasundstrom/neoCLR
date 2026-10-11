@@ -1280,3 +1280,36 @@ source fairness under sustained load and allocation measurements remain open.
 
 No bridge signatures, Runtime Contract settings, compiler emission or public API change.
 The website/API reference still describes the existing public Task implementation.
+
+
+## Native runnable storage independence — 2026-10-11
+
+Native runnable submissions now own linked backlog nodes outside the bounded I/O table.
+This follows the same separation as the interpreter's growing runnable deque: source
+registration capacity no longer controls ordinary scheduling admission. The runtime owns
+storage, callback roots, source arbitration and cleanup; managed batches only project
+one continuation step at a time. Existing .NET responsibility comparisons still apply;
+no Task or Scheduler API semantics are added.
+
+A node is published only after callback validation, allocation and root creation succeed.
+Polling transfers ownership to a staged root, and owned acquire transfers that root into
+the dispatch ticket without allocating a duplicate. Native source results retain separate
+source/dispatch roots. Queued work and ready sources receive alternating turns; legacy
+reserved activations participate in admission ordering. Teardown frees linked nodes and
+all staged/outstanding roots even on terminal faults.
+
+[Executable evidence](experiments/scheduler-continuations/README.md#independent-native-runnable-backlog--2026-10-11)
+qualifies a full timer table plus 128 runnable callbacks, collection during delivery,
+runnable dispatch at root-budget saturation, rejection before ownership transfer, staged
+and queued fault cleanup, and real batch awaits behind 128 submissions in interpreter,
+JIT and AOT on macOS ARM64. Windows remains pending.
+
+Benefit: ordinary runnable work no longer occupies an I/O slot, and admitted runnable
+dispatch needs no extra GC root. Costs: a native allocation/free per submitted node,
+root-budget participation and linked-list bookkeeping. This is not a measured speedup.
+The private 256-root thread budget remains shared across contexts and services; admission
+and non-runnable source dispatch can still fail at resource exhaustion. Configurable
+memory budgets, native diagnostic parity, concurrency rules and performance qualification
+remain ahead of public Task migration. Internal host layout requires matching rebuilt
+sources; managed service signatures, Runtime Contract settings and compiler emission are
+unchanged. Public API documentation and website capabilities remain unchanged.

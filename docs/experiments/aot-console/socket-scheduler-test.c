@@ -112,27 +112,30 @@ static int submitted_work_contract(void) {
     neoclr_probe_leave_v1(&child);
     CHECK(!neoclr_scheduler_submit_v1(&c, original, &entry));
     neoclr_probe_leave_v1(&entry);
-    for (unsigned i = 2; i < 64; i++) CHECK(!neoclr_scheduler_submit_v1(&c, original, NULL));
+    for (unsigned i = 2; i < NEOCLR_GC_HOST_ROOT_LIMIT - 1; i++) CHECK(!neoclr_scheduler_submit_v1(&c, original, NULL));
     CHECK(neoclr_scheduler_submit_v1(&c, original, NULL) == NEOCLR_AOT_FAULT_NATIVE_MEMORY_LIMIT);
     CHECK(!neoclr_gc_host_root_read_v1(&c, original, &read) && read == callback);
-    CHECK(!neoclr_gc_host_root_release_v1(&c, original));
-    CHECK(neoclr_scheduler_submit_v1(&c, original, NULL) == 3);
     CHECK(!neoclr_gc_collect_v1(&c, NULL) && c.text.used);
     uint64_t delivery = 0;
-    for (unsigned i = 0; i < 64; i++) {
+    /* Keep the caller's root: first acquire must work at complete root saturation. */
+    for (unsigned i = 0; i < NEOCLR_GC_HOST_ROOT_LIMIT - 1; i++) {
         CHECK(neoclr_scheduler_acquire_v1(&c, &delivery, NULL) == NEOCLR_SCHEDULER_READY);
         CHECK(!neoclr_gc_callback_read_v1(&c, delivery, &read) && read == callback);
         CHECK(neoclr_scheduler_acquire_v1(&c, &delivery, NULL) == -3);
         CHECK(!neoclr_scheduler_complete_v1(&c, delivery, NULL));
     }
     CHECK(neoclr_scheduler_acquire_v1(&c, &delivery, NULL) == NEOCLR_SCHEDULER_IDLE);
+    CHECK(!neoclr_gc_host_root_release_v1(&c, original));
+    CHECK(neoclr_scheduler_submit_v1(&c, original, NULL) == 3);
     CHECK(!neoclr_gc_collect_v1(&c, NULL) && !c.text.used);
     /* A terminal fault abandons queued work without invoking it. */
     CHECK(!neoclr_allocate_object_v1(&c.text, UINT32_MAX, 24, &callback));
     ((uint64_t *)callback)[1] = 1;
     CHECK(!neoclr_gc_host_root_create_v1(&c, callback, &original));
-    CHECK(!neoclr_scheduler_submit_v1(&c, original, NULL));
+    for (unsigned i = 0; i < 128; i++) CHECK(!neoclr_scheduler_submit_v1(&c, original, NULL));
     CHECK(!neoclr_gc_host_root_release_v1(&c, original));
+    CHECK(neoclr_scheduler_step_v1(&c, &delivery, NULL) == NEOCLR_SCHEDULER_READY);
+    CHECK(scope.runnable_delivery == delivery);
     c.fault.code = 4;
     CHECK(neoclr_scheduler_acquire_v1(&c, &delivery, NULL) == -3);
     CHECK(!neoclr_socket_scope_leave_v1(&scope) && c.fault.code == 4);
@@ -213,7 +216,9 @@ static int registration_contract(void) {
         CHECK(!neoclr_scheduler_register_managed_v1(destination, callback, &c, &registrations[i]));
     CHECK(neoclr_scheduler_register_managed_v1(destination, callback, &c, &rejected) == NEOCLR_AOT_FAULT_NATIVE_MEMORY_LIMIT && rejected == -9);
     int32_t changed = -9;
-    CHECK(neoclr_scheduler_submit_managed_v1(callback, &c, &changed) == NEOCLR_AOT_FAULT_NATIVE_MEMORY_LIMIT && changed == -9);
+    CHECK(!neoclr_scheduler_submit_managed_v1(callback, &c, &changed) && changed == 0);
+    CHECK(neoclr_scheduler_acquire_v1(&c, &delivery, &entry) == NEOCLR_SCHEDULER_READY);
+    CHECK(!neoclr_scheduler_complete_v1(&c, delivery, &entry));
     CHECK(!neoclr_gc_collect_v1(&c, &entry) && c.text.used);
     CHECK(neoclr_scheduler_step_v1(&c, &delivery, &entry) == NEOCLR_SCHEDULER_IDLE);
     CHECK(!neoclr_scheduler_activate_managed_v1(registrations[0], &c, &changed) && changed);
@@ -243,7 +248,41 @@ static int registration_contract(void) {
     return 0;
 }
 
+static int backlog_and_sources_contract(void) {
+    uint64_t buffer[128] = {0};
+    neoclr_aot_context c = {.text = {(unsigned char *)buffer, sizeof(buffer), 0}};
+    neoclr_socket_scope scope;
+    CHECK(!neoclr_socket_scope_enter_v1(&scope, &c));
+    void *callback = NULL;
+    CHECK(!neoclr_allocate_object_v1(&c.text, UINT32_MAX, 24, &callback));
+    ((uint64_t *)callback)[1] = 1;
+    uint64_t original = 0, delivery = 0;
+    CHECK(!neoclr_gc_host_root_create_v1(&c, callback, &original));
+    int64_t timer;
+    for (unsigned i = 0; i < 64; i++) CHECK(!neoclr_timer_start_v1(0, callback, &c, &timer));
+    /* All I/O slots occupied, but runnable admission is independent. */
+    for (unsigned i = 0; i < 128; i++) CHECK(!neoclr_scheduler_submit_v1(&c, original, NULL));
+    CHECK(!neoclr_gc_host_root_release_v1(&c, original));
+    CHECK(!neoclr_gc_collect_v1(&c, NULL) && c.text.used);
+    for (unsigned i = 0; i < 192; i++) {
+        neoclr_runnable *before = scope.runnable_head;
+        CHECK(neoclr_scheduler_acquire_v1(&c, &delivery, NULL) == NEOCLR_SCHEDULER_READY);
+        if (i < 128) CHECK((scope.runnable_head != before) == (i % 2 == 1));
+        void *read = NULL;
+        CHECK(!neoclr_gc_collect_v1(&c, NULL) && c.text.used);
+        CHECK(!neoclr_gc_callback_read_v1(&c, delivery, &read) && read == callback);
+        CHECK(!neoclr_scheduler_complete_v1(&c, delivery, NULL));
+        CHECK(neoclr_scheduler_complete_v1(&c, delivery, NULL) == 3);
+    }
+    CHECK(neoclr_scheduler_acquire_v1(&c, &delivery, NULL) == NEOCLR_SCHEDULER_IDLE);
+    CHECK(!scope.runnable_head && !scope.runnable_tail && !scope.runnable_delivery);
+    CHECK(!neoclr_gc_collect_v1(&c, NULL) && !c.text.used);
+    CHECK(!neoclr_socket_scope_leave_v1(&scope));
+    return 0;
+}
+
 int main(void) {
+    CHECK(!backlog_and_sources_contract());
     CHECK(!registration_contract());
     CHECK(!destination_contract());
     CHECK(!submitted_work_contract());

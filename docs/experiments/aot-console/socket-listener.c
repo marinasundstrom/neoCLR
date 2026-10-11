@@ -10,6 +10,21 @@ static _Thread_local neoclr_socket_scope *head;
 static _Atomic uint64_t next_id = 1;
 #ifdef NEOCLR_NATIVE_GC
 static void release_client(neoclr_socket_scope *, unsigned);
+struct neoclr_runnable {
+    struct neoclr_runnable *next;
+    uint64_t callback, order;
+};
+static int take_runnable(neoclr_socket_scope *scope, uint64_t *callback) {
+    neoclr_runnable *item = scope->runnable_head;
+    if (!item) return 0;
+    scope->runnable_head = item->next;
+    if (!scope->runnable_head) scope->runnable_tail = NULL;
+    scope->runnable_delivery = item->callback;
+    scope->prefer_runnable = 0;
+    *callback = item->callback;
+    free(item);
+    return 1;
+}
 #endif
 #ifdef NEOCLR_NATIVE_GC
 static void release_transfer(neoclr_socket_scope *scope, unsigned i) {
@@ -92,6 +107,15 @@ int32_t neoclr_socket_scope_leave_v1(neoclr_socket_scope *scope) {
         scope->slots[i].id = 0;
     }
 #ifdef NEOCLR_NATIVE_GC
+    while (scope->runnable_head) {
+        neoclr_runnable *item = scope->runnable_head;
+        scope->runnable_head = item->next;
+        if (neoclr_gc_host_root_release_v1(scope->context, item->callback)) status = 3;
+        free(item);
+    }
+    scope->runnable_tail = NULL;
+    if (scope->runnable_delivery && neoclr_gc_host_root_release_v1(scope->context, scope->runnable_delivery)) status = 3;
+    scope->runnable_delivery = 0;
     if (scope->timer_delivery && neoclr_gc_host_root_release_v1(scope->context, scope->timer_delivery)) status = 3;
     scope->timer_delivery = 0;
     if (scope->scheduler_delivery && neoclr_gc_host_root_release_v1(scope->context, scope->scheduler_delivery)) status = 3;
@@ -487,18 +511,17 @@ int32_t neoclr_scheduler_submit_v1(neoclr_aot_context *context, uint64_t callbac
         ? neoclr_gc_callback_read_suspended_v1(context, callback, &value, boundary)
         : neoclr_gc_callback_read_v1(context, callback, &value);
     if (status) return status;
-    unsigned slot = 0;
-    while (slot < 64 && scope->operations[slot].state) slot++;
-    if (slot == 64) return NEOCLR_AOT_FAULT_NATIVE_MEMORY_LIMIT;
     uint64_t order = new_operation_id();
     if (!order) return 3;
+    neoclr_runnable *item = malloc(sizeof(*item));
+    if (!item) return NEOCLR_AOT_FAULT_NATIVE_MEMORY_LIMIT;
     uint64_t root = 0;
     status = neoclr_gc_host_root_create_v1(context, value, &root);
-    if (status) return status;
-    scope->operations[slot].id = order;
-    scope->operations[slot].callback = root;
-    scope->operations[slot].kind = 7;
-    scope->operations[slot].state = 2;
+    if (status) { free(item); return status; }
+    *item = (neoclr_runnable){.next = NULL, .callback = root, .order = order};
+    if (scope->runnable_tail) scope->runnable_tail->next = item;
+    else scope->runnable_head = item;
+    scope->runnable_tail = item;
     return 0;
 }
 
@@ -520,10 +543,18 @@ int32_t neoclr_scheduler_acquire_v1(neoclr_aot_context *context, uint64_t *deliv
     uint64_t source = 0, owned = 0;
     int32_t progress = neoclr_scheduler_step_v1(context, &source, boundary);
     if (progress != NEOCLR_SCHEDULER_READY) return progress;
-    void *callback = NULL;
-    if (neoclr_gc_host_root_read_v1(context, source, &callback) ||
-        neoclr_gc_host_root_create_v1(context, callback, &owned)) return -3;
     neoclr_socket_scope *scope = find_scope(context);
+    if (scope->runnable_delivery == source) {
+        // Runnable work has no independently consumable source result. Transfer
+        // its root into the dispatch ticket; do not allocate another root when
+        // the shared host-root budget may be full.
+        owned = source;
+        scope->runnable_delivery = 0;
+    } else {
+        void *callback = NULL;
+        if (neoclr_gc_host_root_read_v1(context, source, &callback) ||
+            neoclr_gc_host_root_create_v1(context, callback, &owned)) return -3;
+    }
     scope->scheduler_delivery = owned;
     scope->scheduler_boundary = boundary;
     *delivery = owned;
@@ -549,6 +580,10 @@ int32_t neoclr_scheduler_complete_v1(neoclr_aot_context *context, uint64_t deliv
 static int32_t socket_poll(neoclr_aot_context *context, uint64_t *callback) {
     neoclr_socket_scope *scope = find_scope(context);
     if (!scope || !callback || context->fault.code || scope->scheduler_delivery) return -3;
+    if (scope->runnable_delivery) {
+        if (neoclr_gc_host_root_release_v1(context, scope->runnable_delivery)) return -3;
+        scope->runnable_delivery = 0;
+    }
     if (scope->timer_delivery) {
         if (neoclr_gc_host_root_release_v1(context, scope->timer_delivery)) return -3;
         scope->timer_delivery = 0;
@@ -561,6 +596,9 @@ static int32_t socket_poll(neoclr_aot_context *context, uint64_t *callback) {
             (first_submission == 64 || scope->operations[i].id < scope->operations[first_submission].id))
             first_submission = i;
     }
+    int queued_first = scope->runnable_head && (first_submission == 64 ||
+        scope->runnable_head->order < scope->operations[first_submission].id);
+    if (queued_first && scope->prefer_runnable) return take_runnable(scope, callback);
     unsigned first_timer = 64;
     uint64_t now = monotonic_ns();
     if (!now) return -3;
@@ -632,9 +670,10 @@ static int32_t socket_poll(neoclr_aot_context *context, uint64_t *callback) {
             scope->operations[i].state = 2;
         }
         if (scope->operations[i].state == 2) {
-            if (scope->operations[i].kind == 7 && i != first_submission) continue;
+            if (scope->operations[i].kind == 7 && (i != first_submission || queued_first)) continue;
             scope->operations[i].state = 3;
             scope->poll_cursor = (i + 1) % 64;
+            scope->prefer_runnable = 1;
             *callback = scope->operations[i].callback;
             if (scope->operations[i].kind == 6 || scope->operations[i].kind == 7) {
                 scope->timer_delivery = *callback;
@@ -643,6 +682,6 @@ static int32_t socket_poll(neoclr_aot_context *context, uint64_t *callback) {
             return 1;
         }
     }
-    return 0;
+    return take_runnable(scope, callback);
 }
 #endif
