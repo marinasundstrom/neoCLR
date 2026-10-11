@@ -52,9 +52,11 @@ now show about 16–21% less time at 100 operations, with 13–18% more allocati
 Improve notification/lifetime costs and broaden qualification before switching defaults.
 The author further selects a [cross-language operation contract](runtime-scheduling-design.md#cross-language-asynchronous-operation-contract--2026-10-11),
 independent of the concrete managed Task class. Define metadata/runtime semantics
-and prove a second operation implementation before settling the public interface;
-use the current samples and benchmarks as regressions. This is design/prototype work,
-not implemented general awaitable support. Native stack representation, preemption
+and settle the public interface through qualification. A
+[second runtime-backed operation](experiments/runtime-async/README.md#independent-operation-proof--2026-10-11)
+now passes ordinary await, shared readers, cancellation and GC checks through explicit
+provider mapping. Next define validated metadata binding beyond source-local mappings;
+retain the samples and benchmarks as regressions. General interoperability is not yet implemented. Native stack representation, preemption
 and multi-core scheduling remain open. Task/Promise keep operation/producer roles.
 
 **Runtime async groundwork (2026-10-11):** the author directs implementation while

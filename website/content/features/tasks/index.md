@@ -262,6 +262,8 @@ adapters; no foreign-runtime async ABI is implemented or selected.
 A separate, opt-in [Raven runtime-async POC](https://github.com/marinasundstrom/neoCLR/blob/main/docs/experiments/runtime-async/README.md#raven-runtime-async-language-poc-2026-10-11)
 now lowers ordinary async methods and Main to retained interpreter bodies without
 generated state machines. Its source-included provider returns ordinary Task values.
+Explicit await mappings also qualify an independent runtime-backed manual operation
+and a distinct awaiter; the general cross-language metadata contract remains in design.
 Executable samples cover nested awaits, reference/receiver retention, unit results,
 cancellation, terminal faults and GC reclamation. This is development support, with
 restricted method/await shapes and no JIT/AOT qualification or default switch.

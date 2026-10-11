@@ -567,3 +567,52 @@ Reproduce with `benchmark.py --recipe <runtime-await validation.json> --host
 <release runtime_async_interpreter> --output <fresh-directory>`. The recipe supplies
 the exact compiler and bundle selection. The benchmark validates checksums and final
 heap state; it is private measurement tooling, not a public framework addition.
+
+
+## Independent operation proof — 2026-10-11
+
+[RuntimeOperation.rvn](RuntimeOperation.rvn) supplies a second operation implementation
+whose completion and Int32 result live in the runtime, with no Task/Promise backing.
+Ordinary `await` suspends on it through an explicitly selected provider overload.
+An Envelope supplies a separate awaiter, proving that the compiler calls GetAwaiter
+once and reads the result from that returned object. OnCompleted deliberately faults:
+the passing consumer does not route the operation through a managed callback adapter.
+Async method *results* still use Task<T>; this proof generalizes awaited inputs only.
+
+Raven native revision `0764064d4` admits exact source-provider Wait mappings for
+reference awaiters (nongeneric, or one generic parameter constructed with the await
+result type). Missing/ambiguous mappings fail compilation. No implicit conversions,
+value awaiters or extension/static GetAwaiter are admitted. The existing binder's
+TaskAwaiter and cancellation protocol remain required. These are bridge constraints,
+not the final runtime metadata contract; no new public runtime API is introduced.
+
+[Executable evidence](runtime-operation-validation.json) covers 80 cycles with two
+parked readers, shared/repeated results, GC during suspension, exactly-once completion,
+awaiter/result read counts, cancellation without reading an absent result and completion
+immediately before waiting. Native metadata contains no generated state machines.
+Both invalid mapping cases fail without output artifacts. The existing
+[Task language consumer](runtime-operation-task-regression.json) also passes.
+[Heap evidence](runtime-operation-heap.json) records two independent executions, each
+with 3,028 allocations/reclamations, zero final live objects, peak 92 and 163 collections.
+These timings are not a matched performance comparison with the previous workload.
+
+A pending cancellation publishes terminal state before its suspended reader has
+necessarily resumed. The test observes the reader's terminal outcome through an
+explicit callback adapter and then awaits that observation; it does not assume that
+Cancel executes continuations inline. Completed/cancelled handles are explicitly
+released after readers finish. The sample exceeds the 64-operation budget over its
+lifetime, checking handle reuse as well as collection of managed wrappers.
+
+Run `validate.py --runtime-await --runtime-sample operation` with the explicit
+bundle/compiler/runtime/output arguments. Reusing the dedicated output directory
+now removes the old disassembly before inspection. Runtime implementation is unchanged
+in this slice; the new behavior is native compiler mapping and executable qualification.
+
+This establishes representation independence at the experimental provider boundary.
+It does not yet establish an independently loadable interface implementation, native
+producer ABI, multithreaded completion races, JIT/AOT suspension, or arbitrary async
+return types. Next specify the recognized metadata contract, then replace explicit
+per-type provider selection with validated implementation binding. Preserve these
+samples and GC checks during that work. Relative to C#'s awaiter pattern, the language
+shape is familiar while actual parking/resumption is runtime-owned; source-provider
+mapping costs and final lifetime semantics remain explicit design work.

@@ -8,6 +8,13 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-11
 
+- Qualify a runtime-backed manual operation independent of Task storage through
+  ordinary Raven await and explicit provider mappings. Cover distinct awaiters,
+  shared/repeated reads, cancellation, completion-before-wait, mapping rejection and
+  GC reclamation over 80 cycles. Async method results still use Task<T>; final
+  metadata/native interoperability and JIT/AOT remain open. Make experiment
+  disassembly validation repeatable in its dedicated output directory.
+
 - Record the author-directed cross-language async-operation contract design, with
   WinRT/C# comparisons and planned metadata, completion-race and GC qualification.
   Task remains the managed projection; a general operation interface and foreign

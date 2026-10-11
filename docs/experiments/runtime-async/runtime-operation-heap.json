@@ -1,0 +1,29 @@
+{
+  "prepareSeconds": 1.929754084,
+  "runs": [
+    {
+      "allocatedObjects": 3028,
+      "collections": 163,
+      "liveObjects": 0,
+      "peakObjects": 92,
+      "reclaimedObjects": 3028,
+      "seconds": 0.8459375,
+      "stdout": "PASS independent runtime operation await\n"
+    },
+    {
+      "allocatedObjects": 3028,
+      "collections": 163,
+      "liveObjects": 0,
+      "peakObjects": 92,
+      "reclaimedObjects": 3028,
+      "seconds": 0.89983575,
+      "stdout": "PASS independent runtime operation await\n"
+    }
+  ],
+  "sha256": {
+    "target/scheduler-wait-validation/release/examples/runtime_async_interpreter": "48a53f6480bb484addc9389ae0111af1a7513df1675c0311db50d6b8f22e2541",
+    "target/runtime-operation-final/app.dll": "e18a6f3fed5e7e0ea88dd5db7f6400a5989010e38debe7df440c5a2b08c55dae",
+    "docs/experiments/runtime-async/RuntimeOperation.rvn": "e6b61110722b654c5da5eedd160d0b1658701accd3a3cba9ad887d9c599841c2",
+    "docs/experiments/runtime-async/runtime-operation-validation.json": "3eaedaed82329576d968fc9720db7ee704ba99068741ed5e64b7acc74d1f4bff"
+  }
+}

@@ -1619,3 +1619,16 @@ The current POC intentionally accepts Task<T> through a source provider. Treat t
 as a documented bridge limitation to remove during contract qualification, not a
 permanent platform restriction. Preserve its working samples and GC/benchmark evidence
 while introducing the second implementation; no default switch is implied.
+
+
+### Second implementation qualification — 2026-10-11
+
+The [independent-operation consumer](experiments/runtime-async/README.md#independent-operation-proof--2026-10-11)
+now passes through ordinary Raven runtime await. Its result/completion live in runtime
+operation storage, independently of managed Task internals. A distinct awaiter tests
+single evaluation; shared readers, pre-wait completion, cancellation and handle reuse
+pass. Heap checks reclaim all 3,028 objects in each of two invocations. This supersedes
+the Task-only awaited-input limitation above, but async method results remain Tasks.
+The source provider binds exact awaiter types explicitly; a recognized metadata
+interface, independently loaded implementations and foreign producer ownership remain
+open. This is evidence for the contract direction, not completion of that design.

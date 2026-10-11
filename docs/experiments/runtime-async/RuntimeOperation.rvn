@@ -1,0 +1,149 @@
+// A second awaitable implementation: completion/result storage belongs to the runtime.
+module RuntimeOperationSample {
+    import System.*
+    import System.Tasks.*
+    import System.Runtime.CompilerServices.*
+
+    class ManualOperation : TaskAwaiter {
+        val Handle = neoCLR.Runtime.RuntimeAsyncCreate()
+        var AwaiterReads = 0
+        var ResultReads = 0
+        var CompleteBeforeWait = false
+        val IsCompleted: bool => neoCLR.Runtime.RuntimeAsyncIsCompleted(Handle)
+        val IsCancelled: bool => neoCLR.Runtime.RuntimeAsyncIsCancelled(Handle)
+        func GetAwaiter() -> ManualOperation {
+            AwaiterReads = AwaiterReads + 1
+            return self
+        }
+        func GetResult() -> int {
+            ResultReads = ResultReads + 1
+            return neoCLR.Runtime.RuntimeAsyncAwait(Handle)
+        }
+        func Complete() -> bool => neoCLR.Runtime.RuntimeAsyncComplete(Handle, 17)
+        func Cancel() -> bool => neoCLR.Runtime.RuntimeAsyncCancel(Handle)
+        func Release() -> bool => neoCLR.Runtime.RuntimeAsyncRelease(Handle)
+
+        // The existing language binder requires this protocol member. Native runtime
+        // await must use the explicit provider mapping, never this legacy callback.
+        func OnCompleted(callback: () -> System.Void) {
+            System.Fail("Manual operation used the callback adapter")
+        }
+    }
+
+    // Deliberately separate awaitable/awaiter; GetAwaiter must execute exactly once.
+    class Envelope {
+        private val operation: ManualOperation
+        var Reads = 0
+        init(value: ManualOperation) {
+            operation = value
+        }
+        func GetAwaiter() -> ManualOperation {
+            Reads = Reads + 1
+            return operation
+        }
+    }
+
+    async func Read(input: ManualOperation) -> Task<int> {
+        let value = await input
+        System.Runtime.GC.Collect()
+        return value + 25
+    }
+
+    async func ReadEnvelope(input: Envelope) -> Task<int> {
+        let value = await input
+        return value + 25
+    }
+
+    class CancellationObserver {
+        private val task: Task<int>
+        private val source = Promise<bool>()
+        init(value: Task<int>) {
+            task = value
+        }
+        val Task: Task<bool> => source.Task
+        // Explicit outcome observation so cancellation does not propagate to Main.
+        func Complete() -> System.Void {
+            _ = source.Complete(task.IsCompleted && task.IsCancelled)
+        }
+    }
+
+    async func Main() -> Task<int> {
+        var iteration = 0
+        while iteration < 80 {
+            let operation = ManualOperation()
+            let envelope = Envelope(operation)
+            let first = Read(operation)
+            let second = ReadEnvelope(envelope)
+            if first.IsCompleted || second.IsCompleted {
+                System.Fail("Manual operation did not suspend both readers")
+            }
+            System.Runtime.GC.Collect()
+            if !operation.Complete() || operation.Complete() {
+                System.Fail("Completion was not accepted exactly once")
+            }
+            let a = await first
+            let b = await second
+            let repeated = await operation
+            if a != 42 || b != 42 || repeated != 17 {
+                System.Fail("Independent readers lost the result")
+            }
+            if operation.AwaiterReads != 2 || envelope.Reads != 1 || operation.ResultReads != 3 {
+                System.Fail("Awaiter/result evaluation was not exact")
+            }
+            if !operation.Release() {
+                System.Fail("Completed operation retained waiters")
+            }
+            iteration = iteration + 1
+        }
+        let cancelled = ManualOperation()
+        let cancelledReader = Read(cancelled)
+        let observer = CancellationObserver(cancelledReader)
+        cancelledReader.OnCompleted(observer.Complete)
+        if !cancelled.Cancel() {
+            System.Fail("Cancellation failed")
+        }
+        let sawCancellation = await observer.Task
+        if !sawCancellation || cancelled.ResultReads != 0 {
+            System.Fail("Cancellation read an absent result")
+        }
+        if !cancelled.Release() {
+            System.Fail("Cancelled operation retained waiters")
+        }
+        let race = ManualOperation()
+        race.CompleteBeforeWait = true
+        let raced = await Read(race)
+        if raced != 42 || !race.Release() {
+            System.Fail("Completion before wait lost its wakeup")
+        }
+        Console.WriteLine("PASS independent runtime operation await")
+        return 0
+    }
+}
+
+module RuntimeOperationProvider {
+    import System.Tasks.*
+    static class Bridge {
+        static func Start<T>(body: () -> TaskOutcome<T>) -> Task<T> => RuntimeAwaitProvider.Bridge.Start<T>(body)
+        static func Complete<T>(value: T) -> TaskOutcome<T> => RuntimeAwaitProvider.Bridge.Complete<T>(value)
+        static func Cancel<T>() -> TaskOutcome<T> => RuntimeAwaitProvider.Bridge.Cancel<T>()
+        static func Wait<T>(task: Task<T>) -> bool => RuntimeAwaitProvider.Bridge.Wait<T>(task)
+        static func Wait(operation: RuntimeOperationSample.ManualOperation) -> bool {
+            if operation.CompleteBeforeWait && !operation.IsCompleted {
+                _ = operation.Complete()
+            }
+            return neoCLR.Runtime.RuntimeAsyncWaitCompletion(operation.Handle)
+        }
+    }
+}
+
+module neoCLR.Runtime {
+    import System.Runtime.CompilerServices.*
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    internal extern func RuntimeAsyncComplete(operation: long, result: int) -> bool;
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    internal extern func RuntimeAsyncCancel(operation: long) -> bool;
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    internal extern func RuntimeAsyncIsCancelled(operation: long) -> bool;
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    internal extern func RuntimeAsyncAwait(operation: long) -> int;
+}

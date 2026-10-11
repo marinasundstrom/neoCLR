@@ -15074,3 +15074,17 @@ or runtime-await default switch was performed.
   No interface or native interoperability implementation is claimed. The working POC
   remains Task-specific; a distinct second operation implementation is the next
   contract proof, with existing samples and benchmarks retained as regressions.
+
+
+### Independent awaited operation implemented — 2026-10-11
+
+- **Author:** continued the cross-language operation contract work.
+- **Assistant action:** removed the native lowerer's concrete Task restriction for
+  awaited inputs through explicit provider mappings. Added a runtime-backed manual
+  operation, distinct awaiter, rejection cases and existing Task regression consumer.
+- **Finding:** cancellation publication does not imply a reader has resumed; corrected
+  the sample to observe terminal completion instead of requiring inline execution.
+- **Outcome:** 80 shared/repeated-await cycles pass, including cancellation and GC;
+  two heap observations reclaim 3,028 of 3,028 objects each. No state machines emitted.
+  [Evidence/limits](experiments/runtime-async/README.md#independent-operation-proof--2026-10-11).
+  Final metadata binding, native producer ABI and non-Task method returns remain open.

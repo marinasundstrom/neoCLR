@@ -8710,3 +8710,23 @@ hashes, absent state-machine metadata and rejected configuration checks. Repeate
 suspension now triggers managed notification draining, without recursively or
 indefinitely re-entering a suspended legacy queue. Fault remains invocation-terminal.
 See Raven's matching `docs/compiler/neoclr-cli-bridge.md` and runtime-contract docs.
+
+
+### Independent runtime await inputs — 2026-10-11
+
+Raven native revision `0764064d4` extends the explicit `--runtime-async-poc` provider
+contract with exact Wait mappings for reference awaiters. Operand/GetAwaiter evaluation
+occurs once; successful completion permits GetResult on the returned awaiter, while
+cancellation returns the enclosing cancelled outcome. Missing/ambiguous mappings fail
+emission. Async methods still return Task<T>; normal .NET behavior and defaults do not
+change. Raven main remains separate; this native-emitter change is target-specific.
+
+[Consumer and evidence](experiments/runtime-async/README.md#independent-operation-proof--2026-10-11)
+qualify a runtime-backed manual operation and a distinct awaiter with GC, cancellation
+and shared result reads. Source helper overloads plus private operation handles are
+temporary representation, with no independently loadable metadata contract or native
+producer ABI. The binder still requires its existing awaiter/cancellation protocol;
+value and static/extension awaiters remain unsupported. Raven owns emission and neoCLR
+owns scheduling/lifetime qualification. Replace source-local exact-type mapping with
+validated native metadata contract binding; do not promote these restrictions to
+permanent cross-language semantics. Public API documentation is unchanged.
