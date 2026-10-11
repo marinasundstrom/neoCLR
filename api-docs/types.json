@@ -402,6 +402,8 @@
   "System.Web.Http.HttpSocketHandler",
   "System.Web.Http.HttpStatusCode",
   "System.Web.Http.Json.HttpClientJsonExtensions",
+  "System.Web.Http.Json.HttpContentJsonExtensions",
+  "System.Web.Http.Json.HttpContextJsonExtensions",
   "System.Web.Http.Json.HttpJsonError",
   "System.Web.Http.Json.HttpJsonError.Http",
   "System.Web.Http.Json.HttpJsonError.Json",

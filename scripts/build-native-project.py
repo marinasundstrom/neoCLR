@@ -67,9 +67,13 @@ def sha(path):
     return hashlib.sha256(path.read_bytes()).hexdigest()
 
 
-def build(project, bundle, aot, output, profile=PROFILE, bootstrap_root=None, reflection_roots=None, byte_array_limit=65536):
+def build(project, bundle, aot, output, profile=PROFILE, bootstrap_root=None, reflection_roots=None, byte_array_limit=65536, http_heap_bytes=1048576):
     if not 0 < byte_array_limit <= 2147483647:
         raise ValueError("Byte array limit must be a positive Int32")
+    if not 8 <= http_heap_bytes <= 2147483640 or http_heap_bytes % 8:
+        raise ValueError("HTTP heap bytes must be a multiple of eight from 8 through 2147483640")
+    if http_heap_bytes != 1048576 and profile not in (PROFILES['http'], PROFILES['windows-http']):
+        raise ValueError("HTTP heap configuration requires an HTTP profile")
     windows = profile in (PROFILES['windows-console'], PROFILES['windows-http'])
     http = profile in (PROFILES['http'], PROFILES['windows-http'])
     if bootstrap_root and not http:
@@ -90,7 +94,7 @@ def build(project, bundle, aot, output, profile=PROFILE, bootstrap_root=None, re
             raise ValueError('Required build tool is missing: ' + tool)
     output.mkdir(parents=True, exist_ok=False)
     report = dict(profile=profile, passed=False, project=str(project),
-                  host=platform.platform(), byteArrayLimit=byte_array_limit, bootstrapRoot=bootstrap_root, commands=[], inputs={})
+                  host=platform.platform(), byteArrayLimit=byte_array_limit, httpHeapBytes=http_heap_bytes, bootstrapRoot=bootstrap_root, commands=[], inputs={})
 
     def save():
         (output / 'build.json').write_text(json.dumps(report, indent=2) + '\n')
@@ -251,7 +255,7 @@ def build(project, bundle, aot, output, profile=PROFILE, bootstrap_root=None, re
         pending = output / ('app.pending.exe' if windows else 'app.pending')
         if windows:
             run(['cl', '/nologo', '/W4', '/WX', '/std:c11', '/experimental:c11atomics', '/O2', '/MT',
-                 '/DNEOCLR_NATIVE_GC', '/DNEOCLR_NATIVE_BYTE_ARRAY_LIMIT=' + str(byte_array_limit), *(['/DNEOCLR_ENTRY_ARGUMENTS'] if selection.get('entryArguments') else []), *(['/DNEOCLR_HTTP_HOST'] if http else []), '/I' + str(base), '/Fo' + str(output) + '/',
+                 '/DNEOCLR_NATIVE_GC', '/DNEOCLR_HTTP_HEAP_BYTES=' + str(http_heap_bytes), '/DNEOCLR_NATIVE_BYTE_ARRAY_LIMIT=' + str(byte_array_limit), *(['/DNEOCLR_ENTRY_ARGUMENTS'] if selection.get('entryArguments') else []), *(['/DNEOCLR_HTTP_HOST'] if http else []), '/I' + str(base), '/Fo' + str(output) + '/',
                  '/Fe:' + str(pending), *adapters, obj, *native_text, '/link', '/STACK:1048576', *(['Ws2_32.lib'] if http else [])], phase='host-compile-link')
             import re
             dependencies = re.findall(r'^\s+([A-Za-z0-9_.-]+\.dll)\s*$', run(['dumpbin', '/dependents', pending], phase='dependency-check'), re.MULTILINE | re.IGNORECASE)
@@ -260,7 +264,7 @@ def build(project, bundle, aot, output, profile=PROFILE, bootstrap_root=None, re
                 raise RuntimeError('Unexpected native dependencies: ' + repr(dependencies))
         else:
             run([clang, '-isysroot', sdk, '-arch', 'arm64', '-std=c11', '-O2', '-Wall', '-Wextra', '-Werror',
-                 '-DNEOCLR_NATIVE_GC', '-DNEOCLR_NATIVE_BYTE_ARRAY_LIMIT=' + str(byte_array_limit), *(['-DNEOCLR_ENTRY_ARGUMENTS'] if selection.get('entryArguments') else []), '-I', base, *adapters, obj, *native_text, *(['-framework', 'CoreFoundation'] if system_culture else []), '-o', pending], phase='host-compile-link')
+                 '-DNEOCLR_NATIVE_GC', '-DNEOCLR_HTTP_HEAP_BYTES=' + str(http_heap_bytes), '-DNEOCLR_NATIVE_BYTE_ARRAY_LIMIT=' + str(byte_array_limit), *(['-DNEOCLR_ENTRY_ARGUMENTS'] if selection.get('entryArguments') else []), '-I', base, *adapters, obj, *native_text, *(['-framework', 'CoreFoundation'] if system_culture else []), '-o', pending], phase='host-compile-link')
             dependencies = [line.split()[0] for line in run(['xcrun', 'otool', '-L', pending], phase='dependency-check').splitlines()[1:]]
             allowed = {'/usr/lib/libSystem.B.dylib'}
             if system_culture:
@@ -294,12 +298,13 @@ def main():
     packaged = (ROOT / 'native-build-kit.json').is_file()
     parser.add_argument('--bundle', type=Path, required=not packaged, default=ROOT / 'bundle' if packaged else None)
     parser.add_argument('--aot', type=Path, required=not packaged, default=ROOT / 'bin/neoclr-aot-poc' if packaged else None)
+    parser.add_argument('--http-heap-bytes', type=int, default=1048576, help='HTTP native host managed heap capacity, in bytes (multiple of eight)')
     args = parser.parse_args()
     try:
         print(build(*(getattr(args, name).resolve() for name in ('project', 'bundle', 'aot', 'output')),
                     profile=PROFILES[args.profile], bootstrap_root=args.bootstrap_root,
                     reflection_roots=args.reflection_roots.resolve() if args.reflection_roots else None,
-                    byte_array_limit=args.byte_array_limit))
+                    byte_array_limit=args.byte_array_limit, http_heap_bytes=args.http_heap_bytes))
     except (OSError, ValueError, KeyError, TypeError, RuntimeError, subprocess.SubprocessError) as error:
         print('native build: ' + str(error), file=sys.stderr)
         return 1

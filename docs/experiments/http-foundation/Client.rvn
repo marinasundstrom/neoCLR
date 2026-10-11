@@ -1,0 +1,55 @@
+import System.*
+import System.Collections.*
+import System.Result.*
+import System.Tasks.*
+import System.Web.Http.*
+
+func MakeRequest(url: string, size: int) -> HttpRequest {
+    let bytes = ArrayList<byte>()
+    var index = 0
+    while index < size {
+        bytes.Add((byte)(index % 256))
+        index += 1
+    }
+    let Ok(request) = HttpRequest.Create(HttpMethod.Post, url, HttpContent(bytes)) else {
+        System.Fail("Request construction failed")
+    }
+    return request
+}
+
+func Validate(result: Result<HttpResponse, HttpError>, size: int, expected: string) {
+    if let Ok(response) = result {
+        if expected != "ok" || (int)response.StatusCode != 200 || response.Content.Bytes.Count != size {
+            System.Fail("Unexpected response")
+        }
+        var index = 0
+        while index < size {
+            if response.Content.Bytes[index] != (byte)(index % 256) {
+                System.Fail("Response byte mismatch")
+            }
+            index += 1
+        }
+        if response.GetHeaderValues("Link").Count != 0 {
+            System.Fail("Informational headers leaked into final response")
+        }
+    } else if let Error(reason) = result {
+        CheckError(reason, expected)
+    }
+    Console.WriteLine("PASS client")
+}
+
+func ParseSize(value: string) -> int {
+    let Ok(size) = Int32.Parse(value) else {
+        System.Fail("Invalid size")
+    }
+    return size
+}
+
+async func Main(arguments: string[]) -> Task<()> {
+    let size = ParseSize(arguments[1])
+    let request = MakeRequest(arguments[0], size)
+    let client = HttpClient()
+    let result = await client.Send(request)
+    client.Dispose()
+    Validate(result, size, arguments[2])
+}

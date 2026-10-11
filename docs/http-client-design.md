@@ -1,5 +1,10 @@
 # HTTP client pipeline — development experiment, 2026-09-24
 
+**Development update 2026-10-11:** the [HTTP foundation](http-foundation.md) supersedes
+older POC body/header bounds and adds shared chunked request reception, client interim
+responses and content-oriented JSON APIs. Historical dated validation below records
+its original bounds. Streaming, persistence, TLS and upgrades remain open.
+
 The immediate case is a Raven application fetching a UTF-8 greeting over neoCLR TCP.
 The author asks for a provisional client close to the [networking proposal](proposals/network-api.md),
 with handlers attaching behavior to the request/response pipeline. The executable

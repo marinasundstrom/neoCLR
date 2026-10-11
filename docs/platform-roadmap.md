@@ -1,5 +1,13 @@
 # neoCLR platform roadmap
 
+**HTTP hosting direction (2026-10-11):** the author requests stronger HttpClient/
+HttpServer support toward modern web applications and eventual WebSockets, followed
+by better HttpContent/JSON ergonomics. The [bounded foundation](http-foundation.md)
+adds practical buffered limits, shared request/response chunk parsing, informational
+response handling and content-oriented JSON helpers. Streaming, TLS, persistence and
+upgrade ownership remain subsequent gates; this does not qualify a production host
+or permanently reorder the runtime-async milestone.
+
 **Concurrency ambition (2026-10-11):** the author aims for concurrency support
 beyond .NET and at least on par with Go. This is a target, not a measured claim.
 Assess usability and cancellation/cleanup correctness alongside suspended-operation

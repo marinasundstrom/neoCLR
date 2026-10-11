@@ -8,6 +8,19 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-11
 
+- Extend development HTTP/1.1 with 1 MiB buffered bodies/known-length uploads,
+  32 KiB/100-field headers, shared bounded chunk decoding for incoming requests
+  and responses, and up to 16 informational responses before a final client reply.
+  Reject ambiguous framing and invalid request targets. Add HttpContent JSON
+  read extensions with pre-cancellation and HttpContext.RespondJson, preserving
+  the previous response on serialization failure. JSON's separate 1 KiB limit
+  and independent host resource budgets remain; TLS, persistence, streaming and
+  WebSocket upgrades are still open. Keep the native host's default 1 MiB heap;
+  allow explicit HTTP heap sizing. The 1 MiB wire test still exceeds deadlines
+  under safepoint-stress collection and remains a qualification gap. Fix native
+  reflection descriptors for closed function arguments and compact TypeShape
+  dispatch without increasing backend limits. See `docs/http-foundation.md`.
+
 - Add a read-only Sequence<JsonValue> view to JsonArray, with original-node indexing
   and ordered shallow snapshot iteration. Invalid indexer accesses terminate with a
   Fault; Item retains recoverable InvalidIndex errors, and Add retains its quota.

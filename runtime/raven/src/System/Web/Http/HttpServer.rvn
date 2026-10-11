@@ -15,22 +15,40 @@ internal class HttpRequestDecoder {
     private var head: ArrayList<byte> = ArrayList<byte>()
     private var request: Option<HttpRequest> = None()
     private var complete: bool = false
+    private var failed = false
+    private var chunked = false
+    private var chunks: HttpChunkDecoder? = null
     private var expected: int = -1
     private var body: ArrayList<byte> = ArrayList<byte>()
 
     internal init() { }
-    internal val Complete: bool => complete
+    internal val Complete: bool => complete && !failed
 
     internal func Push(value: byte) -> Result<bool, HttpError> {
+        if failed {
+            return Error(HttpError.Protocol("Decoder already failed"))
+        }
+        let result = PushCore(value)
+        if let Error(_) = result {
+            failed = true
+        }
+        return result
+    }
+
+    private func PushCore(value: byte) -> Result<bool, HttpError> {
         if complete {
             return Error(HttpError.Protocol("Request already complete"))
+        }
+        if chunks is HttpChunkDecoder decoder {
+            complete = decoder.Push(value)?
+            return Ok(complete)
         }
         if expected >= 0 {
             body.Add(value)
             complete = body.Count == expected
             return Ok(complete)
         }
-        if head.Count >= 2048 {
+        if head.Count >= HttpWireLimits.HeaderBytes {
             return Error(HttpError.LimitExceeded("Request header limit exceeded"))
         }
         let count = head.Count
@@ -48,13 +66,13 @@ internal class HttpRequestDecoder {
         if size >= 4 && head[size - 4] == 13 && head[size - 3] == 10 && head[size - 2] == 13 && head[size - 1] == 10 {
             let parsed = Parse()?
             request = Some(parsed)
-            complete = expected == 0
+            complete = !chunked && expected == 0
         }
         return Ok(complete)
     }
 
     internal func Finish() -> Result<HttpRequest, HttpError> {
-        if !complete {
+        if !Complete {
             return Error(HttpError.Protocol("Incomplete request"))
         }
         if let Some(parsed) = request {
@@ -116,6 +134,13 @@ internal class HttpRequestDecoder {
                     return Error(HttpError.Protocol("Invalid request method"))
                 }
                 let parsedTarget = Text(methodEnd + 1, end - 9, 0)?
+                var targetIndex = methodEnd + 1
+                while targetIndex < end - 9 {
+                    if head[targetIndex] <= 32 || head[targetIndex] == 127 || head[targetIndex] == 35 {
+                        return Error(HttpError.Protocol("Invalid request target"))
+                    }
+                    targetIndex += 1
+                }
                 target = parsedTarget
                 if !target.StartsWithOrdinal("/") {
                     return Error(HttpError.Protocol("Origin-form target required"))
@@ -127,10 +152,16 @@ internal class HttpRequestDecoder {
                 if (method == "GET" || method == "DELETE" || method == "HEAD") && length != 0 {
                     return Error(HttpError.Unsupported(String.Concat(method, " request bodies unsupported")))
                 }
+                if chunked && hasLength {
+                    return Error(HttpError.Protocol("Ambiguous request framing"))
+                }
+                if chunked {
+                    chunks = HttpChunkDecoder(body, method == "GET" || method == "DELETE" || method == "HEAD")
+                }
                 expected = length
                 return HttpRequest.FromIncoming(method, target, host, headers, body)
             } else {
-                if headers.Count >= 16 {
+                if headers.Count >= HttpWireLimits.HeaderCount {
                     return Error(HttpError.LimitExceeded("Request header count exceeded"))
                 }
                 var colon = start
@@ -166,7 +197,13 @@ internal class HttpRequestDecoder {
                     return Error(HttpError.Unsupported("Request expectation or content encoding unsupported"))
                 }
                 if name == "transfer-encoding" {
-                    return Error(HttpError.Unsupported("Request transfer encoding unsupported"))
+                    if chunked {
+                        return Error(HttpError.Protocol("Duplicate request Transfer-Encoding"))
+                    }
+                    if Text(first, last, 1)? != "chunked" {
+                        return Error(HttpError.Unsupported("Request transfer encoding unsupported"))
+                    }
+                    chunked = true
                 }
                 if name == "content-length" {
                     if hasLength {
@@ -182,7 +219,7 @@ internal class HttpRequestDecoder {
                         if !(digit >= 0 && digit <= 9) {
                             return Error(HttpError.Protocol("Invalid request Content-Length"))
                         }
-                        if length > (1024 - digit) / 10 {
+                        if length > (HttpWireLimits.BodyBytes - digit) / 10 {
                             return Error(HttpError.LimitExceeded("Request body limit exceeded"))
                         }
                         length = length * 10 + digit
@@ -291,11 +328,11 @@ public class HttpServer {
         if (status == 204 || status == 205 || status == 304) && count != 0 {
             return Error(HttpError.InvalidRequest("This response status cannot contain content"))
         }
-        if count > 1024 {
+        if count > HttpWireLimits.BodyBytes {
             return Error(HttpError.LimitExceeded("Response body limit exceeded"))
         }
         let fields = response.Headers
-        if fields.Count > 14 {
+        if fields.Count > HttpWireLimits.HeaderCount - 2 {
             return Error(HttpError.LimitExceeded("Response header count exceeded"))
         }
         let reason = if status == 200 { "OK" } else { "" }
@@ -307,7 +344,7 @@ public class HttpServer {
         var index = 0
         while index < fields.Count {
             let header = fields[index]
-            if header.Name.GetUtf8ByteCount() > 2046 || header.Value.GetUtf8ByteCount() > 2046 {
+            if header.Name.GetUtf8ByteCount() > HttpWireLimits.HeaderBytes - 2 || header.Value.GetUtf8ByteCount() > HttpWireLimits.HeaderBytes - 2 {
                 return Error(HttpError.LimitExceeded("Response header limit exceeded"))
             }
             let name = HttpText.Encode(header.Name)
@@ -341,7 +378,7 @@ public class HttpServer {
                 part += 1
             }
             wire = String.Concat(wire, String.Concat(String.Concat(header.Name, ": "), String.Concat(header.Value, "\r\n")))
-            if wire.GetUtf8ByteCount() > 2046 {
+            if wire.GetUtf8ByteCount() > HttpWireLimits.HeaderBytes - 2 {
                 return Error(HttpError.LimitExceeded("Response header limit exceeded"))
             }
             index += 1

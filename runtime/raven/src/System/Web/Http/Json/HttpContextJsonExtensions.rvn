@@ -1,0 +1,23 @@
+module System.Web.Http.Json
+
+import System.*
+import System.Data.Json.*
+import System.Result.*
+import System.Web.Http.*
+
+/// JSON response configuration for an accepted server exchange.
+public extension HttpContextJsonExtensions for HttpContext {
+    /// Serializes a supported model or DOM and configures status 200 with JSON content.
+    /// Serialization failure leaves Response unchanged. Call Complete to send.
+    func RespondJson(value: Object) -> Result<unit, JsonError> {
+        return self.RespondJson(HttpStatusCode.OK, value)
+    }
+
+    /// Configures the status and application/json; charset=utf-8 content atomically.
+    /// Does not send or close the exchange; Complete still validates status/body rules.
+    func RespondJson(statusCode: HttpStatusCode, value: Object) -> Result<unit, JsonError> {
+        let content = JsonContent.Create(value)?
+        self.Respond(statusCode, content)
+        return Ok(())
+    }
+}

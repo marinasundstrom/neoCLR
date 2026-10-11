@@ -1,0 +1,62 @@
+import System.*
+import System.Collections.*
+import System.Data.Json.*
+import System.Result.*
+import System.Tasks.*
+import System.Web.Http.*
+import System.Web.Http.Json.*
+
+func OpenJsonServer() -> HttpServer {
+    let Ok(server) = HttpServer.Listen("127.0.0.1", 0, 4) else {
+        System.Fail("Listen failed")
+    }
+    let Ok(port) = server.GetLocalPort() else {
+        System.Fail("Port unavailable")
+    }
+    Console.WriteLine(port)
+    return server
+}
+
+async func AcceptJson(server: HttpServer) -> Task<HttpContext> {
+    let result = await server.Accept()
+    let Ok(context) = result else {
+        System.Fail("Accept failed")
+    }
+    return context
+}
+
+func ConfigureJson(context: HttpContext) {
+    let Ok(_) = context.RespondJson(JsonString("first")) else {
+        System.Fail("Default JSON response failed")
+    }
+    let before = context.Response.Content
+    let unsupported = HttpContent.FromText("unsupported model")
+    if !(context.RespondJson(HttpStatusCode.BadRequest, unsupported) is Error(_)) {
+        System.Fail("Unsupported mapping accepted")
+    }
+    if context.Response.Content.Length != before.Length || context.Response.StatusCode != HttpStatusCode.OK {
+        System.Fail("Serialization failure changed response")
+    }
+    let Ok(node) = context.Request.Content.ReadJsonNode().GetResult() else {
+        System.Fail("Request JSON failed")
+    }
+    let Ok(_) = context.RespondJson(HttpStatusCode.Created, node) else {
+        System.Fail("JSON response failed")
+    }
+}
+
+func CheckSent(result: Result<System.Void, HttpError>) {
+    let Ok(_) = result else {
+        System.Fail("JSON send failed")
+    }
+    Console.WriteLine("PASS atomic JSON response configuration")
+}
+
+async func Main() -> Task<()> {
+    let server = OpenJsonServer()
+    let context = await AcceptJson(server)
+    ConfigureJson(context)
+    let sent = await context.Complete()
+    server.Close()
+    CheckSent(sent)
+}

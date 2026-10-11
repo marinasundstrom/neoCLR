@@ -22,3 +22,15 @@ HttpMethod provides canonical method properties, custom token construction and t
 Parse. HttpRequest.Method returns HttpMethod; Create accepts it with URL/Uri and optional
 content. Exact spelling is available through Method.Method; value equality ignores
 ASCII case. CONNECT is representable but the socket transport does not implement tunnelling.
+
+Development HTTP/1.1 admits 1 MiB buffered bodies and known-length uploads, 32 KiB
+headers and 100 fields, subject to independent host allocation budgets. Incoming
+requests support bounded chunked coding; client responses support up to 16 interim
+replies before the final response. Chunk extensions/trailers and status-101 upgrades
+remain unsupported. JSON has a separate 1 KiB bound. See the Web guide for exact
+ownership, limits and deferred hosting capabilities.
+
+The 1 MiB admission ceiling is not a qualified transfer guarantee: the native
+stress-GC host currently exceeds its network deadline at that size. See the
+HTTP foundation evidence in `docs/http-foundation.md`
+for host budgets and validation limitations.

@@ -16,6 +16,17 @@ Statuses: **Implemented** means development source with linked focused evidence;
 **Complete** records a satisfied POC gate; **Deferred** is outside this POC.
 It does not imply inclusion in published Preview 9 or production readiness.
 
+## Author-directed hosting foundation — 2026-10-11
+
+The author requests stronger client/server HTTP toward modern applications and
+WebSockets, then asks for improved HttpContent/JSON ergonomics. The
+[foundation contract](http-foundation.md) implements a 1 MiB buffered body/upload admission ceiling (full-size wire
+qualification is blocked by stress-GC/deadline cost),
+32 KiB/100-field headers, incoming chunked requests, client informational responses
+and content-oriented JSON helpers. The historical POC completion below stays frozen.
+JSON's own 1 KiB limit remains; live streams, configuration, TLS, persistent ownership
+and WebSocket upgrades are still open. See [focused evidence](experiments/http-foundation/README.md).
+
 ## Active direction — minimal Web API
 
 **Selected 2026-09-27; nested JSON implemented in development.** The author now focuses HTTP work
@@ -48,9 +59,9 @@ WebApplication, configurable limits and SQL remain deferred.
 | Method values and custom tokens | Implemented: HttpMethod and Create overloads; custom wire spelling | Implemented: validates token syntax and preserves spelling | [Contract](http-client-design.md#httpmethod-implementation--development-2026-10-11), [wire evidence](experiments/http-method/validation.json); CONNECT tunnelling and OPTIONS asterisk form remain unsupported |
 | Request timeout | Implemented: 100-second default, None disabling, cooperative cancellation/cleanup | Existing server phase budgets | [Timeout evidence](experiments/http-timeout/validation.json); independent five-second transport phase limits remain |
 | Statuses and headers | Implemented: named/numeric status, defaults, request fields, case-insensitive lookup | Implemented: request lookup, response status/fields, no-body rules | [Statuses](experiments/http-status/README.md), [headers](experiments/http-headers/README.md), [request fields](experiments/http-request-headers/README.md) |
-| Buffered bodies | Implemented, at most 1,024 bytes | Implemented, at most 1,024 bytes for request/response bodies | [POST](experiments/http-post/README.md) |
-| Known-length source uploads | Implemented in current increment, at most 65,536 bytes, synchronous source and bounded chunks | Receives only within its existing 1,024-byte buffered limit | [Upload fixture](experiments/http-stream-upload/README.md); larger upload evidence uses an independent peer, not a claim of larger neoCLR server admission |
-| Unknown-length/chunked request bodies | Deferred | Deferred; rejects request transfer coding | Define async producer and optional length before wire support |
+| Buffered bodies | Implemented, at most 1 MiB | Implemented, at most 1 MiB for request/response bodies | [Foundation qualification](experiments/http-foundation/README.md); [earlier POST](experiments/http-post/README.md) |
+| Known-length source uploads | Implemented in current increment, at most 1 MiB, synchronous source and bounded chunks | Receives within its 1 MiB buffered limit | [Upload fixture](experiments/http-stream-upload/README.md); larger upload evidence uses an independent peer, not a claim of larger neoCLR server admission |
+| Unknown-length/chunked request bodies | Deferred producer API | Implemented bounded chunked reception | Define async producer and optional length before client wire emission |
 | Response framing | Implemented: fixed-length, bounded chunked and close-delimited reception | Implemented: fixed-length buffered emission | [Framing contract](http-client-design.md#bounded-response-framing-and-head--2026-09-25); incoming chunked responses still fully buffered |
 | Live response/request body streams | Deferred response reader | Deferred request reader and response writer | Separate body lifetime from connection lifetime; trailers and completion semantics |
 | JSON DOM and typed mapping | Implemented: shared conversion and generic client helpers | Implemented: shared conversion through handler/context | [Mapped application](experiments/json-object-mapping/README.md), [helpers](experiments/http-json-client/README.md); nested reference objects are implemented in development with [evidence](experiments/json-object-mapping/nested-validation.json); current JSON size/shape limits remain |

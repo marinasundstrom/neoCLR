@@ -15407,3 +15407,36 @@ or runtime-await default switch was performed.
   is integrated as runtime code; the unfinished converter changes are preserved as
   an [explicit experiment patch](experiments/json-converters/README.md), with their
   consumer and .NET comparison. Converter APIs are not enabled on main.
+
+## 2026-10-11 — HTTP hosting foundation and JSON content ergonomics
+
+- Author: “Implement decent Http support for HttpClient and HttpServer. The goal is
+  to eventually host a modern web app and websockets. You may create your own work tree.”
+- Assistant: inspected the existing bounded POC and proposed a first increment for
+  larger bodies/headers, interoperable framing, independent peers and explicit
+  remaining streaming/TLS/persistence/upgrade work. Created `codex/http-foundation`
+  in an isolated worktree because the primary checkout contained unrelated edits.
+- Author subsequently asked to improve the API around HttpContent, especially JSON.
+- Assistant: added content-oriented typed/DOM JSON reads and atomic RespondJson
+  configuration, preserving structured errors and existing serializer limits.
+  [Design and validation](http-foundation.md) distinguish implemented behavior from
+  the eventual hosting goal. No new compiler semantics or default-mode switch.
+- Open: configurable limits, larger JSON mapping budgets, body streams, TLS,
+  persistent connections, WebSocket upgrade/socket lifetime and hosting lifecycle.
+- Author: “You need to coordinate work with the other threads...”
+- Assistant action: contacted **Improve the JSON API** and **Choose the next
+  platform priority**, identifying HTTP ownership, shared reference/documentation
+  files, the JSON-options dependency and the AOT function-descriptor correction.
+  HTTP work remains isolated; combined API snapshots require deliberate integration.
+- Runtime chat response: confirms that allocation-pressure collection scheduling
+  is not implemented, and recommends qualifying smaller transfers while retaining
+  the 1 MiB ceiling/deadline limitation explicitly. No GC-policy change is included.
+- JSON chat response: options/converter APIs compile but lack complete end-to-end
+  validation, with union runtime blockers. Keep HTTP helpers on JsonContent.Read/
+  Create and defer options overloads until coordinated validation. Regenerate the
+  combined API snapshots after source integration. Runtime chat confirms no file
+  overlap and leaves descriptor/build/HTTP-host changes with the HTTP worktree.
+- Author: “JSON API is about to be integrated into main”. The assistant confirmed
+  integration commit `2c8204d5`, rebased HTTP onto that baseline, rebuilt libraries
+  and combined references, and added an HTTP JSON consumer of JsonArray indexing
+  and iteration. Converter/options support remains an experiment outside runtime.

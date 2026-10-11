@@ -1,0 +1,94 @@
+import System.*
+import System.Collections.*
+import System.Concurrency.*
+import System.Data.Json.*
+import System.IO.*
+import System.Result.*
+import System.Tasks.*
+import System.Web.Http.*
+import System.Web.Http.Json.*
+
+public class Message {
+    init() { }
+    var Text: string { get; set; } = ""
+}
+
+func Check(value: bool) {
+    if !value {
+        System.Fail("JSON content contract failed")
+    }
+}
+
+func CreateContent() -> HttpContent {
+    let message = Message()
+    message.Text = "Café 🌍"
+    let Ok(content) = JsonContent.Create(message) else {
+        System.Fail("JSON creation failed")
+    }
+    return content
+}
+
+func ValidateMessage(result: Result<Message, JsonError>) {
+    let Ok(message) = result else {
+        System.Fail("JSON model read failed")
+    }
+    Check(message.Text == "Café 🌍")
+}
+
+// These checks intentionally observe already-completed/cancelled tasks: buffered
+// reads must complete synchronously and cancellation must skip invalid content.
+func CheckImmediate(content: HttpContent) {
+    let reading = content.ReadFromJson<Message>()
+    Check(reading.IsCompleted)
+    ValidateMessage(reading.GetResult())
+    ValidateMessage(content.ReadFromJson<Message>().GetResult())
+    Check(content.ReadFromJson(typeof(Message)).GetResult() is Ok(_))
+    Check(content.ReadJsonNode().GetResult() is Ok(_))
+    Check(HttpContent.FromText("null").ReadJsonNode().GetResult() is Ok(_))
+    Check(HttpContent.FromText("{").ReadJsonNode().GetResult() is Error(_))
+    Check(HttpContent.FromText("").ReadFromJson<Message>().GetResult() is Error(_))
+    let invalid = ArrayList<byte>()
+    invalid.Add((byte)255)
+    Check(HttpContent(invalid).ReadJsonNode().GetResult() is Error(JsonError.Read(TextReadError.InvalidUtf8)))
+    let source = CancellationTokenSource()
+    source.Cancel()
+    Check(HttpContent.FromText("{").ReadFromJson<Message>(source.Token).IsCancelled)
+    Check(content.ReadFromJson(typeof(Message), source.Token).IsCancelled)
+    Check(content.ReadJsonNode(source.Token).IsCancelled)
+    source.Dispose()
+    let Ok(node) = HttpContent.FromText("[1,null]").ReadJsonNode().GetResult() else {
+        System.Fail("JSON array content failed")
+    }
+    if node is JsonArray array {
+        Check(array.Count == 2)
+        Check(array[1] is JsonNull)
+        var count = 0
+        for item in array {
+            count += 1
+        }
+        Check(count == 2)
+    } else {
+        System.Fail("JSON array node expected")
+    }
+    let input = MemoryStream()
+    Check(HttpContent.FromStream(input, 1048577, true) is Error(HttpError.LimitExceeded(_)))
+    let Ok(maximum) = HttpContent.FromStream(input, 1048576, true) else {
+        System.Fail("Stream admission boundary failed")
+    }
+    maximum.Dispose()
+    let Ok(stream) = HttpContent.FromStream(input, 0, true) else {
+        System.Fail("Stream creation failed")
+    }
+    Check(stream.ReadFromJson<Message>().GetResult() is Error(JsonError.Read(TextReadError.IoFailure)))
+    Check(input.GetPosition() is Ok(0L))
+    stream.Dispose()
+    input.Close()
+    Console.WriteLine("PASS JSON content reads, typed errors, repeatability and cancellation")
+}
+
+async func Main() -> Task<()> {
+    let content = CreateContent()
+    let result = await content.ReadFromJson<Message>()
+    ValidateMessage(result)
+    CheckImmediate(content)
+}

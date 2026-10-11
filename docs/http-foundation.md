@@ -1,0 +1,124 @@
+# HTTP/1.1 foundation and JSON content ergonomics
+
+Author-directed development work, 2026-10-11, on `codex/http-foundation`.
+The long-term target is modern web application hosting and WebSockets. This
+increment extends the completed bounded POC; it does not qualify a production host.
+
+## Implemented contract
+
+- Both directions buffer at most 1,048,576 body bytes. Known-length client stream
+  uploads use the same whole-message bound; source reads remain synchronous and
+  one-shot. Server responses remain fixed-length buffered messages.
+- Request/response headers admit 32,768 encoded bytes and 100 fields. Client
+  application headers reserve three fields for transport; server response headers
+  reserve two. The client counts informational and final header bytes together.
+  The existing 1,024-byte URL policy and ASCII header grammar remain unchanged.
+- The server accepts `Transfer-Encoding: chunked`, case-insensitively, including
+  empty bodies and fragmented size/data/delimiter input. Request and response
+  parsers share one decoder with a 65,536-byte chunk-framing budget. Conflicting
+  Content-Length/Transfer-Encoding, duplicate framing fields, invalid CRLF,
+  truncation and numeric overflow fail. Chunk extensions and nonempty trailers
+  remain explicitly unsupported. GET/HEAD/DELETE still require empty bodies.
+- The client consumes up to 16 informational responses before the final response,
+  discarding interim fields. It rejects framing headers on interim responses and
+  rejects 101 explicitly: protocol upgrades do not yet transfer socket ownership.
+- Request target whitespace, controls and fragments are rejected before dispatch.
+  A failed request decoder cannot subsequently produce a successful request.
+- Existing cancellation, disposal, deadlines, connection-close behavior and
+  malformed-request closure remain. Rejection does not generate an HTTP error page.
+
+These are HTTP budgets, not reserved memory or relaxed host resource limits. The
+validation harness configures 16,777,216 interpreter array elements, 32 MiB array
+bytes, a 4 MiB native per-byte-array ceiling and a 32 MiB native HTTP heap.
+The HTTP build profile exposes `--http-heap-bytes`; its default remains 1 MiB. Growable buffers and encoding
+snapshots can allocate more than the message's logical length. Hosts must select
+sufficient independent allocation/instruction budgets; default constrained-host
+budgets do not promise 1 MiB transfers. No performance or load claim is made. The stress-GC native host collects at every
+safepoint: a 1 MiB wire test exceeded the existing network deadline. Therefore
+1 MiB is an admission ceiling, not a qualified transfer-size guarantee under this
+host. Smaller executable transfers and rejection at the admission ceiling are
+validated separately. The runtime thread owns collection-policy follow-up.
+
+## Content-oriented JSON APIs
+
+Import `System.Web.Http.Json.*` and use:
+
+```raven
+let result = await request.Content.ReadFromJson<Message>()
+let configured = context.RespondJson(message)
+```
+
+[Compiled consumers](experiments/http-foundation/) cover the actual API spellings.
+`ReadFromJson<T>` and `ReadFromJson(TypeInfo)` return `Task<Result<..., JsonError>>`.
+`ReadJsonNode` returns `Task<Result<JsonValue, JsonError>>`. Each has a token overload.
+They work on request or response content, keep bytes available for repeated reads,
+and preserve serializer errors. Pre-cancellation skips conversion. Conversion is
+synchronous over an already buffered body, so it cannot be interrupted mid-parse.
+A stream-backed upload returns `Read(IoFailure)` without reading or closing its
+source. Explicit JSON reads do not impose status or media-type policy.
+
+`RespondJson(value)` configures status 200; `RespondJson(statusCode, value)` uses
+that status. Both return `Result<unit, JsonError>` and set
+`application/json; charset=utf-8`. They serialize before changing the response,
+so a failure preserves its status/content. Neither sends; call `Complete`, whose
+existing status/body validation remains in force. `JsonContent.Create` continues
+to support explicit request construction and model/DOM serialization.
+
+The serializer's 1,024-byte document bound, depth/value limits and supported type
+mapping remain separate gaps. The larger transport limit does not increase JSON
+capacity. The parallel JSON workstream confirmed that its options/converter APIs are not yet
+qualified for HTTP integration. Options overloads remain a coordinated follow-up;
+content negotiation, lazy JSON streams and asynchronous body readers are also open. These helpers add no compiler or Runtime Contract mode.
+Their execution is qualified through native System.Web metadata, not a new legacy
+CLI bridge-emitter implementation; the aggregate reference carries their signatures.
+
+## Research and alternatives
+
+Primary sources reviewed 2026-10-11:
+
+- [RFC 9112 sections 6–8](https://www.rfc-editor.org/rfc/rfc9112.html#section-6)
+  define HTTP/1.1 framing, chunk decoding and incomplete-message handling. Shared
+  framing logic reduces disagreement between the two parsers. We deliberately
+  reject CL+TE and duplicates rather than normalize ambiguous messages. Extension
+  and trailer support remains incomplete protocol coverage, not a new standard.
+- [.NET HttpClient buffering](https://learn.microsoft.com/en-us/dotnet/api/system.net.http.httpclient.maxresponsecontentbuffersize?view=net-10.0)
+  and [Kestrel limits](https://learn.microsoft.com/en-us/aspnet/core/fundamentals/servers/kestrel/options?view=aspnetcore-10.0)
+  separate client buffering and configurable server admission. neoCLR's private
+  shared fixed limits are a bounded implementation step, not equivalent .NET
+  configurability. Keeping 1 KiB blocks ordinary binary/text payloads; simply
+  removing limits would sacrifice predictable admission. Live body streams and
+  per-endpoint limits are the preferred next evolution, with backpressure and
+  ownership tests before widening the host scope.
+- [.NET content JSON reads](https://learn.microsoft.com/en-us/dotnet/api/system.net.http.json.httpcontentjsonextensions.readfromjsonasync?view=net-10.0)
+  place typed reads on HttpContent and support cancellation; [JsonContent.Create](https://learn.microsoft.com/en-us/dotnet/api/system.net.http.json.jsoncontent.create?view=net-10.0)
+  supplies serialization content. The new neoCLR extensions follow that placement
+  and its existing omission of the Async suffix. Result errors, strict UTF-8 and
+  eager bounded serialization are existing deliberate adaptations. Returning a
+  Task fits existing content reads and leaves room for a future body reader, at
+  the cost of a completed-task allocation today. RespondJson removes repetitive
+  serialization/media-type setup while preserving explicit send lifetime.
+
+## Remaining hosting work
+
+Sequence future work by dependency: configurable admission and JSON budgets;
+live body streams with cancellation/backpressure; HTTP connection ownership and
+persistent reuse; TLS/provider validation; explicit upgrade ownership followed by
+RFC 6455 frame/masking/control/close semantics. HTTP/2/3, redirects, compression,
+trailers/extensions, Expect: 100-continue, graceful draining and hosting middleware
+remain open. WebSockets cannot be implemented by merely admitting status 101.
+No one-off HTTP direction permanently displaces runtime-async priorities.
+
+## Native metadata support
+
+HTTP plus JSON exposed two existing AOT descriptor gaps: closed function signatures
+used as generic arguments lacked descriptor mapping, and generated TypeShape dispatch
+for 114 retained types exceeded the backend's method-size budget. The binder now
+preserves function signature identity/visibility and validates the shape selector
+once before emitting true-flag cases with a false default. It does not increase the
+backend budget or introduce new reflection admission. Explicit fixture retention
+keeps the model constructor/properties available; DOM-only requests use a module
+catalog. These are native binder changes, not Raven compiler/CLI bridge changes.
+
+## Validation
+
+See [reproduction and recorded results](experiments/http-foundation/README.md).

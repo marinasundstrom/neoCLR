@@ -1,0 +1,38 @@
+import System.*
+import System.Collections.*
+import System.Result.*
+import System.Tasks.*
+import System.Web.Http.*
+
+func OpenServer() -> HttpServer {
+    let Ok(server) = HttpServer.Listen("127.0.0.1", 0, 4) else {
+        System.Fail("Listen failed")
+    }
+    let Ok(port) = server.GetLocalPort() else {
+        System.Fail("Port unavailable")
+    }
+    Console.WriteLine(port)
+    return server
+}
+
+func Echo(request: HttpRequest) -> Task<Result<HttpResponse, HttpError>> {
+    return Task.FromResult<Result<HttpResponse, HttpError>>(System.Result<HttpResponse, HttpError>.Ok(HttpResponse(200, ArrayList<HttpHeader>(), request.Content.Bytes)))
+}
+
+func ValidateServer(result: Result<System.Void, HttpError>, expected: string) {
+    if let Ok(_) = result {
+        if expected != "ok" {
+            System.Fail("Invalid request accepted")
+        }
+    } else if let Error(reason) = result {
+        CheckError(reason, expected)
+    }
+    Console.WriteLine("PASS server")
+}
+
+async func Main(arguments: string[]) -> Task<()> {
+    let server = OpenServer()
+    let result = await server.ServeOne(Echo)
+    server.Close()
+    ValidateServer(result, arguments[0])
+}

@@ -1786,3 +1786,16 @@ type selection. The CLI facade renames its positional helper to Item after C#
 compilation to coexist with the indexer's Item metadata name, as for JsonObject.
 Refresh aggregate reference and native rendered snapshots together; no exclusion
 or compiler Runtime Contract option is introduced.
+
+## HTTP foundation and content JSON helpers (2026-10-11)
+
+HttpContentJsonExtensions and HttpContextJsonExtensions add typed/runtime-type/DOM
+content reads and atomic RespondJson configuration. The normal public-type inventory,
+XML and native System.Web reference include them; no public API is excluded. The
+aggregate bridge declares their documentation signatures. Actual execution is native
+metadata; no new legacy CLI emitter bindings are supplied. Existing JsonContent/Create,
+GetFromJson/PostAsJson and JSON size/mapping policies remain.
+
+HTTP wire limits and informational/chunked reception change behavior without changing
+existing signatures. The Web and HTTP/JSON namespace guides document the new bounds,
+independent host budgets and unsupported modern-hosting capabilities.

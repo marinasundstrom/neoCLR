@@ -1,0 +1,62 @@
+module System.Web.Http.Json
+
+import System.*
+import System.Concurrency.*
+import System.Data.Json.*
+import System.Introspection.*
+import System.Result.*
+import System.Tasks.*
+import System.Web.Http.*
+
+/// Explicit JSON reads for buffered request and response content.
+public extension HttpContentJsonExtensions for HttpContent {
+    /// Deserializes buffered UTF-8 JSON, retaining the original content and JsonError.
+    /// Does not check HTTP status or Content-Type. Stream content remains unsupported.
+    func ReadFromJson<T>() -> Task<Result<T, JsonError>> {
+        return self.ReadFromJson<T>(CancellationToken.None)
+    }
+
+    /// Pre-cancellation skips conversion and returns a cancelled task.
+    /// Buffered conversion is synchronous and cannot be interrupted once started.
+    func ReadFromJson<T>(cancellationToken: CancellationToken) -> Task<Result<T, JsonError>> {
+        let source = Promise<Result<T, JsonError>>()
+        if cancellationToken.IsCancellationRequested {
+            _ = source.Cancel()
+        } else {
+            _ = source.Complete(JsonContent.Read<T>(self))
+        }
+        return source.Task
+    }
+
+    /// Reads a model using a runtime type, without consuming or closing the content.
+    func ReadFromJson(type: TypeInfo) -> Task<Result<Object, JsonError>> {
+        return self.ReadFromJson(type, CancellationToken.None)
+    }
+
+    /// Reads buffered JSON using a runtime type; pre-cancellation skips conversion.
+    func ReadFromJson(type: TypeInfo, cancellationToken: CancellationToken) -> Task<Result<Object, JsonError>> {
+        let source = Promise<Result<Object, JsonError>>()
+        if cancellationToken.IsCancellationRequested {
+            _ = source.Cancel()
+        } else {
+            _ = source.Complete(JsonContent.Read(self, type))
+        }
+        return source.Task
+    }
+
+    /// Parses buffered UTF-8 JSON into a DOM, including a JsonNull root.
+    func ReadJsonNode() -> Task<Result<JsonValue, JsonError>> {
+        return self.ReadJsonNode(CancellationToken.None)
+    }
+
+    /// Parses a buffered JSON DOM; pre-cancellation skips conversion.
+    func ReadJsonNode(cancellationToken: CancellationToken) -> Task<Result<JsonValue, JsonError>> {
+        let source = Promise<Result<JsonValue, JsonError>>()
+        if cancellationToken.IsCancellationRequested {
+            _ = source.Cancel()
+        } else {
+            _ = source.Complete(JsonContent.ReadNode(self))
+        }
+        return source.Task
+    }
+}

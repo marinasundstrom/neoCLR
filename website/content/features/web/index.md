@@ -202,8 +202,9 @@ application hosting framework.
 
 Received headers have lowercase names and trimmed surrounding whitespace.
 The server requires exactly one Host. GET/HEAD/DELETE bodies remain unsupported;
-POST, PUT and PATCH read up to 1,024 bytes according to Content-Length before calling the handler.
-Without Content-Length, a request has an empty body. It validates application response headers, computes the byte length
+Development POST, PUT and PATCH buffer up to 1 MiB using Content-Length or chunked
+transfer coding before calling the handler. Without either framing field, a request
+has an empty body. It validates application response headers, computes the byte length
 and adds `Connection: close`. Malformed requests or callback errors close the
 connection without an HTTP error response. Final statuses 200–599 are supported in this preview. Statuses 204, 205 and 304 require empty content; the server omits Content-Length for 204/304.
 
@@ -237,13 +238,24 @@ configuring a received client response only changes the local object.
 
 ## Current limits
 
-Plain HTTP/1.1 GET, HEAD, DELETE and POST/PUT/PATCH support final statuses 200–599 in this preview. Responses use a single Content-Length, bounded chunked coding,
-or connection-close framing. HEAD and bodyless 204/304 complete after headers. Informational responses are not
-yet supported. The experiment bounds URLs to 1,024 bytes, headers to 2,048 bytes and 16
-fields, and decoded bodies to 1,024 bytes. Buffered uploads have the same body limit; known-length stream uploads allow up to 65,536 bytes. Chunk framing has a separate 2,048-byte budget.
-It rejects ambiguous framing, chunk extensions/trailers, other transfer codings
-and content encodings. It does not implement TLS, redirects, pooling,
-streaming responses, unknown-length uploads or informational response handling. Text always means strict UTF-8.
+Development HTTP/1.1 supports final statuses 200–599. Client responses use fixed-length,
+chunked or connection-close framing; HEAD and bodyless 204/304 complete after headers.
+The client also consumes up to 16 informational replies before the final response,
+without merging interim headers. Status 101 remains unsupported.
+
+Buffered bodies and known-length uploads admit up to 1 MiB. This is an admission
+ceiling: the native stress-GC host currently exceeds its network deadline for
+1 MiB transfers; smaller transfers are qualified. Headers admit 32 KiB
+and 100 fields; chunk framing has a separate 64 KiB budget. URLs remain limited to
+1,024 bytes. Independent VM/native memory and instruction budgets must be configured
+for larger transfers; the HTTP bounds do not reserve memory. JSON retains its separate
+1 KiB document limit. Published POC downloads retain their older limits.
+
+Ambiguous framing, chunk extensions/trailers, other transfer codings and content
+encodings are rejected. TLS, redirects, pooling, live body streams, unknown-length
+client upload sources and WebSocket upgrades remain open. The server now accepts
+chunked requests but still buffers the complete body and closes after each exchange.
+Text means strict UTF-8. These are steps toward web hosting, not production readiness.
 
 Development `HttpClient.Timeout` configures one cooperative budget across the handler
 pipeline, DNS, connection and buffered response completion. It defaults to
@@ -432,8 +444,8 @@ let acceptsText = request.WithHeader("Accept", "text/plain")?
 The original request keeps its headers. Content is shared, so keep it stable during
 use. The current helper validates ASCII names and printable ASCII values; it does not
 parse field-specific syntax. Transport headers such as Host and Content-Length are
-reserved, and Content-Type comes from HttpContent. The provider allows 13 stored
-application fields and at most 2,048 encoded header bytes. Stream-backed content uses the same header rules.
+reserved, and Content-Type comes from HttpContent. The development provider allows 97 stored
+application fields and at most 32,768 encoded header bytes. Stream-backed content uses the same header rules.
 
 ## Other request methods
 
@@ -569,3 +581,22 @@ asterisk-form requests remain unsupported. A method value does not enable those 
 
 See the [HttpMethod reference](/docs/api/System/Web/Http/HttpMethod/index.html) and the
 [tested custom-method client](https://github.com/marinasundstrom/neoCLR/blob/main/docs/experiments/http-method/Client.rvn).
+
+## Development: JSON directly from content
+
+Import `System.Web.Http.Json.*` to call `await content.ReadFromJson<T>()` on either
+request or response content. A TypeInfo overload supports runtime-selected models;
+`ReadJsonNode()` returns a DOM. Token overloads acknowledge pre-cancellation before
+conversion. All preserve JsonError, enforce strict UTF-8 and keep buffered bytes
+readable. They do not check HTTP status or media type, and stream-backed content is
+not yet read by these helpers.
+
+`context.RespondJson(value)` serializes a model or DOM, selects status 200 and sets
+`application/json; charset=utf-8`. Its status overload allows another final status.
+It returns `Result<unit, JsonError>` and leaves the previous response unchanged on
+serialization failure. Call `await context.Complete()` to send. `JsonContent.Create`
+remains available when constructing explicit requests or responses.
+
+[Content JSON API](/docs/api/System/Web/Http/Json/HttpContentJsonExtensions/) ·
+[Response JSON API](/docs/api/System/Web/Http/Json/HttpContextJsonExtensions/).
+The existing JSON document/mapping limits still apply.

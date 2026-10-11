@@ -109,6 +109,19 @@ public static class HttpClientJsonExtensions {
     public static Tasks.Task<Result<HttpResponse, HttpJsonError>> PostAsJson<T>(this HttpClient self, Uri url, T value) => default;
     public static Tasks.Task<Result<HttpResponse, HttpJsonError>> PostAsJson<T>(this HttpClient self, Uri url, T value, Concurrency.CancellationToken cancellationToken) => default;
 }
+// Reference surface only; execution uses native System.Web metadata.
+public static class HttpContentJsonExtensions {
+    public static Tasks.Task<Result<T, Data.Json.JsonError>> ReadFromJson<T>(this HttpContent self) => default;
+    public static Tasks.Task<Result<T, Data.Json.JsonError>> ReadFromJson<T>(this HttpContent self, Concurrency.CancellationToken cancellationToken) => default;
+    public static Tasks.Task<Result<object, Data.Json.JsonError>> ReadFromJson(this HttpContent self, Introspection.TypeInfo type) => default;
+    public static Tasks.Task<Result<object, Data.Json.JsonError>> ReadFromJson(this HttpContent self, Introspection.TypeInfo type, Concurrency.CancellationToken cancellationToken) => default;
+    public static Tasks.Task<Result<Data.Json.JsonValue, Data.Json.JsonError>> ReadJsonNode(this HttpContent self) => default;
+    public static Tasks.Task<Result<Data.Json.JsonValue, Data.Json.JsonError>> ReadJsonNode(this HttpContent self, Concurrency.CancellationToken cancellationToken) => default;
+}
+public static class HttpContextJsonExtensions {
+    public static Result<PropagationUnit, Data.Json.JsonError> RespondJson(this HttpContext self, object value) => default;
+    public static Result<PropagationUnit, Data.Json.JsonError> RespondJson(this HttpContext self, HttpStatusCode statusCode, object value) => default;
+}
 internal sealed class JsonClientOperations {
     public JsonClientOperations() { }
     public static Result<T, HttpJsonError> Convert<T>(Result<object, HttpJsonError> result) => default;

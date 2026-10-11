@@ -1,0 +1,15 @@
+import System.*
+import System.Web.Http.*
+
+func CheckError(reason: HttpError, expected: string) {
+    let kind = match reason {
+        HttpError.Protocol(_) => "protocol"
+        HttpError.Unsupported(_) => "unsupported"
+        HttpError.LimitExceeded(_) => "limit"
+        _ => "other"
+    }
+    if kind != expected {
+        Console.WriteLine(reason.ToString())
+        System.Fail("Unexpected HTTP error")
+    }
+}

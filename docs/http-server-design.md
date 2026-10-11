@@ -1,5 +1,10 @@
 # Minimal HTTP server — development POC, 2026-09-24
 
+**Development update 2026-10-11:** the [HTTP foundation](http-foundation.md) supersedes
+older POC body/header bounds and adds shared chunked request reception, client interim
+responses and content-oriented JSON APIs. Historical dated validation below records
+its original bounds. Streaming, persistence, TLS and upgrades remain open.
+
 The opening sections retain the initial checkpoint and its limitations. The
 [current context/lifecycle contract](#context-ownership-and-response-configuration--2026-09-25)
 supersedes the original listener-only Close and callback cancellation gaps.

@@ -29,6 +29,13 @@ static int32_t poll_entry(neoclr_aot_context *context, uint64_t *callback,
     return progress;
 }
 /* Serial reuse proof; not persistent guest state or a public hosting ABI. */
+#ifndef NEOCLR_HTTP_HEAP_BYTES
+#define NEOCLR_HTTP_HEAP_BYTES 1048576
+#endif
+#if NEOCLR_HTTP_HEAP_BYTES < 8 || NEOCLR_HTTP_HEAP_BYTES % 8 != 0
+#error "HTTP heap capacity must be a positive multiple of eight"
+#endif
+
 static int invoke(neoclr_aot_context *context, int *failed, int argc, neoclr_process_char **argv) {
     neoclr_socket_scope sockets;
     neoclr_task_scope tasks;
@@ -78,10 +85,10 @@ int NEOCLR_PROCESS_MAIN(int argc, neoclr_process_char **argv) {
         _setmode(_fileno(stdout), _O_BINARY) == -1 ||
         _setmode(_fileno(stderr), _O_BINARY) == -1) return 2;
     neoclr_windows_gc_host host = {0};
-    if (neoclr_windows_gc_host_open(&host, 1024 * 1024)) return 2;
+    if (neoclr_windows_gc_host_open(&host, NEOCLR_HTTP_HEAP_BYTES)) return 2;
     neoclr_aot_context *context = &host.context;
 #else
-    const size_t words = 131072;
+    const size_t words = NEOCLR_HTTP_HEAP_BYTES / 8;
     uint64_t *buffer = calloc(words + 1, sizeof(uint64_t));
     if (!buffer) return 2;
     buffer[words] = UINT64_C(0x1122334455667788);

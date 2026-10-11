@@ -161,6 +161,12 @@ fn visible(source: &neoclr::Module, ty: &Type) -> bool {
 
 pub(super) fn semantic_token(input: &neoclr::Module, report: &Value, token: &Type) -> Result<Type, Error> {
     if token.is_primitive() { return Ok(token.clone()); }
+    if let Type::Function(function) = token {
+        let mut function = function.clone();
+        function.parameters = function.parameters.iter().map(|p| semantic_token(input, report, p)).collect::<Result<_, _>>()?;
+        function.returns = semantic_token(input, report, &function.returns)?;
+        return Ok(Type::Function(function));
+    }
     if let Type::ArrayRef(element) = token {
         return Ok(Type::ArrayRef(Box::new(semantic_token(input, report, element)?)));
     }
@@ -175,6 +181,12 @@ pub(super) fn semantic_token(input: &neoclr::Module, report: &Value, token: &Typ
 
 fn native_token(input: &neoclr::Module, report: &Value, semantic: &Type) -> Result<Type, Error> {
     if semantic.is_primitive() { return Ok(semantic.clone()); }
+    if let Type::Function(function) = semantic {
+        let mut function = function.clone();
+        function.parameters = function.parameters.iter().map(|p| native_token(input, report, p)).collect::<Result<_, _>>()?;
+        function.returns = native_token(input, report, &function.returns)?;
+        return Ok(Type::Function(function));
+    }
     if let Type::ArrayRef(element) = semantic {
         return Ok(Type::ArrayRef(Box::new(native_token(input, report, element)?)));
     }
@@ -197,6 +209,12 @@ fn signature_name(ty: &Type) -> Result<String, Error> {
 fn shape(source: &neoclr::Module, ty: &Type) -> Result<[bool; 14], Error> {
     use neoclr::metadata::Representation;
     let Some(d) = source.type_definition(ty) else {
+        if matches!(ty, Type::Function(_)) {
+            let mut result = [false; 14];
+            result[11] = visible(source, ty);
+            result[13] = true;
+            return Ok(result);
+        }
         if matches!(ty, Type::ArrayRef(_)) {
             let mut result = [false; 14];
             result[0] = true;
@@ -331,6 +349,13 @@ pub fn bind_queries(
                 }
             };
             (name.to_owned(), arguments.len(), semantic)
+        } else if matches!(token, Type::Function(_)) {
+            let semantic = semantic_token(input, report, token)?;
+            let neoclr::Value::String(name) = neoclr::native_metadata::display_name(source, &semantic)
+                .map_err(|e| e.to_string())? else {
+                return Err("function display name was not a string".into());
+            };
+            (name.to_string(), 0, semantic)
         } else if matches!(token, Type::ArrayRef(_)) {
             let semantic = semantic_token(input, report, token)?;
             let declaration = source.type_definition(&semantic);
@@ -401,7 +426,15 @@ pub fn bind_queries(
         {
             return Err("native descriptor query requires exact reserved TypeName/TypeArgumentCount/TypeArgument/TypeShape/TypeMetadataToken InternalCall contract".into());
         }
-        let mut body = vec![];
+        // Validate the selector once, then emit only true flags per descriptor.
+        // Emitting all fourteen Boolean branches exceeded the bounded backend's
+        // method budget when HTTP and JSON retained more than ninety types.
+        let mut body = if shapes {
+            vec![Op::Arg(1), Op::Int(0), Op::Less, Op::BranchFalse(5),
+                Op::Fault("unknown type shape query".into()),
+                Op::Arg(1), Op::Int(14), Op::Less, Op::BranchTrue(10),
+                Op::Fault("unknown type shape query".into())]
+        } else { vec![] };
         for (descriptor, (token, name, count, flags, metadata_token)) in descriptors.iter().enumerate() {
             let branch = body.len() + 3;
             body.extend([
@@ -419,6 +452,7 @@ pub fn bind_queries(
                 body.push(Op::Fault("generic argument index out of range".into()));
             } else if shapes {
                 for (selector, value) in flags.iter().enumerate() {
+                    if !value { continue; }
                     let next = body.len() + 6;
                     body.extend([
                         Op::Arg(1),
@@ -429,7 +463,7 @@ pub fn bind_queries(
                         Op::Return,
                     ]);
                 }
-                body.push(Op::Fault("unknown type shape query".into()));
+                body.extend([Op::Bool(false), Op::Return]);
             } else {
                 body.extend([
                     if names {
@@ -466,6 +500,33 @@ mod tests {
         let report = json!({"functions":[{"name":"neoCLR.Runtime.TypeName","compiledIndex":0}],
             "sourceMetadata":{"types":[{"compiledTypeIndex":0,"name":"Original","origin":{"name":"Café"},"typeArguments":[]}]}});
         (module, report)
+    }
+
+    #[test]
+    fn function_generic_arguments_preserve_closed_identity_and_shape() {
+        let (input, report) = query();
+        let semantic = Type::Function(Box::new(neoclr::metadata::FunctionType {
+            parameters: vec![Type::Named("Original".into()), Type::Int32],
+            returns: Type::Void,
+            no_result: true,
+            out_parameters: vec![],
+            out_when_true: vec![],
+        }));
+        let native = native_token(&input, &report, &semantic).unwrap();
+        assert_ne!(native, semantic);
+        assert_eq!(semantic_token(&input, &report, &native).unwrap(), semantic);
+        let facts = shape(&input, &native).unwrap();
+        assert!(facts[13]);
+        assert!(!facts[7]);
+        assert!(!facts[12]);
+        let open = Type::Function(Box::new(neoclr::metadata::FunctionType {
+            parameters: vec![Type::MethodTypeParameter(0)],
+            returns: Type::Void,
+            no_result: false,
+            out_parameters: vec![],
+            out_when_true: vec![],
+        }));
+        assert!(native_token(&input, &report, &open).is_err());
     }
 
     #[test]

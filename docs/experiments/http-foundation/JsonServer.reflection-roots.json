@@ -1,0 +1,7 @@
+{
+  "schemaVersion": 4,
+  "types": [],
+  "moduleCatalogs": [
+    "[\"HttpFoundationJsonServer\",\"1.0.0.0\",\"\",\"\",\"0\"]"
+  ]
+}
