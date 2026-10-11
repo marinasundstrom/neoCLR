@@ -1090,3 +1090,32 @@ and memory benchmarks before claiming a diagnostic improvement at acceptable cos
 Faithful logical trace support, including its limits under optimization and missing
 symbols, must be demonstrated with executable cases before documentation calls it
 implemented. This direction does not select green threads or a saved-stack format.
+
+
+## Explicit observer lifetime — 2026-10-11
+
+The internal awaitable now returns a disposable registration from Subscribe for explicit
+observers. Ordinary await remains unchanged. A Raven use scope cancels a dormant runtime
+registration and releases its callback; repeated disposal is harmless, and disposal after
+activation does not retract runnable work. Completion skips deliberately withdrawn
+registrations. An unexpectedly unavailable runtime handle still faults instead of being
+silently accepted as intentional withdrawal.
+
+This follows the familiar .NET separation between subscription/registration lifetime and
+operation completion authority; it does not copy CancellationTokenRegistration's purpose
+or add Dispose to Task/Promise. Task represents operation state; Promise remains the
+producer-side completion source. The managed list may retain a withdrawn handle wrapper
+until completion, but it no longer retains the observer callable through that wrapper.
+The benefit is deterministic release in long-running invocations; costs include wrapper
+state and explicit lifetime management. No allocation/performance improvement is measured.
+
+The consumer withdraws 128 subscriptions on one still-pending operation, exceeding the
+64 runtime slots without exhaustion. It checks scope exit, early return, repeated disposal,
+a surviving awaiter and disposal after admission. Success/fault cases pass in interpreter,
+JIT and AOT on macOS ARM64. [Evidence](experiments/scheduler-continuations/disposal-validation.json).
+No runtime/compiler service changes or Windows qualification are included.
+
+This is not automatic abandonment cleanup or concurrent unsubscription. Protected async
+cleanup is still limited; terminal faults do not unwind use, so runtime teardown remains
+responsible then. Production Task routing must address implicit await lifetime and
+cross-invocation ownership before adopting the prototype wholesale.

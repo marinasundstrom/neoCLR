@@ -30,6 +30,29 @@ Observers await explicit completion signals rather than relying on relative call
 order. Explicit OnCompleted calls are for deferred-observer/cancellation checks;
 ordinary asynchronous flow uses await. Every producer queue contains the pump sentinel.
 
+## Scoped observation cleanup
+
+The internal `Subscribe` adapter returns a disposable `Continuation` for explicit
+observation. Ordinary async code still uses await. `use observer = operation.Subscribe(...)`
+withdraws the dormant callback at scope exit; early return is covered. Dispose is
+idempotent and does not retract work already admitted to dispatch. It does not complete
+or cancel the Task and does not make Task or Promise disposable.
+
+Completion skips wrappers deliberately withdrawn through this adapter. It still faults
+if a pending wrapper's runtime handle is unexpectedly unavailable; unknown/foreign
+runtime handles must not be silently treated as an intentional managed withdrawal.
+Submitted/withdrawn flags are owner-thread state, not a thread-safe transition protocol.
+The outcome's list retains the small wrapper until completion, but the wrapper holds
+no callback reference and cancellation releases the runtime-held callable immediately.
+
+The executable checks 128 normal `use` exits on one pending operation (exceeding the
+64-slot capacity without exhaustion), cleanup on return, repeated explicit disposal,
+no reactivation, normal completion of a surviving waiter, and no retraction after
+activation. The existing terminal-fault consumer remains valid. Terminal faults do not
+unwind Raven `use` cleanup; runtime invocation teardown remains the root-release boundary
+on that path. This is explicit observation lifetime management, not automatic cleanup
+of unreachable/abandoned ordinary awaits, which remains open.
+
 ## Ownership and remaining design work
 
 Each `Continuation` captures `SchedulerCapture()` and immediately registers its
@@ -87,7 +110,8 @@ python3 docs/experiments/jit-async/verify.py \
 Use matching rebuilt runtime/backend binaries and the Xcode SDK environment described
 in the scheduler-projection experiment. [Original invocation-only evidence](validation.json) predates destination capture.
 [Captured-destination evidence](destinations-validation.json) predates runtime-owned
-registrations. [Registration lifecycle evidence](registrations-validation.json) records compiler,
+registrations. [Registration lifecycle evidence](registrations-validation.json) predates scoped
+observation cleanup. [Scoped-disposal evidence](disposal-validation.json) records compiler,
 bundle, shared source, runtime/backend and output hashes plus exact commands. Success
 and terminal-fault cases pass in interpreter, JIT and AOT on macOS ARM64 (six executions).
 Windows was not run. Runtime Contract configuration, compiler emission and class-library

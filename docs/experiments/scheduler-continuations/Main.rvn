@@ -111,6 +111,61 @@ module SchedulerContinuations {
         return 0
     }
 
+    func WithdrawObservers(operation: Completion) {
+        var index = 0
+        while index < 128 {
+            use observer = operation.Subscribe(CancelledRegistrationRan)
+            index += 1
+        }
+    }
+
+    func WithdrawOnReturn(operation: Completion) {
+        use observer = operation.Subscribe(CancelledRegistrationRan)
+        return
+    }
+
+    func DisposeTwice(operation: Completion) {
+        // Deliberate explicit disposal tests idempotence in addition to use cleanup.
+        use observer = operation.Subscribe(CancelledRegistrationRan)
+        observer.Dispose()
+        observer.Dispose()
+        if observer.TrySubmit() {
+            System.Fail("Withdrawn observer was reactivated")
+        }
+    }
+
+    func ObserveCompleted(operation: Completion) {
+        use observer = operation.Subscribe(operation.Observe)
+        if observer.TrySubmit() {
+            System.Fail("Admitted observer was submitted twice")
+        }
+        if operation.Deliveries != 0 {
+            System.Fail("Observation was not deferred")
+        }
+    }
+
+    async func ObserverDisposal() -> Task<int> {
+        let operation = Completion(UnpumpedProducer())
+        WithdrawObservers(operation)
+        WithdrawOnReturn(operation)
+        DisposeTwice(operation)
+        if operation.IsCompleted {
+            System.Fail("Observer disposal changed task state")
+        }
+        // A surviving waiter still completes; withdrawn subscriptions are skipped.
+        _ = neoCLR.Runtime.SchedulerSubmit(operation.Publish)
+        let value = await operation
+        if value != 42 {
+            System.Fail("Disposal disrupted surviving awaiter")
+        }
+        ObserveCompleted(operation)
+        _ = await operation.Observed.Task
+        if operation.Deliveries != 1 {
+            System.Fail("Disposal retracted admitted work")
+        }
+        return 0
+    }
+
     async func Main() -> Task<int> {
         _ = await Pending()
         Console.WriteLine("PASS multiple pending awaits without producer pump")
@@ -120,6 +175,8 @@ module SchedulerContinuations {
         Console.WriteLine("PASS cancellation without producer pump")
         _ = await RegistrationLifecycle()
         Console.WriteLine("PASS registration lifecycle is separate from task state")
+        _ = await ObserverDisposal()
+        Console.WriteLine("PASS scoped observer disposal preserves task state and admitted work")
         let abandoned = Continuation(CancelledRegistrationRan)
         Console.WriteLine("PASS dormant registration does not keep invocation alive")
         return 0

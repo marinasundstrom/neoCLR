@@ -93,6 +93,7 @@ def main():
                   'PASS completed await and deferred observer\n'
                   'PASS cancellation without producer pump\n'
                   'PASS registration lifecycle is separate from task state\n'
+                  'PASS scoped observer disposal preserves task state and admitted work\n'
                   'PASS dormant registration does not keep invocation alive\n', None),
                  ('continuation-fault', ROOT/'docs/experiments/scheduler-continuations/Fault.rvn', [], 1,
                   '', 'fault after continuation submission')]

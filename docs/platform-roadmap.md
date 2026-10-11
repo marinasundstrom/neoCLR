@@ -57,7 +57,9 @@ rejects foreign/expired destinations before retaining callbacks. Production Task
 registration and cross-invocation routing remain open. The internal awaitable now
 uses runtime-owned dormant registrations with one-shot activation/cancellation;
 Task remains the operation/state abstraction and Promise its producer-side completion
-source. Abandonment cleanup and race/lifetime rules remain production-migration gates. The interpreter readiness query now includes
+source. Explicit observers now have scoped disposable registrations, qualified for
+capacity reuse, early return and no retraction after activation in all three modes.
+Automatic await abandonment cleanup and race/lifetime rules remain production-migration gates. The interpreter readiness query now includes
 submitted work and keeps source/submission arbitration private;
 [quiescence contract and validation](runtime-scheduling-design.md#unified-interpreter-readiness--2026-10-11).
 

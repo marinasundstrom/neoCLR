@@ -8,6 +8,13 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-11
 
+- Add scoped disposable observers to the internal continuation experiment. Withdrawal
+  releases dormant runtime callbacks without changing Task state; completion skips
+  intentionally withdrawn observers, while disposal after activation leaves admitted
+  work intact. Scope exit, early return, idempotence and capacity reuse across 128 observers pass
+  in interpreter/JIT/AOT on macOS ARM64. Public Task/Promise routing and automatic
+  abandoned-await cleanup remain unchanged.
+
 - Record faithful logical async stacks as an author-directed runtime-suspension
   acceptance goal, with state-machine compatibility, source attribution, lifetime and
   cross-mode validation requirements. This is design direction, not shipped tracing.

@@ -245,7 +245,9 @@ the existing adapter. The experiment now captures an invocation identity and rej
 foreign or expired destinations. Its runtime-owned registration can be activated
 or cancelled once; that cancellation does not cancel the Task. Task represents the
 operation and state, while Promise is its producer-side completion source.
-Cross-invocation routing and production migration remain open.
+Explicit observers in that internal experiment can use scoped disposal to withdraw
+dormant callbacks without cancelling the Task. Automatic abandoned-await cleanup,
+cross-invocation routing and production migration remain open.
 A pending await currently resumes through the producer queue; custom queue and UI
 affinity are not settled contracts. Ordinary worker joins can still block the queue.
 
