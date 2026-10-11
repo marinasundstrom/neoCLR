@@ -1,0 +1,54 @@
+module RuntimeAwaitGc {
+    import System.*
+    import System.Tasks.*
+    import System.Runtime.GC
+
+    class Payload {
+        val Value: int
+        init(value: int) {
+            Value = value
+        }
+    }
+
+    async func Read(input: Task<Payload>) -> Task<int> {
+        let retained = Payload(25)
+        let value = await input
+        GC.Collect()
+        return retained.Value + value.Value
+    }
+
+    async func Round() -> Task<int> {
+        let source = Promise<Payload>()
+        let task = Read(source.Task)
+        GC.Collect()
+        _ = source.Complete(Payload(17))
+        return await task
+    }
+
+    async func Main() -> Task<int> {
+        var iteration = 0
+        var midpoint = 0L
+        let reclaimedBefore = GC.ReclaimedObjectCount
+        while iteration < 80 {
+            let value = await Round()
+            if value != 42 {
+                System.Fail("A live reference was collected")
+            }
+            GC.Collect()
+            iteration = iteration + 1
+            if iteration == 40 {
+                midpoint = GC.HeapObjectCount
+            }
+        }
+        GC.Collect()
+        if GC.ReclaimedObjectCount <= reclaimedBefore {
+            System.Fail("No unreachable objects were reclaimed")
+        }
+        // Same loop slots and await site: no per-iteration growth after warmup.
+        if GC.HeapObjectCount > midpoint + 8L {
+            System.Fail("Completed runtime async bodies retained unreachable objects")
+        }
+        Console.WriteLine("PASS Raven runtime async GC reclamation")
+        return 0
+    }
+}

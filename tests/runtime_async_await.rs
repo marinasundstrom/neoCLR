@@ -935,17 +935,23 @@ ret
 
 #[test]
 fn parked_activations_keep_managed_completion_dispatch_alive() {
-    assert_managed_dispatch_while_parked("");
+    assert_managed_dispatch_while_parked("", false);
 }
 
 #[test]
 fn suspended_managed_queue_callback_is_not_drained_recursively() {
     assert_managed_dispatch_while_parked(
         "ldc.i4 1\ncall neoCLR.Runtime.RuntimeAsyncDelay(Int32)\ncall neoCLR.Runtime.RuntimeAsyncAwait(Int64)\npop",
+        false,
     );
 }
 
-fn assert_managed_dispatch_while_parked(pause: &str) {
+#[test]
+fn managed_notifications_are_drained_again_after_an_activation_reparks() {
+    assert_managed_dispatch_while_parked("", true);
+}
+
+fn assert_managed_dispatch_while_parked(pause: &str, repeat_direct_wait: bool) {
     let source = r#".module App
 .entry Main
 .function Main() -> Int32
@@ -971,6 +977,14 @@ call neoCLR.Runtime.RuntimeAsyncAwait(Int64)
 ret
 .end
 "#;
+    let source = if repeat_direct_wait {
+        source.replace(
+            "ldloc queue\nfunction.bind fn<Int32> = instance System.Tasks.TaskQueue::Body()\ncall neoCLR.Runtime.RuntimeAsyncStart(fn<Int32>)\nstloc body\nldloc body",
+            "ldloc operation\ncall neoCLR.Runtime.RuntimeAsyncAwait(Int64)\npop\ncall neoCLR.Runtime.RuntimeAsyncCreate()\nstloc operation\nldloc queue\nldloc operation\nstfld System.Tasks.TaskQueue::Gate\nldloc operation",
+        )
+    } else {
+        source.to_owned()
+    };
     let system = neoclr::assemble(&format!(
         r#".module System
 .function neoCLR.Runtime.RuntimeAsyncDelay(Int32 ms) -> Int64
@@ -1036,7 +1050,7 @@ ret
     ))
     .unwrap();
     let app =
-        neoclr::assembler::read_modules(&[neoclr::assembler::ModuleInput::Source(source)], &system)
+        neoclr::assembler::read_modules(&[neoclr::assembler::ModuleInput::Source(&source)], &system)
             .unwrap()
             .remove(0);
     let p = LoadedProgram::with_library(&app, &system).unwrap();

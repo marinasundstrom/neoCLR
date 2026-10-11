@@ -8686,3 +8686,27 @@ The runtime owns retention/dispatch, the managed layer owns Task/Promise outcome
 and Raven owns eventual method/await lowering. Fault remains invocation-terminal.
 See [qualification and tradeoffs](experiments/runtime-async/README.md#managed-task-boundary-and-idle-dispatch-2026-10-11)
 and [matched evidence](experiments/runtime-async/managed-task-validation.json).
+
+
+## Raven language runtime-async POC (2026-10-11)
+
+Native emission now accepts explicit `--runtime-async-poc RuntimeAwaitProvider.Bridge`
+with `--async-library System.Runtime` and the source provider in the
+[runtime-async experiment](experiments/runtime-async/README.md#raven-runtime-async-language-poc-2026-10-11).
+Raven owns automatic closure/return/await lowering; the source helper owns managed
+Task/Promise outcome projection; the interpreter owns retained frames and dispatch.
+This is independent of CLR AsyncHelpers and does not change .NET or native defaults.
+
+Temporary encoding uses ordinary native methods and structural function captures,
+not an async metadata bit or emitted state-machine type. Private InternalCall handles
+and managed notification/cleanup callbacks remain scaffolding to replace with native
+await metadata/backend and runtime Task integration. Nongeneric reference/static
+methods, Task<T> awaits and supported captures are qualified; other shapes are bounded
+by explicit diagnostics and portable-emitter restrictions. No source-level async
+stack/debugging or JIT/AOT qualification is implied.
+
+The linked language, terminal-fault and GC sample reports include exact toolchain
+hashes, absent state-machine metadata and rejected configuration checks. Repeated
+suspension now triggers managed notification draining, without recursively or
+indefinitely re-entering a suspended legacy queue. Fault remains invocation-terminal.
+See Raven's matching `docs/compiler/neoclr-cli-bridge.md` and runtime-contract docs.

@@ -120,8 +120,9 @@ and cannot yet be configured. Delivery still requires scheduler progress. Operat
 DNS/connection deadline; the HTTP handler supplies its own exchange budget. The example
 controls its host and uses a verifier watchdog.
 Socket completion uses nonblocking polling; host lookup runs on bounded host threads.
-Generated Raven state machines still implement async execution. Runtime suspension
-remains future work.
+Generated Raven state machines still implement this networking path. The separate
+interpreter runtime-async POC has language support, but networking integration with
+that path remains unqualified.
 
 ## Where we’re heading
 

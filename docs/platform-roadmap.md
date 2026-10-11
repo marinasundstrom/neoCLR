@@ -42,13 +42,14 @@ The author reaffirms that Fault remains non-recoverable and invocation-terminal.
 Runtime async is the canonical model; compiler-generated state machines are a
 migration path and a useful compiler regression oracle, with eventual retirement
 as the goal. Qualification still precedes default switching.
-A source-local managed Task boundary now qualifies retained bodies producing
-reference, integer and unit results, cancellation and bounded handle reuse
-([evidence](experiments/runtime-async/managed-task-validation.json)). It also fixes
-idle retained-activation dispatch starvation; it is hand-written candidate lowering,
-not compiler-native await. Next are compiler-native
-await integration and equivalent state-machine
-comparisons before switching supported defaults. Native stack representation, preemption and
+Raven now has an explicit native runtime-async language POC: ordinary async methods
+and Main lower to retained bodies without generated state machines. The
+[language, fault and GC samples](experiments/runtime-async/README.md#raven-runtime-async-language-poc-2026-10-11)
+pass, including zero final live objects and bounded heap use across repeated nested
+suspension. The provider remains source-local and interpreter-only. Compare equivalent
+state-machine/runtime-async workloads next, then use that evidence to improve
+notification/lifetime costs and broaden qualification before switching defaults.
+Native stack representation, preemption and
 multi-core scheduling remain open. Task/Promise keep operation/producer roles.
 
 **Runtime async groundwork (2026-10-11):** the author directs implementation while

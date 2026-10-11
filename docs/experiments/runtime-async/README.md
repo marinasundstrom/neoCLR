@@ -1,10 +1,11 @@
 # Interpreter runtime-async experiments
 
-Current development status: [unit-result runtime async](#unit-result-runtime-async-poc-2026-10-11)
-extends the interpreter operations to unit alongside Int32. The ordinary-await
-adapter still emits state machines. Public Task/compiler-native await integration,
-managed lifetime and default switching remain open. Earlier sections record prior
-POC slices and their limitations at the time.
+Current development status: [Raven language support](#raven-runtime-async-language-poc-2026-10-11)
+now lowers ordinary async methods to retained bodies through an explicit native
+compiler option. Executable samples and GC reclamation checks pass without emitted
+state machines. This is interpreter-only and opt-in; production notification/lifetime
+integration, broader lowering and default switching remain open. Earlier sections
+record prior POC slices and their limitations at the time.
 
 Development experiment, 2026-10-11. `Yield.rvn` calls a private runtime boundary
 from ordinary Raven functions; no async state machine is generated for these calls.
@@ -454,3 +455,79 @@ Run with `validate.py --managed-task --bundle <bundle> --compiler <rvnc.dll>
 for this consumer until the selected bundle includes the portable condition fix.
 No public reference snapshot or website capability claim changes. Interpreter-only;
 JIT/AOT, automatic lowering/default selection and comparative benchmarks remain open.
+
+
+## Raven runtime-async language POC (2026-10-11)
+
+The native Raven compiler now supports ordinary `async`/`await` through
+`--runtime-async-poc RuntimeAwaitProvider.Bridge`, with explicit
+`--async-library System.Runtime` and the source-included
+[provider](RuntimeAsyncBridge.rvn). The [language sample](RuntimeAwait.rvn) uses
+ordinary async module functions and an instance method, including async Main.
+There is no hand-written per-method async wrapper in that sample and metadata
+inspection finds no AsyncStateMachine references. This meets the bounded
+language-support POC milestone; it does not switch defaults.
+
+The native backend creates an ordinary closure capturing parameters and a reference
+receiver, invokes it through the selected Start helper, and rewrites awaits to a
+single Task evaluation, a completion wait and a successful GetResult. Cancellation
+returns a cancelled outcome immediately. The provider completes an existing managed
+Promise<T>, so Task<T> remains the operation/outcome and Promise the producer.
+The runtime retains frames and owns dispatch. Fault is never captured as an outcome.
+The non-unit fallthrough guard remains terminal, including after System.Fail.
+
+The explicit emission contract is separate from Raven's CLR runtime-async flag.
+It selects a source-assembly type with generic static Start, Wait, Complete and
+Cancel methods whose Task, callback and result signatures agree. The current
+provider uses TaskOutcome<T>, existing private runtime operations and legacy managed
+notifications. Default compilation still generates state machines. No public Task,
+Scheduler, native ABI or API-reference addition is made by this experiment.
+
+Supported qualification covers nongeneric module/static and reference-instance
+methods on nongeneric owners, supported immutable parameter captures, Task<T>
+awaits, explicit/implicit returns, unit and reference results. Generic methods and
+owners, value receivers, nested async functions, other awaitable patterns, and
+return expressions inside value expressions are rejected. Portable expression and
+capture restrictions still apply. More complex cleanup/protected regions need
+separate qualification. Unsupported shapes do not silently switch back to state
+machines. Project/default selection, source-level async stack presentation and
+JIT/AOT suspension remain open.
+
+### Samples and GC qualification
+
+- [Language sample evidence](runtime-language-validation.json): eager, pending,
+  repeated and nested awaits; live references across GC; instance/parameter capture;
+  unit completion and cancellation. Missing provider/configuration fail compilation
+  without producing an artifact.
+- [Fault sample](RuntimeAwaitFault.rvn) and [evidence](runtime-language-fault-validation.json):
+  a fault after suspension terminates the invocation with the original UserFault;
+  code after the awaited task never executes. No recoverable faulted Task is created.
+- [GC sample](RuntimeAwaitGc.rvn) and [evidence](runtime-language-gc-validation.json):
+  80 nested suspend/resume cycles, preserved live locals/results, positive reclamation,
+  and no continuing growth beyond an eight-object tolerance after the midpoint.
+- [Independent heap observations](runtime-language-gc-heap.json): two executions each
+  allocate 4,736 objects, reclaim all 4,736 and finish with zero live objects; peak
+  heap size is 63 and each records 242 collections. This checks reclamation during
+  repeated execution and at invocation teardown, not just survival of live roots.
+
+The GC sample exposed a second dispatch gap: an activation could post managed
+notifications and park again after the previous drain had finished. Parking now
+requests a fresh drain. If a legacy queue callback itself suspends, finishing that
+Drain clears the request rather than starting an endless series of empty passes.
+A watchdog regression covers repeated parking; the suspended-queue regression
+continues to reject recursive draining. All 33 runtime-operation tests and 18
+entry/scheduler/timer/yield checks pass (51 total).
+
+Run `validate.py --runtime-await` with the explicit bundle/compiler/runtime/output
+arguments above. Add `--runtime-sample gc` or `--runtime-sample fault` for those
+samples. Each report records artifact hashes and checks the absence of generated
+state machines. The private release host `runtime_async_interpreter` additionally
+checks final heap state with metadata loading/verification outside invocation timing.
+This is POC measurement scaffolding, not a new benchmarking-framework API.
+
+Compared with .NET's TaskCompletionSource/builder split, managed outcomes stay in
+Task/Promise while execution state moves to runtime frames. The source provider's
+signals, callbacks, completion unions and lifetime objects add allocation overhead.
+The direct benefits to qualify are simpler generated execution state and lower
+execution cost; neither general throughput nor allocation superiority is assumed.
+Further benchmark evidence should guide replacing that scaffolding before defaults.

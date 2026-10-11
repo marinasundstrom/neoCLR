@@ -104,7 +104,11 @@ or loading its dependencies. Its output is a diagnostic listing, not reassemblab
 
 The native target does not support every Raven or .NET feature. Local nongeneric class
 virtual dispatch is supported; external class overrides and generic virtual classes
-remain limited. Runtime suspension and green threads are not implemented.
+remain limited. An explicit development compiler option now exercises ordinary
+async methods through retained interpreter frames, with sample and GC checks.
+[Runtime-async POC details](../features/tasks/#direction) describe its limits; this
+is not the default mode or JIT/AOT suspension support. General green threads remain
+unfinished.
 
 [Install and run →](../try/) · [HTTP application case →](../cases/http-server/) ·
 [API reference →](../docs/)

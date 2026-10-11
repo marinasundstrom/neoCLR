@@ -1,0 +1,97 @@
+module RuntimeAwaitSample {
+    import System.*
+    import System.Tasks.*
+
+    class Payload {
+        val Value: int
+        init(value: int) {
+            Value = value
+        }
+    }
+
+    async func Read(input: Task<Payload>) -> Task<Payload> {
+        let retained = Payload(25)
+        let value = await input
+        System.Runtime.GC.Collect()
+        return Payload(retained.Value + value.Value)
+    }
+
+    async func Nested(input: Task<Payload>) -> Task<int> {
+        let value = await Read(input)
+        return value.Value
+    }
+
+    async func Unit(input: Task<()>) -> Task<()> {
+        await input
+    }
+
+    async func Eager() -> Task<int> => 42
+
+    class OffsetReader {
+        private val offset: int
+        init(offset: int) {
+            self.offset = offset
+        }
+        async func Read(input: Task<int>) -> Task<int> {
+            let value = await input
+            return value + offset
+        }
+    }
+
+    class CancellationObserver {
+        private val task: Task<Payload>
+        private val source = Promise<bool>()
+        init(task: Task<Payload>) {
+            self.task = task
+        }
+        val Task: Task<bool> => source.Task
+        // Explicit terminal-outcome observer: awaiting cancellation cancels the caller.
+        func Complete() -> System.Void {
+            _ = source.Complete(task.IsCompleted && task.IsCancelled)
+        }
+    }
+
+    async func Main() -> Task<int> {
+        let source = Promise<Payload>()
+        let first = Read(source.Task)
+        let nested = Nested(source.Task)
+        if first.IsCompleted || nested.IsCompleted {
+            System.Fail("Runtime async body completed before its input")
+        }
+        System.Runtime.GC.Collect()
+        _ = source.Complete(Payload(17))
+        let firstResult = await first
+        let nestedResult = await nested
+        let repeated = await first
+        if firstResult.Value != 42 || nestedResult != 42 || repeated.Value != 42 {
+            System.Fail("Runtime async lost a retained result")
+        }
+        let unitSource = Promise<()>()
+        let unit = Unit(unitSource.Task)
+        _ = unitSource.Complete(())
+        await unit
+        let eager = await Eager()
+        if eager != 42 {
+            System.Fail("Runtime async eager result failed")
+        }
+        let instanceSource = Promise<int>()
+        let reader = OffsetReader(25)
+        let instanceTask = reader.Read(instanceSource.Task)
+        _ = instanceSource.Complete(17)
+        let instanceResult = await instanceTask
+        if instanceResult != 42 {
+            System.Fail("Runtime async did not retain its receiver and parameter")
+        }
+        let cancelled = Promise<Payload>()
+        let cancelledTask = Read(cancelled.Task)
+        let observer = CancellationObserver(cancelledTask)
+        cancelledTask.OnCompleted(observer.Complete)
+        _ = cancelled.Cancel()
+        let observed = await observer.Task
+        if !observed {
+            System.Fail("Runtime async cancellation was not propagated")
+        }
+        Console.WriteLine("PASS Raven runtime async language support")
+        return 0
+    }
+}

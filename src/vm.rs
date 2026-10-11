@@ -2480,6 +2480,9 @@ fn interpret_instructions_with_dispatch(
                     } else {
                         true
                     };
+                    // The activation may have posted managed Promise notifications
+                    // before suspending, without completing a runtime callback.
+                    *drain_required = true;
                     parked_activations.push(ParkedActivation {
                         frames: detached,
                         boundary,
@@ -4648,6 +4651,18 @@ fn interpret_instructions_with_dispatch(
                         || frame.constructing;
                     let value = constructed_object.map_or(value, Value::ObjectReference);
                     let runtime_callback = frame.runtime_callback;
+                    if task_queue::member(&function) == "Drain"
+                        && default_task_queue.as_ref().is_some_and(|queue| {
+                            frame.function.owner.as_ref() == Some(&queue.ty())
+                                && frame.args.first().is_some_and(|argument| {
+                                    argument.borrow().get().is_ok_and(|value| value == *queue)
+                                })
+                        })
+                    {
+                        // Parking inside this drain can request a later pass. The
+                        // queue has now finished draining, including newly posted work.
+                        *drain_required = false;
+                    }
                     if let Some(operation) = frame.async_result {
                         match value {
                             Value::Int32(result) => async_operations.complete_body(operation, result),

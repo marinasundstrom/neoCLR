@@ -1,0 +1,32 @@
+{
+  "hostSha256": "48a53f6480bb484addc9389ae0111af1a7513df1675c0311db50d6b8f22e2541",
+  "hostSourceSha256": "dd050dedfabace395a377144acf84c6b8405b84b05bcaca01ccd4c5802340b02",
+  "validationSha256": "236fd684fb61ca5edc96d18aa5e9154ee5c129bf8d8cc923d0b2564f1cedb7a2",
+  "command": [
+    "/Users/robert/Projects/neoclr/target/scheduler-wait-validation/release/examples/runtime_async_interpreter",
+    "/Users/robert/Projects/neoclr/target/runtime-async-language-gc-final/app.dll",
+    "/Users/robert/Projects/neoclr/target/data-cases-bundle",
+    "2"
+  ],
+  "prepareSeconds": 1.8532982919999998,
+  "runs": [
+    {
+      "allocatedObjects": 4736,
+      "collections": 242,
+      "liveObjects": 0,
+      "peakObjects": 63,
+      "reclaimedObjects": 4736,
+      "seconds": 1.427037583,
+      "stdout": "PASS Raven runtime async GC reclamation\n"
+    },
+    {
+      "allocatedObjects": 4736,
+      "collections": 242,
+      "liveObjects": 0,
+      "peakObjects": 63,
+      "reclaimedObjects": 4736,
+      "seconds": 1.425105209,
+      "stdout": "PASS Raven runtime async GC reclamation\n"
+    }
+  ]
+}

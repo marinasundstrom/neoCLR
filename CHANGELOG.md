@@ -8,6 +8,14 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-11
 
+- Qualify Raven's explicit native runtime-async language POC: ordinary async methods
+  and Main produce managed Tasks using retained runtime bodies, without generated
+  state machines. Add executable nested/reference/receiver/unit/cancellation/fault
+  samples and GC reclamation evidence. Fix repeated-suspension notification draining
+  without recursively or indefinitely re-entering legacy queues. This remains an
+  interpreter-only, source-provider experiment; defaults and public Task APIs stay
+  unchanged, with unsupported compiler shapes explicitly bounded.
+
 - Keep managed notifications and host-completion dispatch active when interpreter
   runtime-async activations are all parked; avoid recursive legacy queue draining
   and drain continuations posted by completed retained bodies. Add a compiled

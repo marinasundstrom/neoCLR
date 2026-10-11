@@ -15028,3 +15028,22 @@ or runtime-await default switch was performed.
   pass. Body methods are ordinary retained frames; the wrapper is hand-written.
   Automatic compiler lowering, production lifetime/notification routing and measured
   comparison remain open. No default switch or performance claim was made.
+
+
+### Raven language support, sample tests and GC — 2026-10-11
+
+- **Author:** clarified that the goal is runtime async with Raven language support,
+  followed by benchmarks; additionally requested sample tests and GC investigation
+  to establish that unreachable objects are collected.
+- **Assistant action:** implemented explicit native compiler lowering for ordinary
+  async methods/Main using the qualified managed provider and retained runtime
+  bodies. Added language, terminal-fault and repeated-suspension GC samples, plus
+  provider/configuration rejection and metadata checks.
+- **Findings/fixes:** non-unit terminal-fault bodies needed a compiler fallthrough
+  guard; repeated suspension exposed a missing notification drain request. Clearing
+  the request when a suspended legacy Drain actually finishes prevents endless
+  re-draining. Both gaps were fixed before measurement.
+- **Outcome:** samples pass without state-machine metadata. GC host observations
+  show 4,736 objects allocated/reclaimed per execution, zero final live objects and
+  a peak of 63. [Evidence and limitations](experiments/runtime-async/README.md#raven-runtime-async-language-poc-2026-10-11).
+  This is opt-in interpreter support, not the final provider ABI or a default switch.

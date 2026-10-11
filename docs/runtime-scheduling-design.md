@@ -1541,3 +1541,17 @@ must continue servicing the shared completion dispatcher; their presence cannot
 short-circuit managed notifications or native host delivery. Suspended legacy queues
 are not drained recursively. The experiment records the adapter's allocation,
 lifetime and serial-queue costs; no performance gain is claimed.
+
+
+### Language support and reclamation qualification — 2026-10-11
+
+Raven's native emitter now automatically supplies the experimental retained-body
+wrapper and Task await boundary through explicit provider selection. The
+[executable language/GC samples](experiments/runtime-async/README.md#raven-runtime-async-language-poc-2026-10-11)
+qualify nested suspension, managed cancellation, invocation-terminal faults, root
+survival and reclamation without emitted state machines. Re-parking must request a
+managed notification drain; a suspended legacy queue remains serial, and its actual
+Drain completion clears that request. This preserves the runtime/managed layering
+without promoting the temporary provider or queue integration to public contracts.
+Comparative timing/allocation results are the next readiness evidence, not a reason
+to infer JIT/AOT support or switch defaults prematurely.

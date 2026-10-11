@@ -221,7 +221,7 @@ See [networking](../networking/) and [HTTP](../web/) for operation-specific clea
 
 Both platforms expose awaitable completion. neoCLR uses Promise for producer completion and Result values for expected errors; Task has no faulted outcome. This differs from .NET Task’s exception-based fault state and requires different library and compiler contracts.
 
-Raven emits state machines, with a private invocation scheduler delivering native
+By default Raven emits state machines, with a private invocation scheduler delivering native
 completion through TaskQueue. Native JIT/AOT hosts now share a private completion
 step that distinguishes ready work, pending outcomes and idle sources; callback roots
 remain retained through dispatch. Outer native HTTP hosts now explicitly acquire and
@@ -259,7 +259,13 @@ The intended foundation is runtime-owned asynchrony, with language implementatio
 projecting their async constructs onto a shared lifecycle. Native languages and other
 runtimes should eventually integrate through explicit ownership and completion
 adapters; no foreign-runtime async ABI is implemented or selected.
-Runtime-owned suspension and broader cleanup support remain future directions. Their scheduling, isolation and lifetime rules need design;
+A separate, opt-in [Raven runtime-async POC](https://github.com/marinasundstrom/neoCLR/blob/main/docs/experiments/runtime-async/README.md#raven-runtime-async-language-poc-2026-10-11)
+now lowers ordinary async methods and Main to retained interpreter bodies without
+generated state machines. Its source-included provider returns ordinary Task values.
+Executable samples cover nested awaits, reference/receiver retention, unit results,
+cancellation, terminal faults and GC reclamation. This is development support, with
+restricted method/await shapes and no JIT/AOT qualification or default switch.
+Production notification/lifetime integration and broader cleanup remain open;
 a managed Scheduler API backed by runtime implementation is the selected direction,
 with Task/Promise remaining managed. Its members are not yet selected or implemented.
 See the [builder contracts](../../docs/async-builders.html)
