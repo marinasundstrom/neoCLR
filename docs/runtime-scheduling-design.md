@@ -902,3 +902,9 @@ changes with state machines unchanged; later compare state-machine and runtime-s
 execution on the same scheduler. The .NET-style state-machine path is the local baseline;
 external .NET/Go/JavaScript comparisons are separate studies. Document regressions and
 tradeoffs as well as gains; no percentage target or speedup is assumed in advance.
+
+The first [retained state-machine baseline](../benchmarks/scheduler/README.md) now
+executes completed and pending sequential awaits in interpreter/JIT/AOT on macOS ARM64.
+It records external startup and batch timing, not allocation, retained-memory or
+per-resumption latency measurements. General async benchmark lifecycle support and
+runtime-suspension comparison remain open.

@@ -258,6 +258,12 @@ for the supported compiler integration.
 
 [Related proposals and open questions →](../../proposals/#async)
 
+[Development measurement](https://github.com/marinasundstrom/neoCLR/blob/main/benchmarks/scheduler/README.md) now includes completed and pending sequential-await workloads
+for the current state-machine path in interpreter, JIT and AOT. Startup and external
+batch timings are separate; runtime-suspension comparisons and allocation/retained-memory
+measurements remain future work. These baseline runs do not establish a performance
+improvement.
+
 <a id="feedback"></a>
 
 ## Questions and contributions

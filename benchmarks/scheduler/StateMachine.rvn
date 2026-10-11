@@ -1,0 +1,104 @@
+module Benchmarks.Scheduler {
+    import System.*
+    import System.Tasks.*
+    import System.Result.*
+
+    // Internal projection under test; not a public class-library Scheduler.
+    class Completion {
+        val Done = Promise<int>()
+        var Calls = 0
+
+        func Complete() -> System.Void {
+            Calls += 1
+            Done.Complete(1)
+            return ()
+        }
+    }
+
+    async func RunOperation(pending: bool) -> Task<int> {
+        var total = 0
+        var index = 0
+        while index < 32 {
+            if pending {
+                let completion = Completion()
+                _ = neoCLR.Runtime.SchedulerSubmit(completion.Complete)
+                if completion.Calls != 0 {
+                    System.Fail("Submission executed inline")
+                }
+                let value = await completion.Done.Task
+                if completion.Calls != 1 {
+                    System.Fail("Callback delivery count changed")
+                }
+                total += value
+            } else {
+                let value = await Task.FromResult(1)
+                total += value
+            }
+            index += 1
+        }
+        if total != 32 {
+            System.Fail("Await checksum mismatch")
+        }
+        return 1
+    }
+
+    func ParseCount(text: string) -> int {
+        let Ok(value) = Int32.Parse(text) else {
+            System.Fail("Invalid count")
+        }
+        return value
+    }
+
+    async func Main(arguments: string[]) -> Task<int> {
+        if arguments.Length != 3 {
+            System.Fail("Expected case, warmups and operations")
+        }
+        let name = arguments[0]
+        if name != "await.completed" && name != "await.pending" {
+            System.Fail("Unknown scheduler benchmark")
+        }
+        let warmups = ParseCount(arguments[1])
+        let operations = ParseCount(arguments[2])
+        if warmups < 0 {
+            System.Fail("Benchmark count outside supported range")
+        }
+        if warmups > 10000 {
+            System.Fail("Benchmark count outside supported range")
+        }
+        if operations < 1 {
+            System.Fail("Benchmark count outside supported range")
+        }
+        if operations > 10000 {
+            System.Fail("Benchmark count outside supported range")
+        }
+
+        let pending = name == "await.pending"
+        Console.WriteLine("NEOBENCH/1 READY")
+        var index = 0
+        while index < warmups {
+            let result = await RunOperation(pending)
+            if result != 1 {
+                System.Fail("Warmup failed")
+            }
+            index += 1
+        }
+        Console.WriteLine("NEOBENCH/1 BEGIN")
+        index = 0
+        var checksum = 0
+        while index < operations {
+            let result = await RunOperation(pending)
+            checksum += result
+            index += 1
+        }
+        Console.WriteLine("NEOBENCH/1 END")
+        Console.WriteLine(checksum)
+        return 0
+    }
+}
+
+module neoCLR.Runtime {
+    import System.Runtime.CompilerServices.*
+
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    internal extern func SchedulerSubmit(callback: () -> System.Void) -> int;
+}

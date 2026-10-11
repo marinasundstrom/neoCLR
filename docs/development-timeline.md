@@ -14757,6 +14757,11 @@ outside benchmark measurement. Implementation follows the configuration slice.
   matched workloads within each execution mode, separate scheduler versus suspension
   comparisons, startup versus steady-state measurements and explicit allocation/memory
   instrumentation. Reuse the independent benchmark framework and retain raw evidence.
-- **Open:** produce the current-path baseline and instrument missing metrics; runtime
-  suspension is not yet available for a paired comparison. Existing projection checks
-  are correctness evidence and do not establish a speedup.
+- **Assistant follow-through:** added a dedicated async worker for completed and pending
+  sequential awaits, reusing the independent external benchmark runner. Recorded the
+  [current state-machine baseline](../benchmarks/scheduler/README.md) in all three modes
+  on macOS ARM64, with startup separated from batch timing. Enabled the reserved
+  scheduler binding in the development JIT CLI, which the new consumer required.
+- **Open:** instrument allocation/retained memory and extend representative workloads;
+  runtime suspension is not yet available for a paired comparison. These baseline
+  samples do not establish an improvement from a scheduler or suspension change.

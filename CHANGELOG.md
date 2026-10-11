@@ -8,6 +8,14 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-11
 
+- Add a reproducible scheduler state-machine benchmark worker for completed and
+  pending sequential awaits, using the independent external runner in interpreter,
+  JIT and AOT. Record macOS ARM64 baseline samples with startup separate from batch
+  timing; allocation/memory instrumentation and runtime-suspension comparisons remain
+  follow-ups. Enable the reserved scheduler binding in the development JIT CLI so
+  ordinary CLI consumers can use the existing internal projection. No public
+  Scheduler API or compiler-lowering change is introduced.
+
 - Record the author-directed runtime async foundation: language projections and
   eventual native/foreign-runtime integration over shared lifecycle and ownership
   contracts. Document proposed layers, tradeoffs and validation gates; this is design

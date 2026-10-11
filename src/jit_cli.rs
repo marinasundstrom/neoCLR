@@ -62,6 +62,7 @@ pub(crate) fn run(
         "--bind-system-culture",
         "--bind-time-zone-rules",
         "--bind-task-queue",
+        "--bind-scheduler",
         "--bind-timers",
         "--bind-socket-listener",
         "--bind-socket-accept",

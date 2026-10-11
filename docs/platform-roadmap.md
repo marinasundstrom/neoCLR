@@ -56,7 +56,11 @@ baseline and measure scheduler/suspension changes as they develop. Compare equiv
 workloads within each execution mode, isolate scheduler changes from suspension changes,
 and separate startup from steady-state latency/throughput, allocation and retained
 memory. See the [measurement gates](runtime-scheduling-design.md#scheduler-and-suspension-benchmark-requirement--2026-10-11).
-Correctness qualification alone establishes no performance improvement.
+Correctness qualification alone establishes no performance improvement. A first
+[state-machine baseline](../benchmarks/scheduler/README.md) now measures completed and
+pending sequential awaits through the existing external runner in interpreter/JIT/AOT.
+Allocation and retained-memory instrumentation, broader workloads and the future
+runtime-suspension comparison remain open.
 
 **Common language runtime clarification (2026-10-11):** the primary target is managed
 languages running bytecode through the interpreter or JIT, with native AOT as the

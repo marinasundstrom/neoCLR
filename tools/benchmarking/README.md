@@ -14,7 +14,7 @@ not API or measurement equivalence with BenchmarkDotNet.
 | Host runner | [`runner.py`](../../benchmarks/framework/runner.py): isolated processes, configuration, validation and JSON reports |
 | Preparation | [`benchmarks/json/prepare.py`](../../benchmarks/json/prepare.py): current macOS build-recipe adapter |
 | API reference | [Benchmark APIs](../../api-docs/benchmarking.md), site route `/docs/benchmarking.html` |
-| Workloads | [JSON](../../benchmarks/json/README.md), [HTTP](../../benchmarks/jit-http/README.md) |
+| Workloads | [JSON](../../benchmarks/json/README.md), [HTTP](../../benchmarks/jit-http/README.md), [scheduler](../../benchmarks/scheduler/README.md) |
 
 `[Benchmark]` marks a module function returning `1` after checking correctness.
 Independent benchmark-owned `[Arguments]`/`[ArgumentsSource]` create separately
@@ -72,3 +72,7 @@ The current worker is synchronous. Typed-object/collection JSON workloads, inter
 monotonic timing, async operations, lifecycle/reset hooks and diagnostics remain
 incremental work. Migrate workloads as needed. Existing timings are exploratory;
 functional framework checks do not establish performance rankings.
+
+The [scheduler baseline](../../benchmarks/scheduler/README.md) uses a dedicated async
+worker over the same external protocol. General async attribute discovery/lifecycle
+support is still unimplemented; this worker does not change the synchronous API.

@@ -8297,3 +8297,9 @@ not imply this feature is available from an arbitrary Raven-main build.
 The companion Raven shared-main documentation is committed at `f92f5ca43`; it changes
 no compiler binary and distinguishes reported integration evidence from Raven-main
 execution qualification.
+
+The development `neoclr run --execution jit` adapter now includes the reserved scheduler
+binding alongside task/timer bindings. The backend still requires explicit opt-in;
+the CLI provides that opt-in for its trusted native host. The [scheduler baseline](../benchmarks/scheduler/README.md)
+exercises the normal CLI with argument-taking async Main. No compiler configuration,
+metadata encoding or lowering change is introduced by this CLI addition.
