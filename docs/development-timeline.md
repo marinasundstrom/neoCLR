@@ -14586,3 +14586,18 @@ remain historical rather than being reassigned to the changed source.
 144 measured operations and 36 warmups. A manual selector colliding with the
 discovered function is rejected and leaves no runnable registry/manifest.
 [Evidence](../benchmarks/json/discovery-evidence/results.json).
+
+
+### 2026-10-11 — Configurable measurements and case data
+
+**Author direction:** benchmarks should be configurable to measure different things.
+The assistant separates workload definition from measurement configuration and
+implements manifest/config/CLI precedence, explicit external measurement views and
+effective-settings reports. Seven controller/configuration tests and 27 real worker
+processes pass across startup, batch latency/throughput and first-invocation views.
+Internal timing and allocation diagnostics remain unsupported.
+
+**Author clarification:** both test and benchmark frameworks need input data,
+either inline in attributes or from a data-source method; each row is its own case.
+The assistant accepts this shared model, with source evaluation during registration
+outside benchmark measurement. Implementation follows the configuration slice.

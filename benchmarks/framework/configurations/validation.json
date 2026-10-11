@@ -1,0 +1,384 @@
+{
+  "passed": true,
+  "cases": [
+    {
+      "configuration": {
+        "measurement": "startup",
+        "modes": [
+          "interpreter",
+          "jit",
+          "aot"
+        ],
+        "rounds": 3,
+        "warmups": 0,
+        "operations": 1,
+        "timeout": 120
+      },
+      "origins": {
+        "measurement": "config",
+        "modes": "config",
+        "rounds": "config",
+        "warmups": "config",
+        "operations": "config",
+        "timeout": "default"
+      },
+      "primaryMetric": {
+        "name": "startupSeconds",
+        "unit": "seconds"
+      },
+      "samples": [
+        {
+          "startupSeconds": 2.143025083,
+          "warmupSeconds": 4.258299999992943e-05,
+          "batchSeconds": 0.2080079170000002,
+          "operations": 1,
+          "operationsPerSecond": 4.807509321868739,
+          "case": "Benchmarks.Json.DeserializeNodes",
+          "mode": "interpreter",
+          "round": 0
+        },
+        {
+          "startupSeconds": 1.881934667,
+          "warmupSeconds": 4.658300000048854e-05,
+          "batchSeconds": 0.00524229199999926,
+          "operations": 1,
+          "operationsPerSecond": 190.75625699601264,
+          "case": "Benchmarks.Json.DeserializeNodes",
+          "mode": "jit",
+          "round": 0
+        },
+        {
+          "startupSeconds": 0.012756582999999821,
+          "warmupSeconds": 2.195899999968276e-05,
+          "batchSeconds": 0.0052227080000006865,
+          "operations": 1,
+          "operationsPerSecond": 191.47155077401771,
+          "case": "Benchmarks.Json.DeserializeNodes",
+          "mode": "aot",
+          "round": 0
+        },
+        {
+          "startupSeconds": 1.7207995839999999,
+          "warmupSeconds": 3.687499999927013e-05,
+          "batchSeconds": 0.005355875000000232,
+          "operations": 1,
+          "operationsPerSecond": 186.7108549023188,
+          "case": "Benchmarks.Json.DeserializeNodes",
+          "mode": "jit",
+          "round": 1
+        },
+        {
+          "startupSeconds": 0.01281933400000046,
+          "warmupSeconds": 2.145799999997422e-05,
+          "batchSeconds": 0.005526749999999581,
+          "operations": 1,
+          "operationsPerSecond": 180.93816438233608,
+          "case": "Benchmarks.Json.DeserializeNodes",
+          "mode": "aot",
+          "round": 1
+        },
+        {
+          "startupSeconds": 2.3791899999999995,
+          "warmupSeconds": 4.316700000117635e-05,
+          "batchSeconds": 0.21021362499999974,
+          "operations": 1,
+          "operationsPerSecond": 4.757065580311463,
+          "case": "Benchmarks.Json.DeserializeNodes",
+          "mode": "interpreter",
+          "round": 1
+        },
+        {
+          "startupSeconds": 0.011056082999999717,
+          "warmupSeconds": 1.0083999999466187e-05,
+          "batchSeconds": 0.005371583000000513,
+          "operations": 1,
+          "operationsPerSecond": 186.16486052619956,
+          "case": "Benchmarks.Json.DeserializeNodes",
+          "mode": "aot",
+          "round": 2
+        },
+        {
+          "startupSeconds": 2.1210390419999996,
+          "warmupSeconds": 7.879200000004971e-05,
+          "batchSeconds": 0.21940433299999995,
+          "operations": 1,
+          "operationsPerSecond": 4.55779512795675,
+          "case": "Benchmarks.Json.DeserializeNodes",
+          "mode": "interpreter",
+          "round": 2
+        },
+        {
+          "startupSeconds": 1.7393655829999997,
+          "warmupSeconds": 3.82499999993513e-05,
+          "batchSeconds": 0.005103583000000356,
+          "operations": 1,
+          "operationsPerSecond": 195.94077337430005,
+          "case": "Benchmarks.Json.DeserializeNodes",
+          "mode": "jit",
+          "round": 2
+        }
+      ]
+    },
+    {
+      "configuration": {
+        "measurement": "first-invocation",
+        "modes": [
+          "interpreter",
+          "jit",
+          "aot"
+        ],
+        "rounds": 3,
+        "warmups": 0,
+        "operations": 1,
+        "timeout": 120
+      },
+      "origins": {
+        "measurement": "config",
+        "modes": "config",
+        "rounds": "config",
+        "warmups": "config",
+        "operations": "config",
+        "timeout": "default"
+      },
+      "primaryMetric": {
+        "name": "batchSeconds",
+        "unit": "seconds"
+      },
+      "samples": [
+        {
+          "startupSeconds": 2.712375542,
+          "warmupSeconds": 4.466700000005375e-05,
+          "batchSeconds": 0.25321204099999983,
+          "operations": 1,
+          "operationsPerSecond": 3.94925926923041,
+          "case": "Benchmarks.Json.DeserializeNodes",
+          "mode": "interpreter",
+          "round": 0
+        },
+        {
+          "startupSeconds": 1.9598227920000002,
+          "warmupSeconds": 3.629199999988231e-05,
+          "batchSeconds": 0.0051340409999998116,
+          "operations": 1,
+          "operationsPerSecond": 194.7783432193153,
+          "case": "Benchmarks.Json.DeserializeNodes",
+          "mode": "jit",
+          "round": 0
+        },
+        {
+          "startupSeconds": 0.013706666000000034,
+          "warmupSeconds": 1.9542000000427606e-05,
+          "batchSeconds": 0.0054792499999996025,
+          "operations": 1,
+          "operationsPerSecond": 182.50672993567963,
+          "case": "Benchmarks.Json.DeserializeNodes",
+          "mode": "aot",
+          "round": 0
+        },
+        {
+          "startupSeconds": 1.720623583,
+          "warmupSeconds": 3.5208999999980506e-05,
+          "batchSeconds": 0.0051677500000000265,
+          "operations": 1,
+          "operationsPerSecond": 193.50781287794396,
+          "case": "Benchmarks.Json.DeserializeNodes",
+          "mode": "jit",
+          "round": 1
+        },
+        {
+          "startupSeconds": 0.010971374999999561,
+          "warmupSeconds": 1.0249999999878412e-05,
+          "batchSeconds": 0.005171666999999935,
+          "operations": 1,
+          "operationsPerSecond": 193.36125083073068,
+          "case": "Benchmarks.Json.DeserializeNodes",
+          "mode": "aot",
+          "round": 1
+        },
+        {
+          "startupSeconds": 2.2660339170000006,
+          "warmupSeconds": 3.262499999934221e-05,
+          "batchSeconds": 0.21333270799999937,
+          "operations": 1,
+          "operationsPerSecond": 4.687513740274665,
+          "case": "Benchmarks.Json.DeserializeNodes",
+          "mode": "interpreter",
+          "round": 1
+        },
+        {
+          "startupSeconds": 0.011011417000000634,
+          "warmupSeconds": 1.5207999998878563e-05,
+          "batchSeconds": 0.005226874999999964,
+          "operations": 1,
+          "operationsPerSecond": 191.3189046992719,
+          "case": "Benchmarks.Json.DeserializeNodes",
+          "mode": "aot",
+          "round": 2
+        },
+        {
+          "startupSeconds": 2.1032417500000005,
+          "warmupSeconds": 3.608299999946496e-05,
+          "batchSeconds": 0.206452917,
+          "operations": 1,
+          "operationsPerSecond": 4.843719403586824,
+          "case": "Benchmarks.Json.DeserializeNodes",
+          "mode": "interpreter",
+          "round": 2
+        },
+        {
+          "startupSeconds": 1.7779422919999988,
+          "warmupSeconds": 3.9125000000694854e-05,
+          "batchSeconds": 0.005484167000000539,
+          "operations": 1,
+          "operationsPerSecond": 182.34309786698722,
+          "case": "Benchmarks.Json.DeserializeNodes",
+          "mode": "jit",
+          "round": 2
+        }
+      ]
+    },
+    {
+      "configuration": {
+        "measurement": "batch-latency",
+        "modes": [
+          "jit",
+          "aot"
+        ],
+        "rounds": 3,
+        "warmups": 2,
+        "operations": 8,
+        "timeout": 120
+      },
+      "origins": {
+        "measurement": "override",
+        "modes": "override",
+        "rounds": "config",
+        "warmups": "config",
+        "operations": "config",
+        "timeout": "default"
+      },
+      "primaryMetric": {
+        "name": "batchSeconds",
+        "unit": "seconds"
+      },
+      "samples": [
+        {
+          "startupSeconds": 1.7446032500000002,
+          "warmupSeconds": 0.010277832999999958,
+          "batchSeconds": 0.0413592089999999,
+          "operations": 8,
+          "operationsPerSecond": 193.42729692920432,
+          "case": "Benchmarks.Json.DeserializeNodes",
+          "mode": "jit",
+          "round": 0
+        },
+        {
+          "startupSeconds": 0.011047332999999604,
+          "warmupSeconds": 0.010140291999999995,
+          "batchSeconds": 0.040953417000000325,
+          "operations": 8,
+          "operationsPerSecond": 195.34389523589536,
+          "case": "Benchmarks.Json.DeserializeNodes",
+          "mode": "aot",
+          "round": 0
+        },
+        {
+          "startupSeconds": 0.010486166999999824,
+          "warmupSeconds": 0.010105375000000194,
+          "batchSeconds": 0.04200745800000005,
+          "operations": 8,
+          "operationsPerSecond": 190.4423733518936,
+          "case": "Benchmarks.Json.DeserializeNodes",
+          "mode": "aot",
+          "round": 1
+        },
+        {
+          "startupSeconds": 1.72455925,
+          "warmupSeconds": 0.010463542000000103,
+          "batchSeconds": 0.04284220800000016,
+          "operations": 8,
+          "operationsPerSecond": 186.73173894305285,
+          "case": "Benchmarks.Json.DeserializeNodes",
+          "mode": "jit",
+          "round": 1
+        },
+        {
+          "startupSeconds": 1.7182555419999996,
+          "warmupSeconds": 0.01071854200000022,
+          "batchSeconds": 0.04274550000000055,
+          "operations": 8,
+          "operationsPerSecond": 187.15420336643385,
+          "case": "Benchmarks.Json.DeserializeNodes",
+          "mode": "jit",
+          "round": 2
+        },
+        {
+          "startupSeconds": 0.011525666999999906,
+          "warmupSeconds": 0.010291333000000513,
+          "batchSeconds": 0.04181979200000008,
+          "operations": 8,
+          "operationsPerSecond": 191.29698206055127,
+          "case": "Benchmarks.Json.DeserializeNodes",
+          "mode": "aot",
+          "round": 2
+        }
+      ]
+    },
+    {
+      "configuration": {
+        "measurement": "batch-throughput",
+        "modes": [
+          "aot"
+        ],
+        "rounds": 3,
+        "warmups": 2,
+        "operations": 8,
+        "timeout": 120
+      },
+      "origins": {
+        "measurement": "config",
+        "modes": "override",
+        "rounds": "config",
+        "warmups": "config",
+        "operations": "config",
+        "timeout": "default"
+      },
+      "primaryMetric": {
+        "name": "operationsPerSecond",
+        "unit": "operations/second"
+      },
+      "samples": [
+        {
+          "startupSeconds": 0.010707209000000023,
+          "warmupSeconds": 0.00877799999999998,
+          "batchSeconds": 0.03303441600000001,
+          "operations": 8,
+          "operationsPerSecond": 242.17167937825803,
+          "case": "json.nodes.serialize",
+          "mode": "aot",
+          "round": 0
+        },
+        {
+          "startupSeconds": 0.010399166999999987,
+          "warmupSeconds": 0.008154125000000012,
+          "batchSeconds": 0.03286,
+          "operations": 8,
+          "operationsPerSecond": 243.45709068776628,
+          "case": "json.nodes.serialize",
+          "mode": "aot",
+          "round": 1
+        },
+        {
+          "startupSeconds": 0.010859167000000003,
+          "warmupSeconds": 0.008088790999999984,
+          "batchSeconds": 0.03246766700000003,
+          "operations": 8,
+          "operationsPerSecond": 246.39897902119029,
+          "case": "json.nodes.serialize",
+          "mode": "aot",
+          "round": 2
+        }
+      ]
+    }
+  ]
+}

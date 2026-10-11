@@ -1,0 +1,8 @@
+{
+  "schemaVersion": 1,
+  "measurement": "first-invocation",
+  "modes": ["interpreter", "jit", "aot"],
+  "rounds": 3,
+  "warmups": 0,
+  "operations": 1
+}

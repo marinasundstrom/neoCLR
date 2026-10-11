@@ -78,3 +78,9 @@ Typed JSON objects and collection mapping remain next, followed by a qualified
 monotonic clock and internal measurement, async callbacks and setup/cleanup. These are still gaps relative to BenchmarkDotNet, not new
 permanent semantics. This work stays within the benchmark gate before schedulers
 and runtime-managed suspension.
+
+Configuration now selects external startup, batch latency, batch throughput or
+first invocation after setup, with manifest/config/CLI precedence and recorded
+effective settings. Internal timing, diagnostics and concurrency remain gaps.
+The author additionally requests inline input data or a named data source for both
+tests and benchmarks, with every input row a distinct case; this is the next layer.

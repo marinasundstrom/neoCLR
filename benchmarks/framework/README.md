@@ -131,3 +131,39 @@ Qualification: [inventory](discovery-evidence/benchmarks.json),
 [six discovery checks](discovery-evidence/validation.json). Execution covers two
 discovered functions plus one manual case in interpreter, JIT and AOT on macOS
 ARM64. These are functional checks, not benchmark performance measurements.
+
+## Measurement configuration
+
+Use `--config <file.json>` with `schemaVersion: 1`. Settings resolve in this order:
+built-in defaults, manifest `benchmarkConfig`, the config file, and explicit CLI
+flags. Reports use schema version 2 and retain the effective configuration, each
+setting's origin, selected cases, the primary metric/unit and all raw metrics.
+
+Supported measurements: `startup` (process launch through READY, including setup),
+`batch-latency` (BEGIN through END), `batch-throughput` (operations per that interval),
+and `first-invocation` (one invocation after setup, requiring zero warmups and one
+operation). First invocation is not cold parsing or cold JIT: setup may exercise
+the same code, and JIT compilation occurs before READY. All operation views include
+validation, callbacks and external transport/scheduling costs.
+
+Configurable fields are `measurement`, `modes`, `rounds`, `warmups`, `operations`,
+and `timeout`. Modes are a nonempty unique subset of interpreter/JIT/AOT. At least
+three rounds are required. Timeout is seconds per output/exit wait, not a total
+job deadline. Unknown fields, invalid values, unavailable selected modes and
+unsupported measurements fail before launching workers. Internal timing,
+concurrency, allocation and GC diagnostics remain unsupported.
+
+Examples are in [configurations](configurations):
+
+```sh
+python3 benchmarks/framework/runner.py \
+  --manifest target/benchmark-json-discovered/manifest.json \
+  --output target/configured.json \
+  --config benchmarks/framework/configurations/warmed-batch.json \
+  --measurement batch-latency --mode jit --mode aot \
+  --filter Benchmarks.Json.DeserializeNodes
+```
+
+CLI flags override config values individually; repeated `--mode` replaces the
+mode list. The existing count/filter flags remain available. Attribute defaults
+and data parameters are subsequent layers; no unsupported settings are ignored.

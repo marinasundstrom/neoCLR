@@ -8,6 +8,13 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-11
 
+- Configure benchmark measurement views, mode subsets, warmups, operation counts,
+  launches and output/exit timeouts through manifest defaults, JSON settings and
+  CLI overrides. Reports record effective settings, origins and the primary metric.
+  Support external startup, batch latency/throughput and first invocation after
+  setup; reject unsupported internal/allocation/GC measurements. Seven focused
+  tests and 27 configured Raven worker processes pass.
+
 - Use discovered `Benchmarks.Json.DeserializeNodes` in the JSON benchmark worker,
   replacing its manual `json.nodes.deserialize` selector. Preparation accepts
   explicit manual cases alongside discovered functions and rejects empty/duplicate

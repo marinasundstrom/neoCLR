@@ -1,0 +1,8 @@
+{
+  "schemaVersion": 1,
+  "measurement": "batch-throughput",
+  "modes": ["interpreter", "jit", "aot"],
+  "rounds": 3,
+  "warmups": 2,
+  "operations": 8
+}
