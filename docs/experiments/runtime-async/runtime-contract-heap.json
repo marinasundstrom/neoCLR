@@ -1,0 +1,45 @@
+{
+  "prepareSeconds": 1.932066166,
+  "runs": [
+    {
+      "allocatedObjects": 3064,
+      "collections": 163,
+      "liveObjects": 0,
+      "peakObjects": 94,
+      "reclaimedObjects": 3064,
+      "seconds": 1.1873254580000001,
+      "stdout": "PASS imported runtime operation contract\n"
+    },
+    {
+      "allocatedObjects": 3064,
+      "collections": 163,
+      "liveObjects": 0,
+      "peakObjects": 94,
+      "reclaimedObjects": 3064,
+      "seconds": 1.202446875,
+      "stdout": "PASS imported runtime operation contract\n"
+    }
+  ],
+  "hostCompatibilityRun": {
+    "prepareSeconds": 1.943956625,
+    "runs": [
+      {
+        "allocatedObjects": 3028,
+        "collections": 163,
+        "liveObjects": 0,
+        "peakObjects": 92,
+        "reclaimedObjects": 3028,
+        "seconds": 0.844828583,
+        "stdout": "PASS independent runtime operation await\n"
+      }
+    ]
+  },
+  "sha256": {
+    "target/scheduler-wait-validation/release/examples/runtime_async_interpreter": "c3b6e6680076580ed5756f516969e31250b92da9fbded6ac7e5a99df2c978d54",
+    "target/runtime-contract-final/app.dll": "3c527f0ba9e8d4988b2284ac48a8a8fc41e157432616f6cc7b7514b9eac9752a",
+    "target/runtime-contract-final/Operation.Contracts.dll": "96e56e76c7089c6bb1c2dd694eeb24db7d6729129d7d124187e0dc6f6f4dcf35",
+    "docs/experiments/runtime-async/RuntimeContract.rvn": "6b1cb46e24677bf18dddfb5de82a9d681700caa2254b227ea1267bd378e518c4",
+    "docs/experiments/runtime-async/OperationContract.rvn": "4c70c253221d91c1dfdd518ecc1a3fdd4bb12a2feb6448e4f28f85ce47d0d26c",
+    "docs/experiments/runtime-async/runtime-contract-validation.json": "71734e62967dfa7a87660ad5cb2676f145c9c8a023d292299913aa858bea313e"
+  }
+}

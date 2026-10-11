@@ -8,6 +8,13 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-11
 
+- Qualify an experimental generic operation interface from a separate metadata
+  assembly with pending and immediate implementations sharing one provider mapping.
+  Cover interface conformance/load rejection and full GC reclamation. Extend the
+  private measurement host to load explicit dependencies. Record the author-directed
+  interface-first interop boundary; the final runtime interface/native ABI remains
+  design work, not a new public API or runtime-recognized protocol.
+
 - Qualify a runtime-backed manual operation independent of Task storage through
   ordinary Raven await and explicit provider mappings. Cover distinct awaiters,
   shared/repeated reads, cancellation, completion-before-wait, mapping rejection and

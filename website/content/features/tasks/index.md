@@ -263,7 +263,9 @@ A separate, opt-in [Raven runtime-async POC](https://github.com/marinasundstrom/
 now lowers ordinary async methods and Main to retained interpreter bodies without
 generated state machines. Its source-included provider returns ordinary Task values.
 Explicit await mappings also qualify an independent runtime-backed manual operation
-and a distinct awaiter; the general cross-language metadata contract remains in design.
+and a distinct awaiter. An imported generic interface also supports pending and immediate
+implementations through one mapping. The final runtime-facing contract and native
+interop bindings remain in design.
 Executable samples cover nested awaits, reference/receiver retention, unit results,
 cancellation, terminal faults and GC reclamation. This is development support, with
 restricted method/await shapes and no JIT/AOT qualification or default switch.

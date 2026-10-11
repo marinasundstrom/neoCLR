@@ -8730,3 +8730,21 @@ value and static/extension awaiters remain unsupported. Raven owns emission and 
 owns scheduling/lifetime qualification. Replace source-local exact-type mapping with
 validated native metadata contract binding; do not promote these restrictions to
 permanent cross-language semantics. Public API documentation is unchanged.
+
+
+### Imported operation interface proof — 2026-10-11
+
+The existing native compiler (`0764064d4`) qualifies an Operation<T> interface from a
+separate reference assembly, with pending and immediate implementations sharing one
+provider Wait<T> overload. Ordinary imported metadata and interface dispatch suffice;
+no compiler/default or runtime-code change is needed. Async method results remain
+Tasks. [Source, evidence and bounds](experiments/runtime-async/README.md#imported-operation-contract-proof--2026-10-11).
+
+The provider remains source-local, while the operation interface now crosses an
+assembly boundary. Its binder-facing members and suspension method are experimental
+bridge representation, not the selected runtime interface. Native replacement must
+make operation completion, result typing and ownership a validated shared interface
+independent of Task layout or Raven awaiter requirements. Runtime recognition,
+foreign implementation ABI and thread-race qualification remain open. Raven owns
+import/emission, neoCLR owns runtime dispatch/GC evidence; both repositories document
+the qualification. No production API snapshot change is required for fixture types.

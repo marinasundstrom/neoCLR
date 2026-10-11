@@ -15088,3 +15088,19 @@ or runtime-await default switch was performed.
   two heap observations reclaim 3,028 of 3,028 objects each. No state machines emitted.
   [Evidence/limits](experiments/runtime-async/README.md#independent-operation-proof--2026-10-11).
   Final metadata binding, native producer ABI and non-Task method returns remain open.
+
+
+### Imported operation interface and runtime boundary — 2026-10-11
+
+- **Author:** continued contract work, then clarified the common awaitable-operation
+  concept: platforms supply concrete implementations while the shared runtime-facing
+  interface is well-defined, analogous in purpose to WinRT. Interfaces are a primary,
+  not exclusive, cross-language interaction mechanism; managed languages may use Task.
+- **Assistant action:** qualified an ordinary generic interface from a separate
+  metadata assembly, with pending/manual and immediate implementations sharing one
+  provider mapping. No compiler/runtime change was necessary for this proof.
+- **Outcome:** executable and conformance/load rejection checks pass; both heap runs
+  reclaim all 3,064 objects. [Evidence](experiments/runtime-async/README.md#imported-operation-contract-proof--2026-10-11).
+- **Assistant distinction/open work:** the fixture's Raven awaiter/provider members
+  are adapters, not the final runtime interface. Shared completion/result/lifetime
+  semantics and native implementation bindings remain to specify and qualify.

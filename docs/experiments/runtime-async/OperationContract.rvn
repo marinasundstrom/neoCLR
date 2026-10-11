@@ -1,0 +1,14 @@
+// Experimental implementation protocol, not a selected public library API.
+module RuntimeOperationContracts {
+    import System.Runtime.CompilerServices.*
+
+    public interface Operation<T> : TaskAwaiter {
+        val IsCompleted: bool { get; }
+        val IsCancelled: bool { get; }
+        func GetAwaiter() -> Operation<T>
+        func GetResult() -> T
+
+        // Runtime suspension boundary: false means cancelled; Fault stays terminal.
+        func WaitCompletion() -> bool
+    }
+}

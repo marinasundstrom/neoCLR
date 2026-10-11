@@ -616,3 +616,47 @@ per-type provider selection with validated implementation binding. Preserve thes
 samples and GC checks during that work. Relative to C#'s awaiter pattern, the language
 shape is familiar while actual parking/resumption is runtime-owned; source-provider
 mapping costs and final lifetime semantics remain explicit design work.
+
+
+## Imported operation contract proof — 2026-10-11
+
+[OperationContract.rvn](OperationContract.rvn) is compiled separately into
+Operation.Contracts.dll; the [consumer](RuntimeContract.rvn) imports its generic
+Operation<T> interface. A manual implementation keeps completion/results in runtime
+storage, while an immediate implementation uses no runtime handle. Both return the
+interface from GetAwaiter, so one generic provider mapping handles both concrete
+types. An interface-typed consumer exercises both pending and ready implementations.
+This uses existing metadata interface identity, conformance and runtime dispatch;
+no compiler or runtime implementation change was needed beyond Raven `0764064d4`.
+
+[Validation](runtime-contract-validation.json) covers the 80 shared/repeated wait
+cycles, distinct awaiter, cancellation and GC cases plus both interface implementations.
+Missing WaitCompletion is rejected with RAV0330; missing contract assembly fails
+loading before execution. The consumer emits no generated state machines.
+[Heap observations](runtime-contract-heap.json) show 3,064 allocated/reclaimed objects,
+zero final live objects, peak 94 and 163 collections in each of two executions.
+The private host accepts optional dependency assemblies; its original invocation
+also passes the previous independent-operation sample. These are correctness/GC
+observations, not a matched interface-dispatch performance benchmark.
+
+Run `validate.py --runtime-await --runtime-sample contract` with the established
+bundle/compiler/runtime/output arguments. It compiles the contract library before
+the consumer, records its hash and loads it explicitly. For heap inspection pass
+Operation.Contracts.dll after the repetition count to `runtime_async_interpreter`.
+
+The experimental interface's members are IsCompleted, IsCancelled, GetAwaiter,
+GetResult and WaitCompletion, plus the existing TaskAwaiter callback requirement.
+WaitCompletion suspends through runtime services and returns false for cancellation;
+only true permits result retrieval. These source members are documented here for
+reproduction, not added to the public runtime library/API reference. The runtime
+has not acquired special knowledge of this interface or arbitrary methods named
+WaitCompletion. Implementations must still supply the tested runtime-service adapter.
+Foreign/native ABI, thread races, hostile metadata validation and JIT/AOT remain open.
+
+**Author clarification:** the desired shared runtime boundary is an awaitable-operation
+interface, with concrete implementations supplied by integrating platforms. Managed
+languages may project it as Task<T>. Interfaces are a primary cross-language mechanism,
+not the only allowed form of interop. WinRT is a precedent for the boundary, not a
+specification to copy. This proof qualifies ordinary metadata machinery; the final
+runtime-facing contract must separate operation observation/ownership from Raven's
+GetAwaiter syntax adapter and the private provider. No final member list is selected.

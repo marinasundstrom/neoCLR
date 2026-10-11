@@ -55,8 +55,14 @@ independent of the concrete managed Task class. Define metadata/runtime semantic
 and settle the public interface through qualification. A
 [second runtime-backed operation](experiments/runtime-async/README.md#independent-operation-proof--2026-10-11)
 now passes ordinary await, shared readers, cancellation and GC checks through explicit
-provider mapping. Next define validated metadata binding beyond source-local mappings;
-retain the samples and benchmarks as regressions. General interoperability is not yet implemented. Native stack representation, preemption
+provider mapping. An [imported generic interface proof](experiments/runtime-async/README.md#imported-operation-contract-proof--2026-10-11)
+now lets pending and immediate implementations share one mapping across an assembly
+boundary. The author clarifies that an awaitable-operation interface should be the
+shared runtime interop contract, with platform-owned concrete implementations such
+as managed Task; interfaces are primary, not exclusive, interop mechanisms. Next
+separate that runtime contract from the temporary Raven adapter and specify completion,
+result and ownership semantics. Retain samples/benchmarks as regressions. General
+native interoperability and runtime recognition of the interface remain open. Native stack representation, preemption
 and multi-core scheduling remain open. Task/Promise keep operation/producer roles.
 
 **Runtime async groundwork (2026-10-11):** the author directs implementation while

@@ -1,11 +1,13 @@
 //! Private runtime-async comparison host. Load once, execute with fresh heaps.
-use neoclr::{Limits, LoadedProgram, Value, assembler::ModuleInput, metadata::TypeDefId};
+use neoclr::{assembler::ModuleInput, metadata::TypeDefId, Limits, LoadedProgram, Value};
 use std::{fs, path::Path, time::Instant};
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     let args: Vec<_> = std::env::args().collect();
-    if args.len() != 4 {
-        return Err("expected assembly, bundle and repetitions".into());
+    if args.len() < 4 {
+        return Err(
+            "expected assembly, bundle, repetitions and optional dependency assemblies".into(),
+        );
     }
     let repetitions: usize = args[3].parse()?;
     if !(1..=20).contains(&repetitions) {
@@ -24,6 +26,9 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         "System.Web",
     ] {
         images.push(fs::read(lib.join(format!("{name}.dll")))?);
+    }
+    for dependency in &args[4..] {
+        images.push(fs::read(dependency)?);
     }
     let root = neoclr::metadata_container::decode(&images[1]).map_err(|e| e.to_string())?;
     let index = root

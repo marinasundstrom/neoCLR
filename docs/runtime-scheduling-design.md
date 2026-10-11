@@ -1632,3 +1632,32 @@ the Task-only awaited-input limitation above, but async method results remain Ta
 The source provider binds exact awaiter types explicitly; a recognized metadata
 interface, independently loaded implementations and foreign producer ownership remain
 open. This is evidence for the contract direction, not completion of that design.
+
+
+### Interface-first runtime boundary clarified — 2026-10-11
+
+The author clarifies that the common concept is an **awaitable operation** with a
+well-defined interface passed across runtime integration boundaries. Each integrating
+platform supplies a concrete implementation; managed languages may use Task<T>.
+Interfaces are a main cross-language interaction mechanism, consistent with the
+collection contracts, without excluding other forms of interop. WinRT motivates the
+separation between interface and language projection, not its exact APIs or legacy
+rules. This is author direction, refining the provisional architecture above.
+
+The [imported interface proof](experiments/runtime-async/README.md#imported-operation-contract-proof--2026-10-11)
+now demonstrates two implementations against one generic interface in a separate
+assembly using existing metadata and dispatch. Conformance/load rejection and GC
+pass. The final runtime contract must not be defined by the temporary Raven
+GetAwaiter/OnCompleted requirements or provider Wait method. Those are syntax and
+implementation adapters around the shared operation semantics. Neither Task's class
+layout nor a language-specific state machine is the interop contract.
+
+Next specify completion observation/registration and lifetime capabilities for that
+runtime interface, then bind both the managed projection and a distinct producer to
+it. Do not equate a managed WaitCompletion method with a native ABI or add arbitrary
+blocking to the scheduler. Runtime-recognized operations must preserve no-lost-wakeup,
+multiple-waiter, scheduler-owned resumption and root/release rules. Result typing and
+cancellation observation are shared semantics; initiating work, Promise production and
+requesting cancellation need not be mandatory capabilities on every consumer handle.
+Names and final members remain provisional. Reuse existing interface metadata where
+sufficient; add special recognition only for concrete runtime requirements.
