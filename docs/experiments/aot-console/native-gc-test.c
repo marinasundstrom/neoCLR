@@ -101,6 +101,32 @@ int main(void) {
     CHECK(owner[1] == (uintptr_t)queued && owner[2] == (uintptr_t)bad);
     interior = 0;
     CHECK(!neoclr_gc_collect_v1(&c, &frame) && !c.text.used);
+    /* Two independently parked native chains must remain precise strong roots. */
+    neoclr_probe_frame first, second;
+    neoclr_parked_roots first_roots = {0}, second_roots = {0};
+    uint64_t *retained = allocate(&c, 16, NEOCLR_GC_OBJECT);
+    uint64_t *other = allocate(&c, 16, NEOCLR_GC_OBJECT);
+    CHECK(retained && other);
+    retained[1] = 42; other[1] = 17;
+    neoclr_probe_storage first_slot = {&retained, 8, 0};
+    neoclr_probe_storage second_slot = {&other, 8, 0};
+    neoclr_probe_enter_v3(&first, &c, 1, &first_slot, 1, "{}", 2);
+    neoclr_roots_park_v1(&first_roots);
+    CHECK(!neoclr_root_probe_head_v1() && neoclr_root_probe_depth_v1() == 0);
+    CHECK(neoclr_gc_entry_check_v1(&c) == 3);
+    CHECK(neoclr_gc_owned_roots_check_v1(&c, NULL, 0) == 3);
+    neoclr_probe_enter_v3(&second, &c, 2, &second_slot, 1, "{}", 2);
+    neoclr_roots_park_v1(&second_roots);
+    CHECK(!neoclr_gc_collect_v1(&c, NULL));
+    CHECK(retained[1] == 42 && other[1] == 17);
+    neoclr_roots_resume_v1(&first_roots); /* deliberately resume out of parking order */
+    CHECK(neoclr_root_probe_head_v1() == &first && neoclr_root_probe_depth_v1() == 1);
+    neoclr_probe_leave_v1(&first);
+    CHECK(!neoclr_gc_collect_v1(&c, NULL) && other[1] == 17);
+    neoclr_roots_discard_v1(&second_roots); /* terminal invocation abandonment */
+    CHECK(!neoclr_roots_parked_v1());
+    CHECK(!neoclr_gc_collect_v1(&c, NULL) && !c.text.used);
+    CHECK(!neoclr_gc_entry_check_v1(&c));
     CHECK(buffer[128] == UINT64_C(0x1122334455667788));
     return 0;
 }

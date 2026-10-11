@@ -407,6 +407,17 @@ pub(crate) fn compile_into(
         let queue = module.declare_function("neoclr_task_queue_default_v1", Linkage::Import, &sig)?;
         Some((begin, end, poll, callback, queue))
     } else { None };
+    let runtime_async_callbacks = if details.is_some_and(|d| !d.runtime_async_start.is_empty()) {
+        let mut sig = module.make_signature();
+        sig.params.extend([types::I64, types::I64].map(AbiParam::new));
+        sig.returns.push(AbiParam::new(types::I32));
+        let callback = module.declare_function("neoclr_invoke_void_callback_v1", Linkage::Export, &sig)?;
+        sig.params.pop();
+        let drain = module.declare_function("neoclr_drain_default_queue_v1", Linkage::Export, &sig)?;
+        sig.params = [types::I64, types::I64, types::I64].map(AbiParam::new).to_vec();
+        let pump = module.declare_function("neoclr_runtime_async_pump_v1", Linkage::Import, &sig)?;
+        Some((callback, drain, pump))
+    } else { None };
     let mut socket_services = std::collections::HashMap::new();
     if let Some(d) = details {
         for (indices, symbol, parameters) in [
@@ -419,6 +430,14 @@ pub(crate) fn compile_into(
             (&d.scheduler_capture, "neoclr_scheduler_capture_managed_v1", vec![types::I64, types::I64]),
             (&d.scheduler_submit_to, "neoclr_scheduler_submit_to_managed_v1", vec![types::I64, types::I64, types::I64, types::I64]),
             (&d.scheduler_submit, "neoclr_scheduler_submit_managed_v1", vec![types::I64, types::I64, types::I64]),
+            (&d.runtime_async_gccollect, "neoclr_runtime_async_gccollect_v1", vec![types::I64, types::I64]),
+            (&d.runtime_async_create, "neoclr_runtime_async_create_v1", vec![types::I64, types::I64]),
+            (&d.runtime_async_start, "neoclr_runtime_async_start_v1", vec![types::I64, types::I64, types::I64, types::I64]),
+            (&d.runtime_async_completeunit, "neoclr_runtime_async_completeunit_v1", vec![types::I64, types::I64, types::I64]),
+            (&d.runtime_async_awaitunit, "neoclr_runtime_async_awaitunit_v1", vec![types::I64, types::I64, types::I64]),
+            (&d.runtime_async_release, "neoclr_runtime_async_release_v1", vec![types::I64, types::I64, types::I64]),
+            (&d.runtime_async_iscompleted, "neoclr_runtime_async_iscompleted_v1", vec![types::I64, types::I64, types::I64]),
+            (&d.runtime_async_waitcompletion, "neoclr_runtime_async_waitcompletion_v1", vec![types::I64, types::I64, types::I64]),
             (&d.timer_start, "neoclr_timer_start_v1", vec![types::I32, types::I64, types::I64, types::I64]),
             (&d.timer_cancel, "neoclr_timer_cancel_v1", vec![types::I64, types::I64, types::I64]),
             (&d.socket_deadline_after, "neoclr_socket_deadline_after_v1", vec![types::I32, types::I64, types::I64]),
@@ -897,6 +916,29 @@ pub(crate) fn compile_into(
                 define_checked(module, ids[i], &mut context, stack_budget, long_range_calls)?;
                 continue;
             }
+            if details.is_some_and(|d| d.entry_task_drain.contains(&i)) && runtime_async_callbacks.is_some() {
+                let (callback, drain, pump) = runtime_async_callbacks.unwrap();
+                let callback = module.declare_func_in_func(callback, b.func);
+                let drain = module.declare_func_in_func(drain, b.func);
+                let callback = b.ins().func_addr(types::I64, callback);
+                let drain = b.ins().func_addr(types::I64, drain);
+                let pump = module.declare_func_in_func(pump, b.func);
+                let call = b.ins().call(pump, &[fault_context.unwrap(), callback, drain]);
+                let status = b.inst_results(call)[0];
+                let failed = b.ins().icmp_imm(IntCC::NotEqual, status, 0);
+                let mut site = diagnostic_data.as_ref().unwrap().site(module, &mut b, fault_context.unwrap(), i, 0);
+                site.capture_frame = false;
+                return_if_detailed(&mut b, failed, status, Some(&site));
+                let zero = b.ins().iconst(types::I32, 0);
+                b.ins().store(MemFlags::new(), zero, output, 0);
+                b.ins().return_(&[zero]);
+                b.seal_all_blocks(); b.finalize();
+                if let (Some(probes), Some(frame)) = (&root_probes, probe_frame) {
+                    probes.finish(module, &mut context.func, frame);
+                }
+                define_checked(module, ids[i], &mut context, stack_budget, long_range_calls)?;
+                continue;
+            }
             if details.is_some_and(|d| d.entry_task_drain.contains(&i)) {
                 let d = details.unwrap();
                 let ctx = fault_context.unwrap();
@@ -997,6 +1039,10 @@ pub(crate) fn compile_into(
                     args.extend([run, drain]);
                 }
                 args.push(output);
+                if details.unwrap().runtime_async_start.contains(&i) {
+                    let callback = module.declare_func_in_func(runtime_async_callbacks.unwrap().0, b.func);
+                    args.push(b.ins().func_addr(types::I64, callback));
+                }
                 let call = b.ins().call(service, &args);
                 let raw = b.inst_results(call)[0];
                 let failed = b.ins().icmp_imm(IntCC::NotEqual, raw, 0);

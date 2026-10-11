@@ -105,9 +105,10 @@ or loading its dependencies. Its output is a diagnostic listing, not reassemblab
 The native target does not support every Raven or .NET feature. Local nongeneric class
 virtual dispatch is supported; external class overrides and generic virtual classes
 remain limited. An explicit development compiler option now exercises ordinary
-async methods through retained interpreter frames, with sample and GC checks.
-[Runtime-async POC details](../features/tasks/#direction) describe its limits; this
-is not the default mode or JIT/AOT suspension support. General green threads remain
+async methods through retained runtime frames. The POC now qualifies interpreter
+execution and macOS ARM64 JIT/AOT HTTP application bodies, with cleanup and GC checks.
+[Runtime-async POC details](../features/tasks/#direction) describe the temporary native
+stack carrier and remaining limits; this is not the default mode. General green threads remain
 unfinished.
 
 [Install and run →](../try/) · [HTTP application case →](../cases/http-server/) ·

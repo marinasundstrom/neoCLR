@@ -121,8 +121,8 @@ DNS/connection deadline; the HTTP handler supplies its own exchange budget. The 
 controls its host and uses a verifier watchdog.
 Socket completion uses nonblocking polling; host lookup runs on bounded host threads.
 Generated Raven state machines still implement this networking path. The separate
-interpreter runtime-async POC now qualifies application-level client/server showcase
-execution; full library migration and JIT/AOT suspension remain open.
+runtime-async POC now qualifies application-level client/server showcase execution
+in the interpreter and macOS ARM64 JIT/AOT; full library migration remains open.
 
 ## Where we’re heading
 
@@ -172,5 +172,7 @@ configuration on the first send. HttpClient.Timeout configures the total coopera
 Development runtime-async qualification now runs the existing HTTP client/server
 showcase sources and projects, plus an eight-exchange loopback consumer in the interpreter, including
 GC while requests are pending. Application async bodies use runtime suspension;
-referenced libraries retain their existing implementation. This does not yet qualify
-JIT/AOT suspension or change defaults. [Evidence and limits](https://github.com/marinasundstrom/neoCLR/blob/main/docs/experiments/runtime-async/README.md#managed-http-showcase-and-scoped-cleanup--2026-10-11).
+referenced libraries retain their existing implementation. Both actual projects and
+HTTP timeout/cancellation/fault cases now also pass in macOS ARM64 JIT and AOT. The
+native stack carrier is temporary experiment code; Windows and production integration
+remain open. Defaults are unchanged. [Evidence and limits](https://github.com/marinasundstrom/neoCLR/blob/main/docs/experiments/runtime-async/README.md#compiled-runtime-suspension-jit-and-aot--2026-10-11).

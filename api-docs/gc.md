@@ -53,3 +53,11 @@ Separately compiled consumers can use the source-built GC facade for counters,
 collection and KeepAlive, including `KeepAlive(null)`. The matching compiler and
 metadata tools preserve the nullable parameter annotation across assembly boundaries.
 This metadata contract does not add pinning or change the reachability rules above.
+
+## Compiled runtime-await experiment
+
+The explicit macOS ARM64 runtime-async JIT/AOT POC also binds `GC.Collect()`.
+Collection visits published roots on both active and parked compiled stacks; the
+existing nonmoving collector still scans object payloads conservatively. This does
+not provide native implementations of the counter properties or `KeepAlive` above.
+Those remain gaps in this profile. [Qualification and limits](https://github.com/marinasundstrom/neoCLR/blob/main/docs/experiments/runtime-async/README.md#compiled-runtime-suspension-jit-and-aot--2026-10-11).

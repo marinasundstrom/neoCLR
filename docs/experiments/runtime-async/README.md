@@ -758,3 +758,101 @@ retained-body closure capture of arbitrary structs is still a compiler limitatio
 These checks establish lifecycle behavior, not throughput or complete native-resource
 leak freedom. The author now explicitly requests continuation through JIT and AOT
 runtime-suspension support; existing state-machine support does not satisfy that gate.
+
+## Compiled runtime suspension: JIT and AOT — 2026-10-11
+
+The explicit native POC now retains and resumes **compiled** Raven application
+bodies in both JIT and native AOT on macOS ARM64. There is no interpreter fallback
+and no generated application async state machine. Both actual HTTP Native.rvnproj
+projects pass external-peer qualification, including client localhost DNS and server
+work while accept is pending. The separate lifecycle consumer passes timeout,
+cancellation, malformed-response recovery and terminal Fault in both modes.
+[Reproducible qualification](native-validation.json) records compiler/runtime/source
+hashes, project properties, commands and results.
+
+The language and scoped-cleanup samples cover nested/shared/repeated waits,
+receiver/reference retention, cancellation, eager completion and unit results.
+The lifetime contract checks pending release rejection, exactly-once completion and
+release, and retained outcome reads in interpreter, JIT and AOT. The existing
+100-operation pending-await workload also runs as a checksum/stability test, **not**
+a performance benchmark. It caught starvation of queued lifetime callbacks by ready
+continuations; the pump now services deliveries even when continuations are ready. AOT repeats language and cleanup entries four times on the
+same heap. Both matched native hosts require all parked stacks and operation roots
+to be released before returning; after fault rendering and clearing fault roots,
+final collection must empty the heap. This is checked teardown, not a general
+native-resource leak proof.
+
+Implementation layers:
+
+- Raven native compiler `2ef670ff1` and the existing source provider are unchanged.
+  The Runtime Contract still selects explicit Start/Wait/Complete/Cancel helpers,
+  with synchronous use cleanup enabled only for retained bodies.
+- The shared Cranelift JIT/AOT backend adds `--bind-runtime-async`, exact private
+  service validation and a compiled entry pump. It also binds the existing explicit
+  GC.Collect service for this experiment. Other managed GC counters remain a gap.
+- The private host runs same-thread cooperative stacks for one active invocation. A body starts eagerly, parks
+  only at a runtime wait, and resumes independently of notification/lifetime callbacks.
+  One default-queue drain may remain parked; the pump does not recursively drain it.
+- Published managed root chains are registered before switching away. GC visits all
+  parked chains as well as the current chain. No arbitrary C-stack scan is introduced.
+  Entry reset and exclusive-root checks reject parked guest frames. A focused native
+  collector test checks two chains, out-of-order resumption and terminal abandonment.
+  The stack-boundary test also retains its intended frame allocation at -O2, avoiding
+  scalar replacement that previously invalidated that test.
+- Scheduler delivery is acknowledged only after transferring a rooted callback to
+  the retained activation. Callback ownership then lasts through callback completion.
+  Fault stays invocation-terminal; teardown abandons other activations without managed
+  exception unwinding and finishes before JIT code can be freed.
+
+The temporary carrier uses macOS `ucontext`, which the SDK explicitly marks deprecated
+and unsupported. This is **not the production stack choice**. Each activation reserves
+1 MiB plus two guard pages; the private limits are 128 operations and 128 simultaneous
+activations, within the existing host-root and I/O limits. Stack-budget checks use
+registered activation bounds. These fixed reservations, context-switch cost, per-drain
+stack allocation and lack of preemption are material costs. Windows, dynamic stack
+sizing, multi-core execution, custom scheduler/context propagation across stacks,
+logical async-parent trace stitching and performance comparison remain open. The backend
+rejects this carrier option for Windows rather than implying support.
+
+Task.Run remains a distinct concurrent-work service. The combined RuntimeHttp.rvn
+consumer uses it and is still interpreter-only; it was not silently mapped to the
+cooperative scheduler. The actual client/server projects and lifecycle workload do
+not need it. Referenced libraries still use their existing state-machine implementation.
+A production provider, library migration, native GC metric parity, CLI/build-kit
+integration and default switching remain separate work. Existing compiler method-shape
+and arbitrary-struct capture restrictions still apply.
+
+Reproduce after building the current release `tools/aot-poc` backend and native text
+archive, using the matched Raven compiler/bundle and the existing passing source and
+macOS HTTP build recipes:
+
+```sh
+python3 docs/experiments/runtime-async/validate_native.py \
+  --recipe target/runtime-http-use-final/validation.json \
+  --native-build target/entry-owned-http/build.json \
+  --output target/runtime-native-evidence-v2
+```
+
+The runner rebuilds sources and both projects. It treats the native build report as a
+command recipe, rebuilding all C adapters and recording current hashes; old executable
+artifacts are not accepted as new evidence. `--backend` and `--text-archive` select
+explicit tool locations. Native generation fails without the opt-in service bindings;
+this does not alter normal compiler or execution defaults.
+
+### Architecture comparison and provisional decision
+
+The existing [.NET comparison](../../runtime-scheduling-design.md) separates compiler
+state machines, managed Task/Promise policy and runtime scheduling. This POC deliberately
+moves suspended **application call stacks** into the runtime while keeping managed
+operation results. The benefit demonstrated here is one ordinary compiled call chain
+across an await with explicit GC ownership, not a measured speed improvement.
+
+Alternatives remain compiler state machines (already supported, smaller captured state),
+a maintained context library such as [Boost.Context](https://www.boost.org/doc/libs/latest/libs/context/doc/html/context/ff.html)
+(ABI-aware register/stack preservation but an additional dependency), or a small
+platform-specific carrier (more implementation and ABI validation responsibility).
+[Windows fibers](https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-switchtofiber)
+are another carrier candidate, not an implemented port. Sources were reviewed
+2026-10-11; the local macOS26.2 SDK ucontext.h also supplies the deprecation constraint.
+Choose the production carrier only with stack/GC/fault tests and measured memory and
+switching costs. No stable foreign ABI or public green-thread API is introduced.

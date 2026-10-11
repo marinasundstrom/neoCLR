@@ -231,6 +231,17 @@ fn run() -> Result<(), Box<dyn std::error::Error>> {
     let timer_count = args.iter().filter(|a| *a == "--bind-timers").count();
     if timer_count > 1 { return Err("duplicate --bind-timers option".into()); }
     let bind_timers = timer_count == 1;
+    let runtime_async_count = args.iter().filter(|a| *a == "--bind-runtime-async").count();
+    if runtime_async_count > 1 { return Err("duplicate --bind-runtime-async".into()); }
+    let bind_runtime_async = runtime_async_count == 1;
+    args.retain(|a| a != "--bind-runtime-async");
+    if bind_runtime_async && target != compiler::Target::MacosArm64 {
+        return Err("runtime-async stack carrier currently requires macOS ARM64".into());
+    }
+    if bind_runtime_async && (!compile_system || !native_gc || !native_stack_budget) {
+        return Err("--bind-runtime-async requires compiled System, GC and stack budget".into());
+    }
+
     args.retain(|a| a != "--bind-timers");
     if bind_timers && (!compile_system || !native_gc) {
         return Err("--bind-timers requires --compile-system and --native-gc".into());
@@ -424,6 +435,7 @@ fn run() -> Result<(), Box<dyn std::error::Error>> {
                 bind_task_queue,
                 bind_socket_transfer,
                 bind_timers,
+                bind_runtime_async,
                 bind_scheduler,
                 bind_socket_client,
                 reference_arena,

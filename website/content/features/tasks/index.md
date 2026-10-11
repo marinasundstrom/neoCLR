@@ -260,19 +260,23 @@ projecting their async constructs onto a shared lifecycle. Native languages and 
 runtimes should eventually integrate through explicit ownership and completion
 adapters; no foreign-runtime async ABI is implemented or selected.
 A separate, opt-in [Raven runtime-async POC](https://github.com/marinasundstrom/neoCLR/blob/main/docs/experiments/runtime-async/README.md#raven-runtime-async-language-poc-2026-10-11)
-now lowers ordinary async methods and Main to retained interpreter bodies without
+now lowers ordinary async methods and Main to retained runtime bodies without
 generated state machines. Its source-included provider returns ordinary Task values.
 The development interpreter POC also runs the HTTP client/server showcase sources,
 including a combined loopback consumer and synchronous `use` across awaits. GC and
 cancellation cleanup checks pass. Both native HTTP projects now support explicit
-runtime-await selection; JIT/AOT suspension and default readiness remain open.
+runtime-await selection. Both projects and timeout/cancellation/fault cases now pass
+macOS ARM64 JIT/AOT qualification with explicit parked GC roots and terminal teardown.
+The native stack carrier remains temporary POC scaffolding; Windows, production
+integration and default readiness remain open.
 Explicit await mappings also qualify an independent runtime-backed manual operation
 and a distinct awaiter. An imported generic interface also supports pending and immediate
 implementations through one mapping. The final runtime-facing contract and native
 interop bindings remain in design.
 Executable samples cover nested awaits, reference/receiver retention, unit results,
 cancellation, terminal faults and GC reclamation. This is development support, with
-restricted method/await shapes and no JIT/AOT qualification or default switch.
+restricted method/await shapes and no default switch. The independent operation
+experiments remain interpreter-qualified; compiled evidence covers the managed Task provider.
 Production notification/lifetime integration and broader cleanup remain open;
 a managed Scheduler API backed by runtime implementation is the selected direction,
 with Task/Promise remaining managed. Its members are not yet selected or implemented.
@@ -286,7 +290,7 @@ for the current state-machine path in interpreter, JIT and AOT. Startup and exte
 batch timings are separate. An opt-in Raven runtime-async interpreter comparison now
 measures lower execution time but more allocated objects in bounded nested-await
 workloads ([results and limitations](https://github.com/marinasundstrom/neoCLR/blob/main/docs/experiments/runtime-async/README.md#matched-language-benchmark--2026-10-11));
-JIT/AOT suspension and retained-byte measurements remain open. A matched pending-await comparison also measures
+JIT/AOT suspension performance and retained-byte measurements remain open. A matched pending-await comparison also measures
 direct versus captured invocation registrations. These exploratory runs do not
 establish a general performance improvement.
 

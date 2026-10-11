@@ -8,6 +8,15 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-11
 
+- Add opt-in compiled runtime-await suspension for macOS ARM64 JIT and AOT, sharing
+  exact service bindings, cooperative retained stacks, parked GC roots and terminal
+  teardown. Qualify both HTTP projects, lifecycle outcomes, cancellation/use cleanup,
+  repeated native entries and pending-await stress. Add parked-root and binding
+  contract tests; prevent continuation traffic from starving lifetime callbacks and
+  preserve the native stack test’s intended allocation under optimization. The
+  deprecated ucontext carrier is POC scaffolding; Windows,
+  production carrier selection, native Task.Run and default readiness remain open.
+
 - Qualify interpreter runtime-await HTTP timeout, cancellation, protocol-error and
   terminal-Fault behavior, including socket closure and recovery after nonterminal
   outcomes. Record JIT/AOT runtime suspension as the next explicit author gate.

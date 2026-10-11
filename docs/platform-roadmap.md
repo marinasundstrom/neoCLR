@@ -46,7 +46,7 @@ Raven now has an explicit native runtime-async language POC: ordinary async meth
 and Main lower to retained bodies without generated state machines. The
 [language, fault and GC samples](experiments/runtime-async/README.md#raven-runtime-async-language-poc-2026-10-11)
 pass, including zero final live objects and bounded heap use across repeated nested
-suspension. The provider remains source-local and interpreter-only.
+suspension. The provider remains source-local; compiled support is qualified below.
 [Matched interpreter benchmarks](experiments/runtime-async/README.md#matched-language-benchmark--2026-10-11)
 now show about 16–21% less time at 100 operations, with 13–18% more allocations.
 Improve notification/lifetime costs and broaden qualification before switching defaults.
@@ -72,10 +72,13 @@ cleanup and GC evidence. [Project-level opt-in](experiments/runtime-async/README
 also now qualifies both actual showcase builds, cleanup and configuration rejection,
 with unchanged default lowering. [HTTP timeout/cancellation and terminal failure cases](experiments/runtime-async/README.md#http-lifecycle-qualification--2026-10-11)
 now pass interpreter qualification. The author explicitly directs continuation until
-JIT and AOT runtime suspension work; close those gaps and remeasure costs.
+JIT and AOT runtime suspension work. The [compiled POC](experiments/runtime-async/README.md#compiled-runtime-suspension-jit-and-aot--2026-10-11)
+now qualifies both HTTP projects and lifecycle cases on macOS ARM64, with explicit
+parked-stack GC roots and terminal teardown. Windows and a production stack carrier
+remain open, as do native Task.Run, full library migration and performance qualification.
 Retain cancellation, terminal Fault, GC and benchmark checks. Broaden
-execution-mode coverage before considering defaults; no current JIT/AOT suspension
-support is implied. General native interoperability, runtime interface recognition,
+platform coverage and measure costs before considering defaults. This is explicit
+POC support, not a default-mode or native build-kit change. General native interoperability, runtime interface recognition,
 native stack representation, preemption and multi-core scheduling remain open.
 Task/Promise keep operation/producer roles.
 

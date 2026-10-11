@@ -63,4 +63,14 @@ int32_t neoclr_probe_fault_roots_v1(const void *context, neoclr_probe_storage *o
 const neoclr_probe_frame *neoclr_root_probe_head_v1(void);
 uint64_t neoclr_root_probe_count_v1(void);
 uint32_t neoclr_root_probe_depth_v1(void);
+/* Private cooperative-stack registration. Records and chain storage must stay
+ * alive until resumed. Park/resume do not allocate or collect. */
+typedef struct neoclr_parked_roots {
+    neoclr_probe_frame *head;
+    struct neoclr_parked_roots *next;
+} neoclr_parked_roots;
+void neoclr_roots_park_v1(neoclr_parked_roots *);
+void neoclr_roots_discard_v1(neoclr_parked_roots *);
+void neoclr_roots_resume_v1(neoclr_parked_roots *);
+const neoclr_parked_roots *neoclr_roots_parked_v1(void);
 #endif

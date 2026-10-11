@@ -15165,3 +15165,22 @@ or runtime-await default switch was performed.
   checks pass with peer-observed closure and recovery for nonterminal outcomes.
   [Evidence](experiments/runtime-async/runtime-http-lifecycle-validation.json).
 - Open: compiled stack retention, GC visibility and JIT/AOT HTTP qualification.
+
+
+### 2026-10-11 — Compiled runtime-await HTTP POC
+
+- Following the author's explicit JIT/AOT request, the assistant implemented shared
+  compiled service bindings, a cooperative retained-stack host, parked GC roots and
+  terminal teardown. Raven's existing helper contract remains unchanged.
+- Performed qualification: language/cleanup/fault samples and actual client/server
+  projects work in JIT and AOT on macOS ARM64. HTTP timeout, cancellation, protocol
+  error recovery and terminal Fault include peer-observed socket closure.
+  [Implementation and evidence](experiments/runtime-async/README.md#compiled-runtime-suspension-jit-and-aot--2026-10-11).
+- Assistant decision: use deprecated macOS ucontext only as explicit POC scaffolding,
+  with guard pages and registered bounds; do not claim a production carrier or
+  performance win. Preserve Task.Run's distinct concurrent-work contract instead
+  of silently aliasing it to cooperative submission. Its combined loopback consumer
+  remains interpreter-only; the actual HTTP projects pass compiled qualification.
+- Open: Windows, production carrier, performance/memory measurement, Task.Run and
+  production provider/build integration. No default switch or author endorsement of
+  this particular carrier is inferred.

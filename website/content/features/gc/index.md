@@ -61,8 +61,10 @@ Generations, byte accounting, finalizers, tuning and no-GC regions are future wo
 Development ARM64 AOT builds can opt into `--native-gc`, which links a basic nonmoving
 collector into the executable. The tested Raven routing workload completes 1,024 requests
 within 64 KiB while preserving a pattern and captures across requests. No shared managed
-runtime is needed. This is separate from the public `System.Runtime.GC` API above, which
-is not yet bound in AOT builds.
+runtime is needed. The separate macOS ARM64 runtime-async POC now binds
+`System.Runtime.GC.Collect()` in JIT/AOT and preserves published roots from suspended
+native stacks. Other public GC controls/counters are not yet bound in this native
+profile; native GC metric parity remains open.
 
 The initial collector scans object payloads conservatively and collects at every published
 operation boundary. Conservative scanning can retain extra objects, and frequent collection

@@ -102,3 +102,35 @@ void neoclr_probe_transient_v2(neoclr_probe_frame *frame, uint32_t phase,
 const neoclr_probe_frame *neoclr_root_probe_head_v1(void) { return head; }
 uint64_t neoclr_root_probe_count_v1(void) { return calls; }
 uint32_t neoclr_root_probe_depth_v1(void) { return depth; }
+
+static _Thread_local neoclr_parked_roots *parked;
+void neoclr_roots_park_v1(neoclr_parked_roots *record) {
+    if (!record || record->head || record->next) abort();
+    for (neoclr_parked_roots *p = parked; p; p = p->next) if (p == record) abort();
+    record->head = head;
+    record->next = parked;
+    parked = record;
+    head = NULL;
+    depth = 0;
+}
+void neoclr_roots_resume_v1(neoclr_parked_roots *record) {
+    if (!record || head) abort();
+    neoclr_parked_roots **p = &parked;
+    while (*p && *p != record) p = &(*p)->next;
+    if (!*p) abort();
+    *p = record->next;
+    head = record->head;
+    record->head = NULL;
+    record->next = NULL;
+    depth = 0;
+    for (const neoclr_probe_frame *f = head; f; f = f->previous) depth++;
+}
+const neoclr_parked_roots *neoclr_roots_parked_v1(void) { return parked; }
+
+void neoclr_roots_discard_v1(neoclr_parked_roots *record) {
+    neoclr_parked_roots **p = &parked;
+    while (*p && *p != record) p = &(*p)->next;
+    if (!*p) abort();
+    *p = record->next;
+    memset(record, 0, sizeof(*record));
+}

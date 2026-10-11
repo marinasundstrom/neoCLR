@@ -1,6 +1,9 @@
 #include "entry-arguments.h"
 /* One-request HTTP correctness host, not a production scheduler or load benchmark. */
 #include "native-gc.h"
+#ifdef NEOCLR_RUNTIME_ASYNC
+#include "native-runtime.h"
+#endif
 #include "task-queue.h"
 #include "socket-listener.h"
 #include <stdlib.h>
@@ -50,6 +53,9 @@ static int invoke(neoclr_aot_context *context, int *failed, int argc, neoclr_pro
         else if (progress < 0) host_error = 1;
         else neoclr_os_pause();
     }
+#ifdef NEOCLR_RUNTIME_ASYNC
+    if (neoclr_runtime_async_shutdown_v1(context)) host_error = 1;
+#endif
     if (neoclr_root_probe_head_v1()) host_error = 1;
     if (neoclr_socket_scope_leave_v1(&sockets)) host_error = 1;
     if (neoclr_task_scope_leave_v1(&tasks)) host_error = 1;

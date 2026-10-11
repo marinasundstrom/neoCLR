@@ -51,6 +51,14 @@ pub struct Options {
     pub scheduler_capture: Vec<usize>,
     pub scheduler_submit_to: Vec<usize>,
     pub timer_start: Vec<usize>,
+    pub runtime_async_gccollect: Vec<usize>,
+    pub runtime_async_create: Vec<usize>,
+    pub runtime_async_start: Vec<usize>,
+    pub runtime_async_completeunit: Vec<usize>,
+    pub runtime_async_awaitunit: Vec<usize>,
+    pub runtime_async_release: Vec<usize>,
+    pub runtime_async_iscompleted: Vec<usize>,
+    pub runtime_async_waitcompletion: Vec<usize>,
     pub timer_cancel: Vec<usize>,
     pub socket_deadline_after: Vec<usize>,
     pub socket_deadline_expired: Vec<usize>,
@@ -237,6 +245,30 @@ impl Options {
             scheduler_submit: report.and_then(|r| r["nativeBindings"].as_array()).into_iter().flatten()
                 .filter(|r| r["implementation"] == "scheduler-submit-v1")
                 .filter_map(|r| r["compiledIndex"].as_u64().map(|i| i as usize)).collect(),
+            runtime_async_gccollect: report.and_then(|r| r["nativeBindings"].as_array()).into_iter().flatten()
+                .filter(|b| b["implementation"] == "runtime-async-gccollect-v1")
+                .filter_map(|b| b["compiledIndex"].as_u64().map(|v| v as usize)).collect(),
+            runtime_async_create: report.and_then(|r| r["nativeBindings"].as_array()).into_iter().flatten()
+                .filter(|b| b["implementation"] == "runtime-async-create-v1")
+                .filter_map(|b| b["compiledIndex"].as_u64().map(|v| v as usize)).collect(),
+            runtime_async_start: report.and_then(|r| r["nativeBindings"].as_array()).into_iter().flatten()
+                .filter(|b| b["implementation"] == "runtime-async-start-v1")
+                .filter_map(|b| b["compiledIndex"].as_u64().map(|v| v as usize)).collect(),
+            runtime_async_completeunit: report.and_then(|r| r["nativeBindings"].as_array()).into_iter().flatten()
+                .filter(|b| b["implementation"] == "runtime-async-completeunit-v1")
+                .filter_map(|b| b["compiledIndex"].as_u64().map(|v| v as usize)).collect(),
+            runtime_async_awaitunit: report.and_then(|r| r["nativeBindings"].as_array()).into_iter().flatten()
+                .filter(|b| b["implementation"] == "runtime-async-awaitunit-v1")
+                .filter_map(|b| b["compiledIndex"].as_u64().map(|v| v as usize)).collect(),
+            runtime_async_release: report.and_then(|r| r["nativeBindings"].as_array()).into_iter().flatten()
+                .filter(|b| b["implementation"] == "runtime-async-release-v1")
+                .filter_map(|b| b["compiledIndex"].as_u64().map(|v| v as usize)).collect(),
+            runtime_async_iscompleted: report.and_then(|r| r["nativeBindings"].as_array()).into_iter().flatten()
+                .filter(|b| b["implementation"] == "runtime-async-iscompleted-v1")
+                .filter_map(|b| b["compiledIndex"].as_u64().map(|v| v as usize)).collect(),
+            runtime_async_waitcompletion: report.and_then(|r| r["nativeBindings"].as_array()).into_iter().flatten()
+                .filter(|b| b["implementation"] == "runtime-async-waitcompletion-v1")
+                .filter_map(|b| b["compiledIndex"].as_u64().map(|v| v as usize)).collect(),
             timer_start: report.and_then(|r| r["nativeBindings"].as_array()).into_iter().flatten()
                 .filter(|r| r["implementation"] == "timer-start-v1")
                 .filter_map(|r| r["compiledIndex"].as_u64().map(|i| i as usize)).collect(),

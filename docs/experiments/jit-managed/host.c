@@ -1,5 +1,8 @@
 /* Private JIT entry host. Managed awaits drain within this call; no state escapes. */
 #include "native-gc.h"
+#ifdef NEOCLR_RUNTIME_ASYNC
+#include "native-runtime.h"
+#endif
 #include "task-queue.h"
 #include "socket-listener.h"
 #include <stdlib.h>
@@ -51,6 +54,9 @@ static int32_t run_entry(const void *entry, int32_t with_args, int32_t argc, con
     int32_t status = with_args
         ? args_function(argc, &result, &context, argv)
         : plain_function(0, &result, &context);
+#ifdef NEOCLR_RUNTIME_ASYNC
+    if (neoclr_runtime_async_shutdown_v1(&context)) abort();
+#endif
     int render_error = status && neoclr_aot_render_fault(stderr, &context.fault);
     /* Cleanup must not return to a caller about to unload JIT code while any
        frame/handle still owns its descriptors. Treat a broken invariant as fatal. */
@@ -59,6 +65,10 @@ static int32_t run_entry(const void *entry, int32_t with_args, int32_t argc, con
         neoclr_task_scope_leave_v1(&tasks) ||
         neoclr_gc_owned_roots_check_v1(&context, NULL, 0) ||
         neoclr_gc_collect_v1(&context, NULL)) abort();
+#ifdef NEOCLR_RUNTIME_ASYNC
+    memset(&context.fault, 0, sizeof(context.fault));
+    if (neoclr_gc_collect_v1(&context, NULL) || context.text.used) abort();
+#endif
     free(heap);
     return render_error ? 2 : status ? 1 : result;
 }

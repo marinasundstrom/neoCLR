@@ -8784,3 +8784,19 @@ claimed. Configuration is project-local and dependencies retain their existing
 semantics. Raven owns project import/emission; neoCLR owns showcase/runtime validation.
 The eventual replacement is production managed runtime-async integration, driven by
 execution evidence rather than further interop-interface design at this stage.
+
+
+### Compiled runtime-await application qualification (2026-10-11)
+
+The existing Raven native RuntimeAsyncHelper contract and source provider now run
+through neoCLR's shared JIT/AOT compiled backend on macOS ARM64. Both native HTTP
+projects, cleanup, cancellation and terminal-Fault cases pass without application
+state machines or interpreter fallback. [Evidence and carrier limitations](experiments/runtime-async/README.md#compiled-runtime-suspension-jit-and-aot--2026-10-11).
+Raven native `2ef670ff1` is unchanged; Runtime Contract configuration, source-local
+helper emission and retained cleanup capability remain the same. The temporary
+InternalCall service representation now has explicit compiled bindings; it is not
+native async metadata. neoCLR owns parked stack/GC/scheduler lifetime. A deprecated
+macOS ucontext carrier is experiment scaffolding, not the final native backend ABI.
+Windows, CLI/build-kit integration, native Task.Run, managed GC metric parity, full
+library migration and default readiness remain open. General .NET lowering and
+Raven main remain separate and unchanged.

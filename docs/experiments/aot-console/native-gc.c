@@ -112,6 +112,10 @@ int32_t neoclr_gc_callback_read_suspended_v1(neoclr_aot_context *context, uint64
 }
 int32_t neoclr_gc_entry_check_v1(neoclr_aot_context *context) {
     if (!context) return NEOCLR_AOT_FAULT_RUNTIME_ERROR;
+    for (const neoclr_parked_roots *p = neoclr_roots_parked_v1(); p; p = p->next)
+        for (const neoclr_probe_frame *f = p->head; f; f = f->previous)
+            if (f->context == context) return NEOCLR_AOT_FAULT_RUNTIME_ERROR;
+
     for (host_root *root = host_head; root; root = root->next)
         if (root->context == context) return NEOCLR_AOT_FAULT_RUNTIME_ERROR;
     for (const neoclr_probe_frame *frame = neoclr_root_probe_head_v1(); frame; frame = frame->previous)
@@ -120,6 +124,9 @@ int32_t neoclr_gc_entry_check_v1(neoclr_aot_context *context) {
 }
 int32_t neoclr_gc_owned_roots_check_v1(neoclr_aot_context *context, const uint64_t *handles, uint32_t count) {
     if (!context || count > NEOCLR_GC_HOST_ROOT_LIMIT || (count && !handles)) return 3;
+    for (const neoclr_parked_roots *p = neoclr_roots_parked_v1(); p; p = p->next)
+        for (const neoclr_probe_frame *f = p->head; f; f = f->previous)
+            if (f->context == context) return 3;
     for (const neoclr_probe_frame *f = neoclr_root_probe_head_v1(); f; f = f->previous)
         if (f->context == context) return 3;
     for (uint32_t i = 0; i < count; i++) {
@@ -225,11 +232,17 @@ int32_t neoclr_gc_collect_v1(neoclr_aot_context *context, const neoclr_probe_fra
     mark_slots(a, &index, fault, (uint32_t)count, &pending);
     for (host_root *root = host_head; root; root = root->next)
         if (root->context == context) mark(a, &index, (uintptr_t)root->value, &pending);
-    for (const neoclr_probe_frame *f = head; f; f = f->previous) {
-        if (f->context != context) continue;
-        mark_slots(a, &index, f->storage, f->storage_count, &pending);
-        mark_slots(a, &index, f->transient, f->transient_count, &pending);
-        for (uint32_t i = 0; i < f->lane_count; i++) mark(a, &index, f->lanes[i], &pending);
+    const neoclr_parked_roots *parked = neoclr_roots_parked_v1();
+    for (;;) {
+        for (const neoclr_probe_frame *f = head; f; f = f->previous) {
+            if (f->context != context) continue;
+            mark_slots(a, &index, f->storage, f->storage_count, &pending);
+            mark_slots(a, &index, f->transient, f->transient_count, &pending);
+            for (uint32_t i = 0; i < f->lane_count; i++) mark(a, &index, f->lanes[i], &pending);
+        }
+        if (!parked) break;
+        head = parked->head;
+        parked = parked->next;
     }
     /* Each newly marked allocation enters the intrusive worklist exactly once.
      * The sparse index bounds address searches to a bucket plus its crossing block. */

@@ -686,6 +686,41 @@ fn completion_services(input: &mut neoclr::Module, selection: &Value, submission
     Ok(bindings)
 }
 
+pub fn runtime_async(input: &mut neoclr::Module, selection: &Value) -> Result<Vec<Value>, Error> {
+    let mut bindings = vec![];
+    for row in selection["functions"].as_array().ok_or("missing selection inventory")? {
+        let (parameters, result, implementation, symbol) = match row["name"].as_str() {
+            Some("neoCLR.Runtime.GCCollect") => (vec![], Type::Void, "runtime-async-gccollect-v1", "neoclr_runtime_async_gccollect_v1"),
+            Some("neoCLR.Runtime.RuntimeAsyncCreate") => (vec![], Type::Int64, "runtime-async-create-v1", "neoclr_runtime_async_create_v1"),
+            Some("neoCLR.Runtime.RuntimeAsyncStart") => (vec![neoclr::assembler::parse_type("fn<Void>").expect("fixed runtime callback signature")], Type::Int64, "runtime-async-start-v1", "neoclr_runtime_async_start_v1"),
+            Some("neoCLR.Runtime.RuntimeAsyncCompleteUnit") => (vec![Type::Int64], Type::Boolean, "runtime-async-completeunit-v1", "neoclr_runtime_async_completeunit_v1"),
+            Some("neoCLR.Runtime.RuntimeAsyncAwaitUnit") => (vec![Type::Int64], Type::Void, "runtime-async-awaitunit-v1", "neoclr_runtime_async_awaitunit_v1"),
+            Some("neoCLR.Runtime.RuntimeAsyncRelease") => (vec![Type::Int64], Type::Boolean, "runtime-async-release-v1", "neoclr_runtime_async_release_v1"),
+            Some("neoCLR.Runtime.RuntimeAsyncIsCompleted") => (vec![Type::Int64], Type::Boolean, "runtime-async-iscompleted-v1", "neoclr_runtime_async_iscompleted_v1"),
+            Some("neoCLR.Runtime.RuntimeAsyncWaitCompletion") => (vec![Type::Int64], Type::Boolean, "runtime-async-waitcompletion-v1", "neoclr_runtime_async_waitcompletion_v1"),
+            _ => continue,
+        };
+        let f = &mut input.functions[row["compiledIndex"].as_u64().ok_or("missing compiled index")? as usize];
+        if f.name != row["name"].as_str().unwrap()
+            || f.owner.is_some() || f.instance || f.receiver_byref || f.receiver_readonly
+            || f.parameters != parameters || f.returns != result || f.no_result != (result == Type::Void)
+            || f.impl_flags != 0x1000 || f.pinvoke.is_some() || !f.body.is_empty()
+            || !f.locals.is_empty() || f.is_virtual || f.is_override || f.is_abstract
+            || !f.generic_parameters.is_empty() || !f.generic_arguments.is_empty()
+            || !f.generic_constraints.is_empty() || !f.interface_implementations.is_empty()
+            || !f.out_parameters.is_empty() || !f.out_when_true.is_empty() || !f.readonly_parameters.is_empty()
+        { return Err(format!("native runtime-async binding requires exact reserved InternalCall contract: {} params {:?} returns {:?} no_result {}", f.name, f.parameters, f.returns, f.no_result).into()); }
+        f.impl_flags = 0;
+        f.body = if result == Type::Boolean { vec![Op::Bool(false), Op::Return] }
+            else if result == Type::Int64 { vec![Op::Int64(0), Op::Return] }
+            else { vec![Op::Return] };
+        bindings.push(json!({"definition": row["definition"], "name": row["name"],
+            "compiledIndex": row["compiledIndex"], "implementation": implementation, "symbol": symbol,
+            "storage": "private polled host scope; bounded shared operation table; rooted one-shot callbacks"}));
+    }
+    Ok(bindings)
+}
+
 /// Reference-arena identity uses the same verified primitive as CIL ref.equal.
 pub fn object_reference_equals(input: &mut neoclr::Module, selection: &Value) -> Result<Vec<Value>, Error> {
     let mut bindings = vec![];
@@ -1039,6 +1074,39 @@ mod type_identity_tests {
             let mut input = source;
             let bindings = time_zone_rules(&mut input, &inventory).unwrap();
             assert_eq!(bindings[0]["symbol"], symbol);
+            assert_eq!(input.functions[0].impl_flags, 0);
+        }
+    }
+
+    #[test]
+    fn runtime_async_requires_exact_native_contracts() {
+        for (name, parameters, result) in [
+            ("RuntimeAsyncCreate", "", "Int64"),
+            ("RuntimeAsyncStart", "fn<Void> callback", "Int64"),
+            ("RuntimeAsyncCompleteUnit", "Int64 operation", "Boolean"),
+            ("RuntimeAsyncAwaitUnit", "Int64 operation", "noresult"),
+            ("RuntimeAsyncRelease", "Int64 operation", "Boolean"),
+            ("RuntimeAsyncIsCompleted", "Int64 operation", "Boolean"),
+            ("RuntimeAsyncWaitCompletion", "Int64 operation", "Boolean"),
+            ("GCCollect", "", "noresult"),
+        ] {
+            let source = neoclr::assemble(&format!(".module AsyncBinding\n.function neoCLR.Runtime.{name}({parameters}) -> {result}\n.methodimpl InternalCall\n.end\n")).unwrap();
+            let inventory = json!({"functions":[{"compiledIndex":0,"name":format!("neoCLR.Runtime.{name}")}]});
+            for variant in 0..6 {
+                let mut input = source.clone();
+                let f = &mut input.functions[0];
+                match variant {
+                    0 => f.parameters.push(Type::Int32),
+                    1 => f.returns = Type::String,
+                    2 => f.impl_flags = 0,
+                    3 => f.body.push(Op::Int(0)),
+                    4 => f.no_result = !f.no_result,
+                    _ => f.locals.push(Type::String),
+                }
+                assert!(runtime_async(&mut input, &inventory).is_err(), "{name} variant {variant}");
+            }
+            let mut input = source;
+            assert_eq!(runtime_async(&mut input, &inventory).unwrap().len(), 1);
             assert_eq!(input.functions[0].impl_flags, 0);
         }
     }

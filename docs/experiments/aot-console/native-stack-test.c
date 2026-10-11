@@ -10,6 +10,8 @@ __attribute__((noinline)) static unsigned descend(unsigned depth) {
     volatile unsigned char storage[16384];
     storage[0] = (unsigned char)depth;
     storage[sizeof(storage) - 1] = (unsigned char)(depth + 1);
+    /* Force the complete addressable buffer to survive scalar replacement. */
+    __asm__ volatile("" : : "r" (storage) : "memory");
     assert(depth < 1024);
     unsigned result = neoclr_native_stack_check_v1() == 0 ? descend(depth + 1) : depth;
     assert(storage[0] == (unsigned char)depth);
@@ -30,6 +32,10 @@ static void *small_worker(void *data) {
     return NULL;
 }
 int main(void) {
+    assert(neoclr_native_stack_check_v1() == 0);
+    neoclr_native_stack_bounds_v1(1, 2);
+    assert(neoclr_native_stack_check_v1() == 9);
+    neoclr_native_stack_bounds_v1(0, 0);
     assert(neoclr_native_stack_check_v1() == 0);
     unsigned depth = 0;
     pthread_attr_t attr;
