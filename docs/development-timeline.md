@@ -14908,3 +14908,14 @@ outside benchmark measurement. Implementation follows the configuration slice.
 - Evidence: [runtime-async POC](experiments/runtime-async/README.md). Open: real Raven
   await integration, managed results, native/JIT and Windows qualification, stress
   coverage and comparison benchmarks. Native stack representation remains unselected.
+
+### Follow-up — invocation is a separate compiler integration requirement
+
+Inspection of Raven's CLR runtime-async lowering confirmed it relies on CLR async
+method metadata for returned-Task invocation behavior, in addition to awaiting.
+The assistant implemented a private neoCLR eager body-start primitive: run until
+completion/first pending wait, return a handle, and publish the body's eventual
+integer result. The compiled Raven consumer and 30 focused checks pass. This is
+runtime groundwork; ordinary Raven async lowering and defaults remain unchanged.
+Managed Task results, fault/cancellation projection and native support remain open.
+See [invocation evidence](experiments/runtime-async/start-validation.json).

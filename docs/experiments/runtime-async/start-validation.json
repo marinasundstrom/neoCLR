@@ -1,0 +1,82 @@
+{
+  "passed": true,
+  "commands": [
+    {
+      "command": [
+        "dotnet",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle/sdk/tools/rvnc/rvnc.dll",
+        "neoclr",
+        "--core-reference",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/Core.dll",
+        "--runtime-seed",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/System.runtime.neox",
+        "--bootstrap-intrinsics",
+        "--bootstrap-ownership",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/ownership.json",
+        "--object-library",
+        "System.Runtime",
+        "--async-library",
+        "System.Runtime",
+        "--reference",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/System.Runtime.dll",
+        "--reference",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/System.Data.dll",
+        "--reference",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/System.Networking.dll",
+        "--reference",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/System.Web.dll",
+        "-o",
+        "/Users/robert/Projects/neoclr/target/runtime-async-start/app.dll",
+        "/Users/robert/Projects/neoclr/docs/experiments/runtime-async/Await.rvn"
+      ],
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/scheduler-wait-validation/debug/neoclr",
+        "run",
+        "/Users/robert/Projects/neoclr/target/runtime-async-start/app.dll",
+        "--system",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/System.runtime.neox",
+        "--instructions",
+        "100000000",
+        "--object-root",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/System.Runtime.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/System.Runtime.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/System.Data.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/System.Networking.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/System.Web.dll"
+      ],
+      "exitCode": 0,
+      "stdout": "PASS runtime-owned operation suspension and resumption\n",
+      "stderr": ""
+    }
+  ],
+  "sha256": {
+    "/Users/robert/Projects/neoclr/docs/experiments/runtime-async/Await.rvn": "8915197dfed0a22c22e6d0d317b5cdc7315a4fbcf183e61e8cb18a61feec19ce",
+    "/Users/robert/Projects/neoclr/target/scheduler-wait-validation/debug/neoclr": "bfd9134ed372ab9d70f927bce3a1c0baf8b76ffcaaa2f41a41c3c1d7adda87d9",
+    "/Users/robert/Projects/neoclr/target/data-cases-bundle/sdk/tools/rvnc/rvnc.dll": "ffea7882e8dc83809aaa732db52532b6e65a92ed4f592fa4fc6b5d8d5bd5470a",
+    "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/Core.dll": "3d4a676d379067c18a65a9beb8257ed40bf3196fc643a9ba1d559c619ec73fad",
+    "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/System.runtime.neox": "98a1ae1da85387c87746957e83a4015eb59d0566539a915c69f168d2b511b190",
+    "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/System.Runtime.dll": "818e0147dd0a6fb4946a9ddca0b672e19902b9b6138cdee6ac9b9c07e25bf746",
+    "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/System.Data.dll": "7cfad8f6ca5e0cfc0cc13c15bdb8fc623280aa72fd6aad73a7aacdd586a9c150",
+    "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/System.Networking.dll": "ec3b383eee5f202f0badeb48ad775df16de1b2a81d94843caf2391c21fa9e2e3",
+    "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/System.Web.dll": "edcae392b0cd0a4562680408830a931ad2bf92e5280157da16afd8967103474c"
+  },
+  "sourceBaseRevision": "6ec566d0",
+  "focusedValidation": {
+    "integrationTests": 27,
+    "operationTests": 3,
+    "failed": 0,
+    "commands": [
+      "CARGO_TARGET_DIR=target/scheduler-wait-validation cargo test --test runtime_async_await --test runtime_async_yield --test scheduler_submission",
+      "CARGO_TARGET_DIR=target/scheduler-wait-validation cargo test --lib runtime_async::tests"
+    ]
+  }
+}

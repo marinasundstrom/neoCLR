@@ -90,6 +90,7 @@ pub(crate) fn uses(module: &crate::Module, function: &Function) -> Result<Vec<Se
             | crate::native::Binding::SchedulerSubmitTo
             | crate::native::Binding::SchedulerSubmit
             | crate::native::Binding::ScheduleTask
+            | crate::native::Binding::RuntimeAsyncStart
             | crate::native::Binding::RuntimeAsyncCreate
             | crate::native::Binding::RuntimeAsyncDelay
             | crate::native::Binding::RuntimeAsyncComplete

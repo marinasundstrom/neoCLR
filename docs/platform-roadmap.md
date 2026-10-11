@@ -21,8 +21,9 @@ and the [JIT evaluation brief](native-execution-investigation.md#jit-for-develop
 moving toward green threads. The interpreter POC now resumes detached callbacks and parents independently;
 this is groundwork, not a completed green-thread implementation. The immediate
 author-directed goal is runtime await as Raven’s default, with stability and
-measured improvement. Next are compiler/managed Task integration and equivalent
-state-machine comparisons before switching supported defaults. Native stack representation, preemption and
+measured improvement. The POC now includes eager body invocation and runtime-owned integer-result
+completion. Next are compiler/managed Task integration and equivalent state-machine
+comparisons before switching supported defaults. Native stack representation, preemption and
 multi-core scheduling remain open. Task/Promise keep operation/producer roles.
 
 **Runtime async groundwork (2026-10-11):** the author directs implementation while

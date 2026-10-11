@@ -8,6 +8,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-11
 
+- Add private interpreter async-body invocation: run eagerly until completion or
+  first pending wait, return an operation handle and publish the body's result on
+  return. Reserve frame budget before publication and preserve runtime completion
+  authority. Integer-only handles, terminal faults and absent compiler/native support
+  remain explicit POC limits; Raven async defaults are unchanged.
+
 - Detach parked interpreter activation frames so ready parents can resume before
   callbacks waiting for their replies. Preserve GC roots, array/frame charges and
   entry results while detached; qualify the handshake in Raven and focused tests.

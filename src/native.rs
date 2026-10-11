@@ -52,6 +52,7 @@ pub(crate) enum Binding {
     DrainEntryTasks,
     RuntimeAsyncYield,
     RuntimeAsyncCreate,
+    RuntimeAsyncStart,
     RuntimeAsyncDelay,
     RuntimeAsyncComplete,
     RuntimeAsyncCancel,
@@ -944,6 +945,11 @@ pub(crate) fn bind(function: &Function) -> Result<Binding, Fault> {
                 || *callback == crate::assembler::parse_type("fn<noresult Void>")? =>
         {
             (Binding::ScheduleTask, Type::Void)
+        }
+        ("neoCLR.Runtime.RuntimeAsyncStart", [body])
+            if *body == crate::assembler::parse_type("fn<Int32>")? =>
+        {
+            (Binding::RuntimeAsyncStart, Type::Int64)
         }
         ("neoCLR.Runtime.RuntimeAsyncCreate", []) => (Binding::RuntimeAsyncCreate, Type::Int64),
         ("neoCLR.Runtime.RuntimeAsyncDelay", [Type::Int32]) => (Binding::RuntimeAsyncDelay, Type::Int64),

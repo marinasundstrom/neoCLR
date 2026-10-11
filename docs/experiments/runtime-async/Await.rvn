@@ -45,6 +45,23 @@ module RuntimeAsyncAwaitProbe {
         }
     }
 
+    class AsyncBody {
+        val Gate: long
+        var Phase = 0
+
+        init(gate: long) {
+            Gate = gate
+        }
+
+        func Run() -> int {
+            Phase = 1
+            _ = neoCLR.Runtime.RuntimeAsyncAwait(Gate)
+            System.Runtime.GC.Collect()
+            Phase = 2
+            return 42
+        }
+    }
+
     func Nested(producer: Producer) -> int {
         let saved = 7
         let result = neoCLR.Runtime.RuntimeAsyncAwait(producer.Operation)
@@ -74,6 +91,15 @@ module RuntimeAsyncAwaitProbe {
         if neoCLR.Runtime.RuntimeAsyncAwait(exchange.Done) != 42 {
             System.Fail("Detached callback failed to resume")
         }
+        let body = AsyncBody(neoCLR.Runtime.RuntimeAsyncCreate())
+        let invocation = neoCLR.Runtime.RuntimeAsyncStart(body.Run)
+        if body.Phase != 1 {
+            System.Fail("Async body did not run until its first suspension")
+        }
+        _ = neoCLR.Runtime.RuntimeAsyncComplete(body.Gate, 0)
+        if neoCLR.Runtime.RuntimeAsyncAwait(invocation) != 42 || body.Phase != 2 {
+            System.Fail("Async body did not publish its result")
+        }
         Console.WriteLine("PASS runtime-owned operation suspension and resumption")
         return 0
     }
@@ -86,6 +112,8 @@ module neoCLR.Runtime {
     // frame retention without Raven async/state-machine lowering.
     [MethodImpl(MethodImplOptions.InternalCall)]
     internal extern func RuntimeAsyncCreate() -> long;
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    internal extern func RuntimeAsyncStart(body: () -> int) -> long;
     [MethodImpl(MethodImplOptions.InternalCall)]
     internal extern func RuntimeAsyncDelay(milliseconds: int) -> long;
     [MethodImpl(MethodImplOptions.InternalCall)]

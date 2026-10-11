@@ -10,6 +10,7 @@ const CAPACITY: usize = 64;
 
 enum Operation {
     Pending,
+    Body,
     Timer(Instant),
     Completed(i32),
     Cancelled,
@@ -37,6 +38,19 @@ impl Operations {
         Ok(id)
     }
 
+    pub(crate) fn start(&mut self) -> Result<i64, Fault> {
+        let id = self.create(None)?;
+        self.0.insert(id, Operation::Body);
+        Ok(id)
+    }
+
+    pub(crate) fn complete_body(&mut self, id: i64, value: i32) {
+        if let Some(operation @ Operation::Body) = self.0.get_mut(&id) {
+            *operation = Operation::Completed(value);
+        }
+        // Cancellation retains terminal authority over a later body return.
+    }
+
     pub(crate) fn complete(&mut self, id: i64, value: i32) -> bool {
         let Some(operation @ Operation::Pending) = self.0.get_mut(&id) else {
             return false;
@@ -47,7 +61,7 @@ impl Operations {
 
     pub(crate) fn cancel(&mut self, id: i64) -> bool {
         match self.0.get_mut(&id) {
-            Some(operation @ (Operation::Pending | Operation::Timer(_))) => {
+            Some(operation @ (Operation::Pending | Operation::Body | Operation::Timer(_))) => {
                 *operation = Operation::Cancelled;
                 true
             }
@@ -60,14 +74,14 @@ impl Operations {
             Some(Operation::Timer(deadline)) => deadline
                 .saturating_duration_since(Instant::now())
                 .min(crate::scheduler::POLL_INTERVAL),
-            Some(Operation::Pending) => crate::scheduler::POLL_INTERVAL,
+            Some(Operation::Pending | Operation::Body) => crate::scheduler::POLL_INTERVAL,
             _ => Duration::ZERO,
         }
     }
 
     pub(crate) fn is_ready(&self, id: i64) -> bool {
         match self.0.get(&id) {
-            Some(Operation::Pending) => false,
+            Some(Operation::Pending | Operation::Body) => false,
             Some(Operation::Timer(deadline)) => Instant::now() >= *deadline,
             _ => true,
         }
@@ -85,7 +99,7 @@ impl Operations {
     /// No callback can race between the pending check and boundary installation.
     pub(crate) fn take_ready(&mut self, id: i64) -> Result<Option<i32>, Fault> {
         let result = match self.0.get(&id) {
-            Some(Operation::Pending) => return Ok(None),
+            Some(Operation::Pending | Operation::Body) => return Ok(None),
             Some(Operation::Timer(deadline)) if Instant::now() < *deadline => return Ok(None),
             Some(Operation::Timer(_)) => Ok(Some(0)),
             Some(Operation::Completed(value)) => Ok(Some(*value)),
@@ -116,6 +130,24 @@ mod tests {
         assert!(owner.complete(ids[0], 42));
         assert_eq!(owner.take_ready(ids[0]).unwrap(), Some(42));
         assert!(owner.create(None).is_ok());
+    }
+
+    #[test]
+    fn body_owns_completion_and_cancellation_wins_over_late_return() {
+        let mut operations = Operations::default();
+        let body = operations.start().unwrap();
+        assert!(!operations.complete(body, 99));
+        assert!(!operations.is_ready(body));
+        assert!(operations.cancel(body));
+        operations.complete_body(body, 42);
+        assert_eq!(
+            operations.take_ready(body).unwrap_err().code,
+            crate::FaultCode::ExecutionCancelled
+        );
+        let completed = operations.start().unwrap();
+        operations.complete_body(completed, 42);
+        operations.complete_body(completed, 99);
+        assert_eq!(operations.take_ready(completed).unwrap(), Some(42));
     }
 
     #[test]

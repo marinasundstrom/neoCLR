@@ -8439,3 +8439,23 @@ remain unqualified for this POC. Native activation metadata, source/await links 
 result rooting replace these private integer-only calls before production adoption.
 
 Companion Raven shared-main documentation: `77958770a` (documentation only).
+
+### Async-body invocation bridge (2026-10-11)
+
+Private interpreter service `neoCLR.Runtime.RuntimeAsyncStart(fn<Int32>) -> Int64`
+(ordinary InternalCall, TaskDispatch capability) runs a checked body until completion
+or its first pending wait, then returns the body operation handle. Runtime-owned
+return completion cannot be overwritten by manual RuntimeAsyncComplete. A cancelled
+operation retains terminal authority over late body return. Native/JIT support is
+absent; Runtime Contract configuration and all Raven lowering/defaults are unchanged.
+
+The source-local delegate is a temporary thunk representation. It loses general
+result types, argument/receiver metadata, logical async method identity and the
+public Task lifetime/outcome contract. Faults remain invocation-terminal. Future
+compiler integration must explicitly lower body invocation plus Task construction
+and await outcome projection; skipping generated state machines alone is insufficient.
+Keep ordinary CLR AsyncHelpers/async metadata behavior separate. Evidence is neoCLR
+`docs/experiments/runtime-async/start-validation.json`; ordinary Raven functions use
+these private calls, not newly supported compiler-lowered async methods.
+
+Companion Raven shared-main documentation: `8e95cca70` (documentation only).

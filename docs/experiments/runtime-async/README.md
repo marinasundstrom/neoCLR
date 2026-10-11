@@ -1,7 +1,8 @@
 # Interpreter runtime-async experiments
 
-Current development status: [detached activations](#detached-interpreter-activations--2026-10-11)
-pass the Raven handshake and 41 focused checks. Public Task/compiler await integration
+Current development status: [async-body invocation](#async-body-invocation-ownership--2026-10-11)
+passes the extended Raven consumer and 30 focused checks. Detached activation
+checks from the preceding slice remain recorded below. Public Task/compiler await integration
 and default switching remain open. Earlier sections record the preceding POC slices.
 
 Development experiment, 2026-10-11. `Yield.rvn` calls a private runtime boundary
@@ -167,3 +168,35 @@ extended consumer. Earlier evidence files remain tied to their recorded source h
 The author's immediate goal is Raven runtime await by default, backed by stability
 and improvement evidence. Next is the explicit compiler/managed-await integration
 contract and equivalent comparison cases. This POC does not change Raven defaults.
+
+## Async-body invocation ownership — 2026-10-11
+
+A private interpreter `RuntimeAsyncStart(fn<Int32>) -> Int64` now runs a body
+eagerly until it returns or first parks on a pending operation. Its caller receives
+an operation handle at that point. Returning from the body completes that operation
+with the integer result; completion belongs to the runtime, so manual Complete cannot
+overwrite it. A cancellation outcome wins over a subsequent body return. Already
+completed bodies and nested starts use the same mechanism. Frame budget admission
+precedes operation publication; receiver roots travel with the detached body.
+
+This mirrors the synchronous-prefix/returned-operation responsibility of .NET async
+invocation. It is separate from suspension alone: Raven's existing CLR lowering
+relies on the CLR to supply this responsibility through async method metadata.
+neoCLR cannot safely enable that lowering just by omitting state-machine generation.
+The POC uses a checked source-local delegate and private integer handle, not CLR
+AsyncHelpers or the CLR async method flag. The next compiler contract must explicitly
+connect body invocation, returned managed Task and awaited outcomes.
+
+This remains an interpreter mechanics experiment. The source body is an ordinary
+function, not a compiler-lowered Raven async method. Int32-only single-consumption
+handles do not redefine Task semantics. Body faults remain terminal invocation faults,
+not captured Task outcomes, and cancellation does not implement public Task semantics.
+Managed result rooting, repeated Task awaits, fault/cancellation projection and
+JIT/AOT support are still gates before ordinary await or default switching.
+No performance improvement is claimed by this slice.
+
+`Await.rvn` includes an eager body whose Phase is 1 when Start returns, then 2
+when its awaited result becomes available. [Invocation evidence](start-validation.json)
+records the compiled consumer. Focused tests additionally cover already completed
+bodies, nested starts, frame limits, producer authority and late return after cancel.
+The reproduction script is unchanged; use a dedicated output directory.

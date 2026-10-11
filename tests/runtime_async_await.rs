@@ -6,6 +6,9 @@ fn program(main: &str, extra: &str) -> LoadedProgram {
         r#"
 .module AsyncProbe
 .entry Main
+.function neoCLR.Runtime.RuntimeAsyncStart(fn<Int32> body) -> Int64
+.methodimpl InternalCall
+.end
 .function neoCLR.Runtime.RuntimeAsyncCreate() -> Int64
 .methodimpl InternalCall
 .end
@@ -368,4 +371,107 @@ fn detached_arrays_still_count_against_invocation_budget() {
         })
         .unwrap_err();
     assert_eq!(fault.code, FaultCode::ArrayLimitExceeded);
+}
+
+const BODY: &str = r#"
+.type class AsyncBody
+.field Gate Int64
+.field Phase Int32
+.method instance .ctor() -> noresult
+ret
+.end
+.method instance Run() -> Int32
+ldarg 0
+ldc.i4 1
+stfld AsyncBody::Phase
+ldarg 0
+ldfld AsyncBody::Gate
+call neoCLR.Runtime.RuntimeAsyncAwait(Int64)
+pop
+call neoCLR.Runtime.GCCollect()
+ldarg 0
+ldc.i4 2
+stfld AsyncBody::Phase
+ldc.i4 42
+ret
+.end
+.end
+"#;
+const START_BODY: &str = r#"
+.local AsyncBody body
+newobj instance AsyncBody::.ctor()
+stloc body
+ldloc body
+call neoCLR.Runtime.RuntimeAsyncCreate()
+stfld AsyncBody::Gate
+ldloc body
+function.bind fn<Int32> = instance AsyncBody::Run()
+call neoCLR.Runtime.RuntimeAsyncStart(fn<Int32>)
+stloc operation
+ldloc body
+ldfld AsyncBody::Phase
+ldc.i4 1
+ceq
+brfalse Bad
+ldloc operation
+ldc.i4 99
+call neoCLR.Runtime.RuntimeAsyncComplete(Int64, Int32)
+brtrue Bad
+ldloc body
+ldfld AsyncBody::Gate
+ldc.i4 0
+call neoCLR.Runtime.RuntimeAsyncComplete(Int64, Int32)
+pop
+ldloc operation
+call neoCLR.Runtime.RuntimeAsyncAwait(Int64)
+ret
+Bad:
+fault "async body did not run synchronously until suspension or lost producer authority"
+"#;
+
+#[test]
+fn async_start_runs_until_first_suspend_then_publishes_body_result() {
+    let result = bounded_run(program(START_BODY, BODY));
+    assert_eq!(result.value, Value::Int32(42));
+    assert!(result.heap.is_empty());
+}
+
+#[test]
+fn async_start_completed_body_returns_a_completed_operation() {
+    let extra = BODY.replace(
+        "ldarg 0\nldfld AsyncBody::Gate\ncall neoCLR.Runtime.RuntimeAsyncAwait(Int64)\npop",
+        "",
+    );
+    let main = START_BODY.replace("ldc.i4 1\nceq", "ldc.i4 2\nceq");
+    assert_eq!(bounded_run(program(&main, &extra)).value, Value::Int32(42));
+}
+
+#[test]
+fn async_start_charges_frame_before_running_body() {
+    let fault = program(START_BODY, BODY)
+        .run(Limits {
+            frames: 1,
+            ..Limits::default()
+        })
+        .unwrap_err();
+    assert_eq!(fault.code, FaultCode::StackOverflow);
+}
+
+#[test]
+fn async_start_body_fault_remains_terminal_in_this_poc() {
+    let extra = BODY.replace("ldc.i4 42\nret", "fault \"async body failure\"");
+    let fault = program(START_BODY, &extra)
+        .run(Limits::default())
+        .unwrap_err();
+    assert_eq!(fault.code, FaultCode::UserFault);
+}
+
+#[test]
+fn nested_async_starts_return_to_their_own_callers_and_publish_results() {
+    let extra = BODY.replace("ldarg 0\nldfld AsyncBody::Gate\ncall neoCLR.Runtime.RuntimeAsyncAwait(Int64)\npop", "ldarg 0\nfunction.bind fn<Int32> = instance AsyncBody::Inner()\ncall neoCLR.Runtime.RuntimeAsyncStart(fn<Int32>)\ncall neoCLR.Runtime.RuntimeAsyncAwait(Int64)\npop")
+        .replace("ldc.i4 42\nret\n.end\n.end", "ldc.i4 42\nret\n.end\n.method instance Inner() -> Int32\nldarg 0\nldfld AsyncBody::Gate\ncall neoCLR.Runtime.RuntimeAsyncAwait(Int64)\npop\nldc.i4 7\nret\n.end\n.end");
+    assert_eq!(
+        bounded_run(program(START_BODY, &extra)).value,
+        Value::Int32(42)
+    );
 }

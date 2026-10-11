@@ -1558,6 +1558,7 @@ fn restrict_reference_arguments(
 struct Frame {
     queue_callback: bool,
     runtime_callback: bool,
+    async_result: Option<i64>,
     permit: Option<crate::invocation_budget::FramePermit>,
     function: std::rc::Rc<crate::metadata::Function>,
     pc: usize,
@@ -1633,6 +1634,7 @@ impl Frame {
             permit: None,
             queue_callback: false,
             runtime_callback: false,
+            async_result: None,
             constructing: false,
             construction_object: None,
             construction_receiver: None,
@@ -2121,6 +2123,7 @@ struct RuntimeAsyncBoundary {
     dispatched: bool,
     no_result: bool,
     operation: Option<i64>,
+    started: Option<i64>,
 }
 
 /// State that survives an instruction-boundary suspension. File handles, interning
@@ -2417,6 +2420,7 @@ fn interpret_instructions_with_dispatch(
                 dispatched,
                 no_result,
                 operation,
+                started,
             }) = yield_boundaries.last()
             {
                 options.check_cancellation(
@@ -2443,7 +2447,7 @@ fn interpret_instructions_with_dispatch(
                 }
                 let resumed = match operation {
                     Some(id) => async_operations.take_ready(id)?.map(Value::Int32),
-                    None if dispatched => Some(Value::Void),
+                    None if dispatched => Some(started.map_or(Value::Void, Value::Int64)),
                     None => None,
                 };
                 if resumed.is_none()
@@ -4082,6 +4086,27 @@ fn interpret_instructions_with_dispatch(
                             return Ok(None);
                         }
 
+                        if matches!(binding, crate::native::Binding::RuntimeAsyncStart) {
+                            if work_control.is_some() || task_atomic::active(module, frames) {
+                                return Err(Fault::new(
+                                    "Runtime async is not supported in task mutation or worker execution",
+                                ));
+                            }
+                            let mut body = runtime_submission_frame(module, &args[0])?;
+                            // Reserve the frame before publishing an operation handle.
+                            body.permit = Some(budget.frame()?);
+                            let operation = async_operations.start()?;
+                            body.async_result = Some(operation);
+                            yield_boundaries.push(RuntimeAsyncBoundary {
+                                depth: frames.len(),
+                                dispatched: true,
+                                no_result: false,
+                                operation: None,
+                                started: Some(operation),
+                            });
+                            frames.push(body);
+                            return Ok(None);
+                        }
                         if matches!(
                             binding,
                             crate::native::Binding::RuntimeAsyncCreate
@@ -4121,6 +4146,7 @@ fn interpret_instructions_with_dispatch(
                                         dispatched: false,
                                         no_result: false,
                                         operation: Some(*id),
+                                        started: None,
                                     });
                                     return Ok(Some(Value::Void));
                                 }
@@ -4141,6 +4167,7 @@ fn interpret_instructions_with_dispatch(
                                 dispatched: false,
                                 no_result: callee.no_result,
                                 operation: None,
+                                started: None,
                             });
                             return Ok(Some(Value::Void));
                         }
@@ -4547,6 +4574,12 @@ fn interpret_instructions_with_dispatch(
                         || frame.constructing;
                     let value = constructed_object.map_or(value, Value::ObjectReference);
                     let runtime_callback = frame.runtime_callback;
+                    if let Some(operation) = frame.async_result {
+                        let Value::Int32(result) = value else {
+                            return Err(Fault::new("Runtime async body must return Int32"));
+                        };
+                        async_operations.complete_body(operation, result);
+                    }
                     frames.pop();
                     if runtime_callback {
                         return Ok(Some(Value::Void));

@@ -1396,3 +1396,29 @@ measurements of throughput, latency, allocations and retained memory. Preserve t
 state-machine fallback. Do not switch supported execution modes to an unsupported
 path: JIT/AOT implementations and Windows qualification remain required where exposed.
 The current private interpreter calls prove activation mechanics, not default readiness.
+
+## Async-body invocation ownership — 2026-10-11
+
+A private interpreter `RuntimeAsyncStart(fn<Int32>) -> Int64` now runs a body
+eagerly until it returns or first parks on a pending operation. Its caller receives
+an operation handle at that point. Returning from the body completes that operation
+with the integer result; completion belongs to the runtime, so manual Complete cannot
+overwrite it. A cancellation outcome wins over a subsequent body return. Already
+completed bodies and nested starts use the same mechanism. Frame budget admission
+precedes operation publication; receiver roots travel with the detached body.
+
+This mirrors the synchronous-prefix/returned-operation responsibility of .NET async
+invocation. It is separate from suspension alone: Raven's existing CLR lowering
+relies on the CLR to supply this responsibility through async method metadata.
+neoCLR cannot safely enable that lowering just by omitting state-machine generation.
+The POC uses a checked source-local delegate and private integer handle, not CLR
+AsyncHelpers or the CLR async method flag. The next compiler contract must explicitly
+connect body invocation, returned managed Task and awaited outcomes.
+
+This remains an interpreter mechanics experiment. The source body is an ordinary
+function, not a compiler-lowered Raven async method. Int32-only single-consumption
+handles do not redefine Task semantics. Body faults remain terminal invocation faults,
+not captured Task outcomes, and cancellation does not implement public Task semantics.
+Managed result rooting, repeated Task awaits, fault/cancellation projection and
+JIT/AOT support are still gates before ordinary await or default switching.
+No performance improvement is claimed by this slice.
