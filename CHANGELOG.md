@@ -8,6 +8,14 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-11
 
+- Make interpreter scheduler readiness include submitted callbacks, preventing a
+  false private Idle/Pending report while runnable work exists. Keep source versus
+  submission arbitration inside the scheduler, preserving source turns, rooted
+  installation failure and cancellation cleanup. The existing VM had compensated
+  for the incomplete report; no previously observed application hang is claimed.
+  Nineteen focused checks and six unchanged-workload interpreter benchmark runs pass;
+  retained timings do not establish a performance improvement.
+
 - Add a reproducible scheduler state-machine benchmark worker for completed and
   pending sequential awaits, using the independent external runner in interpreter,
   JIT and AOT. Record macOS ARM64 baseline samples with startup separate from batch

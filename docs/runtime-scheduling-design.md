@@ -908,3 +908,34 @@ executes completed and pending sequential awaits in interpreter/JIT/AOT on macOS
 It records external startup and batch timing, not allocation, retained-memory or
 per-resumption latency measurements. General async benchmark lifecycle support and
 runtime-suspension comparison remain open.
+
+## Unified interpreter readiness — 2026-10-11
+
+The private interpreter scheduler's completion query now reports Ready for admitted
+submissions as well as staged source completions. Pending means sources remain but
+no callback is runnable; Idle means neither kind of runnable work nor pending source
+remains. Previously, a submission-only scheduler could report Idle (or Pending when
+an unrelated source was pending); the VM compensated by checking submissions before
+acting on that result. This slice removes that misleading private contract without
+claiming a previously observed application hang.
+
+Submission/source arbitration now reads the scheduler's own staged source state,
+not a boolean supplied by its caller. Sources are still polled while submissions are
+available, and a delivered submission yields to a staged source before another
+submission. Failed frame installation retains work and its roots; cancellation is
+checked before reporting readiness. The VM still owns frame installation, and source
+callbacks still use the legacy queue adapter. This is not await-site routing migration
+or runtime suspension.
+
+The existing .NET comparison separates runnable scheduling from awaitable outcomes;
+this internal correction provides a consistent progress/quiescence contract for future
+execution adapters. No .NET API divergence or public managed API change is introduced.
+Focused checks cover submission-only and mixed source readiness, installation failure,
+fairness, cancellation/GC cleanup, queue-free execution and existing timer consumers.
+
+Validation: 14 scheduler unit tests, two queue-free submission consumers and three
+timer consumers pass. Six interpreter state-machine benchmark processes pass with
+unchanged guest assembly/library inputs; [raw observations and limits](../benchmarks/scheduler/README.md#interpreter-readiness-regression-check).
+No performance improvement is claimed. Native scheduling and public APIs are unchanged;
+JIT/AOT/Windows qualification and the API snapshot were not repeated for this private
+interpreter correction. Website review found no public behavior claim requiring change.

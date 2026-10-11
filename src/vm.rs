@@ -2366,33 +2366,30 @@ fn interpret_instructions_with_dispatch(
                 }
             }
             let completion = scheduler.completion_state(heap, options)?;
-            if scheduler.install_submission(
-                completion == crate::scheduler::CompletionState::Ready,
-                |callback| {
-                    if frames.len() >= limits.frames {
-                        return Err(Fault::coded(
-                            crate::FaultCode::StackOverflow,
-                            "frame limit exceeded",
-                        ));
-                    }
-                    let Value::Function(binding) = callback else {
-                        return Err(Fault::new("Invalid scheduler callback"));
-                    };
-                    let contract = crate::function_objects::contract(module, &binding.ty)?;
-                    let callee = resolve(module, &binding.target)?;
-                    crate::function_objects::compatible(&contract, &callee)?;
-                    callback.ensure_heap_references()?;
-                    let args = binding
-                        .receiver
-                        .iter()
-                        .map(|receiver| (**receiver).clone())
-                        .collect();
-                    let mut frame = Frame::new(callee, args)?;
-                    frame.runtime_callback = true;
-                    frames.push(frame);
-                    Ok(())
-                },
-            )? {
+            if scheduler.install_submission(|callback| {
+                if frames.len() >= limits.frames {
+                    return Err(Fault::coded(
+                        crate::FaultCode::StackOverflow,
+                        "frame limit exceeded",
+                    ));
+                }
+                let Value::Function(binding) = callback else {
+                    return Err(Fault::new("Invalid scheduler callback"));
+                };
+                let contract = crate::function_objects::contract(module, &binding.ty)?;
+                let callee = resolve(module, &binding.target)?;
+                crate::function_objects::compatible(&contract, &callee)?;
+                callback.ensure_heap_references()?;
+                let args = binding
+                    .receiver
+                    .iter()
+                    .map(|receiver| (**receiver).clone())
+                    .collect();
+                let mut frame = Frame::new(callee, args)?;
+                frame.runtime_callback = true;
+                frames.push(frame);
+                Ok(())
+            })? {
                 // The callback may complete a managed Promise and post its
                 // state-machine continuation through the transitional adapter.
                 *drain_required = true;

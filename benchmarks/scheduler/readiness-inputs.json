@@ -1,0 +1,11 @@
+{
+  "sourceManifest": "/Users/robert/Projects/neoclr/target/scheduler-benchmark-baseline-v4/manifest.json",
+  "sourceManifestSha256": "e6510581d5eb61266fe307de781c20c63c3f12d0966bb7e569c791b2040c292f",
+  "oldRuntimeSha256": "2524bc6cb3d7d9adf53b5e3ac08c9921851334313e157eb1cc2938c2a101cd06",
+  "newRuntimeSha256": "4cf1cfa741fe432daab374a85d0c55e694b8c75abb9442d3d680f1141e7b0f78",
+  "unchangedInputsVerified": true,
+  "changedSources": {
+    "src/scheduler.rs": "5ad4e30426f8f32b14e82cdd3c1fdb19c9ce51e3592e62f534fa3867fa86639e",
+    "src/vm.rs": "ac623ebfccdd9f27d12da95109b64031d2b801c744ae0c378f9943ee9760d1e5"
+  }
+}

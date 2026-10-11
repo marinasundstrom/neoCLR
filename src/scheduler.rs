@@ -1,4 +1,4 @@
-//! Private invocation completion driver. TaskQueue remains the callback adapter.
+//! Private invocation runnable/completion driver. TaskQueue is a legacy source adapter.
 use crate::{ExecutionOptions, Fault, ManagedHeap, Value};
 use std::sync::{Arc, Condvar, Mutex};
 use std::time::{Duration, Instant};
@@ -208,10 +208,9 @@ impl Scheduler {
 
     pub(crate) fn install_submission(
         &mut self,
-        source_ready: bool,
         install: impl FnOnce(&Value) -> Result<(), Fault>,
     ) -> Result<bool, Fault> {
-        if source_ready && !self.prefer_submission {
+        if self.ready.is_some() && !self.prefer_submission {
             return Ok(false);
         }
         let Some(callback) = self.submitted.front() else {
@@ -260,7 +259,9 @@ impl Scheduler {
         Ok(self.ready.is_some())
     }
 
-    /// Poll under graph access; Pending requires publishing VM roots before parking.
+    /// Poll under graph access. Ready includes submitted work and source completions.
+    /// Pending requires publishing VM roots before parking; Idle means neither kind
+    /// of runnable work nor a pending completion source belongs to this scheduler.
     pub(crate) fn completion_state(
         &mut self,
         heap: &ManagedHeap,
@@ -273,6 +274,9 @@ impl Scheduler {
         match self.progress(heap)? {
             Progress::Ready(callback) => {
                 self.stage(callback, None);
+                Ok(CompletionState::Ready)
+            }
+            Progress::Idle | Progress::Pending if !self.submitted.is_empty() => {
                 Ok(CompletionState::Ready)
             }
             Progress::Idle => Ok(CompletionState::Idle),
@@ -700,28 +704,127 @@ mod tests {
         assert_eq!(scheduler.wait_timeout(Instant::now(), true), Duration::ZERO);
         assert!(
             scheduler
-                .install_submission(false, |_| Err(Fault::new("frame rejected")))
+                .install_submission(|_| Err(Fault::new("frame rejected")))
                 .is_err()
         );
         assert_eq!(scheduler.submitted.len(), 64);
         scheduler.stage(Value::Void, None);
-        assert!(scheduler.install_submission(true, |_| Ok(())).unwrap());
+        assert!(scheduler.install_submission(|_| Ok(())).unwrap());
         assert!(
             !scheduler
-                .install_submission(true, |_| panic!("source must get a turn"))
+                .install_submission(|_| panic!("source must get a turn"))
                 .unwrap()
         );
         scheduler.install_ready(|_, _| Ok(())).unwrap();
-        assert!(scheduler.install_submission(true, |_| Ok(())).unwrap());
+        assert!(scheduler.install_submission(|_| Ok(())).unwrap());
         for _ in 0..62 {
-            assert!(scheduler.install_submission(false, |_| Ok(())).unwrap());
+            assert!(scheduler.install_submission(|_| Ok(())).unwrap());
         }
         assert!(
             !scheduler
-                .install_submission(false, |_| panic!("duplicate delivery"))
+                .install_submission(|_| panic!("duplicate delivery"))
                 .unwrap()
         );
         collect(&mut heap, &scheduler, &[]);
+        assert!(heap.is_empty());
+    }
+
+    #[test]
+    fn submissions_prevent_false_idle_and_pending_without_hiding_ready_sources() {
+        let mut heap = ManagedHeap::default();
+        let mut scheduler = Scheduler::default();
+        let options = ExecutionOptions::default();
+        let (callback, _) = ready_graphs(&mut heap);
+        scheduler.submit(callback.clone()).unwrap();
+        assert_eq!(
+            scheduler.completion_state(&heap, &options).unwrap(),
+            CompletionState::Ready
+        );
+        assert!(
+            scheduler
+                .install_submission(|_| Err(Fault::new("not installed")))
+                .is_err()
+        );
+        assert_eq!(
+            scheduler.completion_state(&heap, &options).unwrap(),
+            CompletionState::Ready
+        );
+        scheduler.install_submission(|_| Ok(())).unwrap();
+        assert_eq!(
+            scheduler.completion_state(&heap, &options).unwrap(),
+            CompletionState::Idle
+        );
+
+        let timer = scheduler
+            .timers
+            .start(i32::MAX, callback.clone(), Instant::now())
+            .unwrap();
+        assert_eq!(
+            scheduler.completion_state(&heap, &options).unwrap(),
+            CompletionState::Pending
+        );
+        scheduler.submit(callback.clone()).unwrap();
+        assert_eq!(
+            scheduler.completion_state(&heap, &options).unwrap(),
+            CompletionState::Ready
+        );
+        scheduler.install_submission(|_| Ok(())).unwrap();
+        assert_eq!(
+            scheduler.completion_state(&heap, &options).unwrap(),
+            CompletionState::Pending
+        );
+        assert!(scheduler.timers.cancel(timer));
+
+        // A continuously replenished submission queue must still poll and yield
+        // to an already-due timer. The caller supplies no source-readiness hint.
+        scheduler.submit(callback.clone()).unwrap();
+        scheduler
+            .timers
+            .start(0, callback.clone(), Instant::now())
+            .unwrap();
+        assert_eq!(
+            scheduler.completion_state(&heap, &options).unwrap(),
+            CompletionState::Ready
+        );
+        assert!(
+            !scheduler
+                .install_submission(|_| panic!("source turn"))
+                .unwrap()
+        );
+        assert!(scheduler.install_ready(|_, _| Ok(())).unwrap());
+        assert_eq!(
+            scheduler.completion_state(&heap, &options).unwrap(),
+            CompletionState::Ready
+        );
+        assert!(scheduler.install_submission(|_| Ok(())).unwrap());
+        assert_eq!(
+            scheduler.completion_state(&heap, &options).unwrap(),
+            CompletionState::Idle
+        );
+
+        scheduler.submit(callback).unwrap();
+        let token = crate::CancellationToken::new();
+        token.cancel();
+        let cancelled = ExecutionOptions {
+            cancellation: Some(token),
+            ..Default::default()
+        };
+        assert_eq!(
+            scheduler
+                .completion_state(&heap, &cancelled)
+                .unwrap_err()
+                .code,
+            crate::FaultCode::ExecutionCancelled
+        );
+        collect(&mut heap, &scheduler, &[]);
+        assert_eq!(
+            heap.len(),
+            2,
+            "cancelled dispatch retains the submitted receiver until teardown"
+        );
+        drop(scheduler);
+        heap.collect(vec![], crate::CollectionReason::ExecutionCompleted)
+            .unwrap();
         assert!(heap.is_empty());
     }
 

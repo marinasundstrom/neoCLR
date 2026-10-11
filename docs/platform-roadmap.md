@@ -49,7 +49,9 @@ without a Task or managed queue. A [source-included managed Scheduler prototype]
 now projects a reserved submission service in interpreter/AOT/JIT and preserves
 compiler-generated state machines in pending/completed await and fault cases. It is
 not yet the public class-library Scheduler API or a stable foreign-language ABI. Current public TaskQueue behavior remains implemented
-until the replacement is qualified.
+until the replacement is qualified. The interpreter readiness query now includes
+submitted work and keeps source/submission arbitration private;
+[quiescence contract and validation](runtime-scheduling-design.md#unified-interpreter-readiness--2026-10-11).
 
 **Benchmark requirement (2026-10-11):** retain a compiler-generated state-machine
 baseline and measure scheduler/suspension changes as they develop. Compare equivalent

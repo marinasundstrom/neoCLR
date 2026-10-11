@@ -87,3 +87,25 @@ Windows has not been qualified for this slice.
 These numbers characterize this fixture and machine only. In particular, the first
 completed-await AOT sample was slower than the other two; retain the raw range rather
 than interpreting the small JIT/AOT median differences as a ranking.
+
+## Interpreter readiness regression check
+
+The subsequent private readiness correction keeps submitted callbacks from being
+reported as Idle/Pending and moves source-turn arbitration inside the scheduler.
+[Six fresh interpreter runs](readiness-results.json) retain the exact baseline
+assembly, bundle and workload settings. [Input substitution](readiness-inputs.json)
+records the replaced runtime binary hash and changed Rust source hashes; all other
+baseline manifest inputs were checked unchanged before running. The full runner
+checks their hashes again before and after measurement. To repeat from fresh
+artifacts, use the preparation steps above and add `--mode interpreter` to the runner.
+
+| Case | Baseline median operations/s | Readiness correction median operations/s |
+| --- | ---: | ---: |
+| await.completed | 9.88 | 9.82 |
+| await.pending | 4.39 | 4.36 |
+
+The small differences are not evidence of improvement or regression: these are
+three-round, non-interleaved local measurements with uncontrolled background load.
+This is a correctness change preserving existing dispatch behavior, with a retained
+performance observation rather than a speedup claim. JIT/AOT code is unchanged and
+was not remeasured for this interpreter-only slice.
