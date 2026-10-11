@@ -338,14 +338,18 @@ def main():
     parser.add_argument('--runtime', type=Path, default=ROOT / 'target/release' / ('neoclr.exe' if os.name == 'nt' else 'neoclr'))
     parser.add_argument('--suite', action='append', choices=('collections', 'collection-construction', 'collection-iteration', 'json-dom', 'json-streams', 'memory-stream', 'string-construction', 'unicode-casing', 'encoding', 'encoding-streams', 'encoding-boundaries', 'encoding-buffer-limits', 'int64-parsing', 'primitive-parsing', 'path-values', 'http-header-values', 'http-method-values', 'index-range', 'http-text', 'http-lifetime', 'http-route-matching', 'ip-address-values', 'uri-resolution', 'time-parsing', 'duration-offset-parsing', 'instant-parsing', 'zoned-time-parsing', 'discovery-contract', 'runner-contract'),
                         help='Run only this suite (repeatable); default runs all suites')
+    parser.add_argument("--execution-repetitions", type=int, default=1, help="Repeat the full suite process in each mode for timing; guards/selectors still run once")
     args = parser.parse_args()
+    if args.execution_repetitions < 1:
+        parser.error("--execution-repetitions must be positive")
+    run_started = time.perf_counter()
     bundle, out = args.bundle.resolve(), args.output.resolve()
     out.mkdir(parents=True, exist_ok=False)
     inputs = [Path(__file__).resolve(), ROOT / 'scripts/build-native-project.py', ROOT / 'scripts/discover-runtime-tests.py', ROOT / 'scripts/validate-test-discovery.py',
               *sorted((ROOT / 'tools/testing/NeoCLR.TestDiscovery').glob('*.cs')),
               *sorted((ROOT / 'tools/testing/NeoCLR.TestDiscovery').glob('*.csproj')),
               *sorted(TESTS.rglob('*.rvn')), *sorted(TESTS.rglob('*.rvnproj'))]
-    report = dict(passed=False, platform=platform.platform(), cases=[],
+    report = dict(passed=False, platform=platform.platform(), cases=[], phases=[], executionRepetitions=args.execution_repetitions,
                   inputs={str(p.relative_to(ROOT)): sha(p) for p in inputs},
                   bundleManifestSha256=sha(bundle / 'manifest.json'),
                   aotSha256=sha(args.aot.resolve()), interpreterSha256=sha(args.runtime.resolve()))
@@ -392,7 +396,9 @@ def main():
             build = out / (name + '-build')
             environment = dict(os.environ)
             if name != 'runner-contract':
+                started = time.perf_counter()
                 registry = DISCOVERY.discover(TESTS / name / 'Tests.rvnproj', bundle, out / (name + '-discovery'))
+                report['phases'].append(dict(suite=name, phase='discovery', elapsedSeconds=round(time.perf_counter() - started, 6), details=json.loads((out / (name + '-discovery') / 'timings.json').read_text())))
                 environment['NeoClrTestRegistry'] = str(registry)
             profile = 'http' if name in ('http-text', 'http-lifetime') else 'console'
             if os.name == 'nt':
@@ -402,13 +408,18 @@ def main():
                        '--bundle', bundle, '--aot', args.aot.resolve(), '--output', build]
             if name in ("encoding-buffer-limits", "http-text"):
                 command += ["--byte-array-limit", "131072"]
+            started = time.perf_counter()
             result = subprocess.run(list(map(str, command)), cwd=ROOT, env=environment, capture_output=True, timeout=600)
+            report['phases'].append(dict(suite=name, phase='native-project-build', elapsedSeconds=round(time.perf_counter() - started, 6)))
             (out / (name + '-build.stdout.log')).write_bytes(result.stdout)
             (out / (name + '-build.stderr.log')).write_bytes(result.stderr)
             if result.returncode:
                 raise RuntimeError(name + ' build failed; see retained logs')
+            report['phases'][-1]['commands'] = [{k: c[k] for k in ('phase', 'elapsedSeconds')} for c in json.loads((build / 'build.json').read_text())['commands']]
             if name != 'runner-contract':
+                started = time.perf_counter()
                 DISCOVERY.verify_registration(build / 'app.dll', bundle, out / (name + '-discovery'))
+                report['phases'].append(dict(suite=name, phase='registration-verification', elapsedSeconds=round(time.perf_counter() - started, 6)))
             isolated = out / (name + '-isolated')
             isolated.mkdir()
             exe = isolated / ('app.exe' if os.name == 'nt' else 'app')
@@ -423,10 +434,11 @@ def main():
                 report["encodingBufferBudgets"] = dict(nativeByteArrayElements=131072, interpretedLiveArrayElements=1048576, interpretedLogicalArrayBytes=268435456)
             env = {k: v for k, v in os.environ.items() if k.upper() in ('SYSTEMROOT', 'WINDIR', 'TEMP', 'TMP')}
             executions = [('native', [exe], isolated, env), ('interpreter', interpreter, ROOT, None)]
-            for mode, command, cwd, environment in executions:
+            repeated_executions = [(repetition, *execution) for repetition in range(1, args.execution_repetitions + 1) for execution in executions]
+            for repetition, mode, command, cwd, environment in repeated_executions:
                 started = time.perf_counter()
                 result = subprocess.run(list(map(str, command)), cwd=cwd, env=environment, capture_output=True, timeout=600 if name == "http-text" else 180)
-                record = dict(suite=name, mode=mode, exitCode=result.returncode,
+                record = dict(suite=name, mode=mode, repetition=repetition, exitCode=result.returncode,
                               elapsedSeconds=round(time.perf_counter() - started, 3),
                               stdout=result.stdout.decode('utf-8').replace('\r\n', '\n'),
                               stderr=result.stderr.decode('utf-8').replace('\r\n', '\n'))
@@ -450,8 +462,9 @@ def main():
                 for guard, message in guards.items():
                     for mode, command, cwd, environment in executions:
                         arguments = [*command, *(['--'] if mode == 'interpreter' else []), '--guard', guard]
+                        started = time.perf_counter()
                         result = subprocess.run(list(map(str, arguments)), cwd=cwd, env=environment, capture_output=True, timeout=30)
-                        record = dict(suite=name, mode=mode, guard=guard, exitCode=result.returncode,
+                        record = dict(suite=name, mode=mode, guard=guard, exitCode=result.returncode, elapsedSeconds=round(time.perf_counter() - started, 6),
                                       stdout=result.stdout.decode('utf-8'), stderr=result.stderr.decode('utf-8'))
                         report['cases'].append(record)
                         if not record['exitCode'] or message not in record['stderr'] or record['stdout']:
@@ -478,8 +491,9 @@ def main():
             for arguments, selected_exit, selected_stdout in selections:
                 for mode, command, cwd, environment in [('native', [exe, *arguments], isolated, env),
                                                         ('interpreter', [*interpreter, '--', *arguments], ROOT, None)]:
+                    started = time.perf_counter()
                     result = subprocess.run(list(map(str, command)), cwd=cwd, env=environment, capture_output=True, timeout=600 if name == "http-text" else 180)
-                    record = dict(suite=name, mode=mode, arguments=arguments, exitCode=result.returncode,
+                    record = dict(suite=name, mode=mode, arguments=arguments, exitCode=result.returncode, elapsedSeconds=round(time.perf_counter() - started, 6),
                                   stdout=result.stdout.decode('utf-8').replace('\r\n', '\n'),
                                   stderr=result.stderr.decode('utf-8').replace('\r\n', '\n'))
                     report['cases'].append(record)
@@ -494,6 +508,7 @@ def main():
             raise RuntimeError('Execution tool changed during validation')
         report['passed'] = True
     finally:
+        report['totalElapsedSeconds'] = round(time.perf_counter() - run_started, 6)
         (out / 'report.json').write_text(json.dumps(report, indent=2) + '\n')
     print('Runtime library tests: PASS')
 

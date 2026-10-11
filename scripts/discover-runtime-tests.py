@@ -5,6 +5,7 @@ import json
 import os
 from pathlib import Path
 import subprocess
+import time
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -17,7 +18,9 @@ def discover(project, bundle, output):
     env = dict(os.environ, NeoClrBundleRoot=str(bundle), NeoClrTestRegistry=str(registry))
     compiler = bundle / 'sdk/tools/rvnc/rvnc.dll'
     command = ['dotnet', str(compiler), 'neoclr', '--project', str(project)]
+    started = time.perf_counter()
     compiled = subprocess.run(command, cwd=ROOT, env=env, capture_output=True, text=True, encoding="utf-8", timeout=300)
+    timings = {'sourceCompilationSeconds': round(time.perf_counter() - started, 6)}
     (output / 'compile.stdout.log').write_text(compiled.stdout)
     (output / 'compile.stderr.log').write_text(compiled.stderr)
     if compiled.returncode:
@@ -33,7 +36,10 @@ def discover(project, bundle, output):
     command = ['dotnet', 'run', '--project', str(ROOT / 'tools/testing/NeoCLR.TestDiscovery'),
                '-p:WarningLevel=0', '--', str(artifact), str(registry), str(output / 'tests.json'),
                *[str(bundle / 'lib' / (name + '.dll')) for name in catalog['assemblyNames']]]
+    started = time.perf_counter()
     discovered = subprocess.run(command, cwd=ROOT, capture_output=True, text=True, encoding="utf-8", timeout=300)
+    timings['metadataDiscoveryIncludingToolBuildSeconds'] = round(time.perf_counter() - started, 6)
+    (output / 'timings.json').write_text(json.dumps(timings, indent=2) + '\n')
     (output / 'discovery.stdout.log').write_text(discovered.stdout)
     (output / 'discovery.stderr.log').write_text(discovered.stderr)
     if discovered.returncode:

@@ -9,6 +9,7 @@ import platform
 import shutil
 import subprocess
 import sys
+import time
 
 ROOT = Path(__file__).resolve().parents[1]
 PROFILE = 'macos-arm64-console-v1'
@@ -96,11 +97,12 @@ def build(project, bundle, aot, output, profile=PROFILE, bootstrap_root=None, re
 
     build_env = {**os.environ, "NeoClrBundleRoot": str(bundle)}
 
-    def run(command):
+    def run(command, phase="toolchain"):
         command = list(map(str, command))
+        started = time.perf_counter()
         result = subprocess.run(command, cwd=project.parent, capture_output=True, text=True, encoding="utf-8", errors="replace", timeout=180,
                                 env=build_env)
-        report['commands'].append(dict(command=command, exitCode=result.returncode,
+        report['commands'].append(dict(command=command, phase=phase, elapsedSeconds=round(time.perf_counter() - started, 6), exitCode=result.returncode,
                                        stdout=result.stdout, stderr=result.stderr))
         save()
         if result.returncode:
@@ -180,7 +182,7 @@ def build(project, bundle, aot, output, profile=PROFILE, bootstrap_root=None, re
         report['inputs'] = {str(path): sha(path) for path in inputs}
         # Use Raven's evaluated project, including imports and project references.
         # The current driver reports the root output last, after dependency builds.
-        stdout = run(['dotnet', compiler, 'neoclr', '--project', project])
+        stdout = run(['dotnet', compiler, 'neoclr', '--project', project], phase='source-compilation')
         paths = [line.removeprefix('Native build output: ') for line in stdout.splitlines()
                  if line.startswith('Native build output: ')]
         if not paths or not Path(paths[-1]).is_absolute() or not Path(paths[-1]).is_file():
@@ -214,7 +216,7 @@ def build(project, bundle, aot, output, profile=PROFILE, bootstrap_root=None, re
         if reflection_roots:
             report['inputs'][str(reflection_roots)] = sha(reflection_roots)
             flags += ['--reflection-roots', reflection_roots]
-        selection = json.loads(run([aot, '--closed-world', assembly, selected_root, obj, *context, *flags]))
+        selection = json.loads(run([aot, '--closed-world', assembly, selected_root, obj, *context, *flags], phase='native-compilation'))
         system_culture = any(binding.get('implementation') == 'system-culture-name-v1'
                              for binding in selection.get('nativeBindings', []))
         if system_culture:
@@ -242,7 +244,7 @@ def build(project, bundle, aot, output, profile=PROFILE, bootstrap_root=None, re
                     report['inputs'][str(path)] = sha(path)
                 target = 'x86_64-pc-windows-msvc' if windows else 'aarch64-apple-darwin'
                 command, archive = native_kernel_build(target, time_zone_rules)
-                run(command)
+                run(command, phase="native-kernel-build")
             report['inputs'][str(archive)] = sha(archive)
             native_text.append(archive)
         # Publish the executable only after link and dependency checks succeed.
@@ -250,16 +252,16 @@ def build(project, bundle, aot, output, profile=PROFILE, bootstrap_root=None, re
         if windows:
             run(['cl', '/nologo', '/W4', '/WX', '/std:c11', '/experimental:c11atomics', '/O2', '/MT',
                  '/DNEOCLR_NATIVE_GC', '/DNEOCLR_NATIVE_BYTE_ARRAY_LIMIT=' + str(byte_array_limit), *(['/DNEOCLR_ENTRY_ARGUMENTS'] if selection.get('entryArguments') else []), *(['/DNEOCLR_HTTP_HOST'] if http else []), '/I' + str(base), '/Fo' + str(output) + '/',
-                 '/Fe:' + str(pending), *adapters, obj, *native_text, '/link', '/STACK:1048576', *(['Ws2_32.lib'] if http else [])])
+                 '/Fe:' + str(pending), *adapters, obj, *native_text, '/link', '/STACK:1048576', *(['Ws2_32.lib'] if http else [])], phase='host-compile-link')
             import re
-            dependencies = re.findall(r'^\s+([A-Za-z0-9_.-]+\.dll)\s*$', run(['dumpbin', '/dependents', pending]), re.MULTILINE | re.IGNORECASE)
+            dependencies = re.findall(r'^\s+([A-Za-z0-9_.-]+\.dll)\s*$', run(['dumpbin', '/dependents', pending], phase='dependency-check'), re.MULTILINE | re.IGNORECASE)
             allowed = {'kernel32.dll', *(['ws2_32.dll'] if http else [])}
             if not dependencies or any(name.lower() not in allowed for name in dependencies):
                 raise RuntimeError('Unexpected native dependencies: ' + repr(dependencies))
         else:
             run([clang, '-isysroot', sdk, '-arch', 'arm64', '-std=c11', '-O2', '-Wall', '-Wextra', '-Werror',
-                 '-DNEOCLR_NATIVE_GC', '-DNEOCLR_NATIVE_BYTE_ARRAY_LIMIT=' + str(byte_array_limit), *(['-DNEOCLR_ENTRY_ARGUMENTS'] if selection.get('entryArguments') else []), '-I', base, *adapters, obj, *native_text, *(['-framework', 'CoreFoundation'] if system_culture else []), '-o', pending])
-            dependencies = [line.split()[0] for line in run(['xcrun', 'otool', '-L', pending]).splitlines()[1:]]
+                 '-DNEOCLR_NATIVE_GC', '-DNEOCLR_NATIVE_BYTE_ARRAY_LIMIT=' + str(byte_array_limit), *(['-DNEOCLR_ENTRY_ARGUMENTS'] if selection.get('entryArguments') else []), '-I', base, *adapters, obj, *native_text, *(['-framework', 'CoreFoundation'] if system_culture else []), '-o', pending], phase='host-compile-link')
+            dependencies = [line.split()[0] for line in run(['xcrun', 'otool', '-L', pending], phase='dependency-check').splitlines()[1:]]
             allowed = {'/usr/lib/libSystem.B.dylib'}
             if system_culture:
                 allowed.add('/System/Library/Frameworks/CoreFoundation.framework/Versions/A/CoreFoundation')

@@ -46,6 +46,13 @@ See the [changelog](../CHANGELOG.md) and linked design documents for technical s
   update roadmap/concurrency scope and add a [JIT evaluation brief](native-execution-investigation.md#jit-for-development-iteration-2026-10-11).
   **Open:** measurements, whether to begin JIT implementation, memory-view contract,
   and scheduler/green-thread design. No comparative speed result is claimed.
+- **Follow-up action:** [phase timing and local evaluation](experiments/jit-iteration/README.md)
+  now separate discovery and native build commands and repeat test processes with
+  correctness checks. Thirty tests pass three times per execution mode, plus bounds
+  guards, with both recorded AOT tools. The release tool's compile step is faster in
+  these samples, while whole-harness times are similar because other phases vary.
+  **Assistant recommendation:** start a bounded shared-lowering JIT probe, then run
+  the actual test framework; no JIT implementation or performance prediction is claimed.
 
 ## 2026-10-10 — Experimental API compatibility and Index/Range continuation
 

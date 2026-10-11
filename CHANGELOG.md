@@ -8,6 +8,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-11
 
+- Add phase timings to runtime test discovery/native builds and optional repeated
+  suite execution via `--execution-repetitions`, retaining correctness checks for
+  every run. Record a local development-iteration comparison and scope a shared
+  lowering JIT experiment; no JIT execution or network-throughput result is claimed.
+
 - Record native web/backend product goals, concurrency/suspension/green-thread
   investigation and a renewed JIT evaluation for development and test iteration.
   Keep interpreter support and distinguish proposed measurements and designs from

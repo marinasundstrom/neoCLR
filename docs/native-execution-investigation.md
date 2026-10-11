@@ -48,9 +48,11 @@ These are single process-level timings including startup, without phase attribut
 warmup control or a JIT implementation. They support investigating the execution gap
 but cannot predict JIT speed or explain the full edit–test delay.
 
-**Decision pending:** use the measurements to recommend starting a bounded JIT slice
-now or first removing a demonstrated non-execution bottleneck. No performance threshold,
-production JIT commitment, or benchmark result is asserted by this design brief.
+**Follow-up evaluation:** the [phase-timing slice](experiments/jit-iteration/README.md)
+records repeated local test-process timings and compiler build-profile costs. The
+assistant recommends beginning a bounded shared-lowering JIT probe, with real test
+framework execution as the subsequent milestone. These preliminary measurements
+do not establish JIT performance or a production JIT commitment.
 
 ## Historical starting point
 
