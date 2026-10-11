@@ -5,14 +5,18 @@ import hashlib
 import http.client
 import http.server
 import json
+import os
+import shutil
 from pathlib import Path
 import selectors
 import subprocess
 import threading
+import xml.etree.ElementTree as ET
 
 parser = argparse.ArgumentParser(description=__doc__)
 parser.add_argument('--recipe', type=Path, required=True)
 parser.add_argument('--output', type=Path, required=True)
+parser.add_argument('--projects', action='store_true', help='Build the existing native showcase projects with explicit runtime-await selection')
 args = parser.parse_args()
 recipe = json.loads(args.recipe.read_text())
 if not recipe['passed']:
@@ -33,12 +37,26 @@ def compile_case(name, source):
     assembly = output / (name + '.dll')
     assembly.unlink(missing_ok=True)
     command = compile_base[:compile_base.index('-o')] + ['-o', str(assembly), str(source), str(provider)]
-    result = subprocess.run(command, capture_output=True, text=True, timeout=120)
+    environment = None
+    if args.projects:
+        project = source.with_name('Native.rvnproj')
+        command = compile_base[:2] + ['neoclr', '--project', str(project)]
+        environment = os.environ.copy()
+        environment['NeoClrBundleRoot'] = str(Path(compile_base[compile_base.index('--core-reference') + 1]).parent.parent)
+        environment['RavenNeoClrRuntimeAsyncHelper'] = 'RuntimeAwaitProvider.Bridge'
+        project_assembly = source.parent / 'bin/neoclr/HttpShowcase.dll'
+        project_assembly.unlink(missing_ok=True)
+    result = subprocess.run(command, capture_output=True, text=True, timeout=120, env=environment)
     case = {'name': name, 'source': str(source), 'sourceSha256': hashlib.sha256(source.read_bytes()).hexdigest(),
             'compileCommand': command, 'compileExit': result.returncode, 'compileStderr': result.stderr}
     report['cases'].append(case)
     if result.returncode:
         raise RuntimeError(result.stderr)
+    if args.projects:
+        case['project'] = str(project)
+        case['projectSha256'] = hashlib.sha256(project.read_bytes()).hexdigest()
+        case['environment'] = {key: environment[key] for key in ['NeoClrBundleRoot', 'RavenNeoClrRuntimeAsyncHelper']}
+        shutil.copyfile(project_assembly, assembly)
     case['assemblySha256'] = hashlib.sha256(assembly.read_bytes()).hexdigest()
     listing = output / (name + '.neoil')
     listing.unlink(missing_ok=True)
@@ -111,6 +129,57 @@ try:
         if process.poll() is None:
             process.kill()
             process.communicate(timeout=5)
+    if args.projects:
+        report['projectChecks'] = []
+        bundle = Path(compile_base[compile_base.index('--core-reference') + 1]).parent.parent
+        probe = output / 'cleanup-project.rvnproj'
+        document = ET.Element('Project', Sdk='Microsoft.NET.Sdk')
+        ET.SubElement(document, 'Import', Project=str(bundle / 'lib/NeoCLR.ClassLibrary.props'))
+        properties = ET.SubElement(document, 'PropertyGroup')
+        for key, value in {'TargetFramework': 'net10.0', 'OutputType': 'Exe', 'AssemblyName': 'CleanupProject',
+                           'RavenNeoClrRuntimeAsyncHelper': 'RuntimeAwaitProvider.Bridge'}.items():
+            ET.SubElement(properties, key).text = value
+        items = ET.SubElement(document, 'ItemGroup')
+        for path in [provider.with_name('RuntimeUse.rvn'), provider]:
+            ET.SubElement(items, 'Compile', Include=str(path))
+        ET.ElementTree(document).write(probe, encoding='unicode')
+        artifact = output / 'bin/neoclr/CleanupProject.dll'
+        artifact.unlink(missing_ok=True)
+        command = compile_base[:2] + ['neoclr', '--project', str(probe), '--run', run_base[0]]
+        result = subprocess.run(command, capture_output=True, text=True, timeout=120)
+        passed = result.returncode == 0 and 'PASS runtime async scoped cleanup' in result.stdout
+        report['projectChecks'].append({'case': 'cleanup-project', 'passed': passed, 'command': command,
+            'projectXml': probe.read_text(), 'stdout': result.stdout, 'stderr': result.stderr})
+        if not passed:
+            raise RuntimeError('Project cleanup capability failed')
+        artifact.unlink(missing_ok=True)
+        ET.SubElement(properties, 'RavenNeoClrAsyncLibrary').text = ''
+        ET.ElementTree(document).write(probe, encoding='unicode')
+        result = subprocess.run(command, capture_output=True, text=True, timeout=120)
+        passed = (result.returncode != 0 and 'RavenNeoClrRuntimeAsyncHelper requires RavenNeoClrAsyncLibrary' in result.stderr
+                  and not artifact.exists())
+        report['projectChecks'].append({'case': 'missing-async-library', 'passed': passed, 'command': command,
+            'projectXml': probe.read_text(), 'stderr': result.stderr})
+        if not passed:
+            raise RuntimeError('Invalid project configuration was not rejected')
+        # Build the real server project without opt-in and preserve its ordinary lowering.
+        project = root / 'docs/experiments/http-server/Native.rvnproj'
+        environment = os.environ.copy()
+        environment['NeoClrBundleRoot'] = str(bundle)
+        environment.pop('RavenNeoClrRuntimeAsyncHelper', None)
+        command = compile_base[:2] + ['neoclr', '--project', str(project)]
+        result = subprocess.run(command, capture_output=True, text=True, timeout=120, env=environment)
+        artifact = project.parent / 'bin/neoclr/HttpShowcase.dll'
+        listing = output / 'default-server.neoil'
+        listing.unlink(missing_ok=True)
+        if result.returncode != 0:
+            raise RuntimeError(result.stderr)
+        subprocess.run([run_base[0], 'disassemble', str(artifact), str(listing)], check=True, capture_output=True, timeout=120)
+        mentions = listing.read_text().count('AsyncStateMachine')
+        report['projectChecks'].append({'case': 'default-state-machine-project', 'passed': mentions > 0,
+            'command': command, 'stderr': result.stderr, 'stateMachineMentions': mentions})
+        if not mentions:
+            raise RuntimeError('Default lowering unexpectedly changed')
     report['passed'] = True
 except Exception as error:
     report['error'] = str(error)

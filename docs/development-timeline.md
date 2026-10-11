@@ -15140,3 +15140,17 @@ or runtime-await default switch was performed.
   heap runs reclaim 4,657/4,657 objects each. [Evidence](experiments/runtime-async/README.md#managed-http-showcase-and-scoped-cleanup--2026-10-11).
   Next is native project-level opt-in and showcase build qualification; JIT/AOT and
   broader network lifecycle checks remain open, with defaults unchanged.
+
+
+### HTTP project integration after the source slice — 2026-10-11
+
+- **Author direction:** continue after the HTTP/cleanup slice, with client/server
+  projects as the showcase.
+- **Assistant action:** added explicit native project provider selection and conditional
+  provider source inclusion in both showcase projects. Extended the external-peer
+  validator to build the actual projects and verify configuration/default behavior.
+- **Outcome:** both projects pass runtime-await execution; cleanup passes --project
+  --run; missing async-library selection is rejected; no-opt-in server builds retain
+  state machines. [Evidence](experiments/runtime-async/README.md#http-showcase-project-integration--2026-10-11).
+  This is an interpreter project POC, not default readiness. Network lifecycle cases,
+  Windows and JIT/AOT suspension remain open.

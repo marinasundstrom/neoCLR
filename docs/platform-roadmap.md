@@ -68,8 +68,10 @@ design decisions. Preserve the interface proofs as exploratory evidence, not the
 next milestone. End-to-end [HTTP showcase source qualification](experiments/runtime-async/README.md#managed-http-showcase-and-scoped-cleanup--2026-10-11)
 now passes for both client/server and a combined eight-exchange consumer. The exposed
 async-use gap is fixed behind an explicit retained-scope capability, with cancellation
-cleanup and GC evidence. Next add project-level runtime-await selection and qualify
-the showcase project builds, then expand network edge cases and execution modes.
+cleanup and GC evidence. [Project-level opt-in](experiments/runtime-async/README.md#http-showcase-project-integration--2026-10-11)
+also now qualifies both actual showcase builds, cleanup and configuration rejection,
+with unchanged default lowering. Next expand HTTP timeout/cancellation and terminal
+failure cases, then close runtime-suspension gaps in JIT/AOT and remeasure costs.
 Retain cancellation, terminal Fault, GC and benchmark checks. Broaden
 execution-mode coverage before considering defaults; no current JIT/AOT suspension
 support is implied. General native interoperability, runtime interface recognition,

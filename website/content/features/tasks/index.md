@@ -264,7 +264,8 @@ now lowers ordinary async methods and Main to retained interpreter bodies withou
 generated state machines. Its source-included provider returns ordinary Task values.
 The development interpreter POC also runs the HTTP client/server showcase sources,
 including a combined loopback consumer and synchronous `use` across awaits. GC and
-cancellation cleanup checks pass; project integration and JIT/AOT suspension remain open.
+cancellation cleanup checks pass. Both native HTTP projects now support explicit
+runtime-await selection; JIT/AOT suspension and default readiness remain open.
 Explicit await mappings also qualify an independent runtime-backed manual operation
 and a distinct awaiter. An imported generic interface also supports pending and immediate
 implementations through one mapping. The final runtime-facing contract and native

@@ -8,6 +8,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-11
 
+- Add conditional runtime-await provider inclusion to both native HTTP showcase
+  projects and qualify actual project builds/execution with Raven's explicit
+  RavenNeoClrRuntimeAsyncHelper selection. Check project cleanup, invalid config
+  rejection and unchanged default lowering. Interpreter-only runtime-await support
+  remains opt-in; the source-provider experiment is not a default switch.
+
 - Qualify runtime-await lowering with the existing HTTP client/server showcase
   sources and an eight-exchange managed loopback consumer with suspended handlers.
   Add async `use` success/cancellation/GC evidence through Raven's explicit retained

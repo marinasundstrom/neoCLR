@@ -8765,3 +8765,22 @@ library async migration, project configuration, JIT/AOT suspension or default sw
 is implied. The provider is temporary; Raven owns semantic admission/emission and
 neoCLR owns execution/GC validation. A general main-line disposal capability remains
 a deferred candidate pending an independently qualified backend need.
+
+
+### Runtime-await showcase project selection — 2026-10-11
+
+Native Raven `2ef670ff1` accepts RavenNeoClrRuntimeAsyncHelper in native project
+metadata configuration, requires RavenNeoClrAsyncLibrary and carries the selection
+through binding (retained-scope cleanup) and emission (runtime-body lowering).
+The actual HTTP showcase Native.rvnproj files conditionally include the source
+provider. [Project evidence](experiments/runtime-async/README.md#http-showcase-project-integration--2026-10-11)
+qualifies client/server execution, --project --run cleanup, missing async-library
+rejection and default state-machine output without opt-in. This supersedes the
+source-only project limitation in the preceding slice.
+
+Source-local helpers and private interpreter services remain the temporary bridge;
+no library migration, default switch, JIT/AOT suspension or stable foreign ABI is
+claimed. Configuration is project-local and dependencies retain their existing
+semantics. Raven owns project import/emission; neoCLR owns showcase/runtime validation.
+The eventual replacement is production managed runtime-async integration, driven by
+execution evidence rather than further interop-interface design at this stage.

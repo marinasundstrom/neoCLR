@@ -709,3 +709,34 @@ project-level runtime-await selection is the next slice. JIT/AOT suspension, Win
 qualification, timeout/cancellation network cases and a production provider remain
 readiness gates. Keep defaults unchanged. The HTTP client/server projects are the
 author-selected showcase and acceptance workload, not the interface experiments.
+
+
+## HTTP showcase project integration — 2026-10-11
+
+Native Raven `2ef670ff1` adds the explicit project property
+RavenNeoClrRuntimeAsyncHelper. The existing client/server Native.rvnproj files include
+the experimental provider only when this property is nonempty. Both projects now
+build through `rvnc neoclr --project` and run their loopback acceptance cases with
+runtime-await application bodies ([evidence](runtime-http-project-validation.json)).
+No per-type operation-interface redesign is required.
+
+Reproduce using `http_showcase.py --projects --recipe <passing http validation.json>
+--output <dedicated-directory>`. The runner supplies NeoClrBundleRoot and
+RavenNeoClrRuntimeAsyncHelper=RuntimeAwaitProvider.Bridge as project properties via
+the environment, compiles the actual checked-in native project files, preserves the
+resulting artifacts and checks both external peers. For manual project use, those
+properties may instead be set in project configuration. The matched native compiler
+is required; installing an older bundle compiler does not acquire this feature.
+
+The provider property requires RavenNeoClrAsyncLibrary, which the existing bundle
+props select. A separate cleanup project passes --project --run, including cancellation
+and implicit-return use cleanup. Clearing the async-library property fails before
+publishing output. A control build of the real server without opt-in still emits
+state machines. Project-local configuration does not rebuild dependency libraries
+under different lowering or switch default execution modes.
+
+This completes the bounded interpreter project POC. Broader HTTP timeout/cancellation,
+terminal-fault cleanup, production provider integration, performance remeasurement and
+JIT/AOT suspension remain readiness work. Windows runtime-async qualification is also
+open. Existing JIT/AOT state-machine HTTP support remains valid, but is not evidence
+for runtime suspension in those modes. Runtime await is not ready to become default.
