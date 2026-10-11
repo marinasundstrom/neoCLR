@@ -455,6 +455,9 @@ static int32_t scheduler_registration_transition(int64_t registration, neoclr_ao
         if (registration <= 0 || scope->operations[i].id != (uint64_t)registration ||
             scope->operations[i].kind != 8 || scope->operations[i].state != 1) continue;
         if (activate) {
+            uint64_t order = new_operation_id();
+            if (!order) return 3;
+            scope->operations[i].id = order;
             scope->operations[i].kind = 7;
             scope->operations[i].state = 2;
         } else {
@@ -487,9 +490,12 @@ int32_t neoclr_scheduler_submit_v1(neoclr_aot_context *context, uint64_t callbac
     unsigned slot = 0;
     while (slot < 64 && scope->operations[slot].state) slot++;
     if (slot == 64) return NEOCLR_AOT_FAULT_NATIVE_MEMORY_LIMIT;
+    uint64_t order = new_operation_id();
+    if (!order) return 3;
     uint64_t root = 0;
     status = neoclr_gc_host_root_create_v1(context, value, &root);
     if (status) return status;
+    scope->operations[slot].id = order;
     scope->operations[slot].callback = root;
     scope->operations[slot].kind = 7;
     scope->operations[slot].state = 2;
@@ -546,6 +552,14 @@ static int32_t socket_poll(neoclr_aot_context *context, uint64_t *callback) {
     if (scope->timer_delivery) {
         if (neoclr_gc_host_root_release_v1(context, scope->timer_delivery)) return -3;
         scope->timer_delivery = 0;
+    }
+    // Reused table slots must not let a newly resubmitted batch overtake older
+    // runnable work. Source arbitration still follows the rotating poll cursor.
+    unsigned first_submission = 64;
+    for (unsigned i = 0; i < 64; i++) {
+        if (scope->operations[i].kind == 7 && scope->operations[i].state == 2 &&
+            (first_submission == 64 || scope->operations[i].id < scope->operations[first_submission].id))
+            first_submission = i;
     }
     unsigned first_timer = 64;
     uint64_t now = monotonic_ns();
@@ -618,6 +632,7 @@ static int32_t socket_poll(neoclr_aot_context *context, uint64_t *callback) {
             scope->operations[i].state = 2;
         }
         if (scope->operations[i].state == 2) {
+            if (scope->operations[i].kind == 7 && i != first_submission) continue;
             scope->operations[i].state = 3;
             scope->poll_cursor = (i + 1) % 64;
             *callback = scope->operations[i].callback;

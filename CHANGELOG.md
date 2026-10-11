@@ -8,6 +8,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-11
 
+- Yield internal continuation batches between observers and fix native admission order
+  when operation-table slots are reused. Grow interpreter runnable storage independently
+  of dormant registrations while preserving allocation-free activation reservations.
+  Native independent backlog/full-queue handling remains open; public Task routing
+  is unchanged. Cross-mode yielding, root lifetime and focused scheduler checks pass.
+
 - Admit pending continuations as one runtime-rooted managed batch in the internal
   scheduler experiment, before publishing completion/cancellation. Qualify 128 awaiters
   with one free submission slot, observer disposal after admission, cancellation and

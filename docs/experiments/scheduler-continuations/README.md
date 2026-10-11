@@ -212,3 +212,45 @@ publishes its outcome; this is not an infallible completion contract. Allocation
 or terminal callback faults are not transactional rollback. Cross-thread publication is
 unsupported; publishing after admission relies on owner-thread deferred dispatch.
 No public Task/Promise/Scheduler API, Runtime Contract or compiler emission changes.
+
+
+## Incremental batch turns — 2026-10-11
+
+The managed batch adapter now invokes one observer per dispatch and resubmits itself
+when entries remain. Runtime arbitration runs between those steps. `Yield.rvn` has the
+first observer submit a marker; the second must see that marker. This exposes a native
+slot-reuse problem: rotating operation-table indices could select a newly resubmitted
+batch before older runnable work. Native submissions/activations now receive admission
+order identities, and polling considers only the oldest ready submission while retaining
+source rotation. No new public FIFO or time-slice guarantee is introduced.
+
+The interpreter runnable deque now grows through fallible reservation instead of sharing
+an artificial 64-entry quota with dormant registrations. Every submission reserves enough
+spare space for all dormant registrations; registration likewise reserves its future slot.
+Activation therefore does not allocate. Tests retain 256 submissions plus 64 dormant
+registrations through collection, activate all 64 without capacity changes, and drain all
+320 callbacks. Allocation failure remains a fault before admission. The internal dormant
+registration quota stays 64.
+
+This is intentionally an incomplete cross-mode capacity migration: native runnable work
+still occupies its 64-entry I/O table. Its independent backlog and memory-budget policy
+are next. Incremental native resubmission can still fail if a callback fills every slot;
+public Task migration remains blocked on that ownership/admission issue. The adapter still
+uses fn<Void> callbacks, not a native batch descriptor or runtime suspension. One callback
+per turn adds dispatch/admission work; throughput and larger-quantum tradeoffs remain to
+be measured before selecting production policy.
+
+[Incremental execution evidence](incremental-validation.json) records 15 interpreter/JIT/AOT
+runs (including the marker test) and the interpreter-only explicit-GC case.
+[Original registration regression](incremental-runtime-validation.json) adds six executions.
+[Native contracts](incremental-native-contracts.json) cover six instrumented source/dispatch
+contracts. Seventeen Rust scheduler tests and five submission/timer consumer tests pass.
+Reproduce with the same verifier profiles above; run `cargo test --lib scheduler::tests`
+and `cargo test --test scheduler_submission --test timers` for interpreter contracts.
+Windows and native reclamation diagnostics remain unqualified.
+
+
+The yield fixture assigns the awaited result before comparing it: the current native
+emitter rejects the direct `if await task != value` expression with a value-block exit
+diagnostic. This source workaround does not change scheduling semantics; the general
+compiler expression gap remains separate from this runtime slice.

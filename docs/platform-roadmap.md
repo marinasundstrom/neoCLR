@@ -69,8 +69,11 @@ all three local modes. Prefer this simpler ownership provisionally; native recla
 completion-capacity policy and production migration remain open. A
 [batch adapter](experiments/scheduler-continuations/README.md#completion-batch-admission--2026-10-11)
 now admits 128 awaiters using one runnable slot in all three modes, before outcome
-publication. It drains in one turn; incremental fairness and full-queue policy remain
-open. The original runtime
+publication. The adapter now returns to runtime arbitration between callbacks;
+[incremental evidence](experiments/scheduler-continuations/README.md#incremental-batch-turns--2026-10-11)
+qualifies older-work progress in all three modes. Interpreter runnable storage now grows
+while preserving reserved activation slots. Native independent backlog/full-queue policy
+remains the next gate. The original runtime
 registration service still retains strong roots. The interpreter readiness query now includes
 submitted work and keeps source/submission arbitration private;
 [quiescence contract and validation](runtime-scheduling-design.md#unified-interpreter-readiness--2026-10-11).

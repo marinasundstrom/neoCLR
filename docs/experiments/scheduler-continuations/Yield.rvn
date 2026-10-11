@@ -1,0 +1,42 @@
+module SchedulerContinuations {
+    import System.*
+    import System.Tasks.*
+
+    class YieldCheck {
+        private var markerRan = false
+        val Done = Promise<int>()
+
+        func First() -> System.Void {
+            _ = neoCLR.Runtime.SchedulerSubmit(Marker)
+            return ()
+        }
+
+        func Marker() -> System.Void {
+            markerRan = true
+            return ()
+        }
+
+        func Second() -> System.Void {
+            if !markerRan {
+                System.Fail("Batch did not yield to older runnable work")
+            }
+            Done.Complete(42)
+            return ()
+        }
+    }
+
+    async func Main() -> Task<int> {
+        let operation = Completion(UnpumpedProducer())
+        let check = YieldCheck()
+        // Explicit observers inspect dispatch turns, rather than Task results.
+        operation.OnCompleted(check.First)
+        operation.OnCompleted(check.Second)
+        operation.Publish()
+        let result = await check.Done.Task
+        if result != 42 {
+            System.Fail("Yield check lost result")
+        }
+        Console.WriteLine("PASS batch yields between observers to older runnable work")
+        return 0
+    }
+}

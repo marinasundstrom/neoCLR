@@ -222,12 +222,16 @@ impl Scheduler {
         {
             return Err(Fault::new("Scheduler submission requires a unit callback"));
         }
-        if self.submitted.len() + self.registrations.len() >= 64 {
-            return Err(Fault::coded(
-                crate::FaultCode::NativeMemoryLimitExceeded,
-                "Scheduler submission capacity exceeded",
-            ));
-        }
+        // Runnable storage grows independently of dormant registrations. Reserve
+        // enough spare entries for every promised activation before accepting work.
+        self.submitted
+            .try_reserve(self.registrations.len() + 1)
+            .map_err(|_| {
+                Fault::coded(
+                    crate::FaultCode::NativeMemoryLimitExceeded,
+                    "Scheduler runnable allocation failed",
+                )
+            })?;
         self.submitted.push_back(callback);
         self.wake.signal();
         Ok(())
@@ -246,12 +250,20 @@ impl Scheduler {
                 "Scheduler registration requires a unit callback",
             ));
         }
-        if self.submitted.len() + self.registrations.len() >= 64 {
+        if self.registrations.len() >= 64 {
             return Err(Fault::coded(
                 crate::FaultCode::NativeMemoryLimitExceeded,
                 "Scheduler registration capacity exceeded",
             ));
         }
+        self.submitted
+            .try_reserve(self.registrations.len() + 1)
+            .map_err(|_| {
+                Fault::coded(
+                    crate::FaultCode::NativeMemoryLimitExceeded,
+                    "Scheduler registration allocation failed",
+                )
+            })?;
         let id = NEXT
             .fetch_update(Ordering::Relaxed, Ordering::Relaxed, |value| {
                 value.checked_add(1)
@@ -759,18 +771,14 @@ mod tests {
     }
 
     #[test]
-    fn submitted_callbacks_are_bounded_rooted_and_yield_to_source_delivery() {
+    fn submitted_backlog_is_rooted_and_yields_to_source_delivery() {
         let mut heap = ManagedHeap::default();
         let mut scheduler = Scheduler::default();
         assert!(scheduler.submit(Value::Int32(0)).is_err());
         let (callback, _) = ready_graphs(&mut heap);
-        for _ in 0..64 {
+        for _ in 0..256 {
             scheduler.submit(callback.clone()).unwrap();
         }
-        assert_eq!(
-            scheduler.submit(callback).unwrap_err().code,
-            crate::FaultCode::NativeMemoryLimitExceeded
-        );
         collect(&mut heap, &scheduler, &[]);
         assert_eq!(heap.len(), 2);
         assert_eq!(scheduler.wait_timeout(Instant::now(), true), Duration::ZERO);
@@ -779,7 +787,7 @@ mod tests {
                 .install_submission(|_| Err(Fault::new("frame rejected")))
                 .is_err()
         );
-        assert_eq!(scheduler.submitted.len(), 64);
+        assert_eq!(scheduler.submitted.len(), 256);
         scheduler.stage(Value::Void, None);
         assert!(scheduler.install_submission(|_| Ok(())).unwrap());
         assert!(
@@ -789,7 +797,7 @@ mod tests {
         );
         scheduler.install_ready(|_, _| Ok(())).unwrap();
         assert!(scheduler.install_submission(|_| Ok(())).unwrap());
-        for _ in 0..62 {
+        for _ in 0..254 {
             assert!(scheduler.install_submission(|_| Ok(())).unwrap());
         }
         assert!(
@@ -797,6 +805,36 @@ mod tests {
                 .install_submission(|_| panic!("duplicate delivery"))
                 .unwrap()
         );
+        collect(&mut heap, &scheduler, &[]);
+        assert!(heap.is_empty());
+    }
+
+    #[test]
+    fn growing_backlog_preserves_reserved_activation_capacity() {
+        let mut heap = ManagedHeap::default();
+        let mut scheduler = Scheduler::default();
+        let destination = scheduler.capture_destination().unwrap();
+        let (callback, _) = ready_graphs(&mut heap);
+        let registrations: Vec<_> = (0..64)
+            .map(|_| scheduler.register(destination, callback.clone()).unwrap())
+            .collect();
+        for _ in 0..256 {
+            scheduler.submit(callback.clone()).unwrap();
+            assert!(
+                scheduler.submitted.capacity()
+                    >= scheduler.submitted.len() + scheduler.registrations.len()
+            );
+        }
+        let capacity = scheduler.submitted.capacity();
+        for registration in registrations {
+            assert!(scheduler.activate(registration));
+            assert_eq!(scheduler.submitted.capacity(), capacity);
+        }
+        collect(&mut heap, &scheduler, &[]);
+        assert_eq!(heap.len(), 2);
+        for _ in 0..320 {
+            assert!(scheduler.install_submission(|_| Ok(())).unwrap());
+        }
         collect(&mut heap, &scheduler, &[]);
         assert!(heap.is_empty());
     }
@@ -811,7 +849,8 @@ mod tests {
             .map(|_| scheduler.register(destination, callback.clone()).unwrap())
             .collect();
         assert!(scheduler.register(destination, callback.clone()).is_err());
-        assert!(scheduler.submit(callback).is_err());
+        scheduler.submit(callback).unwrap();
+        assert!(scheduler.install_submission(|_| Ok(())).unwrap());
         collect(&mut heap, &scheduler, &[]);
         assert_eq!(heap.len(), 2);
         assert_eq!(

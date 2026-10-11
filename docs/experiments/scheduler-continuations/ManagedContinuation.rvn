@@ -90,17 +90,26 @@ module SchedulerContinuations {
     }
 
     // Transitional adapter: one runtime-owned callable roots the entire batch.
-    // It drains in one turn; incremental runtime dispatch remains future work.
+    // One continuation per turn returns arbitration to the runtime. A future
+    // native batch descriptor can replace this callback adapter.
     class ContinuationBatch {
         private val pending: ArrayList<Continuation>
+        private var next = 0
+        private val destination: long
 
         init(pending: ArrayList<Continuation>) {
             self.pending = pending
+            destination = neoCLR.Runtime.SchedulerCapture()
         }
 
         func Run() -> System.Void {
-            for registration in pending {
+            if next < pending.Count {
+                let registration = pending[next]
+                next += 1
                 registration.InvokeAdmitted()
+            }
+            if next < pending.Count {
+                _ = neoCLR.Runtime.SchedulerSubmitTo(destination, Run)
             }
             return ()
         }

@@ -1252,3 +1252,31 @@ faults before outcome publication; define a runtime-owned backlog/draining polic
 production migration. Races, native explicit-GC parity and cross-invocation routing remain
 gates. The public library is unchanged and needs no API snapshot or website capability
 update. No new bridge ABI, metadata or compiler lowering is introduced.
+
+
+## Runtime arbitration between batch steps — 2026-10-11
+
+The internal managed adapter now returns to runtime arbitration after each observer,
+resubmitting the remaining batch through the captured destination. Native runnable order
+now follows admission identity rather than reusable operation-table position; otherwise
+new batch steps could overtake work enqueued by the preceding observer. Existing timer/I/O
+source rotation remains in place. This continues the managed-relationship/runtime-execution
+split without new public API or compiler contracts.
+
+Interpreter runnable storage grows independently of the 64 dormant-registration limit.
+Fallible reservation preserves a spare deque slot for every dormant registration, so
+activation remains allocation-free even after ordinary submissions expand the backlog.
+The former fixed runnable limit is removed only in the interpreter; native storage remains
+bounded by the shared I/O table. Do not infer cross-mode capacity parity or infallible
+Task completion. Native independent backlog admission is the next bounded gate.
+
+[Tests and evidence](experiments/scheduler-continuations/README.md#incremental-batch-turns--2026-10-11)
+qualify yielding to older runnable work, GC rooting, reserved activation capacity and
+terminal faults. Relative to .NET's separation of pending continuations and runnable work,
+this is an internal dispatch experiment, not a new await-order contract. Benefit: other
+runnable work can execute between batch observers. Costs: more admissions and dispatches;
+no throughput improvement is asserted. Runtime-native batch representation, work quantum,
+source fairness under sustained load and allocation measurements remain open.
+
+No bridge signatures, Runtime Contract settings, compiler emission or public API change.
+The website/API reference still describes the existing public Task implementation.
