@@ -1,0 +1,1570 @@
+{
+  "passed": true,
+  "platform": "macOS-27.0-arm64-arm-64bit",
+  "sourceSha256": "c86d508524932e19a9495f672e558d97d5aab4cfa06ddeec40c6dffbf0cbd7e6",
+  "jitSha256": "fad409faf40a754713732b5d98f8b05eef93ac446ff568a53158adc3e7f00eda",
+  "interpreterSha256": "f595995a2295f2c892a75db6696589d0f173945dca4cb5601f0e1630a63dd244",
+  "aotSha256": "b3818fee1186ad703ef0df673f6913c84ffdb5da98e32f8d3bde3063af03f1d4",
+  "objectSha256": "62af4b88b66f5d15ddf19321ad064ffc01f32bd941e1a292e9ebd70d81d169af",
+  "builds": [
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/tools/aot-poc/target/release/neoclr-aot-poc",
+        "/Users/robert/Projects/neoclr/docs/experiments/jit-cpu/workload.neoil",
+        "Calculate",
+        "/Users/robert/Projects/neoclr/target/jit-cpu-benchmark/workload.o"
+      ],
+      "seconds": 0.10479325,
+      "stdout": "Emitted aarch64-apple-darwin object; C export: neoclr_entry_v2\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "xcrun",
+        "clang",
+        "-O2",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "/Users/robert/Projects/neoclr/docs/experiments/jit-cpu/host.c",
+        "/Users/robert/Projects/neoclr/target/jit-cpu-benchmark/workload.o",
+        "-o",
+        "/Users/robert/Projects/neoclr/target/jit-cpu-benchmark/workload"
+      ],
+      "seconds": 0.14591391699999998,
+      "stdout": "",
+      "stderr": ""
+    }
+  ],
+  "repetitionsPerProcess": 4,
+  "rounds": 3,
+  "runs": [
+    {
+      "mode": "jit",
+      "count": 0,
+      "round": 0,
+      "command": [
+        "/Users/robert/Projects/neoclr/tools/aot-poc/target/release/neoclr-aot-poc",
+        "--jit-scalar",
+        "/Users/robert/Projects/neoclr/docs/experiments/jit-cpu/workload.neoil",
+        "Calculate",
+        "0",
+        "--repetitions",
+        "4"
+      ],
+      "processSeconds": 0.07088245800000004,
+      "report": {
+        "compileAndFinalizeSeconds": 0.030412667,
+        "invocationSeconds": 6.667e-06,
+        "invocations": [
+          {
+            "invocationSeconds": 6.667e-06,
+            "status": 0,
+            "value": 42
+          },
+          {
+            "invocationSeconds": 1.25e-07,
+            "status": 0,
+            "value": 42
+          },
+          {
+            "invocationSeconds": 8.3e-08,
+            "status": 0,
+            "value": 42
+          },
+          {
+            "invocationSeconds": 8.4e-08,
+            "status": 0,
+            "value": 42
+          }
+        ],
+        "loadSeconds": 0.033632875,
+        "profile": "macos-arm64-jit-scalar-v1",
+        "status": 0,
+        "value": 42
+      }
+    },
+    {
+      "mode": "aot",
+      "count": 0,
+      "round": 0,
+      "command": [
+        "/Users/robert/Projects/neoclr/target/jit-cpu-benchmark/workload",
+        "0",
+        "4"
+      ],
+      "processSeconds": 0.145450083,
+      "report": {
+        "invocations": [
+          {
+            "status": 0,
+            "value": 42,
+            "invocationSeconds": 0.0
+          },
+          {
+            "status": 0,
+            "value": 42,
+            "invocationSeconds": 0.0
+          },
+          {
+            "status": 0,
+            "value": 42,
+            "invocationSeconds": 0.0
+          },
+          {
+            "status": 0,
+            "value": 42,
+            "invocationSeconds": 0.0
+          }
+        ]
+      }
+    },
+    {
+      "mode": "interpreter",
+      "count": 0,
+      "round": 0,
+      "command": [
+        "/Users/robert/Projects/neoclr/target/release/examples/jit_cpu_interpreter",
+        "/Users/robert/Projects/neoclr/docs/experiments/jit-cpu/workload.neoil",
+        "0",
+        "4"
+      ],
+      "processSeconds": 0.07216037499999994,
+      "report": {
+        "invocations": [
+          {
+            "invocationSeconds": 0.000381542,
+            "status": 0,
+            "value": 42
+          },
+          {
+            "invocationSeconds": 0.000181542,
+            "status": 0,
+            "value": 42
+          },
+          {
+            "invocationSeconds": 0.000174083,
+            "status": 0,
+            "value": 42
+          },
+          {
+            "invocationSeconds": 0.000169083,
+            "status": 0,
+            "value": 42
+          }
+        ],
+        "prepareSeconds": 0.062999959
+      }
+    },
+    {
+      "mode": "aot",
+      "count": 0,
+      "round": 1,
+      "command": [
+        "/Users/robert/Projects/neoclr/target/jit-cpu-benchmark/workload",
+        "0",
+        "4"
+      ],
+      "processSeconds": 0.0037799159999999388,
+      "report": {
+        "invocations": [
+          {
+            "status": 0,
+            "value": 42,
+            "invocationSeconds": 1e-06
+          },
+          {
+            "status": 0,
+            "value": 42,
+            "invocationSeconds": 0.0
+          },
+          {
+            "status": 0,
+            "value": 42,
+            "invocationSeconds": 0.0
+          },
+          {
+            "status": 0,
+            "value": 42,
+            "invocationSeconds": 0.0
+          }
+        ]
+      }
+    },
+    {
+      "mode": "interpreter",
+      "count": 0,
+      "round": 1,
+      "command": [
+        "/Users/robert/Projects/neoclr/target/release/examples/jit_cpu_interpreter",
+        "/Users/robert/Projects/neoclr/docs/experiments/jit-cpu/workload.neoil",
+        "0",
+        "4"
+      ],
+      "processSeconds": 0.09429479200000002,
+      "report": {
+        "invocations": [
+          {
+            "invocationSeconds": 0.000241833,
+            "status": 0,
+            "value": 42
+          },
+          {
+            "invocationSeconds": 0.000186042,
+            "status": 0,
+            "value": 42
+          },
+          {
+            "invocationSeconds": 0.000182208,
+            "status": 0,
+            "value": 42
+          },
+          {
+            "invocationSeconds": 0.000178833,
+            "status": 0,
+            "value": 42
+          }
+        ],
+        "prepareSeconds": 0.086020292
+      }
+    },
+    {
+      "mode": "jit",
+      "count": 0,
+      "round": 1,
+      "command": [
+        "/Users/robert/Projects/neoclr/tools/aot-poc/target/release/neoclr-aot-poc",
+        "--jit-scalar",
+        "/Users/robert/Projects/neoclr/docs/experiments/jit-cpu/workload.neoil",
+        "Calculate",
+        "0",
+        "--repetitions",
+        "4"
+      ],
+      "processSeconds": 0.07503154200000006,
+      "report": {
+        "compileAndFinalizeSeconds": 0.032392125,
+        "invocationSeconds": 9.209e-06,
+        "invocations": [
+          {
+            "invocationSeconds": 9.209e-06,
+            "status": 0,
+            "value": 42
+          },
+          {
+            "invocationSeconds": 2.5e-07,
+            "status": 0,
+            "value": 42
+          },
+          {
+            "invocationSeconds": 8.4e-08,
+            "status": 0,
+            "value": 42
+          },
+          {
+            "invocationSeconds": 8.4e-08,
+            "status": 0,
+            "value": 42
+          }
+        ],
+        "loadSeconds": 0.035394709,
+        "profile": "macos-arm64-jit-scalar-v1",
+        "status": 0,
+        "value": 42
+      }
+    },
+    {
+      "mode": "interpreter",
+      "count": 0,
+      "round": 2,
+      "command": [
+        "/Users/robert/Projects/neoclr/target/release/examples/jit_cpu_interpreter",
+        "/Users/robert/Projects/neoclr/docs/experiments/jit-cpu/workload.neoil",
+        "0",
+        "4"
+      ],
+      "processSeconds": 0.07370895799999999,
+      "report": {
+        "invocations": [
+          {
+            "invocationSeconds": 0.000241083,
+            "status": 0,
+            "value": 42
+          },
+          {
+            "invocationSeconds": 0.000186375,
+            "status": 0,
+            "value": 42
+          },
+          {
+            "invocationSeconds": 0.000176875,
+            "status": 0,
+            "value": 42
+          },
+          {
+            "invocationSeconds": 0.000172542,
+            "status": 0,
+            "value": 42
+          }
+        ],
+        "prepareSeconds": 0.064290916
+      }
+    },
+    {
+      "mode": "jit",
+      "count": 0,
+      "round": 2,
+      "command": [
+        "/Users/robert/Projects/neoclr/tools/aot-poc/target/release/neoclr-aot-poc",
+        "--jit-scalar",
+        "/Users/robert/Projects/neoclr/docs/experiments/jit-cpu/workload.neoil",
+        "Calculate",
+        "0",
+        "--repetitions",
+        "4"
+      ],
+      "processSeconds": 0.07231912499999993,
+      "report": {
+        "compileAndFinalizeSeconds": 0.032565041,
+        "invocationSeconds": 9.792e-06,
+        "invocations": [
+          {
+            "invocationSeconds": 9.792e-06,
+            "status": 0,
+            "value": 42
+          },
+          {
+            "invocationSeconds": 1.25e-07,
+            "status": 0,
+            "value": 42
+          },
+          {
+            "invocationSeconds": 1.67e-07,
+            "status": 0,
+            "value": 42
+          },
+          {
+            "invocationSeconds": 1.25e-07,
+            "status": 0,
+            "value": 42
+          }
+        ],
+        "loadSeconds": 0.033293541,
+        "profile": "macos-arm64-jit-scalar-v1",
+        "status": 0,
+        "value": 42
+      }
+    },
+    {
+      "mode": "aot",
+      "count": 0,
+      "round": 2,
+      "command": [
+        "/Users/robert/Projects/neoclr/target/jit-cpu-benchmark/workload",
+        "0",
+        "4"
+      ],
+      "processSeconds": 0.00394508299999996,
+      "report": {
+        "invocations": [
+          {
+            "status": 0,
+            "value": 42,
+            "invocationSeconds": 0.0
+          },
+          {
+            "status": 0,
+            "value": 42,
+            "invocationSeconds": 0.0
+          },
+          {
+            "status": 0,
+            "value": 42,
+            "invocationSeconds": 0.0
+          },
+          {
+            "status": 0,
+            "value": 42,
+            "invocationSeconds": 0.0
+          }
+        ]
+      }
+    },
+    {
+      "mode": "jit",
+      "count": 10000,
+      "round": 0,
+      "command": [
+        "/Users/robert/Projects/neoclr/tools/aot-poc/target/release/neoclr-aot-poc",
+        "--jit-scalar",
+        "/Users/robert/Projects/neoclr/docs/experiments/jit-cpu/workload.neoil",
+        "Calculate",
+        "10000",
+        "--repetitions",
+        "4"
+      ],
+      "processSeconds": 0.06973504200000002,
+      "report": {
+        "compileAndFinalizeSeconds": 0.029853083,
+        "invocationSeconds": 3.6959e-05,
+        "invocations": [
+          {
+            "invocationSeconds": 3.6959e-05,
+            "status": 0,
+            "value": -736009734
+          },
+          {
+            "invocationSeconds": 2.8541e-05,
+            "status": 0,
+            "value": -736009734
+          },
+          {
+            "invocationSeconds": 2.775e-05,
+            "status": 0,
+            "value": -736009734
+          },
+          {
+            "invocationSeconds": 2.7584e-05,
+            "status": 0,
+            "value": -736009734
+          }
+        ],
+        "loadSeconds": 0.032498959,
+        "profile": "macos-arm64-jit-scalar-v1",
+        "status": 0,
+        "value": -736009734
+      }
+    },
+    {
+      "mode": "aot",
+      "count": 10000,
+      "round": 0,
+      "command": [
+        "/Users/robert/Projects/neoclr/target/jit-cpu-benchmark/workload",
+        "10000",
+        "4"
+      ],
+      "processSeconds": 0.003849540999999901,
+      "report": {
+        "invocations": [
+          {
+            "status": 0,
+            "value": -736009734,
+            "invocationSeconds": 2.9e-05
+          },
+          {
+            "status": 0,
+            "value": -736009734,
+            "invocationSeconds": 2.9e-05
+          },
+          {
+            "status": 0,
+            "value": -736009734,
+            "invocationSeconds": 2.9e-05
+          },
+          {
+            "status": 0,
+            "value": -736009734,
+            "invocationSeconds": 2.9e-05
+          }
+        ]
+      }
+    },
+    {
+      "mode": "interpreter",
+      "count": 10000,
+      "round": 0,
+      "command": [
+        "/Users/robert/Projects/neoclr/target/release/examples/jit_cpu_interpreter",
+        "/Users/robert/Projects/neoclr/docs/experiments/jit-cpu/workload.neoil",
+        "10000",
+        "4"
+      ],
+      "processSeconds": 0.20030324999999993,
+      "report": {
+        "invocations": [
+          {
+            "invocationSeconds": 0.033754916,
+            "status": 0,
+            "value": -736009734
+          },
+          {
+            "invocationSeconds": 0.032303875,
+            "status": 0,
+            "value": -736009734
+          },
+          {
+            "invocationSeconds": 0.032751,
+            "status": 0,
+            "value": -736009734
+          },
+          {
+            "invocationSeconds": 0.032445042,
+            "status": 0,
+            "value": -736009734
+          }
+        ],
+        "prepareSeconds": 0.062274667
+      }
+    },
+    {
+      "mode": "aot",
+      "count": 10000,
+      "round": 1,
+      "command": [
+        "/Users/robert/Projects/neoclr/target/jit-cpu-benchmark/workload",
+        "10000",
+        "4"
+      ],
+      "processSeconds": 0.004151291000000112,
+      "report": {
+        "invocations": [
+          {
+            "status": 0,
+            "value": -736009734,
+            "invocationSeconds": 2.8e-05
+          },
+          {
+            "status": 0,
+            "value": -736009734,
+            "invocationSeconds": 2.9e-05
+          },
+          {
+            "status": 0,
+            "value": -736009734,
+            "invocationSeconds": 2.9e-05
+          },
+          {
+            "status": 0,
+            "value": -736009734,
+            "invocationSeconds": 2.9e-05
+          }
+        ]
+      }
+    },
+    {
+      "mode": "interpreter",
+      "count": 10000,
+      "round": 1,
+      "command": [
+        "/Users/robert/Projects/neoclr/target/release/examples/jit_cpu_interpreter",
+        "/Users/robert/Projects/neoclr/docs/experiments/jit-cpu/workload.neoil",
+        "10000",
+        "4"
+      ],
+      "processSeconds": 0.20019566700000002,
+      "report": {
+        "invocations": [
+          {
+            "invocationSeconds": 0.032326667,
+            "status": 0,
+            "value": -736009734
+          },
+          {
+            "invocationSeconds": 0.031891,
+            "status": 0,
+            "value": -736009734
+          },
+          {
+            "invocationSeconds": 0.03196375,
+            "status": 0,
+            "value": -736009734
+          },
+          {
+            "invocationSeconds": 0.032261,
+            "status": 0,
+            "value": -736009734
+          }
+        ],
+        "prepareSeconds": 0.064360667
+      }
+    },
+    {
+      "mode": "jit",
+      "count": 10000,
+      "round": 1,
+      "command": [
+        "/Users/robert/Projects/neoclr/tools/aot-poc/target/release/neoclr-aot-poc",
+        "--jit-scalar",
+        "/Users/robert/Projects/neoclr/docs/experiments/jit-cpu/workload.neoil",
+        "Calculate",
+        "10000",
+        "--repetitions",
+        "4"
+      ],
+      "processSeconds": 0.07222375000000003,
+      "report": {
+        "compileAndFinalizeSeconds": 0.03227725,
+        "invocationSeconds": 3.7416e-05,
+        "invocations": [
+          {
+            "invocationSeconds": 3.7416e-05,
+            "status": 0,
+            "value": -736009734
+          },
+          {
+            "invocationSeconds": 2.8667e-05,
+            "status": 0,
+            "value": -736009734
+          },
+          {
+            "invocationSeconds": 2.875e-05,
+            "status": 0,
+            "value": -736009734
+          },
+          {
+            "invocationSeconds": 2.8625e-05,
+            "status": 0,
+            "value": -736009734
+          }
+        ],
+        "loadSeconds": 0.033458125,
+        "profile": "macos-arm64-jit-scalar-v1",
+        "status": 0,
+        "value": -736009734
+      }
+    },
+    {
+      "mode": "interpreter",
+      "count": 10000,
+      "round": 2,
+      "command": [
+        "/Users/robert/Projects/neoclr/target/release/examples/jit_cpu_interpreter",
+        "/Users/robert/Projects/neoclr/docs/experiments/jit-cpu/workload.neoil",
+        "10000",
+        "4"
+      ],
+      "processSeconds": 0.202899167,
+      "report": {
+        "invocations": [
+          {
+            "invocationSeconds": 0.032871333,
+            "status": 0,
+            "value": -736009734
+          },
+          {
+            "invocationSeconds": 0.032367917,
+            "status": 0,
+            "value": -736009734
+          },
+          {
+            "invocationSeconds": 0.033202083,
+            "status": 0,
+            "value": -736009734
+          },
+          {
+            "invocationSeconds": 0.0326405,
+            "status": 0,
+            "value": -736009734
+          }
+        ],
+        "prepareSeconds": 0.064319209
+      }
+    },
+    {
+      "mode": "jit",
+      "count": 10000,
+      "round": 2,
+      "command": [
+        "/Users/robert/Projects/neoclr/tools/aot-poc/target/release/neoclr-aot-poc",
+        "--jit-scalar",
+        "/Users/robert/Projects/neoclr/docs/experiments/jit-cpu/workload.neoil",
+        "Calculate",
+        "10000",
+        "--repetitions",
+        "4"
+      ],
+      "processSeconds": 0.07515662499999998,
+      "report": {
+        "compileAndFinalizeSeconds": 0.030182417,
+        "invocationSeconds": 3.9791e-05,
+        "invocations": [
+          {
+            "invocationSeconds": 3.9791e-05,
+            "status": 0,
+            "value": -736009734
+          },
+          {
+            "invocationSeconds": 2.8667e-05,
+            "status": 0,
+            "value": -736009734
+          },
+          {
+            "invocationSeconds": 2.8792e-05,
+            "status": 0,
+            "value": -736009734
+          },
+          {
+            "invocationSeconds": 2.8625e-05,
+            "status": 0,
+            "value": -736009734
+          }
+        ],
+        "loadSeconds": 0.038192958,
+        "profile": "macos-arm64-jit-scalar-v1",
+        "status": 0,
+        "value": -736009734
+      }
+    },
+    {
+      "mode": "aot",
+      "count": 10000,
+      "round": 2,
+      "command": [
+        "/Users/robert/Projects/neoclr/target/jit-cpu-benchmark/workload",
+        "10000",
+        "4"
+      ],
+      "processSeconds": 0.006814416000000101,
+      "report": {
+        "invocations": [
+          {
+            "status": 0,
+            "value": -736009734,
+            "invocationSeconds": 2.9e-05
+          },
+          {
+            "status": 0,
+            "value": -736009734,
+            "invocationSeconds": 2.9e-05
+          },
+          {
+            "status": 0,
+            "value": -736009734,
+            "invocationSeconds": 2.9e-05
+          },
+          {
+            "status": 0,
+            "value": -736009734,
+            "invocationSeconds": 2.9e-05
+          }
+        ]
+      }
+    },
+    {
+      "mode": "jit",
+      "count": 100000,
+      "round": 0,
+      "command": [
+        "/Users/robert/Projects/neoclr/tools/aot-poc/target/release/neoclr-aot-poc",
+        "--jit-scalar",
+        "/Users/robert/Projects/neoclr/docs/experiments/jit-cpu/workload.neoil",
+        "Calculate",
+        "100000",
+        "--repetitions",
+        "4"
+      ],
+      "processSeconds": 0.0720210830000001,
+      "report": {
+        "compileAndFinalizeSeconds": 0.031308292,
+        "invocationSeconds": 0.000295,
+        "invocations": [
+          {
+            "invocationSeconds": 0.000295,
+            "status": 0,
+            "value": 289420874
+          },
+          {
+            "invocationSeconds": 0.000287083,
+            "status": 0,
+            "value": 289420874
+          },
+          {
+            "invocationSeconds": 0.000285708,
+            "status": 0,
+            "value": 289420874
+          },
+          {
+            "invocationSeconds": 0.00028875,
+            "status": 0,
+            "value": 289420874
+          }
+        ],
+        "loadSeconds": 0.032722958,
+        "profile": "macos-arm64-jit-scalar-v1",
+        "status": 0,
+        "value": 289420874
+      }
+    },
+    {
+      "mode": "aot",
+      "count": 100000,
+      "round": 0,
+      "command": [
+        "/Users/robert/Projects/neoclr/target/jit-cpu-benchmark/workload",
+        "100000",
+        "4"
+      ],
+      "processSeconds": 0.005112084000000072,
+      "report": {
+        "invocations": [
+          {
+            "status": 0,
+            "value": 289420874,
+            "invocationSeconds": 0.000286
+          },
+          {
+            "status": 0,
+            "value": 289420874,
+            "invocationSeconds": 0.000283
+          },
+          {
+            "status": 0,
+            "value": 289420874,
+            "invocationSeconds": 0.000281
+          },
+          {
+            "status": 0,
+            "value": 289420874,
+            "invocationSeconds": 0.000274
+          }
+        ]
+      }
+    },
+    {
+      "mode": "interpreter",
+      "count": 100000,
+      "round": 0,
+      "command": [
+        "/Users/robert/Projects/neoclr/target/release/examples/jit_cpu_interpreter",
+        "/Users/robert/Projects/neoclr/docs/experiments/jit-cpu/workload.neoil",
+        "100000",
+        "4"
+      ],
+      "processSeconds": 1.3900599580000002,
+      "report": {
+        "invocations": [
+          {
+            "invocationSeconds": 0.335212459,
+            "status": 0,
+            "value": 289420874
+          },
+          {
+            "invocationSeconds": 0.339872208,
+            "status": 0,
+            "value": 289420874
+          },
+          {
+            "invocationSeconds": 0.339697791,
+            "status": 0,
+            "value": 289420874
+          },
+          {
+            "invocationSeconds": 0.305511,
+            "status": 0,
+            "value": 289420874
+          }
+        ],
+        "prepareSeconds": 0.062549042
+      }
+    },
+    {
+      "mode": "aot",
+      "count": 100000,
+      "round": 1,
+      "command": [
+        "/Users/robert/Projects/neoclr/target/jit-cpu-benchmark/workload",
+        "100000",
+        "4"
+      ],
+      "processSeconds": 0.004477916999999998,
+      "report": {
+        "invocations": [
+          {
+            "status": 0,
+            "value": 289420874,
+            "invocationSeconds": 0.000274
+          },
+          {
+            "status": 0,
+            "value": 289420874,
+            "invocationSeconds": 0.000273
+          },
+          {
+            "status": 0,
+            "value": 289420874,
+            "invocationSeconds": 0.000273
+          },
+          {
+            "status": 0,
+            "value": 289420874,
+            "invocationSeconds": 0.000274
+          }
+        ]
+      }
+    },
+    {
+      "mode": "interpreter",
+      "count": 100000,
+      "round": 1,
+      "command": [
+        "/Users/robert/Projects/neoclr/target/release/examples/jit_cpu_interpreter",
+        "/Users/robert/Projects/neoclr/docs/experiments/jit-cpu/workload.neoil",
+        "100000",
+        "4"
+      ],
+      "processSeconds": 1.2983163340000003,
+      "report": {
+        "invocations": [
+          {
+            "invocationSeconds": 0.309213792,
+            "status": 0,
+            "value": 289420874
+          },
+          {
+            "invocationSeconds": 0.3139275,
+            "status": 0,
+            "value": 289420874
+          },
+          {
+            "invocationSeconds": 0.307448667,
+            "status": 0,
+            "value": 289420874
+          },
+          {
+            "invocationSeconds": 0.30467725,
+            "status": 0,
+            "value": 289420874
+          }
+        ],
+        "prepareSeconds": 0.056841959
+      }
+    },
+    {
+      "mode": "jit",
+      "count": 100000,
+      "round": 1,
+      "command": [
+        "/Users/robert/Projects/neoclr/tools/aot-poc/target/release/neoclr-aot-poc",
+        "--jit-scalar",
+        "/Users/robert/Projects/neoclr/docs/experiments/jit-cpu/workload.neoil",
+        "Calculate",
+        "100000",
+        "--repetitions",
+        "4"
+      ],
+      "processSeconds": 0.0636874160000005,
+      "report": {
+        "compileAndFinalizeSeconds": 0.027369625,
+        "invocationSeconds": 0.000279292,
+        "invocations": [
+          {
+            "invocationSeconds": 0.000279292,
+            "status": 0,
+            "value": 289420874
+          },
+          {
+            "invocationSeconds": 0.000271334,
+            "status": 0,
+            "value": 289420874
+          },
+          {
+            "invocationSeconds": 0.000271209,
+            "status": 0,
+            "value": 289420874
+          },
+          {
+            "invocationSeconds": 0.000271292,
+            "status": 0,
+            "value": 289420874
+          }
+        ],
+        "loadSeconds": 0.029617084,
+        "profile": "macos-arm64-jit-scalar-v1",
+        "status": 0,
+        "value": 289420874
+      }
+    },
+    {
+      "mode": "interpreter",
+      "count": 100000,
+      "round": 2,
+      "command": [
+        "/Users/robert/Projects/neoclr/target/release/examples/jit_cpu_interpreter",
+        "/Users/robert/Projects/neoclr/docs/experiments/jit-cpu/workload.neoil",
+        "100000",
+        "4"
+      ],
+      "processSeconds": 1.2779696249999999,
+      "report": {
+        "invocations": [
+          {
+            "invocationSeconds": 0.304532,
+            "status": 0,
+            "value": 289420874
+          },
+          {
+            "invocationSeconds": 0.30256125,
+            "status": 0,
+            "value": 289420874
+          },
+          {
+            "invocationSeconds": 0.302357625,
+            "status": 0,
+            "value": 289420874
+          },
+          {
+            "invocationSeconds": 0.304609708,
+            "status": 0,
+            "value": 289420874
+          }
+        ],
+        "prepareSeconds": 0.057645208
+      }
+    },
+    {
+      "mode": "jit",
+      "count": 100000,
+      "round": 2,
+      "command": [
+        "/Users/robert/Projects/neoclr/tools/aot-poc/target/release/neoclr-aot-poc",
+        "--jit-scalar",
+        "/Users/robert/Projects/neoclr/docs/experiments/jit-cpu/workload.neoil",
+        "Calculate",
+        "100000",
+        "--repetitions",
+        "4"
+      ],
+      "processSeconds": 0.06341075000000007,
+      "report": {
+        "compileAndFinalizeSeconds": 0.027138625,
+        "invocationSeconds": 0.000303625,
+        "invocations": [
+          {
+            "invocationSeconds": 0.000303625,
+            "status": 0,
+            "value": 289420874
+          },
+          {
+            "invocationSeconds": 0.000274709,
+            "status": 0,
+            "value": 289420874
+          },
+          {
+            "invocationSeconds": 0.000271292,
+            "status": 0,
+            "value": 289420874
+          },
+          {
+            "invocationSeconds": 0.000271209,
+            "status": 0,
+            "value": 289420874
+          }
+        ],
+        "loadSeconds": 0.029608958,
+        "profile": "macos-arm64-jit-scalar-v1",
+        "status": 0,
+        "value": 289420874
+      }
+    },
+    {
+      "mode": "aot",
+      "count": 100000,
+      "round": 2,
+      "command": [
+        "/Users/robert/Projects/neoclr/target/jit-cpu-benchmark/workload",
+        "100000",
+        "4"
+      ],
+      "processSeconds": 0.004475957999999558,
+      "report": {
+        "invocations": [
+          {
+            "status": 0,
+            "value": 289420874,
+            "invocationSeconds": 0.000273
+          },
+          {
+            "status": 0,
+            "value": 289420874,
+            "invocationSeconds": 0.000273
+          },
+          {
+            "status": 0,
+            "value": 289420874,
+            "invocationSeconds": 0.000273
+          },
+          {
+            "status": 0,
+            "value": 289420874,
+            "invocationSeconds": 0.000273
+          }
+        ]
+      }
+    },
+    {
+      "mode": "jit",
+      "count": 1000000,
+      "round": 0,
+      "command": [
+        "/Users/robert/Projects/neoclr/tools/aot-poc/target/release/neoclr-aot-poc",
+        "--jit-scalar",
+        "/Users/robert/Projects/neoclr/docs/experiments/jit-cpu/workload.neoil",
+        "Calculate",
+        "1000000",
+        "--repetitions",
+        "4"
+      ],
+      "processSeconds": 0.07431679100000022,
+      "report": {
+        "compileAndFinalizeSeconds": 0.027509875,
+        "invocationSeconds": 0.002723709,
+        "invocations": [
+          {
+            "invocationSeconds": 0.002723709,
+            "status": 0,
+            "value": -1347080854
+          },
+          {
+            "invocationSeconds": 0.002721208,
+            "status": 0,
+            "value": -1347080854
+          },
+          {
+            "invocationSeconds": 0.002716875,
+            "status": 0,
+            "value": -1347080854
+          },
+          {
+            "invocationSeconds": 0.002712167,
+            "status": 0,
+            "value": -1347080854
+          }
+        ],
+        "loadSeconds": 0.030235708,
+        "profile": "macos-arm64-jit-scalar-v1",
+        "status": 0,
+        "value": -1347080854
+      }
+    },
+    {
+      "mode": "aot",
+      "count": 1000000,
+      "round": 0,
+      "command": [
+        "/Users/robert/Projects/neoclr/target/jit-cpu-benchmark/workload",
+        "1000000",
+        "4"
+      ],
+      "processSeconds": 0.01433712499999995,
+      "report": {
+        "invocations": [
+          {
+            "status": 0,
+            "value": -1347080854,
+            "invocationSeconds": 0.002732
+          },
+          {
+            "status": 0,
+            "value": -1347080854,
+            "invocationSeconds": 0.002735
+          },
+          {
+            "status": 0,
+            "value": -1347080854,
+            "invocationSeconds": 0.002732
+          },
+          {
+            "status": 0,
+            "value": -1347080854,
+            "invocationSeconds": 0.002735
+          }
+        ]
+      }
+    },
+    {
+      "mode": "interpreter",
+      "count": 1000000,
+      "round": 0,
+      "command": [
+        "/Users/robert/Projects/neoclr/target/release/examples/jit_cpu_interpreter",
+        "/Users/robert/Projects/neoclr/docs/experiments/jit-cpu/workload.neoil",
+        "1000000",
+        "4"
+      ],
+      "processSeconds": 12.581577417000002,
+      "report": {
+        "invocations": [
+          {
+            "invocationSeconds": 3.014873666,
+            "status": 0,
+            "value": -1347080854
+          },
+          {
+            "invocationSeconds": 3.165820791,
+            "status": 0,
+            "value": -1347080854
+          },
+          {
+            "invocationSeconds": 3.100685375,
+            "status": 0,
+            "value": -1347080854
+          },
+          {
+            "invocationSeconds": 3.233259542,
+            "status": 0,
+            "value": -1347080854
+          }
+        ],
+        "prepareSeconds": 0.056600208
+      }
+    },
+    {
+      "mode": "aot",
+      "count": 1000000,
+      "round": 1,
+      "command": [
+        "/Users/robert/Projects/neoclr/target/jit-cpu-benchmark/workload",
+        "1000000",
+        "4"
+      ],
+      "processSeconds": 0.016436167000001944,
+      "report": {
+        "invocations": [
+          {
+            "status": 0,
+            "value": -1347080854,
+            "invocationSeconds": 0.002897
+          },
+          {
+            "status": 0,
+            "value": -1347080854,
+            "invocationSeconds": 0.0028
+          },
+          {
+            "status": 0,
+            "value": -1347080854,
+            "invocationSeconds": 0.002926
+          },
+          {
+            "status": 0,
+            "value": -1347080854,
+            "invocationSeconds": 0.002948
+          }
+        ]
+      }
+    },
+    {
+      "mode": "interpreter",
+      "count": 1000000,
+      "round": 1,
+      "command": [
+        "/Users/robert/Projects/neoclr/target/release/examples/jit_cpu_interpreter",
+        "/Users/robert/Projects/neoclr/docs/experiments/jit-cpu/workload.neoil",
+        "1000000",
+        "4"
+      ],
+      "processSeconds": 12.289674791,
+      "report": {
+        "invocations": [
+          {
+            "invocationSeconds": 3.063282459,
+            "status": 0,
+            "value": -1347080854
+          },
+          {
+            "invocationSeconds": 3.056433,
+            "status": 0,
+            "value": -1347080854
+          },
+          {
+            "invocationSeconds": 3.052532959,
+            "status": 0,
+            "value": -1347080854
+          },
+          {
+            "invocationSeconds": 3.039193875,
+            "status": 0,
+            "value": -1347080854
+          }
+        ],
+        "prepareSeconds": 0.070312833
+      }
+    },
+    {
+      "mode": "jit",
+      "count": 1000000,
+      "round": 1,
+      "command": [
+        "/Users/robert/Projects/neoclr/tools/aot-poc/target/release/neoclr-aot-poc",
+        "--jit-scalar",
+        "/Users/robert/Projects/neoclr/docs/experiments/jit-cpu/workload.neoil",
+        "Calculate",
+        "1000000",
+        "--repetitions",
+        "4"
+      ],
+      "processSeconds": 0.09359216600000053,
+      "report": {
+        "compileAndFinalizeSeconds": 0.033988708,
+        "invocationSeconds": 0.002860958,
+        "invocations": [
+          {
+            "invocationSeconds": 0.002860958,
+            "status": 0,
+            "value": -1347080854
+          },
+          {
+            "invocationSeconds": 0.002711916,
+            "status": 0,
+            "value": -1347080854
+          },
+          {
+            "invocationSeconds": 0.002711625,
+            "status": 0,
+            "value": -1347080854
+          },
+          {
+            "invocationSeconds": 0.002713625,
+            "status": 0,
+            "value": -1347080854
+          }
+        ],
+        "loadSeconds": 0.037593875,
+        "profile": "macos-arm64-jit-scalar-v1",
+        "status": 0,
+        "value": -1347080854
+      }
+    },
+    {
+      "mode": "interpreter",
+      "count": 1000000,
+      "round": 2,
+      "command": [
+        "/Users/robert/Projects/neoclr/target/release/examples/jit_cpu_interpreter",
+        "/Users/robert/Projects/neoclr/docs/experiments/jit-cpu/workload.neoil",
+        "1000000",
+        "4"
+      ],
+      "processSeconds": 12.218160832999999,
+      "report": {
+        "invocations": [
+          {
+            "invocationSeconds": 3.042324333,
+            "status": 0,
+            "value": -1347080854
+          },
+          {
+            "invocationSeconds": 3.056176708,
+            "status": 0,
+            "value": -1347080854
+          },
+          {
+            "invocationSeconds": 3.029202,
+            "status": 0,
+            "value": -1347080854
+          },
+          {
+            "invocationSeconds": 3.0264535,
+            "status": 0,
+            "value": -1347080854
+          }
+        ],
+        "prepareSeconds": 0.056875
+      }
+    },
+    {
+      "mode": "jit",
+      "count": 1000000,
+      "round": 2,
+      "command": [
+        "/Users/robert/Projects/neoclr/tools/aot-poc/target/release/neoclr-aot-poc",
+        "--jit-scalar",
+        "/Users/robert/Projects/neoclr/docs/experiments/jit-cpu/workload.neoil",
+        "Calculate",
+        "1000000",
+        "--repetitions",
+        "4"
+      ],
+      "processSeconds": 0.07499933299999384,
+      "report": {
+        "compileAndFinalizeSeconds": 0.027254291,
+        "invocationSeconds": 0.002720458,
+        "invocations": [
+          {
+            "invocationSeconds": 0.002720458,
+            "status": 0,
+            "value": -1347080854
+          },
+          {
+            "invocationSeconds": 0.002711583,
+            "status": 0,
+            "value": -1347080854
+          },
+          {
+            "invocationSeconds": 0.002743041,
+            "status": 0,
+            "value": -1347080854
+          },
+          {
+            "invocationSeconds": 0.00271325,
+            "status": 0,
+            "value": -1347080854
+          }
+        ],
+        "loadSeconds": 0.030897334,
+        "profile": "macos-arm64-jit-scalar-v1",
+        "status": 0,
+        "value": -1347080854
+      }
+    },
+    {
+      "mode": "aot",
+      "count": 1000000,
+      "round": 2,
+      "command": [
+        "/Users/robert/Projects/neoclr/target/jit-cpu-benchmark/workload",
+        "1000000",
+        "4"
+      ],
+      "processSeconds": 0.01602862499999702,
+      "report": {
+        "invocations": [
+          {
+            "status": 0,
+            "value": -1347080854,
+            "invocationSeconds": 0.003033
+          },
+          {
+            "status": 0,
+            "value": -1347080854,
+            "invocationSeconds": 0.002742
+          },
+          {
+            "status": 0,
+            "value": -1347080854,
+            "invocationSeconds": 0.002759
+          },
+          {
+            "status": 0,
+            "value": -1347080854,
+            "invocationSeconds": 0.002743
+          }
+        ]
+      }
+    }
+  ],
+  "summaries": [
+    {
+      "mode": "jit",
+      "count": 0,
+      "expected": 42,
+      "invocationMedianSeconds": 1.25e-07,
+      "invocationMinSeconds": 8.3e-08,
+      "invocationMaxSeconds": 2.5e-07,
+      "processMedianSeconds": 0.07231912499999993
+    },
+    {
+      "mode": "aot",
+      "count": 0,
+      "expected": 42,
+      "invocationMedianSeconds": 0.0,
+      "invocationMinSeconds": 0.0,
+      "invocationMaxSeconds": 0.0,
+      "processMedianSeconds": 0.00394508299999996
+    },
+    {
+      "mode": "interpreter",
+      "count": 0,
+      "expected": 42,
+      "invocationMedianSeconds": 0.000178833,
+      "invocationMinSeconds": 0.000169083,
+      "invocationMaxSeconds": 0.000186375,
+      "processMedianSeconds": 0.07370895799999999
+    },
+    {
+      "mode": "jit",
+      "count": 10000,
+      "expected": -736009734,
+      "invocationMedianSeconds": 2.8625e-05,
+      "invocationMinSeconds": 2.7584e-05,
+      "invocationMaxSeconds": 2.8792e-05,
+      "processMedianSeconds": 0.07222375000000003
+    },
+    {
+      "mode": "aot",
+      "count": 10000,
+      "expected": -736009734,
+      "invocationMedianSeconds": 2.9e-05,
+      "invocationMinSeconds": 2.9e-05,
+      "invocationMaxSeconds": 2.9e-05,
+      "processMedianSeconds": 0.004151291000000112
+    },
+    {
+      "mode": "interpreter",
+      "count": 10000,
+      "expected": -736009734,
+      "invocationMedianSeconds": 0.032367917,
+      "invocationMinSeconds": 0.031891,
+      "invocationMaxSeconds": 0.033202083,
+      "processMedianSeconds": 0.20030324999999993
+    },
+    {
+      "mode": "jit",
+      "count": 100000,
+      "expected": 289420874,
+      "invocationMedianSeconds": 0.000271334,
+      "invocationMinSeconds": 0.000271209,
+      "invocationMaxSeconds": 0.00028875,
+      "processMedianSeconds": 0.0636874160000005
+    },
+    {
+      "mode": "aot",
+      "count": 100000,
+      "expected": 289420874,
+      "invocationMedianSeconds": 0.000273,
+      "invocationMinSeconds": 0.000273,
+      "invocationMaxSeconds": 0.000283,
+      "processMedianSeconds": 0.004477916999999998
+    },
+    {
+      "mode": "interpreter",
+      "count": 100000,
+      "expected": 289420874,
+      "invocationMedianSeconds": 0.305511,
+      "invocationMinSeconds": 0.302357625,
+      "invocationMaxSeconds": 0.339872208,
+      "processMedianSeconds": 1.2983163340000003
+    },
+    {
+      "mode": "jit",
+      "count": 1000000,
+      "expected": -1347080854,
+      "invocationMedianSeconds": 0.00271325,
+      "invocationMinSeconds": 0.002711583,
+      "invocationMaxSeconds": 0.002743041,
+      "processMedianSeconds": 0.07499933299999384
+    },
+    {
+      "mode": "aot",
+      "count": 1000000,
+      "expected": -1347080854,
+      "invocationMedianSeconds": 0.002743,
+      "invocationMinSeconds": 0.002732,
+      "invocationMaxSeconds": 0.002948,
+      "processMedianSeconds": 0.01602862499999702
+    },
+    {
+      "mode": "interpreter",
+      "count": 1000000,
+      "expected": -1347080854,
+      "invocationMedianSeconds": 3.056176708,
+      "invocationMinSeconds": 3.0264535,
+      "invocationMaxSeconds": 3.233259542,
+      "processMedianSeconds": 12.289674791
+    }
+  ],
+  "date": "2026-10-11",
+  "hostCpu": "Apple M1",
+  "sourceBaseRevision": "40f9b40b",
+  "sourceState": "Retained scalar JIT invocation and CPU benchmark slice",
+  "scalarTestsPassed": 23,
+  "sourceHashes": {
+    "docs/experiments/jit-cpu/benchmark.py": "faac98cc61d080b476bfd59322afbf01502ab48e0dcf095b3a4134ffaac68be3",
+    "docs/experiments/jit-cpu/host.c": "d3f5b4dc4a5f272b0f28b735cebdc86f5cbbd0837568f302886a30c402566b7f",
+    "docs/experiments/jit-cpu/workload.neoil": "c86d508524932e19a9495f672e558d97d5aab4cfa06ddeec40c6dffbf0cbd7e6",
+    "examples/jit_cpu_interpreter.rs": "686e114e6425d80179133e1d9d04029d4c60e017581b2dec231f0750b698a2d9",
+    "tools/aot-poc/src/jit.rs": "2ae63c4cdbc8cf41752003a0eeb311c3c07e2a78522a02afacef82711ec79118",
+    "tools/aot-poc/src/main.rs": "5ad52a5e0e7894a0ffa722c076da995351f674c2fede4049c4f07e0789951a53"
+  }
+}

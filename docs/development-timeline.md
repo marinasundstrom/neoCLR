@@ -14381,3 +14381,16 @@ JIT and interpreter: local median process times fall from 3.217s to 2.531s and
 3.919s to 2.697s respectively, with substantial host variability retained in the evidence.
 This is shared startup work, not evidence that interpreter dispatch
 now approaches native speed. Sustained-workload comparisons and async/HTTP JIT remain open.
+
+### 2026-10-11 follow-up — functioning JIT remains the goal
+
+**Author:** “Continue on that route. Our goal remains to have a functioning JIT.”
+**Assistant action:** adds compile-once/repeated scalar invocation with owned executable
+storage and repeated fault checks; compares an identical scalar CPU loop through JIT,
+AOT and a retained interpreter function handle. All 144 checksum checks and 23 compiler
+tests pass. One-million-iteration invocation medians are 2.713ms JIT, 2.743ms AOT and
+3,056ms interpreted on the local M1. [Evidence and limitations](experiments/jit-cpu/README.md)
+distinguish this call-heavy synthetic result from application speed or service throughput.
+**Remaining direction:** managed async entry/callback lifetime and then HTTP qualification
+are the next functional JIT milestones. Interpreter dispatch/call profiling remains useful;
+this measurement does not establish a production JIT or change execution defaults.

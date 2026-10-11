@@ -23,6 +23,7 @@ pub(super) fn execute(
     input: &neoclr::Module,
     root: &str,
     argument: i32,
+    repetitions: usize,
 ) -> Result<serde_json::Value, Error> {
     if !cfg!(all(target_os = "macos", target_arch = "aarch64")) {
         return Err("scalar JIT probe currently requires a macOS ARM64 host".into());
@@ -56,20 +57,29 @@ pub(super) fn execute(
     };
     let pointer = module.get_finalized_function(entry);
     let compile_seconds = started.elapsed().as_secs_f64();
-    let mut value = 0i32;
-    let started = Instant::now();
-    // SAFETY: shared scalar lowering always exports this exact C ABI, including its
-    // parameterless-root adapter. The aligned writable result lives through the call,
-    // and CodeOwner retains finalized executable storage until after return.
+    // SAFETY: shared lowering exports this exact ABI. The owner retains executable
+    // storage across every synchronous call; no callable escapes this scope.
     let entry: unsafe extern "C" fn(i32, *mut i32) -> i32 = unsafe { std::mem::transmute(pointer) };
-    let status = unsafe { entry(argument, &mut value) };
-    let invocation_seconds = started.elapsed().as_secs_f64();
+    let mut invocations = Vec::with_capacity(repetitions);
+    for _ in 0..repetitions {
+        let mut value = 0i32;
+        let started = Instant::now();
+        let status = unsafe { entry(argument, &mut value) };
+        invocations.push(serde_json::json!({
+            "status": status,
+            "value": if status == 0 { Some(value) } else { None },
+            "invocationSeconds": started.elapsed().as_secs_f64(),
+        }));
+    }
+    let first = invocations
+        .first()
+        .ok_or("at least one invocation is required")?;
     Ok(serde_json::json!({
         "profile": "macos-arm64-jit-scalar-v1",
-        "status": status,
-        "value": if status == 0 { Some(value) } else { None },
+        "status": first["status"], "value": first["value"],
         "compileAndFinalizeSeconds": compile_seconds,
-        "invocationSeconds": invocation_seconds,
+        "invocationSeconds": first["invocationSeconds"],
+        "invocations": invocations,
     }))
 }
 

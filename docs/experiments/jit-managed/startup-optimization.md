@@ -90,3 +90,7 @@ Remaining work: profile selection/verification more deeply, then measure a susta
 workload and scale metadata size independently. Any persistent cache or lazy compilation
 needs explicit invalidation, semantic validation and lifetime contracts. Async/HTTP JIT
 qualification remains a separate prerequisite for service-throughput comparisons.
+
+Follow-up: the [retained-code CPU experiment](../jit-cpu/README.md) varies computation
+with fixed metadata and reports invocation timing for all three modes. Managed async/HTTP
+lifetime remains the next functional JIT gap; this scalar result does not close it.

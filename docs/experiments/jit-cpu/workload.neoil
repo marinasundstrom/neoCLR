@@ -1,0 +1,32 @@
+.module JitCpu
+.function Step(Int32 value) -> Int32
+    ldarg value
+    ldc.i4 1664525
+    mul
+    ldc.i4 1013904223
+    add
+    ret
+.end
+.function Calculate(Int32 count) -> Int32
+    .local Int32 index
+    .local Int32 value
+    ldc.i4 0
+    stloc index
+    ldc.i4 42
+    stloc value
+Loop:
+    ldloc index
+    ldarg count
+    bge Done
+    ldloc value
+    call Step(Int32)
+    stloc value
+    ldloc index
+    ldc.i4 1
+    add
+    stloc index
+    br Loop
+Done:
+    ldloc value
+    ret
+.end

@@ -34,15 +34,17 @@ fn main() {
 fn run() -> Result<(), Box<dyn std::error::Error>> {
     let mut args: Vec<_> = env::args_os().skip(1).collect();
     if args.first().is_some_and(|arg| arg == "--jit-scalar") {
-        if args.len() != 4 {
-            return Err("usage: neoclr-aot-poc --jit-scalar <input.neoil|input.neox|input.dll> <root-name> <Int32 argument>".into());
+        if args.len() != 4 && !(args.len() == 6 && args[4] == "--repetitions") {
+            return Err("usage: neoclr-aot-poc --jit-scalar <input.neoil|input.neox|input.dll> <root-name> <Int32 argument> [--repetitions 1..1000]".into());
         }
+        let repetitions = if args.len() == 6 { args[5].to_str().ok_or("invalid repetition count")?.parse::<usize>()? } else { 1 };
+        if !(1..=1000).contains(&repetitions) { return Err("repetitions must be 1..1000".into()); }
         let started = std::time::Instant::now();
         let input = read_module(Path::new(&args[1]))?;
         let load_seconds = started.elapsed().as_secs_f64();
         let root = args[2].to_str().ok_or("root must be UTF-8")?;
         let argument: i32 = args[3].to_str().ok_or("argument must be Int32")?.parse()?;
-        let mut result = jit::execute(&input, root, argument)?;
+        let mut result = jit::execute(&input, root, argument, repetitions)?;
         result["loadSeconds"] = serde_json::json!(load_seconds);
         println!("{result}");
         return Ok(());

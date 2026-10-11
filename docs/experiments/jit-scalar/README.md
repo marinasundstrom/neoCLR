@@ -90,3 +90,10 @@ The separate [managed JIT profile](../jit-managed/README.md) now runs the real
 Index/Range framework assembly. It retains the scalar profile's narrow contract and
 uses explicit long-range calls for independently allocated ARM64 JIT code and helpers;
 AOT keeps its existing linker relocation policy.
+
+## Repeated invocation
+
+The private command additionally accepts `--repetitions 1..1000`, retaining one compiled
+image through synchronous calls and reporting every result in `invocations`. Top-level
+status/value/invocation timing describe the first call. See the
+[CPU comparison and ownership contract](../jit-cpu/README.md).

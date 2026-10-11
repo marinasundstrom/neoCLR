@@ -931,3 +931,32 @@ fn jit_native_container_matches_source_and_rejects_corruption() {
     assert!(!result.status.success());
     assert!(result.stdout.is_empty());
 }
+
+#[test]
+#[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+fn jit_reuses_owned_code_for_successful_and_faulting_invocations() {
+    let temp = Temp::new();
+    let input = temp.0.join("repeat.neoil");
+    fs::write(&input, ".module Repeat\n.function Calculate(Int32 value) -> Int32\nldc.i4 12\nldarg value\ndiv\nret\n.end\n").unwrap();
+    for (argument, status, value) in [("4", 0, Some(3)), ("0", 1, None)] {
+        let result = Command::new(env!("CARGO_BIN_EXE_neoclr-aot-poc"))
+            .arg("--jit-scalar").arg(&input)
+            .args(["Calculate", argument, "--repetitions", "3"]).output().unwrap();
+        assert!(result.status.success(), "{}", String::from_utf8_lossy(&result.stderr));
+        let report: serde_json::Value = serde_json::from_slice(&result.stdout).unwrap();
+        let calls = report["invocations"].as_array().unwrap();
+        assert_eq!(calls.len(), 3);
+        for call in calls {
+            assert_eq!(call["status"], status);
+            assert_eq!(call["value"], serde_json::json!(value));
+        }
+    }
+    for repetitions in ["0", "1001"] {
+        let result = Command::new(env!("CARGO_BIN_EXE_neoclr-aot-poc"))
+            .arg("--jit-scalar").arg(&input)
+            .args(["Calculate", "4", "--repetitions", repetitions]).output().unwrap();
+        assert!(!result.status.success());
+        assert!(result.stdout.is_empty());
+        assert!(String::from_utf8_lossy(&result.stderr).contains("repetitions must be"));
+    }
+}

@@ -8,6 +8,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-11
 
+- Add bounded repeated invocation to the private scalar JIT probe, retaining one compiled
+  code image through successful or faulting synchronous calls. Add a checksum-validated
+  CPU-loop comparison with AOT and a retained interpreter function handle, separating
+  invocation timings from loading/compilation and checking increasing work sizes.
+
 - Reuse scope-local metadata candidate indexes during structural validation, reference
   checking and typed verification, preserving full semantic checks while reducing shared
   JIT/interpreter startup work. Add managed JIT metadata-load and selection/verification

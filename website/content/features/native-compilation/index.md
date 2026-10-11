@@ -199,6 +199,11 @@ A subsequent shared metadata lookup optimization reduces startup work in both th
 and interpreter; [before/after evidence](https://github.com/marinasundstrom/neoCLR/blob/main/docs/experiments/jit-managed/startup-optimization.md)
 keeps process timing separate from execution speed.
 
+The scalar probe also retains compiled code across repeated calls, with a
+[checksum-validated CPU comparison](https://github.com/marinasundstrom/neoCLR/blob/main/docs/experiments/jit-cpu/README.md)
+that measures invocation separately from startup. This remains a synthetic workload,
+not service throughput or general JIT/AOT equivalence.
+
 The intended direction is JIT by default where supported, AOT for deployment, and a fully
 supported interpreter for constrained environments. Current execution defaults are unchanged.
 Cross-target hot reload and explicit AOT/interpreter hybrid execution remain future work.

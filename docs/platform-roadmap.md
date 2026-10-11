@@ -29,6 +29,11 @@ This is test-run evidence, not HTTP throughput. The subsequent
 immutable candidate indexes during validation and verification, with a balanced
 before/after comparison for both JIT and interpreter. Continued interpreter improvement
 remains part of the direction; sustained-workload and size-scaling evidence are still open.
+A subsequent [retained-code CPU experiment](experiments/jit-cpu/README.md) now
+checks repeated scalar invocations against AOT and the interpreter, separating
+computation from metadata size. Keep the next functional JIT milestone focused on
+managed async entry/callback lifetime and then HTTP qualification; these measurements
+do not make the current private probe a production execution mode.
 Memory views and suspension remain related design work.
 
 **Module story closure (2026-10-10):** the author requests closing the namespace/module
