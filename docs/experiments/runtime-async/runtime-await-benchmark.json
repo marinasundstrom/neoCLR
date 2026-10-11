@@ -1,0 +1,1206 @@
+{
+  "passed": true,
+  "platform": "macOS-27.0-arm64-arm-64bit",
+  "measurement": "fresh interpreter invocation; load and verification excluded",
+  "repetitions": 4,
+  "discardedWarmupsPerProcess": 1,
+  "rounds": 2,
+  "host": "/Users/robert/Projects/neoclr/target/scheduler-wait-validation/release/examples/runtime_async_interpreter",
+  "hostSha256": "48a53f6480bb484addc9389ae0111af1a7513df1675c0311db50d6b8f22e2541",
+  "recipeSha256": "236fd684fb61ca5edc96d18aa5e9154ee5c129bf8d8cc923d0b2564f1cedb7a2",
+  "providerSha256": "93efd51bf49da558079d798bc3f5a920ac4962010da85f275961494007ab6251",
+  "builds": [
+    {
+      "case": "completed-10",
+      "mode": "state-machine",
+      "command": [
+        "dotnet",
+        "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+        "neoclr",
+        "--core-reference",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/Core.dll",
+        "--runtime-seed",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/System.runtime.neox",
+        "--bootstrap-intrinsics",
+        "--bootstrap-ownership",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/ownership.json",
+        "--object-library",
+        "System.Runtime",
+        "--async-library",
+        "System.Runtime",
+        "--reference",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/System.Runtime.dll",
+        "--reference",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/System.Data.dll",
+        "--reference",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/System.Networking.dll",
+        "--reference",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/System.Web.dll",
+        "-o",
+        "/Users/robert/Projects/neoclr/target/runtime-async-benchmark-final/completed-10-state-machine.dll",
+        "/Users/robert/Projects/neoclr/target/runtime-async-benchmark-final/completed-10.rvn",
+        "/Users/robert/Projects/neoclr/docs/experiments/runtime-async/RuntimeAsyncBridge.rvn"
+      ],
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": "",
+      "sourceSha256": "8a591c53678eedc84bd9f93fd1031e5289faa5accf9bcc8e1f68372b14209a41"
+    },
+    {
+      "case": "completed-10",
+      "mode": "runtime",
+      "command": [
+        "dotnet",
+        "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+        "neoclr",
+        "--core-reference",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/Core.dll",
+        "--runtime-seed",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/System.runtime.neox",
+        "--bootstrap-intrinsics",
+        "--bootstrap-ownership",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/ownership.json",
+        "--object-library",
+        "System.Runtime",
+        "--async-library",
+        "System.Runtime",
+        "--runtime-async-poc",
+        "RuntimeAwaitProvider.Bridge",
+        "--reference",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/System.Runtime.dll",
+        "--reference",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/System.Data.dll",
+        "--reference",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/System.Networking.dll",
+        "--reference",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/System.Web.dll",
+        "-o",
+        "/Users/robert/Projects/neoclr/target/runtime-async-benchmark-final/completed-10-runtime.dll",
+        "/Users/robert/Projects/neoclr/target/runtime-async-benchmark-final/completed-10.rvn",
+        "/Users/robert/Projects/neoclr/docs/experiments/runtime-async/RuntimeAsyncBridge.rvn"
+      ],
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": "",
+      "sourceSha256": "8a591c53678eedc84bd9f93fd1031e5289faa5accf9bcc8e1f68372b14209a41"
+    },
+    {
+      "case": "completed-100",
+      "mode": "state-machine",
+      "command": [
+        "dotnet",
+        "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+        "neoclr",
+        "--core-reference",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/Core.dll",
+        "--runtime-seed",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/System.runtime.neox",
+        "--bootstrap-intrinsics",
+        "--bootstrap-ownership",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/ownership.json",
+        "--object-library",
+        "System.Runtime",
+        "--async-library",
+        "System.Runtime",
+        "--reference",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/System.Runtime.dll",
+        "--reference",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/System.Data.dll",
+        "--reference",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/System.Networking.dll",
+        "--reference",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/System.Web.dll",
+        "-o",
+        "/Users/robert/Projects/neoclr/target/runtime-async-benchmark-final/completed-100-state-machine.dll",
+        "/Users/robert/Projects/neoclr/target/runtime-async-benchmark-final/completed-100.rvn",
+        "/Users/robert/Projects/neoclr/docs/experiments/runtime-async/RuntimeAsyncBridge.rvn"
+      ],
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": "",
+      "sourceSha256": "f954470c41104ae30f515e29a3015ae7949ff723b4b1eb658a3b837d0ecdd10b"
+    },
+    {
+      "case": "completed-100",
+      "mode": "runtime",
+      "command": [
+        "dotnet",
+        "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+        "neoclr",
+        "--core-reference",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/Core.dll",
+        "--runtime-seed",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/System.runtime.neox",
+        "--bootstrap-intrinsics",
+        "--bootstrap-ownership",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/ownership.json",
+        "--object-library",
+        "System.Runtime",
+        "--async-library",
+        "System.Runtime",
+        "--runtime-async-poc",
+        "RuntimeAwaitProvider.Bridge",
+        "--reference",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/System.Runtime.dll",
+        "--reference",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/System.Data.dll",
+        "--reference",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/System.Networking.dll",
+        "--reference",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/System.Web.dll",
+        "-o",
+        "/Users/robert/Projects/neoclr/target/runtime-async-benchmark-final/completed-100-runtime.dll",
+        "/Users/robert/Projects/neoclr/target/runtime-async-benchmark-final/completed-100.rvn",
+        "/Users/robert/Projects/neoclr/docs/experiments/runtime-async/RuntimeAsyncBridge.rvn"
+      ],
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": "",
+      "sourceSha256": "f954470c41104ae30f515e29a3015ae7949ff723b4b1eb658a3b837d0ecdd10b"
+    },
+    {
+      "case": "pending-10",
+      "mode": "state-machine",
+      "command": [
+        "dotnet",
+        "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+        "neoclr",
+        "--core-reference",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/Core.dll",
+        "--runtime-seed",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/System.runtime.neox",
+        "--bootstrap-intrinsics",
+        "--bootstrap-ownership",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/ownership.json",
+        "--object-library",
+        "System.Runtime",
+        "--async-library",
+        "System.Runtime",
+        "--reference",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/System.Runtime.dll",
+        "--reference",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/System.Data.dll",
+        "--reference",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/System.Networking.dll",
+        "--reference",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/System.Web.dll",
+        "-o",
+        "/Users/robert/Projects/neoclr/target/runtime-async-benchmark-final/pending-10-state-machine.dll",
+        "/Users/robert/Projects/neoclr/target/runtime-async-benchmark-final/pending-10.rvn",
+        "/Users/robert/Projects/neoclr/docs/experiments/runtime-async/RuntimeAsyncBridge.rvn"
+      ],
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": "",
+      "sourceSha256": "7f3a58081b3b1321038f9a555d256f08de0431a78191f9ec359ad83fc92ba3c7"
+    },
+    {
+      "case": "pending-10",
+      "mode": "runtime",
+      "command": [
+        "dotnet",
+        "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+        "neoclr",
+        "--core-reference",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/Core.dll",
+        "--runtime-seed",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/System.runtime.neox",
+        "--bootstrap-intrinsics",
+        "--bootstrap-ownership",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/ownership.json",
+        "--object-library",
+        "System.Runtime",
+        "--async-library",
+        "System.Runtime",
+        "--runtime-async-poc",
+        "RuntimeAwaitProvider.Bridge",
+        "--reference",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/System.Runtime.dll",
+        "--reference",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/System.Data.dll",
+        "--reference",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/System.Networking.dll",
+        "--reference",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/System.Web.dll",
+        "-o",
+        "/Users/robert/Projects/neoclr/target/runtime-async-benchmark-final/pending-10-runtime.dll",
+        "/Users/robert/Projects/neoclr/target/runtime-async-benchmark-final/pending-10.rvn",
+        "/Users/robert/Projects/neoclr/docs/experiments/runtime-async/RuntimeAsyncBridge.rvn"
+      ],
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": "",
+      "sourceSha256": "7f3a58081b3b1321038f9a555d256f08de0431a78191f9ec359ad83fc92ba3c7"
+    },
+    {
+      "case": "pending-100",
+      "mode": "state-machine",
+      "command": [
+        "dotnet",
+        "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+        "neoclr",
+        "--core-reference",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/Core.dll",
+        "--runtime-seed",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/System.runtime.neox",
+        "--bootstrap-intrinsics",
+        "--bootstrap-ownership",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/ownership.json",
+        "--object-library",
+        "System.Runtime",
+        "--async-library",
+        "System.Runtime",
+        "--reference",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/System.Runtime.dll",
+        "--reference",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/System.Data.dll",
+        "--reference",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/System.Networking.dll",
+        "--reference",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/System.Web.dll",
+        "-o",
+        "/Users/robert/Projects/neoclr/target/runtime-async-benchmark-final/pending-100-state-machine.dll",
+        "/Users/robert/Projects/neoclr/target/runtime-async-benchmark-final/pending-100.rvn",
+        "/Users/robert/Projects/neoclr/docs/experiments/runtime-async/RuntimeAsyncBridge.rvn"
+      ],
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": "",
+      "sourceSha256": "41f2d7246b5d5c7c3ff160274442df565cc4dcb5c04415978201f62d8793a5ee"
+    },
+    {
+      "case": "pending-100",
+      "mode": "runtime",
+      "command": [
+        "dotnet",
+        "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+        "neoclr",
+        "--core-reference",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/Core.dll",
+        "--runtime-seed",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/System.runtime.neox",
+        "--bootstrap-intrinsics",
+        "--bootstrap-ownership",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/ownership.json",
+        "--object-library",
+        "System.Runtime",
+        "--async-library",
+        "System.Runtime",
+        "--runtime-async-poc",
+        "RuntimeAwaitProvider.Bridge",
+        "--reference",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/System.Runtime.dll",
+        "--reference",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/System.Data.dll",
+        "--reference",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/System.Networking.dll",
+        "--reference",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/System.Web.dll",
+        "-o",
+        "/Users/robert/Projects/neoclr/target/runtime-async-benchmark-final/pending-100-runtime.dll",
+        "/Users/robert/Projects/neoclr/target/runtime-async-benchmark-final/pending-100.rvn",
+        "/Users/robert/Projects/neoclr/docs/experiments/runtime-async/RuntimeAsyncBridge.rvn"
+      ],
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": "",
+      "sourceSha256": "41f2d7246b5d5c7c3ff160274442df565cc4dcb5c04415978201f62d8793a5ee"
+    }
+  ],
+  "runs": [
+    {
+      "case": "completed-10",
+      "mode": "state-machine",
+      "round": 0,
+      "command": [
+        "/Users/robert/Projects/neoclr/target/scheduler-wait-validation/release/examples/runtime_async_interpreter",
+        "/Users/robert/Projects/neoclr/target/runtime-async-benchmark-final/completed-10-state-machine.dll",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle",
+        "4"
+      ],
+      "assemblySha256": "be05b656973ffd4b1c024405eed822579b44aac48364eee57eba7d76fb10bdbe",
+      "prepareSeconds": 1.841692791,
+      "runs": [
+        {
+          "allocatedObjects": 324,
+          "collections": 9,
+          "liveObjects": 0,
+          "peakObjects": 82,
+          "reclaimedObjects": 324,
+          "seconds": 0.115030958,
+          "stdout": ""
+        },
+        {
+          "allocatedObjects": 324,
+          "collections": 9,
+          "liveObjects": 0,
+          "peakObjects": 82,
+          "reclaimedObjects": 324,
+          "seconds": 0.114077917,
+          "stdout": ""
+        },
+        {
+          "allocatedObjects": 324,
+          "collections": 9,
+          "liveObjects": 0,
+          "peakObjects": 82,
+          "reclaimedObjects": 324,
+          "seconds": 0.114300666,
+          "stdout": ""
+        },
+        {
+          "allocatedObjects": 324,
+          "collections": 9,
+          "liveObjects": 0,
+          "peakObjects": 82,
+          "reclaimedObjects": 324,
+          "seconds": 0.112827,
+          "stdout": ""
+        }
+      ]
+    },
+    {
+      "case": "completed-10",
+      "mode": "runtime",
+      "round": 0,
+      "command": [
+        "/Users/robert/Projects/neoclr/target/scheduler-wait-validation/release/examples/runtime_async_interpreter",
+        "/Users/robert/Projects/neoclr/target/runtime-async-benchmark-final/completed-10-runtime.dll",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle",
+        "4"
+      ],
+      "assemblySha256": "0f2dfb8f3f46e9fb54fb21d4b7a2c489c83a55de5e7fb54582a71f3e45f6aa44",
+      "prepareSeconds": 1.935748042,
+      "runs": [
+        {
+          "allocatedObjects": 365,
+          "collections": 10,
+          "liveObjects": 0,
+          "peakObjects": 64,
+          "reclaimedObjects": 365,
+          "seconds": 0.097607541,
+          "stdout": ""
+        },
+        {
+          "allocatedObjects": 365,
+          "collections": 10,
+          "liveObjects": 0,
+          "peakObjects": 64,
+          "reclaimedObjects": 365,
+          "seconds": 0.094234416,
+          "stdout": ""
+        },
+        {
+          "allocatedObjects": 365,
+          "collections": 10,
+          "liveObjects": 0,
+          "peakObjects": 64,
+          "reclaimedObjects": 365,
+          "seconds": 0.096282542,
+          "stdout": ""
+        },
+        {
+          "allocatedObjects": 365,
+          "collections": 10,
+          "liveObjects": 0,
+          "peakObjects": 64,
+          "reclaimedObjects": 365,
+          "seconds": 0.096201958,
+          "stdout": ""
+        }
+      ]
+    },
+    {
+      "case": "completed-10",
+      "mode": "runtime",
+      "round": 1,
+      "command": [
+        "/Users/robert/Projects/neoclr/target/scheduler-wait-validation/release/examples/runtime_async_interpreter",
+        "/Users/robert/Projects/neoclr/target/runtime-async-benchmark-final/completed-10-runtime.dll",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle",
+        "4"
+      ],
+      "assemblySha256": "0f2dfb8f3f46e9fb54fb21d4b7a2c489c83a55de5e7fb54582a71f3e45f6aa44",
+      "prepareSeconds": 1.835134541,
+      "runs": [
+        {
+          "allocatedObjects": 365,
+          "collections": 10,
+          "liveObjects": 0,
+          "peakObjects": 64,
+          "reclaimedObjects": 365,
+          "seconds": 0.097631375,
+          "stdout": ""
+        },
+        {
+          "allocatedObjects": 365,
+          "collections": 10,
+          "liveObjects": 0,
+          "peakObjects": 64,
+          "reclaimedObjects": 365,
+          "seconds": 0.09565525,
+          "stdout": ""
+        },
+        {
+          "allocatedObjects": 365,
+          "collections": 10,
+          "liveObjects": 0,
+          "peakObjects": 64,
+          "reclaimedObjects": 365,
+          "seconds": 0.095736208,
+          "stdout": ""
+        },
+        {
+          "allocatedObjects": 365,
+          "collections": 10,
+          "liveObjects": 0,
+          "peakObjects": 64,
+          "reclaimedObjects": 365,
+          "seconds": 0.095598583,
+          "stdout": ""
+        }
+      ]
+    },
+    {
+      "case": "completed-10",
+      "mode": "state-machine",
+      "round": 1,
+      "command": [
+        "/Users/robert/Projects/neoclr/target/scheduler-wait-validation/release/examples/runtime_async_interpreter",
+        "/Users/robert/Projects/neoclr/target/runtime-async-benchmark-final/completed-10-state-machine.dll",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle",
+        "4"
+      ],
+      "assemblySha256": "be05b656973ffd4b1c024405eed822579b44aac48364eee57eba7d76fb10bdbe",
+      "prepareSeconds": 1.856853875,
+      "runs": [
+        {
+          "allocatedObjects": 324,
+          "collections": 9,
+          "liveObjects": 0,
+          "peakObjects": 82,
+          "reclaimedObjects": 324,
+          "seconds": 0.119418833,
+          "stdout": ""
+        },
+        {
+          "allocatedObjects": 324,
+          "collections": 9,
+          "liveObjects": 0,
+          "peakObjects": 82,
+          "reclaimedObjects": 324,
+          "seconds": 0.114381208,
+          "stdout": ""
+        },
+        {
+          "allocatedObjects": 324,
+          "collections": 9,
+          "liveObjects": 0,
+          "peakObjects": 82,
+          "reclaimedObjects": 324,
+          "seconds": 0.114320625,
+          "stdout": ""
+        },
+        {
+          "allocatedObjects": 324,
+          "collections": 9,
+          "liveObjects": 0,
+          "peakObjects": 82,
+          "reclaimedObjects": 324,
+          "seconds": 0.113264792,
+          "stdout": ""
+        }
+      ]
+    },
+    {
+      "case": "completed-100",
+      "mode": "state-machine",
+      "round": 0,
+      "command": [
+        "/Users/robert/Projects/neoclr/target/scheduler-wait-validation/release/examples/runtime_async_interpreter",
+        "/Users/robert/Projects/neoclr/target/runtime-async-benchmark-final/completed-100-state-machine.dll",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle",
+        "4"
+      ],
+      "assemblySha256": "c743d7ffbba91f75de9f66d0ca48e15fa0f0588e3d3f13626b40d135f29aabfa",
+      "prepareSeconds": 1.886892375,
+      "runs": [
+        {
+          "allocatedObjects": 3114,
+          "collections": 84,
+          "liveObjects": 0,
+          "peakObjects": 82,
+          "reclaimedObjects": 3114,
+          "seconds": 1.10869225,
+          "stdout": ""
+        },
+        {
+          "allocatedObjects": 3114,
+          "collections": 84,
+          "liveObjects": 0,
+          "peakObjects": 82,
+          "reclaimedObjects": 3114,
+          "seconds": 1.088724875,
+          "stdout": ""
+        },
+        {
+          "allocatedObjects": 3114,
+          "collections": 84,
+          "liveObjects": 0,
+          "peakObjects": 82,
+          "reclaimedObjects": 3114,
+          "seconds": 1.09082275,
+          "stdout": ""
+        },
+        {
+          "allocatedObjects": 3114,
+          "collections": 84,
+          "liveObjects": 0,
+          "peakObjects": 82,
+          "reclaimedObjects": 3114,
+          "seconds": 1.083841042,
+          "stdout": ""
+        }
+      ]
+    },
+    {
+      "case": "completed-100",
+      "mode": "runtime",
+      "round": 0,
+      "command": [
+        "/Users/robert/Projects/neoclr/target/scheduler-wait-validation/release/examples/runtime_async_interpreter",
+        "/Users/robert/Projects/neoclr/target/runtime-async-benchmark-final/completed-100-runtime.dll",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle",
+        "4"
+      ],
+      "assemblySha256": "9ef2026030ac5cfe1b26b7d4768b816fd2c5b163befe99a962fe12053974e586",
+      "prepareSeconds": 1.821524417,
+      "runs": [
+        {
+          "allocatedObjects": 3515,
+          "collections": 100,
+          "liveObjects": 0,
+          "peakObjects": 64,
+          "reclaimedObjects": 3515,
+          "seconds": 0.915816125,
+          "stdout": ""
+        },
+        {
+          "allocatedObjects": 3515,
+          "collections": 100,
+          "liveObjects": 0,
+          "peakObjects": 64,
+          "reclaimedObjects": 3515,
+          "seconds": 0.913766708,
+          "stdout": ""
+        },
+        {
+          "allocatedObjects": 3515,
+          "collections": 100,
+          "liveObjects": 0,
+          "peakObjects": 64,
+          "reclaimedObjects": 3515,
+          "seconds": 0.912774042,
+          "stdout": ""
+        },
+        {
+          "allocatedObjects": 3515,
+          "collections": 100,
+          "liveObjects": 0,
+          "peakObjects": 64,
+          "reclaimedObjects": 3515,
+          "seconds": 0.913895708,
+          "stdout": ""
+        }
+      ]
+    },
+    {
+      "case": "completed-100",
+      "mode": "runtime",
+      "round": 1,
+      "command": [
+        "/Users/robert/Projects/neoclr/target/scheduler-wait-validation/release/examples/runtime_async_interpreter",
+        "/Users/robert/Projects/neoclr/target/runtime-async-benchmark-final/completed-100-runtime.dll",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle",
+        "4"
+      ],
+      "assemblySha256": "9ef2026030ac5cfe1b26b7d4768b816fd2c5b163befe99a962fe12053974e586",
+      "prepareSeconds": 1.8189135840000001,
+      "runs": [
+        {
+          "allocatedObjects": 3515,
+          "collections": 100,
+          "liveObjects": 0,
+          "peakObjects": 64,
+          "reclaimedObjects": 3515,
+          "seconds": 0.918122583,
+          "stdout": ""
+        },
+        {
+          "allocatedObjects": 3515,
+          "collections": 100,
+          "liveObjects": 0,
+          "peakObjects": 64,
+          "reclaimedObjects": 3515,
+          "seconds": 0.916749125,
+          "stdout": ""
+        },
+        {
+          "allocatedObjects": 3515,
+          "collections": 100,
+          "liveObjects": 0,
+          "peakObjects": 64,
+          "reclaimedObjects": 3515,
+          "seconds": 0.91224475,
+          "stdout": ""
+        },
+        {
+          "allocatedObjects": 3515,
+          "collections": 100,
+          "liveObjects": 0,
+          "peakObjects": 64,
+          "reclaimedObjects": 3515,
+          "seconds": 0.910272166,
+          "stdout": ""
+        }
+      ]
+    },
+    {
+      "case": "completed-100",
+      "mode": "state-machine",
+      "round": 1,
+      "command": [
+        "/Users/robert/Projects/neoclr/target/scheduler-wait-validation/release/examples/runtime_async_interpreter",
+        "/Users/robert/Projects/neoclr/target/runtime-async-benchmark-final/completed-100-state-machine.dll",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle",
+        "4"
+      ],
+      "assemblySha256": "c743d7ffbba91f75de9f66d0ca48e15fa0f0588e3d3f13626b40d135f29aabfa",
+      "prepareSeconds": 1.8333516250000002,
+      "runs": [
+        {
+          "allocatedObjects": 3114,
+          "collections": 84,
+          "liveObjects": 0,
+          "peakObjects": 82,
+          "reclaimedObjects": 3114,
+          "seconds": 1.099576083,
+          "stdout": ""
+        },
+        {
+          "allocatedObjects": 3114,
+          "collections": 84,
+          "liveObjects": 0,
+          "peakObjects": 82,
+          "reclaimedObjects": 3114,
+          "seconds": 1.091987417,
+          "stdout": ""
+        },
+        {
+          "allocatedObjects": 3114,
+          "collections": 84,
+          "liveObjects": 0,
+          "peakObjects": 82,
+          "reclaimedObjects": 3114,
+          "seconds": 1.08901275,
+          "stdout": ""
+        },
+        {
+          "allocatedObjects": 3114,
+          "collections": 84,
+          "liveObjects": 0,
+          "peakObjects": 82,
+          "reclaimedObjects": 3114,
+          "seconds": 1.092861917,
+          "stdout": ""
+        }
+      ]
+    },
+    {
+      "case": "pending-10",
+      "mode": "state-machine",
+      "round": 0,
+      "command": [
+        "/Users/robert/Projects/neoclr/target/scheduler-wait-validation/release/examples/runtime_async_interpreter",
+        "/Users/robert/Projects/neoclr/target/runtime-async-benchmark-final/pending-10-state-machine.dll",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle",
+        "4"
+      ],
+      "assemblySha256": "1b7ca11470ac8cc0a8982e5cc1ebd72eff60e89ba155f2721f3c810a3a0e8b9d",
+      "prepareSeconds": 1.851072458,
+      "runs": [
+        {
+          "allocatedObjects": 504,
+          "collections": 12,
+          "liveObjects": 0,
+          "peakObjects": 96,
+          "reclaimedObjects": 504,
+          "seconds": 0.234178375,
+          "stdout": ""
+        },
+        {
+          "allocatedObjects": 504,
+          "collections": 12,
+          "liveObjects": 0,
+          "peakObjects": 96,
+          "reclaimedObjects": 504,
+          "seconds": 0.23199275,
+          "stdout": ""
+        },
+        {
+          "allocatedObjects": 504,
+          "collections": 12,
+          "liveObjects": 0,
+          "peakObjects": 96,
+          "reclaimedObjects": 504,
+          "seconds": 0.2310595,
+          "stdout": ""
+        },
+        {
+          "allocatedObjects": 504,
+          "collections": 12,
+          "liveObjects": 0,
+          "peakObjects": 96,
+          "reclaimedObjects": 504,
+          "seconds": 0.233658959,
+          "stdout": ""
+        }
+      ]
+    },
+    {
+      "case": "pending-10",
+      "mode": "runtime",
+      "round": 0,
+      "command": [
+        "/Users/robert/Projects/neoclr/target/scheduler-wait-validation/release/examples/runtime_async_interpreter",
+        "/Users/robert/Projects/neoclr/target/runtime-async-benchmark-final/pending-10-runtime.dll",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle",
+        "4"
+      ],
+      "assemblySha256": "93e190d2c32277cb19a0c7b2c62e74ce5a9c5bbed2dbc1205c5e578ec892712d",
+      "prepareSeconds": 1.8346681249999999,
+      "runs": [
+        {
+          "allocatedObjects": 596,
+          "collections": 14,
+          "liveObjects": 0,
+          "peakObjects": 100,
+          "reclaimedObjects": 596,
+          "seconds": 0.186396667,
+          "stdout": ""
+        },
+        {
+          "allocatedObjects": 596,
+          "collections": 14,
+          "liveObjects": 0,
+          "peakObjects": 100,
+          "reclaimedObjects": 596,
+          "seconds": 0.185570333,
+          "stdout": ""
+        },
+        {
+          "allocatedObjects": 596,
+          "collections": 14,
+          "liveObjects": 0,
+          "peakObjects": 100,
+          "reclaimedObjects": 596,
+          "seconds": 0.186887708,
+          "stdout": ""
+        },
+        {
+          "allocatedObjects": 596,
+          "collections": 14,
+          "liveObjects": 0,
+          "peakObjects": 100,
+          "reclaimedObjects": 596,
+          "seconds": 0.185432041,
+          "stdout": ""
+        }
+      ]
+    },
+    {
+      "case": "pending-10",
+      "mode": "runtime",
+      "round": 1,
+      "command": [
+        "/Users/robert/Projects/neoclr/target/scheduler-wait-validation/release/examples/runtime_async_interpreter",
+        "/Users/robert/Projects/neoclr/target/runtime-async-benchmark-final/pending-10-runtime.dll",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle",
+        "4"
+      ],
+      "assemblySha256": "93e190d2c32277cb19a0c7b2c62e74ce5a9c5bbed2dbc1205c5e578ec892712d",
+      "prepareSeconds": 1.8310391670000001,
+      "runs": [
+        {
+          "allocatedObjects": 596,
+          "collections": 14,
+          "liveObjects": 0,
+          "peakObjects": 100,
+          "reclaimedObjects": 596,
+          "seconds": 0.186230625,
+          "stdout": ""
+        },
+        {
+          "allocatedObjects": 596,
+          "collections": 14,
+          "liveObjects": 0,
+          "peakObjects": 100,
+          "reclaimedObjects": 596,
+          "seconds": 0.187842833,
+          "stdout": ""
+        },
+        {
+          "allocatedObjects": 596,
+          "collections": 14,
+          "liveObjects": 0,
+          "peakObjects": 100,
+          "reclaimedObjects": 596,
+          "seconds": 0.187330833,
+          "stdout": ""
+        },
+        {
+          "allocatedObjects": 596,
+          "collections": 14,
+          "liveObjects": 0,
+          "peakObjects": 100,
+          "reclaimedObjects": 596,
+          "seconds": 0.185191042,
+          "stdout": ""
+        }
+      ]
+    },
+    {
+      "case": "pending-10",
+      "mode": "state-machine",
+      "round": 1,
+      "command": [
+        "/Users/robert/Projects/neoclr/target/scheduler-wait-validation/release/examples/runtime_async_interpreter",
+        "/Users/robert/Projects/neoclr/target/runtime-async-benchmark-final/pending-10-state-machine.dll",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle",
+        "4"
+      ],
+      "assemblySha256": "1b7ca11470ac8cc0a8982e5cc1ebd72eff60e89ba155f2721f3c810a3a0e8b9d",
+      "prepareSeconds": 1.845617791,
+      "runs": [
+        {
+          "allocatedObjects": 504,
+          "collections": 12,
+          "liveObjects": 0,
+          "peakObjects": 96,
+          "reclaimedObjects": 504,
+          "seconds": 0.230184959,
+          "stdout": ""
+        },
+        {
+          "allocatedObjects": 504,
+          "collections": 12,
+          "liveObjects": 0,
+          "peakObjects": 96,
+          "reclaimedObjects": 504,
+          "seconds": 0.230643333,
+          "stdout": ""
+        },
+        {
+          "allocatedObjects": 504,
+          "collections": 12,
+          "liveObjects": 0,
+          "peakObjects": 96,
+          "reclaimedObjects": 504,
+          "seconds": 0.232940458,
+          "stdout": ""
+        },
+        {
+          "allocatedObjects": 504,
+          "collections": 12,
+          "liveObjects": 0,
+          "peakObjects": 96,
+          "reclaimedObjects": 504,
+          "seconds": 0.233156625,
+          "stdout": ""
+        }
+      ]
+    },
+    {
+      "case": "pending-100",
+      "mode": "state-machine",
+      "round": 0,
+      "command": [
+        "/Users/robert/Projects/neoclr/target/scheduler-wait-validation/release/examples/runtime_async_interpreter",
+        "/Users/robert/Projects/neoclr/target/runtime-async-benchmark-final/pending-100-state-machine.dll",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle",
+        "4"
+      ],
+      "assemblySha256": "9c95759728e0a945c52bb2941b3aa2f61d23428ebaef13c3afd880bf8feae616",
+      "prepareSeconds": 1.853260125,
+      "runs": [
+        {
+          "allocatedObjects": 4914,
+          "collections": 117,
+          "liveObjects": 0,
+          "peakObjects": 96,
+          "reclaimedObjects": 4914,
+          "seconds": 2.328860125,
+          "stdout": ""
+        },
+        {
+          "allocatedObjects": 4914,
+          "collections": 117,
+          "liveObjects": 0,
+          "peakObjects": 96,
+          "reclaimedObjects": 4914,
+          "seconds": 2.291002708,
+          "stdout": ""
+        },
+        {
+          "allocatedObjects": 4914,
+          "collections": 117,
+          "liveObjects": 0,
+          "peakObjects": 96,
+          "reclaimedObjects": 4914,
+          "seconds": 2.294123792,
+          "stdout": ""
+        },
+        {
+          "allocatedObjects": 4914,
+          "collections": 117,
+          "liveObjects": 0,
+          "peakObjects": 96,
+          "reclaimedObjects": 4914,
+          "seconds": 2.2931930830000002,
+          "stdout": ""
+        }
+      ]
+    },
+    {
+      "case": "pending-100",
+      "mode": "runtime",
+      "round": 0,
+      "command": [
+        "/Users/robert/Projects/neoclr/target/scheduler-wait-validation/release/examples/runtime_async_interpreter",
+        "/Users/robert/Projects/neoclr/target/runtime-async-benchmark-final/pending-100-runtime.dll",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle",
+        "4"
+      ],
+      "assemblySha256": "9f1ebed299a39f673e32ba79fd2e78ba727cf15805ef80bc0b574ed3d0ce205c",
+      "prepareSeconds": 1.8324845829999998,
+      "runs": [
+        {
+          "allocatedObjects": 5816,
+          "collections": 134,
+          "liveObjects": 0,
+          "peakObjects": 100,
+          "reclaimedObjects": 5816,
+          "seconds": 1.821433375,
+          "stdout": ""
+        },
+        {
+          "allocatedObjects": 5816,
+          "collections": 134,
+          "liveObjects": 0,
+          "peakObjects": 100,
+          "reclaimedObjects": 5816,
+          "seconds": 1.9843353339999998,
+          "stdout": ""
+        },
+        {
+          "allocatedObjects": 5816,
+          "collections": 134,
+          "liveObjects": 0,
+          "peakObjects": 100,
+          "reclaimedObjects": 5816,
+          "seconds": 1.822944084,
+          "stdout": ""
+        },
+        {
+          "allocatedObjects": 5816,
+          "collections": 134,
+          "liveObjects": 0,
+          "peakObjects": 100,
+          "reclaimedObjects": 5816,
+          "seconds": 1.820445292,
+          "stdout": ""
+        }
+      ]
+    },
+    {
+      "case": "pending-100",
+      "mode": "runtime",
+      "round": 1,
+      "command": [
+        "/Users/robert/Projects/neoclr/target/scheduler-wait-validation/release/examples/runtime_async_interpreter",
+        "/Users/robert/Projects/neoclr/target/runtime-async-benchmark-final/pending-100-runtime.dll",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle",
+        "4"
+      ],
+      "assemblySha256": "9f1ebed299a39f673e32ba79fd2e78ba727cf15805ef80bc0b574ed3d0ce205c",
+      "prepareSeconds": 1.852149083,
+      "runs": [
+        {
+          "allocatedObjects": 5816,
+          "collections": 134,
+          "liveObjects": 0,
+          "peakObjects": 100,
+          "reclaimedObjects": 5816,
+          "seconds": 1.830198708,
+          "stdout": ""
+        },
+        {
+          "allocatedObjects": 5816,
+          "collections": 134,
+          "liveObjects": 0,
+          "peakObjects": 100,
+          "reclaimedObjects": 5816,
+          "seconds": 1.8326186249999998,
+          "stdout": ""
+        },
+        {
+          "allocatedObjects": 5816,
+          "collections": 134,
+          "liveObjects": 0,
+          "peakObjects": 100,
+          "reclaimedObjects": 5816,
+          "seconds": 1.8212972920000001,
+          "stdout": ""
+        },
+        {
+          "allocatedObjects": 5816,
+          "collections": 134,
+          "liveObjects": 0,
+          "peakObjects": 100,
+          "reclaimedObjects": 5816,
+          "seconds": 1.819808208,
+          "stdout": ""
+        }
+      ]
+    },
+    {
+      "case": "pending-100",
+      "mode": "state-machine",
+      "round": 1,
+      "command": [
+        "/Users/robert/Projects/neoclr/target/scheduler-wait-validation/release/examples/runtime_async_interpreter",
+        "/Users/robert/Projects/neoclr/target/runtime-async-benchmark-final/pending-100-state-machine.dll",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle",
+        "4"
+      ],
+      "assemblySha256": "9c95759728e0a945c52bb2941b3aa2f61d23428ebaef13c3afd880bf8feae616",
+      "prepareSeconds": 1.84381325,
+      "runs": [
+        {
+          "allocatedObjects": 4914,
+          "collections": 117,
+          "liveObjects": 0,
+          "peakObjects": 96,
+          "reclaimedObjects": 4914,
+          "seconds": 2.348349,
+          "stdout": ""
+        },
+        {
+          "allocatedObjects": 4914,
+          "collections": 117,
+          "liveObjects": 0,
+          "peakObjects": 96,
+          "reclaimedObjects": 4914,
+          "seconds": 2.294149458,
+          "stdout": ""
+        },
+        {
+          "allocatedObjects": 4914,
+          "collections": 117,
+          "liveObjects": 0,
+          "peakObjects": 96,
+          "reclaimedObjects": 4914,
+          "seconds": 2.304068292,
+          "stdout": ""
+        },
+        {
+          "allocatedObjects": 4914,
+          "collections": 117,
+          "liveObjects": 0,
+          "peakObjects": 96,
+          "reclaimedObjects": 4914,
+          "seconds": 2.308999333,
+          "stdout": ""
+        }
+      ]
+    }
+  ],
+  "summaries": [
+    {
+      "case": "completed-10",
+      "operations": 10,
+      "state-machine": {
+        "seconds": 0.1141892915,
+        "allocatedObjects": 324.0,
+        "peakObjects": 82.0,
+        "reclaimedObjects": 324.0,
+        "liveObjects": 0.0
+      },
+      "runtime": {
+        "seconds": 0.09569572900000001,
+        "allocatedObjects": 365.0,
+        "peakObjects": 64.0,
+        "reclaimedObjects": 365.0,
+        "liveObjects": 0.0
+      },
+      "runtimeOverStateMachine": 0.838044686528246
+    },
+    {
+      "case": "completed-100",
+      "operations": 100,
+      "state-machine": {
+        "seconds": 1.0899177500000001,
+        "allocatedObjects": 3114.0,
+        "peakObjects": 82.0,
+        "reclaimedObjects": 3114.0,
+        "liveObjects": 0.0
+      },
+      "runtime": {
+        "seconds": 0.913270375,
+        "allocatedObjects": 3515.0,
+        "peakObjects": 64.0,
+        "reclaimedObjects": 3515.0,
+        "liveObjects": 0.0
+      },
+      "runtimeOverStateMachine": 0.8379259581743667
+    },
+    {
+      "case": "pending-10",
+      "operations": 10,
+      "state-machine": {
+        "seconds": 0.232466604,
+        "allocatedObjects": 504.0,
+        "peakObjects": 96.0,
+        "reclaimedObjects": 504.0,
+        "liveObjects": 0.0
+      },
+      "runtime": {
+        "seconds": 0.1862290205,
+        "allocatedObjects": 596.0,
+        "peakObjects": 100.0,
+        "reclaimedObjects": 596.0,
+        "liveObjects": 0.0
+      },
+      "runtimeOverStateMachine": 0.8011001033937761
+    },
+    {
+      "case": "pending-100",
+      "operations": 100,
+      "state-machine": {
+        "seconds": 2.294136625,
+        "allocatedObjects": 4914.0,
+        "peakObjects": 96.0,
+        "reclaimedObjects": 4914.0,
+        "liveObjects": 0.0
+      },
+      "runtime": {
+        "seconds": 1.822120688,
+        "allocatedObjects": 5816.0,
+        "peakObjects": 100.0,
+        "reclaimedObjects": 5816.0,
+        "liveObjects": 0.0
+      },
+      "runtimeOverStateMachine": 0.7942511654030195
+    }
+  ]
+}

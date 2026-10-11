@@ -8,6 +8,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-11
 
+- Record matched interpreter benchmarks for Raven state-machine and runtime-async
+  lowering, with external rounds, warmup separation, checksums and heap accounting.
+  Runtime async reduces time in these workloads but increases allocations; retain
+  opt-in status and target provider lifetime/notification costs next.
+
 - Qualify Raven's explicit native runtime-async language POC: ordinary async methods
   and Main produce managed Tasks using retained runtime bodies, without generated
   state machines. Add executable nested/reference/receiver/unit/cancellation/fault

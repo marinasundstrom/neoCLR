@@ -531,3 +531,39 @@ signals, callbacks, completion unions and lifetime objects add allocation overhe
 The direct benefits to qualify are simpler generated execution state and lower
 execution cost; neither general throughput nor allocation superiority is assumed.
 Further benchmark evidence should guide replacing that scaffolding before defaults.
+
+
+## Matched language benchmark — 2026-10-11
+
+[Raw results](runtime-await-benchmark.json) compare the same
+[ordinary async source](RuntimeAwaitBenchmark.rvn), compiler and interpreter host,
+changing only generated-state-machine versus runtime-async lowering. Compiler native
+revision: `e96e9b53b`; runtime qualification: `dcfdef4a`. Exact artifact hashes,
+commands, platform and individual observations are in the report.
+
+| Workload | State-machine median | Runtime-async median | Allocations, state-machine / runtime |
+| --- | ---: | ---: | ---: |
+| 10 completed nested awaits | 114.19 ms | 95.70 ms | 324 / 365 |
+| 100 completed nested awaits | 1,089.92 ms | 913.27 ms | 3,114 / 3,515 |
+| 10 pending nested awaits | 232.47 ms | 186.23 ms | 504 / 596 |
+| 100 pending nested awaits | 2,294.14 ms | 1,822.12 ms | 4,914 / 5,816 |
+
+At 100 operations, runtime async takes about 16% less time for completed awaits and
+21% less for pending awaits, while allocating about 13% and 18% more objects.
+All measured invocations reclaim every allocated object and finish with zero live
+objects. Peak live counts are 82 / 64 for completed and 96 / 100 for pending workloads.
+The source provider improves these interpreter timings but does not improve allocation
+counts. Notification, signal and lifetime scaffolding need optimization before defaults.
+
+Method: two external process rounds with mode order reversed in the second round;
+four fresh invocations per process, discarding the first as warmup, leaving six timed
+observations per case/mode. Metadata loading and verification are measured separately
+and excluded; invocation startup, GC and checksum validation are included. Counts of
+10 and 100 expose workload scaling. This is a single-host exploratory experiment,
+without confidence intervals, HTTP qualification, or JIT/AOT/.NET comparisons. It
+measures object counts, not allocated bytes or peak process memory.
+
+Reproduce with `benchmark.py --recipe <runtime-await validation.json> --host
+<release runtime_async_interpreter> --output <fresh-directory>`. The recipe supplies
+the exact compiler and bundle selection. The benchmark validates checksums and final
+heap state; it is private measurement tooling, not a public framework addition.

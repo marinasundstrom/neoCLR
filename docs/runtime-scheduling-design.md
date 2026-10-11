@@ -1553,5 +1553,6 @@ survival and reclamation without emitted state machines. Re-parking must request
 managed notification drain; a suspended legacy queue remains serial, and its actual
 Drain completion clears that request. This preserves the runtime/managed layering
 without promoting the temporary provider or queue integration to public contracts.
-Comparative timing/allocation results are the next readiness evidence, not a reason
-to infer JIT/AOT support or switch defaults prematurely.
+[Matched timing/allocation evidence](experiments/runtime-async/README.md#matched-language-benchmark--2026-10-11)
+shows lower interpreter time but increased allocation counts. Improve provider costs;
+these results do not establish JIT/AOT support or justify switching defaults.

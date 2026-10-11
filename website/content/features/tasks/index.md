@@ -275,10 +275,12 @@ for the supported compiler integration.
 
 [Development measurement](https://github.com/marinasundstrom/neoCLR/blob/main/benchmarks/scheduler/README.md) now includes completed and pending sequential-await workloads
 for the current state-machine path in interpreter, JIT and AOT. Startup and external
-batch timings are separate; runtime-suspension comparisons and allocation/retained-memory
-measurements remain future work. A matched pending-await comparison also measures
+batch timings are separate. An opt-in Raven runtime-async interpreter comparison now
+measures lower execution time but more allocated objects in bounded nested-await
+workloads ([results and limitations](https://github.com/marinasundstrom/neoCLR/blob/main/docs/experiments/runtime-async/README.md#matched-language-benchmark--2026-10-11));
+JIT/AOT suspension and retained-byte measurements remain open. A matched pending-await comparison also measures
 direct versus captured invocation registrations. These exploratory runs do not
-establish a performance improvement.
+establish a general performance improvement.
 
 <a id="feedback"></a>
 

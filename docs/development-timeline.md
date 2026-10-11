@@ -15047,3 +15047,14 @@ or runtime-await default switch was performed.
   show 4,736 objects allocated/reclaimed per execution, zero final live objects and
   a peak of 63. [Evidence and limitations](experiments/runtime-async/README.md#raven-runtime-async-language-poc-2026-10-11).
   This is opt-in interpreter support, not the final provider ABI or a default switch.
+
+
+### Runtime-await benchmark outcome — 2026-10-11
+
+- **Author request:** benchmark runtime async after ordinary Raven language support.
+- **Performed:** matched source compiled with both lowering modes, two alternating
+  external rounds, six measured invocations per case/mode after warmup.
+- **Outcome:** at 100 operations runtime async uses about 16–21% less interpreter
+  time, with 13–18% more allocations. All invocations finish with zero live objects.
+  [Method, raw observations and limits](experiments/runtime-async/README.md#matched-language-benchmark--2026-10-11).
+  Provider allocation costs and broader qualification remain open; no default switch.

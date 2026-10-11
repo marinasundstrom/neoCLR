@@ -46,9 +46,10 @@ Raven now has an explicit native runtime-async language POC: ordinary async meth
 and Main lower to retained bodies without generated state machines. The
 [language, fault and GC samples](experiments/runtime-async/README.md#raven-runtime-async-language-poc-2026-10-11)
 pass, including zero final live objects and bounded heap use across repeated nested
-suspension. The provider remains source-local and interpreter-only. Compare equivalent
-state-machine/runtime-async workloads next, then use that evidence to improve
-notification/lifetime costs and broaden qualification before switching defaults.
+suspension. The provider remains source-local and interpreter-only.
+[Matched interpreter benchmarks](experiments/runtime-async/README.md#matched-language-benchmark--2026-10-11)
+now show about 16–21% less time at 100 operations, with 13–18% more allocations.
+Improve notification/lifetime costs and broaden qualification before switching defaults.
 Native stack representation, preemption and
 multi-core scheduling remain open. Task/Promise keep operation/producer roles.
 

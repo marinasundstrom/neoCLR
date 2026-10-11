@@ -1,0 +1,40 @@
+module RuntimeAwaitBenchmark {
+    import System.*
+    import System.Tasks.*
+
+    async func Read(input: Task<int>) -> Task<int> {
+        let value = await input
+        return value + 1
+    }
+
+    async func Nested(input: Task<int>) -> Task<int> {
+        return await Read(input)
+    }
+
+    async func Main() -> Task<int> {
+        let pending = true
+        let operations = 100
+        var index = 0
+        var sum = 0
+        while index < operations {
+            if pending {
+                let source = Promise<int>()
+                let task = Nested(source.Task)
+                if task.IsCompleted {
+                    System.Fail("Pending benchmark did not suspend")
+                }
+                _ = source.Complete(41)
+                let value = await task
+                sum = sum + value
+            } else {
+                let value = await Nested(Task.FromResult(41))
+                sum = sum + value
+            }
+            index = index + 1
+        }
+        if sum != operations * 42 {
+            System.Fail("Benchmark checksum mismatch")
+        }
+        return 0
+    }
+}
