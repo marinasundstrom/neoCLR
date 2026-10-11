@@ -142,9 +142,9 @@ def main():
             report['cases'].append(dict(name=name, sourceSha256=sha(source), assemblySha256=sha(assembly), objectSha256=sha(obj), executableSha256=sha(exe), outcomes=outcomes))
             print('PASS '+name+' in interpreter/AOT/JIT', flush=True)
         report['rejectedBindings'] = []
-        for flag in ['--bind-socket-listener']:
+        for flag in ['--native-host-bootstrap']:
             result = run([*jit_command, flag])
-            if result.returncode != 1 or result.stdout or 'JIT_RESULT ' in result.stderr or 'console/task compilation' not in result.stderr:
+            if result.returncode != 1 or result.stdout or 'JIT_RESULT ' in result.stderr or 'without bootstrap bindings' not in result.stderr:
                 raise RuntimeError('Unsupported binding was not rejected: '+flag)
             report['rejectedBindings'].append(flag)
         report['passed'] = True

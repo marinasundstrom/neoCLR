@@ -19,5 +19,5 @@ The latter retains 20 passing framework tests and identical AOT object bytes.
 Reproduce with `docs/experiments/jit-async/verify.py --timers`, using the bundle,
 console-qualification and fresh output arguments documented in the
 [async probe](../jit-async/README.md). `--case timer-fault` selects the strengthened
-fault guard alone. Socket completion and HTTP integration are next; execution defaults
-remain unchanged. No website build or API snapshot change is required for private hosting.
+fault guard alone. The subsequent [HTTP qualification](../jit-http/README.md) now
+covers socket completions and client/server integration; execution defaults remain unchanged. No website build or API snapshot change is required for private hosting.

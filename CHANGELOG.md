@@ -14,7 +14,13 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   awaits, cancellation, pending tasks and callback faults against interpreter/AOT behavior.
   Add entry-boundary timer polling with rooted callback delivery and cancellation on
   teardown. Existing timer behavior and abandoned-timer fault cleanup pass in all three
-  modes. Socket completion sources, Windows JIT and production integration remain open.
+  modes. Admit socket bindings through the same invocation-owned poller: fresh HTTP
+  client/server assemblies pass DNS/connect, accept/read/write, fragmented requests,
+  malformed headers, handler errors and timeout/disposal checks in interpreter/AOT/JIT.
+  Qualify JIT handler-fault socket cleanup before code release. Windows JIT and
+  production integration remain open; no HTTP throughput claim is made. Record a
+  later equivalent HTTP client/server benchmark against .NET, Go and JavaScript across
+  each runtime’s supported execution modes.
 
 - Add bounded repeated invocation to the private scalar JIT probe, retaining one compiled
   code image through successful or faulting synchronous calls. Add a checksum-validated
@@ -32,8 +38,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   status. Extend this with a synchronous managed probe using existing GC/stack/fault
   helpers: the real 20-test Index/Range assembly now runs with filtering and fault parity.
   Bind required helpers before invocation and use long-range ARM64 JIT calls while
-  preserving AOT object output. Queued async entries are qualified in the follow-up above;
-  timer/HTTP completion and Windows JIT remain unsupported.
+  preserving AOT object output. Queued async entries and timer/HTTP completion are
+  qualified in the follow-up above; Windows JIT remains unsupported.
   Extend scalar parity checks to JIT and correct stale shift/negation rejection and
   selection-limit expectations. Add a reproducible three-mode test-run benchmark.
   Record eventual JIT defaults, preferred AOT deployment and full interpreter support;

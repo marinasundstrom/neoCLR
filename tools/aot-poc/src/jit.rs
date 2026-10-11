@@ -100,10 +100,9 @@ pub(super) fn execute_managed(
         || !details.probe_stack_roots
         || !details.native_stack_budget
         || details.native_host_bootstrap
-        || !details.socket_listen.is_empty()
     {
         return Err(
-            "managed JIT requires a GC/stack host without socket or bootstrap services"
+            "managed JIT requires a GC/stack host without bootstrap services"
                 .into(),
         );
     }

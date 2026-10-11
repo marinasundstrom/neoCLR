@@ -467,8 +467,8 @@ fn run() -> Result<(), Box<dyn std::error::Error>> {
         d
     });
     if managed_jit == 1 {
-        if !closed || target != compiler::Target::MacosArm64 || bind_socket_listener || bind_socket_accept || bind_socket_client || bind_socket_transfer || native_host_bootstrap {
-            return Err("--jit-managed requires closed-world macOS console/task compilation without socket or bootstrap bindings".into());
+        if !closed || target != compiler::Target::MacosArm64 || native_host_bootstrap {
+            return Err("--jit-managed requires closed-world macOS compilation without bootstrap bindings".into());
         }
         let details = details.as_ref().ok_or("--jit-managed requires explicit GC/context bindings")?;
         let mut result = jit::execute_managed(compile_input, root, details, Path::new(&args[3]), &jit_arguments)?;

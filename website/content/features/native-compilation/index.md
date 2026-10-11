@@ -195,7 +195,10 @@ including filtering and bounds faults, with interpreter/AOT parity. Queued async
 completion, consecutive awaits and fault cleanup now also pass a focused
 [three-mode qualification](https://github.com/marinasundstrom/neoCLR/blob/main/docs/experiments/jit-async/README.md).
 Timer completion, cancellation and fault cleanup also pass the existing timer suite.
-HTTP/socket completions, Windows JIT and normal runtime integration remain open.
+[HTTP client/server qualification](https://github.com/marinasundstrom/neoCLR/blob/main/docs/experiments/jit-http/README.md)
+now covers DNS/connect, accept/read/write, fragmented requests, timeout and fault cleanup
+with interpreter/AOT parity. Windows JIT and normal runtime integration remain open.
+These are functional checks, not HTTP throughput measurements.
 [Contracts, validation and local benchmark](https://github.com/marinasundstrom/neoCLR/blob/main/docs/experiments/jit-managed/README.md).
 
 A subsequent shared metadata lookup optimization reduces startup work in both the JIT

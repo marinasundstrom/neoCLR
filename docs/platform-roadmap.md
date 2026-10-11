@@ -24,7 +24,9 @@ Index/Range framework assembly with filtering/fault parity. The
 [async entry follow-up](experiments/jit-async/README.md) qualifies queued completion,
 consecutive awaits, cancellation, pending-task and callback faults in all three modes.
 [Timer completion/cancellation](experiments/jit-timers/README.md) is also qualified.
-Socket completions, Windows JIT and production integration remain open. A nine-run local
+[HTTP client/server qualification](experiments/jit-http/README.md) now passes with
+DNS/connect, accept/read/write, timeouts and fault cleanup. Windows JIT and production
+integration remain open. A nine-run local
 benchmark records median process times of 2.346s JIT, 2.962s interpreted and 9.00ms
 prebuilt AOT for that same assembly; JIT includes compilation, AOT excludes its build.
 This is test-run evidence, not HTTP throughput. The subsequent
@@ -34,9 +36,13 @@ before/after comparison for both JIT and interpreter. Continued interpreter impr
 remains part of the direction; sustained-workload and size-scaling evidence are still open.
 A subsequent [retained-code CPU experiment](experiments/jit-cpu/README.md) now
 checks repeated scalar invocations against AOT and the interpreter, separating
-computation from metadata size. Keep the next functional JIT milestone focused on
-polled timer completion/cancellation lifetime and then HTTP qualification; these measurements
-do not make the current private probe a production execution mode.
+computation from metadata size. The bounded timer and HTTP milestones are now qualified
+on macOS ARM64. Normal runtime/tooling integration and broader service qualification
+remain the next functional work; these measurements do not make the private probe a
+production execution mode.
+The author also requests a later [equivalent HTTP client/server benchmark](native-execution-investigation.md#later-benchmarking-against-net-and-other-platforms)
+against .NET, Go and JavaScript across each runtime's supported interpreted/JIT/AOT
+modes. This remains planned; the current HTTP checks establish correctness only.
 Memory views and suspension remain related design work.
 
 **Module story closure (2026-10-10):** the author requests closing the namespace/module

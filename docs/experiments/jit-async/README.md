@@ -28,9 +28,10 @@ Cancellation and unresolved-task faults retain neoCLR's current semantics; they 
 not silently reinterpreted as CLR exceptions. The runtime pumps queued work inside one
 host invocation. It does not add background workers, runtime suspension or green threads.
 
-`--jit-managed` now accepts `--bind-task-queue`. Timers, sockets, native bootstrap,
-Windows JIT and general embedding remain unsupported. Both timer and socket-binding
-requests are checked to fail before guest invocation. A task with no completion source
+`--jit-managed` accepts `--bind-task-queue`. This initial slice rejected timers and
+sockets; the follow-ups below now qualify both through the same entry lifetime.
+Native bootstrap, Windows JIT and general embedding remain unsupported. Bootstrap
+bindings are checked to fail before guest invocation. A task with no completion source
 still faults with the existing pending-task diagnostic. Native loops and callbacks have
 no instruction budget; this private trusted host is not an isolation boundary.
 
@@ -84,10 +85,7 @@ retained in full.
 The console verifier now includes the task-scope helper even for synchronous guests.
 There is no public API addition, API snapshot change or website build for this private profile.
 
-Next: supply a polled timer completion source while retaining code and roots through
-completion/cancellation, then qualify HTTP client/server socket completions. Those host
-services are still needed before the JIT can run the showcase. Execution defaults remain
-unchanged.
-
-Follow-up: [timer polling and cancellation](../jit-timers/README.md) are now qualified.
-The earlier timer rejection above records this page’s initial slice; socket integration remains next.
+Follow-ups: [timer polling and cancellation](../jit-timers/README.md) and
+[HTTP client/server socket completions](../jit-http/README.md) are now qualified,
+retaining code and roots through completion/cancellation. Execution defaults remain
+unchanged; normal runtime/tooling integration remains open.

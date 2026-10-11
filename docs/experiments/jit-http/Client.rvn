@@ -1,0 +1,16 @@
+import System.*
+import System.Result.*
+import System.Tasks.*
+import System.Web.Http.*
+
+async func Main(arguments: string[]) -> Task<()> {
+    let client = HttpClient()
+    let result = await client.GetString(arguments[0])
+    // Explicit disposal follows await; async use lowering is a separate compiler gap.
+    client.Dispose()
+    let Ok(text) = result else { System.Fail("HTTP greeting failed") }
+    if text != "Café 🌍" {
+        System.Fail("HTTP greeting body changed")
+    }
+    Console.WriteLine(text)
+}

@@ -702,6 +702,20 @@ are candidate comparisons, not a fixed leaderboard or selected framework/toolcha
 Record neoCLR interpreter, AOT and later JIT results separately; never label a mode
 as tested before it exists.
 
+**Author refinement, 2026-10-11:** benchmark equivalent HTTP **client and server**
+samples in neoCLR, .NET, Go and JavaScript, using each platform's supported interpreted,
+JIT and AOT modes. This is future work following the [HTTP JIT qualification](experiments/jit-http/README.md).
+Select and record concrete JavaScript engines and all toolchain versions when the
+benchmark is scheduled; do not assume every language/runtime offers every mode.
+Mark unsupported combinations explicitly, and distinguish an available mode from a
+mode qualified for the HTTP workload. The earlier Rust suggestion remains optional.
+
+Measure clients against a controlled server and servers against a controlled load
+generator before comparing paired applications, so the peer does not hide the measured
+side's limits. Establish equivalent HTTP behavior and connection policy first. Report
+startup/build costs separately from warmed throughput, latency and memory. No comparative
+HTTP performance result is claimed by the current functional JIT qualification.
+
 Proposed workload progression:
 
 - A small computation with consumed results, checking scalar/call lowering without

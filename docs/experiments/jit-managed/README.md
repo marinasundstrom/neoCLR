@@ -31,13 +31,16 @@ non-colocated-libcall settings, rather than assuming all functions share an allo
 Every declared helper import must resolve before finalization/invocation. An incomplete
 host fails before its entry can execute. The host and generated code remain owned for
 the synchronous invocation. `host.c` uses a 1 MiB heap, renders faults before cleanup,
-leaves its invocation-owned task scope, checks that no stack roots/strong handles remain,
+cancels/releases its invocation-owned I/O scope, leaves its task scope,
+checks that no stack roots/strong handles remain,
 collects, then frees the heap before
 code reclamation. Broken cleanup invariants abort. This private trusted adapter is not
 a general embedding ABI or an isolation boundary; native loops have no instruction budget.
 
 The [async follow-up](../jit-async/README.md) now admits queued async entries and task
-queues within one host invocation. Timers, sockets and host bootstrap remain rejected. Windows
+queues within one host invocation. The [timer](../jit-timers/README.md) and
+[HTTP](../jit-http/README.md) follow-ups admit timer and socket bindings through the
+rooted entry poller. Host bootstrap remains rejected. Windows
 JIT, suspension, hot reload, concurrent invocations and retained callbacks remain
 unqualified. Completion sources that outlive this host invocation need a longer-lived code owner
 and explicit quiescence before unload. AOT-only deployment remains independent of the JIT library.

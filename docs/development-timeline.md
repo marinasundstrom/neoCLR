@@ -14401,3 +14401,27 @@ Fresh Raven integer/unit entries, successive awaits, cancellation, pending tasks
 callback fault pass in interpreter/AOT/JIT. The console/framework regression stays green.
 [Evidence and lifetime limits](experiments/jit-async/README.md). Timer/socket completions
 and the HTTP showcase remain open; the current JIT owner still ends at host-call return.
+
+### 2026-10-11 — complete the HTTP JIT case
+
+**Author:** requests continuing until HTTP is integrated, clarifying “until you have
+fixed the Http case so it works with JIT”.
+**Assistant action:** first qualifies the polled timer layer, then admits socket
+bindings in the private macOS ARM64 managed JIT. Both reuse the existing AOT entry
+drain and operation scope, keeping callbacks rooted and generated code alive until
+completion or teardown. No new HTTP API or Raven bridge contract is introduced.
+**Outcome:** fresh Raven HttpClient and HttpServer assemblies exchange the UTF-8
+greeting through localhost DNS in interpreter, AOT and JIT. Fragmented requests,
+duplicate Content-Length rejection, handler errors, request timeout and disabled-timeout
+success pass across all three modes. A JIT handler fault closes the peer connection
+and passes host root/scope cleanup checks. [Reproduction and evidence](experiments/jit-http/README.md).
+**Open:** production CLI integration, Windows JIT, sustained HTTP throughput and
+long-running service qualification. This completes the bounded HTTP integration case;
+it does not change execution defaults or establish a production JIT.
+
+**Author follow-up:** later benchmark equivalent HTTP client and server samples in
+.NET, Go and JavaScript, and each supported interpreted, JIT and AOT mode.
+**Assistant response/action:** records this in the roadmap and existing benchmark plan,
+with independent client/server measurements, supported-mode qualification, equivalent
+wire behavior and separate startup/build versus steady-state results. No benchmark is
+run or comparative performance outcome inferred from this request.
