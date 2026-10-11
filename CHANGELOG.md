@@ -31,7 +31,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   until JIT readiness; interpreter/AOT checks remain selective and relevant.
   Implement Windows x64 JIT target selection, shared AOT/JIT stack probing, UTF-16
   entry arguments and helper DLL qualification tooling. Add a Windows HTTP/framework
-  execution workflow; Windows runtime qualification remains pending its execution.
+  execution workflow; Windows x64 qualification passes at `f993e94b` in run
+  38134756345 (22 HTTP and 23 framework cases, scalar JIT and CLI checks).
   Local macOS CLI HTTP, Index/Range guards and runner filtering/argument checks pass.
   Compile test assemblies directly for JIT-only/interpreter-only runs, avoiding unused
   AOT objects and executable links; interpreter-only runs need no native compiler.

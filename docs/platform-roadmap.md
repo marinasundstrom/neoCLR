@@ -10,7 +10,7 @@ Current execution defaults remain unchanged pending qualification. The author au
 switching to JIT when ready, with JIT as the routine test mode and selective relevant
 interpreter/AOT checks. [CLI integration and readiness](jit-execution.md) now provide
 explicit mode selection and test-harness selectors. Windows x64 backend/host support
-has an execution gate; a Windows run is still required before claiming qualification.
+passes its [Windows execution gate](experiments/jit-windows/README.md) at `f993e94b`.
 Prior JIT deferral below is historical context, not a prohibition on this evaluation.
 With the Index/Range slice complete locally, assess memory views and shared execution
 requirements without treating any proposed API or backend as selected. See
@@ -44,8 +44,9 @@ Index/Range framework assembly with filtering/fault parity. The
 consecutive awaits, cancellation, pending-task and callback faults in all three modes.
 [Timer completion/cancellation](experiments/jit-timers/README.md) is also qualified.
 [HTTP client/server qualification](experiments/jit-http/README.md) now passes with
-DNS/connect, accept/read/write, timeouts and fault cleanup. Windows JIT and production
-integration remain open beyond the explicit development CLI path. A nine-run local
+DNS/connect, accept/read/write, timeouts and fault cleanup. Windows x64 JIT also
+passes its execution gate; production integration remains open beyond the explicit
+development CLI path. A nine-run local
 benchmark records median process times of 2.346s JIT, 2.962s interpreted and 9.00ms
 prebuilt AOT for that same assembly; JIT includes compilation, AOT excludes its build.
 This is test-run evidence, not HTTP throughput. The subsequent

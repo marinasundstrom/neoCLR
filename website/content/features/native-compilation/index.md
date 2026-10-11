@@ -198,8 +198,8 @@ Timer completion, cancellation and fault cleanup also pass the existing timer su
 [HTTP client/server qualification](https://github.com/marinasundstrom/neoCLR/blob/main/docs/experiments/jit-http/README.md)
 now covers DNS/connect, accept/read/write, fragmented requests, timeout and fault cleanup
 with interpreter/AOT parity. Development builds now expose `neoclr run --execution jit`
-with an explicit matching helper library and compiler. Windows x64 implementation has
-an execution gate pending qualification; Windows ARM64 and normal SDK packaging remain open.
+with an explicit matching helper library and compiler. The Windows x64 execution gate
+passes HTTP and test-framework checks at `f993e94b`; Windows ARM64 and normal SDK packaging remain open.
 [CLI contract and readiness](https://github.com/marinasundstrom/neoCLR/blob/main/docs/jit-execution.md).
 These are functional checks, not HTTP throughput measurements.
 [Contracts, validation and local benchmark](https://github.com/marinasundstrom/neoCLR/blob/main/docs/experiments/jit-managed/README.md).

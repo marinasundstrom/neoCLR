@@ -53,6 +53,8 @@ See the [changelog](../CHANGELOG.md) and linked design documents for technical s
   templates from a lowered collection owner. A focused compiler regression and
   28 JSON tests in each native execution mode pass locally;
   [evidence](experiments/jit-cli/json-validation.json).
+- **Windows outcome:** [run 38134756345](https://github.com/marinasundstrom/neoCLR/actions/runs/38134756345)
+  passes at `f993e94b`; retained HTTP artifact hashes match downloaded files.
 - **Action:** update the [roadmap](platform-roadmap.md). **Open:** scheduler contract,
   suspension representation and implementation; no runtime behavior changed here.
 

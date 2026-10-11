@@ -2,7 +2,14 @@
 
 2026-10-11 development work. The backend now selects the executing Windows x64
 host and uses the existing native HTTP lowering and helper services. This gate is
-implemented; **Windows execution is not yet qualified by local macOS testing**.
+implemented and passes on Windows x64 at `f993e94b` in
+[run 38134756345](https://github.com/marinasundstrom/neoCLR/actions/runs/38134756345).
+All five scalar JIT tests, CLI selection, 22 HTTP cases across interpreter/AOT/JIT,
+and 23 framework/guard/selector cases pass. Downloaded HTTP DLL, assembly, object
+and executable hashes match the retained report. See [HTTP evidence](http-validation.json),
+[framework evidence](framework-validation.json) and [gate report](validation.json).
+The subsequent shared overload fix is separately qualified by macOS JSON JIT/AOT
+execution; it is not part of this Windows run.
 
 Run from an x64 MSVC developer environment with Rust, Python 3.12 and the matching
 .NET SDKs, or use [Windows JIT HTTP](../../../.github/workflows/windows-jit.yml):

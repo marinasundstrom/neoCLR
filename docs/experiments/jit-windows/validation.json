@@ -1,0 +1,119 @@
+{
+  "passed": true,
+  "commands": [
+    {
+      "command": [
+        "C:\\hostedtoolcache\\windows\\Python\\3.12.10\\x64\\python.exe",
+        "D:\\a\\neoCLR\\neoCLR\\scripts\\prepare-native-development-bundle.py",
+        "--bundle",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\neoclr-native-poc",
+        "--output",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\development",
+        "--build-compiler",
+        "--compiler-revision",
+        "163050da2a79444878169f1d011abff644d37b2b"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "cargo",
+        "build",
+        "--locked",
+        "--release",
+        "--manifest-path",
+        "D:\\a\\neoCLR\\neoCLR\\tools\\aot-poc\\Cargo.toml"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "cargo",
+        "build",
+        "--locked",
+        "--release",
+        "--bin",
+        "neoclr"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "cargo",
+        "test",
+        "--locked",
+        "--release",
+        "--manifest-path",
+        "D:\\a\\neoCLR\\neoCLR\\tools\\aot-poc\\Cargo.toml",
+        "--test",
+        "scalar",
+        "jit_"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "cargo",
+        "test",
+        "--locked",
+        "--release",
+        "--test",
+        "cli",
+        "cli_execution_selection"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "C:\\hostedtoolcache\\windows\\Python\\3.12.10\\x64\\python.exe",
+        "D:\\a\\neoCLR\\neoCLR\\scripts\\build-native-project.py",
+        "--profile",
+        "windows-http",
+        "--project",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\server-source\\App.rvnproj",
+        "--bundle",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\development\\bundle",
+        "--aot",
+        "D:\\a\\neoCLR\\neoCLR\\tools\\aot-poc\\target\\release\\neoclr-aot-poc.exe",
+        "--output",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\native"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "C:\\hostedtoolcache\\windows\\Python\\3.12.10\\x64\\python.exe",
+        "D:\\a\\neoCLR\\neoCLR\\docs\\experiments\\jit-http\\verify.py",
+        "--bundle",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\development\\bundle",
+        "--windows-build",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\native\\build.json",
+        "--cli",
+        "--output",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\http"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "C:\\hostedtoolcache\\windows\\Python\\3.12.10\\x64\\python.exe",
+        "D:\\a\\neoCLR\\neoCLR\\scripts\\test-runtime-library.py",
+        "--bundle",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\development\\bundle",
+        "--aot",
+        "D:\\a\\neoCLR\\neoCLR\\tools\\aot-poc\\target\\release\\neoclr-aot-poc.exe",
+        "--mode",
+        "jit",
+        "--jit-host",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\http\\host.dll",
+        "--suite",
+        "index-range",
+        "--suite",
+        "runner-contract",
+        "--output",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\framework"
+      ],
+      "exitCode": 0
+    }
+  ]
+}

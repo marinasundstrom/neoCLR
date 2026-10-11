@@ -54,9 +54,10 @@ and [JIT-only test-framework evidence](experiments/jit-cli/framework-validation.
 implementation uses the Windows calling convention, the same inline stack probes as
 AOT, a helper DLL with explicit native exports, and UTF-16 entry arguments. The shared
 host preserves the UTF-8 byte-stream contract by disabling CRT translation during the
-call and restoring the prior modes afterward. Windows execution must pass the new
-[GitHub Actions gate](../.github/workflows/windows-jit.yml); this checkout's local
-macOS results do not qualify Windows. Windows ARM64 remains a separate target gap.
+call and restoring the prior modes afterward. The
+[Windows execution gate](experiments/jit-windows/README.md) passes at `f993e94b`:
+22 HTTP and 23 framework cases, plus scalar JIT and CLI checks. Windows ARM64
+remains a separate target gap.
 
 Like .NET, code generation and runtime services are separate concerns; see the
 [existing execution investigation](native-execution-investigation.md). Reusing the

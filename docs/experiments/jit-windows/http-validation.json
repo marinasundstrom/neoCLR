@@ -1,0 +1,1485 @@
+{
+  "passed": true,
+  "jitViaRuntimeCli": true,
+  "sourceBaseRevision": "f993e94b37c574e02ac8a88e6c043d6acf44e7ea",
+  "inputs": {
+    "D:\\a\\neoCLR\\neoCLR\\tools\\aot-poc\\target\\release\\neoclr-aot-poc.exe": "2d3516129fb0b9c675460d682af8f44535eeff1a79ce60b0060b4641d2a06b9d",
+    "D:\\a\\neoCLR\\neoCLR\\target\\release\\neoclr.exe": "a58e0596dcc8a1fd1d7f5612dc2af2d648733ebfdc01b9222421a356564c4cff",
+    "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\development\\bundle\\sdk\\tools\\rvnc\\rvnc.dll": "e103c610174231914fb99093fce030aba85d5857a45dbd029e296cf90a14526b",
+    "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\development\\bundle\\lib\\System.runtime.neox": "98a1ae1da85387c87746957e83a4015eb59d0566539a915c69f168d2b511b190",
+    "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\development\\bundle\\lib\\System.Runtime.dll": "d70ad044cda75b6cf3183783f556516db65665ba5d88e71343783eb3bf95eb60",
+    "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\development\\bundle\\lib\\System.Data.dll": "402297f27037313918ed5d18556e52f510aceb47286e0f1a35aa131e1d0770c5",
+    "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\development\\bundle\\lib\\System.Networking.dll": "06c48fc75de46e82992f67a88a2725286de7d87f132183aaf741ed71314a0784",
+    "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\development\\bundle\\lib\\System.Web.dll": "b07f55bbae30dfc900106096b4aec6e9964fe2e2118839c9b4b5884655604ef4",
+    "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\development\\bundle\\lib\\Core.dll": "3d4a676d379067c18a65a9beb8257ed40bf3196fc643a9ba1d559c619ec73fad",
+    "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\development\\bundle\\lib\\ownership.json": "f726cf211fdfb42debe6779ad27ee2241c47425bcfefdd25a39930a71043a523",
+    "D:\\a\\neoCLR\\neoCLR\\docs\\experiments\\jit-http\\verify.py": "d0989680dd1c75fab229622fbe48140ed2c485e1c5407baa245e10942d959dd8",
+    "D:\\a\\neoCLR\\neoCLR\\docs\\experiments\\jit-managed\\host.c": "038bda9e3bc5a726222e0f9661358b456cc46337a45e688817ef4c341002525c"
+  },
+  "builds": [
+    {
+      "command": [
+        "cargo",
+        "build",
+        "--locked",
+        "--release",
+        "--target",
+        "x86_64-pc-windows-msvc",
+        "--target-dir",
+        "D:\\a\\neoCLR\\neoCLR\\tools\\aot-native-text\\target\\text-only",
+        "--manifest-path",
+        "D:\\a\\neoCLR\\neoCLR\\tools\\aot-native-text\\Cargo.toml"
+      ],
+      "exitCode": 0,
+      "stderr": "\u001b[1m\u001b[92m   Compiling\u001b[0m unicode-segmentation v1.12.0\n\u001b[1m\u001b[92m   Compiling\u001b[0m neoclr-aot-native-text v0.0.0 (D:\\a\\neoCLR\\neoCLR\\tools\\aot-native-text)\n\u001b[1m\u001b[92m    Finished\u001b[0m `release` profile [optimized] target(s) in 1.73s\n",
+      "stdout": ""
+    },
+    {
+      "command": [
+        "cl",
+        "/nologo",
+        "/W4",
+        "/WX",
+        "/std:c11",
+        "/experimental:c11atomics",
+        "/O2",
+        "/MT",
+        "/DNEOCLR_NATIVE_GC",
+        "/DNEOCLR_NATIVE_BYTE_ARRAY_LIMIT=65536",
+        "/DNEOCLR_HTTP_HOST",
+        "/ID:\\a\\neoCLR\\neoCLR\\docs\\experiments\\aot-console",
+        "/c",
+        "D:\\a\\neoCLR\\neoCLR\\tools\\native\\windows-console-host.c",
+        "/FoD:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\http\\helper-0.obj"
+      ],
+      "exitCode": 0,
+      "stderr": "",
+      "stdout": "windows-console-host.c\n"
+    },
+    {
+      "command": [
+        "dumpbin",
+        "/symbols",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\http\\helper-0.obj"
+      ],
+      "exitCode": 0,
+      "stderr": "",
+      "stdout": "Microsoft (R) COFF/PE Dumper Version 14.44.35229.0\nCopyright (C) Microsoft Corporation.  All rights reserved.\n\n\nDump of file D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\http\\helper-0.obj\n\nFile Type: COFF OBJECT\n\nCOFF SYMBOL TABLE\n000 0104899D ABS    notype       Static       | @comp.id\n001 80010190 ABS    notype       Static       | @feat.00\n002 00000003 ABS    notype       Static       | @vol.md\n003 00000000 SECT1  notype       Static       | .drectve\n    Section length   69, #relocs    0, #linenums    0, checksum        0\n005 00000000 SECT2  notype       Static       | .debug$S\n    Section length   94, #relocs    0, #linenums    0, checksum        0\n007 00000000 SECT3  notype       Static       | .bss\n    Section length    4, #relocs    0, #linenums    0, checksum        0, selection    2 (pick any)\n009 00000000 SECT3  notype       External     | _Avx2WmemEnabledWeakValue\n00A 00000000 SECT4  notype       Static       | .text$mn\n    Section length   E3, #relocs    C, #linenums    0, checksum 9CC4CCFD, selection    1 (pick no duplicates)\n00C 00000000 UNDEF  notype ()    External     | __acrt_iob_func\n00D 00000000 UNDEF  notype ()    External     | ferror\n00E 00000000 UNDEF  notype ()    External     | fflush\n00F 00000000 UNDEF  notype ()    External     | fputc\n010 00000000 UNDEF  notype ()    External     | fwrite\n011 00000000 UNDEF  notype ()    External     | _lock_file\n012 00000000 UNDEF  notype ()    External     | _unlock_file\n013 00000000 SECT4  notype ()    External     | neoclr_console_write_line_utf8_v1\n014 00000000 SECT4  notype       Label        | $LN20\n015 00000000 SECT5  notype       Static       | .xdata\n    Section length   18, #relocs    0, #linenums    0, checksum C2D1B755, selection    5 (pick associative Section 0x4)\n017 00000000 SECT5  notype       Static       | $unwind$neoclr_console_write_line_utf8_v1\n018 00000000 SECT6  notype       Static       | .pdata\n    Section length    C, #relocs    3, #linenums    0, checksum  D5F2282, selection    5 (pick associative Section 0x4)\n01A 00000000 SECT6  notype       Static       | $pdata$neoclr_console_write_line_utf8_v1\n01B 00000000 SECT7  notype       Static       | .chks64\n    Section length   38, #relocs    0, #linenums    0, checksum        0\n\nString Table Size = 0xBB bytes\n\n  Summary\n\n           4 .bss\n          38 .chks64\n          94 .debug$S\n          69 .drectve\n           C .pdata\n          E3 .text$mn\n          18 .xdata\n"
+    },
+    {
+      "command": [
+        "cl",
+        "/nologo",
+        "/W4",
+        "/WX",
+        "/std:c11",
+        "/experimental:c11atomics",
+        "/O2",
+        "/MT",
+        "/DNEOCLR_NATIVE_GC",
+        "/DNEOCLR_NATIVE_BYTE_ARRAY_LIMIT=65536",
+        "/DNEOCLR_HTTP_HOST",
+        "/ID:\\a\\neoCLR\\neoCLR\\docs\\experiments\\aot-console",
+        "/c",
+        "D:\\a\\neoCLR\\neoCLR\\tools\\native\\windows-gc-host.c",
+        "/FoD:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\http\\helper-1.obj"
+      ],
+      "exitCode": 0,
+      "stderr": "",
+      "stdout": "windows-gc-host.c\n"
+    },
+    {
+      "command": [
+        "dumpbin",
+        "/symbols",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\http\\helper-1.obj"
+      ],
+      "exitCode": 0,
+      "stderr": "",
+      "stdoutPrefix": "Microsoft (R) COFF/PE Dumper Version 14.44.35229.0\nCopyright (C) Microsoft Corporation.  All rights reserved.\n\n\nDump of file D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\http\\helper-1.obj\n\nFile Type: COFF OBJECT\n\nCOFF SYMBOL TABLE\n000 0104899D ABS    notype       Static       | @comp.id\n001 80010190 ABS    notype       Static       | @feat.00\n002 00000003 ABS    notype       Static       | @vol.md\n003 00000000 SECT1  notype       Static       | .drectve\n    Section length   2F, #relocs    0, #linenums    0, checksum        0\n005 00000000 SECT2  notype       Static       | .debug$S\n    Section length   94, #relocs    0, #linenums    0, checksum        0\n007 00000000 SECT3  notype       Static       | .text$mn\n    Section length  11D, #relocs    4, #linenums    0, checksum 2795FFC6, selection    1 (pick no duplicates)\n009 00000000 SECT4  notype       Static       | .text$mn\n    Section length  134, #relocs    4, #linenums    0, checksum 15953CCF, selection    1 (pick no duplicates)\n00B 00000000 UNDEF  notype ()    External     | neoclr_windows_heap_create\n00C 00000000 UNDEF  notype ()    External     | neoclr_windows_heap_release\n00D 00000000 UNDEF  notype ()    External     | neoclr_gc_entry_check_v1\n00E 00000000 SECT4  notype ()    External     | neoclr_windows_gc_host_open\n00F 00000000 SECT3  notype ()    External     | neoclr_windows_gc_host_close\n010 00000000 UNDEF  notype ()    External     | neoclr_native_stack_check_v1\n011 00000000 UNDEF  notype       External     | __imp_GetCurrentThreadId\n012 00000000 UNDEF  notype ()    External     | memset\n013 00000000 SECT4  notype       Label        | $LN16\n014 00000000 SECT3  notype       Label        | $LN23\n015 00000000 SECT5  notype       Static       | .xdata\n    Section length   10, #relocs    0, #linenums    0, checksum DF234358, selection    5 (pick associative Section 0x4)\n017 00000000 SECT5  notype       Static       | $unwind$neoclr_windows_gc_host_open\n018 00000000 SECT6  notype       Static       | .pda",
+      "stdoutSha256": "e7b240cf1be5818d97e9f256c003fcd64699f262bea41d27c4e768fb088b0d6b"
+    },
+    {
+      "command": [
+        "cl",
+        "/nologo",
+        "/W4",
+        "/WX",
+        "/std:c11",
+        "/experimental:c11atomics",
+        "/O2",
+        "/MT",
+        "/DNEOCLR_NATIVE_GC",
+        "/DNEOCLR_NATIVE_BYTE_ARRAY_LIMIT=65536",
+        "/DNEOCLR_HTTP_HOST",
+        "/ID:\\a\\neoCLR\\neoCLR\\docs\\experiments\\aot-console",
+        "/c",
+        "D:\\a\\neoCLR\\neoCLR\\tools\\native\\windows-host-memory.c",
+        "/FoD:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\http\\helper-2.obj"
+      ],
+      "exitCode": 0,
+      "stderr": "",
+      "stdout": "windows-host-memory.c\n"
+    },
+    {
+      "command": [
+        "dumpbin",
+        "/symbols",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\http\\helper-2.obj"
+      ],
+      "exitCode": 0,
+      "stderr": "",
+      "stdout": "Microsoft (R) COFF/PE Dumper Version 14.44.35229.0\nCopyright (C) Microsoft Corporation.  All rights reserved.\n\n\nDump of file D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\http\\helper-2.obj\n\nFile Type: COFF OBJECT\n\nCOFF SYMBOL TABLE\n000 0104899D ABS    notype       Static       | @comp.id\n001 80010190 ABS    notype       Static       | @feat.00\n002 00000003 ABS    notype       Static       | @vol.md\n003 00000000 SECT1  notype       Static       | .drectve\n    Section length   2F, #relocs    0, #linenums    0, checksum        0\n005 00000000 SECT2  notype       Static       | .debug$S\n    Section length   94, #relocs    0, #linenums    0, checksum        0\n007 00000000 SECT3  notype       Static       | .text$mn\n    Section length  120, #relocs    4, #linenums    0, checksum C1902E20, selection    1 (pick no duplicates)\n009 00000000 SECT4  notype       Static       | .text$mn\n    Section length   75, #relocs    1, #linenums    0, checksum 2595013A, selection    1 (pick no duplicates)\n00B 00000000 SECT3  notype ()    External     | neoclr_windows_heap_create\n00C 00000000 SECT4  notype ()    External     | neoclr_windows_heap_release\n00D 00000000 UNDEF  notype       External     | __imp_GetSystemInfo\n00E 00000000 UNDEF  notype       External     | __imp_VirtualAlloc\n00F 00000000 UNDEF  notype       External     | __imp_VirtualFree\n010 00000000 SECT3  notype       Label        | $LN23\n011 00000000 SECT4  notype       Label        | $LN19\n012 00000000 SECT5  notype       Static       | .xdata\n    Section length   18, #relocs    0, #linenums    0, checksum 5BAEAEA9, selection    5 (pick associative Section 0x3)\n014 00000000 SECT5  notype       Static       | $unwind$neoclr_windows_heap_create\n015 00000000 SECT6  notype       Static       | .pdata\n    Section length    C, #relocs    3, #linenums    0, checksum 5F0169E2, selection    5 (pick associative Section 0x3)\n017 00000000 SECT6  notype       Static       | $pdata$neoclr_windows_heap_create\n018 00000000 SECT7  notype       Static       | .xdata\n    Section length    8, #relocs    0, #linenums    0, checksum 2DA1F5C3, selection    5 (pick associative Section 0x4)\n01A 00000000 SECT7  notype       Static       | $unwind$neoclr_windows_heap_release\n01B 00000000 SECT8  notype       Static       | .pdata\n    Section length    C, #relocs    3, #linenums    0, checksum E4B09FF4, selection    5 (pick associative Section 0x4)\n01D 00000000 SECT8  notype       Static       | $pdata$neoclr_windows_heap_release\n01E 00000000 SECT9  notype       Static       | .chks64\n    Section length   48, #relocs    0, #linenums    0, checksum        0\n\nString Table Size = 0x100 bytes\n\n  Summary\n\n          48 .chks64\n          94 .debug$S\n          2F .drectve\n          18 .pdata\n         195 .text$mn\n          20 .xdata\n"
+    },
+    {
+      "command": [
+        "cl",
+        "/nologo",
+        "/W4",
+        "/WX",
+        "/std:c11",
+        "/experimental:c11atomics",
+        "/O2",
+        "/MT",
+        "/DNEOCLR_NATIVE_GC",
+        "/DNEOCLR_NATIVE_BYTE_ARRAY_LIMIT=65536",
+        "/DNEOCLR_HTTP_HOST",
+        "/ID:\\a\\neoCLR\\neoCLR\\docs\\experiments\\aot-console",
+        "/c",
+        "D:\\a\\neoCLR\\neoCLR\\tools\\native\\windows-native-stack.c",
+        "/FoD:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\http\\helper-3.obj"
+      ],
+      "exitCode": 0,
+      "stderr": "",
+      "stdout": "windows-native-stack.c\n"
+    },
+    {
+      "command": [
+        "dumpbin",
+        "/symbols",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\http\\helper-3.obj"
+      ],
+      "exitCode": 0,
+      "stderr": "",
+      "stdout": "Microsoft (R) COFF/PE Dumper Version 14.44.35229.0\nCopyright (C) Microsoft Corporation.  All rights reserved.\n\n\nDump of file D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\http\\helper-3.obj\n\nFile Type: COFF OBJECT\n\nCOFF SYMBOL TABLE\n000 0104899D ABS    notype       Static       | @comp.id\n001 80010190 ABS    notype       Static       | @feat.00\n002 00000003 ABS    notype       Static       | @vol.md\n003 00000000 SECT1  notype       Static       | .drectve\n    Section length   2F, #relocs    0, #linenums    0, checksum        0\n005 00000000 SECT2  notype       Static       | .debug$S\n    Section length   94, #relocs    0, #linenums    0, checksum        0\n007 00000000 SECT3  notype       Static       | .text$mn\n    Section length  10D, #relocs    4, #linenums    0, checksum DCC4BB51, selection    1 (pick no duplicates)\n009 00000000 UNDEF  notype       External     | __imp_IsThreadAFiber\n00A 00000000 UNDEF  notype       External     | __imp_GetCurrentThreadStackLimits\n00B 00000000 UNDEF  notype       External     | __imp_GetSystemInfo\n00C 00000000 UNDEF  notype       External     | __imp_VirtualQuery\n00D 00000000 SECT3  notype ()    External     | neoclr_native_stack_check_v1\n00E 00000000 SECT3  notype       Label        | $LN28\n00F 00000000 SECT4  notype       Static       | .xdata\n    Section length    C, #relocs    0, #linenums    0, checksum 44C1DCD6, selection    5 (pick associative Section 0x3)\n011 00000000 SECT4  notype       Static       | $unwind$neoclr_native_stack_check_v1\n012 00000000 SECT5  notype       Static       | .pdata\n    Section length    C, #relocs    3, #linenums    0, checksum 3D721E65, selection    5 (pick associative Section 0x3)\n014 00000000 SECT5  notype       Static       | $pdata$neoclr_native_stack_check_v1\n015 00000000 SECT6  notype       Static       | .chks64\n    Section length   30, #relocs    0, #linenums    0, checksum        0\n\nString Table Size = 0xC8 bytes\n\n  Summary\n\n          30 .chks64\n          94 .debug$S\n          2F .drectve\n           C .pdata\n         10D .text$mn\n           C .xdata\n"
+    },
+    {
+      "command": [
+        "cl",
+        "/nologo",
+        "/W4",
+        "/WX",
+        "/std:c11",
+        "/experimental:c11atomics",
+        "/O2",
+        "/MT",
+        "/DNEOCLR_NATIVE_GC",
+        "/DNEOCLR_NATIVE_BYTE_ARRAY_LIMIT=65536",
+        "/DNEOCLR_HTTP_HOST",
+        "/ID:\\a\\neoCLR\\neoCLR\\docs\\experiments\\aot-console",
+        "/c",
+        "D:\\a\\neoCLR\\neoCLR\\docs\\experiments\\aot-console\\root-probe.c",
+        "/FoD:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\http\\helper-4.obj"
+      ],
+      "exitCode": 0,
+      "stderr": "",
+      "stdout": "root-probe.c\n"
+    },
+    {
+      "command": [
+        "dumpbin",
+        "/symbols",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\http\\helper-4.obj"
+      ],
+      "exitCode": 0,
+      "stderr": "",
+      "stdoutPrefix": "Microsoft (R) COFF/PE Dumper Version 14.44.35229.0\nCopyright (C) Microsoft Corporation.  All rights reserved.\n\n\nDump of file D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\http\\helper-4.obj\n\nFile Type: COFF OBJECT\n\nCOFF SYMBOL TABLE\n000 0104899D ABS    notype       Static       | @comp.id\n001 80010190 ABS    notype       Static       | @feat.00\n002 00000003 ABS    notype       Static       | @vol.md\n003 00000000 SECT1  notype       Static       | .drectve\n    Section length   2F, #relocs    0, #linenums    0, checksum        0\n005 00000000 SECT2  notype       Static       | .debug$S\n    Section length   94, #relocs    0, #linenums    0, checksum        0\n007 00000000 SECT3  notype       Static       | .text$mn\n    Section length   E6, #relocs    5, #linenums    0, checksum EA696FFF, selection    1 (pick no duplicates)\n009 00000000 SECT4  notype       Static       | .text$mn\n    Section length   93, #relocs    5, #linenums    0, checksum 42025E25, selection    1 (pick no duplicates)\n00B 00000000 SECT5  notype       Static       | .text$mn\n    Section length  24F, #relocs    C, #linenums    0, checksum E87709EE, selection    1 (pick no duplicates)\n00D 00000000 SECT6  notype       Static       | .text$mn\n    Section length   F2, #relocs    5, #linenums    0, checksum F0662667, selection    1 (pick no duplicates)\n00F 00000000 SECT7  notype       Static       | .text$mn\n    Section length   88, #relocs    0, #linenums    0, checksum CAA29BB8, selection    1 (pick no duplicates)\n011 00000000 SECT8  notype       Static       | .text$mn\n    Section length   1D, #relocs    2, #linenums    0, checksum 4741670E, selection    1 (pick no duplicates)\n013 00000000 SECT9  notype       Static       | .text$mn\n    Section length   1C, #relocs    2, #linenums    0, checksum C70039D8, selection    1 (pick no duplicates)\n015 00000000 SECTA  notype       Static       | .text$mn\n    Section length   1D, #relocs    2, #linenums    0, checksum 4741670E, selection    1 (pick no duplicates)",
+      "stdoutSha256": "2cc99bbf938f109e6ae9ed1fb5356f002234a3793c2024eae76f3915c5c4bc22"
+    },
+    {
+      "command": [
+        "cl",
+        "/nologo",
+        "/W4",
+        "/WX",
+        "/std:c11",
+        "/experimental:c11atomics",
+        "/O2",
+        "/MT",
+        "/DNEOCLR_NATIVE_GC",
+        "/DNEOCLR_NATIVE_BYTE_ARRAY_LIMIT=65536",
+        "/DNEOCLR_HTTP_HOST",
+        "/ID:\\a\\neoCLR\\neoCLR\\docs\\experiments\\aot-console",
+        "/c",
+        "D:\\a\\neoCLR\\neoCLR\\docs\\experiments\\aot-console\\native-gc.c",
+        "/FoD:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\http\\helper-5.obj"
+      ],
+      "exitCode": 0,
+      "stderr": "",
+      "stdout": "native-gc.c\n"
+    },
+    {
+      "command": [
+        "dumpbin",
+        "/symbols",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\http\\helper-5.obj"
+      ],
+      "exitCode": 0,
+      "stderr": "",
+      "stdoutPrefix": "Microsoft (R) COFF/PE Dumper Version 14.44.35229.0\nCopyright (C) Microsoft Corporation.  All rights reserved.\n\n\nDump of file D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\http\\helper-5.obj\n\nFile Type: COFF OBJECT\n\nCOFF SYMBOL TABLE\n000 0104899D ABS    notype       Static       | @comp.id\n001 80010190 ABS    notype       Static       | @feat.00\n002 00000003 ABS    notype       Static       | @vol.md\n003 00000000 SECT1  notype       Static       | .drectve\n    Section length   2F, #relocs    0, #linenums    0, checksum        0\n005 00000000 SECT2  notype       Static       | .debug$S\n    Section length   94, #relocs    0, #linenums    0, checksum        0\n007 00000000 SECT3  notype       Static       | .text$mn\n    Section length   13, #relocs    0, #linenums    0, checksum 7EFD76A1, selection    2 (pick any)\n009 00000000 SECT4  notype       Static       | .text$mn\n    Section length   14, #relocs    0, #linenums    0, checksum C31F6A63, selection    2 (pick any)\n00B 00000000 SECT5  notype       Static       | .text$mn\n    Section length    3, #relocs    0, #linenums    0, checksum 922B422E, selection    2 (pick any)\n00D 00000000 SECT6  notype       Static       | .text$mn\n    Section length   A8, #relocs    0, #linenums    0, checksum A3710F8F, selection    1 (pick no duplicates)\n00F 00000000 SECT7  notype       Static       | .text$mn\n    Section length   AD, #relocs    0, #linenums    0, checksum A3E769A3, selection    1 (pick no duplicates)\n011 00000000 SECT8  notype       Static       | .text$mn\n    Section length   F0, #relocs    3, #linenums    0, checksum 8E9215C2, selection    1 (pick no duplicates)\n013 00000000 SECT9  notype       Static       | .text$mn\n    Section length   47, #relocs    2, #linenums    0, checksum D2B58BEC, selection    1 (pick no duplicates)\n015 00000000 SECTA  notype       Static       | .text$mn\n    Section length   46, #relocs    0, #linenums    0, checksum F343D9EC, selection    1 (pick no duplicates)\n017 00000000 SECTB  notype   ",
+      "stdoutSha256": "634e5e644434afc9ab21450f4433c24b86482db2274e53331f9b550b1833d16e"
+    },
+    {
+      "command": [
+        "cl",
+        "/nologo",
+        "/W4",
+        "/WX",
+        "/std:c11",
+        "/experimental:c11atomics",
+        "/O2",
+        "/MT",
+        "/DNEOCLR_NATIVE_GC",
+        "/DNEOCLR_NATIVE_BYTE_ARRAY_LIMIT=65536",
+        "/DNEOCLR_HTTP_HOST",
+        "/ID:\\a\\neoCLR\\neoCLR\\docs\\experiments\\aot-console",
+        "/c",
+        "D:\\a\\neoCLR\\neoCLR\\docs\\experiments\\aot-console\\text-arena.c",
+        "/FoD:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\http\\helper-6.obj"
+      ],
+      "exitCode": 0,
+      "stderr": "",
+      "stdout": "text-arena.c\n"
+    },
+    {
+      "command": [
+        "dumpbin",
+        "/symbols",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\http\\helper-6.obj"
+      ],
+      "exitCode": 0,
+      "stderr": "",
+      "stdoutPrefix": "Microsoft (R) COFF/PE Dumper Version 14.44.35229.0\nCopyright (C) Microsoft Corporation.  All rights reserved.\n\n\nDump of file D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\http\\helper-6.obj\n\nFile Type: COFF OBJECT\n\nCOFF SYMBOL TABLE\n000 0104899D ABS    notype       Static       | @comp.id\n001 80010190 ABS    notype       Static       | @feat.00\n002 00000003 ABS    notype       Static       | @vol.md\n003 00000000 SECT1  notype       Static       | .drectve\n    Section length   2F, #relocs    0, #linenums    0, checksum        0\n005 00000000 SECT2  notype       Static       | .debug$S\n    Section length   94, #relocs    0, #linenums    0, checksum        0\n007 00000000 SECT3  notype       Static       | .text$mn\n    Section length    8, #relocs    1, #linenums    0, checksum 411950D3, selection    2 (pick any)\n009 00000000 SECT4  notype       Static       | .text$mn\n    Section length   E7, #relocs    2, #linenums    0, checksum E46A9297, selection    1 (pick no duplicates)\n00B 00000000 SECT5  notype       Static       | .text$mn\n    Section length   5D, #relocs    0, #linenums    0, checksum AD99C83D, selection    1 (pick no duplicates)\n00D 00000000 SECT6  notype       Static       | .text$mn\n    Section length    B, #relocs    1, #linenums    0, checksum CCFCCF12, selection    1 (pick no duplicates)\n00F 00000000 SECT7  notype       Static       | .text$mn\n    Section length   A1, #relocs    2, #linenums    0, checksum D428D30A, selection    1 (pick no duplicates)\n011 00000000 SECT8  notype       Static       | .text$mn\n    Section length   EA, #relocs    3, #linenums    0, checksum 3120E8C2, selection    1 (pick no duplicates)\n013 00000000 SECT9  notype       Static       | .text$mn\n    Section length   F1, #relocs    3, #linenums    0, checksum 38F9799C, selection    1 (pick no duplicates)\n015 00000000 SECTA  notype       Static       | .text$mn\n    Section length  103, #relocs    2, #linenums    0, checksum 41939CBA, selection    1 (pick no duplicates)\n017 00000",
+      "stdoutSha256": "d77b5896c2b27577f68c975de66b9e5f85d9df74a3036b01fdb7bdb81b5e8a61"
+    },
+    {
+      "command": [
+        "cl",
+        "/nologo",
+        "/W4",
+        "/WX",
+        "/std:c11",
+        "/experimental:c11atomics",
+        "/O2",
+        "/MT",
+        "/DNEOCLR_NATIVE_GC",
+        "/DNEOCLR_NATIVE_BYTE_ARRAY_LIMIT=65536",
+        "/DNEOCLR_HTTP_HOST",
+        "/ID:\\a\\neoCLR\\neoCLR\\docs\\experiments\\aot-console",
+        "/c",
+        "D:\\a\\neoCLR\\neoCLR\\docs\\experiments\\aot-console\\console.c",
+        "/FoD:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\http\\helper-7.obj"
+      ],
+      "exitCode": 0,
+      "stderr": "",
+      "stdout": "console.c\n"
+    },
+    {
+      "command": [
+        "dumpbin",
+        "/symbols",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\http\\helper-7.obj"
+      ],
+      "exitCode": 0,
+      "stderr": "",
+      "stdoutPrefix": "Microsoft (R) COFF/PE Dumper Version 14.44.35229.0\nCopyright (C) Microsoft Corporation.  All rights reserved.\n\n\nDump of file D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\http\\helper-7.obj\n\nFile Type: COFF OBJECT\n\nCOFF SYMBOL TABLE\n000 0104899D ABS    notype       Static       | @comp.id\n001 80010190 ABS    notype       Static       | @feat.00\n002 00000003 ABS    notype       Static       | @vol.md\n003 00000000 SECT1  notype       Static       | .drectve\n    Section length   2F, #relocs    0, #linenums    0, checksum        0\n005 00000000 SECT2  notype       Static       | .debug$S\n    Section length   94, #relocs    0, #linenums    0, checksum        0\n007 00000000 SECT3  notype       Static       | .text$mn\n    Section length   27, #relocs    2, #linenums    0, checksum 7FD12123, selection    1 (pick no duplicates)\n009 00000000 SECT4  notype       Static       | .text$mn\n    Section length   45, #relocs    4, #linenums    0, checksum 83918549, selection    1 (pick no duplicates)\n00B 00000000 SECT5  notype       Static       | .text$mn\n    Section length  160, #relocs    6, #linenums    0, checksum A6CA6C05, selection    1 (pick no duplicates)\n00D 00000000 SECT4  notype ()    External     | neoclr_console_read_byte_v1\n00E 00000000 SECT5  notype ()    External     | neoclr_console_write_bytes_v1\n00F 00000000 SECT3  notype ()    External     | neoclr_console_flush_v1\n010 00000000 UNDEF  notype ()    External     | __acrt_iob_func\n011 00000000 UNDEF  notype ()    External     | ferror\n012 00000000 UNDEF  notype ()    External     | fflush\n013 00000000 UNDEF  notype ()    External     | fgetc\n014 00000000 UNDEF  notype ()    External     | fwrite\n015 00000000 SECT4  notype       Label        | $LN5\n016 00000000 SECT5  notype       Label        | $LN47\n017 00000000 SECT3  notype       Label        | $LN6\n018 00000000 SECT6  notype       Static       | .xdata\n    Section length    8, #relocs    0, #linenums    0, checksum  FC539D1, selection    5 (pick associative Sec",
+      "stdoutSha256": "a19801b20731ceb31460051160319c1804217955ec6a13408c474f924ffe53e3"
+    },
+    {
+      "command": [
+        "cl",
+        "/nologo",
+        "/W4",
+        "/WX",
+        "/std:c11",
+        "/experimental:c11atomics",
+        "/O2",
+        "/MT",
+        "/DNEOCLR_NATIVE_GC",
+        "/DNEOCLR_NATIVE_BYTE_ARRAY_LIMIT=65536",
+        "/DNEOCLR_HTTP_HOST",
+        "/ID:\\a\\neoCLR\\neoCLR\\docs\\experiments\\aot-console",
+        "/c",
+        "D:\\a\\neoCLR\\neoCLR\\docs\\experiments\\aot-fault-details\\render.c",
+        "/FoD:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\http\\helper-8.obj"
+      ],
+      "exitCode": 0,
+      "stderr": "",
+      "stdout": "render.c\n"
+    },
+    {
+      "command": [
+        "dumpbin",
+        "/symbols",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\http\\helper-8.obj"
+      ],
+      "exitCode": 0,
+      "stderr": "",
+      "stdoutPrefix": "Microsoft (R) COFF/PE Dumper Version 14.44.35229.0\nCopyright (C) Microsoft Corporation.  All rights reserved.\n\n\nDump of file D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\http\\helper-8.obj\n\nFile Type: COFF OBJECT\n\nCOFF SYMBOL TABLE\n000 0104899D ABS    notype       Static       | @comp.id\n001 80010190 ABS    notype       Static       | @feat.00\n002 00000003 ABS    notype       Static       | @vol.md\n003 00000000 SECT1  notype       Static       | .drectve\n    Section length   2F, #relocs    0, #linenums    0, checksum        0\n005 00000000 SECT2  notype       Static       | .debug$S\n    Section length   94, #relocs    0, #linenums    0, checksum        0\n007 00000000 SECT3  notype       Static       | .text$mn\n    Section length    8, #relocs    1, #linenums    0, checksum 411950D3, selection    2 (pick any)\n009 00000000 SECT4  notype       Static       | .text$mn\n    Section length   50, #relocs    2, #linenums    0, checksum 6C5752F9, selection    2 (pick any)\n00B 00000000 SECT5  notype       Static       | .text$mn\n    Section length   44, #relocs    2, #linenums    0, checksum 843E50CB, selection    2 (pick any)\n00D 00000000 SECT6  notype       Static       | .text$mn\n    Section length  1A0, #relocs   18, #linenums    0, checksum BB222A59, selection    1 (pick no duplicates)\n00F 00000000 SECT7  notype       Static       | .text$mn\n    Section length   1A, #relocs    1, #linenums    0, checksum E53B740B, selection    1 (pick no duplicates)\n011 00000000 SECT3  notype ()    External     | __local_stdio_printf_options\n012 00000000 UNDEF  notype ()    External     | ferror\n013 00000000 UNDEF  notype ()    External     | fputc\n014 00000000 UNDEF  notype ()    External     | fputs\n015 00000000 UNDEF  notype ()    External     | fwrite\n016 00000000 UNDEF  notype ()    External     | __stdio_common_vfprintf\n017 00000000 SECT4  notype ()    External     | _vfprintf_l\n018 00000000 SECT5  notype ()    External     | fprintf\n019 00000000 SECT6  notype ()    External     |",
+      "stdoutSha256": "06e164a426511b31ab3454d87efad221b847106c9e85640188eeb2022798e087"
+    },
+    {
+      "command": [
+        "cl",
+        "/nologo",
+        "/W4",
+        "/WX",
+        "/std:c11",
+        "/experimental:c11atomics",
+        "/O2",
+        "/MT",
+        "/DNEOCLR_NATIVE_GC",
+        "/DNEOCLR_NATIVE_BYTE_ARRAY_LIMIT=65536",
+        "/DNEOCLR_HTTP_HOST",
+        "/ID:\\a\\neoCLR\\neoCLR\\docs\\experiments\\aot-console",
+        "/c",
+        "D:\\a\\neoCLR\\neoCLR\\docs\\experiments\\jit-managed\\host.c",
+        "/FoD:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\http\\helper-9.obj"
+      ],
+      "exitCode": 0,
+      "stderr": "",
+      "stdout": "host.c\n"
+    },
+    {
+      "command": [
+        "dumpbin",
+        "/symbols",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\http\\helper-9.obj"
+      ],
+      "exitCode": 0,
+      "stderr": "",
+      "stdoutPrefix": "Microsoft (R) COFF/PE Dumper Version 14.44.35229.0\nCopyright (C) Microsoft Corporation.  All rights reserved.\n\n\nDump of file D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\http\\helper-9.obj\n\nFile Type: COFF OBJECT\n\nCOFF SYMBOL TABLE\n000 0104899D ABS    notype       Static       | @comp.id\n001 80010190 ABS    notype       Static       | @feat.00\n002 00000003 ABS    notype       Static       | @vol.md\n003 00000000 SECT1  notype       Static       | .drectve\n    Section length   2F, #relocs    0, #linenums    0, checksum        0\n005 00000000 SECT2  notype       Static       | .debug$S\n    Section length   94, #relocs    0, #linenums    0, checksum        0\n007 00000000 SECT3  notype       Static       | .text$mn\n    Section length  10B, #relocs    B, #linenums    0, checksum E28E91A9, selection    1 (pick no duplicates)\n009 00000000 SECT4  notype       Static       | .text$mn\n    Section length    C, #relocs    1, #linenums    0, checksum B2C88C13, selection    2 (pick any)\n00B 00000000 SECT5  notype       Static       | .text$mn\n    Section length  42A, #relocs    2, #linenums    0, checksum E5B47D24, selection    1 (pick no duplicates)\n00D 00000000 SECT6  notype       Static       | .text$mn\n    Section length  212, #relocs   13, #linenums    0, checksum EB1ED96A, selection    1 (pick no duplicates)\n00F 00000000 UNDEF  notype ()    External     | __acrt_iob_func\n010 00000000 UNDEF  notype ()    External     | fflush\n011 00000000 UNDEF  notype ()    External     | _fileno\n012 00000000 UNDEF  notype ()    External     | neoclr_aot_render_fault\n013 00000000 UNDEF  notype ()    External     | neoclr_root_probe_head_v1\n014 00000000 UNDEF  notype ()    External     | neoclr_gc_owned_roots_check_v1\n015 00000000 UNDEF  notype ()    External     | neoclr_gc_collect_v1\n016 00000000 UNDEF  notype ()    External     | neoclr_task_scope_enter_v1\n017 00000000 UNDEF  notype ()    External     | neoclr_task_scope_leave_v1\n018 00000000 UNDEF  notype       External     | __imp_Slee",
+      "stdoutSha256": "715d5ba9568c859c459913decbad9c633df7c6c15575c7abc849192180aee8b8"
+    },
+    {
+      "command": [
+        "cl",
+        "/nologo",
+        "/W4",
+        "/WX",
+        "/std:c11",
+        "/experimental:c11atomics",
+        "/O2",
+        "/MT",
+        "/DNEOCLR_NATIVE_GC",
+        "/DNEOCLR_NATIVE_BYTE_ARRAY_LIMIT=65536",
+        "/DNEOCLR_HTTP_HOST",
+        "/ID:\\a\\neoCLR\\neoCLR\\docs\\experiments\\aot-console",
+        "/c",
+        "D:\\a\\neoCLR\\neoCLR\\docs\\experiments\\aot-console\\task-queue.c",
+        "/FoD:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\http\\helper-10.obj"
+      ],
+      "exitCode": 0,
+      "stderr": "",
+      "stdout": "task-queue.c\n"
+    },
+    {
+      "command": [
+        "dumpbin",
+        "/symbols",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\http\\helper-10.obj"
+      ],
+      "exitCode": 0,
+      "stderr": "",
+      "stdoutPrefix": "Microsoft (R) COFF/PE Dumper Version 14.44.35229.0\nCopyright (C) Microsoft Corporation.  All rights reserved.\n\n\nDump of file D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\http\\helper-10.obj\n\nFile Type: COFF OBJECT\n\nCOFF SYMBOL TABLE\n000 0104899D ABS    notype       Static       | @comp.id\n001 80010190 ABS    notype       Static       | @feat.00\n002 00000003 ABS    notype       Static       | @vol.md\n003 00000000 SECT1  notype       Static       | .drectve\n    Section length   2F, #relocs    0, #linenums    0, checksum        0\n005 00000000 SECT2  notype       Static       | .debug$S\n    Section length   94, #relocs    0, #linenums    0, checksum        0\n007 00000000 SECT3  notype       Static       | .text$mn\n    Section length   3F, #relocs    1, #linenums    0, checksum BA910CB9, selection    1 (pick no duplicates)\n009 00000000 SECT4  notype       Static       | .text$mn\n    Section length   33, #relocs    2, #linenums    0, checksum 3E3D407A, selection    1 (pick no duplicates)\n00B 00000000 SECT5  notype       Static       | .text$mn\n    Section length   A7, #relocs    4, #linenums    0, checksum 93926951, selection    1 (pick no duplicates)\n00D 00000000 SECT6  notype       Static       | .text$mn\n    Section length  165, #relocs    7, #linenums    0, checksum 9B8F24D2, selection    1 (pick no duplicates)\n00F 00000000 SECT7  notype       Static       | .text$mn\n    Section length   3B, #relocs    2, #linenums    0, checksum F709917A, selection    1 (pick no duplicates)\n011 00000000 SECT8  notype       Static       | .text$mn\n    Section length   C4, #relocs    3, #linenums    0, checksum  C1FC91C, selection    1 (pick no duplicates)\n013 00000000 SECT9  notype       Static       | .text$mn\n    Section length  12E, #relocs    5, #linenums    0, checksum 269ACBD7, selection    1 (pick no duplicates)\n015 00000000 SECTA  notype       Static       | .text$mn\n    Section length   5A, #relocs    3, #linenums    0, checksum 5C94D553, selection    1 (pick no duplicates",
+      "stdoutSha256": "06f8b5283e0816da30f75f6ebf050d5ac1d7175e346f26a49f75c69950a2937f"
+    },
+    {
+      "command": [
+        "cl",
+        "/nologo",
+        "/W4",
+        "/WX",
+        "/std:c11",
+        "/experimental:c11atomics",
+        "/O2",
+        "/MT",
+        "/DNEOCLR_NATIVE_GC",
+        "/DNEOCLR_NATIVE_BYTE_ARRAY_LIMIT=65536",
+        "/DNEOCLR_HTTP_HOST",
+        "/ID:\\a\\neoCLR\\neoCLR\\docs\\experiments\\aot-console",
+        "/c",
+        "D:\\a\\neoCLR\\neoCLR\\docs\\experiments\\aot-console\\socket-listener.c",
+        "/FoD:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\http\\helper-11.obj"
+      ],
+      "exitCode": 0,
+      "stderr": "",
+      "stdout": "socket-listener.c\n"
+    },
+    {
+      "command": [
+        "dumpbin",
+        "/symbols",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\http\\helper-11.obj"
+      ],
+      "exitCode": 0,
+      "stderr": "",
+      "stdoutPrefix": "Microsoft (R) COFF/PE Dumper Version 14.44.35229.0\nCopyright (C) Microsoft Corporation.  All rights reserved.\n\n\nDump of file D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\http\\helper-11.obj\n\nFile Type: COFF OBJECT\n\nCOFF SYMBOL TABLE\n000 0104899D ABS    notype       Static       | @comp.id\n001 80010190 ABS    notype       Static       | @feat.00\n002 00000003 ABS    notype       Static       | @vol.md\n003 00000000 SECT1  notype       Static       | .drectve\n    Section length   2F, #relocs    0, #linenums    0, checksum        0\n005 00000000 SECT2  notype       Static       | .debug$S\n    Section length   94, #relocs    0, #linenums    0, checksum        0\n007 00000000 SECT3  notype       Static       | .text$mn\n    Section length   11, #relocs    0, #linenums    0, checksum A74A1BD0, selection    2 (pick any)\n009 00000000 SECT4  notype       Static       | .text$mn\n    Section length   13, #relocs    0, #linenums    0, checksum 7EFD76A1, selection    2 (pick any)\n00B 00000000 SECT5  notype       Static       | .text$mn\n    Section length    9, #relocs    0, #linenums    0, checksum DA736FBD, selection    2 (pick any)\n00D 00000000 SECT6  notype       Static       | .text$mn\n    Section length   13, #relocs    0, #linenums    0, checksum 6B3C1CC7, selection    2 (pick any)\n00F 00000000 SECT7  notype       Static       | .text$mn\n    Section length   14, #relocs    0, #linenums    0, checksum C31F6A63, selection    2 (pick any)\n011 00000000 SECT8  notype       Static       | .text$mn\n    Section length   40, #relocs    8, #linenums    0, checksum   493564, selection    2 (pick any)\n013 00000000 SECT9  notype       Static       | .text$mn\n    Section length    3, #relocs    0, #linenums    0, checksum 922B422E, selection    2 (pick any)\n015 00000000 SECTA  notype       Static       | .text$mn\n    Section length    8, #relocs    1, #linenums    0, checksum 411950D3, selection    2 (pick any)\n017 00000000 SECTB  notype       Static       | .text$mn\n    Section length   ",
+      "stdoutSha256": "4a32e8ad51152697ce25e6714613fc566fe192f482273ad516ff190ac7c0abd7"
+    },
+    {
+      "command": [
+        "cl",
+        "/nologo",
+        "/W4",
+        "/WX",
+        "/std:c11",
+        "/experimental:c11atomics",
+        "/O2",
+        "/MT",
+        "/DNEOCLR_NATIVE_GC",
+        "/DNEOCLR_NATIVE_BYTE_ARRAY_LIMIT=65536",
+        "/DNEOCLR_HTTP_HOST",
+        "/ID:\\a\\neoCLR\\neoCLR\\docs\\experiments\\aot-console",
+        "/c",
+        "D:\\a\\neoCLR\\neoCLR\\tools\\native\\entry-arguments.c",
+        "/FoD:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\http\\helper-12.obj"
+      ],
+      "exitCode": 0,
+      "stderr": "",
+      "stdout": "entry-arguments.c\n"
+    },
+    {
+      "command": [
+        "dumpbin",
+        "/symbols",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\http\\helper-12.obj"
+      ],
+      "exitCode": 0,
+      "stderr": "",
+      "stdout": "Microsoft (R) COFF/PE Dumper Version 14.44.35229.0\nCopyright (C) Microsoft Corporation.  All rights reserved.\n\n\nDump of file D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\http\\helper-12.obj\n\nFile Type: COFF OBJECT\n\nCOFF SYMBOL TABLE\n000 0104899D ABS    notype       Static       | @comp.id\n001 80010190 ABS    notype       Static       | @feat.00\n002 00000003 ABS    notype       Static       | @vol.md\n003 00000000 SECT1  notype       Static       | .drectve\n    Section length   69, #relocs    0, #linenums    0, checksum        0\n005 00000000 SECT2  notype       Static       | .debug$S\n    Section length   94, #relocs    0, #linenums    0, checksum        0\n007 00000000 SECT3  notype       Static       | .bss\n    Section length    4, #relocs    0, #linenums    0, checksum        0, selection    2 (pick any)\n009 00000000 SECT3  notype       External     | _Avx2WmemEnabledWeakValue\n00A 00000000 SECT4  notype       Static       | .text$mn\n    Section length  1C7, #relocs    7, #linenums    0, checksum B3463D22, selection    1 (pick no duplicates)\n00C 00000000 UNDEF  notype ()    External     | neoclr_text_decode_utf8_bytes_v1\n00D 00000000 UNDEF  notype ()    External     | neoclr_allocate_strings_v1\n00E 00000000 UNDEF  notype ()    External     | free\n00F 00000000 UNDEF  notype ()    External     | malloc\n010 00000000 SECT4  notype ()    External     | neoclr_process_arguments_v1\n011 00000000 UNDEF  notype       External     | __imp_WideCharToMultiByte\n012 00000000 SECT4  notype       Label        | $LN42\n013 00000000 SECT5  notype       Static       | .xdata\n    Section length   1C, #relocs    0, #linenums    0, checksum 212E4BE2, selection    5 (pick associative Section 0x4)\n015 00000000 SECT5  notype       Static       | $unwind$neoclr_process_arguments_v1\n016 00000000 SECT6  notype       Static       | .pdata\n    Section length    C, #relocs    3, #linenums    0, checksum D614459A, selection    5 (pick associative Section 0x4)\n018 00000000 SECT6  notype       Static       | $pdata$neoclr_process_arguments_v1\n019 00000000 SECT7  notype       Static       | .chks64\n    Section length   38, #relocs    0, #linenums    0, checksum        0\n\nString Table Size = 0xD7 bytes\n\n  Summary\n\n           4 .bss\n          38 .chks64\n          94 .debug$S\n          69 .drectve\n           C .pdata\n         1C7 .text$mn\n          1C .xdata\n"
+    },
+    {
+      "command": [
+        "cl",
+        "/nologo",
+        "/W4",
+        "/WX",
+        "/std:c11",
+        "/experimental:c11atomics",
+        "/O2",
+        "/MT",
+        "/DNEOCLR_NATIVE_GC",
+        "/DNEOCLR_NATIVE_BYTE_ARRAY_LIMIT=65536",
+        "/DNEOCLR_HTTP_HOST",
+        "/ID:\\a\\neoCLR\\neoCLR\\docs\\experiments\\aot-console",
+        "/c",
+        "D:\\a\\neoCLR\\neoCLR\\docs\\experiments\\aot-console\\string-unicode.c",
+        "/FoD:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\http\\helper-13.obj"
+      ],
+      "exitCode": 0,
+      "stderr": "",
+      "stdout": "string-unicode.c\n"
+    },
+    {
+      "command": [
+        "dumpbin",
+        "/symbols",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\http\\helper-13.obj"
+      ],
+      "exitCode": 0,
+      "stderr": "",
+      "stdoutPrefix": "Microsoft (R) COFF/PE Dumper Version 14.44.35229.0\nCopyright (C) Microsoft Corporation.  All rights reserved.\n\n\nDump of file D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\http\\helper-13.obj\n\nFile Type: COFF OBJECT\n\nCOFF SYMBOL TABLE\n000 0104899D ABS    notype       Static       | @comp.id\n001 80010190 ABS    notype       Static       | @feat.00\n002 00000003 ABS    notype       Static       | @vol.md\n003 00000000 SECT1  notype       Static       | .drectve\n    Section length   2F, #relocs    0, #linenums    0, checksum        0\n005 00000000 SECT2  notype       Static       | .debug$S\n    Section length   94, #relocs    0, #linenums    0, checksum        0\n007 00000000 SECT3  notype       Static       | .text$mn\n    Section length   E2, #relocs    3, #linenums    0, checksum 371C81D6, selection    1 (pick no duplicates)\n009 00000000 SECT4  notype       Static       | .text$mn\n    Section length   1A, #relocs    0, #linenums    0, checksum 91AF9FC9, selection    1 (pick no duplicates)\n00B 00000000 SECT5  notype       Static       | .text$mn\n    Section length   21, #relocs    0, #linenums    0, checksum A4C565FF, selection    1 (pick no duplicates)\n00D 00000000 SECT6  notype       Static       | .text$mn\n    Section length   40, #relocs    1, #linenums    0, checksum 5DC18E20, selection    1 (pick no duplicates)\n00F 00000000 SECT7  notype       Static       | .text$mn\n    Section length  15A, #relocs    3, #linenums    0, checksum 1CAADDFF, selection    1 (pick no duplicates)\n011 00000000 SECT8  notype       Static       | .text$mn\n    Section length   EF, #relocs    6, #linenums    0, checksum 540EA635, selection    1 (pick no duplicates)\n013 00000000 SECT9  notype       Static       | .text$mn\n    Section length   5A, #relocs    2, #linenums    0, checksum E8F1E9E6, selection    1 (pick no duplicates)\n015 00000000 SECTA  notype       Static       | .text$mn\n    Section length  11A, #relocs    5, #linenums    0, checksum 446D3A4F, selection    1 (pick no duplicates",
+      "stdoutSha256": "708800ff8d86f439b1e43e37a801e0c5096d42b777aa2511fe75bb644d40e1c9"
+    },
+    {
+      "command": [
+        "dumpbin",
+        "/symbols",
+        "D:\\a\\neoCLR\\neoCLR\\tools\\aot-native-text\\target\\text-only\\x86_64-pc-windows-msvc\\release\\neoclr_aot_native_text.lib"
+      ],
+      "exitCode": 0,
+      "stderr": "",
+      "stdoutPrefix": "Microsoft (R) COFF/PE Dumper Version 14.44.35229.0\nCopyright (C) Microsoft Corporation.  All rights reserved.\n\n\nDump of file D:\\a\\neoCLR\\neoCLR\\tools\\aot-native-text\\target\\text-only\\x86_64-pc-windows-msvc\\release\\neoclr_aot_native_text.lib\n\nFile Type: LIBRARY\n\nCOFF SYMBOL TABLE\n000 00000000 SECT1  notype       Static       | .text\n    Section length    0, #relocs    0, #linenums    0, checksum        0\n002 00000000 SECT2  notype       Static       | .data\n    Section length    0, #relocs    0, #linenums    0, checksum        0\n004 00000000 SECT3  notype       Static       | .bss\n    Section length    0, #relocs    0, #linenums    0, checksum        0\n006 00000000 SECT4  notype       Static       | .text$unlikely\n    Section length    B, #relocs    1, #linenums    0, checksum B72D6C83, selection    1 (pick no duplicates)\n008 00000000 SECT4  notype ()    Static       | _RNvCsdtSMxSA38aw_7___rustc17rust_begin_unwind\n009 00000000 SECTC0B notype       Static      | .xdata\n    Section length    8, #relocs    0, #linenums    0, checksum  FC539D1, selection    5 (pick associative Section 0x4)\n00B 00000000 SECT5  notype       Static       | .rdata\n    Section length    8, #relocs    0, #linenums    0, checksum D4068D10, selection    2 (pick any)\n00D 00000000 SECT5  notype       External     | __real@7ff0000000000000\n00E 00000000 SECT6  notype       Static       | .rdata\n    Section length    8, #relocs    0, #linenums    0, checksum 39BE0E30, selection    2 (pick any)\n010 00000000 SECT6  notype       External     | __real@fff0000000000000\n011 00000000 SECT7  notype       Static       | .rdata\n    Section length    8, #relocs    0, #linenums    0, checksum 1CDF0718, selection    2 (pick any)\n013 00000000 SECT7  notype       External     | __real@7ff8000000000000\n014 00000000 SECT8  notype       Static       | .text\n    Section length  738, #relocs   16, #linenums    0, checksum 6515F3FC, selection    1 (pick no duplicates)\n016 00000000 SECT8  notype ()    Static       | _RNv",
+      "stdoutSha256": "6eefc56e2a7c3dc290660c3c85b90544da6194cf161806cf8a80b7b1aadcbfb4"
+    },
+    {
+      "command": [
+        "link",
+        "/NOLOGO",
+        "/DLL",
+        "/OUT:D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\http\\host.dll",
+        "/DEF:D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\http\\host.def",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\http\\helper-0.obj",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\http\\helper-1.obj",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\http\\helper-2.obj",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\http\\helper-3.obj",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\http\\helper-4.obj",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\http\\helper-5.obj",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\http\\helper-6.obj",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\http\\helper-7.obj",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\http\\helper-8.obj",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\http\\helper-9.obj",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\http\\helper-10.obj",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\http\\helper-11.obj",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\http\\helper-12.obj",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\http\\helper-13.obj",
+        "D:\\a\\neoCLR\\neoCLR\\tools\\aot-native-text\\target\\text-only\\x86_64-pc-windows-msvc\\release\\neoclr_aot_native_text.lib",
+        "Ws2_32.lib"
+      ],
+      "exitCode": 0,
+      "stderr": "",
+      "stdout": "   Creating library D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\http\\host.lib and object D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\http\\host.exp\n"
+    },
+    {
+      "command": [
+        "dotnet",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\development\\bundle\\sdk\\tools\\rvnc\\rvnc.dll",
+        "neoclr",
+        "--core-reference",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\development\\bundle\\lib\\Core.dll",
+        "--runtime-seed",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\development\\bundle\\lib\\System.runtime.neox",
+        "--bootstrap-intrinsics",
+        "--bootstrap-ownership",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\development\\bundle\\lib\\ownership.json",
+        "--object-library",
+        "System.Runtime",
+        "--async-library",
+        "System.Runtime",
+        "--reference",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\development\\bundle\\lib\\System.Runtime.dll",
+        "--reference",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\development\\bundle\\lib\\System.Data.dll",
+        "--reference",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\development\\bundle\\lib\\System.Networking.dll",
+        "--reference",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\development\\bundle\\lib\\System.Web.dll",
+        "-o",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\http\\server\\app.dll",
+        "D:\\a\\neoCLR\\neoCLR\\docs\\experiments\\http-server\\Server.rvn"
+      ],
+      "exitCode": 0,
+      "stderr": "warning RAV0162: Unreachable code\n",
+      "stdout": ""
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\tools\\aot-poc\\target\\release\\neoclr-aot-poc.exe",
+        "--closed-world",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\http\\server\\app.dll",
+        "@entry",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\http\\server\\app.obj",
+        "--system",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\development\\bundle\\lib\\System.runtime.neox",
+        "--module",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\development\\bundle\\lib\\System.Runtime.dll",
+        "--module",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\development\\bundle\\lib\\System.Data.dll",
+        "--module",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\development\\bundle\\lib\\System.Networking.dll",
+        "--module",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\development\\bundle\\lib\\System.Web.dll",
+        "--object-root",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\development\\bundle\\lib\\System.Runtime.dll",
+        "--compile-system",
+        "--bind-user-fault",
+        "--reference-arena",
+        "--native-gc",
+        "--bind-console-read-byte",
+        "--bind-console-write-line",
+        "--bind-console-stream-output",
+        "--bind-int32-to-string",
+        "--bind-utf8-text",
+        "--native-stack-budget",
+        "--bind-integer-text",
+        "--bind-character-text",
+        "--bind-system-culture",
+        "--bind-time-zone-rules",
+        "--bind-task-queue",
+        "--bind-timers",
+        "--bind-socket-listener",
+        "--bind-socket-accept",
+        "--bind-socket-transfer",
+        "--bind-socket-client",
+        "--target",
+        "x86_64-pc-windows-msvc",
+        "--windows-http-experiment"
+      ],
+      "exitCode": 0,
+      "stderr": "",
+      "stdoutPrefix": "{\n  \"arrayBackingProjection\": {\n    \"compiledIndex\": 189,\n    \"definition\": {\n      \"index\": 253,\n      \"module\": \"NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17\",\n      \"revision\": \"1.0.0.0\"\n    },\n    \"policy\": \"verified nominal byte-array backing; identity-preserving views and intrinsic storage field\",\n    \"sourceIndex\": 542,\n    \"sourceName\": \"NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D_41727261796031\"\n  },\n  \"boxedInt32Display\": false,\n  \"classVirtualDispatch\": [],\n  \"entryArguments\": false,\n  \"excludedFunctions\": [\n    {\n      \"definition\": {\n        \"index\": 8,\n        \"module\": \"NeoMetadata_D62F03B6673A35DACAF8DEE1F6658E2E40833FFFEF1D133192FF4DE2000C9474\",\n        \"revision\": \"1.0.0.0\"\n      },\n      \"name\": \"NeoMetadata_D62F03B6673A35DACAF8DEE1F6658E2E40833FFFEF1D133192FF4DE2000C9474.T__3C3E635F5F4173796E6353746174654D616368696E6530.M_53657453746174654D616368696E65\",\n      \"sourceIndex\": 8\n    },\n    {\n      \"definition\": {\n        \"index\": 11,\n        \"module\": \"NeoMetadata_D62F03B6673A35DACAF8DEE1F6658E2E40833FFFEF1D133192FF4DE2000C9474\",\n        \"revision\": \"1.0.0.0\"\n      },\n      \"name\": \"NeoMetadata_D62F03B6673A35DACAF8DEE1F6658E2E40833FFFEF1D133192FF4DE2000C9474.T__3C3E635F5F4173796E6353746174654D616368696E6531.M_53657453746174654D616368696E65\",\n      \"sourceIndex\": 11\n    },\n    {\n      \"definition\": {\n        \"index\": 0,\n        \"module\": \"NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17\",\n        \"revision\": \"1.0.0.0\"\n      },\n      \"name\": \"neoCLR.Runtime.TimeZoneDatabaseVersion\",\n      \"sourceIndex\": 14\n    },\n    {\n      \"definition\": {\n        \"index\": 1,\n        \"module\": \"NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17\",\n        \"revision\": \"1.0.0.0\"\n      },\n      \"name\": \"neoCLR.Runtime.SystemTimeZoneName\",\n      \"sourceIndex\": 15\n    },\n    {\n      \"definition\": {\n        \"index\": 2,\n        \"module\": \"Neo",
+      "stdoutSha256": "388768e90f00bea5e653ad0294474874811fbf3e5ab97d1f3e6253fed0b8e74e"
+    },
+    {
+      "command": [
+        "cl",
+        "/nologo",
+        "/W4",
+        "/WX",
+        "/std:c11",
+        "/experimental:c11atomics",
+        "/O2",
+        "/MT",
+        "/DNEOCLR_NATIVE_GC",
+        "/DNEOCLR_NATIVE_BYTE_ARRAY_LIMIT=65536",
+        "/DNEOCLR_HTTP_HOST",
+        "/ID:\\a\\neoCLR\\neoCLR\\docs\\experiments\\aot-console",
+        "/FoD:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\http\\server/",
+        "/Fe:D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\http\\server\\app.exe",
+        "D:\\a\\neoCLR\\neoCLR\\tools\\native\\windows-console-host.c",
+        "D:\\a\\neoCLR\\neoCLR\\tools\\native\\windows-gc-host.c",
+        "D:\\a\\neoCLR\\neoCLR\\tools\\native\\windows-host-memory.c",
+        "D:\\a\\neoCLR\\neoCLR\\tools\\native\\windows-native-stack.c",
+        "D:\\a\\neoCLR\\neoCLR\\docs\\experiments\\aot-console\\root-probe.c",
+        "D:\\a\\neoCLR\\neoCLR\\docs\\experiments\\aot-console\\native-gc.c",
+        "D:\\a\\neoCLR\\neoCLR\\docs\\experiments\\aot-console\\text-arena.c",
+        "D:\\a\\neoCLR\\neoCLR\\docs\\experiments\\aot-console\\console.c",
+        "D:\\a\\neoCLR\\neoCLR\\docs\\experiments\\aot-fault-details\\render.c",
+        "D:\\a\\neoCLR\\neoCLR\\docs\\experiments\\jit-managed\\host.c",
+        "D:\\a\\neoCLR\\neoCLR\\docs\\experiments\\aot-console\\task-queue.c",
+        "D:\\a\\neoCLR\\neoCLR\\docs\\experiments\\aot-console\\socket-listener.c",
+        "D:\\a\\neoCLR\\neoCLR\\tools\\native\\entry-arguments.c",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\http\\server\\app.obj",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\http\\server\\main.c",
+        "D:\\a\\neoCLR\\neoCLR\\docs\\experiments\\aot-console\\string-unicode.c",
+        "D:\\a\\neoCLR\\neoCLR\\tools\\aot-native-text\\target\\text-only\\x86_64-pc-windows-msvc\\release\\neoclr_aot_native_text.lib",
+        "/link",
+        "/STACK:1048576",
+        "Ws2_32.lib"
+      ],
+      "exitCode": 0,
+      "stderr": "",
+      "stdout": "windows-console-host.c\nwindows-gc-host.c\nwindows-host-memory.c\nwindows-native-stack.c\nroot-probe.c\nnative-gc.c\ntext-arena.c\nconsole.c\nrender.c\nhost.c\ntask-queue.c\nsocket-listener.c\nentry-arguments.c\nmain.c\nstring-unicode.c\nGenerating Code...\n"
+    },
+    {
+      "command": [
+        "dotnet",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\development\\bundle\\sdk\\tools\\rvnc\\rvnc.dll",
+        "neoclr",
+        "--core-reference",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\development\\bundle\\lib\\Core.dll",
+        "--runtime-seed",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\development\\bundle\\lib\\System.runtime.neox",
+        "--bootstrap-intrinsics",
+        "--bootstrap-ownership",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\development\\bundle\\lib\\ownership.json",
+        "--object-library",
+        "System.Runtime",
+        "--async-library",
+        "System.Runtime",
+        "--reference",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\development\\bundle\\lib\\System.Runtime.dll",
+        "--reference",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\development\\bundle\\lib\\System.Data.dll",
+        "--reference",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\development\\bundle\\lib\\System.Networking.dll",
+        "--reference",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\development\\bundle\\lib\\System.Web.dll",
+        "-o",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\http\\client\\app.dll",
+        "D:\\a\\neoCLR\\neoCLR\\docs\\experiments\\jit-http\\Client.rvn"
+      ],
+      "exitCode": 0,
+      "stderr": "",
+      "stdout": ""
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\tools\\aot-poc\\target\\release\\neoclr-aot-poc.exe",
+        "--closed-world",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\http\\client\\app.dll",
+        "@entry",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\http\\client\\app.obj",
+        "--system",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\development\\bundle\\lib\\System.runtime.neox",
+        "--module",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\development\\bundle\\lib\\System.Runtime.dll",
+        "--module",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\development\\bundle\\lib\\System.Data.dll",
+        "--module",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\development\\bundle\\lib\\System.Networking.dll",
+        "--module",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\development\\bundle\\lib\\System.Web.dll",
+        "--object-root",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\development\\bundle\\lib\\System.Runtime.dll",
+        "--compile-system",
+        "--bind-user-fault",
+        "--reference-arena",
+        "--native-gc",
+        "--bind-console-read-byte",
+        "--bind-console-write-line",
+        "--bind-console-stream-output",
+        "--bind-int32-to-string",
+        "--bind-utf8-text",
+        "--native-stack-budget",
+        "--bind-integer-text",
+        "--bind-character-text",
+        "--bind-system-culture",
+        "--bind-time-zone-rules",
+        "--bind-task-queue",
+        "--bind-timers",
+        "--bind-socket-listener",
+        "--bind-socket-accept",
+        "--bind-socket-transfer",
+        "--bind-socket-client",
+        "--target",
+        "x86_64-pc-windows-msvc",
+        "--windows-http-experiment"
+      ],
+      "exitCode": 0,
+      "stderr": "",
+      "stdoutPrefix": "{\n  \"arrayBackingProjection\": {\n    \"compiledIndex\": 211,\n    \"definition\": {\n      \"index\": 253,\n      \"module\": \"NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17\",\n      \"revision\": \"1.0.0.0\"\n    },\n    \"policy\": \"verified nominal byte-array backing; identity-preserving views and intrinsic storage field\",\n    \"sourceIndex\": 548,\n    \"sourceName\": \"NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D_41727261796031\"\n  },\n  \"boxedInt32Display\": false,\n  \"classVirtualDispatch\": [\n    {\n      \"contractCompiledIndex\": 344,\n      \"contractSourceIndex\": 2684,\n      \"kind\": \"Send\",\n      \"targets\": [\n        {\n          \"functionCompiledIndex\": 381,\n          \"typeCompiledIndex\": 129\n        }\n      ],\n      \"thunkCompiledIndex\": 749\n    },\n    {\n      \"contractCompiledIndex\": 345,\n      \"contractSourceIndex\": 2685,\n      \"kind\": \"Dispose\",\n      \"targets\": [\n        {\n          \"functionCompiledIndex\": 380,\n          \"typeCompiledIndex\": 129\n        }\n      ],\n      \"thunkCompiledIndex\": 750\n    },\n    {\n      \"contractCompiledIndex\": 380,\n      \"contractSourceIndex\": 2789,\n      \"kind\": \"Dispose\",\n      \"targets\": [\n        {\n          \"functionCompiledIndex\": 380,\n          \"typeCompiledIndex\": 129\n        }\n      ],\n      \"thunkCompiledIndex\": 751\n    },\n    {\n      \"contractCompiledIndex\": 381,\n      \"contractSourceIndex\": 2791,\n      \"kind\": \"Send\",\n      \"targets\": [\n        {\n          \"functionCompiledIndex\": 381,\n          \"typeCompiledIndex\": 129\n        }\n      ],\n      \"thunkCompiledIndex\": 752\n    }\n  ],\n  \"entryArguments\": true,\n  \"excludedFunctions\": [\n    {\n      \"definition\": {\n        \"index\": 4,\n        \"module\": \"NeoMetadata_D62F03B6673A35DACAF8DEE1F6658E2E40833FFFEF1D133192FF4DE2000C9474\",\n        \"revision\": \"1.0.0.0\"\n      },\n      \"name\": \"NeoMetadata_D62F03B6673A35DACAF8DEE1F6658E2E40833FFFEF1D133192FF4DE2000C9474.T__3C3E635F5F4173796E6353746174654D616368696E6530.M_536574537461746",
+      "stdoutSha256": "8221639cbe5486b87fc79d55aaa5a3430501162eb7474fb2a3b29538414b7197"
+    },
+    {
+      "command": [
+        "cl",
+        "/nologo",
+        "/W4",
+        "/WX",
+        "/std:c11",
+        "/experimental:c11atomics",
+        "/O2",
+        "/MT",
+        "/DNEOCLR_NATIVE_GC",
+        "/DNEOCLR_NATIVE_BYTE_ARRAY_LIMIT=65536",
+        "/DNEOCLR_HTTP_HOST",
+        "/ID:\\a\\neoCLR\\neoCLR\\docs\\experiments\\aot-console",
+        "/FoD:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\http\\client/",
+        "/Fe:D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\http\\client\\app.exe",
+        "D:\\a\\neoCLR\\neoCLR\\tools\\native\\windows-console-host.c",
+        "D:\\a\\neoCLR\\neoCLR\\tools\\native\\windows-gc-host.c",
+        "D:\\a\\neoCLR\\neoCLR\\tools\\native\\windows-host-memory.c",
+        "D:\\a\\neoCLR\\neoCLR\\tools\\native\\windows-native-stack.c",
+        "D:\\a\\neoCLR\\neoCLR\\docs\\experiments\\aot-console\\root-probe.c",
+        "D:\\a\\neoCLR\\neoCLR\\docs\\experiments\\aot-console\\native-gc.c",
+        "D:\\a\\neoCLR\\neoCLR\\docs\\experiments\\aot-console\\text-arena.c",
+        "D:\\a\\neoCLR\\neoCLR\\docs\\experiments\\aot-console\\console.c",
+        "D:\\a\\neoCLR\\neoCLR\\docs\\experiments\\aot-fault-details\\render.c",
+        "D:\\a\\neoCLR\\neoCLR\\docs\\experiments\\jit-managed\\host.c",
+        "D:\\a\\neoCLR\\neoCLR\\docs\\experiments\\aot-console\\task-queue.c",
+        "D:\\a\\neoCLR\\neoCLR\\docs\\experiments\\aot-console\\socket-listener.c",
+        "D:\\a\\neoCLR\\neoCLR\\tools\\native\\entry-arguments.c",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\http\\client\\app.obj",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\http\\client\\main.c",
+        "D:\\a\\neoCLR\\neoCLR\\docs\\experiments\\aot-console\\string-unicode.c",
+        "D:\\a\\neoCLR\\neoCLR\\tools\\aot-native-text\\target\\text-only\\x86_64-pc-windows-msvc\\release\\neoclr_aot_native_text.lib",
+        "/link",
+        "/STACK:1048576",
+        "Ws2_32.lib"
+      ],
+      "exitCode": 0,
+      "stderr": "",
+      "stdout": "windows-console-host.c\nwindows-gc-host.c\nwindows-host-memory.c\nwindows-native-stack.c\nroot-probe.c\nnative-gc.c\ntext-arena.c\nconsole.c\nrender.c\nhost.c\ntask-queue.c\nsocket-listener.c\nentry-arguments.c\nmain.c\nstring-unicode.c\nGenerating Code...\n"
+    },
+    {
+      "command": [
+        "dotnet",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\development\\bundle\\sdk\\tools\\rvnc\\rvnc.dll",
+        "neoclr",
+        "--core-reference",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\development\\bundle\\lib\\Core.dll",
+        "--runtime-seed",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\development\\bundle\\lib\\System.runtime.neox",
+        "--bootstrap-intrinsics",
+        "--bootstrap-ownership",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\development\\bundle\\lib\\ownership.json",
+        "--object-library",
+        "System.Runtime",
+        "--async-library",
+        "System.Runtime",
+        "--reference",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\development\\bundle\\lib\\System.Runtime.dll",
+        "--reference",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\development\\bundle\\lib\\System.Data.dll",
+        "--reference",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\development\\bundle\\lib\\System.Networking.dll",
+        "--reference",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\development\\bundle\\lib\\System.Web.dll",
+        "-o",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\http\\timeout\\app.dll",
+        "D:\\a\\neoCLR\\neoCLR\\docs\\experiments\\http-timeout\\Network.rvn"
+      ],
+      "exitCode": 0,
+      "stderr": "",
+      "stdout": ""
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\tools\\aot-poc\\target\\release\\neoclr-aot-poc.exe",
+        "--closed-world",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\http\\timeout\\app.dll",
+        "@entry",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\http\\timeout\\app.obj",
+        "--system",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\development\\bundle\\lib\\System.runtime.neox",
+        "--module",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\development\\bundle\\lib\\System.Runtime.dll",
+        "--module",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\development\\bundle\\lib\\System.Data.dll",
+        "--module",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\development\\bundle\\lib\\System.Networking.dll",
+        "--module",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\development\\bundle\\lib\\System.Web.dll",
+        "--object-root",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\development\\bundle\\lib\\System.Runtime.dll",
+        "--compile-system",
+        "--bind-user-fault",
+        "--reference-arena",
+        "--native-gc",
+        "--bind-console-read-byte",
+        "--bind-console-write-line",
+        "--bind-console-stream-output",
+        "--bind-int32-to-string",
+        "--bind-utf8-text",
+        "--native-stack-budget",
+        "--bind-integer-text",
+        "--bind-character-text",
+        "--bind-system-culture",
+        "--bind-time-zone-rules",
+        "--bind-task-queue",
+        "--bind-timers",
+        "--bind-socket-listener",
+        "--bind-socket-accept",
+        "--bind-socket-transfer",
+        "--bind-socket-client",
+        "--target",
+        "x86_64-pc-windows-msvc",
+        "--windows-http-experiment"
+      ],
+      "exitCode": 0,
+      "stderr": "",
+      "stdoutPrefix": "{\n  \"arrayBackingProjection\": {\n    \"compiledIndex\": 191,\n    \"definition\": {\n      \"index\": 253,\n      \"module\": \"NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17\",\n      \"revision\": \"1.0.0.0\"\n    },\n    \"policy\": \"verified nominal byte-array backing; identity-preserving views and intrinsic storage field\",\n    \"sourceIndex\": 534,\n    \"sourceName\": \"NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D_41727261796031\"\n  },\n  \"boxedInt32Display\": false,\n  \"classVirtualDispatch\": [\n    {\n      \"contractCompiledIndex\": 330,\n      \"contractSourceIndex\": 2684,\n      \"kind\": \"Send\",\n      \"targets\": [\n        {\n          \"functionCompiledIndex\": 365,\n          \"typeCompiledIndex\": 123\n        }\n      ],\n      \"thunkCompiledIndex\": 707\n    },\n    {\n      \"contractCompiledIndex\": 331,\n      \"contractSourceIndex\": 2685,\n      \"kind\": \"Dispose\",\n      \"targets\": [\n        {\n          \"functionCompiledIndex\": 364,\n          \"typeCompiledIndex\": 123\n        }\n      ],\n      \"thunkCompiledIndex\": 708\n    },\n    {\n      \"contractCompiledIndex\": 364,\n      \"contractSourceIndex\": 2789,\n      \"kind\": \"Dispose\",\n      \"targets\": [\n        {\n          \"functionCompiledIndex\": 364,\n          \"typeCompiledIndex\": 123\n        }\n      ],\n      \"thunkCompiledIndex\": 709\n    },\n    {\n      \"contractCompiledIndex\": 365,\n      \"contractSourceIndex\": 2791,\n      \"kind\": \"Send\",\n      \"targets\": [\n        {\n          \"functionCompiledIndex\": 365,\n          \"typeCompiledIndex\": 123\n        }\n      ],\n      \"thunkCompiledIndex\": 710\n    }\n  ],\n  \"entryArguments\": true,\n  \"excludedFunctions\": [\n    {\n      \"definition\": {\n        \"index\": 4,\n        \"module\": \"NeoMetadata_D62F03B6673A35DACAF8DEE1F6658E2E40833FFFEF1D133192FF4DE2000C9474\",\n        \"revision\": \"1.0.0.0\"\n      },\n      \"name\": \"NeoMetadata_D62F03B6673A35DACAF8DEE1F6658E2E40833FFFEF1D133192FF4DE2000C9474.T__3C3E635F5F4173796E6353746174654D616368696E6530.M_536574537461746",
+      "stdoutSha256": "84610325a3da0e2251d63bbb68901852ca19eaee087fbb82001882e1b6312a75"
+    },
+    {
+      "command": [
+        "cl",
+        "/nologo",
+        "/W4",
+        "/WX",
+        "/std:c11",
+        "/experimental:c11atomics",
+        "/O2",
+        "/MT",
+        "/DNEOCLR_NATIVE_GC",
+        "/DNEOCLR_NATIVE_BYTE_ARRAY_LIMIT=65536",
+        "/DNEOCLR_HTTP_HOST",
+        "/ID:\\a\\neoCLR\\neoCLR\\docs\\experiments\\aot-console",
+        "/FoD:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\http\\timeout/",
+        "/Fe:D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\http\\timeout\\app.exe",
+        "D:\\a\\neoCLR\\neoCLR\\tools\\native\\windows-console-host.c",
+        "D:\\a\\neoCLR\\neoCLR\\tools\\native\\windows-gc-host.c",
+        "D:\\a\\neoCLR\\neoCLR\\tools\\native\\windows-host-memory.c",
+        "D:\\a\\neoCLR\\neoCLR\\tools\\native\\windows-native-stack.c",
+        "D:\\a\\neoCLR\\neoCLR\\docs\\experiments\\aot-console\\root-probe.c",
+        "D:\\a\\neoCLR\\neoCLR\\docs\\experiments\\aot-console\\native-gc.c",
+        "D:\\a\\neoCLR\\neoCLR\\docs\\experiments\\aot-console\\text-arena.c",
+        "D:\\a\\neoCLR\\neoCLR\\docs\\experiments\\aot-console\\console.c",
+        "D:\\a\\neoCLR\\neoCLR\\docs\\experiments\\aot-fault-details\\render.c",
+        "D:\\a\\neoCLR\\neoCLR\\docs\\experiments\\jit-managed\\host.c",
+        "D:\\a\\neoCLR\\neoCLR\\docs\\experiments\\aot-console\\task-queue.c",
+        "D:\\a\\neoCLR\\neoCLR\\docs\\experiments\\aot-console\\socket-listener.c",
+        "D:\\a\\neoCLR\\neoCLR\\tools\\native\\entry-arguments.c",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\http\\timeout\\app.obj",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\http\\timeout\\main.c",
+        "D:\\a\\neoCLR\\neoCLR\\docs\\experiments\\aot-console\\string-unicode.c",
+        "D:\\a\\neoCLR\\neoCLR\\tools\\aot-native-text\\target\\text-only\\x86_64-pc-windows-msvc\\release\\neoclr_aot_native_text.lib",
+        "/link",
+        "/STACK:1048576",
+        "Ws2_32.lib"
+      ],
+      "exitCode": 0,
+      "stderr": "",
+      "stdout": "windows-console-host.c\nwindows-gc-host.c\nwindows-host-memory.c\nwindows-native-stack.c\nroot-probe.c\nnative-gc.c\ntext-arena.c\nconsole.c\nrender.c\nhost.c\ntask-queue.c\nsocket-listener.c\nentry-arguments.c\nmain.c\nstring-unicode.c\nGenerating Code...\n"
+    },
+    {
+      "command": [
+        "dotnet",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\development\\bundle\\sdk\\tools\\rvnc\\rvnc.dll",
+        "neoclr",
+        "--core-reference",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\development\\bundle\\lib\\Core.dll",
+        "--runtime-seed",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\development\\bundle\\lib\\System.runtime.neox",
+        "--bootstrap-intrinsics",
+        "--bootstrap-ownership",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\development\\bundle\\lib\\ownership.json",
+        "--object-library",
+        "System.Runtime",
+        "--async-library",
+        "System.Runtime",
+        "--reference",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\development\\bundle\\lib\\System.Runtime.dll",
+        "--reference",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\development\\bundle\\lib\\System.Data.dll",
+        "--reference",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\development\\bundle\\lib\\System.Networking.dll",
+        "--reference",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\development\\bundle\\lib\\System.Web.dll",
+        "-o",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\http\\fault\\app.dll",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\http\\ServerFault.rvn"
+      ],
+      "exitCode": 0,
+      "stderr": "warning RAV0162: Unreachable code\nwarning RAV0162: Unreachable code\nwarning RAV0162: Unreachable code\nwarning RAV0162: Unreachable code\nwarning RAV0162: Unreachable code\nwarning RAV0162: Unreachable code\n",
+      "stdout": ""
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\tools\\aot-poc\\target\\release\\neoclr-aot-poc.exe",
+        "--closed-world",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\http\\fault\\app.dll",
+        "@entry",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\http\\fault\\app.obj",
+        "--system",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\development\\bundle\\lib\\System.runtime.neox",
+        "--module",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\development\\bundle\\lib\\System.Runtime.dll",
+        "--module",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\development\\bundle\\lib\\System.Data.dll",
+        "--module",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\development\\bundle\\lib\\System.Networking.dll",
+        "--module",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\development\\bundle\\lib\\System.Web.dll",
+        "--object-root",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\development\\bundle\\lib\\System.Runtime.dll",
+        "--compile-system",
+        "--bind-user-fault",
+        "--reference-arena",
+        "--native-gc",
+        "--bind-console-read-byte",
+        "--bind-console-write-line",
+        "--bind-console-stream-output",
+        "--bind-int32-to-string",
+        "--bind-utf8-text",
+        "--native-stack-budget",
+        "--bind-integer-text",
+        "--bind-character-text",
+        "--bind-system-culture",
+        "--bind-time-zone-rules",
+        "--bind-task-queue",
+        "--bind-timers",
+        "--bind-socket-listener",
+        "--bind-socket-accept",
+        "--bind-socket-transfer",
+        "--bind-socket-client",
+        "--target",
+        "x86_64-pc-windows-msvc",
+        "--windows-http-experiment"
+      ],
+      "exitCode": 0,
+      "stderr": "",
+      "stdoutPrefix": "{\n  \"arrayBackingProjection\": {\n    \"compiledIndex\": 188,\n    \"definition\": {\n      \"index\": 253,\n      \"module\": \"NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17\",\n      \"revision\": \"1.0.0.0\"\n    },\n    \"policy\": \"verified nominal byte-array backing; identity-preserving views and intrinsic storage field\",\n    \"sourceIndex\": 542,\n    \"sourceName\": \"NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D_41727261796031\"\n  },\n  \"boxedInt32Display\": false,\n  \"classVirtualDispatch\": [],\n  \"entryArguments\": false,\n  \"excludedFunctions\": [\n    {\n      \"definition\": {\n        \"index\": 8,\n        \"module\": \"NeoMetadata_D62F03B6673A35DACAF8DEE1F6658E2E40833FFFEF1D133192FF4DE2000C9474\",\n        \"revision\": \"1.0.0.0\"\n      },\n      \"name\": \"NeoMetadata_D62F03B6673A35DACAF8DEE1F6658E2E40833FFFEF1D133192FF4DE2000C9474.T__3C3E635F5F4173796E6353746174654D616368696E6530.M_53657453746174654D616368696E65\",\n      \"sourceIndex\": 8\n    },\n    {\n      \"definition\": {\n        \"index\": 11,\n        \"module\": \"NeoMetadata_D62F03B6673A35DACAF8DEE1F6658E2E40833FFFEF1D133192FF4DE2000C9474\",\n        \"revision\": \"1.0.0.0\"\n      },\n      \"name\": \"NeoMetadata_D62F03B6673A35DACAF8DEE1F6658E2E40833FFFEF1D133192FF4DE2000C9474.T__3C3E635F5F4173796E6353746174654D616368696E6531.M_53657453746174654D616368696E65\",\n      \"sourceIndex\": 11\n    },\n    {\n      \"definition\": {\n        \"index\": 0,\n        \"module\": \"NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17\",\n        \"revision\": \"1.0.0.0\"\n      },\n      \"name\": \"neoCLR.Runtime.TimeZoneDatabaseVersion\",\n      \"sourceIndex\": 14\n    },\n    {\n      \"definition\": {\n        \"index\": 1,\n        \"module\": \"NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17\",\n        \"revision\": \"1.0.0.0\"\n      },\n      \"name\": \"neoCLR.Runtime.SystemTimeZoneName\",\n      \"sourceIndex\": 15\n    },\n    {\n      \"definition\": {\n        \"index\": 2,\n        \"module\": \"Neo",
+      "stdoutSha256": "98f0efe8ec0a02d096a9131e4976784181106f7910555f6197a88e1e50268418"
+    },
+    {
+      "command": [
+        "cl",
+        "/nologo",
+        "/W4",
+        "/WX",
+        "/std:c11",
+        "/experimental:c11atomics",
+        "/O2",
+        "/MT",
+        "/DNEOCLR_NATIVE_GC",
+        "/DNEOCLR_NATIVE_BYTE_ARRAY_LIMIT=65536",
+        "/DNEOCLR_HTTP_HOST",
+        "/ID:\\a\\neoCLR\\neoCLR\\docs\\experiments\\aot-console",
+        "/FoD:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\http\\fault/",
+        "/Fe:D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\http\\fault\\app.exe",
+        "D:\\a\\neoCLR\\neoCLR\\tools\\native\\windows-console-host.c",
+        "D:\\a\\neoCLR\\neoCLR\\tools\\native\\windows-gc-host.c",
+        "D:\\a\\neoCLR\\neoCLR\\tools\\native\\windows-host-memory.c",
+        "D:\\a\\neoCLR\\neoCLR\\tools\\native\\windows-native-stack.c",
+        "D:\\a\\neoCLR\\neoCLR\\docs\\experiments\\aot-console\\root-probe.c",
+        "D:\\a\\neoCLR\\neoCLR\\docs\\experiments\\aot-console\\native-gc.c",
+        "D:\\a\\neoCLR\\neoCLR\\docs\\experiments\\aot-console\\text-arena.c",
+        "D:\\a\\neoCLR\\neoCLR\\docs\\experiments\\aot-console\\console.c",
+        "D:\\a\\neoCLR\\neoCLR\\docs\\experiments\\aot-fault-details\\render.c",
+        "D:\\a\\neoCLR\\neoCLR\\docs\\experiments\\jit-managed\\host.c",
+        "D:\\a\\neoCLR\\neoCLR\\docs\\experiments\\aot-console\\task-queue.c",
+        "D:\\a\\neoCLR\\neoCLR\\docs\\experiments\\aot-console\\socket-listener.c",
+        "D:\\a\\neoCLR\\neoCLR\\tools\\native\\entry-arguments.c",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\http\\fault\\app.obj",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\http\\fault\\main.c",
+        "D:\\a\\neoCLR\\neoCLR\\docs\\experiments\\aot-console\\string-unicode.c",
+        "D:\\a\\neoCLR\\neoCLR\\tools\\aot-native-text\\target\\text-only\\x86_64-pc-windows-msvc\\release\\neoclr_aot_native_text.lib",
+        "/link",
+        "/STACK:1048576",
+        "Ws2_32.lib"
+      ],
+      "exitCode": 0,
+      "stderr": "",
+      "stdout": "windows-console-host.c\nwindows-gc-host.c\nwindows-host-memory.c\nwindows-native-stack.c\nroot-probe.c\nnative-gc.c\ntext-arena.c\nconsole.c\nrender.c\nhost.c\ntask-queue.c\nsocket-listener.c\nentry-arguments.c\nmain.c\nstring-unicode.c\nGenerating Code...\n"
+    }
+  ],
+  "artifacts": {
+    "server": {
+      "source": "D:\\a\\neoCLR\\neoCLR\\docs\\experiments\\http-server\\Server.rvn",
+      "sourceSha256": "a5e3deade80dbc8aa8647cbf6f848d9a2e6705461aa3ae667e0aafdd9bad9125",
+      "assemblySha256": "4c2d4a9df5dbe37f3337afec383ec94c32c131acec98a2186604aaf1a48d60fe",
+      "objectSha256": "53c71e703555ddf12cbaf44d09589db034e29c5b3b371b36525163938776669e",
+      "executableSha256": "cd37b9a2c7a5f99bfe6174ada0fc5c99434d62a36a9188b56559a0eb69f13ba3",
+      "commands": {
+        "jit": [
+          "D:\\a\\neoCLR\\neoCLR\\target\\release\\neoclr.exe",
+          "run",
+          "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\http\\server\\app.dll",
+          "--execution",
+          "jit",
+          "--jit-compiler",
+          "D:\\a\\neoCLR\\neoCLR\\tools\\aot-poc\\target\\release\\neoclr-aot-poc.exe",
+          "--jit-host",
+          "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\http\\host.dll",
+          "--system",
+          "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\development\\bundle\\lib\\System.runtime.neox",
+          "--object-root",
+          "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\development\\bundle\\lib\\System.Runtime.dll",
+          "--module",
+          "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\development\\bundle\\lib\\System.Runtime.dll",
+          "--module",
+          "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\development\\bundle\\lib\\System.Data.dll",
+          "--module",
+          "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\development\\bundle\\lib\\System.Networking.dll",
+          "--module",
+          "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\development\\bundle\\lib\\System.Web.dll"
+        ],
+        "aot": [
+          "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\http\\server\\app.exe"
+        ],
+        "interpreter": [
+          "D:\\a\\neoCLR\\neoCLR\\target\\release\\neoclr.exe",
+          "run",
+          "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\http\\server\\app.dll",
+          "--system",
+          "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\development\\bundle\\lib\\System.runtime.neox",
+          "--object-root",
+          "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\development\\bundle\\lib\\System.Runtime.dll",
+          "--module",
+          "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\development\\bundle\\lib\\System.Runtime.dll",
+          "--module",
+          "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\development\\bundle\\lib\\System.Data.dll",
+          "--module",
+          "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\development\\bundle\\lib\\System.Networking.dll",
+          "--module",
+          "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\development\\bundle\\lib\\System.Web.dll",
+          "--instructions",
+          "100000000"
+        ]
+      }
+    },
+    "client": {
+      "source": "D:\\a\\neoCLR\\neoCLR\\docs\\experiments\\jit-http\\Client.rvn",
+      "sourceSha256": "a22166f170eca97e30415ac05bb3f2c6f30b7e2faa9da0bf7df7b3cbb45f3e01",
+      "assemblySha256": "158de50c6daa875d18115d082215973420d2b44bf0ee3110eca139d883ed2a35",
+      "objectSha256": "e6ac389619ed516896514f1ea369c8985e8e5a7d2ea8641bac2366d9ec0517d0",
+      "executableSha256": "e79526015611f9fd054be6d5f6347315d69356a3c2054150c3f46636c3da51d7",
+      "commands": {
+        "jit": [
+          "D:\\a\\neoCLR\\neoCLR\\target\\release\\neoclr.exe",
+          "run",
+          "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\http\\client\\app.dll",
+          "--execution",
+          "jit",
+          "--jit-compiler",
+          "D:\\a\\neoCLR\\neoCLR\\tools\\aot-poc\\target\\release\\neoclr-aot-poc.exe",
+          "--jit-host",
+          "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\http\\host.dll",
+          "--system",
+          "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\development\\bundle\\lib\\System.runtime.neox",
+          "--object-root",
+          "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\development\\bundle\\lib\\System.Runtime.dll",
+          "--module",
+          "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\development\\bundle\\lib\\System.Runtime.dll",
+          "--module",
+          "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\development\\bundle\\lib\\System.Data.dll",
+          "--module",
+          "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\development\\bundle\\lib\\System.Networking.dll",
+          "--module",
+          "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\development\\bundle\\lib\\System.Web.dll"
+        ],
+        "aot": [
+          "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\http\\client\\app.exe"
+        ],
+        "interpreter": [
+          "D:\\a\\neoCLR\\neoCLR\\target\\release\\neoclr.exe",
+          "run",
+          "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\http\\client\\app.dll",
+          "--system",
+          "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\development\\bundle\\lib\\System.runtime.neox",
+          "--object-root",
+          "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\development\\bundle\\lib\\System.Runtime.dll",
+          "--module",
+          "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\development\\bundle\\lib\\System.Runtime.dll",
+          "--module",
+          "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\development\\bundle\\lib\\System.Data.dll",
+          "--module",
+          "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\development\\bundle\\lib\\System.Networking.dll",
+          "--module",
+          "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\development\\bundle\\lib\\System.Web.dll",
+          "--instructions",
+          "100000000"
+        ]
+      }
+    },
+    "timeout": {
+      "source": "D:\\a\\neoCLR\\neoCLR\\docs\\experiments\\http-timeout\\Network.rvn",
+      "sourceSha256": "7a8ec182dfcb4d5d07d563ee524bdcd9d6c6626548db83e031b86948d3a1de6b",
+      "assemblySha256": "f2139df531635f169146f119814e94f74785ad90472d271ffd2a9dbb2ffbec7c",
+      "objectSha256": "9ea71a4769c682af8eacde0a15a7f995e32db8319e819da8173607d477f2daad",
+      "executableSha256": "73e173f6d05a39c976ff9a3473bee67099002cfb01ad246be88983d1ebf4e29b",
+      "commands": {
+        "jit": [
+          "D:\\a\\neoCLR\\neoCLR\\target\\release\\neoclr.exe",
+          "run",
+          "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\http\\timeout\\app.dll",
+          "--execution",
+          "jit",
+          "--jit-compiler",
+          "D:\\a\\neoCLR\\neoCLR\\tools\\aot-poc\\target\\release\\neoclr-aot-poc.exe",
+          "--jit-host",
+          "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\http\\host.dll",
+          "--system",
+          "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\development\\bundle\\lib\\System.runtime.neox",
+          "--object-root",
+          "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\development\\bundle\\lib\\System.Runtime.dll",
+          "--module",
+          "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\development\\bundle\\lib\\System.Runtime.dll",
+          "--module",
+          "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\development\\bundle\\lib\\System.Data.dll",
+          "--module",
+          "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\development\\bundle\\lib\\System.Networking.dll",
+          "--module",
+          "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\development\\bundle\\lib\\System.Web.dll"
+        ],
+        "aot": [
+          "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\http\\timeout\\app.exe"
+        ],
+        "interpreter": [
+          "D:\\a\\neoCLR\\neoCLR\\target\\release\\neoclr.exe",
+          "run",
+          "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\http\\timeout\\app.dll",
+          "--system",
+          "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\development\\bundle\\lib\\System.runtime.neox",
+          "--object-root",
+          "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\development\\bundle\\lib\\System.Runtime.dll",
+          "--module",
+          "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\development\\bundle\\lib\\System.Runtime.dll",
+          "--module",
+          "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\development\\bundle\\lib\\System.Data.dll",
+          "--module",
+          "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\development\\bundle\\lib\\System.Networking.dll",
+          "--module",
+          "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\development\\bundle\\lib\\System.Web.dll",
+          "--instructions",
+          "100000000"
+        ]
+      }
+    },
+    "fault": {
+      "source": "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\http\\ServerFault.rvn",
+      "sourceSha256": "f65abb7a3162a689840924dded353eccabe4812a516e45014b4877a7e7b32987",
+      "assemblySha256": "0ccbb671a688d3d843b5a4a24dbc76534abb402f598e02b95ff61d64301a5ae8",
+      "objectSha256": "246cc64a4579e1e4e12f212b800b2d048691e4e00ee103e349ef2be2f8050720",
+      "executableSha256": "bc3be6153ae0b689b2209d2495c13d92ff9c88a2df06410d1634ef37a0840786",
+      "commands": {
+        "jit": [
+          "D:\\a\\neoCLR\\neoCLR\\target\\release\\neoclr.exe",
+          "run",
+          "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\http\\fault\\app.dll",
+          "--execution",
+          "jit",
+          "--jit-compiler",
+          "D:\\a\\neoCLR\\neoCLR\\tools\\aot-poc\\target\\release\\neoclr-aot-poc.exe",
+          "--jit-host",
+          "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\http\\host.dll",
+          "--system",
+          "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\development\\bundle\\lib\\System.runtime.neox",
+          "--object-root",
+          "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\development\\bundle\\lib\\System.Runtime.dll",
+          "--module",
+          "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\development\\bundle\\lib\\System.Runtime.dll",
+          "--module",
+          "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\development\\bundle\\lib\\System.Data.dll",
+          "--module",
+          "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\development\\bundle\\lib\\System.Networking.dll",
+          "--module",
+          "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\development\\bundle\\lib\\System.Web.dll"
+        ],
+        "aot": [
+          "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\http\\fault\\app.exe"
+        ],
+        "interpreter": [
+          "D:\\a\\neoCLR\\neoCLR\\target\\release\\neoclr.exe",
+          "run",
+          "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\http\\fault\\app.dll",
+          "--system",
+          "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\development\\bundle\\lib\\System.runtime.neox",
+          "--object-root",
+          "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\development\\bundle\\lib\\System.Runtime.dll",
+          "--module",
+          "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\development\\bundle\\lib\\System.Runtime.dll",
+          "--module",
+          "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\development\\bundle\\lib\\System.Data.dll",
+          "--module",
+          "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\development\\bundle\\lib\\System.Networking.dll",
+          "--module",
+          "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\development\\bundle\\lib\\System.Web.dll",
+          "--instructions",
+          "100000000"
+        ]
+      }
+    }
+  },
+  "cases": [
+    {
+      "processExitCode": 0,
+      "stdout": "Other work runs while HTTP accept is pending\nServed greeting; server closed\n",
+      "stderr": "",
+      "exitCode": 0,
+      "mode": "interpreter",
+      "case": "greeting",
+      "responseHex": "485454502f312e3120323030204f4b0d0a436f6e74656e742d4c656e6774683a2031300d0a436f6e6e656374696f6e3a20636c6f73650d0a436f6e74656e742d547970653a20746578742f706c61696e3b20636861727365743d7574662d380d0a0d0a436166c3a920f09f8c8d"
+    },
+    {
+      "processExitCode": 0,
+      "stdout": "Other work runs while HTTP accept is pending\nServed greeting; server closed\n",
+      "stderr": "",
+      "exitCode": 0,
+      "mode": "interpreter",
+      "case": "fragmented",
+      "responseHex": "485454502f312e3120323030204f4b0d0a436f6e74656e742d4c656e6774683a2031300d0a436f6e6e656374696f6e3a20636c6f73650d0a436f6e74656e742d547970653a20746578742f706c61696e3b20636861727365743d7574662d380d0a0d0a436166c3a920f09f8c8d"
+    },
+    {
+      "processExitCode": 0,
+      "stdout": "Other work runs while HTTP accept is pending\nServer error: Duplicate request Content-Length\n",
+      "stderr": "",
+      "exitCode": 0,
+      "mode": "interpreter",
+      "case": "duplicate-length",
+      "responseHex": ""
+    },
+    {
+      "processExitCode": 0,
+      "stdout": "Other work runs while HTTP accept is pending\nServer error: Unexpected request\n",
+      "stderr": "",
+      "exitCode": 0,
+      "mode": "interpreter",
+      "case": "handler-error",
+      "responseHex": ""
+    },
+    {
+      "mode": "interpreter",
+      "case": "client-server-dns",
+      "client": {
+        "processExitCode": 0,
+        "stdout": "Caf\u00e9 \ud83c\udf0d\n",
+        "stderr": "",
+        "exitCode": 0
+      },
+      "server": {
+        "processExitCode": 0,
+        "stdout": "Other work runs while HTTP accept is pending\nServed greeting; server closed\n",
+        "stderr": "",
+        "exitCode": 0
+      }
+    },
+    {
+      "mode": "interpreter",
+      "case": "client-timeout",
+      "result": {
+        "processExitCode": 0,
+        "stdout": "PASS socket cleanup before timeout acknowledgement\n",
+        "stderr": "",
+        "exitCode": 0
+      },
+      "peer": {
+        "closed": true
+      }
+    },
+    {
+      "mode": "interpreter",
+      "case": "client-success",
+      "result": {
+        "processExitCode": 0,
+        "stdout": "PASS delayed response with disabled client timeout\n",
+        "stderr": "",
+        "exitCode": 0
+      },
+      "peer": {
+        "closed": true
+      }
+    },
+    {
+      "processExitCode": 0,
+      "stdout": "Other work runs while HTTP accept is pending\nServed greeting; server closed\n",
+      "stderr": "",
+      "exitCode": 0,
+      "mode": "aot",
+      "case": "greeting",
+      "responseHex": "485454502f312e3120323030204f4b0d0a436f6e74656e742d4c656e6774683a2031300d0a436f6e6e656374696f6e3a20636c6f73650d0a436f6e74656e742d547970653a20746578742f706c61696e3b20636861727365743d7574662d380d0a0d0a436166c3a920f09f8c8d"
+    },
+    {
+      "processExitCode": 0,
+      "stdout": "Other work runs while HTTP accept is pending\nServed greeting; server closed\n",
+      "stderr": "",
+      "exitCode": 0,
+      "mode": "aot",
+      "case": "fragmented",
+      "responseHex": "485454502f312e3120323030204f4b0d0a436f6e74656e742d4c656e6774683a2031300d0a436f6e6e656374696f6e3a20636c6f73650d0a436f6e74656e742d547970653a20746578742f706c61696e3b20636861727365743d7574662d380d0a0d0a436166c3a920f09f8c8d"
+    },
+    {
+      "processExitCode": 0,
+      "stdout": "Other work runs while HTTP accept is pending\nServer error: Duplicate request Content-Length\n",
+      "stderr": "",
+      "exitCode": 0,
+      "mode": "aot",
+      "case": "duplicate-length",
+      "responseHex": ""
+    },
+    {
+      "processExitCode": 0,
+      "stdout": "Other work runs while HTTP accept is pending\nServer error: Unexpected request\n",
+      "stderr": "",
+      "exitCode": 0,
+      "mode": "aot",
+      "case": "handler-error",
+      "responseHex": ""
+    },
+    {
+      "mode": "aot",
+      "case": "client-server-dns",
+      "client": {
+        "processExitCode": 0,
+        "stdout": "Caf\u00e9 \ud83c\udf0d\n",
+        "stderr": "",
+        "exitCode": 0
+      },
+      "server": {
+        "processExitCode": 0,
+        "stdout": "Other work runs while HTTP accept is pending\nServed greeting; server closed\n",
+        "stderr": "",
+        "exitCode": 0
+      }
+    },
+    {
+      "mode": "aot",
+      "case": "client-timeout",
+      "result": {
+        "processExitCode": 0,
+        "stdout": "PASS socket cleanup before timeout acknowledgement\n",
+        "stderr": "",
+        "exitCode": 0
+      },
+      "peer": {
+        "closed": true
+      }
+    },
+    {
+      "mode": "aot",
+      "case": "client-success",
+      "result": {
+        "processExitCode": 0,
+        "stdout": "PASS delayed response with disabled client timeout\n",
+        "stderr": "",
+        "exitCode": 0
+      },
+      "peer": {
+        "closed": true
+      }
+    },
+    {
+      "processExitCode": 0,
+      "stdout": "Other work runs while HTTP accept is pending\nServed greeting; server closed\n",
+      "stderr": "",
+      "exitCode": 0,
+      "mode": "jit",
+      "case": "greeting",
+      "responseHex": "485454502f312e3120323030204f4b0d0a436f6e74656e742d4c656e6774683a2031300d0a436f6e6e656374696f6e3a20636c6f73650d0a436f6e74656e742d547970653a20746578742f706c61696e3b20636861727365743d7574662d380d0a0d0a436166c3a920f09f8c8d"
+    },
+    {
+      "processExitCode": 0,
+      "stdout": "Other work runs while HTTP accept is pending\nServed greeting; server closed\n",
+      "stderr": "",
+      "exitCode": 0,
+      "mode": "jit",
+      "case": "fragmented",
+      "responseHex": "485454502f312e3120323030204f4b0d0a436f6e74656e742d4c656e6774683a2031300d0a436f6e6e656374696f6e3a20636c6f73650d0a436f6e74656e742d547970653a20746578742f706c61696e3b20636861727365743d7574662d380d0a0d0a436166c3a920f09f8c8d"
+    },
+    {
+      "processExitCode": 0,
+      "stdout": "Other work runs while HTTP accept is pending\nServer error: Duplicate request Content-Length\n",
+      "stderr": "",
+      "exitCode": 0,
+      "mode": "jit",
+      "case": "duplicate-length",
+      "responseHex": ""
+    },
+    {
+      "processExitCode": 0,
+      "stdout": "Other work runs while HTTP accept is pending\nServer error: Unexpected request\n",
+      "stderr": "",
+      "exitCode": 0,
+      "mode": "jit",
+      "case": "handler-error",
+      "responseHex": ""
+    },
+    {
+      "mode": "jit",
+      "case": "client-server-dns",
+      "client": {
+        "processExitCode": 0,
+        "stdout": "Caf\u00e9 \ud83c\udf0d\n",
+        "stderr": "",
+        "exitCode": 0
+      },
+      "server": {
+        "processExitCode": 0,
+        "stdout": "Other work runs while HTTP accept is pending\nServed greeting; server closed\n",
+        "stderr": "",
+        "exitCode": 0
+      }
+    },
+    {
+      "mode": "jit",
+      "case": "client-timeout",
+      "result": {
+        "processExitCode": 0,
+        "stdout": "PASS socket cleanup before timeout acknowledgement\n",
+        "stderr": "",
+        "exitCode": 0
+      },
+      "peer": {
+        "closed": true
+      }
+    },
+    {
+      "mode": "jit",
+      "case": "client-success",
+      "result": {
+        "processExitCode": 0,
+        "stdout": "PASS delayed response with disabled client timeout\n",
+        "stderr": "",
+        "exitCode": 0
+      },
+      "peer": {
+        "closed": true
+      }
+    },
+    {
+      "mode": "jit",
+      "case": "handler-fault",
+      "result": {
+        "processExitCode": 1,
+        "stdout": "Other work runs while HTTP accept is pending\n",
+        "stderr": "UserFault: HTTP callback fault\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E52756E74696D652E436F6D70696C65725365727669636573_52756E74696D654661696C757265.M_5465726D696E617465 [instruction 1]\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.F_3C4E656F46756E6374696F6E3E3533373937333734363536445F3436363136393643 [instruction 1]\n   at NeoMetadata_D62F03B6673A35DACAF8DEE1F6658E2E40833FFFEF1D133192FF4DE2000C9474.F_526573706F6E64 [instruction 1]\n   at NeoMetadata_A73FE0C4D505EF60D01EE85D686276C3EB75EA34E15D9D88F66D1440F350FF71.T_53797374656D2E5765622E48747470_4874747053657276654F7065726174696F6E.M_4F6E4163636570746564 [instruction 102]\n   at NeoMetadata_A73FE0C4D505EF60D01EE85D686276C3EB75EA34E15D9D88F66D1440F350FF71.T_526176656E2E47656E657261746564_556E697443616C6C6261636B.M_496E766F6B65 [instruction 2]\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E5461736B73_5461736B5175657565.M_447261696E [instruction 42]\n   at System.Runtime.CompilerServices.RuntimeServices.DrainEntryTasks [instruction 0]\n   at NeoMetadata_D62F03B6673A35DACAF8DEE1F6658E2E40833FFFEF1D133192FF4DE2000C9474.F_3C4E656F46756E6374696F6E3E3532363137363635364532453437363536453635373236313734363536345F334334313733373936453633343536453734373237393345 [instruction 1]\n",
+        "exitCode": 1
+      },
+      "peerClosed": true
+    }
+  ],
+  "hostSha256": "f78d045ec4e8c0a312fe574cf5954142a9ac34fb95c879a27b1bc0d4bd57b99e"
+}
