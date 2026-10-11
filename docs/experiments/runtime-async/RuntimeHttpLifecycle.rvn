@@ -1,0 +1,93 @@
+module RuntimeHttpLifecycle {
+    import System.*
+    import System.Concurrency.*
+    import System.Option.*
+    import System.Result.*
+    import System.Tasks.*
+    import System.Time.*
+    import System.Web.Http.*
+
+    class Lifetime : Disposable {
+        val Client = HttpClient()
+        var Disposals = 0
+        func Dispose() {
+            Disposals = Disposals + 1
+            Client.Dispose()
+        }
+    }
+
+    class Observer {
+        private val task: Task<int>
+        private val source = Promise<bool>()
+        init(task: Task<int>) {
+            self.task = task
+        }
+        val Task: Task<bool> => source.Task
+        // Deliberate cancellation observer; awaiting the original cancels its caller.
+        func Complete() -> System.Void {
+            _ = source.Complete(task.IsCancelled)
+        }
+    }
+
+    async func Request(url: string, mode: string, lifetime: Lifetime, cancellation: CancellationTokenSource) -> Task<int> {
+        use owned = lifetime
+        let client = owned.Client
+        if mode == "timeout" {
+            client.Timeout = Some(Duration.FromTicks(20000000L))
+        }
+        let result = await client.GetString(url, cancellation.Token)
+        if mode == "fault" {
+            System.Fail("runtime HTTP continuation fault")
+        }
+        if mode == "timeout" {
+            let Error(HttpError.TimedOut) = result else {
+                System.Fail("Expected HTTP timeout result")
+            }
+        } else if mode == "protocol" {
+            let Error(HttpError.Protocol(_)) = result else {
+                System.Fail("Expected HTTP protocol error")
+            }
+        } else {
+            System.Fail("Cancelled request unexpectedly returned a result")
+        }
+        return 42
+    }
+
+    async func Main(arguments: string[]) -> Task<int> {
+        let url = arguments[0]
+        let mode = arguments[1]
+        let lifetime = Lifetime()
+        use cancellation = CancellationTokenSource()
+        if mode == "cancel" {
+            cancellation.CancelAfter(Duration.FromTicks(20000000L))
+        }
+        let operation = Request(url, mode, lifetime, cancellation)
+        System.Runtime.GC.Collect()
+        if mode == "cancel" {
+            let observer = Observer(operation)
+            operation.OnCompleted(observer.Complete)
+            let cancelled = await observer.Task
+            if !cancelled {
+                System.Fail("Caller cancellation became a result")
+            }
+        } else {
+            let value = await operation
+            if value != 42 {
+                System.Fail("HTTP failure outcome changed")
+            }
+        }
+        if lifetime.Disposals != 1 {
+            System.Fail("HTTP ordinary completion did not release its scope exactly once")
+        }
+        use recovery = HttpClient()
+        let result = await recovery.GetString(arguments[2])
+        let Ok(text) = result else {
+            System.Fail("HTTP recovery request failed")
+        }
+        if text != "recovered" {
+            System.Fail("HTTP recovery response changed")
+        }
+        Console.WriteLine("PASS runtime HTTP lifecycle and recovery")
+        return 0
+    }
+}

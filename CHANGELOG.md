@@ -8,6 +8,10 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-11
 
+- Qualify interpreter runtime-await HTTP timeout, cancellation, protocol-error and
+  terminal-Fault behavior, including socket closure and recovery after nonterminal
+  outcomes. Record JIT/AOT runtime suspension as the next explicit author gate.
+
 - Add conditional runtime-await provider inclusion to both native HTTP showcase
   projects and qualify actual project builds/execution with Raven's explicit
   RavenNeoClrRuntimeAsyncHelper selection. Check project cleanup, invalid config

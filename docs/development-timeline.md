@@ -15154,3 +15154,14 @@ or runtime-await default switch was performed.
   state machines. [Evidence](experiments/runtime-async/README.md#http-showcase-project-integration--2026-10-11).
   This is an interpreter project POC, not default readiness. Network lifecycle cases,
   Windows and JIT/AOT suspension remain open.
+
+
+### 2026-10-11 — Continue through compiled runtime suspension
+
+- Author: “Continue until you have JIT and AOT support.”
+- Assistant interpretation: qualify runtime-async compiled bodies, using the HTTP
+  projects as acceptance workloads; existing state-machine support is insufficient.
+- Performed: interpreter HTTP timeout/cancellation/protocol-error/terminal-Fault
+  checks pass with peer-observed closure and recovery for nonterminal outcomes.
+  [Evidence](experiments/runtime-async/runtime-http-lifecycle-validation.json).
+- Open: compiled stack retention, GC visibility and JIT/AOT HTTP qualification.

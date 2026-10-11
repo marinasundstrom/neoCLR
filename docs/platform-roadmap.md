@@ -70,8 +70,9 @@ now passes for both client/server and a combined eight-exchange consumer. The ex
 async-use gap is fixed behind an explicit retained-scope capability, with cancellation
 cleanup and GC evidence. [Project-level opt-in](experiments/runtime-async/README.md#http-showcase-project-integration--2026-10-11)
 also now qualifies both actual showcase builds, cleanup and configuration rejection,
-with unchanged default lowering. Next expand HTTP timeout/cancellation and terminal
-failure cases, then close runtime-suspension gaps in JIT/AOT and remeasure costs.
+with unchanged default lowering. [HTTP timeout/cancellation and terminal failure cases](experiments/runtime-async/README.md#http-lifecycle-qualification--2026-10-11)
+now pass interpreter qualification. The author explicitly directs continuation until
+JIT and AOT runtime suspension work; close those gaps and remeasure costs.
 Retain cancellation, terminal Fault, GC and benchmark checks. Broaden
 execution-mode coverage before considering defaults; no current JIT/AOT suspension
 support is implied. General native interoperability, runtime interface recognition,

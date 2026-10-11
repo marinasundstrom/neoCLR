@@ -740,3 +740,21 @@ terminal-fault cleanup, production provider integration, performance remeasureme
 JIT/AOT suspension remain readiness work. Windows runtime-async qualification is also
 open. Existing JIT/AOT state-machine HTTP support remains valid, but is not evidence
 for runtime suspension in those modes. Runtime await is not ready to become default.
+
+
+## HTTP lifecycle qualification — 2026-10-11
+
+[RuntimeHttpLifecycle.rvn](RuntimeHttpLifecycle.rvn) passes timeout, cancellation,
+malformed-response and terminal-Fault cases using retained application bodies.
+The external peer checks request delivery and socket closure; recoverable outcomes
+then make a second successful request. Synchronous use cleanup runs exactly once.
+The Fault case remains invocation-terminal and does not claim managed unwinding.
+[Evidence](runtime-http-lifecycle-validation.json) records all four interpreter cases
+and verifies no generated async state machines in the application. Reproduce with
+`http_lifecycle.py --recipe <passing HTTP validation.json> --output <new-directory>`.
+
+The sample captures CancellationTokenSource rather than its value-type token:
+retained-body closure capture of arbitrary structs is still a compiler limitation.
+These checks establish lifecycle behavior, not throughput or complete native-resource
+leak freedom. The author now explicitly requests continuation through JIT and AOT
+runtime-suspension support; existing state-machine support does not satisfy that gate.
