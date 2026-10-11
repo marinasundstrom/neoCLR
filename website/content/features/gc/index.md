@@ -89,3 +89,7 @@ An opt-in macOS native carrier test now reclaims abandoned suspended bodies,
 including stack mappings and operation slots. The managed generator provider is
 not connected to this ownership model yet.
 [Carrier evidence and limitations](https://github.com/marinasundstrom/neoCLR/blob/main/docs/experiments/runtime-async/async-generators.md#owned-native-body-reclamation--2026-10-11).
+
+The experimental managed provider now links pending result, advancement and disposal
+tasks to their producer or iterator. External completion ownership remains open, so
+this does not yet enable automatic abandoned-generator reclamation.

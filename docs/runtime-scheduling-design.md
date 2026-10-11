@@ -1722,3 +1722,11 @@ GC. The sanitized host proves 80 resumptions and 80 abandonments without leaking
 operation slots or stack mappings. External signal ownership remains independent.
 The managed provider still needs to express result-task/iterator/completion reachability;
 no runtime-async default or general pending-task policy changes in this slice.
+
+
+The provider's next [managed ownership checkpoint](experiments/runtime-async/async-generators.md#pending-managed-task-ownership-links--2026-10-11)
+uses bound completion adapters to let pending result, advancement and disposal tasks
+retain their producer/cursor. These are ordinary managed edges, released through
+Promise's existing notification lifecycle, with extra allocation/queue cost. They
+are not a new Task API. External completion ownership, signal release and replacement
+of the `BodyLifetime` waiter remain prerequisites to selecting the owned native entry.

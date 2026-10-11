@@ -406,7 +406,62 @@ async func CheckPendingCleanup(exit: int) -> Task<()> {
     }
 }
 
+// Returning only these tasks deliberately drops the helper's iterator reference.
+// Strong native roots remain enabled; these are managed consumer regressions,
+// not yet proof of conditional-owner reclamation.
+async func EmptyAfterGate(gate: Task<int>, counters: Counters) -> AsyncIterable<int> {
+    use lifetime = Lifetime(counters)
+    counters.Starts = counters.Starts + 1
+    let value = await gate
+    if value != 0 { yield value }
+}
+
+func BeginOnlyAdvancement(gate: Task<int>, counters: Counters) -> Task<bool> {
+    let iterator = EmptyAfterGate(gate, counters).GetAsyncIterator()
+    return iterator.MoveNextAsync()
+}
+
+async func YieldWithPendingDisposal(probe: CleanupProbe) -> AsyncIterable<int> {
+    await for value in probe {
+        yield value
+    }
+}
+
+func BeginOnlyDisposal(probe: CleanupProbe) -> Task<()> {
+    let iterator = YieldWithPendingDisposal(probe).GetAsyncIterator()
+    let first = iterator.MoveNextAsync()
+    if !first.IsCompleted || !first.GetResult() {
+        System.Fail("Expected synchronous first yield before pending disposal")
+    }
+    return iterator.DisposeAsync()
+}
+
+async func CheckTaskOnlyConsumers() -> Task<()> {
+    let gate = Promise<int>()
+    let counters = Counters()
+    let advancement = BeginOnlyAdvancement(gate.Task, counters)
+    if advancement.IsCompleted || counters.Starts != 1 {
+        System.Fail("Task-only advancement did not suspend")
+    }
+    System.Runtime.GC.Collect()
+    _ = gate.Complete(0)
+    if await advancement || counters.Disposals != 1 {
+        System.Fail("Task-only advancement lost completion or cleanup")
+    }
+    let probe = CleanupProbe()
+    let disposal = BeginOnlyDisposal(probe)
+    _ = await probe.Disposing.Task
+    if disposal.IsCompleted || probe.Disposals != 1 {
+        System.Fail("Task-only disposal did not suspend")
+    }
+    System.Runtime.GC.Collect()
+    _ = probe.Release.Complete(())
+    await disposal
+    if probe.Disposals != 1 { System.Fail("Task-only disposal ran cleanup twice") }
+}
+
 async func Main() -> Task<int> {
+    await CheckTaskOnlyConsumers()
     for scenario in 0..4 {
         await CheckPendingCleanup(scenario)
     }

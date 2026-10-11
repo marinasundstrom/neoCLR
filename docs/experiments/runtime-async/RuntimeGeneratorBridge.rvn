@@ -40,6 +40,9 @@ class GeneratorCursor<T> : AsyncIterator<T> {
         if moving { System.Fail("Overlapping generator advancement") }
         moving = true
         next = Promise<bool>()
+        // Ownership adapter: a pending advancement retains this cursor even when
+        // the consumer has dropped its direct iterator reference.
+        next.Task.OnCompleted(KeepAlive)
         if !started {
             started = true
             body = Bridge.Start(Run)
@@ -52,6 +55,9 @@ class GeneratorCursor<T> : AsyncIterator<T> {
     }
 
     private func Run() -> TaskOutcome<()> => callback(self)
+
+    // Deliberate completion adapter: the bound receiver is the lifetime edge.
+    private func KeepAlive() -> System.Void { }
 
     val Current: T {
         get {
@@ -73,6 +79,8 @@ class GeneratorCursor<T> : AsyncIterator<T> {
         if moving { System.Fail("Cannot dispose during generator advancement") }
         if disposing { return done.Task }
         disposing = true
+        // Async disposal can outlive the consumer's reference to this cursor.
+        done.Task.OnCompleted(KeepAlive)
         if !started {
             ended = true
             _ = done.Complete(())

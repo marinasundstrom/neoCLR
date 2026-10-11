@@ -473,3 +473,45 @@ of abandoned native resources; costs include two temporary strong handles per ex
 owned body, promotion/parking bookkeeping, and pump scans after resumptions that might
 collect. The macOS ucontext carrier remains scaffolding. Windows qualification,
 managed-generator reclamation and performance comparisons remain open.
+
+
+## Pending managed-task ownership links — 2026-10-11
+
+The source-local provider now registers a bound lifetime callback on each body
+result task, each pending generator advancement, and the first disposal task.
+This establishes the managed graph needed before native roots can become conditional:
+
+- Result task → Promise callback list → bound producer receiver.
+- Advancement task → Promise callback list → bound iterator receiver.
+- Disposal task → Promise callback list → bound iterator receiver.
+
+A live task can therefore retain its producer/cursor without a separate consumer
+reference. These edges alone do not root an otherwise abandoned cycle. On completion
+or cancellation, Promise clears its registration list and transfers callbacks to the
+scheduler. Queued notifications retain the receiver until delivery, after which the
+ownership adapter has no work to do. Existing Task/Promise APIs and runtime-contract
+configuration are unchanged; this is source-local prototype behavior, not a new
+public lifetime API or a compiler lowering change.
+
+The callbacks are deliberate ownership adapters, not substitutes for user-level
+`await`. They cost one callback registration/allocation and queued notification per
+body, advancement, and first disposal. This is a provisional implementation using
+existing managed contracts; a direct internal ownership field may avoid that cost
+once the complete task/operation model is selected. No performance improvement is
+claimed, and these costs must be included in the eventual state-machine comparison.
+This reuses the scheduler design's preference for managed ownership over host roots;
+it does not claim that .NET implements task lifetime using these callbacks.
+
+[Three-mode regression evidence](pending-task-ownership-validation.json) covers the
+existing cancellation, cleanup, generic-owner and delegation cases plus consumers
+that return only a pending advancement/disposal task and drop their direct iterator
+reference. They collect before completion, then verify completion and exactly-once
+cleanup. Disposal entry is awaited because resuming its producer is scheduled.
+The tests run with the provider's existing strong native roots, so they validate
+consumer behavior and the source change, **not** conditional-owner reclamation.
+
+Still open: a completion callback on an externally owned awaited task must retain
+the suspended body; body-operation release must replace the permanently queued
+`BodyLifetime` waiter; pending signals need their own release rules. The owned native
+entry remains unselected by Raven until those edges and interpreter parity are in
+place. Managed abandoned-generator collection is not enabled by this checkpoint.

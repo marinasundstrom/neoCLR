@@ -8,6 +8,13 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-11
 
+- Add source-local runtime-async ownership adapters so pending result, generator
+  advancement and disposal tasks retain their producer or cursor. New task-only
+  consumers force GC and check completion/cleanup in interpreter, JIT and AOT.
+  These prototype links add callback/queue work; external completion ownership and
+  managed abandoned-generator reclamation remain open, with strong native roots
+  still enabled.
+
 - Connect owned parked frames and dependent callbacks in an opt-in macOS native
   runtime-async carrier entry. Reclaim expired stacks and body-operation slots
   outside GC without resuming bodies or releasing external signals; roll back failed

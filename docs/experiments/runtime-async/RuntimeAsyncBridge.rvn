@@ -39,7 +39,13 @@ module RuntimeAwaitProvider {
 
         init(action: () -> TaskOutcome<T>) {
             callback = action
+            // Prototype ownership adapter: a pending result retains its producer.
+            // Promise clears the registration on completion/cancellation; the queued
+            // callback then owns the producer until notification has drained.
+            source.Task.OnCompleted(KeepAlive)
         }
+
+        private func KeepAlive() -> System.Void { }
 
         val Task: Task<T> => source.Task
 

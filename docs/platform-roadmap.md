@@ -33,7 +33,10 @@ also participates in automatic safepoints and expires unreachable stacks safely.
 now share that marking fixed point, with explicit strong ownership required for
 dispatch. The opt-in [native carrier now reclaims abandoned owned bodies](experiments/runtime-async/async-generators.md#owned-native-body-reclamation--2026-10-11)
 in a sanitized 160-suspension contract test, including stack mappings and operation
-slots. Managed generator integration is still open: its provider retains strong roots. Abandoned-generator collection and
+slots. The provider now adds
+[pending-task ownership links](experiments/runtime-async/async-generators.md#pending-managed-task-ownership-links--2026-10-11)
+for results, advancement and disposal. External completion ownership and body release
+remain open; the provider still uses strong native roots. Abandoned-generator collection and
 performance gates remain open. See
 [scope, evidence and remaining work](experiments/runtime-async/async-generators.md).
 
