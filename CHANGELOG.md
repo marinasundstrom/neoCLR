@@ -47,6 +47,10 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   adapter, and preserve roots on failed installation. Explicit queue destinations and
   current await behavior remain unchanged. Focused scheduler, shared-invocation and
   guest timer checks validate ownership and dispatch; public queue removal is pending.
+  Add a private native runnable-submission hook with deferred execution, independent
+  root ownership and bounded admission. Route the retained managed HTTP callback through
+  it; native contracts and normal/fragmented/fault HTTP cases pass on macOS ARM64.
+  Managed Scheduler projection, interpreter mapping and a stable foreign ABI remain open.
 
 - Document testing and benchmarking as independent development projects, including
   ownership, APIs, runner commands, selection, configuration, reports and limitations.

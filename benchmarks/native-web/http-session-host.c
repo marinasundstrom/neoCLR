@@ -27,7 +27,9 @@ static int invoke_session(neoclr_aot_context *context, int *failed) {
     status = neoclr_bootstrap_callback_v1(0, &callback, context);
     if (!status && neoclr_session_adopt_v1(&session, context, callback)) host_error = 1;
     for (unsigned exchange = 0; exchange < 3 && !status && !host_error; exchange++) {
-        status = neoclr_session_invoke_v1(&session, callback);
+        /* Submit the retained managed callback through the runtime service.
+         * The session retains its own root; dispatch owns a separate admission. */
+        if (neoclr_scheduler_submit_v1(context, callback, NULL)) host_error = 1;
         uint64_t started = milliseconds();
         while (!status && !host_error) {
             status = neoclr_drain_default_queue_v1(context);

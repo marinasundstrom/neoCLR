@@ -43,7 +43,11 @@ remain open. The next [routing migration](runtime-scheduling-design.md#queue-ind
 separates runtime-owned continuation destinations from producer queues, with coordinated
 consumer/API migration. Interpreter completion admission now retains invocation-owned ready work without a
 queue binding; its VM dispatch adapter still resolves the default queue at installation.
-Current public TaskQueue behavior remains implemented until the replacement is qualified.
+A [private native submission hook](experiments/native-scheduler/README.md#runtime-submission-prototype--2026-10-11)
+now defers a rooted managed HTTP callback through runtime-owned admission/dispatch
+without a Task or managed queue. It is not yet a managed Scheduler projection or a
+stable foreign-language ABI. Current public TaskQueue behavior remains implemented
+until the replacement is qualified.
 
 **Common language runtime clarification (2026-10-11):** the primary target is managed
 languages running bytecode through the interpreter or JIT, with native AOT as the

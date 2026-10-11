@@ -80,7 +80,64 @@ static int entry_delivery_contract(void) {
     CHECK(!neoclr_gc_collect_v1(&c, NULL) && !c.text.used);
     return 0;
 }
+static int submitted_work_contract(void) {
+    uint64_t buffer[128] = {0};
+    neoclr_aot_context c = {.text = {(unsigned char *)buffer, sizeof(buffer), 0}}, other = {0};
+    neoclr_socket_scope scope;
+    CHECK(neoclr_scheduler_submit_v1(&c, 1, NULL) == 3);
+    CHECK(!neoclr_socket_scope_enter_v1(&scope, &c));
+    void *callback = NULL, *read = NULL;
+    CHECK(!neoclr_allocate_object_v1(&c.text, UINT32_MAX, 24, &callback));
+    ((uint64_t *)callback)[1] = 1;
+    uint64_t original;
+    CHECK(!neoclr_gc_host_root_create_v1(&c, callback, &original));
+    neoclr_socket_scope foreign;
+    CHECK(!neoclr_socket_scope_enter_v1(&foreign, &other));
+    CHECK(neoclr_scheduler_submit_v1(&other, original, NULL) == 3);
+    CHECK(!neoclr_socket_scope_leave_v1(&foreign));
+    CHECK(neoclr_scheduler_submit_v1(&c, 0, NULL) == 3);
+    c.fault.code = 4;
+    CHECK(neoclr_scheduler_submit_v1(&c, original, NULL) == 3 && c.fault.code == 4);
+    c.fault.code = 0;
+    neoclr_probe_frame entry, child;
+    neoclr_probe_storage empty = {0};
+    neoclr_probe_enter_v3(&entry, &c, 7, &empty, 0, "", 0);
+    CHECK(neoclr_scheduler_submit_v1(&c, original, NULL) == 3);
+    neoclr_probe_enter_v3(&child, &c, 8, &empty, 0, "", 0);
+    CHECK(neoclr_scheduler_submit_v1(&c, original, &entry) == 3);
+    neoclr_probe_leave_v1(&child);
+    CHECK(!neoclr_scheduler_submit_v1(&c, original, &entry));
+    neoclr_probe_leave_v1(&entry);
+    for (unsigned i = 1; i < 64; i++) CHECK(!neoclr_scheduler_submit_v1(&c, original, NULL));
+    CHECK(neoclr_scheduler_submit_v1(&c, original, NULL) == NEOCLR_AOT_FAULT_NATIVE_MEMORY_LIMIT);
+    CHECK(!neoclr_gc_host_root_read_v1(&c, original, &read) && read == callback);
+    CHECK(!neoclr_gc_host_root_release_v1(&c, original));
+    CHECK(neoclr_scheduler_submit_v1(&c, original, NULL) == 3);
+    CHECK(!neoclr_gc_collect_v1(&c, NULL) && c.text.used);
+    uint64_t delivery = 0;
+    for (unsigned i = 0; i < 64; i++) {
+        CHECK(neoclr_scheduler_acquire_v1(&c, &delivery, NULL) == NEOCLR_SCHEDULER_READY);
+        CHECK(!neoclr_gc_callback_read_v1(&c, delivery, &read) && read == callback);
+        CHECK(neoclr_scheduler_acquire_v1(&c, &delivery, NULL) == -3);
+        CHECK(!neoclr_scheduler_complete_v1(&c, delivery, NULL));
+    }
+    CHECK(neoclr_scheduler_acquire_v1(&c, &delivery, NULL) == NEOCLR_SCHEDULER_IDLE);
+    CHECK(!neoclr_gc_collect_v1(&c, NULL) && !c.text.used);
+    /* A terminal fault abandons queued work without invoking it. */
+    CHECK(!neoclr_allocate_object_v1(&c.text, UINT32_MAX, 24, &callback));
+    ((uint64_t *)callback)[1] = 1;
+    CHECK(!neoclr_gc_host_root_create_v1(&c, callback, &original));
+    CHECK(!neoclr_scheduler_submit_v1(&c, original, NULL));
+    CHECK(!neoclr_gc_host_root_release_v1(&c, original));
+    c.fault.code = 4;
+    CHECK(neoclr_scheduler_acquire_v1(&c, &delivery, NULL) == -3);
+    CHECK(!neoclr_socket_scope_leave_v1(&scope) && c.fault.code == 4);
+    c.fault.code = 0;
+    CHECK(!neoclr_gc_collect_v1(&c, NULL) && !c.text.used);
+    return 0;
+}
 int main(void) {
+    CHECK(!submitted_work_contract());
     CHECK(!entry_delivery_contract());
     uint64_t buffer[129] = {0}; buffer[128] = 1234567;
     neoclr_aot_context c = {.text = {(unsigned char *)buffer, 1024, 0}}, other = {0};

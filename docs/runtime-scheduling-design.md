@@ -824,3 +824,28 @@ it as the native ABI. Other language projections remain future consumers. Relati
 to the .NET API baseline above, managed familiarity is preserved at the projection
 layer; a reusable runtime ABI adds versioning, capability and lifetime validation
 costs that must be addressed independently of managed API shape.
+
+
+## First runtime submission hook — 2026-10-11
+
+The private native scheduler now admits a rooted callable with
+`neoclr_scheduler_submit_v1(context, callback_root, boundary)`, independently of
+Task/Promise or managed queue construction. It retains its own root, defers execution,
+and delivers through acquire/complete. The retained managed Raven HTTP callback is
+its first consumer. [Contract, limits and evidence](experiments/native-scheduler/README.md#runtime-submission-prototype--2026-10-11)
+distinguish admission from execution and input ownership from dispatch ownership.
+
+Relative to the .NET scheduling comparison, this models runnable admission beneath a
+managed API rather than taking a managed Task as the native submission payload. A
+Task/Promise projection may still track completion entirely in managed code. Direct
+host invocation is simpler, but bypasses deferred admission and common dispatch
+ownership. The hook costs a retained root and a bounded admission slot; it does not
+promise throughput gains, thread-pool semantics or FIFO order.
+
+Scope remains narrow: owner-thread native hosts, an image-local managed callable
+handle and current published-frame rules. The 64-slot table is shared with I/O/timers
+inside the experimental socket scope. Extracting a runtime service scope, cross-thread
+publication, cancellation handles, ABI version/capability negotiation and native-language
+callable projections remain open. The managed Scheduler API and interpreter-facing
+submission mapping are not implemented by this native prototype. Existing ScheduleTask
+is a distinct interpreter concurrent-work service and is not silently aliased here.

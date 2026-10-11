@@ -113,3 +113,41 @@ Windows qualification remains pending. No performance claim is made.
 Next: continuation destination and cross-mode wait policy, followed by the retained
 activation boundary for runtime suspension. Owned callback dispatch does not itself
 implement runtime async suspension or select a public Scheduler API.
+
+
+## Runtime submission prototype — 2026-10-11
+
+`neoclr_scheduler_submit_v1(context, callback_root, boundary)` admits one deferred
+runnable without requiring a Task/Promise or managed TaskQueue. The callback is an
+already-rooted image-local `fn<Void>` descriptor. The runtime clones its root; the
+caller retains ownership of the input handle and may release it after successful
+submission. Submission never invokes guest code inline. The owner later acquires and
+completes an owned delivery using the existing scheduler hooks. Scope teardown releases
+undispatched work after a terminal fault.
+
+This is a private native ABI prototype, not the public Scheduler or a foreign-language
+callback ABI. Calls are owner-thread-only and require quiescence or the exact published
+frame boundary. Rejected input/capacity leaves caller ownership unchanged. A successful
+submission is not a completed callback or guaranteed eventual execution after teardown.
+There is no submission cancellation ticket, parallel-execution or FIFO promise.
+
+The prototype reuses the native completion source's 64-slot operation table and its
+rotating polling policy. Submitted work therefore shares bounded capacity with I/O
+and timers; this is a temporary storage choice, not an application queue contract.
+Each admission costs one host-root slot; acquisition additionally retains the existing
+dispatch root. No managed Task allocation or performance improvement is claimed.
+A future runtime service scope must separate scheduler lifetime from socket storage.
+
+The retained HTTP host now submits its managed Raven bootstrap callback through this
+hook instead of invoking it directly. The session keeps its own root while dispatch
+owns each submission. [HTTP evidence](submission-http.json) passes three requests,
+fragmented requests and a terminal managed callback fault. The
+[six native contracts](submission-contracts.json) include submission with no managed
+queue, full-capacity rejection, stale/wrong-owner/boundary rejection, input-root release,
+GC retention, exactly 64 deliveries and abandonment on fault. All ran on macOS ARM64;
+Windows execution of this revision remains pending.
+
+Reproduce with `scripts/validate-native-network.py` and the retained HTTP commands
+above, using fresh output directories. The prototype changes no Raven compiler import
+or managed public API. The next projection must define managed submission/continuation
+semantics over runtime hooks rather than exposing this operation table.

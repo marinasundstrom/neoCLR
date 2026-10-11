@@ -15,7 +15,7 @@ typedef struct neoclr_socket_scope {
     struct neoclr_socket_scope *previous;
     struct { uint64_t id; neoclr_socket_descriptor descriptor; int listener; } slots[64];
     /* Private operations: state 1 pending, 2 ready, 3 delivered; kind 1 accept,
-     * 2 receive, 3 send, 4 connect, 5 DNS, 6 one-shot timer. Transfer snapshots have a separate bounded native budget. */
+     * 2 receive, 3 send, 4 connect, 5 DNS, 6 one-shot timer, 7 submitted runnable. Transfer snapshots have a separate bounded native budget. */
     struct { uint64_t id, listener, callback, tag, value, buffer_root, deadline;
         uint32_t state, kind, offset, count; unsigned char *buffer;
         neoclr_dns_work *dns;
@@ -24,7 +24,7 @@ typedef struct neoclr_socket_scope {
         uint16_t port;
         uint64_t attempt_deadline;
     } operations[64];
-    uint64_t timer_delivery; /* Root handed to host, retained until next poll/leave. */
+    uint64_t timer_delivery; /* One-shot delivery root, retained until next poll/leave. */
     uint64_t scheduler_delivery; /* Independent dispatch root, released by completion/leave. */
     const struct neoclr_probe_frame *scheduler_boundary;
     uint64_t transfer_bytes;
@@ -82,6 +82,13 @@ int32_t neoclr_socket_connect_addresses_until_v1(const void *, int32_t, int64_t,
  * still awaiting result consumption keep the scheduler pending. */
 enum { NEOCLR_SCHEDULER_IDLE = 0, NEOCLR_SCHEDULER_READY = 1, NEOCLR_SCHEDULER_PENDING = 2 };
 int32_t neoclr_scheduler_step_v1(neoclr_aot_context *, uint64_t *, const neoclr_probe_frame *);
+/* Private runtime submission prototype. Clone a rooted image-local fn<Void>
+ * into this owner-thread scope; success means admitted, never inline execution.
+ * Caller retains its input handle. No Task/Promise or managed queue is required.
+ * Exact published boundary or quiescence required. Shared operation-table capacity
+ * is bounded; rejection leaves caller ownership unchanged. No FIFO/parallelism or
+ * cancellation ticket contract. Teardown abandons pending submissions. */
+int32_t neoclr_scheduler_submit_v1(neoclr_aot_context *, uint64_t, const neoclr_probe_frame *);
 /* Opt-in owned delivery. Acquire returns the same states as step, but READY
  * publishes an independent root/ticket. No poll may advance until complete.
  * Complete at the acquiring boundary after callback return, including guest fault;

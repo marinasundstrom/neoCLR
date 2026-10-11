@@ -383,6 +383,27 @@ int32_t neoclr_scheduler_step_v1(neoclr_aot_context *context, uint64_t *callback
     return NEOCLR_SCHEDULER_IDLE;
 }
 
+int32_t neoclr_scheduler_submit_v1(neoclr_aot_context *context, uint64_t callback,
+    const neoclr_probe_frame *boundary) {
+    neoclr_socket_scope *scope = find_scope(context);
+    if (!scope) return 3;
+    void *value = NULL;
+    int32_t status = boundary
+        ? neoclr_gc_callback_read_suspended_v1(context, callback, &value, boundary)
+        : neoclr_gc_callback_read_v1(context, callback, &value);
+    if (status) return status;
+    unsigned slot = 0;
+    while (slot < 64 && scope->operations[slot].state) slot++;
+    if (slot == 64) return NEOCLR_AOT_FAULT_NATIVE_MEMORY_LIMIT;
+    uint64_t root = 0;
+    status = neoclr_gc_host_root_create_v1(context, value, &root);
+    if (status) return status;
+    scope->operations[slot].callback = root;
+    scope->operations[slot].kind = 7;
+    scope->operations[slot].state = 2;
+    return 0;
+}
+
 int32_t neoclr_scheduler_acquire_v1(neoclr_aot_context *context, uint64_t *delivery,
     const neoclr_probe_frame *boundary) {
     if (!delivery) return -3;
@@ -496,7 +517,7 @@ static int32_t socket_poll(neoclr_aot_context *context, uint64_t *callback) {
             scope->operations[i].state = 3;
             scope->poll_cursor = (i + 1) % 64;
             *callback = scope->operations[i].callback;
-            if (scope->operations[i].kind == 6) {
+            if (scope->operations[i].kind == 6 || scope->operations[i].kind == 7) {
                 scope->timer_delivery = *callback;
                 memset(&scope->operations[i], 0, sizeof(scope->operations[i]));
             }
