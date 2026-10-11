@@ -15584,11 +15584,15 @@ or runtime-await default switch was performed.
   hosts, added installed compiler/helper/library discovery and a reproducible
   development bundle preparer, and switched routine runtime-library tests to JIT.
   Interpreter selection remains explicit and other hosts retain that default.
-- **Validation in progress:** installed default execution passes the HTTP showcase
-  and runtime-async StackTrace consumer locally. Broad library qualification found
-  the old helper's 64 KiB byte-array limit; preparation now exposes configurable
-  limits with 32 MiB heap/4 MiB byte-array defaults. Current Windows qualification
-  is a required follow-through, not inferred from earlier gate results.
+- **Validation completed:** 29 macOS library suites pass from a relocated install,
+  along with explicit interpreter and runtime-async StackTrace/GC controls. Windows
+  run 38182286947 passes scalar/CLI/framework gates, and eight default-mode HTTP
+  cases pass on each host. Qualification exposed helper size and missing time-zone
+  services; preparation now includes these services and configurable 32 MiB heap/
+  4 MiB byte-array defaults. [Retained evidence](experiments/jit-cli/default/README.md).
+- **Next author direction:** fix native compiler limitations for generic async
+  methods and `use` cleanup inside async methods. This is separate from the
+  completed default-mode gate; focused compiler and runtime checks are in progress.
 - **Open boundaries:** eager compilation, interpreted debugging, Windows runtime
   suspension and Windows ARM64 remain separate gaps. No interpreter fallback hides
   unsupported native programs. See [the execution contract](jit-execution.md).

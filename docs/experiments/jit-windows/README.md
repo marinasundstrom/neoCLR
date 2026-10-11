@@ -39,3 +39,9 @@ runs HTTP with no execution/tool/library flags and runs representative framework
 suites with the omitted-mode JIT default. Windows ARM64 and Windows runtime
 suspension remain separate work. The historical evidence above predates this
 default-mode gate. See [CLI contract and readiness](../../jit-execution.md).
+
+The completed omitted-mode gate passes at `04812f87` in
+[run 38182286947](https://github.com/marinasundstrom/neoCLR/actions/runs/38182286947):
+eight installed HTTP cases and 29 framework/guard/selector records, including
+zoned-time services. [Retained default-mode evidence](../jit-cli/default/README.md)
+is separate from the earlier explicit-mode results above.

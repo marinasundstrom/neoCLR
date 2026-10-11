@@ -1,0 +1,1114 @@
+{
+  "passed": false,
+  "modes": [
+    "jit"
+  ],
+  "jitHostSha256": "554ed1187a8dc3fa3c6a9084dfaf9e344a074f1c0b4853361e72a8f6936921d5",
+  "platform": "macOS-27.0-arm64-arm-64bit",
+  "cases": [
+    {
+      "suite": "http-lifetime",
+      "mode": "jit",
+      "repetition": 1,
+      "exitCode": 0,
+      "elapsedSeconds": 7.067,
+      "stdout": "PASS HTTP client use disposes its owned handler exactly once\nPASS HTTP borrowed handler survives one client and serves another\nPASS HTTP disposal requests cancellation and waits for handler acknowledgement\nPASS HTTP caller cancellation propagates without disposing the handler\nPASS HTTP completed responses survive disposal and retain request association\nPASS HTTP pre-cancellation skips custom handlers\nPASS HTTP socket handler disposal is idempotent through Disposable\nPASS HTTP delegating handlers run outward and unwind inward\nPASS HTTP borrowed delegating pipeline remains reusable\nPASS HTTP borrowed clients cancel only their own pending sends\nTests: 10, passed: 10, failed: 0, skipped: 0\n",
+      "stderr": ""
+    },
+    {
+      "suite": "http-text",
+      "mode": "jit",
+      "repetition": 1,
+      "exitCode": 0,
+      "elapsedSeconds": 4.121,
+      "stdout": "PASS HTTP buffered text preserves scalars beyond the one-shot codec quota\nPASS HTTP buffered text rejects malformed and truncated large bodies\nPASS HTTP buffered text preserves empty BOM and NUL data\nTests: 3, passed: 3, failed: 0, skipped: 0\n",
+      "stderr": ""
+    },
+    {
+      "suite": "collections",
+      "mode": "jit",
+      "repetition": 1,
+      "exitCode": 0,
+      "elapsedSeconds": 3.927,
+      "stdout": "PASS Any does not read Current\nPASS For break disposes its iterator\nPASS ArrayList copy has independent storage\nPASS Map materialization handles collisions and empty input\nPASS HashMap copies sequences and maps independently\nPASS Map iteration snapshots pairs before mutation\nPASS ToMap materializes pair queries and selectors\nPASS HashMap copies preserve reference values and comparer\nPASS Predicate Any stops at its first match\nPASS Queue growth preserves wrapped FIFO contents\nPASS ArrayQueue preserves FIFO\nPASS Queue preserves references through clear and reuse\nPASS Queue iterator captures FIFO contents before mutation\nPASS HashSet applies its comparer\nPASS Stack growth preserves LIFO contents\nPASS ArrayStack preserves LIFO\nPASS Stack preserves references through clear and reuse\nPASS Stack iterator captures LIFO contents before mutation\nTests: 18, passed: 18, failed: 0, skipped: 0\n",
+      "stderr": ""
+    },
+    {
+      "suite": "collections",
+      "mode": "jit",
+      "arguments": [
+        "--filter",
+        "ArrayQueue"
+      ],
+      "exitCode": 0,
+      "elapsedSeconds": 4.047535,
+      "stdout": "PASS ArrayQueue preserves FIFO\nTests: 1, passed: 1, failed: 0, skipped: 0\n",
+      "stderr": ""
+    },
+    {
+      "suite": "collections",
+      "mode": "jit",
+      "arguments": [
+        "--filter",
+        "Map"
+      ],
+      "exitCode": 0,
+      "elapsedSeconds": 5.08363,
+      "stdout": "PASS Map materialization handles collisions and empty input\nPASS HashMap copies sequences and maps independently\nPASS Map iteration snapshots pairs before mutation\nPASS ToMap materializes pair queries and selectors\nPASS HashMap copies preserve reference values and comparer\nTests: 5, passed: 5, failed: 0, skipped: 0\n",
+      "stderr": ""
+    },
+    {
+      "suite": "collection-construction",
+      "mode": "jit",
+      "repetition": 1,
+      "exitCode": 0,
+      "elapsedSeconds": 2.019,
+      "stdout": "PASS Collection constructors consume and dispose each input once\nPASS Collection constructors accept empty arrays\nPASS Queue and stack copies follow source iteration order\nPASS List construction materializes filtered input independently\nPASS Collection copies preserve element reference identity\nPASS Set copy retains values and explicit comparer after source clear\nPASS Map indexers share comparer lookup and insert-or-replace semantics\nPASS Set collision chains survive removal growth and slot reuse\nPASS Set snapshot retains values across clear and reuse\nPASS Set ordinal string equality preserves case and Unicode\nTests: 10, passed: 10, failed: 0, skipped: 0\n",
+      "stderr": ""
+    },
+    {
+      "suite": "collection-iteration",
+      "mode": "jit",
+      "repetition": 1,
+      "exitCode": 0,
+      "elapsedSeconds": 1.756,
+      "stdout": "PASS For completion disposes its iterator\nPASS For continue preserves traversal and disposal\nPASS For disposes an empty iterator\nPASS Labeled continue disposes each inner iterator\nPASS For return disposes before returning to its caller\nPASS All stops at the first failed predicate\nPASS Count advances without reading Current\nPASS Any disposes empty input\nPASS First stops after one value\nPASS Fold visits every value\nPASS Last visits the complete input\nPASS Predicate Single stops at the second match\nPASS Predicate First disposes input with no match\nPASS Predicate Count reads every value\nPASS Predicate First stops at its match\nPASS Predicate Last retains the final match\nPASS Predicate Single scans for a unique match\nPASS Single rejects multiple values without reading the second\nPASS ToList materializes and disposes its input\nTests: 19, passed: 19, failed: 0, skipped: 0\n",
+      "stderr": ""
+    },
+    {
+      "suite": "json-dom",
+      "mode": "jit",
+      "repetition": 1,
+      "exitCode": 0,
+      "elapsedSeconds": 5.276,
+      "stdout": "PASS JSON arrays report invalid indices\nPASS JSON serialization rejects cyclic node graphs\nPASS JSON nested documents round trip with Unicode and number spelling\nPASS JSON document round trip removes surrounding whitespace\nPASS JSON parsing rejects escaped aliases of duplicate names\nPASS JSON parsing rejects trailing commas and truncated input\nPASS Empty JSON objects support empty map snapshots and safe lookup\nPASS JSON map lookup distinguishes null absence and ordinal keys\nPASS JSON map views keep JSON node serialization precedence\nPASS JSON map snapshots preserve insertion order and node identity\nPASS JSON numbers preserve spelling and reject fractional Int32 conversion\nPASS JSON duplicate insertion preserves the original value\nPASS JSON objects distinguish present null from missing fields\nPASS JSON object indexed access preserves insertion order\nPASS JSON documents support every root node kind\nPASS JSON scalar nodes expose their typed values\nPASS JSON sequence indexing retains node identity and explicit null\nPASS Empty JSON arrays expose empty sequence snapshots\nPASS JSON sequence views retain node serialization precedence\nPASS JSON sequence snapshots preserve order and shared child contents\nTests: 20, passed: 20, failed: 0, skipped: 0\n",
+      "stderr": ""
+    },
+    {
+      "suite": "json-streams",
+      "mode": "jit",
+      "repetition": 1,
+      "exitCode": 0,
+      "elapsedSeconds": 6.494,
+      "stdout": "PASS JSON stream serialization detects cycles before writing\nPASS JSON stream output quota includes escaping and validates before writes\nPASS JSON stream reads reject split invalid UTF-8\nPASS JSON memory stream round trip preserves document content\nPASS JSON number document quota preserves long number spelling\nPASS JSON streams retry single-byte reads and writes without taking ownership\nPASS JSON stream reads preserve the underlying I/O failure\nPASS JSON stream input quota counts bytes and preserves ownership\nPASS JSON stream reads reject a truncated document\nPASS JSON stream boundary counts UTF-8 bytes rather than characters\nPASS JSON stream writes preserve partial output and failure cause\nPASS JSON stream writes reject zero progress without looping\nTests: 12, passed: 12, failed: 0, skipped: 0\n",
+      "stderr": ""
+    },
+    {
+      "suite": "memory-stream",
+      "mode": "jit",
+      "repetition": 1,
+      "exitCode": 0,
+      "elapsedSeconds": 2.906,
+      "stdout": "PASS MemoryStream quota errors preserve length and position\nPASS MemoryStream closure is shared across interfaces and idempotent\nPASS MemoryStream gap writes zero-fill while empty writes preserve length\nPASS MemoryStream rejects invalid buffer and seek ranges without moving\nPASS MemoryStream overwrites preserve length and untouched bytes\nTests: 5, passed: 5, failed: 0, skipped: 0\n",
+      "stderr": ""
+    },
+    {
+      "suite": "string-construction",
+      "mode": "jit",
+      "repetition": 1,
+      "exitCode": 0,
+      "elapsedSeconds": 9.407,
+      "stdout": "PASS String construction copies character storage\nPASS String construction accepts an empty character sequence\nPASS String construction preserves and merges grapheme boundaries\nPASS String named arguments preserve public parameter contracts\nPASS String exposes a readonly character sequence\nTests: 5, passed: 5, failed: 0, skipped: 0\n",
+      "stderr": ""
+    },
+    {
+      "suite": "encoding-buffer-limits",
+      "mode": "jit",
+      "repetition": 1,
+      "exitCode": 0,
+      "elapsedSeconds": 5.047,
+      "stdout": "PASS UTF-8 decoder quota rejection preserves an incomplete scalar\nPASS ASCII decoder accepts the maximum input after rejecting an oversized call\nPASS Encoder drain quotas preserve accepted text and destination bytes\nPASS UTF-8 decoder maximum input counts new bytes separately from carried bytes\nPASS Native buffer comprehensions preserve selector indices and range endpoints\nPASS One-shot decoding enforces byte limits and accepts the maximum\nTests: 6, passed: 6, failed: 0, skipped: 0\n",
+      "stderr": ""
+    },
+    {
+      "suite": "encoding-boundaries",
+      "mode": "jit",
+      "repetition": 1,
+      "exitCode": 0,
+      "elapsedSeconds": 5.328,
+      "stdout": "PASS StreamReader decodes Unicode lines across single-byte reads\nPASS StreamReader distinguishes empty lines EOF and lone carriage returns\nPASS StreamReader delimits custom decoded output and bounds expansion\nPASS StreamWriter reports zero progress and preserves flush failures\nPASS StreamReader rejects invalid limits before consuming its input\nPASS Encoding input quotas reject oversized chunks without poisoning sessions\nPASS StreamWriter accepts its maximum byte count and preflights oversized lines\nPASS StreamReader preserves input failures and rejects truncated UTF-8 at EOF\nTests: 8, passed: 8, failed: 0, skipped: 0\n",
+      "stderr": ""
+    },
+    {
+      "suite": "encoding-streams",
+      "mode": "jit",
+      "repetition": 1,
+      "exitCode": 0,
+      "elapsedSeconds": 4.038,
+      "stdout": "PASS StreamWriter completes short writes and preserves cross-input graphemes\nPASS ASCII StreamWriter rejects complete lines before output and remains reusable\nPASS Custom encoder trailers require explicit Finish and are emitted once\nPASS Closing a writer manages ownership without implicit encoder finalization\nPASS Partial write and final-output failures are observable without replay\nPASS Custom encoder final acceptance waits for all trailer bytes to drain\nPASS Selected ASCII reader recognizes CRLF and preserves borrowed ownership\nPASS Selected readers reject malformed bytes and enforce decoded text limits\nTests: 8, passed: 8, failed: 0, skipped: 0\n",
+      "stderr": ""
+    },
+    {
+      "suite": "encoding",
+      "mode": "jit",
+      "repetition": 1,
+      "exitCode": 0,
+      "elapsedSeconds": 3.619,
+      "stdout": "PASS Encoding providers preserve UTF-8 and reject non-ASCII text\nPASS UTF-8 decoding preserves text at every byte split\nPASS UTF-8 decoders reject malformed scalars and truncated final input\nPASS Decoder sessions copy pending input and preserve BOM data\nPASS Decoder range errors are retryable and ASCII errors are terminal\nPASS Encoders preserve accepted input through one-byte drains\nPASS Encoder chunks preserve scalars across the internal byte boundary\nPASS ASCII encoder preflight is retryable and factories are independent\nPASS One-shot decoding preserves Unicode BOM NUL and empty sequences\nPASS One-shot errors do not poison providers and results are snapshots\nTests: 10, passed: 10, failed: 0, skipped: 0\n",
+      "stderr": ""
+    },
+    {
+      "suite": "unicode-casing",
+      "mode": "jit",
+      "repetition": 1,
+      "exitCode": 0,
+      "elapsedSeconds": 3.504,
+      "stdout": "PASS Invariant casing preserves embedded NUL and empty strings\nPASS Invariant casing supports full Unicode expansions\nPASS Invariant casing preserves normalization form\nPASS Full casing expansion does not redefine ordinal ignore-case comparison\nPASS Invariant lowercase respects contextual Greek sigma\nPASS Invariant uppercase preserves emoji and supplementary letters\nTests: 6, passed: 6, failed: 0, skipped: 0\n",
+      "stderr": ""
+    },
+    {
+      "suite": "int64-parsing",
+      "mode": "jit",
+      "repetition": 1,
+      "exitCode": 0,
+      "elapsedSeconds": 2.376,
+      "stdout": "PASS Int64 parsing accepts both signed boundaries\nPASS Int64 decimal formatting round trips signed boundaries\nPASS Int64 parsing rejects noncanonical lexical inputs\nPASS Int64 parsing distinguishes overflow from invalid trailing text\nPASS Int64 parsing accepts signs leading zeros and values beyond Int32\nTests: 5, passed: 5, failed: 0, skipped: 0\n",
+      "stderr": ""
+    },
+    {
+      "suite": "primitive-parsing",
+      "mode": "jit",
+      "repetition": 1,
+      "exitCode": 0,
+      "elapsedSeconds": 2.765,
+      "stdout": "PASS Boolean parsing accepts mixed case and rejects numeric aliases\nPASS Byte parsing preserves values and reports overflow\nPASS Byte parsing preserves distinct small values\nPASS Double parsing preserves values and reports overflow\nPASS Primitive parsers distinguish invalid format from overflow\nPASS Int16 parsing preserves values and reports overflow\nPASS Int32 parsing preserves values and reports overflow\nPASS SByte parsing preserves values and reports overflow\nPASS Single parsing preserves values and reports overflow\nPASS UInt16 parsing preserves values and reports overflow\nPASS UInt32 parsing preserves values and reports overflow\nPASS UInt64 parsing preserves values and reports overflow\nTests: 12, passed: 12, failed: 0, skipped: 0\n",
+      "stderr": ""
+    },
+    {
+      "suite": "path-values",
+      "mode": "jit",
+      "repetition": 1,
+      "exitCode": 0,
+      "elapsedSeconds": 2.741,
+      "stdout": "PASS Path Object equality distinguishes colliding map keys\nPASS Equal paths share hashes and virtual display\nPASS Path maps replace equal keys and retain lookup through growth\nPASS Path equality distinguishes case roots and normalization\nPASS Path equality agrees across typed interface and Object dispatch\nTests: 5, passed: 5, failed: 0, skipped: 0\n",
+      "stderr": ""
+    },
+    {
+      "suite": "index-range",
+      "mode": "jit",
+      "repetition": 1,
+      "exitCode": 0,
+      "elapsedSeconds": 4.516,
+      "stdout": "PASS Index preserves direction and resolves end boundaries\nPASS Index and Range typed equality agrees with hashing\nPASS Range resolution accepts empty and full boundaries\nPASS Array range syntax supports omitted and end-relative boundaries\nPASS Array indexes support values and from-end assignment\nPASS Array slices copy storage and preserve reference elements\nPASS Array indexing and slicing evaluate operands once in source order\nPASS Read-only value fields use defensive copies for method calls\nPASS Array safe access returns options and results for invalid bounds\nPASS String ranges preserve graphemes and half-open boundaries\nPASS String safe access rejects invalid grapheme bounds\nPASS String slicing evaluates receiver and bounds once\nPASS ArrayList supports directional mutation and independent range copies\nPASS Sequence slicing consumes one iterator without indexed reads\nPASS Sequence invalid and empty slices do not acquire iterators\nPASS Sequence slicing disposes when enumeration ends before Count\nPASS Sequence safe indexing and slicing work through array aliases\nPASS Sequence extension indexers provide default access and independent slices\nPASS Sequence slicing delegates to the list range contract\nPASS Native extension indexers support writes and compound assignment\nTests: 20, passed: 20, failed: 0, skipped: 0\n",
+      "stderr": ""
+    },
+    {
+      "suite": "index-range",
+      "mode": "jit",
+      "guard": "negative-index",
+      "exitCode": 1,
+      "elapsedSeconds": 4.014067,
+      "stdout": "",
+      "stderr": "UserFault: Index value must be nonnegative\n   at System.Runtime.CompilerServices.RuntimeFailure.Terminate [instruction 1]\n   at System.Fail [instruction 1]\n   at System.Index..ctor [instruction 5]\n   at NeoClr.RuntimeTests.Main [instruction 21]\n"
+    },
+    {
+      "suite": "index-range",
+      "mode": "jit",
+      "guard": "negative-conversion",
+      "exitCode": 1,
+      "elapsedSeconds": 5.179289,
+      "stdout": "",
+      "stderr": "UserFault: Index value must be nonnegative\n   at System.Runtime.CompilerServices.RuntimeFailure.Terminate [instruction 1]\n   at System.Fail [instruction 1]\n   at System.Index..ctor [instruction 5]\n   at System.Index.FromStart [instruction 2]\n   at System.Index.op_Implicit [instruction 1]\n   at NeoClr.RuntimeTests.Main [instruction 28]\n"
+    },
+    {
+      "suite": "index-range",
+      "mode": "jit",
+      "guard": "negative-length",
+      "exitCode": 1,
+      "elapsedSeconds": 5.116402,
+      "stdout": "",
+      "stderr": "UserFault: Range length must be nonnegative\n   at System.Runtime.CompilerServices.RuntimeFailure.Terminate [instruction 1]\n   at System.Fail [instruction 1]\n   at System.Range.GetOffsetAndLength [instruction 5]\n   at NeoClr.RuntimeTests.Main [instruction 42]\n"
+    },
+    {
+      "suite": "index-range",
+      "mode": "jit",
+      "guard": "list-capacity",
+      "exitCode": 1,
+      "elapsedSeconds": 7.931307,
+      "stdout": "",
+      "stderr": "UserFault: Range is outside the value\n   at System.Runtime.CompilerServices.RuntimeFailure.Terminate [instruction 1]\n   at System.Fail [instruction 1]\n   at System.Range.GetOffsetAndLength [instruction 40]\n   at System.Collections.ArrayList`1.get_Item [instruction 3]\n   at NeoClr.RuntimeTests.Main [instruction 118]\n"
+    },
+    {
+      "suite": "index-range",
+      "mode": "jit",
+      "guard": "list-end",
+      "exitCode": 1,
+      "elapsedSeconds": 6.090104,
+      "stdout": "",
+      "stderr": "UserFault: ArrayList index out of range\n   at System.Runtime.CompilerServices.RuntimeFailure.Terminate [instruction 1]\n   at System.Fail [instruction 1]\n   at System.Collections.ArrayList`1.get_Item [instruction 12]\n   at System.Collections.ArrayList`1.get_Item [instruction 5]\n   at NeoClr.RuntimeTests.Main [instruction 132]\n"
+    },
+    {
+      "suite": "index-range",
+      "mode": "jit",
+      "guard": "string-reversed",
+      "exitCode": 1,
+      "elapsedSeconds": 5.894547,
+      "stdout": "",
+      "stderr": "UserFault: Range is outside the value\n   at System.Runtime.CompilerServices.RuntimeFailure.Terminate [instruction 1]\n   at System.Fail [instruction 1]\n   at System.Range.GetOffsetAndLength [instruction 33]\n   at System.String.get_Item [instruction 3]\n   at NeoClr.RuntimeTests.Main [instruction 92]\n"
+    },
+    {
+      "suite": "index-range",
+      "mode": "jit",
+      "guard": "string-past-end",
+      "exitCode": 1,
+      "elapsedSeconds": 5.564522,
+      "stdout": "",
+      "stderr": "UserFault: Range is outside the value\n   at System.Runtime.CompilerServices.RuntimeFailure.Terminate [instruction 1]\n   at System.Fail [instruction 1]\n   at System.Range.GetOffsetAndLength [instruction 40]\n   at System.String.get_Item [instruction 3]\n   at NeoClr.RuntimeTests.Main [instruction 102]\n"
+    },
+    {
+      "suite": "index-range",
+      "mode": "jit",
+      "guard": "reversed",
+      "exitCode": 1,
+      "elapsedSeconds": 4.817137,
+      "stdout": "",
+      "stderr": "UserFault: Range is outside the value\n   at System.Runtime.CompilerServices.RuntimeFailure.Terminate [instruction 1]\n   at System.Fail [instruction 1]\n   at System.Range.GetOffsetAndLength [instruction 33]\n   at NeoClr.RuntimeTests.Main [instruction 56]\n"
+    },
+    {
+      "suite": "index-range",
+      "mode": "jit",
+      "guard": "past-end",
+      "exitCode": 1,
+      "elapsedSeconds": 4.205441,
+      "stdout": "",
+      "stderr": "UserFault: Range is outside the value\n   at System.Runtime.CompilerServices.RuntimeFailure.Terminate [instruction 1]\n   at System.Fail [instruction 1]\n   at System.Range.GetOffsetAndLength [instruction 40]\n   at NeoClr.RuntimeTests.Main [instruction 68]\n"
+    },
+    {
+      "suite": "index-range",
+      "mode": "jit",
+      "guard": "before-start",
+      "exitCode": 1,
+      "elapsedSeconds": 4.345243,
+      "stdout": "",
+      "stderr": "UserFault: Range is outside the value\n   at System.Runtime.CompilerServices.RuntimeFailure.Terminate [instruction 1]\n   at System.Fail [instruction 1]\n   at System.Range.GetOffsetAndLength [instruction 26]\n   at NeoClr.RuntimeTests.Main [instruction 80]\n"
+    },
+    {
+      "suite": "http-method-values",
+      "mode": "jit",
+      "repetition": 1,
+      "exitCode": 0,
+      "elapsedSeconds": 2.197,
+      "stdout": "PASS HTTP coffee requests retain BREW and unnamed status codes\nPASS HTTP custom method construction and parsing preserve spelling\nPASS HTTP method equality and hashes ignore ASCII case\nPASS HTTP methods retain case-insensitive identity in a set\nPASS HTTP method validation admits token punctuation and rejects separators\nPASS HTTP method parsing canonicalizes every known name\nPASS HTTP predefined method values use canonical tokens\nPASS HTTP request factories retain predefined and custom methods\nPASS HTTP URI request factories support custom methods and empty content\nTests: 9, passed: 9, failed: 0, skipped: 0\n",
+      "stderr": ""
+    },
+    {
+      "suite": "http-header-values",
+      "mode": "jit",
+      "repetition": 1,
+      "exitCode": 0,
+      "elapsedSeconds": 1.891,
+      "stdout": "PASS HTTP header lookup distinguishes empty values from absent fields\nPASS HTTP header lookup rejects invalid names\nPASS HTTP header lookup preserves repeated values without splitting commas\nPASS HTTP request lookup exposes content headers without inventing provider headers\nPASS HTTP header lookup snapshots remain independent of later additions\nTests: 5, passed: 5, failed: 0, skipped: 0\n",
+      "stderr": ""
+    },
+    {
+      "suite": "http-route-matching",
+      "mode": "jit",
+      "repetition": 1,
+      "exitCode": 0,
+      "elapsedSeconds": 1.989,
+      "stdout": "PASS Route matching preserves case segment and trailing-slash distinctions\nPASS Route byte quotas admit the boundary and reject one extra byte\nPASS Route matching separates query text and converts captured integers\nPASS Route captures decode UTF-8 once and preserve literal plus\nPASS Route integer conversion distinguishes path matching from conversion failure\nPASS Route parsing rejects malformed and unsupported pattern syntax\nPASS Route matching validates malformed targets even when literals mismatch\nPASS Route segment quotas admit the boundary and reject one extra segment\nTests: 8, passed: 8, failed: 0, skipped: 0\n",
+      "stderr": ""
+    },
+    {
+      "suite": "ip-address-values",
+      "mode": "jit",
+      "repetition": 1,
+      "exitCode": 0,
+      "elapsedSeconds": 2.258,
+      "stdout": "PASS IPAddress values survive subsequent parse allocations\nPASS IPv4 parsing rejects malformed and unsupported corpus forms\nPASS IPv6 parsing rejects malformed and unsupported corpus forms\nPASS IPAddress Object dispatch preserves value equality hashes and family distinctions\nPASS IPAddress parsing distinguishes unsupported scope from invalid format\nPASS IPv4 parsing and canonical formatting round trip\nPASS IPv6 parsing and canonical formatting round trip\nTests: 7, passed: 7, failed: 0, skipped: 0\n",
+      "stderr": ""
+    },
+    {
+      "suite": "uri-resolution",
+      "mode": "jit",
+      "repetition": 1,
+      "exitCode": 0,
+      "elapsedSeconds": 4.073,
+      "stdout": "PASS URI resolution handles authority and path bases and rejects relative bases\nPASS URI classification and equality preserve literal identity\nPASS URI parsing rejects every invalid grammar corpus input\nPASS URI parsing and resolution enforce the byte quota\nPASS URI reference resolution corpus group 1\nPASS URI reference resolution corpus group 2\nPASS URI reference resolution corpus group 3\nPASS URI reference resolution corpus group 4\nPASS URI reference resolution corpus group 5\nPASS URI reference resolution corpus group 6\nPASS URI parsing reports unsupported bracketed authorities\nTests: 11, passed: 11, failed: 0, skipped: 0\n",
+      "stderr": ""
+    },
+    {
+      "suite": "zoned-time-parsing",
+      "mode": "jit",
+      "repetition": 1,
+      "exitCode": 1,
+      "elapsedSeconds": 2.002,
+      "stdout": "",
+      "stderr": "aot-poc: dlsym(0x66fe5000, neoclr_time_zone_exists_v1): symbol not found\n"
+    }
+  ],
+  "phases": [
+    {
+      "suite": "http-lifetime",
+      "phase": "discovery",
+      "elapsedSeconds": 15.203299,
+      "details": {
+        "sourceCompilationSeconds": 10.047499,
+        "metadataDiscoveryIncludingToolBuildSeconds": 5.152034
+      }
+    },
+    {
+      "suite": "http-lifetime",
+      "phase": "source-compilation",
+      "elapsedSeconds": 11.750382,
+      "command": [
+        "dotnet",
+        "/Users/robert/Projects/neoclr/target/default-jit-prepared-v2/bundle/sdk/tools/rvnc/rvnc.dll",
+        "neoclr",
+        "--project",
+        "/Users/robert/Projects/neoclr/runtime/raven/tests/http-lifetime/Tests.rvnproj"
+      ],
+      "assemblySha256": "5719ab5942310664882d1e3a7cc0fabdde317e9bdbddf43e2d4352edcb881772"
+    },
+    {
+      "suite": "http-lifetime",
+      "phase": "registration-verification",
+      "elapsedSeconds": 4.367598
+    },
+    {
+      "suite": "http-text",
+      "phase": "discovery",
+      "elapsedSeconds": 14.437645,
+      "details": {
+        "sourceCompilationSeconds": 9.199515,
+        "metadataDiscoveryIncludingToolBuildSeconds": 5.233264
+      }
+    },
+    {
+      "suite": "http-text",
+      "phase": "source-compilation",
+      "elapsedSeconds": 9.126279,
+      "command": [
+        "dotnet",
+        "/Users/robert/Projects/neoclr/target/default-jit-prepared-v2/bundle/sdk/tools/rvnc/rvnc.dll",
+        "neoclr",
+        "--project",
+        "/Users/robert/Projects/neoclr/runtime/raven/tests/http-text/Tests.rvnproj"
+      ],
+      "assemblySha256": "6db57da62aa54a319b86e864b18415a868f67cd4460cd3ebdb6c4b6ff7285bdb"
+    },
+    {
+      "suite": "http-text",
+      "phase": "registration-verification",
+      "elapsedSeconds": 4.377947
+    },
+    {
+      "suite": "collections",
+      "phase": "discovery",
+      "elapsedSeconds": 22.706355,
+      "details": {
+        "sourceCompilationSeconds": 17.327273,
+        "metadataDiscoveryIncludingToolBuildSeconds": 5.375435
+      }
+    },
+    {
+      "suite": "collections",
+      "phase": "source-compilation",
+      "elapsedSeconds": 9.293043,
+      "command": [
+        "dotnet",
+        "/Users/robert/Projects/neoclr/target/default-jit-prepared-v2/bundle/sdk/tools/rvnc/rvnc.dll",
+        "neoclr",
+        "--project",
+        "/Users/robert/Projects/neoclr/runtime/raven/tests/collections/Tests.rvnproj"
+      ],
+      "assemblySha256": "62ed68e34446ea5c1946f3c7939093d352fc41ffdddee3b1760e7c90f61e70c6"
+    },
+    {
+      "suite": "collections",
+      "phase": "registration-verification",
+      "elapsedSeconds": 4.558468
+    },
+    {
+      "suite": "collection-construction",
+      "phase": "discovery",
+      "elapsedSeconds": 40.100143,
+      "details": {
+        "sourceCompilationSeconds": 26.430475,
+        "metadataDiscoveryIncludingToolBuildSeconds": 13.663294
+      }
+    },
+    {
+      "suite": "collection-construction",
+      "phase": "source-compilation",
+      "elapsedSeconds": 6.918884,
+      "command": [
+        "dotnet",
+        "/Users/robert/Projects/neoclr/target/default-jit-prepared-v2/bundle/sdk/tools/rvnc/rvnc.dll",
+        "neoclr",
+        "--project",
+        "/Users/robert/Projects/neoclr/runtime/raven/tests/collection-construction/Tests.rvnproj"
+      ],
+      "assemblySha256": "904393f17b62127c2b3620fa33094f7a8fadb564fc9b64e05b6292bfb59e35f2"
+    },
+    {
+      "suite": "collection-construction",
+      "phase": "registration-verification",
+      "elapsedSeconds": 2.716399
+    },
+    {
+      "suite": "collection-iteration",
+      "phase": "discovery",
+      "elapsedSeconds": 11.74764,
+      "details": {
+        "sourceCompilationSeconds": 8.036541,
+        "metadataDiscoveryIncludingToolBuildSeconds": 3.708188
+      }
+    },
+    {
+      "suite": "collection-iteration",
+      "phase": "source-compilation",
+      "elapsedSeconds": 4.529218,
+      "command": [
+        "dotnet",
+        "/Users/robert/Projects/neoclr/target/default-jit-prepared-v2/bundle/sdk/tools/rvnc/rvnc.dll",
+        "neoclr",
+        "--project",
+        "/Users/robert/Projects/neoclr/runtime/raven/tests/collection-iteration/Tests.rvnproj"
+      ],
+      "assemblySha256": "b7b1f951f0e3210e6a40ee98a5b07159056c62728fa1fdf60f560378a58246ec"
+    },
+    {
+      "suite": "collection-iteration",
+      "phase": "registration-verification",
+      "elapsedSeconds": 2.331029
+    },
+    {
+      "suite": "json-dom",
+      "phase": "discovery",
+      "elapsedSeconds": 9.946518,
+      "details": {
+        "sourceCompilationSeconds": 5.760541,
+        "metadataDiscoveryIncludingToolBuildSeconds": 4.182456
+      }
+    },
+    {
+      "suite": "json-dom",
+      "phase": "source-compilation",
+      "elapsedSeconds": 7.660674,
+      "command": [
+        "dotnet",
+        "/Users/robert/Projects/neoclr/target/default-jit-prepared-v2/bundle/sdk/tools/rvnc/rvnc.dll",
+        "neoclr",
+        "--project",
+        "/Users/robert/Projects/neoclr/runtime/raven/tests/json-dom/Tests.rvnproj"
+      ],
+      "assemblySha256": "618c01523858db9073c4d9897b87457b50d2ec81fa4a3eb900494780d1c0c045"
+    },
+    {
+      "suite": "json-dom",
+      "phase": "registration-verification",
+      "elapsedSeconds": 5.219791
+    },
+    {
+      "suite": "json-streams",
+      "phase": "discovery",
+      "elapsedSeconds": 16.702116,
+      "details": {
+        "sourceCompilationSeconds": 10.453819,
+        "metadataDiscoveryIncludingToolBuildSeconds": 6.23963
+      }
+    },
+    {
+      "suite": "json-streams",
+      "phase": "source-compilation",
+      "elapsedSeconds": 11.700998,
+      "command": [
+        "dotnet",
+        "/Users/robert/Projects/neoclr/target/default-jit-prepared-v2/bundle/sdk/tools/rvnc/rvnc.dll",
+        "neoclr",
+        "--project",
+        "/Users/robert/Projects/neoclr/runtime/raven/tests/json-streams/Tests.rvnproj"
+      ],
+      "assemblySha256": "f35e0a3e830b3068ebaa8ae3a0731d22cf07ed14803c5c3464964abcfe238075"
+    },
+    {
+      "suite": "json-streams",
+      "phase": "registration-verification",
+      "elapsedSeconds": 3.984506
+    },
+    {
+      "suite": "memory-stream",
+      "phase": "discovery",
+      "elapsedSeconds": 18.177068,
+      "details": {
+        "sourceCompilationSeconds": 9.279302,
+        "metadataDiscoveryIncludingToolBuildSeconds": 8.891793
+      }
+    },
+    {
+      "suite": "memory-stream",
+      "phase": "source-compilation",
+      "elapsedSeconds": 7.317567,
+      "command": [
+        "dotnet",
+        "/Users/robert/Projects/neoclr/target/default-jit-prepared-v2/bundle/sdk/tools/rvnc/rvnc.dll",
+        "neoclr",
+        "--project",
+        "/Users/robert/Projects/neoclr/runtime/raven/tests/memory-stream/Tests.rvnproj"
+      ],
+      "assemblySha256": "16b5b98c314593a566de9c74986b47a48e98aba46c12769cbcac39810eabbaef"
+    },
+    {
+      "suite": "memory-stream",
+      "phase": "registration-verification",
+      "elapsedSeconds": 5.292844
+    },
+    {
+      "suite": "string-construction",
+      "phase": "discovery",
+      "elapsedSeconds": 16.511495,
+      "details": {
+        "sourceCompilationSeconds": 10.216943,
+        "metadataDiscoveryIncludingToolBuildSeconds": 6.289273
+      }
+    },
+    {
+      "suite": "string-construction",
+      "phase": "source-compilation",
+      "elapsedSeconds": 8.756184,
+      "command": [
+        "dotnet",
+        "/Users/robert/Projects/neoclr/target/default-jit-prepared-v2/bundle/sdk/tools/rvnc/rvnc.dll",
+        "neoclr",
+        "--project",
+        "/Users/robert/Projects/neoclr/runtime/raven/tests/string-construction/Tests.rvnproj"
+      ],
+      "assemblySha256": "bd1b120fd494e5fc1fe0ec3d6684bb91f9bb9704902fd2230165d83b99f2f982"
+    },
+    {
+      "suite": "string-construction",
+      "phase": "registration-verification",
+      "elapsedSeconds": 5.556171
+    },
+    {
+      "suite": "encoding-buffer-limits",
+      "phase": "discovery",
+      "elapsedSeconds": 18.634413,
+      "details": {
+        "sourceCompilationSeconds": 10.649408,
+        "metadataDiscoveryIncludingToolBuildSeconds": 7.976643
+      }
+    },
+    {
+      "suite": "encoding-buffer-limits",
+      "phase": "source-compilation",
+      "elapsedSeconds": 12.267387,
+      "command": [
+        "dotnet",
+        "/Users/robert/Projects/neoclr/target/default-jit-prepared-v2/bundle/sdk/tools/rvnc/rvnc.dll",
+        "neoclr",
+        "--project",
+        "/Users/robert/Projects/neoclr/runtime/raven/tests/encoding-buffer-limits/Tests.rvnproj"
+      ],
+      "assemblySha256": "9b79b69b0c8cd44fd7005a602af0688fda70e63e2f1188192e1dadf0c90e10b8"
+    },
+    {
+      "suite": "encoding-buffer-limits",
+      "phase": "registration-verification",
+      "elapsedSeconds": 5.510962
+    },
+    {
+      "suite": "encoding-boundaries",
+      "phase": "discovery",
+      "elapsedSeconds": 17.393278,
+      "details": {
+        "sourceCompilationSeconds": 10.656653,
+        "metadataDiscoveryIncludingToolBuildSeconds": 6.730837
+      }
+    },
+    {
+      "suite": "encoding-boundaries",
+      "phase": "source-compilation",
+      "elapsedSeconds": 8.295348,
+      "command": [
+        "dotnet",
+        "/Users/robert/Projects/neoclr/target/default-jit-prepared-v2/bundle/sdk/tools/rvnc/rvnc.dll",
+        "neoclr",
+        "--project",
+        "/Users/robert/Projects/neoclr/runtime/raven/tests/encoding-boundaries/Tests.rvnproj"
+      ],
+      "assemblySha256": "096b5361b903471f15bc4dd270c0fcd3b61bec140f4475d938835c6550aea41b"
+    },
+    {
+      "suite": "encoding-boundaries",
+      "phase": "registration-verification",
+      "elapsedSeconds": 3.786783
+    },
+    {
+      "suite": "encoding-streams",
+      "phase": "discovery",
+      "elapsedSeconds": 15.744385,
+      "details": {
+        "sourceCompilationSeconds": 10.275724,
+        "metadataDiscoveryIncludingToolBuildSeconds": 5.460443
+      }
+    },
+    {
+      "suite": "encoding-streams",
+      "phase": "source-compilation",
+      "elapsedSeconds": 9.181139,
+      "command": [
+        "dotnet",
+        "/Users/robert/Projects/neoclr/target/default-jit-prepared-v2/bundle/sdk/tools/rvnc/rvnc.dll",
+        "neoclr",
+        "--project",
+        "/Users/robert/Projects/neoclr/runtime/raven/tests/encoding-streams/Tests.rvnproj"
+      ],
+      "assemblySha256": "fc11c38cd77c01d396296db2ef6948457753a2b41d558c36e01bcb038516dd92"
+    },
+    {
+      "suite": "encoding-streams",
+      "phase": "registration-verification",
+      "elapsedSeconds": 3.791699
+    },
+    {
+      "suite": "encoding",
+      "phase": "discovery",
+      "elapsedSeconds": 13.532265,
+      "details": {
+        "sourceCompilationSeconds": 8.313073,
+        "metadataDiscoveryIncludingToolBuildSeconds": 5.214977
+      }
+    },
+    {
+      "suite": "encoding",
+      "phase": "source-compilation",
+      "elapsedSeconds": 10.418635,
+      "command": [
+        "dotnet",
+        "/Users/robert/Projects/neoclr/target/default-jit-prepared-v2/bundle/sdk/tools/rvnc/rvnc.dll",
+        "neoclr",
+        "--project",
+        "/Users/robert/Projects/neoclr/runtime/raven/tests/encoding/Tests.rvnproj"
+      ],
+      "assemblySha256": "8b538caba6651c7ef875f90ca4d98c6e6c6d798bbdc991b290a426354ea9e0c3"
+    },
+    {
+      "suite": "encoding",
+      "phase": "registration-verification",
+      "elapsedSeconds": 4.53239
+    },
+    {
+      "suite": "unicode-casing",
+      "phase": "discovery",
+      "elapsedSeconds": 13.75443,
+      "details": {
+        "sourceCompilationSeconds": 7.861333,
+        "metadataDiscoveryIncludingToolBuildSeconds": 5.889022
+      }
+    },
+    {
+      "suite": "unicode-casing",
+      "phase": "source-compilation",
+      "elapsedSeconds": 9.828302,
+      "command": [
+        "dotnet",
+        "/Users/robert/Projects/neoclr/target/default-jit-prepared-v2/bundle/sdk/tools/rvnc/rvnc.dll",
+        "neoclr",
+        "--project",
+        "/Users/robert/Projects/neoclr/runtime/raven/tests/unicode-casing/Tests.rvnproj"
+      ],
+      "assemblySha256": "9766c2940781e32b19b33812b46ad1ad2688ca19f6ad039db3a498f12393e85a"
+    },
+    {
+      "suite": "unicode-casing",
+      "phase": "registration-verification",
+      "elapsedSeconds": 4.424305
+    },
+    {
+      "suite": "int64-parsing",
+      "phase": "discovery",
+      "elapsedSeconds": 11.964154,
+      "details": {
+        "sourceCompilationSeconds": 6.953923,
+        "metadataDiscoveryIncludingToolBuildSeconds": 5.006488
+      }
+    },
+    {
+      "suite": "int64-parsing",
+      "phase": "source-compilation",
+      "elapsedSeconds": 7.555625,
+      "command": [
+        "dotnet",
+        "/Users/robert/Projects/neoclr/target/default-jit-prepared-v2/bundle/sdk/tools/rvnc/rvnc.dll",
+        "neoclr",
+        "--project",
+        "/Users/robert/Projects/neoclr/runtime/raven/tests/int64-parsing/Tests.rvnproj"
+      ],
+      "assemblySha256": "26e0741167377046ee574d10dac4eae5a63855806fcf81a037e0ababf4693bfa"
+    },
+    {
+      "suite": "int64-parsing",
+      "phase": "registration-verification",
+      "elapsedSeconds": 3.661676
+    },
+    {
+      "suite": "primitive-parsing",
+      "phase": "discovery",
+      "elapsedSeconds": 12.888825,
+      "details": {
+        "sourceCompilationSeconds": 8.141372,
+        "metadataDiscoveryIncludingToolBuildSeconds": 4.743868
+      }
+    },
+    {
+      "suite": "primitive-parsing",
+      "phase": "source-compilation",
+      "elapsedSeconds": 8.345663,
+      "command": [
+        "dotnet",
+        "/Users/robert/Projects/neoclr/target/default-jit-prepared-v2/bundle/sdk/tools/rvnc/rvnc.dll",
+        "neoclr",
+        "--project",
+        "/Users/robert/Projects/neoclr/runtime/raven/tests/primitive-parsing/Tests.rvnproj"
+      ],
+      "assemblySha256": "8038e3c882efe919f8f9fdd13f1e105bc34c0d2c4f9a95bc70dbc1e2529a3b84"
+    },
+    {
+      "suite": "primitive-parsing",
+      "phase": "registration-verification",
+      "elapsedSeconds": 3.222471
+    },
+    {
+      "suite": "path-values",
+      "phase": "discovery",
+      "elapsedSeconds": 13.471086,
+      "details": {
+        "sourceCompilationSeconds": 8.501404,
+        "metadataDiscoveryIncludingToolBuildSeconds": 4.965163
+      }
+    },
+    {
+      "suite": "path-values",
+      "phase": "source-compilation",
+      "elapsedSeconds": 8.121522,
+      "command": [
+        "dotnet",
+        "/Users/robert/Projects/neoclr/target/default-jit-prepared-v2/bundle/sdk/tools/rvnc/rvnc.dll",
+        "neoclr",
+        "--project",
+        "/Users/robert/Projects/neoclr/runtime/raven/tests/path-values/Tests.rvnproj"
+      ],
+      "assemblySha256": "b89a6a5477626297d87bf6a61c2f6187bcb27435a884e760748de3b3d1073a9c"
+    },
+    {
+      "suite": "path-values",
+      "phase": "registration-verification",
+      "elapsedSeconds": 3.964552
+    },
+    {
+      "suite": "index-range",
+      "phase": "discovery",
+      "elapsedSeconds": 15.577923,
+      "details": {
+        "sourceCompilationSeconds": 9.530175,
+        "metadataDiscoveryIncludingToolBuildSeconds": 6.042728
+      }
+    },
+    {
+      "suite": "index-range",
+      "phase": "source-compilation",
+      "elapsedSeconds": 10.528265,
+      "command": [
+        "dotnet",
+        "/Users/robert/Projects/neoclr/target/default-jit-prepared-v2/bundle/sdk/tools/rvnc/rvnc.dll",
+        "neoclr",
+        "--project",
+        "/Users/robert/Projects/neoclr/runtime/raven/tests/index-range/Tests.rvnproj"
+      ],
+      "assemblySha256": "4b4c652080efe7b8c745374aed60e523751534c8ec531d130c0843ebd6d7bfb5"
+    },
+    {
+      "suite": "index-range",
+      "phase": "registration-verification",
+      "elapsedSeconds": 4.317591
+    },
+    {
+      "suite": "http-method-values",
+      "phase": "discovery",
+      "elapsedSeconds": 20.151242,
+      "details": {
+        "sourceCompilationSeconds": 13.128059,
+        "metadataDiscoveryIncludingToolBuildSeconds": 7.016408
+      }
+    },
+    {
+      "suite": "http-method-values",
+      "phase": "source-compilation",
+      "elapsedSeconds": 12.656768,
+      "command": [
+        "dotnet",
+        "/Users/robert/Projects/neoclr/target/default-jit-prepared-v2/bundle/sdk/tools/rvnc/rvnc.dll",
+        "neoclr",
+        "--project",
+        "/Users/robert/Projects/neoclr/runtime/raven/tests/http-method-values/Tests.rvnproj"
+      ],
+      "assemblySha256": "e4f1a84b732184671fc15c99fede4a8a538eacc81ac11c458a2992dda52b5e2f"
+    },
+    {
+      "suite": "http-method-values",
+      "phase": "registration-verification",
+      "elapsedSeconds": 3.951303
+    },
+    {
+      "suite": "http-header-values",
+      "phase": "discovery",
+      "elapsedSeconds": 8.851625,
+      "details": {
+        "sourceCompilationSeconds": 5.327548,
+        "metadataDiscoveryIncludingToolBuildSeconds": 3.521384
+      }
+    },
+    {
+      "suite": "http-header-values",
+      "phase": "source-compilation",
+      "elapsedSeconds": 5.764874,
+      "command": [
+        "dotnet",
+        "/Users/robert/Projects/neoclr/target/default-jit-prepared-v2/bundle/sdk/tools/rvnc/rvnc.dll",
+        "neoclr",
+        "--project",
+        "/Users/robert/Projects/neoclr/runtime/raven/tests/http-header-values/Tests.rvnproj"
+      ],
+      "assemblySha256": "4e44f69947468ab5b7e99eef621730a4d00aaa78ac4d117a04afcefef6b7e998"
+    },
+    {
+      "suite": "http-header-values",
+      "phase": "registration-verification",
+      "elapsedSeconds": 2.415397
+    },
+    {
+      "suite": "http-route-matching",
+      "phase": "discovery",
+      "elapsedSeconds": 7.947554,
+      "details": {
+        "sourceCompilationSeconds": 4.8041,
+        "metadataDiscoveryIncludingToolBuildSeconds": 3.14109
+      }
+    },
+    {
+      "suite": "http-route-matching",
+      "phase": "source-compilation",
+      "elapsedSeconds": 5.4933,
+      "command": [
+        "dotnet",
+        "/Users/robert/Projects/neoclr/target/default-jit-prepared-v2/bundle/sdk/tools/rvnc/rvnc.dll",
+        "neoclr",
+        "--project",
+        "/Users/robert/Projects/neoclr/runtime/raven/tests/http-route-matching/Tests.rvnproj"
+      ],
+      "assemblySha256": "3968c718e19fcf59efa4ef049b492aa28fb49c5f882597d254cd2486abc8d925"
+    },
+    {
+      "suite": "http-route-matching",
+      "phase": "registration-verification",
+      "elapsedSeconds": 2.162381
+    },
+    {
+      "suite": "ip-address-values",
+      "phase": "discovery",
+      "elapsedSeconds": 8.036164,
+      "details": {
+        "sourceCompilationSeconds": 4.805462,
+        "metadataDiscoveryIncludingToolBuildSeconds": 3.227978
+      }
+    },
+    {
+      "suite": "ip-address-values",
+      "phase": "source-compilation",
+      "elapsedSeconds": 5.950254,
+      "command": [
+        "dotnet",
+        "/Users/robert/Projects/neoclr/target/default-jit-prepared-v2/bundle/sdk/tools/rvnc/rvnc.dll",
+        "neoclr",
+        "--project",
+        "/Users/robert/Projects/neoclr/runtime/raven/tests/ip-address-values/Tests.rvnproj"
+      ],
+      "assemblySha256": "2345ce54434deb717bd65463443a99387080e6546ad32aa53996619e5b0ed149"
+    },
+    {
+      "suite": "ip-address-values",
+      "phase": "registration-verification",
+      "elapsedSeconds": 2.774372
+    },
+    {
+      "suite": "uri-resolution",
+      "phase": "discovery",
+      "elapsedSeconds": 8.380804,
+      "details": {
+        "sourceCompilationSeconds": 5.01968,
+        "metadataDiscoveryIncludingToolBuildSeconds": 3.35851
+      }
+    },
+    {
+      "suite": "uri-resolution",
+      "phase": "source-compilation",
+      "elapsedSeconds": 5.640684,
+      "command": [
+        "dotnet",
+        "/Users/robert/Projects/neoclr/target/default-jit-prepared-v2/bundle/sdk/tools/rvnc/rvnc.dll",
+        "neoclr",
+        "--project",
+        "/Users/robert/Projects/neoclr/runtime/raven/tests/uri-resolution/Tests.rvnproj"
+      ],
+      "assemblySha256": "8e9e268b35896adf6eda000bbc206d7b7f954ef302f90d35af3b0bc413a0094f"
+    },
+    {
+      "suite": "uri-resolution",
+      "phase": "registration-verification",
+      "elapsedSeconds": 3.56288
+    },
+    {
+      "suite": "zoned-time-parsing",
+      "phase": "discovery",
+      "elapsedSeconds": 8.089538,
+      "details": {
+        "sourceCompilationSeconds": 4.874581,
+        "metadataDiscoveryIncludingToolBuildSeconds": 3.211924
+      }
+    },
+    {
+      "suite": "zoned-time-parsing",
+      "phase": "source-compilation",
+      "elapsedSeconds": 7.458569,
+      "command": [
+        "dotnet",
+        "/Users/robert/Projects/neoclr/target/default-jit-prepared-v2/bundle/sdk/tools/rvnc/rvnc.dll",
+        "neoclr",
+        "--project",
+        "/Users/robert/Projects/neoclr/runtime/raven/tests/zoned-time-parsing/Tests.rvnproj"
+      ],
+      "assemblySha256": "c9bfa31ed3bfdc42f4bb9cfadb9b5f61f9ef7c2235ae2477fd3d4e44fbedf1f6"
+    },
+    {
+      "suite": "zoned-time-parsing",
+      "phase": "registration-verification",
+      "elapsedSeconds": 2.577588
+    }
+  ],
+  "executionRepetitions": 1,
+  "inputs": {
+    "scripts/test-runtime-library.py": "60488d90cf46891be260d06c683848af08b524d6ec1ade61d41738c89484a8c0",
+    "scripts/build-native-project.py": "f5f9d23e5b2c7ee734987e90c8b393034227b58b841ef26a309f744323ae31b7",
+    "scripts/discover-runtime-tests.py": "455595ff98a3d9f8df9018caad453ef0f244eedf69e6ab220d54934535ed428e",
+    "scripts/validate-test-discovery.py": "b9a0a6063453f5567d1186d6825fc7b39b58ea9afc15fd0a310296a408d22e1a",
+    "tools/testing/NeoCLR.TestDiscovery/DataAdapters.cs": "6d9484b668f8898fbf4dd9712c0c2e3c8b1b879a346d963d6538ed81e842d561",
+    "tools/testing/NeoCLR.TestDiscovery/Program.cs": "54202b4fc5bbfbc94ee7e8dcddb4cf7315d5596a4b42f9de7b49ce4cb998c8ab",
+    "tools/testing/NeoCLR.TestDiscovery/NeoCLR.TestDiscovery.csproj": "87d0d17b301773d1a73666a6163a6049a06319ea651b9b9c9df34e199707f4ee",
+    "runtime/raven/tests/collection-construction/Construction.rvn": "ddd2af5dcce0720e86c43ca20ee6fdb4f4e0ac4b89d49211fe70b8d0082cb1ca",
+    "runtime/raven/tests/collection-construction/MapIndexers.rvn": "dd484971483eac64fc2bed897e827deba7791c9c577d8f89c8a18de09a5a5b95",
+    "runtime/raven/tests/collection-construction/Sets.rvn": "67968e7a90b91e93b54681f8507a07815abd13f5e0f4a93525708e616bc49558",
+    "runtime/raven/tests/collection-iteration/ForCleanup.rvn": "49d938e6b0886ddef91d0eee932f98170f597d676c2e90a1de93e434d9c719c4",
+    "runtime/raven/tests/collection-iteration/QueryCleanup.rvn": "7e6d9e27d73af1448ad79019c69ac46541c092490972d36c93f3648cbd9414d7",
+    "runtime/raven/tests/collections/Collections.rvn": "2793973c50d8501998f3de17ac6d1be149e6f1a3b34229372c90c0897d280c2b",
+    "runtime/raven/tests/collections/Main.rvn": "e0d4d6b296788027744cc6f4e5db76e85d99381c5cbd7f14c64727bc48ff0c8d",
+    "runtime/raven/tests/collections/MapMaterialization.rvn": "363ee1bc09ec13e638cd7abbad69b2f96c15597fea44d9a2b137ce110124cc8e",
+    "runtime/raven/tests/collections/ObservedNumbers.rvn": "c42f57095c9d357cec05baaa3a17f127a7b6fff23385b95f5a4a9157b32729b4",
+    "runtime/raven/tests/collections/QueueStack.rvn": "36f9b8623731832ef8599273bb9307d03ccce62f1cd1e912c5edb7fca7612f75",
+    "runtime/raven/tests/discovery-contract/OtherAttribute.rvn": "78d87fb89024c33a52dc817347bd983c9f389da46d135571f711618b744c880a",
+    "runtime/raven/tests/discovery-contract/Tests.rvn": "e5800f40e8c8052b98b9b18859cf0ca1df6896d8635c0439410cfa6dc894aeb9",
+    "runtime/raven/tests/duration-offset-parsing/Tests.rvn": "5fa758349d35adc0f31d80c1ba94cfac406dece7a6ef66cf1b51dcd864ac8cdc",
+    "runtime/raven/tests/encoding/Tests.rvn": "e4bfec20e6ff2311f03feee07150a1642e6e65aac2a4facca483a7eb9ef433a2",
+    "runtime/raven/tests/encoding-boundaries/Fixtures.rvn": "c6c5d11390b778013c34c44067f71215cb7527a8672b18ed075f56eef77d1b26",
+    "runtime/raven/tests/encoding-boundaries/Tests.rvn": "a25c6f975b92bce629f0f4dcf3eb650ef381ef2791d4a3cfdfd3b1895dc9392f",
+    "runtime/raven/tests/encoding-buffer-limits/Tests.rvn": "dbb7c3cfd87eb743611352e8199f4b56f0872686913ae2833283c358422c226b",
+    "runtime/raven/tests/encoding-streams/Fixtures.rvn": "32b0a1bbac2784dce51cd502c110653b88ef7a2dac51329ad52aca344e7e8f1d",
+    "runtime/raven/tests/encoding-streams/Tests.rvn": "25aa83a4c0519fc4b4ce2df12e3e9b64694ff36d9fb031f467593748f20685ec",
+    "runtime/raven/tests/framework/Assertions.rvn": "75b24edb65dd3c9bc6af7a211966feda795c9834adea0f3d9d064e05049072eb",
+    "runtime/raven/tests/framework/TestAttribute.rvn": "435a93e9247a6c7f1c94b1a81296e35449f7b4ba735b835c18a816726a56435c",
+    "runtime/raven/tests/framework/TestSuite.rvn": "bf444948246b2296e16de620e21459bbc4d6a1cbc01be41f0139b20e6bd42c67",
+    "runtime/raven/tests/http-header-values/Tests.rvn": "fc0bc92f4bbd80b90550f3e734b15e681c76bf9eb6d675cf9c24114f620ef012",
+    "runtime/raven/tests/http-lifetime/Tests.rvn": "509916f943a0f85e3892ed123d5d62c09482614a23c6e2d7006f899f8c287934",
+    "runtime/raven/tests/http-method-values/Tests.rvn": "b7ea78ddb7988d89ad1fa40d77718b186eb7145918d08a87890b8af6f7117e29",
+    "runtime/raven/tests/http-route-matching/Tests.rvn": "e597b64fb4297491af075579dd8984568e5718df4b3e79f5a6ed031a0361f86d",
+    "runtime/raven/tests/http-text/Tests.rvn": "463c571e8807bd84928c7d071bcd11093b339ee7c5a35e262f71da655237e855",
+    "runtime/raven/tests/index-range/Main.rvn": "06184aaf9a91ece09fbd1ed6ab23f5faf41c2237c970c8ff33390c34c9911c70",
+    "runtime/raven/tests/index-range/Tests.rvn": "f6f371903b2813a9fd20c190fb39f1c80c470c2bedbee3b1b24ed52c05d2a740",
+    "runtime/raven/tests/instant-parsing/Tests.rvn": "639eb2b815c3372435f3cdfe93602b29927c7df1aaa3ca1d22c232c94bdeae09",
+    "runtime/raven/tests/int64-parsing/Tests.rvn": "03ecbfd540200cfe0e17bdda5a542b658dd01541e63228dfe090ed652d96c270",
+    "runtime/raven/tests/ip-address-values/Tests.rvn": "f5c8fd7e24132e984991cabe2b28f65afab00b938c2b0ee37c084c2834a9d3e6",
+    "runtime/raven/tests/json-dom/JsonDom.rvn": "29f901a58c1ba9a4c41b77e1c1facf08ef16ff8d2aeb5a776ed55fc039e9f9da",
+    "runtime/raven/tests/json-streams/JsonStreams.rvn": "92c4b869d5378c53a9b8fbd3fc1167eedd2391d9acbb8af47d09e5122cb9bdc8",
+    "runtime/raven/tests/json-streams/ShortStreams.rvn": "1fbda3bbe9b9aa4cc1cc7f57988b15ff7b9a2ba9ef15a55b4a78fc8daa1cfe86",
+    "runtime/raven/tests/memory-stream/Tests.rvn": "04d626402ba798c34f9e8376e9fb35e809f0fed68f4287ed427847a53f288530",
+    "runtime/raven/tests/path-values/Tests.rvn": "8bffa5ed04a581f21864b68d9231c0587d9c6a518c507d9a533bd900d9a8b85b",
+    "runtime/raven/tests/primitive-parsing/Tests.rvn": "d67dd84ca10671406338e67ad9e3aa4d9b9748da18710d33fc987c9b56edaa47",
+    "runtime/raven/tests/runner-contract/Main.rvn": "6aa7515a6b2bd4eaccbd296e80348c869fab9f8f74e89e067f72530f3ce55d0f",
+    "runtime/raven/tests/string-construction/Tests.rvn": "8861a8e01ee38bb33be583b7e5b614de8882ead5f77ecbc25a957bd5d57ce716",
+    "runtime/raven/tests/time-parsing/Tests.rvn": "d8e5fddeafed0920924052dd08e43f18a2a1a66b6f1e33d3da64d8026380b0fc",
+    "runtime/raven/tests/unicode-casing/Tests.rvn": "b19bebaf414ca5a722e9c2cabf7c7e26b3fed611b54532f4a244e30b051ebd24",
+    "runtime/raven/tests/uri-resolution/Tests.rvn": "82e9fe0f0378fbaf7f2712a9e97c547b56b144ff333922b3b8c92fe3bf127388",
+    "runtime/raven/tests/zoned-time-parsing/Tests.rvn": "58d1a39edc70dff92e3ea17e6c10eaadd3548d4fdf39e3c0f04d5ea8a5393154",
+    "runtime/raven/tests/collection-construction/Tests.rvnproj": "9c0830711edc329a14a4eb23eb1b393f437a7abae8448ceb2b5e1110c15ad9e1",
+    "runtime/raven/tests/collection-iteration/Tests.rvnproj": "9c5fcf509fcc91b3ad3f696a189135f2df1d895709a4b5a8accc27028a42e1b4",
+    "runtime/raven/tests/collections/Tests.rvnproj": "c1374380a7d0c8a586f6a99a98e2530d17ffdc3f0a82cf8cea33f121ba6fffb1",
+    "runtime/raven/tests/discovery-contract/Tests.rvnproj": "138cbef1c75af0c870d1cf93998f95d0b2c6056c13c82800c7b12faf9d460cdc",
+    "runtime/raven/tests/duration-offset-parsing/Tests.rvnproj": "3375a57b3a2ead02c04d5a8d8dcaf6a449d2bcd5560669624d34c44a6f788702",
+    "runtime/raven/tests/encoding/Tests.rvnproj": "76a9551bab7ddefc98291a4ccbfccba1df20e1bf066245b2e891b6c87f9d4673",
+    "runtime/raven/tests/encoding-boundaries/Tests.rvnproj": "856ba10ba0dad773eca9d4f896f8f023362ac99478b4185c33571b7d37b30157",
+    "runtime/raven/tests/encoding-buffer-limits/Tests.rvnproj": "3753b7dfbfb917363cbb08a843a599cfa36700d4d3dd6a4a5fa3849077c48244",
+    "runtime/raven/tests/encoding-streams/Tests.rvnproj": "04c4dc37b436fb98aef5cf89982fb1059c7de4e3d3af2fd57d39e8b3b77ac5e3",
+    "runtime/raven/tests/http-header-values/Tests.rvnproj": "f0d2c1f9c5370068f37ef551d5eab40712a6742e6b4681e897f563209f2367ac",
+    "runtime/raven/tests/http-lifetime/Tests.rvnproj": "bf4046e777ac8d2cbc704c14bf77e99bc0a389b0b9ee088d69e5fe3584071b3f",
+    "runtime/raven/tests/http-method-values/Tests.rvnproj": "7e5a37fcff99002331b520722d561e4849dbbd57ce25d24e38829fad2e7c7e2b",
+    "runtime/raven/tests/http-route-matching/Tests.rvnproj": "e02e34b150ad6458e35678ec26d5cdf93e363562bfcfbb2a8e39806c1f9da199",
+    "runtime/raven/tests/http-text/Tests.rvnproj": "672944d3aafaecf7a846c689b34a3ec62beef32b9b4e4c28a3df847afcf5a2d3",
+    "runtime/raven/tests/index-range/Tests.rvnproj": "df96c52b96a1903608406d6ebe73dd1cb9ff96f9bae85d1277446ab3b11e1f51",
+    "runtime/raven/tests/instant-parsing/Tests.rvnproj": "1336d2c80a6a883fd5dbc4da100be4ea589df294df1c71c32ec457f542c0ab43",
+    "runtime/raven/tests/int64-parsing/Tests.rvnproj": "338266a559ffe4d67c1775fc2e4b5b91330e95d4c0c7336e6c5a8fa2202c1b34",
+    "runtime/raven/tests/ip-address-values/Tests.rvnproj": "b5d6d6b969706cf1b74c408ad27060d26946ee766f04e04ebbf440d25e85765e",
+    "runtime/raven/tests/json-dom/Tests.rvnproj": "2a384379580867b0886ac4eedda4c0f269db9eefca2ad251531c9b88030d062f",
+    "runtime/raven/tests/json-streams/Tests.rvnproj": "e430d27261d4f3c26d7c8f638ad4e54c983872e0a1e774de56887c86db7da1c5",
+    "runtime/raven/tests/memory-stream/Tests.rvnproj": "163fe46d9dc76c149bf6d757f0bfaab1d0d4950017bdcd6be9a8033def9ebf4f",
+    "runtime/raven/tests/path-values/Tests.rvnproj": "109e8179b5c1f498bb73c87a62ade1bab4d943621d4c2f1e038a255cee32bf58",
+    "runtime/raven/tests/primitive-parsing/Tests.rvnproj": "cf259491b67421b4b906f8a47c62995f2428bec98bcdd64e7f9a0efbfade950a",
+    "runtime/raven/tests/runner-contract/Tests.rvnproj": "3061ec4816a7c6dc3025e6cd5775cd2b62fd7a230daabdf6de1709a9541e999e",
+    "runtime/raven/tests/string-construction/Tests.rvnproj": "91e2574c582f0f70a2a1ed811d4645c1cc161783af26b848b3c7df8c9b3a9409",
+    "runtime/raven/tests/time-parsing/Tests.rvnproj": "042f8e0280c165b02ec21e40d180e15706de2d4c4b2964a6391d4ec801cd21cc",
+    "runtime/raven/tests/unicode-casing/Tests.rvnproj": "4bb50d2937be0265c0cec5af3fd658c1b6f745569d33ae403f0a275383916596",
+    "runtime/raven/tests/uri-resolution/Tests.rvnproj": "81f7a1667be14cdad3342698eb6685b5b1caaf1ff4e5d69aaa9eb1843126a899",
+    "runtime/raven/tests/zoned-time-parsing/Tests.rvnproj": "ad502dc19ae2915887362d34b17492fe510b612046d6c14c53ce0983ce67c97d"
+  },
+  "bundleManifestSha256": "f99abade9cb7e6d032c91b1041ed379c991760d9c76b6e16a29836046b449f03",
+  "aotSha256": "a0b8c00819901e7a05499df0073161f2e68788f5f30146790bf7259f823476a1",
+  "interpreterSha256": "f7b2b743b4d0e591e97ff5f1a7572d24eae50e52c34c5f91d69aa4480ff5a2e9",
+  "libraryCatalogSha256": "9e92479f6f59fa274ddefcbb7b881baa807adf637246e9843a73f0fa360885ee",
+  "suites": [
+    "http-lifetime",
+    "http-text",
+    "collections",
+    "collection-construction",
+    "collection-iteration",
+    "json-dom",
+    "json-streams",
+    "memory-stream",
+    "string-construction",
+    "encoding-buffer-limits",
+    "encoding-boundaries",
+    "encoding-streams",
+    "encoding",
+    "unicode-casing",
+    "int64-parsing",
+    "primitive-parsing",
+    "path-values",
+    "index-range",
+    "http-method-values",
+    "http-header-values",
+    "http-route-matching",
+    "ip-address-values",
+    "uri-resolution",
+    "zoned-time-parsing",
+    "instant-parsing",
+    "duration-offset-parsing",
+    "time-parsing",
+    "discovery-contract",
+    "runner-contract"
+  ],
+  "encodingBufferBudgets": {
+    "nativeByteArrayElements": 131072,
+    "interpretedLiveArrayElements": 1048576,
+    "interpretedLogicalArrayBytes": 268435456
+  },
+  "totalElapsedSeconds": 958.020056
+}

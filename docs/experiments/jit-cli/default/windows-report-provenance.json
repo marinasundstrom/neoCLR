@@ -1,0 +1,26 @@
+{
+  "run": 38182286947,
+  "normalization": "CRLF to LF only; hashes inside reports refer to original artifact bytes",
+  "reports": {
+    "windows-manifest.json": {
+      "artifactSha256": "2a3f633f1027a24a7e6430126a241f89044f7ac99e5e018063fd500ceeecf723",
+      "retainedSha256": "b9f0e07c8ac590d5f26fb08514e03d3f114a55de018537780a082904065e73bf"
+    },
+    "windows-framework.json": {
+      "artifactSha256": "deb045393fd8460a24213d20ee08a1394ec835abf1e05f0fc30348284a427a49",
+      "retainedSha256": "6307e1a578ef9db29b1999c7ff6917788ca479c4bda46f5e14773b24e516c8be"
+    },
+    "windows-gate.json": {
+      "artifactSha256": "b294e8bf7dfd90d471978b580aaa4993022c8abc2a75236d26289d9c27dc79ad",
+      "retainedSha256": "5d85086c3e1aa402c8d03f266e5d65ca0da3af7c853565fc79f7c864bae8676c"
+    },
+    "windows-preparation.json": {
+      "artifactSha256": "b9de90aefe23f2b166a572849e7205f22131143abb51909e6fab3f21490cfe4a",
+      "retainedSha256": "59f7087ef68ac10da89a5c8e8f9caf3581b571aa55e643971708334ead1736c4"
+    },
+    "windows-http.json": {
+      "artifactSha256": "439f20cd7646a12577dca83e2d72fa68bc76e30a213f4158749d07ed0ba8c4fd",
+      "retainedSha256": "063eeb62819086599d4e2da90805d9f3561cc40bf024978b2290338a1bdd1cbf"
+    }
+  }
+}

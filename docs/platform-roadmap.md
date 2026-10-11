@@ -7,11 +7,13 @@ reduces controlled AOT runtime-async time about 10–13%, without changing colle
 frequency. The author then explicitly directs completing a working default JIT.
 The implementation selects JIT on macOS ARM64 and Windows x64, stages matching
 helpers and libraries, and makes runtime-library tests use the omitted-mode default.
-Continue qualification through the existing [JIT readiness gates](jit-execution.md#test-policy-and-the-eventual-default):
-matching helper delivery through ordinary tooling, representative suites using JIT
-routinely, and current supported-platform HTTP/lifetime qualification. Native-mode
-benchmark noise is recorded; this does not itself authorize claiming default readiness.
-The author has already authorized switching when those gates are met.
+The [installed-default qualification](experiments/jit-cli/default/README.md) now
+passes: 29 relocated macOS library suites, current Windows scalar/CLI/framework
+gates and eight HTTP cases on each host. JIT is the qualified development default
+on these hosts; Windows ARM64 and Windows runtime suspension remain open. Native
+benchmark noise and the runtime-async performance gap remain separate work.
+The author next explicitly requests fixing generic async and async `use` compiler
+limits, including focused managed/native execution validation.
 
 **Managed stack diagnostics (2026-10-12):** the author requests a StackTrace class
 for printing the current call stack, then continued work on separate debugger and

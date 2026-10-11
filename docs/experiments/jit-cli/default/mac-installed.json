@@ -1,0 +1,387 @@
+{
+  "passed": true,
+  "cases": [
+    {
+      "name": "http-lifetime",
+      "command": [
+        "/var/folders/5x/5r0dfcnx30lf0cl8kp3sphch0000gn/T/neoCLR relocated JIT 87dogq27/installed bundle/bin/neoclr",
+        "run",
+        "/Users/robert/Projects/neoclr/target/default-jit-library-tests-v2/http-lifetime-build/app.dll"
+      ],
+      "exitCode": 0,
+      "stdout": "PASS HTTP client use disposes its owned handler exactly once\nPASS HTTP borrowed handler survives one client and serves another\nPASS HTTP disposal requests cancellation and waits for handler acknowledgement\nPASS HTTP caller cancellation propagates without disposing the handler\nPASS HTTP completed responses survive disposal and retain request association\nPASS HTTP pre-cancellation skips custom handlers\nPASS HTTP socket handler disposal is idempotent through Disposable\nPASS HTTP delegating handlers run outward and unwind inward\nPASS HTTP borrowed delegating pipeline remains reusable\nPASS HTTP borrowed clients cancel only their own pending sends\nTests: 10, passed: 10, failed: 0, skipped: 0\n",
+      "stderr": ""
+    },
+    {
+      "name": "http-text",
+      "command": [
+        "/var/folders/5x/5r0dfcnx30lf0cl8kp3sphch0000gn/T/neoCLR relocated JIT 87dogq27/installed bundle/bin/neoclr",
+        "run",
+        "/Users/robert/Projects/neoclr/target/default-jit-library-tests-v2/http-text-build/app.dll"
+      ],
+      "exitCode": 0,
+      "stdout": "PASS HTTP buffered text preserves scalars beyond the one-shot codec quota\nPASS HTTP buffered text rejects malformed and truncated large bodies\nPASS HTTP buffered text preserves empty BOM and NUL data\nTests: 3, passed: 3, failed: 0, skipped: 0\n",
+      "stderr": ""
+    },
+    {
+      "name": "collections",
+      "command": [
+        "/var/folders/5x/5r0dfcnx30lf0cl8kp3sphch0000gn/T/neoCLR relocated JIT 87dogq27/installed bundle/bin/neoclr",
+        "run",
+        "/Users/robert/Projects/neoclr/target/default-jit-library-tests-v2/collections-build/app.dll"
+      ],
+      "exitCode": 0,
+      "stdout": "PASS Any does not read Current\nPASS For break disposes its iterator\nPASS ArrayList copy has independent storage\nPASS Map materialization handles collisions and empty input\nPASS HashMap copies sequences and maps independently\nPASS Map iteration snapshots pairs before mutation\nPASS ToMap materializes pair queries and selectors\nPASS HashMap copies preserve reference values and comparer\nPASS Predicate Any stops at its first match\nPASS Queue growth preserves wrapped FIFO contents\nPASS ArrayQueue preserves FIFO\nPASS Queue preserves references through clear and reuse\nPASS Queue iterator captures FIFO contents before mutation\nPASS HashSet applies its comparer\nPASS Stack growth preserves LIFO contents\nPASS ArrayStack preserves LIFO\nPASS Stack preserves references through clear and reuse\nPASS Stack iterator captures LIFO contents before mutation\nTests: 18, passed: 18, failed: 0, skipped: 0\n",
+      "stderr": ""
+    },
+    {
+      "name": "collection-construction",
+      "command": [
+        "/var/folders/5x/5r0dfcnx30lf0cl8kp3sphch0000gn/T/neoCLR relocated JIT 87dogq27/installed bundle/bin/neoclr",
+        "run",
+        "/Users/robert/Projects/neoclr/target/default-jit-library-tests-v2/collection-construction-build/app.dll"
+      ],
+      "exitCode": 0,
+      "stdout": "PASS Collection constructors consume and dispose each input once\nPASS Collection constructors accept empty arrays\nPASS Queue and stack copies follow source iteration order\nPASS List construction materializes filtered input independently\nPASS Collection copies preserve element reference identity\nPASS Set copy retains values and explicit comparer after source clear\nPASS Map indexers share comparer lookup and insert-or-replace semantics\nPASS Set collision chains survive removal growth and slot reuse\nPASS Set snapshot retains values across clear and reuse\nPASS Set ordinal string equality preserves case and Unicode\nTests: 10, passed: 10, failed: 0, skipped: 0\n",
+      "stderr": ""
+    },
+    {
+      "name": "collection-iteration",
+      "command": [
+        "/var/folders/5x/5r0dfcnx30lf0cl8kp3sphch0000gn/T/neoCLR relocated JIT 87dogq27/installed bundle/bin/neoclr",
+        "run",
+        "/Users/robert/Projects/neoclr/target/default-jit-library-tests-v2/collection-iteration-build/app.dll"
+      ],
+      "exitCode": 0,
+      "stdout": "PASS For completion disposes its iterator\nPASS For continue preserves traversal and disposal\nPASS For disposes an empty iterator\nPASS Labeled continue disposes each inner iterator\nPASS For return disposes before returning to its caller\nPASS All stops at the first failed predicate\nPASS Count advances without reading Current\nPASS Any disposes empty input\nPASS First stops after one value\nPASS Fold visits every value\nPASS Last visits the complete input\nPASS Predicate Single stops at the second match\nPASS Predicate First disposes input with no match\nPASS Predicate Count reads every value\nPASS Predicate First stops at its match\nPASS Predicate Last retains the final match\nPASS Predicate Single scans for a unique match\nPASS Single rejects multiple values without reading the second\nPASS ToList materializes and disposes its input\nTests: 19, passed: 19, failed: 0, skipped: 0\n",
+      "stderr": ""
+    },
+    {
+      "name": "json-dom",
+      "command": [
+        "/var/folders/5x/5r0dfcnx30lf0cl8kp3sphch0000gn/T/neoCLR relocated JIT 87dogq27/installed bundle/bin/neoclr",
+        "run",
+        "/Users/robert/Projects/neoclr/target/default-jit-library-tests-v2/json-dom-build/app.dll"
+      ],
+      "exitCode": 0,
+      "stdout": "PASS JSON arrays report invalid indices\nPASS JSON serialization rejects cyclic node graphs\nPASS JSON nested documents round trip with Unicode and number spelling\nPASS JSON document round trip removes surrounding whitespace\nPASS JSON parsing rejects escaped aliases of duplicate names\nPASS JSON parsing rejects trailing commas and truncated input\nPASS Empty JSON objects support empty map snapshots and safe lookup\nPASS JSON map lookup distinguishes null absence and ordinal keys\nPASS JSON map views keep JSON node serialization precedence\nPASS JSON map snapshots preserve insertion order and node identity\nPASS JSON numbers preserve spelling and reject fractional Int32 conversion\nPASS JSON duplicate insertion preserves the original value\nPASS JSON objects distinguish present null from missing fields\nPASS JSON object indexed access preserves insertion order\nPASS JSON documents support every root node kind\nPASS JSON scalar nodes expose their typed values\nPASS JSON sequence indexing retains node identity and explicit null\nPASS Empty JSON arrays expose empty sequence snapshots\nPASS JSON sequence views retain node serialization precedence\nPASS JSON sequence snapshots preserve order and shared child contents\nTests: 20, passed: 20, failed: 0, skipped: 0\n",
+      "stderr": ""
+    },
+    {
+      "name": "json-streams",
+      "command": [
+        "/var/folders/5x/5r0dfcnx30lf0cl8kp3sphch0000gn/T/neoCLR relocated JIT 87dogq27/installed bundle/bin/neoclr",
+        "run",
+        "/Users/robert/Projects/neoclr/target/default-jit-library-tests-v2/json-streams-build/app.dll"
+      ],
+      "exitCode": 0,
+      "stdout": "PASS JSON stream serialization detects cycles before writing\nPASS JSON stream output quota includes escaping and validates before writes\nPASS JSON stream reads reject split invalid UTF-8\nPASS JSON memory stream round trip preserves document content\nPASS JSON number document quota preserves long number spelling\nPASS JSON streams retry single-byte reads and writes without taking ownership\nPASS JSON stream reads preserve the underlying I/O failure\nPASS JSON stream input quota counts bytes and preserves ownership\nPASS JSON stream reads reject a truncated document\nPASS JSON stream boundary counts UTF-8 bytes rather than characters\nPASS JSON stream writes preserve partial output and failure cause\nPASS JSON stream writes reject zero progress without looping\nTests: 12, passed: 12, failed: 0, skipped: 0\n",
+      "stderr": ""
+    },
+    {
+      "name": "memory-stream",
+      "command": [
+        "/var/folders/5x/5r0dfcnx30lf0cl8kp3sphch0000gn/T/neoCLR relocated JIT 87dogq27/installed bundle/bin/neoclr",
+        "run",
+        "/Users/robert/Projects/neoclr/target/default-jit-library-tests-v2/memory-stream-build/app.dll"
+      ],
+      "exitCode": 0,
+      "stdout": "PASS MemoryStream quota errors preserve length and position\nPASS MemoryStream closure is shared across interfaces and idempotent\nPASS MemoryStream gap writes zero-fill while empty writes preserve length\nPASS MemoryStream rejects invalid buffer and seek ranges without moving\nPASS MemoryStream overwrites preserve length and untouched bytes\nTests: 5, passed: 5, failed: 0, skipped: 0\n",
+      "stderr": ""
+    },
+    {
+      "name": "string-construction",
+      "command": [
+        "/var/folders/5x/5r0dfcnx30lf0cl8kp3sphch0000gn/T/neoCLR relocated JIT 87dogq27/installed bundle/bin/neoclr",
+        "run",
+        "/Users/robert/Projects/neoclr/target/default-jit-library-tests-v2/string-construction-build/app.dll"
+      ],
+      "exitCode": 0,
+      "stdout": "PASS String construction copies character storage\nPASS String construction accepts an empty character sequence\nPASS String construction preserves and merges grapheme boundaries\nPASS String named arguments preserve public parameter contracts\nPASS String exposes a readonly character sequence\nTests: 5, passed: 5, failed: 0, skipped: 0\n",
+      "stderr": ""
+    },
+    {
+      "name": "encoding-buffer-limits",
+      "command": [
+        "/var/folders/5x/5r0dfcnx30lf0cl8kp3sphch0000gn/T/neoCLR relocated JIT 87dogq27/installed bundle/bin/neoclr",
+        "run",
+        "/Users/robert/Projects/neoclr/target/default-jit-library-tests-v2/encoding-buffer-limits-build/app.dll"
+      ],
+      "exitCode": 0,
+      "stdout": "PASS UTF-8 decoder quota rejection preserves an incomplete scalar\nPASS ASCII decoder accepts the maximum input after rejecting an oversized call\nPASS Encoder drain quotas preserve accepted text and destination bytes\nPASS UTF-8 decoder maximum input counts new bytes separately from carried bytes\nPASS Native buffer comprehensions preserve selector indices and range endpoints\nPASS One-shot decoding enforces byte limits and accepts the maximum\nTests: 6, passed: 6, failed: 0, skipped: 0\n",
+      "stderr": ""
+    },
+    {
+      "name": "encoding-boundaries",
+      "command": [
+        "/var/folders/5x/5r0dfcnx30lf0cl8kp3sphch0000gn/T/neoCLR relocated JIT 87dogq27/installed bundle/bin/neoclr",
+        "run",
+        "/Users/robert/Projects/neoclr/target/default-jit-library-tests-v2/encoding-boundaries-build/app.dll"
+      ],
+      "exitCode": 0,
+      "stdout": "PASS StreamReader decodes Unicode lines across single-byte reads\nPASS StreamReader distinguishes empty lines EOF and lone carriage returns\nPASS StreamReader delimits custom decoded output and bounds expansion\nPASS StreamWriter reports zero progress and preserves flush failures\nPASS StreamReader rejects invalid limits before consuming its input\nPASS Encoding input quotas reject oversized chunks without poisoning sessions\nPASS StreamWriter accepts its maximum byte count and preflights oversized lines\nPASS StreamReader preserves input failures and rejects truncated UTF-8 at EOF\nTests: 8, passed: 8, failed: 0, skipped: 0\n",
+      "stderr": ""
+    },
+    {
+      "name": "encoding-streams",
+      "command": [
+        "/var/folders/5x/5r0dfcnx30lf0cl8kp3sphch0000gn/T/neoCLR relocated JIT 87dogq27/installed bundle/bin/neoclr",
+        "run",
+        "/Users/robert/Projects/neoclr/target/default-jit-library-tests-v2/encoding-streams-build/app.dll"
+      ],
+      "exitCode": 0,
+      "stdout": "PASS StreamWriter completes short writes and preserves cross-input graphemes\nPASS ASCII StreamWriter rejects complete lines before output and remains reusable\nPASS Custom encoder trailers require explicit Finish and are emitted once\nPASS Closing a writer manages ownership without implicit encoder finalization\nPASS Partial write and final-output failures are observable without replay\nPASS Custom encoder final acceptance waits for all trailer bytes to drain\nPASS Selected ASCII reader recognizes CRLF and preserves borrowed ownership\nPASS Selected readers reject malformed bytes and enforce decoded text limits\nTests: 8, passed: 8, failed: 0, skipped: 0\n",
+      "stderr": ""
+    },
+    {
+      "name": "encoding",
+      "command": [
+        "/var/folders/5x/5r0dfcnx30lf0cl8kp3sphch0000gn/T/neoCLR relocated JIT 87dogq27/installed bundle/bin/neoclr",
+        "run",
+        "/Users/robert/Projects/neoclr/target/default-jit-library-tests-v2/encoding-build/app.dll"
+      ],
+      "exitCode": 0,
+      "stdout": "PASS Encoding providers preserve UTF-8 and reject non-ASCII text\nPASS UTF-8 decoding preserves text at every byte split\nPASS UTF-8 decoders reject malformed scalars and truncated final input\nPASS Decoder sessions copy pending input and preserve BOM data\nPASS Decoder range errors are retryable and ASCII errors are terminal\nPASS Encoders preserve accepted input through one-byte drains\nPASS Encoder chunks preserve scalars across the internal byte boundary\nPASS ASCII encoder preflight is retryable and factories are independent\nPASS One-shot decoding preserves Unicode BOM NUL and empty sequences\nPASS One-shot errors do not poison providers and results are snapshots\nTests: 10, passed: 10, failed: 0, skipped: 0\n",
+      "stderr": ""
+    },
+    {
+      "name": "unicode-casing",
+      "command": [
+        "/var/folders/5x/5r0dfcnx30lf0cl8kp3sphch0000gn/T/neoCLR relocated JIT 87dogq27/installed bundle/bin/neoclr",
+        "run",
+        "/Users/robert/Projects/neoclr/target/default-jit-library-tests-v2/unicode-casing-build/app.dll"
+      ],
+      "exitCode": 0,
+      "stdout": "PASS Invariant casing preserves embedded NUL and empty strings\nPASS Invariant casing supports full Unicode expansions\nPASS Invariant casing preserves normalization form\nPASS Full casing expansion does not redefine ordinal ignore-case comparison\nPASS Invariant lowercase respects contextual Greek sigma\nPASS Invariant uppercase preserves emoji and supplementary letters\nTests: 6, passed: 6, failed: 0, skipped: 0\n",
+      "stderr": ""
+    },
+    {
+      "name": "int64-parsing",
+      "command": [
+        "/var/folders/5x/5r0dfcnx30lf0cl8kp3sphch0000gn/T/neoCLR relocated JIT 87dogq27/installed bundle/bin/neoclr",
+        "run",
+        "/Users/robert/Projects/neoclr/target/default-jit-library-tests-v2/int64-parsing-build/app.dll"
+      ],
+      "exitCode": 0,
+      "stdout": "PASS Int64 parsing accepts both signed boundaries\nPASS Int64 decimal formatting round trips signed boundaries\nPASS Int64 parsing rejects noncanonical lexical inputs\nPASS Int64 parsing distinguishes overflow from invalid trailing text\nPASS Int64 parsing accepts signs leading zeros and values beyond Int32\nTests: 5, passed: 5, failed: 0, skipped: 0\n",
+      "stderr": ""
+    },
+    {
+      "name": "primitive-parsing",
+      "command": [
+        "/var/folders/5x/5r0dfcnx30lf0cl8kp3sphch0000gn/T/neoCLR relocated JIT 87dogq27/installed bundle/bin/neoclr",
+        "run",
+        "/Users/robert/Projects/neoclr/target/default-jit-library-tests-v2/primitive-parsing-build/app.dll"
+      ],
+      "exitCode": 0,
+      "stdout": "PASS Boolean parsing accepts mixed case and rejects numeric aliases\nPASS Byte parsing preserves values and reports overflow\nPASS Byte parsing preserves distinct small values\nPASS Double parsing preserves values and reports overflow\nPASS Primitive parsers distinguish invalid format from overflow\nPASS Int16 parsing preserves values and reports overflow\nPASS Int32 parsing preserves values and reports overflow\nPASS SByte parsing preserves values and reports overflow\nPASS Single parsing preserves values and reports overflow\nPASS UInt16 parsing preserves values and reports overflow\nPASS UInt32 parsing preserves values and reports overflow\nPASS UInt64 parsing preserves values and reports overflow\nTests: 12, passed: 12, failed: 0, skipped: 0\n",
+      "stderr": ""
+    },
+    {
+      "name": "path-values",
+      "command": [
+        "/var/folders/5x/5r0dfcnx30lf0cl8kp3sphch0000gn/T/neoCLR relocated JIT 87dogq27/installed bundle/bin/neoclr",
+        "run",
+        "/Users/robert/Projects/neoclr/target/default-jit-library-tests-v2/path-values-build/app.dll"
+      ],
+      "exitCode": 0,
+      "stdout": "PASS Path Object equality distinguishes colliding map keys\nPASS Equal paths share hashes and virtual display\nPASS Path maps replace equal keys and retain lookup through growth\nPASS Path equality distinguishes case roots and normalization\nPASS Path equality agrees across typed interface and Object dispatch\nTests: 5, passed: 5, failed: 0, skipped: 0\n",
+      "stderr": ""
+    },
+    {
+      "name": "index-range",
+      "command": [
+        "/var/folders/5x/5r0dfcnx30lf0cl8kp3sphch0000gn/T/neoCLR relocated JIT 87dogq27/installed bundle/bin/neoclr",
+        "run",
+        "/Users/robert/Projects/neoclr/target/default-jit-library-tests-v2/index-range-build/app.dll"
+      ],
+      "exitCode": 0,
+      "stdout": "PASS Index preserves direction and resolves end boundaries\nPASS Index and Range typed equality agrees with hashing\nPASS Range resolution accepts empty and full boundaries\nPASS Array range syntax supports omitted and end-relative boundaries\nPASS Array indexes support values and from-end assignment\nPASS Array slices copy storage and preserve reference elements\nPASS Array indexing and slicing evaluate operands once in source order\nPASS Read-only value fields use defensive copies for method calls\nPASS Array safe access returns options and results for invalid bounds\nPASS String ranges preserve graphemes and half-open boundaries\nPASS String safe access rejects invalid grapheme bounds\nPASS String slicing evaluates receiver and bounds once\nPASS ArrayList supports directional mutation and independent range copies\nPASS Sequence slicing consumes one iterator without indexed reads\nPASS Sequence invalid and empty slices do not acquire iterators\nPASS Sequence slicing disposes when enumeration ends before Count\nPASS Sequence safe indexing and slicing work through array aliases\nPASS Sequence extension indexers provide default access and independent slices\nPASS Sequence slicing delegates to the list range contract\nPASS Native extension indexers support writes and compound assignment\nTests: 20, passed: 20, failed: 0, skipped: 0\n",
+      "stderr": ""
+    },
+    {
+      "name": "http-method-values",
+      "command": [
+        "/var/folders/5x/5r0dfcnx30lf0cl8kp3sphch0000gn/T/neoCLR relocated JIT 87dogq27/installed bundle/bin/neoclr",
+        "run",
+        "/Users/robert/Projects/neoclr/target/default-jit-library-tests-v2/http-method-values-build/app.dll"
+      ],
+      "exitCode": 0,
+      "stdout": "PASS HTTP coffee requests retain BREW and unnamed status codes\nPASS HTTP custom method construction and parsing preserve spelling\nPASS HTTP method equality and hashes ignore ASCII case\nPASS HTTP methods retain case-insensitive identity in a set\nPASS HTTP method validation admits token punctuation and rejects separators\nPASS HTTP method parsing canonicalizes every known name\nPASS HTTP predefined method values use canonical tokens\nPASS HTTP request factories retain predefined and custom methods\nPASS HTTP URI request factories support custom methods and empty content\nTests: 9, passed: 9, failed: 0, skipped: 0\n",
+      "stderr": ""
+    },
+    {
+      "name": "http-header-values",
+      "command": [
+        "/var/folders/5x/5r0dfcnx30lf0cl8kp3sphch0000gn/T/neoCLR relocated JIT 87dogq27/installed bundle/bin/neoclr",
+        "run",
+        "/Users/robert/Projects/neoclr/target/default-jit-library-tests-v2/http-header-values-build/app.dll"
+      ],
+      "exitCode": 0,
+      "stdout": "PASS HTTP header lookup distinguishes empty values from absent fields\nPASS HTTP header lookup rejects invalid names\nPASS HTTP header lookup preserves repeated values without splitting commas\nPASS HTTP request lookup exposes content headers without inventing provider headers\nPASS HTTP header lookup snapshots remain independent of later additions\nTests: 5, passed: 5, failed: 0, skipped: 0\n",
+      "stderr": ""
+    },
+    {
+      "name": "http-route-matching",
+      "command": [
+        "/var/folders/5x/5r0dfcnx30lf0cl8kp3sphch0000gn/T/neoCLR relocated JIT 87dogq27/installed bundle/bin/neoclr",
+        "run",
+        "/Users/robert/Projects/neoclr/target/default-jit-library-tests-v2/http-route-matching-build/app.dll"
+      ],
+      "exitCode": 0,
+      "stdout": "PASS Route matching preserves case segment and trailing-slash distinctions\nPASS Route byte quotas admit the boundary and reject one extra byte\nPASS Route matching separates query text and converts captured integers\nPASS Route captures decode UTF-8 once and preserve literal plus\nPASS Route integer conversion distinguishes path matching from conversion failure\nPASS Route parsing rejects malformed and unsupported pattern syntax\nPASS Route matching validates malformed targets even when literals mismatch\nPASS Route segment quotas admit the boundary and reject one extra segment\nTests: 8, passed: 8, failed: 0, skipped: 0\n",
+      "stderr": ""
+    },
+    {
+      "name": "ip-address-values",
+      "command": [
+        "/var/folders/5x/5r0dfcnx30lf0cl8kp3sphch0000gn/T/neoCLR relocated JIT 87dogq27/installed bundle/bin/neoclr",
+        "run",
+        "/Users/robert/Projects/neoclr/target/default-jit-library-tests-v2/ip-address-values-build/app.dll"
+      ],
+      "exitCode": 0,
+      "stdout": "PASS IPAddress values survive subsequent parse allocations\nPASS IPv4 parsing rejects malformed and unsupported corpus forms\nPASS IPv6 parsing rejects malformed and unsupported corpus forms\nPASS IPAddress Object dispatch preserves value equality hashes and family distinctions\nPASS IPAddress parsing distinguishes unsupported scope from invalid format\nPASS IPv4 parsing and canonical formatting round trip\nPASS IPv6 parsing and canonical formatting round trip\nTests: 7, passed: 7, failed: 0, skipped: 0\n",
+      "stderr": ""
+    },
+    {
+      "name": "uri-resolution",
+      "command": [
+        "/var/folders/5x/5r0dfcnx30lf0cl8kp3sphch0000gn/T/neoCLR relocated JIT 87dogq27/installed bundle/bin/neoclr",
+        "run",
+        "/Users/robert/Projects/neoclr/target/default-jit-library-tests-v2/uri-resolution-build/app.dll"
+      ],
+      "exitCode": 0,
+      "stdout": "PASS URI resolution handles authority and path bases and rejects relative bases\nPASS URI classification and equality preserve literal identity\nPASS URI parsing rejects every invalid grammar corpus input\nPASS URI parsing and resolution enforce the byte quota\nPASS URI reference resolution corpus group 1\nPASS URI reference resolution corpus group 2\nPASS URI reference resolution corpus group 3\nPASS URI reference resolution corpus group 4\nPASS URI reference resolution corpus group 5\nPASS URI reference resolution corpus group 6\nPASS URI parsing reports unsupported bracketed authorities\nTests: 11, passed: 11, failed: 0, skipped: 0\n",
+      "stderr": ""
+    },
+    {
+      "name": "zoned-time-parsing",
+      "command": [
+        "/var/folders/5x/5r0dfcnx30lf0cl8kp3sphch0000gn/T/neoCLR relocated JIT 87dogq27/installed bundle/bin/neoclr",
+        "run",
+        "/Users/robert/Projects/neoclr/target/default-jit-library-remaining/zoned-time-parsing-build/app.dll"
+      ],
+      "exitCode": 0,
+      "stdout": "PASS Zoned parsing preserves UTC and the pinned database version\nPASS Zoned parsing validates winter and summer offsets\nPASS Explicit offsets select both DST overlap candidates without losing ticks\nPASS Zoned parsing rejects skipped local times for either adjacent offset\nPASS Zoned parsing handles half hour transitions\nPASS Zoned parsing enforces rule bounds and historical second precision\nPASS Zoned parsing preserves lexical and civil range errors\nPASS Named zone lookup remains ordinal and accepts pinned aliases\nTests: 8, passed: 8, failed: 0, skipped: 0\n",
+      "stderr": ""
+    },
+    {
+      "name": "instant-parsing",
+      "command": [
+        "/var/folders/5x/5r0dfcnx30lf0cl8kp3sphch0000gn/T/neoCLR relocated JIT 87dogq27/installed bundle/bin/neoclr",
+        "run",
+        "/Users/robert/Projects/neoclr/target/default-jit-library-remaining/instant-parsing-build/app.dll"
+      ],
+      "exitCode": 0,
+      "stdout": "PASS Instant parsing normalizes explicit offsets to the same epoch\nPASS Instant parsing preserves fractional ticks before and after the epoch\nPASS Instant parsing preserves the wider tick domain at civil boundaries\nPASS Instant parsing requires a complete invariant timestamp and explicit offset\nPASS Instant parsing rejects invalid civil fields and offset ranges\nPASS Parsed instants project back through their explicit fixed offset\nTests: 6, passed: 6, failed: 0, skipped: 0\n",
+      "stderr": ""
+    },
+    {
+      "name": "duration-offset-parsing",
+      "command": [
+        "/var/folders/5x/5r0dfcnx30lf0cl8kp3sphch0000gn/T/neoCLR relocated JIT 87dogq27/installed bundle/bin/neoclr",
+        "run",
+        "/Users/robert/Projects/neoclr/target/default-jit-library-remaining/duration-offset-parsing-build/app.dll"
+      ],
+      "exitCode": 0,
+      "stdout": "PASS Duration parsing preserves signed tick boundaries\nPASS Duration parsing rejects overflow and invalid clock fields\nPASS Duration parsing rejects unsupported numeric grammar\nPASS Duration fractions scale to ticks and accept bounded leading day zeros\nPASS Offset parsing accepts zero signs seconds and inclusive bounds\nPASS Offset parsing rejects invalid ranges without normalization\nPASS Offset parsing requires complete ASCII signed syntax\nPASS Parsed offsets project instants and parsed durations preserve arithmetic\nTests: 8, passed: 8, failed: 0, skipped: 0\n",
+      "stderr": ""
+    },
+    {
+      "name": "time-parsing",
+      "command": [
+        "/var/folders/5x/5r0dfcnx30lf0cl8kp3sphch0000gn/T/neoCLR relocated JIT 87dogq27/installed bundle/bin/neoclr",
+        "run",
+        "/Users/robert/Projects/neoclr/target/default-jit-library-remaining/time-parsing-build/app.dll"
+      ],
+      "exitCode": 0,
+      "stdout": "PASS Date parsing accepts bounds and Gregorian leap years\nPASS Date parsing separates malformed text from invalid civil fields\nPASS Time parsing scales one through seven fraction digits without rounding\nPASS Time parsing rejects malformed clocks leap seconds and excess precision\nPASS Civil parsers round trip all supported numeric culture conventions\nPASS Explicit cultures reject mismatched date and fraction separators\nPASS Local date time parsing preserves boundaries and rejects zone suffixes\nPASS Default civil parsers use the current culture formatting convention\nTests: 8, passed: 8, failed: 0, skipped: 0\n",
+      "stderr": ""
+    },
+    {
+      "name": "discovery-contract",
+      "command": [
+        "/var/folders/5x/5r0dfcnx30lf0cl8kp3sphch0000gn/T/neoCLR relocated JIT 87dogq27/installed bundle/bin/neoclr",
+        "run",
+        "/Users/robert/Projects/neoclr/target/default-jit-library-remaining/discovery-contract-build/app.dll"
+      ],
+      "exitCode": 1,
+      "stdout": "PASS first discovered test\nFAIL discovered failure: Expected 1, actual 2\nPASS after discovered failure\nPASS NeoClr.DiscoveryTests.DWithoutDescription\nPASS NeoClr.DiscoveryTests.EInline(2, 3, 5)\nPASS NeoClr.DiscoveryTests.EInline(5, 6, 11)\nPASS NeoClr.DiscoveryTests.FSource/NeoClr.DiscoveryTests.Inputs[0]\nPASS NeoClr.DiscoveryTests.FSource/NeoClr.DiscoveryTests.Inputs[1]\nPASS manually registered companion\nTests: 9, passed: 8, failed: 1, skipped: 0\n",
+      "stderr": ""
+    },
+    {
+      "name": "runner-contract",
+      "command": [
+        "/var/folders/5x/5r0dfcnx30lf0cl8kp3sphch0000gn/T/neoCLR relocated JIT 87dogq27/installed bundle/bin/neoclr",
+        "run",
+        "/Users/robert/Projects/neoclr/target/default-jit-library-remaining/runner-contract-build/app.dll"
+      ],
+      "exitCode": 1,
+      "stdout": "PASS before failure\nFAIL intentional assertion failure: Expected 1, actual 2\nPASS after failure\nSKIP intentional skip: contract probe\nTests: 4, passed: 2, failed: 1, skipped: 1\n",
+      "stderr": ""
+    },
+    {
+      "name": "explicit-interpreter",
+      "command": [
+        "/var/folders/5x/5r0dfcnx30lf0cl8kp3sphch0000gn/T/neoCLR relocated JIT 87dogq27/installed bundle/bin/neoclr",
+        "run",
+        "/Users/robert/Projects/neoclr/examples/hello.neoil",
+        "--execution",
+        "interpreter"
+      ],
+      "exitCode": 0,
+      "stdout": "Hello, world!\n",
+      "stderr": ""
+    },
+    {
+      "name": "runtime-await-stack",
+      "command": [
+        "/var/folders/5x/5r0dfcnx30lf0cl8kp3sphch0000gn/T/neoCLR relocated JIT 87dogq27/installed bundle/bin/neoclr",
+        "run",
+        "/Users/robert/Projects/neoclr/target/stack-trace-validation-v4/AsyncStackTraceCases.dll"
+      ],
+      "exitCode": 0,
+      "stdout": "   at $closure$0.Invoke [instruction 13]\n   at RuntimeAwaitProvider.Body`1.Run [instruction 2]\n   at Raven.Generated.UnitCallback.Invoke [instruction 2]\n\n   at $closure$0.Invoke [instruction 13]\n   at RuntimeAwaitProvider.Body`1.Run [instruction 2]\n   at Raven.Generated.UnitCallback.Invoke [instruction 2]\n\n",
+      "stderr": ""
+    }
+  ],
+  "manifestSha256": "ad4be8529af602890fbaa9dd7483865aa8a5d8685ccd98a49815f9aac30c9fe6",
+  "baselinesSha256": {
+    "/Users/robert/Projects/neoclr/target/default-jit-library-tests-v2/report.json": "39c8ee962950e43982533bb5bb49459005e7e8c7d0c9e29701b1c2d67346a472",
+    "/Users/robert/Projects/neoclr/target/default-jit-library-remaining/report.json": "55c988705255b256c52892a96d7c058f5b810de8cf6ea9840b117d8336e60740"
+  },
+  "excludedFailedSuite": "zoned-time-parsing",
+  "scriptSha256": "1a3100499c67eaf2671c3a88dbbf2f029e377f4e47106e040a614d3751e34b1c",
+  "assembliesSha256": {
+    "http-lifetime": "5719ab5942310664882d1e3a7cc0fabdde317e9bdbddf43e2d4352edcb881772",
+    "http-text": "6db57da62aa54a319b86e864b18415a868f67cd4460cd3ebdb6c4b6ff7285bdb",
+    "collections": "62ed68e34446ea5c1946f3c7939093d352fc41ffdddee3b1760e7c90f61e70c6",
+    "collection-construction": "904393f17b62127c2b3620fa33094f7a8fadb564fc9b64e05b6292bfb59e35f2",
+    "collection-iteration": "b7b1f951f0e3210e6a40ee98a5b07159056c62728fa1fdf60f560378a58246ec",
+    "json-dom": "618c01523858db9073c4d9897b87457b50d2ec81fa4a3eb900494780d1c0c045",
+    "json-streams": "f35e0a3e830b3068ebaa8ae3a0731d22cf07ed14803c5c3464964abcfe238075",
+    "memory-stream": "16b5b98c314593a566de9c74986b47a48e98aba46c12769cbcac39810eabbaef",
+    "string-construction": "bd1b120fd494e5fc1fe0ec3d6684bb91f9bb9704902fd2230165d83b99f2f982",
+    "encoding-buffer-limits": "9b79b69b0c8cd44fd7005a602af0688fda70e63e2f1188192e1dadf0c90e10b8",
+    "encoding-boundaries": "096b5361b903471f15bc4dd270c0fcd3b61bec140f4475d938835c6550aea41b",
+    "encoding-streams": "fc11c38cd77c01d396296db2ef6948457753a2b41d558c36e01bcb038516dd92",
+    "encoding": "8b538caba6651c7ef875f90ca4d98c6e6c6d798bbdc991b290a426354ea9e0c3",
+    "unicode-casing": "9766c2940781e32b19b33812b46ad1ad2688ca19f6ad039db3a498f12393e85a",
+    "int64-parsing": "26e0741167377046ee574d10dac4eae5a63855806fcf81a037e0ababf4693bfa",
+    "primitive-parsing": "8038e3c882efe919f8f9fdd13f1e105bc34c0d2c4f9a95bc70dbc1e2529a3b84",
+    "path-values": "b89a6a5477626297d87bf6a61c2f6187bcb27435a884e760748de3b3d1073a9c",
+    "index-range": "4b4c652080efe7b8c745374aed60e523751534c8ec531d130c0843ebd6d7bfb5",
+    "http-method-values": "e4f1a84b732184671fc15c99fede4a8a538eacc81ac11c458a2992dda52b5e2f",
+    "http-header-values": "4e44f69947468ab5b7e99eef621730a4d00aaa78ac4d117a04afcefef6b7e998",
+    "http-route-matching": "3968c718e19fcf59efa4ef049b492aa28fb49c5f882597d254cd2486abc8d925",
+    "ip-address-values": "2345ce54434deb717bd65463443a99387080e6546ad32aa53996619e5b0ed149",
+    "uri-resolution": "8e9e268b35896adf6eda000bbc206d7b7f954ef302f90d35af3b0bc413a0094f",
+    "zoned-time-parsing": "609a343bc62a3261c5d082b8b4bbbab29fe983b8cff0a0e984d9014ece0765f0",
+    "instant-parsing": "51c180412216f6ca5909f01e2484325f5ebc4048cfe487e849f04ac307b16705",
+    "duration-offset-parsing": "33191e195b9112b1dc74d611fe0d75ddfd22c922c40834e662f06796eaaa0a48",
+    "time-parsing": "31c5717eda827b9485ec059d17c6a0a8253f40bc068696b55cd4dccb4e60e92b",
+    "discovery-contract": "c148f67e44ca8281386cfd8c5ab9ab2ebc71fdfe249ba4fc123145240a01ebef",
+    "runner-contract": "d1ccd03fb28f91ddafcab3cac7957f54868fbfb361126f39b19f37e3e8600eee"
+  },
+  "asyncAssemblySha256": "c5cd7326eb0401f7b186495b2b2b361fa55270ec10acdc09207a203ed716308a"
+}

@@ -24,6 +24,9 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   Include culture and pinned time-zone services in packaged helpers, with the
   shared text/time-zone kernel rather than an HTTP-only subset; add Windows
   zoned-time coverage after local qualification exposed the missing symbols.
+  Qualify the installed default with 29 relocated macOS library suites and current
+  Windows scalar/CLI/framework gates, plus eight HTTP cases on each host; retain
+  hashes, earlier failures and explicit interpreter/async stack controls.
 
 - Reduce native collector traversal work: validate spans while building the index,
   combine mark reset with intern-root seeding, and trace each activated owned parked

@@ -119,3 +119,11 @@ x64 currently uses compiler-generated async state machines; native runtime
 suspension and Windows ARM64 JIT remain gaps. Unsupported programs report compiler
 errors. Eager closed-world compilation, the external compiler process, bounded
 native heaps and interpreted debugging remain development limitations.
+
+## Installed default qualification — 2026-10-12
+
+The [completed default-mode gate](experiments/jit-cli/default/README.md) validates
+29 macOS library suites from a relocated installation, eight HTTP cases on each
+supported host, and the current Windows scalar/CLI/framework checks. Preparation
+includes the complete text/time-zone helper. These results qualify the development
+default; the remaining platform and execution limits above still apply.
