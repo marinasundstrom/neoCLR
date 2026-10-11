@@ -14936,3 +14936,19 @@ See [invocation evidence](experiments/runtime-async/start-validation.json).
   private terminal-handle release. The compiled Raven consumer and 30 focused checks
   pass. Automatic managed ownership, outcome projection and compiler mapping remain
   open. [Evidence](experiments/runtime-async/shared-results-validation.json).
+
+## 2026-10-11 — Awaiter concept without copying type structure
+
+- Author clarified that the awaiter question was about useful modeling of tasks,
+  scheduling and suspension, and that neoCLR should not copy things for their own sake.
+- Assistant revised its earlier separate-wrapper recommendation: retain the awaiter
+  contract and Task<T>'s self-awaiter for now; a separate wrapper needs a concrete
+  policy/projection use. The protocol is distinct from the runtime's activation model.
+- On continuation, implemented a readiness service and a source-local compatibility
+  adapter. Ordinary Raven await over a custom operation and managed Task now passes
+  pending/fast-path/repeated/check-registration-gap scenarios, with generated state
+  machines still present. The consumer and 23 focused checks pass; no default switched.
+- The readiness property exposed the known bundled compiler binding recursion again.
+  Separate intrinsic declarations avoid it; the compiler defect remains open. This
+  is an adapter POC, not general awaiter support or compiler-native runtime await.
+  [Evidence](experiments/runtime-async/language-await-validation.json).

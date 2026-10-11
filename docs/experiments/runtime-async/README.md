@@ -1,8 +1,8 @@
 # Interpreter runtime-async experiments
 
-Current development status: [shared completed outcomes](#shared-completed-outcomes--2026-10-11)
-passes the extended Raven consumer and 30 focused checks. Detached activation
-checks from the preceding slice remain recorded below. Public Task/compiler await integration
+Current development status: [ordinary Raven await compatibility](#ordinary-raven-await-compatibility--2026-10-11)
+passes the generated-state-machine adapter consumer and 23 focused checks. Earlier
+activation and outcome checks remain recorded below. Public Task/compiler await integration
 and default switching remain open. Earlier sections record the preceding POC slices.
 
 Development experiment, 2026-10-11. `Yield.rvn` calls a private runtime boundary
@@ -230,3 +230,54 @@ cover repeated reads, stale handles, capacity recovery only on release, and refu
 to release a cancelled body that is still parked. See
 [shared-result evidence](shared-results-validation.json). Public API/reference and
 website capability claims remain unchanged. No performance improvement is asserted.
+
+## Ordinary Raven await compatibility — 2026-10-11
+
+`AwaitLanguage.rvn` now connects the ordinary Raven awaiter protocol to private
+runtime operations. Operation returns itself from GetAwaiter; IsCompleted queries
+the runtime, GetResult retrieves the outcome, and OnCompleted submits an adapter
+callback. That callback parks through RuntimeAsyncAwait and invokes the generated
+continuation after resumption. The consumer uses async Main, awaits a custom operation
+and a managed Task, and re-awaits the already completed operation.
+
+This is deliberately a compatibility path: generated state machines still exist.
+It does not implement compiler-native runtime await or change Raven defaults. It
+proves that the current awaiter protocol can participate in runtime scheduling and
+suspension. The adapter allocates an object and submits a callback for each pending
+await; no performance improvement is claimed. The consumer exposes completion only;
+its IsCancelled=false satisfies the current target cancellation protocol but does
+not qualify cancellation adapters. Int32-only outcomes and invocation-terminal
+faults remain POC limits. Custom awaiters are not automatically runtime-aware.
+
+New private InternalCall `neoCLR.Runtime.RuntimeAsyncIsCompleted(Int64) -> Boolean`
+returns terminal readiness without consuming the outcome. Unknown/released handles
+fault. Observing an expired timer materializes completion, so later cancellation
+cannot overwrite observed success. The existing 64-handle budget/lifetime limits
+remain unchanged. No managed library API or separate public awaiter type is added.
+
+The compiled consumer checks pending delivery, GC before resumption, the completed
+fast path without another registration, and completion between a false readiness
+check and callback publication. A submitted adapter rechecks the operation when it
+runs, preventing a lost completion in this serialized interpreter path. Cross-thread
+registration races and native/JIT execution are not qualified.
+
+The bundled compiler recurses when the readiness property calls an attributed
+intrinsic declared in the same source file. Keeping the private declarations in
+`AwaitServices.rvn` avoids that binding cycle; this does not fix the compiler issue
+or establish a language restriction. The next native-await compiler contract must
+preserve this awaiter behavior while replacing generated continuations with runtime
+activation resumption and supplying managed Task outcome/lifetime ownership.
+
+[Recorded language-await evidence](language-await-validation.json) includes binary,
+source and compiler hashes and the generated state-machine name markers. Reproduce:
+
+```sh
+python3 docs/experiments/runtime-async/validate.py --language-await \
+  --bundle target/data-cases-bundle \
+  --runtime target/scheduler-wait-validation/debug/neoclr \
+  --output target/runtime-async-language-await
+```
+
+Use a runtime built from this slice. The default script mode still runs the direct
+runtime-intrinsic consumer. Public API reference/website capability claims remain
+unchanged; these are source-local experimental services and adapters.

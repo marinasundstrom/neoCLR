@@ -4114,6 +4114,7 @@ fn interpret_instructions_with_dispatch(
                                 | crate::native::Binding::RuntimeAsyncComplete
                                 | crate::native::Binding::RuntimeAsyncCancel
                                 | crate::native::Binding::RuntimeAsyncRelease
+                                | crate::native::Binding::RuntimeAsyncIsCompleted
                                 | crate::native::Binding::RuntimeAsyncAwait
                         ) {
                             if work_control.is_some() || task_atomic::active(module, frames) {
@@ -4142,6 +4143,9 @@ fn interpret_instructions_with_dispatch(
                                         || frames.iter().chain(parked_activations.iter().flat_map(|activation| &activation.frames))
                                             .any(|frame| frame.async_result == Some(*id));
                                     Value::Boolean(!in_use && async_operations.release(*id))
+                                }
+                                (crate::native::Binding::RuntimeAsyncIsCompleted, [Value::Int64(id)]) => {
+                                    Value::Boolean(async_operations.is_completed(*id)?)
                                 }
                                 (crate::native::Binding::RuntimeAsyncAwait, [Value::Int64(id)]) => {
                                     async_operations.validate(*id)?;

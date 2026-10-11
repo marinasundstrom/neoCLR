@@ -21,6 +21,9 @@ fn program(main: &str, extra: &str) -> LoadedProgram {
 .function neoCLR.Runtime.RuntimeAsyncCancel(Int64 id) -> Boolean
 .methodimpl InternalCall
 .end
+.function neoCLR.Runtime.RuntimeAsyncIsCompleted(Int64 id) -> Boolean
+.methodimpl InternalCall
+.end
 .function neoCLR.Runtime.RuntimeAsyncRelease(Int64 id) -> Boolean
 .methodimpl InternalCall
 .end
@@ -545,4 +548,38 @@ fn cancelled_body_handle_cannot_be_released_while_body_is_still_parked() {
     let main = START_BODY.replace("ldloc operation\nldc.i4 99\ncall neoCLR.Runtime.RuntimeAsyncComplete(Int64, Int32)\nbrtrue Bad", "ldloc operation\ncall neoCLR.Runtime.RuntimeAsyncCancel(Int64)\npop\nldloc operation\ncall neoCLR.Runtime.RuntimeAsyncRelease(Int64)\nbrtrue Bad")
         .replace("ldloc operation\ncall neoCLR.Runtime.RuntimeAsyncAwait(Int64)\nret", "ldc.i4 0\nret");
     assert_eq!(bounded_run(program(&main, BODY)).value, Value::Int32(0));
+}
+
+#[test]
+fn readiness_query_is_nonconsuming_and_validates_handles() {
+    let main = r#"
+call neoCLR.Runtime.RuntimeAsyncCreate()
+stloc operation
+ldloc operation
+call neoCLR.Runtime.RuntimeAsyncIsCompleted(Int64)
+brtrue Bad
+ldloc operation
+ldc.i4 42
+call neoCLR.Runtime.RuntimeAsyncComplete(Int64, Int32)
+pop
+ldloc operation
+call neoCLR.Runtime.RuntimeAsyncIsCompleted(Int64)
+brfalse Bad
+ldloc operation
+call neoCLR.Runtime.RuntimeAsyncAwait(Int64)
+ret
+Bad:
+fault "readiness did not reflect operation state"
+"#;
+    assert_eq!(
+        program(main, "").run(Limits::default()).unwrap().value,
+        Value::Int32(42)
+    );
+    let fault = program(
+        "ldc.i8 0\ncall neoCLR.Runtime.RuntimeAsyncIsCompleted(Int64)\npop\nldc.i4 0\nret",
+        "",
+    )
+    .run(Limits::default())
+    .unwrap_err();
+    assert!(fault.message.contains("Unknown"));
 }

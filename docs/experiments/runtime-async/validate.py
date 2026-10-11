@@ -10,10 +10,16 @@ parser = argparse.ArgumentParser(description=__doc__)
 parser.add_argument('--bundle', type=Path, required=True)
 parser.add_argument('--runtime', type=Path, required=True)
 parser.add_argument('--output', type=Path, required=True)
+parser.add_argument('--language-await', action='store_true', help='Validate ordinary await via the compatibility adapter')
 args = parser.parse_args()
 bundle, runtime, output = args.bundle.resolve(), args.runtime.resolve(), args.output.resolve()
 output.mkdir(parents=True, exist_ok=True)
-source = Path(__file__).with_name('Await.rvn').resolve()
+source = Path(__file__).with_name('AwaitLanguage.rvn' if args.language_await else 'Await.rvn').resolve()
+expected = ('PASS ordinary Raven await through runtime suspension adapter' if args.language_await
+            else 'PASS runtime-owned operation suspension and resumption')
+sources = [source]
+if args.language_await:
+    sources.append(source.with_name('AwaitServices.rvn'))
 compiler = bundle / 'sdk/tools/rvnc/rvnc.dll'
 lib = bundle / 'lib'
 references = [lib / (name + '.dll') for name in ['System.Runtime', 'System.Data', 'System.Networking', 'System.Web']]
@@ -26,13 +32,13 @@ compile_command = ['dotnet', str(compiler), 'neoclr', '--core-reference', str(li
                    '--async-library', 'System.Runtime']
 for reference in references:
     compile_command += ['--reference', str(reference)]
-compile_command += ['-o', str(assembly), str(source)]
+compile_command += ['-o', str(assembly), *map(str, sources)]
 run_command = [str(runtime), 'run', str(assembly), '--system', str(lib / 'System.runtime.neox'),
                '--instructions', '100000000', '--object-root', str(references[0])]
 for reference in references:
     run_command += ['--module', str(reference)]
 report = {'passed': False, 'commands': [], 'sha256': {str(path): hashlib.sha256(path.read_bytes()).hexdigest()
-          for path in [source, runtime, compiler, lib / 'Core.dll', lib / 'System.runtime.neox', *references]}}
+          for path in [*sources, runtime, compiler, lib / 'Core.dll', lib / 'System.runtime.neox', *references]}}
 try:
     for command in [compile_command, run_command]:
         result = subprocess.run(command, capture_output=True, text=True, timeout=120)
@@ -41,7 +47,7 @@ try:
         if result.returncode:
             break
     report['passed'] = (len(report['commands']) == 2 and result.returncode == 0
-                        and result.stdout.strip() == 'PASS runtime-owned operation suspension and resumption'
+                        and result.stdout.strip() == expected
                         and not result.stderr)
 finally:
     (output / 'validation.json').write_text(json.dumps(report, indent=2) + '\n')

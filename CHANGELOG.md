@@ -8,6 +8,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-11
 
+- Add private runtime operation readiness and an ordinary Raven await compatibility
+  consumer covering pending/repeated awaits, completed fast paths and completion
+  before registration. The source-local adapter retains generated state machines;
+  compiler-native runtime await, managed lifetime and native/JIT remain open. Keep
+  the self-awaiter model rather than introducing a public wrapper without a need.
+
 - Retain interpreter runtime-async POC outcomes for repeated awaits and multiple
   parked observers. Add guarded private terminal-handle release that cannot retract
   waiter delivery or active body ownership. Retained outcomes now occupy the handle

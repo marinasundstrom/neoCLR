@@ -1,0 +1,87 @@
+module RuntimeAwaitLanguage {
+    import System.*
+    import System.Tasks.*
+    import System.Runtime.CompilerServices.*
+
+    // Source-local compatibility adapter, not a proposed public awaiter type.
+    class Operation : TaskAwaiter {
+        private val handle: long
+        var CompleteOnRegistration = false
+        var Registrations = 0
+
+        init(operation: long) {
+            handle = operation
+        }
+
+        // Required by the current neoCLR compiler cancellation protocol. This
+        // completion-only adapter exposes no cancellation producer.
+        val IsCancelled: bool => false
+        val IsCompleted: bool => neoCLR.Runtime.RuntimeAsyncIsCompleted(handle)
+        func GetAwaiter() -> Operation => self
+        func GetResult() -> int => neoCLR.Runtime.RuntimeAsyncAwait(handle)
+
+        // Deliberate awaiter-protocol adapter. Application code below uses await.
+        func OnCompleted(callback: () -> System.Void) {
+            Registrations = Registrations + 1
+            if CompleteOnRegistration {
+                Complete()
+            }
+            let continuation = Continuation(handle, callback)
+            _ = neoCLR.Runtime.SchedulerSubmit(continuation.Run)
+        }
+
+        func Complete() -> System.Void {
+            if !neoCLR.Runtime.RuntimeAsyncComplete(handle, 17) {
+                System.Fail("Operation completion rejected")
+            }
+            return ()
+        }
+    }
+
+    class Continuation {
+        private val handle: long
+        private val callback: () -> System.Void
+
+        init(operation: long, resume: () -> System.Void) {
+            handle = operation
+            callback = resume
+        }
+
+        func Run() -> System.Void {
+            _ = neoCLR.Runtime.RuntimeAsyncAwait(handle)
+            System.Runtime.GC.Collect()
+            callback()
+            return ()
+        }
+    }
+
+    async func Read(operation: Operation) -> Task<int> {
+        let value = await operation
+        return value + 25
+    }
+
+    async func Main() -> Task<int> {
+        let pending = Operation(neoCLR.Runtime.RuntimeAsyncCreate())
+        let task = Read(pending)
+        _ = neoCLR.Runtime.SchedulerSubmit(pending.Complete)
+        let result = await task
+        if result != 42 {
+            System.Fail("Ordinary await lost the result")
+        }
+        let repeated = await pending
+        if repeated != 17 {
+            System.Fail("Repeated await lost the result")
+        }
+        if pending.Registrations != 1 {
+            System.Fail("Completed fast path registered a callback")
+        }
+        let racing = Operation(neoCLR.Runtime.RuntimeAsyncCreate())
+        racing.CompleteOnRegistration = true
+        let raceResult = await racing
+        if raceResult != 17 || racing.Registrations != 1 {
+            System.Fail("Completion between readiness check and registration was lost")
+        }
+        Console.WriteLine("PASS ordinary Raven await through runtime suspension adapter")
+        return 0
+    }
+}

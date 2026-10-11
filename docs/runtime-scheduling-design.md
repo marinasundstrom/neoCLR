@@ -1465,3 +1465,22 @@ awaiter does not own a green thread, create the Task, or select a native stack l
 Primary baseline: [.NET awaitable pattern](https://devblogs.microsoft.com/dotnet/await-anything/)
 and [TaskAwaiter<T>](https://learn.microsoft.com/dotnet/api/system.runtime.compilerservices.taskawaiter-1).
 The awaiter pattern and runtime suspension representation are separate layers.
+
+## Awaiter modeling clarification and executable compatibility
+
+The author clarified that copying .NET type structure is not itself a goal; the
+question concerned whether awaiters help model tasks, runtime scheduling and
+suspension. The assistant revised the previous wrapper recommendation: retain the
+awaiter protocol, keep Task<T> as its own awaiter for now, and introduce a separate
+wrapper only for a demonstrated policy/projection need. No public API change was
+made. This supersedes selecting a separate TaskAwaiter<T> merely for API resemblance.
+
+The [ordinary Raven await consumer](experiments/runtime-async/README.md#ordinary-raven-await-compatibility--2026-10-11)
+now exercises that boundary using a source-local self-awaiter. Generated state
+machines invoke a callback adapter that parks/resumes through the runtime. Pending,
+completed, repeated and completion-before-registration cases pass with GC during
+resumption. This qualifies compatibility, not state-machine elimination or speedup.
+Its extra adapter allocation/submission are explicit costs. The next target lowering
+must replace that adapter with activation registration while preserving readiness,
+outcome observation and ownership. Managed Task lifetime and cancellation/fault
+projection are still open; native/JIT and default switching remain unqualified.

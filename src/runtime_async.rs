@@ -87,6 +87,19 @@ impl Operations {
         }
     }
 
+    pub(crate) fn is_completed(&mut self, id: i64) -> Result<bool, Fault> {
+        self.validate(id)?;
+        if let Some(Operation::Timer(deadline)) = self.0.get(&id) {
+            if Instant::now() >= *deadline {
+                self.0.insert(id, Operation::Completed(0));
+            }
+        }
+        Ok(matches!(
+            self.0.get(&id),
+            Some(Operation::Completed(_) | Operation::Cancelled)
+        ))
+    }
+
     pub(crate) fn validate(&self, id: i64) -> Result<(), Fault> {
         if self.0.contains_key(&id) {
             Ok(())
@@ -167,6 +180,26 @@ mod tests {
         operations.complete_body(completed, 42);
         operations.complete_body(completed, 99);
         assert_eq!(operations.read_ready(completed).unwrap(), Some(42));
+    }
+
+    #[test]
+    fn readiness_observes_terminal_state_without_consuming_result() {
+        let mut operations = Operations::default();
+        let pending = operations.create(None).unwrap();
+        assert!(!operations.is_completed(pending).unwrap());
+        assert!(operations.complete(pending, 42));
+        assert!(operations.is_completed(pending).unwrap());
+        assert_eq!(operations.read_ready(pending).unwrap(), Some(42));
+        let cancelled = operations.create(None).unwrap();
+        assert!(operations.cancel(cancelled));
+        assert!(operations.is_completed(cancelled).unwrap());
+        let timer = operations.create(Some(0)).unwrap();
+        assert!(operations.is_completed(timer).unwrap());
+        assert!(!operations.cancel(timer));
+        assert_eq!(operations.read_ready(timer).unwrap(), Some(0));
+        assert!(operations.release(timer));
+        assert!(operations.is_completed(timer).is_err());
+        assert!(operations.is_completed(0).is_err());
     }
 
     #[test]
