@@ -8,6 +8,10 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-11
 
+- Correct the active runtime-async priority to managed VM-IL execution and Raven
+  consumers. Defer operation-interface/native-ABI stabilization; preserve interface
+  proofs as exploratory evidence. This records author direction, not an API change.
+
 - Qualify an experimental generic operation interface from a separate metadata
   assembly with pending and immediate implementations sharing one provider mapping.
   Cover interface conformance/load rejection and full GC reclamation. Extend the

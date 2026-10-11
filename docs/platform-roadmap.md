@@ -51,19 +51,25 @@ suspension. The provider remains source-local and interpreter-only.
 now show about 16–21% less time at 100 operations, with 13–18% more allocations.
 Improve notification/lifetime costs and broaden qualification before switching defaults.
 The author further selects a [cross-language operation contract](runtime-scheduling-design.md#cross-language-asynchronous-operation-contract--2026-10-11),
-independent of the concrete managed Task class. Define metadata/runtime semantics
-and settle the public interface through qualification. A
+independent of the concrete managed Task class, as a future design direction. A
 [second runtime-backed operation](experiments/runtime-async/README.md#independent-operation-proof--2026-10-11)
 now passes ordinary await, shared readers, cancellation and GC checks through explicit
 provider mapping. An [imported generic interface proof](experiments/runtime-async/README.md#imported-operation-contract-proof--2026-10-11)
 now lets pending and immediate implementations share one mapping across an assembly
 boundary. The author clarifies that an awaitable-operation interface should be the
 shared runtime interop contract, with platform-owned concrete implementations such
-as managed Task; interfaces are primary, not exclusive, interop mechanisms. Next
-separate that runtime contract from the temporary Raven adapter and specify completion,
-result and ownership semantics. Retain samples/benchmarks as regressions. General
-native interoperability and runtime recognition of the interface remain open. Native stack representation, preemption
-and multi-core scheduling remain open. Task/Promise keep operation/producer roles.
+as managed Task; interfaces are primary, not exclusive, interop mechanisms.
+**Subsequent author correction (2026-10-11):** defer pursuing or stabilizing this
+interop contract. The immediate primary target is managed programs compiled to VM IL,
+including Raven. Make that execution path work before making major interface/ABI
+design decisions. Preserve the interface proofs as exploratory evidence, not the
+next milestone. Resume end-to-end managed runtime-async qualification: first a real
+Raven Task-based asynchronous consumer, then fix the concrete compiler/runtime gaps
+it exposes, retaining cancellation, terminal Fault, GC and benchmark checks. Broaden
+execution-mode coverage before considering defaults; no current JIT/AOT suspension
+support is implied. General native interoperability, runtime interface recognition,
+native stack representation, preemption and multi-core scheduling remain open.
+Task/Promise keep operation/producer roles.
 
 **Runtime async groundwork (2026-10-11):** the author directs implementation while
 keeping Raven's CLR lowering separate from neoCLR's execution choices. A private

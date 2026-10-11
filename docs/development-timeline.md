@@ -15104,3 +15104,17 @@ or runtime-await default switch was performed.
 - **Assistant distinction/open work:** the fixture's Raven awaiter/provider members
   are adapters, not the final runtime interface. Shared completion/result/lifetime
   semantics and native implementation bindings remain to specify and qualify.
+
+
+### Return priority to managed execution — 2026-10-11
+
+- **Author correction:** do not pursue the interop interface fully yet or make major
+  design decisions before execution works. The primary platform target now is managed
+  code/programs emitted as VM IL, including by the Raven compiler.
+- **Assistant response/action:** acknowledged that the interface work had advanced
+  ahead of the immediate priority. Updated the roadmap, scheduling notes and experiment
+  status to defer interface/ABI stabilization and return to real managed runtime-async
+  consumers, concrete execution fixes and existing correctness/GC/benchmark gates.
+- **Outcome/open work:** existing proofs are retained as exploratory evidence. No
+  runtime behavior or API changed in this correction; managed execution qualification
+  and eventual safe default selection remain active work.

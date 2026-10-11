@@ -1661,3 +1661,20 @@ cancellation observation are shared semantics; initiating work, Promise producti
 requesting cancellation need not be mandatory capabilities on every consumer handle.
 Names and final members remain provisional. Reuse existing interface metadata where
 sufficient; add special recognition only for concrete runtime requirements.
+
+
+### Managed execution first — author correction, 2026-10-11
+
+The author directs postponing full pursuit of the cross-platform operation interface
+and major design decisions until managed execution works. The primary current target
+is managed programs emitted as VM IL by languages such as Raven. This supersedes the
+immediate interface/ABI next steps above, while retaining them as exploratory ideas.
+The assistant had advanced interface design ahead of that priority; the active roadmap
+now returns to end-to-end managed runtime-async consumers and concrete execution gaps.
+
+Keep Task/Promise and the working runtime-await provider as the current managed path.
+Use real asynchronous samples to drive compiler/runtime fixes and qualify cancellation,
+terminal faults, cleanup and GC; compare measured costs as the implementation changes.
+The interface fixtures remain useful evidence, but do not require promoting them into
+runtime APIs, selecting a foreign ABI, or generalizing async return types now. Default
+switching still requires stability and execution-mode qualification.

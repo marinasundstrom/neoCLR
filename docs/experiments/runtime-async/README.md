@@ -1,5 +1,11 @@
 # Interpreter runtime-async experiments
 
+**Current priority (author correction, 2026-10-11):** make managed programs compiled
+to VM IL work end to end, including Raven runtime async. Cross-platform operation
+interfaces and native ABI design are deferred. The interface experiments below are
+exploratory evidence, not selected public APIs or the next implementation milestone.
+
+
 Current development status: [Raven language support](#raven-runtime-async-language-poc-2026-10-11)
 now lowers ordinary async methods to retained bodies through an explicit native
 compiler option. Executable samples and GC reclamation checks pass without emitted
