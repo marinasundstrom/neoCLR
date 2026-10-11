@@ -337,5 +337,7 @@ See the [Timer API](/docs/api/System/Concurrency/Timer/index.html) and the
 `System.Collections.AsyncIterable<T>` acquires an `AsyncIterator<T>` with
 `GetAsyncIterator()`. Advance with `await iterator.MoveNextAsync()`, read `Current`
 after a true result, and await `iterator.DisposeAsync()` when finished. Operations
-must not overlap. The managed interfaces are implemented; native `await for`
-cleanup and generator `yield`/resume are being integrated separately.
+must not overlap. The managed interfaces are implemented. The explicit retained-runtime async POC
+supports `await for` consumption, including awaited cleanup on early exit and
+cancellation, with interpreter/JIT/AOT qualification on macOS ARM64. The native
+state-machine path and generator `yield` synthesis remain incomplete.

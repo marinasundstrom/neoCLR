@@ -8833,3 +8833,15 @@ aggregate CLI documentation bridge represents unit as PropagationUnit, rewritten
 to the owned System.Void contract using the existing bridge machinery. Runtime
 sources and the native emitter own executable behavior; the bridge is signatures
 only. [Contract evidence and remaining compiler work](experiments/runtime-async/async-generators.md#managed-contract-checkpoint-2026-10-11).
+
+### Native await-for consumption (2026-10-11)
+
+The bootstrap ownership `iteration.async` selection names the managed async iterable
+and iterator types. Use Raven native `e7a5e6cf8` or a deliberately carried successor
+with the matching ownership file; older compilers reject the new selection. Native
+metadata carries ordinary interface calls and managed Task results. Under explicit
+retained-body selection, Raven expands implicit awaits and routes lexical exits
+through awaited disposal without encoding CLR exception handling. Source `use`
+cleanup shares that ordering. No new runtime opcode is introduced and terminal
+Fault remains nonrecoverable. The runtime suspension provider and its platform
+limits are unchanged. [Tests, restrictions and generator follow-up](experiments/runtime-async/async-generators.md#retained-body-await-for-checkpoint-2026-10-11).

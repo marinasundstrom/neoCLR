@@ -20,6 +20,10 @@ def main():
     parser.add_argument('--interpreter-recipe', type=Path, required=True, help='Passing source/interpreter report')
     parser.add_argument('--output', type=Path, required=True)
     parser.add_argument('--libraries', type=Path, required=True)
+    scenarios = parser.add_mutually_exclusive_group()
+    scenarios.add_argument('--await-for', action='store_true', help='Qualify retained-body await-for consumption')
+    scenarios.add_argument('--synchronous-for', action='store_true', help='Recheck existing retained-body synchronous iteration')
+    parser.add_argument('--compiler', type=Path, help='Compiler to qualify instead of the recipe compiler')
     args = parser.parse_args()
     recipe = json.loads(args.recipe.read_text())
     interpreted = json.loads(args.interpreter_recipe.read_text())
@@ -59,7 +63,7 @@ def main():
         return row
 
     try:
-        compiler = Path(command('stack-reuse-source')[1])
+        compiler = args.compiler.resolve() if args.compiler else Path(command('stack-reuse-source')[1])
         for path in compiler.parent.glob('*.dll'):
             report['inputsSha256'][str(path.resolve())] = sha(path)
         for folder in (HERE, ROOT / 'docs/experiments/aot-console', ROOT / 'docs/experiments/aot-fault-details'):
@@ -70,13 +74,17 @@ def main():
         host_cmd[host_cmd.index('-o') + 1] = str(host)
         run('host', host_cmd)
         report['hostSha256'] = sha(host)
-        for lowering in ('state-machine', 'runtime'):
-            for name, filename, expected in (
-                ('contract', 'RuntimeAsyncIteration.rvn', 'PASS managed async iteration contract'),
-            ):
+        samples = [('contract', 'RuntimeAsyncIteration.rvn', 'PASS managed async iteration contract')]
+        if args.await_for:
+            samples = [('await-for', 'RuntimeAwaitFor.rvn', 'PASS await for async lifetime')]
+        if args.synchronous_for:
+            samples = [('for', 'RuntimeForAwait.rvn', 'PASS await in for state and lifetime')]
+        for lowering in (('runtime',) if args.await_for or args.synchronous_for else ('state-machine', 'runtime')):
+            for name, filename, expected in samples:
                 label = lowering + '-' + name
                 assembly, obj, app = [out / (label + suffix) for suffix in ('.dll', '.o', '')]
                 source = command('stack-reuse-source')
+                source[1] = str(compiler)
                 source[source.index('-o') + 1:] = [str(assembly), str(HERE / filename), str(HERE / 'RuntimeAsyncBridge.rvn')]
                 if lowering == 'state-machine':
                     i = source.index('--runtime-async-poc')

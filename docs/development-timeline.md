@@ -15271,3 +15271,8 @@ or runtime-await default switch was performed.
   interpreter, macOS ARM64 JIT and AOT with both lowerings. Raven main contract tests
   pass including cancellation with pending disposal. Native loop cleanup and generator
   production remain in progress. [Evidence](experiments/runtime-async/async-generators.md).
+
+- Follow-up outcome: retained-body `await for` now passes interpreter/JIT/AOT lifecycle
+  checks, including nested/mixed cleanup, cancellation and labelled exits. The label
+  bug was fixed on Raven main before being carried. Native state-machine cleanup
+  remains open; this is not yet generator production or a default-mode change.

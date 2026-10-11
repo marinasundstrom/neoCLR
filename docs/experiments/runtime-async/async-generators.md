@@ -1,8 +1,9 @@
 # Async-generator investigation — 2026-10-11
 
 Status: implementation underway following the author's explicit direction to add
-managed async iteration and await-for consumption before yield/resume. The first
-contract slice is implemented; native generator production remains open.
+managed async iteration and await-for consumption before yield/resume. The managed
+contract and retained-body await-for consumption are implemented; native generator
+production remains open.
 
 ## What works in Raven
 
@@ -115,3 +116,27 @@ not evidence for native await-for lowering or yield production. Raven main
 `da0596cf7` separately qualifies selected-contract await-for with pending disposal
 on completion/break/return/cancellation in .NET 11 (61 focused tests; final contract
 recheck eight tests). Native await-for cleanup is the next integration slice.
+
+## Retained-body await-for checkpoint (2026-10-11)
+
+Raven native `e7a5e6cf8` consumes the managed contract through `await for` with the
+explicit runtime-async POC provider. The ownership manifest now selects AsyncIterable
+and AsyncIterator. Compiler-owned cleanup routes normal completion, return, break,
+continue and cancellation through the appropriate disposal scopes. Cleanup itself
+can suspend or cancel; outer cleanup still runs. Synchronous `use` resources share
+that lexical ordering, including value-producing blocks. Terminal Fault semantics
+remain nonrecoverable without an unwinding promise.
+
+[Executable lifecycle fixture](RuntimeAwaitFor.rvn) covers eight advancement/body/
+cleanup outcomes, nested disposal with cancellation, outward exits, labelled
+break/continue, mixed synchronous resources and GC while cleanup is pending.
+[Interpreter/JIT/AOT evidence](async-await-for-validation.json) uses macOS ARM64 for
+native execution. [Existing synchronous-loop regression](async-iteration-sync-validation.json)
+also passes all three modes with the same compiler. The general labelled await-for
+fix was developed on Raven main `4972d9def` (61 focused .NET 11 tests) before carrying
+it to the native line.
+
+This is retained-body consumption only. The native generated-state-machine path
+still lacks asynchronous cleanup integration. Generator return-type recognition,
+`yield` synthesis and abandoned-generator lifetime remain open. Windows retained
+runtime support is not established by these results.

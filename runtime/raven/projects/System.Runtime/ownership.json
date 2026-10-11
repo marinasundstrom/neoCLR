@@ -316,7 +316,11 @@
     "iterableTypeName": "System.Collections.Iterable`1",
     "iteratorTypeName": "System.Collections.Iterator`1",
     "arraysImplementIterable": true,
-    "arrayShapeTypeName": "System.Array`1"
+    "arrayShapeTypeName": "System.Array`1",
+    "async": {
+      "iterableTypeName": "System.Collections.AsyncIterable`1",
+      "iteratorTypeName": "System.Collections.AsyncIterator`1"
+    }
   },
   "typeOf": {
     "assemblyName": "System.Runtime",

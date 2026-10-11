@@ -8,6 +8,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-11
 
+- Enable native retained-body `await for` through the explicit async-iteration
+  ownership contract. Qualify pending cleanup, early/labelled exits, cancellation,
+  nested iterators, mixed `use` resources and GC in interpreter/JIT/AOT; retain
+  synchronous-loop regression evidence. Requires the matching Raven POC compiler;
+  native state-machine async cleanup and generator production remain incomplete.
+
 - Add the managed AsyncIterable<T>, AsyncIterator<T> and AsyncDisposable contracts,
   with Task-based advancement/disposal and documented single-consumer lifetime.
   Refresh the API reference and qualify pending operations plus GC in interpreter,
