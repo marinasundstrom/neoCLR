@@ -8191,3 +8191,23 @@ AOT execution; see [dispatch qualification](design/native-class-dispatch.md).
 Windows execution remains pending. Native feature support remains
 on `codex/source-object-metadata-resolution`; shared main contains the general async
 receiver and override lookup fixes.
+
+
+## Index/Range array integration (2026-10-11)
+
+Raven integration commit `ad3409e06910bdb33bccd0cfdb1431401f248349` on
+`codex/source-object-metadata-resolution` lowers native Index/Range values and array
+access through the selected runtime types and RuntimeHelpers.GetSubArray. Runtime
+Contract configuration is unchanged. Values retain native type/field identity; CLI
+projection temporarily exposes imported tuple fields through MemberRef signatures.
+The metadata API admits native value-field reads from exact values or initialized
+managed receivers, preserving generic substitution. Writes/addresses remain a gap.
+Optional constructor parameter export and named tuple bootstrapping remain gaps;
+Index uses overloads and Range returns explicit Tuple<int,int> (offset, count).
+
+The compiler owns lowering, unit alias binding and readonly defensive copies; the
+library owns bounds policy and copying; the metadata writer checks receiver shape
+and field contracts. The eventual native metadata/backend path must preserve these
+semantic identities without relying on CLI projection. No ordinary .NET capability
+setting changes. Native support is on the integration branch, not Raven main.
+See [design, comparison, limitations and test evidence](design/index-range.md).

@@ -14248,3 +14248,32 @@ claim completion of in-process test discovery.
   Eight discoverable tests and six wire/guard cases pass in each local execution mode.
   Both API references and existing method-text consumers are updated. Windows CI is
   configured but not executed; CONNECT tunnelling and equality operators remain gaps.
+
+### 2026-10-11 — Slicing performance and future views
+
+- **Author:** requested attention to slicing performance, citing .NET spans while
+  leaving similar or different implementations open for later work.
+- **Assistant proposal:** distinguish copying slices from borrowed views now, retain
+  grapheme-based string semantics, and avoid per-element wrappers. Later compare
+  borrowed views and owner-retaining views using allocation, copying, scanning and
+  retained-memory evidence. No alternative is claimed faster without measurements.
+- **Action:** recorded the alternatives and validation questions in the
+  [Index/Range design](design/index-range.md). Value/array implementation is in
+  progress; span-like views remain exploratory, not implemented or newly prioritized.
+
+## 2026-10-11 — Index/Range access policy clarified
+
+- **Author:** indexing and slicing are unsafe convenience access alongside methods
+  returning options/results; callers must check indexes and ranges. Further clarified:
+  “It’s the APIs using Index and Range that may fault”.
+- **Assistant:** Index/Range describe boundaries; applying them can fault. Unsafe
+  convenience does not mean unchecked memory. Added array Get overloads returning
+  Option and Slice returning Result, plus nonfaulting range resolution. Native compiler
+  and metadata qualification is in progress; string/sequence support remains next.
+- **Evidence:** [contract and research](design/index-range.md),
+  [array tests](../runtime/raven/tests/index-range/Tests.rvn).
+
+- **Outcome:** array milestone passes nine framework tests and six fault guards in
+  each of interpreter and macOS AOT. Compiler changes committed as Raven `ad3409e06`;
+  both API references refreshed. Windows runner is pinned to that compiler, with
+  Windows execution pending. String/sequence slicing is still open.

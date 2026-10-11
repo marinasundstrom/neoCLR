@@ -1721,3 +1721,17 @@ HttpMethod, and four Create overloads accept URL/Uri with optional content. Use
 Method.Method for wire text. Parse returns HttpError.InvalidRequest; invalid direct
 construction faults. Predefined values do not promise singleton identity. CONNECT
 is a representable token but tunnelling remains unsupported by the socket handler.
+
+
+## Index/Range and array access (development, 2026-10-11)
+
+System.Index, System.Range and System.Runtime.CompilerServices.RuntimeHelpers are
+selected in both references. Array<T>.Get(int/Index), Array<T>.Slice(Range) and
+Range.TryGetOffsetAndLength are included. Get returns Option; Slice/resolution return
+Result with InvalidRangeError. Indexing and slicing syntax may fault. Tuple results
+use Item1 (offset) and Item2 (count); optional Index construction uses two overloads.
+The explicit tuple spelling is a runtime bootstrapping gap, not a permanent named
+result policy. These APIs require matching native libraries/compiler; aggregate
+CoreProbe is a documentation facade, not an added legacy runtime binding.
+Imported native value-field reads are host-only APIs documented in the manual
+experimental metadata reference; no public guest API is excluded from the snapshots.

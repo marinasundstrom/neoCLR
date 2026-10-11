@@ -75,3 +75,20 @@ Include the required access and lifetime when reporting an array issue. This dis
 [Share an example on GitHub ↗](https://github.com/marinasundstrom/neoCLR/issues)
 
 Questions, sample programs and documentation corrections are welcome. See [how to contribute](../../#feedback) for ways to participate.
+
+
+## Development: Index and Range
+
+The matching development compiler and native libraries support `values[^1]`,
+from-end assignment and half-open slices such as `values[1..^1]` and `values[..]`.
+Each array slice makes an independent shallow copy; referenced elements remain shared.
+`^0` describes the end boundary, so it can end a slice but cannot select an element.
+
+Indexing and slicing syntax are convenience APIs that may fault on invalid bounds;
+callers must establish valid input. `values.Get(index)` returns an `Option<T>` for
+an integer or Index. `values.Slice(range)` returns `Result<T[], InvalidRangeError>`.
+Index and Range describe positions and boundaries; applying them determines validity.
+The array contract is tested in interpreter and macOS native AOT. Windows execution
+is pending. String and sequence range support and borrowed views remain future work.
+
+[Array API reference →](../../../docs/api/System/Array%601/)

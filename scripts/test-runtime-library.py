@@ -250,6 +250,17 @@ PATH_VALUES_NAMES = [
     'Path equality distinguishes case roots and normalization',
     'Path equality agrees across typed interface and Object dispatch',
 ]
+INDEX_RANGE_NAMES = [
+    'Index preserves direction and resolves end boundaries',
+    'Index and Range typed equality agrees with hashing',
+    'Range resolution accepts empty and full boundaries',
+    'Array range syntax supports omitted and end-relative boundaries',
+    'Array indexes support values and from-end assignment',
+    'Array slices copy storage and preserve reference elements',
+    'Array indexing and slicing evaluate operands once in source order',
+    'Read-only value fields use defensive copies for method calls',
+    'Array safe access returns options and results for invalid bounds',
+]
 HTTP_METHOD_VALUES_NAMES = [
     'HTTP custom method construction and parsing preserve spelling',
     'HTTP method equality and hashes ignore ASCII case',
@@ -314,7 +325,7 @@ def main():
     parser.add_argument('--output', type=Path, required=True, help='Fresh build/evidence directory')
     parser.add_argument('--aot', type=Path, default=ROOT / 'tools/aot-poc/target/debug' / ('neoclr-aot-poc.exe' if os.name == 'nt' else 'neoclr-aot-poc'))
     parser.add_argument('--runtime', type=Path, default=ROOT / 'target/release' / ('neoclr.exe' if os.name == 'nt' else 'neoclr'))
-    parser.add_argument('--suite', action='append', choices=('collections', 'collection-construction', 'collection-iteration', 'json-dom', 'json-streams', 'memory-stream', 'string-construction', 'unicode-casing', 'encoding', 'encoding-streams', 'encoding-boundaries', 'encoding-buffer-limits', 'int64-parsing', 'primitive-parsing', 'path-values', 'http-header-values', 'http-method-values', 'http-text', 'http-lifetime', 'http-route-matching', 'ip-address-values', 'uri-resolution', 'time-parsing', 'duration-offset-parsing', 'instant-parsing', 'zoned-time-parsing', 'discovery-contract', 'runner-contract'),
+    parser.add_argument('--suite', action='append', choices=('collections', 'collection-construction', 'collection-iteration', 'json-dom', 'json-streams', 'memory-stream', 'string-construction', 'unicode-casing', 'encoding', 'encoding-streams', 'encoding-boundaries', 'encoding-buffer-limits', 'int64-parsing', 'primitive-parsing', 'path-values', 'http-header-values', 'http-method-values', 'index-range', 'http-text', 'http-lifetime', 'http-route-matching', 'ip-address-values', 'uri-resolution', 'time-parsing', 'duration-offset-parsing', 'instant-parsing', 'zoned-time-parsing', 'discovery-contract', 'runner-contract'),
                         help='Run only this suite (repeatable); default runs all suites')
     args = parser.parse_args()
     bundle, out = args.bundle.resolve(), args.output.resolve()
@@ -348,6 +359,7 @@ def main():
         ('int64-parsing', 0, ''.join('PASS ' + n + '\n' for n in INT64_PARSING_NAMES) + f'Tests: {len(INT64_PARSING_NAMES)}, passed: {len(INT64_PARSING_NAMES)}, failed: 0, skipped: 0\n'),
         ('primitive-parsing', 0, ''.join('PASS ' + n + '\n' for n in PRIMITIVE_PARSING_NAMES) + f'Tests: {len(PRIMITIVE_PARSING_NAMES)}, passed: {len(PRIMITIVE_PARSING_NAMES)}, failed: 0, skipped: 0\n'),
         ('path-values', 0, ''.join('PASS ' + n + '\n' for n in PATH_VALUES_NAMES) + f'Tests: {len(PATH_VALUES_NAMES)}, passed: {len(PATH_VALUES_NAMES)}, failed: 0, skipped: 0\n'),
+        ('index-range', 0, ''.join('PASS ' + n + '\n' for n in INDEX_RANGE_NAMES) + f'Tests: {len(INDEX_RANGE_NAMES)}, passed: {len(INDEX_RANGE_NAMES)}, failed: 0, skipped: 0\n'),
         ('http-method-values', 0, ''.join('PASS ' + n + '\n' for n in HTTP_METHOD_VALUES_NAMES) + f'Tests: {len(HTTP_METHOD_VALUES_NAMES)}, passed: {len(HTTP_METHOD_VALUES_NAMES)}, failed: 0, skipped: 0\n'),
         ('http-header-values', 0, ''.join('PASS ' + n + '\n' for n in HTTP_HEADER_VALUES_NAMES) + f'Tests: {len(HTTP_HEADER_VALUES_NAMES)}, passed: {len(HTTP_HEADER_VALUES_NAMES)}, failed: 0, skipped: 0\n'),
         ('http-route-matching', 0, ''.join('PASS ' + n + '\n' for n in HTTP_ROUTE_MATCHING_NAMES) + f'Tests: {len(HTTP_ROUTE_MATCHING_NAMES)}, passed: {len(HTTP_ROUTE_MATCHING_NAMES)}, failed: 0, skipped: 0\n'),
@@ -411,6 +423,25 @@ def main():
                 print(name + ' (' + mode + '):\n' + record['stdout'], end='', flush=True)
                 if (record['exitCode'], record['stdout'], record['stderr']) != (exit_code, stdout, ''):
                     raise RuntimeError(name + ' ' + mode + ' did not match the runner contract')
+            if name == 'index-range':
+                guards = {
+                    'negative-index': 'Index value must be nonnegative',
+                    'negative-conversion': 'Index value must be nonnegative',
+                    'negative-length': 'Range length must be nonnegative',
+                    'reversed': 'Range is outside the value',
+                    'past-end': 'Range is outside the value',
+                    'before-start': 'Range is outside the value',
+                }
+                for guard, message in guards.items():
+                    for mode, command, cwd, environment in executions:
+                        arguments = [*command, *(['--'] if mode == 'interpreter' else []), '--guard', guard]
+                        result = subprocess.run(list(map(str, arguments)), cwd=cwd, env=environment, capture_output=True, timeout=30)
+                        record = dict(suite=name, mode=mode, guard=guard, exitCode=result.returncode,
+                                      stdout=result.stdout.decode('utf-8'), stderr=result.stderr.decode('utf-8'))
+                        report['cases'].append(record)
+                        if not record['exitCode'] or message not in record['stderr'] or record['stdout']:
+                            raise RuntimeError('Index/Range guard did not fault as expected: ' + repr(record))
+                print('index-range: six guards passed in both modes', flush=True)
             selections = {
                 'collections': [(['--filter', 'ArrayQueue'], 0, 'PASS ArrayQueue preserves FIFO\nTests: 1, passed: 1, failed: 0, skipped: 0\n'),
                                 (['--filter', 'Map'], 0, ''.join('PASS ' + n + '\n' for n in MAP_NAMES) + f'Tests: {len(MAP_NAMES)}, passed: {len(MAP_NAMES)}, failed: 0, skipped: 0\n')],

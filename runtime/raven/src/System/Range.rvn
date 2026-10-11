@@ -1,0 +1,85 @@
+module System
+
+import System.Result.*
+
+/// A half-open range: the start boundary is inclusive and the end is exclusive.
+public struct Range : EquatableTo<Range> {
+    private val start: Index
+    private val end: Index
+
+    /// Creates a range; bounds are validated when applied to a length.
+    init(start: Index, end: Index) {
+        self.start = start
+        self.end = end
+    }
+
+    /// The inclusive start boundary.
+    val Start: Index => start
+    /// The exclusive end boundary.
+    val End: Index => end
+    /// A range covering the entire value, including an empty value.
+    static val All: Range => Range(Index.Start, Index.End)
+    /// Creates a range from start through the end boundary.
+    static func StartAt(start: Index) -> Range => Range(start, Index.End)
+    /// Creates a range from the first boundary through end, exclusively.
+    static func EndAt(end: Index) -> Range => Range(Index.Start, end)
+
+    /// Resolves a validated offset and count; negative lengths, reversed or out-of-bounds ranges fault.
+    func GetOffsetAndLength(length: int) -> Tuple<int, int> {
+        if length < 0 {
+            Fail("Range length must be nonnegative")
+        }
+        let first = start
+        let last = end
+        let offset = first.GetOffset(length)
+        let limit = last.GetOffset(length)
+        if offset < 0 {
+            Fail("Range is outside the value")
+        }
+        if limit < offset {
+            Fail("Range is outside the value")
+        }
+        if limit > length {
+            Fail("Range is outside the value")
+        }
+        return Tuple<int, int>(offset, limit - offset)
+    }
+
+    /// Resolves offset and count, returning InvalidRangeError for invalid bounds or a negative length.
+    func TryGetOffsetAndLength(length: int) -> Result<Tuple<int, int>, InvalidRangeError> {
+        if length < 0 {
+            return Error(InvalidRangeError())
+        }
+        let offset = start.GetOffset(length)
+        let limit = end.GetOffset(length)
+        if offset < 0 {
+            return Error(InvalidRangeError())
+        }
+        if limit < offset {
+            return Error(InvalidRangeError())
+        }
+        if limit > length {
+            return Error(InvalidRangeError())
+        }
+        return Ok(Tuple<int, int>(offset, limit - offset))
+    }
+
+    /// Compares the two boundary indexes, independently of a collection length.
+    func Equals(other: Range) -> bool {
+        let first = start
+        let last = end
+        return first.Equals(other.start) && last.Equals(other.end)
+    }
+    /// Returns a hash consistent with typed equality.
+    func GetHashCode() -> int {
+        let first = start
+        let last = end
+        return HashCode.Combine(first.GetHashCode(), last.GetHashCode())
+    }
+    /// Formats the two boundaries separated by .. .
+    func ToString() -> string {
+        let first = start
+        let last = end
+        return String.Concat(String.Concat(first.ToString(), ".."), last.ToString())
+    }
+}

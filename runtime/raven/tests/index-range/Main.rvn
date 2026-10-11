@@ -1,0 +1,34 @@
+module NeoClr.RuntimeTests
+
+import System.*
+import NeoClr.Testing.*
+
+func Main(arguments: string[]) -> int {
+    if arguments.Length == 2 && arguments[0] == "--guard" {
+        let name = arguments[1]
+        if name == "negative-index" {
+            _ = Index(-1)
+        }
+        if name == "negative-conversion" {
+            let invalid: Index = -1
+            _ = invalid.GetOffset(3)
+        }
+        if name == "negative-length" {
+            _ = Range.All.GetOffsetAndLength(-1)
+        }
+        if name == "reversed" {
+            _ = Range(Index.FromStart(2), Index.FromStart(1)).GetOffsetAndLength(3)
+        }
+        if name == "past-end" {
+            _ = Range.EndAt(Index.FromStart(4)).GetOffsetAndLength(3)
+        }
+        if name == "before-start" {
+            _ = Range.StartAt(Index.FromEnd(4)).GetOffsetAndLength(3)
+        }
+        Console.WriteLine("ERROR guard did not fault")
+        return 0
+    }
+    let suite = TestSuite()
+    RegisterDiscoveredTests(suite)
+    return TestRunner.Run(suite, arguments)
+}

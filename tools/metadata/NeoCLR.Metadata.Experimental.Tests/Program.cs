@@ -4,6 +4,8 @@ using System.Reflection.PortableExecutable;
 using NeoCLR.Metadata.Experimental.Model;
 using AssemblyDefinition = NeoCLR.Metadata.Experimental.Model.AssemblyDefinition;
 
+if (args is ["--authored-references"]) { AuthoredFunctionReferenceChecks.Run(); Console.WriteLine("PASS authored references"); return 0; }
+
 if (args is ["--module-retention", var moduleInput, var moduleRoots])
 {
     var image = System.Text.Json.Nodes.JsonNode.Parse(NeoCLR.Metadata.Experimental.RuntimeAssemblyContainer.Read(File.ReadAllBytes(moduleInput)))!;

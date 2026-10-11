@@ -5072,8 +5072,8 @@ constructor/conflicting contracts. The separate library IILGenerator remains pla
 `AssemblyBuilder.CreateFieldReference(ImportedTypeReference declaringType, string name,
 SignatureType fieldType, int instanceStorageOrdinal, bool isReadOnly = false)
 -> ImportedFieldReference` authors a public instance-field contract without a reader.
-The owner must be an output-owned top-level root reference-class definition with a
-registered native artifact digest. The caller supplies the native zero-based instance
+The owner must be an output-owned top-level root reference-class or value-type
+definition with a registered native artifact digest. The caller supplies the native zero-based instance
 slot, including private fields in the declaration order, and must assert that this
 layout matches the selected artifact. The library cannot verify a supplied ordinal
 against bytes it has not read. CLI output uses name/type MemberRef; native output uses
@@ -5083,8 +5083,11 @@ Storage supports primitive non-Void values, external reference classes (includin
 generic constructions) and single vectors thereof. Owner type parameters are permitted
 within the declaring definition's arity. Construction arguments are checked recursively;
 method parameters, out-of-scope owner parameters, bare generic definitions and foreign
-output signatures reject. Static/inherited fields, byrefs and value
-profiles are unsupported. Readonly loads work; stores reject during body validation.
+output signatures reject. Static/inherited fields and byref storage are unsupported.
+Native value-type owners support loads from an exact value or initialized managed
+receiver, including generic construction; external value stores/addresses remain
+unsupported. Snapshot ImportReference admits native value owners as well; CLI
+value-field imports remain unsupported. Readonly loads work; stores reject during body validation.
 Matching contracts intern; conflicting names, ordinals, storage or readonly flags on
 the same owner reject. Null arguments throw ArgumentNullException; invalid owner,
 name, negative ordinal, unsupported type or foreign output signatures throw
@@ -8284,3 +8287,15 @@ loading code. This supports enum-valued `AttributeUsage.ValidOn`. Indexed CLI pr
 remain outside this reader profile; native/authored indexers remain supported. CLI void
 results, unsupported encodings and malformed blobs return false. Primitive-only callers
 can continue using `TryGetPrimitiveSignature`.
+
+
+### Native value-field reads (development, 2026-10-11)
+
+CreateFieldReference and ImportReference(FieldDefinition, ...) now admit native
+value-type owners. LoadField validates exact owner identity after generic substitution;
+managed local/parameter receivers must be initialized. Wrong receivers and uninitialized
+loads fail body validation with InvalidDataException. StoreField on an external value
+owner fails validation even for non-readonly storage. Public API signatures and native
+field-slot encoding are unchanged. This supports Tuple<int,int>.Item1/Item2 used by
+range resolution. Focused authored-reference checks and the Raven array suite qualify
+both model validation and interpreter/AOT execution. No new field-address API is added.

@@ -1,0 +1,178 @@
+module NeoClr.RuntimeTests
+
+import System.*
+import System.Result.*
+import System.Option.*
+import NeoClr.Testing.*
+
+[Test("Index preserves direction and resolves end boundaries")]
+func AIndexValues() -> Result<unit, TestFailure> {
+    let start = Index.Start
+    let end = Index.End
+    let last: Index = ^1
+    let converted: Index = 2
+    _ = Assert.Equal(0, start.Value)?
+    _ = Assert.True(!start.IsFromEnd && end.IsFromEnd, "Direction")?
+    _ = Assert.Equal(4, end.GetOffset(4))?
+    _ = Assert.Equal(3, last.GetOffset(4))?
+    _ = Assert.Equal(3, (^1).GetOffset(4))?
+    _ = Assert.Equal(2, converted.GetOffset(4))?
+    _ = Assert.Equal(-1, Index.FromEnd(5).GetOffset(4))?
+    _ = Assert.Equal("^1", last.ToString())?
+    _ = Assert.Equal("2", converted.ToString())?
+    return Assert.Equal(2147483647, Index.FromStart(2147483647).Value)
+}
+
+[Test("Index and Range typed equality agrees with hashing")]
+func BValueEquality() -> Result<unit, TestFailure> {
+    let first = Index.FromEnd(2)
+    let same = Index(2, true)
+    _ = Assert.True(first.Equals(same), "Index equality")?
+    _ = Assert.Equal(first.GetHashCode(), same.GetHashCode())?
+    _ = Assert.True(!first.Equals(Index.FromStart(2)), "Direction matters")?
+    let left = Range(Index.FromStart(1), first)
+    let right = Range(Index.FromStart(1), same)
+    _ = Assert.True(left.Equals(right), "Range equality")?
+    _ = Assert.Equal(left.GetHashCode(), right.GetHashCode())?
+    return Assert.Equal("1..^2", left.ToString())
+}
+
+[Test("Range resolution accepts empty and full boundaries")]
+func CRangeBounds() -> Result<unit, TestFailure> {
+    let all = Range.All
+    let empty = all.GetOffsetAndLength(0)
+    _ = Assert.True(empty.Item1 == 0 && empty.Item2 == 0, "Empty source")?
+    let full = all.GetOffsetAndLength(4)
+    _ = Assert.True(full.Item1 == 0 && full.Item2 == 4, "Full source")?
+    let atEnd = Range(Index.End, Index.End).GetOffsetAndLength(4)
+    _ = Assert.True(atEnd.Item1 == 4 && atEnd.Item2 == 0, "Empty at end")?
+    let middle: Range = 1..^1
+    let bounds = middle.GetOffsetAndLength(4)
+    return Assert.True(bounds.Item1 == 1 && bounds.Item2 == 2, "Half-open range")
+}
+
+[Test("Array range syntax supports omitted and end-relative boundaries")]
+func DArraySlices() -> Result<unit, TestFailure> {
+    let values: int[] = [10, 20, 30, 40]
+    let middle = values[1..^1]
+    let prefix = values[..2]
+    let suffix = values[2..]
+    let all = values[..]
+    let empty = values[^0..]
+    let selected: Range = 1..<3
+    let stored = values[selected]
+    let none: int[] = []
+    let noneCopy = none[..]
+    _ = Assert.True(stored.Length == 2 && stored[0] == 20, "Stored half-open range")?
+    _ = Assert.Equal(0, noneCopy.Length)?
+    _ = Assert.True(middle.Length == 2 && middle[0] == 20 && middle[1] == 30, "Middle")?
+    _ = Assert.True(prefix.Length == 2 && prefix[1] == 20, "Prefix")?
+    _ = Assert.True(suffix.Length == 2 && suffix[0] == 30, "Suffix")?
+    _ = Assert.Equal(4, all.Length)?
+    return Assert.Equal(0, empty.Length)
+}
+
+[Test("Array indexes support values and from-end assignment")]
+func EArrayIndexes() -> Result<unit, TestFailure> {
+    let values: int[] = [10, 20, 30]
+    let last: Index = ^1
+    _ = Assert.Equal(30, values[last])?
+    values[^2] = 42
+    values[last] = 99
+    _ = Assert.Equal(42, values[1])?
+    return Assert.Equal(99, values[^1])
+}
+
+[Test("Array slices copy storage and preserve reference elements")]
+func FCopySemantics() -> Result<unit, TestFailure> {
+    let values: int[] = [10, 20, 30]
+    let copy = values[..]
+    copy[0] = 99
+    _ = Assert.Equal(10, values[0])?
+    let item = Box(7)
+    let objects: Box[] = [item, Box(8)]
+    let selected = objects[..1]
+    _ = Assert.True(Object.ReferenceEquals(item, selected[0]), "Shallow copy")?
+    selected[0] = Box(9)
+    return Assert.True(Object.ReferenceEquals(item, objects[0]), "Independent array storage")
+}
+
+class Box {
+    val Value: int
+    init(value: int) { Value = value }
+}
+
+class ObservedArray {
+    var Calls: int = 0
+    private val values: int[] = [10, 20, 30]
+    func Read() -> int[] {
+        Calls = Calls * 10 + 1
+        return values
+    }
+    func Boundary() -> int {
+        Calls = Calls * 10 + 2
+        return 1
+    }
+}
+
+[Test("Array indexing and slicing evaluate operands once in source order")]
+func GEvaluationOrder() -> Result<unit, TestFailure> {
+    let observed = ObservedArray()
+    _ = Assert.Equal(30, observed.Read()[^observed.Boundary()])?
+    _ = Assert.Equal(12, observed.Calls)?
+    observed.Calls = 0
+    let slice = observed.Read()[observed.Boundary()..^observed.Boundary()]
+    _ = Assert.Equal(122, observed.Calls)?
+    _ = Assert.Equal(1, slice.Length)?
+    return Assert.Equal(20, slice[0])
+}
+
+struct MutableCounter {
+    private var count: int
+    func Next() -> int {
+        count += 1
+        return count
+    }
+}
+
+class ReadOnlyCounter {
+    private val counter: MutableCounter = default(MutableCounter)
+    func Read() -> int => counter.Next() + counter.Next()
+}
+
+[Test("Read-only value fields use defensive copies for method calls")]
+func HReadOnlyReceivers() -> Result<unit, TestFailure> {
+    let value = ReadOnlyCounter()
+    _ = Assert.Equal(2, value.Read())?
+    return Assert.Equal(2, value.Read())
+}
+
+[Test("Array safe access returns options and results for invalid bounds")]
+func IValidatedAccess() -> Result<unit, TestFailure> {
+    let values: int[] = [10, 20, 30]
+    _ = Assert.True(values.Get(-1) is None, "Negative index")?
+    _ = Assert.True(values.Get(3) is None, "Past end")?
+    _ = Assert.True(values.Get(Index.End) is None, "End boundary is not an element")?
+    _ = Assert.True(values.Get(Index.FromEnd(4)) is None, "Before start")?
+    if values.Get(^1) is Some(let last) {
+        _ = Assert.Equal(30, last)?
+    } else {
+        return Assert.True(false, "Last element missing")
+    }
+    _ = Assert.True(values.Slice(Range(2, 1)) is Error(_), "Reversed range")?
+    _ = Assert.True(values.Slice(Range(0, 4)) is Error(_), "Past end range")?
+    _ = Assert.True(Range.All.TryGetOffsetAndLength(-1) is Error(_), "Negative length")?
+    if values.Slice(1..^0) is Ok(let copy) {
+        _ = Assert.Equal(2, copy.Length)?
+        _ = Assert.Equal(20, copy[0])?
+        copy[0] = 99
+        _ = Assert.Equal(20, values[1])?
+    } else {
+        return Assert.True(false, "Valid slice missing")
+    }
+    let empty: int[] = []
+    if empty.Slice(Range.All) is Ok(let copy) {
+        return Assert.Equal(0, copy.Length)
+    }
+    return Assert.True(false, "Empty slice missing")
+}

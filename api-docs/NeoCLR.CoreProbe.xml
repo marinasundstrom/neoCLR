@@ -3074,5 +3074,102 @@
     <member name="M:System.Web.Http.HttpRequest.Create(System.Web.Http.HttpMethod,System.String,System.Web.Http.HttpContent)"><summary>Constructs a request with a predefined or custom method without performing I/O.</summary><param name="method">Validated method token.</param><param name="url">Absolute HTTP address supported by this transport.</param><param name="content">Request content, shared by the prepared request.</param><returns>The prepared request or HttpError.</returns><remarks>Existing URI, framing and body limits apply when sent. Custom methods use ordinary HTTP/1.1 origin-form requests. CONNECT tunnelling is unsupported. Headers retain the content media type.</remarks></member>
     <member name="M:System.Web.Http.HttpRequest.Create(System.Web.Http.HttpMethod,System.Uri)"><summary>Constructs a request with a predefined or custom method without performing I/O.</summary><param name="method">Validated method token.</param><param name="uri">Absolute HTTP address supported by this transport.</param><returns>The prepared request or HttpError.</returns><remarks>Existing URI, framing and body limits apply when sent. Custom methods use ordinary HTTP/1.1 origin-form requests. CONNECT tunnelling is unsupported. Headers retain the content media type.</remarks></member>
     <member name="M:System.Web.Http.HttpRequest.Create(System.Web.Http.HttpMethod,System.Uri,System.Web.Http.HttpContent)"><summary>Constructs a request with a predefined or custom method without performing I/O.</summary><param name="method">Validated method token.</param><param name="uri">Absolute HTTP address supported by this transport.</param><param name="content">Request content, shared by the prepared request.</param><returns>The prepared request or HttpError.</returns><remarks>Existing URI, framing and body limits apply when sent. Custom methods use ordinary HTTP/1.1 origin-form requests. CONNECT tunnelling is unsupported. Headers retain the content media type.</remarks></member>
+<member name="M:System.Index.#ctor(System.Int32)">
+      <summary>Creates an index; negative values fault. From-end zero is the end boundary.</summary>
+    </member>
+    <member name="M:System.Index.#ctor(System.Int32,System.Boolean)">
+      <summary>Creates a directional index; negative values fault.</summary>
+    </member>
+    <member name="M:System.Index.Equals(System.Index)">
+      <summary>Compares distance and direction, independently of any collection length.</summary>
+    </member>
+    <member name="M:System.Index.FromEnd(System.Int32)">
+      <summary>Creates an end-relative index; negative values fault.</summary>
+    </member>
+    <member name="M:System.Index.FromStart(System.Int32)">
+      <summary>Creates a start-relative index; negative values fault.</summary>
+    </member>
+    <member name="M:System.Index.GetHashCode">
+      <summary>Returns a hash consistent with typed equality.</summary>
+    </member>
+    <member name="M:System.Index.GetOffset(System.Int32)">
+      <summary>Resolves an offset. The caller supplies a nonnegative length and checks element bounds.</summary>
+    </member>
+    <member name="M:System.Index.ToString">
+      <summary>Formats the value, prefixing end-relative indexes with ^.</summary>
+    </member>
+    <member name="M:System.Index.op_Implicit(System.Int32)~System.Index">
+      <summary>Converts a nonnegative integer to a start-relative index.</summary>
+    </member>
+    <member name="M:System.Range.#ctor(System.Index,System.Index)">
+      <summary>Creates a range; bounds are validated when applied to a length.</summary>
+    </member>
+    <member name="M:System.Range.EndAt(System.Index)">
+      <summary>Creates a range from the first boundary through end, exclusively.</summary>
+    </member>
+    <member name="M:System.Range.Equals(System.Range)">
+      <summary>Compares the two boundary indexes, independently of a collection length.</summary>
+    </member>
+    <member name="M:System.Range.GetHashCode">
+      <summary>Returns a hash consistent with typed equality.</summary>
+    </member>
+    <member name="M:System.Range.GetOffsetAndLength(System.Int32)">
+      <summary>Resolves a validated offset and count; negative lengths, reversed or out-of-bounds ranges fault.</summary>
+    </member>
+    <member name="M:System.Range.StartAt(System.Index)">
+      <summary>Creates a range from start through the end boundary.</summary>
+    </member>
+    <member name="M:System.Range.ToString">
+      <summary>Formats the two boundaries separated by .. .</summary>
+    </member>
+    <member name="M:System.Runtime.CompilerServices.RuntimeHelpers.GetSubArray``1(``0[],System.Range)">
+      <summary>Copies a half-open range into a new array. Elements are shallow-copied; invalid ranges fault.</summary>
+    </member>
+    <member name="P:System.Index.End">
+      <summary>The boundary immediately after the last element.</summary>
+    </member>
+    <member name="P:System.Index.IsFromEnd">
+      <summary>Whether the distance is measured backwards from the end.</summary>
+    </member>
+    <member name="P:System.Index.Start">
+      <summary>The first boundary.</summary>
+    </member>
+    <member name="P:System.Index.Value">
+      <summary>The nonnegative distance from the selected boundary.</summary>
+    </member>
+    <member name="P:System.Range.All">
+      <summary>A range covering the entire value, including an empty value.</summary>
+    </member>
+    <member name="P:System.Range.End">
+      <summary>The exclusive end boundary.</summary>
+    </member>
+    <member name="P:System.Range.Start">
+      <summary>The inclusive start boundary.</summary>
+    </member>
+    <member name="T:System.Index">
+      <summary>A position measured from the start or end of an indexable value.</summary>
+    </member>
+    <member name="T:System.Range">
+      <summary>A half-open range: the start boundary is inclusive and the end is exclusive.</summary>
+    </member>
+    <member name="T:System.Runtime.CompilerServices.RuntimeHelpers">
+      <summary>Library operations used by compiler lowering.</summary>
+    </member>
+    <member name="M:System.Array`1.Get(System.Index)">
+      <summary>Resolves a directional index and returns the element, or None when outside this array.</summary>
+    </member>
+
+<member name="M:System.Array`1.Get(System.Int32)">
+      <summary>Returns the element, or None when index is outside this array.</summary>
+    </member>
+
+<member name="M:System.Array`1.Slice(System.Range)">
+      <summary>Returns a shallow copy of the range, or InvalidRangeError for invalid bounds.</summary>
+    </member>
+
+<member name="M:System.Range.TryGetOffsetAndLength(System.Int32)">
+      <summary>Resolves offset and count, returning InvalidRangeError for invalid bounds or a negative length.</summary>
+    </member>
+
 </members>
 </doc>

@@ -127,10 +127,24 @@ public sealed partial class MethodBuilder
                     var importedField = instruction.ImportedField!;
                     if (instruction.Op == "field.import.store")
                     {
+                        if (importedField.DeclaringType.IsValueType) throw new InvalidDataException("external value-type field stores are unsupported");
                         if (importedField.IsReadOnly) throw new InvalidDataException("cannot store an external readonly field");
                         Pop(instruction.ImportedConstructedField?.FieldType ?? importedField.FieldType);
                     }
-                    Pop(instruction.Type ?? (SignatureType)importedField.DeclaringType);
+                    var importedFieldOwner = instruction.Type ?? (SignatureType)importedField.DeclaringType;
+                    if (importedField.DeclaringType.IsValueType && stack.Count > 0 && stack[^1].AddressedLocal is { } importedReceiverLocal)
+                    {
+                        if (!assigned[importedReceiverLocal] || locals[importedReceiverLocal].SignatureType != importedFieldOwner)
+                            throw new InvalidDataException("external value field receiver requires an initialized local of the exact owner type");
+                        stack.RemoveAt(stack.Count - 1);
+                    }
+                    else if (importedField.DeclaringType.IsValueType && stack.Count > 0 && stack[^1].ByReferenceElement == importedFieldOwner)
+                    {
+                        if (stack[^1].AddressedParameter is { } importedParameter && !assigned[locals.Count + importedParameter])
+                            throw new InvalidDataException("external value field receiver parameter is uninitialized");
+                        stack.RemoveAt(stack.Count - 1);
+                    }
+                    else Pop(importedFieldOwner);
                     if (instruction.Op == "field.import.load") stack.Add(instruction.ImportedConstructedField?.FieldType ?? importedField.FieldType);
                     break;
                 case "field.load":

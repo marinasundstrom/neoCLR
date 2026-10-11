@@ -1,0 +1,20 @@
+module System.Runtime.CompilerServices
+
+/// Library operations used by compiler lowering.
+public static class RuntimeHelpers {
+    /// Copies a half-open range into a new array. Elements are shallow-copied; invalid ranges fault.
+    static func GetSubArray<T>(array: T[], range: System.Range) -> T[] {
+        let bounds = range.GetOffsetAndLength(array.Length)
+        return CopyRange<T>(array, bounds.Item1, bounds.Item2)
+    }
+
+    internal static func CopyRange<T>(array: T[], offset: int, count: int) -> T[] {
+        let result = CheckedStorage.Reserve<T>(count)
+        var index = 0
+        while index < count {
+            result[index] = array[offset + index]
+            index += 1
+        }
+        return result
+    }
+}

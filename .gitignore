@@ -42,3 +42,6 @@
 /docs/experiments/http-method/obj/
 /runtime/raven/tests/http-method-values/bin/
 /runtime/raven/tests/http-method-values/obj/
+
+/runtime/raven/tests/index-range/bin/
+/runtime/raven/tests/index-range/obj/

@@ -87,6 +87,18 @@ internal static class AuthoredFunctionReferenceChecks
         app.AddInterfaceConversion(item, derived);
         app.AddInterfaceConversion(item, derived); // Idempotent.
         var valueOwner = app.CreateValueTypeReference(dependency, core, hash, "Example", "ValueOwner");
+        var importedValueField = app.CreateFieldReference(valueOwner, "Number", PrimitiveType.Int32, 0);
+        var valueReader = app.AddFunction("ReadValue", new MethodSignature(PrimitiveType.Int32, [valueOwner]));
+        valueReader.LoadArgument(0); valueReader.LoadField(importedValueField); valueReader.Return();
+        var borrowedReader = app.AddFunction("ReadBorrowedValue", new MethodSignature(PrimitiveType.Int32, [SignatureType.ByReference(valueOwner)]));
+        borrowedReader.LoadArgument(0); borrowedReader.LoadField(importedValueField); borrowedReader.Return();
+        var genericValueField = app.CreateFieldReference(valueContract, "Item", SignatureType.TypeParameter(0), 0);
+        var genericValueReader = app.AddFunction("ReadGenericValue", new MethodSignature(PrimitiveType.Int32, [SignatureType.ByReference(valueResult)]));
+        genericValueReader.LoadArgument(0); genericValueReader.LoadField(genericValueField.MakeConstructedReference(PrimitiveType.Int32)); genericValueReader.Return();
+        var localReader = app.AddFunction("ReadLocalValue", new MethodSignature(PrimitiveType.Int32, [valueOwner]));
+        var localIl = localReader.GetILGenerator();
+        var valueLocal = localIl.DeclareLocal(valueOwner);
+        localIl.LoadArgument(0); localIl.StoreLocal(valueLocal); localIl.LoadLocalAddress(valueLocal); localIl.LoadField(importedValueField); localIl.Return();
         var displaySignature = new MethodSignature(PrimitiveType.String, []);
         var display = app.CreateMethodReference(valueOwner, "ToString", displaySignature, isOverride: true);
         if (!display.RequiresManagedReceiver || display.RequiresVirtualDispatch ||
@@ -113,6 +125,27 @@ internal static class AuthoredFunctionReferenceChecks
         dispatch.LoadArgument(0); dispatch.CallVirtual(valueMethod); dispatch.Return();
         var main = app.AddFunction("Main"); app.EntryPoint = main;
         main.LoadConstant(42); main.Call(reference); main.Return();
+        _ = app.WriteNativeAssembly();
+        var invalidValueWriter = app.AddFunction("InvalidValueWrite", new MethodSignature(PrimitiveType.Void, [SignatureType.ByReference(valueOwner)]));
+        invalidValueWriter.LoadArgument(0); invalidValueWriter.LoadConstant(1); invalidValueWriter.StoreField(importedValueField); invalidValueWriter.Return();
+        Reject<InvalidDataException>(() => app.WriteNativeAssembly());
+        invalidValueWriter.ClearBody(); invalidValueWriter.Fail("unsupported store fixture");
+        var wrongValueReader = app.AddFunction("WrongValueRead", new MethodSignature(PrimitiveType.Int32, [item]));
+        wrongValueReader.LoadArgument(0); wrongValueReader.LoadField(importedValueField); wrongValueReader.Return();
+        Reject<InvalidDataException>(() => app.WriteNativeAssembly());
+        wrongValueReader.ClearBody(); wrongValueReader.Fail("wrong receiver fixture");
+        var uninitializedReader = app.AddFunction("UninitializedValueRead", new MethodSignature(PrimitiveType.Int32, []));
+        var uninitializedIl = uninitializedReader.GetILGenerator();
+        uninitializedIl.LoadLocalAddress(uninitializedIl.DeclareLocal(valueOwner)); uninitializedIl.LoadField(importedValueField); uninitializedIl.Return();
+        Reject<InvalidDataException>(() => app.WriteNativeAssembly());
+        uninitializedReader.ClearBody(); uninitializedReader.Fail("uninitialized receiver fixture");
+        var fieldLibrary = new AssemblyBuilder(new("FieldLibrary", new Version(1, 0, 0, 0)), core);
+        var record = fieldLibrary.AddValueType("Example", "Record");
+        record.AddField("Number", PrimitiveType.Int32, FieldVisibility.Public);
+        var fieldSnapshot = AssemblyDefinition.ReadNativeAssembly(NeoCLR.Metadata.Experimental.RuntimeAssemblyContainer.WriteBinary(fieldLibrary));
+        var snapshotField = app.ImportReference(fieldSnapshot.MainModule.Types.Single(t => t.Name == "Record").Fields.Single(), core);
+        var snapshotReader = app.AddFunction("ReadSnapshotValue", new MethodSignature(PrimitiveType.Int32, [snapshotField.DeclaringType]));
+        snapshotReader.LoadArgument(0); snapshotReader.LoadField(snapshotField); snapshotReader.Return();
         _ = app.WriteNativeAssembly();
         var unboxed = app.AddFunction("InvalidUnboxedConversion", new MethodSignature(contract, [valueOwner]));
         unboxed.LoadArgument(0); unboxed.Return();

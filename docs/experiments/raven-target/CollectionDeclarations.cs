@@ -4,6 +4,9 @@ static class CollectionDeclarations
     public const string Source = """
         // Interface metadata for CLI vectors; allocation still uses newarr.
         public sealed class Array<T> : Collections.MutableSequence<T> {
+            public Option<T> Get(int index) => default;
+            public Option<T> Get(Index index) => default;
+            public Result<T[], InvalidRangeError> Slice(Range range) => default;
             private Array() { }
             public static T[] Empty => default;
             public void ForEach(Func<T, PropagationUnit> action) { }

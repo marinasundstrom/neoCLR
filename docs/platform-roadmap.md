@@ -432,8 +432,13 @@ Author-directed follow-up after HttpClient (2026-10-10): add compatible Index an
 Range runtime types and connect Raven's existing indexing/slicing syntax to arrays,
 strings and sequences. Compare .NET from-end indexing, half-open ranges, bounds,
 copy/view behavior and sequence capabilities; preserve the established text-index
-unit for strings rather than exposing UTF-8 storage through syntax. This is queued
-work, not an implemented API or a decision that every Iterable supports indexing.
+unit for strings rather than exposing UTF-8 storage through syntax. The first array
+slice is implemented locally: Index/Range values, from-end read/write, half-open shallow
+copies, Option-returning Get and Result-returning Slice. Nine framework cases and six
+fault guards pass in interpreter and macOS AOT. The author clarified that consuming
+APIs may fault; Index/Range describe positions. String/sequence slicing remains next;
+arbitrary Iterable indexing and borrowed views remain outside this slice. See the
+[contract and evidence](design/index-range.md). Windows execution is pending.
 The host metadata model and native manifests now preserve assembly annotations through
 CLI/native snapshots and CLI reference projection. Loader checks validate constructor
 shape, member-target rejection, limits and declared dependencies without execution.

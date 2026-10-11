@@ -8,6 +8,16 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-11
 
+- Add Index/Range value contracts, native array from-end reads/writes and half-open
+  slicing with independent shallow copies. Convenience access may fault; Array.Get
+  returns Option and Array.Slice/Range.TryGetOffsetAndLength return Result for invalid
+  bounds. Add imported native value-field reads with exact initialized receiver checks;
+  external value-field stores remain unsupported. Require matching Raven integration
+  commit ad3409e06 and native libraries. Refresh both API references and add nine
+  interpreter/macOS AOT tests plus six fault guards per mode. Windows CI uses the new
+  compiler pin; execution there is pending. String/sequence slicing and views remain
+  follow-up work.
+
 - Add Disposable HttpClient lifetime and an abstract HttpHandler base, owned and borrowed handler
   constructors, idempotent disposal and linked pending-request cancellation. Preserve
   completed responses and wait for handler acknowledgement before completing cancelled

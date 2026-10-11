@@ -1,0 +1,49 @@
+module System
+
+/// A position measured from the start or end of an indexable value.
+public struct Index : EquatableTo<Index> {
+    private val offset: int
+    private val fromEnd: bool
+
+    /// Creates an index; negative values fault. From-end zero is the end boundary.
+    init(value: int) {
+        if value < 0 {
+            Fail("Index value must be nonnegative")
+        }
+        offset = value
+        fromEnd = false
+    }
+
+    /// Creates a directional index; negative values fault.
+    init(value: int, fromEnd: bool) {
+        if value < 0 {
+            Fail("Index value must be nonnegative")
+        }
+        offset = value
+        self.fromEnd = fromEnd
+    }
+
+    /// The nonnegative distance from the selected boundary.
+    val Value: int => offset
+    /// Whether the distance is measured backwards from the end.
+    val IsFromEnd: bool => fromEnd
+    /// The first boundary.
+    static val Start: Index => Index(0, false)
+    /// The boundary immediately after the last element.
+    static val End: Index => Index(0, true)
+    /// Creates a start-relative index; negative values fault.
+    static func FromStart(value: int) -> Index => Index(value, false)
+    /// Creates an end-relative index; negative values fault.
+    static func FromEnd(value: int) -> Index => Index(value, true)
+    /// Converts a nonnegative integer to a start-relative index.
+    static func implicit(value: int) -> Index => FromStart(value)
+
+    /// Resolves an offset. The caller supplies a nonnegative length and checks element bounds.
+    func GetOffset(length: int) -> int => if fromEnd { length - offset } else { offset }
+    /// Compares distance and direction, independently of any collection length.
+    func Equals(other: Index) -> bool => offset == other.offset && fromEnd == other.fromEnd
+    /// Returns a hash consistent with typed equality.
+    func GetHashCode() -> int => if fromEnd { -offset - 1 } else { offset }
+    /// Formats the value, prefixing end-relative indexes with ^.
+    func ToString() -> string => if fromEnd { String.Concat("^", offset.ToString()) } else { offset.ToString() }
+}
