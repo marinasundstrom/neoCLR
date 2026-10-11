@@ -17,6 +17,20 @@ requirements without treating any proposed API or backend as selected. See
 [product direction](platform-direction.md#product-direction-clarified-2026-10-11)
 and the [JIT evaluation brief](native-execution-investigation.md#jit-for-development-iteration-2026-10-11).
 
+**Author-directed sequence (2026-10-11):** finish JIT qualification and integrate
+that work into main, then move from the TaskQueue concept to schedulers, followed by
+runtime-managed suspension. The intended suspension model lets the runtime handle
+suspension points instead of requiring Raven-generated async state machines. This
+is a direction, not implemented behavior or a selected stack representation.
+Experimental API/compiler compatibility may be broken where justified. Compare the
+scheduler contract with .NET TaskScheduler/ThreadPool and the suspension mechanism
+with compiler-generated async state machines; document benefits, costs and evidence
+before claiming improvements. Evaluate GC roots, cancellation, cleanup, fairness,
+I/O wakeups, debugging and interpreter/JIT/AOT parity. Green threads remain a design
+candidate rather than an automatic consequence of this decision. See the existing
+[scheduling design](runtime-scheduling-design.md) for inputs, not a replacement for
+this sequence.
+
 **Iteration evaluation progress (2026-10-11):** the runtime-library harness now
 records discovery/build phases and repeatable process timings. The [local evaluation](experiments/jit-iteration/README.md)
 compares existing debug-built and release-built AOT tools while checking HTTP handler

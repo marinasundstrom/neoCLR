@@ -8,6 +8,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-11
 
+- Record the author-directed plan after JIT integration: replace the TaskQueue
+  concept with schedulers, then develop runtime-managed suspension in place of
+  Raven-required async state machines. Implementation choices remain open; breaking
+  experimental contracts are permitted, with interpreter/JIT/AOT validation required.
+
 - Add explicit development `neoclr run --execution jit|interpreter` selection and
   JIT-only runtime-library test execution, preserving output, entry arguments and
   guest exit status without silent interpreter fallback. Defaults remain unchanged

@@ -25,6 +25,20 @@ available original wording; other text is a summary.
 
 See the [changelog](../CHANGELOG.md) and linked design documents for technical status.
 
+## 2026-10-11 — Schedulers followed by runtime-managed suspension
+
+- **Author:** directs work after JIT toward replacing the TaskQueue concept with
+  schedulers, then runtime suspension: “the runtime handles suspension points
+  instead of the Raven compiler providing a state machine.” Explicitly permits
+  breaking changes while the platform is experimental and asks to consider
+  alternatives to .NET implementation choices.
+- **Assistant response:** finish and integrate JIT first; record schedulers then
+  suspension as the next sequence. Evaluate stack representation, cancellation,
+  cleanup and AOT compatibility before selecting an implementation. A shared runtime
+  mechanism should also support future languages.
+- **Action:** update the [roadmap](platform-roadmap.md). **Open:** scheduler contract,
+  suspension representation and implementation; no runtime behavior changed here.
+
 ## 2026-10-11 — Native backend goals, concurrency and JIT iteration
 
 - **Author:** targets Go/modern JavaScript levels of simplicity, productivity and
