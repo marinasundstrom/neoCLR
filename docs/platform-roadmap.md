@@ -75,7 +75,11 @@ now pass interpreter qualification. The author explicitly directs continuation u
 JIT and AOT runtime suspension work. The [compiled POC](experiments/runtime-async/README.md#compiled-runtime-suspension-jit-and-aot--2026-10-11)
 now qualifies both HTTP projects and lifecycle cases on macOS ARM64, with explicit
 parked-stack GC roots and terminal teardown. Windows and a production stack carrier
-remain open, as do native Task.Run, full library migration and performance qualification.
+remain open, as do native Task.Run and full library migration. A
+[matched three-mode benchmark](experiments/runtime-async/README.md#matched-interpreter-jit-and-aot-measurement--2026-10-11)
+now measures both lowerings: interpreter invocation time improves, but the native
+POC is slower than state machines. Profile carrier/notification/GC costs and measure
+retained stack memory before treating this as production performance qualification.
 Retain cancellation, terminal Fault, GC and benchmark checks. Broaden
 platform coverage and measure costs before considering defaults. This is explicit
 POC support, not a default-mode or native build-kit change. General native interoperability, runtime interface recognition,

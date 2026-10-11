@@ -1,0 +1,4533 @@
+{
+  "passed": true,
+  "platform": "macOS-27.0-arm64-arm-64bit",
+  "processor": "Apple M1",
+  "repetitions": 4,
+  "rounds": 2,
+  "measurement": "fresh invocation including heap/scope teardown; load and compilation excluded",
+  "nativeAllocationUnit": "GC blocks, excluding retained native stacks; not interpreter object counts",
+  "discardedWarmupsPerProcess": 1,
+  "inputsSha256": {
+    "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang": "be5518e9c6736cda8dfc3486ce11e8112a2e08045084260691cf41f57a653f59",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-gc-test.c": "14efc7354a98682c0d12a6d9e95757e840a5d54b06f551be7c0bf3dcb66363b8",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-gc.c": "da0d5d5c628f0112782fe02a43808f849efe1baa84320277543468c9f6cec137",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-console/root-probe.c": "ae908fd55ab9a0b2a0e8baf753fdff39c69e584dea125e1423bab44128b297c2",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-stack-test.c": "f55d54d9ceae6e6ee66b48bb55c23b17dc1dd1b62410b498337c40160563af96",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-stack.c": "8bf08bed38457c8a48dcb6fecf784c764651dd75f192a9a8cb4d340b3d638121",
+    "/Users/robert/Projects/neoclr/docs/experiments/jit-managed/host.c": "364ab0e34deb8044b56127206a599f480d37e2d5693024587c3c8e76da43e014",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-console/text-arena.c": "1e845dc0c0622247ca8eb18c222c6cfcc7638e603551634a12493787026c77be",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-console/console.c": "fdc9b345a77b347dba16561394dd9f0ae8bb270478ccfb7d6fed3071404e1769",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-scalar/console.c": "e1caabedff378df882385fd05325f635732e91b968d8dc987e5734fee26e49ae",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-fault-details/render.c": "f1e561bfb6b73ac3e4a7078d5bc9e9905eea9637f545ac3178273698d08efb96",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-console/task-queue.c": "84b7d3e7d0f635622c6b066b57868969e22170e6aea3c500fab7e06297a5f7f4",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-console/socket-listener.c": "c583578971511a75ba279ad2d1dc8103d4e98f3efdf19e7f1f7e287af8b8d461",
+    "/Users/robert/Projects/neoclr/tools/native/entry-arguments.c": "4fdc632b75d590057fad61e42fe6526b8278b60d908cc0467bb611d7a0c582a3",
+    "/Users/robert/Projects/neoclr/docs/experiments/runtime-async/native-runtime.c": "d56268baa8feec2eef1ce7e750a7a78fe5aef9fd6a49b0b86aa107f24870a83e",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-console/string-unicode.c": "80dadd71e3df0bc16f4082a209bc7c37bb07a85ccddb6350c9ee3cf2254399fe",
+    "/Users/robert/Projects/neoclr/tools/aot-native-text/target/text-only/aarch64-apple-darwin/release/libneoclr_aot_native_text.a": "8dbbf86e3cdf0659d73d8d5a9aa277cbc0ac5e95b99a1ff15e5974ce5d9169ad",
+    "/Users/robert/Projects/neoclr/docs/experiments/runtime-async/native-runtime.h": "ba2998af41aacbc8842ba692a547065da29f71e4400915ec4566d3c57392d90d",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-console/entry-arguments.h": "85f5c7d90edfd08cc4bf8db1a220028cf9dab39e4e16a05d1210f2ee18de6c80",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-console/console.h": "1f5be96a30639c5e63781637d95d1abb28ab605962caee50ae91a5a0d5bd8068",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-console/root-probe.h": "3c22e312ac9eadfaa7b6084b94f8d27b8954135588b09c6f5b471b5da279c62f",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-console/socket-listener.h": "095e624c5a5f5ce32669fa5602490ac44e6ab769327283b0dd71bae0d732d4fe",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-console/string-unicode.h": "707e7dc31d0c5993873f53166862da5a53c3779a1f2e15fdb3b4c59086210f1c",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-console/task-queue.h": "cf7d1ded7df30016c353fbb24bb40cb4771bb1c735352bd6bb56d5dea78fa738",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-console/file-input.h": "a1a9840482a2b50f20ba5080eb96453a46e4416238b3403343e03e9c2c84d3f4",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-console/socket-client-internal.h": "e2771ecbe8b74c0e696af297651cd5158755c8ed6e6cc25b1d9bde837a57dddb",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-session.h": "b221dc77da887518e90210bbbfb8ac6ffd6d14416c41faa199ecd2fb43bef7bd",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-console/socket-os.h": "a01419c62fa8a1d3d9131282c5af182f200ba149a440d52c81104e2a156f7ef0",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-stack.h": "d4b1bbc542c3c8b3338d186a64554e5a0c0d4bc3a94d6b6a48900c49f2da0d13",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-gc.h": "2710426be29f0e01061236dcc8dd82db92b0e92ef04633be07575cb4c53df721",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-console/text-arena.h": "6101b22c4fd5eacc3849ad471de197564fca343f8b28345d80be93f20c2c8575",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-console/file-output.h": "f13171699f402f05ea2ab0e4e1686f227bbe48d65c8b48a62e5f94200605e88e",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-fault-details/fault-details.h": "8acf145dd10c8050c7d4c9266a73dec171009cea570aeb2f5473ac39cbfa4370",
+    "/Users/robert/Projects/neoclr/tools/aot-poc/src/flow.rs": "a92d791a2f398ec6030a1513ae9bf0ccb8ad2102bf47375f5a7db47b0e6a9a60",
+    "/Users/robert/Projects/neoclr/tools/aot-poc/src/string_projection.rs": "c480f042172b741d7cda72849efb142c8ec5bbe8c6342e02ad655be73ff34bf5",
+    "/Users/robert/Projects/neoclr/tools/aot-poc/src/boxing.rs": "eac6e6cda876ed276c98c64de47fcde887a9ffc4739d89c9e8a1993ca79e26d0",
+    "/Users/robert/Projects/neoclr/tools/aot-poc/src/reflection_arrays.rs": "09234389a2b626e302a858a697aaa8afb7ed0042417dd1f0cd4fda98b2a86ee1",
+    "/Users/robert/Projects/neoclr/tools/aot-poc/src/gc_layout.rs": "a7cda2d114c1b3ba39f3dd286ee504a75034b7bb18c8421efd9f8057c06ec68d",
+    "/Users/robert/Projects/neoclr/tools/aot-poc/src/fault_details.rs": "71d49b7668379bf121f501d5ede3fb82606c95b6a85c87558457c521e7651b99",
+    "/Users/robert/Projects/neoclr/tools/aot-poc/src/runtime_context.rs": "115f371f8baa9e91ce2fd843474dfdcac0c87c36dc90975ee6accd78e1fb1d6c",
+    "/Users/robert/Projects/neoclr/tools/aot-poc/src/compiler.rs": "89b2d7ffb3d8e13195d0ceaf740686edb8ffa03be77526b605ecdca5df9ad329",
+    "/Users/robert/Projects/neoclr/tools/aot-poc/src/gc_probe.rs": "ce48e9a48ffe7f999e26aa2cb6674e52b00d887d7d7b8eb85413920466ea90d2",
+    "/Users/robert/Projects/neoclr/tools/aot-poc/src/values.rs": "52f91b87785db8f813a973a256060cc3c37fc019f03b57277bbf556af8792ff8",
+    "/Users/robert/Projects/neoclr/tools/aot-poc/src/limits.rs": "97797a5a870ddabe04a76962759e0cc889afe18d05d060da84de6feea94ab49b",
+    "/Users/robert/Projects/neoclr/tools/aot-poc/src/jit.rs": "75a3553c979efe34ada30f484e9716278df3d3ddfaf56190354cb3fb587a3cbd",
+    "/Users/robert/Projects/neoclr/tools/aot-poc/src/specialization.rs": "1cfafcc8f88a7e7c8545530ad5d5f08eaed9fe1f72f44b727bda6c2ba5f34bc0",
+    "/Users/robert/Projects/neoclr/tools/aot-poc/src/reflection_collections.rs": "374f41e82df8dc2d66c9792e170d924c45c0f16e361854741e435dc292d390f8",
+    "/Users/robert/Projects/neoclr/tools/aot-poc/src/gc_points.rs": "0b9ceddbe37aa76ceb0e845b1c7b944907fefdfd6b52df9d64c7d3fc2e1c79d4",
+    "/Users/robert/Projects/neoclr/tools/aot-poc/src/value_profile.rs": "20450aecef7f3e0b8402511b7e59597589f63b7a31f9ddc7f26ff73e54307131",
+    "/Users/robert/Projects/neoclr/tools/aot-poc/src/reflection_metadata.rs": "816c68869cc4df6b5e88cc361b051e02a5e2c1e9186864a9ecc8507bccd2abd6",
+    "/Users/robert/Projects/neoclr/tools/aot-poc/src/selection.rs": "47aee9c760fcf437f28e7377ffd7c38b1968710458ab2b83b12ccef86a77d9aa",
+    "/Users/robert/Projects/neoclr/tools/aot-poc/src/main.rs": "1d13b097b16e76acacacaf03786d4adc3fb0303e9734b94e51b5af1dcebe8c10",
+    "/Users/robert/Projects/neoclr/tools/aot-poc/src/linking.rs": "257738c379041270bbbf6ee41e072391b735fca23dade43131dae1914787d65a",
+    "/Users/robert/Projects/neoclr/tools/aot-poc/src/bindings.rs": "2bd2646930ee53e19d774f4610c36fd5de5d1a2329d737cd72084e637df6081e",
+    "/Users/robert/Projects/neoclr/tools/aot-poc/src/reflection_construction.rs": "66f19a8c7d1bb6f85368e7e0258a068bd29e4bc64e786062301c811d1e3be985",
+    "/Users/robert/Projects/neoclr/tools/aot-poc/src/reflection_properties.rs": "dbee3fbb2f7425537e9f14723659ab38721806b308e7f118b43e42f1462ff757",
+    "/Users/robert/Projects/neoclr/tools/aot-poc/src/inspection.rs": "56068147385078c6baa5a2c89a2cb240868dc1456364f8065f607b2fd05e3470",
+    "/Users/robert/Projects/neoclr/tools/aot-poc/src/reflection_snapshots.rs": "3c5173d0506005006f9eaab00d2fa8016b4d803a6190fe63f6eac86fa04f6f82",
+    "/Users/robert/Projects/neoclr/tools/aot-poc/src/class_dispatch.rs": "63a95b7b1df7ef0e9a8f85f6a5b13602f551b67a7e8d42e80ef1409e8549af3b",
+    "/Users/robert/Projects/neoclr/docs/experiments/runtime-async/validate_native.py": "588a1a36a9ba84b8921d14bd612865783d854a169cd7fb7611a5ac03d9ad4a19",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/Mono.Cecil.Rocks.dll": "bf992f3dce364ebcc3200fa7832ef07e20b4e2dbc3a8a6213ce44e3d239db984",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/Microsoft.NET.HostModel.dll": "be876d9f53ad634fad4a61afd7e4aef99dbca8fe276bbf746d31270dbbe83163",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/System.Reflection.MetadataLoadContext.dll": "8c0deb266f0a90c312770a3db68667d0fae3b30967c2bfa27e17d3668fcf9809",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/RavenDoc.dll": "670345340d455698579c5f01a783ecc11965832bd5a95f13b03b344baec42c38",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/Microsoft.Build.Locator.dll": "fce7cf90fb4f26fe5a84adb24285d92be9a4285fdb314f775a258ba9de08bdcc",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/Microsoft.CodeAnalysis.CSharp.dll": "cfb5f2785c30485eda803d58fb8330d737cb07d469cd3d7bc1113d58e8d8e4bb",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/Spectre.Console.dll": "c97e65cb2d73dc4eb50bc372a0fbc4368ee60ed56e179d0466a606d5955f2118",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/Raven.CodeAnalysis.Console.dll": "65b2d3fc2c63c3826e767cb6b99f0c8bb9ae5d9515e419ced01d9a21f6cfc029",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/NeoCLR.Metadata.Experimental.dll": "7ad46135d5ca47ad1a6be4fc2269145ea614705d769e6d1b25f64d1db76558b8",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/test.dll": "f45312365076c080282997d42703848c7c1dbbfdb13e991b7059c6423a5ca4a2",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll": "8d6c848e3cbac60604856b2733bb84af81381c0b5442c639179c2659d0cabc02",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/Markdig.dll": "a4f94bc5f64010db760f063afc1c1ae7a9a67bb714d96eab2e2773fcc2670d18",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/Raven.CodeAnalysis.NeoClr.dll": "13d997d6e404285366fbdb61a4d25da170525e71accdc8d9c9fcc6b792465506",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/Mono.Cecil.dll": "831dca77470d85cb6ffbea3072daa7a3df5b7c9fcfd9c3f43674a9be99d4bfcf",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/Raven.CodeAnalysis.dll": "a44138862ed30f08b6e8eddb49c87424edec48d147c568168ca962b49ee95be9",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/YamlDotNet.dll": "86f873f682c619a0c24e263dcdd15fe027104666641c92f503516671d61edda6",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/Microsoft.CodeAnalysis.dll": "0a7fb1d94e0e7f46798b138caa67e5d5fb8fb98fd31b5294c917def057ab3d80",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/Mono.Cecil.Pdb.dll": "a332332633fbcb20e8d50e49b4db7bd1557721417122cf0c5f4c42f2332391d0",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/Mono.Cecil.Mdb.dll": "28cb367972bdc1cd43e4006306af2fd96d37f4ed4b239ee90e1dc7237a93af7f",
+    "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/Core.dll": "3d4a676d379067c18a65a9beb8257ed40bf3196fc643a9ba1d559c619ec73fad",
+    "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/System.runtime.neox": "98a1ae1da85387c87746957e83a4015eb59d0566539a915c69f168d2b511b190",
+    "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/ownership.json": "b6776991106e1682db4b9ddd2e16b938b965433f59f6f39d98ef0e2d93fc6527",
+    "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/System.Runtime.dll": "818e0147dd0a6fb4946a9ddca0b672e19902b9b6138cdee6ac9b9c07e25bf746",
+    "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/System.Data.dll": "7cfad8f6ca5e0cfc0cc13c15bdb8fc623280aa72fd6aad73a7aacdd586a9c150",
+    "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/System.Networking.dll": "ec3b383eee5f202f0badeb48ad775df16de1b2a81d94843caf2391c21fa9e2e3",
+    "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/System.Web.dll": "edcae392b0cd0a4562680408830a931ad2bf92e5280157da16afd8967103474c",
+    "/Users/robert/Projects/neoclr/docs/experiments/runtime-async/RuntimeAwait.rvn": "7d374df2df5df303903e1e44edca877fd63bf66f8419d42ce096e4e3b4f5d473",
+    "/Users/robert/Projects/neoclr/docs/experiments/runtime-async/RuntimeAsyncBridge.rvn": "93efd51bf49da558079d798bc3f5a920ac4962010da85f275961494007ab6251",
+    "/Users/robert/Projects/neoclr/target/scheduler-wait-validation/release/neoclr": "e1ee04fc3df37898846db96926c91e9ad76d70eed4c78484fc3c7f4ff7360628",
+    "/Users/robert/Projects/neoclr/tools/aot-poc/target/release/neoclr-aot-poc": "84cabe597f196fc9e1d08b4f8f889afbe131d1b0f3925d8e208a3576040720e6",
+    "/Users/robert/Projects/neoclr/benchmarks/native-web/http-host.c": "57dc4da4325575b5ed132d0571d557c73b02bba793c399ac0ed5cc4c71c06fcd",
+    "/Users/robert/Projects/neoclr/docs/experiments/runtime-async/RuntimeUse.rvn": "d959a73bc3d3a6cc937480565ecda510fc42015e4c2fb962e10a5108f294637a",
+    "/Users/robert/Projects/neoclr/docs/experiments/runtime-async/RuntimeNativeContract.rvn": "96c580a32a0eae57c02619c5a70a2f3e3bbdacf3207e00de4e41a183f6871aeb",
+    "/Users/robert/Projects/neoclr/docs/experiments/runtime-async/RuntimeAwaitBenchmark.rvn": "41f2d7246b5d5c7c3ff160274442df565cc4dcb5c04415978201f62d8793a5ee",
+    "/Users/robert/Projects/neoclr/docs/experiments/runtime-async/RuntimeAwaitFault.rvn": "089bc44ee4bccaa4ee406ed492d80644d267dcebc9e744a3ee24227205e27ed4",
+    "/Users/robert/Projects/neoclr/docs/experiments/runtime-async/RuntimeHttpLifecycle.rvn": "924c541ef22a762f053994e29bd7df96750fe5185d7c2e22b744a09099ebecd2",
+    "/Users/robert/Projects/neoclr/docs/experiments/native-http-client/Native.rvnproj": "ea2e42f32a3e975ce0f0584839df8e5d43bc841a897eb77f1be968bf8d9fcf52",
+    "/Users/robert/Projects/neoclr/docs/experiments/native-http-client/Client.rvn": "11b252a94071dd892833ddd56d4ad3cc7a9c43f5e8dba6a0774825dc408efccd",
+    "/Users/robert/Projects/neoclr/docs/experiments/http-server/Native.rvnproj": "b5fe24feec10fa4ee3bf55e6ad4e89574c08d9d1cd6f9a7c3e21216563c1e0c7",
+    "/Users/robert/Projects/neoclr/docs/experiments/http-server/Server.rvn": "db6d9f013f18b2514049bd042bc36034000f9072419d9c5330da1d887720171f",
+    "/Users/robert/Projects/neoclr/target/runtime-http-use-final/app.dll": "34c5450dbf706fbd0a56daf1277bc86bd48ba4c59c02b2f02a4b53b811c4c8bc",
+    "/Users/robert/Projects/neoclr/docs/experiments/runtime-async/RuntimeHttp.rvn": "876590de94064128d016a8ceaef4ad6827e0b356603b9afd6cefec74d7507e59",
+    "/Users/robert/Projects/neoclr/target/runtime-native-evidence-v2/host.dylib": "21596b183123b40212dc381fced7f32b5f6d5bd3e8100e12c3e39a3c7d4697a8",
+    "/Users/robert/Projects/neoclr/target/runtime-native-evidence-v2/language.dll": "a597d8d3aff6d613ff90c86b08c845732d479ad9c21f2db767e4079febd6af61",
+    "/Users/robert/Projects/neoclr/target/runtime-native-evidence-v2/language.o": "ea16273b81b3cf1665ab657d66fbbe04dddab4ae15413fe355719def2e8d3112",
+    "/Users/robert/Projects/neoclr/target/scheduler-wait-validation/release/examples/runtime_async_interpreter": "c3b6e6680076580ed5756f516969e31250b92da9fbded6ac7e5a99df2c978d54",
+    "/Users/robert/Projects/neoclr/target/runtime-http-use-final/validation.json": "b61b9c011d713770a979e4fa3f8c9ed55e6c11bbe7cdf9ada748199bb7584844",
+    "/Users/robert/Projects/neoclr/docs/experiments/runtime-async/native-validation.json": "999b2c2cc3b3400d3ef2fd7493ba248792408301736030da972a4dfadabcfd17",
+    "/Users/robert/Projects/neoclr/docs/experiments/runtime-async/native-benchmark-host.c": "af7fb7dd165466cdeaac72eb65c66380d63e297f02a024494fa25a6ecea4425f",
+    "/Users/robert/Projects/neoclr/docs/experiments/runtime-async/benchmark_modes.py": "e66d0a71b64df0b17aca01ec28f5d0948f652a4c05d111df1af2e16f746f6362",
+    "/Users/robert/Projects/neoclr/target/runtime-modes-benchmark-final/completed-10.rvn": "8a591c53678eedc84bd9f93fd1031e5289faa5accf9bcc8e1f68372b14209a41",
+    "/Users/robert/Projects/neoclr/target/runtime-modes-benchmark-final/completed-10-state-machine.dll": "8588ac6a3db5f7d94a8fe0f6175de69e90fd46a53a69f6687153730f96c30b7d",
+    "/Users/robert/Projects/neoclr/target/runtime-modes-benchmark-final/completed-10-state-machine.o": "f02a6189fe180e6487bf30cf0d97b55991c3a8aee39bb1fbe65af534c7e916b2",
+    "/Users/robert/Projects/neoclr/target/runtime-modes-benchmark-final/completed-10-state-machine": "9feb1ee6de100afed36a558cf91755c3153629e2cb5a28aaef93caa38e135ef1",
+    "/Users/robert/Projects/neoclr/target/runtime-modes-benchmark-final/host.dylib": "1a863578ea87e1ec671b6ad97e4dec6d066435818ea4a58b6f8e09843b722142",
+    "/Users/robert/Projects/neoclr/target/runtime-modes-benchmark-final/completed-10-runtime.dll": "692358d4f3d35d86f8a537d5744fe2fdb5185caf3fd34a2d165605bd8dcfdacf",
+    "/Users/robert/Projects/neoclr/target/runtime-modes-benchmark-final/completed-10-runtime.o": "fa9c8fe6b3271f29b64cf8aab4ef38d24b30356a728a8bfc77f0ab43dae4bdea",
+    "/Users/robert/Projects/neoclr/target/runtime-modes-benchmark-final/completed-10-runtime": "d33906a2114cc886f72252becceadf34f51deae8200f619fdc4dc05e9bc1b4d0",
+    "/Users/robert/Projects/neoclr/target/runtime-modes-benchmark-final/completed-100.rvn": "f954470c41104ae30f515e29a3015ae7949ff723b4b1eb658a3b837d0ecdd10b",
+    "/Users/robert/Projects/neoclr/target/runtime-modes-benchmark-final/completed-100-state-machine.dll": "2d0b3f7eed17add133931f92f4d00fc676eeddc032876874d371729774060af5",
+    "/Users/robert/Projects/neoclr/target/runtime-modes-benchmark-final/completed-100-state-machine.o": "f1ba201afcbef5deda2a6b70a9600c8ff578e80da8a2d9d60ea17dcde772adb2",
+    "/Users/robert/Projects/neoclr/target/runtime-modes-benchmark-final/completed-100-state-machine": "9f3a5cb35e977f8134f0b9a04946b0467073cd23afdf956cf99625eba33a4e65",
+    "/Users/robert/Projects/neoclr/target/runtime-modes-benchmark-final/completed-100-runtime.dll": "907a3e346d906ff5014c10c7cc38bd5361828a0f1e63e56f7994d4939417f012",
+    "/Users/robert/Projects/neoclr/target/runtime-modes-benchmark-final/completed-100-runtime.o": "cc9c18782820e0e3239bfeac6a2d208bb35ac358b4286b52f5832e8368776e05",
+    "/Users/robert/Projects/neoclr/target/runtime-modes-benchmark-final/completed-100-runtime": "a5f4e61cb033045d05444d5febdbdbc4eee55d475ee8b129572dba8b59ef9420",
+    "/Users/robert/Projects/neoclr/target/runtime-modes-benchmark-final/pending-10.rvn": "7f3a58081b3b1321038f9a555d256f08de0431a78191f9ec359ad83fc92ba3c7",
+    "/Users/robert/Projects/neoclr/target/runtime-modes-benchmark-final/pending-10-state-machine.dll": "9fe21a123444da0da93c6721cfff9ebf44d9e0e1e4c86ce04f05c0b4eac3123a",
+    "/Users/robert/Projects/neoclr/target/runtime-modes-benchmark-final/pending-10-state-machine.o": "ee39ce77f4a3ca4c6ee7c947318874fea2b5ae671e56bdedb6a5aad2d83b7676",
+    "/Users/robert/Projects/neoclr/target/runtime-modes-benchmark-final/pending-10-state-machine": "9e635d0fefe15bcac0143270f9360a12f39bcf11f5f2ede696b84c159ab4774b",
+    "/Users/robert/Projects/neoclr/target/runtime-modes-benchmark-final/pending-10-runtime.dll": "707bbb12a5ce584ca644280744fbf063b0153fe7b1b6b4b855ebf8b96cf4fadf",
+    "/Users/robert/Projects/neoclr/target/runtime-modes-benchmark-final/pending-10-runtime.o": "c3aa6003af7deb5cdb513f7242166ec1b036dfc5d375b04c2b7715bd7964758e",
+    "/Users/robert/Projects/neoclr/target/runtime-modes-benchmark-final/pending-10-runtime": "012e774f901709fde3b1631ba06b36b9e8ad578e43ff72170a83d30185e197ae",
+    "/Users/robert/Projects/neoclr/target/runtime-modes-benchmark-final/pending-100.rvn": "41f2d7246b5d5c7c3ff160274442df565cc4dcb5c04415978201f62d8793a5ee",
+    "/Users/robert/Projects/neoclr/target/runtime-modes-benchmark-final/pending-100-state-machine.dll": "1cdeb04378be8c362d1539a07f1de2440b28d6495c23dab2deeeb716776a55d1",
+    "/Users/robert/Projects/neoclr/target/runtime-modes-benchmark-final/pending-100-state-machine.o": "c103382d1825e3a5fdfe7ddd6203003c597d7e76f4b0ea880f69dbc9ef7b5350",
+    "/Users/robert/Projects/neoclr/target/runtime-modes-benchmark-final/pending-100-state-machine": "cdd0908d883f38e8cbdc6c9daf08a689a7715a69e8724c896bf6f9fd669f6157",
+    "/Users/robert/Projects/neoclr/target/runtime-modes-benchmark-final/pending-100-runtime.dll": "df726c1b08dc386ec24a6039da69a4df7e5b02225bfbb8540f4b859234eada66",
+    "/Users/robert/Projects/neoclr/target/runtime-modes-benchmark-final/pending-100-runtime.o": "7d097db1712b20e1b2194951ef46565b2cc0e1f6aac6c154fe4facc2708c5c14",
+    "/Users/robert/Projects/neoclr/target/runtime-modes-benchmark-final/pending-100-runtime": "952f079440e547e6a7131ec2b03cf4fb2919f046a0b37ffbf11e5ea79ff380f8"
+  },
+  "commands": [
+    {
+      "command": [
+        "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang",
+        "-isysroot",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.2.sdk",
+        "-arch",
+        "arm64",
+        "-std=c11",
+        "-O2",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-DNEOCLR_NATIVE_GC",
+        "-DNEOCLR_NATIVE_BYTE_ARRAY_LIMIT=65536",
+        "-I",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console",
+        "/Users/robert/Projects/neoclr/docs/experiments/runtime-async/native-benchmark-host.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/root-probe.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-gc.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/text-arena.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/console.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-stack.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-scalar/console.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-fault-details/render.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/task-queue.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/socket-listener.c",
+        "/Users/robert/Projects/neoclr/tools/native/entry-arguments.c",
+        "-o",
+        "/Users/robert/Projects/neoclr/target/runtime-modes-benchmark-final/host.dylib",
+        "-DNEOCLR_RUNTIME_ASYNC",
+        "-I",
+        "/Users/robert/Projects/neoclr/docs/experiments/runtime-async",
+        "/Users/robert/Projects/neoclr/docs/experiments/runtime-async/native-runtime.c",
+        "-Wno-deprecated-declarations",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/string-unicode.c",
+        "/Users/robert/Projects/neoclr/tools/aot-native-text/target/text-only/aarch64-apple-darwin/release/libneoclr_aot_native_text.a",
+        "-dynamiclib"
+      ],
+      "seconds": 0.9317393749999998,
+      "exitCode": 0,
+      "stdoutFile": "/Users/robert/Projects/neoclr/target/runtime-modes-benchmark-final/command-0.stdout",
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "dotnet",
+        "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+        "neoclr",
+        "--core-reference",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/Core.dll",
+        "--runtime-seed",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/System.runtime.neox",
+        "--bootstrap-intrinsics",
+        "--bootstrap-ownership",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/ownership.json",
+        "--object-library",
+        "System.Runtime",
+        "--async-library",
+        "System.Runtime",
+        "--reference",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/System.Runtime.dll",
+        "--reference",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/System.Data.dll",
+        "--reference",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/System.Networking.dll",
+        "--reference",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/System.Web.dll",
+        "-o",
+        "/Users/robert/Projects/neoclr/target/runtime-modes-benchmark-final/completed-10-state-machine.dll",
+        "/Users/robert/Projects/neoclr/target/runtime-modes-benchmark-final/completed-10.rvn",
+        "/Users/robert/Projects/neoclr/docs/experiments/runtime-async/RuntimeAsyncBridge.rvn"
+      ],
+      "seconds": 3.820157459,
+      "exitCode": 0,
+      "stdoutFile": "/Users/robert/Projects/neoclr/target/runtime-modes-benchmark-final/command-1.stdout",
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/tools/aot-poc/target/release/neoclr-aot-poc",
+        "--closed-world",
+        "/Users/robert/Projects/neoclr/target/runtime-modes-benchmark-final/completed-10-state-machine.dll",
+        "@entry",
+        "/Users/robert/Projects/neoclr/target/runtime-modes-benchmark-final/completed-10-state-machine.o",
+        "--system",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/System.runtime.neox",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/System.Runtime.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/System.Data.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/System.Networking.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/System.Web.dll",
+        "--object-root",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/System.Runtime.dll",
+        "--compile-system",
+        "--bind-user-fault",
+        "--reference-arena",
+        "--native-gc",
+        "--bind-console-read-byte",
+        "--bind-console-write-line",
+        "--bind-console-stream-output",
+        "--bind-int32-to-string",
+        "--bind-utf8-text",
+        "--native-stack-budget",
+        "--bind-integer-text",
+        "--bind-character-text",
+        "--bind-system-culture",
+        "--bind-time-zone-rules",
+        "--bind-task-queue",
+        "--bind-timers",
+        "--bind-socket-listener",
+        "--bind-socket-accept",
+        "--bind-socket-transfer",
+        "--bind-socket-client",
+        "--bind-scheduler",
+        "--bind-runtime-async"
+      ],
+      "seconds": 1.3960542080000007,
+      "exitCode": 0,
+      "stdoutFile": "/Users/robert/Projects/neoclr/target/runtime-modes-benchmark-final/command-2.stdout",
+      "stdoutSha256": "9b8843bb31a59cf5f496388bffd5edebe7996132f3068a00dbfd3f96360b58df",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang",
+        "-isysroot",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.2.sdk",
+        "-arch",
+        "arm64",
+        "-std=c11",
+        "-O2",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-DNEOCLR_NATIVE_GC",
+        "-DNEOCLR_NATIVE_BYTE_ARRAY_LIMIT=65536",
+        "-I",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console",
+        "/Users/robert/Projects/neoclr/docs/experiments/runtime-async/native-benchmark-host.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/root-probe.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-gc.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/text-arena.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/console.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-stack.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-scalar/console.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-fault-details/render.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/task-queue.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/socket-listener.c",
+        "/Users/robert/Projects/neoclr/tools/native/entry-arguments.c",
+        "-o",
+        "/Users/robert/Projects/neoclr/target/runtime-modes-benchmark-final/completed-10-state-machine",
+        "-DNEOCLR_RUNTIME_ASYNC",
+        "-I",
+        "/Users/robert/Projects/neoclr/docs/experiments/runtime-async",
+        "/Users/robert/Projects/neoclr/docs/experiments/runtime-async/native-runtime.c",
+        "-Wno-deprecated-declarations",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/string-unicode.c",
+        "/Users/robert/Projects/neoclr/tools/aot-native-text/target/text-only/aarch64-apple-darwin/release/libneoclr_aot_native_text.a",
+        "-DNEOCLR_BENCH_AOT",
+        "/Users/robert/Projects/neoclr/target/runtime-modes-benchmark-final/completed-10-state-machine.o"
+      ],
+      "seconds": 0.7241407500000001,
+      "exitCode": 0,
+      "stdoutFile": "/Users/robert/Projects/neoclr/target/runtime-modes-benchmark-final/command-3.stdout",
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "dotnet",
+        "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+        "neoclr",
+        "--core-reference",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/Core.dll",
+        "--runtime-seed",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/System.runtime.neox",
+        "--bootstrap-intrinsics",
+        "--bootstrap-ownership",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/ownership.json",
+        "--object-library",
+        "System.Runtime",
+        "--async-library",
+        "System.Runtime",
+        "--runtime-async-poc",
+        "RuntimeAwaitProvider.Bridge",
+        "--reference",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/System.Runtime.dll",
+        "--reference",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/System.Data.dll",
+        "--reference",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/System.Networking.dll",
+        "--reference",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/System.Web.dll",
+        "-o",
+        "/Users/robert/Projects/neoclr/target/runtime-modes-benchmark-final/completed-10-runtime.dll",
+        "/Users/robert/Projects/neoclr/target/runtime-modes-benchmark-final/completed-10.rvn",
+        "/Users/robert/Projects/neoclr/docs/experiments/runtime-async/RuntimeAsyncBridge.rvn"
+      ],
+      "seconds": 3.0139496669999994,
+      "exitCode": 0,
+      "stdoutFile": "/Users/robert/Projects/neoclr/target/runtime-modes-benchmark-final/command-4.stdout",
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/tools/aot-poc/target/release/neoclr-aot-poc",
+        "--closed-world",
+        "/Users/robert/Projects/neoclr/target/runtime-modes-benchmark-final/completed-10-runtime.dll",
+        "@entry",
+        "/Users/robert/Projects/neoclr/target/runtime-modes-benchmark-final/completed-10-runtime.o",
+        "--system",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/System.runtime.neox",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/System.Runtime.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/System.Data.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/System.Networking.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/System.Web.dll",
+        "--object-root",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/System.Runtime.dll",
+        "--compile-system",
+        "--bind-user-fault",
+        "--reference-arena",
+        "--native-gc",
+        "--bind-console-read-byte",
+        "--bind-console-write-line",
+        "--bind-console-stream-output",
+        "--bind-int32-to-string",
+        "--bind-utf8-text",
+        "--native-stack-budget",
+        "--bind-integer-text",
+        "--bind-character-text",
+        "--bind-system-culture",
+        "--bind-time-zone-rules",
+        "--bind-task-queue",
+        "--bind-timers",
+        "--bind-socket-listener",
+        "--bind-socket-accept",
+        "--bind-socket-transfer",
+        "--bind-socket-client",
+        "--bind-scheduler",
+        "--bind-runtime-async"
+      ],
+      "seconds": 1.352400459,
+      "exitCode": 0,
+      "stdoutFile": "/Users/robert/Projects/neoclr/target/runtime-modes-benchmark-final/command-5.stdout",
+      "stdoutSha256": "745a271be6902603b15ccfd9e3ed17de7da1ba10995def4fd22823694db489bd",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang",
+        "-isysroot",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.2.sdk",
+        "-arch",
+        "arm64",
+        "-std=c11",
+        "-O2",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-DNEOCLR_NATIVE_GC",
+        "-DNEOCLR_NATIVE_BYTE_ARRAY_LIMIT=65536",
+        "-I",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console",
+        "/Users/robert/Projects/neoclr/docs/experiments/runtime-async/native-benchmark-host.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/root-probe.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-gc.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/text-arena.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/console.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-stack.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-scalar/console.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-fault-details/render.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/task-queue.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/socket-listener.c",
+        "/Users/robert/Projects/neoclr/tools/native/entry-arguments.c",
+        "-o",
+        "/Users/robert/Projects/neoclr/target/runtime-modes-benchmark-final/completed-10-runtime",
+        "-DNEOCLR_RUNTIME_ASYNC",
+        "-I",
+        "/Users/robert/Projects/neoclr/docs/experiments/runtime-async",
+        "/Users/robert/Projects/neoclr/docs/experiments/runtime-async/native-runtime.c",
+        "-Wno-deprecated-declarations",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/string-unicode.c",
+        "/Users/robert/Projects/neoclr/tools/aot-native-text/target/text-only/aarch64-apple-darwin/release/libneoclr_aot_native_text.a",
+        "-DNEOCLR_BENCH_AOT",
+        "/Users/robert/Projects/neoclr/target/runtime-modes-benchmark-final/completed-10-runtime.o"
+      ],
+      "seconds": 0.7150788749999997,
+      "exitCode": 0,
+      "stdoutFile": "/Users/robert/Projects/neoclr/target/runtime-modes-benchmark-final/command-6.stdout",
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/scheduler-wait-validation/release/examples/runtime_async_interpreter",
+        "/Users/robert/Projects/neoclr/target/runtime-modes-benchmark-final/completed-10-state-machine.dll",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle",
+        "4"
+      ],
+      "seconds": 2.490877084000001,
+      "exitCode": 0,
+      "stdoutFile": "/Users/robert/Projects/neoclr/target/runtime-modes-benchmark-final/command-7.stdout",
+      "stdoutSha256": "f9df5e511e4ba8218a91e985b5ed09895c77c1ff5903f9cd53ebe1c21ddb8a00",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/scheduler-wait-validation/release/examples/runtime_async_interpreter",
+        "/Users/robert/Projects/neoclr/target/runtime-modes-benchmark-final/completed-10-runtime.dll",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle",
+        "4"
+      ],
+      "seconds": 2.4510148330000003,
+      "exitCode": 0,
+      "stdoutFile": "/Users/robert/Projects/neoclr/target/runtime-modes-benchmark-final/command-8.stdout",
+      "stdoutSha256": "ed8dc149bd7310af186b6acb8307eadc0ccc4c0aa6eafadc07a28d5dd1d00ef6",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/tools/aot-poc/target/release/neoclr-aot-poc",
+        "--jit-managed",
+        "--closed-world",
+        "/Users/robert/Projects/neoclr/target/runtime-modes-benchmark-final/completed-10-state-machine.dll",
+        "@entry",
+        "/Users/robert/Projects/neoclr/target/runtime-modes-benchmark-final/host.dylib",
+        "--system",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/System.runtime.neox",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/System.Runtime.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/System.Data.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/System.Networking.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/System.Web.dll",
+        "--object-root",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/System.Runtime.dll",
+        "--compile-system",
+        "--bind-user-fault",
+        "--reference-arena",
+        "--native-gc",
+        "--bind-console-read-byte",
+        "--bind-console-write-line",
+        "--bind-console-stream-output",
+        "--bind-int32-to-string",
+        "--bind-utf8-text",
+        "--native-stack-budget",
+        "--bind-integer-text",
+        "--bind-character-text",
+        "--bind-system-culture",
+        "--bind-time-zone-rules",
+        "--bind-task-queue",
+        "--bind-timers",
+        "--bind-socket-listener",
+        "--bind-socket-accept",
+        "--bind-socket-transfer",
+        "--bind-socket-client",
+        "--bind-scheduler",
+        "--bind-runtime-async"
+      ],
+      "seconds": 2.202837542000001,
+      "exitCode": 0,
+      "stdoutFile": "/Users/robert/Projects/neoclr/target/runtime-modes-benchmark-final/command-9.stdout",
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr": "NATIVE_SAMPLE {\"seconds\":0.001780000,\"allocatedBlocks\":324,\"reclaimedBlocks\":324,\"collections\":1439}\nNATIVE_SAMPLE {\"seconds\":0.001568000,\"allocatedBlocks\":324,\"reclaimedBlocks\":324,\"collections\":1439}\nNATIVE_SAMPLE {\"seconds\":0.001546000,\"allocatedBlocks\":324,\"reclaimedBlocks\":324,\"collections\":1439}\nNATIVE_SAMPLE {\"seconds\":0.001531000,\"allocatedBlocks\":324,\"reclaimedBlocks\":324,\"collections\":1439}\nJIT_RESULT {\"compileAndFinalizeSeconds\":0.938972542,\"guestExitCode\":0,\"invocationSeconds\":0.006471583,\"metadataLoadSeconds\":0.082670208,\"profile\":\"macos-arm64-jit-managed-v1\",\"selectionAndVerificationSeconds\":1.148432375}\n"
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/tools/aot-poc/target/release/neoclr-aot-poc",
+        "--jit-managed",
+        "--closed-world",
+        "/Users/robert/Projects/neoclr/target/runtime-modes-benchmark-final/completed-10-runtime.dll",
+        "@entry",
+        "/Users/robert/Projects/neoclr/target/runtime-modes-benchmark-final/host.dylib",
+        "--system",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/System.runtime.neox",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/System.Runtime.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/System.Data.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/System.Networking.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/System.Web.dll",
+        "--object-root",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/System.Runtime.dll",
+        "--compile-system",
+        "--bind-user-fault",
+        "--reference-arena",
+        "--native-gc",
+        "--bind-console-read-byte",
+        "--bind-console-write-line",
+        "--bind-console-stream-output",
+        "--bind-int32-to-string",
+        "--bind-utf8-text",
+        "--native-stack-budget",
+        "--bind-integer-text",
+        "--bind-character-text",
+        "--bind-system-culture",
+        "--bind-time-zone-rules",
+        "--bind-task-queue",
+        "--bind-timers",
+        "--bind-socket-listener",
+        "--bind-socket-accept",
+        "--bind-socket-transfer",
+        "--bind-socket-client",
+        "--bind-scheduler",
+        "--bind-runtime-async"
+      ],
+      "seconds": 1.390359833999998,
+      "exitCode": 0,
+      "stdoutFile": "/Users/robert/Projects/neoclr/target/runtime-modes-benchmark-final/command-10.stdout",
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr": "NATIVE_SAMPLE {\"seconds\":0.004390000,\"allocatedBlocks\":428,\"reclaimedBlocks\":428,\"collections\":1657}\nNATIVE_SAMPLE {\"seconds\":0.004751000,\"allocatedBlocks\":428,\"reclaimedBlocks\":428,\"collections\":1657}\nNATIVE_SAMPLE {\"seconds\":0.007220000,\"allocatedBlocks\":428,\"reclaimedBlocks\":428,\"collections\":1657}\nNATIVE_SAMPLE {\"seconds\":0.005319000,\"allocatedBlocks\":428,\"reclaimedBlocks\":428,\"collections\":1657}\nJIT_RESULT {\"compileAndFinalizeSeconds\":0.091753875,\"guestExitCode\":0,\"invocationSeconds\":0.021739917,\"metadataLoadSeconds\":0.080921959,\"profile\":\"macos-arm64-jit-managed-v1\",\"selectionAndVerificationSeconds\":1.165725041}\n"
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/runtime-modes-benchmark-final/completed-10-state-machine"
+      ],
+      "seconds": 0.12911387499999805,
+      "exitCode": 0,
+      "stdoutFile": "/Users/robert/Projects/neoclr/target/runtime-modes-benchmark-final/command-11.stdout",
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr": "NATIVE_SAMPLE {\"seconds\":0.001821000,\"allocatedBlocks\":324,\"reclaimedBlocks\":324,\"collections\":1439}\nNATIVE_SAMPLE {\"seconds\":0.001605000,\"allocatedBlocks\":324,\"reclaimedBlocks\":324,\"collections\":1439}\nNATIVE_SAMPLE {\"seconds\":0.001486000,\"allocatedBlocks\":324,\"reclaimedBlocks\":324,\"collections\":1439}\nNATIVE_SAMPLE {\"seconds\":0.001451000,\"allocatedBlocks\":324,\"reclaimedBlocks\":324,\"collections\":1439}\n"
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/runtime-modes-benchmark-final/completed-10-runtime"
+      ],
+      "seconds": 0.04798170899999832,
+      "exitCode": 0,
+      "stdoutFile": "/Users/robert/Projects/neoclr/target/runtime-modes-benchmark-final/command-12.stdout",
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr": "NATIVE_SAMPLE {\"seconds\":0.003671000,\"allocatedBlocks\":428,\"reclaimedBlocks\":428,\"collections\":1657}\nNATIVE_SAMPLE {\"seconds\":0.003196000,\"allocatedBlocks\":428,\"reclaimedBlocks\":428,\"collections\":1657}\nNATIVE_SAMPLE {\"seconds\":0.003259000,\"allocatedBlocks\":428,\"reclaimedBlocks\":428,\"collections\":1657}\nNATIVE_SAMPLE {\"seconds\":0.004269000,\"allocatedBlocks\":428,\"reclaimedBlocks\":428,\"collections\":1657}\n"
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/runtime-modes-benchmark-final/completed-10-runtime"
+      ],
+      "seconds": 0.018320458000001594,
+      "exitCode": 0,
+      "stdoutFile": "/Users/robert/Projects/neoclr/target/runtime-modes-benchmark-final/command-13.stdout",
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr": "NATIVE_SAMPLE {\"seconds\":0.003809000,\"allocatedBlocks\":428,\"reclaimedBlocks\":428,\"collections\":1657}\nNATIVE_SAMPLE {\"seconds\":0.003308000,\"allocatedBlocks\":428,\"reclaimedBlocks\":428,\"collections\":1657}\nNATIVE_SAMPLE {\"seconds\":0.003394000,\"allocatedBlocks\":428,\"reclaimedBlocks\":428,\"collections\":1657}\nNATIVE_SAMPLE {\"seconds\":0.003606000,\"allocatedBlocks\":428,\"reclaimedBlocks\":428,\"collections\":1657}\n"
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/runtime-modes-benchmark-final/completed-10-state-machine"
+      ],
+      "seconds": 0.011653417000001554,
+      "exitCode": 0,
+      "stdoutFile": "/Users/robert/Projects/neoclr/target/runtime-modes-benchmark-final/command-14.stdout",
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr": "NATIVE_SAMPLE {\"seconds\":0.001638000,\"allocatedBlocks\":324,\"reclaimedBlocks\":324,\"collections\":1439}\nNATIVE_SAMPLE {\"seconds\":0.001548000,\"allocatedBlocks\":324,\"reclaimedBlocks\":324,\"collections\":1439}\nNATIVE_SAMPLE {\"seconds\":0.001673000,\"allocatedBlocks\":324,\"reclaimedBlocks\":324,\"collections\":1439}\nNATIVE_SAMPLE {\"seconds\":0.001771000,\"allocatedBlocks\":324,\"reclaimedBlocks\":324,\"collections\":1439}\n"
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/tools/aot-poc/target/release/neoclr-aot-poc",
+        "--jit-managed",
+        "--closed-world",
+        "/Users/robert/Projects/neoclr/target/runtime-modes-benchmark-final/completed-10-runtime.dll",
+        "@entry",
+        "/Users/robert/Projects/neoclr/target/runtime-modes-benchmark-final/host.dylib",
+        "--system",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/System.runtime.neox",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/System.Runtime.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/System.Data.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/System.Networking.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/System.Web.dll",
+        "--object-root",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/System.Runtime.dll",
+        "--compile-system",
+        "--bind-user-fault",
+        "--reference-arena",
+        "--native-gc",
+        "--bind-console-read-byte",
+        "--bind-console-write-line",
+        "--bind-console-stream-output",
+        "--bind-int32-to-string",
+        "--bind-utf8-text",
+        "--native-stack-budget",
+        "--bind-integer-text",
+        "--bind-character-text",
+        "--bind-system-culture",
+        "--bind-time-zone-rules",
+        "--bind-task-queue",
+        "--bind-timers",
+        "--bind-socket-listener",
+        "--bind-socket-accept",
+        "--bind-socket-transfer",
+        "--bind-socket-client",
+        "--bind-scheduler",
+        "--bind-runtime-async"
+      ],
+      "seconds": 1.3349684589999988,
+      "exitCode": 0,
+      "stdoutFile": "/Users/robert/Projects/neoclr/target/runtime-modes-benchmark-final/command-15.stdout",
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr": "NATIVE_SAMPLE {\"seconds\":0.003689000,\"allocatedBlocks\":428,\"reclaimedBlocks\":428,\"collections\":1657}\nNATIVE_SAMPLE {\"seconds\":0.003658000,\"allocatedBlocks\":428,\"reclaimedBlocks\":428,\"collections\":1657}\nNATIVE_SAMPLE {\"seconds\":0.003464000,\"allocatedBlocks\":428,\"reclaimedBlocks\":428,\"collections\":1657}\nNATIVE_SAMPLE {\"seconds\":0.003365000,\"allocatedBlocks\":428,\"reclaimedBlocks\":428,\"collections\":1657}\nJIT_RESULT {\"compileAndFinalizeSeconds\":0.092949417,\"guestExitCode\":0,\"invocationSeconds\":0.014214417,\"metadataLoadSeconds\":0.083097459,\"profile\":\"macos-arm64-jit-managed-v1\",\"selectionAndVerificationSeconds\":1.1245955}\n"
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/tools/aot-poc/target/release/neoclr-aot-poc",
+        "--jit-managed",
+        "--closed-world",
+        "/Users/robert/Projects/neoclr/target/runtime-modes-benchmark-final/completed-10-state-machine.dll",
+        "@entry",
+        "/Users/robert/Projects/neoclr/target/runtime-modes-benchmark-final/host.dylib",
+        "--system",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/System.runtime.neox",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/System.Runtime.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/System.Data.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/System.Networking.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/System.Web.dll",
+        "--object-root",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/System.Runtime.dll",
+        "--compile-system",
+        "--bind-user-fault",
+        "--reference-arena",
+        "--native-gc",
+        "--bind-console-read-byte",
+        "--bind-console-write-line",
+        "--bind-console-stream-output",
+        "--bind-int32-to-string",
+        "--bind-utf8-text",
+        "--native-stack-budget",
+        "--bind-integer-text",
+        "--bind-character-text",
+        "--bind-system-culture",
+        "--bind-time-zone-rules",
+        "--bind-task-queue",
+        "--bind-timers",
+        "--bind-socket-listener",
+        "--bind-socket-accept",
+        "--bind-socket-transfer",
+        "--bind-socket-client",
+        "--bind-scheduler",
+        "--bind-runtime-async"
+      ],
+      "seconds": 1.391775292000002,
+      "exitCode": 0,
+      "stdoutFile": "/Users/robert/Projects/neoclr/target/runtime-modes-benchmark-final/command-16.stdout",
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr": "NATIVE_SAMPLE {\"seconds\":0.001690000,\"allocatedBlocks\":324,\"reclaimedBlocks\":324,\"collections\":1439}\nNATIVE_SAMPLE {\"seconds\":0.001548000,\"allocatedBlocks\":324,\"reclaimedBlocks\":324,\"collections\":1439}\nNATIVE_SAMPLE {\"seconds\":0.001563000,\"allocatedBlocks\":324,\"reclaimedBlocks\":324,\"collections\":1439}\nNATIVE_SAMPLE {\"seconds\":0.001585000,\"allocatedBlocks\":324,\"reclaimedBlocks\":324,\"collections\":1439}\nJIT_RESULT {\"compileAndFinalizeSeconds\":0.099916084,\"guestExitCode\":0,\"invocationSeconds\":0.006419667,\"metadataLoadSeconds\":0.082971417,\"profile\":\"macos-arm64-jit-managed-v1\",\"selectionAndVerificationSeconds\":1.183202333}\n"
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/scheduler-wait-validation/release/examples/runtime_async_interpreter",
+        "/Users/robert/Projects/neoclr/target/runtime-modes-benchmark-final/completed-10-runtime.dll",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle",
+        "4"
+      ],
+      "seconds": 2.425461249999998,
+      "exitCode": 0,
+      "stdoutFile": "/Users/robert/Projects/neoclr/target/runtime-modes-benchmark-final/command-17.stdout",
+      "stdoutSha256": "4ef93b5987a15fdaf508d852fb26a6b4ae41e3e3ba5598fa8469333248027a51",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/scheduler-wait-validation/release/examples/runtime_async_interpreter",
+        "/Users/robert/Projects/neoclr/target/runtime-modes-benchmark-final/completed-10-state-machine.dll",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle",
+        "4"
+      ],
+      "seconds": 2.4950708329999998,
+      "exitCode": 0,
+      "stdoutFile": "/Users/robert/Projects/neoclr/target/runtime-modes-benchmark-final/command-18.stdout",
+      "stdoutSha256": "685c3713efa45f57de451740d0cb04e952b7ec1a8ee220c0e99c243be5b91779",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "dotnet",
+        "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+        "neoclr",
+        "--core-reference",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/Core.dll",
+        "--runtime-seed",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/System.runtime.neox",
+        "--bootstrap-intrinsics",
+        "--bootstrap-ownership",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/ownership.json",
+        "--object-library",
+        "System.Runtime",
+        "--async-library",
+        "System.Runtime",
+        "--reference",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/System.Runtime.dll",
+        "--reference",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/System.Data.dll",
+        "--reference",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/System.Networking.dll",
+        "--reference",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/System.Web.dll",
+        "-o",
+        "/Users/robert/Projects/neoclr/target/runtime-modes-benchmark-final/completed-100-state-machine.dll",
+        "/Users/robert/Projects/neoclr/target/runtime-modes-benchmark-final/completed-100.rvn",
+        "/Users/robert/Projects/neoclr/docs/experiments/runtime-async/RuntimeAsyncBridge.rvn"
+      ],
+      "seconds": 3.3390898750000026,
+      "exitCode": 0,
+      "stdoutFile": "/Users/robert/Projects/neoclr/target/runtime-modes-benchmark-final/command-19.stdout",
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/tools/aot-poc/target/release/neoclr-aot-poc",
+        "--closed-world",
+        "/Users/robert/Projects/neoclr/target/runtime-modes-benchmark-final/completed-100-state-machine.dll",
+        "@entry",
+        "/Users/robert/Projects/neoclr/target/runtime-modes-benchmark-final/completed-100-state-machine.o",
+        "--system",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/System.runtime.neox",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/System.Runtime.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/System.Data.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/System.Networking.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/System.Web.dll",
+        "--object-root",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/System.Runtime.dll",
+        "--compile-system",
+        "--bind-user-fault",
+        "--reference-arena",
+        "--native-gc",
+        "--bind-console-read-byte",
+        "--bind-console-write-line",
+        "--bind-console-stream-output",
+        "--bind-int32-to-string",
+        "--bind-utf8-text",
+        "--native-stack-budget",
+        "--bind-integer-text",
+        "--bind-character-text",
+        "--bind-system-culture",
+        "--bind-time-zone-rules",
+        "--bind-task-queue",
+        "--bind-timers",
+        "--bind-socket-listener",
+        "--bind-socket-accept",
+        "--bind-socket-transfer",
+        "--bind-socket-client",
+        "--bind-scheduler",
+        "--bind-runtime-async"
+      ],
+      "seconds": 1.4229445419999962,
+      "exitCode": 0,
+      "stdoutFile": "/Users/robert/Projects/neoclr/target/runtime-modes-benchmark-final/command-20.stdout",
+      "stdoutSha256": "36c6de1c41139260756a6af8dd431c9a44648c61722d98552cb6ed63d8cf990a",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang",
+        "-isysroot",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.2.sdk",
+        "-arch",
+        "arm64",
+        "-std=c11",
+        "-O2",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-DNEOCLR_NATIVE_GC",
+        "-DNEOCLR_NATIVE_BYTE_ARRAY_LIMIT=65536",
+        "-I",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console",
+        "/Users/robert/Projects/neoclr/docs/experiments/runtime-async/native-benchmark-host.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/root-probe.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-gc.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/text-arena.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/console.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-stack.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-scalar/console.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-fault-details/render.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/task-queue.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/socket-listener.c",
+        "/Users/robert/Projects/neoclr/tools/native/entry-arguments.c",
+        "-o",
+        "/Users/robert/Projects/neoclr/target/runtime-modes-benchmark-final/completed-100-state-machine",
+        "-DNEOCLR_RUNTIME_ASYNC",
+        "-I",
+        "/Users/robert/Projects/neoclr/docs/experiments/runtime-async",
+        "/Users/robert/Projects/neoclr/docs/experiments/runtime-async/native-runtime.c",
+        "-Wno-deprecated-declarations",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/string-unicode.c",
+        "/Users/robert/Projects/neoclr/tools/aot-native-text/target/text-only/aarch64-apple-darwin/release/libneoclr_aot_native_text.a",
+        "-DNEOCLR_BENCH_AOT",
+        "/Users/robert/Projects/neoclr/target/runtime-modes-benchmark-final/completed-100-state-machine.o"
+      ],
+      "seconds": 0.7386617079999951,
+      "exitCode": 0,
+      "stdoutFile": "/Users/robert/Projects/neoclr/target/runtime-modes-benchmark-final/command-21.stdout",
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "dotnet",
+        "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+        "neoclr",
+        "--core-reference",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/Core.dll",
+        "--runtime-seed",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/System.runtime.neox",
+        "--bootstrap-intrinsics",
+        "--bootstrap-ownership",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/ownership.json",
+        "--object-library",
+        "System.Runtime",
+        "--async-library",
+        "System.Runtime",
+        "--runtime-async-poc",
+        "RuntimeAwaitProvider.Bridge",
+        "--reference",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/System.Runtime.dll",
+        "--reference",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/System.Data.dll",
+        "--reference",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/System.Networking.dll",
+        "--reference",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/System.Web.dll",
+        "-o",
+        "/Users/robert/Projects/neoclr/target/runtime-modes-benchmark-final/completed-100-runtime.dll",
+        "/Users/robert/Projects/neoclr/target/runtime-modes-benchmark-final/completed-100.rvn",
+        "/Users/robert/Projects/neoclr/docs/experiments/runtime-async/RuntimeAsyncBridge.rvn"
+      ],
+      "seconds": 3.1869515829999955,
+      "exitCode": 0,
+      "stdoutFile": "/Users/robert/Projects/neoclr/target/runtime-modes-benchmark-final/command-22.stdout",
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/tools/aot-poc/target/release/neoclr-aot-poc",
+        "--closed-world",
+        "/Users/robert/Projects/neoclr/target/runtime-modes-benchmark-final/completed-100-runtime.dll",
+        "@entry",
+        "/Users/robert/Projects/neoclr/target/runtime-modes-benchmark-final/completed-100-runtime.o",
+        "--system",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/System.runtime.neox",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/System.Runtime.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/System.Data.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/System.Networking.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/System.Web.dll",
+        "--object-root",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/System.Runtime.dll",
+        "--compile-system",
+        "--bind-user-fault",
+        "--reference-arena",
+        "--native-gc",
+        "--bind-console-read-byte",
+        "--bind-console-write-line",
+        "--bind-console-stream-output",
+        "--bind-int32-to-string",
+        "--bind-utf8-text",
+        "--native-stack-budget",
+        "--bind-integer-text",
+        "--bind-character-text",
+        "--bind-system-culture",
+        "--bind-time-zone-rules",
+        "--bind-task-queue",
+        "--bind-timers",
+        "--bind-socket-listener",
+        "--bind-socket-accept",
+        "--bind-socket-transfer",
+        "--bind-socket-client",
+        "--bind-scheduler",
+        "--bind-runtime-async"
+      ],
+      "seconds": 1.3516044590000007,
+      "exitCode": 0,
+      "stdoutFile": "/Users/robert/Projects/neoclr/target/runtime-modes-benchmark-final/command-23.stdout",
+      "stdoutSha256": "9744ebc202aaf0a22429ad3adcbbc75c581387e8223337a6b6e1407ac7baf00c",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang",
+        "-isysroot",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.2.sdk",
+        "-arch",
+        "arm64",
+        "-std=c11",
+        "-O2",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-DNEOCLR_NATIVE_GC",
+        "-DNEOCLR_NATIVE_BYTE_ARRAY_LIMIT=65536",
+        "-I",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console",
+        "/Users/robert/Projects/neoclr/docs/experiments/runtime-async/native-benchmark-host.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/root-probe.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-gc.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/text-arena.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/console.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-stack.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-scalar/console.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-fault-details/render.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/task-queue.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/socket-listener.c",
+        "/Users/robert/Projects/neoclr/tools/native/entry-arguments.c",
+        "-o",
+        "/Users/robert/Projects/neoclr/target/runtime-modes-benchmark-final/completed-100-runtime",
+        "-DNEOCLR_RUNTIME_ASYNC",
+        "-I",
+        "/Users/robert/Projects/neoclr/docs/experiments/runtime-async",
+        "/Users/robert/Projects/neoclr/docs/experiments/runtime-async/native-runtime.c",
+        "-Wno-deprecated-declarations",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/string-unicode.c",
+        "/Users/robert/Projects/neoclr/tools/aot-native-text/target/text-only/aarch64-apple-darwin/release/libneoclr_aot_native_text.a",
+        "-DNEOCLR_BENCH_AOT",
+        "/Users/robert/Projects/neoclr/target/runtime-modes-benchmark-final/completed-100-runtime.o"
+      ],
+      "seconds": 0.7074211250000033,
+      "exitCode": 0,
+      "stdoutFile": "/Users/robert/Projects/neoclr/target/runtime-modes-benchmark-final/command-24.stdout",
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/scheduler-wait-validation/release/examples/runtime_async_interpreter",
+        "/Users/robert/Projects/neoclr/target/runtime-modes-benchmark-final/completed-100-state-machine.dll",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle",
+        "4"
+      ],
+      "seconds": 6.696995958000002,
+      "exitCode": 0,
+      "stdoutFile": "/Users/robert/Projects/neoclr/target/runtime-modes-benchmark-final/command-25.stdout",
+      "stdoutSha256": "c58e9985ce79c77347dbf7b68d1e5d7135b0cca568063cbd98d0c3c6221463d0",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/scheduler-wait-validation/release/examples/runtime_async_interpreter",
+        "/Users/robert/Projects/neoclr/target/runtime-modes-benchmark-final/completed-100-runtime.dll",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle",
+        "4"
+      ],
+      "seconds": 5.910947,
+      "exitCode": 0,
+      "stdoutFile": "/Users/robert/Projects/neoclr/target/runtime-modes-benchmark-final/command-26.stdout",
+      "stdoutSha256": "ac4963e46e794cfc096b8fe3b4aa630c4e9ae9d2e616562d229e986cedab4c78",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/tools/aot-poc/target/release/neoclr-aot-poc",
+        "--jit-managed",
+        "--closed-world",
+        "/Users/robert/Projects/neoclr/target/runtime-modes-benchmark-final/completed-100-state-machine.dll",
+        "@entry",
+        "/Users/robert/Projects/neoclr/target/runtime-modes-benchmark-final/host.dylib",
+        "--system",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/System.runtime.neox",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/System.Runtime.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/System.Data.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/System.Networking.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/System.Web.dll",
+        "--object-root",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/System.Runtime.dll",
+        "--compile-system",
+        "--bind-user-fault",
+        "--reference-arena",
+        "--native-gc",
+        "--bind-console-read-byte",
+        "--bind-console-write-line",
+        "--bind-console-stream-output",
+        "--bind-int32-to-string",
+        "--bind-utf8-text",
+        "--native-stack-budget",
+        "--bind-integer-text",
+        "--bind-character-text",
+        "--bind-system-culture",
+        "--bind-time-zone-rules",
+        "--bind-task-queue",
+        "--bind-timers",
+        "--bind-socket-listener",
+        "--bind-socket-accept",
+        "--bind-socket-transfer",
+        "--bind-socket-client",
+        "--bind-scheduler",
+        "--bind-runtime-async"
+      ],
+      "seconds": 1.4919754579999989,
+      "exitCode": 0,
+      "stdoutFile": "/Users/robert/Projects/neoclr/target/runtime-modes-benchmark-final/command-27.stdout",
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr": "NATIVE_SAMPLE {\"seconds\":0.016887000,\"allocatedBlocks\":3114,\"reclaimedBlocks\":3114,\"collections\":13859}\nNATIVE_SAMPLE {\"seconds\":0.016770000,\"allocatedBlocks\":3114,\"reclaimedBlocks\":3114,\"collections\":13859}\nNATIVE_SAMPLE {\"seconds\":0.015603000,\"allocatedBlocks\":3114,\"reclaimedBlocks\":3114,\"collections\":13859}\nNATIVE_SAMPLE {\"seconds\":0.015296000,\"allocatedBlocks\":3114,\"reclaimedBlocks\":3114,\"collections\":13859}\nJIT_RESULT {\"compileAndFinalizeSeconds\":0.115068583,\"guestExitCode\":0,\"invocationSeconds\":0.064851375,\"metadataLoadSeconds\":0.089016959,\"profile\":\"macos-arm64-jit-managed-v1\",\"selectionAndVerificationSeconds\":1.19161025}\n"
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/tools/aot-poc/target/release/neoclr-aot-poc",
+        "--jit-managed",
+        "--closed-world",
+        "/Users/robert/Projects/neoclr/target/runtime-modes-benchmark-final/completed-100-runtime.dll",
+        "@entry",
+        "/Users/robert/Projects/neoclr/target/runtime-modes-benchmark-final/host.dylib",
+        "--system",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/System.runtime.neox",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/System.Runtime.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/System.Data.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/System.Networking.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/System.Web.dll",
+        "--object-root",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/System.Runtime.dll",
+        "--compile-system",
+        "--bind-user-fault",
+        "--reference-arena",
+        "--native-gc",
+        "--bind-console-read-byte",
+        "--bind-console-write-line",
+        "--bind-console-stream-output",
+        "--bind-int32-to-string",
+        "--bind-utf8-text",
+        "--native-stack-budget",
+        "--bind-integer-text",
+        "--bind-character-text",
+        "--bind-system-culture",
+        "--bind-time-zone-rules",
+        "--bind-task-queue",
+        "--bind-timers",
+        "--bind-socket-listener",
+        "--bind-socket-accept",
+        "--bind-socket-transfer",
+        "--bind-socket-client",
+        "--bind-scheduler",
+        "--bind-runtime-async"
+      ],
+      "seconds": 1.6179581250000012,
+      "exitCode": 0,
+      "stdoutFile": "/Users/robert/Projects/neoclr/target/runtime-modes-benchmark-final/command-28.stdout",
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr": "NATIVE_SAMPLE {\"seconds\":0.035174000,\"allocatedBlocks\":4118,\"reclaimedBlocks\":4118,\"collections\":15967}\nNATIVE_SAMPLE {\"seconds\":0.041515000,\"allocatedBlocks\":4118,\"reclaimedBlocks\":4118,\"collections\":15967}\nNATIVE_SAMPLE {\"seconds\":0.044121000,\"allocatedBlocks\":4118,\"reclaimedBlocks\":4118,\"collections\":15967}\nNATIVE_SAMPLE {\"seconds\":0.036014000,\"allocatedBlocks\":4118,\"reclaimedBlocks\":4118,\"collections\":15967}\nJIT_RESULT {\"compileAndFinalizeSeconds\":0.104397333,\"guestExitCode\":0,\"invocationSeconds\":0.156927916,\"metadataLoadSeconds\":0.082826,\"profile\":\"macos-arm64-jit-managed-v1\",\"selectionAndVerificationSeconds\":1.238441167}\n"
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/runtime-modes-benchmark-final/completed-100-state-machine"
+      ],
+      "seconds": 0.7455324999999959,
+      "exitCode": 0,
+      "stdoutFile": "/Users/robert/Projects/neoclr/target/runtime-modes-benchmark-final/command-29.stdout",
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr": "NATIVE_SAMPLE {\"seconds\":0.016987000,\"allocatedBlocks\":3114,\"reclaimedBlocks\":3114,\"collections\":13859}\nNATIVE_SAMPLE {\"seconds\":0.016447000,\"allocatedBlocks\":3114,\"reclaimedBlocks\":3114,\"collections\":13859}\nNATIVE_SAMPLE {\"seconds\":0.014256000,\"allocatedBlocks\":3114,\"reclaimedBlocks\":3114,\"collections\":13859}\nNATIVE_SAMPLE {\"seconds\":0.014369000,\"allocatedBlocks\":3114,\"reclaimedBlocks\":3114,\"collections\":13859}\n"
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/runtime-modes-benchmark-final/completed-100-runtime"
+      ],
+      "seconds": 0.4944612919999969,
+      "exitCode": 0,
+      "stdoutFile": "/Users/robert/Projects/neoclr/target/runtime-modes-benchmark-final/command-30.stdout",
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr": "NATIVE_SAMPLE {\"seconds\":0.032040000,\"allocatedBlocks\":4118,\"reclaimedBlocks\":4118,\"collections\":15967}\nNATIVE_SAMPLE {\"seconds\":0.031969000,\"allocatedBlocks\":4118,\"reclaimedBlocks\":4118,\"collections\":15967}\nNATIVE_SAMPLE {\"seconds\":0.031474000,\"allocatedBlocks\":4118,\"reclaimedBlocks\":4118,\"collections\":15967}\nNATIVE_SAMPLE {\"seconds\":0.032527000,\"allocatedBlocks\":4118,\"reclaimedBlocks\":4118,\"collections\":15967}\n"
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/runtime-modes-benchmark-final/completed-100-runtime"
+      ],
+      "seconds": 0.13737150000000042,
+      "exitCode": 0,
+      "stdoutFile": "/Users/robert/Projects/neoclr/target/runtime-modes-benchmark-final/command-31.stdout",
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr": "NATIVE_SAMPLE {\"seconds\":0.031803000,\"allocatedBlocks\":4118,\"reclaimedBlocks\":4118,\"collections\":15967}\nNATIVE_SAMPLE {\"seconds\":0.034438000,\"allocatedBlocks\":4118,\"reclaimedBlocks\":4118,\"collections\":15967}\nNATIVE_SAMPLE {\"seconds\":0.031990000,\"allocatedBlocks\":4118,\"reclaimedBlocks\":4118,\"collections\":15967}\nNATIVE_SAMPLE {\"seconds\":0.035165000,\"allocatedBlocks\":4118,\"reclaimedBlocks\":4118,\"collections\":15967}\n"
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/runtime-modes-benchmark-final/completed-100-state-machine"
+      ],
+      "seconds": 0.061104667000002166,
+      "exitCode": 0,
+      "stdoutFile": "/Users/robert/Projects/neoclr/target/runtime-modes-benchmark-final/command-32.stdout",
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr": "NATIVE_SAMPLE {\"seconds\":0.014156000,\"allocatedBlocks\":3114,\"reclaimedBlocks\":3114,\"collections\":13859}\nNATIVE_SAMPLE {\"seconds\":0.014324000,\"allocatedBlocks\":3114,\"reclaimedBlocks\":3114,\"collections\":13859}\nNATIVE_SAMPLE {\"seconds\":0.014651000,\"allocatedBlocks\":3114,\"reclaimedBlocks\":3114,\"collections\":13859}\nNATIVE_SAMPLE {\"seconds\":0.013999000,\"allocatedBlocks\":3114,\"reclaimedBlocks\":3114,\"collections\":13859}\n"
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/tools/aot-poc/target/release/neoclr-aot-poc",
+        "--jit-managed",
+        "--closed-world",
+        "/Users/robert/Projects/neoclr/target/runtime-modes-benchmark-final/completed-100-runtime.dll",
+        "@entry",
+        "/Users/robert/Projects/neoclr/target/runtime-modes-benchmark-final/host.dylib",
+        "--system",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/System.runtime.neox",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/System.Runtime.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/System.Data.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/System.Networking.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/System.Web.dll",
+        "--object-root",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/System.Runtime.dll",
+        "--compile-system",
+        "--bind-user-fault",
+        "--reference-arena",
+        "--native-gc",
+        "--bind-console-read-byte",
+        "--bind-console-write-line",
+        "--bind-console-stream-output",
+        "--bind-int32-to-string",
+        "--bind-utf8-text",
+        "--native-stack-budget",
+        "--bind-integer-text",
+        "--bind-character-text",
+        "--bind-system-culture",
+        "--bind-time-zone-rules",
+        "--bind-task-queue",
+        "--bind-timers",
+        "--bind-socket-listener",
+        "--bind-socket-accept",
+        "--bind-socket-transfer",
+        "--bind-socket-client",
+        "--bind-scheduler",
+        "--bind-runtime-async"
+      ],
+      "seconds": 1.497648875000003,
+      "exitCode": 0,
+      "stdoutFile": "/Users/robert/Projects/neoclr/target/runtime-modes-benchmark-final/command-33.stdout",
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr": "NATIVE_SAMPLE {\"seconds\":0.032697000,\"allocatedBlocks\":4118,\"reclaimedBlocks\":4118,\"collections\":15967}\nNATIVE_SAMPLE {\"seconds\":0.034380000,\"allocatedBlocks\":4118,\"reclaimedBlocks\":4118,\"collections\":15967}\nNATIVE_SAMPLE {\"seconds\":0.034954000,\"allocatedBlocks\":4118,\"reclaimedBlocks\":4118,\"collections\":15967}\nNATIVE_SAMPLE {\"seconds\":0.031842000,\"allocatedBlocks\":4118,\"reclaimedBlocks\":4118,\"collections\":15967}\nJIT_RESULT {\"compileAndFinalizeSeconds\":0.092625084,\"guestExitCode\":0,\"invocationSeconds\":0.133955417,\"metadataLoadSeconds\":0.081956833,\"profile\":\"macos-arm64-jit-managed-v1\",\"selectionAndVerificationSeconds\":1.1602739579999999}\n"
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/tools/aot-poc/target/release/neoclr-aot-poc",
+        "--jit-managed",
+        "--closed-world",
+        "/Users/robert/Projects/neoclr/target/runtime-modes-benchmark-final/completed-100-state-machine.dll",
+        "@entry",
+        "/Users/robert/Projects/neoclr/target/runtime-modes-benchmark-final/host.dylib",
+        "--system",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/System.runtime.neox",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/System.Runtime.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/System.Data.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/System.Networking.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/System.Web.dll",
+        "--object-root",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/System.Runtime.dll",
+        "--compile-system",
+        "--bind-user-fault",
+        "--reference-arena",
+        "--native-gc",
+        "--bind-console-read-byte",
+        "--bind-console-write-line",
+        "--bind-console-stream-output",
+        "--bind-int32-to-string",
+        "--bind-utf8-text",
+        "--native-stack-budget",
+        "--bind-integer-text",
+        "--bind-character-text",
+        "--bind-system-culture",
+        "--bind-time-zone-rules",
+        "--bind-task-queue",
+        "--bind-timers",
+        "--bind-socket-listener",
+        "--bind-socket-accept",
+        "--bind-socket-transfer",
+        "--bind-socket-client",
+        "--bind-scheduler",
+        "--bind-runtime-async"
+      ],
+      "seconds": 1.419219333000001,
+      "exitCode": 0,
+      "stdoutFile": "/Users/robert/Projects/neoclr/target/runtime-modes-benchmark-final/command-34.stdout",
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr": "NATIVE_SAMPLE {\"seconds\":0.016171000,\"allocatedBlocks\":3114,\"reclaimedBlocks\":3114,\"collections\":13859}\nNATIVE_SAMPLE {\"seconds\":0.015201000,\"allocatedBlocks\":3114,\"reclaimedBlocks\":3114,\"collections\":13859}\nNATIVE_SAMPLE {\"seconds\":0.014824000,\"allocatedBlocks\":3114,\"reclaimedBlocks\":3114,\"collections\":13859}\nNATIVE_SAMPLE {\"seconds\":0.014748000,\"allocatedBlocks\":3114,\"reclaimedBlocks\":3114,\"collections\":13859}\nJIT_RESULT {\"compileAndFinalizeSeconds\":0.100552875,\"guestExitCode\":0,\"invocationSeconds\":0.061001667,\"metadataLoadSeconds\":0.085917959,\"profile\":\"macos-arm64-jit-managed-v1\",\"selectionAndVerificationSeconds\":1.150918458}\n"
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/scheduler-wait-validation/release/examples/runtime_async_interpreter",
+        "/Users/robert/Projects/neoclr/target/runtime-modes-benchmark-final/completed-100-runtime.dll",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle",
+        "4"
+      ],
+      "seconds": 5.9845563330000076,
+      "exitCode": 0,
+      "stdoutFile": "/Users/robert/Projects/neoclr/target/runtime-modes-benchmark-final/command-35.stdout",
+      "stdoutSha256": "e64905b506c79f6ab0fb57ff0e3da3ebed2e5b612db7491a56ad6acb18a69fe0",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/scheduler-wait-validation/release/examples/runtime_async_interpreter",
+        "/Users/robert/Projects/neoclr/target/runtime-modes-benchmark-final/completed-100-state-machine.dll",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle",
+        "4"
+      ],
+      "seconds": 6.724258582999994,
+      "exitCode": 0,
+      "stdoutFile": "/Users/robert/Projects/neoclr/target/runtime-modes-benchmark-final/command-36.stdout",
+      "stdoutSha256": "37964750d5e4123335e9c2f172dcc3ecfa721778ba1aa92a0209c89a45465520",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "dotnet",
+        "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+        "neoclr",
+        "--core-reference",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/Core.dll",
+        "--runtime-seed",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/System.runtime.neox",
+        "--bootstrap-intrinsics",
+        "--bootstrap-ownership",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/ownership.json",
+        "--object-library",
+        "System.Runtime",
+        "--async-library",
+        "System.Runtime",
+        "--reference",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/System.Runtime.dll",
+        "--reference",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/System.Data.dll",
+        "--reference",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/System.Networking.dll",
+        "--reference",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/System.Web.dll",
+        "-o",
+        "/Users/robert/Projects/neoclr/target/runtime-modes-benchmark-final/pending-10-state-machine.dll",
+        "/Users/robert/Projects/neoclr/target/runtime-modes-benchmark-final/pending-10.rvn",
+        "/Users/robert/Projects/neoclr/docs/experiments/runtime-async/RuntimeAsyncBridge.rvn"
+      ],
+      "seconds": 3.1687789169999974,
+      "exitCode": 0,
+      "stdoutFile": "/Users/robert/Projects/neoclr/target/runtime-modes-benchmark-final/command-37.stdout",
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/tools/aot-poc/target/release/neoclr-aot-poc",
+        "--closed-world",
+        "/Users/robert/Projects/neoclr/target/runtime-modes-benchmark-final/pending-10-state-machine.dll",
+        "@entry",
+        "/Users/robert/Projects/neoclr/target/runtime-modes-benchmark-final/pending-10-state-machine.o",
+        "--system",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/System.runtime.neox",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/System.Runtime.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/System.Data.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/System.Networking.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/System.Web.dll",
+        "--object-root",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/System.Runtime.dll",
+        "--compile-system",
+        "--bind-user-fault",
+        "--reference-arena",
+        "--native-gc",
+        "--bind-console-read-byte",
+        "--bind-console-write-line",
+        "--bind-console-stream-output",
+        "--bind-int32-to-string",
+        "--bind-utf8-text",
+        "--native-stack-budget",
+        "--bind-integer-text",
+        "--bind-character-text",
+        "--bind-system-culture",
+        "--bind-time-zone-rules",
+        "--bind-task-queue",
+        "--bind-timers",
+        "--bind-socket-listener",
+        "--bind-socket-accept",
+        "--bind-socket-transfer",
+        "--bind-socket-client",
+        "--bind-scheduler",
+        "--bind-runtime-async"
+      ],
+      "seconds": 1.434255707999995,
+      "exitCode": 0,
+      "stdoutFile": "/Users/robert/Projects/neoclr/target/runtime-modes-benchmark-final/command-38.stdout",
+      "stdoutSha256": "435beb2d4440750fcf9b3f7cb06f56b802108be9742e9a24baeff709eb587b29",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang",
+        "-isysroot",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.2.sdk",
+        "-arch",
+        "arm64",
+        "-std=c11",
+        "-O2",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-DNEOCLR_NATIVE_GC",
+        "-DNEOCLR_NATIVE_BYTE_ARRAY_LIMIT=65536",
+        "-I",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console",
+        "/Users/robert/Projects/neoclr/docs/experiments/runtime-async/native-benchmark-host.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/root-probe.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-gc.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/text-arena.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/console.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-stack.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-scalar/console.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-fault-details/render.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/task-queue.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/socket-listener.c",
+        "/Users/robert/Projects/neoclr/tools/native/entry-arguments.c",
+        "-o",
+        "/Users/robert/Projects/neoclr/target/runtime-modes-benchmark-final/pending-10-state-machine",
+        "-DNEOCLR_RUNTIME_ASYNC",
+        "-I",
+        "/Users/robert/Projects/neoclr/docs/experiments/runtime-async",
+        "/Users/robert/Projects/neoclr/docs/experiments/runtime-async/native-runtime.c",
+        "-Wno-deprecated-declarations",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/string-unicode.c",
+        "/Users/robert/Projects/neoclr/tools/aot-native-text/target/text-only/aarch64-apple-darwin/release/libneoclr_aot_native_text.a",
+        "-DNEOCLR_BENCH_AOT",
+        "/Users/robert/Projects/neoclr/target/runtime-modes-benchmark-final/pending-10-state-machine.o"
+      ],
+      "seconds": 0.7353444999999965,
+      "exitCode": 0,
+      "stdoutFile": "/Users/robert/Projects/neoclr/target/runtime-modes-benchmark-final/command-39.stdout",
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "dotnet",
+        "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+        "neoclr",
+        "--core-reference",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/Core.dll",
+        "--runtime-seed",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/System.runtime.neox",
+        "--bootstrap-intrinsics",
+        "--bootstrap-ownership",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/ownership.json",
+        "--object-library",
+        "System.Runtime",
+        "--async-library",
+        "System.Runtime",
+        "--runtime-async-poc",
+        "RuntimeAwaitProvider.Bridge",
+        "--reference",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/System.Runtime.dll",
+        "--reference",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/System.Data.dll",
+        "--reference",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/System.Networking.dll",
+        "--reference",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/System.Web.dll",
+        "-o",
+        "/Users/robert/Projects/neoclr/target/runtime-modes-benchmark-final/pending-10-runtime.dll",
+        "/Users/robert/Projects/neoclr/target/runtime-modes-benchmark-final/pending-10.rvn",
+        "/Users/robert/Projects/neoclr/docs/experiments/runtime-async/RuntimeAsyncBridge.rvn"
+      ],
+      "seconds": 3.1642013339999977,
+      "exitCode": 0,
+      "stdoutFile": "/Users/robert/Projects/neoclr/target/runtime-modes-benchmark-final/command-40.stdout",
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/tools/aot-poc/target/release/neoclr-aot-poc",
+        "--closed-world",
+        "/Users/robert/Projects/neoclr/target/runtime-modes-benchmark-final/pending-10-runtime.dll",
+        "@entry",
+        "/Users/robert/Projects/neoclr/target/runtime-modes-benchmark-final/pending-10-runtime.o",
+        "--system",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/System.runtime.neox",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/System.Runtime.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/System.Data.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/System.Networking.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/System.Web.dll",
+        "--object-root",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/System.Runtime.dll",
+        "--compile-system",
+        "--bind-user-fault",
+        "--reference-arena",
+        "--native-gc",
+        "--bind-console-read-byte",
+        "--bind-console-write-line",
+        "--bind-console-stream-output",
+        "--bind-int32-to-string",
+        "--bind-utf8-text",
+        "--native-stack-budget",
+        "--bind-integer-text",
+        "--bind-character-text",
+        "--bind-system-culture",
+        "--bind-time-zone-rules",
+        "--bind-task-queue",
+        "--bind-timers",
+        "--bind-socket-listener",
+        "--bind-socket-accept",
+        "--bind-socket-transfer",
+        "--bind-socket-client",
+        "--bind-scheduler",
+        "--bind-runtime-async"
+      ],
+      "seconds": 1.3700631669999979,
+      "exitCode": 0,
+      "stdoutFile": "/Users/robert/Projects/neoclr/target/runtime-modes-benchmark-final/command-41.stdout",
+      "stdoutSha256": "e881d8465231abc2ce07320be3dda5d7bbfed6bdc1f2e5fa82216a57b6d3353b",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang",
+        "-isysroot",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.2.sdk",
+        "-arch",
+        "arm64",
+        "-std=c11",
+        "-O2",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-DNEOCLR_NATIVE_GC",
+        "-DNEOCLR_NATIVE_BYTE_ARRAY_LIMIT=65536",
+        "-I",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console",
+        "/Users/robert/Projects/neoclr/docs/experiments/runtime-async/native-benchmark-host.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/root-probe.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-gc.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/text-arena.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/console.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-stack.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-scalar/console.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-fault-details/render.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/task-queue.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/socket-listener.c",
+        "/Users/robert/Projects/neoclr/tools/native/entry-arguments.c",
+        "-o",
+        "/Users/robert/Projects/neoclr/target/runtime-modes-benchmark-final/pending-10-runtime",
+        "-DNEOCLR_RUNTIME_ASYNC",
+        "-I",
+        "/Users/robert/Projects/neoclr/docs/experiments/runtime-async",
+        "/Users/robert/Projects/neoclr/docs/experiments/runtime-async/native-runtime.c",
+        "-Wno-deprecated-declarations",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/string-unicode.c",
+        "/Users/robert/Projects/neoclr/tools/aot-native-text/target/text-only/aarch64-apple-darwin/release/libneoclr_aot_native_text.a",
+        "-DNEOCLR_BENCH_AOT",
+        "/Users/robert/Projects/neoclr/target/runtime-modes-benchmark-final/pending-10-runtime.o"
+      ],
+      "seconds": 0.7001492499999955,
+      "exitCode": 0,
+      "stdoutFile": "/Users/robert/Projects/neoclr/target/runtime-modes-benchmark-final/command-42.stdout",
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/scheduler-wait-validation/release/examples/runtime_async_interpreter",
+        "/Users/robert/Projects/neoclr/target/runtime-modes-benchmark-final/pending-10-state-machine.dll",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle",
+        "4"
+      ],
+      "seconds": 3.0286565410000037,
+      "exitCode": 0,
+      "stdoutFile": "/Users/robert/Projects/neoclr/target/runtime-modes-benchmark-final/command-43.stdout",
+      "stdoutSha256": "f052c69f1a206096aeb87a6dcc814a7e54d94d5da3c5195877614b8b2d185254",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/scheduler-wait-validation/release/examples/runtime_async_interpreter",
+        "/Users/robert/Projects/neoclr/target/runtime-modes-benchmark-final/pending-10-runtime.dll",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle",
+        "4"
+      ],
+      "seconds": 2.792076917000003,
+      "exitCode": 0,
+      "stdoutFile": "/Users/robert/Projects/neoclr/target/runtime-modes-benchmark-final/command-44.stdout",
+      "stdoutSha256": "f6236527e6cc0fc7ea6f31d943d18a079ba1a689fb8a32c8737afe918a5e9aa9",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/tools/aot-poc/target/release/neoclr-aot-poc",
+        "--jit-managed",
+        "--closed-world",
+        "/Users/robert/Projects/neoclr/target/runtime-modes-benchmark-final/pending-10-state-machine.dll",
+        "@entry",
+        "/Users/robert/Projects/neoclr/target/runtime-modes-benchmark-final/host.dylib",
+        "--system",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/System.runtime.neox",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/System.Runtime.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/System.Data.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/System.Networking.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/System.Web.dll",
+        "--object-root",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/System.Runtime.dll",
+        "--compile-system",
+        "--bind-user-fault",
+        "--reference-arena",
+        "--native-gc",
+        "--bind-console-read-byte",
+        "--bind-console-write-line",
+        "--bind-console-stream-output",
+        "--bind-int32-to-string",
+        "--bind-utf8-text",
+        "--native-stack-budget",
+        "--bind-integer-text",
+        "--bind-character-text",
+        "--bind-system-culture",
+        "--bind-time-zone-rules",
+        "--bind-task-queue",
+        "--bind-timers",
+        "--bind-socket-listener",
+        "--bind-socket-accept",
+        "--bind-socket-transfer",
+        "--bind-socket-client",
+        "--bind-scheduler",
+        "--bind-runtime-async"
+      ],
+      "seconds": 1.4386567079999963,
+      "exitCode": 0,
+      "stdoutFile": "/Users/robert/Projects/neoclr/target/runtime-modes-benchmark-final/command-45.stdout",
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr": "NATIVE_SAMPLE {\"seconds\":0.003438000,\"allocatedBlocks\":564,\"reclaimedBlocks\":564,\"collections\":2299}\nNATIVE_SAMPLE {\"seconds\":0.003212000,\"allocatedBlocks\":564,\"reclaimedBlocks\":564,\"collections\":2299}\nNATIVE_SAMPLE {\"seconds\":0.003180000,\"allocatedBlocks\":564,\"reclaimedBlocks\":564,\"collections\":2299}\nNATIVE_SAMPLE {\"seconds\":0.003281000,\"allocatedBlocks\":564,\"reclaimedBlocks\":564,\"collections\":2299}\nJIT_RESULT {\"compileAndFinalizeSeconds\":0.113925375,\"guestExitCode\":0,\"invocationSeconds\":0.0131695,\"metadataLoadSeconds\":0.083051,\"profile\":\"macos-arm64-jit-managed-v1\",\"selectionAndVerificationSeconds\":1.201963834}\n"
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/tools/aot-poc/target/release/neoclr-aot-poc",
+        "--jit-managed",
+        "--closed-world",
+        "/Users/robert/Projects/neoclr/target/runtime-modes-benchmark-final/pending-10-runtime.dll",
+        "@entry",
+        "/Users/robert/Projects/neoclr/target/runtime-modes-benchmark-final/host.dylib",
+        "--system",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/System.runtime.neox",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/System.Runtime.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/System.Data.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/System.Networking.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/System.Web.dll",
+        "--object-root",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/System.Runtime.dll",
+        "--compile-system",
+        "--bind-user-fault",
+        "--reference-arena",
+        "--native-gc",
+        "--bind-console-read-byte",
+        "--bind-console-write-line",
+        "--bind-console-stream-output",
+        "--bind-int32-to-string",
+        "--bind-utf8-text",
+        "--native-stack-budget",
+        "--bind-integer-text",
+        "--bind-character-text",
+        "--bind-system-culture",
+        "--bind-time-zone-rules",
+        "--bind-task-queue",
+        "--bind-timers",
+        "--bind-socket-listener",
+        "--bind-socket-accept",
+        "--bind-socket-transfer",
+        "--bind-socket-client",
+        "--bind-scheduler",
+        "--bind-runtime-async"
+      ],
+      "seconds": 1.4484136250000006,
+      "exitCode": 0,
+      "stdoutFile": "/Users/robert/Projects/neoclr/target/runtime-modes-benchmark-final/command-46.stdout",
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr": "NATIVE_SAMPLE {\"seconds\":0.011368000,\"allocatedBlocks\":761,\"reclaimedBlocks\":761,\"collections\":2841}\nNATIVE_SAMPLE {\"seconds\":0.010590000,\"allocatedBlocks\":761,\"reclaimedBlocks\":761,\"collections\":2841}\nNATIVE_SAMPLE {\"seconds\":0.011062000,\"allocatedBlocks\":761,\"reclaimedBlocks\":761,\"collections\":2841}\nNATIVE_SAMPLE {\"seconds\":0.010491000,\"allocatedBlocks\":761,\"reclaimedBlocks\":761,\"collections\":2841}\nJIT_RESULT {\"compileAndFinalizeSeconds\":0.093453,\"guestExitCode\":0,\"invocationSeconds\":0.043565292,\"metadataLoadSeconds\":0.086240291,\"profile\":\"macos-arm64-jit-managed-v1\",\"selectionAndVerificationSeconds\":1.199234}\n"
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/runtime-modes-benchmark-final/pending-10-state-machine"
+      ],
+      "seconds": 0.25015608300000736,
+      "exitCode": 0,
+      "stdoutFile": "/Users/robert/Projects/neoclr/target/runtime-modes-benchmark-final/command-47.stdout",
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr": "NATIVE_SAMPLE {\"seconds\":0.003334000,\"allocatedBlocks\":564,\"reclaimedBlocks\":564,\"collections\":2299}\nNATIVE_SAMPLE {\"seconds\":0.003090000,\"allocatedBlocks\":564,\"reclaimedBlocks\":564,\"collections\":2299}\nNATIVE_SAMPLE {\"seconds\":0.003216000,\"allocatedBlocks\":564,\"reclaimedBlocks\":564,\"collections\":2299}\nNATIVE_SAMPLE {\"seconds\":0.003001000,\"allocatedBlocks\":564,\"reclaimedBlocks\":564,\"collections\":2299}\n"
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/runtime-modes-benchmark-final/pending-10-runtime"
+      ],
+      "seconds": 0.13096441599999764,
+      "exitCode": 0,
+      "stdoutFile": "/Users/robert/Projects/neoclr/target/runtime-modes-benchmark-final/command-48.stdout",
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr": "NATIVE_SAMPLE {\"seconds\":0.017287000,\"allocatedBlocks\":761,\"reclaimedBlocks\":761,\"collections\":2841}\nNATIVE_SAMPLE {\"seconds\":0.034551000,\"allocatedBlocks\":761,\"reclaimedBlocks\":761,\"collections\":2841}\nNATIVE_SAMPLE {\"seconds\":0.018213000,\"allocatedBlocks\":761,\"reclaimedBlocks\":761,\"collections\":2841}\nNATIVE_SAMPLE {\"seconds\":0.011520000,\"allocatedBlocks\":761,\"reclaimedBlocks\":761,\"collections\":2841}\n"
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/runtime-modes-benchmark-final/pending-10-runtime"
+      ],
+      "seconds": 0.0496192920000027,
+      "exitCode": 0,
+      "stdoutFile": "/Users/robert/Projects/neoclr/target/runtime-modes-benchmark-final/command-49.stdout",
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr": "NATIVE_SAMPLE {\"seconds\":0.011582000,\"allocatedBlocks\":761,\"reclaimedBlocks\":761,\"collections\":2841}\nNATIVE_SAMPLE {\"seconds\":0.011897000,\"allocatedBlocks\":761,\"reclaimedBlocks\":761,\"collections\":2841}\nNATIVE_SAMPLE {\"seconds\":0.011369000,\"allocatedBlocks\":761,\"reclaimedBlocks\":761,\"collections\":2841}\nNATIVE_SAMPLE {\"seconds\":0.010473000,\"allocatedBlocks\":761,\"reclaimedBlocks\":761,\"collections\":2841}\n"
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/runtime-modes-benchmark-final/pending-10-state-machine"
+      ],
+      "seconds": 0.01786566600000583,
+      "exitCode": 0,
+      "stdoutFile": "/Users/robert/Projects/neoclr/target/runtime-modes-benchmark-final/command-50.stdout",
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr": "NATIVE_SAMPLE {\"seconds\":0.004349000,\"allocatedBlocks\":564,\"reclaimedBlocks\":564,\"collections\":2299}\nNATIVE_SAMPLE {\"seconds\":0.003014000,\"allocatedBlocks\":564,\"reclaimedBlocks\":564,\"collections\":2299}\nNATIVE_SAMPLE {\"seconds\":0.003018000,\"allocatedBlocks\":564,\"reclaimedBlocks\":564,\"collections\":2299}\nNATIVE_SAMPLE {\"seconds\":0.002995000,\"allocatedBlocks\":564,\"reclaimedBlocks\":564,\"collections\":2299}\n"
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/tools/aot-poc/target/release/neoclr-aot-poc",
+        "--jit-managed",
+        "--closed-world",
+        "/Users/robert/Projects/neoclr/target/runtime-modes-benchmark-final/pending-10-runtime.dll",
+        "@entry",
+        "/Users/robert/Projects/neoclr/target/runtime-modes-benchmark-final/host.dylib",
+        "--system",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/System.runtime.neox",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/System.Runtime.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/System.Data.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/System.Networking.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/System.Web.dll",
+        "--object-root",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/System.Runtime.dll",
+        "--compile-system",
+        "--bind-user-fault",
+        "--reference-arena",
+        "--native-gc",
+        "--bind-console-read-byte",
+        "--bind-console-write-line",
+        "--bind-console-stream-output",
+        "--bind-int32-to-string",
+        "--bind-utf8-text",
+        "--native-stack-budget",
+        "--bind-integer-text",
+        "--bind-character-text",
+        "--bind-system-culture",
+        "--bind-time-zone-rules",
+        "--bind-task-queue",
+        "--bind-timers",
+        "--bind-socket-listener",
+        "--bind-socket-accept",
+        "--bind-socket-transfer",
+        "--bind-socket-client",
+        "--bind-scheduler",
+        "--bind-runtime-async"
+      ],
+      "seconds": 1.3977738330000022,
+      "exitCode": 0,
+      "stdoutFile": "/Users/robert/Projects/neoclr/target/runtime-modes-benchmark-final/command-51.stdout",
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr": "NATIVE_SAMPLE {\"seconds\":0.013082000,\"allocatedBlocks\":761,\"reclaimedBlocks\":761,\"collections\":2841}\nNATIVE_SAMPLE {\"seconds\":0.011812000,\"allocatedBlocks\":761,\"reclaimedBlocks\":761,\"collections\":2841}\nNATIVE_SAMPLE {\"seconds\":0.010469000,\"allocatedBlocks\":761,\"reclaimedBlocks\":761,\"collections\":2841}\nNATIVE_SAMPLE {\"seconds\":0.010604000,\"allocatedBlocks\":761,\"reclaimedBlocks\":761,\"collections\":2841}\nJIT_RESULT {\"compileAndFinalizeSeconds\":0.096188583,\"guestExitCode\":0,\"invocationSeconds\":0.046017083,\"metadataLoadSeconds\":0.084911667,\"profile\":\"macos-arm64-jit-managed-v1\",\"selectionAndVerificationSeconds\":1.149317958}\n"
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/tools/aot-poc/target/release/neoclr-aot-poc",
+        "--jit-managed",
+        "--closed-world",
+        "/Users/robert/Projects/neoclr/target/runtime-modes-benchmark-final/pending-10-state-machine.dll",
+        "@entry",
+        "/Users/robert/Projects/neoclr/target/runtime-modes-benchmark-final/host.dylib",
+        "--system",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/System.runtime.neox",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/System.Runtime.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/System.Data.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/System.Networking.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/System.Web.dll",
+        "--object-root",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/System.Runtime.dll",
+        "--compile-system",
+        "--bind-user-fault",
+        "--reference-arena",
+        "--native-gc",
+        "--bind-console-read-byte",
+        "--bind-console-write-line",
+        "--bind-console-stream-output",
+        "--bind-int32-to-string",
+        "--bind-utf8-text",
+        "--native-stack-budget",
+        "--bind-integer-text",
+        "--bind-character-text",
+        "--bind-system-culture",
+        "--bind-time-zone-rules",
+        "--bind-task-queue",
+        "--bind-timers",
+        "--bind-socket-listener",
+        "--bind-socket-accept",
+        "--bind-socket-transfer",
+        "--bind-socket-client",
+        "--bind-scheduler",
+        "--bind-runtime-async"
+      ],
+      "seconds": 1.4164251250000035,
+      "exitCode": 0,
+      "stdoutFile": "/Users/robert/Projects/neoclr/target/runtime-modes-benchmark-final/command-52.stdout",
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr": "NATIVE_SAMPLE {\"seconds\":0.003242000,\"allocatedBlocks\":564,\"reclaimedBlocks\":564,\"collections\":2299}\nNATIVE_SAMPLE {\"seconds\":0.003587000,\"allocatedBlocks\":564,\"reclaimedBlocks\":564,\"collections\":2299}\nNATIVE_SAMPLE {\"seconds\":0.003142000,\"allocatedBlocks\":564,\"reclaimedBlocks\":564,\"collections\":2299}\nNATIVE_SAMPLE {\"seconds\":0.003176000,\"allocatedBlocks\":564,\"reclaimedBlocks\":564,\"collections\":2299}\nJIT_RESULT {\"compileAndFinalizeSeconds\":0.101680959,\"guestExitCode\":0,\"invocationSeconds\":0.013188416,\"metadataLoadSeconds\":0.084468625,\"profile\":\"macos-arm64-jit-managed-v1\",\"selectionAndVerificationSeconds\":1.190516958}\n"
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/scheduler-wait-validation/release/examples/runtime_async_interpreter",
+        "/Users/robert/Projects/neoclr/target/runtime-modes-benchmark-final/pending-10-runtime.dll",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle",
+        "4"
+      ],
+      "seconds": 2.9691236660000015,
+      "exitCode": 0,
+      "stdoutFile": "/Users/robert/Projects/neoclr/target/runtime-modes-benchmark-final/command-53.stdout",
+      "stdoutSha256": "578c9af1ecb116a14ee5cfb71f3158f28a6313c81c8345f2b8e4fde0ee90ad6f",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/scheduler-wait-validation/release/examples/runtime_async_interpreter",
+        "/Users/robert/Projects/neoclr/target/runtime-modes-benchmark-final/pending-10-state-machine.dll",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle",
+        "4"
+      ],
+      "seconds": 3.0401585420000004,
+      "exitCode": 0,
+      "stdoutFile": "/Users/robert/Projects/neoclr/target/runtime-modes-benchmark-final/command-54.stdout",
+      "stdoutSha256": "5c7bd0bf4ef7e4522eda97d704fe76f794466e4a3ccecc346219fd97ae07ee73",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "dotnet",
+        "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+        "neoclr",
+        "--core-reference",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/Core.dll",
+        "--runtime-seed",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/System.runtime.neox",
+        "--bootstrap-intrinsics",
+        "--bootstrap-ownership",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/ownership.json",
+        "--object-library",
+        "System.Runtime",
+        "--async-library",
+        "System.Runtime",
+        "--reference",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/System.Runtime.dll",
+        "--reference",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/System.Data.dll",
+        "--reference",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/System.Networking.dll",
+        "--reference",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/System.Web.dll",
+        "-o",
+        "/Users/robert/Projects/neoclr/target/runtime-modes-benchmark-final/pending-100-state-machine.dll",
+        "/Users/robert/Projects/neoclr/target/runtime-modes-benchmark-final/pending-100.rvn",
+        "/Users/robert/Projects/neoclr/docs/experiments/runtime-async/RuntimeAsyncBridge.rvn"
+      ],
+      "seconds": 3.2098530829999987,
+      "exitCode": 0,
+      "stdoutFile": "/Users/robert/Projects/neoclr/target/runtime-modes-benchmark-final/command-55.stdout",
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/tools/aot-poc/target/release/neoclr-aot-poc",
+        "--closed-world",
+        "/Users/robert/Projects/neoclr/target/runtime-modes-benchmark-final/pending-100-state-machine.dll",
+        "@entry",
+        "/Users/robert/Projects/neoclr/target/runtime-modes-benchmark-final/pending-100-state-machine.o",
+        "--system",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/System.runtime.neox",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/System.Runtime.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/System.Data.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/System.Networking.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/System.Web.dll",
+        "--object-root",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/System.Runtime.dll",
+        "--compile-system",
+        "--bind-user-fault",
+        "--reference-arena",
+        "--native-gc",
+        "--bind-console-read-byte",
+        "--bind-console-write-line",
+        "--bind-console-stream-output",
+        "--bind-int32-to-string",
+        "--bind-utf8-text",
+        "--native-stack-budget",
+        "--bind-integer-text",
+        "--bind-character-text",
+        "--bind-system-culture",
+        "--bind-time-zone-rules",
+        "--bind-task-queue",
+        "--bind-timers",
+        "--bind-socket-listener",
+        "--bind-socket-accept",
+        "--bind-socket-transfer",
+        "--bind-socket-client",
+        "--bind-scheduler",
+        "--bind-runtime-async"
+      ],
+      "seconds": 1.625086500000009,
+      "exitCode": 0,
+      "stdoutFile": "/Users/robert/Projects/neoclr/target/runtime-modes-benchmark-final/command-56.stdout",
+      "stdoutSha256": "4eeb9fd0b684448aa756d4e051b98b3655193525b4ed5ffb8a13d82e27baf804",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang",
+        "-isysroot",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.2.sdk",
+        "-arch",
+        "arm64",
+        "-std=c11",
+        "-O2",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-DNEOCLR_NATIVE_GC",
+        "-DNEOCLR_NATIVE_BYTE_ARRAY_LIMIT=65536",
+        "-I",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console",
+        "/Users/robert/Projects/neoclr/docs/experiments/runtime-async/native-benchmark-host.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/root-probe.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-gc.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/text-arena.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/console.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-stack.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-scalar/console.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-fault-details/render.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/task-queue.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/socket-listener.c",
+        "/Users/robert/Projects/neoclr/tools/native/entry-arguments.c",
+        "-o",
+        "/Users/robert/Projects/neoclr/target/runtime-modes-benchmark-final/pending-100-state-machine",
+        "-DNEOCLR_RUNTIME_ASYNC",
+        "-I",
+        "/Users/robert/Projects/neoclr/docs/experiments/runtime-async",
+        "/Users/robert/Projects/neoclr/docs/experiments/runtime-async/native-runtime.c",
+        "-Wno-deprecated-declarations",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/string-unicode.c",
+        "/Users/robert/Projects/neoclr/tools/aot-native-text/target/text-only/aarch64-apple-darwin/release/libneoclr_aot_native_text.a",
+        "-DNEOCLR_BENCH_AOT",
+        "/Users/robert/Projects/neoclr/target/runtime-modes-benchmark-final/pending-100-state-machine.o"
+      ],
+      "seconds": 0.793721000000005,
+      "exitCode": 0,
+      "stdoutFile": "/Users/robert/Projects/neoclr/target/runtime-modes-benchmark-final/command-57.stdout",
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "dotnet",
+        "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+        "neoclr",
+        "--core-reference",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/Core.dll",
+        "--runtime-seed",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/System.runtime.neox",
+        "--bootstrap-intrinsics",
+        "--bootstrap-ownership",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/ownership.json",
+        "--object-library",
+        "System.Runtime",
+        "--async-library",
+        "System.Runtime",
+        "--runtime-async-poc",
+        "RuntimeAwaitProvider.Bridge",
+        "--reference",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/System.Runtime.dll",
+        "--reference",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/System.Data.dll",
+        "--reference",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/System.Networking.dll",
+        "--reference",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/System.Web.dll",
+        "-o",
+        "/Users/robert/Projects/neoclr/target/runtime-modes-benchmark-final/pending-100-runtime.dll",
+        "/Users/robert/Projects/neoclr/target/runtime-modes-benchmark-final/pending-100.rvn",
+        "/Users/robert/Projects/neoclr/docs/experiments/runtime-async/RuntimeAsyncBridge.rvn"
+      ],
+      "seconds": 3.0823417910000046,
+      "exitCode": 0,
+      "stdoutFile": "/Users/robert/Projects/neoclr/target/runtime-modes-benchmark-final/command-58.stdout",
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/tools/aot-poc/target/release/neoclr-aot-poc",
+        "--closed-world",
+        "/Users/robert/Projects/neoclr/target/runtime-modes-benchmark-final/pending-100-runtime.dll",
+        "@entry",
+        "/Users/robert/Projects/neoclr/target/runtime-modes-benchmark-final/pending-100-runtime.o",
+        "--system",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/System.runtime.neox",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/System.Runtime.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/System.Data.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/System.Networking.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/System.Web.dll",
+        "--object-root",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/System.Runtime.dll",
+        "--compile-system",
+        "--bind-user-fault",
+        "--reference-arena",
+        "--native-gc",
+        "--bind-console-read-byte",
+        "--bind-console-write-line",
+        "--bind-console-stream-output",
+        "--bind-int32-to-string",
+        "--bind-utf8-text",
+        "--native-stack-budget",
+        "--bind-integer-text",
+        "--bind-character-text",
+        "--bind-system-culture",
+        "--bind-time-zone-rules",
+        "--bind-task-queue",
+        "--bind-timers",
+        "--bind-socket-listener",
+        "--bind-socket-accept",
+        "--bind-socket-transfer",
+        "--bind-socket-client",
+        "--bind-scheduler",
+        "--bind-runtime-async"
+      ],
+      "seconds": 1.3585624999999908,
+      "exitCode": 0,
+      "stdoutFile": "/Users/robert/Projects/neoclr/target/runtime-modes-benchmark-final/command-59.stdout",
+      "stdoutSha256": "4d700beae397e4ddcff0ec101199a94b9ee49494464a04ab4c4f1bc09ded1e29",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang",
+        "-isysroot",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.2.sdk",
+        "-arch",
+        "arm64",
+        "-std=c11",
+        "-O2",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-DNEOCLR_NATIVE_GC",
+        "-DNEOCLR_NATIVE_BYTE_ARRAY_LIMIT=65536",
+        "-I",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console",
+        "/Users/robert/Projects/neoclr/docs/experiments/runtime-async/native-benchmark-host.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/root-probe.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-gc.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/text-arena.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/console.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-stack.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-scalar/console.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-fault-details/render.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/task-queue.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/socket-listener.c",
+        "/Users/robert/Projects/neoclr/tools/native/entry-arguments.c",
+        "-o",
+        "/Users/robert/Projects/neoclr/target/runtime-modes-benchmark-final/pending-100-runtime",
+        "-DNEOCLR_RUNTIME_ASYNC",
+        "-I",
+        "/Users/robert/Projects/neoclr/docs/experiments/runtime-async",
+        "/Users/robert/Projects/neoclr/docs/experiments/runtime-async/native-runtime.c",
+        "-Wno-deprecated-declarations",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/string-unicode.c",
+        "/Users/robert/Projects/neoclr/tools/aot-native-text/target/text-only/aarch64-apple-darwin/release/libneoclr_aot_native_text.a",
+        "-DNEOCLR_BENCH_AOT",
+        "/Users/robert/Projects/neoclr/target/runtime-modes-benchmark-final/pending-100-runtime.o"
+      ],
+      "seconds": 0.725336041999995,
+      "exitCode": 0,
+      "stdoutFile": "/Users/robert/Projects/neoclr/target/runtime-modes-benchmark-final/command-60.stdout",
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/scheduler-wait-validation/release/examples/runtime_async_interpreter",
+        "/Users/robert/Projects/neoclr/target/runtime-modes-benchmark-final/pending-100-state-machine.dll",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle",
+        "4"
+      ],
+      "seconds": 12.173971124999994,
+      "exitCode": 0,
+      "stdoutFile": "/Users/robert/Projects/neoclr/target/runtime-modes-benchmark-final/command-61.stdout",
+      "stdoutSha256": "3ffc053788a4642c793e354b724ae7e40caddfa29c796ae0d56780a040994683",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/scheduler-wait-validation/release/examples/runtime_async_interpreter",
+        "/Users/robert/Projects/neoclr/target/runtime-modes-benchmark-final/pending-100-runtime.dll",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle",
+        "4"
+      ],
+      "seconds": 10.440216166999988,
+      "exitCode": 0,
+      "stdoutFile": "/Users/robert/Projects/neoclr/target/runtime-modes-benchmark-final/command-62.stdout",
+      "stdoutSha256": "1ea2e1d89c8d4fc5a74b1ed3addef4fadf40544ea417df77ec279abd48506253",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/tools/aot-poc/target/release/neoclr-aot-poc",
+        "--jit-managed",
+        "--closed-world",
+        "/Users/robert/Projects/neoclr/target/runtime-modes-benchmark-final/pending-100-state-machine.dll",
+        "@entry",
+        "/Users/robert/Projects/neoclr/target/runtime-modes-benchmark-final/host.dylib",
+        "--system",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/System.runtime.neox",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/System.Runtime.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/System.Data.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/System.Networking.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/System.Web.dll",
+        "--object-root",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/System.Runtime.dll",
+        "--compile-system",
+        "--bind-user-fault",
+        "--reference-arena",
+        "--native-gc",
+        "--bind-console-read-byte",
+        "--bind-console-write-line",
+        "--bind-console-stream-output",
+        "--bind-int32-to-string",
+        "--bind-utf8-text",
+        "--native-stack-budget",
+        "--bind-integer-text",
+        "--bind-character-text",
+        "--bind-system-culture",
+        "--bind-time-zone-rules",
+        "--bind-task-queue",
+        "--bind-timers",
+        "--bind-socket-listener",
+        "--bind-socket-accept",
+        "--bind-socket-transfer",
+        "--bind-socket-client",
+        "--bind-scheduler",
+        "--bind-runtime-async"
+      ],
+      "seconds": 1.5919260000000008,
+      "exitCode": 0,
+      "stdoutFile": "/Users/robert/Projects/neoclr/target/runtime-modes-benchmark-final/command-63.stdout",
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr": "NATIVE_SAMPLE {\"seconds\":0.032194000,\"allocatedBlocks\":5514,\"reclaimedBlocks\":5514,\"collections\":22459}\nNATIVE_SAMPLE {\"seconds\":0.032919000,\"allocatedBlocks\":5514,\"reclaimedBlocks\":5514,\"collections\":22459}\nNATIVE_SAMPLE {\"seconds\":0.031362000,\"allocatedBlocks\":5514,\"reclaimedBlocks\":5514,\"collections\":22459}\nNATIVE_SAMPLE {\"seconds\":0.031704000,\"allocatedBlocks\":5514,\"reclaimedBlocks\":5514,\"collections\":22459}\nJIT_RESULT {\"compileAndFinalizeSeconds\":0.111678167,\"guestExitCode\":0,\"invocationSeconds\":0.128513667,\"metadataLoadSeconds\":0.095494125,\"profile\":\"macos-arm64-jit-managed-v1\",\"selectionAndVerificationSeconds\":1.228527}\n"
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/tools/aot-poc/target/release/neoclr-aot-poc",
+        "--jit-managed",
+        "--closed-world",
+        "/Users/robert/Projects/neoclr/target/runtime-modes-benchmark-final/pending-100-runtime.dll",
+        "@entry",
+        "/Users/robert/Projects/neoclr/target/runtime-modes-benchmark-final/host.dylib",
+        "--system",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/System.runtime.neox",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/System.Runtime.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/System.Data.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/System.Networking.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/System.Web.dll",
+        "--object-root",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/System.Runtime.dll",
+        "--compile-system",
+        "--bind-user-fault",
+        "--reference-arena",
+        "--native-gc",
+        "--bind-console-read-byte",
+        "--bind-console-write-line",
+        "--bind-console-stream-output",
+        "--bind-int32-to-string",
+        "--bind-utf8-text",
+        "--native-stack-budget",
+        "--bind-integer-text",
+        "--bind-character-text",
+        "--bind-system-culture",
+        "--bind-time-zone-rules",
+        "--bind-task-queue",
+        "--bind-timers",
+        "--bind-socket-listener",
+        "--bind-socket-accept",
+        "--bind-socket-transfer",
+        "--bind-socket-client",
+        "--bind-scheduler",
+        "--bind-runtime-async"
+      ],
+      "seconds": 1.838769124999999,
+      "exitCode": 0,
+      "stdoutFile": "/Users/robert/Projects/neoclr/target/runtime-modes-benchmark-final/command-64.stdout",
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr": "NATIVE_SAMPLE {\"seconds\":0.109795000,\"allocatedBlocks\":7421,\"reclaimedBlocks\":7421,\"collections\":27771}\nNATIVE_SAMPLE {\"seconds\":0.108165000,\"allocatedBlocks\":7421,\"reclaimedBlocks\":7421,\"collections\":27771}\nNATIVE_SAMPLE {\"seconds\":0.111551000,\"allocatedBlocks\":7421,\"reclaimedBlocks\":7421,\"collections\":27771}\nNATIVE_SAMPLE {\"seconds\":0.111187000,\"allocatedBlocks\":7421,\"reclaimedBlocks\":7421,\"collections\":27771}\nJIT_RESULT {\"compileAndFinalizeSeconds\":0.102748291,\"guestExitCode\":0,\"invocationSeconds\":0.440767375,\"metadataLoadSeconds\":0.082901959,\"profile\":\"macos-arm64-jit-managed-v1\",\"selectionAndVerificationSeconds\":1.184958583}\n"
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/runtime-modes-benchmark-final/pending-100-state-machine"
+      ],
+      "seconds": 0.4167109580000101,
+      "exitCode": 0,
+      "stdoutFile": "/Users/robert/Projects/neoclr/target/runtime-modes-benchmark-final/command-65.stdout",
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr": "NATIVE_SAMPLE {\"seconds\":0.158982000,\"allocatedBlocks\":5514,\"reclaimedBlocks\":5514,\"collections\":22459}\nNATIVE_SAMPLE {\"seconds\":0.030706000,\"allocatedBlocks\":5514,\"reclaimedBlocks\":5514,\"collections\":22459}\nNATIVE_SAMPLE {\"seconds\":0.030268000,\"allocatedBlocks\":5514,\"reclaimedBlocks\":5514,\"collections\":22459}\nNATIVE_SAMPLE {\"seconds\":0.031661000,\"allocatedBlocks\":5514,\"reclaimedBlocks\":5514,\"collections\":22459}\n"
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/runtime-modes-benchmark-final/pending-100-runtime"
+      ],
+      "seconds": 0.4819281670000066,
+      "exitCode": 0,
+      "stdoutFile": "/Users/robert/Projects/neoclr/target/runtime-modes-benchmark-final/command-66.stdout",
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr": "NATIVE_SAMPLE {\"seconds\":0.106386000,\"allocatedBlocks\":7421,\"reclaimedBlocks\":7421,\"collections\":27771}\nNATIVE_SAMPLE {\"seconds\":0.110816000,\"allocatedBlocks\":7421,\"reclaimedBlocks\":7421,\"collections\":27771}\nNATIVE_SAMPLE {\"seconds\":0.104649000,\"allocatedBlocks\":7421,\"reclaimedBlocks\":7421,\"collections\":27771}\nNATIVE_SAMPLE {\"seconds\":0.103070000,\"allocatedBlocks\":7421,\"reclaimedBlocks\":7421,\"collections\":27771}\n"
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/runtime-modes-benchmark-final/pending-100-runtime"
+      ],
+      "seconds": 0.4258960420000051,
+      "exitCode": 0,
+      "stdoutFile": "/Users/robert/Projects/neoclr/target/runtime-modes-benchmark-final/command-67.stdout",
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr": "NATIVE_SAMPLE {\"seconds\":0.103453000,\"allocatedBlocks\":7421,\"reclaimedBlocks\":7421,\"collections\":27771}\nNATIVE_SAMPLE {\"seconds\":0.104785000,\"allocatedBlocks\":7421,\"reclaimedBlocks\":7421,\"collections\":27771}\nNATIVE_SAMPLE {\"seconds\":0.102294000,\"allocatedBlocks\":7421,\"reclaimedBlocks\":7421,\"collections\":27771}\nNATIVE_SAMPLE {\"seconds\":0.111541000,\"allocatedBlocks\":7421,\"reclaimedBlocks\":7421,\"collections\":27771}\n"
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/runtime-modes-benchmark-final/pending-100-state-machine"
+      ],
+      "seconds": 0.1254625830000009,
+      "exitCode": 0,
+      "stdoutFile": "/Users/robert/Projects/neoclr/target/runtime-modes-benchmark-final/command-68.stdout",
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr": "NATIVE_SAMPLE {\"seconds\":0.030366000,\"allocatedBlocks\":5514,\"reclaimedBlocks\":5514,\"collections\":22459}\nNATIVE_SAMPLE {\"seconds\":0.029906000,\"allocatedBlocks\":5514,\"reclaimedBlocks\":5514,\"collections\":22459}\nNATIVE_SAMPLE {\"seconds\":0.029834000,\"allocatedBlocks\":5514,\"reclaimedBlocks\":5514,\"collections\":22459}\nNATIVE_SAMPLE {\"seconds\":0.030709000,\"allocatedBlocks\":5514,\"reclaimedBlocks\":5514,\"collections\":22459}\n"
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/tools/aot-poc/target/release/neoclr-aot-poc",
+        "--jit-managed",
+        "--closed-world",
+        "/Users/robert/Projects/neoclr/target/runtime-modes-benchmark-final/pending-100-runtime.dll",
+        "@entry",
+        "/Users/robert/Projects/neoclr/target/runtime-modes-benchmark-final/host.dylib",
+        "--system",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/System.runtime.neox",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/System.Runtime.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/System.Data.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/System.Networking.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/System.Web.dll",
+        "--object-root",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/System.Runtime.dll",
+        "--compile-system",
+        "--bind-user-fault",
+        "--reference-arena",
+        "--native-gc",
+        "--bind-console-read-byte",
+        "--bind-console-write-line",
+        "--bind-console-stream-output",
+        "--bind-int32-to-string",
+        "--bind-utf8-text",
+        "--native-stack-budget",
+        "--bind-integer-text",
+        "--bind-character-text",
+        "--bind-system-culture",
+        "--bind-time-zone-rules",
+        "--bind-task-queue",
+        "--bind-timers",
+        "--bind-socket-listener",
+        "--bind-socket-accept",
+        "--bind-socket-transfer",
+        "--bind-socket-client",
+        "--bind-scheduler",
+        "--bind-runtime-async"
+      ],
+      "seconds": 1.7843395000000157,
+      "exitCode": 0,
+      "stdoutFile": "/Users/robert/Projects/neoclr/target/runtime-modes-benchmark-final/command-69.stdout",
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr": "NATIVE_SAMPLE {\"seconds\":0.115706000,\"allocatedBlocks\":7421,\"reclaimedBlocks\":7421,\"collections\":27771}\nNATIVE_SAMPLE {\"seconds\":0.107858000,\"allocatedBlocks\":7421,\"reclaimedBlocks\":7421,\"collections\":27771}\nNATIVE_SAMPLE {\"seconds\":0.107581000,\"allocatedBlocks\":7421,\"reclaimedBlocks\":7421,\"collections\":27771}\nNATIVE_SAMPLE {\"seconds\":0.102751000,\"allocatedBlocks\":7421,\"reclaimedBlocks\":7421,\"collections\":27771}\nJIT_RESULT {\"compileAndFinalizeSeconds\":0.093739583,\"guestExitCode\":0,\"invocationSeconds\":0.433953875,\"metadataLoadSeconds\":0.084475667,\"profile\":\"macos-arm64-jit-managed-v1\",\"selectionAndVerificationSeconds\":1.151636333}\n"
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/tools/aot-poc/target/release/neoclr-aot-poc",
+        "--jit-managed",
+        "--closed-world",
+        "/Users/robert/Projects/neoclr/target/runtime-modes-benchmark-final/pending-100-state-machine.dll",
+        "@entry",
+        "/Users/robert/Projects/neoclr/target/runtime-modes-benchmark-final/host.dylib",
+        "--system",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/System.runtime.neox",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/System.Runtime.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/System.Data.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/System.Networking.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/System.Web.dll",
+        "--object-root",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/System.Runtime.dll",
+        "--compile-system",
+        "--bind-user-fault",
+        "--reference-arena",
+        "--native-gc",
+        "--bind-console-read-byte",
+        "--bind-console-write-line",
+        "--bind-console-stream-output",
+        "--bind-int32-to-string",
+        "--bind-utf8-text",
+        "--native-stack-budget",
+        "--bind-integer-text",
+        "--bind-character-text",
+        "--bind-system-culture",
+        "--bind-time-zone-rules",
+        "--bind-task-queue",
+        "--bind-timers",
+        "--bind-socket-listener",
+        "--bind-socket-accept",
+        "--bind-socket-transfer",
+        "--bind-socket-client",
+        "--bind-scheduler",
+        "--bind-runtime-async"
+      ],
+      "seconds": 1.5561912920000225,
+      "exitCode": 0,
+      "stdoutFile": "/Users/robert/Projects/neoclr/target/runtime-modes-benchmark-final/command-70.stdout",
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr": "NATIVE_SAMPLE {\"seconds\":0.031803000,\"allocatedBlocks\":5514,\"reclaimedBlocks\":5514,\"collections\":22459}\nNATIVE_SAMPLE {\"seconds\":0.031452000,\"allocatedBlocks\":5514,\"reclaimedBlocks\":5514,\"collections\":22459}\nNATIVE_SAMPLE {\"seconds\":0.031306000,\"allocatedBlocks\":5514,\"reclaimedBlocks\":5514,\"collections\":22459}\nNATIVE_SAMPLE {\"seconds\":0.031244000,\"allocatedBlocks\":5514,\"reclaimedBlocks\":5514,\"collections\":22459}\nJIT_RESULT {\"compileAndFinalizeSeconds\":0.102427458,\"guestExitCode\":0,\"invocationSeconds\":0.125866083,\"metadataLoadSeconds\":0.086599417,\"profile\":\"macos-arm64-jit-managed-v1\",\"selectionAndVerificationSeconds\":1.2166867909999999}\n"
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/scheduler-wait-validation/release/examples/runtime_async_interpreter",
+        "/Users/robert/Projects/neoclr/target/runtime-modes-benchmark-final/pending-100-runtime.dll",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle",
+        "4"
+      ],
+      "seconds": 10.24140833300001,
+      "exitCode": 0,
+      "stdoutFile": "/Users/robert/Projects/neoclr/target/runtime-modes-benchmark-final/command-71.stdout",
+      "stdoutSha256": "69f0813779c1a0f6d7efe4bb03a3c33ad8f97924cc55a6646adf0ffb28ad3b2c",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/scheduler-wait-validation/release/examples/runtime_async_interpreter",
+        "/Users/robert/Projects/neoclr/target/runtime-modes-benchmark-final/pending-100-state-machine.dll",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle",
+        "4"
+      ],
+      "seconds": 12.462821708000007,
+      "exitCode": 0,
+      "stdoutFile": "/Users/robert/Projects/neoclr/target/runtime-modes-benchmark-final/command-72.stdout",
+      "stdoutSha256": "95bd103f09a0f61022b602af192906d702d8c9ff156fd0e34c96481d878d06e3",
+      "stderr": ""
+    }
+  ],
+  "runs": [
+    {
+      "case": "completed-10",
+      "engine": "interpreter",
+      "lowering": "state-machine",
+      "round": 0,
+      "processSeconds": 2.490877084000001,
+      "phases": {
+        "prepareSeconds": 1.968974333
+      },
+      "samples": [
+        {
+          "allocatedObjects": 324,
+          "collections": 9,
+          "liveObjects": 0,
+          "peakObjects": 82,
+          "reclaimedObjects": 324,
+          "seconds": 0.123309291,
+          "stdout": ""
+        },
+        {
+          "allocatedObjects": 324,
+          "collections": 9,
+          "liveObjects": 0,
+          "peakObjects": 82,
+          "reclaimedObjects": 324,
+          "seconds": 0.1246615,
+          "stdout": ""
+        },
+        {
+          "allocatedObjects": 324,
+          "collections": 9,
+          "liveObjects": 0,
+          "peakObjects": 82,
+          "reclaimedObjects": 324,
+          "seconds": 0.124470416,
+          "stdout": ""
+        },
+        {
+          "allocatedObjects": 324,
+          "collections": 9,
+          "liveObjects": 0,
+          "peakObjects": 82,
+          "reclaimedObjects": 324,
+          "seconds": 0.124283333,
+          "stdout": ""
+        }
+      ]
+    },
+    {
+      "case": "completed-10",
+      "engine": "interpreter",
+      "lowering": "runtime",
+      "round": 0,
+      "processSeconds": 2.4510148330000003,
+      "phases": {
+        "prepareSeconds": 1.9967960420000002
+      },
+      "samples": [
+        {
+          "allocatedObjects": 365,
+          "collections": 10,
+          "liveObjects": 0,
+          "peakObjects": 64,
+          "reclaimedObjects": 365,
+          "seconds": 0.107423375,
+          "stdout": ""
+        },
+        {
+          "allocatedObjects": 365,
+          "collections": 10,
+          "liveObjects": 0,
+          "peakObjects": 64,
+          "reclaimedObjects": 365,
+          "seconds": 0.103774917,
+          "stdout": ""
+        },
+        {
+          "allocatedObjects": 365,
+          "collections": 10,
+          "liveObjects": 0,
+          "peakObjects": 64,
+          "reclaimedObjects": 365,
+          "seconds": 0.11568525,
+          "stdout": ""
+        },
+        {
+          "allocatedObjects": 365,
+          "collections": 10,
+          "liveObjects": 0,
+          "peakObjects": 64,
+          "reclaimedObjects": 365,
+          "seconds": 0.106792166,
+          "stdout": ""
+        }
+      ]
+    },
+    {
+      "case": "completed-10",
+      "engine": "jit",
+      "lowering": "state-machine",
+      "round": 0,
+      "processSeconds": 2.202837542000001,
+      "phases": {
+        "compileAndFinalizeSeconds": 0.938972542,
+        "guestExitCode": 0,
+        "invocationSeconds": 0.006471583,
+        "metadataLoadSeconds": 0.082670208,
+        "profile": "macos-arm64-jit-managed-v1",
+        "selectionAndVerificationSeconds": 1.148432375
+      },
+      "samples": [
+        {
+          "seconds": 0.00178,
+          "allocatedBlocks": 324,
+          "reclaimedBlocks": 324,
+          "collections": 1439
+        },
+        {
+          "seconds": 0.001568,
+          "allocatedBlocks": 324,
+          "reclaimedBlocks": 324,
+          "collections": 1439
+        },
+        {
+          "seconds": 0.001546,
+          "allocatedBlocks": 324,
+          "reclaimedBlocks": 324,
+          "collections": 1439
+        },
+        {
+          "seconds": 0.001531,
+          "allocatedBlocks": 324,
+          "reclaimedBlocks": 324,
+          "collections": 1439
+        }
+      ]
+    },
+    {
+      "case": "completed-10",
+      "engine": "jit",
+      "lowering": "runtime",
+      "round": 0,
+      "processSeconds": 1.390359833999998,
+      "phases": {
+        "compileAndFinalizeSeconds": 0.091753875,
+        "guestExitCode": 0,
+        "invocationSeconds": 0.021739917,
+        "metadataLoadSeconds": 0.080921959,
+        "profile": "macos-arm64-jit-managed-v1",
+        "selectionAndVerificationSeconds": 1.165725041
+      },
+      "samples": [
+        {
+          "seconds": 0.00439,
+          "allocatedBlocks": 428,
+          "reclaimedBlocks": 428,
+          "collections": 1657
+        },
+        {
+          "seconds": 0.004751,
+          "allocatedBlocks": 428,
+          "reclaimedBlocks": 428,
+          "collections": 1657
+        },
+        {
+          "seconds": 0.00722,
+          "allocatedBlocks": 428,
+          "reclaimedBlocks": 428,
+          "collections": 1657
+        },
+        {
+          "seconds": 0.005319,
+          "allocatedBlocks": 428,
+          "reclaimedBlocks": 428,
+          "collections": 1657
+        }
+      ]
+    },
+    {
+      "case": "completed-10",
+      "engine": "aot",
+      "lowering": "state-machine",
+      "round": 0,
+      "processSeconds": 0.12911387499999805,
+      "phases": {},
+      "samples": [
+        {
+          "seconds": 0.001821,
+          "allocatedBlocks": 324,
+          "reclaimedBlocks": 324,
+          "collections": 1439
+        },
+        {
+          "seconds": 0.001605,
+          "allocatedBlocks": 324,
+          "reclaimedBlocks": 324,
+          "collections": 1439
+        },
+        {
+          "seconds": 0.001486,
+          "allocatedBlocks": 324,
+          "reclaimedBlocks": 324,
+          "collections": 1439
+        },
+        {
+          "seconds": 0.001451,
+          "allocatedBlocks": 324,
+          "reclaimedBlocks": 324,
+          "collections": 1439
+        }
+      ]
+    },
+    {
+      "case": "completed-10",
+      "engine": "aot",
+      "lowering": "runtime",
+      "round": 0,
+      "processSeconds": 0.04798170899999832,
+      "phases": {},
+      "samples": [
+        {
+          "seconds": 0.003671,
+          "allocatedBlocks": 428,
+          "reclaimedBlocks": 428,
+          "collections": 1657
+        },
+        {
+          "seconds": 0.003196,
+          "allocatedBlocks": 428,
+          "reclaimedBlocks": 428,
+          "collections": 1657
+        },
+        {
+          "seconds": 0.003259,
+          "allocatedBlocks": 428,
+          "reclaimedBlocks": 428,
+          "collections": 1657
+        },
+        {
+          "seconds": 0.004269,
+          "allocatedBlocks": 428,
+          "reclaimedBlocks": 428,
+          "collections": 1657
+        }
+      ]
+    },
+    {
+      "case": "completed-10",
+      "engine": "aot",
+      "lowering": "runtime",
+      "round": 1,
+      "processSeconds": 0.018320458000001594,
+      "phases": {},
+      "samples": [
+        {
+          "seconds": 0.003809,
+          "allocatedBlocks": 428,
+          "reclaimedBlocks": 428,
+          "collections": 1657
+        },
+        {
+          "seconds": 0.003308,
+          "allocatedBlocks": 428,
+          "reclaimedBlocks": 428,
+          "collections": 1657
+        },
+        {
+          "seconds": 0.003394,
+          "allocatedBlocks": 428,
+          "reclaimedBlocks": 428,
+          "collections": 1657
+        },
+        {
+          "seconds": 0.003606,
+          "allocatedBlocks": 428,
+          "reclaimedBlocks": 428,
+          "collections": 1657
+        }
+      ]
+    },
+    {
+      "case": "completed-10",
+      "engine": "aot",
+      "lowering": "state-machine",
+      "round": 1,
+      "processSeconds": 0.011653417000001554,
+      "phases": {},
+      "samples": [
+        {
+          "seconds": 0.001638,
+          "allocatedBlocks": 324,
+          "reclaimedBlocks": 324,
+          "collections": 1439
+        },
+        {
+          "seconds": 0.001548,
+          "allocatedBlocks": 324,
+          "reclaimedBlocks": 324,
+          "collections": 1439
+        },
+        {
+          "seconds": 0.001673,
+          "allocatedBlocks": 324,
+          "reclaimedBlocks": 324,
+          "collections": 1439
+        },
+        {
+          "seconds": 0.001771,
+          "allocatedBlocks": 324,
+          "reclaimedBlocks": 324,
+          "collections": 1439
+        }
+      ]
+    },
+    {
+      "case": "completed-10",
+      "engine": "jit",
+      "lowering": "runtime",
+      "round": 1,
+      "processSeconds": 1.3349684589999988,
+      "phases": {
+        "compileAndFinalizeSeconds": 0.092949417,
+        "guestExitCode": 0,
+        "invocationSeconds": 0.014214417,
+        "metadataLoadSeconds": 0.083097459,
+        "profile": "macos-arm64-jit-managed-v1",
+        "selectionAndVerificationSeconds": 1.1245955
+      },
+      "samples": [
+        {
+          "seconds": 0.003689,
+          "allocatedBlocks": 428,
+          "reclaimedBlocks": 428,
+          "collections": 1657
+        },
+        {
+          "seconds": 0.003658,
+          "allocatedBlocks": 428,
+          "reclaimedBlocks": 428,
+          "collections": 1657
+        },
+        {
+          "seconds": 0.003464,
+          "allocatedBlocks": 428,
+          "reclaimedBlocks": 428,
+          "collections": 1657
+        },
+        {
+          "seconds": 0.003365,
+          "allocatedBlocks": 428,
+          "reclaimedBlocks": 428,
+          "collections": 1657
+        }
+      ]
+    },
+    {
+      "case": "completed-10",
+      "engine": "jit",
+      "lowering": "state-machine",
+      "round": 1,
+      "processSeconds": 1.391775292000002,
+      "phases": {
+        "compileAndFinalizeSeconds": 0.099916084,
+        "guestExitCode": 0,
+        "invocationSeconds": 0.006419667,
+        "metadataLoadSeconds": 0.082971417,
+        "profile": "macos-arm64-jit-managed-v1",
+        "selectionAndVerificationSeconds": 1.183202333
+      },
+      "samples": [
+        {
+          "seconds": 0.00169,
+          "allocatedBlocks": 324,
+          "reclaimedBlocks": 324,
+          "collections": 1439
+        },
+        {
+          "seconds": 0.001548,
+          "allocatedBlocks": 324,
+          "reclaimedBlocks": 324,
+          "collections": 1439
+        },
+        {
+          "seconds": 0.001563,
+          "allocatedBlocks": 324,
+          "reclaimedBlocks": 324,
+          "collections": 1439
+        },
+        {
+          "seconds": 0.001585,
+          "allocatedBlocks": 324,
+          "reclaimedBlocks": 324,
+          "collections": 1439
+        }
+      ]
+    },
+    {
+      "case": "completed-10",
+      "engine": "interpreter",
+      "lowering": "runtime",
+      "round": 1,
+      "processSeconds": 2.425461249999998,
+      "phases": {
+        "prepareSeconds": 1.9750688749999998
+      },
+      "samples": [
+        {
+          "allocatedObjects": 365,
+          "collections": 10,
+          "liveObjects": 0,
+          "peakObjects": 64,
+          "reclaimedObjects": 365,
+          "seconds": 0.100659083,
+          "stdout": ""
+        },
+        {
+          "allocatedObjects": 365,
+          "collections": 10,
+          "liveObjects": 0,
+          "peakObjects": 64,
+          "reclaimedObjects": 365,
+          "seconds": 0.099792125,
+          "stdout": ""
+        },
+        {
+          "allocatedObjects": 365,
+          "collections": 10,
+          "liveObjects": 0,
+          "peakObjects": 64,
+          "reclaimedObjects": 365,
+          "seconds": 0.122175709,
+          "stdout": ""
+        },
+        {
+          "allocatedObjects": 365,
+          "collections": 10,
+          "liveObjects": 0,
+          "peakObjects": 64,
+          "reclaimedObjects": 365,
+          "seconds": 0.105655084,
+          "stdout": ""
+        }
+      ]
+    },
+    {
+      "case": "completed-10",
+      "engine": "interpreter",
+      "lowering": "state-machine",
+      "round": 1,
+      "processSeconds": 2.4950708329999998,
+      "phases": {
+        "prepareSeconds": 1.968757125
+      },
+      "samples": [
+        {
+          "allocatedObjects": 324,
+          "collections": 9,
+          "liveObjects": 0,
+          "peakObjects": 82,
+          "reclaimedObjects": 324,
+          "seconds": 0.130673416,
+          "stdout": ""
+        },
+        {
+          "allocatedObjects": 324,
+          "collections": 9,
+          "liveObjects": 0,
+          "peakObjects": 82,
+          "reclaimedObjects": 324,
+          "seconds": 0.12358575,
+          "stdout": ""
+        },
+        {
+          "allocatedObjects": 324,
+          "collections": 9,
+          "liveObjects": 0,
+          "peakObjects": 82,
+          "reclaimedObjects": 324,
+          "seconds": 0.127788833,
+          "stdout": ""
+        },
+        {
+          "allocatedObjects": 324,
+          "collections": 9,
+          "liveObjects": 0,
+          "peakObjects": 82,
+          "reclaimedObjects": 324,
+          "seconds": 0.124964,
+          "stdout": ""
+        }
+      ]
+    },
+    {
+      "case": "completed-100",
+      "engine": "interpreter",
+      "lowering": "state-machine",
+      "round": 0,
+      "processSeconds": 6.696995958000002,
+      "phases": {
+        "prepareSeconds": 1.96596875
+      },
+      "samples": [
+        {
+          "allocatedObjects": 3114,
+          "collections": 84,
+          "liveObjects": 0,
+          "peakObjects": 82,
+          "reclaimedObjects": 3114,
+          "seconds": 1.17630225,
+          "stdout": ""
+        },
+        {
+          "allocatedObjects": 3114,
+          "collections": 84,
+          "liveObjects": 0,
+          "peakObjects": 82,
+          "reclaimedObjects": 3114,
+          "seconds": 1.16768325,
+          "stdout": ""
+        },
+        {
+          "allocatedObjects": 3114,
+          "collections": 84,
+          "liveObjects": 0,
+          "peakObjects": 82,
+          "reclaimedObjects": 3114,
+          "seconds": 1.177071417,
+          "stdout": ""
+        },
+        {
+          "allocatedObjects": 3114,
+          "collections": 84,
+          "liveObjects": 0,
+          "peakObjects": 82,
+          "reclaimedObjects": 3114,
+          "seconds": 1.182035166,
+          "stdout": ""
+        }
+      ]
+    },
+    {
+      "case": "completed-100",
+      "engine": "interpreter",
+      "lowering": "runtime",
+      "round": 0,
+      "processSeconds": 5.910947,
+      "phases": {
+        "prepareSeconds": 1.922190875
+      },
+      "samples": [
+        {
+          "allocatedObjects": 3515,
+          "collections": 100,
+          "liveObjects": 0,
+          "peakObjects": 64,
+          "reclaimedObjects": 3515,
+          "seconds": 1.018401416,
+          "stdout": ""
+        },
+        {
+          "allocatedObjects": 3515,
+          "collections": 100,
+          "liveObjects": 0,
+          "peakObjects": 64,
+          "reclaimedObjects": 3515,
+          "seconds": 0.992711042,
+          "stdout": ""
+        },
+        {
+          "allocatedObjects": 3515,
+          "collections": 100,
+          "liveObjects": 0,
+          "peakObjects": 64,
+          "reclaimedObjects": 3515,
+          "seconds": 0.971909375,
+          "stdout": ""
+        },
+        {
+          "allocatedObjects": 3515,
+          "collections": 100,
+          "liveObjects": 0,
+          "peakObjects": 64,
+          "reclaimedObjects": 3515,
+          "seconds": 0.9837195,
+          "stdout": ""
+        }
+      ]
+    },
+    {
+      "case": "completed-100",
+      "engine": "jit",
+      "lowering": "state-machine",
+      "round": 0,
+      "processSeconds": 1.4919754579999989,
+      "phases": {
+        "compileAndFinalizeSeconds": 0.115068583,
+        "guestExitCode": 0,
+        "invocationSeconds": 0.064851375,
+        "metadataLoadSeconds": 0.089016959,
+        "profile": "macos-arm64-jit-managed-v1",
+        "selectionAndVerificationSeconds": 1.19161025
+      },
+      "samples": [
+        {
+          "seconds": 0.016887,
+          "allocatedBlocks": 3114,
+          "reclaimedBlocks": 3114,
+          "collections": 13859
+        },
+        {
+          "seconds": 0.01677,
+          "allocatedBlocks": 3114,
+          "reclaimedBlocks": 3114,
+          "collections": 13859
+        },
+        {
+          "seconds": 0.015603,
+          "allocatedBlocks": 3114,
+          "reclaimedBlocks": 3114,
+          "collections": 13859
+        },
+        {
+          "seconds": 0.015296,
+          "allocatedBlocks": 3114,
+          "reclaimedBlocks": 3114,
+          "collections": 13859
+        }
+      ]
+    },
+    {
+      "case": "completed-100",
+      "engine": "jit",
+      "lowering": "runtime",
+      "round": 0,
+      "processSeconds": 1.6179581250000012,
+      "phases": {
+        "compileAndFinalizeSeconds": 0.104397333,
+        "guestExitCode": 0,
+        "invocationSeconds": 0.156927916,
+        "metadataLoadSeconds": 0.082826,
+        "profile": "macos-arm64-jit-managed-v1",
+        "selectionAndVerificationSeconds": 1.238441167
+      },
+      "samples": [
+        {
+          "seconds": 0.035174,
+          "allocatedBlocks": 4118,
+          "reclaimedBlocks": 4118,
+          "collections": 15967
+        },
+        {
+          "seconds": 0.041515,
+          "allocatedBlocks": 4118,
+          "reclaimedBlocks": 4118,
+          "collections": 15967
+        },
+        {
+          "seconds": 0.044121,
+          "allocatedBlocks": 4118,
+          "reclaimedBlocks": 4118,
+          "collections": 15967
+        },
+        {
+          "seconds": 0.036014,
+          "allocatedBlocks": 4118,
+          "reclaimedBlocks": 4118,
+          "collections": 15967
+        }
+      ]
+    },
+    {
+      "case": "completed-100",
+      "engine": "aot",
+      "lowering": "state-machine",
+      "round": 0,
+      "processSeconds": 0.7455324999999959,
+      "phases": {},
+      "samples": [
+        {
+          "seconds": 0.016987,
+          "allocatedBlocks": 3114,
+          "reclaimedBlocks": 3114,
+          "collections": 13859
+        },
+        {
+          "seconds": 0.016447,
+          "allocatedBlocks": 3114,
+          "reclaimedBlocks": 3114,
+          "collections": 13859
+        },
+        {
+          "seconds": 0.014256,
+          "allocatedBlocks": 3114,
+          "reclaimedBlocks": 3114,
+          "collections": 13859
+        },
+        {
+          "seconds": 0.014369,
+          "allocatedBlocks": 3114,
+          "reclaimedBlocks": 3114,
+          "collections": 13859
+        }
+      ]
+    },
+    {
+      "case": "completed-100",
+      "engine": "aot",
+      "lowering": "runtime",
+      "round": 0,
+      "processSeconds": 0.4944612919999969,
+      "phases": {},
+      "samples": [
+        {
+          "seconds": 0.03204,
+          "allocatedBlocks": 4118,
+          "reclaimedBlocks": 4118,
+          "collections": 15967
+        },
+        {
+          "seconds": 0.031969,
+          "allocatedBlocks": 4118,
+          "reclaimedBlocks": 4118,
+          "collections": 15967
+        },
+        {
+          "seconds": 0.031474,
+          "allocatedBlocks": 4118,
+          "reclaimedBlocks": 4118,
+          "collections": 15967
+        },
+        {
+          "seconds": 0.032527,
+          "allocatedBlocks": 4118,
+          "reclaimedBlocks": 4118,
+          "collections": 15967
+        }
+      ]
+    },
+    {
+      "case": "completed-100",
+      "engine": "aot",
+      "lowering": "runtime",
+      "round": 1,
+      "processSeconds": 0.13737150000000042,
+      "phases": {},
+      "samples": [
+        {
+          "seconds": 0.031803,
+          "allocatedBlocks": 4118,
+          "reclaimedBlocks": 4118,
+          "collections": 15967
+        },
+        {
+          "seconds": 0.034438,
+          "allocatedBlocks": 4118,
+          "reclaimedBlocks": 4118,
+          "collections": 15967
+        },
+        {
+          "seconds": 0.03199,
+          "allocatedBlocks": 4118,
+          "reclaimedBlocks": 4118,
+          "collections": 15967
+        },
+        {
+          "seconds": 0.035165,
+          "allocatedBlocks": 4118,
+          "reclaimedBlocks": 4118,
+          "collections": 15967
+        }
+      ]
+    },
+    {
+      "case": "completed-100",
+      "engine": "aot",
+      "lowering": "state-machine",
+      "round": 1,
+      "processSeconds": 0.061104667000002166,
+      "phases": {},
+      "samples": [
+        {
+          "seconds": 0.014156,
+          "allocatedBlocks": 3114,
+          "reclaimedBlocks": 3114,
+          "collections": 13859
+        },
+        {
+          "seconds": 0.014324,
+          "allocatedBlocks": 3114,
+          "reclaimedBlocks": 3114,
+          "collections": 13859
+        },
+        {
+          "seconds": 0.014651,
+          "allocatedBlocks": 3114,
+          "reclaimedBlocks": 3114,
+          "collections": 13859
+        },
+        {
+          "seconds": 0.013999,
+          "allocatedBlocks": 3114,
+          "reclaimedBlocks": 3114,
+          "collections": 13859
+        }
+      ]
+    },
+    {
+      "case": "completed-100",
+      "engine": "jit",
+      "lowering": "runtime",
+      "round": 1,
+      "processSeconds": 1.497648875000003,
+      "phases": {
+        "compileAndFinalizeSeconds": 0.092625084,
+        "guestExitCode": 0,
+        "invocationSeconds": 0.133955417,
+        "metadataLoadSeconds": 0.081956833,
+        "profile": "macos-arm64-jit-managed-v1",
+        "selectionAndVerificationSeconds": 1.1602739579999999
+      },
+      "samples": [
+        {
+          "seconds": 0.032697,
+          "allocatedBlocks": 4118,
+          "reclaimedBlocks": 4118,
+          "collections": 15967
+        },
+        {
+          "seconds": 0.03438,
+          "allocatedBlocks": 4118,
+          "reclaimedBlocks": 4118,
+          "collections": 15967
+        },
+        {
+          "seconds": 0.034954,
+          "allocatedBlocks": 4118,
+          "reclaimedBlocks": 4118,
+          "collections": 15967
+        },
+        {
+          "seconds": 0.031842,
+          "allocatedBlocks": 4118,
+          "reclaimedBlocks": 4118,
+          "collections": 15967
+        }
+      ]
+    },
+    {
+      "case": "completed-100",
+      "engine": "jit",
+      "lowering": "state-machine",
+      "round": 1,
+      "processSeconds": 1.419219333000001,
+      "phases": {
+        "compileAndFinalizeSeconds": 0.100552875,
+        "guestExitCode": 0,
+        "invocationSeconds": 0.061001667,
+        "metadataLoadSeconds": 0.085917959,
+        "profile": "macos-arm64-jit-managed-v1",
+        "selectionAndVerificationSeconds": 1.150918458
+      },
+      "samples": [
+        {
+          "seconds": 0.016171,
+          "allocatedBlocks": 3114,
+          "reclaimedBlocks": 3114,
+          "collections": 13859
+        },
+        {
+          "seconds": 0.015201,
+          "allocatedBlocks": 3114,
+          "reclaimedBlocks": 3114,
+          "collections": 13859
+        },
+        {
+          "seconds": 0.014824,
+          "allocatedBlocks": 3114,
+          "reclaimedBlocks": 3114,
+          "collections": 13859
+        },
+        {
+          "seconds": 0.014748,
+          "allocatedBlocks": 3114,
+          "reclaimedBlocks": 3114,
+          "collections": 13859
+        }
+      ]
+    },
+    {
+      "case": "completed-100",
+      "engine": "interpreter",
+      "lowering": "runtime",
+      "round": 1,
+      "processSeconds": 5.9845563330000076,
+      "phases": {
+        "prepareSeconds": 1.953887875
+      },
+      "samples": [
+        {
+          "allocatedObjects": 3515,
+          "collections": 100,
+          "liveObjects": 0,
+          "peakObjects": 64,
+          "reclaimedObjects": 3515,
+          "seconds": 1.018695083,
+          "stdout": ""
+        },
+        {
+          "allocatedObjects": 3515,
+          "collections": 100,
+          "liveObjects": 0,
+          "peakObjects": 64,
+          "reclaimedObjects": 3515,
+          "seconds": 0.985957833,
+          "stdout": ""
+        },
+        {
+          "allocatedObjects": 3515,
+          "collections": 100,
+          "liveObjects": 0,
+          "peakObjects": 64,
+          "reclaimedObjects": 3515,
+          "seconds": 1.000525208,
+          "stdout": ""
+        },
+        {
+          "allocatedObjects": 3515,
+          "collections": 100,
+          "liveObjects": 0,
+          "peakObjects": 64,
+          "reclaimedObjects": 3515,
+          "seconds": 1.005497084,
+          "stdout": ""
+        }
+      ]
+    },
+    {
+      "case": "completed-100",
+      "engine": "interpreter",
+      "lowering": "state-machine",
+      "round": 1,
+      "processSeconds": 6.724258582999994,
+      "phases": {
+        "prepareSeconds": 1.95534725
+      },
+      "samples": [
+        {
+          "allocatedObjects": 3114,
+          "collections": 84,
+          "liveObjects": 0,
+          "peakObjects": 82,
+          "reclaimedObjects": 3114,
+          "seconds": 1.210106,
+          "stdout": ""
+        },
+        {
+          "allocatedObjects": 3114,
+          "collections": 84,
+          "liveObjects": 0,
+          "peakObjects": 82,
+          "reclaimedObjects": 3114,
+          "seconds": 1.197251375,
+          "stdout": ""
+        },
+        {
+          "allocatedObjects": 3114,
+          "collections": 84,
+          "liveObjects": 0,
+          "peakObjects": 82,
+          "reclaimedObjects": 3114,
+          "seconds": 1.156530833,
+          "stdout": ""
+        },
+        {
+          "allocatedObjects": 3114,
+          "collections": 84,
+          "liveObjects": 0,
+          "peakObjects": 82,
+          "reclaimedObjects": 3114,
+          "seconds": 1.176745875,
+          "stdout": ""
+        }
+      ]
+    },
+    {
+      "case": "pending-10",
+      "engine": "interpreter",
+      "lowering": "state-machine",
+      "round": 0,
+      "processSeconds": 3.0286565410000037,
+      "phases": {
+        "prepareSeconds": 2.002188708
+      },
+      "samples": [
+        {
+          "allocatedObjects": 504,
+          "collections": 12,
+          "liveObjects": 0,
+          "peakObjects": 96,
+          "reclaimedObjects": 504,
+          "seconds": 0.249510834,
+          "stdout": ""
+        },
+        {
+          "allocatedObjects": 504,
+          "collections": 12,
+          "liveObjects": 0,
+          "peakObjects": 96,
+          "reclaimedObjects": 504,
+          "seconds": 0.251441542,
+          "stdout": ""
+        },
+        {
+          "allocatedObjects": 504,
+          "collections": 12,
+          "liveObjects": 0,
+          "peakObjects": 96,
+          "reclaimedObjects": 504,
+          "seconds": 0.255711958,
+          "stdout": ""
+        },
+        {
+          "allocatedObjects": 504,
+          "collections": 12,
+          "liveObjects": 0,
+          "peakObjects": 96,
+          "reclaimedObjects": 504,
+          "seconds": 0.245345375,
+          "stdout": ""
+        }
+      ]
+    },
+    {
+      "case": "pending-10",
+      "engine": "interpreter",
+      "lowering": "runtime",
+      "round": 0,
+      "processSeconds": 2.792076917000003,
+      "phases": {
+        "prepareSeconds": 1.953657208
+      },
+      "samples": [
+        {
+          "allocatedObjects": 596,
+          "collections": 14,
+          "liveObjects": 0,
+          "peakObjects": 100,
+          "reclaimedObjects": 596,
+          "seconds": 0.211268041,
+          "stdout": ""
+        },
+        {
+          "allocatedObjects": 596,
+          "collections": 14,
+          "liveObjects": 0,
+          "peakObjects": 100,
+          "reclaimedObjects": 596,
+          "seconds": 0.2038015,
+          "stdout": ""
+        },
+        {
+          "allocatedObjects": 596,
+          "collections": 14,
+          "liveObjects": 0,
+          "peakObjects": 100,
+          "reclaimedObjects": 596,
+          "seconds": 0.203457167,
+          "stdout": ""
+        },
+        {
+          "allocatedObjects": 596,
+          "collections": 14,
+          "liveObjects": 0,
+          "peakObjects": 100,
+          "reclaimedObjects": 596,
+          "seconds": 0.1954665,
+          "stdout": ""
+        }
+      ]
+    },
+    {
+      "case": "pending-10",
+      "engine": "jit",
+      "lowering": "state-machine",
+      "round": 0,
+      "processSeconds": 1.4386567079999963,
+      "phases": {
+        "compileAndFinalizeSeconds": 0.113925375,
+        "guestExitCode": 0,
+        "invocationSeconds": 0.0131695,
+        "metadataLoadSeconds": 0.083051,
+        "profile": "macos-arm64-jit-managed-v1",
+        "selectionAndVerificationSeconds": 1.201963834
+      },
+      "samples": [
+        {
+          "seconds": 0.003438,
+          "allocatedBlocks": 564,
+          "reclaimedBlocks": 564,
+          "collections": 2299
+        },
+        {
+          "seconds": 0.003212,
+          "allocatedBlocks": 564,
+          "reclaimedBlocks": 564,
+          "collections": 2299
+        },
+        {
+          "seconds": 0.00318,
+          "allocatedBlocks": 564,
+          "reclaimedBlocks": 564,
+          "collections": 2299
+        },
+        {
+          "seconds": 0.003281,
+          "allocatedBlocks": 564,
+          "reclaimedBlocks": 564,
+          "collections": 2299
+        }
+      ]
+    },
+    {
+      "case": "pending-10",
+      "engine": "jit",
+      "lowering": "runtime",
+      "round": 0,
+      "processSeconds": 1.4484136250000006,
+      "phases": {
+        "compileAndFinalizeSeconds": 0.093453,
+        "guestExitCode": 0,
+        "invocationSeconds": 0.043565292,
+        "metadataLoadSeconds": 0.086240291,
+        "profile": "macos-arm64-jit-managed-v1",
+        "selectionAndVerificationSeconds": 1.199234
+      },
+      "samples": [
+        {
+          "seconds": 0.011368,
+          "allocatedBlocks": 761,
+          "reclaimedBlocks": 761,
+          "collections": 2841
+        },
+        {
+          "seconds": 0.01059,
+          "allocatedBlocks": 761,
+          "reclaimedBlocks": 761,
+          "collections": 2841
+        },
+        {
+          "seconds": 0.011062,
+          "allocatedBlocks": 761,
+          "reclaimedBlocks": 761,
+          "collections": 2841
+        },
+        {
+          "seconds": 0.010491,
+          "allocatedBlocks": 761,
+          "reclaimedBlocks": 761,
+          "collections": 2841
+        }
+      ]
+    },
+    {
+      "case": "pending-10",
+      "engine": "aot",
+      "lowering": "state-machine",
+      "round": 0,
+      "processSeconds": 0.25015608300000736,
+      "phases": {},
+      "samples": [
+        {
+          "seconds": 0.003334,
+          "allocatedBlocks": 564,
+          "reclaimedBlocks": 564,
+          "collections": 2299
+        },
+        {
+          "seconds": 0.00309,
+          "allocatedBlocks": 564,
+          "reclaimedBlocks": 564,
+          "collections": 2299
+        },
+        {
+          "seconds": 0.003216,
+          "allocatedBlocks": 564,
+          "reclaimedBlocks": 564,
+          "collections": 2299
+        },
+        {
+          "seconds": 0.003001,
+          "allocatedBlocks": 564,
+          "reclaimedBlocks": 564,
+          "collections": 2299
+        }
+      ]
+    },
+    {
+      "case": "pending-10",
+      "engine": "aot",
+      "lowering": "runtime",
+      "round": 0,
+      "processSeconds": 0.13096441599999764,
+      "phases": {},
+      "samples": [
+        {
+          "seconds": 0.017287,
+          "allocatedBlocks": 761,
+          "reclaimedBlocks": 761,
+          "collections": 2841
+        },
+        {
+          "seconds": 0.034551,
+          "allocatedBlocks": 761,
+          "reclaimedBlocks": 761,
+          "collections": 2841
+        },
+        {
+          "seconds": 0.018213,
+          "allocatedBlocks": 761,
+          "reclaimedBlocks": 761,
+          "collections": 2841
+        },
+        {
+          "seconds": 0.01152,
+          "allocatedBlocks": 761,
+          "reclaimedBlocks": 761,
+          "collections": 2841
+        }
+      ]
+    },
+    {
+      "case": "pending-10",
+      "engine": "aot",
+      "lowering": "runtime",
+      "round": 1,
+      "processSeconds": 0.0496192920000027,
+      "phases": {},
+      "samples": [
+        {
+          "seconds": 0.011582,
+          "allocatedBlocks": 761,
+          "reclaimedBlocks": 761,
+          "collections": 2841
+        },
+        {
+          "seconds": 0.011897,
+          "allocatedBlocks": 761,
+          "reclaimedBlocks": 761,
+          "collections": 2841
+        },
+        {
+          "seconds": 0.011369,
+          "allocatedBlocks": 761,
+          "reclaimedBlocks": 761,
+          "collections": 2841
+        },
+        {
+          "seconds": 0.010473,
+          "allocatedBlocks": 761,
+          "reclaimedBlocks": 761,
+          "collections": 2841
+        }
+      ]
+    },
+    {
+      "case": "pending-10",
+      "engine": "aot",
+      "lowering": "state-machine",
+      "round": 1,
+      "processSeconds": 0.01786566600000583,
+      "phases": {},
+      "samples": [
+        {
+          "seconds": 0.004349,
+          "allocatedBlocks": 564,
+          "reclaimedBlocks": 564,
+          "collections": 2299
+        },
+        {
+          "seconds": 0.003014,
+          "allocatedBlocks": 564,
+          "reclaimedBlocks": 564,
+          "collections": 2299
+        },
+        {
+          "seconds": 0.003018,
+          "allocatedBlocks": 564,
+          "reclaimedBlocks": 564,
+          "collections": 2299
+        },
+        {
+          "seconds": 0.002995,
+          "allocatedBlocks": 564,
+          "reclaimedBlocks": 564,
+          "collections": 2299
+        }
+      ]
+    },
+    {
+      "case": "pending-10",
+      "engine": "jit",
+      "lowering": "runtime",
+      "round": 1,
+      "processSeconds": 1.3977738330000022,
+      "phases": {
+        "compileAndFinalizeSeconds": 0.096188583,
+        "guestExitCode": 0,
+        "invocationSeconds": 0.046017083,
+        "metadataLoadSeconds": 0.084911667,
+        "profile": "macos-arm64-jit-managed-v1",
+        "selectionAndVerificationSeconds": 1.149317958
+      },
+      "samples": [
+        {
+          "seconds": 0.013082,
+          "allocatedBlocks": 761,
+          "reclaimedBlocks": 761,
+          "collections": 2841
+        },
+        {
+          "seconds": 0.011812,
+          "allocatedBlocks": 761,
+          "reclaimedBlocks": 761,
+          "collections": 2841
+        },
+        {
+          "seconds": 0.010469,
+          "allocatedBlocks": 761,
+          "reclaimedBlocks": 761,
+          "collections": 2841
+        },
+        {
+          "seconds": 0.010604,
+          "allocatedBlocks": 761,
+          "reclaimedBlocks": 761,
+          "collections": 2841
+        }
+      ]
+    },
+    {
+      "case": "pending-10",
+      "engine": "jit",
+      "lowering": "state-machine",
+      "round": 1,
+      "processSeconds": 1.4164251250000035,
+      "phases": {
+        "compileAndFinalizeSeconds": 0.101680959,
+        "guestExitCode": 0,
+        "invocationSeconds": 0.013188416,
+        "metadataLoadSeconds": 0.084468625,
+        "profile": "macos-arm64-jit-managed-v1",
+        "selectionAndVerificationSeconds": 1.190516958
+      },
+      "samples": [
+        {
+          "seconds": 0.003242,
+          "allocatedBlocks": 564,
+          "reclaimedBlocks": 564,
+          "collections": 2299
+        },
+        {
+          "seconds": 0.003587,
+          "allocatedBlocks": 564,
+          "reclaimedBlocks": 564,
+          "collections": 2299
+        },
+        {
+          "seconds": 0.003142,
+          "allocatedBlocks": 564,
+          "reclaimedBlocks": 564,
+          "collections": 2299
+        },
+        {
+          "seconds": 0.003176,
+          "allocatedBlocks": 564,
+          "reclaimedBlocks": 564,
+          "collections": 2299
+        }
+      ]
+    },
+    {
+      "case": "pending-10",
+      "engine": "interpreter",
+      "lowering": "runtime",
+      "round": 1,
+      "processSeconds": 2.9691236660000015,
+      "phases": {
+        "prepareSeconds": 1.991501708
+      },
+      "samples": [
+        {
+          "allocatedObjects": 596,
+          "collections": 14,
+          "liveObjects": 0,
+          "peakObjects": 100,
+          "reclaimedObjects": 596,
+          "seconds": 0.230002084,
+          "stdout": ""
+        },
+        {
+          "allocatedObjects": 596,
+          "collections": 14,
+          "liveObjects": 0,
+          "peakObjects": 100,
+          "reclaimedObjects": 596,
+          "seconds": 0.210312458,
+          "stdout": ""
+        },
+        {
+          "allocatedObjects": 596,
+          "collections": 14,
+          "liveObjects": 0,
+          "peakObjects": 100,
+          "reclaimedObjects": 596,
+          "seconds": 0.253983084,
+          "stdout": ""
+        },
+        {
+          "allocatedObjects": 596,
+          "collections": 14,
+          "liveObjects": 0,
+          "peakObjects": 100,
+          "reclaimedObjects": 596,
+          "seconds": 0.258978625,
+          "stdout": ""
+        }
+      ]
+    },
+    {
+      "case": "pending-10",
+      "engine": "interpreter",
+      "lowering": "state-machine",
+      "round": 1,
+      "processSeconds": 3.0401585420000004,
+      "phases": {
+        "prepareSeconds": 1.9898579170000001
+      },
+      "samples": [
+        {
+          "allocatedObjects": 504,
+          "collections": 12,
+          "liveObjects": 0,
+          "peakObjects": 96,
+          "reclaimedObjects": 504,
+          "seconds": 0.255629541,
+          "stdout": ""
+        },
+        {
+          "allocatedObjects": 504,
+          "collections": 12,
+          "liveObjects": 0,
+          "peakObjects": 96,
+          "reclaimedObjects": 504,
+          "seconds": 0.266364417,
+          "stdout": ""
+        },
+        {
+          "allocatedObjects": 504,
+          "collections": 12,
+          "liveObjects": 0,
+          "peakObjects": 96,
+          "reclaimedObjects": 504,
+          "seconds": 0.247350875,
+          "stdout": ""
+        },
+        {
+          "allocatedObjects": 504,
+          "collections": 12,
+          "liveObjects": 0,
+          "peakObjects": 96,
+          "reclaimedObjects": 504,
+          "seconds": 0.256512666,
+          "stdout": ""
+        }
+      ]
+    },
+    {
+      "case": "pending-100",
+      "engine": "interpreter",
+      "lowering": "state-machine",
+      "round": 0,
+      "processSeconds": 12.173971124999994,
+      "phases": {
+        "prepareSeconds": 2.000983
+      },
+      "samples": [
+        {
+          "allocatedObjects": 4914,
+          "collections": 117,
+          "liveObjects": 0,
+          "peakObjects": 96,
+          "reclaimedObjects": 4914,
+          "seconds": 2.558415875,
+          "stdout": ""
+        },
+        {
+          "allocatedObjects": 4914,
+          "collections": 117,
+          "liveObjects": 0,
+          "peakObjects": 96,
+          "reclaimedObjects": 4914,
+          "seconds": 2.517563792,
+          "stdout": ""
+        },
+        {
+          "allocatedObjects": 4914,
+          "collections": 117,
+          "liveObjects": 0,
+          "peakObjects": 96,
+          "reclaimedObjects": 4914,
+          "seconds": 2.558516667,
+          "stdout": ""
+        },
+        {
+          "allocatedObjects": 4914,
+          "collections": 117,
+          "liveObjects": 0,
+          "peakObjects": 96,
+          "reclaimedObjects": 4914,
+          "seconds": 2.509529792,
+          "stdout": ""
+        }
+      ]
+    },
+    {
+      "case": "pending-100",
+      "engine": "interpreter",
+      "lowering": "runtime",
+      "round": 0,
+      "processSeconds": 10.440216166999988,
+      "phases": {
+        "prepareSeconds": 2.045112
+      },
+      "samples": [
+        {
+          "allocatedObjects": 5816,
+          "collections": 134,
+          "liveObjects": 0,
+          "peakObjects": 100,
+          "reclaimedObjects": 5816,
+          "seconds": 1.9580725,
+          "stdout": ""
+        },
+        {
+          "allocatedObjects": 5816,
+          "collections": 134,
+          "liveObjects": 0,
+          "peakObjects": 100,
+          "reclaimedObjects": 5816,
+          "seconds": 2.06535925,
+          "stdout": ""
+        },
+        {
+          "allocatedObjects": 5816,
+          "collections": 134,
+          "liveObjects": 0,
+          "peakObjects": 100,
+          "reclaimedObjects": 5816,
+          "seconds": 2.183266167,
+          "stdout": ""
+        },
+        {
+          "allocatedObjects": 5816,
+          "collections": 134,
+          "liveObjects": 0,
+          "peakObjects": 100,
+          "reclaimedObjects": 5816,
+          "seconds": 2.164010625,
+          "stdout": ""
+        }
+      ]
+    },
+    {
+      "case": "pending-100",
+      "engine": "jit",
+      "lowering": "state-machine",
+      "round": 0,
+      "processSeconds": 1.5919260000000008,
+      "phases": {
+        "compileAndFinalizeSeconds": 0.111678167,
+        "guestExitCode": 0,
+        "invocationSeconds": 0.128513667,
+        "metadataLoadSeconds": 0.095494125,
+        "profile": "macos-arm64-jit-managed-v1",
+        "selectionAndVerificationSeconds": 1.228527
+      },
+      "samples": [
+        {
+          "seconds": 0.032194,
+          "allocatedBlocks": 5514,
+          "reclaimedBlocks": 5514,
+          "collections": 22459
+        },
+        {
+          "seconds": 0.032919,
+          "allocatedBlocks": 5514,
+          "reclaimedBlocks": 5514,
+          "collections": 22459
+        },
+        {
+          "seconds": 0.031362,
+          "allocatedBlocks": 5514,
+          "reclaimedBlocks": 5514,
+          "collections": 22459
+        },
+        {
+          "seconds": 0.031704,
+          "allocatedBlocks": 5514,
+          "reclaimedBlocks": 5514,
+          "collections": 22459
+        }
+      ]
+    },
+    {
+      "case": "pending-100",
+      "engine": "jit",
+      "lowering": "runtime",
+      "round": 0,
+      "processSeconds": 1.838769124999999,
+      "phases": {
+        "compileAndFinalizeSeconds": 0.102748291,
+        "guestExitCode": 0,
+        "invocationSeconds": 0.440767375,
+        "metadataLoadSeconds": 0.082901959,
+        "profile": "macos-arm64-jit-managed-v1",
+        "selectionAndVerificationSeconds": 1.184958583
+      },
+      "samples": [
+        {
+          "seconds": 0.109795,
+          "allocatedBlocks": 7421,
+          "reclaimedBlocks": 7421,
+          "collections": 27771
+        },
+        {
+          "seconds": 0.108165,
+          "allocatedBlocks": 7421,
+          "reclaimedBlocks": 7421,
+          "collections": 27771
+        },
+        {
+          "seconds": 0.111551,
+          "allocatedBlocks": 7421,
+          "reclaimedBlocks": 7421,
+          "collections": 27771
+        },
+        {
+          "seconds": 0.111187,
+          "allocatedBlocks": 7421,
+          "reclaimedBlocks": 7421,
+          "collections": 27771
+        }
+      ]
+    },
+    {
+      "case": "pending-100",
+      "engine": "aot",
+      "lowering": "state-machine",
+      "round": 0,
+      "processSeconds": 0.4167109580000101,
+      "phases": {},
+      "samples": [
+        {
+          "seconds": 0.158982,
+          "allocatedBlocks": 5514,
+          "reclaimedBlocks": 5514,
+          "collections": 22459
+        },
+        {
+          "seconds": 0.030706,
+          "allocatedBlocks": 5514,
+          "reclaimedBlocks": 5514,
+          "collections": 22459
+        },
+        {
+          "seconds": 0.030268,
+          "allocatedBlocks": 5514,
+          "reclaimedBlocks": 5514,
+          "collections": 22459
+        },
+        {
+          "seconds": 0.031661,
+          "allocatedBlocks": 5514,
+          "reclaimedBlocks": 5514,
+          "collections": 22459
+        }
+      ]
+    },
+    {
+      "case": "pending-100",
+      "engine": "aot",
+      "lowering": "runtime",
+      "round": 0,
+      "processSeconds": 0.4819281670000066,
+      "phases": {},
+      "samples": [
+        {
+          "seconds": 0.106386,
+          "allocatedBlocks": 7421,
+          "reclaimedBlocks": 7421,
+          "collections": 27771
+        },
+        {
+          "seconds": 0.110816,
+          "allocatedBlocks": 7421,
+          "reclaimedBlocks": 7421,
+          "collections": 27771
+        },
+        {
+          "seconds": 0.104649,
+          "allocatedBlocks": 7421,
+          "reclaimedBlocks": 7421,
+          "collections": 27771
+        },
+        {
+          "seconds": 0.10307,
+          "allocatedBlocks": 7421,
+          "reclaimedBlocks": 7421,
+          "collections": 27771
+        }
+      ]
+    },
+    {
+      "case": "pending-100",
+      "engine": "aot",
+      "lowering": "runtime",
+      "round": 1,
+      "processSeconds": 0.4258960420000051,
+      "phases": {},
+      "samples": [
+        {
+          "seconds": 0.103453,
+          "allocatedBlocks": 7421,
+          "reclaimedBlocks": 7421,
+          "collections": 27771
+        },
+        {
+          "seconds": 0.104785,
+          "allocatedBlocks": 7421,
+          "reclaimedBlocks": 7421,
+          "collections": 27771
+        },
+        {
+          "seconds": 0.102294,
+          "allocatedBlocks": 7421,
+          "reclaimedBlocks": 7421,
+          "collections": 27771
+        },
+        {
+          "seconds": 0.111541,
+          "allocatedBlocks": 7421,
+          "reclaimedBlocks": 7421,
+          "collections": 27771
+        }
+      ]
+    },
+    {
+      "case": "pending-100",
+      "engine": "aot",
+      "lowering": "state-machine",
+      "round": 1,
+      "processSeconds": 0.1254625830000009,
+      "phases": {},
+      "samples": [
+        {
+          "seconds": 0.030366,
+          "allocatedBlocks": 5514,
+          "reclaimedBlocks": 5514,
+          "collections": 22459
+        },
+        {
+          "seconds": 0.029906,
+          "allocatedBlocks": 5514,
+          "reclaimedBlocks": 5514,
+          "collections": 22459
+        },
+        {
+          "seconds": 0.029834,
+          "allocatedBlocks": 5514,
+          "reclaimedBlocks": 5514,
+          "collections": 22459
+        },
+        {
+          "seconds": 0.030709,
+          "allocatedBlocks": 5514,
+          "reclaimedBlocks": 5514,
+          "collections": 22459
+        }
+      ]
+    },
+    {
+      "case": "pending-100",
+      "engine": "jit",
+      "lowering": "runtime",
+      "round": 1,
+      "processSeconds": 1.7843395000000157,
+      "phases": {
+        "compileAndFinalizeSeconds": 0.093739583,
+        "guestExitCode": 0,
+        "invocationSeconds": 0.433953875,
+        "metadataLoadSeconds": 0.084475667,
+        "profile": "macos-arm64-jit-managed-v1",
+        "selectionAndVerificationSeconds": 1.151636333
+      },
+      "samples": [
+        {
+          "seconds": 0.115706,
+          "allocatedBlocks": 7421,
+          "reclaimedBlocks": 7421,
+          "collections": 27771
+        },
+        {
+          "seconds": 0.107858,
+          "allocatedBlocks": 7421,
+          "reclaimedBlocks": 7421,
+          "collections": 27771
+        },
+        {
+          "seconds": 0.107581,
+          "allocatedBlocks": 7421,
+          "reclaimedBlocks": 7421,
+          "collections": 27771
+        },
+        {
+          "seconds": 0.102751,
+          "allocatedBlocks": 7421,
+          "reclaimedBlocks": 7421,
+          "collections": 27771
+        }
+      ]
+    },
+    {
+      "case": "pending-100",
+      "engine": "jit",
+      "lowering": "state-machine",
+      "round": 1,
+      "processSeconds": 1.5561912920000225,
+      "phases": {
+        "compileAndFinalizeSeconds": 0.102427458,
+        "guestExitCode": 0,
+        "invocationSeconds": 0.125866083,
+        "metadataLoadSeconds": 0.086599417,
+        "profile": "macos-arm64-jit-managed-v1",
+        "selectionAndVerificationSeconds": 1.2166867909999999
+      },
+      "samples": [
+        {
+          "seconds": 0.031803,
+          "allocatedBlocks": 5514,
+          "reclaimedBlocks": 5514,
+          "collections": 22459
+        },
+        {
+          "seconds": 0.031452,
+          "allocatedBlocks": 5514,
+          "reclaimedBlocks": 5514,
+          "collections": 22459
+        },
+        {
+          "seconds": 0.031306,
+          "allocatedBlocks": 5514,
+          "reclaimedBlocks": 5514,
+          "collections": 22459
+        },
+        {
+          "seconds": 0.031244,
+          "allocatedBlocks": 5514,
+          "reclaimedBlocks": 5514,
+          "collections": 22459
+        }
+      ]
+    },
+    {
+      "case": "pending-100",
+      "engine": "interpreter",
+      "lowering": "runtime",
+      "round": 1,
+      "processSeconds": 10.24140833300001,
+      "phases": {
+        "prepareSeconds": 1.9887255000000001
+      },
+      "samples": [
+        {
+          "allocatedObjects": 5816,
+          "collections": 134,
+          "liveObjects": 0,
+          "peakObjects": 100,
+          "reclaimedObjects": 5816,
+          "seconds": 2.144715,
+          "stdout": ""
+        },
+        {
+          "allocatedObjects": 5816,
+          "collections": 134,
+          "liveObjects": 0,
+          "peakObjects": 100,
+          "reclaimedObjects": 5816,
+          "seconds": 1.980929333,
+          "stdout": ""
+        },
+        {
+          "allocatedObjects": 5816,
+          "collections": 134,
+          "liveObjects": 0,
+          "peakObjects": 100,
+          "reclaimedObjects": 5816,
+          "seconds": 1.985599917,
+          "stdout": ""
+        },
+        {
+          "allocatedObjects": 5816,
+          "collections": 134,
+          "liveObjects": 0,
+          "peakObjects": 100,
+          "reclaimedObjects": 5816,
+          "seconds": 2.113213458,
+          "stdout": ""
+        }
+      ]
+    },
+    {
+      "case": "pending-100",
+      "engine": "interpreter",
+      "lowering": "state-machine",
+      "round": 1,
+      "processSeconds": 12.462821708000007,
+      "phases": {
+        "prepareSeconds": 2.012808042
+      },
+      "samples": [
+        {
+          "allocatedObjects": 4914,
+          "collections": 117,
+          "liveObjects": 0,
+          "peakObjects": 96,
+          "reclaimedObjects": 4914,
+          "seconds": 2.697120334,
+          "stdout": ""
+        },
+        {
+          "allocatedObjects": 4914,
+          "collections": 117,
+          "liveObjects": 0,
+          "peakObjects": 96,
+          "reclaimedObjects": 4914,
+          "seconds": 2.4730021669999998,
+          "stdout": ""
+        },
+        {
+          "allocatedObjects": 4914,
+          "collections": 117,
+          "liveObjects": 0,
+          "peakObjects": 96,
+          "reclaimedObjects": 4914,
+          "seconds": 2.731350542,
+          "stdout": ""
+        },
+        {
+          "allocatedObjects": 4914,
+          "collections": 117,
+          "liveObjects": 0,
+          "peakObjects": 96,
+          "reclaimedObjects": 4914,
+          "seconds": 2.512207583,
+          "stdout": ""
+        }
+      ]
+    }
+  ],
+  "summaries": [
+    {
+      "case": "completed-10",
+      "engine": "interpreter",
+      "state-machine": {
+        "median": 0.124565958,
+        "minimum": 0.12358575,
+        "maximum": 0.127788833
+      },
+      "runtime": {
+        "median": 0.10622362499999999,
+        "minimum": 0.099792125,
+        "maximum": 0.122175709
+      },
+      "runtimeOverStateMachine": 0.8527500346442966
+    },
+    {
+      "case": "completed-10",
+      "engine": "jit",
+      "state-machine": {
+        "median": 0.0015555,
+        "minimum": 0.001531,
+        "maximum": 0.001585
+      },
+      "runtime": {
+        "median": 0.0042045,
+        "minimum": 0.003365,
+        "maximum": 0.00722
+      },
+      "runtimeOverStateMachine": 2.702989392478303
+    },
+    {
+      "case": "completed-10",
+      "engine": "aot",
+      "state-machine": {
+        "median": 0.0015765,
+        "minimum": 0.001451,
+        "maximum": 0.001771
+      },
+      "runtime": {
+        "median": 0.003351,
+        "minimum": 0.003196,
+        "maximum": 0.004269
+      },
+      "runtimeOverStateMachine": 2.1255946717411986
+    },
+    {
+      "case": "completed-100",
+      "engine": "interpreter",
+      "state-machine": {
+        "median": 1.176908646,
+        "minimum": 1.156530833,
+        "maximum": 1.197251375
+      },
+      "runtime": {
+        "median": 0.9893344374999999,
+        "minimum": 0.971909375,
+        "maximum": 1.005497084
+      },
+      "runtimeOverStateMachine": 0.8406212673026789
+    },
+    {
+      "case": "completed-100",
+      "engine": "jit",
+      "state-machine": {
+        "median": 0.0152485,
+        "minimum": 0.014748,
+        "maximum": 0.01677
+      },
+      "runtime": {
+        "median": 0.035484,
+        "minimum": 0.031842,
+        "maximum": 0.044121
+      },
+      "runtimeOverStateMachine": 2.3270485621536547
+    },
+    {
+      "case": "completed-100",
+      "engine": "aot",
+      "state-machine": {
+        "median": 0.0143465,
+        "minimum": 0.013999,
+        "maximum": 0.016447
+      },
+      "runtime": {
+        "median": 0.032258499999999996,
+        "minimum": 0.031474,
+        "maximum": 0.035165
+      },
+      "runtimeOverStateMachine": 2.2485275154218796
+    },
+    {
+      "case": "pending-10",
+      "engine": "interpreter",
+      "state-machine": {
+        "median": 0.25357675,
+        "minimum": 0.245345375,
+        "maximum": 0.266364417
+      },
+      "runtime": {
+        "median": 0.207056979,
+        "minimum": 0.1954665,
+        "maximum": 0.258978625
+      },
+      "runtimeOverStateMachine": 0.8165455981275885
+    },
+    {
+      "case": "pending-10",
+      "engine": "jit",
+      "state-machine": {
+        "median": 0.003196,
+        "minimum": 0.003142,
+        "maximum": 0.003587
+      },
+      "runtime": {
+        "median": 0.010597,
+        "minimum": 0.010469,
+        "maximum": 0.011812
+      },
+      "runtimeOverStateMachine": 3.315707133917397
+    },
+    {
+      "case": "pending-10",
+      "engine": "aot",
+      "state-machine": {
+        "median": 0.003016,
+        "minimum": 0.002995,
+        "maximum": 0.003216
+      },
+      "runtime": {
+        "median": 0.0117085,
+        "minimum": 0.010473,
+        "maximum": 0.034551
+      },
+      "runtimeOverStateMachine": 3.882128647214854
+    },
+    {
+      "case": "pending-100",
+      "engine": "interpreter",
+      "state-machine": {
+        "median": 2.5148856874999996,
+        "minimum": 2.4730021669999998,
+        "maximum": 2.731350542
+      },
+      "runtime": {
+        "median": 2.0892863540000004,
+        "minimum": 1.980929333,
+        "maximum": 2.183266167
+      },
+      "runtimeOverStateMachine": 0.8307679209375598
+    },
+    {
+      "case": "pending-100",
+      "engine": "jit",
+      "state-machine": {
+        "median": 0.031407000000000004,
+        "minimum": 0.031244,
+        "maximum": 0.032919
+      },
+      "runtime": {
+        "median": 0.1080115,
+        "minimum": 0.102751,
+        "maximum": 0.111551
+      },
+      "runtimeOverStateMachine": 3.4390900117808125
+    },
+    {
+      "case": "pending-100",
+      "engine": "aot",
+      "state-machine": {
+        "median": 0.030487,
+        "minimum": 0.029834,
+        "maximum": 0.031661
+      },
+      "runtime": {
+        "median": 0.104717,
+        "minimum": 0.102294,
+        "maximum": 0.111541
+      },
+      "runtimeOverStateMachine": 3.434808278938564
+    }
+  ]
+}

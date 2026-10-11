@@ -8,6 +8,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-11
 
+- Add a matched runtime-suspension/state-machine benchmark across interpreter, JIT
+  and AOT, with shared native invocation timing, separate startup/JIT phases,
+  allocation/reclamation checks and reproducible input hashes. Record the native
+  POC performance gap; this does not change async defaults or qualify stack memory.
+
 - Add opt-in compiled runtime-await suspension for macOS ARM64 JIT and AOT, sharing
   exact service bindings, cooperative retained stacks, parked GC roots and terminal
   teardown. Qualify both HTTP projects, lifecycle outcomes, cancellation/use cleanup,

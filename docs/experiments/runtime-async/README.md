@@ -856,3 +856,78 @@ are another carrier candidate, not an implemented port. Sources were reviewed
 2026-10-11; the local macOS26.2 SDK ucontext.h also supplies the deprecation constraint.
 Choose the production carrier only with stack/GC/fault tests and measured memory and
 switching costs. No stable foreign ABI or public green-thread API is introduced.
+
+## Matched interpreter, JIT and AOT measurement — 2026-10-11
+
+`benchmark_modes.py` compiles the same nested-await source and provider with two
+lowerings: compiler-generated state machines and opt-in runtime suspension. It uses
+10 and 100 completed or pending operations, checks the sum, and requires the pending
+path to remain incomplete until its producer completes. This compares neoCLR's two
+implementations; it is **not a .NET runtime benchmark**. The architecture comparison
+above remains the basis for the experiment.
+
+```sh
+python3 docs/experiments/runtime-async/benchmark_modes.py \
+  --recipe target/runtime-http-use-final/validation.json \
+  --host target/scheduler-wait-validation/release/examples/runtime_async_interpreter \
+  --output target/runtime-modes-benchmark-final
+```
+
+The passing source recipe supplies compiler/reference paths; `--qualification`
+defaults to `native-validation.json` and supplies native build commands. Both native
+hosts are rebuilt from current sources. Current tool, source, reference and artifact
+hashes are recorded, and inputs are checked again after measurement. A changed input
+invalidates the run. Recipes retain absolute local paths and need matching local
+builds; they are not portable binary bundles.
+
+Each process executes four fresh invocations, discarding the first. Two rounds
+reverse engine/lowering order, giving six measured invocations per cell. Native JIT
+and AOT use the same C entry wrapper, including fresh heap/scope setup and terminal
+cleanup. Interpreter timing also includes invocation teardown; its implementation is
+not identical. Loading/verification and JIT generation are outside sample time.
+Process wall time and JIT phase times are retained separately in the raw report;
+AOT object generation/linking are build costs, not execution samples.
+
+Every invocation must return zero with no guest output. The native host checks root,
+operation and final-heap teardown and equal allocated/reclaimed GC block counts;
+the interpreter host requires zero final live objects. Compare allocation counts
+**within an engine**, not between interpreter objects and native GC blocks. These
+counters exclude native stack mappings, RSS and reserved address space. They do not
+establish memory efficiency of retained stacks.
+
+These are small, single-threaded local microbenchmarks, with six samples and no
+confidence interval. They do not measure HTTP throughput, concurrent loads, Windows,
+production carrier performance or a fully migrated runtime library. Keep default
+readiness and stack-memory qualification open even if an individual timing improves.
+
+Recorded on Apple M1, macOS-27.0-arm64-arm-64bit. Median fresh-invocation times
+for 100 operations ([raw report](runtime-await-modes-benchmark.json), including
+10-operation results and min/max ranges):
+
+| Workload | Engine | State machine (ms) | Runtime suspension (ms) | Runtime / state machine |
+|---|---|---:|---:|---:|
+| completed-100 | interpreter | 1176.91 | 989.33 | 0.84× |
+| completed-100 | jit | 15.25 | 35.48 | 2.33× |
+| completed-100 | aot | 14.35 | 32.26 | 2.25× |
+| pending-100 | interpreter | 2514.89 | 2089.29 | 0.83× |
+| pending-100 | jit | 31.41 | 108.01 | 3.44× |
+| pending-100 | aot | 30.49 | 104.72 | 3.43× |
+
+All 192 invocations passed result and reclamation checks; 144 remained after warmup
+discard. For these 100-operation cases runtime suspension uses about 16–17% less
+interpreter time, but 2.25–3.44× the native state-machine time. Native runtime
+suspension is still much faster than interpreter execution; that does not make it
+an improvement over native state machines. The preliminary run showed the same
+native regression direction. Small sample counts and observed outliers limit the
+precision of these ratios.
+
+The native allocation comparison at 100 operations also exposes a cost: completed
+work grows from 3,114 to 4,118 GC blocks, and pending work from 5,514 to 7,421. Both
+compiled modes reclaim every block. Interpreter counts grow from 3,114 to 3,515
+objects (completed) and 4,914 to 5,816 (pending), also with zero final live objects.
+The native carrier creates a guarded stack per retained body/callback, while the
+provider introduces notification/lifetime adapters. These are profiling candidates,
+not an attribution of the measured slowdown. GC collection frequency is recorded
+as another candidate. Measure these components and peak retained stack bytes before
+choosing pooling, fast paths or a replacement carrier. The canonical runtime-async
+direction remains intact, but the present native POC has not met the improvement gate.

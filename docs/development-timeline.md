@@ -15184,3 +15184,20 @@ or runtime-await default switch was performed.
 - Open: Windows, production carrier, performance/memory measurement, Task.Run and
   production provider/build integration. No default switch or author endorsement of
   this particular carrier is inferred.
+
+
+### 2026-10-11 — Matched async lowering measurements
+
+- Following the author's continuation and earlier requirement to benchmark runtime
+  suspension against compiler state machines, the assistant selected a bounded
+  comparison across interpreter, JIT and AOT before changing the POC carrier.
+- Performed: built a shared native timing host and compiled identical completed and
+  pending nested-await workloads with both lowerings. Recorded invocation times,
+  separate process/JIT phases, allocation/reclamation checks and input hashes.
+- Outcome: the interpreter comparison improves, while compiled runtime suspension
+  is slower than compiled state machines in this workload. JIT and AOT timings are
+  close. [Method, results and limits](experiments/runtime-async/README.md#matched-interpreter-jit-and-aot-measurement--2026-10-11).
+- Assistant conclusion: profile stack-carrier, notification and GC costs before
+  selecting an optimization. These measurements do not isolate the bottleneck,
+  measure retained stack memory, or justify changing defaults. Windows and the
+  production carrier remain open; no new author design decision is inferred.

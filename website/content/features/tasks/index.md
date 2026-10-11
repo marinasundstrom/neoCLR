@@ -289,8 +289,11 @@ for the supported compiler integration.
 for the current state-machine path in interpreter, JIT and AOT. Startup and external
 batch timings are separate. An opt-in Raven runtime-async interpreter comparison now
 measures lower execution time but more allocated objects in bounded nested-await
-workloads ([results and limitations](https://github.com/marinasundstrom/neoCLR/blob/main/docs/experiments/runtime-async/README.md#matched-language-benchmark--2026-10-11));
-JIT/AOT suspension performance and retained-byte measurements remain open. A matched pending-await comparison also measures
+workloads ([results and limitations](https://github.com/marinasundstrom/neoCLR/blob/main/docs/experiments/runtime-async/README.md#matched-language-benchmark--2026-10-11)).
+A [matched three-mode microbenchmark](https://github.com/marinasundstrom/neoCLR/blob/main/docs/experiments/runtime-async/README.md#matched-interpreter-jit-and-aot-measurement--2026-10-11)
+now also measures native suspension. The current native POC is slower than its
+state-machine baseline; production carrier optimization and retained-byte
+measurements remain open. A matched pending-await comparison also measures
 direct versus captured invocation registrations. These exploratory runs do not
 establish a general performance improvement.
 
