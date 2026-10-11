@@ -991,5 +991,12 @@ checks, five existing submission/timer executable checks, one expanded native bi
 contract, six instrumented native C contracts, and success/fault consumers in all three
 execution modes (six runs). [Evidence](experiments/scheduler-continuations/README.md).
 No Windows run or performance claim is included. The unchanged state-machine benchmark
-remains the production-path baseline; measuring the new registration object/token costs
-requires a matched captured-destination workload before production migration.
+remains the production-path baseline. A subsequent [matched registration workload](../benchmarks/scheduler/registrations.md)
+now measures direct versus captured invocation adapters in all three modes before
+production migration. It covers the complete registration-wrapper/capture/submit path,
+not isolated identity-check latency or allocation/memory metrics.
+
+The eighteen-run registration comparison passes correctness/protocol checks but has
+substantial round-to-round timing variation across both adapters. Its overhead estimate
+is inconclusive; a quieter counterbalanced run is required before a performance-based
+representation decision. Destination checks remain a correctness requirement.

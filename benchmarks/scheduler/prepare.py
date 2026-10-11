@@ -17,6 +17,7 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--recipe', type=Path, required=True)
     parser.add_argument('--output', type=Path, required=True)
+    parser.add_argument('--registrations', action='store_true', help='Build matched direct/captured continuation workers')
     args = parser.parse_args()
     recipe = json.loads(args.recipe.read_text())
     if not recipe['passed'] or recipe['cases'][0]['name'] != 'scheduler':
@@ -27,7 +28,7 @@ def main():
     host, compile_command, native, link, interpret = commands
     old_host = host[host.index('-o')+1]
     old_dir = Path(compile_command[compile_command.index('-o')+1]).parent
-    source = Path(__file__).with_name('StateMachine.rvn').resolve()
+    source = Path(__file__).with_name('Registrations.rvn' if args.registrations else 'StateMachine.rvn').resolve()
     lib = Path(compile_command[compile_command.index('--core-reference')+1]).parent
 
     def replace(command):
@@ -85,7 +86,8 @@ def main():
                 if Path(part).is_absolute() and Path(part).is_file():
                     report['inputs'][part] = sha(part)
         manifest = dict(schemaVersion=1, commands=modes, inputs=report['inputs'],
-                        cases=['await.completed', 'await.pending'])
+                        cases=['registration.direct', 'registration.captured'] if args.registrations
+                              else ['await.completed', 'await.pending'])
         (out/'manifest.json').write_text(json.dumps(manifest, indent=2)+'\n')
         report['passed'] = True
     finally:

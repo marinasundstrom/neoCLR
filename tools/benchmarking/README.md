@@ -76,3 +76,7 @@ functional framework checks do not establish performance rankings.
 The [scheduler baseline](../../benchmarks/scheduler/README.md) uses a dedicated async
 worker over the same external protocol. General async attribute discovery/lifecycle
 support is still unimplemented; this worker does not change the synchronous API.
+
+The scheduler preparation adapter also accepts `--registrations` for the
+[direct versus captured continuation comparison](../../benchmarks/scheduler/registrations.md).
+It uses two dedicated async cases in one assembly, without expanding attribute APIs.

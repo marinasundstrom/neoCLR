@@ -8,6 +8,13 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-11
 
+- Add a matched pending-await benchmark for direct callbacks versus captured
+  invocation registrations in interpreter/JIT/AOT. Retain raw startup/batch samples,
+  build inputs and measurement limits; the original state-machine baseline remains
+  unchanged. These prototype adapter measurements do not measure allocation/memory
+  or runtime suspension. Eighteen macOS ARM64 runs pass correctness checks, but
+  substantial timing variation leaves the capture-overhead estimate inconclusive.
+
 - Add private captured invocation destinations for scheduler continuation submission.
   Interpreter and native scopes reject foreign/expired identities before retaining
   callbacks, including reused native scope addresses. The internal awaitable captures

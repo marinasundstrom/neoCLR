@@ -1,0 +1,199 @@
+module Benchmarks.Scheduler {
+    import System.*
+    import System.Tasks.*
+    import System.Collections.*
+    import System.Result.*
+
+    // Matched prototype adapters: only the captured variant wraps registrations.
+    class Registration {
+        private val destination: long
+        private val callback: () -> System.Void
+
+        init(callback: () -> System.Void) {
+            destination = neoCLR.Runtime.SchedulerCapture()
+            self.callback = callback
+        }
+
+        func Submit() {
+            _ = neoCLR.Runtime.SchedulerSubmitTo(destination, callback)
+        }
+    }
+
+    class DirectCompletion : System.Runtime.CompilerServices.TaskAwaiter {
+        private val source: Promise<int>
+        private var callbacks = ArrayList<() -> System.Void>()
+        var Calls = 0
+
+        init(producer: TaskQueue) {
+            source = Promise<int>(producer)
+        }
+
+        val IsCompleted: bool => source.Task.IsCompleted
+        val IsCancelled: bool => source.Task.IsCancelled
+        func GetAwaiter() -> DirectCompletion => self
+        func GetResult() -> int => source.Task.GetResult()
+
+        func OnCompleted(callback: () -> System.Void) {
+            if IsCompleted {
+                System.Fail("Expected a pending registration")
+            }
+            callbacks.Add(callback)
+        }
+
+        func Complete() -> System.Void {
+            Calls += 1
+            if !source.Complete(1) {
+                System.Fail("Duplicate completion")
+            }
+            let pending = callbacks
+            callbacks = ArrayList<() -> System.Void>()
+            for callback in pending {
+                _ = neoCLR.Runtime.SchedulerSubmit(callback)
+            }
+            return ()
+        }
+    }
+
+    class CapturedCompletion : System.Runtime.CompilerServices.TaskAwaiter {
+        private val source: Promise<int>
+        private var callbacks = ArrayList<Registration>()
+        var Calls = 0
+
+        init(producer: TaskQueue) {
+            source = Promise<int>(producer)
+        }
+
+        val IsCompleted: bool => source.Task.IsCompleted
+        val IsCancelled: bool => source.Task.IsCancelled
+        func GetAwaiter() -> CapturedCompletion => self
+        func GetResult() -> int => source.Task.GetResult()
+
+        func OnCompleted(callback: () -> System.Void) {
+            if IsCompleted {
+                System.Fail("Expected a pending registration")
+            }
+            callbacks.Add(Registration(callback))
+        }
+
+        func Complete() -> System.Void {
+            Calls += 1
+            if !source.Complete(1) {
+                System.Fail("Duplicate completion")
+            }
+            let pending = callbacks
+            callbacks = ArrayList<Registration>()
+            for callback in pending {
+                callback.Submit()
+            }
+            return ()
+        }
+    }
+
+    async func RunOperation(captured: bool, producer: TaskQueue) -> Task<int> {
+        var total = 0
+        var index = 0
+        while index < 32 {
+            if captured {
+                let completion = CapturedCompletion(producer)
+                _ = neoCLR.Runtime.SchedulerSubmit(completion.Complete)
+                if completion.Calls != 0 {
+                    System.Fail("Completion ran inline")
+                }
+                let value = await completion
+                if completion.Calls != 1 {
+                    System.Fail("Delivery count mismatch")
+                }
+                total += value
+            } else {
+                let completion = DirectCompletion(producer)
+                _ = neoCLR.Runtime.SchedulerSubmit(completion.Complete)
+                if completion.Calls != 0 {
+                    System.Fail("Completion ran inline")
+                }
+                let value = await completion
+                if completion.Calls != 1 {
+                    System.Fail("Delivery count mismatch")
+                }
+                total += value
+            }
+            index += 1
+        }
+        if total != 32 {
+            System.Fail("Await checksum mismatch")
+        }
+        return 1
+    }
+
+    func ProducerPumpForbidden() -> System.Void {
+        System.Fail("Producer queue was pumped")
+        return ()
+    }
+
+    func ParseCount(text: string) -> int {
+        let Ok(value) = Int32.Parse(text) else {
+            System.Fail("Invalid count")
+        }
+        return value
+    }
+
+    async func Main(arguments: string[]) -> Task<int> {
+        if arguments.Length != 3 {
+            System.Fail("Expected case, warmups and operations")
+        }
+        let name = arguments[0]
+        if name != "registration.direct" && name != "registration.captured" {
+            System.Fail("Unknown scheduler benchmark")
+        }
+        let warmups = ParseCount(arguments[1])
+        let operations = ParseCount(arguments[2])
+        if warmups < 0 {
+            System.Fail("Benchmark count outside supported range")
+        }
+        if warmups > 10000 {
+            System.Fail("Benchmark count outside supported range")
+        }
+        if operations < 1 {
+            System.Fail("Benchmark count outside supported range")
+        }
+        if operations > 10000 {
+            System.Fail("Benchmark count outside supported range")
+        }
+
+        let captured = name == "registration.captured"
+        let producer = TaskQueue()
+        producer.Post(ProducerPumpForbidden)
+        Console.WriteLine("NEOBENCH/1 READY")
+        var index = 0
+        while index < warmups {
+            let result = await RunOperation(captured, producer)
+            if result != 1 {
+                System.Fail("Warmup failed")
+            }
+            index += 1
+        }
+        Console.WriteLine("NEOBENCH/1 BEGIN")
+        index = 0
+        var checksum = 0
+        while index < operations {
+            let result = await RunOperation(captured, producer)
+            checksum += result
+            index += 1
+        }
+        Console.WriteLine("NEOBENCH/1 END")
+        Console.WriteLine(checksum)
+        return 0
+    }
+}
+
+module neoCLR.Runtime {
+    import System.Runtime.CompilerServices.*
+
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    internal extern func SchedulerSubmit(callback: () -> System.Void) -> int;
+
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    internal extern func SchedulerCapture() -> long;
+
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    internal extern func SchedulerSubmitTo(destination: long, callback: () -> System.Void) -> int;
+}

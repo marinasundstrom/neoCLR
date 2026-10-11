@@ -109,3 +109,7 @@ three-round, non-interleaved local measurements with uncontrolled background loa
 This is a correctness change preserving existing dispatch behavior, with a retained
 performance observation rather than a speedup claim. JIT/AOT code is unchanged and
 was not remeasured for this interpreter-only slice.
+
+A separate [matched registration comparison](registrations.md) measures the direct
+and captured-destination prototypes using the same pending-await workload. It leaves
+this original Task/state-machine baseline unchanged.

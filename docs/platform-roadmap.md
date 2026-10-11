@@ -66,8 +66,11 @@ memory. See the [measurement gates](runtime-scheduling-design.md#scheduler-and-s
 Correctness qualification alone establishes no performance improvement. A first
 [state-machine baseline](../benchmarks/scheduler/README.md) now measures completed and
 pending sequential awaits through the existing external runner in interpreter/JIT/AOT.
-Allocation and retained-memory instrumentation, broader workloads and the future
-runtime-suspension comparison remain open.
+A [matched registration comparison](../benchmarks/scheduler/registrations.md) now
+measures direct callbacks against captured invocation registrations in the same
+pending-await workload. All eighteen runs pass correctness checks, but timing
+variation leaves capture overhead inconclusive. Allocation and retained-memory instrumentation, broader
+workloads and the future runtime-suspension comparison remain open.
 
 **Common language runtime clarification (2026-10-11):** the primary target is managed
 languages running bytecode through the interpreter or JIT, with native AOT as the
