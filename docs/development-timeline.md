@@ -15058,3 +15058,19 @@ or runtime-await default switch was performed.
   time, with 13–18% more allocations. All invocations finish with zero live objects.
   [Method, raw observations and limits](experiments/runtime-async/README.md#matched-language-benchmark--2026-10-11).
   Provider allocation costs and broader qualification remain open; no default switch.
+
+
+### Async operations as cross-language contracts — 2026-10-11
+
+- **Author:** questioned treating a task operation as a concrete class, suggesting an
+  interface analogous to Windows Runtime so other languages can supply different
+  implementations against a metadata contract. Clarified that the goal is runtime
+  asynchrony built from the ground up, without inheriting .NET legacy constraints.
+- **Assistant proposal:** separate the recognized operation contract from managed
+  Task/Promise projections and runtime scheduling. Evaluate a managed interface as
+  one projection; specify race-safe registration, result/lifetime/GC semantics and
+  runtime validation before fixing its shape. Compare WinRT and C# await precedents.
+- **Action/outcome:** recorded the [provisional architecture and qualification plan](runtime-scheduling-design.md#cross-language-asynchronous-operation-contract--2026-10-11).
+  No interface or native interoperability implementation is claimed. The working POC
+  remains Task-specific; a distinct second operation implementation is the next
+  contract proof, with existing samples and benchmarks retained as regressions.

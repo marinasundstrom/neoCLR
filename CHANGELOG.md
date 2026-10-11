@@ -8,6 +8,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-11
 
+- Record the author-directed cross-language async-operation contract design, with
+  WinRT/C# comparisons and planned metadata, completion-race and GC qualification.
+  Task remains the managed projection; a general operation interface and foreign
+  producer ABI are proposals, not implemented capabilities.
+
 - Record matched interpreter benchmarks for Raven state-machine and runtime-async
   lowering, with external rounds, warmup separation, checksums and heap accounting.
   Runtime async reduces time in these workloads but increases allocations; retain

@@ -1556,3 +1556,66 @@ without promoting the temporary provider or queue integration to public contract
 [Matched timing/allocation evidence](experiments/runtime-async/README.md#matched-language-benchmark--2026-10-11)
 shows lower interpreter time but increased allocation counts. Improve provider costs;
 these results do not establish JIT/AOT support or justify switching defaults.
+
+
+### Cross-language asynchronous operation contract — 2026-10-11
+
+**Author direction:** an asynchronous operation is a contract, not necessarily the
+concrete managed Task class. Another language may implement it differently while
+interoperating through metadata. Starting from a clean slate means making asynchrony
+a runtime feature without inheriting .NET's historical implementation constraints.
+This refines the earlier awaiter discussion; it does not declare a new public API.
+
+**Baseline (primary sources retrieved 2026-10-11):**
+[WinRT IAsyncOperation<TResult>](https://learn.microsoft.com/en-us/uwp/api/windows.foundation.iasyncoperation-1)
+provides an interface boundary with completion notification and result retrieval;
+IAsyncInfo adds status, cancellation and lifetime members. Language projections can
+use different internal implementations while exposing that interface at component
+boundaries. [C# await](https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/language-specification/expressions#1299-await-expressions)
+uses an awaiter pattern with completion testing, continuation registration and result
+retrieval; it is not restricted to the concrete Task class. These are useful precedents,
+not a requirement to import COM lifetime rules or compiler state machines into neoCLR.
+
+**Provisional architecture:** metadata describes a recognized asynchronous-operation
+contract and its result type. Runtime validation binds an implementation to that
+contract; the scheduler suspends/resumes execution through it. Task<T> remains the
+standard managed projection, Promise<T> its producer, and Scheduler execution policy.
+An operation is not itself a scheduled body: foreign I/O or manual completion can
+produce an operation without starting a runtime activation. No Task field layout or
+Raven-only method-name convention should be the permanent interoperability ABI.
+
+A managed interface such as AsyncOperation<T> (name undecided) is a candidate public
+projection of that contract. An ordinary interface alone does not specify race safety,
+root ownership or native ABI behavior. Prefer a shared semantic contract with explicit
+managed/native bindings over either hard-coding Task<T> or introducing an unconstrained
+structural method pattern. Keep a minimal implementation protocol separate from
+consumer conveniences and optional cancellation-request capabilities.
+
+The next bounded design/prototype should establish:
+
+- Result type and stable terminal state: repeated observation and multiple independent
+  waiters, with cancellation distinct from recoverable domain errors represented in T.
+  Fault remains invocation-terminal; do not add a recoverable faulted-task state.
+- Race-safe completion observation/registration: completion between checking and
+  parking must not lose a wakeup; each registered waiter resumes at most once.
+  Do not require a user callback setter with single-subscriber semantics.
+- Runtime-owned resumption policy: completion publishes availability; it does not
+  arbitrarily execute suspended user code on a foreign completion thread.
+- Lifetime and GC rules: roots for pending registrations, retained results and foreign
+  handles; cleanup after completion, cancellation and invocation termination. Native
+  retain/release details must be explicit rather than inferred from a managed interface.
+- Validation of contract metadata, unsupported implementations and adapter boundaries.
+  First exercise Task<T> and a distinct manual operation implementation, then qualify
+  native producers and JIT/AOT. An interface declaration by itself is not interop proof.
+
+Benefit: frontends and producers can interoperate without sharing a concrete managed
+class or compiler-generated state-machine convention. Costs: runtime verification,
+adapters, indirect dispatch and ownership bookkeeping; specialization may recover
+costs but requires measurements. The existing timing/allocation benchmark is the
+baseline, not evidence that interface dispatch is free. Metadata encoding, exact
+interface members, cancellation capabilities and foreign ABI remain provisional.
+
+The current POC intentionally accepts Task<T> through a source provider. Treat that
+as a documented bridge limitation to remove during contract qualification, not a
+permanent platform restriction. Preserve its working samples and GC/benchmark evidence
+while introducing the second implementation; no default switch is implied.

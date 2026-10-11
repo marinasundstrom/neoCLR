@@ -50,8 +50,12 @@ suspension. The provider remains source-local and interpreter-only.
 [Matched interpreter benchmarks](experiments/runtime-async/README.md#matched-language-benchmark--2026-10-11)
 now show about 16–21% less time at 100 operations, with 13–18% more allocations.
 Improve notification/lifetime costs and broaden qualification before switching defaults.
-Native stack representation, preemption and
-multi-core scheduling remain open. Task/Promise keep operation/producer roles.
+The author further selects a [cross-language operation contract](runtime-scheduling-design.md#cross-language-asynchronous-operation-contract--2026-10-11),
+independent of the concrete managed Task class. Define metadata/runtime semantics
+and prove a second operation implementation before settling the public interface;
+use the current samples and benchmarks as regressions. This is design/prototype work,
+not implemented general awaitable support. Native stack representation, preemption
+and multi-core scheduling remain open. Task/Promise keep operation/producer roles.
 
 **Runtime async groundwork (2026-10-11):** the author directs implementation while
 keeping Raven's CLR lowering separate from neoCLR's execution choices. A private
