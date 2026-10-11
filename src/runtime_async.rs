@@ -65,6 +65,14 @@ impl Operations {
         }
     }
 
+    pub(crate) fn is_ready(&self, id: i64) -> bool {
+        match self.0.get(&id) {
+            Some(Operation::Pending) => false,
+            Some(Operation::Timer(deadline)) => Instant::now() >= *deadline,
+            _ => true,
+        }
+    }
+
     pub(crate) fn validate(&self, id: i64) -> Result<(), Fault> {
         if self.0.contains_key(&id) {
             Ok(())

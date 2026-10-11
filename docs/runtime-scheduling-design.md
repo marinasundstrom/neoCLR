@@ -1360,3 +1360,39 @@ stacks, heap-frame lowering, preemption or worker topology. The retained-chain P
 is evidence for rooting and resumption, not completion of that execution model.
 Continue the existing CLR/Go/Java research comparison when choosing native activation
 representation and measure memory, fairness and switching costs before claiming gains.
+
+## Detached interpreter activations — 2026-10-11
+
+The private operation-wait POC now detaches a callback's frames when it parks and
+can resume a ready parent independently. When no chain is active, ready parked activations are selected in
+parking order at dispatch boundaries. Their frame permits, GC roots and array
+payload accounting remain live while detached. Entry results are retained while
+remaining activations finish; callback completion cannot overwrite the entry result.
+The host wait considers deadlines across parked activations. Existing state-machine
+and public Task behavior are unchanged.
+
+The new handshake has a callback complete its parent's operation, then await a reply
+from that parent. The parent resumes, sends the reply and awaits callback completion.
+This cannot finish under the preceding LIFO-only implementation. The compiled Raven
+consumer covers it, and focused tests additionally collect while the callback is the
+only owner of its receiver and check detached array budgets and entry-result retention.
+
+This is cooperative, interpreter-only scheduling of private integer-result operations.
+No native stack strategy, preemption, migration across workers, stable foreign ABI,
+public Task projection or compiler `await` lowering is selected by this implementation.
+Uninterrupted guest code still runs until an existing execution boundary; fairness
+and scalable work selection require measurement. Selection currently scans a bounded
+operation/activation set; this is not a throughput improvement claim.
+
+### Immediate default-await goal
+
+The author directs that runtime await become Raven's default, with stability and
+improvement demonstrated. That is the next integration goal rather than treating
+standalone green-thread experiments as the deliverable. Gates are: explicit neoCLR
+compiler target capability/lowering; faithful managed Task results, faults and
+cancellation; ordinary Raven async consumers and entry points; focused stress/root
+and lifetime qualification; and equivalent compiler-state-machine versus runtime-await
+measurements of throughput, latency, allocations and retained memory. Preserve the
+state-machine fallback. Do not switch supported execution modes to an unsupported
+path: JIT/AOT implementations and Windows qualification remain required where exposed.
+The current private interpreter calls prove activation mechanics, not default readiness.

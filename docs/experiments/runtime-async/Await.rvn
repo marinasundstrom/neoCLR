@@ -22,6 +22,29 @@ module RuntimeAsyncAwaitProbe {
         }
     }
 
+    class Exchange {
+        val Parent: long
+        val Reply: long
+        val Done: long
+
+        init(parent: long, reply: long, done: long) {
+            Parent = parent
+            Reply = reply
+            Done = done
+        }
+
+        func Run() -> System.Void {
+            _ = neoCLR.Runtime.RuntimeAsyncComplete(Parent, 17)
+            let reply = neoCLR.Runtime.RuntimeAsyncAwait(Reply)
+            if reply != 25 {
+                System.Fail("Detached callback lost parent reply")
+            }
+            System.Runtime.GC.Collect()
+            _ = neoCLR.Runtime.RuntimeAsyncComplete(Done, 42)
+            return ()
+        }
+    }
+
     func Nested(producer: Producer) -> int {
         let saved = 7
         let result = neoCLR.Runtime.RuntimeAsyncAwait(producer.Operation)
@@ -39,6 +62,17 @@ module RuntimeAsyncAwaitProbe {
         _ = neoCLR.Runtime.RuntimeAsyncComplete(completed, 42)
         if neoCLR.Runtime.RuntimeAsyncAwait(completed) != 42 {
             System.Fail("Already completed operation lost its result")
+        }
+        let exchange = Exchange(neoCLR.Runtime.RuntimeAsyncCreate(),
+            neoCLR.Runtime.RuntimeAsyncCreate(), neoCLR.Runtime.RuntimeAsyncCreate())
+        _ = neoCLR.Runtime.SchedulerSubmit(exchange.Run)
+        if neoCLR.Runtime.RuntimeAsyncAwait(exchange.Parent) != 17 {
+            System.Fail("Parent failed to resume independently")
+        }
+        System.Runtime.GC.Collect()
+        _ = neoCLR.Runtime.RuntimeAsyncComplete(exchange.Reply, 25)
+        if neoCLR.Runtime.RuntimeAsyncAwait(exchange.Done) != 42 {
+            System.Fail("Detached callback failed to resume")
         }
         Console.WriteLine("PASS runtime-owned operation suspension and resumption")
         return 0

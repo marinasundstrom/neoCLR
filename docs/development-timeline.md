@@ -14891,3 +14891,20 @@ outside benchmark measurement. Implementation follows the configuration slice.
 - Recorded the direction in the roadmap and scheduling design. Native stack
   representation, preemption and multi-core topology remain unselected; the user
   has not approved a specific mechanism by this clarification.
+
+## 2026-10-11 — Independent activation POC and default runtime await
+
+- Author requested continuing the POC. Assistant implemented detached interpreter
+  frames so a parent can resume while a callback waits for that parent's reply.
+  The handshake passes in focused tests and the compiled Raven consumer; roots,
+  array charges and entry-result ownership are retained across detachment.
+- Author then clarified: “Our immediate goal is having runtime await the default
+  for Raven. And that we can prove stability and improvement”.
+- Assistant made default Raven runtime await the next integration goal, with explicit
+  target lowering, managed Task semantics, stability testing and equivalent latency,
+  throughput and memory comparisons as readiness gates. No default was switched;
+  the current interpreter/private-intrinsic POC does not establish native readiness
+  or performance improvement. Compiler-generated state machines remain supported.
+- Evidence: [runtime-async POC](experiments/runtime-async/README.md). Open: real Raven
+  await integration, managed results, native/JIT and Windows qualification, stress
+  coverage and comparison benchmarks. Native stack representation remains unselected.

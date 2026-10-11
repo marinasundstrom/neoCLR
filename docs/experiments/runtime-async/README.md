@@ -1,4 +1,8 @@
-# Interpreter retained-frame yield experiment
+# Interpreter runtime-async experiments
+
+Current development status: [detached activations](#detached-interpreter-activations--2026-10-11)
+pass the Raven handshake and 41 focused checks. Public Task/compiler await integration
+and default switching remain open. Earlier sections record the preceding POC slices.
 
 Development experiment, 2026-10-11. `Yield.rvn` calls a private runtime boundary
 from ordinary Raven functions; no async state machine is generated for these calls.
@@ -131,3 +135,35 @@ Public API reference and website capabilities remain unchanged.
 The author subsequently clarified that green threads are the intended direction.
 Independent activation scheduling is therefore the next POC gate; native stack
 representation and preemption remain design questions, not established contracts.
+
+## Detached interpreter activations — 2026-10-11
+
+The private operation-wait POC now detaches a callback's frames when it parks and
+can resume a ready parent independently. When no chain is active, ready parked activations are selected in
+parking order at dispatch boundaries. Their frame permits, GC roots and array
+payload accounting remain live while detached. Entry results are retained while
+remaining activations finish; callback completion cannot overwrite the entry result.
+The host wait considers deadlines across parked activations. Existing state-machine
+and public Task behavior are unchanged.
+
+The new handshake has a callback complete its parent's operation, then await a reply
+from that parent. The parent resumes, sends the reply and awaits callback completion.
+This cannot finish under the preceding LIFO-only implementation. The compiled Raven
+consumer covers it, and focused tests additionally collect while the callback is the
+only owner of its receiver and check detached array budgets and entry-result retention.
+
+This is cooperative, interpreter-only scheduling of private integer-result operations.
+No native stack strategy, preemption, migration across workers, stable foreign ABI,
+public Task projection or compiler `await` lowering is selected by this implementation.
+Uninterrupted guest code still runs until an existing execution boundary; fairness
+and scalable work selection require measurement. Selection currently scans a bounded
+operation/activation set; this is not a throughput improvement claim.
+
+The preceding LIFO limitation is historical for the earlier POC revision. See
+[detached-activation consumer evidence](detached-validation.json). Run the same
+`validate.py` command with a fresh dedicated output directory to reproduce the
+extended consumer. Earlier evidence files remain tied to their recorded source hashes.
+
+The author's immediate goal is Raven runtime await by default, backed by stability
+and improvement evidence. Next is the explicit compiler/managed-await integration
+contract and equivalent comparison cases. This POC does not change Raven defaults.

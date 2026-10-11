@@ -1195,8 +1195,9 @@ ret
         step(&mut state, &mut frames),
         Ok(InstructionProgress::Waiting)
     ));
-    assert_eq!(frames.len(), 1);
-    assert_eq!(frames[0].stack, vec![Value::Int32(10)]);
+    assert!(frames.is_empty());
+    assert_eq!(state.parked_activations.len(), 1);
+    assert_eq!(state.parked_activations[0].frames[0].stack, vec![Value::Int32(10)]);
     let remaining = state.budget.remaining();
     assert!(matches!(
         step(&mut state, &mut frames),

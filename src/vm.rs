@@ -1984,18 +1984,15 @@ fn drive_instructions(
                 Ok(InstructionProgress::Suspended) => continue,
                 Ok(InstructionProgress::Waiting) => {
                     drop(heap);
-                    if let Some(id) = state
-                        .yield_boundaries
-                        .last()
-                        .and_then(|boundary| boundary.operation)
-                    {
-                        // Private operation deadlines are not legacy callback sources.
-                        // The wake latch covers submissions after the pending check;
-                        // the bounded timeout also observes host cancellation.
-                        state
-                            .invocation
-                            .wake
-                            .park(state.async_operations.wait_timeout(id));
+                    if !state.parked_activations.is_empty() {
+                        let timeout = state
+                            .parked_activations
+                            .iter()
+                            .filter_map(|activation| activation.boundary.operation)
+                            .map(|id| state.async_operations.wait_timeout(id))
+                            .min()
+                            .unwrap_or(crate::scheduler::POLL_INTERVAL);
+                        state.invocation.wake.park(timeout);
                     } else {
                         state.invocation.park_dispatch(&state.dispatch_identity);
                     }
@@ -2040,6 +2037,7 @@ fn drive_instructions(
                     }
                     let usage = match frame_array_usage(
                         frames,
+                        &state.parked_activations,
                         state.invocation_result.as_ref(),
                         &state.invocation.limits,
                     ) {
@@ -2054,6 +2052,7 @@ fn drive_instructions(
                         .expect("dispatch lock poisoned");
                     if let Err(fault) = heap.publish(execution_roots(
                         frames,
+                        &state.parked_activations,
                         &dispatch.scheduler,
                         dispatch.default_task_queue.as_ref(),
                         state.invocation_result.as_ref(),
@@ -2082,6 +2081,7 @@ fn completion_notification_frame(
 // All interpreter-owned managed roots, shared by automatic and explicit collections.
 fn execution_roots(
     frames: &[Frame],
+    parked: &[ParkedActivation],
     scheduler: &crate::scheduler::Scheduler,
     default_task_queue: Option<&Value>,
     invocation_result: Option<&Value>,
@@ -2091,7 +2091,7 @@ fn execution_roots(
     for value in default_task_queue.into_iter().chain(invocation_result) {
         crate::gc::trace(value, &mut roots);
     }
-    for frame in frames {
+    for frame in frames.iter().chain(parked.iter().flat_map(|activation| &activation.frames)) {
         if let Some(object) = &frame.construction_object {
             roots.push(object.allocation_id());
         }
@@ -2108,6 +2108,12 @@ fn execution_roots(
         }
     }
     roots
+}
+
+struct ParkedActivation {
+    frames: Vec<Frame>,
+    boundary: RuntimeAsyncBoundary,
+    callback: bool,
 }
 
 struct RuntimeAsyncBoundary {
@@ -2127,6 +2133,9 @@ struct InstructionState {
     entry_drain_depth: Option<usize>,
     yield_boundaries: Vec<RuntimeAsyncBoundary>,
     async_operations: crate::runtime_async::Operations,
+    parked_activations: Vec<ParkedActivation>,
+    // None while choosing work; false for entry frames, true for a detached callback.
+    active_callback: Option<bool>,
     drain_required: bool,
     budget: std::sync::Arc<crate::invocation_budget::Budget>,
     completion_boundary: Option<Value>,
@@ -2152,6 +2161,8 @@ impl InstructionState {
             entry_drain_depth: None,
             yield_boundaries: Vec::new(),
             async_operations: Default::default(),
+            parked_activations: Vec::new(),
+            active_callback: Some(false),
             drain_required: true,
             budget,
             completion_boundary: None,
@@ -2186,6 +2197,7 @@ enum InstructionProgress {
 
 fn frame_array_usage(
     frames: &[Frame],
+    parked: &[ParkedActivation],
     result: Option<&Value>,
     limits: &Limits,
 ) -> Result<crate::arrays::Usage, Fault> {
@@ -2193,7 +2205,7 @@ fn frame_array_usage(
     if let Some(value) = result {
         crate::arrays::measure(value, &mut usage, limits)?;
     }
-    for frame in frames {
+    for frame in frames.iter().chain(parked.iter().flat_map(|activation| &activation.frames)) {
         for cell in frame
             .args
             .iter()
@@ -2227,7 +2239,7 @@ fn interpret_instructions(
     // Lock order is graph -> dispatch. Parking, joining and host I/O hold neither.
     let mut dispatch = invocation.dispatch.lock().expect("dispatch lock poisoned");
     dispatch.bind(heap)?;
-    let initial = frame_array_usage(frames, state.invocation_result.as_ref(), &invocation.limits)?;
+    let initial = frame_array_usage(frames, &state.parked_activations, state.invocation_result.as_ref(), &invocation.limits)?;
     heap.publish_arrays(initial, state.arrays_used);
     let result = interpret_instructions_with_dispatch(
         module,
@@ -2244,7 +2256,7 @@ fn interpret_instructions(
     );
     let publication = dispatch.publish(heap).and_then(|_| {
         let mut usage =
-            frame_array_usage(frames, state.invocation_result.as_ref(), &invocation.limits)?;
+            frame_array_usage(frames, &state.parked_activations, state.invocation_result.as_ref(), &invocation.limits)?;
         if let Some(value) = &state.completion_boundary {
             crate::arrays::measure(value, &mut usage, &invocation.limits)?;
         }
@@ -2261,6 +2273,7 @@ fn interpret_instructions(
         if heap.check_arrays(usage, &invocation.limits).is_err() {
             let mut roots = execution_roots(
                 frames,
+                &state.parked_activations,
                 &dispatch.scheduler,
                 dispatch.default_task_queue.as_ref(),
                 state.invocation_result.as_ref(),
@@ -2333,6 +2346,8 @@ fn interpret_instructions_with_dispatch(
         entry_drain_depth,
         yield_boundaries,
         async_operations,
+        parked_activations,
+        active_callback,
         drain_required,
         budget,
         completion_boundary,
@@ -2362,6 +2377,41 @@ fn interpret_instructions_with_dispatch(
             }
         }
         if let Some(value) = completion_boundary.take() {
+            if frames.is_empty() && yield_boundaries.is_empty() && !parked_activations.is_empty() {
+                if active_callback.take() == Some(false) && invocation_result.is_none() {
+                    *invocation_result = Some(value.clone());
+                }
+                options.check_cancellation("RuntimeAsync.Dispatch", 0)?;
+                if let Some(index) = parked_activations.iter().position(|activation| {
+                    activation
+                        .boundary
+                        .operation
+                        .is_some_and(|id| async_operations.is_ready(id))
+                }) {
+                    let activation = parked_activations.remove(index);
+                    *frames = activation.frames;
+                    yield_boundaries.push(activation.boundary);
+                    *active_callback = Some(activation.callback);
+                    *completion_boundary = Some(Value::Void);
+                    continue;
+                }
+                if scheduler.install_submission(|callback| {
+                    frames.push(runtime_submission_frame(module, callback)?);
+                    Ok(())
+                })? {
+                    *active_callback = Some(true);
+                    continue;
+                }
+                heap.publish(execution_roots(
+                    frames,
+                    parked_activations,
+                    scheduler,
+                    default_task_queue.as_ref(),
+                    invocation_result.as_ref(),
+                ))?;
+                *completion_boundary = Some(value);
+                return Ok(InstructionProgress::Waiting);
+            }
             if let Some(&RuntimeAsyncBoundary {
                 depth,
                 dispatched,
@@ -2380,6 +2430,7 @@ fn interpret_instructions_with_dispatch(
                 if !crate::invocation::Dispatch::claim_owner(owner, dispatch_identity) {
                     heap.publish(execution_roots(
                         frames,
+                        parked_activations,
                         scheduler,
                         default_task_queue.as_ref(),
                         invocation_result.as_ref(),
@@ -2411,14 +2462,22 @@ fn interpret_instructions_with_dispatch(
                     continue;
                 }
                 if operation.is_some() && resumed.is_none() {
-                    heap.publish(execution_roots(
-                        frames,
-                        scheduler,
-                        default_task_queue.as_ref(),
-                        invocation_result.as_ref(),
-                    ))?;
+                    let mut boundary = yield_boundaries.pop().unwrap();
+                    let base = yield_boundaries.last().map_or(0, |parent| parent.depth);
+                    let detached = frames.split_off(base);
+                    boundary.depth -= base;
+                    let callback = if base == 0 {
+                        active_callback.take().unwrap_or(true)
+                    } else {
+                        true
+                    };
+                    parked_activations.push(ParkedActivation {
+                        frames: detached,
+                        boundary,
+                        callback,
+                    });
                     *completion_boundary = Some(Value::Void);
-                    return Ok(InstructionProgress::Waiting);
+                    continue;
                 }
                 // The interpreter kept the ordinary caller chain alive. Returning
                 // from the callback resumes at the instruction after the yield call.
@@ -2437,6 +2496,9 @@ fn interpret_instructions_with_dispatch(
                 }
                 continue;
             }
+            if frames.is_empty() && active_callback.take() == Some(true) && invocation_result.is_none() {
+                return Err(Fault::new("Runtime async callback lost entry activation"));
+            }
             if work_control.is_some() && entry_drain_depth.is_none() {
                 let mut roots = Vec::new();
                 crate::gc::trace(&value, &mut roots);
@@ -2447,6 +2509,7 @@ fn interpret_instructions_with_dispatch(
             if !crate::invocation::Dispatch::claim_owner(owner, dispatch_identity) {
                 let mut roots = execution_roots(
                     frames,
+                    parked_activations,
                     scheduler,
                     default_task_queue.as_ref(),
                     invocation_result.as_ref(),
@@ -2505,6 +2568,7 @@ fn interpret_instructions_with_dispatch(
             {
                 let mut roots = execution_roots(
                     frames,
+                    parked_activations,
                     scheduler,
                     default_task_queue.as_ref(),
                     invocation_result.as_ref(),
@@ -2580,7 +2644,7 @@ fn interpret_instructions_with_dispatch(
             let check =
                 |frames: &[Frame], heap: &crate::shared_heap::Access<'_>| -> Result<(), Fault> {
                     let usage =
-                        frame_array_usage(frames, invocation_result.as_ref(), &invocation.limits)?;
+                        frame_array_usage(frames, parked_activations, invocation_result.as_ref(), &invocation.limits)?;
                     heap.check_arrays(usage, &invocation.limits)
                 };
             if check(frames, heap).is_err() {
@@ -2655,6 +2719,7 @@ fn interpret_instructions_with_dispatch(
         {
             let roots = execution_roots(
                 frames,
+                parked_activations,
                 scheduler,
                 default_task_queue.as_ref(),
                 invocation_result.as_ref(),
@@ -3945,6 +4010,7 @@ fn interpret_instructions_with_dispatch(
                             // The private service consumes no arguments; all roots remain in frames.
                             let roots = execution_roots(
                                 frames,
+                                parked_activations,
                                 scheduler,
                                 default_task_queue.as_ref(),
                                 invocation_result.as_ref(),
@@ -3997,12 +4063,13 @@ fn interpret_instructions_with_dispatch(
                             // child registers the callback before any pressure GC.
                             heap.publish(execution_roots(
                                 frames,
+                                parked_activations,
                                 scheduler,
                                 default_task_queue.as_ref(),
                                 invocation_result.as_ref(),
                             ))?;
                             let usage =
-                                frame_array_usage(frames, invocation_result.as_ref(), &limits)?;
+                                frame_array_usage(frames, parked_activations, invocation_result.as_ref(), &limits)?;
                             heap.publish_arrays(usage, *arrays_used);
                             guest_work::submit(
                                 std::sync::Arc::new(module.clone()),
@@ -4044,9 +4111,8 @@ fn interpret_instructions_with_dispatch(
                                 }
                                 (crate::native::Binding::RuntimeAsyncAwait, [Value::Int64(id)]) => {
                                     async_operations.validate(*id)?;
-                                    if yield_boundaries
-                                        .iter()
-                                        .any(|boundary| boundary.operation == Some(*id))
+                                    if yield_boundaries.iter().any(|boundary| boundary.operation == Some(*id))
+                                        || parked_activations.iter().any(|activation| activation.boundary.operation == Some(*id))
                                     {
                                         return Err(Fault::new("Runtime async operation already has a waiter"));
                                     }
@@ -5090,6 +5156,7 @@ fn interpret_instructions_with_dispatch(
             }
             let mut roots = execution_roots(
                 frames,
+                parked_activations,
                 scheduler,
                 default_task_queue.as_ref(),
                 invocation_result.as_ref(),
@@ -5170,6 +5237,7 @@ fn interpret_instructions_with_dispatch(
     // Every continuation location is published before the driver releases access.
     heap.publish(execution_roots(
         frames,
+        parked_activations,
         scheduler,
         default_task_queue.as_ref(),
         invocation_result.as_ref(),

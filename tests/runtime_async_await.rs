@@ -241,3 +241,131 @@ fn invalid_delay_and_unknown_handles_are_rejected() {
     .message
     .contains("Unknown"));
 }
+
+const INDEPENDENT: &str = r#"
+.type class Exchange
+.field Parent Int64
+.field Reply Int64
+.field Done Int64
+.method instance .ctor() -> noresult
+ret
+.end
+.method instance Run() -> Void
+ldarg 0
+ldfld Exchange::Parent
+ldc.i4 17
+call neoCLR.Runtime.RuntimeAsyncComplete(Int64, Int32)
+pop
+ldarg 0
+ldfld Exchange::Reply
+call neoCLR.Runtime.RuntimeAsyncAwait(Int64)
+ldc.i4 25
+ceq
+brfalse Bad
+call neoCLR.Runtime.GCCollect()
+ldarg 0
+ldfld Exchange::Done
+ldc.i4 42
+call neoCLR.Runtime.RuntimeAsyncComplete(Int64, Int32)
+pop
+ldvoid
+ret
+Bad:
+fault "detached callback lost reply"
+.end
+.end
+"#;
+const EXCHANGE: &str = r#"
+.local Exchange exchange
+newobj instance Exchange::.ctor()
+stloc exchange
+ldloc exchange
+call neoCLR.Runtime.RuntimeAsyncCreate()
+stfld Exchange::Parent
+ldloc exchange
+call neoCLR.Runtime.RuntimeAsyncCreate()
+stfld Exchange::Reply
+ldloc exchange
+call neoCLR.Runtime.RuntimeAsyncCreate()
+stfld Exchange::Done
+ldloc exchange
+function.bind fn<Void> = instance Exchange::Run()
+call neoCLR.Runtime.SchedulerSubmit(fn<Void>)
+pop
+ldloc exchange
+ldfld Exchange::Parent
+call neoCLR.Runtime.RuntimeAsyncAwait(Int64)
+ldc.i4 17
+ceq
+brfalse Bad
+call neoCLR.Runtime.GCCollect()
+ldloc exchange
+ldfld Exchange::Reply
+ldc.i4 25
+call neoCLR.Runtime.RuntimeAsyncComplete(Int64, Int32)
+pop
+ldloc exchange
+ldfld Exchange::Done
+call neoCLR.Runtime.RuntimeAsyncAwait(Int64)
+ret
+Bad:
+fault "parent lost result"
+"#;
+
+fn bounded_run(p: LoadedProgram) -> neoclr::Execution {
+    let token = CancellationToken::new();
+    let (stop, stopped) = std::sync::mpsc::channel();
+    std::thread::scope(|scope| {
+        let cancel = token.clone();
+        scope.spawn(move || {
+            if stopped
+                .recv_timeout(std::time::Duration::from_secs(5))
+                .is_err()
+            {
+                cancel.cancel();
+            }
+        });
+        let result = p.run(ExecutionOptions {
+            cancellation: Some(token),
+            ..Default::default()
+        });
+        let _ = stop.send(());
+        result.unwrap()
+    })
+}
+
+#[test]
+fn parent_resumes_while_callback_waits_for_parent_reply() {
+    let result = bounded_run(program(EXCHANGE, INDEPENDENT));
+    assert_eq!(result.value, Value::Int32(42));
+    assert!(result.heap.is_empty());
+    assert!(result.heap.collections() > 2);
+}
+
+#[test]
+fn entry_result_survives_detached_callback_completion_after_entry_return() {
+    let main = EXCHANGE.replace(
+        "ldloc exchange\nldfld Exchange::Done\ncall neoCLR.Runtime.RuntimeAsyncAwait(Int64)\nret",
+        "local.reset exchange\ncall neoCLR.Runtime.GCCollect()\nldc.i4 99\nret",
+    );
+    let result = bounded_run(program(&main, INDEPENDENT));
+    assert_eq!(result.value, Value::Int32(99));
+    assert!(result.heap.is_empty());
+    assert!(result.heap.collections() > 2);
+}
+
+#[test]
+fn detached_arrays_still_count_against_invocation_budget() {
+    let extra = INDEPENDENT.replace(".method instance Run() -> Void\n", ".method instance Run() -> Void\n.local arrayref<Byte> bytes\nldc.i4 8\nnewarr Byte\nstloc bytes\n");
+    let main = EXCHANGE.replace(
+        "call neoCLR.Runtime.GCCollect()",
+        "ldc.i4 8\nnewarr Byte\npop\ncall neoCLR.Runtime.GCCollect()",
+    );
+    let fault = program(&main, &extra)
+        .run(Limits {
+            array_bytes: 12,
+            ..Limits::default()
+        })
+        .unwrap_err();
+    assert_eq!(fault.code, FaultCode::ArrayLimitExceeded);
+}

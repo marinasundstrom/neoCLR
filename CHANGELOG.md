@@ -8,6 +8,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-11
 
+- Detach parked interpreter activation frames so ready parents can resume before
+  callbacks waiting for their replies. Preserve GC roots, array/frame charges and
+  entry results while detached; qualify the handshake in Raven and focused tests.
+  Record default Raven runtime await as the immediate integration goal with stability
+  and performance gates; compiler defaults and native/JIT await remain unchanged.
+
 - Extend the private interpreter runtime-async POC with context-owned integer-result
   operations and timer waits. Park retained frames outside graph access, resume once,
   and cover completed/pending outcomes, nested producer suspension, GC, cancellation,

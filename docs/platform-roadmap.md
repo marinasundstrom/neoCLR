@@ -18,17 +18,19 @@ requirements without treating any proposed API or backend as selected. See
 and the [JIT evaluation brief](native-execution-investigation.md#jit-for-development-iteration-2026-10-11).
 
 **Green-thread direction (2026-10-11):** the author clarifies that runtime async is
-moving toward green threads. Independently resumable runtime-scheduled activations
-are the next design/POC gate; the retained-chain experiment is groundwork, not a
-completed green-thread implementation. Native stack representation, preemption and
+moving toward green threads. The interpreter POC now resumes detached callbacks and parents independently;
+this is groundwork, not a completed green-thread implementation. The immediate
+author-directed goal is runtime await as Raven’s default, with stability and
+measured improvement. Next are compiler/managed Task integration and equivalent
+state-machine comparisons before switching supported defaults. Native stack representation, preemption and
 multi-core scheduling remain open. Task/Promise keep operation/producer roles.
 
 **Runtime async groundwork (2026-10-11):** the author directs implementation while
 keeping Raven's CLR lowering separate from neoCLR's execution choices. A private
 [interpreter retained-frame yield](experiments/runtime-async/README.md) now exercises
 ordinary call-chain retention and resumption. The subsequent interpreter POC parks
-on private timer/manual operations and resumes with a result; detached activations,
-public Task/HTTP integration, native support and compiler await integration remain
+on private timer/manual operations and resumes with a result. Detached activation
+handshakes now pass; public Task/HTTP integration, native support and compiler await integration remain
 open. This does not complete public Task migration or the scheduler measurement gates.
 
 **Latest author clarification (2026-10-11):** document testing and benchmarking as
