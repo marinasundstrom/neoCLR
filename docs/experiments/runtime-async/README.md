@@ -1050,3 +1050,16 @@ still has no managed-unwind guarantee. Native qualification uses the existing
 bounded compiler/backend profile and macOS stack carrier, not Windows runtime
 suspension. HTTP behavior and performance code were unchanged; prior HTTP and
 benchmark evidence is reused rather than rerunning that matrix.
+
+
+## Async-generator investigation — 2026-10-11
+
+The author also requested an [async-generator investigation](async-generators.md).
+Raven's .NET target already supports generator production, pending asynchronous
+advancement, delegation and asynchronous disposal, with focused execution evidence.
+neoCLR has no corresponding async-iteration runtime/library contract yet, and the
+retained-body POC excludes generator methods. The report separates those gaps from
+ordinary `for` with `await`, compares .NET and ECMAScript contracts, and proposes
+qualifying a managed pull protocol before retained generator production. API names,
+operation representation and abandoned-generator lifetime remain open; this is an
+investigation, not newly implemented native generator support.

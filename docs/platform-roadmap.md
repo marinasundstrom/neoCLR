@@ -86,6 +86,10 @@ open. The author-directed await-in-for compiler fix now passes
 [loop lifetime qualification](experiments/runtime-async/README.md#await-inside-for-both-lowering-paths--2026-10-11)
 in both async lowerings and all three local execution modes, including cancellation
 and outward loop exits. Shared Raven fixes remain separate from native integration.
+The author also requested [async-generator investigation](experiments/runtime-async/async-generators.md):
+Raven/.NET support is distinct from missing neoCLR async-iteration contracts and
+retained-yield lifetime. The proposed follow-up is exploratory and does not change
+this milestone's readiness priorities.
 Retain cancellation, terminal Fault, GC and benchmark checks. Broaden
 platform coverage and measure costs before considering defaults. This is explicit
 POC support, not a default-mode or native build-kit change. General native interoperability, runtime interface recognition,

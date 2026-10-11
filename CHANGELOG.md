@@ -8,6 +8,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-11
 
+- Investigate async generators separately from await inside synchronous loops.
+  Record Raven/.NET lifecycle and delegation test evidence, missing neoCLR
+  async-iteration contracts, and provisional pull-protocol/yield-lifetime work.
+  Compare .NET and ECMAScript semantics; no native generator API or execution
+  support is introduced by this investigation.
+
 - Qualify Raven's await-in-for compiler fixes in interpreter, macOS ARM64 JIT and
   AOT with both state-machine and retained-body lowering. Cover pending waits,
   cancellation, iterator disposal, early/outward exits and GC; replace the retained

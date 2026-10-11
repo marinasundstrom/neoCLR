@@ -15238,3 +15238,23 @@ or runtime-await default switch was performed.
   shared tests and the expanded twelve-run native qualification passing.
   Ref-safety restrictions,
   opt-in runtime-await selection and terminal Fault semantics remain unchanged.
+
+
+### 2026-10-11 — Async-generator investigation requested
+
+- Author: “Also investigate async generators”. This steered the ongoing await-in-for
+  work without replacing the compiler fix.
+- Assistant investigated existing Raven generator lowering, `await for`, delegation,
+  cancellation and cleanup. Two overlapping .NET test selections passed (31 and 36
+  cases); these include executable lifecycle coverage and synchronous/diagnostic
+  cases, not 67 distinct native-generator tests.
+- Finding: neoCLR currently exposes only synchronous iteration, its runtime iteration
+  compiler contract is synchronous, and retained-body lowering rejects iterator
+  methods. .NET success does not establish neoCLR interpreter/JIT/AOT support.
+- Assistant proposal: qualify a managed asynchronous pull/cleanup protocol first,
+  then producer lowering and retained yield/resume. Investigate cancellation during
+  cleanup, backpressure, retained-stack costs and reclamation of abandoned generators.
+  Existing Task-based projections are a provisional alternative to adding ValueTask;
+  no public API or foreign ABI was selected or implemented.
+- [Investigation, source references and validation](experiments/runtime-async/async-generators.md).
+  This records an exploratory follow-up, not a permanent roadmap reprioritization.

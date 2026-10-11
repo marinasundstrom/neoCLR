@@ -1,0 +1,38 @@
+{
+  "scope": "Raven .NET target; selections overlap and include synchronous and diagnostic coverage",
+  "sourceRevision": "a23705567",
+  "framework": "net11.0",
+  "nativeGeneratorExecutionQualified": false,
+  "runs": [
+    {
+      "selection": "cancellation-and-await-for",
+      "filter": "FullyQualifiedName~AsyncIterator|FullyQualifiedName~AwaitFor",
+      "passed": 31,
+      "log": "Test run for /Users/robert/Projects/raven-internals-visible-to/test/Raven.CodeAnalysis.Tests/bin/Debug/net11.0/Raven.CodeAnalysis.Tests.dll (.NETCoreApp,Version=v11.0)\nA total of 1 test files matched the specified pattern.\n\nPassed!  - Failed:     0, Passed:    31, Skipped:     0, Total:    31, Duration: 24 s - Raven.CodeAnalysis.Tests.dll (net11.0)\n",
+      "command": [
+        "dotnet",
+        "test",
+        "test/Raven.CodeAnalysis.Tests/Raven.CodeAnalysis.Tests.csproj",
+        "--no-build",
+        "--no-restore",
+        "--filter",
+        "FullyQualifiedName~AsyncIterator|FullyQualifiedName~AwaitFor"
+      ]
+    },
+    {
+      "selection": "delegation-and-enumeration",
+      "filter": "FullyQualifiedName~YieldFromCodeGenTests|FullyQualifiedName~ForExpressionTests",
+      "passed": 36,
+      "log": "Test run for /Users/robert/Projects/raven-internals-visible-to/test/Raven.CodeAnalysis.Tests/bin/Debug/net11.0/Raven.CodeAnalysis.Tests.dll (.NETCoreApp,Version=v11.0)\nA total of 1 test files matched the specified pattern.\n\nPassed!  - Failed:     0, Passed:    36, Skipped:     0, Total:    36, Duration: 17 s - Raven.CodeAnalysis.Tests.dll (net11.0)\n",
+      "command": [
+        "dotnet",
+        "test",
+        "test/Raven.CodeAnalysis.Tests/Raven.CodeAnalysis.Tests.csproj",
+        "--no-build",
+        "--no-restore",
+        "--filter",
+        "FullyQualifiedName~YieldFromCodeGenTests|FullyQualifiedName~ForExpressionTests"
+      ]
+    }
+  ]
+}

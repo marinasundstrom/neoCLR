@@ -273,6 +273,9 @@ exits. Both async lowerings pass interpreter and macOS ARM64 JIT/AOT
 [loop-lifetime qualification](https://github.com/marinasundstrom/neoCLR/blob/main/docs/experiments/runtime-async/README.md#await-inside-for-both-lowering-paths--2026-10-11).
 The native stack carrier remains temporary POC scaffolding; Windows, production
 integration and default readiness remain open.
+[Async generators are being investigated](https://github.com/marinasundstrom/neoCLR/blob/main/docs/experiments/runtime-async/async-generators.md);
+Raven's .NET support does not yet provide a neoCLR async-iteration protocol or
+retained generator execution.
 Explicit await mappings also qualify an independent runtime-backed manual operation
 and a distinct awaiter. An imported generic interface also supports pending and immediate
 implementations through one mapping. The final runtime-facing contract and native
