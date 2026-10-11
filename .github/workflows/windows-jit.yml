@@ -12,6 +12,7 @@ on:
       - 'docs/experiments/aot-fault-details/**'
       - 'samples/native-windows/**'
       - 'runtime/raven/**'
+      - 'scripts/prepare-jit-bundle.py'
       - 'scripts/prepare-native-development-bundle.py'
       - 'scripts/prepare-native-bootstrap.py'
       - 'scripts/build-native-class-library.py'
@@ -34,6 +35,7 @@ on:
       - 'docs/experiments/aot-fault-details/**'
       - 'samples/native-windows/**'
       - 'runtime/raven/**'
+      - 'scripts/prepare-jit-bundle.py'
       - 'scripts/prepare-native-development-bundle.py'
       - 'scripts/prepare-native-bootstrap.py'
       - 'scripts/build-native-class-library.py'
@@ -81,6 +83,8 @@ jobs:
             target/windows-jit-validation/http/
             target/windows-jit-validation/framework/
             target/windows-jit-validation/native/build.json
+            target/windows-jit-validation/jit-install/preparation.json
+            target/windows-jit-validation/jit-install/bundle/manifest.json
             target/windows-jit-validation/development/**/*.log
           include-hidden-files: true
           retention-days: 14

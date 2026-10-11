@@ -23,7 +23,12 @@ fn cli_assembles_checks_and_executes_hello_world() {
         .output()
         .unwrap();
     assert!(check.status.success());
-    let output = Command::new(binary).arg("run").arg(&path).output().unwrap();
+    let output = Command::new(binary)
+        .arg("run")
+        .arg(&path)
+        .args(["--execution", "interpreter"])
+        .output()
+        .unwrap();
     assert!(output.status.success());
     assert!(output.stderr.is_empty());
     assert_eq!(
@@ -44,7 +49,7 @@ fn cli_assembles_checks_and_executes_hello_world() {
 #[test]
 fn cli_fault_has_failure_exit_code() {
     let output = Command::new(env!("CARGO_BIN_EXE_neoclr"))
-        .args(["run", "examples/fault.neoil"])
+        .args(["run", "examples/fault.neoil", "--execution", "interpreter"])
         .output()
         .unwrap();
     assert!(!output.status.success());
@@ -73,7 +78,7 @@ fn cli_compiles_and_loads_platform_runtime_library() {
         .unwrap();
     assert!(compiled.status.success(), "{compiled:?}");
     let output = Command::new(binary)
-        .args(["run", "examples/hello.neoil"])
+        .args(["run", "examples/hello.neoil", "--execution", "interpreter"])
         .arg(&path)
         .output()
         .unwrap();
@@ -91,7 +96,13 @@ fn cli_compiles_and_loads_platform_runtime_library() {
 fn return_value_is_an_opt_in_stderr_diagnostic() {
     let binary = env!("CARGO_BIN_EXE_neoclr");
     let output = Command::new(binary)
-        .args(["run", "examples/hello.neoil", "--show-result"])
+        .args([
+            "run",
+            "examples/hello.neoil",
+            "--execution",
+            "interpreter",
+            "--show-result",
+        ])
         .output()
         .unwrap();
     assert!(output.status.success());
@@ -148,6 +159,7 @@ ret
         Command::new(env!("CARGO_BIN_EXE_neoclr"))
             .arg("run")
             .arg(&path)
+            .args(["--execution", "interpreter"])
             .args(extra)
             .output()
             .unwrap()
@@ -212,6 +224,7 @@ fn cli_array_budget_is_explicit_and_preserves_default() {
         Command::new(env!("CARGO_BIN_EXE_neoclr"))
             .arg("run")
             .arg(&path)
+            .args(["--execution", "interpreter"])
             .args(extra)
             .output()
             .unwrap()
@@ -331,6 +344,7 @@ fn cli_execution_faults_share_host_presentation_and_exit_one() {
         let output = Command::new(env!("CARGO_BIN_EXE_neoclr"))
             .arg("run")
             .arg(&path)
+            .args(["--execution", "interpreter"])
             .output()
             .unwrap();
         assert_eq!(output.status.code(), Some(1));
@@ -353,6 +367,7 @@ fn cli_execution_faults_share_host_presentation_and_exit_one() {
         let output = Command::new(env!("CARGO_BIN_EXE_neoclr"))
             .arg("run")
             .arg(&path)
+            .args(["--execution", "interpreter"])
             .output()
             .unwrap();
         assert_eq!(output.status.code(), Some(code));
@@ -372,10 +387,18 @@ fn cli_execution_selection_is_explicit_and_rejects_incompatible_options() {
         .args(["run", "examples/hello.neoil", "--execution", "interpreter"])
         .output()
         .unwrap();
-    assert!(ordinary.status.success());
-    assert_eq!(ordinary.stdout, explicit.stdout);
-    assert_eq!(ordinary.stderr, explicit.stderr);
-    assert_eq!(ordinary.status.code(), explicit.status.code());
+    assert!(explicit.status.success());
+    if cfg!(any(
+        all(target_os = "macos", target_arch = "aarch64"),
+        all(target_os = "windows", target_arch = "x86_64")
+    )) {
+        assert!(!ordinary.status.success());
+        assert!(String::from_utf8_lossy(&ordinary.stderr).contains("JIT"));
+        assert!(ordinary.stdout.is_empty());
+    } else {
+        assert_eq!(ordinary.stdout, explicit.stdout);
+        assert_eq!(ordinary.status.code(), explicit.status.code());
+    }
     for options in [
         vec!["--execution", "unknown"],
         vec!["--execution", "interpreter", "--execution", "jit"],

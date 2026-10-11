@@ -1,26 +1,42 @@
 # Development JIT execution and readiness
 
-2026-10-11 development feature. `neoclr run` accepts an explicit execution mode:
+2026-10-12 development behavior: installed JIT bundles default to JIT on macOS
+ARM64 and Windows x64. Other hosts retain interpreter execution.
 
 ```sh
-neoclr run app.dll --execution jit \
-  --jit-compiler /absolute/path/to/neoclr-aot-poc \
-  --jit-host /absolute/path/to/host.dylib \
-  --system /absolute/path/to/System.runtime.neox \
-  --module /absolute/path/to/System.Runtime.dll \
-  --module /absolute/path/to/System.Data.dll \
-  --module /absolute/path/to/System.Networking.dll \
-  --module /absolute/path/to/System.Web.dll \
-  --object-root /absolute/path/to/System.Runtime.dll \
-  -- --filter collection
+neoclr run app.dll -- --filter collection
+neoclr run app.dll --execution interpreter --system lib/System.runtime.neox \
+  --module lib/System.Runtime.dll --object-root lib/System.Runtime.dll
 ```
 
-Use `host.dll` and `neoclr-aot-poc.exe` on Windows. The compiler defaults to a sibling
-of the runtime executable if `--jit-compiler` is omitted. The matching native helper
-library is still explicit and trusted. Build it using the
-[macOS HTTP qualification](experiments/jit-http/README.md) or
-[Windows gate](experiments/jit-windows/README.md). This is development integration,
-not an installed SDK default or stable host ABI.
+The runtime discovers `neoclr-aot-poc` (`.exe` on Windows) and
+`neoclr-jit-host.dylib` (`.dll` on Windows) beside its own executable. Standard
+libraries come from `../lib/bundle.json`; extra `--module` dependencies are merged
+with those libraries. Explicit `--jit-compiler`, `--jit-host`, `--system` and
+`--object-root` overrides remain available. Helpers are trusted native code and
+are never discovered relative to the guest or current directory. Missing tools
+are errors, with no silent interpreter fallback.
+
+Prepare a development installation from a verified compiler/library bundle and a
+passing native host recipe:
+
+```sh
+python3 scripts/prepare-jit-bundle.py \
+  --bundle target/development-bundle \
+  --runtime target/release/neoclr \
+  --jit-compiler tools/aot-poc/target/release/neoclr-aot-poc \
+  --host-recipe target/native-async-validation/validation.json \
+  --output target/jit-install
+```
+
+On Windows use a passing native HTTP `build.json` recipe and `.exe` binaries.
+The preparer rebuilds the helper, stages matching tools and records hashes. Use
+`--libraries` with its matching `--compiler-directory` to replace an old compiler
+and library pair coherently. Default development limits are a 32 MiB managed heap
+and 4 MiB byte arrays, configurable at preparation with `--heap-bytes` and
+`--byte-array-limit`. These are bounded experimental hosts, not general production
+memory limits. Standalone interpreter packages do not contain JIT dependencies;
+select `--execution interpreter` explicitly on supported JIT hosts.
 
 The runtime launches the optional compiler backend with inherited standard streams.
 The backend selects the executing host, compiles the verified closed-world assembly
@@ -30,8 +46,7 @@ guest, including empty strings, Unicode and option-like text. JIT resources are
 released before backend exit. Compilation/host errors remain explicit; there is no
 silent fallback to interpretation. No guest AOT object is emitted by this run command.
 
-`--execution interpreter` selects existing interpretation. Omitting the option still
-selects interpretation. Debugging remains interpreted. Interpreter-only instruction
+`--execution interpreter` selects existing interpretation. Omitting the option selects JIT on the supported hosts. Debugging remains interpreted. Interpreter-only instruction
 budgets, array budgets, GC diagnostics and `--show-result` are rejected with JIT rather
 than ignored. Native execution retains the current host's bounded heap/operation
 limits and has no instruction quota. AOT project builds remain separate.
@@ -74,7 +89,7 @@ selectively when relevant to the behavior or target being changed. This is not a
 requirement to run every test in every mode.
 
 The runtime-library harness now accepts repeatable `--mode jit`, `--mode interpreter`
-and `--mode native` selectors. JIT requires `--jit-host`; the existing `--aot` option
+and `--mode native` selectors. JIT discovers the helper from prepared bundles, with an optional `--jit-host` override; the existing `--aot` option
 selects the backend compiler for both native and JIT work. For example:
 
 ```sh
@@ -89,13 +104,18 @@ python3 scripts/test-runtime-library.py \
 Selectors, intentional failures, bounds guards and entry arguments all use the
 selected modes. JIT-only and interpreter-only runs compile the Raven project directly to metadata,
 without emitting a native object or linking an executable. Interpreter-only runs do
-not require the native compiler ([focused interpreter check](experiments/jit-cli/interpreter-validation.json)). The omitted-mode default remains native plus
-interpreter during this transition.
+not require the native compiler ([focused interpreter check](experiments/jit-cli/interpreter-validation.json)). The omitted-mode default is now JIT, and its run commands omit `--execution` to exercise the CLI default.
 
-Before switching defaults, qualify representative library suites and HTTP/lifetime
-behavior on supported JIT targets, provide matching helpers through ordinary tooling,
-and expand routine JIT test coverage. Keep explicit
+Qualification covers representative library suites and HTTP/lifetime behavior,
+installed helper discovery, and routine JIT test coverage. Keep explicit
 mode selection and visible unsupported-program diagnostics after the switch.
 Use focused interpreter/AOT parity checks for changes to shared lowering, GC, async
 lifetime, platform bindings or other mode-sensitive behavior. AOT remains the preferred
 deployment target. These criteria are implementation work, not a new approval step.
+
+
+Runtime-managed suspension is enabled by the default CLI on macOS ARM64. Windows
+x64 currently uses compiler-generated async state machines; native runtime
+suspension and Windows ARM64 JIT remain gaps. Unsupported programs report compiler
+errors. Eager closed-world compilation, the external compiler process, bounded
+native heaps and interpreted debugging remain development limitations.

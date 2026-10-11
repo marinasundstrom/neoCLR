@@ -169,7 +169,7 @@ The routing workbench also parses a route, extracts an integer parameter and pri
 - **Deployment:** OS dependencies remain. Trimming, a stable public native ABI and a
   fully independent production-core bootstrap are unfinished.
 
-Production JIT integration and native hot reload remain future work. See [project direction](../../proposals/#runtime)
+Production JIT optimization and native hot reload remain future work. See [project direction](../../proposals/#runtime)
 and [garbage collection](../gc/) for related topics.
 
 <a id="measurements-and-comparisons"></a>
@@ -197,9 +197,10 @@ completion, consecutive awaits and fault cleanup now also pass a focused
 Timer completion, cancellation and fault cleanup also pass the existing timer suite.
 [HTTP client/server qualification](https://github.com/marinasundstrom/neoCLR/blob/main/docs/experiments/jit-http/README.md)
 now covers DNS/connect, accept/read/write, fragmented requests, timeout and fault cleanup
-with interpreter/AOT parity. Development builds now expose `neoclr run --execution jit`
-with an explicit matching helper library and compiler. The Windows x64 execution gate
-passes HTTP and test-framework checks at `f993e94b`; Windows ARM64 and normal SDK packaging remain open.
+with interpreter/AOT parity. Development JIT bundles now default `neoclr run app.dll`
+to JIT on macOS ARM64 and Windows x64; `--execution interpreter` remains available.
+The installed bundle supplies a matching helper, compiler and libraries. The Windows
+x64 gate exercises installed default execution; Windows ARM64 remains open.
 [CLI contract and readiness](https://github.com/marinasundstrom/neoCLR/blob/main/docs/jit-execution.md).
 Those gates establish functional behavior. A separate development
 [HTTP execution-mode workbench](https://github.com/marinasundstrom/neoCLR/blob/main/benchmarks/jit-http/README.md)

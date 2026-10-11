@@ -232,6 +232,8 @@ fn documented_cli_supports_redirected_input_and_gc_diagnostics() {
         .args([
             "run",
             "examples/source/calculator.neo",
+            "--execution",
+            "interpreter",
             "--gc-stats",
             "--gc-events",
         ])

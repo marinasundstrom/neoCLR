@@ -15574,3 +15574,21 @@ or runtime-await default switch was performed.
   checks. An old interpreter recipe initially lacked the managed-body binding; reran
   using the qualified owned-runtime recipe. No collector failure was established by
   that stale-host attempt. [Consumer evidence](experiments/runtime-async/collector-walk-showcase.json).
+
+
+## 2026-10-12 — Complete the default JIT transition
+
+- **Author:** “We want to make JIT the default soon,” followed by “Continue work
+  towards a working default JIT. Don't stop until you have it.”
+- **Assistant action:** selected JIT for supported macOS ARM64 and Windows x64
+  hosts, added installed compiler/helper/library discovery and a reproducible
+  development bundle preparer, and switched routine runtime-library tests to JIT.
+  Interpreter selection remains explicit and other hosts retain that default.
+- **Validation in progress:** installed default execution passes the HTTP showcase
+  and runtime-async StackTrace consumer locally. Broad library qualification found
+  the old helper's 64 KiB byte-array limit; preparation now exposes configurable
+  limits with 32 MiB heap/4 MiB byte-array defaults. Current Windows qualification
+  is a required follow-through, not inferred from earlier gate results.
+- **Open boundaries:** eager compilation, interpreted debugging, Windows runtime
+  suspension and Windows ARM64 remain separate gaps. No interpreter fallback hides
+  unsupported native programs. See [the execution contract](jit-execution.md).

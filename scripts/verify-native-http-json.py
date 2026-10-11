@@ -47,7 +47,7 @@ def main():
         raise FileExistsError(args.output)
 
     def command(assembly, argument):
-        result = [str(args.runtime.resolve()), 'run', str(assembly.resolve()), '--system', str(args.seed.resolve()), '--instructions', '100000000']
+        result = [str(args.runtime.resolve()), 'run', str(assembly.resolve()), '--execution', 'interpreter', '--system', str(args.seed.resolve()), '--instructions', '100000000']
         for module in args.module:
             result += ['--module', str(module.resolve())]
         if args.object_root:

@@ -4,7 +4,10 @@
 cost with profiles, correctness tests and benchmarks, and reiterates that JIT should
 become the default soon. The [collector traversal slice](experiments/runtime-async/native-profiling.md#fewer-collector-traversals--2026-10-12)
 reduces controlled AOT runtime-async time about 10–13%, without changing collection
-frequency. After this slice, prioritize the existing [JIT readiness gates](jit-execution.md#test-policy-and-the-eventual-default):
+frequency. The author then explicitly directs completing a working default JIT.
+The implementation selects JIT on macOS ARM64 and Windows x64, stages matching
+helpers and libraries, and makes runtime-library tests use the omitted-mode default.
+Continue qualification through the existing [JIT readiness gates](jit-execution.md#test-policy-and-the-eventual-default):
 matching helper delivery through ordinary tooling, representative suites using JIT
 routinely, and current supported-platform HTTP/lifetime qualification. Native-mode
 benchmark noise is recorded; this does not itself authorize claiming default readiness.

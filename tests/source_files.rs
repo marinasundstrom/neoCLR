@@ -116,7 +116,13 @@ fn cli_assembles_manifest_to_a_standalone_artifact() {
         String::from_utf8_lossy(&output.stderr)
     );
     let output = std::process::Command::new(env!("CARGO_BIN_EXE_neoclr"))
-        .args(["run", "examples/hello.neoil", "--system"])
+        .args([
+            "run",
+            "examples/hello.neoil",
+            "--execution",
+            "interpreter",
+            "--system",
+        ])
         .arg(&artifact)
         .output()
         .unwrap();

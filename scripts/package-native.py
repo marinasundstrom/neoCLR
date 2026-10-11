@@ -54,7 +54,7 @@ Target: {target}-{arch}. Source: {revision}.
 Run from this extracted directory:
 
 ```
-./bin/{executable} run samples/neoil/type-categories.neoil --system lib/System.neoil
+./bin/{executable} run samples/neoil/type-categories.neoil --execution interpreter --system lib/System.neoil
 ```
 
 Expected output: 42, 7 and 9 on separate lines. On Windows use PowerShell.

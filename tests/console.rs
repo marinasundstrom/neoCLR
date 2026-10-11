@@ -242,7 +242,12 @@ fn cli_flushes_prompt_before_waiting_for_redirected_input_without_duplicate_outp
         time::Duration,
     };
     let mut child = Command::new(env!("CARGO_BIN_EXE_neoclr"))
-        .args(["run", "examples/console_input.neoil"])
+        .args([
+            "run",
+            "examples/console_input.neoil",
+            "--execution",
+            "interpreter",
+        ])
         .stdin(Stdio::piped())
         .stdout(Stdio::piped())
         .stderr(Stdio::inherit())

@@ -121,7 +121,13 @@ fn report_runs_from_artifact_and_cli() {
         "Input: input.txt\nUTF-8 bytes: 9\n"
     );
     let output = std::process::Command::new(env!("CARGO_BIN_EXE_neoclr"))
-        .args(["run", "examples/source/file-report.neo", "--"])
+        .args([
+            "run",
+            "examples/source/file-report.neo",
+            "--execution",
+            "interpreter",
+            "--",
+        ])
         .arg(&input)
         .arg(&directory)
         .output()

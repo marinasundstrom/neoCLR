@@ -4,7 +4,12 @@ use std::process::Command;
 fn cli_gc_statistics_are_opt_in_and_do_not_change_program_stdout() {
     let run = |stats: bool| {
         let mut command = Command::new(env!("CARGO_BIN_EXE_neoclr"));
-        command.args(["run", "examples/features.neoil"]);
+        command.args([
+            "run",
+            "examples/features.neoil",
+            "--execution",
+            "interpreter",
+        ]);
         if stats {
             command.arg("--gc-stats");
         }
@@ -45,7 +50,13 @@ fn cli_rejects_gc_statistics_for_analysis_and_duplicate_flags() {
 #[test]
 fn cli_can_report_collection_events_separately_from_stdout() {
     let output = Command::new(env!("CARGO_BIN_EXE_neoclr"))
-        .args(["run", "examples/features.neoil", "--gc-events"])
+        .args([
+            "run",
+            "examples/features.neoil",
+            "--execution",
+            "interpreter",
+            "--gc-events",
+        ])
         .output()
         .unwrap();
     assert!(

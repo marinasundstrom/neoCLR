@@ -65,11 +65,16 @@ def main():
         run([sys.executable, ROOT/'scripts/build-native-project.py', '--profile', 'windows-http',
              '--project', project/'App.rvnproj', '--bundle', bundle, '--aot', jit,
              '--output', out/'native'], 'native-recipe')
-        run([sys.executable, ROOT/'docs/experiments/jit-http/verify.py', '--bundle', bundle,
-             '--windows-build', out/'native/build.json', '--cli', '--output', out/'http'], 'http-jit')
-        run([sys.executable, ROOT/'scripts/test-runtime-library.py', '--bundle', bundle,
-             '--aot', jit, '--mode', 'jit', '--jit-host', out/'http/host.dll',
-             '--suite', 'index-range', '--suite', 'runner-contract', '--output', out/'framework'], 'framework-jit')
+        run([sys.executable, ROOT/'scripts/prepare-jit-bundle.py', '--bundle', bundle,
+             '--runtime', ROOT/'target/release/neoclr.exe', '--jit-compiler', jit,
+             '--host-recipe', out/'native/build.json', '--output', out/'jit-install'], 'prepare-default-jit')
+        installed = out/'jit-install/bundle'
+        run([sys.executable, ROOT/'docs/experiments/jit-http/verify.py', '--bundle', installed,
+             '--windows-build', out/'native/build.json', '--default-cli', '--mode', 'jit',
+             '--output', out/'http'], 'http-default-jit')
+        run([sys.executable, ROOT/'scripts/test-runtime-library.py', '--bundle', installed,
+             '--suite', 'collections', '--suite', 'json-dom', '--suite', 'encoding-streams',
+             '--suite', 'index-range', '--suite', 'runner-contract', '--output', out/'framework'], 'framework-default-jit')
         report['passed'] = True
     finally:
         (out/'validation.json').write_text(json.dumps(report, indent=2)+'\n')

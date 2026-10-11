@@ -345,12 +345,20 @@ def main():
                         help='Run only this suite (repeatable); default runs all suites')
     parser.add_argument("--execution-repetitions", type=int, default=1, help="Repeat the full suite process in each mode for timing; guards/selectors still run once")
     parser.add_argument('--mode', action='append', choices=('native', 'interpreter', 'jit'),
-                        help='Execution modes to qualify (repeatable); defaults to native and interpreter until JIT readiness')
+                        help='Execution modes to qualify (repeatable); defaults to JIT')
     parser.add_argument('--jit-host', type=Path, help='Matching trusted native helper library for JIT')
     args = parser.parse_args()
-    modes = args.mode or ['native', 'interpreter']
+    modes = args.mode or ['jit']
+    bundled_bin = args.bundle.resolve() / 'bin'
+    if (bundled_bin / ('neoclr-jit-host.dll' if os.name == 'nt' else 'neoclr-jit-host.dylib')).is_file():
+        if args.runtime == parser.get_default('runtime'):
+            args.runtime = bundled_bin / ('neoclr.exe' if os.name == 'nt' else 'neoclr')
+        if args.aot == parser.get_default('aot'):
+            args.aot = bundled_bin / ('neoclr-aot-poc.exe' if os.name == 'nt' else 'neoclr-aot-poc')
     if 'jit' in modes and not args.jit_host:
-        parser.error('--mode jit requires --jit-host')
+        args.jit_host = bundled_bin / ('neoclr-jit-host.dll' if os.name == 'nt' else 'neoclr-jit-host.dylib')
+    if 'jit' in modes and not args.jit_host.is_file():
+        parser.error('JIT requires a prepared JIT bundle or a matching --jit-host; select --mode interpreter for interpreter-only testing')
     if args.execution_repetitions < 1:
         parser.error("--execution-repetitions must be positive")
     run_started = time.perf_counter()
@@ -480,10 +488,10 @@ def main():
                 if mode == 'native':
                     executions.append((mode, [exe], isolated, env))
                 elif mode == 'interpreter':
-                    executions.append((mode, interpreter, ROOT, None))
+                    executions.append((mode, interpreter + ['--execution', 'interpreter'], ROOT, None))
                 else:
                     jit = interpreter[:interpreter.index('--instructions')] + [
-                        '--execution', 'jit', '--jit-host', args.jit_host.resolve(),
+                        '--jit-host', args.jit_host.resolve(),
                         '--jit-compiler', args.aot.resolve()]
                     executions.append((mode, jit, ROOT, None))
             repeated_executions = [(repetition, *execution) for repetition in range(1, args.execution_repetitions + 1) for execution in executions]

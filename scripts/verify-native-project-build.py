@@ -57,7 +57,7 @@ def main():
                 assert any(c['exitCode'] != 0 and '--closed-world' in c['command'] for c in evidence['commands']), evidence
                 continue
             assert built.returncode == 0 and evidence['passed'], built.stderr.decode()
-            vm = subprocess.run(list(map(str, [bundle / 'bin/neoclr', 'run', destination / 'app.dll', *context])),
+            vm = subprocess.run(list(map(str, [bundle / 'bin/neoclr', 'run', destination / 'app.dll', '--execution', 'interpreter', *context])),
                                 capture_output=True, timeout=60)
             with tempfile.TemporaryDirectory(prefix='neoclr standalone ') as directory:
                 binary = Path(directory) / 'app'

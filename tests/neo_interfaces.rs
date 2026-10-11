@@ -121,6 +121,7 @@ fn cli_assembles_and_runs_interface_example() {
     let execution = std::process::Command::new(env!("CARGO_BIN_EXE_neoclr"))
         .arg("run")
         .arg(&path)
+        .args(["--execution", "interpreter"])
         .output()
         .unwrap();
     std::fs::remove_file(path).unwrap();

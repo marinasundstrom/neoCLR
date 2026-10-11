@@ -73,6 +73,8 @@ fn cli_preserves_guest_arguments_missing_empty_and_present_variables() {
         command.args([
             "run",
             "examples/source/environment.neo",
+            "--execution",
+            "interpreter",
             "--",
             "a b",
             "--gc-stats",
@@ -123,7 +125,12 @@ func Main() -> int {
     {
         use std::os::unix::ffi::OsStringExt;
         let output = std::process::Command::new(env!("CARGO_BIN_EXE_neoclr"))
-            .args(["run", "examples/source/environment.neo"])
+            .args([
+                "run",
+                "examples/source/environment.neo",
+                "--execution",
+                "interpreter",
+            ])
             .env("NEO_DEMO", std::ffi::OsString::from_vec(vec![0xff]))
             .output()
             .unwrap();

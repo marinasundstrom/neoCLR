@@ -65,6 +65,7 @@ fn array_example_round_trips_through_cli_artifact() {
     let execution = std::process::Command::new(env!("CARGO_BIN_EXE_neoclr"))
         .arg("run")
         .arg(&path)
+        .args(["--execution", "interpreter"])
         .output()
         .unwrap();
     std::fs::remove_file(path).unwrap();

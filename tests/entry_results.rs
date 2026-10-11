@@ -11,6 +11,7 @@ fn integer_entry_becomes_process_exit_status_without_diagnostic_output() {
     let result = Command::new(env!("CARGO_BIN_EXE_neoclr"))
         .arg("run")
         .arg(&path)
+        .args(["--execution", "interpreter"])
         .output()
         .unwrap();
     fs::remove_file(path).unwrap();

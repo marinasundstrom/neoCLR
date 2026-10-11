@@ -26,9 +26,12 @@ def main():
     prerequisite.add_argument('--console-qualification', type=Path)
     prerequisite.add_argument('--windows-build', type=Path)
     p.add_argument('--output', type=Path, required=True)
-    p.add_argument('--cli', action='store_true', help='Invoke JIT through neoclr run --execution jit')
+    p.add_argument('--cli', action='store_true', help='Invoke JIT through explicit neoclr run --execution jit')
+    p.add_argument('--default-cli', action='store_true', help='Use the prepared bundle runtime without JIT flags or library paths')
+    p.add_argument('--runtime', type=Path, help='Explicit runtime executable to qualify')
     p.add_argument('--mode', action='append', choices=['interpreter', 'aot', 'jit'], help='Select relevant modes; defaults to three-mode parity')
     a = p.parse_args()
+    via_cli = a.cli or a.default_cli
     out, bundle = a.output.resolve(), a.bundle.resolve()
     out.mkdir(parents=True, exist_ok=False)
     windows = a.windows_build is not None
@@ -39,6 +42,10 @@ def main():
         raise ValueError('Console qualification required')
     jit = ROOT/'tools/aot-poc/target/release/neoclr-aot-poc'
     runtime = ROOT/('target/release/neoclr.exe' if windows else 'target/release/neoclr')
+    if a.default_cli:
+        runtime = bundle / ('bin/neoclr.exe' if windows else 'bin/neoclr')
+    if a.runtime:
+        runtime = a.runtime.resolve()
     compiler = bundle/'sdk/tools/rvnc/rvnc.dll'
     lib = bundle/'lib'
     refs = [lib/(n+'.dll') for n in ['System.Runtime','System.Data','System.Networking','System.Web']]
@@ -68,7 +75,7 @@ def main():
             source = str(ROOT/'docs/experiments/aot-console'/name)
             if source not in host_command:
                 host_command.append(source)
-    report = dict(passed=False, jitViaRuntimeCli=a.cli, sourceBaseRevision=subprocess.check_output(['git','rev-parse','HEAD'],cwd=ROOT,text=True).strip(),
+    report = dict(passed=False, jitViaRuntimeCli=via_cli, defaultJit=a.default_cli, sourceBaseRevision=subprocess.check_output(['git','rev-parse','HEAD'],cwd=ROOT,text=True).strip(),
                   inputs={str(f):sha(f) for f in [jit,runtime,compiler,seed,*refs,lib/'Core.dll',lib/'ownership.json',HERE/'verify.py',ROOT/'docs/experiments/jit-managed/host.c']},
                   builds=[], artifacts={}, cases=[])
     commands = {}
@@ -89,7 +96,7 @@ def main():
     def outcome(mode, code, stdout, stderr):
         stdout,stderr=stdout.decode(),stderr.decode()
         result=dict(processExitCode=code,stdout=stdout,stderr=stderr)
-        if mode=='jit' and not a.cli:
+        if mode=='jit' and not via_cli:
             summaries=[s for s in stderr.splitlines() if s.startswith('JIT_RESULT ')]
             if code or len(summaries)!=1:
                 raise RuntimeError('JIT did not complete: '+stderr)
@@ -102,9 +109,9 @@ def main():
 
     def command(name,mode,args=()):
         cmd=commands[name][mode].copy()
-        if mode=='jit' and not a.cli:
+        if mode=='jit' and not via_cli:
             for arg in args: cmd+=['--jit-entry-argument',str(arg)]
-        elif mode=='interpreter' or mode=='jit' and a.cli:
+        elif mode=='interpreter' or mode=='jit' and via_cli:
             if args: cmd+=['--',*map(str,args)]
         else: cmd+=list(map(str,args))
         return cmd
@@ -139,6 +146,8 @@ def main():
         else:
             build(host_command)
         report['hostSha256']=sha(host)
+        if a.default_cli:
+            report['cliHostSha256']=sha(bundle / 'bin' / ('neoclr-jit-host.dll' if windows else 'neoclr-jit-host.dylib'))
         server_source=ROOT/'docs/experiments/http-server/Server.rvn'
         fault_source=out/'ServerFault.rvn'
         text=server_source.read_text().replace('func Respond(request: HttpRequest) -> Task<Result<HttpResponse, HttpError>> {','func Respond(request: HttpRequest) -> Task<Result<HttpResponse, HttpError>> {\n    System.Fail("HTTP callback fault")')
@@ -171,11 +180,13 @@ def main():
                 link=[part for part in host_command if part!='-dynamiclib'];link[link.index(str(host))]=str(exe)
                 build([*link,obj,wrapper])
             commands[name]={'jit':list(map(str,[jit,'--jit-managed',*[str(host) if part==str(obj) else part for part in native]])),
-                            'aot':[str(exe)],'interpreter':list(map(str,[runtime,'run',assembly,*context,'--instructions','100000000']))}
+                            'aot':[str(exe)],'interpreter':list(map(str,[runtime,'run',assembly,'--execution','interpreter',*context,'--instructions','100000000']))}
             report['artifacts'][name]=dict(source=str(source),sourceSha256=sha(source),assemblySha256=sha(assembly),objectSha256=sha(obj),executableSha256=sha(exe),commands=commands[name])
-            if a.cli:
+            if via_cli:
                 commands[name]['jit'] = list(map(str,[runtime,'run',assembly,'--execution','jit',
                     '--jit-compiler',jit,'--jit-host',host,*context]))
+            if a.default_cli:
+                commands[name]['jit'] = list(map(str,[runtime,'run',assembly]))
             print('BUILT '+name,flush=True)
         raw_cases=[('greeting',valid,False,None),('fragmented',valid,True,None),
                    ('duplicate-length',b'GET /greeting HTTP/1.1\r\nHost: localhost\r\nContent-Length: 0\r\nContent-Length: 0\r\n\r\n',False,'Duplicate request Content-Length'),

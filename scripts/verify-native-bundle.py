@@ -52,7 +52,7 @@ def main():
             if not assembly.is_file():
                 raise RuntimeError('Missing native sample output: ' + name)
             if sample.get('expected') is not None:
-                run([runtime, 'run', assembly, '--system', seed, *module_args, *object_args,
+                run([runtime, 'run', assembly, '--execution', 'interpreter', '--system', seed, *module_args, *object_args,
                      '--instructions', '100000000'], sample['expected'])
         http_report = args.report.with_name(args.report.stem + '-http.json')
         run([sys.executable, root / 'tools/verify-native-http-json.py', '--runtime', runtime,

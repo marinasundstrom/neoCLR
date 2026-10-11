@@ -56,7 +56,7 @@ impl Context {
             process.arg("--object-root").arg(&self.root);
         }
         if command == "run" {
-            process.arg("--show-result");
+            process.args(["--execution", "interpreter", "--show-result"]);
         }
         process.output().unwrap()
     }

@@ -194,6 +194,8 @@ def main():
                                              'executableSha256': sha(app), 'stateMachineMentions': 0}
             if name == 'contract':
                 interpreted = source_recipe['commands'][1]['command'].copy()
+                if '--execution' not in interpreted:
+                    interpreted += ['--execution', 'interpreter']
                 interpreted[2] = str(assembly)
                 row = run(interpreted, 'contract-interpreter')
                 if row['stdout'].strip() != 'PASS runtime async operation lifetime contract' or row['stderr']:

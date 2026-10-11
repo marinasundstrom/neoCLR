@@ -248,7 +248,7 @@ fn execute(args: &[String], exit_status: &mut i32) -> Result<Vec<String>, String
         }
     }
 
-    if execution_mode == Some("jit") {
+    if command == "run" && execution_mode.unwrap_or(jit_cli::default_execution()) == "jit" {
         if gc_stats
             || gc_events
             || show_result

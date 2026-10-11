@@ -17,7 +17,7 @@ expected = {
 for name, output in expected.items():
     common = [str((args.samples / name).resolve()), '--system', str(args.system.resolve())]
     subprocess.run([str(args.runtime.resolve()), 'verify', *common], check=True)
-    result = subprocess.run([str(args.runtime.resolve()), 'run', *common],
+    result = subprocess.run([str(args.runtime.resolve()), 'run', common[0], '--execution', 'interpreter', *common[1:]],
                             check=True, capture_output=True, text=True)
     if result.stdout != output or result.stderr:
         raise SystemExit(f'{name}: unexpected output: {result.stdout!r}, stderr: {result.stderr!r}')

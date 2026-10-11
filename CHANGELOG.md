@@ -8,6 +8,15 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-12
 
+- Make JIT the development `run` default on macOS ARM64 and Windows x64, with
+  installed compiler/helper/library discovery, explicit errors rather than fallback,
+  and configurable packaged heap/byte-array limits. Enable macOS runtime suspension
+  in the CLI. Other hosts retain interpreter defaults; standalone runtime packages
+  and interpreter diagnostics require explicit `--execution interpreter` on JIT
+  hosts. Add relocatable bundle preparation and default-mode CLI/HTTP/library gates;
+  routine runtime-library tests now select JIT. Windows runtime suspension and
+  Windows ARM64 JIT remain unsupported.
+
 - Reduce native collector traversal work: validate spans while building the index,
   combine mark reset with intern-root seeding, and trace each activated owned parked
   stack once per collection. Preserve fixed-point ownership and collection frequency.

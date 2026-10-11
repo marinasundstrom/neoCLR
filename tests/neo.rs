@@ -171,6 +171,11 @@ fn cli_runs_checks_and_compiles_neo_to_an_ordinary_artifact() {
     for command in ["check", "verify", "run"] {
         let output = Command::new(env!("CARGO_BIN_EXE_neoclr"))
             .args([command, source])
+            .args(if command == "run" {
+                vec!["--execution", "interpreter"]
+            } else {
+                vec![]
+            })
             .output()
             .unwrap();
         assert!(
@@ -203,7 +208,14 @@ fn cli_runs_checks_and_compiles_neo_to_an_ordinary_artifact() {
         Value::Int32(42)
     );
     let output = Command::new(env!("CARGO_BIN_EXE_neoclr"))
-        .args(["run", source, "--module", "examples/hello.neoil"])
+        .args([
+            "run",
+            source,
+            "--execution",
+            "interpreter",
+            "--module",
+            "examples/hello.neoil",
+        ])
         .output()
         .unwrap();
     assert!(!output.status.success());

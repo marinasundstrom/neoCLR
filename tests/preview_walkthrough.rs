@@ -27,6 +27,12 @@ impl Drop for Fixture {
 }
 
 fn cli(args: &[&str], input: &[u8]) -> Output {
+    let mut selected = args.to_vec();
+    if selected.first() == Some(&"run") {
+        selected.splice(2..2, ["--execution", "interpreter"]);
+    }
+    let args = selected.as_slice();
+
     let mut child = Command::new(env!("CARGO_BIN_EXE_neoclr"))
         .args(args)
         .current_dir(env!("CARGO_MANIFEST_DIR"))

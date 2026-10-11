@@ -157,7 +157,7 @@ def main():
                          ('handler-error', valid.replace(b'/greeting', b'/other'), False, 'Unexpected request')]
                 report['httpCases'] = {}
                 for name, request, fragmented, error in cases:
-                    vm = serve([kit / 'bundle/bin/neoclr', 'run', destination / 'app.dll', *context], http_dir, request, fragmented)
+                    vm = serve([kit / 'bundle/bin/neoclr', 'run', destination / 'app.dll', '--execution', 'interpreter', *context], http_dir, request, fragmented)
                     native = serve([http_dir / 'app'], http_dir, request, fragmented)
                     report['httpCases'][name] = dict(interpreter=vm, native=native)
                     assert native == vm
@@ -181,7 +181,7 @@ def main():
                 assert result.returncode == 0 and evidence['passed'], result.stderr
                 shutil.copy2(destination / 'app', http_dir / 'app')
                 request = valid.replace(b'/greeting', b'/fault')
-                vm = serve([kit / 'bundle/bin/neoclr', 'run', destination / 'app.dll', *context], http_dir, request)
+                vm = serve([kit / 'bundle/bin/neoclr', 'run', destination / 'app.dll', '--execution', 'interpreter', *context], http_dir, request)
                 native = serve([http_dir / 'app'], http_dir, request)
                 report['httpCases']['guest-fault'] = dict(interpreter=vm, native=native)
                 assert native == vm and native['exitCode'] == 1

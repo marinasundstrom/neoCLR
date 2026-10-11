@@ -106,7 +106,12 @@ fn property_reads_use_metadata_getters_for_closed_library_values() {
 #[test]
 fn documented_cli_example_runs() {
     let output = Command::new(env!("CARGO_BIN_EXE_neoclr"))
-        .args(["run", "examples/source/typeof.neo"])
+        .args([
+            "run",
+            "examples/source/typeof.neo",
+            "--execution",
+            "interpreter",
+        ])
         .output()
         .unwrap();
     assert!(

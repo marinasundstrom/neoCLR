@@ -57,7 +57,7 @@ if args.runtime_await:
 for reference in references:
     compile_command += ['--reference', str(reference)]
 compile_command += ['-o', str(assembly), *map(str, sources)]
-run_command = [str(runtime), 'run', str(assembly), '--system', str(lib / 'System.runtime.neox'),
+run_command = [str(runtime), 'run', str(assembly), '--execution', 'interpreter', '--system', str(lib / 'System.runtime.neox'),
                '--instructions', '100000000', '--object-root', str(references[0])]
 for reference in references:
     run_command += ['--module', str(reference)]
