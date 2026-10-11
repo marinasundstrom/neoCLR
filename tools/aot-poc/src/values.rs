@@ -407,7 +407,7 @@ pub(crate) fn compile_into(
         let queue = module.declare_function("neoclr_task_queue_default_v1", Linkage::Import, &sig)?;
         Some((begin, end, poll, callback, queue))
     } else { None };
-    let runtime_async_callbacks = if details.is_some_and(|d| !d.runtime_async_start.is_empty()) {
+    let runtime_async_callbacks = if details.is_some_and(|d| !d.runtime_async_start.is_empty() || !d.runtime_async_startmanaged.is_empty()) {
         let mut sig = module.make_signature();
         sig.params.extend([types::I64, types::I64].map(AbiParam::new));
         sig.returns.push(AbiParam::new(types::I32));
@@ -432,6 +432,9 @@ pub(crate) fn compile_into(
             (&d.scheduler_submit, "neoclr_scheduler_submit_managed_v1", vec![types::I64, types::I64, types::I64]),
             (&d.runtime_async_gccollect, "neoclr_runtime_async_gccollect_v1", vec![types::I64, types::I64]),
             (&d.runtime_async_create, "neoclr_runtime_async_create_v1", vec![types::I64, types::I64]),
+            (&d.runtime_async_startmanaged, "neoclr_runtime_async_startmanaged_v1", vec![types::I64; 5]),
+            (&d.runtime_async_createowned, "neoclr_runtime_async_createowned_v1", vec![types::I64; 3]),
+            (&d.runtime_async_currentowner, "neoclr_runtime_async_currentowner_v1", vec![types::I64; 2]),
             (&d.runtime_async_start, "neoclr_runtime_async_start_v1", vec![types::I64, types::I64, types::I64, types::I64]),
             (&d.runtime_async_completeunit, "neoclr_runtime_async_completeunit_v1", vec![types::I64, types::I64, types::I64]),
             (&d.runtime_async_awaitunit, "neoclr_runtime_async_awaitunit_v1", vec![types::I64, types::I64, types::I64]),
@@ -1039,7 +1042,7 @@ pub(crate) fn compile_into(
                     args.extend([run, drain]);
                 }
                 args.push(output);
-                if details.unwrap().runtime_async_start.contains(&i) {
+                if details.unwrap().runtime_async_start.contains(&i) || details.unwrap().runtime_async_startmanaged.contains(&i) {
                     let callback = module.declare_func_in_func(runtime_async_callbacks.unwrap().0, b.func);
                     args.push(b.ins().func_addr(types::I64, callback));
                 }

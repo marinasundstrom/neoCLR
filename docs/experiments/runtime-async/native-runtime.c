@@ -29,7 +29,7 @@ static void unmap_stack(void *mapping, size_t bytes) {
     ++statistics.unmappings;
     statistics.reserved_bytes -= bytes;
 }
-typedef struct { uint64_t id; int complete, body; } operation;
+typedef struct { uint64_t id; int complete, body; uint64_t owner; } operation;
 typedef struct fiber {
     ucontext_t machine;
     neoclr_parked_roots roots;
@@ -38,8 +38,8 @@ typedef struct fiber {
     uintptr_t lower, upper;
     uint64_t callback, operation, waiting;
     void *owner;
-    uint64_t active_owner, active_callback;
-    int done, status, drain, parked;
+    uint64_t active_owner, active_callback, ready_owner;
+    int done, status, drain, parked, managed;
     ucontext_t *caller;
 } fiber;
 static _Thread_local struct {
@@ -146,6 +146,16 @@ static void reap_expired(void) {
         --state.owned;
         memset(f, 0, sizeof(*f));
     }
+    for (unsigned i = 0; i < LIMIT; ++i) {
+        operation *op = &state.operations[i];
+        if (!op->id || !op->owner) continue;
+        void *owner = NULL;
+        if (neoclr_gc_host_root_read_v1(state.context, op->owner, &owner)) {
+            if (neoclr_gc_host_root_release_v1(state.context, op->owner)) abort();
+            memset(op, 0, sizeof(*op));
+            --state.owned;
+        }
+    }
 }
 int32_t neoclr_runtime_async_reap_v1(neoclr_aot_context *c) {
     if (!c || state.context != c || state.current || state.pumping || neoclr_root_probe_head_v1()) return 3;
@@ -166,6 +176,10 @@ static int resume(fiber *f) {
             return status;
         }
     }
+    if (f->ready_owner) {
+        if (neoclr_gc_host_root_release_v1(state.context, f->ready_owner)) abort();
+        f->ready_owner = 0;
+    }
     ++statistics.resumes;
     ucontext_t caller;
     neoclr_parked_roots caller_roots = {0};
@@ -182,6 +196,7 @@ static int resume(fiber *f) {
     int status = f->status;
     if (f->done) {
         if (f->owner) --state.owned;
+        if (f->managed) memset(find(f->operation), 0, sizeof(operation));
         neoclr_roots_discard_v1(&f->roots);
         /* The callback root and parked root chain have ended. Cache only the
          * raw guarded mapping, never a machine context or managed ownership. */
@@ -198,14 +213,14 @@ static int resume(fiber *f) {
 int32_t neoclr_runtime_async_create_v1(neoclr_aot_context *c, uint64_t *out) {
     if (admit(c) || !out || next_id == INT64_MAX) return 3;
     for (unsigned i = 0; i < LIMIT; ++i) if (!state.operations[i].id) {
-        state.operations[i] = (operation){++next_id, 0, 0};
+        state.operations[i] = (operation){.id = ++next_id};
         *out = next_id;
         return 0;
     }
     return 5;
 }
 static int32_t start(void *owner, void *callback, neoclr_aot_context *c,
-    uint64_t *out, neoclr_async_callback invoke) {
+    uint64_t *out, neoclr_async_callback invoke, int managed) {
     if (admit(c) || !out || !invoke || (state.invoke && state.invoke != invoke)) return 3;
     state.invoke = invoke;
     uint64_t root = 0, op = 0;
@@ -217,6 +232,7 @@ static int32_t start(void *owner, void *callback, neoclr_aot_context *c,
     fiber *f = allocate_fiber(root, op, 0);
     if (!f) { neoclr_gc_host_root_release_v1(c, root); find(op)->id = 0; return 5; }
     f->owner = owner;
+    f->managed = managed;
     if (owner) ++state.owned;
     find(op)->body = 1;
     if (!owner) *out = op; /* Preserve the original strong-entry publication point. */
@@ -236,18 +252,60 @@ static int32_t start(void *owner, void *callback, neoclr_aot_context *c,
 }
 int32_t neoclr_runtime_async_start_v1(void *callback, neoclr_aot_context *c,
     uint64_t *out, neoclr_async_callback invoke) {
-    return start(NULL, callback, c, out, invoke);
+    return start(NULL, callback, c, out, invoke, 0);
 }
 int32_t neoclr_runtime_async_start_owned_v1(void *owner, void *callback, neoclr_aot_context *c,
     uint64_t *out, neoclr_async_callback invoke) {
     if (!owner) return 3;
-    return start(owner, callback, c, out, invoke);
+    return start(owner, callback, c, out, invoke, 0);
+}
+int32_t neoclr_runtime_async_startmanaged_v1(void *owner, void *callback, neoclr_aot_context *c,
+    uint64_t *out, neoclr_async_callback invoke) {
+    if (!owner) return 3;
+    return start(owner, callback, c, out, invoke, 1);
+}
+int32_t neoclr_runtime_async_currentowner_v1(neoclr_aot_context *c, void **out) {
+    if (admit(c) || !out) return 3;
+    *out = state.current ? state.current->owner : NULL;
+    return 0;
+}
+int32_t neoclr_runtime_async_createowned_v1(void *owner, neoclr_aot_context *c, uint64_t *out) {
+    if (admit(c) || !owner || !out) return 3;
+    uint64_t id, root;
+    int status = neoclr_runtime_async_create_v1(c, &id);
+    if (status) return status;
+    status = neoclr_gc_host_root_create_owned_v1(c, owner, owner, &root);
+    if (status) { memset(find(id), 0, sizeof(operation)); return status; }
+    find(id)->owner = root;
+    ++state.owned;
+    *out = id;
+    return 0;
 }
 int32_t neoclr_runtime_async_completeunit_v1(uint64_t id, neoclr_aot_context *c, int32_t *out) {
     if (admit(c) || !out) return 3;
     operation *op = find(id);
     *out = op && !op->complete && !op->body;
-    if (*out) op->complete = 1;
+    if (*out) {
+        // The notification may release its last managed owner before dispatch.
+        // Runnable bodies must retain their state until active roots take over.
+        for (unsigned i = 0; i < LIMIT; ++i) {
+            fiber *f = &state.fibers[i];
+            if (!f->mapping || f->waiting != id || !f->owner || f->roots.expired) continue;
+            int status = neoclr_gc_host_root_create_v1(c, f->owner, &f->ready_owner);
+            if (status) {
+                for (unsigned j = 0; j < i; ++j) {
+                    fiber *prior = &state.fibers[j];
+                    if (prior->waiting == id && prior->ready_owner) {
+                        if (neoclr_gc_host_root_release_v1(c, prior->ready_owner)) abort();
+                        prior->ready_owner = 0;
+                    }
+                }
+                *out = 0;
+                return status;
+            }
+        }
+        op->complete = 1;
+    }
     return 0;
 }
 int32_t neoclr_runtime_async_iscompleted_v1(uint64_t id, neoclr_aot_context *c, int32_t *out) {
@@ -261,7 +319,11 @@ int32_t neoclr_runtime_async_release_v1(uint64_t id, neoclr_aot_context *c, int3
     if (!find(id) || !find(id)->complete) return 0;
     for (unsigned i = 0; i < LIMIT; ++i)
         if (state.fibers[i].mapping && (state.fibers[i].waiting == id || state.fibers[i].operation == id)) return 0;
-    find(id)->id = 0;
+    if (find(id)->owner) {
+        if (neoclr_gc_host_root_release_v1(c, find(id)->owner)) abort();
+        --state.owned;
+    }
+    memset(find(id), 0, sizeof(operation));
     *out = 1;
     return 0;
 }
@@ -355,9 +417,11 @@ int32_t neoclr_runtime_async_shutdown_v1(neoclr_aot_context *c) {
             leaked = 1;
             if (f->parked) neoclr_roots_discard_v1(&f->roots);
             if (f->callback && neoclr_gc_host_root_release_v1(c, f->callback)) abort();
+            if (f->ready_owner && neoclr_gc_host_root_release_v1(c, f->ready_owner)) abort();
             unmap_stack(f->mapping, f->mapping_bytes);
         }
         leaked |= state.operations[i].id != 0;
+        if (state.operations[i].owner && neoclr_gc_host_root_release_v1(c, state.operations[i].owner)) abort();
     }
     for (unsigned i = 0; i < state.cached; ++i)
         unmap_stack(state.cache[i].mapping, state.cache[i].bytes);

@@ -80,8 +80,12 @@ reachable owners retain their dependents, while abandoned cycles can be reclaime
 Opt-in owned parked-frame registrations now apply this relationship at automatic
 collection safepoints, preventing an abandoned stack from rooting itself. Dependent
 host handles participate in the same graph and require strong ownership for dispatch. This is
-groundwork for suspended-operation lifetime support. Generator stacks still
-use strong roots; automatic abandoned-generator reclamation is not implemented.
+now integrated into the source-local Raven runtime-async provider. In the scoped
+interpreter and macOS ARM64 JIT/AOT experiment, live consumer tasks and external
+completions retain suspended producers; abandoned pending cycles release frames,
+operation slots and native stack mappings. Runnable work stays rooted until dispatch.
+Collection does not execute managed cleanup: use explicit asynchronous disposal for
+resources. This remains experimental, with Windows and performance qualification open.
 [Development contract and evidence](https://github.com/marinasundstrom/neoCLR/blob/main/docs/experiments/aot-console/native-gc.md#conditional-ownervalue-roots--private-experiment-2026-10-11).
 
 

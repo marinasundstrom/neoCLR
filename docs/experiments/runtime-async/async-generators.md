@@ -3,8 +3,8 @@
 Status: implementation underway following the author's explicit direction to add
 managed async iteration and await-for consumption before yield/resume. The managed
 contract, retained-body await-for consumption and native generator production now
-work in the scoped POC, including generic reference-class owners. Lifetime, platform
-and performance qualification remain open.
+work in the scoped POC, including generic reference-class owners. Managed ownership
+is integrated below; platform and performance qualification remain open.
 
 ## What works in Raven
 
@@ -31,7 +31,7 @@ Compiler implementation evidence (Raven repository):
   lifecycle behavior. Runtime async for ordinary methods does not eliminate the
   iterator state-machine protocol.
 
-## What neoCLR lacks
+## Initial gaps (historical)
 
 The runtime library now also exposes `AsyncIterable<T>`, `AsyncIterator<T>` and
 `AsyncDisposable`. Raven main's optional `RuntimeIterationContract.Async` selects
@@ -42,7 +42,7 @@ Consequently, removing the ordinary-loop diagnostic does **not** enable native
 async generators in interpreter, JIT or AOT. No native generator execution is
 claimed by the .NET tests above.
 
-## Recommended bounded follow-up
+## Original implementation sequence
 
 Keep a pull-based managed contract: acquire an iterator, asynchronously request
 one next item, read `Current`, and asynchronously dispose it. This follows the
@@ -515,3 +515,76 @@ the suspended body; body-operation release must replace the permanently queued
 `BodyLifetime` waiter; pending signals need their own release rules. The owned native
 entry remains unselected by Raven until those edges and interpreter parity are in
 place. Managed abandoned-generator collection is not enabled by this checkpoint.
+
+
+## Managed ownership integration — 2026-10-11
+
+The source-local Raven provider now selects managed body ownership in the
+interpreter and the macOS ARM64 JIT/AOT carrier. `BodyLifetime` and its permanently
+queued waiter are removed. The private services are:
+
+- `RuntimeAsyncStartManaged(object, fn<Void>) -> Int64`: enter eagerly, retain the
+  owner strongly while executing, and retain suspended frames conditionally on it.
+  The returned bookkeeping id is discarded by the provider; completion or
+  abandonment frees its slot automatically. Legacy `RuntimeAsyncStart` keeps its
+  explicit-release protocol.
+- `RuntimeAsyncCurrentOwner() -> object?`: obtain the current body owner, or null
+  for an unowned scheduler callback. It does not expose an ancestor callback's owner.
+- `RuntimeAsyncCreateOwned(object) -> Int64`: associate a pending signal with its
+  managed receiver. An unreachable receiver permits reclamation of the signal slot.
+
+An awaited Task's completion registration retains `CompletionSignal`, which in turn
+retains the current body. Thus an externally reachable pending operation preserves
+its suspended consumer even if the caller discards the returned Task or iterator.
+The earlier result/advancement/disposal adapters preserve the opposite consumer-to-
+producer links. Internal cycles alone do not retain themselves.
+
+**Readiness transfers ownership.** After completion clears the awaited Task's callback
+list, runnable bodies remain strongly owned until dispatch. The interpreter publishes
+ready parked frames as strong roots; the native carrier temporarily roots each ready
+owner, releasing that root only after active roots take over. Otherwise GC between
+notification delivery and resumption could discard legitimate work. Admission failure
+rolls back newly acquired native ready handles before reporting the failure.
+
+For still-pending bodies, collection expires unreachable registrations. The interpreter
+then drops frames and operation slots; native owner-thread reaping detaches roots,
+releases handles and unmaps abandoned stacks. No managed cleanup is invoked by GC.
+Explicit disposal, normal termination and cancellation still execute ordinary cleanup.
+Late completion cannot revive a discarded activation. Shared-heap publication preserves
+conditional edges across other participants' collections and array-pressure recovery.
+The interpreter parks the startup caller chain during entry draining, allowing ready
+retained callbacks to dispatch independently, then restores it when work is drained.
+Removing the lifetime waiter exposed this previously masked dispatcher dependency.
+
+These remain private experiment services and source-included providers. Runtime
+Contract configuration and Raven lowering are unchanged. Native stack switching remains
+macOS ARM64 scaffolding; Windows carrier support, production operation representation,
+performance qualification and execution-default changes remain separate gates.
+
+
+[Sanitized native evidence](managed-ownership-native-validation.json) covers 320
+actual suspensions: 160 live resumptions and 160 abandonments across legacy owned
+and managed automatic-release entries. Live tests drop the external owner and collect
+between completion and dispatch. Late completion, operation-slot reuse, startup quota
+rollback and zero reserved stack bytes after shutdown are checked.
+[Native showcase evidence](managed-ownership-showcase-validation.json) requalifies
+ordinary await, cleanup, repeated execution, terminal Fault, HTTP client/server projects
+and timeout/cancellation/protocol cases in JIT/AOT with the integrated provider. This
+uses the report's pinned library bundle; it is not qualification of every newer HTTP API.
+
+[Focused interpreter evidence](managed-ownership-interpreter-tests.json) records 35
+runtime-async tests, five entry-result tests, 12 shared-heap tests and eight collector
+tests. New cases exceed the interpreter's 64 operation slots through repeated
+abandonment, preserve a ready body after the last external owner is dropped, and
+exercise entry draining without the old lifetime waiter. Shared-heap tests also
+collect from another participant and force array-pressure recovery.
+
+[Final three-mode generator evidence](managed-ownership-generator-validation.json)
+passes interpreter, macOS ARM64 JIT and AOT using native Raven generator syntax.
+It includes 160 abandoned yielded generators (exceeding both operation-table limits),
+external input retained after dropping the consumer, task-only advancement/disposal,
+generic owners, delegation, pending cleanup, cancellation and normal completion.
+The external-input test awaits a producer acknowledgement rather than assuming
+scheduler ordering. The source listing has no generated async state machine.
+This closes the scoped managed-lifetime integration checkpoint. Matched performance,
+production carrier/metadata and Windows qualification remain separate follow-up gates.

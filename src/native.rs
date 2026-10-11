@@ -53,6 +53,9 @@ pub(crate) enum Binding {
     RuntimeAsyncYield,
     RuntimeAsyncCreate,
     RuntimeAsyncStart,
+    RuntimeAsyncStartManaged,
+    RuntimeAsyncCreateOwned,
+    RuntimeAsyncCurrentOwner,
     RuntimeAsyncDelay,
     RuntimeAsyncComplete,
     RuntimeAsyncCompleteUnit,
@@ -959,6 +962,13 @@ pub(crate) fn bind(function: &Function) -> Result<Binding, Fault> {
         {
             (Binding::RuntimeAsyncStart, Type::Int64)
         }
+        ("neoCLR.Runtime.RuntimeAsyncStartManaged", [owner, body])
+            if *owner == Type::Named("System.Object".into()) && *body == crate::assembler::parse_type("fn<Void>")? =>
+            (Binding::RuntimeAsyncStartManaged, Type::Int64),
+        ("neoCLR.Runtime.RuntimeAsyncCreateOwned", [owner]) if *owner == Type::Named("System.Object".into()) =>
+            (Binding::RuntimeAsyncCreateOwned, Type::Int64),
+        ("neoCLR.Runtime.RuntimeAsyncCurrentOwner", []) =>
+            (Binding::RuntimeAsyncCurrentOwner, Type::Named("System.Object".into())),
         ("neoCLR.Runtime.RuntimeAsyncCreate", []) => (Binding::RuntimeAsyncCreate, Type::Int64),
         ("neoCLR.Runtime.RuntimeAsyncDelay", [Type::Int32]) => (Binding::RuntimeAsyncDelay, Type::Int64),
         ("neoCLR.Runtime.RuntimeAsyncComplete", [Type::Int64, Type::Int32]) => (Binding::RuntimeAsyncComplete, Type::Boolean),

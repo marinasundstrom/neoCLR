@@ -47,6 +47,7 @@ pub struct ManagedHeap {
 /// marked. The value may refer back to its owner without making that cycle live.
 /// The caller must remove entries whose owners were reclaimed after collection,
 /// and must exclude graph mutation for the entire collection and cleanup.
+#[cfg(test)]
 pub(crate) struct ConditionalRoot<'a> {
     pub owner: &'a crate::SlotReference,
     pub value: &'a Value,
@@ -71,6 +72,9 @@ impl ManagedHeap {
     }
     pub fn len(&self) -> usize {
         self.objects.len()
+    }
+    pub(crate) fn contains(&self, identity: usize) -> bool {
+        self.objects.contains_key(&identity)
     }
     pub fn is_empty(&self) -> bool {
         self.objects.is_empty()
@@ -178,6 +182,7 @@ impl ManagedHeap {
         self.peak_objects = self.peak_objects.max(self.len());
         Ok(identity)
     }
+    #[cfg(test)]
     pub(crate) fn collect(
         &mut self,
         pending: Vec<usize>,
@@ -186,15 +191,15 @@ impl ManagedHeap {
         self.collect_with_conditional_roots(pending, &[], reason)
     }
 
-    /// Collector foundation only; scheduler registration ownership is not yet
-    /// wired to this path. No conditional value is an unconditional GC root.
+    /// Value/provenance adapter used by collector contract tests. Production
+    /// participants publish the same conditional relationships as validated ids.
+    #[cfg(test)]
     pub(crate) fn collect_with_conditional_roots(
         &mut self,
-        mut pending: Vec<usize>,
+        pending: Vec<usize>,
         conditional: &[ConditionalRoot<'_>],
         reason: CollectionReason,
     ) -> Result<(), Fault> {
-        let roots = pending.len();
         // Index by owner so chains reach a fixed point through the mark worklist,
         // without repeatedly scanning every dormant registration. Validate all
         // owners before marking/sweeping, including unreachable and foreign ones.
@@ -205,6 +210,21 @@ impl ManagedHeap {
                 .entry(entry.owner.allocation_id().expect("validated heap owner"))
                 .or_default()
                 .extend(self.value_roots(entry.value)?);
+        }
+        self.collect_with_dependencies(pending, dependents, reason)
+    }
+
+    pub(crate) fn collect_with_dependencies(
+        &mut self,
+        mut pending: Vec<usize>,
+        mut dependents: BTreeMap<usize, Vec<usize>>,
+        reason: CollectionReason,
+    ) -> Result<(), Fault> {
+        let roots = pending.len();
+        for (&owner, values) in &dependents {
+            if !self.objects.contains_key(&owner) || values.iter().any(|id| !self.objects.contains_key(id)) {
+                return Err(Fault::new("invalid conditional heap reference"));
+            }
         }
         let mut live = HashSet::new();
         while let Some(identity) = pending.pop() {

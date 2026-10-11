@@ -7,13 +7,7 @@ module RuntimeAwaitProvider {
     static class Bridge {
         static func Start<T>(callback: () -> TaskOutcome<T>) -> Task<T> {
             let body = Body<T>(callback)
-            let handle = neoCLR.Runtime.RuntimeAsyncStart(body.Run)
-            let lifetime = BodyLifetime(handle)
-            if neoCLR.Runtime.RuntimeAsyncIsCompleted(handle) {
-                lifetime.Release()
-            } else {
-                _ = neoCLR.Runtime.SchedulerSubmit(lifetime.Release)
-            }
+            _ = neoCLR.Runtime.RuntimeAsyncStartManaged(body, body.Run)
             return body.Task
         }
 
@@ -61,23 +55,15 @@ module RuntimeAwaitProvider {
         }
     }
 
-    class BodyLifetime {
-        private val handle: long
-        init(handle: long) {
-            self.handle = handle
-        }
-
-        // Runtime ownership ends after Body.Run returns, not when its Promise completes.
-        func Release() -> System.Void {
-            _ = neoCLR.Runtime.RuntimeAsyncWaitCompletion(handle)
-            if !neoCLR.Runtime.RuntimeAsyncRelease(handle) {
-                System.Fail("Completed body still has an owner")
-            }
-        }
-    }
-
     class CompletionSignal {
-        val Handle = neoCLR.Runtime.RuntimeAsyncCreate()
+        // External pending tasks retain this callback receiver, and through it
+        // the suspended body. Internal cycles remain collectible.
+        private val owner: object?
+        val Handle: long
+        init() {
+            owner = neoCLR.Runtime.RuntimeAsyncCurrentOwner()
+            Handle = neoCLR.Runtime.RuntimeAsyncCreateOwned(self)
+        }
 
         // Deliberate managed-task notification adapter, including cancellation.
         func Complete() -> System.Void {
@@ -94,6 +80,12 @@ module neoCLR.Runtime {
 
     [MethodImpl(MethodImplOptions.InternalCall)]
     internal extern func RuntimeAsyncCreate() -> long;
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    internal extern func RuntimeAsyncStartManaged(owner: object, body: () -> System.Void) -> long;
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    internal extern func RuntimeAsyncCurrentOwner() -> object?;
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    internal extern func RuntimeAsyncCreateOwned(owner: object) -> long;
     [MethodImpl(MethodImplOptions.InternalCall)]
     internal extern func RuntimeAsyncStart(body: () -> System.Void) -> long;
     [MethodImpl(MethodImplOptions.InternalCall)]

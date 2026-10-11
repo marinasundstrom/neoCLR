@@ -1071,5 +1071,9 @@ The explicit retained-body compiler POC consumes it with `await for` and awaited
 lexical cleanup. A source-local producer now tests demand-driven yield/resume,
 early stop, cancellation and independent iterator state in interpreter/JIT/AOT.
 See [contracts, execution evidence and remaining generator work](async-generators.md).
-The prototype does not enable native Raven `yield` syntax or prove abandoned stacks
-collectible. No default-mode switch or performance improvement is claimed.
+Subsequent checkpoints add native Raven `yield`/`yield from`, generic reference
+owners and [managed suspension ownership](async-generators.md#managed-ownership-integration--2026-10-11).
+Live consumer tasks and external completion callbacks retain their producers; pending
+abandoned cycles release frames, operation slots and native stacks. Ready work retains
+strong ownership through dispatch. No default-mode switch or performance improvement
+is claimed; Windows carrier and performance qualification remain open.

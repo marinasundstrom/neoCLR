@@ -345,6 +345,11 @@ state-machine path remains incomplete.
 Native Raven `yield` and `yield from` now demonstrate lazy, demand-driven yield/resume
 and early-stop cleanup on these interfaces in the opt-in retained-runtime POC.
 Nested producer disposal can suspend; cancellation still waits for outer cleanup.
-Generic generator methods on nongeneric owners support typed captures, awaited
-Task<T> inputs and delegation. Generic owners, collection of abandoned suspended
-generators and performance qualification remain development work.
+Generic generator methods, including those on generic reference owners, support
+typed captures, awaited Task<T> inputs and delegation. The source-local provider now
+connects live tasks and external completions to managed suspension ownership. Pending
+abandoned cycles can release their frames and native stacks without running cleanup;
+runnable work remains rooted until dispatch. Explicit disposal remains necessary for
+deterministic resource cleanup. Windows carrier and performance qualification remain
+open; no execution default changes in this experiment.
+[Ownership contract and evidence](https://github.com/marinasundstrom/neoCLR/blob/main/docs/experiments/runtime-async/async-generators.md#managed-ownership-integration--2026-10-11).

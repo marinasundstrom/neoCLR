@@ -17,6 +17,9 @@ int32_t neoclr_runtime_async_start_v1(void *, neoclr_aot_context *, uint64_t *, 
  * do not retain managed owners. A completed body's normal release is unchanged. */
 int32_t neoclr_runtime_async_start_owned_v1(void *owner, void *callback,
     neoclr_aot_context *, uint64_t *, neoclr_async_callback);
+int32_t neoclr_runtime_async_startmanaged_v1(void *, void *, neoclr_aot_context *, uint64_t *, neoclr_async_callback);
+int32_t neoclr_runtime_async_currentowner_v1(neoclr_aot_context *, void **);
+int32_t neoclr_runtime_async_createowned_v1(void *, neoclr_aot_context *, uint64_t *);
 int32_t neoclr_runtime_async_reap_v1(neoclr_aot_context *);
 int32_t neoclr_runtime_async_completeunit_v1(uint64_t, neoclr_aot_context *, int32_t *);
 int32_t neoclr_runtime_async_awaitunit_v1(uint64_t, neoclr_aot_context *, int32_t *);

@@ -54,6 +54,10 @@ pub struct Options {
     pub runtime_async_gccollect: Vec<usize>,
     pub runtime_async_create: Vec<usize>,
     pub runtime_async_start: Vec<usize>,
+    pub runtime_async_startmanaged: Vec<usize>,
+    pub runtime_async_createowned: Vec<usize>,
+    pub runtime_async_currentowner: Vec<usize>,
+
     pub runtime_async_completeunit: Vec<usize>,
     pub runtime_async_awaitunit: Vec<usize>,
     pub runtime_async_release: Vec<usize>,
@@ -250,6 +254,15 @@ impl Options {
                 .filter_map(|b| b["compiledIndex"].as_u64().map(|v| v as usize)).collect(),
             runtime_async_create: report.and_then(|r| r["nativeBindings"].as_array()).into_iter().flatten()
                 .filter(|b| b["implementation"] == "runtime-async-create-v1")
+                .filter_map(|b| b["compiledIndex"].as_u64().map(|v| v as usize)).collect(),
+            runtime_async_startmanaged: report.and_then(|r| r["nativeBindings"].as_array()).into_iter().flatten()
+                .filter(|b| b["implementation"] == "runtime-async-startmanaged-v1")
+                .filter_map(|b| b["compiledIndex"].as_u64().map(|v| v as usize)).collect(),
+            runtime_async_createowned: report.and_then(|r| r["nativeBindings"].as_array()).into_iter().flatten()
+                .filter(|b| b["implementation"] == "runtime-async-createowned-v1")
+                .filter_map(|b| b["compiledIndex"].as_u64().map(|v| v as usize)).collect(),
+            runtime_async_currentowner: report.and_then(|r| r["nativeBindings"].as_array()).into_iter().flatten()
+                .filter(|b| b["implementation"] == "runtime-async-currentowner-v1")
                 .filter_map(|b| b["compiledIndex"].as_u64().map(|v| v as usize)).collect(),
             runtime_async_start: report.and_then(|r| r["nativeBindings"].as_array()).into_iter().flatten()
                 .filter(|b| b["implementation"] == "runtime-async-start-v1")

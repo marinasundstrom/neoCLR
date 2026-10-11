@@ -691,6 +691,9 @@ pub fn runtime_async(input: &mut neoclr::Module, selection: &Value) -> Result<Ve
     for row in selection["functions"].as_array().ok_or("missing selection inventory")? {
         let (parameters, result, implementation, symbol) = match row["name"].as_str() {
             Some("neoCLR.Runtime.GCCollect") => (vec![], Type::Void, "runtime-async-gccollect-v1", "neoclr_runtime_async_gccollect_v1"),
+            Some("neoCLR.Runtime.RuntimeAsyncStartManaged") => (vec![Type::Named("System.Object".into()), neoclr::assembler::parse_type("fn<Void>").expect("fixed callback shape")], Type::Int64, "runtime-async-startmanaged-v1", "neoclr_runtime_async_startmanaged_v1"),
+            Some("neoCLR.Runtime.RuntimeAsyncCreateOwned") => (vec![Type::Named("System.Object".into())], Type::Int64, "runtime-async-createowned-v1", "neoclr_runtime_async_createowned_v1"),
+            Some("neoCLR.Runtime.RuntimeAsyncCurrentOwner") => (vec![], Type::Named("System.Object".into()), "runtime-async-currentowner-v1", "neoclr_runtime_async_currentowner_v1"),
             Some("neoCLR.Runtime.RuntimeAsyncCreate") => (vec![], Type::Int64, "runtime-async-create-v1", "neoclr_runtime_async_create_v1"),
             Some("neoCLR.Runtime.RuntimeAsyncStart") => (vec![neoclr::assembler::parse_type("fn<Void>").expect("fixed runtime callback signature")], Type::Int64, "runtime-async-start-v1", "neoclr_runtime_async_start_v1"),
             Some("neoCLR.Runtime.RuntimeAsyncCompleteUnit") => (vec![Type::Int64], Type::Boolean, "runtime-async-completeunit-v1", "neoclr_runtime_async_completeunit_v1"),
@@ -713,6 +716,7 @@ pub fn runtime_async(input: &mut neoclr::Module, selection: &Value) -> Result<Ve
         f.impl_flags = 0;
         f.body = if result == Type::Boolean { vec![Op::Bool(false), Op::Return] }
             else if result == Type::Int64 { vec![Op::Int64(0), Op::Return] }
+            else if result != Type::Void { vec![Op::Branch(0)] }
             else { vec![Op::Return] };
         bindings.push(json!({"definition": row["definition"], "name": row["name"],
             "compiledIndex": row["compiledIndex"], "implementation": implementation, "symbol": symbol,

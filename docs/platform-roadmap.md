@@ -46,9 +46,11 @@ dispatch. The opt-in [native carrier now reclaims abandoned owned bodies](experi
 in a sanitized 160-suspension contract test, including stack mappings and operation
 slots. The provider now adds
 [pending-task ownership links](experiments/runtime-async/async-generators.md#pending-managed-task-ownership-links--2026-10-11)
-for results, advancement and disposal. External completion ownership and body release
-remain open; the provider still uses strong native roots. Abandoned-generator collection and
-performance gates remain open. See
+for results, advancement and disposal. The subsequent
+[managed ownership integration](experiments/runtime-async/async-generators.md#managed-ownership-integration--2026-10-11)
+connects external completions, automatic body/signal release and interpreter parity.
+Runnable work retains strong ownership until dispatch; pending abandoned cycles can
+be reclaimed without executing cleanup. Platform and performance gates remain open. See
 [scope, evidence and remaining work](experiments/runtime-async/async-generators.md).
 
 **Compiler lines (2026-10-11):** the author directs keeping Raven main and the

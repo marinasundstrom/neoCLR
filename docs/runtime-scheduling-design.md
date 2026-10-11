@@ -1730,3 +1730,24 @@ retain their producer/cursor. These are ordinary managed edges, released through
 Promise's existing notification lifecycle, with extra allocation/queue cost. They
 are not a new Task API. External completion ownership, signal release and replacement
 of the `BodyLifetime` waiter remain prerequisites to selecting the owned native entry.
+
+
+### Managed suspension ownership checkpoint (2026-10-11)
+
+The [integrated provider](experiments/runtime-async/async-generators.md#managed-ownership-integration--2026-10-11)
+connects live consumer tasks and external awaited completions to conditional retained
+frames. Pending cycles can expire; executing and runnable bodies retain strong roots.
+Completion therefore transfers ownership to dispatch before notification references
+are dropped. Operation bookkeeping and native stack storage are released outside GC;
+GC does not run managed cleanup. Shared interpreter heap participants publish the same
+conditional graph, with expired registrations pruned during collection.
+
+.NET's [AsyncTaskMethodBuilder<T> implementation](https://github.com/dotnet/runtime/blob/main/src/libraries/System.Private.CoreLib/src/System/Runtime/CompilerServices/AsyncTaskMethodBuilderT.cs)
+(accessed 2026-10-11) stores the state machine in an async Task box and clears its
+state/context upon completion. That supports the same broad goal: retaining live work
+without retaining completed state indefinitely. neoCLR's retained-frame experiment
+instead owns VM activations or native stack mappings and must explicitly release that
+storage. Conditional tables and bound lifetime callbacks are provisional implementation
+choices, not claims about CLR implementation or proven performance improvements.
+They add collector/dispatch bookkeeping and managed callback allocations; benchmark
+those costs against compiler state machines before choosing a production representation.

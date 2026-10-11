@@ -15452,3 +15452,29 @@ or runtime-await default switch was performed.
   recorded with the [HTTP evidence](experiments/http-foundation/README.md). The
   platform chat continues its own runtime ownership work; no dirty changes were
   imported from its main checkout.
+
+
+## 2026-10-11 — Finish managed async-generator ownership
+
+- **Author direction:** after asking for the next focus, the author directed:
+  “Go ahead finish it. Don't stop until you do”. The bounded work is completion of
+  managed suspension ownership, followed by a matched performance check; this does
+  not waive the existing platform/performance gates for changing execution defaults.
+- **Assistant implementation:** connect external completion callbacks to body owners,
+  replace the permanently queued `BodyLifetime` waiter with automatically released
+  body operations, and give completion signals managed receiver lifetimes. Apply
+  conditional ownership to interpreter shared heaps and native parked frames.
+- **Gaps found and fixed:** completion initially allowed collection between callback
+  delivery and dispatch, so ready bodies now retain strong ownership. Removing the
+  waiter also exposed interpreter entry-drain starvation; its startup caller chain
+  now parks separately while ready bodies run. Array-pressure root publication now
+  preserves the same conditional graph.
+- **Validation:** the [ownership record](experiments/runtime-async/async-generators.md#managed-ownership-integration--2026-10-11)
+  links focused tests, sanitized native reclamation and HTTP/await showcase evidence.
+  The native test covers 320 real suspensions and zero reserved stack bytes at
+  shutdown. No managed cleanup runs from GC; deterministic disposal remains explicit.
+- **Integration:** private service contracts are documented in neoCLR and on Raven's
+  native compiler branch (`25cf73c64`, documentation only). Raven main remains separate;
+  existing explicit Runtime Contract configuration and compiler lowering are unchanged.
+  Source-local ownership callbacks, production carrier/metadata, Windows support and
+  performance/default qualification remain provisional or open as recorded in the roadmap.

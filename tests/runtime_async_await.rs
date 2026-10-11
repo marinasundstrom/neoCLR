@@ -1057,3 +1057,138 @@ ret
     p.verify().unwrap();
     assert_eq!(bounded_run(p).value, Value::Int32(42));
 }
+
+#[test]
+fn managed_body_ownership_reclaims_abandoned_frames_and_signals() {
+    let extra = r#"
+.type class System.Object
+.end
+.type class Owned
+.extends System.Object
+.method instance Run() -> Void
+call neoCLR.Runtime.RuntimeAsyncCurrentOwner()
+castclass Owned
+ldarg 0
+ref.eq
+brfalse Bad
+ldarg 0
+call neoCLR.Runtime.RuntimeAsyncCreateOwned(System.Object)
+call neoCLR.Runtime.RuntimeAsyncAwaitUnit(Int64)
+pop
+fault "abandoned body resumed"
+Bad:
+fault "managed body lost current owner"
+.end
+.end
+.function neoCLR.Runtime.RuntimeAsyncStartManaged(System.Object owner, fn<Void> body) -> Int64
+.methodimpl InternalCall
+.end
+.function neoCLR.Runtime.RuntimeAsyncCreateOwned(System.Object owner) -> Int64
+.methodimpl InternalCall
+.end
+.function neoCLR.Runtime.RuntimeAsyncCurrentOwner() -> System.Object
+.methodimpl InternalCall
+.end
+.function Abandon() -> noresult
+.local Owned owner
+newobj Owned
+stloc owner
+ldloc owner
+ldloc owner
+function.bind fn<Void> = instance Owned::Run()
+call neoCLR.Runtime.RuntimeAsyncStartManaged(System.Object, fn<Void>)
+pop
+ret
+.end
+"#;
+    let main = r#"
+.local Int32 iteration
+ldc.i4 0
+stloc iteration
+Again:
+call Abandon()
+call neoCLR.Runtime.GCCollect()
+ldloc iteration
+ldc.i4 1
+add
+stloc iteration
+ldloc iteration
+ldc.i4 80
+clt
+brtrue Again
+ldc.i4 42
+ret
+"#;
+    assert_eq!(bounded_run(program(main, extra)).value, Value::Int32(42));
+}
+
+#[test]
+fn ready_managed_body_survives_collection_after_completion_owner_is_dropped() {
+    let extra = r#"
+.type class System.Object
+.end
+.type class Owned
+.extends System.Object
+.field Gate Int64
+.field Done Int64
+.method instance Run() -> Void
+ldarg 0
+ldfld Owned::Gate
+call neoCLR.Runtime.RuntimeAsyncAwaitUnit(Int64)
+pop
+call neoCLR.Runtime.GCCollect()
+ldarg 0
+ldfld Owned::Done
+call neoCLR.Runtime.RuntimeAsyncCompleteUnit(Int64)
+pop
+ldvoid
+ret
+.end
+.end
+.function neoCLR.Runtime.RuntimeAsyncStartManaged(System.Object owner, fn<Void> body) -> Int64
+.methodimpl InternalCall
+.end
+.function CompleteAndDrop(Int64 gate, Int64 done) -> noresult
+.local Owned owner
+ldarg gate
+ldarg done
+newobj Owned
+stloc owner
+ldloc owner
+ldloc owner
+function.bind fn<Void> = instance Owned::Run()
+call neoCLR.Runtime.RuntimeAsyncStartManaged(System.Object, fn<Void>)
+pop
+ldarg gate
+call neoCLR.Runtime.RuntimeAsyncCompleteUnit(Int64)
+pop
+ret
+.end
+"#;
+    let main = r#"
+.local Int64 done
+call neoCLR.Runtime.RuntimeAsyncCreate()
+stloc operation
+call neoCLR.Runtime.RuntimeAsyncCreate()
+stloc done
+ldloc operation
+ldloc done
+call CompleteAndDrop(Int64, Int64)
+call neoCLR.Runtime.GCCollect()
+ldloc done
+call neoCLR.Runtime.RuntimeAsyncAwaitUnit(Int64)
+pop
+ldloc operation
+call neoCLR.Runtime.RuntimeAsyncRelease(Int64)
+pop
+ldloc done
+call neoCLR.Runtime.RuntimeAsyncRelease(Int64)
+pop
+ldc.i4 42
+ret
+"#;
+    assert_eq!(bounded_run(program(main, extra)).value, Value::Int32(42));
+    let draining = main.replace("call neoCLR.Runtime.GCCollect()", "call neoCLR.Runtime.GCCollect()\ncall neoCLR.Runtime.DrainEntryTasks()\npop");
+    let extra = format!("{extra}\n.function neoCLR.Runtime.DrainEntryTasks() -> Void\n.methodimpl InternalCall\n.end\n");
+    assert_eq!(bounded_run(program(&draining, &extra)).value, Value::Int32(42));
+}

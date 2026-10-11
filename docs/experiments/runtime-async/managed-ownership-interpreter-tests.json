@@ -1,0 +1,59 @@
+{
+  "passed": true,
+  "date": "2026-10-11",
+  "environment": {
+    "DEVELOPER_DIR": "/Applications/Xcode.app/Contents/Developer",
+    "SDKROOT": "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.2.sdk",
+    "CARGO_TARGET_DIR": "target/owned-async-cargo"
+  },
+  "commands": [
+    {
+      "command": [
+        "cargo",
+        "test",
+        "-q",
+        "--test",
+        "runtime_async_await",
+        "--test",
+        "entry_results"
+      ],
+      "exitCode": 0,
+      "output": "\nrunning 5 tests\n.....\ntest result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.63s\n\n\nrunning 35 tests\n...................................\ntest result: ok. 35 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 20.33s\n\n",
+      "passedTests": 40
+    },
+    {
+      "command": [
+        "cargo",
+        "test",
+        "-q",
+        "--lib",
+        "shared_heap"
+      ],
+      "exitCode": 0,
+      "output": "\nrunning 12 tests\n............\ntest result: ok. 12 passed; 0 failed; 0 ignored; 0 measured; 269 filtered out; finished in 0.01s\n\n",
+      "passedTests": 12
+    },
+    {
+      "command": [
+        "cargo",
+        "test",
+        "-q",
+        "--lib",
+        "gc::"
+      ],
+      "exitCode": 0,
+      "output": "\nrunning 8 tests\n........\ntest result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 273 filtered out; finished in 0.01s\n\n",
+      "passedTests": 8
+    }
+  ],
+  "inputsSha256": {
+    "src/gc.rs": "1085b0319a79047330a6f07362958c46566279c4b958ba39a31c30aa3773449c",
+    "src/shared_heap.rs": "67821a61ee68739cd17df263fa2647e72922784d782a9874a400783bf96f5a20",
+    "src/runtime_async.rs": "10e67ee0896664e49c88aea95c83e0fc5369c699bfe8afde15f8a128faa4a96a",
+    "src/vm.rs": "5c026926513596033b8a1256c6db8f2335244085b21889bf4f36dbe808ef6362",
+    "src/native.rs": "4dadcd0c61d9b0696a69d9789a51d26ed8cdd66bd1a7287132e0e1b544dc021f",
+    "src/services.rs": "9f84b497c8b65ffdd4b8479702b8545009c56c0a4addb670df8ecf2f56bc2749",
+    "tests/runtime_async_await.rs": "33cf2177d9727d962b23b9b644cfc4cece83a4d4cb422f9f6fa0c2a0597966cc",
+    "tests/entry_results.rs": "372288195c8258f7a9ed993967ba141c5931c3f55722bb22f18b5c6903184f05"
+  }
+}

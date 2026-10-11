@@ -18,9 +18,27 @@ enum Operation {
 }
 
 #[derive(Default)]
-pub(crate) struct Operations(BTreeMap<i64, Operation>);
+pub(crate) struct Operations(BTreeMap<i64, Operation>, BTreeMap<i64, usize>);
 
 impl Operations {
+    pub(crate) fn own(&mut self, id: i64, owner: usize) {
+        self.1.insert(id, owner);
+    }
+    pub(crate) fn abandon(&mut self, id: i64) {
+        self.0.remove(&id);
+        self.1.remove(&id);
+    }
+    pub(crate) fn reap(&mut self, heap: &crate::shared_heap::Access<'_>) {
+        let dead: Vec<_> = self
+            .1
+            .iter()
+            .filter(|(_, owner)| !heap.contains(**owner))
+            .map(|(id, _)| *id)
+            .collect();
+        for id in dead {
+            self.abandon(id);
+        }
+    }
     pub(crate) fn create(&mut self, milliseconds: Option<i32>) -> Result<i64, Fault> {
         let operation = match milliseconds {
             Some(ms) if ms < 0 => {
@@ -162,7 +180,7 @@ impl Operations {
         ) {
             return false;
         }
-        self.0.remove(&id);
+        self.abandon(id);
         true
     }
 

@@ -8,8 +8,34 @@ use std::{
     sync::{Arc, Mutex, MutexGuard, Weak},
 };
 
+#[derive(Default)]
+pub(crate) struct PublishedRoots {
+    pub strong: Vec<usize>,
+    pub conditional: std::collections::BTreeMap<usize, Vec<usize>>,
+}
+impl From<Vec<usize>> for PublishedRoots {
+    fn from(strong: Vec<usize>) -> Self {
+        Self {
+            strong,
+            ..Self::default()
+        }
+    }
+}
+impl Deref for PublishedRoots {
+    type Target = Vec<usize>;
+    fn deref(&self) -> &Self::Target {
+        &self.strong
+    }
+}
+impl DerefMut for PublishedRoots {
+    fn deref_mut(&mut self) -> &mut Self::Target {
+        &mut self.strong
+    }
+}
+
 struct Registration {
     roots: Mutex<Vec<usize>>,
+    conditional: Mutex<std::collections::BTreeMap<usize, Vec<usize>>>,
     arrays: Mutex<crate::arrays::Usage>,
 }
 struct State {
@@ -154,6 +180,7 @@ fn register(
         return Err(Fault::new("shared heap participant limit exceeded"));
     }
     let registration = Arc::new(Registration {
+        conditional: Mutex::new(Default::default()),
         roots: Mutex::new(roots),
         arrays: Mutex::new(Default::default()),
     });
@@ -203,6 +230,7 @@ impl Access<'_> {
             .service_roots
             .retain(|entry| entry.strong_count() != 0);
         let registration = Arc::new(Registration {
+            conditional: Mutex::new(Default::default()),
             roots: Mutex::new(Vec::new()),
             arrays: Mutex::new(Default::default()),
         });
@@ -276,7 +304,19 @@ impl Access<'_> {
                 .lock()
                 .expect("root lock poisoned")
                 .clone();
-            self.collect(roots, CollectionReason::AllocationPressure)?;
+            let conditional = self
+                .registration
+                .conditional
+                .lock()
+                .expect("root lock poisoned")
+                .clone();
+            self.collect(
+                PublishedRoots {
+                    strong: roots,
+                    conditional,
+                },
+                CollectionReason::AllocationPressure,
+            )?;
             self.check_arrays(usage, limits)?;
         }
         Ok(())
@@ -331,15 +371,25 @@ impl Access<'_> {
 
     /// The root walker must include every live frame, continuation and result.
     /// Call before releasing this guard whenever work can resume later.
-    pub(crate) fn publish(&mut self, roots: Vec<usize>) -> Result<(), Fault> {
+    pub(crate) fn publish(&mut self, roots: impl Into<PublishedRoots>) -> Result<(), Fault> {
+        let roots = roots.into();
+        for (&owner, values) in &roots.conditional {
+            validate(&self.state.heap, &[owner])?;
+            validate(&self.state.heap, values)?;
+        }
         validate(&self.state.heap, &roots)?;
-        *self.registration.roots.lock().expect("root lock poisoned") = roots;
+        *self.registration.roots.lock().expect("root lock poisoned") = roots.strong;
+        *self
+            .registration
+            .conditional
+            .lock()
+            .expect("root lock poisoned") = roots.conditional;
         Ok(())
     }
 
     pub(crate) fn collect(
         &mut self,
-        roots: Vec<usize>,
+        roots: impl Into<PublishedRoots>,
         reason: CollectionReason,
     ) -> Result<(), Fault> {
         self.publish(roots)?;
@@ -360,7 +410,23 @@ impl Access<'_> {
                 false
             }
         });
-        self.state.heap.collect(all, reason)
+        let mut conditional = std::collections::BTreeMap::<usize, Vec<usize>>::new();
+        for entry in self.state.participants.iter().filter_map(Weak::upgrade) {
+            for (&owner, values) in entry.conditional.lock().expect("root lock poisoned").iter() {
+                conditional.entry(owner).or_default().extend(values);
+            }
+        }
+        self.state
+            .heap
+            .collect_with_dependencies(all, conditional, reason)?;
+        for entry in self.state.participants.iter().filter_map(Weak::upgrade) {
+            entry
+                .conditional
+                .lock()
+                .expect("root lock poisoned")
+                .retain(|owner, _| self.state.heap.contains(*owner));
+        }
+        Ok(())
     }
 }
 
@@ -390,6 +456,62 @@ mod tests {
                 fields: vec![Value::Int32(value)],
             })
             .unwrap()
+    }
+
+    #[test]
+    fn conditional_publication_rejects_invalid_edges_without_replacing_roots() {
+        let owner = Owner::new(1);
+        let mut participant = owner.participant().unwrap();
+        let mut access = participant.enter();
+        let key = object(&mut access, 1);
+        access.publish(vec![key]).unwrap();
+        assert!(
+            access
+                .publish(PublishedRoots {
+                    strong: vec![],
+                    conditional: [(key, vec![usize::MAX])].into(),
+                })
+                .is_err()
+        );
+        assert_eq!(*access.registration.roots.lock().unwrap(), vec![key]);
+        assert!(access.registration.conditional.lock().unwrap().is_empty());
+        assert_eq!(access.len(), 1);
+    }
+
+    #[test]
+    fn conditional_frames_survive_other_participant_collection_and_expire_as_a_cycle() {
+        let owner = Owner::new(2);
+        let mut suspended = owner.participant().unwrap();
+        let (mut collector, key, value) = {
+            let mut access = suspended.enter();
+            let key = object(&mut access, 1);
+            let value = object(&mut access, 2);
+            let collector = access.fork(vec![key]).unwrap();
+            access
+                .publish(PublishedRoots {
+                    strong: vec![],
+                    conditional: [(key, vec![key, value])].into(),
+                })
+                .unwrap();
+            (collector, key, value)
+        };
+        {
+            let mut access = collector.enter();
+            access
+                .collect(vec![key], CollectionReason::ExplicitRequest)
+                .unwrap();
+            assert!(access.get(value).is_some());
+            access
+                .collect(vec![], CollectionReason::ExplicitRequest)
+                .unwrap();
+            assert_eq!(access.len(), 0);
+            // A second collection must not revisit expired published edges.
+            access
+                .collect(vec![], CollectionReason::ExplicitRequest)
+                .unwrap();
+        }
+        let access = suspended.enter();
+        assert!(access.registration.conditional.lock().unwrap().is_empty());
     }
 
     #[test]
@@ -566,6 +688,43 @@ mod tests {
 mod array_accounting_tests {
     use super::*;
     use crate::{Limits, Value, arrays::Usage, metadata::Type};
+
+    #[test]
+    fn array_pressure_collection_preserves_published_conditional_frames() {
+        let owner = Owner::new(1);
+        let mut participant = owner.participant().unwrap();
+        let mut access = participant.enter();
+        let key = access.allocate(Value::Int32(1)).unwrap();
+        let retained = access.allocate(Value::Int32(2)).unwrap();
+        let garbage = access
+            .allocate(Value::Array {
+                element: Type::Int32,
+                elements: vec![Value::Int32(0); 2],
+            })
+            .unwrap();
+        access
+            .publish(PublishedRoots {
+                strong: vec![key],
+                conditional: [(key, vec![retained])].into(),
+            })
+            .unwrap();
+        access.publish_arrays(Usage::default(), true);
+        access
+            .check_arrays_collecting(
+                Usage::default(),
+                &Limits {
+                    array_elements: 0,
+                    ..Limits::default()
+                },
+            )
+            .unwrap();
+        assert!(access.contains(key) && access.contains(retained));
+        assert!(!access.contains(garbage));
+        assert_eq!(
+            access.registration.conditional.lock().unwrap()[&key],
+            vec![retained]
+        );
+    }
 
     #[test]
     fn aliases_count_heap_storage_once_and_collection_releases_payload() {

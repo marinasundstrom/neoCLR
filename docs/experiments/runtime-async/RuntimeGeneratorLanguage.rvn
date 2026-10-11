@@ -460,7 +460,59 @@ async func CheckTaskOnlyConsumers() -> Task<()> {
     if probe.Disposals != 1 { System.Fail("Task-only disposal ran cleanup twice") }
 }
 
+// Only the scheduler owns the pulse callback; this gives queued notifications
+// an opportunity to drain before checking abandoned operation reclamation.
+async func FlushNotifications() -> Task<()> {
+    let pulse = Promise<()>()
+    _ = neoCLR.Runtime.SchedulerSubmit(() => { _ = pulse.Complete(()) })
+    await pulse.Task
+}
+
+func AbandonYielded(counters: Counters) {
+    let iterator = Values(Task.FromResult(7), counters).GetAsyncIterator()
+    let first = iterator.MoveNextAsync()
+    if !first.IsCompleted || !first.GetResult() { System.Fail("Expected eager first yield") }
+}
+
+async func ExternalValues(gate: Task<int>, counters: Counters, reached: Promise<()>) -> AsyncIterable<int> {
+    use lifetime = Lifetime(counters)
+    let value = await gate
+    counters.Yields = counters.Yields + 1
+    _ = reached.Complete(())
+    yield value
+}
+
+func DropPendingConsumer(gate: Task<int>, counters: Counters, reached: Promise<()>) {
+    let iterator = ExternalValues(gate, counters, reached).GetAsyncIterator()
+    _ = iterator.MoveNextAsync()
+}
+
+async func CheckAbandonedOwnership() -> Task<()> {
+    let counters = Counters()
+    for index in 1..160 {
+        AbandonYielded(counters)
+        await FlushNotifications()
+        System.Runtime.GC.Collect()
+    }
+    if counters.Starts != 160 || counters.Yields != 160 || counters.Resumes != 0 || counters.Disposals != 0 {
+        System.Fail("Abandoned generator resumed or ran managed cleanup")
+    }
+    let external = Promise<int>()
+    let live = Counters()
+    let reached = Promise<()>()
+    DropPendingConsumer(external.Task, live, reached)
+    await FlushNotifications()
+    System.Runtime.GC.Collect()
+    if live.Yields != 0 { System.Fail("Pending external input was bypassed") }
+    _ = external.Complete(9)
+    await reached.Task
+    if live.Yields != 1 || live.Disposals != 0 { System.Fail("External completion lost its suspended producer") }
+    await FlushNotifications()
+    System.Runtime.GC.Collect()
+}
+
 async func Main() -> Task<int> {
+    await CheckAbandonedOwnership()
     await CheckTaskOnlyConsumers()
     for scenario in 0..4 {
         await CheckPendingCleanup(scenario)

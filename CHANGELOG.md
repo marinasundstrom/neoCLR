@@ -33,12 +33,18 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   converter prototype as an opt-in experiment, with native runtime blockers recorded;
   converter/options APIs are not enabled in the runtime library.
 
-- Add source-local runtime-async ownership adapters so pending result, generator
-  advancement and disposal tasks retain their producer or cursor. New task-only
-  consumers force GC and check completion/cleanup in interpreter, JIT and AOT.
-  These prototype links add callback/queue work; external completion ownership and
-  managed abandoned-generator reclamation remain open, with strong native roots
-  still enabled.
+- Integrate managed runtime-async ownership into the source-local Raven provider:
+  live result/advancement/disposal tasks and external completions retain suspended
+  producers, while abandoned pending cycles release frames, signals and body slots.
+  Replace the permanent BodyLifetime waiter with automatically released managed-body
+  operations. Retain runnable bodies through the completion-to-dispatch transition;
+  park interpreter entry-drain callers so ready retained bodies can run independently.
+  Preserve conditional roots across shared-heap and array-pressure collections.
+  Native abandoned stacks are reclaimed outside GC without running managed cleanup.
+  Qualify the Raven generator cases in interpreter/JIT/AOT, 60 focused Rust tests,
+  320 sanitized native suspensions and the JIT/AOT HTTP/await showcase.
+  These remain private POC services with callback/dispatch costs; Windows carrier,
+  performance qualification and default switching remain open.
 
 - Connect owned parked frames and dependent callbacks in an opt-in macOS native
   runtime-async carrier entry. Reclaim expired stacks and body-operation slots
