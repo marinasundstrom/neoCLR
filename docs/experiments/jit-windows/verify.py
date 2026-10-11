@@ -74,7 +74,7 @@ def main():
              '--output', out/'http'], 'http-default-jit')
         run([sys.executable, ROOT/'scripts/test-runtime-library.py', '--bundle', installed,
              '--suite', 'collections', '--suite', 'json-dom', '--suite', 'encoding-streams',
-             '--suite', 'index-range', '--suite', 'runner-contract', '--output', out/'framework'], 'framework-default-jit')
+             '--suite', 'index-range', '--suite', 'zoned-time-parsing', '--suite', 'runner-contract', '--output', out/'framework'], 'framework-default-jit')
         report['passed'] = True
     finally:
         (out/'validation.json').write_text(json.dumps(report, indent=2)+'\n')

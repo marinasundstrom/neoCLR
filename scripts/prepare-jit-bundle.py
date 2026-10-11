@@ -95,19 +95,43 @@ def budget_command(command, prefix):
     return command[:1] + flags + command[1:]
 
 
+def complete_services(command):
+    spec = importlib.util.spec_from_file_location('native_project', ROOT / 'scripts/build-native-project.py')
+    project = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(project)
+    for path in project.native_text_sources():
+        report['inputsSha256'][str(path)] = sha(path)
+    target = 'x86_64-pc-windows-msvc' if windows else 'aarch64-apple-darwin'
+    build, archive = project.native_kernel_build(target, time_zone_rules=True)
+    run(build)
+    # One kernel supplies both text and time-zone symbols; do not link the
+    # text-only archive alongside it and introduce duplicate definitions.
+    command = [str(arg) for arg in command if 'neoclr_aot_native_text' not in str(arg)]
+    additions = [ROOT / 'docs/experiments/aot-console' / name
+                 for name in ('string-unicode.c', 'system-culture.c', 'time-zone.c')]
+    additions.append(archive)
+    for path in additions:
+        if str(path) not in command:
+            command.insert(command.index('/link') if windows else len(command), str(path))
+    if not windows and 'CoreFoundation' not in command:
+        command += ['-framework', 'CoreFoundation']
+    return command
+
+
 try:
     if windows:
         spec = importlib.util.spec_from_file_location('windows_host', ROOT / 'docs/experiments/jit-http/windows.py')
         module = importlib.util.module_from_spec(spec)
         spec.loader.exec_module(module)
         _, command = module.recipe(recipe, ROOT, out)
-        command = module.add_text_kernel(command, ROOT, run)
+        command = complete_services(command)
         command = budget_command(command, '/D')
         helper = module.build_host(command, out, run)
     else:
         command = next(row['command'].copy() for row in recipe['commands'] if row.get('label') == 'jit-host-build')
         helper = out / 'host.dylib'
         command[command.index('-o') + 1] = str(helper)
+        command = complete_services(command)
         command = budget_command(command, '-D')
         run(command)
     suffix = '.exe' if windows else ''

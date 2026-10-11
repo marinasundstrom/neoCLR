@@ -21,6 +21,9 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   Honor the configured JIT helper heap size and update the Windows compiler pin
   for current async-iteration metadata; the prior pin failed before execution.
   Update source-checkout interpreter examples to select their mode explicitly.
+  Include culture and pinned time-zone services in packaged helpers, with the
+  shared text/time-zone kernel rather than an HTTP-only subset; add Windows
+  zoned-time coverage after local qualification exposed the missing symbols.
 
 - Reduce native collector traversal work: validate spans while building the index,
   combine mark reset with intern-root seeding, and trace each activated owned parked
