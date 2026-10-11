@@ -15315,3 +15315,13 @@ or runtime-await default switch was performed.
 - Open: generic owners, generic retained Task methods, abandoned suspended-body
   collection, production carrier/platform support and comparative benchmarks.
   [Implementation/evidence](experiments/runtime-async/async-generators.md#generic-method-synthesis-checkpoint-2026-10-11).
+
+## 2026-10-11 — Future garbage-collector tuning consideration
+
+- Author: “We might want to tune the garbage collector in the future.”
+- Assistant: agreed to record an exploratory follow-up alongside concurrency
+  measurements, after establishing correct suspended/abandoned-operation lifetimes.
+  Proposed measuring allocation rate, retained memory, collector CPU and pauses with
+  scheduler fairness and HTTP/JSON tail latency, comparing matched .NET/Go workloads.
+- Action: added the consideration to the roadmap. No collector algorithm, tuning
+  settings, new performance claim or immediate reprioritization was selected.

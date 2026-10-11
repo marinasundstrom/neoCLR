@@ -8,6 +8,16 @@ comparisons and compiler-state-machine controls; runtime-owned async alone is no
 proof of an improvement. This reinforces the existing runtime-async milestone,
 without bypassing lifetime or performance gates.
 
+**Future GC tuning consideration (2026-10-11):** the author suggests evaluating
+collector tuning later. Keep this exploratory; it does not reprioritize the current
+compiler/runtime-async work or select a collector design. Establish suspended-root
+correctness and abandoned-operation reclamation before tuning. Then measure allocation
+rate, live/retained memory, collector CPU cost and pause distribution alongside scheduler
+fairness and request tail latency under HTTP and JSON workloads. Compare .NET and Go
+under matched workloads and resource budgets; distinguish fewer application allocations
+from collector improvements. Collector policy, pacing, stack scanning and native carrier
+memory are separate candidates to investigate, not implemented capabilities.
+
 **Async iteration implementation (2026-10-11):** author-directed sequencing is the
 managed AsyncIterable/AsyncIterator contract and await-for consumption, followed by
 generator yield/resume. The interface and retained-body await-for slices pass all three local execution modes.
