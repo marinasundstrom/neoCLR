@@ -192,3 +192,47 @@ fn legacy_defaults_are_public_and_invalid_visibility_is_rejected() {
         .is_err()
     );
 }
+
+
+#[test]
+fn nested_generic_types_keep_lexical_private_access_and_independent_parameters() {
+    let source = r#"
+.module NestedGeneric
+.entry Main
+.type class Owner<T>
+.field private value T
+.method instance .ctor(T value) -> noresult
+ldarg 0
+ldarg 1
+stfld Owner<T>::value
+ret
+.end
+.type class Frame<T,U>
+.method static Read(Owner<T> owner, U other) -> T
+ldarg 0
+ldfld Owner<T>::value
+ret
+.end
+.end
+.end
+.function Main() -> Int32
+ldc.i4 42
+newobj instance Owner<Int32>::.ctor(Int32)
+ldstr "second parameter"
+call Owner.Frame<Int32,String>::Read(Owner<Int32>,String)
+ret
+.end
+"#;
+    let module = assemble(source).unwrap();
+    let roundtrip = neoclr::load(&serde_json::to_string(&module).unwrap()).unwrap();
+    let program = LoadedProgram::new(&roundtrip).unwrap();
+    program.verify().unwrap();
+    assert_eq!(program.run(Limits::default()).unwrap().value, Value::Int32(42));
+
+    // A matching name does not grant lexical access when the ownership edge is absent.
+    let mut unrelated = module.clone();
+    unrelated.types.iter_mut().find(|ty| ty.name == "Owner.Frame").unwrap().declaring_type = None;
+    assert!(LoadedProgram::new(&unrelated).unwrap().verify().is_err());
+    let invalid = source.replace("Frame<T,U>", "Frame<U>");
+    assert!(assemble(&invalid).and_then(|m| neoclr::verify(&m)).is_err());
+}

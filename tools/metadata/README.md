@@ -295,3 +295,9 @@ or executes the assembly. It is intended only for the primitive core used by
 metadata library remains independent of Mono.Cecil. Native source libraries replace
 these declarations; the complete API reference remains separate and unchanged by
 this preparation. See the [consumer and limits](../../docs/experiments/attribute-usage/README.md).
+
+
+Nested generic class authoring and generic enclosing scopes are now supported.
+See the [API contract](../../api-docs/experimental-metadata.md#nested-generic-lexical-owners-development-2026-10-11).
+Run the focused `--generic-nested-types` contract group for CLI execution, native
+round-trip and translated dependency scope validation.

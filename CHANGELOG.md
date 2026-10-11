@@ -8,6 +8,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-11
 
+- Fill native nested-generic metadata gaps: author nested generic classes, retain
+  generic enclosing definitions through imports, native round-trips and reference
+  projections, and permit generic lexical owners in assembly/verification. Preserve
+  private-access checks and explicit parameter scopes. Translated dependency aliases
+  gain optional enclosing arity; older aliases retain arity zero.
+
 - Qualify generic native async generator methods on nongeneric owners, backed by
   synthesized typed closure frames. Cover generic lambdas, locals/calls, pending
   Task<T> inputs, delegation, early disposal and captured-object GC. Generic owners,

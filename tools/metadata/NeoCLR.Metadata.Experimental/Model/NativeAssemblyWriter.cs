@@ -367,15 +367,16 @@ public sealed partial class AssemblyBuilder
             revision = d.NativeBinding is null ? d.Identity.Version.ToString() : d.NativeBinding.Revision
         }).ToArray();
         if (moduleBindings.Length != 0) manifest["native_module_bindings"] = moduleBindings;
-        var typeBindings = importedNominalTypes.Values.Where(t => Equals(ExternalObjectRoot, t) || NativeBindingFor(t.AssemblyIdentity) is not null || types.Any(owner => Equals(owner.ExternalBase, t)) || IsNativeGrapheme(t) || AuthoredPrimitiveOwner(t) is PrimitiveType.Void or PrimitiveType.Value).Select(t => new
+        var typeBindings = importedNominalTypes.Values.Where(t => Equals(ExternalObjectRoot, t) || NativeBindingFor(t.AssemblyIdentity) is not null || types.Any(owner => Equals(owner.ExternalBase, t)) || IsNativeGrapheme(t) || AuthoredPrimitiveOwner(t) is PrimitiveType.Void or PrimitiveType.Value).Select(t =>
         {
-            native_name = ExternalName(t),
-            assembly = IdentityText(t.AssemblyIdentity),
-            @namespace = t.Namespace,
-            name = t.Name,
-            arity = t.GenericArity,
-            value_type = t.IsValueType,
-            declaring = t.DeclaringType is null ? null : ExternalName(t.DeclaringType)
+            var row = new Dictionary<string, object?> {
+                ["native_name"] = ExternalName(t), ["assembly"] = IdentityText(t.AssemblyIdentity),
+                ["namespace"] = t.Namespace, ["name"] = t.Name, ["arity"] = t.GenericArity,
+                ["value_type"] = t.IsValueType,
+                ["declaring"] = t.DeclaringType is null ? null : ExternalName(t.DeclaringType)
+            };
+            if (t.DeclaringType is { GenericArity: > 0 } parent) row["declaring_arity"] = parent.GenericArity;
+            return row;
         }).ToArray();
         if (typeBindings.Length != 0) manifest["native_type_bindings"] = typeBindings;
         var importedValues = importedNominalTypes.Values.Where(t => t.IsValueType && AuthoredPrimitiveOwner(t) is null or PrimitiveType.Void or PrimitiveType.Value).Select(ExternalName).Order().ToArray();

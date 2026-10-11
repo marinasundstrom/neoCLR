@@ -2590,3 +2590,33 @@ contract instead of adding consumer stubs or selecting interfaces by matching na
 The old translated adapter remains historical evidence, not an implicit native fallback.
 Compared with CLI arrays, the common principle is specialized storage plus a library
 member contract; no performance or API advantage is claimed for this provisional choice.
+
+
+## Generic lexical nesting gap closure (2026-10-11)
+
+The author directs filling native metadata gaps instead of compensating in compiler
+lowering, and reiterates that the CLI remains the conceptual baseline. Nested generic
+closures require a declaring definition, their own complete generic parameter list,
+and constructed signatures for captured receivers. These concepts already have
+native equivalents; rejecting generic lexical owners was an implementation gap.
+
+The model now authors nested generic classes and imports generic enclosing scopes.
+The runtime validates ownership independently of generic instantiation. Cycles,
+missing/foreign owners, invalid names and unauthorized private access remain invalid.
+Translated dependency aliases add optional `declaring_arity` because their simple
+native names omit CLI arity suffixes. Existing aliases default to zero. This is a
+bridge representation addition, not a new language abstraction.
+
+.NET baseline: ECMA-335 sixth edition, I.10.7.1–2 and II.9
+([official specification](https://ecma-international.org/wp-content/uploads/ECMA-335_6th_edition_june_2012.pdf),
+consulted 2026-10-11): nested generic parameters are redeclared by position and CLI
+metadata carries their full list. CLS names encode newly introduced arity; this host
+builder currently encodes total arity in generated names (also valid CLI, verified
+by execution). That existing naming convention is not a new generic semantic rule.
+Do not infer shared storage or capture from lexical nesting alone.
+
+The alternative assembly-visible accessor bridge would preserve private fields but
+add synthetic callable surface and bypass the missing ownership capability. It was
+prototyped locally and removed. Normal nested ownership preserves direct field access
+without extra calls. No performance advantage is claimed; executable checks cover
+equivalent CLR behavior, native metadata round-trips and runtime access enforcement.

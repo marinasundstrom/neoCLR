@@ -1770,3 +1770,9 @@ with source summaries for acquisition, pending advancement, Current validity and
 asynchronous disposal. The aggregate reference and native source libraries include
 the interfaces. These are development APIs; native await-for and generator production
 are qualified separately in the runtime-async experiment. No API is excluded.
+
+
+Nested generic class authoring and generic enclosing identities (2026-10-11) remain
+host-only APIs under the exclusion above; see the
+[complete contract](experimental-metadata.md#nested-generic-lexical-owners-development-2026-10-11).
+The guest reference inputs/snapshot are unchanged.

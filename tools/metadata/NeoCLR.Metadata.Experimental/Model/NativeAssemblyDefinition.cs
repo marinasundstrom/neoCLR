@@ -30,7 +30,7 @@ public sealed partial class NativeAssemblyDefinition
     private sealed record FieldRow(string Name, JsonElement Type, FieldVisibility Visibility, bool IsReadOnly = false, SignatureType? Signature = null);
     private sealed record MethodRow(string Namespace, string Name, int Owner, MethodSignature Signature, MethodVisibility Visibility, bool Instance, bool Override) { internal Dictionary<int, AttributeRow[]> ParameterAttributes { get; init; } = []; internal AttributeRow[] Attributes { get; init; } = []; internal bool ObjectSlot { get; init; } internal bool Virtual { get; init; } internal bool Abstract { get; init; } internal ushort ImplementationAttributes { get; init; } internal int? ParameterArrayIndex { get; init; } internal Dictionary<int, NullableAnnotation> NullableAnnotations { get; init; } = []; internal (SignatureType Owner, string Name)[] ExplicitInterfaces { get; init; } = []; internal Dictionary<int, string> ParameterNames { get; init; } = []; internal (int Parameter, SignatureType Type, int Owner)[] InterfaceConstraints { get; init; } = []; }
     private sealed record PropertyRow(int Owner, string Name, SignatureType Type, int Getter, int Setter, SignatureType[] Parameters, bool IsInitOnly);
-    private sealed record NativeTypeAlias(string NativeName, AssemblyIdentity Assembly, string Namespace, string Name, int Arity, bool ValueType, string? Declaring);
+    private sealed record NativeTypeAlias(string NativeName, AssemblyIdentity Assembly, string Namespace, string Name, int Arity, bool ValueType, string? Declaring, int DeclaringArity);
     private readonly Dictionary<(string Name, int Arity), NativeTypeAlias> nativeTypeAliases;
     private readonly HashSet<string> valueTypeReferences;
     private readonly PropertyRow[] properties;
@@ -107,10 +107,12 @@ public sealed partial class NativeAssemblyDefinition
                 manifestFields.Add("native_type_bindings");
                 foreach (var binding in Array(manifest, "native_type_bindings", 4096))
                 {
-                    Shape(binding, "native_name", "assembly", "namespace", "name", "arity", "value_type", "declaring");
-                    var alias = new NativeTypeAlias(Text(binding, "native_name"), ReadIdentity(Text(binding, "assembly")), binding.GetProperty("namespace").GetString()!, Text(binding, "name"), binding.GetProperty("arity").GetInt32(), binding.GetProperty("value_type").GetBoolean(), binding.GetProperty("declaring").GetString());
+                    var bindingFields = new List<string> { "native_name", "assembly", "namespace", "name", "arity", "value_type", "declaring" };
+                    if (binding.TryGetProperty("declaring_arity", out _)) bindingFields.Add("declaring_arity");
+                    Shape(binding, bindingFields.ToArray());
+                    var alias = new NativeTypeAlias(Text(binding, "native_name"), ReadIdentity(Text(binding, "assembly")), binding.GetProperty("namespace").GetString()!, Text(binding, "name"), binding.GetProperty("arity").GetInt32(), binding.GetProperty("value_type").GetBoolean(), binding.GetProperty("declaring").GetString(), binding.TryGetProperty("declaring_arity", out var declaringArity) ? declaringArity.GetInt32() : 0);
                     CheckName(alias.NativeName);
-                    Require(alias.Arity is >= 0 and <= 32 && alias.Namespace is not null && nativeTypeAliases.TryAdd((alias.NativeName, alias.Arity), alias), "invalid native type binding");
+                    Require(alias.Arity is >= 0 and <= 32 && alias.DeclaringArity is >= 0 and <= 32 && (alias.Declaring is not null || alias.DeclaringArity == 0) && alias.Namespace is not null && nativeTypeAliases.TryAdd((alias.NativeName, alias.Arity), alias), "invalid native type binding");
                 }
             }
             if (manifest.TryGetProperty("array_backing", out _)) manifestFields.Add("array_backing");
@@ -242,7 +244,7 @@ public sealed partial class NativeAssemblyDefinition
                     typeFields.Add("declaring_type"); Shape(declaring, "module", "revision", "index");
                     declaringType = declaring.GetProperty("index").GetInt32();
                     Require(Text(declaring, "module") == moduleName && Text(declaring, "revision") == identity.Version.ToString() &&
-                        declaringType >= 0 && declaringType < types.Count && types[declaringType].GenericNames.Length == 0,
+                        declaringType >= 0 && declaringType < types.Count,
                         "invalid or unsupported nested owner");
                 }
                 (string Name, int Value)[]? enumMembers = null;
@@ -1085,7 +1087,7 @@ public sealed partial class NativeAssemblyDefinition
             var type = rows[i];
             result[i] = type.DeclaringType < 0 ? DefineType(graph, type) : type.IsValueType
                 ? type.GenericNames.Length == 0 ? result[type.DeclaringType].AddNestedValueType(type.Name, type.Visibility) : result[type.DeclaringType].AddNestedGenericValueType(type.Name[..type.Name.LastIndexOf('`')], type.GenericNames, type.Visibility)
-                : result[type.DeclaringType].AddNestedClass(type.Name, type.Visibility);
+                : type.GenericNames.Length == 0 ? result[type.DeclaringType].AddNestedClass(type.Name, type.Visibility) : result[type.DeclaringType].AddNestedGenericClass(type.Name[..type.Name.LastIndexOf('`')], type.GenericNames, type.Visibility);
             if (type.IsSealedClass) result[i].SetSealedClass();
             if (type.IsAbstractClass && !type.IsObjectRoot && !type.IsClosedHierarchy) result[i].SetAbstractClass();
         }
@@ -1136,7 +1138,7 @@ public sealed partial class NativeAssemblyDefinition
             ImportedTypeReference? parent = null;
             if (item.Declaring is { } declaring)
             {
-                Require(nativeTypeAliases.TryGetValue((declaring, 0), out var enclosing) && enclosing.Assembly.Equals(item.Assembly), "invalid native declaring binding");
+                Require(nativeTypeAliases.TryGetValue((declaring, item.DeclaringArity), out var enclosing) && enclosing.Assembly.Equals(item.Assembly), "invalid native declaring binding");
                 parent = ImportAlias(enclosing!, depth + 1);
             }
             return graph.ImportTypeIdentity(item.Assembly, item.Namespace, item.Name, item.Arity, item.ValueType, parent);
@@ -1150,15 +1152,17 @@ public sealed partial class NativeAssemblyDefinition
             Require(path.Length <= 16, "nested imported depth exceeded");
             var parts = path[0].Split('_'); Require(parts.Length == 2, "invalid imported native type name");
             var top = prefix + path[0];
-            var reference = graph.ImportTypeIdentity(identity, Decode(parts[0]), Decode(parts[1]), path.Length == 1 ? arity : 0, valueTypeReferences.Contains(top));
+            var reference = graph.ImportTypeIdentity(identity, Decode(parts[0]), Decode(parts[1]), path.Length == 1 ? arity : EncodedArity(Decode(parts[1])), valueTypeReferences.Contains(top));
             for (int i = 1; i < path.Length; i++)
             {
                 top += ".N_" + path[i];
-                reference = graph.ImportTypeIdentity(identity, "", Decode(path[i]), i == path.Length - 1 ? arity : 0, valueTypeReferences.Contains(top), reference);
+                reference = graph.ImportTypeIdentity(identity, "", Decode(path[i]), i == path.Length - 1 ? arity : EncodedArity(Decode(path[i])), valueTypeReferences.Contains(top), reference);
             }
             return reference;
         }
         throw new InvalidDataException("signature type must be owned or scoped to a declared dependency");
+        static int EncodedArity(string name) => name.LastIndexOf('`') is var index && index >= 0 &&
+            int.TryParse(name[(index + 1)..], out var count) ? count : 0;
     }
     private static PrimitiveType ReadPrimitive(string? name, bool allowVoid) => name switch
     {

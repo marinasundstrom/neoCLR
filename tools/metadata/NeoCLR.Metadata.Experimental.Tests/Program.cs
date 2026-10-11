@@ -4,6 +4,8 @@ using System.Reflection.PortableExecutable;
 using NeoCLR.Metadata.Experimental.Model;
 using AssemblyDefinition = NeoCLR.Metadata.Experimental.Model.AssemblyDefinition;
 
+if (args is ["--generic-nested-types"]) { GenericNestedTypeChecks.Run(); Console.WriteLine("PASS generic nested types"); return 0; }
+
 if (args is ["--authored-references"]) { AuthoredFunctionReferenceChecks.Run(); Console.WriteLine("PASS authored references"); return 0; }
 
 if (args is ["--module-retention", var moduleInput, var moduleRoots])
@@ -520,6 +522,7 @@ var tests = new (string Name, Action Body)[]
     ("Direct native value constructor import", () => ValueConstructorChecks.Run(native: true)),
     ("Imported value constructor initialization", () => ValueConstructorChecks.Run()),
     ("Nested definition ownership and execution", NestedTypeChecks.Run),
+    ("Generic nested definition ownership", GenericNestedTypeChecks.Run),
     ("Imported nested constructors", () => ValueConstructorChecks.Run(nested: true)),
     ("Structural Function signatures and binding", FunctionSignatureChecks.Run),
     ("Instance callback receiver identity", InstanceFunctionBindingChecks.Run),

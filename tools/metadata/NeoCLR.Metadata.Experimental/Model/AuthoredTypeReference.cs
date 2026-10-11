@@ -35,8 +35,8 @@ public sealed partial class AssemblyBuilder
         string artifactSha256, string @namespace, string name, int genericArity = 0)
         => CreateNominalReference(dependency, dependencyCoreLibrary, artifactSha256, @namespace, name, genericArity, false, true);
 
-    /// <summary>Authors a public nested reference/value identity beneath an output-owned nongeneric scope.</summary>
-    /// <param name="declaringType">An output-owned, unconstructed nongeneric native scope.</param>
+    /// <summary>Authors a public nested reference/value identity beneath an output-owned definition scope.</summary>
+    /// <param name="declaringType">An output-owned, unconstructed native definition scope.</param>
     /// <param name="name">Simple nested metadata name including any arity suffix.</param>
     /// <param name="genericArity">The nested type's own generic arity.</param>
     /// <param name="isValueType">Whether the identity denotes a value type.</param>

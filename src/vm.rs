@@ -374,11 +374,6 @@ fn validate_linked_indexed(module: &Module) -> Result<(), Fault> {
                     "nested type owner must belong to the same module and revision",
                 ));
             }
-            if !parent.generic_parameters.is_empty() {
-                return Err(Fault::new(
-                    "nesting under generic types is not supported yet",
-                ));
-            }
             let prefix = format!("{}.", parent.name);
             if current
                 .name

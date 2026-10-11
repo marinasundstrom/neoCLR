@@ -15325,3 +15325,19 @@ or runtime-await default switch was performed.
   scheduler fairness and HTTP/JSON tail latency, comparing matched .NET/Go workloads.
 - Action: added the consideration to the roadmap. No collector algorithm, tuning
   settings, new performance claim or immediate reprioritization was selected.
+
+
+## 2026-10-11 — Fill native metadata gaps for equivalent lowering
+
+- Author: “If there is any gap in the native metadata format, then fill it”.
+  Clarified that native metadata is based on CLI concepts and lowering should
+  generally match .NET despite deliberate divergences.
+- Assistant: identified generic lexical ownership and nested generic class authoring
+  as gaps exposed by generator frames. Proposed filling the metadata/runtime path
+  instead of adding field-accessor bridges.
+- Action: removed the local accessor prototype, implemented nested generic authoring,
+  native round-trip/import support and generic enclosing ownership. CLR execution
+  and metadata tests pass. Runtime and compiled generator qualification is in progress.
+- Design: preserve the same generic/ownership semantics across targets; distinguish
+  native encoding from semantic divergence. No compiler-line merge or default-mode
+  change is implied. [Design and validation](design/extended-cli-metadata.md#generic-lexical-nesting-gap-closure-2026-10-11).

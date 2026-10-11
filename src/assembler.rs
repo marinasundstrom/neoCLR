@@ -759,11 +759,6 @@ fn parse_parts(source: &str) -> Result<(Module, Vec<FieldFixup>), Fault> {
                         .map_or((false, rest), |rest| (true, rest.trim()));
                     let (mut name, generic_parameters) = parse_type_declaration(rest)?;
                     if let Some(parent) = typedef.take() {
-                        if !parent.generic_parameters.is_empty() {
-                            return Err(Fault::new(
-                                "nesting under generic types is not supported yet",
-                            ));
-                        }
                         if name.contains('.') {
                             return Err(Fault::new(
                                 "nested type declaration requires a simple name",
@@ -777,6 +772,7 @@ fn parse_parts(source: &str) -> Result<(Module, Vec<FieldFixup>), Fault> {
                             name.clone(),
                             generic_parameters.len(),
                             parent.name.clone(),
+                            parent.generic_parameters.len(),
                         ));
                         enclosing_types.push(parent);
                     }
@@ -984,11 +980,11 @@ fn parse_parts(source: &str) -> Result<(Module, Vec<FieldFixup>), Fault> {
         return Err(Fault::new(".module is required"));
     }
     module.normalize_definition_ids()?;
-    for (child, arity, parent) in nesting_fixups {
+    for (child, arity, parent, parent_arity) in nesting_fixups {
         let owner = module
             .types
             .iter()
-            .find(|def| def.name == parent && def.generic_parameters.is_empty())
+            .find(|def| def.name == parent && def.generic_parameters.len() == parent_arity)
             .and_then(|def| def.definition.clone())
             .ok_or_else(|| Fault::new("missing nested type owner"))?;
         for def in &mut module.types {

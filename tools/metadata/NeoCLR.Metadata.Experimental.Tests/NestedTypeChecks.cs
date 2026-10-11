@@ -89,8 +89,8 @@ internal static class NestedTypeChecks
         Reject(() => owner.Definition.NestedTypes.Add(owner.Definition));
         Reject(() => assembly.Definition.MainModule.Types.Add(new TypeDefinition("", "Invalid", 2, owner.Definition.BaseType)));
         var generic = assembly.AddGenericValueType("", "Generic", new[] { "T" });
-        Reject(() => generic.AddNestedValueType("Captured"));
-        if (generic.Definition.NestedTypes.Count != 0 || owner.Definition.NestedTypes.Count != 1) throw new Exception("failed nesting mutated owner");
+        generic.AddNestedValueType("Captured");
+        if (generic.Definition.NestedTypes.Count != 1 || owner.Definition.NestedTypes.Count != 1) throw new Exception("failed nesting mutated owner");
     }
     private static void Reject(Action action) { try { action(); throw new Exception("invalid nesting accepted"); } catch (ArgumentException) { } }
     internal static async Task RunRuntime(string runtime, string directory)

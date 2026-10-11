@@ -8299,3 +8299,38 @@ owner fails validation even for non-readonly storage. Public API signatures and 
 field-slot encoding are unchanged. This supports Tuple<int,int>.Item1/Item2 used by
 range resolution. Focused authored-reference checks and the Raven array suite qualify
 both model validation and interpreter/AOT execution. No new field-address API is added.
+
+
+## Nested generic lexical owners (development, 2026-10-11)
+
+`TypeBuilder.AddNestedGenericClass(string name, IEnumerable<string> parameters,
+TypeVisibility visibility = TypeVisibility.Public): TypeBuilder` creates a nested
+reference class. The name is simple, without an arity suffix; parameters are copied,
+unique names, one through 32. Public and Internal map to CLI NestedPublic and
+NestedAssembly. No constructor is synthesized. Invalid names, duplicates, visibility,
+ownership or limits throw ArgumentException; null parameters throw ArgumentNullException.
+
+All nested class/value builders and `TypeDefinition.NestedTypes` now accept generic
+enclosing definitions. Each definition owns its complete generic parameter list:
+a compiler redeclares the enclosing parameters first, followed by new parameters,
+and supplies the complete list at construction. Ownership does not itself inject
+parameters or an enclosing object instance. As with the existing host builder,
+generated names encode the complete arity; this is a naming convention rather than
+a different runtime generic scope. Standard CLI NestedClass/GenericParam/TypeSpec
+tables represent the same ownership and construction. The .NET execution fixture
+reads a private enclosing field through a nested generic method.
+
+Public nested imports retain the enclosing definition's arity, without constructing
+that definition. Native binary round-tripping, reference projection and translated
+library bindings preserve this scope. Translated `native_type_bindings` optionally
+carry `declaring_arity` (0 when omitted), disambiguating enclosing definitions with
+the same translated name. The value is bounded to 32 and requires a declaring name.
+The direct native encoded identity already contains enclosing metadata names/arity.
+Private/internal imported enclosing scopes remain rejected.
+
+Validation: `dotnet run --project tools/metadata/NeoCLR.Metadata.Experimental.Tests
+-- --generic-nested-types` covers CLR execution, native and external round-trips,
+reference projection, translated bindings, three-level generic nesting and rejection
+of implicit enclosing parameter use. The existing `--nested-type-integration`
+consumer remains valid. This host-only API follows the documented RavenDoc exclusion;
+no guest API or reference assembly changes.

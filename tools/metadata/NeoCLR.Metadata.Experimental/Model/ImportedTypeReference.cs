@@ -142,9 +142,9 @@ public sealed partial class AssemblyBuilder
     private ImportedTypeReference? ImportDeclaringScope(TypeDefinition? type, AssemblyIdentity core, int depth = 0)
     {
         if (type is null) return null;
-        if (depth >= 16 || type.GenericArity != 0 || (type.Attributes & 7) != (type.DeclaringType is null ? 1u : 2u) ||
+        if (depth >= 16 || (type.Attributes & 7) != (type.DeclaringType is null ? 1u : 2u) ||
             type.IsValueType && !type.Module.Assembly.IsNative && !Equals(type.ValueTypeCore, core)) throw new InvalidDataException("unsupported enclosing imported type");
-        return ImportTypeIdentity(type.Module.Assembly.Identity, type.Namespace, type.Name, 0, type.IsValueType, ImportDeclaringScope(type.DeclaringType, core, depth + 1));
+        return ImportTypeIdentity(type.Module.Assembly.Identity, type.Namespace, type.Name, type.GenericArity, type.IsValueType, ImportDeclaringScope(type.DeclaringType, core, depth + 1));
     }
     internal ImportedTypeReference ImportTypeIdentity(AssemblyIdentity identity, string ns, string name, int arity, bool isValueType = false, ImportedTypeReference? declaringType = null)
     {
@@ -156,7 +156,7 @@ public sealed partial class AssemblyBuilder
             name.Length == 0 || name == "<Module>" || ns.Length + name.Length > 1024 || (ns + name).Any(char.IsControl) ||
             (arity == 0 ? name.Contains('`') : !name.EndsWith("`" + arity, StringComparison.Ordinal))) throw new InvalidDataException("unsupported imported type identity");
         if (declaringType is not null && (!ReferenceEquals(declaringType.Owner, this) || !declaringType.AssemblyIdentity.Equals(identity) ||
-            declaringType.GenericArity != 0 || declaringType.TypeArguments.Count != 0 || ns.Length != 0))
+            declaringType.TypeArguments.Count != 0 || ns.Length != 0))
             throw new InvalidDataException("unsupported nested imported scope");
         var key = (identity, ns, name, declaringType);
         if (importedNominalTypes.TryGetValue(key, out var existing))
