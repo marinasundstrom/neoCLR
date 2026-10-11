@@ -804,3 +804,23 @@ Next define the smallest runtime-backed Scheduler surface needed by managed task
 continuations and hosting, then migrate TaskQueue consumers with matching runtime,
 compiler bridge and reference documentation. Task remains managed; runtime-owned
 suspension is not a direction to move the entire Task API into native code.
+
+
+### Runtime ABI and projections — author clarification, 2026-10-11
+
+These are different abstraction levels. The runtime exposes its own ABI hooks for
+async lifecycle and scheduling; the managed environment projects those capabilities
+through Task/Promise and Scheduler. Native languages may later provide native
+projections without constructing managed Task objects merely to use runtime async
+services. Task layout, managed builder types and queue identity must not define the
+underlying ABI. Native projections still obey the selected services' ownership,
+completion, cancellation and execution-entry contracts.
+
+This selects the architectural boundary, not a stable ABI signature or universal
+future representation. The current private host functions are experimental evidence,
+not that final contract. Define and validate the minimum runtime hook contract together
+with its first managed projection; do not start from managed Task layout and expose
+it as the native ABI. Other language projections remain future consumers. Relative
+to the .NET API baseline above, managed familiarity is preserved at the projection
+layer; a reusable runtime ABI adds versioning, capability and lifetime validation
+costs that must be addressed independently of managed API shape.

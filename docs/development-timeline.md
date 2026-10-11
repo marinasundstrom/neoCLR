@@ -14721,3 +14721,15 @@ outside benchmark measurement. Implementation follows the configuration slice.
 - **Outcome/open:** the preceding completion-admission slice is committed (`c9f3e5db`).
   Scheduler is selected as an abstraction, not yet implemented; members, namespace,
   selection/affinity and customization remain open. Task/Promise stay managed.
+
+
+### 2026-10-11 — Runtime ABI below language projections
+
+- **Author:** confirmed the different abstraction levels: the runtime exposes hooks
+  through its own ABI, the managed environment projects them as Task, and native
+  languages may later project them natively.
+- **Assistant action:** clarified the runtime ABI versus managed Task/Promise/Scheduler
+  projections in the design, roadmap and architecture proposal. Managed Task layout
+  is not the native service contract; experimental host functions are not a final ABI.
+- **Open:** minimum hook signatures, capability/versioning and lifetime validation with
+  the first managed consumer. Native projections remain future integration work.

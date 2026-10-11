@@ -13,6 +13,10 @@ foreign-runtime integration models below are future extension points, not an equ
 immediate implementation priority. Service selection does not waive a selected
 service's safety, ownership or lifetime requirements. The
 [platform roadmap](../platform-roadmap.md) governs implementation sequencing.
+The runtime's own ABI will expose async/scheduling hooks; managed Task/Promise and
+Scheduler project these services at a higher abstraction level. Native languages may
+later supply native projections. This direction does not select stable ABI signatures
+or make current experimental host functions a supported public interoperability ABI.
 
 ## Summary
 

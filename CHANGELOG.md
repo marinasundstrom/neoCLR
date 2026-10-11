@@ -18,7 +18,9 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   routing to runtime-owned continuation destinations; current TaskQueue APIs are not
   removed by this documentation change. Subsequent author clarification selects a
   managed Scheduler API backed by runtime implementation, with Task/Promise remaining
-  managed; concrete Scheduler members remain design work, not shipped APIs.
+  managed. Clarify the runtime's own ABI beneath managed projections and possible
+  future native projections; concrete hooks and Scheduler members remain design work,
+  not shipped APIs.
 
 - Begin the resumed scheduler work by moving interpreter invocation wait policy
   into the private scheduler. Bound owner waits by known timer deadlines, preserve
