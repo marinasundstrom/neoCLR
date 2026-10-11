@@ -72,6 +72,14 @@ int32_t neoclr_dns_addresses_v1(uint32_t, uint64_t, neoclr_aot_context *, void *
 int32_t neoclr_socket_connect_v1(const neoclr_aot_text *, int32_t, void *, neoclr_aot_context *, void *);
 int32_t neoclr_socket_connect_addresses_v1(const void *, int32_t, void *, neoclr_aot_context *, void *);
 int32_t neoclr_socket_connect_addresses_until_v1(const void *, int32_t, int64_t, void *, neoclr_aot_context *, void *);
+/* Private native scheduler step shared by JIT and AOT hosts. A NULL boundary
+ * requires quiescence; otherwise it must be the exact published top frame.
+ * Does not wait or invoke guest code. READY transfers the existing callback root
+ * under the poll lifetime below; the host must dispatch it before the next step.
+ * IDLE/PENDING/error leave the callback output unchanged. Delivered operations
+ * still awaiting result consumption keep the scheduler pending. */
+enum { NEOCLR_SCHEDULER_IDLE = 0, NEOCLR_SCHEDULER_READY = 1, NEOCLR_SCHEDULER_PENDING = 2 };
+int32_t neoclr_scheduler_step_v1(neoclr_aot_context *, uint64_t *, const neoclr_probe_frame *);
 /* Quiescent owner-thread poll: 0 no ready work, 1 publishes one retained callback
  * handle, -3 host misuse. Never invokes guest code. Consume result during dispatch;
  * scope teardown releases abandoned operations, roots and accepted sockets. */

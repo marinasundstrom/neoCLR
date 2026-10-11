@@ -533,3 +533,43 @@ An isolated `CARGO_TARGET_DIR=target/scheduler-wait-validation` avoided the edit
 concurrent full-check lock. These checks do not claim native-host parity or a timing
 benchmark. No public API reference snapshot changes are required for this private
 interpreter implementation.
+
+
+## Native completion-state boundary — 2026-10-11
+
+Native JIT, HTTP AOT and retained-session hosts now call
+`neoclr_scheduler_step_v1(context, callback, boundary)` instead of inspecting the
+private operation table. This mirrors the interpreter's ready/pending/idle distinction
+without requiring identical native/VM representations. See the
+[consumer qualification](experiments/native-scheduler/README.md).
+
+The step polls for one completion and returns ready (1), pending (2), idle
+(0), or host failure (-3). It neither blocks nor invokes guest code. A supplied
+boundary must be the exact published top frame for this context; NULL requires
+quiescence. It retains current single-owner/thread and callback delivery contracts.
+Delivered socket results remain pending until consumed. Advancing after a final
+timer callback releases that delivery root before returning idle; previous host-side
+empty-table shortcuts deferred this release until scope teardown.
+
+The .NET TaskScheduler/SynchronizationContext comparison above remains the baseline:
+separate scheduling decisions from asynchronous outcomes and continuation location.
+This private entry point is not a public TaskScheduler implementation. Keeping three
+host copies was cheaper initially but exposed operation storage and duplicated
+quiescence policy. Moving the decision behind one C function preserves existing
+callback semantics, adds no managed allocations, and centralizes future policy changes.
+The source scan is still bounded to 64 operations; no speedup is claimed.
+
+The host must consume/install a returned callback before stepping again. Roots remain
+source-owned under that existing protocol; this slice does not add the interpreter's
+explicit ready-to-active acknowledgment. Await-site destination, general suspended
+activations, nonblocking OS readiness and native wait/deadline policy are still open.
+Native hosts retain their 1 ms polling pause; interpreter waiting has its separate
+10 ms fallback/deadline hint. Shared completion meanings do not imply identical timing,
+parallel execution or a finished TaskQueue migration.
+
+Six native C contracts pass with undefined-behavior/bounds instrumentation. Timer
+success and callback-fault consumers pass across interpreter/AOT/JIT, the HTTP AOT
+host passes ten timer scenarios, and the retained native HTTP consumer passes normal,
+fragmented and terminal-fault cases. Qualification is macOS ARM64; the portable C
+contract is included in the existing Windows workflow but has not been rerun there
+for this revision. No compiler bridge or public API signature changes are involved.

@@ -32,13 +32,11 @@ static int invoke_session(neoclr_aot_context *context, int *failed) {
         while (!status && !host_error) {
             status = neoclr_drain_default_queue_v1(context);
             if (status) break;
-            unsigned active = 0;
-            for (unsigned i = 0; i < 64; i++) active += sockets.operations[i].state != 0;
-            if (!active) break;
             uint64_t completion = 0;
-            int32_t ready = neoclr_socket_poll_v1(context, &completion);
-            if (ready == 1) status = neoclr_invoke_void_callback_v1(completion, context);
-            else if (ready < 0) host_error = 1;
+            int32_t progress = neoclr_scheduler_step_v1(context, &completion, NULL);
+            if (progress == NEOCLR_SCHEDULER_IDLE) break;
+            if (progress == NEOCLR_SCHEDULER_READY) status = neoclr_invoke_void_callback_v1(completion, context);
+            else if (progress < 0) host_error = 1;
             else neoclr_os_pause();
             uint64_t now = milliseconds();
             if (now == UINT64_MAX || started == UINT64_MAX || now - started > 15000) host_error = 1;

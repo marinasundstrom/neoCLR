@@ -366,6 +366,20 @@ int32_t neoclr_socket_poll_suspended_v1(neoclr_aot_context *context, uint64_t *c
     if (!boundary || neoclr_root_probe_head_v1() != boundary || boundary->context != context) return -3;
     return socket_poll(context, callback);
 }
+int32_t neoclr_scheduler_step_v1(neoclr_aot_context *context, uint64_t *callback,
+    const neoclr_probe_frame *boundary) {
+    int32_t ready = boundary
+        ? neoclr_socket_poll_suspended_v1(context, callback, boundary)
+        : neoclr_socket_poll_v1(context, callback);
+    if (ready) return ready;
+    /* Poll first, even when the operation table is empty: the previous timer
+     * delivery remains rooted until this owner advances or tears down the scope. */
+    neoclr_socket_scope *scope = find_scope(context);
+    for (unsigned i = 0; i < 64; i++)
+        if (scope->operations[i].state) return NEOCLR_SCHEDULER_PENDING;
+    return NEOCLR_SCHEDULER_IDLE;
+}
+
 static int32_t socket_poll(neoclr_aot_context *context, uint64_t *callback) {
     neoclr_socket_scope *scope = find_scope(context);
     if (!scope || !callback || context->fault.code) return -3;

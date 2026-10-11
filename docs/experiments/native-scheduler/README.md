@@ -1,0 +1,62 @@
+# Shared native scheduler step
+
+2026-10-11, development implementation. JIT, HTTP AOT and retained HTTP hosts use
+one private completion-state boundary in `socket-listener.c`. They no longer scan
+operation slots to decide whether to keep pumping. This separates host lifetime and
+waiting from completion-source storage. The interpreter retains its existing Rust
+scheduler; both now distinguish ready, pending and idle at their adapter boundary.
+
+This is not public Scheduler API, parallel dispatch or runtime-managed async suspension.
+It preserves source-owned callback roots and owner-thread scope lifetime. A host must
+consume each returned callback before stepping again. Socket outcomes awaiting result
+consumption keep the source pending. A final timer delivery is released at the next
+step, including an idle step. Fault teardown still releases abandoned operations.
+
+## Evidence
+
+- [Six native C contracts](contracts.json): listener, accept, transfer, client, timer,
+  and scheduler. The new case covers pending/ready/idle, GC retention/release,
+  delivered-but-unconsumed socket results, and rejection of missing/wrong scopes and
+  invalid active-frame boundaries without changing the output handle.
+- [Timer and fault cases](timers.json): six interpreter/AOT/JIT executions; successful
+  workers each check ten timer scenarios. A callback fault leaves another operation
+  pending, exercising teardown before code release.
+- [HTTP AOT host timers](http-host-timers.json): ten callback scenarios using the
+  separate project host, with command/input provenance and compact build evidence.
+- [Retained HTTP](retained-http.json): three requests, fragmented requests, and a
+  terminal callback fault after success, including listener shutdown.
+
+All executions were local macOS ARM64. The shared C test joins the existing Windows
+native-network workflow, but no Windows execution is claimed for this revision.
+No performance comparison or public API/metadata change is involved.
+
+## Reproduce
+
+Set the supported Xcode `DEVELOPER_DIR` and `SDKROOT` on macOS, and use matching
+compiler/runtime libraries and tools. Each output path must be fresh.
+
+```sh
+python3 scripts/validate-native-network.py --output target/native-scheduler-contracts
+python3 docs/experiments/jit-async/verify.py \
+  --bundle target/data-cases-bundle \
+  --console-qualification target/jit-startup-validation/validation.json \
+  --timers --output target/native-scheduler-timers
+python3 scripts/build-native-project.py --profile http \
+  --bootstrap-root Bootstrap \
+  --project docs/experiments/retained-http/Native.rvnproj \
+  --bundle target/data-cases-bundle \
+  --aot tools/aot-poc/target/release/neoclr-aot-poc \
+  --output target/native-scheduler-retained
+python3 docs/experiments/native-scheduler/verify-retained.py \
+  --build target/native-scheduler-retained \
+  --output target/native-scheduler-retained/validation.json
+```
+
+The focused retained verifier reuses the established HTTP protocol checker without
+rebuilding unrelated runtime/compiler binaries. It validates input hashes before
+and after execution. The full retained-HTTP verifier remains available for a broader
+interpreter comparison.
+
+Next boundaries: explicit ready-to-active acknowledgment, awaiting execution's
+continuation destination, and wait policy alignment. See the
+[scheduler design](../../runtime-scheduling-design.md#native-completion-state-boundary--2026-10-11).

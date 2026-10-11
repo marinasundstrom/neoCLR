@@ -21,7 +21,10 @@ and the [JIT evaluation brief](native-execution-investigation.md#jit-for-develop
 [independent](../tools/testing/README.md) [projects](../tools/benchmarking/README.md),
 including their runners/APIs (completed), then continue scheduler work followed by suspension.
 The first resumed scheduler slice centralizes interpreter wait policy and timer
-deadline hints; cross-mode dispatch migration remains open.
+deadline hints. Native JIT/AOT hosts now share a
+[completion-state boundary](experiments/native-scheduler/README.md), with explicit
+ready/pending/idle results and existing callback-root ownership. Await-site routing,
+explicit delivery acknowledgment and cross-mode wait policy remain open.
 Migrate more cases as needed; remaining benchmark/framework features are follow-ups,
 not prerequisites for beginning the scheduler slice. Parallel-by-default testing and
 class grouping are proposals to develop with scheduling, not enabled behavior.

@@ -1,0 +1,295 @@
+{
+  "passed": true,
+  "platform": "macOS-27.0-arm64-arm-64bit",
+  "machine": "arm64",
+  "commands": [
+    {
+      "command": [
+        "git",
+        "-C",
+        "/Users/robert/Projects/neoclr",
+        "rev-parse",
+        "HEAD"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "xcrun",
+        "--sdk",
+        "macosx",
+        "--find",
+        "clang"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "xcrun",
+        "--sdk",
+        "macosx",
+        "--show-sdk-path"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang",
+        "-isysroot",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.2.sdk",
+        "-std=c11",
+        "-O2",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-DNEOCLR_NATIVE_GC",
+        "-DNEOCLR_CLIENT_TEST",
+        "-fsanitize=undefined,bounds",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/socket-listener-test.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/socket-listener.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-gc.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/root-probe.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/text-arena.c",
+        "-o",
+        "/Users/robert/Projects/neoclr/target/native-scheduler-step-final/listener"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/native-scheduler-step-final/listener"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang",
+        "-isysroot",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.2.sdk",
+        "-std=c11",
+        "-O2",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-DNEOCLR_NATIVE_GC",
+        "-DNEOCLR_CLIENT_TEST",
+        "-fsanitize=undefined,bounds",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/socket-accept-test.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/socket-listener.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-gc.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/root-probe.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/text-arena.c",
+        "-o",
+        "/Users/robert/Projects/neoclr/target/native-scheduler-step-final/accept"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/native-scheduler-step-final/accept"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang",
+        "-isysroot",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.2.sdk",
+        "-std=c11",
+        "-O2",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-DNEOCLR_NATIVE_GC",
+        "-DNEOCLR_CLIENT_TEST",
+        "-fsanitize=undefined,bounds",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/socket-transfer-test.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/socket-listener.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-gc.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/root-probe.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/text-arena.c",
+        "-o",
+        "/Users/robert/Projects/neoclr/target/native-scheduler-step-final/transfer"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/native-scheduler-step-final/transfer"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang",
+        "-isysroot",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.2.sdk",
+        "-std=c11",
+        "-O2",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-DNEOCLR_NATIVE_GC",
+        "-DNEOCLR_CLIENT_TEST",
+        "-fsanitize=undefined,bounds",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/socket-client-test.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/socket-listener.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-gc.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/root-probe.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/text-arena.c",
+        "-o",
+        "/Users/robert/Projects/neoclr/target/native-scheduler-step-final/client"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/native-scheduler-step-final/client"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang",
+        "-isysroot",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.2.sdk",
+        "-std=c11",
+        "-O2",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-DNEOCLR_NATIVE_GC",
+        "-DNEOCLR_CLIENT_TEST",
+        "-fsanitize=undefined,bounds",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/socket-timer-test.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/socket-listener.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-gc.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/root-probe.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/text-arena.c",
+        "-o",
+        "/Users/robert/Projects/neoclr/target/native-scheduler-step-final/timer"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/native-scheduler-step-final/timer"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang",
+        "-isysroot",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.2.sdk",
+        "-std=c11",
+        "-O2",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-DNEOCLR_NATIVE_GC",
+        "-DNEOCLR_CLIENT_TEST",
+        "-fsanitize=undefined,bounds",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/socket-scheduler-test.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/socket-listener.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-gc.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/root-probe.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/text-arena.c",
+        "-o",
+        "/Users/robert/Projects/neoclr/target/native-scheduler-step-final/scheduler"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/native-scheduler-step-final/scheduler"
+      ],
+      "exitCode": 0
+    }
+  ],
+  "cases": [
+    {
+      "name": "listener",
+      "passed": true
+    },
+    {
+      "name": "accept",
+      "passed": true
+    },
+    {
+      "name": "transfer",
+      "passed": true
+    },
+    {
+      "name": "client",
+      "passed": true
+    },
+    {
+      "name": "timer",
+      "passed": true
+    },
+    {
+      "name": "scheduler",
+      "passed": true
+    }
+  ],
+  "revision": "b8835498026edd670f772e67e6805f5e263e10f3",
+  "inputs": {
+    "docs/experiments/aot-console/socket-os.h": "a01419c62fa8a1d3d9131282c5af182f200ba149a440d52c81104e2a156f7ef0",
+    "docs/experiments/aot-console/socket-client-internal.h": "e2771ecbe8b74c0e696af297651cd5158755c8ed6e6cc25b1d9bde837a57dddb",
+    "docs/experiments/aot-console/socket-client-test.c": "478fbb2a015d2cdda80491fefcc62f8f4681d9227097cf142bb92612cf709cd5",
+    "docs/experiments/aot-console/socket-listener.h": "4b06361daa03f35e0fd3a71a31776870de905b1fda1a3f90874cf25ea27184c4",
+    "docs/experiments/aot-console/socket-listener.c": "13401588bd5667a6695b0c8c4d78141b6b9b2c545b260ba52d0ac90980039165",
+    "docs/experiments/aot-console/socket-listener-test.c": "8927b76095201c45919610ff98c11c519ac10c7a67f430c999188d4704b0f9cb",
+    "docs/experiments/aot-console/socket-accept-test.c": "6bf34e5428e912c6b7b6c166c4d6caecc9cc6b0b6e6fc1c2743b6cb7da3bbd8d",
+    "docs/experiments/aot-console/socket-transfer-test.c": "cb5488f055fd1ec9a9547cd24cea58d0e16a04ba491969251c30e9cc6005bc23",
+    "docs/experiments/aot-console/socket-timer-test.c": "9915ead90ed265c1cb57aae184eea88289a03c912cd7c20574fdf3bb03ab64e4",
+    "docs/experiments/aot-console/socket-scheduler-test.c": "04aab32c4205225f38dbadb991184523f15ad6690c27b535650d2cff2ac03297",
+    "docs/experiments/aot-console/native-gc.c": "dfe3e554913e625e86f2a260e96999934fcf55b980c7c9e1a8dbf26dae4c6f10",
+    "docs/experiments/aot-console/native-gc.h": "2710426be29f0e01061236dcc8dd82db92b0e92ef04633be07575cb4c53df721",
+    "docs/experiments/aot-console/root-probe.c": "0e1bcdb4f08228de74f4b97ea80e83190ed7bb55dc0c55a31f11b470bdb86a7a",
+    "docs/experiments/aot-console/root-probe.h": "45808ddae5d01eac0b242f160f1d3a13892a7c111d61e58ac1ee7075b15c36a1",
+    "docs/experiments/aot-console/text-arena.c": "1e845dc0c0622247ca8eb18c222c6cfcc7638e603551634a12493787026c77be",
+    "docs/experiments/aot-console/text-arena.h": "6101b22c4fd5eacc3849ad471de197564fca343f8b28345d80be93f20c2c8575",
+    "docs/experiments/aot-fault-details/fault-details.h": "8acf145dd10c8050c7d4c9266a73dec171009cea570aeb2f5473ac39cbfa4370",
+    "scripts/validate-native-network.py": "2db49df48907be6f4680ae5cf641fd4d188d3b1d3c4816bed0966d075f42d0e5"
+  },
+  "files": {
+    "accept": "64a52fb1083872baa61b7ff218a816eb1ffa8f3e97710e45eb5ecb8df4e6d3fc",
+    "accept-build.stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "accept-build.stdout.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "accept-execute.stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "accept-execute.stdout.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "clang.stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "clang.stdout.log": "083060ae79a9cc17bc69cb6166b1e16396c638b533de036324d8c6d49b77af24",
+    "client": "6995ca4e2af0115f29663dc67873a344ae04ea21effa2796861816098ec01398",
+    "client-build.stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "client-build.stdout.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "client-execute.stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "client-execute.stdout.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "listener": "7dc6405f80e2631ec104274a13ec26d49b38c7d2f053b655c07ed942b431e508",
+    "listener-build.stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "listener-build.stdout.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "listener-execute.stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "listener-execute.stdout.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "revision.stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "revision.stdout.log": "b8fee770965fd01a35456d52f078c26230cbfa1815799ba329057a0f7bdbd9f3",
+    "scheduler": "d76420108617bb348dbfac0acaae62c186fec7402c76e5534936145d4d519ee2",
+    "scheduler-build.stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "scheduler-build.stdout.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "scheduler-execute.stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "scheduler-execute.stdout.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "sdk.stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "sdk.stdout.log": "e357092b82973b339cf66c3b50ddc37eb011d99942f22bf763e6aacf5c1a58f7",
+    "timer": "17803ccd3e54d54607c1fd59b0f6484708f0b1ea820d703e377d947dbf4da38d",
+    "timer-build.stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "timer-build.stdout.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "timer-execute.stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "timer-execute.stdout.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "transfer": "a27857f4ced02ca48801e2cebb84b4671fd3fade68dc144271a708176b9687c1",
+    "transfer-build.stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "transfer-build.stdout.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "transfer-execute.stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "transfer-execute.stdout.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  }
+}

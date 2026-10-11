@@ -19,14 +19,10 @@ typedef int32_t (*entry_args)(int32_t, int32_t *, neoclr_aot_context *, const en
    consumes each delivered callback before polling again, retaining its root. */
 static int32_t poll_entry(neoclr_aot_context *context, uint64_t *callback,
     const neoclr_probe_frame *boundary, void *state) {
-    neoclr_socket_scope *operations = state;
-    unsigned active = 0;
-    for (unsigned i = 0; i < 64; ++i) active += operations->operations[i].state != 0;
-    if (!active) return 0;
-    int32_t ready = neoclr_socket_poll_suspended_v1(context, callback, boundary);
-    if (ready) return ready;
-    neoclr_os_pause();
-    return 2;
+    (void)state;
+    int32_t progress = neoclr_scheduler_step_v1(context, callback, boundary);
+    if (progress == NEOCLR_SCHEDULER_PENDING) neoclr_os_pause();
+    return progress;
 }
 
 static int32_t run_entry(const void *entry, int32_t with_args, int32_t argc, const entry_char **argv) {
@@ -44,7 +40,6 @@ static int32_t run_entry(const void *entry, int32_t with_args, int32_t argc, con
         return 2;
     }
     tasks.poll = poll_entry;
-    tasks.poll_state = &operations;
     int32_t result = 0;
     entry_args args_function;
     entry_v4 plain_function;

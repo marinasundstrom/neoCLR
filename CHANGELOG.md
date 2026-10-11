@@ -13,7 +13,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   the cancellation/socket polling fallback and avoid spinning a contending context
   on another context's ready work. JIT/AOT host-loop alignment and runtime-managed
   async suspension remain follow-ups; no new public Scheduler API is claimed. Sixteen
-  focused scheduler, ownership/contention and guest timer checks pass.
+  focused scheduler, ownership/contention and guest timer checks pass. Native JIT,
+  AOT HTTP and retained-session hosts now share a private ready/pending/idle scheduler
+  step instead of inspecting operation tables. Preserve callback roots and pending
+  result ownership; release final timer delivery at the next idle step. Native
+  contracts, all-mode timer/fault cases and retained HTTP consumers pass on macOS ARM64.
 
 - Document testing and benchmarking as independent development projects, including
   ownership, APIs, runner commands, selection, configuration, reports and limitations.

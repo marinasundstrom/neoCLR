@@ -222,7 +222,11 @@ See [networking](../networking/) and [HTTP](../web/) for operation-specific clea
 Both platforms expose awaitable completion. neoCLR uses Promise for producer completion and Result values for expected errors; Task has no faulted outcome. This differs from .NET Task’s exception-based fault state and requires different library and compiler contracts.
 
 Raven emits state machines, with a private invocation scheduler delivering native
-completion through TaskQueue. Callbacks must return for other work to progress.
+completion through TaskQueue. Native JIT/AOT hosts now share a private completion
+step that distinguishes ready work, pending outcomes and idle sources; callback roots
+remain retained through dispatch. This is development infrastructure, not a public
+Scheduler API or runtime-managed async suspension. Callbacks must return for other
+work to progress.
 A pending await currently resumes through the producer queue; custom queue and UI
 affinity are not settled contracts. Ordinary worker joins can still block the queue.
 
