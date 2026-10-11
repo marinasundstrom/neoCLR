@@ -17,6 +17,13 @@ requirements without treating any proposed API or backend as selected. See
 [product direction](platform-direction.md#product-direction-clarified-2026-10-11)
 and the [JIT evaluation brief](native-execution-investigation.md#jit-for-development-iteration-2026-10-11).
 
+**Runtime async groundwork (2026-10-11):** the author directs implementation while
+keeping Raven's CLR lowering separate from neoCLR's execution choices. A private
+[interpreter retained-frame yield](experiments/runtime-async/README.md) now exercises
+ordinary call-chain retention and resumption. Operation-triggered parking, detached
+activations, native support and compiler await integration remain open. This does
+not complete public Task migration or the scheduler measurement gates.
+
 **Latest author clarification (2026-10-11):** document testing and benchmarking as
 [independent](../tools/testing/README.md) [projects](../tools/benchmarking/README.md),
 including their runners/APIs (completed), then continue scheduler work followed by suspension.

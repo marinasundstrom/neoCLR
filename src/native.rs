@@ -50,6 +50,7 @@ pub(crate) enum Binding {
     DefaultTaskQueue,
     RegisterDefaultTaskQueue,
     DrainEntryTasks,
+    RuntimeAsyncYield,
     ScheduleTask,
     SchedulerSubmit,
     SchedulerCapture,
@@ -223,7 +224,8 @@ pub(crate) fn bind(function: &Function) -> Result<Binding, Fault> {
     if function.no_result
         && !matches!(
             function.name.as_str(),
-            "neoCLR.Runtime.ReflectionPropertySet"
+            "neoCLR.Runtime.RuntimeAsyncYield"
+                | "neoCLR.Runtime.ReflectionPropertySet"
                 | "neoCLR.Runtime.GCCollect"
                 | "neoCLR.Runtime.GCKeepAlive"
                 | "neoCLR.Runtime.WriteLine"
@@ -938,6 +940,7 @@ pub(crate) fn bind(function: &Function) -> Result<Binding, Fault> {
         {
             (Binding::ScheduleTask, Type::Void)
         }
+        ("neoCLR.Runtime.RuntimeAsyncYield", []) => (Binding::RuntimeAsyncYield, Type::Void),
         ("neoCLR.Runtime.DrainEntryTasks", []) => (Binding::DrainEntryTasks, Type::Void),
         ("neoCLR.Runtime.DefaultTaskQueue", []) => (
             Binding::DefaultTaskQueue,

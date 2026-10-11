@@ -14847,3 +14847,22 @@ outside benchmark measurement. Implementation follows the configuration slice.
   Incremental runtime dispatch, full-queue admission policy, native reclamation and
   race semantics remain open; public Task migration has not occurred. See the
   [design](runtime-scheduling-design.md#completion-batch-adapter--2026-10-11).
+
+## 2026-10-11 — Runtime async insertion points and execution ownership
+
+- Author directed continued runtime-async implementation, then clarified: “We already
+  have, like, the runtime async insertion points in the Raven compiler, but I don't
+  think we should necessarily go the same route as .NET when it comes to building
+  this kind of functionality.”
+- Assistant proposed separating language intent from suspension representation while
+  preserving generated state machines. Inspection found Raven's existing runtime-async
+  path specifically targets CLR AsyncHelpers and metadata; a neoCLR target contract
+  is still needed rather than assuming those hooks are already portable.
+- Implemented a [private interpreter yield probe](experiments/runtime-async/README.md):
+  ordinary frames remain runtime-owned during callback dispatch and resume afterward.
+  This is retained-frame cooperative execution, not detached or operation-triggered
+  suspension. Tests exercise roots, faults, nested yield and budgets; consumer evidence
+  is linked with the experiment.
+- Open: atomic operation parking/resume, cancellation/lifetime rules, native activation
+  design, faithful logical async stacks, compiler integration and comparative benchmarks.
+  No permanent native representation or public API is selected by this slice.

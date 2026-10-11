@@ -8,6 +8,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-11
 
+- Add a private interpreter retained-frame yield experiment: dispatch at most one
+  eligible callback, then resume ordinary callers with locals, evaluation stack,
+  GC roots and resource charges intact. Cover callback faults, nested yields and
+  CLI no-result encoding. Document separate Raven target intent/runtime ownership;
+  operation parking, detached activations and JIT/AOT support remain unimplemented.
+
 - Separate native runnable submissions from the bounded I/O table using runtime-owned
   backlog nodes. Transfer runnable roots directly into dispatch tickets, alternate
   ready sources with queued work, and release nodes/roots on terminal cleanup. Native

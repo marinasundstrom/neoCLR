@@ -1313,3 +1313,21 @@ memory budgets, native diagnostic parity, concurrency rules and performance qual
 remain ahead of public Task migration. Internal host layout requires matching rebuilt
 sources; managed service signatures, Runtime Contract settings and compiler emission are
 unchanged. Public API documentation and website capabilities remain unchanged.
+
+## Runtime-owned frame yield — 2026-10-11
+
+The author clarified that Raven's runtime-async insertion points need not dictate
+the .NET execution design. Inspection shows the current CLR path calls AsyncHelpers
+and emits CLR async metadata; it is not yet a neoCLR target contract. Preserve that
+path and existing generated state machines. Task remains operation state, Promise
+producer authority, and Scheduler a managed projection of runtime scheduling.
+
+The [private interpreter experiment](experiments/runtime-async/README.md) now retains
+ordinary VM frames while one eligible callback executes, then resumes the caller.
+Locals, evaluation stack, GC roots and frame charges survive. This establishes a
+small runtime-owned execution boundary, not operation await or detached suspension.
+The benefit over requiring a synthesized carrier here is direct reuse of runtime
+frames; costs are full-chain retention and reentrant execution. No performance or
+native portability claim is made. Existing .NET research remains the baseline;
+activation representation, native liveness, logical stack links and one-shot parking
+are still design/validation work. No compiler lowering or public API changes.

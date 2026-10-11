@@ -1,0 +1,42 @@
+module RuntimeAsyncProbe {
+    import System.*
+
+    class Counter {
+        var Value = 0
+
+        func Complete() -> System.Void {
+            System.Runtime.GC.Collect()
+            Value = 25
+            return ()
+        }
+    }
+
+    func Nested(counter: Counter) -> int {
+        let saved = 7
+        let before = 10
+        // Deliberate direct runtime boundary: this function has no async lowering.
+        neoCLR.Runtime.RuntimeAsyncYield()
+        return before + saved + counter.Value
+    }
+
+    func Main() -> int {
+        let counter = Counter()
+        _ = neoCLR.Runtime.SchedulerSubmit(counter.Complete)
+        let result = Nested(counter)
+        if result != 42 {
+            System.Fail("Runtime yield lost retained state")
+        }
+        Console.WriteLine("PASS runtime-owned yield resumes ordinary Raven call chain")
+        return 0
+    }
+}
+
+module neoCLR.Runtime {
+    import System.Runtime.CompilerServices.*
+
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    internal extern func RuntimeAsyncYield() -> System.Void;
+
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    internal extern func SchedulerSubmit(callback: () -> System.Void) -> int;
+}

@@ -2104,6 +2104,8 @@ struct InstructionState {
     invocation: std::sync::Arc<crate::invocation::Invocation>,
     invocation_result: Option<Value>,
     entry_drain_depth: Option<usize>,
+    // Retained caller depth, callback dispatched, CLI no-result return.
+    yield_boundaries: Vec<(usize, bool, bool)>,
     drain_required: bool,
     budget: std::sync::Arc<crate::invocation_budget::Budget>,
     completion_boundary: Option<Value>,
@@ -2127,6 +2129,7 @@ impl InstructionState {
             invocation,
             invocation_result: None,
             entry_drain_depth: None,
+            yield_boundaries: Vec::new(),
             drain_required: true,
             budget,
             completion_boundary: None,
@@ -2268,6 +2271,20 @@ fn interpret_instructions(
     }
 }
 
+fn runtime_submission_frame(module: &Module, callback: &Value) -> Result<Frame, Fault> {
+    let Value::Function(binding) = callback else {
+        return Err(Fault::new("Invalid scheduler callback"));
+    };
+    let contract = crate::function_objects::contract(module, &binding.ty)?;
+    let callee = resolve(module, &binding.target)?;
+    crate::function_objects::compatible(&contract, &callee)?;
+    callback.ensure_heap_references()?;
+    let args = binding.receiver.iter().map(|receiver| (**receiver).clone()).collect();
+    let mut frame = Frame::new(callee, args)?;
+    frame.runtime_callback = true;
+    Ok(frame)
+}
+
 #[allow(clippy::too_many_arguments)]
 fn interpret_instructions_with_dispatch(
     module: &Module,
@@ -2292,6 +2309,7 @@ fn interpret_instructions_with_dispatch(
         invocation,
         invocation_result,
         entry_drain_depth,
+        yield_boundaries,
         drain_required,
         budget,
         completion_boundary,
@@ -2321,6 +2339,40 @@ fn interpret_instructions_with_dispatch(
             }
         }
         if let Some(value) = completion_boundary.take() {
+            if let Some(&(depth, dispatched, no_result)) = yield_boundaries.last() {
+                options.check_cancellation("RuntimeAsyncYield", 0)?;
+                if !crate::invocation::Dispatch::claim_owner(owner, dispatch_identity) {
+                    heap.publish(execution_roots(frames, scheduler,
+                        default_task_queue.as_ref(), invocation_result.as_ref()))?;
+                    *completion_boundary = Some(value);
+                    return Ok(InstructionProgress::Waiting);
+                }
+                if frames.len() != depth {
+                    return Err(Fault::new("Invalid runtime yield boundary"));
+                }
+                if !dispatched && scheduler.install_submission(|callback| {
+                    if frames.len() >= limits.frames {
+                        return Err(Fault::coded(crate::FaultCode::StackOverflow, "frame limit exceeded"));
+                    }
+                    frames.push(runtime_submission_frame(module, callback)?);
+                    Ok(())
+                })? {
+                    yield_boundaries.last_mut().unwrap().1 = true;
+                    continue;
+                }
+                // The interpreter kept the ordinary caller chain alive. Returning
+                // from the callback resumes at the instruction after the yield call.
+                yield_boundaries.pop();
+                let caller = frames.last_mut().ok_or_else(|| Fault::new("Missing runtime yield caller"))?;
+                if !no_result && caller.stack.len() >= limits.stack {
+                    return Err(Fault::coded(crate::FaultCode::EvaluationStackOverflow,
+                        "evaluation stack limit exceeded"));
+                }
+                if !no_result {
+                    caller.stack.push(Value::Void);
+                }
+                continue;
+            }
             if work_control.is_some() && entry_drain_depth.is_none() {
                 let mut roots = Vec::new();
                 crate::gc::trace(&value, &mut roots);
@@ -2373,21 +2425,7 @@ fn interpret_instructions_with_dispatch(
                         "frame limit exceeded",
                     ));
                 }
-                let Value::Function(binding) = callback else {
-                    return Err(Fault::new("Invalid scheduler callback"));
-                };
-                let contract = crate::function_objects::contract(module, &binding.ty)?;
-                let callee = resolve(module, &binding.target)?;
-                crate::function_objects::compatible(&contract, &callee)?;
-                callback.ensure_heap_references()?;
-                let args = binding
-                    .receiver
-                    .iter()
-                    .map(|receiver| (**receiver).clone())
-                    .collect();
-                let mut frame = Frame::new(callee, args)?;
-                frame.runtime_callback = true;
-                frames.push(frame);
+                frames.push(runtime_submission_frame(module, callback)?);
                 Ok(())
             })? {
                 // The callback may complete a managed Promise and post its
@@ -3913,8 +3951,16 @@ fn interpret_instructions_with_dispatch(
                             return Ok(None);
                         }
 
+                        if matches!(binding, crate::native::Binding::RuntimeAsyncYield) {
+                            if work_control.is_some() || task_atomic::active(module, frames) {
+                                return Err(Fault::new("Runtime yield is not supported in task mutation or worker execution"));
+                            }
+                            yield_boundaries.push((frames.len(), false, callee.no_result));
+                            return Ok(Some(Value::Void));
+                        }
+
                         if matches!(binding, crate::native::Binding::DrainEntryTasks) {
-                            if entry_drain_depth.is_some() || work_control.is_some() {
+                            if entry_drain_depth.is_some() || work_control.is_some() || !yield_boundaries.is_empty() {
                                 return Err(Fault::new(
                                     "Entry task dispatch cannot be nested or run by a task callback",
                                 ));

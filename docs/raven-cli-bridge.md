@@ -8360,3 +8360,26 @@ abandoned managed operations are still unqualified. The
 and native/interpreter lifecycle evidence; public Task/Promise registration is unchanged.
 
 Companion Raven shared-main documentation: `d0fdf808e` (documentation only).
+
+### Private interpreter frame-yield probe (2026-10-11)
+
+The source-included RuntimeAsyncYield experiment declares exact InternalCall
+`neoCLR.Runtime.RuntimeAsyncYield()` with unit (or CLI no-result) return. neoCLR
+binds it as TaskDispatch and retains ordinary interpreter frames during at most one
+eligible queued callback. No-result encoding does not push a unit at resumption.
+Raven emits an ordinary call; no Runtime Contract setting, async-method semantic
+change or automatic await remapping is added. This private signature is interpreter
+only, not a supported JIT/AOT intrinsic or stable native ABI.
+
+neoCLR owns frame/root lifetime, budgets and dispatch. Raven owns future explicit
+target capability checks and await intent emission. Its existing CLR runtime-async
+AsyncHelpers/metadata route remains separate and unchanged. The temporary CLI call
+cannot describe operation parking, saved activation layout, liveness or logical
+await links. Native metadata/codegen must supply an explicit target contract for
+those before compiler integration; do not emulate CLR helpers merely to enable it.
+Validation uses the existing compiler bundle with a source-local declaration and
+focused neoCLR contracts. Public Task/Promise and compiler-generated state machines
+remain unchanged. See neoCLR `docs/experiments/runtime-async/README.md` for evidence
+and limitations; no native suspension support is implied by compiler hook availability.
+
+Companion Raven shared-main documentation: `15e95e082` (documentation only).

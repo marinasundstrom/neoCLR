@@ -1,0 +1,77 @@
+{
+  "passed": true,
+  "sourceSha256": "fc0dc5ae54fe4a09b8bc51a593e5f75cbe8b1d761d7cb5071aaf6f5ced1c61d4",
+  "commands": [
+    {
+      "command": [
+        "dotnet",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle/sdk/tools/rvnc/rvnc.dll",
+        "neoclr",
+        "--core-reference",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/Core.dll",
+        "--runtime-seed",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/System.runtime.neox",
+        "--bootstrap-intrinsics",
+        "--bootstrap-ownership",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/ownership.json",
+        "--object-library",
+        "System.Runtime",
+        "--async-library",
+        "System.Runtime",
+        "--reference",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/System.Runtime.dll",
+        "--reference",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/System.Data.dll",
+        "--reference",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/System.Networking.dll",
+        "--reference",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/System.Web.dll",
+        "-o",
+        "/Users/robert/Projects/neoclr/target/runtime-async-yield/app.dll",
+        "/Users/robert/Projects/neoclr/docs/experiments/runtime-async/Yield.rvn"
+      ],
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/scheduler-wait-validation/debug/neoclr",
+        "run",
+        "/Users/robert/Projects/neoclr/target/runtime-async-yield/app.dll",
+        "--system",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/System.runtime.neox",
+        "--instructions",
+        "100000000",
+        "--object-root",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/System.Runtime.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/System.Runtime.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/System.Data.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/System.Networking.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/System.Web.dll"
+      ],
+      "exitCode": 0,
+      "stdout": "PASS runtime-owned yield resumes ordinary Raven call chain\n",
+      "stderr": ""
+    }
+  ],
+  "runtimeSha256": "0925b28dcf5ce854188a5250ce308afd190bc6374f004ba8d89da0d0dcf1a61b",
+  "compilerSha256": "ffea7882e8dc83809aaa732db52532b6e65a92ed4f592fa4fc6b5d8d5bd5470a",
+  "referenceSha256": {
+    "target/data-cases-bundle/lib/System.Web.dll": "edcae392b0cd0a4562680408830a931ad2bf92e5280157da16afd8967103474c",
+    "target/data-cases-bundle/lib/Core.dll": "3d4a676d379067c18a65a9beb8257ed40bf3196fc643a9ba1d559c619ec73fad",
+    "target/data-cases-bundle/lib/System.Networking.dll": "ec3b383eee5f202f0badeb48ad775df16de1b2a81d94843caf2391c21fa9e2e3",
+    "target/data-cases-bundle/lib/System.Runtime.dll": "818e0147dd0a6fb4946a9ddca0b672e19902b9b6138cdee6ac9b9c07e25bf746",
+    "target/data-cases-bundle/lib/System.Data.dll": "7cfad8f6ca5e0cfc0cc13c15bdb8fc623280aa72fd6aad73a7aacdd586a9c150"
+  },
+  "sourceBaseRevision": "2936f7b1",
+  "focusedTests": {
+    "command": "CARGO_TARGET_DIR=target/scheduler-wait-validation cargo test --test runtime_async_yield --test scheduler_submission --test timers",
+    "passed": 13,
+    "failed": 0
+  }
+}
