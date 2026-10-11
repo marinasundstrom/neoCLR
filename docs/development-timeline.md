@@ -14637,3 +14637,14 @@ outside benchmark measurement. Implementation follows the configuration slice.
 - **Next design gate:** qualify concurrency/failure/shared-data/cleanup semantics with
   runtime schedulers before enabling parallel-by-default tests. See the
   [testing proposal](../runtime/raven/tests/README.md#parallel-execution-and-class-grouping--proposal-2026-10-11).
+
+
+### 2026-10-11 — Separate project documentation, then schedulers
+
+- **Author:** directed incremental migration of tests/benchmarks as needed, separate
+  project documentation covering runners and APIs, then scheduler work and suspension.
+- **Assistant action:** added independent testing/benchmark project guides and linked
+  on-site API references; recorded the latest sequencing on the roadmap. Existing
+  benchmark gaps remain follow-ups rather than an open-ended prerequisite.
+- **Next work:** inspect the existing private scheduler and choose the next bounded
+  ownership/dispatch slice. Runtime suspension and test parallelism are not yet implemented.

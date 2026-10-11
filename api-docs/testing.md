@@ -133,3 +133,6 @@ The existing three-argument overload registers an untagged test.
 matches. The CLI spelling is `--category <name>`; choose one of category, substring
 `--filter`, or exact `--id`. Empty input and unmatched selection return configuration
 exit code 2. Execution remains serial; categories are not concurrency constraints.
+
+See the [testing project guide](https://github.com/marinasundstrom/neoCLR/blob/main/tools/testing/README.md)
+for build/discovery commands, runner selection and project ownership.

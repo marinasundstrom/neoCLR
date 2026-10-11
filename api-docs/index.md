@@ -50,7 +50,8 @@ These references are for runtime control, host integration and compiler tooling:
 
 - [Garbage collection](gc.md): object counters, explicit collection and KeepAlive.
 - [Runtime failures](faults.md): terminal faults and host diagnostics.
-- [Raven testing helpers](testing.md): development TestAttribute, discovery and runner contracts.
+- [Raven testing project](testing.md): development test APIs, data, categories and runner contracts.
+- [Raven benchmarking project](benchmarking.md): independent benchmark APIs, argument rows and worker contracts.
 - [Runtime hosting](runtime-hosting.md): experimental Object-root load contexts.
 - [.NET metadata tooling](experimental-metadata.md): the host library for reading
   and writing native metadata; this is not an application API.

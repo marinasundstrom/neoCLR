@@ -1753,3 +1753,12 @@ and iterator semantics. The CLI facade uses special-name static accessors; nativ
 import reconstructs indexers from native methods. System.Collections is an extension
 namespace for receiver-page browsing. No public type or member is excluded for this
 slice; the internal SpecialNameAttribute exists only in the aggregate C# facade.
+
+
+## Independent testing and benchmarking tooling (2026-10-11)
+
+The source-included NeoClr.Testing and NeoClr.Benchmarking projects are not members
+of the distributed runtime reference assembly. Their manual references are
+[testing](testing.md) and [benchmarking](benchmarking.md), linked from the API index.
+They cover public attribute constructors and the assembly-internal suite/runner
+contracts. No runtime type is silently excluded from RavenDoc for this tooling.

@@ -8,6 +8,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-11
 
+- Document testing and benchmarking as independent development projects, including
+  ownership, APIs, runner commands, selection, configuration, reports and limitations.
+  Add the benchmark manual API reference and link both projects from the API index.
+  Record the author-directed sequence: scheduler work next, then runtime suspension;
+  further framework features and migrations remain demand-driven.
+
 - Add repeatable test `CategoryAttribute`, per-row category inheritance, manual
   registration categories and exact case-sensitive `--category` selection.
   Empty/unmatched category selections fail configuration. Record future parallel

@@ -71,16 +71,19 @@ correctness checks; it does not implement internal operation timing.
 
 Attribute-driven module-function discovery now uses native metadata introspection
 and generates typed registrations for AOT reachability. Final assembly rediscovery
-checks the generated contract; manual registration remains available. The current
-worker signature remains parameterless `int`, with token `1` for success.
+checks the generated contract; manual registration remains available. Workers return `int`, with token `1` for success; independent argument attributes
+now supply inline scalar rows or typed array source inputs.
 
 Typed JSON objects and collection mapping remain next, followed by a qualified
 monotonic clock and internal measurement, async callbacks and setup/cleanup. These are still gaps relative to BenchmarkDotNet, not new
-permanent semantics. This work stays within the benchmark gate before schedulers
-and runtime-managed suspension.
+permanent semantics. These remain benchmark follow-ups. The author subsequently directed documenting
+the independent projects, then continuing scheduler work and suspension; completing
+every framework feature is no longer a prerequisite for that next slice.
 
 Configuration now selects external startup, batch latency, batch throughput or
 first invocation after setup, with manifest/config/CLI precedence and recorded
 effective settings. Internal timing, diagnostics and concurrency remain gaps.
 The author additionally requests inline input data or a named data source for both
-tests and benchmarks, with every input row a distinct case; this is the next layer.
+tests and benchmarks, with every input row a distinct case; that bounded layer is implemented.
+See the [benchmark project guide](../tools/benchmarking/README.md) and separate
+[testing project guide](../tools/testing/README.md).
