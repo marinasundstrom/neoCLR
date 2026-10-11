@@ -2363,8 +2363,7 @@ fn interpret_instructions_with_dispatch(
                     continue;
                 }
             }
-            let completion =
-                scheduler.completion_state(heap, default_task_queue.as_ref(), options)?;
+            let completion = scheduler.completion_state(heap, options)?;
             let (native_running, revision) = invocation.work.activity();
             if completion == crate::scheduler::CompletionState::Pending
                 || (work_control.is_none()
@@ -2383,7 +2382,10 @@ fn interpret_instructions_with_dispatch(
                 return Ok(InstructionProgress::Waiting);
             }
             if completion == crate::scheduler::CompletionState::Ready {
-                scheduler.install_ready(|queue, callback| {
+                scheduler.install_ready(|destination, callback| {
+                    let queue = destination
+                        .or(default_task_queue.as_ref())
+                        .ok_or_else(|| Fault::new("Missing default TaskQueue adapter"))?;
                     if frames.len() >= limits.frames {
                         return Err(Fault::coded(
                             crate::FaultCode::StackOverflow,
@@ -4902,7 +4904,8 @@ fn interpret_instructions_with_dispatch(
                             && target.parameters.is_empty())
                             && scheduler.poll(heap, queue)?
                         {
-                            scheduler.install_ready(|queue, callback| {
+                            scheduler.install_ready(|destination, callback| {
+                                let queue = destination.unwrap_or(queue);
                                 frames.push(completion_notification_frame(
                                     module,
                                     queue.clone(),

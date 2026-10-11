@@ -36,8 +36,9 @@ class grouping are proposals to develop with scheduling, not enabled behavior.
 details. Migrate away from the visible TaskQueue dependency; do not rename it into
 an application-facing Scheduler. The next [routing migration](runtime-scheduling-design.md#queue-independent-scheduling--2026-10-11)
 separates runtime-owned continuation destinations from producer queues, with coordinated
-consumer/API migration. Current public TaskQueue behavior remains implemented until
-that replacement is qualified.
+consumer/API migration. Interpreter completion admission now retains invocation-owned ready work without a
+queue binding; its VM dispatch adapter still resolves the default queue at installation.
+Current public TaskQueue behavior remains implemented until the replacement is qualified.
 
 **Common language runtime clarification (2026-10-11):** the primary target is managed
 languages running bytecode through the interpreter or JIT, with native AOT as the

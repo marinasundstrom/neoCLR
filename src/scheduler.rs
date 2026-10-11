@@ -118,10 +118,10 @@ impl Arbitration {
 }
 
 /// Owned runnable registration for the current callback adapter. The destination
-/// is explicit even though only the invocation's default queue is supported today.
+/// is absent for invocation-owned work; explicit queues belong to the legacy adapter.
 struct Ready {
     callback: Value,
-    destination: Value,
+    destination: Option<Value>,
 }
 
 #[derive(Debug, PartialEq)]
@@ -188,7 +188,9 @@ impl Scheduler {
     pub(crate) fn trace_roots(&self, roots: &mut Vec<usize>) {
         if let Some(ready) = &self.ready {
             crate::gc::trace(&ready.callback, roots);
-            crate::gc::trace(&ready.destination, roots);
+            if let Some(destination) = &ready.destination {
+                crate::gc::trace(destination, roots);
+            }
         }
         Source::trace_roots(&self.workers, roots);
         Source::trace_roots(&self.sockets, roots);
@@ -196,14 +198,14 @@ impl Scheduler {
         Source::trace_roots(&self.timers, roots);
     }
 
-    fn stage(&mut self, callback: Value, destination: &Value) {
+    fn stage(&mut self, callback: Value, destination: Option<&Value>) {
         assert!(
             self.ready.is_none(),
             "ready work must be installed before admitting more"
         );
         self.ready = Some(Ready {
             callback,
-            destination: destination.clone(),
+            destination: destination.cloned(),
         });
     }
 
@@ -212,7 +214,7 @@ impl Scheduler {
             return Ok(true);
         }
         if let Progress::Ready(callback) = self.progress(heap)? {
-            self.stage(callback, destination);
+            self.stage(callback, Some(destination));
         }
         Ok(self.ready.is_some())
     }
@@ -221,7 +223,6 @@ impl Scheduler {
     pub(crate) fn completion_state(
         &mut self,
         heap: &ManagedHeap,
-        destination: Option<&Value>,
         options: &ExecutionOptions,
     ) -> Result<CompletionState, Fault> {
         options.check_cancellation("Worker.Completion", 0)?;
@@ -230,9 +231,7 @@ impl Scheduler {
         }
         match self.progress(heap)? {
             Progress::Ready(callback) => {
-                let destination =
-                    destination.ok_or_else(|| Fault::new("Missing default TaskQueue"))?;
-                self.stage(callback, destination);
+                self.stage(callback, None);
                 Ok(CompletionState::Ready)
             }
             Progress::Idle => Ok(CompletionState::Idle),
@@ -255,8 +254,17 @@ impl Scheduler {
         options: &ExecutionOptions,
     ) -> Result<bool, Fault> {
         loop {
-            match self.completion_state(heap, destination, options)? {
-                CompletionState::Ready => return Ok(true),
+            match self.completion_state(heap, options)? {
+                CompletionState::Ready => {
+                    // Test adapter: preserve an already-bound destination, or bind
+                    // newly admitted invocation work to this test's queue.
+                    if let Some(ready) = &mut self.ready {
+                        if ready.destination.is_none() {
+                            ready.destination = destination.cloned();
+                        }
+                    }
+                    return Ok(true);
+                }
                 CompletionState::Idle => return Ok(false),
                 CompletionState::Pending => self.park(),
             }
@@ -268,12 +276,12 @@ impl Scheduler {
     /// No source is polled while this slot is occupied.
     pub(crate) fn install_ready(
         &mut self,
-        install: impl FnOnce(&Value, &Value) -> Result<(), Fault>,
+        install: impl FnOnce(Option<&Value>, &Value) -> Result<(), Fault>,
     ) -> Result<bool, Fault> {
         let Some(ready) = &self.ready else {
             return Ok(false);
         };
-        install(&ready.destination, &ready.callback)?;
+        install(ready.destination.as_ref(), &ready.callback)?;
         self.ready = None;
         Ok(true)
     }
@@ -322,7 +330,7 @@ mod tests {
         assert!(scheduler.timers.cancel(early));
         assert_eq!(scheduler.wait_timeout(now, true), POLL_INTERVAL);
         assert!(scheduler.timers.cancel(late));
-        scheduler.stage(callback, &destination);
+        scheduler.stage(callback, Some(&destination));
         assert_eq!(scheduler.wait_timeout(now, true), Duration::ZERO);
         assert_eq!(scheduler.wait_timeout(now, false), POLL_INTERVAL);
         assert!(scheduler.install_ready(|_, _| Ok(())).unwrap());
@@ -452,7 +460,7 @@ mod tests {
         let mut active = vec![];
         scheduler
             .install_ready(|queue, callback| {
-                active.extend([queue.clone(), callback.clone()]);
+                active.extend([queue.unwrap().clone(), callback.clone()]);
                 Ok(())
             })
             .unwrap();
@@ -588,7 +596,7 @@ mod tests {
         let mut heap = ManagedHeap::default();
         let mut scheduler = Scheduler::default();
         let (callback, destination) = ready_graphs(&mut heap);
-        scheduler.stage(callback, &destination);
+        scheduler.stage(callback, Some(&destination));
         drop(destination);
         for _ in 0..100 {
             object(&mut heap, vec![]);
@@ -611,7 +619,7 @@ mod tests {
         assert!(
             scheduler
                 .install_ready(|queue, callback| {
-                    active.extend([queue.clone(), callback.clone()]);
+                    active.extend([queue.unwrap().clone(), callback.clone()]);
                     Ok(())
                 })
                 .unwrap()
@@ -633,10 +641,68 @@ mod tests {
     }
 
     #[test]
+    fn invocation_completion_needs_no_queue_and_survives_adapter_failure() {
+        let mut heap = ManagedHeap::default();
+        let mut scheduler = Scheduler::default();
+        let (callback, _) = ready_graphs(&mut heap);
+        scheduler.timers.start(0, callback, Instant::now()).unwrap();
+        assert_eq!(
+            scheduler
+                .completion_state(&heap, &Default::default())
+                .unwrap(),
+            CompletionState::Ready
+        );
+        collect(&mut heap, &scheduler, &[]);
+        assert_eq!(
+            heap.len(),
+            2,
+            "only the callback graph belongs to ready work"
+        );
+        assert!(
+            scheduler
+                .install_ready(|destination, _| {
+                    assert!(destination.is_none());
+                    Err(Fault::new("adapter unavailable"))
+                })
+                .is_err()
+        );
+        collect(&mut heap, &scheduler, &[]);
+        assert_eq!(heap.len(), 2);
+        // A later legacy poll must not rewrite an already-admitted destination.
+        assert!(scheduler.poll(&heap, &Value::Int32(99)).unwrap());
+        let mut active = vec![];
+        assert!(
+            scheduler
+                .install_ready(|destination, callback| {
+                    assert!(destination.is_none());
+                    active.push(callback.clone());
+                    Ok(())
+                })
+                .unwrap()
+        );
+        assert!(
+            !scheduler
+                .install_ready(|_, _| panic!("duplicate delivery"))
+                .unwrap()
+        );
+        collect(&mut heap, &scheduler, &active);
+        assert_eq!(heap.len(), 2);
+        active.clear();
+        collect(&mut heap, &scheduler, &active);
+        assert!(heap.is_empty());
+        assert_eq!(
+            scheduler
+                .completion_state(&heap, &Default::default())
+                .unwrap(),
+            CompletionState::Idle
+        );
+    }
+
+    #[test]
     fn occupied_ready_slot_preserves_destination_until_acknowledged() {
         let heap = ManagedHeap::default();
         let mut scheduler = Scheduler::default();
-        scheduler.stage(Value::Int32(1), &Value::Int32(2));
+        scheduler.stage(Value::Int32(1), Some(&Value::Int32(2)));
         assert!(scheduler.poll(&heap, &Value::Int32(99)).unwrap());
         assert!(
             scheduler
@@ -646,7 +712,7 @@ mod tests {
         assert!(
             scheduler
                 .install_ready(|destination, callback| {
-                    assert_eq!(*destination, Value::Int32(2));
+                    assert_eq!(destination, Some(&Value::Int32(2)));
                     assert_eq!(*callback, Value::Int32(1));
                     Ok(())
                 })
@@ -660,7 +726,7 @@ mod tests {
         let mut heap = ManagedHeap::default();
         let mut scheduler = Scheduler::default();
         let (callback, destination) = ready_graphs(&mut heap);
-        scheduler.stage(callback, &destination);
+        scheduler.stage(callback, Some(&destination));
         drop(destination);
         let token = crate::CancellationToken::new();
         token.cancel();

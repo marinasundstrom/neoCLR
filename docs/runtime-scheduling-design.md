@@ -731,3 +731,36 @@ not require preserving queue APIs, but changing source visibility alone would br
 existing generated consumers without supplying runtime-owned progress. The destination
 model must also admit later saved activations without depending on TaskQueue or Raven
 state-machine layout. Cross-mode wait policy and runtime suspension follow this boundary.
+
+
+## Invocation-owned completion admission — 2026-10-11
+
+The interpreter scheduler can now admit and retain a ready source callback without
+a managed TaskQueue destination. Invocation-owned work has no queue binding in its
+ready record. The existing VM dispatch adapter resolves the invocation's default
+queue only while installing the callback into a traced active frame. Explicit legacy
+queue-bound work remains rooted and retains its selected destination; polling through
+another adapter does not rewrite an occupied ready record.
+
+Previously completion admission polled the source and then required a default queue
+before storing its callback. An unavailable adapter could therefore reject already
+consumed source readiness before the scheduler retained it. Now installation failure
+leaves the callback rooted for retry or invocation teardown. A focused GC test proves
+queue-free admission, failed installation retention, later transfer to an active
+owner and no duplicate delivery. Shared-invocation ownership and guest timer checks
+preserve existing dispatch behavior.
+
+This is the first boundary in the queue-independent migration, not a new await-site
+routing contract. Promise still captures its producer queue, the current VM callback
+adapter still requires a default queue, and source registration may still require that
+adapter. Native hosts are unchanged. The existing .NET comparison's separation of
+completion and scheduling motivates this split: ready work need not own queue storage.
+The cost is an optional legacy destination and adapter-side resolution; no performance
+improvement is claimed. Public queue removal and runtime-owned continuation registration
+remain next work; completed/pending await semantics have not changed in this slice.
+
+
+Validation on macOS ARM64: `cargo test --lib scheduler::tests` (12),
+`cargo test --lib invocation::dispatch_tests` (2), and `cargo test --test timers` (3),
+using `CARGO_TARGET_DIR=target/scheduler-wait-validation`. These checks exercise the
+changed interpreter ownership boundary; unchanged JIT/AOT adapters were not rerun.

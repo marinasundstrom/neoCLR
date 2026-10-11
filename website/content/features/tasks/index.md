@@ -233,6 +233,8 @@ Scheduler API or runtime-managed async suspension. Callbacks must return for oth
 work to progress.
 Task queues are intended to become implementation details; the currently public
 TaskQueue remains a transitional API pending coordinated consumer migration.
+The interpreter scheduler can retain ready completions without a queue binding;
+its current dispatch adapter still uses the invocation's default queue.
 A pending await currently resumes through the producer queue; custom queue and UI
 affinity are not settled contracts. Ordinary worker joins can still block the queue.
 

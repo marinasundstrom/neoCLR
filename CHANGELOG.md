@@ -38,7 +38,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   deliveries; preserve guest faults and report completion-hook failures on teardown.
   Six native contracts, the legacy task-scope contract, timer success/fault consumers
   in interpreter/AOT/JIT and ten HTTP-host timer scenarios pass. Windows has not been
-  rerun for these slices.
+  rerun for these slices. Decouple interpreter completion admission from the managed
+  queue: retain invocation-owned ready callbacks before resolving the legacy dispatch
+  adapter, and preserve roots on failed installation. Explicit queue destinations and
+  current await behavior remain unchanged. Focused scheduler, shared-invocation and
+  guest timer checks validate ownership and dispatch; public queue removal is pending.
 
 - Document testing and benchmarking as independent development projects, including
   ownership, APIs, runner commands, selection, configuration, reports and limitations.

@@ -333,16 +333,15 @@ mod dispatch_tests {
         for _ in 0..100 {
             let mut heap = collector.enter();
             let mut dispatch = invocation.dispatch.lock().unwrap();
-            let queue = dispatch.default_task_queue.clone();
             let state = dispatch
                 .scheduler
-                .completion_state(&heap, queue.as_ref(), &Default::default())
+                .completion_state(&heap, &Default::default())
                 .unwrap();
             if state == crate::scheduler::CompletionState::Ready {
                 dispatch
                     .scheduler
                     .install_ready(|destination, callback| {
-                        assert_eq!(Some(destination), queue.as_ref());
+                        assert!(destination.is_none());
                         let Value::Function(callback) = callback else {
                             panic!()
                         };
