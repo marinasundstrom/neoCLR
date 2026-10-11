@@ -12,6 +12,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   bodies no longer claim synchronous execution. All three local execution modes
   still pass. Investigate generic generator rejection and identify native generic
   closure capture as a prerequisite; generic generator support remains unimplemented.
+  Qualify explicit typed generic closure storage and method binding for integer,
+  string and object captures across GC in interpreter/JIT/AOT.
 
 - Connect native Raven async `yield` and `yield from` to the retained-runtime POC.
   Qualify lazy demand-driven production, closed integer/string element types,

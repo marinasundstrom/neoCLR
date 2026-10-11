@@ -272,3 +272,32 @@ without the spurious warning, including pending producer cleanup.
 
 The diagnostic correction is Raven main `f5abf1dd0`, deliberately carried as native
 `273e3e3e1`. The executable report identifies the tested compiler binaries by hash.
+
+### Typed closure representation qualification (2026-10-11)
+
+`CheckGenericClosure` in the executable fixture uses an explicit `Capture<T>` class
+and returns its bound `Read` method from a generic factory. It checks integer, string
+and newly allocated object captures after GC, then checks two independently captured
+objects after another GC. The caller retains the callable, not the holder itself.
+The refreshed three-mode report passes interpreter, macOS ARM64 JIT and AOT with
+unchanged compiler `273e3e3e1`. This establishes typed generic storage, constructed
+method binding and captured-reference reachability for the intended representation.
+It is deliberately not a claim of synthesized generic closures or generic generators.
+
+The compiler follow-up must preserve scoped generic identity throughout synthesis:
+
+- Emit a generic closure owner with typed capture fields, analogous to a .NET
+  compiler's generic display class. Avoid an object-boxing workaround for T.
+- Remap enclosing method parameters into that owner's parameter scope in callback
+  signatures, local types, function shapes, field references and constructed calls.
+- Resolve callable references in that scope. The current emission table caches by
+  method symbol alone; a callback remapping cannot reuse a handle resolved in its
+  enclosing method's distinct generic scope.
+- Keep definition import independent of caller-scope substitution, and retain the
+  generic-owner guard until receiver captures and owner/method parameter collisions
+  have their own executable coverage.
+
+These are compiler implementation steps, not new runtime contracts. The portable
+emission planner involved here currently exists only on the native compiler line;
+this is not a reason to copy that experimental subsystem wholesale into Raven main.
+Any independently applicable general compiler fix still belongs on main first.

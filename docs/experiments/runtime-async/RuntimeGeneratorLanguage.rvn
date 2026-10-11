@@ -128,6 +128,39 @@ async func CheckIndependent() -> Task<()> {
     if counters.Disposals != 2 { System.Fail("Independent producers did not both clean up") }
 }
 
+// Explicit typed closure representation for the generic-producer prerequisite.
+// This tests native storage/binding; it does not synthesize a generic generator.
+class Capture<T> {
+    private val value: T
+    init(item: T) { value = item }
+    func Read() -> T => value
+}
+
+class Payload {
+    val Value: int
+    init(value: int) { Value = value }
+}
+
+func CaptureValue<T>(value: T) -> () -> T {
+    let holder = Capture<T>(value)
+    return holder.Read
+}
+
+func CheckGenericClosure() {
+    let number = CaptureValue(42)
+    let text = CaptureValue("generic closure")
+    let reference = CaptureValue(Payload(73))
+    System.Runtime.GC.Collect()
+    if number() != 42 || text() != "generic closure" || reference().Value != 73 {
+        System.Fail("Typed generic closure lost its captured value")
+    }
+    let other = CaptureValue(Payload(19))
+    System.Runtime.GC.Collect()
+    if reference().Value != 73 || other().Value != 19 {
+        System.Fail("Typed generic closures did not retain independent captures")
+    }
+}
+
 async func Words() -> AsyncIterable<string> {
     yield "alpha"
     yield "beta"
@@ -239,6 +272,7 @@ async func Main() -> Task<int> {
     for scenario in 0..4 {
         await CheckPendingCleanup(scenario)
     }
+    CheckGenericClosure()
     await CheckShapes()
     await CheckDelegation(false)
     await CheckDelegation(true)
