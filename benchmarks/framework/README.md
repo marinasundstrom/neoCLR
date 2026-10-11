@@ -84,7 +84,9 @@ The marker derives from `System.Attribute` and uses
 `init(description: string)`; `var Description: string { get; set; }` also accepts
 `[Benchmark(Description: "text")]`. Empty descriptions use the qualified function
 name. Description is display metadata; exact filtering uses the qualified name.
-Manual `suite.Add` remains available alongside discovered functions.
+Manual `suite.Add` remains available alongside discovered functions. Add
+`--manual-case <selector>` when preparing a mixed manifest; it can be repeated,
+but empty or duplicate selectors fail preparation.
 
 Preparation with `--discover` compiles an inspection assembly, reads native custom
 attributes through the metadata introspection API, writes a typed Raven registry,

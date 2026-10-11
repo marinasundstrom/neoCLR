@@ -1,0 +1,416 @@
+{
+  "schemaVersion": 1,
+  "passed": true,
+  "platform": "macOS-27.0-arm64-arm-64bit",
+  "measurement": "External batch latency including protocol, correctness checks and scheduling; not internal operation timing",
+  "rounds": 3,
+  "warmupsPerProcess": 2,
+  "operationsPerProcess": 8,
+  "inputs": {
+    "/Users/robert/Projects/neoclr/benchmarks/json/prepare.py": "47cfe2a92de767fc09d87307304e3ac129ca5cfca0fbe74c871633ce52dd1d72",
+    "/Users/robert/Projects/neoclr/benchmarks/framework/Worker.rvn": "0324fc4f16c7385d22355d9172d6d57c6040a6ea04e796bb4779b5aafb387eaa",
+    "/Users/robert/Projects/neoclr/target/jit-cli-http-final/validation.json": "c65b2d8da9990e46b8e36021a34bc1e7ec08692f6c03fe820e2d2cdbf3938e00",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/Mono.Cecil.Rocks.dll": "bf992f3dce364ebcc3200fa7832ef07e20b4e2dbc3a8a6213ce44e3d239db984",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.runtimeconfig.dev.json": "390b440c4369250a4846d0481f6f5a8d14af4a5160c17535bc03f13a9021fb0d",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/Microsoft.NET.HostModel.dll": "be876d9f53ad634fad4a61afd7e4aef99dbca8fe276bbf746d31270dbbe83163",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/test.runtimeconfig.json": "d093ce9035033b5e5815db98bc0e0fe667311b1109bfeff2ffa2394ef059290d",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/System.Reflection.MetadataLoadContext.dll": "8c0deb266f0a90c312770a3db68667d0fae3b30967c2bfa27e17d3668fcf9809",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/RavenDoc.dll": "3a42176fca91bfee573c3aa88eda00025057fdbb713d8a3eb792b740c0ca7cef",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/Microsoft.Build.Locator.dll": "fce7cf90fb4f26fe5a84adb24285d92be9a4285fdb314f775a258ba9de08bdcc",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/Microsoft.CodeAnalysis.CSharp.dll": "cfb5f2785c30485eda803d58fb8330d737cb07d469cd3d7bc1113d58e8d8e4bb",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/Spectre.Console.dll": "c97e65cb2d73dc4eb50bc372a0fbc4368ee60ed56e179d0466a606d5955f2118",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/Raven.CodeAnalysis.Console.dll": "7139df2929c08168de93e9ba39a84797302fe2714762cb84b98562814a8ab05c",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/RavenDoc.runtimeconfig.json": "f9bc8e9f0c46247078ed47309f19a7576b4b94e4300e9de0003917d6bd2d667a",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/NeoCLR.Metadata.Experimental.dll": "7cc4cce25463b8f456d8a4295a025a6e076a6ccf34a6f6a8cb8d52b9e8852344",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/test.dll": "f45312365076c080282997d42703848c7c1dbbfdb13e991b7059c6423a5ca4a2",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll": "ffea7882e8dc83809aaa732db52532b6e65a92ed4f592fa4fc6b5d8d5bd5470a",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/Markdig.dll": "a4f94bc5f64010db760f063afc1c1ae7a9a67bb714d96eab2e2773fcc2670d18",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/Raven.CodeAnalysis.NeoClr.dll": "4d6b85ea9d806f8246de2bb3821e9dbc015ab5a660076bc2eea8b625c5b1cd4b",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/Mono.Cecil.dll": "831dca77470d85cb6ffbea3072daa7a3df5b7c9fcfd9c3f43674a9be99d4bfcf",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/Raven.CodeAnalysis.dll": "95ed8ee6331921fcff012dea0b9b914ffb94e6688a8f242ce2cf52d99809ef82",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/YamlDotNet.dll": "86f873f682c619a0c24e263dcdd15fe027104666641c92f503516671d61edda6",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/RavenDoc.runtimeconfig.dev.json": "390b440c4369250a4846d0481f6f5a8d14af4a5160c17535bc03f13a9021fb0d",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/Microsoft.CodeAnalysis.dll": "0a7fb1d94e0e7f46798b138caa67e5d5fb8fb98fd31b5294c917def057ab3d80",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.runtimeconfig.json": "f9bc8e9f0c46247078ed47309f19a7576b4b94e4300e9de0003917d6bd2d667a",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.deps.json": "7621edafdabdd0c79fbd2c6be11a731e5e0306d9b648e1782d7efe382b2d6375",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/Mono.Cecil.Pdb.dll": "a332332633fbcb20e8d50e49b4db7bd1557721417122cf0c5f4c42f2332391d0",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/RavenDoc.deps.json": "86b64cc73934a87e38386ce69d2c19c5926eb9008f46297d0200037c17d1ff6a",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/Mono.Cecil.Mdb.dll": "28cb367972bdc1cd43e4006306af2fd96d37f4ed4b239ee90e1dc7237a93af7f",
+    "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang": "be5518e9c6736cda8dfc3486ce11e8112a2e08045084260691cf41f57a653f59",
+    "/Users/robert/Projects/neoclr/docs/experiments/jit-managed/host.c": "f78acb4413e983c5257aa30e1b36bca5ded1d8e7a6f121c625c387a67ef9467f",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-console/root-probe.c": "0e1bcdb4f08228de74f4b97ea80e83190ed7bb55dc0c55a31f11b470bdb86a7a",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-gc.c": "dfe3e554913e625e86f2a260e96999934fcf55b980c7c9e1a8dbf26dae4c6f10",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-console/text-arena.c": "1e845dc0c0622247ca8eb18c222c6cfcc7638e603551634a12493787026c77be",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-console/console.c": "fdc9b345a77b347dba16561394dd9f0ae8bb270478ccfb7d6fed3071404e1769",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-stack.c": "e0d472372663f9c15b131144a83a451ef321342a397f93b61f4db8125e703502",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-scalar/console.c": "e1caabedff378df882385fd05325f635732e91b968d8dc987e5734fee26e49ae",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-fault-details/render.c": "f1e561bfb6b73ac3e4a7078d5bc9e9905eea9637f545ac3178273698d08efb96",
+    "/Users/robert/Projects/neoclr/tools/native/entry-arguments.c": "4fdc632b75d590057fad61e42fe6526b8278b60d908cc0467bb611d7a0c582a3",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-console/string-unicode.c": "80dadd71e3df0bc16f4082a209bc7c37bb07a85ccddb6350c9ee3cf2254399fe",
+    "/Users/robert/Projects/neoclr/tools/aot-native-text/target/text-only/aarch64-apple-darwin/release/libneoclr_aot_native_text.a": "8dbbf86e3cdf0659d73d8d5a9aa277cbc0ac5e95b99a1ff15e5974ce5d9169ad",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-console/task-queue.c": "9f7b3800fa6778867c9d7af9bbb791c64287a9b0aeb419bee03a08de81757aac",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-console/socket-listener.c": "2170ca6ee0fb2c2249dd5407dd9d0b29047256381a005d2c1b18dd134cb7db14",
+    "/Users/robert/Projects/neoclr/target/extension-indexer-final-bundle/lib/Core.dll": "3d4a676d379067c18a65a9beb8257ed40bf3196fc643a9ba1d559c619ec73fad",
+    "/Users/robert/Projects/neoclr/target/extension-indexer-final-bundle/lib/System.runtime.neox": "98a1ae1da85387c87746957e83a4015eb59d0566539a915c69f168d2b511b190",
+    "/Users/robert/Projects/neoclr/target/extension-indexer-final-bundle/lib/ownership.json": "b6776991106e1682db4b9ddd2e16b938b965433f59f6f39d98ef0e2d93fc6527",
+    "/Users/robert/Projects/neoclr/target/extension-indexer-final-bundle/lib/System.Runtime.dll": "818e0147dd0a6fb4946a9ddca0b672e19902b9b6138cdee6ac9b9c07e25bf746",
+    "/Users/robert/Projects/neoclr/target/extension-indexer-final-bundle/lib/System.Data.dll": "7cfad8f6ca5e0cfc0cc13c15bdb8fc623280aa72fd6aad73a7aacdd586a9c150",
+    "/Users/robert/Projects/neoclr/target/extension-indexer-final-bundle/lib/System.Networking.dll": "ec3b383eee5f202f0badeb48ad775df16de1b2a81d94843caf2391c21fa9e2e3",
+    "/Users/robert/Projects/neoclr/target/extension-indexer-final-bundle/lib/System.Web.dll": "edcae392b0cd0a4562680408830a931ad2bf92e5280157da16afd8967103474c",
+    "/Users/robert/Projects/neoclr/benchmarks/json/Nodes.rvn": "47707c37ae17f20aac0aa494a0dfa56ef1df2b6ad3906447d8653e2a23894747",
+    "/Users/robert/Projects/neoclr/benchmarks/framework/BenchmarkAttribute.rvn": "7ed70e62aa55bb60c622f033cc61053bd1ca20741923417609eb98734f43ad0c",
+    "/Users/robert/Projects/neoclr/target/benchmark-json-discovered/BenchmarkRegistry.rvn": "7c765303282a6100c5f6d5bc0814d34cfd80c8662c14abb93458cf82b5e448f3",
+    "/Users/robert/Projects/neoclr/target/benchmark-json-discovered/benchmarks.json": "d60837ccfac9b237ff5e11cc50b072e687df7279604be68ffa0a7c65730a056d",
+    "/Users/robert/Projects/neoclr/tools/benchmarking/NeoCLR.BenchmarkDiscovery/NeoCLR.BenchmarkDiscovery.csproj": "87d0d17b301773d1a73666a6163a6049a06319ea651b9b9c9df34e199707f4ee",
+    "/Users/robert/Projects/neoclr/tools/benchmarking/NeoCLR.BenchmarkDiscovery/Program.cs": "4b7562abbc4303a64b9ad6d68d12422942626ccfe9840ef1a9027e6a9514b9d1",
+    "/Users/robert/Projects/neoclr/tools/aot-poc/target/release/neoclr-aot-poc": "ed23c7b8a55737030567996ca2366559d61203373ea0eb8228d482ed8bee0919",
+    "/Users/robert/Projects/neoclr/target/benchmark-json-discovered/app.dll": "f756747c90b091ebb861c4a3ec0abf538b951e21db8b1cb9617049a9d66f8d20",
+    "/Users/robert/Projects/neoclr/target/benchmark-json-discovered/app.o": "816db0951771b83b3bc539d82450c4d32c3d598b1ca258f8367c5cdf826f5a4f",
+    "/Users/robert/Projects/neoclr/target/benchmark-json-discovered/main.c": "caccd6032a5733b0d9fc38594f4785918323f2b552ed3c67b7038a73210f3f5c",
+    "/Users/robert/Projects/neoclr/target/release/neoclr": "06be444734540b96b8c4fb6ecbe484c902682ca1b2a4e03f8e284c82b0b102aa",
+    "/Users/robert/Projects/neoclr/target/benchmark-json-discovered/host.dylib": "e7548098610f16e01010385d463adabc043dc7e992c548b57b811f6c613b8e2e",
+    "/Users/robert/Projects/neoclr/target/benchmark-json-discovered/app": "3c8c0c1f9ff01c4cf84d026a9cac78a375ef7b4243837ca0ea819fb7b9565af9",
+    "/Users/robert/Projects/neoclr/target/benchmark-json-discovered/manifest.json": "ead5a28f9af340199f59529a113b35889e48b08f22e1ed215e266a382bc84079",
+    "/Users/robert/Projects/neoclr/benchmarks/framework/runner.py": "b479388d615a721e71be7024fca349473a43c8fa6a3da201cf9176bcb2c1db96",
+    "/Users/robert/Projects/neoclr/benchmarks/framework/process.py": "fa5839581c84495ace693b7aabd262446df792934602ba7d7d23d7030622cad1"
+  },
+  "commands": {
+    "jit": [
+      "/Users/robert/Projects/neoclr/target/release/neoclr",
+      "run",
+      "/Users/robert/Projects/neoclr/target/benchmark-json-discovered/app.dll",
+      "--execution",
+      "jit",
+      "--jit-compiler",
+      "/Users/robert/Projects/neoclr/tools/aot-poc/target/release/neoclr-aot-poc",
+      "--jit-host",
+      "/Users/robert/Projects/neoclr/target/benchmark-json-discovered/host.dylib",
+      "--system",
+      "/Users/robert/Projects/neoclr/target/extension-indexer-final-bundle/lib/System.runtime.neox",
+      "--object-root",
+      "/Users/robert/Projects/neoclr/target/extension-indexer-final-bundle/lib/System.Runtime.dll",
+      "--module",
+      "/Users/robert/Projects/neoclr/target/extension-indexer-final-bundle/lib/System.Runtime.dll",
+      "--module",
+      "/Users/robert/Projects/neoclr/target/extension-indexer-final-bundle/lib/System.Data.dll",
+      "--module",
+      "/Users/robert/Projects/neoclr/target/extension-indexer-final-bundle/lib/System.Networking.dll",
+      "--module",
+      "/Users/robert/Projects/neoclr/target/extension-indexer-final-bundle/lib/System.Web.dll"
+    ],
+    "aot": [
+      "/Users/robert/Projects/neoclr/target/benchmark-json-discovered/app"
+    ],
+    "interpreter": [
+      "/Users/robert/Projects/neoclr/target/release/neoclr",
+      "run",
+      "/Users/robert/Projects/neoclr/target/benchmark-json-discovered/app.dll",
+      "--system",
+      "/Users/robert/Projects/neoclr/target/extension-indexer-final-bundle/lib/System.runtime.neox",
+      "--object-root",
+      "/Users/robert/Projects/neoclr/target/extension-indexer-final-bundle/lib/System.Runtime.dll",
+      "--module",
+      "/Users/robert/Projects/neoclr/target/extension-indexer-final-bundle/lib/System.Runtime.dll",
+      "--module",
+      "/Users/robert/Projects/neoclr/target/extension-indexer-final-bundle/lib/System.Data.dll",
+      "--module",
+      "/Users/robert/Projects/neoclr/target/extension-indexer-final-bundle/lib/System.Networking.dll",
+      "--module",
+      "/Users/robert/Projects/neoclr/target/extension-indexer-final-bundle/lib/System.Web.dll",
+      "--instructions",
+      "100000000",
+      "--execution",
+      "interpreter"
+    ]
+  },
+  "samples": [
+    {
+      "startupSeconds": 2.09909675,
+      "warmupSeconds": 0.4133982920000001,
+      "batchSeconds": 1.66795225,
+      "operations": 8,
+      "operationsPerSecond": 4.796300373706742,
+      "case": "Benchmarks.Json.DeserializeNodes",
+      "mode": "interpreter",
+      "round": 0
+    },
+    {
+      "startupSeconds": 1.9144441250000002,
+      "warmupSeconds": 0.011041957999999852,
+      "batchSeconds": 0.04516375000000039,
+      "operations": 8,
+      "operationsPerSecond": 177.13320970911252,
+      "case": "Benchmarks.Json.DeserializeNodes",
+      "mode": "jit",
+      "round": 0
+    },
+    {
+      "startupSeconds": 0.19342362499999943,
+      "warmupSeconds": 0.010717957999999861,
+      "batchSeconds": 0.04247825000000027,
+      "operations": 8,
+      "operationsPerSecond": 188.331675622229,
+      "case": "Benchmarks.Json.DeserializeNodes",
+      "mode": "aot",
+      "round": 0
+    },
+    {
+      "startupSeconds": 2.0675454170000007,
+      "warmupSeconds": 0.43684920799999993,
+      "batchSeconds": 1.7086157499999999,
+      "operations": 8,
+      "operationsPerSecond": 4.682152789472999,
+      "case": "json.nodes.serialize",
+      "mode": "interpreter",
+      "round": 0
+    },
+    {
+      "startupSeconds": 1.6919732920000001,
+      "warmupSeconds": 0.0081033330000011,
+      "batchSeconds": 0.0323517080000002,
+      "operations": 8,
+      "operationsPerSecond": 247.28215276918147,
+      "case": "json.nodes.serialize",
+      "mode": "jit",
+      "round": 0
+    },
+    {
+      "startupSeconds": 0.011124208000000024,
+      "warmupSeconds": 0.0080844589999991,
+      "batchSeconds": 0.03216058300000135,
+      "operations": 8,
+      "operationsPerSecond": 248.75170950724566,
+      "case": "json.nodes.serialize",
+      "mode": "aot",
+      "round": 0
+    },
+    {
+      "startupSeconds": 1.6787118340000013,
+      "warmupSeconds": 0.010310957999999815,
+      "batchSeconds": 0.04116316699999878,
+      "operations": 8,
+      "operationsPerSecond": 194.34850578917403,
+      "case": "Benchmarks.Json.DeserializeNodes",
+      "mode": "jit",
+      "round": 1
+    },
+    {
+      "startupSeconds": 0.011335708000000722,
+      "warmupSeconds": 0.010697499999999138,
+      "batchSeconds": 0.04177924999999938,
+      "operations": 8,
+      "operationsPerSecond": 191.4826139770369,
+      "case": "Benchmarks.Json.DeserializeNodes",
+      "mode": "aot",
+      "round": 1
+    },
+    {
+      "startupSeconds": 2.057403624999999,
+      "warmupSeconds": 0.41485025000000064,
+      "batchSeconds": 1.6643619170000008,
+      "operations": 8,
+      "operationsPerSecond": 4.806646870663766,
+      "case": "Benchmarks.Json.DeserializeNodes",
+      "mode": "interpreter",
+      "round": 1
+    },
+    {
+      "startupSeconds": 1.6804769999999998,
+      "warmupSeconds": 0.008129249999999644,
+      "batchSeconds": 0.03239229200000082,
+      "operations": 8,
+      "operationsPerSecond": 246.97233527037224,
+      "case": "json.nodes.serialize",
+      "mode": "jit",
+      "round": 1
+    },
+    {
+      "startupSeconds": 0.011747041999999652,
+      "warmupSeconds": 0.008373291000001615,
+      "batchSeconds": 0.03184983399999908,
+      "operations": 8,
+      "operationsPerSecond": 251.17870316059518,
+      "case": "json.nodes.serialize",
+      "mode": "aot",
+      "round": 1
+    },
+    {
+      "startupSeconds": 2.0530486250000024,
+      "warmupSeconds": 0.42928824999999904,
+      "batchSeconds": 1.695409625,
+      "operations": 8,
+      "operationsPerSecond": 4.718623677743955,
+      "case": "json.nodes.serialize",
+      "mode": "interpreter",
+      "round": 1
+    },
+    {
+      "startupSeconds": 0.010515791999999635,
+      "warmupSeconds": 0.010238167000000686,
+      "batchSeconds": 0.040644249999999715,
+      "operations": 8,
+      "operationsPerSecond": 196.8298098747069,
+      "case": "Benchmarks.Json.DeserializeNodes",
+      "mode": "aot",
+      "round": 2
+    },
+    {
+      "startupSeconds": 2.078614667,
+      "warmupSeconds": 0.41521320800000083,
+      "batchSeconds": 1.6690752919999987,
+      "operations": 8,
+      "operationsPerSecond": 4.793073169523622,
+      "case": "Benchmarks.Json.DeserializeNodes",
+      "mode": "interpreter",
+      "round": 2
+    },
+    {
+      "startupSeconds": 1.686493875,
+      "warmupSeconds": 0.010532041000001158,
+      "batchSeconds": 0.04192991700000093,
+      "operations": 8,
+      "operationsPerSecond": 190.79455845333115,
+      "case": "Benchmarks.Json.DeserializeNodes",
+      "mode": "jit",
+      "round": 2
+    },
+    {
+      "startupSeconds": 0.011747291999999021,
+      "warmupSeconds": 0.008454415999999298,
+      "batchSeconds": 0.031929375000000704,
+      "operations": 8,
+      "operationsPerSecond": 250.55297825277896,
+      "case": "json.nodes.serialize",
+      "mode": "aot",
+      "round": 2
+    },
+    {
+      "startupSeconds": 2.0504927090000002,
+      "warmupSeconds": 0.4247099999999975,
+      "batchSeconds": 1.7061848749999982,
+      "operations": 8,
+      "operationsPerSecond": 4.688823654001744,
+      "case": "json.nodes.serialize",
+      "mode": "interpreter",
+      "round": 2
+    },
+    {
+      "startupSeconds": 1.672097334,
+      "warmupSeconds": 0.008151875000002917,
+      "batchSeconds": 0.03281570800000111,
+      "operations": 8,
+      "operationsPerSecond": 243.7856894630989,
+      "case": "json.nodes.serialize",
+      "mode": "jit",
+      "round": 2
+    }
+  ],
+  "summary": {
+    "Benchmarks.Json.DeserializeNodes": {
+      "interpreter": {
+        "startupSeconds": {
+          "median": 2.078614667,
+          "minimum": 2.057403624999999,
+          "maximum": 2.09909675
+        },
+        "batchSeconds": {
+          "median": 1.66795225,
+          "minimum": 1.6643619170000008,
+          "maximum": 1.6690752919999987
+        },
+        "operationsPerSecond": {
+          "median": 4.796300373706742,
+          "minimum": 4.793073169523622,
+          "maximum": 4.806646870663766
+        }
+      },
+      "jit": {
+        "startupSeconds": {
+          "median": 1.686493875,
+          "minimum": 1.6787118340000013,
+          "maximum": 1.9144441250000002
+        },
+        "batchSeconds": {
+          "median": 0.04192991700000093,
+          "minimum": 0.04116316699999878,
+          "maximum": 0.04516375000000039
+        },
+        "operationsPerSecond": {
+          "median": 190.79455845333115,
+          "minimum": 177.13320970911252,
+          "maximum": 194.34850578917403
+        }
+      },
+      "aot": {
+        "startupSeconds": {
+          "median": 0.011335708000000722,
+          "minimum": 0.010515791999999635,
+          "maximum": 0.19342362499999943
+        },
+        "batchSeconds": {
+          "median": 0.04177924999999938,
+          "minimum": 0.040644249999999715,
+          "maximum": 0.04247825000000027
+        },
+        "operationsPerSecond": {
+          "median": 191.4826139770369,
+          "minimum": 188.331675622229,
+          "maximum": 196.8298098747069
+        }
+      }
+    },
+    "json.nodes.serialize": {
+      "interpreter": {
+        "startupSeconds": {
+          "median": 2.0530486250000024,
+          "minimum": 2.0504927090000002,
+          "maximum": 2.0675454170000007
+        },
+        "batchSeconds": {
+          "median": 1.7061848749999982,
+          "minimum": 1.695409625,
+          "maximum": 1.7086157499999999
+        },
+        "operationsPerSecond": {
+          "median": 4.688823654001744,
+          "minimum": 4.682152789472999,
+          "maximum": 4.718623677743955
+        }
+      },
+      "jit": {
+        "startupSeconds": {
+          "median": 1.6804769999999998,
+          "minimum": 1.672097334,
+          "maximum": 1.6919732920000001
+        },
+        "batchSeconds": {
+          "median": 0.03239229200000082,
+          "minimum": 0.0323517080000002,
+          "maximum": 0.03281570800000111
+        },
+        "operationsPerSecond": {
+          "median": 246.97233527037224,
+          "minimum": 243.7856894630989,
+          "maximum": 247.28215276918147
+        }
+      },
+      "aot": {
+        "startupSeconds": {
+          "median": 0.011747041999999652,
+          "minimum": 0.011124208000000024,
+          "maximum": 0.011747291999999021
+        },
+        "batchSeconds": {
+          "median": 0.031929375000000704,
+          "minimum": 0.03184983399999908,
+          "maximum": 0.03216058300000135
+        },
+        "operationsPerSecond": {
+          "median": 250.55297825277896,
+          "minimum": 248.75170950724566,
+          "maximum": 251.17870316059518
+        }
+      }
+    }
+  }
+}

@@ -8,6 +8,14 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-11
 
+- Use discovered `Benchmarks.Json.DeserializeNodes` in the JSON benchmark worker,
+  replacing its manual `json.nodes.deserialize` selector. Preparation accepts
+  explicit manual cases alongside discovered functions and rejects empty/duplicate
+  selectors. Serialization remains a captured callback to keep node preparation
+  outside measurement; native static storage/shared fixture support remains a gap.
+  The default node preparation now requires `--discover` and uses
+  `--manual-case json.nodes.serialize` to include both cases.
+
 - Add attribute-driven benchmark module-function discovery with optional
   descriptions. Native metadata introspection generates typed registrations and
   verifies the final assembly contract for AOT reachability; manual registration

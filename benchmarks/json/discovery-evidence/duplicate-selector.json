@@ -1,0 +1,7 @@
+{
+  "passed": true,
+  "manualSelector": "Benchmarks.Json.DeserializeNodes",
+  "error": "Empty or duplicate benchmark selector",
+  "manifestRemoved": true,
+  "registryRemoved": true
+}

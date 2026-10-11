@@ -1,0 +1,10 @@
+{
+  "assembly": "app",
+  "benchmarks": [
+    {
+      "id": "3:app15:Benchmarks.Json32:Benchmarks.Json.DeserializeNodes()",
+      "name": "Benchmarks.Json.DeserializeNodes",
+      "description": "Deserialize a nested Unicode JSON document"
+    }
+  ]
+}

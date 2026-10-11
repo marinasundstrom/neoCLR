@@ -21,7 +21,12 @@ def main():
     parser.add_argument('--output', type=Path, required=True)
     parser.add_argument('--source', type=Path, help='Alternative worker source')
     parser.add_argument('--discover', action='store_true', help='Discover BenchmarkAttribute module functions before final compilation')
+    parser.add_argument('--manual-case', action='append', default=[], help='Explicit manual selector to include alongside discovered functions')
     args = parser.parse_args()
+    if args.manual_case and not args.discover:
+        parser.error('--manual-case requires --discover')
+    if not args.source and not args.discover:
+        parser.error('The JSON node worker requires --discover --manual-case json.nodes.serialize')
     recipe = json.loads(args.recipe.read_text())
     if not recipe['passed'] or not recipe.get('jitViaRuntimeCli'):
         raise ValueError('Passing CLI HTTP recipe required')
@@ -99,8 +104,10 @@ def main():
             for part in command:
                 if Path(part).is_absolute() and Path(part).is_file():
                     report['inputs'].setdefault(part,sha(part))
-        manifest = dict(schemaVersion=1, commands=commands, inputs=report['inputs'],
-                        cases=[item['name'] for item in discovered['benchmarks']] if args.discover else ['json.nodes.serialize','json.nodes.deserialize'])
+        cases = [item['name'] for item in discovered['benchmarks']] + args.manual_case if args.discover else ['json.nodes.serialize','json.nodes.deserialize']
+        if any(not name for name in cases) or len(cases) != len(set(cases)):
+            raise ValueError('Empty or duplicate benchmark selector')
+        manifest = dict(schemaVersion=1, commands=commands, inputs=report['inputs'], cases=cases)
         (out/'manifest.json').write_text(json.dumps(manifest,indent=2)+'\n')
         report['passed']=True
     except Exception:

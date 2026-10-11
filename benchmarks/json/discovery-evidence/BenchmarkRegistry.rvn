@@ -1,0 +1,6 @@
+// Generated from native metadata. Do not edit.
+module NeoClr.Benchmarking
+
+func RegisterDiscoveredBenchmarks(suite: BenchmarkSuite) {
+    suite.Add("Benchmarks.Json.DeserializeNodes", Benchmarks.Json.DeserializeNodes)
+}

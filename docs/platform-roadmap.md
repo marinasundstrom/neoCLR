@@ -30,6 +30,8 @@ The [first benchmark runner](../benchmarks/framework/README.md) adds manually
 registered Raven workers and JSON node serialization/deserialization batches.
 Benchmark attributes now discover module functions through metadata and generate
 typed registrations, with final-assembly verification and AOT execution coverage.
+The JSON deserializer now uses discovery alongside manually registered serialization
+to preserve setup outside measurement; both pass all three modes.
 Typed-object/collection JSON and internal operation timing remain open.
 The author also requests a [BenchmarkDotNet-like framework](benchmarking-framework.md),
 combining external process orchestration with Raven workload measurement.

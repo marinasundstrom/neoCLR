@@ -14573,3 +14573,16 @@ including five rejections and a named-description function whose body would fail
 if executed during discovery. The final assembly's inventory and registration
 match the inspection build. This does not qualify Windows execution or new timing
 claims. [Evidence](../benchmarks/framework/discovery-evidence/validation.json).
+
+**JSON consumer follow-up:** the assistant migrates deserialization to the discovered
+`Benchmarks.Json.DeserializeNodes` module function and supports mixed discovered
+and explicit manual selectors in preparation. Serialization retains its captured
+prebuilt node: native static storage remains unsupported, and moving parsing into
+the measured body would change the workload. A shared setup/fixture contract remains
+open; this gap is not treated as a permanent .NET divergence. The old JSON timings
+remain historical rather than being reassigned to the changed source.
+
+**Outcome:** the mixed worker passes 18 processes across interpreter/JIT/AOT with
+144 measured operations and 36 warmups. A manual selector colliding with the
+discovered function is rejected and leaves no runnable registry/manifest.
+[Evidence](../benchmarks/json/discovery-evidence/results.json).
