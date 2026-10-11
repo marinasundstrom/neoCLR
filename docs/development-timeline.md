@@ -14952,3 +14952,24 @@ See [invocation evidence](experiments/runtime-async/start-validation.json).
   Separate intrinsic declarations avoid it; the compiler defect remains open. This
   is an adapter POC, not general awaiter support or compiler-native runtime await.
   [Evidence](experiments/runtime-async/language-await-validation.json).
+
+
+## 2026-10-11 — Raven branch ownership and awaiter binder regression
+
+- **Author question:** asked how `codex/internals-visible-to-main`,
+  `codex/source-object-metadata-resolution` and main relate.
+- **Assistant inspection:** the friend-assembly branch was fully contained in main;
+  the native compiler line had 527 unique commits versus 115 on main at the audit
+  (`e5b5e054a`/`2535c8706`). These are ancestry counts, not counts of distinct features;
+  cherry-picked equivalents may exist. Worktree folder names were misleading.
+  The assistant initially proposed deliberate reconciliation of the native line.
+- **Author correction:** “Good. We should keep the main and the neoclr branch separated”.
+  This supersedes earlier full-merge direction as the default compiler workflow.
+- **Assistant action/outcome:** recorded separate lines in repository guidance and
+  roadmap. Committed the general property/attribute binding fix on Raven main as
+  `d4c5e5128`, with 74 focused .NET tests passing. Native validation with main's driver
+  could not start because it lacks the native `neoclr` command. Retained the POC's
+  split-file workaround; no native qualification or branch merge was claimed.
+- **Open:** carry the bounded fix to the native compiler line and validate there,
+  then continue compiler-native await/Task integration and comparative measurements.
+  See the [bridge record](raven-cli-bridge.md#compiler-lines-and-property-binding-fix-2026-10-11).

@@ -8506,3 +8506,32 @@ awaiter type is added; author clarification favors the protocol over copying typ
 structure, retaining the self-awaiter until a separate policy wrapper is justified.
 
 Companion Raven shared-main documentation: `e5b5e054a` (documentation only).
+
+
+### Compiler lines and property binding fix (2026-10-11)
+
+The author directs keeping Raven main and the neoCLR compiler line separate.
+The native line is `codex/source-object-metadata-resolution` at `2535c8706`; it
+contains the native metadata/backend and `neoclr` driver command absent from the
+current main driver. `codex/internals-visible-to-main` at `76fb04c76` is already
+contained in main. Historical worktree names do not identify their current branch:
+`raven-internals-visible-to` hosts main, and `Raven` hosts the native line.
+No branches were merged, renamed or removed in this audit. General fixes can be
+carried between lines deliberately with separate target validation.
+
+Raven main `d4c5e5128` fixes a general compilation-unit binding recursion exposed by
+our awaiter readiness property. A property getter/initializer calling an attributed
+function in a later namespace could re-enter member registration before its scope
+was cached. Main now reuses that scope; obsolete diagnostics are retained. The
+reduced .NET-target case stack-overflowed before the fix; 74 focused attribute,
+obsolete, namespace/import/alias, multi-file and file-scoped codegen tests pass after it.
+Runtime Contract configuration, CLI signatures, await lowering and runtime defaults
+are unchanged. This is consistent with ordinary .NET attribute inspection, not a
+neoCLR semantic divergence.
+
+The native compiler bundle has not received this fix. An attempted qualification
+with main's driver stopped because that driver has no `neoclr` subcommand; it did
+not exercise native emission or execution. Keep `AwaitServices.rvn` separate in the
+POC, and retain the historical language-await evidence. Next is carrying the bounded
+binder correction to the native line and qualifying a same-file consumer there.
+No public runtime API, API snapshot or website capability claim changes.

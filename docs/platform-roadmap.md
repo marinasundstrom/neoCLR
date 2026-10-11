@@ -1,5 +1,10 @@
 # neoCLR platform roadmap
 
+**Compiler lines (2026-10-11):** the author directs keeping Raven main and the
+neoCLR compiler branch separate. General fixes can be carried across deliberately;
+main qualification does not qualify the native compiler bundle. See the
+[branch audit and binder fix](raven-cli-bridge.md#compiler-lines-and-property-binding-fix-2026-10-11).
+
 **Product and execution review (2026-10-11):** target simple, productive, fast native
 web/backend development with familiar C#/.NET ergonomics, future language support,
 and concurrency as a core capability. Evaluate suspension and green threads with

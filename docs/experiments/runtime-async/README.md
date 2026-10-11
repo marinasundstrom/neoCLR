@@ -264,7 +264,11 @@ registration races and native/JIT execution are not qualified.
 The bundled compiler recurses when the readiness property calls an attributed
 intrinsic declared in the same source file. Keeping the private declarations in
 `AwaitServices.rvn` avoids that binding cycle; this does not fix the compiler issue
-or establish a language restriction. The next native-await compiler contract must
+or establish a language restriction. Raven main now has the general binder fix
+(`d4c5e5128`, 74 focused .NET-target tests); the separate native compiler line/bundle
+still needs that fix and qualification. See the
+[branch audit](../../raven-cli-bridge.md#compiler-lines-and-property-binding-fix-2026-10-11).
+The next native-await compiler contract must
 preserve this awaiter behavior while replacing generated continuations with runtime
 activation resumption and supplying managed Task outcome/lifetime ownership.
 

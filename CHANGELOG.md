@@ -13,6 +13,9 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   before registration. The source-local adapter retains generated state machines;
   compiler-native runtime await, managed lifetime and native/JIT remain open. Keep
   the self-awaiter model rather than introducing a public wrapper without a need.
+  Record Raven main's property/attribute binder fix (`d4c5e5128`, 74 focused tests)
+  and the author's separate main/native compiler branch policy. Native integration
+  remains pending, so retain the consumer's split-file workaround.
 
 - Retain interpreter runtime-async POC outcomes for repeated awaits and multiple
   parked observers. Add guarded private terminal-handle release that cannot retract

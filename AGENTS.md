@@ -14,7 +14,9 @@
 
 ## Raven integration work
 
-- Develop shared Raven compiler fixes and target contracts on the shared line.
+- Keep Raven main and the neoCLR compiler branch separate (author direction,
+  2026-10-11). Develop general fixes on main and carry them deliberately to the
+  neoCLR line with its own validation; a full branch merge is not the default plan.
   Native Self integration is authorized. Keep structural Function experiments on
   feature branches in both repositories until native metadata/compiler support is ready.
 - Keep target-specific mappings and capability checks behind explicit contracts;
