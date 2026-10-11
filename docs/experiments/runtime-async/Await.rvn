@@ -1,0 +1,63 @@
+module RuntimeAsyncAwaitProbe {
+    import System.*
+
+    class Producer {
+        val Operation: long
+
+        init(operation: long) {
+            Operation = operation
+        }
+        var Value = 0
+
+        func Complete() -> System.Void {
+            // The producer suspends too, retaining its receiver until resumption.
+            let timer = neoCLR.Runtime.RuntimeAsyncDelay(20)
+            _ = neoCLR.Runtime.RuntimeAsyncAwait(timer)
+            System.Runtime.GC.Collect()
+            Value = 25
+            if !neoCLR.Runtime.RuntimeAsyncComplete(Operation, 17) {
+                System.Fail("Completion rejected")
+            }
+            return ()
+        }
+    }
+
+    func Nested(producer: Producer) -> int {
+        let saved = 7
+        let result = neoCLR.Runtime.RuntimeAsyncAwait(producer.Operation)
+        return saved + result + producer.Value
+    }
+
+    func Main() -> int {
+        let producer = Producer(neoCLR.Runtime.RuntimeAsyncCreate())
+        _ = neoCLR.Runtime.SchedulerSubmit(producer.Complete)
+        if Nested(producer) != 49 {
+            System.Fail("Suspended call chain lost its state")
+        }
+
+        let completed = neoCLR.Runtime.RuntimeAsyncCreate()
+        _ = neoCLR.Runtime.RuntimeAsyncComplete(completed, 42)
+        if neoCLR.Runtime.RuntimeAsyncAwait(completed) != 42 {
+            System.Fail("Already completed operation lost its result")
+        }
+        Console.WriteLine("PASS runtime-owned operation suspension and resumption")
+        return 0
+    }
+}
+
+module neoCLR.Runtime {
+    import System.Runtime.CompilerServices.*
+
+    // Private POC intrinsics. These ordinary calls intentionally test runtime
+    // frame retention without Raven async/state-machine lowering.
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    internal extern func RuntimeAsyncCreate() -> long;
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    internal extern func RuntimeAsyncDelay(milliseconds: int) -> long;
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    internal extern func RuntimeAsyncComplete(operation: long, result: int) -> bool;
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    internal extern func RuntimeAsyncAwait(operation: long) -> int;
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    internal extern func SchedulerSubmit(callback: () -> System.Void) -> int;
+}

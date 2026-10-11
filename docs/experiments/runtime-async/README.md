@@ -46,3 +46,88 @@ Detached interpreter activations and JIT/AOT frame/liveness contracts remain ope
 
 The public Task/Promise implementation, API reference and website capability claims
 remain unchanged; no public API is introduced by this experiment.
+
+## Operation-triggered suspension POC — 2026-10-11
+
+`Await.rvn` now demonstrates an ordinary nested function waiting for a producer.
+The producer itself waits on a 20 ms timer, forces GC, updates its receiver and
+completes the original operation with an integer result. Both ordinary call chains
+resume with their state intact. A second case consumes an already completed result.
+There are no async methods or generated state machines in this consumer. Explicit
+private calls are intentional here; user-facing asynchronous code should still use
+`await` with the supported managed Task implementation.
+
+The private services are:
+
+| Service | Result | POC behavior |
+| --- | --- | --- |
+| `RuntimeAsyncCreate()` | Int64 | Create a pending integer-result operation. |
+| `RuntimeAsyncDelay(Int32 milliseconds)` | Int64 | Create a nonnegative monotonic timer; completion yields zero. |
+| `RuntimeAsyncComplete(Int64 id, Int32 value)` | Boolean | Complete a pending manual operation once; false for invalid/terminal/timer handles. |
+| `RuntimeAsyncCancel(Int64 id)` | Boolean | Cancel a pending manual/timer operation once. |
+| `RuntimeAsyncAwait(Int64 id)` | Int32 | Retain frames until ready, consume once, or fault on cancellation. |
+
+These are context-owned tokens, not Task replacements. In particular, public Task
+multiple-await behavior must remain supported when projections are integrated.
+Completed-before-wait results use the same boundary without parking. Pending checks,
+callback completion and boundary installation serialize on the dispatcher; there is
+no asynchronous host producer ABI yet. Unknown, consumed and recursively awaited
+handles fault. Completion cannot overwrite cancellation. Cancelled operations fault
+the invocation with ExecutionCancelled; no recoverable managed cancellation outcome
+is introduced. Timer readiness is observed lazily by the wait; cancellation can win
+before that observation. Timer handles reject explicit producer completion.
+
+Pending execution returns `InstructionProgress::Waiting`, publishes roots and releases
+the managed graph guard before host parking. The durable wake latch covers newly
+submitted callbacks; waits use the smaller of the timer deadline and the existing
+10 ms cancellation polling bound. Tests directly step the VM to prove that repeated
+pending checks preserve frames without spending guest instruction budget.
+
+### Validation
+
+The compiled Raven consumer passes on macOS ARM64, alongside 25 focused checks:
+22 integration tests and three library checks for host return/resumption, context
+ownership, quotas and timer terminal states. See [operation-wait evidence](await-validation.json).
+This qualifies the interpreter POC only; no Windows/native result is asserted.
+
+### Reproduce
+
+```sh
+CARGO_TARGET_DIR=target/scheduler-wait-validation cargo build --bin neoclr
+python3 docs/experiments/runtime-async/validate.py \
+  --bundle target/data-cases-bundle \
+  --runtime target/scheduler-wait-validation/debug/neoclr \
+  --output target/runtime-async-await
+```
+
+The script requires a previously verified matching Raven bundle. It records commands,
+source/runtime/compiler/reference hashes and output in its validation report. Focused
+checks are `cargo test --test runtime_async_await --test runtime_async_yield
+--test scheduler_submission --test timers`, plus library filters
+`runtime_operation_await_returns_to_host` and `runtime_async::tests`.
+
+### Boundaries and next step
+
+This is an interpreter POC with integer results and at most 64 unconsumed operations
+per context. Abandoned operations live until context teardown; consumed slots are
+reusable. Worker execution and task mutation reject these services. A parked wait
+runs submitted callbacks, but does not pump the legacy I/O/default-TaskQueue adapter.
+It does not yet support real HTTP operation awaits or public Task projection.
+
+Frames are retained in LIFO order. If a nested callback parks, its parent cannot
+resume independently even when the parent's operation completes. This head-of-line
+blocking is a concrete reason to investigate detached activations next. The probe
+proves runtime-owned parking/resumption, not scalable green threads. It also does
+not supply complete logical async traces, native/JIT frame maps or cross-thread
+completion rules. No throughput/latency improvement is claimed. Comparative
+state-machine benchmarks belong with an equivalent workload once these paths exist.
+
+The bundled Raven compiler recursed during binding when a property initializer
+called the source-local attributed intrinsic (an explicit property type did not
+fix it). Passing the operation into a constructor avoids that form. The compiler
+issue is tracked in both bridge documents for a separate minimized regression.
+Public API reference and website capabilities remain unchanged.
+
+The author subsequently clarified that green threads are the intended direction.
+Independent activation scheduling is therefore the next POC gate; native stack
+representation and preemption remain design questions, not established contracts.

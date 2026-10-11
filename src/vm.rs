@@ -1984,7 +1984,21 @@ fn drive_instructions(
                 Ok(InstructionProgress::Suspended) => continue,
                 Ok(InstructionProgress::Waiting) => {
                     drop(heap);
-                    state.invocation.park_dispatch(&state.dispatch_identity);
+                    if let Some(id) = state
+                        .yield_boundaries
+                        .last()
+                        .and_then(|boundary| boundary.operation)
+                    {
+                        // Private operation deadlines are not legacy callback sources.
+                        // The wake latch covers submissions after the pending check;
+                        // the bounded timeout also observes host cancellation.
+                        state
+                            .invocation
+                            .wake
+                            .park(state.async_operations.wait_timeout(id));
+                    } else {
+                        state.invocation.park_dispatch(&state.dispatch_identity);
+                    }
                 }
                 Ok(InstructionProgress::HostCall(mut call)) => {
                     drop(heap);
@@ -2096,6 +2110,13 @@ fn execution_roots(
     roots
 }
 
+struct RuntimeAsyncBoundary {
+    depth: usize,
+    dispatched: bool,
+    no_result: bool,
+    operation: Option<i64>,
+}
+
 /// State that survives an instruction-boundary suspension. File handles, interning
 /// budgets, scheduler and native memory share invocation ownership.
 struct InstructionState {
@@ -2104,8 +2125,8 @@ struct InstructionState {
     invocation: std::sync::Arc<crate::invocation::Invocation>,
     invocation_result: Option<Value>,
     entry_drain_depth: Option<usize>,
-    // Retained caller depth, callback dispatched, CLI no-result return.
-    yield_boundaries: Vec<(usize, bool, bool)>,
+    yield_boundaries: Vec<RuntimeAsyncBoundary>,
+    async_operations: crate::runtime_async::Operations,
     drain_required: bool,
     budget: std::sync::Arc<crate::invocation_budget::Budget>,
     completion_boundary: Option<Value>,
@@ -2130,6 +2151,7 @@ impl InstructionState {
             invocation_result: None,
             entry_drain_depth: None,
             yield_boundaries: Vec::new(),
+            async_operations: Default::default(),
             drain_required: true,
             budget,
             completion_boundary: None,
@@ -2310,6 +2332,7 @@ fn interpret_instructions_with_dispatch(
         invocation_result,
         entry_drain_depth,
         yield_boundaries,
+        async_operations,
         drain_required,
         budget,
         completion_boundary,
@@ -2339,37 +2362,78 @@ fn interpret_instructions_with_dispatch(
             }
         }
         if let Some(value) = completion_boundary.take() {
-            if let Some(&(depth, dispatched, no_result)) = yield_boundaries.last() {
-                options.check_cancellation("RuntimeAsyncYield", 0)?;
+            if let Some(&RuntimeAsyncBoundary {
+                depth,
+                dispatched,
+                no_result,
+                operation,
+            }) = yield_boundaries.last()
+            {
+                options.check_cancellation(
+                    if operation.is_some() {
+                        "RuntimeAsyncAwait"
+                    } else {
+                        "RuntimeAsyncYield"
+                    },
+                    0,
+                )?;
                 if !crate::invocation::Dispatch::claim_owner(owner, dispatch_identity) {
-                    heap.publish(execution_roots(frames, scheduler,
-                        default_task_queue.as_ref(), invocation_result.as_ref()))?;
+                    heap.publish(execution_roots(
+                        frames,
+                        scheduler,
+                        default_task_queue.as_ref(),
+                        invocation_result.as_ref(),
+                    ))?;
                     *completion_boundary = Some(value);
                     return Ok(InstructionProgress::Waiting);
                 }
                 if frames.len() != depth {
                     return Err(Fault::new("Invalid runtime yield boundary"));
                 }
-                if !dispatched && scheduler.install_submission(|callback| {
-                    if frames.len() >= limits.frames {
-                        return Err(Fault::coded(crate::FaultCode::StackOverflow, "frame limit exceeded"));
-                    }
-                    frames.push(runtime_submission_frame(module, callback)?);
-                    Ok(())
-                })? {
-                    yield_boundaries.last_mut().unwrap().1 = true;
+                let resumed = match operation {
+                    Some(id) => async_operations.take_ready(id)?.map(Value::Int32),
+                    None if dispatched => Some(Value::Void),
+                    None => None,
+                };
+                if resumed.is_none()
+                    && scheduler.install_submission(|callback| {
+                        if frames.len() >= limits.frames {
+                            return Err(Fault::coded(
+                                crate::FaultCode::StackOverflow,
+                                "frame limit exceeded",
+                            ));
+                        }
+                        frames.push(runtime_submission_frame(module, callback)?);
+                        Ok(())
+                    })?
+                {
+                    yield_boundaries.last_mut().unwrap().dispatched = true;
                     continue;
+                }
+                if operation.is_some() && resumed.is_none() {
+                    heap.publish(execution_roots(
+                        frames,
+                        scheduler,
+                        default_task_queue.as_ref(),
+                        invocation_result.as_ref(),
+                    ))?;
+                    *completion_boundary = Some(Value::Void);
+                    return Ok(InstructionProgress::Waiting);
                 }
                 // The interpreter kept the ordinary caller chain alive. Returning
                 // from the callback resumes at the instruction after the yield call.
                 yield_boundaries.pop();
-                let caller = frames.last_mut().ok_or_else(|| Fault::new("Missing runtime yield caller"))?;
+                let caller = frames
+                    .last_mut()
+                    .ok_or_else(|| Fault::new("Missing runtime yield caller"))?;
                 if !no_result && caller.stack.len() >= limits.stack {
-                    return Err(Fault::coded(crate::FaultCode::EvaluationStackOverflow,
-                        "evaluation stack limit exceeded"));
+                    return Err(Fault::coded(
+                        crate::FaultCode::EvaluationStackOverflow,
+                        "evaluation stack limit exceeded",
+                    ));
                 }
                 if !no_result {
-                    caller.stack.push(Value::Void);
+                    caller.stack.push(resumed.unwrap_or(Value::Void));
                 }
                 continue;
             }
@@ -3951,14 +4015,69 @@ fn interpret_instructions_with_dispatch(
                             return Ok(None);
                         }
 
-                        if matches!(binding, crate::native::Binding::RuntimeAsyncYield) {
+                        if matches!(
+                            binding,
+                            crate::native::Binding::RuntimeAsyncCreate
+                                | crate::native::Binding::RuntimeAsyncDelay
+                                | crate::native::Binding::RuntimeAsyncComplete
+                                | crate::native::Binding::RuntimeAsyncCancel
+                                | crate::native::Binding::RuntimeAsyncAwait
+                        ) {
                             if work_control.is_some() || task_atomic::active(module, frames) {
-                                return Err(Fault::new("Runtime yield is not supported in task mutation or worker execution"));
+                                return Err(Fault::new(
+                                    "Runtime async is not supported in task mutation or worker execution",
+                                ));
                             }
-                            yield_boundaries.push((frames.len(), false, callee.no_result));
-                            return Ok(Some(Value::Void));
+                            let result = match (binding, args.as_slice()) {
+                                (crate::native::Binding::RuntimeAsyncCreate, []) => {
+                                    Value::Int64(async_operations.create(None)?)
+                                }
+                                (crate::native::Binding::RuntimeAsyncDelay, [Value::Int32(ms)]) => {
+                                    Value::Int64(async_operations.create(Some(*ms))?)
+                                }
+                                (
+                                    crate::native::Binding::RuntimeAsyncComplete,
+                                    [Value::Int64(id), Value::Int32(value)],
+                                ) => Value::Boolean(async_operations.complete(*id, *value)),
+                                (crate::native::Binding::RuntimeAsyncCancel, [Value::Int64(id)]) => {
+                                    Value::Boolean(async_operations.cancel(*id))
+                                }
+                                (crate::native::Binding::RuntimeAsyncAwait, [Value::Int64(id)]) => {
+                                    async_operations.validate(*id)?;
+                                    if yield_boundaries
+                                        .iter()
+                                        .any(|boundary| boundary.operation == Some(*id))
+                                    {
+                                        return Err(Fault::new("Runtime async operation already has a waiter"));
+                                    }
+                                    yield_boundaries.push(RuntimeAsyncBoundary {
+                                        depth: frames.len(),
+                                        dispatched: false,
+                                        no_result: false,
+                                        operation: Some(*id),
+                                    });
+                                    return Ok(Some(Value::Void));
+                                }
+                                _ => return Err(Fault::new("Invalid runtime async arguments")),
+                            };
+                            frames.last_mut().unwrap().stack.push(result);
+                            return Ok(None);
                         }
 
+                        if matches!(binding, crate::native::Binding::RuntimeAsyncYield) {
+                            if work_control.is_some() || task_atomic::active(module, frames) {
+                                return Err(Fault::new(
+                                    "Runtime yield is not supported in task mutation or worker execution",
+                                ));
+                            }
+                            yield_boundaries.push(RuntimeAsyncBoundary {
+                                depth: frames.len(),
+                                dispatched: false,
+                                no_result: callee.no_result,
+                                operation: None,
+                            });
+                            return Ok(Some(Value::Void));
+                        }
                         if matches!(binding, crate::native::Binding::DrainEntryTasks) {
                             if entry_drain_depth.is_some() || work_control.is_some() || !yield_boundaries.is_empty() {
                                 return Err(Fault::new(

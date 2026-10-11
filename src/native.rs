@@ -51,6 +51,11 @@ pub(crate) enum Binding {
     RegisterDefaultTaskQueue,
     DrainEntryTasks,
     RuntimeAsyncYield,
+    RuntimeAsyncCreate,
+    RuntimeAsyncDelay,
+    RuntimeAsyncComplete,
+    RuntimeAsyncCancel,
+    RuntimeAsyncAwait,
     ScheduleTask,
     SchedulerSubmit,
     SchedulerCapture,
@@ -940,6 +945,11 @@ pub(crate) fn bind(function: &Function) -> Result<Binding, Fault> {
         {
             (Binding::ScheduleTask, Type::Void)
         }
+        ("neoCLR.Runtime.RuntimeAsyncCreate", []) => (Binding::RuntimeAsyncCreate, Type::Int64),
+        ("neoCLR.Runtime.RuntimeAsyncDelay", [Type::Int32]) => (Binding::RuntimeAsyncDelay, Type::Int64),
+        ("neoCLR.Runtime.RuntimeAsyncComplete", [Type::Int64, Type::Int32]) => (Binding::RuntimeAsyncComplete, Type::Boolean),
+        ("neoCLR.Runtime.RuntimeAsyncCancel", [Type::Int64]) => (Binding::RuntimeAsyncCancel, Type::Boolean),
+        ("neoCLR.Runtime.RuntimeAsyncAwait", [Type::Int64]) => (Binding::RuntimeAsyncAwait, Type::Int32),
         ("neoCLR.Runtime.RuntimeAsyncYield", []) => (Binding::RuntimeAsyncYield, Type::Void),
         ("neoCLR.Runtime.DrainEntryTasks", []) => (Binding::DrainEntryTasks, Type::Void),
         ("neoCLR.Runtime.DefaultTaskQueue", []) => (

@@ -8,6 +8,13 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-11
 
+- Extend the private interpreter runtime-async POC with context-owned integer-result
+  operations and timer waits. Park retained frames outside graph access, resume once,
+  and cover completed/pending outcomes, nested producer suspension, GC, cancellation,
+  stale handles and quotas. Native/JIT, public Task/HTTP integration and independently
+  resumable activations remain open; document retained-chain scheduling limitations
+  and the author-directed move toward green threads.
+
 - Add a private interpreter retained-frame yield experiment: dispatch at most one
   eligible callback, then resume ordinary callers with locals, evaluation stack,
   GC roots and resource charges intact. Cover callback faults, nested yields and

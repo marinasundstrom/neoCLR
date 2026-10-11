@@ -1146,3 +1146,74 @@ fn native_work_failure_is_observed_before_more_guest_instructions() {
     assert_eq!(state.budget.remaining(), before);
     drop(scope);
 }
+
+#[test]
+fn runtime_operation_await_returns_to_host_and_resumes_saved_instruction_once() {
+    let module = crate::assemble(
+        r#"
+.module RuntimeAsync
+.function neoCLR.Runtime.RuntimeAsyncAwait(Int64 operation) -> Int32
+.methodimpl InternalCall
+.end
+.function Main(Int64 operation) -> Int32
+ldc.i4 10
+ldarg operation
+call neoCLR.Runtime.RuntimeAsyncAwait(Int64)
+add
+ret
+.end
+"#,
+    )
+    .unwrap();
+    let options = ExecutionOptions::default();
+    let mut state = InstructionState::new(options.limits);
+    let operation = state.async_operations.create(None).unwrap();
+    let owner = Owner::new(1);
+    let mut participant = owner.participant().unwrap();
+    let entry = module
+        .functions
+        .iter()
+        .find(|f| f.name == "Main")
+        .unwrap()
+        .clone();
+    let mut frames = vec![Frame::new(entry, vec![Value::Int64(operation)]).unwrap()];
+    let mut step = |state: &mut InstructionState, frames: &mut Vec<Frame>| {
+        interpret_instructions(
+            &module,
+            frames,
+            &options,
+            &mut None,
+            &mut participant.enter(),
+            &mut Default::default(),
+            &mut vec![],
+            &mut [vec![], vec![]],
+            state,
+            1024,
+        )
+    };
+    assert!(matches!(
+        step(&mut state, &mut frames),
+        Ok(InstructionProgress::Waiting)
+    ));
+    assert_eq!(frames.len(), 1);
+    assert_eq!(frames[0].stack, vec![Value::Int32(10)]);
+    let remaining = state.budget.remaining();
+    assert!(matches!(
+        step(&mut state, &mut frames),
+        Ok(InstructionProgress::Waiting)
+    ));
+    assert_eq!(
+        state.budget.remaining(),
+        remaining,
+        "parking executes no guest polling loop"
+    );
+    assert!(state.async_operations.complete(operation, 32));
+    assert!(!state.async_operations.complete(operation, 99));
+    assert!(matches!(
+        step(&mut state, &mut frames),
+        Ok(InstructionProgress::Completed(Value::Int32(42)))
+    ));
+    assert!(frames.is_empty());
+    assert!(state.yield_boundaries.is_empty());
+    assert!(state.async_operations.validate(operation).is_err());
+}

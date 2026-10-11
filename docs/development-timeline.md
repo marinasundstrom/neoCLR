@@ -14866,3 +14866,28 @@ outside benchmark measurement. Implementation follows the configuration slice.
 - Open: atomic operation parking/resume, cancellation/lifetime rules, native activation
   design, faithful logical async stacks, compiler integration and comparative benchmarks.
   No permanent native representation or public API is selected by this slice.
+
+## 2026-10-11 — Runtime async proof of concept
+
+- Author asked: “Continue until you have a POC”. Assistant extended the retained-frame
+  yield experiment into private operation-triggered parking and result resumption.
+- The Raven consumer uses ordinary functions: a producer suspends on a timer, forces
+  GC and completes the operation awaited by its caller. The compiled consumer passes;
+  focused VM checks show pending execution returning to the host without guest polling.
+- The POC demonstrates interpreter frame/root preservation and serialized one-shot
+  outcomes. It is not public Task integration or native runtime async. The assistant
+  identified LIFO head-of-line blocking as a limitation requiring independently
+  resumable activations, rather than treating retained nested chains as the final design.
+- A bundled Raven compiler property-initializer binding recursion was encountered;
+  constructor injection avoids the failing form. Both bridge documents record the
+  deferred compiler investigation. [POC, evidence and reproduction](experiments/runtime-async/README.md#operation-triggered-suspension-poc--2026-10-11).
+
+### Same exchange — green threads as the direction
+
+- Author clarified: “We are actually moving towards having green threads.”
+- Assistant interpreted this as the direction toward independently resumable,
+  runtime-scheduled activations, keeping Task/Promise/Scheduler at their separate
+  abstraction levels. The current retained-chain POC is a step toward that model.
+- Recorded the direction in the roadmap and scheduling design. Native stack
+  representation, preemption and multi-core topology remain unselected; the user
+  has not approved a specific mechanism by this clarification.

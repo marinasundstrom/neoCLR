@@ -1331,3 +1331,32 @@ frames; costs are full-chain retention and reentrant execution. No performance o
 native portability claim is made. Existing .NET research remains the baseline;
 activation representation, native liveness, logical stack links and one-shot parking
 are still design/validation work. No compiler lowering or public API changes.
+
+## Operation-triggered retained-frame POC — 2026-10-11
+
+The [runtime-async experiment](experiments/runtime-async/README.md#operation-triggered-suspension-poc--2026-10-11)
+now parks ordinary interpreter calls until an integer-result operation or monotonic
+timer completes. It returns to host control and releases graph access during waiting;
+callbacks can complete operations after nested waits. Completed-before-wait, terminal
+cancellation, stale handles and retained frame/root budgets are covered.
+
+Against the existing .NET comparison, this explores runtime activation ownership
+without requiring compiler-generated state machines. It does not adopt CLR
+AsyncHelpers or redefine managed Task semantics. Benefits demonstrated are preserved
+ordinary frames and no guest polling loop. Costs include full-chain retention,
+context-local bounded operation storage and LIFO head-of-line blocking. The next
+architectural gate is independently resumable activations, followed by rooted
+managed results, host completion races, native liveness and equivalent benchmarks.
+No speedup, production concurrency or native suspension support is claimed.
+
+### Green-thread direction clarified
+
+The author explicitly says “We are actually moving towards having green threads.”
+The next execution goal is independently resumable runtime-scheduled activations,
+with Task as operation/result state, Promise as producer authority and Scheduler
+as the managed policy projection. This author direction goes beyond merely testing
+an alternative async lowering. It does not select copied native stacks, segmented
+stacks, heap-frame lowering, preemption or worker topology. The retained-chain POC
+is evidence for rooting and resumption, not completion of that execution model.
+Continue the existing CLR/Go/Java research comparison when choosing native activation
+representation and measure memory, fairness and switching costs before claiming gains.
