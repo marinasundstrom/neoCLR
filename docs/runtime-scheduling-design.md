@@ -1484,3 +1484,16 @@ Its extra adapter allocation/submission are explicit costs. The next target lowe
 must replace that adapter with activation registration while preserving readiness,
 outcome observation and ownership. Managed Task lifetime and cancellation/fault
 projection are still open; native/JIT and default switching remain unqualified.
+
+
+### Cancellation notification POC — 2026-10-11
+
+The source-local ordinary-await adapter now waits for terminal notification separately
+from result retrieval, projecting runtime cancellation through Raven's current
+IsCancelled protocol into a cancelled managed Task. Pending, completed and
+registration-time cancellation are covered; independent work continues. This aligns
+notification/outcome separation with .NET awaiters while retaining the experimental
+neoCLR cancellation projection. Faulted outcomes, automatic lifetime, compiler-native
+await, JIT/AOT and comparative performance qualification remain open. See
+[cancellation evidence](experiments/runtime-async/cancellation-validation.json) and
+[bridge ownership/limits](raven-cli-bridge.md#runtime-operation-cancellation-delivery-2026-10-11).

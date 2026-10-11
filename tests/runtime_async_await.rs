@@ -24,6 +24,12 @@ fn program(main: &str, extra: &str) -> LoadedProgram {
 .function neoCLR.Runtime.RuntimeAsyncIsCompleted(Int64 id) -> Boolean
 .methodimpl InternalCall
 .end
+.function neoCLR.Runtime.RuntimeAsyncIsCancelled(Int64 id) -> Boolean
+.methodimpl InternalCall
+.end
+.function neoCLR.Runtime.RuntimeAsyncWaitCompletion(Int64 id) -> Boolean
+.methodimpl InternalCall
+.end
 .function neoCLR.Runtime.RuntimeAsyncRelease(Int64 id) -> Boolean
 .methodimpl InternalCall
 .end
@@ -582,4 +588,80 @@ fault "readiness did not reflect operation state"
     .run(Limits::default())
     .unwrap_err();
     assert!(fault.message.contains("Unknown"));
+}
+
+#[test]
+fn cancellation_delivery_resumes_without_reading_the_cancelled_result() {
+    let result = program(
+        r#"
+.local Canceller canceller
+call neoCLR.Runtime.RuntimeAsyncCreate()
+stloc operation
+newobj instance Canceller::.ctor()
+stloc canceller
+ldloc canceller
+ldloc operation
+stfld Canceller::Operation
+ldloc canceller
+function.bind fn<Void> = instance Canceller::Run()
+call neoCLR.Runtime.SchedulerSubmit(fn<Void>)
+pop
+ldloc operation
+call neoCLR.Runtime.RuntimeAsyncWaitCompletion(Int64)
+brtrue Bad
+ldloc operation
+call neoCLR.Runtime.RuntimeAsyncIsCancelled(Int64)
+brfalse Bad
+ldloc operation
+call neoCLR.Runtime.RuntimeAsyncWaitCompletion(Int64)
+brtrue Bad
+ldloc operation
+call neoCLR.Runtime.RuntimeAsyncRelease(Int64)
+brfalse Bad
+ldc.i4 0
+call neoCLR.Runtime.RuntimeAsyncDelay(Int32)
+stloc operation
+ldloc operation
+call neoCLR.Runtime.RuntimeAsyncWaitCompletion(Int64)
+brfalse Bad
+ldloc operation
+call neoCLR.Runtime.RuntimeAsyncIsCancelled(Int64)
+brtrue Bad
+ldloc operation
+call neoCLR.Runtime.RuntimeAsyncAwait(Int64)
+ret
+Bad:
+fault "cancelled observer aborted delivery or corrupted another operation"
+"#,
+        r#"
+.type class Canceller
+.field Operation Int64
+.method instance .ctor() -> noresult
+ret
+.end
+.method instance Run() -> Void
+ldarg 0
+ldfld Canceller::Operation
+call neoCLR.Runtime.RuntimeAsyncCancel(Int64)
+pop
+call neoCLR.Runtime.GCCollect()
+ldvoid
+ret
+.end
+.end
+"#,
+    )
+    .run(Limits::default())
+    .unwrap();
+    assert_eq!(result.value, Value::Int32(0));
+}
+
+#[test]
+fn completion_observation_rejects_unknown_and_released_handles() {
+    for service in ["RuntimeAsyncIsCancelled", "RuntimeAsyncWaitCompletion"] {
+        for setup in ["ldc.i8 0".to_owned(), format!("ldc.i4 0\ncall neoCLR.Runtime.RuntimeAsyncDelay(Int32)\nstloc operation\nldloc operation\ncall neoCLR.Runtime.RuntimeAsyncIsCompleted(Int64)\npop\nldloc operation\ncall neoCLR.Runtime.RuntimeAsyncRelease(Int64)\npop\nldloc operation")] {
+            let fault = program(&format!("{setup}\ncall neoCLR.Runtime.{service}(Int64)\npop\nldc.i4 0\nret"), "").run(Limits::default()).unwrap_err();
+            assert!(fault.message.contains("Unknown or released"));
+        }
+    }
 }

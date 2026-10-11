@@ -7,18 +7,22 @@ module RuntimeAwaitLanguage {
     class Operation : TaskAwaiter {
         private val handle: long
         var CompleteOnRegistration = false
+        var CancelOnRegistration = false
+        var ResultReads = 0
         var Registrations = 0
 
         init(operation: long) {
             handle = operation
         }
 
-        // Required by the current neoCLR compiler cancellation protocol. This
-        // completion-only adapter exposes no cancellation producer.
-        val IsCancelled: bool => false
+        // Project the runtime outcome through the existing compiler protocol.
+        val IsCancelled: bool => neoCLR.Runtime.RuntimeAsyncIsCancelled(handle)
         val IsCompleted: bool => neoCLR.Runtime.RuntimeAsyncIsCompleted(handle)
         func GetAwaiter() -> Operation => self
-        func GetResult() -> int => neoCLR.Runtime.RuntimeAsyncAwait(handle)
+        func GetResult() -> int {
+            ResultReads = ResultReads + 1
+            return neoCLR.Runtime.RuntimeAsyncAwait(handle)
+        }
 
         // Deliberate awaiter-protocol adapter. Application code below uses await.
         func OnCompleted(callback: () -> System.Void) {
@@ -26,8 +30,18 @@ module RuntimeAwaitLanguage {
             if CompleteOnRegistration {
                 Complete()
             }
+            if CancelOnRegistration {
+                Cancel()
+            }
             let continuation = Continuation(handle, callback)
             _ = neoCLR.Runtime.SchedulerSubmit(continuation.Run)
+        }
+
+        func Cancel() -> System.Void {
+            if !neoCLR.Runtime.RuntimeAsyncCancel(handle) {
+                System.Fail("Operation cancellation rejected")
+            }
+            return ()
         }
 
         func Complete() -> System.Void {
@@ -48,11 +62,40 @@ module RuntimeAwaitLanguage {
         }
 
         func Run() -> System.Void {
-            _ = neoCLR.Runtime.RuntimeAsyncAwait(handle)
+            _ = neoCLR.Runtime.RuntimeAsyncWaitCompletion(handle)
             System.Runtime.GC.Collect()
             callback()
             return ()
         }
+    }
+
+    // Deliberate outcome-observation adapter: awaiting a cancelled task would
+    // cancel this observer instead of letting Main assert the terminal outcome.
+    class CancellationObserver {
+        private val operation: Task<int>
+        private val source = Promise<bool>()
+        init(task: Task<int>) {
+            operation = task
+        }
+        val Task: Task<bool> => source.Task
+        func Run() -> System.Void {
+            _ = source.Complete(operation.IsCompleted && operation.IsCancelled)
+            return ()
+        }
+    }
+
+    async func CheckCancellation(operation: Operation, submitCancel: bool) -> Task<()> {
+        let task = Read(operation)
+        let observer = CancellationObserver(task)
+        task.OnCompleted(observer.Run)
+        if submitCancel {
+            _ = neoCLR.Runtime.SchedulerSubmit(operation.Cancel)
+        }
+        let cancelled = await observer.Task
+        if !cancelled || operation.ResultReads != 0 {
+            System.Fail("Cancellation did not propagate without reading a result")
+        }
+        return ()
     }
 
     async func Read(operation: Operation) -> Task<int> {
@@ -81,6 +124,22 @@ module RuntimeAwaitLanguage {
         if raceResult != 17 || racing.Registrations != 1 {
             System.Fail("Completion between readiness check and registration was lost")
         }
+        let cancelled = Operation(neoCLR.Runtime.RuntimeAsyncCreate())
+        await CheckCancellation(cancelled, true)
+        let alreadyCancelled = Operation(neoCLR.Runtime.RuntimeAsyncCreate())
+        alreadyCancelled.Cancel()
+        await CheckCancellation(alreadyCancelled, false)
+        if alreadyCancelled.Registrations != 0 {
+            System.Fail("Already cancelled await registered a callback")
+        }
+        let cancellationRace = Operation(neoCLR.Runtime.RuntimeAsyncCreate())
+        cancellationRace.CancelOnRegistration = true
+        await CheckCancellation(cancellationRace, false)
+        // A cancelled operation must not cancel this invocation or unrelated work.
+        let stillWorks = await pending
+        if stillWorks != 17 {
+            System.Fail("Cancellation corrupted an independent operation")
+        }
         Console.WriteLine("PASS ordinary Raven await through runtime suspension adapter")
         return 0
     }
@@ -93,6 +152,12 @@ module neoCLR.Runtime {
     internal extern func RuntimeAsyncCreate() -> long;
     [MethodImpl(MethodImplOptions.InternalCall)]
     internal extern func RuntimeAsyncIsCompleted(operation: long) -> bool;
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    internal extern func RuntimeAsyncIsCancelled(operation: long) -> bool;
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    internal extern func RuntimeAsyncWaitCompletion(operation: long) -> bool;
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    internal extern func RuntimeAsyncCancel(operation: long) -> bool;
     [MethodImpl(MethodImplOptions.InternalCall)]
     internal extern func RuntimeAsyncComplete(operation: long, result: int) -> bool;
     [MethodImpl(MethodImplOptions.InternalCall)]

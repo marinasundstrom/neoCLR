@@ -2124,6 +2124,7 @@ struct RuntimeAsyncBoundary {
     no_result: bool,
     operation: Option<i64>,
     started: Option<i64>,
+    completion_only: bool,
 }
 
 /// State that survives an instruction-boundary suspension. File handles, interning
@@ -2421,6 +2422,7 @@ fn interpret_instructions_with_dispatch(
                 no_result,
                 operation,
                 started,
+                completion_only,
             }) = yield_boundaries.last()
             {
                 options.check_cancellation(
@@ -2446,6 +2448,9 @@ fn interpret_instructions_with_dispatch(
                     return Err(Fault::new("Invalid runtime yield boundary"));
                 }
                 let resumed = match operation {
+                    Some(id) if completion_only => {
+                        async_operations.read_completion(id)?.map(Value::Boolean)
+                    }
                     Some(id) => async_operations.read_ready(id)?.map(Value::Int32),
                     None if dispatched => Some(started.map_or(Value::Void, Value::Int64)),
                     None => None,
@@ -4103,6 +4108,7 @@ fn interpret_instructions_with_dispatch(
                                 no_result: false,
                                 operation: None,
                                 started: Some(operation),
+                                completion_only: false,
                             });
                             frames.push(body);
                             return Ok(None);
@@ -4114,6 +4120,8 @@ fn interpret_instructions_with_dispatch(
                                 | crate::native::Binding::RuntimeAsyncComplete
                                 | crate::native::Binding::RuntimeAsyncCancel
                                 | crate::native::Binding::RuntimeAsyncRelease
+                                | crate::native::Binding::RuntimeAsyncIsCancelled
+                                | crate::native::Binding::RuntimeAsyncWaitCompletion
                                 | crate::native::Binding::RuntimeAsyncIsCompleted
                                 | crate::native::Binding::RuntimeAsyncAwait
                         ) {
@@ -4147,7 +4155,10 @@ fn interpret_instructions_with_dispatch(
                                 (crate::native::Binding::RuntimeAsyncIsCompleted, [Value::Int64(id)]) => {
                                     Value::Boolean(async_operations.is_completed(*id)?)
                                 }
-                                (crate::native::Binding::RuntimeAsyncAwait, [Value::Int64(id)]) => {
+                                (crate::native::Binding::RuntimeAsyncIsCancelled, [Value::Int64(id)]) => {
+                                    Value::Boolean(async_operations.is_cancelled(*id)?)
+                                }
+                                (wait @ (crate::native::Binding::RuntimeAsyncAwait | crate::native::Binding::RuntimeAsyncWaitCompletion), [Value::Int64(id)]) => {
                                     async_operations.validate(*id)?;
                                     yield_boundaries.push(RuntimeAsyncBoundary {
                                         depth: frames.len(),
@@ -4155,6 +4166,7 @@ fn interpret_instructions_with_dispatch(
                                         no_result: false,
                                         operation: Some(*id),
                                         started: None,
+                                        completion_only: matches!(wait, crate::native::Binding::RuntimeAsyncWaitCompletion),
                                     });
                                     return Ok(Some(Value::Void));
                                 }
@@ -4176,6 +4188,7 @@ fn interpret_instructions_with_dispatch(
                                 no_result: callee.no_result,
                                 operation: None,
                                 started: None,
+                                completion_only: false,
                             });
                             return Ok(Some(Value::Void));
                         }

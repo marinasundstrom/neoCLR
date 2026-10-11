@@ -1,7 +1,8 @@
 # Interpreter runtime-async experiments
 
-Current development status: [ordinary Raven await compatibility](#ordinary-raven-await-compatibility--2026-10-11)
-passes the generated-state-machine adapter consumer and 23 focused checks. Earlier
+Current development status: [cancellation delivery](#runtime-operation-cancellation-delivery--2026-10-11)
+passes the generated-state-machine adapter consumer, 26 focused operation checks
+and eight yield regression checks. Earlier
 activation and outcome checks remain recorded below. Public Task/compiler await integration
 and default switching remain open. Earlier sections record the preceding POC slices.
 
@@ -285,3 +286,32 @@ python3 docs/experiments/runtime-async/validate.py --language-await \
 Use a runtime built from this slice. The default script mode still runs the direct
 runtime-intrinsic consumer. Public API reference/website capability claims remain
 unchanged; these are source-local experimental services and adapters.
+
+
+## Runtime operation cancellation delivery (2026-10-11)
+
+Two private TaskDispatch InternalCalls extend the interpreter POC:
+`neoCLR.Runtime.RuntimeAsyncIsCancelled(Int64) -> Boolean` observes cancellation
+without waiting, and `RuntimeAsyncWaitCompletion(Int64) -> Boolean` parks until
+terminal completion, returning true for success or false for cancellation. Both
+reject unknown/released/context-foreign handles. Waiting retains the outcome and
+shares the activation ownership/release guards of RuntimeAsyncAwait; it does not
+read a cancelled result. Host invocation cancellation remains terminal.
+
+The source-local awaiter now projects IsCancelled from the runtime and its explicit
+OnCompleted adapter waits for terminal notification before invoking the generated
+continuation. Existing Raven cancellation lowering marks the managed Task cancelled
+without calling GetResult. This separates notification from outcome retrieval, as
+in .NET's awaiter model; the boolean bridge and explicit IsCancelled protocol are
+provisional neoCLR representation, not a new public Task contract or .NET exception
+projection. Direct RuntimeAsyncAwait of a cancelled operation still faults.
+
+Pending cancellation, already-cancelled fast paths and cancellation during
+registration pass in the compiled consumer; a later independent await still works.
+The interpreter has 21 focused operation tests plus five operation-state unit tests.
+Evidence: [cancellation validation](cancellation-validation.json).
+Runtime Contract configuration and compiler lowering are unchanged. This uses the
+native compiler line `f51d0561f`; generated state machines remain. No public library
+API, faulted-Task projection, managed lifetime, cross-thread race qualification or
+JIT/AOT suspension support is introduced. Native activation/outcome metadata and
+backend support must eventually replace these private integer-handle signatures.

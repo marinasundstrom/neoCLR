@@ -32,6 +32,8 @@ projection remains open. Ordinary Raven await now passes through a source-local
 compatibility adapter retaining generated state machines. The same-file attributed
 intrinsic binder fix is now qualified on the separate native compiler line
 (`f51d0561f`); [evidence](experiments/runtime-async/single-source-validation.json).
+The adapter now propagates cancellation to managed Tasks without cancelling the
+invocation ([evidence](experiments/runtime-async/cancellation-validation.json)).
 Next are compiler-native
 await/managed Task integration and equivalent state-machine
 comparisons before switching supported defaults. Native stack representation, preemption and

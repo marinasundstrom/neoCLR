@@ -100,6 +100,21 @@ impl Operations {
         ))
     }
 
+    pub(crate) fn is_cancelled(&self, id: i64) -> Result<bool, Fault> {
+        self.validate(id)?;
+        Ok(matches!(self.0.get(&id), Some(Operation::Cancelled)))
+    }
+
+    /// Awaiter adapters need delivery for every terminal outcome, without reading
+    /// a cancelled operation's result and terminating the enclosing invocation.
+    pub(crate) fn read_completion(&mut self, id: i64) -> Result<Option<bool>, Fault> {
+        if self.is_completed(id)? {
+            Ok(Some(!self.is_cancelled(id)?))
+        } else {
+            Ok(None)
+        }
+    }
+
     pub(crate) fn validate(&self, id: i64) -> Result<(), Fault> {
         if self.0.contains_key(&id) {
             Ok(())
@@ -145,6 +160,29 @@ impl Operations {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn completion_observation_preserves_cancelled_and_successful_outcomes() {
+        let mut operations = Operations::default();
+        let id = operations.create(None).unwrap();
+        assert_eq!(operations.read_completion(id).unwrap(), None);
+        assert!(!operations.is_cancelled(id).unwrap());
+        assert!(operations.cancel(id));
+        assert_eq!(operations.read_completion(id).unwrap(), Some(false));
+        assert_eq!(operations.read_completion(id).unwrap(), Some(false));
+        assert!(operations.is_cancelled(id).unwrap());
+        assert!(operations.read_ready(id).is_err());
+        assert!(operations.release(id));
+        assert!(operations.is_cancelled(id).is_err());
+        assert!(operations.read_completion(id).is_err());
+
+        let timer = operations.create(Some(0)).unwrap();
+        assert_eq!(operations.read_completion(timer).unwrap(), Some(true));
+        assert!(!operations.cancel(timer));
+        assert!(!operations.is_cancelled(timer).unwrap());
+        assert_eq!(operations.read_ready(timer).unwrap(), Some(0));
+        assert!(Operations::default().read_completion(timer).is_err());
+    }
 
     #[test]
     fn handles_are_context_owned_and_capacity_returns_only_on_release() {

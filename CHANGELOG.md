@@ -8,6 +8,13 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-11
 
+- Extend the interpreter runtime-async POC with private cancellation observation and
+  terminal-completion waiting. The ordinary-await adapter now propagates pending,
+  pre-existing and registration-time cancellation into managed Tasks while other
+  work continues; direct cancelled-result reads and host cancellation still fault.
+  Generated state machines remain; native-await lowering, faulted outcomes, managed
+  lifetime and JIT/AOT suspension remain open.
+
 - Add private runtime operation readiness and an ordinary Raven await compatibility
   consumer covering pending/repeated awaits, completed fast paths and completion
   before registration. The source-local adapter retains generated state machines;
