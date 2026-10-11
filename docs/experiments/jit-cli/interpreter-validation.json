@@ -11,7 +11,7 @@
       "mode": "interpreter",
       "repetition": 1,
       "exitCode": 0,
-      "elapsedSeconds": 2.747,
+      "elapsedSeconds": 2.745,
       "stdout": "PASS HTTP custom method construction and parsing preserve spelling\nPASS HTTP method equality and hashes ignore ASCII case\nPASS HTTP methods retain case-insensitive identity in a set\nPASS HTTP method validation admits token punctuation and rejects separators\nPASS HTTP method parsing canonicalizes every known name\nPASS HTTP predefined method values use canonical tokens\nPASS HTTP request factories retain predefined and custom methods\nPASS HTTP URI request factories support custom methods and empty content\nTests: 8, passed: 8, failed: 0, skipped: 0\n",
       "stderr": ""
     }
@@ -20,16 +20,16 @@
     {
       "suite": "http-method-values",
       "phase": "discovery",
-      "elapsedSeconds": 8.668718,
+      "elapsedSeconds": 13.00799,
       "details": {
-        "sourceCompilationSeconds": 5.5936,
-        "metadataDiscoveryIncludingToolBuildSeconds": 3.072572
+        "sourceCompilationSeconds": 5.284121,
+        "metadataDiscoveryIncludingToolBuildSeconds": 7.721782
       }
     },
     {
       "suite": "http-method-values",
       "phase": "source-compilation",
-      "elapsedSeconds": 4.8623,
+      "elapsedSeconds": 5.458342,
       "command": [
         "dotnet",
         "/Users/robert/Projects/neoclr/target/extension-indexer-final-bundle/sdk/tools/rvnc/rvnc.dll",
@@ -37,17 +37,17 @@
         "--project",
         "/Users/robert/Projects/neoclr/runtime/raven/tests/http-method-values/Tests.rvnproj"
       ],
-      "assemblySha256": "5d53d0f4a64a8bb5fc739ef03423aca6a4a60d2a41eb033d1617da50c0a82875"
+      "assemblySha256": "d9bd848dbf858d015f7630043dcb836ca6a8f03d17d197a5829eed6667d7ba67"
     },
     {
       "suite": "http-method-values",
       "phase": "registration-verification",
-      "elapsedSeconds": 1.949928
+      "elapsedSeconds": 2.965072
     }
   ],
   "executionRepetitions": 1,
   "inputs": {
-    "scripts/test-runtime-library.py": "3a878623acba33ac88faa61c1f3d3bd8e60a1367fc798ddeaa686a34a7cfdfba",
+    "scripts/test-runtime-library.py": "26fbf9941af37b214f3d099063a2479cdc12640b31e69a1ab46e3f77ddc0e8c7",
     "scripts/build-native-project.py": "9456ae7a463d1bf81d739aa0b250a2da9ffd3db3adaee68ae7d4808d93bca3b7",
     "scripts/discover-runtime-tests.py": "455595ff98a3d9f8df9018caad453ef0f244eedf69e6ab220d54934535ed428e",
     "scripts/validate-test-discovery.py": "83f6cd15cc0a9fbaa4fd2a6a0fbca22d57da5d5edd1e2f248daacf3416088167",
@@ -130,12 +130,11 @@
   "bundleManifestSha256": "f7220f3f01313b0ee7671a8a3c4721316d3fef5ca3c59d5cdb45808bdf5b12c4",
   "aotSha256": null,
   "interpreterSha256": "06be444734540b96b8c4fb6ecbe484c902682ca1b2a4e03f8e284c82b0b102aa",
+  "libraryCatalogSha256": "48984e3f1af3795b310a767997a36c51c0d71c8fbc66e7ad779941e247abbd07",
   "suites": [
     "http-method-values"
   ],
-  "totalElapsedSeconds": 18.330517,
+  "totalElapsedSeconds": 24.382014,
   "qualificationDate": "2026-10-11",
-  "sourceBaseRevision": "3f9a98ac",
-  "ravenCompilerRevision": "163050da2a79444878169f1d011abff644d37b2b",
-  "sourceOnlyArtifactCheck": "Each selected build directory contains only app.dll; no native object or executable"
+  "sourceBaseRevision": "312ea38b"
 }

@@ -75,7 +75,13 @@ jobs:
         if: always()
         with:
           name: windows-jit-${{ github.run_id }}-${{ github.run_attempt }}
-          path: target/windows-jit-validation/
+          path: |
+            target/windows-jit-validation/*.json
+            target/windows-jit-validation/*.log
+            target/windows-jit-validation/http/
+            target/windows-jit-validation/framework/
+            target/windows-jit-validation/native/build.json
+            target/windows-jit-validation/development/**/*.log
           include-hidden-files: true
           retention-days: 14
           if-no-files-found: warn

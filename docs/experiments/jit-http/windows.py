@@ -35,6 +35,18 @@ def build_host(link, output, build):
                 if match:
                     exports.add(match[1])
         objects.append(obj)
+    # Some guest imports (character validation and primitive parsing) live in
+    # the Rust kernel archive, not a C wrapper. Export its defined private ABI
+    # symbols too; merely linking the archive does not export them from a DLL.
+    for library in libraries:
+        if not Path(library).is_absolute():
+            continue  # System import libraries, resolved through MSVC's LIB path.
+        symbols = build(['dumpbin', '/symbols', library]).stdout
+        for line in symbols.splitlines():
+            if 'External' in line and 'UNDEF' not in line:
+                match = re.search(r'\|\s+(neoclr_[A-Za-z0-9_]+)\s*$', line)
+                if match:
+                    exports.add(match[1])
     if 'neoclr_jit_run_v1' not in exports:
         raise ValueError('JIT host entry was not emitted')
     definition = output / 'host.def'

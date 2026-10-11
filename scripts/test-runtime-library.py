@@ -394,6 +394,18 @@ def main():
         ('runner-contract', 1, 'PASS before failure\nFAIL intentional assertion failure: Expected 1, actual 2\nPASS after failure\nSKIP intentional skip: contract probe\nTests: 4, passed: 2, failed: 1, skipped: 1\n'),
     ]
     try:
+        if 'native' not in modes:
+            # Preserve the native builder's bundle-integrity check when bypassing
+            # native compilation. A manifest alone does not validate its files.
+            lib = bundle / 'lib'
+            catalog = json.loads((lib / 'bundle.json').read_text())
+            if catalog.get('version') != 1 or catalog.get('objectAssembly') != 'System.Runtime':
+                raise ValueError('Requires the split native class-library bundle v1')
+            for relative, expected_hash in catalog['files'].items():
+                path = (lib / relative).resolve()
+                if Path(relative).is_absolute() or lib not in path.parents or not path.is_file() or sha(path) != expected_hash:
+                    raise ValueError('Bundle file mismatch: ' + relative)
+            report['libraryCatalogSha256'] = sha(lib / 'bundle.json')
         selected = [case for case in expected if not args.suite or case[0] in args.suite]
         report['suites'] = [case[0] for case in selected]
         if not args.suite:

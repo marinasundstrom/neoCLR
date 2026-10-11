@@ -13,7 +13,7 @@ python docs/experiments/jit-windows/verify.py --output target/windows-jit-valida
 
 The workflow pins and verifies the existing Preview 13 bootstrap bundle, rebuilds
 the recorded Raven revision and current runtime libraries, builds a native HTTP
-recipe, then exports its C helper symbols into a DLL. The JIT resolves every declared
+recipe, then exports its C and Rust-kernel helper symbols into a DLL. The JIT resolves every declared
 import before executing guest code. The host shares rooted task/I/O teardown with
 macOS; it restores the Windows CRT stream modes after each invocation. Generated
 code uses Windows calling conventions and inline guard-page probes. Guest arguments

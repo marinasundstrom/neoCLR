@@ -33,12 +33,14 @@ def main():
     report = dict(passed=False, commands=[])
 
     def run(command, name):
+        print('START '+name, flush=True)
         result = subprocess.run(list(map(str, command)), cwd=ROOT, capture_output=True, timeout=1200)
         (out/(name+'.stdout.log')).write_bytes(result.stdout)
         (out/(name+'.stderr.log')).write_bytes(result.stderr)
         report['commands'].append(dict(command=result.args, exitCode=result.returncode))
         if result.returncode:
             raise RuntimeError(name+' failed; see retained logs')
+        print('PASS '+name, flush=True)
         return result
 
     try:

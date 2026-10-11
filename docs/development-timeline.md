@@ -14451,3 +14451,9 @@ are cross-compilation checks, not Windows JIT execution evidence.
 builds. JIT-only and interpreter-only runs now compile Raven metadata directly;
 interpreter-only runs no longer require an installed AOT/JIT tool. This removes one
 readiness gap while retaining explicit mode selection.
+
+**Author integration direction:** asks to merge or fast-forward the completed changes
+back into main. The assistant selects a fast-forward after Windows qualification.
+**Windows review follow-up:** DLL exports must include directly imported Rust kernel
+helpers as well as the C adapters. The gate is updated accordingly; execution
+evidence is still pending.

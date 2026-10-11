@@ -18,6 +18,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   Local macOS CLI HTTP, Index/Range guards and runner filtering/argument checks pass.
   Compile test assemblies directly for JIT-only/interpreter-only runs, avoiding unused
   AOT objects and executable links; interpreter-only runs need no native compiler.
+  Preserve library catalog checks when bypassing native builds, and export the Rust
+  kernel’s private helper symbols as well as C symbols from the Windows DLL.
   SDK helper packaging and Windows ARM64 remain open.
 
 - Admit queued async entry points in the private macOS ARM64 managed JIT. Keep code and
