@@ -29,8 +29,10 @@ A private [native conditional-root collector primitive](experiments/aot-console/
 now passes sanitized ownership/cycle tests. An opt-in
 [owned parked-frame registration](experiments/aot-console/native-gc.md#managed-ownership-of-parked-frames--private-experiment-2026-10-11)
 also participates in automatic safepoints and expires unreachable stacks safely.
-Generator integration is still open:
-parked stacks/callbacks remain strong roots. Abandoned-generator collection and
+[Dependent host handles](experiments/aot-console/native-gc.md#dependent-host-handles--private-experiment-2026-10-11)
+now share that marking fixed point, with explicit strong ownership required for
+dispatch. Generator integration is still open: its parked stacks/callbacks remain
+strong roots. Abandoned-generator collection and
 performance gates remain open. See
 [scope, evidence and remaining work](experiments/runtime-async/async-generators.md).
 

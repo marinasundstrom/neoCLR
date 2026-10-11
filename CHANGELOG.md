@@ -8,6 +8,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-11
 
+- Add private dependent native host handles, traced with owned parked frames at
+  automatic safepoints. Expired handles reject reads/replacement and remain releasable;
+  callback dispatch requires strong ownership. Sanitized collector/handle tests and
+  interpreter/JIT/AOT generator regressions pass. Generator ownership remains unchanged;
+  end-to-end abandoned-generator reclamation is still open.
+
 - Add private managed-owner registration for native parked frame chains. Automatic
   safepoints trace frames only for reachable owners and expire abandoned registrations
   before sweeping; expired records cannot resume and block reset until discarded.

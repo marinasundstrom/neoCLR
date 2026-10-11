@@ -18,6 +18,95 @@ static void *check_thread(void *unused) {
         return (void *)(uintptr_t)2;
     return NULL;
 }
+static int owned_handles(void) {
+    uint64_t storage[256] = {0}, foreign_storage[64] = {0};
+    neoclr_aot_context c = {.text = {(unsigned char *)storage, sizeof(storage), 0}};
+    neoclr_aot_context other = {.text = {(unsigned char *)foreign_storage, sizeof(foreign_storage), 0}};
+    uint64_t *owner = allocate(&c), *callback = allocate(&c), *alien = allocate(&other);
+    CHECK(owner && callback && alien);
+    callback[0] = UINT32_MAX; callback[1] = (uintptr_t)owner;
+    uint64_t handle = 777;
+    CHECK(neoclr_gc_host_root_create_owned_v1(&c, NULL, callback, &handle) == 3 && handle == 777);
+    CHECK(neoclr_gc_host_root_create_owned_v1(&c, alien, callback, &handle) == 3 && handle == 777);
+    CHECK(neoclr_gc_host_root_create_owned_v1(&c, owner + 1, callback, &handle) == 3 && handle == 777);
+    CHECK(neoclr_gc_host_root_create_owned_v1(&c, owner, alien, &handle) == 3 && handle == 777);
+    CHECK(!neoclr_gc_host_root_create_owned_v1(&c, owner, callback, &handle));
+    uint64_t strong = 0;
+    CHECK(!neoclr_gc_host_root_create_v1(&c, owner, &strong));
+    CHECK(!neoclr_gc_collect_v1(&c, NULL));
+    void *read = NULL;
+    CHECK(neoclr_gc_callback_read_v1(&c, handle, &read) == 3 && !read);
+    CHECK(!neoclr_gc_host_root_read_v1(&c, handle, &read) && read == callback);
+    CHECK(!neoclr_gc_collect_v1(&other, NULL));
+    CHECK(!neoclr_gc_host_root_read_v1(&c, handle, &read) && read == callback);
+    /* Independently rooted callback retains the owner through its receiver. */
+    CHECK(!neoclr_gc_host_root_replace_v1(&c, strong, callback));
+    CHECK(!neoclr_gc_collect_v1(&c, NULL));
+    CHECK(!neoclr_gc_callback_read_v1(&c, strong, &read) && read == callback);
+    CHECK(!neoclr_gc_host_root_release_v1(&c, strong));
+    CHECK(!neoclr_gc_collect_v1(&c, NULL) && !c.text.used);
+    read = (void *)(uintptr_t)123;
+    CHECK(neoclr_gc_host_root_read_v1(&c, handle, &read) == 3 && read == (void *)(uintptr_t)123);
+    CHECK(neoclr_gc_callback_read_v1(&c, handle, &read) == 3 && read == (void *)(uintptr_t)123);
+    CHECK(neoclr_gc_host_root_replace_v1(&c, handle, NULL) == 3);
+    CHECK(neoclr_gc_entry_check_v1(&c) == 3);
+    CHECK(!neoclr_gc_owned_roots_check_v1(&c, &handle, 1));
+    CHECK(allocate(&c) == owner);
+    CHECK(!neoclr_gc_collect_v1(&c, NULL) && !c.text.used);
+    CHECK(neoclr_gc_host_root_read_v1(&c, handle, &read) == 3);
+    CHECK(!neoclr_gc_host_root_release_v1(&c, handle));
+    CHECK(!neoclr_gc_entry_check_v1(&c));
+
+    /* Handles and parked frames must share a fixed point at implicit safepoints. */
+    owner = allocate(&c);
+    uint64_t *stack_owner = allocate(&c), *value = allocate(&c);
+    CHECK(owner && stack_owner && value);
+    value[1] = 42;
+    CHECK(!neoclr_gc_host_root_create_owned_v1(&c, owner, stack_owner, &handle));
+    neoclr_probe_storage slot = {&value, 8, 0};
+    neoclr_probe_frame frame, active;
+    neoclr_parked_roots parked = {0};
+    neoclr_probe_enter_v3(&frame, &c, 1, &slot, 1, "{}", 2);
+    CHECK(!neoclr_gc_roots_park_owned_v1(&c, stack_owner, &parked));
+    void *root = owner;
+    neoclr_probe_storage active_slot = {&root, 8, 0};
+    uint64_t empty = 0;
+    neoclr_probe_enter_v3(&active, &c, 2, &active_slot, 1, "{}", 2);
+    neoclr_probe_stack_roots_v2(&active, 0, &empty, 0, "{\"requiredSpillLanes\":[]}", 25);
+    CHECK(!parked.expired && value[1] == 42);
+    CHECK(!neoclr_gc_host_root_read_v1(&c, handle, &read) && read == stack_owner);
+    root = NULL;
+    neoclr_probe_stack_roots_v2(&active, 1, &empty, 0, "{\"requiredSpillLanes\":[]}", 25);
+    CHECK(parked.expired && !c.text.used);
+    CHECK(neoclr_gc_host_root_read_v1(&c, handle, &read) == 3);
+    neoclr_probe_leave_v1(&active);
+    neoclr_roots_discard_v1(&parked);
+    CHECK(!neoclr_gc_host_root_release_v1(&c, handle));
+
+    /* A malformed dependent cannot expire other handles on failed tracing. */
+    owner = allocate(&c);
+    void *bad = NULL;
+    CHECK(owner && !neoclr_gc_allocate_v1(&c.text, 8, NEOCLR_GC_STRINGS, &bad));
+    CHECK(!neoclr_gc_host_root_create_owned_v1(&c, owner, bad, &handle));
+    CHECK(!neoclr_gc_host_root_create_v1(&c, owner, &strong));
+    uint64_t pending;
+    value = allocate(&c);
+    CHECK(value && !neoclr_gc_host_root_create_owned_v1(&c, value, NULL, &pending));
+    CHECK(neoclr_gc_collect_v1(&c, NULL) == 3);
+    CHECK(!neoclr_gc_host_root_read_v1(&c, handle, &read) && read == bad);
+    CHECK(!neoclr_gc_host_root_read_v1(&c, pending, &read) && !read);
+    CHECK(!neoclr_gc_host_root_replace_v1(&c, handle, NULL));
+    CHECK(!neoclr_gc_collect_v1(&c, NULL));
+    CHECK(!neoclr_gc_host_root_read_v1(&c, handle, &read) && !read);
+    CHECK(neoclr_gc_host_root_read_v1(&c, pending, &read) == 3);
+    CHECK(!neoclr_gc_host_root_release_v1(&c, strong));
+    CHECK(!neoclr_gc_collect_v1(&c, NULL) && !c.text.used);
+    CHECK(neoclr_gc_host_root_replace_v1(&c, handle, NULL) == 3);
+    CHECK(!neoclr_gc_host_root_release_v1(&c, pending));
+    CHECK(!neoclr_gc_host_root_release_v1(&c, handle));
+    CHECK(!neoclr_gc_entry_check_v1(&c));
+    return 0;
+}
 int main(void) {
     uint64_t buffer[129] = {0}, other_buffer[129] = {0};
     buffer[128] = other_buffer[128] = 1234567;
@@ -74,5 +163,7 @@ int main(void) {
     neoclr_probe_leave_v1(&frame);
     CHECK(!neoclr_gc_entry_check_v1(&c));
     CHECK(buffer[128] == 1234567 && other_buffer[128] == 1234567);
+    int owned_status = owned_handles();
+    if (owned_status) return owned_status;
     return 0;
 }

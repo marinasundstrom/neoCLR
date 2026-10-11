@@ -365,3 +365,52 @@ must supply reachability from live iterators, outstanding advancement tasks and
 external completion owners, then discard expired native resources. Merely switching
 generator parking to this API would leave strong callback cycles or lose needed
 work; it is not yet an end-to-end abandoned-generator solution.
+
+
+## Dependent host handles — private experiment, 2026-10-11
+
+`neoclr_gc_host_root_create_owned_v1(context, owner, value, output)` creates a
+persistent dependent handle in the existing thread-affine handle table. The owner
+must be a nonnull live allocation base in the same context; the value may be null
+or another live allocation base. Admission and quota failures preserve the output.
+Strong and dependent handles share the 256-entry per-thread limit and non-reused
+identities. Existing strong-handle behavior is unchanged.
+
+Every collection, including compiler snapshot safepoints, activates the value only
+when the owner is independently marked. These associations share the fixed point
+with parked frames and borrowed conditional roots. A value's back-reference to its
+owner cannot keep an abandoned pair alive, but an independently rooted value can
+retain its owner through ordinary managed references.
+
+Successful collection clears both pointers and expires the handle before sweeping
+an unreachable owner. Reads and replacement then reject without modifying outputs;
+address reuse cannot revive the association. A live handle accepts value replacement
+without changing its owner. Failed tracing leaves handle state unchanged. Expired
+handles still consume quota and block entry reset until explicitly released. Release
+also works for expired handles; the exclusive ownership check still counts them.
+No release or managed cleanup callback is run from the collector.
+
+**Dispatch requires strong ownership.** The callback readers reject dependent
+handles even while live: a borrowed read does not protect the callback across a
+subsequent safepoint. A dispatcher can read the value and create an ordinary strong
+handle without an intervening collection, dispatch through that strong handle, then
+release it. This makes the lifetime requirement explicit at the existing dispatch
+boundary rather than allowing a callback to disappear during execution.
+
+This is the same dependent-lifetime principle as the .NET ConditionalWeakTable
+comparison above, applied to a private native handle table. It does not replace
+managed callback storage or claim CLR Task implementation parity. Costs are two
+pointers/lifetime flags in native bookkeeping and another bounded table scan per
+marking wave. No performance improvement is claimed.
+
+[Sanitized contracts](../runtime-async/owned-callback-roots-validation.json) cover
+admission, live and abandoned receiver cycles, independent callback retention,
+dispatch rejection and strong-handle admission, mixed handle/parked-stack activation
+at automatic safepoints, cross-context isolation, address reuse, null values,
+replacement and failure atomicity. The [generator regression](../runtime-async/owned-callback-generator-validation.json)
+passes interpreter, macOS ARM64 JIT and AOT. No Windows execution is claimed.
+
+The runtime-async carrier and managed provider still use strong callback handles.
+Their integration must describe iterator/task/external completion ownership and
+release expired native operations and stacks. This primitive does not yet enable
+abandoned-generator reclamation.

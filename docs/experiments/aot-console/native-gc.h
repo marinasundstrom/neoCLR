@@ -16,6 +16,16 @@ typedef struct {
  * This does not permit cross-thread context use or extend an entry/arena lifetime. */
 #define NEOCLR_GC_HOST_ROOT_LIMIT 256
 int32_t neoclr_gc_host_root_create_v1(neoclr_aot_context *context, void *value, uint64_t *output);
+/* Private dependent handle: nonnull live owner retains value only while owner
+ * is independently reachable. Participates in every collection, including stack
+ * safepoints. On owner death, pointers clear before sweep; read/callback/replace
+ * then reject without changing outputs. Release remains required and valid.
+ * Same thread/context/quota rules as strong handles. Reading does not strengthen
+ * ownership: callback dispatch rejects dependent handles. Read and create a
+ * strong handle without an intervening collection before dispatch. Replacing a live value preserves its original owner.
+ * No managed cleanup runs. Ordinary strong handles are unchanged. */
+int32_t neoclr_gc_host_root_create_owned_v1(neoclr_aot_context *, void *owner,
+    void *value, uint64_t *output);
 int32_t neoclr_gc_host_root_replace_v1(neoclr_aot_context *context, uint64_t handle, void *value);
 int32_t neoclr_gc_host_root_read_v1(neoclr_aot_context *context, uint64_t handle, void **output);
 int32_t neoclr_gc_host_root_release_v1(neoclr_aot_context *context, uint64_t handle);

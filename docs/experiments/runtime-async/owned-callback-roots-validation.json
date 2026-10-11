@@ -1,0 +1,98 @@
+{
+  "passed": true,
+  "commands": [
+    {
+      "label": "toolchain",
+      "command": [
+        "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang",
+        "--version"
+      ],
+      "exitCode": 0,
+      "stdout": "Apple clang version 17.0.0 (clang-1700.6.3.2)\nTarget: arm64-apple-darwin27.0.0\nThread model: posix\nInstalledDir: /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin\n",
+      "stderr": ""
+    },
+    {
+      "label": "native-gc-test-build",
+      "command": [
+        "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang",
+        "-isysroot",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.2.sdk",
+        "-std=c11",
+        "-O2",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-DNEOCLR_NATIVE_GC",
+        "-fsanitize=undefined,bounds",
+        "-I",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-gc-test.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-gc.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/root-probe.c",
+        "-pthread",
+        "-o",
+        "/Users/robert/Projects/neoclr/target/owned-callback-roots-final/native-gc-test"
+      ],
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "label": "native-gc-test-execute",
+      "command": [
+        "/Users/robert/Projects/neoclr/target/owned-callback-roots-final/native-gc-test"
+      ],
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "label": "host-roots-test-build",
+      "command": [
+        "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang",
+        "-isysroot",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.2.sdk",
+        "-std=c11",
+        "-O2",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-DNEOCLR_NATIVE_GC",
+        "-fsanitize=undefined,bounds",
+        "-I",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/host-roots-test.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-gc.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/root-probe.c",
+        "-pthread",
+        "-o",
+        "/Users/robert/Projects/neoclr/target/owned-callback-roots-final/host-roots-test"
+      ],
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "label": "host-roots-test-execute",
+      "command": [
+        "/Users/robert/Projects/neoclr/target/owned-callback-roots-final/host-roots-test"
+      ],
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": ""
+    }
+  ],
+  "inputsSha256": {
+    "/Users/robert/Projects/neoclr/docs/experiments/runtime-async/validate_conditional_roots.py": "7ce78dbed1026404c385524c2d1d65ed2b46b0d533b5099a3ef2370279d9f213",
+    "/Users/robert/Projects/neoclr/target/owned-parked-generator-regression/validation.json": "327a9c8e37e536eb6e48d6c64239f925970cef30d41fedd3092b694b3652f27d",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-gc.c": "b9e70781420f9b51155b1dbff6f1c683ce6766f519a0df2cfde1a7eee0ebf7ae",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-gc.h": "6a60ec6cceb3e472cda0bb83165b414b570bbc6c32109711774308ede77da33e",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-gc-test.c": "f52b7b74b1d6d048135aa40fe0e164c1d6e30101cf8f6ec50573a0d40248779a",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-console/host-roots-test.c": "842a8f781b0cc87478b7b0c68919a9c19b33b011bf84370f3127c7a7479bec88",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-console/root-probe.c": "c221cde43b2cfb4a34bb64fdfbd67dcb0b2a323c049049fb5c96bc1901e83cca",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-console/root-probe.h": "5bdc5b044d0dc1f768d0057a55d09571df7736926c2b4ffd01e18e5a51b8a70f",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-console/text-arena.h": "6101b22c4fd5eacc3849ad471de197564fca343f8b28345d80be93f20c2c8575",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-stack.h": "d4b1bbc542c3c8b3338d186a64554e5a0c0d4bc3a94d6b6a48900c49f2da0d13",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-fault-details/fault-details.h": "8acf145dd10c8050c7d4c9266a73dec171009cea570aeb2f5473ac39cbfa4370"
+  }
+}

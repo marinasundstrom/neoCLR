@@ -78,7 +78,8 @@ collection and full HTTP-server qualification remain open.
 A private native collector experiment now tests conditional owner/value roots:
 reachable owners retain their dependents, while abandoned cycles can be reclaimed.
 Opt-in owned parked-frame registrations now apply this relationship at automatic
-collection safepoints, preventing an abandoned stack from rooting itself. This is
+collection safepoints, preventing an abandoned stack from rooting itself. Dependent
+host handles participate in the same graph and require strong ownership for dispatch. This is
 groundwork for suspended-operation lifetime support. Generator stacks still
 use strong roots; automatic abandoned-generator reclamation is not implemented.
 [Development contract and evidence](https://github.com/marinasundstrom/neoCLR/blob/main/docs/experiments/aot-console/native-gc.md#conditional-ownervalue-roots--private-experiment-2026-10-11).

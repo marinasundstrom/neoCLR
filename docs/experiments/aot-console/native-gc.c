@@ -27,7 +27,8 @@ static int blocks_valid(const neoclr_aot_text_arena *a) {
 }
 typedef struct host_root {
     neoclr_aot_context *context;
-    void *value;
+    void *value, *owner;
+    int conditional, expired;
     uint64_t handle;
     struct host_root *previous, *next;
 } host_root;
@@ -49,8 +50,10 @@ static host_root *find_host_root(neoclr_aot_context *context, uint64_t handle) {
         if (root->context == context && root->handle == handle) return root;
     return NULL;
 }
-int32_t neoclr_gc_host_root_create_v1(neoclr_aot_context *context, void *value, uint64_t *output) {
-    if (!context || !output || !blocks_valid(&context->text) || !live_base(&context->text, value))
+static int32_t host_root_create(neoclr_aot_context *context, void *owner, void *value,
+    int conditional, uint64_t *output) {
+    if (!context || !output || !blocks_valid(&context->text) || !live_base(&context->text, value) ||
+        (conditional && (!owner || !live_base(&context->text, owner))))
         return NEOCLR_AOT_FAULT_RUNTIME_ERROR;
     host_root *available = NULL;
     for (uint32_t i = 0; i < NEOCLR_GC_HOST_ROOT_LIMIT; i++)
@@ -61,21 +64,29 @@ int32_t neoclr_gc_host_root_create_v1(neoclr_aot_context *context, void *value, 
         if (handle == UINT64_MAX) return NEOCLR_AOT_FAULT_NATIVE_MEMORY_LIMIT;
     } while (!atomic_compare_exchange_weak_explicit(&next_host_handle, &handle, handle + 1,
                 memory_order_relaxed, memory_order_relaxed));
-    *available = (host_root){context, value, handle, NULL, host_head};
+    *available = (host_root){.context = context, .value = value, .owner = owner,
+        .conditional = conditional, .handle = handle, .next = host_head};
     if (host_head) host_head->previous = available;
     host_head = available;
     *output = handle;
     return 0;
 }
+int32_t neoclr_gc_host_root_create_v1(neoclr_aot_context *context, void *value, uint64_t *output) {
+    return host_root_create(context, NULL, value, 0, output);
+}
+int32_t neoclr_gc_host_root_create_owned_v1(neoclr_aot_context *context, void *owner,
+    void *value, uint64_t *output) {
+    return host_root_create(context, owner, value, 1, output);
+}
 int32_t neoclr_gc_host_root_replace_v1(neoclr_aot_context *context, uint64_t handle, void *value) {
     host_root *root = find_host_root(context, handle);
-    if (!root || !blocks_valid(&context->text) || !live_base(&context->text, value)) return NEOCLR_AOT_FAULT_RUNTIME_ERROR;
+    if (!root || root->expired || !blocks_valid(&context->text) || !live_base(&context->text, value)) return NEOCLR_AOT_FAULT_RUNTIME_ERROR;
     root->value = value;
     return 0;
 }
 int32_t neoclr_gc_host_root_read_v1(neoclr_aot_context *context, uint64_t handle, void **output) {
     host_root *root = find_host_root(context, handle);
-    if (!root || !output) return NEOCLR_AOT_FAULT_RUNTIME_ERROR;
+    if (!root || root->expired || !output) return NEOCLR_AOT_FAULT_RUNTIME_ERROR;
     *output = root->value;
     return 0;
 }
@@ -90,7 +101,7 @@ int32_t neoclr_gc_host_root_release_v1(neoclr_aot_context *context, uint64_t han
 }
 static int32_t callback_read(neoclr_aot_context *context, uint64_t handle, void **output) {
     host_root *root = find_host_root(context, handle);
-    if (!root || !output || !root->value || context->fault.code ||
+    if (!root || root->conditional || !output || !root->value || context->fault.code ||
         !blocks_valid(&context->text) || !live_base(&context->text, root->value)) return 3;
     const block *allocation = (const block *)root->value - 1;
     uint64_t kind;
@@ -250,7 +261,9 @@ int32_t neoclr_gc_collect_conditional_v1(neoclr_aot_context *context,
             !live_base(a, conditional[i].owner) || !live_base(a, conditional[i].value))
             return NEOCLR_AOT_FAULT_RUNTIME_ERROR;
     for (host_root *root = host_head; root; root = root->next)
-        if (root->context == context && !live_base(a, root->value)) return NEOCLR_AOT_FAULT_RUNTIME_ERROR;
+        if (root->context == context && (!live_base(a, root->value) ||
+            (root->conditional && !root->expired &&
+                (!root->owner || !live_base(a, root->owner))))) return NEOCLR_AOT_FAULT_RUNTIME_ERROR;
     for (const neoclr_parked_roots *p = neoclr_roots_parked_v1(); p; p = p->next)
         if (p->owner_context == context && !p->expired &&
             (!p->owner || !live_base(a, p->owner))) return NEOCLR_AOT_FAULT_RUNTIME_ERROR;
@@ -272,7 +285,8 @@ int32_t neoclr_gc_collect_conditional_v1(neoclr_aot_context *context,
     }
     mark_slots(a, &index, fault, (uint32_t)count, &pending);
     for (host_root *root = host_head; root; root = root->next)
-        if (root->context == context) mark(a, &index, (uintptr_t)root->value, &pending);
+        if (root->context == context && !root->conditional)
+            mark(a, &index, (uintptr_t)root->value, &pending);
     mark_frames(context, &index, head, &pending);
     for (const neoclr_parked_roots *p = neoclr_roots_parked_v1(); p; p = p->next)
         if (!p->owner_context) mark_frames(context, &index, p->head, &pending);
@@ -328,12 +342,22 @@ int32_t neoclr_gc_collect_conditional_v1(neoclr_aot_context *context,
             if (owner && (((const block *)owner - 1)->state & MARKED))
                 mark(a, &index, (uintptr_t)conditional[i].value, &pending);
         }
+        for (host_root *root = host_head; root; root = root->next)
+            if (root->context == context && root->conditional && !root->expired &&
+                (((const block *)root->owner - 1)->state & MARKED))
+                mark(a, &index, (uintptr_t)root->value, &pending);
         for (const neoclr_parked_roots *p = neoclr_roots_parked_v1(); p; p = p->next)
             if (p->owner_context == context && !p->expired &&
                 (((const block *)p->owner - 1)->state & MARKED))
                 mark_frames(context, &index, p->head, &pending);
         if (!pending) break;
     }
+    for (host_root *root = host_head; root; root = root->next)
+        if (root->context == context && root->conditional && !root->expired &&
+            !(((const block *)root->owner - 1)->state & MARKED)) {
+            root->owner = root->value = NULL;
+            root->expired = 1;
+        }
     for (neoclr_parked_roots *p = (neoclr_parked_roots *)neoclr_roots_parked_v1(); p; p = p->next)
         if (p->owner_context == context && !p->expired &&
             !(((const block *)p->owner - 1)->state & MARKED)) {

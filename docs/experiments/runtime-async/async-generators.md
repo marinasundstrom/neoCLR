@@ -410,3 +410,15 @@ The [generator regression](owned-parked-generator-validation.json) remains green
 all three local modes. Generator callback and pending-operation ownership is still
 unchanged, so abandoned generators are **not yet collectible**. Connecting those
 relationships and releasing expired native resources remains the next integration.
+
+
+### Dependent callback-handle checkpoint — 2026-10-11
+
+[Dependent host handles](../aot-console/native-gc.md#dependent-host-handles--private-experiment-2026-10-11)
+now persist owner/value associations across all native safepoints and cooperate with
+owned parked frames. Expired handles reject reads/replacement and remain releasable;
+dispatch requires a strong handle. Sanitized C tests exercise the combined graph and
+failure transitions. The [generator regression](owned-callback-generator-validation.json)
+passes in all three local modes, using the existing strong roots. The managed
+provider, pending advancement/completion ownership and native resource reclamation
+are still to be connected; this is not yet abandoned-generator support.

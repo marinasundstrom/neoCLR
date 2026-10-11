@@ -1705,3 +1705,11 @@ owners activate suspended frame roots; unreachable registrations expire before
 sweeping and cannot resume. Native storage release remains the scheduler's job.
 This is still opt-in collector machinery, not a change to the generator's callback,
 advancement-task or external-I/O ownership policy. No managed cleanup runs from GC.
+
+
+[Dependent native host handles](experiments/aot-console/native-gc.md#dependent-host-handles--private-experiment-2026-10-11)
+now provide the matching persistent callback association. The collector treats these
+and owned parked frames as one reachability graph. Dispatch must first establish a
+strong handle; expiration never invokes managed cleanup or releases native ownership
+implicitly. Generator integration and the preference for managed callback storage
+remain unchanged.
