@@ -95,6 +95,7 @@ pub(crate) fn uses(module: &crate::Module, function: &Function) -> Result<Vec<Se
             | crate::native::Binding::RuntimeAsyncDelay
             | crate::native::Binding::RuntimeAsyncComplete
             | crate::native::Binding::RuntimeAsyncCancel
+            | crate::native::Binding::RuntimeAsyncRelease
             | crate::native::Binding::RuntimeAsyncAwait
             | crate::native::Binding::RuntimeAsyncYield
             | crate::native::Binding::DrainEntryTasks

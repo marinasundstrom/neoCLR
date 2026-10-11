@@ -1422,3 +1422,46 @@ not captured Task outcomes, and cancellation does not implement public Task sema
 Managed result rooting, repeated Task awaits, fault/cancellation projection and
 JIT/AOT support are still gates before ordinary await or default switching.
 No performance improvement is claimed by this slice.
+
+## Retained operation outcomes — 2026-10-11
+
+The interpreter POC now retains integer outcomes for repeated observation and
+multiple parked waiters, matching the .NET Task distinction between one terminal
+completion and many observers. The earlier consuming operation was a POC shortcut,
+not a desired Task contract. Terminal handles require explicit private release or
+context teardown; release cannot invalidate existing waiters or active bodies.
+
+Benefit: operation completion no longer belongs to whichever waiter resumes first.
+Cost: completed outcomes occupy the operation budget until ownership is released.
+The [consumer and tests](experiments/runtime-async/README.md#shared-completed-outcomes--2026-10-11)
+qualify this lifecycle under the serialized interpreter dispatcher. The private
+release bridge is not a public Task disposal model. GC-linked ownership, managed
+result rooting, fault/cancellation projection and compiler await mapping remain the
+integration gates. Cross-thread publication and native/JIT qualification remain open.
+
+### Awaiters remain the language-facing contract
+
+The author asked how neoCLR handles .NET's task awaiter concept. Today
+`runtime/raven/src/System/Tasks/Tasks.rvn` makes Task<T> its own awaiter:
+GetAwaiter returns self, IsCompleted observes completion, GetResult reads the
+producer's result, and OnCompleted registers a callback. The provisional
+System.Runtime.CompilerServices.TaskAwaiter interface contains only OnCompleted;
+it is a notification contract, not .NET's concrete TaskAwaiter<T> type.
+
+The assistant recommends retaining the awaiter pattern and aligning the API roles
+with .NET: a thin TaskAwaiter<T> value returned from Task<T>.GetAwaiter, with the
+notification interface named separately. This is a proposal, not an implemented
+API change or user decision. Benefit: separate operation ownership from waiting
+policy and allow custom awaitables. Cost: compiler/runtime-library/API-reference
+migration and adapter validation, even if the wrapper requires no heap allocation.
+
+For runtime await, a recognized managed Task awaiter would identify the operation
+to park against and retrieve its outcome after resumption. Existing state machines
+still use continuation registration. Custom awaiters need an adapter that registers
+a one-shot resume notification without losing completion between checking readiness
+and parking; support cannot be inferred from the private integer-handle POC. The
+awaiter does not own a green thread, create the Task, or select a native stack layout.
+
+Primary baseline: [.NET awaitable pattern](https://devblogs.microsoft.com/dotnet/await-anything/)
+and [TaskAwaiter<T>](https://learn.microsoft.com/dotnet/api/system.runtime.compilerservices.taskawaiter-1).
+The awaiter pattern and runtime suspension representation are separate layers.

@@ -14919,3 +14919,20 @@ integer result. The compiled Raven consumer and 30 focused checks pass. This is
 runtime groundwork; ordinary Raven async lowering and defaults remain unchanged.
 Managed Task results, fault/cancellation projection and native support remain open.
 See [invocation evidence](experiments/runtime-async/start-validation.json).
+
+## 2026-10-11 — Shared results and the awaiter boundary
+
+- During the retained-outcome slice, the author asked: “In .NET they also have the
+  concept of a task awaiter. How do we handle that in neoCLR?”
+- Assistant inspected the managed library: Task<T> currently returns itself from
+  GetAwaiter and supplies IsCompleted/GetResult/OnCompleted. The existing TaskAwaiter
+  interface is only the callback notification contract.
+- Assistant proposed retaining the awaiter pattern for runtime await, with a thin
+  separate TaskAwaiter<T> and a separately named notification contract to align API
+  roles with .NET. This is a recommendation; no user approval or API implementation
+  is inferred. Runtime suspension can replace state-machine resumption behind that
+  boundary, with custom-awaitable adapters still requiring race/lifetime validation.
+- Implemented in this slice: retained results for repeated/shared awaits and guarded
+  private terminal-handle release. The compiled Raven consumer and 30 focused checks
+  pass. Automatic managed ownership, outcome projection and compiler mapping remain
+  open. [Evidence](experiments/runtime-async/shared-results-validation.json).

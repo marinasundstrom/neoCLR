@@ -2446,7 +2446,7 @@ fn interpret_instructions_with_dispatch(
                     return Err(Fault::new("Invalid runtime yield boundary"));
                 }
                 let resumed = match operation {
-                    Some(id) => async_operations.take_ready(id)?.map(Value::Int32),
+                    Some(id) => async_operations.read_ready(id)?.map(Value::Int32),
                     None if dispatched => Some(started.map_or(Value::Void, Value::Int64)),
                     None => None,
                 };
@@ -4113,6 +4113,7 @@ fn interpret_instructions_with_dispatch(
                                 | crate::native::Binding::RuntimeAsyncDelay
                                 | crate::native::Binding::RuntimeAsyncComplete
                                 | crate::native::Binding::RuntimeAsyncCancel
+                                | crate::native::Binding::RuntimeAsyncRelease
                                 | crate::native::Binding::RuntimeAsyncAwait
                         ) {
                             if work_control.is_some() || task_atomic::active(module, frames) {
@@ -4134,13 +4135,16 @@ fn interpret_instructions_with_dispatch(
                                 (crate::native::Binding::RuntimeAsyncCancel, [Value::Int64(id)]) => {
                                     Value::Boolean(async_operations.cancel(*id))
                                 }
+                                (crate::native::Binding::RuntimeAsyncRelease, [Value::Int64(id)]) => {
+                                    let in_use = yield_boundaries.iter().any(|boundary|
+                                        boundary.operation == Some(*id) || boundary.started == Some(*id))
+                                        || parked_activations.iter().any(|activation| activation.boundary.operation == Some(*id))
+                                        || frames.iter().chain(parked_activations.iter().flat_map(|activation| &activation.frames))
+                                            .any(|frame| frame.async_result == Some(*id));
+                                    Value::Boolean(!in_use && async_operations.release(*id))
+                                }
                                 (crate::native::Binding::RuntimeAsyncAwait, [Value::Int64(id)]) => {
                                     async_operations.validate(*id)?;
-                                    if yield_boundaries.iter().any(|boundary| boundary.operation == Some(*id))
-                                        || parked_activations.iter().any(|activation| activation.boundary.operation == Some(*id))
-                                    {
-                                        return Err(Fault::new("Runtime async operation already has a waiter"));
-                                    }
                                     yield_boundaries.push(RuntimeAsyncBoundary {
                                         depth: frames.len(),
                                         dispatched: false,

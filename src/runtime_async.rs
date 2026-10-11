@@ -91,13 +91,25 @@ impl Operations {
         if self.0.contains_key(&id) {
             Ok(())
         } else {
-            Err(Fault::new("Unknown or consumed runtime async operation"))
+            Err(Fault::new("Unknown or released runtime async operation"))
         }
     }
 
-    /// Inspection and consumption occur on the same VM dispatcher as completion.
+    /// VM callers additionally reject release while any activation still uses it.
+    pub(crate) fn release(&mut self, id: i64) -> bool {
+        if !matches!(
+            self.0.get(&id),
+            Some(Operation::Completed(_) | Operation::Cancelled)
+        ) {
+            return false;
+        }
+        self.0.remove(&id);
+        true
+    }
+
+    /// Outcome reads serialize on the same VM dispatcher as producer completion.
     /// No callback can race between the pending check and boundary installation.
-    pub(crate) fn take_ready(&mut self, id: i64) -> Result<Option<i32>, Fault> {
+    pub(crate) fn read_ready(&mut self, id: i64) -> Result<Option<i32>, Fault> {
         let result = match self.0.get(&id) {
             Some(Operation::Pending | Operation::Body) => return Ok(None),
             Some(Operation::Timer(deadline)) if Instant::now() < *deadline => return Ok(None),
@@ -107,9 +119,12 @@ impl Operations {
                 crate::FaultCode::ExecutionCancelled,
                 "Runtime async operation cancelled",
             )),
-            None => return Err(Fault::new("Unknown or consumed runtime async operation")),
+            None => return Err(Fault::new("Unknown or released runtime async operation")),
         };
-        self.0.remove(&id);
+        if let Ok(Some(value)) = result {
+            // Materialize timer completion so a later cancel cannot change it.
+            self.0.insert(id, Operation::Completed(value));
+        }
         result
     }
 }
@@ -119,16 +134,20 @@ mod tests {
     use super::*;
 
     #[test]
-    fn handles_are_context_owned_and_capacity_returns_on_consumption() {
+    fn handles_are_context_owned_and_capacity_returns_only_on_release() {
         let mut owner = Operations::default();
         let mut other = Operations::default();
         let ids: Vec<_> = (0..CAPACITY).map(|_| owner.create(None).unwrap()).collect();
         assert!(owner.create(None).is_err());
         assert!(!other.complete(ids[0], 42));
         assert!(!other.cancel(ids[0]));
-        assert!(other.take_ready(ids[0]).is_err());
+        assert!(other.read_ready(ids[0]).is_err());
         assert!(owner.complete(ids[0], 42));
-        assert_eq!(owner.take_ready(ids[0]).unwrap(), Some(42));
+        assert_eq!(owner.read_ready(ids[0]).unwrap(), Some(42));
+        assert_eq!(owner.read_ready(ids[0]).unwrap(), Some(42));
+        assert!(owner.create(None).is_err());
+        assert!(owner.release(ids[0]));
+        assert!(!owner.release(ids[0]));
         assert!(owner.create(None).is_ok());
     }
 
@@ -141,13 +160,13 @@ mod tests {
         assert!(operations.cancel(body));
         operations.complete_body(body, 42);
         assert_eq!(
-            operations.take_ready(body).unwrap_err().code,
+            operations.read_ready(body).unwrap_err().code,
             crate::FaultCode::ExecutionCancelled
         );
         let completed = operations.start().unwrap();
         operations.complete_body(completed, 42);
         operations.complete_body(completed, 99);
-        assert_eq!(operations.take_ready(completed).unwrap(), Some(42));
+        assert_eq!(operations.read_ready(completed).unwrap(), Some(42));
     }
 
     #[test]
@@ -155,15 +174,17 @@ mod tests {
         let mut operations = Operations::default();
         let ready = operations.create(Some(0)).unwrap();
         assert_eq!(operations.wait_timeout(ready), Duration::ZERO);
-        assert_eq!(operations.take_ready(ready).unwrap(), Some(0));
+        assert_eq!(operations.read_ready(ready).unwrap(), Some(0));
         let pending = operations.create(Some(i32::MAX)).unwrap();
         assert!(!operations.complete(pending, 42), "timer owns its result");
         assert!(operations.cancel(pending));
         assert!(!operations.cancel(pending));
         assert_eq!(
-            operations.take_ready(pending).unwrap_err().code,
+            operations.read_ready(pending).unwrap_err().code,
             crate::FaultCode::ExecutionCancelled
         );
+        assert!(operations.validate(pending).is_ok());
+        assert!(operations.release(pending));
         assert!(operations.validate(pending).is_err());
     }
 }

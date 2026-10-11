@@ -22,7 +22,8 @@ moving toward green threads. The interpreter POC now resumes detached callbacks 
 this is groundwork, not a completed green-thread implementation. The immediate
 author-directed goal is runtime await as Raven’s default, with stability and
 measured improvement. The POC now includes eager body invocation and runtime-owned integer-result
-completion. Next are compiler/managed Task integration and equivalent state-machine
+completion, plus retained outcomes for repeated/shared waits. Managed lifetime
+projection remains open. Next are compiler/managed Task integration and equivalent state-machine
 comparisons before switching supported defaults. Native stack representation, preemption and
 multi-core scheduling remain open. Task/Promise keep operation/producer roles.
 

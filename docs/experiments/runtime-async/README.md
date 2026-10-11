@@ -1,6 +1,6 @@
 # Interpreter runtime-async experiments
 
-Current development status: [async-body invocation](#async-body-invocation-ownership--2026-10-11)
+Current development status: [shared completed outcomes](#shared-completed-outcomes--2026-10-11)
 passes the extended Raven consumer and 30 focused checks. Detached activation
 checks from the preceding slice remain recorded below. Public Task/compiler await integration
 and default switching remain open. Earlier sections record the preceding POC slices.
@@ -200,3 +200,33 @@ when its awaited result becomes available. [Invocation evidence](start-validatio
 records the compiled consumer. Focused tests additionally cover already completed
 bodies, nested starts, frame limits, producer authority and late return after cancel.
 The reproduction script is unchanged; use a dedicated output directory.
+
+## Shared completed outcomes — 2026-10-11
+
+The private operation bridge now retains successful outcomes for repeated awaits
+and allows multiple parked activations to await the same operation. Completion is
+still one-shot; delivery is no longer consuming. This aligns result observation
+with .NET Task semantics. A timer becomes terminal when its ready outcome is read,
+so subsequent cancellation cannot overwrite an observed success.
+
+New private `RuntimeAsyncRelease(Int64) -> Boolean` explicitly releases a terminal
+handle. It returns false for pending, foreign, unknown or already released handles,
+and when an active/parked waiter or a running/parked body still uses the operation.
+Release is serialized with dispatcher transitions; it cannot retract an admitted
+waiter's outcome. Reads after successful release fault. No deadlock detection is
+promised for cycles or an operation waiting for itself.
+
+This is experimental handle bookkeeping, **not a Task.Dispose requirement**. The
+future managed projection needs lifetime ownership tied to managed reachability;
+applications should not manage these handles. The 64-operation budget now counts
+retained terminal outcomes until release/context teardown. Earlier consuming-handle
+behavior and reports describe prior revisions. Results remain Int32 only; terminal
+invocation faults/cancellation still prevent full Task outcome semantics, and no
+compiler default or native/JIT capability changes in this slice.
+
+The compiled consumer uses two eager bodies awaiting a shared completion, attempts
+release while the second is parked, then re-awaits both results. Focused checks also
+cover repeated reads, stale handles, capacity recovery only on release, and refusal
+to release a cancelled body that is still parked. See
+[shared-result evidence](shared-results-validation.json). Public API/reference and
+website capability claims remain unchanged. No performance improvement is asserted.

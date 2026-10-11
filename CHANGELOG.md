@@ -8,6 +8,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-11
 
+- Retain interpreter runtime-async POC outcomes for repeated awaits and multiple
+  parked observers. Add guarded private terminal-handle release that cannot retract
+  waiter delivery or active body ownership. Retained outcomes now occupy the handle
+  budget until release/teardown; managed Task lifetime and compiler mapping remain open.
+  Document the current self-awaiter pattern and a proposed separate awaiter projection.
+
 - Add private interpreter async-body invocation: run eagerly until completion or
   first pending wait, return an operation handle and publish the body's result on
   return. Reserve frame budget before publication and preserve runtime completion

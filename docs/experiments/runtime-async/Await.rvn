@@ -53,6 +53,14 @@ module RuntimeAsyncAwaitProbe {
             Gate = gate
         }
 
+        func RunAndCheckWaiter() -> int {
+            let result = Run()
+            if neoCLR.Runtime.RuntimeAsyncRelease(Gate) {
+                System.Fail("Release retracted a parked waiter's result")
+            }
+            return result
+        }
+
         func Run() -> int {
             Phase = 1
             _ = neoCLR.Runtime.RuntimeAsyncAwait(Gate)
@@ -100,6 +108,24 @@ module RuntimeAsyncAwaitProbe {
         if neoCLR.Runtime.RuntimeAsyncAwait(invocation) != 42 || body.Phase != 2 {
             System.Fail("Async body did not publish its result")
         }
+        if neoCLR.Runtime.RuntimeAsyncAwait(invocation) != 42 {
+            System.Fail("Repeated await lost the completed result")
+        }
+
+        let shared = neoCLR.Runtime.RuntimeAsyncCreate()
+        let first = AsyncBody(shared)
+        let second = AsyncBody(shared)
+        let firstTask = neoCLR.Runtime.RuntimeAsyncStart(first.RunAndCheckWaiter)
+        let secondTask = neoCLR.Runtime.RuntimeAsyncStart(second.Run)
+        _ = neoCLR.Runtime.RuntimeAsyncComplete(shared, 0)
+        _ = neoCLR.Runtime.RuntimeAsyncAwait(firstTask)
+        _ = neoCLR.Runtime.RuntimeAsyncAwait(secondTask)
+        if !neoCLR.Runtime.RuntimeAsyncRelease(shared) {
+            System.Fail("Completed operation could not be released")
+        }
+        if neoCLR.Runtime.RuntimeAsyncAwait(firstTask) + neoCLR.Runtime.RuntimeAsyncAwait(secondTask) != 84 {
+            System.Fail("Shared operation did not complete both bodies")
+        }
         Console.WriteLine("PASS runtime-owned operation suspension and resumption")
         return 0
     }
@@ -120,6 +146,8 @@ module neoCLR.Runtime {
     internal extern func RuntimeAsyncComplete(operation: long, result: int) -> bool;
     [MethodImpl(MethodImplOptions.InternalCall)]
     internal extern func RuntimeAsyncAwait(operation: long) -> int;
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    internal extern func RuntimeAsyncRelease(operation: long) -> bool;
     [MethodImpl(MethodImplOptions.InternalCall)]
     internal extern func SchedulerSubmit(callback: () -> System.Void) -> int;
 }

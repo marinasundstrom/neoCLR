@@ -1216,5 +1216,6 @@ ret
     ));
     assert!(frames.is_empty());
     assert!(state.yield_boundaries.is_empty());
-    assert!(state.async_operations.validate(operation).is_err());
+    assert!(state.async_operations.validate(operation).is_ok());
+    assert!(state.async_operations.release(operation));
 }

@@ -21,6 +21,9 @@ fn program(main: &str, extra: &str) -> LoadedProgram {
 .function neoCLR.Runtime.RuntimeAsyncCancel(Int64 id) -> Boolean
 .methodimpl InternalCall
 .end
+.function neoCLR.Runtime.RuntimeAsyncRelease(Int64 id) -> Boolean
+.methodimpl InternalCall
+.end
 .function neoCLR.Runtime.RuntimeAsyncAwait(Int64 id) -> Int32
 .methodimpl InternalCall
 .end
@@ -215,21 +218,11 @@ fn host_cancellation_interrupts_an_incomplete_operation() {
 }
 
 #[test]
-fn consumed_handle_cannot_be_awaited_twice() {
-    let fault = program("ldc.i4 0\ncall neoCLR.Runtime.RuntimeAsyncDelay(Int32)\nstloc operation\nldloc operation\ncall neoCLR.Runtime.RuntimeAsyncAwait(Int64)\npop\nldloc operation\ncall neoCLR.Runtime.RuntimeAsyncAwait(Int64)\nret", "").run(Limits::default()).unwrap_err();
-    assert!(fault.message.contains("consumed"));
-}
-
-#[test]
-fn reentrant_wait_on_same_operation_is_rejected() {
-    let producer = PRODUCER.replace(
-        "ldc.i4 10\ncall neoCLR.Runtime.RuntimeAsyncDelay(Int32)",
-        "ldarg 0\nldfld Producer::Operation",
-    );
-    let fault = program(PENDING, &producer)
-        .run(Limits::default())
-        .unwrap_err();
-    assert!(fault.message.contains("already has a waiter"));
+fn completed_handle_can_be_awaited_repeatedly_until_released() {
+    let result = program("ldc.i4 0\ncall neoCLR.Runtime.RuntimeAsyncDelay(Int32)\nstloc operation\nldloc operation\ncall neoCLR.Runtime.RuntimeAsyncAwait(Int64)\npop\nldloc operation\ncall neoCLR.Runtime.RuntimeAsyncAwait(Int64)\nret", "").run(Limits::default()).unwrap();
+    assert_eq!(result.value, Value::Int32(0));
+    let fault = program("ldc.i4 0\ncall neoCLR.Runtime.RuntimeAsyncDelay(Int32)\nstloc operation\nldloc operation\ncall neoCLR.Runtime.RuntimeAsyncAwait(Int64)\npop\nldloc operation\ncall neoCLR.Runtime.RuntimeAsyncRelease(Int64)\npop\nldloc operation\ncall neoCLR.Runtime.RuntimeAsyncAwait(Int64)\nret", "").run(Limits::default()).unwrap_err();
+    assert!(fault.message.contains("released"));
 }
 
 #[test]
@@ -474,4 +467,82 @@ fn nested_async_starts_return_to_their_own_callers_and_publish_results() {
         bounded_run(program(START_BODY, &extra)).value,
         Value::Int32(42)
     );
+}
+
+#[test]
+fn multiple_parked_bodies_share_completion_and_release_cannot_retract_delivery() {
+    let main = r#"
+.local AsyncBody first
+.local AsyncBody second
+.local Int64 firstTask
+.local Int64 secondTask
+call neoCLR.Runtime.RuntimeAsyncCreate()
+stloc operation
+newobj instance AsyncBody::.ctor()
+stloc first
+ldloc first
+ldloc operation
+stfld AsyncBody::Gate
+newobj instance AsyncBody::.ctor()
+stloc second
+ldloc second
+ldloc operation
+stfld AsyncBody::Gate
+ldloc first
+function.bind fn<Int32> = instance AsyncBody::First()
+call neoCLR.Runtime.RuntimeAsyncStart(fn<Int32>)
+stloc firstTask
+ldloc second
+function.bind fn<Int32> = instance AsyncBody::Run()
+call neoCLR.Runtime.RuntimeAsyncStart(fn<Int32>)
+stloc secondTask
+ldloc operation
+ldc.i4 0
+call neoCLR.Runtime.RuntimeAsyncComplete(Int64, Int32)
+pop
+ldloc firstTask
+call neoCLR.Runtime.RuntimeAsyncAwait(Int64)
+pop
+ldloc secondTask
+call neoCLR.Runtime.RuntimeAsyncAwait(Int64)
+pop
+ldloc operation
+call neoCLR.Runtime.RuntimeAsyncRelease(Int64)
+brfalse Bad
+ldloc firstTask
+call neoCLR.Runtime.RuntimeAsyncAwait(Int64)
+ldloc secondTask
+call neoCLR.Runtime.RuntimeAsyncAwait(Int64)
+add
+ret
+Bad:
+fault "release retracted a parked delivery or failed after delivery"
+"#;
+    let first = r#".method instance First() -> Int32
+ldarg 0
+call instance AsyncBody::Run()
+ldarg 0
+ldfld AsyncBody::Gate
+call neoCLR.Runtime.RuntimeAsyncRelease(Int64)
+brtrue Bad
+ret
+Bad:
+fault "release retracted the second parked waiter"
+.end
+"#;
+    let extra = format!(
+        "{}{}\n.end\n",
+        BODY.trim_end().strip_suffix(".end").unwrap(),
+        first
+    );
+    let result = bounded_run(program(main, &extra));
+    assert_eq!(result.value, Value::Int32(84));
+    assert!(result.heap.is_empty());
+}
+
+#[test]
+fn cancelled_body_handle_cannot_be_released_while_body_is_still_parked() {
+    let main = START_BODY.replace("ldloc operation\nldc.i4 99\ncall neoCLR.Runtime.RuntimeAsyncComplete(Int64, Int32)\nbrtrue Bad", "ldloc operation\ncall neoCLR.Runtime.RuntimeAsyncCancel(Int64)\npop\nldloc operation\ncall neoCLR.Runtime.RuntimeAsyncRelease(Int64)\nbrtrue Bad")
+        .replace("ldloc operation\ncall neoCLR.Runtime.RuntimeAsyncAwait(Int64)\nret", "ldc.i4 0\nret");
+    assert_eq!(bounded_run(program(&main, BODY)).value, Value::Int32(0));
 }
