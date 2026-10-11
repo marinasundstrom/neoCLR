@@ -588,3 +588,19 @@ The external-input test awaits a producer acknowledgement rather than assuming
 scheduler ordering. The source listing has no generated async state machine.
 This closes the scoped managed-lifetime integration checkpoint. Matched performance,
 production carrier/metadata and Windows qualification remain separate follow-up gates.
+
+
+### Initial ownership cost measurement
+
+The [callback-adapter benchmark](managed-ownership-callback-benchmark.json) compares
+compiler state machines and runtime async on neoCLR, not the .NET runtime. On this
+Apple M1 run, 100 completed awaits cost 4.37x as much interpreted and 69–81x as much
+in JIT/AOT. Pending awaits cost 0.88x interpreted and 2.10–2.18x native. All samples
+pass result and teardown/reclamation checks. This is a correctness checkpoint with
+a serious completed-path regression, not performance qualification.
+
+The provisional body callback queues work even for immediately completed Tasks,
+retaining producers until notification drains. The next bounded correction is to
+use the returned Task itself as the conditional runtime owner, removing that
+per-body callback while preserving advancement/disposal ownership adapters. Validate
+this with the same lifetime suite and matched benchmark before claiming improvement.
