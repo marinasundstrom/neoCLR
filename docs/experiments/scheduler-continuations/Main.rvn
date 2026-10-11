@@ -1,0 +1,95 @@
+module SchedulerContinuations {
+    import System.*
+    import System.Collections.*
+    import System.Tasks.*
+    import System.Runtime.CompilerServices.*
+
+    async func Consume(completion: Completion) -> Task<int> {
+        let value = await completion
+        return value
+    }
+
+    async func Pending() -> Task<int> {
+        let producer = UnpumpedProducer()
+        let pending = Completion(producer)
+        let first = Consume(pending)
+        let second = Consume(pending)
+        if first.IsCompleted || second.IsCompleted {
+            System.Fail("Pending await completed inline")
+        }
+        _ = neoCLR.Runtime.SchedulerSubmit(pending.Publish)
+        let one = await first
+        let two = await second
+        if one != 42 || two != 42 {
+            System.Fail("Pending continuation result mismatch")
+        }
+        return 0
+    }
+
+    async func Completed() -> Task<int> {
+        let producer = UnpumpedProducer()
+        let completed = Completion(producer)
+        completed.Publish()
+        let immediate = Consume(completed)
+        if !immediate.IsCompleted {
+            System.Fail("Completed await unnecessarily suspended")
+        }
+        let value = await immediate
+        if value != 42 {
+            System.Fail("Completed await result mismatch")
+        }
+        completed.OnCompleted(completed.Observe)
+        if completed.Deliveries != 0 {
+            System.Fail("Explicit observer ran inline")
+        }
+        _ = await completed.Observed.Task
+        if completed.Deliveries != 1 {
+            System.Fail("Explicit observer delivery mismatch")
+        }
+        return 0
+    }
+
+    async func Cancelled() -> Task<int> {
+        let producer = UnpumpedProducer()
+        let cancelled = Completion(producer)
+        let waiting = Consume(cancelled)
+        cancelled.OnCompleted(cancelled.Observe)
+        _ = neoCLR.Runtime.SchedulerSubmit(cancelled.Cancel)
+        let check = CancellationCheck(waiting)
+        // Outcome observation deliberately avoids awaiting a cancelled result.
+        waiting.OnCompleted(check.Observe)
+        _ = await check.Done.Task
+        _ = await cancelled.Observed.Task
+        if !waiting.IsCancelled || cancelled.Deliveries != 1 {
+            System.Fail("Cancelled continuation mismatch")
+        }
+        return 0
+    }
+    class CancellationCheck {
+        private val task: Task<int>
+        val Done = Promise<int>()
+
+        init(task: Task<int>) {
+            self.task = task
+        }
+
+        func Observe() -> System.Void {
+            if !task.IsCancelled {
+                System.Fail("Await did not propagate cancellation")
+            }
+            Done.Complete(1)
+            return ()
+        }
+    }
+
+    async func Main() -> Task<int> {
+        _ = await Pending()
+        Console.WriteLine("PASS multiple pending awaits without producer pump")
+        _ = await Completed()
+        Console.WriteLine("PASS completed await and deferred observer")
+        _ = await Cancelled()
+        Console.WriteLine("PASS cancellation without producer pump")
+        return 0
+    }
+
+}

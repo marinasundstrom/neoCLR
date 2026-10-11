@@ -1,0 +1,12 @@
+module SchedulerContinuations {
+    import System.*
+    import System.Tasks.*
+
+    async func Main() -> Task<int> {
+        let source = Completion(UnpumpedProducer())
+        _ = neoCLR.Runtime.SchedulerSubmit(source.PublishFault)
+        _ = await source
+        System.Fail("Continuation ran after terminal fault")
+        return 0
+    }
+}

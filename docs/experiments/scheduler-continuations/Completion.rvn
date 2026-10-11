@@ -1,0 +1,90 @@
+module SchedulerContinuations {
+    import System.*
+    import System.Collections.*
+    import System.Tasks.*
+    import System.Runtime.CompilerServices.*
+
+    // Internal experiment: managed outcome storage, runtime continuation dispatch.
+    // The unpumped producer queue is deliberately never used for registration.
+    class Completion : TaskAwaiter {
+        private val source: Promise<int>
+        private var callbacks = ArrayList<() -> System.Void>()
+        var Deliveries = 0
+        val Observed = Promise<int>()
+
+        init(producer: TaskQueue) {
+            source = Promise<int>(producer)
+        }
+
+        val IsCompleted: bool => source.Task.IsCompleted
+        val IsCancelled: bool => source.Task.IsCancelled
+        func GetAwaiter() -> Completion => self
+        func GetResult() -> int => source.Task.GetResult()
+
+        func OnCompleted(callback: () -> System.Void) {
+            if IsCompleted {
+                _ = neoCLR.Runtime.SchedulerSubmit(callback)
+            } else {
+                callbacks.Add(callback)
+            }
+        }
+
+        func Publish() -> System.Void {
+            if !source.Complete(42) {
+                System.Fail("Duplicate completion")
+            }
+            Dispatch()
+            return ()
+        }
+
+        func PublishFault() -> System.Void {
+            Publish()
+            System.Fail("fault after continuation submission")
+            return ()
+        }
+
+        func Cancel() -> System.Void {
+            if !source.Cancel() {
+                System.Fail("Duplicate cancellation")
+            }
+            Dispatch()
+            return ()
+        }
+
+        private func Dispatch() {
+            let pending = callbacks
+            callbacks = ArrayList<() -> System.Void>()
+            for callback in pending {
+                _ = neoCLR.Runtime.SchedulerSubmit(callback)
+            }
+        }
+
+        // Explicit OnCompleted below tests deferred outcome observation, not await.
+        func Observe() -> System.Void {
+            if !IsCompleted {
+                System.Fail("Observer ran before completion")
+            }
+            Deliveries += 1
+            Observed.Complete(Deliveries)
+            return ()
+        }
+    }
+
+    func UnpumpedProducer() -> TaskQueue {
+        let queue = TaskQueue()
+        queue.Post(ProducerPumpForbidden)
+        return queue
+    }
+
+    func ProducerPumpForbidden() -> System.Void {
+        System.Fail("producer queue was pumped")
+        return ()
+    }
+}
+
+module neoCLR.Runtime {
+    import System.Runtime.CompilerServices.*
+
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    internal extern func SchedulerSubmit(callback: () -> System.Void) -> int;
+}

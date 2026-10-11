@@ -939,3 +939,23 @@ unchanged guest assembly/library inputs; [raw observations and limits](../benchm
 No performance improvement is claimed. Native scheduling and public APIs are unchanged;
 JIT/AOT/Windows qualification and the API snapshot were not repeated for this private
 interpreter correction. Website review found no public behavior claim requiring change.
+
+## Producer-independent continuation experiment — 2026-10-11
+
+A [source-included awaitable](experiments/scheduler-continuations/README.md) now retains
+outcomes in the existing managed Promise while submitting its own await continuations
+through the runtime. An explicit producer queue contains a faulting pump sentinel;
+pending/completed awaits, multiple awaiters, deferred observation and cancellation
+succeed without pumping it. A fault after submission terminates without resumption.
+Both cases pass in interpreter/JIT/AOT on macOS ARM64.
+
+This qualifies current generated state machines against a different continuation
+adapter without changing compiler lowering or public Task semantics. The registered
+callback list is still managed; runtime admission owns each submitted callback.
+Destination is implicitly the same invocation in this experiment. It is not yet an
+await-site destination token, cross-invocation/race-safe registration or general
+custom scheduler capture. Those rules must be settled before replacing production
+Promise registration. The existing .NET comparison remains the design baseline;
+producer independence alone does not provide context flow or ConfigureAwait semantics.
+The benchmark workload and shipped library remain unchanged, so no routing speedup
+or memory improvement is asserted.

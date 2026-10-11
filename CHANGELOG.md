@@ -8,6 +8,13 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-11
 
+- Qualify an internal continuation-routing experiment that keeps outcomes managed
+  and submits await callbacks through the runtime without pumping an explicit
+  producer queue. Multiple pending awaiters, completed awaits, deferred observers,
+  cancellation and terminal producer faults pass in interpreter/JIT/AOT on macOS
+  ARM64. Public Task/Promise routing and compiler lowering are unchanged; destination
+  capture, cross-invocation ownership and production migration remain open.
+
 - Make interpreter scheduler readiness include submitted callbacks, preventing a
   false private Idle/Pending report while runnable work exists. Keep source versus
   submission arbitration inside the scheduler, preserving source turns, rooted

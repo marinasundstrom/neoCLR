@@ -238,7 +238,10 @@ its current dispatch adapter still uses the invocation's default queue.
 A private native submission hook now exercises deferred runtime-owned dispatch with
 a retained managed HTTP callback, independently of Task construction. An internal managed Scheduler prototype now exercises the submission service in
 interpreter, AOT and JIT with existing state machines. It is not yet the public
-Scheduler API or a supported foreign-language ABI.
+Scheduler API or a supported foreign-language ABI. A separate internal awaitable
+experiment also passes pending/completed awaits, multiple awaiters, cancellation and
+producer faults without pumping the producer queue. Public Task routing still uses
+the existing adapter; destination capture and production migration remain open.
 A pending await currently resumes through the producer queue; custom queue and UI
 affinity are not settled contracts. Ordinary worker joins can still block the queue.
 

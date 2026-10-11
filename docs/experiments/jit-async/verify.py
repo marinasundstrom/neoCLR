@@ -21,6 +21,7 @@ def main():
     parser.add_argument('--case', action='append', help='Run only named cases in the selected profile')
     parser.add_argument('--timers', action='store_true')
     parser.add_argument('--scheduler', action='store_true')
+    parser.add_argument('--continuations', action='store_true')
     parser.add_argument('--output', type=Path, required=True)
     args = parser.parse_args()
     out, bundle = args.output.resolve(), args.bundle.resolve()
@@ -86,6 +87,13 @@ def main():
         cases = [('scheduler', ROOT/'docs/experiments/scheduler-projection/Main.rvn', [], 0,
                   'PASS deferred submission and state-machine resume\n', None),
                  ('scheduler-fault', ROOT/'docs/experiments/scheduler-projection/Fault.rvn', [], 1, '', 'submitted callback fault')]
+    if args.continuations:
+        cases = [('continuations', ROOT/'docs/experiments/scheduler-continuations/Main.rvn', [], 0,
+                  'PASS multiple pending awaits without producer pump\n'
+                  'PASS completed await and deferred observer\n'
+                  'PASS cancellation without producer pump\n', None),
+                 ('continuation-fault', ROOT/'docs/experiments/scheduler-continuations/Fault.rvn', [], 1,
+                  '', 'fault after continuation submission')]
     if args.case:
         known = {case[0] for case in cases}
         if set(args.case) - known:
@@ -100,13 +108,16 @@ def main():
             case_out = out/name
             case_out.mkdir()
             assembly, obj, exe = (case_out/n for n in ['app.dll', 'app.o', 'app'])
-            result = run([*compile_base, '-o', assembly, source])
+            extra_sources = [ROOT/'docs/experiments/scheduler-continuations/Completion.rvn'] if args.continuations else []
+            for extra in extra_sources:
+                report['inputs'][str(extra)] = sha(extra)
+            result = run([*compile_base, '-o', assembly, source, *extra_sources])
             if result.returncode:
                 raise RuntimeError(name+' Raven compilation failed: '+result.stdout+result.stderr)
             native = [str(assembly) if p == old_input else str(obj) if p == old_host else p for p in native_base]
             if '--bind-task-queue' not in native:
                 native += ['--bind-task-queue']
-            if args.scheduler:
+            if args.scheduler or args.continuations:
                 native += ['--bind-scheduler']
             if args.timers:
                 native += ['--bind-timers']

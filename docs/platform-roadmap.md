@@ -49,7 +49,11 @@ without a Task or managed queue. A [source-included managed Scheduler prototype]
 now projects a reserved submission service in interpreter/AOT/JIT and preserves
 compiler-generated state machines in pending/completed await and fault cases. It is
 not yet the public class-library Scheduler API or a stable foreign-language ABI. Current public TaskQueue behavior remains implemented
-until the replacement is qualified. The interpreter readiness query now includes
+until the replacement is qualified. A [continuation-routing experiment](experiments/scheduler-continuations/README.md)
+now qualifies pending/completed awaits, multiple awaiters, cancellation and terminal
+faults without pumping an explicit producer queue in interpreter/JIT/AOT. It uses an
+internal awaitable; production Task registration, destination capture and cross-invocation
+rules remain open. The interpreter readiness query now includes
 submitted work and keeps source/submission arbitration private;
 [quiescence contract and validation](runtime-scheduling-design.md#unified-interpreter-readiness--2026-10-11).
 
