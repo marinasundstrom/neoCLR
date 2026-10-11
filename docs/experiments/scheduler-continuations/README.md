@@ -126,3 +126,9 @@ Exact reserved signature tests run in both interpreter and native binding layers
 activation, cancellation and root release, dormant quiescence and scope teardown.
 The real awaitable consumer additionally checks registration cancellation independently
 of Task state and exits with an intentionally abandoned dormant registration.
+
+
+The [conditional-root collector experiment](../../runtime-scheduling-design.md#conditional-continuation-roots--collector-experiment-2026-10-11)
+provides graph-level retention/reclamation tests for a possible abandonment policy.
+It is not connected to these registrations: the evidence above still uses strong
+runtime roots, explicit observer disposal and invocation teardown.

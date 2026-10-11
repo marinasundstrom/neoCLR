@@ -8,6 +8,13 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-11
 
+- Add an internal conditional-root collector experiment for continuation lifetime:
+  reachable owners retain dependent graphs, while unreachable back-reference cycles
+  are reclaimed. Validate heap provenance through the shared host-root validation
+  path and preserve failure atomicity; 52 focused collector, scheduler and heap checks
+  pass. Scheduler registrations still use strong
+  roots; automatic await cleanup and native collector integration remain open.
+
 - Add scoped disposable observers to the internal continuation experiment. Withdrawal
   releases dormant runtime callbacks without changing Task state; completion skips
   intentionally withdrawn observers, while disposal after activation leaves admitted

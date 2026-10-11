@@ -14797,3 +14797,18 @@ outside benchmark measurement. Implementation follows the configuration slice.
 - **Open:** representation, symbol/optimization limits, debugger API and executable
   implementation. No faithful async trace support is claimed as delivered by the
   scheduler destination/registration work.
+
+
+### 2026-10-11 — Investigating abandoned await ownership
+
+- **Context:** following the author's continuation request, the assistant investigated
+  the remaining strong-root lifetime gap after scoped observer disposal.
+- **Assistant proposal:** evaluate conditional operation-to-continuation GC roots so
+  callbacks cannot retain otherwise abandoned owners through back references. This is
+  an implementation hypothesis, not a new author-selected API or cancellation rule.
+- **Action:** added a private interpreter collector experiment and graph-level tests;
+  reused host-root provenance checks. The [design comparison](runtime-scheduling-design.md#conditional-continuation-roots--collector-experiment-2026-10-11)
+  also keeps ordinary managed callback storage as a simpler alternative.
+- **Open:** select ownership using real await/source lifetimes, qualify native parity
+  and slot cleanup, and measure costs before public Task migration. Current runtime
+  registrations and Task/Promise behavior remain unchanged.

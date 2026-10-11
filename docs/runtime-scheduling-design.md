@@ -1119,3 +1119,70 @@ This is not automatic abandonment cleanup or concurrent unsubscription. Protecte
 cleanup is still limited; terminal faults do not unwind use, so runtime teardown remains
 responsible then. Production Task routing must address implicit await lifetime and
 cross-invocation ownership before adopting the prototype wholesale.
+
+
+## Conditional continuation roots — collector experiment, 2026-10-11
+
+A dormant callback may point back to the operation it awaits. Unconditionally rooting
+that callback can retain the entire abandoned graph in a long-running invocation.
+Weakening the callback alone is also wrong: a reachable operation must retain its
+waiters even when nothing else references their state machines.
+
+The .NET baseline is the shipped dependent-lifetime behavior of
+[ConditionalWeakTable<TKey,TValue>](https://learn.microsoft.com/en-us/dotnet/api/system.runtime.compilerservices.conditionalweaktable-2?view=net-10.0)
+(.NET 10 API documentation, retrieved 2026-10-11): an entry does not keep its key alive,
+even through a value-to-key back reference. This is a GC relationship, not a claim that
+.NET Task uses a ConditionalWeakTable. Ordinary managed fields already express ownership
+from a Task to its continuations; retaining callbacks in managed storage and admitting
+only runnable work remains a simpler alternative worth comparing. Explicit disposal is
+useful for observers but does not cover ordinary await. Strong runtime registrations
+remain implemented while the replacement is evaluated.
+
+The private interpreter collector now accepts conditional owner/value roots. It checks
+heap provenance, indexes dependents by owner, and expands their references when the
+owner is marked. Ordinary graph tracing then discovers further owners, reaching a
+fixed point regardless of entry order. Multiple waiters share an owner; unreachable
+mutually dependent entries do not make each other live. Independently rooted runnable
+callbacks retain their full graph normally. Invalid inputs fail before sweep or changes
+to collection statistics. Diagnostic root counts continue to count unconditional input
+edges; conditional edges are not reported as ordinary roots.
+
+This is an experimental collector foundation, not an active scheduler policy, a public
+ConditionalWeakTable API, or automatic await cleanup. The caller must publish roots and
+exclude graph mutation throughout collection, then prune dead-owner entries before the
+next collection under the same exclusion. The current API rejects stale owners rather
+than silently tolerating forgotten registrations. Root provenance validation is shared
+with existing host/native result validation; numeric object IDs alone are insufficient.
+
+The benefit under investigation is releasing unreachable await cycles without requiring
+Task disposal or cancelling an operation. Costs include an owner index and reference
+lists per collection, plus owner metadata and post-collection registration cleanup in a
+future integration. No performance improvement is claimed. The default collection path
+supplies no conditional roots; scheduler roots and native collection remain unchanged.
+
+Before production use, identify the actual operation owner and prove its reachability
+from all supported completion sources, consumers and live executions. Losing a returned
+Task reference alone must not abandon independently rooted I/O or runnable work. Add
+native/JIT/AOT collector parity, cleanup of reserved admission slots, activation/GC race
+rules, and executable ordinary-await tests under forced collection. Compare this scheme
+against managed callback storage before selecting either for public Task migration.
+
+Validation: eight collector tests cover live and abandoned back references, transitive
+chains, multiple dependents, unrooted mutual cycles, independent execution roots, foreign
+owners/values, stale handles and failure atomicity. Existing scheduler, shared-heap and
+GC consumer checks cover the unchanged paths. This is graph-level evidence only;
+Windows and generated Raven awaiters have not been qualified for conditional roots.
+
+
+Reproduce the 52 focused checks (macOS ARM64):
+
+```sh
+CARGO_TARGET_DIR=target/scheduler-wait-validation cargo test --lib gc::tests
+CARGO_TARGET_DIR=target/scheduler-wait-validation cargo test --lib shared_heap::tests
+CARGO_TARGET_DIR=target/scheduler-wait-validation cargo test --lib scheduler::tests
+CARGO_TARGET_DIR=target/scheduler-wait-validation cargo test --test runtime_gc --test gc_diagnostics --test heap_references
+```
+
+Website/API review: no public signatures or guest behavior change in this foundation;
+no API snapshot or website capability update is needed. There is no new compiler bridge
+encoding or Runtime Contract configuration.

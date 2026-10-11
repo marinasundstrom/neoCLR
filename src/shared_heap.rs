@@ -217,44 +217,9 @@ impl Access<'_> {
         Identity(Arc::downgrade(self.shared))
     }
 
-    /// Validate native result provenance, including nested values and functions.
-    /// Allocation IDs alone cannot distinguish two invocations with the same ID.
+    /// Validate native result provenance using the heap's shared root validation.
     fn value_roots(&self, value: &crate::Value) -> Result<Vec<usize>, Fault> {
-        use crate::Value;
-        value.ensure_heap_references()?;
-        let mut pending = vec![value];
-        let mut roots = Vec::new();
-        while let Some(value) = pending.pop() {
-            let reference = match value {
-                Value::ObjectReference(object) => Some(&object.reference),
-                Value::SlotReference(reference)
-                | Value::SlotInterface {
-                    receiver: reference,
-                    ..
-                } => Some(reference),
-                Value::Function(function_object) => {
-                    pending.extend(function_object.receiver.as_deref());
-                    None
-                }
-                Value::Object { fields, .. }
-                | Value::Array {
-                    elements: fields, ..
-                } => {
-                    pending.extend(fields);
-                    None
-                }
-                Value::Erased(value) => {
-                    pending.push(value);
-                    None
-                }
-                _ => None,
-            };
-            if let Some(reference) = reference {
-                self.state.heap.check_reference_owner(reference)?;
-                roots.push(reference.allocation_id().expect("checked heap reference"));
-            }
-        }
-        Ok(roots)
+        self.state.heap.value_roots(value)
     }
 
     /// Captures must be actual values so provenance and inline payload cannot be

@@ -59,7 +59,11 @@ uses runtime-owned dormant registrations with one-shot activation/cancellation;
 Task remains the operation/state abstraction and Promise its producer-side completion
 source. Explicit observers now have scoped disposable registrations, qualified for
 capacity reuse, early return and no retraction after activation in all three modes.
-Automatic await abandonment cleanup and race/lifetime rules remain production-migration gates. The interpreter readiness query now includes
+Automatic await abandonment cleanup and race/lifetime rules remain production-migration gates. A
+[conditional-root collector experiment](runtime-scheduling-design.md#conditional-continuation-roots--collector-experiment-2026-10-11)
+now validates live-owner retention and abandoned-cycle reclamation in the interpreter
+heap. Scheduler integration, native parity and choosing conditional roots versus managed
+callback storage remain open; current registrations still retain strong roots. The interpreter readiness query now includes
 submitted work and keeps source/submission arbitration private;
 [quiescence contract and validation](runtime-scheduling-design.md#unified-interpreter-readiness--2026-10-11).
 
