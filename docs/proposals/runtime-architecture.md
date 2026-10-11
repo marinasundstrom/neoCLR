@@ -4,6 +4,14 @@
 
 **Proposal / architectural direction**
 
+**Author clarification (2026-10-11):** neoCLR's primary target is managed languages
+running bytecode, with interpreter and JIT support. Native AOT is the publishing
+target. The goal is a common language runtime with opt-in services; the native and
+foreign-runtime integration models below are future extension points, not an equal
+immediate implementation priority. Service selection does not waive a selected
+service's safety, ownership or lifetime requirements. The
+[platform roadmap](../platform-roadmap.md) governs implementation sequencing.
+
 ## Summary
 
 NeoCLR is a language-neutral managed runtime and application platform.

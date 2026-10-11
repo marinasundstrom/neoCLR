@@ -582,6 +582,14 @@ languages and other runtimes should eventually be able to integrate and project
 these fundamental concepts. This clarifies the scheduler-then-suspension direction,
 without selecting a public API or foreign-runtime ABI.
 
+**Subsequent author clarification:** managed bytecode languages are the primary
+consumers, supported by interpreter and JIT execution; native AOT is the publishing
+target. The common language runtime offers opt-in services, with future integration
+points as outlined in the [architecture proposal](proposals/runtime-architecture.md).
+A synchronous consumer need not acquire scheduling services merely to execute.
+Consumers that opt into asynchrony must satisfy its ownership and root contracts.
+This does not turn every proposed foreign-runtime projection into current scope.
+
 The proposed semantic boundary has three layers:
 
 - The runtime owns registration, completion publication, runnable-work ownership,

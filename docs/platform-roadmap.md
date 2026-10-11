@@ -29,6 +29,14 @@ Migrate more cases as needed; remaining benchmark/framework features are follow-
 not prerequisites for beginning the scheduler slice. Parallel-by-default testing and
 class grouping are proposals to develop with scheduling, not enabled behavior.
 
+**Common language runtime clarification (2026-10-11):** the primary target is managed
+languages running bytecode through the interpreter or JIT, with native AOT as the
+publishing target. Runtime services should be opt-in through explicit contracts;
+future native-language/runtime integration points extend this foundation. The
+[runtime architecture proposal](proposals/runtime-architecture.md) remains exploratory,
+not a commitment to implement every participation model before managed execution.
+Opting into a service still requires its ownership, safety and lifetime rules.
+
 **Async foundation clarification (2026-10-11):** the runtime should own asynchrony,
 with language implementations and eventually native languages/other runtimes able to
 project and integrate its lifecycle. Raven callbacks are a transitional projection,

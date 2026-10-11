@@ -11,7 +11,9 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 - Record the author-directed runtime async foundation: language projections and
   eventual native/foreign-runtime integration over shared lifecycle and ownership
   contracts. Document proposed layers, tradeoffs and validation gates; this is design
-  direction, not implemented suspension or a selected interoperability ABI.
+  direction, not implemented suspension or a selected interoperability ABI. Clarify
+  the primary path: managed bytecode with interpreter/JIT execution and native AOT
+  publishing, opt-in services and future native/foreign-runtime integration.
 
 - Begin the resumed scheduler work by moving interpreter invocation wait policy
   into the private scheduler. Bound owner waits by known timer deadlines, preserve

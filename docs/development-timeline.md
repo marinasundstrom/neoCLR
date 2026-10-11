@@ -14676,3 +14676,16 @@ outside benchmark measurement. Implementation follows the configuration slice.
   boundary; no new execution behavior was implemented in this documentation slice.
 - **Open:** validate a non-Raven consumer, settle suspension representation and native
   interoperability semantics. See the [design and tradeoffs](runtime-scheduling-design.md#runtime-owned-asynchrony-and-language-projections--2026-10-11).
+
+
+### 2026-10-11 — Primary managed execution and opt-in services
+
+- **Author:** clarified the goal as a “common language runtime” with opt-in services,
+  primarily for managed bytecode languages, and future runtime integration points as
+  already outlined in proposals. Further clarified: “JIT and interpreter support for
+  managed languages. Native AOT as a publishing target.”
+- **Assistant action:** aligned the roadmap, architecture proposal status and async
+  design with that priority. Future native/foreign-runtime participation remains an
+  extension of the managed foundation, not a replacement or immediate parity gate.
+- **Boundary:** opting into a service requires its lifetime and safety contracts;
+  this documentation does not implement service negotiation or an interoperability ABI.
