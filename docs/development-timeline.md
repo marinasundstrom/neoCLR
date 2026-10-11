@@ -14692,3 +14692,18 @@ outside benchmark measurement. Implementation follows the configuration slice.
 - **Further author clarification:** future support must include both managed code
   calling native code and native code calling managed code. Recorded as bidirectional
   interop direction; comprehensive support is not claimed by the current native hosts.
+
+
+### 2026-10-11 — Queue visibility and scheduler architecture
+
+- **Author:** said the scheduler architecture should not be based on a visible task
+  queue, which should be an implementation detail; then directed continuation.
+- **Assistant response:** agreed that scheduling/resumption contracts must be independent
+  of queue storage and manual pumping. A TaskQueue-to-Scheduler rename would preserve
+  the wrong dependency.
+- **Action:** inspected Promise/Task producer-queue routing, VM queue recognition and
+  scheduler staging; documented a coordinated routing and public-surface migration in
+  the roadmap, scheduler design, transitional API guide and website direction.
+- **Open:** implementation and qualification of runtime-owned continuation destinations,
+  removal/internalization of public queue APIs, and any consumer-driven policy/affinity
+  controls. Existing APIs remain implemented; this slice changes direction documentation.

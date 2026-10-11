@@ -18,7 +18,11 @@ a permanent custom-builder or scheduler extension API. Use matching compiler, re
 assembly and runtime versions when working with this protocol.
 
 TaskQueue is also currently public and supported within its documented limits, but
-remains transitional. Private scheduler records, wakeups and callback/frame handoffs
+remains transitional. The selected direction is to make task queues implementation
+details: application and language scheduling contracts must not require queue identity,
+storage or manual draining. This is a migration direction, not removal in the current
+reference assembly or a newly selected public Scheduler type.
+Private scheduler records, wakeups and callback/frame handoffs
 are implementation details. No saved runtime frames are implemented by the current
 scheduler. The goal is to support useful APIs with generated state machines now while
 allowing runtime-owned suspension later; it is not a prerequisite for those APIs.

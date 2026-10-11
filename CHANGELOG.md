@@ -13,7 +13,10 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   contracts. Document proposed layers, tradeoffs and validation gates; this is design
   direction, not implemented suspension or a selected interoperability ABI. Clarify
   the primary path: managed bytecode with interpreter/JIT execution and native AOT
-  publishing, opt-in services and future bidirectional managed/native interop.
+  publishing, opt-in services and future bidirectional managed/native interop. Record
+  task queues as implementation details and the planned migration from producer-queue
+  routing to runtime-owned continuation destinations; current TaskQueue APIs are not
+  removed by this documentation change.
 
 - Begin the resumed scheduler work by moving interpreter invocation wait policy
   into the private scheduler. Bound owner waits by known timer deadlines, preserve

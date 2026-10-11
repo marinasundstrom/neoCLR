@@ -231,6 +231,8 @@ entry exit, including guest faults.
 This is development infrastructure, not a public
 Scheduler API or runtime-managed async suspension. Callbacks must return for other
 work to progress.
+Task queues are intended to become implementation details; the currently public
+TaskQueue remains a transitional API pending coordinated consumer migration.
 A pending await currently resumes through the producer queue; custom queue and UI
 affinity are not settled contracts. Ordinary worker joins can still block the queue.
 

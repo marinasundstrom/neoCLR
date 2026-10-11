@@ -1,5 +1,10 @@
 # Runtime scheduling and async suspension
 
+**Queue visibility clarification (2026-10-11):** a task queue is an implementation
+detail, not the scheduler architecture's application-facing foundation. The existing
+public TaskQueue is a transitional dependency to remove through coordinated migration,
+not a public abstraction to rename Scheduler. See the [migration boundary](#queue-independent-scheduling--2026-10-11).
+
 **Latest author direction (2026-10-11):** the independent testing and benchmarking
 project guides are complete. Proceed with scheduler work, then runtime-managed async
 suspension; migrate more cases and extend framework features as needed. Test
@@ -126,7 +131,8 @@ These are proposed implementation rules and validation gates, not new public typ
    producer's location. Adopt the owning invocation as the initial supported target.
    Existing explicit TaskQueue behavior must receive a deliberate migration test and
    documentation update; do not silently change it in a socket backend. Whether public
-   queue affinity survives, changes or is deprecated remains open.
+   queue affinity survives, changes or is deprecated remained open at this proposal;
+   the 2026-10-11 clarification below now directs migration away from visible queues.
 8. Already-completed awaits may continue inline under the current language behavior.
    External pending completion must enqueue resumption rather than invoke guest code
    from a producer. Specify reentrancy separately from context propagation. Logical
@@ -678,3 +684,50 @@ state-machine callbacks, not retained async activations. See
 Next settle continuation destination and shared wait policy. The interpreter and
 native adapters have distinct representations; these checks establish native entry
 ownership behavior, not identical scheduling or full suspension parity.
+
+
+## Queue-independent scheduling — 2026-10-11
+
+**Author:** “We shouldn’t base our scheduler architecture around a visible task
+queue” and “Task queue is an implementation detail”. This settles the architectural
+visibility direction; it does not claim today's public TaskQueue has been removed.
+
+Applications should express asynchronous operations, await completion and observe
+outcomes/cancellation. The runtime owns runnable work, continuation registration,
+dispatch, progress and quiescence. It may implement these with queues, multiple queues,
+work stealing or another mechanism. Queue contents, identity and manual draining must
+not become the necessary application or language integration contract. Opting into
+runtime scheduling means opting into its execution/lifetime guarantees, not owning a
+queue. Future host/custom scheduling controls may describe policy or affinity if a
+consumer requires them; their public shape is still unselected.
+
+This reuses the .NET TaskScheduler/SynchronizationContext comparison above: scheduling
+policy and continuation placement are meaningful contracts independently of storage.
+A queue-shaped public abstraction is cheap to expose but couples applications to pump
+and storage decisions. Hiding it permits backend evolution and reduces application
+bookkeeping, while moving responsibility for progress, observability, fairness and
+host integration into the runtime. These costs must be tested; hiding the queue alone
+is neither a fairness nor a performance improvement.
+
+The inspected dependencies define the next migration, rather than a cosmetic rename:
+
+- `runtime/raven/src/System/Tasks/Tasks.rvn` captures `TaskQueue.Current` in Promise,
+  exposes explicit queue construction, posts completion callbacks to that producer
+  queue and forwards Task.Dispatcher to the producer. Move resumption registration
+  toward the awaiting execution's runtime-owned destination, separately from outcome
+  storage. Preserve explicit callback observation as an adapter with defined placement.
+- `src/scheduler.rs` currently stages ready callbacks with a managed destination;
+  `src/vm.rs` recognizes TaskQueue dispatch boundaries. Separate the runtime's execution
+  destination from this managed queue adapter before removing its public surface.
+- Native task scopes and the new owned-delivery hooks already separate dispatch-root
+  lifetime from outcomes. Keep them private; they are not a public Scheduler API or
+  proof that the queue dependency has been removed.
+
+First qualify registration/routing with completed and pending awaits, different producer
+and awaiting destinations, nested callbacks, cancellation and fault cleanup. Then migrate
+compiler/runtime consumers and remove or internalize public queue APIs with matching
+reference assemblies, API documentation and samples. Experimental compatibility does
+not require preserving queue APIs, but changing source visibility alone would break
+existing generated consumers without supplying runtime-owned progress. The destination
+model must also admit later saved activations without depending on TaskQueue or Raven
+state-machine layout. Cross-mode wait policy and runtime suspension follow this boundary.
