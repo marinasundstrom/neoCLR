@@ -8,6 +8,13 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-12
 
+- Fix native Raven generic async methods and generic state-machine frames, including
+  generic owners, captured values and union results. Enable synchronous `use` scopes
+  across generated async suspension; preserve reverse disposal before completion or
+  cancellation. Qualify both lowerings with interpreter/JIT/AOT and repeated native
+  invocations. Pin the corrected compiler and add Windows project checks; Windows
+  runtime suspension and awaited state-machine disposal remain separate gaps.
+
 - Admit native reference records with more than sixteen declared fields when their
   flattened layout fits the existing 32-slot/264-byte object bound. This removes
   a redundant rejection of async state machines without changing storage or GC

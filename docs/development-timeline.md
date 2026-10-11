@@ -15592,7 +15592,11 @@ or runtime-await default switch was performed.
   4 MiB byte-array defaults. [Retained evidence](experiments/jit-cli/default/README.md).
 - **Next author direction:** fix native compiler limitations for generic async
   methods and `use` cleanup inside async methods. This is separate from the
-  completed default-mode gate; focused compiler and runtime checks are in progress.
+  completed default-mode gate. The native compiler now maps generic frame scopes
+  and admits synchronous `use` with the selected async library. Both lowerings pass
+  interpreter/JIT/AOT and four same-heap native invocations on macOS; 37 focused
+  Raven regressions pass. Windows project checks are added with the corrected pin.
+  [Design and evidence](experiments/runtime-async/generic-cleanup/README.md).
 - **Open boundaries:** eager compilation, interpreted debugging, Windows runtime
   suspension and Windows ARM64 remain separate gaps. No interpreter fallback hides
   unsupported native programs. See [the execution contract](jit-execution.md).

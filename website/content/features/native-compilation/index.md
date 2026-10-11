@@ -236,3 +236,11 @@ cleanup and live suspended-object GC in interpreter, macOS ARM64 JIT and AOT.
 It requires the documented native Raven compiler branch and matching experimental
 libraries. Abandoned-generator collection, Windows suspension and performance gates
 remain open; this is development evidence, not a change to published execution defaults.
+
+
+Development native Raven support also covers generic async methods and methods on
+generic owners, with synchronous `use` resources retained across awaits. Runtime
+bodies and generated state machines dispose on ordinary completion or cancellation;
+Fault remains terminal. [Qualification and limits](https://github.com/marinasundstrom/neoCLR/blob/main/docs/experiments/runtime-async/generic-cleanup/README.md)
+include pending GC, captured values and interpreter/JIT/AOT execution. Windows uses
+the generated-state-machine path; runtime suspension there remains future work.

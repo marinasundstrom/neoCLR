@@ -75,6 +75,32 @@ def main():
         run([sys.executable, ROOT/'scripts/test-runtime-library.py', '--bundle', installed,
              '--suite', 'collections', '--suite', 'json-dom', '--suite', 'encoding-streams',
              '--suite', 'index-range', '--suite', 'zoned-time-parsing', '--suite', 'runner-contract', '--output', out/'framework'], 'framework-default-jit')
+        libraries = json.loads((installed/'lib/bundle.json').read_text())
+        interpreted_context = ['--execution', 'interpreter', '--instructions', '100000000',
+                               '--system', installed/'lib'/libraries['runtimeSeed'],
+                               '--object-root', installed/'lib'/(libraries['objectAssembly']+'.dll')]
+        for assembly_name in libraries['assemblyNames']:
+            interpreted_context += ['--module', installed/'lib'/(assembly_name+'.dll')]
+        for name, fixture, expected in [
+            ('async-use', 'RuntimeUse.rvn', 'PASS runtime async scoped cleanup'),
+            ('generic-async-use', 'RuntimeGenericUse.rvn', 'PASS generic async methods owners and scoped cleanup'),
+        ]:
+            source = out/(name+'-source')
+            source.mkdir()
+            (source/'App.rvnproj').write_text((project/'App.rvnproj').read_text().replace('JitHttp', 'AsyncContract'))
+            (source/'Main.rvn').write_text((ROOT/'docs/experiments/runtime-async'/fixture).read_text(encoding='utf-8'), encoding='utf-8')
+            native = out/name
+            run([sys.executable, ROOT/'scripts/build-native-project.py', '--profile', 'windows-http',
+                 '--project', source/'App.rvnproj', '--bundle', installed, '--aot', jit,
+                 '--output', native], name+'-build')
+            for mode, command in [
+                ('jit', [installed/'bin/neoclr.exe', 'run', native/'app.dll']),
+                ('aot', [native/'app.exe']),
+                ('interpreter', [installed/'bin/neoclr.exe', 'run', native/'app.dll', *interpreted_context]),
+            ]:
+                result = run(command, name+'-'+mode)
+                if result.stdout.decode('utf-8').replace('\r\n', '\n') != expected+'\n' or result.stderr:
+                    raise RuntimeError(name+' '+mode+' outcome differs')
         report['passed'] = True
     finally:
         (out/'validation.json').write_text(json.dumps(report, indent=2)+'\n')

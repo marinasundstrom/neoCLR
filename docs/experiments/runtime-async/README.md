@@ -1077,3 +1077,12 @@ Live consumer tasks and external completion callbacks retain their producers; pe
 abandoned cycles release frames, operation slots and native stacks. Ready work retains
 strong ownership through dispatch. No default-mode switch or performance improvement
 is claimed; Windows carrier and performance qualification remain open.
+
+### Generic Task methods and synchronous use — 2026-10-12
+
+The earlier nongeneric-method/owner limit is lifted on the native compiler line.
+Both runtime bodies and generated state machines support the qualified generic
+method/owner cases; synchronous `use` also works across state-machine suspension.
+[Scope mapping, cleanup semantics and qualification](generic-cleanup/README.md)
+record the compiler/bundle revisions and remaining bounds. This does not enable
+Windows runtime suspension or awaited state-machine disposal.

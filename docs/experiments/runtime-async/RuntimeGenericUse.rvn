@@ -1,0 +1,107 @@
+module RuntimeGenericUse {
+    import System.*
+    import System.Tasks.*
+
+    class Log {
+        var Count = 0
+        var Order = 0
+    }
+
+    class Resource : Disposable {
+        private val log: Log
+        private val id: int
+        init(log: Log, id: int) {
+            self.log = log
+            self.id = id
+        }
+        func Dispose() {
+            log.Count = log.Count + 1
+            log.Order = log.Order * 10 + id
+        }
+    }
+
+    class Box {
+        val Value: int
+        init(value: int) {
+            self.Value = value
+        }
+    }
+
+    async func Echo<T>(gate: Task<T>, log: Log) -> Task<T> {
+        use first = Resource(log, 1)
+        use second = Resource(log, 2)
+        let value = await gate
+        System.Runtime.GC.Collect()
+        return value
+    }
+
+    class Store<T> {
+        private val value: T
+        init(initial: T) {
+            value = initial
+        }
+        async func Read(gate: Task<()>, log: Log) -> Task<T> {
+            use resource = Resource(log, 3)
+            await gate
+            System.Runtime.GC.Collect()
+            return value
+        }
+        async func Relay<U>(gate: Task<U>, log: Log) -> Task<Option<U>> {
+            use resource = Resource(log, 4)
+            _ = value
+            let result = await gate
+            System.Runtime.GC.Collect()
+            let read = () => result
+            return Option<U>.Some(read())
+        }
+    }
+
+    async func Main() -> Task<int> {
+        let log = Log()
+        let gate = Promise<int>()
+        let pending = Echo<int>(gate.Task, log)
+        if pending.IsCompleted || log.Count != 0 {
+            System.Fail("Generic method disposed before completion")
+        }
+        System.Runtime.GC.Collect()
+        _ = gate.Complete(42)
+        let result = await pending
+        if result != 42 || log.Count != 2 || log.Order != 21 {
+            System.Fail("Generic method completion or cleanup differs")
+        }
+
+        let referenceLog = Log()
+        let referenceGate = Promise<Box>()
+        let reference = Echo<Box>(referenceGate.Task, referenceLog)
+        _ = referenceGate.Complete(Box(73))
+        let referenceResult = await reference
+        if referenceResult.Value != 73 || referenceLog.Order != 21 {
+            System.Fail("Generic reference payload or cleanup differs")
+        }
+
+        let store = Store<Box>(Box(19))
+        let ownerLog = Log()
+        let ownerGate = Promise<()>()
+        let ownerTask = store.Read(ownerGate.Task, ownerLog)
+        System.Runtime.GC.Collect()
+        if ownerLog.Count != 0 {
+            System.Fail("Generic owner disposed while suspended")
+        }
+        _ = ownerGate.Complete(())
+        let stored = await ownerTask
+        if stored.Value != 19 || ownerLog.Count != 1 || ownerLog.Order != 3 {
+            System.Fail("Generic owner lost its private payload or cleanup")
+        }
+
+        let nestedLog = Log()
+        let nestedGate = Promise<int>()
+        let nested = store.Relay<int>(nestedGate.Task, nestedLog)
+        _ = nestedGate.Complete(91)
+        let nestedResult = await nested
+        if !(nestedResult is Option<int>.Some(91)) || nestedLog.Count != 1 || nestedLog.Order != 4 {
+            System.Fail("Generic method on generic owner lost its union payload or cleanup")
+        }
+        Console.WriteLine("PASS generic async methods owners and scoped cleanup")
+        return 0
+    }
+}

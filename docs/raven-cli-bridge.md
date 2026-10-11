@@ -8980,3 +8980,18 @@ retains it through dispatch. This changes neither the private service signatures
 nor Runtime Contract configuration; advancement/disposal ownership adapters remain.
 The compiler binary and lowering are unchanged. neoCLR's task-owned generator
 qualification report records the three-mode lifetime regression results.
+
+### Generic native async and synchronous use (2026-10-12)
+
+The native compiler removes its generic Task-method POC guard and enables retained
+synchronous `use` scopes whenever `--async-library` selects the managed Task contract.
+`--runtime-async-poc` still selects runtime bodies; ordinary native lowering uses
+heap state machines. Both preserve reverse disposal before completion/cancellation;
+Fault remains terminal without managed unwinding. Awaited disposal is separate.
+
+State-machine metadata includes explicit enclosing and method generic parameters,
+with consistent constructor, field, local and callback substitutions. This uses
+existing native nested generic classes, not a new format. The temporary CLI bridge
+projects lexical nesting and constructed signatures; direct native metadata/codegen
+owns the eventual replacement. Ordinary Raven/.NET behavior and main are unchanged.
+See [design, limitations and exact validation](experiments/runtime-async/generic-cleanup/README.md).

@@ -13,7 +13,10 @@ gates and eight HTTP cases on each host. JIT is the qualified development defaul
 on these hosts; Windows ARM64 and Windows runtime suspension remain open. Native
 benchmark noise and the runtime-async performance gap remain separate work.
 The author next explicitly requests fixing generic async and async `use` compiler
-limits, including focused managed/native execution validation.
+limits. The [compiler slice](experiments/runtime-async/generic-cleanup/README.md)
+now passes both lowerings across interpreter/JIT/AOT on macOS, including retained
+cleanup and generic captures. Windows state-machine project qualification follows
+with the corrected compiler; Windows runtime suspension remains separate.
 
 **Managed stack diagnostics (2026-10-12):** the author requests a StackTrace class
 for printing the current call stack, then continued work on separate debugger and

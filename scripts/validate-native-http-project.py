@@ -38,7 +38,7 @@ def rebuild_libraries(run, bundle, output):
     # Preview 13 supplies the primitive bootstrap. Build the exact development
     # compiler required by source attributes and test discovery, then this checkout’s libraries.
     run([sys.executable, ROOT / 'scripts/prepare-native-development-bundle.py', '--bundle', bundle,
-         '--output', output, '--build-compiler', '--compiler-revision', 'e349f4783cb7534979ac36b31e81c0ffad3d13ef'], 'development-libraries')
+         '--output', output, '--build-compiler', '--compiler-revision', '1f3cdda12c06a448caaf1110eb4b858ba8124089'], 'development-libraries')
     return output / 'bundle'
 
 def serve(command, request, fragmented, cwd, env=None):

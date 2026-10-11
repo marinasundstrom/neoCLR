@@ -24,6 +24,8 @@ on:
       - 'scripts/verify-native-http-json.py'
       - 'benchmarks/native-web/http-host.c'
       - 'docs/experiments/http-server/Server.rvn'
+      - 'docs/experiments/runtime-async/RuntimeUse.rvn'
+      - 'docs/experiments/runtime-async/RuntimeGenericUse.rvn'
   pull_request:
     paths:
       - 'src/**'
@@ -47,6 +49,8 @@ on:
       - 'scripts/verify-native-http-json.py'
       - 'benchmarks/native-web/http-host.c'
       - 'docs/experiments/http-server/Server.rvn'
+      - 'docs/experiments/runtime-async/RuntimeUse.rvn'
+      - 'docs/experiments/runtime-async/RuntimeGenericUse.rvn'
 permissions:
   contents: read
 jobs:
@@ -83,6 +87,8 @@ jobs:
             target/windows-jit-validation/http/
             target/windows-jit-validation/framework/
             target/windows-jit-validation/native/build.json
+            target/windows-jit-validation/async-use/
+            target/windows-jit-validation/generic-async-use/
             target/windows-jit-validation/jit-install/preparation.json
             target/windows-jit-validation/jit-install/bundle/manifest.json
             target/windows-jit-validation/development/**/*.log
