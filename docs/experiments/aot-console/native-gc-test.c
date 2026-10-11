@@ -105,6 +105,40 @@ static int conditional_roots(void) {
     CHECK(!neoclr_gc_collect_v1(&foreign, NULL) && !foreign.text.used);
     return 0;
 }
+/* Exact-base validation must survive bucket crossings, free spans and payloads
+ * that resemble headers; conservative interior roots are a different contract. */
+static int indexed_conditional_roots(void) {
+    uint64_t storage[16384] = {0};
+    neoclr_aot_context c = {.text = {(unsigned char *)storage, sizeof(storage), 0}};
+    void *owners[100];
+    neoclr_gc_conditional_root edges[100];
+    neoclr_probe_storage slots[100];
+    for (unsigned i = 0; i < 100; i++) {
+        CHECK(allocate(&c, 40 + 8 * (i % 17), NEOCLR_GC_BYTES));
+        owners[i] = allocate(&c, 520 + 8 * (i % 11), NEOCLR_GC_BYTES);
+        void *value = allocate(&c, 8, NEOCLR_GC_BYTES);
+        CHECK(owners[i] && value);
+        edges[i] = (neoclr_gc_conditional_root){owners[i], value, -1};
+        slots[i] = (neoclr_probe_storage){&owners[i], 8, 0};
+        uint64_t fake[] = {40, 8, NEOCLR_GC_BYTES, 1, 42};
+        memcpy(owners[i], fake, sizeof(fake));
+    }
+    neoclr_probe_frame frame = {.context = &c, .storage = slots, .storage_count = 100};
+    CHECK(!neoclr_gc_collect_conditional_v1(&c, &frame, edges, 100));
+    for (unsigned i = 0; i < 100; i++) {
+        CHECK(edges[i].retained);
+        void *invalid[] = {(char *)owners[i] - 32, (char *)owners[i] + 32,
+                          (char *)owners[i] + 1, c.text.data + c.text.used};
+        for (unsigned j = 0; j < 4; j++) {
+            neoclr_gc_conditional_root edge = {invalid[j], edges[i].value, -1};
+            CHECK(neoclr_gc_collect_conditional_v1(&c, &frame, &edge, 1) == 3);
+            CHECK(edge.owner == invalid[j] && edge.value == edges[i].value && edge.retained == -1);
+        }
+    }
+    CHECK(!neoclr_gc_collect_conditional_v1(&c, &frame, edges, 100));
+    CHECK(!neoclr_gc_collect_conditional_v1(&c, NULL, edges, 100) && !c.text.used);
+    return 0;
+}
 static int owned_parked_roots(void) {
     uint64_t storage[256] = {0}, foreign_storage[64] = {0};
     neoclr_aot_context c = {.text = {(unsigned char *)storage, sizeof(storage), 0}};
@@ -322,6 +356,8 @@ int main(void) {
     CHECK(!neoclr_gc_collect_v1(&c, NULL) && !c.text.used);
     CHECK(!neoclr_gc_entry_check_v1(&c));
     CHECK(buffer[128] == UINT64_C(0x1122334455667788));
+    int indexed_status = indexed_conditional_roots();
+    if (indexed_status) return indexed_status;
     int conditional_status = conditional_roots();
     if (conditional_status) return conditional_status;
     int owned_status = owned_parked_roots();

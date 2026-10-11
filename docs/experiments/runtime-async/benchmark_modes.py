@@ -16,8 +16,13 @@ p.add_argument('--recipe', type=Path, required=True)
 p.add_argument('--qualification', type=Path, default=HERE / 'native-validation.json')
 p.add_argument('--host', type=Path, required=True, help='runtime_async_interpreter release host')
 p.add_argument('--output', type=Path, required=True)
+p.add_argument('--engines', nargs='+', choices=['interpreter', 'jit', 'aot'], default=['interpreter', 'jit', 'aot'])
+p.add_argument('--counts', nargs='+', type=int, choices=[10, 100], default=[10, 100])
+p.add_argument('--rounds', type=int, default=2)
 p.add_argument('--stack-cache-limit', type=int, choices=range(129), default=8)
 a = p.parse_args()
+if a.rounds < 2 or a.rounds % 2 or len(set(a.engines)) != len(a.engines) or len(set(a.counts)) != len(a.counts):
+    p.error('use an even number of rounds >= 2 and unique engines/counts')
 if platform.system() != 'Darwin' or platform.machine() != 'arm64':
     p.error('requires macOS ARM64 carrier')
 r = json.loads(a.recipe.read_text())
@@ -34,7 +39,7 @@ link.append(f'-DNEOCLR_ASYNC_STACK_CACHE_LIMIT={a.stack_cache_limit}')
 compile_native = next(c.copy() for c in commands if '--closed-world' in c and '--jit-run' not in c)
 report = dict(passed=False, platform=platform.platform(),
               processor=subprocess.check_output(['sysctl', '-n', 'machdep.cpu.brand_string'], text=True).strip(),
-              repetitions=4, rounds=2, stackCacheLimit=a.stack_cache_limit,
+              repetitions=4, rounds=a.rounds, engines=a.engines, counts=a.counts, stackCacheLimit=a.stack_cache_limit,
               measurement='fresh invocation including heap/scope teardown; load and compilation excluded',
               nativeAllocationUnit='GC blocks, excluding retained native stacks; not interpreter object counts',
               discardedWarmupsPerProcess=1, inputsSha256={}, commands=[], runs=[], summaries=[])
@@ -66,7 +71,7 @@ try:
     link[link.index('-o') + 1] = str(host)
     run(link)
     for pending in [False, True]:
-        for count in [10, 100]:
+        for count in a.counts:
             case = f'{"pending" if pending else "completed"}-{count}'
             source = out / (case + '.rvn')
             source.write_text((HERE / 'RuntimeAwaitBenchmark.rvn').read_text()
@@ -94,9 +99,9 @@ try:
                                          'jit': jit, 'aot': [str(executable)]}
                 for artifact in [source, assembly, obj, executable, host]:
                     report['inputsSha256'][str(artifact)] = sha(artifact)
-            for round_index in range(2):
-                lowerings = ['state-machine', 'runtime'][::1 if round_index == 0 else -1]
-                engines = ['interpreter', 'jit', 'aot'][::1 if round_index == 0 else -1]
+            for round_index in range(a.rounds):
+                lowerings = ['state-machine', 'runtime'][::1 if round_index % 2 == 0 else -1]
+                engines = a.engines[::1 if round_index % 2 == 0 else -1]
                 for engine in engines:
                     for lowering in lowerings:
                         result, wall = run(invocations[lowering][engine])
@@ -123,7 +128,7 @@ try:
                             raise RuntimeError('expected four fresh invocations')
                         report['runs'].append(dict(case=case, engine=engine, lowering=lowering,
                                                    round=round_index, processSeconds=wall, phases=phases, samples=samples))
-            for engine in ['interpreter', 'jit', 'aot']:
+            for engine in a.engines:
                 summary = dict(case=case, engine=engine)
                 for lowering in ['state-machine', 'runtime']:
                     samples = [s['seconds'] for run_data in report['runs']

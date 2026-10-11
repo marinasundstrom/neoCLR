@@ -219,22 +219,31 @@ static void build_index(neoclr_aot_text_arena *a, block_index *index) {
         at = end;
     }
 }
-static void mark(neoclr_aot_text_arena *a, const block_index *index, uint64_t word, block **pending) {
+/* Index lookup preserves exact payload-base validation for host owners/values.
+ * Only use after blocks_valid and before sweep changes block spans. */
+static block *indexed_block(neoclr_aot_text_arena *a, const block_index *index, uint64_t word) {
     uintptr_t base = (uintptr_t)a->data;
-    if (word < base || word - base >= a->used) return;
+    if (word < base || word - base >= a->used) return NULL;
     uint64_t offset = word - base;
     block *first = index->start[offset >> index->shift];
     for (uint64_t at = (uintptr_t)first - base; at < a->used;) {
         block *b = (void *)(a->data + at);
-        if (offset < at + b->span) {
-            uint64_t begin = at + sizeof(block);
-            if (b->state && offset >= begin && offset - begin < b->bytes && !(b->state & MARKED)) {
-                b->state = (uint64_t)(uintptr_t)*pending | ALLOCATED | MARKED;
-                *pending = b;
-            }
-            return; /* Headers, padding and free spans are never managed roots. */
-        }
+        if (offset < at + b->span) return b;
         at += b->span;
+    }
+    return NULL;
+}
+static int indexed_live_base(neoclr_aot_text_arena *a, const block_index *index, const void *value) {
+    if (!value) return 1;
+    block *b = indexed_block(a, index, (uintptr_t)value);
+    return b && (b->state & ALLOCATED) && value == (void *)(b + 1);
+}
+static void mark(neoclr_aot_text_arena *a, const block_index *index, uint64_t word, block **pending) {
+    block *b = indexed_block(a, index, word);
+    if (b && b->state && word >= (uintptr_t)(b + 1) &&
+        word - (uintptr_t)(b + 1) < b->bytes && !(b->state & MARKED)) {
+        b->state = (uint64_t)(uintptr_t)*pending | ALLOCATED | MARKED;
+        *pending = b;
     }
 }
 static void mark_slots(neoclr_aot_text_arena *a, const block_index *index, const neoclr_probe_storage *slots, uint32_t count, block **pending) {
@@ -260,27 +269,27 @@ static int32_t collect_conditional(neoclr_aot_context *context,
     const neoclr_probe_frame *head, neoclr_gc_conditional_root *conditional, uint32_t conditional_count) {
     if (!context || !blocks_valid(&context->text)) return NEOCLR_AOT_FAULT_RUNTIME_ERROR;
     neoclr_aot_text_arena *a = &context->text;
+    block_index index;
+    build_index(a, &index);
     if (conditional_count > NEOCLR_GC_HOST_ROOT_LIMIT || (conditional_count && !conditional))
         return NEOCLR_AOT_FAULT_RUNTIME_ERROR;
     for (uint32_t i = 0; i < conditional_count; i++)
         if ((!conditional[i].owner && conditional[i].value) ||
-            !live_base(a, conditional[i].owner) || !live_base(a, conditional[i].value))
+            !indexed_live_base(a, &index, conditional[i].owner) || !indexed_live_base(a, &index, conditional[i].value))
             return NEOCLR_AOT_FAULT_RUNTIME_ERROR;
     for (host_root *root = host_head; root; root = root->next)
-        if (root->context == context && (!live_base(a, root->value) ||
+        if (root->context == context && (!indexed_live_base(a, &index, root->value) ||
             (root->conditional && !root->expired &&
-                (!root->owner || !live_base(a, root->owner))))) return NEOCLR_AOT_FAULT_RUNTIME_ERROR;
+                (!root->owner || !indexed_live_base(a, &index, root->owner))))) return NEOCLR_AOT_FAULT_RUNTIME_ERROR;
     for (const neoclr_parked_roots *p = neoclr_roots_parked_v1(); p; p = p->next)
         if (p->owner_context == context && !p->expired &&
-            (!p->owner || !live_base(a, p->owner))) return NEOCLR_AOT_FAULT_RUNTIME_ERROR;
+            (!p->owner || !indexed_live_base(a, &index, p->owner))) return NEOCLR_AOT_FAULT_RUNTIME_ERROR;
     neoclr_probe_storage fault[65];
     int32_t count = neoclr_probe_fault_roots_v1(context, fault, 65);
     if (count < 0) return NEOCLR_AOT_FAULT_RUNTIME_ERROR;
     for (uint64_t at = 0; at < a->used;) {
         block *b = (void *)(a->data + at); b->state &= ALLOCATED; at += b->span;
     }
-    block_index index;
-    build_index(a, &index);
     block *pending = NULL;
     // Intern entries and their exact original String owners live until entry reset.
     for (uint64_t at = 0; at < a->used;) {

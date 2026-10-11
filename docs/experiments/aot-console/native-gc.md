@@ -414,3 +414,27 @@ The runtime-async carrier and managed provider still use strong callback handles
 Their integration must describe iterator/task/external completion ownership and
 release expired native operations and stacks. This primitive does not yet enable
 abandoned-generator reclamation.
+
+## Indexed conditional-root validation — 2026-10-11
+
+The [native async profile](../runtime-async/native-profiling.md) identifies collector
+work as the largest pending-await cost. Collection now builds its existing sparse
+address index before validating dependent handles and parked-stack owners. Exact
+allocation-base checks reuse that index instead of walking the entire heap for each
+owner/value. Conservative marking still admits valid interior payload pointers;
+conditional owners and host values still require exact live allocation bases.
+
+The index remains local to one collection, after full descriptor validation and
+before any coalescing. No cached address survives a collection and no context,
+metadata, root-lifetime or collection-frequency contract changes. This is a lookup
+implementation optimization, not a new GC policy or a divergence from managed
+ownership semantics. Like the existing nonmoving collector, its conservative object
+scan differs from CLR's typed moving/generational implementation; this change does
+not introduce compaction or generational collection.
+
+A focused regression fills a heap across index buckets, frees intervening blocks,
+checks 100 conditional edges and rejects 400 header/interior/foreign-boundary pointer
+candidates, including payload bytes shaped like an allocation descriptor. Existing
+conditional chains, cycles, rollback, host handles and 320 native owned suspensions
+remain sanitizer-qualified. Matched benchmark evidence is linked from the
+[profiling notes](../runtime-async/native-profiling.md).

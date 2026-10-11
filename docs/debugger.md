@@ -215,3 +215,13 @@ null before a terminal failure or after successful execution. It also covers
 pre-execution launch failures and cancellation while paused. The terminal view
 prints the code separately. See [the fault reference](../api-docs/faults.md); clients
 should not classify failures by message text.
+
+## Native diagnostics follow-up
+
+The private [native async profiler](experiments/runtime-async/native-profiling.md)
+adds symbolized sampling and opt-in collector timing for the native experiment.
+It does not add native stepping to this debugger. Generated-function-to-IL/source
+mapping, suspended-operation identities and logical async stacks are shared needs
+for profiling and debugger integration. GC snapshots/retention paths and pause
+histograms remain follow-up work; aggregate collector timing is available now in
+that diagnostic host.

@@ -27,6 +27,16 @@ it. Rerun `benchmark_modes.py` without instrumentation for performance conclusio
 Native guest symbols currently identify generated functions by number, not Raven
 source; native debug/source mapping and suspended logical stacks remain open.
 
+## Separate tools, shared diagnostics
+
+The author suggests keeping debugger and profiler as different tools. Follow that
+boundary: the profiler measures CPU, allocations, pauses and suspension behavior;
+the debugger controls/inspects execution through breakpoints, stepping and values.
+The sampling runner does not launch the interactive debugger. Shared source maps,
+operation identities and diagnostic hooks belong below their separate commands and
+interfaces. Sharing those facilities is a direction, not an implemented common
+protocol. Profiling must not require debugger snapshots or per-instruction stepping.
+
 ## Tooling priorities
 
 The author explicitly requests tools that help understand and optimize the runtime,
@@ -52,3 +62,43 @@ most of the workload's sampled execution. This justifies investigating collector
 work before changing the carrier or adding a new scheduler abstraction. Sanitized
 collector, host-root and 320 owned-body suspension tests pass with timers disabled
 (`target/profile-collector-validation/validation.json`).
+
+## Indexed validation result
+
+Collection reuses its already-built sparse address index for exact host-root,
+dependent-owner and parked-owner checks. It does not remove descriptor checks,
+change ownership or reduce collection frequency. [Sanitized validation](indexed-owner-validation.json)
+includes index-bucket/free-span/adversarial-pointer coverage and 320 owned native
+suspensions; [Raven generators](indexed-owner-generators.json) pass all three modes.
+
+The [full matched rerun](indexed-owner-benchmark.json) showed noisy completed-100
+JIT samples (20–110 ms). Keep that evidence, but do not claim a regression or speedup
+from that cell. A [six-round native follow-up](indexed-owner-native-repeat.json),
+alternating lowering/engine order, retains 18 samples per cell after process warmup.
+It measures the same 100-operation inputs with instrumentation disabled:
+
+| Await | Engine | State machine ms | Runtime async ms | Runtime / state machine |
+| --- | --- | ---: | ---: | ---: |
+| completed | JIT | 15.09 | 19.45 | 1.29× |
+| completed | AOT | 14.28 | 18.28 | 1.28× |
+| pending | JIT | 31.74 | 46.86 | 1.48× |
+| pending | AOT | 30.38 | 44.34 | 1.46× |
+
+Previous native ratios were about 1.55–1.56× completed and 1.81× pending.
+Absolute runtime medians are about 19–27% lower than the previous matched run;
+state-machine medians also vary, so prefer the within-run ratios. All invocation
+allocation/reclamation counts balance and reserved stack bytes end at zero.
+The full rerun retains interpreted controls (unchanged implementation); they remain
+faster than state machines in this workload. These are local Apple M1 measurements,
+not statistical guarantees, Windows qualification or HTTP throughput conclusions.
+
+The native gap is reduced, not closed. Remaining profile costs include collection
+marking, repeated root publication/validation, adapter allocations and carrier entry.
+Collection pacing must be evaluated separately with stress-GC retained as a correctness
+mode; reducing collection frequency alone is not proof of a better suspension design.
+The benchmark now accepts `--engines jit aot --counts 100 --rounds 6` for a focused,
+order-balanced follow-up without repeating unaffected interpreter work.
+
+The [native HTTP/await showcase](indexed-owner-showcase.json) also passes JIT and
+AOT language, cleanup, cancellation, HTTP client/server and terminal-Fault checks
+after the index change. This checks behavior; it is not an HTTP throughput benchmark.

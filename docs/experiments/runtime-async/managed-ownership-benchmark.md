@@ -62,6 +62,13 @@ HTTP client/server, timeout/cancellation/protocol handling and terminal Fault.
 The benchmark above measures nested Task awaits; it is not generator-throughput,
 HTTP/JSON throughput, multicore fairness or a comparison with Go/.NET/JavaScript.
 
+## Subsequent profiling and optimization
+
+[Indexed root-validation measurements](native-profiling.md#indexed-validation-result)
+reduce native completed/pending ratios to about 1.28–1.29× / 1.46–1.48×
+with unchanged collection frequency. The tables above remain the pre-optimization
+checkpoint. The native performance/default gate remains open.
+
 ## Next performance gate
 
 Profile remaining native carrier-entry/resumption and collector costs before

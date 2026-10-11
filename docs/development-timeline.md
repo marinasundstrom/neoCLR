@@ -15504,3 +15504,18 @@ or runtime-await default switch was performed.
   open; sampling does not complete those capabilities.
 - **Evidence:** [profiling notes](experiments/runtime-async/native-profiling.md).
   Performance conclusions require the uninstrumented matched benchmark after fixes.
+
+- **Author clarification:** “the debugger and the profiler should perhaps be different
+  tools.” The assistant adopts separate profiling and interactive debugging tools,
+  with possible shared source maps, operation identities and diagnostic hooks below
+  their interfaces. No unified debugger/profiler frontend is planned by this slice.
+
+- **Measured outcome:** indexed collector validation preserves safepoint frequency
+  while reducing native completed/pending ratios to about 1.28–1.29× / 1.46–1.48×
+  in the six-round follow-up. Noisy earlier JIT samples remain recorded. Generator
+  tests pass in all three local modes; sanitized collector/320-suspension tests pass.
+  The native performance/default gate remains open.
+- **Additional author request:** add a StackTrace class (written “StackTrack”) so
+  guest programs can print their call stack. The assistant proposes the familiar
+  System.Diagnostics.StackTrace name and implementation after committing this
+  performance slice. This is requested work, not yet implemented by this entry.

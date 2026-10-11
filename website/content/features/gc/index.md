@@ -89,11 +89,9 @@ resources. This remains experimental, with Windows and performance qualification
 [Development contract and evidence](https://github.com/marinasundstrom/neoCLR/blob/main/docs/experiments/aot-console/native-gc.md#conditional-ownervalue-roots--private-experiment-2026-10-11).
 
 
-An opt-in macOS native carrier test now reclaims abandoned suspended bodies,
-including stack mappings and operation slots. The managed generator provider is
-not connected to this ownership model yet.
-[Carrier evidence and limitations](https://github.com/marinasundstrom/neoCLR/blob/main/docs/experiments/runtime-async/async-generators.md#owned-native-body-reclamation--2026-10-11).
-
-The experimental managed provider now links pending result, advancement and disposal
-tasks to their producer or iterator. External completion ownership remains open, so
-this does not yet enable automatic abandoned-generator reclamation.
+A private native profiling runner now combines symbolized macOS sampling with
+opt-in collector timing and checked heap/stack teardown. Profiler and debugger
+remain separate tools; native stepping and logical async-stack inspection are
+follow-up work. Profiling identified repeated conditional-root validation searches,
+which now reuse the collector's address index without changing collection frequency.
+[Profiling workflow and measurements](https://github.com/marinasundstrom/neoCLR/blob/main/docs/experiments/runtime-async/native-profiling.md).

@@ -12,6 +12,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   pinned inputs and repeated guest/reclamation checks. Add opt-in collector
   attempt/time diagnostics, compiled out of normal execution. Track native
   profiler, GC diagnostics and debugger integration needs alongside performance work.
+  Reuse the collector address index for exact conditional-owner/value validation,
+  preserving safepoint frequency and ownership semantics; add adversarial bucket,
+  free-span and forged-header regression coverage. Matched native 100-operation
+  follow-ups reduce completed/pending runtime-async overhead from about 1.55x/1.81x
+  to 1.28–1.29x/1.46–1.48x; the native parity gate remains open. Keep profiling
+  and debugging as separate tools, per author clarification.
 
 - Extend development HTTP/1.1 with 1 MiB buffered bodies/known-length uploads,
   32 KiB/100-field headers, shared bounded chunk decoding for incoming requests
