@@ -231,6 +231,13 @@ fn run() -> Result<(), Box<dyn std::error::Error>> {
     let timer_count = args.iter().filter(|a| *a == "--bind-timers").count();
     if timer_count > 1 { return Err("duplicate --bind-timers option".into()); }
     let bind_timers = timer_count == 1;
+    let stack_trace_count = args.iter().filter(|a| *a == "--bind-stack-trace").count();
+    if stack_trace_count > 1 { return Err("duplicate --bind-stack-trace".into()); }
+    let bind_stack_trace = stack_trace_count == 1;
+    args.retain(|a| a != "--bind-stack-trace");
+    if bind_stack_trace && (!compile_system || !native_gc) {
+        return Err("--bind-stack-trace requires compiled System and native GC roots".into());
+    }
     let runtime_async_count = args.iter().filter(|a| *a == "--bind-runtime-async").count();
     if runtime_async_count > 1 { return Err("duplicate --bind-runtime-async".into()); }
     let bind_runtime_async = runtime_async_count == 1;
@@ -436,6 +443,7 @@ fn run() -> Result<(), Box<dyn std::error::Error>> {
                 bind_socket_transfer,
                 bind_timers,
                 bind_runtime_async,
+                bind_stack_trace,
                 bind_scheduler,
                 bind_socket_client,
                 reference_arena,

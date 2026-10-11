@@ -30,6 +30,8 @@ pub enum RuntimeService {
     ConsoleInput,
     ValueStorage,
     TypeInspection,
+    /// Captures the current logical guest call stack without local values.
+    StackInspection,
     /// Dynamic construction and property calls; static reachability cannot enumerate targets.
     ReflectionExecution,
     InterfaceDispatch,
@@ -68,6 +70,7 @@ pub(crate) fn uses(module: &crate::Module, function: &Function) -> Result<Vec<Se
     if function.is_internal_call() {
         let binding = crate::native::bind_in(module, function)?;
         let service = match &binding {
+            crate::native::Binding::StackTraceCapture => RuntimeService::StackInspection,
             crate::native::Binding::Socket(_) => RuntimeService::SocketIo,
             crate::native::Binding::Resolve(_) => RuntimeService::NameResolution,
             #[cfg(test)]

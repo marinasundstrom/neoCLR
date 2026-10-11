@@ -1,0 +1,24 @@
+module AsyncStackTraceCases
+
+import System.*
+import System.Tasks.*
+import System.Diagnostics.*
+
+async func CaptureAfter(input: Task<int>) -> Task<StackTrace> {
+    _ = await input
+    return StackTrace()
+}
+
+async func Main() -> Task<int> {
+    let source = Promise<int>()
+    let pending = CaptureAfter(source.Task)
+    if pending.IsCompleted {
+        System.Fail("Expected a suspended capture")
+    }
+    _ = source.Complete(42)
+    let trace = await pending
+    Console.WriteLine(trace.ToString())
+    System.Runtime.GC.Collect()
+    Console.WriteLine(trace.ToString())
+    return 0
+}

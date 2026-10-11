@@ -183,7 +183,9 @@
         "runtime/raven/native/RuntimeTimeZoneServices.rvn",
         "runtime/raven/src/System/AsyncDisposable.rvn",
         "runtime/raven/src/System/Collections/AsyncIterable.rvn",
-        "runtime/raven/src/System/Collections/AsyncIterator.rvn"
+        "runtime/raven/src/System/Collections/AsyncIterator.rvn",
+        "runtime/raven/src/System/Diagnostics/StackTrace.rvn",
+        "runtime/raven/native/RuntimeDiagnosticsCalls.rvn"
       ],
       "types": [
         "System.AttributeTargets",
@@ -307,7 +309,8 @@
         "System.Void",
         "System.AsyncDisposable",
         "System.Collections.AsyncIterable`1",
-        "System.Collections.AsyncIterator`1"
+        "System.Collections.AsyncIterator`1",
+        "System.Diagnostics.StackTrace"
       ]
     }
   ],

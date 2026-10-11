@@ -94,3 +94,56 @@ impl std::fmt::Display for StackTrace {
         Ok(())
     }
 }
+
+/// Diagnostic-only decoding of the experimental native projection's reserved
+/// transport names. Malformed/unrecognized spellings remain unchanged. This does
+/// not change binding identity, and source-origin names should take precedence.
+pub fn diagnostic_function_name(name: &str) -> String {
+    fn hex(text: &str) -> Option<String> {
+        if text.len() % 2 != 0 || !text.bytes().all(|b| b.is_ascii_hexdigit()) {
+            return None;
+        }
+        let bytes = (0..text.len())
+            .step_by(2)
+            .map(|i| u8::from_str_radix(&text[i..i + 2], 16).ok())
+            .collect::<Option<Vec<_>>>()?;
+        String::from_utf8(bytes)
+            .ok()
+            .filter(|s| !s.chars().any(char::is_control))
+    }
+    let decode = || -> Option<String> {
+        let (module, member) = name.strip_prefix("NeoMetadata_")?.split_once('.')?;
+        if module.len() != 64 || !module.bytes().all(|b| b.is_ascii_hexdigit()) {
+            return None;
+        }
+        if let Some(function) = member.strip_prefix("F_") {
+            let function = hex(function)?;
+            if let Some(encoded) = function.strip_prefix("<NeoFunction>") {
+                let (namespace, member) = encoded.split_once('_')?;
+                let namespace = hex(namespace)?;
+                let member = hex(member)?;
+                return Some(if namespace.is_empty() {
+                    member
+                } else {
+                    format!("{namespace}.{member}")
+                });
+            }
+            return Some(function);
+        }
+        let (owner, method) = member.strip_prefix("T_")?.split_once('.')?;
+        let (namespace, owner) = owner.split_once('_')?;
+        let namespace = hex(namespace)?;
+        let owner = hex(owner)?;
+        let method = if let Some(encoded) = method.strip_prefix("M_") {
+            hex(encoded)?
+        } else {
+            method.to_owned()
+        };
+        Some(if namespace.is_empty() {
+            format!("{owner}.{method}")
+        } else {
+            format!("{namespace}.{owner}.{method}")
+        })
+    };
+    decode().unwrap_or_else(|| name.to_owned())
+}

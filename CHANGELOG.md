@@ -6,6 +6,16 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ## Unreleased
 
+### 2026-10-12
+
+- Add development System.Diagnostics.StackTrace with constructor-time capture and
+  stable ToString output after return/GC. The contextual service captures active
+  logical guest frames in interpreter and root-published JIT/AOT, with bounded text
+  and explicit truncation. Add readable diagnostic names for reserved native
+  transport encodings, including native Fault output, without changing identity.
+  Structured frames, source lines and suspended causal callers remain open; Faults
+  remain terminal. Refresh the native class libraries and both API references.
+
 ### 2026-10-11
 
 - Add a private native async profiling runner with symbolized macOS sampling,

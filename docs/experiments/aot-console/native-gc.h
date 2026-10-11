@@ -15,6 +15,10 @@ typedef struct {
     uint64_t attempts, nanoseconds, maximum_nanoseconds;
 } neoclr_gc_profile;
 neoclr_gc_profile neoclr_gc_profile_v1(void);
+/* Private current logical-stack capture; names are immutable current-image text.
+ * Caller supplies published roots. Returns owned text; never changes Fault state. */
+int32_t neoclr_stack_trace_capture_v1(int32_t skip, neoclr_aot_context *,
+    const neoclr_aot_text **output, const neoclr_aot_text *const *names, uint32_t count);
 /* Private thread-affine strong handles for future host-held callbacks/buffers.
  * Context, buffer and creating thread must remain alive until every handle is released.
  * Only null or an untagged live allocation base in that context is admitted.

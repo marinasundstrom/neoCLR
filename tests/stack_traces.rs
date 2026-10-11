@@ -219,3 +219,118 @@ fn native_boundary_faults_show_guest_callers_without_inventing_native_frames() {
         assert_eq!(frames[0].location, CodeLocation::IlInstruction(0));
     }
 }
+
+#[test]
+fn guest_capture_is_owned_current_stack_and_does_not_fault() {
+    let module = assemble(
+        r#"
+.module Capture
+.entry Main
+.function neoCLR.Runtime.StackTraceCapture(Int32 skip) -> String
+.methodimpl InternalCall
+.end
+.function Main() -> String
+call Capture()
+ret
+.end
+.function Capture() -> String
+ldc.i4 0
+call neoCLR.Runtime.StackTraceCapture(Int32)
+ret
+.end
+"#,
+    )
+    .unwrap();
+    let execution = LoadedProgram::new(&module)
+        .unwrap()
+        .run(Limits::default())
+        .unwrap();
+    let Value::String(text) = execution.value else {
+        panic!("expected owned text")
+    };
+    drop(module);
+    assert_eq!(
+        text.as_str(),
+        "   at Capture [instruction 1]\n   at Main [instruction 0]\n"
+    );
+}
+
+#[test]
+fn guest_capture_checks_skip_and_marks_truncation() {
+    let source = r#"
+.module Capture
+.entry Main
+.function neoCLR.Runtime.StackTraceCapture(Int32 skip) -> String
+.methodimpl InternalCall
+.end
+.function Main() -> String
+ldc.i4 70
+call Recurse(Int32)
+ret
+.end
+.function Recurse(Int32 n) -> String
+ldarg 0
+ldc.i4 0
+ceq
+brtrue capture
+ldarg 0
+ldc.i4 1
+sub
+call Recurse(Int32)
+ret
+capture:
+ldc.i4 0
+call neoCLR.Runtime.StackTraceCapture(Int32)
+ret
+.end
+"#;
+    let module = assemble(source).unwrap();
+    let result = LoadedProgram::new(&module)
+        .unwrap()
+        .run(Limits::default())
+        .unwrap();
+    let Value::String(text) = result.value else {
+        panic!("expected text")
+    };
+    assert_eq!(text.as_str().matches("   at ").count(), 64);
+    assert!(text.as_str().ends_with("   ... stack trace truncated\n"));
+    let skipped = assemble(&source.replace("capture:\nldc.i4 0", "capture:\nldc.i4 1000")).unwrap();
+    let result = LoadedProgram::new(&skipped)
+        .unwrap()
+        .run(Limits::default())
+        .unwrap();
+    assert_eq!(result.value, Value::String("".into()));
+    let negative = assemble(&source.replace("capture:\nldc.i4 0", "capture:\nldc.i4 -1")).unwrap();
+    let fault = LoadedProgram::new(&negative)
+        .unwrap()
+        .run(Limits::default())
+        .unwrap_err();
+    assert_eq!(fault.code, neoclr::FaultCode::RuntimeError);
+    assert!(fault.stack_trace.is_some());
+}
+
+#[test]
+fn native_diagnostic_names_decode_only_reserved_valid_transport_names() {
+    use neoclr::diagnostic_function_name as name;
+    let scope = format!("NeoMetadata_{}", "A".repeat(64));
+    assert_eq!(
+        name(&format!(
+            "{scope}.F_3C4E656F46756E6374696F6E3E34313633364436355F353237353645"
+        )),
+        "Acme.Run"
+    );
+    assert_eq!(
+        name(&format!("{scope}.T_53797374656D_5468696E67.M_52756E")),
+        "System.Thing.Run"
+    );
+    for raw in [
+        "App.Run",
+        "NeoMetadata_A.F_123",
+        "NeoMetadata_A.F_00",
+        "NeoMetadata_A.F_FF",
+    ] {
+        assert_eq!(name(raw), raw);
+    }
+    let malformed = format!("{scope}.F_FF");
+    assert_eq!(name(&malformed), malformed);
+}

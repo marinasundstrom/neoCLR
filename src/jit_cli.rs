@@ -49,6 +49,7 @@ pub(crate) fn run(
     command.args([
         "--compile-system",
         "--bind-user-fault",
+        "--bind-stack-trace",
         "--reference-arena",
         "--native-gc",
         "--bind-console-read-byte",

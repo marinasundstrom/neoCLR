@@ -134,3 +134,55 @@ void neoclr_roots_discard_v1(neoclr_parked_roots *record) {
     *p = record->next;
     memset(record, 0, sizeof(*record));
 }
+
+#ifdef NEOCLR_NATIVE_GC
+/* Capture published logical frames, never machine-stack bytes or local values.
+ * Allocation cannot collect, so saved frame/name addresses remain valid through
+ * the copy. Output is published only after a complete owned snapshot is written. */
+int32_t neoclr_stack_trace_capture_v1(int32_t skip, neoclr_aot_context *context,
+    const neoclr_aot_text **output, const neoclr_aot_text *const *names, uint32_t count) {
+    if (skip < 0 || !context || !output || !names) return 3;
+    const neoclr_probe_frame *frames[64];
+    uint32_t selected = 0;
+    uint64_t length = 0;
+    int truncated = 0;
+    const char marker[] = "   ... stack trace truncated\n";
+    for (const neoclr_probe_frame *f = head; f; f = f->previous) {
+        if (f->context != context) continue;
+        if (skip) { --skip; continue; }
+        if (f->function >= count || !names[f->function]) return 3;
+        uint64_t name_length = names[f->function]->length;
+        uint64_t digits = 1;
+        for (uint32_t n = f->instruction; n >= 10; n /= 10) ++digits;
+        uint64_t extra = 6 + name_length + 14 + digits + 2;
+        if (selected == 64 || name_length > 65536 || extra > 65536 - (sizeof(marker) - 1) - length) {
+            truncated = 1;
+            break;
+        }
+        frames[selected++] = f;
+        length += extra;
+    }
+    if (truncated) length += sizeof(marker) - 1;
+    void *allocation = NULL;
+    int32_t status = neoclr_gc_allocate_v1(&context->text, 8 + length, NEOCLR_GC_TEXT, &allocation);
+    if (status) return status;
+    neoclr_aot_text *text = allocation;
+    text->length = length;
+    unsigned char *cursor = (unsigned char *)text->bytes;
+    for (uint32_t i = 0; i < selected; i++) {
+        const neoclr_probe_frame *f = frames[i];
+        const neoclr_aot_text *name = names[f->function];
+        memcpy(cursor, "   at ", 6); cursor += 6;
+        memcpy(cursor, name->bytes, (size_t)name->length); cursor += name->length;
+        memcpy(cursor, " [instruction ", 14); cursor += 14;
+        char digits[10]; unsigned used = 0; uint32_t n = f->instruction;
+        do { digits[used++] = (char)('0' + n % 10); n /= 10; } while (n);
+        while (used) *cursor++ = (unsigned char)digits[--used];
+        *cursor++ = ']'; *cursor++ = '\n';
+    }
+    if (truncated) { memcpy(cursor, marker, sizeof(marker) - 1); cursor += sizeof(marker) - 1; }
+    if ((uint64_t)(cursor - (unsigned char *)text->bytes) != length) abort();
+    *output = text;
+    return 0;
+}
+#endif

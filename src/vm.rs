@@ -4130,6 +4130,29 @@ fn interpret_instructions_with_dispatch(
                             memory.free(pointer)?;
                             return Ok(None);
                         }
+                        if matches!(binding, crate::native::Binding::StackTraceCapture) {
+                            let [Value::Int32(skip)] = args.as_slice() else {
+                                return Err(Fault::new("stack capture requires an Int32 skip count"));
+                            };
+                            if *skip < 0 { return Err(Fault::new("stack capture skip count must be nonnegative")); }
+                            let mut active_frames = frames.iter().rev().skip(*skip as usize);
+                            let mut text = String::new();
+                            let mut truncated = false;
+                            for active in active_frames.by_ref().take(crate::StackTrace::MAX_FRAMES) {
+                                let name = active.function.origin.as_ref()
+                                    .and_then(|o| o.full_name.as_deref()).unwrap_or(&active.function.name);
+                                let name = crate::diagnostic_function_name(name);
+                                let line = format!("   at {} [instruction {}]\n", name, active.trace_pc);
+                                if text.len() + line.len() > 65536 - 29 { truncated = true; break; }
+                                text.push_str(&line);
+                            }
+                            if truncated || active_frames.next().is_some() {
+                                text.push_str("   ... stack trace truncated\n");
+                            }
+                            frames.last_mut().unwrap().stack.push(Value::String(text.into()));
+                            return Ok(None);
+                        }
+
                         if matches!(binding, crate::native::Binding::GcCollect) {
                             // The private service consumes no arguments; all roots remain in frames.
                             let roots = execution_roots(

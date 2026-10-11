@@ -1803,3 +1803,20 @@ independent host budgets and unsupported modern-hosting capabilities.
 HttpServerOptions and the four-argument Listen overload are included in both
 reference paths, with validation ranges, snapshot ownership and phase semantics.
 No public API is excluded. See [server options](../docs/http-server-options.md).
+
+
+### Current StackTrace capture (2026-10-12)
+
+System.Diagnostics.StackTrace is selected automatically in both development reference
+paths. Constructor and ToString XML describe owned capture, current-frame scope, UTF-8
+limits and terminal allocation failure. The [manual guide](stack-trace.md) covers the
+remaining structured/source/async-stack gaps; no implemented member is excluded.
+Native Runtime/Data/Networking/Web were rebuilt with the new class before rendering.
+The aggregate facade is reference-only; the runtime implementation lives in the native
+Runtime library and uses a private contextual capture service.
+
+The host-only Rust `RuntimeService::StackInspection` capability and hidden diagnostic
+name decoder are not guest RavenDoc types. The managed StackTrace class, constructor
+and ToString have rendered native reference pages and aggregate reference entries.
+The native manifest pins the complete rebuilt bundle and renderer binaries, replacing
+older HTTP-only refresh provenance with the coherent current library build.

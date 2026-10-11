@@ -1,37 +1,32 @@
 {
   "format": 1,
   "archive": "native-reference.zip",
-  "sha256": "e8a1c7f75a89838ec3a845453328e748e2939ff1883c04531e300aab856b6311",
-  "librarySourceRevision": "2c8204d5310cf8a15e00b3da15d05ab73d818b7f",
-  "compilerRevision": "8b917fbcb4182f639deb830f32c84f810e727898",
-  "rendererRevision": "e349f4783cb7534979ac36b31e81c0ffad3d13ef",
+  "sha256": "751a2f867455db3b3f3f39c463d2c61baa4239de94737eddbfeec4a3d0911249",
+  "librarySourceRevision": "a3ba2d9804d4551e37c6f10865d6b55c9c4383bc",
+  "compilerRevision": "e349f4783",
+  "rendererRevision": "7622d09e4",
   "libraryArtifacts": {
-    "Core.dll": "3d4a676d379067c18a65a9beb8257ed40bf3196fc643a9ba1d559c619ec73fad",
-    "System.Data.dll": "052add250d91413454eb1a2255c7365092f3ba5c5be596a942a206cf0b08103f",
-    "System.Networking.dll": "8e772e0ed65ad5d400f938ede520d91b0ceb3a44afe020ed68e4521d5a650024",
-    "System.Runtime.dll": "0cfe4c1da8accd073602e73df0aa4c9f4d93aa16dcb2cb5e84f273bf6fab186d",
-    "System.Web.dll": "6325517a9e3fcb5d63b20451000263a471076c6f0a242c511110984d310b8616",
-    "System.runtime.neox": "98a1ae1da85387c87746957e83a4015eb59d0566539a915c69f168d2b511b190"
+    "System.Runtime.dll": "e8fc407595408b17543788ae258e5973c7d48e8eafc7679eb6dd8188a7c6adfe",
+    "System.Data.dll": "655a7f9fe7c86f5ed9b26d944108bb1fcc599acbcda5d38f238bd30d692cb5fc",
+    "System.Networking.dll": "631c4f83553d96c7b81a7106f0c20efbf38f8511d3e4a34228db51581201b8e1",
+    "System.Web.dll": "ceb5bdc1fc1938badbd4416a65dcf6540f2095e78b6cd0f6c79f6244e391173b",
+    "System.runtime.neox": "98a1ae1da85387c87746957e83a4015eb59d0566539a915c69f168d2b511b190",
+    "Core.dll": "3d4a676d379067c18a65a9beb8257ed40bf3196fc643a9ba1d559c619ec73fad"
   },
   "renderingEvidence": {
     "normalized-sidecars.json": "bc9e3ef17efc0a7bf6e5c89425aefe088bb622a701fbf6153ee20841ea0341d3",
-    "restored-xml-comments.json": "a391d34270d57e8fc11ae8ad30aa70c75eb4d37373688cda2f8170dbf62d7e6c"
+    "restored-xml-comments.json": "b930348eff08a18e4bef45eb072bd5be7c61976893ba24b30451195296fba373"
   },
   "scope": "Reviewed native API rendering; legacy coverage gaps remain explicitly marked by the website overlay.",
   "rendererArtifacts": {
-    "Audit.dll": "108d3d09c4bcb7d10e430e2932729ad586e7fb2defbf902bafc730196aba541a",
+    "Audit.dll": "d3e701466b1cb5919e137216c7f53f36f63b598068d871db5266d95775255494",
     "RavenDoc.dll": "df93474b617d7652bb323f5e7a601e08b3c742cea4c70967c576d6e178a47fce",
     "Raven.CodeAnalysis.dll": "9084242b7f93eebb165bbc8c94d97b46443d60b7d8139b1ce06bb1aca251af4b",
     "Raven.CodeAnalysis.NeoClr.dll": "d67b07545a0af978386195689515a2d6ef7fb59eb1604fe4240828a967542216",
     "NeoCLR.Metadata.Experimental.dll": "642e9caaf83a06411757e62df9c74e6175903a4dbd6183ba3586e125c3748e92"
   },
-  "httpFoundation": {
-    "sourceRevision": "084c451f55a22360d3e97ee3a353ef9b3db118c0",
-    "sourceDirty": true,
-    "compilerRevision": "8b917fbcb4182f639deb830f32c84f810e727898",
-    "buildEvidenceSha256": "1df1a67e46ced0fe930be63248cd20a9bc26668fc4b9a1bcc27cf4b5eb8570b7",
-    "scope": "Integrated class libraries and rebuilt HTTP library including HttpServerOptions; executable and reference library hashes match.",
-    "integratedBaselineRevision": "2c8204d5310cf8a15e00b3da15d05ab73d818b7f"
-  },
-  "rendererProvenance": "Renderer rebuilt against Raven e349f4783 outputs; compiler libraries built with pinned 8b917fb binaries. Exact binary hashes retained."
+  "librarySourceDirty": true,
+  "libraryBuildEvidence": "docs/experiments/stack-trace/library-build.json",
+  "libraryBuildEvidenceSha256": "17fe22f1fd44bb57fbaf340a01e4c08f7d57a24186cb7097fbf89241f0ee11e6",
+  "rendererProvenance": "Audit rebuilt without rebuilding project dependencies, using the pinned Raven native compiler/renderer outputs. Exact binary hashes retained."
 }

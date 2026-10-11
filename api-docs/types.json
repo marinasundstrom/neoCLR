@@ -78,6 +78,7 @@
   "System.Data.Json.JsonString",
   "System.Data.Json.JsonValue",
   "System.Delegate",
+  "System.Diagnostics.StackTrace",
   "System.Disposable",
   "System.Double",
   "System.Enum",

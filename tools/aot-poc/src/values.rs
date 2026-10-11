@@ -430,6 +430,7 @@ pub(crate) fn compile_into(
             (&d.scheduler_capture, "neoclr_scheduler_capture_managed_v1", vec![types::I64, types::I64]),
             (&d.scheduler_submit_to, "neoclr_scheduler_submit_to_managed_v1", vec![types::I64, types::I64, types::I64, types::I64]),
             (&d.scheduler_submit, "neoclr_scheduler_submit_managed_v1", vec![types::I64, types::I64, types::I64]),
+            (&d.stack_trace_capture, "neoclr_stack_trace_capture_v1", vec![types::I32, types::I64, types::I64, types::I64, types::I32]),
             (&d.runtime_async_gccollect, "neoclr_runtime_async_gccollect_v1", vec![types::I64, types::I64]),
             (&d.runtime_async_create, "neoclr_runtime_async_create_v1", vec![types::I64, types::I64]),
             (&d.runtime_async_startmanaged, "neoclr_runtime_async_startmanaged_v1", vec![types::I64; 5]),
@@ -1042,6 +1043,17 @@ pub(crate) fn compile_into(
                     args.extend([run, drain]);
                 }
                 args.push(output);
+                if details.unwrap().stack_trace_capture.contains(&i) {
+                    // Unlike interpreter intrinsics, the native service wrapper publishes
+                    // its own probe frame. Hide it without changing managed skip semantics.
+                    // Preserve negative input for validation and saturate at Int32::MAX.
+                    let valid = b.ins().icmp_imm(IntCC::SignedGreaterThanOrEqual, args[0], 0);
+                    let bounded = b.ins().icmp_imm(IntCC::SignedLessThan, args[0], i32::MAX as i64);
+                    let increment = b.ins().band(valid, bounded);
+                    let next = b.ins().iadd_imm(args[0], 1);
+                    args[0] = b.ins().select(increment, next, args[0]);
+                    args.extend(diagnostic_data.as_ref().unwrap().stack_names(module, &mut b));
+                }
                 if details.unwrap().runtime_async_start.contains(&i) || details.unwrap().runtime_async_startmanaged.contains(&i) {
                     let callback = module.declare_func_in_func(runtime_async_callbacks.unwrap().0, b.func);
                     args.push(b.ins().func_addr(types::I64, callback));

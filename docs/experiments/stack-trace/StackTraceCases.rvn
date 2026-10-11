@@ -1,0 +1,15 @@
+module StackTraceCases
+
+import System.*
+import System.Diagnostics.*
+
+func Capture() -> StackTrace => StackTrace()
+func Outer() -> StackTrace => Capture()
+
+func Main() -> int {
+    let trace = Outer()
+    Console.WriteLine(trace.ToString())
+    System.Runtime.GC.Collect()
+    Console.WriteLine(trace.ToString())
+    return 0
+}

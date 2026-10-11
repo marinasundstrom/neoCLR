@@ -6,6 +6,7 @@ use crate::{
 use unicode_segmentation::UnicodeSegmentation;
 
 pub(crate) enum Binding {
+    StackTraceCapture,
     GcCollect,
     GcInfo(u8),
     GcKeepAlive,
@@ -425,6 +426,12 @@ pub(crate) fn bind(function: &Function) -> Result<Binding, Fault> {
         } else {
             Binding::ReflectionProperty(setter)
         });
+    }
+    if function.name == "neoCLR.Runtime.StackTraceCapture" {
+        if function.parameters != [Type::Int32] || function.returns != Type::String || function.no_result {
+            return Err(Fault::new("stack capture service signature mismatch"));
+        }
+        return Ok(Binding::StackTraceCapture);
     }
     if function.name == "neoCLR.Runtime.GCCollect" || function.name == "neoCLR.Runtime.GCKeepAlive"
     {

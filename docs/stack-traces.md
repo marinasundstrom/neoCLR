@@ -2,7 +2,9 @@
 
 Status: owned logical stack snapshots for interpreter execution Faults are implemented.
 The Rust API exposes Fault.stack_trace, StackTrace, StackFrame, and CodeLocation. Guest
-System.Diagnostics.StackTrace/StackFrame and debug-source resolution remain pending.
+System.Diagnostics.StackTrace now provides current capture and printing in the development
+native class library; structured StackFrame access remains pending. See the
+[owned snapshot contract and validation](experiments/stack-trace/README.md).
 The immediate platform milestone emphasizes simple runnable programs, representative
 primitive/String APIs, and Error/Fault behavior; richer source diagnostics follow.
 
@@ -65,6 +67,10 @@ artifact debug-info encoding and retention policy remain to be specified.
 
 ## Runtime library API
 
+Development (2026-10-12) implements `StackTrace()` and `ToString()` as an owned text
+snapshot of the active logical guest chain. It supports interpreter and the native
+root-published JIT/AOT profile. The remaining surface below is still planned.
+
 Provide familiar ordinary library types named System.Diagnostics.StackTrace and
 System.Diagnostics.StackFrame. StackTrace should support explicit current-stack capture,
 FrameCount, indexed GetFrame access, and formatting. StackFrame should expose method
@@ -74,8 +80,8 @@ conventions rather than using null to mean unavailable information.
 Fault formatting uses the snapshot captured at failure. Constructing or explicitly
 capturing a StackTrace inside running guest code captures that current stack instead.
 It must not capture the later host reporting stack or overwrite the original Fault trace.
-The implementation needs a contextual runtime binding: the existing InternalCall registry
-currently receives values/output but has no guest-frame capture context.
+The contextual StackTraceCapture binding now captures active frames in the VM/native
+root chain. It does not yet expose a structured snapshot or suspended causal parents.
 
 These are ordinary platform types; the names do not introduce reference semantics,
 mandatory GC, or a special union category. The backing representation and snapshot

@@ -106,3 +106,16 @@ Questions, examples and documentation corrections are welcome. See [how to contr
 Report issues with a small program, the toolchain version, expected behavior and observed output. API proposals should identify the missing operation or contract.
 
 [Discuss on GitHub ↗](https://github.com/marinasundstrom/neoCLR/issues)
+
+## Printing the current call stack
+
+**Development:** `System.Diagnostics.StackTrace()` captures the active guest call
+stack at construction. `ToString()` prints readable method names and instruction
+indexes, and retains that snapshot after the original calls return or GC runs.
+It supports interpreter, JIT and native AOT execution; current qualification is on
+macOS ARM64. This is useful for seeing how execution reached a point in your code.
+
+Capture is bounded to 64 frames and 64 KiB with explicit truncation. Source lines,
+structured frame access and suspended async caller history remain incomplete.
+Faults remain terminal; capturing a stack does not introduce recovery.
+[StackTrace API and example](../../docs/stack-trace.html).

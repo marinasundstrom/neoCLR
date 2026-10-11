@@ -686,6 +686,28 @@ fn completion_services(input: &mut neoclr::Module, selection: &Value, submission
     Ok(bindings)
 }
 
+pub fn stack_trace(input: &mut neoclr::Module, selection: &Value) -> Result<Vec<Value>, Error> {
+    let mut bindings = vec![];
+    for row in selection["functions"].as_array().ok_or("missing selection inventory")? {
+        if row["name"] != "neoCLR.Runtime.StackTraceCapture" { continue; }
+        let f = &mut input.functions[row["compiledIndex"].as_u64().ok_or("missing compiled index")? as usize];
+        if f.name != "neoCLR.Runtime.StackTraceCapture" || f.owner.is_some() || f.instance
+            || f.parameters != [Type::Int32] || f.returns != Type::String || f.no_result
+            || f.impl_flags != 0x1000 || f.pinvoke.is_some() || !f.body.is_empty()
+            || !f.locals.is_empty() || !f.generic_parameters.is_empty() || !f.generic_arguments.is_empty()
+            || !f.generic_constraints.is_empty() || f.receiver_byref || f.receiver_readonly
+            || f.is_virtual || f.is_override || f.is_abstract || !f.interface_implementations.is_empty()
+            || !f.out_parameters.is_empty() || !f.out_when_true.is_empty() || !f.readonly_parameters.is_empty()
+        { return Err("stack capture binding requires exact reserved InternalCall contract".into()); }
+        f.impl_flags = 0;
+        f.body = vec![Op::Branch(0)];
+        bindings.push(json!({"definition":row["definition"], "name":row["name"],
+            "compiledIndex":row["compiledIndex"], "implementation":"stack-trace-capture-v1",
+            "symbol":"neoclr_stack_trace_capture_v1", "storage":"owned UTF-8 snapshot of active logical guest frames"}));
+    }
+    Ok(bindings)
+}
+
 pub fn runtime_async(input: &mut neoclr::Module, selection: &Value) -> Result<Vec<Value>, Error> {
     let mut bindings = vec![];
     for row in selection["functions"].as_array().ok_or("missing selection inventory")? {
@@ -1113,6 +1135,29 @@ mod type_identity_tests {
             assert_eq!(runtime_async(&mut input, &inventory).unwrap().len(), 1);
             assert_eq!(input.functions[0].impl_flags, 0);
         }
+    }
+
+    #[test]
+    fn stack_trace_requires_exact_native_contract() {
+        let source = neoclr::assemble(".module CaptureBinding\n.function neoCLR.Runtime.StackTraceCapture(Int32 skip) -> String\n.methodimpl InternalCall\n.end\n").unwrap();
+        let inventory = json!({"functions":[{"compiledIndex":0,"name":"neoCLR.Runtime.StackTraceCapture"}]});
+        for variant in 0..7 {
+            let mut input = source.clone();
+            let f = &mut input.functions[0];
+            match variant {
+                0 => f.parameters.clear(),
+                1 => f.returns = Type::Int32,
+                2 => f.impl_flags = 0,
+                3 => f.body.push(Op::Int(0)),
+                4 => f.no_result = true,
+                5 => f.locals.push(Type::String),
+                _ => f.instance = true,
+            }
+            assert!(stack_trace(&mut input, &inventory).is_err(), "variant {variant}");
+        }
+        let mut input = source;
+        assert_eq!(stack_trace(&mut input, &inventory).unwrap().len(), 1);
+        assert_eq!(input.functions[0].impl_flags, 0);
     }
 
 }

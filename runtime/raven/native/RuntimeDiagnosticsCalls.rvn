@@ -1,0 +1,6 @@
+module neoCLR.Runtime
+
+import System.Runtime.CompilerServices.*
+
+[MethodImpl(MethodImplOptions.InternalCall)]
+internal extern func StackTraceCapture(skipFrames: int) -> string;

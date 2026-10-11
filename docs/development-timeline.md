@@ -15519,3 +15519,27 @@ or runtime-await default switch was performed.
   guest programs can print their call stack. The assistant proposes the familiar
   System.Diagnostics.StackTrace name and implementation after committing this
   performance slice. This is requested work, not yet implemented by this entry.
+
+
+## 2026-10-12 — Guest StackTrace and separate runtime diagnostic tools
+
+- **Author direction:** add a class so guest code can print the call stack; afterward,
+  continue debugging and profiling tools needed to understand the runtime. This
+  follows the author's preference that profiler and debugger be separate tools.
+- **Assistant implementation:** add System.Diagnostics.StackTrace current
+  capture/printing, a contextual capture service, native logical-frame publication
+  access and readable diagnostic names for the temporary metadata projection.
+  Keep structured frames and suspended causal parents as explicit gaps.
+- **API comparison:** follow .NET construction/snapshot semantics, documenting bounded
+  UTF-8/frame limits and the missing StackFrame/source overloads as incomplete support.
+  [Design and evidence](experiments/stack-trace/README.md) distinguish current frames
+  from later async/debugger/profiler integration. No recoverable Faults are introduced.
+
+- **Author clarification:** StackTrace is useful to print how execution arrived at
+  a point in code. The implementation captures at construction and retains the
+  snapshot rather than formatting a new stack later.
+- **Outcome:** nested-call and pending-await consumers pass interpreter/JIT/AOT on
+  macOS ARM64, including snapshot retention after GC and native teardown. The native
+  wrapper initially leaked the constructor frame; adjusted wrapper skip semantics
+  restore caller-first behavior. Async bodies still expose generated names and do
+  not reconstruct suspended parents. [Recorded validation](experiments/stack-trace/validation.json).

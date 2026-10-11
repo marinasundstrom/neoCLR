@@ -1,0 +1,17 @@
+module System.Diagnostics
+
+/// An owned text snapshot of the current logical guest call stack.
+/// Captures at construction, innermost first, up to 64 frames with explicit truncation.
+/// Does not capture arguments, locals, native frames, or suspended async callers.
+public class StackTrace {
+    private val text: string
+
+    /// Captures the caller's current stack. Formatting later does not capture again.
+    init() {
+        text = neoCLR.Runtime.StackTraceCapture(1)
+    }
+
+    /// Returns the captured method names and IL instruction indexes.
+    /// Source lines and full async causal stacks are not yet included.
+    override func ToString() -> string => text
+}

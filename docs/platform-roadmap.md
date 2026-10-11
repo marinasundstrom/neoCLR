@@ -1,5 +1,13 @@
 # neoCLR platform roadmap
 
+**Managed stack diagnostics (2026-10-12):** the author requests a StackTrace class
+for printing the current call stack, then continued work on separate debugger and
+profiler tools to understand the runtime. The bounded
+[StackTrace slice](experiments/stack-trace/README.md) captures owned current-stack
+text; structured frames, source mapping and causal async stitching remain follow-ups.
+Continue diagnostic tooling with readable native profile symbols and GC cost
+summaries before choosing another runtime optimization.
+
 **Runtime diagnostics direction (2026-10-11):** the author requests profiling the
 remaining native runtime-async gap and building useful profiler/GC/debugger tools.
 Start with [native sampling and collector diagnostics](experiments/runtime-async/native-profiling.md),

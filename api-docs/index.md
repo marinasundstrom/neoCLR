@@ -28,6 +28,7 @@ member for parameters, return values, errors and usage notes.
 | Dates and globalization | [System.Time](xref:System.Time) · [System.Globalization](xref:System.Globalization) |
 | Networking and HTTP | [System.Networking](xref:System.Networking) · [System.Web.Http](xref:System.Web.Http) · [Sockets](sockets.md) · [Routes](routes.md) |
 | JSON | [System.Data.Json](xref:System.Data.Json) · [Serialization and HTTP content](json.md) |
+| Runtime diagnostics | [StackTrace](xref:System.Diagnostics.StackTrace) · [Capture and limits](stack-trace.md) · [GC](gc.md) |
 | Introspection and reflection | [System.Introspection](xref:System.Introspection) · [Descriptor contracts](introspection.md) · [Runtime reflection](reflection.md) |
 
 ## Using the reference

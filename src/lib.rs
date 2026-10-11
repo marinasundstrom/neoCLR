@@ -70,6 +70,8 @@ mod string_interning;
 mod string_value;
 pub use services::{MissingService, RuntimeService, ServiceUse};
 pub use stack_trace::{CodeLocation, StackFrame, StackTrace};
+#[doc(hidden)]
+pub use stack_trace::diagnostic_function_name;
 pub use string_value::StringValue;
 mod invocation;
 mod invocation_budget;

@@ -51,6 +51,7 @@ pub struct Options {
     pub scheduler_capture: Vec<usize>,
     pub scheduler_submit_to: Vec<usize>,
     pub timer_start: Vec<usize>,
+    pub stack_trace_capture: Vec<usize>,
     pub runtime_async_gccollect: Vec<usize>,
     pub runtime_async_create: Vec<usize>,
     pub runtime_async_start: Vec<usize>,
@@ -248,6 +249,9 @@ impl Options {
                 .filter_map(|r| r["compiledIndex"].as_u64().map(|i| i as usize)).collect(),
             scheduler_submit: report.and_then(|r| r["nativeBindings"].as_array()).into_iter().flatten()
                 .filter(|r| r["implementation"] == "scheduler-submit-v1")
+                .filter_map(|r| r["compiledIndex"].as_u64().map(|i| i as usize)).collect(),
+            stack_trace_capture: report.and_then(|r| r["nativeBindings"].as_array()).into_iter().flatten()
+                .filter(|r| r["implementation"] == "stack-trace-capture-v1")
                 .filter_map(|r| r["compiledIndex"].as_u64().map(|i| i as usize)).collect(),
             runtime_async_gccollect: report.and_then(|r| r["nativeBindings"].as_array()).into_iter().flatten()
                 .filter(|b| b["implementation"] == "runtime-async-gccollect-v1")
@@ -524,6 +528,7 @@ impl Options {
 pub struct Data {
     hidden_frames: HashSet<usize>,
     frames: Vec<DataId>,
+    frame_table: Option<DataId>,
     messages: HashMap<(usize, usize), DataId>,
     defaults: [DataId; 9],
 }
@@ -546,11 +551,12 @@ impl Data {
         let mut frames = vec![];
         let mut messages = HashMap::new();
         for (i, f) in input.functions.iter().enumerate() {
-            let name = options
+            let name = f.origin.as_ref().and_then(|o| o.full_name.as_deref()).unwrap_or_else(|| options
                 .frame_names
                 .get(&i)
-                .map_or(f.name.as_str(), String::as_str);
-            frames.push(literal(module, &format!("fault_frame_{i}"), name)?);
+                .map_or(f.name.as_str(), String::as_str));
+            let name = neoclr::diagnostic_function_name(name);
+            frames.push(literal(module, &format!("fault_frame_{i}"), &name)?);
             for (pc, op) in f.body.iter().enumerate() {
                 if let Op::Fault(text) = op {
                     messages.insert(
@@ -560,6 +566,18 @@ impl Data {
                 }
             }
         }
+        let frame_table = if options.stack_trace_capture.is_empty() { None } else {
+            let id = module.declare_data("stack_trace_names", Linkage::Local, false, false)?;
+            let mut data = DataDescription::new();
+            data.define(vec![0; frames.len() * 8].into_boxed_slice());
+            data.set_align(8);
+            for (i, frame) in frames.iter().enumerate() {
+                let reference = module.declare_data_in_data(*frame, &mut data);
+                data.write_data_addr((i * 8) as u32, reference, 0);
+            }
+            module.define_data(id, &data)?;
+            Some(id)
+        };
         let defaults = [
             literal(
                 module,
@@ -588,10 +606,15 @@ impl Data {
         ];
         Ok(Self {
             hidden_frames: options.class_dispatch_thunks.clone(),
+            frame_table,
             frames,
             messages,
             defaults,
         })
+    }
+    pub fn stack_names(&self, module: &mut impl Module, b: &mut FunctionBuilder<'_>) -> [ir::Value; 2] {
+        let global = module.declare_data_in_func(self.frame_table.expect("stack capture name table"), b.func);
+        [b.ins().global_value(types::I64, global), b.ins().iconst(types::I32, self.frames.len() as i64)]
     }
     pub fn site(
         &self,
