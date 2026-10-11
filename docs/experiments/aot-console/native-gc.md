@@ -438,3 +438,38 @@ candidates, including payload bytes shaped like an allocation descriptor. Existi
 conditional chains, cycles, rollback, host handles and 320 native owned suspensions
 remain sanitizer-qualified. Matched benchmark evidence is linked from the
 [profiling notes](../runtime-async/native-profiling.md).
+
+## Trace each owned parked stack once — 2026-10-12
+
+Native sampling identifies collection and frame marking as the remaining dominant
+runtime-async costs. Conditional ownership previously rescanned every marked owner's
+parked frames on every fixed-point pass. Frames cannot mutate during a collection,
+so repeating a registration's scan cannot discover new references.
+
+Each owned parked registration now carries private `traced` scratch, reset before
+every collection's marking phase. The first independently marked owner activates
+that registration once. Other owners discovered later still activate their stacks
+on subsequent passes; multiple stacks sharing an owner each scan independently.
+No marks survive as reachability evidence across collections, including after failure.
+The field occupies existing alignment padding in the private registration on the
+qualified 64-bit target. Hosts should still rebuild against matching private headers.
+
+This preserves the existing .NET dependent-lifetime comparison above. It is an
+internal tracing optimization, not an API divergence, generational collector or
+change to collection frequency. Unlike reducing collection frequency, it removes
+redundant work within the existing stress-at-safepoints behavior. The cost is one
+private scratch flag per registration and a reset traversal. Concurrent mutation
+or parallel marking would require revisiting the synchronization contract.
+
+Sanitized tests cover reverse dependency order, shared owners, changed frame slots
+on the next collection, failed tracing followed by retry, abandoned cycles and
+owned native suspension/reclamation. Benchmark evidence is linked from the
+[native profiling record](../runtime-async/native-profiling.md).
+
+The same slice fuses heap-descriptor validation with address-index construction and
+clears old marks while seeding intern roots. Every descriptor is still checked before
+any marking mutation. Seeding only queues the current intern entry; transitive owner
+marking starts after that pass, so later blocks cannot have fresh marks cleared.
+The added pass test checks a malformed late descriptor without heap mutation,
+multiple intern entries pointing forward in the heap, repeat collection, and release.
+These changes remove two complete heap traversals without weakening admission.

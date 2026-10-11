@@ -133,3 +133,58 @@ Full raw and annotated outputs remain in the recorded local output directory, wi
 hashes in the checked-in report. Regenerate them using the recipe before comparing
 changed implementations. Pause distributions, retention paths and native debugger
 stepping remain open.
+
+## Fewer collector traversals — 2026-10-12
+
+The first parked-stack-only experiment passed correctness but did not establish a
+clear timing improvement. The completed slice also validates descriptors while
+building the address index and resets marks while seeding intern roots. Every
+validation check remains, collection frequency is unchanged, and each owned parked
+registration is traced once after its owner is marked. See the
+[collector design](../aot-console/native-gc.md#trace-each-owned-parked-stack-once--2026-10-12).
+
+The [controlled AOT comparison](collector-walk-comparison.json) relinks identical
+runtime-async guest objects against baseline collector `2ea1f796` and the changed
+collector, with the same current host and headers. Six rounds alternate variant
+order; each process runs 40 invocations, dropping its first from timing summaries.
+Each cell retains 234 timings. All 960 invocations verify reclamation and stack release.
+
+| 100-operation workload | Baseline median | Optimized median | Reduction |
+| --- | ---: | ---: | ---: |
+| completed awaits | 18.87 ms | 16.85 ms | 10.7% |
+| pending awaits | 45.35 ms | 39.66 ms | 12.6% |
+
+Reproduce from the repository root with a passing benchmark recipe:
+
+```sh
+python3 docs/experiments/runtime-async/compare_collectors.py \
+  --benchmark target/collector-walk-benchmark/results.json \
+  --baseline 2ea1f796 --output target/collector-comparison-new
+```
+
+The [six-round JIT/AOT rerun](collector-walk-benchmark.json) also retains compiler
+state-machine controls. Runtime medians are 19.01/18.27 ms (JIT/AOT completed) and
+47.26/42.58 ms (pending). It contains substantial timing noise, including a 146 ms
+pending JIT outlier. Ratios to state machines range 1.15–1.58; do not treat these
+noisy ratios as proof that the lowering gap has closed. The controlled same-object
+AOT comparison supports the collector-specific improvement, not a Windows or .NET
+performance claim. Other applications and interpreter performance are not inferred.
+
+The [new instrumented profile](collector-walk-profile.json) runs 200 checked
+invocations: collection accounts for about 64% of diagnostic time, with unchanged
+26,664 attempts, 6,617 allocations and 802 resumes per invocation. Collection remains
+a major cost. Investigate pacing separately rather than quietly reducing stress
+coverage as part of this optimization.
+
+[Sanitized validation](collector-walk-validation.json) covers descriptor rejection
+without mutation, multiple forward-pointing intern roots, repeated GC, reverse owner
+discovery, shared parked owners, changed slots on the next collection, failure/retry,
+unrooted cycles, host handles and 320 owned native suspensions. Existing precise
+boundary and forged-header tests remain active. No guest public API changes.
+
+[Native Raven generators](collector-walk-generators.json) pass interpreter/JIT/AOT.
+The [HTTP/await showcase](collector-walk-showcase.json) passes JIT and AOT language,
+cleanup, cancellation, HTTP client/server and lifecycle checks with the new collector.
+An initial replay selected an older interpreter without managed-body support; the
+recorded successful run uses the qualified owned-runtime recipe. These are behavior
+checks, not HTTP throughput measurements or refreshed Windows qualification.

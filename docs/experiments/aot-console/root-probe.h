@@ -72,6 +72,8 @@ typedef struct neoclr_parked_roots {
     const void *owner_context;
     void *owner;
     int32_t expired;
+    /* Private collection scratch; reset before tracing, never persists reachability. */
+    int32_t traced;
 } neoclr_parked_roots;
 void neoclr_roots_park_v1(neoclr_parked_roots *);
 void neoclr_roots_discard_v1(neoclr_parked_roots *);

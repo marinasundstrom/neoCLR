@@ -8,6 +8,13 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-12
 
+- Reduce native collector traversal work: validate spans while building the index,
+  combine mark reset with intern-root seeding, and trace each activated owned parked
+  stack once per collection. Preserve fixed-point ownership and collection frequency.
+  Add failure/retry, shared-owner, intern-root and descriptor-integrity regressions
+  and a repeatable same-object collector comparison. Local AOT runtime-async medians
+  improve about 10–13%; noisy JIT/AOT lowering comparisons do not close the async gap.
+
 - Extend the separate native profiler with a freshly compiled, hash-bound guest
   symbol map, readable sample annotations and warmup-excluded collector summaries.
   Pin transitive local host sources and retain raw samples. A 200-invocation check

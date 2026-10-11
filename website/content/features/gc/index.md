@@ -95,3 +95,10 @@ remain separate tools; native stepping and logical async-stack inspection are
 follow-up work. Profiling identified repeated conditional-root validation searches,
 which now reuse the collector's address index without changing collection frequency.
 [Profiling workflow and measurements](https://github.com/marinasundstrom/neoCLR/blob/main/docs/experiments/runtime-async/native-profiling.md).
+
+**Development follow-up:** native collection now avoids rescanning an activated
+parked stack within one collection and combines two redundant heap walks. Descriptor
+validation, conditional ownership and collection frequency remain unchanged. Local
+AOT comparisons use identical guest objects and verify full heap/stack reclamation;
+these results do not qualify a new collector policy or establish Windows performance.
+The profiling record above retains the benchmark and correctness evidence.

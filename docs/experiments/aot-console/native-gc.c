@@ -18,15 +18,19 @@ static int valid(const neoclr_aot_text_arena *a) {
     return a && a->used <= a->capacity && !(a->used & 7) &&
         (!a->capacity || a->data) && !((uintptr_t)a->data & 7);
 }
+static int block_valid(const neoclr_aot_text_arena *a, uint64_t at) {
+    if (a->used - at < sizeof(block)) return 0;
+    const block *b = (const void *)(a->data + at);
+    return b->span >= sizeof(block) + 8 && !(b->span & 7) && b->span <= a->used - at &&
+        b->state <= 7 && (!b->state || ((b->state & ALLOCATED) &&
+            b->bytes && b->bytes <= b->span - sizeof(block) &&
+            b->kind >= NEOCLR_GC_TEXT && b->kind <= NEOCLR_GC_INTERN));
+}
 static int blocks_valid(const neoclr_aot_text_arena *a) {
     if (!valid(a)) return 0;
     for (uint64_t at = 0; at < a->used;) {
-        if (a->used - at < sizeof(block)) return 0;
+        if (!block_valid(a, at)) return 0;
         const block *b = (const void *)(a->data + at);
-        if (b->span < sizeof(block) + 8 || (b->span & 7) || b->span > a->used - at ||
-            b->state > 7 || (b->state && !(b->state & ALLOCATED)) ||
-            (b->state && (!b->bytes || b->bytes > b->span - sizeof(block) ||
-                          b->kind < NEOCLR_GC_TEXT || b->kind > NEOCLR_GC_INTERN))) return 0;
         at += b->span;
     }
     return 1;
@@ -207,17 +211,20 @@ int32_t neoclr_gc_allocate_v1(neoclr_aot_text_arena *a, uint64_t bytes,
  * A bucket points to the block containing its first byte, including free spans.
  * Interior/tagged candidates still require the exact allocated payload bounds. */
 typedef struct { block *start[256]; unsigned shift; } block_index;
-static void build_index(neoclr_aot_text_arena *a, block_index *index) {
+static int build_index(neoclr_aot_text_arena *a, block_index *index) {
+    if (!valid(a)) return 0;
     index->shift = 6;
     while (a->used && ((a->used - 1) >> index->shift) >= 256) index->shift++;
     unsigned bucket = 0;
     for (uint64_t at = 0; at < a->used;) {
+        if (!block_valid(a, at)) return 0;
         block *b = (void *)(a->data + at);
         uint64_t end = at + b->span;
         while (bucket < 256 && ((uint64_t)bucket << index->shift) < end)
             index->start[bucket++] = b;
         at = end;
     }
+    return 1;
 }
 /* Index lookup preserves exact payload-base validation for host owners/values.
  * Only use after blocks_valid and before sweep changes block spans. */
@@ -267,10 +274,10 @@ int32_t neoclr_gc_collect_v1(neoclr_aot_context *context, const neoclr_probe_fra
 }
 static int32_t collect_conditional(neoclr_aot_context *context,
     const neoclr_probe_frame *head, neoclr_gc_conditional_root *conditional, uint32_t conditional_count) {
-    if (!context || !blocks_valid(&context->text)) return NEOCLR_AOT_FAULT_RUNTIME_ERROR;
+    if (!context) return NEOCLR_AOT_FAULT_RUNTIME_ERROR;
     neoclr_aot_text_arena *a = &context->text;
     block_index index;
-    build_index(a, &index);
+    if (!build_index(a, &index)) return NEOCLR_AOT_FAULT_RUNTIME_ERROR;
     if (conditional_count > NEOCLR_GC_HOST_ROOT_LIMIT || (conditional_count && !conditional))
         return NEOCLR_AOT_FAULT_RUNTIME_ERROR;
     for (uint32_t i = 0; i < conditional_count; i++)
@@ -287,13 +294,15 @@ static int32_t collect_conditional(neoclr_aot_context *context,
     neoclr_probe_storage fault[65];
     int32_t count = neoclr_probe_fault_roots_v1(context, fault, 65);
     if (count < 0) return NEOCLR_AOT_FAULT_RUNTIME_ERROR;
-    for (uint64_t at = 0; at < a->used;) {
-        block *b = (void *)(a->data + at); b->state &= ALLOCATED; at += b->span;
-    }
+    for (neoclr_parked_roots *p = (neoclr_parked_roots *)neoclr_roots_parked_v1(); p; p = p->next)
+        if (p->owner_context == context) p->traced = 0;
     block *pending = NULL;
+    // Reset marks while seeding intern entries. mark() enqueues only the current
+    // block here; it cannot mark later blocks until the worklist runs below.
     // Intern entries and their exact original String owners live until entry reset.
     for (uint64_t at = 0; at < a->used;) {
         block *b = (void *)(a->data + at);
+        b->state &= ALLOCATED;
         if ((b->state & ALLOCATED) && b->kind == NEOCLR_GC_INTERN)
             mark(a, &index, (uintptr_t)(b + 1), &pending);
         at += b->span;
@@ -361,10 +370,15 @@ static int32_t collect_conditional(neoclr_aot_context *context,
             if (root->context == context && root->conditional && !root->expired &&
                 (((const block *)root->owner - 1)->state & MARKED))
                 mark(a, &index, (uintptr_t)root->value, &pending);
-        for (const neoclr_parked_roots *p = neoclr_roots_parked_v1(); p; p = p->next)
-            if (p->owner_context == context && !p->expired &&
-                (((const block *)p->owner - 1)->state & MARKED))
+        /* Parked frame contents are immutable during collection. Once their
+         * owner is marked, scan this registration only once; newly discovered
+         * owners still activate other registrations on subsequent passes. */
+        for (neoclr_parked_roots *p = (neoclr_parked_roots *)neoclr_roots_parked_v1(); p; p = p->next)
+            if (p->owner_context == context && !p->expired && !p->traced &&
+                (((const block *)p->owner - 1)->state & MARKED)) {
+                p->traced = 1;
                 mark_frames(context, &index, p->head, &pending);
+            }
         if (!pending) break;
     }
     for (host_root *root = host_head; root; root = root->next)

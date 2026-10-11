@@ -15551,3 +15551,26 @@ or runtime-await default switch was performed.
   This guides the next investigation; it is not a claim that the async performance
   gap is closed or that native debugger stepping has been implemented.
   [Profiler evidence](experiments/runtime-async/readable-native-profile.json).
+
+## 2026-10-12 — Collector overhead and approaching the JIT default
+
+- **Author:** requests profiling-led collector optimization, correctness validation,
+  fresh benchmarks and a commit per slice; then reiterates that JIT should become
+  the default soon.
+- **Assistant:** finds repeated parked-stack scans and redundant heap traversals.
+  Removes those within the existing safepoint policy; retains conditional ownership,
+  validation and terminal failures. Parked-only timing was inconclusive, so combines
+  the traversal changes and uses an alternating same-object AOT comparison.
+- **Measured outcome:** 960 checked invocations show about 10% lower completed-await
+  and 12% lower pending-await medians. The separate JIT/AOT lowering rerun is noisy
+  and still shows a runtime-async gap. Sanitized collector/owned-body tests pass.
+  [Evidence and limits](experiments/runtime-async/native-profiling.md#fewer-collector-traversals--2026-10-12).
+- **Next priority:** satisfy existing JIT default gates using representative routine
+  tests, ordinary helper/tool delivery and supported-platform qualification. The
+  default has not changed in this collector slice; no new approval is required.
+
+- **Consumer qualification:** native Raven generators pass all three modes; the
+  HTTP/await showcase passes JIT/AOT cleanup, cancellation, client/server and lifecycle
+  checks. An old interpreter recipe initially lacked the managed-body binding; reran
+  using the qualified owned-runtime recipe. No collector failure was established by
+  that stale-host attempt. [Consumer evidence](experiments/runtime-async/collector-walk-showcase.json).

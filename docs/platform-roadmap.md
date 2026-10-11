@@ -1,5 +1,15 @@
 # neoCLR platform roadmap
 
+**Collector and JIT follow-through (2026-10-12):** the author asks to reduce collector
+cost with profiles, correctness tests and benchmarks, and reiterates that JIT should
+become the default soon. The [collector traversal slice](experiments/runtime-async/native-profiling.md#fewer-collector-traversals--2026-10-12)
+reduces controlled AOT runtime-async time about 10–13%, without changing collection
+frequency. After this slice, prioritize the existing [JIT readiness gates](jit-execution.md#test-policy-and-the-eventual-default):
+matching helper delivery through ordinary tooling, representative suites using JIT
+routinely, and current supported-platform HTTP/lifetime qualification. Native-mode
+benchmark noise is recorded; this does not itself authorize claiming default readiness.
+The author has already authorized switching when those gates are met.
+
 **Managed stack diagnostics (2026-10-12):** the author requests a StackTrace class
 for printing the current call stack, then continued work on separate debugger and
 profiler tools to understand the runtime. The bounded

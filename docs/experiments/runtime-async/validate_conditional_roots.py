@@ -26,7 +26,7 @@ def main():
     out = args.output.resolve()
     out.mkdir(parents=True, exist_ok=False)
     inputs = [Path(__file__).resolve(), args.recipe.resolve(),
-              *[BASE / name for name in ('native-gc.c', 'native-gc.h', 'native-gc-test.c',
+              *[BASE / name for name in ('native-gc.c', 'native-gc.h', 'native-gc-test.c', 'native-gc-pass-test.c',
                 'host-roots-test.c', 'root-probe.c', 'root-probe.h', 'text-arena.h', 'native-stack.h')],
               ROOT / 'docs/experiments/aot-fault-details/fault-details.h']
     if args.owned_bodies:
@@ -45,7 +45,7 @@ def main():
 
     try:
         run('toolchain', [host[0], '--version'])
-        for name in ('native-gc-test', 'host-roots-test'):
+        for name in ('native-gc-test', 'native-gc-pass-test', 'host-roots-test'):
             binary = out / name
             run(name + '-build', [*cc, BASE / (name + '.c'), BASE / 'native-gc.c',
                                  BASE / 'root-probe.c', '-pthread', '-o', binary])

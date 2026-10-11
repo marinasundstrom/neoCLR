@@ -208,9 +208,36 @@ static int owned_parked_roots(void) {
     active = (neoclr_probe_frame){.context = &c, .storage = &active_slot, .storage_count = 1};
     CHECK(!neoclr_gc_collect_conditional_v1(&c, &active, &edge, 1));
     CHECK(edge.retained && !parked.expired && !second.expired && value[1] == 77);
+    /* Every new collection must retrace even already-marked registrations.
+     * Replace the parked slot with a newly allocated referent between cycles. */
+    value = allocate(&c, 16, NEOCLR_GC_OBJECT);
+    CHECK(value);
+    value[1] = 88;
+    CHECK(!neoclr_gc_collect_conditional_v1(&c, &active, &edge, 1));
+    CHECK(edge.retained && !parked.expired && !second.expired && value[1] == 88);
     root = NULL;
     CHECK(!neoclr_gc_collect_conditional_v1(&c, &active, &edge, 1));
     CHECK(parked.expired && second.expired && !c.text.used);
+    neoclr_roots_discard_v1(&parked);
+    neoclr_roots_discard_v1(&second);
+
+    /* Scan state belongs to the registration, not its owner: one live owner
+     * may own multiple independent parked chains. */
+    owner = allocate(&c, 16, NEOCLR_GC_OBJECT);
+    value = allocate(&c, 16, NEOCLR_GC_OBJECT);
+    uint64_t *other = allocate(&c, 16, NEOCLR_GC_OBJECT);
+    CHECK(owner && value && other);
+    value[1] = 101; other[1] = 202;
+    neoclr_probe_storage other_slot = {&other, 8, 0};
+    neoclr_probe_enter_v3(&suspended, &c, 1, slots, 1, "{}", 2);
+    CHECK(!neoclr_gc_roots_park_owned_v1(&c, owner, &parked));
+    neoclr_probe_enter_v3(&second_frame, &c, 2, &other_slot, 1, "{}", 2);
+    CHECK(!neoclr_gc_roots_park_owned_v1(&c, owner, &second));
+    root = owner;
+    CHECK(!neoclr_gc_collect_v1(&c, &active));
+    CHECK(!parked.expired && !second.expired && value[1] == 101 && other[1] == 202);
+    root = NULL;
+    CHECK(!neoclr_gc_collect_v1(&c, &active) && !c.text.used);
     neoclr_roots_discard_v1(&parked);
     neoclr_roots_discard_v1(&second);
 
@@ -225,6 +252,11 @@ static int owned_parked_roots(void) {
     root = owner;
     CHECK(neoclr_gc_collect_v1(&c, &active) == 3);
     CHECK(!parked.expired && parked.head == &suspended && !second.expired && second.owner == a);
+    value = allocate(&c, 16, NEOCLR_GC_OBJECT);
+    CHECK(value);
+    value[1] = 99;
+    CHECK(!neoclr_gc_collect_v1(&c, &active));
+    CHECK(!parked.expired && value[1] == 99 && second.expired);
     root = NULL;
     CHECK(!neoclr_gc_collect_v1(&c, &active) && !c.text.used);
     CHECK(parked.expired && second.expired);
