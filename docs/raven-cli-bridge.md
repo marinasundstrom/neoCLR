@@ -8879,3 +8879,25 @@ opts in through an explicit backend capability; this subsystem is not yet on Rav
 main and is not carried wholesale there. Raven owns synthesis; neoCLR owns layout,
 binding and retained-body GC validation. Generic owners, generic Task methods and
 abandoned collection remain open. See the refreshed generator consumer and evidence.
+
+
+### Generic generator lexical ownership (2026-10-11)
+
+Raven native `e349f4783` on `codex/source-object-metadata-resolution` uses native
+nested generic metadata for closure frames, including generic containing classes.
+Owner/method parameters retain separate scopes, and captured private receiver fields
+use constructed references. The runtime owns lexical access validation; JIT/AOT closes
+each enclosing owner alongside the frame. No accessor bridge remains.
+
+The Runtime Contract generator capability, explicit runtime-async POC switch and
+source-local providers are unchanged. This restores CLI-style ownership and lowering;
+native format details are not new language semantics. Eager traversal in the native
+await rewriter also preserves `use` cleanup for awaits inside invocation arguments.
+Ordinary .NET defaults and Raven main remain separate. Broader shared-visitor cleanup
+auditing is a deferred general candidate.
+
+See the [checkpoint, limits and three-mode evidence](experiments/runtime-async/async-generators.md#generic-owner-and-lexical-metadata-checkpoint-2026-10-11)
+and the [host metadata contract](../api-docs/experimental-metadata.md#nested-generic-lexical-owners-development-2026-10-11).
+Source-local async provider/InternalCall encoding remains temporary; production
+native operation metadata/carriers remain the replacement. Lexical nesting itself
+uses the native model and needs no temporary compiler representation.

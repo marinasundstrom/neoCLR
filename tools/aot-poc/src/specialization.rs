@@ -1,5 +1,5 @@
 //! Bounded type-generic specialization before explicit closed-world selection.
-//! Multiple bounded value shapes; primitive static method instantiations.
+//! Closed value/reference shapes and static/instance method instantiations.
 use neoclr::metadata::{Function, FunctionRef, Instruction as Op, Type};
 use serde_json::{Value, json};
 type Error = Box<dyn std::error::Error>;
@@ -122,15 +122,6 @@ impl Specializer<'_> {
                 || self.shapes.iter().any(|t| t.name == private_name) { private_name.push('_'); }
         }
         self.shapes.push(Shape { source: i, arguments: arguments.clone(), row, name: private_name.clone() });
-        for arg in &arguments {
-            self.lower(arg)?;
-        }
-        for field in &definition.fields {
-            self.close(&field.ty, &arguments)?;
-        }
-        for base in definition.base.iter().chain(&definition.implements) {
-            self.close(base, &arguments)?;
-        }
         if let Some(owner) = &definition.declaring_type {
             if owner.module != self.source.name || owner.revision != self.source.revision {
                 return Err("external lexical owner is unsupported".into());
@@ -140,11 +131,23 @@ impl Specializer<'_> {
                 .types
                 .get(owner.index as usize)
                 .ok_or("invalid lexical owner")?;
-            // Selecting a closed generic lexical owner needs its own context contract.
+            // CLI-style nested frames redeclare enclosing parameters first.
+            // Close that owner before discovering dependent fields so every
+            // emitted name and access edge refers to the same specialization.
             if !owner.generic_parameters.is_empty() {
-                return Err("generic lexical owners require a later profile".into());
-            }
-            if owner.is_reference_type {
+                let count = owner.generic_parameters.len();
+                if arguments.len() < count {
+                    return Err("nested specialization requires redeclared enclosing parameters".into());
+                }
+                let closed = self.lower(&Type::Constructed {
+                    definition: owner.name.clone(), arguments: arguments[..count].to_vec(),
+                })?;
+                let Type::Named(parent_name) = closed else { unreachable!() };
+                let suffix = private_name.strip_prefix(&format!("{}.", owner.name))
+                    .ok_or("invalid specialized lexical name")?;
+                private_name = format!("{parent_name}.{suffix}");
+                self.shapes.iter_mut().find(|shape| shape.row == row).unwrap().name = private_name.clone();
+            } else if owner.is_reference_type {
                 // Keep lexical identity only. The value profile separately validates
                 // empty static companions and rejects every executable use.
                 let owner_index = self.type_index(&owner.name)?;
@@ -157,6 +160,15 @@ impl Specializer<'_> {
             } else {
                 self.lower(&Type::Named(owner.name.clone()))?;
             }
+        }
+        for arg in &arguments {
+            self.lower(arg)?;
+        }
+        for field in &definition.fields {
+            self.close(&field.ty, &arguments)?;
+        }
+        for base in definition.base.iter().chain(&definition.implements) {
+            self.close(base, &arguments)?;
         }
         Ok(Type::Named(private_name))
     }
@@ -230,10 +242,6 @@ impl Specializer<'_> {
             .into());
         };
         let i = *i;
-        let f = &self.source.functions[i];
-        if !target.generic_arguments.is_empty() && (f.instance || !arguments.is_empty()) {
-            return Err("generic methods require static functions on nongeneric owners".into());
-        }
         if let Some(instance) = self.instances.iter().find(|v| {
             v.source == i && v.types == arguments && v.methods == target.generic_arguments
         }) {
@@ -373,8 +381,8 @@ impl Specializer<'_> {
                         .as_ref()
                         .map(|t| self.owner(t, closed.instance))
                         .transpose()?;
-                    target.name = if method_clone { clone_name(&source_function, instance_row) }
-                        else { lowered_member_name(&source_function, target.owner.as_ref()) };
+                    target.name = lowered_member_name(&source_function, target.owner.as_ref());
+                    if method_clone { target.name = clone_name(&target.name, instance_row); }
                     target.parameters = closed
                         .parameters
                         .iter()
@@ -409,8 +417,8 @@ fn lowered_member_name(f: &Function, owner: Option<&Type>) -> String {
     }
     f.name.clone()
 }
-fn clone_name(f: &Function, row: usize) -> String {
-    format!("{}$aot_method_{row}", f.name)
+fn clone_name(name: &str, row: usize) -> String {
+    format!("{name}$aot_method_{row}")
 }
 
 fn validate_argument(ty: &Type, depth: usize) -> Result<(), Error> {
@@ -497,7 +505,7 @@ pub fn expand_with_host_roots(input: &neoclr::Module, root: &str, host_roots: &[
                 &instance.methods,
                 &mut pending,
             )?;
-            if !instance.methods.is_empty() { function.name = clone_name(&function, instance.row); }
+            if !instance.methods.is_empty() { function.name = clone_name(&function.name, instance.row); }
             if instance.row != instance.source {
                 if let Some(origin) = &mut function.origin {
                     // Source tokens identify templates, not each private native body. Keep
@@ -616,6 +624,18 @@ pub fn expand_with_host_roots(input: &neoclr::Module, root: &str, host_roots: &[
         at += 1;
         let mut t = input.types[shape.source].clone();
         t.name = shape.name.clone();
+        if let Some(owner_id) = &t.declaring_type {
+            let owner = &input.types[owner_id.index as usize];
+            let count = owner.generic_parameters.len();
+            if count != 0 {
+                let parent = context.shapes.iter().find(|candidate| candidate.source == owner_id.index as usize
+                    && candidate.arguments == shape.arguments[..count])
+                    .ok_or("missing specialized lexical owner")?;
+                t.declaring_type = Some(neoclr::metadata::TypeDefId {
+                    module: input.name.clone(), revision: input.revision.clone(), index: parent.row as u32,
+                });
+            }
+        }
         t.generic_parameters.clear();
         for field in &mut t.fields { field.ty = context.close(&field.ty, &shape.arguments)?; }
         t.base = t.base.as_ref().map(|t| context.close(t, &shape.arguments)).transpose()?;
@@ -673,6 +693,14 @@ pub fn expand_with_host_roots(input: &neoclr::Module, root: &str, host_roots: &[
         }
         expanded.types[shape.row] = t;
     }
+    for shape in &context.shapes {
+        if let Some(parent) = &expanded.types[shape.row].declaring_type {
+            let token = expanded.types[parent.index as usize].origin.as_ref().map(|origin| origin.token);
+            if let Some(origin) = &mut expanded.types[shape.row].origin {
+                origin.declaring_type_token = token;
+            }
+        }
+    }
     // The source backing identifies the generic declaration, not whichever closed
     // shape happened to reuse its row first. This private profile only projects
     // Byte views; carry that exact instantiation through row erasure. The original
@@ -703,7 +731,7 @@ pub fn expand_with_host_roots(input: &neoclr::Module, root: &str, host_roots: &[
         && shape.arguments.len() == 1
         && (matches!(shape.arguments[0], Type::String | Type::Char) || super::selection::scalar_array_element(&shape.arguments[0]) || input.type_definition(&shape.arguments[0]).is_some_and(|t| (t.is_reference_type && t.representation == neoclr::metadata::Representation::Record) || t.representation == neoclr::metadata::Representation::Interface)))
         .map(|shape| shape.row).collect();
-    let report = json!({"referenceArrayBackings":reference_backings,"policy":"up to 512 closed value/reference/interface shapes; primitive static generic methods and closed owner methods, at most 512 function clones and 1024 selected functions; no constraints",
+    let report = json!({"referenceArrayBackings":reference_backings,"policy":"up to 512 closed value/reference/interface shapes; closed static/instance generic methods and lexical owners, at most 512 function clones and 1024 selected functions; no constraints",
         "typeCount": context.shapes.len(), "functionCount": context.instances.len(), "functionCloneCount": context.clones,
         "methods": context.instances.iter().filter(|v| !v.methods.is_empty() || !v.types.is_empty()).map(|v| json!({"sourceIndex":v.source,"expandedIndex":v.row,"definition":input.functions[v.source].definition.clone().unwrap_or(neoclr::metadata::MemberId { module: input.name.clone(), revision: input.revision.clone(), index: v.source as u32 }),"name":input.functions[v.source].name,"sourceOrigin":input.functions[v.source].origin,"arguments":v.methods,"typeArguments":v.types})).collect::<Vec<_>>(),
         "types": context.shapes.iter().filter(|v| !v.arguments.is_empty()).map(|v| json!({"sourceIndex":v.source,"expandedIndex":v.row,"definition":input.types[v.source].definition,"name":input.types[v.source].name,"compiledName":v.name,"arguments":v.arguments})).collect::<Vec<_>>()});
@@ -749,6 +777,83 @@ pub fn restore_methods(report: &mut Value, specialization: &Value) {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn instance_methods_specialize_owner_and_method_parameters_independently() {
+        let input = neoclr::assemble(r#"
+.module GenericOwner
+.entry Main
+.type class Box<T>
+.method instance .ctor() -> noresult
+ret
+.end
+.method instance Choose<U>(T first, U second) -> U
+ldarg 2
+ret
+.end
+.end
+.function Main() -> Int32
+newobj instance Box<Int32>::.ctor()
+ldc.i4 1
+ldstr "method"
+call instance Box<Int32>::Choose<String>(Int32,String)
+pop
+newobj instance Box<String>::.ctor()
+ldstr "owner"
+ldc.i4 42
+call instance Box<String>::Choose<Int32>(String,Int32)
+ret
+.end
+"#).unwrap();
+        neoclr::verify(&input).unwrap();
+        let (expanded, _) = expand(&input, "Main").unwrap();
+        let (selected, _) = super::super::selection::select(&expanded, "Main").unwrap();
+        neoclr::verify(&selected).unwrap();
+        assert_eq!(neoclr::LoadedProgram::new(&selected).unwrap()
+            .run(neoclr::Limits::default()).unwrap().value, neoclr::Value::Int32(42));
+    }
+
+    #[test]
+    fn nested_generic_specializations_preserve_each_lexical_owner() {
+        let input = neoclr::assemble(r#"
+.module NestedGeneric
+.entry Main
+.type class Owner<T>
+.field private value T
+.method instance .ctor(T value) -> noresult
+ldarg 0
+ldarg 1
+stfld Owner<T>::value
+ret
+.end
+.type class Frame<T,U>
+.method static Read(Owner<T> owner, U other) -> T
+ldarg 0
+ldfld Owner<T>::value
+ret
+.end
+.end
+.end
+.function Main() -> Int32
+ldstr "owner"
+newobj instance Owner<String>::.ctor(String)
+ldc.i4 1
+call Owner.Frame<String,Int32>::Read(Owner<String>,Int32)
+pop
+ldc.i4 42
+newobj instance Owner<Int32>::.ctor(Int32)
+ldstr "other"
+call Owner.Frame<Int32,String>::Read(Owner<Int32>,String)
+ret
+.end
+"#).unwrap();
+        neoclr::verify(&input).unwrap();
+        let (expanded, _) = expand(&input, "Main").unwrap();
+        let (selected, _) = super::super::selection::select(&expanded, "Main").unwrap();
+        neoclr::verify(&selected).unwrap();
+        assert_eq!(neoclr::LoadedProgram::new(&selected).unwrap()
+            .run(neoclr::Limits::default()).unwrap().value, neoclr::Value::Int32(42));
+    }
 
     #[test]
     fn signature_only_classes_retain_closed_interface_conformance() {

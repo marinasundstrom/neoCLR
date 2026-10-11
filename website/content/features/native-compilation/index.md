@@ -227,3 +227,11 @@ not service throughput or general JIT/AOT equivalence.
 The intended direction is JIT by default where supported, AOT for deployment, and a fully
 supported interpreter for constrained environments. Current execution defaults are unchanged.
 Cross-target hot reload and explicit AOT/interpreter hybrid execution remain future work.
+
+
+A separate opt-in [runtime-async generator POC](https://github.com/marinasundstrom/neoCLR/blob/main/docs/experiments/runtime-async/async-generators.md#generic-owner-and-lexical-metadata-checkpoint-2026-10-11)
+now passes generic reference-class generators, pending awaits, delegation, cancellation
+cleanup and live suspended-object GC in interpreter, macOS ARM64 JIT and AOT.
+It requires the documented native Raven compiler branch and matching experimental
+libraries. Abandoned-generator collection, Windows suspension and performance gates
+remain open; this is development evidence, not a change to published execution defaults.

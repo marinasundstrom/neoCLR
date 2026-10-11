@@ -2,8 +2,9 @@
 
 Status: implementation underway following the author's explicit direction to add
 managed async iteration and await-for consumption before yield/resume. The managed
-contract and retained-body await-for consumption are implemented; native generator
-production remains open.
+contract, retained-body await-for consumption and native generator production now
+work in the scoped POC, including generic reference-class owners. Lifetime, platform
+and performance qualification remain open.
 
 ## What works in Raven
 
@@ -337,3 +338,45 @@ suspended-generator collection and Windows retained suspension remain separate g
 
 Compiler implementation: Raven native `8b917fbcb` on
 `codex/source-object-metadata-resolution`. Raven main remains separate.
+
+
+## Generic owner and lexical metadata checkpoint (2026-10-11)
+
+Raven native `e349f4783` now supports generators on generic reference classes,
+including methods with independent generic parameters. Generated frames are nested
+under their lexical source type and redeclare owner parameters before method parameters.
+Captured receiver fields use constructed references. This preserves private access
+without synthetic accessors; the ownership/generic model follows CLI concepts.
+
+neoCLR metadata commit `1625be52` adds nested generic class authoring, generic lexical
+owners and native/reference/import round-tripping. JIT/AOT specialization now admits
+closed generic instance methods, retains each specialized lexical owner and remaps
+method names after specializing their owner. Definition identity, source-origin tokens
+and private-field authorization survive selection. The bounded compiled profile uses
+the CLI redeclared-enclosing-parameter prefix; this is not general support for arbitrary
+hand-authored nested generic parameter conventions or generic virtual dispatch.
+
+The expanded `RuntimeGeneratorLanguage.rvn` checks:
+- Generic owner-only iterators and owner-plus-method generic iterable factories.
+- Two owner instantiations, private receiver reads/mutation and generic callbacks.
+- Pending typed awaits, direct and delegated yields, early disposal and cancellation.
+- Captured-object survival across GC while callbacks/producers remain reachable.
+
+Cancellation testing exposed a separate native lowerer bug: a deferred invocation
+argument list could rewrite `Identity(await gate)` after the lexical `use` cleanup
+scope had been removed. The stateful runtime-async visitor now traverses lists eagerly.
+Cancellation disposes before propagating; faults remain terminal. A general audit of
+stateful visitors using the shared lazy traversal is recorded as a separate main-line
+candidate, not a reason to merge compiler branches.
+
+[Generic owner evidence](generic-owner-generator-validation.json) and
+[await-for regression](generic-owner-await-for-validation.json) pass interpreter,
+macOS ARM64 JIT and AOT. The reports hash the exact compiler, backend, providers and
+experimental library bundle. Also passing: 47 focused compiler tests, seven native
+specializer tests, 24 runtime access/metadata tests, nested metadata/CLR execution
+checks and the unchanged guest API snapshot check.
+
+Configuration remains opt-in and source-local, as in the previous checkpoint.
+Generic retained Task methods, value receivers, mutable local captures, abandoned
+suspended-generator reclamation and Windows retained suspension remain open.
+No performance claim or default-mode switch follows from these correctness results.

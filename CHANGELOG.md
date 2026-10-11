@@ -14,13 +14,14 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   private-access checks and explicit parameter scopes. Translated dependency aliases
   gain optional enclosing arity; older aliases retain arity zero.
 
-- Qualify generic native async generator methods on nongeneric owners, backed by
-  synthesized typed closure frames. Cover generic lambdas, locals/calls, pending
-  Task<T> inputs, delegation, early disposal and captured-object GC. Generic owners,
-  generic Task-returning methods, abandoned-generator lifetime and performance
-  qualification remain open; runtime/execution defaults are unchanged. Record the
-  author’s .NET/Go concurrency ambition as a target with explicit evidence gates,
-  and future GC tuning as an exploratory follow-up after lifetime correctness.
+- Qualify generic native async generators on generic reference owners as well as
+  nongeneric owners. Preserve private receiver state through nested closure frames,
+  separate owner/method parameter scopes, and cancellation cleanup for awaits inside
+  invocation arguments. JIT/AOT specializes generic instance methods and lexical
+  owners, including multiple owner instantiations. Generic retained Task methods,
+  abandoned-generator lifetime and performance qualification remain open; defaults
+  are unchanged. Record the author’s .NET/Go concurrency ambition as an evidence
+  target and future GC tuning after lifetime correctness.
 
 - Qualify the Raven diagnostic fix for selected runtime generators: yield-only
   bodies no longer claim synchronous execution. All three local execution modes

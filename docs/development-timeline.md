@@ -15341,3 +15341,11 @@ or runtime-await default switch was performed.
 - Design: preserve the same generic/ownership semantics across targets; distinguish
   native encoding from semantic divergence. No compiler-line merge or default-mode
   change is implied. [Design and validation](design/extended-cli-metadata.md#generic-lexical-nesting-gap-closure-2026-10-11).
+
+
+- Subsequent outcome: generic-owner generators now pass interpreter/JIT/AOT, together
+  with the existing await-for lifecycle regression. Closed-owner specialization and
+  a deferred argument traversal bug were fixed after executable cases exposed them.
+  Raven native `e349f4783` retains lexical private access and cancellation cleanup;
+  Raven main remains separate. Forty-seven compiler, seven specialization and 24
+  runtime tests pass. [Evidence and remaining gates](experiments/runtime-async/async-generators.md#generic-owner-and-lexical-metadata-checkpoint-2026-10-11).

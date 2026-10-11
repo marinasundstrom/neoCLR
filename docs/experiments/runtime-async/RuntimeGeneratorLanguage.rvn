@@ -132,7 +132,9 @@ async func CheckIndependent() -> Task<()> {
 // This tests native storage/binding; it does not synthesize a generic generator.
 class Capture<T> {
     private val value: T
-    init(item: T) { value = item }
+    init(item: T) {
+        value = item
+    }
     func Read() -> T => value
 }
 
@@ -185,6 +187,84 @@ async func EchoAfter<T>(gate: Task<T>, counters: Counters) -> AsyncIterable<T> {
     let value = await gate
     yield value
     yield from Echo(value)
+}
+
+class GeneratorBox<T> {
+    private val value: T
+    private var visits = 0
+    init(item: T) {
+        value = item
+    }
+    func Callback<U>(other: U) -> () -> T {
+        _ = Identity(other)
+        return () => value
+    }
+    async func Single() -> AsyncIterator<T> {
+        yield value
+    }
+    async func Values<U>(gate: Task<U>, counters: Counters) -> AsyncIterable<T> {
+        visits = visits + 1
+        if visits != 1 {
+            System.Fail("Generic receiver mutation failed")
+        }
+        use lifetime = Lifetime(counters)
+        _ = Identity(await gate)
+        yield value
+        yield from Echo(value)
+    }
+}
+
+async func CheckGenericOwner() -> Task<()> {
+    let callback = GeneratorBox<Payload>(Payload(52)).Callback("owner callback")
+    System.Runtime.GC.Collect()
+    if callback().Value != 52 {
+        System.Fail("Generic callback lost its receiver")
+    }
+    let counters = Counters()
+    let gate = Promise<int>()
+    let iterator = GeneratorBox<Payload>(Payload(84)).Values(gate.Task, counters).GetAsyncIterator()
+    let pending = iterator.MoveNextAsync()
+    if pending.IsCompleted {
+        System.Fail("Generic owner failed to suspend")
+    }
+    System.Runtime.GC.Collect()
+    _ = gate.Complete(19)
+    if !await pending || iterator.Current.Value != 84 {
+        System.Fail("Generic owner lost receiver state")
+    }
+    System.Runtime.GC.Collect()
+    if !await iterator.MoveNextAsync() || iterator.Current.Value != 84 {
+        System.Fail("Generic owner delegation failed")
+    }
+    await iterator.DisposeAsync()
+    if counters.Disposals != 1 {
+        System.Fail("Generic owner lost disposal")
+    }
+    var total = 0
+    await for value in GeneratorBox<int>(11).Values(Task.FromResult("other type"), Counters()) {
+        total = total + value
+    }
+    if total != 33 {
+        System.Fail("Owner and method generic parameters collided")
+    }
+    let single = GeneratorBox<int>(27).Single()
+    if !await single.MoveNextAsync() || single.Current != 27 {
+        System.Fail("Generic owner-only iterator failed")
+    }
+    await single.DisposeAsync()
+    let cancelledCounters = Counters()
+    let cancelledGate = Promise<string>()
+    let result = Read(GeneratorBox<int>(3).Values(cancelledGate.Task, cancelledCounters), false)
+    let observer = Observer(result)
+    result.OnCompleted(observer.Complete)
+    _ = cancelledGate.Cancel()
+    let cancelled = await observer.Done.Task
+    if !cancelled {
+        System.Fail("Generic owner lost cancellation outcome")
+    }
+    if cancelledCounters.Disposals != 1 {
+        System.Fail("Generic owner cancellation lost cleanup")
+    }
 }
 
 async func CheckGeneric() -> Task<()> {
@@ -331,6 +411,7 @@ async func Main() -> Task<int> {
         await CheckPendingCleanup(scenario)
     }
     CheckGenericClosure()
+    await CheckGenericOwner()
     await CheckGeneric()
     await CheckShapes()
     await CheckDelegation(false)
