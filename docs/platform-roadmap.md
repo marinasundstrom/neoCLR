@@ -61,7 +61,9 @@ shared runtime interop contract, with platform-owned concrete implementations su
 as managed Task; interfaces are primary, not exclusive, interop mechanisms.
 **Subsequent author correction (2026-10-11):** defer pursuing or stabilizing this
 interop contract. The immediate primary target is managed programs compiled to VM IL,
-including Raven. Make that execution path work before making major interface/ABI
+including Raven. Interpreter, JIT and native AOT all remain relevant targets for those
+managed programs: managed describes the program model, not an interpreter-only
+execution choice. Make those execution paths work before making major interface/ABI
 design decisions. Preserve the interface proofs as exploratory evidence, not the
 next milestone. Resume end-to-end managed runtime-async qualification: first a real
 Raven Task-based asynchronous consumer, then fix the concrete compiler/runtime gaps

@@ -15118,3 +15118,8 @@ or runtime-await default switch was performed.
 - **Outcome/open work:** existing proofs are retained as exploratory evidence. No
   runtime behavior or API changed in this correction; managed execution qualification
   and eventual safe default selection remain active work.
+
+- **Further author clarification:** JIT, interpreter and native AOT remain relevant.
+  **Assistant action:** explicitly recorded all three as execution targets for managed
+  programs. Only cross-platform interop contract stabilization is deferred; current
+  interpreter-only runtime-async evidence does not qualify the other modes.

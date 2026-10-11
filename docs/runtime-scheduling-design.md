@@ -1678,3 +1678,10 @@ terminal faults, cleanup and GC; compare measured costs as the implementation ch
 The interface fixtures remain useful evidence, but do not require promoting them into
 runtime APIs, selecting a foreign ABI, or generalizing async return types now. Default
 switching still requires stability and execution-mode qualification.
+
+
+The author additionally clarifies that interpreter, JIT and native AOT all remain
+relevant. Managed code describes the program/semantic model; it does not restrict
+execution to the interpreter. Current runtime-async evidence is interpreter-only,
+so JIT/AOT support remains implementation and qualification work within this priority,
+not deferred alongside foreign-platform ABI design.

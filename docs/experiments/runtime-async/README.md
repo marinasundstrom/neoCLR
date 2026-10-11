@@ -1,7 +1,8 @@
 # Interpreter runtime-async experiments
 
 **Current priority (author correction, 2026-10-11):** make managed programs compiled
-to VM IL work end to end, including Raven runtime async. Cross-platform operation
+to VM IL work end to end, including Raven runtime async, across interpreter, JIT and
+native AOT. Current runtime-async evidence remains interpreter-only. Cross-platform operation
 interfaces and native ABI design are deferred. The interface experiments below are
 exploratory evidence, not selected public APIs or the next implementation milestone.
 
