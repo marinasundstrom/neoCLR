@@ -34,5 +34,8 @@ The HTTP gate compares relevant interpreter/AOT behavior for this new target. It
 not make a routine three-mode matrix mandatory for unrelated tests.
 
 Reports and logs are uploaded even on failure. A workflow file or successful macOS
-build is not a Windows pass. Windows ARM64, DLL packaging for the SDK and changing
-execution defaults remain separate work. See [CLI contract and readiness](../../jit-execution.md).
+build is not a Windows pass. The current gate prepares an installed JIT bundle,
+runs HTTP with no execution/tool/library flags and runs representative framework
+suites with the omitted-mode JIT default. Windows ARM64 and Windows runtime
+suspension remain separate work. The historical evidence above predates this
+default-mode gate. See [CLI contract and readiness](../../jit-execution.md).

@@ -15,7 +15,9 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   and interpreter diagnostics require explicit `--execution interpreter` on JIT
   hosts. Add relocatable bundle preparation and default-mode CLI/HTTP/library gates;
   routine runtime-library tests now select JIT. Windows runtime suspension and
-  Windows ARM64 JIT remain unsupported.
+  Windows ARM64 JIT remain unsupported. Canonicalize dependency identity when
+  merging installed libraries with explicit modules, avoiding duplicate loads
+  through equivalent paths; keep native-package interpreter controls explicit.
 
 - Reduce native collector traversal work: validate spans while building the index,
   combine mark reset with intern-root seeding, and trace each activated owned parked

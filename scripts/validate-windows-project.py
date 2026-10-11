@@ -98,7 +98,7 @@ def main():
             build = json.loads((destination / 'build.json').read_text())
             if build.get('passed') is not True:
                 raise ValueError('Build did not report completion')
-            vm = run([bundle / 'bin/neoclr.exe', 'run', destination / 'app.dll', *context],
+            vm = run([bundle / 'bin/neoclr.exe', 'run', destination / 'app.dll', '--execution', 'interpreter', *context],
                      name + '-interpreter', expected=code, input=stdin)
             isolated = out / (name + ' executable only')
             isolated.mkdir()

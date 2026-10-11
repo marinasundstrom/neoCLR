@@ -611,15 +611,16 @@ transport/JSON bounds remain unchanged. Windows checks are configured, not local
 qualified. [Obsolete annotations](../../../docs/experiments/obsolete-runtime/README.md)
 have separate compiler/interpreter/native evidence.
 
-## Selecting execution modes during JIT qualification
+## Selecting execution modes
 
 Use repeatable `--mode jit`, `--mode interpreter` and `--mode native` options on
-`scripts/test-runtime-library.py`. JIT requires a matching `--jit-host` library and
-uses the `--aot` compiler through `neoclr run --execution jit`. Filtering, guard cases
+`scripts/test-runtime-library.py`. The omitted mode is JIT. Prepared JIT bundles
+supply the runtime, helper and backend; `--jit-host` and `--aot` remain overrides.
+The harness omits `--execution` to test the CLI default. Filtering, guard cases
 and runner failures execute in the selected modes. See [JIT readiness and commands](../../../docs/jit-execution.md).
 
-The intended routine mode is JIT once ready; interpreter and AOT checks remain
-selective and relevant to the change. Defaults have not switched yet. JIT-only and interpreter-only runs compile the
+The routine mode is JIT; interpreter and AOT checks remain
+selective and relevant to the change. JIT-only and interpreter-only runs compile the
 Raven assembly directly, without a native object or executable build. Interpreter-only
 runs do not require the AOT/JIT compiler.
 

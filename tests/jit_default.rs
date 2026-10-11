@@ -55,6 +55,16 @@ fn installed_default_jit_discovers_trusted_siblings_and_preserves_arguments() {
     let extended_arguments = fs::read_to_string(&recorded).unwrap();
     assert!(extended_arguments.contains(custom.to_str().unwrap()));
     assert!(extended_arguments.contains("System.Runtime.dll"));
+    let standard = root.join("lib/System.Runtime.dll");
+    let duplicate = Command::new(&runtime)
+        .env("NEO_TEST_ARGS", &recorded)
+        .args(["run", "app.dll", "--module"])
+        .arg(&standard)
+        .output()
+        .unwrap();
+    assert_eq!(duplicate.status.code(), Some(37), "{duplicate:?}");
+    let duplicate_arguments = fs::read_to_string(&recorded).unwrap();
+    assert_eq!(duplicate_arguments.matches("--module\n").count(), 1);
     fs::remove_file(&compiler).unwrap();
     let missing = Command::new(&runtime)
         .args(["run", "app.dll"])

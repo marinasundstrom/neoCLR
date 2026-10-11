@@ -1,6 +1,13 @@
 //! Development CLI adapter. The optional compiler remains outside the runtime crate.
 //! No implicit interpreter fallback: unsupported native programs must report their gap.
-use std::{path::PathBuf, process::Command};
+use std::{
+    path::{Path, PathBuf},
+    process::Command,
+};
+
+fn same_path(left: &Path, right: &Path) -> bool {
+    left == right || matches!((left.canonicalize(), right.canonicalize()), (Ok(a), Ok(b)) if a == b)
+}
 
 pub(crate) fn run(
     input: &str,
@@ -44,7 +51,7 @@ pub(crate) fn run(
                 "{}.dll",
                 name.as_str().ok_or("Invalid installed assembly name")?
             ));
-            if !modules.contains(&path) {
+            if !modules.iter().any(|module| same_path(module, &path)) {
                 modules.push(path);
             }
         }
@@ -66,7 +73,7 @@ pub(crate) fn run(
                 .map(|_| libraries.join("System.Runtime.dll"))
         })
         .ok_or("JIT requires installed class libraries or an explicit --object-root dependency")?;
-    if !modules.contains(&object_root) {
+    if !modules.iter().any(|module| same_path(module, &object_root)) {
         return Err("JIT --object-root must also be supplied as --module".into());
     }
     let host = host.map(PathBuf::from).unwrap_or_else(|| {

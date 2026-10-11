@@ -150,7 +150,7 @@ def main():
             executable = isolated / ('app.exe' if windows else 'app')
             shutil.copy2(destination / executable.name, executable)
             env = {key: value for key, value in os.environ.items() if key.upper() in ('SYSTEMROOT', 'WINDIR', 'TEMP', 'TMP')}
-            vm = [interpreter, 'run', destination / 'app.dll', *context, '--instructions', '100000000']
+            vm = [interpreter, 'run', destination / 'app.dll', '--execution', 'interpreter', *context, '--instructions', '100000000']
             for label, request, fragmented, error in ([('callback-fault', valid, False, None)] if fault else cases):
                 row = dict(name=label, dependencies=build['dependencies'])
                 report['cases'].append(row)

@@ -73,7 +73,10 @@ metadata/IL and links runtime support into a standalone executable. Checked case
 include routing and bounded HTTP serving; general interpreter/native parity is open.
 A native executable still needs implementations of GC, text, queues, I/O and Faults.
 
-JIT, general native AOT, native hot reload and trimming remain future work.
+**Development:** JIT bundles default to native JIT execution on macOS ARM64 and
+Windows x64. Interpreter execution remains available explicitly and is the default
+on other hosts. JIT currently compiles eagerly through a separate backend process.
+Broader native parity, native hot reload and trimming remain future work.
 [Setup](../try/) describes the available toolchain, and
 [native compilation](../features/native-compilation/) lists its execution limits.
 
