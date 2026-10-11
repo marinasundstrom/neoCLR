@@ -214,8 +214,8 @@ The report hashes source, compiler, libraries and native inputs. Shared binding 
 Raven main `8d787feca`, deliberately carried into native `36a4fd711` on
 `codex/source-object-metadata-resolution`. The retained backend
 still rejects generic source methods and generic owners; closed element types work.
-Awaitless generators currently produce a misleading RAV2706 warning. This is a
-compiler diagnostic gap, not a synchronous-yield contract.
+The compiler follow-up removes misleading RAV2706 warnings from selected generator
+bodies; ordinary awaitless Task methods retain the warning.
 
 The .NET comparison remains the async pull/disposal protocol, implemented there with
 compiler-generated state and reusable ValueTask machinery. This POC instead retains
@@ -245,3 +245,30 @@ The existing lowering already satisfies these cases; no compiler/runtime behavio
 change was necessary. This validates awaited disposal ordering analogous to .NET
 async iteration, while preserving neoCLR's nonrecoverable terminal Fault contract.
 It is not an abandoned-generator reclamation test or a performance measurement.
+
+### Generic producer prerequisite and diagnostic follow-up (2026-10-11)
+
+A minimal generic producer `async func Echo<T>(value: T) -> AsyncIterable<T>` with
+`yield value`, called with both integer and string arguments, reaches the existing
+nongeneric retained-body guard. Temporarily removing that guard exposes the portable
+emitter's rejection of unconstrained generic closure captures. The retained lowering
+captures source parameters in its producer callback; `T` is neither a known reference
+nor one of the supported primitive capture shapes. The guard was restored, and the
+probe is not claimed as working generic support.
+
+The prerequisite is generic closure emission: preserve enclosing method/type generic
+context in synthesized callbacks and their bindings, define capture storage and GC
+representation for instantiated value/reference arguments, and qualify both generic
+methods and generic owners. This should be a shared compiler capability where
+applicable, with explicit native-backend validation, rather than a generator-specific
+boxing workaround. This is an implementation plan, not a changed language contract.
+
+A separate diagnostic correction suppresses RAV2706 for selected iterator bodies,
+since yield suspends even without explicit await. It does not mark the source as
+containing an await or alter emitted metadata. Ordinary awaitless Task methods still
+warn; default .NET behavior is unchanged. All 37 runtime-iteration compiler contract
+tests pass on .NET 11. Refreshed native evidence above passes interpreter/JIT/AOT
+without the spurious warning, including pending producer cleanup.
+
+The diagnostic correction is Raven main `f5abf1dd0`, deliberately carried as native
+`273e3e3e1`. The executable report identifies the tested compiler binaries by hash.

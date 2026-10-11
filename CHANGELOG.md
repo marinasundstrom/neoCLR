@@ -8,6 +8,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-11
 
+- Qualify the Raven diagnostic fix for selected runtime generators: yield-only
+  bodies no longer claim synchronous execution. All three local execution modes
+  still pass. Investigate generic generator rejection and identify native generic
+  closure capture as a prerequisite; generic generator support remains unimplemented.
+
 - Connect native Raven async `yield` and `yield from` to the retained-runtime POC.
   Qualify lazy demand-driven production, closed integer/string element types,
   direct iterators, nested disposal, cancellation and live-yield GC in interpreter,

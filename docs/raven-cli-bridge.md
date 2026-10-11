@@ -8859,3 +8859,9 @@ production carrier remain the eventual replacement. Generic source methods/owner
 abandoned collection and acquisition cancellation remain restricted; terminal Fault
 semantics and execution defaults remain unchanged.
 [Exact consumer and three-mode evidence](experiments/runtime-async/async-generators.md#native-raven-yield-checkpoint-2026-10-11).
+
+The selected-generator diagnostic follow-up recognizes yield as a suspension boundary
+for RAV2706 reporting only; bound await flags and temporary metadata are unchanged.
+Generic source producer support remains blocked by native generic closure capture,
+not by an intended restriction of AsyncIterable. The investigation and prerequisite
+are recorded in the async-generator experiment, with refreshed three-mode evidence.
