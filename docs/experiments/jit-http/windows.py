@@ -18,6 +18,21 @@ def recipe(prior, root, output):
     return native, link
 
 
+def add_text_kernel(link, root, build):
+    # A server-only recipe can omit text kernels needed by the client and tests.
+    manifest = root / 'tools/aot-native-text/Cargo.toml'
+    directory = manifest.parent / 'target/text-only'
+    build(['cargo', 'build', '--locked', '--release', '--target', 'x86_64-pc-windows-msvc',
+           '--target-dir', directory, '--manifest-path', manifest])
+    archive = directory / 'x86_64-pc-windows-msvc/release/neoclr_aot_native_text.lib'
+    additions = [root / 'docs/experiments/aot-console/string-unicode.c', archive]
+    result = list(link)
+    for path in additions:
+        if str(path) not in result:
+            result.insert(result.index('/link'), str(path))
+    return result
+
+
 def build_host(link, output, build):
     sources = [part for part in link if part.endswith('.c')]
     libraries = [part for part in link if part.lower().endswith('.lib')]

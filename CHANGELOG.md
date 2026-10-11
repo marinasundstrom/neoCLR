@@ -31,7 +31,9 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   Preserve library catalog checks when bypassing native builds, and export the Rust
   kernel’s private helper symbols as well as C symbols from the Windows DLL.
   Fix an MSVC warning-as-error from shadowed timer/transfer clock locals found by
-  the Windows gate. SDK helper packaging and Windows ARM64 remain open.
+  the Windows gate. Include shared Unicode/text kernels when extending the server
+  recipe to a client/framework JIT host; the server alone may not need them.
+  SDK helper packaging and Windows ARM64 remain open.
 
 - Admit queued async entry points in the private macOS ARM64 managed JIT. Keep code and
   helpers alive through the existing rooted entry drain; release the task scope and

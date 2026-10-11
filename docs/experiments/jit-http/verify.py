@@ -134,6 +134,7 @@ def main():
     response=(b'HTTP/1.1 200 OK\r\nContent-Length: 10\r\nConnection: close\r\nContent-Type: text/plain; charset=utf-8\r\n\r\n'+'Café 🌍'.encode())
     try:
         if windows:
+            host_command = windows_host.add_text_kernel(host_command, ROOT, build)
             windows_host.build_host(host_command, out, build)
         else:
             build(host_command)
