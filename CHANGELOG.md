@@ -8,6 +8,13 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-11
 
+- Qualify runtime-await lowering with the existing HTTP client/server showcase
+  sources and an eight-exchange managed loopback consumer with suspended handlers.
+  Add async `use` success/cancellation/GC evidence through Raven's explicit retained
+  scope capability; both heap runs reclaim all 4,657 HTTP objects. This remains
+  interpreter application qualification with existing runtime libraries, not a
+  project/default switch or JIT/AOT suspension claim.
+
 - Correct the active runtime-async priority to managed VM-IL execution and Raven
   consumers across interpreter, JIT and native AOT. Defer cross-platform
   operation-interface/native-ABI stabilization; preserve interface

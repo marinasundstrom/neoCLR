@@ -8748,3 +8748,20 @@ independent of Task layout or Raven awaiter requirements. Runtime recognition,
 foreign implementation ABI and thread-race qualification remain open. Raven owns
 import/emission, neoCLR owns runtime dispatch/GC evidence; both repositories document
 the qualification. No production API snapshot change is required for fixture types.
+
+
+### Runtime-await HTTP and scope cleanup — 2026-10-11
+
+Native Raven `beed357bf` adds RuntimeDisposalContract.AllowAsyncScopeExitCleanup,
+default false and selected by the explicit --runtime-async-poc CLI path. This admits
+synchronous use declarations in retained async bodies; ordinary scope-exit lowering
+runs Dispose before normal/cancelled body outcomes are published. Iterator/default
+state-machine restrictions remain. Terminal Fault gains no managed unwinding.
+
+[HTTP, cleanup and GC evidence](experiments/runtime-async/README.md#managed-http-showcase-and-scoped-cleanup--2026-10-11)
+qualifies the existing client/server showcase sources and a combined loopback sample.
+26 focused compiler tests pass. Runtime library artifacts are unchanged; no general
+library async migration, project configuration, JIT/AOT suspension or default switch
+is implied. The provider is temporary; Raven owns semantic admission/emission and
+neoCLR owns execution/GC validation. A general main-line disposal capability remains
+a deferred candidate pending an independently qualified backend need.

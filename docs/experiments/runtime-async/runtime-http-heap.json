@@ -1,0 +1,29 @@
+{
+  "prepareSeconds": 2.260292625,
+  "runs": [
+    {
+      "allocatedObjects": 4657,
+      "collections": 57,
+      "liveObjects": 0,
+      "peakObjects": 326,
+      "reclaimedObjects": 4657,
+      "seconds": 11.580491875,
+      "stdout": "PASS runtime async HTTP client and server\n"
+    },
+    {
+      "allocatedObjects": 4657,
+      "collections": 57,
+      "liveObjects": 0,
+      "peakObjects": 326,
+      "reclaimedObjects": 4657,
+      "seconds": 10.63255975,
+      "stdout": "PASS runtime async HTTP client and server\n"
+    }
+  ],
+  "sha256": {
+    "target/scheduler-wait-validation/release/examples/runtime_async_interpreter": "c3b6e6680076580ed5756f516969e31250b92da9fbded6ac7e5a99df2c978d54",
+    "target/runtime-http-use-final/app.dll": "34c5450dbf706fbd0a56daf1277bc86bd48ba4c59c02b2f02a4b53b811c4c8bc",
+    "docs/experiments/runtime-async/RuntimeHttp.rvn": "876590de94064128d016a8ceaef4ad6827e0b356603b9afd6cefec74d7507e59",
+    "docs/experiments/runtime-async/runtime-http-validation.json": "b61b9c011d713770a979e4fa3f8c9ed55e6c11bbe7cdf9ada748199bb7584844"
+  }
+}

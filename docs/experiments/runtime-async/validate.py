@@ -15,15 +15,15 @@ mode = parser.add_mutually_exclusive_group()
 mode.add_argument('--language-await', action='store_true', help='Validate ordinary await via the compatibility adapter')
 mode.add_argument('--runtime-await', action='store_true', help='Validate compiler-native runtime async lowering')
 mode.add_argument('--managed-task', action='store_true', help='Validate retained bodies producing ordinary managed Tasks')
-parser.add_argument('--runtime-sample', choices=['language', 'gc', 'fault', 'operation', 'contract'], default='language')
+parser.add_argument('--runtime-sample', choices=['language', 'gc', 'fault', 'operation', 'contract', 'http', 'use'], default='language')
 args = parser.parse_args()
 if args.runtime_sample != 'language' and not args.runtime_await:
     parser.error('--runtime-sample requires --runtime-await')
 bundle, runtime, output = args.bundle.resolve(), args.runtime.resolve(), args.output.resolve()
 output.mkdir(parents=True, exist_ok=True)
-source = Path(__file__).with_name({'language': 'RuntimeAwait.rvn', 'gc': 'RuntimeAwaitGc.rvn', 'fault': 'RuntimeAwaitFault.rvn', 'operation': 'RuntimeOperation.rvn', 'contract': 'RuntimeContract.rvn'}[args.runtime_sample] if args.runtime_await else 'ManagedTask.rvn' if args.managed_task else
+source = Path(__file__).with_name({'language': 'RuntimeAwait.rvn', 'gc': 'RuntimeAwaitGc.rvn', 'fault': 'RuntimeAwaitFault.rvn', 'operation': 'RuntimeOperation.rvn', 'contract': 'RuntimeContract.rvn', 'http': 'RuntimeHttp.rvn', 'use': 'RuntimeUse.rvn'}[args.runtime_sample] if args.runtime_await else 'ManagedTask.rvn' if args.managed_task else
                                 'AwaitLanguage.rvn' if args.language_await else 'Await.rvn').resolve()
-expected = ({'language': 'PASS Raven runtime async language support', 'gc': 'PASS Raven runtime async GC reclamation', 'fault': 'runtime async sample terminal fault', 'operation': 'PASS independent runtime operation await', 'contract': 'PASS imported runtime operation contract'}[args.runtime_sample] if args.runtime_await else
+expected = ({'language': 'PASS Raven runtime async language support', 'gc': 'PASS Raven runtime async GC reclamation', 'fault': 'runtime async sample terminal fault', 'operation': 'PASS independent runtime operation await', 'contract': 'PASS imported runtime operation contract', 'http': 'PASS runtime async HTTP client and server', 'use': 'PASS runtime async scoped cleanup'}[args.runtime_sample] if args.runtime_await else
             'PASS managed Tasks through retained runtime bodies' if args.managed_task else
             'PASS ordinary Raven await through runtime suspension adapter' if args.language_await
             else 'PASS runtime-owned operation suspension and resumption')
@@ -92,6 +92,18 @@ try:
             report['metadataInspection']['stateMachineMentions'] = listing.read_text().count('AsyncStateMachine')
         report['passed'] = (inspection.returncode == 0 and
                             report['metadataInspection']['stateMachineMentions'] == 0)
+    if report['passed'] and args.runtime_await and args.runtime_sample == 'use':
+        command = compile_command.copy()
+        index = command.index('--runtime-async-poc')
+        del command[index:index + 2]
+        rejected_output = output / 'state-machine-use.dll'
+        rejected_output.unlink(missing_ok=True)
+        command[command.index('-o') + 1] = str(rejected_output)
+        rejected = subprocess.run(command, capture_output=True, text=True, timeout=120)
+        passed = rejected.returncode != 0 and 'RAVT006' in rejected.stderr and not rejected_output.exists()
+        report['rejectedContracts'] = [{'case': 'state-machine-use', 'passed': passed,
+            'command': command, 'exitCode': rejected.returncode, 'stderr': rejected.stderr}]
+        report['passed'] = report['passed'] and passed
     if report['passed'] and contract_command:
         invalid_source = output / 'invalid-contract.rvn'
         invalid_source.write_text(source.read_text().replace(

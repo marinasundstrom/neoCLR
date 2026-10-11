@@ -167,3 +167,10 @@ of pending sends and rejects new ones. The host must keep processing completions
 handlers can finish cleanup. Completed responses remain caller-owned. Derive middleware from DelegatingHandler, which owns InnerHandler and freezes its
 configuration on the first send. HttpClient.Timeout configures the total cooperative request budget, defaulting to
 100 seconds; None disables it. Transport phase limits remain independent.
+
+
+Development runtime-async qualification now runs the existing HTTP client/server
+showcase sources and an eight-exchange loopback consumer in the interpreter, including
+GC while requests are pending. Application async bodies use runtime suspension;
+referenced libraries retain their existing implementation. This does not yet qualify
+JIT/AOT suspension or change defaults. [Evidence and limits](https://github.com/marinasundstrom/neoCLR/blob/main/docs/experiments/runtime-async/README.md#managed-http-showcase-and-scoped-cleanup--2026-10-11).

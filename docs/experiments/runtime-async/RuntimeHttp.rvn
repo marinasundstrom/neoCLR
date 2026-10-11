@@ -1,0 +1,52 @@
+module RuntimeHttpSample {
+    import System.*
+    import System.Collections.*
+    import System.Result.*
+    import System.Tasks.*
+    import System.Web.Http.*
+
+    func ProduceBody() -> string => "Café 🌍"
+
+    async func Respond(request: HttpRequest) -> Task<Result<HttpResponse, HttpError>> {
+        if request.Method.Method != "GET" || request.Target != "/greeting" {
+            System.Fail("Unexpected request")
+        }
+        let body = await Task.Run<string>(ProduceBody)
+        System.Runtime.GC.Collect()
+        let headers = ArrayList<HttpHeader>()
+        headers.Add(HttpHeader("Content-Type", "text/plain; charset=utf-8"))
+        return Ok(HttpResponse(200, headers, HttpContent.FromText(body).Bytes))
+    }
+
+    async func Main() -> Task<int> {
+        let Ok(server) = HttpServer.Listen("127.0.0.1", 0, 4) else {
+            System.Fail("Listen failed")
+        }
+        let Ok(port) = server.GetLocalPort() else {
+            System.Fail("Local port unavailable")
+        }
+        use client = HttpClient()
+        let url = String.Concat(String.Concat("http://127.0.0.1:", port.ToString()), "/greeting")
+        var count = 0
+        while count < 8 {
+            let serving = server.ServeOne(Respond)
+            let reading = client.GetString(url)
+            System.Runtime.GC.Collect()
+            let response = await reading
+            let Ok(text) = response else {
+                System.Fail("HTTP request failed")
+            }
+            if text != "Café 🌍" {
+                System.Fail("HTTP response changed")
+            }
+            let served = await serving
+            if let Error(error) = served {
+                System.Fail(error.ToString())
+            }
+            count = count + 1
+        }
+        server.Close()
+        Console.WriteLine("PASS runtime async HTTP client and server")
+        return 0
+    }
+}

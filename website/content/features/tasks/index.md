@@ -262,6 +262,9 @@ adapters; no foreign-runtime async ABI is implemented or selected.
 A separate, opt-in [Raven runtime-async POC](https://github.com/marinasundstrom/neoCLR/blob/main/docs/experiments/runtime-async/README.md#raven-runtime-async-language-poc-2026-10-11)
 now lowers ordinary async methods and Main to retained interpreter bodies without
 generated state machines. Its source-included provider returns ordinary Task values.
+The development interpreter POC also runs the HTTP client/server showcase sources,
+including a combined loopback consumer and synchronous `use` across awaits. GC and
+cancellation cleanup checks pass; project integration and JIT/AOT suspension remain open.
 Explicit await mappings also qualify an independent runtime-backed manual operation
 and a distinct awaiter. An imported generic interface also supports pending and immediate
 implementations through one mapping. The final runtime-facing contract and native

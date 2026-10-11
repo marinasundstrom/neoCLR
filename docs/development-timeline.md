@@ -15123,3 +15123,20 @@ or runtime-await default switch was performed.
   **Assistant action:** explicitly recorded all three as execution targets for managed
   programs. Only cross-platform interop contract stabilization is deferred; current
   interpreter-only runtime-async evidence does not qualify the other modes.
+
+
+### Functional managed HTTP POC — 2026-10-11
+
+- **Author:** requested continued POC work toward functional behavior and eventual
+  default selection; reaffirmed HTTP client/server projects as the showcase and asked
+  to continue after the slice.
+- **Assistant action:** qualified unchanged standalone client/server sources plus a
+  combined managed loopback consumer. Fixed target rejection of async use via explicit
+  retained-scope capability and qualified successful/cancelled/unit cleanup.
+- **Findings:** the peer must speak supported HTTP/1.1; explicit-disposal execution
+  passed first, then the same loopback sample passed with async use. Application
+  runtime bodies interoperate with existing library implementations.
+- **Outcome:** HTTP/source and cleanup samples pass, 26 compiler tests pass, two HTTP
+  heap runs reclaim 4,657/4,657 objects each. [Evidence](experiments/runtime-async/README.md#managed-http-showcase-and-scoped-cleanup--2026-10-11).
+  Next is native project-level opt-in and showcase build qualification; JIT/AOT and
+  broader network lifecycle checks remain open, with defaults unchanged.

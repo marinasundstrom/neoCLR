@@ -1,0 +1,85 @@
+{
+  "passed": true,
+  "commands": [
+    {
+      "command": [
+        "dotnet",
+        "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+        "neoclr",
+        "--core-reference",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/Core.dll",
+        "--runtime-seed",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/System.runtime.neox",
+        "--bootstrap-intrinsics",
+        "--bootstrap-ownership",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/ownership.json",
+        "--object-library",
+        "System.Runtime",
+        "--async-library",
+        "System.Runtime",
+        "--runtime-async-poc",
+        "RuntimeAwaitProvider.Bridge",
+        "--reference",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/System.Runtime.dll",
+        "--reference",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/System.Data.dll",
+        "--reference",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/System.Networking.dll",
+        "--reference",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/System.Web.dll",
+        "-o",
+        "/Users/robert/Projects/neoclr/target/runtime-http-use-final/app.dll",
+        "/Users/robert/Projects/neoclr/docs/experiments/runtime-async/RuntimeHttp.rvn",
+        "/Users/robert/Projects/neoclr/docs/experiments/runtime-async/RuntimeAsyncBridge.rvn"
+      ],
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/scheduler-wait-validation/release/neoclr",
+        "run",
+        "/Users/robert/Projects/neoclr/target/runtime-http-use-final/app.dll",
+        "--system",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/System.runtime.neox",
+        "--instructions",
+        "100000000",
+        "--object-root",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/System.Runtime.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/System.Runtime.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/System.Data.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/System.Networking.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/System.Web.dll"
+      ],
+      "exitCode": 0,
+      "stdout": "PASS runtime async HTTP client and server\n",
+      "stderr": ""
+    }
+  ],
+  "sha256": {
+    "/Users/robert/Projects/neoclr/docs/experiments/runtime-async/RuntimeHttp.rvn": "876590de94064128d016a8ceaef4ad6827e0b356603b9afd6cefec74d7507e59",
+    "/Users/robert/Projects/neoclr/docs/experiments/runtime-async/RuntimeAsyncBridge.rvn": "93efd51bf49da558079d798bc3f5a920ac4962010da85f275961494007ab6251",
+    "/Users/robert/Projects/neoclr/target/scheduler-wait-validation/release/neoclr": "e1ee04fc3df37898846db96926c91e9ad76d70eed4c78484fc3c7f4ff7360628",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll": "2daf07371ad99bb86415f93dd5f131e9a069876d3790d23e056c3cef6e80095b",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/Raven.CodeAnalysis.dll": "440c3d9e1c990688a73507fd3254d7b2720720b6a8938066f29a7bcda20f2fa3",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/Raven.CodeAnalysis.NeoClr.dll": "122ec9ec3854fc4cd424dd0e6151d13e0dadd614df7c9064b7d858d7125bc114",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/NeoCLR.Metadata.Experimental.dll": "f6b9899e3e2c330fb1ba7db7234b68bc7d74f6761f4704abcc1969d1ad90bd80",
+    "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/ownership.json": "b6776991106e1682db4b9ddd2e16b938b965433f59f6f39d98ef0e2d93fc6527",
+    "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/Core.dll": "3d4a676d379067c18a65a9beb8257ed40bf3196fc643a9ba1d559c619ec73fad",
+    "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/System.runtime.neox": "98a1ae1da85387c87746957e83a4015eb59d0566539a915c69f168d2b511b190",
+    "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/System.Runtime.dll": "818e0147dd0a6fb4946a9ddca0b672e19902b9b6138cdee6ac9b9c07e25bf746",
+    "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/System.Data.dll": "7cfad8f6ca5e0cfc0cc13c15bdb8fc623280aa72fd6aad73a7aacdd586a9c150",
+    "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/System.Networking.dll": "ec3b383eee5f202f0badeb48ad775df16de1b2a81d94843caf2391c21fa9e2e3",
+    "/Users/robert/Projects/neoclr/target/data-cases-bundle/lib/System.Web.dll": "edcae392b0cd0a4562680408830a931ad2bf92e5280157da16afd8967103474c"
+  },
+  "metadataInspection": {
+    "exitCode": 0,
+    "stderr": "",
+    "stateMachineMentions": 0
+  }
+}

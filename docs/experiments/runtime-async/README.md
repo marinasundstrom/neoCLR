@@ -667,3 +667,45 @@ not the only allowed form of interop. WinRT is a precedent for the boundary, not
 specification to copy. This proof qualifies ordinary metadata machinery; the final
 runtime-facing contract must separate operation observation/ownership from Raven's
 GetAwaiter syntax adapter and the private provider. No final member list is selected.
+
+
+## Managed HTTP showcase and scoped cleanup — 2026-10-11
+
+The existing [HTTP client](../native-http-client/Client.rvn) and
+[HTTP server](../http-server/Server.rvn) showcase sources now pass with runtime-await
+application lowering ([evidence](runtime-http-showcase-validation.json)). The client
+resolves localhost and receives the exact UTF-8 greeting; the server runs queued work
+while accept is pending, serves the greeting and closes. The peer uses HTTP/1.1, as
+required by the tested library. Application artifacts contain no AsyncStateMachine
+references. Imported runtime libraries keep their existing implementation; this is
+mixed runtime-body/library execution, not a complete library migration.
+
+[RuntimeHttp.rvn](RuntimeHttp.rvn) additionally runs eight loopback exchanges with
+both sides inside one managed invocation. Its async handler awaits scheduled work;
+GC runs during pending requests and inside the handler. HttpClient uses synchronous
+`use` disposal across suspension. [Execution](runtime-http-validation.json) passes;
+[two heap observations](runtime-http-heap.json) each allocate and reclaim all 4,657
+objects, finish with zero live objects, peak at 326 and record 57 collections.
+This is correctness/GC evidence, not a throughput benchmark or native-resource leak proof.
+
+Raven native `beed357bf` fixes the exposed async-use admission gap behind explicit
+RuntimeDisposalContract.AllowAsyncScopeExitCleanup, selected by --runtime-async-poc.
+Retained bodies reuse ordinary scope-exit lowering. [RuntimeUse.rvn](RuntimeUse.rvn)
+checks resources remain alive while suspended, reverse-order exactly-once disposal on
+successful and cancelled exits, and implicit unit-return disposal. [Evidence](runtime-use-validation.json)
+includes rejection without the runtime-async option. All 26 focused compiler scope-exit
+tests pass, including default async rejection and continued iterator rejection.
+Terminal Fault remains invocation-terminal: synchronous scope-exit cleanup does not
+introduce managed fault unwinding or async Dispose support.
+
+Reproduce with `validate.py --runtime-await --runtime-sample http` or `use`, using the
+explicit compiler/bundle/runtime/output arguments. Then run `http_showcase.py --recipe
+<passing http validation.json> --output <dedicated-directory>` to compile the unchanged
+showcase sources and drive external peers. Reports include actual compiler/provider/
+runtime/reference hashes, application hashes, commands and output.
+
+Current limits: interpreter on this host; standalone *sources* are qualified, but
+project-level runtime-await selection is the next slice. JIT/AOT suspension, Windows
+qualification, timeout/cancellation network cases and a production provider remain
+readiness gates. Keep defaults unchanged. The HTTP client/server projects are the
+author-selected showcase and acceptance workload, not the interface experiments.

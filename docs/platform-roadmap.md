@@ -65,9 +65,12 @@ including Raven. Interpreter, JIT and native AOT all remain relevant targets for
 managed programs: managed describes the program model, not an interpreter-only
 execution choice. Make those execution paths work before making major interface/ABI
 design decisions. Preserve the interface proofs as exploratory evidence, not the
-next milestone. Resume end-to-end managed runtime-async qualification: first a real
-Raven Task-based asynchronous consumer, then fix the concrete compiler/runtime gaps
-it exposes, retaining cancellation, terminal Fault, GC and benchmark checks. Broaden
+next milestone. End-to-end [HTTP showcase source qualification](experiments/runtime-async/README.md#managed-http-showcase-and-scoped-cleanup--2026-10-11)
+now passes for both client/server and a combined eight-exchange consumer. The exposed
+async-use gap is fixed behind an explicit retained-scope capability, with cancellation
+cleanup and GC evidence. Next add project-level runtime-await selection and qualify
+the showcase project builds, then expand network edge cases and execution modes.
+Retain cancellation, terminal Fault, GC and benchmark checks. Broaden
 execution-mode coverage before considering defaults; no current JIT/AOT suspension
 support is implied. General native interoperability, runtime interface recognition,
 native stack representation, preemption and multi-core scheduling remain open.
