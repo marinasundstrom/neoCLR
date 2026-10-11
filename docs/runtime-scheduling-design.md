@@ -849,3 +849,56 @@ publication, cancellation handles, ABI version/capability negotiation and native
 callable projections remain open. The managed Scheduler API and interpreter-facing
 submission mapping are not implemented by this native prototype. Existing ScheduleTask
 is a distinct interpreter concurrent-work service and is not silently aliased here.
+
+
+## Managed projection with existing state machines — 2026-10-11
+
+The author reiterates that scheduling must lead toward runtime async suspension/resume
+while keeping compiler-generated state machines valid. The
+[source-included Scheduler experiment](experiments/scheduler-projection/README.md)
+now maps managed submission to a reserved runtime service and passes pending/completed
+await and terminal-fault cases in interpreter, AOT and JIT. Task/Promise remain managed;
+Raven lowering is unchanged. No public Scheduler members are added by this experiment.
+
+The interpreter runs submitted callables in traced frames without a managed queue;
+the native adapter projects the same admission intent into owned dispatch tickets.
+The callback represents today's executable continuation, not the only future runnable
+representation. Runtime-retained activations can later implement the dispatch boundary
+without invalidating callback adapters or moving managed Task layout into the ABI.
+
+This follows the existing .NET comparison's separation of outcomes and scheduling.
+The experiment adds a private internal-call/native binding and retained runnable storage;
+it preserves familiar managed await semantics but has bounded backend-specific capacity
+and requires host progress. The prototype's Int32-zero admission acknowledgment is a
+bridge detail, not a final public API. No performance advantage, suspension support,
+parallelism or production-ready native interoperability is claimed.
+
+
+## Scheduler and suspension benchmark requirement — 2026-10-11
+
+The author requires ongoing scheduler/suspension benchmarks to measure improvement
+from compiler-generated state machines to runtime suspension. Establish a retained
+baseline for the current state-machine path before replacing its execution mechanism;
+keep that path runnable for matched comparisons. Current projection validation is
+correctness evidence, not performance evidence.
+
+Use the independent benchmark framework and compare within each execution mode before
+comparing interpreter, JIT and AOT. Fix workload, compiler/runtime revisions, build flags,
+hardware, concurrency, payload, warmup and sampling policy. Measure startup separately
+from warmed steady state; record host/polling/GC differences instead of attributing
+all observed change to the suspension mechanism.
+
+Initial cases should cover already-completed awaits, repeated pending suspend/resume,
+continuation chains and fan-out, timers, and loopback HTTP client/server work. Include
+cancellation/fault teardown as correctness gates. Compare operation throughput and
+latency distributions, allocations/bytes per operation, retained memory per pending
+operation, and suspension/resumption cost. Add instrumentation where these metrics
+are not yet available; do not substitute process RSS for allocation counts. Use
+in-process measures for dispatch costs and external-process measures for startup and
+end-to-end workloads, with repeated samples and raw evidence.
+
+Keep API/outcome semantics and source workloads equivalent. First compare scheduler
+changes with state machines unchanged; later compare state-machine and runtime-suspended
+execution on the same scheduler. The .NET-style state-machine path is the local baseline;
+external .NET/Go/JavaScript comparisons are separate studies. Document regressions and
+tradeoffs as well as gains; no percentage target or speedup is assumed in advance.

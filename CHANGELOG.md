@@ -50,7 +50,14 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   Add a private native runnable-submission hook with deferred execution, independent
   root ownership and bounded admission. Route the retained managed HTTP callback through
   it; native contracts and normal/fragmented/fault HTTP cases pass on macOS ARM64.
-  Managed Scheduler projection, interpreter mapping and a stable foreign ABI remain open.
+  Add the matching interpreter submission service and explicit native `--bind-scheduler`
+  adapter. A source-included internal Scheduler prototype passes nested deferred work,
+  pending/completed awaits and terminal callback faults in interpreter/AOT/JIT while
+  preserving generated state machines. Bounded roots and exact binding checks cover
+  the new adapters. The public class-library Scheduler API, runtime suspension and a
+  stable foreign ABI remain open. Record the author-required state-machine benchmark
+  baseline and matched scheduler/runtime-suspension measurement plan; no performance
+  improvement is claimed by these correctness checks.
 
 - Document testing and benchmarking as independent development projects, including
   ownership, APIs, runner commands, selection, configuration, reports and limitations.

@@ -14733,3 +14733,30 @@ outside benchmark measurement. Implementation follows the configuration slice.
   is not the native service contract; experimental host functions are not a final ABI.
 - **Open:** minimum hook signatures, capability/versioning and lifetime validation with
   the first managed consumer. Native projections remain future integration work.
+
+
+### 2026-10-11 — Preserve state-machine compatibility during runtime async work
+
+- **Author:** required the scheduler work to fit runtime async suspension/resume while
+  keeping compiler-generated state machines valid.
+- **Assistant action:** added interpreter runnable submission and an explicit native
+  backend binding, then a source-included internal managed Scheduler projection. Its
+  ordinary async Main exercises nested submission, a pending Promise and a completed
+  Task; a second consumer faults with another submission pending.
+- **Outcome:** both consumers pass interpreter/AOT/JIT on macOS ARM64, preserving
+  existing Raven state-machine lowering. See the [evidence](experiments/scheduler-projection/README.md).
+  Runtime suspension and public Scheduler API selection/implementation remain open;
+  the runnable callback is an adapter, not a permanent activation representation.
+
+
+### 2026-10-11 — Benchmark scheduler and suspension changes
+
+- **Author:** requested ongoing benchmarks comparing compiler-generated state machines
+  with runtime suspension to measure improvements.
+- **Assistant proposal/action:** recorded a baseline-before-replacement requirement,
+  matched workloads within each execution mode, separate scheduler versus suspension
+  comparisons, startup versus steady-state measurements and explicit allocation/memory
+  instrumentation. Reuse the independent benchmark framework and retain raw evidence.
+- **Open:** produce the current-path baseline and instrument missing metrics; runtime
+  suspension is not yet available for a paired comparison. Existing projection checks
+  are correctness evidence and do not establish a speedup.

@@ -1557,6 +1557,7 @@ fn restrict_reference_arguments(
 
 struct Frame {
     queue_callback: bool,
+    runtime_callback: bool,
     permit: Option<crate::invocation_budget::FramePermit>,
     function: std::rc::Rc<crate::metadata::Function>,
     pc: usize,
@@ -1631,6 +1632,7 @@ impl Frame {
                 .collect(),
             permit: None,
             queue_callback: false,
+            runtime_callback: false,
             constructing: false,
             construction_object: None,
             construction_receiver: None,
@@ -2364,6 +2366,38 @@ fn interpret_instructions_with_dispatch(
                 }
             }
             let completion = scheduler.completion_state(heap, options)?;
+            if scheduler.install_submission(
+                completion == crate::scheduler::CompletionState::Ready,
+                |callback| {
+                    if frames.len() >= limits.frames {
+                        return Err(Fault::coded(
+                            crate::FaultCode::StackOverflow,
+                            "frame limit exceeded",
+                        ));
+                    }
+                    let Value::Function(binding) = callback else {
+                        return Err(Fault::new("Invalid scheduler callback"));
+                    };
+                    let contract = crate::function_objects::contract(module, &binding.ty)?;
+                    let callee = resolve(module, &binding.target)?;
+                    crate::function_objects::compatible(&contract, &callee)?;
+                    callback.ensure_heap_references()?;
+                    let args = binding
+                        .receiver
+                        .iter()
+                        .map(|receiver| (**receiver).clone())
+                        .collect();
+                    let mut frame = Frame::new(callee, args)?;
+                    frame.runtime_callback = true;
+                    frames.push(frame);
+                    Ok(())
+                },
+            )? {
+                // The callback may complete a managed Promise and post its
+                // state-machine continuation through the transitional adapter.
+                *drain_required = true;
+                continue;
+            }
             let (native_running, revision) = invocation.work.activity();
             if completion == crate::scheduler::CompletionState::Pending
                 || (work_control.is_none()
@@ -3828,6 +3862,11 @@ fn interpret_instructions_with_dispatch(
                             return Ok(None);
                         }
 
+                        if matches!(binding, crate::native::Binding::SchedulerSubmit) {
+                            scheduler.submit(args.remove(0))?;
+                            frames.last_mut().unwrap().stack.push(Value::Int32(0));
+                            return Ok(None);
+                        }
                         if matches!(binding, crate::native::Binding::ScheduleTask) {
                             // Publish the caller after consuming the argument; the
                             // child registers the callback before any pressure GC.
@@ -4079,7 +4118,9 @@ fn interpret_instructions_with_dispatch(
                             )?
                         } else if let crate::native::Binding::AssemblyInfo(query) = binding {
                             query.invoke_profile(
-                                module, &args, &limits,
+                                module,
+                                &args,
+                                &limits,
                                 crate::reflection_source::uses_source(module, &callee.returns),
                             )?
                         } else if let crate::native::Binding::Reflection(query) = binding {
@@ -4251,7 +4292,11 @@ fn interpret_instructions_with_dispatch(
                         || frame.construction_storage.is_some()
                         || frame.constructing;
                     let value = constructed_object.map_or(value, Value::ObjectReference);
+                    let runtime_callback = frame.runtime_callback;
                     frames.pop();
+                    if runtime_callback {
+                        return Ok(Some(Value::Void));
+                    }
                     if let Some(caller) = frames.last_mut() {
                         if produces_value {
                             caller.stack.push(value.on_stack());

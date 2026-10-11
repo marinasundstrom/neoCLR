@@ -51,6 +51,7 @@ pub(crate) enum Binding {
     RegisterDefaultTaskQueue,
     DrainEntryTasks,
     ScheduleTask,
+    SchedulerSubmit,
     StartWorker(bool),
     JoinWorker,
     JoinWorkerResult,
@@ -908,6 +909,11 @@ pub(crate) fn bind(function: &Function) -> Result<Binding, Fault> {
         {
             (Binding::NotifyWorker, Type::Void)
         }
+        ("neoCLR.Runtime.SchedulerSubmit", [callback])
+            if *callback == crate::assembler::parse_type("fn<Void>")? =>
+        {
+            (Binding::SchedulerSubmit, Type::Int32)
+        }
         ("neoCLR.Runtime.ScheduleTask", [callback])
             if *callback == crate::assembler::parse_type("fn<Void>")?
                 || *callback == crate::assembler::parse_type("fn<noresult Void>")? =>
@@ -1645,6 +1651,19 @@ mod task_callback_tests {
                 ".module Test\n.function neoCLR.Runtime.{signature}\n.methodimpl InternalCall\n.end\n"
             ));
             assert_eq!(module.is_ok(), accepted, "{signature}");
+        }
+    }
+
+    #[test]
+    fn scheduler_submission_requires_exact_unit_callback_and_status_result() {
+        for (signature, accepted) in [
+            ("fn<Void> callback) -> Int32", true),
+            ("fn<Void> callback) -> Void", false),
+            ("fn<noresult Void> callback) -> Int32", false),
+            ("fn<Int32> callback) -> Int32", false),
+            ("fn<Int32,Void> callback) -> Int32", false),
+        ] {
+            assert_eq!(crate::assemble(&format!(".module Test\n.function neoCLR.Runtime.SchedulerSubmit({signature}\n.methodimpl InternalCall\n.end\n")).is_ok(), accepted);
         }
     }
 

@@ -137,6 +137,8 @@ pub(crate) struct Scheduler {
     pub(crate) resolver: crate::name_resolution::Resolver,
     pub(crate) timers: crate::timers::Timers,
     ready: Option<Ready>,
+    submitted: std::collections::VecDeque<Value>,
+    prefer_submission: bool,
     arbitration: Arbitration,
     wake: Arc<Wake>,
 }
@@ -149,6 +151,8 @@ impl Default for Scheduler {
             resolver: crate::name_resolution::Resolver::with_wake(wake.clone()),
             timers: Default::default(),
             ready: None,
+            submitted: Default::default(),
+            prefer_submission: true,
             arbitration: Default::default(),
             wake,
         }
@@ -161,7 +165,7 @@ impl Scheduler {
         if !can_dispatch {
             return POLL_INTERVAL;
         }
-        if self.ready.is_some() {
+        if self.ready.is_some() || !self.submitted.is_empty() {
             return Duration::ZERO;
         }
         self.timers
@@ -185,7 +189,44 @@ impl Scheduler {
         self.arbitration.poll(sources, heap)
     }
 
+    pub(crate) fn submit(&mut self, callback: Value) -> Result<(), Fault> {
+        if !matches!(callback, Value::Function(_))
+            || callback.ty() != crate::assembler::parse_type("fn<Void>")?
+        {
+            return Err(Fault::new("Scheduler submission requires a unit callback"));
+        }
+        if self.submitted.len() >= 64 {
+            return Err(Fault::coded(
+                crate::FaultCode::NativeMemoryLimitExceeded,
+                "Scheduler submission capacity exceeded",
+            ));
+        }
+        self.submitted.push_back(callback);
+        self.wake.signal();
+        Ok(())
+    }
+
+    pub(crate) fn install_submission(
+        &mut self,
+        source_ready: bool,
+        install: impl FnOnce(&Value) -> Result<(), Fault>,
+    ) -> Result<bool, Fault> {
+        if source_ready && !self.prefer_submission {
+            return Ok(false);
+        }
+        let Some(callback) = self.submitted.front() else {
+            return Ok(false);
+        };
+        install(callback)?;
+        self.submitted.pop_front();
+        self.prefer_submission = false;
+        Ok(true)
+    }
+
     pub(crate) fn trace_roots(&self, roots: &mut Vec<usize>) {
+        for callback in &self.submitted {
+            crate::gc::trace(callback, roots);
+        }
         if let Some(ready) = &self.ready {
             crate::gc::trace(&ready.callback, roots);
             if let Some(destination) = &ready.destination {
@@ -283,6 +324,7 @@ impl Scheduler {
         };
         install(ready.destination.as_ref(), &ready.callback)?;
         self.ready = None;
+        self.prefer_submission = true;
         Ok(true)
     }
 }
@@ -637,6 +679,49 @@ mod tests {
         );
         active.clear();
         collect(&mut heap, &scheduler, &active);
+        assert!(heap.is_empty());
+    }
+
+    #[test]
+    fn submitted_callbacks_are_bounded_rooted_and_yield_to_source_delivery() {
+        let mut heap = ManagedHeap::default();
+        let mut scheduler = Scheduler::default();
+        assert!(scheduler.submit(Value::Int32(0)).is_err());
+        let (callback, _) = ready_graphs(&mut heap);
+        for _ in 0..64 {
+            scheduler.submit(callback.clone()).unwrap();
+        }
+        assert_eq!(
+            scheduler.submit(callback).unwrap_err().code,
+            crate::FaultCode::NativeMemoryLimitExceeded
+        );
+        collect(&mut heap, &scheduler, &[]);
+        assert_eq!(heap.len(), 2);
+        assert_eq!(scheduler.wait_timeout(Instant::now(), true), Duration::ZERO);
+        assert!(
+            scheduler
+                .install_submission(false, |_| Err(Fault::new("frame rejected")))
+                .is_err()
+        );
+        assert_eq!(scheduler.submitted.len(), 64);
+        scheduler.stage(Value::Void, None);
+        assert!(scheduler.install_submission(true, |_| Ok(())).unwrap());
+        assert!(
+            !scheduler
+                .install_submission(true, |_| panic!("source must get a turn"))
+                .unwrap()
+        );
+        scheduler.install_ready(|_, _| Ok(())).unwrap();
+        assert!(scheduler.install_submission(true, |_| Ok(())).unwrap());
+        for _ in 0..62 {
+            assert!(scheduler.install_submission(false, |_| Ok(())).unwrap());
+        }
+        assert!(
+            !scheduler
+                .install_submission(false, |_| panic!("duplicate delivery"))
+                .unwrap()
+        );
+        collect(&mut heap, &scheduler, &[]);
         assert!(heap.is_empty());
     }
 

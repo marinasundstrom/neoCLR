@@ -8270,3 +8270,30 @@ hoisted fields, matching ordinary .NET emission. Raven main has no portable line
 emitter; only the shared lifetime correction applies there. The HTTP workbench
 checks both samples across interpreter/JIT/AOT with repeated real I/O suspension;
 see [method and evidence](../benchmarks/jit-http/README.md).
+
+
+## Scheduler submission projection experiment (2026-10-11)
+
+Native semantic intent is deferred runtime-owned runnable admission beneath managed
+Task/Scheduler projections, compatible with both current state-machine callbacks and
+future runtime suspension. The temporary source-included internal Scheduler declares
+`neoCLR.Runtime.SchedulerSubmit(fn<Void>) -> Int32` as InternalCall; zero acknowledges
+admission and is discarded by the facade. It is not a Task completion or public API
+result. The runtime recognizes the exact declaration; AOT/JIT require explicit
+`--bind-scheduler`, `--compile-system` and `--native-gc`. Raven Runtime Contract
+configuration and state-machine lowering are unchanged; ordinary .NET behavior is
+unaffected. No general compiler support for this reserved service is inferred.
+
+Current restrictions: unit callbacks only, bounded owner-thread native service scope,
+no stable foreign callback ABI and no saved activation. The interpreter uses its own
+bounded rooted runnable storage. Native metadata/backend replacement must model
+admission and resumption capabilities without depending on Task layout, the integer
+acknowledgment or callback-only encoding. neoCLR owns binding, dispatch and cleanup;
+Raven only emits the existing InternalCall/delegate/state-machine forms. The
+[experiment](experiments/scheduler-projection/README.md) records bundle/compiler hashes
+and six macOS ARM64 interpreter/AOT/JIT outcomes. Native compiler bundle support does
+not imply this feature is available from an arbitrary Raven-main build.
+
+The companion Raven shared-main documentation is committed at `f92f5ca43`; it changes
+no compiler binary and distinguishes reported integration evidence from Raven-main
+execution qualification.

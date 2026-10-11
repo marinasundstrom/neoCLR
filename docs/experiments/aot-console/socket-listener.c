@@ -404,6 +404,18 @@ int32_t neoclr_scheduler_submit_v1(neoclr_aot_context *context, uint64_t callbac
     return 0;
 }
 
+int32_t neoclr_scheduler_submit_managed_v1(void *callback, neoclr_aot_context *context, int32_t *output) {
+    const neoclr_probe_frame *boundary = neoclr_root_probe_head_v1();
+    if (!output || !boundary || boundary->context != context) return 3;
+    uint64_t root = 0;
+    int32_t status = neoclr_gc_host_root_create_v1(context, callback, &root);
+    if (status) return status;
+    status = neoclr_scheduler_submit_v1(context, root, boundary);
+    if (neoclr_gc_host_root_release_v1(context, root)) return 3;
+    if (!status) *output = 0;
+    return status;
+}
+
 int32_t neoclr_scheduler_acquire_v1(neoclr_aot_context *context, uint64_t *delivery,
     const neoclr_probe_frame *boundary) {
     if (!delivery) return -3;

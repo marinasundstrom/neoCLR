@@ -1,0 +1,54 @@
+module SchedulerProjection {
+    import System.*
+    import System.Tasks.*
+
+    // Source-included managed projection prototype, not the class-library API.
+    internal static class Scheduler {
+        static func Submit(callback: () -> System.Void) {
+            _ = neoCLR.Runtime.SchedulerSubmit(callback)
+        }
+    }
+
+    class Work {
+        var Count = 0
+        val Done = Promise<int>()
+
+        func First() -> System.Void {
+            Count += 1
+            Scheduler.Submit(Second)
+            System.Fail("submitted callback fault")
+            return ()
+        }
+
+        func Second() -> System.Void {
+            Count += 1
+            Done.Complete(42)
+            return ()
+        }
+    }
+
+    async func Main() -> Task<int> {
+        let work = Work()
+        Scheduler.Submit(work.First)
+        if work.Count != 0 {
+            System.Fail("Submission ran inline")
+        }
+        let result = await work.Done.Task
+        if result != 42 || work.Count != 2 {
+            System.Fail("Submission or resumption failed")
+        }
+        let completed = await Task.FromResult(7)
+        if completed != 7 {
+            System.Fail("Completed await changed")
+        }
+        Console.WriteLine("PASS deferred submission and state-machine resume")
+        return 0
+    }
+}
+
+module neoCLR.Runtime {
+    import System.Runtime.CompilerServices.*
+
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    internal extern func SchedulerSubmit(callback: () -> System.Void) -> int;
+}

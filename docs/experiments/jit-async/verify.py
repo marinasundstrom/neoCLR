@@ -20,6 +20,7 @@ def main():
     parser.add_argument('--console-qualification', type=Path, required=True)
     parser.add_argument('--case', action='append', help='Run only named cases in the selected profile')
     parser.add_argument('--timers', action='store_true')
+    parser.add_argument('--scheduler', action='store_true')
     parser.add_argument('--output', type=Path, required=True)
     args = parser.parse_args()
     out, bundle = args.output.resolve(), args.bundle.resolve()
@@ -81,6 +82,10 @@ def main():
         cases = [('timers', ROOT/'docs/experiments/timers/Main.rvn', [], 0,
                   ''.join('PASS '+name+'\n' for name in names), None),
                  ('timer-fault', ROOT/'docs/experiments/jit-timers/CallbackFault.rvn', [], 1, '', 'JIT timer callback fault')]
+    if args.scheduler:
+        cases = [('scheduler', ROOT/'docs/experiments/scheduler-projection/Main.rvn', [], 0,
+                  'PASS deferred submission and state-machine resume\n', None),
+                 ('scheduler-fault', ROOT/'docs/experiments/scheduler-projection/Fault.rvn', [], 1, '', 'submitted callback fault')]
     if args.case:
         known = {case[0] for case in cases}
         if set(args.case) - known:
@@ -101,6 +106,8 @@ def main():
             native = [str(assembly) if p == old_input else str(obj) if p == old_host else p for p in native_base]
             if '--bind-task-queue' not in native:
                 native += ['--bind-task-queue']
+            if args.scheduler:
+                native += ['--bind-scheduler']
             if args.timers:
                 native += ['--bind-timers']
             result = run([jit, *native])

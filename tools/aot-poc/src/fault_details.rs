@@ -44,6 +44,7 @@ pub struct Options {
     pub socket_cancel: Vec<usize>,
     pub socket_receive: Vec<usize>,
     pub socket_send: Vec<usize>,
+    pub scheduler_submit: Vec<usize>,
     pub timer_start: Vec<usize>,
     pub timer_cancel: Vec<usize>,
     pub socket_deadline_after: Vec<usize>,
@@ -212,6 +213,9 @@ impl Options {
                 .filter_map(|r| r["compiledIndex"].as_u64().map(|i| i as usize)).collect(),
             socket_cancel: report.and_then(|r| r["nativeBindings"].as_array()).into_iter().flatten()
                 .filter(|r| r["implementation"] == "socket-cancel-v1")
+                .filter_map(|r| r["compiledIndex"].as_u64().map(|i| i as usize)).collect(),
+            scheduler_submit: report.and_then(|r| r["nativeBindings"].as_array()).into_iter().flatten()
+                .filter(|r| r["implementation"] == "scheduler-submit-v1")
                 .filter_map(|r| r["compiledIndex"].as_u64().map(|i| i as usize)).collect(),
             timer_start: report.and_then(|r| r["nativeBindings"].as_array()).into_iter().flatten()
                 .filter(|r| r["implementation"] == "timer-start-v1")

@@ -45,9 +45,18 @@ consumer/API migration. Interpreter completion admission now retains invocation-
 queue binding; its VM dispatch adapter still resolves the default queue at installation.
 A [private native submission hook](experiments/native-scheduler/README.md#runtime-submission-prototype--2026-10-11)
 now defers a rooted managed HTTP callback through runtime-owned admission/dispatch
-without a Task or managed queue. It is not yet a managed Scheduler projection or a
-stable foreign-language ABI. Current public TaskQueue behavior remains implemented
+without a Task or managed queue. A [source-included managed Scheduler prototype](experiments/scheduler-projection/README.md)
+now projects a reserved submission service in interpreter/AOT/JIT and preserves
+compiler-generated state machines in pending/completed await and fault cases. It is
+not yet the public class-library Scheduler API or a stable foreign-language ABI. Current public TaskQueue behavior remains implemented
 until the replacement is qualified.
+
+**Benchmark requirement (2026-10-11):** retain a compiler-generated state-machine
+baseline and measure scheduler/suspension changes as they develop. Compare equivalent
+workloads within each execution mode, isolate scheduler changes from suspension changes,
+and separate startup from steady-state latency/throughput, allocation and retained
+memory. See the [measurement gates](runtime-scheduling-design.md#scheduler-and-suspension-benchmark-requirement--2026-10-11).
+Correctness qualification alone establishes no performance improvement.
 
 **Common language runtime clarification (2026-10-11):** the primary target is managed
 languages running bytecode through the interpreter or JIT, with native AOT as the

@@ -645,9 +645,17 @@ pub fn socket_transfer(input: &mut neoclr::Module, selection: &Value) -> Result<
 }
 
 pub fn timers(input: &mut neoclr::Module, selection: &Value) -> Result<Vec<Value>, Error> {
+    completion_services(input, selection, false)
+}
+pub fn scheduler(input: &mut neoclr::Module, selection: &Value) -> Result<Vec<Value>, Error> {
+    completion_services(input, selection, true)
+}
+fn completion_services(input: &mut neoclr::Module, selection: &Value, submission: bool) -> Result<Vec<Value>, Error> {
     let mut bindings = vec![];
     for row in selection["functions"].as_array().ok_or("missing selection inventory")? {
+        if (row["name"] == "neoCLR.Runtime.SchedulerSubmit") != submission { continue; }
         let (parameters, result, implementation, symbol) = match row["name"].as_str() {
+            Some("neoCLR.Runtime.SchedulerSubmit") => (vec![neoclr::assembler::parse_type("fn<Void>").expect("fixed scheduler callback signature")], Type::Int32, "scheduler-submit-v1", "neoclr_scheduler_submit_managed_v1"),
             Some("neoCLR.Runtime.TimerStart") => (vec![Type::Int32, neoclr::assembler::parse_type("fn<Void>").expect("fixed timer callback signature")], Type::Int64, "timer-start-v1", "neoclr_timer_start_v1"),
             Some("neoCLR.Runtime.TimerCancel") => (vec![Type::Int64], Type::Boolean, "timer-cancel-v1", "neoclr_timer_cancel_v1"),
             _ => continue,
@@ -661,11 +669,11 @@ pub fn timers(input: &mut neoclr::Module, selection: &Value) -> Result<Vec<Value
             || !f.generic_parameters.is_empty() || !f.generic_arguments.is_empty()
             || !f.generic_constraints.is_empty() || !f.interface_implementations.is_empty()
             || !f.out_parameters.is_empty() || !f.out_when_true.is_empty() || !f.readonly_parameters.is_empty()
-        { return Err("native timer binding requires exact reserved TimerStart/TimerCancel InternalCall contract".into()); }
+        { return Err("native completion binding requires exact reserved TimerStart/TimerCancel/SchedulerSubmit InternalCall contract".into()); }
         f.impl_flags = 0;
         f.body = if result == Type::Boolean { vec![Op::Bool(false), Op::Return] }
             else if result == Type::Int64 { vec![Op::Int64(0), Op::Return] }
-            else { vec![Op::Void, Op::PackValue(Type::Void), Op::Return] };
+            else { vec![Op::Int(0), Op::Return] };
         bindings.push(json!({"definition": row["definition"], "name": row["name"],
             "compiledIndex": row["compiledIndex"], "implementation": implementation, "symbol": symbol,
             "storage": "private polled host scope; bounded shared operation table; rooted one-shot callbacks"}));
@@ -756,6 +764,7 @@ mod deadline_tests {
     #[test]
     fn deadlines_and_timers_require_exact_reserved_signatures_and_internal_bodies() {
         for (name, signature) in [
+            ("SchedulerSubmit", "fn<Void> callback) -> Int32"),
             ("TimerStart", "Int32 milliseconds, fn<Void> callback) -> Int64"),
             ("TimerCancel", "Int64 handle) -> Boolean"),
             ("SocketDeadlineAfter", "Int32 milliseconds) -> Int64"),
@@ -765,7 +774,7 @@ mod deadline_tests {
         ] {
             let source = neoclr::assemble(&format!(".module Contract\n.function neoCLR.Runtime.{name}({signature}\n.methodimpl InternalCall\n.end")).unwrap();
             let inventory = json!({"functions":[{"name":format!("neoCLR.Runtime.{name}"),"compiledIndex":0}]});
-            let bind = if name.starts_with("Timer") { timers } else { socket_transfer };
+            let bind = if name == "SchedulerSubmit" { scheduler } else if name.starts_with("Timer") { timers } else { socket_transfer };
             for change in 0..6 {
                 let mut input = source.clone();
                 match change {

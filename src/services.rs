@@ -83,6 +83,7 @@ pub(crate) fn uses(module: &crate::Module, function: &Function) -> Result<Vec<Se
             | crate::native::Binding::CurrentTaskQueue
             | crate::native::Binding::DefaultTaskQueue
             | crate::native::Binding::Timer(_)
+            | crate::native::Binding::SchedulerSubmit
             | crate::native::Binding::ScheduleTask
             | crate::native::Binding::DrainEntryTasks
             | crate::native::Binding::RegisterDefaultTaskQueue => RuntimeService::TaskDispatch,
