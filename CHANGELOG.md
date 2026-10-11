@@ -16,6 +16,7 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   concept with schedulers, then develop runtime-managed suspension in place of
   Raven-required async state machines. Implementation choices remain open; breaking
   experimental contracts are permitted, with interpreter/JIT/AOT validation required.
+  Mark the older scheduler design’s suspension deferral as historical sequencing.
 
 - Add explicit development `neoclr run --execution jit|interpreter` selection and
   JIT-only runtime-library test execution, preserving output, entry arguments and
