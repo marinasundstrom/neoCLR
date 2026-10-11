@@ -14490,3 +14490,42 @@ back into main. The assistant selects a fast-forward after Windows qualification
 **Windows review follow-up:** DLL exports must include directly imported Rust kernel
 helpers as well as the C adapters. The gate is updated accordingly; execution
 evidence is still pending.
+
+
+### 2026-10-11 — Benchmark gate and await binding correction
+
+**Author direction:** requests benchmarks after moving main forward and before
+schedulers/runtime suspension, explicitly adding JSON serialization samples.
+**Assistant action:** fast-forwards neoCLR main through `33648ce6` after the Windows
+JIT qualification; begins a matched HTTP client/server execution-mode benchmark.
+The new sample exposes a `let … else` binding lost across await. The author directs:
+“Fix it”.
+
+**Outcome:** a focused .NET regression reproduces `42` becoming `0` after suspension.
+Raven's shared lowerer now retains the binding despite the synthetic guard block.
+The new and existing pattern-await regressions pass on both Raven main `2059d5e5f`
+and native integration revision `a4f47f57e`; both are committed and pushed. Native
+validation and benchmark results are tracked with the HTTP workbench. JSON
+benchmarking remains part of the gate before scheduler work; external-framework
+comparisons remain follow-up work. See [bridge contract](raven-cli-bridge.md#let-else-bindings-across-await-2026-10-11).
+
+**Native follow-up:** compilation passes but execution exposes the portable emitter
+writing only the temporary local, leaving the hoisted field uninitialized. Raven
+integration commit `2535c8706` writes the field too; main's ordinary .NET generator
+already does so. Both HTTP workloads subsequently pass the complete 32-request
+check in interpreter, JIT and AOT on macOS ARM64. Measured rounds follow in the
+[HTTP workbench](../benchmarks/jit-http/README.md).
+
+**Benchmark framework direction:** the author adds that some benchmarks should run
+outside the process and requests a BenchmarkDotNet equivalent. The assistant
+distinguishes an external controller from timing inside an isolated worker, retains
+the current HTTP controller, and records a staged Raven framework direction with
+BenchmarkDotNet primary references. No new public benchmarking API is claimed. See
+[framework direction](benchmarking-framework.md); JSON is the intended second
+consumer, with clock suitability and runner extraction still open.
+
+**Recorded run:** all 36 HTTP processes and 1,152 requests pass; input hashes remain
+unchanged. Raw timings are retained but explicitly provisional because background
+compilation/indexing competed for CPU. Median server throughput is 1.38/53.49/54.31
+requests/s and client throughput 0.96/34.83/35.66 for interpreter/JIT/AOT respectively.
+This is validation plus exploratory measurement, not a published performance claim.

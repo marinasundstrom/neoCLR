@@ -201,7 +201,12 @@ with interpreter/AOT parity. Development builds now expose `neoclr run --executi
 with an explicit matching helper library and compiler. The Windows x64 execution gate
 passes HTTP and test-framework checks at `f993e94b`; Windows ARM64 and normal SDK packaging remain open.
 [CLI contract and readiness](https://github.com/marinasundstrom/neoCLR/blob/main/docs/jit-execution.md).
-These are functional checks, not HTTP throughput measurements.
+Those gates establish functional behavior. A separate development
+[HTTP execution-mode workbench](https://github.com/marinasundstrom/neoCLR/blob/main/benchmarks/jit-http/README.md)
+checks 32-request client/server samples in interpreter, JIT and AOT, with startup
+separated from request timing. Its initial macOS ARM64 timing run had background
+CPU contention and is exploratory; it does not establish Windows performance or
+comparisons with other frameworks. JSON serialization benchmarks remain next.
 [Contracts, validation and local benchmark](https://github.com/marinasundstrom/neoCLR/blob/main/docs/experiments/jit-managed/README.md).
 
 A subsequent shared metadata lookup optimization reduces startup work in both the JIT

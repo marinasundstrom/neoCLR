@@ -1,0 +1,28 @@
+import System.*
+import System.Result.*
+import System.Tasks.*
+import System.Web.Http.*
+
+async func Main(arguments: string[]) -> Task<()> {
+    let client = HttpClient()
+    Console.WriteLine("READY")
+    var count = 0
+    while count < 32 {
+        let result = await client.GetString(arguments[0])
+        let Ok(text) = result else {
+            client.Dispose()
+            System.Fail("HTTP benchmark request failed")
+        }
+        if text != "Café 🌍" {
+            client.Dispose()
+            System.Fail("HTTP benchmark body changed")
+        }
+        count += 1
+        if count == 8 {
+            Console.WriteLine("WARMED")
+        }
+    }
+    // Async use lowering is a separate compiler gap; dispose after all awaits.
+    client.Dispose()
+    Console.WriteLine("DONE")
+}

@@ -8,6 +8,17 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-11
 
+- Qualify the Raven fix for `let … else` bindings across await using persistent
+  HTTP client/server samples. Shared lifetime analysis is fixed on Raven main
+  (`2059d5e5f`); native portable emission also initializes hoisted pattern fields
+  (`2535c8706`). Add a correctness-checked interpreter/JIT/AOT HTTP benchmark
+  with fresh builds, separate startup timing and recorded artifact hashes. All
+  1,152 requests pass on macOS ARM64; recorded timing is provisional because
+  background CPU contention was observed.
+  JSON serialization remains a required benchmark before scheduler work. Record
+  the author-directed BenchmarkDotNet-like framework plan, separating external
+  process control from Raven workload timing; no framework API is shipped yet.
+
 - Fix shared AOT/JIT interface selection for specialized collection types with
   unselected generic overloads. Ignore the remaining open template when resolving
   a lowered nongeneric owner; keep source verification and closed overload checks.

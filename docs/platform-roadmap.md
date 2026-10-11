@@ -18,11 +18,17 @@ requirements without treating any proposed API or backend as selected. See
 and the [JIT evaluation brief](native-execution-investigation.md#jit-for-development-iteration-2026-10-11).
 
 **Author-directed sequence (2026-10-11):** finish JIT qualification and integrate
-that work into main, then produce the execution/HTTP benchmarks before moving from
+that work into main (completed at `33648ce6`), then produce execution/HTTP and JSON
+serialization benchmarks before moving from
 the TaskQueue concept to schedulers, followed by
 runtime-managed suspension. The intended suspension model lets the runtime handle
 suspension points instead of requiring Raven-generated async state machines. This
 is a direction, not implemented behavior or a selected stack representation.
+The [HTTP workbench](../benchmarks/jit-http/README.md) now passes 1,152 requests
+across all three modes; initial timing is provisional due to background contention.
+JSON benchmarking remains open.
+The author also requests a [BenchmarkDotNet-like framework](benchmarking-framework.md),
+combining external process orchestration with Raven workload measurement.
 Experimental API/compiler compatibility may be broken where justified. Compare the
 scheduler contract with .NET TaskScheduler/ThreadPool and the suspension mechanism
 with compiler-generated async state machines; document benefits, costs and evidence

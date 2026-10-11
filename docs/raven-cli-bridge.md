@@ -8245,3 +8245,28 @@ Final bundle qualification also exposed candidate merging that collapsed native
 int/Index property overloads. Raven now deduplicates repeated property instances
 by identity. The ArrayList Index setter in the index-range suite covers this
 regression; it does not alter the Runtime Contract or temporary encoding.
+
+### Let-else bindings across await (2026-10-11)
+
+The HTTP benchmark exposed a shared Raven async-lowering bug: the synthetic guard
+block for `let … else` truncated analysis of the binding's source lifetime. Ordinary
+.NET execution read a default value after suspension, while native metadata
+correctly rejected the uninitialized local. Raven main `2059d5e5f` and native
+integration branch `codex/source-object-metadata-resolution` at `a4f47f57e` preserve
+these bindings in private state-machine fields. Both branches pass the new
+let-else regression and existing if-let suspension test.
+
+Native intent remains preservation of in-scope values across suspension. Runtime
+Contract configuration, public signatures and temporary CLI representation are
+unchanged. Conservative hoisting may add private fields that finer liveness analysis
+could avoid. Raven owns the lowering; neoCLR retains its definite-assignment checks.
+Runtime-managed suspension is the later replacement direction, not part of this fix.
+Native consumers use the updated compiler explicitly with the existing runtime
+libraries; this does not update or requalify the old Windows compiler bundle.
+
+Native execution then exposed a separate portable-emitter store omission, fixed
+on the integration line at `2535c8706`: pattern payloads now initialize their
+hoisted fields, matching ordinary .NET emission. Raven main has no portable linear
+emitter; only the shared lifetime correction applies there. The HTTP workbench
+checks both samples across interpreter/JIT/AOT with repeated real I/O suspension;
+see [method and evidence](../benchmarks/jit-http/README.md).

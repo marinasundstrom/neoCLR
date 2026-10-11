@@ -1,0 +1,25 @@
+{
+  "date": "2026-10-11",
+  "sharedMainRevision": "2059d5e5f",
+  "nativeIntegrationRevision": "2535c8706",
+  "nativeIntegrationBranch": "codex/source-object-metadata-resolution",
+  "dotnetRegression": {
+    "filter": "FullyQualifiedName~AsyncMethod_LetElseLocalUsedAfterAwait_IsPreserved|FullyQualifiedName~AsyncMethod_PatternLocalUsedAfterAwait_IsPreserved",
+    "framework": "net11.0",
+    "baseline": {"passed": 1, "failed": 1, "expected": ["42", "-1"], "actual": ["0", "-1"]},
+    "fixedMain": {"passed": 2, "failed": 0},
+    "fixedIntegration": {"passed": 2, "failed": 0}
+  },
+  "nativeCompiler": {
+    "framework": "net10.0",
+    "metadataProject": "tools/metadata/NeoCLR.Metadata.Experimental/NeoCLR.Metadata.Experimental.csproj",
+    "buildPassed": true,
+    "baselineEmissionError": "NEOMETA003: MoveNext local loaded before store on some path",
+    "intermediateExecutionError": "NullReference in HttpServer.GetLocalPort: hoisted pattern field was never stored",
+    "executionEvidence": "results.json"
+  },
+  "limits": [
+    "Windows qualification used the earlier compiler and is not repeated by this macOS run",
+    "Raven main has the shared async fix; the portable native emitter exists only on the integration branch"
+  ]
+}
