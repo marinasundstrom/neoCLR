@@ -8,6 +8,13 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-11
 
+- Begin the resumed scheduler work by moving interpreter invocation wait policy
+  into the private scheduler. Bound owner waits by known timer deadlines, preserve
+  the cancellation/socket polling fallback and avoid spinning a contending context
+  on another context's ready work. JIT/AOT host-loop alignment and runtime-managed
+  async suspension remain follow-ups; no new public Scheduler API is claimed. Sixteen
+  focused scheduler, ownership/contention and guest timer checks pass.
+
 - Document testing and benchmarking as independent development projects, including
   ownership, APIs, runner commands, selection, configuration, reports and limitations.
   Add the benchmark manual API reference and link both projects from the API index.

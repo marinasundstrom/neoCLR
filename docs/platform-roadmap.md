@@ -19,7 +19,9 @@ and the [JIT evaluation brief](native-execution-investigation.md#jit-for-develop
 
 **Latest author clarification (2026-10-11):** document testing and benchmarking as
 [independent](../tools/testing/README.md) [projects](../tools/benchmarking/README.md),
-including their runners/APIs, then continue scheduler work followed by suspension.
+including their runners/APIs (completed), then continue scheduler work followed by suspension.
+The first resumed scheduler slice centralizes interpreter wait policy and timer
+deadline hints; cross-mode dispatch migration remains open.
 Migrate more cases as needed; remaining benchmark/framework features are follow-ups,
 not prerequisites for beginning the scheduler slice. Parallel-by-default testing and
 class grouping are proposals to develop with scheduling, not enabled behavior.

@@ -1,7 +1,10 @@
 //! Private invocation completion driver. TaskQueue remains the callback adapter.
 use crate::{ExecutionOptions, Fault, ManagedHeap, Value};
 use std::sync::{Arc, Condvar, Mutex};
-use std::time::Duration;
+use std::time::{Duration, Instant};
+
+// Socket readiness and host cancellation do not yet subscribe to the wake latch.
+pub(crate) const POLL_INTERVAL: Duration = Duration::from_millis(10);
 
 /// A coalesced wake hint, not the completion data. Sources retain their outcomes
 /// until polled. The latch covers a signal between the last poll and parking.
@@ -152,6 +155,22 @@ impl Default for Scheduler {
     }
 }
 impl Scheduler {
+    /// Host wait policy, separate from parking and guest execution. A context that
+    /// cannot own dispatch must not spin on another context's ready work/deadlines.
+    pub(crate) fn wait_timeout(&self, now: Instant, can_dispatch: bool) -> Duration {
+        if !can_dispatch {
+            return POLL_INTERVAL;
+        }
+        if self.ready.is_some() {
+            return Duration::ZERO;
+        }
+        self.timers
+            .next_deadline()
+            .map_or(POLL_INTERVAL, |deadline| {
+                deadline.saturating_duration_since(now).min(POLL_INTERVAL)
+            })
+    }
+
     pub(crate) fn wake(&self) -> Arc<Wake> {
         self.wake.clone()
     }
@@ -225,7 +244,7 @@ impl Scheduler {
     #[cfg(test)]
     pub(crate) fn park(&self) {
         // Cancellation and the socket source have no wake subscription.
-        self.wake.park(Duration::from_millis(10));
+        self.wake.park(self.wait_timeout(Instant::now(), true));
     }
 
     #[cfg(test)]
@@ -285,6 +304,32 @@ mod tests {
     }
 
     #[test]
+    fn wait_policy_respects_deadlines_ready_ownership_and_polling_fallback() {
+        let mut heap = ManagedHeap::default();
+        let mut scheduler = Scheduler::default();
+        let (callback, destination) = ready_graphs(&mut heap);
+        let now = Instant::now();
+        assert_eq!(scheduler.wait_timeout(now, true), POLL_INTERVAL);
+        let late = scheduler.timers.start(20, callback.clone(), now).unwrap();
+        let early = scheduler.timers.start(3, callback.clone(), now).unwrap();
+        assert_eq!(scheduler.wait_timeout(now, true), Duration::from_millis(3));
+        assert_eq!(scheduler.wait_timeout(now, false), POLL_INTERVAL);
+        assert_eq!(
+            scheduler.wait_timeout(now + Duration::from_millis(4), true),
+            Duration::ZERO
+        );
+        // Computing a wait does not consume or release the timer registration.
+        assert!(scheduler.timers.cancel(early));
+        assert_eq!(scheduler.wait_timeout(now, true), POLL_INTERVAL);
+        assert!(scheduler.timers.cancel(late));
+        scheduler.stage(callback, &destination);
+        assert_eq!(scheduler.wait_timeout(now, true), Duration::ZERO);
+        assert_eq!(scheduler.wait_timeout(now, false), POLL_INTERVAL);
+        assert!(scheduler.install_ready(|_, _| Ok(())).unwrap());
+        assert_eq!(scheduler.wait_timeout(now, true), POLL_INTERVAL);
+    }
+
+    #[test]
     fn timer_callback_roots_transfer_once_and_cancelled_timers_release_them() {
         let mut heap = ManagedHeap::default();
         let mut scheduler = Scheduler::default();
@@ -302,9 +347,11 @@ mod tests {
         );
         collect(&mut heap, &scheduler, &[]);
         assert_eq!(heap.len(), 4);
-        assert!(scheduler
-            .install_ready(|_, _| Err(Fault::new("rejected")))
-            .is_err());
+        assert!(
+            scheduler
+                .install_ready(|_, _| Err(Fault::new("rejected")))
+                .is_err()
+        );
         collect(&mut heap, &scheduler, &[]);
         assert_eq!(heap.len(), 4);
         scheduler.install_ready(|_, _| Ok(())).unwrap();

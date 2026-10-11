@@ -1982,7 +1982,7 @@ fn drive_instructions(
                 Ok(InstructionProgress::Suspended) => continue,
                 Ok(InstructionProgress::Waiting) => {
                     drop(heap);
-                    state.invocation.park();
+                    state.invocation.park_dispatch(&state.dispatch_identity);
                 }
                 Ok(InstructionProgress::HostCall(mut call)) => {
                     drop(heap);

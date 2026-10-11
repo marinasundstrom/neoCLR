@@ -1,5 +1,12 @@
 # Runtime scheduling and async suspension
 
+**Latest author direction (2026-10-11):** the independent testing and benchmarking
+project guides are complete. Proceed with scheduler work, then runtime-managed async
+suspension; migrate more cases and extend framework features as needed. Test
+parallelism/class grouping remain consumers to design with this work, not implemented
+contracts. Earlier gates and deferrals below retain their historical dates.
+
+
 **2026-10-11 sequencing update:** after completing and integrating JIT work, the
 author requires the benchmarks before replacing the TaskQueue concept with schedulers, then implementing
 runtime-managed suspension instead of requiring Raven-generated state machines.
@@ -470,3 +477,59 @@ binary-I/O consumers as standalone EXEs, with fault diagnostics and checked clea
 It uses the same normal-thread host and status-return contracts; it does not turn
 thread-local roots into activation ownership or qualify stack migration. Keep those
 boundaries explicit when the next persistent-host/suspension experiment is selected.
+
+
+## Scheduler-owned waiting — 2026-10-11
+
+The first resumed implementation slice moves the interpreter invocation's fixed
+parking timeout behind the private scheduler. `Scheduler::wait_timeout` returns a
+non-consuming host wait hint: zero for ready work or an expired timer, otherwise
+the smaller of the earliest timer deadline and the existing 10 ms polling fallback.
+Cancellation/socket readiness still require that fallback; this is not an event-only
+scheduler or an OS timer precision guarantee.
+
+A contending context that cannot own dispatch keeps the fallback wait even when
+another context has ready/expired work. It must not busy-spin on work it cannot
+execute. Reading the hint does not claim dispatch ownership, consume timers, invoke
+callbacks or release roots. The invocation drops its dispatch lock before parking;
+VM managed graph access has already been released. The existing durable wake latch
+continues to cover a notification between the check and park.
+
+This reuses the .NET comparison above: scheduling policy, completion outcomes and
+execution representation are distinct responsibilities. A deadline hint is an
+internal host-loop decision, not a new application TaskScheduler/SynchronizationContext
+contract. Its cost is a brief dispatch lock and a scan of the bounded timer registry
+(currently at most 64 entries) before a VM wait. No throughput improvement is claimed.
+It avoids deliberately choosing a timeout beyond an already-known nearer deadline;
+OS dispatch can still run later. Concurrently admitted sources still rely on their
+wake behavior or the polling fallback.
+
+Scope: the interpreter's instruction driver and shared invocation contexts use this
+policy. Existing JIT/AOT native host loops are separate adapters and are not changed
+or claimed to inherit it. Their alignment remains part of the scheduler migration.
+Existing private instruction-boundary VM suspension tests provide useful root and
+ownership evidence; they do not implement compiler-independent async/await suspension.
+
+Next: unify the completion/dispatch ownership contract across execution adapters,
+resolve await-site versus producer destination, then design the saved-activation
+boundary. Keep TaskQueue as a documented transitional adapter until consumers and
+backend validation can move together; do not rename it and imply scheduler migration
+is finished. Runtime suspension follows that contract work.
+
+
+Focused validation on macOS ARM64: 11 scheduler cases, one dispatch-ownership
+policy case, one real VM contention/cancellation case and three guest timer cases
+pass. The policy checks use fixed instants rather than wall-clock latency thresholds;
+timer integration checks delivery, return-frame preservation and cancellation.
+
+```sh
+cargo test --lib scheduler::tests
+cargo test --lib invocation::tests::dispatch_wait
+cargo test --lib vm::suspension_tests::contending_dispatch_context
+cargo test --test timers
+```
+
+An isolated `CARGO_TARGET_DIR=target/scheduler-wait-validation` avoided the editor's
+concurrent full-check lock. These checks do not claim native-host parity or a timing
+benchmark. No public API reference snapshot changes are required for this private
+interpreter implementation.

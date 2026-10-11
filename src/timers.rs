@@ -80,6 +80,11 @@ impl Timers {
         self.entries.remove(&id).map(|timer| timer.callback)
     }
 
+    /// Scheduling hint only: observing a deadline never consumes an operation.
+    pub(crate) fn next_deadline(&self) -> Option<Instant> {
+        self.entries.values().map(|timer| timer.deadline).min()
+    }
+
     pub(crate) fn pending(&self) -> bool {
         !self.entries.is_empty()
     }

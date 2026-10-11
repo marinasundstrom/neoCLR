@@ -48,6 +48,14 @@ impl Dispatch {
             .publish(heap, roots)
     }
 
+    fn wait_timeout(&self, context: &Arc<()>, now: std::time::Instant) -> std::time::Duration {
+        let can_dispatch = self
+            .owner
+            .upgrade()
+            .is_none_or(|owner| Arc::ptr_eq(&owner, context));
+        self.scheduler.wait_timeout(now, can_dispatch)
+    }
+
     pub(crate) fn claim_owner(owner: &mut std::sync::Weak<()>, context: &Arc<()>) -> bool {
         if let Some(owner) = owner.upgrade() {
             return Arc::ptr_eq(&owner, context);
@@ -58,8 +66,20 @@ impl Dispatch {
 }
 
 impl Invocation {
+    pub(crate) fn park_dispatch(&self, context: &Arc<()>) {
+        // Read scheduling state briefly; never hold dispatch or graph access while
+        // parking. The durable wake latch still covers publication before parking.
+        let timeout = self
+            .dispatch
+            .lock()
+            .unwrap()
+            .wait_timeout(context, std::time::Instant::now());
+        self.wake.park(timeout);
+    }
+
+    #[cfg(test)]
     pub(crate) fn park(&self) {
-        self.wake.park(std::time::Duration::from_millis(10));
+        self.wake.park(crate::scheduler::POLL_INTERVAL);
     }
 
     #[cfg(test)]
@@ -99,6 +119,41 @@ impl Invocation {
 mod tests {
     use super::*;
     use crate::{Value, file_streams::Operation};
+
+    #[test]
+    fn dispatch_wait_is_deadline_aware_only_for_the_owning_context() {
+        let invocation = Invocation::new(Limits::default());
+        let owner = Arc::new(());
+        let other = Arc::new(());
+        let now = std::time::Instant::now();
+        let callback = Value::Function(crate::Function {
+            object_view: false,
+            identity: Arc::new(()),
+            ty: crate::assembler::parse_type("fn<Void>").unwrap(),
+            target: crate::assembler::parse_function_ref("Ready()").unwrap(),
+            receiver: None,
+        });
+        let mut dispatch = invocation.dispatch.lock().unwrap();
+        dispatch.scheduler.timers.start(0, callback, now).unwrap();
+        dispatch.owner = Arc::downgrade(&owner);
+        assert_eq!(
+            dispatch.wait_timeout(&owner, now),
+            std::time::Duration::ZERO
+        );
+        assert_eq!(
+            dispatch.wait_timeout(&other, now),
+            crate::scheduler::POLL_INTERVAL
+        );
+        drop(owner);
+        assert_eq!(
+            dispatch.wait_timeout(&other, now),
+            std::time::Duration::ZERO
+        );
+        assert!(
+            dispatch.owner.upgrade().is_none(),
+            "waiting does not claim ownership"
+        );
+    }
 
     #[test]
     fn native_contexts_share_intern_identity_and_quota() {

@@ -14648,3 +14648,15 @@ outside benchmark measurement. Implementation follows the configuration slice.
   benchmark gaps remain follow-ups rather than an open-ended prerequisite.
 - **Next work:** inspect the existing private scheduler and choose the next bounded
   ownership/dispatch slice. Runtime suspension and test parallelism are not yet implemented.
+
+
+### 2026-10-11 — Resuming scheduler implementation
+
+- **Assistant action following the author sequence:** completed separate project
+  documentation (`a85ca35d`) and selected a bounded private scheduler wait-policy slice.
+  It centralizes interpreter host waiting and observes timer deadlines without
+  consuming registrations; contending contexts retain a bounded fallback.
+- **Boundary:** this is not a TaskQueue-to-public-Scheduler rename, native-host parity
+  claim or compiler-independent async suspension. Existing private instruction-step
+  suspension support is distinguished from that future async model. Cross-mode
+  dispatch ownership and await-site affinity remain next design work.
