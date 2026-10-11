@@ -1,0 +1,224 @@
+module RuntimeAsyncGenerator
+
+import System.*
+import System.Collections.*
+import System.Tasks.*
+
+class Counters {
+    var Starts = 0
+    var Yields = 0
+    var Resumes = 0
+    var Disposals = 0
+}
+
+class Lifetime : Disposable {
+    private val counters: Counters
+    init(counters: Counters) { self.counters = counters }
+    func Dispose() { counters.Disposals = counters.Disposals + 1 }
+}
+
+class Stream : AsyncIterable<int> {
+    private val gate: Task<int>
+    private val counters: Counters
+    init(gate: Task<int>, counters: Counters) { self.gate = gate; self.counters = counters }
+    func GetAsyncIterator() -> AsyncIterator<int> => Cursor(gate, counters)
+}
+
+// Experimental source-local producer protocol, not a public runtime API.
+// One pending MoveNext owns the next-item promise. Yield owns the resume promise.
+class Cursor : AsyncIterator<int> {
+    private val gate: Task<int>
+    private val counters: Counters
+    private val done = Promise<()>()
+    private var next = Promise<bool>()
+    private var resume = Promise<bool>()
+    private var body = Task.CompletedTask
+    private var started = false
+    private var ended = false
+    private var moving = false
+    private var disposing = false
+    private var current = 0
+
+    init(gate: Task<int>, counters: Counters) { self.gate = gate; self.counters = counters }
+
+    func MoveNextAsync() -> Task<bool> {
+        if ended || disposing { return Task.FromResult(false) }
+        if moving { System.Fail("Overlapping generator advancement") }
+        moving = true
+        next = Promise<bool>()
+        if !started {
+            started = true
+            body = Produce(self, gate, counters)
+            // Deliberate producer-outcome adapter, including cancellation.
+            body.OnCompleted(Finish)
+        } else {
+            if !resume.Complete(true) { System.Fail("Generator has no suspended yield") }
+        }
+        return next.Task
+    }
+
+    val Current: int {
+        get {
+            if !started || moving || ended || disposing { System.Fail("Generator has no current item") }
+            return current
+        }
+    }
+
+    func Yield(value: int) -> Task<bool> {
+        if !moving || disposing { System.Fail("Generator yielded without demand") }
+        current = value
+        resume = Promise<bool>()
+        moving = false
+        counters.Yields = counters.Yields + 1
+        if !next.Complete(true) { System.Fail("Generator delivered an item twice") }
+        return resume.Task
+    }
+
+    func DisposeAsync() -> Task<()> {
+        if moving { System.Fail("Cannot dispose during generator advancement") }
+        if disposing { return done.Task }
+        disposing = true
+        if !started {
+            ended = true
+            _ = done.Complete(())
+        } else if !ended {
+            // Resume with a stop request, so the producer exits through its scopes.
+            if !resume.Complete(false) { System.Fail("Generator has no yield to dispose") }
+        }
+        return done.Task
+    }
+
+    private func Finish() -> System.Void {
+        ended = true
+        moving = false
+        if body.IsCancelled {
+            _ = next.Cancel()
+            _ = done.Cancel()
+        } else {
+            _ = next.Complete(false)
+            _ = done.Complete(())
+        }
+    }
+}
+
+async func Produce(cursor: Cursor, gate: Task<int>, counters: Counters) -> Task<()> {
+    use lifetime = Lifetime(counters)
+    counters.Starts = counters.Starts + 1
+    let value = await gate
+    if !await cursor.Yield(value) { return }
+    counters.Resumes = counters.Resumes + 1
+    if !await cursor.Yield(value + 1) { return }
+    counters.Resumes = counters.Resumes + 1
+}
+
+async func Read(stream: AsyncIterable<int>, stop: bool) -> Task<int> {
+    var sum = 0
+    await for value in stream {
+        System.Runtime.GC.Collect()
+        sum = sum + value
+        if stop { break }
+    }
+    return sum
+}
+
+class Observer {
+    private val task: Task<int>
+    val Done = Promise<bool>()
+    init(task: Task<int>) { self.task = task }
+    // Observe producer/consumer cancellation without cancelling the test runner.
+    func Complete() -> System.Void { _ = Done.Complete(task.IsCancelled) }
+}
+
+async func CheckDemand() -> Task<()> {
+    let gate = Promise<int>()
+    let counters = Counters()
+    let stream = Stream(gate.Task, counters)
+    let iterator = stream.GetAsyncIterator()
+    if counters.Starts != 0 { System.Fail("Generator started before first advancement") }
+    let first = iterator.MoveNextAsync()
+    if first.IsCompleted || counters.Starts != 1 { System.Fail("Generator did not await its input") }
+    _ = gate.Complete(7)
+    if !await first || iterator.Current != 7 || counters.Resumes != 0 { System.Fail("First yield failed") }
+    System.Runtime.GC.Collect()
+    if counters.Yields != 1 || counters.Disposals != 0 { System.Fail("Yield did not retain the producer") }
+    if !await iterator.MoveNextAsync() || iterator.Current != 8 || counters.Resumes != 1 { System.Fail("Second yield failed") }
+    if await iterator.MoveNextAsync() { System.Fail("Generator failed to end") }
+    await iterator.DisposeAsync()
+    if counters.Disposals != 1 || counters.Resumes != 2 { System.Fail("Generator completion lost cleanup") }
+    if await iterator.MoveNextAsync() { System.Fail("Completed generator restarted") }
+}
+
+async func CheckConsumer(stop: bool) -> Task<()> {
+    let gate = Promise<int>()
+    let counters = Counters()
+    let stream = Stream(gate.Task, counters)
+    let result = Read(stream, stop)
+    _ = gate.Complete(7)
+    let sum = await result
+    var expected = 15
+    var resumes = 2
+    var yields = 2
+    if stop { expected = 7; resumes = 0; yields = 1 }
+    if sum != expected || counters.Resumes != resumes || counters.Yields != yields || counters.Disposals != 1 {
+        System.Fail("Consumer failed to stop or complete the producer")
+    }
+}
+
+async func CheckCancellation() -> Task<()> {
+    let gate = Promise<int>()
+    let counters = Counters()
+    let result = Read(Stream(gate.Task, counters), false)
+    let observer = Observer(result)
+    result.OnCompleted(observer.Complete)
+    _ = gate.Cancel()
+    if !await observer.Done.Task || counters.Disposals != 1 || counters.Yields != 0 {
+        System.Fail("Cancelled producer did not clean up")
+    }
+}
+
+async func CheckUnstarted() -> Task<()> {
+    let gate = Promise<int>()
+    let counters = Counters()
+    let iterator = Stream(gate.Task, counters).GetAsyncIterator()
+    await iterator.DisposeAsync()
+    if await iterator.MoveNextAsync() || counters.Starts != 0 || counters.Disposals != 0 {
+        System.Fail("Disposing an unstarted generator ran its body")
+    }
+}
+
+async func CheckIndependent() -> Task<()> {
+    let gate = Promise<int>()
+    let counters = Counters()
+    let stream = Stream(gate.Task, counters)
+    let first = stream.GetAsyncIterator()
+    let second = stream.GetAsyncIterator()
+    let firstPending = first.MoveNextAsync()
+    let secondPending = second.MoveNextAsync()
+    _ = gate.Complete(7)
+    if !await firstPending || !await secondPending || counters.Starts != 2 {
+        System.Fail("Iterable did not create independent producers")
+    }
+    if !await first.MoveNextAsync() || first.Current != 8 || second.Current != 7 {
+        System.Fail("Advancing one iterator changed another")
+    }
+    await first.DisposeAsync()
+    System.Runtime.GC.Collect()
+    if counters.Disposals != 1 || !await second.MoveNextAsync() || second.Current != 8 {
+        System.Fail("Disposing one iterator released another")
+    }
+    await second.DisposeAsync()
+    if counters.Disposals != 2 { System.Fail("Independent producers did not both clean up") }
+}
+
+async func Main() -> Task<int> {
+    await CheckDemand()
+    await CheckUnstarted()
+    await CheckIndependent()
+    for index in 1..8 {
+        await CheckConsumer(false)
+        await CheckConsumer(true)
+        await CheckCancellation()
+    }
+    Console.WriteLine("PASS demand driven async generator prototype")
+    return 0
+}

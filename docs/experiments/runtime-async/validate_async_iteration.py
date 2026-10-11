@@ -23,6 +23,7 @@ def main():
     scenarios = parser.add_mutually_exclusive_group()
     scenarios.add_argument('--await-for', action='store_true', help='Qualify retained-body await-for consumption')
     scenarios.add_argument('--synchronous-for', action='store_true', help='Recheck existing retained-body synchronous iteration')
+    scenarios.add_argument('--generator', action='store_true', help='Qualify the source-local yield/resume prototype')
     parser.add_argument('--compiler', type=Path, help='Compiler to qualify instead of the recipe compiler')
     args = parser.parse_args()
     recipe = json.loads(args.recipe.read_text())
@@ -79,7 +80,9 @@ def main():
             samples = [('await-for', 'RuntimeAwaitFor.rvn', 'PASS await for async lifetime')]
         if args.synchronous_for:
             samples = [('for', 'RuntimeForAwait.rvn', 'PASS await in for state and lifetime')]
-        for lowering in (('runtime',) if args.await_for or args.synchronous_for else ('state-machine', 'runtime')):
+        if args.generator:
+            samples = [('generator', 'RuntimeAsyncGenerator.rvn', 'PASS demand driven async generator prototype')]
+        for lowering in (('runtime',) if args.await_for or args.synchronous_for or args.generator else ('state-machine', 'runtime')):
             for name, filename, expected in samples:
                 label = lowering + '-' + name
                 assembly, obj, app = [out / (label + suffix) for suffix in ('.dll', '.o', '')]

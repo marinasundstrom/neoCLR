@@ -8,6 +8,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-11
 
+- Add a source-local async-generator prototype using managed iteration contracts
+  and retained runtime bodies. Qualify lazy start, demand-driven yield/resume,
+  independent iterators, early stop, cancellation and GC during live iteration in
+  interpreter/JIT/AOT. This is not native Raven `yield` synthesis; abandoned suspended
+  producer collection and performance comparisons remain open.
+
 - Enable native retained-body `await for` through the explicit async-iteration
   ownership contract. Qualify pending cleanup, early/labelled exits, cancellation,
   nested iterators, mixed `use` resources and GC in interpreter/JIT/AOT; retain

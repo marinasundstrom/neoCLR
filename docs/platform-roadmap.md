@@ -2,7 +2,9 @@
 
 **Async iteration implementation (2026-10-11):** author-directed sequencing is the
 managed AsyncIterable/AsyncIterator contract and await-for consumption, followed by
-generator yield/resume. The interface and retained-body await-for slices pass all three local execution modes;
+generator yield/resume. The interface and retained-body await-for slices pass all three local execution modes.
+A source-local yield/resume producer prototype also passes them; native Raven `yield`
+synthesis and abandoned-generator collection remain open. See
 [scope, evidence and remaining work](experiments/runtime-async/async-generators.md).
 
 **Compiler lines (2026-10-11):** the author directs keeping Raven main and the

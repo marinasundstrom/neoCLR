@@ -15276,3 +15276,9 @@ or runtime-await default switch was performed.
   checks, including nested/mixed cleanup, cancellation and labelled exits. The label
   bug was fixed on Raven main before being carried. Native state-machine cleanup
   remains open; this is not yet generator production or a default-mode change.
+
+- Next slice: assistant implemented a source-local yield/resume producer prototype
+  using AsyncIterable/AsyncIterator, runtime-retained bodies and demand/stop promises.
+  Native Raven `yield` syntax is not yet connected to it. Explicit disposal and live
+  GC checks are qualified; abandoned suspended-producer collection remains open.
+  [Producer design and evidence](experiments/runtime-async/async-generators.md#demand-driven-producer-prototype-2026-10-11).

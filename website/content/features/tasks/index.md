@@ -341,3 +341,7 @@ must not overlap. The managed interfaces are implemented. The explicit retained-
 supports `await for` consumption, including awaited cleanup on early exit and
 cancellation, with interpreter/JIT/AOT qualification on macOS ARM64. The native
 state-machine path and generator `yield` synthesis remain incomplete.
+
+A source-local generator prototype now demonstrates lazy, demand-driven yield/resume
+and early-stop cleanup on these interfaces. Native Raven `yield` syntax and collection
+of abandoned suspended generators remain development work.

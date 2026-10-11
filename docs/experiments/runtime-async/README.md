@@ -1063,3 +1063,13 @@ ordinary `for` with `await`, compares .NET and ECMAScript contracts, and propose
 qualifying a managed pull protocol before retained generator production. API names,
 operation representation and abandoned-generator lifetime remain open; this is an
 investigation, not newly implemented native generator support.
+
+### Async iteration and yield/resume prototype
+
+The managed AsyncIterable/AsyncIterator/AsyncDisposable contract is implemented.
+The explicit retained-body compiler POC consumes it with `await for` and awaited
+lexical cleanup. A source-local producer now tests demand-driven yield/resume,
+early stop, cancellation and independent iterator state in interpreter/JIT/AOT.
+See [contracts, execution evidence and remaining generator work](async-generators.md).
+The prototype does not enable native Raven `yield` syntax or prove abandoned stacks
+collectible. No default-mode switch or performance improvement is claimed.

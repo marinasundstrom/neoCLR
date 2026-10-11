@@ -140,3 +140,45 @@ This is retained-body consumption only. The native generated-state-machine path
 still lacks asynchronous cleanup integration. Generator return-type recognition,
 `yield` synthesis and abandoned-generator lifetime remain open. Windows retained
 runtime support is not established by these results.
+
+## Demand-driven producer prototype (2026-10-11)
+
+[RuntimeAsyncGenerator.rvn](RuntimeAsyncGenerator.rvn) supplies a source-local,
+Int32-specialized producer on the new managed interfaces. Its retained async body
+awaits a `Yield(value)` resume gate. A pending MoveNext owns the next-item promise;
+a yield publishes one item and waits for either another request or a stop request.
+Dispose sends stop and awaits producer completion, so lexical resources leave their
+scopes before disposal completes. An outcome callback transfers cancellation and
+completion to the cursor; it is a deliberate adapter rather than ordinary async
+application control flow.
+
+The producer starts on first advancement. Acquisition alone does not run the body.
+Separate iterators from one iterable have independent producer state. The fixture
+checks a pending external input, two demand-driven yields, no run-ahead at yield,
+normal exhaustion, early break, input cancellation, disposal before starting,
+independent iterators, repeated execution and GC at live yield boundaries.
+[Interpreter/JIT/AOT evidence](async-generator-prototype-validation.json) uses
+retained-body lowering with no application AsyncStateMachine carrier. This is
+functional prototype evidence, not a performance benchmark or a production API.
+
+Comparison with .NET: the pull protocol, lazy iterator body, Current lifetime and
+awaited disposal follow IAsyncEnumerable/IAsyncEnumerator semantics. The prototype
+uses retained runtime bodies and managed Task/Promise handshakes rather than a
+compiler-generated iterator state machine and reusable ValueTask machinery. That
+makes the suspension behavior directly testable with existing runtime hooks, but
+allocates promises per advancement/yield and retains a native stack per active body.
+No speed or memory improvement is claimed.
+
+Remaining work before native Raven `yield` support:
+
+- Recognize selected async iterable return types and lower `yield` into a producer
+  factory/cursor protocol, including generic element types. The source-local helper
+  is not a new language intrinsic or public API.
+- Integrate producer cleanup that itself awaits, plus yield delegation and an
+  explicit acquisition cancellation contract. Do not infer these from the current
+  synchronous producer-resource fixture.
+- Resolve abandoned-yield lifetime: the current runtime roots suspended activations.
+  Explicit disposal is qualified; dropping the last consumer reference while yielded
+  is not yet proven collectible. GC during live iteration is a different guarantee.
+- Qualify native generated-state-machine consumption if it remains a supported
+  comparison path, and Windows retained suspension before claiming those targets.
