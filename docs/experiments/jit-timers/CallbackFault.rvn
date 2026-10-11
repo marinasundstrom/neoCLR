@@ -1,0 +1,20 @@
+import System.*
+import System.Concurrency.*
+import System.Tasks.*
+import System.Time.*
+
+async func Main() -> Task<()> {
+    let result = Promise<()>()
+    let timer = Timer(() => {
+        System.Fail("JIT timer callback fault")
+    })
+    // Teardown must also cancel and unroot work still pending when the callback faults.
+    let abandoned = Timer(() => {
+        System.Fail("Abandoned timer must not run")
+    })
+    abandoned.Start(Duration.FromTicks(600000000L))
+    timer.Start(Duration.FromTicks(10000L))
+    await result.Task
+    timer.Dispose()
+    abandoned.Dispose()
+}

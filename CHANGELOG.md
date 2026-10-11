@@ -12,7 +12,9 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   helpers alive through the existing rooted entry drain; release the task scope and
   default-queue root before heap/code teardown. Qualify integer/unit completion, successive
   awaits, cancellation, pending tasks and callback faults against interpreter/AOT behavior.
-  Timer/socket completion sources, Windows JIT and production integration remain open.
+  Add entry-boundary timer polling with rooted callback delivery and cancellation on
+  teardown. Existing timer behavior and abandoned-timer fault cleanup pass in all three
+  modes. Socket completion sources, Windows JIT and production integration remain open.
 
 - Add bounded repeated invocation to the private scalar JIT probe, retaining one compiled
   code image through successful or faulting synchronous calls. Add a checksum-validated

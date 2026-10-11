@@ -88,3 +88,6 @@ Next: supply a polled timer completion source while retaining code and roots thr
 completion/cancellation, then qualify HTTP client/server socket completions. Those host
 services are still needed before the JIT can run the showcase. Execution defaults remain
 unchanged.
+
+Follow-up: [timer polling and cancellation](../jit-timers/README.md) are now qualified.
+The earlier timer rejection above records this page’s initial slice; socket integration remains next.

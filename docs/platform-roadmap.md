@@ -23,7 +23,8 @@ the [managed JIT probe](experiments/jit-managed/README.md) now runs the real 20-
 Index/Range framework assembly with filtering/fault parity. The
 [async entry follow-up](experiments/jit-async/README.md) qualifies queued completion,
 consecutive awaits, cancellation, pending-task and callback faults in all three modes.
-Timer/socket completions, Windows JIT and production integration remain open. A nine-run local
+[Timer completion/cancellation](experiments/jit-timers/README.md) is also qualified.
+Socket completions, Windows JIT and production integration remain open. A nine-run local
 benchmark records median process times of 2.346s JIT, 2.962s interpreted and 9.00ms
 prebuilt AOT for that same assembly; JIT includes compilation, AOT excludes its build.
 This is test-run evidence, not HTTP throughput. The subsequent

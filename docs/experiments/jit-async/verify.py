@@ -18,6 +18,8 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--bundle', type=Path, required=True)
     parser.add_argument('--console-qualification', type=Path, required=True)
+    parser.add_argument('--case', action='append', help='Run only named cases in the selected profile')
+    parser.add_argument('--timers', action='store_true')
     parser.add_argument('--output', type=Path, required=True)
     args = parser.parse_args()
     out, bundle = args.output.resolve(), args.bundle.resolve()
@@ -44,7 +46,10 @@ def main():
     task_source = str(ROOT / 'docs/experiments/aot-console/task-queue.c')
     if task_source not in host_command:
         host_command += [task_source]
-    report = dict(passed=False, sourceBaseRevision='9e919df4', commands=[], cases=[],
+    socket_source = str(ROOT / 'docs/experiments/aot-console/socket-listener.c')
+    if socket_source not in host_command:
+        host_command += [socket_source]
+    report = dict(passed=False, sourceBaseRevision=subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=ROOT, text=True).strip(), commands=[], cases=[],
                   inputs={str(p):sha(p) for p in [jit, runtime, compiler, seed, *refs,
                           lib / 'Core.dll', lib / 'ownership.json', HERE / 'verify.py', ROOT / 'docs/experiments/jit-managed/host.c']})
 
@@ -68,6 +73,19 @@ def main():
         ('pending', bootstrap/'native-async-entry-pending.rvn', [], 1, '', 'Task is still pending'),
         ('callback-fault', HERE/'CallbackFault.rvn', [], 1, '', 'JIT callback fault'),
     ]
+    if args.timers:
+        names = ['one shot', 'stop', 'disposal', 'repeat and stop inside callback',
+                 'reschedule inside callback', 'async repeat waits for completion',
+                 'async restart does not overlap', 'disposal allows async callback to finish',
+                 'cancelled callback stops repeating', 'pending callback cancellation stops repeating']
+        cases = [('timers', ROOT/'docs/experiments/timers/Main.rvn', [], 0,
+                  ''.join('PASS '+name+'\n' for name in names), None),
+                 ('timer-fault', ROOT/'docs/experiments/jit-timers/CallbackFault.rvn', [], 1, '', 'JIT timer callback fault')]
+    if args.case:
+        known = {case[0] for case in cases}
+        if set(args.case) - known:
+            raise ValueError('Unknown case for selected profile')
+        cases = [case for case in cases if case[0] in args.case]
     try:
         result = run(host_command)
         if result.returncode:
@@ -83,6 +101,8 @@ def main():
             native = [str(assembly) if p == old_input else str(obj) if p == old_host else p for p in native_base]
             if '--bind-task-queue' not in native:
                 native += ['--bind-task-queue']
+            if args.timers:
+                native += ['--bind-timers']
             result = run([jit, *native])
             if result.returncode:
                 raise RuntimeError(name+' AOT failed: '+result.stderr)
@@ -122,7 +142,7 @@ def main():
             report['cases'].append(dict(name=name, sourceSha256=sha(source), assemblySha256=sha(assembly), objectSha256=sha(obj), executableSha256=sha(exe), outcomes=outcomes))
             print('PASS '+name+' in interpreter/AOT/JIT', flush=True)
         report['rejectedBindings'] = []
-        for flag in ['--bind-timers', '--bind-socket-listener']:
+        for flag in ['--bind-socket-listener']:
             result = run([*jit_command, flag])
             if result.returncode != 1 or result.stdout or 'JIT_RESULT ' in result.stderr or 'console/task compilation' not in result.stderr:
                 raise RuntimeError('Unsupported binding was not rejected: '+flag)

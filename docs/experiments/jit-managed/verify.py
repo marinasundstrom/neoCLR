@@ -40,7 +40,7 @@ def main():
         if item == str(build / 'app.pending'):
             item = str(host)
         command.append(item)
-    command += [str(ROOT / 'docs/experiments/aot-console/task-queue.c'), '-dynamiclib']
+    command += [str(ROOT / 'docs/experiments/aot-console/task-queue.c'), str(ROOT / 'docs/experiments/aot-console/socket-listener.c'), '-dynamiclib']
     result = subprocess.run(command, capture_output=True, text=True, timeout=180)
     (out / 'host-build.log').write_text(result.stdout + result.stderr)
     if result.returncode:
