@@ -273,6 +273,11 @@ pub(super) fn implicit_implementation(input: &neoclr::Module, concrete: &Type, c
             && (target.definition.as_ref().is_some_and(|id| Some(id) == contract.definition.as_ref())
                 || target.definition.is_none() && target.name == contract.name));
         if !maps_contract && member_name(method) != name { continue; }
+        // The first private shape reuses its template's definition name.
+        // Unselected overloads still have an open owner; they are not methods
+        // of the lowered nongeneric shape and cannot be closed with no arguments.
+        if matches!(concrete, Type::Named(_))
+            && matches!(method.owner, Some(Type::Constructed { .. })) { continue; }
         let method = closed_signature(method, arguments)?;
         if method.owner.as_ref() == Some(concrete) && method.instance == contract.instance
             && method.parameters == contract.parameters && method.returns == contract.returns

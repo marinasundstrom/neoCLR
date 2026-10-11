@@ -36,6 +36,17 @@ budgets, array budgets, GC diagnostics and `--show-result` are rejected with JIT
 than ignored. Native execution retains the current host's bounded heap/operation
 limits and has no instruction quota. AOT project builds remain separate.
 
+## Additional library qualification
+
+The macOS development CLI passes all 16 JSON DOM and 12 JSON stream tests in JIT
+and AOT ([evidence](experiments/jit-cli/json-validation.json)), plus eight
+encoding/stream tests in JIT ([evidence](experiments/jit-cli/encoding-validation.json)).
+The JSON run exposed and fixed shared native selection of unselected generic
+collection overloads after specialization. The first private shape reuses its
+source name; selection must distinguish its closed methods from remaining open
+templates. Original metadata verification remains required. This is an internal
+lowering correction, with no Raven API or compiler bridge change.
+
 ## Target status
 
 macOS ARM64 has executable [CLI HTTP evidence](experiments/jit-cli/http-validation.json)

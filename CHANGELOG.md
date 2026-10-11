@@ -8,6 +8,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-11
 
+- Fix shared AOT/JIT interface selection for specialized collection types with
+  unselected generic overloads. Ignore the remaining open template when resolving
+  a lowered nongeneric owner; keep source verification and closed overload checks.
+  A focused regression and all 16 JSON DOM plus 12 JSON stream tests pass in both
+  JIT and AOT on macOS ARM64. Eight encoding/stream tests also pass through JIT.
+
 - Verify existing HTTP extension values with a BREW/418 regression plus unnamed
   471 and 299 status codes. All nine HTTP method/value tests pass through the macOS
   JIT CLI; no public API change or full coffee-pot protocol support is implied.
@@ -17,6 +23,7 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   Raven-required async state machines. Implementation choices remain open; breaking
   experimental contracts are permitted, with interpreter/JIT/AOT validation required.
   Mark the older scheduler design’s suspension deferral as historical sequencing.
+  Produce execution/HTTP benchmarks after advancing main and before schedulers.
 
 - Add explicit development `neoclr run --execution jit|interpreter` selection and
   JIT-only runtime-library test execution, preserving output, entry arguments and

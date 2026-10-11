@@ -796,6 +796,52 @@ ret
     }
 
     #[test]
+    fn specialized_interface_dispatch_ignores_unselected_open_overload() {
+        let input = neoclr::assemble(".module SignatureConformance
+.entry Main
+.interface Readable<T>
+.method instance Read() -> T
+.end
+.end
+.type class Descriptor<T>
+.implements Readable<T>
+.field Value T
+.method instance Read() -> T
+ldarg 0
+ldfld Descriptor<T>::Value
+ret
+.end
+.method instance Read(Int32 unused) -> T
+ldarg 0
+ldfld Descriptor<T>::Value
+ret
+.end
+.end
+.function Main() -> Int32
+.local Descriptor<Int32> descriptor
+ldloca descriptor
+initobj Descriptor<Int32>
+ldc.bool false
+brfalse Done
+ldloc descriptor
+castclass Readable<Int32>
+callvirt instance Readable<Int32>::Read()
+ret
+Done:
+ldc.i4 42
+ret
+.end").unwrap();
+        neoclr::verify(&input).unwrap();
+        let (expanded, _) = expand(&input, "Main").unwrap();
+        let (selected, report) = super::super::selection::select(&expanded, "Main").unwrap();
+        neoclr::verify(&selected).unwrap();
+        assert!(selected.functions.iter().any(|f| f.name == "Descriptor.Read"));
+        assert!(!selected.functions.iter().any(|f| f.name == "Descriptor.Read" && !f.parameters.is_empty()));
+        assert!(report["interfaceDispatch"].as_array().unwrap().iter().all(|r| r["targets"].as_array().unwrap().is_empty()));
+        assert_eq!(neoclr::LoadedProgram::new(&selected).unwrap().run(neoclr::Limits::default()).unwrap().value, neoclr::Value::Int32(42));
+    }
+
+    #[test]
     fn deeply_nested_type_dependencies_fail_without_overflowing_the_host_stack() {
         let mut source = String::from(".module Deep\n.function Main(T0 value) -> Int32\nldc.i4 0\nret\n.end\n");
         for index in 0..140 {

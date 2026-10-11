@@ -47,6 +47,12 @@ See the [changelog](../CHANGELOG.md) and linked design documents for technical s
   suspension as the next sequence. Evaluate stack representation, cancellation,
   cleanup and AOT compatibility before selecting an implementation. A shared runtime
   mechanism should also support future languages.
+- **Author follow-up:** fix the discovered JSON admission failure before moving on.
+  After moving main forward, produce the benchmarks before scheduler/suspension work.
+- **Follow-up outcome:** shared AOT/JIT selection now excludes unspecialized overload
+  templates from a lowered collection owner. A focused compiler regression and
+  28 JSON tests in each native execution mode pass locally;
+  [evidence](experiments/jit-cli/json-validation.json).
 - **Action:** update the [roadmap](platform-roadmap.md). **Open:** scheduler contract,
   suspension representation and implementation; no runtime behavior changed here.
 

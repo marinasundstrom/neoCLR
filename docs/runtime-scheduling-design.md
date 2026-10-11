@@ -1,7 +1,7 @@
 # Runtime scheduling and async suspension
 
 **2026-10-11 sequencing update:** after completing and integrating JIT work, the
-author directs replacing the TaskQueue concept with schedulers, then implementing
+author requires the benchmarks before replacing the TaskQueue concept with schedulers, then implementing
 runtime-managed suspension instead of requiring Raven-generated state machines.
 The earlier “not yet” direction below is historical sequencing, not a prohibition
 on that next milestone. Experimental contracts may break; the public scheduler
