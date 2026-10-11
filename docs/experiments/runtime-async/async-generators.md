@@ -380,3 +380,20 @@ Configuration remains opt-in and source-local, as in the previous checkpoint.
 Generic retained Task methods, value receivers, mutable local captures, abandoned
 suspended-generator reclamation and Windows retained suspension remain open.
 No performance claim or default-mode switch follows from these correctness results.
+
+
+## Abandoned lifetime prerequisite — 2026-10-11
+
+Inspection confirms that native parked stacks and callback handles are unconditional
+roots. The existing interpreter-only conditional-root experiment cannot by itself
+change that. A [native collector equivalent](../aot-console/native-gc.md#conditional-ownervalue-roots--private-experiment-2026-10-11)
+now qualifies independently live owners, dependent graph retention and abandoned-cycle
+reclamation without allocation. Dead entries are cleared before address reuse.
+
+[Sanitized C evidence](native-conditional-roots-validation.json) covers the collector
+and existing host-root contracts. The [three-mode generator regression](conditional-gc-generator-validation.json)
+still passes. These are collector foundation and non-regression results, **not**
+evidence that abandoned generators are collectible. No compiler or provider contract
+changed. Next: attach explicit managed reachability to parked frames/callbacks and
+operation handles, including pending advancement and external completion ownership.
+Do not make all pending tasks weak or execute asynchronous disposal during collection.

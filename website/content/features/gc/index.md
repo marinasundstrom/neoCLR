@@ -73,3 +73,10 @@ mark worklist avoids repeated heap traversal passes. Local measurements improve 
 graph but show no material routing speedup. General host handles, concurrent
 collection and full HTTP-server qualification remain open.
 [Experimental contract and evidence](https://github.com/marinasundstrom/neoCLR/blob/main/docs/experiments/aot-console/native-gc.md).
+
+
+A private native collector experiment now tests conditional owner/value roots:
+reachable owners retain their dependents, while abandoned cycles can be reclaimed.
+This is groundwork for suspended-operation lifetime support. Generator stacks still
+use strong roots; automatic abandoned-generator reclamation is not implemented.
+[Development contract and evidence](https://github.com/marinasundstrom/neoCLR/blob/main/docs/experiments/aot-console/native-gc.md#conditional-ownervalue-roots--private-experiment-2026-10-11).

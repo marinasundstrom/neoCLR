@@ -1685,3 +1685,15 @@ relevant. Managed code describes the program/semantic model; it does not restric
 execution to the interpreter. Current runtime-async evidence is interpreter-only,
 so JIT/AOT support remains implementation and qualification work within this priority,
 not deferred alongside foreign-platform ABI design.
+
+
+### Native conditional-root parity checkpoint — 2026-10-11
+
+The native collector now has the corresponding private, bounded owner/value primitive.
+It reaches a marking fixed point and clears dead entries before address reuse, with
+sanitized lifecycle and invalid-provenance coverage. It remains caller-supplied per
+collection; no persistent scheduler or generator ownership policy has changed.
+See [contract, costs and evidence](experiments/aot-console/native-gc.md#conditional-ownervalue-roots--private-experiment-2026-10-11).
+This retains the provisional preference for managed callback storage. The immediate
+generator gap is connecting native parked stack roots and operation bookkeeping to
+managed reachability at every collection boundary.

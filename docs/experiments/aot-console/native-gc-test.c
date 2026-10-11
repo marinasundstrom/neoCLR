@@ -5,6 +5,106 @@ static void *allocate(neoclr_aot_context *c, uint64_t bytes, uint32_t kind) {
     void *p = NULL;
     return neoclr_gc_allocate_v1(&c->text, bytes, kind, &p) ? NULL : p;
 }
+static int conditional_roots(void) {
+    uint64_t storage[256] = {0}, foreign_storage[32] = {0};
+    neoclr_aot_context c = {.text = {(unsigned char *)storage, sizeof(storage), 0}};
+    neoclr_aot_context foreign = {.text = {(unsigned char *)foreign_storage, sizeof(foreign_storage), 0}};
+    uint64_t *owner = allocate(&c, 16, NEOCLR_GC_OBJECT);
+    uint64_t *value = allocate(&c, 24, NEOCLR_GC_OBJECT);
+    CHECK(owner && value);
+    value[1] = (uintptr_t)owner; value[2] = 42;
+    neoclr_gc_conditional_root edge = {owner, value, -1};
+    void *root = owner;
+    neoclr_probe_storage slot = {&root, 8, 0};
+    neoclr_probe_frame frame = {.context = &c, .storage = &slot, .storage_count = 1};
+    CHECK(!neoclr_gc_collect_conditional_v1(&c, &frame, &edge, 1));
+    CHECK(edge.retained && value[2] == 42);
+    root = NULL;
+    CHECK(!neoclr_gc_collect_conditional_v1(&c, &frame, &edge, 1));
+    CHECK(!edge.retained && !edge.owner && !edge.value && !c.text.used);
+    /* Cleared entries cannot accidentally retain a reused allocation address. */
+    CHECK(allocate(&c, 16, NEOCLR_GC_OBJECT) == owner);
+    CHECK(!neoclr_gc_collect_conditional_v1(&c, NULL, &edge, 1) && !c.text.used);
+
+    uint64_t *a = allocate(&c, 16, NEOCLR_GC_OBJECT);
+    uint64_t *b = allocate(&c, 16, NEOCLR_GC_OBJECT);
+    uint64_t *d = allocate(&c, 24, NEOCLR_GC_OBJECT);
+    CHECK(a && b && d);
+    d[1] = (uintptr_t)a; d[2] = 63;
+    neoclr_gc_conditional_root chain[] = {{b, d, -1}, {a, b, -1}};
+    root = a;
+    CHECK(!neoclr_gc_collect_conditional_v1(&c, &frame, chain, 2));
+    CHECK(chain[0].retained && chain[1].retained && d[2] == 63);
+    /* Independently rooted callback keeps its owner and downstream graph live. */
+    root = d;
+    CHECK(!neoclr_gc_collect_conditional_v1(&c, &frame, chain, 2));
+    CHECK(chain[0].retained && chain[1].retained);
+    root = NULL;
+    CHECK(!neoclr_gc_collect_conditional_v1(&c, &frame, chain, 2));
+    CHECK(!chain[0].retained && !chain[1].retained && !c.text.used);
+
+    a = allocate(&c, 16, NEOCLR_GC_OBJECT);
+    b = allocate(&c, 16, NEOCLR_GC_OBJECT);
+    CHECK(a && b);
+    chain[0] = (neoclr_gc_conditional_root){a, b, -1};
+    chain[1] = (neoclr_gc_conditional_root){b, a, -1};
+    CHECK(!neoclr_gc_collect_conditional_v1(&c, NULL, chain, 2) && !c.text.used);
+    CHECK(!chain[0].owner && !chain[1].owner);
+
+    /* Several dependents share a key, but a rooted value does not by itself
+     * retain that key when there is no managed back reference. */
+    a = allocate(&c, 16, NEOCLR_GC_OBJECT);
+    b = allocate(&c, 16, NEOCLR_GC_OBJECT);
+    d = allocate(&c, 16, NEOCLR_GC_OBJECT);
+    CHECK(a && b && d);
+    b[1] = 17; d[1] = 19;
+    chain[0] = (neoclr_gc_conditional_root){a, b, -1};
+    chain[1] = (neoclr_gc_conditional_root){a, d, -1};
+    root = a;
+    CHECK(!neoclr_gc_collect_conditional_v1(&c, &frame, chain, 2));
+    CHECK(chain[0].retained && chain[1].retained && b[1] == 17 && d[1] == 19);
+    root = b;
+    CHECK(!neoclr_gc_collect_conditional_v1(&c, &frame, chain, 2));
+    CHECK(!chain[0].retained && !chain[1].retained && b[1] == 17);
+    root = NULL;
+    CHECK(!neoclr_gc_collect_conditional_v1(&c, NULL, chain, 2) && !c.text.used);
+
+    /* A failure discovered while tracing a dependent must not publish results. */
+    a = allocate(&c, 16, NEOCLR_GC_OBJECT);
+    b = allocate(&c, 8, NEOCLR_GC_STRINGS);
+    CHECK(a && b);
+    edge = (neoclr_gc_conditional_root){a, b, -1};
+    root = a;
+    uint64_t collections = neoclr_gc_statistics_v1().collections;
+    CHECK(neoclr_gc_collect_conditional_v1(&c, &frame, &edge, 1) == 3);
+    CHECK(edge.owner == a && edge.value == b && edge.retained == -1 &&
+        neoclr_gc_statistics_v1().collections == collections);
+    root = NULL;
+    CHECK(!neoclr_gc_collect_conditional_v1(&c, NULL, &edge, 1) && !c.text.used);
+
+    a = allocate(&c, 16, NEOCLR_GC_OBJECT);
+    void *alien = allocate(&foreign, 16, NEOCLR_GC_OBJECT);
+    CHECK(a && alien);
+    neoclr_gc_conditional_root invalid[] = {
+        {alien, a, -1}, {a, alien, -1}, {(char *)a + 1, a, -1}, {NULL, a, -1}
+    };
+    uint64_t before = c.text.used;
+    for (unsigned i = 0; i < sizeof(invalid) / sizeof(invalid[0]); i++) {
+        neoclr_gc_conditional_root saved = invalid[i];
+        CHECK(neoclr_gc_collect_conditional_v1(&c, NULL, &invalid[i], 1) == 3);
+        CHECK(invalid[i].owner == saved.owner && invalid[i].value == saved.value &&
+            invalid[i].retained == -1 && c.text.used == before);
+    }
+    CHECK(neoclr_gc_collect_conditional_v1(&c, NULL, NULL, 1) == 3);
+    CHECK(neoclr_gc_collect_conditional_v1(&c, NULL, &edge, NEOCLR_GC_HOST_ROOT_LIMIT + 1) == 3);
+    edge = (neoclr_gc_conditional_root){a, NULL, -1};
+    root = a;
+    CHECK(!neoclr_gc_collect_conditional_v1(&c, &frame, &edge, 1) && edge.retained);
+    root = NULL;
+    CHECK(!neoclr_gc_collect_conditional_v1(&c, NULL, &edge, 1) && !edge.retained && !c.text.used);
+    CHECK(!neoclr_gc_collect_v1(&foreign, NULL) && !foreign.text.used);
+    return 0;
+}
 int main(void) {
     uint64_t buffer[129];
     buffer[128] = UINT64_C(0x1122334455667788);
@@ -128,5 +228,7 @@ int main(void) {
     CHECK(!neoclr_gc_collect_v1(&c, NULL) && !c.text.used);
     CHECK(!neoclr_gc_entry_check_v1(&c));
     CHECK(buffer[128] == UINT64_C(0x1122334455667788));
+    int conditional_status = conditional_roots();
+    if (conditional_status) return conditional_status;
     return 0;
 }

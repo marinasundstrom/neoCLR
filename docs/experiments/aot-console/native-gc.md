@@ -269,3 +269,51 @@ index would add cost without solving the same problem. Shared root/lifetime inva
 and the HTTP workload remain cross-cutting; no interpreter speedup is claimed.
 The existing .NET/Boehm comparison above remains applicable: neither this lookup change
 nor conservative tracing substitutes for precise descriptors or a GC scheduling policy.
+
+
+## Conditional owner/value roots — private experiment, 2026-10-11
+
+`neoclr_gc_collect_conditional_v1(context, frames, entries, count)` adds a bounded
+collector primitive alongside ordinary collection. Each borrowed entry contains a
+live allocation-base `owner`, a null/live allocation-base `value`, and an output
+`retained` flag. A completely null entry is an inert tombstone. Foreign/interior
+pointers, values without owners, null arrays with nonzero counts and counts above
+256 reject before marking. The array is native caller-owned storage, must remain
+valid, and must not be mutated or placed in reclaimable guest storage during the call.
+
+Only independently marked owners activate their values. Ordinary tracing and
+conditional activation repeat to a fixed point, so entry order does not affect
+liveness and mutually dependent abandoned entries do not resurrect each other.
+On successful collection, dead entries are cleared before sweeping; this prevents
+later allocation-address reuse from accidentally reviving an old association.
+Failure leaves entries/results and collection statistics unchanged. Existing
+unconditional host handles, active frames, parked frames and fault roots retain
+their current behavior.
+
+This matches the dependent-lifetime principle of the .NET ConditionalWeakTable
+comparison in the [scheduler design](../../runtime-scheduling-design.md#conditional-continuation-roots--collector-experiment-2026-10-11).
+It does not claim that .NET Task uses that table. Ordinary managed ownership remains
+preferable when it expresses the graph directly. Native retained stacks additionally
+need precise reachability relationships to the managed operation.
+
+This primitive does not persist/register entries: a caller must supply them at every
+relevant collection. It is not wired into generators or scheduler policy. Generator
+stacks/callbacks remain unconditional roots. Integration must account for live iterators,
+outstanding advancement tasks, runnable callbacks and externally owned pending I/O;
+then detach dead parked roots, native stack storage and operation handles without
+running managed cleanup from GC. Explicit asynchronous disposal remains the mechanism
+for deterministic cleanup.
+
+Cost: at most 256 borrowed edges are rescanned after each marking wave, with no
+additional heap allocation. Worst-case dependency chains can require many waves.
+No performance improvement or production policy is claimed.
+
+Validation: [sanitized collector/host-root contracts](../runtime-async/native-conditional-roots-validation.json)
+cover owner retention, value-to-owner cycles, reverse-order chains, shared owners,
+independently rooted values, dead-entry address reuse, null values, foreign/interior
+references and failure after tracing a malformed dependent. The existing Windows
+host validation already compiles this shared collector contract; no Windows execution
+is claimed for this revision. The [generator regression](../runtime-async/conditional-gc-generator-validation.json)
+passes interpreter, macOS ARM64 JIT and AOT using ordinary strong roots.
+Reproduce the focused C checks with `runtime-async/validate_conditional_roots.py`
+and a passing async-iteration host recipe.

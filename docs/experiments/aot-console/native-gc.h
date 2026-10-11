@@ -37,6 +37,20 @@ int32_t neoclr_gc_allocate_v1(neoclr_aot_text_arena *arena, uint64_t bytes,
  * frames. Root addresses are observed, never rewritten. No reentry/concurrency
  * on this context. Service temporaries must not be live at a collection boundary. */
 int32_t neoclr_gc_collect_v1(neoclr_aot_context *context, const neoclr_probe_frame *head);
+/* Private collector experiment, not a registration or stable host ABI.
+ * Entries retain value only when owner is independently marked. Both pointers
+ * must be null, or owner must be a live allocation base and value null/live in
+ * this context. Values may point back to owners without keeping a cycle alive.
+ * Up to NEOCLR_GC_HOST_ROOT_LIMIT entries; graph/array mutation and reentry are
+ * forbidden throughout collection. On success, dead entries are cleared before
+ * their allocations are reclaimed; retained is the result of this collection.
+ * On failure entries are unchanged. Ordinary strong/parked roots still apply. */
+typedef struct {
+    void *owner, *value;
+    int32_t retained;
+} neoclr_gc_conditional_root;
+int32_t neoclr_gc_collect_conditional_v1(neoclr_aot_context *,
+    const neoclr_probe_frame *, neoclr_gc_conditional_root *, uint32_t);
 /* Thread-local cumulative diagnostics across contexts/entries, not heap state. */
 neoclr_gc_statistics neoclr_gc_statistics_v1(void);
 /* Per-entry strong String pool: 4096 entries / 1 MiB UTF-8 payload, matching

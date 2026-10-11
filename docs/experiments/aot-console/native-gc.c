@@ -209,8 +209,18 @@ static void mark_slots(neoclr_aot_text_arena *a, const block_index *index, const
     }
 }
 int32_t neoclr_gc_collect_v1(neoclr_aot_context *context, const neoclr_probe_frame *head) {
+    return neoclr_gc_collect_conditional_v1(context, head, NULL, 0);
+}
+int32_t neoclr_gc_collect_conditional_v1(neoclr_aot_context *context,
+    const neoclr_probe_frame *head, neoclr_gc_conditional_root *conditional, uint32_t conditional_count) {
     if (!context || !blocks_valid(&context->text)) return NEOCLR_AOT_FAULT_RUNTIME_ERROR;
     neoclr_aot_text_arena *a = &context->text;
+    if (conditional_count > NEOCLR_GC_HOST_ROOT_LIMIT || (conditional_count && !conditional))
+        return NEOCLR_AOT_FAULT_RUNTIME_ERROR;
+    for (uint32_t i = 0; i < conditional_count; i++)
+        if ((!conditional[i].owner && conditional[i].value) ||
+            !live_base(a, conditional[i].owner) || !live_base(a, conditional[i].value))
+            return NEOCLR_AOT_FAULT_RUNTIME_ERROR;
     for (host_root *root = host_head; root; root = root->next)
         if (root->context == context && !live_base(a, root->value)) return NEOCLR_AOT_FAULT_RUNTIME_ERROR;
     neoclr_probe_storage fault[65];
@@ -246,47 +256,63 @@ int32_t neoclr_gc_collect_v1(neoclr_aot_context *context, const neoclr_probe_fra
     }
     /* Each newly marked allocation enters the intrusive worklist exactly once.
      * The sparse index bounds address searches to a bucket plus its crossing block. */
-    while (pending) {
-        block *b = pending;
-        pending = (block *)(uintptr_t)(b->state & ~UINT64_C(7));
-        b->state = ALLOCATED | MARKED | SCANNED;
-        const unsigned char *data = (const void *)(b + 1);
-        if (b->kind == NEOCLR_GC_INTERN) {
-            if (b->bytes != 8) goto invalid_descriptor;
-            uint64_t owner; memcpy(&owner, data, 8);
-            mark(a, &index, owner, &pending);
-        } else if (b->kind == NEOCLR_GC_OBJECT) {
-            for (uint64_t offset = 8; offset + 8 <= b->bytes; offset += 8) {
-                uint64_t word; memcpy(&word, data + offset, 8); mark(a, &index, word, &pending);
-            }
-        } else if (b->kind == NEOCLR_GC_RECORDS) {
-            uint64_t kind, length, lanes;
-            if (b->bytes < 24) goto invalid_descriptor;
-            memcpy(&kind, data, 8); memcpy(&length, data + 8, 8); memcpy(&lanes, data + 16, 8);
-            if ((kind & UINT64_C(0xffffffff)) != UINT64_C(0x80000005) ||
-                (kind >> 32) > 512 || ((kind >> 32) && lanes != 1) || !lanes || lanes > 64 ||
-                length > 65536 || length > (b->bytes - 24) / (lanes * 8 + 1)) goto invalid_descriptor;
-            uint64_t markers = 24 + length * lanes * 8;
-            for (uint64_t i = 0; i < length; i++) {
-                if (!data[markers + i]) continue;
-                for (uint64_t lane = 0; lane < lanes; lane++) {
-                    uint64_t word; memcpy(&word, data + 24 + (i * lanes + lane) * 8, 8);
-                    mark(a, &index, word, &pending);
+    for (;;) {
+        while (pending) {
+            block *b = pending;
+            pending = (block *)(uintptr_t)(b->state & ~UINT64_C(7));
+            b->state = ALLOCATED | MARKED | SCANNED;
+            const unsigned char *data = (const void *)(b + 1);
+            if (b->kind == NEOCLR_GC_INTERN) {
+                if (b->bytes != 8) goto invalid_descriptor;
+                uint64_t owner; memcpy(&owner, data, 8);
+                mark(a, &index, owner, &pending);
+            } else if (b->kind == NEOCLR_GC_OBJECT) {
+                for (uint64_t offset = 8; offset + 8 <= b->bytes; offset += 8) {
+                    uint64_t word; memcpy(&word, data + offset, 8); mark(a, &index, word, &pending);
+                }
+            } else if (b->kind == NEOCLR_GC_RECORDS) {
+                uint64_t kind, length, lanes;
+                if (b->bytes < 24) goto invalid_descriptor;
+                memcpy(&kind, data, 8); memcpy(&length, data + 8, 8); memcpy(&lanes, data + 16, 8);
+                if ((kind & UINT64_C(0xffffffff)) != UINT64_C(0x80000005) ||
+                    (kind >> 32) > 512 || ((kind >> 32) && lanes != 1) || !lanes || lanes > 64 ||
+                    length > 65536 || length > (b->bytes - 24) / (lanes * 8 + 1)) goto invalid_descriptor;
+                uint64_t markers = 24 + length * lanes * 8;
+                for (uint64_t i = 0; i < length; i++) {
+                    if (!data[markers + i]) continue;
+                    for (uint64_t lane = 0; lane < lanes; lane++) {
+                        uint64_t word; memcpy(&word, data + 24 + (i * lanes + lane) * 8, 8);
+                        mark(a, &index, word, &pending);
+                    }
+                }
+            } else if (b->kind == NEOCLR_GC_STRINGS) {
+                uint64_t kind, length;
+                if (b->bytes < 16) goto invalid_descriptor;
+                memcpy(&kind, data, 8); memcpy(&length, data + 8, 8);
+                kind &= UINT64_C(0xffffffff);
+                int reserved = kind == UINT64_C(0x80000004);
+                if ((!reserved && kind != UINT64_C(0x80000003)) ||
+                    length > (b->bytes - 16) / (reserved ? 9 : 8)) goto invalid_descriptor;
+                for (uint64_t i = 0; i < length; i++) {
+                    if (reserved && !data[16 + 8 * length + i]) continue;
+                    uint64_t word; memcpy(&word, data + 16 + 8 * i, 8); mark(a, &index, word, &pending);
                 }
             }
-        } else if (b->kind == NEOCLR_GC_STRINGS) {
-            uint64_t kind, length;
-            if (b->bytes < 16) goto invalid_descriptor;
-            memcpy(&kind, data, 8); memcpy(&length, data + 8, 8);
-            kind &= UINT64_C(0xffffffff);
-            int reserved = kind == UINT64_C(0x80000004);
-            if ((!reserved && kind != UINT64_C(0x80000003)) ||
-                length > (b->bytes - 16) / (reserved ? 9 : 8)) goto invalid_descriptor;
-            for (uint64_t i = 0; i < length; i++) {
-                if (reserved && !data[16 + 8 * length + i]) continue;
-                uint64_t word; memcpy(&word, data + 16 + 8 * i, 8); mark(a, &index, word, &pending);
-            }
         }
+        // Values can reveal further owners. Reach a fixed point independent of
+        // entry order; an unrooted cycle never supplies its own first mark.
+        for (uint32_t i = 0; i < conditional_count; i++) {
+            const void *owner = conditional[i].owner;
+            if (owner && (((const block *)owner - 1)->state & MARKED))
+                mark(a, &index, (uintptr_t)conditional[i].value, &pending);
+        }
+        if (!pending) break;
+    }
+    for (uint32_t i = 0; i < conditional_count; i++) {
+        void *owner = conditional[i].owner;
+        conditional[i].retained = owner && (((const block *)owner - 1)->state & MARKED);
+        if (!conditional[i].retained)
+            conditional[i].owner = conditional[i].value = NULL;
     }
     for (uint64_t at = 0; at < a->used;) {
         block *b = (void *)(a->data + at);

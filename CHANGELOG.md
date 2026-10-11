@@ -8,6 +8,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-11
 
+- Add a private native conditional-root collector primitive as a prerequisite for
+  abandoned-generator lifetime work. Preserve independently reachable dependents,
+  collect abandoned owner/value cycles and clear dead entries before address reuse.
+  Sanitized collector/host-root checks and the three-mode generator regression pass.
+  Generator stacks remain strongly rooted; automatic reclamation is not implemented.
+
 - Fill native nested-generic metadata gaps: author nested generic classes, retain
   generic enclosing definitions through imports, native round-trips and reference
   projections, and permit generic lexical owners in assembly/verification. Preserve
