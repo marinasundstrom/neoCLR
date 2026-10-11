@@ -25,6 +25,28 @@ available original wording; other text is a summary.
 
 See the [changelog](../CHANGELOG.md) and linked design documents for technical status.
 
+## 2026-10-11 — Native backend goals, concurrency and JIT iteration
+
+- **Author:** targets Go/modern JavaScript levels of simplicity, productivity and
+  speed, native web/backend services first, familiar C#/.NET ergonomics, and future
+  languages and workloads beyond Raven. Asks to consider allocation/reference
+  alternatives when reviewing Span/Memory-like facilities.
+- **Author:** says concurrency belongs in that goal, including runtime suspension
+  and green threads. Describes improvement over C#/.NET as the intended direction.
+- **Assistant proposal:** evaluate predictable lifetimes, cancellation, scheduling,
+  ownership and debugging; distinguish goals from demonstrated improvements. Keep
+  task completion independent of the eventual suspension/stack mechanism.
+- **Author:** asks whether JIT work should start, then clarifies that interpreter
+  execution makes tests feel slow; expects JIT could approach AOT speed and improve
+  development iteration. Retains a role for the interpreter on some platforms.
+- **Assistant response:** treats edit–test iteration as the concrete motivation;
+  proposes separating compilation, discovery, startup and execution, then comparing
+  interpreter, a bounded JIT prototype and AOT on equivalent tests/HTTP workloads.
+- **Actions:** record [product direction](platform-direction.md#product-direction-clarified-2026-10-11),
+  update roadmap/concurrency scope and add a [JIT evaluation brief](native-execution-investigation.md#jit-for-development-iteration-2026-10-11).
+  **Open:** measurements, whether to begin JIT implementation, memory-view contract,
+  and scheduler/green-thread design. No comparative speed result is claimed.
+
 ## 2026-10-10 — Experimental API compatibility and Index/Range continuation
 
 - **Author:** “Continue towards and through the Index and Range feature”, retaining

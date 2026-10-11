@@ -8,6 +8,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-11
 
+- Record native web/backend product goals, concurrency/suspension/green-thread
+  investigation and a renewed JIT evaluation for development and test iteration.
+  Keep interpreter support and distinguish proposed measurements and designs from
+  implemented behavior; no JIT or comparative performance result is claimed.
+
 - Add Index/Range value contracts, native array from-end reads/writes and half-open
   slicing with independent shallow copies. Convenience access may fault; Array.Get
   returns Option and Array.Slice/Range.TryGetOffsetAndLength return Result for invalid

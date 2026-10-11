@@ -19,6 +19,12 @@ Raven programs use modules to organize code and access libraries for text, colle
 files, Tasks, networking and HTTP. The runtime manages memory and supplies the services
 those libraries need.
 
+The goal is fast native web and backend development with familiar C#/.NET ergonomics,
+competitive with Go and modern JavaScript runtimes in simplicity, productivity and
+speed. Concurrency is central to that direction. Raven is the current frontend;
+other languages and workloads are future goals. These are ambitions, not measured
+performance rankings or additional shipped capabilities.
+
 The project is experimental. The [installation guide](../try/) describes the available
 toolchain; [feature guides](../guides/) explain supported behavior and practical limits.
 

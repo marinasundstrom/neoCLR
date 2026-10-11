@@ -10,6 +10,34 @@ replacement is simpler, safer or faster. Small reversible prototypes can gather
 evidence immediately; major platform contracts require grounded comparisons before
 adoption. Keeping current behavior is always an alternative.
 
+## Product direction clarified 2026-10-11
+
+The author sets simplicity, productivity and speed competitive with Go and modern
+JavaScript runtimes as goals. Native compilation for web and backend services is the
+first workload focus, with familiar C#/.NET development ergonomics. Raven is the
+current frontend; runtime contracts must accommodate future languages and broader
+workloads. These are goals, not measured competitive performance claims.
+
+Concurrency is central to that direction. Evaluate runtime suspension, runtime-owned
+scheduling and green threads together with native foundations and bounded memory
+views. Preserve the distinction between a completion handle and suspended execution.
+No stack representation, preemption policy or public green-thread API is selected.
+The author permits investigating allocation/reference implementation alternatives;
+that does not itself change the public value/reference semantics retained below.
+
+The author also requests evaluating **starting JIT work now**, motivated by slow
+interpreted tests and the developer edit–test cycle. The interpreter remains useful
+for some platforms. Near-AOT JIT execution is a hypothesis to measure, not a result.
+See the [bounded JIT evaluation](native-execution-investigation.md#jit-for-development-iteration-2026-10-11).
+This revisits the timing of JIT investment without committing to a production backend
+or displacing completion of the active Index/Range slice.
+
+Assistant-proposed acceptance criteria are useful runtime-library and HTTP workloads,
+end-to-end iteration time, startup, throughput and tail latency, allocation/retention,
+cancellation under load, and consistent macOS/Windows behavior. Separate compiler,
+discovery and build costs from execution. An improvement over .NET requires evidence
+about correctness and developer effort as well as speed.
+
 ## Foundations to retain
 
 Keep value and reference type categories, ordinary class and array references,

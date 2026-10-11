@@ -9,6 +9,11 @@
 
 **An experimental application platform with a managed runtime, library and Raven development tools.**
 
+The goal is fast native web and backend development with familiar C#/.NET ergonomics,
+competitive with Go and modern JavaScript runtimes in simplicity, productivity and
+speed. These are goals to validate; Raven is the current frontend, with other languages
+and workloads intended later. See the [product direction](docs/platform-direction.md#product-direction-clarified-2026-10-11).
+
 neoCLR is a managed, type-safe virtual machine with garbage-collected heap storage.
 The current Raven target follows familiar CLR value/reference type categories:
 classes and arrays have reference semantics, while values are copied. Managed byrefs

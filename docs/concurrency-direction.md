@@ -1,5 +1,15 @@
 # Concurrency and tracked threads — post-release direction
 
+**2026-10-11 direction update:** concurrency is a core requirement for the native
+web/backend goal. Evaluate runtime suspension and green threads together with
+runtime-owned scheduling; no particular stack or preemption design is selected.
+Compare task lifetime, cancellation, blocking I/O, fairness, root ownership and
+observability with .NET before claiming an improvement. JIT evaluation must preserve
+these contracts across execution modes. See [product direction](platform-direction.md#product-direction-clarified-2026-10-11)
+and [scheduling co-evolution](runtime-scheduling-design.md#co-evolution-with-native-foundations--2026-10-09).
+The dated status below preserves earlier decisions; the roadmap controls sequencing.
+
+
 **Updated 2026-09-27. Explicit Thread implemented; shared-context Task.Run implemented in development with compiler integration gaps.** The author directs renaming
 `System.Threading` to `System.Concurrency` after the async/Tasks release to express
 a broader area. `System.Concurrency` is the namespace for concurrency, including

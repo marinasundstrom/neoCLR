@@ -1,5 +1,62 @@
 # ARM64 native execution and hot reload investigation
 
+## JIT for development iteration (2026-10-11)
+
+**Author request:** evaluate starting JIT implementation because interpreted tests
+feel slow and native execution shows a substantial difference in HTTP/networking
+workloads. Retain the interpreter for platforms where it is useful. The expectation
+that JIT may approach AOT performance is an author hypothesis; this exchange supplies
+no controlled JIT measurements. Earlier AOT-first sequencing below remains historical.
+
+**Assistant proposal:** first attribute the current edit–test time to Raven compilation,
+metadata/test discovery, native compilation/linking, process startup and test execution.
+Report cold and warm runs separately and record artifacts/toolchain revisions. A JIT
+cannot by itself fix slow source compilation or repeated discovery. Compare the same
+runtime-library tests and loopback HTTP client/server workload, including JSON payloads,
+with identical semantics and validation, concurrency, connection reuse and payload size.
+Report time to first result and total iteration time as well as steady-state throughput,
+p50/p95/p99 latency, CPU and memory. Keep network waits and external dependencies out of
+the CPU comparison; include a separate realistic I/O case.
+
+Compare three options: retain interpreter+AOT with targeted iteration improvements;
+reuse existing native lowering through a minimal Cranelift JIT module; or introduce
+tiered/profile-guided compilation later. Prefer the bounded shared-lowering experiment
+if attribution shows execution dominates. It must validate calls, runtime helper
+bindings, faults, managed roots, code lifetime and executable-memory permissions on
+one host before expanding platform coverage. Do not assume changing object emission
+to executable memory is the entire implementation. Tiering, deoptimization, hot reload
+and on-stack replacement are separate follow-ups, not prerequisites for a first JIT.
+
+Shared contracts must cover safepoints/root reporting, suspension/resumption,
+cancellation and stack diagnostics across interpreter, JIT and AOT. A runtime can
+suspend work without a JIT; adding JIT does not imply green threads. Evaluate stackless
+activations and stackful green threads separately. Keep the public Task model independent
+of the execution engine, and compare cancellation, fairness, blocking foreign calls,
+retention and debugging before selecting a scheduler/stack representation.
+
+**.NET baseline, primary sources reviewed 2026-10-11:** [.NET compilation configuration](https://learn.microsoft.com/en-us/dotnet/core/runtime-config/compilation)
+describes tiered compilation and dynamic PGO; [Native AOT](https://learn.microsoft.com/en-us/dotnet/core/deploying/native-aot/)
+compiles ahead of execution and documents dynamic loading/code-generation restrictions.
+These are distinct deployment tradeoffs, not a guarantee that JIT is faster than AOT.
+Reuse the backend/source comparison below, checking the repository's pinned Cranelift
+version before implementation. Costs include executable-code memory, startup compilation,
+platform permissions, code ownership and another execution mode to qualify.
+
+**Initial observation (not a benchmark):** the [Index/Range qualification run](../runtime/raven/tests/sequence-access-validation.json)
+executes the same 20 tests in 0.246 seconds natively and 3.266 seconds interpreted.
+These are single process-level timings including startup, without phase attribution,
+warmup control or a JIT implementation. They support investigating the execution gap
+but cannot predict JIT speed or explain the full edit–test delay.
+
+**Decision pending:** use the measurements to recommend starting a bounded JIT slice
+now or first removing a demonstrated non-execution bottleneck. No performance threshold,
+production JIT commitment, or benchmark result is asserted by this design brief.
+
+## Historical starting point
+
+The following dated investigation predates the subsequent native HTTP and library
+work; consult the roadmap for current implementation status.
+
 **2026-10-07 — provisional design with a first scalar AOT experiment.**
 The [ARM64 scalar probe](experiments/aot-scalar/README.md) now emits and executes a
 small native subset. General AOT, JIT and hot reload remain unimplemented.

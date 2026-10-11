@@ -1,5 +1,16 @@
 # neoCLR platform roadmap
 
+**Product and execution review (2026-10-11):** target simple, productive, fast native
+web/backend development with familiar C#/.NET ergonomics, future language support,
+and concurrency as a core capability. Evaluate suspension and green threads with
+scheduling and memory ownership. Reopen whether to start a bounded JIT experiment
+for development/test iteration; retain interpreter support and AOT deployment.
+Prior JIT deferral below is historical context, not a prohibition on this evaluation.
+With the Index/Range slice complete locally, assess memory views and shared execution
+requirements without treating any proposed API or backend as selected. See
+[product direction](platform-direction.md#product-direction-clarified-2026-10-11)
+and the [JIT evaluation brief](native-execution-investigation.md#jit-for-development-iteration-2026-10-11).
+
 **Module story closure (2026-10-10):** the author requests closing the namespace/module
 authoring and metadata story so work can move on. The accepted model and implemented
 boundary are [recorded here](declaration-modules.md). Keep Namespace as the string and
