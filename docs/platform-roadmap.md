@@ -29,6 +29,14 @@ Migrate more cases as needed; remaining benchmark/framework features are follow-
 not prerequisites for beginning the scheduler slice. Parallel-by-default testing and
 class grouping are proposals to develop with scheduling, not enabled behavior.
 
+**Async foundation clarification (2026-10-11):** the runtime should own asynchrony,
+with language implementations and eventually native languages/other runtimes able to
+project and integrate its lifecycle. Raven callbacks are a transitional projection,
+not the definition of suspension. The [design boundary](runtime-scheduling-design.md#runtime-owned-asynchrony-and-language-projections--2026-10-11)
+keeps completion, scheduling and retained execution ownership separate. Native
+ownership acknowledgment remains the next bounded gate; foreign-runtime ABI and
+suspension representation are not yet selected or implemented.
+
 **Author-directed sequence (2026-10-11):** finish JIT qualification and integrate
 that work into main (completed at `33648ce6`), then produce execution/HTTP and JSON
 serialization benchmarks before moving from

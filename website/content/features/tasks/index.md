@@ -234,6 +234,10 @@ Task.Run is implemented with the integration limits described above.
 Thread may become a backend primitive; its public future remains open. Green
 threads are a possible later runtime backend, subject to the same sharing and
 progress guarantees.
+The intended foundation is runtime-owned asynchrony, with language implementations
+projecting their async constructs onto a shared lifecycle. Native languages and other
+runtimes should eventually integrate through explicit ownership and completion
+adapters; no foreign-runtime async ABI is implemented or selected.
 Runtime-owned suspension and broader cleanup support remain future directions. Their scheduling, isolation and lifetime rules need design;
 no public Scheduler API is selected. See the [builder contracts](../../docs/async-builders.html)
 for the supported compiler integration.

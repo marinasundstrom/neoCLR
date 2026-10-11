@@ -14660,3 +14660,19 @@ outside benchmark measurement. Implementation follows the configuration slice.
   claim or compiler-independent async suspension. Existing private instruction-step
   suspension support is distinguished from that future async model. Cross-mode
   dispatch ownership and await-site affinity remain next design work.
+
+
+### 2026-10-11 — Asynchrony as a runtime foundation
+
+- **Author:** “The runtime itself should understand asynchrony and native languages
+  and runtimes should eventually be able to integrate and project these fundamental
+  concepts.”
+- **Assistant proposal:** runtime-owned async lifecycle and suspension, language
+  projections, and eventual native/foreign-runtime adapters with explicit completion,
+  ownership and wakeup contracts. Raven state machines remain a transitional adapter;
+  no stable ABI or stack representation is selected.
+- **Action:** recorded this direction in the roadmap, scheduler design and website
+  future-direction text. Linked the next native ownership-acknowledgment gate to this
+  boundary; no new execution behavior was implemented in this documentation slice.
+- **Open:** validate a non-Raven consumer, settle suspension representation and native
+  interoperability semantics. See the [design and tradeoffs](runtime-scheduling-design.md#runtime-owned-asynchrony-and-language-projections--2026-10-11).

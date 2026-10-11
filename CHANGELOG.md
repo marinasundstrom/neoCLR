@@ -8,6 +8,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-11
 
+- Record the author-directed runtime async foundation: language projections and
+  eventual native/foreign-runtime integration over shared lifecycle and ownership
+  contracts. Document proposed layers, tradeoffs and validation gates; this is design
+  direction, not implemented suspension or a selected interoperability ABI.
+
 - Begin the resumed scheduler work by moving interpreter invocation wait policy
   into the private scheduler. Bound owner waits by known timer deadlines, preserve
   the cancellation/socket polling fallback and avoid spinning a contending context

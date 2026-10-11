@@ -573,3 +573,53 @@ host passes ten timer scenarios, and the retained native HTTP consumer passes no
 fragmented and terminal-fault cases. Qualification is macOS ARM64; the portable C
 contract is included in the existing Windows workflow but has not been rerun there
 for this revision. No compiler bridge or public API signature changes are involved.
+
+
+## Runtime-owned asynchrony and language projections — 2026-10-11
+
+**Author direction:** the runtime itself should understand asynchrony; native
+languages and other runtimes should eventually be able to integrate and project
+these fundamental concepts. This clarifies the scheduler-then-suspension direction,
+without selecting a public API or foreign-runtime ABI.
+
+The proposed semantic boundary has three layers:
+
+- The runtime owns registration, completion publication, runnable-work ownership,
+  suspension/resumption and the lifetime of retained execution state. Completion,
+  scheduling destination and cancellation acknowledgment remain distinct concerns.
+- Language implementations project their async constructs onto that lifecycle.
+  Raven is one consumer. Task/Promise and compiler-generated callbacks are current
+  projections; the underlying contract must not require Raven-specific method names,
+  TaskQueue or a particular state-machine layout. Interpreter, JIT and AOT may retain
+  different execution representations while enforcing the same lifecycle rules.
+- Native hosts and other runtimes eventually bridge completion and resumption through
+  explicit ownership and wakeup contracts. A foreign completion thread should publish
+  readiness for the owning runtime to dispatch; it must not implicitly acquire guest
+  execution rights or mutate the managed graph. Cross-runtime integration also needs
+  explicit payload/error translation, cancellation and teardown acknowledgment.
+
+This proposal reuses the [.NET comparison](#net-comparison-and-tradeoffs) above:
+Task outcomes, scheduling and continuation placement remain separate. Runtime-owned
+suspension changes the execution mechanism, not that separation. The cited runtime
+async draft is comparative design evidence, not a claim that this direction is unique
+to neoCLR or absent from .NET. Retaining callbacks alone would minimize immediate
+implementation cost; making their lifecycle an adapter to a shared runtime contract
+supports additional language consumers, at the cost of backend contracts, retained
+roots/code lifetimes and interop validation. No performance benefit is established.
+
+Opaque owned operation/resumption handles are a candidate for native integration,
+not an adopted ABI. Stackful versus stackless suspension, green-thread scheduling,
+metadata/instruction encoding, ambient context flow and foreign exception mapping
+remain open. Not every library awaitable must become a built-in runtime type. Async
+interoperability will require adapters; it does not imply automatic compatibility
+with another runtime's Task, future or event loop.
+
+The next bounded implementation gate remains explicit native ready-to-active
+ownership acknowledgment. Design that transfer independently of whether the runnable
+body is today's callback or a future retained activation. Test duplicate/stale
+consumption, cancellation races, roots through dispatch and teardown before selecting
+broader suspension machinery. A later non-Raven consumer should validate registration,
+completion and resumption integration without depending on Raven-generated layouts.
+These are validation requirements, not completed capabilities. Current native hosts
+still use synchronous published-frame boundaries and source-owned callback roots;
+existing instruction-step VM suspension does not implement runtime async/await.
