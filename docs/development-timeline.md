@@ -14601,3 +14601,22 @@ Internal timing and allocation diagnostics remain unsupported.
 either inline in attributes or from a data-source method; each row is its own case.
 The assistant accepts this shared model, with source evaluation during registration
 outside benchmark measurement. Implementation follows the configuration slice.
+
+
+### 2026-10-11 — Data-driven cases and independent frameworks
+
+- **Author:** requested inline attribute values and named data sources for both tests
+  and benchmarks, with each input set becoming its own case. Cited xUnit's
+  `InlineData`/`MemberData`, then selected TUnit as the testing framework model.
+  Clarified that testing and benchmarking must not depend on each other and that
+  only currently needed features should be implemented. Also requested test categories.
+- **Assistant:** adopted testing `[Test]`, `[Arguments]`, `[MethodDataSource]`;
+  benchmark `[Benchmark]`, `[Arguments]`, `[ArgumentsSource]` remain separate
+  contracts and tools. Proposed category filtering as a following independent slice.
+- **Implementation:** typed generated adapters support inline scalar rows and array
+  providers without reflective invocation. Provider rows are materialized at runtime
+  registration, not during metadata inspection. See the
+  [testing contract](../runtime/raven/tests/README.md#data-cases-development-2026-10-11).
+  General attribute arrays, broader provider shapes, lifecycle and async support
+  remain gaps rather than new platform constraints. Category implementation remains
+  pending at this entry.

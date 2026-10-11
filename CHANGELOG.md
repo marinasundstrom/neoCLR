@@ -8,6 +8,13 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-11
 
+- Add independent TUnit-style test data attributes: `Arguments` for supported scalar
+  rows and `MethodDataSource` for typed array inputs. Generated adapters register
+  each row separately for reporting/filtering and retain AOT reachability. Reject
+  invalid data signatures and remove stale discovery output. General inline argument
+  arrays and broader source shapes remain native tooling gaps. Ten negative discovery
+  checks and 15 execution/filter checks across interpreter, JIT and AOT pass.
+
 - Configure benchmark measurement views, mode subsets, warmups, operation counts,
   launches and output/exit timeouts through manifest defaults, JSON settings and
   CLI overrides. Reports record effective settings, origins and the primary metric.

@@ -20,7 +20,7 @@ try
     if (!ReferenceEquals(marker.BaseType, attribute))
         throw new InvalidDataException("TestAttribute must derive from the catalog's System.Attribute");
     var unit = runtime.GetTypes().Single(t => t.FullName == "System.Void");
-    var tests = new List<(string Id, string Name, string Description)>();
+    var tests = new List<(string Id, string Name, string Description, string Code, bool Dynamic)>();
     foreach (var definition in snapshot.MainModule.Methods)
     {
         // Filter before projecting signatures so unrelated unsupported methods do not
@@ -33,8 +33,8 @@ try
         if (matches.Length != 1 || matches[0].GetArguments().Count > 1 || matches[0].GetNamedArguments().Count > 1)
             throw new InvalidDataException(name + ": TestAttribute must occur once with an optional string description");
         if (method.DeclaringType is not null || !method.IsStatic || method.IsAbstract || method.IsGenericMethodDefinition ||
-            method.Accessibility is not (MetadataAccessibility.Public or MetadataAccessibility.Assembly) || method.GetParameters().Count != 0)
-            throw new InvalidDataException(name + ": tests require accessible parameterless, nongeneric module functions");
+            method.Accessibility is not (MetadataAccessibility.Public or MetadataAccessibility.Assembly))
+            throw new InvalidDataException(name + ": tests require accessible nongeneric module functions");
         if (method.ReturnType is not ConstructedTypeInfo result || result.Definition.FullName != "System.Result`2" ||
             !ReferenceEquals(result.Definition.Module.Assembly, runtime) || result.TypeArguments.Count != 2 ||
             !ReferenceEquals(result.TypeArguments[1], failure) || !ReferenceEquals(result.TypeArguments[0], unit))
@@ -59,20 +59,34 @@ try
         static string Part(string value) => value.Length + ":" + value;
         var id = Part(assembly.Name) + Part(method.Module.Name) + Part(name) + "()";
         if (tests.Any(test => test.Id == id)) throw new InvalidDataException("Duplicate test ID: " + id);
-        tests.Add((id, name, description));
+        foreach (var row in DataAdapters.Read(definition, method, snapshot, context, "NeoClr.Testing", "MethodDataSourceAttribute"))
+        {
+            var rowName = name + row.Suffix;
+            var rowId = id + row.Suffix;
+            var display = description + row.Suffix;
+            var callback = row.Suffix.Length == 0 ? name : "() => " + name + "(" + row.Callback + ")";
+            string Registration(string suffix) => "suite.Add(" + Quote(rowId) + suffix + ", " + Quote(display) + suffix + ", " + callback + ")";
+            var code = row.Provider is null ? "    " + Registration("") + "\n" :
+                "    if true {\n        let rows = " + row.Provider + "()\n" +
+                "        if rows.Length == 0 { System.Fail(\"Data source returned no rows\") }\n" +
+                "        if rows.Length > 10000 { System.Fail(\"Data source exceeded 10000 rows\") }\n" +
+                "        for index in 0..<rows.Length {\n            let value = rows[index]\n            " + Registration(" + \"[\" + index.ToString() + \"]\"") + "\n        }\n    }\n";
+            tests.Add((rowId, rowName, display, code, row.Provider is not null));
+        }
     }
     if (tests.Count == 0) throw new InvalidDataException("No tests discovered");
     tests.Sort((left, right) => StringComparer.Ordinal.Compare(left.Name, right.Name));
     static string Quote(string value) => JsonSerializer.Serialize(value);
     var source = "// Generated from native metadata. Do not edit.\nmodule NeoClr.Testing\n\nfunc RegisterDiscoveredTests(suite: TestSuite) {\n" +
-        string.Concat(tests.Select(test => "    suite.Add(" + Quote(test.Id) + ", " + Quote(test.Description) + ", " + test.Name + ")\n")) + "}\n";
+        string.Concat(tests.Select(item => item.Code)) + "}\n";
     File.WriteAllText(args[1], source);
-    File.WriteAllText(args[2], JsonSerializer.Serialize(new { assembly = assembly.Name, tests = tests.Select(t => new { id = t.Id, name = t.Name, description = t.Description }) }, new JsonSerializerOptions { WriteIndented = true }) + "\n");
+    File.WriteAllText(args[2], JsonSerializer.Serialize(new { assembly = assembly.Name, tests = tests.Select(t => new { id = t.Id, name = t.Name, description = t.Description, dynamic = t.Dynamic }) }, new JsonSerializerOptions { WriteIndented = true }) + "\n");
     Console.WriteLine("Discovered " + tests.Count + " tests");
     return 0;
 }
 catch (Exception error) when (error is ArgumentException or InvalidDataException or InvalidOperationException or NotSupportedException or IOException)
 {
+    if (args.Length >= 3) { File.Delete(args[1]); File.Delete(args[2]); }
     Console.Error.WriteLine("Test discovery failed: " + error.Message);
     return 2;
 }

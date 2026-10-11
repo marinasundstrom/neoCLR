@@ -79,10 +79,10 @@ name alone. It never loads the test assembly into the CLR or executes attribute
 constructors/test bodies. The framework currently lives in the test assembly;
 separately packaged marker libraries remain future work.
 
-Discovery accepts accessible parameterless, nongeneric **module functions** returning
+Discovery accepts accessible nongeneric **module functions** returning
 `Result<unit, TestFailure>`. Attributed class methods, unsupported signatures,
 repeated markers, duplicate IDs and empty discovery are configuration errors.
-Overloads/data rows/async/fixtures remain unsupported. The current generated source
+Parameterless functions and the data rows below are supported; overloads, async tests and fixtures remain gaps. The current generated source
 adapter requires ordinary ASCII Raven identifiers. Function IDs use length-prefixed
 assembly name, logical module name and qualified function name plus `()`; they do
 not include metadata row numbers, descriptions or assembly versions. This keeps IDs
@@ -622,3 +622,56 @@ The intended routine mode is JIT once ready; interpreter and AOT checks remain
 selective and relevant to the change. Defaults have not switched yet. JIT-only and interpreter-only runs compile the
 Raven assembly directly, without a native object or executable build. Interpreter-only
 runs do not require the AOT/JIT compiler.
+
+## Data cases (development, 2026-10-11)
+
+The author selected [TUnit's attribute model](https://tunit.dev/docs/comparison/attributes/)
+as the testing design reference. Use `[Test]` with repeatable `[Arguments(...)]` or
+`[MethodDataSource("Inputs")]`; each row registers a separate test. The benchmark
+framework owns separate attributes and discovery code, with no dependency in either
+direction. Matching attribute names do not imply interchangeable contracts.
+
+```raven
+[Test]
+[Arguments(5, 6, 11)]
+[Arguments(2, 3, 5)]
+func Adds(a: int, b: int, expected: int) -> Result<unit, TestFailure> {
+    return Assert.Equal(expected, a + b)
+}
+
+func Inputs() -> int[] => [13, 27]
+
+[Test]
+[MethodDataSource("Inputs")]
+func Positive(value: int) -> Result<unit, TestFailure> {
+    return Assert.True(value > 0, "positive input")
+}
+```
+
+Current `ArgumentsAttribute` constructors accept one `int`, `string`, or `bool`;
+two or three integers; two strings; or a string followed by an integer. Values must
+match the test parameters exactly. This is a native attribute encoding gap versus
+TUnit's general argument lists, not a permanent restriction. Null, arrays, `Type`
+values, conversions and arbitrary inline combinations remain unsupported.
+`MethodDataSourceAttribute(methodName: string)` resolves an accessible parameterless
+module function in the same assembly (unqualified names use the test's module).
+It must return an array matching the test's single parameter type. An object input
+can group fields; tuple spreading, sequences, async sources and provider arguments
+remain future extensions.
+
+Metadata inspection never invokes a source. Generated typed adapters call sources
+once during suite registration and capture each input, preserving AOT reachability.
+Sources must be deterministic, finite, and return 1–10,000 rows; empty or oversized
+sources fault registration. Inline rows append their argument literals to the name
+and ID. Source rows append `/Qualified.Provider[index]`, with zero-based indices;
+reordering source rows changes their identities. `--filter` and `--id` select rows
+independently. The metadata inventory marks source templates `dynamic: true` because
+runtime row counts are not known yet. Duplicate inline rows/sources, wrong argument
+arity/types and missing/invalid providers fail discovery and remove stale output.
+
+This is a bounded subset of [TUnit data injection](https://tunit.dev/docs/writing-tests/data-driven-overview/).
+We expand it as needs arise; fixtures, matrices, hooks and retries are not commitments.
+
+Validation: [ten discovery rejections](data-evidence/discovery.json) and
+[15 execution/filter checks](data-evidence/execution.json) pass on macOS ARM64
+in interpreter, JIT and AOT. This does not qualify Windows.

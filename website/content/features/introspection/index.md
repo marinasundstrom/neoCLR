@@ -337,3 +337,10 @@ owned free functions. Their descriptors have no declaring type and preserve modu
 parameter and method-level attribute metadata. A compiled Raven consumer reads
 `TestAttribute` descriptions without executing tests. Native enumeration and dynamic
 registration remain follow-up work; the current runner uses generated typed adapters.
+
+
+The development testing helper now accepts TUnit-style `[Arguments]` and
+`[MethodDataSource]` on `[Test]` module functions. Generated adapters register each
+input row independently for filtering and reporting, including AOT. Metadata reads
+do not execute providers; providers run during suite registration. See the
+[testing helper contract and current data limits](/docs/testing.html).

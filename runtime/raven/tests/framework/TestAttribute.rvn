@@ -2,7 +2,7 @@ module NeoClr.Testing
 
 import System.*
 
-/// Marks a parameterless module function returning Result<unit, TestFailure>.
+/// Marks a module function returning Result<unit, TestFailure>.
 /// Discovery reads metadata without executing this constructor or the test.
 [AttributeUsage(AttributeTargets.Method)]
 public class TestAttribute : Attribute {
@@ -16,4 +16,22 @@ public class TestAttribute : Attribute {
     init(description: string) {
         Description = description
     }
+}
+
+/// Supplies one inline argument row. Native metadata currently supports scalar values.
+[AttributeUsage(AttributeTargets.Method, AllowMultiple: true)]
+public class ArgumentsAttribute : Attribute {
+    init(value0: int) { }
+    init(value0: string) { }
+    init(value0: bool) { }
+    init(value0: int, value1: int) { }
+    init(value0: int, value1: int, value2: int) { }
+    init(value0: string, value1: string) { }
+    init(value0: string, value1: int) { }
+}
+
+/// Names an accessible, parameterless module function returning an array of inputs.
+[AttributeUsage(AttributeTargets.Method, AllowMultiple: true)]
+public class MethodDataSourceAttribute : Attribute {
+    init(methodName: string) { }
 }

@@ -43,3 +43,18 @@ func Main(arguments: string[]) -> int {
     suite.Add("manual", "manually registered companion", () => Ok(()))
     return TestRunner.Run(suite, arguments)
 }
+
+[Test]
+[Arguments(5, 6, 11)]
+[Arguments(2, 3, 5)]
+func EInline(a: int, b: int, expected: int) -> Result<unit, TestFailure> {
+    return Assert.Equal(expected, a + b)
+}
+
+func Inputs() -> int[] => [13, 27]
+
+[Test]
+[MethodDataSource("Inputs")]
+func FSource(value: int) -> Result<unit, TestFailure> {
+    return Assert.True(value == 13 || value == 27, "source value")
+}

@@ -1,0 +1,55 @@
+{
+  "passed": true,
+  "cases": [
+    {
+      "name": "row-arity",
+      "rejected": "Test discovery failed: Invalid: argument row has wrong arity",
+      "sourceSha256": "9d57bb5cad10bab987d56114bfc60aaa4bc24b6e46ca2a6fe0b3afd8b918b7c4"
+    },
+    {
+      "name": "row-type",
+      "rejected": "Test discovery failed: Invalid: argument row has wrong parameter type",
+      "sourceSha256": "ea52b48faff7fb4d29adfe46fd63571b760e6ff64ea7464edffaecf87f912de1"
+    },
+    {
+      "name": "missing-source",
+      "rejected": "Test discovery failed: Missing or ambiguous data source: DiscoveryValidation.Missing",
+      "sourceSha256": "9c57c9d145012c0798690374ab695a35774a515339c57787ec9a8dbccc871c79"
+    },
+    {
+      "name": "source-type",
+      "rejected": "Test discovery failed: DiscoveryValidation.Inputs: source must be an accessible parameterless module function returning an array of the input type",
+      "sourceSha256": "faaa7bf2881af801eec4ff8ecb861319487de8b4b427c1f1341f3532f76f0e59"
+    },
+    {
+      "name": "duplicate-row",
+      "rejected": "Test discovery failed: Invalid: duplicate data row or source",
+      "sourceSha256": "847fe247a660c9052f7a78b76a13725f4f003efd280abdd495736081d5001f94"
+    },
+    {
+      "name": "parameters",
+      "rejected": "Test discovery failed: Invalid: parameterized function needs a data attribute",
+      "sourceSha256": "af23847344f40a06af3aa3f63cad2e1157f83bc40efceae6963b2bab1c41c97d"
+    },
+    {
+      "name": "result",
+      "rejected": "Test discovery failed: DiscoveryValidation.Invalid: tests require Result<unit, TestFailure>",
+      "sourceSha256": "19006d977f55507be7a477e212aac282f9be0cd4ea11996ca8a3f967cf301d41"
+    },
+    {
+      "name": "instance",
+      "rejected": "Test discovery failed: DiscoveryValidation.Fixture.Invalid: tests require accessible nongeneric module functions",
+      "sourceSha256": "8949d090ef4fcc8037370f41e00376801873ae72e7006aa44593e8a34e3efb64"
+    },
+    {
+      "name": "generic",
+      "rejected": "Test discovery failed: DiscoveryValidation.Invalid: tests require accessible nongeneric module functions",
+      "sourceSha256": "2cef9da6a7ddba4d4fc8fbb99a956944717866f73fb53847b1b5d2aeec8655d8"
+    },
+    {
+      "name": "empty",
+      "rejected": "Test discovery failed: No tests discovered",
+      "sourceSha256": "8323e48a2fa5c4c4495137d047020d5c89b11f7b2a288bd151b711a44f7a84fc"
+    }
+  ]
+}

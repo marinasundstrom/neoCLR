@@ -45,11 +45,11 @@ or probe for dependencies. Unsupported signatures, missing dependencies, duplica
 IDs and an empty discovered set fail with exit code 2. Failure diagnostics identify
 the declaration when its signature is available.
 
-Supported tests are public/internal, parameterless, nongeneric module functions
+Supported tests are public/internal, nongeneric module functions
 returning exactly `System.Result<System.Void, NeoClr.Testing.TestFailure>` from the
 selected runtime/test catalogs. Other attributed declarations fail rather than
 being ignored. Plain ASCII declaration identifiers are required by this first
-source adapter; class fixtures, async tests and data rows are future work.
+source adapter; class fixtures and async tests remain gaps. Parameterized tests require data attributes.
 
 `scripts/discover-runtime-tests.py` compiles an inspection artifact and generates
 `RegisterDiscoveredTests(suite: TestSuite)` plus `tests.json`. Include its output via
@@ -86,3 +86,32 @@ qualified function name; manual additions retain their chosen registration order
 
 See the [complete repository contract and validation](https://github.com/marinasundstrom/neoCLR/blob/main/runtime/raven/tests/README.md).
 Grouping/category selection and future source generators are proposals, not APIs.
+
+
+## ArgumentsAttribute and MethodDataSourceAttribute (development)
+
+Testing follows [TUnit's attribute names](https://tunit.dev/docs/comparison/attributes/).
+Both attributes target methods, allow multiple annotations and accompany `[Test]`.
+They belong to `NeoClr.Testing`; they have no benchmark framework dependency.
+
+`ArgumentsAttribute` constructor overloads are `(int)`, `(string)`, `(bool)`,
+`(int, int)`, `(int, int, int)`, `(string, string)`, and `(string, int)`.
+Each annotation supplies one complete row, whose values must exactly match the
+function parameters. Null and general attribute arrays are unsupported native
+metadata gaps. There are no data attribute properties or named arguments yet.
+
+`MethodDataSourceAttribute(methodName: string)` names a public/internal parameterless,
+nongeneric module function returning `T[]` for a test accepting one `T`. Unqualified
+names resolve in the test's module; qualified names resolve in the same assembly.
+Generated registration calls the provider once and captures each element. The
+provider must return 1–10,000 rows in deterministic order. Sources execute at suite
+registration, not during metadata inspection. Empty/oversized sources fault; invalid
+provider signatures, duplicate sources/inline rows, and inline arity/type mismatches
+fail discovery. An input object can contain multiple fields; sequences, tuple
+spreading, async sources and source arguments are not yet supported.
+
+Each row is a separately reported/filterable test. Inline selectors append `(values)`;
+source selectors append `/Qualified.Provider[index]`. Indices are zero-based and
+change meaning if source order changes. Source entries in the metadata inventory
+have `dynamic: true`; they describe registration templates rather than enumerated
+runtime cases. See the [tested data examples](https://github.com/marinasundstrom/neoCLR/blob/main/runtime/raven/tests/discovery-contract/Tests.rvn).

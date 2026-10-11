@@ -17,10 +17,15 @@ def validate(bundle, output):
     output.mkdir(parents=True, exist_ok=False)
     report = {'passed': False, 'cases': []}
     cases = [
-        ('parameters', '[Test]\nfunc Invalid(value: int) -> Result<unit, TestFailure> => Ok(())', 'parameterless, nongeneric module functions'),
+        ('row-arity', '[Test]\n[Arguments(5)]\nfunc Invalid() -> Result<unit, TestFailure> => Ok(())', 'wrong arity'),
+        ('row-type', '[Test]\n[Arguments("five")]\nfunc Invalid(value: int) -> Result<unit, TestFailure> => Ok(())', 'wrong parameter type'),
+        ('missing-source', '[Test]\n[MethodDataSource("Missing")]\nfunc Invalid(value: int) -> Result<unit, TestFailure> => Ok(())', 'Missing or ambiguous data source'),
+        ('source-type', 'func Inputs() -> string[] => ["bad"]\n[Test]\n[MethodDataSource("Inputs")]\nfunc Invalid(value: int) -> Result<unit, TestFailure> => Ok(())', 'array of the input type'),
+        ('duplicate-row', '[Test]\n[Arguments(5)]\n[Arguments(5)]\nfunc Invalid(value: int) -> Result<unit, TestFailure> => Ok(())', 'duplicate data row'),
+        ('parameters', '[Test]\nfunc Invalid(value: int) -> Result<unit, TestFailure> => Ok(())', 'parameterized function needs a data attribute'),
         ('result', '[Test]\nfunc Invalid() -> Result<int, TestFailure> => Ok(1)', 'Result<unit, TestFailure>'),
-        ('instance', 'class Fixture {\n[Test]\nfunc Invalid() -> Result<unit, TestFailure> => Ok(())\n}', 'parameterless, nongeneric module functions'),
-        ('generic', '[Test]\nfunc Invalid<T>() -> Result<unit, TestFailure> => Ok(())', 'parameterless, nongeneric module functions'),
+        ('instance', 'class Fixture {\n[Test]\nfunc Invalid() -> Result<unit, TestFailure> => Ok(())\n}', 'nongeneric module functions'),
+        ('generic', '[Test]\nfunc Invalid<T>() -> Result<unit, TestFailure> => Ok(())', 'nongeneric module functions'),
         ('empty', 'func NotATest() -> Result<unit, TestFailure> => Ok(())', 'No tests discovered'),
     ]
     try:

@@ -391,7 +391,7 @@ def main():
         ('instant-parsing', 0, ''.join('PASS ' + n + '\n' for n in INSTANT_PARSING_NAMES) + f'Tests: {len(INSTANT_PARSING_NAMES)}, passed: {len(INSTANT_PARSING_NAMES)}, failed: 0, skipped: 0\n'),
         ('duration-offset-parsing', 0, ''.join('PASS ' + n + '\n' for n in DURATION_OFFSET_PARSING_NAMES) + f'Tests: {len(DURATION_OFFSET_PARSING_NAMES)}, passed: {len(DURATION_OFFSET_PARSING_NAMES)}, failed: 0, skipped: 0\n'),
         ('time-parsing', 0, ''.join('PASS ' + n + '\n' for n in TIME_PARSING_NAMES) + f'Tests: {len(TIME_PARSING_NAMES)}, passed: {len(TIME_PARSING_NAMES)}, failed: 0, skipped: 0\n'),
-        ('discovery-contract', 1, 'PASS first discovered test\nFAIL discovered failure: Expected 1, actual 2\nPASS after discovered failure\nPASS NeoClr.DiscoveryTests.DWithoutDescription\nPASS manually registered companion\nTests: 5, passed: 4, failed: 1, skipped: 0\n'),
+        ('discovery-contract', 1, 'PASS first discovered test\nFAIL discovered failure: Expected 1, actual 2\nPASS after discovered failure\nPASS NeoClr.DiscoveryTests.DWithoutDescription\nPASS NeoClr.DiscoveryTests.EInline(2, 3, 5)\nPASS NeoClr.DiscoveryTests.EInline(5, 6, 11)\nPASS NeoClr.DiscoveryTests.FSource/NeoClr.DiscoveryTests.Inputs[0]\nPASS NeoClr.DiscoveryTests.FSource/NeoClr.DiscoveryTests.Inputs[1]\nPASS manually registered companion\nTests: 9, passed: 8, failed: 1, skipped: 0\n'),
         ('runner-contract', 1, 'PASS before failure\nFAIL intentional assertion failure: Expected 1, actual 2\nPASS after failure\nSKIP intentional skip: contract probe\nTests: 4, passed: 2, failed: 1, skipped: 1\n'),
     ]
     try:
@@ -521,7 +521,7 @@ def main():
             selections = {
                 'collections': [(['--filter', 'ArrayQueue'], 0, 'PASS ArrayQueue preserves FIFO\nTests: 1, passed: 1, failed: 0, skipped: 0\n'),
                                 (['--filter', 'Map'], 0, ''.join('PASS ' + n + '\n' for n in MAP_NAMES) + f'Tests: {len(MAP_NAMES)}, passed: {len(MAP_NAMES)}, failed: 0, skipped: 0\n')],
-                'discovery-contract': [(['--id', 'manual'], 0, 'PASS manually registered companion\nTests: 1, passed: 1, failed: 0, skipped: 0\n'),
+                'discovery-contract': [(['--filter', 'Inputs[1]'], 0, 'PASS NeoClr.DiscoveryTests.FSource/NeoClr.DiscoveryTests.Inputs[1]\nTests: 1, passed: 1, failed: 0, skipped: 0\n'), (['--filter', 'EInline(2, 3, 5)'], 0, 'PASS NeoClr.DiscoveryTests.EInline(2, 3, 5)\nTests: 1, passed: 1, failed: 0, skipped: 0\n'), (['--id', 'manual'], 0, 'PASS manually registered companion\nTests: 1, passed: 1, failed: 0, skipped: 0\n'),
                                        (['--filter', 'after discovered'], 0, 'PASS after discovered failure\nTests: 1, passed: 1, failed: 0, skipped: 0\n')],
                 'runner-contract': [
                     (['--entry-probe', '', 'two words', 'Räven ☕ 😀', 'quote"slash\\', '--id'], 0, 'PASS entry arguments preserve text\nTests: 1, passed: 1, failed: 0, skipped: 0\n'),
