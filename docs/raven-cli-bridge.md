@@ -8535,3 +8535,17 @@ not exercise native emission or execution. Keep `AwaitServices.rvn` separate in 
 POC, and retain the historical language-await evidence. Next is carrying the bounded
 binder correction to the native line and qualifying a same-file consumer there.
 No public runtime API, API snapshot or website capability claim changes.
+
+
+### Same-file awaiter consumer qualification (2026-10-11)
+
+Native compiler `f51d0561f` carries main `d4c5e5128` without merging the compiler
+lines. Its 74 focused tests and the same-file ordinary-await interpreter consumer
+pass. The consumer no longer needs `AwaitServices.rvn`; attributed private intrinsic
+declarations live alongside the awaiter. The validation script accepts an explicit
+compiler and hashes its analysis/native-metadata dependencies as well as the driver.
+The old bundle is unchanged; use the fixed compiler as documented in the
+[runtime-async experiment](experiments/runtime-async/README.md).
+Runtime Contract settings, encoding and state-machine lowering remain unchanged.
+This supersedes the pending binder integration status above, not the pending
+compiler-native await, managed lifetime or JIT/AOT suspension work.

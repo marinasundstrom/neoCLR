@@ -261,13 +261,12 @@ check and callback publication. A submitted adapter rechecks the operation when 
 runs, preventing a lost completion in this serialized interpreter path. Cross-thread
 registration races and native/JIT execution are not qualified.
 
-The bundled compiler recurses when the readiness property calls an attributed
-intrinsic declared in the same source file. Keeping the private declarations in
-`AwaitServices.rvn` avoids that binding cycle; this does not fix the compiler issue
-or establish a language restriction. Raven main now has the general binder fix
-(`d4c5e5128`, 74 focused .NET-target tests); the separate native compiler line/bundle
-still needs that fix and qualification. See the
-[branch audit](../../raven-cli-bridge.md#compiler-lines-and-property-binding-fix-2026-10-11).
+The older bundled compiler recurses when the readiness property calls an attributed
+intrinsic in the same file. The general fix from Raven main `d4c5e5128` is now carried
+to the separate native compiler line and qualified with the consolidated consumer.
+Use the fixed compiler explicitly; the historical bundle itself is unchanged.
+[Single-source evidence](single-source-validation.json) includes compiler dependency,
+runtime, source and reference hashes. The earlier two-file report remains historical.
 The next native-await compiler contract must
 preserve this awaiter behavior while replacing generated continuations with runtime
 activation resumption and supplying managed Task outcome/lifetime ownership.
@@ -278,6 +277,7 @@ source and compiler hashes and the generated state-machine name markers. Reprodu
 ```sh
 python3 docs/experiments/runtime-async/validate.py --language-await \
   --bundle target/data-cases-bundle \
+  --compiler /path/to/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll \
   --runtime target/scheduler-wait-validation/debug/neoclr \
   --output target/runtime-async-language-await
 ```

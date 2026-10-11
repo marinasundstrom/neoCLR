@@ -15,7 +15,10 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   the self-awaiter model rather than introducing a public wrapper without a need.
   Record Raven main's property/attribute binder fix (`d4c5e5128`, 74 focused tests)
   and the author's separate main/native compiler branch policy. Native integration
-  remains pending, so retain the consumer's split-file workaround.
+  now passes on the separate native line (`f51d0561f`, 74 focused tests and the
+  compiled interpreter consumer). Remove the split-file workaround; allow explicit
+  compiler selection and record dependency hashes. Retire the fully merged local
+  Raven friend-assembly branch at the author's direction.
 
 - Retain interpreter runtime-async POC outcomes for repeated awaits and multiple
   parked observers. Add guarded private terminal-handle release that cannot retract

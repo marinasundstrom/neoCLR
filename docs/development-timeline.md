@@ -14973,3 +14973,15 @@ See [invocation evidence](experiments/runtime-async/start-validation.json).
 - **Open:** carry the bounded fix to the native compiler line and validate there,
   then continue compiler-native await/Task integration and comparative measurements.
   See the [bridge record](raven-cli-bridge.md#compiler-lines-and-property-binding-fix-2026-10-11).
+
+
+### Follow-up: branch retirement and native qualification
+
+The author directed retiring `codex/internals-visible-to-main`. The assistant
+verified it was merged and unused by worktrees, then deleted that local branch;
+its commits remain in main and the main worktree remains in its historical folder.
+On continuation, the bounded binder fix was carried to the separate native line as
+`f51d0561f`. Its 74 focused tests and the consolidated awaiter consumer pass.
+The author requested returning to POC work after this slice; cancellation projection
+is the next bounded adapter gap identified by the assistant. No full branch merge
+or runtime-await default switch was performed.

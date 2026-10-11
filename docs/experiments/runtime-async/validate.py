@@ -8,6 +8,7 @@ import subprocess
 
 parser = argparse.ArgumentParser(description=__doc__)
 parser.add_argument('--bundle', type=Path, required=True)
+parser.add_argument('--compiler', type=Path, help='Override bundled rvnc.dll for compiler integration validation')
 parser.add_argument('--runtime', type=Path, required=True)
 parser.add_argument('--output', type=Path, required=True)
 parser.add_argument('--language-await', action='store_true', help='Validate ordinary await via the compatibility adapter')
@@ -18,9 +19,9 @@ source = Path(__file__).with_name('AwaitLanguage.rvn' if args.language_await els
 expected = ('PASS ordinary Raven await through runtime suspension adapter' if args.language_await
             else 'PASS runtime-owned operation suspension and resumption')
 sources = [source]
-if args.language_await:
-    sources.append(source.with_name('AwaitServices.rvn'))
-compiler = bundle / 'sdk/tools/rvnc/rvnc.dll'
+compiler = args.compiler.resolve() if args.compiler else bundle / 'sdk/tools/rvnc/rvnc.dll'
+compiler_inputs = [compiler, *(compiler.parent / name for name in [
+    'Raven.CodeAnalysis.dll', 'Raven.CodeAnalysis.NeoClr.dll', 'NeoCLR.Metadata.Experimental.dll'])]
 lib = bundle / 'lib'
 references = [lib / (name + '.dll') for name in ['System.Runtime', 'System.Data', 'System.Networking', 'System.Web']]
 assembly = output / 'app.dll'
@@ -38,7 +39,7 @@ run_command = [str(runtime), 'run', str(assembly), '--system', str(lib / 'System
 for reference in references:
     run_command += ['--module', str(reference)]
 report = {'passed': False, 'commands': [], 'sha256': {str(path): hashlib.sha256(path.read_bytes()).hexdigest()
-          for path in [*sources, runtime, compiler, lib / 'Core.dll', lib / 'System.runtime.neox', *references]}}
+          for path in [*sources, runtime, *compiler_inputs, lib / 'ownership.json', lib / 'Core.dll', lib / 'System.runtime.neox', *references]}}
 try:
     for command in [compile_command, run_command]:
         result = subprocess.run(command, capture_output=True, text=True, timeout=120)
