@@ -14707,3 +14707,17 @@ outside benchmark measurement. Implementation follows the configuration slice.
 - **Open:** implementation and qualification of runtime-owned continuation destinations,
   removal/internalization of public queue APIs, and any consumer-driven policy/affinity
   controls. Existing APIs remain implemented; this slice changes direction documentation.
+
+
+### 2026-10-11 — Public Scheduler, managed Task
+
+- **Author:** clarified that neoCLR should expose Scheduler, analogous to .NET's
+  TaskScheduler, with implementation in the runtime; “The Task API stays in the
+  managed domain.”
+- **Assistant response/action:** distinguished a managed Scheduler service facade from
+  its runtime implementation and private queues; updated roadmap, design and public
+  direction documentation. This supersedes leaving the existence of a public scheduler
+  open, while preserving that earlier position in the record.
+- **Outcome/open:** the preceding completion-admission slice is committed (`c9f3e5db`).
+  Scheduler is selected as an abstraction, not yet implemented; members, namespace,
+  selection/affinity and customization remain open. Task/Promise stay managed.

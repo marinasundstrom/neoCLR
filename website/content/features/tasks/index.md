@@ -247,7 +247,9 @@ projecting their async constructs onto a shared lifecycle. Native languages and 
 runtimes should eventually integrate through explicit ownership and completion
 adapters; no foreign-runtime async ABI is implemented or selected.
 Runtime-owned suspension and broader cleanup support remain future directions. Their scheduling, isolation and lifetime rules need design;
-no public Scheduler API is selected. See the [builder contracts](../../docs/async-builders.html)
+a managed Scheduler API backed by runtime implementation is the selected direction,
+with Task/Promise remaining managed. Its members are not yet selected or implemented.
+See the [builder contracts](../../docs/async-builders.html)
 for the supported compiler integration.
 
 [Related proposals and open questions →](../../proposals/#async)

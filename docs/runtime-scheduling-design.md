@@ -1,5 +1,11 @@
 # Runtime scheduling and async suspension
 
+**Public Scheduler clarification (2026-10-11):** expose a managed `Scheduler`
+contract, with scheduling implemented by the runtime. Task/Promise APIs stay in the
+managed domain; queue storage and pumping remain implementation details. This selects
+the public abstraction, not its exact members, namespace or customization model.
+Earlier statements leaving the existence of a public scheduler open are historical.
+
 **Queue visibility clarification (2026-10-11):** a task queue is an implementation
 detail, not the scheduler architecture's application-facing foundation. The existing
 public TaskQueue is a transitional dependency to remove through coordinated migration,
@@ -764,3 +770,37 @@ Validation on macOS ARM64: `cargo test --lib scheduler::tests` (12),
 `cargo test --lib invocation::dispatch_tests` (2), and `cargo test --test timers` (3),
 using `CARGO_TARGET_DIR=target/scheduler-wait-validation`. These checks exercise the
 changed interpreter ownership boundary; unchanged JIT/AOT adapters were not rerun.
+
+
+## Managed Scheduler contract, runtime implementation — 2026-10-11
+
+**Author clarification:** analogous to .NET exposing TaskScheduler, neoCLR should
+expose Scheduler while its actual implementation resides in the runtime. Task remains
+in the managed domain. This resolves the earlier open question of whether there is a
+public scheduler abstraction; it does not select a copy of all .NET TaskScheduler members.
+
+The intended layering is:
+
+- **Managed Task/Promise:** outcomes, producer completion and consumer awaitability.
+  They use the scheduling contract rather than owning dispatch policy or queue pumps.
+- **Managed Scheduler:** the application/language-facing scheduling abstraction,
+  projecting runtime services. Exact submission, selection, affinity and hosting
+  members, as well as whether/how custom schedulers are supported, remain to be designed.
+- **Runtime scheduling implementation:** runnable registrations, admission, dispatch,
+  wake/park, lifetime/root ownership and eventual activation suspension/resumption.
+  Interpreter, JIT and AOT adapters satisfy this contract using suitable representations.
+- **Private storage:** queues and other scheduling data structures. Applications do
+  not need a queue or manual Drain operation to participate in ordinary async execution.
+
+The existing .NET comparison supplies the API baseline: separate awaitable outcomes
+from scheduling and continuation placement. The author-selected name is Scheduler;
+this document does not infer .NET custom TaskScheduler subclassing or inlining policy
+as already supported. A managed facade preserves language-facing ergonomics while
+runtime implementation centralizes execution ownership. It costs an explicit managed/
+runtime service boundary and requires consistent cross-mode lifetime and error behavior.
+No performance benefit or public API implementation is claimed by this clarification.
+
+Next define the smallest runtime-backed Scheduler surface needed by managed task
+continuations and hosting, then migrate TaskQueue consumers with matching runtime,
+compiler bridge and reference documentation. Task remains managed; runtime-owned
+suspension is not a direction to move the entire Task API into native code.

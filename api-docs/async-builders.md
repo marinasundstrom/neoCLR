@@ -3,7 +3,7 @@
 These development APIs support generated Raven state machines while neoCLR builds
 its application platform. They are compiler/runtime integration details and may be
 deprecated or removed when runtime-owned suspension replaces generated machinery.
-Use Task and await in application code; no public scheduler design is implied.
+Use Task and await in application code; this protocol is not the future Scheduler API.
 
 The reference includes AsyncStateMachine, TaskAwaiter and
 AsyncTaskMethodBuilder&lt;T&gt; under System.Runtime.CompilerServices.
@@ -21,7 +21,9 @@ TaskQueue is also currently public and supported within its documented limits, b
 remains transitional. The selected direction is to make task queues implementation
 details: application and language scheduling contracts must not require queue identity,
 storage or manual draining. This is a migration direction, not removal in the current
-reference assembly or a newly selected public Scheduler type.
+reference assembly. The selected direction now includes a managed Scheduler API
+backed by runtime scheduling, with Task/Promise remaining managed. Scheduler members
+are not yet selected or implemented.
 Private scheduler records, wakeups and callback/frame handoffs
 are implementation details. No saved runtime frames are implemented by the current
 scheduler. The goal is to support useful APIs with generated state machines now while

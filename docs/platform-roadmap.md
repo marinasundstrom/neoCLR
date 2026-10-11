@@ -34,7 +34,10 @@ class grouping are proposals to develop with scheduling, not enabled behavior.
 
 **Queue visibility clarification (2026-10-11):** task queues are implementation
 details. Migrate away from the visible TaskQueue dependency; do not rename it into
-an application-facing Scheduler. The next [routing migration](runtime-scheduling-design.md#queue-independent-scheduling--2026-10-11)
+an application-facing Scheduler without changing its responsibilities. The author
+subsequently selects a managed `Scheduler` API backed by runtime implementation;
+Task/Promise remain managed and queues private. Exact members and customization
+remain open. The next [routing migration](runtime-scheduling-design.md#queue-independent-scheduling--2026-10-11)
 separates runtime-owned continuation destinations from producer queues, with coordinated
 consumer/API migration. Interpreter completion admission now retains invocation-owned ready work without a
 queue binding; its VM dispatch adapter still resolves the default queue at installation.
