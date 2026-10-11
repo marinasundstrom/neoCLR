@@ -14781,3 +14781,19 @@ outside benchmark measurement. Implementation follows the configuration slice.
 - **Open:** public Task routing migration, registration cleanup for abandoned managed
   operations, and cross-invocation/race semantics remain work. No Task state or producer
   completion authority is moved into the runtime registration service.
+
+
+### 2026-10-11 — Faithful stack traces with runtime async
+
+- **Author:** states that adding runtime async will enable faithful stack traces.
+- **Assistant response:** agrees with the goal and clarifies that it requires retained
+  logical frame identities, source locations and await relationships across suspension;
+  moving suspension alone does not guarantee it. Existing compiler-generated state
+  machines should participate in the same diagnostic model.
+- **Action:** records [logical async stacks](runtime-scheduling-design.md#logical-async-stacks--author-direction-2026-10-11)
+  as an acceptance criterion, including multiple awaiters, fault/cancellation attribution,
+  cross-mode validation, metadata lifetime and benchmark costs. Distinguishes physical
+  completion/dispatch stacks from logical caller relationships.
+- **Open:** representation, symbol/optimization limits, debugger API and executable
+  implementation. No faithful async trace support is claimed as delivered by the
+  scheduler destination/registration work.

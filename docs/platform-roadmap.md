@@ -98,7 +98,10 @@ serialization benchmarks before moving from
 the TaskQueue concept to schedulers, followed by
 runtime-managed suspension. The intended suspension model lets the runtime handle
 suspension points instead of requiring Raven-generated async state machines. This
-is a direction, not implemented behavior or a selected stack representation.
+is a direction, not implemented behavior or a selected stack representation. The author
+also requires [faithful logical async stacks](runtime-scheduling-design.md#logical-async-stacks--author-direction-2026-10-11)
+across suspension, retaining source/call relationships with compatible state-machine
+diagnostics. This is an acceptance goal, not an implemented scheduler feature.
 The [HTTP workbench](../benchmarks/jit-http/README.md) now passes 1,152 requests
 across all three modes; initial timing is provisional due to background contention.
 The [first benchmark runner](../benchmarks/framework/README.md) adds manually

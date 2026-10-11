@@ -1047,3 +1047,46 @@ and six interpreter/JIT/AOT success/fault executions pass on macOS ARM64. Window
 has not been requalified. The lifecycle consumer checks cancellation of a registration
 for an operation-completion callback while the Task remains pending, then completes
 that operation through a different activated registration.
+
+## Logical async stacks — author direction, 2026-10-11
+
+**Author:** runtime async should enable faithful stack traces. Treat preservation of
+logical async call chains as a suspension acceptance criterion, not an automatic
+consequence of moving suspension into the runtime. This extends the diagnostics
+boundary above; it is not implemented by destination tokens or registration handles.
+
+A suspended execution needs method/frame identity, available source locations and
+logical await/call relationships retained across resume, faults and cancellation.
+The thread delivering I/O or the producer completing a Promise is not thereby the
+logical caller of the awaiting operation. Multiple awaiters and fan-out form multiple
+relationships: diagnostics must not invent a single physical stack that conflates
+those executions. Keep physical dispatch frames distinguishable from logical frames.
+Task remains the operation/state abstraction; Promise supplies producer completion,
+while runtime activation metadata supplies the suspended execution's diagnostic identity.
+
+Reuse the primary .NET generated-state-machine and runtime-async **draft** comparisons
+above. Do not infer that .NET cannot report async frames, or that the draft is a shipped
+neoCLR contract. Retaining today's callback trace alone is cheaper but loses the intended
+logical continuity; retaining full stack/local snapshots could preserve more detail but
+adds memory, GC and potentially sensitive local-data retention. Prefer evaluating bounded
+logical frame/source metadata first, with explicit missing-information markers rather
+than invented frames. Exact metadata shape, debugger API and retention policy remain open.
+
+Acceptance scenarios for interpreter, JIT and AOT:
+
+- Nested async calls fault after multiple real suspensions: method/source identities
+  and the logical await chain remain available, without replacing the original fault.
+- Completed awaits and pending awaits preserve consistent source-level attribution;
+  physical optimization/inlining differences and unavailable symbols are identified.
+- Multiple awaiters, fan-out, cancellation and producer callbacks do not attach one
+  execution's history to another or substitute the completion thread's stack.
+- Compiler-generated state machines can participate in the same diagnostic model;
+  runtime-owned activations must not make the existing language projection invalid.
+- Teardown, abandoned operations and any future reload release retained diagnostic
+  metadata safely; no references to expired native frames are retained.
+
+Measure frame/relationship retention and capture/resume overhead alongside throughput
+and memory benchmarks before claiming a diagnostic improvement at acceptable cost.
+Faithful logical trace support, including its limits under optimization and missing
+symbols, must be demonstrated with executable cases before documentation calls it
+implemented. This direction does not select green threads or a saved-stack format.

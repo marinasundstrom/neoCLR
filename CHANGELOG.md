@@ -8,6 +8,10 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-11
 
+- Record faithful logical async stacks as an author-directed runtime-suspension
+  acceptance goal, with state-machine compatibility, source attribution, lifetime and
+  cross-mode validation requirements. This is design direction, not shipped tracing.
+
 - Add private runtime-owned dormant continuation registrations with reserved capacity,
   one-shot activation/cancellation and callback-root release on cancellation/teardown.
   Dormant registrations do not keep an invocation alive. The internal awaitable uses
