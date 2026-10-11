@@ -8,7 +8,7 @@ module SchedulerContinuations {
     // The unpumped producer queue is deliberately never used for registration.
     class Completion : TaskAwaiter {
         private val source: Promise<int>
-        private var callbacks = ArrayList<() -> System.Void>()
+        private var callbacks = ArrayList<Continuation>()
         var Deliveries = 0
         val Observed = Promise<int>()
 
@@ -22,10 +22,11 @@ module SchedulerContinuations {
         func GetResult() -> int => source.Task.GetResult()
 
         func OnCompleted(callback: () -> System.Void) {
+            let registration = Continuation(callback)
             if IsCompleted {
-                _ = neoCLR.Runtime.SchedulerSubmit(callback)
+                registration.Submit()
             } else {
-                callbacks.Add(callback)
+                callbacks.Add(registration)
             }
         }
 
@@ -53,9 +54,9 @@ module SchedulerContinuations {
 
         private func Dispatch() {
             let pending = callbacks
-            callbacks = ArrayList<() -> System.Void>()
-            for callback in pending {
-                _ = neoCLR.Runtime.SchedulerSubmit(callback)
+            callbacks = ArrayList<Continuation>()
+            for registration in pending {
+                registration.Submit()
             }
         }
 
@@ -67,6 +68,20 @@ module SchedulerContinuations {
             Deliveries += 1
             Observed.Complete(Deliveries)
             return ()
+        }
+    }
+
+    class Continuation {
+        private val destination: long
+        private val callback: () -> System.Void
+
+        init(callback: () -> System.Void) {
+            destination = neoCLR.Runtime.SchedulerCapture()
+            self.callback = callback
+        }
+
+        func Submit() {
+            _ = neoCLR.Runtime.SchedulerSubmitTo(destination, callback)
         }
     }
 
@@ -87,4 +102,10 @@ module neoCLR.Runtime {
 
     [MethodImpl(MethodImplOptions.InternalCall)]
     internal extern func SchedulerSubmit(callback: () -> System.Void) -> int;
+
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    internal extern func SchedulerCapture() -> long;
+
+    [MethodImpl(MethodImplOptions.InternalCall)]
+    internal extern func SchedulerSubmitTo(destination: long, callback: () -> System.Void) -> int;
 }

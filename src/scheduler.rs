@@ -136,6 +136,7 @@ pub(crate) struct Scheduler {
     pub(crate) sockets: crate::socket_io::Sockets,
     pub(crate) resolver: crate::name_resolution::Resolver,
     pub(crate) timers: crate::timers::Timers,
+    destination: Option<i64>,
     ready: Option<Ready>,
     submitted: std::collections::VecDeque<Value>,
     prefer_submission: bool,
@@ -150,6 +151,7 @@ impl Default for Scheduler {
             sockets: Default::default(),
             resolver: crate::name_resolution::Resolver::with_wake(wake.clone()),
             timers: Default::default(),
+            destination: None,
             ready: None,
             submitted: Default::default(),
             prefer_submission: true,
@@ -187,6 +189,29 @@ impl Scheduler {
             &mut self.timers,
         ];
         self.arbitration.poll(sources, heap)
+    }
+
+    /// Opaque invocation identity, not a queue, root or transferable authority.
+    pub(crate) fn capture_destination(&mut self) -> Result<i64, Fault> {
+        use std::sync::atomic::{AtomicI64, Ordering};
+        static NEXT: AtomicI64 = AtomicI64::new(1);
+        if let Some(destination) = self.destination {
+            return Ok(destination);
+        }
+        let destination = NEXT
+            .fetch_update(Ordering::Relaxed, Ordering::Relaxed, |value| {
+                value.checked_add(1)
+            })
+            .map_err(|_| Fault::new("Scheduler destination identity exhausted"))?;
+        self.destination = Some(destination);
+        Ok(destination)
+    }
+
+    pub(crate) fn submit_to(&mut self, destination: i64, callback: Value) -> Result<(), Fault> {
+        if destination <= 0 || self.destination != Some(destination) {
+            return Err(Fault::new("Scheduler destination is not current"));
+        }
+        self.submit(callback)
     }
 
     pub(crate) fn submit(&mut self, callback: Value) -> Result<(), Fault> {
@@ -727,6 +752,37 @@ mod tests {
         );
         collect(&mut heap, &scheduler, &[]);
         assert!(heap.is_empty());
+    }
+
+    #[test]
+    fn destination_identity_rejects_foreign_and_expired_invocations_before_retaining_work() {
+        let mut heap = ManagedHeap::default();
+        let (callback, _) = ready_graphs(&mut heap);
+        let mut owner = Scheduler::default();
+        let destination = owner.capture_destination().unwrap();
+        assert!(destination > 0);
+        assert_eq!(owner.capture_destination().unwrap(), destination);
+        let mut other = Scheduler::default();
+        let foreign = other.capture_destination().unwrap();
+        assert_ne!(foreign, destination);
+        for rejected in [0, -1, foreign] {
+            assert!(owner.submit_to(rejected, callback.clone()).is_err());
+        }
+        assert!(owner.submitted.is_empty());
+        assert!(other.submit_to(destination, callback.clone()).is_err());
+        owner.submit_to(destination, callback.clone()).unwrap();
+        collect(&mut heap, &owner, &[]);
+        assert_eq!(heap.len(), 2);
+        owner.install_submission(|_| Ok(())).unwrap();
+        drop(owner);
+        let mut replacement = Scheduler::default();
+        assert_ne!(replacement.capture_destination().unwrap(), destination);
+        assert!(replacement.submit_to(destination, callback).is_err());
+        collect(&mut heap, &replacement, &[]);
+        assert!(
+            heap.is_empty(),
+            "rejected destination must retain no callback graph"
+        );
     }
 
     #[test]

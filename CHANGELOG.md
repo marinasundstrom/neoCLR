@@ -8,6 +8,14 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-11
 
+- Add private captured invocation destinations for scheduler continuation submission.
+  Interpreter and native scopes reject foreign/expired identities before retaining
+  callbacks, including reused native scope addresses. The internal awaitable captures
+  a destination per registration; public Task/Promise routing remains unchanged.
+  The Int64 identity is a temporary bridge, not a public Scheduler API or support
+  for cross-invocation delivery. Focused interpreter/native contracts and six
+  interpreter/JIT/AOT consumer runs pass on macOS ARM64; Windows is not requalified.
+
 - Qualify an internal continuation-routing experiment that keeps outcomes managed
   and submits await callbacks through the runtime without pumping an explicit
   producer queue. Multiple pending awaiters, completed awaits, deferred observers,

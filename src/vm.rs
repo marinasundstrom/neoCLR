@@ -3859,6 +3859,19 @@ fn interpret_instructions_with_dispatch(
                             return Ok(None);
                         }
 
+                        if matches!(binding, crate::native::Binding::SchedulerCapture) {
+                            let destination = scheduler.capture_destination()?;
+                            frames.last_mut().unwrap().stack.push(Value::Int64(destination));
+                            return Ok(None);
+                        }
+                        if matches!(binding, crate::native::Binding::SchedulerSubmitTo) {
+                            let Value::Int64(destination) = args.remove(0) else {
+                                return Err(Fault::new("Invalid scheduler destination"));
+                            };
+                            scheduler.submit_to(destination, args.remove(0))?;
+                            frames.last_mut().unwrap().stack.push(Value::Int32(0));
+                            return Ok(None);
+                        }
                         if matches!(binding, crate::native::Binding::SchedulerSubmit) {
                             scheduler.submit(args.remove(0))?;
                             frames.last_mut().unwrap().stack.push(Value::Int32(0));

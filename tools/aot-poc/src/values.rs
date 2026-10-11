@@ -413,6 +413,8 @@ pub(crate) fn compile_into(
             (&d.task_queue_register, "neoclr_task_queue_register_v1", vec![types::I64, types::I64, types::I64]),
             (&d.task_queue_default, "neoclr_task_queue_default_v1", vec![types::I64, types::I64]),
             (&d.task_queue_current, "neoclr_task_queue_current_v1", vec![types::I64, types::I32, types::I32, types::I64]),
+            (&d.scheduler_capture, "neoclr_scheduler_capture_managed_v1", vec![types::I64, types::I64]),
+            (&d.scheduler_submit_to, "neoclr_scheduler_submit_to_managed_v1", vec![types::I64, types::I64, types::I64, types::I64]),
             (&d.scheduler_submit, "neoclr_scheduler_submit_managed_v1", vec![types::I64, types::I64, types::I64]),
             (&d.timer_start, "neoclr_timer_start_v1", vec![types::I32, types::I64, types::I64, types::I64]),
             (&d.timer_cancel, "neoclr_timer_cancel_v1", vec![types::I64, types::I64, types::I64]),

@@ -241,7 +241,9 @@ interpreter, AOT and JIT with existing state machines. It is not yet the public
 Scheduler API or a supported foreign-language ABI. A separate internal awaitable
 experiment also passes pending/completed awaits, multiple awaiters, cancellation and
 producer faults without pumping the producer queue. Public Task routing still uses
-the existing adapter; destination capture and production migration remain open.
+the existing adapter. The experiment now captures an invocation identity and rejects
+foreign or expired destinations; cross-invocation routing and production migration
+remain open.
 A pending await currently resumes through the producer queue; custom queue and UI
 affinity are not settled contracts. Ordinary worker joins can still block the queue.
 

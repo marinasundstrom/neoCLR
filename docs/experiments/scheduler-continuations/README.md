@@ -32,15 +32,23 @@ ordinary asynchronous flow uses await. Every producer queue contains the pump se
 
 ## Ownership and remaining design work
 
-The callback list belongs to the managed awaitable until runtime admission. Submission
-then retains each callback until dispatch or teardown. Outcome storage is independent.
-The destination here is the **current invocation**, which is also the awaiting
-execution's invocation: this owner-thread fixture neither captures a destination token
-nor tests cross-invocation completion, parallel races or custom scheduler affinity.
-Moving completion to another invocation must not silently retarget these registrations.
-A real library migration therefore still needs explicit registration/destination
-ownership and cross-invocation rules. It cannot simply replace every queue.Post with
-SchedulerSubmit.
+Each `Continuation` captures `SchedulerCapture()` at registration and holds that
+opaque destination plus its callback. The managed list retains these registrations
+until completion; `SchedulerSubmitTo` verifies the destination before transferring
+callback ownership into runtime admission. Completed explicit registration follows
+the same capture/submit path. The token retains no runtime or managed root itself.
+
+Interpreter and native scopes keep one lazy identity across dispatch turns. A foreign
+or expired identity faults before admission; reopening a native scope at the same
+address gets a different identity. Identities are private to the loaded runtime and
+must not be persisted or transferred across processes/backends. They are not security
+capabilities. The callback must still belong to the current invocation's heap.
+
+This is captured **invocation** placement, not custom scheduler/context selection.
+Cross-invocation and cross-thread completion remain unsupported and are rejected
+rather than silently rerouted. A real library migration still needs completion
+ownership, registration lifetime, race rules and deliberate cross-invocation handling.
+It cannot simply replace every queue.Post with SchedulerSubmitTo.
 
 Admission is bounded, per callback and may fault. More than available capacity is not
 an atomic fan-out operation; rollback, overload/backpressure, unlinking cancellation
@@ -66,8 +74,14 @@ python3 docs/experiments/jit-async/verify.py \
 ```
 
 Use matching rebuilt runtime/backend binaries and the Xcode SDK environment described
-in the scheduler-projection experiment. [Evidence](validation.json) records compiler,
+in the scheduler-projection experiment. [Original invocation-only evidence](validation.json) predates destination capture.
+[Captured-destination evidence](destinations-validation.json) records compiler,
 bundle, shared source, runtime/backend and output hashes plus exact commands. Success
 and terminal-fault cases pass in interpreter, JIT and AOT on macOS ARM64 (six executions).
 Windows was not run. Runtime Contract configuration, compiler emission and class-library
 binaries are unchanged; no new reference assembly/API snapshot is required.
+
+[Native destination contracts](destination-contracts.json) additionally cover foreign,
+expired/reused scopes, boundary/output rejection and rooted delivery/cleanup. Rust
+scheduler tests cover equivalent destination identity and rejection-before-retention.
+Exact reserved signature tests run in both interpreter and native binding layers.

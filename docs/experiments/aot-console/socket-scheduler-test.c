@@ -140,7 +140,61 @@ static int submitted_work_contract(void) {
     CHECK(!neoclr_gc_collect_v1(&c, NULL) && !c.text.used);
     return 0;
 }
+static int destination_contract(void) {
+    uint64_t buffer[128] = {0};
+    neoclr_aot_context c = {.text = {(unsigned char *)buffer, sizeof(buffer), 0}}, other = {0};
+    neoclr_socket_scope scope, foreign;
+    int64_t destination = -9, again = -9, other_destination = -9;
+    CHECK(neoclr_scheduler_capture_v1(&c, &destination, NULL) == 3 && destination == -9);
+    CHECK(!neoclr_socket_scope_enter_v1(&scope, &c));
+    CHECK(neoclr_scheduler_capture_v1(&c, NULL, NULL) == 3);
+    CHECK(!neoclr_scheduler_capture_v1(&c, &destination, NULL) && destination > 0);
+    CHECK(!neoclr_scheduler_capture_v1(&c, &again, NULL) && again == destination);
+    CHECK(!neoclr_socket_scope_enter_v1(&foreign, &other));
+    CHECK(!neoclr_scheduler_capture_v1(&other, &other_destination, NULL));
+    CHECK(other_destination != destination);
+    void *callback = NULL, *read = NULL;
+    CHECK(!neoclr_allocate_object_v1(&c.text, UINT32_MAX, 24, &callback));
+    ((uint64_t *)callback)[1] = 1;
+    uint64_t input = 0, delivery = 0;
+    CHECK(!neoclr_gc_host_root_create_v1(&c, callback, &input));
+    CHECK(neoclr_scheduler_submit_to_v1(&other, destination, input, NULL) == 3);
+    CHECK(neoclr_scheduler_submit_to_v1(&c, other_destination, input, NULL) == 3);
+    CHECK(neoclr_scheduler_submit_to_v1(&c, 0, input, NULL) == 3);
+    CHECK(neoclr_scheduler_step_v1(&c, &delivery, NULL) == NEOCLR_SCHEDULER_IDLE);
+    CHECK(!neoclr_socket_scope_leave_v1(&foreign));
+    neoclr_probe_frame entry, child;
+    neoclr_probe_storage empty = {0};
+    neoclr_probe_enter_v3(&entry, &c, 7, &empty, 0, "", 0);
+    again = -9;
+    CHECK(neoclr_scheduler_capture_v1(&c, &again, NULL) == 3 && again == -9);
+    CHECK(!neoclr_scheduler_capture_managed_v1(&c, &again) && again == destination);
+    CHECK(neoclr_scheduler_capture_managed_v1(&other, &again) == 3);
+    neoclr_probe_enter_v3(&child, &c, 8, &empty, 0, "", 0);
+    CHECK(neoclr_scheduler_capture_v1(&c, &again, &entry) == 3);
+    CHECK(neoclr_scheduler_submit_to_v1(&c, destination, input, &entry) == 3);
+    neoclr_probe_leave_v1(&child);
+    int32_t result = -9;
+    CHECK(neoclr_scheduler_submit_to_managed_v1(other_destination, callback, &c, &result) == 3 && result == -9);
+    CHECK(!neoclr_scheduler_submit_to_managed_v1(destination, callback, &c, &result) && result == 0);
+    neoclr_probe_leave_v1(&entry);
+    CHECK(!neoclr_gc_host_root_release_v1(&c, input));
+    CHECK(!neoclr_gc_collect_v1(&c, NULL) && c.text.used);
+    CHECK(neoclr_scheduler_acquire_v1(&c, &delivery, NULL) == NEOCLR_SCHEDULER_READY);
+    CHECK(!neoclr_gc_host_root_read_v1(&c, delivery, &read) && read == callback);
+    CHECK(!neoclr_scheduler_complete_v1(&c, delivery, NULL));
+    CHECK(!neoclr_socket_scope_leave_v1(&scope));
+    CHECK(!neoclr_gc_collect_v1(&c, NULL) && !c.text.used);
+    CHECK(!neoclr_socket_scope_enter_v1(&scope, &c));
+    CHECK(!neoclr_scheduler_capture_v1(&c, &again, NULL) && again != destination);
+    CHECK(neoclr_scheduler_submit_to_v1(&c, destination, input, NULL) == 3);
+    CHECK(neoclr_scheduler_step_v1(&c, &delivery, NULL) == NEOCLR_SCHEDULER_IDLE);
+    CHECK(!neoclr_socket_scope_leave_v1(&scope));
+    return 0;
+}
+
 int main(void) {
+    CHECK(!destination_contract());
     CHECK(!submitted_work_contract());
     CHECK(!entry_delivery_contract());
     uint64_t buffer[129] = {0}; buffer[128] = 1234567;

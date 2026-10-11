@@ -8303,3 +8303,34 @@ binding alongside task/timer bindings. The backend still requires explicit opt-i
 the CLI provides that opt-in for its trusted native host. The [scheduler baseline](../benchmarks/scheduler/README.md)
 exercises the normal CLI with argument-taking async Main. No compiler configuration,
 metadata encoding or lowering change is introduced by this CLI addition.
+
+
+### Captured scheduler destinations (2026-10-11)
+
+Native intent is retaining the awaiting invocation's placement identity separately
+from outcome storage and callback execution. The internal experiment now emits exact
+InternalCall declarations for `neoCLR.Runtime.SchedulerCapture() -> Int64` and
+`neoCLR.Runtime.SchedulerSubmitTo(Int64, fn<Void>) -> Int32`. Zero is the same private
+admission acknowledgment as SchedulerSubmit. The native backend binds both under
+`--bind-scheduler` with `--compile-system` and `--native-gc`; the development JIT CLI
+already provides that binding set. No Runtime Contract configuration, Raven semantic
+model, emitted state-machine shape or ordinary .NET behavior is changed.
+
+The Int64 is an opaque, non-owning invocation identity allocated lazily by the runtime.
+A registration captures it and retains its callback in managed storage until admission.
+Submission rejects zero, foreign and expired identities before retaining work. Native
+scope addresses may be reused but identities are not reused within the loaded runtime.
+This does not serialize a scheduler, retain an invocation, route across heaps/threads,
+flow ExecutionContext or expose a stable ABI/security capability. Cross-invocation
+completion deliberately faults pending ownership/wakeup design; public Task/Promise
+still use their existing queue routing.
+
+neoCLR owns identities, validation, rooting and backend calls; Raven only emits existing
+InternalCall, Int64, callable and state-machine representations. Native metadata/backend
+replacement should represent destination identity and lifecycle directly, without a
+permanent integer/callback-only language contract. [Consumer and validation](experiments/scheduler-continuations/README.md)
+record the tested bundle/binaries. These are neoCLR-main development services, not
+inferred execution support from an arbitrary Raven-main build.
+
+Companion Raven shared-main documentation: `b9cf3487b` (documentation only; no
+compiler binary change).

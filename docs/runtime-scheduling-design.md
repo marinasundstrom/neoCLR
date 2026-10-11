@@ -959,3 +959,37 @@ Promise registration. The existing .NET comparison remains the design baseline;
 producer independence alone does not provide context flow or ConfigureAwait semantics.
 The benchmark workload and shipped library remain unchanged, so no routing speedup
 or memory improvement is asserted.
+
+## Captured invocation destinations — 2026-10-11
+
+The internal continuation experiment now captures an opaque destination identity at
+registration, separately from its callback and managed outcome. Interpreter and native
+host scopes allocate that identity lazily, retain it across dispatch turns, and never
+reuse it within the loaded runtime's lifetime. SubmitTo checks equality with the current
+invocation before retaining the callback; zero, foreign and expired identities fault.
+Native capture also checks the exact published boundary or host quiescence. Scope reuse
+gets a new identity, even at the same address. The token itself retains neither an
+invocation nor a managed object and is not a security capability.
+
+This first contract deliberately rejects cross-invocation completion instead of routing
+callbacks into an unrelated heap. It establishes placement identity and fail-closed
+ownership, not cross-thread dispatch, lifetime extension or a general scheduler handle.
+The .NET comparison remains await-site scheduler/context capture, but no ExecutionContext
+flow, custom affinity or lifetime parity is claimed. Its benefit is detecting accidental
+retargeting; its cost is a registration object/token and a checked submission service.
+Saved runtime activations can later project the same ownership requirement without
+using the current fn<Void> callback encoding.
+
+The private services are SchedulerCapture() -> Int64 and
+SchedulerSubmitTo(Int64, fn<Void>) -> Int32. Existing SchedulerSubmit remains available
+for admission into the current invocation. Public Task/Promise registration is still
+unchanged; the source-included awaitable is the consumer under qualification. An
+Int64 token is a temporary bridge, not the proposed public Scheduler API.
+
+Validation on macOS ARM64: 15 scheduler checks, five reserved task/callback signature
+checks, five existing submission/timer executable checks, one expanded native binding
+contract, six instrumented native C contracts, and success/fault consumers in all three
+execution modes (six runs). [Evidence](experiments/scheduler-continuations/README.md).
+No Windows run or performance claim is included. The unchanged state-machine benchmark
+remains the production-path baseline; measuring the new registration object/token costs
+requires a matched captured-destination workload before production migration.

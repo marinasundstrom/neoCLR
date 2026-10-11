@@ -383,6 +383,46 @@ int32_t neoclr_scheduler_step_v1(neoclr_aot_context *context, uint64_t *callback
     return NEOCLR_SCHEDULER_IDLE;
 }
 
+static _Atomic uint64_t next_scheduler_destination = 1;
+static int scheduler_boundary_valid(neoclr_aot_context *context, const neoclr_probe_frame *boundary) {
+    if (boundary) return neoclr_root_probe_head_v1() == boundary && boundary->context == context;
+    for (const neoclr_probe_frame *frame = neoclr_root_probe_head_v1(); frame; frame = frame->previous)
+        if (frame->context == context) return 0;
+    return 1;
+}
+int32_t neoclr_scheduler_capture_v1(neoclr_aot_context *context, int64_t *output,
+    const neoclr_probe_frame *boundary) {
+    neoclr_socket_scope *scope = find_scope(context);
+    if (!scope || !output || !scheduler_boundary_valid(context, boundary)) return 3;
+    if (!scope->scheduler_destination) {
+        uint64_t next = atomic_load_explicit(&next_scheduler_destination, memory_order_relaxed);
+        do {
+            if (next >= INT64_MAX) return 3;
+        } while (!atomic_compare_exchange_weak_explicit(&next_scheduler_destination, &next, next + 1,
+            memory_order_relaxed, memory_order_relaxed));
+        scope->scheduler_destination = next;
+    }
+    *output = (int64_t)scope->scheduler_destination;
+    return 0;
+}
+int32_t neoclr_scheduler_submit_to_v1(neoclr_aot_context *context, int64_t destination,
+    uint64_t callback, const neoclr_probe_frame *boundary) {
+    neoclr_socket_scope *scope = find_scope(context);
+    if (!scope || destination <= 0 || scope->scheduler_destination != (uint64_t)destination) return 3;
+    return neoclr_scheduler_submit_v1(context, callback, boundary);
+}
+int32_t neoclr_scheduler_capture_managed_v1(neoclr_aot_context *context, int64_t *output) {
+    const neoclr_probe_frame *boundary = neoclr_root_probe_head_v1();
+    if (!boundary) return 3;
+    return neoclr_scheduler_capture_v1(context, output, boundary);
+}
+int32_t neoclr_scheduler_submit_to_managed_v1(int64_t destination, void *callback,
+    neoclr_aot_context *context, int32_t *output) {
+    neoclr_socket_scope *scope = find_scope(context);
+    if (!scope || destination <= 0 || scope->scheduler_destination != (uint64_t)destination) return 3;
+    return neoclr_scheduler_submit_managed_v1(callback, context, output);
+}
+
 int32_t neoclr_scheduler_submit_v1(neoclr_aot_context *context, uint64_t callback,
     const neoclr_probe_frame *boundary) {
     neoclr_socket_scope *scope = find_scope(context);

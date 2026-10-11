@@ -52,6 +52,8 @@ pub(crate) enum Binding {
     DrainEntryTasks,
     ScheduleTask,
     SchedulerSubmit,
+    SchedulerCapture,
+    SchedulerSubmitTo,
     StartWorker(bool),
     JoinWorker,
     JoinWorkerResult,
@@ -909,6 +911,12 @@ pub(crate) fn bind(function: &Function) -> Result<Binding, Fault> {
         {
             (Binding::NotifyWorker, Type::Void)
         }
+        ("neoCLR.Runtime.SchedulerCapture", []) => (Binding::SchedulerCapture, Type::Int64),
+        ("neoCLR.Runtime.SchedulerSubmitTo", [Type::Int64, callback])
+            if *callback == crate::assembler::parse_type("fn<Void>")? =>
+        {
+            (Binding::SchedulerSubmitTo, Type::Int32)
+        }
         ("neoCLR.Runtime.SchedulerSubmit", [callback])
             if *callback == crate::assembler::parse_type("fn<Void>")? =>
         {
@@ -1651,6 +1659,21 @@ mod task_callback_tests {
                 ".module Test\n.function neoCLR.Runtime.{signature}\n.methodimpl InternalCall\n.end\n"
             ));
             assert_eq!(module.is_ok(), accepted, "{signature}");
+        }
+    }
+
+    #[test]
+    fn scheduler_destinations_require_exact_contracts() {
+        for (signature, accepted) in [
+            ("SchedulerCapture() -> Int64", true),
+            ("SchedulerCapture() -> Int32", false),
+            ("SchedulerCapture(Int64 value) -> Int64", false),
+            ("SchedulerSubmitTo(Int64 destination, fn<Void> callback) -> Int32", true),
+            ("SchedulerSubmitTo(Int32 destination, fn<Void> callback) -> Int32", false),
+            ("SchedulerSubmitTo(Int64 destination, fn<noresult Void> callback) -> Int32", false),
+            ("SchedulerSubmitTo(Int64 destination, fn<Void> callback) -> Void", false),
+        ] {
+            assert_eq!(crate::assemble(&format!(".module Test\n.function neoCLR.Runtime.{signature}\n.methodimpl InternalCall\n.end\n")).is_ok(), accepted, "{signature}");
         }
     }
 

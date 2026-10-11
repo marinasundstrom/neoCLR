@@ -25,6 +25,7 @@ typedef struct neoclr_socket_scope {
         uint64_t attempt_deadline;
     } operations[64];
     uint64_t timer_delivery; /* One-shot delivery root, retained until next poll/leave. */
+    uint64_t scheduler_destination; /* Lazy, never-reused invocation identity. */
     uint64_t scheduler_delivery; /* Independent dispatch root, released by completion/leave. */
     const struct neoclr_probe_frame *scheduler_boundary;
     uint64_t transfer_bytes;
@@ -81,6 +82,13 @@ int32_t neoclr_socket_connect_addresses_until_v1(const void *, int32_t, int64_t,
  * IDLE/PENDING/error leave the callback output unchanged. Delivered operations
  * still awaiting result consumption keep the scheduler pending. */
 enum { NEOCLR_SCHEDULER_IDLE = 0, NEOCLR_SCHEDULER_READY = 1, NEOCLR_SCHEDULER_PENDING = 2 };
+/* Destination capture identifies this owner-thread invocation. SubmitTo rejects
+ * foreign/stale identities before retaining work; it does not route across scopes.
+ * The token is not a GC root, scheduler customization or transferable capability. */
+int32_t neoclr_scheduler_capture_v1(neoclr_aot_context *, int64_t *, const neoclr_probe_frame *);
+int32_t neoclr_scheduler_submit_to_v1(neoclr_aot_context *, int64_t, uint64_t, const neoclr_probe_frame *);
+int32_t neoclr_scheduler_capture_managed_v1(neoclr_aot_context *, int64_t *);
+int32_t neoclr_scheduler_submit_to_managed_v1(int64_t, void *, neoclr_aot_context *, int32_t *);
 int32_t neoclr_scheduler_step_v1(neoclr_aot_context *, uint64_t *, const neoclr_probe_frame *);
 /* Private runtime submission prototype. Clone a rooted image-local fn<Void>
  * into this owner-thread scope; success means admitted, never inline execution.
