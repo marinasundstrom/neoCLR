@@ -8,6 +8,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-11
 
+- Connect native Raven async `yield` and `yield from` to the retained-runtime POC.
+  Qualify lazy demand-driven production, closed integer/string element types,
+  direct iterators, nested disposal, cancellation and live-yield GC in interpreter,
+  macOS ARM64 JIT and AOT. Generic source methods, abandoned-generator collection,
+  performance qualification and Windows retained suspension remain open.
+
 - Add a source-local async-generator prototype using managed iteration contracts
   and retained runtime bodies. Qualify lazy start, demand-driven yield/resume,
   independent iterators, early stop, cancellation and GC during live iteration in

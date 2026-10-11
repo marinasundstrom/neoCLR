@@ -24,6 +24,7 @@ def main():
     scenarios.add_argument('--await-for', action='store_true', help='Qualify retained-body await-for consumption')
     scenarios.add_argument('--synchronous-for', action='store_true', help='Recheck existing retained-body synchronous iteration')
     scenarios.add_argument('--generator', action='store_true', help='Qualify the source-local yield/resume prototype')
+    scenarios.add_argument('--generator-language', action='store_true', help='Qualify native Raven yield syntax')
     parser.add_argument('--compiler', type=Path, help='Compiler to qualify instead of the recipe compiler')
     args = parser.parse_args()
     recipe = json.loads(args.recipe.read_text())
@@ -82,13 +83,17 @@ def main():
             samples = [('for', 'RuntimeForAwait.rvn', 'PASS await in for state and lifetime')]
         if args.generator:
             samples = [('generator', 'RuntimeAsyncGenerator.rvn', 'PASS demand driven async generator prototype')]
-        for lowering in (('runtime',) if args.await_for or args.synchronous_for or args.generator else ('state-machine', 'runtime')):
+        if args.generator_language:
+            samples = [('generator-language', 'RuntimeGeneratorLanguage.rvn', 'PASS native Raven async generator language')]
+        for lowering in (('runtime',) if args.await_for or args.synchronous_for or args.generator or args.generator_language else ('state-machine', 'runtime')):
             for name, filename, expected in samples:
                 label = lowering + '-' + name
                 assembly, obj, app = [out / (label + suffix) for suffix in ('.dll', '.o', '')]
                 source = command('stack-reuse-source')
                 source[1] = str(compiler)
                 source[source.index('-o') + 1:] = [str(assembly), str(HERE / filename), str(HERE / 'RuntimeAsyncBridge.rvn')]
+                if args.generator_language:
+                    source.append(str(HERE / 'RuntimeGeneratorBridge.rvn'))
                 if lowering == 'state-machine':
                     i = source.index('--runtime-async-poc')
                     del source[i:i + 2]

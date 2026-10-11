@@ -15282,3 +15282,19 @@ or runtime-await default switch was performed.
   Native Raven `yield` syntax is not yet connected to it. Explicit disposal and live
   GC checks are qualified; abandoned suspended-producer collection remains open.
   [Producer design and evidence](experiments/runtime-async/async-generators.md#demand-driven-producer-prototype-2026-10-11).
+
+## 2026-10-11 — Async-generator scope and performance gate
+
+- Author asked how far to go now, requiring working patterns and relevant JIT/AOT
+  performance, and questioned whether state machines should be faster than runtime
+  async. Subsequently directed: “OK proceed”.
+- Assistant proposed a functional native-yield milestone with generic types, cleanup
+  and lifetime qualification, followed by measured performance gates. Runtime-owned
+  async does not imply retained stacks must be faster; preserve state-machine baselines.
+- Action/outcome: native Raven yield and delegation now pass the source-local consumer
+  in interpreter, macOS ARM64 JIT and AOT. Closed integer/string elements, direct
+  iterators, lazy demand, disposal, cancellation and live-yield GC are qualified.
+- Open: generic source methods, pending producer cleanup, abandoned suspended-body
+  reclamation and generator benchmarks. Existing runtime-await cache measurements
+  remain slower than native state-machine controls; no default switch is made.
+  [Implementation and evidence](experiments/runtime-async/async-generators.md#native-raven-yield-checkpoint-2026-10-11).

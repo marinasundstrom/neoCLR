@@ -340,8 +340,9 @@ after a true result, and await `iterator.DisposeAsync()` when finished. Operatio
 must not overlap. The managed interfaces are implemented. The explicit retained-runtime async POC
 supports `await for` consumption, including awaited cleanup on early exit and
 cancellation, with interpreter/JIT/AOT qualification on macOS ARM64. The native
-state-machine path and generator `yield` synthesis remain incomplete.
+state-machine path remains incomplete.
 
-A source-local generator prototype now demonstrates lazy, demand-driven yield/resume
-and early-stop cleanup on these interfaces. Native Raven `yield` syntax and collection
-of abandoned suspended generators remain development work.
+Native Raven `yield` and `yield from` now demonstrate lazy, demand-driven yield/resume
+and early-stop cleanup on these interfaces in the opt-in retained-runtime POC.
+Collection of abandoned suspended generators, generic source generator methods and
+performance qualification remain development work.

@@ -182,3 +182,47 @@ Remaining work before native Raven `yield` support:
   is not yet proven collectible. GC during live iteration is a different guarantee.
 - Qualify native generated-state-machine consumption if it remains a supported
   comparison path, and Windows retained suspension before claiming those targets.
+
+## Native Raven yield checkpoint (2026-10-11)
+
+[Native language consumer](RuntimeGeneratorLanguage.rvn) now uses ordinary `yield`
+and `yield from` with the [source-included generic provider](RuntimeGeneratorBridge.rvn).
+The explicit runtime-async compiler option enables the selected generator-body
+capability. Compilation expands delegation and lexical cleanup before replacing yield
+with a suspension/demand handshake. Iterable acquisition is lazy and independent;
+direct AsyncIterator returns use the same cursor protocol.
+
+[Interpreter/JIT/AOT evidence](async-generator-language-validation.json) passes all
+three modes on this macOS ARM64 host. It covers integer/string items, input waits,
+no producer run-ahead, independent iterators, normal exhaustion, unstarted disposal,
+early consumer exits, delegated producer cleanup, input cancellation, repeated runs
+and GC while yielded. No application AsyncStateMachine carrier is emitted.
+This does not yet qualify producer cleanup which itself suspends or abandoned GC.
+
+Reproduce with the matching Raven native compiler and async-iteration library bundle:
+
+```sh
+python3 docs/experiments/runtime-async/validate_async_iteration.py \
+  --recipe target/runtime-stack-cache-validation-v2/validation.json \
+  --interpreter-recipe target/runtime-http-use-final/validation.json \
+  --libraries target/async-iteration-libraries \
+  --compiler /Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll \
+  --generator-language --output target/generator-language-validation-new
+```
+
+The report hashes source, compiler, libraries and native inputs. Shared binding is
+Raven main `8d787feca`, deliberately carried into native `36a4fd711` on
+`codex/source-object-metadata-resolution`. The retained backend
+still rejects generic source methods and generic owners; closed element types work.
+Awaitless generators currently produce a misleading RAV2706 warning. This is a
+compiler diagnostic gap, not a synchronous-yield contract.
+
+The .NET comparison remains the async pull/disposal protocol, implemented there with
+compiler-generated state and reusable ValueTask machinery. This POC instead retains
+runtime stacks and allocates Task/Promise handshakes per item. It makes suspension
+runtime-owned but is not inherently faster or smaller. Existing cached runtime-await
+measurements still take 1.31–1.91 times the native state-machine time; they are not
+measurements of these generators. The next gates are generic source generators,
+awaited cleanup and abandoned lifetime, followed by matched JIT/AOT throughput,
+allocation, retained-memory and latency measurements. Keep state-machine controls.
+Do not change defaults on the strength of functional evidence alone.

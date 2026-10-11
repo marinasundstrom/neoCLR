@@ -8845,3 +8845,17 @@ through awaited disposal without encoding CLR exception handling. Source `use`
 cleanup shares that ordering. No new runtime opcode is introduced and terminal
 Fault remains nonrecoverable. The runtime suspension provider and its platform
 limits are unchanged. [Tests, restrictions and generator follow-up](experiments/runtime-async/async-generators.md#retained-body-await-for-checkpoint-2026-10-11).
+
+### Native yield producer bridge (2026-10-11)
+
+Raven native `36a4fd711` now selects `RuntimeIterationContract.Async.AllowGeneratorBodies`
+and synthesizes native generator bodies through a source-included provider named
+`<RuntimeAsyncHelper>Generator`. Its generic factories capture a cursor callback;
+yield awaits a Boolean resume/stop gate. Delegation expands through the selected
+async iteration protocol, sharing lexical cleanup. This is temporary bound-tree/CLI
+encoding with ordinary native interface calls, not a public generator ABI. Raven owns
+lowering; neoCLR owns provider/lifetime validation. Native suspension metadata and a
+production carrier remain the eventual replacement. Generic source methods/owners,
+abandoned collection and acquisition cancellation remain restricted; terminal Fault
+semantics and execution defaults remain unchanged.
+[Exact consumer and three-mode evidence](experiments/runtime-async/async-generators.md#native-raven-yield-checkpoint-2026-10-11).

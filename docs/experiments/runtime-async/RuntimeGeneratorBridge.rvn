@@ -1,0 +1,97 @@
+// Source-included prototype contract for native Raven yield lowering.
+module RuntimeAwaitProvider
+
+import System.*
+import System.Collections.*
+import System.Tasks.*
+
+static class BridgeGenerator {
+    static func CreateIterable<T>(body: (GeneratorCursor<T>) -> TaskOutcome<()>) -> AsyncIterable<T> {
+        return GeneratorSource<T>(body)
+    }
+    static func CreateIterator<T>(body: (GeneratorCursor<T>) -> TaskOutcome<()>) -> AsyncIterator<T> {
+        return GeneratorCursor<T>(body)
+    }
+    static func Yield<T>(cursor: GeneratorCursor<T>, value: T) -> Task<bool> => cursor.Publish(value)
+}
+
+class GeneratorSource<T> : AsyncIterable<T> {
+    private val body: (GeneratorCursor<T>) -> TaskOutcome<()>
+    init(action: (GeneratorCursor<T>) -> TaskOutcome<()>) { body = action }
+    func GetAsyncIterator() -> AsyncIterator<T> => GeneratorCursor<T>(body)
+}
+
+class GeneratorCursor<T> : AsyncIterator<T> {
+    private val callback: (GeneratorCursor<T>) -> TaskOutcome<()>
+    private val done = Promise<()>()
+    private var next = Promise<bool>()
+    private var resume = Promise<bool>()
+    private var body = Task.CompletedTask
+    private var started = false
+    private var ended = false
+    private var moving = false
+    private var disposing = false
+    private var current: T = default
+
+    init(action: (GeneratorCursor<T>) -> TaskOutcome<()>) { callback = action }
+
+    func MoveNextAsync() -> Task<bool> {
+        if ended || disposing { return Task.FromResult(false) }
+        if moving { System.Fail("Overlapping generator advancement") }
+        moving = true
+        next = Promise<bool>()
+        if !started {
+            started = true
+            body = Bridge.Start(Run)
+            // Deliberate producer-outcome adapter, including cancellation.
+            body.OnCompleted(Finish)
+        } else {
+            if !resume.Complete(true) { System.Fail("Generator has no suspended yield") }
+        }
+        return next.Task
+    }
+
+    private func Run() -> TaskOutcome<()> => callback(self)
+
+    val Current: T {
+        get {
+            if !started || moving || ended || disposing { System.Fail("Generator has no current item") }
+            return current
+        }
+    }
+
+    func Publish(value: T) -> Task<bool> {
+        if !moving || disposing { System.Fail("Generator yielded without demand") }
+        current = value
+        resume = Promise<bool>()
+        moving = false
+        if !next.Complete(true) { System.Fail("Generator delivered an item twice") }
+        return resume.Task
+    }
+
+    func DisposeAsync() -> Task<()> {
+        if moving { System.Fail("Cannot dispose during generator advancement") }
+        if disposing { return done.Task }
+        disposing = true
+        if !started {
+            ended = true
+            _ = done.Complete(())
+        } else if !ended {
+            if !resume.Complete(false) { System.Fail("Generator has no yield to dispose") }
+        }
+        return done.Task
+    }
+
+    private func Finish() -> System.Void {
+        ended = true
+        moving = false
+        current = default
+        if body.IsCancelled {
+            _ = next.Cancel()
+            _ = done.Cancel()
+        } else {
+            _ = next.Complete(false)
+            _ = done.Complete(())
+        }
+    }
+}

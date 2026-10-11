@@ -1,0 +1,188 @@
+module RuntimeGeneratorLanguage
+
+import System.*
+import System.Collections.*
+import System.Tasks.*
+
+class Counters {
+    var Starts = 0
+    var Yields = 0
+    var Resumes = 0
+    var Disposals = 0
+}
+
+class Lifetime : Disposable {
+    private val counters: Counters
+    init(counters: Counters) { self.counters = counters }
+    func Dispose() { counters.Disposals = counters.Disposals + 1 }
+}
+
+async func Values(gate: Task<int>, counters: Counters) -> AsyncIterable<int> {
+    use lifetime = Lifetime(counters)
+    counters.Starts = counters.Starts + 1
+    let value = await gate
+    counters.Yields = counters.Yields + 1
+    yield value
+    counters.Resumes = counters.Resumes + 1
+    counters.Yields = counters.Yields + 1
+    yield value + 1
+    counters.Resumes = counters.Resumes + 1
+}
+
+async func Read(stream: AsyncIterable<int>, stop: bool) -> Task<int> {
+    var sum = 0
+    await for value in stream {
+        System.Runtime.GC.Collect()
+        sum = sum + value
+        if stop { break }
+    }
+    return sum
+}
+
+class Observer {
+    private val task: Task<int>
+    val Done = Promise<bool>()
+    init(task: Task<int>) { self.task = task }
+    // Observe producer/consumer cancellation without cancelling the test runner.
+    func Complete() -> System.Void { _ = Done.Complete(task.IsCancelled) }
+}
+
+async func CheckDemand() -> Task<()> {
+    let gate = Promise<int>()
+    let counters = Counters()
+    let stream = Values(gate.Task, counters)
+    let iterator = stream.GetAsyncIterator()
+    if counters.Starts != 0 { System.Fail("Generator started before first advancement") }
+    let first = iterator.MoveNextAsync()
+    if first.IsCompleted || counters.Starts != 1 { System.Fail("Generator did not await its input") }
+    _ = gate.Complete(7)
+    if !await first || iterator.Current != 7 || counters.Resumes != 0 { System.Fail("First yield failed") }
+    System.Runtime.GC.Collect()
+    if counters.Yields != 1 || counters.Disposals != 0 { System.Fail("Yield did not retain the producer") }
+    if !await iterator.MoveNextAsync() || iterator.Current != 8 || counters.Resumes != 1 { System.Fail("Second yield failed") }
+    if await iterator.MoveNextAsync() { System.Fail("Generator failed to end") }
+    await iterator.DisposeAsync()
+    if counters.Disposals != 1 || counters.Resumes != 2 { System.Fail("Generator completion lost cleanup") }
+    if await iterator.MoveNextAsync() { System.Fail("Completed generator restarted") }
+}
+
+async func CheckConsumer(stop: bool) -> Task<()> {
+    let gate = Promise<int>()
+    let counters = Counters()
+    let stream = Values(gate.Task, counters)
+    let result = Read(stream, stop)
+    _ = gate.Complete(7)
+    let sum = await result
+    var expected = 15
+    var resumes = 2
+    var yields = 2
+    if stop { expected = 7; resumes = 0; yields = 1 }
+    if sum != expected || counters.Resumes != resumes || counters.Yields != yields || counters.Disposals != 1 {
+        System.Fail("Consumer failed to stop or complete the producer")
+    }
+}
+
+async func CheckCancellation() -> Task<()> {
+    let gate = Promise<int>()
+    let counters = Counters()
+    let result = Read(Values(gate.Task, counters), false)
+    let observer = Observer(result)
+    result.OnCompleted(observer.Complete)
+    _ = gate.Cancel()
+    if !await observer.Done.Task || counters.Disposals != 1 || counters.Yields != 0 {
+        System.Fail("Cancelled producer did not clean up")
+    }
+}
+
+async func CheckUnstarted() -> Task<()> {
+    let gate = Promise<int>()
+    let counters = Counters()
+    let iterator = Values(gate.Task, counters).GetAsyncIterator()
+    await iterator.DisposeAsync()
+    if await iterator.MoveNextAsync() || counters.Starts != 0 || counters.Disposals != 0 {
+        System.Fail("Disposing an unstarted generator ran its body")
+    }
+}
+
+async func CheckIndependent() -> Task<()> {
+    let gate = Promise<int>()
+    let counters = Counters()
+    let stream = Values(gate.Task, counters)
+    let first = stream.GetAsyncIterator()
+    let second = stream.GetAsyncIterator()
+    let firstPending = first.MoveNextAsync()
+    let secondPending = second.MoveNextAsync()
+    _ = gate.Complete(7)
+    if !await firstPending || !await secondPending || counters.Starts != 2 {
+        System.Fail("Iterable did not create independent producers")
+    }
+    if !await first.MoveNextAsync() || first.Current != 8 || second.Current != 7 {
+        System.Fail("Advancing one iterator changed another")
+    }
+    await first.DisposeAsync()
+    System.Runtime.GC.Collect()
+    if counters.Disposals != 1 || !await second.MoveNextAsync() || second.Current != 8 {
+        System.Fail("Disposing one iterator released another")
+    }
+    await second.DisposeAsync()
+    if counters.Disposals != 2 { System.Fail("Independent producers did not both clean up") }
+}
+
+async func Words() -> AsyncIterable<string> {
+    yield "alpha"
+    yield "beta"
+}
+
+async func Single() -> AsyncIterator<int> { yield 7 }
+
+async func Delegated(gate: Task<int>, inner: Counters, outer: Counters) -> AsyncIterable<int> {
+    use lifetime = Lifetime(outer)
+    yield 1
+    yield from Values(gate, inner)
+    yield 99
+}
+
+async func CheckShapes() -> Task<()> {
+    var text = ""
+    await for word in Words() {
+        System.Runtime.GC.Collect()
+        text = text + word
+    }
+    if text != "alphabeta" { System.Fail("Reference-valued generator failed") }
+    let iterator = Single()
+    if !await iterator.MoveNextAsync() || iterator.Current != 7 {
+        System.Fail("Direct iterator generator failed")
+    }
+    await iterator.DisposeAsync()
+}
+
+async func CheckDelegation(stop: bool) -> Task<()> {
+    let inner = Counters()
+    let outer = Counters()
+    var sum = 0
+    await for value in Delegated(Task.FromResult(7), inner, outer) {
+        sum = sum + value
+        if stop && value == 7 { break }
+    }
+    var expected = 115
+    if stop { expected = 8 }
+    if sum != expected || inner.Disposals != 1 || outer.Disposals != 1 {
+        System.Fail("Yield delegation lost values or nested cleanup")
+    }
+}
+
+async func Main() -> Task<int> {
+    await CheckShapes()
+    await CheckDelegation(false)
+    await CheckDelegation(true)
+    await CheckDemand()
+    await CheckUnstarted()
+    await CheckIndependent()
+    for index in 1..8 {
+        await CheckConsumer(false)
+        await CheckConsumer(true)
+        await CheckCancellation()
+    }
+    Console.WriteLine("PASS native Raven async generator language")
+    return 0
+}
