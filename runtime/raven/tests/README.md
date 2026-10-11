@@ -675,3 +675,41 @@ We expand it as needs arise; fixtures, matrices, hooks and retries are not commi
 Validation: [ten discovery rejections](data-evidence/discovery.json) and
 [15 execution/filter checks](data-evidence/execution.json) pass on macOS ARM64
 in interpreter, JIT and AOT. This does not qualify Windows.
+
+
+## Categories (development)
+
+Use repeatable `[Category("fast")]` on a `[Test]` function. Every data row inherits
+those categories. `--category fast` selects exact case-sensitive matches, independently
+of names/descriptions; it does not combine with `--filter` or `--id` yet. Empty and
+unmatched selection fail configuration. Manual cases can use
+`Add(id, name, body, categories: string[])`; registration copies the category list.
+The existing overload remains untagged. Tests still execute serially.
+
+## Parallel execution and class grouping — proposal, 2026-10-11
+
+The author requests considering parallel-by-default execution, keyed grouping and
+eventual class-based test groups. This is future work, not implemented behavior.
+Following [TUnit's concurrency model](https://tunit.dev/docs/execution/parallelism/),
+keep these meanings distinct:
+
+- `ParallelGroup("key")`: cases may overlap within a group, with groups isolated.
+- `NotInParallel("key")`: cases sharing a constraint key must not overlap.
+- `Category("key")`: selection only, with no scheduling effect.
+
+The assistant initially proposed same-key serialization under ParallelGroup, then
+corrected that proposal after checking TUnit. Names and detailed scheduler semantics
+are provisional; we should not introduce the opposite meaning under a familiar name.
+Class discovery could later supply default metadata, while retaining module functions.
+
+Before parallel execution becomes the default, qualify bounded concurrency, shared
+source inputs, deterministic reporting, cancellation/fault handling and cleanup with
+the runtime scheduler. Class instance lifetime and inheritance rules need separate
+design; per-case instances are a candidate matching TUnit, not a current guarantee.
+Parallelism can shorten suites but increases resource contention and exposes shared
+state. Validate non-overlap and concurrency limits with synchronization-based tests
+rather than timing-only assertions. No new scheduling attribute is added in this slice.
+
+Category evidence: [18 JIT/AOT checks](category-evidence/execution.json),
+[empty-category rejection](category-evidence/discovery.json), and
+[existing JIT runner checks](category-evidence/runner.json) pass on macOS ARM64.

@@ -521,7 +521,10 @@ def main():
             selections = {
                 'collections': [(['--filter', 'ArrayQueue'], 0, 'PASS ArrayQueue preserves FIFO\nTests: 1, passed: 1, failed: 0, skipped: 0\n'),
                                 (['--filter', 'Map'], 0, ''.join('PASS ' + n + '\n' for n in MAP_NAMES) + f'Tests: {len(MAP_NAMES)}, passed: {len(MAP_NAMES)}, failed: 0, skipped: 0\n')],
-                'discovery-contract': [(['--filter', 'Inputs[1]'], 0, 'PASS NeoClr.DiscoveryTests.FSource/NeoClr.DiscoveryTests.Inputs[1]\nTests: 1, passed: 1, failed: 0, skipped: 0\n'), (['--filter', 'EInline(2, 3, 5)'], 0, 'PASS NeoClr.DiscoveryTests.EInline(2, 3, 5)\nTests: 1, passed: 1, failed: 0, skipped: 0\n'), (['--id', 'manual'], 0, 'PASS manually registered companion\nTests: 1, passed: 1, failed: 0, skipped: 0\n'),
+                'discovery-contract': [(['--category', 'fast'], 0, 'PASS first discovered test\nPASS NeoClr.DiscoveryTests.EInline(2, 3, 5)\nPASS NeoClr.DiscoveryTests.EInline(5, 6, 11)\nTests: 3, passed: 3, failed: 0, skipped: 0\n'),
+                                       (['--category', 'data'], 0, 'PASS NeoClr.DiscoveryTests.FSource/NeoClr.DiscoveryTests.Inputs[0]\nPASS NeoClr.DiscoveryTests.FSource/NeoClr.DiscoveryTests.Inputs[1]\nTests: 2, passed: 2, failed: 0, skipped: 0\n'),
+                                       (['--category', 'FAST'], 2, 'ERROR No tests matched the selection\n'),
+                                       (['--category', ''], 2, 'ERROR Expected --filter <text>, --id <id> or --category <name>\n'), (['--filter', 'Inputs[1]'], 0, 'PASS NeoClr.DiscoveryTests.FSource/NeoClr.DiscoveryTests.Inputs[1]\nTests: 1, passed: 1, failed: 0, skipped: 0\n'), (['--filter', 'EInline(2, 3, 5)'], 0, 'PASS NeoClr.DiscoveryTests.EInline(2, 3, 5)\nTests: 1, passed: 1, failed: 0, skipped: 0\n'), (['--id', 'manual'], 0, 'PASS manually registered companion\nTests: 1, passed: 1, failed: 0, skipped: 0\n'),
                                        (['--filter', 'after discovered'], 0, 'PASS after discovered failure\nTests: 1, passed: 1, failed: 0, skipped: 0\n')],
                 'runner-contract': [
                     (['--entry-probe', '', 'two words', 'Räven ☕ 😀', 'quote"slash\\', '--id'], 0, 'PASS entry arguments preserve text\nTests: 1, passed: 1, failed: 0, skipped: 0\n'),
@@ -530,11 +533,11 @@ def main():
                     (['--id', 'runner.skipped'], 0, 'SKIP intentional skip: contract probe\nTests: 1, passed: 0, failed: 0, skipped: 1\n'),
                     (['--filter', 'failure'], 1, 'PASS before failure\nFAIL intentional assertion failure: Expected 1, actual 2\nPASS after failure\nTests: 3, passed: 2, failed: 1, skipped: 0\n'),
                     (['--filter', 'RUNNER'], 2, 'ERROR No tests matched the selection\n'),
-                    (['--filter'], 2, 'ERROR Expected --filter <text> or --id <id>\n'),
-                    (['--filter', ''], 2, 'ERROR Expected --filter <text> or --id <id>\n'),
-                    (['--unknown', 'after'], 2, 'ERROR Expected --filter <text> or --id <id>\n'),
-                    (['--jit-managed', '--jit-run', '--target', '--jit-entry-argument'], 2, 'ERROR Expected --filter <text> or --id <id>\n'),
-                    (['--id', 'runner.after', '--filter', 'after'], 2, 'ERROR Expected --filter <text> or --id <id>\n'),
+                    (['--filter'], 2, 'ERROR Expected --filter <text>, --id <id> or --category <name>\n'),
+                    (['--filter', ''], 2, 'ERROR Expected --filter <text>, --id <id> or --category <name>\n'),
+                    (['--unknown', 'after'], 2, 'ERROR Expected --filter <text>, --id <id> or --category <name>\n'),
+                    (['--jit-managed', '--jit-run', '--target', '--jit-entry-argument'], 2, 'ERROR Expected --filter <text>, --id <id> or --category <name>\n'),
+                    (['--id', 'runner.after', '--filter', 'after'], 2, 'ERROR Expected --filter <text>, --id <id> or --category <name>\n'),
                 ],
             }.get(name, [])
             for arguments, selected_exit, selected_stdout in selections:

@@ -1,0 +1,10 @@
+{
+  "passed": true,
+  "cases": [
+    {
+      "name": "empty-category",
+      "rejected": "Test discovery failed: DiscoveryValidation.Invalid: Category requires one nonempty string",
+      "sourceSha256": "d3a053755d82d957e52fcf404deea8c0fd9c8735447b51afdf6bfe6e15924a9c"
+    }
+  ]
+}

@@ -8,6 +8,13 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-11
 
+- Add repeatable test `CategoryAttribute`, per-row category inheritance, manual
+  registration categories and exact case-sensitive `--category` selection.
+  Empty/unmatched category selections fail configuration. Record future parallel
+  execution/class grouping as proposals; the runner remains serial. Category selection
+  passes 18 JIT/AOT checks, empty-category discovery rejection and the existing JIT
+  runner contract.
+
 - Add benchmark-owned `Arguments` and `ArgumentsSource` attributes without a testing
   dependency. Generate per-row callbacks/selectors and enumerate runtime source
   rows before measurement. Inline scalar and typed array sources pass in interpreter,

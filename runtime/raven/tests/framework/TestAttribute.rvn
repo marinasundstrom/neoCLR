@@ -35,3 +35,13 @@ public class ArgumentsAttribute : Attribute {
 public class MethodDataSourceAttribute : Attribute {
     init(methodName: string) { }
 }
+
+/// Groups a test and all its data rows for exact category selection.
+[AttributeUsage(AttributeTargets.Method, AllowMultiple: true)]
+public class CategoryAttribute : Attribute {
+    val Name: string
+
+    init(name: string) {
+        Name = name
+    }
+}

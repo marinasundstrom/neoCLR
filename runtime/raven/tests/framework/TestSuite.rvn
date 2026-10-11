@@ -15,13 +15,26 @@ class TestCase {
     val Id: string
     val Name: string
     val SkipReason: Option<string>
+    private val categories = ArrayList<string>()
     private val body: () -> Result<unit, TestFailure>
 
-    init(id: string, name: string, body: () -> Result<unit, TestFailure>, skipReason: Option<string>) {
+    init(id: string, name: string, body: () -> Result<unit, TestFailure>, skipReason: Option<string>, categories: string[]) {
         Id = id
         Name = name
         self.body = body
         SkipReason = skipReason
+        for category in categories {
+            self.categories.Add(category)
+        }
+    }
+
+    func HasCategory(name: string) -> bool {
+        for category in categories {
+            if category == name {
+                return true
+            }
+        }
+        return false
     }
 
     func Invoke() -> Result<unit, TestFailure> => body()
@@ -89,7 +102,17 @@ class TestSuite {
     }
 
     func Add(id: string, name: string, body: () -> Result<unit, TestFailure>) {
-        Register(TestCase(id, name, body, None))
+        Add(id, name, body, [])
+    }
+
+    func Add(id: string, name: string, body: () -> Result<unit, TestFailure>, categories: string[]) {
+        for category in categories {
+            if category == "" {
+                registrationError = "Test categories must be nonempty"
+                return
+            }
+        }
+        Register(TestCase(id, name, body, None, categories))
     }
 
     func Skip(id: string, name: string, reason: string) {
@@ -97,21 +120,28 @@ class TestSuite {
             registrationError = "Skipped tests require a reason"
             return
         }
-        Register(TestCase(id, name, () => Ok(()), Some(reason)))
+        Register(TestCase(id, name, () => Ok(()), Some(reason), []))
     }
 
-    func Run() -> TestRunReport => RunSelected("", false)
+    func Run() -> TestRunReport => RunSelected("", false, false)
 
-    func Run(filter: string) -> TestRunReport => RunSelected(filter, false)
+    func Run(filter: string) -> TestRunReport => RunSelected(filter, false, false)
 
     func RunId(id: string) -> TestRunReport {
         if id == "" {
             return TestRunReport(ArrayList<TestExecution>(), 0, 0, 0, "Test ID must be nonempty")
         }
-        return RunSelected(id, true)
+        return RunSelected(id, true, false)
     }
 
-    private func RunSelected(filter: string, exactId: bool) -> TestRunReport {
+    func RunCategory(category: string) -> TestRunReport {
+        if category == "" {
+            return TestRunReport(ArrayList<TestExecution>(), 0, 0, 0, "Test category must be nonempty")
+        }
+        return RunSelected(category, false, true)
+    }
+
+    private func RunSelected(filter: string, exactId: bool, byCategory: bool) -> TestRunReport {
         let results = ArrayList<TestExecution>()
         if registrationError != "" {
             return TestRunReport(results, 0, 0, 0, registrationError)
@@ -123,7 +153,9 @@ class TestSuite {
         var failed = 0
         var skipped = 0
         for test in cases {
-            let selected = if exactId {
+            let selected = if byCategory {
+                test.HasCategory(filter)
+            } else if exactId {
                 test.Id == filter
             } else {
                 filter == "" || test.Id.ContainsOrdinal(filter) || test.Name.ContainsOrdinal(filter)
@@ -182,11 +214,13 @@ static class TestRunner {
             ConsoleReporter.Write(all)
             return all.ExitCode
         }
-        if arguments.Length != start + 2 || (arguments[start] != "--filter" && arguments[start] != "--id") || arguments[start + 1] == "" {
-            Console.WriteLine("ERROR Expected --filter <text> or --id <id>")
+        if arguments.Length != start + 2 || (arguments[start] != "--filter" && arguments[start] != "--id" && arguments[start] != "--category") || arguments[start + 1] == "" {
+            Console.WriteLine("ERROR Expected --filter <text>, --id <id> or --category <name>")
             return 2
         }
-        let report = if arguments[start] == "--id" {
+        let report = if arguments[start] == "--category" {
+            suite.RunCategory(arguments[start + 1])
+        } else if arguments[start] == "--id" {
             suite.RunId(arguments[start + 1])
         } else {
             suite.Run(arguments[start + 1])

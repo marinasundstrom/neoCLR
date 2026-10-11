@@ -344,3 +344,7 @@ The development testing helper now accepts TUnit-style `[Arguments]` and
 input row independently for filtering and reporting, including AOT. Metadata reads
 do not execute providers; providers run during suite registration. See the
 [testing helper contract and current data limits](/docs/testing.html).
+
+Repeatable `[Category("name")]` tags those tests and their rows for exact
+`--category name` selection. Categories do not change execution order; parallel
+execution and class grouping remain future design work.

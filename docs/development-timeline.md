@@ -14620,3 +14620,20 @@ outside benchmark measurement. Implementation follows the configuration slice.
   General attribute arrays, broader provider shapes, lifecycle and async support
   remain gaps rather than new platform constraints. Category implementation remains
   pending at this entry.
+
+
+### 2026-10-11 — Categories, concurrency and eventual test classes
+
+- **Author:** requested CategoryAttribute, then proposed parallel execution by default,
+  a keyed ParallelGroup attribute, sequential constraints and eventual class grouping.
+- **Assistant:** implemented method categories, inherited by all generated data rows,
+  with exact runner selection. Testing and benchmark data were committed separately
+  (`f3e12bec`, `d89b6899`). The runner still executes serially.
+- **Correction:** the assistant first proposed same-key serialization for ParallelGroup.
+  After reading [TUnit's documentation](https://tunit.dev/docs/execution/parallelism/),
+  corrected this to distinguish internally concurrent/isolated ParallelGroup from
+  same-key non-overlap with NotInParallel. This is a proposal, not an author-approved
+  final scheduling contract. Class instances and lifecycle remain open.
+- **Next design gate:** qualify concurrency/failure/shared-data/cleanup semantics with
+  runtime schedulers before enabling parallel-by-default tests. See the
+  [testing proposal](../runtime/raven/tests/README.md#parallel-execution-and-class-grouping--proposal-2026-10-11).

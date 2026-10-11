@@ -85,7 +85,7 @@ metadata tokens and assembly versions are excluded. Discovery sorts ordinally by
 qualified function name; manual additions retain their chosen registration order.
 
 See the [complete repository contract and validation](https://github.com/marinasundstrom/neoCLR/blob/main/runtime/raven/tests/README.md).
-Grouping/category selection and future source generators are proposals, not APIs.
+Parallel scheduling, class fixtures and future source generators remain proposals.
 
 
 ## ArgumentsAttribute and MethodDataSourceAttribute (development)
@@ -115,3 +115,21 @@ source selectors append `/Qualified.Provider[index]`. Indices are zero-based and
 change meaning if source order changes. Source entries in the metadata inventory
 have `dynamic: true`; they describe registration templates rather than enumerated
 runtime cases. See the [tested data examples](https://github.com/marinasundstrom/neoCLR/blob/main/runtime/raven/tests/discovery-contract/Tests.rvn).
+
+
+## CategoryAttribute (development)
+
+`[Category("name")]` tags a `[Test]` module function and all its argument rows.
+`CategoryAttribute : Attribute` has `init(name: string)` and read-only `Name: string`.
+It targets methods and allows repeated annotations. Discovery rejects empty category
+names; repeated identical names are deduplicated, and categories are sorted ordinally
+in the metadata inventory. Categories affect selection, not case identity or order.
+Class/assembly category inheritance is not supported yet.
+
+`TestSuite.Add(id, name, body, categories: string[])` registers manual categories,
+copying the array contents. Empty category names produce a registration error.
+The existing three-argument overload registers an untagged test.
+`RunCategory(category: string) -> TestRunReport` selects exact, case-sensitive category
+matches. The CLI spelling is `--category <name>`; choose one of category, substring
+`--filter`, or exact `--id`. Empty input and unmatched selection return configuration
+exit code 2. Execution remains serial; categories are not concurrency constraints.

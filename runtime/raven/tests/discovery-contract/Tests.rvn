@@ -11,6 +11,7 @@ func CAfter() -> Result<unit, TestFailure> {
 }
 
 [Test(Description: "first discovered test")]
+[Category("fast")]
 func ABefore() -> Result<unit, TestFailure> {
     return Ok(())
 }
@@ -45,6 +46,8 @@ func Main(arguments: string[]) -> int {
 }
 
 [Test]
+[Category("math")]
+[Category("fast")]
 [Arguments(5, 6, 11)]
 [Arguments(2, 3, 5)]
 func EInline(a: int, b: int, expected: int) -> Result<unit, TestFailure> {
@@ -54,6 +57,7 @@ func EInline(a: int, b: int, expected: int) -> Result<unit, TestFailure> {
 func Inputs() -> int[] => [13, 27]
 
 [Test]
+[Category("data")]
 [MethodDataSource("Inputs")]
 func FSource(value: int) -> Result<unit, TestFailure> {
     return Assert.True(value == 13 || value == 27, "source value")

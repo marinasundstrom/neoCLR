@@ -20,7 +20,7 @@ try
     if (!ReferenceEquals(marker.BaseType, attribute))
         throw new InvalidDataException("TestAttribute must derive from the catalog's System.Attribute");
     var unit = runtime.GetTypes().Single(t => t.FullName == "System.Void");
-    var tests = new List<(string Id, string Name, string Description, string Code, bool Dynamic)>();
+    var tests = new List<(string Id, string Name, string Description, string Code, bool Dynamic, string[] Categories)>();
     foreach (var definition in snapshot.MainModule.Methods)
     {
         // Filter before projecting signatures so unrelated unsupported methods do not
@@ -54,6 +54,17 @@ try
         }
         if (!name.Split('.').All(part => Regex.IsMatch(part, "^[A-Za-z_][A-Za-z0-9_]*$")))
             throw new InvalidDataException(name + ": this adapter requires plain Raven identifiers");
+        var categories = new List<string>();
+        foreach (var category in definition.CustomAttributes.Where(a => a.AttributeType.Namespace == "NeoClr.Testing" && a.AttributeType.Name == "CategoryAttribute"))
+        {
+            var own = assembly.GetTypes().Single(t => t.FullName == "NeoClr.Testing.CategoryAttribute");
+            if (!ReferenceEquals(context.Resolve(category.AttributeType), own)) continue;
+            var values = category.GetArguments();
+            if (values.Count != 1 || values[0].Value is not string label || label.Length == 0 || category.GetNamedArguments().Count != 0)
+                throw new InvalidDataException(name + ": Category requires one nonempty string");
+            if (!categories.Contains(label, StringComparer.Ordinal)) categories.Add(label);
+        }
+        categories.Sort(StringComparer.Ordinal);
         // Length-prefixed components avoid punctuation ambiguities. Versions are intentionally
         // excluded: IDs remain stable across rebuilds and assembly version increments.
         static string Part(string value) => value.Length + ":" + value;
@@ -65,13 +76,13 @@ try
             var rowId = id + row.Suffix;
             var display = description + row.Suffix;
             var callback = row.Suffix.Length == 0 ? name : "() => " + name + "(" + row.Callback + ")";
-            string Registration(string suffix) => "suite.Add(" + Quote(rowId) + suffix + ", " + Quote(display) + suffix + ", " + callback + ")";
+            string Registration(string suffix) => "suite.Add(" + Quote(rowId) + suffix + ", " + Quote(display) + suffix + ", " + callback + ", [" + string.Join(", ", categories.Select(Quote)) + "])";
             var code = row.Provider is null ? "    " + Registration("") + "\n" :
                 "    if true {\n        let rows = " + row.Provider + "()\n" +
                 "        if rows.Length == 0 { System.Fail(\"Data source returned no rows\") }\n" +
                 "        if rows.Length > 10000 { System.Fail(\"Data source exceeded 10000 rows\") }\n" +
                 "        for index in 0..<rows.Length {\n            let value = rows[index]\n            " + Registration(" + \"[\" + index.ToString() + \"]\"") + "\n        }\n    }\n";
-            tests.Add((rowId, rowName, display, code, row.Provider is not null));
+            tests.Add((rowId, rowName, display, code, row.Provider is not null, categories.ToArray()));
         }
     }
     if (tests.Count == 0) throw new InvalidDataException("No tests discovered");
@@ -80,7 +91,7 @@ try
     var source = "// Generated from native metadata. Do not edit.\nmodule NeoClr.Testing\n\nfunc RegisterDiscoveredTests(suite: TestSuite) {\n" +
         string.Concat(tests.Select(item => item.Code)) + "}\n";
     File.WriteAllText(args[1], source);
-    File.WriteAllText(args[2], JsonSerializer.Serialize(new { assembly = assembly.Name, tests = tests.Select(t => new { id = t.Id, name = t.Name, description = t.Description, dynamic = t.Dynamic }) }, new JsonSerializerOptions { WriteIndented = true }) + "\n");
+    File.WriteAllText(args[2], JsonSerializer.Serialize(new { assembly = assembly.Name, tests = tests.Select(t => new { id = t.Id, name = t.Name, description = t.Description, dynamic = t.Dynamic, categories = t.Categories }) }, new JsonSerializerOptions { WriteIndented = true }) + "\n");
     Console.WriteLine("Discovered " + tests.Count + " tests");
     return 0;
 }

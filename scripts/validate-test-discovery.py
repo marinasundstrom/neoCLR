@@ -13,10 +13,11 @@ DISCOVERY = importlib.util.module_from_spec(SPEC)
 SPEC.loader.exec_module(DISCOVERY)
 
 
-def validate(bundle, output):
+def validate(bundle, output, selected=None):
     output.mkdir(parents=True, exist_ok=False)
     report = {'passed': False, 'cases': []}
     cases = [
+        ('empty-category', '[Test]\n[Category("")]\nfunc Invalid() -> Result<unit, TestFailure> => Ok(())', 'Category requires one nonempty string'),
         ('row-arity', '[Test]\n[Arguments(5)]\nfunc Invalid() -> Result<unit, TestFailure> => Ok(())', 'wrong arity'),
         ('row-type', '[Test]\n[Arguments("five")]\nfunc Invalid(value: int) -> Result<unit, TestFailure> => Ok(())', 'wrong parameter type'),
         ('missing-source', '[Test]\n[MethodDataSource("Missing")]\nfunc Invalid(value: int) -> Result<unit, TestFailure> => Ok(())', 'Missing or ambiguous data source'),
@@ -28,8 +29,12 @@ def validate(bundle, output):
         ('generic', '[Test]\nfunc Invalid<T>() -> Result<unit, TestFailure> => Ok(())', 'nongeneric module functions'),
         ('empty', 'func NotATest() -> Result<unit, TestFailure> => Ok(())', 'No tests discovered'),
     ]
+    if selected and set(selected) - {case[0] for case in cases}:
+        raise ValueError('Unknown discovery fixture')
     try:
         for name, body, expected in cases:
+            if selected and name not in selected:
+                continue
             case = output / name
             case.mkdir()
             source = case / 'Main.rvn'
@@ -66,5 +71,6 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--bundle', type=Path, required=True)
     parser.add_argument('--output', type=Path, required=True)
+    parser.add_argument('--case', action='append', help='Run only a named fixture (repeatable)')
     args = parser.parse_args()
-    validate(args.bundle.resolve(), args.output.resolve())
+    validate(args.bundle.resolve(), args.output.resolve(), args.case)
