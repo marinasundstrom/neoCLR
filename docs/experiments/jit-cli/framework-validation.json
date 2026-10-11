@@ -11,7 +11,7 @@
       "mode": "jit",
       "repetition": 1,
       "exitCode": 0,
-      "elapsedSeconds": 2.326,
+      "elapsedSeconds": 1.794,
       "stdout": "PASS Index preserves direction and resolves end boundaries\nPASS Index and Range typed equality agrees with hashing\nPASS Range resolution accepts empty and full boundaries\nPASS Array range syntax supports omitted and end-relative boundaries\nPASS Array indexes support values and from-end assignment\nPASS Array slices copy storage and preserve reference elements\nPASS Array indexing and slicing evaluate operands once in source order\nPASS Read-only value fields use defensive copies for method calls\nPASS Array safe access returns options and results for invalid bounds\nPASS String ranges preserve graphemes and half-open boundaries\nPASS String safe access rejects invalid grapheme bounds\nPASS String slicing evaluates receiver and bounds once\nPASS ArrayList supports directional mutation and independent range copies\nPASS Sequence slicing consumes one iterator without indexed reads\nPASS Sequence invalid and empty slices do not acquire iterators\nPASS Sequence slicing disposes when enumeration ends before Count\nPASS Sequence safe indexing and slicing work through array aliases\nPASS Sequence extension indexers provide default access and independent slices\nPASS Sequence slicing delegates to the list range contract\nPASS Native extension indexers support writes and compound assignment\nTests: 20, passed: 20, failed: 0, skipped: 0\n",
       "stderr": ""
     },
@@ -20,7 +20,7 @@
       "mode": "jit",
       "guard": "negative-index",
       "exitCode": 1,
-      "elapsedSeconds": 2.847488,
+      "elapsedSeconds": 1.735021,
       "stdout": "",
       "stderr": "UserFault: Index value must be nonnegative\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E52756E74696D652E436F6D70696C65725365727669636573_52756E74696D654661696C757265.M_5465726D696E617465 [instruction 1]\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.F_3C4E656F46756E6374696F6E3E3533373937333734363536445F3436363136393643 [instruction 1]\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D_496E646578..ctor [instruction 5]\n   at NeoMetadata_5E43E4972CD669B7C0E6B6E017E8991966964D79AA9EC21AF3AA44426AD2C9E5.F_3C4E656F46756E6374696F6E3E34453635364634333643373232453532373536453734363936443635353436353733373437335F3444363136393645 [instruction 21]\n"
     },
@@ -29,7 +29,7 @@
       "mode": "jit",
       "guard": "negative-conversion",
       "exitCode": 1,
-      "elapsedSeconds": 3.189688,
+      "elapsedSeconds": 1.778343,
       "stdout": "",
       "stderr": "UserFault: Index value must be nonnegative\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E52756E74696D652E436F6D70696C65725365727669636573_52756E74696D654661696C757265.M_5465726D696E617465 [instruction 1]\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.F_3C4E656F46756E6374696F6E3E3533373937333734363536445F3436363136393643 [instruction 1]\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D_496E646578..ctor [instruction 5]\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D_496E646578.M_46726F6D5374617274 [instruction 2]\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D_496E646578.M_6F705F496D706C69636974 [instruction 1]\n   at NeoMetadata_5E43E4972CD669B7C0E6B6E017E8991966964D79AA9EC21AF3AA44426AD2C9E5.F_3C4E656F46756E6374696F6E3E34453635364634333643373232453532373536453734363936443635353436353733373437335F3444363136393645 [instruction 28]\n"
     },
@@ -38,7 +38,7 @@
       "mode": "jit",
       "guard": "negative-length",
       "exitCode": 1,
-      "elapsedSeconds": 2.562002,
+      "elapsedSeconds": 1.76263,
       "stdout": "",
       "stderr": "UserFault: Range length must be nonnegative\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E52756E74696D652E436F6D70696C65725365727669636573_52756E74696D654661696C757265.M_5465726D696E617465 [instruction 1]\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.F_3C4E656F46756E6374696F6E3E3533373937333734363536445F3436363136393643 [instruction 1]\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D_52616E6765.M_4765744F6666736574416E644C656E677468 [instruction 5]\n   at NeoMetadata_5E43E4972CD669B7C0E6B6E017E8991966964D79AA9EC21AF3AA44426AD2C9E5.F_3C4E656F46756E6374696F6E3E34453635364634333643373232453532373536453734363936443635353436353733373437335F3444363136393645 [instruction 42]\n"
     },
@@ -47,7 +47,7 @@
       "mode": "jit",
       "guard": "list-capacity",
       "exitCode": 1,
-      "elapsedSeconds": 3.001287,
+      "elapsedSeconds": 1.827955,
       "stdout": "",
       "stderr": "UserFault: Range is outside the value\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E52756E74696D652E436F6D70696C65725365727669636573_52756E74696D654661696C757265.M_5465726D696E617465 [instruction 1]\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.F_3C4E656F46756E6374696F6E3E3533373937333734363536445F3436363136393643 [instruction 1]\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D_52616E6765.M_4765744F6666736574416E644C656E677468 [instruction 40]\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E436F6C6C656374696F6E73_41727261794C6973746031.M_6765745F4974656D [instruction 3]\n   at NeoMetadata_5E43E4972CD669B7C0E6B6E017E8991966964D79AA9EC21AF3AA44426AD2C9E5.F_3C4E656F46756E6374696F6E3E34453635364634333643373232453532373536453734363936443635353436353733373437335F3444363136393645 [instruction 118]\n"
     },
@@ -56,7 +56,7 @@
       "mode": "jit",
       "guard": "list-end",
       "exitCode": 1,
-      "elapsedSeconds": 3.073838,
+      "elapsedSeconds": 1.89113,
       "stdout": "",
       "stderr": "UserFault: ArrayList index out of range\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E52756E74696D652E436F6D70696C65725365727669636573_52756E74696D654661696C757265.M_5465726D696E617465 [instruction 1]\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.F_3C4E656F46756E6374696F6E3E3533373937333734363536445F3436363136393643 [instruction 1]\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E436F6C6C656374696F6E73_41727261794C6973746031.M_6765745F4974656D [instruction 12]\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E436F6C6C656374696F6E73_41727261794C6973746031.M_6765745F4974656D [instruction 5]\n   at NeoMetadata_5E43E4972CD669B7C0E6B6E017E8991966964D79AA9EC21AF3AA44426AD2C9E5.F_3C4E656F46756E6374696F6E3E34453635364634333643373232453532373536453734363936443635353436353733373437335F3444363136393645 [instruction 132]\n"
     },
@@ -65,7 +65,7 @@
       "mode": "jit",
       "guard": "string-reversed",
       "exitCode": 1,
-      "elapsedSeconds": 2.63947,
+      "elapsedSeconds": 1.846645,
       "stdout": "",
       "stderr": "UserFault: Range is outside the value\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E52756E74696D652E436F6D70696C65725365727669636573_52756E74696D654661696C757265.M_5465726D696E617465 [instruction 1]\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.F_3C4E656F46756E6374696F6E3E3533373937333734363536445F3436363136393643 [instruction 1]\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D_52616E6765.M_4765744F6666736574416E644C656E677468 [instruction 33]\n   at System.String.get_Item [instruction 3]\n   at NeoMetadata_5E43E4972CD669B7C0E6B6E017E8991966964D79AA9EC21AF3AA44426AD2C9E5.F_3C4E656F46756E6374696F6E3E34453635364634333643373232453532373536453734363936443635353436353733373437335F3444363136393645 [instruction 92]\n"
     },
@@ -74,7 +74,7 @@
       "mode": "jit",
       "guard": "string-past-end",
       "exitCode": 1,
-      "elapsedSeconds": 2.968956,
+      "elapsedSeconds": 1.743321,
       "stdout": "",
       "stderr": "UserFault: Range is outside the value\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E52756E74696D652E436F6D70696C65725365727669636573_52756E74696D654661696C757265.M_5465726D696E617465 [instruction 1]\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.F_3C4E656F46756E6374696F6E3E3533373937333734363536445F3436363136393643 [instruction 1]\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D_52616E6765.M_4765744F6666736574416E644C656E677468 [instruction 40]\n   at System.String.get_Item [instruction 3]\n   at NeoMetadata_5E43E4972CD669B7C0E6B6E017E8991966964D79AA9EC21AF3AA44426AD2C9E5.F_3C4E656F46756E6374696F6E3E34453635364634333643373232453532373536453734363936443635353436353733373437335F3444363136393645 [instruction 102]\n"
     },
@@ -83,7 +83,7 @@
       "mode": "jit",
       "guard": "reversed",
       "exitCode": 1,
-      "elapsedSeconds": 3.036179,
+      "elapsedSeconds": 1.713926,
       "stdout": "",
       "stderr": "UserFault: Range is outside the value\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E52756E74696D652E436F6D70696C65725365727669636573_52756E74696D654661696C757265.M_5465726D696E617465 [instruction 1]\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.F_3C4E656F46756E6374696F6E3E3533373937333734363536445F3436363136393643 [instruction 1]\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D_52616E6765.M_4765744F6666736574416E644C656E677468 [instruction 33]\n   at NeoMetadata_5E43E4972CD669B7C0E6B6E017E8991966964D79AA9EC21AF3AA44426AD2C9E5.F_3C4E656F46756E6374696F6E3E34453635364634333643373232453532373536453734363936443635353436353733373437335F3444363136393645 [instruction 56]\n"
     },
@@ -92,7 +92,7 @@
       "mode": "jit",
       "guard": "past-end",
       "exitCode": 1,
-      "elapsedSeconds": 2.720009,
+      "elapsedSeconds": 1.729162,
       "stdout": "",
       "stderr": "UserFault: Range is outside the value\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E52756E74696D652E436F6D70696C65725365727669636573_52756E74696D654661696C757265.M_5465726D696E617465 [instruction 1]\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.F_3C4E656F46756E6374696F6E3E3533373937333734363536445F3436363136393643 [instruction 1]\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D_52616E6765.M_4765744F6666736574416E644C656E677468 [instruction 40]\n   at NeoMetadata_5E43E4972CD669B7C0E6B6E017E8991966964D79AA9EC21AF3AA44426AD2C9E5.F_3C4E656F46756E6374696F6E3E34453635364634333643373232453532373536453734363936443635353436353733373437335F3444363136393645 [instruction 68]\n"
     },
@@ -101,7 +101,7 @@
       "mode": "jit",
       "guard": "before-start",
       "exitCode": 1,
-      "elapsedSeconds": 2.961546,
+      "elapsedSeconds": 1.69349,
       "stdout": "",
       "stderr": "UserFault: Range is outside the value\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E52756E74696D652E436F6D70696C65725365727669636573_52756E74696D654661696C757265.M_5465726D696E617465 [instruction 1]\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.F_3C4E656F46756E6374696F6E3E3533373937333734363536445F3436363136393643 [instruction 1]\n   at NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D_52616E6765.M_4765744F6666736574416E644C656E677468 [instruction 26]\n   at NeoMetadata_5E43E4972CD669B7C0E6B6E017E8991966964D79AA9EC21AF3AA44426AD2C9E5.F_3C4E656F46756E6374696F6E3E34453635364634333643373232453532373536453734363936443635353436353733373437335F3444363136393645 [instruction 80]\n"
     },
@@ -110,7 +110,7 @@
       "mode": "jit",
       "repetition": 1,
       "exitCode": 1,
-      "elapsedSeconds": 2.638,
+      "elapsedSeconds": 1.317,
       "stdout": "PASS before failure\nFAIL intentional assertion failure: Expected 1, actual 2\nPASS after failure\nSKIP intentional skip: contract probe\nTests: 4, passed: 2, failed: 1, skipped: 1\n",
       "stderr": ""
     },
@@ -126,7 +126,7 @@
         "--id"
       ],
       "exitCode": 0,
-      "elapsedSeconds": 2.509262,
+      "elapsedSeconds": 1.423434,
       "stdout": "PASS entry arguments preserve text\nTests: 1, passed: 1, failed: 0, skipped: 0\n",
       "stderr": ""
     },
@@ -138,7 +138,7 @@
         "runner.after"
       ],
       "exitCode": 0,
-      "elapsedSeconds": 2.185237,
+      "elapsedSeconds": 1.341909,
       "stdout": "PASS after failure\nTests: 1, passed: 1, failed: 0, skipped: 0\n",
       "stderr": ""
     },
@@ -150,7 +150,7 @@
         "runner.failure"
       ],
       "exitCode": 1,
-      "elapsedSeconds": 2.457253,
+      "elapsedSeconds": 1.319491,
       "stdout": "FAIL intentional assertion failure: Expected 1, actual 2\nTests: 1, passed: 0, failed: 1, skipped: 0\n",
       "stderr": ""
     },
@@ -162,7 +162,7 @@
         "runner.skipped"
       ],
       "exitCode": 0,
-      "elapsedSeconds": 2.156763,
+      "elapsedSeconds": 1.318403,
       "stdout": "SKIP intentional skip: contract probe\nTests: 1, passed: 0, failed: 0, skipped: 1\n",
       "stderr": ""
     },
@@ -174,7 +174,7 @@
         "failure"
       ],
       "exitCode": 1,
-      "elapsedSeconds": 2.432825,
+      "elapsedSeconds": 1.354043,
       "stdout": "PASS before failure\nFAIL intentional assertion failure: Expected 1, actual 2\nPASS after failure\nTests: 3, passed: 2, failed: 1, skipped: 0\n",
       "stderr": ""
     },
@@ -186,7 +186,7 @@
         "RUNNER"
       ],
       "exitCode": 2,
-      "elapsedSeconds": 2.191033,
+      "elapsedSeconds": 1.321616,
       "stdout": "ERROR No tests matched the selection\n",
       "stderr": ""
     },
@@ -197,7 +197,7 @@
         "--filter"
       ],
       "exitCode": 2,
-      "elapsedSeconds": 2.204388,
+      "elapsedSeconds": 1.318905,
       "stdout": "ERROR Expected --filter <text> or --id <id>\n",
       "stderr": ""
     },
@@ -209,7 +209,7 @@
         ""
       ],
       "exitCode": 2,
-      "elapsedSeconds": 2.511516,
+      "elapsedSeconds": 1.350636,
       "stdout": "ERROR Expected --filter <text> or --id <id>\n",
       "stderr": ""
     },
@@ -221,7 +221,7 @@
         "after"
       ],
       "exitCode": 2,
-      "elapsedSeconds": 2.12016,
+      "elapsedSeconds": 1.30929,
       "stdout": "ERROR Expected --filter <text> or --id <id>\n",
       "stderr": ""
     },
@@ -235,7 +235,7 @@
         "--jit-entry-argument"
       ],
       "exitCode": 2,
-      "elapsedSeconds": 2.433507,
+      "elapsedSeconds": 1.320401,
       "stdout": "ERROR Expected --filter <text> or --id <id>\n",
       "stderr": ""
     },
@@ -249,7 +249,7 @@
         "after"
       ],
       "exitCode": 2,
-      "elapsedSeconds": 2.231685,
+      "elapsedSeconds": 1.31584,
       "stdout": "ERROR Expected --filter <text> or --id <id>\n",
       "stderr": ""
     }
@@ -258,95 +258,47 @@
     {
       "suite": "index-range",
       "phase": "discovery",
-      "elapsedSeconds": 12.645357,
+      "elapsedSeconds": 13.24053,
       "details": {
-        "sourceCompilationSeconds": 8.139632,
-        "metadataDiscoveryIncludingToolBuildSeconds": 4.501838
+        "sourceCompilationSeconds": 5.612362,
+        "metadataDiscoveryIncludingToolBuildSeconds": 7.62583
       }
     },
     {
       "suite": "index-range",
-      "phase": "native-project-build",
-      "elapsedSeconds": 14.040842,
-      "commands": [
-        {
-          "phase": "toolchain",
-          "elapsedSeconds": 0.015822
-        },
-        {
-          "phase": "toolchain",
-          "elapsedSeconds": 0.013188
-        },
-        {
-          "phase": "toolchain",
-          "elapsedSeconds": 0.013673
-        },
-        {
-          "phase": "source-compilation",
-          "elapsedSeconds": 9.749391
-        },
-        {
-          "phase": "native-compilation",
-          "elapsedSeconds": 2.776219
-        },
-        {
-          "phase": "native-kernel-build",
-          "elapsedSeconds": 0.05225
-        },
-        {
-          "phase": "host-compile-link",
-          "elapsedSeconds": 0.924883
-        },
-        {
-          "phase": "dependency-check",
-          "elapsedSeconds": 0.026546
-        }
-      ]
+      "phase": "source-compilation",
+      "elapsedSeconds": 6.171946,
+      "command": [
+        "dotnet",
+        "/Users/robert/Projects/neoclr/target/extension-indexer-final-bundle/sdk/tools/rvnc/rvnc.dll",
+        "neoclr",
+        "--project",
+        "/Users/robert/Projects/neoclr/runtime/raven/tests/index-range/Tests.rvnproj"
+      ],
+      "assemblySha256": "48e1567365159aa08610c69ea28e46a13f4b26914a02ebad18527df93edf3dde"
     },
     {
       "suite": "index-range",
       "phase": "registration-verification",
-      "elapsedSeconds": 3.986612
+      "elapsedSeconds": 2.493204
     },
     {
       "suite": "runner-contract",
-      "phase": "native-project-build",
-      "elapsedSeconds": 14.810996,
-      "commands": [
-        {
-          "phase": "toolchain",
-          "elapsedSeconds": 0.00982
-        },
-        {
-          "phase": "toolchain",
-          "elapsedSeconds": 0.008169
-        },
-        {
-          "phase": "toolchain",
-          "elapsedSeconds": 0.012738
-        },
-        {
-          "phase": "source-compilation",
-          "elapsedSeconds": 9.972536
-        },
-        {
-          "phase": "native-compilation",
-          "elapsedSeconds": 3.22078
-        },
-        {
-          "phase": "host-compile-link",
-          "elapsedSeconds": 1.163204
-        },
-        {
-          "phase": "dependency-check",
-          "elapsedSeconds": 0.045032
-        }
-      ]
+      "phase": "source-compilation",
+      "elapsedSeconds": 4.623093,
+      "command": [
+        "dotnet",
+        "/Users/robert/Projects/neoclr/target/extension-indexer-final-bundle/sdk/tools/rvnc/rvnc.dll",
+        "neoclr",
+        "--project",
+        "/Users/robert/Projects/neoclr/runtime/raven/tests/runner-contract/Tests.rvnproj"
+      ],
+      "assemblySha256": "ffdf51b982b555900f9c975f38817f06a9d62cf2d448142e9605fae27db036d8"
     }
   ],
   "executionRepetitions": 1,
   "inputs": {
-    "scripts/test-runtime-library.py": "c759a6eb93c89f7ec812cf636cae5e5c6ccbfb3b8d670dec5572d309b98cadad",
+    "scripts/test-runtime-library.py": "3a878623acba33ac88faa61c1f3d3bd8e60a1367fc798ddeaa686a34a7cfdfba",
     "scripts/build-native-project.py": "9456ae7a463d1bf81d739aa0b250a2da9ffd3db3adaee68ae7d4808d93bca3b7",
     "scripts/discover-runtime-tests.py": "455595ff98a3d9f8df9018caad453ef0f244eedf69e6ab220d54934535ed428e",
     "scripts/validate-test-discovery.py": "83f6cd15cc0a9fbaa4fd2a6a0fbca22d57da5d5edd1e2f248daacf3416088167",
@@ -433,8 +385,9 @@
     "index-range",
     "runner-contract"
   ],
-  "totalElapsedSeconds": 105.134925,
+  "totalElapsedSeconds": 62.170071,
   "qualificationDate": "2026-10-11",
-  "sourceBaseRevision": "79948f80",
-  "ravenCompilerRevision": "163050da2a79444878169f1d011abff644d37b2b"
+  "sourceBaseRevision": "3f9a98ac",
+  "ravenCompilerRevision": "163050da2a79444878169f1d011abff644d37b2b",
+  "sourceOnlyArtifactCheck": "Each selected build directory contains only app.dll; no native object or executable"
 }

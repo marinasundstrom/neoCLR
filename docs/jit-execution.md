@@ -75,13 +75,14 @@ python3 scripts/test-runtime-library.py \
 ```
 
 Selectors, intentional failures, bounds guards and entry arguments all use the
-selected modes. The harness still builds its AOT project as assembly preparation,
-even for JIT-only execution; removing that redundant native build is readiness work.
-Its omitted-mode default remains native plus interpreter during this transition.
+selected modes. JIT-only and interpreter-only runs compile the Raven project directly to metadata,
+without emitting a native object or linking an executable. Interpreter-only runs do
+not require the native compiler ([focused interpreter check](experiments/jit-cli/interpreter-validation.json)). The omitted-mode default remains native plus
+interpreter during this transition.
 
 Before switching defaults, qualify representative library suites and HTTP/lifetime
 behavior on supported JIT targets, provide matching helpers through ordinary tooling,
-and remove the test harness's unnecessary AOT build in JIT-only runs. Keep explicit
+and expand routine JIT test coverage. Keep explicit
 mode selection and visible unsupported-program diagnostics after the switch.
 Use focused interpreter/AOT parity checks for changes to shared lowering, GC, async
 lifetime, platform bindings or other mode-sensitive behavior. AOT remains the preferred

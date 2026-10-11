@@ -16,8 +16,9 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   entry arguments and helper DLL qualification tooling. Add a Windows HTTP/framework
   execution workflow; Windows runtime qualification remains pending its execution.
   Local macOS CLI HTTP, Index/Range guards and runner filtering/argument checks pass.
-  SDK helper packaging, JIT-only test preparation without an AOT build, and Windows
-  ARM64 remain open.
+  Compile test assemblies directly for JIT-only/interpreter-only runs, avoiding unused
+  AOT objects and executable links; interpreter-only runs need no native compiler.
+  SDK helper packaging and Windows ARM64 remain open.
 
 - Admit queued async entry points in the private macOS ARM64 managed JIT. Keep code and
   helpers alive through the existing rooted entry drain; release the task scope and

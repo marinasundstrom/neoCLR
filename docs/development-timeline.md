@@ -14446,3 +14446,8 @@ framework execution passes Index/Range tests and bounds guards, filtering, expec
 failures, Unicode/empty arguments and compiler-option-like guest text. Five Windows
 AOT stack/profile tests pass locally, including generated inline page probes; these
 are cross-compilation checks, not Windows JIT execution evidence.
+
+**Follow-up action:** separates test assembly preparation from native executable
+builds. JIT-only and interpreter-only runs now compile Raven metadata directly;
+interpreter-only runs no longer require an installed AOT/JIT tool. This removes one
+readiness gap while retaining explicit mode selection.

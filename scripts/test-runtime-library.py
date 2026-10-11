@@ -358,7 +358,7 @@ def main():
     report = dict(passed=False, modes=modes, jitHostSha256=sha(args.jit_host.resolve()) if args.jit_host else None, platform=platform.platform(), cases=[], phases=[], executionRepetitions=args.execution_repetitions,
                   inputs={str(p.relative_to(ROOT)): sha(p) for p in inputs},
                   bundleManifestSha256=sha(bundle / 'manifest.json'),
-                  aotSha256=sha(args.aot.resolve()), interpreterSha256=sha(args.runtime.resolve()))
+                  aotSha256=sha(args.aot.resolve()) if any(mode in modes for mode in ('native', 'jit')) else None, interpreterSha256=sha(args.runtime.resolve()))
     validation_spec = importlib.util.spec_from_file_location('discovery_validation', ROOT / 'scripts/validate-test-discovery.py')
     validation = importlib.util.module_from_spec(validation_spec)
     validation_spec.loader.exec_module(validation)
@@ -409,19 +409,37 @@ def main():
             profile = 'http' if name in ('http-text', 'http-lifetime') else 'console'
             if os.name == 'nt':
                 profile = 'windows-' + profile
-            command = [sys.executable, ROOT / 'scripts/build-native-project.py', '--profile',
-                       profile, '--project', TESTS / name / 'Tests.rvnproj',
-                       '--bundle', bundle, '--aot', args.aot.resolve(), '--output', build]
-            if name in ("encoding-buffer-limits", "http-text"):
-                command += ["--byte-array-limit", "131072"]
+            if 'native' in modes:
+                command = [sys.executable, ROOT / 'scripts/build-native-project.py', '--profile',
+                           profile, '--project', TESTS / name / 'Tests.rvnproj',
+                           '--bundle', bundle, '--aot', args.aot.resolve(), '--output', build]
+                if name in ("encoding-buffer-limits", "http-text"):
+                    command += ["--byte-array-limit", "131072"]
+                phase = 'native-project-build'
+            else:
+                # Raven emits the same metadata assembly directly. JIT/interpreter
+                # runs do not require an unused native object, linker or executable.
+                build.mkdir()
+                environment['NeoClrBundleRoot'] = str(bundle)
+                command = ['dotnet', bundle / 'sdk/tools/rvnc/rvnc.dll', 'neoclr',
+                           '--project', TESTS / name / 'Tests.rvnproj']
+                phase = 'source-compilation'
             started = time.perf_counter()
             result = subprocess.run(list(map(str, command)), cwd=ROOT, env=environment, capture_output=True, timeout=600)
-            report['phases'].append(dict(suite=name, phase='native-project-build', elapsedSeconds=round(time.perf_counter() - started, 6)))
+            report['phases'].append(dict(suite=name, phase=phase, elapsedSeconds=round(time.perf_counter() - started, 6)))
             (out / (name + '-build.stdout.log')).write_bytes(result.stdout)
             (out / (name + '-build.stderr.log')).write_bytes(result.stderr)
             if result.returncode:
                 raise RuntimeError(name + ' build failed; see retained logs')
-            report['phases'][-1]['commands'] = [{k: c[k] for k in ('phase', 'elapsedSeconds')} for c in json.loads((build / 'build.json').read_text())['commands']]
+            if 'native' in modes:
+                report['phases'][-1]['commands'] = [{k: c[k] for k in ('phase', 'elapsedSeconds')} for c in json.loads((build / 'build.json').read_text())['commands']]
+            else:
+                paths = [line.removeprefix('Native build output: ') for line in result.stdout.decode('utf-8').splitlines()
+                         if line.startswith('Native build output: ')]
+                if not paths or not Path(paths[-1]).is_absolute() or not Path(paths[-1]).is_file():
+                    raise RuntimeError('Raven did not report a valid project assembly')
+                shutil.copy2(paths[-1], build / 'app.dll')
+                report['phases'][-1].update(command=list(map(str,command)), assemblySha256=sha(build / 'app.dll'))
             if name != 'runner-contract':
                 started = time.perf_counter()
                 DISCOVERY.verify_registration(build / 'app.dll', bundle, out / (name + '-discovery'))
@@ -429,7 +447,8 @@ def main():
             isolated = out / (name + '-isolated')
             isolated.mkdir()
             exe = isolated / ('app.exe' if os.name == 'nt' else 'app')
-            shutil.copy2(build / exe.name, exe)
+            if 'native' in modes:
+                shutil.copy2(build / exe.name, exe)
             lib = bundle / 'lib'
             catalog = json.loads((lib / 'bundle.json').read_text())
             interpreter = [args.runtime.resolve(), 'run', build / 'app.dll', '--system', lib / catalog['runtimeSeed'],
@@ -521,7 +540,7 @@ def main():
         for name, digest in report['inputs'].items():
             if sha(ROOT / name) != digest:
                 raise RuntimeError('Input changed during validation: ' + name)
-        if sha(args.aot.resolve()) != report['aotSha256'] or sha(args.runtime.resolve()) != report['interpreterSha256']:
+        if (report['aotSha256'] and sha(args.aot.resolve()) != report['aotSha256']) or sha(args.runtime.resolve()) != report['interpreterSha256']:
             raise RuntimeError('Execution tool changed during validation')
         if args.jit_host and sha(args.jit_host.resolve()) != report['jitHostSha256']:
             raise RuntimeError('JIT helper library changed during validation')

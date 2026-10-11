@@ -619,6 +619,6 @@ uses the `--aot` compiler through `neoclr run --execution jit`. Filtering, guard
 and runner failures execute in the selected modes. See [JIT readiness and commands](../../../docs/jit-execution.md).
 
 The intended routine mode is JIT once ready; interpreter and AOT checks remain
-selective and relevant to the change. Defaults have not switched yet. JIT-only runs
-still use the native project build for assembly preparation, which must be separated
-before this becomes the routine fast development path.
+selective and relevant to the change. Defaults have not switched yet. JIT-only and interpreter-only runs compile the
+Raven assembly directly, without a native object or executable build. Interpreter-only
+runs do not require the AOT/JIT compiler.
