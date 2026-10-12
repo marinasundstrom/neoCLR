@@ -9199,3 +9199,10 @@ encoding is introduced, and native branches/locals already represent the intende
 semantics. Raven's focused prepared-body, pattern-body and enumeration-cleanup
 regressions pass (22 tests); this does not qualify a new runtime bundle or Windows.
 The affected portable backend files are absent on Raven main, which stays separate.
+
+The subsequent metadata slice aligns writer/readback admission with the native
+backend's existing 1,024-local maximum. Slot operands already use integer indices;
+there is no metadata format revision or CLI encoding change. Existing 256-local
+readers require updating for larger artifacts. The last admitted slot executes
+correctly in .NET and the interpreter; 1,025 locals fail both authoring and readback.
+This is bounded capacity, not a claim of local-lifetime allocation optimization.

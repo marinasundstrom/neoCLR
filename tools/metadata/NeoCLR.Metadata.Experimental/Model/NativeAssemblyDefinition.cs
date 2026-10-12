@@ -694,7 +694,7 @@ public sealed partial class NativeAssemblyDefinition
                 Require(methods.Count == 0 || methods[^1].Owner <= ownerIndex, "native owner declaration order mismatch");
                 typeArity = ownerIndex < 0 ? 0 : types[ownerIndex].GenericNames.Length;
                 if (method.TryGetProperty("locals", out _))
-                    foreach (var local in Array(method, "locals", 256)) _ = ReadType(local, false);
+                    foreach (var local in Array(method, "locals", 1024)) _ = ReadType(local, false);
                 var parameters = Array(method, "parameters", 256);
                 var parameterTypes = parameters.Select(p => ReadType(p, false, allowByReference: true, allowSelf: ownerIndex >= 0 && types[ownerIndex].IsInterface)).ToArray();
                 var methodConstraints = new List<(int Parameter, SignatureType Type, int Owner)>();

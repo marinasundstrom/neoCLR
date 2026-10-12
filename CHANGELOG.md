@@ -8,6 +8,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-12
 
+- Align native metadata authoring/readback with the backend's existing 1,024-local
+  budget, allowing larger async consumers while retaining bounded admission.
+  Test the last slot, all declaration overloads and oversized readback rejection;
+  the boundary fixture returns 42 in .NET and the neoCLR interpreter.
+
 - Record Raven native lowering fixes exposed by SQL parameter reflection and
   inline awaited queries, with 22 focused compiler regressions passing. Keep the
   separate native local quota and boxed Int64 execution gaps explicit; no new

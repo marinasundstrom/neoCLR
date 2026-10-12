@@ -610,7 +610,7 @@ internal sealed class MethodILGenerator(MethodBuilder bodyBuilder) : IILGenerato
     public LocalDefinition DeclareLocal(PrimitiveType type)
     {
         if (!Enum.IsDefined(type) || type == PrimitiveType.Void) throw new ArgumentException("unsupported local type", nameof(type));
-        if (locals.Count >= 256) throw new InvalidDataException("local limit exceeded");
+        if (locals.Count >= 1024) throw new InvalidDataException("local limit exceeded");
         var local = new LocalDefinition(bodyBuilder, locals.Count, type); locals.Add(local); return local;
     }
 
@@ -618,7 +618,7 @@ internal sealed class MethodILGenerator(MethodBuilder bodyBuilder) : IILGenerato
     {
         ArgumentNullException.ThrowIfNull(type);
         if (type.IsStatic || !ReferenceEquals(type.Assembly, Assembly)) throw new ArgumentException("local requires an owned root class", nameof(type));
-        if (locals.Count >= 256) throw new InvalidDataException("local limit exceeded");
+        if (locals.Count >= 1024) throw new InvalidDataException("local limit exceeded");
         var local = new LocalDefinition(bodyBuilder, locals.Count, type); locals.Add(local); return local;
     }
 
@@ -627,7 +627,7 @@ internal sealed class MethodILGenerator(MethodBuilder bodyBuilder) : IILGenerato
         ArgumentNullException.ThrowIfNull(type);
         type.ValidateOwner(Assembly, Signature.GenericParameterNames.Count, DeclaringType?.GenericParameterNames.Count ?? 0);
         if (type.Primitive == PrimitiveType.Void) throw new ArgumentException("local cannot be Void", nameof(type));
-        if (locals.Count >= 256) throw new InvalidDataException("local limit exceeded");
+        if (locals.Count >= 1024) throw new InvalidDataException("local limit exceeded");
         var local = new LocalDefinition(bodyBuilder, locals.Count, type); locals.Add(local); return local;
     }
 

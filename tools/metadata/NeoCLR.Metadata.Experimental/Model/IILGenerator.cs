@@ -493,20 +493,20 @@ public interface IILGenerator
     void LoadDefault(SignatureType type);
     /// <summary>Declares an Int32 local. Loads require a store or typed initialization on every reachable path.</summary>
     /// <returns>A local handle owned by this method.</returns>
-    /// <exception cref="InvalidDataException">The method already has 256 locals.</exception>
+    /// <exception cref="InvalidDataException">The method already has 1024 locals.</exception>
     LocalDefinition DeclareInt32Local();
     /// <summary>Declares a typed primitive local. ClearBody retains the slot and type.</summary>
     /// <param name="type">Any defined PrimitiveType except Void.</param>
     /// <returns>A stable local handle owned by this method.</returns>
     /// <exception cref="ArgumentException">Type is Void or an invalid enum value.</exception>
-    /// <exception cref="InvalidDataException">The method already has 256 locals.</exception>
+    /// <exception cref="InvalidDataException">The method already has 1024 locals.</exception>
     LocalDefinition DeclareLocal(PrimitiveType type);
     /// <summary>Declares a local holding an instance of a root class in this output assembly.</summary>
     /// <param name="type">Nonstatic class declaration owned by the output assembly.</param>
     /// <returns>A stable local handle; ClearBody retains its declared class identity.</returns>
     /// <exception cref="ArgumentNullException">Class is null.</exception>
     /// <exception cref="ArgumentException">Class is static or belongs to another assembly.</exception>
-    /// <exception cref="InvalidDataException">The method already has 256 locals.</exception>
+    /// <exception cref="InvalidDataException">The method already has 1024 locals.</exception>
     /// <remarks>Loads require a store or typed initialization on every path. No inheritance, boxing or external class locals are admitted.</remarks>
     LocalDefinition DeclareLocal(TypeBuilder type);
     /// <summary>Declares a primitive, owned root-class or vector local with exact type identity.</summary>
