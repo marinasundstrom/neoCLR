@@ -9135,3 +9135,13 @@ wire representation or Runtime Contract option is introduced. Native metadata ow
 this identity; CLI projection and service admission remain unchanged. The focused
 foreign-import probe now verifies an unbound runtime service without resolving or
 executing it, alongside existing foreign and ordinary managed readback cases.
+
+### Managed HTTPS native layout admission — 2026-10-12
+
+The native backend and linked host now share bounded 128-lane value/object/record-
+array admission. This supports nested error values and compiler-generated async
+frames without changing Raven lowering, native metadata, public API contracts or
+private storage headers. Keep Runtime Contract service configuration unchanged;
+rebuild JIT/AOT hosts with the matching compiler. See [layout audit, validation and
+limitations](experiments/shared-tls/native-layout-budget.md). No wider heap/stack
+budget or end-to-end HTTPS qualification is implied.

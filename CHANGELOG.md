@@ -8,6 +8,13 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-12
 
+- Admit bounded 128-lane native inline values, object payloads and record-array
+  elements for nested HTTP results and compiler-generated async frames. Keep
+  allocator and GC descriptor checks aligned, preserve stack/heap budgets, and
+  qualify boundary copying, allocation canaries, overflow rejection and roots
+  beyond lane 64. Rebuild native compiler/host bundles together; Windows execution
+  remains pending. See docs/experiments/shared-tls/native-layout-budget.md.
+
 - Record function-pointer mapping as the next proposed FFI slice, distinguishing
   native-address invocation from managed callbacks and their lifetime obligations.
   No pointer-call or callback implementation is claimed.

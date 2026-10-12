@@ -189,14 +189,14 @@ impl<'a> Profile<'a> {
                 }
                 p.layouts[i].push(width);
                 width += p.lanes(&ty);
-                if width > 64 {
-                    return Err(format!("{}: value layout exceeds sixty-four flattened lanes ({width})", p.input.types[i].name).into());
+                if !p.input.types[i].is_reference_type && width > crate::limits::INLINE_LANES {
+                    return Err(format!("{}: value layout exceeds {} flattened lanes ({width})", p.input.types[i].name, crate::limits::INLINE_LANES).into());
                 }
             }
-            if p.input.types[i].is_reference_type && width > 32 {
+            if p.input.types[i].is_reference_type && width > crate::limits::OBJECT_LANES {
                 return Err(format!(
-                    "{}: reference hierarchy exceeds the 264-byte native object bound ({width} flattened lanes)",
-                    p.input.types[i].name
+                    "{}: reference hierarchy exceeds the {}-byte native object bound ({width} flattened lanes)",
+                    p.input.types[i].name, 8 + crate::limits::OBJECT_LANES * 8
                 ).into());
             }
             p.widths[i] = width.max(1);

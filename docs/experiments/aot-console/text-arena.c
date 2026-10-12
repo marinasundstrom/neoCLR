@@ -73,7 +73,7 @@ int32_t neoclr_uint64_to_string_v1(uint64_t value, neoclr_aot_text_arena *arena,
 int32_t neoclr_allocate_object_v1(neoclr_aot_text_arena *arena, uint32_t type,
                                 uint32_t bytes, void **output) {
     if (arena->used > arena->capacity || (arena->capacity && !arena->data) ||
-        ((uintptr_t)arena->data & 7) || bytes < 8 || bytes > 264 || (bytes & 7))
+        ((uintptr_t)arena->data & 7) || bytes < 8 || bytes > NEOCLR_NATIVE_OBJECT_BYTES || (bytes & 7))
         return NEOCLR_AOT_FAULT_RUNTIME_ERROR;
     void *storage;
     int32_t status = reserve_storage(arena, bytes, OBJECT_STORAGE, &storage);
@@ -436,7 +436,7 @@ int32_t neoclr_reserve_records_v1(neoclr_aot_text_arena *arena, int32_t length,
                                 uint32_t lanes, void **output) {
     if (length < 0) return NEOCLR_AOT_FAULT_RUNTIME_ERROR;
     if (length > 65536) return NEOCLR_AOT_FAULT_ARRAY_LIMIT;
-    if (!arena || !output || !lanes || lanes > 64) return NEOCLR_AOT_FAULT_RUNTIME_ERROR;
+    if (!arena || !output || !lanes || lanes > NEOCLR_NATIVE_LAYOUT_LANES) return NEOCLR_AOT_FAULT_RUNTIME_ERROR;
     void *storage;
     uint64_t bytes = 24 + (uint64_t)length * (8 * lanes + 1);
     int32_t status = reserve_storage(arena, bytes, RECORDS_STORAGE, &storage);

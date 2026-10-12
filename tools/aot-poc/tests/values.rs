@@ -588,8 +588,8 @@ fn cyclic_unknown_and_oversized_inline_layouts_never_emit() {
         ),
         (".type A\n.field Child Int32\n.end", "local named record"),
         (
-            ".type A\n.field X Int32\n.field Y Int32\n.field Z Int32\n.field U Int32\n.field V Int32\n.field W Int32\n.end\n.type B\n.field X A\n.field Y A\n.field Z A\n.field U A\n.field V A\n.field W A\n.field A0 A\n.field A1 A\n.field A2 A\n.field A3 A\n.field A4 A\n.end",
-            "sixty-four flattened lanes",
+            ".type A\n.field X Int32\n.field Y Int32\n.field Z Int32\n.field U Int32\n.field V Int32\n.field W Int32\n.field Extra0 Int32\n.field Extra1 Int32\n.field Extra2 Int32\n.field Extra3 Int32\n.field Extra4 Int32\n.field Extra5 Int32\n.end\n.type B\n.field X A\n.field Y A\n.field Z A\n.field U A\n.field V A\n.field W A\n.field A0 A\n.field A1 A\n.field A2 A\n.field A3 A\n.field A4 A\n.end",
+            "128 flattened lanes",
         ),
     ] {
         let source = format!(
@@ -2184,4 +2184,51 @@ fn integer_shifts_match_interpreter_at_width_boundaries() {
             }
         }
     }
+}
+
+#[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+#[test]
+fn wide_inline_boundary_preserves_calls_copies_and_nested_addresses() {
+    let mut source = String::from(".module WideInline\n.entry Main\n.type Chunk\n");
+    for i in 0..16 { source += &format!(".field F{i} Int32\n"); }
+    source += ".end\n.type Wide\n";
+    for i in 0..8 { source += &format!(".field C{i} Chunk\n"); }
+    source += r#".end
+.function Copy(Wide value) -> Wide
+ldarg value
+ret
+.end
+.function Main() -> Int32
+.local Wide original
+.local Wide copy
+ldloca original
+initobj Wide
+ldloca original
+ldflda Wide::C0
+ldc.i4 12
+stfld Chunk::F0
+pop
+ldloca original
+ldflda Wide::C7
+ldc.i4 30
+stfld Chunk::F15
+pop
+ldloc original
+call Copy(Wide)
+stloc copy
+ldloca original
+initobj Wide
+ldloc copy
+ldfld Wide::C0
+ldfld Chunk::F0
+ldloc copy
+ldfld Wide::C7
+ldfld Chunk::F15
+add
+ret
+.end
+"#;
+    let m = neoclr::assemble(&source).unwrap();
+    assert_eq!(neoclr::run(&m, neoclr::Limits::default()).unwrap().value, neoclr::Value::Int32(42));
+    native(&neoclr::metadata_container::write_module(&m).unwrap(), 0, 42);
 }

@@ -5,6 +5,8 @@
 #define NEOCLR_NATIVE_BYTE_ARRAY_LIMIT 65536
 #endif
 _Static_assert(NEOCLR_NATIVE_BYTE_ARRAY_LIMIT > 0 && NEOCLR_NATIVE_BYTE_ARRAY_LIMIT <= INT32_MAX, "byte array budget");
+#define NEOCLR_NATIVE_LAYOUT_LANES 128
+#define NEOCLR_NATIVE_OBJECT_BYTES (8 + 8 * NEOCLR_NATIVE_LAYOUT_LANES)
 #define NEOCLR_AOT_FAULT_NATIVE_MEMORY_LIMIT 5
 #define NEOCLR_AOT_FAULT_NULL_REFERENCE 6
 #define NEOCLR_AOT_FAULT_ARRAY_LIMIT 7
@@ -46,7 +48,7 @@ int32_t neoclr_string_slice_utf8_v1(const neoclr_aot_text *text, int32_t start, 
 int32_t neoclr_utf8_encode_v1(const neoclr_aot_text *text, neoclr_aot_text_arena *arena,
                              const void **output);
 /* Internal object allocation for the explicit reference-arena profile. Header is
- * a private type index; bytes includes header and padded payload (8..264 bytes).
+ * a private type index; bytes includes header and padded payload (8..1032 bytes).
  * The arena owns objects and cycles until the next entry/reset, just like text.
  */
 int32_t neoclr_allocate_object_v1(neoclr_aot_text_arena *arena, uint32_t type,
