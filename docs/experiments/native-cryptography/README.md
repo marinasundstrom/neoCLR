@@ -55,7 +55,7 @@ and ordinary managed method bodies.
 
 Windows execution is pending; adding CI is not platform qualification. This is a
 private bytecode checkpoint, not the public Raven cryptography API. The qualification host now links only the standalone
-cryptography archive for its raw C exports. Normal AOT project packaging,
+cryptography archive for its raw C exports. Packaged native build kits,
 public managed projection and matching API
 reference snapshots remain next. Managed SslStream and certificate/trust APIs are
 also still open.
@@ -82,3 +82,32 @@ diagnostic, rather than the isolated test host's exit code 103.
 [Installed evidence](installed-validation.json) records macOS outcomes and a retained
 seven-case managed MemoryStream regression. The Windows JIT workflow now runs the
 same cryptography consumer after bundle preparation; Windows execution is pending.
+
+## Raven source project integration
+
+The source-checkout `build-native-project.py` path now admits the verified
+cryptography contracts and links the standalone provider only when a selected
+function uses them. It records the adapter, provider source and archive hashes in
+`build.json`, together with `cryptography: true`. Merely declaring an unused
+private service does not link the provider. Windows console and HTTP profiles use
+the same adapter and static-CRT archive; macOS uses the same provider implementation.
+Packaged build kits are not upgraded by this source-checkout change.
+
+[The project](project/Main.rvn) uses existing Raven `MethodImpl(InternalCall)`
+declarations owned by the test assembly. No new Raven compiler mapping is required.
+This remains a private runtime contract rather than a public cryptography facade.
+The compiler's existing native CLI bridge retains those signatures and implementation
+flags; the normal native binder validates them before selecting host code.
+
+```sh
+python3 docs/experiments/native-cryptography/validate-project.py \
+  --bundle path/to/prepared/bundle --aot path/to/neoclr-aot-poc \
+  --output target/crypto-project-validation
+```
+
+The [source-project checkpoint](project-validation.json) covers SHA-256 and HMAC
+known answers, verification and tamper rejection, preserved destination tails,
+unchanged short destinations and zero/nonzero random fill in interpreter, default
+JIT and AOT. AOT runs from a directory containing only the executable. A second
+project build proves unused declarations do not pull in the provider. Windows runs
+this consumer in its JIT workflow; execution of this checkpoint remains pending CI.

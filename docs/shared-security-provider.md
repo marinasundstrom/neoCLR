@@ -58,7 +58,8 @@ used by Rustls. Its safe Rust implementation now lives in the separate
 are packaged separately from TLS; native cryptography consumers no longer link
 Rustls or certificate parsing. There are no public managed methods yet. Private interpreter services now project
 these operations through verified byte-array contracts; explicit JIT/AOT lowering is now qualified on macOS through a source host. Normal
-host packaging, the public managed facade and API reference generation remain open.
+packaged build kits, the public managed facade and API reference generation remain open.
+Source AOT projects now select and link the standalone provider on demand.
 
 The intended baseline is .NET's
 [RandomNumberGenerator.Fill](https://learn.microsoft.com/en-us/dotnet/api/system.security.cryptography.randomnumbergenerator.fill?view=net-10.0),
@@ -132,6 +133,7 @@ The [explicit cryptography bindings](experiments/native-cryptography/README.md) 
 pass twelve identical cases across interpreter, JIT and AOT on macOS. The same
 Windows CI gate is configured but not yet executed. The qualification host links
 the standalone cryptography archive, with dependency checks excluding TLS. Normal
-AOT project packaging and the managed facade remain open; prepared JIT hosts now
-include these services for default CLI execution; this does not make public Raven
+packaged native build kits and the managed facade remain open. Source AOT projects
+link the provider on demand, and prepared JIT hosts include these services for
+default CLI execution; this does not make public Raven
 cryptography or SslStream APIs available.

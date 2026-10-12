@@ -93,6 +93,7 @@ jobs:
             target/windows-jit-validation/http/
             target/windows-jit-validation/framework/
             target/windows-jit-validation/cryptography/
+            target/windows-jit-validation/cryptography-project/
             target/windows-jit-validation/native/build.json
             target/windows-jit-validation/async-use/
             target/windows-jit-validation/generic-async-use/

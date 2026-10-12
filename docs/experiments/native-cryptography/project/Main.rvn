@@ -1,0 +1,68 @@
+import neoCLR.Runtime.*
+
+func Main() -> int {
+    let data: byte[] = [(byte)97, (byte)98, (byte)99]
+    let output: byte[] = [
+        (byte)0, (byte)0, (byte)0, (byte)0, (byte)0, (byte)0, (byte)0, (byte)0,
+        (byte)0, (byte)0, (byte)0, (byte)0, (byte)0, (byte)0, (byte)0, (byte)0,
+        (byte)0, (byte)0, (byte)0, (byte)0, (byte)0, (byte)0, (byte)0, (byte)0,
+        (byte)0, (byte)0, (byte)0, (byte)0, (byte)0, (byte)0, (byte)0, (byte)0,
+        (byte)0
+    ]
+    output[32] = (byte)165
+    if CryptoSha256(data, output) != 0 {
+        return 1
+    }
+    let expected: byte[] = [
+        (byte)186, (byte)120, (byte)22, (byte)191, (byte)143, (byte)1, (byte)207, (byte)234,
+        (byte)65, (byte)65, (byte)64, (byte)222, (byte)93, (byte)174, (byte)34, (byte)35,
+        (byte)176, (byte)3, (byte)97, (byte)163, (byte)150, (byte)23, (byte)122, (byte)156,
+        (byte)180, (byte)16, (byte)255, (byte)97, (byte)242, (byte)0, (byte)21, (byte)173
+    ]
+    var index = 0
+    while index < expected.Length {
+        if output[index] != expected[index] {
+            return 2
+        }
+        index = index + 1
+    }
+    if output[32] != (byte)165 {
+        return 3
+    }
+    let small: byte[] = [(byte)165]
+    if CryptoSha256(data, small) != -1 || small[0] != (byte)165 {
+        return 4
+    }
+    let key: byte[] = [(byte)107, (byte)101, (byte)121]
+    let tag: byte[] = [
+        (byte)0, (byte)0, (byte)0, (byte)0, (byte)0, (byte)0, (byte)0, (byte)0,
+        (byte)0, (byte)0, (byte)0, (byte)0, (byte)0, (byte)0, (byte)0, (byte)0,
+        (byte)0, (byte)0, (byte)0, (byte)0, (byte)0, (byte)0, (byte)0, (byte)0,
+        (byte)0, (byte)0, (byte)0, (byte)0, (byte)0, (byte)0, (byte)0, (byte)0
+    ]
+    if CryptoHmacSha256(key, data, tag) != 0 || !CryptoHmacSha256Verify(key, data, tag) {
+        return 5
+    }
+    let expectedTag: byte[] = [
+        (byte)156, (byte)25, (byte)110, (byte)50, (byte)220, (byte)1, (byte)117, (byte)248,
+        (byte)111, (byte)75, (byte)28, (byte)184, (byte)146, (byte)137, (byte)214, (byte)97,
+        (byte)157, (byte)230, (byte)190, (byte)230, (byte)153, (byte)228, (byte)195, (byte)120,
+        (byte)230, (byte)131, (byte)9, (byte)237, (byte)151, (byte)161, (byte)166, (byte)171
+    ]
+    index = 0
+    while index < tag.Length {
+        if tag[index] != expectedTag[index] {
+            return 6
+        }
+        index = index + 1
+    }
+    tag[0] = (byte)0
+    if CryptoHmacSha256Verify(key, data, tag) {
+        return 7
+    }
+    let empty: byte[] = []
+    if CryptoRandomFill(empty) != 0 || CryptoRandomFill(output) != 0 {
+        return 8
+    }
+    return 0
+}

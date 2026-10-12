@@ -20,7 +20,10 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   include the adapter/provider, and default CLI execution admits the verified
   bindings. All twelve cases and seven retained MemoryStream tests pass through
   the installed macOS host; Windows CI includes the same cryptography check.
-  Public managed APIs and normal AOT project packaging remain open.
+  Source AOT project builds now link the provider only for selected cryptography
+  services. A Raven consumer passes in interpreter/default-JIT/AOT, including
+  standalone execution and a control proving unused declarations omit the provider.
+  Public managed APIs and packaged native build kits remain open.
 
 - Connect private typed cryptography services to the interpreter using the shared
   TLS-independent provider. Require exact byte-array signatures and report

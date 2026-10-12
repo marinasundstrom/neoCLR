@@ -47,3 +47,6 @@
 /runtime/raven/tests/index-range/obj/
 
 /tools/native-crypto/target/
+
+/docs/experiments/native-cryptography/project/bin/
+/docs/experiments/native-cryptography/project/obj/

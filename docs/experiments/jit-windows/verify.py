@@ -71,6 +71,8 @@ def main():
         installed = out/'jit-install/bundle'
         run([sys.executable, ROOT/'docs/experiments/native-cryptography/validate-bundle.py',
              '--bundle', installed, '--output', out/'cryptography'], 'cryptography-default-jit')
+        run([sys.executable, ROOT/'docs/experiments/native-cryptography/validate-project.py',
+             '--bundle', installed, '--aot', jit, '--output', out/'cryptography-project'], 'cryptography-project')
         run([sys.executable, ROOT/'docs/experiments/jit-http/verify.py', '--bundle', installed,
              '--windows-build', out/'native/build.json', '--default-cli', '--mode', 'jit',
              '--output', out/'http'], 'http-default-jit')

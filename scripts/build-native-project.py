@@ -51,7 +51,6 @@ def native_tls_build(windows=False):
     return command, directory / target / 'release' / ('neoclr_native_tls.lib' if windows else 'libneoclr_native_tls.a')
 
 
-
 def native_crypto_sources():
     return [ROOT / 'tools/native-crypto/Cargo.toml', ROOT / 'tools/native-crypto/Cargo.lock',
             ROOT / 'tools/native-crypto/src/lib.rs', ROOT / 'tools/native-crypto/include/neoclr_crypto.h',
@@ -243,6 +242,8 @@ def build(project, bundle, aot, output, profile=PROFILE, bootstrap_root=None, re
         flags = ['--compile-system', '--bind-user-fault', '--reference-arena', '--native-gc',
                  '--bind-console-read-byte', '--bind-console-write-line', '--bind-console-stream-output',
                  '--bind-int32-to-string', '--bind-utf8-text', '--native-stack-budget', '--bind-integer-text', '--bind-character-text', '--bind-system-culture', '--bind-time-zone-rules']
+        if not kit_path.exists():
+            flags += ['--bind-cryptography']
         if http:
             flags += ['--bind-task-queue', '--bind-timers',
                       '--bind-socket-listener', '--bind-socket-accept', '--bind-socket-transfer', '--bind-socket-client']
@@ -296,6 +297,19 @@ def build(project, bundle, aot, output, profile=PROFILE, bootstrap_root=None, re
                 run(command, phase="native-kernel-build")
             report['inputs'][str(archive)] = sha(archive)
             native_text.append(archive)
+        native_crypto = []
+        if any(binding.get('implementation') == 'cryptography-v1'
+               for binding in selection.get('nativeBindings', [])):
+            if kit_path.exists():
+                raise ValueError('Cryptography currently requires a source checkout, not a packaged build kit')
+            for path in native_crypto_sources():
+                report['inputs'][str(path)] = sha(path)
+            adapters.append(base / 'cryptography.c')
+            command, archive = native_crypto_build(windows)
+            run(command, phase='native-crypto-build')
+            report['inputs'][str(archive)] = sha(archive)
+            native_crypto.append(archive)
+        report['cryptography'] = bool(native_crypto)
         native_tls = []
         if https_server:
             for path in [ROOT / 'tools/native-tls/Cargo.toml', ROOT / 'tools/native-tls/Cargo.lock',
@@ -314,18 +328,18 @@ def build(project, bundle, aot, output, profile=PROFILE, bootstrap_root=None, re
         if windows:
             run(['cl', '/nologo', '/W4', '/WX', '/std:c11', '/experimental:c11atomics', '/O2', '/MT',
                  '/DNEOCLR_NATIVE_GC', *(['/DNEOCLR_HTTPS_SERVER'] if https_server else []), '/DNEOCLR_HTTP_HEAP_BYTES=' + str(http_heap_bytes), '/DNEOCLR_NATIVE_BYTE_ARRAY_LIMIT=' + str(byte_array_limit), *(['/DNEOCLR_ENTRY_ARGUMENTS'] if selection.get('entryArguments') else []), *(['/DNEOCLR_HTTP_HOST'] if http else []), '/I' + str(base), '/Fo' + str(output) + '/',
-                 '/Fe:' + str(pending), *adapters, obj, *native_text, *native_tls, '/link', '/STACK:1048576', *(['Ws2_32.lib'] if http else []),
-                 *(['Bcrypt.lib', 'Ntdll.lib', 'Userenv.lib', 'Advapi32.lib'] if https_server else [])], phase='host-compile-link')
+                 '/Fe:' + str(pending), *adapters, obj, *native_text, *native_tls, *native_crypto, '/link', '/STACK:1048576', *(['Ws2_32.lib'] if http or native_crypto else []),
+                 *(['Bcrypt.lib', 'Ntdll.lib', 'Userenv.lib', 'Advapi32.lib'] if https_server or native_crypto else [])], phase='host-compile-link')
             import re
             dependencies = re.findall(r'^\s+([A-Za-z0-9_.-]+\.dll)\s*$', run(['dumpbin', '/dependents', pending], phase='dependency-check'), re.MULTILINE | re.IGNORECASE)
-            allowed = {'kernel32.dll', *(['ws2_32.dll'] if http else []),
+            allowed = {'kernel32.dll', *(['ws2_32.dll'] if http or native_crypto else []),
                        *(['bcrypt.dll', 'bcryptprimitives.dll', 'api-ms-win-core-synch-l1-2-0.dll',
-                          'ntdll.dll', 'userenv.dll', 'advapi32.dll'] if https_server else [])}
+                          'ntdll.dll', 'userenv.dll', 'advapi32.dll'] if https_server or native_crypto else [])}
             if not dependencies or any(name.lower() not in allowed for name in dependencies):
                 raise RuntimeError('Unexpected native dependencies: ' + repr(dependencies))
         else:
             run([clang, '-isysroot', sdk, '-arch', 'arm64', '-std=c11', '-O2', '-Wall', '-Wextra', '-Werror',
-                 '-DNEOCLR_NATIVE_GC', *(['-DNEOCLR_HTTPS_SERVER'] if https_server else []), '-DNEOCLR_HTTP_HEAP_BYTES=' + str(http_heap_bytes), '-DNEOCLR_NATIVE_BYTE_ARRAY_LIMIT=' + str(byte_array_limit), *(['-DNEOCLR_ENTRY_ARGUMENTS'] if selection.get('entryArguments') else []), '-I', base, *adapters, obj, *native_text, *native_tls, *(['-framework', 'CoreFoundation'] if system_culture else []), '-o', pending], phase='host-compile-link')
+                 '-DNEOCLR_NATIVE_GC', *(['-DNEOCLR_HTTPS_SERVER'] if https_server else []), '-DNEOCLR_HTTP_HEAP_BYTES=' + str(http_heap_bytes), '-DNEOCLR_NATIVE_BYTE_ARRAY_LIMIT=' + str(byte_array_limit), *(['-DNEOCLR_ENTRY_ARGUMENTS'] if selection.get('entryArguments') else []), '-I', base, *adapters, obj, *native_text, *native_tls, *native_crypto, *(['-framework', 'CoreFoundation'] if system_culture else []), '-o', pending], phase='host-compile-link')
             dependencies = [line.split()[0] for line in run(['xcrun', 'otool', '-L', pending], phase='dependency-check').splitlines()[1:]]
             allowed = {'/usr/lib/libSystem.B.dylib'}
             if system_culture:

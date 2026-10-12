@@ -40,8 +40,9 @@ tests, with [typed interpreter/JIT/AOT service qualification](experiments/native
 now passing locally on macOS using a standalone native cryptography archive without
 TLS dependencies. Prepared JIT bundles now include the provider, with private
 cryptography cases passing through default CLI execution. Windows uses the pending
-CI gates. Normal AOT project packaging and managed SSL/System.Security.Cryptography
-projections remain next. Socket/TLS adapters
+CI gates. Source AOT projects now link the provider on demand, with a Raven consumer
+qualified in all three local modes. Packaged build kits and managed
+SSL/System.Security.Cryptography projections remain next. Socket/TLS adapters
 and certificate APIs remain open. Compare .NET,
 Windows Runtime and other platforms, retaining .NET as the ergonomics target.
 See the [first async contract](stream-design.md#first-async-contract--2026-10-12).

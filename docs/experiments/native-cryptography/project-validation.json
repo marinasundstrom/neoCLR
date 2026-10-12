@@ -1,0 +1,35 @@
+{
+  "passed": true,
+  "date": "2026-10-12",
+  "platform": "macOS-27.0-arm64-arm-64bit",
+  "modes": [
+    "interpreter",
+    "default-jit",
+    "aot"
+  ],
+  "standaloneExecution": true,
+  "unusedProviderOmitted": true,
+  "dependencies": [
+    "/usr/lib/libSystem.B.dylib"
+  ],
+  "artifacts": {
+    "app.dll": "cd5d03133569317bc700cc0c38b5d69cac61d9b346462d800981f0d9a7c3149b",
+    "app.o": "a3907b9c680a3bf18223ba57ebc95983a745731d7989e48bb99d115390bebaf4",
+    "app": "556f179d5a9fecc6396550c7b21140187e2140026565ce4159ced4dcc2c3686c"
+  },
+  "sourceSha256": {
+    "scripts/build-native-project.py": "ad691d194d76b02b80cb222674314cde562a6ed8aef7c442b8ed765c12ff37e8",
+    "docs/experiments/native-cryptography/validate-project.py": "e1964c8c8336512bfb0ff408d77a2ac764ecdd172057f4228377805b95cc7877",
+    "docs/experiments/native-cryptography/project/Main.rvn": "6e42e82cda6ec688b81d716e6336ffa1f29fa9f8cd8056dcd380262e8cdec7d7",
+    "docs/experiments/native-cryptography/project/App.rvnproj": "c259814ae2aa551b8308ada850aaff75a14163fd8de643459c30ddb2fa7d5a92",
+    "docs/experiments/native-cryptography/project/Calls.rvn": "323537ec9b2e4b002e7fbdf1dfc1e37dd21a4426dfd770be2331c19642f07612"
+  },
+  "bundleManifestSha256": "ee0c13071062277c7e4322f4581fe1ba93ac6e693b292ef446cd39cd8ca0c89d",
+  "buildManifestSha256": "be7e884d0734a993b639d4472e38b943071777d9a4e2fdf4a2883252d831cea3",
+  "detailedReport": "target/crypto-project-validation/validation.json",
+  "limitations": [
+    "Private test-owned InternalCalls, not a public managed cryptography facade.",
+    "Source-checkout project path; packaged native build kits are unchanged.",
+    "Windows execution pending CI."
+  ]
+}
