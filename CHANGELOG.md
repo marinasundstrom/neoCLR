@@ -8,6 +8,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-13
 
+- Update reflection regression fixtures to the logical-module contract: declare
+  empty logical module names explicitly and report a type namespace through
+  ModuleInfo rather than its physical CLI scope. Preserve assembly-scoped identity
+  comparisons; all 26 focused reflection tests pass.
+
 - Align nested-type regressions with implemented generic lexical ownership:
   retain malformed-owner/name/access rejection and add explicit nested generic
   parameter round-trip/execution coverage. All six focused tests pass; remove

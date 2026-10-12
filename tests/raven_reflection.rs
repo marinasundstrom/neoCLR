@@ -485,7 +485,8 @@ call instance System.Runtime.RuntimeContext::GetTypeInfoFromHandle(System.Runtim
             "{}{query}\nret\n.end",
             prefix.replace("Main() -> Int32", "Main() -> String")
         )),
-        Value::String("App.dll".into())
+        // ModuleInfo describes the logical namespace, not the physical origin scope.
+        Value::String("Example".into())
     );
 }
 
@@ -636,14 +637,15 @@ ret
 
 #[test]
 fn assembly_module_object_identity_preserves_catalog_scope() {
-    // Both assemblies deliberately share short names, module names and tokens.
-    // The first also has a second module to check the other half of the key.
+    // Both assemblies deliberately share short names, logical module names and tokens.
+    // Explicit declaration tables retain empty logical modules; physical CLI
+    // scopes alone do not declare logical modules. The first has two logical names.
     assert_eq!(
         run_introspection(
             r#"
 .module ScopedDescriptors
-.assembly {"name":"Shared","full_name":"Shared, Version=1","modules":["Shared.dll","Other.netmodule"],"references":["Shared, Version=2","System.Runtime"]}
-.assembly {"name":"Shared","full_name":"Shared, Version=2","modules":["Shared.dll"],"references":["System.Runtime"]}
+.assembly {"name":"Shared","full_name":"Shared, Version=1","modules":["Shared.dll","Other.netmodule"],"declaration_modules":{"version":1,"names":["","Other"]},"references":["Shared, Version=2","System.Runtime"]}
+.assembly {"name":"Shared","full_name":"Shared, Version=2","modules":["Shared.dll"],"declaration_modules":{"version":1,"names":[""]},"references":["System.Runtime"]}
 .entry Main
 .function First() -> System.Introspection.AssemblyInfo
 .origin {"assembly":"Shared, Version=1","module":"Shared.dll","name":"First","token":100663297}
