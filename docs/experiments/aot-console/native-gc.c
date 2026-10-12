@@ -1,3 +1,6 @@
+#ifdef NEOCLR_DIAGNOSTICS
+#include "../runtime-diagnostics/attach.h"
+#endif
 #include "native-gc.h"
 #include <string.h>
 #include <stdatomic.h>
@@ -469,6 +472,9 @@ int32_t neoclr_gc_collect_conditional_v1(neoclr_aot_context *context,
     profile.failures += status != 0;
     profile.nanoseconds += ns;
     if (ns > profile.maximum_nanoseconds) profile.maximum_nanoseconds = ns;
+#endif
+#ifdef NEOCLR_DIAGNOSTICS
+    neoclr_diagnostics_publish_v1();
 #endif
     return status;
 }

@@ -8,6 +8,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-12
 
+- Add a provisional native GC snapshot endpoint and standalone Python profiler.
+  Publish owner-thread copies without blocking collection; report stale/unavailable
+  data explicitly. Qualify protocol, disconnect and shutdown behavior with focused
+  undefined-behavior/bounds-sanitized tests on macOS; HTTP integration follows.
+
 - Record separate attachable debugger/profiler clients as the runtime diagnostics
   direction, with opt-in runtime hooks, safe counter publication and an HTTP attach
   validation gate. Update current tooling limits; attachment remains unimplemented.
