@@ -346,6 +346,7 @@ pub fn bind(
                 f.name.as_str(),
                 "neoCLR.Runtime.TypeProperties"
                     | "neoCLR.Runtime.TypeModule"
+                    | "neoCLR.Runtime.TypeDeclaringType"
                     | "neoCLR.Runtime.ModuleAssembly"
                     | "neoCLR.Runtime.AssemblyName"
                     | "neoCLR.Runtime.AssemblyModules"
@@ -419,6 +420,7 @@ pub fn bind(
     for index in services {
         let f = &input.functions[index];
         let modules = f.name.ends_with("TypeModule");
+        let declaring = f.name.ends_with("TypeDeclaringType");
         let module_assembly = f.name.ends_with("ModuleAssembly");
         let assembly_name = f.name.ends_with("AssemblyName");
         let assembly_modules = f.name.ends_with("AssemblyModules");
@@ -563,6 +565,34 @@ pub fn bind(
             factory.body.push(Op::Fault(
                 "native assembly ownership metadata was not retained".into(),
             ));
+        } else if declaring {
+            let Type::Constructed { arguments, .. } = &expected else {
+                return Err("TypeDeclaringType requires scoped Option<TypeInfo>".into());
+            };
+            if !matches!(name(source, &expected), Some("System.Option" | "System.Option`1"))
+                || arguments.len() != 1
+                || name(source, &arguments[0]) != Some("System.Introspection.TypeInfo")
+            {
+                return Err("TypeDeclaringType requires scoped Option<TypeInfo>".into());
+            }
+            for row in retention["types"].as_array().unwrap() {
+                let id: TypeDefId = serde_json::from_value(row["definition"].clone())?;
+                let ti = definitions
+                    .iter()
+                    .position(|definition| *definition == id)
+                    .ok_or("missing declaring-type snapshot root")?;
+                let owner = Type::Named(source.types[ti].name.clone());
+                let branch = factory.body.len() + 3;
+                factory.body.extend([
+                    Op::Arg(0), Op::LoadTypeToken(owner.clone()), Op::Equal, Op::BranchFalse(0),
+                ]);
+                let recipe = neoclr::native_metadata::declaring_type(source, &owner)
+                    .map_err(|error| error.to_string())?;
+                factory.emit(&recipe, &expected)?;
+                factory.body.push(Op::Return);
+                factory.body[branch] = Op::BranchFalse(factory.body.len());
+            }
+            factory.body.push(Op::Fault("native declaring-type metadata was not retained; configure --reflection-roots".into()));
         } else if modules {
             if name(source, &expected) != Some("System.Introspection.ModuleInfo") {
                 return Err("TypeModule requires scoped ModuleInfo".into());
@@ -932,6 +962,21 @@ fn bind_attributes(
 #[cfg(test)]
 mod catalog_tests {
     use super::*;
+
+    #[test]
+    fn declaring_type_requires_exact_contract_and_explicit_retention() {
+        let source = neoclr::assemble(".module Declaring\n.function neoCLR.Runtime.TypeDeclaringType(RuntimeTypeHandle) -> System.Option<System.Introspection.TypeInfo>\n.methodimpl InternalCall\n.end\n").unwrap();
+        let mut retention = json!({"types":[]});
+        let mut input = source.clone();
+        bind(&mut input, &source, &[], &mut retention).unwrap();
+        assert!(matches!(&input.functions[0].body[..], [Op::Fault(message)] if message.contains("declaring-type metadata was not retained")));
+        let mut invalid = source.clone();
+        invalid.functions[0].parameters[0] = Type::Int32;
+        assert!(bind(&mut invalid, &source, &[], &mut retention).unwrap_err().to_string().contains("exact reserved InternalCall contract"));
+        let mut invalid = source.clone();
+        invalid.functions[0].returns = neoclr::assembler::parse_type("System.Option<Int32>").unwrap();
+        assert!(bind(&mut invalid, &source, &[], &mut retention).unwrap_err().to_string().contains("Option<TypeInfo>"));
+    }
 
     #[test]
     fn unretained_module_attributes_bind_an_explicit_fault_with_exact_contract() {

@@ -8,6 +8,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-12
 
+- Bind retained declaring-type metadata in the native backend using interpreter
+  identity rules. Qualify nested and top-level Raven queries in interpreter, JIT
+  and AOT on macOS ARM64, including explicit missing-retention faults. Full module
+  discovery now reaches an interface-to-object Equals dispatch gap; it is not yet
+  supported natively. Generic declaration retention remains unsupported.
+
 - Start issue #27 execution qualification: make the module-function discovery
   harness select interpreter mode explicitly and support an explicit JIT check.
   Retain passing interpreter/GC evidence and matching JIT/AOT compilation failures

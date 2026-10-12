@@ -30,6 +30,17 @@ pub fn element_type(module: &Module, owner: &Type) -> Result<Value, Fault> {
     )
 }
 
+/// Return the optional declaring-type recipe using the interpreter's identity rules.
+/// Native callers must explicitly retain the queried declaration; this grants no invocation.
+pub fn declaring_type(module: &Module, owner: &Type) -> Result<Value, Fault> {
+    crate::reflection::Query::DeclaringType.invoke_profile(
+        module,
+        &[Value::RuntimeTypeHandle(Box::new(crate::type_identity::describe_loaded(module, owner)?))],
+        &Limits::default(),
+        true,
+    )
+}
+
 /// Return a retained nominal type's logical module descriptor recipe.
 /// This unstable backend bridge adds no loading or callable execution capability.
 pub fn type_module(module: &Module, owner: &Type) -> Result<Value, Fault> {
@@ -268,6 +279,22 @@ fault "test body must not execute"
     fn fields(value: &Value) -> &[Value] {
         let Value::Object { fields, .. } = value else { panic!("expected descriptor"); };
         fields
+    }
+
+    #[test]
+    fn declaring_type_recipe_preserves_nested_identity_and_absent_owner() {
+        let module = crate::assemble(".module Nested\n.type Outer\n.type Inner\n.end\n.end\n.type Other\n.type Inner\n.end\n.end\n").unwrap();
+        for (nested, parent) in [("Outer.Inner", "Outer"), ("Other.Inner", "Other")] {
+            let result = declaring_type(&module, &Type::Named(nested.into())).unwrap();
+            assert_eq!(fields(&result)[0], Value::Boolean(true));
+            let descriptor = &fields(&result)[1];
+            assert_eq!(fields(descriptor)[0], Value::RuntimeTypeHandle(Box::new(
+                crate::type_identity::describe_loaded(&module, &Type::Named(parent.into())).unwrap()
+            )));
+        }
+        let result = declaring_type(&module, &Type::Named("Outer".into())).unwrap();
+        assert_eq!(fields(&result), [Value::Boolean(false)]);
+        assert!(declaring_type(&module, &Type::Named("Missing".into())).is_err());
     }
 
     #[test]

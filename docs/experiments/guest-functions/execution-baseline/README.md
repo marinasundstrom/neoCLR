@@ -17,8 +17,9 @@ The previous interpreter harness relied on the old execution default. It now sel
 retains its failed report. An optional `--jit-compiler` pins the backend under test.
 Native failures are not accepted as passing validation or silently interpreted.
 
-Next bounded implementation: retain and bind the declaring-type query reached by
-this consumer, then rerun to expose the next actual dependency. Module-function
+Follow-up: [retained declaring-type support](../../declaring-type/README.md) now passes
+a focused native consumer. The full discovery rerun exposes interface-to-object
+Equals dispatch as the next blocker; the original baseline above is preserved. Module-function
 catalog retention/enumeration and ownerless attribute support still need native
 implementation. Generic signatures and invocation remain separately tracked in #27.
 Do not infer native discovery support from existing host-side recipe helpers.

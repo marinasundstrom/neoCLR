@@ -1,0 +1,50 @@
+{
+  "passed": false,
+  "execution": "jit",
+  "platform": "macOS-27.0-arm64-arm-64bit",
+  "commands": [
+    {
+      "command": [
+        "dotnet",
+        "/Users/robert/Projects/neoclr/target/generic-cleanup-project-compiler/rvnc.dll",
+        "neoclr",
+        "--project",
+        "/Users/robert/Projects/neoclr/target/guest-functions-after-declaring/source/docs/experiments/guest-functions/GuestFunctions.rvnproj"
+      ],
+      "exitCode": 0,
+      "stdout": "Native build output: /Users/robert/Projects/neoclr/target/guest-functions-after-declaring/source/docs/experiments/guest-functions/bin/neoclr/GuestFunctions.dll\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/generic-cleanup-gc-bundle/bundle/bin/neoclr",
+        "run",
+        "/Users/robert/Projects/neoclr/target/guest-functions-after-declaring/source/docs/experiments/guest-functions/bin/neoclr/GuestFunctions.dll",
+        "--execution",
+        "jit",
+        "--system",
+        "/Users/robert/Projects/neoclr/target/generic-cleanup-gc-bundle/bundle/lib/System.runtime.neox",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/generic-cleanup-gc-bundle/bundle/lib/System.Runtime.dll",
+        "--object-root",
+        "/Users/robert/Projects/neoclr/target/generic-cleanup-gc-bundle/bundle/lib/System.Runtime.dll",
+        "--jit-compiler",
+        "/Users/robert/Projects/neoclr/tools/aot-poc/target/release/neoclr-aot-poc"
+      ],
+      "exitCode": 1,
+      "stdout": "",
+      "stderr": "aot-poc: NeoMetadata_C47DAF380B8189018A2412DC9BF395A0116DF0DEA2D95E46973AD61C6F942416.F_3C4E656F46756E6374696F6E3E343537383631364437303643363532453532373536453645363537325F3444363136393645 instruction 130: value operand type mismatch: expected Reference(1), found Interface(25) for CallVirtual(FunctionRef { definition: Some(MemberId { module: \"NeoMetadata_C47DAF380B8189018A2412DC9BF395A0116DF0DEA2D95E46973AD61C6F942416\", revision: Some(\"1.0.0.0\"), index: 9 }), name: \"$aot_ObjectBase.$aot_ObjectDisplay_9\", owner: Some(Named(\"$aot_ObjectBase\")), instance: true, generic_arguments: [], parameters: [Named(\"$aot_ObjectBase\")] })\n"
+    }
+  ],
+  "inputs": {
+    "docs/experiments/guest-functions/verify.py": "30df132156f65277d7ac9b84e934b3b8e03b3af192d3a5c311a13a1d480f8c40",
+    "docs/experiments/guest-functions/Main.rvn": "51e64956771434d0027704a7855fc5938529e83146f293001a93737698043a24",
+    "docs/experiments/guest-functions/GuestFunctions.rvnproj": "864260c44ed3538b98492e209e15437748c281f35415ae259ca2510bc36786f5",
+    "runtime/raven/tests/framework/TestAttribute.rvn": "435a93e9247a6c7f1c94b1a81296e35449f7b4ba735b835c18a816726a56435c"
+  },
+  "compilerSha256": "3ce6561ad39a9dced0ed172ef06012a42e69f5bce7fbddae056c736ea3b2bbd2",
+  "runnerSha256": "f13312c1afe1014921617c38b61b2d19208804a92979794035afc2871164dc42",
+  "runtimeSha256": "1f4f52f898ae1339cf6d653d9bd5e902a8f99ef01acad27ffa1f0a9a66b93296",
+  "jitCompilerSha256": "b54af5f4a93ba6426864f66a13ffb6fa00843b17d6c3f6c80eb620c093487bee",
+  "imageSha256": "7d963ad02924d18d3624ed6831b5ee7ff0bc58f27d175c38d12e69db9f2cb7e6"
+}

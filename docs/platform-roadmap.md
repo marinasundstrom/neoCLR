@@ -397,7 +397,11 @@ attributes, are queued in [issue #27](https://github.com/marinasundstrom/neoCLR/
 This follow-up does not change the active milestone priority. The
 [2026-10-12 execution baseline](experiments/guest-functions/execution-baseline/README.md)
 passes explicit interpreter discovery and identifies `TypeDeclaringType` as the
-first shared JIT/AOT prerequisite, before module-function enumeration. The guest-function
+first shared JIT/AOT prerequisite, before module-function enumeration.
+[Retained declaring-type queries now pass](experiments/declaring-type/README.md)
+a focused interpreter/JIT/AOT consumer on macOS ARM64. The full discovery consumer
+now fails on interface-to-object Equals dispatch in JIT and AOT; native enumeration
+is not yet qualified. The guest-function
 Windows run at 5e4cbd84 exposed an AOT shared-provider binding regression in nominal
 attribute inspection; [the fix passes locally](experiments/native-attributes/shared-provider-validation.json)
 with rebuilt libraries. Windows requalification remains pending.

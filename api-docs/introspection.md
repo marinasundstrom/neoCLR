@@ -99,6 +99,15 @@ return Fault. It is an in-repository compiler helper, outside the guest API and
 RavenDoc type selection; native snapshot factories materialize its result under
 explicit retention.
 
+The unstable helper
+`neoclr::native_metadata::declaring_type(&Module, &metadata::Type) -> Result<Value, Fault>`
+returns the interpreter's optional enclosing-type recipe. Top-level declarations
+produce None; nested declarations preserve exact enclosing definition identity;
+unknown types return Fault. The native adapter answers only explicitly retained
+nongeneric declarations and faults for unretained handles. It grants no callable
+rights. [Interpreter/JIT/AOT consumer and limits](../docs/experiments/declaring-type/README.md).
+This backend-only helper is outside guest RavenDoc selection; guest signatures are unchanged.
+
 The same unstable backend bridge provides
 `module_assembly(&Module, identity: &str, name: &str) -> Result<Value, Fault>` and
 `assembly_name(&Module, identity: &str) -> Result<Value, Fault>`. These validate
