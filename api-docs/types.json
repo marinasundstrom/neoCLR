@@ -120,6 +120,8 @@
   "System.Globalization.Language",
   "System.Globalization.SystemCultureProvider",
   "System.HashCode",
+  "System.IO.AsyncInputStream",
+  "System.IO.AsyncOutputStream",
   "System.IO.FileInputStream",
   "System.IO.FileOutputStream",
   "System.IO.InputStream",

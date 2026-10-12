@@ -6,6 +6,9 @@ import System.Option.*
 import NeoClr.Testing.*
 
 import System.IO.*
+import System.Tasks.*
+import System.Tasks.TaskOutcome.*
+import System.Concurrency.*
 
 [Test("MemoryStream overwrites preserve length and untouched bytes")]
 func MemoryOverwrite() -> Result<unit, TestFailure> {
@@ -87,4 +90,74 @@ func MemoryClosed() -> Result<unit, TestFailure> {
     _ = Assert.True(input.Read(bytes, 0, 0) is Error(StreamError.Closed), "Closed empty read")?
     _ = Assert.True(output.Flush() is Error(StreamError.Closed), "Closed flush")?
     return Assert.True(seek.Seek(0) is Error(StreamError.Closed), "Closed seek")
+}
+
+[Test("MemoryStream async interfaces preserve complete writes short reads and EOF")]
+func MemoryAsyncRoundTrip() -> Result<unit, TestFailure> {
+    let task = AsyncMemoryChecks.RoundTrip()
+    // Observe settlement to assert the memory fast path; ordinary consumers await.
+    let Some(Completed(result)) = task.Outcome else {
+        return Assert.True(false, "Memory operations must settle without scheduled work")
+    }
+    return Assert.True(result, "Awaited memory exchange and settled outcomes")
+}
+
+internal class AsyncMemoryChecks {
+    async static func RoundTrip() -> Task<bool> {
+        let stream = MemoryStream()
+        let input: AsyncInputStream = stream
+        let output: AsyncOutputStream = stream
+        let bytes: byte[] = [(byte)11, (byte)22, (byte)33]
+        let written = await Write(output, bytes)
+        let rewound = stream.Seek(0) is Ok(0L)
+        let destination: byte[] = [(byte)99, (byte)99, (byte)99, (byte)99]
+        let received = await input.ReadAsync(destination, 1, 3, CancellationToken.None)
+        return Check(input, output, bytes, destination, written && rewound && received is Ok(2))
+    }
+
+    async static func Write(output: AsyncOutputStream, bytes: byte[]) -> Task<bool> {
+        let result = await output.WriteAsync(bytes, 1, 2, CancellationToken.None)
+        return result is Ok(_)
+    }
+
+    static func Check(input: AsyncInputStream, output: AsyncOutputStream, bytes: byte[], destination: byte[], validExchange: bool) -> bool {
+        // Observe settled outcomes here to verify the memory fast path.
+        let flushed = output.FlushAsync(CancellationToken.None).Outcome
+        let eof = input.ReadAsync(destination, 0, 1, CancellationToken.None).Outcome
+        let empty = input.ReadAsync(destination, 4, 0, CancellationToken.None).Outcome
+        input.Close()
+        output.Close()
+        let closedWrite = output.WriteAsync(bytes, 0, 0, CancellationToken.None).Outcome
+        let closedFlush = output.FlushAsync(CancellationToken.None).Outcome
+        return validExchange
+            && flushed is Some(Completed(Ok(_)))
+            && eof is Some(Completed(Ok(0)))
+            && empty is Some(Completed(Ok(0)))
+            && closedWrite is Some(Completed(Error(StreamError.Closed)))
+            && closedFlush is Some(Completed(Error(StreamError.Closed)))
+            && destination[0] == 99 && destination[1] == 22 && destination[2] == 33 && destination[3] == 99
+    }
+}
+
+[Test("MemoryStream async cancellation and rejected ranges preserve storage")]
+func MemoryAsyncRejection() -> Result<unit, TestFailure> {
+    let stream = MemoryStream()
+    use cancellation = CancellationTokenSource()
+    cancellation.Cancel()
+    let bytes: byte[] = [(byte)42]
+    // Cancellation has no success value to await; inspect the documented outcome.
+    _ = Assert.True(stream.WriteAsync(bytes, 0, 1, cancellation.Token).IsCancelled, "Cancelled write")?
+    _ = Assert.True(stream.ReadAsync(bytes, -1, 1, cancellation.Token).IsCancelled, "Cancellation precedes range validation")?
+    _ = Assert.True(stream.FlushAsync(cancellation.Token).IsCancelled, "Cancelled flush")?
+    _ = Assert.True(stream.GetLength() is Ok(0L) && stream.GetPosition() is Ok(0L), "No mutation on cancellation")?
+    let Some(Completed(Error(StreamError.InvalidRange))) = stream.WriteAsync(bytes, 2147483647, 1, CancellationToken.None).Outcome else {
+        return Assert.True(false, "Overflow-safe range rejection")
+    }
+    _ = Assert.True(stream.Seek(65536) is Ok(_), "Quota boundary")?
+    let Some(Completed(Error(StreamError.LimitExceeded))) = stream.WriteAsync(bytes, 0, 1, CancellationToken.None).Outcome else {
+        return Assert.True(false, "Quota rejection")
+    }
+    _ = Assert.True(stream.GetLength() is Ok(0L) && stream.GetPosition() is Ok(65536L), "Rejected writes preserve state")?
+    stream.Close()
+    return Assert.True(stream.ReadAsync(bytes, 0, 1, cancellation.Token).IsCancelled, "Pre-cancellation precedes closed state")
 }

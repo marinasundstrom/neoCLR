@@ -205,6 +205,8 @@ JSON_STREAM_NAMES = [
     'JSON stream writes reject zero progress without looping',
 ]
 MEMORY_STREAM_NAMES = [
+    'MemoryStream async cancellation and rejected ranges preserve storage',
+    'MemoryStream async interfaces preserve complete writes short reads and EOF',
     'MemoryStream quota errors preserve length and position',
     'MemoryStream closure is shared across interfaces and idempotent',
     'MemoryStream gap writes zero-fill while empty writes preserve length',
@@ -431,7 +433,8 @@ def main():
                 registry = DISCOVERY.discover(TESTS / name / 'Tests.rvnproj', bundle, out / (name + '-discovery'))
                 report['phases'].append(dict(suite=name, phase='discovery', elapsedSeconds=round(time.perf_counter() - started, 6), details=json.loads((out / (name + '-discovery') / 'timings.json').read_text())))
                 environment['NeoClrTestRegistry'] = str(registry)
-            profile = 'http' if name in ('http-text', 'http-lifetime') else 'console'
+            # Async memory tests need Task/cancellation lifecycle bindings (including TimerCancel).
+            profile = 'http' if name in ('http-text', 'http-lifetime', 'memory-stream') else 'console'
             if os.name == 'nt':
                 profile = 'windows-' + profile
             if 'native' in modes:

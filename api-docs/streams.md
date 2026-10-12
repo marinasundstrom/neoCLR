@@ -1,8 +1,9 @@
-# File byte streams
+# Byte streams
 
 System.IO provides blocking file input and output through directional stream
 interfaces. Use matching compiler and runtime artifacts. The supported surface is bounded,
-not a finalized provider model or asynchronous I/O contract.
+not a finalized provider model. Async capabilities and memory operations are also
+available in development; file streams remain synchronous.
 
 ## Browse the API
 
@@ -289,3 +290,38 @@ reporting UTF-16 char consumption. It permits arbitrarily small byte destination
 at the cost of retained input, two-stage usage and fragments that may split a scalar.
 The synthetic final-output test is a contract fixture, not an additional supported
 encoding. HTTP charset policy and additional codecs remain separate work.
+
+## Async streams (development)
+
+[AsyncInputStream](xref:System.IO.AsyncInputStream) provides
+`ReadAsync(byte[], int offset, int count, CancellationToken) -> Task<Result<int, StreamError>>`
+and `Close()`. A successful positive-count read returns 1..count bytes or zero at
+EOF. A zero-count read consumes nothing. Invalid ranges are recoverable errors.
+
+[AsyncOutputStream](xref:System.IO.AsyncOutputStream) provides
+`WriteAsync(byte[], int offset, int count, CancellationToken) -> Task<Result<unit, StreamError>>`,
+`FlushAsync(CancellationToken) -> Task<Result<unit, StreamError>>` and `Close()`.
+Write success means the whole range was accepted. Failure/cancellation can follow
+partial output; retrying the entire write may duplicate data. Flush does not
+promise durability or peer receipt. Close is idempotent disposal, not an awaited
+flush or TLS shutdown. Pass CancellationToken.None when cancellation is unused.
+
+Keep buffers alive and unchanged (apart from the input stream's destination writes)
+until operations settle. Cancellation uses Task cancellation state. Implementations
+specify concurrency and ownership; these interfaces do not imply thread safety.
+Only MemoryStream implements these async contracts in this slice. Socket/TLS/file
+adapters, pending-I/O concurrency and shared stream deadlines remain follow-ups.
+
+MemoryStream implements both interfaces over its existing bounded storage and shared
+cursor. Async methods complete inline with settled tasks, with no scheduled worker.
+Pre-cancellation wins over range and closed-state validation and leaves buffers,
+length and position untouched. Otherwise ReadAsync/WriteAsync/FlushAsync preserve
+Read/Write/Flush errors, including Closed, InvalidRange and LimitExceeded. Writes
+preflight the 64 KiB storage quota; zero writes do not extend the stream. MemoryStream
+is not thread-safe, and Close affects every interface view.
+
+The executable memory-stream suite contains an awaited interface-based round trip,
+short reads, EOF, offset preservation, cancellation and rejected-range checks.
+Unlike the synchronous partial-count Write, async WriteAsync follows .NET's
+complete-write convention. Expected failures remain Result values; no ValueTask,
+Windows Runtime IBuffer or new runtime await protocol is introduced.

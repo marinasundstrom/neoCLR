@@ -1,11 +1,67 @@
 # Stream API proposal
 
+## First async contract — 2026-10-12
+
+Author clarification: compare .NET, Windows Runtime and other platforms, while
+keeping .NET as the ergonomics target. The initial implemented development surface
+is `System.IO.AsyncInputStream` and `AsyncOutputStream`, with MemoryStream as the
+first implementation. Socket/TLS adapters and pending-I/O qualification follow.
+
+| Reference | Relevant behavior | neoCLR choice |
+| --- | --- | --- |
+| [.NET Stream](https://learn.microsoft.com/en-us/dotnet/api/system.io.stream?view=net-10.0) | ReadAsync returns a count; WriteAsync represents the complete write; CancellationToken parameter | Keep familiar Async names, short reads and complete-write success. Use existing Task<Result<...>> for recoverable errors. |
+| [Windows Runtime IInputStream](https://learn.microsoft.com/en-us/uwp/api/windows.storage.streams.iinputstream?view=winrt-26100) and [InputStreamOptions](https://learn.microsoft.com/en-us/uwp/api/windows.storage.streams.inputstreamoptions?view=winrt-26100) | Separate input capability; Partial allows completion when bytes become available | Separate async capabilities fit existing neoCLR streams. Short reads are ordinary behavior; no read-options enum yet. |
+| [Windows Runtime IOutputStream.WriteAsync](https://learn.microsoft.com/en-us/uwp/api/windows.storage.streams.ioutputstream.writeasync?view=winrt-26100) | Returns an operation with byte-count progress using IBuffer | Keep ordinary managed byte arrays and Task; a cross-language buffer/operation ABI is not required for this slice. |
+| [Go io.Reader/Writer](https://pkg.go.dev/io) | Small directional interfaces and explicit transferred-byte counts/errors | Retain directional composition. Prefer .NET complete writes at the async stream boundary; Socket.Send remains the partial primitive. |
+
+Sources reviewed 2026-10-12. This supersedes the older proposal below where all
+writes returned partial counts. `AsyncOutputStream.WriteAsync` returns
+`Task<Result<unit, StreamError>>`; success accepts the full range, while an error
+or cancellation can follow partial progress and provides no rollback. Adapters
+must loop over partial transport writes and reject zero progress. The synchronous
+OutputStream contract remains unchanged. This asymmetry costs adapter code but
+makes ordinary awaited writes familiar to .NET callers.
+
+Memory operations settle inline without a worker. Pre-requested cancellation wins
+before validation/mutation, following existing neoCLR task adapters. Other errors
+retain synchronous MemoryStream semantics. The stream shares one cursor across
+sync/async views and is not thread-safe. Cancellation is task state, never a new
+StreamError case; close is not graceful async shutdown. The initial interface
+requires an explicit token (`CancellationToken.None` when unused); convenience
+operations can follow without new primitive implementation requirements.
+
+Validation exposed an existing Raven native limitation: an assembly-level async
+helper returning Task<Result<unit, TestFailure>> compiles with an empty discovery
+registry but reports RAV2704 with generated references to the tests. Moving the same
+body into an internal static helper compiles on c71baae94 and 371d1d707. The memory
+suite uses that helper while retaining assembly-level Test methods. Separating
+awaited results from inline pattern assertions also avoids NEOMETA001 (value block
+cannot exit its enclosing expression). The state-machine native backend also rejects a test retaining many result locals
+with a 77-lane layout (its existing limit is 64), and the smaller 43-lane
+variant exceeds its 264-byte reference-object bound. The bounded fixture awaits
+the write/read exchange and observes other settled memory outcomes directly. These are recorded compiler/backend follow-ups, not restrictions of
+AsyncInputStream/AsyncOutputStream or intended Raven semantics.
+
+[Validation evidence](../runtime/raven/tests/async-stream-validation.json): seven
+memory-stream tests pass in interpreter, JIT and AOT on macOS ARM64, including the
+five existing synchronous regression tests. The suite uses the existing HTTP host
+profile for Task/cancellation/timer lifecycle services; no network request is needed.
+Both reference snapshots are refreshed and checked. The new managed APIs have not
+yet received Windows execution qualification or pending socket/TLS coverage.
+
+The author also asks whether `System.Tasks` should become
+`System.Concurrency.Tasks`. The assistant recommends that hierarchy as a separate
+migration, keeping Scheduler and cancellation at the broader concurrency layer.
+This is a recommendation, not a completed rename or confirmed author decision.
+Compiler well-known names, bootstrap ownership, native metadata, reference APIs,
+samples and tests must move together when undertaken; this slice keeps System.Tasks.
+
 ## Common async transport direction — 2026-10-12
 
-**Status: design follow-through, not implemented APIs.** The author requests async
+**Status: broader design follow-through; the first async/memory slice is above.** The author requests async
 stream operations and a secure-stream equivalent, then emphasizes common APIs and
-learning from other platforms rather than reproducing .NET's hierarchy. The current
-implemented contracts are synchronous `System.IO.InputStream` and `OutputStream`;
+learning from other platforms rather than reproducing .NET's hierarchy. The original
+implemented contracts were synchronous `System.IO.InputStream` and `OutputStream`;
 `System.Networking.Sockets.Socket` already provides Task-based Receive/Send with
 cancellation and nonrenewing deadlines. The [HTTPS host proof](experiments/https-server/README.md)
 shares its TLS engine and socket operation policy across native host builds, but

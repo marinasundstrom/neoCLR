@@ -3317,5 +3317,54 @@ Missing/ambiguous columns, SQL NULL and unsupported property types are errors. E
       <summary>Development PostgreSQL protocol-v3 binding for local trust-authenticated servers.
 Connects only to 127.0.0.1. No TLS, password authentication, pooling or automatic retries.</summary>
     </member>
+    <member name="M:System.IO.AsyncInputStream.Close">
+      <summary>Closes this stream; repeated closure has no additional effect.</summary>
+      <remarks>Close is disposal, not an awaited flush or TLS shutdown.</remarks>
+    </member>
+    <member name="M:System.IO.AsyncInputStream.ReadAsync(System.Byte[],System.Int32,System.Int32,System.Concurrency.CancellationToken)">
+      <summary>Reads up to count bytes; a positive-count read returns zero only at EOF.</summary>
+      <param name="buffer">Destination whose bytes outside the requested range are preserved.</param>
+      <param name="offset">First destination index.</param>
+      <param name="count">Maximum bytes to read; zero completes without consuming input.</param>
+      <param name="cancellationToken">Cancellation produces a cancelled task, not a StreamError.</param>
+      <returns>A byte count or stream error. Short reads are successful.</returns>
+    </member>
+    <member name="M:System.IO.AsyncOutputStream.Close">
+      <summary>Closes this stream; repeated closure has no additional effect.</summary>
+      <remarks>Close is disposal, not an awaited flush or TLS shutdown.</remarks>
+    </member>
+    <member name="M:System.IO.AsyncOutputStream.FlushAsync(System.Concurrency.CancellationToken)">
+      <summary>Flushes pending output; does not promise durable storage or peer receipt.</summary>
+      <param name="cancellationToken">Cancellation request for this operation.</param>
+      <returns>Completion or a stream error.</returns>
+    </member>
+    <member name="M:System.IO.AsyncOutputStream.WriteAsync(System.Byte[],System.Int32,System.Int32,System.Concurrency.CancellationToken)">
+      <summary>Writes the entire requested range before reporting success.</summary>
+      <param name="buffer">Source bytes, retained until the task settles.</param>
+      <param name="offset">First source index.</param>
+      <param name="count">Number of bytes to write; zero does not extend storage.</param>
+      <param name="cancellationToken">Cancellation produces a cancelled task, not a StreamError.</param>
+      <returns>Success only after all requested bytes are accepted, or a stream error.</returns>
+    </member>
+    <member name="M:System.IO.MemoryStream.FlushAsync(System.Concurrency.CancellationToken)">
+      <summary>Returns settled success for open memory storage; no data needs flushing.</summary>
+      <remarks>Pre-cancellation wins over Closed. Does not change position or length.</remarks>
+    </member>
+    <member name="M:System.IO.MemoryStream.ReadAsync(System.Byte[],System.Int32,System.Int32,System.Concurrency.CancellationToken)">
+      <summary>Reads memory synchronously and returns a settled task; no worker is scheduled.</summary>
+      <remarks>Pre-cancellation wins before validation or mutation. Other errors match Read. This shared-cursor stream is not thread-safe.</remarks>
+    </member>
+    <member name="M:System.IO.MemoryStream.WriteAsync(System.Byte[],System.Int32,System.Int32,System.Concurrency.CancellationToken)">
+      <summary>Writes the full range to memory and returns a settled task.</summary>
+      <remarks>Pre-cancellation wins before validation or mutation. Range, closed-state and quota errors preserve storage and cursor, as with Write.</remarks>
+    </member>
+    <member name="T:System.IO.AsyncInputStream">
+      <summary>Asynchronous byte input without requiring synchronous or seek operations.</summary>
+      <remarks>Keep the destination range available and unmodified until the task settles. Implementations document concurrency and ownership.</remarks>
+    </member>
+    <member name="T:System.IO.AsyncOutputStream">
+      <summary>Asynchronous complete-range byte output without requiring synchronous or seek operations.</summary>
+      <remarks>Keep source bytes unchanged until completion. An error or cancellation may follow partial output; writes are not transactional.</remarks>
+    </member>
 </members>
 </doc>

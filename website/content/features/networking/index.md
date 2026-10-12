@@ -192,3 +192,12 @@ per-listener configuration API. Interpreter/client TLS, Windows ARM64 and packag
 TLS remain open. Common async transport is the next API step toward an HTTP server
 and client exchanging JSON, with optional PostgreSQL/container integration later.
 [Host setup, evidence and limits](https://github.com/marinasundstrom/neoCLR/blob/main/docs/experiments/https-server/README.md).
+
+
+### Common async stream foundation
+
+Development `System.IO.AsyncInputStream` and `AsyncOutputStream` provide awaited
+read, complete-write and flush contracts. MemoryStream is the first implementation;
+socket and secure-stream adapters remain follow-ups. The API keeps .NET-style
+method names and cancellation tokens with neoCLR Result errors.
+[Stream API reference](../../docs/streams.html).

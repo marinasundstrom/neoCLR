@@ -17,7 +17,10 @@ for further development. Follow the [bounded security API sequence](stream-desig
 common async byte I/O, certificate/key ownership and explicit trust, then managed
 TLS composition and verified client/server JSON. Expose cryptographic primitives
 as reusable capabilities backed by established implementations, with scope driven
-by concrete consumers. These APIs are planned, not implemented by the host proof.
+by concrete consumers. The first managed slice adds AsyncInputStream/AsyncOutputStream and MemoryStream
+operations; socket/TLS adapters and certificate APIs remain next. Compare .NET,
+Windows Runtime and other platforms, retaining .NET as the ergonomics target.
+See the [first async contract](stream-design.md#first-async-contract--2026-10-12).
 
 **Windows HTTPS follow-through (2026-10-12):** the author explicitly requests
 Windows behavior consistent with macOS. Source linking and a shared validation

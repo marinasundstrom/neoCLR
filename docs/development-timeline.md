@@ -15812,3 +15812,28 @@ or runtime-await default switch was performed.
   ownership questions and validation requirements in the [stream design](stream-design.md#security-and-certificate-foundations--2026-10-12)
   and roadmap. This is planning, not completed public API implementation. Certificate
   stores, issuance and broader algorithm coverage remain later candidates.
+
+
+## 2026-10-12 — Async stream ergonomics and task-module hierarchy
+
+- **Author direction:** continue API work by comparing .NET, Windows Runtime and
+  other platforms; .NET remains the ergonomics target.
+- **Assistant decision and implementation:** add separate AsyncInputStream and
+  AsyncOutputStream capabilities to System.IO, using ReadAsync/WriteAsync/FlushAsync,
+  CancellationToken and existing Task/Result contracts. Async writes complete the
+  whole range, unlike the existing synchronous partial-write primitive. MemoryStream
+  is the first implementation and settles operations inline without a worker.
+- **Author question:** should System.Tasks be renamed System.Concurrency.Tasks?
+  **Assistant recommendation:** yes, as a separate coherent compiler/metadata/API
+  migration; retain Scheduler and cancellation at the broader concurrency layer.
+  No rename has been performed, and no subsequent author decision is assumed.
+- **Validation:** all seven memory-stream tests pass in macOS ARM64 interpreter,
+  JIT and native AOT. Both API reference snapshots are refreshed; snapshot checks
+  and five new/changed member-page checks pass. [Evidence](../runtime/raven/tests/async-stream-validation.json).
+- **Gaps exposed:** an assembly-level async helper fails with RAV2704 once generated
+  test registration references the tests; the equivalent static member compiles.
+  Inline awaited assertions hit NEOMETA001, and large generated state machines hit
+  existing native layout limits. The bounded fixture uses separated awaits and an
+  internal helper, with these gaps recorded in the [design](stream-design.md#first-async-contract--2026-10-12).
+  The existing Task-enabled HTTP test host supplies cancellation lifecycle services.
+  These findings do not establish Windows execution, pending-I/O or TLS adapters.

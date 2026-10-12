@@ -28,8 +28,21 @@ static class StreamBindings
                 Result<PropagationUnit, StreamError> Flush();
                 void Close();
             }
-            public sealed class MemoryStream : InputStream, OutputStream, SeekableStream {
+            // Documentation facade only; native metadata provides executable async contracts.
+            public interface AsyncInputStream {
+                Tasks.Task<Result<int, StreamError>> ReadAsync(byte[] buffer, int offset, int count, Concurrency.CancellationToken cancellationToken);
+                void Close();
+            }
+            public interface AsyncOutputStream {
+                Tasks.Task<Result<PropagationUnit, StreamError>> WriteAsync(byte[] buffer, int offset, int count, Concurrency.CancellationToken cancellationToken);
+                Tasks.Task<Result<PropagationUnit, StreamError>> FlushAsync(Concurrency.CancellationToken cancellationToken);
+                void Close();
+            }
+            public sealed class MemoryStream : InputStream, OutputStream, SeekableStream, AsyncInputStream, AsyncOutputStream {
                 public MemoryStream() { }
+                public Tasks.Task<Result<int, StreamError>> ReadAsync(byte[] buffer, int offset, int count, Concurrency.CancellationToken cancellationToken) => null!;
+                public Tasks.Task<Result<PropagationUnit, StreamError>> WriteAsync(byte[] buffer, int offset, int count, Concurrency.CancellationToken cancellationToken) => null!;
+                public Tasks.Task<Result<PropagationUnit, StreamError>> FlushAsync(Concurrency.CancellationToken cancellationToken) => null!;
                 public Result<long, StreamError> GetLength() => default;
                 public Result<long, StreamError> GetPosition() => default;
                 public Result<long, StreamError> Seek(long position) => default;

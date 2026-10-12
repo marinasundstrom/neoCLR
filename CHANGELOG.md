@@ -8,6 +8,13 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-12
 
+- Add System.IO.AsyncInputStream/AsyncOutputStream and MemoryStream ReadAsync,
+  WriteAsync and FlushAsync, with cancellation and .NET-style complete-write
+  success. Separate async capabilities preserve synchronous implementations.
+  Seven memory-stream tests pass in macOS interpreter/JIT/AOT; refresh both API
+  references. Record .NET/Windows Runtime/Go comparisons and compiler state-machine
+  follow-ups. Socket/TLS adapters and Windows qualification remain open.
+
 - Record the planned async-stream, System.Security.Cryptography and certificate
   foundations for common managed TLS, with bounded scope, .NET API comparisons
   and validation requirements. No managed security API is added by this plan.

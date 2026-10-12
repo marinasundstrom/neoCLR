@@ -1859,3 +1859,13 @@ ModuleInfo.GetFunctions and ownerless method attribute data in macOS ARM64 JIT/A
 [Manual reference](introspection.md#guest-module-functions-development) and feature
 pages describe policy, faults and limits. No guest signatures, type selection or
 reference assembly change; the existing snapshot fingerprint check remains applicable.
+
+## Async stream foundations (development, 2026-10-12)
+
+AsyncInputStream and AsyncOutputStream are selected in the aggregate and native
+references, with MemoryStream's ReadAsync/WriteAsync/FlushAsync implementations.
+The [stream reference](streams.md#async-streams-development) documents parameters,
+complete-write semantics, cancellation precedence, buffer lifetime and current
+memory-only implementation. The aggregate declarations are documentation facades;
+execution uses native metadata, with no new legacy CLI emitter support. No public
+API is excluded. This slice adds no runtime service or compiler configuration.

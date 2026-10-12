@@ -3,9 +3,11 @@ module System.IO
 import System.*
 import System.Collections.*
 import System.Result.*
+import System.Tasks.*
+import System.Concurrency.*
 
 // Provisional, bounded managed storage. All stream capabilities share one cursor.
-public class MemoryStream : InputStream, OutputStream, SeekableStream {
+public class MemoryStream : InputStream, OutputStream, SeekableStream, AsyncInputStream, AsyncOutputStream {
     private var bytes: List<byte> = ArrayList<byte>()
     private var position: int = 0
     private var closed: bool = false
@@ -110,6 +112,43 @@ public class MemoryStream : InputStream, OutputStream, SeekableStream {
             return Error(StreamError.Closed)
         }
         return Ok(())
+    }
+
+    /// <summary>Reads memory synchronously and returns a settled task; no worker is scheduled.</summary>
+    /// <remarks>Pre-cancellation wins before validation or mutation. Other errors match Read. This shared-cursor stream is not thread-safe.</remarks>
+    func ReadAsync(buffer: byte[], offset: int, count: int, cancellationToken: CancellationToken) -> Task<Result<int, StreamError>> {
+        if cancellationToken.IsCancellationRequested {
+            let source = Promise<Result<int, StreamError>>()
+            _ = source.Cancel()
+            return source.Task
+        }
+        return Task.FromResult(Read(buffer, offset, count))
+    }
+
+    /// <summary>Writes the full range to memory and returns a settled task.</summary>
+    /// <remarks>Pre-cancellation wins before validation or mutation. Range, closed-state and quota errors preserve storage and cursor, as with Write.</remarks>
+    func WriteAsync(buffer: byte[], offset: int, count: int, cancellationToken: CancellationToken) -> Task<Result<unit, StreamError>> {
+        if cancellationToken.IsCancellationRequested {
+            let source = Promise<Result<unit, StreamError>>()
+            _ = source.Cancel()
+            return source.Task
+        }
+        let result: Result<unit, StreamError> = match Write(buffer, offset, count) {
+            Ok(_) => Ok(())
+            Error(let error) => Error(error)
+        }
+        return Task.FromResult(result)
+    }
+
+    /// <summary>Returns settled success for open memory storage; no data needs flushing.</summary>
+    /// <remarks>Pre-cancellation wins over Closed. Does not change position or length.</remarks>
+    func FlushAsync(cancellationToken: CancellationToken) -> Task<Result<unit, StreamError>> {
+        if cancellationToken.IsCancellationRequested {
+            let source = Promise<Result<unit, StreamError>>()
+            _ = source.Cancel()
+            return source.Task
+        }
+        return Task.FromResult(Flush())
     }
 
     func Close() {
