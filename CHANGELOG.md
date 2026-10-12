@@ -8,6 +8,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-12
 
+- Make reflection-root preparation repeatable in installed sample tasks: disassemble
+  into an owned temporary directory instead of recreating App.neoil beside the
+  program. Repeated preparation leaves caller-owned listings untouched; all three
+  sample-runner argument/task/reflection regressions pass.
+
 - Make installed HTTP showcase tasks usable from VS Code: prompt for the server
   request count and client base URL, and forward program arguments after `--` in
   the sample runner. Refresh editor tasks when preparing a JIT bundle even when

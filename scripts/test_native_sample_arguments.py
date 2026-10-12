@@ -33,6 +33,26 @@ class SampleArguments(unittest.TestCase):
             self.assertEqual(command[command.index('--') + 1:], guest)
             self.assertEqual(command[0], str(root.resolve() / 'bin/neoclr'))
 
+    def test_reflection_preparation_can_repeat_without_overwriting_a_listing(self):
+        with tempfile.TemporaryDirectory() as directory:
+            assembly = Path(directory) / 'App.dll'
+            existing = assembly.with_suffix('.neoil')
+            existing.write_text('Keep this caller-owned listing')
+            outputs = []
+            metadata = dict(name='Sample', revision=1, types=[dict(name='Native.T__506572736F6E')])
+            def disassemble(command):
+                listing = command[-1]
+                self.assertFalse(listing.exists())
+                outputs.append(listing)
+                listing.write_text(json.dumps(metadata))
+            for _ in range(2):
+                args = runner.reflection_roots('neoclr', assembly, ['Person'], disassemble)
+                roots = json.loads(args[1].read_text())
+                self.assertEqual(roots['types'][0]['definition']['index'], 0)
+            self.assertNotEqual(outputs[0], outputs[1])
+            self.assertTrue(all(not path.exists() for path in outputs))
+            self.assertEqual(existing.read_text(), 'Keep this caller-owned listing')
+
     def test_http_tasks_prompt_for_required_program_inputs(self):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)

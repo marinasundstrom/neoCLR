@@ -5,14 +5,16 @@ import json
 from pathlib import Path
 import subprocess
 import sys
+import tempfile
 
 
 def reflection_roots(runtime, assembly, names, run):
     if not names:
         return []
-    listing = assembly.with_suffix('.neoil')
-    run([runtime, 'disassemble', assembly, listing])
-    text = listing.read_text()
+    with tempfile.TemporaryDirectory(prefix='neoclr-sample-reflection-') as directory:
+        listing = Path(directory) / 'module.neoil'
+        run([runtime, 'disassemble', assembly, listing])
+        text = listing.read_text()
     metadata, _ = json.JSONDecoder().raw_decode(text[text.index('{'):])
     selected = []
     for name in names:
