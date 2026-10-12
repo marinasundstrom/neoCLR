@@ -13,6 +13,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   with TLS 1.2/1.3, verified clients, rejected peers, handshake timeout/cancellation
   and recovery. A fragmented/backpressured transport test checks send ownership;
   ordinary hosts stay cleartext. No public TLS API or installed HTTPS support yet.
+  Record server-first direction, qualification and remaining integration work in
+  the roadmap, HTTP tracker, development record and website.
 
 - Qualify provisional profiler attachment during the Raven HTTP showcase in
   macOS ARM64 AOT and JIT: 128 requests per mode, repeated external attachment,

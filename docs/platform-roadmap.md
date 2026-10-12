@@ -1,5 +1,14 @@
 # neoCLR platform roadmap
 
+**HTTPS server direction (2026-10-12):** after discussing shared TLS, the author
+explicitly selects HTTPS server support. The [native hosting proof](experiments/https-server/README.md)
+puts Rustls behind runtime-owned nonblocking I/O, preserving Raven HttpServer handling,
+deadlines, cancellation and recovery. It qualifies an explicit HTTPS-only host on
+macOS ARM64 JIT/AOT; managed per-listener TLS configuration, Windows/interpreter
+integration and installed packaging remain open. Client and PostgreSQL TLS are not
+implemented by this server slice. This is bounded author-directed networking work;
+the runtime correctness/performance milestone remains active.
+
 **SQL data access direction (2026-10-12):** the author requests a small SQL provider,
 PostgreSQL binding and Dapper-like mapper, explicitly avoiding an ADO.NET-shaped
 abstraction, and selects submodules under System.Data. The bounded

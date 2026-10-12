@@ -132,7 +132,7 @@ seconds. Pending attempts get at most one second while alternatives remain; the 
 gets the remaining time. The echo demo checks fallback and caller-list reuse.
 These provisional limits are not configurable and can reject slow connections.
 A [development HTTP client](/features/web/) exercises requests, headers,
-responses, UTF-8 bodies and handlers over Socket. A bounded neoCLR HTTP responder also exchanges messages with independent clients. TLS is a separate requirement for HTTPS. TcpClient and
+responses, UTF-8 bodies and handlers over Socket. A bounded neoCLR HTTP responder also exchanges messages with independent clients. The default host uses cleartext HTTP. TcpClient and
 UdpClient may follow when a working case needs them.
 
 The HTTP experiment provides bounded client/server exchanges; it is not a complete HTTP stack.
@@ -176,3 +176,14 @@ referenced libraries retain their existing implementation. Both actual projects 
 HTTP timeout/cancellation/fault cases now also pass in macOS ARM64 JIT and AOT. The
 native stack carrier is temporary experiment code; Windows and production integration
 remain open. Defaults are unchanged. [Evidence and limits](https://github.com/marinasundstrom/neoCLR/blob/main/docs/experiments/runtime-async/README.md#compiled-runtime-suspension-jit-and-aot--2026-10-11).
+
+
+### HTTPS server experiment
+
+A development native host can now run Raven HttpServer over TLS 1.2/1.3 using
+host-supplied PEM certificates and keys. macOS ARM64 JIT/AOT checks cover verified
+HTTPS requests, handshake timeout/cancellation and recovery after rejected peers.
+TLS record handling stays below the existing HTTP handlers. This HTTPS-only host
+is not installed support or a public per-listener configuration API. Windows,
+interpreter TLS and HTTPS client integration remain open.
+[Host setup and validation](https://github.com/marinasundstrom/neoCLR/blob/main/docs/experiments/https-server/README.md).

@@ -25,6 +25,30 @@ available original wording; other text is a summary.
 
 See the [changelog](../CHANGELOG.md) and linked design documents for technical status.
 
+## 2026-10-12 — HTTPS server selected after diagnostics
+
+**Author:** Asked about the immediate goal and existing TLS documentation, then
+requested continuing HTTP Server support. When asked whether this meant HTTPS or
+cleartext improvements, explicitly selected “HTTPS server support”.
+
+**Assistant:** Had proposed a bounded collector investigation followed by shared TLS
+with client-first validation. The author's server selection takes precedence for
+this slice. Proposed TLS beneath existing HTTP handling, retaining runtime ownership
+of sockets, scheduling, cancellation, deadlines and cleanup.
+
+**Action/outcome:** Implemented a [provisional HTTPS-only native host](experiments/https-server/README.md)
+using pinned Rustls behind private borrowed-I/O callbacks. Raven HttpServer still
+handles requests. The qualification covers macOS ARM64 JIT/AOT with an independent
+OpenSSL client, certificate/hostname rejection, protocol failures, timeout,
+cancellation and recovery. A fragmented/backpressured transport test checks pending
+send acknowledgement without replay. The ordinary host remains cleartext.
+
+**Open:** Public managed TLS/per-listener configuration, Windows/interpreter TLS,
+installed packaging, graceful asynchronous TLS close, client and PostgreSQL reuse
+remain follow-ups. This is a working hosting proof, not public-network readiness or
+a finalized provider API. The earlier shared-TLS proposal remains distinct from
+implemented server support.
+
 ## 2026-10-12 — Working diagnostics before settled tool architecture
 
 **Author:** Requested continuing the profiler attachment milestone: observe GC
