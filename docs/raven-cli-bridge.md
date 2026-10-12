@@ -9150,3 +9150,18 @@ validation and native fixture execution own current evidence; compiler mapping a
 shared JIT/AOT lowering remain subsequent work on appropriately isolated branches.
 The proposed AOT sidecar will describe export symbols/signatures/layouts, not serialize
 process-specific live addresses. See [the import/export design](design/native-import-export-contract.md).
+
+
+### Callable arguments and results (2026-10-12)
+
+The same runtime experiment adds callback_parameters and function_return to native
+ABI metadata, with neoIL .callback/.functionreturn authoring. Native intent is a
+structural Function parameter or result plus independent ABI mapping; a callback
+adapter also retains captured managed state. The initial runtime contract is
+call-scoped, same-thread scalar callbacks and native-address Function results.
+There is no new CLI encoding, guest attribute or Runtime Contract configuration.
+Raven/C# metadata authoring is not implemented by this slice. The runtime owns
+validation and the libffi/interpreter adapters; the eventual native backend owns
+entry stubs and sidecar emission. Native registration lifetime, thread attachment,
+AOT exports and source mapping remain separate gates. No compiler repository was
+changed; do not infer source authoring support from this runtime experiment.

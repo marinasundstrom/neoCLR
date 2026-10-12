@@ -171,6 +171,9 @@ impl LoadedProgram {
     /// Native code and library initializers/destructors must uphold pointer validity,
     /// allocation lifetimes, and Rust's memory safety requirements. Guest metadata
     /// alone cannot establish these guarantees. The caller must trust the code.
+    /// Call-scoped callbacks must finish on the calling thread before native return;
+    /// native code must not retain, free or return their entry pointers. Returned
+    /// native callables and their state must remain valid while wrappers live.
     pub unsafe fn run_with_native(
         &self,
         options: impl Into<ExecutionOptions>,
@@ -250,6 +253,8 @@ impl LoadedFunction<'_> {
     /// Native declarations must match their exported C ABI signatures. Native code
     /// and library initializers/destructors must uphold pointer validity, allocation
     /// lifetimes, and Rust's memory safety requirements. The caller must trust the code.
+    /// The call-scoped callback and returned-callable lifetime requirements of
+    /// [`LoadedProgram::run_with_native`] also apply.
     pub unsafe fn invoke_with_native(
         &self,
         arguments: Vec<crate::Value>,
@@ -289,6 +294,8 @@ impl LoadedFunction<'_> {
     /// Native declarations must match their exported C ABI signatures. Native code
     /// and library initializers/destructors must uphold pointer validity, allocation
     /// lifetimes, and Rust's memory safety requirements. The caller must trust the code.
+    /// The call-scoped callback and returned-callable lifetime requirements of
+    /// [`LoadedProgram::run_with_native`] also apply.
     pub unsafe fn invoke_instance_with_native(
         &self,
         receiver: crate::Value,

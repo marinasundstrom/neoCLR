@@ -19,8 +19,12 @@ code artifacts with sidecar public-member and ABI mapping metadata consumable by
 compatible runtimes and native tools. The [contract design](design/native-import-export-contract.md)
 separates public type descriptions from native layouts/entry stubs and records
 versioning, ownership and runtime-entry requirements. The `codex/native-function-pointers`
-branch supplies the first interpreter address-binding experiment; source compiler
-mapping, JIT/AOT, export generation and a stable sidecar remain open.
+branch supplies interpreter address binding, call-scoped managed callbacks and
+native callable results with independent ABI descriptors. Captured state, scalar
+marshalling and runtime reentry are covered by the [callable contract](native-interop.md#callable-parameters-and-results-feature-branch).
+Retained registrations, source compiler mapping, JIT/AOT, export generation and a
+stable sidecar remain open. This author-directed experiment does not reorder the
+active platform milestone.
 
 **Foreign function interface direction (2026-10-12):** the author requests platform
 invocation/FFI beyond a Windows-oriented interface, retains `extern` plus attributes,

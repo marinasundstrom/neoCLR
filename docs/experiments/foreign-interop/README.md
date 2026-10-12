@@ -109,3 +109,35 @@ and ABI vocabulary; see [the contract direction](../../design/native-import-expo
 [Recorded results and source fingerprints](pointer-validation.json): 15 interop tests,
 26 existing Function-object tests and the library-lifetime test pass on macOS ARM64.
 The native backend compilation and API snapshot checks also pass.
+
+
+## Callable parameters and results (2026-10-12)
+
+The runtime feature branch now has bidirectional structural callable mappings:
+call-scoped managed callback parameters and automatically wrapped native Function
+results. [callable-validation.json](callable-validation.json) identifies the inputs,
+commands and host. The [executable sample](../../../examples/foreign_callable.neoil)
+round-trips through JSON and binary NEOX before calling the fixture.
+
+Focused checks pass: 27 native interop integration tests, 26 existing Function tests
+and two interop unit tests. These cover captured receiver mutation across forced GC,
+repeated callbacks, all supported numeric widths, Bool8/Bool32, void/no-result,
+independent System convention, native Function results passed back as callbacks,
+null and temporary-stub result rejection, bad descriptors, wrong-thread entry,
+managed faults, Rust panic containment, shared instruction fuel and bounded reentry.
+The temporary-stub test deliberately returns the currently live stub to verify
+rejection; it never invokes an expired pointer. No retained callback is exercised.
+
+```sh
+SDKROOT=/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.2.sdk CARGO_TARGET_DIR=target/ffi-validation cargo test --locked --test pinvoke --test function_objects -j 4
+SDKROOT=/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.2.sdk CARGO_TARGET_DIR=target/ffi-validation cargo test --locked --lib interop -j 4
+SDKROOT=/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.2.sdk CARGO_TARGET_DIR=target/ffi-backend-check cargo check --manifest-path tools/aot-poc/Cargo.toml --locked -j 4
+python3 scripts/build-api-docs.py --check
+```
+
+The backend check establishes build compatibility only, not native import/callback
+lowering. The API snapshot remains unchanged because no Raven guest API or compiler
+bridge changed; Rust metadata fields have a manual API reference. No website build
+was needed. Qualification is macOS ARM64 only. Retained registrations, source
+attributes/emission, arbitrary foreign threads, richer callback types and JIT/AOT
+exports/sidecars remain open. Existing source compiler evidence above is unaffected.

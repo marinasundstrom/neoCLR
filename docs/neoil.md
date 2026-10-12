@@ -738,3 +738,14 @@ specify string_marshalling, parameter_marshalling and return_marshalling, as des
 in [native interop](native-interop.md#structural-native-function-bindings-feature-branch).
 Ordinary Function Invoke calls execute it. This is an interpreter experiment;
 Raven authoring and native backend emission are subsequent gates.
+
+
+### Foreign callable mappings (feature branch)
+
+After `.foreign`, `.callback index = ABI_JSON` describes a call-scoped callable
+parameter; `.functionreturn ABI_JSON` describes a returned native Function pointer.
+Each directive fits on one line. Duplicate descriptors and invalid indices are
+rejected. Both use the NativeAbi object, including its required calling_convention.
+`function.bind.native` also accepts callback_parameters and function_return inside
+its ABI JSON. The [tested sample](../examples/foreign_callable.neoil) covers both
+directions; see [callback lifetime and error rules](native-interop.md#callable-parameters-and-results-feature-branch).

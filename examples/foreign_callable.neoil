@@ -1,0 +1,25 @@
+.module ForeignCallable
+.entry Main
+.function Apply(fn<Int32,Int32,Int32>) -> Int32
+.foreign "./target/native/neoclr_sample" "neoclr_apply_binary" cdecl
+.callback 0 = {"calling_convention":"Cdecl"}
+.end
+.function GetFunction() -> fn<Int32>
+.foreign "./target/native/neoclr_sample" "neoclr_get_constant" cdecl
+.functionreturn {"calling_convention":"Cdecl"}
+.end
+.function Add(Int32,Int32) -> Int32
+ldarg 0
+ldarg 1
+add
+ret
+.end
+.function Main() -> Int32
+function.bind fn<Int32,Int32,Int32> = Add(Int32,Int32)
+call Apply(fn<Int32,Int32,Int32>)
+call System.Console.WriteLine(Int32)
+pop
+call GetFunction()
+call instance fn<Int32>::Invoke()
+ret
+.end

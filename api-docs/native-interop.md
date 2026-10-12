@@ -34,7 +34,7 @@ memory or crash; they are not generally discoverable from export metadata.
 
 See the [tested source shape and full contract](https://github.com/marinasundstrom/neoclr/blob/main/docs/native-interop.md) and
 [website guide](/features/native-interop/). Returned strings, buffers with declared
-length/ownership, record layout, platform-error capture and callbacks remain open.
+length/ownership, record layout, platform-error capture and retained callbacks remain open.
 The generated type/member reference includes all five types; no API is excluded.
 
 ## Structural pointer binding experiment
@@ -63,3 +63,35 @@ guarantee. Clones share binding identity; independent mappings are distinct.
 Direct scheduler submission requires a managed wrapper. The independent C# metadata
 API and Raven emitter do not yet author this instruction; public AOT exports and
 sidecar generation remain [design work](https://github.com/marinasundstrom/neoCLR/blob/codex/native-function-pointers/docs/design/native-import-export-contract.md).
+
+
+## Callable ABI metadata (same feature branch)
+
+Both Rust `metadata::NativeImport` and `metadata::NativeAbi` additionally expose:
+
+| Field | Type and meaning |
+| --- | --- |
+| `callback_parameters` | `BTreeMap<String, NativeAbi>`: canonical zero-based parameter index to that callable's independent ABI. Empty by default and omitted in serialization. |
+| `function_return` | `Option<Box<NativeAbi>>`: ABI of a returned native pointer mapped to the declared structural Function. None by default and omitted in serialization. |
+
+`From<&NativeImport>` copies these fields as well. The new public fields require
+updates to Rust struct literals; wire records without them retain their previous
+meaning. A matching runtime is required for records containing them. No new guest
+attribute or generated RavenDoc type is introduced; this manual entry documents the
+experimental Rust API. The independent C# metadata API does not author these fields.
+
+Callback parameters require an exact non-null Function and a scalar callable shape.
+Numeric types, explicit Bool8/Bool32 and void/no-result returns are supported. The
+runtime retains the captured receiver, generates a call-duration entry stub and
+reenters the same managed invocation on the calling thread. Managed faults are caught
+at the stub, return zero/false to native code and propagate when the foreign call
+returns. Later callbacks in that call do not execute guest code after a fault.
+Native code must not retain the pointer. Retained registration needs a future
+ownership/unregistration API; calling a native function `Register` does not extend
+this lifetime. Suspension and other-thread entry are unsupported.
+
+A returned pointer becomes a library-retaining Function using function_return.
+Null, tracked-data and current temporary callback addresses are rejected. Provider
+library retention cannot guarantee arbitrary native state/code lifetime. Callable
+ABI nesting is limited to eight; native callback reentry is limited to 32 and the
+remaining managed frame budget. See [the tested example and complete boundaries](https://github.com/marinasundstrom/neoCLR/blob/codex/native-function-pointers/docs/native-interop.md#callable-parameters-and-results-feature-branch).

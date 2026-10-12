@@ -54,13 +54,18 @@ entry stubs and generated native bindings after validation of the reverse direct
 1. Bind a returned native address to a structural Function and invoke it using the
    existing marshaller. Reject null/data pointers and unsupported signatures before
    entry; retain loaded code owners. Qualified scope is the interpreter first.
-2. Add Raven/native metadata authoring for that binding and shared JIT/AOT lowering.
+2. Author follow-through on 2026-10-12 brings both callable directions forward:
+   pass a managed Function to native code and wrap a returned native pointer as a
+   Function. The interpreter branch implements call-scoped, same-thread scalar
+   callbacks and typed callable results. See [the bounded contract](../native-interop.md#callable-parameters-and-results-feature-branch).
+   Raven/native metadata authoring and shared JIT/AOT lowering remain next gates.
 3. Produce a small AOT library with fixed-width scalar exports and a versioned sidecar;
    generate/validate a C consumer against those exports. Include artifact mismatch and
    unsupported-ABI rejection, and avoid claiming arbitrary public members are exportable.
 4. Add stable record layouts, bounded buffers and opaque owned handles with explicit
    error and release protocols. Qualify targets individually.
-5. Add callbacks and managed-state exports with runtime entry, rooting, unregistration
+5. Extend call-scoped callbacks to retained registrations and managed-state exports
+   with runtime entry, rooting, unregistration
    and in-flight call teardown. Never allow a managed fault to unwind through an
    unspecified foreign ABI.
 

@@ -1737,6 +1737,9 @@ pub fn run_with_library(
 /// Native code and library initializers/destructors must uphold pointer validity,
 /// allocation lifetimes, and Rust's memory safety requirements. Guest metadata alone
 /// cannot establish these guarantees. The caller must trust the code being executed.
+/// Native code must finish all callback uses on the calling thread before returning;
+/// it must not retain, free or return call-scoped callback entry pointers. Returned
+/// native callables and their external state must remain valid while wrappers live.
 pub unsafe fn run_with_native(
     module: &Module,
     library: &Module,
@@ -1990,6 +1993,9 @@ fn drive_instructions(
                 Ok(InstructionProgress::Suspended) => continue,
                 Ok(InstructionProgress::Waiting) => {
                     drop(heap);
+                    if state.foreign_depth != 0 {
+                        break Err(Fault::new("native callback cannot suspend managed execution"));
+                    }
                     if !state.parked_activations.is_empty() {
                         let timeout = state
                             .parked_activations
@@ -2016,6 +2022,8 @@ fn drive_instructions(
                         output,
                         console_bytes,
                         options,
+                        participant,
+                        frames.len(),
                     ) {
                         Ok(value) => value,
                         Err(fault) => break Err(fault),
@@ -2204,6 +2212,7 @@ enum RuntimeAsyncObservation {
 /// State that survives an instruction-boundary suspension. File handles, interning
 /// budgets, scheduler and native memory share invocation ownership.
 struct InstructionState {
+    foreign_depth: usize,
     collection_threshold: usize,
     arrays_used: bool,
     invocation: std::sync::Arc<crate::invocation::Invocation>,
@@ -2232,6 +2241,7 @@ impl InstructionState {
         let limits = invocation.limits;
         let budget = invocation.budget.clone();
         Self {
+            foreign_depth: 0,
             collection_threshold: limits.heap_objects.min(64),
             arrays_used: false,
             invocation,
@@ -2251,6 +2261,9 @@ impl InstructionState {
         }
     }
 }
+#[path = "vm_foreign_callbacks.rs"]
+mod foreign_callbacks;
+
 #[path = "vm_guest_work.rs"]
 mod guest_work;
 use guest_work::transfer_task_output;
@@ -2431,6 +2444,7 @@ fn interpret_instructions_with_dispatch(
     }
     let limits = options.limits;
     let InstructionState {
+        foreign_depth,
         collection_threshold,
         arrays_used,
         invocation,
@@ -2606,7 +2620,9 @@ fn interpret_instructions_with_dispatch(
             if frames.is_empty() && active_callback.take() == Some(true) && invocation_result.is_none() {
                 return Err(Fault::new("Runtime async callback lost entry activation"));
             }
-            if work_control.is_some() && !*entry_drain_active {
+            if (*foreign_depth != 0 && frames.is_empty() && yield_boundaries.is_empty())
+                || (work_control.is_some() && !*entry_drain_active)
+            {
                 let mut roots = Vec::new();
                 crate::gc::trace(&value, &mut roots);
                 heap.publish(roots)?;

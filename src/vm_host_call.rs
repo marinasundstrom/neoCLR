@@ -187,29 +187,15 @@ impl HostCall {
         output: &mut Vec<String>,
         bytes: &mut [Vec<u8>; 2],
         options: &ExecutionOptions,
+        participant: &mut crate::shared_heap::Participant,
+        frame_depth: usize,
     ) -> Result<Value, Fault> {
         let result = (|| {
             options.check_cancellation(&self.context, self.pc)?;
             if let Some(value) = &self.immediate {
                 return Ok(value.clone());
             }
-            let value = if let Some(call) = &self.indirect {
-                if state
-                    .invocation
-                    .native_libraries
-                    .lock()
-                    .expect("native library lock poisoned")
-                    .is_none()
-                {
-                    return Err(Fault::new(
-                        "native Function invocation requires trusted run_with_native execution",
-                    ));
-                }
-                let _borrow = memory.borrow_native(&self.args)?;
-                // SAFETY: trusted execution covers this address/signature; the binding retains
-                // loaded libraries, and tracked argument memory is borrowed through the call.
-                unsafe { call.invoke(self.args.clone(), memory)? }
-            } else if self.callee.pinvoke.is_some() {
+            let value = if self.indirect.is_some() || self.callee.pinvoke.is_some() {
                 let _borrow = memory.borrow_native(&self.args)?;
                 let call = {
                     let mut libraries = state
@@ -220,13 +206,29 @@ impl HostCall {
                     let libraries = libraries.as_mut().ok_or_else(|| {
                         Fault::new("native imports require trusted run_with_native execution")
                     })?;
-                    // SAFETY: only run_with_native supplies this trusted session.
-                    unsafe { libraries.prepare(&self.callee)? }
+                    match &self.indirect {
+                        Some(call) => call.clone(),
+                        // SAFETY: only trusted execution supplies this library session.
+                        None => std::sync::Arc::new(unsafe { libraries.prepare(&self.callee)? }),
+                    }
                 };
-                // SAFETY: the trusted ABI contract still covers exports and indirect
-                // pointers. Tracked argument storage stays exclusively borrowed; no
-                // heap, scheduler, library-table or memory mutex is held in native code.
-                unsafe { call.invoke(self.args.clone(), memory)? }
+                let mut runner = |callback: &Value, arguments: Vec<Value>| {
+                    foreign_callbacks::invoke(
+                        module,
+                        callback,
+                        arguments,
+                        state,
+                        participant,
+                        options,
+                        frame_depth,
+                        output,
+                        bytes,
+                    )
+                };
+                // SAFETY: the validated ABI and caller's native trust cover this call.
+                // All input storage, callback contexts and loaded code remain alive.
+                // No graph or library lock is held while entering native code.
+                unsafe { call.invoke(self.args.clone(), memory, &mut runner)? }
             } else {
                 let binding = crate::native::bind(&self.callee)?;
                 let before = output.len();

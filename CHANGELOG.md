@@ -8,6 +8,16 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-12
 
+- Extend codex/native-function-pointers with callable parameters and results:
+  independent ABI descriptors adapt managed Functions (including captured receivers)
+  to call-scoped native callbacks and wrap returned native pointers as Functions.
+  Preserve shared-heap rooting, invocation budgets and library ownership. Support
+  scalar/Boolean callback marshalling, bound reentry, reject other-thread calls and
+  contain managed faults at the native boundary. Add neoIL authoring and native
+  fixture coverage. Retained registration, source compiler attributes and JIT/AOT
+  remain open. Optional wire fields require a matching runtime when used; Rust
+  NativeImport/NativeAbi struct literals must include the new fields.
+
 - On codex/native-function-pointers, bind native addresses to structural Function
   values through the interpreter/neoIL function.bind.native instruction. Share ABI
   validation/marshalling with named imports, retain loaded library owners, reject

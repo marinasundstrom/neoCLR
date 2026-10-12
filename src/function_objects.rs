@@ -69,6 +69,10 @@ pub(crate) fn is_contract(_module: &Module, function: &Function) -> bool {
 }
 
 pub(crate) fn contract(_module: &Module, ty: &Type) -> Result<Function, Fault> {
+    structural_contract(ty)
+}
+
+pub(crate) fn structural_contract(ty: &Type) -> Result<Function, Fault> {
     if let Type::Function(shape) = ty {
         shape.validate()?;
         return Ok(Function {

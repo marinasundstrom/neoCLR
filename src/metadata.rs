@@ -519,6 +519,12 @@ pub struct NativeImport {
     pub parameter_marshalling: std::collections::BTreeMap<String, NativeMarshalling>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub return_marshalling: Option<NativeMarshalling>,
+    /// Call-scoped, same-thread callable parameters and their independent native ABI.
+    #[serde(default, skip_serializing_if = "std::collections::BTreeMap::is_empty")]
+    pub callback_parameters: std::collections::BTreeMap<String, NativeAbi>,
+    /// ABI of a returned native function pointer, wrapped as a structural Function.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub function_return: Option<Box<NativeAbi>>,
 }
 
 /// ABI and conversion contract shared by named imports and address-bound Functions.
@@ -536,6 +542,12 @@ pub struct NativeAbi {
     /// Result conversion; strings and ownership conversions remain unsupported.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub return_marshalling: Option<NativeMarshalling>,
+    /// Call-scoped, same-thread callable parameters and their independent native ABI.
+    #[serde(default, skip_serializing_if = "std::collections::BTreeMap::is_empty")]
+    pub callback_parameters: std::collections::BTreeMap<String, NativeAbi>,
+    /// ABI of a returned native function pointer, wrapped as a structural Function.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub function_return: Option<Box<NativeAbi>>,
 }
 impl From<&NativeImport> for NativeAbi {
     fn from(import: &NativeImport) -> Self {
@@ -544,6 +556,8 @@ impl From<&NativeImport> for NativeAbi {
             string_marshalling: import.string_marshalling,
             parameter_marshalling: import.parameter_marshalling.clone(),
             return_marshalling: import.return_marshalling,
+            callback_parameters: import.callback_parameters.clone(),
+            function_return: import.function_return.clone(),
         }
     }
 }

@@ -25,6 +25,30 @@ available original wording; other text is a summary.
 
 See the [changelog](../CHANGELOG.md) and linked design documents for technical status.
 
+## 2026-10-12 — Callable foreign parameters and results
+
+- **Author:** requested a foreign parameter expressed as a callable so native code
+  can invoke a passed managed Function with a matching signature. Clarified:
+  “This should go both direction. A foreign function could return a function object also.”
+  Examples were `extern func Register(func: (int, int) -> int)` and
+  `extern func GetFunction() -> () -> int`, with attributes omitted.
+- **Assistant proposal:** use independent ABI descriptors on structural callable
+  parameters/results, generate managed callback entry stubs, and wrap native return
+  addresses. Distinguish signature compatibility from captured-state rooting, native
+  lifetime and fault boundaries. A Register API that stores its callback needs an
+  owned registration and unregister protocol; call-duration rooting does not suffice.
+- **Action:** extend codex/native-function-pointers with a bounded interpreter
+  experiment: same-thread call-scoped scalar callbacks, captured receiver rooting,
+  independent convention/Boolean mappings and typed native Function results. Preserve
+  invocation heap/services/budget across reentry and keep faults from unwinding into C.
+- **Validation:** executable native fixtures exercise both directions, captured state
+  across GC, repeated entry, scalar widths, fault/thread rejection and returned-callable
+  composition. See [evidence](experiments/foreign-interop/README.md#callable-parameters-and-results-2026-10-12).
+- **Open:** persistent registrations, foreign-thread attachment, richer reverse
+  marshalling, Raven attributes/emission and JIT/AOT exports/sidecars. The author
+  established the desired two-way interface, not approval of a permanent call-scoped
+  limitation or a particular future attribute spelling.
+
 ## 2026-10-12 — Shared SSL transport implementation
 
 - **Author:** requested shared SSL transport and foundational
