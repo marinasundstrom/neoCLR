@@ -180,14 +180,15 @@ remain open. Defaults are unchanged. [Evidence and limits](https://github.com/ma
 
 ### HTTPS server experiment
 
-A development native host can now run Raven HttpServer over TLS 1.2/1.3 using
-host-supplied PEM certificates and keys. macOS ARM64 JIT/AOT checks cover verified
-HTTPS requests, handshake timeout/cancellation and recovery after rejected peers.
-TLS record handling stays below the existing HTTP handlers. This HTTPS-only host
-is not installed support or a public per-listener configuration API. Windows,
-interpreter TLS and HTTPS client integration remain open.
-[Host setup and validation](https://github.com/marinasundstrom/neoCLR/blob/main/docs/experiments/https-server/README.md).
+Development native hosts run Raven HttpServer over TLS 1.2/1.3 using host-supplied
+PEM certificates and keys. macOS ARM64 and Windows x64 AOT/JIT qualification covers
+verified requests, rejected peers, fragmented traffic, timeout/cancellation,
+authenticated EOF and recovery. All 15 shared project AOT cases match across hosts;
+Windows also passes the twelve request scenarios in JIT. Unicode credential paths
+and ordinary cleartext-host isolation are covered.
 
-Windows HTTPS source-build integration now has a dedicated CI qualification gate
-using the same TLS and HTTP cases as macOS. Passing Windows runtime evidence is
-still pending; this does not add a public secure-stream API or packaged TLS support.
+This remains source-only hosting support, without a public secure-stream or
+per-listener configuration API. Interpreter/client TLS, Windows ARM64 and packaged
+TLS remain open. Common async transport is the next API step toward an HTTP server
+and client exchanging JSON, with optional PostgreSQL/container integration later.
+[Host setup, evidence and limits](https://github.com/marinasundstrom/neoCLR/blob/main/docs/experiments/https-server/README.md).

@@ -37,6 +37,16 @@ explicitly report supported capabilities. AOT instrumentation and symbol availab
 are build capabilities; attaching cannot enable code that was compiled out. This
 adds no managed Task/Scheduler dependency and requires no language-specific API.
 
+## Recorded rendering gap — 2026-10-12
+
+The [Windows HTTP regression](experiments/https-server/windows-http-regression.json)
+shows encoded CLI bridge names in interpreter fault frames, while native frames
+use readable names and include different entry wrappers. Normalize bridge names
+through the metadata/display-name layer in a future diagnostics slice, without
+requiring engines to have identical physical frames. The HTTP harness compares
+fault identity and observable output while preserving both traces; it does not
+claim this rendering gap is fixed.
+
 ## Baseline and alternatives
 
 Primary documentation reviewed 2026-10-12:

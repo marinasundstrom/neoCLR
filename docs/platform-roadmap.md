@@ -15,7 +15,9 @@ or claiming Linux JIT/AOT or Docker application support.
 Windows behavior consistent with macOS. Source linking and a shared validation
 harness are implemented; a dedicated Windows CI gate now covers TLS versions,
 rejection, fragmentation, timeout/cancellation, EOF/recovery and cleartext isolation.
-Windows runtime evidence is pending. The author also requests async stream concepts
+[Windows AOT/JIT now passes 27 host cases plus two Rust transport tests](experiments/https-server/README.md#windowsmacos-parity-milestone--2026-10-12);
+the shared 15 AOT cases match macOS. This closes the bounded source-host integration
+gate, not managed TLS APIs or installed packaging. The author also requests async stream concepts
 and a reusable secure-stream equivalent, clarifying that .NET is a reference rather
 than a required hierarchy; evaluate other platforms before settling that API.
 
@@ -23,8 +25,8 @@ than a required hierarchy; evaluate other platforms before settling that API.
 explicitly selects HTTPS server support. The [native hosting proof](experiments/https-server/README.md)
 puts Rustls behind runtime-owned nonblocking I/O, preserving Raven HttpServer handling,
 deadlines, cancellation and recovery. It qualifies an explicit HTTPS-only host on
-macOS ARM64 JIT/AOT; managed per-listener TLS configuration, Windows/interpreter
-integration and installed packaging remain open. The source project builder now
+macOS ARM64 JIT/AOT, followed by Windows x64 above; managed per-listener TLS
+configuration, Windows ARM64/interpreter integration and installed packaging remain open. The source project builder now
 accepts an explicit `--https-server` switch, qualified with the shared Raven unary
 await capture fix; [project evidence](experiments/https-server/project-validation.json)
 covers twelve host cases plus fragmented transport. The subsequent

@@ -1,5 +1,10 @@
 # HTTPS server hosting proof
 
+**Current qualification (2026-10-12):** macOS ARM64 and Windows x64 native AOT/JIT
+pass the bounded HTTPS server checks. [Cross-platform evidence](platform-parity.json)
+compares the shared AOT cases and Windows JIT outcomes. This remains a private
+source-host capability; managed secure-stream APIs and installed TLS are not added.
+
 Author-selected next slice, 2026-10-12. This is an experimental native host capability,
 not a new managed TLS API or installed HTTPS support. Raven's existing HttpServer runs
 over authenticated TLS records without changing its HTTP parser/handler pipeline.
@@ -101,14 +106,16 @@ no duplicated plaintext, deferred send acknowledgement, config/session ownership
 and terminal cancellation. It runs explicitly with ephemeral fixture credentials;
 ordinary `cargo test` marks it ignored because those credentials are required.
 
-Qualification is macOS ARM64 JIT/AOT only. Windows x64/ARM64, interpreter TLS,
+The original qualification was macOS ARM64 JIT/AOT; Windows x64 now passes below.
+Windows ARM64, interpreter TLS,
 expired-certificate fixtures, forced network send-deadline expiry, adversarial load,
 SNI certificate selection, client authentication and installed packaging remain open.
 No production-readiness or throughput claim is made.
 
 ## Source project build
 
-The source builder accepts `--profile http --https-server` on macOS ARM64. This
+The source builder accepts `--profile http --https-server` on macOS ARM64 and
+`--profile windows-http --https-server` on Windows x64 in an MSVC developer shell. This
 links the pinned Rustls archive into the ordinary project AOT host. It is an
 explicit development capability, rejected for other profiles, retained-session
 bootstrap and installed build kits. All accepted connections use TLS; outgoing
@@ -131,8 +138,9 @@ when running the executable directly. Credentials are loaded at runtime, not
 embedded in the executable or build report. The validation harness creates and
 removes its own ephemeral credentials. Its project mode verifies the build's
 input and artifact hashes before using the executable, then runs twelve network
-scenarios, two credential rejection cases and two Rust transport tests. Cleartext and
-JIT isolation retain the separate runtime-async proof above.
+scenarios, two credential rejection cases and two Rust transport tests. Add
+`--cleartext-build` for ordinary-host isolation. Windows also supports `--windows-jit`
+with a project build; macOS runtime-async JIT retains its separate proof above.
 
 The project path uses compiler-generated state machines. A qualified compiler
 must include the async project cleanup configuration fix and unary-operand walker
@@ -170,8 +178,8 @@ private credentials remain temporary. Earlier reports above are historical check
 
 This closes the bounded authenticated-EOF qualification gap on macOS ARM64. It
 adds no managed API or new TLS behavior. Guaranteed asynchronous graceful shutdown
-under backpressure, expired-certificate fixtures, Windows/interpreter support and
-installed TLS packaging remain open.
+under backpressure, expired-certificate fixtures, interpreter support and installed
+TLS packaging remain open. Windows x64 qualification follows below.
 
 ## Windows source-host integration — 2026-10-12
 
@@ -180,8 +188,8 @@ x86_64 MSVC Rust archive with a static CRT, and links it into the existing share
 socket adapter. OS socket calls remain behind `socket-os.h`; TLS state, deadlines,
 cancellation and EOF rules are shared with macOS. Windows project validation uses
 the same client cases, plus an optional `--cleartext-build` isolation check.
-Windows execution is not yet qualified by this integration change; CI evidence is
-required before claiming parity. Windows ARM64 and Windows runtime suspension
+The integration alone did not qualify execution; the passing CI evidence is recorded
+below. Windows ARM64 and Windows runtime suspension
 remain separate gaps. No packaged build-kit capability is added.
 
 ### Reusable secure streams direction
@@ -193,7 +201,7 @@ OutputStream interfaces are synchronous. The next managed design should compare
 .NET's stream decorator with capability-based async I/O and explicit TLS state
 machines, addressing buffer ownership, cancellation, authentication, duplex use and
 async shutdown. This is direction, not a shipped API or a settled class hierarchy.
-The host-only switch remains provisional while Windows behavior is qualified.
+The host-only switch remains provisional while common managed APIs are developed.
 
 The `Windows native HTTPS project` GitHub workflow runs
 `scripts/validate-windows-https-project.py` in an MSVC x64 environment. It rebuilds
@@ -259,3 +267,38 @@ is 27 host cases (12 AOT, 12 JIT, two invalid-credential startups, one cleartext
 isolation check), plus two Rust transport tests. This uses compiler state machines
 on Windows; Windows runtime suspension remains unsupported. This gate addition
 alone is not a passing Windows JIT result or installed CLI TLS support.
+
+## Windows/macOS parity milestone — 2026-10-12
+
+The [combined Windows run](https://github.com/marinasundstrom/neoCLR/actions/runs/38243539279)
+passes **27 host cases and two Rust transport tests**. Twelve scenarios run in both
+AOT and JIT: TLS 1.2/1.3, fragmented requests, untrusted/wrong-host peers, ALPN
+rejection, plaintext/truncated handshakes, abrupt/clean EOF, timeout and cancellation.
+Each network case verifies a subsequent successful request in the same runtime.
+The other three cases reject missing/invalid credentials before listening and
+verify that a host built without TLS still serves cleartext HTTP.
+
+[Windows results](windows-jit-validation.json), [HTTPS build](windows-jit-project-build.json)
+and [cleartext build](windows-jit-cleartext-build.json) retain commands, hashes and
+observed system dependencies. The earlier [AOT-only run](https://github.com/marinasundstrom/neoCLR/actions/runs/38243158880)
+also passes [all 15 cases](windows-aot-validation.json).
+[macOS results](macos-parity-validation.json) pass the same 15 project cases and both
+Rust tests with explicit leaf certificates in Unicode directories. Its
+[HTTPS build](macos-parity-build.json) and [cleartext build](macos-parity-cleartext-build.json)
+identify the exact inputs. [Machine-readable comparison](platform-parity.json)
+confirms equal AOT case outcomes/negotiated protocols across hosts and equal results
+for all 12 Windows AOT/JIT request scenarios. Large build output is represented by
+hash/byte count; fullReportSha256 identifies the original CI/local report.
+
+The [ordinary Windows HTTP regression](windows-http-regression.json) also passes
+five cases, including callback faults, with the corrected diagnostic comparison.
+Interpreter bridge-name rendering is tracked in [runtime diagnostics](../../runtime-diagnostics.md).
+
+This closes Windows x64 source-host HTTPS qualification, using compiler-generated
+state machines in Windows AOT/JIT. macOS runtime-async JIT/AOT retains the earlier
+separate evidence. The debug-built Windows compiler is a correctness tool here;
+repeated JIT startup in this matrix is not a performance benchmark. Windows ARM64,
+Windows runtime suspension, interpreter/client TLS, managed per-connection APIs,
+full async bidirectional shutdown and installed packaging remain open. Continue
+through [common async transport](../../stream-design.md#common-async-transport-direction--2026-10-12)
+toward the HTTP server/client JSON showcase.

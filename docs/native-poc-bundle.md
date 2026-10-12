@@ -191,11 +191,14 @@ remains the default; native HTTP support is not inferred from an application's
 references. Use `--http` with `scripts/verify-native-build-kit.py` to include the
 HTTP consumers in extracted-kit acceptance.
 
-In a source checkout, `--profile http --https-server` additionally selects the
+In a source checkout, `--profile http --https-server` (macOS ARM64) or
+`--profile windows-http --https-server` (Windows x64) selects the
 [development HTTPS host](experiments/https-server/README.md#source-project-build).
 It builds the pinned Rustls archive and loads PEM credentials at runtime. This
 option requires the qualified compiler fixes documented there and is deliberately
-unavailable in installed build kits or other host profiles.
+unavailable in installed build kits or non-HTTP host profiles. The same shared
+HTTPS cases pass on both hosts; the Windows qualification also builds a matching
+JIT helper DLL. This is not installed CLI TLS support.
 
 This profile links the existing [HTTP correctness host](../benchmarks/native-web/http-host.c),
 with a 1 MiB native GC heap, scoped sockets/tasks, private default-queue draining,

@@ -21,12 +21,14 @@ It does not imply inclusion in published Preview 9 or production readiness.
 The author selects server TLS first. The [native proof](experiments/https-server/README.md)
 uses the existing Raven handler with an explicitly configured HTTPS-only host.
 Certificates are supplied by the host; clients validate trust and hostname. The
-ordinary runtime still uses cleartext sockets. The source macOS ARM64 project builder
-exposes the explicit `--https-server` capability, with
-[twelve passing host cases](experiments/https-server/project-validation.json) after
-fixing shared Raven unary-await capture. Next integration questions are managed
-secure-transport/per-listener configuration and Windows/interpreter support, followed
-by reuse for client and SQL traffic. This does not reopen the published cleartext POC.
+ordinary runtime still uses cleartext sockets. Source macOS ARM64 and Windows x64
+project builders expose the explicit `--https-server` capability. The
+[Windows/macOS qualification](experiments/https-server/README.md#windowsmacos-parity-milestone--2026-10-12)
+passes 27 Windows AOT/JIT host cases plus two Rust tests; all 15 common AOT cases
+match macOS. Next is [common async transport](stream-design.md#common-async-transport-direction--2026-10-12),
+explicit secure-stream/per-listener configuration and verified client TLS for the
+HTTP server/client JSON showcase. Windows ARM64, interpreter TLS and installed
+packaging remain open. This does not reopen the published cleartext POC.
 
 ## Author-directed hosting foundation — 2026-10-11
 
@@ -79,7 +81,7 @@ WebApplication, configurable limits and SQL remain deferred.
 | JSON DOM and typed mapping | Implemented: shared conversion and generic client helpers | Implemented: shared conversion through handler/context | [Mapped application](experiments/json-object-mapping/README.md), [helpers](experiments/http-json-client/README.md); nested reference objects are implemented in development with [evidence](experiments/json-object-mapping/nested-validation.json); current JSON size/shape limits remain |
 | Cancellation and cleanup | Implemented through lookup/connect/transfer; upload ownership and one-shot rules | Implemented accept/context/complete/shutdown lifetime | [Network cancellation](experiments/network-cancellation/README.md), [context](experiments/http-context/README.md); synchronous source reads cannot be interrupted mid-read |
 | Application pipeline | Implemented custom/forwarding HttpHandler | Implemented Accept/HttpContext and bounded callback hosting; development RoutePattern matching and named/Int32 parameters | [Routing](route-parsing.md); optional application union dispatch; no hosting framework |
-| HTTPS/TLS | Deferred; no client TLS implementation | Experimental HTTPS-only native host, macOS ARM64 JIT/AOT | [Server proof](experiments/https-server/README.md): TLS 1.2/1.3, cancellation/deadline/recovery checks; no installed support, public per-listener API or production qualification |
+| HTTPS/TLS | Deferred; no client TLS implementation | Experimental HTTPS-only native hosts, macOS ARM64 and Windows x64 JIT/AOT | [Server proof](experiments/https-server/README.md): TLS 1.2/1.3, cancellation/deadline/recovery checks; no installed support, public per-listener API or production qualification |
 | Pooling/persistent reuse | Deferred; currently one connection per exchange | Deferred; closes each exchange | Separate request and connection ownership |
 | HTTP/2 | Deferred | Deferred | Multiplexing, flow control, HPACK, negotiation and per-stream errors |
 | HTTP/3 | Deferred | Deferred | QUIC provider, QPACK, negotiation and stream lifecycle |

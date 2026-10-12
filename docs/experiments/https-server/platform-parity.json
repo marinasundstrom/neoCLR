@@ -1,0 +1,26 @@
+{
+  "passed": true,
+  "date": "2026-10-12",
+  "macosWindowsAotCases": 15,
+  "windowsJitRequestCases": 12,
+  "rustTransportTestsEach": 2,
+  "windowsHostCases": 27,
+  "macosHostCases": 15,
+  "macosWindowsAotResultsAndProtocolsMatch": true,
+  "windowsAotJitResultsAndProtocolsMatch": true,
+  "credentialPaths": "non-ASCII and non-BMP",
+  "windowsLowering": "compiler state machines",
+  "windowsWorkflow": "https://github.com/marinasundstrom/neoCLR/actions/runs/38243539279",
+  "ordinaryWindowsHttpWorkflow": "https://github.com/marinasundstrom/neoCLR/actions/runs/38240648458",
+  "reports": {
+    "macos-parity-validation.json": "89057ee21e13975cef3f89c6017bbcf7d3a7e8d089b13079ccf099944ab2fd40",
+    "windows-jit-validation.json": "d06d6538e769cfcca96cd20653fd3dcf08b82bca001bd228dd44bfbd40e9e276",
+    "windows-http-regression.json": "23a03a3b15626eca8ac090dc34c2e4e5906946a024c47606bfeb1187a473828a"
+  },
+  "limits": [
+    "Private source-host capability, not installed TLS or managed per-listener API",
+    "Windows ARM64, Windows runtime suspension and interpreter TLS unqualified",
+    "Native client TLS and full async bidirectional shutdown remain open",
+    "Correctness qualification, not a performance benchmark"
+  ]
+}

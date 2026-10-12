@@ -134,7 +134,7 @@ The routing workbench also parses a route, extracts an integer parameter and pri
 - **Platform:** native Windows ARM64 is planned but unqualified. Windows file/path
   services and packaged native build kits remain open.
 - **HTTP:** these bounded showcases do not establish native support for the entire
-  Web API surface, HTTP/2 or arbitrary concurrent servers. A source-only macOS ARM64
+  Web API surface, HTTP/2 or arbitrary concurrent servers. A source-only macOS ARM64/Windows x64
   [HTTPS server experiment](https://github.com/marinasundstrom/neoCLR/blob/main/docs/experiments/https-server/README.md)
   supports an explicit TLS-only host, including the project builder's `--https-server`
   option. Public per-listener TLS configuration and packaged HTTPS remain open.
@@ -253,6 +253,6 @@ Fault remains terminal. [Qualification and limits](https://github.com/marinasund
 include pending GC, captured values and interpreter/JIT/AOT execution. Windows uses
 the generated-state-machine path; runtime suspension there remains future work.
 
-Windows HTTPS source-build integration now has a dedicated CI qualification gate
-using the same TLS and HTTP cases as macOS. Passing Windows runtime evidence is
-still pending; this does not add a public secure-stream API or packaged TLS support.
+Windows HTTPS now passes its dedicated AOT/JIT qualification gate: 27 host cases
+and two Rust transport tests. All 15 common project AOT cases match macOS. This
+remains source-host support, without public secure-stream APIs or packaged TLS.

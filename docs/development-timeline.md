@@ -15773,3 +15773,28 @@ or runtime-await default switch was performed.
   packaging remains optional and needs its own runtime/host qualification. No Linux
   native support is inferred from Windows/macOS results. See the
   [stream design](stream-design.md#common-async-transport-direction--2026-10-12).
+
+
+## 2026-10-12 — Windows HTTPS qualification outcome
+
+- **Assistant implementation:** reuses the macOS Rustls/socket adapter in Windows
+  source builds, with static CRT linking, exact system DLL checks and owned wide
+  environment snapshots converted to UTF-8. Separate commits cover integration,
+  CI, MSVC diagnostics, Unicode paths, dependencies and portable test fixtures.
+- **Observed failures and fixes:** MSVC rejected deprecated getenv; the DLL policy
+  omitted system RNG/synchronization imports; host OpenSSL defaults produced a CA
+  rather than a server leaf; reciprocal client shutdown after socket disposal
+  exceeded the provisional server-close contract. Fixes retain strict compilation,
+  peer verification and authenticated EOF checks. Full async shutdown remains open.
+- **Validated outcome:** [Windows AOT/JIT CI](https://github.com/marinasundstrom/neoCLR/actions/runs/38243539279)
+  passes 27 host cases and two Rust transport tests. All 15 common AOT outcomes and
+  TLS versions match macOS; the twelve Windows JIT request cases match AOT.
+  [Evidence](experiments/https-server/platform-parity.json) records the reports.
+  The [ordinary Windows HTTP gate](https://github.com/marinasundstrom/neoCLR/actions/runs/38240648458)
+  passes all five cases after comparing fault outcomes rather than engine-specific
+  frames. Interpreter bridge-name rendering remains a documented diagnostics gap.
+- **Boundary:** source-only private hosting, with compiler state machines on Windows;
+  no Windows ARM64/runtime-suspension, interpreter TLS, native client TLS, installed
+  package or new public secure-stream API is claimed. The next common-API work is
+  async byte transport and explicit TLS composition for the server/client JSON
+  showcase. Database/application Docker stages remain optional author suggestions.

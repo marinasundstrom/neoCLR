@@ -32,30 +32,16 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   Extend authenticated shutdown coverage to clean TLS EOF and abrupt disconnects,
   buffered plaintext and subsequent request recovery: 14 project AOT host cases,
   27 runtime-async AOT/JIT cases and two Rust transport tests pass on macOS ARM64.
-  Add Windows x64 MSVC TLS archive/link support and a portable HTTPS project
-  validator using the same socket adapter and cases as macOS. Build-policy checks
-  pass; Windows execution qualification is pending. Add a dedicated Windows CI
-  gate that rebuilds the pinned compiler/libraries and runs the shared HTTPS cases
-  plus cleartext isolation, preserving failure logs and evidence.
-  Fix MSVC credential-path loading with owned environment snapshots after the
-  first Windows gate exposed deprecated getenv under warnings-as-errors; retain
-  strict warnings and fail-closed admission. Keep CI artifacts focused on logs and
-  provenance reports and print failed command output directly in Actions.
-  Preserve Windows Unicode credential paths using wide snapshots and explicit
-  UTF-8 conversion; exercise accented/non-BMP credential directories in the shared
-  HTTPS harness instead of assuming ASCII paths.
-  Admit the exact Windows system RNG/synchronization DLLs observed in the TLS
-  link, keeping the ordinary HTTP allowlist and rejection of unknown dependencies.
-  Make the HTTPS certificate fixture independent of host OpenSSL configuration:
-  explicitly generate a server-auth leaf with CA:FALSE and key usage constraints.
-  Windows exposed a default CA certificate that Rustls correctly rejected; peer
-  verification remains enabled and unchanged.
-  Validate server close_notify through strict authenticated TLS EOF rather than
-  requiring reciprocal client shutdown after socket disposal; abrupt EOF and
-  trailing application data still fail. Full async TLS shutdown remains open.
-  Add Windows JIT qualification using an exported helper built from the matching
-  AOT/TLS recipe, with dependency checks and the same twelve request/recovery cases;
-  execution evidence remains pending until the shared gate passes.
+  Extend source hosting to Windows x64 AOT/JIT with the shared Rustls/socket
+  adapter, static CRT linking and checked system dependencies. Wide environment
+  snapshots preserve UTF-8 credential paths. The portable harness uses explicit
+  server-auth leaf certificates and strict authenticated TLS EOF, with Unicode
+  paths, failure recovery and cleartext isolation. Windows passes 27 host cases
+  plus two Rust transport tests; all 15 common AOT cases match macOS, and all twelve
+  Windows AOT/JIT request outcomes match. Check in hashed evidence and update the
+  roadmap, hosting docs and website. Public secure-stream/per-listener APIs,
+  interpreter/client TLS, Windows ARM64, full async shutdown and installed
+  packaging remain open; this is correctness qualification, not a benchmark.
 
 - Fix the HTTPS source compiler gap through Raven main `99ae011b4`, deliberately
   carried to its neoCLR branch as `c71baae94`: traverse unary operands so `use`
