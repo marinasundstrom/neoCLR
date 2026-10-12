@@ -3,7 +3,8 @@
 Hosted source qualification now passes on `a9adc97cb`, including the full Linux
 archive suite, macOS/Windows host boundaries and the minimum-Rust matrix. Backend
 repair `566fb34dc` has focused Windows object-generation and macOS execution
-coverage; its Windows HTTP/package runs remain pending. This is **not a published
+coverage and passing Windows SDK/package qualification. The later Windows AOT
+heap repair remains under its broader HTTP execution gate. This is **not a published
 release**. Earlier failures remain evidence rather than being rewritten.
 
 ## Results and exact revisions
@@ -51,7 +52,11 @@ explain why removing its redundant union cap does not alter per-shape admission 
 the callback ABI. `566fb34dc` passes two focused tests: Windows x64 COFF generation
 and sanitized macOS host execution across four unit/no-result/mixed variants.
 This backend-only delta follows the source-qualified revision; it does not claim
-a second full source run. Windows execution must still pass its own consumer gate.
+a second full source run. Windows SSL subsequently passes interpreter/default JIT,
+but standalone AOT exposes the host's old 1 MiB allocation cap. [The report](windows-ssl-before-heap-fix.json)
+preserves that failure; `a77e20dba` aligns Windows heap admission with the common
+build contract and adds 8/32 MiB guarded-allocation coverage. Its hosted run is
+still pending.
 
 The refreshed macOS bundle passes [extracted default-JIT acceptance](callback-extracted-acceptance.json),
 [SSL/HTTPS JSON in all three modes](callback-ssl.json) and
@@ -67,9 +72,18 @@ The first [Windows SDK/package run 38317604005](https://github.com/marinasundstr
 passes on `a9adc97cb`: [default-JIT packaged samples](windows-sdk-acceptance-initial.json),
 [26 VS Code checks](windows-sdk-vscode-initial.json) and [archive hashes](windows-sdk-package-initial.json).
 This qualifies Raven `6b5e052ce` and SDK/VSIX `0.1.13-neoclr.20261013.1` on Windows,
-but its backend precedes the callback repair. Run `38319479140` rebuilds and retests
-the package with that repair; run `38319332994` qualifies the broader Windows
-SSL/HTTP execution matrix.
+but its backend precedes the callback repair.
+
+[Windows package run 38319479140](https://github.com/marinasundstrom/neoCLR/actions/runs/38319479140)
+now passes on callback-fixed `566fb34dc`: [packaged default-JIT samples](windows-sdk-acceptance.json),
+[26 installed editor checks](windows-sdk-vscode.json) and [package construction](windows-sdk-package.json).
+Downloaded archive and manifest hashes match; [component hashes](windows-sdk-components.json)
+identify the runtime, backend, helper, compiler, language server, extension and base
+libraries. This Windows bundle does not include the optional PostgreSQL provider.
+The Windows JIT host uses its existing allocated heap, not the AOT host's guarded
+allocation entry; the later heap repair is qualified separately as source AOT work.
+[Run 38321019998](https://github.com/marinasundstrom/neoCLR/actions/runs/38321019998)
+is testing that repair and the broader SSL/HTTP matrix.
 
 ## Remaining release gates
 
@@ -78,14 +92,14 @@ SSL/HTTP execution matrix.
 2. Retain Windows Raven native revision `6b5e052ce3648f9247ac76aba275587a3a5a1bb4`
    qualification above. Its validation branch is `codex/neoclr-release-20261013`;
    Raven main and the native compiler line remain separate.
-3. Qualify the rebuilt Windows default-JIT bundle, HTTP/HTTPS and matching SDK/editor;
-   retain archive, payload and compiler hashes. Refresh packaged notices on both
-   distribution targets and verify extracted payloads before publication.
+3. Complete Windows guarded-allocation and HTTP/HTTPS execution on `a77e20dba`.
+   The matching SDK/editor and default-JIT package gate now pass above; refreshed
+   notices and extracted payload hashes are verified on both package targets.
 4. Review the selected package and [draft release notes](../../next-preview-release-notes.md). Local installed VS Code acceptance
    now passes all [26 checks](installed-vscode-acceptance.json), including activation,
    navigation, native/.NET editing and Tasks/await runs; [hashes](installed-vscode-provenance.json)
-   identify the real installed SDK/extension. Windows editor acceptance passes on the initial
-   package and will be repeated with the repaired backend.
+   identify the real installed SDK/extension. Windows editor acceptance also passes on the
+   callback-fixed package.
 
 The [installed macOS instructions](../../local-preview-20261012.md) retain the same
 SDK and launch paths; the runtime/backend refresh has its own evidence above. Tagging, uploading releases and website publication have

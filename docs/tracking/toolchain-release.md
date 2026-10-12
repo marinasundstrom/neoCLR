@@ -14,8 +14,10 @@ passing tests and those three failures; it remains recorded as failed. A fresh
 source archive passes all 25 smoke programs, seed/notices, native FFI and embedding.
 The hosted source/format/Clippy gate, macOS/Windows host checks and minimum-Rust
 matrix now pass on a9adc97cb. The later mixed-callback backend repair has focused
-Windows object-generation and macOS execution coverage; fresh Windows HTTP/package
-execution remains required. The author installation now has the qualified refreshed
+Windows object-generation and macOS execution coverage; the callback-fixed Windows
+package and all 26 editor checks also pass. Windows interpreter/JIT SSL passes, but
+AOT exposed a separate old host heap cap, now repaired and awaiting its execution
+gate. The author installation now has the qualified refreshed
 runtime/backend and notices, with the same SDK/VSIX and launch paths. Installed
 samples pass, and all 26 real VS Code checks cover the unchanged compiler/extension.
 [Draft release notes](../next-preview-release-notes.md) await final artifact review.

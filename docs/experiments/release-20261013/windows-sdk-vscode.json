@@ -1,0 +1,674 @@
+{
+  "vscode": "1.141.0",
+  "checks": [
+    "native imported hover",
+    "native imported Markdown documentation hover",
+    "native Markdown sidecar edit refreshes hover",
+    "native XML fallback after Markdown member deletion",
+    "read-only metadata declaration navigation",
+    "native imported completion",
+    "native imported completion documentation",
+    "actual file watcher invalidates replaced native library",
+    "unsaved buffer survives native workspace reload",
+    "missing native reference produces a project diagnostic",
+    "native dependency recovery clears the project diagnostic",
+    "System.Data.Json.JsonValue native hover and metadata navigation",
+    "shipped native Networking documentation appears in hover",
+    "System.Networking.IPAddress native hover and metadata navigation",
+    "System.Web.Http.HttpClient native hover and metadata navigation",
+    "imported bundle configuration edit produces project diagnostic",
+    "restored bundle configuration recovers the workspace",
+    "unchanged broad sample imports source-built class library",
+    "native Option and Result type hovers retain union kind and constructed arguments",
+    "repeated broad-sample type and query hovers return symbols",
+    "broad-sample hovers return after unsaved edits",
+    "configured VS Code native build task",
+    "VS Code task executes exact broad-sample output on native runtime",
+    "failed build preserves last successful artifact",
+    "ordinary .NET editor hover and diagnostics",
+    "unchanged Tasks/await sample builds and executes from VS Code"
+  ],
+  "passed": true,
+  "hoverTimings": [
+    {
+      "uri": "file:///d%3A/a/neoCLR/neoCLR/neoclr/target/editor-acceptance/Probe.rvn",
+      "line": 0,
+      "character": 41,
+      "startedAt": "2026-10-12T23:19:44.108Z",
+      "elapsedMs": 4,
+      "hasResult": false
+    },
+    {
+      "uri": "file:///d%3A/a/neoCLR/neoCLR/neoclr/target/editor-acceptance/Probe.rvn",
+      "line": 0,
+      "character": 41,
+      "startedAt": "2026-10-12T23:19:44.615Z",
+      "elapsedMs": 2,
+      "hasResult": false
+    },
+    {
+      "uri": "file:///d%3A/a/neoCLR/neoCLR/neoclr/target/editor-acceptance/Probe.rvn",
+      "line": 0,
+      "character": 41,
+      "startedAt": "2026-10-12T23:19:45.129Z",
+      "elapsedMs": 2,
+      "hasResult": false
+    },
+    {
+      "uri": "file:///d%3A/a/neoCLR/neoCLR/neoclr/target/editor-acceptance/Probe.rvn",
+      "line": 0,
+      "character": 41,
+      "startedAt": "2026-10-12T23:19:45.645Z",
+      "elapsedMs": 2,
+      "hasResult": false
+    },
+    {
+      "uri": "file:///d%3A/a/neoCLR/neoCLR/neoclr/target/editor-acceptance/Probe.rvn",
+      "line": 0,
+      "character": 41,
+      "startedAt": "2026-10-12T23:19:46.150Z",
+      "elapsedMs": 2,
+      "hasResult": false
+    },
+    {
+      "uri": "file:///d%3A/a/neoCLR/neoCLR/neoclr/target/editor-acceptance/Probe.rvn",
+      "line": 0,
+      "character": 41,
+      "startedAt": "2026-10-12T23:19:46.653Z",
+      "elapsedMs": 2,
+      "hasResult": false
+    },
+    {
+      "uri": "file:///d%3A/a/neoCLR/neoCLR/neoclr/target/editor-acceptance/Probe.rvn",
+      "line": 0,
+      "character": 41,
+      "startedAt": "2026-10-12T23:19:47.159Z",
+      "elapsedMs": 2,
+      "hasResult": false
+    },
+    {
+      "uri": "file:///d%3A/a/neoCLR/neoCLR/neoclr/target/editor-acceptance/Probe.rvn",
+      "line": 0,
+      "character": 41,
+      "startedAt": "2026-10-12T23:19:47.676Z",
+      "elapsedMs": 2,
+      "hasResult": false
+    },
+    {
+      "uri": "file:///d%3A/a/neoCLR/neoCLR/neoclr/target/editor-acceptance/Probe.rvn",
+      "line": 0,
+      "character": 41,
+      "startedAt": "2026-10-12T23:19:48.180Z",
+      "elapsedMs": 2,
+      "hasResult": false
+    },
+    {
+      "uri": "file:///d%3A/a/neoCLR/neoCLR/neoclr/target/editor-acceptance/Probe.rvn",
+      "line": 0,
+      "character": 41,
+      "startedAt": "2026-10-12T23:19:48.682Z",
+      "elapsedMs": 2,
+      "hasResult": false
+    },
+    {
+      "uri": "file:///d%3A/a/neoCLR/neoCLR/neoclr/target/editor-acceptance/Probe.rvn",
+      "line": 0,
+      "character": 41,
+      "startedAt": "2026-10-12T23:19:49.185Z",
+      "elapsedMs": 2,
+      "hasResult": false
+    },
+    {
+      "uri": "file:///d%3A/a/neoCLR/neoCLR/neoclr/target/editor-acceptance/Probe.rvn",
+      "line": 0,
+      "character": 41,
+      "startedAt": "2026-10-12T23:19:49.689Z",
+      "elapsedMs": 2,
+      "hasResult": false
+    },
+    {
+      "uri": "file:///d%3A/a/neoCLR/neoCLR/neoclr/target/editor-acceptance/Probe.rvn",
+      "line": 0,
+      "character": 41,
+      "startedAt": "2026-10-12T23:19:50.193Z",
+      "elapsedMs": 2,
+      "hasResult": false
+    },
+    {
+      "uri": "file:///d%3A/a/neoCLR/neoCLR/neoclr/target/editor-acceptance/Probe.rvn",
+      "line": 0,
+      "character": 41,
+      "startedAt": "2026-10-12T23:19:50.695Z",
+      "elapsedMs": 2,
+      "hasResult": false
+    },
+    {
+      "uri": "file:///d%3A/a/neoCLR/neoCLR/neoclr/target/editor-acceptance/Probe.rvn",
+      "line": 0,
+      "character": 41,
+      "startedAt": "2026-10-12T23:19:51.199Z",
+      "elapsedMs": 2,
+      "hasResult": false
+    },
+    {
+      "uri": "file:///d%3A/a/neoCLR/neoCLR/neoclr/target/editor-acceptance/Probe.rvn",
+      "line": 0,
+      "character": 41,
+      "startedAt": "2026-10-12T23:19:51.711Z",
+      "elapsedMs": 2,
+      "hasResult": false
+    },
+    {
+      "uri": "file:///d%3A/a/neoCLR/neoCLR/neoclr/target/editor-acceptance/Probe.rvn",
+      "line": 0,
+      "character": 41,
+      "startedAt": "2026-10-12T23:19:52.216Z",
+      "elapsedMs": 2,
+      "hasResult": false
+    },
+    {
+      "uri": "file:///d%3A/a/neoCLR/neoCLR/neoclr/target/editor-acceptance/Probe.rvn",
+      "line": 0,
+      "character": 41,
+      "startedAt": "2026-10-12T23:19:52.721Z",
+      "elapsedMs": 2,
+      "hasResult": false
+    },
+    {
+      "uri": "file:///d%3A/a/neoCLR/neoCLR/neoclr/target/editor-acceptance/Probe.rvn",
+      "line": 0,
+      "character": 41,
+      "startedAt": "2026-10-12T23:19:53.226Z",
+      "elapsedMs": 2,
+      "hasResult": false
+    },
+    {
+      "uri": "file:///d%3A/a/neoCLR/neoCLR/neoclr/target/editor-acceptance/Probe.rvn",
+      "line": 0,
+      "character": 41,
+      "startedAt": "2026-10-12T23:19:53.728Z",
+      "elapsedMs": 2,
+      "hasResult": false
+    },
+    {
+      "uri": "file:///d%3A/a/neoCLR/neoCLR/neoclr/target/editor-acceptance/Probe.rvn",
+      "line": 0,
+      "character": 41,
+      "startedAt": "2026-10-12T23:19:54.241Z",
+      "elapsedMs": 2,
+      "hasResult": false
+    },
+    {
+      "uri": "file:///d%3A/a/neoCLR/neoCLR/neoclr/target/editor-acceptance/Probe.rvn",
+      "line": 0,
+      "character": 41,
+      "startedAt": "2026-10-12T23:19:54.756Z",
+      "elapsedMs": 7,
+      "hasResult": false
+    },
+    {
+      "uri": "file:///d%3A/a/neoCLR/neoCLR/neoclr/target/editor-acceptance/Probe.rvn",
+      "line": 0,
+      "character": 41,
+      "startedAt": "2026-10-12T23:19:55.265Z",
+      "elapsedMs": 2,
+      "hasResult": false
+    },
+    {
+      "uri": "file:///d%3A/a/neoCLR/neoCLR/neoclr/target/editor-acceptance/Probe.rvn",
+      "line": 0,
+      "character": 41,
+      "startedAt": "2026-10-12T23:19:55.772Z",
+      "elapsedMs": 761,
+      "hasResult": true
+    },
+    {
+      "uri": "file:///d%3A/a/neoCLR/neoCLR/neoclr/target/editor-acceptance/Probe.rvn",
+      "line": 0,
+      "character": 41,
+      "startedAt": "2026-10-12T23:19:56.537Z",
+      "elapsedMs": 92,
+      "hasResult": true
+    },
+    {
+      "uri": "file:///d%3A/a/neoCLR/neoCLR/neoclr/target/editor-acceptance/Probe.rvn",
+      "line": 0,
+      "character": 41,
+      "startedAt": "2026-10-12T23:19:57.131Z",
+      "elapsedMs": 8074,
+      "hasResult": true
+    },
+    {
+      "uri": "file:///d%3A/a/neoCLR/neoCLR/neoclr/target/editor-acceptance/Probe.rvn",
+      "line": 0,
+      "character": 41,
+      "startedAt": "2026-10-12T23:20:05.207Z",
+      "elapsedMs": 1502,
+      "hasResult": true
+    },
+    {
+      "uri": "file:///d%3A/a/neoCLR/neoCLR/neoclr/target/editor-acceptance/Probe.rvn",
+      "line": 0,
+      "character": 41,
+      "startedAt": "2026-10-12T23:20:07.208Z",
+      "elapsedMs": 4767,
+      "hasResult": true
+    },
+    {
+      "uri": "file:///d%3A/a/neoCLR/neoCLR/neoclr/target/editor-acceptance/Probe.rvn",
+      "line": 0,
+      "character": 41,
+      "startedAt": "2026-10-12T23:20:18.312Z",
+      "elapsedMs": 928,
+      "hasResult": true
+    },
+    {
+      "uri": "file:///d%3A/a/neoCLR/neoCLR/neoclr/target/editor-acceptance/Probe.rvn",
+      "line": 0,
+      "character": 41,
+      "startedAt": "2026-10-12T23:20:19.743Z",
+      "elapsedMs": 7,
+      "hasResult": true
+    },
+    {
+      "uri": "file:///d%3A/a/neoCLR/neoCLR/neoclr/target/editor-acceptance/Probe.rvn",
+      "line": 0,
+      "character": 43,
+      "startedAt": "2026-10-12T23:20:30.928Z",
+      "elapsedMs": 788,
+      "hasResult": true
+    },
+    {
+      "uri": "file:///d%3A/a/neoCLR/neoCLR/neoclr/target/editor-acceptance/Probe.rvn",
+      "line": 0,
+      "character": 44,
+      "startedAt": "2026-10-12T23:20:31.760Z",
+      "elapsedMs": 110,
+      "hasResult": true
+    },
+    {
+      "uri": "file:///d%3A/a/neoCLR/neoCLR/neoclr/target/editor-acceptance/Probe.rvn",
+      "line": 0,
+      "character": 42,
+      "startedAt": "2026-10-12T23:20:31.900Z",
+      "elapsedMs": 192,
+      "hasResult": true
+    },
+    {
+      "uri": "file:///d%3A/a/neoCLR/neoCLR/neoclr/target/editor-acceptance/Main.rvn",
+      "line": 25,
+      "character": 55,
+      "startedAt": "2026-10-12T23:20:43.783Z",
+      "elapsedMs": 1573,
+      "hasResult": true
+    },
+    {
+      "uri": "file:///d%3A/a/neoCLR/neoCLR/neoclr/target/editor-acceptance/Main.rvn",
+      "line": 33,
+      "character": 60,
+      "startedAt": "2026-10-12T23:20:45.356Z",
+      "elapsedMs": 40,
+      "hasResult": true
+    },
+    {
+      "uri": "file:///d%3A/a/neoCLR/neoCLR/neoclr/target/editor-acceptance/Main.rvn",
+      "line": 41,
+      "character": 47,
+      "startedAt": "2026-10-12T23:20:45.396Z",
+      "elapsedMs": 9,
+      "hasResult": true
+    },
+    {
+      "uri": "file:///d%3A/a/neoCLR/neoCLR/neoclr/target/editor-acceptance/Main.rvn",
+      "line": 25,
+      "character": 55,
+      "startedAt": "2026-10-12T23:20:45.406Z",
+      "elapsedMs": 6,
+      "hasResult": true
+    },
+    {
+      "uri": "file:///d%3A/a/neoCLR/neoCLR/neoclr/target/editor-acceptance/Main.rvn",
+      "line": 33,
+      "character": 60,
+      "startedAt": "2026-10-12T23:20:45.412Z",
+      "elapsedMs": 5,
+      "hasResult": true
+    },
+    {
+      "uri": "file:///d%3A/a/neoCLR/neoCLR/neoclr/target/editor-acceptance/Main.rvn",
+      "line": 41,
+      "character": 47,
+      "startedAt": "2026-10-12T23:20:45.417Z",
+      "elapsedMs": 10,
+      "hasResult": true
+    },
+    {
+      "uri": "file:///d%3A/a/neoCLR/neoCLR/neoclr/target/editor-acceptance/Main.rvn",
+      "line": 90,
+      "character": 26,
+      "startedAt": "2026-10-12T23:20:45.427Z",
+      "elapsedMs": 16,
+      "hasResult": true
+    },
+    {
+      "uri": "file:///d%3A/a/neoCLR/neoCLR/neoclr/target/editor-acceptance/Main.rvn",
+      "line": 91,
+      "character": 10,
+      "startedAt": "2026-10-12T23:20:45.443Z",
+      "elapsedMs": 6,
+      "hasResult": true
+    },
+    {
+      "uri": "file:///d%3A/a/neoCLR/neoCLR/neoclr/target/editor-acceptance/Main.rvn",
+      "line": 25,
+      "character": 55,
+      "startedAt": "2026-10-12T23:20:45.449Z",
+      "elapsedMs": 5,
+      "hasResult": true
+    },
+    {
+      "uri": "file:///d%3A/a/neoCLR/neoCLR/neoclr/target/editor-acceptance/Main.rvn",
+      "line": 33,
+      "character": 60,
+      "startedAt": "2026-10-12T23:20:45.454Z",
+      "elapsedMs": 5,
+      "hasResult": true
+    },
+    {
+      "uri": "file:///d%3A/a/neoCLR/neoCLR/neoclr/target/editor-acceptance/Main.rvn",
+      "line": 41,
+      "character": 47,
+      "startedAt": "2026-10-12T23:20:45.460Z",
+      "elapsedMs": 5,
+      "hasResult": true
+    },
+    {
+      "uri": "file:///d%3A/a/neoCLR/neoCLR/neoclr/target/editor-acceptance/Main.rvn",
+      "line": 90,
+      "character": 26,
+      "startedAt": "2026-10-12T23:20:45.464Z",
+      "elapsedMs": 5,
+      "hasResult": true
+    },
+    {
+      "uri": "file:///d%3A/a/neoCLR/neoCLR/neoclr/target/editor-acceptance/Main.rvn",
+      "line": 91,
+      "character": 10,
+      "startedAt": "2026-10-12T23:20:45.469Z",
+      "elapsedMs": 5,
+      "hasResult": true
+    },
+    {
+      "uri": "file:///d%3A/a/neoCLR/neoCLR/neoclr/target/editor-acceptance/Main.rvn",
+      "line": 25,
+      "character": 55,
+      "startedAt": "2026-10-12T23:20:45.475Z",
+      "elapsedMs": 5,
+      "hasResult": true
+    },
+    {
+      "uri": "file:///d%3A/a/neoCLR/neoCLR/neoclr/target/editor-acceptance/Main.rvn",
+      "line": 33,
+      "character": 60,
+      "startedAt": "2026-10-12T23:20:45.480Z",
+      "elapsedMs": 5,
+      "hasResult": true
+    },
+    {
+      "uri": "file:///d%3A/a/neoCLR/neoCLR/neoclr/target/editor-acceptance/Main.rvn",
+      "line": 41,
+      "character": 47,
+      "startedAt": "2026-10-12T23:20:45.484Z",
+      "elapsedMs": 5,
+      "hasResult": true
+    },
+    {
+      "uri": "file:///d%3A/a/neoCLR/neoCLR/neoclr/target/editor-acceptance/Main.rvn",
+      "line": 90,
+      "character": 26,
+      "startedAt": "2026-10-12T23:20:45.489Z",
+      "elapsedMs": 5,
+      "hasResult": true
+    },
+    {
+      "uri": "file:///d%3A/a/neoCLR/neoCLR/neoclr/target/editor-acceptance/Main.rvn",
+      "line": 91,
+      "character": 10,
+      "startedAt": "2026-10-12T23:20:45.494Z",
+      "elapsedMs": 12,
+      "hasResult": true
+    },
+    {
+      "uri": "file:///d%3A/a/neoCLR/neoCLR/neoclr/target/editor-acceptance/Main.rvn",
+      "line": 25,
+      "character": 55,
+      "startedAt": "2026-10-12T23:20:45.516Z",
+      "elapsedMs": 111,
+      "hasResult": true
+    },
+    {
+      "uri": "file:///d%3A/a/neoCLR/neoCLR/neoclr/target/editor-acceptance/Main.rvn",
+      "line": 25,
+      "character": 55,
+      "startedAt": "2026-10-12T23:20:45.633Z",
+      "elapsedMs": 258,
+      "hasResult": true
+    },
+    {
+      "uri": "file:///d%3A/a/neoCLR/neoCLR/neoclr/target/editor-acceptance/Main.rvn",
+      "line": 25,
+      "character": 55,
+      "startedAt": "2026-10-12T23:20:45.903Z",
+      "elapsedMs": 253,
+      "hasResult": true
+    },
+    {
+      "uri": "file:///d%3A/a/neoCLR/neoCLR/neoclr/target/editor-acceptance-dotnet/Main.rvn",
+      "line": 0,
+      "character": 35,
+      "startedAt": "2026-10-12T23:21:25.051Z",
+      "elapsedMs": 2435,
+      "hasResult": true
+    }
+  ],
+  "lastHover": "```raven\nstatic func VersionOne() -> int\n```\n\nMethod in `class EditorApi`\n\n---\n\nReturns the **documented answer**.",
+  "diagnostics": [],
+  "hover": "```raven\nstatic func VersionOne() -> int\n```\n\nMethod in `class EditorApi`\n\n---\n\nReturns the **documented answer**.",
+  "completion": [
+    {
+      "label": "VersionOne",
+      "description": "EditorApi"
+    }
+  ],
+  "bundleHovers": {
+    "System.Data.Json.JsonValue": "```raven\nsealed class JsonValue\n```\n\nType in `Json`",
+    "System.Networking.IPAddress": "```raven\nsealed class IPAddress: EquatableTo<IPAddress>\n```\n\nType in `Networking`\n\n---\n\nAn immutable IP address in the closed IPv4 and IPv6 family.",
+    "System.Web.Http.HttpClient": "```raven\nclass HttpClient: Disposable\n```\n\nType in `Http`"
+  },
+  "unionHovers": {
+    "Option<Order>": "```raven\nunion struct Option<Order>: Propagatable<Option<Order>, Order, void>\n```\n\nType in `System`",
+    "Result<Order, SingleError>": "```raven\nunion struct Result<Order, SingleError>: Propagatable<Result<Order, SingleError>, Order, SingleError>\n```\n\nType in `System`"
+  },
+  "repeatedMainHovers": [
+    {
+      "round": 0,
+      "term": "ArrayList",
+      "uri": "file:///d%3A/a/neoCLR/neoCLR/neoclr/target/editor-acceptance/Main.rvn",
+      "line": 25,
+      "character": 55,
+      "startedAt": "2026-10-12T23:20:45.406Z",
+      "elapsedMs": 6,
+      "hasResult": true
+    },
+    {
+      "round": 0,
+      "term": "Option<Order>",
+      "uri": "file:///d%3A/a/neoCLR/neoCLR/neoclr/target/editor-acceptance/Main.rvn",
+      "line": 33,
+      "character": 60,
+      "startedAt": "2026-10-12T23:20:45.412Z",
+      "elapsedMs": 5,
+      "hasResult": true
+    },
+    {
+      "round": 0,
+      "term": "Result<Order, SingleError>",
+      "uri": "file:///d%3A/a/neoCLR/neoCLR/neoclr/target/editor-acceptance/Main.rvn",
+      "line": 41,
+      "character": 47,
+      "startedAt": "2026-10-12T23:20:45.417Z",
+      "elapsedMs": 10,
+      "hasResult": true
+    },
+    {
+      "round": 0,
+      "term": "Filter(",
+      "uri": "file:///d%3A/a/neoCLR/neoCLR/neoclr/target/editor-acceptance/Main.rvn",
+      "line": 90,
+      "character": 26,
+      "startedAt": "2026-10-12T23:20:45.427Z",
+      "elapsedMs": 16,
+      "hasResult": true
+    },
+    {
+      "round": 0,
+      "term": ".Map(",
+      "uri": "file:///d%3A/a/neoCLR/neoCLR/neoclr/target/editor-acceptance/Main.rvn",
+      "line": 91,
+      "character": 10,
+      "startedAt": "2026-10-12T23:20:45.443Z",
+      "elapsedMs": 6,
+      "hasResult": true
+    },
+    {
+      "round": 1,
+      "term": "ArrayList",
+      "uri": "file:///d%3A/a/neoCLR/neoCLR/neoclr/target/editor-acceptance/Main.rvn",
+      "line": 25,
+      "character": 55,
+      "startedAt": "2026-10-12T23:20:45.449Z",
+      "elapsedMs": 5,
+      "hasResult": true
+    },
+    {
+      "round": 1,
+      "term": "Option<Order>",
+      "uri": "file:///d%3A/a/neoCLR/neoCLR/neoclr/target/editor-acceptance/Main.rvn",
+      "line": 33,
+      "character": 60,
+      "startedAt": "2026-10-12T23:20:45.454Z",
+      "elapsedMs": 5,
+      "hasResult": true
+    },
+    {
+      "round": 1,
+      "term": "Result<Order, SingleError>",
+      "uri": "file:///d%3A/a/neoCLR/neoCLR/neoclr/target/editor-acceptance/Main.rvn",
+      "line": 41,
+      "character": 47,
+      "startedAt": "2026-10-12T23:20:45.460Z",
+      "elapsedMs": 5,
+      "hasResult": true
+    },
+    {
+      "round": 1,
+      "term": "Filter(",
+      "uri": "file:///d%3A/a/neoCLR/neoCLR/neoclr/target/editor-acceptance/Main.rvn",
+      "line": 90,
+      "character": 26,
+      "startedAt": "2026-10-12T23:20:45.464Z",
+      "elapsedMs": 5,
+      "hasResult": true
+    },
+    {
+      "round": 1,
+      "term": ".Map(",
+      "uri": "file:///d%3A/a/neoCLR/neoCLR/neoclr/target/editor-acceptance/Main.rvn",
+      "line": 91,
+      "character": 10,
+      "startedAt": "2026-10-12T23:20:45.469Z",
+      "elapsedMs": 5,
+      "hasResult": true
+    },
+    {
+      "round": 2,
+      "term": "ArrayList",
+      "uri": "file:///d%3A/a/neoCLR/neoCLR/neoclr/target/editor-acceptance/Main.rvn",
+      "line": 25,
+      "character": 55,
+      "startedAt": "2026-10-12T23:20:45.475Z",
+      "elapsedMs": 5,
+      "hasResult": true
+    },
+    {
+      "round": 2,
+      "term": "Option<Order>",
+      "uri": "file:///d%3A/a/neoCLR/neoCLR/neoclr/target/editor-acceptance/Main.rvn",
+      "line": 33,
+      "character": 60,
+      "startedAt": "2026-10-12T23:20:45.480Z",
+      "elapsedMs": 5,
+      "hasResult": true
+    },
+    {
+      "round": 2,
+      "term": "Result<Order, SingleError>",
+      "uri": "file:///d%3A/a/neoCLR/neoCLR/neoclr/target/editor-acceptance/Main.rvn",
+      "line": 41,
+      "character": 47,
+      "startedAt": "2026-10-12T23:20:45.484Z",
+      "elapsedMs": 5,
+      "hasResult": true
+    },
+    {
+      "round": 2,
+      "term": "Filter(",
+      "uri": "file:///d%3A/a/neoCLR/neoCLR/neoclr/target/editor-acceptance/Main.rvn",
+      "line": 90,
+      "character": 26,
+      "startedAt": "2026-10-12T23:20:45.489Z",
+      "elapsedMs": 5,
+      "hasResult": true
+    },
+    {
+      "round": 2,
+      "term": ".Map(",
+      "uri": "file:///d%3A/a/neoCLR/neoCLR/neoclr/target/editor-acceptance/Main.rvn",
+      "line": 91,
+      "character": 10,
+      "startedAt": "2026-10-12T23:20:45.494Z",
+      "elapsedMs": 12,
+      "hasResult": true
+    }
+  ],
+  "postEditMainHovers": [
+    {
+      "round": 0,
+      "uri": "file:///d%3A/a/neoCLR/neoCLR/neoclr/target/editor-acceptance/Main.rvn",
+      "line": 25,
+      "character": 55,
+      "startedAt": "2026-10-12T23:20:45.516Z",
+      "elapsedMs": 111,
+      "hasResult": true
+    },
+    {
+      "round": 1,
+      "uri": "file:///d%3A/a/neoCLR/neoCLR/neoclr/target/editor-acceptance/Main.rvn",
+      "line": 25,
+      "character": 55,
+      "startedAt": "2026-10-12T23:20:45.633Z",
+      "elapsedMs": 258,
+      "hasResult": true
+    },
+    {
+      "round": 2,
+      "uri": "file:///d%3A/a/neoCLR/neoCLR/neoclr/target/editor-acceptance/Main.rvn",
+      "line": 25,
+      "character": 55,
+      "startedAt": "2026-10-12T23:20:45.903Z",
+      "elapsedMs": 253,
+      "hasResult": true
+    }
+  ],
+  "stdout": "Native build output: d:\\a\\neoCLR\\neoCLR\\neoclr\\target\\editor-acceptance\\bin\\neoclr\\App.dll\nDuplicate order rejected\n3\n3\nUnknown order\nOrder already shipped\nMultiple\n2\nFiltered orders share identity\n2\n303\n303\n0\nEmpty\n"
+}

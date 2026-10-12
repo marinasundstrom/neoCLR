@@ -57,7 +57,9 @@ convention; update older synchronous stream consumers to await them. The package
 when that execution mode is required. Native bounds are implementation limitations,
 not language rules or a promise of unrestricted native compilation.
 
-The selected qualification targets are macOS ARM64 and Windows x64. Windows ARM64,
+The selected qualification targets are macOS ARM64 and Windows x64. The Windows
+JIT bundle uses compiler-generated async state machines; it does not yet enable
+the macOS runtime-owned suspension path. Windows ARM64,
 Linux JIT/AOT, general boxed Object formatting and unrestricted reflection remain
 outside this release qualification. PostgreSQL has local macOS evidence; fresh
 Windows SQL and standalone SQL deployment qualification remain open. Source

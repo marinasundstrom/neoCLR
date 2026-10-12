@@ -1,0 +1,35 @@
+{
+  "passed": true,
+  "run": "https://github.com/marinasundstrom/neoCLR/actions/runs/38319479140",
+  "revision": "566fb34dcbf840461d1bb2261a949a0a635363ea",
+  "archiveSha256": "03e33ee877a6bf8ec7e38d7c608a2abcb4f1d5513ba0de235ede0e0486f85736",
+  "manifestSha256": "c39a3b84a2715c6d7d3d3b98a519ab11ccb08d0db902ed9ad1390027132f7b60",
+  "jit": {
+    "default": true,
+    "compiler": "bin/neoclr-aot-poc.exe",
+    "host": "bin/neoclr-jit-host.dll",
+    "runtimeAsync": false,
+    "cryptography": true,
+    "tlsOwnership": true,
+    "heapBytes": 33554432,
+    "byteArrayLimit": 4194304
+  },
+  "files": {
+    "bin/neoclr-aot-poc.exe": "0a494513d8c49c83ff07bcb664b0fdf8fc01f9ae0d3084cc8e98043236de2c0a",
+    "bin/neoclr-jit-host.dll": "9eb83a1bd07494b021819e0404b50d620d6c08f7d52af4e4fcb30080fd809a50",
+    "bin/neoclr.exe": "c25d84fa8d8b33e6f8a95ee112a49c38515568dfa085d5e5ca0d8f84b196299d",
+    "editor/raven-vscode.vsix": "c6420d85cc266d5220a25df7f0bb5605a5bdc2eed14332073fabe1449eb1d257",
+    "lib/bundle.json": "ecce03d42d42a0187e110c2b5999204d0adbf9ba9f1d72742267cbd2b3f18927",
+    "lib/Core.dll": "3f7cfa9db7c4feb551e2e97b0edb89c4dcf4c64d8eccf01bd006848dcacfd3f4",
+    "lib/NeoCLR.ClassLibrary.props": "3cd2d52dfff595e759cbde6a5c2801e23795f790d7dd90b62f6a9d97e4fe0c11",
+    "lib/System.Data.dll": "833d8b51f3e3b868fe37151de2038762372107c5ae239fd580389569761da288",
+    "lib/System.Networking.dll": "dbd943be76b35af1ba51a6866f1bd3e69c0bdeb8eb39e2af08f3803def96cb11",
+    "lib/System.Runtime.dll": "78cb48eb6e9759f4e4f13ca5375cdd2c48a015ecd8475839824e62d967269ee6",
+    "lib/System.runtime.neox": "98a1ae1da85387c87746957e83a4015eb59d0566539a915c69f168d2b511b190",
+    "lib/System.Web.dll": "fc7e3c24f7c909260ed8b4e77290f719226853c28b7e124140c228a3a0f7426a",
+    "sdk/tools/language-server/Raven.LanguageServer.dll": "da7c8b1dcc32fa8165c4a43a402e09059a9f73dbba105c059f09e78eb64d7517",
+    "sdk/tools/rvnc/Raven.CodeAnalysis.dll": "7a3da01f86ca4e4fd69bea5a057afe7e9c74fe46230b54339f110afcc0ccfe40",
+    "sdk/tools/rvnc/rvnc.dll": "4cc2e30e24567535a49d9a47809974369c1acc0bb7a0ad8937b080c0c8a13844",
+    "third-party/manifest.json": "f2a24633ffda28828c2e358435f6feeb8299d7dd4eff11b1cc7829fd957ccf8a"
+  }
+}

@@ -19,8 +19,10 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   plus the matching Windows SDK/VSIX's extracted samples and 26 editor checks.
   Qualify the callback-fixed macOS bundle through SSL/HTTPS in interpreter/JIT/AOT,
   refresh the installed runtime/backend and notices, and pass installed default-JIT
-  samples. Retain exact hashes and draft next-preview notes; Windows callback-fixed
-  HTTP/package runs and final publication review remain open.
+  samples. The callback-fixed Windows package also passes its samples and all 26
+  editor checks, with downloaded archive/manifest and component hashes verified.
+  Draft notes distinguish Windows state-machine execution and optional SQL packaging.
+  The later Windows AOT heap repair's HTTP gate and publication review remain open.
 
 - Repair native host callback admission for mixed unit/no-result continuations:
   remove the redundant combined 32-target cap without changing per-shape bounds

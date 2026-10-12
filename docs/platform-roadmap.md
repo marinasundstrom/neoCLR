@@ -3,8 +3,9 @@
 **Release preflight (2026-10-13):** [qualification evidence](experiments/release-20261013/README.md)
 now includes passing hosted source/format/Clippy, minimum-Rust and macOS/Windows
 host gates. The mixed-callback backend repair passes focused Windows object and
-macOS SSL/HTTP checks; the author installation is refreshed. Windows HTTP/package
-qualification of that repair remains open. [Draft notes](next-preview-release-notes.md)
+macOS SSL/HTTP checks; the author installation is refreshed. Windows default-JIT
+package/editor qualification passes. A separate Windows AOT heap-admission repair
+remains under its HTTP/HTTPS execution gate. [Draft notes](next-preview-release-notes.md)
 are ready for review; no publication or milestone reorder is implied.
 
 **Local default-JIT preview (2026-10-12):** the [author-testing installation](local-preview-20261012.md)
