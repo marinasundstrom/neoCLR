@@ -4,6 +4,7 @@ on:
   push:
     paths:
       - 'tools/native-tls/**'
+      - 'tools/security-provider/**'
       - 'docs/experiments/https-server/**'
       - 'docs/experiments/aot-console/socket-*'
       - 'scripts/build-native-project.py'
@@ -13,6 +14,7 @@ on:
   pull_request:
     paths:
       - 'tools/native-tls/**'
+      - 'tools/security-provider/**'
       - 'docs/experiments/https-server/**'
       - 'docs/experiments/aot-console/socket-*'
       - 'scripts/build-native-project.py'

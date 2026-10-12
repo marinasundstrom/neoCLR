@@ -53,7 +53,9 @@ will use canonical async InputStream/OutputStream and System.Concurrency.Tasks.
 The same private archive now exposes the C declarations in
 `tools/native-tls/include/neoclr_crypto.h`: secure random fill, one-shot SHA-256,
 HMAC-SHA-256 and HMAC verification. All delegate to pinned ring 0.17.14, already
-used by Rustls. There are no guest-facing methods yet; the following managed
+used by Rustls. Its safe Rust implementation now lives in the separate
+`tools/security-provider` crate, without TLS dependencies; the TLS archive retains
+the existing C ABI wrappers. There are no guest-facing methods yet; the following managed
 projection remains the next slice, including interpreter/JIT/AOT wiring and API
 reference generation.
 
@@ -98,3 +100,7 @@ HMAC cases 1, 2 and 6 plus altered/truncated tags; invalid arguments preserving 
 random fill bounds; and injected provider failure clearing partial output. All ten
 provider tests pass together on macOS. The same CI command covers these on Windows;
 Windows execution remains pending. Random tests check behavior, not statistical quality.
+
+The extraction checkpoint reruns all ten tests (nine C-ABI/TLS tests and one shared
+provider failure test). Both CI workflows watch the shared crate, and HTTPS project
+build manifests include its source inputs.

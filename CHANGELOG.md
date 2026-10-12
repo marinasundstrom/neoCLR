@@ -8,6 +8,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-12
 
+- Extract the shared cryptographic implementation into a TLS-independent Rust crate,
+  preserving native C ABI wrappers and all ten provider tests. Track the shared
+  source in both security CI gates and HTTPS project build manifests, preparing
+  managed runtime integration without pulling TLS into hash-only consumers.
+
 - Add private ring-backed secure random fill, SHA-256, HMAC-SHA-256 and MAC
   verification primitives for the forthcoming System.Security.Cryptography projection.
   Document C ABI ownership/errors and the managed integration still required. Five

@@ -4,11 +4,13 @@ on:
   push:
     paths:
       - 'tools/native-tls/**'
+      - 'tools/security-provider/**'
       - 'scripts/test-native-security.py'
       - '.github/workflows/native-security-provider.yml'
   pull_request:
     paths:
       - 'tools/native-tls/**'
+      - 'tools/security-provider/**'
       - 'scripts/test-native-security.py'
       - '.github/workflows/native-security-provider.yml'
 permissions:

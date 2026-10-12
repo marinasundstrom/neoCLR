@@ -9,6 +9,8 @@ ROOT = Path(__file__).resolve().parents[1]
 
 
 def main():
+    subprocess.run(["cargo", "test", "--locked", "--manifest-path",
+                    str(ROOT / "tools/security-provider/Cargo.toml")], check=True, timeout=180)
     with tempfile.TemporaryDirectory(prefix='neoclr-security-') as directory:
         path = Path(directory)
         config = path / 'openssl.cnf'

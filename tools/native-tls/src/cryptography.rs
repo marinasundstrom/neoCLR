@@ -1,9 +1,6 @@
 //! Private host primitives for the future managed cryptography projection.
 //! Pointers are trusted host buffers, valid for the supplied lengths and call.
-use ring::{
-    digest, hmac,
-    rand::{SecureRandom, SystemRandom},
-};
+use neoclr_security_provider as provider;
 
 const SUCCESS: i32 = 0;
 const INVALID: i32 = -1;
@@ -37,9 +34,9 @@ pub unsafe extern "C" fn neoclr_crypto_sha256(
     let Some(data) = (unsafe { input(data, count) }) else {
         return INVALID;
     };
-    let hash = digest::digest(&digest::SHA256, data);
+    let hash = provider::sha256(data);
     unsafe {
-        std::ptr::copy_nonoverlapping(hash.as_ref().as_ptr(), output, TAG_LENGTH);
+        std::ptr::copy_nonoverlapping(hash.as_ptr(), output, TAG_LENGTH);
     }
     SUCCESS
 }
@@ -62,10 +59,9 @@ pub unsafe extern "C" fn neoclr_crypto_hmac_sha256(
     let Some(data) = (unsafe { input(data, count) }) else {
         return INVALID;
     };
-    let key = hmac::Key::new(hmac::HMAC_SHA256, key);
-    let tag = hmac::sign(&key, data);
+    let tag = provider::hmac_sha256(key, data);
     unsafe {
-        std::ptr::copy_nonoverlapping(tag.as_ref().as_ptr(), output, TAG_LENGTH);
+        std::ptr::copy_nonoverlapping(tag.as_ptr(), output, TAG_LENGTH);
     }
     SUCCESS
 }
@@ -90,21 +86,10 @@ pub unsafe extern "C" fn neoclr_crypto_hmac_sha256_verify(
     let Some(tag) = (unsafe { input(tag, tag_count) }) else {
         return INVALID;
     };
-    let key = hmac::Key::new(hmac::HMAC_SHA256, key);
-    if hmac::verify(&key, data, tag).is_ok() {
+    if provider::verify_hmac_sha256(key, data, tag) {
         SUCCESS
     } else {
         1
-    }
-}
-
-fn fill(output: &mut [u8], generate: impl FnOnce(&mut [u8]) -> Result<(), ()>) -> i32 {
-    if generate(output).is_err() {
-        // No partially generated output can be mistaken for a successful fill.
-        output.fill(0);
-        PROVIDER_FAILURE
-    } else {
-        SUCCESS
     }
 }
 
@@ -116,10 +101,10 @@ pub unsafe extern "C" fn neoclr_crypto_random_fill(output: *mut u8, count: u32) 
     if output.is_null() || count as usize > isize::MAX as usize {
         return INVALID;
     }
-    fill(
-        unsafe { std::slice::from_raw_parts_mut(output, count as usize) },
-        |buffer| SystemRandom::new().fill(buffer).map_err(|_| ()),
-    )
+    match provider::random_fill(unsafe { std::slice::from_raw_parts_mut(output, count as usize) }) {
+        Ok(()) => SUCCESS,
+        Err(_) => PROVIDER_FAILURE,
+    }
 }
 
 #[cfg(test)]
@@ -277,19 +262,6 @@ mod tests {
         }
         assert_eq!(output, [0xa5; 32]);
     }
-    #[test]
-    fn random_provider_failure_discards_partial_output() {
-        let mut output = [0xa5; 32];
-        assert_eq!(
-            fill(&mut output, |buffer| {
-                buffer[0] = 73;
-                Err(())
-            }),
-            PROVIDER_FAILURE
-        );
-        assert_eq!(output, [0; 32]);
-    }
-
     #[test]
     fn random_fill_respects_bounds_and_empty_input() {
         let mut output = [0xa5; 66];
