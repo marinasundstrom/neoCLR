@@ -304,3 +304,10 @@ limit. Requests still decode targets, allocate arguments and perform checked
 constructor invocation. Attribute constructors never execute. Source generation
 remains a possible future alternative. The ordinary [route primitives](/docs/routes.html)
 remain independently usable.
+
+## Request-processing benchmarks
+
+The [HTTP benchmark matrix](/benchmarks/http/) separates plain-text responses,
+JSON serialization and JSON with database access across interpreter, JIT and AOT.
+It distinguishes measured development baselines from workloads still awaiting
+measurement, and keeps startup separate from request processing.

@@ -47,7 +47,7 @@ An async entry point awaits the operation and handles its Result:
 | Upload content | Buffered bytes/text or a known-length InputStream source with explicit ownership |
 
 Import `System.Web.Http.Json.*` for JSON helpers. These are bounded experimental
-HTTP/1.1 APIs. Development HTTPS uses explicit trust/credentials and managed SslStream; connection pooling and HTTP/2/3 remain unsupported. See the [TLS reference](/docs/ssl-streams/) and limits below.
+HTTP/1.1 APIs. Development HTTPS uses explicit trust/credentials and managed SslStream; connection pooling and HTTP/2/3 remain unsupported. See the [TLS reference](/docs/ssl-streams.html) and limits below.
 
 [Download the general client example and verifier](/samples/http-client.zip).
 `Overview.rvn` contains the full program. With a matching runtime bundle and SDK,
@@ -611,3 +611,10 @@ options object do not affect the server. Existing defaults remain unchanged.
 The read budget covers headers and body after acceptance; the write budget starts
 after encoding. Both accept positive durations through 60 seconds. Host memory,
 stress-GC costs and the 1 MiB transfer qualification gap remain independent limits.
+
+## Request-processing benchmarks
+
+The [HTTP benchmark matrix](/benchmarks/http/) separates plain-text responses,
+JSON serialization and JSON with database access across interpreter, JIT and AOT.
+It distinguishes measured development baselines from workloads still awaiting
+measurement, and keeps startup separate from request processing.

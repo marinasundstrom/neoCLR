@@ -185,15 +185,15 @@ and [garbage collection](../gc/) for related topics.
 
 ## Performance measurements
 
-The [benchmark report](../../benchmarks/) compares recorded interpreter and native
-builds using routing and HTTP workloads. It includes methodology, measurements
-and limitations. The cross-platform HTTP checks establish correctness, not a
-performance ranking against .NET.
+The [general execution report](/benchmarks/execution/) covers CPU work,
+serialization and startup across interpreter, JIT and AOT. Each experiment states
+its workload, revisions, timing boundary and limitations. Memory, deployment size
+and AOT build time are separate measurement dimensions.
 
-The development JSON corpus additionally exercises two nested documents through
-JsonValue and typed objects, plus typed scalar/object vectors, with macOS
-interpreter/native parity. The same corpus now passes Windows x64 project execution. Lists/sequences and maps
-remain under development; no comparative benchmark results are published yet.
+[HTTP request processing](/benchmarks/http/) has a separate matrix for plain text,
+JSON and JSON with database access. A standalone serializer or SQL benchmark does
+not measure HTTP throughput. Equivalent .NET, Go and JavaScript comparisons remain
+pending.
 
 ## JIT investigation
 

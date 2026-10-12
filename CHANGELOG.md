@@ -8,6 +8,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-12
 
+- Organize website benchmarks into an HTTP plain-text/JSON/database workload
+  matrix and a general execution report linked from native compilation. Preserve
+  historical results and label unmeasured cases and contention-affected timings;
+  document evidence requirements for future graphs. Repair TLS guide navigation
+  and TLS/compression links. No new timing or deployment is claimed.
+
 - Require an explicit architectural comparison of runtime-owned InternalCall
   services and separate native libraries invoked through FFI when designing relevant
   features. Record runtime privileges, ownership/lifecycle, packaging, execution-mode

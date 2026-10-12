@@ -140,6 +140,14 @@ and an optional local PostgreSQL provider in System.Data.PostgreSql. Authenticat
 remote servers and streaming remain follow-ups; this one-off direction does not
 permanently reprioritize the active runtime milestone.
 
+**Benchmark publication direction (2026-10-12):** publish HTTP request-processing
+results as a plain-text, JSON and JSON-plus-database matrix across interpreter,
+JIT and AOT. The native-compilation page should cover general execution performance.
+The [website structure](design/feature-pages.md#benchmark-placement--author-direction-2026-10-12)
+records graph/evidence requirements. Website reports now separate these concerns;
+matched composed HTTP measurements and graphs remain pending. Standalone SQL
+qualification or timing is not HTTP benchmark evidence.
+
 **Collector and JIT follow-through (2026-10-12):** the author asks to reduce collector
 cost with profiles, correctness tests and benchmarks, and reiterates that JIT should
 become the default soon. The [collector traversal slice](experiments/runtime-async/native-profiling.md#fewer-collector-traversals--2026-10-12)

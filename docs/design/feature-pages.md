@@ -258,3 +258,19 @@ under an explicit RavenDoc navigation section while preserving their published
 lets Guides use the same visible article sidebar across folders. The API browser
 continues to list library symbols separately. A page's `toc: false` disables only
 its in-page outline, not the Guides sidebar.
+
+## Benchmark placement — author direction, 2026-10-12
+
+Publish HTTP request-processing measurements with the HTTP pages, through the
+[HTTP benchmark report](../../website/content/benchmarks/http/index.md): plain text,
+JSON, and JSON with database access, across interpreter, JIT and AOT. Keep client
+and server measurements distinguishable. The AOT/native-compilation page points
+to [general execution performance](../../website/content/benchmarks/execution/index.md),
+including CPU, serialization, startup and memory rather than centering HTTP.
+
+Graphs are a presentation option for qualified measurements, not a substitute for
+raw evidence. Include units, workload/configuration, revision/date, variability,
+a numerical table and reproduction links. Do not combine different historical
+builds, infer HTTP performance from standalone SQL/JSON timings, or render missing
+measurements as zero. Retain historical reports and incoming anchors. Publication
+remains the separate manual workflow described above.

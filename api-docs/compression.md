@@ -2,7 +2,7 @@
 
 `GZipStream` implements InputStream and OutputStream in System.Runtime. It adapts
 async byte streams to the RFC 1952 gzip format. See the
-[design and HTTP follow-through](../docs/gzip-compression.md) for implementation choices.
+[design and HTTP follow-through](https://github.com/marinasundstrom/neoCLR/blob/main/docs/gzip-compression.md) for implementation choices.
 
 | Member | Contract |
 | --- | --- |
@@ -36,7 +36,7 @@ not a live HTTP connection. Incremental decoding and automatic HTTP integration 
 gaps, not implemented behavior. Compression has no whole-stream size bound and uses
 bounded blocks; it can expand incompressible data.
 
-The [compiled suite](../runtime/raven/tests/gzip/Tests.rvn) demonstrates creation,
+The [compiled suite](https://github.com/marinasundstrom/neoCLR/blob/main/runtime/raven/tests/gzip/Tests.rvn) demonstrates creation,
 Write/Finish/Read ordering, ownership and error handling. The factories avoid ambiguous
 .NET-style constructors when a stream supports both input and output capabilities.
 

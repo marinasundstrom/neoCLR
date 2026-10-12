@@ -82,7 +82,7 @@ adopt the same backend.
 
 The local macOS consumer exchanges nested JSON using HttpClient and HttpServer,
 with GC during request handling, in interpreter, default JIT and native AOT modes.
-[HTTP failure checks](../docs/experiments/shared-tls/http-failures-validation.json) also
+[HTTP failure checks](https://github.com/marinasundstrom/neoCLR/blob/main/docs/experiments/shared-tls/http-failures-validation.json) also
 pass hostname rejection followed by recovery, client timeout/cancellation after
 ClientHello, and the server handshake deadline in all three modes. This is a
 development checkpoint, not broad protocol or performance certification.

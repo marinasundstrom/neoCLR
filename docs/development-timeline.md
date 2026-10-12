@@ -25,6 +25,25 @@ available original wording; other text is a summary.
 
 See the [changelog](../CHANGELOG.md) and linked design documents for technical status.
 
+## 2026-10-12 — Website benchmark organization
+
+**Author:** intends to publish benchmarks on the website: HTTP pages should cover
+request processing, plain text and a matrix including JSON and database access;
+the AOT page should cover general performance. Suggests graphs.
+
+**Assistant response and action:** separated the website benchmark overview into
+HTTP request processing and general execution reports, linked from the HTTP and
+native-compilation pages. Preserved historical measurements, dates and caveats.
+The HTTP matrix labels missing composed JSON/database measurements as pending;
+the existing three-mode HTTP timing is explicitly exploratory under observed CPU
+contention. Proposed graphs with numerical tables, variability and raw evidence
+once matched runs are qualified. No graph or new performance result is claimed
+from functional SQL validation. Website publication remains a separate action.
+
+**Validation:** 22 website tests pass; the full build checks 3,979 pages and local
+links. Fixed existing TLS guide navigation and TLS/compression evidence links found
+by that check. No deployment was performed.
+
 ## 2026-10-12 — Runtime services versus separate foreign libraries
 
 - **Author:** asks to document consideration of implementing features in the runtime

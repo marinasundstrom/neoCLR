@@ -36,8 +36,14 @@
       href: features/native-interop/index.md
     - name: "Native compilation"
       href: features/native-compilation/index.md
-    - name: "Native benchmarks"
+    - name: "Benchmarks"
       href: benchmarks/index.md
+    - name: HTTP request benchmarks
+      href: benchmarks/http/index.md
+    - name: General execution benchmarks
+      href: benchmarks/execution/index.md
+    - name: Historical measurements
+      href: benchmarks/historical/index.md
     - name: "Tasks and async"
       href: features/tasks/index.md
     - name: "Files and storage"
@@ -136,3 +142,5 @@
       href: docs/stack-trace.md
     - name: "Sequence access"
       href: docs/sequence-access.md
+    - name: TLS streams (development)
+      href: docs/ssl-streams.md
