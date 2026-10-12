@@ -9,6 +9,8 @@ fn same_path(left: &Path, right: &Path) -> bool {
     left == right || matches!((left.canonicalize(), right.canonicalize()), (Ok(a), Ok(b)) if a == b)
 }
 
+// This adapter forwards the independent CLI options without changing their defaults.
+#[allow(clippy::too_many_arguments)]
 pub(crate) fn run(
     input: &str,
     modules: &[&str],

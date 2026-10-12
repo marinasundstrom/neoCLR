@@ -87,10 +87,16 @@ fn pump(args: &[Value], owner: usize, heap: &mut ManagedHeap) -> Result<Value, F
     let mut control_bytes = array(control, heap)?;
     let values = [input, output, plaintext, control];
     for (i, value) in values.iter().enumerate() {
-        let Value::ObjectReference(a) = value else { unreachable!() };
-        if i != 0 { a.reference.require_writable()?; }
+        let Value::ObjectReference(a) = value else {
+            unreachable!()
+        };
+        if i != 0 {
+            a.reference.require_writable()?;
+        }
         for other in values.iter().skip(i + 1) {
-            let Value::ObjectReference(b) = other else { unreachable!() };
+            let Value::ObjectReference(b) = other else {
+                unreachable!()
+            };
             if a.allocation_id() == b.allocation_id() {
                 return Err(Fault::new("TLS pump buffers must be distinct"));
             }
@@ -107,19 +113,40 @@ fn pump(args: &[Value], owner: usize, heap: &mut ManagedHeap) -> Result<Value, F
         _ => return Ok(Value::Int32(-10)),
     };
     let count = u32::from_le_bytes(control_bytes[4..8].try_into().unwrap()) as usize;
-    if count > input_bytes.len() { return Ok(Value::Int32(-10)); }
+    if count > input_bytes.len() {
+        return Ok(Value::Int32(-10));
+    }
     let result = if let Some(id) = heap.tls.owners.get(&owner).copied() {
-        heap.tls.context().pump(id, operation, &input_bytes[..count], control_bytes[1] != 0,
-            &mut output_bytes, &mut plaintext_bytes)
+        heap.tls.context().pump(
+            id,
+            operation,
+            &input_bytes[..count],
+            control_bytes[1] != 0,
+            &mut output_bytes,
+            &mut plaintext_bytes,
+        )
     } else {
-        neoclr_native_tls::resources::PumpProgress { status: -18, consumed: 0, produced: 0 }
+        neoclr_native_tls::resources::PumpProgress {
+            status: -18,
+            consumed: 0,
+            produced: 0,
+        }
     };
     control_bytes[8..12].copy_from_slice(&(result.consumed as u32).to_le_bytes());
     control_bytes[12..16].copy_from_slice(&(result.produced as u32).to_le_bytes());
-    for (value, bytes) in [(output, output_bytes), (plaintext, plaintext_bytes), (control, control_bytes)] {
-        let Value::ObjectReference(array) = value else { unreachable!() };
+    for (value, bytes) in [
+        (output, output_bytes),
+        (plaintext, plaintext_bytes),
+        (control, control_bytes),
+    ] {
+        let Value::ObjectReference(array) = value else {
+            unreachable!()
+        };
         for (index, byte) in bytes.into_iter().enumerate() {
-            array.reference.element(index, &Type::Byte)?.write(Value::Byte(byte))?;
+            array
+                .reference
+                .element(index, &Type::Byte)?
+                .write(Value::Byte(byte))?;
         }
     }
     Ok(Value::Int32(result.status as i32))
@@ -198,21 +225,55 @@ mod tests {
         let mut heap = ManagedHeap::default();
         let config = bytes(&mut heap, &[]);
         let session = bytes(&mut heap, &[]);
-        let roots = bytes(&mut heap, &std::fs::read(std::env::var("NEOCLR_HTTPS_CERTIFICATE").unwrap()).unwrap());
+        let roots = bytes(
+            &mut heap,
+            &std::fs::read(std::env::var("NEOCLR_HTTPS_CERTIFICATE").unwrap()).unwrap(),
+        );
         let empty = bytes(&mut heap, &[]);
-        assert_eq!(Operation::ClientConfig.invoke(&[config.clone(), roots, empty], &mut heap).unwrap(), Value::Int32(0));
+        assert_eq!(
+            Operation::ClientConfig
+                .invoke(&[config.clone(), roots, empty], &mut heap)
+                .unwrap(),
+            Value::Int32(0)
+        );
         let name = bytes(&mut heap, b"localhost");
-        assert_eq!(Operation::Session.invoke(&[session.clone(), config, name], &mut heap).unwrap(), Value::Int32(0));
+        assert_eq!(
+            Operation::Session
+                .invoke(&[session.clone(), config, name], &mut heap)
+                .unwrap(),
+            Value::Int32(0)
+        );
         let input = bytes(&mut heap, &[]);
         let output = bytes(&mut heap, &[0; 17]);
         let plaintext = bytes(&mut heap, &[]);
-        let control = bytes(&mut heap, &[1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]);
-        assert!(Operation::Pump.invoke(&[session.clone(), input.clone(), output.clone(), plaintext.clone(), output.clone()], &mut heap).is_err());
-        assert_eq!(Operation::Pump.invoke(&[session, input, output.clone(), plaintext, control.clone()], &mut heap).unwrap(), Value::Int32(-1));
+        let control = bytes(&mut heap, &[1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]);
+        assert!(
+            Operation::Pump
+                .invoke(
+                    &[
+                        session.clone(),
+                        input.clone(),
+                        output.clone(),
+                        plaintext.clone(),
+                        output.clone()
+                    ],
+                    &mut heap
+                )
+                .is_err()
+        );
+        assert_eq!(
+            Operation::Pump
+                .invoke(
+                    &[session, input, output.clone(), plaintext, control.clone()],
+                    &mut heap
+                )
+                .unwrap(),
+            Value::Int32(-1)
+        );
         let counts = array(&control, &heap).unwrap();
-        assert_eq!(&counts[8..12], &[0;4]);
-        assert_eq!(&counts[12..16], &[17,0,0,0]);
-        assert_ne!(array(&output, &heap).unwrap(), vec![0;17]);
+        assert_eq!(&counts[8..12], &[0; 4]);
+        assert_eq!(&counts[12..16], &[17, 0, 0, 0]);
+        assert_ne!(array(&output, &heap).unwrap(), vec![0; 17]);
     }
     #[test]
     fn invalid_and_foreign_owner_tokens_fault_without_resources() {
@@ -225,7 +286,7 @@ mod tests {
         assert!(Operation::Release.invoke(&[nonempty], &mut heap).is_err());
         assert_eq!(
             Operation::Release
-                .invoke(&[owner.clone()], &mut heap)
+                .invoke(std::slice::from_ref(&owner), &mut heap)
                 .unwrap(),
             Value::Int32(0)
         );
@@ -308,7 +369,7 @@ mod tests {
         assert_eq!(heap.tls.context().resource_count(), 1);
         assert_eq!(
             Operation::Abort
-                .invoke(&[session.clone()], &mut heap)
+                .invoke(std::slice::from_ref(&session), &mut heap)
                 .unwrap(),
             Value::Int32(0)
         );
@@ -338,7 +399,7 @@ mod tests {
         for _ in 0..2 {
             assert_eq!(
                 Operation::Release
-                    .invoke(&[owner.clone()], &mut heap)
+                    .invoke(std::slice::from_ref(&owner), &mut heap)
                     .unwrap(),
                 Value::Int32(0)
             );

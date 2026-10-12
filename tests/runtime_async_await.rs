@@ -216,7 +216,10 @@ fault "cancel lost terminal authority"
 
 #[test]
 fn host_cancellation_interrupts_an_incomplete_operation() {
-    let p = program("call neoCLR.Runtime.RuntimeAsyncCreate()\ncall neoCLR.Runtime.RuntimeAsyncAwait(Int64)\nret", "");
+    let p = program(
+        "call neoCLR.Runtime.RuntimeAsyncCreate()\ncall neoCLR.Runtime.RuntimeAsyncAwait(Int64)\nret",
+        "",
+    );
     let token = CancellationToken::new();
     std::thread::scope(|scope| {
         let token_copy = token.clone();
@@ -246,14 +249,16 @@ fn completed_handle_can_be_awaited_repeatedly_until_released() {
 #[test]
 fn invalid_delay_and_unknown_handles_are_rejected() {
     assert!(program("ldc.i4 -1\ncall neoCLR.Runtime.RuntimeAsyncDelay(Int32)\ncall neoCLR.Runtime.RuntimeAsyncAwait(Int64)\nret", "").run(Limits::default()).unwrap_err().message.contains("nonnegative"));
-    assert!(program(
-        "ldc.i8 0\ncall neoCLR.Runtime.RuntimeAsyncAwait(Int64)\nret",
-        ""
-    )
-    .run(Limits::default())
-    .unwrap_err()
-    .message
-    .contains("Unknown"));
+    assert!(
+        program(
+            "ldc.i8 0\ncall neoCLR.Runtime.RuntimeAsyncAwait(Int64)\nret",
+            ""
+        )
+        .run(Limits::default())
+        .unwrap_err()
+        .message
+        .contains("Unknown")
+    );
 }
 
 const INDEPENDENT: &str = r#"
@@ -668,8 +673,16 @@ ret
 #[test]
 fn completion_observation_rejects_unknown_and_released_handles() {
     for service in ["RuntimeAsyncIsCancelled", "RuntimeAsyncWaitCompletion"] {
-        for setup in ["ldc.i8 0".to_owned(), format!("ldc.i4 0\ncall neoCLR.Runtime.RuntimeAsyncDelay(Int32)\nstloc operation\nldloc operation\ncall neoCLR.Runtime.RuntimeAsyncIsCompleted(Int64)\npop\nldloc operation\ncall neoCLR.Runtime.RuntimeAsyncRelease(Int64)\npop\nldloc operation")] {
-            let fault = program(&format!("{setup}\ncall neoCLR.Runtime.{service}(Int64)\npop\nldc.i4 0\nret"), "").run(Limits::default()).unwrap_err();
+        for setup in [
+            "ldc.i8 0".to_owned(),
+            "ldc.i4 0\ncall neoCLR.Runtime.RuntimeAsyncDelay(Int32)\nstloc operation\nldloc operation\ncall neoCLR.Runtime.RuntimeAsyncIsCompleted(Int64)\npop\nldloc operation\ncall neoCLR.Runtime.RuntimeAsyncRelease(Int64)\npop\nldloc operation".to_string(),
+        ] {
+            let fault = program(
+                &format!("{setup}\ncall neoCLR.Runtime.{service}(Int64)\npop\nldc.i4 0\nret"),
+                "",
+            )
+            .run(Limits::default())
+            .unwrap_err();
             assert!(fault.message.contains("Unknown or released"));
         }
     }
@@ -716,9 +729,11 @@ fn pending_body_self_wait_fails_instead_of_hanging() {
             result.unwrap_err()
         });
         assert_eq!(fault.code, FaultCode::RuntimeError);
-        assert!(fault
-            .message
-            .contains("cannot await its own pending operation"));
+        assert!(
+            fault
+                .message
+                .contains("cannot await its own pending operation")
+        );
         assert!(fault.function.unwrap().contains("ObserveSelf"));
     }
 }
@@ -755,7 +770,9 @@ fault "independent observer lost body result"
         "stloc operation",
         "stloc operation\nldloc body\nldloc operation\nstfld AsyncBody::OwnOperation",
     );
-    let extra = format!(".function neoCLR.Runtime.RuntimeAsyncYield() -> Void\n.methodimpl InternalCall\n.end\n{extra}");
+    let extra = format!(
+        ".function neoCLR.Runtime.RuntimeAsyncYield() -> Void\n.methodimpl InternalCall\n.end\n{extra}"
+    );
     assert_eq!(bounded_run(program(&main, &extra)).value, Value::Int32(42));
 }
 
@@ -926,10 +943,16 @@ pop
 ldc.i4 42
 ret
 "#;
-    let main = START_BODY.replace(".local AsyncBody body", ".local AsyncBody body\n.local Observer observer").replace("fn<Int32>", "fn<Void>").replace(
-        "ldloc operation\ncall neoCLR.Runtime.RuntimeAsyncAwait(Int64)\nret",
-        tail,
-    );
+    let main = START_BODY
+        .replace(
+            ".local AsyncBody body",
+            ".local AsyncBody body\n.local Observer observer",
+        )
+        .replace("fn<Int32>", "fn<Void>")
+        .replace(
+            "ldloc operation\ncall neoCLR.Runtime.RuntimeAsyncAwait(Int64)\nret",
+            tail,
+        );
     assert_eq!(bounded_run(program(&main, &extra)).value, Value::Int32(42));
 }
 
@@ -1049,10 +1072,12 @@ ret
 "#,
     ))
     .unwrap();
-    let app =
-        neoclr::assembler::read_modules(&[neoclr::assembler::ModuleInput::Source(&source)], &system)
-            .unwrap()
-            .remove(0);
+    let app = neoclr::assembler::read_modules(
+        &[neoclr::assembler::ModuleInput::Source(&source)],
+        &system,
+    )
+    .unwrap()
+    .remove(0);
     let p = LoadedProgram::with_library(&app, &system).unwrap();
     p.verify().unwrap();
     assert_eq!(bounded_run(p).value, Value::Int32(42));
@@ -1188,7 +1213,15 @@ ldc.i4 42
 ret
 "#;
     assert_eq!(bounded_run(program(main, extra)).value, Value::Int32(42));
-    let draining = main.replace("call neoCLR.Runtime.GCCollect()", "call neoCLR.Runtime.GCCollect()\ncall neoCLR.Runtime.DrainEntryTasks()\npop");
-    let extra = format!("{extra}\n.function neoCLR.Runtime.DrainEntryTasks() -> Void\n.methodimpl InternalCall\n.end\n");
-    assert_eq!(bounded_run(program(&draining, &extra)).value, Value::Int32(42));
+    let draining = main.replace(
+        "call neoCLR.Runtime.GCCollect()",
+        "call neoCLR.Runtime.GCCollect()\ncall neoCLR.Runtime.DrainEntryTasks()\npop",
+    );
+    let extra = format!(
+        "{extra}\n.function neoCLR.Runtime.DrainEntryTasks() -> Void\n.methodimpl InternalCall\n.end\n"
+    );
+    assert_eq!(
+        bounded_run(program(&draining, &extra)).value,
+        Value::Int32(42)
+    );
 }

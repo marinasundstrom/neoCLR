@@ -286,8 +286,9 @@ mod dispatch_tests {
                 object_view: false,
                 identity: std::sync::Arc::new(()),
                 ty: crate::assembler::parse_type("fn<Void>").unwrap(),
-                target: Some(crate::assembler::parse_function_ref("instance Capture::Callback()")
-                    .unwrap()),
+                target: Some(
+                    crate::assembler::parse_function_ref("instance Capture::Callback()").unwrap(),
+                ),
                 native: None,
                 receiver: Some(Box::new(object(&mut heap))),
             });

@@ -37,7 +37,9 @@ def main():
     commands += [cargo + ['test', '--locked', '--release', '--lib', name] for name in HOST_UNITS]
     commands += [cargo + ['run', '--locked', '--release', '--example', name]
                  for name in ('invoke', 'build_native')]
-    commands += [cargo + ['run', '--locked', '--release', '--', 'run', 'examples/pinvoke.neoil']]
+    # This source-only foreign-call fixture qualifies interpreter ABI behavior.
+    # Installed default-JIT qualification belongs to the toolchain bundle gate.
+    commands += [cargo + ['run', '--locked', '--release', '--', 'run', 'examples/pinvoke.neoil', '--execution', 'interpreter']]
     if args.plan:
         print(json.dumps(commands, indent=2))
         return

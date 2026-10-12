@@ -240,8 +240,10 @@ pub(crate) fn bind(function: &Function) -> Result<Binding, Fault> {
         });
     }
     if function.name.starts_with("neoCLR.Runtime.Crypto")
-        && (!function.generic_parameters.is_empty() || !function.generic_arguments.is_empty()
-            || !function.generic_constraints.is_empty()) {
+        && (!function.generic_parameters.is_empty()
+            || !function.generic_arguments.is_empty()
+            || !function.generic_constraints.is_empty())
+    {
         return Err(Fault::new("cryptography service cannot be generic"));
     }
     if function.no_result
@@ -269,7 +271,9 @@ pub(crate) fn bind(function: &Function) -> Result<Binding, Fault> {
     }
     if let Some((query, count, result)) = crate::assembly_info::Query::binding(&function.name) {
         let mut parameters = vec![Type::String; count];
-        if matches!(query, crate::assembly_info::Query::ModuleMemberAttributes) { parameters[2] = Type::Int32; }
+        if matches!(query, crate::assembly_info::Query::ModuleMemberAttributes) {
+            parameters[2] = Type::Int32;
+        }
         if function.parameters != parameters
             || function.returns != crate::assembler::parse_type(result)?
         {
@@ -435,7 +439,10 @@ pub(crate) fn bind(function: &Function) -> Result<Binding, Fault> {
         });
     }
     if function.name == "neoCLR.Runtime.StackTraceCapture" {
-        if function.parameters != [Type::Int32] || function.returns != Type::String || function.no_result {
+        if function.parameters != [Type::Int32]
+            || function.returns != Type::String
+            || function.no_result
+        {
             return Err(Fault::new("stack capture service signature mismatch"));
         }
         return Ok(Binding::StackTraceCapture);
@@ -598,29 +605,96 @@ pub(crate) fn bind(function: &Function) -> Result<Binding, Fault> {
         }
         ("neoCLR.Runtime.WriteLine", [Type::String]) => (Binding::WriteLine, Type::Void),
         ("neoCLR.Runtime.CharCategory", [Type::UInt32]) => (Binding::CharCategory, Type::Int32),
-        ("neoCLR.Runtime.TlsPump", types) if types.len() == 5 && types.iter().all(|ty| *ty == Type::ArrayRef(Box::new(Type::Byte))) =>
-            (Binding::Tls(crate::tls::Operation::Pump), Type::Int32),
-        ("neoCLR.Runtime.TlsCreateClient", types) if types.len() == 3 && types.iter().all(|ty| *ty == Type::ArrayRef(Box::new(Type::Byte))) =>
-            (Binding::Tls(crate::tls::Operation::ClientConfig), Type::Int32),
-        ("neoCLR.Runtime.TlsCreateServer", types) if types.len() == 4 && types.iter().all(|ty| *ty == Type::ArrayRef(Box::new(Type::Byte))) =>
-            (Binding::Tls(crate::tls::Operation::ServerConfig), Type::Int32),
-        ("neoCLR.Runtime.TlsCreateSession", types) if types.len() == 3 && types.iter().all(|ty| *ty == Type::ArrayRef(Box::new(Type::Byte))) =>
-            (Binding::Tls(crate::tls::Operation::Session), Type::Int32),
-        ("neoCLR.Runtime.TlsRelease", types) if types.len() == 1 && types.iter().all(|ty| *ty == Type::ArrayRef(Box::new(Type::Byte))) =>
-            (Binding::Tls(crate::tls::Operation::Release), Type::Int32),
-        ("neoCLR.Runtime.TlsAbort", types) if types.len() == 1 && types.iter().all(|ty| *ty == Type::ArrayRef(Box::new(Type::Byte))) =>
-            (Binding::Tls(crate::tls::Operation::Abort), Type::Int32),
+        ("neoCLR.Runtime.TlsPump", types)
+            if types.len() == 5
+                && types
+                    .iter()
+                    .all(|ty| *ty == Type::ArrayRef(Box::new(Type::Byte))) =>
+        {
+            (Binding::Tls(crate::tls::Operation::Pump), Type::Int32)
+        }
+        ("neoCLR.Runtime.TlsCreateClient", types)
+            if types.len() == 3
+                && types
+                    .iter()
+                    .all(|ty| *ty == Type::ArrayRef(Box::new(Type::Byte))) =>
+        {
+            (
+                Binding::Tls(crate::tls::Operation::ClientConfig),
+                Type::Int32,
+            )
+        }
+        ("neoCLR.Runtime.TlsCreateServer", types)
+            if types.len() == 4
+                && types
+                    .iter()
+                    .all(|ty| *ty == Type::ArrayRef(Box::new(Type::Byte))) =>
+        {
+            (
+                Binding::Tls(crate::tls::Operation::ServerConfig),
+                Type::Int32,
+            )
+        }
+        ("neoCLR.Runtime.TlsCreateSession", types)
+            if types.len() == 3
+                && types
+                    .iter()
+                    .all(|ty| *ty == Type::ArrayRef(Box::new(Type::Byte))) =>
+        {
+            (Binding::Tls(crate::tls::Operation::Session), Type::Int32)
+        }
+        ("neoCLR.Runtime.TlsRelease", types)
+            if types.len() == 1
+                && types
+                    .iter()
+                    .all(|ty| *ty == Type::ArrayRef(Box::new(Type::Byte))) =>
+        {
+            (Binding::Tls(crate::tls::Operation::Release), Type::Int32)
+        }
+        ("neoCLR.Runtime.TlsAbort", types)
+            if types.len() == 1
+                && types
+                    .iter()
+                    .all(|ty| *ty == Type::ArrayRef(Box::new(Type::Byte))) =>
+        {
+            (Binding::Tls(crate::tls::Operation::Abort), Type::Int32)
+        }
         ("neoCLR.Runtime.CryptoSha256", [Type::ArrayRef(data), Type::ArrayRef(output)])
             if **data == Type::Byte && **output == Type::Byte =>
-            (Binding::Cryptography(crate::cryptography::Operation::Sha256), Type::Int32),
-        ("neoCLR.Runtime.CryptoHmacSha256", [Type::ArrayRef(key), Type::ArrayRef(data), Type::ArrayRef(output)])
-            if **key == Type::Byte && **data == Type::Byte && **output == Type::Byte =>
-            (Binding::Cryptography(crate::cryptography::Operation::HmacSha256), Type::Int32),
-        ("neoCLR.Runtime.CryptoHmacSha256Verify", [Type::ArrayRef(key), Type::ArrayRef(data), Type::ArrayRef(tag)])
-            if **key == Type::Byte && **data == Type::Byte && **tag == Type::Byte =>
-            (Binding::Cryptography(crate::cryptography::Operation::VerifyHmacSha256), Type::Boolean),
-        ("neoCLR.Runtime.CryptoRandomFill", [Type::ArrayRef(output)]) if **output == Type::Byte =>
-            (Binding::Cryptography(crate::cryptography::Operation::RandomFill), Type::Int32),
+        {
+            (
+                Binding::Cryptography(crate::cryptography::Operation::Sha256),
+                Type::Int32,
+            )
+        }
+        (
+            "neoCLR.Runtime.CryptoHmacSha256",
+            [
+                Type::ArrayRef(key),
+                Type::ArrayRef(data),
+                Type::ArrayRef(output),
+            ],
+        ) if **key == Type::Byte && **data == Type::Byte && **output == Type::Byte => (
+            Binding::Cryptography(crate::cryptography::Operation::HmacSha256),
+            Type::Int32,
+        ),
+        (
+            "neoCLR.Runtime.CryptoHmacSha256Verify",
+            [
+                Type::ArrayRef(key),
+                Type::ArrayRef(data),
+                Type::ArrayRef(tag),
+            ],
+        ) if **key == Type::Byte && **data == Type::Byte && **tag == Type::Byte => (
+            Binding::Cryptography(crate::cryptography::Operation::VerifyHmacSha256),
+            Type::Boolean,
+        ),
+        ("neoCLR.Runtime.CryptoRandomFill", [Type::ArrayRef(output)]) if **output == Type::Byte => {
+            (
+                Binding::Cryptography(crate::cryptography::Operation::RandomFill),
+                Type::Int32,
+            )
+        }
         ("neoCLR.Runtime.Utf8Encode", [Type::String]) => {
             (Binding::Utf8Encode, Type::Array(Box::new(Type::Byte)))
         }
@@ -974,8 +1048,12 @@ pub(crate) fn bind(function: &Function) -> Result<Binding, Fault> {
         {
             (Binding::SchedulerRegister, Type::Int64)
         }
-        ("neoCLR.Runtime.SchedulerActivate", [Type::Int64]) => (Binding::SchedulerActivate, Type::Boolean),
-        ("neoCLR.Runtime.SchedulerCancel", [Type::Int64]) => (Binding::SchedulerCancel, Type::Boolean),
+        ("neoCLR.Runtime.SchedulerActivate", [Type::Int64]) => {
+            (Binding::SchedulerActivate, Type::Boolean)
+        }
+        ("neoCLR.Runtime.SchedulerCancel", [Type::Int64]) => {
+            (Binding::SchedulerCancel, Type::Boolean)
+        }
         ("neoCLR.Runtime.SchedulerCapture", []) => (Binding::SchedulerCapture, Type::Int64),
         ("neoCLR.Runtime.SchedulerSubmitTo", [Type::Int64, callback])
             if *callback == crate::assembler::parse_type("fn<Void>")? =>
@@ -1000,23 +1078,51 @@ pub(crate) fn bind(function: &Function) -> Result<Binding, Fault> {
             (Binding::RuntimeAsyncStart, Type::Int64)
         }
         ("neoCLR.Runtime.RuntimeAsyncStartManaged", [owner, body])
-            if *owner == Type::Named("System.Object".into()) && *body == crate::assembler::parse_type("fn<Void>")? =>
-            (Binding::RuntimeAsyncStartManaged, Type::Int64),
-        ("neoCLR.Runtime.RuntimeAsyncCreateOwned", [owner]) if *owner == Type::Named("System.Object".into()) =>
-            (Binding::RuntimeAsyncCreateOwned, Type::Int64),
-        ("neoCLR.Runtime.RuntimeAsyncCurrentOwner", []) =>
-            (Binding::RuntimeAsyncCurrentOwner, Type::Named("System.Object".into())),
+            if *owner == Type::Named("System.Object".into())
+                && *body == crate::assembler::parse_type("fn<Void>")? =>
+        {
+            (Binding::RuntimeAsyncStartManaged, Type::Int64)
+        }
+        ("neoCLR.Runtime.RuntimeAsyncCreateOwned", [owner])
+            if *owner == Type::Named("System.Object".into()) =>
+        {
+            (Binding::RuntimeAsyncCreateOwned, Type::Int64)
+        }
+        ("neoCLR.Runtime.RuntimeAsyncCurrentOwner", []) => (
+            Binding::RuntimeAsyncCurrentOwner,
+            Type::Named("System.Object".into()),
+        ),
         ("neoCLR.Runtime.RuntimeAsyncCreate", []) => (Binding::RuntimeAsyncCreate, Type::Int64),
-        ("neoCLR.Runtime.RuntimeAsyncDelay", [Type::Int32]) => (Binding::RuntimeAsyncDelay, Type::Int64),
-        ("neoCLR.Runtime.RuntimeAsyncComplete", [Type::Int64, Type::Int32]) => (Binding::RuntimeAsyncComplete, Type::Boolean),
-        ("neoCLR.Runtime.RuntimeAsyncCompleteUnit", [Type::Int64]) => (Binding::RuntimeAsyncCompleteUnit, Type::Boolean),
-        ("neoCLR.Runtime.RuntimeAsyncAwaitUnit", [Type::Int64]) => (Binding::RuntimeAsyncAwaitUnit, Type::Void),
-        ("neoCLR.Runtime.RuntimeAsyncCancel", [Type::Int64]) => (Binding::RuntimeAsyncCancel, Type::Boolean),
-        ("neoCLR.Runtime.RuntimeAsyncRelease", [Type::Int64]) => (Binding::RuntimeAsyncRelease, Type::Boolean),
-        ("neoCLR.Runtime.RuntimeAsyncIsCompleted", [Type::Int64]) => (Binding::RuntimeAsyncIsCompleted, Type::Boolean),
-        ("neoCLR.Runtime.RuntimeAsyncIsCancelled", [Type::Int64]) => (Binding::RuntimeAsyncIsCancelled, Type::Boolean),
-        ("neoCLR.Runtime.RuntimeAsyncWaitCompletion", [Type::Int64]) => (Binding::RuntimeAsyncWaitCompletion, Type::Boolean),
-        ("neoCLR.Runtime.RuntimeAsyncAwait", [Type::Int64]) => (Binding::RuntimeAsyncAwait, Type::Int32),
+        ("neoCLR.Runtime.RuntimeAsyncDelay", [Type::Int32]) => {
+            (Binding::RuntimeAsyncDelay, Type::Int64)
+        }
+        ("neoCLR.Runtime.RuntimeAsyncComplete", [Type::Int64, Type::Int32]) => {
+            (Binding::RuntimeAsyncComplete, Type::Boolean)
+        }
+        ("neoCLR.Runtime.RuntimeAsyncCompleteUnit", [Type::Int64]) => {
+            (Binding::RuntimeAsyncCompleteUnit, Type::Boolean)
+        }
+        ("neoCLR.Runtime.RuntimeAsyncAwaitUnit", [Type::Int64]) => {
+            (Binding::RuntimeAsyncAwaitUnit, Type::Void)
+        }
+        ("neoCLR.Runtime.RuntimeAsyncCancel", [Type::Int64]) => {
+            (Binding::RuntimeAsyncCancel, Type::Boolean)
+        }
+        ("neoCLR.Runtime.RuntimeAsyncRelease", [Type::Int64]) => {
+            (Binding::RuntimeAsyncRelease, Type::Boolean)
+        }
+        ("neoCLR.Runtime.RuntimeAsyncIsCompleted", [Type::Int64]) => {
+            (Binding::RuntimeAsyncIsCompleted, Type::Boolean)
+        }
+        ("neoCLR.Runtime.RuntimeAsyncIsCancelled", [Type::Int64]) => {
+            (Binding::RuntimeAsyncIsCancelled, Type::Boolean)
+        }
+        ("neoCLR.Runtime.RuntimeAsyncWaitCompletion", [Type::Int64]) => {
+            (Binding::RuntimeAsyncWaitCompletion, Type::Boolean)
+        }
+        ("neoCLR.Runtime.RuntimeAsyncAwait", [Type::Int64]) => {
+            (Binding::RuntimeAsyncAwait, Type::Int32)
+        }
         ("neoCLR.Runtime.RuntimeAsyncYield", []) => (Binding::RuntimeAsyncYield, Type::Void),
         ("neoCLR.Runtime.DrainEntryTasks", []) => (Binding::DrainEntryTasks, Type::Void),
         ("neoCLR.Runtime.DefaultTaskQueue", []) => (
@@ -1724,14 +1830,28 @@ mod task_callback_tests {
     #[test]
     fn timer_services_require_exact_internal_call_signatures() {
         for (signature, accepted) in [
-            ("TimerStart(Int32 milliseconds, fn<Void> callback) -> Int64", true),
+            (
+                "TimerStart(Int32 milliseconds, fn<Void> callback) -> Int64",
+                true,
+            ),
             ("TimerCancel(Int64 handle) -> Boolean", true),
-            ("TimerStart(Int64 milliseconds, fn<Void> callback) -> Int64", false),
-            ("TimerStart(Int32 milliseconds, fn<Int32> callback) -> Int64", false),
-            ("TimerStart(Int32 milliseconds, fn<Void> callback) -> Int32", false),
+            (
+                "TimerStart(Int64 milliseconds, fn<Void> callback) -> Int64",
+                false,
+            ),
+            (
+                "TimerStart(Int32 milliseconds, fn<Int32> callback) -> Int64",
+                false,
+            ),
+            (
+                "TimerStart(Int32 milliseconds, fn<Void> callback) -> Int32",
+                false,
+            ),
             ("TimerCancel(Int32 handle) -> Boolean", false),
         ] {
-            let source = format!(".module Test\n.function neoCLR.Runtime.{signature}\n.methodimpl InternalCall\n.end\n");
+            let source = format!(
+                ".module Test\n.function neoCLR.Runtime.{signature}\n.methodimpl InternalCall\n.end\n"
+            );
             assert_eq!(crate::assemble(&source).is_ok(), accepted, "{signature}");
         }
     }
@@ -1759,19 +1879,40 @@ mod task_callback_tests {
     fn scheduler_destinations_require_exact_contracts() {
         for (signature, accepted) in [
             ("SchedulerCapture() -> Int64", true),
-            ("SchedulerRegister(Int64 destination, fn<Void> callback) -> Int64", true),
-            ("SchedulerRegister(Int64 destination, fn<Int32> callback) -> Int64", false),
-            ("SchedulerRegister(Int64 destination, fn<Void> callback) -> Int32", false),
+            (
+                "SchedulerRegister(Int64 destination, fn<Void> callback) -> Int64",
+                true,
+            ),
+            (
+                "SchedulerRegister(Int64 destination, fn<Int32> callback) -> Int64",
+                false,
+            ),
+            (
+                "SchedulerRegister(Int64 destination, fn<Void> callback) -> Int32",
+                false,
+            ),
             ("SchedulerActivate(Int64 registration) -> Boolean", true),
             ("SchedulerCancel(Int64 registration) -> Boolean", true),
             ("SchedulerActivate(Int32 registration) -> Boolean", false),
             ("SchedulerCancel(Int64 registration) -> Int32", false),
             ("SchedulerCapture() -> Int32", false),
             ("SchedulerCapture(Int64 value) -> Int64", false),
-            ("SchedulerSubmitTo(Int64 destination, fn<Void> callback) -> Int32", true),
-            ("SchedulerSubmitTo(Int32 destination, fn<Void> callback) -> Int32", false),
-            ("SchedulerSubmitTo(Int64 destination, fn<noresult Void> callback) -> Int32", false),
-            ("SchedulerSubmitTo(Int64 destination, fn<Void> callback) -> Void", false),
+            (
+                "SchedulerSubmitTo(Int64 destination, fn<Void> callback) -> Int32",
+                true,
+            ),
+            (
+                "SchedulerSubmitTo(Int32 destination, fn<Void> callback) -> Int32",
+                false,
+            ),
+            (
+                "SchedulerSubmitTo(Int64 destination, fn<noresult Void> callback) -> Int32",
+                false,
+            ),
+            (
+                "SchedulerSubmitTo(Int64 destination, fn<Void> callback) -> Void",
+                false,
+            ),
         ] {
             assert_eq!(crate::assemble(&format!(".module Test\n.function neoCLR.Runtime.{signature}\n.methodimpl InternalCall\n.end\n")).is_ok(), accepted, "{signature}");
         }

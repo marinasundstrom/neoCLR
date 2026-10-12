@@ -135,10 +135,10 @@ def main():
             # demonstration programs intentionally return their computed values.
             expected_status = {"reflection": 0, "reference-identity": 0, "typeof": 0,
                                "control-flow": 21, "reflection-hierarchy": 3}.get(name, 42)
-            direct = run([executable, "run", program], source, True, expected_status=expected_status)
+            direct = run([executable, "run", program, "--execution", "interpreter"], source, True, expected_status=expected_status)
             run([executable, "assemble", program, artifact], source)
             run([executable, "verify", artifact], source)
-            restored = run([executable, "run", artifact], source, True, expected_status=expected_status)
+            restored = run([executable, "run", artifact, "--execution", "interpreter"], source, True, expected_status=expected_status)
             if direct != restored:
                 raise RuntimeError("source/artifact output mismatch: " + name)
             report["smoke_programs"].append(name)
@@ -165,7 +165,7 @@ def main():
                     guest_args = ["--", fixture, output]
                 elif name == "environment":
                     guest_args = ["--", "argument with spaces", "--gc-stats"]
-                command = [str(executable), "run", str(input_path), "--show-result"] + list(map(str, guest_args))
+                command = [str(executable), "run", str(input_path), "--execution", "interpreter", "--show-result"] + list(map(str, guest_args))
                 result = subprocess.run(command, cwd=source, env=smoke_env,
                                         capture_output=True, text=True, encoding="utf-8", check=True)
                 lines = result.stdout.splitlines()
@@ -185,7 +185,7 @@ def main():
                     raise RuntimeError("file-report output mismatch")
             report["smoke_programs"].append(name)
         run(cargo + ["run", "--locked", "--example", "build_native"] + profile, source, env=env)
-        run([executable, "run", "examples/pinvoke.neoil"], source)
+        run([executable, "run", "examples/pinvoke.neoil", "--execution", "interpreter"], source)
         run(cargo + ["run", "--locked", "--example", "invoke"] + profile, source, env=env)
         report["status"] = "passed"
     except Exception as error:

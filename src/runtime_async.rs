@@ -42,7 +42,7 @@ impl Operations {
     pub(crate) fn create(&mut self, milliseconds: Option<i32>) -> Result<i64, Fault> {
         let operation = match milliseconds {
             Some(ms) if ms < 0 => {
-                return Err(Fault::new("Runtime async delay must be nonnegative"))
+                return Err(Fault::new("Runtime async delay must be nonnegative"));
             }
             Some(ms) => Operation::Timer(Instant::now() + Duration::from_millis(ms as u64)),
             None => Operation::Pending,

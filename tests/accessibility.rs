@@ -193,7 +193,6 @@ fn legacy_defaults_are_public_and_invalid_visibility_is_rejected() {
     );
 }
 
-
 #[test]
 fn nested_generic_types_keep_lexical_private_access_and_independent_parameters() {
     let source = r#"
@@ -227,11 +226,19 @@ ret
     let roundtrip = neoclr::load(&serde_json::to_string(&module).unwrap()).unwrap();
     let program = LoadedProgram::new(&roundtrip).unwrap();
     program.verify().unwrap();
-    assert_eq!(program.run(Limits::default()).unwrap().value, Value::Int32(42));
+    assert_eq!(
+        program.run(Limits::default()).unwrap().value,
+        Value::Int32(42)
+    );
 
     // A matching name does not grant lexical access when the ownership edge is absent.
     let mut unrelated = module.clone();
-    unrelated.types.iter_mut().find(|ty| ty.name == "Owner.Frame").unwrap().declaring_type = None;
+    unrelated
+        .types
+        .iter_mut()
+        .find(|ty| ty.name == "Owner.Frame")
+        .unwrap()
+        .declaring_type = None;
     assert!(LoadedProgram::new(&unrelated).unwrap().verify().is_err());
     let invalid = source.replace("Frame<T,U>", "Frame<U>");
     assert!(assemble(&invalid).and_then(|m| neoclr::verify(&m)).is_err());

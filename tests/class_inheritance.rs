@@ -304,8 +304,18 @@ ldc.i4 42
 ret
 .end
 "#;
-    assert!(assemble(source).unwrap_err().message.contains("sealed class cannot be inherited"));
+    assert!(
+        assemble(source)
+            .unwrap_err()
+            .message
+            .contains("sealed class cannot be inherited")
+    );
     let mut m = assemble(&source.replace(".sealed\n", "")).unwrap();
     m.types[0].is_sealed = true;
-    assert!(verify(&m).unwrap_err().message.contains("sealed class cannot be inherited"));
+    assert!(
+        verify(&m)
+            .unwrap_err()
+            .message
+            .contains("sealed class cannot be inherited")
+    );
 }

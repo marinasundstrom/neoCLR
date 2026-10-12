@@ -10,6 +10,8 @@ use std::{
 };
 
 type Scope<'a> = Option<(&'a str, Option<&'a str>)>;
+type FriendScope = (Option<String>, Option<usize>);
+
 #[derive(Debug, Default)]
 pub(crate) struct Cache(OnceLock<Index>);
 // Module is mutable input; a clone must never inherit decisions from an old snapshot.
@@ -20,7 +22,7 @@ impl Clone for Cache {
 }
 #[derive(Debug, Default)]
 struct Index {
-    scopes: HashMap<String, Vec<(Option<String>, Option<usize>)>>,
+    scopes: HashMap<String, Vec<FriendScope>>,
     grants: HashSet<(usize, usize)>,
 }
 impl Index {

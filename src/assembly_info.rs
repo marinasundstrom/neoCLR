@@ -33,8 +33,16 @@ impl Query {
             "neoCLR.Runtime.ModuleTypes" => {
                 (Self::ModuleTypes, 2, "System.Introspection.TypeInfo[]")
             }
-            "neoCLR.Runtime.ModuleFunctions" => (Self::ModuleFunctions, 2, "System.Introspection.MethodInfo[]"),
-            "neoCLR.Runtime.ModuleMemberCustomAttributes" => (Self::ModuleMemberAttributes, 3, "System.Introspection.CustomAttributeData[]"),
+            "neoCLR.Runtime.ModuleFunctions" => (
+                Self::ModuleFunctions,
+                2,
+                "System.Introspection.MethodInfo[]",
+            ),
+            "neoCLR.Runtime.ModuleMemberCustomAttributes" => (
+                Self::ModuleMemberAttributes,
+                3,
+                "System.Introspection.CustomAttributeData[]",
+            ),
             _ => return None,
         })
     }
@@ -89,18 +97,35 @@ impl Query {
             ),
             Self::ModuleFunctions => crate::reflection::array(
                 "System.Introspection.MethodInfo",
-                module_functions(module, identity, selected_module.ok_or_else(|| Fault::new("module name required"))?)?
-                    .into_iter().map(|function| crate::reflection::module_function_snapshot(module, function, source)),
+                module_functions(
+                    module,
+                    identity,
+                    selected_module.ok_or_else(|| Fault::new("module name required"))?,
+                )?
+                .into_iter()
+                .map(|function| {
+                    crate::reflection::module_function_snapshot(module, function, source)
+                }),
                 limits,
             ),
             Self::ModuleMemberAttributes => {
-                let Some(Value::Int32(token)) = args.get(2) else { return Err(Fault::new("module member token requires Int32")); };
-                let functions = module_functions(module, identity, selected_module.ok_or_else(|| Fault::new("module name required"))?)?;
+                let Some(Value::Int32(token)) = args.get(2) else {
+                    return Err(Fault::new("module member token requires Int32"));
+                };
+                let functions = module_functions(
+                    module,
+                    identity,
+                    selected_module.ok_or_else(|| Fault::new("module name required"))?,
+                )?;
                 let mut matches = Vec::new();
                 for function in functions {
-                    if crate::metadata_tokens::method(function)? == *token { matches.push(function); }
+                    if crate::metadata_tokens::method(function)? == *token {
+                        matches.push(function);
+                    }
                 }
-                if matches.len() != 1 { return Err(Fault::new("missing or ambiguous module member token")); }
+                if matches.len() != 1 {
+                    return Err(Fault::new("missing or ambiguous module member token"));
+                }
                 crate::reflection::module_function_attributes(module, matches[0], source)
             }
             Self::Types | Self::ModuleTypes => {
@@ -265,17 +290,28 @@ pub(crate) fn module_functions<'a>(
     name: &str,
 ) -> Result<Vec<&'a crate::metadata::Function>, Fault> {
     let assembly = lookup(module, identity)?;
-    if !module_names(module, assembly)?.iter().any(|candidate| candidate == name) {
+    if !module_names(module, assembly)?
+        .iter()
+        .any(|candidate| candidate == name)
+    {
         return Err(Fault::new("module does not belong to assembly"));
     }
     let mut functions = Vec::new();
     let mut definitions = std::collections::HashSet::new();
     for function in &module.functions {
-        if function.owner.is_some() || function.namespace != name || !function.generic_arguments.is_empty() {
+        if function.owner.is_some()
+            || function.namespace != name
+            || !function.generic_arguments.is_empty()
+        {
             continue;
         }
         let belongs = function.origin.as_ref().map_or_else(
-            || function.definition.as_ref().is_some_and(|id| assembly.modules.contains(&id.module)),
+            || {
+                function
+                    .definition
+                    .as_ref()
+                    .is_some_and(|id| assembly.modules.contains(&id.module))
+            },
             |origin| origin.assembly == identity,
         );
         if !belongs {
@@ -283,7 +319,9 @@ pub(crate) fn module_functions<'a>(
         }
         // Reuse ownership validation, including ambiguous legacy physical scopes.
         function_module_value(module, function)?;
-        let definition = function.definition.as_ref()
+        let definition = function
+            .definition
+            .as_ref()
             .ok_or_else(|| Fault::new("module function requires definition identity"))?;
         if !definitions.insert(definition.clone()) {
             return Err(Fault::new("duplicate module function definition identity"));
@@ -432,9 +470,11 @@ mod tests {
             Value::String("Package".into()),
             Value::String("Acme".into()),
         ];
-        assert!(Query::ModuleTypes
-            .invoke(&module, &args, &Limits::default())
-            .is_err());
+        assert!(
+            Query::ModuleTypes
+                .invoke(&module, &args, &Limits::default())
+                .is_err()
+        );
         let args = [
             Value::String("Package".into()),
             Value::String("Acme.Empty".into()),
@@ -467,7 +507,9 @@ mod tests {
                 );
             }
             assert!(crate::native_metadata::module_assembly(&module, "Package", "Acme").is_err());
-            assert!(crate::native_metadata::module_assembly(&module, "Missing", &names[0]).is_err());
+            assert!(
+                crate::native_metadata::module_assembly(&module, "Missing", &names[0]).is_err()
+            );
             assert!(crate::native_metadata::assembly_name(&module, "Missing").is_err());
         }
         let root_args = [
@@ -502,7 +544,9 @@ mod tests {
             function.origin = Some(origin("Package", &format!("Function{index}")));
             function.namespace = "Example".into();
             // Discovery must not execute even an unconditionally failing body.
-            function.body = vec![crate::metadata::Instruction::Fault("must not execute".into())];
+            function.body = vec![crate::metadata::Instruction::Fault(
+                "must not execute".into(),
+            )];
         }
         module.functions[1].generic_parameters = vec![Some("T".into())];
         module.functions[1].visibility = crate::metadata::Visibility::Private;
@@ -518,7 +562,11 @@ mod tests {
     #[test]
     fn module_functions_preserve_source_order_and_exact_namespace_ownership() {
         let mut module = function_catalog();
-        let expected: Vec<_> = module.functions.iter().map(|f| f.definition.clone().unwrap()).collect();
+        let expected: Vec<_> = module
+            .functions
+            .iter()
+            .map(|f| f.definition.clone().unwrap())
+            .collect();
         let seed = module.functions[0].clone();
         for index in 0..4 {
             let mut excluded = seed.clone();
@@ -531,16 +579,38 @@ mod tests {
             module.functions.push(excluded);
         }
         let selected = module_functions(&module, "Package", "Example").unwrap();
-        assert_eq!(selected.iter().map(|f| f.definition.clone().unwrap()).collect::<Vec<_>>(), expected);
+        assert_eq!(
+            selected
+                .iter()
+                .map(|f| f.definition.clone().unwrap())
+                .collect::<Vec<_>>(),
+            expected
+        );
         assert_eq!(selected[1].generic_parameters.len(), 1);
-        assert_eq!(module_functions(&module, "Other", "Example").unwrap().len(), 1);
-        assert_eq!(module_functions(&module, "Package", "Example.Child").unwrap().len(), 1);
-        assert!(module_functions(&module, "Package", "Empty").unwrap().is_empty());
+        assert_eq!(
+            module_functions(&module, "Other", "Example").unwrap().len(),
+            1
+        );
+        assert_eq!(
+            module_functions(&module, "Package", "Example.Child")
+                .unwrap()
+                .len(),
+            1
+        );
+        assert!(
+            module_functions(&module, "Package", "Empty")
+                .unwrap()
+                .is_empty()
+        );
         assert!(module_functions(&module, "Package", "").unwrap().is_empty());
         assert!(module_functions(&module, "Package", "Exam").is_err());
         assert!(module_functions(&module, "Missing", "Example").is_err());
         #[cfg(feature = "native-metadata")]
-        assert_eq!(crate::native_metadata::module_function_definitions(&module, "Package", "Example").unwrap(), expected);
+        assert_eq!(
+            crate::native_metadata::module_function_definitions(&module, "Package", "Example")
+                .unwrap(),
+            expected
+        );
     }
 
     #[test]
@@ -548,18 +618,45 @@ mod tests {
         let module = function_catalog();
         let mut missing = module.clone();
         missing.functions[0].definition = None;
-        assert!(module_functions(&missing, "Package", "Example").unwrap_err().to_string().contains("definition identity"));
+        assert!(
+            module_functions(&missing, "Package", "Example")
+                .unwrap_err()
+                .to_string()
+                .contains("definition identity")
+        );
         let mut duplicate = module.clone();
         duplicate.functions.push(duplicate.functions[0].clone());
-        assert!(module_functions(&duplicate, "Package", "Example").unwrap_err().to_string().contains("duplicate"));
+        assert!(
+            module_functions(&duplicate, "Package", "Example")
+                .unwrap_err()
+                .to_string()
+                .contains("duplicate")
+        );
         let mut legacy = module.clone();
-        for function in &mut legacy.functions { function.origin = None; }
-        assert!(module_functions(&legacy, "Package", "Example").unwrap_err().to_string().contains("ambiguous physical"));
+        for function in &mut legacy.functions {
+            function.origin = None;
+        }
+        assert!(
+            module_functions(&legacy, "Package", "Example")
+                .unwrap_err()
+                .to_string()
+                .contains("ambiguous physical")
+        );
         legacy.assemblies.pop();
         legacy.assemblies[0].declaration_modules = None;
-        assert_eq!(module_functions(&legacy, "Package", "Example").unwrap().len(), 2);
+        assert_eq!(
+            module_functions(&legacy, "Package", "Example")
+                .unwrap()
+                .len(),
+            2
+        );
         #[cfg(feature = "native-metadata")]
-        assert!(crate::native_metadata::module_function_definitions(&legacy, "Package", "Example").unwrap_err().to_string().contains("explicit declaration"));
+        assert!(
+            crate::native_metadata::module_function_definitions(&legacy, "Package", "Example")
+                .unwrap_err()
+                .to_string()
+                .contains("explicit declaration")
+        );
     }
 
     #[test]

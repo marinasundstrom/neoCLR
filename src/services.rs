@@ -282,7 +282,10 @@ pub(crate) fn uses(module: &crate::Module, function: &Function) -> Result<Vec<Se
             });
         }
         if matches!(&binding, crate::native::Binding::Tls(_)) {
-            uses.push(ServiceUse { service: RuntimeService::ManagedHeap, instruction: None });
+            uses.push(ServiceUse {
+                service: RuntimeService::ManagedHeap,
+                instruction: None,
+            });
         }
         if matches!(
             &binding,

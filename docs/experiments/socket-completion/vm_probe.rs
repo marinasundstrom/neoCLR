@@ -329,7 +329,10 @@ fn vm_rejects_invalid_receive_ranges_and_missing_dispatcher_before_consuming_soc
             &format!("ldc.i4 {offset}\nldc.i4 {count}\nldloc buffer"),
         );
         if !dispatcher {
-            types = types.replace("call System.Concurrency.Tasks.TaskQueue::get_Default()\npop", "");
+            types = types.replace(
+                "call System.Concurrency.Tasks.TaskQueue::get_Default()\npop",
+                "",
+            );
         }
         let fault = execute_types(
             "call Launch()\npop\nldstr \"entry\"",

@@ -158,7 +158,6 @@ fn reserved_output_is_initialized_but_uninitialized_input_faults() {
         .resolve_function(&parse_function_ref("Run()").unwrap())
         .unwrap()
         .invoke(vec![], Limits::default())
-        .err()
-        .expect("uninitialized input must fault");
+        .expect_err("uninitialized input must fault");
     assert!(error.message.contains("initialized"), "{error:?}");
 }

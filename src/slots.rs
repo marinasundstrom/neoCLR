@@ -569,7 +569,10 @@ impl SlotReference {
         // for each byte written to a large buffer. Assignment epochs still advance.
         let byte_leaf = matches!(
             (&*field, &value),
-            (Value::Byte(_) | Value::Uninitialized(Type::Byte), Value::Byte(_))
+            (
+                Value::Byte(_) | Value::Uninitialized(Type::Byte),
+                Value::Byte(_)
+            )
         );
         *field = value;
         if !byte_leaf {
@@ -767,10 +770,13 @@ mod tests {
     #[test]
     fn byte_array_writes_preserve_quotas_initialization_and_output_epochs() {
         let size = std::mem::size_of::<Value>();
-        let cell = Slot::cell(Type::Array(Box::new(Type::Byte)), Some(Value::Array {
-            element: Type::Byte,
-            elements: vec![Value::Uninitialized(Type::Byte); 3],
-        }));
+        let cell = Slot::cell(
+            Type::Array(Box::new(Type::Byte)),
+            Some(Value::Array {
+                element: Type::Byte,
+                elements: vec![Value::Uninitialized(Type::Byte); 3],
+            }),
+        );
         let root = SlotReference::new(&cell);
         let first = root.element(0, &Type::Byte).unwrap();
         let second = root.element(1, &Type::Byte).unwrap();

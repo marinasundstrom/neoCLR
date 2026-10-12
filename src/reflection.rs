@@ -1123,7 +1123,9 @@ pub(crate) fn module_function_snapshot(
     source: bool,
 ) -> Result<Value, Fault> {
     if target.owner.is_some() || target.instance {
-        return Err(Fault::new("module function snapshot requires a static ownerless definition"));
+        return Err(Fault::new(
+            "module function snapshot requires a static ownerless definition",
+        ));
     }
     let context = QueryContext { module, source };
     // Reuse the bound-function signature key privately. It is not a declaring type.
@@ -1137,21 +1139,32 @@ pub(crate) fn module_function_snapshot(
     let mut result = method(&context, &shape, target, &[], &Limits::default())?;
     if let Value::Object { fields, .. } = &mut result {
         fields[1] = Value::NullObjectReference(Type::from_name("System.Introspection.TypeInfo"));
-        fields[3] = option(&context, "System.Introspection.ModuleInfo",
-            Some(crate::assembly_info::function_module_value(module, target)?))?;
+        fields[3] = option(
+            &context,
+            "System.Introspection.ModuleInfo",
+            Some(crate::assembly_info::function_module_value(module, target)?),
+        )?;
     }
     Ok(result)
 }
 
 /// Method-level annotations only; parameter/return annotations are separate targets.
-pub(crate) fn module_function_attributes(module: &Module, target: &Function, source: bool) -> Result<Value, Fault> {
+pub(crate) fn module_function_attributes(
+    module: &Module,
+    target: &Function,
+    source: bool,
+) -> Result<Value, Fault> {
     let context = QueryContext { module, source };
     let token = crate::metadata_tokens::method(target)? as u32;
-    array("System.Introspection.CustomAttributeData",
-        target.custom_attributes.iter()
+    array(
+        "System.Introspection.CustomAttributeData",
+        target
+            .custom_attributes
+            .iter()
             .filter(|attribute| attribute.target_token.is_none_or(|target| target == token))
             .map(|attribute| attribute_data(&context, attribute, &Limits::default())),
-        &Limits::default())
+        &Limits::default(),
+    )
 }
 
 /// The binding's target descriptor, never the signature's synthesized Invoke.

@@ -36,7 +36,9 @@ fn region(module: &Module, function: &Function) -> bool {
             member(function),
             "Complete" | "Cancel" | "Register" | "Read" | "Completed" | "Cancelled"
         ),
-        Some("System.Concurrency.Tasks.Task") => matches!(member(function), "get_State" | "get_Outcome"),
+        Some("System.Concurrency.Tasks.Task") => {
+            matches!(member(function), "get_State" | "get_Outcome")
+        }
         Some("System.Concurrency.Tasks.TaskQueue") => {
             matches!(member(function), "Post" | "Run" | "Drain" | "get_Default")
         }

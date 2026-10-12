@@ -402,10 +402,12 @@ ret
             object_view: false,
             identity: std::sync::Arc::new(()),
             ty: crate::assembler::parse_type("fn<Void>").unwrap(),
-            target: Some(crate::assembler::parse_function_ref(
-                "instance System.Concurrency.Tasks.TaskQueue::Drain()",
-            )
-            .unwrap()),
+            target: Some(
+                crate::assembler::parse_function_ref(
+                    "instance System.Concurrency.Tasks.TaskQueue::Drain()",
+                )
+                .unwrap(),
+            ),
             native: None,
             receiver: Some(Box::new(queue.clone())),
         });
@@ -1198,7 +1200,10 @@ ret
     ));
     assert!(frames.is_empty());
     assert_eq!(state.parked_activations.len(), 1);
-    assert_eq!(state.parked_activations[0].frames[0].stack, vec![Value::Int32(10)]);
+    assert_eq!(
+        state.parked_activations[0].frames[0].stack,
+        vec![Value::Int32(10)]
+    );
     let remaining = state.budget.remaining();
     assert!(matches!(
         step(&mut state, &mut frames),

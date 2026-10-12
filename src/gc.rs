@@ -223,7 +223,9 @@ impl ManagedHeap {
     ) -> Result<(), Fault> {
         let roots = pending.len();
         for (&owner, values) in &dependents {
-            if !self.objects.contains_key(&owner) || values.iter().any(|id| !self.objects.contains_key(id)) {
+            if !self.objects.contains_key(&owner)
+                || values.iter().any(|id| !self.objects.contains_key(id))
+            {
                 return Err(Fault::new("invalid conditional heap reference"));
             }
         }

@@ -1994,7 +1994,9 @@ fn drive_instructions(
                 Ok(InstructionProgress::Waiting) => {
                     drop(heap);
                     if state.foreign_depth != 0 {
-                        break Err(Fault::new("native callback cannot suspend managed execution"));
+                        break Err(Fault::new(
+                            "native callback cannot suspend managed execution",
+                        ));
                     }
                     if !state.parked_activations.is_empty() {
                         let timeout = state
@@ -2296,7 +2298,10 @@ fn frame_array_usage(
     if let Some(value) = result {
         crate::arrays::measure(value, &mut usage, limits)?;
     }
-    for frame in frames.iter().chain(parked.iter().flat_map(|activation| &activation.frames)) {
+    for frame in frames
+        .iter()
+        .chain(parked.iter().flat_map(|activation| &activation.frames))
+    {
         for cell in frame
             .args
             .iter()
@@ -2330,8 +2335,17 @@ fn interpret_instructions(
     // Lock order is graph -> dispatch. Parking, joining and host I/O hold neither.
     let mut dispatch = invocation.dispatch.lock().expect("dispatch lock poisoned");
     dispatch.bind(heap)?;
-    reap_async(heap, &mut state.parked_activations, &mut state.async_operations);
-    let initial = frame_array_usage(frames, &state.parked_activations, state.invocation_result.as_ref(), &invocation.limits)?;
+    reap_async(
+        heap,
+        &mut state.parked_activations,
+        &mut state.async_operations,
+    );
+    let initial = frame_array_usage(
+        frames,
+        &state.parked_activations,
+        state.invocation_result.as_ref(),
+        &invocation.limits,
+    )?;
     heap.publish_arrays(initial, state.arrays_used);
     let result = interpret_instructions_with_dispatch(
         module,
@@ -2347,8 +2361,12 @@ fn interpret_instructions(
         &mut dispatch,
     );
     let publication = dispatch.publish(heap).and_then(|_| {
-        let mut usage =
-            frame_array_usage(frames, &state.parked_activations, state.invocation_result.as_ref(), &invocation.limits)?;
+        let mut usage = frame_array_usage(
+            frames,
+            &state.parked_activations,
+            state.invocation_result.as_ref(),
+            &invocation.limits,
+        )?;
         if let Some(value) = &state.completion_boundary {
             crate::arrays::measure(value, &mut usage, &invocation.limits)?;
         }
@@ -2380,15 +2398,27 @@ fn interpret_instructions(
                 _ => {}
             }
             heap.collect(roots, crate::CollectionReason::AllocationPressure)?;
-            reap_async(heap, &mut state.parked_activations, &mut state.async_operations);
-            let mut usage = frame_array_usage(frames, &state.parked_activations,
-                state.invocation_result.as_ref(), &invocation.limits)?;
+            reap_async(
+                heap,
+                &mut state.parked_activations,
+                &mut state.async_operations,
+            );
+            let mut usage = frame_array_usage(
+                frames,
+                &state.parked_activations,
+                state.invocation_result.as_ref(),
+                &invocation.limits,
+            )?;
             if let Some(value) = &state.completion_boundary {
                 crate::arrays::measure(value, &mut usage, &invocation.limits)?;
             }
             match &result {
-                Ok(InstructionProgress::Completed(value)) => crate::arrays::measure(value, &mut usage, &invocation.limits)?,
-                Ok(InstructionProgress::HostCall(call)) => call.array_usage(&mut usage, &invocation.limits)?,
+                Ok(InstructionProgress::Completed(value)) => {
+                    crate::arrays::measure(value, &mut usage, &invocation.limits)?
+                }
+                Ok(InstructionProgress::HostCall(call)) => {
+                    call.array_usage(&mut usage, &invocation.limits)?
+                }
                 _ => {}
             }
             heap.publish_arrays(usage, state.arrays_used);
@@ -2419,7 +2449,11 @@ fn runtime_submission_frame(module: &Module, callback: &Value) -> Result<Frame, 
     let callee = resolve(module, binding.managed_target()?)?;
     crate::function_objects::compatible(&contract, &callee)?;
     callback.ensure_heap_references()?;
-    let args = binding.receiver.iter().map(|receiver| (**receiver).clone()).collect();
+    let args = binding
+        .receiver
+        .iter()
+        .map(|receiver| (**receiver).clone())
+        .collect();
     let mut frame = Frame::new(callee, args)?;
     frame.runtime_callback = true;
     Ok(frame)
@@ -2487,20 +2521,28 @@ fn interpret_instructions_with_dispatch(
             // Entry draining must not occupy the active stack while retained
             // callbacks are runnable. Preserve its caller chain as an unowned
             // activation, restored only after the other work has drained.
-            if *entry_drain_active && yield_boundaries.is_empty()
+            if *entry_drain_active
+                && yield_boundaries.is_empty()
                 && frames.last().is_some_and(|frame| frame.entry_drain_wait)
             {
                 parked_activations.push(ParkedActivation {
                     boundary: RuntimeAsyncBoundary {
-                        depth: frames.len(), dispatched: true, no_result: false,
-                        operation: None, started: None,
+                        depth: frames.len(),
+                        dispatched: true,
+                        no_result: false,
+                        operation: None,
+                        started: None,
                         observation: RuntimeAsyncObservation::Unit,
                     },
-                    frames: std::mem::take(frames), callback: false,
+                    frames: std::mem::take(frames),
+                    callback: false,
                 });
             }
             if frames.is_empty() && yield_boundaries.is_empty() && !parked_activations.is_empty() {
-                if active_callback.take() == Some(false) && invocation_result.is_none() && !*entry_drain_active {
+                if active_callback.take() == Some(false)
+                    && invocation_result.is_none()
+                    && !*entry_drain_active
+                {
                     *invocation_result = Some(value.clone());
                 }
                 options.check_cancellation("RuntimeAsync.Dispatch", 0)?;
@@ -2617,7 +2659,10 @@ fn interpret_instructions_with_dispatch(
                 }
                 continue;
             }
-            if frames.is_empty() && active_callback.take() == Some(true) && invocation_result.is_none() {
+            if frames.is_empty()
+                && active_callback.take() == Some(true)
+                && invocation_result.is_none()
+            {
                 return Err(Fault::new("Runtime async callback lost entry activation"));
             }
             if (*foreign_depth != 0 && frames.is_empty() && yield_boundaries.is_empty())
@@ -2653,7 +2698,9 @@ fn interpret_instructions_with_dispatch(
             // Post frame, then drained on this invocation and instruction budget.
             if !*entry_drain_active
                 && invocation_result.is_none()
-                && !parked_activations.iter().any(|activation| !activation.callback)
+                && !parked_activations
+                    .iter()
+                    .any(|activation| !activation.callback)
             {
                 *invocation_result = Some(value.clone());
             }
@@ -2662,7 +2709,11 @@ fn interpret_instructions_with_dispatch(
             let queue_is_draining = default_task_queue.as_ref().is_some_and(|queue| {
                 frames
                     .iter()
-                    .chain(parked_activations.iter().flat_map(|activation| &activation.frames))
+                    .chain(
+                        parked_activations
+                            .iter()
+                            .flat_map(|activation| &activation.frames),
+                    )
                     .any(|frame| {
                         frame.function.owner.as_ref() == Some(&queue.ty())
                             && task_queue::member(&frame.function) == "Drain"
@@ -2744,8 +2795,12 @@ fn interpret_instructions_with_dispatch(
                 *completion_boundary = Some(value);
                 continue;
             }
-            if *entry_drain_active && parked_activations.len() == 1
-                && parked_activations[0].frames.last().is_some_and(|frame| frame.entry_drain_wait)
+            if *entry_drain_active
+                && parked_activations.len() == 1
+                && parked_activations[0]
+                    .frames
+                    .last()
+                    .is_some_and(|frame| frame.entry_drain_wait)
             {
                 *frames = parked_activations.pop().unwrap().frames;
                 *active_callback = Some(false);
@@ -2800,16 +2855,27 @@ fn interpret_instructions_with_dispatch(
         }
 
         if *arrays_used || heap.arrays_used() {
-            let check =
-                |frames: &[Frame], parked_activations: &[ParkedActivation], heap: &crate::shared_heap::Access<'_>| -> Result<(), Fault> {
-                    let usage =
-                        frame_array_usage(frames, parked_activations, invocation_result.as_ref(), &invocation.limits)?;
-                    heap.check_arrays(usage, &invocation.limits)
-                };
+            let check = |frames: &[Frame],
+                         parked_activations: &[ParkedActivation],
+                         heap: &crate::shared_heap::Access<'_>|
+             -> Result<(), Fault> {
+                let usage = frame_array_usage(
+                    frames,
+                    parked_activations,
+                    invocation_result.as_ref(),
+                    &invocation.limits,
+                )?;
+                heap.check_arrays(usage, &invocation.limits)
+            };
             if check(frames, parked_activations, heap).is_err() {
-                let roots = execution_roots(frames, parked_activations,
-                async_operations, scheduler,
-                    default_task_queue.as_ref(), invocation_result.as_ref());
+                let roots = execution_roots(
+                    frames,
+                    parked_activations,
+                    async_operations,
+                    scheduler,
+                    default_task_queue.as_ref(),
+                    invocation_result.as_ref(),
+                );
                 heap.collect(roots, crate::CollectionReason::AllocationPressure)?;
                 reap_async(heap, parked_activations, async_operations);
                 check(frames, parked_activations, heap).map_err(|mut error| {
@@ -3256,7 +3322,11 @@ fn interpret_instructions_with_dispatch(
                                 ));
                             }
                             host_call = Some(HostCall::indirect(
-                                call.clone(), args, executing_assembly.clone(), context.clone(), pc,
+                                call.clone(),
+                                args,
+                                executing_assembly.clone(),
+                                context.clone(),
+                                pc,
                             ));
                             return Ok(None);
                         }
@@ -3937,13 +4007,19 @@ fn interpret_instructions_with_dispatch(
                     let Value::Pointer(pointer) = frame.pop()? else {
                         return Err(Fault::new("native binding requires a function pointer"));
                     };
-                    let libraries = invocation.native_libraries.lock()
+                    let libraries = invocation
+                        .native_libraries
+                        .lock()
                         .expect("native library lock poisoned");
-                    let libraries = libraries.as_ref().ok_or_else(|| Fault::new(
-                        "native Function binding requires trusted run_with_native execution",
-                    ))?;
+                    let libraries = libraries.as_ref().ok_or_else(|| {
+                        Fault::new(
+                            "native Function binding requires trusted run_with_native execution",
+                        )
+                    })?;
                     let call = libraries.bind_pointer(module, function_type, abi, &pointer)?;
-                    frame.stack.push(crate::function_objects::bind_native(function_type, call));
+                    frame
+                        .stack
+                        .push(crate::function_objects::bind_native(function_type, call));
                 }
                 Op::BindFunction {
                     function_type,
@@ -4177,24 +4253,43 @@ fn interpret_instructions_with_dispatch(
                         }
                         if matches!(binding, crate::native::Binding::StackTraceCapture) {
                             let [Value::Int32(skip)] = args.as_slice() else {
-                                return Err(Fault::new("stack capture requires an Int32 skip count"));
+                                return Err(Fault::new(
+                                    "stack capture requires an Int32 skip count",
+                                ));
                             };
-                            if *skip < 0 { return Err(Fault::new("stack capture skip count must be nonnegative")); }
+                            if *skip < 0 {
+                                return Err(Fault::new(
+                                    "stack capture skip count must be nonnegative",
+                                ));
+                            }
                             let mut active_frames = frames.iter().rev().skip(*skip as usize);
                             let mut text = String::new();
                             let mut truncated = false;
-                            for active in active_frames.by_ref().take(crate::StackTrace::MAX_FRAMES) {
-                                let name = active.function.origin.as_ref()
-                                    .and_then(|o| o.full_name.as_deref()).unwrap_or(&active.function.name);
+                            for active in active_frames.by_ref().take(crate::StackTrace::MAX_FRAMES)
+                            {
+                                let name = active
+                                    .function
+                                    .origin
+                                    .as_ref()
+                                    .and_then(|o| o.full_name.as_deref())
+                                    .unwrap_or(&active.function.name);
                                 let name = crate::diagnostic_function_name(name);
-                                let line = format!("   at {} [instruction {}]\n", name, active.trace_pc);
-                                if text.len() + line.len() > 65536 - 29 { truncated = true; break; }
+                                let line =
+                                    format!("   at {} [instruction {}]\n", name, active.trace_pc);
+                                if text.len() + line.len() > 65536 - 29 {
+                                    truncated = true;
+                                    break;
+                                }
                                 text.push_str(&line);
                             }
                             if truncated || active_frames.next().is_some() {
                                 text.push_str("   ... stack trace truncated\n");
                             }
-                            frames.last_mut().unwrap().stack.push(Value::String(text.into()));
+                            frames
+                                .last_mut()
+                                .unwrap()
+                                .stack
+                                .push(Value::String(text.into()));
                             return Ok(None);
                         }
 
@@ -4221,14 +4316,22 @@ fn interpret_instructions_with_dispatch(
                             return Ok(None);
                         }
 
-                        if matches!(binding, crate::native::Binding::SchedulerRegister
-                            | crate::native::Binding::SchedulerActivate | crate::native::Binding::SchedulerCancel) {
+                        if matches!(
+                            binding,
+                            crate::native::Binding::SchedulerRegister
+                                | crate::native::Binding::SchedulerActivate
+                                | crate::native::Binding::SchedulerCancel
+                        ) {
                             let Value::Int64(id) = args.remove(0) else {
                                 return Err(Fault::new("Invalid scheduler registration argument"));
                             };
                             let result = match binding {
-                                crate::native::Binding::SchedulerRegister => Value::Int64(scheduler.register(id, args.remove(0))?),
-                                crate::native::Binding::SchedulerActivate => Value::Boolean(scheduler.activate(id)),
+                                crate::native::Binding::SchedulerRegister => {
+                                    Value::Int64(scheduler.register(id, args.remove(0))?)
+                                }
+                                crate::native::Binding::SchedulerActivate => {
+                                    Value::Boolean(scheduler.activate(id))
+                                }
                                 _ => Value::Boolean(scheduler.cancel_registration(id)),
                             };
                             frames.last_mut().unwrap().stack.push(result);
@@ -4236,7 +4339,11 @@ fn interpret_instructions_with_dispatch(
                         }
                         if matches!(binding, crate::native::Binding::SchedulerCapture) {
                             let destination = scheduler.capture_destination()?;
-                            frames.last_mut().unwrap().stack.push(Value::Int64(destination));
+                            frames
+                                .last_mut()
+                                .unwrap()
+                                .stack
+                                .push(Value::Int64(destination));
                             return Ok(None);
                         }
                         if matches!(binding, crate::native::Binding::SchedulerSubmitTo) {
@@ -4263,8 +4370,12 @@ fn interpret_instructions_with_dispatch(
                                 default_task_queue.as_ref(),
                                 invocation_result.as_ref(),
                             ))?;
-                            let usage =
-                                frame_array_usage(frames, parked_activations, invocation_result.as_ref(), &limits)?;
+                            let usage = frame_array_usage(
+                                frames,
+                                parked_activations,
+                                invocation_result.as_ref(),
+                                &limits,
+                            )?;
                             heap.publish_arrays(usage, *arrays_used);
                             guest_work::submit(
                                 std::sync::Arc::new(module.clone()),
@@ -4277,14 +4388,20 @@ fn interpret_instructions_with_dispatch(
                             return Ok(None);
                         }
 
-                        if matches!(binding, crate::native::Binding::RuntimeAsyncStart | crate::native::Binding::RuntimeAsyncStartManaged) {
+                        if matches!(
+                            binding,
+                            crate::native::Binding::RuntimeAsyncStart
+                                | crate::native::Binding::RuntimeAsyncStartManaged
+                        ) {
                             if work_control.is_some() || task_atomic::active(module, frames) {
                                 return Err(Fault::new(
                                     "Runtime async is not supported in task mutation or worker execution",
                                 ));
                             }
-                            let managed = matches!(binding, crate::native::Binding::RuntimeAsyncStartManaged);
-                            let mut body = runtime_submission_frame(module, &args[usize::from(managed)])?;
+                            let managed =
+                                matches!(binding, crate::native::Binding::RuntimeAsyncStartManaged);
+                            let mut body =
+                                runtime_submission_frame(module, &args[usize::from(managed)])?;
                             if managed {
                                 if !matches!(args[0], Value::ObjectReference(_)) {
                                     return Err(Fault::new("Managed body requires a heap owner"));
@@ -4328,11 +4445,18 @@ fn interpret_instructions_with_dispatch(
                                 ));
                             }
                             let result = match (binding, args.as_slice()) {
-                                (crate::native::Binding::RuntimeAsyncCurrentOwner, []) => {
-                                    frames.iter().rev().find(|frame| frame.runtime_callback)
-                                        .and_then(|frame| frame.async_owner.clone()).unwrap_or(Value::NullObjectReference(Type::Named("System.Object".into())))
-                                }
-                                (crate::native::Binding::RuntimeAsyncCreateOwned, [value @ Value::ObjectReference(_)]) => {
+                                (crate::native::Binding::RuntimeAsyncCurrentOwner, []) => frames
+                                    .iter()
+                                    .rev()
+                                    .find(|frame| frame.runtime_callback)
+                                    .and_then(|frame| frame.async_owner.clone())
+                                    .unwrap_or(Value::NullObjectReference(Type::Named(
+                                        "System.Object".into(),
+                                    ))),
+                                (
+                                    crate::native::Binding::RuntimeAsyncCreateOwned,
+                                    [value @ Value::ObjectReference(_)],
+                                ) => {
                                     let mut ids = Vec::new();
                                     crate::gc::trace(value, &mut ids);
                                     let id = async_operations.create(None)?;
@@ -4349,37 +4473,54 @@ fn interpret_instructions_with_dispatch(
                                     crate::native::Binding::RuntimeAsyncComplete,
                                     [Value::Int64(id), Value::Int32(value)],
                                 ) => Value::Boolean(async_operations.complete(*id, *value)),
-                                (crate::native::Binding::RuntimeAsyncCompleteUnit, [Value::Int64(id)]) => {
-                                    Value::Boolean(async_operations.complete_unit(*id))
-                                }
-                                (crate::native::Binding::RuntimeAsyncCancel, [Value::Int64(id)]) => {
-                                    Value::Boolean(async_operations.cancel(*id))
-                                }
-                                (crate::native::Binding::RuntimeAsyncRelease, [Value::Int64(id)]) => {
-                                    let in_use = yield_boundaries.iter().any(|boundary|
-                                        boundary.operation == Some(*id) || boundary.started == Some(*id))
-                                        || parked_activations.iter().any(|activation| activation.boundary.operation == Some(*id))
-                                        || frames.iter().chain(parked_activations.iter().flat_map(|activation| &activation.frames))
-                                            .any(|frame| frame.async_result == Some(*id));
+                                (
+                                    crate::native::Binding::RuntimeAsyncCompleteUnit,
+                                    [Value::Int64(id)],
+                                ) => Value::Boolean(async_operations.complete_unit(*id)),
+                                (
+                                    crate::native::Binding::RuntimeAsyncCancel,
+                                    [Value::Int64(id)],
+                                ) => Value::Boolean(async_operations.cancel(*id)),
+                                (
+                                    crate::native::Binding::RuntimeAsyncRelease,
+                                    [Value::Int64(id)],
+                                ) => {
+                                    let in_use = yield_boundaries.iter().any(|boundary| {
+                                        boundary.operation == Some(*id)
+                                            || boundary.started == Some(*id)
+                                    }) || parked_activations.iter().any(
+                                        |activation| activation.boundary.operation == Some(*id),
+                                    ) || frames
+                                        .iter()
+                                        .chain(
+                                            parked_activations
+                                                .iter()
+                                                .flat_map(|activation| &activation.frames),
+                                        )
+                                        .any(|frame| frame.async_result == Some(*id));
                                     Value::Boolean(!in_use && async_operations.release(*id))
                                 }
-                                (crate::native::Binding::RuntimeAsyncIsCompleted, [Value::Int64(id)]) => {
-                                    Value::Boolean(async_operations.is_completed(*id)?)
-                                }
-                                (crate::native::Binding::RuntimeAsyncIsCancelled, [Value::Int64(id)]) => {
-                                    Value::Boolean(async_operations.is_cancelled(*id)?)
-                                }
+                                (
+                                    crate::native::Binding::RuntimeAsyncIsCompleted,
+                                    [Value::Int64(id)],
+                                ) => Value::Boolean(async_operations.is_completed(*id)?),
+                                (
+                                    crate::native::Binding::RuntimeAsyncIsCancelled,
+                                    [Value::Int64(id)],
+                                ) => Value::Boolean(async_operations.is_cancelled(*id)?),
                                 (
                                     wait @ (crate::native::Binding::RuntimeAsyncAwait
-                                        | crate::native::Binding::RuntimeAsyncAwaitUnit
-                                        | crate::native::Binding::RuntimeAsyncWaitCompletion),
+                                    | crate::native::Binding::RuntimeAsyncAwaitUnit
+                                    | crate::native::Binding::RuntimeAsyncWaitCompletion),
                                     [Value::Int64(id)],
                                 ) => {
                                     async_operations.validate(*id)?;
                                     // Ordinary calls inherit their runtime body's operation;
                                     // independently dispatched callbacks do not. A pending
                                     // body cannot finish while waiting for its own return.
-                                    let owner = frames.iter().rev()
+                                    let owner = frames
+                                        .iter()
+                                        .rev()
                                         .find(|frame| frame.runtime_callback)
                                         .and_then(|frame| frame.async_result);
                                     if owner == Some(*id) && !async_operations.is_ready(*id) {
@@ -4394,8 +4535,12 @@ fn interpret_instructions_with_dispatch(
                                         operation: Some(*id),
                                         started: None,
                                         observation: match wait {
-                                            crate::native::Binding::RuntimeAsyncAwaitUnit => RuntimeAsyncObservation::Unit,
-                                            crate::native::Binding::RuntimeAsyncWaitCompletion => RuntimeAsyncObservation::Completion,
+                                            crate::native::Binding::RuntimeAsyncAwaitUnit => {
+                                                RuntimeAsyncObservation::Unit
+                                            }
+                                            crate::native::Binding::RuntimeAsyncWaitCompletion => {
+                                                RuntimeAsyncObservation::Completion
+                                            }
                                             _ => RuntimeAsyncObservation::Int32,
                                         },
                                     });
@@ -4424,7 +4569,10 @@ fn interpret_instructions_with_dispatch(
                             return Ok(Some(Value::Void));
                         }
                         if matches!(binding, crate::native::Binding::DrainEntryTasks) {
-                            if *entry_drain_active || work_control.is_some() || !yield_boundaries.is_empty() {
+                            if *entry_drain_active
+                                || work_control.is_some()
+                                || !yield_boundaries.is_empty()
+                            {
                                 return Err(Fault::new(
                                     "Entry task dispatch cannot be nested or run by a task callback",
                                 ));
@@ -4843,9 +4991,15 @@ fn interpret_instructions_with_dispatch(
                     }
                     if let Some(operation) = frame.async_result {
                         match value {
-                            Value::Int32(result) => async_operations.complete_body(operation, result),
+                            Value::Int32(result) => {
+                                async_operations.complete_body(operation, result)
+                            }
                             Value::Void => async_operations.complete_body_unit(operation),
-                            _ => return Err(Fault::new("Runtime async body must return Int32 or unit")),
+                            _ => {
+                                return Err(Fault::new(
+                                    "Runtime async body must return Int32 or unit",
+                                ));
+                            }
                         }
                         if frame.async_owner.is_some() {
                             async_operations.abandon(operation);
@@ -5601,7 +5755,11 @@ fn debug_value(
         Value::Function(binding) => {
             result.value = debug_text(&format!(
                 "Function {}<{:?}>",
-                binding.target.as_ref().map_or("<native>", |t| t.name.as_str()), binding.target.as_ref().map(|t| &t.generic_arguments)
+                binding
+                    .target
+                    .as_ref()
+                    .map_or("<native>", |t| t.name.as_str()),
+                binding.target.as_ref().map(|t| &t.generic_arguments)
             ));
             if let Some(receiver) = &binding.receiver {
                 result.children.push((

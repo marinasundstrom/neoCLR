@@ -276,7 +276,9 @@ pub(crate) fn validate(module: &Module) -> Result<(), Fault> {
             if !text(&binding.native_name)
                 || !text(&binding.name)
                 || binding.arity > 32
-                || binding.declaring_arity.is_some_and(|arity| arity > 32 || binding.declaring.is_none())
+                || binding
+                    .declaring_arity
+                    .is_some_and(|arity| arity > 32 || binding.declaring.is_none())
                 || (!binding.namespace.is_empty() && !text(&binding.namespace))
                 || binding.declaring.as_ref().is_some_and(|d| !text(d))
                 || !bound_assemblies.contains(&binding.assembly)

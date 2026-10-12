@@ -3,8 +3,8 @@ use crate::{Value, metadata::Type};
 use chrono::{LocalResult, TimeZone};
 use chrono_tz::Tz;
 
-use crate::time_zone_rules::{timestamp, ticks};
 pub(crate) use crate::time_zone_rules::{exists, offset};
+use crate::time_zone_rules::{ticks, timestamp};
 pub(crate) fn map_local(id: &str, local_ticks: i64) -> Value {
     // Status: -1 out of range/unknown; 0 gap; 1 unique; 2 ordered overlap.
     let values = match id.parse::<Tz>().ok().zip(timestamp(local_ticks)) {

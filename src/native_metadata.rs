@@ -35,7 +35,9 @@ pub fn element_type(module: &Module, owner: &Type) -> Result<Value, Fault> {
 pub fn declaring_type(module: &Module, owner: &Type) -> Result<Value, Fault> {
     crate::reflection::Query::DeclaringType.invoke_profile(
         module,
-        &[Value::RuntimeTypeHandle(Box::new(crate::type_identity::describe_loaded(module, owner)?))],
+        &[Value::RuntimeTypeHandle(Box::new(
+            crate::type_identity::describe_loaded(module, owner)?,
+        ))],
         &Limits::default(),
         true,
     )
@@ -46,7 +48,9 @@ pub fn declaring_type(module: &Module, owner: &Type) -> Result<Value, Fault> {
 pub fn type_module(module: &Module, owner: &Type) -> Result<Value, Fault> {
     crate::reflection::Query::Module.invoke_profile(
         module,
-        &[Value::RuntimeTypeHandle(Box::new(crate::type_identity::describe_loaded(module, owner)?))],
+        &[Value::RuntimeTypeHandle(Box::new(
+            crate::type_identity::describe_loaded(module, owner)?,
+        ))],
         &Limits::default(),
         true,
     )
@@ -73,8 +77,13 @@ pub fn assembly_name(module: &Module, identity: &str) -> Result<Value, Fault> {
 /// Return a complete explicit logical module catalog, including empty declarations.
 /// Legacy namespace projections cannot establish completeness and are rejected.
 pub fn assembly_modules(module: &Module, identity: &str) -> Result<Value, Fault> {
-    if crate::assembly_info::lookup(module, identity)?.declaration_modules.is_none() {
-        return Err(Fault::new("native module catalog requires explicit declaration metadata"));
+    if crate::assembly_info::lookup(module, identity)?
+        .declaration_modules
+        .is_none()
+    {
+        return Err(Fault::new(
+            "native module catalog requires explicit declaration metadata",
+        ));
     }
     crate::assembly_info::Query::Modules.invoke(
         module,
@@ -91,13 +100,22 @@ pub fn module_function_definitions(
     identity: &str,
     name: &str,
 ) -> Result<Vec<crate::metadata::MemberId>, Fault> {
-    if crate::assembly_info::lookup(module, identity)?.declaration_modules.is_none() {
-        return Err(Fault::new("native module function discovery requires explicit declaration metadata"));
+    if crate::assembly_info::lookup(module, identity)?
+        .declaration_modules
+        .is_none()
+    {
+        return Err(Fault::new(
+            "native module function discovery requires explicit declaration metadata",
+        ));
     }
     crate::assembly_info::module_functions(module, identity, name)?
         .into_iter()
-        .map(|function| function.definition.clone()
-            .ok_or_else(|| Fault::new("module function requires definition identity")))
+        .map(|function| {
+            function
+                .definition
+                .clone()
+                .ok_or_else(|| Fault::new("module function requires definition identity"))
+        })
         .collect()
 }
 
@@ -112,7 +130,8 @@ fn module_function<'a>(
         return Err(Fault::new("function does not belong to assembly module"));
     }
     crate::assembly_info::module_functions(module, identity, name)?
-        .into_iter().find(|function| function.definition.as_ref() == Some(definition))
+        .into_iter()
+        .find(|function| function.definition.as_ref() == Some(definition))
         .ok_or_else(|| Fault::new("missing module function definition"))
 }
 
@@ -124,7 +143,11 @@ pub fn module_function_snapshot(
     name: &str,
     definition: &crate::metadata::MemberId,
 ) -> Result<Value, Fault> {
-    crate::reflection::module_function_snapshot(module, module_function(module, identity, name, definition)?, true)
+    crate::reflection::module_function_snapshot(
+        module,
+        module_function(module, identity, name, definition)?,
+        true,
+    )
 }
 
 /// Read method-level attribute data, without invoking constructors or test bodies.
@@ -134,7 +157,11 @@ pub fn module_function_attributes(
     name: &str,
     definition: &crate::metadata::MemberId,
 ) -> Result<Value, Fault> {
-    crate::reflection::module_function_attributes(module, module_function(module, identity, name, definition)?, true)
+    crate::reflection::module_function_attributes(
+        module,
+        module_function(module, identity, name, definition)?,
+        true,
+    )
 }
 
 /// Describe the assembly of a verified lexical caller, using the VM facade rules.
@@ -143,8 +170,9 @@ pub fn executing_assembly(
     facade: &crate::metadata::Function,
     caller: &crate::metadata::Function,
 ) -> Result<Value, Fault> {
-    let identity = crate::assembly_info::executing_assembly(module, [facade, caller].into_iter())
-        .ok_or_else(|| Fault::new("ExecutingAssembly requires source caller metadata"))?;
+    let identity =
+        crate::assembly_info::executing_assembly(module, [facade, caller].into_iter())
+            .ok_or_else(|| Fault::new("ExecutingAssembly requires source caller metadata"))?;
     crate::assembly_info::assembly_value(module, &identity)
 }
 
@@ -233,7 +261,12 @@ pub fn type_token(module: &Module, owner: &Type) -> Result<i32, Fault> {
 pub fn display_name(module: &Module, owner: &Type) -> Result<Value, Fault> {
     crate::reflection::Query::DisplayName.invoke_profile(
         module,
-        &[Value::RuntimeTypeHandle(Box::new(crate::type_identity::describe_loaded(module, owner)?)), Value::Int32(0)],
+        &[
+            Value::RuntimeTypeHandle(Box::new(crate::type_identity::describe_loaded(
+                module, owner,
+            )?)),
+            Value::Int32(0),
+        ],
         &Limits::default(),
         true,
     )
@@ -244,7 +277,8 @@ mod module_function_tests {
     use super::*;
 
     fn fixture() -> Module {
-        let mut module = crate::assemble(r#"
+        let mut module = crate::assemble(
+            r#"
 .module Functions
 .type IntegerMetadata
 .end
@@ -264,12 +298,25 @@ fault "attribute constructor must not execute"
 .custom instance Marker::.ctor(String) = [{"String":"a discovered test"}]
 fault "test body must not execute"
 .end
-"#).unwrap();
-        for (definition, name) in module.types.iter_mut().zip(["System.Int32", "System.String", "System.Void"]) {
+"#,
+        )
+        .unwrap();
+        for (definition, name) in
+            module
+                .types
+                .iter_mut()
+                .zip(["System.Int32", "System.String", "System.Void"])
+        {
             definition.name = name.into();
         }
-        module.functions.iter_mut().find(|f| f.owner.is_none()).unwrap().namespace = "Example.Tests".into();
-        module.assemblies = vec![serde_json::from_value(serde_json::json!({
+        module
+            .functions
+            .iter_mut()
+            .find(|f| f.owner.is_none())
+            .unwrap()
+            .namespace = "Example.Tests".into();
+        module.assemblies =
+            vec![serde_json::from_value(serde_json::json!({
             "name":"Package", "full_name":"Package", "modules":["Functions"], "references":[],
             "declaration_modules":{"version":1,"names":["", "Example.Tests", "Other"]}
         })).unwrap()];
@@ -277,7 +324,9 @@ fault "test body must not execute"
     }
 
     fn fields(value: &Value) -> &[Value] {
-        let Value::Object { fields, .. } = value else { panic!("expected descriptor"); };
+        let Value::Object { fields, .. } = value else {
+            panic!("expected descriptor");
+        };
         fields
     }
 
@@ -288,9 +337,13 @@ fault "test body must not execute"
             let result = declaring_type(&module, &Type::Named(nested.into())).unwrap();
             assert_eq!(fields(&result)[0], Value::Boolean(true));
             let descriptor = &fields(&result)[1];
-            assert_eq!(fields(descriptor)[0], Value::RuntimeTypeHandle(Box::new(
-                crate::type_identity::describe_loaded(&module, &Type::Named(parent.into())).unwrap()
-            )));
+            assert_eq!(
+                fields(descriptor)[0],
+                Value::RuntimeTypeHandle(Box::new(
+                    crate::type_identity::describe_loaded(&module, &Type::Named(parent.into()))
+                        .unwrap()
+                ))
+            );
         }
         let result = declaring_type(&module, &Type::Named("Outer".into())).unwrap();
         assert_eq!(fields(&result), [Value::Boolean(false)]);
@@ -302,14 +355,23 @@ fault "test body must not execute"
         let module = fixture();
         let ids = module_function_definitions(&module, "Package", "Example.Tests").unwrap();
         assert_eq!(ids.len(), 1);
-        let snapshot = module_function_snapshot(&module, "Package", "Example.Tests", &ids[0]).unwrap();
+        let snapshot =
+            module_function_snapshot(&module, "Package", "Example.Tests", &ids[0]).unwrap();
         let values = fields(&snapshot);
         assert_eq!(values[0], Value::String("Probe".into()));
         assert!(matches!(values[1], Value::NullObjectReference(_)));
         assert_eq!(fields(&values[3])[0], Value::Boolean(true));
-        assert_eq!(fields(&fields(&values[3])[1]), [Value::String("Package".into()), Value::String("Example.Tests".into())]);
+        assert_eq!(
+            fields(&fields(&values[3])[1]),
+            [
+                Value::String("Package".into()),
+                Value::String("Example.Tests".into())
+            ]
+        );
         assert_eq!(values[5], Value::Boolean(true)); // Static.
-        let Value::Array { elements, .. } = &values[11] else { panic!("expected parameters"); };
+        let Value::Array { elements, .. } = &values[11] else {
+            panic!("expected parameters");
+        };
         assert_eq!(elements.len(), 1);
         let parameter = fields(&elements[0]);
         assert_eq!(parameter[0], Value::String("input".into()));
@@ -322,25 +384,55 @@ fault "test body must not execute"
     #[test]
     fn module_attribute_recipes_preserve_descriptions_and_exclude_parameter_annotations() {
         let mut module = fixture();
-        let index = module.functions.iter().position(|f| f.owner.is_none()).unwrap();
+        let index = module
+            .functions
+            .iter()
+            .position(|f| f.owner.is_none())
+            .unwrap();
         let id = module.functions[index].definition.clone().unwrap();
-        module.functions[index].custom_attributes[0].named_arguments.push(crate::metadata::CustomAttributeNamedArgument {
-            name: "Tag".into(), is_field: true,
-            value: crate::metadata::AttributeArgument::String(Some("named description".into())),
-        });
+        module.functions[index].custom_attributes[0]
+            .named_arguments
+            .push(crate::metadata::CustomAttributeNamedArgument {
+                name: "Tag".into(),
+                is_field: true,
+                value: crate::metadata::AttributeArgument::String(Some("named description".into())),
+            });
         let mut parameter_attribute = module.functions[index].custom_attributes[0].clone();
         parameter_attribute.target_token = Some(0x08000001);
-        module.functions[index].custom_attributes.push(parameter_attribute);
+        module.functions[index]
+            .custom_attributes
+            .push(parameter_attribute);
         let result = module_function_attributes(&module, "Package", "Example.Tests", &id).unwrap();
-        let Value::Array { elements, .. } = result else { panic!("expected attributes"); };
+        let Value::Array { elements, .. } = result else {
+            panic!("expected attributes");
+        };
         assert_eq!(elements.len(), 1);
-        let Value::Array { elements: arguments, .. } = &fields(&elements[0])[2] else { panic!("expected arguments"); };
-        assert_eq!(fields(&arguments[0])[1], Value::Erased(Box::new(Value::String("a discovered test".into()))));
-        let Value::Array { elements: named, .. } = &fields(&elements[0])[3] else { panic!("expected named arguments"); };
+        let Value::Array {
+            elements: arguments,
+            ..
+        } = &fields(&elements[0])[2]
+        else {
+            panic!("expected arguments");
+        };
+        assert_eq!(
+            fields(&arguments[0])[1],
+            Value::Erased(Box::new(Value::String("a discovered test".into())))
+        );
+        let Value::Array {
+            elements: named, ..
+        } = &fields(&elements[0])[3]
+        else {
+            panic!("expected named arguments");
+        };
         assert_eq!(named.len(), 1);
         assert_eq!(fields(&named[0])[0], Value::String("Tag".into()));
         module.functions[index].generic_parameters = vec![Some("T".into())];
-        assert!(module_function_snapshot(&module, "Package", "Example.Tests", &id).unwrap_err().to_string().contains("generic method definition"));
+        assert!(
+            module_function_snapshot(&module, "Package", "Example.Tests", &id)
+                .unwrap_err()
+                .to_string()
+                .contains("generic method definition")
+        );
         // Attributes remain available even when signature materialization is unsupported.
         assert!(module_function_attributes(&module, "Package", "Example.Tests", &id).is_ok());
     }

@@ -8,6 +8,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-12
 
+- Repair source release/host checks after the JIT default change: explicitly run
+  interpreter-only source and FFI fixtures in interpreter mode; installed default
+  JIT remains a separate bundle gate. Apply canonical Rust formatting and bounded
+  lint cleanups without changing runtime behavior. Three host-validator tests and
+  the foreign-call executable pass locally; full release qualification is separate.
+
 - Extend native host/entry callback dispatch to no-result unit callbacks as well
   as inhabited Void, completing the dispatch side of Task.Run submission. Preserve
   the 32-target bound and strict callback admission. Both encodings pass sanitized

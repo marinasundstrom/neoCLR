@@ -1,5 +1,5 @@
 //! Private runtime-async comparison host. Load once, execute with fresh heaps.
-use neoclr::{assembler::ModuleInput, metadata::TypeDefId, Limits, LoadedProgram, Value};
+use neoclr::{Limits, LoadedProgram, Value, assembler::ModuleInput, metadata::TypeDefId};
 use std::{fs, path::Path, time::Instant};
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {

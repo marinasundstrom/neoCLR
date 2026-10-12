@@ -150,7 +150,9 @@ fault "yield drained more than one callback"
 #[test]
 fn reserved_signature_requires_no_parameters_and_unit_result() {
     for signature in ["Int32", "Void"] {
-        let source = format!(".module Test\n.function neoCLR.Runtime.RuntimeAsyncYield() -> {signature}\n.methodimpl InternalCall\n.end\n");
+        let source = format!(
+            ".module Test\n.function neoCLR.Runtime.RuntimeAsyncYield() -> {signature}\n.methodimpl InternalCall\n.end\n"
+        );
         assert_eq!(neoclr::assemble(&source).is_ok(), signature == "Void");
     }
     assert!(neoclr::assemble(".module Test\n.function neoCLR.Runtime.RuntimeAsyncYield(Int32 value) -> Void\n.methodimpl InternalCall\n.end\n").is_err());

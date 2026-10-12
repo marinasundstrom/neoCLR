@@ -9,7 +9,9 @@ fn guest_tls_configuration_reports_errors_and_capabilities() {
     let program = LoadedProgram::new(&module).unwrap();
     program.verify().unwrap();
     let entry = parse_function_ref("Run()").unwrap();
-    let graph = program.analyze_reachability(&[entry.clone()], 16).unwrap();
+    let graph = program
+        .analyze_reachability(std::slice::from_ref(&entry), 16)
+        .unwrap();
     for service in [
         RuntimeService::Tls,
         RuntimeService::ManagedArrays,

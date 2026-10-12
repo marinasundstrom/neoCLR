@@ -334,9 +334,12 @@ fn validate_methods(module: &Module) -> Result<(), Fault> {
         };
         let adapted_receiver = boxed_parent.is_some() && method.receiver_byref;
         if method.is_override {
-            let parent = inherited
-                .or(boxed_parent)
-                .ok_or_else(|| Fault::new(format!("override requires an inherited virtual method: {}", method.name)))?;
+            let parent = inherited.or(boxed_parent).ok_or_else(|| {
+                Fault::new(format!(
+                    "override requires an inherited virtual method: {}",
+                    method.name
+                ))
+            })?;
             if !parent.is_virtual
                 || (adapted_receiver && !method.generic_parameters.is_empty())
                 || parent.returns != method.returns

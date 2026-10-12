@@ -178,7 +178,8 @@ fn execute(args: &[String], exit_status: &mut i32) -> Result<Vec<String>, String
             }
             "--reflection-roots" if command == "run" && reflection_roots.is_none() => {
                 reflection_roots = Some(
-                    options.next()
+                    options
+                        .next()
                         .filter(|value| !value.starts_with("--"))
                         .ok_or("Missing retention file for --reflection-roots")?
                         .as_str(),
@@ -280,7 +281,9 @@ fn execute(args: &[String], exit_status: &mut i32) -> Result<Vec<String>, String
         return Ok(Vec::new());
     }
     if reflection_roots.is_some() {
-        return Err("--reflection-roots requires JIT execution; interpreter metadata is not trimmed".into());
+        return Err(
+            "--reflection-roots requires JIT execution; interpreter metadata is not trimmed".into(),
+        );
     }
     if jit_host.is_some() || jit_compiler.is_some() {
         return Err("--jit-host and --jit-compiler require --execution jit".into());

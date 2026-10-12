@@ -28,6 +28,15 @@ class HostEvidenceTests(unittest.TestCase):
                     validator.main()
             return json.loads((output / 'report.json').read_text())
 
+    def test_source_ffi_probe_selects_interpreter_explicitly(self):
+        output = io.StringIO()
+        with patch.object(sys, 'argv', ['validate-host.py', '--output', 'unused', '--plan']), \
+             contextlib.redirect_stdout(output):
+            validator.main()
+        commands = json.loads(output.getvalue())
+        ffi = next(command for command in commands if 'examples/pinvoke.neoil' in command)
+        self.assertEqual(ffi[-2:], ['--execution', 'interpreter'])
+
     def test_nonzero_command_retains_failure_evidence(self):
         report = self.run_validator(lambda cmd, **kw: subprocess.CompletedProcess(cmd, 7, 'failure\n'),
                                     'Host check failed')

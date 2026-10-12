@@ -1,8 +1,16 @@
 //! Strict culture-independent parsing used by the concrete primitive Parse methods.
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub(crate) enum ParsedNumber {
-    SByte(i8), Byte(u8), Int16(i16), UInt16(u16), UInt32(u32), UInt64(u64),
-    Single(f32), Double(f64), Boolean(bool), Int32(i32),
+    SByte(i8),
+    Byte(u8),
+    Int16(i16),
+    UInt16(u16),
+    UInt32(u32),
+    UInt64(u64),
+    Single(f32),
+    Double(f64),
+    Boolean(bool),
+    Int32(i32),
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
