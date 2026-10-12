@@ -250,3 +250,12 @@ Normal-response validation now reads authenticated TLS EOF with
 application data fails. Client-initiated clean shutdown retains its separate unwrap
 case. This checks the existing one-way notification contract without claiming the
 unimplemented fully asynchronous bidirectional shutdown API.
+
+The Windows gate now also requests `--windows-jit`. The validator derives its helper
+DLL from the exact AOT project's TLS-enabled host recipe, uses the existing Windows
+JIT export builder, checks its system dependencies against the AOT executable and
+runs the twelve request/recovery cases again with `--jit-run`. Combined acceptance
+is 27 host cases (12 AOT, 12 JIT, two invalid-credential startups, one cleartext
+isolation check), plus two Rust transport tests. This uses compiler state machines
+on Windows; Windows runtime suspension remains unsupported. This gate addition
+alone is not a passing Windows JIT result or installed CLI TLS support.

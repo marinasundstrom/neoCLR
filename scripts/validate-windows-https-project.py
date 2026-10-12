@@ -65,7 +65,7 @@ def main():
                 '--output', out / label, *flags])
         run('https-validation', [sys.executable, ROOT / 'docs/experiments/https-server/validate.py',
             '--bundle', bundle, '--project-build', out / 'https', '--cleartext-build', out / 'cleartext',
-            '--output', out / 'validation'])
+            '--output', out / 'validation', '--windows-jit'])
         report['passed'] = True
     finally:
         (out / 'validation.json').write_text(json.dumps(report, indent=2) + '\n')

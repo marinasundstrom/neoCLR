@@ -7,6 +7,7 @@ import json
 import os
 from pathlib import Path
 import platform
+import re
 import importlib.util
 import socket
 import ssl
@@ -28,12 +29,15 @@ def main():
     parser.add_argument('--recipe', type=Path, default=HERE.parent / 'runtime-async/collector-walk-showcase.json')
     parser.add_argument('--bundle', type=Path, required=True)
     parser.add_argument('--output', type=Path, required=True)
+    parser.add_argument('--windows-jit', action='store_true', help='Also qualify a Windows JIT helper DLL built from the project recipe')
     parser.add_argument('--cleartext-build', type=Path, help='Matching ordinary project build for cleartext isolation')
     parser.add_argument('--project-build', type=Path, help='Validate a matching --https-server project build instead of rebuilding experimental hosts')
     args = parser.parse_args()
     if not ssl.HAS_TLSv1_3:
         parser.error('requires Python linked to OpenSSL with TLS 1.3 support')
     windows = platform.system() == 'Windows' and platform.machine().lower() in ('amd64', 'x86_64')
+    if args.windows_jit and not (windows and args.project_build):
+        parser.error('--windows-jit requires a Windows project build')
     if windows and not args.project_build:
         parser.error('Windows qualification requires --project-build')
     if not windows and (platform.system(), platform.machine()) != ('Darwin', 'arm64'):
@@ -54,12 +58,14 @@ def main():
                 report['inputsSha256'][str(Path(value).resolve())] = sha(value)
         result = subprocess.run(cmd, capture_output=True, text=True, timeout=180, cwd=ROOT, **kwargs)
         row = dict(label=label, command=cmd, exitCode=result.returncode, stderr=result.stderr)
-        if label == 'native':
-            p = out / 'selection.json'; p.write_text(result.stdout)
+        if label == 'native' or len(result.stdout) > 20000:
+            p = out / ('selection.json' if label == 'native' else label + '.stdout.log')
+            p.write_text(result.stdout)
             row['stdoutSha256'] = sha(p)
         else: row['stdout'] = result.stdout
         report['commands'].append(row)
         if result.returncode: raise RuntimeError(label + ': ' + result.stderr + result.stdout[-1000:])
+        return result
 
     try:
         if args.project_build:
@@ -75,6 +81,28 @@ def main():
             report['inputsSha256'].update(evidence['inputs'])
             invocations = [('aot-project', [str(build / ('app.exe' if windows else 'app'))])]
             credential_app = build / ('app.exe' if windows else 'app')
+            if args.windows_jit:
+                helper_path = HERE.parent / 'jit-http/windows.py'
+                helper_spec = importlib.util.spec_from_file_location('windows_jit', helper_path)
+                helper = importlib.util.module_from_spec(helper_spec)
+                helper_spec.loader.exec_module(helper)
+                report['inputsSha256'][str(helper_path)] = sha(helper_path)
+                native, link = helper.recipe(evidence, ROOT, out)
+                sequence = 0
+                def jit_build(cmd):
+                    nonlocal sequence
+                    sequence += 1
+                    return run('jit-host-' + str(sequence), list(map(str, cmd)))
+                host = helper.build_host(link, out, jit_build)
+                dependency_output = run('jit-dependencies', ['dumpbin', '/dependents', str(host)]).stdout
+                dependencies = re.findall(r'^\s+([A-Za-z0-9_.-]+\.dll)\s*$', dependency_output, re.MULTILINE | re.IGNORECASE)
+                if not dependencies or set(map(str.lower, dependencies)) - set(map(str.lower, evidence['dependencies'])):
+                    raise RuntimeError('JIT helper added unexpected dependencies: ' + repr(dependencies))
+                report['jitHostSha256'] = sha(host)
+                report['jitDependencies'] = dependencies
+                jit = [native[0], '--jit-run', *native[1:]]
+                jit[5] = str(host)
+                invocations.append(('jit', jit))
         else:
             run('tls-build', ['cargo', 'build', '--locked', '--release', '--manifest-path', str(ROOT / 'tools/native-tls/Cargo.toml')])
             source = command('language-source')

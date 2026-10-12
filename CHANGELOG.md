@@ -53,6 +53,9 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   Validate server close_notify through strict authenticated TLS EOF rather than
   requiring reciprocal client shutdown after socket disposal; abrupt EOF and
   trailing application data still fail. Full async TLS shutdown remains open.
+  Add Windows JIT qualification using an exported helper built from the matching
+  AOT/TLS recipe, with dependency checks and the same twelve request/recovery cases;
+  execution evidence remains pending until the shared gate passes.
 
 - Fix the HTTPS source compiler gap through Raven main `99ae011b4`, deliberately
   carried to its neoCLR branch as `c71baae94`: traverse unary operands so `use`
