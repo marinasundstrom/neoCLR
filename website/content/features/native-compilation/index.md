@@ -145,6 +145,8 @@ The routing workbench also parses a route, extracts an integer parameter and pri
   and property-access adapters. Explicit module-function and method-attribute roots
   also qualify namespace-scoped `TestAttribute` discovery on macOS ARM64 JIT/AOT,
   without invoking test bodies; dynamic registration remains separate work.
+  The development CLI accepts `neoclr run app.dll --reflection-roots roots.json`
+  for JIT metadata retention; interpreter execution rejects that option.
   On macOS ARM64 and Windows x64, explicit attribute-data retention
   also supports fixed/enum arguments and member/parameter annotations without
   executing attribute constructors. Named primitive field/property snapshots also pass

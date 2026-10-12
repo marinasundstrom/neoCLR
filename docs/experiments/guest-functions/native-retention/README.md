@@ -62,14 +62,18 @@ python3 docs/experiments/guest-functions/verify_native.py \
   --bundle target/generic-cleanup-gc-bundle/bundle \
   --compiler target/generic-cleanup-project-compiler/rvnc.dll \
   --backend tools/aot-poc/target/release/neoclr-aot-poc \
+  --runner /path/to/current/neoclr \
   --output target/guest-functions-native-check
 ```
 
 The harness compiles a fresh consumer and reuses the pinned macOS shared-GC host
 recipe, including absolute SDK/library paths. It records commands and input hashes;
-large compiler inventories are represented by hashes. JIT runs directly through the
-backend because the public run CLI does not yet project reflection-root settings.
-This is not a portable SDK command or Windows qualification.
+large compiler inventories are represented by hashes. The original validation above
+used the backend directly. The [CLI follow-up](cli-validation.json) now runs JIT and
+all three negative retention cases through `neoclr run --reflection-roots` with
+explicit compiler/host overrides. `--runner` selects an updated runtime, defaulting
+to the bundle runtime when omitted. This harness still uses a platform-specific
+AOT host recipe; it is not a portable SDK command or Windows qualification.
 
 The descriptor structure and annotation semantics follow the existing .NET-inspired
 API; logical modules scope exact assembly namespaces rather than physical .NET

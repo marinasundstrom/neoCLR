@@ -13,12 +13,14 @@ HERE = Path(__file__).resolve().parent
 parser = argparse.ArgumentParser(description=__doc__)
 for name in ('bundle', 'compiler', 'backend', 'output'):
     parser.add_argument('--' + name, type=Path, required=True)
+parser.add_argument('--runner', type=Path, help='Runtime CLI with reflection-root support; defaults to the bundle runtime')
 args = parser.parse_args()
 bundle, compiler, backend, output = (getattr(args, n).resolve() for n in ('bundle', 'compiler', 'backend', 'output'))
+runner = args.runner.resolve() if args.runner else bundle / 'bin/neoclr'
 output.mkdir(parents=True, exist_ok=False)
 sha = lambda p: hashlib.sha256(p.read_bytes()).hexdigest()
 inputs = [Path(__file__), HERE / 'verify.py', HERE / 'Main.rvn', HERE / 'GuestFunctions.rvnproj',
-          ROOT / 'runtime/raven/tests/framework/TestAttribute.rvn', compiler, backend,
+          ROOT / 'runtime/raven/tests/framework/TestAttribute.rvn', compiler, backend, runner,
           bundle / 'lib/System.Runtime.dll', bundle / 'bin/neoclr-jit-host.dylib',
           ROOT / 'docs/experiments/runtime-async/generic-cleanup/mac-shared-gc-validation.json']
 report = dict(passed=False, platform=platform.platform(), commands=[], inputs={str(p): sha(p) for p in inputs})
@@ -41,7 +43,7 @@ def run(label, command, expected=0, stdout=None):
 
 
 run('interpreter', [sys.executable, HERE / 'verify.py', '--bundle', bundle, '--compiler', compiler,
-                   '--runner', bundle / 'bin/neoclr', '--execution', 'interpreter', '--output', output / 'interpreter'])
+                   '--runner', runner, '--execution', 'interpreter', '--output', output / 'interpreter'])
 reference = json.loads((output / 'interpreter/report.json').read_text())
 image = Path(reference['commands'][1]['command'][2])
 report['imageSha256'] = sha(image)
@@ -69,9 +71,10 @@ for item in link:
 run('aot-link', link)
 expected = 'Guest module function discovery passed\n'
 run('aot-run', [output / 'app'], stdout=expected)
-jit = compile_command.copy()
-jit[4] = str(bundle / 'bin/neoclr-jit-host.dylib')
-jit += ['--jit-run']
+jit = [str(item) for item in [runner, 'run', image, '--execution', 'jit',
+       '--jit-compiler', backend, '--jit-host', bundle / 'bin/neoclr-jit-host.dylib',
+       '--reflection-roots', root_path, '--system', bundle / 'lib/System.runtime.neox',
+       '--module', bundle / 'lib/System.Runtime.dll', '--object-root', bundle / 'lib/System.Runtime.dll']]
 run('jit-run', jit, stdout=expected)
 for label, config, message in [
     ('no-functions', dict(roots, moduleFunctions=[]), 'native module function metadata was not retained'),
@@ -86,6 +89,6 @@ for label, config, message in [
     assert message in result.stderr, result.stderr
 assert all(sha(Path(p)) == digest for p, digest in report['inputs'].items())
 assert sha(image) == report['imageSha256']
-report.update(passed=True, scope='Interpreter, macOS ARM64 JIT/AOT module-function metadata discovery and method attribute data. Explicit negative retention cases. No function invocation or automatic test registration.')
+report.update(passed=True, scope='Interpreter, macOS ARM64 CLI JIT/AOT module-function metadata discovery and method attribute data. Explicit negative retention cases. No function invocation or automatic test registration.')
 (output / 'report.json').write_text(json.dumps(report, indent=2) + '\n')
 print('Module function discovery: interpreter, JIT, AOT and retention faults PASS')

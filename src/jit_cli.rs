@@ -16,11 +16,17 @@ pub(crate) fn run(
     object_root: Option<&str>,
     host: Option<&str>,
     compiler: Option<&str>,
+    reflection_roots: Option<&str>,
     arguments: &[String],
 ) -> Result<i32, String> {
     let windows = cfg!(all(target_os = "windows", target_arch = "x86_64"));
     if !windows && !cfg!(all(target_os = "macos", target_arch = "aarch64")) {
         return Err("JIT execution currently requires macOS ARM64 or Windows x64".into());
+    }
+    if let Some(path) = reflection_roots {
+        if !Path::new(path).is_file() {
+            return Err(format!("Missing reflection retention file: {path}"));
+        }
     }
     let executable = std::env::current_exe().map_err(|error| error.to_string())?;
     let bin = executable
@@ -151,6 +157,11 @@ pub(crate) fn run(
             "x86_64-pc-windows-msvc",
             "--windows-http-experiment",
         ]);
+    }
+    if let Some(path) = reflection_roots {
+        // Exact caller-supplied policy; the matching backend validates its schema.
+        // Do not discover ambient roots or silently grant metadata retention.
+        command.args(["--reflection-roots", path]);
     }
     for argument in arguments {
         command.args(["--jit-entry-argument", argument]);

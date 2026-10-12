@@ -8,6 +8,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-12
 
+- Expose explicit JIT retention policies through `neoclr run --reflection-roots`.
+  Preserve path/guest-argument boundaries and backend diagnostics; reject missing,
+  duplicate and interpreter-mode options. The real module-function discovery and
+  three missing-retention checks now pass through the CLI on macOS ARM64.
+
 - Add explicit schema-5 module-function and method-attribute retention to the
   native backend. The Raven TestAttribute discovery consumer now passes interpreter,
   macOS ARM64 JIT and linked AOT execution, preserving module/parameter ownership and

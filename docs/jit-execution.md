@@ -17,6 +17,23 @@ with those libraries. Explicit `--jit-compiler`, `--jit-host`, `--system` and
 are never discovered relative to the guest or current directory. Missing tools
 are errors, with no silent interpreter fallback.
 
+Development JIT runs can supply an explicit metadata-retention policy:
+
+```sh
+neoclr run app.dll --reflection-roots roots.json -- --filter collection
+```
+
+`--reflection-roots` is a single file path relative to the calling directory (quote
+paths containing spaces). The CLI requires an existing file and forwards it unchanged
+to the selected backend, which validates its schema and source identities before
+execution. No ambient policy is discovered. Missing, duplicate or malformed options
+fail; an invalid policy does not fall back to interpretation. The option is rejected
+with `--execution interpreter`, whose loaded metadata is not trimmed.
+See [schema-5 module/function/attribute retention](experiments/guest-functions/native-retention/README.md).
+[The CLI consumer](experiments/guest-functions/native-retention/cli-validation.json)
+passes on macOS ARM64, including missing-retention faults. Windows retention execution
+is not qualified by this check.
+
 Prepare a development installation from a verified compiler/library bundle and a
 passing native host recipe:
 

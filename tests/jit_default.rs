@@ -65,6 +65,31 @@ fn installed_default_jit_discovers_trusted_siblings_and_preserves_arguments() {
     assert_eq!(duplicate.status.code(), Some(37), "{duplicate:?}");
     let duplicate_arguments = fs::read_to_string(&recorded).unwrap();
     assert_eq!(duplicate_arguments.matches("--module\n").count(), 1);
+    let roots = root.join("retained metadata.json");
+    fs::write(&roots, r#"{"schemaVersion":5,"types":[],"moduleCatalogs":[],"moduleFunctions":[]}"#).unwrap();
+    let retained = Command::new(&runtime)
+        .env("NEO_TEST_ARGS", &recorded)
+        .args(["run", "app.dll", "--reflection-roots"])
+        .arg(&roots)
+        .args(["--", "--reflection-roots", "guest policy"])
+        .output().unwrap();
+    assert_eq!(retained.status.code(), Some(37), "{retained:?}");
+    let forwarded = fs::read_to_string(&recorded).unwrap();
+    assert!(forwarded.contains(&format!("--reflection-roots\n{}\n", roots.display())));
+    assert!(forwarded.ends_with("--jit-entry-argument\n--reflection-roots\n--jit-entry-argument\nguest policy\n"));
+    for options in [
+        vec!["--reflection-roots"],
+        vec!["--reflection-roots", "--execution", "jit"],
+        vec!["--reflection-roots", roots.to_str().unwrap(), "--reflection-roots", roots.to_str().unwrap()],
+        vec!["--execution", "interpreter", "--reflection-roots", roots.to_str().unwrap()],
+        vec!["--reflection-roots", "missing-retention.json"],
+    ] {
+        fs::remove_file(&recorded).unwrap_or(());
+        let rejected = Command::new(&runtime).env("NEO_TEST_ARGS", &recorded)
+            .args(["run", "app.dll"]).args(options).output().unwrap();
+        assert!(!rejected.status.success(), "{rejected:?}");
+        assert!(!recorded.exists(), "invalid CLI policy reached the backend");
+    }
     fs::remove_file(&compiler).unwrap();
     let missing = Command::new(&runtime)
         .args(["run", "app.dll"])

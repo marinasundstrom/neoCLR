@@ -12,7 +12,7 @@ const USAGE: &str = "Usage:
   neoclr disassemble <metadata-input> [output]
   neoclr emit-il <source.neo> [output.neoil]
   neoclr assemble <source.neoil> <output> [--format json|neox] [--module <input>]... [--system <input>]
-  neoclr run <input> [--execution interpreter|jit] [--jit-host <library>] [--jit-compiler <tool>] [System.neo.json] [--module <input>]... [--system <input>] [--gc-stats] [--gc-events] [--show-result] [--instructions <positive-count>] [--array-elements <positive-count>] [--array-bytes <positive-count>] [-- <guest-argument>...]
+  neoclr run <input> [--execution interpreter|jit] [--jit-host <library>] [--jit-compiler <tool>] [--reflection-roots <file.json>] [System.neo.json] [--module <input>]... [--system <input>] [--gc-stats] [--gc-events] [--show-result] [--instructions <positive-count>] [--array-elements <positive-count>] [--array-bytes <positive-count>] [-- <guest-argument>...]
   neoclr debug <input> [--module <input>]... [--system <input>] [-- <guest-argument>...]
   neoclr check <input> [--module <input>]... [--system <input>]
   neoclr verify <input> [--module <input>]... [--system <input>]
@@ -137,6 +137,7 @@ fn execute(args: &[String], exit_status: &mut i32) -> Result<Vec<String>, String
     let mut execution_mode = None;
     let mut jit_host = None;
     let mut jit_compiler = None;
+    let mut reflection_roots = None;
     let mut output_format = None;
     let mut instruction_limit = None;
     let mut array_element_limit = None;
@@ -172,6 +173,14 @@ fn execute(args: &[String], exit_status: &mut i32) -> Result<Vec<String>, String
                         .next()
                         .filter(|value| !value.starts_with("--"))
                         .ok_or("Missing compiler executable for --jit-compiler")?
+                        .as_str(),
+                );
+            }
+            "--reflection-roots" if command == "run" && reflection_roots.is_none() => {
+                reflection_roots = Some(
+                    options.next()
+                        .filter(|value| !value.starts_with("--"))
+                        .ok_or("Missing retention file for --reflection-roots")?
                         .as_str(),
                 );
             }
@@ -265,9 +274,13 @@ fn execute(args: &[String], exit_status: &mut i32) -> Result<Vec<String>, String
             object_root_path.map(String::as_str),
             jit_host,
             jit_compiler,
+            reflection_roots,
             &guest_arguments[1..],
         )?;
         return Ok(Vec::new());
+    }
+    if reflection_roots.is_some() {
+        return Err("--reflection-roots requires JIT execution; interpreter metadata is not trimmed".into());
     }
     if jit_host.is_some() || jit_compiler.is_some() {
         return Err("--jit-host and --jit-compiler require --execution jit".into());

@@ -403,7 +403,9 @@ first shared JIT/AOT prerequisite, before module-function enumeration.
 a focused interpreter/JIT/AOT consumer on macOS ARM64. The subsequent [interface-to-object dispatch fix](experiments/guest-functions/interface-object-dispatch/README.md)
 passes seven native Object regressions. The subsequent [schema-5 retention milestone](experiments/guest-functions/native-retention/README.md)
 passes full discovery in interpreter, JIT and AOT, including negative checks for missing
-catalog/function/attribute retention. Windows native discovery remains unqualified. The guest-function
+catalog/function/attribute retention. The [CLI follow-up](experiments/guest-functions/native-retention/cli-validation.json)
+qualifies `neoclr run --reflection-roots`, preserving explicit retention policy and
+rejecting its use in interpreter mode. Windows native discovery remains unqualified. The guest-function
 Windows run at 5e4cbd84 exposed an AOT shared-provider binding regression in nominal
 attribute inspection; [the fix passes locally](experiments/native-attributes/shared-provider-validation.json)
 with rebuilt libraries. Windows requalification remains pending.
@@ -533,9 +535,10 @@ and AssemblyInfo.Name/FullName ownership inspection. Explicit schema-4 catalog r
 now support native AssemblyInfo.GetModules, including empty declarations, with a
 missing-catalog fault. Native RuntimeContext.ExecutingAssembly now retains the lexical
 caller assembly through direct query calls, including separate-library helpers and
-callbacks, without requiring reflection roots. Context-wide discovery and type enumeration,
-guest module-function enumeration now works in the interpreter, while native enumeration
-and general callable invocation remain open. See
+callbacks, without requiring reflection roots. Context-wide discovery, type enumeration
+and general callable invocation remain open. Guest module-function enumeration and
+method-level attributes now pass the explicitly retained macOS ARM64 interpreter/JIT/AOT
+consumer described above. See
 [the guest consumer](experiments/guest-modules/README.md).
 
 **Author clarifications (2026-10-10):** a module is a unit and namespace of members
