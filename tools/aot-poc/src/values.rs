@@ -2425,7 +2425,9 @@ fn compile_host_callbacks(module: &mut impl Module, p: &Profile<'_>, ids: &[cran
     for target in p.callable_targets(&no_result)? {
         if !targets.contains(&target) { targets.push(target); }
     }
-    if targets.len() > 32 { return Err("native host callbacks exceed 32 possible targets".into()); }
+    // Each shape is admitted independently by callable_targets. Their union
+    // needs no separate cap: this dispatcher emits branches, not a fixed-size
+    // host table. Mixed unit/no-result continuations can exceed either shape.
     // Hosts link this ABI even when no guest callback is reachable. Keep the
     // rejecting dispatcher so synchronous task-only programs can link as well.
     let mut signature = module.make_signature();

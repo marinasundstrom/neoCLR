@@ -4012,14 +4012,49 @@ fn native_host_bootstrap_requires_explicit_exact_contract() {
     assert!(!dir.0.join("app.o").exists());
 }
 
+// Keep each callback shape below its independent admission bound while the
+// combined host dispatcher exceeds 32. Bind the late targets so closed-world
+// selection retains them, and execute the last target through the host session.
+fn mixed_host_callback_source(no_result: bool) -> String {
+    let mut source = include_str!("../../../docs/experiments/aot-console/host-callbacks.neoil").to_owned();
+    if no_result {
+        source = source.replace("-> Void", "-> noresult").replace("ldvoid\n", "")
+            .replace("fn<Void>", "fn<noresult Void>").replace("call Fail()\npop", "call Fail()");
+    }
+    let mut bindings = String::new();
+    for i in 0..20 {
+        source.push_str(&format!("\n.function Unit{i}() -> Void\nldvoid\nret\n.end\n.function Empty{i}() -> noresult\nret\n.end\n"));
+        bindings.push_str(&format!("function.bind fn<Void> = Unit{i}()\npop\nfunction.bind fn<noresult Void> = Empty{i}()\npop\n"));
+    }
+    source = source.replace("ldarg mode\n", &format!("{bindings}ldarg mode\n"));
+    source.replace("function.bind fn<Void> = Unit()", "function.bind fn<Void> = Unit19()")
+        .replace("function.bind fn<noresult Void> = Unit()", "function.bind fn<noresult Void> = Empty19()")
+}
+
+#[test]
+fn native_host_callbacks_compile_mixed_shapes_for_windows() {
+    let dir = Temp::new();
+    let seed = neoclr::assemble(".module System\n.references ()\n").unwrap();
+    let result = compile_source(&dir, &seed, &mixed_host_callback_source(true),
+        &["--compile-system", "--reference-arena", "--native-gc", "--native-host-bootstrap",
+          "--target", "x86_64-pc-windows-msvc", "--windows-console-experiment", "--native-stack-budget"], false);
+    assert!(result.status.success(), "{}", String::from_utf8_lossy(&result.stderr));
+    use object::Object;
+    let bytes = fs::read(dir.0.join("app.o")).unwrap();
+    let object = object::File::parse(bytes.as_slice()).unwrap();
+    assert_eq!(object.format(), object::BinaryFormat::Coff);
+    assert_eq!(object.architecture(), object::Architecture::X86_64);
+}
+
 #[test]
 #[cfg(all(target_os = "macos", target_arch = "aarch64"))]
 fn native_host_callbacks_preserve_roots_state_and_faults_without_entry_reset() {
-    for no_result in [false, true] {
+    for variant in 0..4 {
         let dir = Temp::new();
         let seed = neoclr::assemble(".module System\n.references ()\n").unwrap();
-        let source = include_str!("../../../docs/experiments/aot-console/host-callbacks.neoil");
-        let source = if no_result {
+        let mixed = mixed_host_callback_source(variant == 3);
+        let source = if variant >= 2 { mixed.as_str() } else { include_str!("../../../docs/experiments/aot-console/host-callbacks.neoil") };
+        let source = if variant == 1 {
             source.replace("-> Void", "-> noresult").replace("ldvoid\n", "")
                 .replace("fn<Void>", "fn<noresult Void>").replace("call Fail()\npop", "call Fail()")
         } else { source.to_owned() };

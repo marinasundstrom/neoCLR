@@ -82,3 +82,24 @@ backend/helper through `prepare-jit-bundle.py`, and archives only verified manif
 members. It records archive and manifest hashes, retains build logs and refreshes
 notices. Two local archive regressions pass (stale output exclusion/hash mismatch
 and out-of-bundle rejection); actual Windows execution remains a hosted gate.
+
+### Mixed callback dispatcher repair
+
+Candidate `a9adc97cb` reached managed SSL stream compilation in
+[Windows run 38317601422](https://github.com/marinasundstrom/neoCLR/actions/runs/38317601422)
+after passing compiler/library preparation, crypto and direct TLS checks. It then
+failed at the combined host callback dispatcher: inhabited-unit and no-result
+callbacks each fit the existing per-shape bound, but their union exceeded 32.
+
+The generated dispatcher uses branches and has no fixed-size host table. Remove
+only the redundant combined bound; retain independent shape admission, managed
+function selection bounds, handle validation and GC ownership. This is a backend
+admission repair, with no managed API or callback ABI change. Like .NET delegates,
+valid callbacks do not gain a different invocation contract when unrelated
+callbacks are linked; remaining native POC bounds are implementation gaps.
+
+Focused regression coverage emits Windows x64 COFF for mixed shapes and executes
+both shapes on macOS ARM64 with more than 32 combined targets. The sanitized host
+session checks late-target invocation, retained roots, collection, fault propagation
+and invalid/stale handles. The full Windows SSL/HTTP consumer still requires a
+fresh hosted run; object generation alone does not qualify Windows execution.

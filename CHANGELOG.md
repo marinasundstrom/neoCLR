@@ -8,6 +8,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-13
 
+- Repair native host callback admission for mixed unit/no-result continuations:
+  remove the redundant combined 32-target cap without changing per-shape bounds
+  or the host ABI. Windows x64 object emission and sanitized macOS session tests
+  pass with more than 32 combined targets, including late-target dispatch, GC
+  ownership and fault/rejection behavior. Windows SSL/HTTP rerun remains required.
+
 - Qualify the installed macOS SDK/VSIX in real VS Code: all 26 activation,
   documentation/navigation, completion, watcher/recovery, build/run and Tasks/await
   checks pass in an isolated profile, including ordinary .NET editing. Retain
