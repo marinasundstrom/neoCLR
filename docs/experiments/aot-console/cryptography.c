@@ -1,7 +1,7 @@
 /* Private synchronous byte-array adapter shared by JIT and AOT. Never collects,
  * calls guest code, retains pointers, or owns guest storage. */
 #include "text-arena.h"
-#include "../../../tools/native-tls/include/neoclr_crypto.h"
+#include "../../../tools/native-crypto/include/neoclr_crypto.h"
 #include <string.h>
 
 typedef struct { unsigned char *bytes, *initialized; uint32_t count; } crypto_bytes;

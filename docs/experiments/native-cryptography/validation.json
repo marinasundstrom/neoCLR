@@ -117,27 +117,62 @@
   },
   "inputsSha256": {
     "runtime/neoCLR/Runtime/Cryptography.neoil": "dff152ba487c7f9ad0856d7411b0525847f082bd35b6e8f2ced092c2f49aebbe",
-    "docs/experiments/aot-console/cryptography.c": "c461b00eaa5d3b4a63a1edc53cb94b998d278bdf31d1075e96e85ebde6580958",
+    "docs/experiments/aot-console/cryptography.c": "5f087f6f1d99df6678bf0131644cbcedd7ec1e0e0dd774ece76b1c037f7fb304",
     "docs/experiments/native-cryptography/host.c": "2b7bf26f40de61f7a179e2c8e36411f4dd673cf4d933e61505d9f89e3377a6fa",
-    "docs/experiments/native-cryptography/validate.py": "f609635a41ac3f1eeec599bb7bbe6a08fd25038d63aba730a2a4b92def1091a0",
-    "tools/native-tls/Cargo.lock": "28b42799ad50d6b16882abaf4bbeb23b73cf2d6b1676ac804ff80f45150c7c06",
-    "tools/native-tls/src/cryptography.rs": "1a98016db28e10cbdbe1f9416b08b6acf7e159789db4532e177c301f9642f3ca",
+    "docs/experiments/native-cryptography/validate.py": "2cd9a73cb150487f4a613096ba858ab06ccaddd9c008b46bbdea7bda341eae87",
     "tools/security-provider/src/lib.rs": "5fe43bf7941c119dcf5122959c4e81a0f602507fae44717a565f7ca08750e92a",
     "tools/aot-poc/src/bindings.rs": "f0d47afa2a3df3faedae78f78e9f0560900198048d1d2d97ff25bb28cb4386e4",
     "tools/aot-poc/src/values.rs": "a45dffdedb3eb480455874e79eaef13d85efea3c0c2051728664a9d0d52e7166",
     "tools/aot-poc/src/fault_details.rs": "83c31653c5ef7a2af8bf955845b99b70e2cb45fa4f0a2254344eb06a223a89c8",
     "tools/aot-poc/src/gc_points.rs": "7b5f5a9a581e79a862bf99de84c488b63e6c05bf2c2bf5f68f563615956a4e99",
     "tools/aot-poc/src/linking.rs": "de77ffcb2c3739b807a609c448ea1593dd55f2441ed9170bbeaab9da5d988626",
-    "tools/aot-poc/src/main.rs": "6d4baba4d79e6b7810b4cfe599e07bbf5adf95b7c7b43baf6205e95f5d3fc681"
+    "tools/aot-poc/src/main.rs": "6d4baba4d79e6b7810b4cfe599e07bbf5adf95b7c7b43baf6205e95f5d3fc681",
+    "tools/native-crypto/Cargo.toml": "9ee131ccdfd166323242554b0eb595b4e69b7a77dfaae846c87eaf68af75f9a6",
+    "tools/native-crypto/Cargo.lock": "635f0c79d3e3a0a6406e0ebb7bc418148f3ae962b7100c9c27d5129cec02f439",
+    "tools/native-crypto/src/lib.rs": "1a98016db28e10cbdbe1f9416b08b6acf7e159789db4532e177c301f9642f3ca",
+    "tools/native-crypto/include/neoclr_crypto.h": "3119838eb5e5588cb7ed13fdb3f6957ba0c4ca8bc5d5df7a58b15f21f49d19bf",
+    "tools/security-provider/Cargo.toml": "903cfd204db2bb1e841d45a123f47f8e01dbfdfcfea9fcbfc2b66df4a50039d5"
   },
   "toolsSha256": {
     "tools/aot-poc/target/debug/neoclr-aot-poc": "ab9b50ce02d9cd1a56a41451a0a5a7bb70764e8a4233f092e74fc124e7a6c53d",
     "target/security-services/debug/neoclr": "c9b4131066e5f46c44ef8b0781a9d9a7532fc79c49bd55c46d66ceade1b4f5b5"
   },
-  "detailedReport": "target/native-cryptography-final/validation.json",
+  "detailedReport": "target/native-cryptography-standalone/validation.json",
   "limitations": [
     "Private source-host services, no public Raven API or installed-host packaging.",
-    "Qualification links the native TLS archive for its C cryptography exports.",
     "Windows object generation is not Windows execution qualification."
-  ]
+  ],
+  "providerPackages": [
+    "cc",
+    "cfg-if",
+    "find-msvc-tools",
+    "getrandom",
+    "libc",
+    "neoclr-native-crypto",
+    "neoclr-security-provider",
+    "ring",
+    "shlex",
+    "untrusted",
+    "wasi",
+    "windows-sys",
+    "windows-targets",
+    "windows_aarch64_gnullvm",
+    "windows_aarch64_msvc",
+    "windows_i686_gnu",
+    "windows_i686_gnullvm",
+    "windows_i686_msvc",
+    "windows_x86_64_gnu",
+    "windows_x86_64_gnullvm",
+    "windows_x86_64_msvc"
+  ],
+  "providerArchive": {
+    "path": "tools/native-crypto/target/release/libneoclr_native_crypto.a",
+    "sha256": "d745f24295e1931e7809ab2c0ef0f97db9d0d3a148a3caf63dd2da94c3995d20"
+  },
+  "providerTests": {
+    "safeRust": 1,
+    "nativeCrypto": 4,
+    "nativeTls": 5,
+    "passed": true
+  }
 }

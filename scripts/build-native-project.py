@@ -281,8 +281,6 @@ def build(project, bundle, aot, output, profile=PROFILE, bootstrap_root=None, re
         if https_server:
             for path in [ROOT / 'tools/native-tls/Cargo.toml', ROOT / 'tools/native-tls/Cargo.lock',
                          *(ROOT / 'tools/native-tls/src').glob('*.rs'),
-                         ROOT / 'tools/security-provider/Cargo.toml',
-                         *(ROOT / 'tools/security-provider/src').glob('*.rs'),
                          ROOT / 'docs/experiments/https-server/native-tls.h']:
                 report['inputs'][str(path)] = sha(path)
             command, archive = native_tls_build(windows)

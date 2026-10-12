@@ -68,9 +68,15 @@ def main():
             raise RuntimeError(f'{command[0]} exited {result.returncode}, expected {expected}: {result.stderr}')
         return result.stdout
     try:
-        manifest = ROOT / 'tools/native-tls/Cargo.toml'
+        manifest = ROOT / 'tools/native-crypto/Cargo.toml'
+        metadata = json.loads(run(['cargo', 'metadata', '--locked', '--format-version', '1', '--manifest-path', manifest]))
+        packages = sorted(package['name'] for package in metadata['packages'])
+        if any(name.startswith('rustls') or name == 'neoclr-native-tls' for name in packages):
+            raise RuntimeError('standalone cryptography unexpectedly depends on TLS')
+        report['providerPackages'] = packages
         run(['cargo', 'build', '--locked', '--release', '--manifest-path', manifest])
-        archive = ROOT / 'tools/native-tls/target/release' / ('neoclr_native_tls.lib' if windows else 'libneoclr_native_tls.a')
+        archive = ROOT / 'tools/native-crypto/target/release' / ('neoclr_native_crypto.lib' if windows else 'libneoclr_native_crypto.a')
+        report['providerArchive'] = dict(path=str(archive.relative_to(ROOT)), sha256=hashlib.sha256(archive.read_bytes()).hexdigest())
         base = ROOT / 'docs/experiments/aot-console'
         sources = [HERE / 'host.c', base / 'cryptography.c', base / 'text-arena.c', base / 'native-gc.c', base / 'root-probe.c']
         sources.append(ROOT / 'tools/native/windows-native-stack.c' if windows else base / 'native-stack.c')

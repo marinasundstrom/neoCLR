@@ -37,7 +37,8 @@ python3 docs/experiments/native-cryptography/validate.py \
 
 On Windows x64, run from an MSVC x64 developer environment and use `.exe` for the
 two tool paths. The same script is wired into the Windows/macOS security workflow.
-The script builds the provider archive and a focused GC/stack host, assembles the
+The script verifies that the standalone `tools/native-crypto` dependency graph
+contains no TLS provider, builds its archive and a focused GC/stack host, assembles the
 same IL for every mode, and checks real process results. Detailed commands and
 output go to the target directory's `validation.json`. The checked-in
 [checkpoint](validation.json) records the local case outcomes and input hashes.
@@ -54,9 +55,8 @@ and ordinary managed method bodies.
 
 Windows execution is pending; adding CI is not platform qualification. This is a
 private bytecode/source-host checkpoint, not the public Raven cryptography API or
-an installed bundle capability. The qualification host currently links the existing
-TLS archive for its raw C exports, though the cryptographic implementation itself
-is in the TLS-independent provider crate. A standalone native cryptography archive,
-normal project/JIT-host packaging, public managed projection and matching API
+an installed bundle capability. The qualification host now links only the standalone
+cryptography archive for its raw C exports. Normal project/JIT-host packaging,
+public managed projection and matching API
 reference snapshots remain next. Managed SslStream and certificate/trust APIs are
 also still open.

@@ -4,6 +4,7 @@ on:
   push:
     paths:
       - 'tools/native-tls/**'
+      - 'tools/native-crypto/**'
       - 'tools/security-provider/**'
       - 'tools/aot-poc/**'
       - 'docs/experiments/native-cryptography/**'
@@ -20,6 +21,7 @@ on:
   pull_request:
     paths:
       - 'tools/native-tls/**'
+      - 'tools/native-crypto/**'
       - 'tools/security-provider/**'
       - 'tools/aot-poc/**'
       - 'docs/experiments/native-cryptography/**'

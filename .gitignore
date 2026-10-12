@@ -45,3 +45,5 @@
 
 /runtime/raven/tests/index-range/bin/
 /runtime/raven/tests/index-range/obj/
+
+/tools/native-crypto/target/

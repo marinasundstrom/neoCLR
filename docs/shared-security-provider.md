@@ -50,12 +50,13 @@ will use canonical async InputStream/OutputStream and System.Concurrency.Tasks.
 
 ## Cryptographic primitive foundation
 
-The same private archive now exposes the C declarations in
-`tools/native-tls/include/neoclr_crypto.h`: secure random fill, one-shot SHA-256,
+The standalone `tools/native-crypto` archive exposes the C declarations in
+`tools/native-crypto/include/neoclr_crypto.h`: secure random fill, one-shot SHA-256,
 HMAC-SHA-256 and HMAC verification. All delegate to pinned ring 0.17.14, already
 used by Rustls. Its safe Rust implementation now lives in the separate
-`tools/security-provider` crate, without TLS dependencies; the TLS archive retains
-the existing C ABI wrappers. There are no public managed methods yet. Private interpreter services now project
+`tools/security-provider` crate, without TLS dependencies. The C ABI wrappers
+are packaged separately from TLS; native cryptography consumers no longer link
+Rustls or certificate parsing. There are no public managed methods yet. Private interpreter services now project
 these operations through verified byte-array contracts; explicit JIT/AOT lowering is now qualified on macOS through a source host. Normal
 host packaging, the public managed facade and API reference generation remain open.
 
@@ -101,9 +102,9 @@ random fill bounds; and injected provider failure clearing partial output. All t
 provider tests pass together on macOS. The same CI command covers these on Windows;
 Windows execution remains pending. Random tests check behavior, not statistical quality.
 
-The extraction checkpoint reruns all ten tests (nine C-ABI/TLS tests and one shared
-provider failure test). Both CI workflows watch the shared crate, and HTTPS project
-build manifests include its source inputs.
+The standalone archive checkpoint reruns all ten tests (four C-ABI tests, five TLS
+tests and one shared provider failure test). The security CI workflow watches both
+cryptography crates. HTTPS build manifests now include only their TLS dependencies.
 
 ## Typed interpreter boundary
 
@@ -129,6 +130,7 @@ CI job but has not been executed locally.
 
 The [explicit cryptography bindings](experiments/native-cryptography/README.md) now
 pass twelve identical cases across interpreter, JIT and AOT on macOS. The same
-Windows CI gate is configured but not yet executed. Host packaging, a standalone
-crypto archive and the managed facade remain open; this does not make public Raven
+Windows CI gate is configured but not yet executed. The qualification host links
+the standalone cryptography archive, with dependency checks excluding TLS. Normal
+host packaging and the managed facade remain open; this does not make public Raven
 cryptography or SslStream APIs available.

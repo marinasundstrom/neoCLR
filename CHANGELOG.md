@@ -13,7 +13,10 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   terminal Fault semantics. Twelve identical cases pass in interpreter/JIT/AOT
   on macOS (36 executions); binding admission tests reject changed contracts.
   Windows x64 object generation passes a SHA case, with execution pending the
-  expanded Windows/macOS CI gate. Public managed APIs and installed-host packaging
+  expanded Windows/macOS CI gate. Extract the unchanged C ABI into a standalone
+  native cryptography archive without TLS dependencies; all 36 mode executions and
+  ten provider/TLS tests pass on macOS. Native consumers now link that archive
+  instead of the TLS archive for cryptography exports. Public managed APIs and installed-host packaging
   remain open; this is a private source-host checkpoint.
 
 - Connect private typed cryptography services to the interpreter using the shared

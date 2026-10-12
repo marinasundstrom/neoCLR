@@ -1,0 +1,17 @@
+[package]
+name = "neoclr-native-crypto"
+version = "0.0.0"
+edition = "2024"
+publish = false
+license = "MIT"
+
+[workspace]
+
+[lib]
+crate-type = ["staticlib"]
+
+[dependencies]
+neoclr-security-provider = { path = "../security-provider" }
+
+[profile.release]
+panic = "abort"
