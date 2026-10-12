@@ -1,0 +1,15 @@
+{
+  "status": "failed",
+  "platform": "macOS-27.0-arm64-arm-64bit",
+  "toolchain": "stable",
+  "distribution": "native",
+  "full_tests": false,
+  "smoke_programs": [],
+  "build_profile": "release",
+  "validator_sha256": "7cbc1bfb6c7b7da877d709ee73647a8972781150e63010d9e0f50841ba0b1a04",
+  "commit": "874c36f8568032473605b2b51c1a696625964be6",
+  "archive_sha256": "6592511b3d60acfb4a05f3ab3af9ca28b3e4eb46cc72e767a67f7532e44b8d7c",
+  "tracked_files": 6068,
+  "error": "notice inventory differs from locked registry packages",
+  "elapsed_seconds": 2.565
+}

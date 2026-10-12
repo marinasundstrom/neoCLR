@@ -1,0 +1,47 @@
+{
+  "date": "2026-10-13",
+  "runtimeChange": "Only targeted deprecation allowances; no semantic runtime change.",
+  "checks": [
+    {
+      "name": "nested-types",
+      "command": "cargo test --locked --release --test nested_types",
+      "logSha256": "b080b18c42aff1e945f85cda358f70fc23f773fe7e667177d2746d285245a4f6",
+      "output": "   Compiling ring v0.17.14\n   Compiling neoclr v0.1.0-preview.13 (/Users/robert/Projects/neoclr)\n   Compiling rustls v0.23.45\n   Compiling rustls-webpki v0.103.15\n   Compiling neoclr-security-provider v0.0.0 (/Users/robert/Projects/neoclr/tools/security-provider)\n   Compiling neoclr-native-tls v0.0.0 (/Users/robert/Projects/neoclr/tools/native-tls)\n    Finished `release` profile [optimized] target(s) in 1m 43s\n     Running tests/nested_types.rs (target/release/deps/nested_types-a316335219d6e069)\n\nrunning 6 tests\ntest multiple_levels_distinct_owners_and_void_payload ... ok\ntest enclosing_visibility_is_effective_across_module_linking ... ok\ntest nested_callers_access_enclosing_private_members_without_opening_them_to_peers ... ok\ntest generic_lexical_owner_preserves_explicit_nested_parameters ... ok\ntest nested_generic_case_round_trip_execution_and_host_identity ... ok\ntest malformed_ownership_and_invalid_declarations_are_rejected ... ok\n\ntest result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.17s\n\n",
+      "passed": true
+    },
+    {
+      "name": "reflection",
+      "command": "cargo test --locked --release --test raven_reflection",
+      "logSha256": "5e7162dd7a487ed6cbc5b5a4ba147e992abd5acd241a8f381f2a87187f0d6c3e",
+      "output": "   Compiling neoclr v0.1.0-preview.13 (/Users/robert/Projects/neoclr)\n    Finished `release` profile [optimized] target(s) in 7.14s\n     Running tests/raven_reflection.rs (target/release/deps/raven_reflection-42387fa94db1470e)\n\nrunning 26 tests\ntest direct_native_type_result_preserves_public_interface_view ... ok\ntest descriptor_parameter_sequences_do_not_expose_runtime_owned_storage ... ok\ntest enum_snapshots_keep_unsigned_order_aliases_and_nominal_boxes ... ok\ntest bound_function_parameters_keep_closed_module_method_identity ... ok\ntest assembly_module_object_identity_preserves_catalog_scope ... ok\ntest inheritance_classification_metadata_round_trips_and_checks_directives ... ok\ntest descriptor_private_accessor_requires_explicit_inclusion ... ok\ntest executing_assembly_exposes_system_runtime_through_sequence ... ok\ntest member_queries_currently_enumerate_declarations_only ... ok\ntest executing_assembly_follows_source_caller_not_entry_or_runtime_facade ... ok\ntest discovery_limits_and_unloaded_references_fail_without_loading ... ok\ntest member_object_identity_includes_kind_closed_owner_and_definition ... ok\ntest handle_fields_must_be_assigned_by_class_constructors ... ok\ntest constructed_types_reuse_definition_tokens_and_arrays_are_not_members has been running for over 60 seconds\ntest constructed_types_reuse_definition_tokens_and_arrays_are_not_members ... ok\ntest object_get_type_rejects_null ... ok\ntest object_get_type_reports_derived_allocation_through_base_and_interface ... ok\ntest module_inventory_contains_open_generic_definitions ... ok\ntest type_has_no_metadata_query_exports ... ok\ntest parameter_identity_uses_owner_kind_closed_type_definition_and_position ... ok\ntest reflection_snapshots_implement_public_info_interfaces ... ok\ntest returned_descriptor_keeps_nested_type_snapshot_alive_and_obeys_heap_limit ... ok\ntest type_classification_distinguishes_open_closed_leaf_and_nominal_union ... ok\ntest property_tokens_are_definition_rows_scoped_to_the_declaring_module ... ok\ntest object_get_type_preserves_concrete_type_through_reference_views ... ok\ntest source_tokens_reach_type_member_and_parameter_interfaces ... ok\ntest value_type_classification_uses_type_category_not_addressing_mode has been running for over 60 seconds\ntest value_type_classification_uses_type_category_not_addressing_mode ... ok\n\ntest result: ok. 26 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 150.41s\n\n",
+      "passed": true
+    },
+    {
+      "name": "tooling",
+      "command": "PYTHONPATH=scripts python3 -m unittest test_validate_host test_native_sample_arguments test_native_bundle_notices",
+      "logSha256": "a980327a4623beba0fa1a3447e1ebf1f2c04898a1db2595c757731e1081b3287",
+      "output": ".......\n----------------------------------------------------------------------\nRan 7 tests in 0.218s\n\nOK\n",
+      "passed": true
+    },
+    {
+      "name": "clippy-all-targets",
+      "command": "cargo clippy --locked --all-targets -- -D warnings",
+      "logSha256": "ddf4ccb4dfae850102ee6943452b4afed6b627bdd05fd1168f5442a46506356c",
+      "output": "    Blocking waiting for file lock on build directory\n   Compiling ring v0.17.14\n   Compiling rustls v0.23.45\n    Checking rustls-webpki v0.103.15\n    Checking neoclr-security-provider v0.0.0 (/Users/robert/Projects/neoclr/tools/security-provider)\n    Checking neoclr-native-tls v0.0.0 (/Users/robert/Projects/neoclr/tools/native-tls)\n    Checking neoclr v0.1.0-preview.13 (/Users/robert/Projects/neoclr)\n    Finished `dev` profile [unoptimized + debuginfo] target(s) in 12m 17s\n",
+      "passed": true
+    },
+    {
+      "name": "clippy-corrected-regressions",
+      "command": "cargo clippy --locked --test nested_types --test raven_reflection -- -D warnings",
+      "logSha256": "a4479a3311b1d3ce64430080951cb88d206a8f8f11a4121be99616a9fb87afa4",
+      "output": "    Blocking waiting for file lock on build directory\n   Compiling ring v0.17.14\n   Compiling rustls v0.23.45\n    Checking rustls-webpki v0.103.15\n    Checking neoclr-security-provider v0.0.0 (/Users/robert/Projects/neoclr/tools/security-provider)\n    Checking neoclr-native-tls v0.0.0 (/Users/robert/Projects/neoclr/tools/native-tls)\n    Checking neoclr v0.1.0-preview.13 (/Users/robert/Projects/neoclr)\n    Finished `dev` profile [unoptimized + debuginfo] target(s) in 2m 03s\n",
+      "passed": true
+    }
+  ],
+  "sourceHashes": {
+    "tests/nested_types.rs": "0178b7c91cdb80ba7bf688b934792bce01c2dd85e43cefa19af2dd46ae403064",
+    "tests/raven_reflection.rs": "d1bd205d8b47da64e9c4be1d0cd724c5ec70c4258c38f21cf8ca2ac8f188409a",
+    "src/runtime_async.rs": "05e1e2abc5019a58b55fc6d74b843f1ea59b9d7636a38b11601ce67c3b7ff91e",
+    "src/scheduler.rs": "e3275f3f6f7c1adc17b3b1e950e5e0eb9209672ee3ebc1adaba9dd86ccb27cee"
+  }
+}

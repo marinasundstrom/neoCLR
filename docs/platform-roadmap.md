@@ -1,5 +1,10 @@
 # neoCLR platform roadmap
 
+**Release preflight (2026-10-13):** [local source and packaging checks](experiments/release-20261013/README.md)
+repair TLS notice coverage and stale generic-owner/logical-module tests. Fresh source
+smoke and focused repairs pass; clean hosted and Windows bundle qualification remain
+release gates. No publication or platform milestone reorder is implied.
+
 **Local default-JIT preview (2026-10-12):** the [author-testing installation](local-preview-20261012.md)
 now passes extracted HTTP JSON checks and repeated installed client/server runs.
 Heap-object layout is bounded independently from inline values; matching SDK/VSIX

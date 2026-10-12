@@ -8,6 +8,13 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-13
 
+- Record release preflight evidence: the full extracted-source run completed
+  with 1,956 passing tests and three stale expectations, now repaired with 32
+  passing focused tests. Fresh native-profile archive smoke passes all 25 programs,
+  notices, seed, FFI and embedding; seven tooling tests and strict Clippy pass.
+  Update candidate instructions and track clean hosted/Windows/editor gates.
+  Preserve the failed full-run report; no release or replacement installation occurs.
+
 - Update reflection regression fixtures to the logical-module contract: declare
   empty logical module names explicitly and report a type namespace through
   ModuleInfo rather than its physical CLI scope. Preserve assembly-scoped identity

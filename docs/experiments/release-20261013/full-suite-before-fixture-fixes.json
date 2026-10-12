@@ -1,0 +1,19 @@
+{
+  "status": "failed",
+  "platform": "macOS-27.0-arm64-arm-64bit",
+  "toolchain": "stable",
+  "distribution": "native",
+  "full_tests": false,
+  "smoke_programs": [],
+  "build_profile": "release",
+  "validator_sha256": "7cbc1bfb6c7b7da877d709ee73647a8972781150e63010d9e0f50841ba0b1a04",
+  "commit": "501532e2a98874bdcdba001850c3539aa1544b85",
+  "archive_sha256": "c9d9c0d6524f06aa7d5cfd05ee7a2c9d172786d57da0c514b5d0fed86801b3bb",
+  "tracked_files": 6068,
+  "registry_packages": 99,
+  "notice_files": 198,
+  "raven_library_snapshot": "not qualified by native distribution profile",
+  "rustc": "rustc 1.95.0 (59807616e 2026-04-14)\nbinary: rustc\ncommit-hash: 59807616e1fa2540724bfbac14d7976d7e4a3860\ncommit-date: 2026-04-14\nhost: aarch64-apple-darwin\nrelease: 1.95.0\nLLVM version: 22.1.2",
+  "error": "Command '['cargo', '+stable', 'test', '--locked', '--all-targets', '--no-fail-fast', '--release']' returned non-zero exit status 101.",
+  "elapsed_seconds": 1691.647
+}

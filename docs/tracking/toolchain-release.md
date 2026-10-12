@@ -5,6 +5,16 @@ This page owns shared integration/delivery status. The [HTTP tracker](../http-ca
 owns whether its packaged sample passes and whether the POC is complete; do not
 maintain a second HTTP completion checklist here.
 
+## Release preflight — 2026-10-13
+
+[Local qualification evidence](../experiments/release-20261013/README.md) records the
+notice audit repair, current JIT bundle notice refresh, three corrected stale test
+expectations and their passing focused checks. The full run completed with 1,956
+passing tests and those three failures; it remains recorded as failed. A fresh
+source archive passes all 25 smoke programs, seed/notices, native FFI and embedding.
+A clean hosted gate and fresh Windows bundle/editor qualification remain required.
+The local author-testing installation is unchanged; no release has been published.
+
 ## Installed default-JIT preview — 2026-10-12
 
 The [local installation](../local-preview-20261012.md) closes the HTTP async object-size

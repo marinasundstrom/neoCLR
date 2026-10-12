@@ -1,0 +1,15 @@
+{
+  "commit": "501532e2a98874bdcdba001850c3539aa1544b85",
+  "command": "cargo +stable test --locked --all-targets --no-fail-fast --release",
+  "exitCode": 101,
+  "completedTargets": 250,
+  "passed": 1956,
+  "failed": 3,
+  "ignored": 3,
+  "failedCases": [
+    "malformed_ownership_and_unsupported_contexts_are_rejected",
+    "assembly_module_object_identity_preserves_catalog_scope",
+    "source_tokens_reach_type_member_and_parameter_interfaces"
+  ],
+  "logSha256": "eec9eb37a4d82c0e0896417f57a1f48d39a0a395cc540ff07d4384a1cb80778b"
+}
