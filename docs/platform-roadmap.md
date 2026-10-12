@@ -1,5 +1,16 @@
 # neoCLR platform roadmap
 
+**End-to-end showcase target (2026-10-12):** the author identifies a neoCLR HTTP
+server and client exchanging JSON as the ultimate showcase, possibly backed by
+PostgreSQL running in Docker, with both applications possibly containerized too.
+Continue toward common APIs rather than platform-specific public surfaces. The
+[common async transport design](stream-design.md#common-async-transport-direction--2026-10-12)
+connects Windows HTTPS qualification to reusable streams, explicit TLS and verified
+client/server JSON round trips. PostgreSQL persistence and application containers
+are optional later slices; qualify the selected container/runtime target separately.
+This records a concrete consumer goal without replacing the active correctness gate
+or claiming Linux JIT/AOT or Docker application support.
+
 **Windows HTTPS follow-through (2026-10-12):** the author explicitly requests
 Windows behavior consistent with macOS. Source linking and a shared validation
 harness are implemented; a dedicated Windows CI gate now covers TLS versions,

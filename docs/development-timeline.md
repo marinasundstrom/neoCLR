@@ -15756,3 +15756,20 @@ or runtime-await default switch was performed.
   macOS regression passes 14 project cases and two Rust transport tests. Windows
   execution remains pending at this entry; ARM64, Windows runtime suspension and
   managed secure-stream APIs remain open. See the [HTTPS evidence record](experiments/https-server/README.md).
+
+
+## 2026-10-12 — Common APIs and the end-to-end showcase
+
+- **Author:** asks to continue toward common APIs where possible. Identifies the
+  ultimate showcase as a neoCLR HTTP server and client exchanging JSON, possibly
+  using PostgreSQL in Docker and possibly running both applications in Docker.
+- **Assistant:** keeps Windows HTTPS qualification first, and connects the next
+  common async stream/secure-transport work to that showcase. Compares .NET stream
+  composition, Go connection/TLS adapters and Tokio's async capabilities; records
+  buffer, cancellation, deadline, error and shutdown questions before publishing APIs.
+- **Proposed sequence:** qualify native HTTPS, establish common async byte transport,
+  add explicit secure-stream/server and verified-client integration, then exercise
+  JSON round trips with optional PostgreSQL persistence. Database/application Docker
+  packaging remains optional and needs its own runtime/host qualification. No Linux
+  native support is inferred from Windows/macOS results. See the
+  [stream design](stream-design.md#common-async-transport-direction--2026-10-12).

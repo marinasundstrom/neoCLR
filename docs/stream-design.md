@@ -1,5 +1,100 @@
 # Stream API proposal
 
+## Common async transport direction — 2026-10-12
+
+**Status: design follow-through, not implemented APIs.** The author requests async
+stream operations and a secure-stream equivalent, then emphasizes common APIs and
+learning from other platforms rather than reproducing .NET's hierarchy. The current
+implemented contracts are synchronous `System.IO.InputStream` and `OutputStream`;
+`System.Networking.Sockets.Socket` already provides Task-based Receive/Send with
+cancellation and nonrenewing deadlines. The [HTTPS host proof](experiments/https-server/README.md)
+shares its TLS engine and socket operation policy across native host builds, but
+still selects TLS for every accepted socket through a private host flag.
+
+The next bounded API slice should connect these existing layers, not add Windows
+or macOS stream types. Prefer common async input/output capabilities in System.IO,
+a socket-backed adapter in System.Networking, and a TLS decorator in
+System.Networking.Security. `SslStream` is a candidate name. Keep protocol framing
+in HTTP/SQL, TLS authentication/records below that, and readiness/scheduling/root
+ownership in the runtime. Use the existing managed Task and CancellationToken
+contracts; no new awaiter, scheduler or public native handle is needed for this step.
+
+### Comparison and unresolved choices
+
+Primary contracts reviewed 2026-10-12 (shipped APIs, not neoCLR commitments):
+
+- [.NET 10 SslStream](https://learn.microsoft.com/en-us/dotnet/api/system.net.security.sslstream?view=net-10.0)
+  provides TLS over another stream with explicit authentication and ownership
+  configuration. Reuse that composition principle; inheritance from a single
+  all-capabilities Stream base is not necessary for neoCLR's existing interfaces.
+- [.NET 10 Stream.WriteAsync](https://learn.microsoft.com/en-us/dotnet/api/system.io.stream.writeasync?view=net-10.0)
+  completes the requested write rather than returning a partial byte count.
+  neoCLR's existing OutputStream.Write and Socket.Send return counts. Settle this
+  difference explicitly: a complete-write helper can loop over a partial primitive,
+  but cancellation after partial progress is not transactional rollback.
+- [Go 1.27.2 net.Conn](https://pkg.go.dev/net@go1.27.2#Conn) composes byte I/O,
+  close and deadlines; [crypto/tls.Conn](https://pkg.go.dev/crypto/tls@go1.27.2#Conn)
+  wraps a connection. This supports a shared transport contract without exposing
+  OS-specific socket implementations. Its blocking-looking calls and goroutine
+  scheduling are not evidence that neoCLR should wrap blocking I/O in completed Tasks.
+- [Tokio AsyncRead](https://docs.rs/tokio/latest/tokio/io/trait.AsyncRead.html)
+  separates asynchronous read capability and polling. The capability split fits
+  neoCLR; exposing Rust polling or pinning to managed callers would duplicate
+  responsibilities already owned by neoCLR's runtime.
+
+Adding async members to the existing synchronous interfaces would force every
+implementation to provide them. Separate async capabilities allow genuine async
+network implementations and synchronously completed memory operations without
+pretending that blocking file/console operations have become nonblocking. Costs
+include additional interfaces, adapters and overloads. This is the preferred first
+experiment, not a final public signature. No independent .NET transport alternative
+has been evaluated for this slice; include that review before settling the broader
+secure-stream API. No performance advantage is claimed.
+
+### Showcase acceptance target
+
+The author identifies two neoCLR applications exchanging JSON over HTTP as the
+ultimate showcase. A proposed first end-to-end scenario is a client posting a typed
+record and reading it back, verifying nested JSON and error responses against the
+server. Use the same application code and common transport contracts on supported
+hosts; add explicit HTTPS and verified peer identity once client TLS is implemented.
+This is a proposed scenario, not a new sample claimed to run today.
+
+PostgreSQL in Docker is an optional persistence stage, reusing the developing SQL
+provider after its relevant authentication/transport gaps are addressed. Running
+both neoCLR applications in containers is another optional stage. Linux container
+packaging needs its own interpreter/JIT/AOT and network qualification; macOS and
+Windows native binaries cannot be treated as Linux container images. Decide that
+execution target explicitly, then verify startup/readiness, configuration, shutdown
+and the same JSON round trip. Do not couple reusable stream APIs to Docker or SQL.
+
+### Requirements for the first executable slice
+
+- Compile one common consumer against memory and socket adapters on macOS and
+  Windows. Keep byte-array range validation, short reads, zero-count reads, EOF,
+  partial writes, flush and closed-state behavior explicit. Decide ReadAsync /
+  WriteAsync naming and full-write versus partial-write semantics before publishing.
+- Preserve Task cancellation, distinguish timeout from cancellation and transport
+  failure, and never resume a poisoned TLS session after an interrupted transfer.
+  StreamError currently lacks network timeout/TLS distinctions: define the mapping
+  rather than silently flattening all failures to IoFailure. Do not make System.IO
+  depend on System.Networking.NetworkDeadline; evaluate a shared deadline contract
+  separately while retaining the existing HTTP deadline behavior.
+- Document buffer ownership until an operation settles and validate suspended GC
+  roots. Start with the runtime's supported arrays/copies; new span/memory types
+  or zero-copy claims are not prerequisites for common APIs.
+- Specify one reader/one writer concurrency, rejection of overlapping same-direction
+  operations, and close during pending I/O. Qualify duplex TLS explicitly; sequential
+  HTTP request/response coverage alone does not establish duplex behavior.
+- Separate abort/disposal from awaited graceful TLS shutdown under backpressure.
+  Define inner-stream ownership and authentication state before exposing a decorator.
+  The current best-effort close_notify is not a completed async shutdown contract.
+- Replace the host-wide TLS switch with explicit per-connection authentication only
+  after that common stream/ownership boundary is executable. Keep the current HTTPS
+  parity matrix as a regression gate and add JIT/interpreter/AOT coverage relevant
+  to each new managed contract. Update API reference snapshots when APIs are added.
+
+
 **Planning update, 2026-09-23:** this note preserves the earlier sync/async design.
 The [supplied Streams revision](proposals/streams-api.md) instead proposes
 System.Streams InputStream/OutputStream with Task-based I/O. The

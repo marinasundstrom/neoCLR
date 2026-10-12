@@ -8,6 +8,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-12
 
+- Record common async stream/secure-transport API direction with .NET, Go and Tokio
+  comparisons, ownership/error/deadline questions and executable acceptance gates.
+  Record the author-selected HTTP server/client JSON showcase, with PostgreSQL and
+  application containers as optional follow-through; no new managed APIs or Docker
+  qualification are claimed by this design slice.
+
 - Correct the native HTTP parity harness to compare callback fault identity,
   exit/output and response bytes without requiring engine-specific stack frames
   to match. Keep full traces and reject missing frames or extra diagnostics.
