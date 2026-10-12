@@ -8,6 +8,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-12
 
+- Expose recorded implementation flags through metadata MethodInfo's .NET-style
+  GetMethodImplementationFlags API. Preserve extern identity for imported runtime
+  internal calls as well as foreign imports; keep native descriptors and runtime
+  flags distinct. Validate provider exclusivity and metadata-only service readback.
+
 - Raise experimental native function selection/clone admission from 1,024 to
   2,048 and intermediate function inventory from 4,096 to 8,192 for the managed
   HTTPS/JSON consumer. Preserve reachability, interface retention and all type,

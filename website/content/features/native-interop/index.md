@@ -56,3 +56,7 @@ properties, enum values, errors and ownership rules.
 
 Metadata tools can inspect the immutable ABI descriptor without loading native code.
 Raven preserves `extern` when reading a native import from another assembly.
+
+Runtime-owned internal calls remain separate from foreign imports. Both use `extern`,
+while `MethodImpl(InternalCall)` identifies a runtime service and `NativeImport`
+identifies a library/export. Metadata inspection preserves both distinctions.

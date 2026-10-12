@@ -16055,3 +16055,20 @@ or runtime-await default switch was performed.
   object emission and overflow rejection pass. End-to-end HTTPS remains unqualified:
   the next admission failure is HttpError's 68-lane value layout against a 64-lane
   bound. See [scope, evidence and remaining gap](experiments/shared-tls/native-selection-budget.md).
+
+## 2026-10-12 — Internal-call identity follow-through
+
+- **Author:** “Right. We should take a route that makes sense.”
+- **Assistant choice:** use existing native descriptors and the .NET-style
+  GetMethodImplementationFlags inspection API, rather than adding redundant
+  implementation-kind state. Keep provider identity separate from implementation
+  options; do not expand the supported native flag set.
+- **Implemented outcome:** metadata inspection now exposes recorded implementation
+  flags, and Raven imports both InternalCall and native-import methods as extern.
+  Runtime services have no NativeImport descriptor; foreign imports have zero
+  implementation flags. The metadata API rejects selecting both providers.
+- **Validation:** the new compiler regression failed before the fix and passes
+  afterward, alongside ten foreign-import readback cases and focused metadata checks.
+  The API snapshot remains stale due to concurrent HTTP/TLS work. No runtime dispatch,
+  new MethodImpl option support or Runtime Contract setting changed. See
+  [evidence](experiments/foreign-interop/README.md#internal-call-identity-follow-through-2026-10-12).

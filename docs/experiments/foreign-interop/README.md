@@ -63,3 +63,15 @@ inputs from concurrent HTTP/TLS source and reference-declaration work (CoreDecla
 HttpBindings, SourceUnionReferences, SslDeclarations, Security/Ssl* and Web/Http*).
 Those changes are outside this slice; the snapshot was not refreshed from a mismatched
 reference assembly. None of the changed fingerprint inputs belongs to this follow-through.
+
+## Internal-call identity follow-through (2026-10-12)
+
+The same attribute-source probe additionally reloads an unbound runtime internal-call
+declaration and verifies static, non-abstract, extern identity without resolving a
+service. This failed before the InternalCall flag was included in IsExtern and passes
+afterward; all ten foreign readback cases still pass. The metadata --foreign-imports
+checks also pass, distinguishing zero implementation flags on managed/foreign methods
+from InternalCall, verifying a null native descriptor on the runtime service and
+rejecting attempts to attach a native import to it. No runtime dispatch code changed.
+The API snapshot check was repeated and remains stale from the concurrent unrelated
+source inputs noted above; guest reference signatures are unchanged by this slice.

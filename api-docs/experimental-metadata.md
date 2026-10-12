@@ -8377,3 +8377,13 @@ later mutations, including an import used as the entry point. SetInternalCall re
 an already imported declaration. Native JSON/binary preserve all descriptors; executable
 CLI writing rejects imports while reference projections retain throwing stubs.
 See [the runtime contract](../docs/native-interop.md).
+
+`Introspection.MethodInfo.GetMethodImplementationFlags(): System.Reflection.MethodImplAttributes`
+returns recorded implementation bits without loading code. Native snapshots currently
+admit zero or InternalCall; CLI snapshots expose their recorded bits without promising
+native execution support. InternalCall identifies a runtime service and has no
+NativeImport descriptor. Foreign imports have a descriptor and zero implementation
+flags; ordinary native managed methods have neither. This follows .NET's inspection
+API without treating Unmanaged, Native, NoInlining or other flags as implemented neoCLR
+features. Abstract methods must still be identified through IsAbstract; the absence
+of a foreign descriptor does not imply an executable managed body.

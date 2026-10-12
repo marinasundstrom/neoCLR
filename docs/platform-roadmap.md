@@ -20,7 +20,7 @@ and calls for explicit calling conventions and individual value marshalling. The
 parameter/result MarshalAs, Cdecl/System, UTF-8/UTF-16 input buffers and Bool8/Bool32.
 Native metadata preserves descriptors; lookup is lazy, and static class imports work.
 Loaded metadata inspection retains the ABI descriptor and Raven imported symbols retain
-the extern classification.
+the extern classification for both foreign imports and runtime internal calls.
 The [focused source/native evidence](experiments/foreign-interop/README.md) covers
 actual Raven attribute source and real foreign calls. JIT/AOT, installed bundles,
 other-host qualification, bounded buffers/ownership, error capture and callbacks remain

@@ -156,6 +156,22 @@ required; the neoCLR backend and explicit registered core/library identities own
 admission. The current compiler work is on Raven's separate neoCLR line, not main.
 See [compiler integration](raven-cli-bridge.md#foreign-import-attributes-2026-10-12).
 
+## Runtime internal calls and implementation options
+
+`extern` means the source declaration supplies no body. Its provider is identified
+separately: `MethodImpl(MethodImplOptions.InternalCall)` selects a runtime-owned
+service; `NativeImport` selects a foreign library/export. A declaration cannot select
+both. Runtime services use their registered managed signature and runtime conventions,
+not the public foreign-function marshaller. The current Raven service admission is
+restricted to internal extern namespace functions in neoCLR.Runtime.
+
+Metadata tooling can inspect GetMethodImplementationFlags() and NativeImport separately.
+Raven reports IsExtern for imported internal calls and foreign imports alike. Reading
+either kind does not resolve a runtime service or load a foreign library. The native
+wire format still accepts only zero or InternalCall implementation flags; this does
+not add NoInlining, NoOptimization or other MethodImpl options. There is no redundant
+implementation-kind enum or change to Runtime Contract configuration.
+
 ## Research and alternatives
 
 Author direction: implement platform invocation/FFI, learn from .NET without treating

@@ -43,6 +43,11 @@ public sealed class MethodInfo
     /// <remarks>Metadata inspection does not load libraries, resolve exports or synthesize source attributes.</remarks>
     public NativeImportDefinition? NativeImport => Definition.NativeImport;
 
+    /// <summary>Gets the recorded implementation flags, including InternalCall for runtime-provided methods.</summary>
+    /// <remarks>This metadata-only query does not resolve an implementation or imply support for every CLI flag.</remarks>
+    public System.Reflection.MethodImplAttributes GetMethodImplementationFlags()
+        => (System.Reflection.MethodImplAttributes)Definition.ImplementationAttributes;
+
     /// <summary>Gets the declaration name.</summary>
     public string Name { get; }
     /// <summary>Gets the namespace recorded for a namespace function; empty when absent.</summary>

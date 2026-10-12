@@ -29,6 +29,9 @@ internal static class ForeignImportChecks
         overrides[0] = "Bool32";
         var ordinary = booleans.AddFunction("Ordinary", new(PrimitiveType.Int32, []));
         ordinary.LoadConstant(42); ordinary.Return();
+        var service = booleans.AddFunction("RuntimeProvided", new(PrimitiveType.Void, []));
+        service.SetInternalCall();
+        Reject(() => service.SetNativeImport(new("x", "y")));
         var booleanSnapshot = AssemblyDefinition.ReadNativeAssembly(RuntimeAssemblyContainer.WriteBinary(booleans));
         var booleanContext = new MetadataLoadContext([booleanSnapshot]);
         var views = booleanSnapshot.MainModule.Methods.Select(booleanContext.Resolve).ToArray();
@@ -36,6 +39,11 @@ internal static class ForeignImportChecks
         if (descriptor is not { CallingConvention: "System", ReturnMarshalling: "Bool32" } ||
             descriptor.ParameterMarshalling[0] != "Bool8" || views.Single(m => m.Name == "Ordinary").NativeImport is not null)
             throw new Exception("introspection changed native ABI or ordinary method classification");
+        var serviceView = views.Single(m => m.Name == "RuntimeProvided");
+        if (serviceView.GetMethodImplementationFlags() != System.Reflection.MethodImplAttributes.InternalCall ||
+            serviceView.NativeImport is not null ||
+            views.Where(m => m.Name != "RuntimeProvided").Any(m => m.GetMethodImplementationFlags() != 0))
+            throw new Exception("implementation flags conflated runtime services, foreign imports and managed bodies");
         Reject(() => method.SetNativeImport(new("x", "y")));
         Reject(() => imported.SetInternalCall());
         Reject(() => graph.Write());
