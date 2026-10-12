@@ -172,6 +172,21 @@ wire format still accepts only zero or InternalCall implementation flags; this d
 not add NoInlining, NoOptimization or other MethodImpl options. There is no redundant
 implementation-kind enum or change to Runtime Contract configuration.
 
+### Choosing the implementation provider
+
+For new features and substantive revisions, consider runtime-owned InternalCall
+services and separate native libraries reached through FFI as alternative placements.
+Operations needing privileged GC, object-layout or execution-state access may belong
+inside the runtime. Features that can honor a stable ABI may benefit from independent
+native libraries, subject to ownership, error, packaging and compatibility costs.
+A runtime service can also use a native component internally; provider placement
+need not change the public managed API.
+
+Record the reason for the choice, its interpreter/JIT/AOT implications and validation.
+Do not infer placement or safety from the implementation language, assume boundary
+performance, or treat current FFI limitations as permanent architecture. This direction
+does not relocate existing services. Follow the [implementation-provider review](design-research.md#choose-runtime-services-or-foreign-libraries-deliberately).
+
 ## Research and alternatives
 
 Author direction: implement platform invocation/FFI, learn from .NET without treating

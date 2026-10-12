@@ -26,6 +26,49 @@ reflection, dispatch, debugger and frontend contracts. Do not treat an implement
 choice as settled merely because it exists. Keep published history frozen; describe
 reassessment and migration in current design documents and Unreleased entries.
 
+## Choose runtime services or foreign libraries deliberately
+
+Author direction, 2026-10-12: for features that need implementation outside managed
+code, explicitly consider both a runtime-owned service invoked through InternalCall
+and a separate native library invoked through the foreign-function interface.
+Neither placement is the default simply because the implementation is native.
+Keep ordinary managed implementations in the comparison where they meet the need.
+
+InternalCall is appropriate to consider when the operation needs privileged access
+to runtime invariants: allocation and GC, managed object representation, execution
+state, thread attachment or tightly coordinated runtime lifecycle. Account for the
+cost of enlarging the trusted runtime, adding bindings across execution modes, and
+coupling implementation changes to runtime releases.
+
+A separate native library is appropriate to consider when a feature can expose a
+well-defined ABI with explicit ownership and error contracts. Evaluate independent
+packaging/versioning, reuse, replacement and optional deployment against the costs
+of library resolution, ABI compatibility, marshalling, callbacks, lifetime management
+and target distribution. Foreign code may itself be managed by another runtime;
+the distinction concerns implementation ownership and guarantees, not its language.
+
+For each decision, record:
+
+- Required runtime privileges and whether a stable ABI can avoid exposing runtime
+  internals; identify GC roots, thread entry, callback and shutdown obligations.
+- Public managed API and behavior, including errors and cancellation, independently
+  of which implementation provider supplies them. A safe public wrapper must uphold
+  its guarantees whichever provider it uses.
+- Packaging, version compatibility, optional dependencies, supported platforms and
+  interpreter/JIT/AOT availability. Current FFI gaps count as implementation work,
+  not evidence that a feature must permanently live inside the runtime.
+- Boundary costs and relevant measurements when performance motivates placement;
+  neither InternalCall nor a foreign library is assumed faster without evidence.
+- The .NET API/runtime/library baseline, alternatives, selected tradeoffs and focused
+  validation, following the research requirements below. Keep provisional placement
+  and the conditions for reconsidering it explicit.
+
+This is an architectural review criterion, not a mandate to move existing services
+or introduce a new registration API. A runtime-owned adapter may delegate to a
+separate native component when that separation is justified. See the existing
+[provider distinction](native-interop.md#runtime-internal-calls-and-implementation-options)
+and [trust/ownership contract](design/native-import-export-contract.md#trust-and-ownership-across-the-boundary).
+
 ## Required design comparison
 
 For each substantive slice, record these points in its design document. A small

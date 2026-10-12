@@ -8,6 +8,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-12
 
+- Require an explicit architectural comparison of runtime-owned InternalCall
+  services and separate native libraries invoked through FFI when designing relevant
+  features. Record runtime privileges, ownership/lifecycle, packaging, execution-mode
+  support and measured boundary costs; no existing service placement changes.
+
 - Admit native Int64 boxing, exact type tests and checked unboxing for ordinary
   Object-valued SQL parameters. Preserve all 64 bits and GC ownership; differential
   interpreter/native tests cover signed extremes, mismatched/null unboxing and

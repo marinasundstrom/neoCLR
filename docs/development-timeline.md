@@ -25,6 +25,22 @@ available original wording; other text is a summary.
 
 See the [changelog](../CHANGELOG.md) and linked design documents for technical status.
 
+## 2026-10-12 — Runtime services versus separate foreign libraries
+
+- **Author:** asks to document consideration of implementing features in the runtime
+  and invoking them as internal calls versus implementing them in separate native
+  libraries and using foreign calls.
+- **Assistant response and action:** add an explicit implementation-provider comparison
+  to [design research](design-research.md#choose-runtime-services-or-foreign-libraries-deliberately)
+  and link it from the FFI contract. Compare required runtime privileges, ownership,
+  error/lifecycle behavior, public API, packaging/versioning, execution-mode support
+  and measured boundary costs. Keep the earlier trust-boundary distinction intact.
+- **Scope:** no default provider is selected and no existing service is moved. This
+  is a criterion for future feature design and substantive revisions; current FFI
+  gaps remain implementation work rather than permanent placement constraints.
+- **Validation:** documentation diff and staged whitespace checks only; runtime,
+  compiler and public API signatures are unchanged.
+
 ## 2026-10-12 — Callable foreign parameters and results
 
 - **Author:** requested a foreign parameter expressed as a callable so native code
