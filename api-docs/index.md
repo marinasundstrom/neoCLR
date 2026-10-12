@@ -27,6 +27,7 @@ member for parameters, return values, errors and usage notes.
 | Tasks and concurrency | [System.Concurrency.Tasks](xref:System.Concurrency.Tasks) · [System.Concurrency](xref:System.Concurrency) |
 | Dates and globalization | [System.Time](xref:System.Time) · [System.Globalization](xref:System.Globalization) |
 | Networking and HTTP | [System.Networking](xref:System.Networking) · [System.Web.Http](xref:System.Web.Http) · [Sockets](sockets.md) · [Routes](routes.md) |
+| Cryptography | [Hashing and secure random bytes](cryptography.md) · System.Security.Cryptography |
 | SQL databases | [SQL sessions and mapping](sql.md) · System.Data.Sql · System.Data.PostgreSql |
 | JSON | [System.Data.Json](xref:System.Data.Json) · [Serialization and HTTP content](json.md) |
 | Native libraries | [Foreign-function attributes](native-interop.md) · [NativeImportAttribute](xref:System.Runtime.InteropServices.NativeImportAttribute) · [MarshalAsAttribute](xref:System.Runtime.InteropServices.MarshalAsAttribute) |

@@ -50,3 +50,6 @@
 
 /docs/experiments/native-cryptography/project/bin/
 /docs/experiments/native-cryptography/project/obj/
+
+/runtime/raven/tests/cryptography/bin/
+/runtime/raven/tests/cryptography/obj/

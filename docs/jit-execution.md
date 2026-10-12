@@ -174,7 +174,7 @@ libraries cannot supply the new symbols. The bundle manifest records
 
 The [installed qualification](experiments/native-cryptography/README.md#installed-jit-host)
 uses the normal CLI without host, compiler or execution-mode overrides. This is
-private runtime plumbing beneath the planned .NET-style managed facade; it adds no
-public Raven cryptography types. Source AOT projects also link the provider on
-demand; public Raven facade APIs and packaged build kits remain separate gates. Windows uses the same preparation path and explicit DLL
+private runtime plumbing beneath the bounded .NET-style managed facade described
+in the [cryptography reference](../api-docs/cryptography.md). Source AOT projects also link the provider on
+demand; allocating/streaming overloads and packaged build kits remain separate gates. Windows uses the same preparation path and explicit DLL
 exports; execution of this new checkpoint is pending its CI job.

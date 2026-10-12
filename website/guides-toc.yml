@@ -120,6 +120,10 @@
       href: docs/text-numbers.md
     - name: "Local time mapping payloads"
       href: docs/time-zone-mappings.md
+    - name: "Native interop contracts (development)"
+      href: docs/native-interop.md
+    - name: "Cryptography (development)"
+      href: docs/cryptography.md
     - name: "SQL data access (development)"
       href: docs/sql.md
     - name: "Benchmarking"

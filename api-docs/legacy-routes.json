@@ -1,11 +1,11 @@
 {
   "System.Tasks.TaskState.html": {
-    "uid": "T:System.Tasks.TaskState",
+    "uid": "T:System.Concurrency.Tasks.TaskState",
     "anchors": {
-      "System_Tasks_TaskState": "T:System.Tasks.TaskState",
-      "System_Tasks_TaskState_Pending": "F:System.Tasks.TaskState.Pending",
-      "System_Tasks_TaskState_Completed": "F:System.Tasks.TaskState.Completed",
-      "System_Tasks_TaskState_Cancelled": "F:System.Tasks.TaskState.Cancelled"
+      "System_Tasks_TaskState": "T:System.Concurrency.Tasks.TaskState",
+      "System_Tasks_TaskState_Pending": "F:System.Concurrency.Tasks.TaskState.Pending",
+      "System_Tasks_TaskState_Completed": "F:System.Concurrency.Tasks.TaskState.Completed",
+      "System_Tasks_TaskState_Cancelled": "F:System.Concurrency.Tasks.TaskState.Cancelled"
     }
   },
   "System.Storage.FileWriteError.NotRegularFile.html": {
@@ -607,7 +607,7 @@
     }
   },
   "System.Tasks.html": {
-    "uid": "N:System.Tasks",
+    "uid": "N:System.Concurrency.Tasks",
     "anchors": {}
   },
   "System.IO.FileOutputStream.html": {
@@ -715,15 +715,15 @@
     }
   },
   "System.Tasks.Task-1.html": {
-    "uid": "T:System.Tasks.Task`1",
+    "uid": "T:System.Concurrency.Tasks.Task`1",
     "anchors": {
-      "System_Tasks_Task_1": "T:System.Tasks.Task`1",
-      "System_Tasks_Task_1_GetResult": "M:System.Tasks.Task`1.GetResult",
-      "System_Tasks_Task_1_GetAwaiter": "M:System.Tasks.Task`1.GetAwaiter",
-      "System_Tasks_Task_1_State": "P:System.Tasks.Task`1.State",
-      "System_Tasks_Task_1_Outcome": "P:System.Tasks.Task`1.Outcome",
-      "System_Tasks_Task_1_IsCompleted": "P:System.Tasks.Task`1.IsCompleted",
-      "System_Tasks_Task_1_IsCancelled": "P:System.Tasks.Task`1.IsCancelled"
+      "System_Tasks_Task_1": "T:System.Concurrency.Tasks.Task`1",
+      "System_Tasks_Task_1_GetResult": "M:System.Concurrency.Tasks.Task`1.GetResult",
+      "System_Tasks_Task_1_GetAwaiter": "M:System.Concurrency.Tasks.Task`1.GetAwaiter",
+      "System_Tasks_Task_1_State": "P:System.Concurrency.Tasks.Task`1.State",
+      "System_Tasks_Task_1_Outcome": "P:System.Concurrency.Tasks.Task`1.Outcome",
+      "System_Tasks_Task_1_IsCompleted": "P:System.Concurrency.Tasks.Task`1.IsCompleted",
+      "System_Tasks_Task_1_IsCancelled": "P:System.Concurrency.Tasks.Task`1.IsCancelled"
     }
   },
   "System.Runtime.CompilerServices.html": {
@@ -884,14 +884,14 @@
     }
   },
   "System.Tasks.Promise-1.html": {
-    "uid": "T:System.Tasks.Promise`1",
+    "uid": "T:System.Concurrency.Tasks.Promise`1",
     "anchors": {
-      "System_Tasks_Promise_1": "T:System.Tasks.Promise`1",
-      "System_Tasks_Promise_1__ctor": "M:System.Tasks.Promise`1.#ctor",
-      "System_Tasks_Promise_1__ctor_System_Tasks_TaskQueue_": "M:System.Tasks.Promise`1.#ctor",
-      "System_Tasks_Promise_1_Complete__0_": "M:System.Tasks.Promise`1.Complete",
-      "System_Tasks_Promise_1_Cancel": "M:System.Tasks.Promise`1.Cancel",
-      "System_Tasks_Promise_1_Task": "P:System.Tasks.Promise`1.Task"
+      "System_Tasks_Promise_1": "T:System.Concurrency.Tasks.Promise`1",
+      "System_Tasks_Promise_1__ctor": "M:System.Concurrency.Tasks.Promise`1.#ctor",
+      "System_Tasks_Promise_1__ctor_System_Tasks_TaskQueue_": "M:System.Concurrency.Tasks.Promise`1.#ctor",
+      "System_Tasks_Promise_1_Complete__0_": "M:System.Concurrency.Tasks.Promise`1.Complete",
+      "System_Tasks_Promise_1_Cancel": "M:System.Concurrency.Tasks.Promise`1.Cancel",
+      "System_Tasks_Promise_1_Task": "P:System.Concurrency.Tasks.Promise`1.Task"
     }
   },
   "System.Storage.FileWriteError.AccessDenied.html": {
@@ -986,12 +986,12 @@
     }
   },
   "System.Tasks.TaskQueue.html": {
-    "uid": "T:System.Tasks.TaskQueue",
+    "uid": "T:System.Concurrency.Tasks.TaskQueue",
     "anchors": {
-      "System_Tasks_TaskQueue": "T:System.Tasks.TaskQueue",
-      "System_Tasks_TaskQueue__ctor": "M:System.Tasks.TaskQueue.#ctor",
-      "System_Tasks_TaskQueue_Drain": "M:System.Tasks.TaskQueue.Drain",
-      "System_Tasks_TaskQueue_Default": "P:System.Tasks.TaskQueue.Default"
+      "System_Tasks_TaskQueue": "T:System.Concurrency.Tasks.TaskQueue",
+      "System_Tasks_TaskQueue__ctor": "M:System.Concurrency.Tasks.TaskQueue.#ctor",
+      "System_Tasks_TaskQueue_Drain": "M:System.Concurrency.Tasks.TaskQueue.Drain",
+      "System_Tasks_TaskQueue_Default": "P:System.Concurrency.Tasks.TaskQueue.Default"
     }
   },
   "System.Storage.FileReadError.AccessDenied.html": {

@@ -1,5 +1,11 @@
 # neoCLR platform roadmap
 
+**Gzip foundation (2026-10-12):** the author requests System.IO.Compression and
+identifies HTTP as a likely consumer. [GZipStream](gzip-compression.md) adds incremental
+async compression and bounded validated decompression over existing stream contracts.
+Automatic HTTP encoding/negotiation and incremental decoding remain follow-through;
+this author-directed slice does not reorder the active milestone.
+
 **Foreign function interface direction (2026-10-12):** the author requests platform
 invocation/FFI beyond a Windows-oriented interface, retains `extern` plus attributes,
 and calls for explicit calling conventions and individual value marshalling. The
@@ -42,8 +48,10 @@ TLS dependencies. Prepared JIT bundles now include the provider, with private
 cryptography cases passing through default CLI execution. Windows uses the pending
 CI gates. Source AOT projects now link the provider on demand, with a Raven consumer
 qualified in all three local modes. Packaged build kits and managed
-SSL/System.Security.Cryptography projections remain next. Socket/TLS adapters
-and certificate APIs remain open. Compare .NET,
+SSL composition remain next. A bounded public System.Security.Cryptography facade
+now adds destination-buffer SHA256/HMACSHA256, tag verification and secure random
+fill; allocating/streaming overloads, socket/TLS adapters and certificate APIs
+remain open. Compare .NET,
 Windows Runtime and other platforms, retaining .NET as the ergonomics target.
 See the [first async contract](stream-design.md#first-async-contract--2026-10-12).
 The subsequent [async-first naming direction](stream-design.md#async-first-naming-direction--2026-10-12)

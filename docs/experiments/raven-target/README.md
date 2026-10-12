@@ -1695,3 +1695,14 @@ RAV0103: 'None' is not in scope. No generated output or hashes were changed.
 Resolve that legacy union-reference build before refreshing translated snapshots.
 Native clock acceptance rebuilds the library from Raven sources and is independent
 of those translated artifacts.
+
+## Cryptography reference facade (2026-10-12)
+
+The reference bridge declares the bounded System.Security.Cryptography destination
+HashData methods, HMAC VerifyData and RandomNumberGenerator.Fill. It projects the
+CryptographyError union from Raven source into the aggregate reference. These
+stubs never execute. Native System.Runtime owns the Raven wrappers and internal
+service declarations; existing MethodImpl/InternalCall metadata and binding
+validation apply without new compiler Runtime Contract configuration or lowering.
+The facade uses byte arrays and Result instead of .NET spans and exceptions.
+See [contracts and validation](../../shared-security-provider.md#managed-cryptography-facade-development-2026-10-12).

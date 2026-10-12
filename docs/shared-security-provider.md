@@ -56,9 +56,8 @@ HMAC-SHA-256 and HMAC verification. All delegate to pinned ring 0.17.14, already
 used by Rustls. Its safe Rust implementation now lives in the separate
 `tools/security-provider` crate, without TLS dependencies. The C ABI wrappers
 are packaged separately from TLS; native cryptography consumers no longer link
-Rustls or certificate parsing. There are no public managed methods yet. Private interpreter services now project
-these operations through verified byte-array contracts; explicit JIT/AOT lowering is now qualified on macOS through a source host. Normal
-packaged build kits, the public managed facade and API reference generation remain open.
+Rustls or certificate parsing. A bounded public managed facade now exposes these operations (see below). Private interpreter services now project
+these operations through verified byte-array contracts; explicit JIT/AOT lowering is now qualified on macOS through a source host. Packaged build kits and broader cryptography APIs remain open.
 Source AOT projects now select and link the standalone provider on demand.
 
 The intended baseline is .NET's
@@ -132,8 +131,40 @@ CI job but has not been executed locally.
 The [explicit cryptography bindings](experiments/native-cryptography/README.md) now
 pass twelve identical cases across interpreter, JIT and AOT on macOS. The same
 Windows CI gate is configured but not yet executed. The qualification host links
-the standalone cryptography archive, with dependency checks excluding TLS. Normal
-packaged native build kits and the managed facade remain open. Source AOT projects
+the standalone cryptography archive, with dependency checks excluding TLS. Packaged native build kits and broader cryptography APIs remain open. Source AOT projects
 link the provider on demand, and prepared JIT hosts include these services for
-default CLI execution; this does not make public Raven
-cryptography or SslStream APIs available.
+default CLI execution. The bounded public cryptography facade is described below;
+SslStream remains open.
+
+## Managed cryptography facade (development, 2026-10-12)
+
+`System.Runtime` now owns public `System.Security.Cryptography.SHA256`,
+`HMACSHA256`, `RandomNumberGenerator` and the standard Raven `CryptographyError`
+union. HashData writes to a caller-provided byte array and returns `Result<int,
+CryptographyError>`; Fill returns `Result<unit, CryptographyError>`. HMAC VerifyData
+returns bool and delegates tag verification to the provider. The private native
+services remain internal library declarations.
+
+This first slice follows .NET's static algorithm names and destination-buffer
+HashData semantics. Deliberate differences are byte arrays instead of spans,
+Result instead of throwing for a short destination or RNG failure, and a direct
+provider-backed HMAC VerifyData helper. These choices preserve neoCLR's existing
+recoverable-error model and avoid asking callers to implement tag comparison.
+Costs are different signatures from .NET and a bounded surface; allocating
+HashData overloads, stream hashing and stateful algorithms remain support gaps.
+The existing .NET/ring sources above are the design baseline. No new Runtime
+Contract setting or Raven compiler behavior is introduced. The reference bridge
+contains declaration-only stubs and projects the error union from Raven source;
+all executable bodies come from the native managed library.
+
+[API contracts](../api-docs/cryptography.md) and the
+[managed test suite](../runtime/raven/tests/cryptography/Tests.rvn) document borrowed
+buffers, overlapping inputs, preserved tails, short destinations, exact tags,
+empty inputs and provider failure. Lower-level fault/RNG-injection evidence remains
+in the provider and runtime tests; the managed API adds no recoverable Fault path.
+
+Local managed qualification passes three discovered tests in interpreter, JIT and
+AOT (nine executions). Native project validation also fixes acceptance of the
+existing optional PostgreSQL bundle layout without requiring that provider at
+execution. Both aggregate and native API snapshots include these public types.
+Windows runs the same managed suite in its JIT workflow; execution remains pending.

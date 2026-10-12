@@ -266,5 +266,6 @@ The public managed API and installed-host packaging remain open.
 Development JIT bundles now include these private cryptography services in their
 normal host, with twelve cases checked through default CLI execution on macOS.
 Source AOT projects now link the same provider on demand, with a Raven source
-consumer checked in all three modes. Public Raven cryptography APIs and packaged
-build kits remain in development; Windows execution of this integration awaits CI.
+consumer checked in all three modes. The development
+[cryptography APIs](/docs/cryptography.html) now expose buffer-based SHA-256, HMAC
+and secure random fill. Packaged native build kits remain open; Windows execution of this integration awaits CI.

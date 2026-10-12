@@ -73,6 +73,9 @@ def main():
              '--bundle', installed, '--output', out/'cryptography'], 'cryptography-default-jit')
         run([sys.executable, ROOT/'docs/experiments/native-cryptography/validate-project.py',
              '--bundle', installed, '--aot', jit, '--output', out/'cryptography-project'], 'cryptography-project')
+        run([sys.executable, ROOT/'scripts/test-runtime-library.py', '--bundle', installed,
+             '--suite', 'cryptography', '--mode', 'interpreter', '--mode', 'jit', '--mode', 'native',
+             '--output', out/'public-cryptography'], 'public-cryptography')
         run([sys.executable, ROOT/'docs/experiments/jit-http/verify.py', '--bundle', installed,
              '--windows-build', out/'native/build.json', '--default-cli', '--mode', 'jit',
              '--output', out/'http'], 'http-default-jit')

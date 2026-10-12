@@ -1,0 +1,22 @@
+module System.Security.Cryptography
+
+import System.*
+import System.Result.*
+
+/// Secure random bytes supplied by the operating-system provider.
+public static class RandomNumberGenerator {
+    /// <summary>Fills the entire buffer with secure random bytes.</summary>
+    /// <param name="destination">Writable byte array; empty buffers succeed without requesting randomness.</param>
+    /// <returns>Ok(unit), or Error(ProviderFailure) after clearing the entire destination.</returns>
+    /// <remarks>Invalid managed storage is a terminal fault.</remarks>
+    static func Fill(destination: byte[]) -> Result<unit, CryptographyError> {
+        let status = neoCLR.Runtime.CryptoRandomFill(destination)
+        if status == 0 {
+            return Ok(())
+        }
+        if status == -2 {
+            return Error(CryptographyError.ProviderFailure)
+        }
+        System.Fail("Unexpected random provider result")
+    }
+}

@@ -1,0 +1,89 @@
+{
+  "passed": true,
+  "platform": "macOS-27.0-arm64-arm-64bit",
+  "modes": [
+    "interpreter",
+    "jit",
+    "native"
+  ],
+  "cases": [
+    {
+      "suite": "cryptography",
+      "mode": "interpreter",
+      "repetition": 1,
+      "exitCode": 0,
+      "elapsedSeconds": 32.117,
+      "stdout": "PASS SHA256 preserves aliases tails and short destinations\nPASS HMACSHA256 verifies known answers and rejects altered tags\nPASS RandomNumberGenerator accepts empty and writable buffers\nTests: 3, passed: 3, failed: 0, skipped: 0\n",
+      "stderr": ""
+    },
+    {
+      "suite": "cryptography",
+      "mode": "jit",
+      "repetition": 1,
+      "exitCode": 0,
+      "elapsedSeconds": 28.665,
+      "stdout": "PASS SHA256 preserves aliases tails and short destinations\nPASS HMACSHA256 verifies known answers and rejects altered tags\nPASS RandomNumberGenerator accepts empty and writable buffers\nTests: 3, passed: 3, failed: 0, skipped: 0\n",
+      "stderr": ""
+    },
+    {
+      "suite": "cryptography",
+      "mode": "native",
+      "repetition": 1,
+      "exitCode": 0,
+      "elapsedSeconds": 0.212,
+      "stdout": "PASS SHA256 preserves aliases tails and short destinations\nPASS HMACSHA256 verifies known answers and rejects altered tags\nPASS RandomNumberGenerator accepts empty and writable buffers\nTests: 3, passed: 3, failed: 0, skipped: 0\n",
+      "stderr": ""
+    }
+  ],
+  "bundleManifestSha256": "af3564f4a76cf3a5f1ed3b1f0bb851e69dac6f79dbe8783fc2580e92f13aecd3",
+  "aotSha256": "ab9b50ce02d9cd1a56a41451a0a5a7bb70764e8a4233f092e74fc124e7a6c53d",
+  "interpreterSha256": "c23f2034a7db8e25cdcdfee72fc4c1efcd47eb6e07f0abd04fc74fd388001b33",
+  "date": "2026-10-12",
+  "testsPerMode": 3,
+  "totalTestExecutions": 9,
+  "detailedReport": "target/crypto-public-tests-v3/report.json",
+  "testedLibraryArtifacts": {
+    "System.Runtime.dll": "9064e729addf66ee60f6f214aa49e5d4a52cb655c0fbe00b4aac6103dea17175",
+    "System.Data.dll": "088f511a37bb0076ff2e0d3e57963b4ff66f3a23e07f12b5cf91728cbb12459b",
+    "System.Networking.dll": "c432d1efbb0ba7e5477e9626c39b900bc21f190d79522628a738ae38ce6dd6cb",
+    "System.Web.dll": "6887540dcce926f378307dd52e57a91c5b94350f2627cabec8aeda988dd163b6",
+    "System.Data.PostgreSql.dll": "64f46e42d70c513d249edfe07fd83a60d8efe9f9197f8802c1a8dc865f428bd6",
+    "System.runtime.neox": "98a1ae1da85387c87746957e83a4015eb59d0566539a915c69f168d2b511b190",
+    "Core.dll": "3d4a676d379067c18a65a9beb8257ed40bf3196fc643a9ba1d559c619ec73fad"
+  },
+  "documentationLibraryArtifacts": {
+    "System.Runtime.dll": "86f66cad7cf0bce1b04d41a0537a0fd8ed6e9734c585b6f55c78166cf5cd885a",
+    "System.Data.dll": "cbf0a345058f128115539c7f155d4cd0dd694ad00351957ad524254cb2dc96f6",
+    "System.Networking.dll": "c79dfbf37671c96b774bf87f34569f2dcda98f4668177f856a17e170fbafd390",
+    "System.Web.dll": "f5fd71b4dd354a0c14157ecd09ef2cfdf3b2c548245816012990d7af18e3d2fb",
+    "System.Data.PostgreSql.dll": "9c477eefad10e9f3187bf0cbc818a44203a9ac3a644e733a1d37acfaf9d2b794",
+    "System.runtime.neox": "98a1ae1da85387c87746957e83a4015eb59d0566539a915c69f168d2b511b190",
+    "Core.dll": "3d4a676d379067c18a65a9beb8257ed40bf3196fc643a9ba1d559c619ec73fad"
+  },
+  "documentation": "After runtime tests, only XML comments on the three facade types were expanded and libraries rebuilt for the native documentation snapshot. Executable source bodies are unchanged.",
+  "sourcesSha256": {
+    "runtime/raven/src/System/Security/Cryptography/RandomNumberGenerator.rvn": "54f5a595d72c54097937119fb0d3c79a763cee25283ac95c325237c2d728397c",
+    "runtime/raven/src/System/Security/Cryptography/SHA256.rvn": "2e00e1b5fb1384d27cbfda77fe356bdf685878df620d19eb628b16856f4186a6",
+    "runtime/raven/src/System/Security/Cryptography/CryptographyError.rvn": "45a12b2a7b3cb43aa0324a2ca2c479bd8f6423a4198a678609c72dfc370b9ac0",
+    "runtime/raven/src/System/Security/Cryptography/HMACSHA256.rvn": "79c426360a3eac90f843b8d158b9f5b0b1471902dcecd86a44d1b49beda46fd8",
+    "runtime/raven/native/RuntimeCryptographyCalls.rvn": "9fbc54f2513cfb6205ecc00717cab535e77aca88a8db8d4946dfbbbbe69e5d17",
+    "runtime/raven/tests/cryptography/Tests.rvn": "946ab81f5cca34ccd77b13712a3aa15194ac8312931d8694b9db7f90077aafac",
+    "runtime/raven/tests/cryptography/Tests.rvnproj": "f3fb63664d446832c711972ca7f7150df7e964889fd5a5098b6908df59af0178"
+  },
+  "limitations": [
+    "Windows suite is wired into CI; this checkpoint is macOS only.",
+    "Provider-failure injection and invalid-storage faults reuse the existing lower-level tests.",
+    "Only destination-buffer APIs; allocating overloads, stream hashing, stateful algorithms and certificates remain open."
+  ],
+  "documentationValidation": {
+    "aggregateSnapshot": "passed against isolated staged source tree",
+    "nativeSnapshotTests": 2,
+    "nativeRendering": "passed",
+    "websitePublication": {
+      "passed": true,
+      "pagesChecked": 4212,
+      "legacyPagesRetained": 132
+    },
+    "scope": "Aggregate website rendering and link checks passed; after repairing native documentation, the publication stage was rerun successfully. No website was deployed."
+  }
+}

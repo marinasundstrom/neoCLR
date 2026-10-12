@@ -1881,3 +1881,30 @@ attributes compile in the focused foreign-import probe. The full installed libra
 and native RavenDoc archive have not been rebuilt for this development slice; native
 archive coverage of these five types remains a tracked gap. The aggregate reference
 and linked manual entry provide coverage meanwhile.
+
+## Cryptography foundation (development, 2026-10-12)
+
+SHA256, HMACSHA256, RandomNumberGenerator and CryptographyError are included in the
+aggregate reference and native reference snapshot. The [cryptography guide](cryptography.md)
+documents the initial byte-array destination API, Result errors, buffer ownership,
+provider-backed verification and unsupported overloads. No new public type is
+excluded. The error union is projected from its authored Raven source; reference
+stubs carry declarations only, while native System.Runtime supplies execution.
+
+## Gzip foundation (development, 2026-10-12)
+
+GZipStream and StreamError.InvalidData are included in aggregate and native references.
+The [compression guide](compression.md) documents every factory and operation, quotas,
+Finish/Close ownership and HTTP gaps. No public type or member is excluded.
+The aggregate is declaration-only; native System.Runtime owns the managed codec.
+
+### Native namespace-function XML documentation gap
+
+Raven revision `5614397c5` does not supply a canonical XML documentation ID for
+native namespace functions. The native audit therefore cannot restore their
+reviewed aggregate XML comments through `DocumentationCommentIdBuilder`.
+`System.Math.Exp` retains its summary and parameter documentation through the
+native-only [manual content entry](../docs/experiments/native-library-documentation-audit/api-content/math-exp.md).
+The signature remains metadata-generated. Remove this fallback when native
+namespace-function XML IDs and comment lookup are implemented; other module
+functions still need a documentation-coverage audit. No API is excluded.

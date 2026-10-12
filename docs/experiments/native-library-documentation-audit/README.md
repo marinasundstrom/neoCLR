@@ -99,3 +99,18 @@ the complete native bundle pass with the explicit unit-owner correction.
 Raven implementation: `502d1f19d`. Browser review before commit verified Math XML,
 Pi/E/Tau navigation, both Abs overloads and the CancellationToken → GetHashCode →
 Object link chain in the neoCLR theme at canonical API routes.
+
+## Native function documentation fallback (2026-10-12)
+
+With Raven `5614397c5`, native namespace functions render correctly but
+`DocumentationCommentIdBuilder` does not provide their XML IDs, preventing the
+recovery above. The themed audit merges shared API content with native-only
+`api-content/` entries into its fresh output directory. Math.Exp uses a reviewed
+manual summary and parameter entry until canonical IDs and comment lookup work.
+RavenDoc validates each content UID against an actual rendered symbol; metadata
+continues to supply signatures. See the tracked gap in
+[API maintenance](../../../api-docs/README.md#native-namespace-function-xml-documentation-gap).
+
+The historical sidecar normalizer also accepts a plain-text summary followed by
+XML parameter/return/remark tags (Encoding.Decode). It converts those contracts
+to Markdown directives before rendering; malformed or nested XML still fails.

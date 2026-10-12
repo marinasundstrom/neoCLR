@@ -1,0 +1,34 @@
+module System.Security.Cryptography
+
+import System.*
+import System.Result.*
+
+/// One-shot HMACSHA256 operations using the runtime cryptographic provider.
+public static class HMACSHA256 {
+    /// <summary>Writes a 32-byte digest. Short destinations remain unchanged; trailing bytes are preserved. Inputs may overlap destination and are never retained.</summary>
+    /// <param name="key">Fully initialized key bytes; empty keys are accepted.</param>
+    /// <param name="data">Fully initialized input bytes; empty data is accepted.</param>
+    /// <param name="destination">Writable byte array of at least 32 bytes.</param>
+    /// <returns>Ok(32), or Error(DestinationTooSmall) without mutation.</returns>
+    /// <remarks>Invalid storage or uninitialized inputs are terminal faults.</remarks>
+    static func HashData(key: byte[], data: byte[], destination: byte[]) -> Result<int, CryptographyError> {
+        let status = neoCLR.Runtime.CryptoHmacSha256(key, data, destination)
+        if status == 0 {
+            return Ok(32)
+        }
+        if status == -1 {
+            return Error(CryptographyError.DestinationTooSmall)
+        }
+        System.Fail("Unexpected cryptography provider result")
+    }
+
+    /// <summary>Verifies a complete tag through the provider's timing-safe comparison.</summary>
+    /// <param name="key">Fully initialized key bytes.</param>
+    /// <param name="data">Fully initialized message bytes.</param>
+    /// <param name="tag">Fully initialized tag; altered or truncated tags return false.</param>
+    /// <returns>True only for a matching complete 32-byte tag.</returns>
+    /// <remarks>Invalid storage remains a terminal fault.</remarks>
+    static func VerifyData(key: byte[], data: byte[], tag: byte[]) -> bool {
+        return neoCLR.Runtime.CryptoHmacSha256Verify(key, data, tag)
+    }
+}

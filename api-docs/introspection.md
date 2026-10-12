@@ -106,7 +106,7 @@ returns the interpreter's optional enclosing-type recipe. Top-level declarations
 produce None; nested declarations preserve exact enclosing definition identity;
 unknown types return Fault. The native adapter answers only explicitly retained
 nongeneric declarations and faults for unretained handles. It grants no callable
-rights. [Interpreter/JIT/AOT consumer and limits](../docs/experiments/declaring-type/README.md).
+rights. [Interpreter/JIT/AOT consumer and limits](https://github.com/marinasundstrom/neoCLR/blob/main/docs/experiments/declaring-type/README.md).
 This backend-only helper is outside guest RavenDoc selection; guest signatures are unchanged.
 
 The same unstable backend bridge provides

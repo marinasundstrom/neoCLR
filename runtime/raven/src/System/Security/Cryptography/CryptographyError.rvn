@@ -1,0 +1,17 @@
+module System.Security.Cryptography
+
+/// Recoverable errors from the bounded cryptography operations.
+public union CryptographyError {
+    /// The destination cannot hold the complete digest; nothing was written.
+    case DestinationTooSmall
+    /// Operating-system randomness failed; the requested destination was cleared.
+    case ProviderFailure
+
+    override func ToString() -> string {
+        return match self {
+            DestinationTooSmall => "DestinationTooSmall"
+            ProviderFailure => "ProviderFailure"
+            _ => "Empty"
+        }
+    }
+}

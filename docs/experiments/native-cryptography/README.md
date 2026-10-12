@@ -56,8 +56,9 @@ and ordinary managed method bodies.
 Windows execution is pending; adding CI is not platform qualification. This is a
 private bytecode checkpoint, not the public Raven cryptography API. The qualification host now links only the standalone
 cryptography archive for its raw C exports. Packaged native build kits,
-public managed projection and matching API
-reference snapshots remain next. Managed SslStream and certificate/trust APIs are
+allocating and streaming managed overloads remain next. The bounded
+[public facade](../../shared-security-provider.md#managed-cryptography-facade-development-2026-10-12)
+and both API snapshots are now available. Managed SslStream and certificate/trust APIs are
 also still open.
 
 ## Installed JIT host
@@ -76,8 +77,8 @@ python3 docs/experiments/native-cryptography/validate-bundle.py \
 
 The test verifies bundle hashes, declares the private InternalCalls in each test
 assembly, and runs all twelve cases against the installed seed and libraries.
-These test-owned declarations do not supply a public managed facade or alter the
-installed seed. Terminal faults use the normal host's exit code 1 and RuntimeError
+These test-owned declarations do not alter the installed seed. Public managed
+facade validation is tracked separately in the runtime cryptography test suite. Terminal faults use the normal host's exit code 1 and RuntimeError
 diagnostic, rather than the isolated test host's exit code 103.
 [Installed evidence](installed-validation.json) records macOS outcomes and a retained
 seven-case managed MemoryStream regression. The Windows JIT workflow now runs the

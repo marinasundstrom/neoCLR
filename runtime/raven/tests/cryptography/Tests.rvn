@@ -1,0 +1,98 @@
+module NeoClr.RuntimeTests
+
+import System.*
+import System.Result.*
+import System.Security.Cryptography.*
+import NeoClr.Testing.*
+
+[Test("SHA256 preserves aliases tails and short destinations")]
+func AHash() -> Result<unit, TestFailure> {
+    let data: byte[] = [(byte)97, (byte)98, (byte)99]
+    let output: byte[] = [
+        (byte)0, (byte)0, (byte)0, (byte)0, (byte)0, (byte)0, (byte)0, (byte)0,
+        (byte)0, (byte)0, (byte)0, (byte)0, (byte)0, (byte)0, (byte)0, (byte)0,
+        (byte)0, (byte)0, (byte)0, (byte)0, (byte)0, (byte)0, (byte)0, (byte)0,
+        (byte)0, (byte)0, (byte)0, (byte)0, (byte)0, (byte)0, (byte)0, (byte)0,
+        (byte)165
+    ]
+    _ = Assert.True(SHA256.HashData(data, output) is Ok(32), "SHA result")?
+    let expected: byte[] = [
+        (byte)186, (byte)120, (byte)22, (byte)191, (byte)143, (byte)1, (byte)207, (byte)234,
+        (byte)65, (byte)65, (byte)64, (byte)222, (byte)93, (byte)174, (byte)34, (byte)35,
+        (byte)176, (byte)3, (byte)97, (byte)163, (byte)150, (byte)23, (byte)122, (byte)156,
+        (byte)180, (byte)16, (byte)255, (byte)97, (byte)242, (byte)0, (byte)21, (byte)173
+    ]
+    var index = 0
+    while index < expected.Length {
+        _ = Assert.Equal((int)expected[index], (int)output[index])?
+        index = index + 1
+    }
+    _ = Assert.Equal(165, (int)output[32])?
+    let shortBuffer: byte[] = [(byte)165]
+    _ = Assert.True(SHA256.HashData(data, shortBuffer) is Error(CryptographyError.DestinationTooSmall), "Short destination")?
+    _ = Assert.Equal(165, (int)shortBuffer[0])?
+    let aliased: byte[] = [
+        (byte)0, (byte)0, (byte)0, (byte)0, (byte)0, (byte)0, (byte)0, (byte)0,
+        (byte)0, (byte)0, (byte)0, (byte)0, (byte)0, (byte)0, (byte)0, (byte)0,
+        (byte)0, (byte)0, (byte)0, (byte)0, (byte)0, (byte)0, (byte)0, (byte)0,
+        (byte)0, (byte)0, (byte)0, (byte)0, (byte)0, (byte)0, (byte)0, (byte)0
+    ]
+    _ = Assert.True(SHA256.HashData(aliased, aliased) is Ok(32), "Alias result")?
+    let aliasExpected: byte[] = [
+        (byte)102, (byte)104, (byte)122, (byte)173, (byte)248, (byte)98, (byte)189, (byte)119,
+        (byte)108, (byte)143, (byte)193, (byte)139, (byte)142, (byte)159, (byte)142, (byte)32,
+        (byte)8, (byte)151, (byte)20, (byte)133, (byte)110, (byte)226, (byte)51, (byte)179,
+        (byte)144, (byte)42, (byte)89, (byte)29, (byte)13, (byte)95, (byte)41, (byte)37
+    ]
+    index = 0
+    while index < aliased.Length {
+        _ = Assert.Equal((int)aliasExpected[index], (int)aliased[index])?
+        index = index + 1
+    }
+    return Ok(())
+}
+
+[Test("HMACSHA256 verifies known answers and rejects altered tags")]
+func BMac() -> Result<unit, TestFailure> {
+    let key: byte[] = [(byte)107, (byte)101, (byte)121]
+    let data: byte[] = [(byte)97, (byte)98, (byte)99]
+    let tag: byte[] = [
+        (byte)0, (byte)0, (byte)0, (byte)0, (byte)0, (byte)0, (byte)0, (byte)0,
+        (byte)0, (byte)0, (byte)0, (byte)0, (byte)0, (byte)0, (byte)0, (byte)0,
+        (byte)0, (byte)0, (byte)0, (byte)0, (byte)0, (byte)0, (byte)0, (byte)0,
+        (byte)0, (byte)0, (byte)0, (byte)0, (byte)0, (byte)0, (byte)0, (byte)0
+    ]
+    _ = Assert.True(HMACSHA256.HashData(key, data, tag) is Ok(32), "MAC result")?
+    let expected: byte[] = [
+        (byte)156, (byte)25, (byte)110, (byte)50, (byte)220, (byte)1, (byte)117, (byte)248,
+        (byte)111, (byte)75, (byte)28, (byte)184, (byte)146, (byte)137, (byte)214, (byte)97,
+        (byte)157, (byte)230, (byte)190, (byte)230, (byte)153, (byte)228, (byte)195, (byte)120,
+        (byte)230, (byte)131, (byte)9, (byte)237, (byte)151, (byte)161, (byte)166, (byte)171
+    ]
+    var index = 0
+    while index < tag.Length {
+        _ = Assert.Equal((int)expected[index], (int)tag[index])?
+        index = index + 1
+    }
+    _ = Assert.True(HMACSHA256.VerifyData(key, data, tag), "Verify")?
+    tag[0] = (byte)0
+    _ = Assert.True(!HMACSHA256.VerifyData(key, data, tag), "Reject altered tag")?
+    let small: byte[] = [(byte)165]
+    _ = Assert.True(!HMACSHA256.VerifyData(key, data, small), "Reject truncated tag")?
+    _ = Assert.True(HMACSHA256.HashData(key, data, small) is Error(CryptographyError.DestinationTooSmall), "Short MAC destination")?
+    return Assert.Equal(165, (int)small[0])
+}
+
+[Test("RandomNumberGenerator accepts empty and writable buffers")]
+func CRandom() -> Result<unit, TestFailure> {
+    let empty: byte[] = []
+    let output: byte[] = [
+        (byte)0, (byte)0, (byte)0, (byte)0, (byte)0, (byte)0, (byte)0, (byte)0,
+        (byte)0, (byte)0, (byte)0, (byte)0, (byte)0, (byte)0, (byte)0, (byte)0,
+        (byte)0, (byte)0, (byte)0, (byte)0, (byte)0, (byte)0, (byte)0, (byte)0,
+        (byte)0, (byte)0, (byte)0, (byte)0, (byte)0, (byte)0, (byte)0, (byte)0
+    ]
+    _ = Assert.True(RandomNumberGenerator.Fill(empty) is Ok, "Empty fill")?
+    _ = Assert.True(RandomNumberGenerator.Fill(output) is Ok, "Nonempty fill")?
+    return Assert.Equal(32, output.Length)
+}

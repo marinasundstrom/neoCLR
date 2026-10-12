@@ -25,7 +25,14 @@ if (args.Length == 3)
         if (!text.StartsWith("---\n", StringComparison.Ordinal) || delimiter < 0) continue;
         var start = delimiter + 4;
         var body = text[start..].Trim();
-        if (!body.StartsWith("<summary>", StringComparison.Ordinal)) continue;
+        if (!body.StartsWith("<summary>", StringComparison.Ordinal))
+        {
+            // Older declarations can mix a plain summary with XML contract tags.
+            var contract = System.Text.RegularExpressions.Regex.Match(body, @"(?m)^<(?:param|returns|remarks)[ >]");
+            if (!contract.Success || body[..contract.Index].Contains('<')) continue;
+            body = new System.Xml.Linq.XElement("summary", body[..contract.Index].Trim()).ToString()
+                + body[contract.Index..];
+        }
         var xml = System.Xml.Linq.XElement.Parse("<doc>" + body + "</doc>");
         if (xml.Elements().Any(element => element.HasElements || element.Name.LocalName is not ("summary" or "param" or "returns" or "remarks")))
             throw new InvalidDataException("Unsupported historical XML sidecar: " + file);
@@ -140,6 +147,18 @@ if (args.Length == 3)
         Path.ChangeExtension(Path.GetRelativePath(websiteRoot, source), ".html").Replace('\\', '/');
     var navigation = (IReadOnlyList<DocumentationNavigationItem>)loadNavigation.Invoke(null,
         [Path.Combine(websiteRoot, "toc.yml"), websiteRoot, resolveArticle])!;
+    // Native namespace functions currently lack canonical XML documentation IDs.
+    // Keep their reviewed fallback prose separate from CLI-carrier content IDs.
+    var apiContent = Path.Combine(output, "api-content");
+    Directory.CreateDirectory(apiContent);
+    foreach (var directory in new[] { Path.Combine(repository, "website/api-content"),
+        Path.Combine(repository, "docs/experiments/native-library-documentation-audit/api-content") })
+        foreach (var file in Directory.EnumerateFiles(directory, "*.md", SearchOption.AllDirectories))
+        {
+            var destination = Path.Combine(apiContent, Path.GetRelativePath(directory, file));
+            Directory.CreateDirectory(Path.GetDirectoryName(destination)!);
+            File.Copy(file, destination, overwrite: true);
+        }
     options = options with
     {
         Links = links,
@@ -157,7 +176,7 @@ if (args.Length == 3)
         NamespaceNavigation = Setting("namespaceNavigation") ?? "flat",
         SharedApiNavigation = true,
         ModuleTerminology = true,
-        ApiContent = Path.Combine(repository, "website/api-content")
+        ApiContent = apiContent
     };
 }
 // Audit harness only: invoke the existing internal combined renderer in the host tool.

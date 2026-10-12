@@ -97,7 +97,7 @@ string/JSON-node/object conversion overloads remain immediate. The serializer bo
 streams and preserves existing document quotas and errors. HTTP stream uploads await
 InputStream reads, including pending reads, before sending the next body chunk.
 
-See [the design and current qualification](../docs/stream-design.md) and the tested
+See [the design and current qualification](https://github.com/marinasundstrom/neoCLR/blob/main/docs/stream-design.md) and the tested
 memory-stream, encoding-streams, encoding-boundaries and json-streams suites under
 `runtime/raven/tests`. Native library support does not imply that the historical
 synchronous CLI execution bridge supports these new signatures.

@@ -28,6 +28,7 @@ is supported.
 | `System.Runtime` | RuntimeContext, the application entry point for the executing assembly and type information from runtime type handles. | [Runtime discovery](/features/introspection/index.html) |
 | `System.Storage` | Paths, storage items, File and Directory interfaces, StorageProvider lookup, the host FileSystem provider, metadata and FileText helpers with typed errors. Items describe stored resources; their byte and text streams use System.IO. | [Reference](xref:System.Storage), [storage items](storage-items.md), [providers](storage-provider.md), [working POC](storage-poc.md) |
 | `System.Concurrency.Tasks` | Task, Promise, TaskQueue, completion state, TaskOutcome and composition/propagation helpers. Tasks describe completion and cancellation; expected errors remain values such as Result. | [Reference](xref:System.Concurrency.Tasks), [Tasks guide](/features/tasks/index.html), [callback methods](callbacks.md) |
+| `System.Security.Cryptography` | Development buffer-based SHA-256, HMAC verification and secure random fill. | [Cryptography contracts](cryptography.md) |
 | `System.Text` | UnicodeScalar helpers, strict UTF-8/ASCII Encoding policies, conversion sessions and text error types. String itself lives in System. | [Text reference](xref:System.Text) · [Strings and UTF-8](/features/strings/index.html) |
 
 ## Runtime and compiler support

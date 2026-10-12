@@ -1,0 +1,23 @@
+module System.Security.Cryptography
+
+import System.*
+import System.Result.*
+
+/// One-shot SHA256 operations using the runtime cryptographic provider.
+public static class SHA256 {
+    /// <summary>Writes a 32-byte digest. Short destinations remain unchanged; trailing bytes are preserved. Inputs may overlap destination and are never retained.</summary>
+    /// <param name="data">Fully initialized input bytes; empty data is accepted.</param>
+    /// <param name="destination">Writable byte array of at least 32 bytes.</param>
+    /// <returns>Ok(32), or Error(DestinationTooSmall) without mutation.</returns>
+    /// <remarks>Invalid storage or uninitialized inputs are terminal faults.</remarks>
+    static func HashData(data: byte[], destination: byte[]) -> Result<int, CryptographyError> {
+        let status = neoCLR.Runtime.CryptoSha256(data, destination)
+        if status == 0 {
+            return Ok(32)
+        }
+        if status == -1 {
+            return Error(CryptographyError.DestinationTooSmall)
+        }
+        System.Fail("Unexpected cryptography provider result")
+    }
+}

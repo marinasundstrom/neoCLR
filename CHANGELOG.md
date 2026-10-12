@@ -23,7 +23,18 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   Source AOT project builds now link the provider only for selected cryptography
   services. A Raven consumer passes in interpreter/default-JIT/AOT, including
   standalone execution and a control proving unused declarations omit the provider.
-  Public managed APIs and packaged native build kits remain open.
+  Add the first public System.Security.Cryptography facade in System.Runtime:
+  destination-buffer SHA256/HMACSHA256.HashData, provider-backed HMAC verification,
+  RandomNumberGenerator.Fill and typed CryptographyError results. Three discovered
+  managed tests pass in interpreter/JIT/AOT (nine executions). Accept the existing
+  optional PostgreSQL bundle in AOT project builds. Refresh both API references
+  and add the module/contract guide; repair the missing native-interop guide sidebar
+  entry, stale task-namespace redirects and repository-evidence links found by
+  website validation. Retain native Math.Exp documentation through an explicit
+  manual fallback while namespace-function XML IDs remain unsupported, and normalize
+  legacy mixed Markdown/XML sidecars to keep Encoding.Decode HTML valid.
+  Allocating/streaming overloads, certificate
+  APIs and packaged native build kits remain open; Windows execution awaits CI.
 
 - Connect private typed cryptography services to the interpreter using the shared
   TLS-independent provider. Require exact byte-array signatures and report
