@@ -1,5 +1,13 @@
 # neoCLR platform roadmap
 
+**Windows HTTPS follow-through (2026-10-12):** the author explicitly requests
+Windows behavior consistent with macOS. Source linking and a shared validation
+harness are implemented; a dedicated Windows CI gate now covers TLS versions,
+rejection, fragmentation, timeout/cancellation, EOF/recovery and cleartext isolation.
+Windows runtime evidence is pending. The author also requests async stream concepts
+and a reusable secure-stream equivalent, clarifying that .NET is a reference rather
+than a required hierarchy; evaluate other platforms before settling that API.
+
 **HTTPS server direction (2026-10-12):** after discussing shared TLS, the author
 explicitly selects HTTPS server support. The [native hosting proof](experiments/https-server/README.md)
 puts Rustls behind runtime-owned nonblocking I/O, preserving Raven HttpServer handling,

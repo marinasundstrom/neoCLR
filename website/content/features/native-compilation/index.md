@@ -252,3 +252,7 @@ bodies and generated state machines dispose on ordinary completion or cancellati
 Fault remains terminal. [Qualification and limits](https://github.com/marinasundstrom/neoCLR/blob/main/docs/experiments/runtime-async/generic-cleanup/README.md)
 include pending GC, captured values and interpreter/JIT/AOT execution. Windows uses
 the generated-state-machine path; runtime suspension there remains future work.
+
+Windows HTTPS source-build integration now has a dedicated CI qualification gate
+using the same TLS and HTTP cases as macOS. Passing Windows runtime evidence is
+still pending; this does not add a public secure-stream API or packaged TLS support.

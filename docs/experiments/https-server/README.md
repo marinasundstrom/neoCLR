@@ -194,3 +194,11 @@ OutputStream interfaces are synchronous. The next managed design should compare
 machines, addressing buffer ownership, cancellation, authentication, duplex use and
 async shutdown. This is direction, not a shipped API or a settled class hierarchy.
 The host-only switch remains provisional while Windows behavior is qualified.
+
+The `Windows native HTTPS project` GitHub workflow runs
+`scripts/validate-windows-https-project.py` in an MSVC x64 environment. It rebuilds
+source libraries with Raven `371d1d7078bffa05e5e2607b6d3cd3833d6e8404`, builds
+HTTPS and cleartext versions of the same Raven project, and runs 15 host cases and
+two Rust transport tests. Reports retain commands, compiler/artifact hashes and
+failure logs; generated test keys live only in a temporary directory. A workflow
+existing or starting is not evidence that Windows passed.

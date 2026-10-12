@@ -1,0 +1,58 @@
+name: Windows native HTTPS project
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'tools/native-tls/**'
+      - 'docs/experiments/https-server/**'
+      - 'docs/experiments/aot-console/socket-*'
+      - 'scripts/build-native-project.py'
+      - 'scripts/validate-windows-https-project.py'
+      - 'scripts/verify-native-http-json.py'
+      - '.github/workflows/windows-native-https-project.yml'
+  pull_request:
+    paths:
+      - 'tools/native-tls/**'
+      - 'docs/experiments/https-server/**'
+      - 'docs/experiments/aot-console/socket-*'
+      - 'scripts/build-native-project.py'
+      - 'scripts/validate-windows-https-project.py'
+      - 'scripts/verify-native-http-json.py'
+      - '.github/workflows/windows-native-https-project.yml'
+permissions:
+  contents: read
+jobs:
+  https-project:
+    runs-on: windows-2022
+    timeout-minutes: 45
+    env:
+      PYTHONUTF8: '1'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: |
+            10.0.x
+            11.0.100-rc.1.26425.128
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Build and qualify HTTPS and cleartext hosts
+        shell: pwsh
+        run: |
+          $openssl = 'C:\Program Files\Git\usr\bin'
+          if (-not (Test-Path "$openssl\openssl.exe")) { throw 'OpenSSL test certificate tool not found' }
+          $env:PATH = "$openssl;$env:PATH"
+          $vs = & "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\vswhere.exe" -latest -products '*' -requires Microsoft.VisualStudio.Component.VC.Tools.x86.x64 -property installationPath
+          if (-not $vs) { throw 'MSVC x64 tools not found' }
+          cmd /c "`"$vs\VC\Auxiliary\Build\vcvars64.bat`" && python scripts/validate-windows-https-project.py --output target/windows-https-project-validation"
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: windows-native-https-project-${{ github.run_id }}-${{ github.run_attempt }}
+          path: target/windows-https-project-validation/
+          include-hidden-files: true
+          retention-days: 14
+          if-no-files-found: warn

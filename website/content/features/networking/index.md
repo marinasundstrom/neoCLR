@@ -187,3 +187,7 @@ TLS record handling stays below the existing HTTP handlers. This HTTPS-only host
 is not installed support or a public per-listener configuration API. Windows,
 interpreter TLS and HTTPS client integration remain open.
 [Host setup and validation](https://github.com/marinasundstrom/neoCLR/blob/main/docs/experiments/https-server/README.md).
+
+Windows HTTPS source-build integration now has a dedicated CI qualification gate
+using the same TLS and HTTP cases as macOS. Passing Windows runtime evidence is
+still pending; this does not add a public secure-stream API or packaged TLS support.

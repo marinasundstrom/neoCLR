@@ -22,7 +22,9 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   27 runtime-async AOT/JIT cases and two Rust transport tests pass on macOS ARM64.
   Add Windows x64 MSVC TLS archive/link support and a portable HTTPS project
   validator using the same socket adapter and cases as macOS. Build-policy checks
-  pass; Windows execution qualification is pending.
+  pass; Windows execution qualification is pending. Add a dedicated Windows CI
+  gate that rebuilds the pinned compiler/libraries and runs the shared HTTPS cases
+  plus cleartext isolation, preserving failure logs and evidence.
 
 - Fix the HTTPS source compiler gap through Raven main `99ae011b4`, deliberately
   carried to its neoCLR branch as `c71baae94`: traverse unary operands so `use`

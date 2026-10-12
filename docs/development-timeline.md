@@ -15739,3 +15739,20 @@ or runtime-await default switch was performed.
 - **Open boundaries:** eager compilation, interpreted debugging, Windows runtime
   suspension and Windows ARM64 remain separate gaps. No interpreter fallback hides
   unsupported native programs. See [the execution contract](jit-execution.md).
+
+
+## 2026-10-12 — Windows HTTPS parity and reusable secure streams
+
+- **Author:** directs continuing Windows HTTPS support with macOS-consistent
+  behavior and separate commits per slice. Suggests async stream methods followed
+  by an SslStream equivalent, possibly System.Networking.Security.SslStream.
+- **Author clarification:** “The point that we need the concepts and they don't
+  have to be exactly like .NET if we can improve them by looking at other platform.”
+- **Assistant:** retains Windows qualification as the immediate task; proposes
+  reusable async byte transport and TLS composition, comparing .NET and other
+  platforms before settling the managed API. No new class hierarchy is adopted.
+- **Actions:** adds source Windows MSVC TLS linking and a portable shared validator,
+  then a dedicated Windows GitHub Actions gate with a pinned native Raven compiler.
+  macOS regression passes 14 project cases and two Rust transport tests. Windows
+  execution remains pending at this entry; ARM64, Windows runtime suspension and
+  managed secure-stream APIs remain open. See the [HTTPS evidence record](experiments/https-server/README.md).
