@@ -8,6 +8,7 @@ import platform
 from pathlib import Path
 import shutil
 import subprocess
+from native_bundle_samples import refresh_samples, sample_definitions, configure_editor_tasks
 
 ROOT = Path(__file__).resolve().parents[1]
 sha = lambda path: hashlib.sha256(Path(path).read_bytes()).hexdigest()
@@ -19,9 +20,12 @@ p.add_argument('--host-recipe', type=Path, required=True, help='Passing native a
 p.add_argument('--libraries', type=Path, help='Replace libraries with a coherent rebuilt native bundle')
 p.add_argument('--compiler-directory', type=Path, help='Matching Raven compiler directory for replacement libraries')
 p.add_argument('--output', type=Path, required=True)
+p.add_argument('--refresh-samples', action='store_true', help='Refresh packaged Raven samples against replacement libraries')
 p.add_argument('--heap-bytes', type=int, default=33554432)
 p.add_argument('--byte-array-limit', type=int, default=4194304)
 a = p.parse_args()
+if a.refresh_samples and not a.libraries:
+    p.error('--refresh-samples requires replacement --libraries')
 windows = platform.system() == 'Windows' and platform.machine().lower() in ('amd64', 'x86_64')
 if not windows and not (platform.system() == 'Darwin' and platform.machine() == 'arm64'):
     p.error('JIT bundles currently support macOS ARM64 and Windows x64')
@@ -168,8 +172,17 @@ try:
     manifest['jit'] = dict(default=True, compiler='bin/neoclr-aot-poc' + suffix,
                            host='bin/' + helper_name, runtimeAsync=not windows, cryptography=True, tlsOwnership=True,
                            heapBytes=a.heap_bytes, byteArrayLimit=a.byte_array_limit)
-    # Current verification tools make their interpreter controls explicit.
-    for name in ('verify-native-bundle.py', 'verify-native-http-json.py'):
+    if a.refresh_samples:
+        refresh_samples(bundle, manifest)
+        configure_editor_tasks(bundle, manifest['samples'])
+        for sources, _, _ in sample_definitions().values():
+            for source in sources:
+                path = ROOT / 'docs/experiments' / source
+                report['inputsSha256'][str(path)] = sha(path)
+        path = ROOT / 'scripts/native_bundle_samples.py'
+        report['inputsSha256'][str(path)] = sha(path)
+    # Acceptance defaults to installed JIT when the bundle advertises it.
+    for name in ('verify-native-bundle.py', 'verify-native-http-json.py', 'run-native-sample.py'):
         shutil.copy2(ROOT / 'scripts' / name, bundle / 'tools' / name)
     manifest['files'] = {path.relative_to(bundle).as_posix(): sha(path)
                          for path in sorted(bundle.rglob('*')) if path.is_file()}

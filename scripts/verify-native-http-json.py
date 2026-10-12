@@ -39,19 +39,29 @@ def main():
         parser.add_argument('--' + name, type=Path, required=True)
     parser.add_argument('--module', type=Path, action='append', required=True)
     parser.add_argument('--object-root', type=Path)
+    parser.add_argument('--execution', choices=('default', 'interpreter'), default='interpreter')
+    parser.add_argument('--server-reflection-roots', type=Path)
+    parser.add_argument('--client-reflection-roots', type=Path)
     args = parser.parse_args()
     inputs = [args.runtime, args.server, args.client, args.seed, *args.module, *([args.object_root] if args.object_root else [])]
-    report = {'inputs': {str(p.resolve()): hashlib.sha256(p.read_bytes()).hexdigest() for p in inputs}, 'runs': [], 'passed': False}
+    inputs += [p for p in (args.server_reflection_roots, args.client_reflection_roots) if p]
+    report = {'execution': args.execution, 'inputs': {str(p.resolve()): hashlib.sha256(p.read_bytes()).hexdigest() for p in inputs}, 'runs': [], 'passed': False}
     args.output.parent.mkdir(parents=True, exist_ok=True)
     if args.output.exists():
         raise FileExistsError(args.output)
 
     def command(assembly, argument):
-        result = [str(args.runtime.resolve()), 'run', str(assembly.resolve()), '--execution', 'interpreter', '--system', str(args.seed.resolve()), '--instructions', '100000000']
-        for module in args.module:
-            result += ['--module', str(module.resolve())]
-        if args.object_root:
-            result += ['--object-root', str(args.object_root.resolve())]
+        result = [str(args.runtime.resolve()), 'run', str(assembly.resolve())]
+        if args.execution == 'interpreter':
+            result += ['--execution', 'interpreter', '--system', str(args.seed.resolve()), '--instructions', '100000000']
+            for module in args.module:
+                result += ['--module', str(module.resolve())]
+            if args.object_root:
+                result += ['--object-root', str(args.object_root.resolve())]
+        else:
+            roots = args.server_reflection_roots if assembly == args.server else args.client_reflection_roots
+            if roots:
+                result += ['--reflection-roots', str(roots.resolve())]
         return result + ['--', argument]
 
     try:

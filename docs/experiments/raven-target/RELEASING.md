@@ -5,6 +5,26 @@ build. It does **not** follow Raven's full product release cycle or imply a norm
 Raven release. Keep compiler changes on the Raven experimental feature branch; do
 not merge or tag Raven main just to ship this bundle.
 
+## Current local candidate preparation — 2026-10-12
+
+Native packages now share current sample definitions, async stream examples and
+explicit JSON reflection roots. `verify-native-bundle.py` uses default CLI execution
+when a bundle advertises JIT; `--execution interpreter` selects the differential
+control. VS Code's `neoCLR: Run` task calls the same reflection-root preparation
+through `tools/run-native-sample.py`; edited samples rebuild before execution.
+The optional System.Data.PostgreSql library is accepted by the package builder.
+`prepare-jit-bundle.py --refresh-samples` refreshes known sample inputs only when
+matching replacement libraries are supplied. Archive/extract acceptance remains
+required; a successful staging step does not qualify an installed package.
+
+Raven main's method-group overload fix is deliberately carried to native compiler
+`acfe352067b8428f8414d345111527ad6a8b26ef`; see the
+[integration record](../../raven-cli-bridge.md#method-group-overload-applicability--2026-10-12).
+The local candidate uses a fully packaged compiler and matching library build;
+a partial development compiler copy failed the async JSON consumer and is not an
+installation candidate. This checkpoint does not publish a release or close the
+Windows package and native-only bootstrap gates.
+
 ## Scope and evidence
 
 The [release walkthrough](../../runtime-raven-preview.md) defines two primary paths:

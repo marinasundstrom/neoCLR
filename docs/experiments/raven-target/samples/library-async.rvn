@@ -3,12 +3,8 @@ import System.Concurrency.Tasks.*
 import System.Console.*
 
 async func Main() -> Task<unit> {
-    let source = Promise<int>()
-    TaskQueue.Default.Post(() => {
-        _ = source.Complete(41)
-    })
+    let operation = Task.Run(() => 41)
     WriteLine("Suspended")
-    let value = await source.Task
+    let value = await operation
     WriteLine(value + 1)
-    return ()
 }

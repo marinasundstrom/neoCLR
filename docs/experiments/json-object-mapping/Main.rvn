@@ -2,6 +2,7 @@ import System.*
 import System.Data.Json.*
 import System.IO.*
 import System.Result.*
+import System.Concurrency.Tasks.*
 
 func Check(condition: bool) {
     if !condition {
@@ -9,7 +10,7 @@ func Check(condition: bool) {
     }
 }
 
-func RoundTrip() -> Result<unit, MappingError> {
+async func RoundTrip() -> Task<Result<unit, MappingError>> {
     let document = JsonSerializer.DeserializeNode("{\"station\":\"Café\"}")?
     let report = DecodeReport(document)?
     Check(report.Station == "Café")
@@ -20,9 +21,9 @@ func RoundTrip() -> Result<unit, MappingError> {
 
     // Serializer borrows the stream; mapping remains a separate DOM operation.
     let stream = MemoryStream()
-    _ = JsonSerializer.SerializeNode(stream, mapped)?
+    _ = await JsonSerializer.SerializeNode(stream, mapped)?
     _ = stream.Seek(0).MapError(error => MappingError.Schema("Seek failed"))?
-    let reread = JsonSerializer.DeserializeNode(stream)?
+    let reread = await JsonSerializer.DeserializeNode(stream)?
     let restored = DecodeReport(reread)?
     Check(restored.Station == report.Station)
     Check(restored.Assignments == 1)
@@ -36,8 +37,8 @@ func RoundTrip() -> Result<unit, MappingError> {
     return Ok(())
 }
 
-func Main() {
-    if let Ok(_) = RoundTrip() {
+async func Main() -> Task<()> {
+    if let Ok(_) = await RoundTrip() {
         Console.WriteLine("JSON object mapping checks passed")
     } else {
         System.Fail("JSON object mapping failed")

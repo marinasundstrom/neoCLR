@@ -9,6 +9,7 @@ import shutil
 import subprocess
 import tarfile
 import xml.etree.ElementTree as X
+from native_bundle_samples import sample_definitions, configure_editor_tasks
 
 ROOT = Path(__file__).resolve().parent.parent
 
@@ -27,7 +28,8 @@ def main():
         if args.core or args.seed:
             raise ValueError('Split bundle owns its core and seed; omit --core and --seed')
         catalog = json.loads((args.libraries / 'bundle.json').read_text())
-        if catalog['assemblyNames'] != ['System.Runtime', 'System.Data', 'System.Networking', 'System.Web']:
+        core_assemblies = ['System.Runtime', 'System.Data', 'System.Networking', 'System.Web']
+        if catalog['assemblyNames'] not in (core_assemblies, core_assemblies + ['System.Data.PostgreSql']):
             raise ValueError('Unsupported split class-library selection')
         for relative, expected in catalog['files'].items():
             path = (args.libraries / relative).resolve()
@@ -107,20 +109,13 @@ def main():
         for name in ('Numbers', 'Http'):
             shutil.copy2(args.libraries / (name + '.dll'), staged / 'lib' / (name + '.dll'))
             shutil.copy2(ROOT / 'api-docs/NeoCLR.CoreProbe.xml', staged / 'lib' / (name + '.xml'))
-    for name in ('verify-native-bundle.py', 'verify-native-http-json.py'):
+    for name in ('verify-native-bundle.py', 'verify-native-http-json.py', 'run-native-sample.py'):
         shutil.copy2(ROOT / 'scripts' / name, staged / 'tools' / name)
     shutil.copytree(ROOT / 'third-party', staged / 'third-party')
     for name in ('LICENSE', 'THIRD_PARTY_NOTICES.md'):
         shutil.copy2(ROOT / name, staged / name)
-    samples = {
-        'collections': (['raven-target/samples/application-order-collections.rvn'],
-                        (ROOT / 'docs/experiments/raven-target/samples/application-order-collections.expected.txt').read_text()),
-        'tasks': (['raven-target/samples/library-async.rvn'], 'Suspended\n42\n'),
-        'json': (['json-object-mapping/Mapping.rvn', 'json-object-mapping/Main.rvn'], 'JSON object mapping checks passed\n'),
-        'http-json-server': (['json-object-mapping/HttpApplication.rvn', 'json-object-mapping/HttpServer.rvn'], None),
-        'http-json-client': (['json-object-mapping/HttpApplication.rvn', 'json-object-mapping/HttpClient.rvn'], None),
-    }
-    for name, (sources, expected) in samples.items():
+    samples = sample_definitions()
+    for name, (sources, expected, roots) in samples.items():
         folder = staged / 'samples' / name
         folder.mkdir(parents=True)
         for source in sources:
@@ -151,6 +146,7 @@ def main():
             label='neoCLR: Run', type='process', command='dotnet', args=[
                 '${workspaceFolder}/../../sdk/tools/rvnc/rvnc.dll', 'neoclr', '--project', '${workspaceFolder}/App.rvnproj',
                 '--run', '${workspaceFolder}/../../bin/' + executable], problemMatcher=[])]}, indent=2) + '\n')
+    configure_editor_tasks(staged, samples)
     (staged / 'README.md').write_text('''# Native neoCLR POC bundle
 
 This is an experimental native-metadata POC bundle. The host needs the
@@ -182,7 +178,7 @@ The original library build evidence and declared revisions are in provenance.jso
         platform=platform.platform(), runtime='bin/' + executable,
         objectRoot=('lib/' + catalog['objectAssembly'] + '.dll') if split else None,
         runtimeSeed='lib/' + seed_name, modules=['lib/' + name + '.dll' for name in library_names],
-        samples={name: dict(expected=expected) for name, (_, expected) in samples.items()},
+        samples={name: dict(expected=expected, reflectionTypes=roots) for name, (_, expected, roots) in samples.items()},
         files={p.relative_to(staged).as_posix(): sha(p) for p in sorted(staged.rglob('*')) if p.is_file()})
     (staged / 'manifest.json').write_text(json.dumps(manifest, indent=2) + '\n')
     archive = output / 'neoclr-native-poc.tar.gz'

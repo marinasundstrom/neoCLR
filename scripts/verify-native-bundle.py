@@ -2,6 +2,7 @@
 """Verify and execute the extracted native POC bundle without a source checkout."""
 import argparse
 import hashlib
+import runpy
 import json
 from pathlib import Path
 import subprocess
@@ -11,6 +12,7 @@ import sys
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('bundle', nargs='?', type=Path, default=Path(__file__).resolve().parent.parent)
+    parser.add_argument('--execution', choices=('default', 'interpreter'), help='Defaults to installed execution for JIT bundles, interpreter for older bundles')
     parser.add_argument('--report', required=True, type=Path)
     args = parser.parse_args()
     args.report = args.report.resolve()
@@ -27,6 +29,9 @@ def main():
             if hashlib.sha256(path.read_bytes()).hexdigest() != expected:
                 raise ValueError('Bundle hash mismatch: ' + relative)
         report['verifiedFiles'] = len(manifest['files'])
+        execution = args.execution or ('default' if manifest.get('jit', {}).get('default') else 'interpreter')
+        report['execution'] = execution
+        reflection = {}
         compiler = root / 'sdk/tools/rvnc/rvnc.dll'
         runtime = root / manifest['runtime']
         seed = root / manifest.get('runtimeSeed', 'lib/System.neox')
@@ -44,6 +49,7 @@ def main():
             report['commands'].append(item)
             if result.returncode or expected_stdout is not None and (result.stdout != expected_stdout or result.stderr):
                 raise RuntimeError('Bundle command failed: ' + json.dumps(item))
+            return result
 
         for name, sample in manifest['samples'].items():
             folder = root / 'samples' / name
@@ -51,14 +57,25 @@ def main():
             assembly = folder / 'bin/neoclr/App.dll'
             if not assembly.is_file():
                 raise RuntimeError('Missing native sample output: ' + name)
+            roots = sample.get('reflectionTypes', [])
+            if execution == 'default' and roots:
+                prepare = runpy.run_path(str(root / 'tools/run-native-sample.py'))['reflection_roots']
+                reflection[name] = prepare(runtime, assembly, roots, run)[1]
             if sample.get('expected') is not None:
-                run([runtime, 'run', assembly, '--execution', 'interpreter', '--system', seed, *module_args, *object_args,
-                     '--instructions', '100000000'], sample['expected'])
+                context = (['--execution', 'interpreter', '--system', seed, *module_args, *object_args,
+                            '--instructions', '100000000'] if execution == 'interpreter' else [])
+                if name in reflection:
+                    context += ['--reflection-roots', reflection[name]]
+                run([runtime, 'run', assembly, *context], sample['expected'])
         http_report = args.report.with_name(args.report.stem + '-http.json')
+        http_options = ['--execution', execution]
+        for name in ('server', 'client'):
+            if 'http-json-' + name in reflection:
+                http_options += ['--' + name + '-reflection-roots', reflection['http-json-' + name]]
         run([sys.executable, root / 'tools/verify-native-http-json.py', '--runtime', runtime,
              '--server', root / 'samples/http-json-server/bin/neoclr/App.dll',
              '--client', root / 'samples/http-json-client/bin/neoclr/App.dll',
-             '--seed', seed, *module_args, *object_args, '--output', http_report])
+             '--seed', seed, *module_args, *object_args, *http_options, '--output', http_report])
         report['http'] = json.loads(http_report.read_text())
         report['passed'] = True
     except Exception as error:

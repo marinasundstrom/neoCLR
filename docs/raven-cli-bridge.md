@@ -5,6 +5,24 @@
 
 # Raven CLI bridge
 
+## Method-group overload applicability — 2026-10-12
+
+Extracted preview qualification exposed false ambiguity for the collections sample's
+`HashMap<int, Order>(SameNumber, HashNumber)` constructor. A method group with an
+error placeholder type could match an unrelated Iterable/comparer overload through
+error-recovery identity conversion. Raven main `04de9de64` now requires a resolved
+natural function type for non-delegate named targets before ordinary conversion
+classification. Delegate signature matching and valid natural-function-to-Object
+conversion are retained. The native compiler branch carries this general fix in
+`acfe352067b8428f8414d345111527ad6a8b26ef`; no full branch merge was performed.
+
+No Runtime Contract setting, bridge representation or native metadata format changes.
+This is semantic overload admission before emission, equally applicable to ordinary
+.NET and the native backend. Main validation passes 415 overload-feature cases and
+69 focused semantic/codegen cases. The native compiler rebuild and unchanged
+collections consumer compilation pass. Candidate libraries built with that compiler
+are under qualification; this does not qualify all SDK/editor or Windows paths.
+
 ## Current-stack diagnostics (2026-10-12)
 
 The native compiler line consumes `System.Diagnostics.StackTrace` from the rebuilt

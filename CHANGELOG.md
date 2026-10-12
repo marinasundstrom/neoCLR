@@ -8,6 +8,14 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-12
 
+- Refresh packaged Raven demos for async streams and Task.Run, and qualify JIT
+  bundles through the CLI's installed default mode with explicit interpreter
+  controls. Share sample definitions and JSON reflection roots with VS Code run
+  tasks; allow the optional PostgreSql library in native packages. Record Raven's
+  general method-group overload fix (main 04de9de64, native acfe35206). Local task,
+  collections and JSON consumers pass; complete package acceptance is tracked
+  separately. Canonical formatting and all-target Clippy now pass locally.
+
 - Make ordinary website builds use the committed native API snapshot, preventing
   stale local audit selections from replacing current module/type pages and menus.
   Add explicit --native-audit for intentional previews. Verify current
