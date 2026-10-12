@@ -23,8 +23,10 @@ benchmark noise and the runtime-async performance gap remain separate work.
 The author next explicitly requests fixing generic async and async `use` compiler
 limits. The [compiler slice](experiments/runtime-async/generic-cleanup/README.md)
 now passes both lowerings across interpreter/JIT/AOT on macOS, including retained
-cleanup and generic captures. Windows state-machine project qualification follows
-with the corrected compiler; Windows runtime suspension remains separate.
+cleanup and generic captures. Windows x64 state-machine projects now also pass
+interpreter/default-JIT/AOT, after fixing project cleanup admission and decoupling
+explicit collection from runtime suspension. This compiler slice is complete;
+Windows runtime suspension remains separate.
 
 **Managed stack diagnostics (2026-10-12):** the author requests a StackTrace class
 for printing the current call stack, then continued work on separate debugger and

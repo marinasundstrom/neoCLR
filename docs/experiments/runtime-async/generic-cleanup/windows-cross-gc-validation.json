@@ -1,0 +1,272 @@
+{
+  "passed": true,
+  "scope": "Windows x64 object emission on macOS; not Windows execution",
+  "commands": [
+    {
+      "case": "use",
+      "command": [
+        "/Users/robert/Projects/neoclr/tools/aot-poc/target/release/neoclr-aot-poc",
+        "--closed-world",
+        "/Users/robert/Projects/neoclr/target/generic-cleanup-project-validation/use-state-machine.dll",
+        "@entry",
+        "/Users/robert/Projects/neoclr/target/use-shared-gc-windows.obj",
+        "--system",
+        "/Users/robert/Projects/neoclr/target/generic-async-jit-bundle/bundle/lib/System.runtime.neox",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/generic-async-jit-bundle/bundle/lib/System.Runtime.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/generic-async-jit-bundle/bundle/lib/System.Data.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/generic-async-jit-bundle/bundle/lib/System.Networking.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/generic-async-jit-bundle/bundle/lib/System.Web.dll",
+        "--object-root",
+        "/Users/robert/Projects/neoclr/target/generic-async-jit-bundle/bundle/lib/System.Runtime.dll",
+        "--compile-system",
+        "--bind-user-fault",
+        "--reference-arena",
+        "--native-gc",
+        "--bind-console-read-byte",
+        "--bind-console-write-line",
+        "--bind-console-stream-output",
+        "--bind-int32-to-string",
+        "--bind-utf8-text",
+        "--native-stack-budget",
+        "--bind-integer-text",
+        "--bind-character-text",
+        "--bind-system-culture",
+        "--bind-time-zone-rules",
+        "--bind-task-queue",
+        "--bind-timers",
+        "--bind-socket-listener",
+        "--bind-socket-accept",
+        "--bind-socket-transfer",
+        "--bind-socket-client",
+        "--bind-scheduler",
+        "--target",
+        "x86_64-pc-windows-msvc",
+        "--windows-http-experiment"
+      ],
+      "exitCode": 0,
+      "nativeBindings": [
+        {
+          "compiledIndex": 24,
+          "definition": {
+            "index": 116,
+            "module": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17",
+            "revision": "1.0.0.0"
+          },
+          "diagnostics": "UTF-8 message and managed frames; caller-owned ABI v3",
+          "implementation": "terminal-user-fault-v1",
+          "name": "neoCLR.Runtime.Fail",
+          "status": 4
+        },
+        {
+          "compiledIndex": 22,
+          "definition": {
+            "index": 38,
+            "module": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17",
+            "revision": "1.0.0.0"
+          },
+          "implementation": "console-write-line-v1",
+          "name": "neoCLR.Runtime.WriteLine",
+          "symbol": "neoclr_console_write_line_utf8_v1"
+        },
+        {
+          "compiledIndex": 25,
+          "definition": {
+            "index": 128,
+            "module": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17",
+            "revision": "1.0.0.0"
+          },
+          "implementation": "gc-collect-v1",
+          "name": "neoCLR.Runtime.GCCollect",
+          "storage": "explicit collection using published guest and host roots",
+          "symbol": "neoclr_gc_collect_managed_v1"
+        },
+        {
+          "compiledIndex": 85,
+          "definition": {
+            "index": 135,
+            "module": "System"
+          },
+          "implementation": "task-queue-register-v1",
+          "name": "neoCLR.Runtime.RegisterTaskQueue",
+          "queueType": {
+            "Named": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E5461736B73_5461736B5175657565"
+          },
+          "symbol": "neoclr_task_queue_register_v1"
+        },
+        {
+          "compiledIndex": 86,
+          "definition": {
+            "index": 133,
+            "module": "System"
+          },
+          "implementation": "task-queue-default-v1",
+          "name": "neoCLR.Runtime.GetDefaultTaskQueue",
+          "queueType": {
+            "Named": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E5461736B73_5461736B5175657565"
+          },
+          "symbol": "neoclr_task_queue_default_v1"
+        },
+        {
+          "compiledIndex": 87,
+          "definition": {
+            "index": 134,
+            "module": "System"
+          },
+          "implementation": "task-queue-current-v1",
+          "name": "neoCLR.Runtime.GetCurrentTaskQueue",
+          "queueType": {
+            "Named": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E5461736B73_5461736B5175657565"
+          },
+          "symbol": "neoclr_task_queue_current_v1"
+        },
+        {
+          "compiledIndex": 80,
+          "definition": {
+            "index": 132,
+            "module": "System"
+          },
+          "implementation": "entry-task-drain-v1",
+          "name": "neoCLR.Runtime.DrainEntryTasks",
+          "requiresHostIo": false
+        }
+      ]
+    },
+    {
+      "case": "generic-use",
+      "command": [
+        "/Users/robert/Projects/neoclr/tools/aot-poc/target/release/neoclr-aot-poc",
+        "--closed-world",
+        "/Users/robert/Projects/neoclr/target/generic-cleanup-project-validation/generic-use-state-machine.dll",
+        "@entry",
+        "/Users/robert/Projects/neoclr/target/generic-use-shared-gc-windows.obj",
+        "--system",
+        "/Users/robert/Projects/neoclr/target/generic-async-jit-bundle/bundle/lib/System.runtime.neox",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/generic-async-jit-bundle/bundle/lib/System.Runtime.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/generic-async-jit-bundle/bundle/lib/System.Data.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/generic-async-jit-bundle/bundle/lib/System.Networking.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/generic-async-jit-bundle/bundle/lib/System.Web.dll",
+        "--object-root",
+        "/Users/robert/Projects/neoclr/target/generic-async-jit-bundle/bundle/lib/System.Runtime.dll",
+        "--compile-system",
+        "--bind-user-fault",
+        "--reference-arena",
+        "--native-gc",
+        "--bind-console-read-byte",
+        "--bind-console-write-line",
+        "--bind-console-stream-output",
+        "--bind-int32-to-string",
+        "--bind-utf8-text",
+        "--native-stack-budget",
+        "--bind-integer-text",
+        "--bind-character-text",
+        "--bind-system-culture",
+        "--bind-time-zone-rules",
+        "--bind-task-queue",
+        "--bind-timers",
+        "--bind-socket-listener",
+        "--bind-socket-accept",
+        "--bind-socket-transfer",
+        "--bind-socket-client",
+        "--bind-scheduler",
+        "--target",
+        "x86_64-pc-windows-msvc",
+        "--windows-http-experiment"
+      ],
+      "exitCode": 0,
+      "nativeBindings": [
+        {
+          "compiledIndex": 25,
+          "definition": {
+            "index": 116,
+            "module": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17",
+            "revision": "1.0.0.0"
+          },
+          "diagnostics": "UTF-8 message and managed frames; caller-owned ABI v3",
+          "implementation": "terminal-user-fault-v1",
+          "name": "neoCLR.Runtime.Fail",
+          "status": 4
+        },
+        {
+          "compiledIndex": 23,
+          "definition": {
+            "index": 38,
+            "module": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17",
+            "revision": "1.0.0.0"
+          },
+          "implementation": "console-write-line-v1",
+          "name": "neoCLR.Runtime.WriteLine",
+          "symbol": "neoclr_console_write_line_utf8_v1"
+        },
+        {
+          "compiledIndex": 26,
+          "definition": {
+            "index": 128,
+            "module": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17",
+            "revision": "1.0.0.0"
+          },
+          "implementation": "gc-collect-v1",
+          "name": "neoCLR.Runtime.GCCollect",
+          "storage": "explicit collection using published guest and host roots",
+          "symbol": "neoclr_gc_collect_managed_v1"
+        },
+        {
+          "compiledIndex": 90,
+          "definition": {
+            "index": 135,
+            "module": "System"
+          },
+          "implementation": "task-queue-register-v1",
+          "name": "neoCLR.Runtime.RegisterTaskQueue",
+          "queueType": {
+            "Named": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E5461736B73_5461736B5175657565"
+          },
+          "symbol": "neoclr_task_queue_register_v1"
+        },
+        {
+          "compiledIndex": 91,
+          "definition": {
+            "index": 133,
+            "module": "System"
+          },
+          "implementation": "task-queue-default-v1",
+          "name": "neoCLR.Runtime.GetDefaultTaskQueue",
+          "queueType": {
+            "Named": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E5461736B73_5461736B5175657565"
+          },
+          "symbol": "neoclr_task_queue_default_v1"
+        },
+        {
+          "compiledIndex": 92,
+          "definition": {
+            "index": 134,
+            "module": "System"
+          },
+          "implementation": "task-queue-current-v1",
+          "name": "neoCLR.Runtime.GetCurrentTaskQueue",
+          "queueType": {
+            "Named": "NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D2E5461736B73_5461736B5175657565"
+          },
+          "symbol": "neoclr_task_queue_current_v1"
+        },
+        {
+          "compiledIndex": 85,
+          "definition": {
+            "index": 132,
+            "module": "System"
+          },
+          "implementation": "entry-task-drain-v1",
+          "name": "neoCLR.Runtime.DrainEntryTasks",
+          "requiresHostIo": false
+        }
+      ]
+    }
+  ]
+}

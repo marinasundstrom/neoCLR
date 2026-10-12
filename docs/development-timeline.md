@@ -15632,7 +15632,11 @@ or runtime-await default switch was performed.
   tests, and carried that change separately to the native line. Clean library
   producers and direct consumers pass. Windows then exposed a project-provider
   cleanup opt-in missed by direct-source tests; both project lowerings now pass
-  macOS interpreter/JIT/AOT, with a corrected Windows run pending.
+  macOS interpreter/JIT/AOT. A second Windows run exposed explicit GC collection
+  being incorrectly coupled to macOS runtime suspension. The assistant moved it
+  to the shared native collector and repeated 32 local checks with stable hashes.
+  Final Windows run 38186468730 passes both projects in interpreter/default-JIT/AOT
+  plus HTTP/framework checks, closing this bounded compiler slice.
 - **Open boundaries:** eager compilation, interpreted debugging, Windows runtime
   suspension and Windows ARM64 remain separate gaps. No interpreter fallback hides
   unsupported native programs. See [the execution contract](jit-execution.md).

@@ -82,4 +82,32 @@ only with macOS runtime suspension: [gate](windows-second-gate.json),
 [project](windows-second-project.json). Explicit collection now belongs to the
 shared native GC adapter and is enabled by `--native-gc`, independently of async
 lowering. It uses the same published guest/host roots and does not add Windows
-runtime suspension. Windows execution qualification is being rerun.
+runtime suspension. Windows execution qualification now passes (below).
+
+The shared collector rerun passes [32 macOS project checks](mac-shared-gc-validation.json),
+including both lowerings and repeated same-heap AOT execution. State-machine AOT
+now explicitly omits `--bind-runtime-async`. Both fixtures also pass
+[Windows x64 object emission](windows-cross-gc-validation.json) on macOS; this
+cross-emission check is not a substitute for Windows execution.
+
+## Completed Windows qualification
+
+[Run 38186468730](https://github.com/marinasundstrom/neoCLR/actions/runs/38186468730)
+passes at neoCLR `ce90e82b9bd79c93bdd24db03a87a930fcef8181` with Raven
+`c1a938ccdc473dda6a7dfb2dbde4710855d5b5db`: [gate report](windows-final-gate.json),
+[cleanup project](windows-final-use-project.json),
+[generic project](windows-final-generic-project.json). Both fixtures execute
+successfully under interpreter, installed default JIT and native AOT on Windows x64.
+The same gate passes scalar/CLI, HTTP and framework checks.
+
+[Provenance](windows-final-provenance.json) records all six exact execution outputs
+and artifact hashes; JSON reports normalize CRLF to LF only.
+[Preparation](windows-final-preparation.json) and [manifest](windows-final-manifest.json)
+pin the rebuilt helper, compiler and libraries. The macOS shared-GC report retains
+execution output and input hashes, replacing large native compilation inventories
+with their SHA-256 hashes; its original report hash is recorded.
+
+This closes the bounded generic async/synchronous async-`use` compiler slice.
+Windows runtime suspension, Windows ARM64 JIT and awaited state-machine disposal
+remain separate capabilities. Fault remains non-recoverable and does not promise
+managed cleanup.

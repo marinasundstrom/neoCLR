@@ -1,0 +1,250 @@
+{
+  "passed": true,
+  "commands": [
+    {
+      "command": [
+        "C:\\hostedtoolcache\\windows\\Python\\3.12.10\\x64\\python.exe",
+        "D:\\a\\neoCLR\\neoCLR\\scripts\\prepare-native-development-bundle.py",
+        "--bundle",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\neoclr-native-poc",
+        "--output",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\development",
+        "--build-compiler",
+        "--compiler-revision",
+        "c1a938ccdc473dda6a7dfb2dbde4710855d5b5db"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "cargo",
+        "build",
+        "--locked",
+        "--release",
+        "--manifest-path",
+        "D:\\a\\neoCLR\\neoCLR\\tools\\aot-poc\\Cargo.toml"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "cargo",
+        "build",
+        "--locked",
+        "--release",
+        "--bin",
+        "neoclr"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "cargo",
+        "test",
+        "--locked",
+        "--release",
+        "--manifest-path",
+        "D:\\a\\neoCLR\\neoCLR\\tools\\aot-poc\\Cargo.toml",
+        "--test",
+        "scalar",
+        "jit_"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "cargo",
+        "test",
+        "--locked",
+        "--release",
+        "--test",
+        "cli",
+        "cli_execution_selection"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "C:\\hostedtoolcache\\windows\\Python\\3.12.10\\x64\\python.exe",
+        "D:\\a\\neoCLR\\neoCLR\\scripts\\build-native-project.py",
+        "--profile",
+        "windows-http",
+        "--project",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\server-source\\App.rvnproj",
+        "--bundle",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\development\\bundle",
+        "--aot",
+        "D:\\a\\neoCLR\\neoCLR\\tools\\aot-poc\\target\\release\\neoclr-aot-poc.exe",
+        "--output",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\native"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "C:\\hostedtoolcache\\windows\\Python\\3.12.10\\x64\\python.exe",
+        "D:\\a\\neoCLR\\neoCLR\\scripts\\prepare-jit-bundle.py",
+        "--bundle",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\development\\bundle",
+        "--runtime",
+        "D:\\a\\neoCLR\\neoCLR\\target\\release\\neoclr.exe",
+        "--jit-compiler",
+        "D:\\a\\neoCLR\\neoCLR\\tools\\aot-poc\\target\\release\\neoclr-aot-poc.exe",
+        "--host-recipe",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\native\\build.json",
+        "--output",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\jit-install"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "C:\\hostedtoolcache\\windows\\Python\\3.12.10\\x64\\python.exe",
+        "D:\\a\\neoCLR\\neoCLR\\docs\\experiments\\jit-http\\verify.py",
+        "--bundle",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\jit-install\\bundle",
+        "--windows-build",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\native\\build.json",
+        "--default-cli",
+        "--mode",
+        "jit",
+        "--output",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\http"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "C:\\hostedtoolcache\\windows\\Python\\3.12.10\\x64\\python.exe",
+        "D:\\a\\neoCLR\\neoCLR\\scripts\\test-runtime-library.py",
+        "--bundle",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\jit-install\\bundle",
+        "--suite",
+        "collections",
+        "--suite",
+        "json-dom",
+        "--suite",
+        "encoding-streams",
+        "--suite",
+        "index-range",
+        "--suite",
+        "zoned-time-parsing",
+        "--suite",
+        "runner-contract",
+        "--output",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\framework"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "C:\\hostedtoolcache\\windows\\Python\\3.12.10\\x64\\python.exe",
+        "D:\\a\\neoCLR\\neoCLR\\scripts\\build-native-project.py",
+        "--profile",
+        "windows-http",
+        "--project",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\async-use-source\\App.rvnproj",
+        "--bundle",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\jit-install\\bundle",
+        "--aot",
+        "D:\\a\\neoCLR\\neoCLR\\tools\\aot-poc\\target\\release\\neoclr-aot-poc.exe",
+        "--output",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\async-use"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\jit-install\\bundle\\bin\\neoclr.exe",
+        "run",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\async-use\\app.dll"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\async-use\\app.exe"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\jit-install\\bundle\\bin\\neoclr.exe",
+        "run",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\async-use\\app.dll",
+        "--execution",
+        "interpreter",
+        "--instructions",
+        "100000000",
+        "--system",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\jit-install\\bundle\\lib\\System.runtime.neox",
+        "--object-root",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\jit-install\\bundle\\lib\\System.Runtime.dll",
+        "--module",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\jit-install\\bundle\\lib\\System.Runtime.dll",
+        "--module",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\jit-install\\bundle\\lib\\System.Data.dll",
+        "--module",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\jit-install\\bundle\\lib\\System.Networking.dll",
+        "--module",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\jit-install\\bundle\\lib\\System.Web.dll"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "C:\\hostedtoolcache\\windows\\Python\\3.12.10\\x64\\python.exe",
+        "D:\\a\\neoCLR\\neoCLR\\scripts\\build-native-project.py",
+        "--profile",
+        "windows-http",
+        "--project",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\generic-async-use-source\\App.rvnproj",
+        "--bundle",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\jit-install\\bundle",
+        "--aot",
+        "D:\\a\\neoCLR\\neoCLR\\tools\\aot-poc\\target\\release\\neoclr-aot-poc.exe",
+        "--output",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\generic-async-use"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\jit-install\\bundle\\bin\\neoclr.exe",
+        "run",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\generic-async-use\\app.dll"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\generic-async-use\\app.exe"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\jit-install\\bundle\\bin\\neoclr.exe",
+        "run",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\generic-async-use\\app.dll",
+        "--execution",
+        "interpreter",
+        "--instructions",
+        "100000000",
+        "--system",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\jit-install\\bundle\\lib\\System.runtime.neox",
+        "--object-root",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\jit-install\\bundle\\lib\\System.Runtime.dll",
+        "--module",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\jit-install\\bundle\\lib\\System.Runtime.dll",
+        "--module",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\jit-install\\bundle\\lib\\System.Data.dll",
+        "--module",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\jit-install\\bundle\\lib\\System.Networking.dll",
+        "--module",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\jit-install\\bundle\\lib\\System.Web.dll"
+      ],
+      "exitCode": 0
+    }
+  ]
+}

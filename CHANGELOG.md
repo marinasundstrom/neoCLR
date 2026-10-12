@@ -19,7 +19,9 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   lowerings. Carry the general generic readonly-initializer fix from Raven main
   with separate .NET and native execution evidence. Decouple explicit native
   GC.Collect binding from runtime suspension so Windows state-machine projects
-  can collect using the shared published-root collector.
+  can collect using the shared published-root collector. Qualify both Windows
+  projects in interpreter/default-JIT/AOT, retain six successful execution outcomes
+  and repeat 32 macOS checks with both async lowerings.
 
 - Admit native reference records with more than sixteen declared fields when their
   flattened layout fits the existing 32-slot/264-byte object bound. This removes

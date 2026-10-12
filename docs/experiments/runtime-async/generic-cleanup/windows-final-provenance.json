@@ -1,0 +1,79 @@
+{
+  "run": 38186468730,
+  "url": "https://github.com/marinasundstrom/neoCLR/actions/runs/38186468730",
+  "neoCLRCommit": "ce90e82b9bd79c93bdd24db03a87a930fcef8181",
+  "ravenCommit": "c1a938ccdc473dda6a7dfb2dbde4710855d5b5db",
+  "normalization": "CRLF to LF only",
+  "reports": {
+    "windows-final-gate.json": {
+      "artifactSha256": "41ad0c0f7218482a5cd8c976662a273063aa9569e6c6ceffbd893093b054a703",
+      "retainedSha256": "291ff27801adac4a92fc0286ec62cd27f6e303eb9ddd6cfefc83c005088b5275"
+    },
+    "windows-final-use-project.json": {
+      "artifactSha256": "1c81112d37c36be622765913dbeed66bf6781738e3726d1db81fcd24de3d204f",
+      "retainedSha256": "90e2aa23a35c4b4466b60249d8e4f04b69f86f8d753f6a09e418ec2f3eb281f5"
+    },
+    "windows-final-generic-project.json": {
+      "artifactSha256": "d2fcaecd1cc233ff372aecbda0fe2f6cdd88368492b58df9fbbbe70f01ba115e",
+      "retainedSha256": "bd2cf9e754fb9666bf824a65050a644b1c1651af538ef01d311c12e36d03c8f7"
+    },
+    "windows-final-preparation.json": {
+      "artifactSha256": "b2dca413abd03f18a3d4e966f882b9dcce797d367bdca489700f53f1bdd74417",
+      "retainedSha256": "1c5958c0fdd10f466b16cf03445a185ec6b0fb0cc6fe9aacfd38770d0a0cd31d"
+    },
+    "windows-final-manifest.json": {
+      "artifactSha256": "2cd575bd1a068a389704f07e9fc47fb204b347fd0405659b672fa576f95865e0",
+      "retainedSha256": "31f9e971c0e1dacc5891f7284ec93d5654f535ea6c35ce646b431968a4d34b70"
+    }
+  },
+  "executions": [
+    {
+      "case": "async-use",
+      "mode": "jit",
+      "stdout": "PASS runtime async scoped cleanup\n",
+      "stderr": "",
+      "stdoutArtifactSha256": "34410ba398b8a73a53c3150e8cf46285eb89ebd04a3a6402ea55c7fe67c35442",
+      "stderrArtifactSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "case": "async-use",
+      "mode": "aot",
+      "stdout": "PASS runtime async scoped cleanup\n",
+      "stderr": "",
+      "stdoutArtifactSha256": "34410ba398b8a73a53c3150e8cf46285eb89ebd04a3a6402ea55c7fe67c35442",
+      "stderrArtifactSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "case": "async-use",
+      "mode": "interpreter",
+      "stdout": "PASS runtime async scoped cleanup\n",
+      "stderr": "",
+      "stdoutArtifactSha256": "34410ba398b8a73a53c3150e8cf46285eb89ebd04a3a6402ea55c7fe67c35442",
+      "stderrArtifactSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "case": "generic-async-use",
+      "mode": "jit",
+      "stdout": "PASS generic async methods owners and scoped cleanup\n",
+      "stderr": "",
+      "stdoutArtifactSha256": "5e319d56223765571c50e3c3f7730a0d49eb030bf9f2690be345b6cc18a5d716",
+      "stderrArtifactSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "case": "generic-async-use",
+      "mode": "aot",
+      "stdout": "PASS generic async methods owners and scoped cleanup\n",
+      "stderr": "",
+      "stdoutArtifactSha256": "5e319d56223765571c50e3c3f7730a0d49eb030bf9f2690be345b6cc18a5d716",
+      "stderrArtifactSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "case": "generic-async-use",
+      "mode": "interpreter",
+      "stdout": "PASS generic async methods owners and scoped cleanup\n",
+      "stderr": "",
+      "stdoutArtifactSha256": "5e319d56223765571c50e3c3f7730a0d49eb030bf9f2690be345b6cc18a5d716",
+      "stderrArtifactSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ]
+}
