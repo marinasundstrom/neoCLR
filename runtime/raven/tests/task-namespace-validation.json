@@ -128,5 +128,129 @@
     "macOS ARM64 qualification; Windows namespace qualification has not run.",
     "Compiler state-machine consumers validated; no new runtime-suspension performance claim.",
     "Historical legacy fragments were mechanically renamed, not regenerated from current source."
-  ]
+  ],
+  "integration": {
+    "compilerRevision": "5614397c5d134ae900b7b6b9e2a1e62f2ac97e41",
+    "mergedNeoClrBase": "71a5a00a0",
+    "nativeLibraryArtifacts": {
+      "System.Runtime.dll": "a592b04f54bbaf869e448aa9334bb3a549d31710fa9422eec9e05c8a70f0e269",
+      "System.Data.dll": "16e8dbdbdc7b928ea121fed4946cc9eea7e3d569532aaaa46eb48f6cedecdb5d",
+      "System.Networking.dll": "1945ece6d70ece44d8159f4f09a7f6ed7f961eaf47055b1857eef49846780868",
+      "System.Web.dll": "53d389bab8e7eb9fb352446348e8e21d7d9bbc11e1c9e70f7e7a665c5f3af53e",
+      "System.Data.PostgreSql.dll": "fca60a967562d0dea2ffae81489e391843b8594c3f40acfd593402f5e4eebe4a",
+      "System.runtime.neox": "98a1ae1da85387c87746957e83a4015eb59d0566539a915c69f168d2b511b190",
+      "Core.dll": "3d4a676d379067c18a65a9beb8257ed40bf3196fc643a9ba1d559c619ec73fad"
+    },
+    "runtimeSha256": "6fad5d96e9658f725d9c961e8ad0ae0e025d014d27e7cd9a467213b527a5b7cb",
+    "aotCompilerSha256": "9858dca9c56e9a6b683f38d93b044b3566466f0d29ea74bf50d24ced4a3bff16",
+    "passed": true,
+    "runtimeCases": [
+      {
+        "suite": "memory-stream",
+        "mode": "interpreter",
+        "exitCode": 0,
+        "summary": "Tests: 7, passed: 7, failed: 0, skipped: 0"
+      },
+      {
+        "suite": "memory-stream",
+        "mode": "jit",
+        "exitCode": 0,
+        "summary": "Tests: 7, passed: 7, failed: 0, skipped: 0"
+      },
+      {
+        "suite": "memory-stream",
+        "mode": "native",
+        "exitCode": 0,
+        "summary": "Tests: 7, passed: 7, failed: 0, skipped: 0"
+      },
+      {
+        "suite": "encoding-streams",
+        "mode": "interpreter",
+        "exitCode": 0,
+        "summary": "Tests: 11, passed: 11, failed: 0, skipped: 0"
+      },
+      {
+        "suite": "encoding-streams",
+        "mode": "jit",
+        "exitCode": 0,
+        "summary": "Tests: 11, passed: 11, failed: 0, skipped: 0"
+      },
+      {
+        "suite": "encoding-streams",
+        "mode": "native",
+        "exitCode": 0,
+        "summary": "Tests: 11, passed: 11, failed: 0, skipped: 0"
+      }
+    ],
+    "httpCases": [
+      {
+        "case": "success",
+        "execution": "jit",
+        "outcome": "passed",
+        "statistics": ""
+      },
+      {
+        "case": "borrowed",
+        "execution": "jit",
+        "outcome": "passed",
+        "statistics": ""
+      },
+      {
+        "case": "empty",
+        "execution": "jit",
+        "outcome": "passed",
+        "statistics": ""
+      },
+      {
+        "case": "eof",
+        "execution": "jit",
+        "outcome": "passed",
+        "statistics": ""
+      },
+      {
+        "case": "read-error",
+        "execution": "jit",
+        "outcome": "passed",
+        "statistics": ""
+      },
+      {
+        "case": "overread",
+        "execution": "jit",
+        "outcome": "passed",
+        "statistics": ""
+      },
+      {
+        "case": "cancel",
+        "execution": "jit",
+        "outcome": "passed",
+        "statistics": ""
+      },
+      {
+        "case": "precancel",
+        "execution": "jit",
+        "outcome": "passed",
+        "statistics": ""
+      },
+      {
+        "case": "disposed",
+        "execution": "jit",
+        "outcome": "passed",
+        "statistics": ""
+      },
+      {
+        "case": "invalid-header",
+        "execution": "jit",
+        "outcome": "passed",
+        "statistics": ""
+      },
+      {
+        "case": "refused",
+        "execution": "jit",
+        "outcome": "passed",
+        "statistics": ""
+      }
+    ],
+    "websiteTests": 22,
+    "nativeSnapshotTests": 2
+  }
 }

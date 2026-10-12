@@ -252,3 +252,159 @@ fn foreign_pointers_can_be_returned_and_forwarded_without_claiming_vm_ownership(
             .contains("untracked native pointer")
     );
 }
+
+#[test]
+fn explicit_input_strings_preserve_encoding_and_call_scoped_buffers() {
+    let fixture = Fixture::new();
+    let sample = include_str!("../examples/foreign_strings.neoil")
+        .replace("\"./target/native/neoclr_sample\"", &fixture.import);
+    assert_eq!(
+        fixture.execute(&assemble(&sample).unwrap()).unwrap().output,
+        ["7", "4"]
+    );
+    for (encoding, symbol, text, length) in [
+        ("utf8", "neoclr_utf8_len", "", 0),
+        ("utf8", "neoclr_utf8_len", "hé🦀", 7),
+        ("utf16", "neoclr_utf16_len", "", 0),
+        ("utf16", "neoclr_utf16_len", "hé🦀", 4),
+    ] {
+        let source = format!(
+            ".module Test\n.entry Main\n.function Length(String) -> UIntPtr\n.foreign {} {symbol:?} cdecl {encoding}\n.end\n.function Main() -> UIntPtr\nldstr {text:?}\ncall Length(String)\nret\n.end",
+            fixture.import
+        );
+        let module = assemble(&source).unwrap();
+        let module = load(&serde_json::to_string(&module).unwrap()).unwrap();
+        assert_eq!(
+            fixture.execute(&module).unwrap().value,
+            Value::UIntPtr(length)
+        );
+    }
+    let source = format!(
+        ".module Test\n.entry Main\n.function Pair(String,Int32,String) -> Int32\n.foreign {} \"neoclr_utf8_pair\" cdecl utf8\n.end\n.function Main() -> Int32\nldstr \"hé🦀\"\nldc.i4 41\nldstr \"世界\"\ncall Pair(String,Int32,String)\npop\nldstr \"hé🦀\"\nldc.i4 99\nldstr \"世界\"\ncall Pair(String,Int32,String)\nret\n.end",
+        fixture.import
+    );
+    assert_eq!(
+        fixture.execute(&assemble(&source).unwrap()).unwrap().value,
+        Value::Int32(100)
+    );
+    let source = format!(
+        ".module Test\n.entry Main\n.function Check(String) -> Int32\n.foreign {} \"neoclr_utf16_check\" cdecl utf16\n.end\n.function Main() -> Int32\nldstr \"hé🦀\"\ncall Check(String)\nret\n.end",
+        fixture.import
+    );
+    assert_eq!(
+        fixture.execute(&assemble(&source).unwrap()).unwrap().value,
+        Value::Int32(1)
+    );
+}
+
+#[test]
+fn native_input_strings_reject_embedded_nul_and_unsupported_metadata() {
+    let fixture = Fixture::new();
+    for encoding in ["utf8", "utf16"] {
+        let source = format!(
+            ".module Test\n.entry Main\n.function Length(String) -> UIntPtr\n.foreign {} \"neoclr_utf8_len\" cdecl {encoding}\n.end\n.function Main() -> UIntPtr\nldstr \"a\\u0000b\"\ncall Length(String)\nret\n.end",
+            fixture.import
+        );
+        let fault = fixture.execute(&assemble(&source).unwrap()).unwrap_err();
+        assert!(fault.message.contains("embedded NUL"), "{fault:?}");
+        assert_eq!(fault.function.as_deref(), Some("Main"));
+    }
+    for (parameters, returns, options) in [
+        ("String", "Void", "cdecl"),
+        ("", "String", "cdecl utf8"),
+        ("String&", "Void", "cdecl utf16"),
+        ("String", "Void", "cdecl ansi"),
+        ("String", "Void", "cdecl utf8 utf16"),
+    ] {
+        assert!(assemble(&format!(".module Test\n.function F({parameters}) -> {returns}\n.foreign \"missing\" \"f\" {options}\n.end")).is_err());
+    }
+    let module = assemble(
+        ".module Test\n.function F(String) -> Void\n.foreign \"missing\" \"f\" cdecl utf8\n.end",
+    )
+    .unwrap();
+    let mut json = serde_json::to_value(&module).unwrap();
+    json["functions"][0]["pinvoke"]["string_marshalling"] = "Ansi".into();
+    assert!(load(&json.to_string()).is_err());
+    json["functions"][0]["pinvoke"]["string_marshalling"] = serde_json::Value::Null;
+    assert!(load(&json.to_string()).is_err());
+}
+
+#[test]
+fn foreign_is_the_platform_neutral_import_directive_with_legacy_alias() {
+    let legacy =
+        ".module Test\n.function F(Int32) -> Int32\n.pinvoke \"missing\" \"f\" cdecl\n.end";
+    let canonical = legacy.replace(".pinvoke", ".foreign");
+    let canonical = assemble(&canonical).unwrap();
+    assert_eq!(
+        serde_json::to_value(assemble(legacy).unwrap()).unwrap(),
+        serde_json::to_value(canonical).unwrap()
+    );
+    assert!(
+        assemble(&legacy.replace(
+            "cdecl\n.end",
+            "cdecl\n.foreign \"missing\" \"f\" cdecl\n.end"
+        ))
+        .is_err()
+    );
+    let legacy_json = serde_json::to_value(assemble(legacy).unwrap()).unwrap();
+    assert!(
+        legacy_json["functions"][0]["pinvoke"]
+            .get("string_marshalling")
+            .is_none()
+    );
+}
+
+#[test]
+fn per_slot_marshalling_preserves_boolean_width_and_mixed_encodings() {
+    let fixture = Fixture::new();
+    let library: String = serde_json::from_str(&fixture.import).unwrap();
+    for (kind, symbol) in [("Bool8", "neoclr_bool8"), ("Bool32", "neoclr_bool32")] {
+        for (number, expected) in [(0, false), (1, true)] {
+            let mut module = assemble(&format!(".module Test\n.entry Main\n.function F(Boolean) -> Boolean\nldarg 0\nret\n.end\n.function Main() -> Boolean\nldc.i4 {number}\nldc.i4 1\nceq\ncall F(Boolean)\nret\n.end")).unwrap();
+            module.functions[0].body.clear();
+            module.functions[0].pinvoke = Some(
+                serde_json::from_value(serde_json::json!({
+                    "library": library, "entry_point": symbol, "calling_convention": "Cdecl",
+                    "parameter_marshalling": { "0": kind }, "return_marshalling": kind
+                }))
+                .unwrap(),
+            );
+            let module = load(&serde_json::to_string(&module).unwrap()).unwrap();
+            assert_eq!(
+                fixture.execute(&module).unwrap().value,
+                Value::Boolean(expected)
+            );
+            for index in [0, 1] {
+                let mut invalid = module.clone();
+                invalid.functions[0]
+                    .pinvoke
+                    .as_mut()
+                    .unwrap()
+                    .parameter_marshalling
+                    .insert(index.to_string(), neoclr::metadata::NativeMarshalling::Utf8);
+                assert!(load(&serde_json::to_string(&invalid).unwrap()).is_err());
+            }
+        }
+    }
+    let mut module = assemble(".module Test\n.entry Main\n.function F(String,String) -> Int32\nldc.i4 0\nret\n.end\n.function Main() -> Int32\nldstr \"hé🦀\"\nldstr \"hé🦀\"\ncall F(String,String)\nret\n.end").unwrap();
+    module.functions[0].body.clear();
+    module.functions[0].pinvoke = Some(serde_json::from_value(serde_json::json!({
+        "library": library, "entry_point": "neoclr_mixed_encoding", "calling_convention": "Cdecl",
+        "string_marshalling": "Utf16", "parameter_marshalling": { "0": "Utf8" }
+    })).unwrap());
+    let module = load(&serde_json::to_string(&module).unwrap()).unwrap();
+    assert_eq!(fixture.execute(&module).unwrap().value, Value::Int32(42));
+    let system = fixture.module(
+        "Int32,Int32",
+        "Int32",
+        "neoclr_system_add",
+        "ldc.i4 19\nldc.i4 23",
+    );
+    let mut system = system;
+    system.functions[0]
+        .pinvoke
+        .as_mut()
+        .unwrap()
+        .calling_convention = neoclr::metadata::CallingConvention::System;
+    assert_eq!(fixture.execute(&system).unwrap().value, Value::Int32(42));
+}

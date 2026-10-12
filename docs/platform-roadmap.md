@@ -1,5 +1,16 @@
 # neoCLR platform roadmap
 
+**Foreign function interface direction (2026-10-12):** the author requests platform
+invocation/FFI beyond a Windows-oriented interface, retains `extern` plus attributes,
+and calls for explicit calling conventions and individual value marshalling. The
+[implemented source-to-interpreter slice](native-interop.md) adds NativeImport,
+parameter/result MarshalAs, Cdecl/System, UTF-8/UTF-16 input buffers and Bool8/Bool32.
+Native metadata preserves descriptors; lookup is lazy, and static class imports work.
+The [focused source/native evidence](experiments/foreign-interop/README.md) covers
+actual Raven attribute source and real foreign calls. JIT/AOT, installed bundles,
+other-host qualification, bounded buffers/ownership, error capture and callbacks remain
+gates. This author-directed slice does not permanently reorder the active milestone.
+
 **End-to-end showcase target (2026-10-12):** the author identifies a neoCLR HTTP
 server and client exchanging JSON as the ultimate showcase, possibly backed by
 PostgreSQL running in Docker, with both applications possibly containerized too.

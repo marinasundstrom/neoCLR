@@ -88,7 +88,7 @@ public sealed partial class AssemblyBuilder
         if (types.Sum(type => type.Properties.Count) > 4096) throw new InvalidDataException("too many properties");
         if (types.Sum(type => type.MetadataFields.Count()) > 4096) throw new InvalidDataException("too many fields");
         if (methods.Length > 4096) throw new InvalidDataException("too many methods");
-        if (EntryPoint is not null && (!methods.Contains(EntryPoint) || EntryPoint.Definition.ImplementationAttributes != 0 || !EntryPoint.IsStatic || EntryPoint.Signature.GenericParameterNames.Count != 0 || EntryPoint.DeclaringType?.GenericParameterNames.Count > 0 || (EntryPoint.ParameterCount != 0 && EntryPoint.Signature.ParameterTypes is not [{ ArrayElement.Primitive: PrimitiveType.String }]) || EntryPoint.Signature.ReturnType.Primitive is not (PrimitiveType.Int32 or PrimitiveType.Void)))
+        if (EntryPoint is not null && (!methods.Contains(EntryPoint) || EntryPoint.Definition.NativeImport is not null || EntryPoint.Definition.ImplementationAttributes != 0 || !EntryPoint.IsStatic || EntryPoint.Signature.GenericParameterNames.Count != 0 || EntryPoint.DeclaringType?.GenericParameterNames.Count > 0 || (EntryPoint.ParameterCount != 0 && EntryPoint.Signature.ParameterTypes is not [{ ArrayElement.Primitive: PrimitiveType.String }]) || EntryPoint.Signature.ReturnType.Primitive is not (PrimitiveType.Int32 or PrimitiveType.Void)))
             throw new InvalidDataException("entry point must be a local Int32 or no-result method with no parameters or one String vector");
         var importedTargets = importedReferences.Values.Concat(authoredCallableReferences).Select(reference => reference.Target).ToHashSet();
         foreach (var target in methods.SelectMany(m => m.Instructions).Select(i => i.Target).OfType<MethodBuilder>())
@@ -167,7 +167,14 @@ public sealed partial class AssemblyBuilder
                     if (instruction.ConstructedField is { } field) ((SignatureType)field.DeclaringType).ValidateOwner(this, method.Signature.GenericParameterNames.Count, arity, complete: true);
                     instruction.Type?.ValidateOwner(this, method.Signature.GenericParameterNames.Count, arity, complete: true);
                 }
-                if (method.Definition.ImplementationAttributes == 0x1000)
+                if (method.Definition.NativeImport is { } import)
+                {
+                    if (!method.IsStatic || method.IsAbstract || method.IsVirtual || method.IsConstructor || arity != 0 ||
+                        method.Definition.ImplementationAttributes != 0 || method.Instructions.Count != 0 || method.Locals.Count != 0 || method.Definition.Body.Labels.Count != 0)
+                        throw new InvalidDataException("native imports require empty nongeneric static declarations");
+                    import.Validate(method.Signature);
+                }
+                else if (method.Definition.ImplementationAttributes == 0x1000)
                 {
                     if (method.DeclaringType is not null || method.Signature.GenericParameterNames.Count != 0 ||
                         method.Instructions.Count != 0 || method.Locals.Count != 0 || method.Definition.Body.Labels.Count != 0)
@@ -346,6 +353,8 @@ public sealed partial class AssemblyBuilder
         if (!referenceOnly && assemblyConstants.Count != 0)
             throw new InvalidDataException("assembly-level constants require native emission");
         var methods = ValidateGraph(validateBodies: !referenceOnly);
+        if (!referenceOnly && methods.Any(m => m.Definition.NativeImport is not null))
+            throw new InvalidDataException("native imports require native emission; CLI projection is reference-only");
         if (CoreLibrary.Equals(Identity) && (!referenceOnly || NativeObjectRoot is null))
             throw new InvalidDataException("self-owned core requires native reference emission with an authored Object root");
         if (!referenceOnly && (ExternalObjectRoot is not null || types.Any(t => t.Definition.IsNativeObjectRoot)))

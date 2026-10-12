@@ -306,11 +306,13 @@ See [the assembly reference](docs/neoil.md) for primitive aliases and syntax.
 ```sh
 cargo run --locked --example build_native
 cargo run --locked -- run examples/pinvoke.neoil --execution interpreter
+cargo run --locked -- run examples/foreign_strings.neoil --execution interpreter
 ```
 
 This builds a native C-ABI library, then demonstrates a native function modifying
 explicitly allocated guest storage. The CLI executes native imports as trusted code;
-metadata checking does not load libraries. See [P/Invoke](docs/native-interop.md) for
+metadata checking does not load libraries. The platform-neutral `.foreign` declaration also supports explicit UTF-8/UTF-16
+input strings. See [native interop](docs/native-interop.md) for
 supported signatures, embedding APIs, and the current memory boundaries.
 
 ## Runtime library

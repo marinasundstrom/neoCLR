@@ -39,3 +39,9 @@ native libraries compile, including PostgreSQL. Both API references are refreshe
 22 website tests and two snapshot checks pass. The renderer check caught and fixed
 the namespace article UID and extension namespace selection. Windows execution is
 not claimed by this local migration gate.
+
+The integrated checkpoint combines this migration with neoCLR `71a5a00a0` native
+imports and Raven `5614397c5d134ae900b7b6b9e2a1e62f2ac97e41`. The rebuilt combined bundle repeats all
+54 stream executions, eleven HTTP cases and documentation checks successfully.
+The evidence records both checkpoints separately; it does not attribute namespace
+validation to the older FFI-only bundle or claim Windows execution.

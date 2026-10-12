@@ -61,9 +61,12 @@ escapes. Identifiers contain ASCII letters, digits, underscores, and dots.
 - `.methodimpl InternalCall` marks a runtime-provided function with no IL body or
   locals. It lowers to `impl_flags: 4096`; ordinary functions default to zero.
   Unknown flags and missing or mismatched native bindings are rejected.
-- `.pinvoke "library" "entry_point" cdecl` declares a native C-ABI import with no
-  body or locals. It is separate from InternalCall and supports scalar/pointer
-  signatures. Calls remain ordinary signature-based calls. See [native interop](native-interop.md).
+- `.foreign "library" "entry_point" cdecl|system [utf8|utf16]` declares a native C ABI
+  import with no body or locals. `system` selects the platform system ABI. It is separate from InternalCall and supports
+  scalar/pointer signatures. Calls remain ordinary signature-based calls.
+  `.pinvoke` remains a compatibility alias. Optional encoding enables call-scoped,
+  terminated input String buffers; embedded NULs and String returns are rejected.
+  See [native interop](native-interop.md) for ownership and execution-mode limits.
 - `Label:` identifies the following instruction. Branches name labels in the same
   function; labels can be forward references. A label past the last instruction
   cannot be a branch target.

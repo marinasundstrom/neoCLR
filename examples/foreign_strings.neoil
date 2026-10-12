@@ -1,0 +1,24 @@
+.module ForeignStrings
+.entry Main
+
+.type Native
+    .method static Utf8Length(String text) -> UIntPtr
+        .foreign "./target/native/neoclr_sample" "neoclr_utf8_len" cdecl utf8
+    .end
+    .method static Utf16Length(String text) -> UIntPtr
+        .foreign "./target/native/neoclr_sample" "neoclr_utf16_len" cdecl utf16
+    .end
+.end
+
+.function Main() -> Void
+    ldstr "hé🦀"
+    call Native.Utf8Length(String)
+    conv.i4
+    call System.Console.WriteLine(Int32)
+    pop
+    ldstr "hé🦀"
+    call Native.Utf16Length(String)
+    conv.i4
+    call System.Console.WriteLine(Int32)
+    ret
+.end

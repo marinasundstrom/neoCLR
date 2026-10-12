@@ -1,8 +1,10 @@
-//! Explicit trusted native imports. No string marshalling or ownership inference.
+//! Explicit trusted native imports with call-scoped input string marshalling.
 use crate::{
     Fault, Value,
     memory::SharedMemory,
-    metadata::{Function, Type},
+    metadata::{
+        CallingConvention, Function, NativeImport, NativeMarshalling, NativeStringMarshalling, Type,
+    },
 };
 use libffi::middle::{Arg, Cif, CodePtr, Type as FfiType, arg};
 use std::{collections::HashMap, ffi::c_void, path::Path};
@@ -38,7 +40,7 @@ pub(crate) fn validate(function: &Function) -> Result<(), Fault> {
         || !function.body.is_empty()
     {
         return Err(Fault::new(
-            "PInvoke must be static with no IL body, locals, or implementation flags",
+            "native import must be static with no IL body, locals, or implementation flags",
         ));
     }
     for name in [&import.library, &import.entry_point] {
@@ -46,19 +48,103 @@ pub(crate) fn validate(function: &Function) -> Result<(), Fault> {
             return Err(Fault::new("invalid native library or entry point"));
         }
     }
-    for ty in &function.parameters {
+    if import.parameter_marshalling.keys().any(|key| {
+        key.parse::<usize>().map_or(true, |index| {
+            index >= function.parameters.len() || index.to_string() != *key
+        })
+    }) {
+        return Err(Fault::new(
+            "native parameter marshalling index outside signature",
+        ));
+    }
+    for (index, ty) in function.parameters.iter().enumerate() {
         if *ty == Type::Void {
             return Err(Fault::new("Void is not a native argument type"));
         }
-        ffi_type(ty)?;
+        marshalled_type(ty, parameter_marshalling(import, index, ty))?;
     }
-    ffi_type(&function.returns)?;
+    // String returns need an explicit allocator/length/lifetime contract first.
+    if function.returns == Type::String {
+        return Err(Fault::new(
+            "native String returns require an ownership contract",
+        ));
+    }
+    marshalled_type(&function.returns, import.return_marshalling)?;
     Ok(())
+}
+
+fn parameter_marshalling(
+    import: &NativeImport,
+    index: usize,
+    ty: &Type,
+) -> Option<NativeMarshalling> {
+    import
+        .parameter_marshalling
+        .get(&index.to_string())
+        .copied()
+        .or_else(|| {
+            if *ty != Type::String {
+                return None;
+            }
+            import.string_marshalling.map(|encoding| match encoding {
+                NativeStringMarshalling::Utf8 => NativeMarshalling::Utf8,
+                NativeStringMarshalling::Utf16 => NativeMarshalling::Utf16,
+            })
+        })
+}
+
+fn marshalled_type(ty: &Type, marshalling: Option<NativeMarshalling>) -> Result<FfiType, Fault> {
+    match (ty, marshalling) {
+        (Type::String, Some(NativeMarshalling::Utf8 | NativeMarshalling::Utf16)) => {
+            Ok(FfiType::pointer())
+        }
+        (Type::Boolean, Some(NativeMarshalling::Bool8)) => Ok(FfiType::u8()),
+        (Type::Boolean, Some(NativeMarshalling::Bool32)) => Ok(FfiType::i32()),
+        (_, None) => ffi_type(ty),
+        _ => Err(Fault::new("native marshalling does not match managed type")),
+    }
+}
+
+fn native_abi(convention: CallingConvention) -> libffi::middle::FfiAbi {
+    // System follows extern "system": stdcall only on 32-bit Windows, C elsewhere.
+    #[cfg(all(windows, target_arch = "x86"))]
+    if matches!(convention, CallingConvention::System) {
+        return libffi::raw::ffi_abi_FFI_STDCALL;
+    }
+    let _ = convention;
+    libffi::middle::ffi_abi_FFI_DEFAULT_ABI
+}
+
+// Separate owned buffers avoid exposing managed string storage to native code.
+// Their allocations and address slots survive until the synchronous call returns.
+enum NativeString {
+    Utf8(std::ffi::CString),
+    Utf16(Vec<u16>),
+}
+impl NativeString {
+    fn new(text: &str, encoding: NativeMarshalling) -> Result<Self, Fault> {
+        if text.contains('\0') {
+            return Err(Fault::new("native input string contains an embedded NUL"));
+        }
+        Ok(match encoding {
+            NativeMarshalling::Utf8 => Self::Utf8(std::ffi::CString::new(text).unwrap()),
+            NativeMarshalling::Utf16 => Self::Utf16(text.encode_utf16().chain([0]).collect()),
+            _ => return Err(Fault::new("native String requires a string encoding")),
+        })
+    }
+
+    fn address(&self) -> *mut c_void {
+        match self {
+            Self::Utf8(value) => value.as_ptr() as *mut c_void,
+            Self::Utf16(value) => value.as_ptr() as *mut c_void,
+        }
+    }
 }
 
 #[derive(Debug, Default)]
 pub struct NativeLibraries {
     libraries: HashMap<String, std::sync::Arc<libloading::Library>>,
+    symbols: HashMap<(String, String), unsafe extern "C" fn()>,
 }
 impl NativeLibraries {
     pub fn loaded_count(&self) -> usize {
@@ -96,15 +182,34 @@ impl NativeLibraries {
             .libraries
             .get(&import.library)
             .ok_or_else(|| Fault::new("missing loaded library"))?;
+        let key = (import.library.clone(), import.entry_point.clone());
+        let function_pointer = if let Some(pointer) = self.symbols.get(&key) {
+            *pointer
+        } else {
+            // SAFETY: caller trusts the symbol and ABI; the owning library is retained.
+            let symbol =
+                unsafe { library.get::<unsafe extern "C" fn()>(import.entry_point.as_bytes()) }
+                    .map_err(|e| {
+                        Fault::new(format!(
+                            "cannot resolve native entry {}: {e}",
+                            import.entry_point
+                        ))
+                    })?;
+            let pointer = *symbol;
+            self.symbols.insert(key, pointer);
+            pointer
+        };
         Ok(NativeCall {
-            library: library.clone(),
+            _library: library.clone(),
+            function_pointer,
             function: function.clone(),
         })
     }
 }
 
 pub(crate) struct NativeCall {
-    library: std::sync::Arc<libloading::Library>,
+    _library: std::sync::Arc<libloading::Library>,
+    function_pointer: unsafe extern "C" fn(),
     function: Function,
 }
 impl NativeCall {
@@ -114,31 +219,57 @@ impl NativeCall {
         values: Vec<Value>,
         memory: &SharedMemory,
     ) -> Result<Value, Fault> {
-        let library = &self.library;
         let function = &self.function;
         let import = function.pinvoke.as_ref().expect("prepared native import");
-        // SAFETY: the import's symbol and C signature are part of the caller's contract.
-        let symbol =
-            unsafe { library.get::<unsafe extern "C" fn()>(import.entry_point.as_bytes()) }
-                .map_err(|e| {
-                    Fault::new(format!(
-                        "cannot resolve native entry {}: {e}",
-                        import.entry_point
-                    ))
-                })?;
-        let function_pointer = CodePtr(*symbol as *mut c_void);
-        let cif = Cif::new(
+        let function_pointer = CodePtr(self.function_pointer as *mut c_void);
+        if values.len() != function.parameters.len() {
+            return Err(Fault::new("native argument count mismatch"));
+        }
+        let values: Vec<Value> = values
+            .into_iter()
+            .enumerate()
+            .map(|(i, value)| match value {
+                Value::Boolean(value) => {
+                    match parameter_marshalling(import, i, &function.parameters[i]) {
+                        Some(NativeMarshalling::Bool8) => Ok(Value::Byte(u8::from(value))),
+                        Some(NativeMarshalling::Bool32) => Ok(Value::Int32(i32::from(value))),
+                        _ => Err(Fault::new("native Boolean requires explicit width")),
+                    }
+                }
+                value => Ok(value),
+            })
+            .collect::<Result<_, _>>()?;
+        let strings: Vec<Option<NativeString>> = values
+            .iter()
+            .enumerate()
+            .map(|(i, value)| match value {
+                Value::String(text) => {
+                    let encoding = parameter_marshalling(import, i, &function.parameters[i])
+                        .ok_or_else(|| Fault::new("native String requires explicit marshalling"))?;
+                    NativeString::new(text.as_str(), encoding).map(Some)
+                }
+                _ => Ok(None),
+            })
+            .collect::<Result<_, _>>()?;
+        let cif = Cif::new_with_abi(
             function
                 .parameters
                 .iter()
-                .map(ffi_type)
+                .enumerate()
+                .map(|(i, ty)| marshalled_type(ty, parameter_marshalling(import, i, ty)))
                 .collect::<Result<Vec<_>, _>>()?,
-            ffi_type(&function.returns)?,
+            marshalled_type(&function.returns, import.return_marshalling)?,
+            native_abi(import.calling_convention),
         );
         // Pointer arguments must reference an address-sized slot, not the Pointer struct.
         let addresses: Vec<*mut c_void> = values
             .iter()
-            .map(|value| match value {
+            .enumerate()
+            .map(|(i, value)| match value {
+                Value::String(_) => strings[i]
+                    .as_ref()
+                    .expect("marshalled input string")
+                    .address(),
                 Value::Pointer(p) => p.address as *mut c_void,
                 _ => std::ptr::null_mut(),
             })
@@ -160,7 +291,7 @@ impl NativeCall {
                     Value::UIntPtr(n) => arg(n),
                     Value::Single(n) => arg(n),
                     Value::Double(n) => arg(n),
-                    Value::Pointer(_) => arg(&addresses[i]),
+                    Value::Pointer(_) | Value::String(_) => arg(&addresses[i]),
                     _ => return Err(Fault::new("unsupported native argument value")),
                 })
             })
@@ -174,6 +305,15 @@ impl NativeCall {
                     cif.call::<()>(function_pointer, &args);
                     Value::Void
                 }
+                Type::Boolean => match import.return_marshalling {
+                    Some(NativeMarshalling::Bool8) => {
+                        Value::Boolean(cif.call::<u8>(function_pointer, &args) != 0)
+                    }
+                    Some(NativeMarshalling::Bool32) => {
+                        Value::Boolean(cif.call::<i32>(function_pointer, &args) != 0)
+                    }
+                    _ => return Err(Fault::new("native Boolean result requires explicit width")),
+                },
                 Type::SByte => Value::SByte(cif.call(function_pointer, &args)),
                 Type::Byte => Value::Byte(cif.call(function_pointer, &args)),
                 Type::Int16 => Value::Int16(cif.call(function_pointer, &args)),

@@ -9,7 +9,7 @@ public sealed partial class MethodDefinition
     /// <exception cref="InvalidOperationException">Loaded, type-owned, generic or nonempty declaration.</exception>
     public void SetInternalCall()
     {
-        if (AuthoredSignature is null || IsTypeDeclaration || GenericArity != 0 ||
+        if (NativeImport is not null || AuthoredSignature is null || IsTypeDeclaration || GenericArity != 0 ||
             Body.Instructions.Count != 0 || Body.LocalStorage.Count != 0 || Body.LabelStorage.Count != 0)
             throw new InvalidOperationException("internal calls require an empty authored nongeneric assembly function");
         ImplementationAttributes = 0x1000;

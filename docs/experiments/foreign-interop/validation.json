@@ -1,0 +1,326 @@
+{
+  "host": "macOS-27.0-arm64-arm-64bit",
+  "cases": [
+    {
+      "name": "ForeignAdd",
+      "expectedExit": 42,
+      "exitCode": 42,
+      "passed": true
+    },
+    {
+      "name": "ForeignStrings",
+      "expectedExit": 42,
+      "exitCode": 42,
+      "passed": true
+    },
+    {
+      "name": "ForeignWide",
+      "expectedExit": 1,
+      "exitCode": 1,
+      "passed": true
+    },
+    {
+      "name": "ForeignDefaultName",
+      "expectedExit": 42,
+      "exitCode": 42,
+      "passed": true
+    },
+    {
+      "name": "ForeignSystem",
+      "expectedExit": 42,
+      "exitCode": 42,
+      "passed": true
+    },
+    {
+      "name": "ForeignMixedEncoding",
+      "expectedExit": 42,
+      "exitCode": 42,
+      "passed": true
+    },
+    {
+      "name": "ForeignBool8",
+      "expectedExit": 42,
+      "exitCode": 42,
+      "passed": true
+    },
+    {
+      "name": "ForeignBool32",
+      "expectedExit": 42,
+      "exitCode": 42,
+      "passed": true
+    },
+    {
+      "name": "ForeignStatic",
+      "expectedExit": 42,
+      "exitCode": 42,
+      "passed": true
+    },
+    {
+      "name": "ForeignMissing",
+      "expectedExit": 1,
+      "exitCode": 1,
+      "passed": true
+    }
+  ],
+  "commands": [
+    {
+      "command": [
+        "rustc",
+        "--edition=2024",
+        "--crate-type=cdylib",
+        "--crate-name=foreign_fixture",
+        "/Users/robert/Projects/neoclr/examples/native/library.rs",
+        "-o",
+        "/Users/robert/Projects/neoclr/target/foreign-validation/libforeign_fixture.dylib"
+      ],
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "dotnet",
+        "/Users/robert/Projects/Raven/tools/NeoClrMetadataProbe/bin/Debug/net10.0/NeoClrMetadataProbe.dll",
+        "--native-foreign-source",
+        "/Users/robert/Projects/neoclr/target/foreign-api/NeoCLR.CoreProbe.dll",
+        "/Users/robert/Projects/neoclr/target/foreign-validation/libforeign_fixture.dylib",
+        "/Users/robert/Projects/neoclr/target/foreign-validation",
+        "/Users/robert/Projects/neoclr/runtime/raven/src/System/Runtime/InteropServices/NativeImportAttribute.rvn"
+      ],
+      "exitCode": 0,
+      "stdout": "PASS ForeignAdd\nPASS ForeignStrings\nPASS ForeignWide\nPASS ForeignDefaultName\nPASS ForeignMissing\nPASS ForeignSystem\nPASS ForeignMixedEncoding\nPASS ForeignBool8\nPASS ForeignBool32\nPASS ForeignStatic\nPASS native foreign attribute positive/negative checks\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/debug/neoclr",
+        "check",
+        "/Users/robert/Projects/neoclr/target/foreign-validation/ForeignAdd.dll"
+      ],
+      "exitCode": 0,
+      "stdout": "NeoMetadata_731B6D6DD92F6C3F3ADB9AE8ACFDAC907354E9B4687EE4FACF1B529CB4C1AB24: metadata valid (execution types checked at runtime)\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/debug/neoclr",
+        "run",
+        "/Users/robert/Projects/neoclr/target/foreign-validation/ForeignAdd.dll",
+        "--execution",
+        "interpreter"
+      ],
+      "exitCode": 42,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/debug/neoclr",
+        "check",
+        "/Users/robert/Projects/neoclr/target/foreign-validation/ForeignStrings.dll"
+      ],
+      "exitCode": 0,
+      "stdout": "NeoMetadata_4457A739558A8C88799C25DCE6A34D08149BDAAF4B064DC985C4858C45C8ADFB: metadata valid (execution types checked at runtime)\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/debug/neoclr",
+        "run",
+        "/Users/robert/Projects/neoclr/target/foreign-validation/ForeignStrings.dll",
+        "--execution",
+        "interpreter"
+      ],
+      "exitCode": 42,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/debug/neoclr",
+        "check",
+        "/Users/robert/Projects/neoclr/target/foreign-validation/ForeignWide.dll"
+      ],
+      "exitCode": 0,
+      "stdout": "NeoMetadata_002AF1B5A843F53B89A93F34FA47666A335DE43B4F62D2CC5B1C8D0841908B7D: metadata valid (execution types checked at runtime)\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/debug/neoclr",
+        "run",
+        "/Users/robert/Projects/neoclr/target/foreign-validation/ForeignWide.dll",
+        "--execution",
+        "interpreter"
+      ],
+      "exitCode": 1,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/debug/neoclr",
+        "check",
+        "/Users/robert/Projects/neoclr/target/foreign-validation/ForeignDefaultName.dll"
+      ],
+      "exitCode": 0,
+      "stdout": "NeoMetadata_5C1D145DC19522904D7105FFEC21F61F4EB14D12DD5BF700590713F770E77FF0: metadata valid (execution types checked at runtime)\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/debug/neoclr",
+        "run",
+        "/Users/robert/Projects/neoclr/target/foreign-validation/ForeignDefaultName.dll",
+        "--execution",
+        "interpreter"
+      ],
+      "exitCode": 42,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/debug/neoclr",
+        "check",
+        "/Users/robert/Projects/neoclr/target/foreign-validation/ForeignSystem.dll"
+      ],
+      "exitCode": 0,
+      "stdout": "NeoMetadata_23BE9EDDE4FEE3CCDEEA3A6241578496EAAF84737642955242C33A718B937131: metadata valid (execution types checked at runtime)\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/debug/neoclr",
+        "run",
+        "/Users/robert/Projects/neoclr/target/foreign-validation/ForeignSystem.dll",
+        "--execution",
+        "interpreter"
+      ],
+      "exitCode": 42,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/debug/neoclr",
+        "check",
+        "/Users/robert/Projects/neoclr/target/foreign-validation/ForeignMixedEncoding.dll"
+      ],
+      "exitCode": 0,
+      "stdout": "NeoMetadata_ECA460C7F739C35387927EB5652143D890286541FA2E2256F2E24A9E00559A6C: metadata valid (execution types checked at runtime)\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/debug/neoclr",
+        "run",
+        "/Users/robert/Projects/neoclr/target/foreign-validation/ForeignMixedEncoding.dll",
+        "--execution",
+        "interpreter"
+      ],
+      "exitCode": 42,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/debug/neoclr",
+        "check",
+        "/Users/robert/Projects/neoclr/target/foreign-validation/ForeignBool8.dll"
+      ],
+      "exitCode": 0,
+      "stdout": "NeoMetadata_D621B50C577D167D934BAE0A3892DC1EDAACEE85BBE5C8B8B6DEC95C99AE463B: metadata valid (execution types checked at runtime)\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/debug/neoclr",
+        "run",
+        "/Users/robert/Projects/neoclr/target/foreign-validation/ForeignBool8.dll",
+        "--execution",
+        "interpreter"
+      ],
+      "exitCode": 42,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/debug/neoclr",
+        "check",
+        "/Users/robert/Projects/neoclr/target/foreign-validation/ForeignBool32.dll"
+      ],
+      "exitCode": 0,
+      "stdout": "NeoMetadata_FA47875C28981C9BD4BDDFA9348294AF719E677BEFD61F38D3BF6D4EF0236F09: metadata valid (execution types checked at runtime)\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/debug/neoclr",
+        "run",
+        "/Users/robert/Projects/neoclr/target/foreign-validation/ForeignBool32.dll",
+        "--execution",
+        "interpreter"
+      ],
+      "exitCode": 42,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/debug/neoclr",
+        "check",
+        "/Users/robert/Projects/neoclr/target/foreign-validation/ForeignStatic.dll"
+      ],
+      "exitCode": 0,
+      "stdout": "NeoMetadata_A6CBA3A532353E348422C33F968EEA145A6244CE0F8CEFEBEB21B7FDB3023AB5: metadata valid (execution types checked at runtime)\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/debug/neoclr",
+        "run",
+        "/Users/robert/Projects/neoclr/target/foreign-validation/ForeignStatic.dll",
+        "--execution",
+        "interpreter"
+      ],
+      "exitCode": 42,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/debug/neoclr",
+        "check",
+        "/Users/robert/Projects/neoclr/target/foreign-validation/ForeignMissing.dll"
+      ],
+      "exitCode": 0,
+      "stdout": "NeoMetadata_967FA77C461549ED81EE239523EE73C248CD61378A4E9A236623366AE632D12B: metadata valid (execution types checked at runtime)\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/debug/neoclr",
+        "run",
+        "/Users/robert/Projects/neoclr/target/foreign-validation/ForeignMissing.dll",
+        "--execution",
+        "interpreter"
+      ],
+      "exitCode": 1,
+      "stdout": "",
+      "stderr": "RuntimeError: Runtime error\n   at NeoMetadata_967FA77C461549ED81EE239523EE73C248CD61378A4E9A236623366AE632D12B.F_4D61696E [instruction 0]\n"
+    }
+  ],
+  "compilerBaseRevision": "0afdb3ee1f38743c742ee2f5a01a0fec703bf0be",
+  "runtimeBaseRevision": "d1a44924c5f140ac554ef918efd75a43c898c140",
+  "note": "Working-tree compiler/runtime changes; base revisions do not identify these uncommitted implementations.",
+  "inputs": {
+    "/Users/robert/Projects/neoclr/runtime/raven/src/System/Runtime/InteropServices/NativeImportAttribute.rvn": "29ac8bc0caed07aed5a5f418e9fefc108c4c5282f61df9c67eca17d5dfef42a4",
+    "/Users/robert/Projects/Raven/tools/NeoClrMetadataProbe/bin/Debug/net10.0/NeoClrMetadataProbe.dll": "f59ccf128c51ee2840ed19fa31a6c7d84fe6d50af4e840291f21a58d40940529",
+    "/Users/robert/Projects/neoclr/target/debug/neoclr": "e7e411b3533b158dcb15544e55d625a5e35fbcadf8f71289a1dd1cfde4fea5bc",
+    "/Users/robert/Projects/neoclr/target/foreign-api/NeoCLR.CoreProbe.dll": "df36b7b81767e144bd5db324244a6341bf769b566ccf1e314e8630d9ffef1b60",
+    "/Users/robert/Projects/neoclr/src/interop.rs": "9cbe21c9f7425bfcbeaef7977ddd28fe9f03e373edc2bd68e3ba6b1651887d9c",
+    "/Users/robert/Projects/neoclr/src/metadata.rs": "43c0c4d3ea21ef2c0341b00693674086864ecaa46ed81481e1b00d4d8fba0b7b"
+  }
+}

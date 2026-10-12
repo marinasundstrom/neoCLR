@@ -1,0 +1,67 @@
+module System.Runtime.InteropServices
+
+import System.*
+
+/// Selects the ABI used by a foreign function. Unsupported conventions are rejected.
+public enum NativeCallingConvention {
+    Cdecl = 0
+    System = 1
+}
+
+/// Selects explicit, call-scoped input string conversion for foreign functions.
+public enum NativeStringMarshalling {
+    None = 0
+    Utf8 = 1
+    Utf16 = 2
+}
+
+/// Binds an extern static method or namespace function to an exact native export.
+/// Library loading and symbol resolution occur on first invocation. The declaration
+/// must match the actual native ABI; metadata cannot prove the export's signature.
+[AttributeUsage(AttributeTargets.Method, Inherited: false)]
+public class NativeImportAttribute : System.Attribute {
+    private val libraryName: string
+
+    /// Records a native library loader name or path. Does not load native code.
+    init(libraryName: string) {
+        self.libraryName = libraryName
+    }
+
+    /// Gets the native library loader name or path.
+    val LibraryName: string => libraryName
+
+    /// Selects an exact export name; omission uses the declared function name.
+    var EntryPoint: string = ""
+
+    /// Selects the platform C calling convention.
+    var CallingConvention: NativeCallingConvention = NativeCallingConvention.Cdecl
+
+    /// Selects input string encoding; None rejects String parameters.
+    /// Buffers cannot be retained, modified, freed or returned by native code.
+    var StringMarshalling: NativeStringMarshalling = NativeStringMarshalling.None
+}
+
+
+/// Explicit native representations supported by parameter and result marshalling.
+public enum NativeType {
+    Utf8 = 0
+    Utf16 = 1
+    Bool8 = 2
+    Bool32 = 3
+}
+
+/// Overrides the native representation of one parameter or result.
+/// Strings are input-only; Bool8 and Bool32 normalize false/true to 0/1 on input
+/// and treat every nonzero native result as true.
+[AttributeUsage(AttributeTargets.Parameter | AttributeTargets.ReturnValue, Inherited: false)]
+public class MarshalAsAttribute : System.Attribute {
+    private val nativeType: NativeType
+
+    /// Records a conversion descriptor. Does not allocate or invoke native code.
+    init(nativeType: NativeType) {
+        self.nativeType = nativeType
+    }
+
+    /// Gets the selected native representation.
+    val Value: NativeType => nativeType
+}

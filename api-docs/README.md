@@ -1871,3 +1871,13 @@ aggregate declarations are documentation facades; the historical synchronous CLI
 execution bridge is not extended. No new synchronous capability interface is added.
 The root library selects RavenNeoClrAsyncLibrary=System.Runtime to compile its own
 async adapters, requiring the matching source-owned provider compiler support.
+
+## Foreign import attributes (development, 2026-10-12)
+
+All five interop types and their members are selected in the refreshed aggregate
+reference and XML snapshot. [Manual reference](native-interop.md) specifies encoding,
+Boolean widths, conventions, lifetime and rejection behavior. Actual Raven source
+attributes compile in the focused foreign-import probe. The full installed library
+and native RavenDoc archive have not been rebuilt for this development slice; native
+archive coverage of these five types remains a tracked gap. The aggregate reference
+and linked manual entry provide coverage meanwhile.
