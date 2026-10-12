@@ -66,7 +66,7 @@ static int owned_handles(void) {
     neoclr_probe_storage slot = {&value, 8, 0};
     neoclr_probe_frame frame, active;
     neoclr_parked_roots parked = {0};
-    neoclr_probe_enter_v3(&frame, &c, 1, &slot, 1, "{}", 2);
+    neoclr_probe_enter_v3(&frame, &c, 2047, &slot, 1, "{}", 2);
     CHECK(!neoclr_gc_roots_park_owned_v1(&c, stack_owner, &parked));
     void *root = owner;
     neoclr_probe_storage active_slot = {&root, 8, 0};

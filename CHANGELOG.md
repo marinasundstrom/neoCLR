@@ -8,6 +8,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-12
 
+- Align the native root hook with the 2,048-function compiler budget; remove a
+  stale 1,024-index rejection that aborted the managed HTTPS showcase. Exercise
+  the final admitted index in host-root lifetime tests. The local AOT HTTPS JSON
+  exchange now passes; interpreter/JIT and broader SSL qualification remain open.
+
 - Admit bounded 128-lane native inline values, object payloads and record-array
   elements for nested HTTP results and compiler-generated async frames. Keep
   allocator and GC descriptor checks aligned, preserve stack/heap budgets, and

@@ -36,3 +36,13 @@ value-layout admission: `HttpError` reaches 68 flattened lanes against the
 unchanged 64-lane limit. That separate representation issue remains open; this
 checkpoint does not claim interpreter/JIT/AOT HTTPS execution or Windows
 qualification. See [measured inventory](selection-budget-validation.json).
+
+## Execution follow-through
+
+The [layout checkpoint](native-layout-budget.md) admits the nested values and async
+frames. First AOT execution then exposed a stale `function >= 1024` guard in the
+native root hook. Align its bound with 2,048 and exercise index 2,047 in the native
+host-root retention/context/lifetime test. A freshly linked local AOT consumer now
+prints `Managed HTTPS JSON exchange passed`, including GC during request handling.
+This is provisional consumer evidence; broader SSL and interpreter/JIT qualification
+remain separate gates. Rebuild linked hosts and prepared JIT bundles together.
