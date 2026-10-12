@@ -38,9 +38,9 @@ the previously installed author-testing bundle has not been replaced in this sli
 
 1. Obtain a clean hosted source/format/Clippy gate on the selected candidate, including
    focused macOS/Windows boundaries and the minimum-Rust matrix.
-2. Make the qualified Raven native revision `6b5e052ce3648f9247ac76aba275587a3a5a1bb4`
-   available to hosted builds and select it deliberately. Current Windows recipes
-   still pin older revisions; a passing old run does not qualify the new compiler.
+2. Qualify Raven native revision `6b5e052ce3648f9247ac76aba275587a3a5a1bb4` on Windows.
+   It is now available on `codex/neoclr-release-20261013`, and HTTP/JIT and SDK
+   qualification select it. A passing older run does not qualify this compiler.
 3. Qualify the rebuilt Windows default-JIT bundle, HTTP/HTTPS and matching SDK/editor;
    retain archive, payload and compiler hashes. Refresh packaged notices on both
    distribution targets and verify extracted payloads before publication.

@@ -66,3 +66,19 @@ Python/OpenSSL peers with TLS 1.2 and TLS 1.3, in both client/server directions.
 It also exercises chunked responses crossing TLS record and UTF-8 boundaries.
 Use a Python SSL build with TLS 1.3 enabled; credentials are generated per run and
 verification remains enabled. Uploads include the validation and native build reports.
+
+## Release candidate alignment — 2026-10-13
+
+The development HTTP/JIT gates now select Raven native commit
+`6b5e052ce3648f9247ac76aba275587a3a5a1bb4`, matching the installed macOS compiler
+and its forward async-return declaration fix. The revision is available on the
+Raven validation branch `codex/neoclr-release-20261013`; Raven main and the native
+compiler line remain separate.
+
+The native-toolchain workflow builds the matching Windows SDK/VSIX, then prepares
+an actual default-JIT bundle before extracting and testing it. The new
+`prepare-windows-jit-package.py` builds a Windows HTTP recipe, packages the current
+backend/helper through `prepare-jit-bundle.py`, and archives only verified manifest
+members. It records archive and manifest hashes, retains build logs and refreshes
+notices. Two local archive regressions pass (stale output exclusion/hash mismatch
+and out-of-bundle rejection); actual Windows execution remains a hosted gate.

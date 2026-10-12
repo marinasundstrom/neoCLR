@@ -8,6 +8,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-13
 
+- Align Windows HTTP/JIT and SDK qualification with the locally qualified Raven
+  native compiler 6b5e052ce. Prepare and archive a real default-JIT backend/host
+  bundle before extracted SDK/editor checks; retain hashes and build logs. Two
+  archive regressions pass locally; hosted Windows execution remains to qualify.
+  Use validation branches and explicit workflow dispatch for this candidate.
+
 - Record release preflight evidence: the full extracted-source run completed
   with 1,956 passing tests and three stale expectations, now repaired with 32
   passing focused tests. Fresh native-profile archive smoke passes all 25 programs,
