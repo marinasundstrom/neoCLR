@@ -15857,3 +15857,20 @@ or runtime-await default switch was performed.
   protocol names remain separate decisions; no wholesale hierarchy or protocol rename
   is inferred. The pending migration must preserve behavior and update callers/tests
   and both API snapshots together.
+
+
+## 2026-10-12 — Stream views and return-type overloads
+
+- **Author exploration:** the InputStream/AsyncInputStream pairing is unfortunate;
+  casting to the desired interface could allow shared names. The author also asks
+  whether neoCLR could distinguish overloads using return types.
+- **Assistant analysis:** native method signatures already contain return types and
+  support explicit interface mappings; language overload selection is a separate
+  concern. .NET explicit interface implementation is a relevant comparison, not
+  evidence that the complete proposed Raven stream pattern is already qualified.
+- **Assistant recommendation:** one canonical asynchronous stream capability, with
+  optional synchronous access and explicit naming or interface views. Avoid making
+  suspension behavior depend on contextual return-type inference just for streams.
+- **Action:** recorded alternatives and inference/interop validation questions in
+  [stream design](stream-design.md#interface-views-and-return-type-overloading-discussion).
+  No new author decision, API rename or compiler capability is claimed.

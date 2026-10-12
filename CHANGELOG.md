@@ -14,7 +14,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   Seven memory-stream tests pass in macOS interpreter/JIT/AOT; refresh both API
   references. Record the subsequent async-first naming policy and planned stream
   migration: ordinary asynchronous operation names, Sync for synchronous alternatives
-  when distinction is needed. Implemented names are unchanged in this policy slice.
+  when distinction is needed. Record interface-view and return-type-overload
+  alternatives for review; implemented names and overload rules remain unchanged.
   Record .NET/Windows Runtime/Go comparisons and compiler state-machine
   follow-ups. Socket/TLS adapters and Windows qualification remain open.
 

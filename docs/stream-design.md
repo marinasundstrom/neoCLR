@@ -36,6 +36,27 @@ TLS shutdown are different operations and need semantic design before naming the
 The table is a migration plan, not an API already available: the first implementation
 and current reference still expose ReadAsync/WriteAsync/FlushAsync.
 
+### Interface views and return-type overloading (discussion)
+
+The author questions the dual InputStream/AsyncInputStream surface and suggests
+selecting a view by casting, or exploring return-type-aware overloads. These are
+open alternatives, not a settled migration decision. The native metadata model
+already records MethodSignature.ReturnType and explicit interface mappings; that
+does not establish language support for selecting overloads from an expected result.
+[.NET explicit interface implementations](https://learn.microsoft.com/en-us/dotnet/csharp/programming-guide/interfaces/explicit-interface-implementation)
+illustrate how distinct interface views can select same-named members without
+return-type overload resolution. neoCLR/Raven support for the particular stream
+combination still needs an executable test before adoption.
+
+The assistant recommends one canonical asynchronous InputStream/OutputStream
+contract, with an optional synchronous capability where implementations support it.
+ReadSync/WriteSync on concrete dual-capability types remain the least ambiguous
+starting point; explicit synchronous interface views are an alternative to test.
+Do not add Task-versus-value overload selection merely to solve stream naming:
+`let result = stream.Read(...)` supplies no expected result type, and `await`-based
+selection would need deliberate rules for inference, method groups and other
+languages. No compiler or runtime dispatch change is made by this discussion.
+
 ## First async contract — 2026-10-12
 
 Author clarification: compare .NET, Windows Runtime and other platforms, while
