@@ -16,8 +16,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   expanded Windows/macOS CI gate. Extract the unchanged C ABI into a standalone
   native cryptography archive without TLS dependencies; all 36 mode executions and
   ten provider/TLS tests pass on macOS. Native consumers now link that archive
-  instead of the TLS archive for cryptography exports. Public managed APIs and installed-host packaging
-  remain open; this is a private source-host checkpoint.
+  instead of the TLS archive for cryptography exports. Prepared JIT bundles now
+  include the adapter/provider, and default CLI execution admits the verified
+  bindings. All twelve cases and seven retained MemoryStream tests pass through
+  the installed macOS host; Windows CI includes the same cryptography check.
+  Public managed APIs and normal AOT project packaging remain open.
 
 - Connect private typed cryptography services to the interpreter using the shared
   TLS-independent provider. Require exact byte-array signatures and report

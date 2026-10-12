@@ -262,3 +262,8 @@ TLS dependencies and now pass twelve cases in interpreter, JIT
 and AOT on macOS, using a shared host adapter. Windows qualification is pending.
 The public managed API and installed-host packaging remain open.
 [Native cryptography checkpoint](https://github.com/marinasundstrom/neoCLR/blob/main/docs/experiments/native-cryptography/README.md).
+
+Development JIT bundles now include these private cryptography services in their
+normal host, with twelve cases checked through default CLI execution on macOS.
+Public Raven cryptography APIs and AOT project packaging remain in development;
+Windows execution of this integration awaits CI.

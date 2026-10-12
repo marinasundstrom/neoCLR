@@ -132,5 +132,6 @@ The [explicit cryptography bindings](experiments/native-cryptography/README.md) 
 pass twelve identical cases across interpreter, JIT and AOT on macOS. The same
 Windows CI gate is configured but not yet executed. The qualification host links
 the standalone cryptography archive, with dependency checks excluding TLS. Normal
-host packaging and the managed facade remain open; this does not make public Raven
+AOT project packaging and the managed facade remain open; prepared JIT hosts now
+include these services for default CLI execution; this does not make public Raven
 cryptography or SslStream APIs available.

@@ -110,6 +110,16 @@ def complete_services(command):
     additions = [ROOT / 'docs/experiments/aot-console' / name
                  for name in ('string-unicode.c', 'system-culture.c', 'time-zone.c')]
     additions.append(archive)
+    for path in project.native_crypto_sources():
+        report['inputsSha256'][str(path)] = sha(path)
+    crypto_build, crypto_archive = project.native_crypto_build(windows)
+    run(crypto_build)
+    # A qualified source recipe may already contain the cryptography archive.
+    command = [arg for arg in command if 'neoclr_native_crypto' not in str(arg)]
+    additions += [ROOT / 'docs/experiments/aot-console/cryptography.c', crypto_archive]
+    if windows:
+        additions += [name for name in ('Bcrypt.lib', 'Ntdll.lib', 'Userenv.lib', 'Advapi32.lib', 'Ws2_32.lib')
+                      if name.lower() not in {str(arg).lower() for arg in command}]
     for path in additions:
         if str(path) not in command:
             command.insert(command.index('/link') if windows else len(command), str(path))
@@ -146,7 +156,7 @@ try:
     manifest['platform'] = platform.platform()
     manifest['runtime'] = 'bin/neoclr' + suffix
     manifest['jit'] = dict(default=True, compiler='bin/neoclr-aot-poc' + suffix,
-                           host='bin/' + helper_name, runtimeAsync=not windows,
+                           host='bin/' + helper_name, runtimeAsync=not windows, cryptography=True,
                            heapBytes=a.heap_bytes, byteArrayLimit=a.byte_array_limit)
     # Current verification tools make their interpreter controls explicit.
     for name in ('verify-native-bundle.py', 'verify-native-http-json.py'):

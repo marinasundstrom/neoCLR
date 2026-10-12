@@ -171,7 +171,8 @@ require `ManagedArrays`. These are synchronous interpreter services backed by th
 same TLS-independent provider as the native C ABI, not arbitrary native imports.
 Reachability reporting is not a permission grant. JIT/AOT now have explicit
 `--bind-cryptography` lowering with a matching private host adapter; the public
-managed API and installed-host integration remain open. See the
+managed API and normal AOT project packaging remain open. Development JIT bundle
+preparation now includes the adapter and standalone provider for default CLI execution. See the
 [native qualification](experiments/native-cryptography/README.md).
 
 Inputs must be initialized byte arrays. Destination arrays must be writable and

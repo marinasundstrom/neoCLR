@@ -140,6 +140,7 @@ pub(crate) fn run(
         "--bind-character-text",
         "--bind-system-culture",
         "--bind-time-zone-rules",
+        "--bind-cryptography",
         "--bind-task-queue",
         "--bind-scheduler",
         "--bind-timers",

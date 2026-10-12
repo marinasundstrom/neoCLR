@@ -54,9 +54,31 @@ and ordinary managed method bodies.
 ## Remaining gates
 
 Windows execution is pending; adding CI is not platform qualification. This is a
-private bytecode/source-host checkpoint, not the public Raven cryptography API or
-an installed bundle capability. The qualification host now links only the standalone
-cryptography archive for its raw C exports. Normal project/JIT-host packaging,
+private bytecode checkpoint, not the public Raven cryptography API. The qualification host now links only the standalone
+cryptography archive for its raw C exports. Normal AOT project packaging,
 public managed projection and matching API
 reference snapshots remain next. Managed SslStream and certificate/trust APIs are
 also still open.
+
+## Installed JIT host
+
+`scripts/prepare-jit-bundle.py` now links the standalone provider into the normal
+shared JIT host. Windows builds select static CRT consistently with the C host.
+`neoclr run` admits the verified private bindings by default; no per-program host
+or compiler override is needed. The preparation manifest records source/archive
+hashes and `jit.cryptography: true`. Rebuild the matching runtime/compiler/host
+bundle when adopting this change.
+
+```sh
+python3 docs/experiments/native-cryptography/validate-bundle.py \
+  --bundle path/to/prepared/bundle --output target/crypto-installed-validation
+```
+
+The test verifies bundle hashes, declares the private InternalCalls in each test
+assembly, and runs all twelve cases against the installed seed and libraries.
+These test-owned declarations do not supply a public managed facade or alter the
+installed seed. Terminal faults use the normal host's exit code 1 and RuntimeError
+diagnostic, rather than the isolated test host's exit code 103.
+[Installed evidence](installed-validation.json) records macOS outcomes and a retained
+seven-case managed MemoryStream regression. The Windows JIT workflow now runs the
+same cryptography consumer after bundle preparation; Windows execution is pending.

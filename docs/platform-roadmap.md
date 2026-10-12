@@ -38,8 +38,10 @@ configuration and explicit authentication; its macOS/Windows CI gate is added, w
 local macOS validation complete. Private secure-random/SHA-256/HMAC-SHA-256 primitives also pass local provider
 tests, with [typed interpreter/JIT/AOT service qualification](experiments/native-cryptography/README.md)
 now passing locally on macOS using a standalone native cryptography archive without
-TLS dependencies. Windows uses the same pending CI gate. Normal host
-packaging and managed SSL/System.Security.Cryptography projections remain next. Socket/TLS adapters
+TLS dependencies. Prepared JIT bundles now include the provider, with private
+cryptography cases passing through default CLI execution. Windows uses the pending
+CI gates. Normal AOT project packaging and managed SSL/System.Security.Cryptography
+projections remain next. Socket/TLS adapters
 and certificate APIs remain open. Compare .NET,
 Windows Runtime and other platforms, retaining .NET as the ergonomics target.
 See the [first async contract](stream-design.md#first-async-contract--2026-10-12).

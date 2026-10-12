@@ -6,6 +6,9 @@ on:
       - 'src/**'
       - 'Cargo.*'
       - 'tools/aot-poc/**'
+      - 'tools/native-crypto/**'
+      - 'tools/security-provider/**'
+      - 'docs/experiments/native-cryptography/**'
       - 'docs/experiments/jit-*/**'
       - 'tools/native/windows-*'
       - 'docs/experiments/aot-console/**'
@@ -31,6 +34,9 @@ on:
       - 'src/**'
       - 'Cargo.*'
       - 'tools/aot-poc/**'
+      - 'tools/native-crypto/**'
+      - 'tools/security-provider/**'
+      - 'docs/experiments/native-cryptography/**'
       - 'docs/experiments/jit-*/**'
       - 'tools/native/windows-*'
       - 'docs/experiments/aot-console/**'
@@ -86,6 +92,7 @@ jobs:
             target/windows-jit-validation/*.log
             target/windows-jit-validation/http/
             target/windows-jit-validation/framework/
+            target/windows-jit-validation/cryptography/
             target/windows-jit-validation/native/build.json
             target/windows-jit-validation/async-use/
             target/windows-jit-validation/generic-async-use/

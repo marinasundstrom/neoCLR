@@ -162,3 +162,19 @@ Explicit managed `GC.Collect` uses the shared native collector when `--native-gc
 is enabled, independently of runtime suspension. This applies to generated async
 state machines on Windows x64 as well as macOS ARM64. The collector uses the
 published guest and host roots; enabling it does not enable runtime async on Windows.
+
+### Private cryptography host integration — 2026-10-12
+
+Development bundle preparation now includes the standalone cryptography archive
+and byte-array adapter alongside text, time-zone and network services. Default JIT
+execution explicitly admits the four verified cryptography InternalCalls. Prepare
+and use matching runtime, native compiler and host versions together; older helper
+libraries cannot supply the new symbols. The bundle manifest records
+`jit.cryptography: true`, and preparation hashes the provider sources and archive.
+
+The [installed qualification](experiments/native-cryptography/README.md#installed-jit-host)
+uses the normal CLI without host, compiler or execution-mode overrides. This is
+private runtime plumbing beneath the planned .NET-style managed facade; it adds no
+public Raven cryptography types. AOT project packaging and Raven source mappings
+remain separate gates. Windows uses the same preparation path and explicit DLL
+exports; execution of this new checkpoint is pending its CI job.

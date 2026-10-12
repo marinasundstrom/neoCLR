@@ -1,0 +1,94 @@
+{
+  "passed": true,
+  "date": "2026-10-12",
+  "platform": "macOS-27.0-arm64-arm-64bit",
+  "cases": [
+    {
+      "name": "sha-empty",
+      "defaultJit": true,
+      "exitCode": 0
+    },
+    {
+      "name": "sha-abc",
+      "defaultJit": true,
+      "exitCode": 0
+    },
+    {
+      "name": "sha-multiblock",
+      "defaultJit": true,
+      "exitCode": 0
+    },
+    {
+      "name": "sha-alias",
+      "defaultJit": true,
+      "exitCode": 0
+    },
+    {
+      "name": "hmac-valid",
+      "defaultJit": true,
+      "exitCode": 0
+    },
+    {
+      "name": "hmac-tampered",
+      "defaultJit": true,
+      "exitCode": 0
+    },
+    {
+      "name": "random-0",
+      "defaultJit": true,
+      "exitCode": 0
+    },
+    {
+      "name": "random-32",
+      "defaultJit": true,
+      "exitCode": 0
+    },
+    {
+      "name": "short-output",
+      "defaultJit": true,
+      "exitCode": 0
+    },
+    {
+      "name": "reserved-output",
+      "defaultJit": true,
+      "exitCode": 0
+    },
+    {
+      "name": "uninitialized-1",
+      "defaultJit": true,
+      "exitCode": 1
+    },
+    {
+      "name": "uninitialized-65537",
+      "defaultJit": true,
+      "exitCode": 1
+    }
+  ],
+  "bundleManifestSha256": "ee0c13071062277c7e4322f4581fe1ba93ac6e693b292ef446cd39cd8ca0c89d",
+  "bundleFilesSha256": {
+    "bin/neoclr": "c23f2034a7db8e25cdcdfee72fc4c1efcd47eb6e07f0abd04fc74fd388001b33",
+    "bin/neoclr-aot-poc": "ab9b50ce02d9cd1a56a41451a0a5a7bb70764e8a4233f092e74fc124e7a6c53d",
+    "bin/neoclr-jit-host.dylib": "ab05c8940374613aaa7eaff5364d59de3154e1292c78afb48f2c07aa80fb697d"
+  },
+  "preparationReport": "target/crypto-jit-bundle/preparation.json",
+  "detailedReport": "target/crypto-installed-validation/validation.json",
+  "inputsSha256": {
+    "src/jit_cli.rs": "a2d4b52c34eb860f928bdb38aa56e2e267ba58284aace3277f1ac37d402dd719",
+    "scripts/prepare-jit-bundle.py": "99fd8b532a1ed2b3d0719e93554263c80e4541bb46463b7f2eb2835d03212e9f",
+    "scripts/build-native-project.py": "6cc1beb0bc56172d7af28104f5ccbb47f9b94eae6108867b76f349898666a934",
+    "docs/experiments/native-cryptography/validate-bundle.py": "5509e96ef3c89a526d18f5af8a0f22ea9d1d30a2fe1f23760253a0e5dd373a88",
+    "docs/experiments/native-cryptography/validate.py": "2cd9a73cb150487f4a613096ba858ab06ccaddd9c008b46bbdea7bda341eae87",
+    "runtime/neoCLR/Runtime/Cryptography.neoil": "dff152ba487c7f9ad0856d7411b0525847f082bd35b6e8f2ced092c2f49aebbe"
+  },
+  "memoryStreamRegression": {
+    "exitCode": 0,
+    "passed": 7,
+    "stdout": "PASS MemoryStream async cancellation and rejected ranges preserve storage\nPASS MemoryStream async interfaces preserve complete writes short reads and EOF\nPASS MemoryStream quota errors preserve length and position\nPASS MemoryStream closure is shared across interfaces and idempotent\nPASS MemoryStream gap writes zero-fill while empty writes preserve length\nPASS MemoryStream rejects invalid buffer and seek ranges without moving\nPASS MemoryStream overwrites preserve length and untouched bytes\nTests: 7, passed: 7, failed: 0, skipped: 0\n",
+    "assemblySha256": "d6c0543f765a659723cb05a5d497d42a349fd13c2cbaa9f6f880f8c42d539ccf"
+  },
+  "limitations": [
+    "Private test-owned InternalCalls; no new public Raven API or installed runtime seed declaration.",
+    "Default JIT uses installed libraries and host without mode/compiler/host overrides.",
+    "AOT project integration and Windows execution remain open."
+  ]
+}

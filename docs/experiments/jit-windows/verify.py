@@ -69,6 +69,8 @@ def main():
              '--runtime', ROOT/'target/release/neoclr.exe', '--jit-compiler', jit,
              '--host-recipe', out/'native/build.json', '--output', out/'jit-install'], 'prepare-default-jit')
         installed = out/'jit-install/bundle'
+        run([sys.executable, ROOT/'docs/experiments/native-cryptography/validate-bundle.py',
+             '--bundle', installed, '--output', out/'cryptography'], 'cryptography-default-jit')
         run([sys.executable, ROOT/'docs/experiments/jit-http/verify.py', '--bundle', installed,
              '--windows-build', out/'native/build.json', '--default-cli', '--mode', 'jit',
              '--output', out/'http'], 'http-default-jit')
