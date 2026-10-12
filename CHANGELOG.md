@@ -8,6 +8,9 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-12
 
+- Clarify MethodImpl/InternalCall versus foreign-import implementation providers;
+  record the remaining InternalCall extern-symbol readback gap without claiming a fix.
+
 - Preserve native imports through metadata inspection and Raven symbol readback:
   expose immutable Introspection.MethodInfo.NativeImport without library loading,
   and retain IsExtern for imported namespace functions and static methods. Add

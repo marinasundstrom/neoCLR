@@ -16018,3 +16018,25 @@ or runtime-await default switch was performed.
 - **Open:** Windows execution of new cases, managed ownership/SSL composition and
   SQL adapters. [Design and evidence](shared-security-provider.md#certificate-configuration-foundation-development-2026-10-12)
   distinguish this prerequisite from a completed managed SSL API.
+
+## 2026-10-12 — MethodImpl and foreign imports
+
+- **Author question:** “How does MethodImplAttribute fit into this model? I mean
+  with do have internal calls etc also.”
+- **Assistant explanation:** extern denotes a declaration without a source body.
+  MethodImpl(InternalCall) selects a runtime-owned implementation identified by its
+  runtime service contract; NativeImport selects an external library/export with an
+  explicit ABI and marshalling descriptor. They are mutually exclusive implementation
+  providers. MethodImpl also has .NET implementation options such as NoInlining; those
+  are distinct from choosing a provider and must not imply unsupported neoCLR behavior.
+- **Inspection:** neoCLR already separates impl_flags/InternalCall from native imports
+  and rejects their combination. Current Raven runtime-service admission is deliberately
+  narrow (internal extern namespace functions in neoCLR.Runtime). The latest imported
+  symbol IsExtern fix recognizes NativeImport only; InternalCall readback remains a
+  gap, not an intended semantic distinction.
+- **Assistant proposal:** eventually expose implementation kind separately from
+  implementation options and derive IsExtern for both native-import and internal-call
+  declarations. No implementation or author acceptance of this proposal is claimed.
+  [.NET MethodImplOptions](https://learn.microsoft.com/en-us/dotnet/api/system.runtime.compilerservices.methodimploptions)
+  and [CoreCLR core-library boundaries](https://github.com/dotnet/runtime/blob/main/docs/design/coreclr/botr/corelib.md)
+  support the runtime-owned versus public foreign-import distinction.
