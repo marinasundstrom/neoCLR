@@ -17,6 +17,9 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   the roadmap, HTTP tracker, development record and website.
   Add an explicit source-only macOS ARM64 `--https-server` project build option;
   twelve host cases and the Rust transport test pass with the fixed compiler.
+  Extend authenticated shutdown coverage to clean TLS EOF and abrupt disconnects,
+  buffered plaintext and subsequent request recovery: 14 project AOT host cases,
+  27 runtime-async AOT/JIT cases and two Rust transport tests pass on macOS ARM64.
 
 - Fix the HTTPS source compiler gap through Raven main `99ae011b4`, deliberately
   carried to its neoCLR branch as `c71baae94`: traverse unary operands so `use`

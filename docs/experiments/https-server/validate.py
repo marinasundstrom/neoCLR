@@ -126,7 +126,7 @@ def main():
                         return protocol
 
             for mode, invocation in invocations:
-                for case in ['tls13', 'tls12', 'fragmented', 'untrusted', 'wrong-host', 'alpn', 'plaintext', 'truncated', 'timeout', 'cancel']:
+                for case in ['tls13', 'tls12', 'fragmented', 'untrusted', 'wrong-host', 'alpn', 'plaintext', 'truncated', 'abrupt-eof', 'clean-eof', 'timeout', 'cancel']:
                     scenario = 'ok' if case in ('tls13', 'tls12', 'fragmented') else case
                     process = subprocess.Popen(invocation + ([scenario] if mode != 'jit' else ['--jit-entry-argument', scenario]), env=env, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
                     try:
@@ -138,6 +138,18 @@ def main():
                         if scenario == 'ok':
                             protocol = valid(port, ssl.TLSVersion.TLSv1_2 if case == 'tls12' else ssl.TLSVersion.TLSv1_3,
                                              case == 'fragmented')
+                        elif case in ('abrupt-eof', 'clean-eof'):
+                            with socket.create_connection(('127.0.0.1', port), timeout=10) as tcp:
+                                with trust.wrap_socket(tcp, server_hostname='localhost') as secure:
+                                    # An authenticated peer closes before finishing its HTTP headers.
+                                    secure.sendall(b'GET /greeting HTTP/1.1\r\nHost: local')
+                                    if case == 'clean-eof':
+                                        with secure.unwrap():
+                                            pass
+                                    else:
+                                        # Transfer the descriptor so closing bypasses TLS close_notify.
+                                        with socket.socket(fileno=secure.detach()) as raw:
+                                            raw.shutdown(socket.SHUT_WR)
                         elif case in ('untrusted', 'wrong-host', 'alpn'):
                             context = ssl.create_default_context() if case == 'untrusted' else ssl.create_default_context(cafile=str(cert))
                             context.set_alpn_protocols(['h2'] if case == 'alpn' else ['http/1.1'])

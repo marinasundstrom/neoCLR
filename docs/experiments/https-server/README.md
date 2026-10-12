@@ -130,8 +130,8 @@ Supply `NEOCLR_HTTPS_CERTIFICATE` and `NEOCLR_HTTPS_PRIVATE_KEY` as PEM file pat
 when running the executable directly. Credentials are loaded at runtime, not
 embedded in the executable or build report. The validation harness creates and
 removes its own ephemeral credentials. Its project mode verifies the build's
-input and artifact hashes before using the executable, then runs the ten network
-scenarios, two credential rejection cases and Rust transport test. Cleartext and
+input and artifact hashes before using the executable, then runs twelve network
+scenarios, two credential rejection cases and two Rust transport tests. Cleartext and
 JIT isolation retain the separate runtime-async proof above.
 
 The project path uses compiler-generated state machines. A qualified compiler
@@ -146,3 +146,29 @@ The build report replaces its 7 MB native selection stdout with byte count and h
 host cases and the explicit Rust transport test pass. This locally qualified bundle
 retains the existing runtime libraries and replaces only its compiler directory;
 the original bundle is preserved. Both compiler and library inputs are hashed.
+
+## Authenticated shutdown qualification — 2026-10-12
+
+The existing TLS EOF policy now has direct regression coverage. For nonempty receive buffers, the private ABI
+must deliver all buffered plaintext, report zero bytes only for authenticated
+`close_notify`, and report a terminal error after abrupt TCP EOF. A second Rust
+transport test exercises both outcomes with fragmented records and checks that a
+failed session cannot resume. The runtime implementation required no change.
+
+The independent OpenSSL client also sends an incomplete HTTP request after a valid
+handshake, then either sends `close_notify` or disconnects without it. Both requests
+must fail before reaching the handler; each is followed by a successful request
+on a new connection in the same runtime. A clean TLS shutdown does not make an
+incomplete HTTP message valid. Normal complete responses still require close_notify.
+
+[Project AOT results](eof-project-validation.json) pass 14 host cases and both Rust
+tests, using [this build](eof-project-build.json). The build evidence retains the
+original report hash and replaces large selection output with its hash/byte count.
+[Runtime-async AOT/JIT results](eof-runtime-validation.json) pass 27 host cases and
+both Rust tests, including the ordinary cleartext-host check. All inputs are hashed;
+private credentials remain temporary. Earlier reports above are historical checkpoints.
+
+This closes the bounded authenticated-EOF qualification gap on macOS ARM64. It
+adds no managed API or new TLS behavior. Guaranteed asynchronous graceful shutdown
+under backpressure, expired-certificate fixtures, Windows/interpreter support and
+installed TLS packaging remain open.

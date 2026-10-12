@@ -8,7 +8,10 @@ macOS ARM64 JIT/AOT; managed per-listener TLS configuration, Windows/interpreter
 integration and installed packaging remain open. The source project builder now
 accepts an explicit `--https-server` switch, qualified with the shared Raven unary
 await capture fix; [project evidence](experiments/https-server/project-validation.json)
-covers twelve host cases plus fragmented transport. Client and PostgreSQL TLS are not
+covers twelve host cases plus fragmented transport. The subsequent
+[authenticated-shutdown checkpoint](experiments/https-server/README.md#authenticated-shutdown-qualification--2026-10-12)
+passes 14 project AOT cases, 27 runtime-async AOT/JIT cases and two Rust transport
+tests, distinguishing clean TLS EOF from truncation while preserving buffered data. Client and PostgreSQL TLS are not
 implemented by this server slice. This is bounded author-directed networking work;
 the runtime correctness/performance milestone remains active.
 Compiler follow-through also closes the 15 broader .NET async baseline failures:

@@ -245,6 +245,7 @@ mod tests {
         incoming: VecDeque<u8>,
         outgoing: Vec<u8>,
         writes: usize,
+        eof: bool,
     }
     unsafe extern "C" fn fragmented(
         state: *mut c_void,
@@ -265,7 +266,7 @@ mod tests {
         } else {
             let count = data.len().min(11).min(state.incoming.len());
             if count == 0 {
-                return -1;
+                return if state.eof { 0 } else { -1 };
             }
             for item in &mut data[..count] {
                 *item = state.incoming.pop_front().unwrap();
@@ -287,9 +288,7 @@ mod tests {
         }
     }
 
-    #[test]
-    #[ignore = "run by HTTPS validation with ephemeral certificate/key paths"]
-    fn fragmented_handshake_and_backpressured_send() {
+    fn connected() -> (*mut c_void, rustls::ClientConnection, Memory) {
         let cert_path = CString::new(std::env::var("NEOCLR_HTTPS_CERTIFICATE").unwrap()).unwrap();
         let key_path = CString::new(std::env::var("NEOCLR_HTTPS_PRIVATE_KEY").unwrap()).unwrap();
         let config = unsafe { neoclr_tls_config_new(cert_path.as_ptr(), key_path.as_ptr()) };
@@ -316,6 +315,7 @@ mod tests {
             incoming: VecDeque::new(),
             outgoing: Vec::new(),
             writes: 0,
+            eof: false,
         };
         let mut scratch = [0; 32];
         for _ in 0..10000 {
@@ -335,6 +335,15 @@ mod tests {
             }
         }
         assert!(!client.is_handshaking() && !session.connection.is_handshaking());
+        (raw, client, memory)
+    }
+
+    #[test]
+    #[ignore = "run by HTTPS validation with ephemeral certificate/key paths"]
+    fn fragmented_handshake_and_backpressured_send() {
+        let (raw, mut client, mut memory) = connected();
+        let session = unsafe { &mut *raw.cast::<Session>() };
+        let mut scratch = [0; 32];
         let mut payload = vec![42; 8192];
         let mut acknowledged = false;
         let mut received = Vec::new();
@@ -392,5 +401,65 @@ mod tests {
             -2
         );
         unsafe { neoclr_tls_session_free(raw, (&mut memory as *mut Memory).cast(), fragmented) };
+    }
+
+    #[test]
+    #[ignore = "run by HTTPS validation with ephemeral certificate/key paths"]
+    fn authenticated_eof_preserves_data_and_requires_close_notify() {
+        for graceful in [false, true] {
+            let (raw, mut client, mut memory) = connected();
+            let payload = vec![73; 1024];
+            client.writer().write_all(&payload).unwrap();
+            if graceful {
+                client.send_close_notify();
+            }
+            exchange(&mut client, &mut memory);
+            memory.eof = true;
+            let mut scratch = [0; 32];
+            let mut received = Vec::new();
+            let mut terminal = None;
+            for _ in 0..10000 {
+                let result = unsafe {
+                    neoclr_tls_transfer(
+                        raw,
+                        (&mut memory as *mut Memory).cast(),
+                        fragmented,
+                        scratch.as_mut_ptr(),
+                        scratch.len() as u32,
+                        0,
+                    )
+                };
+                exchange(&mut client, &mut memory);
+                if result > 0 {
+                    received.extend_from_slice(&scratch[..result as usize]);
+                } else if result != -1 {
+                    terminal = Some(result);
+                    break;
+                }
+            }
+            assert_eq!(
+                received, payload,
+                "buffered plaintext must be delivered before EOF"
+            );
+            let expected = if graceful { 0 } else { -2 };
+            assert_eq!(terminal, Some(expected));
+            // An abrupt EOF poisons the session; subsequent operations cannot resume it.
+            assert_eq!(
+                unsafe {
+                    neoclr_tls_transfer(
+                        raw,
+                        (&mut memory as *mut Memory).cast(),
+                        fragmented,
+                        scratch.as_mut_ptr(),
+                        scratch.len() as u32,
+                        0,
+                    )
+                },
+                expected
+            );
+            unsafe {
+                neoclr_tls_session_free(raw, (&mut memory as *mut Memory).cast(), fragmented)
+            };
+        }
     }
 }
