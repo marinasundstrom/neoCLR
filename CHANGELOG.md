@@ -51,6 +51,10 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   Fragmentation, backpressure, half-close and truncation pass in 19 TLS tests;
   nine supporting provider/lifetime tests and the real C adapter also pass on macOS.
   Windows runs the same CI harness; managed pump bindings and Raven APIs remain open.
+  Bind the private buffered TLS pump to heap-owned sessions in interpreter/JIT/AOT,
+  validating managed storage before provider access. Eight cases pass in each local
+  mode (24 executions); the provider/lifetime suite and C adapter pass on macOS.
+  Native hosts and compilers must be rebuilt together for the v2 private adapter.
   Document shared HTTP/SQL security concepts without forcing a common native backend;
   managed SSL/certificate ownership and handshake diagnostics remain open.
 

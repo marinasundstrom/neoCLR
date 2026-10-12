@@ -43,6 +43,11 @@ def cases(cert, key):
         body += expect(0, 'configured')
         body += 'ldloc session\nldloc owner\nldloc name\n' + session + expect(0, 'created')
         body += 'ldloc owner\n' + release + expect(0, 'config_released')
+        if role == 'client':
+            pump_body = body + literal('input', b'') + literal('output', bytes(17)) + literal('plaintext', b'') + literal('control', bytes([1]) + bytes(15))
+            pump_body += 'ldloc session\nldloc input\nldloc output\nldloc plaintext\nldloc control\ncall neoCLR.Runtime.TlsPump(arrayref<Byte>,arrayref<Byte>,arrayref<Byte>,arrayref<Byte>,arrayref<Byte>)\n' + expect(-1, 'pending')
+            pump_body += 'ldloc control\nldc.i4 12\nldelem Byte\nconv.i4\n' + expect(17, 'produced')
+            yield 'client-pump', pump_body, False
         body += 'ldloc session\n' + abort + expect(0, 'aborted')
         # Deliberately leave a live session for collector/host teardown.
         yield role + '-session', body, False
@@ -95,7 +100,7 @@ def main():
         if windows:
             cc = ['cl', '/nologo', '/W4', '/WX', '/std:c11', '/experimental:c11atomics', '/O2', '/MT', '/DNEOCLR_NATIVE_GC', '/DNEOCLR_NATIVE_BYTE_ARRAY_LIMIT=131072', '/I'+str(base), '/Fo'+str(out)+'/', *sources]
             libs = [archive, '/link', 'Bcrypt.lib', 'Ntdll.lib', 'Userenv.lib', 'Advapi32.lib', 'Ws2_32.lib']
-            run([*cc, '/LD', '/Fe:'+str(host), *libs, '/EXPORT:neoclr_gc_callback_read_v1', '/EXPORT:neoclr_gc_enter_v1', '/EXPORT:neoclr_gc_entry_check_v1', '/EXPORT:neoclr_gc_leave_v1', '/EXPORT:neoclr_gc_stack_roots_v1', '/EXPORT:neoclr_gc_transient_v1', '/EXPORT:neoclr_native_stack_check_v1', '/EXPORT:neoclr_jit_run_v1', '/EXPORT:neoclr_tls_managed_v1', '/EXPORT:neoclr_allocate_bytes_v1', '/EXPORT:neoclr_reserve_bytes_v1', '/EXPORT:neoclr_probe_enter_v1', '/EXPORT:neoclr_probe_leave_v1', '/EXPORT:neoclr_probe_stack_roots_v2', '/EXPORT:neoclr_check_bytes_initialized_v1'])
+            run([*cc, '/LD', '/Fe:'+str(host), *libs, '/EXPORT:neoclr_gc_callback_read_v1', '/EXPORT:neoclr_gc_enter_v1', '/EXPORT:neoclr_gc_entry_check_v1', '/EXPORT:neoclr_gc_leave_v1', '/EXPORT:neoclr_gc_stack_roots_v1', '/EXPORT:neoclr_gc_transient_v1', '/EXPORT:neoclr_native_stack_check_v1', '/EXPORT:neoclr_jit_run_v1', '/EXPORT:neoclr_tls_managed_v1', '/EXPORT:neoclr_tls_managed_v2', '/EXPORT:neoclr_allocate_bytes_v1', '/EXPORT:neoclr_reserve_bytes_v1', '/EXPORT:neoclr_probe_enter_v1', '/EXPORT:neoclr_probe_leave_v1', '/EXPORT:neoclr_probe_stack_roots_v2', '/EXPORT:neoclr_check_bytes_initialized_v1'])
         else:
             cc = [os.environ.get('CC', 'clang'), '-isysroot', os.environ.get('SDKROOT') or run(['xcrun','--show-sdk-path']).strip(), '-std=c11', '-O2', '-Wall', '-Wextra', '-Werror', '-DNEOCLR_NATIVE_GC', '-DNEOCLR_NATIVE_BYTE_ARRAY_LIMIT=131072', '-I', base, *sources]
             libs = [archive]

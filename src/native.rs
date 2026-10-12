@@ -598,6 +598,8 @@ pub(crate) fn bind(function: &Function) -> Result<Binding, Fault> {
         }
         ("neoCLR.Runtime.WriteLine", [Type::String]) => (Binding::WriteLine, Type::Void),
         ("neoCLR.Runtime.CharCategory", [Type::UInt32]) => (Binding::CharCategory, Type::Int32),
+        ("neoCLR.Runtime.TlsPump", types) if types.len() == 5 && types.iter().all(|ty| *ty == Type::ArrayRef(Box::new(Type::Byte))) =>
+            (Binding::Tls(crate::tls::Operation::Pump), Type::Int32),
         ("neoCLR.Runtime.TlsCreateClient", types) if types.len() == 3 && types.iter().all(|ty| *ty == Type::ArrayRef(Box::new(Type::Byte))) =>
             (Binding::Tls(crate::tls::Operation::ClientConfig), Type::Int32),
         ("neoCLR.Runtime.TlsCreateServer", types) if types.len() == 4 && types.iter().all(|ty| *ty == Type::ArrayRef(Box::new(Type::Byte))) =>

@@ -1257,6 +1257,7 @@ pub fn tls(input: &mut neoclr::Module, selection: &Value) -> Result<Vec<Value>, 
             Some("neoCLR.Runtime.TlsCreateSession") => (3, 3, Type::Int32),
             Some("neoCLR.Runtime.TlsRelease") => (4, 1, Type::Int32),
             Some("neoCLR.Runtime.TlsAbort") => (5, 1, Type::Int32),
+            Some("neoCLR.Runtime.TlsPump") => (6, 5, Type::Int32),
             _ => continue,
         };
         let index = row["compiledIndex"].as_u64().ok_or("missing compiled index")? as usize;
@@ -1274,7 +1275,7 @@ pub fn tls(input: &mut neoclr::Module, selection: &Value) -> Result<Vec<Value>, 
         f.impl_flags = 0;
         f.body = vec![if result == Type::Boolean { Op::Bool(false) } else { Op::Int(0) }, Op::Return];
         bindings.push(json!({"definition":row["definition"], "name":row["name"], "compiledIndex":index,
-            "implementation":"tls-v1", "operation":operation, "symbol":"neoclr_tls_managed_v1"}));
+            "implementation":"tls-v1", "operation":operation, "symbol":"neoclr_tls_managed_v2"}));
     }
     Ok(bindings)
 }
@@ -1290,7 +1291,7 @@ mod tls_tests {
         let mut valid = original.clone();
         let rows = tls(&mut valid, &selection).unwrap();
         assert_eq!(rows[0]["operation"], 1);
-        assert_eq!(rows[0]["symbol"], "neoclr_tls_managed_v1");
+        assert_eq!(rows[0]["symbol"], "neoclr_tls_managed_v2");
         for change in 0..5 {
             let mut bad = original.clone();
             let f = &mut bad.functions[0];

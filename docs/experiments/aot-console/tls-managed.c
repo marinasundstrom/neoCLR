@@ -72,9 +72,20 @@ void neoclr_tls_managed_dispose_v1(neoclr_aot_context *heap) {
     while ((context = find_context(heap)) != NULL)
         if (neoclr_gc_resource_release_v1(heap, &context->owners->registration)) return;
 }
+static uint32_t read32(const unsigned char *p) {
+    return (uint32_t)p[0] | (uint32_t)p[1] << 8 | (uint32_t)p[2] << 16 | (uint32_t)p[3] << 24;
+}
+static void write32(unsigned char *p, uint32_t value) {
+    for (int i = 0; i < 4; ++i) p[i] = (unsigned char)(value >> (8 * i));
+}
 int32_t neoclr_tls_managed_v1(int32_t operation, neoclr_aot_context *heap,
     void *owner, void *first, void *second, void *third, int32_t *result) {
-    if (!result || operation < NEOCLR_TLS_CLIENT || operation > NEOCLR_TLS_ABORT ||
+    if (operation > NEOCLR_TLS_ABORT) return 3;
+    return neoclr_tls_managed_v2(operation, heap, owner, first, second, third, NULL, result);
+}
+int32_t neoclr_tls_managed_v2(int32_t operation, neoclr_aot_context *heap,
+    void *owner, void *first, void *second, void *third, void *fourth, int32_t *result) {
+    if (!result || operation < NEOCLR_TLS_CLIENT || operation > NEOCLR_TLS_PUMP ||
         owner_token(heap, owner)) return 3;
     tls_context *context = find_context(heap);
     tls_owner *existing = find_owner(context, owner);
@@ -85,6 +96,24 @@ int32_t neoclr_tls_managed_v1(int32_t operation, neoclr_aot_context *heap,
     }
     if (operation == NEOCLR_TLS_ABORT) {
         *result = existing ? neoclr_tls_context_abort(context->provider, existing->handle) : -18;
+        return 0;
+    }
+    if (operation == NEOCLR_TLS_PUMP) {
+        bytes input, output, plaintext, control;
+        if (array(heap, first, &input) || array(heap, second, &output) ||
+            array(heap, third, &plaintext) || array(heap, fourth, &control) ||
+            first == second || first == third || first == fourth || second == third ||
+            second == fourth || third == fourth) return 3;
+        if (control.count != 16 || control.data[0] < 1 || control.data[0] > 4 ||
+            control.data[1] > 1 || control.data[2] || control.data[3] ||
+            read32(control.data + 4) > input.count) { *result = -10; return 0; }
+        neoclr_tls_pump_progress progress = {0};
+        *result = existing ? (int32_t)neoclr_tls_context_pump_v1(context->provider,
+            existing->handle, control.data[0], input.data, read32(control.data + 4),
+            control.data[1], (unsigned char *)output.data, output.count,
+            (unsigned char *)plaintext.data, plaintext.count, &progress) : -18;
+        write32((unsigned char *)control.data + 8, progress.consumed);
+        write32((unsigned char *)control.data + 12, progress.produced);
         return 0;
     }
     if (existing) return 3;

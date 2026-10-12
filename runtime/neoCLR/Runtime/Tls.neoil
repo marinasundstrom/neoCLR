@@ -16,3 +16,9 @@
 .function neoCLR.Runtime.TlsAbort(arrayref<Byte> owner) -> Int32
 .methodimpl InternalCall
 .end
+
+; control: operation, EOF, two reserved zero bytes, input count, consumed, produced.
+; The three counts are little-endian UInt32. All buffers must be initialized/distinct.
+.function neoCLR.Runtime.TlsPump(arrayref<Byte> owner,arrayref<Byte> input,arrayref<Byte> output,arrayref<Byte> plaintext,arrayref<Byte> control) -> Int32
+.methodimpl InternalCall
+.end

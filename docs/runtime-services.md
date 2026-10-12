@@ -212,3 +212,27 @@ It implements the five ownership operations and explicit abortive host teardown;
 explicit compiler/JIT binding admission and prepared development JIT hosts are available.
 Source AOT projects link the adapter on demand; released native build kits remain open. See the
 [shared-provider checkpoint](shared-security-provider.md#native-tls-ownership-adapter-development-2026-10-12).
+
+### Managed TLS pump (development, 2026-10-12)
+
+`TlsPump(owner, input, output, plaintext, control) -> Int32` admits only the exact
+five-Byte-array InternalCall. All arrays are initialized, live in the current heap;
+input/output/plaintext/control must be distinct. Writable arrays are checked before
+provider access. The private 16-byte control block contains operation (1 handshake,
+2 read, 3 write, 4 shutdown), EOF (0/1), two reserved zero bytes, then little-endian
+UInt32 input count, consumed count and produced count. Capacity bounds and statuses
+are those of the provider pump. Counts publish even on pending/failure; invalid
+control input does not change them. Guest code cannot supply a native handle.
+
+Native lowering uses `neoclr_tls_managed_v2`; rebuild compiler and host together.
+The old ownership-only C adapter remains available to existing focused hosts.
+This is a private bridge encoding, not the eventual public stream or native buffer
+ABI. It loses typed operation/progress fields at this boundary; managed wrappers
+own those invariants. There are no Raven Runtime Contract or CLI semantic changes:
+existing InternalCall metadata carries the exact declaration. Future native typed
+buffer/service metadata can replace the control block without changing stream APIs.
+
+Eight cases now pass in interpreter/JIT/AOT on macOS, including a real client pump
+with partial ciphertext and configuration released before pumping. Heap tests and
+the real C adapter cover buffer alias rejection. Windows uses the same harness;
+execution remains pending. See [evidence](experiments/shared-tls/pump-bindings-validation.json).

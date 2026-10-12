@@ -1,0 +1,70 @@
+{
+  "passed": true,
+  "platform": "macOS-27.0-arm64-arm-64bit",
+  "cases": [
+    {
+      "name": "invalid-trust",
+      "interpreter": true,
+      "aot": true,
+      "jit": {
+        "guestExitCode": 0
+      }
+    },
+    {
+      "name": "release-empty",
+      "interpreter": true,
+      "aot": true,
+      "jit": {
+        "guestExitCode": 0
+      }
+    },
+    {
+      "name": "abort-empty",
+      "interpreter": true,
+      "aot": true,
+      "jit": {
+        "guestExitCode": 0
+      }
+    },
+    {
+      "name": "invalid-owner",
+      "interpreter": true,
+      "aot": true,
+      "jit": {
+        "guestExitCode": 103
+      }
+    },
+    {
+      "name": "uninitialized",
+      "interpreter": true,
+      "aot": true,
+      "jit": {
+        "guestExitCode": 103
+      }
+    },
+    {
+      "name": "client-pump",
+      "interpreter": true,
+      "aot": true,
+      "jit": {
+        "guestExitCode": 0
+      }
+    },
+    {
+      "name": "client-session",
+      "interpreter": true,
+      "aot": true,
+      "jit": {
+        "guestExitCode": 0
+      }
+    },
+    {
+      "name": "server-session",
+      "interpreter": true,
+      "aot": true,
+      "jit": {
+        "guestExitCode": 0
+      }
+    }
+  ]
+}

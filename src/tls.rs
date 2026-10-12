@@ -10,6 +10,7 @@ pub(crate) enum Operation {
     Session,
     Release,
     Abort,
+    Pump,
 }
 
 #[derive(Debug, Default)]
@@ -74,6 +75,55 @@ fn owner(value: &Value, heap: &ManagedHeap) -> Result<usize, Fault> {
     }
     Ok(object.allocation_id())
 }
+// Private pump control: operation, EOF, two reserved zero bytes, then little-endian
+// input count, consumed and produced UInt32 fields. No managed pointers escape.
+fn pump(args: &[Value], owner: usize, heap: &mut ManagedHeap) -> Result<Value, Fault> {
+    let [_, input, output, plaintext, control] = args else {
+        return Err(Fault::new("invalid TLS pump arguments"));
+    };
+    let input_bytes = array(input, heap)?;
+    let mut output_bytes = array(output, heap)?;
+    let mut plaintext_bytes = array(plaintext, heap)?;
+    let mut control_bytes = array(control, heap)?;
+    let values = [input, output, plaintext, control];
+    for (i, value) in values.iter().enumerate() {
+        let Value::ObjectReference(a) = value else { unreachable!() };
+        if i != 0 { a.reference.require_writable()?; }
+        for other in values.iter().skip(i + 1) {
+            let Value::ObjectReference(b) = other else { unreachable!() };
+            if a.allocation_id() == b.allocation_id() {
+                return Err(Fault::new("TLS pump buffers must be distinct"));
+            }
+        }
+    }
+    if control_bytes.len() != 16 || control_bytes[1] > 1 || control_bytes[2..4] != [0, 0] {
+        return Ok(Value::Int32(-10));
+    }
+    let operation = match control_bytes[0] {
+        1 => neoclr_native_tls::resources::PumpOperation::Handshake,
+        2 => neoclr_native_tls::resources::PumpOperation::Read,
+        3 => neoclr_native_tls::resources::PumpOperation::Write,
+        4 => neoclr_native_tls::resources::PumpOperation::Shutdown,
+        _ => return Ok(Value::Int32(-10)),
+    };
+    let count = u32::from_le_bytes(control_bytes[4..8].try_into().unwrap()) as usize;
+    if count > input_bytes.len() { return Ok(Value::Int32(-10)); }
+    let result = if let Some(id) = heap.tls.owners.get(&owner).copied() {
+        heap.tls.context().pump(id, operation, &input_bytes[..count], control_bytes[1] != 0,
+            &mut output_bytes, &mut plaintext_bytes)
+    } else {
+        neoclr_native_tls::resources::PumpProgress { status: -18, consumed: 0, produced: 0 }
+    };
+    control_bytes[8..12].copy_from_slice(&(result.consumed as u32).to_le_bytes());
+    control_bytes[12..16].copy_from_slice(&(result.produced as u32).to_le_bytes());
+    for (value, bytes) in [(output, output_bytes), (plaintext, plaintext_bytes), (control, control_bytes)] {
+        let Value::ObjectReference(array) = value else { unreachable!() };
+        for (index, byte) in bytes.into_iter().enumerate() {
+            array.reference.element(index, &Type::Byte)?.write(Value::Byte(byte))?;
+        }
+    }
+    Ok(Value::Int32(result.status as i32))
+}
 impl Operation {
     pub(crate) fn invoke(self, args: &[Value], heap: &mut ManagedHeap) -> Result<Value, Fault> {
         let id = owner(
@@ -82,6 +132,7 @@ impl Operation {
             heap,
         )?;
         match self {
+            Self::Pump => return pump(args, id, heap),
             Self::Release => return Ok(Value::Int32(heap.tls.release(id))),
             Self::Abort => {
                 let Some(handle) = heap.tls.owners.get(&id).copied() else {
@@ -140,6 +191,28 @@ mod tests {
             reference: heap.address(id).unwrap(),
             view: None,
         })
+    }
+    #[test]
+    #[ignore = "disposable credentials from test-native-security.py"]
+    fn managed_pump_checks_buffers_and_reports_partial_ciphertext() {
+        let mut heap = ManagedHeap::default();
+        let config = bytes(&mut heap, &[]);
+        let session = bytes(&mut heap, &[]);
+        let roots = bytes(&mut heap, &std::fs::read(std::env::var("NEOCLR_HTTPS_CERTIFICATE").unwrap()).unwrap());
+        let empty = bytes(&mut heap, &[]);
+        assert_eq!(Operation::ClientConfig.invoke(&[config.clone(), roots, empty], &mut heap).unwrap(), Value::Int32(0));
+        let name = bytes(&mut heap, b"localhost");
+        assert_eq!(Operation::Session.invoke(&[session.clone(), config, name], &mut heap).unwrap(), Value::Int32(0));
+        let input = bytes(&mut heap, &[]);
+        let output = bytes(&mut heap, &[0; 17]);
+        let plaintext = bytes(&mut heap, &[]);
+        let control = bytes(&mut heap, &[1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]);
+        assert!(Operation::Pump.invoke(&[session.clone(), input.clone(), output.clone(), plaintext.clone(), output.clone()], &mut heap).is_err());
+        assert_eq!(Operation::Pump.invoke(&[session, input, output.clone(), plaintext, control.clone()], &mut heap).unwrap(), Value::Int32(-1));
+        let counts = array(&control, &heap).unwrap();
+        assert_eq!(&counts[8..12], &[0;4]);
+        assert_eq!(&counts[12..16], &[17,0,0,0]);
+        assert_ne!(array(&output, &heap).unwrap(), vec![0;17]);
     }
     #[test]
     fn invalid_and_foreign_owner_tokens_fault_without_resources() {

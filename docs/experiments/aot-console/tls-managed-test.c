@@ -78,6 +78,16 @@ int main(int argc, char **argv) {
     CHECK(!neoclr_tls_managed_v1(NEOCLR_TLS_CLIENT, &c, config, cert, empty, NULL, &result) && !result);
     CHECK(!neoclr_tls_managed_v1(NEOCLR_TLS_SESSION, &c, session, config, name, NULL, &result) && !result);
     CHECK(!neoclr_tls_managed_v1(NEOCLR_TLS_RELEASE, &c, config, NULL, NULL, NULL, &result) && !result);
+    unsigned char control_bytes[16] = {1};
+    void *pump_input = array(&c, NULL, 0), *pump_plaintext = array(&c, NULL, 0);
+    void *pump_output = array(&c, encrypted, sizeof(encrypted));
+    void *pump_control = array(&c, control_bytes, sizeof(control_bytes));
+    CHECK(pump_input && pump_plaintext && pump_output && pump_control);
+    CHECK(neoclr_tls_managed_v2(NEOCLR_TLS_PUMP, &c, session, pump_input,
+        pump_output, pump_plaintext, pump_output, &result) == 3);
+    CHECK(!neoclr_tls_managed_v2(NEOCLR_TLS_PUMP, &c, session, pump_input,
+        pump_output, pump_plaintext, pump_control, &result) && result == -1);
+    CHECK(((unsigned char *)pump_control)[28] == sizeof(encrypted));
     c.fault.code = 1;
     neoclr_tls_managed_dispose_v1(&c);
     CHECK(c.fault.code == 1 && !neoclr_gc_entry_check_v1(&c));

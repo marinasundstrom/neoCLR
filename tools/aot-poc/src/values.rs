@@ -387,9 +387,9 @@ pub(crate) fn compile_into(
     } else { None };
     let tls_service = if details.is_some_and(|d| !d.tls.is_empty()) {
         let mut sig = module.make_signature();
-        sig.params.extend([types::I32, types::I64, types::I64, types::I64, types::I64, types::I64, types::I64].map(AbiParam::new));
+        sig.params.extend([types::I32, types::I64, types::I64, types::I64, types::I64, types::I64, types::I64, types::I64].map(AbiParam::new));
         sig.returns.push(AbiParam::new(types::I32));
-        Some(module.declare_function("neoclr_tls_managed_v1", Linkage::Import, &sig)?)
+        Some(module.declare_function("neoclr_tls_managed_v2", Linkage::Import, &sig)?)
     } else { None };
     let mut stream_services = std::collections::HashMap::new();
     if let Some(d) = details {
@@ -1124,9 +1124,9 @@ pub(crate) fn compile_into(
                 let op = b.ins().iconst(types::I32, i64::from(*operation));
                 let null = b.ins().iconst(types::I64, 0);
                 let mut args = vec![op, fault_context.unwrap()];
-                let arity = match operation { 2 => 4, 4 | 5 => 1, _ => 3 };
+                let arity = match operation { 2 => 4, 4 | 5 => 1, 6 => 5, _ => 3 };
                 args.extend(parameters.iter().take(arity).copied());
-                while args.len() < 6 { args.push(null); }
+                while args.len() < 7 { args.push(null); }
                 args.push(output);
                 let call = b.ins().call(service, &args);
                 let status = b.inst_results(call)[0];
