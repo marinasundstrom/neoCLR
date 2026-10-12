@@ -50,7 +50,9 @@ CI gates. Source AOT projects now link the provider on demand, with a Raven cons
 qualified in all three local modes. Packaged build kits and managed
 SSL composition remain next. Typed private certificate/configuration errors and rejection
 qualification now prepare that boundary. Private pollable close-notify shutdown
-also passes TLS 1.2/1.3 backpressure and lifecycle tests. HTTP and SQL may share concepts/types
+also passes TLS 1.2/1.3 backpressure and lifecycle tests. A checked resource context
+now owns configurations/sessions behind non-reused IDs and bounded quotas; managed
+rooting and runtime-service bindings remain next. HTTP and SQL may share concepts/types
 without requiring one native TLS backend; see the [backend boundary](shared-security-provider.md#shared-concepts-independent-backends). A bounded public System.Security.Cryptography facade
 now adds destination-buffer SHA256/HMACSHA256, tag verification and secure random
 fill; allocating/streaming overloads, socket/TLS adapters and certificate APIs

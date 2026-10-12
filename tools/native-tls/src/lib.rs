@@ -1,6 +1,7 @@
 //! Private nonblocking TLS adapter. The host owns sockets, deadlines and scheduling.
 use rustls::{ClientConfig, ClientConnection, Connection, ServerConfig, ServerConnection};
 mod configuration;
+mod resources;
 use std::{
     ffi::{CStr, c_char, c_void},
     fs::File,
@@ -220,15 +221,17 @@ pub unsafe extern "C" fn neoclr_tls_client_session_new(
     create().map_or(std::ptr::null_mut(), new_session)
 }
 
-fn new_session(mut connection: Connection) -> *mut c_void {
+fn make_session(mut connection: Connection) -> Session {
     connection.set_buffer_limit(Some(LIMIT));
-    Box::into_raw(Box::new(Session {
+    Session {
         connection,
         pending: 0,
         failed: false,
         closing: false,
-    }))
-    .cast()
+    }
+}
+fn new_session(connection: Connection) -> *mut c_void {
+    Box::into_raw(Box::new(make_session(connection))).cast()
 }
 
 #[unsafe(no_mangle)]
@@ -925,6 +928,206 @@ mod tests {
         );
         assert_eq!(client.shutdown(), -2);
         assert_eq!(client.handshake(), -2);
+    }
+
+    #[test]
+    #[ignore = "run by HTTPS validation with ephemeral certificate/key paths"]
+    fn checked_context_transports_after_configuration_release() {
+        use super::resources::*;
+        let cert = std::fs::read(std::env::var("NEOCLR_HTTPS_CERTIFICATE").unwrap()).unwrap();
+        let key = std::fs::read(std::env::var("NEOCLR_HTTPS_PRIVATE_KEY").unwrap()).unwrap();
+        let context = neoclr_tls_context_new(4);
+        let mut server_config = 0;
+        let mut client_config = 0;
+        let mut server = 0;
+        let mut client = 0;
+        unsafe {
+            assert_eq!(
+                neoclr_tls_context_server_config(
+                    context,
+                    cert.as_ptr(),
+                    cert.len() as u32,
+                    key.as_ptr(),
+                    key.len() as u32,
+                    std::ptr::null(),
+                    0,
+                    &mut server_config
+                ),
+                0
+            );
+            assert_eq!(
+                neoclr_tls_context_client_config(
+                    context,
+                    cert.as_ptr(),
+                    cert.len() as u32,
+                    std::ptr::null(),
+                    0,
+                    &mut client_config
+                ),
+                0
+            );
+            assert_eq!(
+                neoclr_tls_context_session(
+                    context,
+                    server_config,
+                    std::ptr::null(),
+                    0,
+                    &mut server
+                ),
+                0
+            );
+            assert_eq!(
+                neoclr_tls_context_session(
+                    context,
+                    client_config,
+                    b"localhost".as_ptr(),
+                    9,
+                    &mut client
+                ),
+                0
+            );
+            assert_eq!(neoclr_tls_context_release(context, server_config), 0);
+            assert_eq!(neoclr_tls_context_release(context, client_config), 0);
+        }
+        drop(cert);
+        drop(key);
+        let make_wire = || Memory {
+            incoming: VecDeque::new(),
+            outgoing: vec![],
+            writes: 0,
+            eof: false,
+        };
+        let mut a = make_wire();
+        let mut b = make_wire();
+        let pump = |a: &mut Memory, b: &mut Memory| {
+            a.incoming.extend(b.outgoing.drain(..));
+            b.incoming.extend(a.outgoing.drain(..));
+        };
+        let mut authenticated = false;
+        for _ in 0..20000 {
+            let x = unsafe {
+                neoclr_tls_context_handshake(
+                    context,
+                    server,
+                    (&mut a as *mut Memory).cast(),
+                    fragmented,
+                )
+            };
+            let y = unsafe {
+                neoclr_tls_context_handshake(
+                    context,
+                    client,
+                    (&mut b as *mut Memory).cast(),
+                    fragmented,
+                )
+            };
+            assert!(matches!(x, 0 | -1) && matches!(y, 0 | -1));
+            pump(&mut a, &mut b);
+            if x == 0 && y == 0 {
+                authenticated = true;
+                break;
+            }
+        }
+        assert!(authenticated);
+        let mut payload = [37; 4096];
+        let mut received = Vec::new();
+        let mut acknowledged = false;
+        for _ in 0..20000 {
+            if !acknowledged {
+                let result = unsafe {
+                    neoclr_tls_context_transfer(
+                        context,
+                        client,
+                        (&mut b as *mut Memory).cast(),
+                        fragmented,
+                        payload.as_mut_ptr(),
+                        payload.len() as u32,
+                        1,
+                    )
+                };
+                assert!(result == -1 || result == payload.len() as i64);
+                acknowledged = result > 0;
+            }
+            pump(&mut a, &mut b);
+            let mut scratch = [0; 59];
+            let result = unsafe {
+                neoclr_tls_context_transfer(
+                    context,
+                    server,
+                    (&mut a as *mut Memory).cast(),
+                    fragmented,
+                    scratch.as_mut_ptr(),
+                    scratch.len() as u32,
+                    0,
+                )
+            };
+            if result > 0 {
+                received.extend_from_slice(&scratch[..result as usize]);
+            } else {
+                assert_eq!(result, -1);
+            }
+            if acknowledged && received.len() == payload.len() {
+                break;
+            }
+        }
+        assert!(acknowledged);
+        assert_eq!(received, payload);
+        let mut closed = false;
+        for _ in 0..2000 {
+            let status = unsafe {
+                neoclr_tls_context_shutdown(
+                    context,
+                    client,
+                    (&mut b as *mut Memory).cast(),
+                    fragmented,
+                )
+            };
+            assert!(matches!(status, 0 | -1));
+            pump(&mut a, &mut b);
+            let mut scratch = [0];
+            let read = unsafe {
+                neoclr_tls_context_transfer(
+                    context,
+                    server,
+                    (&mut a as *mut Memory).cast(),
+                    fragmented,
+                    scratch.as_mut_ptr(),
+                    1,
+                    0,
+                )
+            };
+            assert!(matches!(read, 0 | -1));
+            if status == 0 && read == 0 {
+                closed = true;
+                break;
+            }
+        }
+        assert!(closed);
+        unsafe {
+            assert_eq!(neoclr_tls_context_release(context, client), 0);
+            assert_eq!(
+                neoclr_tls_context_handshake(
+                    context,
+                    client,
+                    (&mut b as *mut Memory).cast(),
+                    fragmented
+                ),
+                -18
+            );
+            assert_eq!(
+                neoclr_tls_context_transfer(
+                    context,
+                    server,
+                    (&mut a as *mut Memory).cast(),
+                    fragmented,
+                    std::ptr::null_mut(),
+                    1,
+                    0
+                ),
+                -10
+            );
+            neoclr_tls_context_free(context); // remaining server session is released without I/O
+        }
     }
 
     fn exchange(client: &mut rustls::ClientConnection, memory: &mut Memory) {

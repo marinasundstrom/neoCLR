@@ -1,0 +1,33 @@
+{
+  "date": "2026-10-12",
+  "passed": true,
+  "platform": "macOS-27.0-arm64-arm-64bit",
+  "command": "python3 scripts/test-native-security.py",
+  "toolchain": "Xcode 26.2 SDK selected explicitly",
+  "tests": {
+    "tls": 15,
+    "nativeCryptography": 4,
+    "safeProvider": 1
+  },
+  "cases": [
+    "quota enforcement and release capacity",
+    "stale/foreign/wrong-kind handle rejection",
+    "failed creation clears output without allocating a live resource",
+    "invalid client identity rejection",
+    "session retains configuration after handle release",
+    "context teardown releases retained configuration",
+    "fragmented authenticated transfer and shutdown through checked IDs after PEM/configuration release"
+  ],
+  "sourcesSha256": {
+    "tools/native-tls/src/resources.rs": "8f2c6870dd54423110f00d28f9110f2c68da1366fa11679daa680902adecd62a",
+    "tools/native-tls/src/lib.rs": "7af967ed275a51ac3fead85231cc76a0cb81aa8f6e712245b58c792493a275e1",
+    "tools/native-tls/src/configuration.rs": "bdc31ba723370d7f9d84e4ce2f9f0ffee8655a3446e5d205b6fbceeff5291179",
+    "docs/experiments/https-server/native-tls.h": "950190bb566353baef9f178d9b4b124d7041cc4bb628b57a804353458ff8f17f",
+    "scripts/test-native-security.py": "4f6b6c3d0b71402272be9f6a7be15969b1e654b180db59e6732569bfe43b4c2e"
+  },
+  "limitations": [
+    "Windows execution of the new cases remains pending in the existing shared CI gate.",
+    "Private provider context; managed rooting/finalization, runtime service binding and Raven APIs are not implemented by this slice.",
+    "Host must serialize calls and forbid callback reentrancy; context pointers remain trusted native resources."
+  ]
+}

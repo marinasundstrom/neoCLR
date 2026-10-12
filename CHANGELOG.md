@@ -15,7 +15,10 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   Add pollable close-notify shutdown with backpressure, idempotence, pending-write
   protection and terminal abort/failure handling; keep inbound reads available.
   All sixteen provider tests pass on macOS, including explicit TLS 1.2/1.3 shutdown;
-  Windows uses the existing CI gate.
+  Windows uses the existing CI gate. Add a bounded TLS resource context with
+  non-reused checked IDs, retained session/configuration ownership and abortive
+  teardown; all twenty provider tests pass locally, including transfer/shutdown
+  after configuration release. Managed rooting and service bindings remain open.
   Document shared HTTP/SQL security concepts without forcing a common native backend;
   managed SSL/certificate ownership and handshake diagnostics remain open.
 

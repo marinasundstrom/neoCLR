@@ -37,4 +37,23 @@ void *neoclr_tls_session_new(void *);
 int64_t neoclr_tls_transfer(void *, void *, neoclr_tls_io, unsigned char *, uint32_t, int32_t);
 void neoclr_tls_abort(void *);
 void neoclr_tls_session_free(void *, void *, neoclr_tls_io);
+/* Checked resource contexts for managed adapters. The host owns this pointer and
+ * serializes calls, including callbacks (no reentrancy). Guests receive only IDs.
+ * IDs are unique/non-reused within this provider instance, not authorization tokens. Free/release performs
+ * abortive cleanup without I/O; explicit shutdown must be polled before release.
+ * Additional statuses: -17 resource limit, -18 wrong/stale/foreign handle, -19 name.
+ * All create outputs are zeroed on failure; slots must not alias input storage. */
+void *neoclr_tls_context_new(uint32_t);
+void neoclr_tls_context_free(void *);
+int32_t neoclr_tls_context_release(void *, uint64_t);
+int32_t neoclr_tls_context_server_config(void *, const unsigned char *, uint32_t,
+    const unsigned char *, uint32_t, const unsigned char *, uint32_t, uint64_t *);
+int32_t neoclr_tls_context_client_config(void *, const unsigned char *, uint32_t,
+    const unsigned char *, uint32_t, uint64_t *);
+int32_t neoclr_tls_context_session(void *, uint64_t, const unsigned char *, uint32_t, uint64_t *);
+int32_t neoclr_tls_context_handshake(void *, uint64_t, void *, neoclr_tls_io);
+int32_t neoclr_tls_context_shutdown(void *, uint64_t, void *, neoclr_tls_io);
+int32_t neoclr_tls_context_abort(void *, uint64_t);
+int64_t neoclr_tls_context_transfer(void *, uint64_t, void *, neoclr_tls_io,
+    unsigned char *, uint32_t, int32_t);
 #endif

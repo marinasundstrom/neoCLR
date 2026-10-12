@@ -267,3 +267,53 @@ EOF, repeated shutdown, continued inbound traffic, rejection during an unfinishe
 write, abort during shutdown and terminal transport failure. All sixteen provider
 tests pass on macOS; the unchanged macOS/Windows CI harness covers the new tests.
 [Evidence](experiments/shared-tls/shutdown-validation.json) records the local boundary.
+
+## Checked resource ownership boundary (development, 2026-10-12)
+
+The private `neoclr_tls_context_*` ABI now owns configurations and sessions in a
+host-created context. It is intended for the forthcoming managed adapters; existing
+HTTPS hosts retain their original pointer-based ABI. The host chooses a live-resource
+limit from 1 to 65536. Guest-facing adapters can carry 64-bit resource IDs instead of
+native pointers; IDs are never reused within a provider instance, even across
+contexts. Lookups check context membership and resource kind. These IDs are not
+security capabilities or authorization tokens.
+
+Configuration creation copies/parses borrowed credentials and returns a configuration
+ID. Session creation retains its configuration independently, so callers may release
+the configuration and original PEM buffers before authentication. `release` removes
+one resource; context teardown drops every remaining resource, including configuration
+references retained by sessions. Both are abortive and perform no callbacks or I/O.
+Explicit graceful shutdown remains separate. Repeated release returns invalid-handle
+rather than touching freed storage; a future managed Dispose should clear its own ID.
+
+Additional private statuses are -17 (live-resource/ID limit), -18 (missing, wrong-kind,
+stale or foreign-context ID), and -19 (invalid client peer name or nonempty server
+name). Creation outputs are zero on failure. Failure does not publish a resource or
+consume live capacity. Buffer sizes retain the private 64 KiB bound. The private
+transport functions also validate pointer/count combinations and sending direction;
+valid native buffer storage and writable, non-aliasing output slots remain trusted
+host obligations.
+
+All operations, releases and context teardown must be serialized by the host. A
+transport callback must not reenter the context. Callbacks and transient I/O buffers
+are never retained. The raw context pointer is host-owned and must not be exposed to
+guest code or used after teardown. Integer checks do not make those host rules optional.
+
+The .NET baseline is [SafeHandle lifetime protection](https://learn.microsoft.com/en-us/dotnet/fundamentals/runtime-libraries/system-runtime-interopservices-safehandle)
+(reviewed 2026-10-12): resources must not be freed or recycled while in use. Instead
+of exposing an OS/provider pointer, this bounded adapter uses typed context lookup,
+non-reused IDs and retained configuration ownership. This adds a table lookup and
+requires runtime serialization; it is not a replacement for managed rooting or a
+performance claim. Per-object GC cleanup, pending-operation roots, service admission,
+interpreter/JIT/AOT bindings and managed certificate/SslStream APIs remain required
+before exposing the boundary to Raven. Context teardown alone is insufficient for
+long-lived runtimes whose managed wrappers become unreachable.
+
+The focused [ownership evidence](experiments/shared-tls/resource-context-validation.json)
+passes twenty provider tests locally: fifteen TLS, four native cryptography and one
+safe-provider test. New tests cover quotas, failed creation, invalid names, wrong-kind,
+stale and foreign handles, configuration lifetime through session/context teardown,
+and a complete fragmented transfer plus graceful shutdown after configuration and PEM
+release. Windows runs this unchanged harness in the existing provider workflow;
+execution of the new cases remains pending. This Rustls-specific adapter does not
+require an SQL backend to adopt its resource representation or TLS implementation.
