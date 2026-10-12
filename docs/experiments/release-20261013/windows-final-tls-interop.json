@@ -1,0 +1,251 @@
+{
+  "passed": true,
+  "platform": "Windows-2022Server-10.0.20348-SP0",
+  "openssl": "OpenSSL 3.0.16 11 Feb 2025",
+  "commands": [
+    {
+      "command": [
+        "openssl",
+        "req",
+        "-x509",
+        "-newkey",
+        "ec",
+        "-pkeyopt",
+        "ec_paramgen_curve:prime256v1",
+        "-pkeyopt",
+        "ec_param_enc:named_curve",
+        "-nodes",
+        "-sha256",
+        "-days",
+        "1",
+        "-config",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\tls-http-interop\\openssl.cnf",
+        "-addext",
+        "basicConstraints=critical,CA:FALSE",
+        "-addext",
+        "keyUsage=critical,digitalSignature",
+        "-addext",
+        "extendedKeyUsage=serverAuth",
+        "-addext",
+        "subjectAltName=DNS:localhost",
+        "-keyout",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\tls-http-interop\\key.pem",
+        "-out",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\tls-http-interop\\cert.pem"
+      ],
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": "-----\n"
+    },
+    {
+      "command": [
+        "C:\\hostedtoolcache\\windows\\Python\\3.12.10\\x64\\python.exe",
+        "D:\\a\\neoCLR\\neoCLR\\scripts\\build-native-project.py",
+        "--profile",
+        "windows-http",
+        "--project",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\tls-http-interop\\project\\App.rvnproj",
+        "--bundle",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\jit-install\\bundle",
+        "--aot",
+        "D:\\a\\neoCLR\\neoCLR\\tools\\aot-poc\\target\\release\\neoclr-aot-poc.exe",
+        "--output",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\tls-http-interop\\native",
+        "--http-heap-bytes",
+        "8388608",
+        "--command-timeout",
+        "600"
+      ],
+      "exitCode": 0,
+      "stdout": "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\tls-http-interop\\native\\app.exe\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\jit-install\\bundle\\bin\\neoclr.exe",
+        "run",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\tls-http-interop\\native\\app.dll",
+        "--execution",
+        "interpreter",
+        "--instructions",
+        "100000000",
+        "--array-elements",
+        "1048576",
+        "--array-bytes",
+        "67108864",
+        "--system",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\jit-install\\bundle\\lib\\System.runtime.neox",
+        "--object-root",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\jit-install\\bundle\\lib\\System.Runtime.dll",
+        "--module",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\jit-install\\bundle\\lib\\System.Runtime.dll",
+        "--module",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\jit-install\\bundle\\lib\\System.Data.dll",
+        "--module",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\jit-install\\bundle\\lib\\System.Networking.dll",
+        "--module",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\jit-install\\bundle\\lib\\System.Web.dll",
+        "--",
+        "client",
+        "https://localhost:53182/echo"
+      ],
+      "exitCode": 0,
+      "stdout": "PASS managed client\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\jit-install\\bundle\\bin\\neoclr.exe",
+        "run",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\tls-http-interop\\native\\app.dll",
+        "--execution",
+        "interpreter",
+        "--instructions",
+        "100000000",
+        "--array-elements",
+        "1048576",
+        "--array-bytes",
+        "67108864",
+        "--system",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\jit-install\\bundle\\lib\\System.runtime.neox",
+        "--object-root",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\jit-install\\bundle\\lib\\System.Runtime.dll",
+        "--module",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\jit-install\\bundle\\lib\\System.Runtime.dll",
+        "--module",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\jit-install\\bundle\\lib\\System.Data.dll",
+        "--module",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\jit-install\\bundle\\lib\\System.Networking.dll",
+        "--module",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\jit-install\\bundle\\lib\\System.Web.dll",
+        "--",
+        "server"
+      ],
+      "exitCode": 0,
+      "stdout": "53191\nPASS managed server\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\jit-install\\bundle\\bin\\neoclr.exe",
+        "run",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\tls-http-interop\\native\\app.dll",
+        "--",
+        "client",
+        "https://localhost:53202/echo"
+      ],
+      "exitCode": 0,
+      "stdout": "PASS managed client\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\jit-install\\bundle\\bin\\neoclr.exe",
+        "run",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\tls-http-interop\\native\\app.dll",
+        "--",
+        "server"
+      ],
+      "exitCode": 0,
+      "stdout": "53217\nPASS managed server\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\tls-http-interop\\native\\app.exe",
+        "client",
+        "https://localhost:53222/echo"
+      ],
+      "exitCode": 0,
+      "stdout": "PASS managed client\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\tls-http-interop\\native\\app.exe",
+        "server"
+      ],
+      "exitCode": 0,
+      "stdout": "53225\nPASS managed server\n",
+      "stderr": ""
+    }
+  ],
+  "cases": [
+    {
+      "mode": "interpreter",
+      "peer": "external-server",
+      "protocol": "TLSv1.2",
+      "passed": true
+    },
+    {
+      "mode": "interpreter",
+      "peer": "external-server",
+      "protocol": "TLSv1.3",
+      "passed": true
+    },
+    {
+      "mode": "interpreter",
+      "peer": "external-client",
+      "protocol": "TLSv1.2",
+      "passed": true
+    },
+    {
+      "mode": "interpreter",
+      "peer": "external-client",
+      "protocol": "TLSv1.3",
+      "passed": true
+    },
+    {
+      "mode": "default-jit",
+      "peer": "external-server",
+      "protocol": "TLSv1.2",
+      "passed": true
+    },
+    {
+      "mode": "default-jit",
+      "peer": "external-server",
+      "protocol": "TLSv1.3",
+      "passed": true
+    },
+    {
+      "mode": "default-jit",
+      "peer": "external-client",
+      "protocol": "TLSv1.2",
+      "passed": true
+    },
+    {
+      "mode": "default-jit",
+      "peer": "external-client",
+      "protocol": "TLSv1.3",
+      "passed": true
+    },
+    {
+      "mode": "aot",
+      "peer": "external-server",
+      "protocol": "TLSv1.2",
+      "passed": true
+    },
+    {
+      "mode": "aot",
+      "peer": "external-server",
+      "protocol": "TLSv1.3",
+      "passed": true
+    },
+    {
+      "mode": "aot",
+      "peer": "external-client",
+      "protocol": "TLSv1.2",
+      "passed": true
+    },
+    {
+      "mode": "aot",
+      "peer": "external-client",
+      "protocol": "TLSv1.3",
+      "passed": true
+    }
+  ],
+  "sourceHashes": {
+    "App.rvnproj": "6571a07bd01ec9febe67500840b694934271c01a4110aa072e603c43a03a13bb",
+    "Main.rvn": "b7f6245e52286a107160bd5a21546f364c00ce4fa2fc8976864f8ac1b000deed"
+  }
+}

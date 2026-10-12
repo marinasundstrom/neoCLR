@@ -4,7 +4,7 @@ Hosted source qualification now passes on `a9adc97cb`, including the full Linux
 archive suite, macOS/Windows host boundaries and the minimum-Rust matrix. Backend
 repair `566fb34dc` has focused Windows object-generation and macOS execution
 coverage and passing Windows SDK/package qualification. The later Windows AOT
-heap repair remains under its broader HTTP execution gate. This is **not a published
+heap repair also passes the broader Windows HTTP execution gate on `a77e20dba`. This is **not a published
 release**. Earlier failures remain evidence rather than being rewritten.
 
 ## Results and exact revisions
@@ -55,8 +55,7 @@ This backend-only delta follows the source-qualified revision; it does not claim
 a second full source run. Windows SSL subsequently passes interpreter/default JIT,
 but standalone AOT exposes the host's old 1 MiB allocation cap. [The report](windows-ssl-before-heap-fix.json)
 preserves that failure; `a77e20dba` aligns Windows heap admission with the common
-build contract and adds 8/32 MiB guarded-allocation coverage. Its hosted run is
-still pending.
+build contract and adds 8/32 MiB guarded-allocation coverage. Its hosted run passes the guarded allocator and complete Windows consumer matrix.
 
 The refreshed macOS bundle passes [extracted default-JIT acceptance](callback-extracted-acceptance.json),
 [SSL/HTTPS JSON in all three modes](callback-ssl.json) and
@@ -83,18 +82,39 @@ libraries. This Windows bundle does not include the optional PostgreSQL provider
 The Windows JIT host uses its existing allocated heap, not the AOT host's guarded
 allocation entry; the later heap repair is qualified separately as source AOT work.
 [Run 38321019998](https://github.com/marinasundstrom/neoCLR/actions/runs/38321019998)
-is testing that repair and the broader SSL/HTTP matrix.
+passes that repair and the broader SSL/HTTP matrix. It confirms the 18 guarded
+heap lifecycles, managed SSL/HTTPS JSON, rejection/recovery and cancellation/deadline
+cases, independent TLS interoperability, public cryptography, default-JIT HTTP,
+framework suites, and both ordinary/generic async cleanup consumers. Interpreter,
+JIT and AOT controls pass where selected by the gate. See the retained final reports
+below for exact cases and hashes.
 
-## Remaining release gates
+[Final summary](windows-final-summary.json) verifies all 27 stages, twelve
+downloaded HTTP DLL/object/executable hashes and the three changed AOT host source
+hashes (accounting for Windows checkout line endings). Retained reports cover:
+
+- [Complete gate](windows-final-gate.json), including both async cleanup consumers.
+- [SSL/HTTPS JSON](windows-final-ssl.json) and [failure/recovery cases](windows-final-https-failures.json)
+  in interpreter, default JIT and AOT.
+- [12 independent TLS 1.2/1.3 client/server interoperability cases](windows-final-tls-interop.json).
+- [8 default-JIT HTTP cases](windows-final-http.json).
+- [29 framework execution/filter cases](windows-final-framework.json) across
+  collections, JSON DOM, encoding/streams, Index/Range, zoned-time parsing and runner contracts.
+- [Public cryptography](windows-final-cryptography.json) in interpreter, JIT and AOT.
+
+## Publication review
 
 1. Retain the passing hosted source gate and focused backend-delta evidence above.
    Do not present the earlier source revision as testing the later callback repair.
 2. Retain Windows Raven native revision `6b5e052ce3648f9247ac76aba275587a3a5a1bb4`
    qualification above. Its validation branch is `codex/neoclr-release-20261013`;
    Raven main and the native compiler line remain separate.
-3. Complete Windows guarded-allocation and HTTP/HTTPS execution on `a77e20dba`.
-   The matching SDK/editor and default-JIT package gate now pass above; refreshed
-   notices and extracted payload hashes are verified on both package targets.
+3. Windows guarded-allocation and HTTP/HTTPS execution pass on `a77e20dba`.
+   The matching SDK/editor and default-JIT package gate pass on `566fb34dc`;
+   the later source delta only changes Windows AOT heap admission/diagnostics and
+   validation/docs. Refreshed notices and extracted payload hashes are verified
+   on both package targets. These are separate exact-revision results, not a claim
+   that every workflow ran on one commit.
 4. Review the selected package and [draft release notes](../../next-preview-release-notes.md). Local installed VS Code acceptance
    now passes all [26 checks](installed-vscode-acceptance.json), including activation,
    navigation, native/.NET editing and Tasks/await runs; [hashes](installed-vscode-provenance.json)

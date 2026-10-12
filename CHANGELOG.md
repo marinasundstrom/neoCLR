@@ -13,7 +13,9 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   guard pages and ownership, add 8/32 MiB lifecycle coverage to the Windows HTTP
   gate, and report host-initialization failures. The callback-fixed Windows SSL
   consumer now passes interpreter/JIT; AOT exposed this separate host limit.
-  Local build-policy/syntax checks pass; Windows execution is pending.
+  Windows qualification passes all 18 guarded heap lifecycles and the complete
+  27-stage SSL/HTTP, TLS interoperability, cryptography, framework and async-cleanup
+  gate. Retain reports and verify downloaded binaries and selected host source hashes.
 
 - Record passing hosted source, host-boundary and minimum-Rust qualification,
   plus the matching Windows SDK/VSIX's extracted samples and 26 editor checks.
@@ -22,13 +24,14 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   samples. The callback-fixed Windows package also passes its samples and all 26
   editor checks, with downloaded archive/manifest and component hashes verified.
   Draft notes distinguish Windows state-machine execution and optional SQL packaging.
-  The later Windows AOT heap repair's HTTP gate and publication review remain open.
+  The later Windows AOT heap repair also passes HTTP/HTTPS; publication review remains.
 
 - Repair native host callback admission for mixed unit/no-result continuations:
   remove the redundant combined 32-target cap without changing per-shape bounds
   or the host ABI. Windows x64 object emission and sanitized macOS session tests
   pass with more than 32 combined targets, including late-target dispatch, GC
-  ownership and fault/rejection behavior. Windows SSL/HTTP rerun remains required.
+  ownership and fault/rejection behavior. Windows SSL/HTTP execution also passes
+  after the separate AOT heap repair.
 
 - Qualify the installed macOS SDK/VSIX in real VS Code: all 26 activation,
   documentation/navigation, completion, watcher/recovery, build/run and Tasks/await

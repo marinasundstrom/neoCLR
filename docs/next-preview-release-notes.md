@@ -2,7 +2,7 @@
 
 **Draft for review; no version, publication date or download assets are selected.**
 Follow the [qualification record](experiments/release-20261013/README.md) for exact
-revisions and remaining gates. These notes describe the candidate, not Preview 13.
+revisions and publication status. These notes describe the candidate, not Preview 13.
 
 The candidate makes default JIT execution usable for the HTTP client/server
 showcase, including typed JSON. It also adds shared managed TLS streams and an
@@ -68,4 +68,4 @@ bootstrap still retains the documented primitive core/seed dependency.
 Recorded benchmarks describe named development configurations. No new cross-runtime
 performance claim, stable ABI, production support guarantee or website deployment
 is implied by this candidate. Publication requires review of the final artifacts,
-checksums and [remaining gates](experiments/release-20261013/README.md#remaining-release-gates).
+checksums and [qualification record](experiments/release-20261013/README.md#publication-review).

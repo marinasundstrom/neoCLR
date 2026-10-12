@@ -126,3 +126,16 @@ The JIT/HTTP gate runs that check before its consumers. Host initialization fail
 now print their status and requested heap size rather than silently returning 2.
 Python syntax checks pass locally; real guarded-allocation and AOT execution remain
 Windows-host validation requirements.
+
+### Current qualification — 2026-10-13
+
+[Run 38321019998](https://github.com/marinasundstrom/neoCLR/actions/runs/38321019998)
+passes on `a77e20dba`, including the mixed callback and heap admission repairs.
+All guarded-heap, SSL/HTTPS, cryptography, independent TLS interoperability, HTTP,
+framework and async cleanup stages pass. Both ordinary and generic async cleanup
+consumers pass interpreter, JIT and AOT. The matching default-JIT SDK package and
+all 26 installed VS Code checks pass separately on `566fb34dc` in
+[run 38319479140](https://github.com/marinasundstrom/neoCLR/actions/runs/38319479140).
+See the [release qualification record](../release-20261013/README.md) for retained
+reports, component hashes and precise revision boundaries. This is qualification,
+not release publication or Windows ARM64 support.

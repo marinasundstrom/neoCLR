@@ -1,0 +1,130 @@
+{
+  "passed": true,
+  "platform": "Windows-2022Server-10.0.20348-SP0",
+  "commands": [
+    {
+      "command": [
+        "openssl",
+        "req",
+        "-x509",
+        "-newkey",
+        "ec",
+        "-pkeyopt",
+        "ec_paramgen_curve:prime256v1",
+        "-pkeyopt",
+        "ec_param_enc:named_curve",
+        "-nodes",
+        "-sha256",
+        "-days",
+        "1",
+        "-config",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\tls-http-failures\\openssl.cnf",
+        "-addext",
+        "basicConstraints=critical,CA:FALSE",
+        "-addext",
+        "keyUsage=critical,digitalSignature",
+        "-addext",
+        "extendedKeyUsage=serverAuth",
+        "-addext",
+        "subjectAltName=DNS:localhost",
+        "-keyout",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\tls-http-failures\\key.pem",
+        "-out",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\tls-http-failures\\cert.pem"
+      ],
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": "-----\n",
+      "elapsedSeconds": 0.016
+    },
+    {
+      "command": [
+        "C:\\hostedtoolcache\\windows\\Python\\3.12.10\\x64\\python.exe",
+        "D:\\a\\neoCLR\\neoCLR\\scripts\\build-native-project.py",
+        "--profile",
+        "windows-http",
+        "--project",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\tls-http-failures\\project\\App.rvnproj",
+        "--bundle",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\jit-install\\bundle",
+        "--aot",
+        "D:\\a\\neoCLR\\neoCLR\\tools\\aot-poc\\target\\release\\neoclr-aot-poc.exe",
+        "--output",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\tls-http-failures\\native",
+        "--http-heap-bytes",
+        "8388608",
+        "--command-timeout",
+        "600"
+      ],
+      "exitCode": 0,
+      "stdout": "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\tls-http-failures\\native\\app.exe\n",
+      "stderr": "",
+      "elapsedSeconds": 22.828
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\jit-install\\bundle\\bin\\neoclr.exe",
+        "run",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\tls-http-failures\\native\\app.dll",
+        "--execution",
+        "interpreter",
+        "--instructions",
+        "100000000",
+        "--array-elements",
+        "1048576",
+        "--array-bytes",
+        "67108864",
+        "--system",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\jit-install\\bundle\\lib\\System.runtime.neox",
+        "--object-root",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\jit-install\\bundle\\lib\\System.Runtime.dll",
+        "--module",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\jit-install\\bundle\\lib\\System.Runtime.dll",
+        "--module",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\jit-install\\bundle\\lib\\System.Data.dll",
+        "--module",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\jit-install\\bundle\\lib\\System.Networking.dll",
+        "--module",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\jit-install\\bundle\\lib\\System.Web.dll"
+      ],
+      "exitCode": 0,
+      "stdout": "HTTPS rejection and recovery passed\nHTTPS client timeout passed\nHTTPS client cancellation passed\nHTTPS server deadline passed\n",
+      "stderr": "",
+      "elapsedSeconds": 23.328
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\jit-install\\bundle\\bin\\neoclr.exe",
+        "run",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\tls-http-failures\\native\\app.dll"
+      ],
+      "exitCode": 0,
+      "stdout": "HTTPS rejection and recovery passed\nHTTPS client timeout passed\nHTTPS client cancellation passed\nHTTPS server deadline passed\n",
+      "stderr": "",
+      "elapsedSeconds": 16.641
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\tls-http-failures\\native\\app.exe"
+      ],
+      "exitCode": 0,
+      "stdout": "HTTPS rejection and recovery passed\nHTTPS client timeout passed\nHTTPS client cancellation passed\nHTTPS server deadline passed\n",
+      "stderr": "",
+      "elapsedSeconds": 6.328
+    }
+  ],
+  "modes": [
+    "interpreter",
+    "default-jit",
+    "aot"
+  ],
+  "scope": "HTTP TLS rejection/recovery, client timeout/cancellation and server deadline",
+  "timingNote": "Timings include compilation and are not benchmarks.",
+  "sourceHashes": {
+    "runtime\\raven\\src\\System\\Networking\\Security\\SslError.rvn": "9a12027a85d6023c200b0080ef793a1237e6117fa15d25ddcc15f2a5b99def01",
+    "runtime\\raven\\src\\System\\Networking\\Security\\SslOptions.rvn": "0630f760039f609d5edbf4cff6bf4eef2b455e7c488441a6fcab0f296537c1e3",
+    "runtime\\raven\\src\\System\\Networking\\Security\\SslStream.rvn": "c42c7b37601a5721530bee64a52d50c905db69583d0f282755432587b4a502ea",
+    "docs\\experiments\\shared-tls\\http-failure-project\\App.rvnproj": "3add952756d70da5fe4c0c5aaa088f30fb5a1d3ee06f27c1d0381f8008203d1d",
+    "docs\\experiments\\shared-tls\\http-failure-project\\Main.rvn": "9cd9eb4a4342bb4e761fb3d777bc7015e6506c722592e2da3c953ad3c0a6b783"
+  }
+}

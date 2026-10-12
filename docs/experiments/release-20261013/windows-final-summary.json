@@ -1,0 +1,48 @@
+{
+  "passed": true,
+  "run": "https://github.com/marinasundstrom/neoCLR/actions/runs/38321019998",
+  "revision": "a77e20dba15bee10ffa637d46643cf12c96bad5d",
+  "completedAt": "2026-10-12T23:38:24Z",
+  "guardedHeap": "Windows guarded heap: 18 allocation lifecycles passed",
+  "stages": 27,
+  "httpCases": 8,
+  "tlsInteropCases": 12,
+  "frameworkCases": 29,
+  "frameworkSuites": [
+    "collections",
+    "json-dom",
+    "encoding-streams",
+    "index-range",
+    "zoned-time-parsing",
+    "runner-contract"
+  ],
+  "verifiedDownloadedArtifacts": {
+    "http/server/app.dll": "61514f1fe5a66ea2e7cfd13a50c00a0bb503890ca2b35b81826a601364cc9479",
+    "http/server/app.obj": "aa85afb6012c98a07af634b965b1784f8c7bc6a73ec6f9188c885d0941371cb9",
+    "http/server/app.exe": "3d12e8e1579c9fa23710215bb7abd6ba34b1ba36d1805d4856687a1c6a07bdf9",
+    "http/client/app.dll": "2edc28939c8290cbe7b686e06f7546130888ac0f8534b6f09de3bee3bdd62d95",
+    "http/client/app.obj": "68659083f4f90f418dcba909425aa8dd8698f8c60b4213b0f79a5bd55e26c5d2",
+    "http/client/app.exe": "b5f8ad9cd2eee943aca950853c10d72bbd1bafdbc19ff68b2a58578a0b6374f8",
+    "http/timeout/app.dll": "cdfa4fc25b956a016d8640d4d92656caae1226e440a5436cf7f0d21708bb616d",
+    "http/timeout/app.obj": "0f2a8a568400dc1845d50e1b62a00554db6a52259b6e735eeaf00e7333e890dc",
+    "http/timeout/app.exe": "3ec539558311ce16c715f1023bdecb1669e6c9cc9421a1b8e19dabe7a3e78d97",
+    "http/fault/app.dll": "38469d7412716e80f7cd26f29ebe098b031316f02bb666ba4a2222e54966a4b4",
+    "http/fault/app.obj": "52d824d3bdb61dca25dae73f48d2455f27566a299d4fe5c126fa7ac23de7502c",
+    "http/fault/app.exe": "01414750f52a179223f061acee39d7f46ba55685bf8f16f8d16f2ae5820ab888"
+  },
+  "verifiedAotHostSources": {
+    "tools/native/windows-host-memory.c": {
+      "gitLfSha256": "347d2e90201d8bbfbfe612b6b3c8860c7febd6f02a104434ff3d72e994211399",
+      "windowsCrlfSha256": "ad68495b2bee5a2a0050cad91bea79f767579bf70f01fca15d4727cd5a6ea7e7"
+    },
+    "benchmarks/native-web/http-host.c": {
+      "gitLfSha256": "cc11b74b5122fe62d208a51b27d81861109bfd03658d61f52500fca8cb16d61a",
+      "windowsCrlfSha256": "79864cb256fabe6af0903dbb0d3008373778e5ff8026e6cac854124ae32454ba"
+    },
+    "tools/native/windows-host-memory.h": {
+      "gitLfSha256": "9671b286bb7367f2b0f30a7485f068442ab9394e81b44b45c17141d7aedf1ba5",
+      "windowsCrlfSha256": "55fe190e0cc03b5463c1f8566a93ff6685468312c2cb7eb32bf1d7d14f7b5fcc"
+    }
+  },
+  "sourceHashNote": "Windows checkout uses CRLF; reported host source hashes match the selected LF Git contents after that line-ending conversion. Binary hashes are checked without conversion."
+}

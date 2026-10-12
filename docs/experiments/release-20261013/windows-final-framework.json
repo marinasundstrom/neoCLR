@@ -1,0 +1,569 @@
+{
+  "passed": true,
+  "modes": [
+    "jit"
+  ],
+  "jitHostSha256": "bb822ca0466083ec60bb25339a2f433b465fb5d84420248ab50aad01fde7890c",
+  "platform": "Windows-2022Server-10.0.20348-SP0",
+  "cases": [
+    {
+      "suite": "collections",
+      "mode": "jit",
+      "repetition": 1,
+      "exitCode": 0,
+      "elapsedSeconds": 4.775,
+      "stdout": "PASS Any does not read Current\nPASS For break disposes its iterator\nPASS ArrayList copy has independent storage\nPASS Map materialization handles collisions and empty input\nPASS HashMap copies sequences and maps independently\nPASS Map iteration snapshots pairs before mutation\nPASS ToMap materializes pair queries and selectors\nPASS HashMap copies preserve reference values and comparer\nPASS Predicate Any stops at its first match\nPASS Queue growth preserves wrapped FIFO contents\nPASS ArrayQueue preserves FIFO\nPASS Queue preserves references through clear and reuse\nPASS Queue iterator captures FIFO contents before mutation\nPASS HashSet applies its comparer\nPASS Stack growth preserves LIFO contents\nPASS ArrayStack preserves LIFO\nPASS Stack preserves references through clear and reuse\nPASS Stack iterator captures LIFO contents before mutation\nTests: 18, passed: 18, failed: 0, skipped: 0\n",
+      "stderr": ""
+    },
+    {
+      "suite": "collections",
+      "mode": "jit",
+      "arguments": [
+        "--filter",
+        "ArrayQueue"
+      ],
+      "exitCode": 0,
+      "elapsedSeconds": 4.592648,
+      "stdout": "PASS ArrayQueue preserves FIFO\nTests: 1, passed: 1, failed: 0, skipped: 0\n",
+      "stderr": ""
+    },
+    {
+      "suite": "collections",
+      "mode": "jit",
+      "arguments": [
+        "--filter",
+        "Map"
+      ],
+      "exitCode": 0,
+      "elapsedSeconds": 4.590369,
+      "stdout": "PASS Map materialization handles collisions and empty input\nPASS HashMap copies sequences and maps independently\nPASS Map iteration snapshots pairs before mutation\nPASS ToMap materializes pair queries and selectors\nPASS HashMap copies preserve reference values and comparer\nTests: 5, passed: 5, failed: 0, skipped: 0\n",
+      "stderr": ""
+    },
+    {
+      "suite": "json-dom",
+      "mode": "jit",
+      "repetition": 1,
+      "exitCode": 0,
+      "elapsedSeconds": 6.083,
+      "stdout": "PASS JSON arrays report invalid indices\nPASS JSON serialization rejects cyclic node graphs\nPASS JSON nested documents round trip with Unicode and number spelling\nPASS JSON document round trip removes surrounding whitespace\nPASS JSON parsing rejects escaped aliases of duplicate names\nPASS JSON parsing rejects trailing commas and truncated input\nPASS Empty JSON objects support empty map snapshots and safe lookup\nPASS JSON map lookup distinguishes null absence and ordinal keys\nPASS JSON map views keep JSON node serialization precedence\nPASS JSON map snapshots preserve insertion order and node identity\nPASS JSON numbers preserve spelling and reject fractional Int32 conversion\nPASS JSON duplicate insertion preserves the original value\nPASS JSON objects distinguish present null from missing fields\nPASS JSON object indexed access preserves insertion order\nPASS JSON documents support every root node kind\nPASS JSON scalar nodes expose their typed values\nPASS JSON sequence indexing retains node identity and explicit null\nPASS Empty JSON arrays expose empty sequence snapshots\nPASS JSON sequence views retain node serialization precedence\nPASS JSON sequence snapshots preserve order and shared child contents\nTests: 20, passed: 20, failed: 0, skipped: 0\n",
+      "stderr": ""
+    },
+    {
+      "suite": "encoding-streams",
+      "mode": "jit",
+      "repetition": 1,
+      "exitCode": 0,
+      "elapsedSeconds": 5.668,
+      "stdout": "PASS StreamWriter completes short writes and preserves cross-input graphemes\nPASS ASCII StreamWriter rejects complete lines before output and remains reusable\nPASS Custom encoder trailers require explicit Finish and are emitted once\nPASS Closing a writer manages ownership without implicit encoder finalization\nPASS Partial write and final-output failures are observable without replay\nPASS Custom encoder final acceptance waits for all trailer bytes to drain\nPASS Selected ASCII reader recognizes CRLF and preserves borrowed ownership\nPASS Selected readers reject malformed bytes and enforce decoded text limits\nPASS StreamReader waits for pending input before decoding and completing\nPASS StreamWriter waits for pending output before reporting the byte count\nPASS Cancelled input cancels the pending reader operation\nTests: 11, passed: 11, failed: 0, skipped: 0\n",
+      "stderr": ""
+    },
+    {
+      "suite": "index-range",
+      "mode": "jit",
+      "repetition": 1,
+      "exitCode": 0,
+      "elapsedSeconds": 4.221,
+      "stdout": "PASS Index preserves direction and resolves end boundaries\nPASS Index and Range typed equality agrees with hashing\nPASS Range resolution accepts empty and full boundaries\nPASS Array range syntax supports omitted and end-relative boundaries\nPASS Array indexes support values and from-end assignment\nPASS Array slices copy storage and preserve reference elements\nPASS Array indexing and slicing evaluate operands once in source order\nPASS Read-only value fields use defensive copies for method calls\nPASS Array safe access returns options and results for invalid bounds\nPASS String ranges preserve graphemes and half-open boundaries\nPASS String safe access rejects invalid grapheme bounds\nPASS String slicing evaluates receiver and bounds once\nPASS ArrayList supports directional mutation and independent range copies\nPASS Sequence slicing consumes one iterator without indexed reads\nPASS Sequence invalid and empty slices do not acquire iterators\nPASS Sequence slicing disposes when enumeration ends before Count\nPASS Sequence safe indexing and slicing work through array aliases\nPASS Sequence extension indexers provide default access and independent slices\nPASS Sequence slicing delegates to the list range contract\nPASS Native extension indexers support writes and compound assignment\nTests: 20, passed: 20, failed: 0, skipped: 0\n",
+      "stderr": ""
+    },
+    {
+      "suite": "index-range",
+      "mode": "jit",
+      "guard": "negative-index",
+      "exitCode": 1,
+      "elapsedSeconds": 4.251703,
+      "stdout": "",
+      "stderr": "UserFault: Index value must be nonnegative\n   at System.Runtime.CompilerServices.RuntimeFailure.Terminate [instruction 1]\n   at System.Fail [instruction 1]\n   at System.Index..ctor [instruction 5]\n   at NeoClr.RuntimeTests.Main [instruction 21]\n"
+    },
+    {
+      "suite": "index-range",
+      "mode": "jit",
+      "guard": "negative-conversion",
+      "exitCode": 1,
+      "elapsedSeconds": 4.229642,
+      "stdout": "",
+      "stderr": "UserFault: Index value must be nonnegative\n   at System.Runtime.CompilerServices.RuntimeFailure.Terminate [instruction 1]\n   at System.Fail [instruction 1]\n   at System.Index..ctor [instruction 5]\n   at System.Index.FromStart [instruction 2]\n   at System.Index.op_Implicit [instruction 1]\n   at NeoClr.RuntimeTests.Main [instruction 28]\n"
+    },
+    {
+      "suite": "index-range",
+      "mode": "jit",
+      "guard": "negative-length",
+      "exitCode": 1,
+      "elapsedSeconds": 4.198521,
+      "stdout": "",
+      "stderr": "UserFault: Range length must be nonnegative\n   at System.Runtime.CompilerServices.RuntimeFailure.Terminate [instruction 1]\n   at System.Fail [instruction 1]\n   at System.Range.GetOffsetAndLength [instruction 5]\n   at NeoClr.RuntimeTests.Main [instruction 42]\n"
+    },
+    {
+      "suite": "index-range",
+      "mode": "jit",
+      "guard": "list-capacity",
+      "exitCode": 1,
+      "elapsedSeconds": 4.257916,
+      "stdout": "",
+      "stderr": "UserFault: Range is outside the value\n   at System.Runtime.CompilerServices.RuntimeFailure.Terminate [instruction 1]\n   at System.Fail [instruction 1]\n   at System.Range.GetOffsetAndLength [instruction 40]\n   at System.Collections.ArrayList`1.get_Item [instruction 3]\n   at NeoClr.RuntimeTests.Main [instruction 118]\n"
+    },
+    {
+      "suite": "index-range",
+      "mode": "jit",
+      "guard": "list-end",
+      "exitCode": 1,
+      "elapsedSeconds": 4.204658,
+      "stdout": "",
+      "stderr": "UserFault: ArrayList index out of range\n   at System.Runtime.CompilerServices.RuntimeFailure.Terminate [instruction 1]\n   at System.Fail [instruction 1]\n   at System.Collections.ArrayList`1.get_Item [instruction 12]\n   at System.Collections.ArrayList`1.get_Item [instruction 5]\n   at NeoClr.RuntimeTests.Main [instruction 132]\n"
+    },
+    {
+      "suite": "index-range",
+      "mode": "jit",
+      "guard": "string-reversed",
+      "exitCode": 1,
+      "elapsedSeconds": 4.232033,
+      "stdout": "",
+      "stderr": "UserFault: Range is outside the value\n   at System.Runtime.CompilerServices.RuntimeFailure.Terminate [instruction 1]\n   at System.Fail [instruction 1]\n   at System.Range.GetOffsetAndLength [instruction 33]\n   at System.String.get_Item [instruction 3]\n   at NeoClr.RuntimeTests.Main [instruction 92]\n"
+    },
+    {
+      "suite": "index-range",
+      "mode": "jit",
+      "guard": "string-past-end",
+      "exitCode": 1,
+      "elapsedSeconds": 4.198277,
+      "stdout": "",
+      "stderr": "UserFault: Range is outside the value\n   at System.Runtime.CompilerServices.RuntimeFailure.Terminate [instruction 1]\n   at System.Fail [instruction 1]\n   at System.Range.GetOffsetAndLength [instruction 40]\n   at System.String.get_Item [instruction 3]\n   at NeoClr.RuntimeTests.Main [instruction 102]\n"
+    },
+    {
+      "suite": "index-range",
+      "mode": "jit",
+      "guard": "reversed",
+      "exitCode": 1,
+      "elapsedSeconds": 4.22522,
+      "stdout": "",
+      "stderr": "UserFault: Range is outside the value\n   at System.Runtime.CompilerServices.RuntimeFailure.Terminate [instruction 1]\n   at System.Fail [instruction 1]\n   at System.Range.GetOffsetAndLength [instruction 33]\n   at NeoClr.RuntimeTests.Main [instruction 56]\n"
+    },
+    {
+      "suite": "index-range",
+      "mode": "jit",
+      "guard": "past-end",
+      "exitCode": 1,
+      "elapsedSeconds": 4.267148,
+      "stdout": "",
+      "stderr": "UserFault: Range is outside the value\n   at System.Runtime.CompilerServices.RuntimeFailure.Terminate [instruction 1]\n   at System.Fail [instruction 1]\n   at System.Range.GetOffsetAndLength [instruction 40]\n   at NeoClr.RuntimeTests.Main [instruction 68]\n"
+    },
+    {
+      "suite": "index-range",
+      "mode": "jit",
+      "guard": "before-start",
+      "exitCode": 1,
+      "elapsedSeconds": 4.228627,
+      "stdout": "",
+      "stderr": "UserFault: Range is outside the value\n   at System.Runtime.CompilerServices.RuntimeFailure.Terminate [instruction 1]\n   at System.Fail [instruction 1]\n   at System.Range.GetOffsetAndLength [instruction 26]\n   at NeoClr.RuntimeTests.Main [instruction 80]\n"
+    },
+    {
+      "suite": "zoned-time-parsing",
+      "mode": "jit",
+      "repetition": 1,
+      "exitCode": 0,
+      "elapsedSeconds": 3.916,
+      "stdout": "PASS Zoned parsing preserves UTC and the pinned database version\nPASS Zoned parsing validates winter and summer offsets\nPASS Explicit offsets select both DST overlap candidates without losing ticks\nPASS Zoned parsing rejects skipped local times for either adjacent offset\nPASS Zoned parsing handles half hour transitions\nPASS Zoned parsing enforces rule bounds and historical second precision\nPASS Zoned parsing preserves lexical and civil range errors\nPASS Named zone lookup remains ordinal and accepts pinned aliases\nTests: 8, passed: 8, failed: 0, skipped: 0\n",
+      "stderr": ""
+    },
+    {
+      "suite": "runner-contract",
+      "mode": "jit",
+      "repetition": 1,
+      "exitCode": 1,
+      "elapsedSeconds": 3.461,
+      "stdout": "PASS before failure\nFAIL intentional assertion failure: Expected 1, actual 2\nPASS after failure\nSKIP intentional skip: contract probe\nTests: 4, passed: 2, failed: 1, skipped: 1\n",
+      "stderr": ""
+    },
+    {
+      "suite": "runner-contract",
+      "mode": "jit",
+      "arguments": [
+        "--entry-probe",
+        "",
+        "two words",
+        "R\u00e4ven \u2615 \ud83d\ude00",
+        "quote\"slash\\",
+        "--id"
+      ],
+      "exitCode": 0,
+      "elapsedSeconds": 3.529015,
+      "stdout": "PASS entry arguments preserve text\nTests: 1, passed: 1, failed: 0, skipped: 0\n",
+      "stderr": ""
+    },
+    {
+      "suite": "runner-contract",
+      "mode": "jit",
+      "arguments": [
+        "--id",
+        "runner.after"
+      ],
+      "exitCode": 0,
+      "elapsedSeconds": 3.527853,
+      "stdout": "PASS after failure\nTests: 1, passed: 1, failed: 0, skipped: 0\n",
+      "stderr": ""
+    },
+    {
+      "suite": "runner-contract",
+      "mode": "jit",
+      "arguments": [
+        "--id",
+        "runner.failure"
+      ],
+      "exitCode": 1,
+      "elapsedSeconds": 3.621392,
+      "stdout": "FAIL intentional assertion failure: Expected 1, actual 2\nTests: 1, passed: 0, failed: 1, skipped: 0\n",
+      "stderr": ""
+    },
+    {
+      "suite": "runner-contract",
+      "mode": "jit",
+      "arguments": [
+        "--id",
+        "runner.skipped"
+      ],
+      "exitCode": 0,
+      "elapsedSeconds": 3.506346,
+      "stdout": "SKIP intentional skip: contract probe\nTests: 1, passed: 0, failed: 0, skipped: 1\n",
+      "stderr": ""
+    },
+    {
+      "suite": "runner-contract",
+      "mode": "jit",
+      "arguments": [
+        "--filter",
+        "failure"
+      ],
+      "exitCode": 1,
+      "elapsedSeconds": 3.550536,
+      "stdout": "PASS before failure\nFAIL intentional assertion failure: Expected 1, actual 2\nPASS after failure\nTests: 3, passed: 2, failed: 1, skipped: 0\n",
+      "stderr": ""
+    },
+    {
+      "suite": "runner-contract",
+      "mode": "jit",
+      "arguments": [
+        "--filter",
+        "RUNNER"
+      ],
+      "exitCode": 2,
+      "elapsedSeconds": 3.523375,
+      "stdout": "ERROR No tests matched the selection\n",
+      "stderr": ""
+    },
+    {
+      "suite": "runner-contract",
+      "mode": "jit",
+      "arguments": [
+        "--filter"
+      ],
+      "exitCode": 2,
+      "elapsedSeconds": 3.552545,
+      "stdout": "ERROR Expected --filter <text>, --id <id> or --category <name>\n",
+      "stderr": ""
+    },
+    {
+      "suite": "runner-contract",
+      "mode": "jit",
+      "arguments": [
+        "--filter",
+        ""
+      ],
+      "exitCode": 2,
+      "elapsedSeconds": 3.510183,
+      "stdout": "ERROR Expected --filter <text>, --id <id> or --category <name>\n",
+      "stderr": ""
+    },
+    {
+      "suite": "runner-contract",
+      "mode": "jit",
+      "arguments": [
+        "--unknown",
+        "after"
+      ],
+      "exitCode": 2,
+      "elapsedSeconds": 3.510391,
+      "stdout": "ERROR Expected --filter <text>, --id <id> or --category <name>\n",
+      "stderr": ""
+    },
+    {
+      "suite": "runner-contract",
+      "mode": "jit",
+      "arguments": [
+        "--jit-managed",
+        "--jit-run",
+        "--target",
+        "--jit-entry-argument"
+      ],
+      "exitCode": 2,
+      "elapsedSeconds": 3.523201,
+      "stdout": "ERROR Expected --filter <text>, --id <id> or --category <name>\n",
+      "stderr": ""
+    },
+    {
+      "suite": "runner-contract",
+      "mode": "jit",
+      "arguments": [
+        "--id",
+        "runner.after",
+        "--filter",
+        "after"
+      ],
+      "exitCode": 2,
+      "elapsedSeconds": 3.523032,
+      "stdout": "ERROR Expected --filter <text>, --id <id> or --category <name>\n",
+      "stderr": ""
+    }
+  ],
+  "phases": [
+    {
+      "suite": "collections",
+      "phase": "discovery",
+      "elapsedSeconds": 12.739915,
+      "details": {
+        "sourceCompilationSeconds": 8.273688,
+        "metadataDiscoveryIncludingToolBuildSeconds": 4.462925
+      }
+    },
+    {
+      "suite": "collections",
+      "phase": "source-compilation",
+      "elapsedSeconds": 8.39504,
+      "command": [
+        "dotnet",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\jit-install\\bundle\\sdk\\tools\\rvnc\\rvnc.dll",
+        "neoclr",
+        "--project",
+        "D:\\a\\neoCLR\\neoCLR\\runtime\\raven\\tests\\collections\\Tests.rvnproj"
+      ],
+      "assemblySha256": "91b043e53b374c44f876634de1ed5a5b092e4a14e86d9d7cd99a152c5695437a"
+    },
+    {
+      "suite": "collections",
+      "phase": "registration-verification",
+      "elapsedSeconds": 3.758131
+    },
+    {
+      "suite": "json-dom",
+      "phase": "discovery",
+      "elapsedSeconds": 12.271653,
+      "details": {
+        "sourceCompilationSeconds": 8.109214,
+        "metadataDiscoveryIncludingToolBuildSeconds": 4.158592
+      }
+    },
+    {
+      "suite": "json-dom",
+      "phase": "source-compilation",
+      "elapsedSeconds": 8.159279,
+      "command": [
+        "dotnet",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\jit-install\\bundle\\sdk\\tools\\rvnc\\rvnc.dll",
+        "neoclr",
+        "--project",
+        "D:\\a\\neoCLR\\neoCLR\\runtime\\raven\\tests\\json-dom\\Tests.rvnproj"
+      ],
+      "assemblySha256": "94883132baa0a1152686b68c2237460032bb435dfc3edb5c4a626b8a8458fd9c"
+    },
+    {
+      "suite": "json-dom",
+      "phase": "registration-verification",
+      "elapsedSeconds": 3.765622
+    },
+    {
+      "suite": "encoding-streams",
+      "phase": "discovery",
+      "elapsedSeconds": 13.738896,
+      "details": {
+        "sourceCompilationSeconds": 9.127433,
+        "metadataDiscoveryIncludingToolBuildSeconds": 4.607996
+      }
+    },
+    {
+      "suite": "encoding-streams",
+      "phase": "source-compilation",
+      "elapsedSeconds": 8.990178,
+      "command": [
+        "dotnet",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\jit-install\\bundle\\sdk\\tools\\rvnc\\rvnc.dll",
+        "neoclr",
+        "--project",
+        "D:\\a\\neoCLR\\neoCLR\\runtime\\raven\\tests\\encoding-streams\\Tests.rvnproj"
+      ],
+      "assemblySha256": "80039453032334e783beacfd9cd068b0a6defc5995f952ad0bfed486250054b0"
+    },
+    {
+      "suite": "encoding-streams",
+      "phase": "registration-verification",
+      "elapsedSeconds": 3.768811
+    },
+    {
+      "suite": "index-range",
+      "phase": "discovery",
+      "elapsedSeconds": 12.981395,
+      "details": {
+        "sourceCompilationSeconds": 8.669253,
+        "metadataDiscoveryIncludingToolBuildSeconds": 4.308609
+      }
+    },
+    {
+      "suite": "index-range",
+      "phase": "source-compilation",
+      "elapsedSeconds": 8.754469,
+      "command": [
+        "dotnet",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\jit-install\\bundle\\sdk\\tools\\rvnc\\rvnc.dll",
+        "neoclr",
+        "--project",
+        "D:\\a\\neoCLR\\neoCLR\\runtime\\raven\\tests\\index-range\\Tests.rvnproj"
+      ],
+      "assemblySha256": "6312e1a595e24e47edc0249c6da8074366027b109d81ec303ed378c05aa3aaed"
+    },
+    {
+      "suite": "index-range",
+      "phase": "registration-verification",
+      "elapsedSeconds": 3.759136
+    },
+    {
+      "suite": "zoned-time-parsing",
+      "phase": "discovery",
+      "elapsedSeconds": 11.951407,
+      "details": {
+        "sourceCompilationSeconds": 7.505181,
+        "metadataDiscoveryIncludingToolBuildSeconds": 4.442797
+      }
+    },
+    {
+      "suite": "zoned-time-parsing",
+      "phase": "source-compilation",
+      "elapsedSeconds": 7.616319,
+      "command": [
+        "dotnet",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\jit-install\\bundle\\sdk\\tools\\rvnc\\rvnc.dll",
+        "neoclr",
+        "--project",
+        "D:\\a\\neoCLR\\neoCLR\\runtime\\raven\\tests\\zoned-time-parsing\\Tests.rvnproj"
+      ],
+      "assemblySha256": "1f3b47e6f221496f7efeede579f64b1a481598e67b4f5c38bf0dfd255c303d7e"
+    },
+    {
+      "suite": "zoned-time-parsing",
+      "phase": "registration-verification",
+      "elapsedSeconds": 3.874623
+    },
+    {
+      "suite": "runner-contract",
+      "phase": "source-compilation",
+      "elapsedSeconds": 7.174519,
+      "command": [
+        "dotnet",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\jit-install\\bundle\\sdk\\tools\\rvnc\\rvnc.dll",
+        "neoclr",
+        "--project",
+        "D:\\a\\neoCLR\\neoCLR\\runtime\\raven\\tests\\runner-contract\\Tests.rvnproj"
+      ],
+      "assemblySha256": "ceccc7ca0a062b5f09bc7c33bc12a13ac84076621f401e3def83227e193fb866"
+    }
+  ],
+  "executionRepetitions": 1,
+  "inputs": {
+    "scripts\\test-runtime-library.py": "590fafa097c2657a111be03dc1c38bcf5b6e5512bd5394153bb7c6ab2b43b4c2",
+    "scripts\\build-native-project.py": "859fbf8b3416e5c7d8dc86747f758471598c3e16ac57260eb792f088826284b2",
+    "scripts\\discover-runtime-tests.py": "3d16fcf19c4f5db58d1b60e5b9f6cc635edc66e16aff20c11d4aea426dbb22b4",
+    "scripts\\validate-test-discovery.py": "1706e22d3437c8ac7054e3ccf5eda2361a04b8df2dfd59361434557cd5cb28b3",
+    "tools\\testing\\NeoCLR.TestDiscovery\\DataAdapters.cs": "e73b65b379532ff9f14bd4f462619394d8f19a374c5510d182d39e0b20d9d55e",
+    "tools\\testing\\NeoCLR.TestDiscovery\\Program.cs": "0b2fa5974f5e5513acd7344d2e6fc31f9f02a41a7604f3b0d158d70301f6169d",
+    "tools\\testing\\NeoCLR.TestDiscovery\\NeoCLR.TestDiscovery.csproj": "39c77b762c8bc7c170030c7feacfaa33c733b61d22b2895bd8542d310c9d4ff2",
+    "runtime\\raven\\tests\\collection-construction\\Construction.rvn": "4cff666c2258e01cd36cfc5669f27719b7579292115843f436a6df7993b29cf9",
+    "runtime\\raven\\tests\\collection-construction\\MapIndexers.rvn": "e2b6241435f55569c26a3e09e4345467e77e675812bc0a5c823b87ca57783d12",
+    "runtime\\raven\\tests\\collection-construction\\Sets.rvn": "d7398b56f6242dd99f3c0daffcdb91a220ae11964c1017f9369dafa0e258bad1",
+    "runtime\\raven\\tests\\collection-iteration\\ForCleanup.rvn": "9fffa04e230f9b2a1b931d28ac6d78e1e65bf701911cb0f467a66b036d41a358",
+    "runtime\\raven\\tests\\collection-iteration\\QueryCleanup.rvn": "bd76b5214ec3aa02b077bcad2af2f0040585f7a6c994027ac217972b01763654",
+    "runtime\\raven\\tests\\collections\\Collections.rvn": "604eecf5617e999866b2da57b1d5dd1b1eaf1553781f86209b4f610f217ef785",
+    "runtime\\raven\\tests\\collections\\Main.rvn": "ca9f2314e15b34b06cf504513169d83095068a5f246fe8aee852f258d6b3bb43",
+    "runtime\\raven\\tests\\collections\\MapMaterialization.rvn": "1ed2fe4c2984dd26b3d90a8c3c57cac0c912e88884d3058b44e40edb18d8d013",
+    "runtime\\raven\\tests\\collections\\ObservedNumbers.rvn": "bb28c264dbd6c16a1190cafab56d3afca6353ee420cf92afdabc2a50934f5644",
+    "runtime\\raven\\tests\\collections\\QueueStack.rvn": "d2b7c05321c3af495657d7e97bef3f6f4dfab5d695459a54b8c48c0de5c68d2c",
+    "runtime\\raven\\tests\\cryptography\\Tests.rvn": "cc6cc6339382917148e0aac0d85111a33afea23a5450f14dfa83100112e30a95",
+    "runtime\\raven\\tests\\discovery-contract\\OtherAttribute.rvn": "e5930fda0dc25c534060f939d56798670943e28796c9c958026de70d9c9732fe",
+    "runtime\\raven\\tests\\discovery-contract\\Tests.rvn": "997a9f59a67c1a95e02cf665ca580d40274c1b34108ac23ee21076bfc90c3f96",
+    "runtime\\raven\\tests\\duration-offset-parsing\\Tests.rvn": "699d551d1e436fb11790904611106d3c16fe3b5aac80a6a245208479cb81c967",
+    "runtime\\raven\\tests\\encoding\\Tests.rvn": "5301115ea9751ef576d94ca05a6ce2419d3ac886f6c129aeaf742ee22f1b7847",
+    "runtime\\raven\\tests\\encoding-boundaries\\Fixtures.rvn": "75f68c42097052af8ef229493ccaf84d3f251a3186069a7784969e74cd7395fc",
+    "runtime\\raven\\tests\\encoding-boundaries\\Tests.rvn": "aa6d3d68d2a2cf3574faad911e88f84369a02ca3b1f1ac13cb38be2a92790106",
+    "runtime\\raven\\tests\\encoding-buffer-limits\\Tests.rvn": "a9e04e2a80deff1bbd4238b067fad6bedfd1331eae3d5bf63ad67c503be601c3",
+    "runtime\\raven\\tests\\encoding-streams\\Fixtures.rvn": "50e682f9022d1614d1dcb733c48426efdb7f0d597ff5afc1f2a59b55000e51d4",
+    "runtime\\raven\\tests\\encoding-streams\\Tests.rvn": "b72f849ffcb032bc2db0dc9e521c55ed9a8f7aa8a888345244579f5c0e366363",
+    "runtime\\raven\\tests\\framework\\Assertions.rvn": "fe47084fb259fe06436d41cdaaa20ab294174da6b582e85f8c7bd88703f69f8e",
+    "runtime\\raven\\tests\\framework\\TestAttribute.rvn": "71894c41e973b704d9a1fd57d3f8a632f98bf2dd57ded1c27a65752a38392786",
+    "runtime\\raven\\tests\\framework\\TestSuite.rvn": "b0e4152f9213e211e9d4d8140a90efe3d84de208eacc2b71375f96c654572358",
+    "runtime\\raven\\tests\\gzip\\Fixtures.rvn": "8a1b68bf8917bb59678bf1932c7e552eeeed062f8bb7a87a4eb788ecd19d4554",
+    "runtime\\raven\\tests\\gzip\\Streams.rvn": "fdc92e4f26be2006102071f1679d807f78f7e0e2b746ccbac55f17d66040b7de",
+    "runtime\\raven\\tests\\gzip\\Tests.rvn": "b26f45f8bc7eb6ccaeb3c7dbb50ac754120a598b5d0e4e8cfe803ebd821fef20",
+    "runtime\\raven\\tests\\http-header-values\\Tests.rvn": "1e4513600e0ab5fef4409ad2cac36bbf3b80c93be3bfda614af2743481caad94",
+    "runtime\\raven\\tests\\http-lifetime\\Tests.rvn": "1603922b49515fe72626f3f8939d654735abc37ec86a2dc7e115dc3227668d62",
+    "runtime\\raven\\tests\\http-method-values\\Tests.rvn": "a0a4f9271f1a0b0ff90a0a8a4daad2673458b340ac865d0d812b8d6d912fd9d8",
+    "runtime\\raven\\tests\\http-route-matching\\Tests.rvn": "efe87eb010f7190d8e47f0b3ef2ab0b6a4121e7119edf376971b1c7289fb6de9",
+    "runtime\\raven\\tests\\http-text\\Tests.rvn": "3b2d8d935d0570ecc8b643fce9d9ebc09b2ddfce8de90499b6652a309eae454b",
+    "runtime\\raven\\tests\\index-range\\Main.rvn": "704e5a3d425a4679fb843fe6951b4e7e2ea443bcde4eed39dc8cb7b25a67073c",
+    "runtime\\raven\\tests\\index-range\\Tests.rvn": "8bcf57256438d59795277c9e00c437ad06fd6f0d630b65ba1008b5c0fd5fa30a",
+    "runtime\\raven\\tests\\instant-parsing\\Tests.rvn": "b6fef679fd94dea242d8af3e3a7afccf9cfddabeccb764d6f7291c97a8b18865",
+    "runtime\\raven\\tests\\int64-parsing\\Tests.rvn": "0ba4dccdad2d2966204acc943a9573f12d15d75ea4caa9395734571ee064490c",
+    "runtime\\raven\\tests\\ip-address-values\\Tests.rvn": "80c3503b5b8297bc7170381607a2587c140b51d4f48736b6ae394b9f765b53ec",
+    "runtime\\raven\\tests\\json-dom\\JsonDom.rvn": "35359ad7d6dfd6f51ba8827a4de7624846f2c857097ae79bd468537d6d82828b",
+    "runtime\\raven\\tests\\json-streams\\JsonStreams.rvn": "56989eba543d616d510c8f7dd7ec9538281bcedbb961be2dc2546a226e0731c3",
+    "runtime\\raven\\tests\\json-streams\\ShortStreams.rvn": "b2d71bb3875b4d9d51c2385ca1917953f1c635f595759d44c37146c978363703",
+    "runtime\\raven\\tests\\memory-stream\\Tests.rvn": "20e2821935b962a7e6d8aa8384542efc39c1b74917b21b96919f0963fc200217",
+    "runtime\\raven\\tests\\path-values\\Tests.rvn": "be50caa65629f4ba728f5c392b0483fdab56e5facabc375c09341df1cbf68ec0",
+    "runtime\\raven\\tests\\primitive-parsing\\Tests.rvn": "0a2c3c7872b8d9edcaa5dfa7958a786a593a0a2b145a03f0db4e0eb68c689ccd",
+    "runtime\\raven\\tests\\runner-contract\\Main.rvn": "8fc110a41edbd7eec0b9e0786ac024a1896a98673bf858b740c7570d4fc0b2a0",
+    "runtime\\raven\\tests\\string-construction\\Tests.rvn": "83db11b1d50f393571ce67cf7e5c4ba0626bc5a0e171ba6f6c54c6bbba88c6f7",
+    "runtime\\raven\\tests\\time-parsing\\Tests.rvn": "b2a8206d4bb3a1053ca4937f27b17af4fc2cee68379e8466f882fc605954f783",
+    "runtime\\raven\\tests\\unicode-casing\\Tests.rvn": "36960670ec553bc5eff7a480d1ad83f6acc7a71f288cb99c4179cfc7cd49c502",
+    "runtime\\raven\\tests\\uri-resolution\\Tests.rvn": "e95669de991c8fbf6e6965faf7bf9ab0c06c3fbbd7f24ee0e90e5720ee187c2f",
+    "runtime\\raven\\tests\\zoned-time-parsing\\Tests.rvn": "f6a21780f6d8f87cdbb8dee643b304a836e77b6d61175a90ddc65fd6dadb3448",
+    "runtime\\raven\\tests\\collection-construction\\Tests.rvnproj": "8ceeb0982a9ca70e3e5b29495bc956a528430aac934e2379e503ed3c1b69e04c",
+    "runtime\\raven\\tests\\collection-iteration\\Tests.rvnproj": "e2103dc1d355d62fc301c49d5f197c95230928666ea68a6bc4b31d11f3d0a97b",
+    "runtime\\raven\\tests\\collections\\Tests.rvnproj": "3011608cb22113d44ad5f52231ce58b5bd031a13aeaf772b4a0bd1fe263c445f",
+    "runtime\\raven\\tests\\cryptography\\Tests.rvnproj": "b8666ba1ae0903b16304439d925ef397a31eeb11a49ee517804d79a1726c9a4b",
+    "runtime\\raven\\tests\\discovery-contract\\Tests.rvnproj": "758bb3567a1f3a81a5b4a94da28a67ffefd9edf8dd07aeabd77f22cc6f5446a7",
+    "runtime\\raven\\tests\\duration-offset-parsing\\Tests.rvnproj": "f4594d177c8ceecc0aff78a2b25552a5a4f9fe8a742f3c3b97de88f24478401f",
+    "runtime\\raven\\tests\\encoding\\Tests.rvnproj": "028a2045b4a74167962d3960c3feaa01e74cdff901c059cc47cb3b7a17c53bcc",
+    "runtime\\raven\\tests\\encoding-boundaries\\Tests.rvnproj": "74818a57af75d5f50909f421c04eb1292f9bc88be634aeb8861b9fc7f1e21606",
+    "runtime\\raven\\tests\\encoding-buffer-limits\\Tests.rvnproj": "324cdb91c22577bf3aedfe524b332823335c3037d1249ce328f8c5ec80adf1f7",
+    "runtime\\raven\\tests\\encoding-streams\\Tests.rvnproj": "a69839114e3bb44430b62767ac9479a48edf1d7af7701c59cf65543e0fd404f6",
+    "runtime\\raven\\tests\\gzip\\Tests.rvnproj": "7ac5cf7838fcff10634a99036b191b006d9f547e4c3354bf746fcae34186b9eb",
+    "runtime\\raven\\tests\\http-header-values\\Tests.rvnproj": "a26a4f992a634d1410ffbbdca3897c6ce76301a8fed6411560f9100a6417f348",
+    "runtime\\raven\\tests\\http-lifetime\\Tests.rvnproj": "d83725f249fa139e9afdd0522b47d1d54039676cab32e97c8a430f3ef01372d9",
+    "runtime\\raven\\tests\\http-method-values\\Tests.rvnproj": "a8fffa83ea35695d85c749bf9161c3e97d4d26d01847aa0482db4db7fb98002f",
+    "runtime\\raven\\tests\\http-route-matching\\Tests.rvnproj": "044809d979d1681d8519bdb34b7c677020a4981de72f5f46c379dc30e95fefb4",
+    "runtime\\raven\\tests\\http-text\\Tests.rvnproj": "ba05f0ec0c582fc549bd6ff1b59ff784e7d9fcc50bff225d4867a0603e93decc",
+    "runtime\\raven\\tests\\index-range\\Tests.rvnproj": "969344fc3fcf11062c33e36d1a8fce38364a8b85291094995fb468cea6c54b3a",
+    "runtime\\raven\\tests\\instant-parsing\\Tests.rvnproj": "4f966d9a4968d26a7aa65e3adcd7d07f71efca095cd52e4fd70e0212473ef247",
+    "runtime\\raven\\tests\\int64-parsing\\Tests.rvnproj": "09b073a9d326699a64b6d659ea1bbf5517688123f9e3a19b044a7123248f94a5",
+    "runtime\\raven\\tests\\ip-address-values\\Tests.rvnproj": "ed8164d114e313a718fbfa43f1fb7c9078fb17f8d580addbe04d92a64c7d0124",
+    "runtime\\raven\\tests\\json-dom\\Tests.rvnproj": "aac57dd796996fd74d3009de9667d8b1af0f83f92afb365e0c3eef6ea84e691d",
+    "runtime\\raven\\tests\\json-streams\\Tests.rvnproj": "e783ac21413a396296ed9aab09fd666a7bb30e81c353df97471015188421befc",
+    "runtime\\raven\\tests\\memory-stream\\Tests.rvnproj": "20ecd3b42dc0da1de2a00901ca968dc2426c31564f32fb8d26f7c445ce65936e",
+    "runtime\\raven\\tests\\path-values\\Tests.rvnproj": "1456fb06565edf3fb4893c37877bf23f80cab0373250aff3b218d2e7ea0381a5",
+    "runtime\\raven\\tests\\primitive-parsing\\Tests.rvnproj": "582beaa3d9a4be3d9aedb25041285650d9069f4bd85c0f849cd3a7432600d28b",
+    "runtime\\raven\\tests\\runner-contract\\Tests.rvnproj": "745e5adc40722f57a4f43a17ea07e355d273bf66f896c84489a1af73dd7f3959",
+    "runtime\\raven\\tests\\string-construction\\Tests.rvnproj": "fffe5ca561d9b065bd719318baaec2981071ae20bfac3967ee08a0c095be28d8",
+    "runtime\\raven\\tests\\time-parsing\\Tests.rvnproj": "76fcbdd604bc9cd0e27cda1c8265d5047009d977f06da6d15d44acb6d446dc3e",
+    "runtime\\raven\\tests\\unicode-casing\\Tests.rvnproj": "fd37c68c7512e80db2f4b55e1c4aed5e066c5b045b5ac8b374a466caed900088",
+    "runtime\\raven\\tests\\uri-resolution\\Tests.rvnproj": "badf541153421e123e04874f43bcd36fbe722c76573671093c4269983597e08e",
+    "runtime\\raven\\tests\\zoned-time-parsing\\Tests.rvnproj": "482376ce45321a77665fa28ea8b0e56d6a243757987d4d4017765971bd07be37"
+  },
+  "bundleManifestSha256": "8923c3a3b55278964355db46ad3dabfc4a9f0e3e9a10b3594c849e69212e7338",
+  "aotSha256": "2abc9293bd1be3d5355272b550c45d473f580228a38024e41a89bf73a50d10c7",
+  "interpreterSha256": "d4f8922d937d03c31cfd012d4f66887aba50f0c43bf5702bc7ca7ab9f7edd1c7",
+  "libraryCatalogSha256": "95e1a2003611a405f8b61174890dd7fb3f3596abbb3d018aa632dac0c89b7509",
+  "suites": [
+    "collections",
+    "json-dom",
+    "encoding-streams",
+    "index-range",
+    "zoned-time-parsing",
+    "runner-contract"
+  ],
+  "totalElapsedSeconds": 250.599173
+}

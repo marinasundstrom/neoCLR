@@ -16,8 +16,8 @@ The hosted source/format/Clippy gate, macOS/Windows host checks and minimum-Rust
 matrix now pass on a9adc97cb. The later mixed-callback backend repair has focused
 Windows object-generation and macOS execution coverage; the callback-fixed Windows
 package and all 26 editor checks also pass. Windows interpreter/JIT SSL passes, but
-AOT exposed a separate old host heap cap, now repaired and awaiting its execution
-gate. The author installation now has the qualified refreshed
+AOT exposed a separate old host heap cap. Its repair now passes the guarded heap
+and full Windows SSL/HTTP/framework execution gate. The author installation now has the qualified refreshed
 runtime/backend and notices, with the same SDK/VSIX and launch paths. Installed
 samples pass, and all 26 real VS Code checks cover the unchanged compiler/extension.
 [Draft release notes](../next-preview-release-notes.md) await final artifact review.
