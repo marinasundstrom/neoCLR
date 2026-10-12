@@ -97,9 +97,9 @@ fn enclosing_visibility_is_effective_across_module_linking() {
 }
 
 #[test]
-fn malformed_ownership_and_unsupported_contexts_are_rejected() {
+fn malformed_ownership_and_invalid_declarations_are_rejected() {
     let module = assemble(SAMPLE).unwrap();
-    for mode in 0..5 {
+    for mode in 0..4 {
         let mut bad = module.clone();
         let index = bad
             .types
@@ -110,16 +110,7 @@ fn malformed_ownership_and_unsupported_contexts_are_rejected() {
             0 => bad.types[index].declaring_type.as_mut().unwrap().index = 999,
             1 => bad.types[index].declaring_type = bad.types[index].definition.clone(),
             2 => bad.types[index].name = "Unrelated.Case".into(),
-            3 => bad.types[index].declaring_type.as_mut().unwrap().module = "Other".into(),
-            _ => {
-                bad.types[index].declaring_type = bad
-                    .types
-                    .iter()
-                    .find(|d| d.name == "Demo.Result" && d.generic_parameters.len() == 2)
-                    .unwrap()
-                    .definition
-                    .clone()
-            }
+            _ => bad.types[index].declaring_type.as_mut().unwrap().module = "Other".into(),
         }
         assert!(
             neoclr::load(&serde_json::to_string(&bad).unwrap()).is_err(),
@@ -127,12 +118,51 @@ fn malformed_ownership_and_unsupported_contexts_are_rejected() {
         );
     }
     for source in [
-        ".module Bad\n.type Outer<T>\n.type Case<U>\n.end\n.end",
         ".module Bad\n.type Outer\n.type A.B\n.end\n.end",
         ".module Bad\n.type Outer\n.type private Case\n.end\n.end",
     ] {
         assert!(assemble(source).is_err());
     }
+}
+
+#[test]
+fn generic_lexical_owner_preserves_explicit_nested_parameters() {
+    let source = r#"
+.module GenericNested
+.type Outer<T>
+.type Case<T,U>
+.field Value U
+.end
+.end
+.function Main() -> Outer.Case<String,Int32>
+ldc.i4 42
+newobj Outer.Case<String,Int32>
+ret
+.end
+.entry Main
+"#;
+    let module = assemble(source).unwrap();
+    let module = neoclr::load(&serde_json::to_string(&module).unwrap()).unwrap();
+    let owner = module.types.iter().find(|d| d.name == "Outer").unwrap();
+    let nested = module
+        .types
+        .iter()
+        .find(|d| d.name == "Outer.Case")
+        .unwrap();
+    assert_eq!(nested.declaring_type, owner.definition);
+    assert_eq!(
+        nested.generic_parameters,
+        vec![Some("T".into()), Some("U".into())]
+    );
+    let program = LoadedProgram::new(&module).unwrap();
+    program.verify().unwrap();
+    assert_eq!(
+        program.run(Limits::default()).unwrap().value,
+        Value::Object {
+            ty: parse_type("Outer.Case<String,Int32>").unwrap(),
+            fields: vec![Value::Int32(42)],
+        }
+    );
 }
 
 #[test]

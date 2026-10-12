@@ -8,6 +8,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-13
 
+- Align nested-type regressions with implemented generic lexical ownership:
+  retain malformed-owner/name/access rejection and add explicit nested generic
+  parameter round-trip/execution coverage. All six focused tests pass; remove
+  obsolete non-generic-only restrictions from the design guide. No runtime semantic
+  change is required.
+
 - Retain Rust 1.85-compatible atomic identity allocation in runtime async and
   Scheduler while narrowly allowing the newer Rust deprecation of fetch_update.
   This matches existing host-service compatibility handling without changing

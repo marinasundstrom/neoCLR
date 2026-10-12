@@ -1,8 +1,8 @@
 # Nested case types and generic union companions
 
-Status: [name-plus-arity identity](type-arities.md) and ordinary nested ownership
-under non-generic types are implemented. The System companion case migration remains
-unfinished.
+Status: [name-plus-arity identity](type-arities.md), ordinary nested ownership and
+[generic lexical owners](design/extended-cli-metadata.md#generic-lexical-nesting-gap-closure-2026-10-11)
+are implemented. System Option/Result cases use non-generic companions.
 The user clarified that case types
 are ordinary nested types and generic unions should use a non-generic companion type.
 This supersedes the earlier exploration of selectively capturing outer parameters.
@@ -113,7 +113,10 @@ does not establish ownership.
 
 Ownership must stay within one module/revision, resolve to a real definition, and
 be acyclic with bounded depth (32). Generic cases declare only their own parameters.
-Nesting under a generic outer definition is rejected for this initial subset.
+Generic outer definitions are also supported. Ownership identifies the lexical
+definition independently of instantiation; nested definitions carry their complete
+explicit generic parameter list. The companion convention keeps union-case
+parameters independent and does not restrict ordinary generic nesting.
 No new opcode, allocation rule, implicit outer instance, field, generic argument,
 or inheritance relation is introduced. Existing metadata artifacts without the
 optional ownership field remain top-level definitions.
@@ -142,19 +145,16 @@ Future Map/MapError/AndThen remain ordinary library operations. Companion case t
 may make their source construction and inference more convenient, but generic methods
 and callable values are still separate prerequisites.
 
-## Implementation order and proof
+## Validation
 
-Same-name definitions with different generic arities and nested generic definitions
-under non-generic companions are implemented. Next move Option/Result cases and
-migrate their constructor/query references.
-Preserve the currently working top-level carriers during those foundational slices.
+Same-name definitions with different generic arities, ordinary companion nesting,
+and generic lexical owners are implemented. Option/Result cases use their companion
+owners; generic enclosing ownership is also used by compiler-generated generator
+frames. See the [generic lexical metadata checkpoint](design/extended-cli-metadata.md#generic-lexical-nesting-gap-closure-2026-10-11).
 
-The proof must include coexisting Result and Result<T,TError>, nested Ok<T> and
-Error<TError>, same-name cases under distinct companions, Void payloads, Result<T,T>,
-multiple nesting levels, and invalid owner/arity references. Round trips, overload
-binding, module linking, accessibility, type identity, verification and host input must
-agree. Keep generic-outer nesting as a separately specified follow-up if it is not
-needed by the first companion implementation.
-
-This supports Preview 1's ordinary type and union program (P3). It does not require
-a high-level compiler, inheritance or broad reflection support.
+`tests/nested_types.rs` covers round-trip execution and host identity, multiple
+nesting levels, Void payloads, effective enclosing visibility, malformed ownership,
+explicit generic parameters under a generic owner, and lexical private access.
+Missing/foreign owners, ownership cycles and invalid qualified nested declarations
+remain rejected. Acceptance of generic owners is intentional and must not be
+regressed to the earlier non-generic-only subset.
