@@ -1,0 +1,30 @@
+{
+  "passed": true,
+  "serverCommand": [
+    "python3",
+    "/Users/robert/.neoclr/experiments/preview-20261012-2/tools/run-native-sample.py",
+    "http-json-server",
+    "--",
+    "2"
+  ],
+  "serverLines": [
+    "Native build output: /Users/robert/.neoclr/experiments/preview-20261012-2/samples/http-json-server/bin/neoclr/App.dll\n",
+    "Disassembled /Users/robert/.neoclr/experiments/preview-20261012-2/samples/http-json-server/bin/neoclr/App.dll -> /var/folders/5x/5r0dfcnx30lf0cl8kp3sphch0000gn/T/neoclr-sample-reflection-ktjowmec/module.neoil\n",
+    "56693\n",
+    "Reports served\n"
+  ],
+  "client": {
+    "command": [
+      "python3",
+      "/Users/robert/.neoclr/experiments/preview-20261012-2/tools/run-native-sample.py",
+      "http-json-client",
+      "--",
+      "http://127.0.0.1:56693/"
+    ],
+    "exitCode": 0,
+    "stdout": "Native build output: /Users/robert/.neoclr/experiments/preview-20261012-2/samples/http-json-client/bin/neoclr/App.dll\nDisassembled /Users/robert/.neoclr/experiments/preview-20261012-2/samples/http-json-client/bin/neoclr/App.dll -> /var/folders/5x/5r0dfcnx30lf0cl8kp3sphch0000gn/T/neoclr-sample-reflection-6waxbhz2/module.neoil\n{\"accepted\":true}\n",
+    "stderr": "/Users/robert/.neoclr/experiments/preview-20261012-2/samples/http-json-client/HttpApplication.rvn(64,32): info RAV1506: Result propagation converts errors from 'JsonError' to 'AppError' via implicit conversion 'static func implicit(error: JsonError) -> AppError'.\n/Users/robert/.neoclr/experiments/preview-20261012-2/samples/http-json-client/HttpApplication.rvn(65,45): info RAV1506: Result propagation converts errors from 'JsonError' to 'AppError' via implicit conversion 'static func implicit(error: JsonError) -> AppError'.\n/Users/robert/.neoclr/experiments/preview-20261012-2/samples/http-json-client/HttpApplication.rvn(70,26): info RAV1506: Result propagation converts errors from 'HttpJsonError' to 'AppError' via implicit conversion 'static func implicit(error: HttpJsonError) -> AppError'.\n/Users/robert/.neoclr/experiments/preview-20261012-2/samples/http-json-client/HttpApplication.rvn(74,68): info RAV1506: Result propagation converts errors from 'JsonError' to 'AppError' via implicit conversion 'static func implicit(error: JsonError) -> AppError'.\n/Users/robert/.neoclr/experiments/preview-20261012-2/samples/http-json-client/HttpApplication.rvn(76,53): info RAV1506: Result propagation converts errors from 'JsonError' to 'AppError' via implicit conversion 'static func implicit(error: JsonError) -> AppError'.\n/Users/robert/.neoclr/experiments/preview-20261012-2/samples/http-json-client/HttpClient.rvn(11,71): info RAV1506: Result propagation converts errors from 'HttpJsonError' to 'AppError' via implicit conversion 'static func implicit(error: HttpJsonError) -> AppError'.\n/Users/robert/.neoclr/experiments/preview-20261012-2/samples/http-json-client/HttpClient.rvn(21,9): warning RAV0162: Unreachable code\n"
+  },
+  "serverExitCode": 0,
+  "serverStderr": "/Users/robert/.neoclr/experiments/preview-20261012-2/samples/http-json-server/HttpApplication.rvn(64,32): info RAV1506: Result propagation converts errors from 'JsonError' to 'AppError' via implicit conversion 'static func implicit(error: JsonError) -> AppError'.\n/Users/robert/.neoclr/experiments/preview-20261012-2/samples/http-json-server/HttpApplication.rvn(65,45): info RAV1506: Result propagation converts errors from 'JsonError' to 'AppError' via implicit conversion 'static func implicit(error: JsonError) -> AppError'.\n/Users/robert/.neoclr/experiments/preview-20261012-2/samples/http-json-server/HttpApplication.rvn(70,26): info RAV1506: Result propagation converts errors from 'HttpJsonError' to 'AppError' via implicit conversion 'static func implicit(error: HttpJsonError) -> AppError'.\n/Users/robert/.neoclr/experiments/preview-20261012-2/samples/http-json-server/HttpApplication.rvn(74,68): info RAV1506: Result propagation converts errors from 'JsonError' to 'AppError' via implicit conversion 'static func implicit(error: JsonError) -> AppError'.\n/Users/robert/.neoclr/experiments/preview-20261012-2/samples/http-json-server/HttpApplication.rvn(76,53): info RAV1506: Result propagation converts errors from 'JsonError' to 'AppError' via implicit conversion 'static func implicit(error: JsonError) -> AppError'.\n/Users/robert/.neoclr/experiments/preview-20261012-2/samples/http-json-server/HttpServer.rvn(18,40): info RAV1506: Result propagation converts errors from 'JsonError' to 'AppError' via implicit conversion 'static func implicit(error: JsonError) -> AppError'.\n/Users/robert/.neoclr/experiments/preview-20261012-2/samples/http-json-server/HttpServer.rvn(19,53): info RAV1506: Result propagation converts errors from 'JsonError' to 'AppError' via implicit conversion 'static func implicit(error: JsonError) -> AppError'.\n/Users/robert/.neoclr/experiments/preview-20261012-2/samples/http-json-server/HttpServer.rvn(82,9): warning RAV0162: Unreachable code\n/Users/robert/.neoclr/experiments/preview-20261012-2/samples/http-json-server/HttpServer.rvn(87,9): warning RAV0162: Unreachable code\n"
+}

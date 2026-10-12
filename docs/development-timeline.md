@@ -25,6 +25,26 @@ available original wording; other text is a summary.
 
 See the [changelog](../CHANGELOG.md) and linked design documents for technical status.
 
+## 2026-10-12 — Default-JIT HTTP preview installed
+
+**Author:** asks to continue fixing the native async object-size limit, rerun HTTP
+checks, then install the SDK and VS Code extension after they pass, committing each
+slice.
+
+**Assistant actions:** separates the native heap-object allocation bound from inline
+value layout instead of expanding both together. Heap objects admit 256 payload
+lanes; inline values remain at 128. Native allocation boundaries, canaries and GC
+tracing/reclamation pass. The rebuilt extracted default-JIT bundle then passes HTTP
+JSON checks. Before handoff, the assistant adds missing HTTP task inputs and fixes
+reflection preparation that prevented repeated sample runs.
+
+**Outcome:** the final extracted bundle passes, followed by two consecutive installed
+HTTP client/server runs. SDK/VSIX 0.1.13-neoclr.20261012.2 is installed side by side on
+macOS ARM64 in a dedicated VS Code setup. Installed hashes, extension version and
+language-server completion probes pass. [Launch instructions and evidence](local-preview-20261012.md)
+record the exact scope; interactive editor activation, fresh Windows qualification
+and publication are not claimed. Field-liveness optimization remains separate work.
+
 ## 2026-10-12 — Current-state website and progressive guides
 
 **Author:** requests PostgreSQL examples on the SQL page and a website review: the

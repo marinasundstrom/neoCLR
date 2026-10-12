@@ -5,6 +5,15 @@ This page owns shared integration/delivery status. The [HTTP tracker](../http-ca
 owns whether its packaged sample passes and whether the POC is complete; do not
 maintain a second HTTP completion checklist here.
 
+## Installed default-JIT preview — 2026-10-12
+
+The [local installation](../local-preview-20261012.md) closes the HTTP async object-size
+blocker below by separating heap-object capacity from inline-value layout. The final
+extracted bundle passes default-JIT collections, Tasks, JSON and HTTP; installed
+client/server runners pass twice consecutively. SDK/VSIX 0.1.13-neoclr.20261012.2 is
+installed side by side for macOS ARM64 author testing. This is not publication or
+fresh Windows qualification. The earlier failed attempts below remain evidence.
+
 ## Next local preview acceptance — 2026-10-12
 
 The forward async-return declaration issue is fixed on Raven main 0ccb9a265 and

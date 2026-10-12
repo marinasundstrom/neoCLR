@@ -1,5 +1,11 @@
 # neoCLR platform roadmap
 
+**Local default-JIT preview (2026-10-12):** the [author-testing installation](local-preview-20261012.md)
+now passes extracted HTTP JSON checks and repeated installed client/server runs.
+Heap-object layout is bounded independently from inline values; matching SDK/VSIX
+0.1.13-neoclr.20261012.2 is installed on macOS ARM64. Publication and fresh Windows
+qualification remain separate gates; this does not reorder the platform milestone.
+
 **Managed HTTPS composition (2026-10-12):** public development SslStream and
 explicit PEM authentication options now compose HttpClient and HttpServer over the
 shared provider. Nested JSON, lifetime checks and GC pass locally in interpreter,

@@ -1,0 +1,102 @@
+{
+  "execution": "default",
+  "inputs": {
+    "/private/var/folders/5x/5r0dfcnx30lf0cl8kp3sphch0000gn/T/neoCLR extracted preview qousro8e/neoCLR preview/bin/neoclr": "19d027f44503dde74731c813fb3f2fac5a43e47b7c9f6498b6d0dadf8085d825",
+    "/private/var/folders/5x/5r0dfcnx30lf0cl8kp3sphch0000gn/T/neoCLR extracted preview qousro8e/neoCLR preview/samples/http-json-server/bin/neoclr/App.dll": "be15f5aae6eb913eae08b781b215ffdf62c604b66b10005e6b1d079a9277fafa",
+    "/private/var/folders/5x/5r0dfcnx30lf0cl8kp3sphch0000gn/T/neoCLR extracted preview qousro8e/neoCLR preview/samples/http-json-client/bin/neoclr/App.dll": "e9dc3402bd6db2278889d375a93574984d61544061897dc4e8acf8f29caa0eb1",
+    "/private/var/folders/5x/5r0dfcnx30lf0cl8kp3sphch0000gn/T/neoCLR extracted preview qousro8e/neoCLR preview/lib/System.runtime.neox": "98a1ae1da85387c87746957e83a4015eb59d0566539a915c69f168d2b511b190",
+    "/private/var/folders/5x/5r0dfcnx30lf0cl8kp3sphch0000gn/T/neoCLR extracted preview qousro8e/neoCLR preview/lib/System.Runtime.dll": "4e85571b0eaa3e0868f0e6165b0ba9038f2fde89e03c83934f0ad264307276a3",
+    "/private/var/folders/5x/5r0dfcnx30lf0cl8kp3sphch0000gn/T/neoCLR extracted preview qousro8e/neoCLR preview/lib/System.Data.dll": "a563b65aa74faef25fa3dde618b67a45387d5db719d25dbe6ed6f2120f0314d4",
+    "/private/var/folders/5x/5r0dfcnx30lf0cl8kp3sphch0000gn/T/neoCLR extracted preview qousro8e/neoCLR preview/lib/System.Networking.dll": "6715aeb443494f9c5a4e1f4f61a807147468a87f1b0980ee51e533f3a076bebb",
+    "/private/var/folders/5x/5r0dfcnx30lf0cl8kp3sphch0000gn/T/neoCLR extracted preview qousro8e/neoCLR preview/lib/System.Web.dll": "01898aa2b6c028bf8a7af183f403995652459b560e4576f5490b452e346d8a8e",
+    "/private/var/folders/5x/5r0dfcnx30lf0cl8kp3sphch0000gn/T/neoCLR extracted preview qousro8e/neoCLR preview/lib/System.Data.PostgreSql.dll": "fa12626ce72cb597d44c30fb39970c19b2db6888c9ded996fdaea1a18f6fa3c2",
+    "/private/var/folders/5x/5r0dfcnx30lf0cl8kp3sphch0000gn/T/neoCLR extracted preview qousro8e/neoCLR preview/samples/http-json-server/bin/neoclr/App.reflection.json": "faa451155938d04a6eb3c432b0b5be5463351950d5e2db4ca88fa9bc2d3b2177",
+    "/private/var/folders/5x/5r0dfcnx30lf0cl8kp3sphch0000gn/T/neoCLR extracted preview qousro8e/neoCLR preview/samples/http-json-client/bin/neoclr/App.reflection.json": "dd4b72854e23ce7c56cc9f84ebb83d9fafe0ac0d624a8a3339c5e8d180e5aff3"
+  },
+  "runs": [
+    {
+      "serverCommand": [
+        "/private/var/folders/5x/5r0dfcnx30lf0cl8kp3sphch0000gn/T/neoCLR extracted preview qousro8e/neoCLR preview/bin/neoclr",
+        "run",
+        "/private/var/folders/5x/5r0dfcnx30lf0cl8kp3sphch0000gn/T/neoCLR extracted preview qousro8e/neoCLR preview/samples/http-json-server/bin/neoclr/App.dll",
+        "--reflection-roots",
+        "/private/var/folders/5x/5r0dfcnx30lf0cl8kp3sphch0000gn/T/neoCLR extracted preview qousro8e/neoCLR preview/samples/http-json-server/bin/neoclr/App.reflection.json",
+        "--",
+        "4"
+      ],
+      "requests": [
+        {
+          "method": "GET",
+          "path": "/report",
+          "status": 200,
+          "body": {
+            "station": "Caf\u00e9"
+          }
+        },
+        {
+          "method": "POST",
+          "path": "/reports",
+          "status": 201,
+          "body": {
+            "accepted": true
+          }
+        },
+        {
+          "method": "POST",
+          "path": "/reports",
+          "status": 400,
+          "body": {
+            "error": "Invalid report"
+          }
+        },
+        {
+          "method": "GET",
+          "path": "/missing",
+          "status": 404,
+          "body": {
+            "error": "Not found"
+          }
+        }
+      ],
+      "port": "56654",
+      "server": {
+        "exitCode": 0,
+        "stdout": "Reports served\n",
+        "stderr": ""
+      }
+    },
+    {
+      "serverCommand": [
+        "/private/var/folders/5x/5r0dfcnx30lf0cl8kp3sphch0000gn/T/neoCLR extracted preview qousro8e/neoCLR preview/bin/neoclr",
+        "run",
+        "/private/var/folders/5x/5r0dfcnx30lf0cl8kp3sphch0000gn/T/neoCLR extracted preview qousro8e/neoCLR preview/samples/http-json-server/bin/neoclr/App.dll",
+        "--reflection-roots",
+        "/private/var/folders/5x/5r0dfcnx30lf0cl8kp3sphch0000gn/T/neoCLR extracted preview qousro8e/neoCLR preview/samples/http-json-server/bin/neoclr/App.reflection.json",
+        "--",
+        "2"
+      ],
+      "requests": [],
+      "port": "56663",
+      "clientCommand": [
+        "/private/var/folders/5x/5r0dfcnx30lf0cl8kp3sphch0000gn/T/neoCLR extracted preview qousro8e/neoCLR preview/bin/neoclr",
+        "run",
+        "/private/var/folders/5x/5r0dfcnx30lf0cl8kp3sphch0000gn/T/neoCLR extracted preview qousro8e/neoCLR preview/samples/http-json-client/bin/neoclr/App.dll",
+        "--reflection-roots",
+        "/private/var/folders/5x/5r0dfcnx30lf0cl8kp3sphch0000gn/T/neoCLR extracted preview qousro8e/neoCLR preview/samples/http-json-client/bin/neoclr/App.reflection.json",
+        "--",
+        "http://127.0.0.1:56663/"
+      ],
+      "client": {
+        "exitCode": 0,
+        "stdout": "{\"accepted\":true}\n",
+        "stderr": ""
+      },
+      "server": {
+        "exitCode": 0,
+        "stdout": "Reports served\n",
+        "stderr": ""
+      }
+    }
+  ],
+  "passed": true
+}

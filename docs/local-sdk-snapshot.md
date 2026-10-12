@@ -1,5 +1,7 @@
 # Local SDK snapshot — 27 September 2026
 
+Current author-testing setup: [12 October default-JIT preview](local-preview-20261012.md).
+
 For the newer Function types build, see [the 30 September local setup](local-function-types-build.md).
 The snapshot below remains the historical HTTP/JSON installation.
 

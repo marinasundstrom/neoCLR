@@ -1,0 +1,42 @@
+{
+  "installedAt": "2026-10-12T23:42:36.161676+02:00",
+  "root": "/Users/robert/.neoclr/experiments/preview-20261012-2",
+  "sdk": "/Users/robert/.raven/sdk/0.1.13-neoclr.20261012.2",
+  "version": "0.1.13-neoclr.20261012.2",
+  "archiveSha256": "0f327fdd36ec26b6d0ccaa1461f644d2c1b13d08b52564399b6cdade1d197892",
+  "manifestSha256": "01a7c9fd19b441e78a48b707294053420c553ba008e983a94795df66942d64f6",
+  "commands": [
+    {
+      "command": [
+        "/usr/local/bin/code",
+        "--user-data-dir",
+        "/Users/robert/.neoclr/experiments/preview-20261012-2/editor-state",
+        "--extensions-dir",
+        "/Users/robert/.neoclr/experiments/preview-20261012-2/editor-extensions",
+        "--install-extension",
+        "/Users/robert/.neoclr/experiments/preview-20261012-2/editor/raven-vscode.vsix",
+        "--force"
+      ],
+      "exitCode": 0,
+      "stdout": "Installing extensions...\nExtension 'raven-vscode.vsix' was successfully installed.\n",
+      "stderr": "(node:72674) [DEP0169] DeprecationWarning: `url.parse()` behavior is not standardized and prone to errors that have security implications. Use the WHATWG URL API instead. CVEs are not issued for `url.parse()` vulnerabilities.\n(Use `Code --trace-deprecation ...` to show where the warning was created)\n"
+    },
+    {
+      "command": [
+        "/usr/local/bin/code",
+        "--user-data-dir",
+        "/Users/robert/.neoclr/experiments/preview-20261012-2/editor-state",
+        "--extensions-dir",
+        "/Users/robert/.neoclr/experiments/preview-20261012-2/editor-extensions",
+        "--list-extensions",
+        "--show-versions"
+      ],
+      "exitCode": 0,
+      "stdout": "raven.raven-vscode@0.1.13-neoclr.20261012.2\n",
+      "stderr": ""
+    }
+  ],
+  "passed": true,
+  "initialArchiveSha256": "aeb21d6c9868058dba73eb79302642dcf06053cf49c8a7ea053ae52fa26e3ea2",
+  "runnerUpdateSource": "/Users/robert/Projects/neoclr/target/preview-install-repeatable"
+}

@@ -1,0 +1,17 @@
+{
+  "Task factory": [
+    "CompletedTask",
+    "FromResult<T>",
+    "Run",
+    "Run<T>"
+  ],
+  "Promise": [
+    "Cancel",
+    "Complete",
+    "Equals",
+    "GetHashCode",
+    "GetType",
+    "Task",
+    "ToString"
+  ]
+}

@@ -8,6 +8,13 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-12
 
+- Qualify and install the macOS ARM64 default-JIT preview: extracted collections,
+  Tasks, JSON and HTTP pass; two consecutive installed HTTP runner pairs pass.
+  Install SDK/VSIX 0.1.13-neoclr.20261012.2 side by side in a dedicated editor setup,
+  verify installed hashes and language-server Task/Promise completions, and document
+  launch instructions. This closes the HTTP object-size installation blocker;
+  publication and fresh Windows/AOT-HTTP qualification remain separate.
+
 - Make reflection-root preparation repeatable in installed sample tasks: disassemble
   into an owned temporary directory instead of recreating App.neoil beside the
   program. Repeated preparation leaves caller-owned listings untouched; all three

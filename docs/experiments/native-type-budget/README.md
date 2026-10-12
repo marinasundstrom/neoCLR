@@ -75,3 +75,14 @@ reference_`, the `limits::` binary tests and the `values` test
 `native-gc.c` and `root-probe.c` with Clang `-std=c11 -Wall -Wextra -Werror
 -fsanitize=undefined,bounds` and run the resulting program. Use the matching platform
 SDK/toolchain. Full extracted HTTP acceptance is recorded separately below.
+
+
+## Qualified HTTP and installed preview — 2026-10-12
+
+The rebuilt backend and native helper pass the [final extracted default-JIT gate](installed-preview/acceptance-default.json),
+including independent HTTP JSON requests and the managed client/server pair.
+The [installed preview](../../local-preview-20261012.md) also passes two consecutive
+HTTP runs through its sample runners after repairing repeatable reflection preparation.
+This closes the 204-lane object-size installation blocker; the earlier failing reports
+above remain historical evidence. SDK/VSIX 0.1.13-neoclr.20261012.2 is installed for
+local macOS ARM64 testing. No publication or fresh Windows qualification occurred.
