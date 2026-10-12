@@ -208,3 +208,11 @@ reached native host compilation and exposed MSVC's deprecated `getenv` diagnosti
 under warnings-as-errors. Windows credential loading now uses owned `_dupenv_s`
 snapshots, freed after configuration parsing, rather than disabling strict warnings.
 This build failure is not Windows TLS execution evidence.
+
+The parallel [ordinary HTTP regression](https://github.com/marinasundstrom/neoCLR/actions/runs/38239236215)
+passed requests but failed its byte-for-byte callback-fault comparison: native
+frames have readable names and extra entry frames; interpreter frames retain CLI
+bridge encodings. Both reported the same UserFault, exit status and empty response.
+The harness now compares those observable outcomes while retaining and checking
+stack-trace structure. Interpreter bridge-name rendering remains a diagnostics gap;
+this test correction does not fix or hide it in retained evidence.

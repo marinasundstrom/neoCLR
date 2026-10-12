@@ -74,6 +74,21 @@ def serve(command, request, fragmented, cwd, env=None):
             process.kill()
             process.communicate()
 
+def same_outcome(native, interpreted, fault=False):
+    if not fault:
+        return native == interpreted
+    # Execution engines have different entry frames and name rendering. Preserve
+    # full traces in evidence, but compare the fault identity and wire outcome.
+    normalized = []
+    for result in (native, interpreted):
+        lines = result['stderr'].splitlines()
+        if (len(lines) < 2 or lines[0] != 'UserFault: HTTP callback fault'
+                or any(not line.startswith('   at ') for line in lines[1:])):
+            return False
+        normalized.append(dict(result, stderr=lines[0]))
+    return normalized[0] == normalized[1]
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--output', type=Path, required=True)
@@ -156,7 +171,7 @@ def main():
                 report['cases'].append(row)
                 row['interpreter'] = serve(vm, request, fragmented, ROOT)
                 row['native'] = serve([executable], request, fragmented, isolated, env)
-                if row['native'] != row['interpreter']:
+                if not same_outcome(row['native'], row['interpreter'], fault):
                     raise ValueError(label + ': interpreter/native mismatch')
                 result = row['native']
                 if fault:

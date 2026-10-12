@@ -8,6 +8,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-12
 
+- Correct the native HTTP parity harness to compare callback fault identity,
+  exit/output and response bytes without requiring engine-specific stack frames
+  to match. Keep full traces and reject missing frames or extra diagnostics.
+  Windows evidence exposes a separate interpreter bridge-name rendering gap;
+  this harness fix does not claim that gap is resolved.
+
 - Add an opt-in HTTPS-only native hosting proof using pinned Rustls behind
   runtime-owned nonblocking sockets. Qualify Raven HttpServer in macOS ARM64 JIT/AOT
   with TLS 1.2/1.3, verified clients, rejected peers, handshake timeout/cancellation
