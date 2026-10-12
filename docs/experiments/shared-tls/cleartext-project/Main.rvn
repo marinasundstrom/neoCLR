@@ -1,0 +1,30 @@
+import System.*
+import System.Collections.*
+import System.Result.*
+import System.Concurrency.Tasks.*
+import System.Web.Http.*
+
+func Respond(request: HttpRequest) -> Task<Result<HttpResponse, HttpError>> {
+    let result: Result<HttpResponse, HttpError> = if request.IsSecure {
+        Error(HttpError.Handler("Cleartext request marked secure"))
+    } else {
+        Ok(HttpResponse(HttpStatusCode.OK, ArrayList<HttpHeader>(), HttpContent.FromText("plain").Bytes))
+    }
+    return Task.FromResult(result)
+}
+
+async func Main() -> Task<int> {
+    let Ok(server) = HttpServer.Listen("127.0.0.1", 0, 4) else { return 1 }
+    let Ok(port) = server.GetLocalPort() else { return 2 }
+    let serving = server.ServeOne(Respond)
+    use client = HttpClient()
+    let url = String.Concat(String.Concat("http://localhost:", port.ToString()), "/")
+    let response = await client.Get(url)
+    let completed = await serving
+    server.Close()
+    let Ok(received) = response else { return 3 }
+    if let Error(_) = completed { return 4 }
+    if received.Content.Bytes.Count != 5 || received.Content.Bytes[0] != (byte)112 { return 5 }
+    Console.WriteLine("Managed cleartext exchange passed")
+    return 0
+}

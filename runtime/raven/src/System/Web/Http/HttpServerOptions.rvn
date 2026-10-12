@@ -1,6 +1,7 @@
 module System.Web.Http
 
 import System.*
+import System.Networking.Security.*
 import System.Result.*
 import System.Time.*
 
@@ -8,6 +9,9 @@ import System.Time.*
 /// <remarks>Listen validates and snapshots these values before opening a socket. Later mutation has no effect on an existing server. These limits do not reserve host memory.</remarks>
 public class HttpServerOptions {
     init() { }
+
+    /// Optional HTTPS credentials. Snapshot by reference; caller keeps options alive until the server closes.
+    var SslOptions: SslServerAuthenticationOptions? { get; set; } = null
 
     /// <summary>Maximum decoded request body bytes, from zero through 1,048,576. Defaults to 1,048,576.</summary>
     var MaxRequestBodySize: int { get; set; } = 1048576

@@ -521,3 +521,18 @@ harness; execution remains pending. See
 Next: bind buffer pumping to managed ownership in interpreter/JIT/AOT, then expose
 Raven certificate and SslStream APIs. Existing HTTPS hosts still use the callback
 adapter; these provider tests do not qualify managed HTTPS composition.
+
+## Managed stream composition (development, 2026-10-12)
+
+The private bindings now support public Raven SslStream and explicit PEM authentication
+options. HttpClient and HttpServer share this stream adapter; native provider ownership
+continues through checked runtime resources and GC cleanup. The API follows .NET's
+stream composition, borrowed option objects and leave-open ownership concepts, while
+using Task<Result<...>> and async-first names. Simultaneous stream operations currently
+return WrongAccess: this is an implementation gap, not a replacement duplex contract.
+
+[The API reference](../api-docs/ssl-streams.md) documents authentication, cancellation,
+shutdown, trust and ownership. [Qualification](experiments/shared-tls/streams-validation.json)
+covers nested JSON and GC in all three local modes. Windows managed qualification and
+HTTP handshake failure/deadline recovery remain follow-through. Earlier sections are
+chronological checkpoints; their "remaining" lists describe those earlier slices.

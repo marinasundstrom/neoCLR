@@ -1,0 +1,12 @@
+module System.Networking.Security
+
+/// Expected TLS configuration or authentication failures. Provider details are provisional.
+public union SslError {
+    case InvalidCertificate
+    case InvalidPrivateKey
+    case KeyMismatch
+    case InvalidTrust
+    case Closed
+    case AuthenticationFailed
+    case InvalidConfiguration
+}

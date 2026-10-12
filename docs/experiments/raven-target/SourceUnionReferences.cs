@@ -10,6 +10,7 @@ static class SourceUnionReferences
         "System.Storage.StorageLookupError",
         "System.Text.EncodingError",
         "System.Security.Cryptography.CryptographyError",
+        "System.Networking.Security.SslError",
         "System.Text.EncoderState",
         "System.IO.TextReadError",
         "System.IO.StreamError",

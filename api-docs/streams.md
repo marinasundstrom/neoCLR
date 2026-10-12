@@ -108,3 +108,5 @@ synchronous CLI execution bridge supports these new signatures.
 and requires awaited Finish before Close. The initial decoder reads to EOF with
 64 KiB compressed/decoded limits and validates gzip before exposing bytes. InvalidData
 is preserved through StreamReader as TextReadError.InvalidData.
+
+[Development SslStream](ssl-streams.md) supplies authenticated encrypted input/output over these stream capabilities.

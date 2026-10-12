@@ -8,6 +8,7 @@ import System.Concurrency.Tasks.*
 import System.Concurrency.*
 import System.Text.*
 import System.Networking.*
+import System.Networking.Security.*
 import System.Networking.Sockets.*
 import System.Runtime.CompilerServices.*
 
@@ -22,9 +23,11 @@ internal class HttpRequestDecoder {
     private var body: ArrayList<byte> = ArrayList<byte>()
 
     private val settings: HttpServerSettings
+    private val secure: bool
 
-    internal init(settings: HttpServerSettings) {
+    internal init(settings: HttpServerSettings, secure: bool) {
         self.settings = settings
+        self.secure = secure
     }
     internal val Complete: bool => complete && !failed
 
@@ -163,7 +166,7 @@ internal class HttpRequestDecoder {
                     chunks = HttpChunkDecoder(body, method == "GET" || method == "DELETE" || method == "HEAD", settings.BodyBytes)
                 }
                 expected = length
-                return HttpRequest.FromIncoming(method, target, host, headers, body)
+                return HttpRequest.FromIncoming(method, target, host, headers, body, secure)
             } else {
                 if headers.Count >= settings.HeaderCount {
                     return Error(HttpError.LimitExceeded("Request header count exceeded"))
@@ -241,6 +244,7 @@ internal class HttpRequestDecoder {
 }
 
 public class HttpServer {
+    internal val SslOptions: SslServerAuthenticationOptions?
     private val settings: HttpServerSettings
     internal val Settings: HttpServerSettings => settings
     private var listener: Socket
@@ -254,7 +258,8 @@ public class HttpServer {
         active -= 1
     }
 
-    internal init(listener: Socket, settings: HttpServerSettings) {
+    internal init(listener: Socket, settings: HttpServerSettings, sslOptions: SslServerAuthenticationOptions?) {
+        SslOptions = sslOptions
         self.listener = listener
         self.settings = settings
     }
@@ -269,7 +274,7 @@ public class HttpServer {
         let settings = HttpServerSettings.Create(options)?
         let result = Socket.Listen(address, port, backlog)
         if let Ok(listener) = result {
-            return Ok(HttpServer(listener, settings))
+            return Ok(HttpServer(listener, settings, options.SslOptions))
         }
         if let Error(reason) = result {
             return Error(HttpError.Transport(reason))
@@ -433,21 +438,21 @@ public class HttpServer {
 // A context owns one exchange, not a reusable physical connection contract.
 public class HttpContext : Disposable {
     private var owner: HttpServer
-    private var connection: Socket
+    private var connection: HttpConnection
     private var request: HttpRequest
     private var response: HttpResponse = HttpResponse(HttpStatusCode.OK, ArrayList<HttpHeader>(), ArrayList<byte>())
     private var closed: bool = false
     private var started: bool = false
     private var shutdownRegistration: CancellationRegistration? = null
     private var source: Promise<Result<System.Void, HttpError>> = Promise<Result<System.Void, HttpError>>()
-    private var transfer: Option<Task<Result<int, SocketError>>> = None()
+    private var transfer: Option<Task<Result<int, HttpError>>> = None()
     private var buffer: byte[] = CheckedStorage.Reserve<byte>(256)
     private var outgoing: Sequence<byte> = ArrayList<byte>()
     private var sent: int = 0
     private var token: CancellationToken = CancellationToken.None
     private var deadline = NetworkDeadline.Expired
 
-    internal init(owner: HttpServer, connection: Socket, request: HttpRequest) {
+    internal init(owner: HttpServer, connection: HttpConnection, request: HttpRequest) {
         self.owner = owner
         self.connection = connection
         self.request = request
@@ -553,7 +558,9 @@ public class HttpContext : Disposable {
             return
         }
         if sent == outgoing.Count {
-            Finish(Ok(()))
+            let shutdownTask = connection.Shutdown(token)
+            finishing = shutdownTask
+            shutdownTask.OnCompleted(self.OnShutdown)
             return
         }
         var count = 0
@@ -564,6 +571,15 @@ public class HttpContext : Disposable {
         let pending = connection.SendUntil(buffer, 0, count, deadline, token)
         transfer = Some(pending)
         pending.OnCompleted(self.OnSent)
+    }
+
+    private var finishing: Task<Result<unit, HttpError>>? = null
+    private func OnShutdown() {
+        if finishing is Task<Result<unit, HttpError>> pending {
+            finishing = null
+            if pending.IsCancelled { Close(); _ = source.Cancel(); return }
+            Finish(pending.GetResult())
+        }
     }
 
     private func OnSent() {
@@ -587,7 +603,7 @@ public class HttpContext : Disposable {
                 sent += count
                 SendNext()
             } else if let Error(reason) = pending.GetResult() {
-                Finish(Error(HttpError.Transport(reason)))
+                Finish(Error(reason))
             }
         }
     }
@@ -600,15 +616,15 @@ internal class HttpServerExchange {
     private var callerRegistration: CancellationRegistration? = null
     private var shutdownRegistration: CancellationRegistration? = null
     private var source: Promise<Result<HttpContext, HttpError>> = Promise<Result<HttpContext, HttpError>>()
-    private var socket: Option<Socket> = None()
+    private var socket: Option<HttpConnection> = None()
     private var accepting: Option<Task<Result<Socket, SocketError>>> = None()
-    private var transfer: Option<Task<Result<int, SocketError>>> = None()
+    private var transfer: Option<Task<Result<int, HttpError>>> = None()
     private val decoder: HttpRequestDecoder
     private var buffer: byte[] = CheckedStorage.Reserve<byte>(256)
     private var deadline = NetworkDeadline.Expired
 
     internal init(owner: HttpServer, listener: Socket, token: CancellationToken) {
-        decoder = HttpRequestDecoder(owner.Settings)
+        decoder = HttpRequestDecoder(owner.Settings, owner.SslOptions is SslServerAuthenticationOptions)
         self.owner = owner
         self.listener = listener
         callerRegistration = token.Register(self.RequestCancellation)
@@ -665,12 +681,28 @@ internal class HttpServerExchange {
                 return
             }
             if let Ok(connection) = pending.GetResult() {
-                socket = Some(connection)
+                let transport = HttpConnection(connection)
+                socket = Some(transport)
                 deadline = NetworkDeadline.AfterMilliseconds(owner.Settings.ReadMilliseconds)
-                ReceiveNext()
+                if owner.SslOptions is SslServerAuthenticationOptions options {
+                    let handshake = transport.AuthenticateServer(options, deadline, cancellation.Token)
+                    authentication = handshake
+                    handshake.OnCompleted(self.OnAuthenticated)
+                } else { ReceiveNext() }
             } else if let Error(reason) = pending.GetResult() {
                 Fail(HttpError.Transport(reason))
             }
+        }
+    }
+
+    private var authentication: Task<Result<unit, HttpError>>? = null
+    // Outcome adapter transfers cancellation to the HTTP exchange before cleanup.
+    private func OnAuthenticated() {
+        if authentication is Task<Result<unit, HttpError>> pending {
+            authentication = null
+            if pending.IsCancelled { Fail(HttpError.InvalidRequest("TLS cancelled")); return }
+            if let Error(error) = pending.GetResult() { Fail(error); return }
+            ReceiveNext()
         }
     }
 
@@ -725,7 +757,7 @@ internal class HttpServerExchange {
                     ReceiveNext()
                 }
             } else if let Error(reason) = pending.GetResult() {
-                Fail(HttpError.Transport(reason))
+                Fail(reason)
             }
         }
     }

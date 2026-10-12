@@ -16096,3 +16096,17 @@ or runtime-await default switch was performed.
   distinguish both directions and callback rooting. An explicit owning registration
   could reduce accidental collection but still requires a native unregistration
   protocol; its exact API and backend feasibility remain open.
+
+## 2026-10-12 — Managed SSL composition and HTTP follow-through
+
+The author directed completion of SslStream with HttpClient/HttpServer integration,
+asked whether trimming could help compiler limits, and selected the safest route.
+The assistant used measured bounded admission and matching native layout/root-hook
+fixes, preserving existing memory budgets instead of adding unqualified trimming.
+
+Local interpreter, default JIT and AOT now pass the HTTPS nested-JSON consumer with
+GC and lifetime checks; a cleartext HTTP regression passes too. See the
+[recorded evidence](experiments/shared-tls/streams-validation.json). Windows managed
+qualification remains pending. The author then directed: “After this slice, continue
+with the Http case”. The assistant proposed HTTP handshake rejection, timeout,
+cancellation and recovery as the next bounded checks; these are not yet outcomes.

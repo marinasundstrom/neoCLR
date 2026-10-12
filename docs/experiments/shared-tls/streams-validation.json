@@ -1,0 +1,54 @@
+{
+  "date": "2026-10-12",
+  "passed": true,
+  "platform": "macOS-27.0-arm64-arm-64bit",
+  "compilerRevision": "6fe7d630a25d0e27f3e9e89b1403987caf30d9d6",
+  "nativePrerequisiteCommits": [
+    "d7729e3fc",
+    "4cc761172",
+    "c3f2cedf8"
+  ],
+  "bundle": "target/ssl-bundle-v5/bundle",
+  "rawReport": "target/ssl-stream-validation-v5/validation.json",
+  "modes": [
+    "interpreter",
+    "default-jit",
+    "aot"
+  ],
+  "results": [
+    {
+      "exitCode": 0,
+      "stdout": "Managed HTTPS JSON exchange passed\n"
+    },
+    {
+      "exitCode": 0,
+      "stdout": "Managed HTTPS JSON exchange passed\n"
+    },
+    {
+      "exitCode": 0,
+      "stdout": "Managed HTTPS JSON exchange passed\n"
+    }
+  ],
+  "cleartext": {
+    "mode": "interpreter",
+    "exitCode": 0,
+    "stdout": "Managed cleartext exchange passed\n"
+  },
+  "scope": [
+    "HTTPS nested JSON including UTF-8, arrays and null",
+    "incoming and copied HttpRequest.IsSecure",
+    "direct SslStream borrowed/owned stream lifetime and closed-state errors",
+    "GC during handler and after stream lifetime checks"
+  ],
+  "interpreterBudgets": {
+    "instructions": 100000000,
+    "arrayElements": 1048576,
+    "arrayBytes": 67108864
+  },
+  "limitations": [
+    "Windows managed execution not performed",
+    "Not a performance benchmark",
+    "Libraries were built before subsequent whitespace-only source formatting",
+    "HTTP negative handshake/deadline/recovery qualification follows separately"
+  ]
+}

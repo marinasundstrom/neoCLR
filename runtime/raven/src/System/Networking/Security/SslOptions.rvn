@@ -1,0 +1,114 @@
+module System.Networking.Security
+
+import System.*
+import System.Collections.*
+import System.Result.*
+import System.Text.*
+import System.Runtime.CompilerServices.*
+
+/// Immutable explicit PEM trust configuration. No operating-system trust store is consulted.
+/// Dispose releases configuration ownership; sessions already created retain it.
+public class SslClientAuthenticationOptions : Disposable {
+    private val owner: byte[] = []
+    private var closed = false
+    private init() { }
+
+    /// Validates a PEM certificate bundle as explicit trust anchors. Input is not retained.
+    static func Create(trustPem: byte[]) -> Result<SslClientAuthenticationOptions, SslError> {
+        let options = SslClientAuthenticationOptions()
+        let status = neoCLR.Runtime.TlsCreateClient(options.owner, trustPem, [])
+        if status != 0 {
+            return Error(SslBuffers.Error(status))
+        }
+        return Ok(options)
+    }
+
+    internal func CreateSession(session: byte[], host: string) -> int {
+        if closed {
+            return -18
+        }
+        return neoCLR.Runtime.TlsCreateSession(session, owner, SslBuffers.Encode(host))
+    }
+
+    /// Idempotent release. Subsequent authentication using these options fails.
+    func Dispose() {
+        if !closed {
+            closed = true
+            _ = neoCLR.Runtime.TlsRelease(owner)
+        }
+    }
+}
+
+/// Owned PEM certificate chain/private key configuration. Sessions retain their credentials.
+/// The provider selects TLS 1.2/1.3; client certificates and protocol selection are not yet exposed.
+public class SslServerAuthenticationOptions : Disposable {
+    private val owner: byte[] = []
+    private var closed = false
+    private init() { }
+
+    /// Validates the PEM chain and matching unencrypted private key without retaining input arrays.
+    static func Create(certificatePem: byte[], privateKeyPem: byte[]) -> Result<SslServerAuthenticationOptions, SslError> {
+        let options = SslServerAuthenticationOptions()
+        let status = neoCLR.Runtime.TlsCreateServer(options.owner, certificatePem, privateKeyPem, [])
+        if status != 0 {
+            return Error(SslBuffers.Error(status))
+        }
+        return Ok(options)
+    }
+
+    internal func CreateSession(session: byte[]) -> int {
+        if closed {
+            return -18
+        }
+        return neoCLR.Runtime.TlsCreateSession(session, owner, [])
+    }
+
+    /// Idempotent release. Existing sessions remain usable.
+    func Dispose() {
+        if !closed {
+            closed = true
+            _ = neoCLR.Runtime.TlsRelease(owner)
+        }
+    }
+}
+
+internal static class SslBuffers {
+    internal static func Allocate(count: int) -> byte[] {
+        let bytes = CheckedStorage.Reserve<byte>(count)
+        var index = 0
+        while index < count {
+            bytes[index] = (byte)0
+            index += 1
+        }
+        return bytes
+    }
+    internal static func Encode(text: string) -> byte[] {
+        let Ok(encoded) = Encodings.Utf8.Encode(text) else { System.Fail("Invalid TLS host text") }
+        let bytes = Allocate(encoded.Count)
+        var index = 0
+        for value in encoded {
+            bytes[index] = value
+            index += 1
+        }
+        return bytes
+    }
+    internal static func Error(status: int) -> SslError {
+        return match status {
+            -11 => SslError.InvalidCertificate
+            -12 => SslError.InvalidPrivateKey
+            -13 => SslError.KeyMismatch
+            -14 => SslError.InvalidTrust
+            -18 => SslError.Closed
+            _ => SslError.InvalidConfiguration
+        }
+    }
+    internal static func ReadCount(buffer: byte[], offset: int) -> int {
+        return (int)buffer[offset] + (int)buffer[offset + 1] * 256 + (int)buffer[offset + 2] * 65536
+    }
+    internal static func WriteCount(buffer: byte[], offset: int, count: int) {
+        buffer[offset] = (byte)(count % 256)
+        buffer[offset + 1] = (byte)((count / 256) % 256)
+        buffer[offset + 2] = (byte)(count / 65536)
+        buffer[offset + 3] = (byte)0
+    }
+}

@@ -5,6 +5,7 @@ import System.Option.*
 import System.Concurrency.Tasks.*
 import System.Concurrency.*
 import System.Networking.*
+import System.Networking.Security.*
 import System.Networking.Sockets.*
 import System.*
 import System.Collections.*
@@ -626,6 +627,9 @@ public class HttpRequest {
     val Method: HttpMethod => storedMethod
     private var storedHost: string
     val Host: string => storedHost
+    private var secure = false
+    /// Whether the request uses authenticated HTTPS transport.
+    val IsSecure: bool => secure
     private var storedPort: int
     val Port: int => storedPort
     private var storedTarget: string
@@ -639,8 +643,9 @@ public class HttpRequest {
         storedTarget = target
     }
 
-    internal static func FromIncoming(method: string, target: string, host: string, headers: Sequence<HttpHeader>, body: Sequence<byte>) -> Result<HttpRequest, HttpError> {
-        let url = String.Concat(String.Concat("http://", host), target)
+    internal static func FromIncoming(method: string, target: string, host: string, headers: Sequence<HttpHeader>, body: Sequence<byte>, secure: bool) -> Result<HttpRequest, HttpError> {
+        let scheme = if secure { "https://" } else { "http://" }
+        let url = String.Concat(String.Concat(scheme, host), target)
         let request = Get(url)?
         if request.Target != target {
             return Error(HttpError.InvalidRequest("Invalid Host authority"))
@@ -789,6 +794,7 @@ public class HttpRequest {
             return Error(HttpError.LimitExceeded("Request application header count exceeded"))
         }
         let request = HttpRequest(storedHost, storedPort, storedTarget)
+        request.secure = secure
         request.storedMethod = storedMethod
         request.storedContent = storedContent
         request.storedHeaders = headers
@@ -825,6 +831,7 @@ public class HttpRequest {
             return Error(HttpError.LimitExceeded("Request application header count exceeded"))
         }
         let request = HttpRequest(storedHost, storedPort, storedTarget)
+        request.secure = secure
         request.storedMethod = storedMethod
         request.storedContent = storedContent
         request.storedHeaders = headers
@@ -970,18 +977,20 @@ public class HttpRequest {
             return Error(HttpError.InvalidRequest("An absolute request URI is required"))
         }
         let url = uri.Text
-        if !url.StartsWithOrdinal("http://") {
-            return Error(HttpError.Unsupported("Only plain http:// URLs are supported"))
+        let secure = url.StartsWithOrdinal("https://")
+        if !secure && !url.StartsWithOrdinal("http://") {
+            return Error(HttpError.Unsupported("Only http:// and https:// URLs are supported"))
         }
+        let authorityStart = if secure { 8 } else { 7 }
         let bytes = HttpText.Encode(url)
         if bytes.Count > 1024 {
             return Error(HttpError.LimitExceeded("URL limit exceeded"))
         }
-        var end = 7
+        var end = authorityStart
         while end < bytes.Count && bytes[end] != 47 && bytes[end] != 63 && bytes[end] != 35 {
             end += 1
         }
-        var colon = 7
+        var colon = authorityStart
         while colon < end && bytes[colon] != 58 {
             let value = bytes[colon]
             if !((value >= 65 && value <= 90) || (value >= 97 && value <= 122) ||
@@ -990,11 +999,11 @@ public class HttpRequest {
             }
             colon += 1
         }
-        if colon == 7 || colon - 7 > 253 {
+        if colon == authorityStart || colon - authorityStart > 253 {
             return Error(HttpError.InvalidRequest("Invalid hostname length"))
         }
-        let host = Text(bytes, 7, colon)?
-        var port = 80
+        let host = Text(bytes, authorityStart, colon)?
+        var port = if secure { 443 } else { 80 }
         if colon < end {
             port = 0
             var index = colon + 1
@@ -1028,7 +1037,9 @@ public class HttpRequest {
                 target = String.Concat("/", target)
             }
         }
-        return Ok(HttpRequest(host, port, target))
+        let request = HttpRequest(host, port, target)
+        request.secure = secure
+        return Ok(request)
     }
 }
 
@@ -1554,10 +1565,14 @@ public class HttpClient : Disposable {
 }
 
 public class HttpSocketHandler : HttpHandler {
+    private val sslOptions: SslClientAuthenticationOptions? = null
     private val lifetime = CancellationTokenSource()
     private var disposed = false
 
     init() { }
+
+    /// Uses explicit TLS trust for HTTPS. The caller owns these immutable options.
+    init(sslOptions: SslClientAuthenticationOptions) { self.sslOptions = sslOptions }
 
     /// Requests cancellation of this handler's pending exchanges, once.
     override func Dispose() {
@@ -1584,7 +1599,7 @@ public class HttpSocketHandler : HttpHandler {
             return source.Task
         }
         let operation = HttpSendScope(request, cancellationToken, lifetime.Token)
-        let exchange = HttpExchange(request, operation.Token)
+        let exchange = HttpExchange(request, operation.Token, sslOptions)
         return operation.Attach(exchange.Execute())
     }
 }
@@ -1597,16 +1612,19 @@ internal class HttpExchange {
     private var token: CancellationToken
     private var request: HttpRequest
     private var source: Promise<Result<HttpResponse, HttpError>>
-    private var socket: Option<Socket>
+    private var socket: Option<HttpConnection>
     private var lookup: Option<Task<Result<Sequence<IPAddress>, DnsError>>>
     private var connecting: Option<Task<Result<Socket, SocketError>>>
-    private var transfer: Option<Task<Result<int, SocketError>>>
+    private var transfer: Option<Task<Result<int, HttpError>>>
     private var outgoing: Sequence<byte>
     private var sent: int
     private var buffer: byte[]
     private var decoder: HttpResponseDecoder
 
-    internal init(request: HttpRequest, token: CancellationToken) {
+    private val sslOptions: SslClientAuthenticationOptions?
+    private var authentication: Task<Result<unit, HttpError>>? = null
+    internal init(request: HttpRequest, token: CancellationToken, sslOptions: SslClientAuthenticationOptions?) {
+        self.sslOptions = sslOptions
         self.token = token
         self.request = request
         source = Promise<Result<HttpResponse, HttpError>>()
@@ -1621,6 +1639,10 @@ internal class HttpExchange {
     }
 
     internal func Execute() -> Task<Result<HttpResponse, HttpError>> {
+        if request.IsSecure && sslOptions is null {
+            _ = source.Complete(Error(HttpError.InvalidRequest("HTTPS requires explicit TLS trust options")))
+            return source.Task
+        }
         // Validate and snapshot before starting the network exchange budget.
         let encoded = request.Encode()
         if let Ok(bytes) = encoded {
@@ -1694,11 +1716,26 @@ internal class HttpExchange {
             let result = pending.GetResult()
             connecting = None()
             if let Ok(connection) = result {
-                socket = Some(connection)
-                SendNext()
+                let transport = HttpConnection(connection)
+                socket = Some(transport)
+                if request.IsSecure && sslOptions is SslClientAuthenticationOptions options {
+                    let pending = transport.AuthenticateClient(options, request.Host, token)
+                    authentication = pending
+                    pending.OnCompleted(self.OnAuthenticated)
+                } else { SendNext() }
             } else if let Error(reason) = result {
                 Finish(Error(HttpError.Transport(reason)))
             }
+        }
+    }
+
+    // Outcome adapter preserves outer HTTP cancellation and cleanup ownership.
+    private func OnAuthenticated() {
+        if authentication is Task<Result<unit, HttpError>> pending {
+            authentication = null
+            if pending.IsCancelled { Cancel(); return }
+            if let Error(error) = pending.GetResult() { Finish(Error(error)); return }
+            SendNext()
         }
     }
 
@@ -1777,7 +1814,7 @@ internal class HttpExchange {
                     Finish(Error(HttpError.Protocol("Send made no progress")))
                 }
             } else if let Error(reason) = result {
-                Finish(Error(HttpError.Transport(reason)))
+                Finish(Error(reason))
             }
         }
     }
@@ -1818,7 +1855,7 @@ internal class HttpExchange {
                     ReceiveNext()
                 }
             } else if let Error(reason) = result {
-                Finish(Error(HttpError.Transport(reason)))
+                Finish(Error(reason))
             }
         }
     }

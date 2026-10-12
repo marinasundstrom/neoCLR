@@ -81,3 +81,5 @@ with nullable migration messages and compiler warning/error severity.
 
 [Sequence indexing and slicing](sequence-access.md) documents the development
 Index/Range extension and list contracts, copy semantics and safe alternatives.
+
+Development: [TLS stream APIs and HTTP integration](ssl-streams.md).

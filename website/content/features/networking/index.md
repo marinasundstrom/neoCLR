@@ -187,17 +187,22 @@ authenticated EOF and recovery. All 15 shared project AOT cases match across hos
 Windows also passes the twelve request scenarios in JIT. Unicode credential paths
 and ordinary cleartext-host isolation are covered.
 
-This remains source-only hosting support, without a public secure-stream or
-per-listener configuration API. Interpreter/client TLS, Windows ARM64 and packaged
-TLS remain open. Common async transport is the next API step toward an HTTP server
-and client exchanging JSON, with optional PostgreSQL/container integration later.
+This host adapter remains source-only. Development managed TLS now also exposes
+`System.Networking.Security.SslStream`, explicit PEM client trust/server credentials,
+and `HttpServerOptions.SslOptions`. `HttpSocketHandler(sslOptions)` enables HTTPS
+clients through the same managed stream API. The client/server showcase exchanges
+nested JSON, with GC during handling, in local macOS interpreter, JIT and AOT runs.
+See the [TLS API reference](/docs/ssl-streams/) for ownership, cancellation and bounds.
+Windows managed-stream execution, Windows ARM64 and packaged TLS remain open;
+the Windows host results above do not qualify this new managed composition.
+PostgreSQL/container integration remains later work.
 [Host setup, evidence and limits](https://github.com/marinasundstrom/neoCLR/blob/main/docs/experiments/https-server/README.md).
 
 
 The shared private security provider now also has client sessions with explicit trust
 and hostname verification, plus secure random, SHA-256 and HMAC-SHA-256 primitives.
 Local provider tests pass on macOS; the new Windows paths await CI qualification.
-These are foundations for managed SSL and cryptography APIs, not public APIs yet.
+Development managed SSL and SHA256/HMACSHA256/random APIs now use these services; broader certificate inspection and policy APIs remain open.
 [Provider contract and remaining work](https://github.com/marinasundstrom/neoCLR/blob/main/docs/shared-security-provider.md).
 
 ### Common async stream foundation

@@ -47,7 +47,7 @@ An async entry point awaits the operation and handles its Result:
 | Upload content | Buffered bytes/text or a known-length InputStream source with explicit ownership |
 
 Import `System.Web.Http.Json.*` for JSON helpers. These are bounded experimental
-HTTP/1.1 APIs: no HTTPS, connection pooling or HTTP/2/3 yet. See the limits below.
+HTTP/1.1 APIs. Development HTTPS uses explicit trust/credentials and managed SslStream; connection pooling and HTTP/2/3 remain unsupported. See the [TLS reference](/docs/ssl-streams/) and limits below.
 
 [Download the general client example and verifier](/samples/http-client.zip).
 `Overview.rvn` contains the full program. With a matching runtime bundle and SDK,

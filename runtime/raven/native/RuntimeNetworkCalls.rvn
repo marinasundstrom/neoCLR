@@ -64,3 +64,22 @@ internal extern func SocketSendUntil(socket: long, buffer: byte[], offset: int, 
 
 [MethodImpl(MethodImplOptions.InternalCall)]
 internal extern func SocketCancel(operation: long) -> bool;
+
+// Private TLS ownership and bounded buffer pumping.
+[MethodImpl(MethodImplOptions.InternalCall)]
+internal extern func TlsCreateClient(owner: byte[], roots: byte[], alpn: byte[]) -> int;
+
+[MethodImpl(MethodImplOptions.InternalCall)]
+internal extern func TlsCreateServer(owner: byte[], cert: byte[], key: byte[], alpn: byte[]) -> int;
+
+[MethodImpl(MethodImplOptions.InternalCall)]
+internal extern func TlsCreateSession(owner: byte[], config: byte[], name: byte[]) -> int;
+
+[MethodImpl(MethodImplOptions.InternalCall)]
+internal extern func TlsRelease(owner: byte[]) -> int;
+
+[MethodImpl(MethodImplOptions.InternalCall)]
+internal extern func TlsAbort(owner: byte[]) -> int;
+
+[MethodImpl(MethodImplOptions.InternalCall)]
+internal extern func TlsPump(owner: byte[], input: byte[], output: byte[], plaintext: byte[], control: byte[]) -> int;

@@ -1,0 +1,135 @@
+module System.Web.Http
+
+import System.*
+import System.IO.*
+import System.Result.*
+import System.Option.*
+import System.Concurrency.*
+import System.Concurrency.Tasks.*
+import System.Networking.*
+import System.Networking.Sockets.*
+import System.Networking.Security.*
+
+// HTTP keeps its deadline across every underlying TLS read/write, including handshake.
+internal class HttpSocketStream : InputStream, OutputStream {
+    private val socket: Socket
+    internal var Deadline: Option<NetworkDeadline> = None()
+    internal var LastError: Option<SocketError> = None()
+    internal init(socket: Socket) { self.socket = socket }
+    func Read(buffer: byte[], offset: int, count: int) -> Task<Result<int, StreamError>> {
+        return Read(buffer, offset, count, CancellationToken.None)
+    }
+    async func Read(buffer: byte[], offset: int, count: int, cancellationToken: CancellationToken) -> Task<Result<int, StreamError>> {
+        let pending = if let Some(deadline) = Deadline {
+            socket.ReceiveUntil(buffer, offset, count, deadline, cancellationToken)
+        } else { socket.Receive(buffer, offset, count, cancellationToken) }
+        if let Ok(read) = await pending {
+            return Ok(read)
+        }
+        if let Error(error) = pending.GetResult() { LastError = Some(error) }
+        return Error(StreamError.IoFailure)
+    }
+    func Write(buffer: byte[], offset: int, count: int) -> Task<Result<unit, StreamError>> {
+        return Write(buffer, offset, count, CancellationToken.None)
+    }
+    async func Write(buffer: byte[], offset: int, count: int, cancellationToken: CancellationToken) -> Task<Result<unit, StreamError>> {
+        var sent = 0
+        while sent < count {
+            let pending = if let Some(deadline) = Deadline {
+                socket.SendUntil(buffer, offset + sent, count - sent, deadline, cancellationToken)
+            } else { socket.Send(buffer, offset + sent, count - sent, cancellationToken) }
+            let result = await pending
+            if let Error(error) = result {
+                LastError = Some(error)
+                return Error(StreamError.IoFailure)
+            }
+            let Ok(written) = result else { System.Fail("Missing socket write outcome") }
+            if written <= 0 || written > count - sent {
+                return Error(StreamError.IoFailure)
+            }
+            sent += written
+        }
+        return Ok(())
+    }
+    func Flush() -> Task<Result<unit, StreamError>> { return Flush(CancellationToken.None) }
+    func Flush(cancellationToken: CancellationToken) -> Task<Result<unit, StreamError>> {
+        let source = Promise<Result<unit, StreamError>>()
+        if cancellationToken.IsCancellationRequested { _ = source.Cancel() }
+        else { _ = source.Complete(Ok(())) }
+        return source.Task
+    }
+    func Close() { socket.Close() }
+}
+
+internal class HttpConnection {
+    private val transport: HttpSocketStream
+    private var ssl: SslStream? = null
+    internal init(socket: Socket) { transport = HttpSocketStream(socket) }
+    internal async func AuthenticateClient(options: SslClientAuthenticationOptions, host: string, token: CancellationToken) -> Task<Result<unit, HttpError>> {
+        let stream = SslStream(transport, transport)
+        ssl = stream
+        if let Error(error) = await stream.AuthenticateAsClient(options, host, token) {
+            return Error(HttpError.Tls(error))
+        }
+        return Ok(())
+    }
+    internal async func AuthenticateServer(options: SslServerAuthenticationOptions, deadline: NetworkDeadline, token: CancellationToken) -> Task<Result<unit, HttpError>> {
+        transport.Deadline = Some(deadline)
+        let stream = SslStream(transport, transport)
+        ssl = stream
+        if let Error(error) = await stream.AuthenticateAsServer(options, token) {
+            if deadline.IsExpired {
+                return Error(HttpError.TimedOut)
+            }
+            return Error(HttpError.Tls(error))
+        }
+        return Ok(())
+    }
+    private func Failure(error: StreamError) -> HttpError {
+        if let Some(deadline) = transport.Deadline {
+            if deadline.IsExpired {
+                return HttpError.TimedOut
+            }
+        }
+        if let Some(reason) = transport.LastError {
+            return HttpError.Transport(reason)
+        }
+        return HttpError.SecureTransport(error)
+    }
+    internal func ReceiveUntil(buffer: byte[], offset: int, count: int, deadline: NetworkDeadline, token: CancellationToken) -> Task<Result<int, HttpError>> {
+        transport.Deadline = Some(deadline)
+        return Receive(buffer, offset, count, token)
+    }
+    internal async func Receive(buffer: byte[], offset: int, count: int, token: CancellationToken) -> Task<Result<int, HttpError>> {
+        let input: InputStream = if ssl is SslStream secure { secure } else { transport }
+        let result = await input.Read(buffer, offset, count, token)
+        if let Ok(read) = result {
+            return Ok(read)
+        }
+        let Error(error) = result else { System.Fail("Missing stream read outcome") }
+        return Error(Failure(error))
+    }
+    internal func SendUntil(buffer: byte[], offset: int, count: int, deadline: NetworkDeadline, token: CancellationToken) -> Task<Result<int, HttpError>> {
+        transport.Deadline = Some(deadline)
+        return Send(buffer, offset, count, token)
+    }
+    internal async func Send(buffer: byte[], offset: int, count: int, token: CancellationToken) -> Task<Result<int, HttpError>> {
+        let output: OutputStream = if ssl is SslStream secure { secure } else { transport }
+        if let Error(error) = await output.Write(buffer, offset, count, token) {
+            return Error(Failure(error))
+        }
+        return Ok(count)
+    }
+    internal async func Shutdown(token: CancellationToken) -> Task<Result<unit, HttpError>> {
+        if ssl is SslStream secure {
+            if let Error(error) = await secure.Shutdown(token) {
+                return Error(Failure(error))
+            }
+        }
+        return Ok(())
+    }
+    internal func Close() {
+        if ssl is SslStream secure { secure.Close() }
+        transport.Close()
+    }
+}

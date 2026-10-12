@@ -1,0 +1,320 @@
+module System.Networking.Security
+
+import System.*
+import System.IO.*
+import System.Result.*
+import System.Concurrency.*
+import System.Concurrency.Tasks.*
+
+/// TLS over asynchronous byte streams, with explicit authentication and graceful shutdown.
+/// Sequential operations only; overlapping operations return WrongAccess. Close is abortive.
+/// Cancellation or transport failure after an operation starts poisons the TLS session.
+public class SslStream : InputStream, OutputStream, Disposable {
+    private val input: InputStream
+    private val output: OutputStream
+    private val leaveOpen: bool
+    private val owner: byte[] = []
+    private val lifetime = CancellationTokenSource()
+    internal val StopToken: CancellationToken => lifetime.Token
+    private val encryptedInput = SslBuffers.Allocate(16384)
+    private val encryptedOutput = SslBuffers.Allocate(16384)
+    private val control = SslBuffers.Allocate(16)
+    private var inputCount = 0
+    private var eof = false
+    private var authenticated = false
+    private var started = false
+    private var closed = false
+    private var failed = false
+    private var busy = false
+    private var writeClosed = false
+
+    /// Creates a wrapper owning both stream capabilities; repeated underlying Close must be safe.
+    init(input: InputStream, output: OutputStream) {
+        self.input = input
+        self.output = output
+        self.leaveOpen = false
+    }
+    /// Creates a wrapper, optionally preserving both underlying stream capabilities on Close.
+    init(input: InputStream, output: OutputStream, leaveOpen: bool) {
+        self.input = input
+        self.output = output
+        self.leaveOpen = leaveOpen
+    }
+    /// True after successful authentication, while this session remains usable.
+    val IsAuthenticated: bool => authenticated && !failed && !closed
+
+    /// Authenticates the server using explicit trust and the expected DNS name (also used for SNI).
+    func AuthenticateAsClient(options: SslClientAuthenticationOptions, targetHost: string) -> Task<Result<unit, SslError>> {
+        return AuthenticateAsClient(options, targetHost, CancellationToken.None)
+    }
+    /// Cancellation before entry preserves state; cancellation after starting aborts the session.
+    async func AuthenticateAsClient(options: SslClientAuthenticationOptions, targetHost: string, cancellationToken: CancellationToken) -> Task<Result<unit, SslError>> {
+        if cancellationToken.IsCancellationRequested {
+            return await CancelAuthentication()
+        }
+        if closed {
+            return Error(SslError.Closed)
+        }
+        if started || busy {
+            return Error(SslError.InvalidConfiguration)
+        }
+        let status = options.CreateSession(owner, targetHost)
+        if status != 0 {
+            return Error(SslBuffers.Error(status))
+        }
+        return await Authenticate(cancellationToken)
+    }
+    /// Authenticates as a server using an owned certificate chain and private key.
+    func AuthenticateAsServer(options: SslServerAuthenticationOptions) -> Task<Result<unit, SslError>> {
+        return AuthenticateAsServer(options, CancellationToken.None)
+    }
+    /// Cancellation after starting aborts the session; no client certificate is requested.
+    async func AuthenticateAsServer(options: SslServerAuthenticationOptions, cancellationToken: CancellationToken) -> Task<Result<unit, SslError>> {
+        if cancellationToken.IsCancellationRequested {
+            return await CancelAuthentication()
+        }
+        if closed {
+            return Error(SslError.Closed)
+        }
+        if started || busy {
+            return Error(SslError.InvalidConfiguration)
+        }
+        let status = options.CreateSession(owner)
+        if status != 0 {
+            return Error(SslBuffers.Error(status))
+        }
+        return await Authenticate(cancellationToken)
+    }
+    private static func CancelAuthentication() -> Task<Result<unit, SslError>> {
+        let promise = Promise<Result<unit, SslError>>()
+        _ = promise.Cancel()
+        return promise.Task
+    }
+    private async func Authenticate(token: CancellationToken) -> Task<Result<unit, SslError>> {
+        started = true
+        busy = true
+        use operation = SslOperation(self, token)
+        if let Error(error) = await Pump(1, [], operation.Token) {
+            return Error(SslError.AuthenticationFailed)
+        }
+        authenticated = true
+        operation.Complete()
+        return Ok(())
+    }
+    internal func EndOperation(success: bool) {
+        busy = false
+        if !success {
+            failed = true
+            _ = neoCLR.Runtime.TlsAbort(owner)
+        }
+    }
+    private async func Pump(kind: int, plaintext: byte[], token: CancellationToken) -> Task<Result<int, StreamError>> {
+        control[0] = (byte)kind
+        while true {
+            if closed {
+                return Error(StreamError.Closed)
+            }
+            control[1] = (byte)(if eof { 1 } else { 0 })
+            SslBuffers.WriteCount(control, 4, inputCount)
+            let status = neoCLR.Runtime.TlsPump(owner, encryptedInput, encryptedOutput, plaintext, control)
+            let consumed = SslBuffers.ReadCount(control, 8)
+            let produced = SslBuffers.ReadCount(control, 12)
+            inputCount -= consumed
+            var index = 0
+            while index < inputCount {
+                encryptedInput[index] = encryptedInput[index + consumed]
+                index += 1
+            }
+            if produced > 0 {
+                _ = (await output.Write(encryptedOutput, 0, produced, token))?
+            }
+            if closed {
+                return Error(StreamError.Closed)
+            }
+            if status >= 0 {
+                return Ok(status)
+            }
+            if status != -1 {
+                return Error(StreamError.InvalidData)
+            }
+            // Full output requires another pump before waiting for peer input.
+            if produced == encryptedOutput.Length {
+                continue
+            }
+            if inputCount == 0 {
+                if eof {
+                    return Error(StreamError.InvalidData)
+                }
+                let received = (await input.Read(encryptedInput, 0, encryptedInput.Length, token))?
+                inputCount = received
+                if !(inputCount >= 0) || inputCount > encryptedInput.Length {
+                    System.Fail("Invalid TLS input count")
+                }
+                eof = inputCount == 0
+            }
+        }
+    }
+    /// Reads with CancellationToken.None.
+    func Read(buffer: byte[], offset: int, count: int) -> Task<Result<int, StreamError>> {
+        return Read(buffer, offset, count, CancellationToken.None)
+    }
+    /// Reads authenticated plaintext. Zero count is a no-op; positive-count zero means close-notify.
+    async func Read(buffer: byte[], offset: int, count: int, cancellationToken: CancellationToken) -> Task<Result<int, StreamError>> {
+        if cancellationToken.IsCancellationRequested {
+            let promise = Promise<Result<int, StreamError>>()
+            _ = promise.Cancel()
+            return await promise.Task
+        }
+        if closed {
+            return Error(StreamError.Closed)
+        }
+        if !authenticated || failed || busy {
+            return Error(StreamError.WrongAccess)
+        }
+        if !(offset >= 0) || !(count >= 0) || offset > buffer.Length || count > buffer.Length - offset {
+            return Error(StreamError.InvalidRange)
+        }
+        if count == 0 {
+            return Ok(0)
+        }
+        busy = true
+        use operation = SslOperation(self, cancellationToken)
+        let plain = SslBuffers.Allocate(if count > 16384 { 16384 } else { count })
+        let read = (await Pump(2, plain, operation.Token))?
+        var index = 0
+        while index < read {
+            buffer[offset + index] = plain[index]
+            index += 1
+        }
+        operation.Complete()
+        return Ok(read)
+    }
+    /// Writes with CancellationToken.None.
+    func Write(buffer: byte[], offset: int, count: int) -> Task<Result<unit, StreamError>> {
+        return Write(buffer, offset, count, CancellationToken.None)
+    }
+    /// Encrypts and writes the complete range. Success does not imply peer receipt.
+    async func Write(buffer: byte[], offset: int, count: int, cancellationToken: CancellationToken) -> Task<Result<unit, StreamError>> {
+        if cancellationToken.IsCancellationRequested {
+            return await CancelWrite()
+        }
+        if closed {
+            return Error(StreamError.Closed)
+        }
+        if !authenticated || failed || busy || writeClosed {
+            return Error(StreamError.WrongAccess)
+        }
+        if !(offset >= 0) || !(count >= 0) || offset > buffer.Length || count > buffer.Length - offset {
+            return Error(StreamError.InvalidRange)
+        }
+        busy = true
+        use operation = SslOperation(self, cancellationToken)
+        var sent = 0
+        while sent < count {
+            let size = if count - sent > 16384 { 16384 } else { count - sent }
+            let plain = SslBuffers.Allocate(size)
+            var index = 0
+            while index < size {
+                plain[index] = buffer[offset + sent + index]
+                index += 1
+            }
+            let written = (await Pump(3, plain, operation.Token))?
+            if written <= 0 || written > size { System.Fail("Invalid TLS write count") }
+            sent += written
+        }
+        operation.Complete()
+        return Ok(())
+    }
+    private static func CancelWrite() -> Task<Result<unit, StreamError>> {
+        let promise = Promise<Result<unit, StreamError>>()
+        _ = promise.Cancel()
+        return promise.Task
+    }
+    /// Flushes the underlying output with CancellationToken.None.
+    func Flush() -> Task<Result<unit, StreamError>> { return Flush(CancellationToken.None) }
+    /// Flushes the underlying output; no TLS application data remains buffered after Write.
+    async func Flush(cancellationToken: CancellationToken) -> Task<Result<unit, StreamError>> {
+        if cancellationToken.IsCancellationRequested {
+            return await CancelWrite()
+        }
+        if closed {
+            return Error(StreamError.Closed)
+        }
+        if !authenticated || failed || busy {
+            return Error(StreamError.WrongAccess)
+        }
+        busy = true
+        use operation = SslOperation(self, cancellationToken)
+        _ = (await output.Flush(operation.Token))?
+        if closed {
+            return Error(StreamError.Closed)
+        }
+        operation.Complete()
+        return Ok(())
+    }
+    /// Sends close-notify without closing the input side or underlying transport.
+    func Shutdown() -> Task<Result<unit, StreamError>> { return Shutdown(CancellationToken.None) }
+    /// Gracefully closes local writes. Idempotent; cancellation after entry aborts the session.
+    async func Shutdown(cancellationToken: CancellationToken) -> Task<Result<unit, StreamError>> {
+        if cancellationToken.IsCancellationRequested {
+            return await CancelWrite()
+        }
+        if closed {
+            return Error(StreamError.Closed)
+        }
+        if !authenticated || failed || busy {
+            return Error(StreamError.WrongAccess)
+        }
+        if writeClosed {
+            return Ok(())
+        }
+        busy = true
+        use operation = SslOperation(self, cancellationToken)
+        _ = (await Pump(4, [], operation.Token))?
+        _ = (await output.Flush(operation.Token))?
+        if closed {
+            return Error(StreamError.Closed)
+        }
+        writeClosed = true
+        operation.Complete()
+        return Ok(())
+    }
+    /// Abortive, idempotent release; use Shutdown first when graceful closure is required.
+    func Close() {
+        if closed {
+            return
+        }
+        closed = true
+        lifetime.Cancel()
+        lifetime.Dispose()
+        _ = neoCLR.Runtime.TlsRelease(owner)
+        if !leaveOpen {
+            input.Close()
+            output.Close()
+        }
+    }
+    /// Equivalent to Close.
+    func Dispose() { Close() }
+}
+
+internal class SslOperation : Disposable {
+    private val stream: SslStream
+    private var completed = false
+    private val cancellation = CancellationTokenSource()
+    private val callerRegistration: CancellationRegistration
+    private val ownerRegistration: CancellationRegistration
+    internal val Token: CancellationToken => cancellation.Token
+    internal init(stream: SslStream, token: CancellationToken) {
+        self.stream = stream
+        callerRegistration = token.Register(self.Cancel)
+        ownerRegistration = stream.StopToken.Register(self.Cancel)
+    }
+    private func Cancel() { cancellation.Cancel() }
+    internal func Complete() { completed = true }
+    func Dispose() {
+        callerRegistration.Dispose()
+        ownerRegistration.Dispose()
+        cancellation.Dispose()
+        stream.EndOperation(completed)
+    }
+}

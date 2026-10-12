@@ -1,0 +1,99 @@
+import System.*
+import System.Collections.*
+import System.IO.*
+import System.Result.*
+import System.Time.*
+import System.Concurrency.*
+import System.Concurrency.Tasks.*
+import System.Networking.Security.*
+import System.Web.Http.*
+import System.Web.Http.Json.*
+import System.Data.Json.*
+
+async func Echo(request: HttpRequest) -> Task<Result<HttpResponse, HttpError>> {
+    if !request.IsSecure { return Error(HttpError.Handler("Expected HTTPS request")) }
+    let result = await request.Content.ReadJsonNode()
+    let Ok(node) = result else {
+        return Error(HttpError.Handler("Expected JSON request"))
+    }
+    System.Runtime.GC.Collect()
+    let Ok(content) = JsonContent.CreateNode(node) else {
+        return Error(HttpError.Handler("Cannot encode JSON"))
+    }
+    let response = HttpResponse(HttpStatusCode.OK, ArrayList<HttpHeader>(), ArrayList<byte>())
+    response.Respond(HttpStatusCode.OK, content)
+    return Ok(response)
+}
+
+async func CheckLifetime() -> Task<int> {
+    let borrowed = MemoryStream()
+    let wrapper = SslStream(borrowed, borrowed, true)
+    if wrapper.IsAuthenticated { return 31 }
+    if let Error(StreamError.WrongAccess) = await wrapper.Read([], 0, 0) {
+    } else {
+        return 32
+    }
+    wrapper.Close()
+    wrapper.Dispose()
+    if let Ok(_) = borrowed.GetLength() {
+    } else {
+        return 33
+    }
+    if let Error(StreamError.Closed) = await wrapper.Write([], 0, 0) {
+    } else {
+        return 34
+    }
+    borrowed.Close()
+    let owned = MemoryStream()
+    let owner = SslStream(owned, owned)
+    owner.Dispose()
+    if let Error(StreamError.Closed) = owned.GetLength() {
+    } else {
+        return 35
+    }
+    return 0
+}
+
+async func Main() -> Task<int> {
+    let lifetime = await CheckLifetime()
+    if lifetime != 0 { return lifetime }
+    System.Runtime.GC.Collect()
+    let Ok(credentials) = SslServerAuthenticationOptions.Create(Fixtures.Certificate(), Fixtures.Key()) else { return 1 }
+    use serverCredentials = credentials
+    let Ok(trust) = SslClientAuthenticationOptions.Create(Fixtures.Certificate()) else { return 2 }
+    use clientTrust = trust
+    let options = HttpServerOptions()
+    options.SslOptions = credentials
+    // Keep the same deadline in every mode; unoptimized interpreter setup is slower.
+    options.RequestReadTimeout = Duration.FromTicks(600000000L)
+    options.ResponseWriteTimeout = Duration.FromTicks(600000000L)
+    let Ok(server) = HttpServer.Listen("127.0.0.1", 0, 8, options) else { return 3 }
+    let Ok(port) = server.GetLocalPort() else { return 4 }
+    let url = String.Concat(String.Concat("https://localhost:", port.ToString()), "/echo")
+    let Ok(request) = HttpRequest.Get(url) else { return 5 }
+    if !request.IsSecure { return 6 }
+    let Ok(copied) = request.WithHeader("X-Test", "secure") else { return 7 }
+    if !copied.IsSecure { return 8 }
+    let serving = server.ServeOne(Echo)
+    use client = HttpClient(HttpSocketHandler(trust))
+    let Ok(node) = JsonSerializer.DeserializeNode("{\"message\":\"Café\",\"items\":[1,true,null]}") else { return 9 }
+    let Ok(content) = JsonContent.CreateNode(node) else { return 10 }
+    let response = await client.Post(url, content)
+    if let Error(error) = response {
+        Console.WriteLine(error.ToString())
+        server.Close()
+        return 11
+    }
+    let Ok(received) = response else { return 12 }
+    let Ok(reply) = await received.Content.ReadJsonNode() else { return 13 }
+    let Ok(text) = JsonSerializer.SerializeNode(reply) else { return 14 }
+    if text != "{\"message\":\"Café\",\"items\":[1,true,null]}" { return 15 }
+    let completed = await serving
+    server.Close()
+    if let Error(error) = completed {
+        Console.WriteLine(error.ToString())
+        return 16
+    }
+    Console.WriteLine("Managed HTTPS JSON exchange passed")
+    return 0
+}

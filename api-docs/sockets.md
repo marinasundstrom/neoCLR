@@ -133,7 +133,7 @@ Host-backed hostname resolution is available through Dns.GetHostAddresses.
 Planned next: an HTTP request/response client using
 Socket directly; TcpClient and UdpClient are not required for it. The HTTP
 prototype will include headers, status and byte bodies with explicit message framing.
-The first controlled demo uses plain HTTP; HTTPS needs a separate TLS implementation.
+The original controlled demo uses plain HTTP. Development [SslStream](ssl-streams.md) now composes authenticated TLS over asynchronous transport capabilities; the HTTP handler and server expose explicit TLS configuration.
 These planned additions are not available in the current Socket API.
 
 

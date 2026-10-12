@@ -8,6 +8,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-12
 
+- Add development SslStream and explicit PEM authentication options, composing
+  HTTPS in HttpClient and HttpServer through shared managed transport. Qualify
+  nested JSON, GC and stream ownership in interpreter/JIT/AOT on macOS, plus a
+  cleartext regression. Refresh public API documentation; Windows managed
+  qualification and HTTP failure/recovery coverage remain follow-through.
+
 - Align the native root hook with the 2,048-function compiler budget; remove a
   stale 1,024-index rejection that aborted the managed HTTPS showcase. Exercise
   the final admitted index in host-root lifetime tests. The local AOT HTTPS JSON

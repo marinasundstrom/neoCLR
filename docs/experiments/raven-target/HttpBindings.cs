@@ -13,7 +13,7 @@ static class HttpBindings
     public const string Declarations = """
         namespace Web.Http {
             public enum HttpStatusCode { Continue = 100, SwitchingProtocols = 101, OK = 200, Created = 201, Accepted = 202, NoContent = 204, ResetContent = 205, PartialContent = 206, MultipleChoices = 300, MovedPermanently = 301, Found = 302, SeeOther = 303, NotModified = 304, TemporaryRedirect = 307, PermanentRedirect = 308, BadRequest = 400, Unauthorized = 401, Forbidden = 403, NotFound = 404, MethodNotAllowed = 405, RequestTimeout = 408, Conflict = 409, Gone = 410, LengthRequired = 411, PreconditionFailed = 412, RequestEntityTooLarge = 413, RequestUriTooLong = 414, UnsupportedMediaType = 415, RequestedRangeNotSatisfiable = 416, ExpectationFailed = 417, UnprocessableContent = 422, TooManyRequests = 429, InternalServerError = 500, NotImplemented = 501, BadGateway = 502, ServiceUnavailable = 503, GatewayTimeout = 504, HttpVersionNotSupported = 505 }
-            public struct HttpError { public struct InvalidUri { } public struct NameResolution { } public struct Transport { } public struct Content { } public struct InvalidRequest { } public struct Protocol { } public struct Unsupported { } public struct LimitExceeded { } public struct TimedOut { } public struct Handler { } public struct UnsuccessfulStatus { } }
+            public struct HttpError { public struct InvalidUri { } public struct NameResolution { } public struct Transport { } public struct Content { } public struct InvalidRequest { } public struct Protocol { } public struct Unsupported { } public struct LimitExceeded { } public struct TimedOut { } public struct Tls { } public struct SecureTransport { } public struct Handler { } public struct UnsuccessfulStatus { } }
             public abstract class HttpHandler : Disposable {
                 protected HttpHandler() { }
                 public abstract Concurrency.Tasks.Task<Result<HttpResponse, HttpError>> Send(HttpRequest request, Concurrency.CancellationToken cancellationToken);
@@ -79,6 +79,7 @@ static class HttpBindings
             }
             public sealed class HttpSocketHandler : HttpHandler {
                 public HttpSocketHandler() { }
+                public HttpSocketHandler(Networking.Security.SslClientAuthenticationOptions sslOptions) { }
                 public override void Dispose() { }
                 public Concurrency.Tasks.Task<Result<HttpResponse, HttpError>> Send(HttpRequest request) => default;
                 public override Concurrency.Tasks.Task<Result<HttpResponse, HttpError>> Send(HttpRequest request, Concurrency.CancellationToken cancellationToken) => default;
@@ -109,6 +110,7 @@ static class HttpBindings
                 public override string ToString() => default;
             }
             public sealed class HttpRequest {
+                public bool IsSecure => false;
                 public static Result<HttpRequest, HttpError> Create(HttpMethod method, string url) => default;
                 public static Result<HttpRequest, HttpError> Create(HttpMethod method, string url, HttpContent content) => default;
                 public static Result<HttpRequest, HttpError> Create(HttpMethod method, Uri uri) => default;
@@ -168,6 +170,7 @@ static class HttpBindings
             }
             public sealed class HttpServerOptions {
                 public HttpServerOptions() { }
+                public Networking.Security.SslServerAuthenticationOptions SslOptions { get; set; }
                 public int MaxRequestBodySize { get; set; }
                 public int MaxRequestHeadersTotalSize { get; set; }
                 public int MaxRequestHeaderCount { get; set; }

@@ -1912,3 +1912,13 @@ native-only [manual content entry](../docs/experiments/native-library-documentat
 The signature remains metadata-generated. Remove this fallback when native
 namespace-function XML IDs and comment lookup are implemented; other module
 functions still need a documentation-coverage audit. No API is excluded.
+
+## Managed TLS development reference (2026-10-12)
+
+The aggregate reference selects SslStream, SslError and client/server authentication
+options in System.Networking.Security. The [TLS guide](ssl-streams.md) documents
+explicit PEM trust/key ownership, sequential stream operations, cancelled tasks,
+EOF/truncation, abortive disposal, graceful shutdown and current certificate-policy
+gaps. HTTP handler/server options, IsSecure and TLS error cases have member entries.
+These are development APIs; Windows host TLS evidence does not qualify the new
+managed composition. No public SSL type is excluded from RavenDoc selection.

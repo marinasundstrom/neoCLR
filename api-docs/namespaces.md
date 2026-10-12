@@ -71,3 +71,7 @@ see [garbage collection](gc.md) for object counters, explicit collection and lif
 ## System.IO.Compression (development)
 
 GZipStream composes async byte streams; see [compression](compression.md).
+
+## System.Networking.Security
+
+[SslStream and immutable TLS options](ssl-streams.md) compose async byte streams and explicit certificate trust. These development types belong to System.Networking.

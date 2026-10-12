@@ -11,6 +11,7 @@
     <PackageReference Include="Mono.Cecil" Version="0.11.6" />
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="../../../runtime/raven/src/System/Networking/Security/SslError.rvn" LogicalName="NeoCLR.SslError.rvn" />
     <EmbeddedResource Include="../../../runtime/raven/src/System/Security/Cryptography/CryptographyError.rvn" LogicalName="NeoCLR.CryptographyError.rvn" />
     <EmbeddedResource Include="../../../runtime/raven/src/System/Concurrency/Tasks/TaskOutcome.rvn" LogicalName="NeoCLR.TaskOutcome.rvn" />
     <EmbeddedResource Include="../../../runtime/raven/src/System/Option.rvn" LogicalName="NeoCLR.Option.rvn" />

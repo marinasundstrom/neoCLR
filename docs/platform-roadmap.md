@@ -1,9 +1,13 @@
 # neoCLR platform roadmap
 
-**Managed HTTPS compiler admission (2026-10-12):** measured closed-world selection
-now fits bounded 2,048-function admission, preserving existing retention and type
-limits. This is compiler follow-through, not HTTPS completion: the consumer next
-hits a separate value-layout bound. See [evidence and remaining work](experiments/shared-tls/native-selection-budget.md).
+**Managed HTTPS composition (2026-10-12):** public development SslStream and
+explicit PEM authentication options now compose HttpClient and HttpServer over the
+shared provider. Nested JSON, lifetime checks and GC pass locally in interpreter,
+default JIT and standalone AOT; cleartext HTTP also passes. Bounded compiler and
+host admission fixes preserve explicit memory budgets rather than introducing
+trimming. See [qualification and remaining HTTP work](experiments/shared-tls/README.md#managed-ssl-and-http-composition).
+Windows managed qualification, HTTP rejection/deadline/recovery cases and packaged
+build kits remain gates.
 
 **Gzip foundation (2026-10-12):** the author requests System.IO.Compression and
 identifies HTTP as a likely consumer. [GZipStream](gzip-compression.md) adds incremental
@@ -56,8 +60,7 @@ now passing locally on macOS using a standalone native cryptography archive with
 TLS dependencies. Prepared JIT bundles now include the provider, with private
 cryptography cases passing through default CLI execution. Windows uses the pending
 CI gates. Source AOT projects now link the provider on demand, with a Raven consumer
-qualified in all three local modes. Packaged build kits and managed
-SSL composition remain next. Typed private certificate/configuration errors and rejection
+qualified in all three local modes. Packaged build kits remain open; managed SSL composition is qualified above. Typed private certificate/configuration errors and rejection
 qualification now prepare that boundary. Private pollable close-notify shutdown
 also passes TLS 1.2/1.3 backpressure and lifecycle tests. A checked resource context
 now owns configurations/sessions behind non-reused IDs and bounded quotas; managed
@@ -70,7 +73,7 @@ ownership/teardown; nine default-JIT cases and a Raven project pass locally.
 A borrowed-buffer ciphertext pump now passes fragmented transport, backpressure,
 shutdown and truncation checks on macOS, including its private C entry point; see
 [transport evidence](experiments/shared-tls/buffered-transport-validation.json).
-Managed pump bindings and SSL composition remain next; released build kits remain open. See [host evidence](experiments/shared-tls/host-integration-validation.json). See
+Managed pump bindings and SSL composition now pass locally; released build kits remain open. See [host evidence](experiments/shared-tls/host-integration-validation.json). See
 [binding evidence](experiments/shared-tls/bindings-validation.json). See [native lifetime evidence](experiments/shared-tls/native-lifetime-validation.json). HTTP and SQL may share concepts/types
 without requiring one native TLS backend; see the [backend boundary](shared-security-provider.md#shared-concepts-independent-backends). A bounded public System.Security.Cryptography facade
 now adds destination-buffer SHA256/HMACSHA256, tag verification and secure random

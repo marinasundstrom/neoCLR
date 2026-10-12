@@ -1,8 +1,8 @@
 # Shared TLS development checkpoints
 
 The [provider design](../../shared-security-provider.md) describes ownership, status
-codes, platform scope and remaining managed API work. These are private development
-contracts, not published Raven certificate/SslStream APIs.
+codes, platform scope and remaining managed API work. The chronological checkpoints below distinguish private foundations from the
+current public development APIs. None is a published release claim.
 
 Run the provider and native adapter checks with:
 
@@ -69,3 +69,33 @@ adapter test also calls the exported C pump. See
 [pump contract](../../shared-security-provider.md#borrowed-buffer-transport-pump-development-2026-10-12).
 Managed pumping service bindings and public certificate/SslStream APIs remain open;
 Windows execution is pending the existing shared-provider CI gate.
+
+## Managed SSL and HTTP composition
+
+`System.Networking.Security.SslStream` now implements async InputStream/OutputStream
+with explicit PEM client trust and server certificate/private-key options. HttpClient
+selects it for HTTPS using `HttpSocketHandler(options)`; HttpServer selects it through
+`HttpServerOptions.SslOptions`. Both retain cleartext HTTP support. See the
+[API and limitations](../../../api-docs/ssl-streams.md).
+
+```sh
+python3 docs/experiments/shared-tls/validate-streams.py \
+  --bundle path/to/bundle --aot tools/aot-poc/target/debug/neoclr-aot-poc \
+  --output target/tls-streams-validation
+```
+
+[Local evidence](streams-validation.json) records interpreter, default JIT and AOT
+nested JSON exchange with GC and direct stream ownership checks, plus a separate
+cleartext HTTP interpreter regression. Use an optimized interpreter; its explicit
+100-million-instruction, 1,048,576-element and 64-MiB array-storage budgets are test
+configuration, not widened runtime defaults. Timings are not performance evidence.
+The fixture has a common 60-second server deadline to accommodate interpreted setup.
+
+The tested Raven compiler is `6fe7d630a25d0e27f3e9e89b1403987caf30d9d6` on its
+neoCLR branch. Rebuild compiler, libraries and host together: bounded
+[function admission](native-selection-budget.md), [layout admission](native-layout-budget.md)
+and matching root hooks are required. Public signatures have a refreshed API snapshot.
+Windows managed execution remains pending; the earlier native HTTPS host result does
+not qualify this new managed composition. Next are HTTP handshake rejection, timeout,
+cancellation and recovery checks. Full-duplex simultaneous stream operations, OS trust
+stores, general X509 inspection, mTLS and release packaging remain outside this slice.
