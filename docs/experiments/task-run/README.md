@@ -22,8 +22,12 @@ managed API; it does not add thread-pool parallelism or new public APIs.
 The exact-signature regression passes, and the [native contract report](native-submission-validation.json)
 passes all six socket/timer/scheduler cases with undefined-behavior and bounds
 sanitizers on macOS. The scheduler case now submits through the unit shim and
-checks its existing rooted delivery lifecycle. Windows and extracted Task.Run
-consumer qualification remain separate gates at this checkpoint.
+checks its existing rooted delivery lifecycle. A follow-up extends host and entry-pump dispatch to both unit callback encodings;
+bootstrap admission accepts the same two shapes. Both variants pass the existing
+compiled callback lifecycle/fault regression under sanitizers, including receiver
+mutation, collection, stale/foreign handles and non-recoverable faults. The combined
+host dispatch table remains bounded to 32 targets. Windows and complete extracted
+bundle qualification remain separate gates at this checkpoint.
 
 ## Implemented boundary
 

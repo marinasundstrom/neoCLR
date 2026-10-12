@@ -3998,7 +3998,7 @@ fn native_host_bootstrap_requires_explicit_exact_contract() {
         let dir = Temp::new();
         let r = compile_source(&dir, &seed, source, &flags, false);
         assert!(!r.status.success() && !dir.0.join("app.o").exists(), "{r:?}");
-        assert!(String::from_utf8_lossy(&r.stderr).contains("exactly fn<Void> result"), "{r:?}");
+        assert!(String::from_utf8_lossy(&r.stderr).contains("a zero-argument unit callback result"), "{r:?}");
     }
     let dir = Temp::new();
     let r = compile_source(&dir, &seed, source, &flags, true);
@@ -4011,29 +4011,35 @@ fn native_host_bootstrap_requires_explicit_exact_contract() {
 #[test]
 #[cfg(all(target_os = "macos", target_arch = "aarch64"))]
 fn native_host_callbacks_preserve_roots_state_and_faults_without_entry_reset() {
-    let dir = Temp::new();
-    let seed = neoclr::assemble(".module System\n.references ()\n").unwrap();
-    let source = include_str!("../../../docs/experiments/aot-console/host-callbacks.neoil");
-    let r = compile_source(&dir, &seed, source,
-        &["--compile-system", "--reference-arena", "--native-gc", "--native-host-bootstrap"], false);
-    assert!(r.status.success(), "{}", String::from_utf8_lossy(&r.stderr));
-    let base = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../docs/experiments/aot-console");
-    fs::write(dir.0.join("host.c"), include_str!("../../../docs/experiments/aot-console/native-session-compiled-test.c")).unwrap();
-    let r = Command::new("clang")
-        .args(["-arch", "arm64", "-std=c11", "-Wall", "-Wextra", "-Werror", "-DNEOCLR_NATIVE_GC", "-fsanitize=undefined,bounds", "-I"])
-        .arg(&base).arg(dir.0.join("host.c"))
-        .arg(base.join("native-session.c")).arg(base.join("root-probe.c")).arg(base.join("native-gc.c")).arg(base.join("text-arena.c"))
-        .arg(base.join("../aot-fault-details/render.c"))
-        .arg(dir.0.join("app.o")).arg("-o").arg(dir.0.join("host"))
-        .output().unwrap();
-    assert!(r.status.success(), "{}", String::from_utf8_lossy(&r.stderr));
-    let r = Command::new(dir.0.join("host")).env_clear().output().unwrap();
-    assert!(r.status.success(), "{r:?}");
-    let app = neoclr::assemble(source).unwrap();
-    let program = neoclr::LoadedProgram::with_library(&app, &seed).unwrap();
-    let method = program.resolve_function(&neoclr::assembler::parse_function_ref("Fail()").unwrap()).unwrap();
-    let fault = method.invoke(vec![], neoclr::Limits::default()).unwrap_err();
-    assert_eq!(String::from_utf8_lossy(&r.stderr), fault.diagnostic().to_string());
+    for no_result in [false, true] {
+        let dir = Temp::new();
+        let seed = neoclr::assemble(".module System\n.references ()\n").unwrap();
+        let source = include_str!("../../../docs/experiments/aot-console/host-callbacks.neoil");
+        let source = if no_result {
+            source.replace("-> Void", "-> noresult").replace("ldvoid\n", "")
+                .replace("fn<Void>", "fn<noresult Void>").replace("call Fail()\npop", "call Fail()")
+        } else { source.to_owned() };
+        let r = compile_source(&dir, &seed, &source,
+            &["--compile-system", "--reference-arena", "--native-gc", "--native-host-bootstrap"], false);
+        assert!(r.status.success(), "{}", String::from_utf8_lossy(&r.stderr));
+        let base = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../docs/experiments/aot-console");
+        fs::write(dir.0.join("host.c"), include_str!("../../../docs/experiments/aot-console/native-session-compiled-test.c")).unwrap();
+        let r = Command::new("clang")
+            .args(["-arch", "arm64", "-std=c11", "-Wall", "-Wextra", "-Werror", "-DNEOCLR_NATIVE_GC", "-fsanitize=undefined,bounds", "-I"])
+            .arg(&base).arg(dir.0.join("host.c"))
+            .arg(base.join("native-session.c")).arg(base.join("root-probe.c")).arg(base.join("native-gc.c")).arg(base.join("text-arena.c"))
+            .arg(base.join("../aot-fault-details/render.c"))
+            .arg(dir.0.join("app.o")).arg("-o").arg(dir.0.join("host"))
+            .output().unwrap();
+        assert!(r.status.success(), "{}", String::from_utf8_lossy(&r.stderr));
+        let r = Command::new(dir.0.join("host")).env_clear().output().unwrap();
+        assert!(r.status.success(), "{r:?}");
+        let app = neoclr::assemble(&source).unwrap();
+        let program = neoclr::LoadedProgram::with_library(&app, &seed).unwrap();
+        let method = program.resolve_function(&neoclr::assembler::parse_function_ref("Fail()").unwrap()).unwrap();
+        let fault = method.invoke(vec![], neoclr::Limits::default()).unwrap_err();
+        assert_eq!(String::from_utf8_lossy(&r.stderr), fault.diagnostic().to_string());
+    }
 }
 
 #[test]

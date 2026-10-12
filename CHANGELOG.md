@@ -8,6 +8,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-12
 
+- Extend native host/entry callback dispatch to no-result unit callbacks as well
+  as inhabited Void, completing the dispatch side of Task.Run submission. Preserve
+  the 32-target bound and strict callback admission. Both encodings pass sanitized
+  compiled ownership, receiver mutation, GC and non-recoverable fault checks.
+
 - Bind native Task.Run submission to the existing scheduler, retaining both unit
   callback encodings and rooted one-shot ownership. Use a unit-result shim to avoid
   writing scalar admission data into unit storage. Exact-signature regression and

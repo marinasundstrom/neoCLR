@@ -2409,7 +2409,7 @@ pub(crate) fn compile_into(
     Ok(())
 }
 
-// Quiescent host entry for the existing inhabited-Void callback shape. The strong
+// Quiescent host entry for inhabited-Void and no-result unit callback shapes. The strong
 // handle keeps the descriptor/receiver alive across the callee's collection points.
 fn compile_host_callbacks(module: &mut impl Module, p: &Profile<'_>, ids: &[cranelift_module::FuncId], stack_check: Option<cranelift_module::FuncId>, diagnostic_data: Option<&crate::fault_details::Data>, entry_pump: bool, long_range_calls: bool) -> Result<(), Error> {
     use neoclr::metadata::{FunctionType, Type};
@@ -2417,7 +2417,15 @@ fn compile_host_callbacks(module: &mut impl Module, p: &Profile<'_>, ids: &[cran
         parameters: vec![], returns: Type::Void, no_result: false,
         out_parameters: vec![], out_when_true: vec![],
     }));
-    let targets = p.callable_targets(&shape)?;
+    let mut targets = p.callable_targets(&shape)?;
+    let no_result = Type::Function(Box::new(FunctionType {
+        parameters: vec![], returns: Type::Void, no_result: true,
+        out_parameters: vec![], out_when_true: vec![],
+    }));
+    for target in p.callable_targets(&no_result)? {
+        if !targets.contains(&target) { targets.push(target); }
+    }
+    if targets.len() > 32 { return Err("native host callbacks exceed 32 possible targets".into()); }
     // Hosts link this ABI even when no guest callback is reachable. Keep the
     // rejecting dispatcher so synchronous task-only programs can link as well.
     let mut signature = module.make_signature();
