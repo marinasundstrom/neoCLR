@@ -8,6 +8,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-12
 
+- Make installed HTTP showcase tasks usable from VS Code: prompt for the server
+  request count and client base URL, and forward program arguments after `--` in
+  the sample runner. Refresh editor tasks when preparing a JIT bundle even when
+  retaining sample sources. Argument-boundary and task-input regressions pass.
+
 - Separate native heap-object capacity from inline-value layout: admit 256 payload
   lanes (2056 bytes with header) while retaining the 128-lane inline/array-element
   bound. Keep allocator and compiler limits aligned. Native boundary/canary checks

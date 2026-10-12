@@ -4,6 +4,7 @@ import argparse
 import json
 from pathlib import Path
 import subprocess
+import sys
 
 
 def reflection_roots(runtime, assembly, names, run):
@@ -31,7 +32,11 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('sample')
     parser.add_argument('--bundle', type=Path, default=Path(__file__).resolve().parent.parent)
-    args = parser.parse_args()
+    parser.epilog = 'Pass program arguments after --, for example: http-json-client -- http://127.0.0.1:8080/'
+    command_line = sys.argv[1:]
+    separator = command_line.index('--') if '--' in command_line else len(command_line)
+    args = parser.parse_args(command_line[:separator])
+    program_arguments = command_line[separator + 1:]
     root = args.bundle.resolve()
     manifest = json.loads((root / 'manifest.json').read_text())
     if args.sample not in manifest['samples']:
@@ -51,6 +56,8 @@ def main():
             context += ['--module', root / module]
         if manifest.get('objectRoot'):
             context += ['--object-root', root / manifest['objectRoot']]
+    if program_arguments:
+        context += ['--', *program_arguments]
     raise SystemExit(subprocess.call(list(map(str, [runtime, 'run', assembly, *context])), cwd=folder))
 
 

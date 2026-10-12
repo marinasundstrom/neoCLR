@@ -174,13 +174,13 @@ try:
                            heapBytes=a.heap_bytes, byteArrayLimit=a.byte_array_limit)
     if a.refresh_samples:
         refresh_samples(bundle, manifest)
-        configure_editor_tasks(bundle, manifest['samples'])
         for sources, _, _ in sample_definitions().values():
             for source in sources:
                 path = ROOT / 'docs/experiments' / source
                 report['inputsSha256'][str(path)] = sha(path)
-        path = ROOT / 'scripts/native_bundle_samples.py'
-        report['inputsSha256'][str(path)] = sha(path)
+    configure_editor_tasks(bundle, manifest['samples'])
+    path = ROOT / 'scripts/native_bundle_samples.py'
+    report['inputsSha256'][str(path)] = sha(path)
     # Acceptance defaults to installed JIT when the bundle advertises it.
     for name in ('verify-native-bundle.py', 'verify-native-http-json.py', 'run-native-sample.py'):
         shutil.copy2(ROOT / 'scripts' / name, bundle / 'tools' / name)

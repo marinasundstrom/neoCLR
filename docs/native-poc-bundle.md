@@ -301,7 +301,18 @@ file fails before compilation. It writes a failure report and exits nonzero on f
 a launch or compilation success alone is not the gate.
 
 For IDE use, install `editor/raven-vscode.vsix`, open one individual `samples` folder,
-and run the `neoCLR: Run` task. The bundled server comes from the installed extension;
+and run the `neoCLR: Run` task. The HTTP server task prompts for a request count
+(use two for the client/server pair); the client task prompts for the base URL using
+the port printed by the server. Open the server and client sample folders in separate
+windows to run them together. From a terminal, forward program arguments after `--`:
+
+```sh
+python3 tools/run-native-sample.py http-json-server -- 2
+# In another terminal, replace PORT with the server's printed port:
+python3 tools/run-native-sample.py http-json-client -- http://127.0.0.1:PORT/
+```
+
+The language server comes from the selected matching SDK or installed extension;
 project reference and task paths are relative to the extracted installation. Do not
 set a development-checkout language-server override for installation acceptance.
 

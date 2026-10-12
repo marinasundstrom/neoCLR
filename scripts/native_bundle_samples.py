@@ -37,7 +37,19 @@ def configure_editor_tasks(bundle, names):
     for name in names:
         settings = bundle / 'samples' / name / '.vscode'
         settings.mkdir(exist_ok=True)
-        (settings / 'tasks.json').write_text(json.dumps({'version': '2.0.0', 'tasks': [dict(
-            label='neoCLR: Run', type='process', command='python3', args=[
-                '${workspaceFolder}/../../tools/run-native-sample.py', name],
-            problemMatcher=[])]}, indent=2) + '\n')
+        arguments = ['${workspaceFolder}/../../tools/run-native-sample.py', name]
+        inputs = []
+        if name == 'http-json-server':
+            inputs = [dict(id='requestCount', type='promptString',
+                           description='Number of requests before the server exits (the client sends two)', default='2')]
+            arguments += ['--', '${input:requestCount}']
+        elif name == 'http-json-client':
+            inputs = [dict(id='serverUrl', type='promptString',
+                           description='Server URL using the port printed by the server', default='http://127.0.0.1:8080/')]
+            arguments += ['--', '${input:serverUrl}']
+        tasks = {'version': '2.0.0', 'tasks': [dict(
+            label='neoCLR: Run', type='process', command='python3', args=arguments,
+            problemMatcher=[])]}
+        if inputs:
+            tasks['inputs'] = inputs
+        (settings / 'tasks.json').write_text(json.dumps(tasks, indent=2) + '\n')
