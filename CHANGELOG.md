@@ -46,6 +46,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   Windows CI adds the same bundle/project checks; execution remains pending. Public
   certificate/stream APIs and release build kits remain open. A synchronous HTTP
   profile without queue bindings still lacks its generated drain export.
+  Add a private borrowed-buffer TLS pump for handshake, read/write and shutdown,
+  with bounded ciphertext progress, explicit EOF and checked C buffer ranges.
+  Fragmentation, backpressure, half-close and truncation pass in 19 TLS tests;
+  nine supporting provider/lifetime tests and the real C adapter also pass on macOS.
+  Windows runs the same CI harness; managed pump bindings and Raven APIs remain open.
   Document shared HTTP/SQL security concepts without forcing a common native backend;
   managed SSL/certificate ownership and handshake diagnostics remain open.
 

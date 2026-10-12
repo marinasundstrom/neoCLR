@@ -481,3 +481,43 @@ installed-bundle/project CI checks but has not executed them yet. See
 
 Next are shared ciphertext pumping and managed certificate/SslStream APIs; none of
 these ownership checks constitutes managed HTTPS client/server qualification.
+
+## Borrowed-buffer transport pump (development, 2026-10-12)
+
+The provider now exposes a private memory pump in safe Rust (`OwnedContext::pump`)
+and C (`neoclr_tls_context_pump_v1`). Handshake, read, write and local shutdown use
+borrowed ciphertext input/output and plaintext buffers, each limited to 64 KiB.
+The pump performs no socket I/O or managed callbacks and retains no buffer pointer.
+It drives the existing Rustls session engine, preserving certificate validation,
+terminal failures, pending-write rules and graceful half-close behavior.
+
+Every valid poll returns consumed/produced ciphertext counts even when pending or
+failed. The caller must preserve unconsumed input and send produced output before
+reusing its storage. Empty input means would-block unless EOF is explicitly set;
+transport EOF without close-notify remains truncation. Pending writes require the
+same plaintext and operation until completion or abort. Operations on a context are
+serialized. The private C boundary rejects null nonempty buffers, oversized or
+overflowing ranges, overlapping buffers/progress and invalid operation/EOF flags
+before provider access; rejected arguments leave progress untouched. The trusted
+host remains responsible for accessible, aligned memory and context lifetime.
+
+This prepares the existing .NET SslStream comparison: authentication and encrypted
+read/write over an underlying stream, with a future managed loop awaiting its I/O.
+It does not introduce a new public stream contract or require HTTP and SQL to use
+one native backend. Bounded copying and caller-owned buffering are explicit costs;
+no throughput improvement is claimed. Managed adapters must eventually validate
+heap buffers and root owners across awaits; the pump itself neither suspends nor
+collects. GC cleanup remains abortive, separate from explicit graceful shutdown.
+
+All 19 TLS provider checks, four interpreter lifetime checks, four cryptography
+checks, one safe-provider check and the real-provider C adapter pass on macOS.
+New coverage includes fragmented memory transport, bidirectional backpressure,
+partial output, authenticated half-close, pre/post-authentication truncation,
+wrong-host rejection and C range validation. The C adapter also calls the exported
+pump against a real client session. Windows runs the same shared-provider CI
+harness; execution remains pending. See
+[buffered transport evidence](experiments/shared-tls/buffered-transport-validation.json).
+
+Next: bind buffer pumping to managed ownership in interpreter/JIT/AOT, then expose
+Raven certificate and SslStream APIs. Existing HTTPS hosts still use the callback
+adapter; these provider tests do not qualify managed HTTPS composition.

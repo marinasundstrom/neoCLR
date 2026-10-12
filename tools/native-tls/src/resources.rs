@@ -236,6 +236,217 @@ pub unsafe extern "C" fn neoclr_tls_context_transfer(
     }
 }
 
+/// Private transport-independent poll operation. Serialize a session's operations;
+/// retry a pending write with the same plaintext until completion or abort.
+#[derive(Clone, Copy, Debug)]
+pub enum PumpOperation {
+    Handshake,
+    Read,
+    Write,
+    Shutdown,
+}
+/// Ciphertext consumed/produced is meaningful even when status is pending or failed.
+/// Caller must send produced bytes and preserve unconsumed input across polls.
+#[derive(Debug, PartialEq, Eq)]
+pub struct PumpProgress {
+    pub status: i64,
+    pub consumed: usize,
+    pub produced: usize,
+}
+struct BufferedWire<'a> {
+    input: &'a [u8],
+    output: &'a mut [u8],
+    consumed: usize,
+    produced: usize,
+    eof: bool,
+}
+unsafe extern "C" fn buffered_transfer(
+    state: *mut c_void,
+    data: *mut u8,
+    count: u32,
+    sending: i32,
+) -> i64 {
+    // This callback is called synchronously by the provider and never retained.
+    let wire = unsafe { &mut *state.cast::<BufferedWire<'_>>() };
+    if sending != 0 {
+        let count = (count as usize).min(wire.output.len() - wire.produced);
+        if count == 0 {
+            return -1;
+        }
+        let source = unsafe { std::slice::from_raw_parts(data, count) };
+        wire.output[wire.produced..wire.produced + count].copy_from_slice(source);
+        wire.produced += count;
+        count as i64
+    } else {
+        let count = (count as usize).min(wire.input.len() - wire.consumed);
+        if count == 0 {
+            return if wire.eof { 0 } else { -1 };
+        }
+        let destination = unsafe { std::slice::from_raw_parts_mut(data, count) };
+        destination.copy_from_slice(&wire.input[wire.consumed..wire.consumed + count]);
+        wire.consumed += count;
+        count as i64
+    }
+}
+
+fn pump(
+    context: &mut Context,
+    id: u64,
+    operation: PumpOperation,
+    input: &[u8],
+    eof: bool,
+    output: &mut [u8],
+    plaintext: &mut [u8],
+) -> PumpProgress {
+    let failure = |status| PumpProgress {
+        status,
+        consumed: 0,
+        produced: 0,
+    };
+    if input.len() > LIMIT
+        || output.len() > LIMIT
+        || plaintext.len() > LIMIT
+        || (matches!(
+            operation,
+            PumpOperation::Handshake | PumpOperation::Shutdown
+        ) && !plaintext.is_empty())
+    {
+        return failure(INVALID_INPUT as i64);
+    }
+    let session = match context.session(id) {
+        Ok(session) => session,
+        Err(status) => return failure(status as i64),
+    };
+    let mut wire = BufferedWire {
+        input,
+        output,
+        eof,
+        consumed: 0,
+        produced: 0,
+    };
+    let pointer = (&mut wire as *mut BufferedWire<'_>).cast();
+    let status = unsafe {
+        match operation {
+            PumpOperation::Handshake => {
+                neoclr_tls_handshake(session, pointer, buffered_transfer) as i64
+            }
+            PumpOperation::Shutdown => {
+                neoclr_tls_shutdown(session, pointer, buffered_transfer) as i64
+            }
+            PumpOperation::Read | PumpOperation::Write => neoclr_tls_transfer(
+                session,
+                pointer,
+                buffered_transfer,
+                plaintext.as_mut_ptr(),
+                plaintext.len() as u32,
+                i32::from(matches!(operation, PumpOperation::Write)),
+            ),
+        }
+    };
+    PumpProgress {
+        status,
+        consumed: wire.consumed,
+        produced: wire.produced,
+    }
+}
+
+/// Private C progress layout, separate from platform-sized Rust slice lengths.
+#[repr(C)]
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub struct NativePumpProgress {
+    pub consumed: u32,
+    pub produced: u32,
+}
+fn span(pointer: *const u8, count: usize) -> Option<(usize, usize)> {
+    let start = pointer as usize;
+    if count != 0 && start == 0 {
+        return None;
+    }
+    Some((start, start.checked_add(count)?))
+}
+fn overlap(a: (usize, usize), b: (usize, usize)) -> bool {
+    a.0 != a.1 && b.0 != b.1 && a.0 < b.1 && b.0 < a.1
+}
+/// Private checked memory transport. Buffers and progress are borrowed only here;
+/// nonempty ranges must be valid and pairwise disjoint. Host serializes context.
+/// Rejected null/overflow/length/overlap/operation inputs leave progress untouched.
+/// The host remains responsible for accessible, aligned memory and context lifetime.
+#[unsafe(no_mangle)]
+pub unsafe extern "C" fn neoclr_tls_context_pump_v1(
+    pointer: *mut c_void,
+    id: u64,
+    operation: i32,
+    input: *const u8,
+    input_count: u32,
+    eof: i32,
+    output: *mut u8,
+    output_count: u32,
+    plaintext: *mut u8,
+    plaintext_count: u32,
+    progress: *mut NativePumpProgress,
+) -> i64 {
+    if pointer.is_null()
+        || progress.is_null()
+        || !(0..=1).contains(&eof)
+        || [input_count, output_count, plaintext_count]
+            .iter()
+            .any(|n| *n as usize > LIMIT)
+    {
+        return INVALID_INPUT as i64;
+    }
+    let operation = match operation {
+        1 => PumpOperation::Handshake,
+        2 => PumpOperation::Read,
+        3 => PumpOperation::Write,
+        4 => PumpOperation::Shutdown,
+        _ => return INVALID_INPUT as i64,
+    };
+    let spans = [
+        span(input, input_count as usize),
+        span(output, output_count as usize),
+        span(plaintext, plaintext_count as usize),
+        span(progress.cast(), std::mem::size_of::<NativePumpProgress>()),
+    ];
+    for (i, a) in spans.iter().enumerate() {
+        let Some(a) = *a else {
+            return INVALID_INPUT as i64;
+        };
+        for b in spans.iter().skip(i + 1) {
+            let Some(b) = *b else {
+                return INVALID_INPUT as i64;
+            };
+            if overlap(a, b) {
+                return INVALID_INPUT as i64;
+            }
+        }
+    }
+    // Zero-sized ranges may use null in the C ABI; never form a null Rust slice.
+    let input = if input_count == 0 {
+        &[]
+    } else {
+        unsafe { std::slice::from_raw_parts(input, input_count as usize) }
+    };
+    let output = if output_count == 0 {
+        &mut []
+    } else {
+        unsafe { std::slice::from_raw_parts_mut(output, output_count as usize) }
+    };
+    let plaintext = if plaintext_count == 0 {
+        &mut []
+    } else {
+        unsafe { std::slice::from_raw_parts_mut(plaintext, plaintext_count as usize) }
+    };
+    let context = unsafe { &mut *pointer.cast::<Context>() };
+    let result = pump(context, id, operation, input, eof != 0, output, plaintext);
+    unsafe {
+        *progress = NativePumpProgress {
+            consumed: result.consumed as u32,
+            produced: result.produced as u32,
+        };
+    }
+    result.status
+}
+
 /// Safe Rust owner for the interpreter adapter. Not a managed/public platform API.
 /// Mutable access serializes provider calls; dropping this value releases all resources.
 pub struct OwnedContext(Box<Context>);
@@ -312,6 +523,22 @@ impl OwnedContext {
             )
         };
         if status == 0 { Ok(id) } else { Err(status) }
+    }
+    /// One bounded, nonblocking TLS poll over borrowed memory, with no socket or
+    /// managed callback. All buffers are at most 64 KiB. EOF means no more encrypted
+    /// bytes follow input; an empty input without EOF is merely would-block.
+    /// Handshake/shutdown require empty plaintext. Read fills plaintext; Write
+    /// borrows it unchanged. Drain output to the transport before reusing it.
+    pub fn pump(
+        &mut self,
+        id: u64,
+        operation: PumpOperation,
+        input: &[u8],
+        eof: bool,
+        output: &mut [u8],
+        plaintext: &mut [u8],
+    ) -> PumpProgress {
+        pump(&mut self.0, id, operation, input, eof, output, plaintext)
     }
     pub fn release(&mut self, id: u64) -> i32 {
         unsafe { neoclr_tls_context_release(self.pointer(), id) }

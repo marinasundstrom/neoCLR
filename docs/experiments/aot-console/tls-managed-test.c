@@ -1,5 +1,6 @@
 #define _CRT_SECURE_NO_WARNINGS
 #include "tls-managed.h"
+#include "../https-server/native-tls.h"
 #include <stdio.h>
 #include <string.h>
 #define CHECK(x) do { if (!(x)) { fprintf(stderr, "TLS adapter check failed: %d\n", __LINE__); return 1; } } while (0)
@@ -29,6 +30,22 @@ int main(int argc, char **argv) {
     void *empty = array(&c, NULL, 0), *config = array(&c, NULL, 0);
     void *session = array(&c, NULL, 0), *alien = array(&other, NULL, 0);
     CHECK(cert && key && empty && config && session && alien);
+    /* Exercise the C buffer-pump ABI with a real client flight and no socket. */
+    void *provider = neoclr_tls_context_new(2);
+    uint64_t config_id = 0, session_id = 0, cert_size = 0;
+    memcpy(&cert_size, (char *)cert + 8, 8);
+    CHECK(provider);
+    CHECK(!neoclr_tls_context_client_config(provider, (unsigned char *)cert + 16,
+        (uint32_t)cert_size, NULL, 0, &config_id));
+    CHECK(!neoclr_tls_context_session(provider, config_id, (const unsigned char *)"localhost", 9, &session_id));
+    unsigned char encrypted[17] = {0};
+    neoclr_tls_pump_progress progress = {123, 456};
+    CHECK(neoclr_tls_context_pump_v1(provider, session_id, 1, NULL, 0, 0,
+        encrypted, sizeof(encrypted), NULL, 0, &progress) == -1);
+    CHECK(!progress.consumed && progress.produced == sizeof(encrypted));
+    CHECK(neoclr_tls_context_pump_v1(provider, session_id, 1, NULL, 0, 0,
+        NULL, 0, NULL, 0, &progress) == -1 && !progress.produced);
+    neoclr_tls_context_free(provider);
     int32_t result = 777;
     CHECK(neoclr_tls_managed_v1(NEOCLR_TLS_RELEASE, &c, alien, NULL, NULL, NULL, &result) == 3 && result == 777);
     CHECK(neoclr_tls_managed_v1(NEOCLR_TLS_RELEASE, &c, (char *)config + 8, NULL, NULL, NULL, &result) == 3);

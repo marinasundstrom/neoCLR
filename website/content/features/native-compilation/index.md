@@ -262,7 +262,9 @@ cases in interpreter, JIT and AOT on macOS, with Windows execution pending CI.
 They use GC-owned resources. Prepared development JIT hosts now include ownership
 services, and source AOT projects link the provider on demand; nine default-JIT
 cases and a Raven project pass locally. Packaged release build kits and managed
-certificate/secure-stream APIs remain open.
+certificate/secure-stream APIs remain open. A private borrowed-buffer TLS pump now
+passes fragmented transport and shutdown tests on macOS; managed stream integration
+and Windows qualification of the pump remain pending.
 [TLS binding checkpoint](https://github.com/marinasundstrom/neoCLR/blob/main/docs/shared-security-provider.md#explicit-native-service-lowering-development-2026-10-12).
 
 Private cryptography service bindings use a standalone provider archive without

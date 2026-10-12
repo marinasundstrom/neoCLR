@@ -60,8 +60,10 @@ and teardown guards. A tested native TLS adapter now connects owner tokens to th
 hooks. Explicit native JIT/AOT bindings now pass seven cases in all three local
 modes. Prepared development JIT hosts and source AOT projects now integrate TLS
 ownership/teardown; nine default-JIT cases and a Raven project pass locally.
-Shared ciphertext pumping and managed SSL composition remain next; released build
-kits remain open. See [host evidence](experiments/shared-tls/host-integration-validation.json). See
+A borrowed-buffer ciphertext pump now passes fragmented transport, backpressure,
+shutdown and truncation checks on macOS, including its private C entry point; see
+[transport evidence](experiments/shared-tls/buffered-transport-validation.json).
+Managed pump bindings and SSL composition remain next; released build kits remain open. See [host evidence](experiments/shared-tls/host-integration-validation.json). See
 [binding evidence](experiments/shared-tls/bindings-validation.json). See [native lifetime evidence](experiments/shared-tls/native-lifetime-validation.json). HTTP and SQL may share concepts/types
 without requiring one native TLS backend; see the [backend boundary](shared-security-provider.md#shared-concepts-independent-backends). A bounded public System.Security.Cryptography facade
 now adds destination-buffer SHA256/HMACSHA256, tag verification and secure random

@@ -57,3 +57,15 @@ HTTP hosts also dispose TLS after stopping async work and socket/task scopes.
 A local async-Main HTTP-profile probe passes. A synchronous HTTP-profile probe with
 no queue bindings still fails to link its generated drain export; this existing
 host/compiler gap remains open and is not a TLS API restriction.
+
+## Borrowed-buffer transport
+
+The same `scripts/test-native-security.py` harness now exercises the private Rust
+and C ciphertext pump with disposable credentials. It covers fragmented handshake,
+bidirectional backpressure, partial output, half-close, explicit EOF/truncation,
+terminal certificate rejection and invalid buffer ranges. The native managed
+adapter test also calls the exported C pump. See
+[local evidence](buffered-transport-validation.json) and the
+[pump contract](../../shared-security-provider.md#borrowed-buffer-transport-pump-development-2026-10-12).
+Managed pumping service bindings and public certificate/SslStream APIs remain open;
+Windows execution is pending the existing shared-provider CI gate.

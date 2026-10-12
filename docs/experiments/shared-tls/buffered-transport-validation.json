@@ -1,0 +1,37 @@
+{
+  "date": "2026-10-12",
+  "platform": "macOS-27.0-arm64-arm-64bit",
+  "scope": "Private borrowed-buffer TLS transport; no managed pump binding or public SslStream API",
+  "command": "python3 scripts/test-native-security.py",
+  "passed": true,
+  "tests": {
+    "tlsProvider": 19,
+    "interpreterLifetime": 4,
+    "cryptography": 4,
+    "safeProvider": 1,
+    "nativeCAdapter": "passed, including exported memory pump with real client session"
+  },
+  "coverage": [
+    "Fragmented handshake with independent input/output backpressure",
+    "Bidirectional plaintext transfer and pending-write retry",
+    "Close-notify, idempotent shutdown and response after local half-close",
+    "Would-block versus explicit EOF, truncation before and after authentication",
+    "Terminal wrong-host rejection",
+    "Rejected buffer overlap, null nonempty input, oversized buffers, invalid operation/EOF",
+    "Valid null empty buffers and invalid session progress"
+  ],
+  "sourceSha256": {
+    "tools/native-tls/src/resources.rs": "eafd66a3ea04abbf2ff9bf63452663441252e2e1cde16097b2dae389be180706",
+    "tools/native-tls/src/buffered_tests.rs": "4be022c3762a08753428ef7489c5a4dac0ab4ce75ce2ecd2366af05b4c958a96",
+    "tools/native-tls/src/lib.rs": "1b17dbd4e3393925ef72e12e1e78d1d502589e9b6b1e970d54e4a9ba3d6dc53a",
+    "docs/experiments/https-server/native-tls.h": "8883e904261952f7f83c12d005b9e3862734a94836de94bf83419e02a898b3e1",
+    "docs/experiments/aot-console/tls-managed-test.c": "40b943c006ae46e590a5090f1657f30865e55ac230e8b3e416f3e3ee5010f2e1",
+    "scripts/test-native-security.py": "1d6846820c3267b36e0b93bdd68e9b1de178fad89a4780cbb650dbb990cb2a4c"
+  },
+  "limitations": [
+    "Windows execution pending existing macOS/Windows provider CI",
+    "No new performance measurement; bounded copying remains",
+    "Managed buffer validation/bindings and public certificate/SslStream APIs remain open",
+    "Existing HTTPS hosts still use callback transport"
+  ]
+}

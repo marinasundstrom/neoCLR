@@ -1319,3 +1319,6 @@ mod tests {
         }
     }
 }
+
+#[cfg(test)]
+mod buffered_tests;

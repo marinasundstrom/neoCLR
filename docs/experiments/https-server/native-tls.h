@@ -56,4 +56,19 @@ int32_t neoclr_tls_context_shutdown(void *, uint64_t, void *, neoclr_tls_io);
 int32_t neoclr_tls_context_abort(void *, uint64_t);
 int64_t neoclr_tls_context_transfer(void *, uint64_t, void *, neoclr_tls_io,
     unsigned char *, uint32_t, int32_t);
+/* Borrowed-memory TLS pump: 1 handshake, 2 read, 3 write, 4 local shutdown.
+ * Each byte buffer is <=64 KiB. Nonempty ranges must be valid, pairwise disjoint
+ * and disjoint from the writable aligned progress record and opaque context.
+ * Empty buffers may be NULL. eof is 0 (would-block) or 1 (no bytes follow input).
+ * Returns the underlying operation status; -10 invalid input, -18 invalid ID.
+ * Progress counts apply even on pending/failure. Preserve unconsumed ciphertext;
+ * send all produced ciphertext before reusing output, even when status is pending.
+ * A pending write is retried with the same plaintext until completion or abort.
+ * Handshake/shutdown require empty plaintext. No callback, socket, I/O or retained
+ * buffer. Rejected null/overflow/length/overlap/op/eof arguments leave progress
+ * untouched. The host remains responsible for accessible, aligned memory. */
+typedef struct { uint32_t consumed, produced; } neoclr_tls_pump_progress;
+int64_t neoclr_tls_context_pump_v1(void *, uint64_t, int32_t,
+    const unsigned char *, uint32_t, int32_t, unsigned char *, uint32_t,
+    unsigned char *, uint32_t, neoclr_tls_pump_progress *);
 #endif
