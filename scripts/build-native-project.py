@@ -299,7 +299,8 @@ def build(project, bundle, aot, output, profile=PROFILE, bootstrap_root=None, re
             import re
             dependencies = re.findall(r'^\s+([A-Za-z0-9_.-]+\.dll)\s*$', run(['dumpbin', '/dependents', pending], phase='dependency-check'), re.MULTILINE | re.IGNORECASE)
             allowed = {'kernel32.dll', *(['ws2_32.dll'] if http else []),
-                       *(['bcrypt.dll', 'ntdll.dll', 'userenv.dll', 'advapi32.dll'] if https_server else [])}
+                       *(['bcrypt.dll', 'bcryptprimitives.dll', 'api-ms-win-core-synch-l1-2-0.dll',
+                          'ntdll.dll', 'userenv.dll', 'advapi32.dll'] if https_server else [])}
             if not dependencies or any(name.lower() not in allowed for name in dependencies):
                 raise RuntimeError('Unexpected native dependencies: ' + repr(dependencies))
         else:

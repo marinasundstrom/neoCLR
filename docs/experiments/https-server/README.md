@@ -223,3 +223,14 @@ Credential-path parity also requires Unicode preservation. Following Microsoft's
 conversion for the private Rust ABI. The shared harness places ephemeral credentials
 under a directory containing accented and non-BMP characters. Conversion failure
 rejects configuration; credential paths and contents are not diagnostic output.
+
+The [second Windows run](https://github.com/marinasundstrom/neoCLR/actions/runs/38240463962)
+compiled and linked the host, then the dependency check correctly rejected two
+unlisted system imports. The HTTPS-only allowlist now includes
+`bcryptprimitives.dll` ([ProcessPrng](https://learn.microsoft.com/en-us/windows/win32/seccng/processprng))
+and `api-ms-win-core-synch-l1-2-0.dll`
+([WaitOnAddress](https://learn.microsoft.com/en-us/windows/win32/api/synchapi/nf-synchapi-waitonaddress));
+Microsoft documents both as Windows system components (reviewed 2026-10-12).
+The executable uses the static CRT; arbitrary third-party DLLs remain rejected.
+This does not change the ordinary cleartext host's dependency policy. The CI host
+is Windows Server 2022 x64; this is not qualification of older Windows versions.

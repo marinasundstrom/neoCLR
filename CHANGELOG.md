@@ -38,6 +38,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   Preserve Windows Unicode credential paths using wide snapshots and explicit
   UTF-8 conversion; exercise accented/non-BMP credential directories in the shared
   HTTPS harness instead of assuming ASCII paths.
+  Admit the exact Windows system RNG/synchronization DLLs observed in the TLS
+  link, keeping the ordinary HTTP allowlist and rejection of unknown dependencies.
 
 - Fix the HTTPS source compiler gap through Raven main `99ae011b4`, deliberately
   carried to its neoCLR branch as `c71baae94`: traverse unary operands so `use`
