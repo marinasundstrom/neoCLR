@@ -124,3 +124,81 @@ pub unsafe extern "C" fn neoclr_mixed_encoding(a: *const std::ffi::c_char, b: *c
         -1
     }
 }
+
+// Address-returning exports exercise structural Function bindings independently of names.
+#[unsafe(no_mangle)]
+pub extern "C" fn neoclr_get_add() -> *const std::ffi::c_void {
+    neoclr_add as *const std::ffi::c_void
+}
+#[unsafe(no_mangle)]
+pub extern "C" fn neoclr_get_utf8_pair() -> *const std::ffi::c_void {
+    neoclr_utf8_pair as *const std::ffi::c_void
+}
+#[unsafe(no_mangle)]
+pub extern "C" fn neoclr_get_bool8() -> *const std::ffi::c_void {
+    neoclr_bool8 as *const std::ffi::c_void
+}
+
+// Call-scoped callback fixtures never retain a supplied function pointer.
+#[unsafe(no_mangle)]
+pub extern "C" fn neoclr_apply_binary(callback: extern "C" fn(i32, i32) -> i32) -> i32 {
+    callback(19, 23)
+}
+#[unsafe(no_mangle)]
+pub extern "C" fn neoclr_apply_twice(callback: extern "C" fn(i32) -> i32) -> i32 {
+    callback(1);
+    callback(1)
+}
+#[unsafe(no_mangle)]
+pub extern "C" fn neoclr_apply_other_thread(callback: extern "C" fn(i32) -> i32) -> i32 {
+    std::thread::spawn(move || callback(1)).join().unwrap()
+}
+#[unsafe(no_mangle)]
+pub extern "C" fn neoclr_constant() -> i32 {
+    42
+}
+#[unsafe(no_mangle)]
+pub extern "C" fn neoclr_get_constant() -> *const std::ffi::c_void {
+    neoclr_constant as *const std::ffi::c_void
+}
+#[unsafe(no_mangle)]
+pub extern "C" fn neoclr_get_null_function() -> *const std::ffi::c_void {
+    std::ptr::null()
+}
+
+macro_rules! callback_identity {
+    ($name:ident, $ty:ty, $value:expr) => {
+        #[unsafe(no_mangle)]
+        pub extern "C" fn $name(callback: extern "C" fn($ty) -> $ty) -> $ty {
+            callback($value)
+        }
+    };
+}
+callback_identity!(neoclr_callback_i8, i8, -128);
+callback_identity!(neoclr_callback_u8, u8, 255);
+callback_identity!(neoclr_callback_i16, i16, -32768);
+callback_identity!(neoclr_callback_u16, u16, 65535);
+callback_identity!(neoclr_callback_i32, i32, i32::MIN);
+callback_identity!(neoclr_callback_u32, u32, u32::MAX);
+callback_identity!(neoclr_callback_i64, i64, i64::MIN);
+callback_identity!(neoclr_callback_u64, u64, u64::MAX);
+callback_identity!(neoclr_callback_isize, isize, -42);
+callback_identity!(neoclr_callback_usize, usize, 42);
+callback_identity!(neoclr_callback_f32, f32, 1.25);
+callback_identity!(neoclr_callback_f64, f64, -2.5);
+#[unsafe(no_mangle)]
+pub extern "C" fn neoclr_callback_void(callback: extern "C" fn()) -> i32 {
+    callback();
+    42
+}
+#[unsafe(no_mangle)]
+pub extern "C" fn neoclr_callback_system(callback: extern "system" fn(i32, i32) -> i32) -> i32 {
+    callback(19, 23)
+}
+
+#[unsafe(no_mangle)]
+pub extern "C" fn neoclr_echo_callback(
+    callback: *const std::ffi::c_void,
+) -> *const std::ffi::c_void {
+    callback
+}

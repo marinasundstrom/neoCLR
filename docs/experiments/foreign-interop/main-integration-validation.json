@@ -1,0 +1,47 @@
+{
+  "date": "2026-10-12",
+  "host": "macOS-27.0-arm64-arm-64bit",
+  "branch": "main",
+  "parents": [
+    "a678a268b1c424fdc761df459d977efcc6f9fe8e",
+    "204b78676816c323a0b8c9dff156779626bd6281"
+  ],
+  "note": "Focused checks executed against the resolved merge tree before the merge commit. Code merged without conflicts; documentation retains both histories and records author-directed main integration.",
+  "checks": [
+    {
+      "command": "cargo test --locked --test pinvoke --test function_objects -j 4",
+      "passed": true,
+      "interopTests": 27,
+      "functionTests": 26
+    },
+    {
+      "command": "cargo test --locked --lib interop -j 4",
+      "passed": true,
+      "tests": 2
+    },
+    {
+      "command": "cargo check --manifest-path tools/aot-poc/Cargo.toml --locked -j 4",
+      "passed": true,
+      "scope": "Build compatibility only; no new native FFI lowering claimed"
+    },
+    {
+      "command": "python3 scripts/build-api-docs.py --check",
+      "passed": true
+    }
+  ],
+  "environment": {
+    "SDKROOT": "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.2.sdk",
+    "runtimeTargetDirectory": "/Users/robert/.codex/worktrees/native-function-pointers/neoclr/target/ffi-validation",
+    "backendTargetDirectory": "/Users/robert/.codex/worktrees/native-function-pointers/neoclr/target/ffi-backend-check"
+  },
+  "sha256": {
+    "src/metadata.rs": "6551c66f1d7a303efa31c805f3df88959dbc38a426bcd2cbb2e6a6050d1d4755",
+    "src/interop.rs": "8ee6ed3eeafb290287d3b915b4b812596f9e48df81dc96185720418b89febe84",
+    "src/interop_callbacks.rs": "b7c7c31d78d359d14ce1bd278e289576c0f7da4a5db3c911c5b9ec915069285e",
+    "src/vm.rs": "da00a8472b1227bb241f0b237ec2914b56aaccd6ff8030c2ec2925625ae91e65",
+    "src/vm_foreign_callbacks.rs": "e13756e37ba2f282dd81adb1edf7780203b3980f32d5f7de33f992eeb356db9a",
+    "src/vm_host_call.rs": "3c89ab5f34a92880388ad5ba0c2470b79f0a58f736fac03e3fc87c391dc569d3",
+    "tests/pinvoke.rs": "7c03c1a94b85613bb9ae20e7efc8c639f815846e9bbfffae24948b29980f719b",
+    "examples/native/library.rs": "b076cc174522e95e3e37586d634ac3aea3d4243bf26f1a01c9121c98cff9ee2a"
+  }
+}

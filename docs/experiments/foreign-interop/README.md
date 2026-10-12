@@ -75,3 +75,81 @@ from InternalCall, verifying a null native descriptor on the runtime service and
 rejecting attempts to attach a native import to it. No runtime dispatch code changed.
 The API snapshot check was repeated and remains stale from the concurrent unrelated
 source inputs noted above; guest reference signatures are unchanged by this slice.
+
+## Structural native-address binding (feature branch, 2026-10-12)
+
+Branch `codex/native-function-pointers` adds function.bind.native, producing the
+existing structural Function from a pointer and NativeAbi contract. The independent
+Raven compiler probe above is unchanged; the new instruction is authored in neoIL.
+The [sample](../../../examples/foreign_function_pointer.neoil) obtains an Add address
+from a real native library and invokes it with 19 and 23, yielding 42.
+
+Focused reproduction from this branch:
+
+```sh
+CARGO_TARGET_DIR=target/ffi-validation cargo test --locked --test pinvoke --test function_objects -j 4
+CARGO_TARGET_DIR=target/ffi-validation cargo test --locked --lib interop::tests::address_binding_retains_library_after_session_drop -j 4
+CARGO_TARGET_DIR=target/ffi-backend-check cargo check --manifest-path tools/aot-poc/Cargo.toml --locked -j 4
+python3 scripts/build-api-docs.py --check
+```
+
+This host uses the Xcode MacOSX26.2 SDK override described above. Private target
+directories avoid contention with unrelated workspace checks. The integration cases
+cover JSON and binary NEOX round trips, returned-address invocation, per-slot UTF-8
+and Bool8 conversion, System ABI on this host, null/data-pointer rejection, trusted
+execution, binding identity and the absence of a managed reflection target. The
+unit check verifies library ownership survives session drop and releases with the
+last binding. The backend check establishes compilation only, not native lowering.
+
+No new guest attribute signature or reference assembly is required. Raven source
+mapping, independent C# metadata authoring, native backend lowering, callback exports
+and AOT sidecar generation remain open. Future exports should use the same signature
+and ABI vocabulary; see [the contract direction](../../design/native-import-export-contract.md).
+
+[Recorded results and source fingerprints](pointer-validation.json): 15 interop tests,
+26 existing Function-object tests and the library-lifetime test pass on macOS ARM64.
+The native backend compilation and API snapshot checks also pass.
+
+
+## Callable parameters and results (2026-10-12)
+
+The runtime feature branch now has bidirectional structural callable mappings:
+call-scoped managed callback parameters and automatically wrapped native Function
+results. [callable-validation.json](callable-validation.json) identifies the inputs,
+commands and host. The [executable sample](../../../examples/foreign_callable.neoil)
+round-trips through JSON and binary NEOX before calling the fixture.
+
+Focused checks pass: 27 native interop integration tests, 26 existing Function tests
+and two interop unit tests. These cover captured receiver mutation across forced GC,
+repeated callbacks, all supported numeric widths, Bool8/Bool32, void/no-result,
+independent System convention, native Function results passed back as callbacks,
+null and temporary-stub result rejection, bad descriptors, wrong-thread entry,
+managed faults, Rust panic containment, shared instruction fuel and bounded reentry.
+The temporary-stub test deliberately returns the currently live stub to verify
+rejection; it never invokes an expired pointer. No retained callback is exercised.
+
+```sh
+SDKROOT=/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.2.sdk CARGO_TARGET_DIR=target/ffi-validation cargo test --locked --test pinvoke --test function_objects -j 4
+SDKROOT=/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.2.sdk CARGO_TARGET_DIR=target/ffi-validation cargo test --locked --lib interop -j 4
+SDKROOT=/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.2.sdk CARGO_TARGET_DIR=target/ffi-backend-check cargo check --manifest-path tools/aot-poc/Cargo.toml --locked -j 4
+python3 scripts/build-api-docs.py --check
+```
+
+The backend check establishes build compatibility only, not native import/callback
+lowering. The API snapshot remains unchanged because no Raven guest API or compiler
+bridge changed; Rust metadata fields have a manual API reference. No website build
+was needed. Qualification is macOS ARM64 only. Retained registrations, source
+attributes/emission, arbitrary foreign threads, richer callback types and JIT/AOT
+exports/sidecars remain open. Existing source compiler evidence above is unaffected.
+
+
+## Main integration — 2026-10-12
+
+The author explicitly directed merging the bounded interpreter feature now, leaving
+expansion as future work. The resolved main merge passes all 55 focused tests
+(27 interop, 26 Function and two interop unit tests), backend build compatibility
+and the API snapshot check. [Integration evidence](main-integration-validation.json)
+records both parent revisions and tested code hashes. Code merged without conflicts;
+documentation conflicts retained the separate HTTP/SSL and FFI records. The earlier
+branch reports above remain historical evidence. No Raven source authoring,
+additional platform qualification or native FFI lowering is implied by this merge.

@@ -2,6 +2,7 @@
 use super::*;
 
 pub(super) struct HostCall {
+    indirect: Option<std::sync::Arc<crate::interop::NativeCall>>,
     callee: crate::metadata::Function,
     args: Vec<Value>,
     assembly: Option<String>,
@@ -13,6 +14,26 @@ pub(super) struct HostCall {
 }
 
 impl HostCall {
+    pub(super) fn indirect(
+        call: std::sync::Arc<crate::interop::NativeCall>,
+        args: Vec<Value>,
+        assembly: Option<String>,
+        context: String,
+        pc: usize,
+    ) -> Self {
+        Self {
+            callee: call.function.clone(),
+            indirect: Some(call),
+            args,
+            assembly,
+            context,
+            pc,
+            patch: None,
+            immediate: None,
+            join: None,
+        }
+    }
+
     pub(super) fn new(
         callee: crate::metadata::Function,
         mut args: Vec<Value>,
@@ -57,6 +78,7 @@ impl HostCall {
             }
         }
         Ok(Self {
+            indirect: None,
             callee,
             args,
             assembly,
@@ -72,7 +94,8 @@ impl HostCall {
         &mut self,
         scheduler: &mut crate::scheduler::Scheduler,
     ) -> Result<(), Fault> {
-        if self.callee.pinvoke.is_none()
+        if self.indirect.is_none()
+            && self.callee.pinvoke.is_none()
             && matches!(
                 crate::native::bind(&self.callee)?,
                 crate::native::Binding::JoinWorker | crate::native::Binding::JoinWorkerResult
@@ -164,13 +187,15 @@ impl HostCall {
         output: &mut Vec<String>,
         bytes: &mut [Vec<u8>; 2],
         options: &ExecutionOptions,
+        participant: &mut crate::shared_heap::Participant,
+        frame_depth: usize,
     ) -> Result<Value, Fault> {
         let result = (|| {
             options.check_cancellation(&self.context, self.pc)?;
             if let Some(value) = &self.immediate {
                 return Ok(value.clone());
             }
-            let value = if self.callee.pinvoke.is_some() {
+            let value = if self.indirect.is_some() || self.callee.pinvoke.is_some() {
                 let _borrow = memory.borrow_native(&self.args)?;
                 let call = {
                     let mut libraries = state
@@ -181,13 +206,29 @@ impl HostCall {
                     let libraries = libraries.as_mut().ok_or_else(|| {
                         Fault::new("native imports require trusted run_with_native execution")
                     })?;
-                    // SAFETY: only run_with_native supplies this trusted session.
-                    unsafe { libraries.prepare(&self.callee)? }
+                    match &self.indirect {
+                        Some(call) => call.clone(),
+                        // SAFETY: only trusted execution supplies this library session.
+                        None => std::sync::Arc::new(unsafe { libraries.prepare(&self.callee)? }),
+                    }
                 };
-                // SAFETY: the trusted ABI contract still covers exports and indirect
-                // pointers. Tracked argument storage stays exclusively borrowed; no
-                // heap, scheduler, library-table or memory mutex is held in native code.
-                unsafe { call.invoke(self.args.clone(), memory)? }
+                let mut runner = |callback: &Value, arguments: Vec<Value>| {
+                    foreign_callbacks::invoke(
+                        module,
+                        callback,
+                        arguments,
+                        state,
+                        participant,
+                        options,
+                        frame_depth,
+                        output,
+                        bytes,
+                    )
+                };
+                // SAFETY: the validated ABI and caller's native trust cover this call.
+                // All input storage, callback contexts and loaded code remain alive.
+                // No graph or library lock is held while entering native code.
+                unsafe { call.invoke(self.args.clone(), memory, &mut runner)? }
             } else {
                 let binding = crate::native::bind(&self.callee)?;
                 let before = output.len();
@@ -247,11 +288,13 @@ impl HostCall {
                 value
             };
             expect(&value, &self.callee.returns)?;
-            Ok(if self.callee.pinvoke.is_some() {
-                value.on_stack()
-            } else {
-                value
-            })
+            Ok(
+                if self.indirect.is_some() || self.callee.pinvoke.is_some() {
+                    value.on_stack()
+                } else {
+                    value
+                },
+            )
         })();
         result.map_err(|mut fault: Fault| {
             fault.function = Some(self.context.clone());

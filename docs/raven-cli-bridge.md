@@ -9145,3 +9145,38 @@ private storage headers. Keep Runtime Contract service configuration unchanged;
 rebuild JIT/AOT hosts with the matching compiler. See [layout audit, validation and
 limitations](experiments/shared-tls/native-layout-budget.md). No wider heap/stack
 budget or end-to-end HTTPS qualification is implied.
+
+## Native-address Function experiment (2026-10-12)
+
+Main now admits the interpreter development instruction function.bind.native with
+a structural Function shape and NativeAbi descriptor. It consumes a native pointer;
+no delegate type or synthetic managed method identity is created. The existing named
+import descriptor is unchanged. New instruction records require a matching runtime.
+
+This slice uses runtime JSON/NEOX and neoIL directly. Raven and the independent C#
+metadata API do not yet emit this instruction, and no CLI projection can represent
+a live address binding. Runtime Contract configuration is unchanged. Interpreter
+validation and native fixture execution own current evidence; compiler mapping and
+shared JIT/AOT lowering remain subsequent work on appropriately isolated branches.
+The proposed AOT sidecar will describe export symbols/signatures/layouts, not serialize
+process-specific live addresses. See [the import/export design](design/native-import-export-contract.md).
+
+
+### Callable arguments and results (2026-10-12)
+
+The same runtime experiment adds callback_parameters and function_return to native
+ABI metadata, with neoIL .callback/.functionreturn authoring. Native intent is a
+structural Function parameter or result plus independent ABI mapping; a callback
+adapter also retains captured managed state. The initial runtime contract is
+call-scoped, same-thread scalar callbacks and native-address Function results.
+There is no new CLI encoding, guest attribute or Runtime Contract configuration.
+Raven/C# metadata authoring is not implemented by this slice. The runtime owns
+validation and the libffi/interpreter adapters; the eventual native backend owns
+entry stubs and sidecar emission. Native registration lifetime, thread attachment,
+AOT exports and source mapping remain separate gates. No compiler repository was
+changed; do not infer source authoring support from this runtime experiment.
+
+
+The author explicitly directed main integration of this bounded FFI slice on
+2026-10-12. Source compiler/native metadata tooling and backend expansion remain
+future work; their previous readiness gate is deferred for this slice only.

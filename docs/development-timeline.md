@@ -25,6 +25,65 @@ available original wording; other text is a summary.
 
 See the [changelog](../CHANGELOG.md) and linked design documents for technical status.
 
+## 2026-10-12 — Callable foreign parameters and results
+
+- **Author:** requested a foreign parameter expressed as a callable so native code
+  can invoke a passed managed Function with a matching signature. Clarified:
+  “This should go both direction. A foreign function could return a function object also.”
+  Examples were `extern func Register(func: (int, int) -> int)` and
+  `extern func GetFunction() -> () -> int`, with attributes omitted.
+- **Assistant proposal:** use independent ABI descriptors on structural callable
+  parameters/results, generate managed callback entry stubs, and wrap native return
+  addresses. Distinguish signature compatibility from captured-state rooting, native
+  lifetime and fault boundaries. A Register API that stores its callback needs an
+  owned registration and unregister protocol; call-duration rooting does not suffice.
+- **Action:** extend codex/native-function-pointers with a bounded interpreter
+  experiment: same-thread call-scoped scalar callbacks, captured receiver rooting,
+  independent convention/Boolean mappings and typed native Function results. Preserve
+  invocation heap/services/budget across reentry and keep faults from unwinding into C.
+- **Validation:** executable native fixtures exercise both directions, captured state
+  across GC, repeated entry, scalar widths, fault/thread rejection and returned-callable
+  composition. See [evidence](experiments/foreign-interop/README.md#callable-parameters-and-results-2026-10-12).
+- **Author correction:** “The code I showed were just samples of extern function.
+  Not an API for registering anything.” The names illustrate callable parameter
+  and result types; they do not request a registration API or establish retention.
+- **Assistant response:** acknowledge overinterpreting the name Register and correct
+  the contract/API documentation. Callback retention remains a conditional lifetime
+  concern, not an author-requested API or an inferred next priority. No runtime
+  behavior changes in this correction.
+- **Author clarification:** crossing a foreign-function boundary requires trusting
+  the receiver, which may have a different memory management and security model;
+  the runtime may still retain references on its side.
+- **Assistant response and action:** record independent ownership/security models
+  in the [design](design/native-import-export-contract.md#trust-and-ownership-across-the-boundary).
+  Distinguish managed rooting from foreign ownership, and borrowing/copying/transfer
+  from merely passing an address. Runtime checks protect local invariants rather
+  than enforce a foreign collector or provide a sandbox. Longer-lived mappings do
+  not inherently require the native side to adopt a neoCLR registration API.
+  This is a contract clarification; no runtime behavior changed.
+- **Author refinement:** unsafe means operating outside the runtime's guarantees,
+  rather than merely being unmanaged; foreign code may be managed elsewhere.
+- **Assistant response and action:** adopt that distinction in the contract design.
+  Another runtime's managed code still requires an explicit cross-runtime agreement;
+  a native runtime service may uphold a safe managed contract. Safe wrappers are a
+  design possibility when they uphold all caller-facing obligations, not a guarantee
+  supplied by attributes alone. Existing trusted execution behavior is unchanged.
+- **Integration decision:** after the assistant proposed compiler/metadata support
+  and additional qualification before main integration, the author directed:
+  “Let's merge it right now and leave a note to future work that we might expand
+  this later.” This explicitly supersedes the earlier compiler-readiness gate for
+  this bounded FFI slice. Preserve current interpreter restrictions and record
+  possible expansion rather than implying those capabilities are complete.
+- **Integration action:** merge the feature branch into main, retain both sides of
+  documentation conflicts, update current feature/API status and preserve unrelated
+  local documentation edits outside the merge commit. Prior test evidence remains
+  historical; [focused integration checks](experiments/foreign-interop/main-integration-validation.json)
+  pass all 55 tests, backend build compatibility and the API snapshot check.
+- **Open:** persistent registrations, foreign-thread attachment, richer reverse
+  marshalling, Raven attributes/emission and JIT/AOT exports/sidecars. The author
+  established the desired two-way interface, not approval of a permanent call-scoped
+  limitation or a particular future attribute spelling.
+
 ## 2026-10-12 — Shared SSL transport implementation
 
 - **Author:** requested shared SSL transport and foundational
@@ -16120,3 +16179,27 @@ scenarios pass locally in interpreter, default JIT and AOT; no further runtime f
 was required by these cases. [Evidence](experiments/shared-tls/http-failures-validation.json)
 and the identical pending Windows gate distinguish local results from platform
 qualification. Request and response deadline documentation now includes TLS work.
+
+## 2026-10-12 — Structural FFI mappings and AOT sidecars
+
+- **Author:** asks to continue toward a more elaborate importing/exporting interface,
+  explains “We don't have delegates in neoCLR, we directly express function signature”,
+  and describes future AOT output paired with sidecar public-member metadata and
+  annotations so compatible runtimes/native consumers know functions, structures,
+  types and members.
+- **Assistant response:** use the existing structural Function shape plus explicit
+  ABI/ownership mapping, keeping binding instance data separate from shape identity.
+  An AOT sidecar describes code and native layouts; entry stubs/runtime coordination
+  are still required where managed state crosses the boundary.
+- **Action:** isolate the runtime experiment on codex/native-function-pointers. Add
+  a native-address binding instruction, shared ABI validation/marshalling and retained
+  library owners. Native bindings have no managed method target; imports remain
+  distinct from InternalCall. No delegate declaration or Raven source mapping API
+  is introduced. Record the [sidecar design](design/native-import-export-contract.md)
+  as a goal and proposed contract, not an implemented or stable schema.
+- **Open:** Raven/native metadata authoring, JIT/AOT lowering, export stubs, ABI layout
+  manifests, callbacks, ownership/release protocols and platform qualification.
+- **Validation:** 42 focused tests pass (15 interop, 26 existing Function-object
+  checks and library lifetime), as do native backend compilation and API snapshot
+  checks. Included unit fixtures were updated for the explicit managed/native
+  binding distinction. [Evidence](experiments/foreign-interop/pointer-validation.json).

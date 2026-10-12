@@ -1,0 +1,44 @@
+{
+  "date": "2026-10-12",
+  "host": "macOS-27.0-arm64-arm-64bit",
+  "branch": "codex/native-function-pointers",
+  "baseRevision": "ce1d384c2757d3271d7452ab7fe6672f05e3b691",
+  "note": "Working-tree implementation at validation; base revision excludes this change. Results observed in focused tool executions.",
+  "checks": [
+    {
+      "command": "cargo test --locked --test pinvoke --test function_objects -j 4",
+      "passed": true,
+      "interopTests": 15,
+      "functionTests": 26
+    },
+    {
+      "command": "cargo test --locked --lib interop::tests::address_binding_retains_library_after_session_drop -j 4",
+      "passed": true,
+      "tests": 1
+    },
+    {
+      "command": "cargo check --manifest-path tools/aot-poc/Cargo.toml --locked -j 4",
+      "passed": true,
+      "scope": "Build only; pointer-call native lowering remains unsupported"
+    },
+    {
+      "command": "python3 scripts/build-api-docs.py --check",
+      "passed": true
+    }
+  ],
+  "environment": {
+    "SDKROOT": "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.2.sdk",
+    "runtimeTargetDirectory": "target/ffi-validation",
+    "backendTargetDirectory": "target/ffi-backend-check"
+  },
+  "sha256": {
+    "src/metadata.rs": "fc937090dbf035fb49f81d2d9ef56010d34921b673cabbba50a5ca9ccebe7d98",
+    "src/interop.rs": "195499dad8b9fb45abbf1d8b7fdd85a07879afc5be61af6c1527ffedf32ae5f4",
+    "src/function_objects.rs": "d4988014ffad1b9b70ff67a0801acb97a9618b73f175dead4f750dc8f4f275bd",
+    "src/vm.rs": "fcccb25fb62aa1565668cbf483bc145271b14c565414832f2651e5e1b1ca8171",
+    "src/vm_host_call.rs": "cb7649236aee9d5d9a1700f054829f91b115bdd63f0842abdfb9664675c79961",
+    "tests/pinvoke.rs": "393e5b8a187d1d58e3f0596f3a22b0042ad6d0165161e941e8e7c836ae199d15",
+    "examples/native/library.rs": "8d87dc12a883ae0a041c4876655c84fb07837b05c2134d53aebe92ef09bff2ef",
+    "examples/foreign_function_pointer.neoil": "c1b60892b3ced0d049e22b00f49257202d7ddb6d509658e5810fe026411b0fb0"
+  }
+}

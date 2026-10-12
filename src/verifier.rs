@@ -676,6 +676,7 @@ fn effect(
         CreateArray(_) | ArrayElement(_) | ArrayAddress(_) => (2, 1),
         StoreArrayElement(_) => (3, 0),
         New(ty) => (crate::vm::record_fields(module, ty, arity)?.len(), 1),
+        BindNativeFunction { .. } => (1, 1),
         BindFunction { target, .. } => (usize::from(target.instance), 1),
         Call(target) | CallVirtual(target) | CallSelf { target, .. } => (
             target.parameters.len() + usize::from(target.instance),
@@ -1100,6 +1101,15 @@ fn typed_effect(
                 "interface.borrow requires a typed pointer or managed slot reference",
             )),
         },
+        BindNativeFunction { function_type, abi } => {
+            crate::interop::indirect_contract(module, function_type, abi)?;
+            if !matches!(exact(&values[0])?, T::Ptr(_)) {
+                return Err(crate::Fault::new(
+                    "native Function binding requires a pointer",
+                ));
+            }
+            one(function_type.clone())
+        }
         BindFunction {
             function_type,
             target,

@@ -1,0 +1,56 @@
+{
+  "date": "2026-10-12",
+  "host": "macOS-27.0-arm64-arm-64bit",
+  "branch": "codex/native-function-pointers",
+  "baseRevision": "95941231a457ca2c6ed950ab48deeda0d5988bcd",
+  "note": "Working-tree implementation at validation; base revision excludes this change. Results observed in focused tool executions. API safety comments were added after executable tests; they do not change execution.",
+  "checks": [
+    {
+      "command": "cargo test --locked --test pinvoke --test function_objects -j 4",
+      "passed": true,
+      "interopTests": 27,
+      "functionTests": 26
+    },
+    {
+      "command": "cargo test --locked --test pinvoke --test function_objects --lib interop -j 4",
+      "passed": true,
+      "unitTests": 2,
+      "note": "interop filter selected two library tests; integration suites were fully executed by the separate command above."
+    },
+    {
+      "command": "cargo check --manifest-path tools/aot-poc/Cargo.toml --locked -j 4",
+      "passed": true,
+      "scope": "Build compatibility only; native import/callback lowering remains unsupported"
+    },
+    {
+      "command": "python3 scripts/build-api-docs.py --check",
+      "passed": true
+    }
+  ],
+  "environment": {
+    "SDKROOT": "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.2.sdk",
+    "runtimeTargetDirectory": "target/ffi-validation",
+    "backendTargetDirectory": "target/ffi-backend-check"
+  },
+  "limitations": [
+    "Call-scoped same-thread callbacks only; native code must not retain callback pointers",
+    "Scalar callback signatures; explicit Boolean conversions",
+    "No Raven attribute/compiler authoring or C# metadata API support for callable mappings",
+    "No JIT/AOT callbacks, public native exports or sidecar generation",
+    "Only macOS ARM64 execution qualified"
+  ],
+  "sha256": {
+    "src/metadata.rs": "6551c66f1d7a303efa31c805f3df88959dbc38a426bcd2cbb2e6a6050d1d4755",
+    "src/assembler.rs": "b2f924391247eb710987a4d2e73b491158340c21f202962f841f87aef81dacc1",
+    "src/interop.rs": "8ee6ed3eeafb290287d3b915b4b812596f9e48df81dc96185720418b89febe84",
+    "src/interop_callbacks.rs": "b7c7c31d78d359d14ce1bd278e289576c0f7da4a5db3c911c5b9ec915069285e",
+    "src/function_objects.rs": "cb894991ff9413f60a03626bac7671fb878fd20c43a1112ff04d1736a636fd78",
+    "src/vm.rs": "da00a8472b1227bb241f0b237ec2914b56aaccd6ff8030c2ec2925625ae91e65",
+    "src/vm_host_call.rs": "3c89ab5f34a92880388ad5ba0c2470b79f0a58f736fac03e3fc87c391dc569d3",
+    "src/vm_foreign_callbacks.rs": "e13756e37ba2f282dd81adb1edf7780203b3980f32d5f7de33f992eeb356db9a",
+    "src/program.rs": "0def0bb2c5142b0ef83ef6c09a6a6f6478caf3ca73eb1e985e73f1ae55ffb629",
+    "tests/pinvoke.rs": "7c03c1a94b85613bb9ae20e7efc8c639f815846e9bbfffae24948b29980f719b",
+    "examples/native/library.rs": "b076cc174522e95e3e37586d634ac3aea3d4243bf26f1a01c9121c98cff9ee2a",
+    "examples/foreign_callable.neoil": "bf7d391b960352fd35c12a9af460349be1502c4e0434d137a2d5826d94cbb4d6"
+  }
+}

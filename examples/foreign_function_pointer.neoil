@@ -1,0 +1,18 @@
+.module ForeignFunctionPointer
+.entry Main
+
+.function GetAdd() -> Void*
+    .foreign "./target/native/neoclr_sample" "neoclr_get_add" cdecl
+.end
+
+.function Main() -> Int32
+    .local fn<Int32,Int32,Int32> add
+    call GetAdd()
+    function.bind.native fn<Int32,Int32,Int32> = {"calling_convention":"Cdecl"}
+    stloc add
+    ldloc add
+    ldc.i4 19
+    ldc.i4 23
+    call instance fn<Int32,Int32,Int32>::Invoke(Int32,Int32)
+    ret
+.end

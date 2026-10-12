@@ -454,6 +454,31 @@ fn parse_parts(source: &str) -> Result<(Module, Vec<FieldFixup>), Fault> {
                         .function
                         .custom_attributes
                         .push(parse_custom_attribute(rest)?);
+                } else if matches!(word, ".callback" | ".functionreturn") {
+                    let import = pending.function.pinvoke.as_mut().ok_or_else(|| {
+                        Fault::new("callable ABI directive requires a preceding .foreign")
+                    })?;
+                    if word == ".callback" {
+                        let (index, json) = rest
+                            .split_once(" = ")
+                            .ok_or_else(|| Fault::new("expected .callback index = ABI JSON"))?;
+                        let abi = serde_json::from_str(json)
+                            .map_err(|e| Fault::new(format!("invalid callback ABI: {e}")))?;
+                        if import
+                            .callback_parameters
+                            .insert(index.into(), abi)
+                            .is_some()
+                        {
+                            return Err(Fault::new("duplicate callback ABI"));
+                        }
+                    } else {
+                        let abi = serde_json::from_str(rest).map_err(|e| {
+                            Fault::new(format!("invalid returned Function ABI: {e}"))
+                        })?;
+                        if import.function_return.replace(Box::new(abi)).is_some() {
+                            return Err(Fault::new("duplicate returned Function ABI"));
+                        }
+                    }
                 } else if matches!(word, ".foreign" | ".pinvoke") {
                     if pending.function.pinvoke.is_some()
                         || !pending.function.body.is_empty()
@@ -493,6 +518,8 @@ fn parse_parts(source: &str) -> Result<(Module, Vec<FieldFixup>), Fault> {
                         string_marshalling,
                         parameter_marshalling: Default::default(),
                         return_marshalling: None,
+                        callback_parameters: Default::default(),
+                        function_return: None,
                     });
                 } else if word == ".override" {
                     if !pending.function.body.is_empty() || !pending.labels.is_empty() {
@@ -651,6 +678,16 @@ fn parse_parts(source: &str) -> Result<(Module, Vec<FieldFixup>), Fault> {
                                 .map_or((false, ty.trim()), |ty| (true, ty));
                             Some(
                                 serde_json::json!({"borrowed": borrowed, "self_type": parse_type(ty)?, "target": parse_function_ref(target.trim())?}),
+                            )
+                        }
+                        "function.bind.native" => {
+                            let (ty, abi) = rest.split_once(" = ").ok_or_else(|| {
+                                Fault::new("expected function.bind.native Type = ABI JSON")
+                            })?;
+                            let abi: crate::metadata::NativeAbi =
+                                serde_json::from_str(abi).map_err(|e| Fault::new(e.to_string()))?;
+                            Some(
+                                serde_json::json!({"function_type": parse_type(ty.trim())?, "abi": abi}),
                             )
                         }
                         "function.bind" => {

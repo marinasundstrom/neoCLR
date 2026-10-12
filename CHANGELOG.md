@@ -8,6 +8,14 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-12
 
+- Merge the bounded callable FFI implementation into main at the author's direction.
+  Keep its interpreter/neoIL scope and trusted, call-scoped callback contract explicit.
+  Record source/compiler metadata integration, richer marshalling/lifetimes,
+  JIT/AOT and export/sidecar support as possible future expansion; defer the prior
+  compiler-readiness gate for this slice without promoting other structural work.
+  Validate the merged tree with 55 focused tests, backend compilation and API
+  snapshot checks.
+
 - Qualify managed HTTP TLS hostname rejection/recovery, client handshake timeout
   and cancellation, and server handshake deadlines in interpreter/JIT/AOT. Observe
   ClientHello before the client failure checks, document deadline scope, and add
@@ -34,6 +42,31 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   qualify boundary copying, allocation canaries, overflow rejection and roots
   beyond lane 64. Rebuild native compiler/host bundles together; Windows execution
   remains pending. See docs/experiments/shared-tls/native-layout-budget.md.
+
+- Extend codex/native-function-pointers with callable parameters and results:
+  independent ABI descriptors adapt managed Functions (including captured receivers)
+  to call-scoped native callbacks and wrap returned native pointers as Functions.
+  Preserve shared-heap rooting, invocation budgets and library ownership. Support
+  scalar/Boolean callback marshalling, bound reentry, reject other-thread calls and
+  contain managed faults at the native boundary. Add neoIL authoring and native
+  fixture coverage. Retained registration, source compiler attributes and JIT/AOT
+  remain open. Optional wire fields require a matching runtime when used; Rust
+  NativeImport/NativeAbi struct literals must include the new fields. Clarify that
+  the author's extern examples describe callable parameters/results, not a requested
+  registration API; names alone establish no retention contract. Record the foreign
+  boundary as a trusted agreement between independent memory/security models,
+  distinguishing managed rooting from foreign ownership and release obligations.
+  Define unsafe in terms of leaving runtime guarantees, independent of whether the
+  foreign implementation is native or managed by another runtime.
+
+- On codex/native-function-pointers, bind native addresses to structural Function
+  values through the interpreter/neoIL function.bind.native instruction. Share ABI
+  validation/marshalling with named imports, retain loaded library owners, reject
+  null/tracked data addresses and preserve trusted-execution checks. Add pointer
+  factory, marshalling, identity, lifetime and binary round-trip coverage. Record
+  the author's AOT import/export sidecar direction; Raven authoring, native backend
+  lowering and export stubs remain unimplemented. New opcodes require a matching
+  runtime; existing named-import metadata is unchanged.
 
 - Record function-pointer mapping as the next proposed FFI slice, distinguishing
   native-address invocation from managed callbacks and their lifetime obligations.

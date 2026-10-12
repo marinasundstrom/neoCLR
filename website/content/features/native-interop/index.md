@@ -47,7 +47,7 @@ requires trust.
 
 The low-level neoIL spelling is `.foreign`; `.pinvoke` remains a compatibility alias.
 Explicit scalar and pointer ABI imports remain supported. Returned strings, bounded
-input/output buffers, automatic record layout, error-state capture and callbacks need
+input/output buffers, automatic record layout, error-state capture and retained callbacks need
 further contracts. The current evidence covers macOS ARM64 interpreter execution,
 including mixed encodings, boolean results and static class imports.
 
@@ -60,3 +60,19 @@ Raven preserves `extern` when reading a native import from another assembly.
 Runtime-owned internal calls remain separate from foreign imports. Both use `extern`,
 while `MethodImpl(InternalCall)` identifies a runtime service and `NativeImport`
 identifies a library/export. Metadata inspection preserves both distinctions.
+
+Main includes development support for binding a native
+address to a structural Function signature in the interpreter. It also accepts
+managed Functions as call-scoped native callbacks and wraps returned native callable
+pointers as Functions. Each callable has its own convention and conversion metadata;
+captured managed state stays alive through the call. The initial callback scope is
+same-thread scalar signatures. Native APIs that store callbacks need a future
+registration/unregistration lifetime contract. Raven mapping syntax and JIT/AOT support
+remain next. The longer-term goal is an AOT library plus versioned public-interface
+metadata for runtime and native consumers. Export stubs and that sidecar format are
+not implemented yet.
+
+
+This bounded interpreter feature was integrated at the author's direction on
+2026-10-12. Source annotations, richer marshalling/lifetime support and native
+backend/export integration may expand it later; they are not implemented by this merge.

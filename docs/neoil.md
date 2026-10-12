@@ -728,3 +728,24 @@ validation. Closed-interface enforcement and general sealed-leaf enforcement rem
 separate work. No explicit permits-list encoding is introduced. A retained
 UnionAttribute marks a nominal union independently. See the
 [introspection contract](introspection-design.md#type-classification-flags--development-2026-09-24).
+
+### Native Function binding experiment
+
+In the main development interpreter, `function.bind.native fn<Int32,Int32,Int32> =
+{"calling_convention":"Cdecl"}` consumes a typed native pointer and returns a
+structural Function. The instruction must be on one line. ABI JSON may additionally
+specify string_marshalling, parameter_marshalling and return_marshalling, as described
+in [native interop](native-interop.md#structural-native-function-bindings-development).
+Ordinary Function Invoke calls execute it. This is an interpreter experiment;
+Raven authoring and native backend emission are subsequent gates.
+
+
+### Foreign callable mappings (development)
+
+After `.foreign`, `.callback index = ABI_JSON` describes a call-scoped callable
+parameter; `.functionreturn ABI_JSON` describes a returned native Function pointer.
+Each directive fits on one line. Duplicate descriptors and invalid indices are
+rejected. Both use the NativeAbi object, including its required calling_convention.
+`function.bind.native` also accepts callback_parameters and function_return inside
+its ABI JSON. The [tested sample](../examples/foreign_callable.neoil) covers both
+directions; see [callback lifetime and error rules](native-interop.md#callable-parameters-and-results-development).

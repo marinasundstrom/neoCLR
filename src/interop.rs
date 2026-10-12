@@ -3,7 +3,7 @@ use crate::{
     Fault, Value,
     memory::SharedMemory,
     metadata::{
-        CallingConvention, Function, NativeImport, NativeMarshalling, NativeStringMarshalling, Type,
+        CallingConvention, Function, NativeAbi, NativeMarshalling, NativeStringMarshalling, Type,
     },
 };
 use libffi::middle::{Arg, Cif, CodePtr, Type as FfiType, arg};
@@ -48,6 +48,59 @@ pub(crate) fn validate(function: &Function) -> Result<(), Fault> {
             return Err(Fault::new("invalid native library or entry point"));
         }
     }
+    validate_abi(function, &NativeAbi::from(import))
+}
+
+fn validate_abi(function: &Function, import: &NativeAbi) -> Result<(), Fault> {
+    validate_abi_depth(function, import, 0)
+}
+
+fn validate_abi_depth(function: &Function, import: &NativeAbi, depth: usize) -> Result<(), Fault> {
+    if depth > 8 {
+        return Err(Fault::new("native callable ABI nesting limit exceeded"));
+    }
+    for (index, abi) in &import.callback_parameters {
+        let index = index
+            .parse::<usize>()
+            .ok()
+            .filter(|i| i.to_string() == *index)
+            .filter(|i| *i < function.parameters.len())
+            .ok_or_else(|| Fault::new("native callback index outside signature"))?;
+        let ty = &function.parameters[index];
+        let nested = callable_contract(ty)?;
+        // Reverse marshalling initially admits scalar values only. In particular,
+        // a callback cannot hand native code a managed address or a temporary stub.
+        if abi.string_marshalling.is_some()
+            || !abi.callback_parameters.is_empty()
+            || abi.function_return.is_some()
+            || nested
+                .parameters
+                .iter()
+                .chain([&nested.returns])
+                .any(|ty| matches!(ty, Type::String | Type::Ptr(_) | Type::Function(_)))
+        {
+            return Err(Fault::new(
+                "native callbacks currently require scalar signatures",
+            ));
+        }
+        validate_abi_depth(&nested, abi, depth + 1)?;
+        if import
+            .parameter_marshalling
+            .contains_key(&index.to_string())
+        {
+            return Err(Fault::new("callback parameter has conflicting marshalling"));
+        }
+    }
+    if let Some(abi) = &import.function_return {
+        if import.return_marshalling.is_some() {
+            return Err(Fault::new(
+                "native Function result has conflicting marshalling",
+            ));
+        }
+        let nested = callable_contract(&function.returns)?;
+        validate_abi_depth(&nested, abi, depth + 1)?;
+    }
+
     if import.parameter_marshalling.keys().any(|key| {
         key.parse::<usize>().map_or(true, |index| {
             index >= function.parameters.len() || index.to_string() != *key
@@ -61,7 +114,7 @@ pub(crate) fn validate(function: &Function) -> Result<(), Fault> {
         if *ty == Type::Void {
             return Err(Fault::new("Void is not a native argument type"));
         }
-        marshalled_type(ty, parameter_marshalling(import, index, ty))?;
+        argument_type(import, index, ty)?;
     }
     // String returns need an explicit allocator/length/lifetime contract first.
     if function.returns == Type::String {
@@ -69,15 +122,74 @@ pub(crate) fn validate(function: &Function) -> Result<(), Fault> {
             "native String returns require an ownership contract",
         ));
     }
-    marshalled_type(&function.returns, import.return_marshalling)?;
+    result_type(&function.returns, import)?;
     Ok(())
 }
 
-fn parameter_marshalling(
-    import: &NativeImport,
-    index: usize,
+pub(crate) fn indirect_contract(
+    module: &crate::Module,
     ty: &Type,
-) -> Option<NativeMarshalling> {
+    abi: &NativeAbi,
+) -> Result<Function, Fault> {
+    let Type::Function(shape) = ty else {
+        return Err(Fault::new("native binding requires a Function signature"));
+    };
+    shape.validate()?;
+    if !shape.out_parameters.is_empty() || !shape.out_when_true.is_empty() {
+        return Err(Fault::new(
+            "native Function output contracts are not supported",
+        ));
+    }
+    let mut function = crate::function_objects::contract(module, ty)?;
+    function.instance = false;
+    function.owner = None;
+    validate_abi(&function, abi)?;
+    Ok(function)
+}
+
+fn callable_contract(ty: &Type) -> Result<Function, Fault> {
+    let Type::Function(shape) = ty else {
+        return Err(Fault::new(
+            "native callable mapping requires a Function signature",
+        ));
+    };
+    shape.validate()?;
+    if !shape.out_parameters.is_empty() || !shape.out_when_true.is_empty() {
+        return Err(Fault::new(
+            "native Function output contracts are not supported",
+        ));
+    }
+    let mut function = crate::function_objects::structural_contract(ty)?;
+    function.name = "$NativeFunction.Invoke".into();
+    function.owner = None;
+    function.instance = false;
+    function.pinvoke = None;
+    function.parameters = shape.parameters.clone();
+    function.returns = shape.returns.clone();
+    function.no_result = shape.no_result;
+    Ok(function)
+}
+
+fn argument_type(abi: &NativeAbi, index: usize, ty: &Type) -> Result<FfiType, Fault> {
+    if abi.callback_parameters.contains_key(&index.to_string()) {
+        Ok(FfiType::pointer())
+    } else {
+        marshalled_type(ty, parameter_marshalling(abi, index, ty))
+    }
+}
+fn result_type(ty: &Type, abi: &NativeAbi) -> Result<FfiType, Fault> {
+    if abi.function_return.is_some() {
+        Ok(FfiType::pointer())
+    } else {
+        marshalled_type(ty, abi.return_marshalling)
+    }
+}
+
+#[path = "interop_callbacks.rs"]
+mod callbacks;
+pub(crate) type CallbackRunner<'a> = dyn FnMut(&Value, Vec<Value>) -> Result<Value, Fault> + 'a;
+
+fn parameter_marshalling(import: &NativeAbi, index: usize, ty: &Type) -> Option<NativeMarshalling> {
     import
         .parameter_marshalling
         .get(&index.to_string())
@@ -147,6 +259,30 @@ pub struct NativeLibraries {
     symbols: HashMap<(String, String), unsafe extern "C" fn()>,
 }
 impl NativeLibraries {
+    pub(crate) fn bind_pointer(
+        &self,
+        module: &crate::Module,
+        ty: &Type,
+        abi: &NativeAbi,
+        pointer: &crate::memory::Pointer,
+    ) -> Result<NativeCall, Fault> {
+        let function = indirect_contract(module, ty, abi)?;
+        if pointer.address == 0 {
+            return Err(Fault::new("cannot bind a null native function pointer"));
+        }
+        if pointer.allocation.is_some() {
+            return Err(Fault::new(
+                "guest data storage cannot be bound as native code",
+            ));
+        }
+        Ok(NativeCall {
+            _libraries: self.libraries.values().cloned().collect(),
+            address: pointer.address,
+            function,
+            abi: abi.clone(),
+        })
+    }
+
     pub fn loaded_count(&self) -> usize {
         self.libraries.len()
     }
@@ -200,17 +336,20 @@ impl NativeLibraries {
             pointer
         };
         Ok(NativeCall {
-            _library: library.clone(),
-            function_pointer,
+            _libraries: vec![library.clone()],
+            address: function_pointer as usize,
+            abi: NativeAbi::from(import),
             function: function.clone(),
         })
     }
 }
 
+#[derive(Debug)]
 pub(crate) struct NativeCall {
-    _library: std::sync::Arc<libloading::Library>,
-    function_pointer: unsafe extern "C" fn(),
-    function: Function,
+    _libraries: Vec<std::sync::Arc<libloading::Library>>,
+    address: usize,
+    pub(crate) function: Function,
+    abi: NativeAbi,
 }
 impl NativeCall {
     /// The caller holds the tracked argument borrow for the entire call.
@@ -218,10 +357,11 @@ impl NativeCall {
         &self,
         values: Vec<Value>,
         memory: &SharedMemory,
+        runner: &mut CallbackRunner<'_>,
     ) -> Result<Value, Fault> {
         let function = &self.function;
-        let import = function.pinvoke.as_ref().expect("prepared native import");
-        let function_pointer = CodePtr(self.function_pointer as *mut c_void);
+        let import = &self.abi;
+        let function_pointer = CodePtr(self.address as *mut c_void);
         if values.len() != function.parameters.len() {
             return Err(Fault::new("native argument count mismatch"));
         }
@@ -239,6 +379,14 @@ impl NativeCall {
                 value => Ok(value),
             })
             .collect::<Result<_, _>>()?;
+        let callback_runner = std::cell::RefCell::new(runner);
+        let callback_fault = std::sync::Mutex::new(None);
+        let contexts =
+            callbacks::contexts(function, import, &values, &callback_runner, &callback_fault)?;
+        let closures = contexts
+            .iter()
+            .map(callbacks::Closure::new)
+            .collect::<Result<Vec<_>, _>>()?;
         let strings: Vec<Option<NativeString>> = values
             .iter()
             .enumerate()
@@ -256,9 +404,9 @@ impl NativeCall {
                 .parameters
                 .iter()
                 .enumerate()
-                .map(|(i, ty)| marshalled_type(ty, parameter_marshalling(import, i, ty)))
+                .map(|(i, ty)| argument_type(import, i, ty))
                 .collect::<Result<Vec<_>, _>>()?,
-            marshalled_type(&function.returns, import.return_marshalling)?,
+            result_type(&function.returns, import)?,
             native_abi(import.calling_convention),
         );
         // Pointer arguments must reference an address-sized slot, not the Pointer struct.
@@ -271,6 +419,10 @@ impl NativeCall {
                     .expect("marshalled input string")
                     .address(),
                 Value::Pointer(p) => p.address as *mut c_void,
+                Value::Function(_) => closures
+                    .iter()
+                    .find(|closure| closure.index == i)
+                    .map_or(std::ptr::null_mut(), |closure| closure.address()),
                 _ => std::ptr::null_mut(),
             })
             .collect();
@@ -291,7 +443,7 @@ impl NativeCall {
                     Value::UIntPtr(n) => arg(n),
                     Value::Single(n) => arg(n),
                     Value::Double(n) => arg(n),
-                    Value::Pointer(_) | Value::String(_) => arg(&addresses[i]),
+                    Value::Pointer(_) | Value::String(_) | Value::Function(_) => arg(&addresses[i]),
                     _ => return Err(Fault::new("unsupported native argument value")),
                 })
             })
@@ -299,7 +451,7 @@ impl NativeCall {
         // SAFETY: slots match the validated CIF; all remain alive for the call, and
         // the library stays loaded. Caller guarantees the actual export matches
         // this signature and upholds all native pointer and lifetime requirements.
-        unsafe {
+        let result = (|| unsafe {
             Ok(match &function.returns {
                 Type::Void => {
                     cif.call::<()>(function_pointer, &args);
@@ -326,12 +478,115 @@ impl NativeCall {
                 Type::UIntPtr => Value::UIntPtr(cif.call(function_pointer, &args)),
                 Type::Single => Value::Single(cif.call(function_pointer, &args)),
                 Type::Double => Value::Double(cif.call(function_pointer, &args)),
+                Type::Function(_) => {
+                    let address: *mut c_void = cif.call(function_pointer, &args);
+                    if address.is_null() {
+                        return Err(Fault::new("native function returned a null callable"));
+                    }
+                    if closures.iter().any(|closure| closure.address() == address) {
+                        return Err(Fault::new(
+                            "native function cannot return a call-scoped callback pointer",
+                        ));
+                    }
+                    if memory
+                        .pointer_at_address(address as usize, Type::Void)
+                        .allocation
+                        .is_some()
+                    {
+                        return Err(Fault::new(
+                            "guest data storage cannot be returned as native code",
+                        ));
+                    }
+                    let abi = import
+                        .function_return
+                        .as_ref()
+                        .ok_or_else(|| Fault::new("native Function result requires an ABI"))?;
+                    crate::function_objects::bind_native(
+                        &function.returns,
+                        NativeCall {
+                            _libraries: self._libraries.clone(),
+                            address: address as usize,
+                            function: callable_contract(&function.returns)?,
+                            abi: *abi.clone(),
+                        },
+                    )
+                }
                 Type::Ptr(target) => {
                     let address: *mut c_void = cif.call(function_pointer, &args);
                     Value::Pointer(memory.pointer_at_address(address as usize, *target.clone()))
                 }
                 _ => return Err(Fault::new("unsupported native return type")),
             })
+        })();
+        if let Some(fault) = callback_fault
+            .lock()
+            .unwrap_or_else(|e| e.into_inner())
+            .take()
+        {
+            return Err(fault);
         }
+        result
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn address_binding_retains_library_after_session_drop() {
+        let directory =
+            std::env::temp_dir().join(format!("neoclr-binding-owner-{}", std::process::id()));
+        std::fs::create_dir_all(&directory).unwrap();
+        let path = directory.join(libloading::library_filename("binding_owner"));
+        assert!(
+            std::process::Command::new("rustc")
+                .args([
+                    "--edition=2024",
+                    "--crate-type=cdylib",
+                    "--crate-name=binding_owner"
+                ])
+                .arg(
+                    std::path::Path::new(env!("CARGO_MANIFEST_DIR"))
+                        .join("examples/native/library.rs")
+                )
+                .arg("-o")
+                .arg(&path)
+                .status()
+                .unwrap()
+                .success()
+        );
+        // SAFETY: this is the test fixture compiled above; its initializers and export
+        // signature are controlled by this test. No arbitrary pointer is executed.
+        let library = std::sync::Arc::new(unsafe { libloading::Library::new(&path).unwrap() });
+        let address = unsafe {
+            *library
+                .get::<unsafe extern "C" fn()>(b"neoclr_add")
+                .unwrap()
+        } as usize;
+        let owner = std::sync::Arc::downgrade(&library);
+        let mut libraries = NativeLibraries::default();
+        libraries.libraries.insert("binding_owner".into(), library);
+        let ty = crate::assembler::parse_type("fn<Int32,Int32,Int32>").unwrap();
+        let abi: NativeAbi = serde_json::from_str(r#"{"calling_convention":"Cdecl"}"#).unwrap();
+        let module = crate::assemble(".module Test").unwrap();
+        let call = libraries
+            .bind_pointer(
+                &module,
+                &ty,
+                &abi,
+                &crate::memory::Pointer {
+                    address,
+                    allocation: None,
+                    offset: 0,
+                    target: Type::Void,
+                },
+            )
+            .unwrap();
+        drop(libraries);
+        assert!(owner.upgrade().is_some());
+        drop(call);
+        assert!(owner.upgrade().is_none());
+        std::fs::remove_dir_all(directory).unwrap();
     }
 }

@@ -217,6 +217,140 @@ Windows/Linux qualification and installed bundles remain open.
 
 Next: shared JIT/AOT import lowering; bounded pointer-plus-length input/output buffers;
 explicit owned handles and release functions; errno/GetLastError capture; verified
-record layout; callbacks with rooting, thread entry and teardown. Native libraries
+record layout; retained callbacks with thread entry and teardown.
+Main includes the bounded callable development feature described below. Native libraries
 that retain pointers need explicit ownership, not an annotation that extends a temporary
 buffer accidentally. These are gates, not implemented capabilities.
+
+## Structural native Function bindings (development)
+
+The interpreter supports the low-level instruction
+`function.bind.native fn<...> = {"calling_convention":"Cdecl"}`. It consumes a native
+pointer and produces an ordinary structural Function value. ABI JSON accepts the same
+string default and parameter/result marshalling descriptors as named imports. No
+delegate or source-level Raven mapping API is introduced in this slice.
+
+The binding retains all libraries already loaded by its native execution session.
+External addresses still require caller-owned lifetime guarantees; retaining those
+libraries cannot prove that an arbitrary address belongs to one of them. Binding and
+invocation require trusted native execution. Null and tracked guest-data pointers are
+rejected. Signature/ABI mismatch with actual machine code remains the caller's risk.
+
+Clones share binding identity; independently mapped native addresses create distinct
+bindings. Shape identity remains structural. ToString identifies a native Function;
+the transitional managed Function property faults because a raw address has no managed
+MethodInfo. Direct scheduler/worker submission requires a managed wrapper.
+Call-scoped callbacks are described below. Exports, JIT/AOT lowering and independent
+C# metadata authoring remain unimplemented.
+
+See [the executable example](../examples/foreign_function_pointer.neoil) and the
+[author-directed AOT sidecar design](design/native-import-export-contract.md).
+
+## Callable parameters and results (development)
+
+The interpreter maps structural Function values in both directions.
+A parameter has `callback_parameters["index"]: NativeAbi`; a Function result has
+`function_return: NativeAbi`. Each callable has an independent convention and
+conversion map. The shape remains the declared Function type. These optional fields
+are shared by NativeImport and NativeAbi; existing descriptors omit them unchanged.
+New descriptors require a matching runtime. This adds fields to Rust struct literals.
+
+The [tested neoIL example](../examples/foreign_callable.neoil) passes a managed
+`fn<Int32,Int32,Int32>` to a native function and calls a returned `fn<Int32>`:
+
+```text
+.function Apply(fn<Int32,Int32,Int32>) -> Int32
+.foreign "./target/native/neoclr_sample" "neoclr_apply_binary" cdecl
+.callback 0 = {"calling_convention":"Cdecl"}
+.end
+.function GetFunction() -> fn<Int32>
+.foreign "./target/native/neoclr_sample" "neoclr_get_constant" cdecl
+.functionreturn {"calling_convention":"Cdecl"}
+.end
+```
+
+The callback adapter roots the Function and its captured receiver through the native
+call. libffi generates a temporary entry stub; entry rejoins the same invocation,
+heap, instruction budget and services without holding the graph or library lock.
+Callbacks may invoke ordinary managed functions and make nested native calls.
+They do not implicitly drain the enclosing scheduler. Callback entry consumes the
+remaining managed frame budget, including its adapter frame, and has a further
+32-entry native reentry cap to bound host-stack recursion.
+
+This first callback contract is **synchronous, call-scoped and on the calling thread**.
+Native code must finish all uses before returning, and must not store, free or return
+the callback pointer. The runtime rejects other-thread entry without running guest
+code. Waiting for managed suspension is unsupported. A managed fault or caught Rust
+panic produces a zero/false native result (or void); later callbacks in that same
+native call also return zero without guest execution. After native code returns,
+the first callback fault propagates to the managed caller. Native side effects are
+not rolled back, and a native routine that never returns cannot deliver that fault.
+A native API needing an immediate error indication needs a matching status protocol.
+
+Callback signatures currently support the numeric scalar types, explicitly mapped
+Boolean parameters/results, and Void or no-result returns. Strings, pointers,
+records, byrefs and nested callable values within a callback signature are rejected.
+A callback parameter must contain a non-null Function with the exact structural
+signature. Its ABI cannot also have an ordinary parameter conversion. Unknown,
+noncanonical or out-of-range indices and incompatible mappings fail before entry.
+
+A returned native callable is automatically wrapped; users do not manually convert
+its pointer. It retains the returning binding's library owners and uses its own ABI
+when invoked. A null pointer, a tracked guest data address, or one of the current
+call's temporary callback entry pointers is rejected. External dependencies and
+native-owned callable state still require a trusted lifetime guarantee. Retaining
+a library does not prove ownership of arbitrary executable addresses. A returned
+Function can itself be passed as a callable parameter, using an adapter with the
+parameter's ABI. ABI descriptor nesting is bounded to eight levels.
+
+The author's `Register` and `GetFunction` declarations are illustrative extern
+functions, not a proposed registration API. Their names imply no callback lifetime.
+If a foreign function retains a callback beyond the call, that use is not supported
+by the current call-scoped contract. Supporting it will require explicit ownership,
+release and in-flight-call coordination, plus thread attachment where applicable.
+Returning a callable that captures native state likewise needs a future context
+and release contract. No retained-callback attribute spelling is being standardized
+by this experiment. Raven attributes/compiler emission, C# metadata authoring,
+JIT/AOT adapters and sidecar exports remain follow-through.
+
+Compared with .NET's delegate-to-function-pointer marshalling, this adapts neoCLR's
+existing structural Function directly, preserving captured state without introducing
+a delegate declaration. It retains the distinction between automatic call-duration
+rooting and a longer-lived callback registration. The cost is a per-call executable
+stub and interpreter entry; no performance advantage is claimed. Raw pointers alone
+would avoid this adapter but could not carry a managed captured receiver safely.
+Static-only unmanaged exports remain a useful separate AOT path, not a substitute
+for captured callbacks. See the [primary comparison sources](design/native-import-export-contract.md#comparison).
+The closure storage, widened integer returns and raw entry mechanics were checked
+against libffi 5.2.0 / libffi-sys 4.2.2, including its bundled libffi manual, on
+2026-10-12. Other-platform and executable-memory-policy qualification remains open.
+
+
+### Independent foreign memory and security models
+
+The FFI is a trusted boundary. Foreign code manages its own data under its own
+memory and security model; neoCLR does not impose its collector or allocator on it.
+A passed value can be borrowed, copied or transferred according to the ABI contract.
+Crossing the boundary alone does not select ownership or a release operation.
+neoCLR retaining a managed reference protects the managed object's lifetime; it does
+not manage arbitrary foreign copies, allocations or retained pointers. The same
+separation applies when foreign code returns data or a callable to neoCLR.
+See [the trust and ownership design](design/native-import-export-contract.md#trust-and-ownership-across-the-boundary).
+These principles clarify the intended interface without extending the current
+call-scoped callback implementation or claiming that native misuse is sandboxed.
+
+
+### Main integration and possible expansion — 2026-10-12
+
+At the author's explicit direction, the bounded interpreter/neoIL implementation is
+integrated into main now. Earlier compiler-readiness gates are deferred for this
+specific FFI slice; this does not promote unrelated structural-type experiments.
+This is development functionality, not a claim of a published release or complete
+cross-platform FFI support.
+
+Possible future expansion includes Raven callable ABI annotations and C# metadata
+reader/writer support, JIT/AOT lowering, richer reverse marshalling, longer-lived
+callable ownership and foreign-thread entry, platform qualification, and native
+exports with sidecar metadata. These remain future work and are not prerequisites
+for this authorized merge. Attribute spellings, expanded lifetime contracts and
+sidecar schema remain unsettled; no registration API is inferred from extern names.

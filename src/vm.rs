@@ -1049,6 +1049,10 @@ fn validate_linked_indexed(module: &Module) -> Result<(), Fault> {
                         "cannot rebind or take the address of a managed reference parameter",
                     ));
                 }
+                Op::BindNativeFunction { function_type, abi } => {
+                    check(function_type)?;
+                    crate::interop::indirect_contract(module, function_type, abi)?;
+                }
                 Op::BindFunction {
                     function_type,
                     target,
@@ -1733,6 +1737,9 @@ pub fn run_with_library(
 /// Native code and library initializers/destructors must uphold pointer validity,
 /// allocation lifetimes, and Rust's memory safety requirements. Guest metadata alone
 /// cannot establish these guarantees. The caller must trust the code being executed.
+/// Native code must finish all callback uses on the calling thread before returning;
+/// it must not retain, free or return call-scoped callback entry pointers. Returned
+/// native callables and their external state must remain valid while wrappers live.
 pub unsafe fn run_with_native(
     module: &Module,
     library: &Module,
@@ -1986,6 +1993,9 @@ fn drive_instructions(
                 Ok(InstructionProgress::Suspended) => continue,
                 Ok(InstructionProgress::Waiting) => {
                     drop(heap);
+                    if state.foreign_depth != 0 {
+                        break Err(Fault::new("native callback cannot suspend managed execution"));
+                    }
                     if !state.parked_activations.is_empty() {
                         let timeout = state
                             .parked_activations
@@ -2012,6 +2022,8 @@ fn drive_instructions(
                         output,
                         console_bytes,
                         options,
+                        participant,
+                        frames.len(),
                     ) {
                         Ok(value) => value,
                         Err(fault) => break Err(fault),
@@ -2200,6 +2212,7 @@ enum RuntimeAsyncObservation {
 /// State that survives an instruction-boundary suspension. File handles, interning
 /// budgets, scheduler and native memory share invocation ownership.
 struct InstructionState {
+    foreign_depth: usize,
     collection_threshold: usize,
     arrays_used: bool,
     invocation: std::sync::Arc<crate::invocation::Invocation>,
@@ -2228,6 +2241,7 @@ impl InstructionState {
         let limits = invocation.limits;
         let budget = invocation.budget.clone();
         Self {
+            foreign_depth: 0,
             collection_threshold: limits.heap_objects.min(64),
             arrays_used: false,
             invocation,
@@ -2247,6 +2261,9 @@ impl InstructionState {
         }
     }
 }
+#[path = "vm_foreign_callbacks.rs"]
+mod foreign_callbacks;
+
 #[path = "vm_guest_work.rs"]
 mod guest_work;
 use guest_work::transfer_task_output;
@@ -2399,7 +2416,7 @@ fn runtime_submission_frame(module: &Module, callback: &Value) -> Result<Frame, 
         return Err(Fault::new("Invalid scheduler callback"));
     };
     let contract = crate::function_objects::contract(module, &binding.ty)?;
-    let callee = resolve(module, &binding.target)?;
+    let callee = resolve(module, binding.managed_target()?)?;
     crate::function_objects::compatible(&contract, &callee)?;
     callback.ensure_heap_references()?;
     let args = binding.receiver.iter().map(|receiver| (**receiver).clone()).collect();
@@ -2427,6 +2444,7 @@ fn interpret_instructions_with_dispatch(
     }
     let limits = options.limits;
     let InstructionState {
+        foreign_depth,
         collection_threshold,
         arrays_used,
         invocation,
@@ -2602,7 +2620,9 @@ fn interpret_instructions_with_dispatch(
             if frames.is_empty() && active_callback.take() == Some(true) && invocation_result.is_none() {
                 return Err(Fault::new("Runtime async callback lost entry activation"));
             }
-            if work_control.is_some() && !*entry_drain_active {
+            if (*foreign_depth != 0 && frames.is_empty() && yield_boundaries.is_empty())
+                || (work_control.is_some() && !*entry_drain_active)
+            {
                 let mut roots = Vec::new();
                 crate::gc::trace(&value, &mut roots);
                 heap.publish(roots)?;
@@ -3219,7 +3239,6 @@ fn interpret_instructions_with_dispatch(
                     if &binding.ty != ty {
                         return Err(Fault::new("Function shape mismatch"));
                     }
-                    let callee = resolve(module, &binding.target)?;
                     if let Some(value) = crate::function_objects::object_dispatch(
                         module,
                         &binding,
@@ -3229,6 +3248,20 @@ fn interpret_instructions_with_dispatch(
                         frame.stack.push(value);
                         return Ok(None);
                     }
+                    if signature.name == "$Function.Invoke" {
+                        if let Some(call) = &binding.native {
+                            if task_atomic::active(module, frames) {
+                                return Err(Fault::new(
+                                    "Task mutation cannot invoke a native Function",
+                                ));
+                            }
+                            host_call = Some(HostCall::indirect(
+                                call.clone(), args, executing_assembly.clone(), context.clone(), pc,
+                            ));
+                            return Ok(None);
+                        }
+                    }
+                    let callee = resolve(module, binding.managed_target()?)?;
                     if signature.name == "$Function.get_Function" {
                         let value =
                             crate::reflection::bound_function(module, &binding, &callee, &limits)?;
@@ -3899,6 +3932,18 @@ fn interpret_instructions_with_dispatch(
                         );
                     }
                     frames.push(child);
+                }
+                Op::BindNativeFunction { function_type, abi } => {
+                    let Value::Pointer(pointer) = frame.pop()? else {
+                        return Err(Fault::new("native binding requires a function pointer"));
+                    };
+                    let libraries = invocation.native_libraries.lock()
+                        .expect("native library lock poisoned");
+                    let libraries = libraries.as_ref().ok_or_else(|| Fault::new(
+                        "native Function binding requires trusted run_with_native execution",
+                    ))?;
+                    let call = libraries.bind_pointer(module, function_type, abi, &pointer)?;
+                    frame.stack.push(crate::function_objects::bind_native(function_type, call));
                 }
                 Op::BindFunction {
                     function_type,
@@ -5556,7 +5601,7 @@ fn debug_value(
         Value::Function(binding) => {
             result.value = debug_text(&format!(
                 "Function {}<{:?}>",
-                binding.target.name, binding.target.generic_arguments
+                binding.target.as_ref().map_or("<native>", |t| t.name.as_str()), binding.target.as_ref().map(|t| &t.generic_arguments)
             ));
             if let Some(receiver) = &binding.receiver {
                 result.children.push((
