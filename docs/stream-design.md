@@ -1,5 +1,41 @@
 # Stream API proposal
 
+## Async-first naming direction — 2026-10-12
+
+**Author correction after the first implementation:** asynchrony is the default;
+Async suffixes are not necessary. Where both forms need distinguishing, mark the
+synchronous alternative with Sync. This supersedes the naming choice in the first
+contract below, while preserving its implemented behavior and historical evidence.
+.NET remains the ergonomics target, with this explicit naming divergence; Windows
+Runtime and other platforms remain comparison inputs rather than naming mandates.
+See the [API naming policy](raven-conventions.md#async-first-api-naming-2026-10-12).
+
+The next stream migration should be coherent across interfaces, implementations,
+callers, compiler reference declarations and both API snapshots:
+
+| Current implemented member | Intended member after migration |
+| --- | --- |
+| AsyncInputStream.ReadAsync | Read |
+| AsyncOutputStream.WriteAsync | Write |
+| AsyncOutputStream.FlushAsync | Flush |
+| Synchronous InputStream.Read | ReadSync |
+| Synchronous OutputStream.Write / Flush | WriteSync / FlushSync |
+
+MemoryStream implements both forms, so its synchronous and Task-returning methods
+must move together. Although a required cancellation token currently differentiates
+some overloads, omitting a token should not select synchronous I/O. Retain short
+reads, complete async writes, partial synchronous writes, cancellation precedence,
+buffer ownership and closure behavior; name changes must not silently alter these
+contracts. Existing socket Receive/Send and HTTP task-returning operations already
+use unsuffixed names and provide a useful consistency reference.
+
+The author discussed operation names, not a compulsory rename of AsyncInputStream /
+AsyncOutputStream types or compiler protocol members. Review capability type names
+separately; do not infer a new class hierarchy. Close/disposal and awaited graceful
+TLS shutdown are different operations and need semantic design before naming them.
+The table is a migration plan, not an API already available: the first implementation
+and current reference still expose ReadAsync/WriteAsync/FlushAsync.
+
 ## First async contract — 2026-10-12
 
 Author clarification: compare .NET, Windows Runtime and other platforms, while

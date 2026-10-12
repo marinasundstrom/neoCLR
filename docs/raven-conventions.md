@@ -20,6 +20,38 @@ gap to fix, not a reason to make application examples callback-driven. Let
 `Task<()>`/`Task<unit>` functions complete by reaching the end; omit a redundant
 trailing `return ()`. Keep explicit unit returns where an early exit is intended.
 
+## Async-first API naming (2026-10-12)
+
+Author direction: asynchrony is the default for operations that may wait. Prefer
+ordinary names such as `Read`, `Write`, `Flush`, `Connect` and `Send` for Task-returning
+operations; an `Async` suffix is not required. When exposing both asynchronous and
+synchronous versions of the same conceptual operation would be ambiguous, name the
+synchronous alternative `ReadSync`, `WriteSync`, etc. Do not make return type or the
+presence of a cancellation token the only practical way to distinguish blocking
+from asynchronous behavior. Optional-token overloads must retain the same execution
+model as their token-taking equivalents.
+
+This does not require every operation to return Task or every immediate operation
+to acquire a Sync suffix. Pure computation, collection access, properties and other
+naturally immediate operations retain ordinary names. A Task-returning operation
+may complete inline, as for memory I/O; it need not schedule work. Do not implement
+a synchronous alternative by secretly blocking on a Task unless that behavior is
+explicitly supported and justified for the runtime's scheduling model.
+
+This is an author-directed naming divergence from .NET, which remains the primary
+ergonomics reference. Benefits are uncluttered default call sites and conspicuous
+synchronous alternatives; costs are porting/name differences and coherent migration
+of existing APIs, examples and metadata. Preserve await/cancellation/ownership and
+error semantics rather than changing them as part of a rename. Compiler-recognized
+protocol names require coordinated compiler/runtime work, not mechanical renaming.
+Async capability type names and disposal-versus-graceful-shutdown contracts are
+separate design decisions, not automatically renamed by this policy.
+
+The just-added stream members still have Async suffixes. Their planned migration
+is recorded in [stream design](stream-design.md#async-first-naming-direction--2026-10-12);
+keep reference documentation truthful until that implementation slice lands. Raven's
+ordinary .NET target continues to use the actual .NET API names.
+
 ## Scoped iterator cleanup (2026-10-10)
 
 Prefer `use iterator = source.GetIterator()` when explicitly driving an iterator.

@@ -15837,3 +15837,23 @@ or runtime-await default switch was performed.
   internal helper, with these gaps recorded in the [design](stream-design.md#first-async-contract--2026-10-12).
   The existing Task-enabled HTTP test host supplies cancellation lifecycle services.
   These findings do not establish Windows execution, pending-I/O or TLS adapters.
+
+
+## 2026-10-12 — Async-first operation names
+
+- **Author direction:** asynchrony should be the default rather than requiring an
+  Async suffix. Where two forms of the same operation need distinguishing, consider
+  marking the synchronous alternative Sync instead.
+- **Assistant response:** adopt ordinary Task-returning operation names and Sync
+  names for synchronous alternatives where necessary. Do not use cancellation-token
+  overload presence to silently select blocking behavior. Immediate computation and
+  collection APIs need neither Task wrapping nor blanket Sync suffixes.
+- **Action:** recorded the policy in [Raven conventions](raven-conventions.md#async-first-api-naming-2026-10-12)
+  and a coordinated [stream migration plan](stream-design.md#async-first-naming-direction--2026-10-12).
+  This corrects the assistant's earlier ReadAsync/WriteAsync/FlushAsync naming choice,
+  while retaining .NET as the ergonomics reference and preserving the earlier evidence.
+- **Scope and outcome:** documentation-only policy commit. Existing public signatures
+  and reference snapshots are unchanged. Capability type names and compiler async
+  protocol names remain separate decisions; no wholesale hierarchy or protocol rename
+  is inferred. The pending migration must preserve behavior and update callers/tests
+  and both API snapshots together.

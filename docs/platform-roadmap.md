@@ -21,6 +21,9 @@ by concrete consumers. The first managed slice adds AsyncInputStream/AsyncOutput
 operations; socket/TLS adapters and certificate APIs remain next. Compare .NET,
 Windows Runtime and other platforms, retaining .NET as the ergonomics target.
 See the [first async contract](stream-design.md#first-async-contract--2026-10-12).
+The subsequent [async-first naming direction](stream-design.md#async-first-naming-direction--2026-10-12)
+reserves ordinary operation names for asynchronous I/O and Sync for synchronous
+alternatives when distinction is needed; migrate the first stream names coherently.
 
 **Windows HTTPS follow-through (2026-10-12):** the author explicitly requests
 Windows behavior consistent with macOS. Source linking and a shared validation

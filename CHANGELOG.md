@@ -12,7 +12,10 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   WriteAsync and FlushAsync, with cancellation and .NET-style complete-write
   success. Separate async capabilities preserve synchronous implementations.
   Seven memory-stream tests pass in macOS interpreter/JIT/AOT; refresh both API
-  references. Record .NET/Windows Runtime/Go comparisons and compiler state-machine
+  references. Record the subsequent async-first naming policy and planned stream
+  migration: ordinary asynchronous operation names, Sync for synchronous alternatives
+  when distinction is needed. Implemented names are unchanged in this policy slice.
+  Record .NET/Windows Runtime/Go comparisons and compiler state-machine
   follow-ups. Socket/TLS adapters and Windows qualification remain open.
 
 - Record the planned async-stream, System.Security.Cryptography and certificate
