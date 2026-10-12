@@ -35,6 +35,9 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   first Windows gate exposed deprecated getenv under warnings-as-errors; retain
   strict warnings and fail-closed admission. Keep CI artifacts focused on logs and
   provenance reports and print failed command output directly in Actions.
+  Preserve Windows Unicode credential paths using wide snapshots and explicit
+  UTF-8 conversion; exercise accented/non-BMP credential directories in the shared
+  HTTPS harness instead of assuming ASCII paths.
 
 - Fix the HTTPS source compiler gap through Raven main `99ae011b4`, deliberately
   carried to its neoCLR branch as `c71baae94`: traverse unary operands so `use`

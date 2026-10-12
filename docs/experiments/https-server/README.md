@@ -216,3 +216,10 @@ bridge encodings. Both reported the same UserFault, exit status and empty respon
 The harness now compares those observable outcomes while retaining and checking
 stack-trace structure. Interpreter bridge-name rendering remains a diagnostics gap;
 this test correction does not fix or hide it in retained evidence.
+
+Credential-path parity also requires Unicode preservation. Following Microsoft's
+[wide environment snapshot contract](https://learn.microsoft.com/en-us/cpp/c-runtime-library/reference/dupenv-s-wdupenv-s?view=msvc-170)
+(reviewed 2026-10-12), the Windows adapter uses `_wdupenv_s` and explicit UTF-8
+conversion for the private Rust ABI. The shared harness places ephemeral credentials
+under a directory containing accented and non-BMP characters. Conversion failure
+rejects configuration; credential paths and contents are not diagnostic output.

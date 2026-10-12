@@ -9,16 +9,27 @@
 #ifdef NEOCLR_HTTPS_SERVER
 #include "../https-server/native-tls.h"
 /* Experimental HTTPS-only host capability. Ordinary Socket builds stay TCP. */
+#ifdef _WIN32
+static char *tls_environment_utf8(const wchar_t *name) {
+    wchar_t *wide = NULL;
+    if (_wdupenv_s(&wide, NULL, name) != 0 || !wide) return NULL;
+    int bytes = WideCharToMultiByte(CP_UTF8, WC_ERR_INVALID_CHARS, wide, -1, NULL, 0, NULL, NULL);
+    char *utf8 = bytes > 0 ? malloc((size_t)bytes) : NULL;
+    if (utf8 && WideCharToMultiByte(CP_UTF8, WC_ERR_INVALID_CHARS, wide, -1,
+                                    utf8, bytes, NULL, NULL) != bytes) {
+        free(utf8);
+        utf8 = NULL;
+    }
+    free(wide);
+    return utf8;
+}
+#endif
 static void *tls_config_from_environment(void) {
 #ifdef _WIN32
-    /* MSVC's owned snapshot avoids deprecated getenv and keeps both strings
-     * alive through config parsing. No credential data enters diagnostics. */
-    char *certificate = NULL, *key = NULL;
-    size_t certificate_size = 0, key_size = 0;
-    void *config = NULL;
-    if (_dupenv_s(&certificate, &certificate_size, "NEOCLR_HTTPS_CERTIFICATE") == 0 &&
-        _dupenv_s(&key, &key_size, "NEOCLR_HTTPS_PRIVATE_KEY") == 0)
-        config = neoclr_tls_config_new(certificate, key);
+    /* Owned UTF-8 snapshots match the Rust ABI without ANSI code-page loss. */
+    char *certificate = tls_environment_utf8(L"NEOCLR_HTTPS_CERTIFICATE");
+    char *key = tls_environment_utf8(L"NEOCLR_HTTPS_PRIVATE_KEY");
+    void *config = neoclr_tls_config_new(certificate, key);
     free(certificate);
     free(key);
     return config;

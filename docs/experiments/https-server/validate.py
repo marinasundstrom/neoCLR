@@ -41,7 +41,8 @@ def main():
     out = args.output.resolve(); out.mkdir(parents=True, exist_ok=False)
     recipe = json.loads(args.recipe.read_text()); assert recipe['passed']
     report = dict(passed=False, platform=platform.platform(), ssl=ssl.OPENSSL_VERSION,
-                  commands=[], cases=[], inputsSha256={}, recipeSha256=sha(args.recipe))
+                  commands=[], cases=[], inputsSha256={}, recipeSha256=sha(args.recipe),
+                  credentialPathFixture='non-ASCII and non-BMP directory')
 
     def command(label):
         cmd = next(row['command'].copy() for row in recipe['commands'] if row.get('label') == label)
@@ -102,7 +103,7 @@ def main():
                 if p.suffix in ('.c', '.h', '.rs', '.rvn', '.py'): report['inputsSha256'][str(p)] = sha(p)
         report['inputsSha256'][str(ROOT / 'scripts/verify-native-http-json.py')] = sha(ROOT / 'scripts/verify-native-http-json.py')
         report['inputsSha256'][str(ROOT / 'tools/native-tls/Cargo.lock')] = sha(ROOT / 'tools/native-tls/Cargo.lock')
-        with tempfile.TemporaryDirectory(prefix='nc-https-') as directory:
+        with tempfile.TemporaryDirectory(prefix='nc-https-Café-🌍-') as directory:
             cert, key = Path(directory) / 'cert.pem', Path(directory) / 'key.pem'
             # One-use development certificate: explicit trust in this peer only, no global store edits.
             subprocess.run(['openssl', 'req', '-x509', '-newkey', 'rsa:2048', '-nodes', '-sha256', '-days', '1',
