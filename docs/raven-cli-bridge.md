@@ -9057,3 +9057,31 @@ and PostgreSQL libraries compile. The stream migration's [execution evidence](..
 qualifies the consuming Task-based adapters. Some inline await/propagation expression
 shapes still require separating the awaited result from pure pattern handling; the
 console samples do that explicitly. These bridge restrictions are not language rules.
+
+## Foreign import attributes (2026-10-12)
+
+On Raven's separate neoCLR compiler line, NativeImportAttribute plus extern lowers to
+NativeImportDefinition/pinvoke metadata. Namespace functions and static methods are
+supported. The attribute must resolve from the explicit core or registered System.Runtime
+assembly; ordinary .NET extern/DllImport emission is unchanged. No new Runtime Contract
+option is needed. MarshalAs on parameters/results emits checked representation descriptors;
+return attributes are admitted only for this implemented native-import path.
+
+Native semantics: exact library/export, Cdecl/System ABI, per-slot input text or sized
+boolean conversion, call-scoped buffer ownership and lazy loader resolution. Invalid
+signatures, bodies, annotation combinations and unapproved attribute identities produce
+emission diagnostics without output. Metadata/runtime checks repeat the ABI restrictions.
+
+Temporary CLI representation is a reference-only throwing projection; the authoritative
+native metadata owns import behavior. Executable CLI writing rejects these native imports
+rather than guessing DllImport charset/marshalling behavior. Source import attributes are
+consumed into descriptors; no attribute constructors run during binding. Metadata reading
+preserves NativeImportDefinition. The native binary form uses decimal-string parameter
+keys, consistent with the JSON transport. Old runtimes need matching descriptor support.
+
+Validation and owners: Raven owns target admission/lowering; neoCLR owns metadata,
+libffi dispatch, library/buffer lifetimes and Faults. [Actual Raven attribute sources,
+compiler rejection cases and native consumers](experiments/foreign-interop/README.md)
+qualify the macOS ARM64 interpreter subset. JIT/AOT lowering, installed bundles and other
+hosts remain separate gates. Replace the reference-only transport assumptions as native
+backend ABI lowering arrives; bridge limitations are not permanent platform semantics.

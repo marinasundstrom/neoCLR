@@ -655,7 +655,7 @@ fn validate_linked_indexed(module: &Module) -> Result<(), Fault> {
             && (function.receiver_byref
                 || function.receiver_readonly
                 || function.is_internal_call()
-                || function.pinvoke.is_some())
+                || function.pinvoke.is_some() && function.instance)
         {
             return Err(Fault::new("class methods require ordinary IL receivers"));
         }

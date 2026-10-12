@@ -43,6 +43,7 @@ They need only enough application context to explain the choices and results.
 
 | Guide | What you’ll learn |
 | --- | --- |
+| [Native libraries and FFI](../features/native-interop/) | Explicit C ABI imports, text encoding and lifetime contracts |
 | [Native compilation](../features/native-compilation/) | Standalone ARM64 execution, supported workloads and limits |
 | [Native benchmarks](../benchmarks/) | Measurements and methodology for interpreter/native comparisons |
 | [Tasks and async](../features/tasks/) | Await results, complete promises and understand isolated workers |

@@ -8,6 +8,18 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-12
 
+- Add source-level native imports through extern plus NativeImport/MarshalAs
+  attributes, preserving platform-neutral .foreign declarations and the .pinvoke
+  compatibility alias. Support Cdecl/System ABI selection, per-parameter UTF-8/UTF-16
+  overrides, and explicit Bool8/Bool32 parameters/results in the interpreter.
+  Preserve native metadata descriptors, cache export lookup, retain call-scoped
+  buffers, reject embedded NULs/unsupported conversions and admit static class imports.
+  Extend the metadata authoring/reading API and publish all five guest attribute/enum
+  types in the API reference. Source compiler work is on the separate Raven neoCLR
+  line; JIT/AOT, installed bundles and other-host qualification remain open. New
+  descriptors require a matching runtime; existing imports keep their no-marshalling
+  defaults. Record research, ownership limits and the remaining FFI gates.
+
 - Support nested native reference classes deriving from the same assembly's
   explicit Object root, including generic generated async state machines. Preserve
   lexical ownership/base identity through native authoring and loading; keep other

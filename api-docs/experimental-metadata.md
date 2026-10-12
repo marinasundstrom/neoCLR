@@ -8351,3 +8351,23 @@ source-defined classes. CLI metadata already represents nested ownership and cla
 inheritance independently; this adds no new wire-format concept. General nested
 inheritance remains outside the bounded authoring surface. Validate with the
 metadata test executable's `--generic-object-roots` group.
+
+
+## Native imports (development, 2026-10-12)
+
+`NativeImportDefinition(library, entryPoint, stringMarshalling = null,
+callingConvention = "Cdecl", parameterMarshalling = null, returnMarshalling = null)`
+records an immutable foreign ABI descriptor. Library/EntryPoint must be nonempty and
+NUL-free; conventions are Cdecl/System; string defaults are Utf8/Utf16; per-slot values
+are Utf8/Utf16/Bool8/Bool32. Parameter indices are zero-based and copied on construction.
+Invalid option values throw ArgumentException. No library is loaded.
+
+`MethodDefinition.NativeImport` exposes the descriptor after authoring or native reading.
+`MethodDefinition.SetNativeImport` and `MethodBuilder.SetNativeImport` require an empty
+nongeneric static declaration with no implementation flags, abstract/virtual slot or
+generic owner. Invalid declaration state throws InvalidOperationException; unsupported
+signature/marshalling combinations throw InvalidDataException. Graph validation rechecks
+later mutations, including an import used as the entry point. SetInternalCall rejects
+an already imported declaration. Native JSON/binary preserve all descriptors; executable
+CLI writing rejects imports while reference projections retain throwing stubs.
+See [the runtime contract](../docs/native-interop.md).

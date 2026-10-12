@@ -58,7 +58,8 @@ code; execution creates the live objects and other program state. Read
 | Raven library | Modules organizing application APIs, built from library code and explicit service contracts |
 
 The current Raven target has copied values and reference-semantic classes and arrays.
-Managed byrefs address slots; unmanaged pointers have a separate interop contract.
+Managed byrefs address slots; unmanaged pointers have a separate
+[native interop contract](../features/native-interop/).
 Strings use UTF-8, with distinct byte, scalar and grapheme operations.
 [Option and Result](../features/outcomes/) express absence and expected errors;
 terminal Faults are a separate runtime mechanism. These choices affect libraries,

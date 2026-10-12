@@ -32,6 +32,8 @@
       href: features/globalization/index.md
 - name: Runtime services
   items:
+    - name: "Native libraries and FFI"
+      href: features/native-interop/index.md
     - name: "Native compilation"
       href: features/native-compilation/index.md
     - name: "Native benchmarks"

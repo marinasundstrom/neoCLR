@@ -28,6 +28,7 @@ public sealed partial class MethodDefinition
         LoadNullableAnnotations(row.NullableAnnotations);
         parameterArrayIndex = row.ParameterArrayIndex;
         nativeSignature = row.NativeSignature?.Materialize(module);
+        NativeImport = row.NativeImport;
         nativeNamespace = row.NativeNamespace;
     }
     /// <summary>Gets the owning module snapshot.</summary>

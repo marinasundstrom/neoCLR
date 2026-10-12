@@ -29,6 +29,7 @@ member for parameters, return values, errors and usage notes.
 | Networking and HTTP | [System.Networking](xref:System.Networking) · [System.Web.Http](xref:System.Web.Http) · [Sockets](sockets.md) · [Routes](routes.md) |
 | SQL databases | [SQL sessions and mapping](sql.md) · System.Data.Sql · System.Data.PostgreSql |
 | JSON | [System.Data.Json](xref:System.Data.Json) · [Serialization and HTTP content](json.md) |
+| Native libraries | [Foreign-function attributes](native-interop.md) · [NativeImportAttribute](xref:System.Runtime.InteropServices.NativeImportAttribute) · [MarshalAsAttribute](xref:System.Runtime.InteropServices.MarshalAsAttribute) |
 | Runtime diagnostics | [StackTrace](xref:System.Diagnostics.StackTrace) · [Capture and limits](stack-trace.md) · [GC](gc.md) |
 | Introspection and reflection | [System.Introspection](xref:System.Introspection) · [Descriptor contracts](introspection.md) · [Runtime reflection](reflection.md) |
 

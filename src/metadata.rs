@@ -511,11 +511,34 @@ pub struct NativeImport {
     pub library: String,
     pub entry_point: String,
     pub calling_convention: CallingConvention,
+    /// Explicit, call-scoped input string encoding; absent means no marshalling.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub string_marshalling: Option<NativeStringMarshalling>,
+    /// Zero-based parameter overrides; absent entries use the import's string default.
+    #[serde(default, skip_serializing_if = "std::collections::BTreeMap::is_empty")]
+    pub parameter_marshalling: std::collections::BTreeMap<String, NativeMarshalling>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub return_marshalling: Option<NativeMarshalling>,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+pub enum NativeMarshalling {
+    Utf8,
+    Utf16,
+    Bool8,
+    Bool32,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+pub enum NativeStringMarshalling {
+    Utf8,
+    Utf16,
 }
 
 #[derive(Debug, Clone, Copy, Serialize, Deserialize)]
 pub enum CallingConvention {
     Cdecl,
+    System,
 }
 
 pub const INTERNAL_CALL: u16 = 0x1000;

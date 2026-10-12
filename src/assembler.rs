@@ -454,13 +454,13 @@ fn parse_parts(source: &str) -> Result<(Module, Vec<FieldFixup>), Fault> {
                         .function
                         .custom_attributes
                         .push(parse_custom_attribute(rest)?);
-                } else if word == ".pinvoke" {
+                } else if matches!(word, ".foreign" | ".pinvoke") {
                     if pending.function.pinvoke.is_some()
                         || !pending.function.body.is_empty()
                         || !pending.labels.is_empty()
                     {
                         return Err(Fault::new(
-                            "expected one .pinvoke directive before any body",
+                            "expected one native import directive before any body",
                         ));
                     }
                     let mut strings =
@@ -473,13 +473,26 @@ fn parse_parts(source: &str) -> Result<(Module, Vec<FieldFixup>), Fault> {
                         .next()
                         .ok_or_else(|| Fault::new("expected quoted native entry point"))?
                         .map_err(|_| Fault::new("expected quoted native entry point"))?;
-                    if rest[strings.byte_offset()..].trim() != "cdecl" {
-                        return Err(Fault::new("expected cdecl calling convention"));
-                    }
+                    let options: Vec<_> =
+                        rest[strings.byte_offset()..].split_whitespace().collect();
+                    let calling_convention = match options.first().copied() {
+                        Some("cdecl") => crate::metadata::CallingConvention::Cdecl,
+                        Some("system") => crate::metadata::CallingConvention::System,
+                        _ => return Err(Fault::new("expected cdecl or system calling convention")),
+                    };
+                    let string_marshalling = match &options[1..] {
+                        [] => None,
+                        ["utf8"] => Some(crate::metadata::NativeStringMarshalling::Utf8),
+                        ["utf16"] => Some(crate::metadata::NativeStringMarshalling::Utf16),
+                        _ => return Err(Fault::new("expected optional utf8 or utf16")),
+                    };
                     pending.function.pinvoke = Some(crate::metadata::NativeImport {
                         library,
                         entry_point,
-                        calling_convention: crate::metadata::CallingConvention::Cdecl,
+                        calling_convention,
+                        string_marshalling,
+                        parameter_marshalling: Default::default(),
+                        return_marshalling: None,
                     });
                 } else if word == ".override" {
                     if !pending.function.body.is_empty() || !pending.labels.is_empty() {

@@ -15876,6 +15876,56 @@ or runtime-await default switch was performed.
   No new author decision, API rename or compiler capability is claimed.
 
 
+## 2026-10-12 — Author-directed platform invocation and FFI
+
+- **Author:** “Implement what is needed for platform invocation or a foreign function
+  interface. There are things to take from .NET but that shouldn’t limit us”.
+- **Assistant assessment/proposal:** existing interpreter imports already cover C ABI
+  scalars/pointers; native backends reject imports. Extend explicit text marshalling
+  and reusable export resolution first, preserving ownership and trust boundaries.
+- **Assistant implementation/outcome:** added UTF-8/UTF-16 input-string metadata and
+  dispatch, NUL rejection, per-call buffers, cached symbol lookup, native fixtures and
+  a neoIL consumer. Ten focused integration tests pass locally. Compared .NET's
+  explicit encoding with Rust CString and Silk.NET binding-generation experience.
+- **Open:** native metadata/Raven authoring, JIT/AOT, foreign buffer/handle ownership,
+  error capture and callbacks. No author approval of every design choice or complete
+  cross-platform FFI is inferred. See [contract, research and gates](native-interop.md).
+
+- **Author correction:** “The interface shouldn’t imply it’s tied to Windows”.
+- **Assistant response/action:** made `.foreign` the canonical low-level declaration,
+  retaining `.pinvoke` only as a compatibility alias and its serialized metadata field
+  for existing artifacts. Documentation uses foreign/native-library terminology and
+  treats UTF-16 as a portable explicit encoding rather than a Windows mode. No
+  Windows-style source attribute or managed API name is introduced.
+
+- **Author clarification:** asks for an attribute family similar to .NET while
+  retaining `extern`, then asks whether startup registers declarations and resolves
+  them to native code, with failures becoming apparent at invocation.
+- **Assistant response:** agrees with extern plus attributes as the source model;
+  distinguishes descriptor validation from lazy library/symbol resolution on first
+  call. Missing library/symbol produces a Fault, but a wrong native ABI can corrupt
+  memory or crash rather than yield a managed error. Mapping targets compiled exports,
+  not native source. Startup eager resolution is a possible policy, not current behavior.
+- **Inspection/outstanding work:** Raven's existing .NET path supports extern/DllImport;
+  its native portable planner rejects extern. Recorded a provisional attribute family
+  and target-capability/metadata/backend gates; no source attribute API is claimed
+  implemented. The low-level `.foreign` spelling does not replace Raven `extern`.
+
+
+- **Author authorization:** “Okay, continue implementing this the best way, or the
+  way you think is the best.” The author then calls for calling conventions and
+  marshalling descriptions for individual parameter values, suggesting room to improve.
+- **Assistant implementation:** added NativeImportAttribute, MarshalAsAttribute and
+  explicit ABI/string/native-type enums in Raven; native compiler lowering and metadata
+  authoring/readback; Cdecl/System dispatch; per-parameter string overrides and sized
+  boolean parameters/results. Descriptors are checked before execution. Corrected
+  decimal parameter keys for binary metadata and admitted static class imports.
+- **Validation/outstanding:** focused Rust interop tests and actual source/native-call
+  fixtures cover the selected subset; [reproducible evidence](experiments/foreign-interop/README.md).
+  API references and both repositories' integration notes/changelogs are updated.
+  JIT/AOT, installed bundles, other hosts, bounded output/owned buffers, structs, native
+  error capture and callbacks remain open; no complete FFI or performance win is claimed.
+
 ## 2026-10-12 — Canonical asynchronous streams and task namespace sequence
 
 - **Author decision:** make InputStream and OutputStream asynchronous by default;

@@ -3372,5 +3372,26 @@ Connects only to 127.0.0.1. No TLS, password authentication, pooling or automati
     </member>
 
 
+    <member name="T:System.Runtime.InteropServices.NativeImportAttribute"><summary>Binds an extern static method or namespace function to a native export. Loading is lazy; callers must match the native ABI.</summary></member>
+    <member name="M:System.Runtime.InteropServices.NativeImportAttribute.#ctor(System.String)"><summary>Records a nonempty library loader name or path. Does not load native code.</summary></member>
+    <member name="P:System.Runtime.InteropServices.NativeImportAttribute.LibraryName"><summary>Gets the native library loader name or path.</summary></member>
+    <member name="P:System.Runtime.InteropServices.NativeImportAttribute.EntryPoint"><summary>Selects the exact native export. Omission uses the declared function name.</summary></member>
+    <member name="P:System.Runtime.InteropServices.NativeImportAttribute.CallingConvention"><summary>Selects Cdecl or the platform System convention. Defaults to Cdecl.</summary></member>
+    <member name="P:System.Runtime.InteropServices.NativeImportAttribute.StringMarshalling"><summary>Selects the input string encoding default. None rejects unannotated strings; parameter MarshalAs overrides this setting.</summary></member>
+    <member name="T:System.Runtime.InteropServices.NativeCallingConvention"><summary>Supported foreign calling conventions. Cdecl uses the platform C ABI; System uses stdcall on 32-bit Windows and C elsewhere.</summary></member>
+    <member name="T:System.Runtime.InteropServices.NativeStringMarshalling"><summary>Input string marshalling defaults. Buffers are terminated and valid for one call; embedded NULs are rejected.</summary></member>
+    <member name="T:System.Runtime.InteropServices.NativeType"><summary>Explicit native representations. UTF-8 and UTF-16 are input-only; Bool8 and Bool32 support parameters and results.</summary></member>
+    <member name="T:System.Runtime.InteropServices.MarshalAsAttribute"><summary>Overrides one native parameter or result representation. Unsupported combinations are rejected at emission and metadata validation.</summary></member>
+    <member name="M:System.Runtime.InteropServices.MarshalAsAttribute.#ctor(System.Runtime.InteropServices.NativeType)"><summary>Records the selected native representation.</summary></member>
+    <member name="P:System.Runtime.InteropServices.MarshalAsAttribute.Value"><summary>Gets the selected native representation.</summary></member>
+    <member name="F:System.Runtime.InteropServices.NativeCallingConvention.Cdecl"><summary>Platform C ABI.</summary></member>
+    <member name="F:System.Runtime.InteropServices.NativeCallingConvention.System"><summary>Platform system ABI; stdcall on 32-bit Windows, C elsewhere.</summary></member>
+    <member name="F:System.Runtime.InteropServices.NativeStringMarshalling.None"><summary>No implicit String conversion.</summary></member>
+    <member name="F:System.Runtime.InteropServices.NativeStringMarshalling.Utf8"><summary>Terminated UTF-8 input buffer.</summary></member>
+    <member name="F:System.Runtime.InteropServices.NativeStringMarshalling.Utf16"><summary>Terminated native-endian UTF-16 input buffer, not host wchar_t.</summary></member>
+    <member name="F:System.Runtime.InteropServices.NativeType.Utf8"><summary>Terminated UTF-8 input String.</summary></member>
+    <member name="F:System.Runtime.InteropServices.NativeType.Utf16"><summary>Terminated native-endian UTF-16 input String.</summary></member>
+    <member name="F:System.Runtime.InteropServices.NativeType.Bool8"><summary>One-byte integer boolean; inputs are zero or one, every nonzero result is true.</summary></member>
+    <member name="F:System.Runtime.InteropServices.NativeType.Bool32"><summary>Four-byte integer boolean; inputs are zero or one, every nonzero result is true.</summary></member>
 </members>
 </doc>
