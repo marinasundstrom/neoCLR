@@ -8,6 +8,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-12
 
+- Review PostgreSQL implementation placement: the current optional provider is
+  managed Raven over shared sockets, with no database-specific native service.
+  Recommend retaining it for the preview; document an optional future libpq FFI
+  provider, async/lifetime requirements and qualification costs without claiming
+  implementation or performance gains.
+
 - Add provider-neutral SqlMapper.Query overloads for statements, ordinary positional
   values and named parameter objects. Snapshot names/values in SqlStatement and
   keep PostgreSQL placeholder rewriting inside its provider. Support native Int64

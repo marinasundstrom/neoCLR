@@ -77,6 +77,51 @@ handle-lifetime contract. The executable consumer uses `use` for connection clea
 native revision `c1a938ccd`, following the adjacent thread's compiler fix. Explicit
 Dispose calls remain where the fixture tests early close and idempotency.
 
+## Implementation placement review — 2026-10-12
+
+The author asks whether foreign calls should replace runtime implementations,
+identifying PostgreSQL as a possible candidate if it uses native code. Source review
+finds the current provider in `runtime/raven/providers/System.Data.PostgreSql`:
+`PostgresConnection` implements protocol framing and SQL behavior in Raven and
+awaits shared Socket operations. It declares no extern/InternalCall methods and
+has no libpq dependency. There is no database-specific runtime service to extract.
+
+**Recommendation:** retain this optional managed provider for the preview. Keep SQL
+protocol, parameter binding and mapping outside the runtime. Runtime ownership is
+justified for shared socket readiness, task suspension/resumption and managed lifetime;
+these are execution services used by many libraries, not database policy.
+
+The .NET baseline is a library provider exposing async connection/command operations,
+as illustrated by [Npgsql's documentation](https://www.npgsql.org/doc/index.html)
+(reviewed 2026-10-12). neoCLR's smaller SqlConnection interface intentionally differs
+from ADO.NET, as documented above; it does not require a different runtime boundary.
+
+A future **optional libpq provider through FFI** is a reasonable alternative when its
+broader authentication/protocol support justifies another dependency. Prefer that
+placement over adding PostgreSQL InternalCalls. Its ABI needs owned opaque connection
+and result handles, explicit release, copied error/text data, and bounded buffer
+marshalling. No borrowed result pointer may outlive its PGresult or cross an await
+without an ownership rule. A generic readiness integration must avoid conflicting
+ownership of libpq's socket and preserve deadlines/cancellation during shutdown.
+
+PostgreSQL 18's [asynchronous libpq contract](https://www.postgresql.org/docs/18/libpq-async.html)
+(reviewed 2026-10-12) requires input consumption and busy checks before retrieving
+results without blocking. Calling a synchronous query function behind a Task would
+not provide cooperative I/O. Library discovery, ABI versions, native notices and
+macOS/Windows distribution would also become provider responsibilities. Current
+[FFI execution-mode gaps](native-interop.md) must be closed and tested before adopting
+this route for a JIT/AOT preview; they do not justify permanent database runtime APIs.
+
+The managed implementation avoids another native dependency and exercises common
+runtime contracts, but leaves us responsible for protocol/authentication correctness.
+Libpq could reduce that implementation burden at the cost of marshalling, packaging
+and async integration. Neither option has demonstrated a performance advantage here.
+Before changing providers, compare the same parameter/NULL/error/transaction cases,
+fragmented I/O, timeout/cancellation, disposal/GC and concurrent HTTP progress in all
+three execution modes on both hosts. Benchmark matched workloads separately.
+This review recommends placement; it does not implement libpq or expand the current
+local trust-authentication provider's supported scope.
+
 ## PostgreSQL binding and bounds
 
 The binding implements protocol 3.0 over existing asynchronous sockets. It sends

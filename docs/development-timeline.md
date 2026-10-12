@@ -25,6 +25,25 @@ available original wording; other text is a summary.
 
 See the [changelog](../CHANGELOG.md) and linked design documents for technical status.
 
+## 2026-10-12 — Preview installation and provider placement
+
+**Author:** asks to continue toward an experimental preview release, then requests
+installation of the matching SDK and VS Code extension for testing and a website
+review. Subsequently asks to review foreign calls versus runtime implementations,
+with PostgreSQL as a candidate if it uses native code.
+
+**Assistant response and actions:** qualifies extracted bundles before installation;
+found and fixed a Raven constructor-overload applicability bug on main and carried
+it deliberately to the native branch. Native Task.Run binding and package checks
+are still being completed. Website publication remains separate from local review.
+Reviewed PostgreSQL sources: protocol handling is already managed Raven over shared
+sockets, with no libpq or database-specific InternalCall. Recommends retaining that
+provider for the preview and treating a future libpq implementation as an optional
+FFI provider with explicit ownership and nonblocking readiness integration.
+See the [placement review](sql-data-access.md#implementation-placement-review--2026-10-12).
+Installation and final candidate qualification remain pending at this checkpoint;
+no published release or provider rewrite is claimed.
+
 ## 2026-10-12 — Website benchmark organization
 
 **Author:** intends to publish benchmarks on the website: HTTP pages should cover
