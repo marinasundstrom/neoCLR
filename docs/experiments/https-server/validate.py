@@ -24,6 +24,7 @@ def main():
     parser.add_argument('--recipe', type=Path, default=HERE.parent / 'runtime-async/collector-walk-showcase.json')
     parser.add_argument('--bundle', type=Path, required=True)
     parser.add_argument('--output', type=Path, required=True)
+    parser.add_argument('--project-build', type=Path, help='Validate a matching --https-server project build instead of rebuilding experimental hosts')
     args = parser.parse_args()
     if not ssl.HAS_TLSv1_3:
         parser.error('requires Python linked to OpenSSL with TLS 1.3 support')
@@ -52,25 +53,41 @@ def main():
         if result.returncode: raise RuntimeError(label + ': ' + result.stderr + result.stdout[-1000:])
 
     try:
-        run('tls-build', ['cargo', 'build', '--locked', '--release', '--manifest-path', str(ROOT / 'tools/native-tls/Cargo.toml')])
-        source = command('language-source')
-        source[source.index('-o') + 1] = str(out / 'server.dll'); source[-2] = str(HERE / 'Server.rvn')
-        run('source', source)
-        native = command('server-native-compile'); native[2], native[4] = str(out / 'server.dll'), str(out / 'server.o')
-        run('native', native)
-        archive = str(ROOT / 'tools/native-tls/target/release/libneoclr_native_tls.a')
-        link = command('server-link')
-        link = [str(out / 'server.o') if v.endswith('/server.o') else v for v in link]
-        link[link.index('-o') + 1] = str(out / 'server')
-        link += ['-DNEOCLR_ENTRY_ARGUMENTS', '-DNEOCLR_HTTPS_SERVER', archive]
-        run('aot-link', link)
-        cleartext = [item for item in link if item not in ('-DNEOCLR_HTTPS_SERVER', archive)]
-        cleartext[cleartext.index('-o') + 1] = str(out / 'cleartext')
-        run('cleartext-link', cleartext)
-        jit_link = command('jit-host-build') + ['-DNEOCLR_HTTPS_SERVER', archive]
-        jit_link[jit_link.index('-o') + 1] = str(out / 'host.dylib')
-        run('jit-link', jit_link)
-        jit = [native[0], '--jit-run', *native[1:]]; jit[5] = str(out / 'host.dylib')
+        if args.project_build:
+            build = args.project_build.resolve()
+            evidence = json.loads((build / 'build.json').read_text())
+            if not evidence.get('passed') or not evidence.get('httpsServer'):
+                raise ValueError('Requires a successful HTTPS server project build')
+            for path, digest in evidence['inputs'].items():
+                if sha(path) != digest: raise ValueError('Project build input changed: ' + path)
+            for name, digest in evidence['artifacts'].items():
+                if sha(build / name) != digest: raise ValueError('Project build artifact changed: ' + name)
+            report['projectBuildSha256'] = sha(build / 'build.json')
+            report['inputsSha256'].update(evidence['inputs'])
+            invocations = [('aot-project', [str(build / 'app')])]
+            credential_app = build / 'app'
+        else:
+            run('tls-build', ['cargo', 'build', '--locked', '--release', '--manifest-path', str(ROOT / 'tools/native-tls/Cargo.toml')])
+            source = command('language-source')
+            source[source.index('-o') + 1] = str(out / 'server.dll'); source[-2] = str(HERE / 'Server.rvn')
+            run('source', source)
+            native = command('server-native-compile'); native[2], native[4] = str(out / 'server.dll'), str(out / 'server.o')
+            run('native', native)
+            archive = str(ROOT / 'tools/native-tls/target/release/libneoclr_native_tls.a')
+            link = command('server-link')
+            link = [str(out / 'server.o') if v.endswith('/server.o') else v for v in link]
+            link[link.index('-o') + 1] = str(out / 'server')
+            link += ['-DNEOCLR_ENTRY_ARGUMENTS', '-DNEOCLR_HTTPS_SERVER', archive]
+            run('aot-link', link)
+            cleartext = [item for item in link if item not in ('-DNEOCLR_HTTPS_SERVER', archive)]
+            cleartext[cleartext.index('-o') + 1] = str(out / 'cleartext')
+            run('cleartext-link', cleartext)
+            jit_link = command('jit-host-build') + ['-DNEOCLR_HTTPS_SERVER', archive]
+            jit_link[jit_link.index('-o') + 1] = str(out / 'host.dylib')
+            run('jit-link', jit_link)
+            jit = [native[0], '--jit-run', *native[1:]]; jit[5] = str(out / 'host.dylib')
+            invocations = [('aot', [str(out / 'server')]), ('jit', jit)]
+            credential_app = out / 'server'
         # Current transitive host headers and TLS engine, without any generated private keys.
         for folder in [HERE, HERE.parent / 'aot-console', ROOT / 'tools/native-tls/src']:
             for p in folder.iterdir():
@@ -108,10 +125,10 @@ def main():
                         secure.unwrap()
                         return protocol
 
-            for mode, invocation in [('aot', [str(out / 'server')]), ('jit', jit)]:
+            for mode, invocation in invocations:
                 for case in ['tls13', 'tls12', 'fragmented', 'untrusted', 'wrong-host', 'alpn', 'plaintext', 'truncated', 'timeout', 'cancel']:
                     scenario = 'ok' if case in ('tls13', 'tls12', 'fragmented') else case
-                    process = subprocess.Popen(invocation + ([scenario] if mode == 'aot' else ['--jit-entry-argument', scenario]), env=env, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+                    process = subprocess.Popen(invocation + ([scenario] if mode != 'jit' else ['--jit-entry-argument', scenario]), env=env, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
                     try:
                         if not select.select([process.stdout], [], [], 60)[0]: raise RuntimeError('startup timeout')
                         line = process.stdout.readline()
@@ -151,26 +168,27 @@ def main():
             # Config errors happen before binding, never a cleartext fallback.
             for name, overrides in [('missing', {'NEOCLR_HTTPS_PRIVATE_KEY': ''}),
                                     ('invalid', {'NEOCLR_HTTPS_PRIVATE_KEY': str(cert)})]:
-                result = subprocess.run([str(out / 'server'), 'ok'], env=dict(env, **overrides), capture_output=True, text=True, timeout=5)
+                result = subprocess.run([str(credential_app), 'ok'], env=dict(env, **overrides), capture_output=True, text=True, timeout=5)
                 good = result.returncode != 0 and not result.stdout
                 report['cases'].append(dict(mode='aot', case=name + '-credentials', passed=good, exitCode=result.returncode))
                 if not good: raise RuntimeError('invalid credentials accepted')
-        plain = subprocess.Popen([str(out / 'cleartext'), 'ok'], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
-        try:
-            if not select.select([plain.stdout], [], [], 20)[0]: raise RuntimeError('cleartext startup timeout')
-            port = int(plain.stdout.readline())
-            for _ in range(2):
-                connection = http.client.HTTPConnection('127.0.0.1', port, timeout=10)
-                connection.request('GET', '/greeting'); response = connection.getresponse()
-                if response.status != 200 or response.read() != 'Café 🌍 over TLS'.encode():
-                    raise RuntimeError('cleartext behavior changed')
-                connection.close()
-            stdout, stderr = plain.communicate(timeout=10)
-            good = plain.returncode == 0 and not stderr and 'PASS HTTPS server and recovery' in stdout
-            report['cases'].append(dict(mode='aot', case='ordinary-host-stays-cleartext', passed=good))
-            if not good: raise RuntimeError('cleartext shutdown failed')
-        finally:
-            if plain.poll() is None: plain.kill(); plain.communicate()
+        if not args.project_build:
+            plain = subprocess.Popen([str(out / 'cleartext'), 'ok'], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+            try:
+                if not select.select([plain.stdout], [], [], 20)[0]: raise RuntimeError('cleartext startup timeout')
+                port = int(plain.stdout.readline())
+                for _ in range(2):
+                    connection = http.client.HTTPConnection('127.0.0.1', port, timeout=10)
+                    connection.request('GET', '/greeting'); response = connection.getresponse()
+                    if response.status != 200 or response.read() != 'Café 🌍 over TLS'.encode():
+                        raise RuntimeError('cleartext behavior changed')
+                    connection.close()
+                stdout, stderr = plain.communicate(timeout=10)
+                good = plain.returncode == 0 and not stderr and 'PASS HTTPS server and recovery' in stdout
+                report['cases'].append(dict(mode='aot', case='ordinary-host-stays-cleartext', passed=good))
+                if not good: raise RuntimeError('cleartext shutdown failed')
+            finally:
+                if plain.poll() is None: plain.kill(); plain.communicate()
         for path, digest in report['inputsSha256'].items():
             if sha(path) != digest: raise RuntimeError('input changed: ' + path)
         report['passed'] = True

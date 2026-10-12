@@ -25,6 +25,26 @@ available original wording; other text is a summary.
 
 See the [changelog](../CHANGELOG.md) and linked design documents for technical status.
 
+## 2026-10-12 — Fix compiler gaps exposed by HTTPS projects
+
+- **Author:** “We should fix compiler gaps.” This follows the HTTPS server work
+  and a source workaround for `if !(await observer.Task)` inside a `use` scope.
+- **Assistant action:** reduce the failure to a native project and trace it to
+  the shared Raven bound-tree walker skipping unary operands. Capture analysis
+  missed suspension, leaving a disposable resource in a local. Keep native
+  definite-assignment checking strict and remove the source workaround.
+- **Outcome:** general fix committed on Raven main as `99ae011b4`, deliberately
+  carried to the separate neoCLR compiler line as `c71baae94`. All 18 .NET resource
+  lifetime cases pass, including four new cases that failed before the fix.
+  A broader async selection has 15 failures; all reproduce with the unchanged
+  walker and remain separate baseline gaps. No metadata or Runtime Contract change.
+- **Integration:** add explicit source-only `--https-server` project builds on
+  macOS ARM64. The original server source passes twelve host checks and the Rust
+  fragmented transport test using the fixed compiler, including cancellation and
+  recovery. Public per-listener configuration, Windows/interpreter and packaging
+  remain open. See [compiler evidence](experiments/async-unary-cleanup/README.md)
+  and [HTTPS project evidence](experiments/https-server/project-validation.json).
+
 ## 2026-10-12 — HTTPS server selected after diagnostics
 
 **Author:** Asked about the immediate goal and existing TLS documentation, then

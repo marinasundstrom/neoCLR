@@ -15,6 +15,14 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   ordinary hosts stay cleartext. No public TLS API or installed HTTPS support yet.
   Record server-first direction, qualification and remaining integration work in
   the roadmap, HTTP tracker, development record and website.
+  Add an explicit source-only macOS ARM64 `--https-server` project build option;
+  twelve host cases and the Rust transport test pass with the fixed compiler.
+
+- Fix the HTTPS source compiler gap through Raven main `99ae011b4`, deliberately
+  carried to its neoCLR branch as `c71baae94`: traverse unary operands so `use`
+  resources survive awaited conditions. Record native project and .NET regression
+  evidence, remove the need for a source workaround, and identify pre-existing
+  broader async test gaps without weakening native verification.
 
 - Qualify provisional profiler attachment during the Raven HTTP showcase in
   macOS ARM64 AOT and JIT: 128 requests per mode, repeated external attachment,

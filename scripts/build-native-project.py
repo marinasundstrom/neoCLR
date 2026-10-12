@@ -39,6 +39,26 @@ def native_kernel_build(target, time_zone_rules=False):
     return command, archive
 
 
+def native_tls_build():
+    manifest = ROOT / 'tools/native-tls/Cargo.toml'
+    target = 'aarch64-apple-darwin'
+    directory = manifest.parent / 'target'
+    return (['cargo', 'build', '--locked', '--release', '--target', target,
+             '--target-dir', directory, '--manifest-path', manifest],
+            directory / target / 'release/libneoclr_native_tls.a')
+
+
+def validate_https_server(enabled, profile, bootstrap_root, packaged):
+    if not enabled:
+        return
+    if profile != PROFILES['http']:
+        raise ValueError('--https-server requires the macOS ARM64 HTTP profile; other hosts are not qualified')
+    if bootstrap_root:
+        raise ValueError('--https-server does not yet support retained session bootstrap')
+    if packaged:
+        raise ValueError('--https-server currently requires a source checkout, not a packaged build kit')
+
+
 def support_files():
     base = ROOT / 'docs/experiments'
     return [ROOT / 'scripts/build-native-project.py', ROOT / 'tools/native/console-host.c', ROOT / 'tools/native/entry-arguments.c',
@@ -67,7 +87,8 @@ def sha(path):
     return hashlib.sha256(path.read_bytes()).hexdigest()
 
 
-def build(project, bundle, aot, output, profile=PROFILE, bootstrap_root=None, reflection_roots=None, byte_array_limit=65536, http_heap_bytes=1048576, command_timeout=180):
+def build(project, bundle, aot, output, profile=PROFILE, bootstrap_root=None, reflection_roots=None, byte_array_limit=65536, http_heap_bytes=1048576, command_timeout=180, https_server=False):
+    validate_https_server(https_server, profile, bootstrap_root, (ROOT / 'native-build-kit.json').exists())
     if not 0 < command_timeout <= 3600:
         raise ValueError("Command timeout must be between 1 and 3600 seconds")
     if not 0 < byte_array_limit <= 2147483647:
@@ -96,7 +117,7 @@ def build(project, bundle, aot, output, profile=PROFILE, bootstrap_root=None, re
             raise ValueError('Required build tool is missing: ' + tool)
     output.mkdir(parents=True, exist_ok=False)
     report = dict(profile=profile, passed=False, project=str(project),
-                  host=platform.platform(), byteArrayLimit=byte_array_limit, httpHeapBytes=http_heap_bytes, commandTimeoutSeconds=command_timeout, bootstrapRoot=bootstrap_root, commands=[], inputs={})
+                  host=platform.platform(), httpsServer=https_server, byteArrayLimit=byte_array_limit, httpHeapBytes=http_heap_bytes, commandTimeoutSeconds=command_timeout, bootstrapRoot=bootstrap_root, commands=[], inputs={})
 
     def save():
         (output / 'build.json').write_text(json.dumps(report, indent=2) + '\n')
@@ -253,6 +274,18 @@ def build(project, bundle, aot, output, profile=PROFILE, bootstrap_root=None, re
                 run(command, phase="native-kernel-build")
             report['inputs'][str(archive)] = sha(archive)
             native_text.append(archive)
+        native_tls = []
+        if https_server:
+            for path in [ROOT / 'tools/native-tls/Cargo.toml', ROOT / 'tools/native-tls/Cargo.lock',
+                         ROOT / 'tools/native-tls/src/lib.rs', ROOT / 'docs/experiments/https-server/native-tls.h']:
+                report['inputs'][str(path)] = sha(path)
+            command, archive = native_tls_build()
+            run(command, phase='native-tls-build')
+            report['inputs'][str(archive)] = sha(archive)
+            native_tls.append(archive)
+            report['httpsConfiguration'] = dict(scope='all-accepted-connections',
+                certificateEnvironment='NEOCLR_HTTPS_CERTIFICATE', privateKeyEnvironment='NEOCLR_HTTPS_PRIVATE_KEY',
+                credentialLoading='runtime-only', api='private-host-capability')
         # Publish the executable only after link and dependency checks succeed.
         pending = output / ('app.pending.exe' if windows else 'app.pending')
         if windows:
@@ -266,7 +299,7 @@ def build(project, bundle, aot, output, profile=PROFILE, bootstrap_root=None, re
                 raise RuntimeError('Unexpected native dependencies: ' + repr(dependencies))
         else:
             run([clang, '-isysroot', sdk, '-arch', 'arm64', '-std=c11', '-O2', '-Wall', '-Wextra', '-Werror',
-                 '-DNEOCLR_NATIVE_GC', '-DNEOCLR_HTTP_HEAP_BYTES=' + str(http_heap_bytes), '-DNEOCLR_NATIVE_BYTE_ARRAY_LIMIT=' + str(byte_array_limit), *(['-DNEOCLR_ENTRY_ARGUMENTS'] if selection.get('entryArguments') else []), '-I', base, *adapters, obj, *native_text, *(['-framework', 'CoreFoundation'] if system_culture else []), '-o', pending], phase='host-compile-link')
+                 '-DNEOCLR_NATIVE_GC', *(['-DNEOCLR_HTTPS_SERVER'] if https_server else []), '-DNEOCLR_HTTP_HEAP_BYTES=' + str(http_heap_bytes), '-DNEOCLR_NATIVE_BYTE_ARRAY_LIMIT=' + str(byte_array_limit), *(['-DNEOCLR_ENTRY_ARGUMENTS'] if selection.get('entryArguments') else []), '-I', base, *adapters, obj, *native_text, *native_tls, *(['-framework', 'CoreFoundation'] if system_culture else []), '-o', pending], phase='host-compile-link')
             dependencies = [line.split()[0] for line in run(['xcrun', 'otool', '-L', pending], phase='dependency-check').splitlines()[1:]]
             allowed = {'/usr/lib/libSystem.B.dylib'}
             if system_culture:
@@ -292,6 +325,7 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--profile', choices=PROFILES, default='console',
                         help='Explicit native service/host profile (default: console)')
+    parser.add_argument('--https-server', action='store_true', help='Source-only macOS HTTP host: TLS for all accepted connections; PEM credentials are supplied at runtime')
     parser.add_argument('--reflection-roots', type=Path, help='Private versioned source-identity reflection retention JSON')
     parser.add_argument('--byte-array-limit', type=int, default=65536, help='Private native byte-array allocation limit; heap capacity remains independent')
     parser.add_argument('--bootstrap-root', help='Private retained HTTP experiment: fn<Void> factory, three host dispatches')
@@ -307,7 +341,7 @@ def main():
         print(build(*(getattr(args, name).resolve() for name in ('project', 'bundle', 'aot', 'output')),
                     profile=PROFILES[args.profile], bootstrap_root=args.bootstrap_root,
                     reflection_roots=args.reflection_roots.resolve() if args.reflection_roots else None,
-                    byte_array_limit=args.byte_array_limit, http_heap_bytes=args.http_heap_bytes, command_timeout=args.command_timeout))
+                    byte_array_limit=args.byte_array_limit, http_heap_bytes=args.http_heap_bytes, command_timeout=args.command_timeout, https_server=args.https_server))
     except (OSError, ValueError, KeyError, TypeError, RuntimeError, subprocess.SubprocessError) as error:
         print('native build: ' + str(error), file=sys.stderr)
         return 1

@@ -9007,3 +9007,14 @@ The Windows project gate exposed the missed provider path; macOS project consume
 now pass both lowerings and all execution modes. A general generic readonly `self`
 initializer fix was implemented on Raven main (`3bfdf9b92`) and deliberately carried
 into the native branch (`201d1c090`). No full branch merge or format change occurred.
+
+## Unary await capture correction — 2026-10-12
+
+The shared Raven walker now traverses unary operands so `use` resources remain
+captured across `!(await task)`. Main `99ae011b4` is deliberately carried to the
+neoCLR compiler branch as `c71baae94`; no full branch merge is involved. The compiler
+owns the correction, and native definite-assignment checking remains unchanged.
+No new Runtime Contract configuration, temporary CLI representation, metadata
+information loss or native replacement is introduced by this fix. Existing async
+and disposal contracts apply. See [regression and limitations](experiments/async-unary-cleanup/README.md)
+and the compiler-side `docs/compiler/neoclr-cli-bridge.md`.

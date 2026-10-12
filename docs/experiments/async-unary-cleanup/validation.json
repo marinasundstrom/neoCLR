@@ -1,0 +1,44 @@
+{
+  "date": "2026-10-12",
+  "ravenMain": "99ae011b4",
+  "ravenNative": "c71baae94",
+  "nativeBefore": "NEOMETA003: MoveNext local loaded before store on some path",
+  "nativeAfter": "project compiles",
+  "dotnetBefore": {
+    "passed": 14,
+    "failed": 4,
+    "error": "InvalidProgramException in all four new unary-await lifetime cases"
+  },
+  "dotnetAfter": {
+    "passed": 18,
+    "failed": 0
+  },
+  "broaderAsync": {
+    "passed": 132,
+    "failed": 15,
+    "allFailuresReproducedWithUnchangedWalker": true,
+    "failures": [
+      "Raven.CodeAnalysis.Tests.CodeGen.AsyncFunctionExpressionStateMachineTests.Nested_async_lambda_with_capture_executes_and_returns_value(invocation: \"Task.Run(run)\")",
+      "Raven.CodeAnalysis.Tests.CodeGen.AsyncFunctionExpressionStateMachineTests.Nested_async_lambda_with_capture_executes_and_returns_value(invocation: \"run()\")",
+      "Raven.CodeAnalysis.Tests.CodeGen.AsyncFunctionExpressionStateMachineTests.Async_method_mutable_local_is_shared_with_callbacks(invoke: \"_ = write()\", suspend: \"await Task.Yield()\")",
+      "Raven.CodeAnalysis.Tests.CodeGen.AsyncFunctionExpressionStateMachineTests.Async_method_mutable_local_is_shared_with_callbacks(invoke: \"_ = await Task.Run(write)\", suspend: \"await Task.Yield()\")",
+      "Raven.CodeAnalysis.Tests.CodeGen.AsyncFunctionExpressionStateMachineTests.TaskRun_async_lambda_with_capture_executes_and_returns_value",
+      "Raven.CodeAnalysis.Tests.CodeGen.AsyncFunctionExpressionStateMachineTests.Async_method_local_function_and_lambda_share_captured_local",
+      "Raven.CodeAnalysis.Tests.CodeGen.AsyncFunctionExpressionStateMachineTests.Async_method_closure_initializes_receiver_and_parameter_captures",
+      "Raven.CodeAnalysis.Tests.CodeGen.AsyncFunctionExpressionStateMachineTests.Async_method_closure_survives_completion_and_is_per_invocation",
+      "Raven.CodeAnalysis.Tests.CodeGen.AsyncFunctionExpressionStateMachineTests.TopLevelAsyncMain_AsyncLambdaWithParameterAndOuterCapture_ExecutesAndPassesIlVerifyWhenToolAvailable",
+      "Raven.CodeAnalysis.Tests.CodeGen.AsyncFunctionExpressionStateMachineTests.TaskRun_async_lambda_executes_and_returns_value",
+      "Raven.CodeAnalysis.Semantics.Tests.AsyncMethodTests.TopLevelAwait_InVariableInitializer_PromotesSynthesizedMainToAsyncTask",
+      "Raven.CodeAnalysis.Semantics.Tests.AsyncMethodTests.TopLevelAwait_InInvocationArgument_PromotesSynthesizedMainToAsyncTask",
+      "Raven.CodeAnalysis.Semantics.Tests.AsyncMethodTests.TopLevelAwait_PromotesSynthesizedMainToAsyncTask",
+      "Raven.CodeAnalysis.Semantics.Tests.AsyncMethodTests.TopLevelAwait_WithReturnUnit_SynthesizesTaskMain",
+      "Raven.CodeAnalysis.Semantics.Tests.AsyncMethodTests.TopLevelAwait_WithReturnExpression_SynthesizesTaskOfInt"
+    ]
+  },
+  "inputsSha256": {
+    "docs/experiments/async-unary-cleanup/NegatedAwait.rvn": "9a45ec84a704ac6479a39fe0af36ac0a5a677efcfbd834230090b5a7660b924f",
+    "docs/experiments/async-unary-cleanup/Native.rvnproj": "48dfe5b233fb5828de6f1ddb78fe4b26d061dc7c74be231a915701a875c34aa5",
+    "target/https-unary-fixed-bundle/sdk/tools/rvnc/rvnc.dll": "589901f0b1ddd5dff4054a7abd808f232b05cc762ec9be52d42bd24585a8e09e",
+    "target/https-unary-fixed-bundle/sdk/tools/rvnc/Raven.CodeAnalysis.dll": "1f52e1f34a281b2a07b93acf44a192d706754c7474af876ff9bf9e486b7a88ca"
+  }
+}

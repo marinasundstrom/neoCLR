@@ -134,8 +134,11 @@ The routing workbench also parses a route, extracts an integer parameter and pri
 - **Platform:** native Windows ARM64 is planned but unqualified. Windows file/path
   services and packaged native build kits remain open.
 - **HTTP:** these bounded showcases do not establish native support for the entire
-  Web API surface, TLS, HTTP/2 or arbitrary concurrent servers. The native transport
-  uses IPv4, bounded DNS workers and polled socket operations.
+  Web API surface, HTTP/2 or arbitrary concurrent servers. A source-only macOS ARM64
+  [HTTPS server experiment](https://github.com/marinasundstrom/neoCLR/blob/main/docs/experiments/https-server/README.md)
+  supports an explicit TLS-only host, including the project builder's `--https-server`
+  option. Public per-listener TLS configuration and packaged HTTPS remain open.
+  The native transport uses IPv4, bounded DNS workers and polled socket operations.
 - **Code and APIs:** development includes opaque closed type-token identity and the
   runtime type-equality, name, generic-arity and type-shape queries for primitive and closed
   nominal/vector token producers, plus concrete source-class/primitive-box `GetType()` identity,

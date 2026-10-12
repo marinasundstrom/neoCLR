@@ -21,7 +21,10 @@ It does not imply inclusion in published Preview 9 or production readiness.
 The author selects server TLS first. The [native proof](experiments/https-server/README.md)
 uses the existing Raven handler with an explicitly configured HTTPS-only host.
 Certificates are supplied by the host; clients validate trust and hostname. The
-ordinary runtime still uses cleartext sockets. Next integration questions are managed
+ordinary runtime still uses cleartext sockets. The source macOS ARM64 project builder
+exposes the explicit `--https-server` capability, with
+[twelve passing host cases](experiments/https-server/project-validation.json) after
+fixing shared Raven unary-await capture. Next integration questions are managed
 secure-transport/per-listener configuration and Windows/interpreter support, followed
 by reuse for client and SQL traffic. This does not reopen the published cleartext POC.
 

@@ -5,7 +5,10 @@ explicitly selects HTTPS server support. The [native hosting proof](experiments/
 puts Rustls behind runtime-owned nonblocking I/O, preserving Raven HttpServer handling,
 deadlines, cancellation and recovery. It qualifies an explicit HTTPS-only host on
 macOS ARM64 JIT/AOT; managed per-listener TLS configuration, Windows/interpreter
-integration and installed packaging remain open. Client and PostgreSQL TLS are not
+integration and installed packaging remain open. The source project builder now
+accepts an explicit `--https-server` switch, qualified with the shared Raven unary
+await capture fix; [project evidence](experiments/https-server/project-validation.json)
+covers twelve host cases plus fragmented transport. Client and PostgreSQL TLS are not
 implemented by this server slice. This is bounded author-directed networking work;
 the runtime correctness/performance milestone remains active.
 

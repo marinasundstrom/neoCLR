@@ -105,3 +105,44 @@ Qualification is macOS ARM64 JIT/AOT only. Windows x64/ARM64, interpreter TLS,
 expired-certificate fixtures, forced network send-deadline expiry, adversarial load,
 SNI certificate selection, client authentication and installed packaging remain open.
 No production-readiness or throughput claim is made.
+
+## Source project build
+
+The source builder accepts `--profile http --https-server` on macOS ARM64. This
+links the pinned Rustls archive into the ordinary project AOT host. It is an
+explicit development capability, rejected for other profiles, retained-session
+bootstrap and installed build kits. All accepted connections use TLS; outgoing
+connections retain their existing transport behavior. No public managed API is added.
+
+```sh
+python3 scripts/build-native-project.py --profile http --https-server \
+  --project docs/experiments/https-server/Native.rvnproj \
+  --bundle /path/to/qualified/bundle \
+  --aot tools/aot-poc/target/release/neoclr-aot-poc \
+  --output target/https-project-new
+python3 docs/experiments/https-server/validate.py \
+  --bundle /path/to/qualified/bundle \
+  --project-build target/https-project-new \
+  --output target/https-project-validation-new
+```
+
+Supply `NEOCLR_HTTPS_CERTIFICATE` and `NEOCLR_HTTPS_PRIVATE_KEY` as PEM file paths
+when running the executable directly. Credentials are loaded at runtime, not
+embedded in the executable or build report. The validation harness creates and
+removes its own ephemeral credentials. Its project mode verifies the build's
+input and artifact hashes before using the executable, then runs the ten network
+scenarios, two credential rejection cases and Rust transport test. Cleartext and
+JIT isolation retain the separate runtime-async proof above.
+
+The project path uses compiler-generated state machines. A qualified compiler
+must include the async project cleanup configuration fix and unary-operand walker
+fix described in [the compiler regression](../async-unary-cleanup/README.md). Existing
+published bundles are not silently upgraded by this source-only option.
+
+[Project build evidence](project-build.json) and [host results](project-validation.json)
+qualify native compiler `c71baae94` with the unchanged original awaited condition.
+The build report replaces its 7 MB native selection stdout with byte count and hash;
+`fullReportSha256` identifies the original report checked by the validator. Twelve
+host cases and the explicit Rust transport test pass. This locally qualified bundle
+retains the existing runtime libraries and replaces only its compiler directory;
+the original bundle is preserved. Both compiler and library inputs are hashed.
