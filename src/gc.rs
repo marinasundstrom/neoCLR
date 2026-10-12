@@ -35,6 +35,7 @@ pub struct CollectionEvent {
 
 #[derive(Debug, Default)]
 pub struct ManagedHeap {
+    pub(crate) tls: crate::tls::Resources,
     objects: BTreeMap<usize, crate::slots::Cell>,
     next_identity: usize,
     collections: usize,
@@ -242,6 +243,7 @@ impl ManagedHeap {
         }
         let before = self.len();
         self.objects.retain(|identity, _| live.contains(identity));
+        self.tls.reap(&live);
         self.reclaimed = self.reclaimed.saturating_add(before - self.len());
         self.collections = self.collections.saturating_add(1);
         if self.events.len() == 64 {

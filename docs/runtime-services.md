@@ -191,3 +191,15 @@ are copied back through ordinary managed slot writes. This preserves initializat
 and readonly checks but adds copying and holds execution during provider work.
 Native lowering and any future large-buffer optimization must retain these semantics.
 See [shared provider design and validation](shared-security-provider.md).
+
+## TLS ownership services (development, 2026-10-12)
+
+The interpreter recognizes the exact private declarations in
+[runtime/neoCLR/Runtime/Tls.neoil](../runtime/neoCLR/Runtime/Tls.neoil). They create
+client/server configuration and session resources, release them or abort a session.
+`Tls` capability use also requires ManagedArrays and ManagedHeap. Guest owner tokens
+are empty managed byte arrays validated against the current heap; raw provider handles
+never cross this boundary. Unreachable owners release their resources during successful
+collection, with abortive cleanup only. See [TLS ownership](shared-security-provider.md#interpreter-service-and-heap-ownership-development-2026-10-12)
+for faults, statuses, quotas, lifetime rules and the remaining native/managed gates.
+These imports do not yet have native JIT/AOT lowering or a public Raven API.

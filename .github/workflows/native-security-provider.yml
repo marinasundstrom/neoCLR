@@ -9,6 +9,11 @@ on:
       - 'tools/aot-poc/**'
       - 'docs/experiments/native-cryptography/**'
       - 'docs/experiments/aot-console/cryptography.c'
+      - 'src/tls.rs'
+      - 'src/gc.rs'
+      - 'src/vm.rs'
+      - 'tests/tls_services.rs'
+      - 'runtime/neoCLR/Runtime/Tls.neoil'
       - 'src/cryptography.rs'
       - 'src/native.rs'
       - 'src/services.rs'
@@ -26,6 +31,11 @@ on:
       - 'tools/aot-poc/**'
       - 'docs/experiments/native-cryptography/**'
       - 'docs/experiments/aot-console/cryptography.c'
+      - 'src/tls.rs'
+      - 'src/gc.rs'
+      - 'src/vm.rs'
+      - 'tests/tls_services.rs'
+      - 'runtime/neoCLR/Runtime/Tls.neoil'
       - 'src/cryptography.rs'
       - 'src/native.rs'
       - 'src/services.rs'
@@ -59,7 +69,7 @@ jobs:
       - name: Test shared client, server and primitives
         run: python scripts/test-native-security.py
       - name: Test typed interpreter services
-        run: cargo test --locked --test cryptography --test runtime_services
+        run: cargo test --locked --test cryptography --test runtime_services --test tls_services
       - name: Build native compiler and test binding admission
         run: |
           cargo build --locked --bin neoclr

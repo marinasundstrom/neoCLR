@@ -45,6 +45,8 @@ pub enum RuntimeService {
     NameResolution,
     /// Hash/MAC operations and operating-system secure randomness.
     Cryptography,
+    /// Managed ownership of TLS configurations and sessions.
+    Tls,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -73,6 +75,7 @@ pub(crate) fn uses(module: &crate::Module, function: &Function) -> Result<Vec<Se
         let binding = crate::native::bind_in(module, function)?;
         let service = match &binding {
             crate::native::Binding::Cryptography(_) => RuntimeService::Cryptography,
+            crate::native::Binding::Tls(_) => RuntimeService::Tls,
             crate::native::Binding::StackTraceCapture => RuntimeService::StackInspection,
             crate::native::Binding::Socket(_) => RuntimeService::SocketIo,
             crate::native::Binding::Resolve(_) => RuntimeService::NameResolution,
@@ -278,9 +281,13 @@ pub(crate) fn uses(module: &crate::Module, function: &Function) -> Result<Vec<Se
                 instruction: None,
             });
         }
+        if matches!(&binding, crate::native::Binding::Tls(_)) {
+            uses.push(ServiceUse { service: RuntimeService::ManagedHeap, instruction: None });
+        }
         if matches!(
             &binding,
-            crate::native::Binding::Cryptography(_)
+            crate::native::Binding::Tls(_)
+                | crate::native::Binding::Cryptography(_)
                 | crate::native::Binding::UnixTimeToLocal
                 | crate::native::Binding::ReflectionCollection(_)
                 | crate::native::Binding::ReflectionMember(_)

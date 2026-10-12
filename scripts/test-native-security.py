@@ -29,6 +29,8 @@ def main():
         ], check=True, capture_output=True, timeout=30)
         os.chmod(key, 0o600)
         env = dict(os.environ, NEOCLR_HTTPS_CERTIFICATE=str(cert), NEOCLR_HTTPS_PRIVATE_KEY=str(key))
+        subprocess.run(['cargo', 'test', '--locked', '--lib', 'tls::tests', '--', '--include-ignored'],
+                       cwd=ROOT, env=env, check=True, timeout=600)
         subprocess.run(['cargo', 'test', '--locked', '--manifest-path',
                         str(ROOT / 'tools/native-tls/Cargo.toml'), '--', '--include-ignored'],
                        env=env, check=True, timeout=180)

@@ -4567,6 +4567,8 @@ fn interpret_instructions_with_dispatch(
                                 ));
                             }
                             scheduler.timers.invoke(operation, &args)?
+                        } else if let crate::native::Binding::Tls(operation) = binding {
+                            operation.invoke(&args, heap)?
                         } else if let crate::native::Binding::Resolve(operation) = binding {
                             if matches!(
                                 operation,

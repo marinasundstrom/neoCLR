@@ -1,0 +1,18 @@
+; Private TLS ownership services. Owner tokens are empty managed byte arrays.
+; Resources are released explicitly or when their owner is reclaimed by the heap.
+; No provider handle or native pointer is exposed to guest code.
+.function neoCLR.Runtime.TlsCreateClient(arrayref<Byte> owner,arrayref<Byte> roots,arrayref<Byte> alpn) -> Int32
+.methodimpl InternalCall
+.end
+.function neoCLR.Runtime.TlsCreateServer(arrayref<Byte> owner,arrayref<Byte> cert,arrayref<Byte> key,arrayref<Byte> alpn) -> Int32
+.methodimpl InternalCall
+.end
+.function neoCLR.Runtime.TlsCreateSession(arrayref<Byte> owner,arrayref<Byte> config,arrayref<Byte> name) -> Int32
+.methodimpl InternalCall
+.end
+.function neoCLR.Runtime.TlsRelease(arrayref<Byte> owner) -> Int32
+.methodimpl InternalCall
+.end
+.function neoCLR.Runtime.TlsAbort(arrayref<Byte> owner) -> Int32
+.methodimpl InternalCall
+.end

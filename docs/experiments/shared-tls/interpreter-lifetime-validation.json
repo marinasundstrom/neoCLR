@@ -1,0 +1,38 @@
+{
+  "date": "2026-10-12",
+  "platform": "macOS arm64",
+  "scope": "Private interpreter TLS services and managed resource lifetime",
+  "validation": [
+    {
+      "command": "python3 scripts/test-native-security.py",
+      "passed": 24,
+      "details": "4 heap ownership, 15 TLS provider, 4 native cryptography, 1 safe provider"
+    },
+    {
+      "command": "cargo test --locked --test tls_services --test runtime_services",
+      "passed": 14
+    },
+    {
+      "command": "cargo test --locked --lib gc::tests",
+      "passed": 8
+    },
+    {
+      "command": "cargo check --manifest-path tools/aot-poc/Cargo.toml",
+      "result": "passed; compiler build only, not native TLS service lowering"
+    }
+  ],
+  "source_sha256": {
+    "src/tls.rs": "e7b1d1bc7b8d22f2871a60494df657de1fd873be21961fbb0d49716eb07fc0ae",
+    "src/gc.rs": "5659dc4692c85516eed3bd7af443acb3945e91f71e856d4a1c39bc7ad929eac3",
+    "src/native.rs": "75125e68370e6ec611e23f46f4f43ff8ea70aa398e9eb6cbbc2fa6a02c4ef007",
+    "src/services.rs": "fab8ccebba821325ed578faa8bf84b20bd299f3593ef5a92e5750fe7f7ca06b1",
+    "runtime/neoCLR/Runtime/Tls.neoil": "97b99c40dd6487b1796688ad7b0d877f7543d57913fb843aa630b27cc7c68929",
+    "tools/native-tls/src/resources.rs": "17161397cbaf5d4ae4a0efbe4e530840fb544c3f63a71b89a6fa48a3555ac9ed"
+  },
+  "limitations": [
+    "Windows execution pending the identical CI harness",
+    "Native JIT/AOT bindings and collector integration remain open",
+    "Ciphertext pumping and managed certificate/SslStream APIs remain open",
+    "No performance claim"
+  ]
+}

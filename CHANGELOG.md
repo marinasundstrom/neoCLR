@@ -18,7 +18,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   Windows uses the existing CI gate. Add a bounded TLS resource context with
   non-reused checked IDs, retained session/configuration ownership and abortive
   teardown; all twenty provider tests pass locally, including transfer/shutdown
-  after configuration release. Managed rooting and service bindings remain open.
+  after configuration release. Add exact interpreter TLS service bindings and
+  GC-owned resource tokens with idempotent release, failed-trace protection and
+  retained session configuration. Twenty-four provider/lifetime checks, fourteen
+  service checks and eight collector regressions pass on macOS; Windows CI runs
+  the same lifetime checks. Native JIT/AOT TLS bindings and Raven APIs remain open.
   Document shared HTTP/SQL security concepts without forcing a common native backend;
   managed SSL/certificate ownership and handshake diagnostics remain open.
 

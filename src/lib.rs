@@ -37,6 +37,7 @@ pub use gc::{CollectionEvent, CollectionReason, GcStatistics, ManagedHeap};
 pub use slots::SlotReference;
 mod char_categories;
 mod cryptography;
+mod tls;
 mod file_io;
 mod file_streams;
 mod intrinsic_objects;

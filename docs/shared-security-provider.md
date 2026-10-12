@@ -317,3 +317,44 @@ and a complete fragmented transfer plus graceful shutdown after configuration an
 release. Windows runs this unchanged harness in the existing provider workflow;
 execution of the new cases remains pending. This Rustls-specific adapter does not
 require an SQL backend to adopt its resource representation or TLS implementation.
+
+## Interpreter service and heap ownership (development, 2026-10-12)
+
+`runtime/neoCLR/Runtime/Tls.neoil` introduces exact private InternalCall declarations
+for TlsCreateClient, TlsCreateServer, TlsCreateSession, TlsRelease and TlsAbort. The
+interpreter dispatches only the declared byte-array signatures and Int32 return type;
+capability analysis reports Tls, ManagedArrays and ManagedHeap. Native JIT/AOT lowering
+is not enabled for these imports yet. No Raven public declaration is added by this slice.
+
+Every resource is associated with a distinct, zero-length managed byte-array owner
+token. The token is a temporary private representation, not a proposed public
+certificate type. Calls validate the token's provenance against the active heap;
+foreign, collected or incorrectly shaped references fault. Credentials/ALPN/peer-name
+arrays must contain initialized bytes. Configuration and session creation return the
+provider's status; reusing an owner with a live resource faults. A session is created
+from another owner's configuration, retaining the provider configuration independently.
+There is no native pointer or numeric provider handle in the guest contract.
+
+The heap keeps an untraced owner-ID-to-resource association. After a successful mark,
+resources whose owners are unmarked are released before the collection completes.
+Failed tracing does not release anything. A managed wrapper or suspended operation
+must keep the token reachable; the resource table itself does not keep it alive.
+Explicit release is idempotent while the owner is live. Heap teardown also drops the
+resource context. Cleanup is abortive, performs no I/O or managed callbacks, and is
+not a user finalizer mechanism. Awaited graceful shutdown remains a separate operation.
+
+This is a focused adaptation of the SafeHandle ownership concern described above,
+using the existing tracing heap rather than adding guest finalizers. The native
+resource quota remains 1024 per heap; collection scans active TLS associations only
+when a TLS context exists. Costs include a byte-array token and a resource-table entry
+per owner, a bounded scan on collection and the shared Rustls dependency in the
+interpreter. No performance improvement is claimed. The native compiler's dependency
+lock is updated too; all provider builds retain matching pinned TLS dependencies.
+
+Validation includes executable IL service admission, invalid credentials, explicit
+release, foreign/invalid owner rejection, uninitialized input faults, retained sessions
+and collection of unrooted owners. The provider CI harness now runs the focused heap
+lifetime tests with its disposable certificates on macOS and Windows. Results and
+remaining gates are recorded in the [validation checkpoint](experiments/shared-tls/interpreter-lifetime-validation.json). Full managed
+stream composition still needs ciphertext pumping, pending-operation ownership and
+native JIT/AOT service/collector integration before Raven certificate/SslStream APIs.

@@ -8,6 +8,7 @@ use unicode_segmentation::UnicodeSegmentation;
 pub(crate) enum Binding {
     StackTraceCapture,
     Cryptography(crate::cryptography::Operation),
+    Tls(crate::tls::Operation),
     GcCollect,
     GcInfo(u8),
     GcKeepAlive,
@@ -597,6 +598,16 @@ pub(crate) fn bind(function: &Function) -> Result<Binding, Fault> {
         }
         ("neoCLR.Runtime.WriteLine", [Type::String]) => (Binding::WriteLine, Type::Void),
         ("neoCLR.Runtime.CharCategory", [Type::UInt32]) => (Binding::CharCategory, Type::Int32),
+        ("neoCLR.Runtime.TlsCreateClient", types) if types.len() == 3 && types.iter().all(|ty| *ty == Type::ArrayRef(Box::new(Type::Byte))) =>
+            (Binding::Tls(crate::tls::Operation::ClientConfig), Type::Int32),
+        ("neoCLR.Runtime.TlsCreateServer", types) if types.len() == 4 && types.iter().all(|ty| *ty == Type::ArrayRef(Box::new(Type::Byte))) =>
+            (Binding::Tls(crate::tls::Operation::ServerConfig), Type::Int32),
+        ("neoCLR.Runtime.TlsCreateSession", types) if types.len() == 3 && types.iter().all(|ty| *ty == Type::ArrayRef(Box::new(Type::Byte))) =>
+            (Binding::Tls(crate::tls::Operation::Session), Type::Int32),
+        ("neoCLR.Runtime.TlsRelease", types) if types.len() == 1 && types.iter().all(|ty| *ty == Type::ArrayRef(Box::new(Type::Byte))) =>
+            (Binding::Tls(crate::tls::Operation::Release), Type::Int32),
+        ("neoCLR.Runtime.TlsAbort", types) if types.len() == 1 && types.iter().all(|ty| *ty == Type::ArrayRef(Box::new(Type::Byte))) =>
+            (Binding::Tls(crate::tls::Operation::Abort), Type::Int32),
         ("neoCLR.Runtime.CryptoSha256", [Type::ArrayRef(data), Type::ArrayRef(output)])
             if **data == Type::Byte && **output == Type::Byte =>
             (Binding::Cryptography(crate::cryptography::Operation::Sha256), Type::Int32),

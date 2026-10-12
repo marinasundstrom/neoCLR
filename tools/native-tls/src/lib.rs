@@ -1,7 +1,7 @@
 //! Private nonblocking TLS adapter. The host owns sockets, deadlines and scheduling.
 use rustls::{ClientConfig, ClientConnection, Connection, ServerConfig, ServerConnection};
 mod configuration;
-mod resources;
+pub mod resources;
 use std::{
     ffi::{CStr, c_char, c_void},
     fs::File,

@@ -236,6 +236,91 @@ pub unsafe extern "C" fn neoclr_tls_context_transfer(
     }
 }
 
+/// Safe Rust owner for the interpreter adapter. Not a managed/public platform API.
+/// Mutable access serializes provider calls; dropping this value releases all resources.
+pub struct OwnedContext(Box<Context>);
+impl std::fmt::Debug for OwnedContext {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.debug_struct("TlsContext")
+            .field("resources", &self.0.resources.len())
+            .finish()
+    }
+}
+impl OwnedContext {
+    pub fn new(limit: u32) -> Option<Self> {
+        (limit > 0 && limit <= 65536).then(|| {
+            Self(Box::new(Context {
+                resources: BTreeMap::new(),
+                limit: limit as usize,
+            }))
+        })
+    }
+    pub fn resource_count(&self) -> usize {
+        self.0.resources.len()
+    }
+    fn pointer(&mut self) -> *mut c_void {
+        (&mut *self.0 as *mut Context).cast()
+    }
+    pub fn client_config(&mut self, roots: &[u8], alpn: &[u8]) -> Result<u64, i32> {
+        if roots.len() > LIMIT || alpn.len() > LIMIT {
+            return Err(INVALID_INPUT);
+        }
+        let mut id = 0;
+        let status = unsafe {
+            neoclr_tls_context_client_config(
+                self.pointer(),
+                roots.as_ptr(),
+                roots.len() as u32,
+                alpn.as_ptr(),
+                alpn.len() as u32,
+                &mut id,
+            )
+        };
+        if status == 0 { Ok(id) } else { Err(status) }
+    }
+    pub fn server_config(&mut self, cert: &[u8], key: &[u8], alpn: &[u8]) -> Result<u64, i32> {
+        if cert.len() > LIMIT || key.len() > LIMIT || alpn.len() > LIMIT {
+            return Err(INVALID_INPUT);
+        }
+        let mut id = 0;
+        let status = unsafe {
+            neoclr_tls_context_server_config(
+                self.pointer(),
+                cert.as_ptr(),
+                cert.len() as u32,
+                key.as_ptr(),
+                key.len() as u32,
+                alpn.as_ptr(),
+                alpn.len() as u32,
+                &mut id,
+            )
+        };
+        if status == 0 { Ok(id) } else { Err(status) }
+    }
+    pub fn session(&mut self, config: u64, name: &[u8]) -> Result<u64, i32> {
+        if name.len() > LIMIT {
+            return Err(INVALID_INPUT);
+        }
+        let mut id = 0;
+        let status = unsafe {
+            neoclr_tls_context_session(
+                self.pointer(),
+                config,
+                name.as_ptr(),
+                name.len() as u32,
+                &mut id,
+            )
+        };
+        if status == 0 { Ok(id) } else { Err(status) }
+    }
+    pub fn release(&mut self, id: u64) -> i32 {
+        unsafe { neoclr_tls_context_release(self.pointer(), id) }
+    }
+    pub fn abort(&mut self, id: u64) -> i32 {
+        unsafe { neoclr_tls_context_abort(self.pointer(), id) }
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
