@@ -50,6 +50,8 @@ impl Operations {
         if self.0.len() >= CAPACITY {
             return Err(Fault::new("Runtime async operation limit exceeded"));
         }
+        // try_update is newer than the supported Rust 1.85 minimum.
+        #[allow(deprecated)]
         let id = NEXT
             .fetch_update(Ordering::Relaxed, Ordering::Relaxed, |id| id.checked_add(1))
             .map_err(|_| Fault::new("Runtime async identity exhausted"))?;

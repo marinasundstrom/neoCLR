@@ -200,6 +200,8 @@ impl Scheduler {
         if let Some(destination) = self.destination {
             return Ok(destination);
         }
+        // try_update is newer than the supported Rust 1.85 minimum.
+        #[allow(deprecated)]
         let destination = NEXT
             .fetch_update(Ordering::Relaxed, Ordering::Relaxed, |value| {
                 value.checked_add(1)
@@ -264,6 +266,8 @@ impl Scheduler {
                     "Scheduler registration allocation failed",
                 )
             })?;
+        // try_update is newer than the supported Rust 1.85 minimum.
+        #[allow(deprecated)]
         let id = NEXT
             .fetch_update(Ordering::Relaxed, Ordering::Relaxed, |value| {
                 value.checked_add(1)

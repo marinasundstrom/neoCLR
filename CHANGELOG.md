@@ -8,6 +8,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-13
 
+- Retain Rust 1.85-compatible atomic identity allocation in runtime async and
+  Scheduler while narrowly allowing the newer Rust deprecation of fetch_update.
+  This matches existing host-service compatibility handling without changing
+  allocation, ordering or exhaustion behavior.
+
 - Refresh source notices when preparing a development JIT bundle instead of
   retaining the older bootstrap inventory. Retain the backend and TLS inventories,
   lockfiles and Cranelift license; record copied notice input hashes in preparation
