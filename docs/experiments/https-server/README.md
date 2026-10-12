@@ -172,3 +172,25 @@ This closes the bounded authenticated-EOF qualification gap on macOS ARM64. It
 adds no managed API or new TLS behavior. Guaranteed asynchronous graceful shutdown
 under backpressure, expired-certificate fixtures, Windows/interpreter support and
 installed TLS packaging remain open.
+
+## Windows source-host integration — 2026-10-12
+
+The source builder now accepts `--profile windows-http --https-server`, builds the
+x86_64 MSVC Rust archive with a static CRT, and links it into the existing shared
+socket adapter. OS socket calls remain behind `socket-os.h`; TLS state, deadlines,
+cancellation and EOF rules are shared with macOS. Windows project validation uses
+the same client cases, plus an optional `--cleartext-build` isolation check.
+Windows execution is not yet qualified by this integration change; CI evidence is
+required before claiming parity. Windows ARM64 and Windows runtime suspension
+remain separate gaps. No packaged build-kit capability is added.
+
+### Reusable secure streams direction
+
+The author requests async stream operations followed by a secure-stream equivalent,
+possibly `System.Networking.Security.SslStream`, then clarifies that these concepts
+need not copy .NET when other platforms offer a better fit. Current InputStream and
+OutputStream interfaces are synchronous. The next managed design should compare
+.NET's stream decorator with capability-based async I/O and explicit TLS state
+machines, addressing buffer ownership, cancellation, authentication, duplex use and
+async shutdown. This is direction, not a shipped API or a settled class hierarchy.
+The host-only switch remains provisional while Windows behavior is qualified.

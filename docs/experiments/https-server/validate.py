@@ -7,7 +7,7 @@ import json
 import os
 from pathlib import Path
 import platform
-import select
+import importlib.util
 import socket
 import ssl
 import subprocess
@@ -16,6 +16,10 @@ import time
 
 ROOT = Path(__file__).resolve().parents[3]
 HERE = Path(__file__).resolve().parent
+spec = importlib.util.spec_from_file_location('http_json', ROOT / 'scripts/verify-native-http-json.py')
+http_json = importlib.util.module_from_spec(spec)
+spec.loader.exec_module(http_json)
+read_port = http_json.read_port
 sha = lambda path: hashlib.sha256(Path(path).read_bytes()).hexdigest()
 
 
@@ -24,12 +28,16 @@ def main():
     parser.add_argument('--recipe', type=Path, default=HERE.parent / 'runtime-async/collector-walk-showcase.json')
     parser.add_argument('--bundle', type=Path, required=True)
     parser.add_argument('--output', type=Path, required=True)
+    parser.add_argument('--cleartext-build', type=Path, help='Matching ordinary project build for cleartext isolation')
     parser.add_argument('--project-build', type=Path, help='Validate a matching --https-server project build instead of rebuilding experimental hosts')
     args = parser.parse_args()
     if not ssl.HAS_TLSv1_3:
         parser.error('requires Python linked to OpenSSL with TLS 1.3 support')
-    if (platform.system(), platform.machine()) != ('Darwin', 'arm64'):
-        parser.error('this native qualification recipe requires macOS ARM64')
+    windows = platform.system() == 'Windows' and platform.machine().lower() in ('amd64', 'x86_64')
+    if windows and not args.project_build:
+        parser.error('Windows qualification requires --project-build')
+    if not windows and (platform.system(), platform.machine()) != ('Darwin', 'arm64'):
+        parser.error('requires macOS ARM64 or Windows x64')
     out = args.output.resolve(); out.mkdir(parents=True, exist_ok=False)
     recipe = json.loads(args.recipe.read_text()); assert recipe['passed']
     report = dict(passed=False, platform=platform.platform(), ssl=ssl.OPENSSL_VERSION,
@@ -64,8 +72,8 @@ def main():
                 if sha(build / name) != digest: raise ValueError('Project build artifact changed: ' + name)
             report['projectBuildSha256'] = sha(build / 'build.json')
             report['inputsSha256'].update(evidence['inputs'])
-            invocations = [('aot-project', [str(build / 'app')])]
-            credential_app = build / 'app'
+            invocations = [('aot-project', [str(build / ('app.exe' if windows else 'app'))])]
+            credential_app = build / ('app.exe' if windows else 'app')
         else:
             run('tls-build', ['cargo', 'build', '--locked', '--release', '--manifest-path', str(ROOT / 'tools/native-tls/Cargo.toml')])
             source = command('language-source')
@@ -92,6 +100,7 @@ def main():
         for folder in [HERE, HERE.parent / 'aot-console', ROOT / 'tools/native-tls/src']:
             for p in folder.iterdir():
                 if p.suffix in ('.c', '.h', '.rs', '.rvn', '.py'): report['inputsSha256'][str(p)] = sha(p)
+        report['inputsSha256'][str(ROOT / 'scripts/verify-native-http-json.py')] = sha(ROOT / 'scripts/verify-native-http-json.py')
         report['inputsSha256'][str(ROOT / 'tools/native-tls/Cargo.lock')] = sha(ROOT / 'tools/native-tls/Cargo.lock')
         with tempfile.TemporaryDirectory(prefix='nc-https-') as directory:
             cert, key = Path(directory) / 'cert.pem', Path(directory) / 'key.pem'
@@ -130,8 +139,7 @@ def main():
                     scenario = 'ok' if case in ('tls13', 'tls12', 'fragmented') else case
                     process = subprocess.Popen(invocation + ([scenario] if mode != 'jit' else ['--jit-entry-argument', scenario]), env=env, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
                     try:
-                        if not select.select([process.stdout], [], [], 60)[0]: raise RuntimeError('startup timeout')
-                        line = process.stdout.readline()
+                        line = read_port(process.stdout, timeout=60)
                         if not line.strip().isdigit(): raise RuntimeError('startup failed: ' + line + process.stderr.read())
                         port = int(line)
                         protocol = None
@@ -184,11 +192,23 @@ def main():
                 good = result.returncode != 0 and not result.stdout
                 report['cases'].append(dict(mode='aot', case=name + '-credentials', passed=good, exitCode=result.returncode))
                 if not good: raise RuntimeError('invalid credentials accepted')
-        if not args.project_build:
-            plain = subprocess.Popen([str(out / 'cleartext'), 'ok'], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+        if args.cleartext_build or not args.project_build:
+            plain_app = out / 'cleartext'
+            if args.cleartext_build:
+                plain_build = args.cleartext_build.resolve()
+                plain_evidence = json.loads((plain_build / 'build.json').read_text())
+                if not plain_evidence.get('passed') or plain_evidence.get('httpsServer'):
+                    raise ValueError('Requires an ordinary cleartext project build')
+                for path, digest in plain_evidence['inputs'].items():
+                    if sha(path) != digest: raise ValueError('Cleartext input changed: ' + path)
+                for name, digest in plain_evidence['artifacts'].items():
+                    if sha(plain_build / name) != digest: raise ValueError('Cleartext artifact changed: ' + name)
+                report['inputsSha256'].update(plain_evidence['inputs'])
+                report['cleartextBuildSha256'] = sha(plain_build / 'build.json')
+                plain_app = plain_build / ('app.exe' if windows else 'app')
+            plain = subprocess.Popen([str(plain_app), 'ok'], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
             try:
-                if not select.select([plain.stdout], [], [], 20)[0]: raise RuntimeError('cleartext startup timeout')
-                port = int(plain.stdout.readline())
+                port = int(read_port(plain.stdout, timeout=20))
                 for _ in range(2):
                     connection = http.client.HTTPConnection('127.0.0.1', port, timeout=10)
                     connection.request('GET', '/greeting'); response = connection.getresponse()

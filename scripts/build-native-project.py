@@ -39,20 +39,23 @@ def native_kernel_build(target, time_zone_rules=False):
     return command, archive
 
 
-def native_tls_build():
+def native_tls_build(windows=False):
     manifest = ROOT / 'tools/native-tls/Cargo.toml'
-    target = 'aarch64-apple-darwin'
+    target = 'x86_64-pc-windows-msvc' if windows else 'aarch64-apple-darwin'
     directory = manifest.parent / 'target'
-    return (['cargo', 'build', '--locked', '--release', '--target', target,
-             '--target-dir', directory, '--manifest-path', manifest],
-            directory / target / 'release/libneoclr_native_tls.a')
+    command = ['cargo', 'build', '--locked', '--release', '--target', target,
+               '--target-dir', directory, '--manifest-path', manifest]
+    if windows:
+        # Match the host's /MT CRT; TLS must not add a redistributable dependency.
+        command += ['--config', 'target.x86_64-pc-windows-msvc.rustflags=["-C","target-feature=+crt-static"]']
+    return command, directory / target / 'release' / ('neoclr_native_tls.lib' if windows else 'libneoclr_native_tls.a')
 
 
 def validate_https_server(enabled, profile, bootstrap_root, packaged):
     if not enabled:
         return
-    if profile != PROFILES['http']:
-        raise ValueError('--https-server requires the macOS ARM64 HTTP profile; other hosts are not qualified')
+    if profile not in (PROFILES['http'], PROFILES['windows-http']):
+        raise ValueError('--https-server requires a source HTTP profile')
     if bootstrap_root:
         raise ValueError('--https-server does not yet support retained session bootstrap')
     if packaged:
@@ -279,7 +282,7 @@ def build(project, bundle, aot, output, profile=PROFILE, bootstrap_root=None, re
             for path in [ROOT / 'tools/native-tls/Cargo.toml', ROOT / 'tools/native-tls/Cargo.lock',
                          ROOT / 'tools/native-tls/src/lib.rs', ROOT / 'docs/experiments/https-server/native-tls.h']:
                 report['inputs'][str(path)] = sha(path)
-            command, archive = native_tls_build()
+            command, archive = native_tls_build(windows)
             run(command, phase='native-tls-build')
             report['inputs'][str(archive)] = sha(archive)
             native_tls.append(archive)
@@ -290,11 +293,13 @@ def build(project, bundle, aot, output, profile=PROFILE, bootstrap_root=None, re
         pending = output / ('app.pending.exe' if windows else 'app.pending')
         if windows:
             run(['cl', '/nologo', '/W4', '/WX', '/std:c11', '/experimental:c11atomics', '/O2', '/MT',
-                 '/DNEOCLR_NATIVE_GC', '/DNEOCLR_HTTP_HEAP_BYTES=' + str(http_heap_bytes), '/DNEOCLR_NATIVE_BYTE_ARRAY_LIMIT=' + str(byte_array_limit), *(['/DNEOCLR_ENTRY_ARGUMENTS'] if selection.get('entryArguments') else []), *(['/DNEOCLR_HTTP_HOST'] if http else []), '/I' + str(base), '/Fo' + str(output) + '/',
-                 '/Fe:' + str(pending), *adapters, obj, *native_text, '/link', '/STACK:1048576', *(['Ws2_32.lib'] if http else [])], phase='host-compile-link')
+                 '/DNEOCLR_NATIVE_GC', *(['/DNEOCLR_HTTPS_SERVER'] if https_server else []), '/DNEOCLR_HTTP_HEAP_BYTES=' + str(http_heap_bytes), '/DNEOCLR_NATIVE_BYTE_ARRAY_LIMIT=' + str(byte_array_limit), *(['/DNEOCLR_ENTRY_ARGUMENTS'] if selection.get('entryArguments') else []), *(['/DNEOCLR_HTTP_HOST'] if http else []), '/I' + str(base), '/Fo' + str(output) + '/',
+                 '/Fe:' + str(pending), *adapters, obj, *native_text, *native_tls, '/link', '/STACK:1048576', *(['Ws2_32.lib'] if http else []),
+                 *(['Bcrypt.lib', 'Ntdll.lib', 'Userenv.lib', 'Advapi32.lib'] if https_server else [])], phase='host-compile-link')
             import re
             dependencies = re.findall(r'^\s+([A-Za-z0-9_.-]+\.dll)\s*$', run(['dumpbin', '/dependents', pending], phase='dependency-check'), re.MULTILINE | re.IGNORECASE)
-            allowed = {'kernel32.dll', *(['ws2_32.dll'] if http else [])}
+            allowed = {'kernel32.dll', *(['ws2_32.dll'] if http else []),
+                       *(['bcrypt.dll', 'ntdll.dll', 'userenv.dll', 'advapi32.dll'] if https_server else [])}
             if not dependencies or any(name.lower() not in allowed for name in dependencies):
                 raise RuntimeError('Unexpected native dependencies: ' + repr(dependencies))
         else:
