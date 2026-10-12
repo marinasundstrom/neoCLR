@@ -40,6 +40,10 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   HTTPS harness instead of assuming ASCII paths.
   Admit the exact Windows system RNG/synchronization DLLs observed in the TLS
   link, keeping the ordinary HTTP allowlist and rejection of unknown dependencies.
+  Make the HTTPS certificate fixture independent of host OpenSSL configuration:
+  explicitly generate a server-auth leaf with CA:FALSE and key usage constraints.
+  Windows exposed a default CA certificate that Rustls correctly rejected; peer
+  verification remains enabled and unchanged.
 
 - Fix the HTTPS source compiler gap through Raven main `99ae011b4`, deliberately
   carried to its neoCLR branch as `c71baae94`: traverse unary operands so `use`

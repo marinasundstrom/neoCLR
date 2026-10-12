@@ -105,9 +105,16 @@ def main():
         report['inputsSha256'][str(ROOT / 'tools/native-tls/Cargo.lock')] = sha(ROOT / 'tools/native-tls/Cargo.lock')
         with tempfile.TemporaryDirectory(prefix='nc-https-Café-🌍-') as directory:
             cert, key = Path(directory) / 'cert.pem', Path(directory) / 'key.pem'
-            # One-use development certificate: explicit trust in this peer only, no global store edits.
+            # Do not inherit platform OpenSSL defaults (some mark self-signed certs as CAs).
+            config = Path(directory) / 'openssl.cnf'
+            config.write_text('[req]\nprompt=no\ndistinguished_name=dn\n[dn]\nCN=localhost\n')
+            # One-use development leaf: explicit peer trust, no global store edits.
             subprocess.run(['openssl', 'req', '-x509', '-newkey', 'rsa:2048', '-nodes', '-sha256', '-days', '1',
-                            '-subj', '/CN=localhost', '-addext', 'subjectAltName=DNS:localhost,IP:127.0.0.1',
+                            '-config', str(config), '-subj', '/CN=localhost',
+                            '-addext', 'basicConstraints=critical,CA:FALSE',
+                            '-addext', 'keyUsage=critical,digitalSignature,keyEncipherment',
+                            '-addext', 'extendedKeyUsage=serverAuth',
+                            '-addext', 'subjectAltName=DNS:localhost,IP:127.0.0.1',
                             '-keyout', str(key), '-out', str(cert)], check=True, capture_output=True, timeout=30)
             os.chmod(key, 0o600)
             trust = ssl.create_default_context(cafile=str(cert)); trust.set_alpn_protocols(['http/1.1'])

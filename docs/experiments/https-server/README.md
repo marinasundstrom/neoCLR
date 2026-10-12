@@ -234,3 +234,10 @@ Microsoft documents both as Windows system components (reviewed 2026-10-12).
 The executable uses the static CRT; arbitrary third-party DLLs remain rejected.
 This does not change the ordinary cleartext host's dependency policy. The CI host
 is Windows Server 2022 x64; this is not qualification of older Windows versions.
+
+The [third Windows run](https://github.com/marinasundstrom/neoCLR/actions/runs/38241143604)
+passed native compilation/link/dependency checks, then Rustls correctly rejected the
+OpenSSL-generated test certificate as a CA used as an end entity. The fixture now
+supplies its own minimal OpenSSL configuration and explicit CA:FALSE, key usage,
+serverAuth and SAN extensions on every platform. It no longer inherits machine
+certificate-generation defaults; trust and hostname verification are unchanged.
