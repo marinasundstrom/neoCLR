@@ -77,6 +77,8 @@ def main():
              '--bundle', installed, '--output', out/'tls-ownership'], 'tls-default-jit')
         run([sys.executable, ROOT/'docs/experiments/shared-tls/validate-project.py',
              '--bundle', installed, '--aot', jit, '--output', out/'tls-project'], 'tls-project')
+        run([sys.executable, ROOT/'docs/experiments/shared-tls/validate-streams.py',
+             '--bundle', installed, '--aot', jit, '--output', out/'tls-streams'], 'tls-streams')
         run([sys.executable, ROOT/'scripts/test-runtime-library.py', '--bundle', installed,
              '--suite', 'cryptography', '--mode', 'interpreter', '--mode', 'jit', '--mode', 'native',
              '--output', out/'public-cryptography'], 'public-cryptography')

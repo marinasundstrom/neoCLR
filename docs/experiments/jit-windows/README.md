@@ -45,3 +45,16 @@ The completed omitted-mode gate passes at `04812f87` in
 eight installed HTTP cases and 29 framework/guard/selector records, including
 zoned-time services. [Retained default-mode evidence](../jit-cli/default/README.md)
 is separate from the earlier explicit-mode results above.
+
+## Managed SSL composition gate
+
+The Windows runner now invokes the same managed SSL/HTTPS JSON consumer used on
+macOS, in interpreter, default JIT and AOT, and uploads its validation/build reports.
+This extends the earlier private provider/host checks; adding the gate does not mean
+Windows managed qualification has passed.
+
+The development bundle pins Raven neoCLR compiler revision
+`6fe7d630a25d0e27f3e9e89b1403987caf30d9d6`, including native async receiver/pattern
+lowering required by SslStream. That revision must be available from the configured
+Raven remote before CI can rebuild the bundle. It was local at this checkpoint;
+publication and an actual Windows run remain pending. Raven main remains separate.

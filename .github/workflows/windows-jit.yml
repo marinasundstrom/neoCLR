@@ -107,6 +107,8 @@ jobs:
             target/windows-jit-validation/tls-ownership/validation.json
             target/windows-jit-validation/tls-project/validation.json
             target/windows-jit-validation/tls-project/native/build.json
+            target/windows-jit-validation/tls-streams/validation.json
+            target/windows-jit-validation/tls-streams/native/build.json
             target/windows-jit-validation/public-cryptography/
             target/windows-jit-validation/native/build.json
             target/windows-jit-validation/async-use/

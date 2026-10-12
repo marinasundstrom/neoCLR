@@ -8,6 +8,10 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-12
 
+- Add the managed SSL/HTTPS JSON consumer to Windows JIT/AOT/interpreter CI and
+  retain its build reports. Pin the required Raven native-async compiler revision;
+  publishing that revision and Windows execution remain pending prerequisites.
+
 - Add development SslStream and explicit PEM authentication options, composing
   HTTPS in HttpClient and HttpServer through shared managed transport. Qualify
   nested JSON, GC and stream ownership in interpreter/JIT/AOT on macOS, plus a
