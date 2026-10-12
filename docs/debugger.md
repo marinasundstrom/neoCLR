@@ -1,5 +1,10 @@
 # Interactive debugger
 
+This is the current in-process interpreter debugger. It cannot attach to another
+process or step native code. The [diagnostics direction](runtime-diagnostics.md)
+calls for separate external debugger and profiler clients backed by an opt-in
+runtime service; that attachment layer is not implemented yet.
+
 The terminal debugger inspects a live neoCLR execution without changing guest
 values. It shows the call stack, arguments, locals, evaluation stacks, managed heap
 objects, GC statistics and tracked native allocation bytes. Neo source locations

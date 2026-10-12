@@ -8,6 +8,10 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-12
 
+- Record separate attachable debugger/profiler clients as the runtime diagnostics
+  direction, with opt-in runtime hooks, safe counter publication and an HTTP attach
+  validation gate. Update current tooling limits; attachment remains unimplemented.
+
 - Add opt-in native GC allocation/live-payload gauges and bounded pause histograms,
   with reset and failure accounting. Validate enabled/disabled instrumentation and
   owned suspension under sanitizers; retain a 200-invocation diagnostic profile.

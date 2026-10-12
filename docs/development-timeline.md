@@ -25,6 +25,29 @@ available original wording; other text is a summary.
 
 See the [changelog](../CHANGELOG.md) and linked design documents for technical status.
 
+## 2026-10-12 — Separate attachable debugger and profiler
+
+**Author:** “I want the debugger and profiler to be separate tools that can attach
+to the runtime. I believe that is what most programming language runtimes do.”
+
+**Assistant:** Agreed with separating clients and runtime hooks, while clarifying
+that the existing profiler is a build-and-sample harness and the terminal debugger
+is in-process. Proposed an opt-in diagnostics endpoint with shared identities,
+symbol mapping and capability negotiation, independent profiling and debugger control.
+Primary .NET, Node and Go documentation supports the general separation, without
+claiming that all runtimes use one identical protocol.
+
+**Action/outcome:** Recorded the [architecture and validation gates](runtime-diagnostics.md)
+and updated roadmap, debugger and website descriptions. The preceding
+[GC measurement slice](experiments/runtime-async/native-profiling.md#payload-and-pause-measurements--2026-10-12)
+adds payload gauges and pause histograms, with sanitized correctness checks and a
+200-invocation diagnostic run. It changes no collector policy.
+
+**Open:** Runtime attachment is not implemented. The proposed first gate is a
+read-only profiler client observing coherent GC snapshots while the native HTTP
+showcase continues. Thread-local counter publication, host transport, overhead and
+later debugger pause/resume semantics still require implementation and validation.
+
 ## 2026-10-12 — SQL domain abstraction and PostgreSQL
 
 - **Author:** “Let's implement a small SQL provider and a binding to Postgresql.”

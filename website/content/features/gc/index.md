@@ -90,9 +90,11 @@ resources. This remains experimental, with Windows and performance qualification
 
 
 A private native profiling runner now combines symbolized macOS sampling with
-opt-in collector timing and checked heap/stack teardown. Profiler and debugger
-remain separate tools; native stepping and logical async-stack inspection are
-follow-up work. Profiling identified repeated conditional-root validation searches,
+opt-in collector timing, allocation/live-payload counters, bounded pause histograms
+and checked heap/stack teardown. The current terminal debugger runs in-process;
+the profiler is a build-and-sample harness. Separate debugger and profiler clients
+that attach to an opt-in runtime service are the intended direction, not available
+attach support. Native stepping and logical async-stack inspection remain follow-ups. Profiling identified repeated conditional-root validation searches,
 which now reuse the collector's address index without changing collection frequency.
 [Profiling workflow and measurements](https://github.com/marinasundstrom/neoCLR/blob/main/docs/experiments/runtime-async/native-profiling.md).
 

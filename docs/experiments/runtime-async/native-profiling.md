@@ -233,3 +233,6 @@ python3 docs/experiments/runtime-async/profile_native.py \
 
 Raw local outputs are identified by hashes in the report. These measurements remain
 part of the build-and-sample harness, not a runtime attach protocol.
+
+See [attachable runtime diagnostics](../../runtime-diagnostics.md) for the separate
+external debugger/profiler architecture and the next read-only attachment gate.

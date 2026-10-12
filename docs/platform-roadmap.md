@@ -38,6 +38,15 @@ Readable native profile symbols and warmup-excluded GC summaries now pass a
 diagnostic time; investigate collection work/pacing next with stress-GC validation
 retained. Native debugger stepping, retention paths and causal stacks remain open.
 
+**Attachable diagnostics direction (2026-10-12):** the author requires separate
+external debugger and profiler tools attaching to an opt-in runtime service. The
+[architecture and first attach gate](runtime-diagnostics.md) distinguish current
+in-process/harness tooling from this unimplemented endpoint. Start with coherent
+read-only GC snapshots during HTTP execution, then debugger control. The
+[payload/pause measurement slice](experiments/runtime-async/native-profiling.md#payload-and-pause-measurements--2026-10-12)
+provides bounded instrumentation and sanitized ownership checks; it does not provide
+attach support or change collection pacing.
+
 **Runtime diagnostics direction (2026-10-11):** the author requests profiling the
 remaining native runtime-async gap and building useful profiler/GC/debugger tools.
 Start with [native sampling and collector diagnostics](experiments/runtime-async/native-profiling.md),
