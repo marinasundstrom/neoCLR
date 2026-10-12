@@ -8,6 +8,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-12
 
+- Update RavenDoc to render protected subclass contracts and suppress duplicate
+  extension-indexer getter links. Correct malformed generic type markup, stale
+  API/repository links and the outdated generic-async restriction on feature pages.
+  Validate 3,813 site pages, 38 publisher tests and 22 website tests.
+
 - Restore ModuleInfo.GetFunctions in the aggregate reference interface and its
   reference-only implementation stub, matching the existing managed API and XML.
   Regenerate the API snapshot and queue remaining native discovery/reflection

@@ -395,7 +395,7 @@ ownerless descriptors, including supported fixed and named arguments, without
 executing attribute constructors or method bodies. Missing or ambiguous module/token
 matches fault. Open generic method signature snapshots remain unsupported and cause
 GetFunctions to fault; ownerless parameter/return attribute queries remain a gap.
-The [compiled consumer](../docs/experiments/guest-functions/README.md) demonstrates
+The [compiled consumer](https://github.com/marinasundstrom/neoCLR/blob/main/docs/experiments/guest-functions/README.md) demonstrates
 TestAttribute inspection. Interpreter support is qualified; AOT enumeration/retention
 and dynamic invocation are not added. The inherited attribute API signature is unchanged.
 

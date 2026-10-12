@@ -13,7 +13,9 @@ Task describes whether an operation produced a value. It does not imply a thread
 Nongeneric functions and class methods can await completed or pending Tasks. Locals and
 receiver identity survive suspension. Native `Task<unit>` and `Task<int>` entry points
 complete registered work before reading the result; cancellation and unresolved tasks
-fail explicitly. Generic async methods and `Task<Result<...>>` entry points are not supported.
+fail explicitly. Development builds also support generic async methods and generic
+owners, including captured values and synchronous `use` across suspension.
+See [native compilation](../native-compilation/) for the qualified modes and limits.
 
 ## Already completed work
 
@@ -346,7 +348,7 @@ Native Raven `yield` and `yield from` now demonstrate lazy, demand-driven yield/
 and early-stop cleanup on these interfaces in the opt-in retained-runtime POC.
 Nested producer disposal can suspend; cancellation still waits for outer cleanup.
 Generic generator methods, including those on generic reference owners, support
-typed captures, awaited Task<T> inputs and delegation. The source-local provider now
+typed captures, awaited `Task<T>` inputs and delegation. The source-local provider now
 connects live tasks and external completions to managed suspension ownership. Pending
 abandoned cycles can release their frames and native stacks without running cleanup;
 runnable work remains rooted until dispatch. Explicit disposal remains necessary for

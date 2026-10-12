@@ -329,7 +329,7 @@ with .NET flag values and policy defaults (AllowMultiple=false, Inherited=true).
 Imported target validation is covered by the
 [usage consumer](https://github.com/marinasundstrom/neoCLR/blob/main/docs/experiments/attribute-usage/README.md).
 Inherited guest queries and guest in-process discovery remain future work. See the
-[AttributeUsageAttribute reference](/docs/api/System.AttributeUsageAttribute.html).
+[AttributeUsageAttribute reference](/docs/api/System/AttributeUsageAttribute/index.html).
 
 
 Development interpreter builds also expose `ModuleInfo.GetFunctions()` for directly

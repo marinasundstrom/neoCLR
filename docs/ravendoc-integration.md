@@ -305,3 +305,14 @@ Final validation: 42 focused publisher tests, 21 website tests, the reference sn
 check, production native audit and full 3,490-page build/link checks pass. Browser
 review confirms separate Type extensions, linked receiver components, the Type
 parameters table and Receiver-before-Type-parameters ordering. Publication is separate.
+
+## Website closure — 2026-10-12
+
+Raven main `08b5ef0b0` adds protected/protected-internal subclass contracts to the
+publisher; `10b3565d7` excludes extension accessor implementations from receiver
+pages. Native-line carries `4da61241d` and `efb31ebc7` preserve branch separation.
+These changes affect rendering and cross-references only, not Runtime Contract
+configuration, managed accessibility or metadata emission. Both generation passes
+qualify 38 tests; neoCLR website tests pass 22 checks and the full site validates
+3,813 pages after correcting authored links and generic-type markup. The pinned
+archive is rebuilt from the native-line commit; deployment remains manual.

@@ -1842,7 +1842,14 @@ The remaining execution-support gaps are queued in
 does not implement native enumeration or invocation.
 
 Reference repair validation (2026-10-12): the snapshot fingerprint check and rendered
-`ModuleInfo.GetFunctions` cross-reference/signature/summary checks pass. Full-site
-validation proceeds past this member, then stops at the separately missing
-`M:System.Web.Http.HttpHandler.#ctor` generated reference entry. No full-site pass
-is claimed; the protected-constructor documentation/rendering mismatch remains open.
+`ModuleInfo.GetFunctions` cross-reference/signature/summary checks pass. Follow-through
+fixes RavenDoc to include protected/protected-internal subclass contracts, including
+HTTP handler constructors, and omit duplicate extension accessor links. The general
+changes are developed on Raven main and carried separately to the native line.
+No runtime accessibility or reflection support changes.
+
+Website follow-through validation (2026-10-12): all 38 RavenDoc generation tests
+and 22 website tests pass. The pinned native-line publisher at `efb31ebc7` builds
+and checks all 3,813 site pages, including native preview integration and 448
+retained legacy pages. API coverage, HTML structure, local files and anchors pass.
+Existing missing-summary notices remain documentation backlog; publication is separate.

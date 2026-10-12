@@ -92,4 +92,4 @@ The array contract is tested in interpreter and macOS native AOT. Windows execut
 is pending. String range support is available in the matching development libraries, using
 grapheme boundaries. Sequence range support and borrowed views remain future work.
 
-[Array API reference →](../../../docs/api/System/Array%601/)
+[Array API reference →](../../docs/api/System/Array%601/index.html)

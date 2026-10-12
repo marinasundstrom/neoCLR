@@ -8102,7 +8102,7 @@ literal metadata-token support. Assembly/module, return-value and generic-parame
 annotations are not added by this slice. Rewriting loaded snapshots remains unsupported.
 Earlier bounded host readers may reject newly admitted data; use matching tools.
 
-[Design, scope and validation](../docs/custom-attributes.md). No guest reference
+[Design, scope and validation](https://github.com/marinasundstrom/neoCLR/blob/main/docs/custom-attributes.md). No guest reference
 assembly or RavenDoc type selection changes are required for this host-only API;
 this manual reference supplies the signatures and limitations.
 

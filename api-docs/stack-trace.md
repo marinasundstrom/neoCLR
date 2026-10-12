@@ -24,4 +24,4 @@ Generated async-body names may appear. Native capture requires a matching develo
 host/backend with published GC roots and stack-capture binding enabled. This feature
 does not introduce recoverable exceptions or change Fault handling.
 
-[Implementation, .NET comparison and validation](../docs/experiments/stack-trace/README.md).
+[Implementation, .NET comparison and validation](https://github.com/marinasundstrom/neoCLR/blob/main/docs/experiments/stack-trace/README.md).
