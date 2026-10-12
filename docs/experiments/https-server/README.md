@@ -202,3 +202,9 @@ HTTPS and cleartext versions of the same Raven project, and runs 15 host cases a
 two Rust transport tests. Reports retain commands, compiler/artifact hashes and
 failure logs; generated test keys live only in a temporary directory. A workflow
 existing or starting is not evidence that Windows passed.
+
+The [first Windows CI run](https://github.com/marinasundstrom/neoCLR/actions/runs/38239236379)
+reached native host compilation and exposed MSVC's deprecated `getenv` diagnostic
+under warnings-as-errors. Windows credential loading now uses owned `_dupenv_s`
+snapshots, freed after configuration parsing, rather than disabling strict warnings.
+This build failure is not Windows TLS execution evidence.

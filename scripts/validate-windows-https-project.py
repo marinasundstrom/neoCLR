@@ -27,11 +27,14 @@ def main():
     report = dict(passed=False, platform=platform.platform(), compilerRevision=COMPILER, commands=[])
 
     def run(label, command):
+        print(label, flush=True)
         result = subprocess.run(list(map(str, command)), cwd=ROOT, capture_output=True, timeout=1200)
         (out / (label + '.stdout.log')).write_bytes(result.stdout)
         (out / (label + '.stderr.log')).write_bytes(result.stderr)
         report['commands'].append(dict(label=label, command=result.args, exitCode=result.returncode))
         if result.returncode:
+            print(result.stdout[-8000:].decode('utf-8', errors='replace'), flush=True)
+            print(result.stderr[-8000:].decode('utf-8', errors='replace'), flush=True)
             raise RuntimeError(label + ' failed; see retained logs')
 
     try:

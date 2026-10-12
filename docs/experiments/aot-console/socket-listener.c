@@ -9,6 +9,23 @@
 #ifdef NEOCLR_HTTPS_SERVER
 #include "../https-server/native-tls.h"
 /* Experimental HTTPS-only host capability. Ordinary Socket builds stay TCP. */
+static void *tls_config_from_environment(void) {
+#ifdef _WIN32
+    /* MSVC's owned snapshot avoids deprecated getenv and keeps both strings
+     * alive through config parsing. No credential data enters diagnostics. */
+    char *certificate = NULL, *key = NULL;
+    size_t certificate_size = 0, key_size = 0;
+    void *config = NULL;
+    if (_dupenv_s(&certificate, &certificate_size, "NEOCLR_HTTPS_CERTIFICATE") == 0 &&
+        _dupenv_s(&key, &key_size, "NEOCLR_HTTPS_PRIVATE_KEY") == 0)
+        config = neoclr_tls_config_new(certificate, key);
+    free(certificate);
+    free(key);
+    return config;
+#else
+    return neoclr_tls_config_new(getenv("NEOCLR_HTTPS_CERTIFICATE"), getenv("NEOCLR_HTTPS_PRIVATE_KEY"));
+#endif
+}
 static int64_t tls_io(void *state, unsigned char *data, uint32_t count, int32_t sending) {
     neoclr_socket_descriptor fd = *(neoclr_socket_descriptor *)state;
     int64_t result = neoclr_os_transfer(fd, data, count, sending);
@@ -111,7 +128,7 @@ int32_t neoclr_socket_scope_enter_v1(neoclr_socket_scope *scope, neoclr_aot_cont
     if (neoclr_os_start()) return 3;
     memset(scope, 0, sizeof(*scope));
 #ifdef NEOCLR_HTTPS_SERVER
-    scope->tls_config = neoclr_tls_config_new(getenv("NEOCLR_HTTPS_CERTIFICATE"), getenv("NEOCLR_HTTPS_PRIVATE_KEY"));
+    scope->tls_config = tls_config_from_environment();
     if (!scope->tls_config) { neoclr_os_stop(); return 3; }
 #endif
     scope->context = context; scope->previous = head; head = scope;

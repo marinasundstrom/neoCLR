@@ -330,7 +330,7 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--profile', choices=PROFILES, default='console',
                         help='Explicit native service/host profile (default: console)')
-    parser.add_argument('--https-server', action='store_true', help='Source-only macOS HTTP host: TLS for all accepted connections; PEM credentials are supplied at runtime')
+    parser.add_argument('--https-server', action='store_true', help='Source-only macOS/Windows HTTP host: TLS for all accepted connections; PEM credentials are supplied at runtime')
     parser.add_argument('--reflection-roots', type=Path, help='Private versioned source-identity reflection retention JSON')
     parser.add_argument('--byte-array-limit', type=int, default=65536, help='Private native byte-array allocation limit; heap capacity remains independent')
     parser.add_argument('--bootstrap-root', help='Private retained HTTP experiment: fn<Void> factory, three host dispatches')

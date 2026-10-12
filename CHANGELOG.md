@@ -25,6 +25,10 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   pass; Windows execution qualification is pending. Add a dedicated Windows CI
   gate that rebuilds the pinned compiler/libraries and runs the shared HTTPS cases
   plus cleartext isolation, preserving failure logs and evidence.
+  Fix MSVC credential-path loading with owned environment snapshots after the
+  first Windows gate exposed deprecated getenv under warnings-as-errors; retain
+  strict warnings and fail-closed admission. Keep CI artifacts focused on logs and
+  provenance reports and print failed command output directly in Actions.
 
 - Fix the HTTPS source compiler gap through Raven main `99ae011b4`, deliberately
   carried to its neoCLR branch as `c71baae94`: traverse unary operands so `use`

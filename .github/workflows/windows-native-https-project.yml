@@ -52,7 +52,13 @@ jobs:
         if: always()
         with:
           name: windows-native-https-project-${{ github.run_id }}-${{ github.run_attempt }}
-          path: target/windows-https-project-validation/
+          path: |
+            target/windows-https-project-validation/*.log
+            target/windows-https-project-validation/validation.json
+            target/windows-https-project-validation/https/build.json
+            target/windows-https-project-validation/cleartext/build.json
+            target/windows-https-project-validation/validation/**
+            target/windows-https-project-validation/development/preparation.json
           include-hidden-files: true
           retention-days: 14
           if-no-files-found: warn
