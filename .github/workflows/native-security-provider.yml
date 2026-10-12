@@ -1,0 +1,36 @@
+name: Native security provider
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'tools/native-tls/**'
+      - 'scripts/test-native-security.py'
+      - '.github/workflows/native-security-provider.yml'
+  pull_request:
+    paths:
+      - 'tools/native-tls/**'
+      - 'scripts/test-native-security.py'
+      - '.github/workflows/native-security-provider.yml'
+permissions:
+  contents: read
+jobs:
+  provider:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [macos-14, windows-2022]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Select Windows OpenSSL
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          'C:\Program Files\Git\usr\bin' >> $env:GITHUB_PATH
+      - name: Test shared client, server and primitives
+        run: python scripts/test-native-security.py

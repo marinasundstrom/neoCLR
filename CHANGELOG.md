@@ -8,6 +8,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-12
 
+- Generalize the private Rustls transport to client and server sessions, in-memory
+  PEM configuration, explicit client trust/peer verification and protocol-neutral
+  ALPN. Preserve the HTTPS host ABI and add explicit nonblocking authentication.
+  Five local macOS provider tests pass; add the same focused Windows/macOS CI gate.
+  Managed SSL/certificate APIs and Windows execution of this new client path remain open.
+
 - Move System.Tasks to System.Concurrency.Tasks, including Task, Promise, outcomes,
   states and operators. Update Raven mappings, runtime dispatch guards, native
   linking, consumers and both API references. This breaks imports and metadata

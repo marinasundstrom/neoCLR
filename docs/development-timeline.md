@@ -25,6 +25,21 @@ available original wording; other text is a summary.
 
 See the [changelog](../CHANGELOG.md) and linked design documents for technical status.
 
+## 2026-10-12 — Shared SSL transport implementation
+
+- **Author:** requested shared SSL transport and foundational
+  System.Security.Cryptography APIs, consistent macOS/Windows behavior, and separate
+  commits for each slice.
+- **Assistant action:** generalized the existing private Rustls server adapter into
+  a client/server provider with borrowed PEM inputs, retained configuration ownership,
+  explicit trust and peer verification, optional ALPN and nonblocking authentication.
+  The HTTPS file-based compatibility entry point remains available.
+- **Observed outcome:** five focused provider tests pass locally on macOS. The same
+  test command is wired into Windows/macOS CI; new Windows client execution remains
+  unqualified. No managed SslStream or cryptography API is claimed in this slice.
+- **Open:** managed projections, cryptographic primitives, certificate/trust errors
+  and negative authentication qualification. See [provider boundaries and evidence](shared-security-provider.md).
+
 ## 2026-10-12 — Fix compiler gaps exposed by HTTPS projects
 
 - **Author:** “We should fix compiler gaps.” This follows the HTTPS server work

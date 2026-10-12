@@ -1,5 +1,6 @@
 //! Private nonblocking TLS adapter. The host owns sockets, deadlines and scheduling.
-use rustls::{ServerConfig, ServerConnection};
+use rustls::{ClientConfig, ClientConnection, Connection, ServerConfig, ServerConnection};
+mod configuration;
 use std::{
     ffi::{CStr, c_char, c_void},
     fs::File,
@@ -69,27 +70,109 @@ pub unsafe extern "C" fn neoclr_tls_config_new(
     let create = || -> Option<Arc<ServerConfig>> {
         let cert = unsafe { file(cert) }?;
         let key = unsafe { file(key) }?;
-        let certs = rustls_pemfile::certs(&mut &cert[..])
-            .collect::<Result<Vec<_>, _>>()
-            .ok()?;
-        let key = rustls_pemfile::private_key(&mut &key[..]).ok()??;
-        let mut config =
-            ServerConfig::builder_with_provider(Arc::new(rustls::crypto::ring::default_provider()))
-                .with_safe_default_protocol_versions()
-                .ok()?
-                .with_no_client_auth()
-                .with_single_cert(certs, key)
-                .ok()?;
-        config.alpn_protocols = vec![b"http/1.1".to_vec()];
-        // No tickets/session cache in this first bounded hosting proof.
-        config.send_tls13_tickets = 0;
-        config.session_storage = Arc::new(rustls::server::NoServerSessionStorage {});
-        Some(Arc::new(config))
+        configuration::server(&cert, &key, b"http/1.1")
+            .ok()
+            .map(Arc::new)
     };
     create().map_or(std::ptr::null_mut(), |config| {
         Box::into_raw(Box::new(config)).cast()
     })
 }
+
+// These byte-oriented entry points are private runtime ABI, not guest APIs.
+// Input buffers are borrowed only for the call; configs own parsed credentials.
+unsafe fn bytes<'a>(data: *const u8, count: u32) -> Option<&'a [u8]> {
+    if count == 0 {
+        return Some(&[]);
+    }
+    if data.is_null() || count as usize > LIMIT {
+        return None;
+    }
+    Some(unsafe { std::slice::from_raw_parts(data, count as usize) })
+}
+
+/// Empty ALPN selects no application protocol. Otherwise one 1..255-byte identifier.
+#[unsafe(no_mangle)]
+pub unsafe extern "C" fn neoclr_tls_server_config_from_pem(
+    cert: *const u8,
+    cert_count: u32,
+    key: *const u8,
+    key_count: u32,
+    alpn: *const u8,
+    alpn_count: u32,
+) -> *mut c_void {
+    let create = || {
+        configuration::server(
+            unsafe { bytes(cert, cert_count) }?,
+            unsafe { bytes(key, key_count) }?,
+            unsafe { bytes(alpn, alpn_count) }?,
+        )
+        .ok()
+        .map(Arc::new)
+    };
+    create().map_or(std::ptr::null_mut(), |config| {
+        Box::into_raw(Box::new(config)).cast()
+    })
+}
+
+/// Explicit PEM trust anchors only: no ambient store, insecure verifier or client identity.
+#[unsafe(no_mangle)]
+pub unsafe extern "C" fn neoclr_tls_client_config_from_pem(
+    roots: *const u8,
+    roots_count: u32,
+    alpn: *const u8,
+    alpn_count: u32,
+) -> *mut c_void {
+    let create = || {
+        configuration::client(unsafe { bytes(roots, roots_count) }?, unsafe {
+            bytes(alpn, alpn_count)
+        }?)
+        .ok()
+        .map(Arc::new)
+    };
+    create().map_or(std::ptr::null_mut(), |config| {
+        Box::into_raw(Box::new(config)).cast()
+    })
+}
+
+#[unsafe(no_mangle)]
+pub unsafe extern "C" fn neoclr_tls_client_config_free(config: *mut c_void) {
+    if !config.is_null() {
+        drop(unsafe { Box::from_raw(config.cast::<Arc<ClientConfig>>()) });
+    }
+}
+
+/// The UTF-8 server name is verified, and is retained independently of this call.
+#[unsafe(no_mangle)]
+pub unsafe extern "C" fn neoclr_tls_client_session_new(
+    config: *mut c_void,
+    name: *const u8,
+    name_count: u32,
+) -> *mut c_void {
+    let create = || {
+        if config.is_null() {
+            return None;
+        }
+        let name = std::str::from_utf8(unsafe { bytes(name, name_count) }?).ok()?;
+        let name = rustls::pki_types::ServerName::try_from(name.to_owned()).ok()?;
+        let config = unsafe { &*config.cast::<Arc<ClientConfig>>() };
+        ClientConnection::new(config.clone(), name)
+            .ok()
+            .map(Connection::Client)
+    };
+    create().map_or(std::ptr::null_mut(), new_session)
+}
+
+fn new_session(mut connection: Connection) -> *mut c_void {
+    connection.set_buffer_limit(Some(LIMIT));
+    Box::into_raw(Box::new(Session {
+        connection,
+        pending: 0,
+        failed: false,
+    }))
+    .cast()
+}
+
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn neoclr_tls_config_free(config: *mut c_void) {
     if !config.is_null() {
@@ -97,7 +180,7 @@ pub unsafe extern "C" fn neoclr_tls_config_free(config: *mut c_void) {
     }
 }
 struct Session {
-    connection: ServerConnection,
+    connection: Connection,
     pending: usize,
     failed: bool,
 }
@@ -107,20 +190,13 @@ pub unsafe extern "C" fn neoclr_tls_session_new(config: *mut c_void) -> *mut c_v
         return std::ptr::null_mut();
     }
     let config = unsafe { &*config.cast::<Arc<ServerConfig>>() };
-    match ServerConnection::new(config.clone()) {
-        Ok(mut connection) => {
-            connection.set_buffer_limit(Some(LIMIT));
-            Box::into_raw(Box::new(Session {
-                connection,
-                pending: 0,
-                failed: false,
-            }))
-            .cast()
-        }
-        Err(_) => std::ptr::null_mut(),
-    }
+    ServerConnection::new(config.clone())
+        .ok()
+        .map(Connection::Server)
+        .map_or(std::ptr::null_mut(), new_session)
 }
-fn flush(connection: &mut ServerConnection, wire: &mut Wire) -> io::Result<bool> {
+
+fn flush(connection: &mut Connection, wire: &mut Wire) -> io::Result<bool> {
     if connection.wants_write() {
         match connection.write_tls(wire) {
             Ok(0) => return Err(io::ErrorKind::WriteZero.into()),
@@ -174,6 +250,53 @@ fn transfer(
         connection.reader().read(data)
     }
 }
+/// Drives authentication without reading or writing application plaintext.
+/// Returns 0 authenticated, -1 pending, -2 terminal failure. Host serializes all polls.
+#[unsafe(no_mangle)]
+pub unsafe extern "C" fn neoclr_tls_handshake(
+    session: *mut c_void,
+    context: *mut c_void,
+    callback: Transfer,
+) -> i32 {
+    if session.is_null() {
+        return -2;
+    }
+    let session = unsafe { &mut *session.cast::<Session>() };
+    if session.failed {
+        return -2;
+    }
+    let connection = &mut session.connection;
+    let mut wire = Wire {
+        context,
+        transfer: callback,
+    };
+    let result = (|| -> io::Result<bool> {
+        if !flush(connection, &mut wire)? {
+            return Ok(false);
+        }
+        if !connection.is_handshaking() {
+            return Ok(true);
+        }
+        match connection.read_tls(&mut wire) {
+            Ok(0) => return Err(io::ErrorKind::UnexpectedEof.into()),
+            Ok(_) => {
+                connection.process_new_packets().map_err(io::Error::other)?;
+            }
+            Err(error) if error.kind() == io::ErrorKind::WouldBlock => return Ok(false),
+            Err(error) => return Err(error),
+        }
+        Ok(flush(connection, &mut wire)? && !connection.is_handshaking())
+    })();
+    match result {
+        Ok(true) => 0,
+        Ok(false) => -1,
+        Err(_) => {
+            session.failed = true;
+            -2
+        }
+    }
+}
+
 /// Returns -1 pending, -2 terminal transport/TLS failure, otherwise plaintext bytes.
 /// A pending send must be retried with the same operation until completion or abort.
 #[unsafe(no_mangle)]
@@ -274,6 +397,175 @@ mod tests {
             count as i64
         }
     }
+    struct Endpoint {
+        session: *mut c_void,
+        wire: Memory,
+    }
+    impl Endpoint {
+        fn new(session: *mut c_void) -> Self {
+            assert!(!session.is_null());
+            Self {
+                session,
+                wire: Memory {
+                    incoming: VecDeque::new(),
+                    outgoing: vec![],
+                    writes: 0,
+                    eof: false,
+                },
+            }
+        }
+        fn handshake(&mut self) -> i32 {
+            unsafe {
+                neoclr_tls_handshake(
+                    self.session,
+                    (&mut self.wire as *mut Memory).cast(),
+                    fragmented,
+                )
+            }
+        }
+        fn transfer(&mut self, data: &mut [u8], sending: bool) -> i64 {
+            unsafe {
+                neoclr_tls_transfer(
+                    self.session,
+                    (&mut self.wire as *mut Memory).cast(),
+                    fragmented,
+                    data.as_mut_ptr(),
+                    data.len() as u32,
+                    sending as i32,
+                )
+            }
+        }
+    }
+    impl Drop for Endpoint {
+        fn drop(&mut self) {
+            unsafe {
+                neoclr_tls_session_free(
+                    self.session,
+                    (&mut self.wire as *mut Memory).cast(),
+                    fragmented,
+                )
+            }
+        }
+    }
+    fn pump(a: &mut Endpoint, b: &mut Endpoint) {
+        a.wire.incoming.extend(b.wire.outgoing.drain(..));
+        b.wire.incoming.extend(a.wire.outgoing.drain(..));
+    }
+    fn pair(name: &str, protocol: &[u8]) -> (Endpoint, Endpoint) {
+        let cert = std::fs::read(std::env::var("NEOCLR_HTTPS_CERTIFICATE").unwrap()).unwrap();
+        let key = std::fs::read(std::env::var("NEOCLR_HTTPS_PRIVATE_KEY").unwrap()).unwrap();
+        unsafe {
+            let server = neoclr_tls_server_config_from_pem(
+                cert.as_ptr(),
+                cert.len() as u32,
+                key.as_ptr(),
+                key.len() as u32,
+                protocol.as_ptr(),
+                protocol.len() as u32,
+            );
+            let client = neoclr_tls_client_config_from_pem(
+                cert.as_ptr(),
+                cert.len() as u32,
+                protocol.as_ptr(),
+                protocol.len() as u32,
+            );
+            assert!(!server.is_null() && !client.is_null());
+            let a = Endpoint::new(neoclr_tls_session_new(server));
+            let b = Endpoint::new(neoclr_tls_client_session_new(
+                client,
+                name.as_ptr(),
+                name.len() as u32,
+            ));
+            // Drop source buffers and config handles before authentication: sessions own them.
+            neoclr_tls_config_free(server);
+            neoclr_tls_client_config_free(client);
+            (a, b)
+        }
+    }
+    fn authenticate(a: &mut Endpoint, b: &mut Endpoint) -> bool {
+        for _ in 0..20000 {
+            let x = a.handshake();
+            let y = b.handshake();
+            pump(a, b);
+            if x == -2 || y == -2 {
+                return false;
+            }
+            if x == 0 && y == 0 {
+                return true;
+            }
+        }
+        panic!("handshake never settled");
+    }
+    fn deliver(a: &mut Endpoint, b: &mut Endpoint) {
+        let mut payload = vec![53; 8192];
+        let mut received = Vec::new();
+        let mut acknowledged = false;
+        for _ in 0..20000 {
+            if !acknowledged {
+                match a.transfer(&mut payload, true) {
+                    -1 => (),
+                    n if n == payload.len() as i64 => acknowledged = true,
+                    n => panic!("unexpected write {n}"),
+                }
+            }
+            pump(a, b);
+            let mut scratch = [0; 79];
+            match b.transfer(&mut scratch, false) {
+                -1 => (),
+                n if n > 0 => received.extend_from_slice(&scratch[..n as usize]),
+                n => panic!("unexpected read {n}"),
+            }
+            if acknowledged && received.len() >= payload.len() {
+                break;
+            }
+        }
+        assert!(acknowledged);
+        assert_eq!(received, payload);
+        assert_eq!(b.transfer(&mut [0; 1], false), -1, "no plaintext replay");
+    }
+    #[test]
+    #[ignore = "run by HTTPS validation with ephemeral certificate/key paths"]
+    fn shared_client_server_authentication_and_bidirectional_transport() {
+        for protocol in [&b""[..], &b"http/1.1"[..]] {
+            let (mut server, mut client) = pair("localhost", protocol);
+            assert!(authenticate(&mut server, &mut client));
+            for endpoint in [&server, &client] {
+                let connection = &unsafe { &*endpoint.session.cast::<Session>() }.connection;
+                assert_eq!(
+                    connection.alpn_protocol(),
+                    if protocol.is_empty() {
+                        None
+                    } else {
+                        Some(protocol)
+                    }
+                );
+            }
+            deliver(&mut client, &mut server);
+            deliver(&mut server, &mut client);
+            unsafe { neoclr_tls_abort(client.session) };
+            assert_eq!(client.handshake(), -2);
+        }
+    }
+    #[test]
+    #[ignore = "run by HTTPS validation with ephemeral certificate/key paths"]
+    fn shared_client_rejects_wrong_peer_name() {
+        let (mut server, mut client) = pair("wrong.invalid", b"");
+        assert!(!authenticate(&mut server, &mut client));
+        assert_eq!(client.handshake(), -2);
+    }
+    #[test]
+    fn configuration_rejects_invalid_inputs() {
+        let null = std::ptr::null();
+        unsafe {
+            assert!(neoclr_tls_client_config_from_pem(null, 0, null, 0).is_null());
+            assert!(neoclr_tls_client_config_from_pem(null, 1, null, 0).is_null());
+            assert!(neoclr_tls_client_config_from_pem(b"invalid".as_ptr(), 7, null, 0).is_null());
+            assert!(neoclr_tls_server_config_from_pem(null, 0, null, 0, null, 0).is_null());
+            assert!(neoclr_tls_client_session_new(std::ptr::null_mut(), null, 0).is_null());
+            assert!(bytes(b"x".as_ptr(), (LIMIT + 1) as u32).is_none());
+        }
+    }
+
     fn exchange(client: &mut rustls::ClientConnection, memory: &mut Memory) {
         if client.wants_write() {
             let mut bytes = Vec::new();
