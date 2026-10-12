@@ -9028,3 +9028,32 @@ gaps recorded in the unary-await slice. The native compiler branch's .NET CLI
 fixture returns exit code 42 and its native HTTPS project still compiles. See
 [qualification and target limits](experiments/top-level-async-entry/README.md).
 Runtime Contracts, native metadata and target-owned Main adaptation are unchanged.
+
+## Source-owned async provider and nested Object bases — 2026-10-12
+
+The native stream migration requires async bodies inside System.Runtime, the
+assembly defining Task and the compiler protocol. Explicit
+`RavenNeoClrAsyncLibrary=System.Runtime` now also selects declarations in the
+current source assembly. The compiler classifies only the configured neoCLR Task,
+builder and state-machine identities, validates their public shape, and emits the
+ordinary native Task/state-machine contracts. Imported providers remain supported;
+.NET behavior and return-type overload resolution do not change.
+
+Nested generated state machines need the source-owned Object constructor as their
+direct base. The native metadata builder/loader now accepts that bounded base while
+retaining lexical ownership. This is native metadata support, not an additional CLI
+bridge encoding. The aggregate CLI facade remains documentation-only for the new
+stream signatures; historical synchronous bridge execution is not migrated by this
+change. Raven owns provider resolution/emission; neoCLR owns metadata validation
+and runtime execution. Focused compiler checks: 38 pass; metadata authoring/native
+round trips: `--generic-object-roots` passes. Full stream execution is validated in
+the consuming migration slice, separately from these declaration checks.
+
+The source-provider fix is Raven native-line `1aedea607`. A shared async lowering
+correction routes return expressions in match arms through the existing completion
+path: Raven main `a459d4467`, deliberately carried as `3c91e6a5b`. Five focused .NET
+cases pass; complete native System.Runtime/System.Data/System.Networking/System.Web
+and PostgreSQL libraries compile. The stream migration's [execution evidence](../runtime/raven/tests/default-stream-validation.json)
+qualifies the consuming Task-based adapters. Some inline await/propagation expression
+shapes still require separating the awaited result from pure pattern handling; the
+console samples do that explicitly. These bridge restrictions are not language rules.

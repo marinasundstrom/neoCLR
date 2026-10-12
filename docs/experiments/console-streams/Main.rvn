@@ -1,40 +1,49 @@
 import System.*
+import System.Tasks.*
 import System.Result.*
 import System.Option.*
 
-func Main() {
-    Console.Write("Name: ")
+async func Main() -> Task<()> {
+    await Console.Write("Name: ")
     let diagnostics = Console.Error
-    let Ok(line) = Console.ReadLine(128) else {
-        let Ok(_) = diagnostics.WriteLine("Could not read a UTF-8 line (maximum 128 bytes)") else {
+    let result1 = await Console.ReadLine(128)
+    let Ok(line) = result1 else {
+        let result2 = await diagnostics.WriteLine("Could not read a UTF-8 line (maximum 128 bytes)")
+        let Ok(_) = result2 else {
             System.Fail("Could not write diagnostic")
-            return
+            return ()
         }
-        let Ok(_) = diagnostics.Flush() else {
+        let result3 = await diagnostics.Flush()
+        let Ok(_) = result3 else {
             System.Fail("Could not write diagnostic")
-            return
+            return ()
         }
-        return
+        return ()
     }
     let Some(name) = line else {
         Console.WriteLine("End of input")
-        return
+        return ()
     }
     let output = Console.Out
-    let Ok(_) = output.WriteLine("Hello, $name") else {
+    let result4 = await output.WriteLine("Hello, $name")
+    let Ok(_) = result4 else {
         System.Fail("Could not write greeting")
-        return
+        return ()
     }
-    let Ok(_) = output.Flush() else {
+    let result5 = await output.Flush()
+    let Ok(_) = result5 else {
         System.Fail("Could not flush greeting")
-        return
+        return ()
     }
-    let Ok(_) = diagnostics.WriteLine("Read one line") else {
+    let result6 = await diagnostics.WriteLine("Read one line")
+    let Ok(_) = result6 else {
         System.Fail("Could not write diagnostic")
-        return
+        return ()
     }
-    let Ok(_) = diagnostics.Flush() else {
+    let result7 = await diagnostics.Flush()
+    let Ok(_) = result7 else {
         System.Fail("Could not write diagnostic")
-        return
+        return ()
     }
+    return ()
 }

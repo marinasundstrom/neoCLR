@@ -1862,10 +1862,12 @@ reference assembly change; the existing snapshot fingerprint check remains appli
 
 ## Async stream foundations (development, 2026-10-12)
 
-AsyncInputStream and AsyncOutputStream are selected in the aggregate and native
-references, with MemoryStream's ReadAsync/WriteAsync/FlushAsync implementations.
-The [stream reference](streams.md#async-streams-development) documents parameters,
-complete-write semantics, cancellation precedence, buffer lifetime and current
-memory-only implementation. The aggregate declarations are documentation facades;
-execution uses native metadata, with no new legacy CLI emitter support. No public
-API is excluded. This slice adds no runtime service or compiler configuration.
+InputStream/OutputStream replace the interim AsyncInputStream/AsyncOutputStream
+split. Their Task-returning Read/Write/Flush overloads, memory/file implementations,
+text adapters and JSON stream overloads must appear in both native and aggregate
+references. See [the stream reference](streams.md) for full writes, short reads,
+cancellation, buffer lifetime and inline/blocking provider limitations. The
+aggregate declarations are documentation facades; the historical synchronous CLI
+execution bridge is not extended. No new synchronous capability interface is added.
+The root library selects RavenNeoClrAsyncLibrary=System.Runtime to compile its own
+async adapters, requiring the matching source-owned provider compiler support.

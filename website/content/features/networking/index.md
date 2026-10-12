@@ -196,8 +196,11 @@ and client exchanging JSON, with optional PostgreSQL/container integration later
 
 ### Common async stream foundation
 
-Development `System.IO.AsyncInputStream` and `AsyncOutputStream` provide awaited
-read, complete-write and flush contracts. MemoryStream is the first implementation;
-socket and secure-stream adapters remain follow-ups. The API keeps .NET-style
-method names and cancellation tokens with neoCLR Result errors.
+Development `System.IO.InputStream` and `OutputStream` use Task-returning `Read`,
+`Write` and `Flush` as their ordinary I/O contracts. Memory operations can complete
+inline; Task represents possible future completion rather than a background thread.
+Text/JSON stream adapters and HTTP uploads consume these contracts. Existing file
+and console providers still block internally; nonblocking socket and secure-stream
+adapters remain follow-ups. Cancellation tokens and complete-write semantics follow
+.NET conventions, with neoCLR Result errors and deliberately async-first names.
 [Stream API reference](../../docs/streams.html).

@@ -1,0 +1,201 @@
+{
+  "date": "2026-10-12",
+  "platform": "macOS ARM64",
+  "compilerBranch": "codex/source-object-metadata-resolution",
+  "compilerRevision": "3c91e6a5bbe20a60365abe5881d7a6fa51143bfc",
+  "nativeLibraryArtifacts": {
+    "System.Runtime.dll": "d32f96b244442f3b0b1ed3b493971511989366e4715ce1f98561e25aecaf0fe8",
+    "System.Data.dll": "fb5a1c3ef0200acb08cf5c5bfc9a7367732ad47f5363fa0e7a341d16e1288453",
+    "System.Networking.dll": "39ab55a0d3e16e64218000a80be61616694f855d9a19ea48141f2fef9310901b",
+    "System.Web.dll": "527b37021fa3c200f1b42443c0569b8caa29b2bdabc48d00a37677f9fa027db6",
+    "System.Data.PostgreSql.dll": "aa31bb88f222aa34ed4ae151aa346fa55fd30ed2759292e7ba86fbe796359952",
+    "System.runtime.neox": "98a1ae1da85387c87746957e83a4015eb59d0566539a915c69f168d2b511b190",
+    "Core.dll": "3d4a676d379067c18a65a9beb8257ed40bf3196fc643a9ba1d559c619ec73fad"
+  },
+  "tests": [
+    {
+      "suite": "memory-stream",
+      "mode": "jit",
+      "exitCode": 0,
+      "stdout": "PASS MemoryStream async cancellation and rejected ranges preserve storage\nPASS MemoryStream async interfaces preserve complete writes short reads and EOF\nPASS MemoryStream quota errors preserve length and position\nPASS MemoryStream closure is shared across interfaces and idempotent\nPASS MemoryStream gap writes zero-fill while empty writes preserve length\nPASS MemoryStream rejects invalid buffer and seek ranges without moving\nPASS MemoryStream overwrites preserve length and untouched bytes\nTests: 7, passed: 7, failed: 0, skipped: 0\n"
+    },
+    {
+      "suite": "memory-stream",
+      "mode": "interpreter",
+      "exitCode": 0,
+      "stdout": "PASS MemoryStream async cancellation and rejected ranges preserve storage\nPASS MemoryStream async interfaces preserve complete writes short reads and EOF\nPASS MemoryStream quota errors preserve length and position\nPASS MemoryStream closure is shared across interfaces and idempotent\nPASS MemoryStream gap writes zero-fill while empty writes preserve length\nPASS MemoryStream rejects invalid buffer and seek ranges without moving\nPASS MemoryStream overwrites preserve length and untouched bytes\nTests: 7, passed: 7, failed: 0, skipped: 0\n"
+    },
+    {
+      "suite": "memory-stream",
+      "mode": "native",
+      "exitCode": 0,
+      "stdout": "PASS MemoryStream async cancellation and rejected ranges preserve storage\nPASS MemoryStream async interfaces preserve complete writes short reads and EOF\nPASS MemoryStream quota errors preserve length and position\nPASS MemoryStream closure is shared across interfaces and idempotent\nPASS MemoryStream gap writes zero-fill while empty writes preserve length\nPASS MemoryStream rejects invalid buffer and seek ranges without moving\nPASS MemoryStream overwrites preserve length and untouched bytes\nTests: 7, passed: 7, failed: 0, skipped: 0\n"
+    },
+    {
+      "suite": "json-streams",
+      "mode": "jit",
+      "exitCode": 0,
+      "stdout": "PASS JSON stream serialization detects cycles before writing\nPASS JSON stream output quota includes escaping and validates before writes\nPASS JSON stream reads reject split invalid UTF-8\nPASS JSON memory stream round trip preserves document content\nPASS JSON number document quota preserves long number spelling\nPASS JSON streams retry single-byte reads and writes without taking ownership\nPASS JSON stream reads preserve the underlying I/O failure\nPASS JSON stream input quota counts bytes and preserves ownership\nPASS JSON stream reads reject a truncated document\nPASS JSON stream boundary counts UTF-8 bytes rather than characters\nPASS JSON stream writes preserve partial output and failure cause\nPASS JSON stream writes reject zero progress without looping\nTests: 12, passed: 12, failed: 0, skipped: 0\n"
+    },
+    {
+      "suite": "json-streams",
+      "mode": "native",
+      "exitCode": 0,
+      "stdout": "PASS JSON stream serialization detects cycles before writing\nPASS JSON stream output quota includes escaping and validates before writes\nPASS JSON stream reads reject split invalid UTF-8\nPASS JSON memory stream round trip preserves document content\nPASS JSON number document quota preserves long number spelling\nPASS JSON streams retry single-byte reads and writes without taking ownership\nPASS JSON stream reads preserve the underlying I/O failure\nPASS JSON stream input quota counts bytes and preserves ownership\nPASS JSON stream reads reject a truncated document\nPASS JSON stream boundary counts UTF-8 bytes rather than characters\nPASS JSON stream writes preserve partial output and failure cause\nPASS JSON stream writes reject zero progress without looping\nTests: 12, passed: 12, failed: 0, skipped: 0\n"
+    },
+    {
+      "suite": "encoding-boundaries",
+      "mode": "jit",
+      "exitCode": 0,
+      "stdout": "PASS StreamReader decodes Unicode lines across single-byte reads\nPASS StreamReader distinguishes empty lines EOF and lone carriage returns\nPASS StreamReader delimits custom decoded output and bounds expansion\nPASS StreamWriter reports zero progress and preserves flush failures\nPASS StreamReader rejects invalid limits before consuming its input\nPASS Encoding input quotas reject oversized chunks without poisoning sessions\nPASS StreamWriter accepts its maximum byte count and preflights oversized lines\nPASS StreamReader preserves input failures and rejects truncated UTF-8 at EOF\nTests: 8, passed: 8, failed: 0, skipped: 0\n"
+    },
+    {
+      "suite": "encoding-boundaries",
+      "mode": "native",
+      "exitCode": 0,
+      "stdout": "PASS StreamReader decodes Unicode lines across single-byte reads\nPASS StreamReader distinguishes empty lines EOF and lone carriage returns\nPASS StreamReader delimits custom decoded output and bounds expansion\nPASS StreamWriter reports zero progress and preserves flush failures\nPASS StreamReader rejects invalid limits before consuming its input\nPASS Encoding input quotas reject oversized chunks without poisoning sessions\nPASS StreamWriter accepts its maximum byte count and preflights oversized lines\nPASS StreamReader preserves input failures and rejects truncated UTF-8 at EOF\nTests: 8, passed: 8, failed: 0, skipped: 0\n"
+    },
+    {
+      "suite": "encoding-boundaries",
+      "mode": "jit",
+      "exitCode": 0,
+      "stdout": "PASS StreamReader decodes Unicode lines across single-byte reads\nPASS StreamReader distinguishes empty lines EOF and lone carriage returns\nPASS StreamReader delimits custom decoded output and bounds expansion\nPASS StreamWriter reports zero progress and preserves flush failures\nPASS StreamReader rejects invalid limits before consuming its input\nPASS Encoding input quotas reject oversized chunks without poisoning sessions\nPASS StreamWriter accepts its maximum byte count and preflights oversized lines\nPASS StreamReader preserves input failures and rejects truncated UTF-8 at EOF\nTests: 8, passed: 8, failed: 0, skipped: 0\n"
+    },
+    {
+      "suite": "encoding-boundaries",
+      "mode": "native",
+      "exitCode": 0,
+      "stdout": "PASS StreamReader decodes Unicode lines across single-byte reads\nPASS StreamReader distinguishes empty lines EOF and lone carriage returns\nPASS StreamReader delimits custom decoded output and bounds expansion\nPASS StreamWriter reports zero progress and preserves flush failures\nPASS StreamReader rejects invalid limits before consuming its input\nPASS Encoding input quotas reject oversized chunks without poisoning sessions\nPASS StreamWriter accepts its maximum byte count and preflights oversized lines\nPASS StreamReader preserves input failures and rejects truncated UTF-8 at EOF\nTests: 8, passed: 8, failed: 0, skipped: 0\n"
+    },
+    {
+      "suite": "encoding-streams",
+      "mode": "jit",
+      "exitCode": 0,
+      "stdout": "PASS StreamWriter completes short writes and preserves cross-input graphemes\nPASS ASCII StreamWriter rejects complete lines before output and remains reusable\nPASS Custom encoder trailers require explicit Finish and are emitted once\nPASS Closing a writer manages ownership without implicit encoder finalization\nPASS Partial write and final-output failures are observable without replay\nPASS Custom encoder final acceptance waits for all trailer bytes to drain\nPASS Selected ASCII reader recognizes CRLF and preserves borrowed ownership\nPASS Selected readers reject malformed bytes and enforce decoded text limits\nPASS StreamReader waits for pending input before decoding and completing\nPASS StreamWriter waits for pending output before reporting the byte count\nPASS Cancelled input cancels the pending reader operation\nTests: 11, passed: 11, failed: 0, skipped: 0\n"
+    },
+    {
+      "suite": "encoding-streams",
+      "mode": "native",
+      "exitCode": 0,
+      "stdout": "PASS StreamWriter completes short writes and preserves cross-input graphemes\nPASS ASCII StreamWriter rejects complete lines before output and remains reusable\nPASS Custom encoder trailers require explicit Finish and are emitted once\nPASS Closing a writer manages ownership without implicit encoder finalization\nPASS Partial write and final-output failures are observable without replay\nPASS Custom encoder final acceptance waits for all trailer bytes to drain\nPASS Selected ASCII reader recognizes CRLF and preserves borrowed ownership\nPASS Selected readers reject malformed bytes and enforce decoded text limits\nPASS StreamReader waits for pending input before decoding and completing\nPASS StreamWriter waits for pending output before reporting the byte count\nPASS Cancelled input cancels the pending reader operation\nTests: 11, passed: 11, failed: 0, skipped: 0\n"
+    }
+  ],
+  "samples": [
+    {
+      "sample": "console-propagation",
+      "compileExit": 0,
+      "runExit": 0,
+      "stdout": "Input is: Raven\n",
+      "stderr": ""
+    },
+    {
+      "sample": "console-iflet",
+      "compileExit": 0,
+      "runExit": 0,
+      "stdout": "Input is: Raven\n",
+      "stderr": ""
+    },
+    {
+      "sample": "console-main",
+      "compileExit": 0,
+      "runExit": 0,
+      "stdout": "Name: Hello, Raven\n",
+      "stderr": "Read one line\n"
+    },
+    {
+      "sample": "storage",
+      "compileExit": 0,
+      "runExit": 0,
+      "stdout": "Created message.txt\nRead: Hello, v\u00e4rld!\nRe-read after seek: Hello, v\u00e4rld!\nExisting file: AlreadyExists\nItems:\ndirectory: examples\nfile: message.txt\nDirectory: /examples\nItem: message.txt\nMissing file: NotFound\n",
+      "stderr": ""
+    },
+    {
+      "sample": "console-contracts",
+      "compileExit": 0,
+      "runExit": 0,
+      "stdout": "A\n42\nConsole stream contracts passed\n",
+      "stderr": ""
+    }
+  ],
+  "httpUploads": [
+    {
+      "case": "success",
+      "execution": "jit",
+      "outcome": "passed",
+      "statistics": ""
+    },
+    {
+      "case": "borrowed",
+      "execution": "jit",
+      "outcome": "passed",
+      "statistics": ""
+    },
+    {
+      "case": "empty",
+      "execution": "jit",
+      "outcome": "passed",
+      "statistics": ""
+    },
+    {
+      "case": "eof",
+      "execution": "jit",
+      "outcome": "passed",
+      "statistics": ""
+    },
+    {
+      "case": "read-error",
+      "execution": "jit",
+      "outcome": "passed",
+      "statistics": ""
+    },
+    {
+      "case": "overread",
+      "execution": "jit",
+      "outcome": "passed",
+      "statistics": ""
+    },
+    {
+      "case": "cancel",
+      "execution": "jit",
+      "outcome": "passed",
+      "statistics": ""
+    },
+    {
+      "case": "precancel",
+      "execution": "jit",
+      "outcome": "passed",
+      "statistics": ""
+    },
+    {
+      "case": "disposed",
+      "execution": "jit",
+      "outcome": "passed",
+      "statistics": ""
+    },
+    {
+      "case": "invalid-header",
+      "execution": "jit",
+      "outcome": "passed",
+      "statistics": ""
+    },
+    {
+      "case": "refused",
+      "execution": "jit",
+      "outcome": "passed",
+      "statistics": ""
+    }
+  ],
+  "documentation": {
+    "websiteUnitTests": 22,
+    "nativeSnapshotTests": 2,
+    "aggregateSnapshot": "Checked exact staged input tree separately from concurrent FFI work",
+    "nativeRendering": "Passed with matching native libraries"
+  },
+  "limitations": [
+    "No Windows stream qualification in this slice.",
+    "File/console host calls block before returning settled Tasks; no claim of nonblocking providers.",
+    "HTTP JIT checkpoint does not collect final GC statistics.",
+    "Legacy synchronous CLI execution bindings are not migrated.",
+    "Some native await/propagation expression shapes require separate result handling; no general compiler closure is claimed."
+  ]
+}

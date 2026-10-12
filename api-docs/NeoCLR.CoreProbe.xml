@@ -48,13 +48,13 @@
     <member name="T:System.IO.TextReadError.InvalidUtf8"><summary>The InvalidUtf8 text-reading error case.</summary></member>
     <member name="M:System.IO.TextReadError.InvalidUtf8.#ctor"><summary>Creates InvalidUtf8.</summary></member>
     <member name="M:System.IO.TextReadError.#ctor(System.IO.TextReadError.InvalidUtf8)"><summary>Creates an error containing InvalidUtf8.</summary><param name="value">The error case.</param></member>
-    <member name="T:System.IO.TextReader"><summary>A sequential text-reading contract independent of its backing source.</summary><remarks>Development API: bounded line and whole-text reading with explicit Close. Does not require byte streams or seekability. Synchronous; no async members are implemented.</remarks></member>
-    <member name="T:System.IO.StreamReader"><summary>A synchronous TextReader over InputStream, with strict UTF-8 by default.</summary><remarks>Preserves a UTF-8 BOM as text. Reads from the current byte position. In development after Preview 10, ReadToEnd decodes bounded chunks and carries incomplete UTF-8 sequences between reads; it still accumulates the returned text. ReadLine retains its bounded line buffer. Supports partial reads and split UTF-8 scalars. Development constructors accept Encoding; Encodings.Ascii selects strict ASCII. ReadLine delimits decoded text and retains any decoded suffix. See the [reader guide](/docs/streams.html#text-readers). Close owns the input unless leaveOpen was selected. The reader has no seek API.</remarks></member>
+    <member name="T:System.IO.TextReader"><summary>A sequential text-reading contract independent of its backing source.</summary><remarks>Development API: bounded line and whole-text reading with explicit Close. Does not require byte streams or seekability. Read operations return Tasks that may complete inline.</remarks></member>
+    <member name="T:System.IO.StreamReader"><summary>An asynchronous TextReader over InputStream, with strict UTF-8 by default.</summary><remarks>Preserves a UTF-8 BOM as text. Reads from the current byte position. In development after Preview 10, ReadToEnd decodes bounded chunks and carries incomplete UTF-8 sequences between reads; it still accumulates the returned text. ReadLine retains its bounded line buffer. Supports partial reads and split UTF-8 scalars. Development constructors accept Encoding; Encodings.Ascii selects strict ASCII. ReadLine delimits decoded text and retains any decoded suffix. See the [reader guide](/docs/streams.html#text-and-json-adapters). Close owns the input unless leaveOpen was selected. The reader has no seek API.</remarks></member>
     <member name="M:System.IO.StreamReader.#ctor(System.IO.InputStream)"><summary>Creates a reader that closes its input when closed.</summary><param name="input">Input at its current position; construction performs no read.</param></member>
     <member name="M:System.IO.StreamReader.#ctor(System.IO.InputStream,System.Boolean)"><summary>Creates a reader with explicit ownership of its input.</summary><param name="input">Input at its current position; construction performs no read.</param><param name="leaveOpen">True leaves the input open when the reader closes.</param></member>
-    <member name="M:System.IO.TextReader.ReadToEnd(System.Int32)"><summary>Reads remaining text subject to a UTF-8 output-byte bound.</summary><param name="maxUtf8Bytes">Nonnegative maximum UTF-8 bytes in the returned text. StreamReader accepts up to 65536; zero succeeds only at EOF. Source reads are separately bounded by the same number plus one overflow byte.</param><returns>The remaining text, or TextReadError.</returns><remarks>StreamReader checks Closed before bounds and reads no input for invalid bounds. It consumes at most one byte beyond the bound to distinguish exact-bound EOF. Errors can leave input advanced; there is no rollback. Decoding is strict and preserves a BOM. Development ReadToEnd rejects malformed completed input during chunk processing, without waiting for EOF; an underlying chunk can already have advanced the cursor beyond the malformed byte. An over-limit read is reported before decoding that read. Truncated final sequences return InvalidUtf8. Failure returns no partial text and does not roll back input. Repeated reading at EOF returns empty text. Host execution and allocation budgets still apply.</remarks></member>
+    <member name="M:System.IO.TextReader.ReadToEnd(System.Int32)"><summary>Returns a Task; await completion. Reads remaining text subject to a UTF-8 output-byte bound.</summary><param name="maxUtf8Bytes">Nonnegative maximum UTF-8 bytes in the returned text. StreamReader accepts up to 65536; zero succeeds only at EOF. Source reads are separately bounded by the same number plus one overflow byte.</param><returns>The completed task contains: The remaining text, or TextReadError.</returns><remarks>StreamReader checks Closed before bounds and reads no input for invalid bounds. It consumes at most one byte beyond the bound to distinguish exact-bound EOF. Errors can leave input advanced; there is no rollback. Decoding is strict and preserves a BOM. Development ReadToEnd rejects malformed completed input during chunk processing, without waiting for EOF; an underlying chunk can already have advanced the cursor beyond the malformed byte. An over-limit read is reported before decoding that read. Truncated final sequences return InvalidUtf8. Failure returns no partial text and does not roll back input. Repeated reading at EOF returns empty text. Host execution and allocation budgets still apply.</remarks></member>
     <member name="M:System.IO.TextReader.Close"><summary>Closes the reader idempotently.</summary><remarks>Later reads return Closed. StreamReader closes owned input, or leaves it open if requested. Does not rewind or report underlying close errors.</remarks></member>
-    <member name="M:System.IO.StreamReader.ReadToEnd(System.Int32)"><summary>Reads remaining text subject to a UTF-8 output-byte bound.</summary><param name="maxUtf8Bytes">Nonnegative maximum UTF-8 bytes in the returned text. StreamReader accepts up to 65536; zero succeeds only at EOF. Source reads are separately bounded by the same number plus one overflow byte.</param><returns>The remaining text, or TextReadError.</returns><remarks>StreamReader checks Closed before bounds and reads no input for invalid bounds. It consumes at most one byte beyond the bound to distinguish exact-bound EOF. Errors can leave input advanced; there is no rollback. Decoding is strict and preserves a BOM. Development ReadToEnd rejects malformed completed input during chunk processing, without waiting for EOF; an underlying chunk can already have advanced the cursor beyond the malformed byte. An over-limit read is reported before decoding that read. Truncated final sequences return InvalidUtf8. Failure returns no partial text and does not roll back input. Repeated reading at EOF returns empty text. Host execution and allocation budgets still apply.</remarks></member>
+    <member name="M:System.IO.StreamReader.ReadToEnd(System.Int32)"><summary>Returns a Task; await completion. Reads remaining text subject to a UTF-8 output-byte bound.</summary><param name="maxUtf8Bytes">Nonnegative maximum UTF-8 bytes in the returned text. StreamReader accepts up to 65536; zero succeeds only at EOF. Source reads are separately bounded by the same number plus one overflow byte.</param><returns>The completed task contains: The remaining text, or TextReadError.</returns><remarks>StreamReader checks Closed before bounds and reads no input for invalid bounds. It consumes at most one byte beyond the bound to distinguish exact-bound EOF. Errors can leave input advanced; there is no rollback. Decoding is strict and preserves a BOM. Development ReadToEnd rejects malformed completed input during chunk processing, without waiting for EOF; an underlying chunk can already have advanced the cursor beyond the malformed byte. An over-limit read is reported before decoding that read. Truncated final sequences return InvalidUtf8. Failure returns no partial text and does not roll back input. Repeated reading at EOF returns empty text. Host execution and allocation budgets still apply.</remarks></member>
     <member name="M:System.IO.StreamReader.Close"><summary>Closes the reader idempotently.</summary><remarks>Later reads return Closed. StreamReader closes owned input, or leaves it open if requested. Does not rewind or report underlying close errors.</remarks></member>
     <member name="T:System.IO.SeekableStream"><summary>An optional capability for repositioning a stream by byte offset.</summary><remarks>Independent of reading and writing. FileInputStream implements this capability; TextReader does not. Calls are synchronous and return typed errors. No concurrent position operations are promised.</remarks></member>
     <member name="M:System.IO.SeekableStream.GetPosition"><summary>Reports the current absolute byte position.</summary><returns>The nonnegative position as Int64, or StreamError.</returns><remarks>Closed streams return Closed. Positions outside the representable range return LimitExceeded. This is not a decoded-character position.</remarks></member>
@@ -299,58 +299,58 @@
       <returns>A task for the copied result text, completed on the selected dispatcher.</returns>
     </member>
     <member name="N:System.IO">
-      <summary>Development byte-stream APIs. File operations are blocking and scoped to one runtime invocation.</summary>
+      <summary>Development asynchronous byte/text stream contracts. Existing file providers block internally and are scoped to one runtime invocation.</summary>
     </member>
     <member name="T:System.IO.InputStream">
-      <summary>A synchronous input capability implemented by platform file streams and application providers. Development API after Preview 9.</summary>
-      <remarks>Caller-owned arrays, partial transfers, explicit idempotent Close and typed errors. No seeking, scheduling or automatic disposal is implied. The interface does not impose native file lifetime on memory implementations.</remarks>
-      <seealso href="../streams.html#capability-contracts">Capability contracts and Flush reference</seealso>
+      <summary>Asynchronous input capability with Task-returning operations and immediate idempotent Close.</summary>
+      <remarks>Operations may complete inline. Retain caller buffers until settlement and serialize operations unless the provider documents otherwise. No synchronous or seeking capability is required.</remarks>
+      <seealso href="../streams.html">Stream contracts and provider limitations</seealso>
     </member>
     <member name="M:System.IO.InputStream.Read(System.Byte[],System.Int32,System.Int32)">
-      <summary>Attempts one synchronous partial read.</summary>
-      <param name="buffer">Caller-owned byte array; retained only for the duration of this call.</param>
-      <param name="offset">Zero-based start within the array.</param>
-      <param name="count">Maximum bytes to transfer, from zero through 65536 and within the array range.</param>
-      <returns>Ok with the transferred count, or StreamError. Closed is checked before range validation; invalid ranges and oversized requests fail before transfer.</returns>
-      <remarks>Only the transferred elements change. A positive-count read returning zero indicates EOF; zero-count does not establish EOF. Calls do not suspend. No concurrency safety is promised.</remarks>
+      <summary>Reads up to the requested byte count.</summary>
+      <param name="buffer">Caller buffer, available and unmodified until the task settles.</param>
+      <param name="offset">First buffer index.</param>
+      <param name="count">Requested bytes; zero consumes no input or output.</param>
+      <returns>A task containing Ok(byte count), including short reads and zero for EOF, or StreamError.</returns>
+      <remarks>Uses CancellationToken.None. Await before reusing buffers or closing the stream. Invalid ranges fail before transfer; operations may already be complete.</remarks>
     </member>
     <member name="M:System.IO.InputStream.Close">
       <summary>Closes this stream; repeated calls are harmless.</summary>
       <remarks>Subsequent transfers return Closed. This no-result operation does not report close failures or promise flush/durability. Other streams opened separately retain their own lifetime.</remarks>
     </member>
     <member name="T:System.IO.OutputStream">
-      <summary>A synchronous output capability implemented by platform file streams and application providers. Development API after Preview 9.</summary>
-      <remarks>Caller-owned arrays, partial transfers, explicit idempotent Close and typed errors. No seeking, scheduling or automatic disposal is implied. The interface does not impose native file lifetime on memory implementations.</remarks>
-      <seealso href="../streams.html#capability-contracts">Capability contracts and Flush reference</seealso>
+      <summary>Asynchronous output capability with Task-returning operations and immediate idempotent Close.</summary>
+      <remarks>Operations may complete inline. Retain caller buffers until settlement and serialize operations unless the provider documents otherwise. No synchronous or seeking capability is required.</remarks>
+      <seealso href="../streams.html">Stream contracts and provider limitations</seealso>
     </member>
     <member name="M:System.IO.OutputStream.Write(System.Byte[],System.Int32,System.Int32)">
-      <summary>Attempts one synchronous partial write.</summary>
-      <param name="buffer">Caller-owned byte array; retained only for the duration of this call.</param>
-      <param name="offset">Zero-based start within the array.</param>
-      <param name="count">Maximum bytes to transfer, from zero through 65536 and within the array range.</param>
-      <returns>Ok with the transferred count, or StreamError. Closed is checked before range validation; invalid ranges and oversized requests fail before transfer.</returns>
-      <remarks>The buffer is not modified. A positive-count successful write must make progress; callers loop over partial writes. Calls do not suspend. No concurrency safety is promised.</remarks>
+      <summary>Writes the entire requested range on success.</summary>
+      <param name="buffer">Caller buffer, available and unmodified until the task settles.</param>
+      <param name="offset">First buffer index.</param>
+      <param name="count">Requested bytes; zero consumes no input or output.</param>
+      <returns>A task containing Ok(unit) after the full range is accepted, or StreamError. Partial failure is not rolled back.</returns>
+      <remarks>Uses CancellationToken.None. Await before reusing buffers or closing the stream. Invalid ranges fail before transfer; operations may already be complete.</remarks>
     </member>
     <member name="M:System.IO.OutputStream.Close">
       <summary>Closes this stream; repeated calls are harmless.</summary>
       <remarks>Subsequent transfers return Closed. This no-result operation does not report close failures or promise flush/durability. Other streams opened separately retain their own lifetime.</remarks>
     </member>
     <member name="M:System.IO.OutputStream.Flush">
-      <summary>Asks the provider to flush output and report an expected failure.</summary>
-      <returns>Ok with unit or StreamError; a closed stream returns Closed.</returns>
-      <remarks>No durability guarantee. Exact signature and provider-specific behavior are documented in the stream guide.</remarks>
+      <summary>Flushes output without a durability guarantee.</summary>
+      <returns>A task containing Ok(unit) or StreamError.</returns>
+      <remarks>Uses CancellationToken.None. Await before reusing buffers or closing the stream. Invalid ranges fail before transfer; operations may already be complete.</remarks>
     </member>
     <member name="T:System.IO.FileInputStream">
       <summary>A blocking, explicitly closed file read stream. Development API, not included in Preview 9.</summary>
       <remarks>Native resources belong to the invocation. Close promptly; invocation teardown closes remaining files. A retained stream cannot be reused in another invocation. There is no finalizer, automatic disposal or asynchronous scheduling in this slice. FileInputStream additionally implements SeekableStream; FileOutputStream remains sequential.</remarks>
     </member>
     <member name="M:System.IO.FileInputStream.Read(System.Byte[],System.Int32,System.Int32)">
-      <summary>Attempts one partial read using a caller-owned byte array.</summary>
-      <param name="buffer">Managed byte array. Do not mutate it during the call.</param>
-      <param name="offset">Zero-based start index.</param>
-      <param name="count">Maximum bytes to transfer; zero through 65536, within the array range.</param>
-      <returns>Ok with the transferred count, or a typed StreamError. Invalid ranges fail before I/O.</returns>
-      <remarks>Calls block. A read changes only the transferred range. A zero count returns zero without establishing EOF; a positive-count read returning zero means EOF. Writes may be partial; loop until all bytes have been accepted.</remarks>
+      <summary>Reads up to the requested byte count.</summary>
+      <param name="buffer">Caller buffer, available and unmodified until the task settles.</param>
+      <param name="offset">First buffer index.</param>
+      <param name="count">Requested bytes; zero consumes no input or output.</param>
+      <returns>A task containing Ok(byte count), including short reads and zero for EOF, or StreamError.</returns>
+      <remarks>The current file provider performs blocking host I/O inline; it cannot interrupt an in-progress call. Uses CancellationToken.None. Await before reusing buffers or closing the stream. Invalid ranges fail before transfer; operations may already be complete.</remarks>
     </member>
     <member name="M:System.IO.FileInputStream.Close">
       <summary>Releases the open file. Repeated calls are harmless.</summary>
@@ -367,12 +367,12 @@
       <seealso href="../streams.html#flush">Flush contract and file stream guide</seealso>
     </member>
     <member name="M:System.IO.FileOutputStream.Write(System.Byte[],System.Int32,System.Int32)">
-      <summary>Attempts one partial write using a caller-owned byte array.</summary>
-      <param name="buffer">Managed byte array. Do not mutate it during the call.</param>
-      <param name="offset">Zero-based start index.</param>
-      <param name="count">Maximum bytes to transfer; zero through 65536, within the array range.</param>
-      <returns>Ok with the transferred count, or a typed StreamError. Invalid ranges fail before I/O.</returns>
-      <remarks>Calls block and may write fewer bytes than requested. Loop over the remaining range. Closing does not make a failed write transactional.</remarks>
+      <summary>Writes the entire requested range on success.</summary>
+      <param name="buffer">Caller buffer, available and unmodified until the task settles.</param>
+      <param name="offset">First buffer index.</param>
+      <param name="count">Requested bytes; zero consumes no input or output.</param>
+      <returns>A task containing Ok(unit) after the full range is accepted, or StreamError. Partial failure is not rolled back.</returns>
+      <remarks>The current file provider performs blocking host I/O inline; it cannot interrupt an in-progress call. Uses CancellationToken.None. Await before reusing buffers or closing the stream. Invalid ranges fail before transfer; operations may already be complete.</remarks>
     </member>
     <member name="M:System.IO.FileOutputStream.Close">
       <summary>Releases the open file. Repeated calls are harmless.</summary>
@@ -385,9 +385,9 @@
       <remarks>No truncate, overwrite, append or recursive directory creation is implied.</remarks>
     </member>
     <member name="M:System.IO.FileOutputStream.Flush">
-      <summary>Flushes the writable file through the host file API.</summary>
-      <returns>Ok with unit, or a typed error. Closed streams return Closed.</returns>
-      <remarks>This is not an fsync or durable-storage guarantee. The wrapper adds no managed buffering.</remarks>
+      <summary>Flushes output without a durability guarantee.</summary>
+      <returns>A task containing Ok(unit) or StreamError.</returns>
+      <remarks>The current file provider performs blocking host I/O inline; it cannot interrupt an in-progress call. Uses CancellationToken.None. Await before reusing buffers or closing the stream. Invalid ranges fail before transfer; operations may already be complete.</remarks>
     </member>
     <member name="T:System.IO.StreamError">
       <summary>Expected file-stream failures represented as typed cases. The error taxonomy is provisional.</summary>
@@ -955,10 +955,10 @@
     <member name="M:System.Console.OpenStandardOutput"><summary>Opens a non-owning byte-stream wrapper for standard output.</summary><returns>An InputStream for input or OutputStream for either output channel.</returns><remarks>Each call creates an independent wrapper; Close closes only the wrapper. Input may return a one-byte short read. Calls are synchronous; operations are limited to 65536 bytes.</remarks></member>
     <member name="M:System.Console.OpenStandardError"><summary>Opens a non-owning byte-stream wrapper for standard error.</summary><returns>An InputStream for input or OutputStream for either output channel.</returns><remarks>Each call creates an independent wrapper; Close closes only the wrapper. Input may return a one-byte short read. Calls are synchronous; operations are limited to 65536 bytes.</remarks></member>
     <member name="M:System.Console.ReadByte"><summary>Reads one raw input byte.</summary><returns>Some byte, None at EOF, or ConsoleReadError when unavailable or failed.</returns></member>
-    <member name="M:System.Console.ReadLine"><summary>Reads one bounded strict UTF-8 line.</summary><returns>Some text, including empty text for an empty line; None for EOF before any data; or TextReadError.</returns><remarks>The parameterless overload uses 65536. LF and CRLF delimit lines; a lone CR is data. No read-ahead past LF. A limit error consumes input without rollback. Unavailable input maps to IoFailure. See StreamReader.ReadLine.</remarks></member>
-    <member name="M:System.Console.ReadLine(System.Int32)"><summary>Reads one bounded strict UTF-8 line.</summary><returns>Some text, including empty text for an empty line; None for EOF before any data; or TextReadError.</returns><param name="maxUtf8Bytes">Maximum returned UTF-8 bytes, from 0 through 65536.</param><remarks>The parameterless overload uses 65536. LF and CRLF delimit lines; a lone CR is data. No read-ahead past LF. A limit error consumes input without rollback. Unavailable input maps to IoFailure. See StreamReader.ReadLine.</remarks></member>
-    <member name="M:System.Console.Write(System.String)"><summary>Writes text without a line ending to stdout.</summary><param name="value0">Value to write.</param><remarks>Flushes before returning. Output failure is a terminal Fault. For recoverable output errors, use Console.Out. Write(string) is bounded to 65536 UTF-8 bytes; existing WriteLine overloads retain their prior behavior.</remarks></member>
-    <member name="M:System.Console.Write(System.Int32)"><summary>Writes a decimal integer without a line ending to stdout.</summary><param name="value0">Value to write.</param><remarks>Flushes before returning. Output failure is a terminal Fault. For recoverable output errors, use Console.Out. Write(string) is bounded to 65536 UTF-8 bytes; existing WriteLine overloads retain their prior behavior.</remarks></member>
+    <member name="M:System.Console.ReadLine"><summary>Returns a Task; await completion. Reads one bounded strict UTF-8 line.</summary><returns>Some text, including empty text for an empty line; None for EOF before any data; or TextReadError.</returns><remarks>The parameterless overload uses 65536. LF and CRLF delimit lines; a lone CR is data. No read-ahead past LF. A limit error consumes input without rollback. Unavailable input maps to IoFailure. See StreamReader.ReadLine.</remarks></member>
+    <member name="M:System.Console.ReadLine(System.Int32)"><summary>Returns a Task; await completion. Reads one bounded strict UTF-8 line.</summary><returns>Some text, including empty text for an empty line; None for EOF before any data; or TextReadError.</returns><param name="maxUtf8Bytes">Maximum returned UTF-8 bytes, from 0 through 65536.</param><remarks>The parameterless overload uses 65536. LF and CRLF delimit lines; a lone CR is data. No read-ahead past LF. A limit error consumes input without rollback. Unavailable input maps to IoFailure. See StreamReader.ReadLine.</remarks></member>
+    <member name="M:System.Console.Write(System.String)"><summary>Returns a Task; await completion. Writes text without a line ending to stdout.</summary><param name="value0">Value to write.</param><remarks>Flushes before returning. Output failure is a terminal Fault. For recoverable output errors, use Console.Out. Write(string) is bounded to 65536 UTF-8 bytes; existing WriteLine overloads retain their prior behavior.</remarks></member>
+    <member name="M:System.Console.Write(System.Int32)"><summary>Returns a Task; await completion. Writes a decimal integer without a line ending to stdout.</summary><param name="value0">Value to write.</param><remarks>Flushes before returning. Output failure is a terminal Fault. For recoverable output errors, use Console.Out. Write(string) is bounded to 65536 UTF-8 bytes; existing WriteLine overloads retain their prior behavior.</remarks></member>
     <member name="M:System.Console.WriteLine(System.String)"><summary>Writes text followed by LF to stdout.</summary><param name="value0">Value to write.</param><remarks>Flushes before returning. Output failure is a terminal Fault. For recoverable output errors, use Console.Out. Write(string) is bounded to 65536 UTF-8 bytes; existing WriteLine overloads retain their prior behavior.</remarks></member>
     <member name="M:System.Console.WriteLine(System.Int32)"><summary>Writes a decimal integer followed by LF to stdout.</summary><param name="value0">Value to write.</param><remarks>Flushes before returning. Output failure is a terminal Fault. For recoverable output errors, use Console.Out. Write(string) is bounded to 65536 UTF-8 bytes; existing WriteLine overloads retain their prior behavior.</remarks></member>
     <member name="M:System.Console.WriteLine(System.Object)"><summary>Writes the virtual ToString representation followed by LF, or an empty line for null.</summary><param name="value">Object to display. Value types may be boxed when using this fallback.</param><remarks>Flushes stdout before returning. Output failure is a terminal Fault; use Console.Out for recoverable errors. Does not add formatting support missing from the underlying type.</remarks></member>
@@ -980,19 +980,19 @@
     <member name="T:System.ConsoleReadError.ReadFailed"><summary>The host input operation failed.</summary></member>
     <member name="M:System.ConsoleReadError.#ctor(System.ConsoleReadError.ReadFailed)"><summary>Creates the ReadFailed case.</summary><param name="value">Case marker.</param></member>
     <member name="M:System.ConsoleReadError.ToString"><summary>Returns the active case name, or Empty for an inactive default.</summary><returns>The case name or Empty.</returns></member>
-    <member name="M:System.IO.TextReader.ReadLine(System.Int32)"><summary>Reads a decoded line without its LF or CRLF terminator.</summary><param name="maxUtf8Bytes">Maximum content bytes, 0 through 65536 for StreamReader.</param><returns>Some text for a line; None for EOF before any data; or TextReadError.</returns><remarks>StreamReader performs one-byte reads to avoid read-ahead. A lone CR is data. A BOM is preserved. An unterminated final line is returned once. Invalid bounds consume nothing; decoding, I/O and length errors may advance input. Close is checked first. No rollback or asynchronous behavior is promised.</remarks></member>
-    <member name="M:System.IO.StreamReader.ReadLine(System.Int32)"><summary>Reads a decoded line without its LF or CRLF terminator.</summary><param name="maxUtf8Bytes">Maximum content bytes, 0 through 65536 for StreamReader.</param><returns>Some text for a line; None for EOF before any data; or TextReadError.</returns><remarks>StreamReader performs one-byte reads to avoid read-ahead. A lone CR is data. A BOM is preserved. An unterminated final line is returned once. Invalid bounds consume nothing; decoding, I/O and length errors may advance input. Close is checked first. No rollback or asynchronous behavior is promised.</remarks></member>
-    <member name="T:System.IO.TextWriter"><summary>A synchronous text output contract independent of its destination.</summary></member>
-    <member name="T:System.IO.StreamWriter"><summary>A synchronous TextWriter with bounded encoding output over OutputStream, with UTF-8 by default.</summary><remarks>Built-ins write no BOM and use LF for WriteLine. Development constructors accept Encoding; Encodings.Ascii selects strict ASCII. Retries partial writes; a zero-progress write becomes IoFailure. No concurrent-write serialization is provided. Errors can follow partial output. Finish reports final conversion output/errors; Flush reports stream flush errors. Close releases owned output without implicitly finishing or flushing. After a drain or output failure, later writes and Finish return InvalidEncoding.</remarks></member>
-    <member name="M:System.IO.StreamWriter.#ctor(System.IO.OutputStream)"><summary>Creates a synchronous UTF-8 writer with bounded conversion output.</summary><param name="output">Destination stream.</param><remarks>The one-argument constructor owns its output. Construction performs no I/O.</remarks></member>
-    <member name="M:System.IO.StreamWriter.#ctor(System.IO.OutputStream,System.Boolean)"><summary>Creates a synchronous UTF-8 writer with bounded conversion output.</summary><param name="output">Destination stream.</param><param name="leaveOpen">True leaves the destination open when this writer closes.</param><remarks>The one-argument constructor owns its output. Construction performs no I/O.</remarks></member>
-    <member name="M:System.IO.TextWriter.Write(System.String)"><summary>Writes text.</summary><param name="text">Text to encode using the selected policy.</param><returns>Number of bytes written, including LF for WriteLine, or StreamError.</returns><remarks>StreamWriter accepts at most 65536 UTF-8 input bytes and 65536 encoded output bytes per call, including the line terminator. Later conversion failures may return InvalidEncoding after partial output. Closed, oversized input and built-in ASCII preflight errors occur before output. Custom encoded-output overflow can be detected after partial output; the writer never writes beyond 65536 bytes per call. Drain/output failures stop later writes and Finish; there is no replay or rollback.</remarks></member>
-    <member name="M:System.IO.TextWriter.WriteLine(System.String)"><summary>Writes text followed by LF.</summary><param name="text">Text to encode using the selected policy.</param><returns>Number of bytes written, including LF for WriteLine, or StreamError.</returns><remarks>StreamWriter accepts at most 65536 UTF-8 input bytes and 65536 encoded output bytes per call, including the line terminator. Later conversion failures may return InvalidEncoding after partial output. Closed, oversized input and built-in ASCII preflight errors occur before output. Custom encoded-output overflow can be detected after partial output; the writer never writes beyond 65536 bytes per call. Drain/output failures stop later writes and Finish; there is no replay or rollback.</remarks></member>
-    <member name="M:System.IO.TextWriter.Flush"><summary>Flushes the output.</summary><returns>Unit on success or StreamError.</returns><remarks>See the manual Console reference for this Result&lt;unit, StreamError&gt; signature.</remarks></member>
+    <member name="M:System.IO.TextReader.ReadLine(System.Int32)"><summary>Returns a Task; await completion. Reads a decoded line without its LF or CRLF terminator.</summary><param name="maxUtf8Bytes">Maximum content bytes, 0 through 65536 for StreamReader.</param><returns>The completed task contains: Some text for a line; None for EOF before any data; or TextReadError.</returns><remarks>StreamReader performs one-byte reads to avoid read-ahead. A lone CR is data. A BOM is preserved. An unterminated final line is returned once. Invalid bounds consume nothing; decoding, I/O and length errors may advance input. Close is checked first. No rollback is promised. Await completion before further reads.</remarks></member>
+    <member name="M:System.IO.StreamReader.ReadLine(System.Int32)"><summary>Returns a Task; await completion. Reads a decoded line without its LF or CRLF terminator.</summary><param name="maxUtf8Bytes">Maximum content bytes, 0 through 65536 for StreamReader.</param><returns>The completed task contains: Some text for a line; None for EOF before any data; or TextReadError.</returns><remarks>StreamReader performs one-byte reads to avoid read-ahead. A lone CR is data. A BOM is preserved. An unterminated final line is returned once. Invalid bounds consume nothing; decoding, I/O and length errors may advance input. Close is checked first. No rollback is promised. Await completion before further reads.</remarks></member>
+    <member name="T:System.IO.TextWriter"><summary>An asynchronous text output contract independent of its destination.</summary></member>
+    <member name="T:System.IO.StreamWriter"><summary>An asynchronous TextWriter with bounded encoding output over OutputStream, with UTF-8 by default.</summary><remarks>Built-ins write no BOM and use LF for WriteLine. Development constructors accept Encoding; Encodings.Ascii selects strict ASCII. Awaits complete output writes; provider errors remain observable. No concurrent-write serialization is provided. Errors can follow partial output. Finish reports final conversion output/errors; Flush reports stream flush errors. Close releases owned output without implicitly finishing or flushing. After a drain or output failure, later writes and Finish return InvalidEncoding.</remarks></member>
+    <member name="M:System.IO.StreamWriter.#ctor(System.IO.OutputStream)"><summary>Creates an asynchronous UTF-8 writer with bounded conversion output.</summary><param name="output">Destination stream.</param><remarks>The one-argument constructor owns its output. Construction performs no I/O.</remarks></member>
+    <member name="M:System.IO.StreamWriter.#ctor(System.IO.OutputStream,System.Boolean)"><summary>Creates an asynchronous UTF-8 writer with bounded conversion output.</summary><param name="output">Destination stream.</param><param name="leaveOpen">True leaves the destination open when this writer closes.</param><remarks>The one-argument constructor owns its output. Construction performs no I/O.</remarks></member>
+    <member name="M:System.IO.TextWriter.Write(System.String)"><summary>Returns a Task; await completion. Writes text.</summary><param name="text">Text to encode using the selected policy.</param><returns>The completed task contains: Number of bytes written, including LF for WriteLine, or StreamError.</returns><remarks>StreamWriter accepts at most 65536 UTF-8 input bytes and 65536 encoded output bytes per call, including the line terminator. Later conversion failures may return InvalidEncoding after partial output. Closed, oversized input and built-in ASCII preflight errors occur before output. Custom encoded-output overflow can be detected after partial output; the writer never writes beyond 65536 bytes per call. Drain/output failures stop later writes and Finish; there is no replay or rollback.</remarks></member>
+    <member name="M:System.IO.TextWriter.WriteLine(System.String)"><summary>Returns a Task; await completion. Writes text followed by LF.</summary><param name="text">Text to encode using the selected policy.</param><returns>The completed task contains: Number of bytes written, including LF for WriteLine, or StreamError.</returns><remarks>StreamWriter accepts at most 65536 UTF-8 input bytes and 65536 encoded output bytes per call, including the line terminator. Later conversion failures may return InvalidEncoding after partial output. Closed, oversized input and built-in ASCII preflight errors occur before output. Custom encoded-output overflow can be detected after partial output; the writer never writes beyond 65536 bytes per call. Drain/output failures stop later writes and Finish; there is no replay or rollback.</remarks></member>
+    <member name="M:System.IO.TextWriter.Flush"><summary>Returns a Task; await completion. Flushes the output.</summary><returns>The completed task contains: Unit on success or StreamError.</returns><remarks>See the manual Console reference for this Result&lt;unit, StreamError&gt; signature.</remarks></member>
     <member name="M:System.IO.TextWriter.Close"><summary>Closes the writer idempotently.</summary><remarks>StreamWriter closes owned output unless leaveOpen is true. Later writes and Flush return Closed. Call Finish and then Flush before Close to observe final conversion and flush errors. Close does not perform either operation.</remarks></member>
-    <member name="M:System.IO.StreamWriter.Write(System.String)"><summary>Writes text.</summary><param name="text">Text to encode using the selected policy.</param><returns>Number of bytes written, including LF for WriteLine, or StreamError.</returns><remarks>StreamWriter accepts at most 65536 UTF-8 input bytes and 65536 encoded output bytes per call, including the line terminator. Later conversion failures may return InvalidEncoding after partial output. Closed, oversized input and built-in ASCII preflight errors occur before output. Custom encoded-output overflow can be detected after partial output; the writer never writes beyond 65536 bytes per call. Drain/output failures stop later writes and Finish; there is no replay or rollback.</remarks></member>
-    <member name="M:System.IO.StreamWriter.WriteLine(System.String)"><summary>Writes text followed by LF.</summary><param name="text">Text to encode using the selected policy.</param><returns>Number of bytes written, including LF for WriteLine, or StreamError.</returns><remarks>StreamWriter accepts at most 65536 UTF-8 input bytes and 65536 encoded output bytes per call, including the line terminator. Later conversion failures may return InvalidEncoding after partial output. Closed, oversized input and built-in ASCII preflight errors occur before output. Custom encoded-output overflow can be detected after partial output; the writer never writes beyond 65536 bytes per call. Drain/output failures stop later writes and Finish; there is no replay or rollback.</remarks></member>
-    <member name="M:System.IO.StreamWriter.Flush"><summary>Flushes the output.</summary><returns>Unit on success or StreamError.</returns><remarks>See the manual Console reference for this Result&lt;unit, StreamError&gt; signature.</remarks></member>
+    <member name="M:System.IO.StreamWriter.Write(System.String)"><summary>Returns a Task; await completion. Writes text.</summary><param name="text">Text to encode using the selected policy.</param><returns>The completed task contains: Number of bytes written, including LF for WriteLine, or StreamError.</returns><remarks>StreamWriter accepts at most 65536 UTF-8 input bytes and 65536 encoded output bytes per call, including the line terminator. Later conversion failures may return InvalidEncoding after partial output. Closed, oversized input and built-in ASCII preflight errors occur before output. Custom encoded-output overflow can be detected after partial output; the writer never writes beyond 65536 bytes per call. Drain/output failures stop later writes and Finish; there is no replay or rollback.</remarks></member>
+    <member name="M:System.IO.StreamWriter.WriteLine(System.String)"><summary>Returns a Task; await completion. Writes text followed by LF.</summary><param name="text">Text to encode using the selected policy.</param><returns>The completed task contains: Number of bytes written, including LF for WriteLine, or StreamError.</returns><remarks>StreamWriter accepts at most 65536 UTF-8 input bytes and 65536 encoded output bytes per call, including the line terminator. Later conversion failures may return InvalidEncoding after partial output. Closed, oversized input and built-in ASCII preflight errors occur before output. Custom encoded-output overflow can be detected after partial output; the writer never writes beyond 65536 bytes per call. Drain/output failures stop later writes and Finish; there is no replay or rollback.</remarks></member>
+    <member name="M:System.IO.StreamWriter.Flush"><summary>Returns a Task; await completion. Flushes the output.</summary><returns>The completed task contains: Unit on success or StreamError.</returns><remarks>See the manual Console reference for this Result&lt;unit, StreamError&gt; signature.</remarks></member>
     <member name="M:System.IO.StreamWriter.Close"><summary>Closes the writer idempotently.</summary><remarks>StreamWriter closes owned output unless leaveOpen is true. Later writes and Flush return Closed. Call Finish and then Flush before Close to observe final conversion and flush errors. Close does not perform either operation.</remarks></member>
     <member name="M:System.ConsoleReadError.ReadFailed.#ctor"><summary>Creates a ReadFailed case marker.</summary></member>
     <member name="M:System.ConsoleReadError.Unavailable.#ctor"><summary>Creates an Unavailable case marker.</summary></member>
@@ -2330,22 +2330,25 @@
       <returns>The new position; InvalidRange for negative positions, LimitExceeded above 65536, or Closed. Errors leave the position unchanged.</returns>
     </member>
     <member name="M:System.IO.MemoryStream.Read(System.Byte[],System.Int32,System.Int32)">
-      <summary>Copies available bytes into the supplied range and advances the shared cursor.</summary>
-      <param name="buffer">Destination array; bytes outside the requested range remain unchanged.</param>
-      <param name="offset">Starting array index.</param>
-      <param name="count">Maximum bytes to read.</param>
-      <returns>Bytes read, zero at or beyond EOF or for an empty range; InvalidRange or Closed on failure. Validation errors do not advance the cursor.</returns>
+      <summary>Reads up to the requested byte count.</summary>
+      <param name="buffer">Caller buffer, available and unmodified until the task settles.</param>
+      <param name="offset">First buffer index.</param>
+      <param name="count">Requested bytes; zero consumes no input or output.</param>
+      <returns>A task containing Ok(byte count), including short reads and zero for EOF, or StreamError.</returns>
+      <remarks>Uses CancellationToken.None. Await before reusing buffers or closing the stream. Invalid ranges fail before transfer; operations may already be complete.</remarks>
     </member>
     <member name="M:System.IO.MemoryStream.Write(System.Byte[],System.Int32,System.Int32)">
-      <summary>Copies the supplied bytes into storage, advancing the cursor and extending length when needed.</summary>
-      <param name="buffer">Source array, copied without retaining an alias.</param>
-      <param name="offset">Starting array index.</param>
-      <param name="count">Bytes to copy. Zero leaves both position and length unchanged.</param>
-      <returns>The requested count; InvalidRange for an invalid source range, LimitExceeded if the end would exceed 65536, or Closed. Validation failures do not mutate storage.</returns>
+      <summary>Writes the entire requested range on success.</summary>
+      <param name="buffer">Caller buffer, available and unmodified until the task settles.</param>
+      <param name="offset">First buffer index.</param>
+      <param name="count">Requested bytes; zero consumes no input or output.</param>
+      <returns>A task containing Ok(unit) after the full range is accepted, or StreamError. Partial failure is not rolled back.</returns>
+      <remarks>Uses CancellationToken.None. Await before reusing buffers or closing the stream. Invalid ranges fail before transfer; operations may already be complete.</remarks>
     </member>
     <member name="M:System.IO.MemoryStream.Flush">
-      <summary>Succeeds without work for an open memory stream; returns Closed otherwise.</summary>
-      <returns>A successful unit result or Closed.</returns>
+      <summary>Flushes output without a durability guarantee.</summary>
+      <returns>A task containing Ok(unit) or StreamError.</returns>
+      <remarks>Uses CancellationToken.None. Await before reusing buffers or closing the stream. Invalid ranges fail before transfer; operations may already be complete.</remarks>
     </member>
     <member name="M:System.IO.MemoryStream.Close">
       <summary>Closes all capabilities and releases the backing storage. Repeated calls have no effect.</summary>
@@ -2723,7 +2726,7 @@
     <member name="M:System.Text.EncodingError.Busy.#ctor"><summary>Creates the Busy case.</summary></member>
     <member name="M:System.Text.EncodingError.#ctor(System.Text.EncodingError.Busy)"><summary>Creates the union with Busy active.</summary><param name="value">The case value.</param></member>
     <member name="M:System.Text.EncodingError.TryGetValue(System.Text.EncodingError.Busy@)"><summary>Extracts Busy if active.</summary><param name="value">Receives the active case when true is returned.</param><returns>Whether Busy is active.</returns><remarks>Prefer Raven case patterns.</remarks></member>
-    <member name="M:System.IO.StreamWriter.Finish"><summary>Finalizes conversion and writes all remaining encoded bytes.</summary><returns>Additional bytes written, or StreamError.</returns><remarks>Development API on StreamWriter, not TextWriter. Repeated successful calls return zero. It does not flush or close the output. Later Write/WriteLine return InvalidEncoding. Observe Finish and Flush results before Close when using stateful encoders. Output/encoder-drain failures can follow partial output and make subsequent Write/Finish return InvalidEncoding. Closed takes precedence.</remarks></member>
+    <member name="M:System.IO.StreamWriter.Finish"><summary>Returns a Task; await completion. Finalizes conversion and writes all remaining encoded bytes.</summary><returns>The completed task contains: Additional bytes written, or StreamError.</returns><remarks>Development API on StreamWriter, not TextWriter. Repeated successful calls return zero. It does not flush or close the output. Later Write/WriteLine return InvalidEncoding. Observe Finish and Flush results before Close when using stateful encoders. Output/encoder-drain failures can follow partial output and make subsequent Write/Finish return InvalidEncoding. Closed takes precedence.</remarks></member>
     <member name="M:System.String.ToUpperInvariant"><summary>Returns Unicode 17 full default uppercase text.</summary><returns>A String with expanding mappings, such as ß to SS. Byte, scalar and grapheme counts can change.</returns><remarks>Development API. Independent of host culture; no normalization or language tailoring. This is full Unicode casing, not .NET-compatible simple invariant mapping or the existing OrdinalIgnoreCase folding/hash policy. Existing references remain unchanged.</remarks></member>
     <member name="M:System.String.ToLowerInvariant"><summary>Returns Unicode 17 full default lowercase text.</summary><returns>A String including default final-sigma context and expanding mappings such as İ to i plus combining dot.</returns><remarks>Development API. Context is evaluated on original text while skipping case-ignorable scalars. No locale selection or normalization. Counts can change. Use StringComparer.OrdinalIgnoreCase for its separate comparison/hash policy; casing is not that policy.</remarks></member>
     <member name="M:System.Int64.Parse(System.String)"><summary>Parses strict signed ASCII decimal text as a 64-bit integer.</summary><param name="value">An optional ASCII + or - followed by one or more ASCII digits; leading zeros are accepted.</param><returns>Ok with the integer; InvalidFormat for invalid syntax, or Overflow outside the signed 64-bit range.</returns><remarks>Development API. No whitespace, separators, prefixes, NUL or non-ASCII digits. Whole-input format validation precedes overflow detection. Unlike .NET's default parsing, surrounding whitespace is rejected. Use Raven Result case patterns.</remarks></member>
@@ -3317,54 +3320,57 @@ Missing/ambiguous columns, SQL NULL and unsupported property types are errors. E
       <summary>Development PostgreSQL protocol-v3 binding for local trust-authenticated servers.
 Connects only to 127.0.0.1. No TLS, password authentication, pooling or automatic retries.</summary>
     </member>
-    <member name="M:System.IO.AsyncInputStream.Close">
-      <summary>Closes this stream; repeated closure has no additional effect.</summary>
-      <remarks>Close is disposal, not an awaited flush or TLS shutdown.</remarks>
+
+    <member name="M:System.IO.InputStream.Read(System.Byte[],System.Int32,System.Int32,System.Concurrency.CancellationToken)">
+      <summary>Reads up to the requested byte count.</summary>
+      <param name="buffer">Caller buffer, available and unmodified until the task settles.</param>
+      <param name="offset">First buffer index.</param>
+      <param name="count">Requested bytes; zero consumes no input or output.</param>
+      <param name="cancellationToken">Cancellation yields a cancelled task, not a StreamError. Pre-cancellation precedes validation.</param>
+      <returns>A task containing Ok(byte count), including short reads and zero for EOF, or StreamError.</returns>
+      <remarks>Pre-cancellation precedes Closed and range checks. Await before reusing buffers or closing the stream. Invalid ranges fail before transfer; operations may already be complete.</remarks>
     </member>
-    <member name="M:System.IO.AsyncInputStream.ReadAsync(System.Byte[],System.Int32,System.Int32,System.Concurrency.CancellationToken)">
-      <summary>Reads up to count bytes; a positive-count read returns zero only at EOF.</summary>
-      <param name="buffer">Destination whose bytes outside the requested range are preserved.</param>
-      <param name="offset">First destination index.</param>
-      <param name="count">Maximum bytes to read; zero completes without consuming input.</param>
-      <param name="cancellationToken">Cancellation produces a cancelled task, not a StreamError.</param>
-      <returns>A byte count or stream error. Short reads are successful.</returns>
+
+    <member name="M:System.IO.OutputStream.Flush(System.Concurrency.CancellationToken)">
+      <summary>Flushes output without a durability guarantee.</summary>
+      <param name="cancellationToken">Cancellation yields a cancelled task, not a StreamError. Pre-cancellation precedes validation.</param>
+      <returns>A task containing Ok(unit) or StreamError.</returns>
+      <remarks>Pre-cancellation precedes Closed and range checks. Await before reusing buffers or closing the stream. Invalid ranges fail before transfer; operations may already be complete.</remarks>
     </member>
-    <member name="M:System.IO.AsyncOutputStream.Close">
-      <summary>Closes this stream; repeated closure has no additional effect.</summary>
-      <remarks>Close is disposal, not an awaited flush or TLS shutdown.</remarks>
+    <member name="M:System.IO.OutputStream.Write(System.Byte[],System.Int32,System.Int32,System.Concurrency.CancellationToken)">
+      <summary>Writes the entire requested range on success.</summary>
+      <param name="buffer">Caller buffer, available and unmodified until the task settles.</param>
+      <param name="offset">First buffer index.</param>
+      <param name="count">Requested bytes; zero consumes no input or output.</param>
+      <param name="cancellationToken">Cancellation yields a cancelled task, not a StreamError. Pre-cancellation precedes validation.</param>
+      <returns>A task containing Ok(unit) after the full range is accepted, or StreamError. Partial failure is not rolled back.</returns>
+      <remarks>Pre-cancellation precedes Closed and range checks. Await before reusing buffers or closing the stream. Invalid ranges fail before transfer; operations may already be complete.</remarks>
     </member>
-    <member name="M:System.IO.AsyncOutputStream.FlushAsync(System.Concurrency.CancellationToken)">
-      <summary>Flushes pending output; does not promise durable storage or peer receipt.</summary>
-      <param name="cancellationToken">Cancellation request for this operation.</param>
-      <returns>Completion or a stream error.</returns>
+    <member name="M:System.IO.MemoryStream.Flush(System.Concurrency.CancellationToken)">
+      <summary>Flushes output without a durability guarantee.</summary>
+      <param name="cancellationToken">Cancellation yields a cancelled task, not a StreamError. Pre-cancellation precedes validation.</param>
+      <returns>A task containing Ok(unit) or StreamError.</returns>
+      <remarks>Pre-cancellation precedes Closed and range checks. Await before reusing buffers or closing the stream. Invalid ranges fail before transfer; operations may already be complete.</remarks>
     </member>
-    <member name="M:System.IO.AsyncOutputStream.WriteAsync(System.Byte[],System.Int32,System.Int32,System.Concurrency.CancellationToken)">
-      <summary>Writes the entire requested range before reporting success.</summary>
-      <param name="buffer">Source bytes, retained until the task settles.</param>
-      <param name="offset">First source index.</param>
-      <param name="count">Number of bytes to write; zero does not extend storage.</param>
-      <param name="cancellationToken">Cancellation produces a cancelled task, not a StreamError.</param>
-      <returns>Success only after all requested bytes are accepted, or a stream error.</returns>
+    <member name="M:System.IO.MemoryStream.Read(System.Byte[],System.Int32,System.Int32,System.Concurrency.CancellationToken)">
+      <summary>Reads up to the requested byte count.</summary>
+      <param name="buffer">Caller buffer, available and unmodified until the task settles.</param>
+      <param name="offset">First buffer index.</param>
+      <param name="count">Requested bytes; zero consumes no input or output.</param>
+      <param name="cancellationToken">Cancellation yields a cancelled task, not a StreamError. Pre-cancellation precedes validation.</param>
+      <returns>A task containing Ok(byte count), including short reads and zero for EOF, or StreamError.</returns>
+      <remarks>Pre-cancellation precedes Closed and range checks. Await before reusing buffers or closing the stream. Invalid ranges fail before transfer; operations may already be complete.</remarks>
     </member>
-    <member name="M:System.IO.MemoryStream.FlushAsync(System.Concurrency.CancellationToken)">
-      <summary>Returns settled success for open memory storage; no data needs flushing.</summary>
-      <remarks>Pre-cancellation wins over Closed. Does not change position or length.</remarks>
+    <member name="M:System.IO.MemoryStream.Write(System.Byte[],System.Int32,System.Int32,System.Concurrency.CancellationToken)">
+      <summary>Writes the entire requested range on success.</summary>
+      <param name="buffer">Caller buffer, available and unmodified until the task settles.</param>
+      <param name="offset">First buffer index.</param>
+      <param name="count">Requested bytes; zero consumes no input or output.</param>
+      <param name="cancellationToken">Cancellation yields a cancelled task, not a StreamError. Pre-cancellation precedes validation.</param>
+      <returns>A task containing Ok(unit) after the full range is accepted, or StreamError. Partial failure is not rolled back.</returns>
+      <remarks>Pre-cancellation precedes Closed and range checks. Await before reusing buffers or closing the stream. Invalid ranges fail before transfer; operations may already be complete.</remarks>
     </member>
-    <member name="M:System.IO.MemoryStream.ReadAsync(System.Byte[],System.Int32,System.Int32,System.Concurrency.CancellationToken)">
-      <summary>Reads memory synchronously and returns a settled task; no worker is scheduled.</summary>
-      <remarks>Pre-cancellation wins before validation or mutation. Other errors match Read. This shared-cursor stream is not thread-safe.</remarks>
-    </member>
-    <member name="M:System.IO.MemoryStream.WriteAsync(System.Byte[],System.Int32,System.Int32,System.Concurrency.CancellationToken)">
-      <summary>Writes the full range to memory and returns a settled task.</summary>
-      <remarks>Pre-cancellation wins before validation or mutation. Range, closed-state and quota errors preserve storage and cursor, as with Write.</remarks>
-    </member>
-    <member name="T:System.IO.AsyncInputStream">
-      <summary>Asynchronous byte input without requiring synchronous or seek operations.</summary>
-      <remarks>Keep the destination range available and unmodified until the task settles. Implementations document concurrency and ownership.</remarks>
-    </member>
-    <member name="T:System.IO.AsyncOutputStream">
-      <summary>Asynchronous complete-range byte output without requiring synchronous or seek operations.</summary>
-      <remarks>Keep source bytes unchanged until completion. An error or cancellation may follow partial output; writes are not transactional.</remarks>
-    </member>
+
+
 </members>
 </doc>

@@ -3,6 +3,8 @@ module NeoClr.RuntimeTests
 import System.*
 import System.Collections.*
 import System.IO.*
+import System.Tasks.*
+import System.Concurrency.*
 import System.Result.*
 import System.Text.*
 
@@ -58,7 +60,7 @@ class FailedSink : OutputStream {
         self.zero = zero
     }
     val Calls: int => calls
-    func Write(buffer: byte[], offset: int, count: int) -> Result<int, StreamError> {
+    private func WriteCore(buffer: byte[], offset: int, count: int) -> Result<int, StreamError> {
         calls += 1
         if zero {
             return Ok(0)
@@ -68,10 +70,45 @@ class FailedSink : OutputStream {
         }
         return Error(StreamError.AccessDenied)
     }
-    func Flush() -> Result<unit, StreamError> {
+    private func FlushCore() -> Result<unit, StreamError> {
         return Error(StreamError.IoFailure)
     }
     func Close() { }
+
+    func Write(buffer: byte[], offset: int, count: int) -> Task<Result<unit, StreamError>> {
+        return Write(buffer, offset, count, CancellationToken.None)
+    }
+    func Write(buffer: byte[], offset: int, count: int, cancellationToken: CancellationToken) -> Task<Result<unit, StreamError>> {
+        if cancellationToken.IsCancellationRequested {
+            let cancelled = Promise<Result<unit, StreamError>>()
+            _ = cancelled.Cancel()
+            return cancelled.Task
+        }
+        return Task.FromResult(WriteAll(buffer, offset, count))
+    }
+
+    private func WriteAll(buffer: byte[], offset: int, count: int) -> Result<unit, StreamError> {
+        var sent = 0
+        while !(sent >= count) {
+            let amount = WriteCore(buffer, offset + sent, count - sent)?
+            if amount == 0 {
+                return Error(StreamError.IoFailure)
+            }
+            sent += amount
+        }
+        return Ok(())
+    }
+    func Flush() -> Task<Result<unit, StreamError>> {
+        return Flush(CancellationToken.None)
+    }
+    func Flush(cancellationToken: CancellationToken) -> Task<Result<unit, StreamError>> {
+        if cancellationToken.IsCancellationRequested {
+            let cancelled = Promise<Result<unit, StreamError>>()
+            _ = cancelled.Cancel()
+            return cancelled.Task
+        }
+        return Task.FromResult(FlushCore())
+    }
 }
 
 class CountingSink : OutputStream {
@@ -79,7 +116,7 @@ class CountingSink : OutputStream {
     private var allX = true
     val Total: int => total
     val AllX: bool => allX
-    func Write(buffer: byte[], offset: int, count: int) -> Result<int, StreamError> {
+    private func WriteCore(buffer: byte[], offset: int, count: int) -> Result<int, StreamError> {
         for index in offset..<(offset + count) {
             if buffer[index] != 120 {
                 allX = false
@@ -88,9 +125,44 @@ class CountingSink : OutputStream {
         total += count
         return Ok(count)
     }
-    func Flush() -> Result<unit, StreamError> {
+    private func FlushCore() -> Result<unit, StreamError> {
         return Ok(())
     }
     func Close() {
+    }
+
+    func Write(buffer: byte[], offset: int, count: int) -> Task<Result<unit, StreamError>> {
+        return Write(buffer, offset, count, CancellationToken.None)
+    }
+    func Write(buffer: byte[], offset: int, count: int, cancellationToken: CancellationToken) -> Task<Result<unit, StreamError>> {
+        if cancellationToken.IsCancellationRequested {
+            let cancelled = Promise<Result<unit, StreamError>>()
+            _ = cancelled.Cancel()
+            return cancelled.Task
+        }
+        return Task.FromResult(WriteAll(buffer, offset, count))
+    }
+
+    private func WriteAll(buffer: byte[], offset: int, count: int) -> Result<unit, StreamError> {
+        var sent = 0
+        while !(sent >= count) {
+            let amount = WriteCore(buffer, offset + sent, count - sent)?
+            if amount == 0 {
+                return Error(StreamError.IoFailure)
+            }
+            sent += amount
+        }
+        return Ok(())
+    }
+    func Flush() -> Task<Result<unit, StreamError>> {
+        return Flush(CancellationToken.None)
+    }
+    func Flush(cancellationToken: CancellationToken) -> Task<Result<unit, StreamError>> {
+        if cancellationToken.IsCancellationRequested {
+            let cancelled = Promise<Result<unit, StreamError>>()
+            _ = cancelled.Cancel()
+            return cancelled.Task
+        }
+        return Task.FromResult(FlushCore())
     }
 }

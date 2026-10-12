@@ -1,10 +1,11 @@
 module System.IO
 
 import System.*
+import System.Tasks.*
 
 public interface TextWriter {
-    func Write(text: string) -> Result<int, StreamError>
-    func WriteLine(text: string) -> Result<int, StreamError>
-    func Flush() -> Result<unit, StreamError>
+    func Write(text: string) -> Task<Result<int, StreamError>>
+    func WriteLine(text: string) -> Task<Result<int, StreamError>>
+    func Flush() -> Task<Result<unit, StreamError>>
     func Close()
 }

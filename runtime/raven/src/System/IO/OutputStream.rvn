@@ -1,9 +1,28 @@
 module System.IO
 
 import System.*
+import System.Tasks.*
+import System.Concurrency.*
 
+/// <summary>Asynchronous complete-range byte output without requiring synchronous or seek operations.</summary>
+/// <remarks>Keep source bytes unchanged until completion. An error or cancellation may follow partial output; writes are not transactional.</remarks>
 public interface OutputStream {
-    func Write(buffer: byte[], offset: int, count: int) -> Result<int, StreamError>
-    func Flush() -> Result<unit, StreamError>
+    /// Writes the complete range with CancellationToken.None.
+    func Write(buffer: byte[], offset: int, count: int) -> Task<Result<unit, StreamError>>
+    /// Flushes with CancellationToken.None.
+    func Flush() -> Task<Result<unit, StreamError>>
+    /// <summary>Writes the entire requested range before reporting success.</summary>
+    /// <param name="buffer">Source bytes, retained until the task settles.</param>
+    /// <param name="offset">First source index.</param>
+    /// <param name="count">Number of bytes to write; zero does not extend storage.</param>
+    /// <param name="cancellationToken">Cancellation produces a cancelled task, not a StreamError.</param>
+    /// <returns>Success only after all requested bytes are accepted, or a stream error.</returns>
+    func Write(buffer: byte[], offset: int, count: int, cancellationToken: CancellationToken) -> Task<Result<unit, StreamError>>
+    /// <summary>Flushes pending output; does not promise durable storage or peer receipt.</summary>
+    /// <param name="cancellationToken">Cancellation request for this operation.</param>
+    /// <returns>Completion or a stream error.</returns>
+    func Flush(cancellationToken: CancellationToken) -> Task<Result<unit, StreamError>>
+    /// <summary>Closes this stream; repeated closure has no additional effect.</summary>
+    /// <remarks>Close is disposal, not an awaited flush or TLS shutdown.</remarks>
     func Close()
 }

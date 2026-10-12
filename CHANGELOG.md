@@ -13,16 +13,18 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   lexical ownership/base identity through native authoring and loading; keep other
   nested local bases restricted. Focused metadata round-trip checks pass.
 
-- Add System.IO.AsyncInputStream/AsyncOutputStream and MemoryStream ReadAsync,
-  WriteAsync and FlushAsync, with cancellation and .NET-style complete-write
-  success. Separate async capabilities preserve synchronous implementations.
-  Seven memory-stream tests pass in macOS interpreter/JIT/AOT; refresh both API
-  references. Record the subsequent async-first naming policy and planned stream
-  migration: ordinary asynchronous operation names, Sync for synchronous alternatives
-  when distinction is needed. Record interface-view and return-type-overload
-  alternatives for review; implemented names and overload rules remain unchanged.
-  Record .NET/Windows Runtime/Go comparisons and compiler state-machine
-  follow-ups. Socket/TLS adapters and Windows qualification remain open.
+- Make InputStream/OutputStream asynchronous by default: Read, Write and Flush
+  return Tasks; remove the interim Async-prefixed interfaces/methods. Write succeeds
+  only after the complete requested range. Migrate text streams, JSON stream
+  overloads, console I/O consumers and HTTP uploads, including pending source reads.
+  This breaks synchronous implementations/callers; await the operation before reuse
+  or Close. Memory settles inline; file/console host calls remain blocking. Seek and
+  Close remain immediate, and legacy Console.WriteLine/ReadByte retain host paths.
+  Focused memory/JSON/encoding tests pass in macOS JIT/AOT, memory also in interpreter,
+  and eleven deferred-upload peer cases pass in JIT. Refresh both API references and
+  tested console/storage examples. Document compiler prerequisites and the next
+  System.Concurrency.Tasks namespace slice. Windows qualification, nonblocking
+  providers, socket/TLS adapters and certificate APIs remain open.
 
 - Record the planned async-stream, System.Security.Cryptography and certificate
   foundations for common managed TLS, with bounded scope, .NET API comparisons

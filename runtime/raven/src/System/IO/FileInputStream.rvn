@@ -1,6 +1,8 @@
 module System.IO
 
 import System.*
+import System.Concurrency.*
+import System.Tasks.*
 import System.Result.*
 import System.Runtime.CompilerServices.*
 
@@ -20,7 +22,21 @@ public class FileInputStream : InputStream, SeekableStream {
         return Ok(FileInputStream(RuntimeServices.UnpackValue<int>(payload)))
     }
 
-    func Read(buffer: byte[], offset: int, count: int) -> Result<int, StreamError> {
+    func Read(buffer: byte[], offset: int, count: int) -> Task<Result<int, StreamError>> {
+        return Read(buffer, offset, count, CancellationToken.None)
+    }
+
+    /// Returns an inline-completed operation over the current blocking provider.
+    func Read(buffer: byte[], offset: int, count: int, cancellationToken: CancellationToken) -> Task<Result<int, StreamError>> {
+        if cancellationToken.IsCancellationRequested {
+            let source = Promise<Result<int, StreamError>>()
+            _ = source.Cancel()
+            return source.Task
+        }
+        return Task.FromResult(ReadCore(buffer, offset, count))
+    }
+
+    private func ReadCore(buffer: byte[], offset: int, count: int) -> Result<int, StreamError> {
         if closed {
             return Error(StreamError.Closed())
         }

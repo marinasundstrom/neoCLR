@@ -43,36 +43,39 @@ static class ReaderBindings
         }
         namespace IO {
             public interface TextWriter {
-                Result<int, StreamError> Write(string text);
-                Result<int, StreamError> WriteLine(string text);
-                Result<PropagationUnit, StreamError> Flush();
+                Tasks.Task<Result<int, StreamError>> Write(string text);
+                Tasks.Task<Result<int, StreamError>> WriteLine(string text);
+                Tasks.Task<Result<PropagationUnit, StreamError>> Flush();
                 void Close();
             }
             public sealed class StreamWriter : TextWriter {
-                public Result<int, StreamError> Finish() => default;
+                public Tasks.Task<Result<int, StreamError>> Finish() => default;
                 public StreamWriter(OutputStream output) { }
                 public StreamWriter(OutputStream output, bool leaveOpen) { }
                 public StreamWriter(OutputStream output, Text.Encoding encoding) { }
                 public StreamWriter(OutputStream output, Text.Encoding encoding, bool leaveOpen) { }
-                public Result<int, StreamError> Write(string text) => default;
-                public Result<int, StreamError> WriteLine(string text) => default;
-                public Result<PropagationUnit, StreamError> Flush() => default;
+                public Tasks.Task<Result<int, StreamError>> Write(string text) => default;
+                public Tasks.Task<Result<int, StreamError>> WriteLine(string text) => default;
+                public Tasks.Task<Result<PropagationUnit, StreamError>> Flush() => default;
                 public void Close() { }
             }
             public sealed class ConsoleInputStream : InputStream {
                 public ConsoleInputStream() { }
-                public Result<int, StreamError> Read(byte[] buffer, int offset, int count) => default;
+                public Tasks.Task<Result<int, StreamError>> Read(byte[] buffer, int offset, int count) => default;
+                public Tasks.Task<Result<int, StreamError>> Read(byte[] buffer, int offset, int count, Concurrency.CancellationToken cancellationToken) => default;
                 public void Close() { }
             }
             public sealed class ConsoleOutputStream : OutputStream {
                 public ConsoleOutputStream(bool error) { }
-                public Result<int, StreamError> Write(byte[] buffer, int offset, int count) => default;
-                public Result<PropagationUnit, StreamError> Flush() => default;
+                public Tasks.Task<Result<PropagationUnit, StreamError>> Write(byte[] buffer, int offset, int count) => default;
+                public Tasks.Task<Result<PropagationUnit, StreamError>> Write(byte[] buffer, int offset, int count, Concurrency.CancellationToken cancellationToken) => default;
+                public Tasks.Task<Result<PropagationUnit, StreamError>> Flush() => default;
+                public Tasks.Task<Result<PropagationUnit, StreamError>> Flush(Concurrency.CancellationToken cancellationToken) => default;
                 public void Close() { }
             }
             public interface TextReader {
-                Result<Option<string>, TextReadError> ReadLine(int maxUtf8Bytes);
-                Result<string, TextReadError> ReadToEnd(int maxUtf8Bytes);
+                Tasks.Task<Result<Option<string>, TextReadError>> ReadLine(int maxUtf8Bytes);
+                Tasks.Task<Result<string, TextReadError>> ReadToEnd(int maxUtf8Bytes);
                 void Close();
             }
             public sealed class StreamReader : TextReader {
@@ -80,8 +83,8 @@ static class ReaderBindings
                 public StreamReader(InputStream input, bool leaveOpen) { }
                 public StreamReader(InputStream input, Text.Encoding encoding) { }
                 public StreamReader(InputStream input, Text.Encoding encoding, bool leaveOpen) { }
-                public Result<Option<string>, TextReadError> ReadLine(int maxUtf8Bytes) => default;
-                public Result<string, TextReadError> ReadToEnd(int maxUtf8Bytes) => default;
+                public Tasks.Task<Result<Option<string>, TextReadError>> ReadLine(int maxUtf8Bytes) => default;
+                public Tasks.Task<Result<string, TextReadError>> ReadToEnd(int maxUtf8Bytes) => default;
                 public void Close() { }
             }
         }

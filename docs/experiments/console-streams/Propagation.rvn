@@ -1,10 +1,16 @@
 import System.*
+import System.Tasks.*
 import System.IO.*
 import System.Result.*
 import System.Option.*
 
-func ReadInput() -> Result<unit, TextReadError> {
-    let Some(input) = Console.ReadLine()? else {
+async func ReadInput() -> Task<Result<unit, TextReadError>> {
+    let result = await Console.ReadLine()
+    return DescribeInput(result)
+}
+
+func DescribeInput(result1: Result<Option<string>, TextReadError>) -> Result<unit, TextReadError> {
+    let Some(input) = result1? else {
         Console.WriteLine("No input")
         return Ok(())
     }
@@ -12,19 +18,22 @@ func ReadInput() -> Result<unit, TextReadError> {
     return Ok(())
 }
 
-func Main() {
-    match ReadInput() {
+async func Main() -> Task<()> {
+    match await ReadInput() {
         Ok(_) => { }
         Error(_) => {
             let diagnostics = Console.Error
-            let Ok(_) = diagnostics.WriteLine("Could not read input") else {
+            let result2 = await diagnostics.WriteLine("Could not read input")
+            let Ok(_) = result2 else {
                 System.Fail("Could not write diagnostic")
-                return
+                return ()
             }
-            let Ok(_) = diagnostics.Flush() else {
+            let result3 = await diagnostics.Flush()
+            let Ok(_) = result3 else {
                 System.Fail("Could not write diagnostic")
-                return
+                return ()
             }
         }
     }
+    return ()
 }

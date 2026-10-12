@@ -1,4 +1,45 @@
-# Stream API proposal
+# Stream API design
+
+## Canonical asynchronous stream contracts — 2026-10-12
+
+**Author decision; implemented and locally validated:** InputStream and OutputStream are the
+foundational asynchronous contracts. Read, Write and Flush return Task results;
+remove the separate AsyncInputStream/AsyncOutputStream contracts. Do not introduce
+synchronous interfaces now. A future synchronous capability would be separate,
+rather than a required implementation on every stream.
+
+Task represents an operation that may finish later. It does not imply a background
+thread, a suspension, parallel execution or a nonblocking provider. Memory streams
+complete inline. Existing file/console providers still perform blocking host calls
+before returning completed tasks; nonblocking provider integration is separate work.
+TextReader/TextWriter, StreamReader/StreamWriter, JSON stream overloads and HTTP
+stream uploads consume the foundational asynchronous contract. Encoding and
+JSON operations on in-memory values stay immediate. Close remains immediate resource
+disposal, not an implicit flush or graceful TLS shutdown. Seek/position are a separate
+capability; this migration concerns byte/text I/O rather than metadata access.
+
+This deliberately differs from .NET Stream's paired Read/ReadAsync surface: fewer
+required capabilities and one ordinary I/O name, at the cost of breaking all existing
+synchronous stream implementations and consumers. Preserve short-read/EOF semantics
+and full-range write success, following .NET asynchronous stream behavior. Public
+buffer ownership lasts until settlement; cancellation may follow partial progress
+and does not imply rollback. Serial use is required unless a provider explicitly
+supports concurrent operations. No return-type overload resolution change is needed.
+
+**Next authorized slice:** after this migration, move System.Tasks to
+System.Concurrency.Tasks separately, then continue SSL and foundational
+System.Security.Cryptography work. The namespace move includes compiler/runtime
+contract mappings, consumers and reference documentation; it is not just an import
+rename. This supersedes the earlier exploratory naming discussion below.
+
+Validation: memory streams pass seven cases in interpreter/JIT/AOT; JSON streams
+pass twelve, encoding boundaries eight and text streams eleven in JIT/AOT, including
+pending and canceled operations. Eleven HTTP upload peer cases pass in JIT with
+explicitly deferred source reads. Console/storage samples execute in the interpreter.
+Both API references are refreshed. This does not qualify Windows or nonblocking
+file/console providers. See [retained evidence](../runtime/raven/tests/default-stream-validation.json).
+Earlier sections below preserve the progression of the design; the canonical
+contracts above supersede the initial separate Async interfaces.
 
 ## Async-first naming direction — 2026-10-12
 

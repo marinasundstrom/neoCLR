@@ -28,7 +28,26 @@ class GeneratedInput : InputStream {
         self.cancellation = cancellation
     }
 
-    func Read(buffer: byte[], offset: int, count: int) -> Result<int, StreamError> {
+    func Read(buffer: byte[], offset: int, count: int) -> Task<Result<int, StreamError>> {
+        return Read(buffer, offset, count, CancellationToken.None)
+    }
+
+    func Read(buffer: byte[], offset: int, count: int, cancellationToken: CancellationToken) -> Task<Result<int, StreamError>> {
+        if cancellationToken.IsCancellationRequested {
+            let source = Promise<Result<int, StreamError>>()
+            _ = source.Cancel()
+            return source.Task
+        }
+        // Deliberately defer the fixture read: uploads must wait before sending
+        // or reusing the destination buffer. Production consumers use await.
+        let pending = Promise<Result<int, StreamError>>()
+        TaskQueue.Default.Post(() => {
+            _ = pending.Complete(ReadCore(buffer, offset, count))
+        })
+        return pending.Task
+    }
+
+    private func ReadCore(buffer: byte[], offset: int, count: int) -> Result<int, StreamError> {
         Check(Closes == 0 && offset == 0 && count > 0 && count <= 256)
         Reads += 1
         if mode == "read-error" {
@@ -59,7 +78,7 @@ class GeneratedInput : InputStream {
 }
 
 class ForwardUpload : DelegatingHandler {
-    init() : base(HttpSocketHandler()) { }
+    init(inner: HttpHandler) : base(inner) { }
     override func Send(request: HttpRequest, cancellationToken: CancellationToken) -> Task<Result<HttpResponse, HttpError>> {
         Check(!request.Content.IsBuffered)
         return base.Send(request, cancellationToken)
@@ -71,8 +90,9 @@ class UploadCase {
     private var cancellation: CancellationTokenSource = CancellationTokenSource()
     private var input: GeneratedInput
     private var content: HttpContent
-    private var client: HttpClient = HttpClient(ForwardUpload())
+    private var client: HttpClient = HttpClient(ForwardUpload(HttpSocketHandler()))
     private var pending: Task<Result<HttpResponse, HttpError>>
+    private val completion = Promise<unit>()
     private var url: string
 
     init(url: string, mode: string) {
@@ -88,7 +108,7 @@ class UploadCase {
         Check(content.Length == length)
     }
 
-    func Run() {
+    func Run() -> Task<unit> {
         Check(!content.IsBuffered && content.TryGetBytes() is None)
         Check(content.ReadText().GetResult() is Error(_))
         Check(JsonContent.ReadNode(content) is Error(JsonError.Read(TextReadError.IoFailure)))
@@ -108,7 +128,10 @@ class UploadCase {
             // The first exchange owns consumption even while DNS/connect is pending.
             Check(client.Post(url, content).GetResult() is Error(HttpError.InvalidRequest(_)))
         }
+        // This fixture observes cancellation as an outcome; Main still awaits
+        // the fixture's completion so the runtime owns the asynchronous lifetime.
         pending.OnCompleted(self.Completed)
+        return completion.Task
     }
 
     func Completed() {
@@ -146,23 +169,25 @@ class UploadCase {
         Check(client.Post(url, content).GetResult() is Error(HttpError.InvalidRequest(_)))
         cancellation.Dispose()
         Console.WriteLine("Stream upload checks passed")
+        _ = completion.Complete(())
     }
 }
 
-func Main(arguments: string[]) {
+async func Main(arguments: string[]) -> Task<unit> {
     let cancellation = CancellationTokenSource()
     let untouched = GeneratedInput("success", cancellation)
     Check(HttpContent.FromStream(untouched, -1, false) is Error(HttpError.InvalidRequest(_)))
-    Check(HttpContent.FromStream(untouched, 65537, false) is Error(HttpError.LimitExceeded(_)))
+    Check(HttpContent.FromStream(untouched, 1048577, false) is Error(HttpError.LimitExceeded(_)))
     Check(untouched.Closes == 0 && untouched.Reads == 0)
-    let Ok(maximum) = HttpContent.FromStream(untouched, 65536, true) else {
+    let Ok(maximum) = HttpContent.FromStream(untouched, 1048576, true) else {
         System.Fail("Maximum length rejected")
-        return
+        return ()
     }
-    Check(maximum.Length == 65536)
+    Check(maximum.Length == 1048576)
     let disposable: Disposable = maximum
     disposable.Dispose()
     Check(untouched.Closes == 0 && untouched.Reads == 0)
     cancellation.Dispose()
-    UploadCase(arguments[0], arguments[1]).Run()
+    await UploadCase(arguments[0], arguments[1]).Run()
+    return ()
 }

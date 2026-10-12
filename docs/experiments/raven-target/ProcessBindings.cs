@@ -42,10 +42,10 @@ static class ProcessBindings
         public static IO.InputStream OpenStandardInput() => default;
         public static IO.OutputStream OpenStandardOutput() => default;
         public static IO.OutputStream OpenStandardError() => default;
-        public static Result<Option<string>, IO.TextReadError> ReadLine() => default;
-        public static Result<Option<string>, IO.TextReadError> ReadLine(int maxUtf8Bytes) => default;
-        public static void Write(string value0) { }
-        public static void Write(int value0) { }
+        public static Tasks.Task<Result<Option<string>, IO.TextReadError>> ReadLine() => default;
+        public static Tasks.Task<Result<Option<string>, IO.TextReadError>> ReadLine(int maxUtf8Bytes) => default;
+        public static Tasks.Task<PropagationUnit> Write(string value0) => default;
+        public static Tasks.Task<PropagationUnit> Write(int value0) => default;
         public static void WriteLine() { }
         public static void WriteLine(object? value) { }
         public static void WriteLine(bool value) { }

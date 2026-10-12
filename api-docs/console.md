@@ -6,7 +6,9 @@ standard stream accessors when code needs an InputStream, OutputStream, TextRead
 or TextWriter.
 
 Console is a static class. Terminal key handling, colors, cursor movement,
-character-at-a-time text input and asynchronous console calls are not implemented.
+character-at-a-time text input and nonblocking console host I/O are not implemented.
+Stream operations and Console.ReadLine/Write return Tasks, which currently settle inline.
+Legacy Console.WriteLine diagnostics and ReadByte retain their immediate host paths.
 
 | Member | Type or result | Purpose |
 | --- | --- | --- |
@@ -15,8 +17,8 @@ character-at-a-time text input and asynchronous console calls are not implemente
 | `Console.Error` | `TextWriter` | Write UTF-8 standard error |
 | `OpenStandardInput()` | `InputStream` | Read raw bytes |
 | `OpenStandardOutput()` / `OpenStandardError()` | `OutputStream` | Write raw bytes without text conversion |
-| `ReadLine()` | `Result<Option<string>, TextReadError>` | Read a line with a 65536-byte content bound |
-| `ReadLine(maxUtf8Bytes)` | `Result<Option<string>, TextReadError>` | Read a line with an explicit content bound |
+| `ReadLine()` | `Task<Result<Option<string>, TextReadError>>` | Read a line with a 65536-byte content bound |
+| `ReadLine(maxUtf8Bytes)` | `Task<Result<Option<string>, TextReadError>>` | Read a line with an explicit content bound |
 
 Each property/factory call creates a fresh wrapper. Wrappers share the underlying
 channel and its position, but their closed state is independent. Cache a wrapper
@@ -46,12 +48,12 @@ interrupted by cancellation while executing.
 
 ## Text and byte output
 
-`TextWriter.Write(text)` and `WriteLine(text)` return `Result<int, StreamError>`:
+`TextWriter.Write(text)` and `WriteLine(text)` return `Task<Result<int, StreamError>>`:
 the byte count on success, including LF for WriteLine. StreamWriter writes UTF-8
 without a BOM, handles short writes and reports IoFailure if a stream makes zero
 progress. Each call accepts at most 65536 encoded bytes, including any LF. A failed
 write may already have produced output; there is no rollback or atomic-write promise.
-Raw OutputStream.Write preserves arbitrary bytes and may return a short count.
+Raw OutputStream.Write preserves arbitrary bytes and completes successfully only for the full range.
 
 Convenience Console.Write and Console.WriteLine flush stdout before returning and
 turn failures into terminal Faults. Use Console.Out or Console.Error for recoverable
@@ -62,7 +64,7 @@ are not serialized into whole messages.
 Both TextWriter and StreamWriter also expose:
 
 ```raven
-func Flush() -> Result<unit, StreamError>
+func Flush() -> Task<Result<unit, StreamError>>
 func Close()
 ```
 
@@ -81,8 +83,13 @@ compatible Result, `?` propagates a read error. Pattern binding then handles the
 optional value:
 
 ```raven
-func ReadInput() -> Result<unit, TextReadError> {
-    let Some(input) = Console.ReadLine()? else {
+async func ReadInput() -> Task<Result<unit, TextReadError>> {
+    let result = await Console.ReadLine()
+    return DescribeInput(result)
+}
+
+func DescribeInput(result1: Result<Option<string>, TextReadError>) -> Result<unit, TextReadError> {
+    let Some(input) = result1? else {
         Console.WriteLine("No input")
         return Ok(())
     }
@@ -139,7 +146,7 @@ provisional tradeoffs, not claims of superiority. Sources reviewed 2026-09-23:
 
 Node exposes separate standard streams too, but output blocking behavior depends on
 the destination/platform. neoCLR currently chooses explicitly synchronous host calls;
-future scheduling work must not relabel these blocking operations as asynchronous.
+the Task contract describes possible future completion without claiming that this provider is nonblocking.
 [Node process I/O](https://nodejs.org/api/process.html#a-note-on-process-io).
 
 <a id="object-and-scalar-output-development"></a>

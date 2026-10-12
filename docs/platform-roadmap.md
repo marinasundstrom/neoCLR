@@ -17,13 +17,19 @@ for further development. Follow the [bounded security API sequence](stream-desig
 common async byte I/O, certificate/key ownership and explicit trust, then managed
 TLS composition and verified client/server JSON. Expose cryptographic primitives
 as reusable capabilities backed by established implementations, with scope driven
-by concrete consumers. The first managed slice adds AsyncInputStream/AsyncOutputStream and MemoryStream
-operations; socket/TLS adapters and certificate APIs remain next. Compare .NET,
+by concrete consumers. The canonical InputStream/OutputStream contracts now return
+Tasks, with text/JSON adapters and deferred HTTP uploads migrated. Memory, text and
+JSON tests pass in JIT/AOT; memory also passes in the interpreter. File and console
+host calls still block before returning settled Tasks. The next author-directed slice
+is System.Tasks → System.Concurrency.Tasks, including compiler/runtime identities
+and consumers, followed by SSL and System.Security.Cryptography. Socket/TLS adapters
+and certificate APIs remain open. Compare .NET,
 Windows Runtime and other platforms, retaining .NET as the ergonomics target.
 See the [first async contract](stream-design.md#first-async-contract--2026-10-12).
 The subsequent [async-first naming direction](stream-design.md#async-first-naming-direction--2026-10-12)
 reserves ordinary operation names for asynchronous I/O and Sync for synchronous
-alternatives when distinction is needed; migrate the first stream names coherently.
+alternatives when distinction is needed; the initial Async-prefixed stream interfaces
+are removed. See [migration evidence](../runtime/raven/tests/default-stream-validation.json).
 
 **Windows HTTPS follow-through (2026-10-12):** the author explicitly requests
 Windows behavior consistent with macOS. Source linking and a shared validation

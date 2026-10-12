@@ -60,15 +60,15 @@ public sealed class JsonNull : JsonValue {
 public sealed class JsonSerializer {
     private JsonSerializer() { }
     public static Result<T, JsonError> Deserialize<T>(string text) => default;
-    public static Result<T, JsonError> Deserialize<T>(IO.InputStream input) => default;
+    public static Tasks.Task<Result<T, JsonError>> Deserialize<T>(IO.InputStream input) => default;
     public static Result<object, JsonError> Deserialize(string text, Introspection.TypeInfo type) => default;
-    public static Result<object, JsonError> Deserialize(IO.InputStream input, Introspection.TypeInfo type) => default;
+    public static Tasks.Task<Result<object, JsonError>> Deserialize(IO.InputStream input, Introspection.TypeInfo type) => default;
     public static Result<string, JsonError> Serialize(object value) => default;
-    public static Result<PropagationUnit, JsonError> Serialize(IO.OutputStream output, object value) => default;
+    public static Tasks.Task<Result<PropagationUnit, JsonError>> Serialize(IO.OutputStream output, object value) => default;
     public static Result<JsonValue, JsonError> DeserializeNode(string text) => default;
-    public static Result<JsonValue, JsonError> DeserializeNode(IO.InputStream input) => default;
+    public static Tasks.Task<Result<JsonValue, JsonError>> DeserializeNode(IO.InputStream input) => default;
     public static Result<string, JsonError> SerializeNode(JsonValue value) => default;
-    public static Result<PropagationUnit, JsonError> SerializeNode(IO.OutputStream output, JsonValue value) => default;
+    public static Tasks.Task<Result<PropagationUnit, JsonError>> SerializeNode(IO.OutputStream output, JsonValue value) => default;
 }
 internal sealed class ObjectMapper {
     public ObjectMapper() { }

@@ -1,6 +1,6 @@
 using Mono.Cecil;
 
-// Directional, blocking file streams. Raw resource IDs never enter the public contract.
+// Async-first documentation facade; the legacy execution bridge below retains its historical bounded contracts.
 static class StreamBindings
 {
     const string Prefix = "System.IO.";
@@ -20,35 +20,28 @@ static class StreamBindings
                 Result<long, StreamError> Seek(long position);
             }
             public interface InputStream {
-                Result<int, StreamError> Read(byte[] buffer, int offset, int count);
+                Tasks.Task<Result<int, StreamError>> Read(byte[] buffer, int offset, int count);
+                Tasks.Task<Result<int, StreamError>> Read(byte[] buffer, int offset, int count, Concurrency.CancellationToken cancellationToken);
                 void Close();
             }
             public interface OutputStream {
-                Result<int, StreamError> Write(byte[] buffer, int offset, int count);
-                Result<PropagationUnit, StreamError> Flush();
+                Tasks.Task<Result<PropagationUnit, StreamError>> Write(byte[] buffer, int offset, int count);
+                Tasks.Task<Result<PropagationUnit, StreamError>> Write(byte[] buffer, int offset, int count, Concurrency.CancellationToken cancellationToken);
+                Tasks.Task<Result<PropagationUnit, StreamError>> Flush();
+                Tasks.Task<Result<PropagationUnit, StreamError>> Flush(Concurrency.CancellationToken cancellationToken);
                 void Close();
             }
-            // Documentation facade only; native metadata provides executable async contracts.
-            public interface AsyncInputStream {
-                Tasks.Task<Result<int, StreamError>> ReadAsync(byte[] buffer, int offset, int count, Concurrency.CancellationToken cancellationToken);
-                void Close();
-            }
-            public interface AsyncOutputStream {
-                Tasks.Task<Result<PropagationUnit, StreamError>> WriteAsync(byte[] buffer, int offset, int count, Concurrency.CancellationToken cancellationToken);
-                Tasks.Task<Result<PropagationUnit, StreamError>> FlushAsync(Concurrency.CancellationToken cancellationToken);
-                void Close();
-            }
-            public sealed class MemoryStream : InputStream, OutputStream, SeekableStream, AsyncInputStream, AsyncOutputStream {
+            public sealed class MemoryStream : InputStream, OutputStream, SeekableStream {
                 public MemoryStream() { }
-                public Tasks.Task<Result<int, StreamError>> ReadAsync(byte[] buffer, int offset, int count, Concurrency.CancellationToken cancellationToken) => null!;
-                public Tasks.Task<Result<PropagationUnit, StreamError>> WriteAsync(byte[] buffer, int offset, int count, Concurrency.CancellationToken cancellationToken) => null!;
-                public Tasks.Task<Result<PropagationUnit, StreamError>> FlushAsync(Concurrency.CancellationToken cancellationToken) => null!;
                 public Result<long, StreamError> GetLength() => default;
                 public Result<long, StreamError> GetPosition() => default;
                 public Result<long, StreamError> Seek(long position) => default;
-                public Result<int, StreamError> Read(byte[] buffer, int offset, int count) => default;
-                public Result<int, StreamError> Write(byte[] buffer, int offset, int count) => default;
-                public Result<PropagationUnit, StreamError> Flush() => default;
+                public Tasks.Task<Result<int, StreamError>> Read(byte[] buffer, int offset, int count) => default;
+                public Tasks.Task<Result<int, StreamError>> Read(byte[] buffer, int offset, int count, Concurrency.CancellationToken cancellationToken) => default;
+                public Tasks.Task<Result<PropagationUnit, StreamError>> Write(byte[] buffer, int offset, int count) => default;
+                public Tasks.Task<Result<PropagationUnit, StreamError>> Write(byte[] buffer, int offset, int count, Concurrency.CancellationToken cancellationToken) => default;
+                public Tasks.Task<Result<PropagationUnit, StreamError>> Flush() => default;
+                public Tasks.Task<Result<PropagationUnit, StreamError>> Flush(Concurrency.CancellationToken cancellationToken) => default;
                 public void Close() { }
             }
             public sealed class FileInputStream : InputStream, SeekableStream {
@@ -56,14 +49,17 @@ static class StreamBindings
                 public Result<long, StreamError> Seek(long position) => default;
                 private FileInputStream(int handle) { }
                 public static Result<FileInputStream, StreamError> Open(string path) => default;
-                public Result<int, StreamError> Read(byte[] buffer, int offset, int count) => default;
+                public Tasks.Task<Result<int, StreamError>> Read(byte[] buffer, int offset, int count) => default;
+                public Tasks.Task<Result<int, StreamError>> Read(byte[] buffer, int offset, int count, Concurrency.CancellationToken cancellationToken) => default;
                 public void Close() { }
             }
             public sealed class FileOutputStream : OutputStream {
                 private FileOutputStream(int handle) { }
                 public static Result<FileOutputStream, StreamError> CreateNew(string path) => default;
-                public Result<int, StreamError> Write(byte[] buffer, int offset, int count) => default;
-                public Result<PropagationUnit, StreamError> Flush() => default;
+                public Tasks.Task<Result<PropagationUnit, StreamError>> Write(byte[] buffer, int offset, int count) => default;
+                public Tasks.Task<Result<PropagationUnit, StreamError>> Write(byte[] buffer, int offset, int count, Concurrency.CancellationToken cancellationToken) => default;
+                public Tasks.Task<Result<PropagationUnit, StreamError>> Flush() => default;
+                public Tasks.Task<Result<PropagationUnit, StreamError>> Flush(Concurrency.CancellationToken cancellationToken) => default;
                 public void Close() { }
             }
         }

@@ -1,8 +1,8 @@
 # Files, storage and streams
 
 System.Storage describes provider-bound paths, files and directories. System.IO
-supplies byte streams, text readers and writers. Operations are synchronous and
-return typed Result errors. See [setup](../../try/) for toolchain requirements.
+supplies asynchronous byte streams, text readers and writers. Await their Task
+results; storage lookup/open operations remain immediate. See [setup](../../try/) for toolchain requirements.
 
 <a id="example"></a>
 
@@ -42,13 +42,13 @@ overload accepts one child name. GetItems produces a bounded synchronous snapsho
 FileInputStream and FileOutputStream provide bounded reads and writes, exclusive
 creation and explicit close. InputStream and OutputStream express separate
 capabilities; optional seekability is separate. MemoryStream provides in-memory
-byte storage. Callers own buffers and must handle partial transfers.
+byte storage. Callers retain buffers until settlement. Reads may be short; successful writes cover the requested range.
 
-StreamReader decodes strict UTF-8; StreamWriter retries partial UTF-8 writes.
+StreamReader decodes strict UTF-8; StreamWriter awaits complete encoded writes.
 ReadToEnd decodes chunks incrementally and reports
 malformed input before EOF when detected. It still returns one accumulated String;
-errors return no partial text. See the [reader contract](../../docs/streams.html#text-readers).
-Callers flush and close explicitly. FileText supplies bounded whole-file text
+errors return no partial text. See the [reader contract](../../docs/streams.html#text-and-json-adapters).
+Callers await flushing and close explicitly. FileText supplies bounded whole-file text
 helpers. Console exposes the same text and byte interfaces through standard streams.
 
 [Streams and ownership](../../docs/streams.html) · [Console](../console/)
@@ -64,8 +64,8 @@ UTF-8 as the default. `Encodings.Ascii` selects strict ASCII. Both adapters reta
 the leaveOpen option. Lines are recognized after decoding; unsupported ASCII output
 fails before writing. StreamWriter uses bounded encoder output and
 provides Finish to observe final conversion bytes/errors. Flush handles the stream;
-Close releases ownership. Call Finish and Flush explicitly when required before
-Close. See [selected encoding contracts](../../docs/streams.html#selected-encodings-development).
+Close releases ownership. Await Finish and Flush explicitly when required before
+Close. See [selected encoding contracts](../../docs/streams.html#text-and-json-adapters).
 
 ## Behavior and limits
 

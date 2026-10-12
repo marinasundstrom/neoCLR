@@ -11,6 +11,7 @@
     <RavenNeoClrRuntimeSeed Condition="'$(RavenNeoClrBootstrapSeed)' != ''">$(RavenNeoClrBootstrapSeed)</RavenNeoClrRuntimeSeed>
     <RavenNeoClrBootstrapOwnership>ownership.json</RavenNeoClrBootstrapOwnership>
     <RavenNeoClrSourceObjectRoot>true</RavenNeoClrSourceObjectRoot>
+    <RavenNeoClrAsyncLibrary>System.Runtime</RavenNeoClrAsyncLibrary>
     <RavenNeoClrBootstrapIntrinsics>true</RavenNeoClrBootstrapIntrinsics>
   </PropertyGroup>
   <ItemGroup>

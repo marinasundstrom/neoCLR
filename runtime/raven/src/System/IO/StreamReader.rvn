@@ -1,6 +1,7 @@
 module System.IO
 
 import System.*
+import System.Tasks.*
 import System.Collections.*
 import System.Result.*
 import System.Option.*
@@ -41,7 +42,7 @@ public class StreamReader : TextReader {
     }
 
     // Delimit decoded text. Built-in codecs do not read ahead across lines.
-    func ReadLine(maxUtf8Bytes: int) -> Result<Option<string>, TextReadError> {
+    async func ReadLine(maxUtf8Bytes: int) -> Task<Result<Option<string>, TextReadError>> {
         if closed {
             return Error(TextReadError.Closed)
         }
@@ -91,7 +92,7 @@ public class StreamReader : TextReader {
             if accepted > maxUtf8Bytes + 1 {
                 return Error(TextReadError.LimitExceeded)
             }
-            match ReadPart(buffer, 1, 1) {
+            match await ReadPart(buffer, 1, 1) {
                 Ok(let decoded) => pendingText = decoded
                 Error(let error) => return Error(error)
             }
@@ -116,7 +117,7 @@ public class StreamReader : TextReader {
         }
     }
 
-    func ReadToEnd(maxUtf8Bytes: int) -> Result<string, TextReadError> {
+    async func ReadToEnd(maxUtf8Bytes: int) -> Task<Result<string, TextReadError>> {
         if closed {
             return Error(TextReadError.Closed)
         }
@@ -141,7 +142,7 @@ public class StreamReader : TextReader {
             if request > buffer.Length {
                 request = buffer.Length
             }
-            match ReadPart(buffer, request, maxUtf8Bytes - accepted) {
+            match await ReadPart(buffer, request, maxUtf8Bytes - accepted) {
                 Ok(let part) => text = String.Concat(text, part)
                 Error(let error) => return Error(error)
             }
@@ -153,8 +154,8 @@ public class StreamReader : TextReader {
         return Error(TextReadError.IoFailure)
     }
 
-    private func ReadPart(buffer: byte[], request: int, remaining: int) -> Result<string, TextReadError> {
-        let count = match input.Read(buffer, 0, request) {
+    private async func ReadPart(buffer: byte[], request: int, remaining: int) -> Task<Result<string, TextReadError>> {
+        let count = match await input.Read(buffer, 0, request) {
             Ok(let value) => value
             Error(let error) => return Error(FromStream(error))
         }

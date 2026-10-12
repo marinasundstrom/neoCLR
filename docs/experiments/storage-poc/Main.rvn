@@ -1,4 +1,5 @@
 import System.*
+import System.Tasks.*
 import System.Result.*
 import System.Storage.*
 import System.Storage.File
@@ -16,31 +17,14 @@ func Parse(text: string) -> Path {
     }
 }
 
-func WriteMessage(output: OutputStream) -> Result<unit, StreamError> {
-    let message = Utf8.Encode("Hello, värld!")
-    let buffer: byte[] = [(byte)0, (byte)0, (byte)0]
-    var position = 0
-    while position < message.Count {
-        var count = 0
-        while count < buffer.Length && position < message.Count {
-            buffer[count] = message[position]
-            count += 1
-            position += 1
-        }
-        var offset = 0
-        while offset < count {
-            match output.Write(buffer, offset, count - offset) {
-                Ok(let written) => {
-                    if written <= 0 || written > count - offset {
-                        System.Fail("Invalid write progress")
-                    }
-                    offset += written
-                }
-                Error(let error) => return Error(error)
-            }
-        }
+async func WriteMessage(output: OutputStream) -> Task<Result<unit, StreamError>> {
+    let writer = StreamWriter(output, true)
+    let written = await writer.Write("Hello, värld!")
+    writer.Close()
+    if let Error(error) = written {
+        return Error(error)
     }
-    return output.Flush()
+    return await output.Flush()
 }
 
 func ShowText(prefix: string, result: Result<string, TextReadError>) {
@@ -50,10 +34,10 @@ func ShowText(prefix: string, result: Result<string, TextReadError>) {
     }
 }
 
-func FileAccess(file: File) {
+async func FileAccess(file: File) -> Task<()> {
     match file.CreateNew() {
         Ok(let output) => {
-            let written = WriteMessage(output)
+            let written = await WriteMessage(output)
             output.Close()
             match written {
                 Ok(_) => Console.WriteLine("Created " + file.Name)
@@ -66,7 +50,7 @@ func FileAccess(file: File) {
         Ok(let input) => {
             // This reader borrows the input; close it before repositioning.
             let reader: TextReader = StreamReader(input, true)
-            let text = reader.ReadToEnd(64)
+            let text = await reader.ReadToEnd(64)
             reader.Close()
             ShowText("Read: ", text)
             // Seekability is optional on a generic InputStream.
@@ -75,7 +59,7 @@ func FileAccess(file: File) {
                 match seek.Seek(0) {
                     Ok(_) => {
                         let again: TextReader = StreamReader(input, true)
-                        let reread = again.ReadToEnd(64)
+                        let reread = await again.ReadToEnd(64)
                         again.Close()
                         ShowText("Re-read after seek: ", reread)
                     }
@@ -93,12 +77,13 @@ func FileAccess(file: File) {
             System.Fail("Exclusive creation replaced a file")
         }
     }
+    return ()
 }
 
-func Explore(directory: Directory) {
+async func Explore(directory: Directory) -> Task<()> {
     // FileAt describes a destination; CreateNew performs exclusive creation.
     match directory.FileAt("message.txt") {
-        Ok(let file) => FileAccess(file)
+        Ok(let file) => await FileAccess(file)
         Error(let error) => System.Fail(error.ToString())
     }
     match directory.GetItems(8) {
@@ -126,12 +111,14 @@ func Explore(directory: Directory) {
         Error(let error) => Console.WriteLine("Missing file: " + error.ToString())
         Ok(_) => System.Fail("Unexpected fixture file")
     }
+    return ()
 }
 
-func Main() {
+async func Main() -> Task<()> {
     let provider: StorageProvider = FileSystem("storage-demo")
     match provider.GetDirectory(Parse("/")) {
-        Ok(let directory) => Explore(directory)
+        Ok(let directory) => await Explore(directory)
         Error(let error) => System.Fail(error.ToString())
     }
+    return ()
 }

@@ -17,7 +17,7 @@ This does not enlarge neoCLR server admission, which remains 1,024 buffered byte
 
 ## Contract
 
-- Factory length is 0–65,536 bytes, measured from the source's current position.
+- Factory length is 0–1,048,576 bytes, measured from the source's current position.
   Negative/oversized lengths fail without reading, closing or taking ownership.
   Exact-length consumption leaves extra source bytes unread; early EOF and impossible
   read counts become HttpError.Content(StreamError.IoFailure). Other read errors
@@ -31,14 +31,16 @@ This does not enlarge neoCLR server admission, which remains 1,024 buffered byte
   chunk before reading more. Existing socket deadlines remain unchanged. No whole
   body is assembled; the current chunk is copied into bounded managed storage.
 - Cancellation is checked around source reads and forwarded to native operations.
-  A synchronous InputStream.Read cannot be interrupted mid-call. Sources must return
-  promptly and remain exclusively available; guest faults are not Result failures.
+  InputStream.Read returns a Task and receives the request cancellation token. The
+  exchange resumes after its outcome settles. Providers may still block before
+  returning; cancellation cannot interrupt such a host call. Sources remain
+  exclusively available; guest faults are not Result failures.
 - IsBuffered and TryGetBytes distinguish content representation. Bytes retains its
   buffered contract and faults for stream content instead of inventing empty bytes.
   ReadText returns an error for a stream. JSON readers reject stream content and
   server response encoding returns Unsupported. Responses remain buffered.
 - Custom handlers may inspect and forward stream content. General custom body
-  consumption, async sources, unknown lengths, retries/replay and streaming responses
+  consumption, unknown lengths, retries/replay and streaming responses
   are separate future contracts. Length is provisional for this known-length slice.
 
 ## .NET and HTTP comparison
@@ -47,8 +49,7 @@ The [.NET 10 StreamContent implementation](https://github.com/dotnet/runtime/blo
 wraps a stream, computes length when seekable, disposes its source, and permits
 replay by rewinding seekable sources. neoCLR's factory instead takes an explicit
 range and ownership flag and rejects all reuse. This admits non-seekable sources
-without a new seek contract, but leaves sizing to callers and postpones replay and
-asynchronous source reads. Retaining only buffered content is simpler but requires
+without a new seek contract, but leaves sizing to callers and postpones replay. Source reads now support pending Tasks. Retaining only buffered content is simpler but requires
 whole-body storage. A polymorphic async content reader/writer is the longer-term
 alternative, with larger handler and lifecycle implications.
 
@@ -57,7 +58,18 @@ guide fixed-length framing. No Transfer-Encoding is emitted here. The wire still
 closes each connection. Those choices are provider limits, not the future common
 HTTP model; see the [modern HTTP direction](../../http-capabilities.md#modern-http-direction).
 
-## Validation and integration
+## Async-first stream checkpoint — 2026-10-12
+
+All eleven cases pass on macOS ARM64 JIT with the canonical InputStream contract.
+The source posts completion to the managed dispatcher, proving that upload waits
+for pending reads. Main awaits fixture completion; callbacks are confined to the
+outcome adapter that checks cancellation. The verifier defaults to JIT and uses the
+matching sibling JIT compiler/host. This checkpoint does not claim GC statistics or
+Windows qualification. [Evidence](../../../runtime/raven/tests/default-stream-validation.json)
+records the matching library/compiler artifacts. The following results describe
+older checkpoints and their original collection checks.
+
+## Historical validation and integration
 
 All 11 serial independent-peer cases pass: owned and borrowed uploads, empty body,
 premature EOF, source error, invalid read count, cancellation during Read,

@@ -15874,3 +15874,23 @@ or runtime-await default switch was performed.
 - **Action:** recorded alternatives and inference/interop validation questions in
   [stream design](stream-design.md#interface-views-and-return-type-overloading-discussion).
   No new author decision, API rename or compiler capability is claimed.
+
+
+## 2026-10-12 — Canonical asynchronous streams and task namespace sequence
+
+- **Author decision:** make InputStream and OutputStream asynchronous by default;
+  a Task represents possible later completion, not a requirement to execute
+  asynchronously. Do not add a synchronous interface now.
+- **Author sequence:** “After this you can focus on System.Concurrency.Tasks before
+  continuing work on SSL and System.Security.Cryptography”.
+- **Assistant action:** migrated byte/text streams, JSON stream overloads, console
+  readers/writers and HTTP uploads to the canonical Task contracts. Removed the
+  interim AsyncInputStream/AsyncOutputStream surface. File/console providers still
+  block inside their host calls. Close and seek remain immediate operations.
+- **Compiler work:** source-owned async-provider/nested Object support on the native
+  line; shared return-expression completion lowering fixed on Raven main and carried
+  separately. No full Raven branch merge.
+- **Outcome:** focused interpreter/JIT/AOT stream tests and deferred JIT HTTP uploads
+  pass on macOS; see [evidence](../runtime/raven/tests/default-stream-validation.json).
+  API references and tested website examples updated. Windows stream qualification,
+  nonblocking file/console integration and the namespace move remain subsequent work.

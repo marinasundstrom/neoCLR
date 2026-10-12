@@ -540,12 +540,12 @@ public class HttpContent : Disposable {
         return Ok(())
     }
 
-    internal func ReadUpload(buffer: byte[], count: int) -> Result<int, HttpError> {
+    internal async func ReadUpload(buffer: byte[], count: int, cancellationToken: CancellationToken) -> Task<Result<int, HttpError>> {
         if let Some(stream) = input {
             if disposed {
                 return Error(HttpError.Content(StreamError.Closed))
             }
-            let result = stream.Read(buffer, 0, count)
+            let result = await stream.Read(buffer, 0, count, cancellationToken)
             if let Error(reason) = result {
                 return Error(HttpError.Content(reason))
             }
@@ -1702,6 +1702,37 @@ internal class HttpExchange {
         }
     }
 
+    private var uploadRead: Option<Task<Result<int, HttpError>>> = None()
+
+    // Outcome observation is part of the existing socket callback adapter: cancellation
+    // must settle the outer operation without accessing a cancelled task's result.
+    private func OnUploadRead() {
+        if let Some(pending) = uploadRead {
+            uploadRead = None()
+            if pending.IsCancelled || token.IsCancellationRequested {
+                Cancel()
+                return
+            }
+            let reading = pending.GetResult()
+            if let Error(reason) = reading {
+                Finish(Error(reason))
+                return
+            }
+            if let Ok(read) = reading {
+                let chunk = ArrayList<byte>()
+                var index = 0
+                while index < read {
+                    chunk.Add(buffer[index])
+                    index += 1
+                }
+                outgoing = chunk
+                sent = 0
+                uploadRemaining -= read
+                SendNext()
+            }
+        }
+    }
+
     private func SendNext() {
         if token.IsCancellationRequested {
             Cancel()
@@ -1714,27 +1745,10 @@ internal class HttpExchange {
                     return
                 }
                 let requested = if uploadRemaining < 256 { uploadRemaining } else { 256 }
-                let reading = request.Content.ReadUpload(buffer, requested)
-                // A synchronous source may request cancellation during Read.
-                if token.IsCancellationRequested {
-                    Cancel()
-                    return
-                }
-                if let Error(reason) = reading {
-                    Finish(Error(reason))
-                    return
-                }
-                if let Ok(read) = reading {
-                    let chunk = ArrayList<byte>()
-                    var index = 0
-                    while index < read {
-                        chunk.Add(buffer[index])
-                        index += 1
-                    }
-                    outgoing = chunk
-                    sent = 0
-                    uploadRemaining -= read
-                }
+                let reading = request.Content.ReadUpload(buffer, requested, token)
+                uploadRead = Some(reading)
+                reading.OnCompleted(self.OnUploadRead)
+                return
             }
             var count = 0
             while count < 256 && sent + count < outgoing.Count {

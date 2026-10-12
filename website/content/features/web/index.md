@@ -509,7 +509,8 @@ native and interpreted execution. The
 [stream suite](https://github.com/marinasundstrom/neoCLR/tree/main/runtime/raven/tests/json-streams)
 also checks partial I/O, borrowed ownership, errors and UTF-8 document quotas.
 Object mapping uses `Deserialize<T>` and `Serialize`. The stream overloads use
-StreamReader/StreamWriter and leave supplied streams open;
+Task-returning StreamReader/StreamWriter operations and leave supplied streams open;
+await those stream overloads before handling their Result.
 the caller controls flushing and closing. The sample also runs through
 [MemoryStream](/docs/api/System/IO/MemoryStream/) using write, rewind and read.
 

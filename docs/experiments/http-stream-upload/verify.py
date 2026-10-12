@@ -15,6 +15,7 @@ for name in ('compiler', 'core', 'seed', 'ownership'):
     parser.add_argument('--' + name, type=Path)
 parser.add_argument('--native-library', type=Path, action='append', default=[])
 parser.add_argument('--runner', type=Path, required=True)
+parser.add_argument('--execution', choices=('jit', 'interpreter'), default='jit', help='Native managed execution mode')
 parser.add_argument('--sdk', type=Path, help='Separate extracted Raven SDK; defaults to TOOLCHAIN_ROOT/raven-sdk')
 cases = ('success', 'borrowed', 'empty', 'eof', 'read-error', 'overread',
          'cancel', 'precancel', 'disposed', 'invalid-header', 'refused')
@@ -37,7 +38,8 @@ with tempfile.TemporaryDirectory(prefix='neoclr-stream-upload-') as folder:
     if native:
         command = ['dotnet', str(args.compiler.resolve()), 'neoclr', '--core-reference', str(args.core.resolve()),
                    '--runtime-seed', str(args.seed.resolve()), '--bootstrap-intrinsics',
-                   '--bootstrap-ownership', str(args.ownership.resolve())]
+                   '--bootstrap-ownership', str(args.ownership.resolve()),
+                   '--object-library', 'System.Runtime', '--async-library', 'System.Runtime']
         for library in args.native_library:
             command += ['--reference', str(library.resolve())]
         command += ['-o', str(root / 'App.dll'), str(root / 'Main.rvn')]
@@ -87,7 +89,15 @@ with tempfile.TemporaryDirectory(prefix='neoclr-stream-upload-') as folder:
                 thread.start()
             command = [str(runner), str(app), str(bundle / 'lib/System.neoil'), '256', '100000000']
             if native:
-                command = [str(runner), 'run', str(app), '--system', str(args.seed.resolve()), '--gc-stats', '--instructions', '100000000']
+                command = [str(runner), 'run', str(app), '--execution', args.execution, '--system', str(args.seed.resolve())]
+                runtime_root = next(path for path in args.native_library if path.name == 'System.Runtime.dll')
+                command += ['--object-root', str(runtime_root.resolve())]
+                if args.execution == 'interpreter':
+                    command += ['--gc-stats', '--instructions', '100000000']
+                else:
+                    suffix = '.dll' if os.name == 'nt' else '.dylib'
+                    command += ['--jit-compiler', str(runner.with_name('neoclr-aot-poc.exe' if os.name == 'nt' else 'neoclr-aot-poc')),
+                                '--jit-host', str(runner.with_name('neoclr-jit-host' + suffix))]
                 for library in args.native_library:
                     command += ['--module', str(library.resolve())]
             command += ['--', f'http://127.0.0.1:{port}/upload', mode]
@@ -98,6 +108,7 @@ with tempfile.TemporaryDirectory(prefix='neoclr-stream-upload-') as folder:
                 assert not thread.is_alive(), f'{mode}: peer did not finish; {result.stdout} {result.stderr}'
             assert result.returncode == 0 and 'Stream upload checks passed' in result.stdout, (
                 mode, result.stdout, result.stderr, errors)
-            assert 'live=0 ' in result.stderr, result.stderr
+            if not native or args.execution == 'interpreter':
+                assert 'live=0 ' in result.stderr, result.stderr
             assert not errors, (mode, errors)
-            print(json.dumps({'case': mode, 'outcome': 'passed', 'statistics': result.stderr.strip()}), flush=True)
+            print(json.dumps({'case': mode, 'execution': args.execution if native else 'legacy', 'outcome': 'passed', 'statistics': result.stderr.strip()}), flush=True)

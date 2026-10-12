@@ -50,6 +50,9 @@ ENCODING_STREAM_NAMES = [
     'Custom encoder final acceptance waits for all trailer bytes to drain',
     'Selected ASCII reader recognizes CRLF and preserves borrowed ownership',
     'Selected readers reject malformed bytes and enforce decoded text limits',
+    'StreamReader waits for pending input before decoding and completing',
+    'StreamWriter waits for pending output before reporting the byte count',
+    'Cancelled input cancels the pending reader operation',
 ]
 
 ENCODING_NAMES = [
@@ -434,7 +437,7 @@ def main():
                 report['phases'].append(dict(suite=name, phase='discovery', elapsedSeconds=round(time.perf_counter() - started, 6), details=json.loads((out / (name + '-discovery') / 'timings.json').read_text())))
                 environment['NeoClrTestRegistry'] = str(registry)
             # Async memory tests need Task/cancellation lifecycle bindings (including TimerCancel).
-            profile = 'http' if name in ('http-text', 'http-lifetime', 'memory-stream') else 'console'
+            profile = 'http' if name in ('http-text', 'http-lifetime', 'memory-stream', 'json-streams', 'encoding-streams', 'encoding-boundaries') else 'console'
             if os.name == 'nt':
                 profile = 'windows-' + profile
             if 'native' in modes:

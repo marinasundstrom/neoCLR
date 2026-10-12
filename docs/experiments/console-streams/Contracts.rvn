@@ -1,4 +1,7 @@
 import System.*
+import System.Tasks.*
+import System.Tasks.TaskOutcome.*
+import System.Concurrency.*
 import System.IO.*
 import System.Collections.*
 import System.Result.*
@@ -11,12 +14,12 @@ func Check(value: bool) {
 }
 
 class ShortOutput : OutputStream {
-    private field bytes: List<byte> = ArrayList<byte>()
-    private field closed: bool = false
+    private var bytes: List<byte> = ArrayList<byte>()
+    private var closed: bool = false
     val Closed: bool => closed
     val Count: int => bytes.Count
     func ByteAt(index: int) -> byte => bytes[index]
-    func Write(buffer: byte[], offset: int, count: int) -> Result<int, StreamError> {
+    private func WriteCore(buffer: byte[], offset: int, count: int) -> Result<int, StreamError> {
         if closed {
             return Error(StreamError.Closed)
         }
@@ -26,26 +29,94 @@ class ShortOutput : OutputStream {
         bytes.Add(buffer[offset])
         return Ok(1)
     }
-    func Flush() -> Result<unit, StreamError> {
+    private func FlushCore() -> Result<unit, StreamError> {
         return Ok(())
     }
     func Close() {
         closed = true
     }
+
+    func Write(buffer: byte[], offset: int, count: int) -> Task<Result<unit, StreamError>> {
+        return Write(buffer, offset, count, CancellationToken.None)
+    }
+    func Write(buffer: byte[], offset: int, count: int, cancellationToken: CancellationToken) -> Task<Result<unit, StreamError>> {
+        if cancellationToken.IsCancellationRequested {
+            let cancelled = Promise<Result<unit, StreamError>>()
+            _ = cancelled.Cancel()
+            return cancelled.Task
+        }
+        return Task.FromResult(WriteAll(buffer, offset, count))
+    }
+    private func WriteAll(buffer: byte[], offset: int, count: int) -> Result<unit, StreamError> {
+        var sent = 0
+        while !(sent >= count) {
+            let amount = WriteCore(buffer, offset + sent, count - sent)?
+            if amount == 0 {
+                return Error(StreamError.IoFailure)
+            }
+            sent += amount
+        }
+        return Ok(())
+    }
+    func Flush() -> Task<Result<unit, StreamError>> {
+        return Flush(CancellationToken.None)
+    }
+    func Flush(cancellationToken: CancellationToken) -> Task<Result<unit, StreamError>> {
+        if cancellationToken.IsCancellationRequested {
+            let cancelled = Promise<Result<unit, StreamError>>()
+            _ = cancelled.Cancel()
+            return cancelled.Task
+        }
+        return Task.FromResult(FlushCore())
+    }
 }
 
 class ZeroOutput : OutputStream {
-    func Write(buffer: byte[], offset: int, count: int) -> Result<int, StreamError> {
+    private func WriteCore(buffer: byte[], offset: int, count: int) -> Result<int, StreamError> {
         return Ok(0)
     }
-    func Flush() -> Result<unit, StreamError> {
+    private func FlushCore() -> Result<unit, StreamError> {
         return Ok(())
     }
     func Close() { }
+
+    func Write(buffer: byte[], offset: int, count: int) -> Task<Result<unit, StreamError>> {
+        return Write(buffer, offset, count, CancellationToken.None)
+    }
+    func Write(buffer: byte[], offset: int, count: int, cancellationToken: CancellationToken) -> Task<Result<unit, StreamError>> {
+        if cancellationToken.IsCancellationRequested {
+            let cancelled = Promise<Result<unit, StreamError>>()
+            _ = cancelled.Cancel()
+            return cancelled.Task
+        }
+        return Task.FromResult(WriteAll(buffer, offset, count))
+    }
+    private func WriteAll(buffer: byte[], offset: int, count: int) -> Result<unit, StreamError> {
+        var sent = 0
+        while !(sent >= count) {
+            let amount = WriteCore(buffer, offset + sent, count - sent)?
+            if amount == 0 {
+                return Error(StreamError.IoFailure)
+            }
+            sent += amount
+        }
+        return Ok(())
+    }
+    func Flush() -> Task<Result<unit, StreamError>> {
+        return Flush(CancellationToken.None)
+    }
+    func Flush(cancellationToken: CancellationToken) -> Task<Result<unit, StreamError>> {
+        if cancellationToken.IsCancellationRequested {
+            let cancelled = Promise<Result<unit, StreamError>>()
+            _ = cancelled.Cancel()
+            return cancelled.Task
+        }
+        return Task.FromResult(FlushCore())
+    }
 }
 
 func ReadExpected(reader: TextReader, bound: int, expected: string) -> Result<unit, TextReadError> {
-    let Some(text) = reader.ReadLine(bound)? else {
+    let Some(text) = CompletedValue(reader.ReadLine(bound))? else {
         System.Fail("Unexpected EOF")
         return Ok(())
     }
@@ -55,13 +126,13 @@ func ReadExpected(reader: TextReader, bound: int, expected: string) -> Result<un
 
 func Main() {
     let stopped = StreamWriter(ZeroOutput())
-    match stopped.Write("x") {
+    match CompletedValue(stopped.Write("x")) {
         Error(let error) => Check((error is System.IO.StreamError.IoFailure))
         Ok(_) => System.Fail("Zero-progress output was accepted")
     }
     let destination = ShortOutput()
     let writer: TextWriter = StreamWriter(destination, true)
-    match writer.WriteLine("å") {
+    match CompletedValue(writer.WriteLine("å")) {
         Ok(let count) => Check(count == 3)
         Error(_) => System.Fail("Short writes were not handled")
     }
@@ -69,7 +140,7 @@ func Main() {
     Check(destination.ByteAt(0) == 195 && destination.ByteAt(1) == 165 && destination.ByteAt(2) == 10)
     writer.Close()
     Check(!destination.Closed)
-    match writer.Write("") {
+    match CompletedValue(writer.Write("")) {
         Error(let error) => Check((error is System.IO.StreamError.Closed))
         Ok(_) => System.Fail("Closed writer accepted text")
     }
@@ -79,45 +150,53 @@ func Main() {
 
     let input = Console.OpenStandardInput()
     let reader: TextReader = StreamReader(input, true)
-    Check(ReadExpected(reader, 2, "å").IsOk)
-    Check(ReadExpected(reader, 0, "").IsOk)
+    Check(ReadExpected(reader, 2, "å") is Ok(_))
+    Check(ReadExpected(reader, 0, "") is Ok(_))
     reader.Close()
     // Closing the reader leaves this stream open, at the next unread byte.
     let next = StreamReader(input)
-    Check(ReadExpected(next, 4, "tail").IsOk)
-    let Ok(end) = next.ReadLine(0) else {
+    Check(ReadExpected(next, 4, "tail") is Ok(_))
+    let Ok(end) = CompletedValue(next.ReadLine(0)) else {
         System.Fail("Could not read EOF")
         return
     }
-    Check(end.IsNone)
+    Check(end is None)
     next.Close()
     let buffer: byte[] = [(byte)0]
-    match input.Read(buffer, 0, 0) {
+    match CompletedValue(input.Read(buffer, 0, 0)) {
         Error(let error) => Check((error is System.IO.StreamError.Closed))
         Ok(_) => System.Fail("Owned input was not closed")
     }
     // Closing a wrapper must not close the process channel.
     let closed = Console.OpenStandardOutput()
     closed.Close()
-    match closed.Write(buffer, 0, 1) {
+    match CompletedValue(closed.Write(buffer, 0, 1)) {
         Error(let error) => Check((error is System.IO.StreamError.Closed))
         Ok(_) => System.Fail("Closed output accepted bytes")
     }
     let output = Console.OpenStandardOutput()
-    match output.Write(buffer, 2, 0) {
+    match CompletedValue(output.Write(buffer, 2, 0)) {
         Error(let error) => Check((error is System.IO.StreamError.InvalidRange))
         Ok(_) => System.Fail("Invalid range accepted")
     }
     let raw: byte[] = [(byte)65, (byte)10]
-    match output.Write(raw, 0, 2) {
-        Ok(let count) => Check(count == 2)
+    match CompletedValue(output.Write(raw, 0, 2)) {
+        Ok(_) => { }
         Error(_) => System.Fail("Byte output failed")
     }
-    let Ok(_) = output.Flush() else {
+    let Ok(_) = CompletedValue(output.Flush()) else {
         System.Fail("Could not flush raw output")
         return
     }
-    Console.Write(42)
+    Check(Console.Write(42).IsCompleted)
     Console.WriteLine()
     Console.WriteLine("Console stream contracts passed")
+}
+
+// This fixture deliberately asserts immediate completion of memory/console providers.
+func CompletedValue<T>(operation: Task<T>) -> T {
+    let Some(Completed(value)) = operation.Outcome else {
+        System.Fail("Expected inline fixture completion")
+    }
+    return value
 }

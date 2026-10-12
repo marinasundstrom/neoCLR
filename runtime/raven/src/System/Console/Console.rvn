@@ -1,6 +1,7 @@
 module System
 
 import System.*
+import System.Tasks.*
 import System.IO.*
 import System.ConsoleReadError
 import System.Result.*
@@ -110,28 +111,29 @@ public static class Console {
     static func OpenStandardOutput() -> OutputStream => ConsoleOutputStream(false)
     static func OpenStandardError() -> OutputStream => ConsoleOutputStream(true)
 
-    static func ReadLine() -> System.Result<System.Option<string>, TextReadError> {
+    static func ReadLine() -> Task<System.Result<System.Option<string>, TextReadError>> {
         return In.ReadLine(65536)
     }
 
-    static func ReadLine(maxUtf8Bytes: int) -> System.Result<System.Option<string>, TextReadError> {
+    static func ReadLine(maxUtf8Bytes: int) -> Task<System.Result<System.Option<string>, TextReadError>> {
         return In.ReadLine(maxUtf8Bytes)
     }
 
-    static func Write(value0: string) {
+    async static func Write(value0: string) -> Task<unit> {
         let writer = Out
-        match writer.Write(value0) {
+        match await writer.Write(value0) {
             Ok(_) => { }
             Error(_) => System.Fail("console output failed")
         }
-        match writer.Flush() {
+        match await writer.Flush() {
             Ok(_) => { }
             Error(_) => System.Fail("console output failed")
         }
+        return ()
     }
 
-    static func Write(value0: int) {
-        Write(RuntimeServices.Int32ToString(value0))
+    static func Write(value0: int) -> Task<unit> {
+        return Write(RuntimeServices.Int32ToString(value0))
     }
 
     static func WriteLine() {

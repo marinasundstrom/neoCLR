@@ -8,13 +8,13 @@ Console is a static class in System. Standard streams use UTF-8.
 
 ## Reading input with Result and Option
 
-ReadLine returns Result<Option&lt;string&gt;, TextReadError>. The question mark propagates a read error to the caller. The Some pattern binds the line; the else branch handles end-of-input and returns. An empty line is a successful value containing an empty string.
+ReadLine returns Task<Result<Option&lt;string&gt;, TextReadError>>. Await the operation before handling its result. The question mark propagates a read error to the caller. The Some pattern binds the line; the else branch handles end-of-input and returns. An empty line is a successful value containing an empty string.
 
 ```raven
 {{CONSOLE_PROPAGATION_SAMPLE}}
 ```
 
-The enclosing Result return type makes propagation explicit. The complete application handles the final error at its entry point. There is no need to match both unions at every call. See [error and optional-result handling in Raven](../outcomes/#handling) for the equivalent if let form and when a match is useful.
+The enclosing Task<Result<…>> return type makes propagation explicit. The complete application handles the final error at its entry point. There is no need to match both unions at every call. See [error and optional-result handling in Raven](../outcomes/#handling) for the equivalent if let form and when a match is useful.
 
 [Download the tested samples](../../samples/console-streams.zip) · [Console API guide](../../docs/console.html)
 
@@ -34,7 +34,7 @@ Write and WriteLine are convenient for ordinary output. Use the text writers whe
 
 The shape is familiar from .NET Console: text properties and standard byte-stream factories. The contracts differ: input uses typed Result and Option values, text is strict UTF-8, and operations have explicit bounds. .NET ReadLine returns null at EOF; this API returns None.
 
-Calls block. ReadLine recognizes LF and CRLF, preserves a lone CR as data, and accepts at most 65,536 UTF-8 bytes per line. The overload accepts a smaller bound. Writers emit LF without a BOM and allow at most 65,536 encoded bytes per call, including a newline. StreamWriter retries partial writes; callers flush explicitly. Encoding selection, console redirection setters and terminal controls are not implemented.
+Stream operations return Tasks; the current console host still performs blocking I/O inline. ReadLine recognizes LF and CRLF, preserves a lone CR as data, and accepts at most 65,536 UTF-8 bytes per line. The overload accepts a smaller bound. Writers emit LF without a BOM and allow at most 65,536 encoded bytes per call, including a newline. StreamWriter awaits complete writes; callers await flushing explicitly. Encoding selection, console redirection setters and terminal controls are not implemented.
 
 Embedding hosts opt into the byte-output hooks. Older hosts, including the current worker and debugger adapters, support legacy WriteLine but return an I/O error for the new output streams. See the [API guide](../../docs/console.html) for ownership and host behavior.
 
@@ -42,7 +42,7 @@ Embedding hosts opt into the byte-output hooks. Older hosts, including the curre
 
 ## Future work
 
-This small synchronous surface supplies a concrete application case for streams and text readers. Suspension, scheduling and asynchronous I/O remain open design work. The current line rules and bounds are provisional; examples and failure cases will guide their evolution.
+The asynchronous stream surface supplies a concrete application case for readers and writers. Nonblocking console host integration remains future work. The current line rules and bounds are provisional; examples and failure cases will guide their evolution.
 
 Reports with input bytes, expected output and the toolchain revision help us evaluate the contract. See [how to contribute](../../#feedback).
 

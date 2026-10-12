@@ -1,6 +1,8 @@
 module System.IO
 
 import System.*
+import System.Concurrency.*
+import System.Tasks.*
 import System.Result.*
 import System.Option.*
 import System.Runtime.CompilerServices.*
@@ -10,7 +12,21 @@ internal class ConsoleInputStream : InputStream {
 
     internal init() { }
 
-    func Read(buffer: byte[], offset: int, count: int) -> Result<int, StreamError> {
+    func Read(buffer: byte[], offset: int, count: int) -> Task<Result<int, StreamError>> {
+        return Read(buffer, offset, count, CancellationToken.None)
+    }
+
+    /// Returns an inline-completed operation over the current blocking provider.
+    func Read(buffer: byte[], offset: int, count: int, cancellationToken: CancellationToken) -> Task<Result<int, StreamError>> {
+        if cancellationToken.IsCancellationRequested {
+            let source = Promise<Result<int, StreamError>>()
+            _ = source.Cancel()
+            return source.Task
+        }
+        return Task.FromResult(ReadCore(buffer, offset, count))
+    }
+
+    private func ReadCore(buffer: byte[], offset: int, count: int) -> Result<int, StreamError> {
         if closed {
             return Error(StreamError.Closed())
         }
@@ -57,7 +73,49 @@ internal class ConsoleOutputStream : OutputStream {
         self.error = error
     }
 
-    func Write(buffer: byte[], offset: int, count: int) -> Result<int, StreamError> {
+    func Write(buffer: byte[], offset: int, count: int) -> Task<Result<unit, StreamError>> {
+        return Write(buffer, offset, count, CancellationToken.None)
+    }
+
+    /// Completes the range inline with the current blocking provider; partial failures are not rolled back.
+    func Write(buffer: byte[], offset: int, count: int, cancellationToken: CancellationToken) -> Task<Result<unit, StreamError>> {
+        if cancellationToken.IsCancellationRequested {
+            let source = Promise<Result<unit, StreamError>>()
+            _ = source.Cancel()
+            return source.Task
+        }
+        return Task.FromResult(WriteAll(buffer, offset, count))
+    }
+
+    private func WriteAll(buffer: byte[], offset: int, count: int) -> Result<unit, StreamError> {
+        // The provider validates the full range even when count is zero.
+        var sent = 0
+        while true {
+            let written = WriteCore(buffer, offset + sent, count - sent)?
+            if !(written >= 0) || written > count - sent {
+                System.Fail("Invalid output count")
+            }
+            sent += written
+            if sent == count { return Ok(()) }
+            if written == 0 { return Error(StreamError.IoFailure) }
+        }
+        return Error(StreamError.IoFailure)
+    }
+
+    func Flush() -> Task<Result<unit, StreamError>> {
+        return Flush(CancellationToken.None)
+    }
+
+    func Flush(cancellationToken: CancellationToken) -> Task<Result<unit, StreamError>> {
+        if cancellationToken.IsCancellationRequested {
+            let source = Promise<Result<unit, StreamError>>()
+            _ = source.Cancel()
+            return source.Task
+        }
+        return Task.FromResult(FlushCore())
+    }
+
+    private func WriteCore(buffer: byte[], offset: int, count: int) -> Result<int, StreamError> {
         if closed {
             return Error(StreamError.Closed())
         }
@@ -75,7 +133,7 @@ internal class ConsoleOutputStream : OutputStream {
         return Ok(RuntimeServices.UnpackValue<int>(payload))
     }
 
-    func Flush() -> Result<unit, StreamError> {
+    private func FlushCore() -> Result<unit, StreamError> {
         if closed {
             return Error(StreamError.Closed())
         }

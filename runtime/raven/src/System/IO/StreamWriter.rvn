@@ -1,6 +1,7 @@
 module System.IO
 
 import System.*
+import System.Tasks.*
 import System.Result.*
 import System.Text.*
 import System.Runtime.CompilerServices.*
@@ -38,7 +39,7 @@ public class StreamWriter : TextWriter {
         self.leaveOpen = leaveOpen
     }
 
-    func Write(text: string) -> Result<int, StreamError> {
+    async func Write(text: string) -> Task<Result<int, StreamError>> {
         if closed {
             return Error(StreamError.Closed)
         }
@@ -53,11 +54,11 @@ public class StreamWriter : TextWriter {
             Error(EncodingError.LimitExceeded) => return Error(StreamError.LimitExceeded)
             Error(_) => return Error(StreamError.InvalidEncoding)
         }
-        return Pump()
+        return await Pump()
     }
 
     // Finalize conversion explicitly; Flush remains an output-stream operation.
-    func Finish() -> Result<int, StreamError> {
+    async func Finish() -> Task<Result<int, StreamError>> {
         if closed {
             return Error(StreamError.Closed)
         }
@@ -73,10 +74,10 @@ public class StreamWriter : TextWriter {
             Error(_) => return Error(StreamError.InvalidEncoding)
         }
         finishing = true
-        return Pump()
+        return await Pump()
     }
 
-    private func Pump() -> Result<int, StreamError> {
+    private async func Pump() -> Task<Result<int, StreamError>> {
         let buffer = CheckedStorage.Reserve<byte>(256)
         var total = 0
         while true {
@@ -94,24 +95,11 @@ public class StreamWriter : TextWriter {
                 failed = true
                 return Error(StreamError.LimitExceeded)
             }
-            var sent = 0
-            while sent < step.BytesWritten {
-                match output.Write(buffer, sent, step.BytesWritten - sent) {
-                    Ok(let count) => {
-                        if !(count >= 0) || count > step.BytesWritten - sent {
-                            System.Fail("Invalid output count")
-                        }
-                        if count == 0 {
-                            failed = true
-                            return Error(StreamError.IoFailure)
-                        }
-                        sent += count
-                        total += count
-                    }
-                    Error(let error) => {
-                        failed = true
-                        return Error(error)
-                    }
+            match await output.Write(buffer, 0, step.BytesWritten) {
+                Ok(_) => total += step.BytesWritten
+                Error(let error) => {
+                    failed = true
+                    return Error(error)
                 }
             }
             match step.State {
@@ -139,7 +127,7 @@ public class StreamWriter : TextWriter {
         return Error(StreamError.IoFailure)
     }
 
-    func WriteLine(text: string) -> Result<int, StreamError> {
+    async func WriteLine(text: string) -> Task<Result<int, StreamError>> {
         if closed {
             return Error(StreamError.Closed())
         }
@@ -149,14 +137,14 @@ public class StreamWriter : TextWriter {
         if text.GetUtf8ByteCount() >= 65536 {
             return Error(StreamError.LimitExceeded())
         }
-        return self.Write(text + "\n")
+        return await self.Write(text + "\n")
     }
 
-    func Flush() -> Result<unit, StreamError> {
+    async func Flush() -> Task<Result<unit, StreamError>> {
         if closed {
             return Error(StreamError.Closed())
         }
-        return output.Flush()
+        return await output.Flush()
     }
 
     // Finish conversion and Flush explicitly to observe errors before Close.
