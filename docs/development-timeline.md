@@ -16072,3 +16072,27 @@ or runtime-await default switch was performed.
   The API snapshot remains stale due to concurrent HTTP/TLS work. No runtime dispatch,
   new MethodImpl option support or Runtime Contract setting changed. See
   [evidence](experiments/foreign-interop/README.md#internal-call-identity-follow-through-2026-10-12).
+
+## 2026-10-12 — Usable FFI and function-pointer mapping
+
+- **Author:** asks what is next for a usable FFI, then adds “Supporting mapping
+  function pointers”.
+- **Assistant proposal:** prioritize a typed native-address callable that carries
+  the existing ABI and marshalling descriptor, with explicit library/owner lifetime.
+  First prove a native factory returning a function pointer, signature binding and
+  invocation. A raw address cannot reveal or validate its actual native signature.
+- **Separate direction:** managed-to-native callbacks require entry stubs, managed
+  rooting, thread entry, fault containment and explicit release after unregistration
+  and completion of in-flight calls. Start with static scalar/pointer callbacks before
+  closures or retained asynchronous callbacks. This remains proposed, not implemented.
+- **Broader sequence:** qualify named/address calls across interpreter and JIT/AOT;
+  then bounded buffers/ref/out, owned handles, native error capture and record layout.
+  Use real consumers alongside purpose-built ABI fixtures. A direct zlib compression
+  binding is a candidate for buffer/length validation, not a chosen replacement for
+  the existing compression stack.
+- **Research:** [.NET GetDelegateForFunctionPointer](https://learn.microsoft.com/en-us/dotnet/api/system.runtime.interopservices.marshal.getdelegateforfunctionpointer),
+  [GetFunctionPointerForDelegate](https://learn.microsoft.com/en-us/dotnet/api/system.runtime.interopservices.marshal.getfunctionpointerfordelegate)
+  and [UnmanagedCallersOnly](https://learn.microsoft.com/en-us/dotnet/api/system.runtime.interopservices.unmanagedcallersonlyattribute)
+  distinguish both directions and callback rooting. An explicit owning registration
+  could reduce accidental collection but still requires a native unregistration
+  protocol; its exact API and backend feasibility remain open.

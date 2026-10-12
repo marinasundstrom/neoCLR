@@ -8,6 +8,10 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-12
 
+- Record function-pointer mapping as the next proposed FFI slice, distinguishing
+  native-address invocation from managed callbacks and their lifetime obligations.
+  No pointer-call or callback implementation is claimed.
+
 - Expose recorded implementation flags through metadata MethodInfo's .NET-style
   GetMethodImplementationFlags API. Preserve extern identity for imported runtime
   internal calls as well as foreign imports; keep native descriptors and runtime
