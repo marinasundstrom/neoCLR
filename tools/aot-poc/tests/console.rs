@@ -6348,7 +6348,7 @@ int main(int argc, char **argv) {
     let app=neoclr::assembler::read_modules(&[neoclr::assembler::ModuleInput::Source(source)], &seed).unwrap().remove(0);
     let program=neoclr::LoadedProgram::with_library(&app,&seed).unwrap();
     let method=program.resolve_function(&neoclr::assembler::parse_function_ref("Calculate(Int32)").unwrap()).unwrap();
-    for mode in 0..3 {
+    for mode in 0..6 {
         let reference=method.invoke(vec![neoclr::Value::Int32(mode)],neoclr::Limits::default());
         let r=Command::new(dir.0.join("app")).arg(mode.to_string()).env_clear().output().unwrap();
         match reference {

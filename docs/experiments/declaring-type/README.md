@@ -30,3 +30,7 @@ dispatch mismatch in both [JIT](discovery-jit.json) and [AOT](discovery-aot.json
 These are retained failures, not passing discovery claims. Module-function retention,
 ownerless attribute queries and registration remain tracked in
 [issue #27](https://github.com/marinasundstrom/neoCLR/issues/27).
+
+Follow-up: [interface-to-Object dispatch now passes](../guest-functions/interface-object-dispatch/README.md).
+The reports above preserve the earlier failure; current discovery starts under JIT
+and faults on missing module-catalog retention.

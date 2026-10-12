@@ -2,6 +2,8 @@
 use super::{Error, checked_arithmetic, flow, return_if_detailed};
 #[path = "value_profile.rs"]
 mod profile;
+#[path = "object_upcasts.rs"]
+mod object_upcasts;
 #[path = "gc_layout.rs"]
 mod gc_layout;
 #[path = "gc_points.rs"]
@@ -315,7 +317,7 @@ pub(crate) fn compile_into(
         || matches!(ty, Ty::Interface(i) if string_interfaces.is_some_and(|indices| indices.contains(i)));
     // The backend's narrow shape analysis is additional admission, not a replacement
     // for type/member identity, accessibility, initialization or byref lifetime checks.
-    neoclr::LoadedProgram::new(input).and_then(|v| v.verify()).map_err(|e| e.to_string())?;
+    object_upcasts::verify(&p, &flows)?;
     // Immutable length-prefixed UTF-8. Strings originate from these image literals
     // or explicit, bounded invocation-arena producers. When identity is observable,
     // literal evaluations receive fresh arena storage; image data remains a template.

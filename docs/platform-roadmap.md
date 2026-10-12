@@ -399,9 +399,10 @@ This follow-up does not change the active milestone priority. The
 passes explicit interpreter discovery and identifies `TypeDeclaringType` as the
 first shared JIT/AOT prerequisite, before module-function enumeration.
 [Retained declaring-type queries now pass](experiments/declaring-type/README.md)
-a focused interpreter/JIT/AOT consumer on macOS ARM64. The full discovery consumer
-now fails on interface-to-object Equals dispatch in JIT and AOT; native enumeration
-is not yet qualified. The guest-function
+a focused interpreter/JIT/AOT consumer on macOS ARM64. The subsequent [interface-to-object dispatch fix](experiments/guest-functions/interface-object-dispatch/README.md)
+passes seven native Object regressions. Full discovery now compiles to an AOT object
+and starts under JIT, then faults on missing assembly module-catalog retention.
+Native enumeration is not yet qualified. The guest-function
 Windows run at 5e4cbd84 exposed an AOT shared-provider binding regression in nominal
 attribute inspection; [the fix passes locally](experiments/native-attributes/shared-provider-validation.json)
 with rebuilt libraries. Windows requalification remains pending.

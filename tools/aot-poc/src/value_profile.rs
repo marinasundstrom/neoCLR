@@ -551,6 +551,10 @@ impl<'a> Profile<'a> {
     }
     fn reference_assignable(&self, actual: &Ty, expected: &Ty) -> bool {
         match (actual, expected) {
+            // Interface views retain the original object reference. Every managed
+            // interface reference is assignable to the verified Object base, but
+            // not to arbitrary concrete classes without an explicit cast.
+            (Ty::Interface(_), Ty::Reference(expected)) if self.object_base == Some(*expected) => true,
             (Ty::ByteArray | Ty::ReferenceArray(_) | Ty::ScalarArray(_) | Ty::StringArray | Ty::CharacterArray, Ty::Reference(i)) if self.backing_for_array(actual) == Some(*i) => true,
             (Ty::ByteArray | Ty::ReferenceArray(_) | Ty::ScalarArray(_) | Ty::StringArray | Ty::CharacterArray, _) if self.backing_for_array(actual).is_some() => self.reference_assignable(&Ty::Reference(self.backing_for_array(actual).unwrap()), expected),
             (Ty::Reference(actual) | Ty::Interface(actual), Ty::Interface(expected)) =>
@@ -1313,5 +1317,23 @@ impl<'a> Profile<'a> {
         }
         self.verify_outputs(i, &stacks)?;
         Ok(stacks)
+    }
+}
+
+#[cfg(test)]
+mod object_assignment_tests {
+    use super::*;
+
+    #[test]
+    fn interface_upcast_requires_the_explicit_object_base() {
+        let input = neoclr::assemble(".module Upcasts\n.type class abstract Root\n.end\n.interface View\n.end\n.type class Other\n.end\n").unwrap();
+        let index = |name: &str| input.types.iter().position(|t| t.name == name).unwrap();
+        let root = index("Root");
+        let view = Ty::Interface(index("View"));
+        let make = |object_base| Profile::new(&input, true, object_base, None, &[], None, None, None, false).unwrap();
+        let profile = make(Some(root));
+        assert!(profile.reference_assignable(&view, &Ty::Reference(root)));
+        assert!(!profile.reference_assignable(&view, &Ty::Reference(index("Other"))));
+        assert!(!make(None).reference_assignable(&view, &Ty::Reference(root)));
     }
 }

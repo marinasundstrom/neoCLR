@@ -8,6 +8,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-12
 
+- Restore native interface-to-Object upcasts for method dispatch and ordinary
+  local/argument stores and returns, preserving identity, overrides and null faults
+  without adding executable casts. Seven native Object regressions and an exact
+  Object-base guard pass. Full discovery now compiles to AOT and starts under JIT;
+  missing module-catalog retention remains the next execution blocker.
+
 - Bind retained declaring-type metadata in the native backend using interpreter
   identity rules. Qualify nested and top-level Raven queries in interpreter, JIT
   and AOT on macOS ARM64, including explicit missing-retention faults. Full module

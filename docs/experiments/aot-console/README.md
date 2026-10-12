@@ -2072,6 +2072,13 @@ with the interpreter. See [bridge details](../../raven-cli-bridge.md#object-valu
 for remaining limits and [runtime tests](../../../runtime/raven/tests/README.md) for
 Path/IPAddress qualification. Windows execution remains pending.
 
+The [2026-10-12 interface-reference follow-up](../guest-functions/interface-object-dispatch/README.md)
+restores Object upcasts for interface-valued receivers and arguments, preserving
+identity, override dispatch and null faults. The private verification projection
+also covers local/argument stores and returns; emitted code is unchanged. Seven
+focused native Object tests pass. Full module-function discovery now compiles but
+still needs explicit catalog/function retention before it can run successfully.
+
 
 ### Grapheme slicing (development, 2026-10-11)
 

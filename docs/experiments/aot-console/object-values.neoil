@@ -1,10 +1,14 @@
 .module ObjectValues
+.interface View
+.end
 .type class Plain
+.implements View
 .method instance .ctor() -> noresult
 ret
 .end
 .end
 .type class Overridden
+.implements View
 .method instance .ctor() -> noresult
 ret
 .end
@@ -17,12 +21,33 @@ ldc.i4 42
 ret
 .end
 .end
+.function AsObject(View value) -> System.Object
+.local System.Object result
+ldarg value
+stloc result
+ldloc result
+ret
+.end
 .function Calculate(Int32 mode) -> Int32
 .local System.Object first
 .local System.Object second
 .local System.Object absent
+.local View view
+.local View otherView
 ldloca absent
 initobj System.Object
+ldarg mode
+ldc.i4 3
+ceq
+brtrue InterfaceIdentity
+ldarg mode
+ldc.i4 4
+ceq
+brtrue InterfaceOverride
+ldarg mode
+ldc.i4 5
+ceq
+brtrue InterfaceNull
 ldarg mode
 ldc.i4 1
 ceq
@@ -72,6 +97,48 @@ ceq
 brfalse Fail
 ldc.i4 1
 ret
+InterfaceIdentity:
+newobj.ctor instance Plain::.ctor()
+stloc view
+newobj.ctor instance Plain::.ctor()
+stloc otherView
+ldloc view
+ldloc view
+callvirt instance System.Object::Equals(System.Object)
+brfalse Fail
+ldloc view
+ldloc otherView
+callvirt instance System.Object::Equals(System.Object)
+brtrue Fail
+ldloc view
+call AsObject(View)
+ldloc view
+callvirt instance System.Object::Equals(System.Object)
+brfalse Fail
+ldc.i4 1
+ret
+InterfaceOverride:
+newobj.ctor instance Overridden::.ctor()
+stloc view
+ldloc view
+ldloc absent
+callvirt instance System.Object::Equals(System.Object)
+brfalse Fail
+ldloc view
+callvirt instance System.Object::GetHashCode()
+ldc.i4 42
+ceq
+brfalse Fail
+ldc.i4 1
+ret
+InterfaceNull:
+ldloca view
+initobj View
+ldloc view
+ldloc absent
+callvirt instance System.Object::Equals(System.Object)
+pop
+br Fail
 Null:
 ldloc absent
 ldloc absent
