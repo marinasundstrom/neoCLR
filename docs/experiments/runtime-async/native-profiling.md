@@ -188,3 +188,48 @@ cleanup, cancellation, HTTP client/server and lifecycle checks with the new coll
 An initial replay selected an older interpreter without managed-body support; the
 recorded successful run uses the qualified owned-runtime recipe. These are behavior
 checks, not HTTP throughput measurements or refreshed Windows qualification.
+
+## Payload and pause measurements — 2026-10-12
+
+The [instrumented report](gc-pause-profile.json) adds requested allocation bytes,
+post-collection live payload/block gauges, peak arena usage and a bounded 64-bucket
+logarithmic histogram of timed collection attempts. All updates compile out without
+`NEOCLR_GC_PROFILE`. The private C diagnostic struct changed: rebuild matching hosts
+and collector objects together. No managed public API or collector policy changes.
+
+The pending-100 runtime lowering runs 200 invocations and excludes the first from
+summaries. Across 199 retained invocations, 5,306,136 collection attempts yield p50
+at most 1,023 ns and p95/p99 at most 2,047 ns. These are histogram upper bounds,
+weighted by individual attempts. Zero/sub-resolution timings occupy bucket zero.
+The maximum timed attempt is 40.805 ms; sampling, scheduling and instrumentation
+can contribute to this tail, so it is not an isolated collector latency measurement.
+
+Median allocated payload per invocation is 194,373 bytes; observed peak live payload
+**after collection** is 1,785 bytes and peak arena usage is 4,024 bytes. Payload
+excludes headers, padding and free spans. Gauges describe the last successful
+collection; peaks are maxima across contexts on one thread, not simultaneous totals.
+Private harness resets happen between invocations and never alter heap state.
+
+Median instrumented invocation time is 42.122 ms, about 63.1% in collection, with
+26,664 attempts for 6,617 allocations and 802 resumes. This motivates investigating
+pacing for small live heaps; it establishes no new speedup or production pause SLA.
+All invocations balance allocation/reclamation and release native stacks.
+
+[Sanitized validation](gc-pause-validation.json) covers enabled/disabled accounting,
+reset without heap mutation, failed collection, rooted payload survival and release,
+plus existing precise roots and 320 owned native suspensions. Three Python summary
+tests cover weighted quantiles, bucket boundaries and rejection of inconsistent or
+unreclaimed samples. Reproduce with:
+
+```sh
+python3 -m unittest discover -s docs/experiments/runtime-async -p test_profile_summary.py
+python3 docs/experiments/runtime-async/validate_conditional_roots.py \
+  --recipe docs/experiments/runtime-async/collector-walk-generators.json \
+  --output target/gc-pause-validation --owned-bodies
+python3 docs/experiments/runtime-async/profile_native.py \
+  --benchmark target/collector-walk-benchmark/results.json \
+  --case pending-100 --lowering runtime --output target/gc-pause-profile
+```
+
+Raw local outputs are identified by hashes in the report. These measurements remain
+part of the build-and-sample harness, not a runtime attach protocol.

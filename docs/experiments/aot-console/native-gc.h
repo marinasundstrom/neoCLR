@@ -11,10 +11,20 @@ typedef struct {
 /* Opt-in collector diagnostics. Timers are compiled out unless NEOCLR_GC_PROFILE
  * is defined; separate from the experimental heap/context layout. Cumulative,
  * thread-local and inclusive of validation/mark/sweep, including failed attempts. */
+#define NEOCLR_GC_PAUSE_BUCKETS 64
+/* Bucket i covers [2^i, 2^(i+1)-1] ns; bucket 0 also includes zero.
+ * Live bytes count requested payload, excluding headers/padding/free spans.
+ * Peaks are across contexts on this thread since reset, not summed heaps. */
 typedef struct {
     uint64_t attempts, nanoseconds, maximum_nanoseconds;
+    uint64_t failures, allocated_bytes, peak_arena_used;
+    uint64_t live_bytes, live_blocks, peak_live_bytes;
+    uint64_t pause_buckets[NEOCLR_GC_PAUSE_BUCKETS];
 } neoclr_gc_profile;
 neoclr_gc_profile neoclr_gc_profile_v1(void);
+/* Reset diagnostics only, between operations; never changes heap/GC state.
+ * Disabled builds return zero diagnostics and reset is a no-op. */
+void neoclr_gc_profile_reset_v1(void);
 /* Explicit managed collection uses the current published root chain. */
 int32_t neoclr_gc_collect_managed_v1(neoclr_aot_context *, void *output);
 /* Private current logical-stack capture; names are immutable current-image text.

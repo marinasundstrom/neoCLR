@@ -13,6 +13,7 @@ import re
 import shlex
 import statistics
 import subprocess
+from profile_summary import pause_summary
 
 p = argparse.ArgumentParser(description=__doc__)
 p.add_argument('--benchmark', type=Path, required=True)
@@ -62,6 +63,8 @@ for directory in (Path(__file__).resolve().parent, Path(__file__).resolve().pare
     for header in directory.glob('*.h'):
         inputs[str(header)] = sha(header)
 inputs[str(Path(__file__).resolve())] = sha(__file__)
+summary_source = Path(__file__).with_name('profile_summary.py').resolve()
+inputs[str(summary_source)] = sha(summary_source)
 inputs[str(a.benchmark.resolve())] = sha(a.benchmark)
 report = dict(passed=False, command=command, inputsSha256=inputs,
               platform=platform.platform(), case=a.case, lowering=a.lowering,
@@ -144,7 +147,12 @@ try:
         medianGcAttempts=statistics.median(s['gcAttempts'] for s in retained),
         medianAllocatedBlocks=statistics.median(s['allocatedBlocks'] for s in retained),
         medianResumes=statistics.median(s['resumes'] for s in retained),
-        annotatedGuestSymbols=len(hits))
+        annotatedGuestSymbols=len(hits),
+        gcPauses=pause_summary(retained),
+        medianAllocatedPayloadBytes=statistics.median(s['allocatedPayloadBytes'] for s in retained),
+        medianPeakLivePayloadBytesAfterCollection=statistics.median(s['peakLivePayloadBytesAfterCollection'] for s in retained),
+        maximumPeakLivePayloadBytesAfterCollection=max(s['peakLivePayloadBytesAfterCollection'] for s in retained),
+        maximumArenaUsedBytes=max(s['peakArenaUsedBytes'] for s in retained))
     if sha(obj) != mapping['objectSha256'] or sha(selection_path) != mapping['selectionSha256']:
         raise RuntimeError('guest object or symbol selection changed while profiling')
     report['outputSha256'] = {name: sha(out / name) for name in

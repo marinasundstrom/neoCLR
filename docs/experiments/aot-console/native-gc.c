@@ -7,6 +7,11 @@
 #endif
 static _Thread_local neoclr_gc_profile profile;
 neoclr_gc_profile neoclr_gc_profile_v1(void) { return profile; }
+void neoclr_gc_profile_reset_v1(void) {
+#ifdef NEOCLR_GC_PROFILE
+    profile = (neoclr_gc_profile){0};
+#endif
+}
 /* Allocation descriptors live in the same bounded buffer as payloads. Free
  * blocks coalesce; payload addresses never move. Object words are conservative
  * candidates; text/byte payloads are atomic, String arrays have explicit slots. */
@@ -204,6 +209,10 @@ int32_t neoclr_gc_allocate_v1(neoclr_aot_text_arena *a, uint64_t bytes,
     memset(chosen + 1, 0, (size_t)(chosen->span - sizeof(block)));
     *output = chosen + 1;
     statistics.allocations++;
+#ifdef NEOCLR_GC_PROFILE
+    profile.allocated_bytes += bytes;
+    if (a->used > profile.peak_arena_used) profile.peak_arena_used = a->used;
+#endif
     return 0;
 }
 /* Sparse byte-range index rebuilt from validated spans for each collection.
@@ -400,6 +409,9 @@ static int32_t collect_conditional(neoclr_aot_context *context,
         if (!conditional[i].retained)
             conditional[i].owner = conditional[i].value = NULL;
     }
+#ifdef NEOCLR_GC_PROFILE
+    uint64_t live_bytes = 0, live_blocks = 0;
+#endif
     for (uint64_t at = 0; at < a->used;) {
         block *b = (void *)(a->data + at);
         if (b->state && !(b->state & MARKED)) {
@@ -408,6 +420,9 @@ static int32_t collect_conditional(neoclr_aot_context *context,
             memset(b + 1, 0xdd, (size_t)(b->span - sizeof(block)));
             b->state = 0; b->bytes = 0; b->kind = 0;
         } else b->state &= ALLOCATED;
+#ifdef NEOCLR_GC_PROFILE
+        if (b->state) { live_bytes += b->bytes; live_blocks++; }
+#endif
         at += b->span;
     }
     for (uint64_t at = 0; at < a->used;) {
@@ -423,6 +438,10 @@ static int32_t collect_conditional(neoclr_aot_context *context,
         at += b->span;
     }
     statistics.collections++;
+#ifdef NEOCLR_GC_PROFILE
+    profile.live_bytes = live_bytes; profile.live_blocks = live_blocks;
+    if (live_bytes > profile.peak_live_bytes) profile.peak_live_bytes = live_bytes;
+#endif
     return 0;
 invalid_descriptor:
     /* Do not leave private queue links in public quiescent heap state on failure.
@@ -443,7 +462,11 @@ int32_t neoclr_gc_collect_conditional_v1(neoclr_aot_context *context,
     if (clock_gettime(CLOCK_MONOTONIC, &after)) abort();
     uint64_t ns = (uint64_t)((int64_t)(after.tv_sec - before.tv_sec) * INT64_C(1000000000)
                            + after.tv_nsec - before.tv_nsec);
+    unsigned bucket = 0;
+    for (uint64_t remaining = ns; remaining > 1; remaining >>= 1) bucket++;
+    profile.pause_buckets[bucket]++;
     profile.attempts++;
+    profile.failures += status != 0;
     profile.nanoseconds += ns;
     if (ns > profile.maximum_nanoseconds) profile.maximum_nanoseconds = ns;
 #endif

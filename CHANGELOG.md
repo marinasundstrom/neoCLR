@@ -8,6 +8,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-12
 
+- Add opt-in native GC allocation/live-payload gauges and bounded pause histograms,
+  with reset and failure accounting. Validate enabled/disabled instrumentation and
+  owned suspension under sanitizers; retain a 200-invocation diagnostic profile.
+  Histogram quantiles are bounds, not exact pauses; collector policy is unchanged.
+
 - Expose explicit JIT retention policies through `neoclr run --reflection-roots`.
   Preserve path/guest-argument boundaries and backend diagnostics; reject missing,
   duplicate and interpreter-mode options. The real module-function discovery and
