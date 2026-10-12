@@ -35,6 +35,7 @@ pub(super) fn native_body(p: &Profile<'_>, i: usize, details: Option<&crate::fau
                 &d.socket_send,
                 &d.socket_transfer_result,
                 &d.scheduler_submit,
+                &d.task_schedule,
                 &d.scheduler_register,
                 &d.scheduler_activate,
                 &d.scheduler_cancel,

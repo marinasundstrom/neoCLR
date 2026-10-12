@@ -598,6 +598,13 @@ int32_t neoclr_scheduler_submit_managed_v1(void *callback, neoclr_aot_context *c
     return status;
 }
 
+// Task.Run has a unit result; never write an Int32 into its result storage.
+int32_t neoclr_schedule_task_managed_v1(void *callback, neoclr_aot_context *context, void *output) {
+    (void)output;
+    int32_t admitted = -1;
+    return neoclr_scheduler_submit_managed_v1(callback, context, &admitted);
+}
+
 int32_t neoclr_scheduler_acquire_v1(neoclr_aot_context *context, uint64_t *delivery,
     const neoclr_probe_frame *boundary) {
     if (!delivery) return -3;

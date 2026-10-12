@@ -8,6 +8,23 @@ owns its selected sharing/progress contract, .NET comparison and future green-th
 direction. [Runtime tracking](../../tracking/runtime-language.md#author-selected-taskrun-work--2026-09-27)
 owns implementation status.
 
+## Native scheduler binding — 2026-10-12
+
+The native backend now binds the reserved ScheduleTask service used by Task.Run
+through the existing one-shot scheduler submission path. It accepts the two existing
+unit callback encodings (`fn<Void>` and `fn<noresult Void>`), matching interpreter
+admission; unrelated signatures, result types and managed bodies remain rejected.
+A unit-result shim avoids writing the scheduler's Int32 admission value into unit
+result storage. GC root publication, host-root transfer, cancellation/teardown and
+callback dispatch reuse the scheduler implementation. This restores the intended
+managed API; it does not add thread-pool parallelism or new public APIs.
+
+The exact-signature regression passes, and the [native contract report](native-submission-validation.json)
+passes all six socket/timer/scheduler cases with undefined-behavior and bounds
+sanitizers on macOS. The scheduler case now submits through the unit shim and
+checks its existing rooted delivery lifecycle. Windows and extracted Task.Run
+consumer qualification remain separate gates at this checkpoint.
+
 ## Implemented boundary
 
 Managed storage changes from Rc/RefCell to Arc and a mutex per slot. Cloning a

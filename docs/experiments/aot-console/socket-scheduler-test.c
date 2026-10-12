@@ -105,7 +105,8 @@ static int submitted_work_contract(void) {
     CHECK(neoclr_scheduler_submit_managed_v1(callback, &c, &admitted) == 3 && admitted == 99);
     neoclr_probe_enter_v3(&entry, &c, 7, &empty, 0, "", 0);
     CHECK(neoclr_scheduler_submit_managed_v1(callback, &c, NULL) == 3);
-    CHECK(!neoclr_scheduler_submit_managed_v1(callback, &c, &admitted) && admitted == 0);
+    CHECK(!neoclr_schedule_task_managed_v1(callback, &c, NULL));
+    CHECK(admitted == 99);
     CHECK(neoclr_scheduler_submit_v1(&c, original, NULL) == 3);
     neoclr_probe_enter_v3(&child, &c, 8, &empty, 0, "", 0);
     CHECK(neoclr_scheduler_submit_v1(&c, original, &entry) == 3);

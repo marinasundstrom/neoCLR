@@ -47,6 +47,7 @@ pub struct Options {
     pub socket_receive: Vec<usize>,
     pub socket_send: Vec<usize>,
     pub scheduler_submit: Vec<usize>,
+    pub task_schedule: Vec<usize>,
     pub scheduler_register: Vec<usize>,
     pub scheduler_activate: Vec<usize>,
     pub scheduler_cancel: Vec<usize>,
@@ -251,6 +252,9 @@ impl Options {
                 .filter_map(|r| r["compiledIndex"].as_u64().map(|i| i as usize)).collect(),
             scheduler_submit_to: report.and_then(|r| r["nativeBindings"].as_array()).into_iter().flatten()
                 .filter(|r| r["implementation"] == "scheduler-submit-to-v1")
+                .filter_map(|r| r["compiledIndex"].as_u64().map(|i| i as usize)).collect(),
+            task_schedule: report.and_then(|r| r["nativeBindings"].as_array()).into_iter().flatten()
+                .filter(|r| r["implementation"] == "task-schedule-v1")
                 .filter_map(|r| r["compiledIndex"].as_u64().map(|i| i as usize)).collect(),
             scheduler_submit: report.and_then(|r| r["nativeBindings"].as_array()).into_iter().flatten()
                 .filter(|r| r["implementation"] == "scheduler-submit-v1")

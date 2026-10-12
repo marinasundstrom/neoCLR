@@ -443,6 +443,7 @@ pub(crate) fn compile_into(
             (&d.scheduler_cancel, "neoclr_scheduler_cancel_managed_v1", vec![types::I64, types::I64, types::I64]),
             (&d.scheduler_capture, "neoclr_scheduler_capture_managed_v1", vec![types::I64, types::I64]),
             (&d.scheduler_submit_to, "neoclr_scheduler_submit_to_managed_v1", vec![types::I64, types::I64, types::I64, types::I64]),
+            (&d.task_schedule, "neoclr_schedule_task_managed_v1", vec![types::I64, types::I64, types::I64]),
             (&d.scheduler_submit, "neoclr_scheduler_submit_managed_v1", vec![types::I64, types::I64, types::I64]),
             (&d.stack_trace_capture, "neoclr_stack_trace_capture_v1", vec![types::I32, types::I64, types::I64, types::I64, types::I32]),
             (&d.gc_collect, "neoclr_gc_collect_managed_v1", vec![types::I64, types::I64]),

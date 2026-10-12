@@ -116,6 +116,7 @@ int32_t neoclr_scheduler_step_v1(neoclr_aot_context *, uint64_t *, const neoclr_
 int32_t neoclr_scheduler_submit_v1(neoclr_aot_context *, uint64_t, const neoclr_probe_frame *);
 /* Private compiled managed-call adapter; output is the private admission acknowledgment (Int32 zero).
  * Called on a published frame, converts a managed callable to an admission root. */
+int32_t neoclr_schedule_task_managed_v1(void *, neoclr_aot_context *, void *);
 int32_t neoclr_scheduler_submit_managed_v1(void *, neoclr_aot_context *, int32_t *);
 /* Opt-in owned delivery. Acquire returns the same states as step, but READY
  * publishes an owned root/ticket. Runnable roots transfer directly; I/O results

@@ -8,6 +8,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-12
 
+- Bind native Task.Run submission to the existing scheduler, retaining both unit
+  callback encodings and rooted one-shot ownership. Use a unit-result shim to avoid
+  writing scalar admission data into unit storage. Exact-signature regression and
+  six sanitized native socket/scheduler contracts pass locally; extracted consumer
+  and Windows qualification remain separate gates.
+
 - Review PostgreSQL implementation placement: the current optional provider is
   managed Raven over shared sockets, with no database-specific native service.
   Recommend retaining it for the preview; document an optional future libpq FFI

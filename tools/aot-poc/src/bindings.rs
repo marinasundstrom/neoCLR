@@ -653,13 +653,14 @@ pub fn scheduler(input: &mut neoclr::Module, selection: &Value) -> Result<Vec<Va
 fn completion_services(input: &mut neoclr::Module, selection: &Value, submission: bool) -> Result<Vec<Value>, Error> {
     let mut bindings = vec![];
     for row in selection["functions"].as_array().ok_or("missing selection inventory")? {
-        if row["name"].as_str().is_some_and(|name| name.starts_with("neoCLR.Runtime.Scheduler")) != submission { continue; }
+        if row["name"].as_str().is_some_and(|name| name.starts_with("neoCLR.Runtime.Scheduler") || name == "neoCLR.Runtime.ScheduleTask") != submission { continue; }
         let (parameters, result, implementation, symbol) = match row["name"].as_str() {
             Some("neoCLR.Runtime.SchedulerRegister") => (vec![Type::Int64, neoclr::assembler::parse_type("fn<Void>").expect("fixed scheduler callback signature")], Type::Int64, "scheduler-register-v1", "neoclr_scheduler_register_managed_v1"),
             Some("neoCLR.Runtime.SchedulerActivate") => (vec![Type::Int64], Type::Boolean, "scheduler-activate-v1", "neoclr_scheduler_activate_managed_v1"),
             Some("neoCLR.Runtime.SchedulerCancel") => (vec![Type::Int64], Type::Boolean, "scheduler-cancel-v1", "neoclr_scheduler_cancel_managed_v1"),
             Some("neoCLR.Runtime.SchedulerCapture") => (vec![], Type::Int64, "scheduler-capture-v1", "neoclr_scheduler_capture_managed_v1"),
             Some("neoCLR.Runtime.SchedulerSubmitTo") => (vec![Type::Int64, neoclr::assembler::parse_type("fn<Void>").expect("fixed scheduler callback signature")], Type::Int32, "scheduler-submit-to-v1", "neoclr_scheduler_submit_to_managed_v1"),
+            Some("neoCLR.Runtime.ScheduleTask") => (vec![neoclr::assembler::parse_type("fn<Void>").expect("fixed task callback signature")], Type::Void, "task-schedule-v1", "neoclr_schedule_task_managed_v1"),
             Some("neoCLR.Runtime.SchedulerSubmit") => (vec![neoclr::assembler::parse_type("fn<Void>").expect("fixed scheduler callback signature")], Type::Int32, "scheduler-submit-v1", "neoclr_scheduler_submit_managed_v1"),
             Some("neoCLR.Runtime.TimerStart") => (vec![Type::Int32, neoclr::assembler::parse_type("fn<Void>").expect("fixed timer callback signature")], Type::Int64, "timer-start-v1", "neoclr_timer_start_v1"),
             Some("neoCLR.Runtime.TimerCancel") => (vec![Type::Int64], Type::Boolean, "timer-cancel-v1", "neoclr_timer_cancel_v1"),
@@ -668,7 +669,9 @@ fn completion_services(input: &mut neoclr::Module, selection: &Value, submission
         let f = &mut input.functions[row["compiledIndex"].as_u64().ok_or("missing compiled index")? as usize];
         if f.name != row["name"].as_str().unwrap()
             || f.owner.is_some() || f.instance || f.receiver_byref || f.receiver_readonly
-            || f.parameters != parameters || f.returns != result || f.no_result
+            || (f.parameters != parameters && !(implementation == "task-schedule-v1"
+                && f.parameters == vec![neoclr::assembler::parse_type("fn<noresult Void>").expect("fixed no-result task callback signature")]))
+            || f.returns != result || f.no_result
             || f.impl_flags != 0x1000 || f.pinvoke.is_some() || !f.body.is_empty()
             || !f.locals.is_empty() || f.is_virtual || f.is_override || f.is_abstract
             || !f.generic_parameters.is_empty() || !f.generic_arguments.is_empty()
@@ -676,7 +679,8 @@ fn completion_services(input: &mut neoclr::Module, selection: &Value, submission
             || !f.out_parameters.is_empty() || !f.out_when_true.is_empty() || !f.readonly_parameters.is_empty()
         { return Err("native completion binding requires exact reserved TimerStart/TimerCancel/SchedulerSubmit InternalCall contract".into()); }
         f.impl_flags = 0;
-        f.body = if result == Type::Boolean { vec![Op::Bool(false), Op::Return] }
+        f.body = if result == Type::Void { vec![Op::Void, Op::Return] }
+            else if result == Type::Boolean { vec![Op::Bool(false), Op::Return] }
             else if result == Type::Int64 { vec![Op::Int64(0), Op::Return] }
             else { vec![Op::Int(0), Op::Return] };
         bindings.push(json!({"definition": row["definition"], "name": row["name"],
@@ -855,6 +859,8 @@ mod deadline_tests {
     #[test]
     fn deadlines_and_timers_require_exact_reserved_signatures_and_internal_bodies() {
         for (name, signature) in [
+            ("ScheduleTask", "fn<Void> callback) -> Void"),
+            ("ScheduleTask", "fn<noresult Void> callback) -> Void"),
             ("SchedulerSubmit", "fn<Void> callback) -> Int32"),
             ("SchedulerCapture", ") -> Int64"),
             ("SchedulerRegister", "Int64 destination, fn<Void> callback) -> Int64"),
@@ -870,7 +876,7 @@ mod deadline_tests {
         ] {
             let source = neoclr::assemble(&format!(".module Contract\n.function neoCLR.Runtime.{name}({signature}\n.methodimpl InternalCall\n.end")).unwrap();
             let inventory = json!({"functions":[{"name":format!("neoCLR.Runtime.{name}"),"compiledIndex":0}]});
-            let bind = if name.starts_with("Scheduler") { scheduler } else if name.starts_with("Timer") { timers } else { socket_transfer };
+            let bind = if name.starts_with("Scheduler") || name == "ScheduleTask" { scheduler } else if name.starts_with("Timer") { timers } else { socket_transfer };
             for change in 0..6 {
                 let mut input = source.clone();
                 match change {
@@ -883,7 +889,7 @@ mod deadline_tests {
                             input.functions[0].parameters[0] = Type::String;
                         }
                     },
-                    3 => input.functions[0].returns = Type::Void,
+                    3 => input.functions[0].returns = Type::String,
                     4 => input.functions[0].no_result = true,
                     _ => input.functions[0].out_parameters = vec![0],
                 }
