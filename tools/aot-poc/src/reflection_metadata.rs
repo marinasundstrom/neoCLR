@@ -656,7 +656,7 @@ pub fn bind_object_type(input: &mut neoclr::Module, report: &mut Value) -> Resul
             }
         }
     }
-    for (key, primitive) in [("int32Boxes", Some(Type::Int32)), ("booleanBoxes", Some(Type::Boolean)), ("emptyRecordBoxes", None)] {
+    for (key, primitive) in [("int64Boxes", Some(Type::Int64)), ("int32Boxes", Some(Type::Int32)), ("booleanBoxes", Some(Type::Boolean)), ("emptyRecordBoxes", None)] {
         for row in report[key].as_array().into_iter().flatten() {
             let index = row["typeCompiledIndex"].as_u64().ok_or("missing box tag")? as usize;
             let token = primitive.clone().unwrap_or_else(|| Type::Named(input.types[index].name.clone()));

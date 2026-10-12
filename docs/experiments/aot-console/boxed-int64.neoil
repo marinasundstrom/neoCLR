@@ -1,0 +1,55 @@
+.module BoxedInt64
+.type class abstract System.Object
+.end
+.function Calculate(Int32 mode) -> Int32
+.local System.Object value
+ldarg mode
+ldc.i4 1
+beq WrongType
+ldarg mode
+ldc.i4 2
+beq Missing
+ldc.i8 9223372036854775807
+box Int64
+stloc value
+ldloc value
+isinst Int64
+ref.isnull
+brtrue Failed
+ldloc value
+isinst Int32
+ref.isnull
+brfalse Failed
+ldloc value
+isinst Boolean
+ref.isnull
+brfalse Failed
+ldloc value
+unbox.any Int64
+ldc.i8 9223372036854775807
+ceq
+brfalse Failed
+ldc.i8 -9223372036854775808
+box Int64
+unbox.any Int64
+ldc.i8 -9223372036854775808
+ceq
+brfalse Failed
+ldc.i4 42
+ret
+WrongType:
+ldc.i4 42
+box Int32
+unbox.any Int64
+pop
+br Failed
+Missing:
+ldloca value
+initobj System.Object
+ldloc value
+unbox.any Int64
+pop
+Failed:
+ldc.i4 99
+ret
+.end

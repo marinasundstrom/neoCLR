@@ -749,7 +749,10 @@ pub(crate) fn compile_into(
                     else { b.ins().iconst(types::I8, 0) };
                 b.ins().brif(valid, matched, &[], absent, &[]);
                 b.switch_to_block(matched);
-                let value = if unbox { b.ins().load(types::I32, MemFlags::new(), receiver, 8) } else { receiver };
+                let value = if unbox {
+                    let scalar = if p.input.functions[i].returns == neoclr::metadata::Type::Int64 { types::I64 } else { types::I32 };
+                    b.ins().load(scalar, MemFlags::new(), receiver, 8)
+                } else { receiver };
                 write(&mut b, output, &[value]);
                 let zero = b.ins().iconst(types::I32, 0);
                 b.ins().return_(&[zero]);
@@ -773,11 +776,11 @@ pub(crate) fn compile_into(
                 define_checked(module, ids[i], &mut context, stack_budget, long_range_calls)?;
                 continue;
             }
-            if let Some(&record) = details.and_then(|d| d.empty_record_boxes.get(&i).or_else(|| d.int32_boxes.get(&i)).or_else(|| d.boolean_boxes.get(&i))) {
+            if let Some(&record) = details.and_then(|d| d.empty_record_boxes.get(&i).or_else(|| d.int32_boxes.get(&i)).or_else(|| d.int64_boxes.get(&i)).or_else(|| d.boolean_boxes.get(&i))) {
                 let service = module.declare_func_in_func(object_service.unwrap(), b.func);
                 let arena = b.ins().iadd_imm(fault_context.unwrap(), 1048);
                 let tag = b.ins().iconst(types::I32, record as i64);
-                let primitive = details.unwrap().int32_boxes.contains_key(&i) || details.unwrap().boolean_boxes.contains_key(&i);
+                let primitive = details.unwrap().int32_boxes.contains_key(&i) || details.unwrap().int64_boxes.contains_key(&i) || details.unwrap().boolean_boxes.contains_key(&i);
                 let bytes = b.ins().iconst(types::I32, if primitive { 16 } else { 8 });
                 let call = b.ins().call(service, &[arena, tag, bytes, output]);
                 let raw = b.inst_results(call)[0];
@@ -894,7 +897,7 @@ pub(crate) fn compile_into(
                     // Do not silently apply reference identity to value boxes.
                     // Their Object-slot value semantics need explicit adapters.
                     let d = details.unwrap();
-                    let mut boxes: Vec<_> = d.int32_boxes.values().chain(d.boolean_boxes.values())
+                    let mut boxes: Vec<_> = d.int32_boxes.values().chain(d.int64_boxes.values()).chain(d.boolean_boxes.values())
                         .chain(d.empty_record_boxes.values()).copied().collect();
                     boxes.sort_unstable(); boxes.dedup();
                     for index in boxes {

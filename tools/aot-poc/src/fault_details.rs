@@ -120,6 +120,7 @@ pub struct Options {
     pub object_type_queries: HashMap<usize, Vec<(usize, neoclr::metadata::Type)>>,
     pub scalar_box_queries: HashMap<usize, (Option<usize>, bool)>,
     pub boolean_boxes: HashMap<usize, usize>,
+    pub int64_boxes: HashMap<usize, usize>,
     pub int32_boxes: HashMap<usize, usize>,
     pub boxed_int32_display: bool,
     pub object_default_display: Vec<(usize, String)>,
@@ -180,6 +181,8 @@ impl Options {
             scalar_box_queries: report.and_then(|r| r["scalarBoxQueries"].as_array()).into_iter().flatten()
                 .filter_map(|r| Some((r["helperCompiledIndex"].as_u64()? as usize, (r["typeCompiledIndex"].as_u64().map(|v| v as usize), r["unbox"].as_bool()?)))).collect(),
             boolean_boxes: report.and_then(|r| r["booleanBoxes"].as_array()).into_iter().flatten()
+                .filter_map(|r| Some((r["helperCompiledIndex"].as_u64()? as usize, r["typeCompiledIndex"].as_u64()? as usize))).collect(),
+            int64_boxes: report.and_then(|r| r["int64Boxes"].as_array()).into_iter().flatten()
                 .filter_map(|r| Some((r["helperCompiledIndex"].as_u64()? as usize, r["typeCompiledIndex"].as_u64()? as usize))).collect(),
             int32_boxes: report.and_then(|r| r["int32Boxes"].as_array()).into_iter().flatten()
                 .filter_map(|r| Some((r["helperCompiledIndex"].as_u64()? as usize, r["typeCompiledIndex"].as_u64()? as usize))).collect(),

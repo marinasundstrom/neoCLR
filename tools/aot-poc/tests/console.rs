@@ -6558,3 +6558,15 @@ fn reference_field_admission_uses_the_flattened_storage_bound() {
         }
     }
 }
+
+#[test]
+#[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+fn native_int64_boxing_preserves_width_and_exact_type_checks() {
+    check_reference_execution(include_str!("../../../docs/experiments/aot-console/boxed-int64.neoil"), 3, b"", &[0]);
+}
+
+#[test]
+#[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+fn native_int64_type_test_without_box_producer_returns_null() {
+    check_reference_execution(".module NoWideBox\n.type class abstract System.Object\n.end\n.function Calculate(Int32 mode) -> Int32\nldc.i4 1\nbox Int32\nisinst Int64\nref.isnull\nbrfalse Fail\nldc.i4 42\nret\nFail:\nldc.i4 99\nret\n.end\n", 1, b"", &[0]);
+}

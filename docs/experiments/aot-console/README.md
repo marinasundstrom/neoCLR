@@ -2105,3 +2105,19 @@ admission only, not allocation layout, GC descriptors or collection policy.
 Focused tests admit 17 and 32 scalar fields, reject 33 before object emission, and
 check allocation canaries plus the one-byte-too-small arena failure. Unlike the
 CLR, native object layouts remain explicitly bounded in this experimental host.
+
+### Boxed Int64 parameter values (2026-10-12)
+
+Native JIT/AOT now admit Int64 boxing, exact-type tests and checked unboxing,
+matching interpreter/.NET scalar behavior for Object-valued SQL parameters. The
+private 16-byte object stores an eight-byte signed payload, a distinct Int64 tag,
+and participates in native GC; ObjectTypeHandle maps that tag to Int64. This reuses
+existing box lowering rather than adding a SQL-specific runtime service.
+
+`native_int64_boxing_preserves_width_and_exact_type_checks` compares interpreter
+and native execution for both signed extremes, mismatched boxes and null unboxing.
+The no-producer test verifies an Int64 type test returns null when only Int32 boxes
+exist. The sanitized native host checks final GC/root cleanup. Boxed Int64 virtual
+ToString and Object value-semantic dispatch remain explicitly unsupported, as do
+general primitive reflection-array adapters; this slice does not claim full CLR
+boxing compatibility or Windows execution qualification.

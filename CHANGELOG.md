@@ -8,6 +8,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-12
 
+- Admit native Int64 boxing, exact type tests and checked unboxing for ordinary
+  Object-valued SQL parameters. Preserve all 64 bits and GC ownership; differential
+  interpreter/native tests cover signed extremes, mismatched/null unboxing and
+  type tests without an Int64 producer. Boxed virtual display remains unsupported.
+
 - Align native metadata authoring/readback with the backend's existing 1,024-local
   budget, allowing larger async consumers while retaining bounded admission.
   Test the last slot, all declaration overloads and oversized readback rejection;
