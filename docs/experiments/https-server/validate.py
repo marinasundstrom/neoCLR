@@ -128,7 +128,7 @@ def main():
                     context = ssl.create_default_context(cafile=str(cert)); context.set_alpn_protocols(['http/1.1'])
                     context.minimum_version = context.maximum_version = version
                 with socket.create_connection(('127.0.0.1', port), timeout=10) as tcp:
-                    with context.wrap_socket(tcp, server_hostname='localhost') as secure:
+                    with context.wrap_socket(tcp, server_hostname='localhost', suppress_ragged_eofs=False) as secure:
                         wire = b'GET /greeting HTTP/1.1\r\nHost: localhost\r\nConnection: close\r\n\r\n'
                         if fragmented:
                             for i in range(0, len(wire), 3): secure.sendall(wire[i:i+3])
@@ -138,8 +138,10 @@ def main():
                         if response.status != 200 or body != 'Café 🌍 over TLS'.encode(): raise RuntimeError('bad HTTPS response')
                         if secure.selected_alpn_protocol() != 'http/1.1': raise RuntimeError('ALPN changed')
                         protocol = secure.version()
-                        # Require the normal completion path to send TLS close_notify.
-                        secure.unwrap()
+                        # Require authenticated TLS EOF, not reciprocal shutdown after
+                        # the server has already closed its socket. In strict mode an
+                        # absent close_notify raises SSLEOFError rather than returning EOF.
+                        if secure.recv(1) != b'': raise RuntimeError('trailing TLS application data')
                         return protocol
 
             for mode, invocation in invocations:

@@ -241,3 +241,12 @@ OpenSSL-generated test certificate as a CA used as an end entity. The fixture no
 supplies its own minimal OpenSSL configuration and explicit CA:FALSE, key usage,
 serverAuth and SAN extensions on every platform. It no longer inherits machine
 certificate-generation defaults; trust and hostname verification are unchanged.
+
+The [fourth Windows run](https://github.com/marinasundstrom/neoCLR/actions/runs/38242127298)
+passed both Rust transport tests and served a verified TLS response, then failed
+while the Python peer attempted reciprocal shutdown after server socket disposal.
+Normal-response validation now reads authenticated TLS EOF with
+`suppress_ragged_eofs=False`: absent close_notify raises an error, and trailing
+application data fails. Client-initiated clean shutdown retains its separate unwrap
+case. This checks the existing one-way notification contract without claiming the
+unimplemented fully asynchronous bidirectional shutdown API.
