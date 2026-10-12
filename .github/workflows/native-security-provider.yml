@@ -5,6 +5,9 @@ on:
     paths:
       - 'tools/native-tls/**'
       - 'tools/security-provider/**'
+      - 'tools/aot-poc/**'
+      - 'docs/experiments/native-cryptography/**'
+      - 'docs/experiments/aot-console/cryptography.c'
       - 'src/cryptography.rs'
       - 'src/native.rs'
       - 'src/services.rs'
@@ -18,6 +21,9 @@ on:
     paths:
       - 'tools/native-tls/**'
       - 'tools/security-provider/**'
+      - 'tools/aot-poc/**'
+      - 'docs/experiments/native-cryptography/**'
+      - 'docs/experiments/aot-console/cryptography.c'
       - 'src/cryptography.rs'
       - 'src/native.rs'
       - 'src/services.rs'
@@ -36,7 +42,7 @@ jobs:
       matrix:
         os: [macos-14, windows-2022]
     runs-on: ${{ matrix.os }}
-    timeout-minutes: 20
+    timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
       - uses: dtolnay/rust-toolchain@stable
@@ -52,3 +58,25 @@ jobs:
         run: python scripts/test-native-security.py
       - name: Test typed interpreter services
         run: cargo test --locked --test cryptography --test runtime_services
+      - name: Build native compiler and test binding admission
+        run: |
+          cargo build --locked --bin neoclr
+          cargo build --locked --manifest-path tools/aot-poc/Cargo.toml
+          cargo test --locked --manifest-path tools/aot-poc/Cargo.toml cryptography_tests --bin neoclr-aot-poc
+      - name: Qualify macOS execution modes
+        if: runner.os == 'macOS'
+        run: python docs/experiments/native-cryptography/validate.py --runtime target/debug/neoclr --compiler tools/aot-poc/target/debug/neoclr-aot-poc --output target/native-cryptography
+      - name: Qualify Windows execution modes
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          $vs = & "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\vswhere.exe" -latest -products '*' -requires Microsoft.VisualStudio.Component.VC.Tools.x86.x64 -property installationPath
+          if (-not $vs) { throw 'MSVC x64 tools not found' }
+          cmd /c "`"$vs\VC\Auxiliary\Build\vcvars64.bat`" && python docs/experiments/native-cryptography/validate.py --runtime target/debug/neoclr.exe --compiler tools/aot-poc/target/debug/neoclr-aot-poc.exe --output target/native-cryptography"
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: native-cryptography-${{ matrix.os }}-${{ github.run_id }}
+          path: target/native-cryptography/validation.json
+          if-no-files-found: warn

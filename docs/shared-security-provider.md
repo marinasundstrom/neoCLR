@@ -56,8 +56,8 @@ HMAC-SHA-256 and HMAC verification. All delegate to pinned ring 0.17.14, already
 used by Rustls. Its safe Rust implementation now lives in the separate
 `tools/security-provider` crate, without TLS dependencies; the TLS archive retains
 the existing C ABI wrappers. There are no public managed methods yet. Private interpreter services now project
-these operations through verified byte-array contracts; JIT/AOT lowering, the public
-managed facade and API reference generation remain open.
+these operations through verified byte-array contracts; explicit JIT/AOT lowering is now qualified on macOS through a source host. Normal
+host packaging, the public managed facade and API reference generation remain open.
 
 The intended baseline is .NET's
 [RandomNumberGenerator.Fill](https://learn.microsoft.com/en-us/dotnet/api/system.security.cryptography.randomnumbergenerator.fill?view=net-10.0),
@@ -124,3 +124,11 @@ macOS/Windows provider workflow includes the same focused interpreter tests.
 Local qualification: all seven cryptography integration tests and all twelve
 runtime-service regression tests pass on macOS. Windows is wired into the same
 CI job but has not been executed locally.
+
+## Native execution checkpoint
+
+The [explicit cryptography bindings](experiments/native-cryptography/README.md) now
+pass twelve identical cases across interpreter, JIT and AOT on macOS. The same
+Windows CI gate is configured but not yet executed. Host packaging, a standalone
+crypto archive and the managed facade remain open; this does not make public Raven
+cryptography or SslStream APIs available.

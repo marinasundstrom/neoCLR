@@ -13,6 +13,7 @@ pub struct RuntimeContext {
     pub bind_console_read_byte: bool,
     pub bind_console_write_line: bool,
     pub bind_console_stream_output: bool,
+    pub bind_cryptography: bool,
     pub bind_int32_to_string: bool,
     pub bind_utf8_text: bool,
     pub bind_paths: bool,
@@ -405,6 +406,11 @@ pub fn prepare(
     let bind_file_input = context.is_some_and(|c| c.bind_file_input);
     if bind_file_input {
         let rows = super::bindings::file_input(&mut selected, &report)?;
+        report["nativeBindings"].as_array_mut().unwrap().extend(rows);
+    }
+    let bind_cryptography = context.is_some_and(|c| c.bind_cryptography);
+    if bind_cryptography {
+        let rows = super::bindings::cryptography(&mut selected, &report)?;
         report["nativeBindings"].as_array_mut().unwrap().extend(rows);
     }
     let bind_utf8_text = context.is_some_and(|c| c.bind_utf8_text);
@@ -817,7 +823,7 @@ pub fn prepare(
     }
     report["loadSet"] = json!({"modules": inputs.iter().map(|m| json!({"name": m.name, "revision": m.revision})).collect::<Vec<_>>(),
         "validation": "all original bodies verified with runtime binder before private canonical projection",
-        "runtimeContext": {"system": system.name, "revision": system.revision, "explicit": context.is_some(), "objectRoot": context.and_then(|c| c.object_root.as_ref()), "compileSystem": compile_system, "bindUserFault": bind_user_fault, "bindConsoleReadByte": bind_console_read_byte, "bindConsoleWriteLine": bind_console_write_line, "bindConsoleStreamOutput": bind_console_stream_output, "bindInt32ToString": bind_int32_to_string, "bindUtf8Text": bind_utf8_text, "bindPaths": bind_paths, "bindFileOutput": bind_file_output, "bindFileInput": bind_file_input, "bindCharacterText": bind_character_text, "bindSystemCulture": bind_system_culture, "bindTimeZoneRules": bind_time_zone_rules, "bindIntegerText": bind_integer_text, "bindSocketListener": bind_socket_listener, "bindSocketAccept": bind_socket_accept, "bindTaskQueue": bind_task_queue, "bindSocketTransfer": bind_socket_transfer, "bindTimers": bind_timers, "bindGCCollect": bind_gc_collect, "bindRuntimeAsync": bind_runtime_async, "bindStackTrace": bind_stack_trace, "bindScheduler": bind_scheduler, "bindSocketClient": bind_socket_client, "referenceArena": reference_arena, "scope": if compile_system { "explicit managed System body selection; native services still require bindings" } else { "validation only; System seed bodies are not compilation inputs" }},
+        "runtimeContext": {"system": system.name, "revision": system.revision, "explicit": context.is_some(), "objectRoot": context.and_then(|c| c.object_root.as_ref()), "compileSystem": compile_system, "bindUserFault": bind_user_fault, "bindConsoleReadByte": bind_console_read_byte, "bindConsoleWriteLine": bind_console_write_line, "bindConsoleStreamOutput": bind_console_stream_output, "bindInt32ToString": bind_int32_to_string, "bindCryptography": bind_cryptography, "bindUtf8Text": bind_utf8_text, "bindPaths": bind_paths, "bindFileOutput": bind_file_output, "bindFileInput": bind_file_input, "bindCharacterText": bind_character_text, "bindSystemCulture": bind_system_culture, "bindTimeZoneRules": bind_time_zone_rules, "bindIntegerText": bind_integer_text, "bindSocketListener": bind_socket_listener, "bindSocketAccept": bind_socket_accept, "bindTaskQueue": bind_task_queue, "bindSocketTransfer": bind_socket_transfer, "bindTimers": bind_timers, "bindGCCollect": bind_gc_collect, "bindRuntimeAsync": bind_runtime_async, "bindStackTrace": bind_stack_trace, "bindScheduler": bind_scheduler, "bindSocketClient": bind_socket_client, "referenceArena": reference_arena, "scope": if compile_system { "explicit managed System body selection; native services still require bindings" } else { "validation only; System seed bodies are not compilation inputs" }},
         "limits": "up to 128 closed value/reference/interface shapes and 128 function clones; primitive static generic methods; one to eight explicit dependencies; no dynamic loading"});
     Ok((selected, report))
 }

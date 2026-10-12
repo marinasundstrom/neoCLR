@@ -379,6 +379,12 @@ pub(crate) fn compile_into(
         sig.returns.push(AbiParam::new(types::I32));
         Some(module.declare_function("neoclr_console_write_line_utf8_v1", Linkage::Import, &sig)?)
     } else { None };
+    let cryptography_service = if details.is_some_and(|d| !d.cryptography.is_empty()) {
+        let mut sig = module.make_signature();
+        sig.params.extend([types::I32, types::I64, types::I64, types::I64, types::I64].map(AbiParam::new));
+        sig.returns.push(AbiParam::new(types::I32));
+        Some(module.declare_function("neoclr_cryptography_v1", Linkage::Import, &sig)?)
+    } else { None };
     let mut stream_services = std::collections::HashMap::new();
     if let Some(d) = details {
         for (indices, symbol, parameters) in [
@@ -1074,6 +1080,30 @@ pub(crate) fn compile_into(
                     let array = b.ins().load(types::I64, MemFlags::new(), output, 0);
                     tag_array(&mut b, &p, ty, array);
                 }
+                let zero = b.ins().iconst(types::I32, 0);
+                b.ins().return_(&[zero]);
+                b.seal_all_blocks(); b.finalize();
+                if let (Some(probes), Some(frame)) = (&root_probes, probe_frame) {
+                    probes.finish(module, &mut context.func, frame);
+                }
+                define_checked(module, ids[i], &mut context, stack_budget, long_range_calls)?;
+                continue;
+            }
+            if let Some(operation) = details.and_then(|d| d.cryptography.get(&i)) {
+                let service = module.declare_func_in_func(cryptography_service.unwrap(), b.func);
+                let op = b.ins().iconst(types::I32, i64::from(*operation));
+                let null = b.ins().iconst(types::I64, 0);
+                let mut args = vec![op];
+                let arity = match operation { 1 => 2, 4 => 1, _ => 3 };
+                args.extend(parameters.iter().take(arity).copied());
+                while args.len() < 4 { args.push(null); }
+                args.push(output);
+                let call = b.ins().call(service, &args);
+                let status = b.inst_results(call)[0];
+                let failed = b.ins().icmp_imm(IntCC::NotEqual, status, 0);
+                let mut site = diagnostic_data.as_ref().unwrap().site(module, &mut b, fault_context.unwrap(), i, 0);
+                site.capture_frame = false;
+                return_if_detailed(&mut b, failed, status, Some(&site));
                 let zero = b.ins().iconst(types::I32, 0);
                 b.ins().return_(&[zero]);
                 b.seal_all_blocks(); b.finalize();

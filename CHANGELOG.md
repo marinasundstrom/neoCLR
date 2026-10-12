@@ -8,6 +8,14 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-12
 
+- Add explicit JIT/AOT cryptography bindings and a shared native byte-array adapter,
+  preserving initialized-input checks, aliased outputs, short destinations and
+  terminal Fault semantics. Twelve identical cases pass in interpreter/JIT/AOT
+  on macOS (36 executions); binding admission tests reject changed contracts.
+  Windows x64 object generation passes a SHA case, with execution pending the
+  expanded Windows/macOS CI gate. Public managed APIs and installed-host packaging
+  remain open; this is a private source-host checkpoint.
+
 - Connect private typed cryptography services to the interpreter using the shared
   TLS-independent provider. Require exact byte-array signatures and report
   Cryptography/ManagedArrays capabilities; preserve aliasing, initialization,

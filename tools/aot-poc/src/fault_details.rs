@@ -21,6 +21,7 @@ pub struct Options {
     pub console_write_line: Vec<usize>,
     pub console_write_bytes: Vec<usize>,
     pub console_flush: Vec<usize>,
+    pub cryptography: HashMap<usize, i32>,
     pub entry_host_io: bool,
     pub entry_task_drain: Vec<usize>,
     pub task_queue_register: Vec<usize>,
@@ -350,6 +351,9 @@ impl Options {
                 .filter(|r| r["implementation"] == "console-write-bytes-v1")
                 .filter_map(|r| r["compiledIndex"].as_u64().map(|i| i as usize))
                 .collect(),
+            cryptography: report.and_then(|r| r["nativeBindings"].as_array()).into_iter().flatten()
+                .filter(|r| r["implementation"] == "cryptography-v1")
+                .filter_map(|r| Some((r["compiledIndex"].as_u64()? as usize, r["operation"].as_i64()? as i32))).collect(),
             console_flush: report
                 .and_then(|r| r["nativeBindings"].as_array())
                 .into_iter().flatten()
