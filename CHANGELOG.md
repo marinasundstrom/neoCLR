@@ -8,6 +8,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-12
 
+- Add an opt-in HTTPS-only native hosting proof using pinned Rustls behind
+  runtime-owned nonblocking sockets. Qualify Raven HttpServer in macOS ARM64 JIT/AOT
+  with TLS 1.2/1.3, verified clients, rejected peers, handshake timeout/cancellation
+  and recovery. A fragmented/backpressured transport test checks send ownership;
+  ordinary hosts stay cleartext. No public TLS API or installed HTTPS support yet.
+
 - Qualify provisional profiler attachment during the Raven HTTP showcase in
   macOS ARM64 AOT and JIT: 128 requests per mode, repeated external attachment,
   fresh coherent GC snapshots and continued request progress. Record exploratory

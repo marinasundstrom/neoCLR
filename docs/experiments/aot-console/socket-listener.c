@@ -6,6 +6,20 @@
 #include <string.h>
 #include <stdlib.h>
 
+#ifdef NEOCLR_HTTPS_SERVER
+#include "../https-server/native-tls.h"
+/* Experimental HTTPS-only host capability. Ordinary Socket builds stay TCP. */
+static int64_t tls_io(void *state, unsigned char *data, uint32_t count, int32_t sending) {
+    neoclr_socket_descriptor fd = *(neoclr_socket_descriptor *)state;
+    int64_t result = neoclr_os_transfer(fd, data, count, sending);
+    if (result >= 0) return result;
+    return result == -1 && neoclr_os_retry(neoclr_os_error()) ? -1 : -2;
+}
+static void tls_close(neoclr_socket_scope *scope, unsigned slot) {
+    neoclr_tls_session_free(scope->slots[slot].tls, &scope->slots[slot].descriptor, tls_io);
+    scope->slots[slot].tls = NULL;
+}
+#endif
 static _Thread_local neoclr_socket_scope *head;
 static _Atomic uint64_t next_id = 1;
 #ifdef NEOCLR_NATIVE_GC
@@ -96,6 +110,10 @@ int32_t neoclr_socket_scope_enter_v1(neoclr_socket_scope *scope, neoclr_aot_cont
     for (neoclr_socket_scope *s = head; s; s = s->previous) if (s == scope) return 3;
     if (neoclr_os_start()) return 3;
     memset(scope, 0, sizeof(*scope));
+#ifdef NEOCLR_HTTPS_SERVER
+    scope->tls_config = neoclr_tls_config_new(getenv("NEOCLR_HTTPS_CERTIFICATE"), getenv("NEOCLR_HTTPS_PRIVATE_KEY"));
+    if (!scope->tls_config) { neoclr_os_stop(); return 3; }
+#endif
     scope->context = context; scope->previous = head; head = scope;
     return 0;
 }
@@ -103,6 +121,9 @@ int32_t neoclr_socket_scope_leave_v1(neoclr_socket_scope *scope) {
     if (!scope || scope != head) return 3;
     int32_t status = 0;
     for (unsigned i = 0; i < 64; i++) {
+#ifdef NEOCLR_HTTPS_SERVER
+        tls_close(scope, i);
+#endif
         if (scope->slots[i].id && neoclr_os_close(scope->slots[i].descriptor)) status = 3;
         scope->slots[i].id = 0;
     }
@@ -127,6 +148,10 @@ int32_t neoclr_socket_scope_leave_v1(neoclr_socket_scope *scope) {
         release_transfer(scope, i);
         memset(&scope->operations[i], 0, sizeof(scope->operations[i]));
     }
+#endif
+#ifdef NEOCLR_HTTPS_SERVER
+    neoclr_tls_config_free(scope->tls_config);
+    scope->tls_config = NULL;
 #endif
     if (neoclr_os_stop()) status = 3;
     head = scope->previous;
@@ -202,6 +227,9 @@ int32_t neoclr_socket_close_v1(uint64_t handle, neoclr_aot_context *context, voi
                 release_transfer(scope, op);
             }
         }
+#endif
+#ifdef NEOCLR_HTTPS_SERVER
+        tls_close(scope, i);
 #endif
         neoclr_os_close(scope->slots[i].descriptor);
         break;
@@ -292,6 +320,11 @@ int32_t neoclr_socket_cancel_v1(uint64_t operation, neoclr_aot_context *context,
         if (*output) {
             scope->operations[i].state = 2;
             scope->operations[i].tag = 2; scope->operations[i].value = 5;
+#ifdef NEOCLR_HTTPS_SERVER
+            for (unsigned slot = 0; slot < 64; slot++)
+                if (scope->slots[slot].id == scope->operations[i].listener)
+                    neoclr_tls_abort(scope->slots[slot].tls);
+#endif
             release_client(scope, i);
             release_transfer(scope, i);
         }
@@ -629,13 +662,28 @@ static int32_t socket_poll(neoclr_aot_context *context, uint64_t *callback) {
             if (count && transfer_now >= scope->operations[i].deadline) { tag = 2; value = 10; }
             else if (count) {
                 neoclr_socket_descriptor fd = scope->slots[slot].descriptor;
-                int64_t transferred = neoclr_os_transfer(fd, scope->operations[i].buffer, count, sending);
-                if (transferred == -2) return -3; /* Host signal-suppression setup failed. */
-                if (transferred < 0 && neoclr_os_retry(neoclr_os_error())) continue;
-                if (transferred < 0) { tag = 2; value = error_code(neoclr_os_error()); }
-                else if (!transferred && sending) { tag = 2; value = 11; }
-                else value = (uint64_t)transferred;
+                int64_t transferred;
+#ifdef NEOCLR_HTTPS_SERVER
+                if (scope->slots[slot].tls) {
+                    transferred = neoclr_tls_transfer(scope->slots[slot].tls, &fd, tls_io,
+                        scope->operations[i].buffer, count, sending);
+                    if (transferred == -1) continue;
+                    if (transferred < 0) { tag = 2; value = 11; }
+                    else value = (uint64_t)transferred;
+                } else
+#endif
+                {
+                    transferred = neoclr_os_transfer(fd, scope->operations[i].buffer, count, sending);
+                    if (transferred == -2) return -3; /* Host signal-suppression setup failed. */
+                    if (transferred < 0 && neoclr_os_retry(neoclr_os_error())) continue;
+                    if (transferred < 0) { tag = 2; value = error_code(neoclr_os_error()); }
+                    else if (!transferred && sending) { tag = 2; value = 11; }
+                    else value = (uint64_t)transferred;
+                }
             }
+#ifdef NEOCLR_HTTPS_SERVER
+            if (tag == 2) neoclr_tls_abort(scope->slots[slot].tls);
+#endif
             if (tag == 1 && !sending && value) {
                 void *array = NULL;
                 if (neoclr_gc_host_root_read_v1(context, scope->operations[i].buffer_root, &array)) return -3;
@@ -663,6 +711,10 @@ static int32_t socket_poll(neoclr_aot_context *context, uint64_t *callback) {
                 else {
                     scope->slots[slot].id = id; scope->slots[slot].descriptor = fd;
                     scope->slots[slot].listener = 0; tag = 5; value = id;
+#ifdef NEOCLR_HTTPS_SERVER
+                    scope->slots[slot].tls = neoclr_tls_session_new(scope->tls_config);
+                    if (!scope->slots[slot].tls) { scope->slots[slot].id = 0; tag = 2; value = 4; }
+#endif
                 }
                 if (tag == 2) neoclr_os_close(fd);
             }

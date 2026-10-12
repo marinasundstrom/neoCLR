@@ -134,3 +134,7 @@ lockfile and [dependency inventory](tools/aot-poc/THIRD_PARTY_NOTICES.md), inclu
 Cranelift 0.121.2 under Apache-2.0 WITH LLVM-exception. These compiler dependencies
 are not added to the runtime distribution. The experiment's emitted scalar object
 has no Cranelift or neoCLR runtime imports.
+
+The optional native HTTPS experiment has a separate pinned dependency inventory and
+[preserved license texts](tools/native-tls/THIRD_PARTY_NOTICES.md). It is not part of
+the installed runtime distribution.

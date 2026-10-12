@@ -1,0 +1,182 @@
+#!/usr/bin/env python3
+"""Native HTTPS server proof against Python/OpenSSL with certificate verification."""
+import argparse
+import hashlib
+import http.client
+import json
+import os
+from pathlib import Path
+import platform
+import select
+import socket
+import ssl
+import subprocess
+import tempfile
+import time
+
+ROOT = Path(__file__).resolve().parents[3]
+HERE = Path(__file__).resolve().parent
+sha = lambda path: hashlib.sha256(Path(path).read_bytes()).hexdigest()
+
+
+def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--recipe', type=Path, default=HERE.parent / 'runtime-async/collector-walk-showcase.json')
+    parser.add_argument('--bundle', type=Path, required=True)
+    parser.add_argument('--output', type=Path, required=True)
+    args = parser.parse_args()
+    if not ssl.HAS_TLSv1_3:
+        parser.error('requires Python linked to OpenSSL with TLS 1.3 support')
+    if (platform.system(), platform.machine()) != ('Darwin', 'arm64'):
+        parser.error('this native qualification recipe requires macOS ARM64')
+    out = args.output.resolve(); out.mkdir(parents=True, exist_ok=False)
+    recipe = json.loads(args.recipe.read_text()); assert recipe['passed']
+    report = dict(passed=False, platform=platform.platform(), ssl=ssl.OPENSSL_VERSION,
+                  commands=[], cases=[], inputsSha256={}, recipeSha256=sha(args.recipe))
+
+    def command(label):
+        cmd = next(row['command'].copy() for row in recipe['commands'] if row.get('label') == label)
+        return [str(args.bundle.resolve() / 'lib' / Path(v).name) if '/data-cases-bundle/lib/' in v else v for v in cmd]
+
+    def run(label, cmd, **kwargs):
+        for value in cmd:
+            if Path(value).is_file() and not Path(value).is_relative_to(out):
+                report['inputsSha256'][str(Path(value).resolve())] = sha(value)
+        result = subprocess.run(cmd, capture_output=True, text=True, timeout=180, cwd=ROOT, **kwargs)
+        row = dict(label=label, command=cmd, exitCode=result.returncode, stderr=result.stderr)
+        if label == 'native':
+            p = out / 'selection.json'; p.write_text(result.stdout)
+            row['stdoutSha256'] = sha(p)
+        else: row['stdout'] = result.stdout
+        report['commands'].append(row)
+        if result.returncode: raise RuntimeError(label + ': ' + result.stderr + result.stdout[-1000:])
+
+    try:
+        run('tls-build', ['cargo', 'build', '--locked', '--release', '--manifest-path', str(ROOT / 'tools/native-tls/Cargo.toml')])
+        source = command('language-source')
+        source[source.index('-o') + 1] = str(out / 'server.dll'); source[-2] = str(HERE / 'Server.rvn')
+        run('source', source)
+        native = command('server-native-compile'); native[2], native[4] = str(out / 'server.dll'), str(out / 'server.o')
+        run('native', native)
+        archive = str(ROOT / 'tools/native-tls/target/release/libneoclr_native_tls.a')
+        link = command('server-link')
+        link = [str(out / 'server.o') if v.endswith('/server.o') else v for v in link]
+        link[link.index('-o') + 1] = str(out / 'server')
+        link += ['-DNEOCLR_ENTRY_ARGUMENTS', '-DNEOCLR_HTTPS_SERVER', archive]
+        run('aot-link', link)
+        cleartext = [item for item in link if item not in ('-DNEOCLR_HTTPS_SERVER', archive)]
+        cleartext[cleartext.index('-o') + 1] = str(out / 'cleartext')
+        run('cleartext-link', cleartext)
+        jit_link = command('jit-host-build') + ['-DNEOCLR_HTTPS_SERVER', archive]
+        jit_link[jit_link.index('-o') + 1] = str(out / 'host.dylib')
+        run('jit-link', jit_link)
+        jit = [native[0], '--jit-run', *native[1:]]; jit[5] = str(out / 'host.dylib')
+        # Current transitive host headers and TLS engine, without any generated private keys.
+        for folder in [HERE, HERE.parent / 'aot-console', ROOT / 'tools/native-tls/src']:
+            for p in folder.iterdir():
+                if p.suffix in ('.c', '.h', '.rs', '.rvn', '.py'): report['inputsSha256'][str(p)] = sha(p)
+        report['inputsSha256'][str(ROOT / 'tools/native-tls/Cargo.lock')] = sha(ROOT / 'tools/native-tls/Cargo.lock')
+        with tempfile.TemporaryDirectory(prefix='nc-https-') as directory:
+            cert, key = Path(directory) / 'cert.pem', Path(directory) / 'key.pem'
+            # One-use development certificate: explicit trust in this peer only, no global store edits.
+            subprocess.run(['openssl', 'req', '-x509', '-newkey', 'rsa:2048', '-nodes', '-sha256', '-days', '1',
+                            '-subj', '/CN=localhost', '-addext', 'subjectAltName=DNS:localhost,IP:127.0.0.1',
+                            '-keyout', str(key), '-out', str(cert)], check=True, capture_output=True, timeout=30)
+            os.chmod(key, 0o600)
+            trust = ssl.create_default_context(cafile=str(cert)); trust.set_alpn_protocols(['http/1.1'])
+            env = dict(os.environ, NEOCLR_HTTPS_CERTIFICATE=str(cert), NEOCLR_HTTPS_PRIVATE_KEY=str(key))
+            env.pop('NEOCLR_DIAGNOSTICS_DIRECTORY', None)
+            run('fragmented-transport-test', ['cargo', 'test', '--locked', '--manifest-path', str(ROOT / 'tools/native-tls/Cargo.toml'), '--', '--ignored'], env=env)
+
+            def valid(port, version=None, fragmented=False):
+                context = trust
+                if version:
+                    context = ssl.create_default_context(cafile=str(cert)); context.set_alpn_protocols(['http/1.1'])
+                    context.minimum_version = context.maximum_version = version
+                with socket.create_connection(('127.0.0.1', port), timeout=10) as tcp:
+                    with context.wrap_socket(tcp, server_hostname='localhost') as secure:
+                        wire = b'GET /greeting HTTP/1.1\r\nHost: localhost\r\nConnection: close\r\n\r\n'
+                        if fragmented:
+                            for i in range(0, len(wire), 3): secure.sendall(wire[i:i+3])
+                        else: secure.sendall(wire)
+                        response = http.client.HTTPResponse(secure); response.begin()
+                        body = response.read()
+                        if response.status != 200 or body != 'Café 🌍 over TLS'.encode(): raise RuntimeError('bad HTTPS response')
+                        if secure.selected_alpn_protocol() != 'http/1.1': raise RuntimeError('ALPN changed')
+                        protocol = secure.version()
+                        # Require the normal completion path to send TLS close_notify.
+                        secure.unwrap()
+                        return protocol
+
+            for mode, invocation in [('aot', [str(out / 'server')]), ('jit', jit)]:
+                for case in ['tls13', 'tls12', 'fragmented', 'untrusted', 'wrong-host', 'alpn', 'plaintext', 'truncated', 'timeout', 'cancel']:
+                    scenario = 'ok' if case in ('tls13', 'tls12', 'fragmented') else case
+                    process = subprocess.Popen(invocation + ([scenario] if mode == 'aot' else ['--jit-entry-argument', scenario]), env=env, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+                    try:
+                        if not select.select([process.stdout], [], [], 60)[0]: raise RuntimeError('startup timeout')
+                        line = process.stdout.readline()
+                        if not line.strip().isdigit(): raise RuntimeError('startup failed: ' + line + process.stderr.read())
+                        port = int(line)
+                        protocol = None
+                        if scenario == 'ok':
+                            protocol = valid(port, ssl.TLSVersion.TLSv1_2 if case == 'tls12' else ssl.TLSVersion.TLSv1_3,
+                                             case == 'fragmented')
+                        elif case in ('untrusted', 'wrong-host', 'alpn'):
+                            context = ssl.create_default_context() if case == 'untrusted' else ssl.create_default_context(cafile=str(cert))
+                            context.set_alpn_protocols(['h2'] if case == 'alpn' else ['http/1.1'])
+                            try:
+                                with socket.create_connection(('127.0.0.1', port), timeout=10) as tcp:
+                                    with context.wrap_socket(tcp, server_hostname='wrong.example' if case == 'wrong-host' else 'localhost'):
+                                        raise RuntimeError('invalid TLS peer accepted')
+                            except ssl.SSLCertVerificationError:
+                                if case not in ('untrusted', 'wrong-host'): raise
+                            except ssl.SSLError:
+                                if case != 'alpn': raise
+                        else:
+                            with socket.create_connection(('127.0.0.1', port), timeout=10) as tcp:
+                                if case == 'plaintext': tcp.sendall(b'GET / HTTP/1.1\r\nHost: localhost\r\n\r\n')
+                                if case == 'truncated': tcp.sendall(b'\x16\x03\x03\x00'); tcp.shutdown(socket.SHUT_WR)
+                                try: data = tcp.recv(4096)
+                                except ConnectionResetError: data = b''
+                                if data: raise RuntimeError('unexpected plaintext response')
+                        valid(port)
+                        stdout, stderr = process.communicate(timeout=10)
+                        good = process.returncode == 0 and not stderr and stdout.strip() == 'PASS HTTPS server and recovery'
+                        report['cases'].append(dict(mode=mode, case=case, passed=good, protocol=protocol,
+                                                    exitCode=process.returncode, stdout=stdout, stderr=stderr))
+                        print(mode, case, 'PASS' if good else 'FAIL', flush=True)
+                        if not good: raise RuntimeError(str(report['cases'][-1]))
+                    finally:
+                        if process.poll() is None: process.kill(); process.communicate()
+            # Config errors happen before binding, never a cleartext fallback.
+            for name, overrides in [('missing', {'NEOCLR_HTTPS_PRIVATE_KEY': ''}),
+                                    ('invalid', {'NEOCLR_HTTPS_PRIVATE_KEY': str(cert)})]:
+                result = subprocess.run([str(out / 'server'), 'ok'], env=dict(env, **overrides), capture_output=True, text=True, timeout=5)
+                good = result.returncode != 0 and not result.stdout
+                report['cases'].append(dict(mode='aot', case=name + '-credentials', passed=good, exitCode=result.returncode))
+                if not good: raise RuntimeError('invalid credentials accepted')
+        plain = subprocess.Popen([str(out / 'cleartext'), 'ok'], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+        try:
+            if not select.select([plain.stdout], [], [], 20)[0]: raise RuntimeError('cleartext startup timeout')
+            port = int(plain.stdout.readline())
+            for _ in range(2):
+                connection = http.client.HTTPConnection('127.0.0.1', port, timeout=10)
+                connection.request('GET', '/greeting'); response = connection.getresponse()
+                if response.status != 200 or response.read() != 'Café 🌍 over TLS'.encode():
+                    raise RuntimeError('cleartext behavior changed')
+                connection.close()
+            stdout, stderr = plain.communicate(timeout=10)
+            good = plain.returncode == 0 and not stderr and 'PASS HTTPS server and recovery' in stdout
+            report['cases'].append(dict(mode='aot', case='ordinary-host-stays-cleartext', passed=good))
+            if not good: raise RuntimeError('cleartext shutdown failed')
+        finally:
+            if plain.poll() is None: plain.kill(); plain.communicate()
+        for path, digest in report['inputsSha256'].items():
+            if sha(path) != digest: raise RuntimeError('input changed: ' + path)
+        report['passed'] = True
+    finally:
+        (out / 'validation.json').write_text(json.dumps(report, indent=2) + '\n')
+    print(out / 'validation.json')
+
+
+if __name__ == '__main__': main()

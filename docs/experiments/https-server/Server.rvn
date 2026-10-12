@@ -1,0 +1,66 @@
+import System.*
+import System.Collections.*
+import System.Concurrency.*
+import System.Result.*
+import System.Tasks.*
+import System.Time.*
+import System.Web.Http.*
+
+func Respond(request: HttpRequest) -> Task<Result<HttpResponse, HttpError>> {
+    if request.Target != "/greeting" {
+        System.Fail("Unexpected HTTPS request")
+    }
+    let headers = ArrayList<HttpHeader>()
+    headers.Add(HttpHeader("Content-Type", "text/plain; charset=utf-8"))
+    let result: Result<HttpResponse, HttpError> = Ok(HttpResponse(200, headers, HttpContent.FromText("Café 🌍 over TLS").Bytes))
+    return Task.FromResult(result)
+}
+
+class CancellationObserver {
+    private val operation: Task<Result<System.Void, HttpError>>
+    private val source = Promise<bool>()
+    init(operation: Task<Result<System.Void, HttpError>>) {
+        self.operation = operation
+    }
+    val Task: Task<bool> => source.Task
+    // Observe cancellation without cancelling the recovery test's async caller.
+    func Complete() {
+        _ = source.Complete(operation.IsCancelled)
+    }
+}
+
+async func Main(arguments: string[]) -> Task<()> {
+    let mode = arguments[0]
+    let options = HttpServerOptions()
+    options.RequestReadTimeout = Duration.FromTicks(10000000L)
+    let Ok(server) = HttpServer.Listen("127.0.0.1", 0, 8, options) else {
+        System.Fail("HTTPS listen failed")
+    }
+    let Ok(port) = server.GetLocalPort() else {
+        System.Fail("HTTPS port unavailable")
+    }
+    Console.WriteLine(port)
+    if mode == "cancel" {
+        use cancellation = CancellationTokenSource()
+        cancellation.CancelAfter(Duration.FromTicks(2000000L))
+        let operation = server.ServeOne(Respond, cancellation.Token)
+        let observer = CancellationObserver(operation)
+        operation.OnCompleted(observer.Complete)
+        if !(await observer.Task) {
+            System.Fail("Expected cancellation")
+        }
+    } else {
+        let first = await server.ServeOne(Respond)
+        if mode == "ok" {
+            if !(first is Ok(_)) { System.Fail("HTTPS request failed") }
+        } else if mode == "timeout" {
+            if !(first is Error(HttpError.TimedOut)) { System.Fail("Expected handshake timeout") }
+        } else {
+            if !(first is Error(_)) { System.Fail("Invalid TLS peer reached handler") }
+        }
+    }
+    let recovery = await server.ServeOne(Respond)
+    if !(recovery is Ok(_)) { System.Fail("HTTPS recovery failed") }
+    server.Close()
+    Console.WriteLine("PASS HTTPS server and recovery")
+}

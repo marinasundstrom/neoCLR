@@ -14,7 +14,14 @@ typedef struct neoclr_runnable neoclr_runnable;
 typedef struct neoclr_socket_scope {
     neoclr_aot_context *context;
     struct neoclr_socket_scope *previous;
-    struct { uint64_t id; neoclr_socket_descriptor descriptor; int listener; } slots[64];
+    struct { uint64_t id; neoclr_socket_descriptor descriptor; int listener;
+#ifdef NEOCLR_HTTPS_SERVER
+        void *tls;
+#endif
+    } slots[64];
+#ifdef NEOCLR_HTTPS_SERVER
+    void *tls_config;
+#endif
     /* Private operations: state 1 pending, 2 ready, 3 delivered; kind 1 accept,
      * 2 receive, 3 send, 4 connect, 5 DNS, 6 one-shot timer, 7 submitted runnable, 8 dormant registration. Transfer snapshots have a separate bounded native budget. */
     struct { uint64_t id, listener, callback, tag, value, buffer_root, deadline;
