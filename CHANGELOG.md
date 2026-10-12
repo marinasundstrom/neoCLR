@@ -8,6 +8,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-12
 
+- Support nested native reference classes deriving from the same assembly's
+  explicit Object root, including generic generated async state machines. Preserve
+  lexical ownership/base identity through native authoring and loading; keep other
+  nested local bases restricted. Focused metadata round-trip checks pass.
+
 - Add System.IO.AsyncInputStream/AsyncOutputStream and MemoryStream ReadAsync,
   WriteAsync and FlushAsync, with cancellation and .NET-style complete-write
   success. Separate async capabilities preserve synchronous implementations.

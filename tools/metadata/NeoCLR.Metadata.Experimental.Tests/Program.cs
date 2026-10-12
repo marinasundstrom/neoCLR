@@ -4,6 +4,8 @@ using System.Reflection.PortableExecutable;
 using NeoCLR.Metadata.Experimental.Model;
 using AssemblyDefinition = NeoCLR.Metadata.Experimental.Model.AssemblyDefinition;
 
+if (args is ["--generic-object-roots"]) { GenericObjectRootChecks.Run(); Console.WriteLine("PASS generic and nested native Object roots"); return 0; }
+
 if (args is ["--generic-nested-types"]) { GenericNestedTypeChecks.Run(); Console.WriteLine("PASS generic nested types"); return 0; }
 
 if (args is ["--authored-references"]) { AuthoredFunctionReferenceChecks.Run(); Console.WriteLine("PASS authored references"); return 0; }

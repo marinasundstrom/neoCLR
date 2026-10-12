@@ -8334,3 +8334,20 @@ reference projection, translated bindings, three-level generic nesting and rejec
 of implicit enclosing parameter use. The existing `--nested-type-integration`
 consumer remains valid. This host-only API follows the documented RavenDoc exclusion;
 no guest API or reference assembly changes.
+
+## Nested classes with a source-owned Object root (development, 2026-10-12)
+
+`TypeBuilder.AddNestedClass(string name, TypeBuilder baseType,
+IEnumerable<string>? parameters = null, TypeVisibility visibility = Public)`
+creates a nested reference class whose direct base is the same assembly's explicit
+native Object root. Null parameters mean nongeneric; otherwise supply the complete
+nested generic scope. Ordinary or foreign bases are rejected before attachment.
+Constructors must initialize that direct base. Native authoring, serialization,
+loading and introspection preserve both lexical ownership and base identity.
+
+This fills a metadata gap exposed when the runtime library itself contains async
+methods: their nested generated state machines have the same Object base as other
+source-defined classes. CLI metadata already represents nested ownership and class
+inheritance independently; this adds no new wire-format concept. General nested
+inheritance remains outside the bounded authoring surface. Validate with the
+metadata test executable's `--generic-object-roots` group.

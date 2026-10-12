@@ -57,6 +57,26 @@ public sealed partial class TypeBuilder
     /// <exception cref="ArgumentNullException">Parameters are null.</exception>
     public TypeBuilder AddNestedGenericClass(string name, IEnumerable<string> parameters, TypeVisibility visibility = TypeVisibility.Public)
         => AddNested(name, visibility, false, parameters ?? throw new ArgumentNullException(nameof(parameters)));
+    /// <summary>Adds a nested class deriving from this assembly's native Object root.</summary>
+    /// <param name="name">Simple metadata name, without an arity suffix.</param>
+    /// <param name="baseType">The native Object root attached to this assembly.</param>
+    /// <param name="parameters">Complete generic parameter scope, or null for a nongeneric class.</param>
+    /// <param name="visibility">Public or Internal.</param>
+    /// <returns>The attached nested reference class.</returns>
+    /// <exception cref="ArgumentException">The base is not this assembly's native Object root, or names/visibility are invalid.</exception>
+    public TypeBuilder AddNestedClass(string name, TypeBuilder baseType, IEnumerable<string>? parameters = null, TypeVisibility visibility = TypeVisibility.Public)
+    {
+        ArgumentNullException.ThrowIfNull(baseType);
+        if (!ReferenceEquals(baseType.Assembly, Assembly) || !baseType.IsNativeObjectRoot)
+            throw new ArgumentException("nested local bases require this output's native Object root", nameof(baseType));
+        if (visibility is not (TypeVisibility.Public or TypeVisibility.Internal))
+            throw new ArgumentException("unsupported nested visibility", nameof(visibility));
+        var attributes = visibility == TypeVisibility.Public ? 2u : 5u;
+        var definition = parameters is null ? new TypeDefinition("", name, attributes, baseType.Definition.ToReference())
+            : new TypeDefinition("", name, attributes, baseType.Definition.ToReference(), parameters);
+        Definition.NestedTypes.Add(definition);
+        return definition.Producer!;
+    }
     private TypeBuilder AddNested(string name, TypeVisibility visibility, bool value, IEnumerable<string>? parameters = null)
     {
         if (visibility is not (TypeVisibility.Public or TypeVisibility.Internal)) throw new ArgumentException("unsupported nested visibility", nameof(visibility));

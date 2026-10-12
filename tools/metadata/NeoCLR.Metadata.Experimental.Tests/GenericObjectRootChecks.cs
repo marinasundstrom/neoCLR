@@ -3,7 +3,7 @@ using NeoCLR.Metadata.Experimental.Model;
 
 internal static class GenericObjectRootChecks
 {
-    internal static AssemblyBuilder Create(bool manual = false)
+    internal static AssemblyBuilder Create(bool manual = false, bool nested = false)
     {
         var graph = new AssemblyBuilder(new("GenericObjectRoot", new(1, 0, 0, 0)), new("System.Runtime", new(10, 0, 0, 0)));
         var root = graph.AddNativeObjectRoot();
@@ -16,7 +16,12 @@ internal static class GenericObjectRootChecks
         var equals = root.AddNativeObjectSlot("Equals", new(PrimitiveType.Boolean, [root]));
         equals.GetILGenerator().Emit(OpCode.Ldc_Bool, false); equals.GetILGenerator().Return();
         TypeBuilder box;
-        if (manual)
+        if (nested)
+        {
+            var owner = graph.AddType("Example", "Owner");
+            box = owner.AddNestedClass("Box", root, ["T"]);
+        }
+        else if (manual)
         {
             var definition = new TypeDefinition("Example", "Box", 1, root.Definition.ToReference(), ["T"]);
             graph.Definition.MainModule.Types.Add(definition);
@@ -79,9 +84,11 @@ internal static class GenericObjectRootChecks
         try { RuntimeAssemblyContainer.WriteBinary(missing); throw new Exception("missing base initialization accepted"); }
         catch (InvalidDataException) { }
 
-        foreach (bool manual in new[] { false, true })
+        var owner = restricted.AddType("Example", "Owner");
+        try { owner.AddNestedClass("Bad", ordinary); throw new Exception("nested ordinary base admitted"); }
+        catch (ArgumentException) { }
+        foreach (var graph in new[] { Create(), Create(manual: true), Create(nested: true) })
         {
-            var graph = Create(manual);
             var image = RuntimeAssemblyContainer.WriteBinary(graph);
             var loaded = AssemblyDefinition.ReadNativeAssembly(image);
             var context = new NeoCLR.Metadata.Experimental.Introspection.MetadataLoadContext([loaded]);
