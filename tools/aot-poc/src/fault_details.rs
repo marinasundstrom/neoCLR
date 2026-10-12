@@ -52,7 +52,7 @@ pub struct Options {
     pub scheduler_submit_to: Vec<usize>,
     pub timer_start: Vec<usize>,
     pub stack_trace_capture: Vec<usize>,
-    pub runtime_async_gccollect: Vec<usize>,
+    pub gc_collect: Vec<usize>,
     pub runtime_async_create: Vec<usize>,
     pub runtime_async_start: Vec<usize>,
     pub runtime_async_startmanaged: Vec<usize>,
@@ -253,8 +253,8 @@ impl Options {
             stack_trace_capture: report.and_then(|r| r["nativeBindings"].as_array()).into_iter().flatten()
                 .filter(|r| r["implementation"] == "stack-trace-capture-v1")
                 .filter_map(|r| r["compiledIndex"].as_u64().map(|i| i as usize)).collect(),
-            runtime_async_gccollect: report.and_then(|r| r["nativeBindings"].as_array()).into_iter().flatten()
-                .filter(|b| b["implementation"] == "runtime-async-gccollect-v1")
+            gc_collect: report.and_then(|r| r["nativeBindings"].as_array()).into_iter().flatten()
+                .filter(|b| b["implementation"] == "gc-collect-v1")
                 .filter_map(|b| b["compiledIndex"].as_u64().map(|v| v as usize)).collect(),
             runtime_async_create: report.and_then(|r| r["nativeBindings"].as_array()).into_iter().flatten()
                 .filter(|b| b["implementation"] == "runtime-async-create-v1")

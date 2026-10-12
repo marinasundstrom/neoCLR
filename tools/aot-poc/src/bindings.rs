@@ -708,11 +708,36 @@ pub fn stack_trace(input: &mut neoclr::Module, selection: &Value) -> Result<Vec<
     Ok(bindings)
 }
 
+pub fn gc_collect(input: &mut neoclr::Module, selection: &Value) -> Result<Vec<Value>, Error> {
+    let mut bindings = vec![];
+    for row in selection["functions"].as_array().ok_or("missing selection inventory")? {
+        let (parameters, result, implementation, symbol) = match row["name"].as_str() {
+            Some("neoCLR.Runtime.GCCollect") => (vec![], Type::Void, "gc-collect-v1", "neoclr_gc_collect_managed_v1"),
+            _ => continue,
+        };
+        let f = &mut input.functions[row["compiledIndex"].as_u64().ok_or("missing compiled index")? as usize];
+        if f.name != row["name"].as_str().unwrap()
+            || f.owner.is_some() || f.instance || f.receiver_byref || f.receiver_readonly
+            || f.parameters != parameters || f.returns != result || f.no_result != (result == Type::Void)
+            || f.impl_flags != 0x1000 || f.pinvoke.is_some() || !f.body.is_empty()
+            || !f.locals.is_empty() || f.is_virtual || f.is_override || f.is_abstract
+            || !f.generic_parameters.is_empty() || !f.generic_arguments.is_empty()
+            || !f.generic_constraints.is_empty() || !f.interface_implementations.is_empty()
+            || !f.out_parameters.is_empty() || !f.out_when_true.is_empty() || !f.readonly_parameters.is_empty()
+        { return Err(format!("native GC binding requires exact reserved InternalCall contract: {} params {:?} returns {:?} no_result {}", f.name, f.parameters, f.returns, f.no_result).into()); }
+        f.impl_flags = 0;
+        f.body = vec![Op::Return];
+        bindings.push(json!({"definition": row["definition"], "name": row["name"],
+            "compiledIndex": row["compiledIndex"], "implementation": implementation, "symbol": symbol,
+            "storage": "explicit collection using published guest and host roots"}));
+    }
+    Ok(bindings)
+}
+
 pub fn runtime_async(input: &mut neoclr::Module, selection: &Value) -> Result<Vec<Value>, Error> {
     let mut bindings = vec![];
     for row in selection["functions"].as_array().ok_or("missing selection inventory")? {
         let (parameters, result, implementation, symbol) = match row["name"].as_str() {
-            Some("neoCLR.Runtime.GCCollect") => (vec![], Type::Void, "runtime-async-gccollect-v1", "neoclr_runtime_async_gccollect_v1"),
             Some("neoCLR.Runtime.RuntimeAsyncStartManaged") => (vec![Type::Named("System.Object".into()), neoclr::assembler::parse_type("fn<Void>").expect("fixed callback shape")], Type::Int64, "runtime-async-startmanaged-v1", "neoclr_runtime_async_startmanaged_v1"),
             Some("neoCLR.Runtime.RuntimeAsyncCreateOwned") => (vec![Type::Named("System.Object".into())], Type::Int64, "runtime-async-createowned-v1", "neoclr_runtime_async_createowned_v1"),
             Some("neoCLR.Runtime.RuntimeAsyncCurrentOwner") => (vec![], Type::Named("System.Object".into()), "runtime-async-currentowner-v1", "neoclr_runtime_async_currentowner_v1"),
@@ -1129,10 +1154,12 @@ mod type_identity_tests {
                     4 => f.no_result = !f.no_result,
                     _ => f.locals.push(Type::String),
                 }
-                assert!(runtime_async(&mut input, &inventory).is_err(), "{name} variant {variant}");
+                let bind = if name == "GCCollect" { gc_collect } else { runtime_async };
+                assert!(bind(&mut input, &inventory).is_err(), "{name} variant {variant}");
             }
             let mut input = source;
-            assert_eq!(runtime_async(&mut input, &inventory).unwrap().len(), 1);
+            let bind = if name == "GCCollect" { gc_collect } else { runtime_async };
+            assert_eq!(bind(&mut input, &inventory).unwrap().len(), 1);
             assert_eq!(input.functions[0].impl_flags, 0);
         }
     }

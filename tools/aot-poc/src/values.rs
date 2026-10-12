@@ -431,7 +431,7 @@ pub(crate) fn compile_into(
             (&d.scheduler_submit_to, "neoclr_scheduler_submit_to_managed_v1", vec![types::I64, types::I64, types::I64, types::I64]),
             (&d.scheduler_submit, "neoclr_scheduler_submit_managed_v1", vec![types::I64, types::I64, types::I64]),
             (&d.stack_trace_capture, "neoclr_stack_trace_capture_v1", vec![types::I32, types::I64, types::I64, types::I64, types::I32]),
-            (&d.runtime_async_gccollect, "neoclr_runtime_async_gccollect_v1", vec![types::I64, types::I64]),
+            (&d.gc_collect, "neoclr_gc_collect_managed_v1", vec![types::I64, types::I64]),
             (&d.runtime_async_create, "neoclr_runtime_async_create_v1", vec![types::I64, types::I64]),
             (&d.runtime_async_startmanaged, "neoclr_runtime_async_startmanaged_v1", vec![types::I64; 5]),
             (&d.runtime_async_createowned, "neoclr_runtime_async_createowned_v1", vec![types::I64; 3]),

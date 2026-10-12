@@ -430,8 +430,3 @@ int32_t neoclr_runtime_async_shutdown_v1(neoclr_aot_context *c) {
     bounds(NULL);
     return leaked && !c->fault.code ? 3 : 0;
 }
-
-int32_t neoclr_runtime_async_gccollect_v1(neoclr_aot_context *c, void *out) {
-    (void)out;
-    return neoclr_gc_collect_v1(c, neoclr_root_probe_head_v1());
-}

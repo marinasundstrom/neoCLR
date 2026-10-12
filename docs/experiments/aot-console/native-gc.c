@@ -478,3 +478,9 @@ int32_t neoclr_string_intern_v1(const neoclr_aot_text *text, neoclr_aot_text_are
     *output = text;
     return 0;
 }
+
+/* Managed GC.Collect is available independently of runtime suspension. */
+int32_t neoclr_gc_collect_managed_v1(neoclr_aot_context *c, void *out) {
+    (void)out;
+    return neoclr_gc_collect_v1(c, neoclr_root_probe_head_v1());
+}

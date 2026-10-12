@@ -1,0 +1,14 @@
+{
+  "run": 38185267503,
+  "normalization": "CRLF to LF only",
+  "reports": {
+    "windows-second-gate.json": {
+      "artifactSha256": "ddf0b15a89ab35f02dff0c8fd0ce517ee38dcbd63c4ddc6a361023377ea6b803",
+      "retainedSha256": "0001c80bde970f67e05ad0c8f2499d04c72f48e4242b71be55df3c6d65a24fb9"
+    },
+    "windows-second-project.json": {
+      "artifactSha256": "0ecbd96a12b2ce77367fbff659254812eb9ea14d86367ebeba44aacfc6ee3c9b",
+      "retainedSha256": "0208ace492eb96d2d357859fb986f5dbe825fc2c0a0f9a717683203446157f69"
+    }
+  }
+}

@@ -17,7 +17,9 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   Align project and direct-source cleanup admission after the Windows project gate
   exposed a missed provider path. Rebuild clean libraries and verify both project
   lowerings. Carry the general generic readonly-initializer fix from Raven main
-  with separate .NET and native execution evidence.
+  with separate .NET and native execution evidence. Decouple explicit native
+  GC.Collect binding from runtime suspension so Windows state-machine projects
+  can collect using the shared published-root collector.
 
 - Admit native reference records with more than sixteen declared fields when their
   flattened layout fits the existing 32-slot/264-byte object bound. This removes

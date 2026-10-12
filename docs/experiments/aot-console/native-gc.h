@@ -15,6 +15,8 @@ typedef struct {
     uint64_t attempts, nanoseconds, maximum_nanoseconds;
 } neoclr_gc_profile;
 neoclr_gc_profile neoclr_gc_profile_v1(void);
+/* Explicit managed collection uses the current published root chain. */
+int32_t neoclr_gc_collect_managed_v1(neoclr_aot_context *, void *output);
 /* Private current logical-stack capture; names are immutable current-image text.
  * Caller supplies published roots. Returns owned text; never changes Fault state. */
 int32_t neoclr_stack_trace_capture_v1(int32_t skip, neoclr_aot_context *,

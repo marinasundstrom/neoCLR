@@ -116,6 +116,8 @@ def main():
                 run(interpreted, key + '-interpreter', expected)
                 run([bundle / 'bin/neoclr', 'run', assembly, '--jit-compiler', backend], key + '-jit', expected)
                 compile_native = native.copy()
+                if lowering == "state-machine":
+                    compile_native.remove("--bind-runtime-async")
                 compile_native[2], compile_native[4] = str(assembly), str(obj)
                 run(compile_native, key + '-native')
                 app_link = [str(obj) if x == old_obj else str(app) if x == old_app else x for x in link]

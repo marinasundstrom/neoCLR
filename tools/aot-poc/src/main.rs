@@ -442,6 +442,7 @@ fn run() -> Result<(), Box<dyn std::error::Error>> {
                 bind_task_queue,
                 bind_socket_transfer,
                 bind_timers,
+                bind_gc_collect: native_gc,
                 bind_runtime_async,
                 bind_stack_trace,
                 bind_scheduler,

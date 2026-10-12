@@ -75,3 +75,11 @@ with `--async-library`. [Project evidence](mac-project-validation.json) passes
 32 checks across both lowerings, interpreter/JIT/AOT and repeated native invocations.
 Use `--project` with the runner to exercise this path, and `--case generic-use`
 for only the generic fixture. The Windows gate now pins this corrected compiler.
+
+The second Windows [run 38185267503](https://github.com/marinasundstrom/neoCLR/actions/runs/38185267503)
+compiles the project successfully, then exposes explicit `GC.Collect` being bound
+only with macOS runtime suspension: [gate](windows-second-gate.json),
+[project](windows-second-project.json). Explicit collection now belongs to the
+shared native GC adapter and is enabled by `--native-gc`, independently of async
+lowering. It uses the same published guest/host roots and does not add Windows
+runtime suspension. Windows execution qualification is being rerun.

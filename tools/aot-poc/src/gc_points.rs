@@ -40,7 +40,7 @@ pub(super) fn native_body(p: &Profile<'_>, i: usize, details: Option<&crate::fau
                 &d.scheduler_capture,
                 &d.scheduler_submit_to,
                 &d.stack_trace_capture,
-                &d.runtime_async_gccollect,
+                &d.gc_collect,
                 &d.runtime_async_create,
                 &d.runtime_async_start,
                 &d.runtime_async_startmanaged,

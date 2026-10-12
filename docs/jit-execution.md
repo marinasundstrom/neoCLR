@@ -140,3 +140,8 @@ calls. Reports preserve each original definition/name and its private compiled n
 The focused `sql_linking` native-tool test covers admitted and unadmitted variants;
 [SQL qualification](experiments/sql-postgresql/README.md) supplies the real consumer.
 The change is shared by JIT/AOT selection; it introduces no host ABI or compiler setting.
+
+Explicit managed `GC.Collect` uses the shared native collector when `--native-gc`
+is enabled, independently of runtime suspension. This applies to generated async
+state machines on Windows x64 as well as macOS ARM64. The collector uses the
+published guest and host roots; enabling it does not enable runtime async on Windows.
