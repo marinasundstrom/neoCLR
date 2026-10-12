@@ -96,8 +96,8 @@ neoCLR branch. Rebuild compiler, libraries and host together: bounded
 [function admission](native-selection-budget.md), [layout admission](native-layout-budget.md)
 and matching root hooks are required. Public signatures have a refreshed API snapshot.
 Windows managed execution remains pending; the earlier native HTTPS host result does
-not qualify this new managed composition. Next are HTTP handshake rejection, timeout,
-cancellation and recovery checks. Full-duplex simultaneous stream operations, OS trust
+not qualify this new managed composition. HTTP handshake rejection, timeout,
+cancellation and recovery checks are covered below. Full-duplex simultaneous stream operations, OS trust
 stores, general X509 inspection, mTLS and release packaging remain outside this slice.
 
 ### HTTP handshake failure checks
@@ -113,3 +113,36 @@ Tasks cannot accidentally skip the remaining assertions.
 [Local qualification](http-failures-validation.json) passes all four scenarios in
 interpreter, default JIT and standalone AOT on macOS. Windows uses the same consumer
 in CI; execution is pending. These checks required no additional runtime change.
+
+### Independent HTTPS peers
+
+`validate-interop.py` runs the managed HTTP client against a Python/OpenSSL server,
+then Python's HTTPS client against the managed HTTP server. Each pair exchanges
+nested JSON containing multi-byte UTF-8 in TLS 1.2 and TLS 1.3. The external server
+returns chunked HTTP, splitting chunk framing and UTF-8 across TLS records. Server
+handlers collect garbage before producing their response. This is interoperability
+qualification, not a performance comparison or a production hosting claim.
+
+```sh
+python3 docs/experiments/shared-tls/validate-interop.py \
+  --bundle path/to/bundle --aot tools/aot-poc/target/debug/neoclr-aot-poc \
+  --output target/tls-http-interop
+```
+
+Python must link an SSL library with TLS 1.3 support; the harness rejects older
+system Python builds before compiling. The local macOS setup uses Homebrew Python
+with OpenSSL. Credentials are disposable test fixtures with explicit localhost
+trust; no certificate verification is disabled. Keep the generated output private
+because it contains the private key. The Windows workflow invokes the same harness.
+
+The first external-peer attempt exposed a managed pump deadlock: a short output
+record could leave another handshake record queued, but SslStream waited for input.
+The adapter now drains any output progress before reading again. The initial local
+interpreter failure surfaced as authentication failure after waiting for the peer. The provider's pending status did not imply read readiness.
+`--reuse-build` can repeat peer checks after validating recorded build inputs and
+consumer source; use a new output directory when either changes.
+
+[Local interoperability evidence](interop-validation.json) passes all twelve
+peer/protocol/execution-mode combinations on macOS ARM64. The four existing HTTP
+failure scenarios also pass again in the interpreter with the corrected library.
+Windows execution remains pending.

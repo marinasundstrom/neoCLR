@@ -1,0 +1,71 @@
+import System.*
+import System.Collections.*
+import System.Result.*
+import System.Concurrency.Tasks.*
+import System.Time.*
+import System.Networking.Security.*
+import System.Web.Http.*
+import System.Web.Http.Json.*
+import System.Data.Json.*
+
+async func Echo(request: HttpRequest) -> Task<Result<HttpResponse, HttpError>> {
+    if !request.IsSecure || request.Method.Method != "POST" || request.Target != "/echo" {
+        return Error(HttpError.Handler("Unexpected request"))
+    }
+    let Ok(node) = await request.Content.ReadJsonNode() else {
+        return Error(HttpError.Handler("Invalid JSON request"))
+    }
+    System.Runtime.GC.Collect()
+    let Ok(content) = JsonContent.CreateNode(node) else {
+        return Error(HttpError.Handler("Cannot encode JSON response"))
+    }
+    let response = HttpResponse(HttpStatusCode.OK, ArrayList<HttpHeader>(), ArrayList<byte>())
+    response.Respond(HttpStatusCode.OK, content)
+    return Ok(response)
+}
+
+async func Main(arguments: string[]) -> Task<int> {
+    if arguments[0] == "server" {
+        let Ok(credentials) = SslServerAuthenticationOptions.Create(Fixtures.Certificate(), Fixtures.Key()) else { return 1 }
+        use ownedCredentials = credentials
+        let options = HttpServerOptions()
+        options.SslOptions = credentials
+        options.RequestReadTimeout = Duration.FromTicks(600000000L)
+        options.ResponseWriteTimeout = Duration.FromTicks(600000000L)
+        let Ok(server) = HttpServer.Listen("127.0.0.1", 0, 8, options) else { return 2 }
+        let Ok(port) = server.GetLocalPort() else { return 3 }
+        Console.WriteLine(port)
+        var served = 0
+        while served < 2 {
+            if let Error(error) = await server.ServeOne(Echo) {
+                Console.WriteLine(error.ToString())
+                server.Close()
+                return 4
+            }
+            served += 1
+        }
+        server.Close()
+        Console.WriteLine("PASS managed server")
+        return 0
+    }
+    let Ok(trust) = SslClientAuthenticationOptions.Create(Fixtures.Certificate()) else { return 5 }
+    use ownedTrust = trust
+    use client = HttpClient(HttpSocketHandler(trust))
+    let json = "{\"message\":\"Café 🌍\",\"nested\":{\"items\":[1,true,null]}}"
+    var count = 0
+    while count < 2 {
+        let Ok(node) = JsonSerializer.DeserializeNode(json) else { return 6 }
+        let Ok(content) = JsonContent.CreateNode(node) else { return 7 }
+        let result = await client.Post(arguments[1], content)
+        let Ok(response) = result else {
+            if let Error(error) = result { Console.WriteLine(error.ToString()) }
+            return 8
+        }
+        let Ok(reply) = await response.Content.ReadJsonNode() else { return 9 }
+        let Ok(text) = JsonSerializer.SerializeNode(reply) else { return 10 }
+        if text != json { return 11 }
+        count += 1
+    }
+    Console.WriteLine("PASS managed client")
+    return 0
+}

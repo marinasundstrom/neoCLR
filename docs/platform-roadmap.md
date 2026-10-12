@@ -8,6 +8,9 @@ host admission fixes preserve explicit memory budgets rather than introducing
 trimming. See [qualification and remaining HTTP work](experiments/shared-tls/README.md#managed-ssl-and-http-composition).
 HTTP hostname rejection/recovery, handshake deadlines and caller cancellation also
 pass in all three local modes; see [HTTP evidence](experiments/shared-tls/http-failures-validation.json).
+Independent OpenSSL peers now pass TLS 1.2/1.3 JSON exchange in both directions
+across all three local modes, after fixing short-record output pumping; see
+[interoperability evidence](experiments/shared-tls/interop-validation.json).
 Windows managed qualification and packaged build kits remain gates.
 
 **Gzip foundation (2026-10-12):** the author requests System.IO.Compression and

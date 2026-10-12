@@ -536,3 +536,14 @@ shutdown, trust and ownership. [Qualification](experiments/shared-tls/streams-va
 covers nested JSON and GC in all three local modes. Windows managed qualification and
 HTTP handshake failure/deadline recovery remain follow-through. Earlier sections are
 chronological checkpoints; their "remaining" lists describe those earlier slices.
+
+### Short ciphertext writes and managed progress — 2026-10-12
+
+Independent OpenSSL peer qualification exposed an adapter assumption: a pending
+pump may produce a short ciphertext record while more records remain queued.
+`produced < output.Length` is not evidence that the provider needs peer input.
+SslStream now pumps again after any produced output and only waits for input once
+a pending poll produces none. This preserves the bounded provider ABI and .NET-like
+stream authentication semantics. The cost is an extra pump when a short output
+already drained the queue; no new public API or TLS-policy divergence is introduced.
+The provider's pending status continues to mean incomplete, not specifically read-ready.

@@ -192,6 +192,8 @@ This host adapter remains source-only. Development managed TLS now also exposes
 and `HttpServerOptions.SslOptions`. `HttpSocketHandler(sslOptions)` enables HTTPS
 clients through the same managed stream API. The client/server showcase exchanges
 nested JSON, with GC during handling, in local macOS interpreter, JIT and AOT runs.
+Independent Python/OpenSSL peers also pass TLS 1.2/1.3 JSON exchange in both
+directions across the three local modes, including fragmented chunked responses.
 See the [TLS API reference](/docs/ssl-streams/) for ownership, cancellation and bounds.
 Windows managed-stream execution, Windows ARM64 and packaged TLS remain open;
 the Windows host results above do not qualify this new managed composition.

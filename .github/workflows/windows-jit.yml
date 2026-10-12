@@ -111,6 +111,8 @@ jobs:
             target/windows-jit-validation/tls-streams/native/build.json
             target/windows-jit-validation/tls-http-failures/validation.json
             target/windows-jit-validation/tls-http-failures/native/build.json
+            target/windows-jit-validation/tls-http-interop/validation.json
+            target/windows-jit-validation/tls-http-interop/native/build.json
             target/windows-jit-validation/public-cryptography/
             target/windows-jit-validation/native/build.json
             target/windows-jit-validation/async-use/

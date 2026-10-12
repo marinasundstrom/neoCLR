@@ -60,3 +60,9 @@ The development bundle pins Raven neoCLR compiler revision
 lowering required by SslStream. That revision must be available from the configured
 Raven remote before CI can rebuild the bundle. It was local at this checkpoint;
 publication and an actual Windows run remain pending. Raven main remains separate.
+
+The managed HTTP interoperability gate (`tls-http-interop`) uses independent
+Python/OpenSSL peers with TLS 1.2 and TLS 1.3, in both client/server directions.
+It also exercises chunked responses crossing TLS record and UTF-8 boundaries.
+Use a Python SSL build with TLS 1.3 enabled; credentials are generated per run and
+verification remains enabled. Uploads include the validation and native build reports.

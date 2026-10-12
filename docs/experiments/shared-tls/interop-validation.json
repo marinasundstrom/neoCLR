@@ -1,0 +1,101 @@
+{
+  "passed": true,
+  "platform": "macOS-27.0-arm64-arm-64bit-Mach-O",
+  "openssl": "OpenSSL 3.6.4 25 Aug 2026",
+  "cases": [
+    {
+      "mode": "interpreter",
+      "peer": "external-server",
+      "protocol": "TLSv1.2",
+      "passed": true
+    },
+    {
+      "mode": "interpreter",
+      "peer": "external-server",
+      "protocol": "TLSv1.3",
+      "passed": true
+    },
+    {
+      "mode": "interpreter",
+      "peer": "external-client",
+      "protocol": "TLSv1.2",
+      "passed": true
+    },
+    {
+      "mode": "interpreter",
+      "peer": "external-client",
+      "protocol": "TLSv1.3",
+      "passed": true
+    },
+    {
+      "mode": "default-jit",
+      "peer": "external-server",
+      "protocol": "TLSv1.2",
+      "passed": true
+    },
+    {
+      "mode": "default-jit",
+      "peer": "external-server",
+      "protocol": "TLSv1.3",
+      "passed": true
+    },
+    {
+      "mode": "default-jit",
+      "peer": "external-client",
+      "protocol": "TLSv1.2",
+      "passed": true
+    },
+    {
+      "mode": "default-jit",
+      "peer": "external-client",
+      "protocol": "TLSv1.3",
+      "passed": true
+    },
+    {
+      "mode": "aot",
+      "peer": "external-server",
+      "protocol": "TLSv1.2",
+      "passed": true
+    },
+    {
+      "mode": "aot",
+      "peer": "external-server",
+      "protocol": "TLSv1.3",
+      "passed": true
+    },
+    {
+      "mode": "aot",
+      "peer": "external-client",
+      "protocol": "TLSv1.2",
+      "passed": true
+    },
+    {
+      "mode": "aot",
+      "peer": "external-client",
+      "protocol": "TLSv1.3",
+      "passed": true
+    }
+  ],
+  "sourceHashes": {
+    "Main.rvn": "466767bdb46312fc107e33ef9bae96459d44f8ea417ed1283e96010219edc26c",
+    "App.rvnproj": "8031cdb50e84d9416a482c841f3f6a3f4a099a8b8a5cf2f4640375d9cc11fb42"
+  },
+  "date": "2026-10-12",
+  "compilerRevision": "6fe7d630a25d0e27f3e9e89b1403987caf30d9d6",
+  "rawReport": "target/ssl-http-interop-v4/validation.json",
+  "scope": "Independent HTTPS peers; nested UTF-8 JSON, fragmented chunked responses, TLS 1.2/1.3, both directions; not a performance benchmark",
+  "windows": "Identical CI gate added; execution pending",
+  "sslStreamSha256": "c42c7b37601a5721530bee64a52d50c905db69583d0f282755432587b4a502ea",
+  "libraries": {
+    "System.Web.dll": "1412ab0e94f861080f0cbc4d18e83135cd73bebd4ace4c1cda789b4e7b0f7f5d",
+    "System.Networking.dll": "e3556c4351a2caccc62c5f8a52257232c2fa0b394536aae21478203984202f7b",
+    "System.Runtime.dll": "55431cbeecc5f7bb086657c4fc24493fa1eafd4d2f82312a8c87d592cf672f73",
+    "System.Data.dll": "79dc7ab249444fbd0d69632aec53370f0a1b24316533b9cfae3cd6144934e989",
+    "System.Data.PostgreSql.dll": "479a41391143d476c40c77d716f7b3a7aef664f73ca88a4716804b0f008a93dc"
+  },
+  "httpFailureRegression": {
+    "mode": "interpreter",
+    "exitCode": 0,
+    "stdout": "HTTPS rejection and recovery passed\nHTTPS client timeout passed\nHTTPS client cancellation passed\nHTTPS server deadline passed\n"
+  }
+}

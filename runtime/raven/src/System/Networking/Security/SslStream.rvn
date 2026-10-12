@@ -137,8 +137,9 @@ public class SslStream : InputStream, OutputStream, Disposable {
             if status != -1 {
                 return Error(StreamError.InvalidData)
             }
-            // Full output requires another pump before waiting for peer input.
-            if produced == encryptedOutput.Length {
+            // A short write can leave another TLS record queued. Drain all output
+            // progress before waiting for the peer, even when the buffer was not full.
+            if produced > 0 {
                 continue
             }
             if inputCount == 0 {
