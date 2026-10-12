@@ -226,6 +226,7 @@ fn new_session(mut connection: Connection) -> *mut c_void {
         connection,
         pending: 0,
         failed: false,
+        closing: false,
     }))
     .cast()
 }
@@ -240,6 +241,7 @@ struct Session {
     connection: Connection,
     pending: usize,
     failed: bool,
+    closing: bool,
 }
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn neoclr_tls_session_new(config: *mut c_void) -> *mut c_void {
@@ -354,7 +356,47 @@ pub unsafe extern "C" fn neoclr_tls_handshake(
     }
 }
 
+/// Flushes a close-notify without waiting for the peer or closing the transport.
+/// Returns 0 flushed, -1 pending, -2 terminal failure, -3 invalid operation state.
+/// Complete authentication and any pending write first; serialize all session calls.
+#[unsafe(no_mangle)]
+pub unsafe extern "C" fn neoclr_tls_shutdown(
+    session: *mut c_void,
+    context: *mut c_void,
+    callback: Transfer,
+) -> i32 {
+    if session.is_null() {
+        return -2;
+    }
+    let session = unsafe { &mut *session.cast::<Session>() };
+    if session.failed {
+        return -2;
+    }
+    if session.connection.is_handshaking() || session.pending != 0 {
+        return -3;
+    }
+    if !session.closing {
+        session.closing = true;
+        session.connection.send_close_notify();
+    }
+    match flush(
+        &mut session.connection,
+        &mut Wire {
+            context,
+            transfer: callback,
+        },
+    ) {
+        Ok(true) => 0,
+        Ok(false) => -1,
+        Err(_) => {
+            session.failed = true;
+            -2
+        }
+    }
+}
+
 /// Returns -1 pending, -2 terminal transport/TLS failure, otherwise plaintext bytes.
+/// Returns -3 for a new send after local shutdown; reads remain available.
 /// A pending send must be retried with the same operation until completion or abort.
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn neoclr_tls_transfer(
@@ -368,6 +410,9 @@ pub unsafe extern "C" fn neoclr_tls_transfer(
     let session = unsafe { &mut *session.cast::<Session>() };
     if session.failed {
         return -2;
+    }
+    if sending != 0 && session.closing {
+        return -3;
     }
     let data = unsafe { std::slice::from_raw_parts_mut(data, count as usize) };
     match transfer(
@@ -405,7 +450,9 @@ pub unsafe extern "C" fn neoclr_tls_session_free(
     }
     let mut session = unsafe { Box::from_raw(session.cast::<Session>()) };
     if !session.failed && session.pending == 0 && !session.connection.is_handshaking() {
-        session.connection.send_close_notify();
+        if !session.closing {
+            session.connection.send_close_notify();
+        }
         let _ = flush(
             &mut session.connection,
             &mut Wire {
@@ -474,6 +521,15 @@ mod tests {
         fn handshake(&mut self) -> i32 {
             unsafe {
                 neoclr_tls_handshake(
+                    self.session,
+                    (&mut self.wire as *mut Memory).cast(),
+                    fragmented,
+                )
+            }
+        }
+        fn shutdown(&mut self) -> i32 {
+            unsafe {
+                neoclr_tls_shutdown(
                     self.session,
                     (&mut self.wire as *mut Memory).cast(),
                     fragmented,
@@ -778,6 +834,97 @@ mod tests {
             assert!(authenticate(&mut valid_server, &mut valid_client));
             deliver(&mut valid_client, &mut valid_server);
         }
+    }
+
+    #[test]
+    #[ignore = "run by HTTPS validation with ephemeral certificate/key paths"]
+    fn graceful_shutdown_flushes_under_backpressure_and_preserves_reads() {
+        for version in [&rustls::version::TLS12, &rustls::version::TLS13] {
+            let (mut server, mut client) = pair_with_config("localhost", b"", |config| {
+                let pem =
+                    std::fs::read(std::env::var("NEOCLR_HTTPS_CERTIFICATE").unwrap()).unwrap();
+                let mut roots = rustls::RootCertStore::empty();
+                for cert in rustls_pemfile::certs(&mut &pem[..]) {
+                    roots.add(cert.unwrap()).unwrap();
+                }
+                *config = ClientConfig::builder_with_provider(Arc::new(
+                    rustls::crypto::ring::default_provider(),
+                ))
+                .with_protocol_versions(&[version])
+                .unwrap()
+                .with_root_certificates(roots)
+                .with_no_client_auth();
+            });
+            assert_eq!(
+                client.shutdown(),
+                -3,
+                "cannot close an unauthenticated session"
+            );
+            assert!(authenticate(&mut server, &mut client));
+            deliver(&mut client, &mut server);
+            let mut pending = 0;
+            let mut flushed = false;
+            let mut eof = false;
+            for _ in 0..2000 {
+                match client.shutdown() {
+                    0 => flushed = true,
+                    -1 => pending += 1,
+                    status => panic!("unexpected shutdown {status}"),
+                }
+                pump(&mut client, &mut server);
+                match server.transfer(&mut [0; 1], false) {
+                    0 => eof = true,
+                    -1 => (),
+                    status => panic!("unexpected peer read {status}"),
+                }
+                if flushed && eof {
+                    break;
+                }
+            }
+            assert!(flushed && eof && pending > 0);
+            let writes = client.wire.writes;
+            assert_eq!(client.shutdown(), 0);
+            assert_eq!(
+                client.wire.writes, writes,
+                "repeat shutdown must not send another alert"
+            );
+            assert_eq!(client.transfer(&mut [9], true), -3);
+            // Closing local output does not discard authenticated peer response bytes.
+            deliver(&mut server, &mut client);
+        }
+    }
+
+    #[test]
+    #[ignore = "run by HTTPS validation with ephemeral certificate/key paths"]
+    fn graceful_shutdown_rejects_pending_send_and_honors_abort() {
+        let (mut server, mut client) = pair("localhost", b"");
+        assert!(authenticate(&mut server, &mut client));
+        let mut payload = vec![53; 8192];
+        assert_eq!(client.transfer(&mut payload, true), -1);
+        assert!(unsafe { &*client.session.cast::<Session>() }.pending > 0);
+        assert_eq!(client.shutdown(), -3);
+        // Resume the exact payload; shutdown rejection did not consume its acknowledgement.
+        deliver(&mut client, &mut server);
+        assert_eq!(client.shutdown(), -1);
+        unsafe { neoclr_tls_abort(client.session) };
+        assert_eq!(client.shutdown(), -2);
+        assert_eq!(client.transfer(&mut [0], false), -2);
+    }
+
+    unsafe extern "C" fn failed_transport(_: *mut c_void, _: *mut u8, _: u32, _: i32) -> i64 {
+        -2
+    }
+    #[test]
+    #[ignore = "run by HTTPS validation with ephemeral certificate/key paths"]
+    fn graceful_shutdown_transport_failure_is_terminal() {
+        let (mut server, mut client) = pair("localhost", b"");
+        assert!(authenticate(&mut server, &mut client));
+        assert_eq!(
+            unsafe { neoclr_tls_shutdown(client.session, std::ptr::null_mut(), failed_transport) },
+            -2
+        );
+        assert_eq!(client.shutdown(), -2);
+        assert_eq!(client.handshake(), -2);
     }
 
     fn exchange(client: &mut rustls::ClientConnection, memory: &mut Memory) {

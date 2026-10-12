@@ -12,7 +12,10 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   key mismatch, ALPN and provider setup; clear output handles on failure and retain
   the existing HTTPS ABI. Qualify credential rejection, untrusted/expired/future
   peers, terminal failed sessions and recovery alongside transport ownership tests.
-  All thirteen provider tests pass on macOS; Windows uses the existing CI gate.
+  Add pollable close-notify shutdown with backpressure, idempotence, pending-write
+  protection and terminal abort/failure handling; keep inbound reads available.
+  All sixteen provider tests pass on macOS, including explicit TLS 1.2/1.3 shutdown;
+  Windows uses the existing CI gate.
   Document shared HTTP/SQL security concepts without forcing a common native backend;
   managed SSL/certificate ownership and handshake diagnostics remain open.
 

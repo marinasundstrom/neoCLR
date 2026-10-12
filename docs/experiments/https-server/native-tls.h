@@ -27,6 +27,10 @@ void *neoclr_tls_client_config_from_pem(const unsigned char *, uint32_t,
 void neoclr_tls_client_config_free(void *);
 void *neoclr_tls_client_session_new(void *, const unsigned char *, uint32_t);
 int32_t neoclr_tls_handshake(void *, void *, neoclr_tls_io);
+/* Local close-notify flush: 0 done, -1 pending, -2 failed, -3 handshake/write pending.
+ * Does not close transport or await peer notification. Reads remain available;
+ * neoclr_tls_transfer rejects subsequent writes with -3. Serialize session calls. */
+int32_t neoclr_tls_shutdown(void *, void *, neoclr_tls_io);
 void *neoclr_tls_config_new(const char *, const char *);
 void neoclr_tls_config_free(void *);
 void *neoclr_tls_session_new(void *);

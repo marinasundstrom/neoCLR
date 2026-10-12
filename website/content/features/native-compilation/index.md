@@ -256,6 +256,8 @@ the generated-state-machine path; runtime suspension there remains future work.
 Windows HTTPS now passes its dedicated AOT/JIT qualification gate: 27 host cases
 and two Rust transport tests. All 15 common project AOT cases match macOS. This
 remains source-host support, without public secure-stream APIs or packaged TLS.
+The shared private provider now distinguishes certificate configuration errors and
+supports pollable graceful shutdown; its managed secure-stream projection remains open.
 
 Private cryptography service bindings use a standalone provider archive without
 TLS dependencies and now pass twelve cases in interpreter, JIT

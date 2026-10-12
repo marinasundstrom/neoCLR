@@ -1,0 +1,35 @@
+{
+  "date": "2026-10-12",
+  "passed": true,
+  "platform": "macOS-27.0-arm64-arm-64bit",
+  "command": "python3 scripts/test-native-security.py",
+  "toolchain": "Xcode 26.2 SDK selected explicitly",
+  "tests": {
+    "tls": 11,
+    "nativeCryptography": 4,
+    "safeProvider": 1
+  },
+  "shutdownVersions": [
+    "TLS1.2",
+    "TLS1.3"
+  ],
+  "cases": [
+    "fragmented close-notify flush",
+    "peer EOF",
+    "idempotent shutdown",
+    "inbound data after local shutdown",
+    "unfinished write acknowledgement preserved",
+    "abort during pending shutdown",
+    "terminal transport error"
+  ],
+  "sourcesSha256": {
+    "tools/native-tls/src/lib.rs": "1ba0e6a5b758b8810aa02a4e259a229b2b139755aad43b9c07b3b8daf5ed99e7",
+    "tools/native-tls/src/configuration.rs": "bdc31ba723370d7f9d84e4ce2f9f0ffee8655a3446e5d205b6fbceeff5291179",
+    "docs/experiments/https-server/native-tls.h": "d370b10a14fd87b984dec8337bc4c5e1768a16c0ae170ba6f1a148f48d8051b5",
+    "scripts/test-native-security.py": "4f6b6c3d0b71402272be9f6a7be15969b1e654b180db59e6732569bfe43b4c2e"
+  },
+  "limitations": [
+    "Windows execution of the new cases remains pending in the existing shared CI gate.",
+    "Private provider transport lifecycle only; managed SSL streams, GC-rooted handles and runtime service bindings remain open."
+  ]
+}

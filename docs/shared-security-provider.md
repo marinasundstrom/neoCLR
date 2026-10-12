@@ -32,7 +32,8 @@ and polls after readiness; it must not busy-spin. Existing transfer semantics re
 a pending write retains its operation until ciphertext flush completes; a retry
 must not replace its payload. An authenticated close delivers buffered plaintext
 before EOF; a truncated transport is a terminal failure. Destruction sends
-close-notify best effort and never waits. An awaited graceful shutdown is still open.
+close-notify best effort and never waits. Explicit pollable local shutdown is now
+available in the private ABI (below); its managed awaited projection remains open.
 All opaque handles and callbacks are trusted internal ABI, not guest pointers.
 
 ## Comparison and boundaries
@@ -237,3 +238,32 @@ and ownership decisions; common concepts must not require extracting private-key
 The next managed slice still needs rooted handle ownership, async stream composition,
 cancellation/concurrency rules and the client/server JSON consumer. No claim of those
 features follows from provider-level qualification alone.
+
+## Pollable graceful shutdown (development, 2026-10-12)
+
+`neoclr_tls_shutdown` queues close-notify once and flushes its ciphertext through the
+same bounded nonblocking callback used for other transport operations. It returns
+0 when flushed, -1 while pending, -2 for terminal transport/TLS failure, and -3 if
+handshake or a prior write operation still needs completion. An invalid-state result
+does not consume the write acknowledgement or change the session. The host must
+serialize calls and resume after readiness rather than spin.
+
+Once shutdown begins, new application writes return -3; application reads remain
+available. Successful repeated shutdown is idempotent. Completion means the local
+alert reached the underlying transport, not that the peer received it or returned
+its own alert. This does not close the underlying stream. Cancellation/deadline
+handling remains host-owned and may abort the session; abort and transport failure
+are terminal. Disposal remains immediate best-effort cleanup and cannot substitute
+for awaiting a required graceful shutdown.
+
+The baseline is [.NET SslStream.ShutdownAsync](https://learn.microsoft.com/en-us/dotnet/api/system.net.security.sslstream.shutdownasync?view=net-10.0)
+and [Rustls close-notify](https://docs.rs/rustls/0.23.45/rustls/struct.CommonState.html#method.send_close_notify),
+reviewed 2026-10-12. A private readiness-driven poll avoids making a second scheduler
+inside the TLS provider. The cost is explicit serialization and lifecycle work in
+the managed adapter. No Task or managed SslStream member is exposed by this slice.
+
+Tests force TLS 1.2 and TLS 1.3, fragmented/backpressured alert writes, peer-observed
+EOF, repeated shutdown, continued inbound traffic, rejection during an unfinished
+write, abort during shutdown and terminal transport failure. All sixteen provider
+tests pass on macOS; the unchanged macOS/Windows CI harness covers the new tests.
+[Evidence](experiments/shared-tls/shutdown-validation.json) records the local boundary.
