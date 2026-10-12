@@ -3,7 +3,7 @@ module System.IO
 import System.*
 import System.Collections.*
 import System.Result.*
-import System.Tasks.*
+import System.Concurrency.Tasks.*
 import System.Concurrency.*
 
 // Provisional, bounded managed storage. All stream capabilities share one cursor.

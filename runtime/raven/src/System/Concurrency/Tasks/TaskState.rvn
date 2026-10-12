@@ -1,4 +1,4 @@
-module System.Tasks
+module System.Concurrency.Tasks
 
 public enum TaskState {
     Pending = 0

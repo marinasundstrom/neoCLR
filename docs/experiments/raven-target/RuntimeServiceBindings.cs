@@ -149,11 +149,11 @@ static partial class RuntimeServiceBindings
             ("TypeArgument", ["System.RuntimeTypeHandle", "Int32"], "System.RuntimeTypeHandle"),
             ("TypeShape", ["System.RuntimeTypeHandle", "Int32"], "Boolean"),
             ("TypeDisplayName", ["System.RuntimeTypeHandle", "Int32"], "String"),
-            ("DefaultTaskQueue", [], "System.Tasks.TaskQueue"),
+            ("DefaultTaskQueue", [], "System.Concurrency.Tasks.TaskQueue"),
             ("ScheduleTask", ["fn<Void>"], "noresult"),
             ("DrainEntryTasks", [], "noresult"),
-            ("RegisterDefaultTaskQueue", ["System.Tasks.TaskQueue"], "noresult"),
-            ("CurrentTaskQueue", [], "System.Tasks.TaskQueue"),
+            ("RegisterDefaultTaskQueue", ["System.Concurrency.Tasks.TaskQueue"], "noresult"),
+            ("CurrentTaskQueue", [], "System.Concurrency.Tasks.TaskQueue"),
             ("ExecutingAssembly", [], "System.Introspection.AssemblyInfo"),
             ("AssemblyName", ["String"], "String"),
             ("AssemblyMetadataToken", ["String"], "Int32"),
@@ -235,7 +235,7 @@ static partial class RuntimeServiceBindings
                     : definition.ReturnType is not GenericParameter { Position: 0 }))
                 throw new InvalidDataException("Unsupported generic queue service.");
             var element = RuntimeSignatures.Map(generic.GenericArguments[0], GenericUnionBindings.Type);
-            if (element != "System.Tasks.TaskQueue") throw new InvalidDataException("Unsupported legacy queue identity.");
+            if (element != "System.Concurrency.Tasks.TaskQueue") throw new InvalidDataException("Unsupported legacy queue identity.");
             return new("", register ? [element] : [], register ? "noresult" : element,
                 Instruction: $"call neoCLR.Runtime.{reference.Name}<{element}>({(register ? element : "")})" + (register ? "\npop" : ""));
         }
@@ -259,7 +259,7 @@ static partial class RuntimeServiceBindings
         if (reference.Name == "ScheduleTask")
             return new("", args, result, Instruction: "call neoCLR.Runtime.ScheduleTask(fn<Void>)\npop");
         if (reference.Name == "RegisterDefaultTaskQueue")
-            return new("", args, result, Instruction: "call neoCLR.Runtime.RegisterDefaultTaskQueue(System.Tasks.TaskQueue)\npop");
+            return new("", args, result, Instruction: "call neoCLR.Runtime.RegisterDefaultTaskQueue(System.Concurrency.Tasks.TaskQueue)\npop");
         if (reference.Name == "ReflectionPropertySet")
             return new("", args, result, Instruction: "call neoCLR.Runtime.ReflectionPropertySet(System.RuntimeTypeHandle,Int32,System.Object,System.Object)\npop");
         if (reference.Name == "WriteLine")

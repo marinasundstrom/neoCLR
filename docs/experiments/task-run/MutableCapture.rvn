@@ -1,6 +1,6 @@
 import System.*
-import System.Tasks.*
-alias Task = System.Tasks.Task
+import System.Concurrency.Tasks.*
+alias Task = System.Concurrency.Tasks.Task
 
 async func Main() -> Task<int> {
     var count = 0

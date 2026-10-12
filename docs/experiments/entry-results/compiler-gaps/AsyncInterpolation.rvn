@@ -1,5 +1,5 @@
 import System.*
-import System.Tasks.*
+import System.Concurrency.Tasks.*
 
 // Reproducer: no async Main is involved. Expected output is "Value 1".
 async func Work() -> Task<int> {

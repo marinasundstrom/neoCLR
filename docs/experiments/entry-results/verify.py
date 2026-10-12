@@ -15,7 +15,7 @@ parser.add_argument('--case', action='append')
 args = parser.parse_args()
 artifacts = {name: getattr(args, name).resolve() for name in ('runtime', 'bridge', 'system', 'reference')}
 here = Path(__file__).resolve().parent
-prefix = 'import System.*\nimport System.Tasks.*\n'
+prefix = 'import System.*\nimport System.Concurrency.Tasks.*\n'
 
 
 def run(command):

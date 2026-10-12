@@ -3,13 +3,13 @@ using Mono.Cecil;
 // Provisional single-invocation completion API. No exception or async lowering policy.
 static class TaskBindings
 {
-    const string Prefix = "System.Tasks.";
+    const string Prefix = "System.Concurrency.Tasks.";
     const string Queue = Prefix + "TaskQueue";
     static readonly Dictionary<string, (string Kind, string Payload)> Shapes = new();
     public static void Reset() => Shapes.Clear();
     public static bool IsType(string type) => Shapes.ContainsKey(type);
     public const string Declarations = """
-        namespace Tasks {
+        namespace Concurrency.Tasks {
             public enum TaskState { Pending = 0, Completed = 1, Cancelled = 2 }
             public static class TaskOutcome {
                 public struct Cancelled { public Cancelled() { } }
@@ -79,9 +79,9 @@ static class TaskBindings
             }
             public interface TaskAwaiter { void OnCompleted(Func<PropagationUnit> callback); }
             public sealed class AsyncTaskMethodBuilder<T> {
-                public AsyncTaskMethodBuilder(Tasks.TaskQueue queue) { }
+                public AsyncTaskMethodBuilder(Concurrency.Tasks.TaskQueue queue) { }
                 public static AsyncTaskMethodBuilder<T> Create() => default;
-                public Tasks.Task<T> Task => default;
+                public Concurrency.Tasks.Task<T> Task => default;
                 public void Start<TState>(ref TState stateMachine) where TState : AsyncStateMachine { }
                 public void SetStateMachine(AsyncStateMachine stateMachine) { }
                 public bool HasStateMachine() => false;
@@ -167,7 +167,7 @@ static class TaskBindings
             ("TaskQueue", "Drain") => ("", "noresult"),
             ("Task", ".ctor") => (Prefix + "Promise<" + payload + ">", "noresult"),
             ("Task", "get_State") => ("", EnumBindings.TaskState),
-            ("Task", "get_Outcome") => ("", "System.Option<System.Tasks.TaskOutcome<" + payload + ">>"),
+            ("Task", "get_Outcome") => ("", "System.Option<System.Concurrency.Tasks.TaskOutcome<" + payload + ">>"),
             ("Task", "get_IsCompleted" or "get_IsCancelled") => ("", "Boolean"),
             ("Task" or "Promise", "Dispatcher") when library => ("", Queue),
             ("Task", "GetAwaiter") => ("", owner),

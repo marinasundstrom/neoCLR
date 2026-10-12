@@ -6,7 +6,7 @@ pub(super) fn validate(module: &Module, ty: &Type) -> Result<(), Fault> {
     let definition = module
         .type_definition(ty)
         .ok_or_else(|| Fault::new("TaskQueue service requires a defined queue type"))?;
-    let legacy = definition.name == "System.Tasks.TaskQueue"
+    let legacy = definition.name == "System.Concurrency.Tasks.TaskQueue"
         && definition
             .definition
             .as_ref()
@@ -14,7 +14,7 @@ pub(super) fn validate(module: &Module, ty: &Type) -> Result<(), Fault> {
     let native = definition
         .origin
         .as_ref()
-        .is_some_and(|origin| origin.name == "System.Tasks.TaskQueue");
+        .is_some_and(|origin| origin.name == "System.Concurrency.Tasks.TaskQueue");
     if !definition.is_reference_type
         || !definition.generic_parameters.is_empty()
         || !(legacy || native)

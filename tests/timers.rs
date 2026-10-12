@@ -5,7 +5,7 @@ fn program(setup: &str, body: &str) -> LoadedProgram {
     let source = format!(
         r#".module TimerConsumer
 .entry Main
-.type class System.Tasks.TaskQueue
+.type class System.Concurrency.Tasks.TaskQueue
 .method instance .ctor() -> noresult
 ret
 .end
@@ -32,7 +32,7 @@ ldvoid
 ret
 .end
 .end
-.function neoCLR.Runtime.RegisterDefaultTaskQueue(System.Tasks.TaskQueue queue) -> Void
+.function neoCLR.Runtime.RegisterDefaultTaskQueue(System.Concurrency.Tasks.TaskQueue queue) -> Void
 .methodimpl InternalCall
 .end
 .function neoCLR.Runtime.DrainEntryTasks() -> Void
@@ -62,7 +62,7 @@ ret
     program.verify().unwrap();
     program
 }
-const QUEUE: &str = "newobj instance System.Tasks.TaskQueue::.ctor()\ncall neoCLR.Runtime.RegisterDefaultTaskQueue(System.Tasks.TaskQueue)\npop";
+const QUEUE: &str = "newobj instance System.Concurrency.Tasks.TaskQueue::.ctor()\ncall neoCLR.Runtime.RegisterDefaultTaskQueue(System.Concurrency.Tasks.TaskQueue)\npop";
 const START: &str = "ldc.i4 1\nldloc counter\nfunction.bind fn<Void> = instance Counter::Complete()\ncall neoCLR.Runtime.TimerStart(Int32, fn<Void>)\nstloc handle";
 
 #[test]

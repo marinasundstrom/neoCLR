@@ -16,14 +16,14 @@ static class HttpBindings
             public struct HttpError { public struct InvalidUri { } public struct NameResolution { } public struct Transport { } public struct Content { } public struct InvalidRequest { } public struct Protocol { } public struct Unsupported { } public struct LimitExceeded { } public struct TimedOut { } public struct Handler { } public struct UnsuccessfulStatus { } }
             public abstract class HttpHandler : Disposable {
                 protected HttpHandler() { }
-                public abstract Tasks.Task<Result<HttpResponse, HttpError>> Send(HttpRequest request, Concurrency.CancellationToken cancellationToken);
+                public abstract Concurrency.Tasks.Task<Result<HttpResponse, HttpError>> Send(HttpRequest request, Concurrency.CancellationToken cancellationToken);
                 public virtual void Dispose() { }
             }
             public abstract class DelegatingHandler : HttpHandler {
                 protected DelegatingHandler() { }
                 protected DelegatingHandler(HttpHandler innerHandler) { }
                 public HttpHandler InnerHandler { get; set; }
-                public override Tasks.Task<Result<HttpResponse, HttpError>> Send(HttpRequest request, Concurrency.CancellationToken cancellationToken) => default;
+                public override Concurrency.Tasks.Task<Result<HttpResponse, HttpError>> Send(HttpRequest request, Concurrency.CancellationToken cancellationToken) => default;
                 public override void Dispose() { }
             }
             public sealed class RoutePattern {
@@ -46,42 +46,42 @@ static class HttpBindings
                 public Option<string> BaseUri { get; set; }
                 public Option<Time.Duration> Timeout { get; set; }
                 public Collections.Sequence<HttpHeader> DefaultRequestHeaders { get; set; }
-                public Tasks.Task<Result<HttpResponse, HttpError>> Get(string url) => default;
-                public Tasks.Task<Result<HttpResponse, HttpError>> Get(string url, Concurrency.CancellationToken cancellationToken) => default;
-                public Tasks.Task<Result<string, HttpError>> GetString(string url) => default;
-                public Tasks.Task<Result<string, HttpError>> GetString(string url, Concurrency.CancellationToken cancellationToken) => default;
-                public Tasks.Task<Result<HttpResponse, HttpError>> Get(Uri uri) => default;
-                public Tasks.Task<Result<HttpResponse, HttpError>> Get(Uri uri, Concurrency.CancellationToken cancellationToken) => default;
-                public Tasks.Task<Result<string, HttpError>> GetString(Uri uri) => default;
-                public Tasks.Task<Result<string, HttpError>> GetString(Uri uri, Concurrency.CancellationToken cancellationToken) => default;
-                public Tasks.Task<Result<HttpResponse, HttpError>> Post(string url, HttpContent content) => default;
-                public Tasks.Task<Result<HttpResponse, HttpError>> Post(string url, HttpContent content, Concurrency.CancellationToken cancellationToken) => default;
-                public Tasks.Task<Result<HttpResponse, HttpError>> Post(Uri uri, HttpContent content) => default;
-                public Tasks.Task<Result<HttpResponse, HttpError>> Post(Uri uri, HttpContent content, Concurrency.CancellationToken cancellationToken) => default;
-                public Tasks.Task<Result<HttpResponse, HttpError>> Put(string url, HttpContent content) => default;
-                public Tasks.Task<Result<HttpResponse, HttpError>> Put(string url, HttpContent content, Concurrency.CancellationToken cancellationToken) => default;
-                public Tasks.Task<Result<HttpResponse, HttpError>> Put(Uri uri, HttpContent content) => default;
-                public Tasks.Task<Result<HttpResponse, HttpError>> Put(Uri uri, HttpContent content, Concurrency.CancellationToken cancellationToken) => default;
-                public Tasks.Task<Result<HttpResponse, HttpError>> Patch(string url, HttpContent content) => default;
-                public Tasks.Task<Result<HttpResponse, HttpError>> Patch(string url, HttpContent content, Concurrency.CancellationToken cancellationToken) => default;
-                public Tasks.Task<Result<HttpResponse, HttpError>> Patch(Uri uri, HttpContent content) => default;
-                public Tasks.Task<Result<HttpResponse, HttpError>> Patch(Uri uri, HttpContent content, Concurrency.CancellationToken cancellationToken) => default;
-                public Tasks.Task<Result<HttpResponse, HttpError>> Delete(string url) => default;
-                public Tasks.Task<Result<HttpResponse, HttpError>> Head(string url) => default;
-                public Tasks.Task<Result<HttpResponse, HttpError>> Delete(string url, Concurrency.CancellationToken cancellationToken) => default;
-                public Tasks.Task<Result<HttpResponse, HttpError>> Head(string url, Concurrency.CancellationToken cancellationToken) => default;
-                public Tasks.Task<Result<HttpResponse, HttpError>> Delete(Uri uri) => default;
-                public Tasks.Task<Result<HttpResponse, HttpError>> Head(Uri uri) => default;
-                public Tasks.Task<Result<HttpResponse, HttpError>> Delete(Uri uri, Concurrency.CancellationToken cancellationToken) => default;
-                public Tasks.Task<Result<HttpResponse, HttpError>> Head(Uri uri, Concurrency.CancellationToken cancellationToken) => default;
-                public Tasks.Task<Result<HttpResponse, HttpError>> Send(HttpRequest request) => default;
-                public Tasks.Task<Result<HttpResponse, HttpError>> Send(HttpRequest request, Concurrency.CancellationToken cancellationToken) => default;
+                public Concurrency.Tasks.Task<Result<HttpResponse, HttpError>> Get(string url) => default;
+                public Concurrency.Tasks.Task<Result<HttpResponse, HttpError>> Get(string url, Concurrency.CancellationToken cancellationToken) => default;
+                public Concurrency.Tasks.Task<Result<string, HttpError>> GetString(string url) => default;
+                public Concurrency.Tasks.Task<Result<string, HttpError>> GetString(string url, Concurrency.CancellationToken cancellationToken) => default;
+                public Concurrency.Tasks.Task<Result<HttpResponse, HttpError>> Get(Uri uri) => default;
+                public Concurrency.Tasks.Task<Result<HttpResponse, HttpError>> Get(Uri uri, Concurrency.CancellationToken cancellationToken) => default;
+                public Concurrency.Tasks.Task<Result<string, HttpError>> GetString(Uri uri) => default;
+                public Concurrency.Tasks.Task<Result<string, HttpError>> GetString(Uri uri, Concurrency.CancellationToken cancellationToken) => default;
+                public Concurrency.Tasks.Task<Result<HttpResponse, HttpError>> Post(string url, HttpContent content) => default;
+                public Concurrency.Tasks.Task<Result<HttpResponse, HttpError>> Post(string url, HttpContent content, Concurrency.CancellationToken cancellationToken) => default;
+                public Concurrency.Tasks.Task<Result<HttpResponse, HttpError>> Post(Uri uri, HttpContent content) => default;
+                public Concurrency.Tasks.Task<Result<HttpResponse, HttpError>> Post(Uri uri, HttpContent content, Concurrency.CancellationToken cancellationToken) => default;
+                public Concurrency.Tasks.Task<Result<HttpResponse, HttpError>> Put(string url, HttpContent content) => default;
+                public Concurrency.Tasks.Task<Result<HttpResponse, HttpError>> Put(string url, HttpContent content, Concurrency.CancellationToken cancellationToken) => default;
+                public Concurrency.Tasks.Task<Result<HttpResponse, HttpError>> Put(Uri uri, HttpContent content) => default;
+                public Concurrency.Tasks.Task<Result<HttpResponse, HttpError>> Put(Uri uri, HttpContent content, Concurrency.CancellationToken cancellationToken) => default;
+                public Concurrency.Tasks.Task<Result<HttpResponse, HttpError>> Patch(string url, HttpContent content) => default;
+                public Concurrency.Tasks.Task<Result<HttpResponse, HttpError>> Patch(string url, HttpContent content, Concurrency.CancellationToken cancellationToken) => default;
+                public Concurrency.Tasks.Task<Result<HttpResponse, HttpError>> Patch(Uri uri, HttpContent content) => default;
+                public Concurrency.Tasks.Task<Result<HttpResponse, HttpError>> Patch(Uri uri, HttpContent content, Concurrency.CancellationToken cancellationToken) => default;
+                public Concurrency.Tasks.Task<Result<HttpResponse, HttpError>> Delete(string url) => default;
+                public Concurrency.Tasks.Task<Result<HttpResponse, HttpError>> Head(string url) => default;
+                public Concurrency.Tasks.Task<Result<HttpResponse, HttpError>> Delete(string url, Concurrency.CancellationToken cancellationToken) => default;
+                public Concurrency.Tasks.Task<Result<HttpResponse, HttpError>> Head(string url, Concurrency.CancellationToken cancellationToken) => default;
+                public Concurrency.Tasks.Task<Result<HttpResponse, HttpError>> Delete(Uri uri) => default;
+                public Concurrency.Tasks.Task<Result<HttpResponse, HttpError>> Head(Uri uri) => default;
+                public Concurrency.Tasks.Task<Result<HttpResponse, HttpError>> Delete(Uri uri, Concurrency.CancellationToken cancellationToken) => default;
+                public Concurrency.Tasks.Task<Result<HttpResponse, HttpError>> Head(Uri uri, Concurrency.CancellationToken cancellationToken) => default;
+                public Concurrency.Tasks.Task<Result<HttpResponse, HttpError>> Send(HttpRequest request) => default;
+                public Concurrency.Tasks.Task<Result<HttpResponse, HttpError>> Send(HttpRequest request, Concurrency.CancellationToken cancellationToken) => default;
             }
             public sealed class HttpSocketHandler : HttpHandler {
                 public HttpSocketHandler() { }
                 public override void Dispose() { }
-                public Tasks.Task<Result<HttpResponse, HttpError>> Send(HttpRequest request) => default;
-                public override Tasks.Task<Result<HttpResponse, HttpError>> Send(HttpRequest request, Concurrency.CancellationToken cancellationToken) => default;
+                public Concurrency.Tasks.Task<Result<HttpResponse, HttpError>> Send(HttpRequest request) => default;
+                public override Concurrency.Tasks.Task<Result<HttpResponse, HttpError>> Send(HttpRequest request, Concurrency.CancellationToken cancellationToken) => default;
             }
             public sealed class HttpHeader {
                 public HttpHeader(string name, string value) { }
@@ -164,7 +164,7 @@ static class HttpBindings
                 public Result<int, HttpError> ReadUpload(byte[] buffer, int count) => default;
                 public Option<string> MediaType => default;
                 public Collections.Sequence<byte> Bytes => default;
-                public Tasks.Task<Result<string, string>> ReadText() => default;
+                public Concurrency.Tasks.Task<Result<string, string>> ReadText() => default;
             }
             public sealed class HttpServerOptions {
                 public HttpServerOptions() { }
@@ -179,12 +179,12 @@ static class HttpBindings
                 public static Result<HttpServer, HttpError> Listen(string address, int port, int backlog) => default;
                 public static Result<HttpServer, HttpError> Listen(string address, int port, int backlog, HttpServerOptions options) => default;
                 public Result<int, HttpError> GetLocalPort() => default;
-                public Tasks.Task<Result<HttpContext, HttpError>> Accept() => default;
-                public Tasks.Task<Result<HttpContext, HttpError>> Accept(Concurrency.CancellationToken cancellationToken) => default;
+                public Concurrency.Tasks.Task<Result<HttpContext, HttpError>> Accept() => default;
+                public Concurrency.Tasks.Task<Result<HttpContext, HttpError>> Accept(Concurrency.CancellationToken cancellationToken) => default;
                 public Concurrency.CancellationToken StopToken => default;
                 public void Release() { }
-                public Tasks.Task<Result<PropagationUnit, HttpError>> ServeOne(Func<HttpRequest, Tasks.Task<Result<HttpResponse, HttpError>>> handler) => default;
-                public Tasks.Task<Result<PropagationUnit, HttpError>> ServeOne(Func<HttpRequest, Tasks.Task<Result<HttpResponse, HttpError>>> handler, Concurrency.CancellationToken cancellationToken) => default;
+                public Concurrency.Tasks.Task<Result<PropagationUnit, HttpError>> ServeOne(Func<HttpRequest, Concurrency.Tasks.Task<Result<HttpResponse, HttpError>>> handler) => default;
+                public Concurrency.Tasks.Task<Result<PropagationUnit, HttpError>> ServeOne(Func<HttpRequest, Concurrency.Tasks.Task<Result<HttpResponse, HttpError>>> handler, Concurrency.CancellationToken cancellationToken) => default;
                 public void Close() { }
                 public static Result<Collections.Sequence<byte>, HttpError> EncodeResponse(HttpResponse response, int headOnly) => default;
             }
@@ -202,19 +202,19 @@ static class HttpBindings
                 public void Respond(HttpStatusCode statusCode, HttpContent content) { }
                 public void RespondText(string text) { }
                 public void RespondText(HttpStatusCode statusCode, string text) { }
-                public Tasks.Task<Result<PropagationUnit, HttpError>> Complete() => default;
-                public Tasks.Task<Result<PropagationUnit, HttpError>> Complete(Concurrency.CancellationToken cancellationToken) => default;
-                public Tasks.Task<Result<PropagationUnit, HttpError>> Send(HttpResponse response, Concurrency.CancellationToken cancellationToken) => default;
+                public Concurrency.Tasks.Task<Result<PropagationUnit, HttpError>> Complete() => default;
+                public Concurrency.Tasks.Task<Result<PropagationUnit, HttpError>> Complete(Concurrency.CancellationToken cancellationToken) => default;
+                public Concurrency.Tasks.Task<Result<PropagationUnit, HttpError>> Send(HttpResponse response, Concurrency.CancellationToken cancellationToken) => default;
                 public void Close() { }
                 public void Dispose() { }
             }
             public sealed class HttpServerExchange {
                 public HttpServerExchange(HttpServer owner, Networking.Sockets.Socket listener, Concurrency.CancellationToken token) { }
-                public Tasks.Task<Result<HttpContext, HttpError>> Start() => default;
+                public Concurrency.Tasks.Task<Result<HttpContext, HttpError>> Start() => default;
             }
             public sealed class HttpServeOperation {
-                public HttpServeOperation(HttpServer server, Func<HttpRequest, Tasks.Task<Result<HttpResponse, HttpError>>> handler, Concurrency.CancellationToken token) { }
-                public Tasks.Task<Result<PropagationUnit, HttpError>> Start() => default;
+                public HttpServeOperation(HttpServer server, Func<HttpRequest, Concurrency.Tasks.Task<Result<HttpResponse, HttpError>>> handler, Concurrency.CancellationToken token) { }
+                public Concurrency.Tasks.Task<Result<PropagationUnit, HttpError>> Start() => default;
             }
             public sealed class HttpResponseDecoder {
                 public HttpResponseDecoder(bool isHead) { }
@@ -225,7 +225,7 @@ static class HttpBindings
             }
             public sealed class HttpExchange {
                 public HttpExchange(HttpRequest request, Concurrency.CancellationToken token) { }
-                public Tasks.Task<Result<HttpResponse, HttpError>> Execute() => default;
+                public Concurrency.Tasks.Task<Result<HttpResponse, HttpError>> Execute() => default;
             }
         }
         """;
@@ -251,7 +251,7 @@ static class HttpBindings
         var request = Prefix + "HttpRequest";
         var response = Prefix + "HttpResponse";
         var outcome = $"System.Result<{response},System.Web.Http.HttpError>";
-        var task = $"System.Tasks.Task<{outcome}>";
+        var task = $"System.Concurrency.Tasks.Task<{outcome}>";
         var expected = (owner[Prefix.Length..], definition.Name) switch {
             ("RoutePattern", "Parse") => ("String", "System.Result<System.Web.Http.RoutePattern,String>", true),
             ("RoutePattern", "GetParameterNames") => ("", "System.Collections.Sequence<String>", false),
@@ -263,7 +263,7 @@ static class HttpBindings
             ("HttpServer", "Listen") => ("String,Int32,Int32", $"System.Result<{Prefix}HttpServer,System.Web.Http.HttpError>", true),
             ("HttpServer", "GetLocalPort") => ("", "System.Result<Int32,System.Web.Http.HttpError>", false),
             ("HttpServer", "Close") => ("", "noresult", false),
-            ("HttpServer", "ServeOne") => ($"fn<{request},{task}>" + (args.Length == 2 ? "," + CancellationBindings.Token : ""), "System.Tasks.Task<System.Result<Void,System.Web.Http.HttpError>>", false),
+            ("HttpServer", "ServeOne") => ($"fn<{request},{task}>" + (args.Length == 2 ? "," + CancellationBindings.Token : ""), "System.Concurrency.Tasks.Task<System.Result<Void,System.Web.Http.HttpError>>", false),
             ("HttpServer", "EncodeResponse") when library => (response + ",Int32", "System.Result<System.Collections.Sequence<Byte>,System.Web.Http.HttpError>", true),
             ("HttpRequest", "FromIncoming") when library => ($"String,String,String,System.Collections.Sequence<{Prefix}HttpHeader>,System.Collections.Sequence<Byte>", $"System.Result<{request},System.Web.Http.HttpError>", true),
             ("HttpHeader", "FindValues") when library => ($"System.Collections.Sequence<{Prefix}HttpHeader>,String", "System.Collections.Sequence<String>", true),
@@ -274,20 +274,20 @@ static class HttpBindings
             ("HttpRequestDecoder", "Push") when library => ("Byte", "System.Result<Boolean,System.Web.Http.HttpError>", false),
             ("HttpRequestDecoder", "Finish") when library => ("", $"System.Result<{request},System.Web.Http.HttpError>", false),
             ("HttpServerExchange", ".ctor") when library => ($"{Prefix}HttpServer,System.Networking.Sockets.Socket,{CancellationBindings.Token}", "noresult", false),
-            ("HttpServerExchange", "Start") when library => ("", $"System.Tasks.Task<System.Result<{Prefix}HttpContext,System.Web.Http.HttpError>>", false),
+            ("HttpServerExchange", "Start") when library => ("", $"System.Concurrency.Tasks.Task<System.Result<{Prefix}HttpContext,System.Web.Http.HttpError>>", false),
             ("HttpServeOperation", ".ctor") when library => ($"{Prefix}HttpServer,fn<{request},{task}>,{CancellationBindings.Token}", "noresult", false),
-            ("HttpServeOperation", "Start") when library => ("", "System.Tasks.Task<System.Result<Void,System.Web.Http.HttpError>>", false),
-            ("HttpServer", "Accept") => (args.Length == 1 ? CancellationBindings.Token : "", $"System.Tasks.Task<System.Result<{Prefix}HttpContext,System.Web.Http.HttpError>>", false),
+            ("HttpServeOperation", "Start") when library => ("", "System.Concurrency.Tasks.Task<System.Result<Void,System.Web.Http.HttpError>>", false),
+            ("HttpServer", "Accept") => (args.Length == 1 ? CancellationBindings.Token : "", $"System.Concurrency.Tasks.Task<System.Result<{Prefix}HttpContext,System.Web.Http.HttpError>>", false),
             ("HttpServer", "Release") when library => ("", "noresult", false),
             ("HttpServer", "get_StopToken") when library => ("", CancellationBindings.Token, false),
             ("HttpContext", ".ctor") when library => ($"{Prefix}HttpServer,System.Networking.Sockets.Socket,{request}", "noresult", false),
             ("HttpContext", "get_Response") => ("", response, false),
-            ("HttpContext", "Complete") => (args.Length == 1 ? CancellationBindings.Token : "", "System.Tasks.Task<System.Result<Void,System.Web.Http.HttpError>>", false),
+            ("HttpContext", "Complete") => (args.Length == 1 ? CancellationBindings.Token : "", "System.Concurrency.Tasks.Task<System.Result<Void,System.Web.Http.HttpError>>", false),
             ("HttpContext", "RespondText") => (args.Length == 1 ? "String" : Prefix + "HttpStatusCode,String", "noresult", false),
             ("HttpResponse" or "HttpContext", "Respond") => (Prefix + "HttpStatusCode" + (args.Length == 2 ? "," + Prefix + "HttpContent" : ""), "noresult", false),
             ("HttpContext", "get_Request") => ("", request, false),
             ("HttpContext", "Close" or "Dispose") => ("", "noresult", false),
-            ("HttpContext", "Send") when library => (response + (args.Length == 2 ? "," + CancellationBindings.Token : ""), "System.Tasks.Task<System.Result<Void,System.Web.Http.HttpError>>", false),
+            ("HttpContext", "Send") when library => (response + (args.Length == 2 ? "," + CancellationBindings.Token : ""), "System.Concurrency.Tasks.Task<System.Result<Void,System.Web.Http.HttpError>>", false),
             ("HttpHandler", ".ctor") => ("", "noresult", false),
             ("DelegatingHandler", ".ctor") => (args.Length == 0 ? "" : Prefix + "HttpHandler", "noresult", false),
             ("DelegatingHandler", "get_InnerHandler") => ("", Prefix + "HttpHandler", false),
@@ -297,7 +297,7 @@ static class HttpBindings
             ("HttpClient" or "HttpSocketHandler" or "HttpHandler" or "DelegatingHandler", "Dispose") => ("", "noresult", false),
             ("HttpClient", ".ctor") => (Prefix + "HttpHandler", "noresult", false),
             ("HttpClient", "Get" or "GetString" or "Delete" or "Head") => (args.Length > 0 && args[0] == "String" ? "String" : "System.Uri",
-                definition.Name != "GetString" ? task : "System.Tasks.Task<System.Result<String,System.Web.Http.HttpError>>", false),
+                definition.Name != "GetString" ? task : "System.Concurrency.Tasks.Task<System.Result<String,System.Web.Http.HttpError>>", false),
             ("HttpClient", "Post" or "Put" or "Patch") => ((args.Length > 0 && args[0] == "String" ? "String" : "System.Uri") + "," + Prefix + "HttpContent", task, false),
             ("HttpRequest", "Post" or "Put" or "Patch") => ((args.Length > 0 && args[0] == "String" ? "String" : "System.Uri") + "," + Prefix + "HttpContent", $"System.Result<{request},System.Web.Http.HttpError>", true),
             ("HttpRequest", "get_Content") => ("", Prefix + "HttpContent", false),
@@ -345,7 +345,7 @@ static class HttpBindings
             ("HttpResponse", "get_Content") => ("", Prefix + "HttpContent", false),
             ("HttpContent", ".ctor") => (args.Length == 2 ? "System.Collections.Sequence<Byte>,String" : "System.Collections.Sequence<Byte>", "noresult", false),
             ("HttpContent", "get_Bytes") => ("", "System.Collections.Sequence<Byte>", false),
-            ("HttpContent", "ReadText") => ("", "System.Tasks.Task<System.Result<String,String>>", false),
+            ("HttpContent", "ReadText") => ("", "System.Concurrency.Tasks.Task<System.Result<String,String>>", false),
             ("HttpResponseDecoder", "get_Complete") when library => ("", "Boolean", false),
             ("HttpResponseDecoder", "Push") when library => ("Byte", "System.Result<Boolean,System.Web.Http.HttpError>", false),
             ("HttpResponseDecoder", "Finish" or "EndOfInput") when library => ("", outcome, false),

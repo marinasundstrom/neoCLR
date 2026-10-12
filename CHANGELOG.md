@@ -8,6 +8,14 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-12
 
+- Move System.Tasks to System.Concurrency.Tasks, including Task, Promise, outcomes,
+  states and operators. Update Raven mappings, runtime dispatch guards, native
+  linking, consumers and both API references. This breaks imports and metadata
+  identity; rebuild with matching libraries/compiler. System.Runtime ownership and
+  ordinary .NET task mapping stay unchanged. On macOS, 18 stream cases pass in each
+  interpreter/JIT/AOT mode, 11 HTTP upload cases pass in JIT, and focused compiler,
+  runtime and documentation checks pass. Windows execution remains unqualified.
+
 - Support nested native reference classes deriving from the same assembly's
   explicit Object root, including generic generated async state machines. Preserve
   lexical ownership/base identity through native authoring and loading; keep other

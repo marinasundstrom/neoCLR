@@ -13,7 +13,7 @@ parser.add_argument('--system', type=Path, required=True)
 parser.add_argument('--runtime', type=Path, required=True)
 args = parser.parse_args()
 prelude = """import System.*
-import System.Tasks.*
+import System.Concurrency.Tasks.*
 import System.Result.*
 import System.Console.*
 func Check(value: bool) {

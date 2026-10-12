@@ -1,9 +1,9 @@
-module System.Tasks {
+module System.Concurrency.Tasks {
 
 import System.*
 import System.Collections.*
 import System.Option.*
-import System.Tasks.TaskOutcome.*
+import System.Concurrency.Tasks.TaskOutcome.*
 
 // Submission owns no public thread handle; all overloads use the default dispatcher.
 public static class Task {
@@ -270,7 +270,7 @@ public class Promise<T> {
 module System.Runtime.CompilerServices {
     import System.*
     import System.Option.*
-    import System.Tasks.*
+    import System.Concurrency.Tasks.*
 
     public interface AsyncStateMachine {
         func MoveNext()

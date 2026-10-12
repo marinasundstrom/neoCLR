@@ -13,7 +13,7 @@ parser.add_argument('--system', type=Path, required=True)
 parser.add_argument('--runtime', type=Path, required=True)
 args = parser.parse_args()
 prelude = '''import System.*
-import System.Tasks.*
+import System.Concurrency.Tasks.*
 import System.Concurrency.*
 import System.Console.*
 public func Check(value: bool) { if !value { System.Fail("Default queue assertion failed") } }

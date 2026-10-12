@@ -1,6 +1,6 @@
 import System.*
 import System.Console.*
-import System.Tasks.*
+import System.Concurrency.Tasks.*
 
 // Keep the queue nonempty until the consumer finishes. Completion must make
 // progress between callbacks; waiting for an empty queue would never finish.

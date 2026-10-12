@@ -49,11 +49,11 @@ static class AsyncRefChecks
         copiedParameter.ElementMethod.Parameters[0].ParameterType = start.GenericParameters[0];
         Reject(copiedParameter, start);
         Reject(Call(start, core.TypeSystem.Int32), start);
-        var task = new GenericInstanceType(core.GetType("System.Tasks.Task`1"));
+        var task = new GenericInstanceType(core.GetType("System.Concurrency.Tasks.Task`1"));
         task.GenericArguments.Add(core.TypeSystem.Int32);
         var awaitMethod = definition.Methods.Single(m => m.Name == "AwaitOnCompleted");
         var awaitBinding = AsyncBindings.BindByRef(Call(awaitMethod, task, state), awaitMethod, "test", Map)!;
-        if (awaitBinding.Arguments.Length != 3 || awaitBinding.Arguments[1] != "System.Tasks.Task<Int32>&"
+        if (awaitBinding.Arguments.Length != 3 || awaitBinding.Arguments[1] != "System.Concurrency.Tasks.Task<Int32>&"
             || awaitBinding.Arguments[2] != "State&") throw new Exception("Ref await contract changed.");
         Reject(Call(awaitMethod, core.GetType("System.Object"), state), awaitMethod);
         Console.WriteLine("Ref async metadata: 2 valid and 4 rejected contracts passed");

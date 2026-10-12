@@ -1,7 +1,7 @@
 import System.*
 import System.Collections.*
 import System.Result.*
-import System.Tasks.*
+import System.Concurrency.Tasks.*
 import System.Web.Http.*
 
 // A buffered echo handler: the same content contract is used in each direction.

@@ -2,7 +2,7 @@ module System.Web.Http
 
 import System.Runtime.CompilerServices.*
 import System.Option.*
-import System.Tasks.*
+import System.Concurrency.Tasks.*
 import System.Concurrency.*
 import System.Networking.*
 import System.Networking.Sockets.*

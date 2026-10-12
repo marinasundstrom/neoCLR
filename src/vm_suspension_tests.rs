@@ -223,7 +223,7 @@ fn queue_and_entry_drain_state_survive_collection_at_every_pause() {
     let system = crate::assemble(
         r#"
 .module System
-.type class System.Tasks.TaskQueue
+.type class System.Concurrency.Tasks.TaskQueue
 .field Drains Int32
 .method instance .ctor() -> noresult
 ret
@@ -231,14 +231,14 @@ ret
 .method instance Drain() -> noresult
 ldarg 0
 ldarg 0
-ldfld System.Tasks.TaskQueue::Drains
+ldfld System.Concurrency.Tasks.TaskQueue::Drains
 ldc.i4 1
 add
-stfld System.Tasks.TaskQueue::Drains
+stfld System.Concurrency.Tasks.TaskQueue::Drains
 ret
 .end
 .end
-.function neoCLR.Runtime.RegisterDefaultTaskQueue(System.Tasks.TaskQueue queue) -> Void
+.function neoCLR.Runtime.RegisterDefaultTaskQueue(System.Concurrency.Tasks.TaskQueue queue) -> Void
 .methodimpl InternalCall
 .end
 .function neoCLR.Runtime.DrainEntryTasks() -> Void
@@ -250,12 +250,12 @@ ret
     let source = r#"
 .module App
 .entry Main
-.function Main() -> System.Tasks.TaskQueue
-.local System.Tasks.TaskQueue queue
-newobj instance System.Tasks.TaskQueue::.ctor()
+.function Main() -> System.Concurrency.Tasks.TaskQueue
+.local System.Concurrency.Tasks.TaskQueue queue
+newobj instance System.Concurrency.Tasks.TaskQueue::.ctor()
 stloc queue
 ldloc queue
-call neoCLR.Runtime.RegisterDefaultTaskQueue(System.Tasks.TaskQueue)
+call neoCLR.Runtime.RegisterDefaultTaskQueue(System.Concurrency.Tasks.TaskQueue)
 pop
 call neoCLR.Runtime.DrainEntryTasks()
 pop
@@ -344,31 +344,31 @@ fn completion_wait_probe(cancel: bool) {
     let module = crate::assemble(
         r#"
 .module System
-.type class System.Tasks.TaskQueue
+.type class System.Concurrency.Tasks.TaskQueue
 .field Posts Int32
 .field Drains Int32
 .method instance Post(fn<Void> callback) -> noresult
 ldarg 0
 ldarg 0
-ldfld System.Tasks.TaskQueue::Posts
+ldfld System.Concurrency.Tasks.TaskQueue::Posts
 ldc.i4 1
 add
-stfld System.Tasks.TaskQueue::Posts
+stfld System.Concurrency.Tasks.TaskQueue::Posts
 ret
 .end
 .method instance Drain() -> noresult
 ldarg 0
 ldarg 0
-ldfld System.Tasks.TaskQueue::Drains
+ldfld System.Concurrency.Tasks.TaskQueue::Drains
 ldc.i4 1
 add
-stfld System.Tasks.TaskQueue::Drains
+stfld System.Concurrency.Tasks.TaskQueue::Drains
 ret
 .end
 .end
 .type class Result
 .field Number Int32
-.field Queue System.Tasks.TaskQueue
+.field Queue System.Concurrency.Tasks.TaskQueue
 .end
 .function Main(Result result) -> Result
 ldarg result
@@ -390,7 +390,7 @@ ret
         let mut heap = participant.enter();
         let id = heap
             .allocate(Value::Object {
-                ty: Type::from_name("System.Tasks.TaskQueue"),
+                ty: Type::from_name("System.Concurrency.Tasks.TaskQueue"),
                 fields: vec![Value::Int32(0), Value::Int32(0)],
             })
             .unwrap();
@@ -403,7 +403,7 @@ ret
             identity: std::sync::Arc::new(()),
             ty: crate::assembler::parse_type("fn<Void>").unwrap(),
             target: crate::assembler::parse_function_ref(
-                "instance System.Tasks.TaskQueue::Drain()",
+                "instance System.Concurrency.Tasks.TaskQueue::Drain()",
             )
             .unwrap(),
             receiver: Some(Box::new(queue.clone())),
@@ -797,22 +797,22 @@ fn guest_contexts_observe_one_default_queue_after_submitter_exits() {
     let module = crate::assemble(
         r#"
 .module System
-.type class System.Tasks.TaskQueue
+.type class System.Concurrency.Tasks.TaskQueue
 .field Drains Int32
 .method instance Drain() -> noresult
 ldarg 0
 ldarg 0
-ldfld System.Tasks.TaskQueue::Drains
+ldfld System.Concurrency.Tasks.TaskQueue::Drains
 ldc.i4 1
 add
-stfld System.Tasks.TaskQueue::Drains
+stfld System.Concurrency.Tasks.TaskQueue::Drains
 ret
 .end
 .end
-.function neoCLR.Runtime.DefaultTaskQueue() -> System.Tasks.TaskQueue
+.function neoCLR.Runtime.DefaultTaskQueue() -> System.Concurrency.Tasks.TaskQueue
 .methodimpl InternalCall
 .end
-.function ReadQueue() -> System.Tasks.TaskQueue
+.function ReadQueue() -> System.Concurrency.Tasks.TaskQueue
 call neoCLR.Runtime.DefaultTaskQueue()
 ret
 .end
@@ -827,7 +827,7 @@ ret
         let mut heap = participant.enter();
         let id = heap
             .allocate(Value::Object {
-                ty: Type::from_name("System.Tasks.TaskQueue"),
+                ty: Type::from_name("System.Concurrency.Tasks.TaskQueue"),
                 fields: vec![Value::Int32(0)],
             })
             .unwrap();

@@ -106,10 +106,10 @@ ldelem Byte
 conv.i4
 ldc.i4 72
 beq Done
-call System.Tasks.TaskQueue::get_Default()
+call System.Concurrency.Tasks.TaskQueue::get_Default()
 ldarg this
 function.bind fn<Void> = instance SocketCompletion::Busy()
-call instance System.Tasks.TaskQueue::Post(fn<Void>)
+call instance System.Concurrency.Tasks.TaskQueue::Post(fn<Void>)
 Done:
 ldvoid
 ret
@@ -124,7 +124,7 @@ ret
 .end
 .function Launch() -> Void
 .local arrayref<Byte> buffer
-call System.Tasks.TaskQueue::get_Default()
+call System.Concurrency.Tasks.TaskQueue::get_Default()
 pop
 ldc.i4 3
 newarr Byte
@@ -231,7 +231,7 @@ fn tcp_completion_survives_both_vm_collection_paths_and_empty_queue_wait() {
             assert_eq!(peer.read(&mut [0]).unwrap(), 0);
         });
         let body = format!(
-            ".local Int32 index\ncall Launch()\npop\n{PRESSURE}\ncall System.Tasks.TaskQueue::get_Default()\nfunction.bind fn<Void> = Ready()\ncall instance System.Tasks.TaskQueue::Post(fn<Void>)\nldstr \"entry\""
+            ".local Int32 index\ncall Launch()\npop\n{PRESSURE}\ncall System.Concurrency.Tasks.TaskQueue::get_Default()\nfunction.bind fn<Void> = Ready()\ncall instance System.Concurrency.Tasks.TaskQueue::Post(fn<Void>)\nldstr \"entry\""
         );
         let result = execute(
             &body,
@@ -301,7 +301,7 @@ fn socket_completes_while_default_queue_remains_busy() {
         peer.write_all(b"H").unwrap();
     });
     let launch = "call neoCLR.Runtime.TestSocketReceive(arrayref<Byte>,Int32,Int32,fn<Void>)\npop";
-    let types = TYPES.replace(launch, &(launch.to_string() + "\ncall System.Tasks.TaskQueue::get_Default()\nldloc buffer\nnewobj SocketCompletion\nfunction.bind fn<Void> = instance SocketCompletion::Busy()\ncall instance System.Tasks.TaskQueue::Post(fn<Void>)"));
+    let types = TYPES.replace(launch, &(launch.to_string() + "\ncall System.Concurrency.Tasks.TaskQueue::get_Default()\nldloc buffer\nnewobj SocketCompletion\nfunction.bind fn<Void> = instance SocketCompletion::Busy()\ncall instance System.Concurrency.Tasks.TaskQueue::Post(fn<Void>)"));
     let result = execute_types(
         "call Launch()\npop\ncall Ready()\npop\nldstr \"entry\"",
         crate::ExecutionOptions {
@@ -329,7 +329,7 @@ fn vm_rejects_invalid_receive_ranges_and_missing_dispatcher_before_consuming_soc
             &format!("ldc.i4 {offset}\nldc.i4 {count}\nldloc buffer"),
         );
         if !dispatcher {
-            types = types.replace("call System.Tasks.TaskQueue::get_Default()\npop", "");
+            types = types.replace("call System.Concurrency.Tasks.TaskQueue::get_Default()\npop", "");
         }
         let fault = execute_types(
             "call Launch()\npop\nldstr \"entry\"",

@@ -1,6 +1,6 @@
 module Benchmarks.Scheduler {
     import System.*
-    import System.Tasks.*
+    import System.Concurrency.Tasks.*
     import System.Result.*
 
     // Internal projection under test; not a public class-library Scheduler.

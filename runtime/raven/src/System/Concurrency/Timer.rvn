@@ -1,7 +1,7 @@
 module System.Concurrency
 
 import System.*
-import System.Tasks.*
+import System.Concurrency.Tasks.*
 import System.Time.*
 
 /// An invocation-local timer. Callbacks run serially on the invocation's completion queue.

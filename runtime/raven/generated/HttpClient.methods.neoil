@@ -345,7 +345,7 @@ stfld System.Web.Http.HttpClient::handler
 M00000012_IL_002c:
 ret
 .end
-.method instance Send(System.Web.Http.HttpRequest request) -> System.Tasks.Task<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>>
+.method instance Send(System.Web.Http.HttpRequest request) -> System.Concurrency.Tasks.Task<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>>
 M00000013_IL_0000:
 M00000013_IL_0001:
 M00000013_IL_0002:
@@ -359,11 +359,11 @@ callvirt instance System.Web.Http.HttpClient::Send(System.Web.Http.HttpRequest,S
 M00000013_IL_000e:
 ret
 .end
-.method instance Send(System.Web.Http.HttpRequest request,System.Concurrency.CancellationToken cancellationToken) -> System.Tasks.Task<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>>
+.method instance Send(System.Web.Http.HttpRequest request,System.Concurrency.CancellationToken cancellationToken) -> System.Concurrency.Tasks.Task<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>>
 .local System.Result<System.Web.Http.HttpRequest,System.Web.Http.HttpError> local0
 .local System.Web.Http.HttpError local1
 .local System.Web.Http.HttpRequest local2
-.local System.Tasks.Task<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>> local3
+.local System.Concurrency.Tasks.Task<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>> local3
 .local System.Web.Http.HttpResponse local4
 .local System.Result<System.Web.Http.HttpRequest,System.Web.Http.HttpError> local5
 .local System.Result.Error<System.Web.Http.HttpError> local6
@@ -378,7 +378,7 @@ initobj System.Web.Http.HttpError
 ldloca local2
 initobj System.Web.Http.HttpRequest
 ldloca local3
-initobj System.Tasks.Task<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>>
+initobj System.Concurrency.Tasks.Task<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>>
 ldloca local4
 initobj System.Web.Http.HttpResponse
 ldloca local5
@@ -510,7 +510,7 @@ M00000014_IL_00b8:
 M00000014_IL_00b9:
 ldloc local3
 M00000014_IL_00ba:
-call instance System.Tasks.Task<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>>::get_IsCompleted()
+call instance System.Concurrency.Tasks.Task<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>>::get_IsCompleted()
 call neoCLR.Library.System.Web.Http.HttpClient.RuntimeBooleanToInt32(Boolean)
 M00000014_IL_00bf:
 brtrue M00000014_IL_00c9
@@ -520,7 +520,7 @@ M00000014_IL_00c9:
 M00000014_IL_00ca:
 ldloc local3
 M00000014_IL_00cb:
-call instance System.Tasks.Task<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>>::get_IsCancelled()
+call instance System.Concurrency.Tasks.Task<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>>::get_IsCancelled()
 call neoCLR.Library.System.Web.Http.HttpClient.RuntimeBooleanToInt32(Boolean)
 M00000014_IL_00d0:
 ldc.i4 0
@@ -535,7 +535,7 @@ M00000014_IL_00dd:
 M00000014_IL_00de:
 ldloc local3
 M00000014_IL_00df:
-call instance System.Tasks.Task<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>>::GetResult()
+call instance System.Concurrency.Tasks.Task<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>>::GetResult()
 M00000014_IL_00e4:
 stloc local9
 M00000014_IL_00e6:
@@ -587,11 +587,11 @@ M00000014_IL_012d:
 M00000014_IL_0133:
 function.bind fn<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>,System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>> = instance System.Web.Http.HttpResponseAssociation::Attach(System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>)
 M00000014_IL_0138:
-call System.Tasks.TaskOperators::Map<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>,System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>>(System.Tasks.Task<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>>,fn<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>,System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>>)
+call System.Concurrency.Tasks.TaskOperators::Map<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>,System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>>(System.Concurrency.Tasks.Task<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>>,fn<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>,System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>>)
 M00000014_IL_013d:
 ret
 .end
-.method instance Get(String url) -> System.Tasks.Task<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>>
+.method instance Get(String url) -> System.Concurrency.Tasks.Task<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>>
 M00000015_IL_0000:
 M00000015_IL_0001:
 M00000015_IL_0002:
@@ -605,7 +605,7 @@ callvirt instance System.Web.Http.HttpClient::Get(String,System.Concurrency.Canc
 M00000015_IL_000e:
 ret
 .end
-.method instance Get(String url,System.Concurrency.CancellationToken cancellationToken) -> System.Tasks.Task<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>>
+.method instance Get(String url,System.Concurrency.CancellationToken cancellationToken) -> System.Concurrency.Tasks.Task<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>>
 .local System.Result<System.Uri,System.UriError> local0
 .local System.Uri local1
 .local System.UriError local2
@@ -737,7 +737,7 @@ M00000016_IL_00b1:
 call System.Fail(String)
 fault "System.Fail returned unexpectedly"
 .end
-.method instance Get(System.Uri uri) -> System.Tasks.Task<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>>
+.method instance Get(System.Uri uri) -> System.Concurrency.Tasks.Task<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>>
 M00000017_IL_0000:
 M00000017_IL_0001:
 M00000017_IL_0002:
@@ -751,7 +751,7 @@ callvirt instance System.Web.Http.HttpClient::Get(System.Uri,System.Concurrency.
 M00000017_IL_000e:
 ret
 .end
-.method instance Get(System.Uri uri,System.Concurrency.CancellationToken cancellationToken) -> System.Tasks.Task<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>>
+.method instance Get(System.Uri uri,System.Concurrency.CancellationToken cancellationToken) -> System.Concurrency.Tasks.Task<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>>
 .local System.Result<System.Web.Http.HttpRequest,System.Web.Http.HttpError> local0
 .local System.Web.Http.HttpRequest local1
 .local System.Web.Http.HttpError local2
@@ -881,7 +881,7 @@ M00000018_IL_00a8:
 call System.Fail(String)
 fault "System.Fail returned unexpectedly"
 .end
-.method instance Post(String url,System.Web.Http.HttpContent content) -> System.Tasks.Task<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>>
+.method instance Post(String url,System.Web.Http.HttpContent content) -> System.Concurrency.Tasks.Task<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>>
 M00000019_IL_0000:
 M00000019_IL_0001:
 M00000019_IL_0002:
@@ -897,7 +897,7 @@ callvirt instance System.Web.Http.HttpClient::Post(String,System.Web.Http.HttpCo
 M00000019_IL_000f:
 ret
 .end
-.method instance Post(String url,System.Web.Http.HttpContent content,System.Concurrency.CancellationToken cancellationToken) -> System.Tasks.Task<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>>
+.method instance Post(String url,System.Web.Http.HttpContent content,System.Concurrency.CancellationToken cancellationToken) -> System.Concurrency.Tasks.Task<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>>
 .local System.Result<System.Uri,System.UriError> local0
 .local System.Uri local1
 .local System.UriError local2
@@ -1031,7 +1031,7 @@ M0000001a_IL_00b2:
 call System.Fail(String)
 fault "System.Fail returned unexpectedly"
 .end
-.method instance Post(System.Uri uri,System.Web.Http.HttpContent content) -> System.Tasks.Task<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>>
+.method instance Post(System.Uri uri,System.Web.Http.HttpContent content) -> System.Concurrency.Tasks.Task<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>>
 M0000001b_IL_0000:
 M0000001b_IL_0001:
 M0000001b_IL_0002:
@@ -1047,7 +1047,7 @@ callvirt instance System.Web.Http.HttpClient::Post(System.Uri,System.Web.Http.Ht
 M0000001b_IL_000f:
 ret
 .end
-.method instance Post(System.Uri uri,System.Web.Http.HttpContent content,System.Concurrency.CancellationToken cancellationToken) -> System.Tasks.Task<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>>
+.method instance Post(System.Uri uri,System.Web.Http.HttpContent content,System.Concurrency.CancellationToken cancellationToken) -> System.Concurrency.Tasks.Task<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>>
 .local System.Result<System.Web.Http.HttpRequest,System.Web.Http.HttpError> local0
 .local System.Web.Http.HttpRequest local1
 .local System.Web.Http.HttpError local2
@@ -1265,7 +1265,7 @@ ldloc local5
 M0000001d_IL_0050:
 ret
 .end
-.method instance Put(String url,System.Web.Http.HttpContent content) -> System.Tasks.Task<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>>
+.method instance Put(String url,System.Web.Http.HttpContent content) -> System.Concurrency.Tasks.Task<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>>
 M0000001e_IL_0000:
 M0000001e_IL_0001:
 M0000001e_IL_0002:
@@ -1281,7 +1281,7 @@ callvirt instance System.Web.Http.HttpClient::Put(String,System.Web.Http.HttpCon
 M0000001e_IL_000f:
 ret
 .end
-.method instance Put(String url,System.Web.Http.HttpContent content,System.Concurrency.CancellationToken cancellationToken) -> System.Tasks.Task<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>>
+.method instance Put(String url,System.Web.Http.HttpContent content,System.Concurrency.CancellationToken cancellationToken) -> System.Concurrency.Tasks.Task<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>>
 .local System.Result<System.Uri,System.UriError> local0
 .local System.Uri local1
 .local System.UriError local2
@@ -1415,7 +1415,7 @@ M0000001f_IL_00b2:
 call System.Fail(String)
 fault "System.Fail returned unexpectedly"
 .end
-.method instance Put(System.Uri uri,System.Web.Http.HttpContent content) -> System.Tasks.Task<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>>
+.method instance Put(System.Uri uri,System.Web.Http.HttpContent content) -> System.Concurrency.Tasks.Task<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>>
 M00000020_IL_0000:
 M00000020_IL_0001:
 M00000020_IL_0002:
@@ -1431,7 +1431,7 @@ callvirt instance System.Web.Http.HttpClient::Put(System.Uri,System.Web.Http.Htt
 M00000020_IL_000f:
 ret
 .end
-.method instance Put(System.Uri uri,System.Web.Http.HttpContent content,System.Concurrency.CancellationToken cancellationToken) -> System.Tasks.Task<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>>
+.method instance Put(System.Uri uri,System.Web.Http.HttpContent content,System.Concurrency.CancellationToken cancellationToken) -> System.Concurrency.Tasks.Task<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>>
 .local System.Result<System.Web.Http.HttpRequest,System.Web.Http.HttpError> local0
 .local System.Web.Http.HttpRequest local1
 .local System.Web.Http.HttpError local2
@@ -1649,7 +1649,7 @@ ldloc local5
 M00000022_IL_0050:
 ret
 .end
-.method instance Patch(String url,System.Web.Http.HttpContent content) -> System.Tasks.Task<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>>
+.method instance Patch(String url,System.Web.Http.HttpContent content) -> System.Concurrency.Tasks.Task<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>>
 M00000023_IL_0000:
 M00000023_IL_0001:
 M00000023_IL_0002:
@@ -1665,7 +1665,7 @@ callvirt instance System.Web.Http.HttpClient::Patch(String,System.Web.Http.HttpC
 M00000023_IL_000f:
 ret
 .end
-.method instance Patch(String url,System.Web.Http.HttpContent content,System.Concurrency.CancellationToken cancellationToken) -> System.Tasks.Task<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>>
+.method instance Patch(String url,System.Web.Http.HttpContent content,System.Concurrency.CancellationToken cancellationToken) -> System.Concurrency.Tasks.Task<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>>
 .local System.Result<System.Uri,System.UriError> local0
 .local System.Uri local1
 .local System.UriError local2
@@ -1799,7 +1799,7 @@ M00000024_IL_00b2:
 call System.Fail(String)
 fault "System.Fail returned unexpectedly"
 .end
-.method instance Patch(System.Uri uri,System.Web.Http.HttpContent content) -> System.Tasks.Task<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>>
+.method instance Patch(System.Uri uri,System.Web.Http.HttpContent content) -> System.Concurrency.Tasks.Task<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>>
 M00000025_IL_0000:
 M00000025_IL_0001:
 M00000025_IL_0002:
@@ -1815,7 +1815,7 @@ callvirt instance System.Web.Http.HttpClient::Patch(System.Uri,System.Web.Http.H
 M00000025_IL_000f:
 ret
 .end
-.method instance Patch(System.Uri uri,System.Web.Http.HttpContent content,System.Concurrency.CancellationToken cancellationToken) -> System.Tasks.Task<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>>
+.method instance Patch(System.Uri uri,System.Web.Http.HttpContent content,System.Concurrency.CancellationToken cancellationToken) -> System.Concurrency.Tasks.Task<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>>
 .local System.Result<System.Web.Http.HttpRequest,System.Web.Http.HttpError> local0
 .local System.Web.Http.HttpRequest local1
 .local System.Web.Http.HttpError local2
@@ -2033,7 +2033,7 @@ ldloc local5
 M00000027_IL_0050:
 ret
 .end
-.method instance Delete(String url) -> System.Tasks.Task<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>>
+.method instance Delete(String url) -> System.Concurrency.Tasks.Task<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>>
 M00000028_IL_0000:
 M00000028_IL_0001:
 M00000028_IL_0002:
@@ -2047,7 +2047,7 @@ callvirt instance System.Web.Http.HttpClient::Delete(String,System.Concurrency.C
 M00000028_IL_000e:
 ret
 .end
-.method instance Delete(String url,System.Concurrency.CancellationToken cancellationToken) -> System.Tasks.Task<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>>
+.method instance Delete(String url,System.Concurrency.CancellationToken cancellationToken) -> System.Concurrency.Tasks.Task<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>>
 .local System.Result<System.Uri,System.UriError> local0
 .local System.Uri local1
 .local System.UriError local2
@@ -2179,7 +2179,7 @@ M00000029_IL_00b1:
 call System.Fail(String)
 fault "System.Fail returned unexpectedly"
 .end
-.method instance Delete(System.Uri uri) -> System.Tasks.Task<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>>
+.method instance Delete(System.Uri uri) -> System.Concurrency.Tasks.Task<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>>
 M0000002a_IL_0000:
 M0000002a_IL_0001:
 M0000002a_IL_0002:
@@ -2193,7 +2193,7 @@ callvirt instance System.Web.Http.HttpClient::Delete(System.Uri,System.Concurren
 M0000002a_IL_000e:
 ret
 .end
-.method instance Delete(System.Uri uri,System.Concurrency.CancellationToken cancellationToken) -> System.Tasks.Task<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>>
+.method instance Delete(System.Uri uri,System.Concurrency.CancellationToken cancellationToken) -> System.Concurrency.Tasks.Task<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>>
 .local System.Result<System.Web.Http.HttpRequest,System.Web.Http.HttpError> local0
 .local System.Web.Http.HttpRequest local1
 .local System.Web.Http.HttpError local2
@@ -2400,7 +2400,7 @@ ldloc local4
 M0000002c_IL_004b:
 ret
 .end
-.method instance Head(String url) -> System.Tasks.Task<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>>
+.method instance Head(String url) -> System.Concurrency.Tasks.Task<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>>
 M0000002d_IL_0000:
 M0000002d_IL_0001:
 M0000002d_IL_0002:
@@ -2414,7 +2414,7 @@ callvirt instance System.Web.Http.HttpClient::Head(String,System.Concurrency.Can
 M0000002d_IL_000e:
 ret
 .end
-.method instance Head(String url,System.Concurrency.CancellationToken cancellationToken) -> System.Tasks.Task<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>>
+.method instance Head(String url,System.Concurrency.CancellationToken cancellationToken) -> System.Concurrency.Tasks.Task<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>>
 .local System.Result<System.Uri,System.UriError> local0
 .local System.Uri local1
 .local System.UriError local2
@@ -2546,7 +2546,7 @@ M0000002e_IL_00b1:
 call System.Fail(String)
 fault "System.Fail returned unexpectedly"
 .end
-.method instance Head(System.Uri uri) -> System.Tasks.Task<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>>
+.method instance Head(System.Uri uri) -> System.Concurrency.Tasks.Task<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>>
 M0000002f_IL_0000:
 M0000002f_IL_0001:
 M0000002f_IL_0002:
@@ -2560,7 +2560,7 @@ callvirt instance System.Web.Http.HttpClient::Head(System.Uri,System.Concurrency
 M0000002f_IL_000e:
 ret
 .end
-.method instance Head(System.Uri uri,System.Concurrency.CancellationToken cancellationToken) -> System.Tasks.Task<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>>
+.method instance Head(System.Uri uri,System.Concurrency.CancellationToken cancellationToken) -> System.Concurrency.Tasks.Task<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>>
 .local System.Result<System.Web.Http.HttpRequest,System.Web.Http.HttpError> local0
 .local System.Web.Http.HttpRequest local1
 .local System.Web.Http.HttpError local2
@@ -2767,7 +2767,7 @@ ldloc local4
 M00000031_IL_004b:
 ret
 .end
-.method instance GetString(String url) -> System.Tasks.Task<System.Result<String,System.Web.Http.HttpError>>
+.method instance GetString(String url) -> System.Concurrency.Tasks.Task<System.Result<String,System.Web.Http.HttpError>>
 M00000032_IL_0000:
 M00000032_IL_0001:
 M00000032_IL_0002:
@@ -2781,10 +2781,10 @@ callvirt instance System.Web.Http.HttpClient::GetString(String,System.Concurrenc
 M00000032_IL_000e:
 ret
 .end
-.method instance GetString(String url,System.Concurrency.CancellationToken cancellationToken) -> System.Tasks.Task<System.Result<String,System.Web.Http.HttpError>>
-.local System.Tasks.Promise<System.Result<String,System.Web.Http.HttpError>> local0
+.method instance GetString(String url,System.Concurrency.CancellationToken cancellationToken) -> System.Concurrency.Tasks.Task<System.Result<String,System.Web.Http.HttpError>>
+.local System.Concurrency.Tasks.Promise<System.Result<String,System.Web.Http.HttpError>> local0
 ldloca local0
-initobj System.Tasks.Promise<System.Result<String,System.Web.Http.HttpError>>
+initobj System.Concurrency.Tasks.Promise<System.Result<String,System.Web.Http.HttpError>>
 M00000033_IL_0000:
 M00000033_IL_0001:
 M00000033_IL_0002:
@@ -2798,13 +2798,13 @@ M00000033_IL_000e:
 br M00000033_IL_0029
 M00000033_IL_0013:
 M00000033_IL_0014:
-newobj instance System.Tasks.Promise<System.Result<String,System.Web.Http.HttpError>>::.ctor()
+newobj instance System.Concurrency.Tasks.Promise<System.Result<String,System.Web.Http.HttpError>>::.ctor()
 M00000033_IL_0019:
 stloc local0
 M00000033_IL_001a:
 ldloc local0
 M00000033_IL_001b:
-call instance System.Tasks.Promise<System.Result<String,System.Web.Http.HttpError>>::Cancel()
+call instance System.Concurrency.Tasks.Promise<System.Result<String,System.Web.Http.HttpError>>::Cancel()
 call neoCLR.Library.System.Web.Http.HttpClient.RuntimeBooleanToInt32(Boolean)
 M00000033_IL_0020:
 pop
@@ -2812,7 +2812,7 @@ M00000033_IL_0021:
 M00000033_IL_0022:
 ldloc local0
 M00000033_IL_0023:
-call instance System.Tasks.Promise<System.Result<String,System.Web.Http.HttpError>>::get_Task()
+call instance System.Concurrency.Tasks.Promise<System.Result<String,System.Web.Http.HttpError>>::get_Task()
 M00000033_IL_0028:
 ret
 M00000033_IL_0029:
@@ -2830,11 +2830,11 @@ M00000033_IL_0034:
 M00000033_IL_003a:
 function.bind fn<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>,System.Result<String,System.Web.Http.HttpError>> = System.Web.Http.HttpClient.DecodeText(System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>)
 M00000033_IL_003f:
-call System.Tasks.TaskOperators::Map<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>,System.Result<String,System.Web.Http.HttpError>>(System.Tasks.Task<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>>,fn<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>,System.Result<String,System.Web.Http.HttpError>>)
+call System.Concurrency.Tasks.TaskOperators::Map<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>,System.Result<String,System.Web.Http.HttpError>>(System.Concurrency.Tasks.Task<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>>,fn<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>,System.Result<String,System.Web.Http.HttpError>>)
 M00000033_IL_0044:
 ret
 .end
-.method instance GetString(System.Uri uri) -> System.Tasks.Task<System.Result<String,System.Web.Http.HttpError>>
+.method instance GetString(System.Uri uri) -> System.Concurrency.Tasks.Task<System.Result<String,System.Web.Http.HttpError>>
 M00000034_IL_0000:
 M00000034_IL_0001:
 M00000034_IL_0002:
@@ -2848,10 +2848,10 @@ callvirt instance System.Web.Http.HttpClient::GetString(System.Uri,System.Concur
 M00000034_IL_000e:
 ret
 .end
-.method instance GetString(System.Uri uri,System.Concurrency.CancellationToken cancellationToken) -> System.Tasks.Task<System.Result<String,System.Web.Http.HttpError>>
-.local System.Tasks.Promise<System.Result<String,System.Web.Http.HttpError>> local0
+.method instance GetString(System.Uri uri,System.Concurrency.CancellationToken cancellationToken) -> System.Concurrency.Tasks.Task<System.Result<String,System.Web.Http.HttpError>>
+.local System.Concurrency.Tasks.Promise<System.Result<String,System.Web.Http.HttpError>> local0
 ldloca local0
-initobj System.Tasks.Promise<System.Result<String,System.Web.Http.HttpError>>
+initobj System.Concurrency.Tasks.Promise<System.Result<String,System.Web.Http.HttpError>>
 M00000035_IL_0000:
 M00000035_IL_0001:
 M00000035_IL_0002:
@@ -2865,13 +2865,13 @@ M00000035_IL_000e:
 br M00000035_IL_0029
 M00000035_IL_0013:
 M00000035_IL_0014:
-newobj instance System.Tasks.Promise<System.Result<String,System.Web.Http.HttpError>>::.ctor()
+newobj instance System.Concurrency.Tasks.Promise<System.Result<String,System.Web.Http.HttpError>>::.ctor()
 M00000035_IL_0019:
 stloc local0
 M00000035_IL_001a:
 ldloc local0
 M00000035_IL_001b:
-call instance System.Tasks.Promise<System.Result<String,System.Web.Http.HttpError>>::Cancel()
+call instance System.Concurrency.Tasks.Promise<System.Result<String,System.Web.Http.HttpError>>::Cancel()
 call neoCLR.Library.System.Web.Http.HttpClient.RuntimeBooleanToInt32(Boolean)
 M00000035_IL_0020:
 pop
@@ -2879,7 +2879,7 @@ M00000035_IL_0021:
 M00000035_IL_0022:
 ldloc local0
 M00000035_IL_0023:
-call instance System.Tasks.Promise<System.Result<String,System.Web.Http.HttpError>>::get_Task()
+call instance System.Concurrency.Tasks.Promise<System.Result<String,System.Web.Http.HttpError>>::get_Task()
 M00000035_IL_0028:
 ret
 M00000035_IL_0029:
@@ -2897,7 +2897,7 @@ M00000035_IL_0034:
 M00000035_IL_003a:
 function.bind fn<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>,System.Result<String,System.Web.Http.HttpError>> = System.Web.Http.HttpClient.DecodeText(System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>)
 M00000035_IL_003f:
-call System.Tasks.TaskOperators::Map<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>,System.Result<String,System.Web.Http.HttpError>>(System.Tasks.Task<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>>,fn<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>,System.Result<String,System.Web.Http.HttpError>>)
+call System.Concurrency.Tasks.TaskOperators::Map<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>,System.Result<String,System.Web.Http.HttpError>>(System.Concurrency.Tasks.Task<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>>,fn<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>,System.Result<String,System.Web.Http.HttpError>>)
 M00000035_IL_0044:
 ret
 .end
@@ -3087,20 +3087,20 @@ call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion55(System.Result.Erro
 M00000036_IL_010d:
 ret
 .end
-.method private static Cancelled() -> System.Tasks.Task<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>>
-.local System.Tasks.Promise<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>> local0
+.method private static Cancelled() -> System.Concurrency.Tasks.Task<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>>
+.local System.Concurrency.Tasks.Promise<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>> local0
 ldloca local0
-initobj System.Tasks.Promise<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>>
+initobj System.Concurrency.Tasks.Promise<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>>
 M00000037_IL_0000:
 M00000037_IL_0001:
-newobj instance System.Tasks.Promise<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>>::.ctor()
+newobj instance System.Concurrency.Tasks.Promise<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>>::.ctor()
 M00000037_IL_0006:
 stloc local0
 M00000037_IL_0007:
 M00000037_IL_0008:
 ldloc local0
 M00000037_IL_0009:
-call instance System.Tasks.Promise<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>>::Cancel()
+call instance System.Concurrency.Tasks.Promise<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>>::Cancel()
 call neoCLR.Library.System.Web.Http.HttpClient.RuntimeBooleanToInt32(Boolean)
 M00000037_IL_000e:
 pop
@@ -3108,7 +3108,7 @@ M00000037_IL_000f:
 M00000037_IL_0010:
 ldloc local0
 M00000037_IL_0011:
-call instance System.Tasks.Promise<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>>::get_Task()
+call instance System.Concurrency.Tasks.Promise<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>>::get_Task()
 M00000037_IL_0016:
 ret
 .end
@@ -3548,13 +3548,13 @@ call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion58(System.Result.Ok<S
 M00000039_IL_021b:
 ret
 .end
-.method private static Failure(System.Web.Http.HttpError reason) -> System.Tasks.Task<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>>
-.local System.Tasks.Promise<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>> local0
+.method private static Failure(System.Web.Http.HttpError reason) -> System.Concurrency.Tasks.Task<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>>
+.local System.Concurrency.Tasks.Promise<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>> local0
 ldloca local0
-initobj System.Tasks.Promise<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>>
+initobj System.Concurrency.Tasks.Promise<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>>
 M0000003a_IL_0000:
 M0000003a_IL_0001:
-newobj instance System.Tasks.Promise<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>>::.ctor()
+newobj instance System.Concurrency.Tasks.Promise<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>>::.ctor()
 M0000003a_IL_0006:
 stloc local0
 M0000003a_IL_0007:
@@ -3567,7 +3567,7 @@ call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion54(System.Web.Http.Ht
 M0000003a_IL_000f:
 call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion63(System.Result.Error<System.Web.Http.HttpError>)
 M0000003a_IL_0014:
-call instance System.Tasks.Promise<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>>::Complete(System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>)
+call instance System.Concurrency.Tasks.Promise<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>>::Complete(System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>)
 call neoCLR.Library.System.Web.Http.HttpClient.RuntimeBooleanToInt32(Boolean)
 M0000003a_IL_0019:
 pop
@@ -3575,7 +3575,7 @@ M0000003a_IL_001a:
 M0000003a_IL_001b:
 ldloc local0
 M0000003a_IL_001c:
-call instance System.Tasks.Promise<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>>::get_Task()
+call instance System.Concurrency.Tasks.Promise<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>>::get_Task()
 M0000003a_IL_0021:
 ret
 .end

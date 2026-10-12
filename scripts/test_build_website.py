@@ -114,15 +114,15 @@ class RavenDocPages(unittest.TestCase):
         xrefs = {uid.replace('+', '.'): path for uid, path in
                  json.loads((output / 'xref-map.json').read_text()).items()}
         for name in ('System.Array', 'System.Option.Some`1', 'System.Result.Ok`1',
-                     'System.Tasks.TaskOutcome.Cancelled',
+                     'System.Concurrency.Tasks.TaskOutcome.Cancelled',
                      'Raven.Runtime.CompilerServices.RavenUnionCompanionAttribute'):
             self.assertNotIn('T:' + name, xrefs)
         for name in ('System.Array`1', 'System.Option`1', 'System.Result`2',
-                     'System.Tasks.TaskOutcome`1'):
+                     'System.Concurrency.Tasks.TaskOutcome`1'):
             self.assertIn('T:' + name, xrefs)
             self.assertTrue((output / xrefs['T:' + name].split('#')[0]).is_file(), name)
         # Companion IDs remain useful aliases, but never create duplicate pages.
-        for name, arity in (('System.Option', 1), ('System.Result', 2), ('System.Tasks.TaskOutcome', 1)):
+        for name, arity in (('System.Option', 1), ('System.Result', 2), ('System.Concurrency.Tasks.TaskOutcome', 1)):
             self.assertEqual(xrefs['T:' + name], xrefs['T:' + name + '`' + str(arity)])
         case = (output / 'api/System/BooleanParseError/InvalidFormat/index.html').read_text()
         self.assertNotIn('ReferenceEquals', case)
@@ -134,17 +134,17 @@ class RavenDocPages(unittest.TestCase):
         self.assertIn('Any(predicate: char -&gt; bool)', string_page)
         self.assertNotIn('Any&lt;T&gt;', string_page)
         self.assertIn('Map&lt;U&gt;(selector: char -&gt; U)', string_page)
-        factory = (output / 'api/System/Tasks/Task/index.html').read_text()
+        factory = (output / 'api/System/Concurrency/Tasks/Task/index.html').read_text()
         self.assertNotIn('data-member-inherited="true"', factory)
         self.assertIn('Run(callback: () -&gt; void) -&gt; Task&lt;void&gt;', factory)
         self.assertIn('Run&lt;T&gt;(callback: () -&gt; Task&lt;T&gt;)', factory)
         self.assertIn('FlatMap&lt;U&gt;(selector: char -&gt; Iterable&lt;U&gt;)', string_page)
-        run_page = (output / 'api/System/Tasks/Task/method_Run.html').read_text()
+        run_page = (output / 'api/System/Concurrency/Tasks/Task/method_Run.html').read_text()
         self.assertNotIn('Func&lt;', run_page)
         self.assertIn('api-parameter-name', run_page)
         self.assertIn('() -&gt; void', run_page)
         for receiver, container, methods in (
-                ('System/Tasks/Task`1', 'TaskOperators', ('Map', 'Then')),
+                ('System/Concurrency/Tasks/Task`1', 'TaskOperators', ('Map', 'Then')),
                 ('System/Result`2', 'ResultOperators', ('Map', 'Then', 'MapError')),
                 ('System/Option`1', 'OptionOperators', ('Map',))):
             page = (output / 'api' / receiver / 'index.html').read_text()

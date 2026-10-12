@@ -2868,7 +2868,7 @@ fn interpret_instructions_with_dispatch(
 
         let requested_queue = match op {
             Op::Call(target) if target.name == "neoCLR.Runtime.CurrentTaskQueue" => {
-                Some(Type::from_name("System.Tasks.TaskQueue"))
+                Some(Type::from_name("System.Concurrency.Tasks.TaskQueue"))
             }
             Op::Call(target) if target.name == "neoCLR.Runtime.GetCurrentTaskQueue" => {
                 target.generic_arguments.first().cloned()
@@ -4517,13 +4517,13 @@ fn interpret_instructions_with_dispatch(
                                 .or_else(|| default_task_queue.clone())
                                 .unwrap_or_else(|| {
                                     Value::NullObjectReference(Type::from_name(
-                                        "System.Tasks.TaskQueue",
+                                        "System.Concurrency.Tasks.TaskQueue",
                                     ))
                                 })
                         } else if matches!(binding, crate::native::Binding::DefaultTaskQueue) {
                             default_task_queue.clone().unwrap_or_else(|| {
                                 Value::NullObjectReference(Type::from_name(
-                                    "System.Tasks.TaskQueue",
+                                    "System.Concurrency.Tasks.TaskQueue",
                                 ))
                             })
                         } else if matches!(

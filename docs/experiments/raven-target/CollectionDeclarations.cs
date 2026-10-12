@@ -15,7 +15,7 @@ static class CollectionDeclarations
             public Collections.Iterator<T> GetIterator() => default;
         }
         public interface Disposable { void Dispose(); }
-        public interface AsyncDisposable { Tasks.Task<PropagationUnit> DisposeAsync(); }
+        public interface AsyncDisposable { Concurrency.Tasks.Task<PropagationUnit> DisposeAsync(); }
         namespace Collections {
             public interface Queue<T> : Collection<T> {
                 void Enqueue(T value);
@@ -105,7 +105,7 @@ static class CollectionDeclarations
             }
             public interface AsyncIterable<T> { AsyncIterator<T> GetAsyncIterator(); }
             public interface AsyncIterator<T> : AsyncDisposable {
-                Tasks.Task<bool> MoveNextAsync();
+                Concurrency.Tasks.Task<bool> MoveNextAsync();
                 T Current { get; }
             }
             public interface Iterable<T> { Iterator<T> GetIterator(); }

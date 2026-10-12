@@ -198,7 +198,7 @@ result['targetProfileAdditions'] = [{
     'tests': ['tests/workers.rs', 'docs/experiments/task-contract/verify_workers.py'],
     'note': 'Dedicated and pooled OS workers exchange text and return caller-owned Tasks. Queue pumping may block for results; no shared guest state. See docs/isolated-workers.md.'
 }, {
-    'file': 'runtime/raven/src/System/Tasks/Tasks.rvn',
+    'file': 'runtime/raven/src/System/Concurrency/Tasks/Tasks.rvn',
     'disposition': 'provisional-raven-task-completion',
     'samples': ['library-tasks.rvn', 'library-async.rvn'],
     'tests': ['tests/tasks.rs', 'docs/experiments/task-contract/verify_tasks.py', 'docs/experiments/task-contract/verify_async.py'],

@@ -3,8 +3,8 @@ import System.Option.*
 import System.Result.*
 import System.Runtime.CompilerServices.*
 import System.Console.*
-import System.Tasks.*
-import System.Tasks.TaskOutcome.*
+import System.Concurrency.Tasks.*
+import System.Concurrency.Tasks.TaskOutcome.*
 
 public func Check(condition: bool, message: string) {
     if !condition {

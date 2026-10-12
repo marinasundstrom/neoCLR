@@ -9057,3 +9057,12 @@ and PostgreSQL libraries compile. The stream migration's [execution evidence](..
 qualifies the consuming Task-based adapters. Some inline await/propagation expression
 shapes still require separating the awaited result from pure pattern handling; the
 console samples do that explicitly. These bridge restrictions are not language rules.
+
+
+## Task module identity — 2026-10-12
+
+Raven native-line `4012c24da5b1b5b00264a64a52cc30ce391a1166` selects System.Concurrency.Tasks.Task<T> for the
+explicit async provider. System.Runtime assembly ownership, builder/state-machine
+protocols and .NET default mapping are unchanged. The temporary CLI facade and
+native metadata use the same new full name; no encoding or information loss is
+added. Rebuild applications and libraries together. See [design and execution gates](task-namespace-migration.md).

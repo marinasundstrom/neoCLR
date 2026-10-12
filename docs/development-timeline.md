@@ -15894,3 +15894,19 @@ or runtime-await default switch was performed.
   pass on macOS; see [evidence](../runtime/raven/tests/default-stream-validation.json).
   API references and tested website examples updated. Windows stream qualification,
   nonblocking file/console integration and the namespace move remain subsequent work.
+
+
+## 2026-10-12 — Task namespace implementation
+
+- **Author direction:** after canonical asynchronous streams, focus on
+  System.Concurrency.Tasks before SSL and System.Security.Cryptography.
+- **Assistant implementation:** moved task contracts/operators and all active source
+  consumers; updated Raven's explicit provider identity, runtime guards, bootstrap
+  ownership, native linking and public API documentation together. The assembly
+  remains System.Runtime and .NET compilation retains System.Threading.Tasks.
+- **Outcome:** eighteen stream cases pass in all three local execution modes, eleven
+  JIT HTTP upload cases pass, and compiler/runtime/documentation checks pass. See
+  [retained evidence](../runtime/raven/tests/task-namespace-validation.json).
+  Work was isolated while a separate FFI slice modified the shared checkout.
+- **Open:** Windows qualification and subsequent shared SSL/cryptography APIs.
+  No scheduling or performance improvement is claimed for a namespace change.

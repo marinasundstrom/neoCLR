@@ -1,7 +1,7 @@
 module RuntimeManagedTask {
     import System.*
-    import System.Tasks.*
-    import System.Tasks.TaskOutcome.*
+    import System.Concurrency.Tasks.*
+    import System.Concurrency.Tasks.TaskOutcome.*
 
     // Private, hand-written candidate lowering boundary. These are not public APIs.
     // A normal managed Promise owns T; the runtime retains only the unit body.

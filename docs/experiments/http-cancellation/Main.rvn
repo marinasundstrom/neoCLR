@@ -3,7 +3,7 @@ import System.Collections.*
 import System.Concurrency.*
 import System.Option.*
 import System.Result.*
-import System.Tasks.*
+import System.Concurrency.Tasks.*
 import System.Text.*
 import System.Web.Http.*
 import System.Networking.Sockets.*

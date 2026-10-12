@@ -32,7 +32,7 @@ def main():
               '--runtime-seed', args.seed.resolve(), '--bootstrap-intrinsics',
               '--bootstrap-ownership', args.ownership.resolve(), '--reference', args.base_library.resolve()]
     library = output / 'EnumContracts.dll'
-    enum_source = ROOT / 'runtime/raven/src/System/Tasks/TaskState.rvn'
+    enum_source = ROOT / 'runtime/raven/src/System/Concurrency/Tasks/TaskState.rvn'
     run(common + ['--library', '-o', library, enum_source, HERE / 'enum-contracts.rvn'])
     dependencies = ['--module', args.base_library.resolve(), '--module', library, '--system', args.seed.resolve()]
     for name, source, expected, error in [('Consumer', 'enum-consumer.rvn', 42, None)]:

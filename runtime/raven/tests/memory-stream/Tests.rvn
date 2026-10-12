@@ -6,8 +6,8 @@ import System.Option.*
 import NeoClr.Testing.*
 
 import System.IO.*
-import System.Tasks.*
-import System.Tasks.TaskOutcome.*
+import System.Concurrency.Tasks.*
+import System.Concurrency.Tasks.TaskOutcome.*
 import System.Concurrency.*
 
 [Test("MemoryStream overwrites preserve length and untouched bytes")]
@@ -164,7 +164,7 @@ func MemoryAsyncRejection() -> Result<unit, TestFailure> {
 
 // These fixtures promise inline completion; observation verifies that contract.
 // Consumers of potentially pending streams use await instead.
-func CompletedValue<T>(operation: System.Tasks.Task<T>) -> T {
+func CompletedValue<T>(operation: System.Concurrency.Tasks.Task<T>) -> T {
     let Some(Completed(value)) = operation.Outcome else {
         System.Fail("Expected an immediately completed fixture operation")
     }

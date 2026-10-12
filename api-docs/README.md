@@ -480,7 +480,7 @@ no public API is excluded.
 
 ### Task.Run development checkpoint (2026-09-27)
 
-The static System.Tasks.Task owner and all three Run overloads have public inventory
+The static System.Concurrency.Tasks.Task owner and all three Run overloads have public inventory
 and XML coverage. The matching bridge/reference/library implement shared captures,
 completion-only and typed work, and async unwrapping. ScheduleTask and helper carriers
 remain private implementation details. [The callback guide](callbacks.md#task.run-development)
@@ -1447,7 +1447,7 @@ extensions as well. See the native reader limitation in
 
 ### Completed task factories (2026-10-09)
 
-`System.Tasks.Task.CompletedTask` and `Task.FromResult<T>(value)` are development
+`System.Concurrency.Tasks.Task.CompletedTask` and `Task.FromResult<T>(value)` are development
 APIs in System.Runtime. Their public property/method pages are rendered in the
 native snapshot, with matching XML help and legacy bridge reference. The temporary
 CLI unit projection now covers property signatures as well as accessors; no public

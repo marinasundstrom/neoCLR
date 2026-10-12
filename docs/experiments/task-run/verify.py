@@ -12,7 +12,7 @@ parser.add_argument('--case', action='append', help='Run only selected consumer 
 args = parser.parse_args()
 tools = {name: getattr(args, name).resolve() for name in ('runtime', 'bridge', 'system', 'reference')}
 here = Path(__file__).resolve().parent
-prefix = 'import System.*\nimport System.Tasks.*\nalias Task = System.Tasks.Task\n'
+prefix = 'import System.*\nimport System.Concurrency.Tasks.*\nalias Task = System.Concurrency.Tasks.Task\n'
 cases = [
     ('unit-delegate', prefix + """func Main() {
         let callback: Func<Void> = () => Console.WriteLine("called")

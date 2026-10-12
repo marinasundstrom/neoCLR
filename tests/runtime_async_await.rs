@@ -956,20 +956,20 @@ fn assert_managed_dispatch_while_parked(pause: &str, repeat_direct_wait: bool) {
 .entry Main
 .function Main() -> Int32
 .local Int64 operation
-.local System.Tasks.TaskQueue queue
+.local System.Concurrency.Tasks.TaskQueue queue
 .local Int64 body
-newobj instance System.Tasks.TaskQueue::.ctor()
+newobj instance System.Concurrency.Tasks.TaskQueue::.ctor()
 stloc queue
 ldloc queue
-call neoCLR.Runtime.RegisterDefaultTaskQueue(System.Tasks.TaskQueue)
+call neoCLR.Runtime.RegisterDefaultTaskQueue(System.Concurrency.Tasks.TaskQueue)
 pop
 call neoCLR.Runtime.RuntimeAsyncCreate()
 stloc operation
 ldloc queue
 ldloc operation
-stfld System.Tasks.TaskQueue::Gate
+stfld System.Concurrency.Tasks.TaskQueue::Gate
 ldloc queue
-function.bind fn<Int32> = instance System.Tasks.TaskQueue::Body()
+function.bind fn<Int32> = instance System.Concurrency.Tasks.TaskQueue::Body()
 call neoCLR.Runtime.RuntimeAsyncStart(fn<Int32>)
 stloc body
 ldloc body
@@ -979,8 +979,8 @@ ret
 "#;
     let source = if repeat_direct_wait {
         source.replace(
-            "ldloc queue\nfunction.bind fn<Int32> = instance System.Tasks.TaskQueue::Body()\ncall neoCLR.Runtime.RuntimeAsyncStart(fn<Int32>)\nstloc body\nldloc body",
-            "ldloc operation\ncall neoCLR.Runtime.RuntimeAsyncAwait(Int64)\npop\ncall neoCLR.Runtime.RuntimeAsyncCreate()\nstloc operation\nldloc queue\nldloc operation\nstfld System.Tasks.TaskQueue::Gate\nldloc operation",
+            "ldloc queue\nfunction.bind fn<Int32> = instance System.Concurrency.Tasks.TaskQueue::Body()\ncall neoCLR.Runtime.RuntimeAsyncStart(fn<Int32>)\nstloc body\nldloc body",
+            "ldloc operation\ncall neoCLR.Runtime.RuntimeAsyncAwait(Int64)\npop\ncall neoCLR.Runtime.RuntimeAsyncCreate()\nstloc operation\nldloc queue\nldloc operation\nstfld System.Concurrency.Tasks.TaskQueue::Gate\nldloc operation",
         )
     } else {
         source.to_owned()
@@ -1002,10 +1002,10 @@ ret
 .function neoCLR.Runtime.RuntimeAsyncComplete(Int64 id, Int32 value) -> Boolean
 .methodimpl InternalCall
 .end
-.function neoCLR.Runtime.RegisterDefaultTaskQueue(System.Tasks.TaskQueue queue) -> Void
+.function neoCLR.Runtime.RegisterDefaultTaskQueue(System.Concurrency.Tasks.TaskQueue queue) -> Void
 .methodimpl InternalCall
 .end
-.type class System.Tasks.TaskQueue
+.type class System.Concurrency.Tasks.TaskQueue
 .field Gate Int64
 .field Running Boolean
 .method instance .ctor() -> noresult
@@ -1013,26 +1013,26 @@ ret
 .end
 .method instance Drain() -> noresult
 ldarg 0
-ldfld System.Tasks.TaskQueue::Running
+ldfld System.Concurrency.Tasks.TaskQueue::Running
 brfalse Begin
 fault "queue was drained recursively"
 Begin:
 ldarg 0
 ldc.bool true
-stfld System.Tasks.TaskQueue::Running
+stfld System.Concurrency.Tasks.TaskQueue::Running
 ldarg 0
-function.bind fn<Void> = instance System.Tasks.TaskQueue::Signal()
+function.bind fn<Void> = instance System.Concurrency.Tasks.TaskQueue::Signal()
 call instance fn<Void>::Invoke()
 pop
 ldarg 0
 ldc.bool false
-stfld System.Tasks.TaskQueue::Running
+stfld System.Concurrency.Tasks.TaskQueue::Running
 ret
 .end
 .method instance Signal() -> Void
 {pause}
 ldarg 0
-ldfld System.Tasks.TaskQueue::Gate
+ldfld System.Concurrency.Tasks.TaskQueue::Gate
 ldc.i4 42
 call neoCLR.Runtime.RuntimeAsyncComplete(Int64, Int32)
 pop
@@ -1041,7 +1041,7 @@ ret
 .end
 .method instance Body() -> Int32
 ldarg 0
-ldfld System.Tasks.TaskQueue::Gate
+ldfld System.Concurrency.Tasks.TaskQueue::Gate
 call neoCLR.Runtime.RuntimeAsyncAwait(Int64)
 ret
 .end

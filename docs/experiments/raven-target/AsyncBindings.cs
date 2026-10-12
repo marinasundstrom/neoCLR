@@ -41,9 +41,9 @@ static class AsyncBindings
         var state = Prefix + "AsyncStateMachine";
         var payload = reference.DeclaringType is GenericInstanceType g ? GenericUnionBindings.Type(g.GenericArguments[0]) : null;
         var expected = definition.Name switch {
-            ".ctor" => ("System.Tasks.TaskQueue", "noresult"),
+            ".ctor" => ("System.Concurrency.Tasks.TaskQueue", "noresult"),
             "Create" => ("", owner),
-            "get_Task" => ("", "System.Tasks.Task<" + payload + ">"),
+            "get_Task" => ("", "System.Concurrency.Tasks.Task<" + payload + ">"),
             "SetCancelled" => ("", "noresult"),
             "SetResult" => (payload!, "noresult"),
             "Start" or "SetStateMachine" => (state, "noresult"),
@@ -103,7 +103,7 @@ static class AsyncBindings
             return new([owner, state + "&"], "noresult", load + $"call instance {state}::MoveNext()\npop");
         }
         var awaiter = map(generic.GenericArguments[0]);
-        if (!awaiter.StartsWith("System.Tasks.Task<"))
+        if (!awaiter.StartsWith("System.Concurrency.Tasks.Task<"))
             throw new InvalidDataException("Only target Task awaiters are admitted by the ref async protocol.");
         var id = "async_" + suffix;
         var promote = stateDefinition.IsValueType ? $"box {state}\ncastclass {machine}" : $"castclass {machine}";

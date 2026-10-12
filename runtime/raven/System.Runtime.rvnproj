@@ -50,10 +50,10 @@
     <Compile Include="src/System/Networking/Sockets/SocketError.rvn" />
   </ItemGroup>
   <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'TaskState'">
-    <Compile Include="src/System/Tasks/TaskState.rvn" />
+    <Compile Include="src/System/Concurrency/Tasks/TaskState.rvn" />
   </ItemGroup>
   <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'TaskOutcome'">
-    <Compile Include="src/System/Tasks/TaskOutcome.rvn" />
+    <Compile Include="src/System/Concurrency/Tasks/TaskOutcome.rvn" />
   </ItemGroup>
   <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'FileSystem'">
     <Compile Include="src/System/Storage/FileSystem.rvn" />
@@ -313,8 +313,8 @@
     <Compile Include="src/System/Text/UnicodeScalar.rvn" />
   </ItemGroup>
   <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'Tasks'">
-    <Compile Include="src/System/Tasks/Tasks.rvn" />
-    <Compile Include="src/System/Tasks/TaskOperators.rvn" />
+    <Compile Include="src/System/Concurrency/Tasks/Tasks.rvn" />
+    <Compile Include="src/System/Concurrency/Tasks/TaskOperators.rvn" />
   </ItemGroup>
   <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'Workers'">
     <Compile Include="src/System/Concurrency/Workers.rvn" />

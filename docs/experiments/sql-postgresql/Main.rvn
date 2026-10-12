@@ -4,7 +4,7 @@ import System.Data.Sql.*
 import System.Data.PostgreSql.*
 import System.Option.*
 import System.Result.*
-import System.Tasks.*
+import System.Concurrency.Tasks.*
 
 public class Person {
     init() { }

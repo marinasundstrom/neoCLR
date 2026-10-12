@@ -62,10 +62,10 @@ try:
     uri = (project / 'Main.rvn').as_uri()
     results = {}
     probes = [
-        ('TaskOutcome', 'import System.Tasks.*\nfunc Inspect(outcome: TaskOutcome<int>) {\n    outcome.\n}', '    outcome.', ['HasValue', 'Value', 'TryGetValue', 'ToString']),
-        ('Task', 'import System.*\nimport System.Tasks.*\nfunc Inspect(task: Task<Result<int, string>>) {\n    task.\n}', '    task.', ['State', 'Outcome', 'Map', 'Then', 'MapResult']),
-        ('Promise', 'import System.*\nimport System.Tasks.*\nfunc Inspect(promise: Promise<int>) {\n    promise.\n}', '    promise.', ['Task', 'Complete', 'Cancel']),
-        ('Queue', 'import System.Tasks.*\nfunc Inspect() {\n    TaskQueue.\n}', '    TaskQueue.', ['Default']),
+        ('TaskOutcome', 'import System.Concurrency.Tasks.*\nfunc Inspect(outcome: TaskOutcome<int>) {\n    outcome.\n}', '    outcome.', ['HasValue', 'Value', 'TryGetValue', 'ToString']),
+        ('Task', 'import System.*\nimport System.Concurrency.Tasks.*\nfunc Inspect(task: Task<Result<int, string>>) {\n    task.\n}', '    task.', ['State', 'Outcome', 'Map', 'Then', 'MapResult']),
+        ('Promise', 'import System.*\nimport System.Concurrency.Tasks.*\nfunc Inspect(promise: Promise<int>) {\n    promise.\n}', '    promise.', ['Task', 'Complete', 'Cancel']),
+        ('Queue', 'import System.Concurrency.Tasks.*\nfunc Inspect() {\n    TaskQueue.\n}', '    TaskQueue.', ['Default']),
     ]
     for index, (label, text, access, expected) in enumerate(probes):
         lines = text.splitlines()

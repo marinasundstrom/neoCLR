@@ -21,7 +21,7 @@ static class CancellationBindings
         namespace Concurrency {
             public sealed class Timer : Disposable {
                 public Timer(Func<PropagationUnit> callback) { }
-                public Timer(Func<Tasks.Task<PropagationUnit>> callback) { }
+                public Timer(Func<Concurrency.Tasks.Task<PropagationUnit>> callback) { }
                 public bool IsRunning => default;
                 public void Start(Time.Duration delay) { }
                 public void Start(Time.Duration delay, Time.Duration interval) { }
@@ -88,7 +88,7 @@ static class CancellationBindings
         if (owner is null) return null;
         var (args, result) = RuntimeSignatures.Match(reference, definition, GenericUnionBindings.Type, allowInternal: library);
         var expected = (owner, definition.Name) switch {
-            (Timer, ".ctor") => (args.Length == 1 && args[0] == "fn<System.Tasks.Task<Void>>" ? "fn<System.Tasks.Task<Void>>" : "fn<Void>", "noresult", false),
+            (Timer, ".ctor") => (args.Length == 1 && args[0] == "fn<System.Concurrency.Tasks.Task<Void>>" ? "fn<System.Concurrency.Tasks.Task<Void>>" : "fn<Void>", "noresult", false),
             (Timer, "get_IsRunning") => ("", "Boolean", false),
             (Timer, "Start") => (args.Length == 1 ? "System.Time.Duration" : "System.Time.Duration,System.Time.Duration", "noresult", false),
             (Timer, "Stop" or "Dispose") => ("", "noresult", false),

@@ -643,19 +643,19 @@ ldarg arg0
 newobj instance System.Option<System.Networking.Sockets.Socket>::.ctor(System.Option.None)
 ret
 .end
-.function neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion111(System.Option.None arg0) -> System.Option<System.Tasks.Task<System.Result<System.Collections.Sequence<System.Networking.IPAddress>,System.Networking.DnsError>>>
+.function neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion111(System.Option.None arg0) -> System.Option<System.Concurrency.Tasks.Task<System.Result<System.Collections.Sequence<System.Networking.IPAddress>,System.Networking.DnsError>>>
 ldarg arg0
-newobj instance System.Option<System.Tasks.Task<System.Result<System.Collections.Sequence<System.Networking.IPAddress>,System.Networking.DnsError>>>::.ctor(System.Option.None)
+newobj instance System.Option<System.Concurrency.Tasks.Task<System.Result<System.Collections.Sequence<System.Networking.IPAddress>,System.Networking.DnsError>>>::.ctor(System.Option.None)
 ret
 .end
-.function neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion112(System.Option.None arg0) -> System.Option<System.Tasks.Task<System.Result<System.Networking.Sockets.Socket,System.Networking.Sockets.SocketError>>>
+.function neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion112(System.Option.None arg0) -> System.Option<System.Concurrency.Tasks.Task<System.Result<System.Networking.Sockets.Socket,System.Networking.Sockets.SocketError>>>
 ldarg arg0
-newobj instance System.Option<System.Tasks.Task<System.Result<System.Networking.Sockets.Socket,System.Networking.Sockets.SocketError>>>::.ctor(System.Option.None)
+newobj instance System.Option<System.Concurrency.Tasks.Task<System.Result<System.Networking.Sockets.Socket,System.Networking.Sockets.SocketError>>>::.ctor(System.Option.None)
 ret
 .end
-.function neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion113(System.Option.None arg0) -> System.Option<System.Tasks.Task<System.Result<Int32,System.Networking.Sockets.SocketError>>>
+.function neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion113(System.Option.None arg0) -> System.Option<System.Concurrency.Tasks.Task<System.Result<Int32,System.Networking.Sockets.SocketError>>>
 ldarg arg0
-newobj instance System.Option<System.Tasks.Task<System.Result<Int32,System.Networking.Sockets.SocketError>>>::.ctor(System.Option.None)
+newobj instance System.Option<System.Concurrency.Tasks.Task<System.Result<Int32,System.Networking.Sockets.SocketError>>>::.ctor(System.Option.None)
 ret
 .end
 .function neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion114(System.Result<System.Collections.Sequence<Byte>,System.Web.Http.HttpError>& arg0,out(true) System.Result.Ok<System.Collections.Sequence<Byte>>& arg1) -> Boolean
@@ -681,14 +681,14 @@ ldarg arg1
 call instance System.Result<Void,System.Web.Http.HttpError>::TryGetValue(System.Result.Error<System.Web.Http.HttpError>&)
 ret
 .end
-.function neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion118(System.Tasks.Task<System.Result<System.Collections.Sequence<System.Networking.IPAddress>,System.Networking.DnsError>> arg0) -> System.Option.Some<System.Tasks.Task<System.Result<System.Collections.Sequence<System.Networking.IPAddress>,System.Networking.DnsError>>>
+.function neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion118(System.Concurrency.Tasks.Task<System.Result<System.Collections.Sequence<System.Networking.IPAddress>,System.Networking.DnsError>> arg0) -> System.Option.Some<System.Concurrency.Tasks.Task<System.Result<System.Collections.Sequence<System.Networking.IPAddress>,System.Networking.DnsError>>>
 ldarg arg0
-newobj instance System.Option.Some<System.Tasks.Task<System.Result<System.Collections.Sequence<System.Networking.IPAddress>,System.Networking.DnsError>>>::.ctor(System.Tasks.Task<System.Result<System.Collections.Sequence<System.Networking.IPAddress>,System.Networking.DnsError>>)
+newobj instance System.Option.Some<System.Concurrency.Tasks.Task<System.Result<System.Collections.Sequence<System.Networking.IPAddress>,System.Networking.DnsError>>>::.ctor(System.Concurrency.Tasks.Task<System.Result<System.Collections.Sequence<System.Networking.IPAddress>,System.Networking.DnsError>>)
 ret
 .end
-.function neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion119(System.Option.Some<System.Tasks.Task<System.Result<System.Collections.Sequence<System.Networking.IPAddress>,System.Networking.DnsError>>> arg0) -> System.Option<System.Tasks.Task<System.Result<System.Collections.Sequence<System.Networking.IPAddress>,System.Networking.DnsError>>>
+.function neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion119(System.Option.Some<System.Concurrency.Tasks.Task<System.Result<System.Collections.Sequence<System.Networking.IPAddress>,System.Networking.DnsError>>> arg0) -> System.Option<System.Concurrency.Tasks.Task<System.Result<System.Collections.Sequence<System.Networking.IPAddress>,System.Networking.DnsError>>>
 ldarg arg0
-newobj instance System.Option<System.Tasks.Task<System.Result<System.Collections.Sequence<System.Networking.IPAddress>,System.Networking.DnsError>>>::.ctor(System.Option.Some<System.Tasks.Task<System.Result<System.Collections.Sequence<System.Networking.IPAddress>,System.Networking.DnsError>>>)
+newobj instance System.Option<System.Concurrency.Tasks.Task<System.Result<System.Collections.Sequence<System.Networking.IPAddress>,System.Networking.DnsError>>>::.ctor(System.Option.Some<System.Concurrency.Tasks.Task<System.Result<System.Collections.Sequence<System.Networking.IPAddress>,System.Networking.DnsError>>>)
 ret
 .end
 .function neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion120(System.Option<System.Networking.Sockets.Socket>& arg0,out(true) System.Option.Some<System.Networking.Sockets.Socket>& arg1) -> Boolean
@@ -702,15 +702,15 @@ ldarg arg0
 call instance System.Option.Some<System.Networking.Sockets.Socket>::get_Value()
 ret
 .end
-.function neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion122(System.Option<System.Tasks.Task<System.Result<System.Collections.Sequence<System.Networking.IPAddress>,System.Networking.DnsError>>>& arg0,out(true) System.Option.Some<System.Tasks.Task<System.Result<System.Collections.Sequence<System.Networking.IPAddress>,System.Networking.DnsError>>>& arg1) -> Boolean
+.function neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion122(System.Option<System.Concurrency.Tasks.Task<System.Result<System.Collections.Sequence<System.Networking.IPAddress>,System.Networking.DnsError>>>& arg0,out(true) System.Option.Some<System.Concurrency.Tasks.Task<System.Result<System.Collections.Sequence<System.Networking.IPAddress>,System.Networking.DnsError>>>& arg1) -> Boolean
 ldarg arg0
 ldarg arg1
-call instance System.Option<System.Tasks.Task<System.Result<System.Collections.Sequence<System.Networking.IPAddress>,System.Networking.DnsError>>>::TryGetValue(System.Option.Some<System.Tasks.Task<System.Result<System.Collections.Sequence<System.Networking.IPAddress>,System.Networking.DnsError>>>&)
+call instance System.Option<System.Concurrency.Tasks.Task<System.Result<System.Collections.Sequence<System.Networking.IPAddress>,System.Networking.DnsError>>>::TryGetValue(System.Option.Some<System.Concurrency.Tasks.Task<System.Result<System.Collections.Sequence<System.Networking.IPAddress>,System.Networking.DnsError>>>&)
 ret
 .end
-.function neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion123(System.Option.Some<System.Tasks.Task<System.Result<System.Collections.Sequence<System.Networking.IPAddress>,System.Networking.DnsError>>>& arg0) -> System.Tasks.Task<System.Result<System.Collections.Sequence<System.Networking.IPAddress>,System.Networking.DnsError>>
+.function neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion123(System.Option.Some<System.Concurrency.Tasks.Task<System.Result<System.Collections.Sequence<System.Networking.IPAddress>,System.Networking.DnsError>>>& arg0) -> System.Concurrency.Tasks.Task<System.Result<System.Collections.Sequence<System.Networking.IPAddress>,System.Networking.DnsError>>
 ldarg arg0
-call instance System.Option.Some<System.Tasks.Task<System.Result<System.Collections.Sequence<System.Networking.IPAddress>,System.Networking.DnsError>>>::get_Value()
+call instance System.Option.Some<System.Concurrency.Tasks.Task<System.Result<System.Collections.Sequence<System.Networking.IPAddress>,System.Networking.DnsError>>>::get_Value()
 ret
 .end
 .function neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion124(System.Result<System.Collections.Sequence<System.Networking.IPAddress>,System.Networking.DnsError>& arg0,out(true) System.Result.Ok<System.Collections.Sequence<System.Networking.IPAddress>>& arg1) -> Boolean
@@ -735,25 +735,25 @@ ldarg arg0
 call instance System.Result.Error<System.Networking.DnsError>::get_Value()
 ret
 .end
-.function neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion128(System.Tasks.Task<System.Result<System.Networking.Sockets.Socket,System.Networking.Sockets.SocketError>> arg0) -> System.Option.Some<System.Tasks.Task<System.Result<System.Networking.Sockets.Socket,System.Networking.Sockets.SocketError>>>
+.function neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion128(System.Concurrency.Tasks.Task<System.Result<System.Networking.Sockets.Socket,System.Networking.Sockets.SocketError>> arg0) -> System.Option.Some<System.Concurrency.Tasks.Task<System.Result<System.Networking.Sockets.Socket,System.Networking.Sockets.SocketError>>>
 ldarg arg0
-newobj instance System.Option.Some<System.Tasks.Task<System.Result<System.Networking.Sockets.Socket,System.Networking.Sockets.SocketError>>>::.ctor(System.Tasks.Task<System.Result<System.Networking.Sockets.Socket,System.Networking.Sockets.SocketError>>)
+newobj instance System.Option.Some<System.Concurrency.Tasks.Task<System.Result<System.Networking.Sockets.Socket,System.Networking.Sockets.SocketError>>>::.ctor(System.Concurrency.Tasks.Task<System.Result<System.Networking.Sockets.Socket,System.Networking.Sockets.SocketError>>)
 ret
 .end
-.function neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion129(System.Option.Some<System.Tasks.Task<System.Result<System.Networking.Sockets.Socket,System.Networking.Sockets.SocketError>>> arg0) -> System.Option<System.Tasks.Task<System.Result<System.Networking.Sockets.Socket,System.Networking.Sockets.SocketError>>>
+.function neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion129(System.Option.Some<System.Concurrency.Tasks.Task<System.Result<System.Networking.Sockets.Socket,System.Networking.Sockets.SocketError>>> arg0) -> System.Option<System.Concurrency.Tasks.Task<System.Result<System.Networking.Sockets.Socket,System.Networking.Sockets.SocketError>>>
 ldarg arg0
-newobj instance System.Option<System.Tasks.Task<System.Result<System.Networking.Sockets.Socket,System.Networking.Sockets.SocketError>>>::.ctor(System.Option.Some<System.Tasks.Task<System.Result<System.Networking.Sockets.Socket,System.Networking.Sockets.SocketError>>>)
+newobj instance System.Option<System.Concurrency.Tasks.Task<System.Result<System.Networking.Sockets.Socket,System.Networking.Sockets.SocketError>>>::.ctor(System.Option.Some<System.Concurrency.Tasks.Task<System.Result<System.Networking.Sockets.Socket,System.Networking.Sockets.SocketError>>>)
 ret
 .end
-.function neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion130(System.Option<System.Tasks.Task<System.Result<System.Networking.Sockets.Socket,System.Networking.Sockets.SocketError>>>& arg0,out(true) System.Option.Some<System.Tasks.Task<System.Result<System.Networking.Sockets.Socket,System.Networking.Sockets.SocketError>>>& arg1) -> Boolean
+.function neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion130(System.Option<System.Concurrency.Tasks.Task<System.Result<System.Networking.Sockets.Socket,System.Networking.Sockets.SocketError>>>& arg0,out(true) System.Option.Some<System.Concurrency.Tasks.Task<System.Result<System.Networking.Sockets.Socket,System.Networking.Sockets.SocketError>>>& arg1) -> Boolean
 ldarg arg0
 ldarg arg1
-call instance System.Option<System.Tasks.Task<System.Result<System.Networking.Sockets.Socket,System.Networking.Sockets.SocketError>>>::TryGetValue(System.Option.Some<System.Tasks.Task<System.Result<System.Networking.Sockets.Socket,System.Networking.Sockets.SocketError>>>&)
+call instance System.Option<System.Concurrency.Tasks.Task<System.Result<System.Networking.Sockets.Socket,System.Networking.Sockets.SocketError>>>::TryGetValue(System.Option.Some<System.Concurrency.Tasks.Task<System.Result<System.Networking.Sockets.Socket,System.Networking.Sockets.SocketError>>>&)
 ret
 .end
-.function neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion131(System.Option.Some<System.Tasks.Task<System.Result<System.Networking.Sockets.Socket,System.Networking.Sockets.SocketError>>>& arg0) -> System.Tasks.Task<System.Result<System.Networking.Sockets.Socket,System.Networking.Sockets.SocketError>>
+.function neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion131(System.Option.Some<System.Concurrency.Tasks.Task<System.Result<System.Networking.Sockets.Socket,System.Networking.Sockets.SocketError>>>& arg0) -> System.Concurrency.Tasks.Task<System.Result<System.Networking.Sockets.Socket,System.Networking.Sockets.SocketError>>
 ldarg arg0
-call instance System.Option.Some<System.Tasks.Task<System.Result<System.Networking.Sockets.Socket,System.Networking.Sockets.SocketError>>>::get_Value()
+call instance System.Option.Some<System.Concurrency.Tasks.Task<System.Result<System.Networking.Sockets.Socket,System.Networking.Sockets.SocketError>>>::get_Value()
 ret
 .end
 .function neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion132(System.Result<System.Networking.Sockets.Socket,System.Networking.Sockets.SocketError>& arg0,out(true) System.Result.Ok<System.Networking.Sockets.Socket>& arg1) -> Boolean
@@ -788,14 +788,14 @@ ldarg arg0
 call instance System.Result.Error<System.Networking.Sockets.SocketError>::get_Value()
 ret
 .end
-.function neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion138(System.Tasks.Task<System.Result<Int32,System.Networking.Sockets.SocketError>> arg0) -> System.Option.Some<System.Tasks.Task<System.Result<Int32,System.Networking.Sockets.SocketError>>>
+.function neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion138(System.Concurrency.Tasks.Task<System.Result<Int32,System.Networking.Sockets.SocketError>> arg0) -> System.Option.Some<System.Concurrency.Tasks.Task<System.Result<Int32,System.Networking.Sockets.SocketError>>>
 ldarg arg0
-newobj instance System.Option.Some<System.Tasks.Task<System.Result<Int32,System.Networking.Sockets.SocketError>>>::.ctor(System.Tasks.Task<System.Result<Int32,System.Networking.Sockets.SocketError>>)
+newobj instance System.Option.Some<System.Concurrency.Tasks.Task<System.Result<Int32,System.Networking.Sockets.SocketError>>>::.ctor(System.Concurrency.Tasks.Task<System.Result<Int32,System.Networking.Sockets.SocketError>>)
 ret
 .end
-.function neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion139(System.Option.Some<System.Tasks.Task<System.Result<Int32,System.Networking.Sockets.SocketError>>> arg0) -> System.Option<System.Tasks.Task<System.Result<Int32,System.Networking.Sockets.SocketError>>>
+.function neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion139(System.Option.Some<System.Concurrency.Tasks.Task<System.Result<Int32,System.Networking.Sockets.SocketError>>> arg0) -> System.Option<System.Concurrency.Tasks.Task<System.Result<Int32,System.Networking.Sockets.SocketError>>>
 ldarg arg0
-newobj instance System.Option<System.Tasks.Task<System.Result<Int32,System.Networking.Sockets.SocketError>>>::.ctor(System.Option.Some<System.Tasks.Task<System.Result<Int32,System.Networking.Sockets.SocketError>>>)
+newobj instance System.Option<System.Concurrency.Tasks.Task<System.Result<Int32,System.Networking.Sockets.SocketError>>>::.ctor(System.Option.Some<System.Concurrency.Tasks.Task<System.Result<Int32,System.Networking.Sockets.SocketError>>>)
 ret
 .end
 .function neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion140(System.Result<Int32,System.Web.Http.HttpError>& arg0,out(true) System.Result.Error<System.Web.Http.HttpError>& arg1) -> Boolean
@@ -810,15 +810,15 @@ ldarg arg1
 call instance System.Result<Int32,System.Web.Http.HttpError>::TryGetValue(System.Result.Ok<Int32>&)
 ret
 .end
-.function neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion142(System.Option<System.Tasks.Task<System.Result<Int32,System.Networking.Sockets.SocketError>>>& arg0,out(true) System.Option.Some<System.Tasks.Task<System.Result<Int32,System.Networking.Sockets.SocketError>>>& arg1) -> Boolean
+.function neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion142(System.Option<System.Concurrency.Tasks.Task<System.Result<Int32,System.Networking.Sockets.SocketError>>>& arg0,out(true) System.Option.Some<System.Concurrency.Tasks.Task<System.Result<Int32,System.Networking.Sockets.SocketError>>>& arg1) -> Boolean
 ldarg arg0
 ldarg arg1
-call instance System.Option<System.Tasks.Task<System.Result<Int32,System.Networking.Sockets.SocketError>>>::TryGetValue(System.Option.Some<System.Tasks.Task<System.Result<Int32,System.Networking.Sockets.SocketError>>>&)
+call instance System.Option<System.Concurrency.Tasks.Task<System.Result<Int32,System.Networking.Sockets.SocketError>>>::TryGetValue(System.Option.Some<System.Concurrency.Tasks.Task<System.Result<Int32,System.Networking.Sockets.SocketError>>>&)
 ret
 .end
-.function neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion143(System.Option.Some<System.Tasks.Task<System.Result<Int32,System.Networking.Sockets.SocketError>>>& arg0) -> System.Tasks.Task<System.Result<Int32,System.Networking.Sockets.SocketError>>
+.function neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion143(System.Option.Some<System.Concurrency.Tasks.Task<System.Result<Int32,System.Networking.Sockets.SocketError>>>& arg0) -> System.Concurrency.Tasks.Task<System.Result<Int32,System.Networking.Sockets.SocketError>>
 ldarg arg0
-call instance System.Option.Some<System.Tasks.Task<System.Result<Int32,System.Networking.Sockets.SocketError>>>::get_Value()
+call instance System.Option.Some<System.Concurrency.Tasks.Task<System.Result<Int32,System.Networking.Sockets.SocketError>>>::get_Value()
 ret
 .end
 .function neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion144(System.Result<Int32,System.Networking.Sockets.SocketError>& arg0,out(true) System.Result.Ok<Int32>& arg1) -> Boolean
@@ -868,29 +868,29 @@ ldarg arg0
 newobj instance System.Option<System.Web.Http.HttpContext>::.ctor(System.Option.None)
 ret
 .end
-.function neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion153(System.Option.None arg0) -> System.Option<System.Tasks.Task<System.Result<System.Web.Http.HttpContext,System.Web.Http.HttpError>>>
+.function neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion153(System.Option.None arg0) -> System.Option<System.Concurrency.Tasks.Task<System.Result<System.Web.Http.HttpContext,System.Web.Http.HttpError>>>
 ldarg arg0
-newobj instance System.Option<System.Tasks.Task<System.Result<System.Web.Http.HttpContext,System.Web.Http.HttpError>>>::.ctor(System.Option.None)
+newobj instance System.Option<System.Concurrency.Tasks.Task<System.Result<System.Web.Http.HttpContext,System.Web.Http.HttpError>>>::.ctor(System.Option.None)
 ret
 .end
-.function neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion154(System.Option.None arg0) -> System.Option<System.Tasks.Task<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>>>
+.function neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion154(System.Option.None arg0) -> System.Option<System.Concurrency.Tasks.Task<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>>>
 ldarg arg0
-newobj instance System.Option<System.Tasks.Task<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>>>::.ctor(System.Option.None)
+newobj instance System.Option<System.Concurrency.Tasks.Task<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>>>::.ctor(System.Option.None)
 ret
 .end
-.function neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion155(System.Option.None arg0) -> System.Option<System.Tasks.Task<System.Result<Void,System.Web.Http.HttpError>>>
+.function neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion155(System.Option.None arg0) -> System.Option<System.Concurrency.Tasks.Task<System.Result<Void,System.Web.Http.HttpError>>>
 ldarg arg0
-newobj instance System.Option<System.Tasks.Task<System.Result<Void,System.Web.Http.HttpError>>>::.ctor(System.Option.None)
+newobj instance System.Option<System.Concurrency.Tasks.Task<System.Result<Void,System.Web.Http.HttpError>>>::.ctor(System.Option.None)
 ret
 .end
-.function neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion156(System.Tasks.Task<System.Result<System.Web.Http.HttpContext,System.Web.Http.HttpError>> arg0) -> System.Option.Some<System.Tasks.Task<System.Result<System.Web.Http.HttpContext,System.Web.Http.HttpError>>>
+.function neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion156(System.Concurrency.Tasks.Task<System.Result<System.Web.Http.HttpContext,System.Web.Http.HttpError>> arg0) -> System.Option.Some<System.Concurrency.Tasks.Task<System.Result<System.Web.Http.HttpContext,System.Web.Http.HttpError>>>
 ldarg arg0
-newobj instance System.Option.Some<System.Tasks.Task<System.Result<System.Web.Http.HttpContext,System.Web.Http.HttpError>>>::.ctor(System.Tasks.Task<System.Result<System.Web.Http.HttpContext,System.Web.Http.HttpError>>)
+newobj instance System.Option.Some<System.Concurrency.Tasks.Task<System.Result<System.Web.Http.HttpContext,System.Web.Http.HttpError>>>::.ctor(System.Concurrency.Tasks.Task<System.Result<System.Web.Http.HttpContext,System.Web.Http.HttpError>>)
 ret
 .end
-.function neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion157(System.Option.Some<System.Tasks.Task<System.Result<System.Web.Http.HttpContext,System.Web.Http.HttpError>>> arg0) -> System.Option<System.Tasks.Task<System.Result<System.Web.Http.HttpContext,System.Web.Http.HttpError>>>
+.function neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion157(System.Option.Some<System.Concurrency.Tasks.Task<System.Result<System.Web.Http.HttpContext,System.Web.Http.HttpError>>> arg0) -> System.Option<System.Concurrency.Tasks.Task<System.Result<System.Web.Http.HttpContext,System.Web.Http.HttpError>>>
 ldarg arg0
-newobj instance System.Option<System.Tasks.Task<System.Result<System.Web.Http.HttpContext,System.Web.Http.HttpError>>>::.ctor(System.Option.Some<System.Tasks.Task<System.Result<System.Web.Http.HttpContext,System.Web.Http.HttpError>>>)
+newobj instance System.Option<System.Concurrency.Tasks.Task<System.Result<System.Web.Http.HttpContext,System.Web.Http.HttpError>>>::.ctor(System.Option.Some<System.Concurrency.Tasks.Task<System.Result<System.Web.Http.HttpContext,System.Web.Http.HttpError>>>)
 ret
 .end
 .function neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion158(System.Option<System.Web.Http.HttpContext>& arg0,out(true) System.Option.Some<System.Web.Http.HttpContext>& arg1) -> Boolean
@@ -904,26 +904,26 @@ ldarg arg0
 call instance System.Option.Some<System.Web.Http.HttpContext>::get_Value()
 ret
 .end
-.function neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion160(System.Option<System.Tasks.Task<System.Result<Void,System.Web.Http.HttpError>>>& arg0,out(true) System.Option.Some<System.Tasks.Task<System.Result<Void,System.Web.Http.HttpError>>>& arg1) -> Boolean
+.function neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion160(System.Option<System.Concurrency.Tasks.Task<System.Result<Void,System.Web.Http.HttpError>>>& arg0,out(true) System.Option.Some<System.Concurrency.Tasks.Task<System.Result<Void,System.Web.Http.HttpError>>>& arg1) -> Boolean
 ldarg arg0
 ldarg arg1
-call instance System.Option<System.Tasks.Task<System.Result<Void,System.Web.Http.HttpError>>>::TryGetValue(System.Option.Some<System.Tasks.Task<System.Result<Void,System.Web.Http.HttpError>>>&)
+call instance System.Option<System.Concurrency.Tasks.Task<System.Result<Void,System.Web.Http.HttpError>>>::TryGetValue(System.Option.Some<System.Concurrency.Tasks.Task<System.Result<Void,System.Web.Http.HttpError>>>&)
 ret
 .end
-.function neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion161(System.Option.Some<System.Tasks.Task<System.Result<Void,System.Web.Http.HttpError>>>& arg0) -> System.Tasks.Task<System.Result<Void,System.Web.Http.HttpError>>
+.function neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion161(System.Option.Some<System.Concurrency.Tasks.Task<System.Result<Void,System.Web.Http.HttpError>>>& arg0) -> System.Concurrency.Tasks.Task<System.Result<Void,System.Web.Http.HttpError>>
 ldarg arg0
-call instance System.Option.Some<System.Tasks.Task<System.Result<Void,System.Web.Http.HttpError>>>::get_Value()
+call instance System.Option.Some<System.Concurrency.Tasks.Task<System.Result<Void,System.Web.Http.HttpError>>>::get_Value()
 ret
 .end
-.function neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion162(System.Option<System.Tasks.Task<System.Result<System.Web.Http.HttpContext,System.Web.Http.HttpError>>>& arg0,out(true) System.Option.Some<System.Tasks.Task<System.Result<System.Web.Http.HttpContext,System.Web.Http.HttpError>>>& arg1) -> Boolean
+.function neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion162(System.Option<System.Concurrency.Tasks.Task<System.Result<System.Web.Http.HttpContext,System.Web.Http.HttpError>>>& arg0,out(true) System.Option.Some<System.Concurrency.Tasks.Task<System.Result<System.Web.Http.HttpContext,System.Web.Http.HttpError>>>& arg1) -> Boolean
 ldarg arg0
 ldarg arg1
-call instance System.Option<System.Tasks.Task<System.Result<System.Web.Http.HttpContext,System.Web.Http.HttpError>>>::TryGetValue(System.Option.Some<System.Tasks.Task<System.Result<System.Web.Http.HttpContext,System.Web.Http.HttpError>>>&)
+call instance System.Option<System.Concurrency.Tasks.Task<System.Result<System.Web.Http.HttpContext,System.Web.Http.HttpError>>>::TryGetValue(System.Option.Some<System.Concurrency.Tasks.Task<System.Result<System.Web.Http.HttpContext,System.Web.Http.HttpError>>>&)
 ret
 .end
-.function neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion163(System.Option.Some<System.Tasks.Task<System.Result<System.Web.Http.HttpContext,System.Web.Http.HttpError>>>& arg0) -> System.Tasks.Task<System.Result<System.Web.Http.HttpContext,System.Web.Http.HttpError>>
+.function neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion163(System.Option.Some<System.Concurrency.Tasks.Task<System.Result<System.Web.Http.HttpContext,System.Web.Http.HttpError>>>& arg0) -> System.Concurrency.Tasks.Task<System.Result<System.Web.Http.HttpContext,System.Web.Http.HttpError>>
 ldarg arg0
-call instance System.Option.Some<System.Tasks.Task<System.Result<System.Web.Http.HttpContext,System.Web.Http.HttpError>>>::get_Value()
+call instance System.Option.Some<System.Concurrency.Tasks.Task<System.Result<System.Web.Http.HttpContext,System.Web.Http.HttpError>>>::get_Value()
 ret
 .end
 .function neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion164(System.Result<System.Web.Http.HttpContext,System.Web.Http.HttpError>& arg0,out(true) System.Result.Ok<System.Web.Http.HttpContext>& arg1) -> Boolean
@@ -953,25 +953,25 @@ ldarg arg0
 newobj instance System.Option<System.Web.Http.HttpContext>::.ctor(System.Option.Some<System.Web.Http.HttpContext>)
 ret
 .end
-.function neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion169(System.Tasks.Task<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>> arg0) -> System.Option.Some<System.Tasks.Task<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>>>
+.function neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion169(System.Concurrency.Tasks.Task<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>> arg0) -> System.Option.Some<System.Concurrency.Tasks.Task<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>>>
 ldarg arg0
-newobj instance System.Option.Some<System.Tasks.Task<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>>>::.ctor(System.Tasks.Task<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>>)
+newobj instance System.Option.Some<System.Concurrency.Tasks.Task<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>>>::.ctor(System.Concurrency.Tasks.Task<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>>)
 ret
 .end
-.function neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion170(System.Option.Some<System.Tasks.Task<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>>> arg0) -> System.Option<System.Tasks.Task<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>>>
+.function neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion170(System.Option.Some<System.Concurrency.Tasks.Task<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>>> arg0) -> System.Option<System.Concurrency.Tasks.Task<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>>>
 ldarg arg0
-newobj instance System.Option<System.Tasks.Task<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>>>::.ctor(System.Option.Some<System.Tasks.Task<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>>>)
+newobj instance System.Option<System.Concurrency.Tasks.Task<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>>>::.ctor(System.Option.Some<System.Concurrency.Tasks.Task<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>>>)
 ret
 .end
-.function neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion171(System.Option<System.Tasks.Task<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>>>& arg0,out(true) System.Option.Some<System.Tasks.Task<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>>>& arg1) -> Boolean
+.function neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion171(System.Option<System.Concurrency.Tasks.Task<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>>>& arg0,out(true) System.Option.Some<System.Concurrency.Tasks.Task<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>>>& arg1) -> Boolean
 ldarg arg0
 ldarg arg1
-call instance System.Option<System.Tasks.Task<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>>>::TryGetValue(System.Option.Some<System.Tasks.Task<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>>>&)
+call instance System.Option<System.Concurrency.Tasks.Task<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>>>::TryGetValue(System.Option.Some<System.Concurrency.Tasks.Task<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>>>&)
 ret
 .end
-.function neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion172(System.Option.Some<System.Tasks.Task<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>>>& arg0) -> System.Tasks.Task<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>>
+.function neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion172(System.Option.Some<System.Concurrency.Tasks.Task<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>>>& arg0) -> System.Concurrency.Tasks.Task<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>>
 ldarg arg0
-call instance System.Option.Some<System.Tasks.Task<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>>>::get_Value()
+call instance System.Option.Some<System.Concurrency.Tasks.Task<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>>>::get_Value()
 ret
 .end
 .function neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion173(System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>& arg0,out(true) System.Result.Error<System.Web.Http.HttpError>& arg1) -> Boolean
@@ -980,14 +980,14 @@ ldarg arg1
 call instance System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>::TryGetValue(System.Result.Error<System.Web.Http.HttpError>&)
 ret
 .end
-.function neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion174(System.Tasks.Task<System.Result<Void,System.Web.Http.HttpError>> arg0) -> System.Option.Some<System.Tasks.Task<System.Result<Void,System.Web.Http.HttpError>>>
+.function neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion174(System.Concurrency.Tasks.Task<System.Result<Void,System.Web.Http.HttpError>> arg0) -> System.Option.Some<System.Concurrency.Tasks.Task<System.Result<Void,System.Web.Http.HttpError>>>
 ldarg arg0
-newobj instance System.Option.Some<System.Tasks.Task<System.Result<Void,System.Web.Http.HttpError>>>::.ctor(System.Tasks.Task<System.Result<Void,System.Web.Http.HttpError>>)
+newobj instance System.Option.Some<System.Concurrency.Tasks.Task<System.Result<Void,System.Web.Http.HttpError>>>::.ctor(System.Concurrency.Tasks.Task<System.Result<Void,System.Web.Http.HttpError>>)
 ret
 .end
-.function neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion175(System.Option.Some<System.Tasks.Task<System.Result<Void,System.Web.Http.HttpError>>> arg0) -> System.Option<System.Tasks.Task<System.Result<Void,System.Web.Http.HttpError>>>
+.function neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion175(System.Option.Some<System.Concurrency.Tasks.Task<System.Result<Void,System.Web.Http.HttpError>>> arg0) -> System.Option<System.Concurrency.Tasks.Task<System.Result<Void,System.Web.Http.HttpError>>>
 ldarg arg0
-newobj instance System.Option<System.Tasks.Task<System.Result<Void,System.Web.Http.HttpError>>>::.ctor(System.Option.Some<System.Tasks.Task<System.Result<Void,System.Web.Http.HttpError>>>)
+newobj instance System.Option<System.Concurrency.Tasks.Task<System.Result<Void,System.Web.Http.HttpError>>>::.ctor(System.Option.Some<System.Concurrency.Tasks.Task<System.Result<Void,System.Web.Http.HttpError>>>)
 ret
 .end
 .function neoCLR.Library.System.Web.Http.HttpClient.RuntimeBooleanFromInt32(Int32 value) -> Boolean
@@ -3864,7 +3864,7 @@ ret
 .end
 .end
 .interface System.Web.Http.HttpHandler
-.method instance Send(System.Web.Http.HttpRequest request,System.Concurrency.CancellationToken cancellationToken) -> System.Tasks.Task<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>>
+.method instance Send(System.Web.Http.HttpRequest request,System.Concurrency.CancellationToken cancellationToken) -> System.Concurrency.Tasks.Task<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>>
 .end
 .end
 .type class System.Web.Http.HttpRequest
@@ -9993,20 +9993,20 @@ newobj instance System.Web.Http.HttpContent::.ctor(System.Collections.Sequence<B
 M0000006d_IL_0012:
 ret
 .end
-.method instance ReadText() -> System.Tasks.Task<System.Result<String,String>>
-.local System.Tasks.Promise<System.Result<String,String>> local0
+.method instance ReadText() -> System.Concurrency.Tasks.Task<System.Result<String,String>>
+.local System.Concurrency.Tasks.Promise<System.Result<String,String>> local0
 .local String local1
 .local System.Result<String,System.Text.InvalidUtf8Error> local2
 .local System.Result.Ok<String> local3
 ldloca local0
-initobj System.Tasks.Promise<System.Result<String,String>>
+initobj System.Concurrency.Tasks.Promise<System.Result<String,String>>
 ldloca local2
 initobj System.Result<String,System.Text.InvalidUtf8Error>
 ldloca local3
 initobj System.Result.Ok<String>
 M0000006e_IL_0000:
 M0000006e_IL_0001:
-newobj instance System.Tasks.Promise<System.Result<String,String>>::.ctor()
+newobj instance System.Concurrency.Tasks.Promise<System.Result<String,String>>::.ctor()
 M0000006e_IL_0006:
 stloc local0
 M0000006e_IL_0007:
@@ -10034,7 +10034,7 @@ call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion3(String)
 M0000006e_IL_0027:
 call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion4(System.Result.Error<String>)
 M0000006e_IL_002c:
-call instance System.Tasks.Promise<System.Result<String,String>>::Complete(System.Result<String,String>)
+call instance System.Concurrency.Tasks.Promise<System.Result<String,String>>::Complete(System.Result<String,String>)
 call neoCLR.Library.System.Web.Http.HttpClient.RuntimeBooleanToInt32(Boolean)
 M0000006e_IL_0031:
 pop
@@ -10042,7 +10042,7 @@ M0000006e_IL_0032:
 M0000006e_IL_0033:
 ldloc local0
 M0000006e_IL_0034:
-call instance System.Tasks.Promise<System.Result<String,String>>::get_Task()
+call instance System.Concurrency.Tasks.Promise<System.Result<String,String>>::get_Task()
 M0000006e_IL_0039:
 ret
 M0000006e_IL_003a:
@@ -10088,7 +10088,7 @@ call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion5(String)
 M0000006e_IL_007f:
 call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion6(System.Result.Ok<String>)
 M0000006e_IL_0084:
-call instance System.Tasks.Promise<System.Result<String,String>>::Complete(System.Result<String,String>)
+call instance System.Concurrency.Tasks.Promise<System.Result<String,String>>::Complete(System.Result<String,String>)
 call neoCLR.Library.System.Web.Http.HttpClient.RuntimeBooleanToInt32(Boolean)
 M0000006e_IL_0089:
 pop
@@ -10104,7 +10104,7 @@ call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion3(String)
 M0000006e_IL_009c:
 call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion4(System.Result.Error<String>)
 M0000006e_IL_00a1:
-call instance System.Tasks.Promise<System.Result<String,String>>::Complete(System.Result<String,String>)
+call instance System.Concurrency.Tasks.Promise<System.Result<String,String>>::Complete(System.Result<String,String>)
 call neoCLR.Library.System.Web.Http.HttpClient.RuntimeBooleanToInt32(Boolean)
 M0000006e_IL_00a6:
 pop
@@ -10113,7 +10113,7 @@ M0000006e_IL_00a8:
 M0000006e_IL_00a9:
 ldloc local0
 M0000006e_IL_00aa:
-call instance System.Tasks.Promise<System.Result<String,String>>::get_Task()
+call instance System.Concurrency.Tasks.Promise<System.Result<String,String>>::get_Task()
 M0000006e_IL_00af:
 ret
 .end
@@ -10887,7 +10887,7 @@ pop
 M00000073_IL_0007:
 ret
 .end
-.method instance Send(System.Web.Http.HttpRequest request) -> System.Tasks.Task<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>>
+.method instance Send(System.Web.Http.HttpRequest request) -> System.Concurrency.Tasks.Task<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>>
 M00000074_IL_0000:
 M00000074_IL_0001:
 M00000074_IL_0002:
@@ -10901,11 +10901,11 @@ callvirt instance System.Web.Http.HttpSocketHandler::Send(System.Web.Http.HttpRe
 M00000074_IL_000e:
 ret
 .end
-.method instance Send(System.Web.Http.HttpRequest request,System.Concurrency.CancellationToken cancellationToken) -> System.Tasks.Task<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>>
-.local System.Tasks.Promise<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>> local0
+.method instance Send(System.Web.Http.HttpRequest request,System.Concurrency.CancellationToken cancellationToken) -> System.Concurrency.Tasks.Task<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>>
+.local System.Concurrency.Tasks.Promise<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>> local0
 .local System.Web.Http.HttpExchange local1
 ldloca local0
-initobj System.Tasks.Promise<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>>
+initobj System.Concurrency.Tasks.Promise<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>>
 ldloca local1
 initobj System.Web.Http.HttpExchange
 M00000075_IL_0000:
@@ -10921,13 +10921,13 @@ M00000075_IL_000e:
 br M00000075_IL_0029
 M00000075_IL_0013:
 M00000075_IL_0014:
-newobj instance System.Tasks.Promise<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>>::.ctor()
+newobj instance System.Concurrency.Tasks.Promise<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>>::.ctor()
 M00000075_IL_0019:
 stloc local0
 M00000075_IL_001a:
 ldloc local0
 M00000075_IL_001b:
-call instance System.Tasks.Promise<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>>::Cancel()
+call instance System.Concurrency.Tasks.Promise<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>>::Cancel()
 call neoCLR.Library.System.Web.Http.HttpClient.RuntimeBooleanToInt32(Boolean)
 M00000075_IL_0020:
 pop
@@ -10935,7 +10935,7 @@ M00000075_IL_0021:
 M00000075_IL_0022:
 ldloc local0
 M00000075_IL_0023:
-call instance System.Tasks.Promise<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>>::get_Task()
+call instance System.Concurrency.Tasks.Promise<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>>::get_Task()
 M00000075_IL_0028:
 ret
 M00000075_IL_0029:
@@ -15209,11 +15209,11 @@ ret
 .field private deadline Int64
 .field private token System.Concurrency.CancellationToken
 .field private request System.Web.Http.HttpRequest
-.field private source System.Tasks.Promise<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>>
+.field private source System.Concurrency.Tasks.Promise<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>>
 .field private socket System.Option<System.Networking.Sockets.Socket>
-.field private lookup System.Option<System.Tasks.Task<System.Result<System.Collections.Sequence<System.Networking.IPAddress>,System.Networking.DnsError>>>
-.field private connecting System.Option<System.Tasks.Task<System.Result<System.Networking.Sockets.Socket,System.Networking.Sockets.SocketError>>>
-.field private transfer System.Option<System.Tasks.Task<System.Result<Int32,System.Networking.Sockets.SocketError>>>
+.field private lookup System.Option<System.Concurrency.Tasks.Task<System.Result<System.Collections.Sequence<System.Networking.IPAddress>,System.Networking.DnsError>>>
+.field private connecting System.Option<System.Concurrency.Tasks.Task<System.Result<System.Networking.Sockets.Socket,System.Networking.Sockets.SocketError>>>
+.field private transfer System.Option<System.Concurrency.Tasks.Task<System.Result<Int32,System.Networking.Sockets.SocketError>>>
 .field private outgoing System.Collections.Sequence<Byte>
 .field private sent Int32
 .field private buffer arrayref<Byte>
@@ -15265,7 +15265,7 @@ stfld System.Web.Http.HttpExchange::request
 M00000080_IL_0030:
 ldarg 0
 M00000080_IL_0031:
-newobj instance System.Tasks.Promise<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>>::.ctor()
+newobj instance System.Concurrency.Tasks.Promise<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>>::.ctor()
 M00000080_IL_0036:
 stfld System.Web.Http.HttpExchange::source
 M00000080_IL_003b:
@@ -15341,12 +15341,12 @@ stfld System.Web.Http.HttpExchange::decoder
 M00000080_IL_00bb:
 ret
 .end
-.method internal instance Execute() -> System.Tasks.Task<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>>
+.method internal instance Execute() -> System.Concurrency.Tasks.Task<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>>
 .local System.Result<System.Collections.Sequence<Byte>,System.Web.Http.HttpError> local0
 .local System.Collections.Sequence<Byte> local1
 .local System.Web.Http.HttpError local2
 .local System.Web.Http.HttpError local3
-.local System.Tasks.Task<System.Result<System.Collections.Sequence<System.Networking.IPAddress>,System.Networking.DnsError>> local4
+.local System.Concurrency.Tasks.Task<System.Result<System.Collections.Sequence<System.Networking.IPAddress>,System.Networking.DnsError>> local4
 .local System.Result<System.Collections.Sequence<Byte>,System.Web.Http.HttpError> local5
 .local System.Result.Ok<System.Collections.Sequence<Byte>> local6
 .local System.Result<System.Collections.Sequence<Byte>,System.Web.Http.HttpError> local7
@@ -15362,7 +15362,7 @@ initobj System.Web.Http.HttpError
 ldloca local3
 initobj System.Web.Http.HttpError
 ldloca local4
-initobj System.Tasks.Task<System.Result<System.Collections.Sequence<System.Networking.IPAddress>,System.Networking.DnsError>>
+initobj System.Concurrency.Tasks.Task<System.Result<System.Collections.Sequence<System.Networking.IPAddress>,System.Networking.DnsError>>
 ldloca local5
 initobj System.Result<System.Collections.Sequence<Byte>,System.Web.Http.HttpError>
 ldloca local6
@@ -15463,7 +15463,7 @@ call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion54(System.Web.Http.Ht
 M00000081_IL_0090:
 call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion63(System.Result.Error<System.Web.Http.HttpError>)
 M00000081_IL_0095:
-call instance System.Tasks.Promise<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>>::Complete(System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>)
+call instance System.Concurrency.Tasks.Promise<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>>::Complete(System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>)
 call neoCLR.Library.System.Web.Http.HttpClient.RuntimeBooleanToInt32(Boolean)
 M00000081_IL_009a:
 pop
@@ -15472,7 +15472,7 @@ ldarg 0
 M00000081_IL_009c:
 ldfld System.Web.Http.HttpExchange::source
 M00000081_IL_00a1:
-call instance System.Tasks.Promise<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>>::get_Task()
+call instance System.Concurrency.Tasks.Promise<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>>::get_Task()
 M00000081_IL_00a6:
 ret
 M00000081_IL_00a7:
@@ -15523,7 +15523,7 @@ call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion54(System.Web.Http.Ht
 M00000081_IL_00f8:
 call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion63(System.Result.Error<System.Web.Http.HttpError>)
 M00000081_IL_00fd:
-call instance System.Tasks.Promise<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>>::Complete(System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>)
+call instance System.Concurrency.Tasks.Promise<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>>::Complete(System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>)
 call neoCLR.Library.System.Web.Http.HttpClient.RuntimeBooleanToInt32(Boolean)
 M00000081_IL_0102:
 pop
@@ -15533,7 +15533,7 @@ ldarg 0
 M00000081_IL_0105:
 ldfld System.Web.Http.HttpExchange::source
 M00000081_IL_010a:
-call instance System.Tasks.Promise<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>>::get_Task()
+call instance System.Concurrency.Tasks.Promise<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>>::get_Task()
 M00000081_IL_010f:
 ret
 M00000081_IL_0110:
@@ -15612,9 +15612,9 @@ ldarg 0
 M00000081_IL_0181:
 ldloc local4
 M00000081_IL_0183:
-call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion118(System.Tasks.Task<System.Result<System.Collections.Sequence<System.Networking.IPAddress>,System.Networking.DnsError>>)
+call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion118(System.Concurrency.Tasks.Task<System.Result<System.Collections.Sequence<System.Networking.IPAddress>,System.Networking.DnsError>>)
 M00000081_IL_0188:
-call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion119(System.Option.Some<System.Tasks.Task<System.Result<System.Collections.Sequence<System.Networking.IPAddress>,System.Networking.DnsError>>>)
+call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion119(System.Option.Some<System.Concurrency.Tasks.Task<System.Result<System.Collections.Sequence<System.Networking.IPAddress>,System.Networking.DnsError>>>)
 M00000081_IL_018d:
 stfld System.Web.Http.HttpExchange::lookup
 M00000081_IL_0192:
@@ -15626,14 +15626,14 @@ M00000081_IL_0196:
 M00000081_IL_019c:
 function.bind fn<Void> = instance System.Web.Http.HttpExchange::FunctionTarget_Application_V1_M_363A6D6574686F643131313A343A7479706536393A53797374656D2E52756E74696D652C2056657273696F6E3D312E302E302E302C2043756C747572653D6E65757472616C2C205075626C69634B6579546F6B656E3D6E756C6C31353A53797374656D2E5765622E4874747031323A4874747045786368616E6765383A4F6E4C6F6F6B7570343A54727565353A46616C7365313A30313A3039383A343A7479706537353A6D73636F726C69622C2056657273696F6E3D342E302E302E302C2043756C747572653D6E65757472616C2C205075626C69634B6579546F6B656E3D62373761356335363139333465303839363A53797374656D343A566F6964303ADirect()
 M00000081_IL_01a1:
-call instance System.Tasks.Task<System.Result<System.Collections.Sequence<System.Networking.IPAddress>,System.Networking.DnsError>>::OnCompleted(fn<Void>)
+call instance System.Concurrency.Tasks.Task<System.Result<System.Collections.Sequence<System.Networking.IPAddress>,System.Networking.DnsError>>::OnCompleted(fn<Void>)
 M00000081_IL_01a6:
 M00000081_IL_01a7:
 ldarg 0
 M00000081_IL_01a8:
 ldfld System.Web.Http.HttpExchange::source
 M00000081_IL_01ad:
-call instance System.Tasks.Promise<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>>::get_Task()
+call instance System.Concurrency.Tasks.Promise<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>>::get_Task()
 M00000081_IL_01b2:
 ret
 .end
@@ -15760,7 +15760,7 @@ ldarg 0
 M00000083_IL_0009:
 ldfld System.Web.Http.HttpExchange::source
 M00000083_IL_000e:
-call instance System.Tasks.Promise<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>>::Cancel()
+call instance System.Concurrency.Tasks.Promise<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>>::Cancel()
 call neoCLR.Library.System.Web.Http.HttpClient.RuntimeBooleanToInt32(Boolean)
 M00000083_IL_0013:
 pop
@@ -15800,7 +15800,7 @@ call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion54(System.Web.Http.Ht
 M00000084_IL_0033:
 call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion63(System.Result.Error<System.Web.Http.HttpError>)
 M00000084_IL_0038:
-call instance System.Tasks.Promise<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>>::Complete(System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>)
+call instance System.Concurrency.Tasks.Promise<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>>::Complete(System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>)
 call neoCLR.Library.System.Web.Http.HttpClient.RuntimeBooleanToInt32(Boolean)
 M00000084_IL_003d:
 pop
@@ -15814,7 +15814,7 @@ ldfld System.Web.Http.HttpExchange::source
 M00000084_IL_004b:
 ldarg 1
 M00000084_IL_004c:
-call instance System.Tasks.Promise<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>>::Complete(System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>)
+call instance System.Concurrency.Tasks.Promise<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>>::Complete(System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>)
 call neoCLR.Library.System.Web.Http.HttpClient.RuntimeBooleanToInt32(Boolean)
 M00000084_IL_0051:
 pop
@@ -15824,31 +15824,31 @@ M00000084_IL_0054:
 ret
 .end
 .method private instance OnLookup() -> noresult
-.local System.Tasks.Task<System.Result<System.Collections.Sequence<System.Networking.IPAddress>,System.Networking.DnsError>> local0
+.local System.Concurrency.Tasks.Task<System.Result<System.Collections.Sequence<System.Networking.IPAddress>,System.Networking.DnsError>> local0
 .local System.Result<System.Collections.Sequence<System.Networking.IPAddress>,System.Networking.DnsError> local1
 .local System.Collections.Sequence<System.Networking.IPAddress> local2
-.local System.Tasks.Task<System.Result<System.Networking.Sockets.Socket,System.Networking.Sockets.SocketError>> local3
+.local System.Concurrency.Tasks.Task<System.Result<System.Networking.Sockets.Socket,System.Networking.Sockets.SocketError>> local3
 .local System.Networking.DnsError local4
-.local System.Option<System.Tasks.Task<System.Result<System.Collections.Sequence<System.Networking.IPAddress>,System.Networking.DnsError>>> local5
-.local System.Option.Some<System.Tasks.Task<System.Result<System.Collections.Sequence<System.Networking.IPAddress>,System.Networking.DnsError>>> local6
+.local System.Option<System.Concurrency.Tasks.Task<System.Result<System.Collections.Sequence<System.Networking.IPAddress>,System.Networking.DnsError>>> local5
+.local System.Option.Some<System.Concurrency.Tasks.Task<System.Result<System.Collections.Sequence<System.Networking.IPAddress>,System.Networking.DnsError>>> local6
 .local System.Result<System.Collections.Sequence<System.Networking.IPAddress>,System.Networking.DnsError> local7
 .local System.Result.Ok<System.Collections.Sequence<System.Networking.IPAddress>> local8
 .local System.Result<System.Collections.Sequence<System.Networking.IPAddress>,System.Networking.DnsError> local9
 .local System.Result.Error<System.Networking.DnsError> local10
 ldloca local0
-initobj System.Tasks.Task<System.Result<System.Collections.Sequence<System.Networking.IPAddress>,System.Networking.DnsError>>
+initobj System.Concurrency.Tasks.Task<System.Result<System.Collections.Sequence<System.Networking.IPAddress>,System.Networking.DnsError>>
 ldloca local1
 initobj System.Result<System.Collections.Sequence<System.Networking.IPAddress>,System.Networking.DnsError>
 ldloca local2
 initobj System.Collections.Sequence<System.Networking.IPAddress>
 ldloca local3
-initobj System.Tasks.Task<System.Result<System.Networking.Sockets.Socket,System.Networking.Sockets.SocketError>>
+initobj System.Concurrency.Tasks.Task<System.Result<System.Networking.Sockets.Socket,System.Networking.Sockets.SocketError>>
 ldloca local4
 initobj System.Networking.DnsError
 ldloca local5
-initobj System.Option<System.Tasks.Task<System.Result<System.Collections.Sequence<System.Networking.IPAddress>,System.Networking.DnsError>>>
+initobj System.Option<System.Concurrency.Tasks.Task<System.Result<System.Collections.Sequence<System.Networking.IPAddress>,System.Networking.DnsError>>>
 ldloca local6
-initobj System.Option.Some<System.Tasks.Task<System.Result<System.Collections.Sequence<System.Networking.IPAddress>,System.Networking.DnsError>>>
+initobj System.Option.Some<System.Concurrency.Tasks.Task<System.Result<System.Collections.Sequence<System.Networking.IPAddress>,System.Networking.DnsError>>>
 ldloca local7
 initobj System.Result<System.Collections.Sequence<System.Networking.IPAddress>,System.Networking.DnsError>
 ldloca local8
@@ -15868,19 +15868,19 @@ stloc local5
 M00000085_IL_000a:
 ldloca local6
 M00000085_IL_000c:
-initobj System.Option.Some<System.Tasks.Task<System.Result<System.Collections.Sequence<System.Networking.IPAddress>,System.Networking.DnsError>>>
+initobj System.Option.Some<System.Concurrency.Tasks.Task<System.Result<System.Collections.Sequence<System.Networking.IPAddress>,System.Networking.DnsError>>>
 M00000085_IL_0012:
 ldloca local5
 M00000085_IL_0014:
 ldloca local6
 M00000085_IL_0016:
-call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion122(System.Option<System.Tasks.Task<System.Result<System.Collections.Sequence<System.Networking.IPAddress>,System.Networking.DnsError>>>&,System.Option.Some<System.Tasks.Task<System.Result<System.Collections.Sequence<System.Networking.IPAddress>,System.Networking.DnsError>>>&)
+call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion122(System.Option<System.Concurrency.Tasks.Task<System.Result<System.Collections.Sequence<System.Networking.IPAddress>,System.Networking.DnsError>>>&,System.Option.Some<System.Concurrency.Tasks.Task<System.Result<System.Collections.Sequence<System.Networking.IPAddress>,System.Networking.DnsError>>>&)
 M00000085_IL_001b:
 brfalse M00000085_IL_0034
 M00000085_IL_0020:
 ldloca local6
 M00000085_IL_0022:
-call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion123(System.Option.Some<System.Tasks.Task<System.Result<System.Collections.Sequence<System.Networking.IPAddress>,System.Networking.DnsError>>>&)
+call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion123(System.Option.Some<System.Concurrency.Tasks.Task<System.Result<System.Collections.Sequence<System.Networking.IPAddress>,System.Networking.DnsError>>>&)
 M00000085_IL_0027:
 stloc local0
 M00000085_IL_0028:
@@ -15892,7 +15892,7 @@ M00000085_IL_0039:
 M00000085_IL_003a:
 ldloc local0
 M00000085_IL_003b:
-call instance System.Tasks.Task<System.Result<System.Collections.Sequence<System.Networking.IPAddress>,System.Networking.DnsError>>::get_IsCancelled()
+call instance System.Concurrency.Tasks.Task<System.Result<System.Collections.Sequence<System.Networking.IPAddress>,System.Networking.DnsError>>::get_IsCancelled()
 call neoCLR.Library.System.Web.Http.HttpClient.RuntimeBooleanToInt32(Boolean)
 M00000085_IL_0040:
 brtrue M00000085_IL_004a
@@ -15910,7 +15910,7 @@ M00000085_IL_0053:
 M00000085_IL_0054:
 ldloc local0
 M00000085_IL_0055:
-call instance System.Tasks.Task<System.Result<System.Collections.Sequence<System.Networking.IPAddress>,System.Networking.DnsError>>::GetResult()
+call instance System.Concurrency.Tasks.Task<System.Result<System.Collections.Sequence<System.Networking.IPAddress>,System.Networking.DnsError>>::GetResult()
 M00000085_IL_005a:
 stloc local1
 M00000085_IL_005b:
@@ -16004,9 +16004,9 @@ ldarg 0
 M00000085_IL_00f2:
 ldloc local3
 M00000085_IL_00f3:
-call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion128(System.Tasks.Task<System.Result<System.Networking.Sockets.Socket,System.Networking.Sockets.SocketError>>)
+call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion128(System.Concurrency.Tasks.Task<System.Result<System.Networking.Sockets.Socket,System.Networking.Sockets.SocketError>>)
 M00000085_IL_00f8:
-call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion129(System.Option.Some<System.Tasks.Task<System.Result<System.Networking.Sockets.Socket,System.Networking.Sockets.SocketError>>>)
+call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion129(System.Option.Some<System.Concurrency.Tasks.Task<System.Result<System.Networking.Sockets.Socket,System.Networking.Sockets.SocketError>>>)
 M00000085_IL_00fd:
 stfld System.Web.Http.HttpExchange::connecting
 M00000085_IL_0102:
@@ -16018,7 +16018,7 @@ M00000085_IL_0105:
 M00000085_IL_010b:
 function.bind fn<Void> = instance System.Web.Http.HttpExchange::FunctionTarget_Application_V1_M_363A6D6574686F643131313A343A7479706536393A53797374656D2E52756E74696D652C2056657273696F6E3D312E302E302E302C2043756C747572653D6E65757472616C2C205075626C69634B6579546F6B656E3D6E756C6C31353A53797374656D2E5765622E4874747031323A4874747045786368616E676531313A4F6E436F6E6E6563746564343A54727565353A46616C7365313A30313A3039383A343A7479706537353A6D73636F726C69622C2056657273696F6E3D342E302E302E302C2043756C747572653D6E65757472616C2C205075626C69634B6579546F6B656E3D62373761356335363139333465303839363A53797374656D343A566F6964303ADirect()
 M00000085_IL_0110:
-call instance System.Tasks.Task<System.Result<System.Networking.Sockets.Socket,System.Networking.Sockets.SocketError>>::OnCompleted(fn<Void>)
+call instance System.Concurrency.Tasks.Task<System.Result<System.Networking.Sockets.Socket,System.Networking.Sockets.SocketError>>::OnCompleted(fn<Void>)
 M00000085_IL_0115:
 br M00000085_IL_016d
 M00000085_IL_011b:
@@ -16072,18 +16072,18 @@ M00000085_IL_0170:
 ret
 .end
 .method private instance OnConnected() -> noresult
-.local System.Tasks.Task<System.Result<System.Networking.Sockets.Socket,System.Networking.Sockets.SocketError>> local0
+.local System.Concurrency.Tasks.Task<System.Result<System.Networking.Sockets.Socket,System.Networking.Sockets.SocketError>> local0
 .local System.Result<System.Networking.Sockets.Socket,System.Networking.Sockets.SocketError> local1
 .local System.Networking.Sockets.Socket local2
 .local System.Networking.Sockets.SocketError local3
-.local System.Option<System.Tasks.Task<System.Result<System.Networking.Sockets.Socket,System.Networking.Sockets.SocketError>>> local4
-.local System.Option.Some<System.Tasks.Task<System.Result<System.Networking.Sockets.Socket,System.Networking.Sockets.SocketError>>> local5
+.local System.Option<System.Concurrency.Tasks.Task<System.Result<System.Networking.Sockets.Socket,System.Networking.Sockets.SocketError>>> local4
+.local System.Option.Some<System.Concurrency.Tasks.Task<System.Result<System.Networking.Sockets.Socket,System.Networking.Sockets.SocketError>>> local5
 .local System.Result<System.Networking.Sockets.Socket,System.Networking.Sockets.SocketError> local6
 .local System.Result.Ok<System.Networking.Sockets.Socket> local7
 .local System.Result<System.Networking.Sockets.Socket,System.Networking.Sockets.SocketError> local8
 .local System.Result.Error<System.Networking.Sockets.SocketError> local9
 ldloca local0
-initobj System.Tasks.Task<System.Result<System.Networking.Sockets.Socket,System.Networking.Sockets.SocketError>>
+initobj System.Concurrency.Tasks.Task<System.Result<System.Networking.Sockets.Socket,System.Networking.Sockets.SocketError>>
 ldloca local1
 initobj System.Result<System.Networking.Sockets.Socket,System.Networking.Sockets.SocketError>
 ldloca local2
@@ -16091,9 +16091,9 @@ initobj System.Networking.Sockets.Socket
 ldloca local3
 initobj System.Networking.Sockets.SocketError
 ldloca local4
-initobj System.Option<System.Tasks.Task<System.Result<System.Networking.Sockets.Socket,System.Networking.Sockets.SocketError>>>
+initobj System.Option<System.Concurrency.Tasks.Task<System.Result<System.Networking.Sockets.Socket,System.Networking.Sockets.SocketError>>>
 ldloca local5
-initobj System.Option.Some<System.Tasks.Task<System.Result<System.Networking.Sockets.Socket,System.Networking.Sockets.SocketError>>>
+initobj System.Option.Some<System.Concurrency.Tasks.Task<System.Result<System.Networking.Sockets.Socket,System.Networking.Sockets.SocketError>>>
 ldloca local6
 initobj System.Result<System.Networking.Sockets.Socket,System.Networking.Sockets.SocketError>
 ldloca local7
@@ -16113,19 +16113,19 @@ stloc local4
 M00000086_IL_000a:
 ldloca local5
 M00000086_IL_000c:
-initobj System.Option.Some<System.Tasks.Task<System.Result<System.Networking.Sockets.Socket,System.Networking.Sockets.SocketError>>>
+initobj System.Option.Some<System.Concurrency.Tasks.Task<System.Result<System.Networking.Sockets.Socket,System.Networking.Sockets.SocketError>>>
 M00000086_IL_0012:
 ldloca local4
 M00000086_IL_0014:
 ldloca local5
 M00000086_IL_0016:
-call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion130(System.Option<System.Tasks.Task<System.Result<System.Networking.Sockets.Socket,System.Networking.Sockets.SocketError>>>&,System.Option.Some<System.Tasks.Task<System.Result<System.Networking.Sockets.Socket,System.Networking.Sockets.SocketError>>>&)
+call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion130(System.Option<System.Concurrency.Tasks.Task<System.Result<System.Networking.Sockets.Socket,System.Networking.Sockets.SocketError>>>&,System.Option.Some<System.Concurrency.Tasks.Task<System.Result<System.Networking.Sockets.Socket,System.Networking.Sockets.SocketError>>>&)
 M00000086_IL_001b:
 brfalse M00000086_IL_0034
 M00000086_IL_0020:
 ldloca local5
 M00000086_IL_0022:
-call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion131(System.Option.Some<System.Tasks.Task<System.Result<System.Networking.Sockets.Socket,System.Networking.Sockets.SocketError>>>&)
+call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion131(System.Option.Some<System.Concurrency.Tasks.Task<System.Result<System.Networking.Sockets.Socket,System.Networking.Sockets.SocketError>>>&)
 M00000086_IL_0027:
 stloc local0
 M00000086_IL_0028:
@@ -16137,7 +16137,7 @@ M00000086_IL_0039:
 M00000086_IL_003a:
 ldloc local0
 M00000086_IL_003b:
-call instance System.Tasks.Task<System.Result<System.Networking.Sockets.Socket,System.Networking.Sockets.SocketError>>::get_IsCancelled()
+call instance System.Concurrency.Tasks.Task<System.Result<System.Networking.Sockets.Socket,System.Networking.Sockets.SocketError>>::get_IsCancelled()
 call neoCLR.Library.System.Web.Http.HttpClient.RuntimeBooleanToInt32(Boolean)
 M00000086_IL_0040:
 brtrue M00000086_IL_004a
@@ -16155,7 +16155,7 @@ M00000086_IL_0053:
 M00000086_IL_0054:
 ldloc local0
 M00000086_IL_0055:
-call instance System.Tasks.Task<System.Result<System.Networking.Sockets.Socket,System.Networking.Sockets.SocketError>>::GetResult()
+call instance System.Concurrency.Tasks.Task<System.Result<System.Networking.Sockets.Socket,System.Networking.Sockets.SocketError>>::GetResult()
 M00000086_IL_005a:
 stloc local1
 M00000086_IL_005b:
@@ -16270,7 +16270,7 @@ ret
 .local System.Collections.ArrayList<Byte> local5
 .local Int32 local6
 .local Int32 local7
-.local System.Tasks.Task<System.Result<Int32,System.Networking.Sockets.SocketError>> local8
+.local System.Concurrency.Tasks.Task<System.Result<Int32,System.Networking.Sockets.SocketError>> local8
 .local System.Concurrency.CancellationToken local9
 .local System.Option<System.Networking.Sockets.Socket> local10
 .local System.Option.Some<System.Networking.Sockets.Socket> local11
@@ -16298,7 +16298,7 @@ stloc local6
 ldc.i4 0
 stloc local7
 ldloca local8
-initobj System.Tasks.Task<System.Result<Int32,System.Networking.Sockets.SocketError>>
+initobj System.Concurrency.Tasks.Task<System.Result<Int32,System.Networking.Sockets.SocketError>>
 ldloca local9
 initobj System.Concurrency.CancellationToken
 ldloca local10
@@ -16793,9 +16793,9 @@ ldarg 0
 M00000087_IL_02c4:
 ldloc local8
 M00000087_IL_02c6:
-call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion138(System.Tasks.Task<System.Result<Int32,System.Networking.Sockets.SocketError>>)
+call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion138(System.Concurrency.Tasks.Task<System.Result<Int32,System.Networking.Sockets.SocketError>>)
 M00000087_IL_02cb:
-call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion139(System.Option.Some<System.Tasks.Task<System.Result<Int32,System.Networking.Sockets.SocketError>>>)
+call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion139(System.Option.Some<System.Concurrency.Tasks.Task<System.Result<Int32,System.Networking.Sockets.SocketError>>>)
 M00000087_IL_02d0:
 stfld System.Web.Http.HttpExchange::transfer
 M00000087_IL_02d5:
@@ -16807,25 +16807,25 @@ M00000087_IL_02d9:
 M00000087_IL_02df:
 function.bind fn<Void> = instance System.Web.Http.HttpExchange::FunctionTarget_Application_V1_M_363A6D6574686F643131313A343A7479706536393A53797374656D2E52756E74696D652C2056657273696F6E3D312E302E302E302C2043756C747572653D6E65757472616C2C205075626C69634B6579546F6B656E3D6E756C6C31353A53797374656D2E5765622E4874747031323A4874747045786368616E6765363A4F6E53656E74343A54727565353A46616C7365313A30313A3039383A343A7479706537353A6D73636F726C69622C2056657273696F6E3D342E302E302E302C2043756C747572653D6E65757472616C2C205075626C69634B6579546F6B656E3D62373761356335363139333465303839363A53797374656D343A566F6964303ADirect()
 M00000087_IL_02e4:
-call instance System.Tasks.Task<System.Result<Int32,System.Networking.Sockets.SocketError>>::OnCompleted(fn<Void>)
+call instance System.Concurrency.Tasks.Task<System.Result<Int32,System.Networking.Sockets.SocketError>>::OnCompleted(fn<Void>)
 M00000087_IL_02e9:
 M00000087_IL_02ea:
 M00000087_IL_02eb:
 ret
 .end
 .method private instance OnSent() -> noresult
-.local System.Tasks.Task<System.Result<Int32,System.Networking.Sockets.SocketError>> local0
+.local System.Concurrency.Tasks.Task<System.Result<Int32,System.Networking.Sockets.SocketError>> local0
 .local System.Result<Int32,System.Networking.Sockets.SocketError> local1
 .local Int32 local2
 .local System.Networking.Sockets.SocketError local3
-.local System.Option<System.Tasks.Task<System.Result<Int32,System.Networking.Sockets.SocketError>>> local4
-.local System.Option.Some<System.Tasks.Task<System.Result<Int32,System.Networking.Sockets.SocketError>>> local5
+.local System.Option<System.Concurrency.Tasks.Task<System.Result<Int32,System.Networking.Sockets.SocketError>>> local4
+.local System.Option.Some<System.Concurrency.Tasks.Task<System.Result<Int32,System.Networking.Sockets.SocketError>>> local5
 .local System.Result<Int32,System.Networking.Sockets.SocketError> local6
 .local System.Result.Ok<Int32> local7
 .local System.Result<Int32,System.Networking.Sockets.SocketError> local8
 .local System.Result.Error<System.Networking.Sockets.SocketError> local9
 ldloca local0
-initobj System.Tasks.Task<System.Result<Int32,System.Networking.Sockets.SocketError>>
+initobj System.Concurrency.Tasks.Task<System.Result<Int32,System.Networking.Sockets.SocketError>>
 ldloca local1
 initobj System.Result<Int32,System.Networking.Sockets.SocketError>
 ldc.i4 0
@@ -16833,9 +16833,9 @@ stloc local2
 ldloca local3
 initobj System.Networking.Sockets.SocketError
 ldloca local4
-initobj System.Option<System.Tasks.Task<System.Result<Int32,System.Networking.Sockets.SocketError>>>
+initobj System.Option<System.Concurrency.Tasks.Task<System.Result<Int32,System.Networking.Sockets.SocketError>>>
 ldloca local5
-initobj System.Option.Some<System.Tasks.Task<System.Result<Int32,System.Networking.Sockets.SocketError>>>
+initobj System.Option.Some<System.Concurrency.Tasks.Task<System.Result<Int32,System.Networking.Sockets.SocketError>>>
 ldloca local6
 initobj System.Result<Int32,System.Networking.Sockets.SocketError>
 ldloca local7
@@ -16855,19 +16855,19 @@ stloc local4
 M00000088_IL_000a:
 ldloca local5
 M00000088_IL_000c:
-initobj System.Option.Some<System.Tasks.Task<System.Result<Int32,System.Networking.Sockets.SocketError>>>
+initobj System.Option.Some<System.Concurrency.Tasks.Task<System.Result<Int32,System.Networking.Sockets.SocketError>>>
 M00000088_IL_0012:
 ldloca local4
 M00000088_IL_0014:
 ldloca local5
 M00000088_IL_0016:
-call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion142(System.Option<System.Tasks.Task<System.Result<Int32,System.Networking.Sockets.SocketError>>>&,System.Option.Some<System.Tasks.Task<System.Result<Int32,System.Networking.Sockets.SocketError>>>&)
+call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion142(System.Option<System.Concurrency.Tasks.Task<System.Result<Int32,System.Networking.Sockets.SocketError>>>&,System.Option.Some<System.Concurrency.Tasks.Task<System.Result<Int32,System.Networking.Sockets.SocketError>>>&)
 M00000088_IL_001b:
 brfalse M00000088_IL_0034
 M00000088_IL_0020:
 ldloca local5
 M00000088_IL_0022:
-call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion143(System.Option.Some<System.Tasks.Task<System.Result<Int32,System.Networking.Sockets.SocketError>>>&)
+call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion143(System.Option.Some<System.Concurrency.Tasks.Task<System.Result<Int32,System.Networking.Sockets.SocketError>>>&)
 M00000088_IL_0027:
 stloc local0
 M00000088_IL_0028:
@@ -16879,7 +16879,7 @@ M00000088_IL_0039:
 M00000088_IL_003a:
 ldloc local0
 M00000088_IL_003b:
-call instance System.Tasks.Task<System.Result<Int32,System.Networking.Sockets.SocketError>>::get_IsCancelled()
+call instance System.Concurrency.Tasks.Task<System.Result<Int32,System.Networking.Sockets.SocketError>>::get_IsCancelled()
 call neoCLR.Library.System.Web.Http.HttpClient.RuntimeBooleanToInt32(Boolean)
 M00000088_IL_0040:
 brtrue M00000088_IL_004a
@@ -16897,7 +16897,7 @@ M00000088_IL_0053:
 M00000088_IL_0054:
 ldloc local0
 M00000088_IL_0055:
-call instance System.Tasks.Task<System.Result<Int32,System.Networking.Sockets.SocketError>>::GetResult()
+call instance System.Concurrency.Tasks.Task<System.Result<Int32,System.Networking.Sockets.SocketError>>::GetResult()
 M00000088_IL_005a:
 stloc local1
 M00000088_IL_005b:
@@ -17065,13 +17065,13 @@ ret
 .end
 .method private instance ReceiveNext() -> noresult
 .local System.Networking.Sockets.Socket local0
-.local System.Tasks.Task<System.Result<Int32,System.Networking.Sockets.SocketError>> local1
+.local System.Concurrency.Tasks.Task<System.Result<Int32,System.Networking.Sockets.SocketError>> local1
 .local System.Option<System.Networking.Sockets.Socket> local2
 .local System.Option.Some<System.Networking.Sockets.Socket> local3
 ldloca local0
 initobj System.Networking.Sockets.Socket
 ldloca local1
-initobj System.Tasks.Task<System.Result<Int32,System.Networking.Sockets.SocketError>>
+initobj System.Concurrency.Tasks.Task<System.Result<Int32,System.Networking.Sockets.SocketError>>
 ldloca local2
 initobj System.Option<System.Networking.Sockets.Socket>
 ldloca local3
@@ -17164,9 +17164,9 @@ ldarg 0
 M00000089_IL_008d:
 ldloc local1
 M00000089_IL_008e:
-call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion138(System.Tasks.Task<System.Result<Int32,System.Networking.Sockets.SocketError>>)
+call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion138(System.Concurrency.Tasks.Task<System.Result<Int32,System.Networking.Sockets.SocketError>>)
 M00000089_IL_0093:
-call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion139(System.Option.Some<System.Tasks.Task<System.Result<Int32,System.Networking.Sockets.SocketError>>>)
+call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion139(System.Option.Some<System.Concurrency.Tasks.Task<System.Result<Int32,System.Networking.Sockets.SocketError>>>)
 M00000089_IL_0098:
 stfld System.Web.Http.HttpExchange::transfer
 M00000089_IL_009d:
@@ -17178,22 +17178,22 @@ M00000089_IL_00a0:
 M00000089_IL_00a6:
 function.bind fn<Void> = instance System.Web.Http.HttpExchange::FunctionTarget_Application_V1_M_363A6D6574686F643131313A343A7479706536393A53797374656D2E52756E74696D652C2056657273696F6E3D312E302E302E302C2043756C747572653D6E65757472616C2C205075626C69634B6579546F6B656E3D6E756C6C31353A53797374656D2E5765622E4874747031323A4874747045786368616E676531303A4F6E5265636569766564343A54727565353A46616C7365313A30313A3039383A343A7479706537353A6D73636F726C69622C2056657273696F6E3D342E302E302E302C2043756C747572653D6E65757472616C2C205075626C69634B6579546F6B656E3D62373761356335363139333465303839363A53797374656D343A566F6964303ADirect()
 M00000089_IL_00ab:
-call instance System.Tasks.Task<System.Result<Int32,System.Networking.Sockets.SocketError>>::OnCompleted(fn<Void>)
+call instance System.Concurrency.Tasks.Task<System.Result<Int32,System.Networking.Sockets.SocketError>>::OnCompleted(fn<Void>)
 M00000089_IL_00b0:
 M00000089_IL_00b1:
 M00000089_IL_00b2:
 ret
 .end
 .method private instance OnReceived() -> noresult
-.local System.Tasks.Task<System.Result<Int32,System.Networking.Sockets.SocketError>> local0
+.local System.Concurrency.Tasks.Task<System.Result<Int32,System.Networking.Sockets.SocketError>> local0
 .local System.Result<Int32,System.Networking.Sockets.SocketError> local1
 .local Int32 local2
 .local Int32 local3
 .local System.Result<Boolean,System.Web.Http.HttpError> local4
 .local System.Web.Http.HttpError local5
 .local System.Networking.Sockets.SocketError local6
-.local System.Option<System.Tasks.Task<System.Result<Int32,System.Networking.Sockets.SocketError>>> local7
-.local System.Option.Some<System.Tasks.Task<System.Result<Int32,System.Networking.Sockets.SocketError>>> local8
+.local System.Option<System.Concurrency.Tasks.Task<System.Result<Int32,System.Networking.Sockets.SocketError>>> local7
+.local System.Option.Some<System.Concurrency.Tasks.Task<System.Result<Int32,System.Networking.Sockets.SocketError>>> local8
 .local System.Result<Int32,System.Networking.Sockets.SocketError> local9
 .local System.Result.Ok<Int32> local10
 .local System.Result<Boolean,System.Web.Http.HttpError> local11
@@ -17201,7 +17201,7 @@ ret
 .local System.Result<Int32,System.Networking.Sockets.SocketError> local13
 .local System.Result.Error<System.Networking.Sockets.SocketError> local14
 ldloca local0
-initobj System.Tasks.Task<System.Result<Int32,System.Networking.Sockets.SocketError>>
+initobj System.Concurrency.Tasks.Task<System.Result<Int32,System.Networking.Sockets.SocketError>>
 ldloca local1
 initobj System.Result<Int32,System.Networking.Sockets.SocketError>
 ldc.i4 0
@@ -17215,9 +17215,9 @@ initobj System.Web.Http.HttpError
 ldloca local6
 initobj System.Networking.Sockets.SocketError
 ldloca local7
-initobj System.Option<System.Tasks.Task<System.Result<Int32,System.Networking.Sockets.SocketError>>>
+initobj System.Option<System.Concurrency.Tasks.Task<System.Result<Int32,System.Networking.Sockets.SocketError>>>
 ldloca local8
-initobj System.Option.Some<System.Tasks.Task<System.Result<Int32,System.Networking.Sockets.SocketError>>>
+initobj System.Option.Some<System.Concurrency.Tasks.Task<System.Result<Int32,System.Networking.Sockets.SocketError>>>
 ldloca local9
 initobj System.Result<Int32,System.Networking.Sockets.SocketError>
 ldloca local10
@@ -17241,19 +17241,19 @@ stloc local7
 M0000008a_IL_000a:
 ldloca local8
 M0000008a_IL_000c:
-initobj System.Option.Some<System.Tasks.Task<System.Result<Int32,System.Networking.Sockets.SocketError>>>
+initobj System.Option.Some<System.Concurrency.Tasks.Task<System.Result<Int32,System.Networking.Sockets.SocketError>>>
 M0000008a_IL_0012:
 ldloca local7
 M0000008a_IL_0014:
 ldloca local8
 M0000008a_IL_0016:
-call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion142(System.Option<System.Tasks.Task<System.Result<Int32,System.Networking.Sockets.SocketError>>>&,System.Option.Some<System.Tasks.Task<System.Result<Int32,System.Networking.Sockets.SocketError>>>&)
+call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion142(System.Option<System.Concurrency.Tasks.Task<System.Result<Int32,System.Networking.Sockets.SocketError>>>&,System.Option.Some<System.Concurrency.Tasks.Task<System.Result<Int32,System.Networking.Sockets.SocketError>>>&)
 M0000008a_IL_001b:
 brfalse M0000008a_IL_0034
 M0000008a_IL_0020:
 ldloca local8
 M0000008a_IL_0022:
-call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion143(System.Option.Some<System.Tasks.Task<System.Result<Int32,System.Networking.Sockets.SocketError>>>&)
+call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion143(System.Option.Some<System.Concurrency.Tasks.Task<System.Result<Int32,System.Networking.Sockets.SocketError>>>&)
 M0000008a_IL_0027:
 stloc local0
 M0000008a_IL_0028:
@@ -17265,7 +17265,7 @@ M0000008a_IL_0039:
 M0000008a_IL_003a:
 ldloc local0
 M0000008a_IL_003b:
-call instance System.Tasks.Task<System.Result<Int32,System.Networking.Sockets.SocketError>>::get_IsCancelled()
+call instance System.Concurrency.Tasks.Task<System.Result<Int32,System.Networking.Sockets.SocketError>>::get_IsCancelled()
 call neoCLR.Library.System.Web.Http.HttpClient.RuntimeBooleanToInt32(Boolean)
 M0000008a_IL_0040:
 brtrue M0000008a_IL_004a
@@ -17283,7 +17283,7 @@ M0000008a_IL_0053:
 M0000008a_IL_0054:
 ldloc local0
 M0000008a_IL_0055:
-call instance System.Tasks.Task<System.Result<Int32,System.Networking.Sockets.SocketError>>::GetResult()
+call instance System.Concurrency.Tasks.Task<System.Result<Int32,System.Networking.Sockets.SocketError>>::GetResult()
 M0000008a_IL_005a:
 stloc local1
 M0000008a_IL_005b:
@@ -17876,7 +17876,7 @@ call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion94(System.Result.Erro
 M0000008f_IL_0068:
 ret
 .end
-.method instance Accept() -> System.Tasks.Task<System.Result<System.Web.Http.HttpContext,System.Web.Http.HttpError>>
+.method instance Accept() -> System.Concurrency.Tasks.Task<System.Result<System.Web.Http.HttpContext,System.Web.Http.HttpError>>
 M00000090_IL_0000:
 M00000090_IL_0001:
 M00000090_IL_0002:
@@ -17888,13 +17888,13 @@ callvirt instance System.Web.Http.HttpServer::Accept(System.Concurrency.Cancella
 M00000090_IL_000d:
 ret
 .end
-.method instance Accept(System.Concurrency.CancellationToken cancellationToken) -> System.Tasks.Task<System.Result<System.Web.Http.HttpContext,System.Web.Http.HttpError>>
-.local System.Tasks.Promise<System.Result<System.Web.Http.HttpContext,System.Web.Http.HttpError>> local0
+.method instance Accept(System.Concurrency.CancellationToken cancellationToken) -> System.Concurrency.Tasks.Task<System.Result<System.Web.Http.HttpContext,System.Web.Http.HttpError>>
+.local System.Concurrency.Tasks.Promise<System.Result<System.Web.Http.HttpContext,System.Web.Http.HttpError>> local0
 ldloca local0
-initobj System.Tasks.Promise<System.Result<System.Web.Http.HttpContext,System.Web.Http.HttpError>>
+initobj System.Concurrency.Tasks.Promise<System.Result<System.Web.Http.HttpContext,System.Web.Http.HttpError>>
 M00000091_IL_0000:
 M00000091_IL_0001:
-newobj instance System.Tasks.Promise<System.Result<System.Web.Http.HttpContext,System.Web.Http.HttpError>>::.ctor()
+newobj instance System.Concurrency.Tasks.Promise<System.Result<System.Web.Http.HttpContext,System.Web.Http.HttpError>>::.ctor()
 M00000091_IL_0006:
 stloc local0
 M00000091_IL_0007:
@@ -17911,7 +17911,7 @@ M00000091_IL_0019:
 M00000091_IL_001a:
 ldloc local0
 M00000091_IL_001b:
-call instance System.Tasks.Promise<System.Result<System.Web.Http.HttpContext,System.Web.Http.HttpError>>::Cancel()
+call instance System.Concurrency.Tasks.Promise<System.Result<System.Web.Http.HttpContext,System.Web.Http.HttpError>>::Cancel()
 call neoCLR.Library.System.Web.Http.HttpClient.RuntimeBooleanToInt32(Boolean)
 M00000091_IL_0020:
 pop
@@ -17919,7 +17919,7 @@ M00000091_IL_0021:
 M00000091_IL_0022:
 ldloc local0
 M00000091_IL_0023:
-call instance System.Tasks.Promise<System.Result<System.Web.Http.HttpContext,System.Web.Http.HttpError>>::get_Task()
+call instance System.Concurrency.Tasks.Promise<System.Result<System.Web.Http.HttpContext,System.Web.Http.HttpError>>::get_Task()
 M00000091_IL_0028:
 ret
 M00000091_IL_0029:
@@ -17947,7 +17947,7 @@ call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion54(System.Web.Http.Ht
 M00000091_IL_0051:
 call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion149(System.Result.Error<System.Web.Http.HttpError>)
 M00000091_IL_0056:
-call instance System.Tasks.Promise<System.Result<System.Web.Http.HttpContext,System.Web.Http.HttpError>>::Complete(System.Result<System.Web.Http.HttpContext,System.Web.Http.HttpError>)
+call instance System.Concurrency.Tasks.Promise<System.Result<System.Web.Http.HttpContext,System.Web.Http.HttpError>>::Complete(System.Result<System.Web.Http.HttpContext,System.Web.Http.HttpError>)
 call neoCLR.Library.System.Web.Http.HttpClient.RuntimeBooleanToInt32(Boolean)
 M00000091_IL_005b:
 pop
@@ -17955,7 +17955,7 @@ M00000091_IL_005c:
 M00000091_IL_005d:
 ldloc local0
 M00000091_IL_005e:
-call instance System.Tasks.Promise<System.Result<System.Web.Http.HttpContext,System.Web.Http.HttpError>>::get_Task()
+call instance System.Concurrency.Tasks.Promise<System.Result<System.Web.Http.HttpContext,System.Web.Http.HttpError>>::get_Task()
 M00000091_IL_0063:
 ret
 M00000091_IL_0064:
@@ -17992,7 +17992,7 @@ call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion54(System.Web.Http.Ht
 M00000091_IL_0093:
 call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion149(System.Result.Error<System.Web.Http.HttpError>)
 M00000091_IL_0098:
-call instance System.Tasks.Promise<System.Result<System.Web.Http.HttpContext,System.Web.Http.HttpError>>::Complete(System.Result<System.Web.Http.HttpContext,System.Web.Http.HttpError>)
+call instance System.Concurrency.Tasks.Promise<System.Result<System.Web.Http.HttpContext,System.Web.Http.HttpError>>::Complete(System.Result<System.Web.Http.HttpContext,System.Web.Http.HttpError>)
 call neoCLR.Library.System.Web.Http.HttpClient.RuntimeBooleanToInt32(Boolean)
 M00000091_IL_009d:
 pop
@@ -18000,7 +18000,7 @@ M00000091_IL_009e:
 M00000091_IL_009f:
 ldloc local0
 M00000091_IL_00a0:
-call instance System.Tasks.Promise<System.Result<System.Web.Http.HttpContext,System.Web.Http.HttpError>>::get_Task()
+call instance System.Concurrency.Tasks.Promise<System.Result<System.Web.Http.HttpContext,System.Web.Http.HttpError>>::get_Task()
 M00000091_IL_00a5:
 ret
 M00000091_IL_00a6:
@@ -18033,7 +18033,7 @@ callvirt instance System.Web.Http.HttpServerExchange::Start()
 M00000091_IL_00c9:
 ret
 .end
-.method instance ServeOne(fn<System.Web.Http.HttpRequest,System.Tasks.Task<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>>> handler) -> System.Tasks.Task<System.Result<Void,System.Web.Http.HttpError>>
+.method instance ServeOne(fn<System.Web.Http.HttpRequest,System.Concurrency.Tasks.Task<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>>> handler) -> System.Concurrency.Tasks.Task<System.Result<Void,System.Web.Http.HttpError>>
 M00000092_IL_0000:
 M00000092_IL_0001:
 M00000092_IL_0002:
@@ -18043,11 +18043,11 @@ ldarg 1
 M00000092_IL_0004:
 call System.Concurrency.CancellationToken::get_None()
 M00000092_IL_0009:
-callvirt instance System.Web.Http.HttpServer::ServeOne(fn<System.Web.Http.HttpRequest,System.Tasks.Task<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>>>,System.Concurrency.CancellationToken)
+callvirt instance System.Web.Http.HttpServer::ServeOne(fn<System.Web.Http.HttpRequest,System.Concurrency.Tasks.Task<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>>>,System.Concurrency.CancellationToken)
 M00000092_IL_000e:
 ret
 .end
-.method instance ServeOne(fn<System.Web.Http.HttpRequest,System.Tasks.Task<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>>> handler,System.Concurrency.CancellationToken cancellationToken) -> System.Tasks.Task<System.Result<Void,System.Web.Http.HttpError>>
+.method instance ServeOne(fn<System.Web.Http.HttpRequest,System.Concurrency.Tasks.Task<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>>> handler,System.Concurrency.CancellationToken cancellationToken) -> System.Concurrency.Tasks.Task<System.Result<Void,System.Web.Http.HttpError>>
 M00000093_IL_0000:
 M00000093_IL_0001:
 M00000093_IL_0002:
@@ -18057,7 +18057,7 @@ ldarg 1
 M00000093_IL_0004:
 ldarg 2
 M00000093_IL_0005:
-newobj instance System.Web.Http.HttpServeOperation::.ctor(System.Web.Http.HttpServer,fn<System.Web.Http.HttpRequest,System.Tasks.Task<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>>>,System.Concurrency.CancellationToken)
+newobj instance System.Web.Http.HttpServeOperation::.ctor(System.Web.Http.HttpServer,fn<System.Web.Http.HttpRequest,System.Concurrency.Tasks.Task<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>>>,System.Concurrency.CancellationToken)
 M00000093_IL_000a:
 callvirt instance System.Web.Http.HttpServeOperation::Start()
 M00000093_IL_000f:
@@ -22520,10 +22520,10 @@ ret
 .field private cancellation System.Concurrency.CancellationTokenSource
 .field private callerRegistration System.Concurrency.CancellationRegistration
 .field private shutdownRegistration System.Concurrency.CancellationRegistration
-.field private source System.Tasks.Promise<System.Result<System.Web.Http.HttpContext,System.Web.Http.HttpError>>
+.field private source System.Concurrency.Tasks.Promise<System.Result<System.Web.Http.HttpContext,System.Web.Http.HttpError>>
 .field private socket System.Option<System.Networking.Sockets.Socket>
-.field private accepting System.Option<System.Tasks.Task<System.Result<System.Networking.Sockets.Socket,System.Networking.Sockets.SocketError>>>
-.field private transfer System.Option<System.Tasks.Task<System.Result<Int32,System.Networking.Sockets.SocketError>>>
+.field private accepting System.Option<System.Concurrency.Tasks.Task<System.Result<System.Networking.Sockets.Socket,System.Networking.Sockets.SocketError>>>
+.field private transfer System.Option<System.Concurrency.Tasks.Task<System.Result<Int32,System.Networking.Sockets.SocketError>>>
 .field private decoder System.Web.Http.HttpRequestDecoder
 .field private buffer arrayref<Byte>
 .field private deadline Int64
@@ -22559,7 +22559,7 @@ M0000009f_IL_0021:
 M0000009f_IL_0022:
 ldarg 0
 M0000009f_IL_0023:
-newobj instance System.Tasks.Promise<System.Result<System.Web.Http.HttpContext,System.Web.Http.HttpError>>::.ctor()
+newobj instance System.Concurrency.Tasks.Promise<System.Result<System.Web.Http.HttpContext,System.Web.Http.HttpError>>::.ctor()
 M0000009f_IL_0028:
 stfld System.Web.Http.HttpServerExchange::source
 M0000009f_IL_002d:
@@ -22678,10 +22678,10 @@ M000000a0_IL_000d:
 M000000a0_IL_000e:
 ret
 .end
-.method internal instance Start() -> System.Tasks.Task<System.Result<System.Web.Http.HttpContext,System.Web.Http.HttpError>>
-.local System.Tasks.Task<System.Result<System.Networking.Sockets.Socket,System.Networking.Sockets.SocketError>> local0
+.method internal instance Start() -> System.Concurrency.Tasks.Task<System.Result<System.Web.Http.HttpContext,System.Web.Http.HttpError>>
+.local System.Concurrency.Tasks.Task<System.Result<System.Networking.Sockets.Socket,System.Networking.Sockets.SocketError>> local0
 ldloca local0
-initobj System.Tasks.Task<System.Result<System.Networking.Sockets.Socket,System.Networking.Sockets.SocketError>>
+initobj System.Concurrency.Tasks.Task<System.Result<System.Networking.Sockets.Socket,System.Networking.Sockets.SocketError>>
 M000000a1_IL_0000:
 M000000a1_IL_0001:
 M000000a1_IL_0002:
@@ -22704,9 +22704,9 @@ ldarg 0
 M000000a1_IL_001b:
 ldloc local0
 M000000a1_IL_001c:
-call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion128(System.Tasks.Task<System.Result<System.Networking.Sockets.Socket,System.Networking.Sockets.SocketError>>)
+call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion128(System.Concurrency.Tasks.Task<System.Result<System.Networking.Sockets.Socket,System.Networking.Sockets.SocketError>>)
 M000000a1_IL_0021:
-call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion129(System.Option.Some<System.Tasks.Task<System.Result<System.Networking.Sockets.Socket,System.Networking.Sockets.SocketError>>>)
+call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion129(System.Option.Some<System.Concurrency.Tasks.Task<System.Result<System.Networking.Sockets.Socket,System.Networking.Sockets.SocketError>>>)
 M000000a1_IL_0026:
 stfld System.Web.Http.HttpServerExchange::accepting
 M000000a1_IL_002b:
@@ -22718,14 +22718,14 @@ M000000a1_IL_002e:
 M000000a1_IL_0034:
 function.bind fn<Void> = instance System.Web.Http.HttpServerExchange::FunctionTarget_Application_V1_M_363A6D6574686F643131373A343A7479706536393A53797374656D2E52756E74696D652C2056657273696F6E3D312E302E302E302C2043756C747572653D6E65757472616C2C205075626C69634B6579546F6B656E3D6E756C6C31353A53797374656D2E5765622E4874747031383A4874747053657276657245786368616E676531303A4F6E4163636570746564343A54727565353A46616C7365313A30313A3039383A343A7479706537353A6D73636F726C69622C2056657273696F6E3D342E302E302E302C2043756C747572653D6E65757472616C2C205075626C69634B6579546F6B656E3D62373761356335363139333465303839363A53797374656D343A566F6964303ADirect()
 M000000a1_IL_0039:
-call instance System.Tasks.Task<System.Result<System.Networking.Sockets.Socket,System.Networking.Sockets.SocketError>>::OnCompleted(fn<Void>)
+call instance System.Concurrency.Tasks.Task<System.Result<System.Networking.Sockets.Socket,System.Networking.Sockets.SocketError>>::OnCompleted(fn<Void>)
 M000000a1_IL_003e:
 M000000a1_IL_003f:
 ldarg 0
 M000000a1_IL_0040:
 ldfld System.Web.Http.HttpServerExchange::source
 M000000a1_IL_0045:
-call instance System.Tasks.Promise<System.Result<System.Web.Http.HttpContext,System.Web.Http.HttpError>>::get_Task()
+call instance System.Concurrency.Tasks.Promise<System.Result<System.Web.Http.HttpContext,System.Web.Http.HttpError>>::get_Task()
 M000000a1_IL_004a:
 ret
 .end
@@ -22942,7 +22942,7 @@ ldarg 0
 M000000a3_IL_007d:
 ldfld System.Web.Http.HttpServerExchange::source
 M000000a3_IL_0082:
-call instance System.Tasks.Promise<System.Result<System.Web.Http.HttpContext,System.Web.Http.HttpError>>::Cancel()
+call instance System.Concurrency.Tasks.Promise<System.Result<System.Web.Http.HttpContext,System.Web.Http.HttpError>>::Cancel()
 call neoCLR.Library.System.Web.Http.HttpClient.RuntimeBooleanToInt32(Boolean)
 M000000a3_IL_0087:
 pop
@@ -22960,7 +22960,7 @@ call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion54(System.Web.Http.Ht
 M000000a3_IL_009b:
 call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion149(System.Result.Error<System.Web.Http.HttpError>)
 M000000a3_IL_00a0:
-call instance System.Tasks.Promise<System.Result<System.Web.Http.HttpContext,System.Web.Http.HttpError>>::Complete(System.Result<System.Web.Http.HttpContext,System.Web.Http.HttpError>)
+call instance System.Concurrency.Tasks.Promise<System.Result<System.Web.Http.HttpContext,System.Web.Http.HttpError>>::Complete(System.Result<System.Web.Http.HttpContext,System.Web.Http.HttpError>)
 call neoCLR.Library.System.Web.Http.HttpClient.RuntimeBooleanToInt32(Boolean)
 M000000a3_IL_00a5:
 pop
@@ -22970,25 +22970,25 @@ M000000a3_IL_00a8:
 ret
 .end
 .method private instance OnAccepted() -> noresult
-.local System.Tasks.Task<System.Result<System.Networking.Sockets.Socket,System.Networking.Sockets.SocketError>> local0
+.local System.Concurrency.Tasks.Task<System.Result<System.Networking.Sockets.Socket,System.Networking.Sockets.SocketError>> local0
 .local System.Networking.Sockets.Socket local1
 .local System.Networking.Sockets.SocketError local2
-.local System.Option<System.Tasks.Task<System.Result<System.Networking.Sockets.Socket,System.Networking.Sockets.SocketError>>> local3
-.local System.Option.Some<System.Tasks.Task<System.Result<System.Networking.Sockets.Socket,System.Networking.Sockets.SocketError>>> local4
+.local System.Option<System.Concurrency.Tasks.Task<System.Result<System.Networking.Sockets.Socket,System.Networking.Sockets.SocketError>>> local3
+.local System.Option.Some<System.Concurrency.Tasks.Task<System.Result<System.Networking.Sockets.Socket,System.Networking.Sockets.SocketError>>> local4
 .local System.Result<System.Networking.Sockets.Socket,System.Networking.Sockets.SocketError> local5
 .local System.Result.Ok<System.Networking.Sockets.Socket> local6
 .local System.Result<System.Networking.Sockets.Socket,System.Networking.Sockets.SocketError> local7
 .local System.Result.Error<System.Networking.Sockets.SocketError> local8
 ldloca local0
-initobj System.Tasks.Task<System.Result<System.Networking.Sockets.Socket,System.Networking.Sockets.SocketError>>
+initobj System.Concurrency.Tasks.Task<System.Result<System.Networking.Sockets.Socket,System.Networking.Sockets.SocketError>>
 ldloca local1
 initobj System.Networking.Sockets.Socket
 ldloca local2
 initobj System.Networking.Sockets.SocketError
 ldloca local3
-initobj System.Option<System.Tasks.Task<System.Result<System.Networking.Sockets.Socket,System.Networking.Sockets.SocketError>>>
+initobj System.Option<System.Concurrency.Tasks.Task<System.Result<System.Networking.Sockets.Socket,System.Networking.Sockets.SocketError>>>
 ldloca local4
-initobj System.Option.Some<System.Tasks.Task<System.Result<System.Networking.Sockets.Socket,System.Networking.Sockets.SocketError>>>
+initobj System.Option.Some<System.Concurrency.Tasks.Task<System.Result<System.Networking.Sockets.Socket,System.Networking.Sockets.SocketError>>>
 ldloca local5
 initobj System.Result<System.Networking.Sockets.Socket,System.Networking.Sockets.SocketError>
 ldloca local6
@@ -23008,19 +23008,19 @@ stloc local3
 M000000a4_IL_0009:
 ldloca local4
 M000000a4_IL_000b:
-initobj System.Option.Some<System.Tasks.Task<System.Result<System.Networking.Sockets.Socket,System.Networking.Sockets.SocketError>>>
+initobj System.Option.Some<System.Concurrency.Tasks.Task<System.Result<System.Networking.Sockets.Socket,System.Networking.Sockets.SocketError>>>
 M000000a4_IL_0011:
 ldloca local3
 M000000a4_IL_0013:
 ldloca local4
 M000000a4_IL_0015:
-call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion130(System.Option<System.Tasks.Task<System.Result<System.Networking.Sockets.Socket,System.Networking.Sockets.SocketError>>>&,System.Option.Some<System.Tasks.Task<System.Result<System.Networking.Sockets.Socket,System.Networking.Sockets.SocketError>>>&)
+call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion130(System.Option<System.Concurrency.Tasks.Task<System.Result<System.Networking.Sockets.Socket,System.Networking.Sockets.SocketError>>>&,System.Option.Some<System.Concurrency.Tasks.Task<System.Result<System.Networking.Sockets.Socket,System.Networking.Sockets.SocketError>>>&)
 M000000a4_IL_001a:
 brfalse M000000a4_IL_0033
 M000000a4_IL_001f:
 ldloca local4
 M000000a4_IL_0021:
-call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion131(System.Option.Some<System.Tasks.Task<System.Result<System.Networking.Sockets.Socket,System.Networking.Sockets.SocketError>>>&)
+call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion131(System.Option.Some<System.Concurrency.Tasks.Task<System.Result<System.Networking.Sockets.Socket,System.Networking.Sockets.SocketError>>>&)
 M000000a4_IL_0026:
 stloc local0
 M000000a4_IL_0027:
@@ -23040,7 +23040,7 @@ stfld System.Web.Http.HttpServerExchange::accepting
 M000000a4_IL_0049:
 ldloc local0
 M000000a4_IL_004a:
-call instance System.Tasks.Task<System.Result<System.Networking.Sockets.Socket,System.Networking.Sockets.SocketError>>::get_IsCancelled()
+call instance System.Concurrency.Tasks.Task<System.Result<System.Networking.Sockets.Socket,System.Networking.Sockets.SocketError>>::get_IsCancelled()
 call neoCLR.Library.System.Web.Http.HttpClient.RuntimeBooleanToInt32(Boolean)
 M000000a4_IL_004f:
 brtrue M000000a4_IL_0059
@@ -23065,7 +23065,7 @@ M000000a4_IL_0072:
 M000000a4_IL_0073:
 ldloc local0
 M000000a4_IL_0074:
-call instance System.Tasks.Task<System.Result<System.Networking.Sockets.Socket,System.Networking.Sockets.SocketError>>::GetResult()
+call instance System.Concurrency.Tasks.Task<System.Result<System.Networking.Sockets.Socket,System.Networking.Sockets.SocketError>>::GetResult()
 M000000a4_IL_0079:
 stloc local5
 M000000a4_IL_007b:
@@ -23121,7 +23121,7 @@ M000000a4_IL_00d9:
 M000000a4_IL_00da:
 ldloc local0
 M000000a4_IL_00db:
-call instance System.Tasks.Task<System.Result<System.Networking.Sockets.Socket,System.Networking.Sockets.SocketError>>::GetResult()
+call instance System.Concurrency.Tasks.Task<System.Result<System.Networking.Sockets.Socket,System.Networking.Sockets.SocketError>>::GetResult()
 M000000a4_IL_00e0:
 stloc local7
 M000000a4_IL_00e2:
@@ -23167,13 +23167,13 @@ ret
 .end
 .method private instance ReceiveNext() -> noresult
 .local System.Networking.Sockets.Socket local0
-.local System.Tasks.Task<System.Result<Int32,System.Networking.Sockets.SocketError>> local1
+.local System.Concurrency.Tasks.Task<System.Result<Int32,System.Networking.Sockets.SocketError>> local1
 .local System.Option<System.Networking.Sockets.Socket> local2
 .local System.Option.Some<System.Networking.Sockets.Socket> local3
 ldloca local0
 initobj System.Networking.Sockets.Socket
 ldloca local1
-initobj System.Tasks.Task<System.Result<Int32,System.Networking.Sockets.SocketError>>
+initobj System.Concurrency.Tasks.Task<System.Result<Int32,System.Networking.Sockets.SocketError>>
 ldloca local2
 initobj System.Option<System.Networking.Sockets.Socket>
 ldloca local3
@@ -23267,9 +23267,9 @@ ldarg 0
 M000000a5_IL_008e:
 ldloc local1
 M000000a5_IL_008f:
-call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion138(System.Tasks.Task<System.Result<Int32,System.Networking.Sockets.SocketError>>)
+call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion138(System.Concurrency.Tasks.Task<System.Result<Int32,System.Networking.Sockets.SocketError>>)
 M000000a5_IL_0094:
-call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion139(System.Option.Some<System.Tasks.Task<System.Result<Int32,System.Networking.Sockets.SocketError>>>)
+call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion139(System.Option.Some<System.Concurrency.Tasks.Task<System.Result<Int32,System.Networking.Sockets.SocketError>>>)
 M000000a5_IL_0099:
 stfld System.Web.Http.HttpServerExchange::transfer
 M000000a5_IL_009e:
@@ -23281,14 +23281,14 @@ M000000a5_IL_00a1:
 M000000a5_IL_00a7:
 function.bind fn<Void> = instance System.Web.Http.HttpServerExchange::FunctionTarget_Application_V1_M_363A6D6574686F643131373A343A7479706536393A53797374656D2E52756E74696D652C2056657273696F6E3D312E302E302E302C2043756C747572653D6E65757472616C2C205075626C69634B6579546F6B656E3D6E756C6C31353A53797374656D2E5765622E4874747031383A4874747053657276657245786368616E676531303A4F6E5265636569766564343A54727565353A46616C7365313A30313A3039383A343A7479706537353A6D73636F726C69622C2056657273696F6E3D342E302E302E302C2043756C747572653D6E65757472616C2C205075626C69634B6579546F6B656E3D62373761356335363139333465303839363A53797374656D343A566F6964303ADirect()
 M000000a5_IL_00ac:
-call instance System.Tasks.Task<System.Result<Int32,System.Networking.Sockets.SocketError>>::OnCompleted(fn<Void>)
+call instance System.Concurrency.Tasks.Task<System.Result<Int32,System.Networking.Sockets.SocketError>>::OnCompleted(fn<Void>)
 M000000a5_IL_00b1:
 M000000a5_IL_00b2:
 M000000a5_IL_00b3:
 ret
 .end
 .method private instance OnReceived() -> noresult
-.local System.Tasks.Task<System.Result<Int32,System.Networking.Sockets.SocketError>> local0
+.local System.Concurrency.Tasks.Task<System.Result<Int32,System.Networking.Sockets.SocketError>> local0
 .local Int32 local1
 .local Int32 local2
 .local System.Web.Http.HttpError local3
@@ -23296,8 +23296,8 @@ ret
 .local System.Networking.Sockets.Socket local5
 .local System.Web.Http.HttpContext local6
 .local System.Networking.Sockets.SocketError local7
-.local System.Option<System.Tasks.Task<System.Result<Int32,System.Networking.Sockets.SocketError>>> local8
-.local System.Option.Some<System.Tasks.Task<System.Result<Int32,System.Networking.Sockets.SocketError>>> local9
+.local System.Option<System.Concurrency.Tasks.Task<System.Result<Int32,System.Networking.Sockets.SocketError>>> local8
+.local System.Option.Some<System.Concurrency.Tasks.Task<System.Result<Int32,System.Networking.Sockets.SocketError>>> local9
 .local System.Result<Int32,System.Networking.Sockets.SocketError> local10
 .local System.Result.Ok<Int32> local11
 .local System.Result<Boolean,System.Web.Http.HttpError> local12
@@ -23309,7 +23309,7 @@ ret
 .local System.Result<Int32,System.Networking.Sockets.SocketError> local18
 .local System.Result.Error<System.Networking.Sockets.SocketError> local19
 ldloca local0
-initobj System.Tasks.Task<System.Result<Int32,System.Networking.Sockets.SocketError>>
+initobj System.Concurrency.Tasks.Task<System.Result<Int32,System.Networking.Sockets.SocketError>>
 ldc.i4 0
 stloc local1
 ldc.i4 0
@@ -23325,9 +23325,9 @@ initobj System.Web.Http.HttpContext
 ldloca local7
 initobj System.Networking.Sockets.SocketError
 ldloca local8
-initobj System.Option<System.Tasks.Task<System.Result<Int32,System.Networking.Sockets.SocketError>>>
+initobj System.Option<System.Concurrency.Tasks.Task<System.Result<Int32,System.Networking.Sockets.SocketError>>>
 ldloca local9
-initobj System.Option.Some<System.Tasks.Task<System.Result<Int32,System.Networking.Sockets.SocketError>>>
+initobj System.Option.Some<System.Concurrency.Tasks.Task<System.Result<Int32,System.Networking.Sockets.SocketError>>>
 ldloca local10
 initobj System.Result<Int32,System.Networking.Sockets.SocketError>
 ldloca local11
@@ -23359,19 +23359,19 @@ stloc local8
 M000000a6_IL_000a:
 ldloca local9
 M000000a6_IL_000c:
-initobj System.Option.Some<System.Tasks.Task<System.Result<Int32,System.Networking.Sockets.SocketError>>>
+initobj System.Option.Some<System.Concurrency.Tasks.Task<System.Result<Int32,System.Networking.Sockets.SocketError>>>
 M000000a6_IL_0012:
 ldloca local8
 M000000a6_IL_0014:
 ldloca local9
 M000000a6_IL_0016:
-call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion142(System.Option<System.Tasks.Task<System.Result<Int32,System.Networking.Sockets.SocketError>>>&,System.Option.Some<System.Tasks.Task<System.Result<Int32,System.Networking.Sockets.SocketError>>>&)
+call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion142(System.Option<System.Concurrency.Tasks.Task<System.Result<Int32,System.Networking.Sockets.SocketError>>>&,System.Option.Some<System.Concurrency.Tasks.Task<System.Result<Int32,System.Networking.Sockets.SocketError>>>&)
 M000000a6_IL_001b:
 brfalse M000000a6_IL_0034
 M000000a6_IL_0020:
 ldloca local9
 M000000a6_IL_0022:
-call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion143(System.Option.Some<System.Tasks.Task<System.Result<Int32,System.Networking.Sockets.SocketError>>>&)
+call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion143(System.Option.Some<System.Concurrency.Tasks.Task<System.Result<Int32,System.Networking.Sockets.SocketError>>>&)
 M000000a6_IL_0027:
 stloc local0
 M000000a6_IL_0028:
@@ -23391,7 +23391,7 @@ stfld System.Web.Http.HttpServerExchange::transfer
 M000000a6_IL_004a:
 ldloc local0
 M000000a6_IL_004b:
-call instance System.Tasks.Task<System.Result<Int32,System.Networking.Sockets.SocketError>>::get_IsCancelled()
+call instance System.Concurrency.Tasks.Task<System.Result<Int32,System.Networking.Sockets.SocketError>>::get_IsCancelled()
 call neoCLR.Library.System.Web.Http.HttpClient.RuntimeBooleanToInt32(Boolean)
 M000000a6_IL_0050:
 brtrue M000000a6_IL_0065
@@ -23453,7 +23453,7 @@ M000000a6_IL_00b2:
 M000000a6_IL_00b3:
 ldloc local0
 M000000a6_IL_00b4:
-call instance System.Tasks.Task<System.Result<Int32,System.Networking.Sockets.SocketError>>::GetResult()
+call instance System.Concurrency.Tasks.Task<System.Result<Int32,System.Networking.Sockets.SocketError>>::GetResult()
 M000000a6_IL_00b9:
 stloc local10
 M000000a6_IL_00bb:
@@ -23716,7 +23716,7 @@ call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion150(System.Web.Http.H
 M000000a6_IL_025c:
 call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion151(System.Result.Ok<System.Web.Http.HttpContext>)
 M000000a6_IL_0261:
-call instance System.Tasks.Promise<System.Result<System.Web.Http.HttpContext,System.Web.Http.HttpError>>::Complete(System.Result<System.Web.Http.HttpContext,System.Web.Http.HttpError>)
+call instance System.Concurrency.Tasks.Promise<System.Result<System.Web.Http.HttpContext,System.Web.Http.HttpError>>::Complete(System.Result<System.Web.Http.HttpContext,System.Web.Http.HttpError>)
 call neoCLR.Library.System.Web.Http.HttpClient.RuntimeBooleanToInt32(Boolean)
 M000000a6_IL_0266:
 pop
@@ -23749,7 +23749,7 @@ M000000a6_IL_0298:
 M000000a6_IL_0299:
 ldloc local0
 M000000a6_IL_029a:
-call instance System.Tasks.Task<System.Result<Int32,System.Networking.Sockets.SocketError>>::GetResult()
+call instance System.Concurrency.Tasks.Task<System.Result<Int32,System.Networking.Sockets.SocketError>>::GetResult()
 M000000a6_IL_029f:
 stloc local18
 M000000a6_IL_02a1:
@@ -23822,8 +23822,8 @@ ret
 .field private closed Boolean
 .field private started Boolean
 .field private shutdownRegistration System.Concurrency.CancellationRegistration
-.field private source System.Tasks.Promise<System.Result<Void,System.Web.Http.HttpError>>
-.field private transfer System.Option<System.Tasks.Task<System.Result<Int32,System.Networking.Sockets.SocketError>>>
+.field private source System.Concurrency.Tasks.Promise<System.Result<Void,System.Web.Http.HttpError>>
+.field private transfer System.Option<System.Concurrency.Tasks.Task<System.Result<Int32,System.Networking.Sockets.SocketError>>>
 .field private buffer arrayref<Byte>
 .field private outgoing System.Collections.Sequence<Byte>
 .field private sent Int32
@@ -23883,7 +23883,7 @@ M000000a7_IL_0039:
 M000000a7_IL_003a:
 ldarg 0
 M000000a7_IL_003b:
-newobj instance System.Tasks.Promise<System.Result<Void,System.Web.Http.HttpError>>::.ctor()
+newobj instance System.Concurrency.Tasks.Promise<System.Result<Void,System.Web.Http.HttpError>>::.ctor()
 M000000a7_IL_0040:
 stfld System.Web.Http.HttpContext::source
 M000000a7_IL_0045:
@@ -24064,7 +24064,7 @@ M000000ad_IL_0014:
 M000000ad_IL_0015:
 ret
 .end
-.method instance Complete() -> System.Tasks.Task<System.Result<Void,System.Web.Http.HttpError>>
+.method instance Complete() -> System.Concurrency.Tasks.Task<System.Result<Void,System.Web.Http.HttpError>>
 M000000ae_IL_0000:
 M000000ae_IL_0001:
 M000000ae_IL_0002:
@@ -24076,7 +24076,7 @@ callvirt instance System.Web.Http.HttpContext::Complete(System.Concurrency.Cance
 M000000ae_IL_000d:
 ret
 .end
-.method instance Complete(System.Concurrency.CancellationToken cancellationToken) -> System.Tasks.Task<System.Result<Void,System.Web.Http.HttpError>>
+.method instance Complete(System.Concurrency.CancellationToken cancellationToken) -> System.Concurrency.Tasks.Task<System.Result<Void,System.Web.Http.HttpError>>
 M000000af_IL_0000:
 M000000af_IL_0001:
 M000000af_IL_0002:
@@ -24092,8 +24092,8 @@ callvirt instance System.Web.Http.HttpContext::Send(System.Web.Http.HttpResponse
 M000000af_IL_000f:
 ret
 .end
-.method internal instance Send(System.Web.Http.HttpResponse response,System.Concurrency.CancellationToken cancellationToken) -> System.Tasks.Task<System.Result<Void,System.Web.Http.HttpError>>
-.local System.Tasks.Promise<System.Result<Void,System.Web.Http.HttpError>> local0
+.method internal instance Send(System.Web.Http.HttpResponse response,System.Concurrency.CancellationToken cancellationToken) -> System.Concurrency.Tasks.Task<System.Result<Void,System.Web.Http.HttpError>>
+.local System.Concurrency.Tasks.Promise<System.Result<Void,System.Web.Http.HttpError>> local0
 .local System.Result<System.Collections.Sequence<Byte>,System.Web.Http.HttpError> local1
 .local System.Collections.Sequence<Byte> local2
 .local System.Web.Http.HttpError local3
@@ -24105,7 +24105,7 @@ ret
 .local System.Result<System.Collections.Sequence<Byte>,System.Web.Http.HttpError> local9
 .local System.Result.Error<System.Web.Http.HttpError> local10
 ldloca local0
-initobj System.Tasks.Promise<System.Result<Void,System.Web.Http.HttpError>>
+initobj System.Concurrency.Tasks.Promise<System.Result<Void,System.Web.Http.HttpError>>
 ldloca local1
 initobj System.Result<System.Collections.Sequence<Byte>,System.Web.Http.HttpError>
 ldloca local2
@@ -24150,7 +24150,7 @@ M000000b0_IL_001e:
 br M000000b0_IL_0052
 M000000b0_IL_0023:
 M000000b0_IL_0024:
-newobj instance System.Tasks.Promise<System.Result<Void,System.Web.Http.HttpError>>::.ctor()
+newobj instance System.Concurrency.Tasks.Promise<System.Result<Void,System.Web.Http.HttpError>>::.ctor()
 M000000b0_IL_0029:
 stloc local0
 M000000b0_IL_002a:
@@ -24166,7 +24166,7 @@ call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion54(System.Web.Http.Ht
 M000000b0_IL_003f:
 call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion93(System.Result.Error<System.Web.Http.HttpError>)
 M000000b0_IL_0044:
-call instance System.Tasks.Promise<System.Result<Void,System.Web.Http.HttpError>>::Complete(System.Result<Void,System.Web.Http.HttpError>)
+call instance System.Concurrency.Tasks.Promise<System.Result<Void,System.Web.Http.HttpError>>::Complete(System.Result<Void,System.Web.Http.HttpError>)
 call neoCLR.Library.System.Web.Http.HttpClient.RuntimeBooleanToInt32(Boolean)
 M000000b0_IL_0049:
 pop
@@ -24174,7 +24174,7 @@ M000000b0_IL_004a:
 M000000b0_IL_004b:
 ldloc local0
 M000000b0_IL_004c:
-call instance System.Tasks.Promise<System.Result<Void,System.Web.Http.HttpError>>::get_Task()
+call instance System.Concurrency.Tasks.Promise<System.Result<Void,System.Web.Http.HttpError>>::get_Task()
 M000000b0_IL_0051:
 ret
 M000000b0_IL_0052:
@@ -24226,7 +24226,7 @@ ldarg 0
 M000000b0_IL_008d:
 ldfld System.Web.Http.HttpContext::source
 M000000b0_IL_0092:
-call instance System.Tasks.Promise<System.Result<Void,System.Web.Http.HttpError>>::Cancel()
+call instance System.Concurrency.Tasks.Promise<System.Result<Void,System.Web.Http.HttpError>>::Cancel()
 call neoCLR.Library.System.Web.Http.HttpClient.RuntimeBooleanToInt32(Boolean)
 M000000b0_IL_0097:
 pop
@@ -24236,7 +24236,7 @@ ldarg 0
 M000000b0_IL_009a:
 ldfld System.Web.Http.HttpContext::source
 M000000b0_IL_009f:
-call instance System.Tasks.Promise<System.Result<Void,System.Web.Http.HttpError>>::get_Task()
+call instance System.Concurrency.Tasks.Promise<System.Result<Void,System.Web.Http.HttpError>>::get_Task()
 M000000b0_IL_00a4:
 ret
 M000000b0_IL_00a5:
@@ -24371,7 +24371,7 @@ ldarg 0
 M000000b0_IL_0178:
 ldfld System.Web.Http.HttpContext::source
 M000000b0_IL_017d:
-call instance System.Tasks.Promise<System.Result<Void,System.Web.Http.HttpError>>::get_Task()
+call instance System.Concurrency.Tasks.Promise<System.Result<Void,System.Web.Http.HttpError>>::get_Task()
 M000000b0_IL_0182:
 ret
 .end
@@ -24492,7 +24492,7 @@ ldfld System.Web.Http.HttpContext::source
 M000000b3_IL_0019:
 ldarg 1
 M000000b3_IL_001a:
-call instance System.Tasks.Promise<System.Result<Void,System.Web.Http.HttpError>>::Complete(System.Result<Void,System.Web.Http.HttpError>)
+call instance System.Concurrency.Tasks.Promise<System.Result<Void,System.Web.Http.HttpError>>::Complete(System.Result<Void,System.Web.Http.HttpError>)
 call neoCLR.Library.System.Web.Http.HttpClient.RuntimeBooleanToInt32(Boolean)
 M000000b3_IL_001f:
 pop
@@ -24502,13 +24502,13 @@ ret
 .end
 .method private instance SendNext() -> noresult
 .local Int32 local0
-.local System.Tasks.Task<System.Result<Int32,System.Networking.Sockets.SocketError>> local1
+.local System.Concurrency.Tasks.Task<System.Result<Int32,System.Networking.Sockets.SocketError>> local1
 .local System.Concurrency.CancellationToken local2
 .local Void local3
 ldc.i4 0
 stloc local0
 ldloca local1
-initobj System.Tasks.Task<System.Result<Int32,System.Networking.Sockets.SocketError>>
+initobj System.Concurrency.Tasks.Task<System.Result<Int32,System.Networking.Sockets.SocketError>>
 ldloca local2
 initobj System.Concurrency.CancellationToken
 ldvoid
@@ -24557,7 +24557,7 @@ ldarg 0
 M000000b4_IL_003e:
 ldfld System.Web.Http.HttpContext::source
 M000000b4_IL_0043:
-call instance System.Tasks.Promise<System.Result<Void,System.Web.Http.HttpError>>::Cancel()
+call instance System.Concurrency.Tasks.Promise<System.Result<Void,System.Web.Http.HttpError>>::Cancel()
 call neoCLR.Library.System.Web.Http.HttpClient.RuntimeBooleanToInt32(Boolean)
 M000000b4_IL_0048:
 pop
@@ -24738,9 +24738,9 @@ ldarg 0
 M000000b4_IL_0140:
 ldloc local1
 M000000b4_IL_0141:
-call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion138(System.Tasks.Task<System.Result<Int32,System.Networking.Sockets.SocketError>>)
+call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion138(System.Concurrency.Tasks.Task<System.Result<Int32,System.Networking.Sockets.SocketError>>)
 M000000b4_IL_0146:
-call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion139(System.Option.Some<System.Tasks.Task<System.Result<Int32,System.Networking.Sockets.SocketError>>>)
+call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion139(System.Option.Some<System.Concurrency.Tasks.Task<System.Result<Int32,System.Networking.Sockets.SocketError>>>)
 M000000b4_IL_014b:
 stfld System.Web.Http.HttpContext::transfer
 M000000b4_IL_0150:
@@ -24752,32 +24752,32 @@ M000000b4_IL_0153:
 M000000b4_IL_0159:
 function.bind fn<Void> = instance System.Web.Http.HttpContext::FunctionTarget_Application_V1_M_363A6D6574686F643131303A343A7479706536393A53797374656D2E52756E74696D652C2056657273696F6E3D312E302E302E302C2043756C747572653D6E65757472616C2C205075626C69634B6579546F6B656E3D6E756C6C31353A53797374656D2E5765622E4874747031313A48747470436F6E74657874363A4F6E53656E74343A54727565353A46616C7365313A30313A3039383A343A7479706537353A6D73636F726C69622C2056657273696F6E3D342E302E302E302C2043756C747572653D6E65757472616C2C205075626C69634B6579546F6B656E3D62373761356335363139333465303839363A53797374656D343A566F6964303ADirect()
 M000000b4_IL_015e:
-call instance System.Tasks.Task<System.Result<Int32,System.Networking.Sockets.SocketError>>::OnCompleted(fn<Void>)
+call instance System.Concurrency.Tasks.Task<System.Result<Int32,System.Networking.Sockets.SocketError>>::OnCompleted(fn<Void>)
 M000000b4_IL_0163:
 M000000b4_IL_0164:
 ret
 .end
 .method private instance OnSent() -> noresult
-.local System.Tasks.Task<System.Result<Int32,System.Networking.Sockets.SocketError>> local0
+.local System.Concurrency.Tasks.Task<System.Result<Int32,System.Networking.Sockets.SocketError>> local0
 .local Int32 local1
 .local System.Networking.Sockets.SocketError local2
-.local System.Option<System.Tasks.Task<System.Result<Int32,System.Networking.Sockets.SocketError>>> local3
-.local System.Option.Some<System.Tasks.Task<System.Result<Int32,System.Networking.Sockets.SocketError>>> local4
+.local System.Option<System.Concurrency.Tasks.Task<System.Result<Int32,System.Networking.Sockets.SocketError>>> local3
+.local System.Option.Some<System.Concurrency.Tasks.Task<System.Result<Int32,System.Networking.Sockets.SocketError>>> local4
 .local System.Concurrency.CancellationToken local5
 .local System.Result<Int32,System.Networking.Sockets.SocketError> local6
 .local System.Result.Ok<Int32> local7
 .local System.Result<Int32,System.Networking.Sockets.SocketError> local8
 .local System.Result.Error<System.Networking.Sockets.SocketError> local9
 ldloca local0
-initobj System.Tasks.Task<System.Result<Int32,System.Networking.Sockets.SocketError>>
+initobj System.Concurrency.Tasks.Task<System.Result<Int32,System.Networking.Sockets.SocketError>>
 ldc.i4 0
 stloc local1
 ldloca local2
 initobj System.Networking.Sockets.SocketError
 ldloca local3
-initobj System.Option<System.Tasks.Task<System.Result<Int32,System.Networking.Sockets.SocketError>>>
+initobj System.Option<System.Concurrency.Tasks.Task<System.Result<Int32,System.Networking.Sockets.SocketError>>>
 ldloca local4
-initobj System.Option.Some<System.Tasks.Task<System.Result<Int32,System.Networking.Sockets.SocketError>>>
+initobj System.Option.Some<System.Concurrency.Tasks.Task<System.Result<Int32,System.Networking.Sockets.SocketError>>>
 ldloca local5
 initobj System.Concurrency.CancellationToken
 ldloca local6
@@ -24799,19 +24799,19 @@ stloc local3
 M000000b5_IL_0009:
 ldloca local4
 M000000b5_IL_000b:
-initobj System.Option.Some<System.Tasks.Task<System.Result<Int32,System.Networking.Sockets.SocketError>>>
+initobj System.Option.Some<System.Concurrency.Tasks.Task<System.Result<Int32,System.Networking.Sockets.SocketError>>>
 M000000b5_IL_0011:
 ldloca local3
 M000000b5_IL_0013:
 ldloca local4
 M000000b5_IL_0015:
-call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion142(System.Option<System.Tasks.Task<System.Result<Int32,System.Networking.Sockets.SocketError>>>&,System.Option.Some<System.Tasks.Task<System.Result<Int32,System.Networking.Sockets.SocketError>>>&)
+call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion142(System.Option<System.Concurrency.Tasks.Task<System.Result<Int32,System.Networking.Sockets.SocketError>>>&,System.Option.Some<System.Concurrency.Tasks.Task<System.Result<Int32,System.Networking.Sockets.SocketError>>>&)
 M000000b5_IL_001a:
 brfalse M000000b5_IL_0033
 M000000b5_IL_001f:
 ldloca local4
 M000000b5_IL_0021:
-call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion143(System.Option.Some<System.Tasks.Task<System.Result<Int32,System.Networking.Sockets.SocketError>>>&)
+call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion143(System.Option.Some<System.Concurrency.Tasks.Task<System.Result<Int32,System.Networking.Sockets.SocketError>>>&)
 M000000b5_IL_0026:
 stloc local0
 M000000b5_IL_0027:
@@ -24831,7 +24831,7 @@ stfld System.Web.Http.HttpContext::transfer
 M000000b5_IL_0049:
 ldloc local0
 M000000b5_IL_004a:
-call instance System.Tasks.Task<System.Result<Int32,System.Networking.Sockets.SocketError>>::get_IsCancelled()
+call instance System.Concurrency.Tasks.Task<System.Result<Int32,System.Networking.Sockets.SocketError>>::get_IsCancelled()
 call neoCLR.Library.System.Web.Http.HttpClient.RuntimeBooleanToInt32(Boolean)
 M000000b5_IL_004f:
 brtrue M000000b5_IL_005f
@@ -24881,7 +24881,7 @@ ldarg 0
 M000000b5_IL_0097:
 ldfld System.Web.Http.HttpContext::source
 M000000b5_IL_009c:
-call instance System.Tasks.Promise<System.Result<Void,System.Web.Http.HttpError>>::Cancel()
+call instance System.Concurrency.Tasks.Promise<System.Result<Void,System.Web.Http.HttpError>>::Cancel()
 call neoCLR.Library.System.Web.Http.HttpClient.RuntimeBooleanToInt32(Boolean)
 M000000b5_IL_00a1:
 pop
@@ -24921,7 +24921,7 @@ M000000b5_IL_00d8:
 M000000b5_IL_00d9:
 ldloc local0
 M000000b5_IL_00da:
-call instance System.Tasks.Task<System.Result<Int32,System.Networking.Sockets.SocketError>>::GetResult()
+call instance System.Concurrency.Tasks.Task<System.Result<Int32,System.Networking.Sockets.SocketError>>::GetResult()
 M000000b5_IL_00df:
 stloc local6
 M000000b5_IL_00e1:
@@ -25001,7 +25001,7 @@ M000000b5_IL_015d:
 M000000b5_IL_015e:
 ldloc local0
 M000000b5_IL_015f:
-call instance System.Tasks.Task<System.Result<Int32,System.Networking.Sockets.SocketError>>::GetResult()
+call instance System.Concurrency.Tasks.Task<System.Result<Int32,System.Networking.Sockets.SocketError>>::GetResult()
 M000000b5_IL_0164:
 stloc local8
 M000000b5_IL_0166:
@@ -25065,16 +25065,16 @@ ret
 .type internal class System.Web.Http.HttpServeOperation
 .sealed
 .field private server System.Web.Http.HttpServer
-.field private handler fn<System.Web.Http.HttpRequest,System.Tasks.Task<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>>>
+.field private handler fn<System.Web.Http.HttpRequest,System.Concurrency.Tasks.Task<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>>>
 .field private token System.Concurrency.CancellationToken
-.field private source System.Tasks.Promise<System.Result<Void,System.Web.Http.HttpError>>
+.field private source System.Concurrency.Tasks.Promise<System.Result<Void,System.Web.Http.HttpError>>
 .field private context System.Option<System.Web.Http.HttpContext>
-.field private accepting System.Option<System.Tasks.Task<System.Result<System.Web.Http.HttpContext,System.Web.Http.HttpError>>>
-.field private handling System.Option<System.Tasks.Task<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>>>
-.field private sending System.Option<System.Tasks.Task<System.Result<Void,System.Web.Http.HttpError>>>
+.field private accepting System.Option<System.Concurrency.Tasks.Task<System.Result<System.Web.Http.HttpContext,System.Web.Http.HttpError>>>
+.field private handling System.Option<System.Concurrency.Tasks.Task<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>>>
+.field private sending System.Option<System.Concurrency.Tasks.Task<System.Result<Void,System.Web.Http.HttpError>>>
 .field private callerRegistration System.Concurrency.CancellationRegistration
 .field private shutdownRegistration System.Concurrency.CancellationRegistration
-.method internal instance .ctor(System.Web.Http.HttpServer server,fn<System.Web.Http.HttpRequest,System.Tasks.Task<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>>> handler,System.Concurrency.CancellationToken token) -> noresult
+.method internal instance .ctor(System.Web.Http.HttpServer server,fn<System.Web.Http.HttpRequest,System.Concurrency.Tasks.Task<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>>> handler,System.Concurrency.CancellationToken token) -> noresult
 M000000b6_IL_0000:
 M000000b6_IL_0001:
 ldarg 0
@@ -25084,7 +25084,7 @@ M000000b6_IL_0007:
 M000000b6_IL_0008:
 ldarg 0
 M000000b6_IL_0009:
-newobj instance System.Tasks.Promise<System.Result<Void,System.Web.Http.HttpError>>::.ctor()
+newobj instance System.Concurrency.Tasks.Promise<System.Result<Void,System.Web.Http.HttpError>>::.ctor()
 M000000b6_IL_000e:
 stfld System.Web.Http.HttpServeOperation::source
 M000000b6_IL_0013:
@@ -25159,10 +25159,10 @@ stfld System.Web.Http.HttpServeOperation::token
 M000000b6_IL_007d:
 ret
 .end
-.method internal instance Start() -> System.Tasks.Task<System.Result<Void,System.Web.Http.HttpError>>
-.local System.Tasks.Task<System.Result<System.Web.Http.HttpContext,System.Web.Http.HttpError>> local0
+.method internal instance Start() -> System.Concurrency.Tasks.Task<System.Result<Void,System.Web.Http.HttpError>>
+.local System.Concurrency.Tasks.Task<System.Result<System.Web.Http.HttpContext,System.Web.Http.HttpError>> local0
 ldloca local0
-initobj System.Tasks.Task<System.Result<System.Web.Http.HttpContext,System.Web.Http.HttpError>>
+initobj System.Concurrency.Tasks.Task<System.Result<System.Web.Http.HttpContext,System.Web.Http.HttpError>>
 M000000b7_IL_0000:
 M000000b7_IL_0001:
 M000000b7_IL_0002:
@@ -25183,9 +25183,9 @@ ldarg 0
 M000000b7_IL_0016:
 ldloc local0
 M000000b7_IL_0017:
-call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion156(System.Tasks.Task<System.Result<System.Web.Http.HttpContext,System.Web.Http.HttpError>>)
+call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion156(System.Concurrency.Tasks.Task<System.Result<System.Web.Http.HttpContext,System.Web.Http.HttpError>>)
 M000000b7_IL_001c:
-call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion157(System.Option.Some<System.Tasks.Task<System.Result<System.Web.Http.HttpContext,System.Web.Http.HttpError>>>)
+call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion157(System.Option.Some<System.Concurrency.Tasks.Task<System.Result<System.Web.Http.HttpContext,System.Web.Http.HttpError>>>)
 M000000b7_IL_0021:
 stfld System.Web.Http.HttpServeOperation::accepting
 M000000b7_IL_0026:
@@ -25197,14 +25197,14 @@ M000000b7_IL_0029:
 M000000b7_IL_002f:
 function.bind fn<Void> = instance System.Web.Http.HttpServeOperation::FunctionTarget_Application_V1_M_363A6D6574686F643131373A343A7479706536393A53797374656D2E52756E74696D652C2056657273696F6E3D312E302E302E302C2043756C747572653D6E65757472616C2C205075626C69634B6579546F6B656E3D6E756C6C31353A53797374656D2E5765622E4874747031383A4874747053657276654F7065726174696F6E31303A4F6E4163636570746564343A54727565353A46616C7365313A30313A3039383A343A7479706537353A6D73636F726C69622C2056657273696F6E3D342E302E302E302C2043756C747572653D6E65757472616C2C205075626C69634B6579546F6B656E3D62373761356335363139333465303839363A53797374656D343A566F6964303ADirect()
 M000000b7_IL_0034:
-call instance System.Tasks.Task<System.Result<System.Web.Http.HttpContext,System.Web.Http.HttpError>>::OnCompleted(fn<Void>)
+call instance System.Concurrency.Tasks.Task<System.Result<System.Web.Http.HttpContext,System.Web.Http.HttpError>>::OnCompleted(fn<Void>)
 M000000b7_IL_0039:
 M000000b7_IL_003a:
 ldarg 0
 M000000b7_IL_003b:
 ldfld System.Web.Http.HttpServeOperation::source
 M000000b7_IL_0040:
-call instance System.Tasks.Promise<System.Result<Void,System.Web.Http.HttpError>>::get_Task()
+call instance System.Concurrency.Tasks.Promise<System.Result<Void,System.Web.Http.HttpError>>::get_Task()
 M000000b7_IL_0045:
 ret
 .end
@@ -25369,8 +25369,8 @@ ret
 .local System.Web.Http.HttpContext local0
 .local System.Option<System.Web.Http.HttpContext> local1
 .local System.Option.Some<System.Web.Http.HttpContext> local2
-.local System.Option<System.Tasks.Task<System.Result<Void,System.Web.Http.HttpError>>> local3
-.local System.Option.Some<System.Tasks.Task<System.Result<Void,System.Web.Http.HttpError>>> local4
+.local System.Option<System.Concurrency.Tasks.Task<System.Result<Void,System.Web.Http.HttpError>>> local3
+.local System.Option.Some<System.Concurrency.Tasks.Task<System.Result<Void,System.Web.Http.HttpError>>> local4
 ldloca local0
 initobj System.Web.Http.HttpContext
 ldloca local1
@@ -25378,9 +25378,9 @@ initobj System.Option<System.Web.Http.HttpContext>
 ldloca local2
 initobj System.Option.Some<System.Web.Http.HttpContext>
 ldloca local3
-initobj System.Option<System.Tasks.Task<System.Result<Void,System.Web.Http.HttpError>>>
+initobj System.Option<System.Concurrency.Tasks.Task<System.Result<Void,System.Web.Http.HttpError>>>
 ldloca local4
-initobj System.Option.Some<System.Tasks.Task<System.Result<Void,System.Web.Http.HttpError>>>
+initobj System.Option.Some<System.Concurrency.Tasks.Task<System.Result<Void,System.Web.Http.HttpError>>>
 M000000b9_IL_0000:
 M000000b9_IL_0001:
 M000000b9_IL_0002:
@@ -25428,19 +25428,19 @@ stloc local3
 M000000b9_IL_0048:
 ldloca local4
 M000000b9_IL_004a:
-initobj System.Option.Some<System.Tasks.Task<System.Result<Void,System.Web.Http.HttpError>>>
+initobj System.Option.Some<System.Concurrency.Tasks.Task<System.Result<Void,System.Web.Http.HttpError>>>
 M000000b9_IL_0050:
 ldloca local3
 M000000b9_IL_0052:
 ldloca local4
 M000000b9_IL_0054:
-call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion160(System.Option<System.Tasks.Task<System.Result<Void,System.Web.Http.HttpError>>>&,System.Option.Some<System.Tasks.Task<System.Result<Void,System.Web.Http.HttpError>>>&)
+call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion160(System.Option<System.Concurrency.Tasks.Task<System.Result<Void,System.Web.Http.HttpError>>>&,System.Option.Some<System.Concurrency.Tasks.Task<System.Result<Void,System.Web.Http.HttpError>>>&)
 M000000b9_IL_0059:
 brfalse M000000b9_IL_0072
 M000000b9_IL_005e:
 ldloca local4
 M000000b9_IL_0060:
-call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion161(System.Option.Some<System.Tasks.Task<System.Result<Void,System.Web.Http.HttpError>>>&)
+call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion161(System.Option.Some<System.Concurrency.Tasks.Task<System.Result<Void,System.Web.Http.HttpError>>>&)
 M000000b9_IL_0065:
 pop
 M000000b9_IL_0066:
@@ -25462,7 +25462,7 @@ ldarg 0
 M000000b9_IL_0082:
 ldfld System.Web.Http.HttpServeOperation::source
 M000000b9_IL_0087:
-call instance System.Tasks.Promise<System.Result<Void,System.Web.Http.HttpError>>::Cancel()
+call instance System.Concurrency.Tasks.Promise<System.Result<Void,System.Web.Http.HttpError>>::Cancel()
 call neoCLR.Library.System.Web.Http.HttpClient.RuntimeBooleanToInt32(Boolean)
 M000000b9_IL_008c:
 pop
@@ -25484,7 +25484,7 @@ ldfld System.Web.Http.HttpServeOperation::source
 M000000ba_IL_000e:
 ldarg 1
 M000000ba_IL_000f:
-call instance System.Tasks.Promise<System.Result<Void,System.Web.Http.HttpError>>::Complete(System.Result<Void,System.Web.Http.HttpError>)
+call instance System.Concurrency.Tasks.Promise<System.Result<Void,System.Web.Http.HttpError>>::Complete(System.Result<Void,System.Web.Http.HttpError>)
 call neoCLR.Library.System.Web.Http.HttpClient.RuntimeBooleanToInt32(Boolean)
 M000000ba_IL_0014:
 pop
@@ -25493,12 +25493,12 @@ M000000ba_IL_0016:
 ret
 .end
 .method private instance OnAccepted() -> noresult
-.local System.Tasks.Task<System.Result<System.Web.Http.HttpContext,System.Web.Http.HttpError>> local0
+.local System.Concurrency.Tasks.Task<System.Result<System.Web.Http.HttpContext,System.Web.Http.HttpError>> local0
 .local System.Web.Http.HttpContext local1
-.local System.Tasks.Task<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>> local2
+.local System.Concurrency.Tasks.Task<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>> local2
 .local System.Web.Http.HttpError local3
-.local System.Option<System.Tasks.Task<System.Result<System.Web.Http.HttpContext,System.Web.Http.HttpError>>> local4
-.local System.Option.Some<System.Tasks.Task<System.Result<System.Web.Http.HttpContext,System.Web.Http.HttpError>>> local5
+.local System.Option<System.Concurrency.Tasks.Task<System.Result<System.Web.Http.HttpContext,System.Web.Http.HttpError>>> local4
+.local System.Option.Some<System.Concurrency.Tasks.Task<System.Result<System.Web.Http.HttpContext,System.Web.Http.HttpError>>> local5
 .local System.Result<System.Web.Http.HttpContext,System.Web.Http.HttpError> local6
 .local System.Result.Ok<System.Web.Http.HttpContext> local7
 .local System.Concurrency.CancellationToken local8
@@ -25506,17 +25506,17 @@ ret
 .local System.Result<System.Web.Http.HttpContext,System.Web.Http.HttpError> local10
 .local System.Result.Error<System.Web.Http.HttpError> local11
 ldloca local0
-initobj System.Tasks.Task<System.Result<System.Web.Http.HttpContext,System.Web.Http.HttpError>>
+initobj System.Concurrency.Tasks.Task<System.Result<System.Web.Http.HttpContext,System.Web.Http.HttpError>>
 ldloca local1
 initobj System.Web.Http.HttpContext
 ldloca local2
-initobj System.Tasks.Task<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>>
+initobj System.Concurrency.Tasks.Task<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>>
 ldloca local3
 initobj System.Web.Http.HttpError
 ldloca local4
-initobj System.Option<System.Tasks.Task<System.Result<System.Web.Http.HttpContext,System.Web.Http.HttpError>>>
+initobj System.Option<System.Concurrency.Tasks.Task<System.Result<System.Web.Http.HttpContext,System.Web.Http.HttpError>>>
 ldloca local5
-initobj System.Option.Some<System.Tasks.Task<System.Result<System.Web.Http.HttpContext,System.Web.Http.HttpError>>>
+initobj System.Option.Some<System.Concurrency.Tasks.Task<System.Result<System.Web.Http.HttpContext,System.Web.Http.HttpError>>>
 ldloca local6
 initobj System.Result<System.Web.Http.HttpContext,System.Web.Http.HttpError>
 ldloca local7
@@ -25540,19 +25540,19 @@ stloc local4
 M000000bb_IL_000a:
 ldloca local5
 M000000bb_IL_000c:
-initobj System.Option.Some<System.Tasks.Task<System.Result<System.Web.Http.HttpContext,System.Web.Http.HttpError>>>
+initobj System.Option.Some<System.Concurrency.Tasks.Task<System.Result<System.Web.Http.HttpContext,System.Web.Http.HttpError>>>
 M000000bb_IL_0012:
 ldloca local4
 M000000bb_IL_0014:
 ldloca local5
 M000000bb_IL_0016:
-call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion162(System.Option<System.Tasks.Task<System.Result<System.Web.Http.HttpContext,System.Web.Http.HttpError>>>&,System.Option.Some<System.Tasks.Task<System.Result<System.Web.Http.HttpContext,System.Web.Http.HttpError>>>&)
+call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion162(System.Option<System.Concurrency.Tasks.Task<System.Result<System.Web.Http.HttpContext,System.Web.Http.HttpError>>>&,System.Option.Some<System.Concurrency.Tasks.Task<System.Result<System.Web.Http.HttpContext,System.Web.Http.HttpError>>>&)
 M000000bb_IL_001b:
 brfalse M000000bb_IL_0034
 M000000bb_IL_0020:
 ldloca local5
 M000000bb_IL_0022:
-call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion163(System.Option.Some<System.Tasks.Task<System.Result<System.Web.Http.HttpContext,System.Web.Http.HttpError>>>&)
+call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion163(System.Option.Some<System.Concurrency.Tasks.Task<System.Result<System.Web.Http.HttpContext,System.Web.Http.HttpError>>>&)
 M000000bb_IL_0027:
 stloc local0
 M000000bb_IL_0028:
@@ -25572,7 +25572,7 @@ stfld System.Web.Http.HttpServeOperation::accepting
 M000000bb_IL_004a:
 ldloc local0
 M000000bb_IL_004b:
-call instance System.Tasks.Task<System.Result<System.Web.Http.HttpContext,System.Web.Http.HttpError>>::get_IsCancelled()
+call instance System.Concurrency.Tasks.Task<System.Result<System.Web.Http.HttpContext,System.Web.Http.HttpError>>::get_IsCancelled()
 call neoCLR.Library.System.Web.Http.HttpClient.RuntimeBooleanToInt32(Boolean)
 M000000bb_IL_0050:
 brtrue M000000bb_IL_005a
@@ -25590,7 +25590,7 @@ M000000bb_IL_0063:
 M000000bb_IL_0064:
 ldloc local0
 M000000bb_IL_0065:
-call instance System.Tasks.Task<System.Result<System.Web.Http.HttpContext,System.Web.Http.HttpError>>::GetResult()
+call instance System.Concurrency.Tasks.Task<System.Result<System.Web.Http.HttpContext,System.Web.Http.HttpError>>::GetResult()
 M000000bb_IL_006a:
 stloc local6
 M000000bb_IL_006c:
@@ -25675,9 +25675,9 @@ ldarg 0
 M000000bb_IL_00f8:
 ldfld System.Web.Http.HttpServeOperation::source
 M000000bb_IL_00fd:
-call instance System.Tasks.Promise<System.Result<Void,System.Web.Http.HttpError>>::get_Task()
+call instance System.Concurrency.Tasks.Promise<System.Result<Void,System.Web.Http.HttpError>>::get_Task()
 M000000bb_IL_0102:
-call instance System.Tasks.Task<System.Result<Void,System.Web.Http.HttpError>>::get_IsCompleted()
+call instance System.Concurrency.Tasks.Task<System.Result<Void,System.Web.Http.HttpError>>::get_IsCompleted()
 call neoCLR.Library.System.Web.Http.HttpClient.RuntimeBooleanToInt32(Boolean)
 M000000bb_IL_0107:
 brtrue M000000bb_IL_0111
@@ -25701,7 +25701,7 @@ ldloc local1
 M000000bb_IL_0122:
 callvirt instance System.Web.Http.HttpContext::get_Request()
 M000000bb_IL_0127:
-callvirt instance fn<System.Web.Http.HttpRequest,System.Tasks.Task<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>>>::Invoke(System.Web.Http.HttpRequest)
+callvirt instance fn<System.Web.Http.HttpRequest,System.Concurrency.Tasks.Task<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>>>::Invoke(System.Web.Http.HttpRequest)
 M000000bb_IL_012c:
 stloc local2
 M000000bb_IL_012d:
@@ -25710,9 +25710,9 @@ ldarg 0
 M000000bb_IL_012f:
 ldfld System.Web.Http.HttpServeOperation::source
 M000000bb_IL_0134:
-call instance System.Tasks.Promise<System.Result<Void,System.Web.Http.HttpError>>::get_Task()
+call instance System.Concurrency.Tasks.Promise<System.Result<Void,System.Web.Http.HttpError>>::get_Task()
 M000000bb_IL_0139:
-call instance System.Tasks.Task<System.Result<Void,System.Web.Http.HttpError>>::get_IsCompleted()
+call instance System.Concurrency.Tasks.Task<System.Result<Void,System.Web.Http.HttpError>>::get_IsCompleted()
 call neoCLR.Library.System.Web.Http.HttpClient.RuntimeBooleanToInt32(Boolean)
 M000000bb_IL_013e:
 brtrue M000000bb_IL_0148
@@ -25732,9 +25732,9 @@ ldarg 0
 M000000bb_IL_0153:
 ldloc local2
 M000000bb_IL_0154:
-call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion169(System.Tasks.Task<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>>)
+call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion169(System.Concurrency.Tasks.Task<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>>)
 M000000bb_IL_0159:
-call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion170(System.Option.Some<System.Tasks.Task<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>>>)
+call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion170(System.Option.Some<System.Concurrency.Tasks.Task<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>>>)
 M000000bb_IL_015e:
 stfld System.Web.Http.HttpServeOperation::handling
 M000000bb_IL_0163:
@@ -25746,14 +25746,14 @@ M000000bb_IL_0166:
 M000000bb_IL_016c:
 function.bind fn<Void> = instance System.Web.Http.HttpServeOperation::FunctionTarget_Application_V1_M_363A6D6574686F643131373A343A7479706536393A53797374656D2E52756E74696D652C2056657273696F6E3D312E302E302E302C2043756C747572653D6E65757472616C2C205075626C69634B6579546F6B656E3D6E756C6C31353A53797374656D2E5765622E4874747031383A4874747053657276654F7065726174696F6E393A4F6E48616E646C6564343A54727565353A46616C7365313A30313A3039383A343A7479706537353A6D73636F726C69622C2056657273696F6E3D342E302E302E302C2043756C747572653D6E65757472616C2C205075626C69634B6579546F6B656E3D62373761356335363139333465303839363A53797374656D343A566F6964303ADirect()
 M000000bb_IL_0171:
-call instance System.Tasks.Task<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>>::OnCompleted(fn<Void>)
+call instance System.Concurrency.Tasks.Task<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>>::OnCompleted(fn<Void>)
 M000000bb_IL_0176:
 br M000000bb_IL_01c7
 M000000bb_IL_017c:
 M000000bb_IL_017d:
 ldloc local0
 M000000bb_IL_017e:
-call instance System.Tasks.Task<System.Result<System.Web.Http.HttpContext,System.Web.Http.HttpError>>::GetResult()
+call instance System.Concurrency.Tasks.Task<System.Result<System.Web.Http.HttpContext,System.Web.Http.HttpError>>::GetResult()
 M000000bb_IL_0183:
 stloc local10
 M000000bb_IL_0185:
@@ -25798,13 +25798,13 @@ M000000bb_IL_01ca:
 ret
 .end
 .method private instance OnHandled() -> noresult
-.local System.Tasks.Task<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>> local0
+.local System.Concurrency.Tasks.Task<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>> local0
 .local System.Web.Http.HttpResponse local1
 .local System.Web.Http.HttpContext local2
-.local System.Tasks.Task<System.Result<Void,System.Web.Http.HttpError>> local3
+.local System.Concurrency.Tasks.Task<System.Result<Void,System.Web.Http.HttpError>> local3
 .local System.Web.Http.HttpError local4
-.local System.Option<System.Tasks.Task<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>>> local5
-.local System.Option.Some<System.Tasks.Task<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>>> local6
+.local System.Option<System.Concurrency.Tasks.Task<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>>> local5
+.local System.Option.Some<System.Concurrency.Tasks.Task<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>>> local6
 .local System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError> local7
 .local System.Result.Ok<System.Web.Http.HttpResponse> local8
 .local System.Option<System.Web.Http.HttpContext> local9
@@ -25812,19 +25812,19 @@ ret
 .local System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError> local11
 .local System.Result.Error<System.Web.Http.HttpError> local12
 ldloca local0
-initobj System.Tasks.Task<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>>
+initobj System.Concurrency.Tasks.Task<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>>
 ldloca local1
 initobj System.Web.Http.HttpResponse
 ldloca local2
 initobj System.Web.Http.HttpContext
 ldloca local3
-initobj System.Tasks.Task<System.Result<Void,System.Web.Http.HttpError>>
+initobj System.Concurrency.Tasks.Task<System.Result<Void,System.Web.Http.HttpError>>
 ldloca local4
 initobj System.Web.Http.HttpError
 ldloca local5
-initobj System.Option<System.Tasks.Task<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>>>
+initobj System.Option<System.Concurrency.Tasks.Task<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>>>
 ldloca local6
-initobj System.Option.Some<System.Tasks.Task<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>>>
+initobj System.Option.Some<System.Concurrency.Tasks.Task<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>>>
 ldloca local7
 initobj System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>
 ldloca local8
@@ -25844,9 +25844,9 @@ ldarg 0
 M000000bc_IL_0003:
 ldfld System.Web.Http.HttpServeOperation::source
 M000000bc_IL_0008:
-call instance System.Tasks.Promise<System.Result<Void,System.Web.Http.HttpError>>::get_Task()
+call instance System.Concurrency.Tasks.Promise<System.Result<Void,System.Web.Http.HttpError>>::get_Task()
 M000000bc_IL_000d:
-call instance System.Tasks.Task<System.Result<Void,System.Web.Http.HttpError>>::get_IsCompleted()
+call instance System.Concurrency.Tasks.Task<System.Result<Void,System.Web.Http.HttpError>>::get_IsCompleted()
 call neoCLR.Library.System.Web.Http.HttpClient.RuntimeBooleanToInt32(Boolean)
 M000000bc_IL_0012:
 brtrue M000000bc_IL_001c
@@ -25866,19 +25866,19 @@ stloc local5
 M000000bc_IL_0028:
 ldloca local6
 M000000bc_IL_002a:
-initobj System.Option.Some<System.Tasks.Task<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>>>
+initobj System.Option.Some<System.Concurrency.Tasks.Task<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>>>
 M000000bc_IL_0030:
 ldloca local5
 M000000bc_IL_0032:
 ldloca local6
 M000000bc_IL_0034:
-call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion171(System.Option<System.Tasks.Task<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>>>&,System.Option.Some<System.Tasks.Task<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>>>&)
+call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion171(System.Option<System.Concurrency.Tasks.Task<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>>>&,System.Option.Some<System.Concurrency.Tasks.Task<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>>>&)
 M000000bc_IL_0039:
 brfalse M000000bc_IL_0052
 M000000bc_IL_003e:
 ldloca local6
 M000000bc_IL_0040:
-call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion172(System.Option.Some<System.Tasks.Task<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>>>&)
+call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion172(System.Option.Some<System.Concurrency.Tasks.Task<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>>>&)
 M000000bc_IL_0045:
 stloc local0
 M000000bc_IL_0046:
@@ -25898,7 +25898,7 @@ stfld System.Web.Http.HttpServeOperation::handling
 M000000bc_IL_0068:
 ldloc local0
 M000000bc_IL_0069:
-call instance System.Tasks.Task<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>>::get_IsCancelled()
+call instance System.Concurrency.Tasks.Task<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>>::get_IsCancelled()
 call neoCLR.Library.System.Web.Http.HttpClient.RuntimeBooleanToInt32(Boolean)
 M000000bc_IL_006e:
 brtrue M000000bc_IL_0078
@@ -25916,7 +25916,7 @@ M000000bc_IL_0081:
 M000000bc_IL_0082:
 ldloc local0
 M000000bc_IL_0083:
-call instance System.Tasks.Task<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>>::GetResult()
+call instance System.Concurrency.Tasks.Task<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>>::GetResult()
 M000000bc_IL_0088:
 stloc local7
 M000000bc_IL_008a:
@@ -25991,9 +25991,9 @@ ldarg 0
 M000000bc_IL_0102:
 ldloc local3
 M000000bc_IL_0103:
-call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion174(System.Tasks.Task<System.Result<Void,System.Web.Http.HttpError>>)
+call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion174(System.Concurrency.Tasks.Task<System.Result<Void,System.Web.Http.HttpError>>)
 M000000bc_IL_0108:
-call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion175(System.Option.Some<System.Tasks.Task<System.Result<Void,System.Web.Http.HttpError>>>)
+call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion175(System.Option.Some<System.Concurrency.Tasks.Task<System.Result<Void,System.Web.Http.HttpError>>>)
 M000000bc_IL_010d:
 stfld System.Web.Http.HttpServeOperation::sending
 M000000bc_IL_0112:
@@ -26005,7 +26005,7 @@ M000000bc_IL_0115:
 M000000bc_IL_011b:
 function.bind fn<Void> = instance System.Web.Http.HttpServeOperation::FunctionTarget_Application_V1_M_363A6D6574686F643131373A343A7479706536393A53797374656D2E52756E74696D652C2056657273696F6E3D312E302E302E302C2043756C747572653D6E65757472616C2C205075626C69634B6579546F6B656E3D6E756C6C31353A53797374656D2E5765622E4874747031383A4874747053657276654F7065726174696F6E363A4F6E53656E74343A54727565353A46616C7365313A30313A3039383A343A7479706537353A6D73636F726C69622C2056657273696F6E3D342E302E302E302C2043756C747572653D6E65757472616C2C205075626C69634B6579546F6B656E3D62373761356335363139333465303839363A53797374656D343A566F6964303ADirect()
 M000000bc_IL_0120:
-call instance System.Tasks.Task<System.Result<Void,System.Web.Http.HttpError>>::OnCompleted(fn<Void>)
+call instance System.Concurrency.Tasks.Task<System.Result<Void,System.Web.Http.HttpError>>::OnCompleted(fn<Void>)
 M000000bc_IL_0125:
 M000000bc_IL_0126:
 br M000000bc_IL_0179
@@ -26013,7 +26013,7 @@ M000000bc_IL_012c:
 M000000bc_IL_012d:
 ldloc local0
 M000000bc_IL_012e:
-call instance System.Tasks.Task<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>>::GetResult()
+call instance System.Concurrency.Tasks.Task<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>>::GetResult()
 M000000bc_IL_0133:
 stloc local11
 M000000bc_IL_0135:
@@ -26058,15 +26058,15 @@ M000000bc_IL_017c:
 ret
 .end
 .method private instance OnSent() -> noresult
-.local System.Tasks.Task<System.Result<Void,System.Web.Http.HttpError>> local0
-.local System.Option<System.Tasks.Task<System.Result<Void,System.Web.Http.HttpError>>> local1
-.local System.Option.Some<System.Tasks.Task<System.Result<Void,System.Web.Http.HttpError>>> local2
+.local System.Concurrency.Tasks.Task<System.Result<Void,System.Web.Http.HttpError>> local0
+.local System.Option<System.Concurrency.Tasks.Task<System.Result<Void,System.Web.Http.HttpError>>> local1
+.local System.Option.Some<System.Concurrency.Tasks.Task<System.Result<Void,System.Web.Http.HttpError>>> local2
 ldloca local0
-initobj System.Tasks.Task<System.Result<Void,System.Web.Http.HttpError>>
+initobj System.Concurrency.Tasks.Task<System.Result<Void,System.Web.Http.HttpError>>
 ldloca local1
-initobj System.Option<System.Tasks.Task<System.Result<Void,System.Web.Http.HttpError>>>
+initobj System.Option<System.Concurrency.Tasks.Task<System.Result<Void,System.Web.Http.HttpError>>>
 ldloca local2
-initobj System.Option.Some<System.Tasks.Task<System.Result<Void,System.Web.Http.HttpError>>>
+initobj System.Option.Some<System.Concurrency.Tasks.Task<System.Result<Void,System.Web.Http.HttpError>>>
 M000000bd_IL_0000:
 M000000bd_IL_0001:
 M000000bd_IL_0002:
@@ -26078,19 +26078,19 @@ stloc local1
 M000000bd_IL_0009:
 ldloca local2
 M000000bd_IL_000b:
-initobj System.Option.Some<System.Tasks.Task<System.Result<Void,System.Web.Http.HttpError>>>
+initobj System.Option.Some<System.Concurrency.Tasks.Task<System.Result<Void,System.Web.Http.HttpError>>>
 M000000bd_IL_0011:
 ldloca local1
 M000000bd_IL_0013:
 ldloca local2
 M000000bd_IL_0015:
-call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion160(System.Option<System.Tasks.Task<System.Result<Void,System.Web.Http.HttpError>>>&,System.Option.Some<System.Tasks.Task<System.Result<Void,System.Web.Http.HttpError>>>&)
+call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion160(System.Option<System.Concurrency.Tasks.Task<System.Result<Void,System.Web.Http.HttpError>>>&,System.Option.Some<System.Concurrency.Tasks.Task<System.Result<Void,System.Web.Http.HttpError>>>&)
 M000000bd_IL_001a:
 brfalse M000000bd_IL_0033
 M000000bd_IL_001f:
 ldloca local2
 M000000bd_IL_0021:
-call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion161(System.Option.Some<System.Tasks.Task<System.Result<Void,System.Web.Http.HttpError>>>&)
+call neoCLR.Library.System.Web.Http.HttpClient.RuntimeUnion161(System.Option.Some<System.Concurrency.Tasks.Task<System.Result<Void,System.Web.Http.HttpError>>>&)
 M000000bd_IL_0026:
 stloc local0
 M000000bd_IL_0027:
@@ -26110,7 +26110,7 @@ stfld System.Web.Http.HttpServeOperation::sending
 M000000bd_IL_0049:
 ldloc local0
 M000000bd_IL_004a:
-call instance System.Tasks.Task<System.Result<Void,System.Web.Http.HttpError>>::get_IsCancelled()
+call instance System.Concurrency.Tasks.Task<System.Result<Void,System.Web.Http.HttpError>>::get_IsCancelled()
 call neoCLR.Library.System.Web.Http.HttpClient.RuntimeBooleanToInt32(Boolean)
 M000000bd_IL_004f:
 brtrue M000000bd_IL_0059
@@ -26130,7 +26130,7 @@ ldarg 0
 M000000bd_IL_0064:
 ldloc local0
 M000000bd_IL_0065:
-call instance System.Tasks.Task<System.Result<Void,System.Web.Http.HttpError>>::GetResult()
+call instance System.Concurrency.Tasks.Task<System.Result<Void,System.Web.Http.HttpError>>::GetResult()
 M000000bd_IL_006a:
 callvirt instance System.Web.Http.HttpServeOperation::Finish(System.Result<Void,System.Web.Http.HttpError>)
 M000000bd_IL_006f:

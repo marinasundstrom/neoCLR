@@ -1,7 +1,7 @@
 module System.IO
 
 import System.*
-import System.Tasks.*
+import System.Concurrency.Tasks.*
 import System.Result.*
 import System.Text.*
 import System.Runtime.CompilerServices.*

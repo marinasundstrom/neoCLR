@@ -1,6 +1,6 @@
 module System.Collections
 
-import System.Tasks.*
+import System.Concurrency.Tasks.*
 
 /// A single-consumer asynchronous cursor. Do not overlap advancement or disposal.
 public interface AsyncIterator<T> : System.AsyncDisposable {

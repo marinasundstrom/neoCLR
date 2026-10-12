@@ -5,7 +5,7 @@ import System.Collections.*
 import System.Introspection.*
 import System.Option.*
 import System.Result.*
-import System.Tasks.*
+import System.Concurrency.Tasks.*
 import System.Runtime.Reflection.*
 
 /// SQL-first buffered mapping; no change tracking, SQL generation or dynamic code generation.

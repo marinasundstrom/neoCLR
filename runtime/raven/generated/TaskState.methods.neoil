@@ -1,13 +1,13 @@
-; Generated from runtime/raven/src/System/Tasks/TaskState.rvn. Regenerate with build_runtime_library.py.
-.type System.Tasks.TaskState
+; Generated from runtime/raven/src/System/Concurrency/Tasks/TaskState.rvn. Regenerate with build_runtime_library.py.
+.type System.Concurrency.Tasks.TaskState
 .enum Int32
 .field private Bits Int32
 .literal Pending 0
 .literal Completed 1
 .literal Cancelled 2
-.method static FromValue(Int32 value) -> System.Tasks.TaskState
+.method static FromValue(Int32 value) -> System.Concurrency.Tasks.TaskState
 ldarg value
-newobj System.Tasks.TaskState
+newobj System.Concurrency.Tasks.TaskState
 ret
 .end
 .method instance get_Value() -> Int32
@@ -15,41 +15,41 @@ ldarg this
 ldfld 0
 ret
 .end
-.method instance Or(System.Tasks.TaskState other) -> System.Tasks.TaskState
+.method instance Or(System.Concurrency.Tasks.TaskState other) -> System.Concurrency.Tasks.TaskState
 ldarg this
 ldfld 0
 ldarg other
 ldfld 0
 or
-newobj System.Tasks.TaskState
+newobj System.Concurrency.Tasks.TaskState
 ret
 .end
-.method instance And(System.Tasks.TaskState other) -> System.Tasks.TaskState
+.method instance And(System.Concurrency.Tasks.TaskState other) -> System.Concurrency.Tasks.TaskState
 ldarg this
 ldfld 0
 ldarg other
 ldfld 0
 and
-newobj System.Tasks.TaskState
+newobj System.Concurrency.Tasks.TaskState
 ret
 .end
-.method instance Xor(System.Tasks.TaskState other) -> System.Tasks.TaskState
+.method instance Xor(System.Concurrency.Tasks.TaskState other) -> System.Concurrency.Tasks.TaskState
 ldarg this
 ldfld 0
 ldarg other
 ldfld 0
 xor
-newobj System.Tasks.TaskState
+newobj System.Concurrency.Tasks.TaskState
 ret
 .end
-.method instance Not() -> System.Tasks.TaskState
+.method instance Not() -> System.Concurrency.Tasks.TaskState
 ldarg this
 ldfld 0
 not
-newobj System.Tasks.TaskState
+newobj System.Concurrency.Tasks.TaskState
 ret
 .end
-.method instance HasFlag(System.Tasks.TaskState other) -> Boolean
+.method instance HasFlag(System.Concurrency.Tasks.TaskState other) -> Boolean
 ldarg this
 ldfld 0
 ldarg other
@@ -60,7 +60,7 @@ ldfld 0
 ceq
 ret
 .end
-.method instance Equals(System.Tasks.TaskState other) -> Boolean
+.method instance Equals(System.Concurrency.Tasks.TaskState other) -> Boolean
 ldarg this
 ldfld 0
 ldarg other
@@ -69,25 +69,25 @@ ceq
 ret
 .end
 .method instance override byref ToString() -> String
-ldtoken System.Tasks.TaskState
+ldtoken System.Concurrency.Tasks.TaskState
 ldarg this
 ldfld 0
 call neoCLR.Runtime.EnumFormat(System.RuntimeTypeHandle,Int32)
 ret
 .end
-.method static Pending() -> System.Tasks.TaskState
+.method static Pending() -> System.Concurrency.Tasks.TaskState
 ldc.i4 0
-newobj System.Tasks.TaskState
+newobj System.Concurrency.Tasks.TaskState
 ret
 .end
-.method static Completed() -> System.Tasks.TaskState
+.method static Completed() -> System.Concurrency.Tasks.TaskState
 ldc.i4 1
-newobj System.Tasks.TaskState
+newobj System.Concurrency.Tasks.TaskState
 ret
 .end
-.method static Cancelled() -> System.Tasks.TaskState
+.method static Cancelled() -> System.Concurrency.Tasks.TaskState
 ldc.i4 2
-newobj System.Tasks.TaskState
+newobj System.Concurrency.Tasks.TaskState
 ret
 .end
 .end

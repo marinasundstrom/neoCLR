@@ -2,7 +2,7 @@ module System.IO
 
 import System.*
 import System.Concurrency.*
-import System.Tasks.*
+import System.Concurrency.Tasks.*
 import System.Result.*
 import System.Option.*
 import System.Runtime.CompilerServices.*

@@ -20,9 +20,9 @@ as reusable capabilities backed by established implementations, with scope drive
 by concrete consumers. The canonical InputStream/OutputStream contracts now return
 Tasks, with text/JSON adapters and deferred HTTP uploads migrated. Memory, text and
 JSON tests pass in JIT/AOT; memory also passes in the interpreter. File and console
-host calls still block before returning settled Tasks. The next author-directed slice
-is System.Tasks → System.Concurrency.Tasks, including compiler/runtime identities
-and consumers, followed by SSL and System.Security.Cryptography. Socket/TLS adapters
+host calls still block before returning settled Tasks. System.Tasks has moved to System.Concurrency.Tasks, including compiler/runtime
+identities and consumers; [qualification](task-namespace-migration.md) covers the
+three local execution modes. Next are SSL and System.Security.Cryptography. Socket/TLS adapters
 and certificate APIs remain open. Compare .NET,
 Windows Runtime and other platforms, retaining .NET as the ergonomics target.
 See the [first async contract](stream-design.md#first-async-contract--2026-10-12).

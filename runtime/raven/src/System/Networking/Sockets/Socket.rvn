@@ -3,7 +3,7 @@ module System.Networking.Sockets
 import System.*
 import System.Networking.*
 import System.Result.*
-import System.Tasks.*
+import System.Concurrency.Tasks.*
 import System.Concurrency.*
 import System.Collections.*
 import System.Runtime.CompilerServices.*

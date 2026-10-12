@@ -908,8 +908,8 @@ pub fn task_queue(input: &mut neoclr::Module, selection: &Value, source: &neoclr
         let arguments: Vec<Type> = serde_json::from_value(row["methodArguments"].clone())?;
         let [ty] = arguments.as_slice() else { return Err("task queue binding requires one closed type argument".into()); };
         let definition = source.type_definition(ty).ok_or("missing source TaskQueue declaration")?;
-        let is_queue = definition.origin.as_ref().is_some_and(|o| o.name == "System.Tasks.TaskQueue")
-            || (definition.name == "System.Tasks.TaskQueue" && (definition.definition.as_ref().is_some_and(|d| d.module == "System")
+        let is_queue = definition.origin.as_ref().is_some_and(|o| o.name == "System.Concurrency.Tasks.TaskQueue")
+            || (definition.name == "System.Concurrency.Tasks.TaskQueue" && (definition.definition.as_ref().is_some_and(|d| d.module == "System")
                 || selection["types"].as_array().is_some_and(|types| types.iter().any(|row|
                     row["name"] == definition.name && row["definition"]["module"] == "System"))));
         if !is_queue || !definition.is_reference_type || !definition.generic_parameters.is_empty()
@@ -1014,14 +1014,14 @@ mod task_queue_tests {
     fn queue_binding_preserves_closed_source_ownership_and_rejects_impostors() {
         for service in ["RegisterTaskQueue", "GetDefaultTaskQueue", "GetCurrentTaskQueue"] {
             let register = service == "RegisterTaskQueue";
-            let parameters = if register { "System.Tasks.TaskQueue queue" } else { "" };
-            let returns = if register { "Void" } else { "System.Tasks.TaskQueue" };
+            let parameters = if register { "System.Concurrency.Tasks.TaskQueue queue" } else { "" };
+            let returns = if register { "Void" } else { "System.Concurrency.Tasks.TaskQueue" };
             let compiled = format!("neoCLR.Runtime.{service}$aot_method_1");
-            let mut source = neoclr::assemble(&format!(".module System\n.references ()\n.type class System.Tasks.TaskQueue\n.method instance Drain() -> noresult\nret\n.end\n.end\n.function Stub({parameters}) -> {returns}\nAgain:\nbr Again\n.end")).unwrap();
+            let mut source = neoclr::assemble(&format!(".module System\n.references ()\n.type class System.Concurrency.Tasks.TaskQueue\n.method instance Drain() -> noresult\nret\n.end\n.end\n.function Stub({parameters}) -> {returns}\nAgain:\nbr Again\n.end")).unwrap();
             source.functions[1].name = compiled.clone();
             source.functions[1].impl_flags = 0x1000;
             source.functions[1].body.clear();
-            let inventory = json!({"functions":[{"name":format!("neoCLR.Runtime.{service}"),"compiledName":compiled,"compiledIndex":1,"methodArguments":[Type::Named("System.Tasks.TaskQueue".into())]}]});
+            let inventory = json!({"functions":[{"name":format!("neoCLR.Runtime.{service}"),"compiledName":compiled,"compiledIndex":1,"methodArguments":[Type::Named("System.Concurrency.Tasks.TaskQueue".into())]}]});
             let (rows, frames) = task_queue(&mut source.clone(), &inventory, &source).unwrap();
             assert_eq!(rows.len(), 1);
             assert_eq!(frames["Drain"], 0);

@@ -1,7 +1,7 @@
 module System
 
 import System.*
-import System.Tasks.*
+import System.Concurrency.Tasks.*
 import System.IO.*
 import System.ConsoleReadError
 import System.Result.*

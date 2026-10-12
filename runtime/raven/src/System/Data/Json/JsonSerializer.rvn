@@ -1,7 +1,7 @@
 module System.Data.Json
 
 import System.*
-import System.Tasks.*
+import System.Concurrency.Tasks.*
 import System.IO.*
 import System.Introspection.*
 import System.Result.*

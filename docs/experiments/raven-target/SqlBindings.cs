@@ -14,14 +14,14 @@ public struct SqlValue {
     // Avoid primitive-bootstrap text rewriting of the unrelated nested case name.
     public partial struct Boolean { }
 }
-public interface SqlDatabase { Tasks.Task<Result<SqlConnection, SqlError>> Open(); }
+public interface SqlDatabase { Concurrency.Tasks.Task<Result<SqlConnection, SqlError>> Open(); }
 public interface SqlConnection : Disposable {
-    Tasks.Task<Result<SqlResult, SqlError>> Execute(SqlStatement statement);
-    Tasks.Task<Result<SqlTransaction, SqlError>> Begin();
+    Concurrency.Tasks.Task<Result<SqlResult, SqlError>> Execute(SqlStatement statement);
+    Concurrency.Tasks.Task<Result<SqlTransaction, SqlError>> Begin();
 }
 public interface SqlTransaction : Disposable {
-    Tasks.Task<Result<PropagationUnit, SqlError>> Commit();
-    Tasks.Task<Result<PropagationUnit, SqlError>> Rollback();
+    Concurrency.Tasks.Task<Result<PropagationUnit, SqlError>> Commit();
+    Concurrency.Tasks.Task<Result<PropagationUnit, SqlError>> Rollback();
 }
 public class SqlStatement {
     public SqlStatement(string text) { }
@@ -56,7 +56,7 @@ public class SqlMapper {
 namespace Data.PostgreSql {
 public class PostgresDatabase : Sql.SqlDatabase {
     public PostgresDatabase(string database, string user, int port, int timeoutMilliseconds) { }
-    public Tasks.Task<Result<Sql.SqlConnection, Sql.SqlError>> Open() => default;
+    public Concurrency.Tasks.Task<Result<Sql.SqlConnection, Sql.SqlError>> Open() => default;
 }
 }
 """;

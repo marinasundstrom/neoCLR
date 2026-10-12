@@ -152,12 +152,12 @@ ret
 .end
 .type internal class System.Networking.DnsCompletion
 .sealed
-.field private source System.Tasks.Promise<System.Result<System.Collections.Sequence<System.Networking.IPAddress>,System.Networking.DnsError>>
+.field private source System.Concurrency.Tasks.Promise<System.Result<System.Collections.Sequence<System.Networking.IPAddress>,System.Networking.DnsError>>
 .field private operation Int64
 .field private token System.Concurrency.CancellationToken
 .field private registration System.Concurrency.CancellationRegistration
 .field private cancellationWon Boolean
-.method internal instance .ctor(System.Tasks.Promise<System.Result<System.Collections.Sequence<System.Networking.IPAddress>,System.Networking.DnsError>> source,System.Concurrency.CancellationToken token) -> noresult
+.method internal instance .ctor(System.Concurrency.Tasks.Promise<System.Result<System.Collections.Sequence<System.Networking.IPAddress>,System.Networking.DnsError>> source,System.Concurrency.CancellationToken token) -> noresult
 M00000007_IL_0000:
 M00000007_IL_0001:
 ldarg 0
@@ -257,7 +257,7 @@ ldarg 0
 M00000009_IL_001c:
 ldfld System.Networking.DnsCompletion::source
 M00000009_IL_0021:
-call instance System.Tasks.Promise<System.Result<System.Collections.Sequence<System.Networking.IPAddress>,System.Networking.DnsError>>::Cancel()
+call instance System.Concurrency.Tasks.Promise<System.Result<System.Collections.Sequence<System.Networking.IPAddress>,System.Networking.DnsError>>::Cancel()
 call neoCLR.Library.System.Networking.Dns.RuntimeBooleanToInt32(Boolean)
 M00000009_IL_0026:
 pop
@@ -267,7 +267,7 @@ ret
 M00000009_IL_0029:
 M00000009_IL_002a:
 M00000009_IL_002b:
-call System.Tasks.TaskQueue::get_Default()
+call System.Concurrency.Tasks.TaskQueue::get_Default()
 M00000009_IL_0030:
 pop
 M00000009_IL_0031:
@@ -340,7 +340,7 @@ call neoCLR.Library.System.Networking.Dns.RuntimeUnion0(System.Networking.DnsErr
 M00000009_IL_0093:
 call neoCLR.Library.System.Networking.Dns.RuntimeUnion1(System.Result.Error<System.Networking.DnsError>)
 M00000009_IL_0098:
-call instance System.Tasks.Promise<System.Result<System.Collections.Sequence<System.Networking.IPAddress>,System.Networking.DnsError>>::Complete(System.Result<System.Collections.Sequence<System.Networking.IPAddress>,System.Networking.DnsError>)
+call instance System.Concurrency.Tasks.Promise<System.Result<System.Collections.Sequence<System.Networking.IPAddress>,System.Networking.DnsError>>::Complete(System.Result<System.Collections.Sequence<System.Networking.IPAddress>,System.Networking.DnsError>)
 call neoCLR.Library.System.Networking.Dns.RuntimeBooleanToInt32(Boolean)
 M00000009_IL_009d:
 pop
@@ -519,7 +519,7 @@ ldarg 0
 M0000000b_IL_0058:
 ldfld System.Networking.DnsCompletion::source
 M0000000b_IL_005d:
-call instance System.Tasks.Promise<System.Result<System.Collections.Sequence<System.Networking.IPAddress>,System.Networking.DnsError>>::Cancel()
+call instance System.Concurrency.Tasks.Promise<System.Result<System.Collections.Sequence<System.Networking.IPAddress>,System.Networking.DnsError>>::Cancel()
 call neoCLR.Library.System.Networking.Dns.RuntimeBooleanToInt32(Boolean)
 M0000000b_IL_0062:
 pop
@@ -553,7 +553,7 @@ call neoCLR.Library.System.Networking.Dns.RuntimeUnion0(System.Networking.DnsErr
 M0000000b_IL_008e:
 call neoCLR.Library.System.Networking.Dns.RuntimeUnion1(System.Result.Error<System.Networking.DnsError>)
 M0000000b_IL_0093:
-call instance System.Tasks.Promise<System.Result<System.Collections.Sequence<System.Networking.IPAddress>,System.Networking.DnsError>>::Complete(System.Result<System.Collections.Sequence<System.Networking.IPAddress>,System.Networking.DnsError>)
+call instance System.Concurrency.Tasks.Promise<System.Result<System.Collections.Sequence<System.Networking.IPAddress>,System.Networking.DnsError>>::Complete(System.Result<System.Collections.Sequence<System.Networking.IPAddress>,System.Networking.DnsError>)
 call neoCLR.Library.System.Networking.Dns.RuntimeBooleanToInt32(Boolean)
 M0000000b_IL_0098:
 pop
@@ -648,7 +648,7 @@ call neoCLR.Library.System.Networking.Dns.RuntimeUnion0(System.Networking.DnsErr
 M0000000b_IL_012f:
 call neoCLR.Library.System.Networking.Dns.RuntimeUnion1(System.Result.Error<System.Networking.DnsError>)
 M0000000b_IL_0134:
-call instance System.Tasks.Promise<System.Result<System.Collections.Sequence<System.Networking.IPAddress>,System.Networking.DnsError>>::Complete(System.Result<System.Collections.Sequence<System.Networking.IPAddress>,System.Networking.DnsError>)
+call instance System.Concurrency.Tasks.Promise<System.Result<System.Collections.Sequence<System.Networking.IPAddress>,System.Networking.DnsError>>::Complete(System.Result<System.Collections.Sequence<System.Networking.IPAddress>,System.Networking.DnsError>)
 call neoCLR.Library.System.Networking.Dns.RuntimeBooleanToInt32(Boolean)
 M0000000b_IL_0139:
 pop
@@ -684,7 +684,7 @@ call neoCLR.Library.System.Networking.Dns.RuntimeUnion2(System.Collections.Seque
 M0000000b_IL_015c:
 call neoCLR.Library.System.Networking.Dns.RuntimeUnion3(System.Result.Ok<System.Collections.Sequence<System.Networking.IPAddress>>)
 M0000000b_IL_0161:
-call instance System.Tasks.Promise<System.Result<System.Collections.Sequence<System.Networking.IPAddress>,System.Networking.DnsError>>::Complete(System.Result<System.Collections.Sequence<System.Networking.IPAddress>,System.Networking.DnsError>)
+call instance System.Concurrency.Tasks.Promise<System.Result<System.Collections.Sequence<System.Networking.IPAddress>,System.Networking.DnsError>>::Complete(System.Result<System.Collections.Sequence<System.Networking.IPAddress>,System.Networking.DnsError>)
 call neoCLR.Library.System.Networking.Dns.RuntimeBooleanToInt32(Boolean)
 M0000000b_IL_0166:
 pop

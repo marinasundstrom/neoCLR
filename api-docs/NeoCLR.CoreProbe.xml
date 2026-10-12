@@ -125,137 +125,137 @@
       <returns>A provider-owned File or Directory through StorageItem, or StorageLookupError such as NotFound, AccessDenied, InvalidPath or IoFailure.</returns>
       <remarks>Does not create entries or open content. An unsupported native entry kind can return WrongKind. Success does not guarantee later access or stable identity. Consumers can inspect the closed File/Directory branches without depending on concrete implementation classes.</remarks>
     </member>
-    <member name="T:System.Tasks.Task">
+    <member name="T:System.Concurrency.Tasks.Task">
       <summary>Creates completed tasks or submits work with runtime-selected execution (development).</summary>
-      <remarks>Run currently starts bounded native-thread work in the calling invocation. Captured objects retain identity. Importing System.Tasks.* supports Task.Run alongside Task&lt;T&gt; without an alias. Inline block callbacks infer value results, and direct unit await is supported; generic async callers still require unsupported constructed application state-machine import (see the callback guide). Work uses the default dispatcher; arbitrary shared read-modify-write operations are not atomic. Invocation limits and cancellation apply. A callback Fault terminates the invocation, not a task error case.</remarks>
+      <remarks>Run currently starts bounded native-thread work in the calling invocation. Captured objects retain identity. Importing System.Concurrency.Tasks.* supports Task.Run alongside Task&lt;T&gt; without an alias. Inline block callbacks infer value results, and direct unit await is supported; generic async callers still require unsupported constructed application state-machine import (see the callback guide). Work uses the default dispatcher; arbitrary shared read-modify-write operations are not atomic. Invocation limits and cancellation apply. A callback Fault terminates the invocation, not a task error case.</remarks>
     </member>
-    <member name="P:System.Tasks.Task.CompletedTask">
+    <member name="P:System.Concurrency.Tasks.Task.CompletedTask">
       <summary>Returns a successfully completed Task of unit (development).</summary>
       <value>A Task&lt;()&gt; whose IsCompleted is true and IsCancelled is false.</value>
       <remarks>Awaiting needs no scheduled work. Uses the current dispatcher; explicit OnCompleted callbacks remain deferred. Task identity is not guaranteed and no instance is shared across invocations. Use FromResult for a value-bearing task. Does not start work or suppress a Fault.</remarks>
     </member>
-    <member name="M:System.Tasks.Task.FromResult``1(``0)">
+    <member name="M:System.Concurrency.Tasks.Task.FromResult``1(``0)">
       <summary>Returns a successfully completed task containing the supplied value (development).</summary>
       <typeparam name="T">The result type, inferred from value when possible.</typeparam>
       <param name="value">The completed result. Reference values retain their identity.</param>
       <returns>A Task&lt;T&gt; whose IsCompleted is true and IsCancelled is false.</returns>
       <remarks>Completion occurs before return, without scheduling work. Uses the current dispatcher; explicit OnCompleted callbacks remain deferred. An Error Result remains an ordinary successful task result. No implicit default value or cross-invocation task cache is used.</remarks>
     </member>
-    <member name="M:System.Tasks.Task.Run(System.Func{System.Void})">
+    <member name="M:System.Concurrency.Tasks.Task.Run(System.Func{System.Void})">
       <summary>Submits completion-only work with shared captures (development).</summary>
       <param name="callback">Work to invoke at most once on a runtime-owned execution context.</param>
       <returns>A Task of unit that completes after the callback returns.</returns>
       <remarks>Submission is bounded by invocation quotas; admission failure or host cancellation can prevent execution. Entry draining waits for submitted work. Blocking callbacks permit caller progress; native-thread affinity is not guaranteed.</remarks>
     </member>
-    <member name="M:System.Tasks.Task.Run``1(System.Func{``0})">
+    <member name="M:System.Concurrency.Tasks.Task.Run``1(System.Func{``0})">
       <summary>Submits work that produces a value with shared captures (development).</summary>
       <typeparam name="T">The callback result type.</typeparam>
       <param name="callback">Work producing the result. Reference results preserve identity.</param>
       <returns>A task carrying the callback result.</returns>
       <remarks>Uses the default dispatcher and shared invocation budgets. A callback Fault fails the invocation.</remarks>
     </member>
-    <member name="M:System.Tasks.Task.Run``1(System.Func{System.Tasks.Task{``0}})">
+    <member name="M:System.Concurrency.Tasks.Task.Run``1(System.Func{System.Concurrency.Tasks.Task{``0}})">
       <summary>Submits task-producing work and follows its outcome (development).</summary>
       <typeparam name="T">The inner task result type, including unit.</typeparam>
       <param name="callback">Work producing the inner task.</param>
       <returns>A single task carrying the inner value or cancellation, without a nested Task payload.</returns>
       <remarks>The callback starts on a runtime-owned context. Await continuations use existing producer-queue rules. Custom queues remain caller-driven; Run does not make an otherwise unresolved task complete.</remarks>
     </member>
-    <member name="T:System.Tasks.Task`1">
+    <member name="T:System.Concurrency.Tasks.Task`1">
       <summary>A consumer handle for one eventual value or cancellation.</summary>
       <remarks>Obtain a task from `Promise&lt;T&gt;`.Task, an async method, Task.CompletedTask or Task.FromResult(value). Consumers cannot complete it. Expected failures belong in the result type; there is no faulted Task state. This provisional API is confined to one guest invocation. Callback methods using Func&lt;System.Void&gt; are described in the [callback guide](/docs/callbacks.html).</remarks>
       <typeparam name="T">The value type carried by successful completion, including Result values for expected failures.</typeparam>
     </member>
-    <member name="P:System.Tasks.Task`1.State">
+    <member name="P:System.Concurrency.Tasks.Task`1.State">
       <summary>Gets Pending, Completed or Cancelled.</summary>
       <remarks>Completed means a value is available. Cancelled is a separate terminal state.</remarks>
     </member>
-    <member name="P:System.Tasks.Task`1.Outcome">
+    <member name="P:System.Concurrency.Tasks.Task`1.Outcome">
       <summary>Gets None while pending, or Some containing Completed(value) or Cancelled.</summary>
       <remarks>Inspect the union with Raven patterns to handle cancellation explicitly. Reading this property does not wait or pump a queue.</remarks>
     </member>
-    <member name="P:System.Tasks.Task`1.IsCompleted">
+    <member name="P:System.Concurrency.Tasks.Task`1.IsCompleted">
       <summary>Gets whether the task has reached either terminal state.</summary>
       <remarks>True for both successful completion and cancellation. Inspect State or Outcome to distinguish them.</remarks>
     </member>
-    <member name="P:System.Tasks.Task`1.IsCancelled">
+    <member name="P:System.Concurrency.Tasks.Task`1.IsCancelled">
       <summary>Gets whether the producer cancelled the task.</summary>
       <remarks>Also used by the provisional async compiler protocol.</remarks>
     </member>
-    <member name="M:System.Tasks.Task`1.GetAwaiter">
+    <member name="M:System.Concurrency.Tasks.Task`1.GetAwaiter">
       <summary>Returns this task for the await protocol.</summary>
       <returns>The same task instance.</returns>
     </member>
-    <member name="M:System.Tasks.Task`1.GetResult">
+    <member name="M:System.Concurrency.Tasks.Task`1.GetResult">
       <summary>Reads the completed value without waiting.</summary>
       <remarks>A pending or cancelled task produces a runtime fault. Application code should normally use await or inspect Outcome.</remarks>
       <returns>The value supplied by the producer.</returns>
     </member>
-    <member name="M:System.Tasks.Task`1.OnCompleted(System.Func{System.Void})">
+    <member name="M:System.Concurrency.Tasks.Task`1.OnCompleted(System.Func{System.Void})">
       <summary>Schedules a callback when this task reaches a terminal state.</summary>
       <remarks>The callback is posted to the promise’s queue, never invoked inline by registration. Registering after completion or cancellation also posts it.</remarks>
       <param name="callback">The callback to run on the associated queue.</param>
     </member>
-    <member name="T:System.Tasks.Promise`1">
+    <member name="T:System.Concurrency.Tasks.Promise`1">
       <summary>Producer authority to complete or cancel one task.</summary>
       <remarks>The first successful terminal operation wins. Subsequent Complete or Cancel calls return false. Continuations are queued. This is not a thread-safe shared-memory primitive or a cancellation-token source.</remarks>
       <typeparam name="T">The value type carried by successful completion, including Result values for expected failures.</typeparam>
     </member>
-    <member name="M:System.Tasks.Promise`1.#ctor">
+    <member name="M:System.Concurrency.Tasks.Promise`1.#ctor">
       <summary>Creates a promise on the current queue, falling back to the invocation’s default queue.</summary>
     </member>
-    <member name="M:System.Tasks.Promise`1.#ctor(System.Tasks.TaskQueue)">
+    <member name="M:System.Concurrency.Tasks.Promise`1.#ctor(System.Concurrency.Tasks.TaskQueue)">
       <summary>Creates a promise on an explicit queue.</summary>
       <param name="queue">The dispatcher that will receive completion and cancellation callbacks.</param>
     </member>
-    <member name="P:System.Tasks.Promise`1.Task">
+    <member name="P:System.Concurrency.Tasks.Promise`1.Task">
       <summary>Gets the stable consumer handle for this promise.</summary>
       <remarks>Repeated reads return the same task. The handle does not expose Complete or Cancel.</remarks>
     </member>
-    <member name="M:System.Tasks.Promise`1.Complete(`0)">
+    <member name="M:System.Concurrency.Tasks.Promise`1.Complete(`0)">
       <summary>Completes a pending task with a value and posts its registered callbacks.</summary>
       <returns>True if this call completed the task; false if it was already completed or cancelled.</returns>
       <param name="value">The task’s successful result, which may itself be a Result value.</param>
     </member>
-    <member name="M:System.Tasks.Promise`1.Cancel">
+    <member name="M:System.Concurrency.Tasks.Promise`1.Cancel">
       <summary>Cancels a pending task and posts its registered callbacks.</summary>
       <remarks>This changes the promise state. It does not stop a worker or cancel the host invocation. Awaiting a cancelled input propagates cancellation to the enclosing async task.</remarks>
       <returns>True if this call cancelled the task; false if it was already completed or cancelled.</returns>
     </member>
-    <member name="T:System.Tasks.TaskQueue">
+    <member name="T:System.Concurrency.Tasks.TaskQueue">
       <summary>A FIFO callback dispatcher within one guest invocation.</summary>
       <remarks>Post schedules work. Drain runs callbacks in batches until empty, including callbacks posted during dispatch. Recursive pumping produces a runtime fault. This is not a thread pool or general-purpose event loop. Callback methods using Func&lt;System.Void&gt; are described in the [callback guide](/docs/callbacks.html).</remarks>
     </member>
-    <member name="M:System.Tasks.TaskQueue.#ctor">
+    <member name="M:System.Concurrency.Tasks.TaskQueue.#ctor">
       <summary>Creates an empty explicit queue.</summary>
     </member>
-    <member name="P:System.Tasks.TaskQueue.Default">
+    <member name="P:System.Concurrency.Tasks.TaskQueue.Default">
       <summary>Gets the lazily created queue for the current invocation.</summary>
       <remarks>Repeated reads within an invocation return the same queue. Normal runtime invocation pumps default-queue work after the entry point returns; isolated workers have their own invocation state.</remarks>
     </member>
-    <member name="M:System.Tasks.TaskQueue.Post(System.Func{System.Void})">
+    <member name="M:System.Concurrency.Tasks.TaskQueue.Post(System.Func{System.Void})">
       <summary>Appends a callback without executing it.</summary>
       <param name="callback">Work to execute when the queue is pumped.</param>
     </member>
-    <member name="M:System.Tasks.TaskQueue.Run(System.Func{System.Void})">
+    <member name="M:System.Concurrency.Tasks.TaskQueue.Run(System.Func{System.Void})">
       <summary>Runs the callback, then drains this queue.</summary>
       <remarks>Recursive pumping produces a runtime fault. While Run or Drain is active, newly constructed promises and async methods select the nearest active queue. An explicit `Promise&lt;T&gt;`(queue) selects its supplied queue instead.</remarks>
       <param name="callback">Initial work to execute before queued callbacks.</param>
     </member>
-    <member name="M:System.Tasks.TaskQueue.Drain">
+    <member name="M:System.Concurrency.Tasks.TaskQueue.Drain">
       <summary>Runs queued callbacks until the queue is empty.</summary>
       <remarks>Callbacks posted by a running callback join the next batch. Recursive pumping produces a runtime fault. Runtime faults stop execution; this is not an exception recovery boundary.</remarks>
     </member>
-    <member name="T:System.Tasks.TaskState">
+    <member name="T:System.Concurrency.Tasks.TaskState">
       <summary>The observable state of a task.</summary>
     </member>
-    <member name="F:System.Tasks.TaskState.Pending">
+    <member name="F:System.Concurrency.Tasks.TaskState.Pending">
       <summary>No value or cancellation has been published.</summary>
     </member>
-    <member name="F:System.Tasks.TaskState.Completed">
+    <member name="F:System.Concurrency.Tasks.TaskState.Completed">
       <summary>A value is available. This state is terminal.</summary>
     </member>
-    <member name="F:System.Tasks.TaskState.Cancelled">
+    <member name="F:System.Concurrency.Tasks.TaskState.Cancelled">
       <summary>The producer cancelled the task. This state is terminal.</summary>
     </member>
     <member name="T:System.Concurrency.Thread">
@@ -1010,7 +1010,7 @@
     <member name="T:System.Runtime.CompilerServices.TaskAwaiter"><summary>Temporary continuation-registration contract used by the async compiler protocol.</summary><remarks>OnCompleted is documented in the async builder guide.</remarks></member>
     <member name="M:System.Runtime.CompilerServices.TaskAwaiter.OnCompleted(System.Func{System.Void})"><summary>Registers a continuation to run when the awaited operation completes.</summary><param name="callback">The continuation queued on the operation's dispatcher.</param></member>
     <member name="T:System.Runtime.CompilerServices.AsyncTaskMethodBuilder`1"><summary>Temporary reference-type builder sharing completion and suspended-state ownership.</summary><typeparam name="T">Task result payload.</typeparam><remarks>Compiler support, not a permanent application abstraction. The importer specializes ref startup and await registration for admitted non-generic state machines. The existing heap policy remains the default. See the async builder guide for limits and ownership.</remarks></member>
-    <member name="M:System.Runtime.CompilerServices.AsyncTaskMethodBuilder`1.#ctor(System.Tasks.TaskQueue)"><summary>Creates completion storage using the selected dispatcher.</summary><param name="queue">Dispatcher for completion callbacks.</param></member>
+    <member name="M:System.Runtime.CompilerServices.AsyncTaskMethodBuilder`1.#ctor(System.Concurrency.Tasks.TaskQueue)"><summary>Creates completion storage using the selected dispatcher.</summary><param name="queue">Dispatcher for completion callbacks.</param></member>
     <member name="M:System.Runtime.CompilerServices.AsyncTaskMethodBuilder`1.Create"><summary>Creates a builder using the current TaskQueue.</summary><returns>The shared completion owner.</returns></member>
     <member name="P:System.Runtime.CompilerServices.AsyncTaskMethodBuilder`1.Task"><summary>Gets the task representing this builder's completion.</summary></member>
     <member name="M:System.Runtime.CompilerServices.AsyncTaskMethodBuilder`1.Start``1(``0@)"><summary>Starts the supplied state in its existing storage without boxing it.</summary><typeparam name="TState">An admitted application state machine implementing AsyncStateMachine.</typeparam><param name="stateMachine">Mutable state reference; it is not retained after this call.</param></member>
@@ -1742,39 +1742,39 @@
     <member name="T:System.Runtime.CompilerServices.RefSafetyRulesAttribute"><summary>Records the compiler reference-safety metadata version.</summary><remarks>Compiler-reference support metadata, not an additional executable application service. Its presence does not imply the corresponding .NET runtime API is supported.</remarks></member>
     <member name="M:System.Runtime.CompilerServices.RefSafetyRulesAttribute.#ctor(System.Int32)"><summary>Constructs RefSafetyRulesAttribute with the supplied arguments.</summary></member>
 
-    <member name="T:System.Tasks.TaskOutcome"><summary>Contains the Completed and Cancelled cases used by TaskOutcome values.</summary></member>
-    <member name="T:System.Tasks.TaskOutcome.Cancelled"><summary>The Cancelled case of System.Tasks.TaskOutcome.</summary></member>
-    <member name="M:System.Tasks.TaskOutcome.Cancelled.#ctor"><summary>Creates Cancelled.</summary></member>
+    <member name="T:System.Concurrency.Tasks.TaskOutcome"><summary>Contains the Completed and Cancelled cases used by TaskOutcome values.</summary></member>
+    <member name="T:System.Concurrency.Tasks.TaskOutcome.Cancelled"><summary>The Cancelled case of System.Concurrency.Tasks.TaskOutcome.</summary></member>
+    <member name="M:System.Concurrency.Tasks.TaskOutcome.Cancelled.#ctor"><summary>Creates Cancelled.</summary></member>
 
-    <member name="T:System.Tasks.TaskOutcome.Completed`1"><summary>The Completed case of System.Tasks.TaskOutcome.</summary></member>
-    <member name="M:System.Tasks.TaskOutcome.Completed`1.#ctor(`0)"><summary>Constructs Completed with the supplied arguments.</summary><param name="value">The value on which this operation acts.</param></member>
+    <member name="T:System.Concurrency.Tasks.TaskOutcome.Completed`1"><summary>The Completed case of System.Concurrency.Tasks.TaskOutcome.</summary></member>
+    <member name="M:System.Concurrency.Tasks.TaskOutcome.Completed`1.#ctor(`0)"><summary>Constructs Completed with the supplied arguments.</summary><param name="value">The value on which this operation acts.</param></member>
 
-    <member name="M:System.Tasks.TaskOutcome.Completed`1.Deconstruct(`0@)"><summary>Writes the case payload to the output parameter.</summary><param name="value">The value on which this operation acts.</param></member>
+    <member name="M:System.Concurrency.Tasks.TaskOutcome.Completed`1.Deconstruct(`0@)"><summary>Writes the case payload to the output parameter.</summary><param name="value">The value on which this operation acts.</param></member>
 
-    <member name="P:System.Tasks.TaskOutcome.Completed`1.Value"><summary>Gets the stored payload; prefer typed case patterns for nominal union carriers.</summary></member>
-    <member name="T:System.Tasks.TaskOutcome`1"><summary>A standard Raven union containing a completed task value or cancellation.</summary><remarks>Completed carries the task result; Cancelled carries no value. Cancellation is distinct from an expected error inside a completed Result. The default is inactive, with HasValue false and Value null.</remarks></member>
-    <member name="M:System.Tasks.TaskOutcome`1.#ctor(System.Tasks.TaskOutcome.Completed{`0})"><summary>Constructs TaskOutcome with the supplied arguments.</summary><param name="value">The value on which this operation acts.</param></member>
+    <member name="P:System.Concurrency.Tasks.TaskOutcome.Completed`1.Value"><summary>Gets the stored payload; prefer typed case patterns for nominal union carriers.</summary></member>
+    <member name="T:System.Concurrency.Tasks.TaskOutcome`1"><summary>A standard Raven union containing a completed task value or cancellation.</summary><remarks>Completed carries the task result; Cancelled carries no value. Cancellation is distinct from an expected error inside a completed Result. The default is inactive, with HasValue false and Value null.</remarks></member>
+    <member name="M:System.Concurrency.Tasks.TaskOutcome`1.#ctor(System.Concurrency.Tasks.TaskOutcome.Completed{`0})"><summary>Constructs TaskOutcome with the supplied arguments.</summary><param name="value">The value on which this operation acts.</param></member>
 
-    <member name="M:System.Tasks.TaskOutcome`1.#ctor(System.Tasks.TaskOutcome.Cancelled)"><summary>Constructs TaskOutcome with the supplied arguments.</summary><param name="value">The value on which this operation acts.</param></member>
-
-
+    <member name="M:System.Concurrency.Tasks.TaskOutcome`1.#ctor(System.Concurrency.Tasks.TaskOutcome.Cancelled)"><summary>Constructs TaskOutcome with the supplied arguments.</summary><param name="value">The value on which this operation acts.</param></member>
 
 
 
-    <member name="M:System.Tasks.TaskOutcome`1.TryGetValue(System.Tasks.TaskOutcome.Completed{`0}@)"><summary>Tests the requested case and assigns its case value on a successful match; clears the output to its default value otherwise.</summary><param name="value">The value on which this operation acts.</param></member>
 
-    <member name="M:System.Tasks.TaskOutcome`1.TryGetValue(System.Tasks.TaskOutcome.Cancelled@)"><summary>Tests the requested case and assigns its case value on a successful match; clears the output to its default value otherwise.</summary><param name="value">The value on which this operation acts.</param></member>
 
-    <member name="P:System.Tasks.TaskOutcome`1.Value"><summary>Gets the boxed active case, or null for an inactive default.</summary></member>
-    <member name="P:System.Tasks.TaskOutcome`1.HasValue"><summary>Reports whether a case is active, including Cancelled.</summary></member>
-    <member name="M:System.Tasks.TaskOutcome`1.ToString"><summary>Returns the generated union case representation or the inactive-default marker.</summary></member>
-    <member name="T:System.Tasks.TaskResultOperators"><summary>Transforms successful results inside tasks while preserving expected errors and cancellation.</summary></member>
-    <member name="M:System.Tasks.TaskResultOperators.MapResult``3(System.Tasks.Task{System.Result{``0,``1}},System.Func{``0,``2})"><summary>Transforms the successful value into the returned result or task result, preserving the enclosing absence/error/cancellation contract.</summary><param name="self">The source outcome or iterable on which the extension operates.</param></member>
+    <member name="M:System.Concurrency.Tasks.TaskOutcome`1.TryGetValue(System.Concurrency.Tasks.TaskOutcome.Completed{`0}@)"><summary>Tests the requested case and assigns its case value on a successful match; clears the output to its default value otherwise.</summary><param name="value">The value on which this operation acts.</param></member>
 
-    <member name="T:System.Tasks.TaskOperators"><summary>Transforms or chains task completion while preserving cancellation.</summary></member>
-    <member name="M:System.Tasks.TaskOperators.Map``2(System.Tasks.Task{``0},System.Func{``0,``1})"><summary>Transforms each available successful value with the selector, preserving absence, failure or cancellation as applicable.</summary><param name="self">The source outcome or iterable on which the extension operates.</param></member>
+    <member name="M:System.Concurrency.Tasks.TaskOutcome`1.TryGetValue(System.Concurrency.Tasks.TaskOutcome.Cancelled@)"><summary>Tests the requested case and assigns its case value on a successful match; clears the output to its default value otherwise.</summary><param name="value">The value on which this operation acts.</param></member>
 
-    <member name="M:System.Tasks.TaskOperators.Then``2(System.Tasks.Task{``0},System.Func{``0,System.Tasks.Task{``1}})"><summary>Chains a successful value to the next outcome-producing operation, preserving absence, error or cancellation.</summary><param name="self">The source outcome or iterable on which the extension operates.</param></member>
+    <member name="P:System.Concurrency.Tasks.TaskOutcome`1.Value"><summary>Gets the boxed active case, or null for an inactive default.</summary></member>
+    <member name="P:System.Concurrency.Tasks.TaskOutcome`1.HasValue"><summary>Reports whether a case is active, including Cancelled.</summary></member>
+    <member name="M:System.Concurrency.Tasks.TaskOutcome`1.ToString"><summary>Returns the generated union case representation or the inactive-default marker.</summary></member>
+    <member name="T:System.Concurrency.Tasks.TaskResultOperators"><summary>Transforms successful results inside tasks while preserving expected errors and cancellation.</summary></member>
+    <member name="M:System.Concurrency.Tasks.TaskResultOperators.MapResult``3(System.Concurrency.Tasks.Task{System.Result{``0,``1}},System.Func{``0,``2})"><summary>Transforms the successful value into the returned result or task result, preserving the enclosing absence/error/cancellation contract.</summary><param name="self">The source outcome or iterable on which the extension operates.</param></member>
+
+    <member name="T:System.Concurrency.Tasks.TaskOperators"><summary>Transforms or chains task completion while preserving cancellation.</summary></member>
+    <member name="M:System.Concurrency.Tasks.TaskOperators.Map``2(System.Concurrency.Tasks.Task{``0},System.Func{``0,``1})"><summary>Transforms each available successful value with the selector, preserving absence, failure or cancellation as applicable.</summary><param name="self">The source outcome or iterable on which the extension operates.</param></member>
+
+    <member name="M:System.Concurrency.Tasks.TaskOperators.Then``2(System.Concurrency.Tasks.Task{``0},System.Func{``0,System.Concurrency.Tasks.Task{``1}})"><summary>Chains a successful value to the next outcome-producing operation, preserving absence, error or cancellation.</summary><param name="self">The source outcome or iterable on which the extension operates.</param></member>
 
     <member name="T:System.Linq.SingleError"><summary>An expected cardinality failure when a query requires exactly one matching element.</summary><remarks>Use named case patterns. The default union is inactive: HasValue is false, Value is null and ToString returns Empty.</remarks></member>
     <member name="M:System.Linq.SingleError.ToString"><summary>Returns the active case name, or Empty for an inactive default.</summary><returns>The case name or Empty.</returns></member>
@@ -1931,7 +1931,7 @@
     <member name="T:System.Web.Http.HttpServer"><summary>A bounded HTTP/1.1 server over neoCLR sockets that preserves predefined and custom method tokens.</summary><remarks>Development after Preview 9. Each ServeOne accepts one connection and closes it after sending a buffered final response. Requests require exactly one Host. Methods other than GET, HEAD and DELETE accept a Content-Length body up to 1,024 bytes; absent length means empty. GET/HEAD/DELETE bodies, transfer encoding, content encoding and Expect are unsupported. Limits: 2,048 header bytes, 16 request fields, 14 application response fields and 1,024 response body bytes. No TLS, routing, keep-alive, whole-request deadline or cancellation parameter. Each nonempty socket transfer has a separate provisional five-second deadline; accept and application callback waiting are not bounded by it. Transfer errors close the accepted connection. Errors use HttpError; Transport retains the underlying SocketError.</remarks></member>
     <member name="M:System.Web.Http.HttpServer.Listen(System.String,System.Int32,System.Int32)"><summary>Binds a TCP listener for bounded HTTP exchanges.</summary><param name="address">Numeric local IPv4 address; use 127.0.0.1 for loopback.</param><param name="port">Port from zero through 65535; zero requests an OS-assigned port.</param><param name="backlog">Requested connection backlog from 1 through 128.</param><returns>A server or HttpError.Transport carrying the socket bind/listen error.</returns><remarks>The caller owns the server and must call Close. Binding does not start accepting requests.</remarks></member>
     <member name="M:System.Web.Http.HttpServer.GetLocalPort"><summary>Returns the listener's bound port.</summary><returns>The selected port or HttpError.Transport carrying the socket error.</returns></member>
-    <member name="M:System.Web.Http.HttpServer.ServeOne(System.Func{System.Web.Http.HttpRequest,System.Tasks.Task{System.Result{System.Web.Http.HttpResponse,System.Web.Http.HttpError}}})"><summary>Accepts one request, awaits its application response, sends it and closes the connection.</summary><param name="handler">Non-null callback invoked once after a complete valid supported request. Keep response sequences stable while consumed.</param><returns>A task containing success after sending, or a typed accept, parse, handler, validation or transfer error.</returns><remarks>Malformed requests and handler errors close the connection without an HTTP error response. The server supplies Content-Length and Connection: close; application headers cannot override framing or declare content/transfer encoding. Final statuses 200–599 are supported; 204/205/304 require empty content. Content-Length is omitted for 204/304. One accept may be pending per listener. Closing the server cancels pending acceptance and closes active contexts, including callback waits. Cancelled callback tasks close their context and cancel ServeOne. Runtime Faults remain terminal; managed cleanup is not guaranteed after a Fault. This is not a permanent hosting loop.</remarks></member>
+    <member name="M:System.Web.Http.HttpServer.ServeOne(System.Func{System.Web.Http.HttpRequest,System.Concurrency.Tasks.Task{System.Result{System.Web.Http.HttpResponse,System.Web.Http.HttpError}}})"><summary>Accepts one request, awaits its application response, sends it and closes the connection.</summary><param name="handler">Non-null callback invoked once after a complete valid supported request. Keep response sequences stable while consumed.</param><returns>A task containing success after sending, or a typed accept, parse, handler, validation or transfer error.</returns><remarks>Malformed requests and handler errors close the connection without an HTTP error response. The server supplies Content-Length and Connection: close; application headers cannot override framing or declare content/transfer encoding. Final statuses 200–599 are supported; 204/205/304 require empty content. Content-Length is omitted for 204/304. One accept may be pending per listener. Closing the server cancels pending acceptance and closes active contexts, including callback waits. Cancelled callback tasks close their context and cancel ServeOne. Runtime Faults remain terminal; managed cleanup is not guaranteed after a Fault. This is not a permanent hosting loop.</remarks></member>
     <member name="M:System.Web.Http.HttpServer.Close"><summary>Stops acceptance and closes all owned exchanges.</summary><remarks>Idempotent. Cancels pending accepts and callback waits, and closes active contexts. Does not drain or preempt handlers. Native completion callbacks still acknowledge pending I/O; scheduler progress is required. This changes the previous listener-only shutdown behavior.</remarks></member>
     <member name="P:System.Web.Http.HttpRequest.Headers"><summary>Received request headers in wire order, with lowercase names and trimmed surrounding whitespace.</summary><remarks>Requests created by Get have an empty sequence. Post includes its optional Content-Type; socket framing headers are generated by the provider. Incoming headers are retained. This read-only capability is not a general client header builder.</remarks></member>
     <member name="T:System.Uri"><summary>An immutable validated ASCII URI reference.</summary><remarks>Development contract: escaped ASCII up to 4096 bytes. No I/O, implicit escaping, IDNA, IRI or bracketed IP literals. Equality and hashing use exact Text, including casing, escaping and fragment; they are not resource or origin equivalence. Parsing does not imply HTTP transport support.</remarks></member>
@@ -2306,7 +2306,7 @@
     <member name="M:System.Web.Http.HttpContext.RespondText(System.Web.Http.HttpStatusCode,System.String)"><summary>Configures a status and UTF-8 text/plain content without sending.</summary><param name="statusCode">Status to validate when the context completes.</param><param name="text">Text encoded as UTF-8 with Content-Type text/plain; charset=utf-8.</param><remarks>Forwards to Response.Respond. Call Complete to send; statuses prohibiting content require empty text.</remarks></member>
     <member name="M:System.Web.Http.HttpResponse.Respond(System.Web.Http.HttpStatusCode)"><summary>Sets status and empty content without network I/O.</summary><param name="statusCode">Sets the local status value; context completion validates final status range and content rules.</param><remarks>Replaces Content-Type using content metadata (removes it when absent); preserves other headers. This is mutable message configuration, not an asynchronous send. HttpContext.Complete sends a snapshot. Calling this on a client response only changes that local object. Separate inbound/outbound implementations are a future design direction.</remarks></member>
     <member name="M:System.Web.Http.HttpResponse.Respond(System.Web.Http.HttpStatusCode,System.Web.Http.HttpContent)"><summary>Sets status and content without network I/O.</summary><param name="statusCode">Sets the local status value; context completion validates final status range and content rules.</param><param name="content">Non-null buffered content retained by reference until context completion snapshots it.</param><remarks>Replaces Content-Type using content metadata (removes it when absent); preserves other headers. This is mutable message configuration, not an asynchronous send. HttpContext.Complete sends a snapshot. Calling this on a client response only changes that local object. Separate inbound/outbound implementations are a future design direction.</remarks></member>
-    <member name="M:System.Web.Http.HttpServer.ServeOne(System.Func{System.Web.Http.HttpRequest,System.Tasks.Task{System.Result{System.Web.Http.HttpResponse,System.Web.Http.HttpError}}},System.Concurrency.CancellationToken)"><summary>Accepts a context, invokes the callback and sends its response through the context lifetime.</summary><param name="handler">Callback returning a buffered response or application error.</param><param name="cancellationToken">Covers accept, request read, callback wait and sending.</param><returns>A completed result or an acknowledged cancelled task.</returns><remarks>Callback errors/cancellation close the context. Cancellation stops waiting for a handler and ignores a later result, but cannot preempt user code or cancel arbitrary handler work. Server.Close has the same scope-ending effect. Runtime Faults remain terminal and are not converted into HTTP errors; managed cleanup is not guaranteed after a terminal Fault.</remarks></member>
+    <member name="M:System.Web.Http.HttpServer.ServeOne(System.Func{System.Web.Http.HttpRequest,System.Concurrency.Tasks.Task{System.Result{System.Web.Http.HttpResponse,System.Web.Http.HttpError}}},System.Concurrency.CancellationToken)"><summary>Accepts a context, invokes the callback and sends its response through the context lifetime.</summary><param name="handler">Callback returning a buffered response or application error.</param><param name="cancellationToken">Covers accept, request read, callback wait and sending.</param><returns>A completed result or an acknowledged cancelled task.</returns><remarks>Callback errors/cancellation close the context. Cancellation stops waiting for a handler and ignores a later result, but cannot preempt user code or cancel arbitrary handler work. Server.Close has the same scope-ending effect. Runtime Faults remain terminal and are not converted into HTTP errors; managed cleanup is not guaranteed after a terminal Fault.</remarks></member>
     <member name="M:System.Web.Http.HttpContext.Respond(System.Web.Http.HttpStatusCode)"><summary>Forwards to Response.Respond to set status and empty content without network I/O.</summary><param name="statusCode">Sets the local status value; context completion validates final status range and content rules.</param><remarks>Replaces Content-Type using content metadata (removes it when absent); preserves other headers. This is mutable message configuration, not an asynchronous send. HttpContext.Complete sends a snapshot. Separate inbound/outbound implementations are a future design direction.</remarks></member>
     <member name="M:System.Web.Http.HttpContext.Respond(System.Web.Http.HttpStatusCode,System.Web.Http.HttpContent)"><summary>Forwards to Response.Respond to set status and content without network I/O.</summary><param name="statusCode">Sets the local status value; context completion validates final status range and content rules.</param><param name="content">Non-null buffered content retained by reference until context completion snapshots it.</param><remarks>Replaces Content-Type using content metadata (removes it when absent); preserves other headers. This is mutable message configuration, not an asynchronous send. HttpContext.Complete sends a snapshot. Separate inbound/outbound implementations are a future design direction.</remarks></member>
       <member name="T:System.IO.MemoryStream">
@@ -3056,7 +3056,7 @@
     <member name="M:System.Web.Http.DelegatingHandler.Dispose"><summary>Disposes the owned inner handler once.</summary><remarks>Overrides must call base.Dispose(). Repeated disposal is harmless.</remarks></member>
     <member name="T:System.Concurrency.Timer"><summary>An invocation-local, duration-based timer with captured callback state.</summary><remarks>Development API. Callbacks run serially through the invocation completion queue. Repeating schedules wait the interval after each callback completes; missed ticks do not accumulate. This is not a thread-pool timer. Scheduler progress is required.</remarks></member>
     <member name="M:System.Concurrency.Timer.#ctor(System.Func{System.Void})"><summary>Creates a stopped timer.</summary><param name="callback">Synchronous callback, which may capture state.</param></member>
-    <member name="M:System.Concurrency.Timer.#ctor(System.Func{System.Tasks.Task{System.Void}})"><summary>Creates a stopped timer with an asynchronous callback.</summary><param name="callback">Callback returning Task&lt;()&gt;. The next interval begins after completion; a cancelled task stops its schedule.</param><remarks>Restarting never overlaps an in-flight callback. Stop and Dispose suppress future runs without cancelling callback work.</remarks></member>
+    <member name="M:System.Concurrency.Timer.#ctor(System.Func{System.Concurrency.Tasks.Task{System.Void}})"><summary>Creates a stopped timer with an asynchronous callback.</summary><param name="callback">Callback returning Task&lt;()&gt;. The next interval begins after completion; a cancelled task stops its schedule.</param><remarks>Restarting never overlaps an in-flight callback. Stop and Dispose suppress future runs without cancelling callback work.</remarks></member>
     <member name="P:System.Concurrency.Timer.IsRunning"><summary>Whether scheduling or callback completion is pending. Stop immediately makes this false.</summary></member>
     <member name="M:System.Concurrency.Timer.Start(System.Time.Duration)"><summary>Replaces the current schedule with one callback.</summary><param name="delay">Nonnegative delay, at most Int32.MaxValue milliseconds. Positive fractional milliseconds round upward.</param><remarks>Zero schedules a later completion turn. Faults after disposal or for invalid delays; invalid arguments preserve the old schedule.</remarks></member>
     <member name="M:System.Concurrency.Timer.Start(System.Time.Duration,System.Time.Duration)"><summary>Replaces the schedule with delayed, repeating callbacks.</summary><param name="delay">Nonnegative initial delay, bounded as for one-shot Start.</param><param name="interval">Positive delay after each callback completes, at most Int32.MaxValue milliseconds. Fractional milliseconds round upward.</param><remarks>Callbacks cannot overlap on the invocation. Start, Stop or Dispose inside a callback supersedes its old schedule. Faults after disposal or for invalid durations.</remarks></member>

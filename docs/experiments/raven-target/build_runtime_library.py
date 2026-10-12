@@ -70,9 +70,9 @@ SLICES = {
     'FileInputStream': 'System.IO.FileInputStream',
     'FileOutputStream': 'System.IO.FileOutputStream',
 
-    'TaskOutcome': 'System.Tasks.TaskOutcome',
-    'TaskState': 'System.Tasks.TaskState',
-    'Tasks': 'System.Tasks.Task',
+    'TaskOutcome': 'System.Concurrency.Tasks.TaskOutcome',
+    'TaskState': 'System.Concurrency.Tasks.TaskState',
+    'Tasks': 'System.Concurrency.Tasks.Task',
     'Workers': 'System.Concurrency.Thread',
 
     'Array': 'System.Array',
@@ -249,9 +249,9 @@ SOURCES = {
     'FileInputStream': 'runtime/raven/src/System/IO/FileInputStream.rvn',
     'FileOutputStream': 'runtime/raven/src/System/IO/FileOutputStream.rvn',
 
-    'TaskOutcome': 'runtime/raven/src/System/Tasks/TaskOutcome.rvn',
-    'TaskState': 'runtime/raven/src/System/Tasks/TaskState.rvn',
-    'Tasks': 'runtime/raven/src/System/Tasks/Tasks.rvn',
+    'TaskOutcome': 'runtime/raven/src/System/Concurrency/Tasks/TaskOutcome.rvn',
+    'TaskState': 'runtime/raven/src/System/Concurrency/Tasks/TaskState.rvn',
+    'Tasks': 'runtime/raven/src/System/Concurrency/Tasks/Tasks.rvn',
     'Workers': 'runtime/raven/src/System/Concurrency/Workers.rvn',
 
     'Array': 'runtime/raven/src/System/Array.rvn',
@@ -394,7 +394,7 @@ def fragments(text, name="Math", owner="System.Math", bootstrap=False):
         assert match, lines[0]
         end = lines.index('.end\n')
         body = ''.join(lines[:end + 1])
-        if (name == 'Tasks' and match[1].startswith(('System.Tasks.TaskOperators.', 'System.Tasks.TaskResultOperators.'))) or ('<' not in match[1] and name == 'Descriptors' and match[1].startswith(('System.Runtime.Reflection.TypeReflectionExtensions.', 'System.Runtime.Reflection.PropertyReflectionExtensions.', 'System.Runtime.Reflection.ConstructorReflectionExtensions.', 'System.Runtime.Reflection.MethodReflectionExtensions.', 'System.Runtime.Reflection.FieldReflectionExtensions.'))):
+        if (name == 'Tasks' and match[1].startswith(('System.Concurrency.Tasks.TaskOperators.', 'System.Concurrency.Tasks.TaskResultOperators.'))) or ('<' not in match[1] and name == 'Descriptors' and match[1].startswith(('System.Runtime.Reflection.TypeReflectionExtensions.', 'System.Runtime.Reflection.PropertyReflectionExtensions.', 'System.Runtime.Reflection.ConstructorReflectionExtensions.', 'System.Runtime.Reflection.MethodReflectionExtensions.', 'System.Runtime.Reflection.FieldReflectionExtensions.'))):
             operator_owner = match[1].rsplit('.', 1)[0]
             extension_owners.setdefault(operator_owner, []).append(body.replace('.function ' + operator_owner + '.', '.method static ', 1))
         elif match[1].startswith(owner + '.'):
@@ -417,7 +417,7 @@ def fragments(text, name="Math", owner="System.Math", bootstrap=False):
         submission = [body for body in methods if body.startswith('.method ')]
         methods = [body for body in methods if not body.startswith('.method ')]
         if submission:
-            types.append('.type System.Tasks.Task\n' + ''.join(submission) + '.end\n')
+            types.append('.type System.Concurrency.Tasks.Task\n' + ''.join(submission) + '.end\n')
     # Nongeneric classes can also own static factories. Merge their function roots
     # into the emitted class rather than leaving top-level method fragments.
     for body in types[:]:
@@ -531,7 +531,7 @@ def main():
                         raise SystemExit('Regenerated library differs: ' + output)
                 continue
             inputs = [ROOT / path for path in SOURCES.values()]
-            inputs += [ROOT / "runtime/raven/src/System/Tasks/TaskOperators.rvn", ROOT / "runtime/raven/src/System/Console/Streams.rvn"]
+            inputs += [ROOT / "runtime/raven/src/System/Concurrency/Tasks/TaskOperators.rvn", ROOT / "runtime/raven/src/System/Console/Streams.rvn"]
             inputs += [PROJECT, ROOT / 'build/NeoCLR.Raven.props']
             data = {'format': 'raven-library-bootstrap-v1', 'owner': owner,
                     'inputs': {str(p.relative_to(ROOT)): digest(p) for p in inputs},

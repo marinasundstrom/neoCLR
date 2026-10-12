@@ -1,6 +1,6 @@
 module SchedulerContinuations {
     import System.*
-    import System.Tasks.*
+    import System.Concurrency.Tasks.*
 
     func FailInBatch() -> System.Void {
         System.Fail("batch callback fault")

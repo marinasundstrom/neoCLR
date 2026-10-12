@@ -27,7 +27,7 @@ static class EntryPointBindings
     {
         if (IsUnit(type)) return type;
         if (!collectionProfile) throw new InvalidDataException("Value-returning entries require the managed collection profile.");
-        if (type is GenericInstanceType task && task.ElementType.FullName == "System.Tasks.Task`1"
+        if (type is GenericInstanceType task && task.ElementType.FullName == "System.Concurrency.Tasks.Task`1"
             && RuntimeSignatures.IsCore(task.Scope) && task.GenericArguments.Count == 1)
             type = task.GenericArguments[0];
         if (type.MetadataType == MetadataType.Int32 || IsUnit(type)) return type;
@@ -42,7 +42,7 @@ static class EntryPointBindings
     {
         var hasArguments = HasArguments(method, true);
         var produced = ValidateReturn(method.ReturnType, true);
-        var task = method.ReturnType is GenericInstanceType candidate && candidate.ElementType.FullName == "System.Tasks.Task`1";
+        var task = method.ReturnType is GenericInstanceType candidate && candidate.ElementType.FullName == "System.Concurrency.Tasks.Task`1";
         var text = new StringBuilder($".function {Startup}() -> Int32\n");
         if (produced is GenericInstanceType resultLocals)
             text.AppendLine($".local {map(resultLocals)} result\n.local {map(resultLocals.GenericArguments[0])} success\n.local {map(resultLocals.GenericArguments[1])} error\n.local System.Object errorObject");

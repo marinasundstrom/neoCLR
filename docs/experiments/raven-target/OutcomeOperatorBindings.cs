@@ -4,7 +4,7 @@ using Mono.Cecil;
 static class OutcomeOperatorBindings
 {
     public const string Declarations = """
-        namespace Tasks {
+        namespace Concurrency.Tasks {
             public static class TaskResultOperators {
                 public static Task<Result<U,E>> MapResult<T,E,U>(this Task<Result<T,E>> self, Func<T,U> transform) => default;
             }
@@ -48,9 +48,9 @@ static class OutcomeOperatorBindings
 
     sealed record Contract(string Owner, string Name, int Arity, string[] Arguments, string Result);
     static readonly Contract[] Contracts = [
-        new("System.Tasks.TaskResultOperators", "MapResult", 3, ["System.Tasks.Task<System.Result<@0,@1>>", "fn<@0,@2>"], "System.Tasks.Task<System.Result<@2,@1>>"),
-        new("System.Tasks.TaskOperators", "Map", 2, ["System.Tasks.Task<@0>", "fn<@0,@1>"], "System.Tasks.Task<@1>"),
-        new("System.Tasks.TaskOperators", "Then", 2, ["System.Tasks.Task<@0>", "fn<@0,System.Tasks.Task<@1>>"], "System.Tasks.Task<@1>"),
+        new("System.Concurrency.Tasks.TaskResultOperators", "MapResult", 3, ["System.Concurrency.Tasks.Task<System.Result<@0,@1>>", "fn<@0,@2>"], "System.Concurrency.Tasks.Task<System.Result<@2,@1>>"),
+        new("System.Concurrency.Tasks.TaskOperators", "Map", 2, ["System.Concurrency.Tasks.Task<@0>", "fn<@0,@1>"], "System.Concurrency.Tasks.Task<@1>"),
+        new("System.Concurrency.Tasks.TaskOperators", "Then", 2, ["System.Concurrency.Tasks.Task<@0>", "fn<@0,System.Concurrency.Tasks.Task<@1>>"], "System.Concurrency.Tasks.Task<@1>"),
         new("System.OptionOperators", "Map", 2, ["System.Option<@0>", "fn<@0,@1>"], "System.Option<@1>"),
         new("System.OptionOperators", "Then", 2, ["System.Option<@0>", "fn<@0,System.Option<@1>>"], "System.Option<@1>"),
         new("System.OptionOperators", "Filter", 1, ["System.Option<@0>", "fn<@0,Boolean>"], "System.Option<@0>"),
@@ -80,7 +80,7 @@ static class OutcomeOperatorBindings
 
     public static ResultBindings.Binding? Bind(MethodReference reference, MethodDefinition definition, bool callvirt)
     {
-        if (reference.DeclaringType.FullName is not ("System.OptionOperators" or "System.ResultOperators" or "System.OptionNestedOperators" or "System.Tasks.TaskOperators" or "System.Tasks.TaskResultOperators")) return null;
+        if (reference.DeclaringType.FullName is not ("System.OptionOperators" or "System.ResultOperators" or "System.OptionNestedOperators" or "System.Concurrency.Tasks.TaskOperators" or "System.Concurrency.Tasks.TaskResultOperators")) return null;
         if (!RuntimeSignatures.IsCore(reference.DeclaringType.Scope) || reference.HasThis || callvirt
             || reference is not GenericInstanceMethod method
             || definition.GenericParameters.Any(p => p.HasConstraints || p.Attributes != GenericParameterAttributes.NonVariant))

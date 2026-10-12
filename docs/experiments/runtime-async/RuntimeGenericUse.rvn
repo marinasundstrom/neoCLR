@@ -1,6 +1,6 @@
 module RuntimeGenericUse {
     import System.*
-    import System.Tasks.*
+    import System.Concurrency.Tasks.*
 
     class Log {
         var Count = 0

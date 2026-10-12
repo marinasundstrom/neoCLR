@@ -1,4 +1,4 @@
-module System.Tasks
+module System.Concurrency.Tasks
 
 /// Describes completion or cancellation of a task.
 public union TaskOutcome<T> {

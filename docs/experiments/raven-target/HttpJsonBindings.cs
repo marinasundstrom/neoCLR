@@ -13,7 +13,7 @@ static class HttpJsonBindings
     const string Response = "System.Web.Http.HttpResponse";
     const string Token = "System.Concurrency.CancellationToken";
     static string Result(string value) => $"System.Result<{value},{Error}>";
-    static string Task(string value) => $"System.Tasks.Task<{Result(value)}>";
+    static string Task(string value) => $"System.Concurrency.Tasks.Task<{Result(value)}>";
     public static bool IsGeneric(MethodDefinition method)
     {
         if (method.DeclaringType.FullName is not (Extensions or Operations)

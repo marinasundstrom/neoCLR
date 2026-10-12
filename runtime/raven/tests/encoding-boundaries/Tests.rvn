@@ -1,7 +1,7 @@
 module NeoClr.RuntimeTests
 
 import System.*
-import System.Tasks.TaskOutcome.*
+import System.Concurrency.Tasks.TaskOutcome.*
 import System.Collections.*
 import System.IO.*
 import System.Option.*
@@ -153,7 +153,7 @@ func EncodedBytes(text: string) -> Result<Sequence<byte>, TestFailure> {
 
 // These fixtures promise inline completion; observation verifies that contract.
 // Consumers of potentially pending streams use await instead.
-func CompletedValue<T>(operation: System.Tasks.Task<T>) -> T {
+func CompletedValue<T>(operation: System.Concurrency.Tasks.Task<T>) -> T {
     let Some(Completed(value)) = operation.Outcome else {
         System.Fail("Expected an immediately completed fixture operation")
     }

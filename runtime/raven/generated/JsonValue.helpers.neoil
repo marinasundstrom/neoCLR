@@ -224,7 +224,7 @@ call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion20<T0>(System.Result.
 M00000040_IL_0060:
 ret
 .end
-.function System.Web.Http.Json.HttpClientJsonExtensions.GetFromJsonText<T0>(System.Web.Http.HttpClient self,String url) -> System.Tasks.Task<System.Result<T0,System.Web.Http.Json.HttpJsonError>>
+.function System.Web.Http.Json.HttpClientJsonExtensions.GetFromJsonText<T0>(System.Web.Http.HttpClient self,String url) -> System.Concurrency.Tasks.Task<System.Result<T0,System.Web.Http.Json.HttpJsonError>>
 .local fn<System.Result<System.Object,System.Web.Http.Json.HttpJsonError>,System.Result<T0,System.Web.Http.Json.HttpJsonError>> local0
 M00000042_IL_0000:
 M00000042_IL_0001:
@@ -252,15 +252,15 @@ call System.Web.Http.Json.JsonClientOperations::Get(System.Web.Http.HttpClient,S
 M00000042_IL_002b:
 ldloc local0
 M00000042_IL_002c:
-call System.Tasks.TaskOperators::Map<System.Result<System.Object,System.Web.Http.Json.HttpJsonError>,System.Result<T0,System.Web.Http.Json.HttpJsonError>>(System.Tasks.Task<System.Result<System.Object,System.Web.Http.Json.HttpJsonError>>,fn<System.Result<System.Object,System.Web.Http.Json.HttpJsonError>,System.Result<T0,System.Web.Http.Json.HttpJsonError>>)
+call System.Concurrency.Tasks.TaskOperators::Map<System.Result<System.Object,System.Web.Http.Json.HttpJsonError>,System.Result<T0,System.Web.Http.Json.HttpJsonError>>(System.Concurrency.Tasks.Task<System.Result<System.Object,System.Web.Http.Json.HttpJsonError>>,fn<System.Result<System.Object,System.Web.Http.Json.HttpJsonError>,System.Result<T0,System.Web.Http.Json.HttpJsonError>>)
 M00000042_IL_0031:
 ret
 .end
-.function System.Web.Http.Json.HttpClientJsonExtensions.GetFromJsonTextWithToken<T0>(System.Web.Http.HttpClient self,String url,System.Concurrency.CancellationToken cancellationToken) -> System.Tasks.Task<System.Result<T0,System.Web.Http.Json.HttpJsonError>>
-.local System.Tasks.Promise<System.Result<T0,System.Web.Http.Json.HttpJsonError>> local0
+.function System.Web.Http.Json.HttpClientJsonExtensions.GetFromJsonTextWithToken<T0>(System.Web.Http.HttpClient self,String url,System.Concurrency.CancellationToken cancellationToken) -> System.Concurrency.Tasks.Task<System.Result<T0,System.Web.Http.Json.HttpJsonError>>
+.local System.Concurrency.Tasks.Promise<System.Result<T0,System.Web.Http.Json.HttpJsonError>> local0
 .local fn<System.Result<System.Object,System.Web.Http.Json.HttpJsonError>,System.Result<T0,System.Web.Http.Json.HttpJsonError>> local1
 ldloca local0
-initobj System.Tasks.Promise<System.Result<T0,System.Web.Http.Json.HttpJsonError>>
+initobj System.Concurrency.Tasks.Promise<System.Result<T0,System.Web.Http.Json.HttpJsonError>>
 M00000043_IL_0000:
 M00000043_IL_0001:
 M00000043_IL_0002:
@@ -274,13 +274,13 @@ M00000043_IL_000e:
 br M00000043_IL_0029
 M00000043_IL_0013:
 M00000043_IL_0014:
-newobj instance System.Tasks.Promise<System.Result<T0,System.Web.Http.Json.HttpJsonError>>::.ctor()
+newobj instance System.Concurrency.Tasks.Promise<System.Result<T0,System.Web.Http.Json.HttpJsonError>>::.ctor()
 M00000043_IL_0019:
 stloc local0
 M00000043_IL_001a:
 ldloc local0
 M00000043_IL_001b:
-call instance System.Tasks.Promise<System.Result<T0,System.Web.Http.Json.HttpJsonError>>::Cancel()
+call instance System.Concurrency.Tasks.Promise<System.Result<T0,System.Web.Http.Json.HttpJsonError>>::Cancel()
 call neoCLR.Library.System.Data.Json.JsonValue.RuntimeBooleanToInt32(Boolean)
 M00000043_IL_0020:
 pop
@@ -288,7 +288,7 @@ M00000043_IL_0021:
 M00000043_IL_0022:
 ldloc local0
 M00000043_IL_0023:
-call instance System.Tasks.Promise<System.Result<T0,System.Web.Http.Json.HttpJsonError>>::get_Task()
+call instance System.Concurrency.Tasks.Promise<System.Result<T0,System.Web.Http.Json.HttpJsonError>>::get_Task()
 M00000043_IL_0028:
 ret
 M00000043_IL_0029:
@@ -317,11 +317,11 @@ call System.Web.Http.Json.JsonClientOperations::Get(System.Web.Http.HttpClient,S
 M00000043_IL_0050:
 ldloc local1
 M00000043_IL_0051:
-call System.Tasks.TaskOperators::Map<System.Result<System.Object,System.Web.Http.Json.HttpJsonError>,System.Result<T0,System.Web.Http.Json.HttpJsonError>>(System.Tasks.Task<System.Result<System.Object,System.Web.Http.Json.HttpJsonError>>,fn<System.Result<System.Object,System.Web.Http.Json.HttpJsonError>,System.Result<T0,System.Web.Http.Json.HttpJsonError>>)
+call System.Concurrency.Tasks.TaskOperators::Map<System.Result<System.Object,System.Web.Http.Json.HttpJsonError>,System.Result<T0,System.Web.Http.Json.HttpJsonError>>(System.Concurrency.Tasks.Task<System.Result<System.Object,System.Web.Http.Json.HttpJsonError>>,fn<System.Result<System.Object,System.Web.Http.Json.HttpJsonError>,System.Result<T0,System.Web.Http.Json.HttpJsonError>>)
 M00000043_IL_0056:
 ret
 .end
-.function System.Web.Http.Json.HttpClientJsonExtensions.GetFromJsonUri<T0>(System.Web.Http.HttpClient self,System.Uri url) -> System.Tasks.Task<System.Result<T0,System.Web.Http.Json.HttpJsonError>>
+.function System.Web.Http.Json.HttpClientJsonExtensions.GetFromJsonUri<T0>(System.Web.Http.HttpClient self,System.Uri url) -> System.Concurrency.Tasks.Task<System.Result<T0,System.Web.Http.Json.HttpJsonError>>
 .local fn<System.Result<System.Object,System.Web.Http.Json.HttpJsonError>,System.Result<T0,System.Web.Http.Json.HttpJsonError>> local0
 M00000044_IL_0000:
 M00000044_IL_0001:
@@ -349,15 +349,15 @@ call System.Web.Http.Json.JsonClientOperations::Get(System.Web.Http.HttpClient,S
 M00000044_IL_002b:
 ldloc local0
 M00000044_IL_002c:
-call System.Tasks.TaskOperators::Map<System.Result<System.Object,System.Web.Http.Json.HttpJsonError>,System.Result<T0,System.Web.Http.Json.HttpJsonError>>(System.Tasks.Task<System.Result<System.Object,System.Web.Http.Json.HttpJsonError>>,fn<System.Result<System.Object,System.Web.Http.Json.HttpJsonError>,System.Result<T0,System.Web.Http.Json.HttpJsonError>>)
+call System.Concurrency.Tasks.TaskOperators::Map<System.Result<System.Object,System.Web.Http.Json.HttpJsonError>,System.Result<T0,System.Web.Http.Json.HttpJsonError>>(System.Concurrency.Tasks.Task<System.Result<System.Object,System.Web.Http.Json.HttpJsonError>>,fn<System.Result<System.Object,System.Web.Http.Json.HttpJsonError>,System.Result<T0,System.Web.Http.Json.HttpJsonError>>)
 M00000044_IL_0031:
 ret
 .end
-.function System.Web.Http.Json.HttpClientJsonExtensions.GetFromJsonUriWithToken<T0>(System.Web.Http.HttpClient self,System.Uri url,System.Concurrency.CancellationToken cancellationToken) -> System.Tasks.Task<System.Result<T0,System.Web.Http.Json.HttpJsonError>>
-.local System.Tasks.Promise<System.Result<T0,System.Web.Http.Json.HttpJsonError>> local0
+.function System.Web.Http.Json.HttpClientJsonExtensions.GetFromJsonUriWithToken<T0>(System.Web.Http.HttpClient self,System.Uri url,System.Concurrency.CancellationToken cancellationToken) -> System.Concurrency.Tasks.Task<System.Result<T0,System.Web.Http.Json.HttpJsonError>>
+.local System.Concurrency.Tasks.Promise<System.Result<T0,System.Web.Http.Json.HttpJsonError>> local0
 .local fn<System.Result<System.Object,System.Web.Http.Json.HttpJsonError>,System.Result<T0,System.Web.Http.Json.HttpJsonError>> local1
 ldloca local0
-initobj System.Tasks.Promise<System.Result<T0,System.Web.Http.Json.HttpJsonError>>
+initobj System.Concurrency.Tasks.Promise<System.Result<T0,System.Web.Http.Json.HttpJsonError>>
 M00000045_IL_0000:
 M00000045_IL_0001:
 M00000045_IL_0002:
@@ -371,13 +371,13 @@ M00000045_IL_000e:
 br M00000045_IL_0029
 M00000045_IL_0013:
 M00000045_IL_0014:
-newobj instance System.Tasks.Promise<System.Result<T0,System.Web.Http.Json.HttpJsonError>>::.ctor()
+newobj instance System.Concurrency.Tasks.Promise<System.Result<T0,System.Web.Http.Json.HttpJsonError>>::.ctor()
 M00000045_IL_0019:
 stloc local0
 M00000045_IL_001a:
 ldloc local0
 M00000045_IL_001b:
-call instance System.Tasks.Promise<System.Result<T0,System.Web.Http.Json.HttpJsonError>>::Cancel()
+call instance System.Concurrency.Tasks.Promise<System.Result<T0,System.Web.Http.Json.HttpJsonError>>::Cancel()
 call neoCLR.Library.System.Data.Json.JsonValue.RuntimeBooleanToInt32(Boolean)
 M00000045_IL_0020:
 pop
@@ -385,7 +385,7 @@ M00000045_IL_0021:
 M00000045_IL_0022:
 ldloc local0
 M00000045_IL_0023:
-call instance System.Tasks.Promise<System.Result<T0,System.Web.Http.Json.HttpJsonError>>::get_Task()
+call instance System.Concurrency.Tasks.Promise<System.Result<T0,System.Web.Http.Json.HttpJsonError>>::get_Task()
 M00000045_IL_0028:
 ret
 M00000045_IL_0029:
@@ -414,11 +414,11 @@ call System.Web.Http.Json.JsonClientOperations::Get(System.Web.Http.HttpClient,S
 M00000045_IL_0050:
 ldloc local1
 M00000045_IL_0051:
-call System.Tasks.TaskOperators::Map<System.Result<System.Object,System.Web.Http.Json.HttpJsonError>,System.Result<T0,System.Web.Http.Json.HttpJsonError>>(System.Tasks.Task<System.Result<System.Object,System.Web.Http.Json.HttpJsonError>>,fn<System.Result<System.Object,System.Web.Http.Json.HttpJsonError>,System.Result<T0,System.Web.Http.Json.HttpJsonError>>)
+call System.Concurrency.Tasks.TaskOperators::Map<System.Result<System.Object,System.Web.Http.Json.HttpJsonError>,System.Result<T0,System.Web.Http.Json.HttpJsonError>>(System.Concurrency.Tasks.Task<System.Result<System.Object,System.Web.Http.Json.HttpJsonError>>,fn<System.Result<System.Object,System.Web.Http.Json.HttpJsonError>,System.Result<T0,System.Web.Http.Json.HttpJsonError>>)
 M00000045_IL_0056:
 ret
 .end
-.function System.Web.Http.Json.HttpClientJsonExtensions.PostAsJsonText<T0>(System.Web.Http.HttpClient self,String url,T0 value) -> System.Tasks.Task<System.Result<System.Web.Http.HttpResponse,System.Web.Http.Json.HttpJsonError>>
+.function System.Web.Http.Json.HttpClientJsonExtensions.PostAsJsonText<T0>(System.Web.Http.HttpClient self,String url,T0 value) -> System.Concurrency.Tasks.Task<System.Result<System.Web.Http.HttpResponse,System.Web.Http.Json.HttpJsonError>>
 M00000046_IL_0000:
 M00000046_IL_0001:
 M00000046_IL_0002:
@@ -436,7 +436,7 @@ call System.Web.Http.Json.JsonClientOperations::Post(System.Web.Http.HttpClient,
 M00000046_IL_0014:
 ret
 .end
-.function System.Web.Http.Json.HttpClientJsonExtensions.PostAsJsonTextWithToken<T0>(System.Web.Http.HttpClient self,String url,T0 value,System.Concurrency.CancellationToken cancellationToken) -> System.Tasks.Task<System.Result<System.Web.Http.HttpResponse,System.Web.Http.Json.HttpJsonError>>
+.function System.Web.Http.Json.HttpClientJsonExtensions.PostAsJsonTextWithToken<T0>(System.Web.Http.HttpClient self,String url,T0 value,System.Concurrency.CancellationToken cancellationToken) -> System.Concurrency.Tasks.Task<System.Result<System.Web.Http.HttpResponse,System.Web.Http.Json.HttpJsonError>>
 M00000047_IL_0000:
 M00000047_IL_0001:
 M00000047_IL_0002:
@@ -454,7 +454,7 @@ call System.Web.Http.Json.JsonClientOperations::Post(System.Web.Http.HttpClient,
 M00000047_IL_0010:
 ret
 .end
-.function System.Web.Http.Json.HttpClientJsonExtensions.PostAsJsonUri<T0>(System.Web.Http.HttpClient self,System.Uri url,T0 value) -> System.Tasks.Task<System.Result<System.Web.Http.HttpResponse,System.Web.Http.Json.HttpJsonError>>
+.function System.Web.Http.Json.HttpClientJsonExtensions.PostAsJsonUri<T0>(System.Web.Http.HttpClient self,System.Uri url,T0 value) -> System.Concurrency.Tasks.Task<System.Result<System.Web.Http.HttpResponse,System.Web.Http.Json.HttpJsonError>>
 M00000048_IL_0000:
 M00000048_IL_0001:
 M00000048_IL_0002:
@@ -472,7 +472,7 @@ call System.Web.Http.Json.JsonClientOperations::Post(System.Web.Http.HttpClient,
 M00000048_IL_0014:
 ret
 .end
-.function System.Web.Http.Json.HttpClientJsonExtensions.PostAsJsonUriWithToken<T0>(System.Web.Http.HttpClient self,System.Uri url,T0 value,System.Concurrency.CancellationToken cancellationToken) -> System.Tasks.Task<System.Result<System.Web.Http.HttpResponse,System.Web.Http.Json.HttpJsonError>>
+.function System.Web.Http.Json.HttpClientJsonExtensions.PostAsJsonUriWithToken<T0>(System.Web.Http.HttpClient self,System.Uri url,T0 value,System.Concurrency.CancellationToken cancellationToken) -> System.Concurrency.Tasks.Task<System.Result<System.Web.Http.HttpResponse,System.Web.Http.Json.HttpJsonError>>
 M00000049_IL_0000:
 M00000049_IL_0001:
 M00000049_IL_0002:
@@ -12063,7 +12063,7 @@ ldloc local1
 M0000004c_IL_009d:
 ret
 .end
-.method static Get(System.Web.Http.HttpClient client,String url,System.Introspection.TypeInfo type,System.Concurrency.CancellationToken token) -> System.Tasks.Task<System.Result<System.Object,System.Web.Http.Json.HttpJsonError>>
+.method static Get(System.Web.Http.HttpClient client,String url,System.Introspection.TypeInfo type,System.Concurrency.CancellationToken token) -> System.Concurrency.Tasks.Task<System.Result<System.Object,System.Web.Http.Json.HttpJsonError>>
 M0000004d_IL_0000:
 M0000004d_IL_0001:
 M0000004d_IL_0002:
@@ -12082,22 +12082,22 @@ M0000004d_IL_0010:
 M0000004d_IL_0016:
 function.bind fn<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>,System.Result<System.Object,System.Web.Http.Json.HttpJsonError>> = instance System.Web.Http.Json.JsonClientRead::Decode(System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>)
 M0000004d_IL_001b:
-call System.Tasks.TaskOperators::Map<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>,System.Result<System.Object,System.Web.Http.Json.HttpJsonError>>(System.Tasks.Task<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>>,fn<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>,System.Result<System.Object,System.Web.Http.Json.HttpJsonError>>)
+call System.Concurrency.Tasks.TaskOperators::Map<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>,System.Result<System.Object,System.Web.Http.Json.HttpJsonError>>(System.Concurrency.Tasks.Task<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>>,fn<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>,System.Result<System.Object,System.Web.Http.Json.HttpJsonError>>)
 M0000004d_IL_0020:
 ret
 .end
-.method static Post(System.Web.Http.HttpClient client,String url,System.Object value,System.Concurrency.CancellationToken token) -> System.Tasks.Task<System.Result<System.Web.Http.HttpResponse,System.Web.Http.Json.HttpJsonError>>
-.local System.Tasks.Promise<System.Result<System.Web.Http.HttpResponse,System.Web.Http.Json.HttpJsonError>> local0
+.method static Post(System.Web.Http.HttpClient client,String url,System.Object value,System.Concurrency.CancellationToken token) -> System.Concurrency.Tasks.Task<System.Result<System.Web.Http.HttpResponse,System.Web.Http.Json.HttpJsonError>>
+.local System.Concurrency.Tasks.Promise<System.Result<System.Web.Http.HttpResponse,System.Web.Http.Json.HttpJsonError>> local0
 .local System.Result<System.Web.Http.HttpContent,System.Data.Json.JsonError> local1
 .local System.Web.Http.HttpContent local2
 .local System.Data.Json.JsonError local3
-.local System.Tasks.Promise<System.Result<System.Web.Http.HttpResponse,System.Web.Http.Json.HttpJsonError>> local4
+.local System.Concurrency.Tasks.Promise<System.Result<System.Web.Http.HttpResponse,System.Web.Http.Json.HttpJsonError>> local4
 .local System.Result<System.Web.Http.HttpContent,System.Data.Json.JsonError> local5
 .local System.Result.Ok<System.Web.Http.HttpContent> local6
 .local System.Result<System.Web.Http.HttpContent,System.Data.Json.JsonError> local7
 .local System.Result.Error<System.Data.Json.JsonError> local8
 ldloca local0
-initobj System.Tasks.Promise<System.Result<System.Web.Http.HttpResponse,System.Web.Http.Json.HttpJsonError>>
+initobj System.Concurrency.Tasks.Promise<System.Result<System.Web.Http.HttpResponse,System.Web.Http.Json.HttpJsonError>>
 ldloca local1
 initobj System.Result<System.Web.Http.HttpContent,System.Data.Json.JsonError>
 ldloca local2
@@ -12105,7 +12105,7 @@ initobj System.Web.Http.HttpContent
 ldloca local3
 initobj System.Data.Json.JsonError
 ldloca local4
-initobj System.Tasks.Promise<System.Result<System.Web.Http.HttpResponse,System.Web.Http.Json.HttpJsonError>>
+initobj System.Concurrency.Tasks.Promise<System.Result<System.Web.Http.HttpResponse,System.Web.Http.Json.HttpJsonError>>
 ldloca local5
 initobj System.Result<System.Web.Http.HttpContent,System.Data.Json.JsonError>
 ldloca local6
@@ -12127,13 +12127,13 @@ M0000004e_IL_000e:
 br M0000004e_IL_0029
 M0000004e_IL_0013:
 M0000004e_IL_0014:
-newobj instance System.Tasks.Promise<System.Result<System.Web.Http.HttpResponse,System.Web.Http.Json.HttpJsonError>>::.ctor()
+newobj instance System.Concurrency.Tasks.Promise<System.Result<System.Web.Http.HttpResponse,System.Web.Http.Json.HttpJsonError>>::.ctor()
 M0000004e_IL_0019:
 stloc local0
 M0000004e_IL_001a:
 ldloc local0
 M0000004e_IL_001b:
-call instance System.Tasks.Promise<System.Result<System.Web.Http.HttpResponse,System.Web.Http.Json.HttpJsonError>>::Cancel()
+call instance System.Concurrency.Tasks.Promise<System.Result<System.Web.Http.HttpResponse,System.Web.Http.Json.HttpJsonError>>::Cancel()
 call neoCLR.Library.System.Data.Json.JsonValue.RuntimeBooleanToInt32(Boolean)
 M0000004e_IL_0020:
 pop
@@ -12141,7 +12141,7 @@ M0000004e_IL_0021:
 M0000004e_IL_0022:
 ldloc local0
 M0000004e_IL_0023:
-call instance System.Tasks.Promise<System.Result<System.Web.Http.HttpResponse,System.Web.Http.Json.HttpJsonError>>::get_Task()
+call instance System.Concurrency.Tasks.Promise<System.Result<System.Web.Http.HttpResponse,System.Web.Http.Json.HttpJsonError>>::get_Task()
 M0000004e_IL_0028:
 ret
 M0000004e_IL_0029:
@@ -12196,7 +12196,7 @@ M0000004e_IL_0070:
 M0000004e_IL_0076:
 function.bind fn<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>,System.Result<System.Web.Http.HttpResponse,System.Web.Http.Json.HttpJsonError>> = System.Web.Http.Json.JsonClientOperations.Adapt(System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>)
 M0000004e_IL_007b:
-call System.Tasks.TaskOperators::Map<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>,System.Result<System.Web.Http.HttpResponse,System.Web.Http.Json.HttpJsonError>>(System.Tasks.Task<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>>,fn<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>,System.Result<System.Web.Http.HttpResponse,System.Web.Http.Json.HttpJsonError>>)
+call System.Concurrency.Tasks.TaskOperators::Map<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>,System.Result<System.Web.Http.HttpResponse,System.Web.Http.Json.HttpJsonError>>(System.Concurrency.Tasks.Task<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>>,fn<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>,System.Result<System.Web.Http.HttpResponse,System.Web.Http.Json.HttpJsonError>>)
 M0000004e_IL_0080:
 ret
 M0000004e_IL_0087:
@@ -12230,7 +12230,7 @@ M0000004e_IL_00b6:
 br M0000004e_IL_00e8
 M0000004e_IL_00bb:
 M0000004e_IL_00bc:
-newobj instance System.Tasks.Promise<System.Result<System.Web.Http.HttpResponse,System.Web.Http.Json.HttpJsonError>>::.ctor()
+newobj instance System.Concurrency.Tasks.Promise<System.Result<System.Web.Http.HttpResponse,System.Web.Http.Json.HttpJsonError>>::.ctor()
 M0000004e_IL_00c1:
 stloc local4
 M0000004e_IL_00c3:
@@ -12246,14 +12246,14 @@ call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion77(System.Web.Http.Js
 M0000004e_IL_00d5:
 call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion78(System.Result.Error<System.Web.Http.Json.HttpJsonError>)
 M0000004e_IL_00da:
-call instance System.Tasks.Promise<System.Result<System.Web.Http.HttpResponse,System.Web.Http.Json.HttpJsonError>>::Complete(System.Result<System.Web.Http.HttpResponse,System.Web.Http.Json.HttpJsonError>)
+call instance System.Concurrency.Tasks.Promise<System.Result<System.Web.Http.HttpResponse,System.Web.Http.Json.HttpJsonError>>::Complete(System.Result<System.Web.Http.HttpResponse,System.Web.Http.Json.HttpJsonError>)
 call neoCLR.Library.System.Data.Json.JsonValue.RuntimeBooleanToInt32(Boolean)
 M0000004e_IL_00df:
 pop
 M0000004e_IL_00e0:
 ldloc local4
 M0000004e_IL_00e2:
-call instance System.Tasks.Promise<System.Result<System.Web.Http.HttpResponse,System.Web.Http.Json.HttpJsonError>>::get_Task()
+call instance System.Concurrency.Tasks.Promise<System.Result<System.Web.Http.HttpResponse,System.Web.Http.Json.HttpJsonError>>::get_Task()
 M0000004e_IL_00e7:
 ret
 M0000004e_IL_00e8:
@@ -12265,7 +12265,7 @@ M0000004e_IL_00f0:
 call System.Fail(String)
 fault "System.Fail returned unexpectedly"
 .end
-.method static Get(System.Web.Http.HttpClient client,System.Uri url,System.Introspection.TypeInfo type,System.Concurrency.CancellationToken token) -> System.Tasks.Task<System.Result<System.Object,System.Web.Http.Json.HttpJsonError>>
+.method static Get(System.Web.Http.HttpClient client,System.Uri url,System.Introspection.TypeInfo type,System.Concurrency.CancellationToken token) -> System.Concurrency.Tasks.Task<System.Result<System.Object,System.Web.Http.Json.HttpJsonError>>
 M0000004f_IL_0000:
 M0000004f_IL_0001:
 M0000004f_IL_0002:
@@ -12284,22 +12284,22 @@ M0000004f_IL_0010:
 M0000004f_IL_0016:
 function.bind fn<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>,System.Result<System.Object,System.Web.Http.Json.HttpJsonError>> = instance System.Web.Http.Json.JsonClientRead::Decode(System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>)
 M0000004f_IL_001b:
-call System.Tasks.TaskOperators::Map<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>,System.Result<System.Object,System.Web.Http.Json.HttpJsonError>>(System.Tasks.Task<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>>,fn<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>,System.Result<System.Object,System.Web.Http.Json.HttpJsonError>>)
+call System.Concurrency.Tasks.TaskOperators::Map<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>,System.Result<System.Object,System.Web.Http.Json.HttpJsonError>>(System.Concurrency.Tasks.Task<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>>,fn<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>,System.Result<System.Object,System.Web.Http.Json.HttpJsonError>>)
 M0000004f_IL_0020:
 ret
 .end
-.method static Post(System.Web.Http.HttpClient client,System.Uri url,System.Object value,System.Concurrency.CancellationToken token) -> System.Tasks.Task<System.Result<System.Web.Http.HttpResponse,System.Web.Http.Json.HttpJsonError>>
-.local System.Tasks.Promise<System.Result<System.Web.Http.HttpResponse,System.Web.Http.Json.HttpJsonError>> local0
+.method static Post(System.Web.Http.HttpClient client,System.Uri url,System.Object value,System.Concurrency.CancellationToken token) -> System.Concurrency.Tasks.Task<System.Result<System.Web.Http.HttpResponse,System.Web.Http.Json.HttpJsonError>>
+.local System.Concurrency.Tasks.Promise<System.Result<System.Web.Http.HttpResponse,System.Web.Http.Json.HttpJsonError>> local0
 .local System.Result<System.Web.Http.HttpContent,System.Data.Json.JsonError> local1
 .local System.Web.Http.HttpContent local2
 .local System.Data.Json.JsonError local3
-.local System.Tasks.Promise<System.Result<System.Web.Http.HttpResponse,System.Web.Http.Json.HttpJsonError>> local4
+.local System.Concurrency.Tasks.Promise<System.Result<System.Web.Http.HttpResponse,System.Web.Http.Json.HttpJsonError>> local4
 .local System.Result<System.Web.Http.HttpContent,System.Data.Json.JsonError> local5
 .local System.Result.Ok<System.Web.Http.HttpContent> local6
 .local System.Result<System.Web.Http.HttpContent,System.Data.Json.JsonError> local7
 .local System.Result.Error<System.Data.Json.JsonError> local8
 ldloca local0
-initobj System.Tasks.Promise<System.Result<System.Web.Http.HttpResponse,System.Web.Http.Json.HttpJsonError>>
+initobj System.Concurrency.Tasks.Promise<System.Result<System.Web.Http.HttpResponse,System.Web.Http.Json.HttpJsonError>>
 ldloca local1
 initobj System.Result<System.Web.Http.HttpContent,System.Data.Json.JsonError>
 ldloca local2
@@ -12307,7 +12307,7 @@ initobj System.Web.Http.HttpContent
 ldloca local3
 initobj System.Data.Json.JsonError
 ldloca local4
-initobj System.Tasks.Promise<System.Result<System.Web.Http.HttpResponse,System.Web.Http.Json.HttpJsonError>>
+initobj System.Concurrency.Tasks.Promise<System.Result<System.Web.Http.HttpResponse,System.Web.Http.Json.HttpJsonError>>
 ldloca local5
 initobj System.Result<System.Web.Http.HttpContent,System.Data.Json.JsonError>
 ldloca local6
@@ -12329,13 +12329,13 @@ M00000050_IL_000e:
 br M00000050_IL_0029
 M00000050_IL_0013:
 M00000050_IL_0014:
-newobj instance System.Tasks.Promise<System.Result<System.Web.Http.HttpResponse,System.Web.Http.Json.HttpJsonError>>::.ctor()
+newobj instance System.Concurrency.Tasks.Promise<System.Result<System.Web.Http.HttpResponse,System.Web.Http.Json.HttpJsonError>>::.ctor()
 M00000050_IL_0019:
 stloc local0
 M00000050_IL_001a:
 ldloc local0
 M00000050_IL_001b:
-call instance System.Tasks.Promise<System.Result<System.Web.Http.HttpResponse,System.Web.Http.Json.HttpJsonError>>::Cancel()
+call instance System.Concurrency.Tasks.Promise<System.Result<System.Web.Http.HttpResponse,System.Web.Http.Json.HttpJsonError>>::Cancel()
 call neoCLR.Library.System.Data.Json.JsonValue.RuntimeBooleanToInt32(Boolean)
 M00000050_IL_0020:
 pop
@@ -12343,7 +12343,7 @@ M00000050_IL_0021:
 M00000050_IL_0022:
 ldloc local0
 M00000050_IL_0023:
-call instance System.Tasks.Promise<System.Result<System.Web.Http.HttpResponse,System.Web.Http.Json.HttpJsonError>>::get_Task()
+call instance System.Concurrency.Tasks.Promise<System.Result<System.Web.Http.HttpResponse,System.Web.Http.Json.HttpJsonError>>::get_Task()
 M00000050_IL_0028:
 ret
 M00000050_IL_0029:
@@ -12398,7 +12398,7 @@ M00000050_IL_0070:
 M00000050_IL_0076:
 function.bind fn<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>,System.Result<System.Web.Http.HttpResponse,System.Web.Http.Json.HttpJsonError>> = System.Web.Http.Json.JsonClientOperations.Adapt(System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>)
 M00000050_IL_007b:
-call System.Tasks.TaskOperators::Map<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>,System.Result<System.Web.Http.HttpResponse,System.Web.Http.Json.HttpJsonError>>(System.Tasks.Task<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>>,fn<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>,System.Result<System.Web.Http.HttpResponse,System.Web.Http.Json.HttpJsonError>>)
+call System.Concurrency.Tasks.TaskOperators::Map<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>,System.Result<System.Web.Http.HttpResponse,System.Web.Http.Json.HttpJsonError>>(System.Concurrency.Tasks.Task<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>>,fn<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>,System.Result<System.Web.Http.HttpResponse,System.Web.Http.Json.HttpJsonError>>)
 M00000050_IL_0080:
 ret
 M00000050_IL_0087:
@@ -12432,7 +12432,7 @@ M00000050_IL_00b6:
 br M00000050_IL_00e8
 M00000050_IL_00bb:
 M00000050_IL_00bc:
-newobj instance System.Tasks.Promise<System.Result<System.Web.Http.HttpResponse,System.Web.Http.Json.HttpJsonError>>::.ctor()
+newobj instance System.Concurrency.Tasks.Promise<System.Result<System.Web.Http.HttpResponse,System.Web.Http.Json.HttpJsonError>>::.ctor()
 M00000050_IL_00c1:
 stloc local4
 M00000050_IL_00c3:
@@ -12448,14 +12448,14 @@ call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion77(System.Web.Http.Js
 M00000050_IL_00d5:
 call neoCLR.Library.System.Data.Json.JsonValue.RuntimeUnion78(System.Result.Error<System.Web.Http.Json.HttpJsonError>)
 M00000050_IL_00da:
-call instance System.Tasks.Promise<System.Result<System.Web.Http.HttpResponse,System.Web.Http.Json.HttpJsonError>>::Complete(System.Result<System.Web.Http.HttpResponse,System.Web.Http.Json.HttpJsonError>)
+call instance System.Concurrency.Tasks.Promise<System.Result<System.Web.Http.HttpResponse,System.Web.Http.Json.HttpJsonError>>::Complete(System.Result<System.Web.Http.HttpResponse,System.Web.Http.Json.HttpJsonError>)
 call neoCLR.Library.System.Data.Json.JsonValue.RuntimeBooleanToInt32(Boolean)
 M00000050_IL_00df:
 pop
 M00000050_IL_00e0:
 ldloc local4
 M00000050_IL_00e2:
-call instance System.Tasks.Promise<System.Result<System.Web.Http.HttpResponse,System.Web.Http.Json.HttpJsonError>>::get_Task()
+call instance System.Concurrency.Tasks.Promise<System.Result<System.Web.Http.HttpResponse,System.Web.Http.Json.HttpJsonError>>::get_Task()
 M00000050_IL_00e7:
 ret
 M00000050_IL_00e8:

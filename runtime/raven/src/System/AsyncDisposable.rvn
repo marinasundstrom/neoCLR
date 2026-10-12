@@ -1,6 +1,6 @@
 module System
 
-import System.Tasks.*
+import System.Concurrency.Tasks.*
 
 /// A resource whose cleanup may suspend. Await disposal before releasing its owner.
 public interface AsyncDisposable {

@@ -26,9 +26,9 @@ buffer ownership lasts until settlement; cancellation may follow partial progres
 and does not imply rollback. Serial use is required unless a provider explicitly
 supports concurrent operations. No return-type overload resolution change is needed.
 
-**Next authorized slice:** after this migration, move System.Tasks to
-System.Concurrency.Tasks separately, then continue SSL and foundational
-System.Security.Cryptography work. The namespace move includes compiler/runtime
+**Subsequent slice completed:** System.Tasks moved to System.Concurrency.Tasks
+with [matching compiler/runtime qualification](task-namespace-migration.md). Continue
+with SSL and foundational System.Security.Cryptography work. The namespace move includes compiler/runtime
 contract mappings, consumers and reference documentation; it is not just an import
 rename. This supersedes the earlier exploratory naming discussion below.
 

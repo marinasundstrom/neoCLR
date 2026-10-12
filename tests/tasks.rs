@@ -15,7 +15,7 @@ fn library() -> &'static Module {
 }
 fn load(body: &str) -> Result<LoadedProgram, String> {
     let source = format!(".module App\n.entry Main\n.function Main() -> Int32\n{body}\nret\n.end")
-        .replace("Tasks.", "System.Tasks.")
+        .replace("Tasks.", "System.Concurrency.Tasks.")
         + "\n"
         + include_str!("fixtures/union-patterns.neoil");
     let app = neoclr::assembler::read_modules(

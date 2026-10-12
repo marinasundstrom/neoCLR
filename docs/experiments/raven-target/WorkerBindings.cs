@@ -10,18 +10,18 @@ static class WorkerBindings
     public const string Declarations = """
         namespace Concurrency {
             public sealed class WorkerCompletion {
-                public WorkerCompletion(int handle, Tasks.Promise<string> source) { }
+                public WorkerCompletion(int handle, Concurrency.Tasks.Promise<string> source) { }
                 public void Complete() { }
             }
             public sealed class Thread {
                 public Thread(Func<string, string> callback, string input) { }
-                public Tasks.Task<string> Task => default;
+                public Concurrency.Tasks.Task<string> Task => default;
                 public bool IsStarted => default;
                 public void Start() { }
-                public static Tasks.Task<string> Run(Func<string, string> callback, string input) => default;
+                public static Concurrency.Tasks.Task<string> Run(Func<string, string> callback, string input) => default;
             }
             public sealed class ThreadPool {
-                public static Tasks.Task<string> Queue(Func<string, string> callback, string input) => default;
+                public static Concurrency.Tasks.Task<string> Queue(Func<string, string> callback, string input) => default;
             }
         }
         """;
@@ -39,12 +39,12 @@ static class WorkerBindings
         if (owner is null) return null;
         var (args, result) = RuntimeSignatures.Match(reference, definition, GenericUnionBindings.Type);
         var expected = (owner, definition.Name) switch {
-            (Prefix + "WorkerCompletion", ".ctor") when library => ("Int32,System.Tasks.Promise<String>", "noresult", false),
+            (Prefix + "WorkerCompletion", ".ctor") when library => ("Int32,System.Concurrency.Tasks.Promise<String>", "noresult", false),
             (Prefix + "WorkerCompletion", "Complete") when library => ("", "noresult", false),
-            (Prefix + "Thread", "Run") or (Prefix + "ThreadPool", "Queue") => ("fn<String,String>,String", "System.Tasks.Task<String>", true),
+            (Prefix + "Thread", "Run") or (Prefix + "ThreadPool", "Queue") => ("fn<String,String>,String", "System.Concurrency.Tasks.Task<String>", true),
             (Prefix + "Thread", ".ctor") => ("fn<String,String>,String", "noresult", false),
             (Prefix + "Thread", "Start") => ("", "noresult", false),
-            (Prefix + "Thread", "get_Task") => ("", "System.Tasks.Task<String>", false),
+            (Prefix + "Thread", "get_Task") => ("", "System.Concurrency.Tasks.Task<String>", false),
             (Prefix + "Thread", "get_IsStarted") => ("", "Boolean", false),
             _ => throw new InvalidDataException("Unsupported worker member.")
         };

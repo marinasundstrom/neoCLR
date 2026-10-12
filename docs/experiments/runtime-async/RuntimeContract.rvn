@@ -1,7 +1,7 @@
 // A second awaitable implementation: completion/result storage belongs to the runtime.
 module RuntimeContractSample {
     import System.*
-    import System.Tasks.*
+    import System.Concurrency.Tasks.*
     import System.Runtime.CompilerServices.*
 
     import RuntimeOperationContracts.*
@@ -167,7 +167,7 @@ module RuntimeContractSample {
 }
 
 module RuntimeContractProvider {
-    import System.Tasks.*
+    import System.Concurrency.Tasks.*
     static class Bridge {
         static func Start<T>(body: () -> TaskOutcome<T>) -> Task<T> => RuntimeAwaitProvider.Bridge.Start<T>(body)
         static func Complete<T>(value: T) -> TaskOutcome<T> => RuntimeAwaitProvider.Bridge.Complete<T>(value)

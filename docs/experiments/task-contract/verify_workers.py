@@ -15,7 +15,7 @@ parent = Path(__file__).resolve().parents[1]
 samples = parent / 'samples' if (parent / 'samples').is_dir() else parent / 'raven-target/samples'
 sample = samples / 'library-workers.rvn'
 prelude = '''import System.*
-import System.Tasks.*
+import System.Concurrency.Tasks.*
 import System.Concurrency.*
 import System.Console.*
 public func Echo(value: string) -> string => value

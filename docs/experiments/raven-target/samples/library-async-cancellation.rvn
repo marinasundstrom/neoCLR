@@ -1,7 +1,7 @@
 import System.*
-import System.Tasks.*
+import System.Concurrency.Tasks.*
 import System.Option.*
-import System.Tasks.TaskOutcome.*
+import System.Concurrency.Tasks.TaskOutcome.*
 import System.Console.*
 
 async func Read(input: Task<int>) -> Task<int> {

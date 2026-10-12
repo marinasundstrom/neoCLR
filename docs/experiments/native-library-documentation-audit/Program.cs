@@ -123,7 +123,7 @@ foreach (var assembly in assemblies) Visit(assembly.GlobalNamespace);
 File.WriteAllText(Path.Combine(output, "types.json"), JsonSerializer.Serialize(inventory, new JsonSerializerOptions { WriteIndented = true }));
 var site = Path.Combine(output, "site");
 var apiOutput = site;
-var options = new DocumentationSiteOptions([], ExtensionNamespaces: ["System", "System.Collections", "System.Linq", "System.Runtime.Reflection", "System.Tasks"]);
+var options = new DocumentationSiteOptions([], ExtensionNamespaces: ["System", "System.Collections", "System.Linq", "System.Runtime.Reflection", "System.Concurrency.Tasks"]);
 if (args.Length == 3)
 {
     var repository = Path.GetFullPath(args[2]);

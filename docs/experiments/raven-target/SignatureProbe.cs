@@ -61,16 +61,16 @@ static class SignatureProbe
         }
         foreach (var entryResult in new TypeReference[] {
             EntryGeneric("System.Result`2", module.TypeSystem.Int32, module.TypeSystem.String),
-            EntryGeneric("System.Tasks.Task`1", module.TypeSystem.Int32),
-            EntryGeneric("System.Tasks.Task`1", EntryGeneric("System.Result`2", module.TypeSystem.Int32, module.TypeSystem.String)) }) {
+            EntryGeneric("System.Concurrency.Tasks.Task`1", module.TypeSystem.Int32),
+            EntryGeneric("System.Concurrency.Tasks.Task`1", EntryGeneric("System.Result`2", module.TypeSystem.Int32, module.TypeSystem.String)) }) {
             entry.ReturnType = entryResult;
             Check("Entry return " + entryResult.FullName, EntryPointBindings.HasArguments(entry, true));
             Reject("Entry return outside collection profile " + entryResult.FullName, () => EntryPointBindings.HasArguments(entry, false));
         }
         foreach (var invalidResult in new TypeReference[] {
             EntryGeneric("System.Result`2", module.TypeSystem.String, module.TypeSystem.String),
-            EntryGeneric("System.Tasks.Task`1", module.TypeSystem.String),
-            EntryGeneric("System.Tasks.Task`1", EntryGeneric("System.Tasks.Task`1", module.TypeSystem.Int32)),
+            EntryGeneric("System.Concurrency.Tasks.Task`1", module.TypeSystem.String),
+            EntryGeneric("System.Concurrency.Tasks.Task`1", EntryGeneric("System.Concurrency.Tasks.Task`1", module.TypeSystem.Int32)),
             new ByReferenceType(module.TypeSystem.Int32) }) {
             entry.ReturnType = invalidResult;
             Reject("Invalid entry return " + invalidResult.FullName, () => EntryPointBindings.HasArguments(entry, true));
@@ -176,15 +176,15 @@ static class SignatureProbe
         directoryKind.Constant = 99;
         Reject("EntryKind literal contract mismatch", () => EnumBindings.Validate(module, EnumBindings.EntryKind));
         directoryKind.Constant = 2;
-        var outcome = new GenericInstanceType(module.GetType("System.Tasks.TaskOutcome`1"));
+        var outcome = new GenericInstanceType(module.GetType("System.Concurrency.Tasks.TaskOutcome`1"));
         outcome.GenericArguments.Add(module.TypeSystem.String);
-        Check("TaskOutcome is an ordinary union payload", GenericUnionBindings.Type(outcome) == "System.Tasks.TaskOutcome<String>");
+        Check("TaskOutcome is an ordinary union payload", GenericUnionBindings.Type(outcome) == "System.Concurrency.Tasks.TaskOutcome<String>");
         Check("TaskOutcome implements UnionValue without Result propagation",
             outcome.Resolve().Interfaces.Select(i => i.InterfaceType.FullName).SequenceEqual(new[] { StandardUnionLibrary.ProtocolName }));
-        var task = new GenericInstanceType(module.GetType("System.Tasks.Task`1"));
+        var task = new GenericInstanceType(module.GetType("System.Concurrency.Tasks.Task`1"));
         task.GenericArguments.Add(module.TypeSystem.String);
         var getOutcome = task.Resolve().Methods.Single(m => m.Name == "get_Outcome");
-        Check("Task exposes optional terminal outcome", TaskBindings.Bind(Reference(getOutcome, task), getOutcome, false, false)?.Result == "System.Option<System.Tasks.TaskOutcome<String>>");
+        Check("Task exposes optional terminal outcome", TaskBindings.Bind(Reference(getOutcome, task), getOutcome, false, false)?.Result == "System.Option<System.Concurrency.Tasks.TaskOutcome<String>>");
         var wrongOutcome = Reference(getOutcome, task);
         wrongOutcome.ReturnType = module.TypeSystem.String;
         Reject("Task outcome signature mismatch", () => TaskBindings.Bind(wrongOutcome, getOutcome, false, false));
@@ -700,7 +700,7 @@ static class SignatureProbe
             Reject("Unmarked static implementation cannot satisfy an extension contract", () =>
                 LibraryImplementation.CheckExtensionContract(implementation, original));
         }
-        foreach (var ownerName in new[] { "OptionOperators", "OptionNestedOperators", "ResultOperators", "Tasks.TaskOperators", "Tasks.TaskResultOperators" }) {
+        foreach (var ownerName in new[] { "OptionOperators", "OptionNestedOperators", "ResultOperators", "Concurrency.Tasks.TaskOperators", "Concurrency.Tasks.TaskResultOperators" }) {
             var operatorType = module.GetType("System." + ownerName);
             var index = 0;
             foreach (var operation in operatorType.Methods) {
@@ -710,8 +710,8 @@ static class SignatureProbe
                 var operatorTypeArguments = new[] { module.TypeSystem.Int32, module.TypeSystem.String, module.TypeSystem.Boolean };
                 for (var i = 0; i < operation.GenericParameters.Count; i++) call.GenericArguments.Add(operatorTypeArguments[i]);
                 var expected = (ownerName, operation.Name) switch {
-                    ("Tasks.TaskResultOperators", "MapResult") => "System.Tasks.Task<System.Result<Boolean,String>>",
-                    ("Tasks.TaskOperators", "Map" or "Then") => "System.Tasks.Task<String>",
+                    ("Concurrency.Tasks.TaskResultOperators", "MapResult") => "System.Concurrency.Tasks.Task<System.Result<Boolean,String>>",
+                    ("Concurrency.Tasks.TaskOperators", "Map" or "Then") => "System.Concurrency.Tasks.Task<String>",
                     ("OptionOperators", "Map" or "Then") => "System.Option<String>",
                     ("OptionOperators", "Match") => "String",
                     ("OptionOperators", "ThenResult" or "MapResult") => "System.Result<String,Boolean>",
@@ -759,7 +759,7 @@ static class SignatureProbe
         Check("Generic Void return stays a value signature", RuntimeSignatures.Match(voidInvoke, invoke, GenericUnionBindings.Type).Result == "Void");
         Check("Generic completion delegate preserves inhabited unit", FunctionBindings.Bind(voidInvoke, invoke, true)?.Result == "Void");
         Reject("Delegate requires virtual invocation", () => FunctionBindings.Bind(voidInvoke, invoke, false));
-        var taskDefinition = module.GetType("System.Tasks.Task`1");
+        var taskDefinition = module.GetType("System.Concurrency.Tasks.Task`1");
         var taskInt = new GenericInstanceType(taskDefinition);
         taskInt.GenericArguments.Add(module.TypeSystem.Int32);
         var getResult = taskDefinition.Methods.Single(m => m.Name == "GetResult");

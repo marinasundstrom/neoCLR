@@ -74,11 +74,11 @@ static class LibraryImplementation
             foreach (var name in names) ApplicationTypes.BindLibrary(source.GetType(name), name);
             return names.SelectMany(name => InstanceRoots(source.GetType(name), core.GetType(name), name)).ToArray();
         }
-        if (owner == "System.Tasks.Task" && includeTaskFamily)
+        if (owner == "System.Concurrency.Tasks.Task" && includeTaskFamily)
         {
-            var names = new[] { "System.Tasks.TaskQueue", "System.Tasks.Task`1", "System.Tasks.Promise`1", "System.Runtime.CompilerServices.AsyncTaskMethodBuilder`1", "System.Runtime.CompilerServices.AsyncStateMachine", "System.Runtime.CompilerServices.TaskAwaiter" };
+            var names = new[] { "System.Concurrency.Tasks.TaskQueue", "System.Concurrency.Tasks.Task`1", "System.Concurrency.Tasks.Promise`1", "System.Runtime.CompilerServices.AsyncTaskMethodBuilder`1", "System.Runtime.CompilerServices.AsyncStateMachine", "System.Runtime.CompilerServices.TaskAwaiter" };
             foreach (var name in names) ApplicationTypes.BindLibrary(source.GetType(name), name.Split('`')[0]);
-            return names.SelectMany(name => source.GetType(name).IsInterface ? InterfaceRoots(source.GetType(name), core.GetType(name), name) : InstanceRoots(source.GetType(name), core.GetType(name), name.Split('`')[0])).Concat(Roots(source, core, "System.Tasks.Task", includeTaskFamily: false)).Concat(Roots(source, core, "System.Tasks.TaskOperators")).Concat(Roots(source, core, "System.Tasks.TaskResultOperators")).ToArray();
+            return names.SelectMany(name => source.GetType(name).IsInterface ? InterfaceRoots(source.GetType(name), core.GetType(name), name) : InstanceRoots(source.GetType(name), core.GetType(name), name.Split('`')[0])).Concat(Roots(source, core, "System.Concurrency.Tasks.Task", includeTaskFamily: false)).Concat(Roots(source, core, "System.Concurrency.Tasks.TaskOperators")).Concat(Roots(source, core, "System.Concurrency.Tasks.TaskResultOperators")).ToArray();
         }
         if (owner == "System.Tuple")
             return Enumerable.Range(1, 7).SelectMany(n => {
@@ -99,7 +99,7 @@ static class LibraryImplementation
             var provider = owner.Replace(".Introspection.", ".Introspection.Runtime");
             return InstanceRoots(source.GetType(provider), core.GetType(provider), provider);
         }
-        if (owner is "System.Option" or "System.Result" or "System.Tasks.TaskOutcome")
+        if (owner is "System.Option" or "System.Result" or "System.Concurrency.Tasks.TaskOutcome")
         {
             var name = owner + (owner == "System.Result" ? "`2" : "`1");
             return StandardUnionLibrary.Roots(source.GetType(name), core.GetType(name));
@@ -141,7 +141,7 @@ static class LibraryImplementation
                 && m.Parameters.Zip(method.Parameters).All(p => p.First.Name == p.Second.Name && SameType(p.First.ParameterType, p.Second.ParameterType))).ToArray();
             if (matches.Length == 1) CheckMethod(matches[0]);
             if (matches.Length != 1) throw new InvalidDataException("Library export does not match reference contract: " + method.FullName);
-            if (owner is HttpJsonBindings.Extensions or "System.Runtime.Reflection.TypeReflectionExtensions" or "System.Runtime.Reflection.PropertyReflectionExtensions" or "System.Runtime.Reflection.ConstructorReflectionExtensions" or "System.Runtime.Reflection.MethodReflectionExtensions" or "System.Runtime.Reflection.FieldReflectionExtensions" or "System.Linq.Operators" or "System.OptionOperators" or "System.OptionNestedOperators" or "System.ResultOperators" or "System.Tasks.TaskOperators" or "System.Tasks.TaskResultOperators")
+            if (owner is HttpJsonBindings.Extensions or "System.Runtime.Reflection.TypeReflectionExtensions" or "System.Runtime.Reflection.PropertyReflectionExtensions" or "System.Runtime.Reflection.ConstructorReflectionExtensions" or "System.Runtime.Reflection.MethodReflectionExtensions" or "System.Runtime.Reflection.FieldReflectionExtensions" or "System.Linq.Operators" or "System.OptionOperators" or "System.OptionNestedOperators" or "System.ResultOperators" or "System.Concurrency.Tasks.TaskOperators" or "System.Concurrency.Tasks.TaskResultOperators")
                 CheckExtensionContract(method, matches[0]);
         }
         return methods.Concat(consoleProviders).ToArray();
@@ -296,7 +296,7 @@ static class LibraryImplementation
                 return right is GenericInstanceType r && MatchType(l.ElementType, r.ElementType)
                     && l.GenericArguments.Count == r.GenericArguments.Count
                     && l.GenericArguments.Zip(r.GenericArguments).All(p => MatchType(p.First, p.Second));
-            if (left.FullName is "System.Option/None" or "System.Option/Some`1" or "System.Result/Ok`1" or "System.Result/Error`1" or "System.Tasks.TaskOutcome/Completed`1" or "System.Tasks.TaskOutcome/Cancelled"
+            if (left.FullName is "System.Option/None" or "System.Option/Some`1" or "System.Result/Ok`1" or "System.Result/Error`1" or "System.Concurrency.Tasks.TaskOutcome/Completed`1" or "System.Concurrency.Tasks.TaskOutcome/Cancelled"
                 && left.FullName == right.FullName && GenericUnionLibrary.IsCase(left.Resolve()) && GenericUnionLibrary.IsCase(right.Resolve())
                 && RuntimeSignatures.IsCore(left.Scope) && ApplicationTypes.IsLibrary(right)) return true;
             return AsyncBindings.SameType(left, right) || TaskBindings.SameType(left, right) || DescriptorLibrary.SameType(left, right) || SameTypeArgument(left, right) || ErrorCarrierLibrary.SameCase(left, right, type, contract) || (left.FullName == contract.FullName && right.FullName == type.FullName
@@ -420,7 +420,7 @@ static class LibraryImplementation
                 && !(owner == JsonBindings.Root && (h.StartsWith(HttpJsonBindings.Extensions + ".", StringComparison.Ordinal) || h.StartsWith(HttpJsonBindings.Operations + ".Convert<", StringComparison.Ordinal)))
                 && !(owner == JsonBindings.Root && h is "System.Data.Json.JsonSerializer.DeserializeText<T0>" or "System.Data.Json.JsonSerializer.DeserializeStream<T0>" or "System.Web.Http.Json.JsonContent.ReadModel<T0>")
                 && !(owner == "System.Introspection.MemberInfo" && (h.StartsWith("System.Runtime.Reflection.TypeReflectionExtensions.", StringComparison.Ordinal) || h.StartsWith("System.Runtime.Reflection.PropertyReflectionExtensions.", StringComparison.Ordinal) || h.StartsWith("System.Runtime.Reflection.ConstructorReflectionExtensions.", StringComparison.Ordinal) || h.StartsWith("System.Runtime.Reflection.MethodReflectionExtensions.", StringComparison.Ordinal) || h.StartsWith("System.Runtime.Reflection.FieldReflectionExtensions.", StringComparison.Ordinal)))
-                && !(owner == "System.Tasks.Task" && (h.StartsWith("System.Tasks.TaskOperators.", StringComparison.Ordinal) || h.StartsWith("System.Tasks.TaskResultOperators.", StringComparison.Ordinal)))).ToArray();
+                && !(owner == "System.Concurrency.Tasks.Task" && (h.StartsWith("System.Concurrency.Tasks.TaskOperators.", StringComparison.Ordinal) || h.StartsWith("System.Concurrency.Tasks.TaskResultOperators.", StringComparison.Ordinal)))).ToArray();
         // Adapters generated from open signatures must themselves declare the free
         // method parameters. Propagate through helper calls before qualifying names.
         var bodies = Regex.Matches(text, @"(?ms)^\.function (?:internal )?([^\(]+)\(.*?^\.end\r?$")
@@ -442,7 +442,7 @@ static class LibraryImplementation
                 && !(owner == JsonBindings.Root && (h.StartsWith(HttpJsonBindings.Extensions + ".", StringComparison.Ordinal) || h.StartsWith(HttpJsonBindings.Operations + ".Convert<", StringComparison.Ordinal)))
                 && !(owner == JsonBindings.Root && h is "System.Data.Json.JsonSerializer.DeserializeText<T0>" or "System.Data.Json.JsonSerializer.DeserializeStream<T0>" or "System.Web.Http.Json.JsonContent.ReadModel<T0>")
                 && !(owner == "System.Introspection.MemberInfo" && (h.StartsWith("System.Runtime.Reflection.TypeReflectionExtensions.", StringComparison.Ordinal) || h.StartsWith("System.Runtime.Reflection.PropertyReflectionExtensions.", StringComparison.Ordinal) || h.StartsWith("System.Runtime.Reflection.ConstructorReflectionExtensions.", StringComparison.Ordinal) || h.StartsWith("System.Runtime.Reflection.MethodReflectionExtensions.", StringComparison.Ordinal) || h.StartsWith("System.Runtime.Reflection.FieldReflectionExtensions.", StringComparison.Ordinal)))
-                && !(owner == "System.Tasks.Task" && (h.StartsWith("System.Tasks.TaskOperators.", StringComparison.Ordinal) || h.StartsWith("System.Tasks.TaskResultOperators.", StringComparison.Ordinal)))))
+                && !(owner == "System.Concurrency.Tasks.Task" && (h.StartsWith("System.Concurrency.Tasks.TaskOperators.", StringComparison.Ordinal) || h.StartsWith("System.Concurrency.Tasks.TaskResultOperators.", StringComparison.Ordinal)))))
         {
             var generic = parameters[helper].Count == 0 ? "" : "<" + string.Join(',',
                 parameters[helper].OrderBy(p => int.Parse(p[1..]))) + ">";

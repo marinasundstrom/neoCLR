@@ -1,7 +1,7 @@
 module SchedulerContinuations {
     import System.*
     import System.Collections.*
-    import System.Tasks.*
+    import System.Concurrency.Tasks.*
     import System.Runtime.CompilerServices.*
 
     async func Consume(completion: Completion) -> Task<int> {

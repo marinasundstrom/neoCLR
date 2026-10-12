@@ -63,7 +63,7 @@ with tempfile.TemporaryDirectory(prefix='neoclr-union-reference-') as directory:
     report = run(['dotnet', bridge, '--union-metadata-report', projected]).stdout
     assert all('"Name":"' + case + '"' in report for case in cases), report
     (root / 'Consumer.rvn').write_text('''import System.*
-import System.Tasks.*
+import System.Concurrency.Tasks.*
 import System.Networking.Sockets.*
 func Connect() -> Task<Result<Socket, SocketError>> {
     Socket.Connect("127.0.0.1", 80)

@@ -1,6 +1,6 @@
 import System.*
-import System.Tasks.*
-import System.Tasks.TaskOutcome.*
+import System.Concurrency.Tasks.*
+import System.Concurrency.Tasks.TaskOutcome.*
 import System.Concurrency.*
 import System.IO.*
 import System.Collections.*

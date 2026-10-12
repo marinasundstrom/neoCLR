@@ -60,15 +60,15 @@ public sealed class JsonNull : JsonValue {
 public sealed class JsonSerializer {
     private JsonSerializer() { }
     public static Result<T, JsonError> Deserialize<T>(string text) => default;
-    public static Tasks.Task<Result<T, JsonError>> Deserialize<T>(IO.InputStream input) => default;
+    public static Concurrency.Tasks.Task<Result<T, JsonError>> Deserialize<T>(IO.InputStream input) => default;
     public static Result<object, JsonError> Deserialize(string text, Introspection.TypeInfo type) => default;
-    public static Tasks.Task<Result<object, JsonError>> Deserialize(IO.InputStream input, Introspection.TypeInfo type) => default;
+    public static Concurrency.Tasks.Task<Result<object, JsonError>> Deserialize(IO.InputStream input, Introspection.TypeInfo type) => default;
     public static Result<string, JsonError> Serialize(object value) => default;
-    public static Tasks.Task<Result<PropagationUnit, JsonError>> Serialize(IO.OutputStream output, object value) => default;
+    public static Concurrency.Tasks.Task<Result<PropagationUnit, JsonError>> Serialize(IO.OutputStream output, object value) => default;
     public static Result<JsonValue, JsonError> DeserializeNode(string text) => default;
-    public static Tasks.Task<Result<JsonValue, JsonError>> DeserializeNode(IO.InputStream input) => default;
+    public static Concurrency.Tasks.Task<Result<JsonValue, JsonError>> DeserializeNode(IO.InputStream input) => default;
     public static Result<string, JsonError> SerializeNode(JsonValue value) => default;
-    public static Tasks.Task<Result<PropagationUnit, JsonError>> SerializeNode(IO.OutputStream output, JsonValue value) => default;
+    public static Concurrency.Tasks.Task<Result<PropagationUnit, JsonError>> SerializeNode(IO.OutputStream output, JsonValue value) => default;
 }
 internal sealed class ObjectMapper {
     public ObjectMapper() { }
@@ -100,23 +100,23 @@ public sealed class JsonContent {
 namespace Web.Http.Json {
 public struct HttpJsonError { public struct Http { } public struct Json { } }
 public static class HttpClientJsonExtensions {
-    public static Tasks.Task<Result<T, HttpJsonError>> GetFromJson<T>(this HttpClient self, string url) => default;
-    public static Tasks.Task<Result<T, HttpJsonError>> GetFromJson<T>(this HttpClient self, string url, Concurrency.CancellationToken cancellationToken) => default;
-    public static Tasks.Task<Result<T, HttpJsonError>> GetFromJson<T>(this HttpClient self, Uri url) => default;
-    public static Tasks.Task<Result<T, HttpJsonError>> GetFromJson<T>(this HttpClient self, Uri url, Concurrency.CancellationToken cancellationToken) => default;
-    public static Tasks.Task<Result<HttpResponse, HttpJsonError>> PostAsJson<T>(this HttpClient self, string url, T value) => default;
-    public static Tasks.Task<Result<HttpResponse, HttpJsonError>> PostAsJson<T>(this HttpClient self, string url, T value, Concurrency.CancellationToken cancellationToken) => default;
-    public static Tasks.Task<Result<HttpResponse, HttpJsonError>> PostAsJson<T>(this HttpClient self, Uri url, T value) => default;
-    public static Tasks.Task<Result<HttpResponse, HttpJsonError>> PostAsJson<T>(this HttpClient self, Uri url, T value, Concurrency.CancellationToken cancellationToken) => default;
+    public static Concurrency.Tasks.Task<Result<T, HttpJsonError>> GetFromJson<T>(this HttpClient self, string url) => default;
+    public static Concurrency.Tasks.Task<Result<T, HttpJsonError>> GetFromJson<T>(this HttpClient self, string url, Concurrency.CancellationToken cancellationToken) => default;
+    public static Concurrency.Tasks.Task<Result<T, HttpJsonError>> GetFromJson<T>(this HttpClient self, Uri url) => default;
+    public static Concurrency.Tasks.Task<Result<T, HttpJsonError>> GetFromJson<T>(this HttpClient self, Uri url, Concurrency.CancellationToken cancellationToken) => default;
+    public static Concurrency.Tasks.Task<Result<HttpResponse, HttpJsonError>> PostAsJson<T>(this HttpClient self, string url, T value) => default;
+    public static Concurrency.Tasks.Task<Result<HttpResponse, HttpJsonError>> PostAsJson<T>(this HttpClient self, string url, T value, Concurrency.CancellationToken cancellationToken) => default;
+    public static Concurrency.Tasks.Task<Result<HttpResponse, HttpJsonError>> PostAsJson<T>(this HttpClient self, Uri url, T value) => default;
+    public static Concurrency.Tasks.Task<Result<HttpResponse, HttpJsonError>> PostAsJson<T>(this HttpClient self, Uri url, T value, Concurrency.CancellationToken cancellationToken) => default;
 }
 // Reference surface only; execution uses native System.Web metadata.
 public static class HttpContentJsonExtensions {
-    public static Tasks.Task<Result<T, Data.Json.JsonError>> ReadFromJson<T>(this HttpContent self) => default;
-    public static Tasks.Task<Result<T, Data.Json.JsonError>> ReadFromJson<T>(this HttpContent self, Concurrency.CancellationToken cancellationToken) => default;
-    public static Tasks.Task<Result<object, Data.Json.JsonError>> ReadFromJson(this HttpContent self, Introspection.TypeInfo type) => default;
-    public static Tasks.Task<Result<object, Data.Json.JsonError>> ReadFromJson(this HttpContent self, Introspection.TypeInfo type, Concurrency.CancellationToken cancellationToken) => default;
-    public static Tasks.Task<Result<Data.Json.JsonValue, Data.Json.JsonError>> ReadJsonNode(this HttpContent self) => default;
-    public static Tasks.Task<Result<Data.Json.JsonValue, Data.Json.JsonError>> ReadJsonNode(this HttpContent self, Concurrency.CancellationToken cancellationToken) => default;
+    public static Concurrency.Tasks.Task<Result<T, Data.Json.JsonError>> ReadFromJson<T>(this HttpContent self) => default;
+    public static Concurrency.Tasks.Task<Result<T, Data.Json.JsonError>> ReadFromJson<T>(this HttpContent self, Concurrency.CancellationToken cancellationToken) => default;
+    public static Concurrency.Tasks.Task<Result<object, Data.Json.JsonError>> ReadFromJson(this HttpContent self, Introspection.TypeInfo type) => default;
+    public static Concurrency.Tasks.Task<Result<object, Data.Json.JsonError>> ReadFromJson(this HttpContent self, Introspection.TypeInfo type, Concurrency.CancellationToken cancellationToken) => default;
+    public static Concurrency.Tasks.Task<Result<Data.Json.JsonValue, Data.Json.JsonError>> ReadJsonNode(this HttpContent self) => default;
+    public static Concurrency.Tasks.Task<Result<Data.Json.JsonValue, Data.Json.JsonError>> ReadJsonNode(this HttpContent self, Concurrency.CancellationToken cancellationToken) => default;
 }
 public static class HttpContextJsonExtensions {
     public static Result<PropagationUnit, Data.Json.JsonError> RespondJson(this HttpContext self, object value) => default;
@@ -125,10 +125,10 @@ public static class HttpContextJsonExtensions {
 internal sealed class JsonClientOperations {
     public JsonClientOperations() { }
     public static Result<T, HttpJsonError> Convert<T>(Result<object, HttpJsonError> result) => default;
-    public static Tasks.Task<Result<object, HttpJsonError>> Get(HttpClient client, string url, Introspection.TypeInfo type, Concurrency.CancellationToken token) => default;
-    public static Tasks.Task<Result<HttpResponse, HttpJsonError>> Post(HttpClient client, string url, object value, Concurrency.CancellationToken token) => default;
-    public static Tasks.Task<Result<object, HttpJsonError>> Get(HttpClient client, Uri url, Introspection.TypeInfo type, Concurrency.CancellationToken token) => default;
-    public static Tasks.Task<Result<HttpResponse, HttpJsonError>> Post(HttpClient client, Uri url, object value, Concurrency.CancellationToken token) => default;
+    public static Concurrency.Tasks.Task<Result<object, HttpJsonError>> Get(HttpClient client, string url, Introspection.TypeInfo type, Concurrency.CancellationToken token) => default;
+    public static Concurrency.Tasks.Task<Result<HttpResponse, HttpJsonError>> Post(HttpClient client, string url, object value, Concurrency.CancellationToken token) => default;
+    public static Concurrency.Tasks.Task<Result<object, HttpJsonError>> Get(HttpClient client, Uri url, Introspection.TypeInfo type, Concurrency.CancellationToken token) => default;
+    public static Concurrency.Tasks.Task<Result<HttpResponse, HttpJsonError>> Post(HttpClient client, Uri url, object value, Concurrency.CancellationToken token) => default;
 }
 internal sealed class JsonClientRead {
     public JsonClientRead(Introspection.TypeInfo type) { }

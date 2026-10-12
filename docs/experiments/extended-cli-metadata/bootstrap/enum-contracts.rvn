@@ -1,4 +1,4 @@
-import System.Tasks.*
+import System.Concurrency.Tasks.*
 
 public class TaskStateBox {
     private var state: TaskState = TaskState.Pending

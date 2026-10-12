@@ -3,7 +3,7 @@ module RuntimeHttpLifecycle {
     import System.Concurrency.*
     import System.Option.*
     import System.Result.*
-    import System.Tasks.*
+    import System.Concurrency.Tasks.*
     import System.Time.*
     import System.Web.Http.*
 

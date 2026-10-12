@@ -4,7 +4,7 @@ import System.Networking.Sockets.*
 import System.Collections.*
 import System.Concurrency.*
 import System.Result.*
-import System.Tasks.*
+import System.Concurrency.Tasks.*
 
 class DeadlineHolder {
     init() { }

@@ -3,7 +3,7 @@ module NeoClr.RuntimeTests
 import System.*
 import System.Collections.*
 import System.IO.*
-import System.Tasks.*
+import System.Concurrency.Tasks.*
 import System.Concurrency.*
 import System.Result.*
 import System.Text.*

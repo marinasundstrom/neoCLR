@@ -4,8 +4,8 @@ These three public methods use `Func<System.Void>`, a callback returning neoCLR'
 unit value. RavenDoc renders these methods in the generated reference; this guide
 explains their queue and continuation contracts.
 
-This is the same queue used by [Task&lt;T&gt;](xref:System.Tasks.Task`1) and
-[Promise&lt;T&gt;](xref:System.Tasks.Promise`1). See the
+This is the same queue used by [Task&lt;T&gt;](xref:System.Concurrency.Tasks.Task`1) and
+[Promise&lt;T&gt;](xref:System.Concurrency.Tasks.Promise`1). See the
 [Tasks guide](/features/tasks/index.html) for tested producer and async examples.
 
 ## TaskQueue.Post
@@ -68,7 +68,7 @@ per-job `worker_result_bytes` cap. These host quota choices are provisional. Thi
 runtime-owned, invocation-scoped backend differs from .NET's process-wide thread pool.
 See the [task feature page](/features/tasks/#task-run) for the compiled example.
 
-Importing `System.Tasks.*` supports `Task.Run` alongside `Task<T>` without an alias.
+Importing `System.Concurrency.Tasks.*` supports `Task.Run` alongside `Task<T>` without an alias.
 Inline multi-statement value callbacks infer their result with or without explicit
 Run type arguments; a typed `Func<T>` local is optional. Direct `Task<unit>` awaits,
 typed awaits and async unwrapping use the ordinary Task protocol with the matching

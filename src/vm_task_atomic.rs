@@ -1,10 +1,10 @@
-//! Scheduling policy for the closed System.Tasks implementation. These regions
+//! Scheduling policy for the closed System.Concurrency.Tasks implementation. These regions
 //! retain graph access across instruction quanta, not across user callbacks or I/O.
 use super::Frame;
 use crate::{Module, metadata::Function};
 
 pub(super) fn queue_pump(module: &Module, function: &Function) -> bool {
-    trusted_owner(module, function) == Some("System.Tasks.TaskQueue")
+    trusted_owner(module, function) == Some("System.Concurrency.Tasks.TaskQueue")
         && matches!(member(function), "Run" | "Drain")
 }
 
@@ -19,9 +19,9 @@ fn trusted_owner<'a>(module: &'a Module, function: &'a Function) -> Option<&'a s
         return None;
     }
     match origin.name.as_str() {
-        "System.Tasks.TaskQueue" => Some("System.Tasks.TaskQueue"),
-        "System.Tasks.Promise`1" => Some("System.Tasks.Promise"),
-        "System.Tasks.Task`1" => Some("System.Tasks.Task"),
+        "System.Concurrency.Tasks.TaskQueue" => Some("System.Concurrency.Tasks.TaskQueue"),
+        "System.Concurrency.Tasks.Promise`1" => Some("System.Concurrency.Tasks.Promise"),
+        "System.Concurrency.Tasks.Task`1" => Some("System.Concurrency.Tasks.Task"),
         _ => None,
     }
 }
@@ -32,12 +32,12 @@ fn member(function: &Function) -> &str {
 
 fn region(module: &Module, function: &Function) -> bool {
     match trusted_owner(module, function) {
-        Some("System.Tasks.Promise") => matches!(
+        Some("System.Concurrency.Tasks.Promise") => matches!(
             member(function),
             "Complete" | "Cancel" | "Register" | "Read" | "Completed" | "Cancelled"
         ),
-        Some("System.Tasks.Task") => matches!(member(function), "get_State" | "get_Outcome"),
-        Some("System.Tasks.TaskQueue") => {
+        Some("System.Concurrency.Tasks.Task") => matches!(member(function), "get_State" | "get_Outcome"),
+        Some("System.Concurrency.Tasks.TaskQueue") => {
             matches!(member(function), "Post" | "Run" | "Drain" | "get_Default")
         }
         _ => false,

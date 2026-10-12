@@ -34,7 +34,7 @@ fn entry_dispatch_without_a_queue_resumes_and_preserves_stack_values() {
 fn dispatch_program(drain: &str) -> neoclr::LoadedProgram {
     let system = neoclr::assemble(&format!(
         r#".module System
-.type class System.Tasks.TaskQueue
+.type class System.Concurrency.Tasks.TaskQueue
 .method instance .ctor() -> noresult
 ret
 .end
@@ -43,7 +43,7 @@ ret
 ret
 .end
 .end
-.function neoCLR.Runtime.RegisterDefaultTaskQueue(System.Tasks.TaskQueue queue) -> Void
+.function neoCLR.Runtime.RegisterDefaultTaskQueue(System.Concurrency.Tasks.TaskQueue queue) -> Void
 .methodimpl InternalCall
 .end
 .function neoCLR.Runtime.DrainEntryTasks() -> Void
@@ -55,8 +55,8 @@ ret
     let source = r#".module App
 .entry Main
 .function Main() -> Int32
-newobj instance System.Tasks.TaskQueue::.ctor()
-call neoCLR.Runtime.RegisterDefaultTaskQueue(System.Tasks.TaskQueue)
+newobj instance System.Concurrency.Tasks.TaskQueue::.ctor()
+call neoCLR.Runtime.RegisterDefaultTaskQueue(System.Concurrency.Tasks.TaskQueue)
 pop
 ldc.i4 42
 call Wait()

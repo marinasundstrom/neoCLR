@@ -2,7 +2,7 @@ module RuntimeGeneratorLanguage
 
 import System.*
 import System.Collections.*
-import System.Tasks.*
+import System.Concurrency.Tasks.*
 
 class Counters {
     var Starts = 0

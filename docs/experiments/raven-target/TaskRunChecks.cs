@@ -10,7 +10,7 @@ static class TaskRunChecks
         CoreDeclarations.Write(path, unionProbe: true, collectionProbe: true);
         using var core = AssemblyDefinition.ReadAssembly(path);
         var module = core.MainModule;
-        var owner = module.GetType("System.Tasks.Task");
+        var owner = module.GetType("System.Concurrency.Tasks.Task");
         var checks = new List<string>();
         void Check(string name, bool valid) {
             if (!valid) throw new Exception("Task.Run check failed: " + name);
@@ -29,7 +29,7 @@ static class TaskRunChecks
                 reference = closed;
             }
             var result = method.HasGenericParameters ? "Int32" : "Void";
-            Check("Bind " + method.FullName, TaskBindings.Bind(reference, method, false, false)?.Result == $"System.Tasks.Task<{result}>");
+            Check("Bind " + method.FullName, TaskBindings.Bind(reference, method, false, false)?.Result == $"System.Concurrency.Tasks.Task<{result}>");
             var attributes = method.Attributes;
             method.IsPublic = false;
             method.IsPrivate = true;

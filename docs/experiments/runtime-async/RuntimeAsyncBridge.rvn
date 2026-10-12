@@ -1,8 +1,8 @@
 // Source-included experimental provider for the compiler's explicit native contract.
 module RuntimeAwaitProvider {
     import System.*
-    import System.Tasks.*
-    import System.Tasks.TaskOutcome.*
+    import System.Concurrency.Tasks.*
+    import System.Concurrency.Tasks.TaskOutcome.*
 
     static class Bridge {
         static func Start<T>(callback: () -> TaskOutcome<T>) -> Task<T> {

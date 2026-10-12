@@ -24,7 +24,7 @@ member for parameters, return values, errors and usage notes.
 | Functions | [Function shapes and objects](functions.md) · [Callbacks](callbacks.md) |
 | Streams and files | [System.IO](xref:System.IO) · [System.Storage](xref:System.Storage) · [Stream contracts](streams.md) |
 | Console and environment | [Console](xref:System.Console) · [Environment](xref:System.Environment) · [Standard streams](console.md) |
-| Tasks and concurrency | [System.Tasks](xref:System.Tasks) · [System.Concurrency](xref:System.Concurrency) |
+| Tasks and concurrency | [System.Concurrency.Tasks](xref:System.Concurrency.Tasks) · [System.Concurrency](xref:System.Concurrency) |
 | Dates and globalization | [System.Time](xref:System.Time) · [System.Globalization](xref:System.Globalization) |
 | Networking and HTTP | [System.Networking](xref:System.Networking) · [System.Web.Http](xref:System.Web.Http) · [Sockets](sockets.md) · [Routes](routes.md) |
 | SQL databases | [SQL sessions and mapping](sql.md) · System.Data.Sql · System.Data.PostgreSql |

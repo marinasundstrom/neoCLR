@@ -10,7 +10,7 @@ pop
 M00000001_IL_0007:
 ret
 .end
-.method static GetHostAddresses(String hostName) -> System.Tasks.Task<System.Result<System.Collections.Sequence<System.Networking.IPAddress>,System.Networking.DnsError>>
+.method static GetHostAddresses(String hostName) -> System.Concurrency.Tasks.Task<System.Result<System.Collections.Sequence<System.Networking.IPAddress>,System.Networking.DnsError>>
 M00000002_IL_0000:
 M00000002_IL_0001:
 M00000002_IL_0002:
@@ -22,7 +22,7 @@ call System.Networking.Dns::GetHostAddresses(String,System.Concurrency.Cancellat
 M00000002_IL_000d:
 ret
 .end
-.method static GetHostAddresses(String hostName,System.Concurrency.CancellationToken cancellationToken) -> System.Tasks.Task<System.Result<System.Collections.Sequence<System.Networking.IPAddress>,System.Networking.DnsError>>
+.method static GetHostAddresses(String hostName,System.Concurrency.CancellationToken cancellationToken) -> System.Concurrency.Tasks.Task<System.Result<System.Collections.Sequence<System.Networking.IPAddress>,System.Networking.DnsError>>
 M00000003_IL_0000:
 M00000003_IL_0001:
 M00000003_IL_0002:
@@ -38,7 +38,7 @@ call System.Networking.Dns::GetHostAddressesUntil(String,Int64,System.Concurrenc
 M00000003_IL_000b:
 ret
 .end
-.method internal static GetHostAddressesUntil(String hostName,Int64 deadline) -> System.Tasks.Task<System.Result<System.Collections.Sequence<System.Networking.IPAddress>,System.Networking.DnsError>>
+.method internal static GetHostAddressesUntil(String hostName,Int64 deadline) -> System.Concurrency.Tasks.Task<System.Result<System.Collections.Sequence<System.Networking.IPAddress>,System.Networking.DnsError>>
 M00000004_IL_0000:
 M00000004_IL_0001:
 M00000004_IL_0002:
@@ -52,16 +52,16 @@ call System.Networking.Dns::GetHostAddressesUntil(String,Int64,System.Concurrenc
 M00000004_IL_000e:
 ret
 .end
-.method internal static GetHostAddressesUntil(String hostName,Int64 deadline,System.Concurrency.CancellationToken cancellationToken) -> System.Tasks.Task<System.Result<System.Collections.Sequence<System.Networking.IPAddress>,System.Networking.DnsError>>
-.local System.Tasks.Promise<System.Result<System.Collections.Sequence<System.Networking.IPAddress>,System.Networking.DnsError>> local0
+.method internal static GetHostAddressesUntil(String hostName,Int64 deadline,System.Concurrency.CancellationToken cancellationToken) -> System.Concurrency.Tasks.Task<System.Result<System.Collections.Sequence<System.Networking.IPAddress>,System.Networking.DnsError>>
+.local System.Concurrency.Tasks.Promise<System.Result<System.Collections.Sequence<System.Networking.IPAddress>,System.Networking.DnsError>> local0
 .local System.Networking.DnsCompletion local1
 ldloca local0
-initobj System.Tasks.Promise<System.Result<System.Collections.Sequence<System.Networking.IPAddress>,System.Networking.DnsError>>
+initobj System.Concurrency.Tasks.Promise<System.Result<System.Collections.Sequence<System.Networking.IPAddress>,System.Networking.DnsError>>
 ldloca local1
 initobj System.Networking.DnsCompletion
 M00000005_IL_0000:
 M00000005_IL_0001:
-newobj instance System.Tasks.Promise<System.Result<System.Collections.Sequence<System.Networking.IPAddress>,System.Networking.DnsError>>::.ctor()
+newobj instance System.Concurrency.Tasks.Promise<System.Result<System.Collections.Sequence<System.Networking.IPAddress>,System.Networking.DnsError>>::.ctor()
 M00000005_IL_0006:
 stloc local0
 M00000005_IL_0007:
@@ -70,7 +70,7 @@ ldloc local0
 M00000005_IL_0009:
 ldarg 2
 M00000005_IL_000a:
-newobj instance System.Networking.DnsCompletion::.ctor(System.Tasks.Promise<System.Result<System.Collections.Sequence<System.Networking.IPAddress>,System.Networking.DnsError>>,System.Concurrency.CancellationToken)
+newobj instance System.Networking.DnsCompletion::.ctor(System.Concurrency.Tasks.Promise<System.Result<System.Collections.Sequence<System.Networking.IPAddress>,System.Networking.DnsError>>,System.Concurrency.CancellationToken)
 M00000005_IL_000f:
 stloc local1
 M00000005_IL_0010:
@@ -86,7 +86,7 @@ M00000005_IL_0019:
 M00000005_IL_001a:
 ldloc local0
 M00000005_IL_001b:
-call instance System.Tasks.Promise<System.Result<System.Collections.Sequence<System.Networking.IPAddress>,System.Networking.DnsError>>::get_Task()
+call instance System.Concurrency.Tasks.Promise<System.Result<System.Collections.Sequence<System.Networking.IPAddress>,System.Networking.DnsError>>::get_Task()
 M00000005_IL_0020:
 ret
 .end

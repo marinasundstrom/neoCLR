@@ -1,6 +1,6 @@
 import System.*
 import System.Console.*
-import System.Tasks.*
+import System.Concurrency.Tasks.*
 
 func Ready() {
     WriteLine("Unrelated ready work")

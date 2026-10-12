@@ -1,0 +1,132 @@
+{
+  "date": "2026-10-12",
+  "platform": "macOS-27.0-arm64-arm-64bit",
+  "compilerBranch": "codex/concurrency-tasks",
+  "compilerRevision": "4012c24da5b1b5b00264a64a52cc30ce391a1166",
+  "nativeLibraryArtifacts": {
+    "System.Runtime.dll": "37302eb9cfc98b455d48b1fde36a0ccb518199f8b14749d124bf2223ba715be3",
+    "System.Data.dll": "344dc1b20b0a2b33fcd614ae65bec45760c221e7d761eaef13b446089b8f2db9",
+    "System.Networking.dll": "9e94c8dd9e6c7751c51a329951e206f76cfcb27cda24c08f4f254b517a11e556",
+    "System.Web.dll": "04a342344094083fbc7dcaede2e1135a2e047f4e4bc914de458e41a572af6d3c",
+    "System.Data.PostgreSql.dll": "c79ab0bd521560f033af483a4b972db9f8a2d251f31a24223fd4ce9594cf78db",
+    "System.runtime.neox": "98a1ae1da85387c87746957e83a4015eb59d0566539a915c69f168d2b511b190",
+    "Core.dll": "3d4a676d379067c18a65a9beb8257ed40bf3196fc643a9ba1d559c619ec73fad"
+  },
+  "runtimeSha256": "ee1f00dbdba5a6badb7f5a8e573f1b40eb5a1e194bf90f8d22db6ef98cd69f8d",
+  "aotCompilerSha256": "6cf2e23e8e211a9009999f4620cc52bbbbfbbac4eb9b14787ff6346cb9ac21f2",
+  "runtimeTests": [
+    {
+      "suite": "memory-stream",
+      "mode": "interpreter",
+      "exitCode": 0,
+      "stdout": "PASS MemoryStream async cancellation and rejected ranges preserve storage\nPASS MemoryStream async interfaces preserve complete writes short reads and EOF\nPASS MemoryStream quota errors preserve length and position\nPASS MemoryStream closure is shared across interfaces and idempotent\nPASS MemoryStream gap writes zero-fill while empty writes preserve length\nPASS MemoryStream rejects invalid buffer and seek ranges without moving\nPASS MemoryStream overwrites preserve length and untouched bytes\nTests: 7, passed: 7, failed: 0, skipped: 0\n"
+    },
+    {
+      "suite": "memory-stream",
+      "mode": "jit",
+      "exitCode": 0,
+      "stdout": "PASS MemoryStream async cancellation and rejected ranges preserve storage\nPASS MemoryStream async interfaces preserve complete writes short reads and EOF\nPASS MemoryStream quota errors preserve length and position\nPASS MemoryStream closure is shared across interfaces and idempotent\nPASS MemoryStream gap writes zero-fill while empty writes preserve length\nPASS MemoryStream rejects invalid buffer and seek ranges without moving\nPASS MemoryStream overwrites preserve length and untouched bytes\nTests: 7, passed: 7, failed: 0, skipped: 0\n"
+    },
+    {
+      "suite": "memory-stream",
+      "mode": "native",
+      "exitCode": 0,
+      "stdout": "PASS MemoryStream async cancellation and rejected ranges preserve storage\nPASS MemoryStream async interfaces preserve complete writes short reads and EOF\nPASS MemoryStream quota errors preserve length and position\nPASS MemoryStream closure is shared across interfaces and idempotent\nPASS MemoryStream gap writes zero-fill while empty writes preserve length\nPASS MemoryStream rejects invalid buffer and seek ranges without moving\nPASS MemoryStream overwrites preserve length and untouched bytes\nTests: 7, passed: 7, failed: 0, skipped: 0\n"
+    },
+    {
+      "suite": "encoding-streams",
+      "mode": "interpreter",
+      "exitCode": 0,
+      "stdout": "PASS StreamWriter completes short writes and preserves cross-input graphemes\nPASS ASCII StreamWriter rejects complete lines before output and remains reusable\nPASS Custom encoder trailers require explicit Finish and are emitted once\nPASS Closing a writer manages ownership without implicit encoder finalization\nPASS Partial write and final-output failures are observable without replay\nPASS Custom encoder final acceptance waits for all trailer bytes to drain\nPASS Selected ASCII reader recognizes CRLF and preserves borrowed ownership\nPASS Selected readers reject malformed bytes and enforce decoded text limits\nPASS StreamReader waits for pending input before decoding and completing\nPASS StreamWriter waits for pending output before reporting the byte count\nPASS Cancelled input cancels the pending reader operation\nTests: 11, passed: 11, failed: 0, skipped: 0\n"
+    },
+    {
+      "suite": "encoding-streams",
+      "mode": "jit",
+      "exitCode": 0,
+      "stdout": "PASS StreamWriter completes short writes and preserves cross-input graphemes\nPASS ASCII StreamWriter rejects complete lines before output and remains reusable\nPASS Custom encoder trailers require explicit Finish and are emitted once\nPASS Closing a writer manages ownership without implicit encoder finalization\nPASS Partial write and final-output failures are observable without replay\nPASS Custom encoder final acceptance waits for all trailer bytes to drain\nPASS Selected ASCII reader recognizes CRLF and preserves borrowed ownership\nPASS Selected readers reject malformed bytes and enforce decoded text limits\nPASS StreamReader waits for pending input before decoding and completing\nPASS StreamWriter waits for pending output before reporting the byte count\nPASS Cancelled input cancels the pending reader operation\nTests: 11, passed: 11, failed: 0, skipped: 0\n"
+    },
+    {
+      "suite": "encoding-streams",
+      "mode": "native",
+      "exitCode": 0,
+      "stdout": "PASS StreamWriter completes short writes and preserves cross-input graphemes\nPASS ASCII StreamWriter rejects complete lines before output and remains reusable\nPASS Custom encoder trailers require explicit Finish and are emitted once\nPASS Closing a writer manages ownership without implicit encoder finalization\nPASS Partial write and final-output failures are observable without replay\nPASS Custom encoder final acceptance waits for all trailer bytes to drain\nPASS Selected ASCII reader recognizes CRLF and preserves borrowed ownership\nPASS Selected readers reject malformed bytes and enforce decoded text limits\nPASS StreamReader waits for pending input before decoding and completing\nPASS StreamWriter waits for pending output before reporting the byte count\nPASS Cancelled input cancels the pending reader operation\nTests: 11, passed: 11, failed: 0, skipped: 0\n"
+    }
+  ],
+  "httpUploads": [
+    {
+      "case": "success",
+      "execution": "jit",
+      "outcome": "passed",
+      "statistics": ""
+    },
+    {
+      "case": "borrowed",
+      "execution": "jit",
+      "outcome": "passed",
+      "statistics": ""
+    },
+    {
+      "case": "empty",
+      "execution": "jit",
+      "outcome": "passed",
+      "statistics": ""
+    },
+    {
+      "case": "eof",
+      "execution": "jit",
+      "outcome": "passed",
+      "statistics": ""
+    },
+    {
+      "case": "read-error",
+      "execution": "jit",
+      "outcome": "passed",
+      "statistics": ""
+    },
+    {
+      "case": "overread",
+      "execution": "jit",
+      "outcome": "passed",
+      "statistics": ""
+    },
+    {
+      "case": "cancel",
+      "execution": "jit",
+      "outcome": "passed",
+      "statistics": ""
+    },
+    {
+      "case": "precancel",
+      "execution": "jit",
+      "outcome": "passed",
+      "statistics": ""
+    },
+    {
+      "case": "disposed",
+      "execution": "jit",
+      "outcome": "passed",
+      "statistics": ""
+    },
+    {
+      "case": "invalid-header",
+      "execution": "jit",
+      "outcome": "passed",
+      "statistics": ""
+    },
+    {
+      "case": "refused",
+      "execution": "jit",
+      "outcome": "passed",
+      "statistics": ""
+    }
+  ],
+  "compilerChecks": 18,
+  "runtimeAtomicChecks": 6,
+  "websiteTests": 22,
+  "nativeSnapshotTests": 2,
+  "limitations": [
+    "macOS ARM64 qualification; Windows namespace qualification has not run.",
+    "Compiler state-machine consumers validated; no new runtime-suspension performance claim.",
+    "Historical legacy fragments were mechanically renamed, not regenerated from current source."
+  ]
+}

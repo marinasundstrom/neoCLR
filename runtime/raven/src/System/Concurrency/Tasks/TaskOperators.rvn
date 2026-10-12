@@ -1,9 +1,9 @@
-module System.Tasks
+module System.Concurrency.Tasks
 
 import System.*
 import System.Option.*
 import System.Result.*
-import System.Tasks.TaskOutcome.*
+import System.Concurrency.Tasks.TaskOutcome.*
 
 public extension TaskOperators<T> for Task<T> {
     func Map<U>(transform: (T) -> U) -> Task<U> {

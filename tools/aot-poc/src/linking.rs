@@ -252,8 +252,8 @@ pub fn prepare(
         // already needed by the application may add this root.
         let mut host_roots = vec![];
         for (index, ty) in joined.types.iter().enumerate() {
-            let source_queue = ty.origin.as_ref().is_some_and(|o| o.name == "System.Tasks.TaskQueue")
-                || (ty.name == "System.Tasks.TaskQueue" && types[index].module == "System");
+            let source_queue = ty.origin.as_ref().is_some_and(|o| o.name == "System.Concurrency.Tasks.TaskQueue")
+                || (ty.name == "System.Concurrency.Tasks.TaskQueue" && types[index].module == "System");
             if !source_queue || !selected.types.iter().any(|t| t.name == ty.name) { continue; }
             if !ty.is_reference_type || !ty.generic_parameters.is_empty() { return Err("host queue requires nongeneric source reference type".into()); }
             let members: Vec<_> = joined.functions.iter().enumerate().filter(|(_, f)|

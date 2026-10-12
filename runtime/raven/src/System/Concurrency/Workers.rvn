@@ -1,7 +1,7 @@
 module System.Concurrency
 
 import System.*
-import System.Tasks.*
+import System.Concurrency.Tasks.*
 import System.Runtime.CompilerServices.*
 
 public class Thread {

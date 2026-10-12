@@ -18,7 +18,7 @@ stfld System.Networking.Sockets.Socket::handle
 M00000001_IL_000f:
 ret
 .end
-.method static Connect(System.Networking.IPAddress address,Int32 port) -> System.Tasks.Task<System.Result<System.Networking.Sockets.Socket,System.Networking.Sockets.SocketError>>
+.method static Connect(System.Networking.IPAddress address,Int32 port) -> System.Concurrency.Tasks.Task<System.Result<System.Networking.Sockets.Socket,System.Networking.Sockets.SocketError>>
 M00000002_IL_0000:
 M00000002_IL_0001:
 M00000002_IL_0002:
@@ -32,13 +32,13 @@ call System.Networking.Sockets.Socket::Connect(System.Networking.IPAddress,Int32
 M00000002_IL_000e:
 ret
 .end
-.method static Connect(System.Networking.IPAddress address,Int32 port,System.Concurrency.CancellationToken cancellationToken) -> System.Tasks.Task<System.Result<System.Networking.Sockets.Socket,System.Networking.Sockets.SocketError>>
-.local System.Tasks.Promise<System.Result<System.Networking.Sockets.Socket,System.Networking.Sockets.SocketError>> local0
-.local System.Tasks.Promise<System.Result<System.Networking.Sockets.Socket,System.Networking.Sockets.SocketError>> local1
+.method static Connect(System.Networking.IPAddress address,Int32 port,System.Concurrency.CancellationToken cancellationToken) -> System.Concurrency.Tasks.Task<System.Result<System.Networking.Sockets.Socket,System.Networking.Sockets.SocketError>>
+.local System.Concurrency.Tasks.Promise<System.Result<System.Networking.Sockets.Socket,System.Networking.Sockets.SocketError>> local0
+.local System.Concurrency.Tasks.Promise<System.Result<System.Networking.Sockets.Socket,System.Networking.Sockets.SocketError>> local1
 ldloca local0
-initobj System.Tasks.Promise<System.Result<System.Networking.Sockets.Socket,System.Networking.Sockets.SocketError>>
+initobj System.Concurrency.Tasks.Promise<System.Result<System.Networking.Sockets.Socket,System.Networking.Sockets.SocketError>>
 ldloca local1
-initobj System.Tasks.Promise<System.Result<System.Networking.Sockets.Socket,System.Networking.Sockets.SocketError>>
+initobj System.Concurrency.Tasks.Promise<System.Result<System.Networking.Sockets.Socket,System.Networking.Sockets.SocketError>>
 M00000003_IL_0000:
 M00000003_IL_0001:
 M00000003_IL_0002:
@@ -52,13 +52,13 @@ M00000003_IL_000e:
 br M00000003_IL_0029
 M00000003_IL_0013:
 M00000003_IL_0014:
-newobj instance System.Tasks.Promise<System.Result<System.Networking.Sockets.Socket,System.Networking.Sockets.SocketError>>::.ctor()
+newobj instance System.Concurrency.Tasks.Promise<System.Result<System.Networking.Sockets.Socket,System.Networking.Sockets.SocketError>>::.ctor()
 M00000003_IL_0019:
 stloc local0
 M00000003_IL_001a:
 ldloc local0
 M00000003_IL_001b:
-call instance System.Tasks.Promise<System.Result<System.Networking.Sockets.Socket,System.Networking.Sockets.SocketError>>::Cancel()
+call instance System.Concurrency.Tasks.Promise<System.Result<System.Networking.Sockets.Socket,System.Networking.Sockets.SocketError>>::Cancel()
 call neoCLR.Library.System.Networking.Sockets.Socket.RuntimeBooleanToInt32(Boolean)
 M00000003_IL_0020:
 pop
@@ -66,7 +66,7 @@ M00000003_IL_0021:
 M00000003_IL_0022:
 ldloc local0
 M00000003_IL_0023:
-call instance System.Tasks.Promise<System.Result<System.Networking.Sockets.Socket,System.Networking.Sockets.SocketError>>::get_Task()
+call instance System.Concurrency.Tasks.Promise<System.Result<System.Networking.Sockets.Socket,System.Networking.Sockets.SocketError>>::get_Task()
 M00000003_IL_0028:
 ret
 M00000003_IL_0029:
@@ -100,7 +100,7 @@ M00000003_IL_004c:
 ret
 M00000003_IL_004d:
 M00000003_IL_004e:
-newobj instance System.Tasks.Promise<System.Result<System.Networking.Sockets.Socket,System.Networking.Sockets.SocketError>>::.ctor()
+newobj instance System.Concurrency.Tasks.Promise<System.Result<System.Networking.Sockets.Socket,System.Networking.Sockets.SocketError>>::.ctor()
 M00000003_IL_0053:
 stloc local1
 M00000003_IL_0054:
@@ -115,7 +115,7 @@ call neoCLR.Library.System.Networking.Sockets.Socket.RuntimeUnion0(System.Networ
 M00000003_IL_0065:
 call neoCLR.Library.System.Networking.Sockets.Socket.RuntimeUnion1(System.Result.Error<System.Networking.Sockets.SocketError>)
 M00000003_IL_006a:
-call instance System.Tasks.Promise<System.Result<System.Networking.Sockets.Socket,System.Networking.Sockets.SocketError>>::Complete(System.Result<System.Networking.Sockets.Socket,System.Networking.Sockets.SocketError>)
+call instance System.Concurrency.Tasks.Promise<System.Result<System.Networking.Sockets.Socket,System.Networking.Sockets.SocketError>>::Complete(System.Result<System.Networking.Sockets.Socket,System.Networking.Sockets.SocketError>)
 call neoCLR.Library.System.Networking.Sockets.Socket.RuntimeBooleanToInt32(Boolean)
 M00000003_IL_006f:
 pop
@@ -123,11 +123,11 @@ M00000003_IL_0070:
 M00000003_IL_0071:
 ldloc local1
 M00000003_IL_0072:
-call instance System.Tasks.Promise<System.Result<System.Networking.Sockets.Socket,System.Networking.Sockets.SocketError>>::get_Task()
+call instance System.Concurrency.Tasks.Promise<System.Result<System.Networking.Sockets.Socket,System.Networking.Sockets.SocketError>>::get_Task()
 M00000003_IL_0077:
 ret
 .end
-.method static Connect(System.Collections.Sequence<System.Networking.IPAddress> addresses,Int32 port) -> System.Tasks.Task<System.Result<System.Networking.Sockets.Socket,System.Networking.Sockets.SocketError>>
+.method static Connect(System.Collections.Sequence<System.Networking.IPAddress> addresses,Int32 port) -> System.Concurrency.Tasks.Task<System.Result<System.Networking.Sockets.Socket,System.Networking.Sockets.SocketError>>
 M00000004_IL_0000:
 M00000004_IL_0001:
 M00000004_IL_0002:
@@ -141,7 +141,7 @@ call System.Networking.Sockets.Socket::Connect(System.Collections.Sequence<Syste
 M00000004_IL_000e:
 ret
 .end
-.method static Connect(System.Collections.Sequence<System.Networking.IPAddress> addresses,Int32 port,System.Concurrency.CancellationToken cancellationToken) -> System.Tasks.Task<System.Result<System.Networking.Sockets.Socket,System.Networking.Sockets.SocketError>>
+.method static Connect(System.Collections.Sequence<System.Networking.IPAddress> addresses,Int32 port,System.Concurrency.CancellationToken cancellationToken) -> System.Concurrency.Tasks.Task<System.Result<System.Networking.Sockets.Socket,System.Networking.Sockets.SocketError>>
 M00000005_IL_0000:
 M00000005_IL_0001:
 M00000005_IL_0002:
@@ -159,7 +159,7 @@ call System.Networking.Sockets.Socket::ConnectUntil(System.Collections.Sequence<
 M00000005_IL_000c:
 ret
 .end
-.method internal static ConnectUntil(System.Collections.Sequence<System.Networking.IPAddress> addresses,Int32 port,Int64 deadline) -> System.Tasks.Task<System.Result<System.Networking.Sockets.Socket,System.Networking.Sockets.SocketError>>
+.method internal static ConnectUntil(System.Collections.Sequence<System.Networking.IPAddress> addresses,Int32 port,Int64 deadline) -> System.Concurrency.Tasks.Task<System.Result<System.Networking.Sockets.Socket,System.Networking.Sockets.SocketError>>
 M00000006_IL_0000:
 M00000006_IL_0001:
 M00000006_IL_0002:
@@ -175,20 +175,20 @@ call System.Networking.Sockets.Socket::ConnectUntil(System.Collections.Sequence<
 M00000006_IL_000f:
 ret
 .end
-.method internal static ConnectUntil(System.Collections.Sequence<System.Networking.IPAddress> addresses,Int32 port,Int64 deadline,System.Concurrency.CancellationToken cancellationToken) -> System.Tasks.Task<System.Result<System.Networking.Sockets.Socket,System.Networking.Sockets.SocketError>>
-.local System.Tasks.Promise<System.Result<System.Networking.Sockets.Socket,System.Networking.Sockets.SocketError>> local0
-.local System.Tasks.Promise<System.Result<System.Networking.Sockets.Socket,System.Networking.Sockets.SocketError>> local1
-.local System.Tasks.Promise<System.Result<System.Networking.Sockets.Socket,System.Networking.Sockets.SocketError>> local2
+.method internal static ConnectUntil(System.Collections.Sequence<System.Networking.IPAddress> addresses,Int32 port,Int64 deadline,System.Concurrency.CancellationToken cancellationToken) -> System.Concurrency.Tasks.Task<System.Result<System.Networking.Sockets.Socket,System.Networking.Sockets.SocketError>>
+.local System.Concurrency.Tasks.Promise<System.Result<System.Networking.Sockets.Socket,System.Networking.Sockets.SocketError>> local0
+.local System.Concurrency.Tasks.Promise<System.Result<System.Networking.Sockets.Socket,System.Networking.Sockets.SocketError>> local1
+.local System.Concurrency.Tasks.Promise<System.Result<System.Networking.Sockets.Socket,System.Networking.Sockets.SocketError>> local2
 .local System.Collections.ArrayList<String> local3
 .local Int32 local4
 .local System.Networking.IPAddress local5
-.local System.Tasks.Promise<System.Result<System.Networking.Sockets.Socket,System.Networking.Sockets.SocketError>> local6
+.local System.Concurrency.Tasks.Promise<System.Result<System.Networking.Sockets.Socket,System.Networking.Sockets.SocketError>> local6
 ldloca local0
-initobj System.Tasks.Promise<System.Result<System.Networking.Sockets.Socket,System.Networking.Sockets.SocketError>>
+initobj System.Concurrency.Tasks.Promise<System.Result<System.Networking.Sockets.Socket,System.Networking.Sockets.SocketError>>
 ldloca local1
-initobj System.Tasks.Promise<System.Result<System.Networking.Sockets.Socket,System.Networking.Sockets.SocketError>>
+initobj System.Concurrency.Tasks.Promise<System.Result<System.Networking.Sockets.Socket,System.Networking.Sockets.SocketError>>
 ldloca local2
-initobj System.Tasks.Promise<System.Result<System.Networking.Sockets.Socket,System.Networking.Sockets.SocketError>>
+initobj System.Concurrency.Tasks.Promise<System.Result<System.Networking.Sockets.Socket,System.Networking.Sockets.SocketError>>
 ldloca local3
 initobj System.Collections.ArrayList<String>
 ldc.i4 0
@@ -196,7 +196,7 @@ stloc local4
 ldloca local5
 initobj System.Networking.IPAddress
 ldloca local6
-initobj System.Tasks.Promise<System.Result<System.Networking.Sockets.Socket,System.Networking.Sockets.SocketError>>
+initobj System.Concurrency.Tasks.Promise<System.Result<System.Networking.Sockets.Socket,System.Networking.Sockets.SocketError>>
 M00000007_IL_0000:
 M00000007_IL_0001:
 M00000007_IL_0002:
@@ -210,13 +210,13 @@ M00000007_IL_000e:
 br M00000007_IL_0029
 M00000007_IL_0013:
 M00000007_IL_0014:
-newobj instance System.Tasks.Promise<System.Result<System.Networking.Sockets.Socket,System.Networking.Sockets.SocketError>>::.ctor()
+newobj instance System.Concurrency.Tasks.Promise<System.Result<System.Networking.Sockets.Socket,System.Networking.Sockets.SocketError>>::.ctor()
 M00000007_IL_0019:
 stloc local0
 M00000007_IL_001a:
 ldloc local0
 M00000007_IL_001b:
-call instance System.Tasks.Promise<System.Result<System.Networking.Sockets.Socket,System.Networking.Sockets.SocketError>>::Cancel()
+call instance System.Concurrency.Tasks.Promise<System.Result<System.Networking.Sockets.Socket,System.Networking.Sockets.SocketError>>::Cancel()
 call neoCLR.Library.System.Networking.Sockets.Socket.RuntimeBooleanToInt32(Boolean)
 M00000007_IL_0020:
 pop
@@ -224,7 +224,7 @@ M00000007_IL_0021:
 M00000007_IL_0022:
 ldloc local0
 M00000007_IL_0023:
-call instance System.Tasks.Promise<System.Result<System.Networking.Sockets.Socket,System.Networking.Sockets.SocketError>>::get_Task()
+call instance System.Concurrency.Tasks.Promise<System.Result<System.Networking.Sockets.Socket,System.Networking.Sockets.SocketError>>::get_Task()
 M00000007_IL_0028:
 ret
 M00000007_IL_0029:
@@ -244,7 +244,7 @@ M00000007_IL_0039:
 br M00000007_IL_0068
 M00000007_IL_003e:
 M00000007_IL_003f:
-newobj instance System.Tasks.Promise<System.Result<System.Networking.Sockets.Socket,System.Networking.Sockets.SocketError>>::.ctor()
+newobj instance System.Concurrency.Tasks.Promise<System.Result<System.Networking.Sockets.Socket,System.Networking.Sockets.SocketError>>::.ctor()
 M00000007_IL_0044:
 stloc local1
 M00000007_IL_0045:
@@ -258,7 +258,7 @@ call neoCLR.Library.System.Networking.Sockets.Socket.RuntimeUnion0(System.Networ
 M00000007_IL_0055:
 call neoCLR.Library.System.Networking.Sockets.Socket.RuntimeUnion1(System.Result.Error<System.Networking.Sockets.SocketError>)
 M00000007_IL_005a:
-call instance System.Tasks.Promise<System.Result<System.Networking.Sockets.Socket,System.Networking.Sockets.SocketError>>::Complete(System.Result<System.Networking.Sockets.Socket,System.Networking.Sockets.SocketError>)
+call instance System.Concurrency.Tasks.Promise<System.Result<System.Networking.Sockets.Socket,System.Networking.Sockets.SocketError>>::Complete(System.Result<System.Networking.Sockets.Socket,System.Networking.Sockets.SocketError>)
 call neoCLR.Library.System.Networking.Sockets.Socket.RuntimeBooleanToInt32(Boolean)
 M00000007_IL_005f:
 pop
@@ -266,7 +266,7 @@ M00000007_IL_0060:
 M00000007_IL_0061:
 ldloc local1
 M00000007_IL_0062:
-call instance System.Tasks.Promise<System.Result<System.Networking.Sockets.Socket,System.Networking.Sockets.SocketError>>::get_Task()
+call instance System.Concurrency.Tasks.Promise<System.Result<System.Networking.Sockets.Socket,System.Networking.Sockets.SocketError>>::get_Task()
 M00000007_IL_0067:
 ret
 M00000007_IL_0068:
@@ -286,7 +286,7 @@ M00000007_IL_0079:
 br M00000007_IL_00a8
 M00000007_IL_007e:
 M00000007_IL_007f:
-newobj instance System.Tasks.Promise<System.Result<System.Networking.Sockets.Socket,System.Networking.Sockets.SocketError>>::.ctor()
+newobj instance System.Concurrency.Tasks.Promise<System.Result<System.Networking.Sockets.Socket,System.Networking.Sockets.SocketError>>::.ctor()
 M00000007_IL_0084:
 stloc local2
 M00000007_IL_0085:
@@ -300,7 +300,7 @@ call neoCLR.Library.System.Networking.Sockets.Socket.RuntimeUnion0(System.Networ
 M00000007_IL_0095:
 call neoCLR.Library.System.Networking.Sockets.Socket.RuntimeUnion1(System.Result.Error<System.Networking.Sockets.SocketError>)
 M00000007_IL_009a:
-call instance System.Tasks.Promise<System.Result<System.Networking.Sockets.Socket,System.Networking.Sockets.SocketError>>::Complete(System.Result<System.Networking.Sockets.Socket,System.Networking.Sockets.SocketError>)
+call instance System.Concurrency.Tasks.Promise<System.Result<System.Networking.Sockets.Socket,System.Networking.Sockets.SocketError>>::Complete(System.Result<System.Networking.Sockets.Socket,System.Networking.Sockets.SocketError>)
 call neoCLR.Library.System.Networking.Sockets.Socket.RuntimeBooleanToInt32(Boolean)
 M00000007_IL_009f:
 pop
@@ -308,7 +308,7 @@ M00000007_IL_00a0:
 M00000007_IL_00a1:
 ldloc local2
 M00000007_IL_00a2:
-call instance System.Tasks.Promise<System.Result<System.Networking.Sockets.Socket,System.Networking.Sockets.SocketError>>::get_Task()
+call instance System.Concurrency.Tasks.Promise<System.Result<System.Networking.Sockets.Socket,System.Networking.Sockets.SocketError>>::get_Task()
 M00000007_IL_00a7:
 ret
 M00000007_IL_00a8:
@@ -367,7 +367,7 @@ M00000007_IL_00e7:
 br M00000007_IL_0119
 M00000007_IL_00ec:
 M00000007_IL_00ed:
-newobj instance System.Tasks.Promise<System.Result<System.Networking.Sockets.Socket,System.Networking.Sockets.SocketError>>::.ctor()
+newobj instance System.Concurrency.Tasks.Promise<System.Result<System.Networking.Sockets.Socket,System.Networking.Sockets.SocketError>>::.ctor()
 M00000007_IL_00f2:
 stloc local6
 M00000007_IL_00f4:
@@ -381,7 +381,7 @@ call neoCLR.Library.System.Networking.Sockets.Socket.RuntimeUnion0(System.Networ
 M00000007_IL_0105:
 call neoCLR.Library.System.Networking.Sockets.Socket.RuntimeUnion1(System.Result.Error<System.Networking.Sockets.SocketError>)
 M00000007_IL_010a:
-call instance System.Tasks.Promise<System.Result<System.Networking.Sockets.Socket,System.Networking.Sockets.SocketError>>::Complete(System.Result<System.Networking.Sockets.Socket,System.Networking.Sockets.SocketError>)
+call instance System.Concurrency.Tasks.Promise<System.Result<System.Networking.Sockets.Socket,System.Networking.Sockets.SocketError>>::Complete(System.Result<System.Networking.Sockets.Socket,System.Networking.Sockets.SocketError>)
 call neoCLR.Library.System.Networking.Sockets.Socket.RuntimeBooleanToInt32(Boolean)
 M00000007_IL_010f:
 pop
@@ -389,7 +389,7 @@ M00000007_IL_0110:
 M00000007_IL_0111:
 ldloc local6
 M00000007_IL_0113:
-call instance System.Tasks.Promise<System.Result<System.Networking.Sockets.Socket,System.Networking.Sockets.SocketError>>::get_Task()
+call instance System.Concurrency.Tasks.Promise<System.Result<System.Networking.Sockets.Socket,System.Networking.Sockets.SocketError>>::get_Task()
 M00000007_IL_0118:
 ret
 M00000007_IL_0119:
@@ -470,7 +470,7 @@ call neoCLR.Library.System.Networking.Sockets.Socket.RuntimeUnion1(System.Result
 M00000008_IL_0039:
 ret
 .end
-.method static Connect(String address,Int32 port) -> System.Tasks.Task<System.Result<System.Networking.Sockets.Socket,System.Networking.Sockets.SocketError>>
+.method static Connect(String address,Int32 port) -> System.Concurrency.Tasks.Task<System.Result<System.Networking.Sockets.Socket,System.Networking.Sockets.SocketError>>
 M00000009_IL_0000:
 M00000009_IL_0001:
 M00000009_IL_0002:
@@ -484,16 +484,16 @@ call System.Networking.Sockets.Socket::Connect(String,Int32,System.Concurrency.C
 M00000009_IL_000e:
 ret
 .end
-.method static Connect(String address,Int32 port,System.Concurrency.CancellationToken cancellationToken) -> System.Tasks.Task<System.Result<System.Networking.Sockets.Socket,System.Networking.Sockets.SocketError>>
-.local System.Tasks.Promise<System.Result<System.Networking.Sockets.Socket,System.Networking.Sockets.SocketError>> local0
+.method static Connect(String address,Int32 port,System.Concurrency.CancellationToken cancellationToken) -> System.Concurrency.Tasks.Task<System.Result<System.Networking.Sockets.Socket,System.Networking.Sockets.SocketError>>
+.local System.Concurrency.Tasks.Promise<System.Result<System.Networking.Sockets.Socket,System.Networking.Sockets.SocketError>> local0
 .local System.Networking.Sockets.SocketConnectCompletion local1
 ldloca local0
-initobj System.Tasks.Promise<System.Result<System.Networking.Sockets.Socket,System.Networking.Sockets.SocketError>>
+initobj System.Concurrency.Tasks.Promise<System.Result<System.Networking.Sockets.Socket,System.Networking.Sockets.SocketError>>
 ldloca local1
 initobj System.Networking.Sockets.SocketConnectCompletion
 M0000000a_IL_0000:
 M0000000a_IL_0001:
-newobj instance System.Tasks.Promise<System.Result<System.Networking.Sockets.Socket,System.Networking.Sockets.SocketError>>::.ctor()
+newobj instance System.Concurrency.Tasks.Promise<System.Result<System.Networking.Sockets.Socket,System.Networking.Sockets.SocketError>>::.ctor()
 M0000000a_IL_0006:
 stloc local0
 M0000000a_IL_0007:
@@ -502,7 +502,7 @@ ldloc local0
 M0000000a_IL_0009:
 ldarg 2
 M0000000a_IL_000a:
-newobj instance System.Networking.Sockets.SocketConnectCompletion::.ctor(System.Tasks.Promise<System.Result<System.Networking.Sockets.Socket,System.Networking.Sockets.SocketError>>,System.Concurrency.CancellationToken)
+newobj instance System.Networking.Sockets.SocketConnectCompletion::.ctor(System.Concurrency.Tasks.Promise<System.Result<System.Networking.Sockets.Socket,System.Networking.Sockets.SocketError>>,System.Concurrency.CancellationToken)
 M0000000a_IL_000f:
 stloc local1
 M0000000a_IL_0010:
@@ -518,11 +518,11 @@ M0000000a_IL_0019:
 M0000000a_IL_001a:
 ldloc local0
 M0000000a_IL_001b:
-call instance System.Tasks.Promise<System.Result<System.Networking.Sockets.Socket,System.Networking.Sockets.SocketError>>::get_Task()
+call instance System.Concurrency.Tasks.Promise<System.Result<System.Networking.Sockets.Socket,System.Networking.Sockets.SocketError>>::get_Task()
 M0000000a_IL_0020:
 ret
 .end
-.method static Connect(System.Collections.Sequence<String> addresses,Int32 port) -> System.Tasks.Task<System.Result<System.Networking.Sockets.Socket,System.Networking.Sockets.SocketError>>
+.method static Connect(System.Collections.Sequence<String> addresses,Int32 port) -> System.Concurrency.Tasks.Task<System.Result<System.Networking.Sockets.Socket,System.Networking.Sockets.SocketError>>
 M0000000b_IL_0000:
 M0000000b_IL_0001:
 M0000000b_IL_0002:
@@ -536,7 +536,7 @@ call System.Networking.Sockets.Socket::Connect(System.Collections.Sequence<Strin
 M0000000b_IL_000e:
 ret
 .end
-.method static Connect(System.Collections.Sequence<String> addresses,Int32 port,System.Concurrency.CancellationToken cancellationToken) -> System.Tasks.Task<System.Result<System.Networking.Sockets.Socket,System.Networking.Sockets.SocketError>>
+.method static Connect(System.Collections.Sequence<String> addresses,Int32 port,System.Concurrency.CancellationToken cancellationToken) -> System.Concurrency.Tasks.Task<System.Result<System.Networking.Sockets.Socket,System.Networking.Sockets.SocketError>>
 M0000000c_IL_0000:
 M0000000c_IL_0001:
 M0000000c_IL_0002:
@@ -554,7 +554,7 @@ call System.Networking.Sockets.Socket::ConnectUntil(System.Collections.Sequence<
 M0000000c_IL_000c:
 ret
 .end
-.method internal static ConnectUntil(System.Collections.Sequence<String> addresses,Int32 port,Int64 deadline) -> System.Tasks.Task<System.Result<System.Networking.Sockets.Socket,System.Networking.Sockets.SocketError>>
+.method internal static ConnectUntil(System.Collections.Sequence<String> addresses,Int32 port,Int64 deadline) -> System.Concurrency.Tasks.Task<System.Result<System.Networking.Sockets.Socket,System.Networking.Sockets.SocketError>>
 M0000000d_IL_0000:
 M0000000d_IL_0001:
 M0000000d_IL_0002:
@@ -570,16 +570,16 @@ call System.Networking.Sockets.Socket::ConnectUntil(System.Collections.Sequence<
 M0000000d_IL_000f:
 ret
 .end
-.method internal static ConnectUntil(System.Collections.Sequence<String> addresses,Int32 port,Int64 deadline,System.Concurrency.CancellationToken cancellationToken) -> System.Tasks.Task<System.Result<System.Networking.Sockets.Socket,System.Networking.Sockets.SocketError>>
-.local System.Tasks.Promise<System.Result<System.Networking.Sockets.Socket,System.Networking.Sockets.SocketError>> local0
+.method internal static ConnectUntil(System.Collections.Sequence<String> addresses,Int32 port,Int64 deadline,System.Concurrency.CancellationToken cancellationToken) -> System.Concurrency.Tasks.Task<System.Result<System.Networking.Sockets.Socket,System.Networking.Sockets.SocketError>>
+.local System.Concurrency.Tasks.Promise<System.Result<System.Networking.Sockets.Socket,System.Networking.Sockets.SocketError>> local0
 .local System.Networking.Sockets.SocketConnectCompletion local1
 ldloca local0
-initobj System.Tasks.Promise<System.Result<System.Networking.Sockets.Socket,System.Networking.Sockets.SocketError>>
+initobj System.Concurrency.Tasks.Promise<System.Result<System.Networking.Sockets.Socket,System.Networking.Sockets.SocketError>>
 ldloca local1
 initobj System.Networking.Sockets.SocketConnectCompletion
 M0000000e_IL_0000:
 M0000000e_IL_0001:
-newobj instance System.Tasks.Promise<System.Result<System.Networking.Sockets.Socket,System.Networking.Sockets.SocketError>>::.ctor()
+newobj instance System.Concurrency.Tasks.Promise<System.Result<System.Networking.Sockets.Socket,System.Networking.Sockets.SocketError>>::.ctor()
 M0000000e_IL_0006:
 stloc local0
 M0000000e_IL_0007:
@@ -588,7 +588,7 @@ ldloc local0
 M0000000e_IL_0009:
 ldarg 3
 M0000000e_IL_000a:
-newobj instance System.Networking.Sockets.SocketConnectCompletion::.ctor(System.Tasks.Promise<System.Result<System.Networking.Sockets.Socket,System.Networking.Sockets.SocketError>>,System.Concurrency.CancellationToken)
+newobj instance System.Networking.Sockets.SocketConnectCompletion::.ctor(System.Concurrency.Tasks.Promise<System.Result<System.Networking.Sockets.Socket,System.Networking.Sockets.SocketError>>,System.Concurrency.CancellationToken)
 M0000000e_IL_000f:
 stloc local1
 M0000000e_IL_0010:
@@ -606,7 +606,7 @@ M0000000e_IL_001a:
 M0000000e_IL_001b:
 ldloc local0
 M0000000e_IL_001c:
-call instance System.Tasks.Promise<System.Result<System.Networking.Sockets.Socket,System.Networking.Sockets.SocketError>>::get_Task()
+call instance System.Concurrency.Tasks.Promise<System.Result<System.Networking.Sockets.Socket,System.Networking.Sockets.SocketError>>::get_Task()
 M0000000e_IL_0021:
 ret
 .end
@@ -662,7 +662,7 @@ call neoCLR.Library.System.Networking.Sockets.Socket.RuntimeUnion3(System.Result
 M0000000f_IL_004a:
 ret
 .end
-.method instance Accept() -> System.Tasks.Task<System.Result<System.Networking.Sockets.Socket,System.Networking.Sockets.SocketError>>
+.method instance Accept() -> System.Concurrency.Tasks.Task<System.Result<System.Networking.Sockets.Socket,System.Networking.Sockets.SocketError>>
 M00000010_IL_0000:
 M00000010_IL_0001:
 M00000010_IL_0002:
@@ -674,16 +674,16 @@ callvirt instance System.Networking.Sockets.Socket::Accept(System.Concurrency.Ca
 M00000010_IL_000d:
 ret
 .end
-.method instance Accept(System.Concurrency.CancellationToken cancellationToken) -> System.Tasks.Task<System.Result<System.Networking.Sockets.Socket,System.Networking.Sockets.SocketError>>
-.local System.Tasks.Promise<System.Result<System.Networking.Sockets.Socket,System.Networking.Sockets.SocketError>> local0
+.method instance Accept(System.Concurrency.CancellationToken cancellationToken) -> System.Concurrency.Tasks.Task<System.Result<System.Networking.Sockets.Socket,System.Networking.Sockets.SocketError>>
+.local System.Concurrency.Tasks.Promise<System.Result<System.Networking.Sockets.Socket,System.Networking.Sockets.SocketError>> local0
 .local System.Networking.Sockets.SocketConnectCompletion local1
 ldloca local0
-initobj System.Tasks.Promise<System.Result<System.Networking.Sockets.Socket,System.Networking.Sockets.SocketError>>
+initobj System.Concurrency.Tasks.Promise<System.Result<System.Networking.Sockets.Socket,System.Networking.Sockets.SocketError>>
 ldloca local1
 initobj System.Networking.Sockets.SocketConnectCompletion
 M00000011_IL_0000:
 M00000011_IL_0001:
-newobj instance System.Tasks.Promise<System.Result<System.Networking.Sockets.Socket,System.Networking.Sockets.SocketError>>::.ctor()
+newobj instance System.Concurrency.Tasks.Promise<System.Result<System.Networking.Sockets.Socket,System.Networking.Sockets.SocketError>>::.ctor()
 M00000011_IL_0006:
 stloc local0
 M00000011_IL_0007:
@@ -692,7 +692,7 @@ ldloc local0
 M00000011_IL_0009:
 ldarg 1
 M00000011_IL_000a:
-newobj instance System.Networking.Sockets.SocketConnectCompletion::.ctor(System.Tasks.Promise<System.Result<System.Networking.Sockets.Socket,System.Networking.Sockets.SocketError>>,System.Concurrency.CancellationToken)
+newobj instance System.Networking.Sockets.SocketConnectCompletion::.ctor(System.Concurrency.Tasks.Promise<System.Result<System.Networking.Sockets.Socket,System.Networking.Sockets.SocketError>>,System.Concurrency.CancellationToken)
 M00000011_IL_000f:
 stloc local1
 M00000011_IL_0010:
@@ -708,7 +708,7 @@ M00000011_IL_001d:
 M00000011_IL_001e:
 ldloc local0
 M00000011_IL_001f:
-call instance System.Tasks.Promise<System.Result<System.Networking.Sockets.Socket,System.Networking.Sockets.SocketError>>::get_Task()
+call instance System.Concurrency.Tasks.Promise<System.Result<System.Networking.Sockets.Socket,System.Networking.Sockets.SocketError>>::get_Task()
 M00000011_IL_0024:
 ret
 .end
@@ -760,7 +760,7 @@ call neoCLR.Library.System.Networking.Sockets.Socket.RuntimeUnion6(System.Result
 M00000012_IL_0048:
 ret
 .end
-.method instance Receive(arrayref<Byte> buffer,Int32 offset,Int32 count) -> System.Tasks.Task<System.Result<Int32,System.Networking.Sockets.SocketError>>
+.method instance Receive(arrayref<Byte> buffer,Int32 offset,Int32 count) -> System.Concurrency.Tasks.Task<System.Result<Int32,System.Networking.Sockets.SocketError>>
 M00000013_IL_0000:
 M00000013_IL_0001:
 M00000013_IL_0002:
@@ -778,7 +778,7 @@ callvirt instance System.Networking.Sockets.Socket::Receive(arrayref<Byte>,Int32
 M00000013_IL_0010:
 ret
 .end
-.method instance Receive(arrayref<Byte> buffer,Int32 offset,Int32 count,System.Concurrency.CancellationToken cancellationToken) -> System.Tasks.Task<System.Result<Int32,System.Networking.Sockets.SocketError>>
+.method instance Receive(arrayref<Byte> buffer,Int32 offset,Int32 count,System.Concurrency.CancellationToken cancellationToken) -> System.Concurrency.Tasks.Task<System.Result<Int32,System.Networking.Sockets.SocketError>>
 M00000014_IL_0000:
 M00000014_IL_0001:
 M00000014_IL_0002:
@@ -800,7 +800,7 @@ callvirt instance System.Networking.Sockets.Socket::ReceiveUntil(arrayref<Byte>,
 M00000014_IL_000f:
 ret
 .end
-.method internal instance ReceiveUntil(arrayref<Byte> buffer,Int32 offset,Int32 count,Int64 deadline) -> System.Tasks.Task<System.Result<Int32,System.Networking.Sockets.SocketError>>
+.method internal instance ReceiveUntil(arrayref<Byte> buffer,Int32 offset,Int32 count,Int64 deadline) -> System.Concurrency.Tasks.Task<System.Result<Int32,System.Networking.Sockets.SocketError>>
 M00000015_IL_0000:
 M00000015_IL_0001:
 M00000015_IL_0002:
@@ -820,16 +820,16 @@ callvirt instance System.Networking.Sockets.Socket::ReceiveUntil(arrayref<Byte>,
 M00000015_IL_0012:
 ret
 .end
-.method internal instance ReceiveUntil(arrayref<Byte> buffer,Int32 offset,Int32 count,Int64 deadline,System.Concurrency.CancellationToken cancellationToken) -> System.Tasks.Task<System.Result<Int32,System.Networking.Sockets.SocketError>>
-.local System.Tasks.Promise<System.Result<Int32,System.Networking.Sockets.SocketError>> local0
+.method internal instance ReceiveUntil(arrayref<Byte> buffer,Int32 offset,Int32 count,Int64 deadline,System.Concurrency.CancellationToken cancellationToken) -> System.Concurrency.Tasks.Task<System.Result<Int32,System.Networking.Sockets.SocketError>>
+.local System.Concurrency.Tasks.Promise<System.Result<Int32,System.Networking.Sockets.SocketError>> local0
 .local System.Networking.Sockets.SocketTransferCompletion local1
 ldloca local0
-initobj System.Tasks.Promise<System.Result<Int32,System.Networking.Sockets.SocketError>>
+initobj System.Concurrency.Tasks.Promise<System.Result<Int32,System.Networking.Sockets.SocketError>>
 ldloca local1
 initobj System.Networking.Sockets.SocketTransferCompletion
 M00000016_IL_0000:
 M00000016_IL_0001:
-newobj instance System.Tasks.Promise<System.Result<Int32,System.Networking.Sockets.SocketError>>::.ctor()
+newobj instance System.Concurrency.Tasks.Promise<System.Result<Int32,System.Networking.Sockets.SocketError>>::.ctor()
 M00000016_IL_0006:
 stloc local0
 M00000016_IL_0007:
@@ -838,7 +838,7 @@ ldloc local0
 M00000016_IL_0009:
 ldarg 5
 M00000016_IL_000b:
-newobj instance System.Networking.Sockets.SocketTransferCompletion::.ctor(System.Tasks.Promise<System.Result<Int32,System.Networking.Sockets.SocketError>>,System.Concurrency.CancellationToken)
+newobj instance System.Networking.Sockets.SocketTransferCompletion::.ctor(System.Concurrency.Tasks.Promise<System.Result<Int32,System.Networking.Sockets.SocketError>>,System.Concurrency.CancellationToken)
 M00000016_IL_0010:
 stloc local1
 M00000016_IL_0011:
@@ -862,11 +862,11 @@ M00000016_IL_0023:
 M00000016_IL_0024:
 ldloc local0
 M00000016_IL_0025:
-call instance System.Tasks.Promise<System.Result<Int32,System.Networking.Sockets.SocketError>>::get_Task()
+call instance System.Concurrency.Tasks.Promise<System.Result<Int32,System.Networking.Sockets.SocketError>>::get_Task()
 M00000016_IL_002a:
 ret
 .end
-.method instance Send(arrayref<Byte> buffer,Int32 offset,Int32 count) -> System.Tasks.Task<System.Result<Int32,System.Networking.Sockets.SocketError>>
+.method instance Send(arrayref<Byte> buffer,Int32 offset,Int32 count) -> System.Concurrency.Tasks.Task<System.Result<Int32,System.Networking.Sockets.SocketError>>
 M00000017_IL_0000:
 M00000017_IL_0001:
 M00000017_IL_0002:
@@ -884,7 +884,7 @@ callvirt instance System.Networking.Sockets.Socket::Send(arrayref<Byte>,Int32,In
 M00000017_IL_0010:
 ret
 .end
-.method instance Send(arrayref<Byte> buffer,Int32 offset,Int32 count,System.Concurrency.CancellationToken cancellationToken) -> System.Tasks.Task<System.Result<Int32,System.Networking.Sockets.SocketError>>
+.method instance Send(arrayref<Byte> buffer,Int32 offset,Int32 count,System.Concurrency.CancellationToken cancellationToken) -> System.Concurrency.Tasks.Task<System.Result<Int32,System.Networking.Sockets.SocketError>>
 M00000018_IL_0000:
 M00000018_IL_0001:
 M00000018_IL_0002:
@@ -906,7 +906,7 @@ callvirt instance System.Networking.Sockets.Socket::SendUntil(arrayref<Byte>,Int
 M00000018_IL_000f:
 ret
 .end
-.method internal instance SendUntil(arrayref<Byte> buffer,Int32 offset,Int32 count,Int64 deadline) -> System.Tasks.Task<System.Result<Int32,System.Networking.Sockets.SocketError>>
+.method internal instance SendUntil(arrayref<Byte> buffer,Int32 offset,Int32 count,Int64 deadline) -> System.Concurrency.Tasks.Task<System.Result<Int32,System.Networking.Sockets.SocketError>>
 M00000019_IL_0000:
 M00000019_IL_0001:
 M00000019_IL_0002:
@@ -926,16 +926,16 @@ callvirt instance System.Networking.Sockets.Socket::SendUntil(arrayref<Byte>,Int
 M00000019_IL_0012:
 ret
 .end
-.method internal instance SendUntil(arrayref<Byte> buffer,Int32 offset,Int32 count,Int64 deadline,System.Concurrency.CancellationToken cancellationToken) -> System.Tasks.Task<System.Result<Int32,System.Networking.Sockets.SocketError>>
-.local System.Tasks.Promise<System.Result<Int32,System.Networking.Sockets.SocketError>> local0
+.method internal instance SendUntil(arrayref<Byte> buffer,Int32 offset,Int32 count,Int64 deadline,System.Concurrency.CancellationToken cancellationToken) -> System.Concurrency.Tasks.Task<System.Result<Int32,System.Networking.Sockets.SocketError>>
+.local System.Concurrency.Tasks.Promise<System.Result<Int32,System.Networking.Sockets.SocketError>> local0
 .local System.Networking.Sockets.SocketTransferCompletion local1
 ldloca local0
-initobj System.Tasks.Promise<System.Result<Int32,System.Networking.Sockets.SocketError>>
+initobj System.Concurrency.Tasks.Promise<System.Result<Int32,System.Networking.Sockets.SocketError>>
 ldloca local1
 initobj System.Networking.Sockets.SocketTransferCompletion
 M0000001a_IL_0000:
 M0000001a_IL_0001:
-newobj instance System.Tasks.Promise<System.Result<Int32,System.Networking.Sockets.SocketError>>::.ctor()
+newobj instance System.Concurrency.Tasks.Promise<System.Result<Int32,System.Networking.Sockets.SocketError>>::.ctor()
 M0000001a_IL_0006:
 stloc local0
 M0000001a_IL_0007:
@@ -944,7 +944,7 @@ ldloc local0
 M0000001a_IL_0009:
 ldarg 5
 M0000001a_IL_000b:
-newobj instance System.Networking.Sockets.SocketTransferCompletion::.ctor(System.Tasks.Promise<System.Result<Int32,System.Networking.Sockets.SocketError>>,System.Concurrency.CancellationToken)
+newobj instance System.Networking.Sockets.SocketTransferCompletion::.ctor(System.Concurrency.Tasks.Promise<System.Result<Int32,System.Networking.Sockets.SocketError>>,System.Concurrency.CancellationToken)
 M0000001a_IL_0010:
 stloc local1
 M0000001a_IL_0011:
@@ -968,7 +968,7 @@ M0000001a_IL_0023:
 M0000001a_IL_0024:
 ldloc local0
 M0000001a_IL_0025:
-call instance System.Tasks.Promise<System.Result<Int32,System.Networking.Sockets.SocketError>>::get_Task()
+call instance System.Concurrency.Tasks.Promise<System.Result<Int32,System.Networking.Sockets.SocketError>>::get_Task()
 M0000001a_IL_002a:
 ret
 .end

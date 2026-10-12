@@ -60,56 +60,56 @@ ldvoid
 ret
 .end
 .end
-.function MakeQueue() -> System.Tasks.TaskQueue
-newobj instance System.Tasks.TaskQueue::.ctor()
+.function MakeQueue() -> System.Concurrency.Tasks.TaskQueue
+newobj instance System.Concurrency.Tasks.TaskQueue::.ctor()
 ret
 .end
-.function DefaultQueue() -> System.Tasks.TaskQueue
-call System.Tasks.TaskQueue::get_Default()
+.function DefaultQueue() -> System.Concurrency.Tasks.TaskQueue
+call System.Concurrency.Tasks.TaskQueue::get_Default()
 ret
 .end
-.function Post(System.Tasks.TaskQueue queue, Counter counter) -> Void
+.function Post(System.Concurrency.Tasks.TaskQueue queue, Counter counter) -> Void
 ldarg queue
 ldarg counter
 function.bind fn<Void> = instance Counter::Tick()
-callvirt instance System.Tasks.TaskQueue::Post(fn<Void>)
+callvirt instance System.Concurrency.Tasks.TaskQueue::Post(fn<Void>)
 ldvoid
 ret
 .end
-.function Pump(System.Tasks.TaskQueue queue) -> Void
+.function Pump(System.Concurrency.Tasks.TaskQueue queue) -> Void
 ldarg queue
-callvirt instance System.Tasks.TaskQueue::Drain()
+callvirt instance System.Concurrency.Tasks.TaskQueue::Drain()
 ldvoid
 ret
 .end
-.function Register(System.Tasks.Promise<Int32> source, Counter counter) -> Void
+.function Register(System.Concurrency.Tasks.Promise<Int32> source, Counter counter) -> Void
 ldarg source
-callvirt instance System.Tasks.Promise<Int32>::get_Task()
+callvirt instance System.Concurrency.Tasks.Promise<Int32>::get_Task()
 ldarg counter
 function.bind fn<Void> = instance Counter::Tick()
-callvirt instance System.Tasks.Task<Int32>::OnCompleted(fn<Void>)
+callvirt instance System.Concurrency.Tasks.Task<Int32>::OnCompleted(fn<Void>)
 ldvoid
 ret
 .end
-.function QueueOf(System.Tasks.Promise<Int32> source) -> System.Tasks.TaskQueue
+.function QueueOf(System.Concurrency.Tasks.Promise<Int32> source) -> System.Concurrency.Tasks.TaskQueue
 ldarg source
-callvirt instance System.Tasks.Promise<Int32>::Dispatcher()
+callvirt instance System.Concurrency.Tasks.Promise<Int32>::Dispatcher()
 ret
 .end
-.function Make() -> System.Tasks.Promise<Int32>
-newobj instance System.Tasks.TaskQueue::.ctor()
-newobj instance System.Tasks.Promise<Int32>::.ctor(System.Tasks.TaskQueue)
+.function Make() -> System.Concurrency.Tasks.Promise<Int32>
+newobj instance System.Concurrency.Tasks.TaskQueue::.ctor()
+newobj instance System.Concurrency.Tasks.Promise<Int32>::.ctor(System.Concurrency.Tasks.TaskQueue)
 ret
 .end
-.function Complete(System.Tasks.Promise<Int32> source) -> Boolean
+.function Complete(System.Concurrency.Tasks.Promise<Int32> source) -> Boolean
 ldarg source
 ldc.i4 42
-callvirt instance System.Tasks.Promise<Int32>::Complete(Int32)
+callvirt instance System.Concurrency.Tasks.Promise<Int32>::Complete(Int32)
 ret
 .end
-.function Cancel(System.Tasks.Promise<Int32> source) -> Boolean
+.function Cancel(System.Concurrency.Tasks.Promise<Int32> source) -> Boolean
 ldarg source
-callvirt instance System.Tasks.Promise<Int32>::Cancel()
+callvirt instance System.Concurrency.Tasks.Promise<Int32>::Cancel()
 ret
 .end
 "#,
@@ -207,7 +207,7 @@ fn guarded_mutations_keep_instruction_limits_and_reject_host_suspension() {
         ("again:\nbr again", true),
         ("call neoCLR.Runtime.ConsoleReadByte()\npop\nret", false),
     ] {
-        let module = crate::assemble(&format!(".module System\n.type class System.Tasks.TaskQueue\n.method instance Post() -> noresult\n{body}\n.end\n.end\n.function neoCLR.Runtime.ConsoleReadByte() -> Value\n.methodimpl InternalCall\n.end")).unwrap();
+        let module = crate::assemble(&format!(".module System\n.type class System.Concurrency.Tasks.TaskQueue\n.method instance Post() -> noresult\n{body}\n.end\n.end\n.function neoCLR.Runtime.ConsoleReadByte() -> Value\n.methodimpl InternalCall\n.end")).unwrap();
         let cancellation = crate::CancellationToken::new();
         if cancelled {
             cancellation.cancel();
@@ -233,7 +233,7 @@ fn guarded_mutations_keep_instruction_limits_and_reject_host_suspension() {
             Frame::new(
                 function,
                 vec![Value::NullObjectReference(Type::from_name(
-                    "System.Tasks.TaskQueue",
+                    "System.Concurrency.Tasks.TaskQueue",
                 ))],
             )
             .unwrap(),
@@ -264,11 +264,11 @@ fn guarded_mutations_keep_instruction_limits_and_reject_host_suspension() {
 
 #[test]
 fn application_names_do_not_receive_system_atomic_policy() {
-    let module = crate::assemble(".module Application\n.type class System.Tasks.TaskQueue\n.method instance Post() -> noresult\nagain:\nbr again\n.end\n.end").unwrap();
+    let module = crate::assemble(".module Application\n.type class System.Concurrency.Tasks.TaskQueue\n.method instance Post() -> noresult\nagain:\nbr again\n.end\n.end").unwrap();
     let frame = Frame::new(
         module.functions[0].clone(),
         vec![Value::NullObjectReference(Type::from_name(
-            "System.Tasks.TaskQueue",
+            "System.Concurrency.Tasks.TaskQueue",
         ))],
     )
     .unwrap();

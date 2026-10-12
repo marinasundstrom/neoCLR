@@ -53,7 +53,7 @@
     "System",
     "System.Linq",
     "System.Runtime.Reflection",
-    "System.Tasks",
+    "System.Concurrency.Tasks",
     "System.Collections"
   ],
   "search": true,

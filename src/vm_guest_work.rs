@@ -171,11 +171,11 @@ ret
 .module App
 .entry Main
 .type class Job
-.field Source System.Tasks.Promise<Int32>
+.field Source System.Concurrency.Tasks.Promise<Int32>
 .field Observed Int32
 .method instance .ctor() -> noresult
 ldarg 0
-newobj instance System.Tasks.Promise<Int32>::.ctor()
+newobj instance System.Concurrency.Tasks.Promise<Int32>::.ctor()
 stfld Job::Source
 ret
 .end
@@ -183,7 +183,7 @@ ret
 ldarg 0
 ldfld Job::Source
 ldc.i4 42
-callvirt instance System.Tasks.Promise<Int32>::Complete(Int32)
+callvirt instance System.Concurrency.Tasks.Promise<Int32>::Complete(Int32)
 pop
 ldvoid
 ret
@@ -192,8 +192,8 @@ ret
 ldarg 0
 ldarg 0
 ldfld Job::Source
-callvirt instance System.Tasks.Promise<Int32>::get_Task()
-callvirt instance System.Tasks.Task<Int32>::GetResult()
+callvirt instance System.Concurrency.Tasks.Promise<Int32>::get_Task()
+callvirt instance System.Concurrency.Tasks.Task<Int32>::GetResult()
 stfld Job::Observed
 ldvoid
 ret
@@ -205,10 +205,10 @@ newobj instance Job::.ctor()
 stloc job
 ldloc job
 ldfld Job::Source
-callvirt instance System.Tasks.Promise<Int32>::get_Task()
+callvirt instance System.Concurrency.Tasks.Promise<Int32>::get_Task()
 ldloc job
 function.bind fn<Void> = instance Job::Observe()
-callvirt instance System.Tasks.Task<Int32>::OnCompleted(fn<Void>)
+callvirt instance System.Concurrency.Tasks.Task<Int32>::OnCompleted(fn<Void>)
 ldloc job
 function.bind fn<Void> = instance Job::Run()
 call neoCLR.Runtime.ScheduleTask(fn<Void>)
@@ -218,8 +218,8 @@ ret
 .end
 "#;
         for (body, fails) in [(source.to_owned(), false),
-            (source.replace("ldc.i4 42\ncallvirt instance System.Tasks.Promise<Int32>::Complete(Int32)",
-                "fault \"submitted guest failure\"\nldc.i4 42\ncallvirt instance System.Tasks.Promise<Int32>::Complete(Int32)"), true)] {
+            (source.replace("ldc.i4 42\ncallvirt instance System.Concurrency.Tasks.Promise<Int32>::Complete(Int32)",
+                "fault \"submitted guest failure\"\nldc.i4 42\ncallvirt instance System.Concurrency.Tasks.Promise<Int32>::Complete(Int32)"), true)] {
             let app = crate::assembler::read_modules(
                 &[crate::assembler::ModuleInput::Source(&body)], &system,
             ).unwrap().remove(0);
@@ -282,21 +282,21 @@ ret
         let module = crate::assemble(
             r#"
 .module System
-.type class System.Tasks.TaskQueue
+.type class System.Concurrency.Tasks.TaskQueue
 .field Drains Int32
 .field Pending Int32
 .field Observed Int32
 .method instance Drain() -> noresult
 ldarg 0
 ldarg 0
-ldfld System.Tasks.TaskQueue::Drains
+ldfld System.Concurrency.Tasks.TaskQueue::Drains
 ldc.i4 1
 add
-stfld System.Tasks.TaskQueue::Drains
+stfld System.Concurrency.Tasks.TaskQueue::Drains
 ldarg 0
 ldarg 0
-ldfld System.Tasks.TaskQueue::Pending
-stfld System.Tasks.TaskQueue::Observed
+ldfld System.Concurrency.Tasks.TaskQueue::Pending
+stfld System.Concurrency.Tasks.TaskQueue::Observed
 ret
 .end
 .end
@@ -316,7 +316,7 @@ ret
             let mut heap = parent.enter();
             let id = heap
                 .allocate(Value::Object {
-                    ty: Type::from_name("System.Tasks.TaskQueue"),
+                    ty: Type::from_name("System.Concurrency.Tasks.TaskQueue"),
                     fields: vec![Value::Int32(0); 3],
                 })
                 .unwrap();

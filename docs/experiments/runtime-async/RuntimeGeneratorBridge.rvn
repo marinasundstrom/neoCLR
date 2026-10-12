@@ -3,7 +3,7 @@ module RuntimeAwaitProvider
 
 import System.*
 import System.Collections.*
-import System.Tasks.*
+import System.Concurrency.Tasks.*
 
 static class BridgeGenerator {
     static func CreateIterable<T>(body: (GeneratorCursor<T>) -> TaskOutcome<()>) -> AsyncIterable<T> {

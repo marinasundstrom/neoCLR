@@ -62,7 +62,7 @@ with tempfile.TemporaryDirectory(prefix='neoclr-socket-client-') as folder, sock
         ('private DNS completion', 'let completion = System.Networking.DnsCompletion(Promise<Result<System.Collections.Sequence<string>, System.Networking.DnsError>>())'),
         ('private completion type', 'let completion = SocketConnectCompletion(Promise<Result<Socket, SocketError>>())'),
     ]:
-        (root / 'Main.rvn').write_text('import System.*\nimport System.Tasks.*\nimport System.Networking.Sockets.*\nfunc Main() {\n' + code + '\n}\n')
+        (root / 'Main.rvn').write_text('import System.*\nimport System.Concurrency.Tasks.*\nimport System.Networking.Sockets.*\nfunc Main() {\n' + code + '\n}\n')
         build = subprocess.run(['dotnet', 'msbuild', str(root / 'SocketClient.rvnproj'), '-nologo', '-v:minimal'], env=env, capture_output=True, text=True, timeout=90)
         diagnostics = build.stdout + build.stderr
         assert build.returncode != 0 and 'error RAV' in diagnostics and 'Unhandled exception' not in diagnostics, diagnostics

@@ -171,7 +171,7 @@ ret
 .function Launch() -> Void
 .local Int32 handle
 .local arrayref<Byte> buffer
-call System.Tasks.TaskQueue::get_Default()
+call System.Concurrency.Tasks.TaskQueue::get_Default()
 pop
 function.bind fn<String,String> = Echo(String)
 ldstr "data"
@@ -203,9 +203,9 @@ fn registered_completion_survives_both_vm_collection_paths_and_dispatches() {
 .local Int32 index
 call Launch()
 pop
-call System.Tasks.TaskQueue::get_Default()
+call System.Concurrency.Tasks.TaskQueue::get_Default()
 function.bind fn<Void> = Ready()
-call instance System.Tasks.TaskQueue::Post(fn<Void>)
+call instance System.Concurrency.Tasks.TaskQueue::Post(fn<Void>)
 ldc.i4 0
 stloc index
 Again:
@@ -250,7 +250,7 @@ fn notification_rejects_missing_dispatcher_unknown_and_duplicate_handles() {
     );
     assert!(
         execute(
-            &format!("call System.Tasks.TaskQueue::get_Default()\npop\n{call}"),
+            &format!("call System.Concurrency.Tasks.TaskQueue::get_Default()\npop\n{call}"),
             NOTIFY_TYPES
         )
         .unwrap_err()
@@ -445,7 +445,7 @@ const BUSY_QUEUE: &str = r#"
 .type class BusyQueue
 .field Handle Int32
 .field Done Int32
-.field Queue System.Tasks.TaskQueue
+.field Queue System.Concurrency.Tasks.TaskQueue
 .method instance Complete() -> Void
 ldarg this
 ldfld BusyQueue::Handle
@@ -471,7 +471,7 @@ ldarg this
 ldfld BusyQueue::Queue
 ldarg this
 function.bind fn<Void> = instance BusyQueue::Tick()
-call instance System.Tasks.TaskQueue::Post(fn<Void>)
+call instance System.Concurrency.Tasks.TaskQueue::Post(fn<Void>)
 ldvoid
 ret
 Finished:
@@ -486,20 +486,20 @@ ret
 
 fn busy_queue_body(explicit: bool) -> String {
     let queue = if explicit {
-        "newobj instance System.Tasks.TaskQueue::.ctor()"
+        "newobj instance System.Concurrency.Tasks.TaskQueue::.ctor()"
     } else {
-        "call System.Tasks.TaskQueue::get_Default()"
+        "call System.Concurrency.Tasks.TaskQueue::get_Default()"
     };
     let drain = if explicit {
-        "ldloc queue\ncall instance System.Tasks.TaskQueue::Drain()"
+        "ldloc queue\ncall instance System.Concurrency.Tasks.TaskQueue::Drain()"
     } else {
         ""
     };
     format!(
         r#"
-.local System.Tasks.TaskQueue queue
+.local System.Concurrency.Tasks.TaskQueue queue
 .local BusyQueue state
-call System.Tasks.TaskQueue::get_Default()
+call System.Concurrency.Tasks.TaskQueue::get_Default()
 pop
 {queue}
 stloc queue
@@ -519,7 +519,7 @@ pop
 ldloc queue
 ldloc state
 function.bind fn<Void> = instance BusyQueue::Tick()
-call instance System.Tasks.TaskQueue::Post(fn<Void>)
+call instance System.Concurrency.Tasks.TaskQueue::Post(fn<Void>)
 {drain}
 ldstr "entry"
 "#

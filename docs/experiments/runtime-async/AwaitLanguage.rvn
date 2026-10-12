@@ -1,6 +1,6 @@
 module RuntimeAwaitLanguage {
     import System.*
-    import System.Tasks.*
+    import System.Concurrency.Tasks.*
     import System.Runtime.CompilerServices.*
 
     // Source-local compatibility adapter, not a proposed public awaiter type.

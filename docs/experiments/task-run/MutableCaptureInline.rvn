@@ -1,5 +1,5 @@
 import System.*
-import System.Tasks.*
+import System.Concurrency.Tasks.*
 async func Main() -> Task<int> {
     var count = 0
     let callback: () -> int = () => {

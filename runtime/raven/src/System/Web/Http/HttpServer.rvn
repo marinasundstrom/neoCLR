@@ -4,7 +4,7 @@ import System.*
 import System.Option.*
 import System.Result.*
 import System.Collections.*
-import System.Tasks.*
+import System.Concurrency.Tasks.*
 import System.Concurrency.*
 import System.Text.*
 import System.Networking.*

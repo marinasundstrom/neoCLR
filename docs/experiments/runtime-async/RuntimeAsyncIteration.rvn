@@ -2,7 +2,7 @@ module RuntimeAsyncIteration
 
 import System.*
 import System.Collections.*
-import System.Tasks.*
+import System.Concurrency.Tasks.*
 
 class Probe : AsyncIterable<int>, AsyncIterator<int> {
     val Next = Promise<bool>()

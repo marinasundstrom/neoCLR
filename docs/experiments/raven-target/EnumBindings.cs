@@ -7,7 +7,7 @@ static class EnumBindings
     public const string StringComparison = "System.StringComparison";
     static readonly (string Name, int Value)[] StringLiterals = [("Ordinal", 0), ("OrdinalIgnoreCase", 1)];
     public const string Flags = "System.Introspection.BindingFlags";
-    public const string TaskState = "System.Tasks.TaskState";
+    public const string TaskState = "System.Concurrency.Tasks.TaskState";
     public const string EntryKind = "System.Storage.EntryKind";
     public const string HttpStatusCode = "System.Web.Http.HttpStatusCode";
     static readonly (string Name, int Value)[] HttpLiterals = [("Continue", 100), ("SwitchingProtocols", 101), ("OK", 200), ("Created", 201), ("Accepted", 202), ("NoContent", 204), ("ResetContent", 205), ("PartialContent", 206), ("MultipleChoices", 300), ("MovedPermanently", 301), ("Found", 302), ("SeeOther", 303), ("NotModified", 304), ("TemporaryRedirect", 307), ("PermanentRedirect", 308), ("BadRequest", 400), ("Unauthorized", 401), ("Forbidden", 403), ("NotFound", 404), ("MethodNotAllowed", 405), ("RequestTimeout", 408), ("Conflict", 409), ("Gone", 410), ("LengthRequired", 411), ("PreconditionFailed", 412), ("RequestEntityTooLarge", 413), ("RequestUriTooLong", 414), ("UnsupportedMediaType", 415), ("RequestedRangeNotSatisfiable", 416), ("ExpectationFailed", 417), ("UnprocessableContent", 422), ("TooManyRequests", 429), ("InternalServerError", 500), ("NotImplemented", 501), ("BadGateway", 502), ("ServiceUnavailable", 503), ("GatewayTimeout", 504), ("HttpVersionNotSupported", 505)];

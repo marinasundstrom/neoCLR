@@ -8,7 +8,7 @@ import System.Networking.*
 import System.Networking.Sockets.*
 import System.Option.*
 import System.Result.*
-import System.Tasks.*
+import System.Concurrency.Tasks.*
 import System.Runtime.CompilerServices.*
 
 internal class PostgresConnection : SqlConnection {

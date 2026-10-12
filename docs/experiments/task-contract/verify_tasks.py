@@ -20,10 +20,10 @@ parser.add_argument('--runtime', type=Path, required=True)
 args = parser.parse_args()
 prelude = '''import System.*
 import System.Collections.*
-import System.Tasks.*
+import System.Concurrency.Tasks.*
 import System.Result.*
 import System.Option.*
-import System.Tasks.TaskOutcome.*
+import System.Concurrency.Tasks.TaskOutcome.*
 import System.Console.*
 
 public func Check(value: bool) {

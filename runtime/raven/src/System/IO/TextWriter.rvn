@@ -1,7 +1,7 @@
 module System.IO
 
 import System.*
-import System.Tasks.*
+import System.Concurrency.Tasks.*
 
 public interface TextWriter {
     func Write(text: string) -> Task<Result<int, StreamError>>

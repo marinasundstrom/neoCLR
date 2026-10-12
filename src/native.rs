@@ -991,16 +991,16 @@ pub(crate) fn bind(function: &Function) -> Result<Binding, Fault> {
         ("neoCLR.Runtime.DrainEntryTasks", []) => (Binding::DrainEntryTasks, Type::Void),
         ("neoCLR.Runtime.DefaultTaskQueue", []) => (
             Binding::DefaultTaskQueue,
-            Type::from_name("System.Tasks.TaskQueue"),
+            Type::from_name("System.Concurrency.Tasks.TaskQueue"),
         ),
         ("neoCLR.Runtime.RegisterDefaultTaskQueue", [queue])
-            if queue == &Type::from_name("System.Tasks.TaskQueue") =>
+            if queue == &Type::from_name("System.Concurrency.Tasks.TaskQueue") =>
         {
             (Binding::RegisterDefaultTaskQueue, Type::Void)
         }
         ("neoCLR.Runtime.CurrentTaskQueue", []) => (
             Binding::CurrentTaskQueue,
-            Type::from_name("System.Tasks.TaskQueue"),
+            Type::from_name("System.Concurrency.Tasks.TaskQueue"),
         ),
         ("neoCLR.Runtime.ExecutingAssembly", []) => (
             Binding::ExecutingAssembly,

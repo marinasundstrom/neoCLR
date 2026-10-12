@@ -1,7 +1,7 @@
 module NeoClr.RuntimeTests
 
 import System.*
-import System.Tasks.TaskOutcome.*
+import System.Concurrency.Tasks.TaskOutcome.*
 import System.Collections.*
 import System.IO.*
 import System.Option.*
@@ -146,7 +146,7 @@ func HReaderErrors() -> Result<unit, TestFailure> {
 
 // These fixtures promise inline completion; observation verifies that contract.
 // Consumers of potentially pending streams use await instead.
-func CompletedValue<T>(operation: System.Tasks.Task<T>) -> T {
+func CompletedValue<T>(operation: System.Concurrency.Tasks.Task<T>) -> T {
     let Some(Completed(value)) = operation.Outcome else {
         System.Fail("Expected an immediately completed fixture operation")
     }
@@ -160,7 +160,7 @@ func IPendingRead() -> Result<unit, TestFailure> {
     let operation = reader.ReadToEnd(16)
     _ = Assert.True(!operation.IsCompleted, "Reader remains pending")?
     source.Complete()
-    System.Tasks.TaskQueue.Default.Drain()
+    System.Concurrency.Tasks.TaskQueue.Default.Drain()
     return Assert.True(CompletedValue(operation) is Ok("A"), "Resume decoding and observe EOF")
 }
 
@@ -171,7 +171,7 @@ func JPendingWrite() -> Result<unit, TestFailure> {
     let operation = writer.Write("é")
     _ = Assert.True(!operation.IsCompleted && sink.Received == 2, "Writer retains pending output")?
     sink.Complete()
-    System.Tasks.TaskQueue.Default.Drain()
+    System.Concurrency.Tasks.TaskQueue.Default.Drain()
     return Assert.True(CompletedValue(operation) is Ok(2), "Report bytes only after settlement")
 }
 
@@ -182,6 +182,6 @@ func KPendingCancellation() -> Result<unit, TestFailure> {
     let operation = reader.ReadToEnd(16)
     _ = Assert.True(!operation.IsCompleted, "Reader starts pending")?
     source.Cancel()
-    System.Tasks.TaskQueue.Default.Drain()
+    System.Concurrency.Tasks.TaskQueue.Default.Drain()
     return Assert.True(operation.IsCancelled, "Cancellation propagates through await")
 }

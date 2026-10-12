@@ -15,7 +15,7 @@ parser.add_argument('--case', help='Run cases whose label contains this text')
 args = parser.parse_args()
 prelude = '''import System.*
 import System.Collections.*
-import System.Tasks.*
+import System.Concurrency.Tasks.*
 import System.Result.*
 import System.Option.*
 import System.Console.*

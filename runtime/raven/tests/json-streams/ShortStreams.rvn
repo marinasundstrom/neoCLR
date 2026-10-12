@@ -4,7 +4,7 @@ import System.*
 import System.Data.Json.*
 import System.Collections.*
 import System.IO.*
-import System.Tasks.*
+import System.Concurrency.Tasks.*
 import System.Concurrency.*
 import System.Result.*
 import System.Text.*

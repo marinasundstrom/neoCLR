@@ -1,7 +1,7 @@
 module AsyncStackTraceCases
 
 import System.*
-import System.Tasks.*
+import System.Concurrency.Tasks.*
 import System.Diagnostics.*
 
 async func CaptureAfter(input: Task<int>) -> Task<StackTrace> {
