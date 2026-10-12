@@ -1010,6 +1010,22 @@ ret
                 assert_eq!(report["functionCount"], 1);
                 assert_eq!(report["functionCloneCount"], 0);
             } else {
+                assert!(result.err().unwrap().to_string().contains("specialization input exceeds metadata limits"));
+            }
+        }
+    }
+    #[test]
+    fn generic_shape_expansion_has_its_own_bound_before_selection() {
+        for count in [MAX_SPECIALIZED_TYPES / 2, MAX_SPECIALIZED_TYPES / 2 + 1] {
+            let mut source = String::from(".module ExpansionBudget\n.type Box<T>\n.field Value T\n.end\n");
+            for index in 0..count { source += &format!(".type Leaf{index}\n.end\n"); }
+            source += ".function Main() -> Int32\n";
+            for index in 0..count { source += &format!(".local Box<Leaf{index}> item{index}\n"); }
+            source += "ldc.i4 0\nret\n.end\n";
+            let result = expand(&neoclr::assemble(&source).unwrap(), "Main");
+            if count * 2 == MAX_SPECIALIZED_TYPES {
+                assert_eq!(result.unwrap().1["typeCount"], MAX_SPECIALIZED_TYPES);
+            } else {
                 assert!(result.err().unwrap().to_string().contains(&format!("specialized type count exceeds {MAX_SPECIALIZED_TYPES}")));
             }
         }

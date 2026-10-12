@@ -8,6 +8,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-12
 
+- Raise the bounded native selected/specialized type inventory to 1024 and keep
+  typed-reference-array GC admission aligned with it. Boundary tests and sanitized
+  GC checks pass; extracted collections, Tasks and JSON pass. HTTP now reaches a
+  separate 204-lane generated async object above the unchanged 128-lane limit;
+  record that blocker and defer SDK/editor installation pending full acceptance.
+
 - Record Raven main 0ccb9a265 and native carry 6b5e052ce fixing false async-return
   diagnostics for forward generic union results. Retain the intermittent failing
   baseline and a six-process, two-source-order default-JIT regression; all six builds

@@ -1872,7 +1872,7 @@ ret
 
 #[test]
 fn multiple_value_shape_discovery_stays_bounded() {
-    for count in [256,257] {
+    for count in [512,513] {
     let mut source = String::from(".module ManyShapes\n.type Box<T>\n.field Value T\n.end\n");
     for n in 0..count { source.push_str(&format!(".type Leaf{n}\n.end\n")); }
     source.push_str(".function Main() -> Int32\n");
@@ -1881,10 +1881,10 @@ fn multiple_value_shape_discovery_stays_bounded() {
     let m = neoclr::assemble(&source).unwrap();
     let temp = Temp::new();
     let r = compile_mode(&neoclr::metadata_container::write_module(&m).unwrap(),&temp,"Main",true);
-    assert_eq!(r.status.success(),count==256,"{}",String::from_utf8_lossy(&r.stderr));
-    if count==257 {
+    assert_eq!(r.status.success(),count==512,"{}",String::from_utf8_lossy(&r.stderr));
+    if count==513 {
     assert!(!temp.0.join("value.o").exists());
-    assert!(String::from_utf8_lossy(&r.stderr).contains("specialized type count exceeds 512"));
+    assert!(String::from_utf8_lossy(&r.stderr).contains("specialized type count exceeds 1024"));
     }
     }
 }
@@ -2017,8 +2017,8 @@ fn erased_wide_integer_mismatch_faults_without_publishing_result() {
 }
 
 #[test]
-fn selected_value_type_budget_accepts_512_and_rejects_513() {
-    for count in [512, 513] {
+fn selected_value_type_budget_accepts_1024_and_rejects_1025() {
+    for count in [1024, 1025] {
         let mut source = String::from(".module TypeBudget\n.function Main() -> Int32\n");
         for index in 0..count {
             source += &format!("call Make{index}()\npop\n");
@@ -2030,10 +2030,10 @@ fn selected_value_type_budget_accepts_512_and_rejects_513() {
         let module = neoclr::assemble(&source).unwrap();
         let temp = Temp::new();
         let result = compile_mode(&neoclr::metadata_container::write_module(&module).unwrap(), &temp, "Main", true);
-        assert_eq!(result.status.success(), count == 512, "{}", String::from_utf8_lossy(&result.stderr));
-        if count == 513 {
+        assert_eq!(result.status.success(), count == 1024, "{}", String::from_utf8_lossy(&result.stderr));
+        if count == 1025 {
             assert!(!temp.0.join("value.o").exists());
-            assert!(String::from_utf8_lossy(&result.stderr).contains("selected types exceed"));
+            assert!(String::from_utf8_lossy(&result.stderr).contains("closed-world input inventory exceeds bounds"));
         }
     }
 }

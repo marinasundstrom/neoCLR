@@ -1,0 +1,37 @@
+{
+  "execution": "default",
+  "inputs": {
+    "/private/var/folders/5x/5r0dfcnx30lf0cl8kp3sphch0000gn/T/neoCLR extracted preview shswuvfz/neoCLR preview/bin/neoclr": "19d027f44503dde74731c813fb3f2fac5a43e47b7c9f6498b6d0dadf8085d825",
+    "/private/var/folders/5x/5r0dfcnx30lf0cl8kp3sphch0000gn/T/neoCLR extracted preview shswuvfz/neoCLR preview/samples/http-json-server/bin/neoclr/App.dll": "8a94d8c90b1981fab6cdc3a32b7fcdb054d9e078be931376c6110a49c3c388bc",
+    "/private/var/folders/5x/5r0dfcnx30lf0cl8kp3sphch0000gn/T/neoCLR extracted preview shswuvfz/neoCLR preview/samples/http-json-client/bin/neoclr/App.dll": "877b9b7de17914febc5d8eb68731ecdc551312b5f606ef3ab1f2b80441127f1c",
+    "/private/var/folders/5x/5r0dfcnx30lf0cl8kp3sphch0000gn/T/neoCLR extracted preview shswuvfz/neoCLR preview/lib/System.runtime.neox": "98a1ae1da85387c87746957e83a4015eb59d0566539a915c69f168d2b511b190",
+    "/private/var/folders/5x/5r0dfcnx30lf0cl8kp3sphch0000gn/T/neoCLR extracted preview shswuvfz/neoCLR preview/lib/System.Runtime.dll": "4e85571b0eaa3e0868f0e6165b0ba9038f2fde89e03c83934f0ad264307276a3",
+    "/private/var/folders/5x/5r0dfcnx30lf0cl8kp3sphch0000gn/T/neoCLR extracted preview shswuvfz/neoCLR preview/lib/System.Data.dll": "a563b65aa74faef25fa3dde618b67a45387d5db719d25dbe6ed6f2120f0314d4",
+    "/private/var/folders/5x/5r0dfcnx30lf0cl8kp3sphch0000gn/T/neoCLR extracted preview shswuvfz/neoCLR preview/lib/System.Networking.dll": "6715aeb443494f9c5a4e1f4f61a807147468a87f1b0980ee51e533f3a076bebb",
+    "/private/var/folders/5x/5r0dfcnx30lf0cl8kp3sphch0000gn/T/neoCLR extracted preview shswuvfz/neoCLR preview/lib/System.Web.dll": "01898aa2b6c028bf8a7af183f403995652459b560e4576f5490b452e346d8a8e",
+    "/private/var/folders/5x/5r0dfcnx30lf0cl8kp3sphch0000gn/T/neoCLR extracted preview shswuvfz/neoCLR preview/lib/System.Data.PostgreSql.dll": "fa12626ce72cb597d44c30fb39970c19b2db6888c9ded996fdaea1a18f6fa3c2",
+    "/private/var/folders/5x/5r0dfcnx30lf0cl8kp3sphch0000gn/T/neoCLR extracted preview shswuvfz/neoCLR preview/samples/http-json-server/bin/neoclr/App.reflection.json": "faa451155938d04a6eb3c432b0b5be5463351950d5e2db4ca88fa9bc2d3b2177",
+    "/private/var/folders/5x/5r0dfcnx30lf0cl8kp3sphch0000gn/T/neoCLR extracted preview shswuvfz/neoCLR preview/samples/http-json-client/bin/neoclr/App.reflection.json": "faa451155938d04a6eb3c432b0b5be5463351950d5e2db4ca88fa9bc2d3b2177"
+  },
+  "runs": [
+    {
+      "serverCommand": [
+        "/private/var/folders/5x/5r0dfcnx30lf0cl8kp3sphch0000gn/T/neoCLR extracted preview shswuvfz/neoCLR preview/bin/neoclr",
+        "run",
+        "/private/var/folders/5x/5r0dfcnx30lf0cl8kp3sphch0000gn/T/neoCLR extracted preview shswuvfz/neoCLR preview/samples/http-json-server/bin/neoclr/App.dll",
+        "--reflection-roots",
+        "/private/var/folders/5x/5r0dfcnx30lf0cl8kp3sphch0000gn/T/neoCLR extracted preview shswuvfz/neoCLR preview/samples/http-json-server/bin/neoclr/App.reflection.json",
+        "--",
+        "4"
+      ],
+      "requests": [],
+      "port": "",
+      "server": {
+        "exitCode": 1,
+        "stdout": "",
+        "stderr": "aot-poc: NeoMetadata_5154FB160D7108AB5DC6F9F3613BE6ACF54CF0AB8A14FFDA15DA0D1B86634AA5.T__5265706F7274536572766572.N_3C3E635F5F4173796E6353746174654D616368696E6530: reference hierarchy exceeds the 1032-byte native object bound (204 flattened lanes)\n"
+      }
+    }
+  ],
+  "passed": false
+}

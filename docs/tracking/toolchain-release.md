@@ -5,6 +5,23 @@ This page owns shared integration/delivery status. The [HTTP tracker](../http-ca
 owns whether its packaged sample passes and whether the POC is complete; do not
 maintain a second HTTP completion checklist here.
 
+## Next local preview acceptance — 2026-10-12
+
+The forward async-return declaration issue is fixed on Raven main 0ccb9a265 and
+carried independently to the native line as 6b5e052ce. The updated local SDK/VSIX
+0.1.13-neoclr.20261012.2 builds all packaged projects, and its language server
+returns Task and Promise completions. Extracted default-JIT collections, Tasks and
+JSON pass. [Native type-budget qualification](../experiments/native-type-budget/README.md)
+raises the bounded inventory consistently with the collector, but HTTP now exposes
+a generated async state machine above the unchanged object-size bound. Installation
+and release remain gated on complete extracted HTTP acceptance; neither happened.
+
+The PostgreSQL website case passes positional and named-object mapping locally.
+General Object display combined with Boolean boxing still reaches the native
+`Object display with boxing or arrays requires a later receiver/metadata profile`
+restriction; the example uses explicit typed formatting. Keep this backend gap
+visible rather than claiming general boxed formatting support.
+
 ## Preview 13 qualification — 2026-10-09
 
 [Preview 13](https://github.com/marinasundstrom/neoCLR/releases/tag/v0.1.0-preview.13) is published

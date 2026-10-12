@@ -400,7 +400,7 @@ static int32_t collect_conditional(neoclr_aot_context *context,
                 if (b->bytes < 24) goto invalid_descriptor;
                 memcpy(&kind, data, 8); memcpy(&length, data + 8, 8); memcpy(&lanes, data + 16, 8);
                 if ((kind & UINT64_C(0xffffffff)) != UINT64_C(0x80000005) ||
-                    (kind >> 32) > 512 || ((kind >> 32) && lanes != 1) || !lanes || lanes > NEOCLR_NATIVE_LAYOUT_LANES ||
+                    (kind >> 32) > NEOCLR_NATIVE_TYPE_LIMIT || ((kind >> 32) && lanes != 1) || !lanes || lanes > NEOCLR_NATIVE_LAYOUT_LANES ||
                     length > 65536 || length > (b->bytes - 24) / (lanes * 8 + 1)) goto invalid_descriptor;
                 uint64_t markers = 24 + length * lanes * 8;
                 for (uint64_t i = 0; i < length; i++) {
