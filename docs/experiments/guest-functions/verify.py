@@ -1,4 +1,4 @@
-"""Compile and execute guest module-function metadata discovery (interpreter)."""
+"""Compile and qualify guest module-function discovery in an explicit execution mode."""
 import argparse
 import hashlib
 import json
@@ -13,15 +13,19 @@ HERE = Path(__file__).resolve().parent
 parser = argparse.ArgumentParser(description=__doc__)
 for name in ('bundle', 'compiler', 'runner', 'output'):
     parser.add_argument('--' + name, type=Path, required=True)
+parser.add_argument('--execution', choices=('interpreter', 'jit'), default='interpreter')
+parser.add_argument('--jit-compiler', type=Path, help='Explicit development JIT backend')
 args = parser.parse_args()
 bundle, compiler, runner, output = (getattr(args, name).resolve() for name in ('bundle', 'compiler', 'runner', 'output'))
 output.mkdir(parents=True, exist_ok=False)
 inputs = [Path(__file__), HERE / 'Main.rvn', HERE / 'GuestFunctions.rvnproj', ROOT / 'runtime/raven/tests/framework/TestAttribute.rvn']
 sha = lambda path: hashlib.sha256(path.read_bytes()).hexdigest()
-report = dict(passed=False, platform=platform.platform(), commands=[],
+report = dict(passed=False, execution=args.execution, platform=platform.platform(), commands=[],
               inputs={str(p.relative_to(ROOT)): sha(p) for p in inputs},
               compilerSha256=sha(compiler), runnerSha256=sha(runner),
               runtimeSha256=sha(bundle / 'lib/System.Runtime.dll'))
+if args.jit_compiler:
+    report['jitCompilerSha256'] = sha(args.jit_compiler)
 for path in inputs[1:]:
     copied = output / 'source' / path.relative_to(ROOT)
     copied.parent.mkdir(parents=True, exist_ok=True)
@@ -40,11 +44,21 @@ def run(command):
 
 run(['dotnet', compiler, 'neoclr', '--project', project])
 image = project.parent / 'bin/neoclr/GuestFunctions.dll'
-result = run([runner, 'run', image, '--system', bundle / 'lib/System.runtime.neox',
-              '--module', bundle / 'lib/System.Runtime.dll', '--object-root', bundle / 'lib/System.Runtime.dll', '--gc-stats'])
+command = [runner, 'run', image, '--execution', args.execution,
+           '--system', bundle / 'lib/System.runtime.neox',
+           '--module', bundle / 'lib/System.Runtime.dll', '--object-root', bundle / 'lib/System.Runtime.dll']
+if args.execution == 'interpreter':
+    command += ['--gc-stats']
+if args.jit_compiler:
+    command += ['--jit-compiler', args.jit_compiler.resolve()]
+report['imageSha256'] = sha(image)
+result = run(command)
 assert result.stdout == 'Guest module function discovery passed\n'
-assert 'live=0' in result.stderr
+if args.execution == 'interpreter':
+    assert 'live=0' in result.stderr
+else:
+    assert not result.stderr
 assert all(sha(ROOT / path) == digest for path, digest in report['inputs'].items())
-report.update(passed=True, imageSha256=sha(image), scope='Interpreter module function enumeration, absent declaring type, module/parameter metadata, exact TestAttribute identity and fixed/named descriptions. No test invocation, AOT retention or registration is claimed.')
+report.update(passed=True, imageSha256=sha(image), scope=args.execution + ' module function enumeration, absent declaring type, module/parameter metadata, exact TestAttribute identity and fixed/named descriptions. No test invocation, AOT retention or registration is claimed.')
 (output / 'report.json').write_text(json.dumps(report, indent=2) + '\n')
-print('Guest module function discovery: PASS')
+print('Guest module function discovery (' + args.execution + '): PASS')

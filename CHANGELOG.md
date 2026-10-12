@@ -8,6 +8,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-12
 
+- Start issue #27 execution qualification: make the module-function discovery
+  harness select interpreter mode explicitly and support an explicit JIT check.
+  Retain passing interpreter/GC evidence and matching JIT/AOT compilation failures
+  at TypeDeclaringType; native discovery support remains unimplemented.
+
 - Update RavenDoc to render protected subclass contracts and suppress duplicate
   extension-indexer getter links. Correct malformed generic type markup, stale
   API/repository links and the outdated generic-async restriction on feature pages.

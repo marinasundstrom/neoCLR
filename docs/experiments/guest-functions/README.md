@@ -41,3 +41,11 @@ Author priority after this discovery slice: make the runner useful through test
 filtering before introducing grouping attributes. Existing IDs and display names
 provide selection inputs; exact CLI/filter semantics still need focused design and
 validation. Manual registration must remain supported.
+
+## Current execution baseline (2026-10-12)
+
+The harness now selects interpreter mode explicitly after the default-JIT change.
+`--execution jit` and optional `--jit-compiler` expose the current native failure
+without fallback. [The retained baseline](execution-baseline/README.md) passes the
+interpreter consumer and identifies `TypeDeclaringType` as the first shared JIT/AOT
+blocker, before module-function enumeration. Remaining work is tracked in issue #27.

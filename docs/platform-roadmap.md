@@ -394,7 +394,10 @@ Open generic signature snapshots remain explicitly unsupported. Native enumerati
 retention and in-process callable registration are still open. These remaining
 module-function discovery/reflection gaps, including ownerless parameter/return
 attributes, are queued in [issue #27](https://github.com/marinasundstrom/neoCLR/issues/27).
-This follow-up does not change the active milestone priority. The guest-function
+This follow-up does not change the active milestone priority. The
+[2026-10-12 execution baseline](experiments/guest-functions/execution-baseline/README.md)
+passes explicit interpreter discovery and identifies `TypeDeclaringType` as the
+first shared JIT/AOT prerequisite, before module-function enumeration. The guest-function
 Windows run at 5e4cbd84 exposed an AOT shared-provider binding regression in nominal
 attribute inspection; [the fix passes locally](experiments/native-attributes/shared-provider-validation.json)
 with rebuilt libraries. Windows requalification remains pending.

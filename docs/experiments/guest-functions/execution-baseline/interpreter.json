@@ -1,0 +1,49 @@
+{
+  "passed": true,
+  "execution": "interpreter",
+  "platform": "macOS-27.0-arm64-arm-64bit",
+  "commands": [
+    {
+      "command": [
+        "dotnet",
+        "/Users/robert/Projects/neoclr/target/generic-cleanup-project-compiler/rvnc.dll",
+        "neoclr",
+        "--project",
+        "/Users/robert/Projects/neoclr/target/guest-functions-current-interpreter/source/docs/experiments/guest-functions/GuestFunctions.rvnproj"
+      ],
+      "exitCode": 0,
+      "stdout": "Native build output: /Users/robert/Projects/neoclr/target/guest-functions-current-interpreter/source/docs/experiments/guest-functions/bin/neoclr/GuestFunctions.dll\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/generic-cleanup-gc-bundle/bundle/bin/neoclr",
+        "run",
+        "/Users/robert/Projects/neoclr/target/guest-functions-current-interpreter/source/docs/experiments/guest-functions/bin/neoclr/GuestFunctions.dll",
+        "--execution",
+        "interpreter",
+        "--system",
+        "/Users/robert/Projects/neoclr/target/generic-cleanup-gc-bundle/bundle/lib/System.runtime.neox",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/generic-cleanup-gc-bundle/bundle/lib/System.Runtime.dll",
+        "--object-root",
+        "/Users/robert/Projects/neoclr/target/generic-cleanup-gc-bundle/bundle/lib/System.Runtime.dll",
+        "--gc-stats"
+      ],
+      "exitCode": 0,
+      "stdout": "Guest module function discovery passed\n",
+      "stderr": "GC: allocated=70 live=0 peak=67 collections=2 reclaimed=70\n"
+    }
+  ],
+  "inputs": {
+    "docs/experiments/guest-functions/verify.py": "30df132156f65277d7ac9b84e934b3b8e03b3af192d3a5c311a13a1d480f8c40",
+    "docs/experiments/guest-functions/Main.rvn": "51e64956771434d0027704a7855fc5938529e83146f293001a93737698043a24",
+    "docs/experiments/guest-functions/GuestFunctions.rvnproj": "864260c44ed3538b98492e209e15437748c281f35415ae259ca2510bc36786f5",
+    "runtime/raven/tests/framework/TestAttribute.rvn": "435a93e9247a6c7f1c94b1a81296e35449f7b4ba735b835c18a816726a56435c"
+  },
+  "compilerSha256": "3ce6561ad39a9dced0ed172ef06012a42e69f5bce7fbddae056c736ea3b2bbd2",
+  "runnerSha256": "f13312c1afe1014921617c38b61b2d19208804a92979794035afc2871164dc42",
+  "runtimeSha256": "1f4f52f898ae1339cf6d653d9bd5e902a8f99ef01acad27ffa1f0a9a66b93296",
+  "imageSha256": "4f0bd940302dc524667074dfda8c76128d7d83307510671d5ff8fcb5fecaad64",
+  "scope": "interpreter module function enumeration, absent declaring type, module/parameter metadata, exact TestAttribute identity and fixed/named descriptions. No test invocation, AOT retention or registration is claimed."
+}
