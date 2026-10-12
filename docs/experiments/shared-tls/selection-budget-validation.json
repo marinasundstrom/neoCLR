@@ -1,0 +1,40 @@
+{
+  "date": "2026-10-12",
+  "scope": "macOS ARM64 native selection admission; not end-to-end HTTPS qualification",
+  "limits": {
+    "selectedFunctions": 2048,
+    "functionClones": 2048,
+    "selectedTypes": 512,
+    "inputFunctions": 8192,
+    "inputTypes": 1024
+  },
+  "selectionPassed": true,
+  "retainedFunctions": 1392,
+  "excludedFunctionEntries": 2913,
+  "retainedTypes": 488,
+  "excludedTypeEntries": 361,
+  "specialization": {
+    "policy": "up to 512 closed value/reference/interface shapes, 2048 function clones and 2048 selected functions; closed generic methods and lexical owners; no constraints",
+    "functionCount": 1392,
+    "functionCloneCount": 606,
+    "typeCount": 489
+  },
+  "nativeAdmission": {
+    "accepted": false,
+    "firstError": "NeoMetadata_A73FE0C4D505EF60D01EE85D686276C3EB75EA34E15D9D88F66D1440F350FF71.T_53797374656D2E5765622E48747470_487474704572726F72: value layout exceeds sixty-four flattened lanes (68)",
+    "phase": "compilation"
+  },
+  "tests": {
+    "command": "cargo test --manifest-path tools/aot-poc/Cargo.toml --bin neoclr-aot-poc specialization::tests::",
+    "passed": 9
+  },
+  "inputHashes": {
+    "target/ssl-stream-validation-v2/native/app.dll": "4b355e1f56bbd2c7953892886f29244697ab1d67137d1ed68d6ed722f1b43b46",
+    "target/ssl-bundle-v1/bundle/lib/System.runtime.neox": "98a1ae1da85387c87746957e83a4015eb59d0566539a915c69f168d2b511b190",
+    "target/ssl-bundle-v1/bundle/lib/System.Runtime.dll": "522a81477f3ecf78ac708522b1c78a1c78fe5589650580318b1d0c42f6210a21",
+    "target/ssl-bundle-v1/bundle/lib/System.Data.dll": "395731e29583985a80a8eb29bda872dc0c2415b493b99ebcc5ae18074a791716",
+    "target/ssl-bundle-v1/bundle/lib/System.Networking.dll": "5fae33e86ec74dc5127c6bbbe2f7fb9e649bfae17d1428749cb08e84664b43c2",
+    "target/ssl-bundle-v1/bundle/lib/System.Web.dll": "1ca21d120adfce236179e4b77aafaa6e208ef16509f4a39703ab5680183277a7",
+    "target/ssl-bundle-v1/bundle/lib/System.Data.PostgreSql.dll": "9e299782ad7488e4d55bbacadd42e20f4dfa955784957fb0f09356d365c51f3a"
+  }
+}

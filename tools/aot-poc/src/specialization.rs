@@ -110,7 +110,7 @@ impl Specializer<'_> {
         if let Some(existing) = self.shapes.iter().find(|v| v.source == i && v.arguments == arguments) {
             return Ok(Type::Named(existing.name.clone()));
         }
-        if self.shapes.len() >= MAX_SPECIALIZED_TYPES { return Err("specialized type count exceeds 512".into()); }
+        if self.shapes.len() >= MAX_SPECIALIZED_TYPES { return Err(format!("specialized type count exceeds {MAX_SPECIALIZED_TYPES}").into()); }
         let row = if self.shapes.iter().any(|v| v.source == i) {
             let row = self.source.types.len() + self.type_clones;
             self.type_clones += 1;
@@ -152,7 +152,7 @@ impl Specializer<'_> {
                 // empty static companions and rejects every executable use.
                 let owner_index = self.type_index(&owner.name)?;
                 if !self.shapes.iter().any(|v| v.source == owner_index) && self.shapes.len() >= MAX_SPECIALIZED_TYPES {
-                    return Err("specialized type count exceeds 512".into());
+                    return Err(format!("specialized type count exceeds {MAX_SPECIALIZED_TYPES}").into());
                 }
                 if !self.shapes.iter().any(|v| v.source == owner_index) {
                     self.shapes.push(Shape { source: owner_index, arguments: vec![], row: owner_index, name: owner.name.clone() });
@@ -178,7 +178,7 @@ impl Specializer<'_> {
                 let i = self.type_index(name)?;
                 if super::selection::static_owner(&self.source.types[i]) {
                     if !self.shapes.iter().any(|v| v.source == i) && self.shapes.len() >= MAX_SPECIALIZED_TYPES {
-                        return Err("specialized type count exceeds 512".into());
+                        return Err(format!("specialized type count exceeds {MAX_SPECIALIZED_TYPES}").into());
                     }
                     if !self.shapes.iter().any(|v| v.source == i) {
                         self.shapes.push(Shape { source: i, arguments: vec![], row: i, name: name.clone() });
@@ -446,7 +446,7 @@ pub fn expand(input: &neoclr::Module, root: &str) -> Result<(neoclr::Module, Val
     expand_with_host_roots(input, root, &[])
 }
 pub fn expand_with_host_roots(input: &neoclr::Module, root: &str, host_roots: &[usize]) -> Result<(neoclr::Module, Value), Error> {
-    if input.types.len() > 1024 || input.functions.len() > 4096 {
+    if input.types.len() > crate::limits::INPUT_TYPES || input.functions.len() > crate::limits::INPUT_FUNCTIONS {
         return Err("specialization input exceeds metadata limits".into());
     }
     let roots: Vec<_> = input
@@ -731,7 +731,7 @@ pub fn expand_with_host_roots(input: &neoclr::Module, root: &str, host_roots: &[
         && shape.arguments.len() == 1
         && (matches!(shape.arguments[0], Type::String | Type::Char) || super::selection::scalar_array_element(&shape.arguments[0]) || input.type_definition(&shape.arguments[0]).is_some_and(|t| (t.is_reference_type && t.representation == neoclr::metadata::Representation::Record) || t.representation == neoclr::metadata::Representation::Interface)))
         .map(|shape| shape.row).collect();
-    let report = json!({"referenceArrayBackings":reference_backings,"policy":"up to 512 closed value/reference/interface shapes; closed static/instance generic methods and lexical owners, at most 512 function clones and 1024 selected functions; no constraints",
+    let report = json!({"referenceArrayBackings":reference_backings,"policy":format!("up to {} closed value/reference/interface shapes, {} function clones and {} selected functions; closed generic methods and lexical owners; no constraints", MAX_SPECIALIZED_TYPES, MAX_FUNCTION_CLONES, crate::limits::FUNCTIONS),
         "typeCount": context.shapes.len(), "functionCount": context.instances.len(), "functionCloneCount": context.clones,
         "methods": context.instances.iter().filter(|v| !v.methods.is_empty() || !v.types.is_empty()).map(|v| json!({"sourceIndex":v.source,"expandedIndex":v.row,"definition":input.functions[v.source].definition.clone().unwrap_or(neoclr::metadata::MemberId { module: input.name.clone(), revision: input.revision.clone(), index: v.source as u32 }),"name":input.functions[v.source].name,"sourceOrigin":input.functions[v.source].origin,"arguments":v.methods,"typeArguments":v.types})).collect::<Vec<_>>(),
         "types": context.shapes.iter().filter(|v| !v.arguments.is_empty()).map(|v| json!({"sourceIndex":v.source,"expandedIndex":v.row,"definition":input.types[v.source].definition,"name":input.types[v.source].name,"compiledName":v.name,"arguments":v.arguments})).collect::<Vec<_>>()});
@@ -958,6 +958,40 @@ ret
         assert!(expand(&input, "Main").err().unwrap().to_string().contains("type dependency nesting exceeds 128"));
     }
     #[test]
+    fn selected_function_budget_accepts_boundary_and_rejects_overflow() {
+        for count in [crate::limits::FUNCTIONS, crate::limits::FUNCTIONS + 1] {
+            let mut source = String::from(".module FunctionBudget\n.function Main() -> Int32\n");
+            for index in 1..count {
+                source += &format!("call F{index}()\npop\n");
+            }
+            source += "ldc.i4 42\nret\n.end\n";
+            for index in 1..count {
+                source += &format!(".function F{index}() -> Int32\nldc.i4 0\nret\n.end\n");
+            }
+            let input = neoclr::assemble(&source).unwrap();
+            let specialized = expand(&input, "Main");
+            let selected = super::super::selection::select(&input, "Main");
+            if count == crate::limits::FUNCTIONS {
+                assert_eq!(specialized.unwrap().1["functionCount"], count);
+                let (module, _) = selected.unwrap();
+                assert_eq!(module.functions.len(), count);
+                assert!(!super::super::compiler::compile(&module, "Main", false, None).unwrap().is_empty());
+            } else {
+                assert!(specialized.err().unwrap().to_string().contains("method specialization exceeds"));
+                assert!(selected.err().unwrap().to_string().contains("selected functions exceed"));
+            }
+        }
+    }
+
+    #[test]
+    fn input_function_inventory_remains_bounded() {
+        let mut input = neoclr::assemble(".module InputBudget\n.function Main() -> Int32\nldc.i4 0\nret\n.end\n").unwrap();
+        input.functions.resize(crate::limits::INPUT_FUNCTIONS + 1, input.functions[0].clone());
+        assert!(expand(&input, "Main").err().unwrap().to_string().contains("specialization input exceeds metadata limits"));
+        assert!(super::super::selection::select(&input, "Main").err().unwrap().to_string().contains("closed-world input inventory exceeds bounds"));
+    }
+
+    #[test]
     fn closed_type_budget_includes_nongeneric_dependency_shapes() {
         for count in [128, MAX_SPECIALIZED_TYPES, MAX_SPECIALIZED_TYPES + 1] {
             let mut source = String::from(".module Shapes\n.function Main(T0 value) -> Int32\nldc.i4 0\nret\n.end\n");
@@ -976,7 +1010,7 @@ ret
                 assert_eq!(report["functionCount"], 1);
                 assert_eq!(report["functionCloneCount"], 0);
             } else {
-                assert!(result.err().unwrap().to_string().contains("specialized type count exceeds 512"));
+                assert!(result.err().unwrap().to_string().contains(&format!("specialized type count exceeds {MAX_SPECIALIZED_TYPES}")));
             }
         }
     }

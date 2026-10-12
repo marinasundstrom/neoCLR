@@ -384,7 +384,7 @@ pub(super) fn dispatch_targets_with_array(input: &neoclr::Module, contract: usiz
 }
 
 pub(super) fn validate_source(input: &neoclr::Module, single_assembly: bool) -> Result<(), Error> {
-    if input.functions.len() > 4096 || input.types.len() > 1024 {
+    if input.functions.len() > crate::limits::INPUT_FUNCTIONS || input.types.len() > crate::limits::INPUT_TYPES {
         return Err("closed-world input inventory exceeds bounds".into());
     }
     if single_assembly && input.assemblies.len() > 1 {

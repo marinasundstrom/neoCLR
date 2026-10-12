@@ -1,5 +1,10 @@
 # neoCLR platform roadmap
 
+**Managed HTTPS compiler admission (2026-10-12):** measured closed-world selection
+now fits bounded 2,048-function admission, preserving existing retention and type
+limits. This is compiler follow-through, not HTTPS completion: the consumer next
+hits a separate value-layout bound. See [evidence and remaining work](experiments/shared-tls/native-selection-budget.md).
+
 **Gzip foundation (2026-10-12):** the author requests System.IO.Compression and
 identifies HTTP as a likely consumer. [GZipStream](gzip-compression.md) adds incremental
 async compression and bounded validated decompression over existing stream contracts.

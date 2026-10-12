@@ -16040,3 +16040,18 @@ or runtime-await default switch was performed.
   [.NET MethodImplOptions](https://learn.microsoft.com/en-us/dotnet/api/system.runtime.compilerservices.methodimploptions)
   and [CoreCLR core-library boundaries](https://github.com/dotnet/runtime/blob/main/docs/design/coreclr/botr/corelib.md)
   support the runtime-owned versus public foreign-import distinction.
+
+## 2026-10-12 — Conservative native compiler admission for managed HTTPS
+
+- **Author:** asked “Could trimming help?” while the managed SslStream/HTTP/JSON
+  consumer exceeded the experimental native compiler function budget, then directed
+  “Take the safest route in handling the limit in out current scenario”.
+- **Assistant:** inspected existing closed-world selection and conservative
+  signature-only interface conformance. Proposed retaining those correctness rules
+  and increasing only the measured function/inventory limits, deferring aggressive
+  trimming to independently validated work.
+- **Outcome:** 1,392 selected functions and 489 specialized type shapes fit a
+  2,048-function budget without changing the 512-type bound. Exact-boundary native
+  object emission and overflow rejection pass. End-to-end HTTPS remains unqualified:
+  the next admission failure is HttpError's 68-lane value layout against a 64-lane
+  bound. See [scope, evidence and remaining gap](experiments/shared-tls/native-selection-budget.md).

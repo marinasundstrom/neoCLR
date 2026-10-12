@@ -86,8 +86,7 @@ impl<'a> Profile<'a> {
     pub fn new(input: &'a neoclr::Module, references: bool, object_base: Option<usize>, array_backing: Option<usize>, reference_backings: &[usize], object_display: Option<&HashMap<usize, Vec<(usize, usize)>>>, string_dispatch: Option<&HashMap<usize, usize>>, primitive_receivers: Option<&[usize]>, native_stack_budget: bool) -> Result<Self, Error> {
         if input.name == "System" || input.types.len() > crate::limits::TYPES || input.functions.len() > crate::limits::FUNCTIONS {
             return Err(
-                "value profile requires an application with at most 512 types and 1024 functions"
-                    .into(),
+                format!("value profile requires an application with at most {} types and {} functions", crate::limits::TYPES, crate::limits::FUNCTIONS).into(),
             );
         }
         if input.functions.iter().any(|f| f.body.iter().any(|op| matches!(op, Op::ReserveArray(_))))

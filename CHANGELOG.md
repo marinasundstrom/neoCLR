@@ -8,6 +8,13 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-12
 
+- Raise experimental native function selection/clone admission from 1,024 to
+  2,048 and intermediate function inventory from 4,096 to 8,192 for the managed
+  HTTPS/JSON consumer. Preserve reachability, interface retention and all type,
+  layout and runtime bounds. Qualify exact-boundary native emission and overflow
+  rejection; the consumer passes selection but its separate HttpError value-layout
+  gap remains open. See docs/experiments/shared-tls/native-selection-budget.md.
+
 - Clarify MethodImpl/InternalCall versus foreign-import implementation providers;
   record the remaining InternalCall extern-symbol readback gap without claiming a fix.
 
