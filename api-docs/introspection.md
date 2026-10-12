@@ -88,8 +88,9 @@ modules. Without that policy the call faults, even when some type owners are ret
 Native RuntimeContext.ExecutingAssembly now preserves the calling code’s assembly,
 including library calls, and supports Name/FullName without reflection-roots flags.
 It does not implicitly retain module catalogs. AssemblyInfo.GetTypes, Module.GetTypes and
-module Object.Equals dispatch are not qualified by this slice. Guest module function
-enumeration and context-wide assembly discovery remain open.
+module Object.Equals dispatch were not qualified by that initial slice. The later
+[guest module-function retention](#guest-module-functions-development) qualifies
+namespace-scoped discovery on macOS ARM64; context-wide assembly discovery remains open.
 
 The unstable Rust backend bridge
 `neoclr::native_metadata::type_module(&Module, &metadata::Type) -> Result<Value, Fault>`
@@ -405,8 +406,14 @@ executing attribute constructors or method bodies. Missing or ambiguous module/t
 matches fault. Open generic method signature snapshots remain unsupported and cause
 GetFunctions to fault; ownerless parameter/return attribute queries remain a gap.
 The [compiled consumer](https://github.com/marinasundstrom/neoCLR/blob/main/docs/experiments/guest-functions/README.md) demonstrates
-TestAttribute inspection. Interpreter support is qualified; AOT enumeration/retention
-and dynamic invocation are not added. The inherited attribute API signature is unchanged.
+TestAttribute inspection. Interpreter and explicitly retained macOS ARM64 JIT/AOT
+execution are qualified. Development reflection-roots schema 5 adds `moduleFunctions`
+entries with exact `assembly`, namespace `name`, and Boolean `customAttributes` fields.
+Catalog retention alone grants no function metadata; attribute retention is separately
+opted in per function scope. Unretained queries fault. See the
+[retention contract and executable checks](https://github.com/marinasundstrom/neoCLR/blob/main/docs/experiments/guest-functions/native-retention/README.md).
+Windows, dynamic invocation and automatic registration are not qualified by this slice.
+The inherited attribute API and guest reference signatures are unchanged.
 
 
 ## Host class dispatch helper (development 2026-10-11)

@@ -8,6 +8,13 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-12
 
+- Add explicit schema-5 module-function and method-attribute retention to the
+  native backend. The Raven TestAttribute discovery consumer now passes interpreter,
+  macOS ARM64 JIT and linked AOT execution, preserving module/parameter ownership and
+  fixed/named descriptions without running test bodies. Missing catalog, function
+  or attribute retention faults. Windows, generic signatures and automatic callable
+  registration remain unqualified; schemas 1–4 keep their existing meaning.
+
 - Restore native interface-to-Object upcasts for method dispatch and ordinary
   local/argument stores and returns, preserving identity, overrides and null faults
   without adding executable casts. Seven native Object regressions and an exact

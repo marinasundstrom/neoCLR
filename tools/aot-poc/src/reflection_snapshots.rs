@@ -318,6 +318,30 @@ impl Factory<'_> {
                         self.emit(&fields[i], &Type::String)?;
                         self.body.push(Op::SetField(i));
                     }
+                    if logical == "System.Introspection.MethodInfo"
+                        && matches!(fields.get(1), Some(V::NullObjectReference(_)))
+                    {
+                        // Ownerless methods have no declaring type from which the
+                        // managed provider can derive its module. Install only the
+                        // runtime-owned metadata field, never execute the target.
+                        let field = layout.get(3).ok_or("missing method module slot")?;
+                        if field.name != "StoredModule" { return Err("invalid method module slot".into()); }
+                        let mut declaration = owner.clone();
+                        loop {
+                            let index = self.input.types.iter().position(|t| Some(t.name.as_str()) == declaration.definition_name())
+                                .ok_or("missing module field owner")?;
+                            if let Some(slot) = self.input.types[index].fields.iter_mut().find(|f| f.name == "StoredModule") {
+                                if slot.ty != field.ty { return Err("invalid method module field contract".into()); }
+                                slot.visibility = Visibility::Internal;
+                                break;
+                            }
+                            declaration = self.input.types[index].base.clone().ok_or("missing inherited module field")?;
+                        }
+                        self.trusted.push(json!({"moduleField":"StoredModule","owner":declaration}));
+                        self.body.push(Op::Dup);
+                        self.emit(&fields[3], &field.ty)?;
+                        self.body.push(Op::SetField(3));
+                    }
                     self.body.push(Op::CastClass(expected.clone()));
                 }
             }
@@ -353,6 +377,7 @@ pub fn bind(
                     | "neoCLR.Runtime.TypeElementType"
                     | "neoCLR.Runtime.MemberCustomAttributes"
                     | "neoCLR.Runtime.ModuleMemberCustomAttributes"
+                    | "neoCLR.Runtime.ModuleFunctions"
             )
         })
         .map(|(i, _)| i)
@@ -427,6 +452,7 @@ pub fn bind(
         let properties = f.name.ends_with("Properties");
         let attributes = f.name == "neoCLR.Runtime.MemberCustomAttributes";
         let module_attributes = f.name == "neoCLR.Runtime.ModuleMemberCustomAttributes";
+        let module_functions = f.name == "neoCLR.Runtime.ModuleFunctions";
         let attribute_parameters = attributes
             && f.parameters.len() == 2
             && name(source, &f.parameters[0]) == Some("System.Introspection.TypeInfo")
@@ -438,7 +464,7 @@ pub fn bind(
                 && f.parameters
                     != if module_attributes {
                         vec![Type::String, Type::String, Type::Int32]
-                    } else if module_assembly {
+                    } else if module_assembly || module_functions {
                         vec![Type::String, Type::String]
                     } else if assembly_name || assembly_modules {
                         vec![Type::String]
@@ -475,19 +501,53 @@ pub fn bind(
             locals: vec![],
             trusted: vec![],
         };
-        if module_attributes {
+        if module_attributes || module_functions {
             let Type::ArrayRef(element) = &expected else {
-                return Err("ModuleMemberCustomAttributes requires CustomAttributeData vector".into());
+                return Err("module member query requires a vector result".into());
             };
-            if name(source, element) != Some("System.Introspection.CustomAttributeData") {
-                return Err("ModuleMemberCustomAttributes requires scoped CustomAttributeData".into());
+            let logical = if module_attributes { "System.Introspection.CustomAttributeData" }
+                else { "System.Introspection.MethodInfo" };
+            if name(source, element) != Some(logical) {
+                return Err(format!("module member query requires scoped {logical}").into());
             }
-            // RuntimeMemberInfo shares nominal and ownerless paths. The latter has
-            // no native retention policy yet; keep nominal consumers compilable
-            // without silently granting metadata or returning an empty snapshot.
-            factory.body.push(Op::Fault(
-                "native module-member custom attribute metadata was not retained; module-member retention is not yet supported".into(),
-            ));
+            for row in retention["moduleFunctions"].as_array().into_iter().flatten() {
+                if module_attributes && row["customAttributes"] != true { continue; }
+                let identity = row["assembly"].as_str().ok_or("invalid retained function assembly")?;
+                let module_name = row["name"].as_str().ok_or("invalid retained function module")?;
+                let first = factory.body.len() + 3;
+                factory.body.extend([Op::Arg(0), Op::String(identity.into()), Op::Equal, Op::BranchFalse(0)]);
+                let second = factory.body.len() + 3;
+                factory.body.extend([Op::Arg(1), Op::String(module_name.into()), Op::Equal, Op::BranchFalse(0)]);
+                let definitions = neoclr::native_metadata::module_function_definitions(source, identity, module_name)
+                    .map_err(|error| error.to_string())?;
+                if module_functions {
+                    let elements = definitions.iter().map(|id|
+                        neoclr::native_metadata::module_function_snapshot(source, identity, module_name, id)
+                            .map_err(|error| error.to_string()))
+                        .collect::<Result<Vec<_>, _>>()?;
+                    factory.emit(&V::Array { element: Type::Named(logical.into()), elements }, &expected)?;
+                    factory.body.push(Op::Return);
+                } else {
+                    for id in definitions {
+                        let target = source.functions.iter().find(|f| f.definition.as_ref() == Some(&id))
+                            .ok_or("missing retained module function")?;
+                        let token = target.origin.as_ref().ok_or("module attributes require source token")?.token;
+                        let token: i32 = token.try_into()?;
+                        let skip = factory.body.len() + 3;
+                        factory.body.extend([Op::Arg(2), Op::Int(token), Op::Equal, Op::BranchFalse(0)]);
+                        let recipe = neoclr::native_metadata::module_function_attributes(source, identity, module_name, &id)
+                            .map_err(|error| error.to_string())?;
+                        factory.emit(&recipe, &expected)?;
+                        factory.body.push(Op::Return);
+                        factory.body[skip] = Op::BranchFalse(factory.body.len());
+                    }
+                }
+                factory.body[first] = Op::BranchFalse(factory.body.len());
+                factory.body[second] = Op::BranchFalse(factory.body.len());
+            }
+            factory.body.push(Op::Fault(if module_attributes {
+                "native module-member custom attribute metadata was not retained; configure --reflection-roots"
+            } else { "native module function metadata was not retained; configure --reflection-roots" }.into()));
         } else if attributes {
             bind_attributes(&mut factory, index, definitions, retention, &expected)?;
         } else if assembly_modules {
@@ -964,6 +1024,25 @@ mod catalog_tests {
     use super::*;
 
     #[test]
+    fn empty_function_scope_is_explicit_and_preserves_unretained_faults() {
+        let mut source = neoclr::assemble(".module Functions\n.function neoCLR.Runtime.ModuleFunctions(String,String) -> arrayref<System.Introspection.MethodInfo>\n.methodimpl InternalCall\n.end\n").unwrap();
+        source.assemblies = serde_json::from_value(json!([
+            {"name":"One","full_name":"One","modules":["Functions"],"references":[],
+             "declaration_modules":{"version":1,"names":["Empty"]}}
+        ])).unwrap();
+        let mut retention = json!({"types":[],"moduleFunctions":[{"assembly":"One","name":"Empty","customAttributes":false}]});
+        let mut input = source.clone();
+        bind(&mut input, &source, &[], &mut retention).unwrap();
+        assert!(input.functions[0].body.iter().any(|op| matches!(op, Op::ReserveArray(_))));
+        assert!(matches!(input.functions[0].body.last(), Some(Op::Fault(message)) if message.contains("module function metadata was not retained")));
+        assert_eq!(input.functions[0].body.iter().filter(|op| matches!(op, Op::BranchFalse(_))).count(), 2);
+        let mut invalid = source.clone(); invalid.functions[0].parameters[1] = Type::Int32;
+        assert!(bind(&mut invalid, &source, &[], &mut retention).unwrap_err().to_string().contains("exact reserved InternalCall contract"));
+        let mut invalid = source.clone(); invalid.functions[0].returns = Type::ArrayRef(Box::new(Type::Int32));
+        assert!(bind(&mut invalid, &source, &[], &mut retention).unwrap_err().to_string().contains("scoped System.Introspection.MethodInfo"));
+    }
+
+    #[test]
     fn declaring_type_requires_exact_contract_and_explicit_retention() {
         let source = neoclr::assemble(".module Declaring\n.function neoCLR.Runtime.TypeDeclaringType(RuntimeTypeHandle) -> System.Option<System.Introspection.TypeInfo>\n.methodimpl InternalCall\n.end\n").unwrap();
         let mut retention = json!({"types":[]});
@@ -985,14 +1064,14 @@ mod catalog_tests {
         let mut input = source.clone();
         bind(&mut input, &source, &[], &mut retention).unwrap();
         assert_eq!(input.functions[0].impl_flags, 0);
-        assert!(matches!(&input.functions[0].body[..], [Op::Fault(message)] if message.contains("module-member retention is not yet supported")));
+        assert!(matches!(&input.functions[0].body[..], [Op::Fault(message)] if message.contains("module-member custom attribute metadata was not retained")));
         assert_eq!(retention["snapshotFactories"], json!([]));
         let mut invalid = source.clone();
         invalid.functions[0].parameters[2] = Type::String;
         assert!(bind(&mut invalid, &source, &[], &mut retention).unwrap_err().to_string().contains("exact reserved InternalCall contract"));
         let mut invalid = source.clone();
         invalid.functions[0].returns = Type::ArrayRef(Box::new(Type::Int32));
-        assert!(bind(&mut invalid, &source, &[], &mut retention).unwrap_err().to_string().contains("scoped CustomAttributeData"));
+        assert!(bind(&mut invalid, &source, &[], &mut retention).unwrap_err().to_string().contains("scoped System.Introspection.CustomAttributeData"));
     }
 
     #[test]

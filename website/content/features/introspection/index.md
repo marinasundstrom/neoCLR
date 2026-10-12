@@ -332,11 +332,14 @@ Inherited guest queries and guest in-process discovery remain future work. See t
 [AttributeUsageAttribute reference](/docs/api/System/AttributeUsageAttribute/index.html).
 
 
-Development interpreter builds also expose `ModuleInfo.GetFunctions()` for directly
+Development builds also expose `ModuleInfo.GetFunctions()` for directly
 owned free functions. Their descriptors have no declaring type and preserve module,
 parameter and method-level attribute metadata. A compiled Raven consumer reads
-`TestAttribute` descriptions without executing tests. Native enumeration and dynamic
-registration remain follow-up work; the current runner uses generated typed adapters.
+`TestAttribute` descriptions without executing tests. Explicit function/attribute
+retention also passes this consumer in macOS ARM64 JIT and AOT; see the
+[retention contract and validation](https://github.com/marinasundstrom/neoCLR/blob/main/docs/experiments/guest-functions/native-retention/README.md).
+Windows qualification and dynamic registration remain follow-up work; the current
+runner uses generated typed adapters.
 
 
 The development testing helper now accepts TUnit-style `[Arguments]` and

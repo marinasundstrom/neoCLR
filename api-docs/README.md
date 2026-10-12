@@ -1853,3 +1853,9 @@ and 22 website tests pass. The pinned native-line publisher at `efb31ebc7` build
 and checks all 3,813 site pages, including native preview integration and 448
 retained legacy pages. API coverage, HTML structure, local files and anchors pass.
 Existing missing-summary notices remain documentation backlog; publication is separate.
+
+Module-function native retention (2026-10-12): schema-5 backend roots qualify
+ModuleInfo.GetFunctions and ownerless method attribute data in macOS ARM64 JIT/AOT.
+[Manual reference](introspection.md#guest-module-functions-development) and feature
+pages describe policy, faults and limits. No guest signatures, type selection or
+reference assembly change; the existing snapshot fingerprint check remains applicable.

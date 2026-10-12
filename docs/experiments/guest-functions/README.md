@@ -34,7 +34,8 @@ is documented in the module design. It neither loads assemblies nor grants invoc
 Open generic signatures currently fail explicitly rather than silently disappearing.
 Method-level attribute lookup checks the exact module and method token and rejects
 missing/ambiguous matches. Parameter/return attribute queries for ownerless functions
-remain unsupported. Native enumeration, retention and callable registration are
+remain unsupported. [Explicit native retention](native-retention/README.md) now
+qualifies this consumer in macOS ARM64 JIT and AOT; callable registration remains
 separate work; existing generated typed test registrations remain the execution path.
 
 Author priority after this discovery slice: make the runner useful through test
@@ -49,3 +50,7 @@ The harness now selects interpreter mode explicitly after the default-JIT change
 without fallback. [The retained baseline](execution-baseline/README.md) passes the
 interpreter consumer and identifies `TypeDeclaringType` as the first shared JIT/AOT
 blocker, before module-function enumeration. Remaining work is tracked in issue #27.
+
+The [2026-10-12 native harness](verify_native.py) covers the same consumer in all
+three modes plus catalog/function/attribute retention failures. See the
+[retention schema, evidence and limits](native-retention/README.md).

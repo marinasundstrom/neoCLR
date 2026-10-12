@@ -390,8 +390,9 @@ explicit module catalog. Four focused checks pass. Ownerless method/parameter an
 checks, including absent DeclaringType, fixed/named descriptions and excluded parameter
 targets. Guest ModuleInfo.GetFunctions and method-level attribute queries now pass an
 interpreted Raven consumer using the real TestAttribute, without invoking bodies.
-Open generic signature snapshots remain explicitly unsupported. Native enumeration,
-retention and in-process callable registration are still open. These remaining
+Open generic signature snapshots remain explicitly unsupported. Explicit native
+enumeration and method-attribute retention now pass a macOS ARM64 JIT/AOT consumer;
+in-process callable registration remains open. These remaining
 module-function discovery/reflection gaps, including ownerless parameter/return
 attributes, are queued in [issue #27](https://github.com/marinasundstrom/neoCLR/issues/27).
 This follow-up does not change the active milestone priority. The
@@ -400,9 +401,9 @@ passes explicit interpreter discovery and identifies `TypeDeclaringType` as the
 first shared JIT/AOT prerequisite, before module-function enumeration.
 [Retained declaring-type queries now pass](experiments/declaring-type/README.md)
 a focused interpreter/JIT/AOT consumer on macOS ARM64. The subsequent [interface-to-object dispatch fix](experiments/guest-functions/interface-object-dispatch/README.md)
-passes seven native Object regressions. Full discovery now compiles to an AOT object
-and starts under JIT, then faults on missing assembly module-catalog retention.
-Native enumeration is not yet qualified. The guest-function
+passes seven native Object regressions. The subsequent [schema-5 retention milestone](experiments/guest-functions/native-retention/README.md)
+passes full discovery in interpreter, JIT and AOT, including negative checks for missing
+catalog/function/attribute retention. Windows native discovery remains unqualified. The guest-function
 Windows run at 5e4cbd84 exposed an AOT shared-provider binding regression in nominal
 attribute inspection; [the fix passes locally](experiments/native-attributes/shared-provider-validation.json)
 with rebuilt libraries. Windows requalification remains pending.

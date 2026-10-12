@@ -142,7 +142,10 @@ The routing workbench also parses a route, extracts an integer parameter and pri
   as first steps toward native JSON. Retained vectors support checked creation,
   length, readback and semantic `GetType()` identity; other compound queries remain unsupported.
   Explicit development reflection roots now support checked parameterless construction
-  and property-access adapters. On macOS ARM64 and Windows x64, explicit attribute-data retention
+  and property-access adapters. Explicit module-function and method-attribute roots
+  also qualify namespace-scoped `TestAttribute` discovery on macOS ARM64 JIT/AOT,
+  without invoking test bodies; dynamic registration remains separate work.
+  On macOS ARM64 and Windows x64, explicit attribute-data retention
   also supports fixed/enum arguments and member/parameter annotations without
   executing attribute constructors. Named primitive field/property snapshots also pass
   on macOS with the updated source library; their Windows gate is pending. This metadata-authored gate still requires

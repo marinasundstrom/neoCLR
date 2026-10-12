@@ -19,15 +19,15 @@ pub fn bind(
         .get("schemaVersion")
         .and_then(Value::as_u64)
         .unwrap_or(0);
-    if config.len() != if version == 4 { 3 } else { 2 } || !matches!(version, 1 | 2 | 3 | 4) {
-        return Err("reflection roots require schemaVersion 1–3 and types, or schemaVersion 4 with types and moduleCatalogs".into());
+    if config.len() != if version == 5 { 4 } else if version >= 4 { 3 } else { 2 } || !matches!(version, 1 | 2 | 3 | 4 | 5) {
+        return Err("reflection roots require schemaVersion 1–3 and types, 4 with moduleCatalogs, or 5 with moduleCatalogs and moduleFunctions".into());
     }
     let roots = config
         .get("types")
         .and_then(Value::as_array)
         .ok_or("reflection roots require types array")?;
     let mut catalogs = vec![];
-    if version == 4 {
+    if version >= 4 {
         let requested = config.get("moduleCatalogs").and_then(Value::as_array)
             .ok_or("moduleCatalogs must be an array of full assembly identities")?;
         if requested.len() > 64 {
@@ -43,8 +43,28 @@ pub fn bind(
             catalogs.push(identity);
         }
     }
-    if (roots.is_empty() && catalogs.is_empty()) || roots.len() > 64 {
-        return Err("reflection roots require one to 64 types or an explicit module catalog".into());
+    let mut function_modules = vec![];
+    if version == 5 {
+        let requested = config.get("moduleFunctions").and_then(Value::as_array)
+            .ok_or("moduleFunctions must be an array")?;
+        if requested.len() > 64 { return Err("moduleFunctions admits at most 64 modules".into()); }
+        let mut seen = std::collections::HashSet::new();
+        for entry in requested {
+            let fields = entry.as_object().ok_or("moduleFunctions entries must be objects")?;
+            if fields.len() != 3 { return Err("moduleFunctions requires assembly, name and customAttributes".into()); }
+            let assembly = entry["assembly"].as_str().ok_or("moduleFunctions requires full assembly identity")?;
+            let name = entry["name"].as_str().ok_or("moduleFunctions requires module name")?;
+            entry["customAttributes"].as_bool().ok_or("moduleFunctions requires Boolean customAttributes")?;
+            if !seen.insert((assembly, name)) { return Err("duplicate moduleFunctions scope".into()); }
+            // Validate exact ownership and catalog membership without executing or
+            // selecting bodies. Signature recipe admission happens in the binder.
+            neoclr::native_metadata::module_function_definitions(source, assembly, name)
+                .map_err(|error| error.to_string())?;
+            function_modules.push(entry.clone());
+        }
+    }
+    if (roots.is_empty() && catalogs.is_empty() && function_modules.is_empty()) || roots.len() > 64 {
+        return Err("reflection roots require one to 64 types, an explicit module catalog or a function scope".into());
     }
     let mut selected = vec![];
     let mut rows = vec![];
@@ -244,15 +264,46 @@ pub fn bind(
         f.body = body;
     }
     let mut result = json!({"schemaVersion":version,"types":rows});
-    if version == 4 {
+    if version >= 4 {
         result["moduleCatalogs"] = json!(catalogs);
     }
+    if version == 5 { result["moduleFunctions"] = json!(function_modules); }
     Ok(result)
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn function_retention_requires_exact_module_scope_and_attribute_policy() {
+        let mut source = neoclr::assemble(".module Functions\n.function Probe() -> Int32\nldc.i4 1\nret\n.end\n").unwrap();
+        source.assemblies = serde_json::from_value(json!([
+            {"name":"One","full_name":"One","modules":["Functions"],"references":[],
+             "declaration_modules":{"version":1,"names":["", "Empty"]}},
+            {"name":"Two","full_name":"Two","modules":["Other"],"references":[],
+             "declaration_modules":{"version":1,"names":[""]}}
+        ])).unwrap();
+        let valid = json!({"schemaVersion":5,"types":[],"moduleCatalogs":[],"moduleFunctions":[
+            {"assembly":"One","name":"","customAttributes":true},
+            {"assembly":"One","name":"Empty","customAttributes":false},
+            {"assembly":"Two","name":"","customAttributes":false}
+        ]});
+        let result = bind(&mut source.clone(), &source, &[], &[], &valid).unwrap();
+        assert_eq!(result["moduleFunctions"], valid["moduleFunctions"]);
+        assert_eq!(result["moduleCatalogs"], json!([]));
+        for rows in [json!([]), json!([{"assembly":"Missing","name":"","customAttributes":false}]),
+            json!([{"assembly":"One","name":"Missing","customAttributes":false}]),
+            json!([{"assembly":"One","name":"","customAttributes":"true"}]),
+            json!([{"assembly":"One","name":""}]),
+            json!([valid["moduleFunctions"][0].clone(),valid["moduleFunctions"][0].clone()]),
+            json!(true)] {
+            let mut config = valid.clone(); config["moduleFunctions"] = rows;
+            assert!(bind(&mut source.clone(), &source, &[], &[], &config).is_err());
+        }
+        let mut config = valid.clone(); config["unexpected"] = json!(true);
+        assert!(bind(&mut source.clone(), &source, &[], &[], &config).is_err());
+    }
 
     #[test]
     fn module_catalogs_require_explicit_scoped_metadata_without_type_roots() {
