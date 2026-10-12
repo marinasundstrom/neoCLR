@@ -8,6 +8,13 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-13
 
+- Align private Windows AOT heap admission with the shared native HTTP build's
+  configured byte budget instead of silently rejecting heaps above 1 MiB. Preserve
+  guard pages and ownership, add 8/32 MiB lifecycle coverage to the Windows HTTP
+  gate, and report host-initialization failures. The callback-fixed Windows SSL
+  consumer now passes interpreter/JIT; AOT exposed this separate host limit.
+  Local build-policy/syntax checks pass; Windows execution is pending.
+
 - Record passing hosted source, host-boundary and minimum-Rust qualification,
   plus the matching Windows SDK/VSIX's extracted samples and 26 editor checks.
   Qualify the callback-fixed macOS bundle through SSL/HTTPS in interpreter/JIT/AOT,

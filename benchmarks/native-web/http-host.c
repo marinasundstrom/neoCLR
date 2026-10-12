@@ -91,7 +91,12 @@ int NEOCLR_PROCESS_MAIN(int argc, neoclr_process_char **argv) {
         _setmode(_fileno(stdout), _O_BINARY) == -1 ||
         _setmode(_fileno(stderr), _O_BINARY) == -1) return 2;
     neoclr_windows_gc_host host = {0};
-    if (neoclr_windows_gc_host_open(&host, NEOCLR_HTTP_HEAP_BYTES)) return 2;
+    int32_t opened = neoclr_windows_gc_host_open(&host, NEOCLR_HTTP_HEAP_BYTES);
+    if (opened) {
+        fprintf(stderr, "Native HTTP host initialization failed (status %d, heap %zu bytes)\n",
+                opened, (size_t)NEOCLR_HTTP_HEAP_BYTES);
+        return 2;
+    }
     neoclr_aot_context *context = &host.context;
 #else
     const size_t words = NEOCLR_HTTP_HEAP_BYTES / 8;

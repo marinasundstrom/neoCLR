@@ -5,7 +5,9 @@
  * Zero-initialize before create. Single owner: do not copy, mutate or concurrently
  * access this record. Release only after all activations, callbacks and roots are
  * gone. No TLS ownership, GC, suspension or synchronization is supplied here. */
-#define NEOCLR_WINDOWS_HEAP_LIMIT (1024u * 1024u)
+/* Match the shared native HTTP build's aligned Int32 byte budget. This is an
+ * admission ceiling, not an eager allocation or a promise that OS commit succeeds. */
+#define NEOCLR_WINDOWS_HEAP_LIMIT ((size_t)2147483640)
 typedef struct {
     void *reservation;
     unsigned char *data;

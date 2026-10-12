@@ -63,8 +63,10 @@ int main(void) {
         check_capacity(1);
         check_capacity(info.dwPageSize);
         check_capacity((size_t)info.dwPageSize + 1);
-        check_capacity(NEOCLR_WINDOWS_HEAP_LIMIT);
+        check_capacity(1024u * 1024u);
+        check_capacity(8u * 1024u * 1024u);  /* Managed SSL showcase AOT heap. */
+        check_capacity(32u * 1024u * 1024u); /* Default JIT/framework budget. */
     }
-    puts("Windows guarded heap: 12 allocation lifecycles passed");
+    puts("Windows guarded heap: 18 allocation lifecycles passed");
     return 0;
 }

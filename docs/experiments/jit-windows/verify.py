@@ -44,6 +44,13 @@ def main():
         return result
 
     try:
+        memory = ROOT/'tools/native'
+        run(['cl', '/nologo', '/W4', '/WX', '/std:c11', '/O2', '/MT',
+             '/Fo'+str(out)+'/', '/Fe:'+str(out/'guarded-heap.exe'),
+             memory/'windows-host-memory.c', memory/'windows-host-memory-test.c'], 'guarded-heap-build')
+        result = run([out/'guarded-heap.exe'], 'guarded-heap')
+        if result.stdout != b'Windows guarded heap: 18 allocation lifecycles passed\r\n' or result.stderr:
+            raise RuntimeError('Guarded heap acceptance differs')
         archive = out/prerequisite.ARCHIVE
         urllib.request.urlretrieve(prerequisite.URL, archive)
         if prerequisite.sha(archive) != prerequisite.BUNDLE_SHA:

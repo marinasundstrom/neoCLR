@@ -13,7 +13,8 @@ int neoclr_windows_heap_create(neoclr_windows_heap *heap, size_t capacity) {
     GetSystemInfo(&info);
     size_t page = info.dwPageSize;
     if (!page || page > NEOCLR_WINDOWS_HEAP_LIMIT) return 1;
-    /* Inputs are bounded to 1 MiB, so rounding and two guards cannot overflow. */
+    /* Capacity and page size are bounded below 2 GiB on this x64-only host,
+     * so rounding and two guards cannot overflow size_t. */
     size_t committed = ((capacity + page - 1) / page) * page;
     unsigned char *base = VirtualAlloc(NULL, committed + 2 * page,
                                       MEM_RESERVE, PAGE_NOACCESS);

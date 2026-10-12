@@ -43,7 +43,8 @@ SDK prerequisites described in the [package procedure](experiments/raven-target/
   positional values or named parameter objects. The shared mapper takes a
   connection and statement; PostgreSQL placeholder handling belongs to its provider.
   The current provider is managed Raven over shared sockets, not a libpq binding.
-  See the tested [PostgreSQL example](experiments/postgresql-people/README.md).
+  It is included in the macOS development bundle; the Windows candidate currently
+  packages the four base libraries without the PostgreSQL provider. See the tested [PostgreSQL example](experiments/postgresql-people/README.md).
 - **Tooling and examples:** installed sample tasks accept HTTP arguments, repeated
   reflection preparation preserves caller-owned files, and the API website uses
   its committed native snapshot rather than stale local audit output.

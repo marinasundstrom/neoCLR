@@ -1,0 +1,117 @@
+{
+  "passed": false,
+  "platform": "Windows-2022Server-10.0.20348-SP0",
+  "commands": [
+    {
+      "command": [
+        "openssl",
+        "req",
+        "-x509",
+        "-newkey",
+        "ec",
+        "-pkeyopt",
+        "ec_paramgen_curve:prime256v1",
+        "-pkeyopt",
+        "ec_param_enc:named_curve",
+        "-nodes",
+        "-sha256",
+        "-days",
+        "1",
+        "-config",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\tls-streams\\openssl.cnf",
+        "-addext",
+        "basicConstraints=critical,CA:FALSE",
+        "-addext",
+        "keyUsage=critical,digitalSignature",
+        "-addext",
+        "extendedKeyUsage=serverAuth",
+        "-addext",
+        "subjectAltName=DNS:localhost",
+        "-keyout",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\tls-streams\\key.pem",
+        "-out",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\tls-streams\\cert.pem"
+      ],
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": "-----\n",
+      "elapsedSeconds": 0.032
+    },
+    {
+      "command": [
+        "C:\\hostedtoolcache\\windows\\Python\\3.12.10\\x64\\python.exe",
+        "D:\\a\\neoCLR\\neoCLR\\scripts\\build-native-project.py",
+        "--profile",
+        "windows-http",
+        "--project",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\tls-streams\\project\\App.rvnproj",
+        "--bundle",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\jit-install\\bundle",
+        "--aot",
+        "D:\\a\\neoCLR\\neoCLR\\tools\\aot-poc\\target\\release\\neoclr-aot-poc.exe",
+        "--output",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\tls-streams\\native",
+        "--http-heap-bytes",
+        "8388608",
+        "--command-timeout",
+        "600"
+      ],
+      "exitCode": 0,
+      "stdout": "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\tls-streams\\native\\app.exe\n",
+      "stderr": "",
+      "elapsedSeconds": 24.906
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\jit-install\\bundle\\bin\\neoclr.exe",
+        "run",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\tls-streams\\native\\app.dll",
+        "--execution",
+        "interpreter",
+        "--instructions",
+        "100000000",
+        "--array-elements",
+        "1048576",
+        "--array-bytes",
+        "67108864",
+        "--system",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\jit-install\\bundle\\lib\\System.runtime.neox",
+        "--object-root",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\jit-install\\bundle\\lib\\System.Runtime.dll",
+        "--module",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\jit-install\\bundle\\lib\\System.Runtime.dll",
+        "--module",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\jit-install\\bundle\\lib\\System.Data.dll",
+        "--module",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\jit-install\\bundle\\lib\\System.Networking.dll",
+        "--module",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\jit-install\\bundle\\lib\\System.Web.dll"
+      ],
+      "exitCode": 0,
+      "stdout": "Managed HTTPS JSON exchange passed\n",
+      "stderr": "",
+      "elapsedSeconds": 15.469
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\jit-install\\bundle\\bin\\neoclr.exe",
+        "run",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\tls-streams\\native\\app.dll"
+      ],
+      "exitCode": 0,
+      "stdout": "Managed HTTPS JSON exchange passed\n",
+      "stderr": "",
+      "elapsedSeconds": 11.766
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\tls-streams\\native\\app.exe"
+      ],
+      "exitCode": 2,
+      "stdout": "",
+      "stderr": "",
+      "elapsedSeconds": 0.015
+    }
+  ],
+  "error": ""
+}

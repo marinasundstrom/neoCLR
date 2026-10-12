@@ -103,3 +103,26 @@ both shapes on macOS ARM64 with more than 32 combined targets. The sanitized hos
 session checks late-target invocation, retained roots, collection, fault propagation
 and invalid/stale handles. The full Windows SSL/HTTP consumer still requires a
 fresh hosted run; object generation alone does not qualify Windows execution.
+
+### Windows AOT host heap admission
+
+[Run 38319332994](https://github.com/marinasundstrom/neoCLR/actions/runs/38319332994)
+gets past callback compilation and passes the SSL JSON consumer in interpreter and
+default JIT. The standalone AOT executable exits with code 2 before guest execution:
+the shared build accepted an 8 MiB heap, but the private Windows allocator still
+rejected anything above its original 1 MiB experiment bound. [Retained report](../release-20261013/windows-ssl-before-heap-fix.json).
+
+Align Windows capacity admission with the shared native HTTP build's maximum
+aligned Int32 byte budget (2,147,483,640 bytes), preserving its 1 MiB default and
+caller-selected capacities. Like a CLR host's resource budget, this ceiling does
+not promise successful OS allocation. Guard pages, zero initialization, failure
+atomicity and ownership remain unchanged. Windows x64 arithmetic stays bounded;
+this does not qualify Windows ARM64 or alter public managed APIs.
+
+The Windows memory test now covers 18 lifecycles, including 8 MiB SSL and 32 MiB
+framework heaps, both guard pages, zeroing, duplicate create rejection, release and
+invalid capacities. It does not allocate the multi-gigabyte admission ceiling.
+The JIT/HTTP gate runs that check before its consumers. Host initialization failures
+now print their status and requested heap size rather than silently returning 2.
+Python syntax checks pass locally; real guarded-allocation and AOT execution remain
+Windows-host validation requirements.

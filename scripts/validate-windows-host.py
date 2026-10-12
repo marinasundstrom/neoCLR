@@ -38,10 +38,10 @@ def main():
         report['inputs'] = {p.relative_to(ROOT).as_posix(): hashlib.sha256(p.read_bytes()).hexdigest() for p in inputs}
         run(['cl', '/nologo', '/W4', '/WX', '/std:c11', '/O2', '/MT', '/Fe:host-memory.exe', inputs[0], inputs[2]], 'build')
         result = run([out / 'host-memory.exe'], 'execute')
-        expected = b'Windows guarded heap: 12 allocation lifecycles passed\r\n'
+        expected = b'Windows guarded heap: 18 allocation lifecycles passed\r\n'
         if result.stdout != expected or result.stderr:
             raise ValueError('Host memory acceptance did not report exact completion')
-        report['execution'] = dict(exitCode=0, stdout=result.stdout.decode(), stderr='', allocationLifecycles=12)
+        report['execution'] = dict(exitCode=0, stdout=result.stdout.decode(), stderr='', allocationLifecycles=18)
         base = ROOT / 'docs/experiments/aot-console'
         collector_inputs = [ROOT / 'tools/native' / name for name in
                             ('windows-gc-host.c', 'windows-gc-host.h', 'windows-gc-host-test.c', 'windows-native-stack.c')]
