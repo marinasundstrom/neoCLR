@@ -8363,6 +8363,12 @@ are Utf8/Utf16/Bool8/Bool32. Parameter indices are zero-based and copied on cons
 Invalid option values throw ArgumentException. No library is loaded.
 
 `MethodDefinition.NativeImport` exposes the descriptor after authoring or native reading.
+`Introspection.MethodInfo.NativeImport: NativeImportDefinition?` exposes that immutable
+descriptor through a loaded callable view, or null for a method without a native import.
+Library/entry point, calling convention, default encoding and parameter/result overrides
+are preserved. Reading this property does not load a native library, resolve an export,
+invoke native code or synthesize custom attributes. Reference-only CLI stubs do not carry
+the descriptor; inspect the native artifact for authoritative information.
 `MethodDefinition.SetNativeImport` and `MethodBuilder.SetNativeImport` require an empty
 nongeneric static declaration with no implementation flags, abstract/virtual slot or
 generic owner. Invalid declaration state throws InvalidOperationException; unsupported

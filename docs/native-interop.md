@@ -145,6 +145,8 @@ cannot read newly extended descriptors; use matching compiler/runtime builds. Ru
 NativeImport literals need the new optional/default fields. The independent metadata
 API exposes NativeImportDefinition and SetNativeImport, preserves descriptors when
 reading native artifacts, and rejects bodies, runtime flags and entry-point imports.
+Introspection.MethodInfo.NativeImport exposes the immutable descriptor without
+resolving native libraries; Raven retains IsExtern when importing native artifacts.
 CLI projections remain reference-only throwing stubs; executable CLI writing rejects
 these imports. No partial or host-dependent DllImport marshalling substitute is emitted.
 

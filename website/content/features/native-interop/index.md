@@ -53,3 +53,6 @@ including mixed encodings, boolean results and static class imports.
 
 See the [attribute API reference](/docs/native-interop.html) for constructors,
 properties, enum values, errors and ownership rules.
+
+Metadata tools can inspect the immutable ABI descriptor without loading native code.
+Raven preserves `extern` when reading a native import from another assembly.

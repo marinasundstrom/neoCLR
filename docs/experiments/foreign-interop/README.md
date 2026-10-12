@@ -36,3 +36,30 @@ System ABI on this host, and deferred missing-export failure. Rust tests additio
 cover empty strings, embedded NULs and incompatible descriptor rejection.
 This does not qualify Win32 stdcall, other hosts, JIT/AOT imports, installed bundles,
 returned-string ownership, buffer lengths/layouts, callbacks or custom marshallers.
+
+## Imported symbol follow-through (2026-10-12)
+
+The actual attribute-source probe now reloads all ten emitted binary artifacts into
+Raven and checks exactly one extern method plus a non-extern managed Main. Both
+namespace functions and static class imports pass. The regression failed at ForeignAdd
+before NativeMethodSymbol.IsExtern was changed to use the public immutable metadata
+descriptor. Inspection passes with the deliberately nonexistent library name
+`nonexistent-native-library`; this follow-through does not execute native code.
+
+```sh
+dotnet /path/to/Raven/tools/NeoClrMetadataProbe/bin/Debug/net10.0/NeoClrMetadataProbe.dll --native-foreign-source target/foreign-api/NeoCLR.CoreProbe.dll nonexistent-native-library target/foreign-symbol-validation runtime/raven/src/System/Runtime/InteropServices/NativeImportAttribute.rvn
+dotnet run --project tools/metadata/NeoCLR.Metadata.Experimental.Tests/NeoCLR.Metadata.Experimental.Tests.csproj --no-restore /property:WarningLevel=0 -- --foreign-imports
+```
+
+Both commands passed. Metadata checks cover the unchanged string default, System
+calling convention, Bool8 parameter/Bool32 return descriptors, defensive copying and
+null descriptors for ordinary methods. Existing native execution evidence above is
+reused because invocation/emission behavior did not change. This adds a host metadata
+inspection member documented in the manual experimental metadata reference; guest
+attribute signatures and their reference snapshot are unchanged.
+
+The API snapshot check was attempted during this follow-through and reports stale
+inputs from concurrent HTTP/TLS source and reference-declaration work (CoreDeclarations,
+HttpBindings, SourceUnionReferences, SslDeclarations, Security/Ssl* and Web/Http*).
+Those changes are outside this slice; the snapshot was not refreshed from a mismatched
+reference assembly. None of the changed fingerprint inputs belongs to this follow-through.

@@ -39,6 +39,10 @@ public sealed class MethodInfo
     public IReadOnlyList<CustomAttributeInfo> GetCustomAttributes() => Array.AsReadOnly(Definition.CustomAttributes
         .Select(attribute => new CustomAttributeInfo(Context, attribute)).ToArray());
 
+    /// <summary>Gets the immutable native ABI descriptor, or null when this method has no native import.</summary>
+    /// <remarks>Metadata inspection does not load libraries, resolve exports or synthesize source attributes.</remarks>
+    public NativeImportDefinition? NativeImport => Definition.NativeImport;
+
     /// <summary>Gets the declaration name.</summary>
     public string Name { get; }
     /// <summary>Gets the namespace recorded for a namespace function; empty when absent.</summary>

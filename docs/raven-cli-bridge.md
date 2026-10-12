@@ -9113,3 +9113,16 @@ independent .NET/Python wire interoperability; the aggregate is validated as a
 reference snapshot. Native library emission and the native RavenDoc provider already
 supply the execution/documentation path that replaces reliance on this temporary
 facade. Retiring the aggregate remains the broader documentation-migration task.
+
+### Foreign import symbol readback (2026-10-12)
+
+Native imported method symbols now report IsExtern from the native ABI descriptor.
+Namespace functions and static class imports retain that classification; ordinary
+managed methods remain non-extern. The public metadata MethodInfo.NativeImport view
+preserves descriptor data without loading libraries or synthesizing source attributes.
+This follows the .NET distinction between external and managed method symbols while
+using native metadata rather than CLI PInvoke flags. Runtime Contract configuration
+and emission are unchanged. Reference-only CLI stubs remain lossy; native artifact
+inspection is authoritative. The neoCLR compiler line owns symbol projection and the
+metadata API owns descriptor decoding. The foreign-import probe checks readback for
+all ten source cases, including missing-library/export names, before execution.

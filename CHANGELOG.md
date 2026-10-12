@@ -8,6 +8,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-12
 
+- Preserve native imports through metadata inspection and Raven symbol readback:
+  expose immutable Introspection.MethodInfo.NativeImport without library loading,
+  and retain IsExtern for imported namespace functions and static methods. Add
+  missing-library readback and ABI descriptor regression checks.
+
 - Add typed private TLS configuration errors for invalid certificate/key/trust,
   key mismatch, ALPN and provider setup; clear output handles on failure and retain
   the existing HTTPS ABI. Qualify credential rejection, untrusted/expired/future

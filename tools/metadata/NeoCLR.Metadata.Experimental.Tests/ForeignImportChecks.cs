@@ -1,6 +1,7 @@
 using System.Text.Json.Nodes;
 using NeoCLR.Metadata.Experimental;
 using NeoCLR.Metadata.Experimental.Model;
+using NeoCLR.Metadata.Experimental.Introspection;
 
 internal static class ForeignImportChecks
 {
@@ -17,6 +18,24 @@ internal static class ForeignImportChecks
         var method = definition.MainModule.Methods.Single();
         if (method.NativeImport is not { Library: "missing-library", EntryPoint: "read", StringMarshalling: "Utf8" })
             throw new Exception("foreign import descriptor lost");
+        var context = new MetadataLoadContext([definition]);
+        if (!ReferenceEquals(context.Resolve(method).NativeImport, method.NativeImport))
+            throw new Exception("introspection lost immutable native descriptor");
+        var booleans = Graph();
+        var overrides = new Dictionary<int, string> { [0] = "Bool8" };
+        booleans.AddFunction("Test", new(PrimitiveType.Boolean, [PrimitiveType.Boolean]))
+            .SetNativeImport(new("missing-library", "test", callingConvention: "System",
+                parameterMarshalling: overrides, returnMarshalling: "Bool32"));
+        overrides[0] = "Bool32";
+        var ordinary = booleans.AddFunction("Ordinary", new(PrimitiveType.Int32, []));
+        ordinary.LoadConstant(42); ordinary.Return();
+        var booleanSnapshot = AssemblyDefinition.ReadNativeAssembly(RuntimeAssemblyContainer.WriteBinary(booleans));
+        var booleanContext = new MetadataLoadContext([booleanSnapshot]);
+        var views = booleanSnapshot.MainModule.Methods.Select(booleanContext.Resolve).ToArray();
+        var descriptor = views.Single(m => m.Name == "Test").NativeImport;
+        if (descriptor is not { CallingConvention: "System", ReturnMarshalling: "Bool32" } ||
+            descriptor.ParameterMarshalling[0] != "Bool8" || views.Single(m => m.Name == "Ordinary").NativeImport is not null)
+            throw new Exception("introspection changed native ABI or ordinary method classification");
         Reject(() => method.SetNativeImport(new("x", "y")));
         Reject(() => imported.SetInternalCall());
         Reject(() => graph.Write());
