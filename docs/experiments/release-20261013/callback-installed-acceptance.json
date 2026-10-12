@@ -1,0 +1,272 @@
+{
+  "passed": true,
+  "root": "/Users/robert/.neoclr/experiments/preview-20261012-2",
+  "commands": [
+    {
+      "command": [
+        "dotnet",
+        "/Users/robert/.neoclr/experiments/preview-20261012-2/sdk/tools/rvnc/rvnc.dll",
+        "neoclr",
+        "--project",
+        "/Users/robert/.neoclr/experiments/preview-20261012-2/samples/collections/App.rvnproj"
+      ],
+      "exitCode": 0,
+      "stdout": "Native build output: /Users/robert/.neoclr/experiments/preview-20261012-2/samples/collections/bin/neoclr/App.dll\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/.neoclr/experiments/preview-20261012-2/bin/neoclr",
+        "run",
+        "/Users/robert/.neoclr/experiments/preview-20261012-2/samples/collections/bin/neoclr/App.dll"
+      ],
+      "exitCode": 0,
+      "stdout": "Duplicate order rejected\n3\n3\nUnknown order\nOrder already shipped\nMultiple\n2\nFiltered orders share identity\n2\n303\n303\n0\nEmpty\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "dotnet",
+        "/Users/robert/.neoclr/experiments/preview-20261012-2/sdk/tools/rvnc/rvnc.dll",
+        "neoclr",
+        "--project",
+        "/Users/robert/.neoclr/experiments/preview-20261012-2/samples/tasks/App.rvnproj"
+      ],
+      "exitCode": 0,
+      "stdout": "Native build output: /Users/robert/.neoclr/experiments/preview-20261012-2/samples/tasks/bin/neoclr/App.dll\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/.neoclr/experiments/preview-20261012-2/bin/neoclr",
+        "run",
+        "/Users/robert/.neoclr/experiments/preview-20261012-2/samples/tasks/bin/neoclr/App.dll"
+      ],
+      "exitCode": 0,
+      "stdout": "Suspended\n42\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "dotnet",
+        "/Users/robert/.neoclr/experiments/preview-20261012-2/sdk/tools/rvnc/rvnc.dll",
+        "neoclr",
+        "--project",
+        "/Users/robert/.neoclr/experiments/preview-20261012-2/samples/json/App.rvnproj"
+      ],
+      "exitCode": 0,
+      "stdout": "Native build output: /Users/robert/.neoclr/experiments/preview-20261012-2/samples/json/bin/neoclr/App.dll\n",
+      "stderr": "/Users/robert/.neoclr/experiments/preview-20261012-2/samples/json/Main.rvn(14,76): info RAV1506: Result propagation converts errors from 'JsonError' to 'MappingError' via implicit conversion 'static func implicit(error: JsonError) -> MappingError'.\n/Users/robert/.neoclr/experiments/preview-20261012-2/samples/json/Main.rvn(19,52): info RAV1506: Result propagation converts errors from 'JsonError' to 'MappingError' via implicit conversion 'static func implicit(error: JsonError) -> MappingError'.\n/Users/robert/.neoclr/experiments/preview-20261012-2/samples/json/Main.rvn(24,59): info RAV1506: Result propagation converts errors from 'JsonError' to 'MappingError' via implicit conversion 'static func implicit(error: JsonError) -> MappingError'.\n/Users/robert/.neoclr/experiments/preview-20261012-2/samples/json/Main.rvn(26,62): info RAV1506: Result propagation converts errors from 'JsonError' to 'MappingError' via implicit conversion 'static func implicit(error: JsonError) -> MappingError'.\n/Users/robert/.neoclr/experiments/preview-20261012-2/samples/json/Main.rvn(34,43): info RAV1506: Result propagation converts errors from 'JsonError' to 'MappingError' via implicit conversion 'static func implicit(error: JsonError) -> MappingError'.\n/Users/robert/.neoclr/experiments/preview-20261012-2/samples/json/Mapping.rvn(50,53): info RAV1506: Result propagation converts errors from 'JsonError' to 'MappingError' via implicit conversion 'static func implicit(error: JsonError) -> MappingError'.\n/Users/robert/.neoclr/experiments/preview-20261012-2/samples/json/Mapping.rvn(52,66): info RAV1506: Result propagation converts errors from 'ReflectionError' to 'MappingError' via implicit conversion 'static func implicit(error: ReflectionError) -> MappingError'.\n/Users/robert/.neoclr/experiments/preview-20261012-2/samples/json/Mapping.rvn(55,61): info RAV1506: Result propagation converts errors from 'ReflectionError' to 'MappingError' via implicit conversion 'static func implicit(error: ReflectionError) -> MappingError'.\n/Users/robert/.neoclr/experiments/preview-20261012-2/samples/json/Mapping.rvn(67,42): info RAV1506: Result propagation converts errors from 'ReflectionError' to 'MappingError' via implicit conversion 'static func implicit(error: ReflectionError) -> MappingError'.\n/Users/robert/.neoclr/experiments/preview-20261012-2/samples/json/Mapping.rvn(70,57): info RAV1506: Result propagation converts errors from 'JsonError' to 'MappingError' via implicit conversion 'static func implicit(error: JsonError) -> MappingError'.\n"
+    },
+    {
+      "command": [
+        "/Users/robert/.neoclr/experiments/preview-20261012-2/bin/neoclr",
+        "disassemble",
+        "/Users/robert/.neoclr/experiments/preview-20261012-2/samples/json/bin/neoclr/App.dll",
+        "/var/folders/5x/5r0dfcnx30lf0cl8kp3sphch0000gn/T/neoclr-sample-reflection-72uuthoh/module.neoil"
+      ],
+      "exitCode": 0,
+      "stdout": "Disassembled /Users/robert/.neoclr/experiments/preview-20261012-2/samples/json/bin/neoclr/App.dll -> /var/folders/5x/5r0dfcnx30lf0cl8kp3sphch0000gn/T/neoclr-sample-reflection-72uuthoh/module.neoil\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/.neoclr/experiments/preview-20261012-2/bin/neoclr",
+        "run",
+        "/Users/robert/.neoclr/experiments/preview-20261012-2/samples/json/bin/neoclr/App.dll",
+        "--reflection-roots",
+        "/Users/robert/.neoclr/experiments/preview-20261012-2/samples/json/bin/neoclr/App.reflection.json"
+      ],
+      "exitCode": 0,
+      "stdout": "JSON object mapping checks passed\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "dotnet",
+        "/Users/robert/.neoclr/experiments/preview-20261012-2/sdk/tools/rvnc/rvnc.dll",
+        "neoclr",
+        "--project",
+        "/Users/robert/.neoclr/experiments/preview-20261012-2/samples/http-json-server/App.rvnproj"
+      ],
+      "exitCode": 0,
+      "stdout": "Native build output: /Users/robert/.neoclr/experiments/preview-20261012-2/samples/http-json-server/bin/neoclr/App.dll\n",
+      "stderr": "/Users/robert/.neoclr/experiments/preview-20261012-2/samples/http-json-server/HttpApplication.rvn(64,32): info RAV1506: Result propagation converts errors from 'JsonError' to 'AppError' via implicit conversion 'static func implicit(error: JsonError) -> AppError'.\n/Users/robert/.neoclr/experiments/preview-20261012-2/samples/http-json-server/HttpApplication.rvn(65,45): info RAV1506: Result propagation converts errors from 'JsonError' to 'AppError' via implicit conversion 'static func implicit(error: JsonError) -> AppError'.\n/Users/robert/.neoclr/experiments/preview-20261012-2/samples/http-json-server/HttpApplication.rvn(70,26): info RAV1506: Result propagation converts errors from 'HttpJsonError' to 'AppError' via implicit conversion 'static func implicit(error: HttpJsonError) -> AppError'.\n/Users/robert/.neoclr/experiments/preview-20261012-2/samples/http-json-server/HttpApplication.rvn(74,68): info RAV1506: Result propagation converts errors from 'JsonError' to 'AppError' via implicit conversion 'static func implicit(error: JsonError) -> AppError'.\n/Users/robert/.neoclr/experiments/preview-20261012-2/samples/http-json-server/HttpApplication.rvn(76,53): info RAV1506: Result propagation converts errors from 'JsonError' to 'AppError' via implicit conversion 'static func implicit(error: JsonError) -> AppError'.\n/Users/robert/.neoclr/experiments/preview-20261012-2/samples/http-json-server/HttpServer.rvn(18,40): info RAV1506: Result propagation converts errors from 'JsonError' to 'AppError' via implicit conversion 'static func implicit(error: JsonError) -> AppError'.\n/Users/robert/.neoclr/experiments/preview-20261012-2/samples/http-json-server/HttpServer.rvn(19,53): info RAV1506: Result propagation converts errors from 'JsonError' to 'AppError' via implicit conversion 'static func implicit(error: JsonError) -> AppError'.\n/Users/robert/.neoclr/experiments/preview-20261012-2/samples/http-json-server/HttpServer.rvn(82,9): warning RAV0162: Unreachable code\n/Users/robert/.neoclr/experiments/preview-20261012-2/samples/http-json-server/HttpServer.rvn(87,9): warning RAV0162: Unreachable code\n"
+    },
+    {
+      "command": [
+        "/Users/robert/.neoclr/experiments/preview-20261012-2/bin/neoclr",
+        "disassemble",
+        "/Users/robert/.neoclr/experiments/preview-20261012-2/samples/http-json-server/bin/neoclr/App.dll",
+        "/var/folders/5x/5r0dfcnx30lf0cl8kp3sphch0000gn/T/neoclr-sample-reflection-8fi0bwzz/module.neoil"
+      ],
+      "exitCode": 0,
+      "stdout": "Disassembled /Users/robert/.neoclr/experiments/preview-20261012-2/samples/http-json-server/bin/neoclr/App.dll -> /var/folders/5x/5r0dfcnx30lf0cl8kp3sphch0000gn/T/neoclr-sample-reflection-8fi0bwzz/module.neoil\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "dotnet",
+        "/Users/robert/.neoclr/experiments/preview-20261012-2/sdk/tools/rvnc/rvnc.dll",
+        "neoclr",
+        "--project",
+        "/Users/robert/.neoclr/experiments/preview-20261012-2/samples/http-json-client/App.rvnproj"
+      ],
+      "exitCode": 0,
+      "stdout": "Native build output: /Users/robert/.neoclr/experiments/preview-20261012-2/samples/http-json-client/bin/neoclr/App.dll\n",
+      "stderr": "/Users/robert/.neoclr/experiments/preview-20261012-2/samples/http-json-client/HttpApplication.rvn(64,32): info RAV1506: Result propagation converts errors from 'JsonError' to 'AppError' via implicit conversion 'static func implicit(error: JsonError) -> AppError'.\n/Users/robert/.neoclr/experiments/preview-20261012-2/samples/http-json-client/HttpApplication.rvn(65,45): info RAV1506: Result propagation converts errors from 'JsonError' to 'AppError' via implicit conversion 'static func implicit(error: JsonError) -> AppError'.\n/Users/robert/.neoclr/experiments/preview-20261012-2/samples/http-json-client/HttpApplication.rvn(70,26): info RAV1506: Result propagation converts errors from 'HttpJsonError' to 'AppError' via implicit conversion 'static func implicit(error: HttpJsonError) -> AppError'.\n/Users/robert/.neoclr/experiments/preview-20261012-2/samples/http-json-client/HttpApplication.rvn(74,68): info RAV1506: Result propagation converts errors from 'JsonError' to 'AppError' via implicit conversion 'static func implicit(error: JsonError) -> AppError'.\n/Users/robert/.neoclr/experiments/preview-20261012-2/samples/http-json-client/HttpApplication.rvn(76,53): info RAV1506: Result propagation converts errors from 'JsonError' to 'AppError' via implicit conversion 'static func implicit(error: JsonError) -> AppError'.\n/Users/robert/.neoclr/experiments/preview-20261012-2/samples/http-json-client/HttpClient.rvn(11,71): info RAV1506: Result propagation converts errors from 'HttpJsonError' to 'AppError' via implicit conversion 'static func implicit(error: HttpJsonError) -> AppError'.\n/Users/robert/.neoclr/experiments/preview-20261012-2/samples/http-json-client/HttpClient.rvn(21,9): warning RAV0162: Unreachable code\n"
+    },
+    {
+      "command": [
+        "/Users/robert/.neoclr/experiments/preview-20261012-2/bin/neoclr",
+        "disassemble",
+        "/Users/robert/.neoclr/experiments/preview-20261012-2/samples/http-json-client/bin/neoclr/App.dll",
+        "/var/folders/5x/5r0dfcnx30lf0cl8kp3sphch0000gn/T/neoclr-sample-reflection-qwkm67cj/module.neoil"
+      ],
+      "exitCode": 0,
+      "stdout": "Disassembled /Users/robert/.neoclr/experiments/preview-20261012-2/samples/http-json-client/bin/neoclr/App.dll -> /var/folders/5x/5r0dfcnx30lf0cl8kp3sphch0000gn/T/neoclr-sample-reflection-qwkm67cj/module.neoil\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Applications/Xcode.app/Contents/Developer/usr/bin/python3",
+        "/Users/robert/.neoclr/experiments/preview-20261012-2/tools/verify-native-http-json.py",
+        "--runtime",
+        "/Users/robert/.neoclr/experiments/preview-20261012-2/bin/neoclr",
+        "--server",
+        "/Users/robert/.neoclr/experiments/preview-20261012-2/samples/http-json-server/bin/neoclr/App.dll",
+        "--client",
+        "/Users/robert/.neoclr/experiments/preview-20261012-2/samples/http-json-client/bin/neoclr/App.dll",
+        "--seed",
+        "/Users/robert/.neoclr/experiments/preview-20261012-2/lib/System.runtime.neox",
+        "--module",
+        "/Users/robert/.neoclr/experiments/preview-20261012-2/lib/System.Runtime.dll",
+        "--module",
+        "/Users/robert/.neoclr/experiments/preview-20261012-2/lib/System.Data.dll",
+        "--module",
+        "/Users/robert/.neoclr/experiments/preview-20261012-2/lib/System.Networking.dll",
+        "--module",
+        "/Users/robert/.neoclr/experiments/preview-20261012-2/lib/System.Web.dll",
+        "--module",
+        "/Users/robert/.neoclr/experiments/preview-20261012-2/lib/System.Data.PostgreSql.dll",
+        "--object-root",
+        "/Users/robert/.neoclr/experiments/preview-20261012-2/lib/System.Runtime.dll",
+        "--execution",
+        "default",
+        "--server-reflection-roots",
+        "/Users/robert/.neoclr/experiments/preview-20261012-2/samples/http-json-server/bin/neoclr/App.reflection.json",
+        "--client-reflection-roots",
+        "/Users/robert/.neoclr/experiments/preview-20261012-2/samples/http-json-client/bin/neoclr/App.reflection.json",
+        "--output",
+        "/Users/robert/Projects/neoclr/target/release-callback-bundle-20261013/installed-acceptance-http.json"
+      ],
+      "exitCode": 0,
+      "stdout": "Native HTTP/JSON server requests passed\nNative HTTP/JSON client/server pair passed\n",
+      "stderr": ""
+    }
+  ],
+  "verifiedFiles": 1463,
+  "execution": "default",
+  "http": {
+    "execution": "default",
+    "inputs": {
+      "/Users/robert/.neoclr/experiments/preview-20261012-2/bin/neoclr": "57e1551815390c17044a73b87a3e4bb663406d00549d6adb3bcdcd5c9b9f7ebb",
+      "/Users/robert/.neoclr/experiments/preview-20261012-2/samples/http-json-server/bin/neoclr/App.dll": "a60ab521c4cdea1f83decfadf7fc8287c752918e2abb32bc319a5bbb3dab6c60",
+      "/Users/robert/.neoclr/experiments/preview-20261012-2/samples/http-json-client/bin/neoclr/App.dll": "de71ad03717136ffbbbbb611b96ba1055febf0c557fb5a0e4dfe4fc097b48a82",
+      "/Users/robert/.neoclr/experiments/preview-20261012-2/lib/System.runtime.neox": "98a1ae1da85387c87746957e83a4015eb59d0566539a915c69f168d2b511b190",
+      "/Users/robert/.neoclr/experiments/preview-20261012-2/lib/System.Runtime.dll": "4e85571b0eaa3e0868f0e6165b0ba9038f2fde89e03c83934f0ad264307276a3",
+      "/Users/robert/.neoclr/experiments/preview-20261012-2/lib/System.Data.dll": "a563b65aa74faef25fa3dde618b67a45387d5db719d25dbe6ed6f2120f0314d4",
+      "/Users/robert/.neoclr/experiments/preview-20261012-2/lib/System.Networking.dll": "6715aeb443494f9c5a4e1f4f61a807147468a87f1b0980ee51e533f3a076bebb",
+      "/Users/robert/.neoclr/experiments/preview-20261012-2/lib/System.Web.dll": "01898aa2b6c028bf8a7af183f403995652459b560e4576f5490b452e346d8a8e",
+      "/Users/robert/.neoclr/experiments/preview-20261012-2/lib/System.Data.PostgreSql.dll": "fa12626ce72cb597d44c30fb39970c19b2db6888c9ded996fdaea1a18f6fa3c2",
+      "/Users/robert/.neoclr/experiments/preview-20261012-2/samples/http-json-server/bin/neoclr/App.reflection.json": "faa451155938d04a6eb3c432b0b5be5463351950d5e2db4ca88fa9bc2d3b2177",
+      "/Users/robert/.neoclr/experiments/preview-20261012-2/samples/http-json-client/bin/neoclr/App.reflection.json": "faa451155938d04a6eb3c432b0b5be5463351950d5e2db4ca88fa9bc2d3b2177"
+    },
+    "runs": [
+      {
+        "serverCommand": [
+          "/Users/robert/.neoclr/experiments/preview-20261012-2/bin/neoclr",
+          "run",
+          "/Users/robert/.neoclr/experiments/preview-20261012-2/samples/http-json-server/bin/neoclr/App.dll",
+          "--reflection-roots",
+          "/Users/robert/.neoclr/experiments/preview-20261012-2/samples/http-json-server/bin/neoclr/App.reflection.json",
+          "--",
+          "4"
+        ],
+        "requests": [
+          {
+            "method": "GET",
+            "path": "/report",
+            "status": 200,
+            "body": {
+              "station": "Caf\u00e9"
+            }
+          },
+          {
+            "method": "POST",
+            "path": "/reports",
+            "status": 201,
+            "body": {
+              "accepted": true
+            }
+          },
+          {
+            "method": "POST",
+            "path": "/reports",
+            "status": 400,
+            "body": {
+              "error": "Invalid report"
+            }
+          },
+          {
+            "method": "GET",
+            "path": "/missing",
+            "status": 404,
+            "body": {
+              "error": "Not found"
+            }
+          }
+        ],
+        "port": "57790",
+        "server": {
+          "exitCode": 0,
+          "stdout": "Reports served\n",
+          "stderr": ""
+        }
+      },
+      {
+        "serverCommand": [
+          "/Users/robert/.neoclr/experiments/preview-20261012-2/bin/neoclr",
+          "run",
+          "/Users/robert/.neoclr/experiments/preview-20261012-2/samples/http-json-server/bin/neoclr/App.dll",
+          "--reflection-roots",
+          "/Users/robert/.neoclr/experiments/preview-20261012-2/samples/http-json-server/bin/neoclr/App.reflection.json",
+          "--",
+          "2"
+        ],
+        "requests": [],
+        "port": "57795",
+        "clientCommand": [
+          "/Users/robert/.neoclr/experiments/preview-20261012-2/bin/neoclr",
+          "run",
+          "/Users/robert/.neoclr/experiments/preview-20261012-2/samples/http-json-client/bin/neoclr/App.dll",
+          "--reflection-roots",
+          "/Users/robert/.neoclr/experiments/preview-20261012-2/samples/http-json-client/bin/neoclr/App.reflection.json",
+          "--",
+          "http://127.0.0.1:57795/"
+        ],
+        "client": {
+          "exitCode": 0,
+          "stdout": "{\"accepted\":true}\n",
+          "stderr": ""
+        },
+        "server": {
+          "exitCode": 0,
+          "stdout": "Reports served\n",
+          "stderr": ""
+        }
+      }
+    ],
+    "passed": true
+  }
+}

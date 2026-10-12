@@ -1,9 +1,11 @@
 # neoCLR platform roadmap
 
-**Release preflight (2026-10-13):** [local source and packaging checks](experiments/release-20261013/README.md)
-repair TLS notice coverage and stale generic-owner/logical-module tests. Fresh source
-smoke and focused repairs pass; clean hosted and Windows bundle qualification remain
-release gates. No publication or platform milestone reorder is implied.
+**Release preflight (2026-10-13):** [qualification evidence](experiments/release-20261013/README.md)
+now includes passing hosted source/format/Clippy, minimum-Rust and macOS/Windows
+host gates. The mixed-callback backend repair passes focused Windows object and
+macOS SSL/HTTP checks; the author installation is refreshed. Windows HTTP/package
+qualification of that repair remains open. [Draft notes](next-preview-release-notes.md)
+are ready for review; no publication or milestone reorder is implied.
 
 **Local default-JIT preview (2026-10-12):** the [author-testing installation](local-preview-20261012.md)
 now passes extracted HTTP JSON checks and repeated installed client/server runs.

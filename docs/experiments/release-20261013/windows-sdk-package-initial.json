@@ -1,0 +1,56 @@
+{
+  "passed": true,
+  "sourceRevision": "a9adc97cbe5efc7ac8bb211afaa0da08420ea708",
+  "commands": [
+    {
+      "name": "backend",
+      "command": [
+        "cargo",
+        "build",
+        "--locked",
+        "--release",
+        "--manifest-path",
+        "D:\\a\\neoCLR\\neoCLR\\neoclr\\tools\\aot-poc\\Cargo.toml"
+      ],
+      "exitCode": 0
+    },
+    {
+      "name": "host-recipe",
+      "command": [
+        "C:\\hostedtoolcache\\windows\\Python\\3.12.10\\x64\\python.exe",
+        "D:\\a\\neoCLR\\neoCLR\\neoclr\\scripts\\build-native-project.py",
+        "--profile",
+        "windows-http",
+        "--project",
+        "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\jit-package\\host-source\\App.rvnproj",
+        "--bundle",
+        "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\distribution\\neoclr-native-poc",
+        "--aot",
+        "D:\\a\\neoCLR\\neoCLR\\neoclr\\tools\\aot-poc\\target\\release\\neoclr-aot-poc.exe",
+        "--output",
+        "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\jit-package\\native"
+      ],
+      "exitCode": 0
+    },
+    {
+      "name": "jit-bundle",
+      "command": [
+        "C:\\hostedtoolcache\\windows\\Python\\3.12.10\\x64\\python.exe",
+        "D:\\a\\neoCLR\\neoCLR\\neoclr\\scripts\\prepare-jit-bundle.py",
+        "--bundle",
+        "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\distribution\\neoclr-native-poc",
+        "--runtime",
+        "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\release\\neoclr.exe",
+        "--jit-compiler",
+        "D:\\a\\neoCLR\\neoCLR\\neoclr\\tools\\aot-poc\\target\\release\\neoclr-aot-poc.exe",
+        "--host-recipe",
+        "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\jit-package\\native\\build.json",
+        "--output",
+        "D:\\a\\neoCLR\\neoCLR\\neoclr\\target\\jit-package\\jit"
+      ],
+      "exitCode": 0
+    }
+  ],
+  "archiveSha256": "dd5fbbbe1b7ff180a645df0f8b9342082f5bc0636b6df35d3e3f0480c5d8b9f1",
+  "manifestSha256": "109eabef1e3184dfc7ff911ba1b4dc0258aae279b5167afd12a31f3a8a61e1ad"
+}

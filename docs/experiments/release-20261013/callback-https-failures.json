@@ -1,0 +1,132 @@
+{
+  "passed": true,
+  "platform": "macOS-27.0-arm64-arm-64bit",
+  "commands": [
+    {
+      "command": [
+        "openssl",
+        "req",
+        "-x509",
+        "-newkey",
+        "ec",
+        "-pkeyopt",
+        "ec_paramgen_curve:prime256v1",
+        "-pkeyopt",
+        "ec_param_enc:named_curve",
+        "-nodes",
+        "-sha256",
+        "-days",
+        "1",
+        "-config",
+        "/Users/robert/Projects/neoclr/target/release-callback-https-failures-20261013/openssl.cnf",
+        "-addext",
+        "basicConstraints=critical,CA:FALSE",
+        "-addext",
+        "keyUsage=critical,digitalSignature",
+        "-addext",
+        "extendedKeyUsage=serverAuth",
+        "-addext",
+        "subjectAltName=DNS:localhost",
+        "-keyout",
+        "/Users/robert/Projects/neoclr/target/release-callback-https-failures-20261013/key.pem",
+        "-out",
+        "/Users/robert/Projects/neoclr/target/release-callback-https-failures-20261013/cert.pem"
+      ],
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": "Generating a 2048 bit EC private key\nwriting new private key to '/Users/robert/Projects/neoclr/target/release-callback-https-failures-20261013/key.pem'\n-----\n",
+      "elapsedSeconds": 0.022705
+    },
+    {
+      "command": [
+        "/Applications/Xcode.app/Contents/Developer/usr/bin/python3",
+        "/Users/robert/Projects/neoclr/scripts/build-native-project.py",
+        "--profile",
+        "http",
+        "--project",
+        "/Users/robert/Projects/neoclr/target/release-callback-https-failures-20261013/project/App.rvnproj",
+        "--bundle",
+        "/Users/robert/Projects/neoclr/target/release-callback-bundle-20261013/bundle",
+        "--aot",
+        "/Users/robert/Projects/neoclr/tools/aot-poc/target/release/neoclr-aot-poc",
+        "--output",
+        "/Users/robert/Projects/neoclr/target/release-callback-https-failures-20261013/native",
+        "--http-heap-bytes",
+        "8388608",
+        "--command-timeout",
+        "600"
+      ],
+      "exitCode": 0,
+      "stdout": "/Users/robert/Projects/neoclr/target/release-callback-https-failures-20261013/native/app\n",
+      "stderr": "",
+      "elapsedSeconds": 15.0663
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/release-callback-bundle-20261013/bundle/bin/neoclr",
+        "run",
+        "/Users/robert/Projects/neoclr/target/release-callback-https-failures-20261013/native/app.dll",
+        "--execution",
+        "interpreter",
+        "--instructions",
+        "100000000",
+        "--array-elements",
+        "1048576",
+        "--array-bytes",
+        "67108864",
+        "--system",
+        "/Users/robert/Projects/neoclr/target/release-callback-bundle-20261013/bundle/lib/System.runtime.neox",
+        "--object-root",
+        "/Users/robert/Projects/neoclr/target/release-callback-bundle-20261013/bundle/lib/System.Runtime.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/release-callback-bundle-20261013/bundle/lib/System.Runtime.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/release-callback-bundle-20261013/bundle/lib/System.Data.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/release-callback-bundle-20261013/bundle/lib/System.Networking.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/release-callback-bundle-20261013/bundle/lib/System.Web.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/release-callback-bundle-20261013/bundle/lib/System.Data.PostgreSql.dll"
+      ],
+      "exitCode": 0,
+      "stdout": "HTTPS rejection and recovery passed\nHTTPS client timeout passed\nHTTPS client cancellation passed\nHTTPS server deadline passed\n",
+      "stderr": "",
+      "elapsedSeconds": 19.575672
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/release-callback-bundle-20261013/bundle/bin/neoclr",
+        "run",
+        "/Users/robert/Projects/neoclr/target/release-callback-https-failures-20261013/native/app.dll"
+      ],
+      "exitCode": 0,
+      "stdout": "HTTPS rejection and recovery passed\nHTTPS client timeout passed\nHTTPS client cancellation passed\nHTTPS server deadline passed\n",
+      "stderr": "",
+      "elapsedSeconds": 12.656507
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/release-callback-https-failures-20261013/native/app"
+      ],
+      "exitCode": 0,
+      "stdout": "HTTPS rejection and recovery passed\nHTTPS client timeout passed\nHTTPS client cancellation passed\nHTTPS server deadline passed\n",
+      "stderr": "",
+      "elapsedSeconds": 6.643874
+    }
+  ],
+  "modes": [
+    "interpreter",
+    "default-jit",
+    "aot"
+  ],
+  "scope": "HTTP TLS rejection/recovery, client timeout/cancellation and server deadline",
+  "timingNote": "Timings include compilation and are not benchmarks.",
+  "sourceHashes": {
+    "runtime/raven/src/System/Networking/Security/SslStream.rvn": "c42c7b37601a5721530bee64a52d50c905db69583d0f282755432587b4a502ea",
+    "runtime/raven/src/System/Networking/Security/SslOptions.rvn": "0630f760039f609d5edbf4cff6bf4eef2b455e7c488441a6fcab0f296537c1e3",
+    "runtime/raven/src/System/Networking/Security/SslError.rvn": "9a12027a85d6023c200b0080ef793a1237e6117fa15d25ddcc15f2a5b99def01",
+    "docs/experiments/shared-tls/http-failure-project/Main.rvn": "354a1c118962034afeef14a4fa88eef8df05242303c2028452a1e6d290e70ae3",
+    "docs/experiments/shared-tls/http-failure-project/App.rvnproj": "7f4ad0af0f55212f6e461df8b346e1f5a76ee1ae295aa068fa06e1ac1249ba6f"
+  }
+}

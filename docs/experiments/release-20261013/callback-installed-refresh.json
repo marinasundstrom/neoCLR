@@ -1,0 +1,33 @@
+{
+  "passed": true,
+  "installation": "/Users/robert/.neoclr/experiments/preview-20261012-2",
+  "changedFiles": [
+    "THIRD_PARTY_NOTICES.md",
+    "bin/neoclr",
+    "bin/neoclr-aot-poc",
+    "bin/neoclr-jit-host.dylib",
+    "third-party/manifest.json",
+    "tools/aot-poc/CRANELIFT-LICENSE",
+    "tools/aot-poc/Cargo.lock",
+    "tools/aot-poc/THIRD_PARTY_NOTICES.md",
+    "tools/native-tls/Cargo.lock",
+    "tools/native-tls/THIRD_PARTY_NOTICES.md"
+  ],
+  "previousManifestSha256": "01a7c9fd19b441e78a48b707294053420c553ba008e983a94795df66942d64f6",
+  "manifestSha256": "06748d41c37f423e7869cb2adcbfc2bc14e48cb18f11264ee93aa5c249ed4bff",
+  "sdkVersion": "0.1.13-neoclr.20261012.2",
+  "sdkAndExtensionUnchanged": true,
+  "sourceRevision": "566fb34dcbf840461d1bb2261a949a0a635363ea",
+  "files": {
+    "THIRD_PARTY_NOTICES.md": "7ec1804c4a09df2517ec67b18e74f80c8fde182304132c49b6ae55a8e54b20a7",
+    "bin/neoclr": "57e1551815390c17044a73b87a3e4bb663406d00549d6adb3bcdcd5c9b9f7ebb",
+    "bin/neoclr-aot-poc": "76972bc0e4b722c2f0f27b859afdbddad3b7e6c1154c9cdd8ecaf39f0261baca",
+    "bin/neoclr-jit-host.dylib": "2d1cbfb9aa2ae521c117f804366aa2ba7646850d5a0868b4d02ca65cee8f2b4b",
+    "third-party/manifest.json": "9513540a83b112dc7b3f1879db90d209600bbd0dd945debc8c6d6d24fbdbbbb6",
+    "tools/aot-poc/CRANELIFT-LICENSE": "a6c48161a09acc75a0e25503bab66a731eb5fba5392ed4bb4743e4ba5085327a",
+    "tools/aot-poc/Cargo.lock": "55127a0aa6df2bd5566242f689b58850a817ef153a02b8c1f57f62e7f1f74aa1",
+    "tools/aot-poc/THIRD_PARTY_NOTICES.md": "c0737a3d56a505f602e6db302a0b58c736029bd401a87b88b13a09b7c5f3b57f",
+    "tools/native-tls/Cargo.lock": "cbc61b43fa2808dfb2b66e4dd1aedae56d23426edf8050344acd65396ba6a3d8",
+    "tools/native-tls/THIRD_PARTY_NOTICES.md": "fbe9019a76f3fae96d0a66588f30cf913ce441b79d0f187e5d2ace990db3597b"
+  }
+}

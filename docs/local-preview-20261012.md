@@ -15,6 +15,12 @@ qualification.
   Native object-budget fix: neoCLR `b1b43b35a`. Component and archive hashes are in
   the [installation record](experiments/native-type-budget/installed-preview/installation.json).
 
+On 13 October, the installed runtime/backend and dependency notices were refreshed;
+extracted and installed default-JIT acceptance both pass. The SDK/VSIX, libraries
+and samples are unchanged. [Refresh hashes and validation](experiments/release-20261013/README.md#hosted-source-and-callback-repair)
+include fresh macOS interpreter/JIT/AOT HTTPS checks. The launch paths below remain
+the same; the original installation record still describes the earlier payload.
+
 ## Open and run
 
 ```sh

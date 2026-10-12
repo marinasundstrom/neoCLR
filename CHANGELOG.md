@@ -8,6 +8,13 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-13
 
+- Record passing hosted source, host-boundary and minimum-Rust qualification,
+  plus the matching Windows SDK/VSIX's extracted samples and 26 editor checks.
+  Qualify the callback-fixed macOS bundle through SSL/HTTPS in interpreter/JIT/AOT,
+  refresh the installed runtime/backend and notices, and pass installed default-JIT
+  samples. Retain exact hashes and draft next-preview notes; Windows callback-fixed
+  HTTP/package runs and final publication review remain open.
+
 - Repair native host callback admission for mixed unit/no-result continuations:
   remove the redundant combined 32-target cap without changing per-shape bounds
   or the host ABI. Windows x64 object emission and sanitized macOS session tests

@@ -1,0 +1,241 @@
+{
+  "status": "passed",
+  "scope": "focused host contracts; not full suite or packaged SDK qualification",
+  "platform": "Windows-2025Server-10.0.26100-SP0",
+  "toolchain": "stable",
+  "createdUtc": "2026-10-12T22:36:47.414927+00:00",
+  "commit": "a9adc97cbe5efc7ac8bb211afaa0da08420ea708",
+  "validator_sha256": "7e52d4405a843a3ae62e6d022a373c2f598aaaa7b64cbba20eef8933680438c3",
+  "integration_tests": [
+    "cancellation",
+    "workers",
+    "environment",
+    "instant_clock",
+    "date_time",
+    "file_input",
+    "file_output",
+    "file_streams",
+    "path",
+    "io_errors",
+    "console",
+    "console_streams",
+    "cli",
+    "cli_modules",
+    "source_files",
+    "native",
+    "pinvoke",
+    "native_integers",
+    "native_memory_api",
+    "target_layout"
+  ],
+  "unit_filters": [
+    "file_io::",
+    "file_streams::",
+    "workers::",
+    "socket_io::",
+    "name_resolution::",
+    "socket_vm_probe::",
+    "external_io_gc_probe::",
+    "scheduler::"
+  ],
+  "commands": [
+    {
+      "argv": [
+        "cargo",
+        "+stable",
+        "test",
+        "--locked",
+        "--release",
+        "--no-fail-fast",
+        "--test",
+        "cancellation",
+        "--test",
+        "workers",
+        "--test",
+        "environment",
+        "--test",
+        "instant_clock",
+        "--test",
+        "date_time",
+        "--test",
+        "file_input",
+        "--test",
+        "file_output",
+        "--test",
+        "file_streams",
+        "--test",
+        "path",
+        "--test",
+        "io_errors",
+        "--test",
+        "console",
+        "--test",
+        "console_streams",
+        "--test",
+        "cli",
+        "--test",
+        "cli_modules",
+        "--test",
+        "source_files",
+        "--test",
+        "native",
+        "--test",
+        "pinvoke",
+        "--test",
+        "native_integers",
+        "--test",
+        "native_memory_api",
+        "--test",
+        "target_layout"
+      ],
+      "exit_code": 0,
+      "seconds": 320.594
+    },
+    {
+      "argv": [
+        "cargo",
+        "+stable",
+        "test",
+        "--locked",
+        "--release",
+        "--lib",
+        "file_io::"
+      ],
+      "exit_code": 0,
+      "seconds": 71.156
+    },
+    {
+      "argv": [
+        "cargo",
+        "+stable",
+        "test",
+        "--locked",
+        "--release",
+        "--lib",
+        "file_streams::"
+      ],
+      "exit_code": 0,
+      "seconds": 0.172
+    },
+    {
+      "argv": [
+        "cargo",
+        "+stable",
+        "test",
+        "--locked",
+        "--release",
+        "--lib",
+        "workers::"
+      ],
+      "exit_code": 0,
+      "seconds": 0.156
+    },
+    {
+      "argv": [
+        "cargo",
+        "+stable",
+        "test",
+        "--locked",
+        "--release",
+        "--lib",
+        "socket_io::"
+      ],
+      "exit_code": 0,
+      "seconds": 2.188
+    },
+    {
+      "argv": [
+        "cargo",
+        "+stable",
+        "test",
+        "--locked",
+        "--release",
+        "--lib",
+        "name_resolution::"
+      ],
+      "exit_code": 0,
+      "seconds": 0.156
+    },
+    {
+      "argv": [
+        "cargo",
+        "+stable",
+        "test",
+        "--locked",
+        "--release",
+        "--lib",
+        "socket_vm_probe::"
+      ],
+      "exit_code": 0,
+      "seconds": 25.453
+    },
+    {
+      "argv": [
+        "cargo",
+        "+stable",
+        "test",
+        "--locked",
+        "--release",
+        "--lib",
+        "external_io_gc_probe::"
+      ],
+      "exit_code": 0,
+      "seconds": 0.188
+    },
+    {
+      "argv": [
+        "cargo",
+        "+stable",
+        "test",
+        "--locked",
+        "--release",
+        "--lib",
+        "scheduler::"
+      ],
+      "exit_code": 0,
+      "seconds": 0.172
+    },
+    {
+      "argv": [
+        "cargo",
+        "+stable",
+        "run",
+        "--locked",
+        "--release",
+        "--example",
+        "invoke"
+      ],
+      "exit_code": 0,
+      "seconds": 3.187
+    },
+    {
+      "argv": [
+        "cargo",
+        "+stable",
+        "run",
+        "--locked",
+        "--release",
+        "--example",
+        "build_native"
+      ],
+      "exit_code": 0,
+      "seconds": 0.828
+    },
+    {
+      "argv": [
+        "cargo",
+        "+stable",
+        "run",
+        "--locked",
+        "--release",
+        "--",
+        "run",
+        "examples/pinvoke.neoil",
+        "--execution",
+        "interpreter"
+      ],
+      "exit_code": 0,
+      "seconds": 0.313
+    }
+  ]
+}

@@ -1,8 +1,10 @@
 # Release preflight — 2026-10-13
 
-Local macOS ARM64 preflight closes notice-inventory and stale-test blockers.
-This is **not a published release or fresh Windows qualification**, and the initial
-full-suite report remains failed rather than being rewritten after repairs.
+Hosted source qualification now passes on `a9adc97cb`, including the full Linux
+archive suite, macOS/Windows host boundaries and the minimum-Rust matrix. Backend
+repair `566fb34dc` has focused Windows object-generation and macOS execution
+coverage; its Windows HTTP/package runs remain pending. This is **not a published
+release**. Earlier failures remain evidence rather than being rewritten.
 
 ## Results and exact revisions
 
@@ -34,22 +36,57 @@ bootstrap notices. It also retains backend/TLS inventories and lockfiles and the
 Cranelift license. This preparation behavior has a focused packaging regression;
 the previously installed author-testing bundle has not been replaced in this slice.
 
+## Hosted source and callback repair
+
+[Hosted run 38317598328](https://github.com/marinasundstrom/neoCLR/actions/runs/38317598328)
+passes the canonical format/strict-Clippy/source gate on `a9adc97cb`:
+[full source/archive report](hosted-source.json), [macOS host report](hosted-macos.json)
+and [Windows host report](hosted-windows.json). Rust 1.85 checks pass on all three
+hosts. This closes the previous source gate; the original failed reports above
+remain unchanged.
+
+Windows JIT run `38317601422` exposed a separate SSL compilation failure in the
+combined host callback dispatcher. [Repair details](../jit-windows/README.md#mixed-callback-dispatcher-repair)
+explain why removing its redundant union cap does not alter per-shape admission or
+the callback ABI. `566fb34dc` passes two focused tests: Windows x64 COFF generation
+and sanitized macOS host execution across four unit/no-result/mixed variants.
+This backend-only delta follows the source-qualified revision; it does not claim
+a second full source run. Windows execution must still pass its own consumer gate.
+
+The refreshed macOS bundle passes [extracted default-JIT acceptance](callback-extracted-acceptance.json),
+[SSL/HTTPS JSON in all three modes](callback-ssl.json) and
+[HTTPS failure/recovery, timeout, cancellation and deadline checks](callback-https-failures.json).
+[Archive hashes](callback-bundle-archive.json) and [component inputs](callback-bundle-inputs.json)
+identify the bundle. It refreshes ten catalogued runtime/backend/notice files in the
+existing author installation, after verifying that no installed files had drifted.
+The SDK, libraries, samples and extension remain unchanged. [Installed hashes](callback-installed-refresh.json)
+and [fresh installed acceptance](callback-installed-acceptance.json) pass; earlier
+SDK/editor evidence still describes the unchanged compiler and extension.
+
+The first [Windows SDK/package run 38317604005](https://github.com/marinasundstrom/neoCLR/actions/runs/38317604005)
+passes on `a9adc97cb`: [default-JIT packaged samples](windows-sdk-acceptance-initial.json),
+[26 VS Code checks](windows-sdk-vscode-initial.json) and [archive hashes](windows-sdk-package-initial.json).
+This qualifies Raven `6b5e052ce` and SDK/VSIX `0.1.13-neoclr.20261013.1` on Windows,
+but its backend precedes the callback repair. Run `38319479140` rebuilds and retests
+the package with that repair; run `38319332994` qualifies the broader Windows
+SSL/HTTP execution matrix.
+
 ## Remaining release gates
 
-1. Obtain a clean hosted source/format/Clippy gate on the selected candidate, including
-   focused macOS/Windows boundaries and the minimum-Rust matrix.
-2. Qualify Raven native revision `6b5e052ce3648f9247ac76aba275587a3a5a1bb4` on Windows.
-   It is now available on `codex/neoclr-release-20261013`, and HTTP/JIT and SDK
-   qualification select it. A passing older run does not qualify this compiler.
+1. Retain the passing hosted source gate and focused backend-delta evidence above.
+   Do not present the earlier source revision as testing the later callback repair.
+2. Retain Windows Raven native revision `6b5e052ce3648f9247ac76aba275587a3a5a1bb4`
+   qualification above. Its validation branch is `codex/neoclr-release-20261013`;
+   Raven main and the native compiler line remain separate.
 3. Qualify the rebuilt Windows default-JIT bundle, HTTP/HTTPS and matching SDK/editor;
    retain archive, payload and compiler hashes. Refresh packaged notices on both
    distribution targets and verify extracted payloads before publication.
-4. Review the selected package/release notes. Local installed VS Code acceptance
+4. Review the selected package and [draft release notes](../../next-preview-release-notes.md). Local installed VS Code acceptance
    now passes all [26 checks](installed-vscode-acceptance.json), including activation,
    navigation, native/.NET editing and Tasks/await runs; [hashes](installed-vscode-provenance.json)
-   identify the real installed SDK/extension. Windows editor acceptance remains in its
-   hosted package gate.
+   identify the real installed SDK/extension. Windows editor acceptance passes on the initial
+   package and will be repeated with the repaired backend.
 
-Reuse the [installed macOS HTTP evidence](../../local-preview-20261012.md) for its
-unchanged binary behavior. Tagging, uploading releases and website publication have
+The [installed macOS instructions](../../local-preview-20261012.md) retain the same
+SDK and launch paths; the runtime/backend refresh has its own evidence above. Tagging, uploading releases and website publication have
 not occurred. No Windows ARM64 or Linux JIT/AOT qualification is implied.
