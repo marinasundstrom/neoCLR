@@ -1,0 +1,81 @@
+{
+  "date": "2026-10-12",
+  "platform": "macOS-27.0-arm64-arm-64bit",
+  "compilerRevision": "5614397c5",
+  "scope": "Six contract groups qualified in AOT and JIT; one selected interpreter contract qualified. Full interpreter suite remains unqualified.",
+  "fullSuite": {
+    "native": "passed",
+    "jit": "passed",
+    "interpreter": "timed_out"
+  },
+  "cases": [
+    {
+      "suite": "gzip",
+      "mode": "native",
+      "repetition": 1,
+      "exitCode": 0,
+      "elapsedSeconds": 1.937,
+      "stdout": "PASS Gzip decodes independent stored fixed dynamic and optional-header members\nPASS Gzip validates checksums truncation headers and quotas before output\nPASS Gzip incrementally compresses repeated writes and finishes once\nPASS Gzip empty finish ownership ranges modes and cancellation are explicit\nPASS Gzip awaits output and poisons interrupted streams without replay\nPASS Gzip handles pending fragmented input and preserves text-reader errors\nTests: 6, passed: 6, failed: 0, skipped: 0\n",
+      "stderr": ""
+    },
+    {
+      "suite": "gzip",
+      "mode": "jit",
+      "repetition": 1,
+      "exitCode": 0,
+      "elapsedSeconds": 74.289,
+      "stdout": "PASS Gzip decodes independent stored fixed dynamic and optional-header members\nPASS Gzip validates checksums truncation headers and quotas before output\nPASS Gzip incrementally compresses repeated writes and finishes once\nPASS Gzip empty finish ownership ranges modes and cancellation are explicit\nPASS Gzip awaits output and poisons interrupted streams without replay\nPASS Gzip handles pending fragmented input and preserves text-reader errors\nTests: 6, passed: 6, failed: 0, skipped: 0\n",
+      "stderr": ""
+    }
+  ],
+  "interpreterSmoke": {
+    "mode": "interpreter",
+    "selection": [
+      "--filter",
+      "pending fragmented"
+    ],
+    "exitCode": 0,
+    "elapsedSeconds": 49.086844042,
+    "stdout": "PASS Gzip handles pending fragmented input and preserves text-reader errors\nTests: 1, passed: 1, failed: 0, skipped: 0\n",
+    "stderr": ""
+  },
+  "interpreterLimits": {
+    "status": "timed_out",
+    "attemptsSeconds": [
+      180,
+      600
+    ],
+    "instructions": 100000000,
+    "liveArrayElements": 1048576,
+    "logicalArrayBytes": 268435456
+  },
+  "nativeTestBudgets": {
+    "heapBytes": 33554432,
+    "byteArrayElements": 65536
+  },
+  "python": "3.9.6",
+  "zlib": "1.2.12",
+  "sources": {
+    "runtime/raven/src/System/IO/Compression/GZipDecoder.rvn": "48ba67fb0a4013d88c6ae752dd657314d5a4c12e37c3818cab799f042af84081",
+    "runtime/raven/src/System/IO/Compression/GZipEncoder.rvn": "68b01949610d51b4c3212c628744c9d511b6305ccde8f2054d9b8a6edf4411d4",
+    "runtime/raven/src/System/IO/Compression/GZipStream.rvn": "81090485ea1ce1d445badd2b995f7c9553d8c968b9c66504597002b4594e592f",
+    "runtime/raven/src/System/IO/StreamError.rvn": "c9756386806382c8dc4e233879f2cfbe5ea756f816d26b304e7c82cec77a73b3",
+    "runtime/raven/src/System/IO/TextReadError.rvn": "6c7075b52a6f931530dcd75859647a4d5fc3664045ab5803d0943b2fa0378b8b",
+    "runtime/raven/src/System/IO/StreamReader.rvn": "f76ca794b9bc0bbf9f67140e89f6e717b3015d9a8294fac909f8420e6022dd4f",
+    "runtime/raven/tests/gzip/Fixtures.rvn": "10c94c3c2b9ed0eae12fc568334abd8093ead83c6e7e70143c14e606f94ef1db",
+    "runtime/raven/tests/gzip/Tests.rvn": "a435bc3d39d83cb1edc7f82fdc4771b47261ef8f611f9c769991a54b0c0ca906",
+    "runtime/raven/tests/gzip/Streams.rvn": "e43354105f0d4186fbc90f6f0a0b9edc180b3d0dedf1d6e4b79ae2b28262c26f",
+    "runtime/raven/tests/gzip/generate-fixtures.py": "43a972670de0478001bf9c37b16f7cc6c6f49cd5dd27ee87c5a43c8d59bcf324"
+  },
+  "toolchain": {
+    "bundleManifestSha256": "5af43a2c90eab196e9a077be5a416497befdf280e17ff348dc998bd4b5260676",
+    "aotSha256": "ab9b50ce02d9cd1a56a41451a0a5a7bb70764e8a4233f092e74fc124e7a6c53d",
+    "interpreterSha256": "c23f2034a7db8e25cdcdfee72fc4c1efcd47eb6e07f0abd04fc74fd388001b33",
+    "jitHostSha256": "f6953fe5bb57c83cff313e2cda6e5a87dfff1acd8a7094794a7e319336ca80fe"
+  },
+  "reports": {
+    "target/gzip-tests-v9/report.json": "8b95f6ef0455275a955f2fcd80551ce51b2c8849f6a5f751864f6b918ff9a336",
+    "target/gzip-tests-interpreter/report.json": "ff1ee582e1aad5266f1486f19ff453e149384f6754b5177ae0e174c87576c0d9",
+    "target/gzip-interpreter-smoke.json": "ba5e6e4d1418dbecfb9dbee215a65a2045c4464f1981dacddaee1aa591014e6b"
+  }
+}

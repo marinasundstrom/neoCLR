@@ -1893,10 +1893,14 @@ stubs carry declarations only, while native System.Runtime supplies execution.
 
 ## Gzip foundation (development, 2026-10-12)
 
-GZipStream and StreamError.InvalidData are included in aggregate and native references.
+GZipStream, StreamError.InvalidData and TextReadError.InvalidData are included in
+aggregate and native references.
 The [compression guide](compression.md) documents every factory and operation, quotas,
 Finish/Close ownership and HTTP gaps. No public type or member is excluded.
 The aggregate is declaration-only; native System.Runtime owns the managed codec.
+Six native/JIT contract groups and independent .NET/Python wire interoperability
+pass. A selected interpreter contract passes; the full interpreter suite times out
+at 600 seconds. Both reference snapshots and native snapshot checks pass.
 
 ### Native namespace-function XML documentation gap
 

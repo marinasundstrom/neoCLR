@@ -101,3 +101,10 @@ See [the design and current qualification](https://github.com/marinasundstrom/ne
 memory-stream, encoding-streams, encoding-boundaries and json-streams suites under
 `runtime/raven/tests`. Native library support does not imply that the historical
 synchronous CLI execution bridge supports these new signatures.
+
+## Gzip composition (development)
+
+[GZipStream](compression.md) wraps these capabilities. Compression writes incrementally
+and requires awaited Finish before Close. The initial decoder reads to EOF with
+64 KiB compressed/decoded limits and validates gzip before exposing bytes. InvalidData
+is preserved through StreamReader as TextReadError.InvalidData.

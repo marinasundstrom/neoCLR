@@ -9094,3 +9094,22 @@ compiler rejection cases and native consumers](experiments/foreign-interop/READM
 qualify the macOS ARM64 interpreter subset. JIT/AOT lowering, installed bundles and other
 hosts remain separate gates. Replace the reference-only transport assumptions as native
 backend ABI lowering arrives; bridge limitations are not permanent platform semantics.
+
+## Gzip reference projection (development, 2026-10-12)
+
+System.IO.Compression.GZipStream is implemented by managed Raven in native
+System.Runtime. Compression composes OutputStream and decompression composes
+InputStream; Task/Result, ownership, quotas and Finish are library semantics.
+The aggregate CoreProbe reference adds declaration-only C# signatures and projects
+StreamError.InvalidData/TextReadError.InvalidData from their standard Raven unions.
+These facades preserve public signatures for documentation; their default-returning
+bodies are not execution implementations. The historical CLI-to-neoIL stream bridge
+is not extended to execute gzip, and no new Raven Runtime Contract configuration,
+compiler mapping, runtime service or native metadata encoding is introduced.
+
+neoCLR owns the source library, facade and matching aggregate/native API snapshots.
+The [gzip consumer](experiments/gzip/README.md) executes native metadata, including
+independent .NET/Python wire interoperability; the aggregate is validated as a
+reference snapshot. Native library emission and the native RavenDoc provider already
+supply the execution/documentation path that replaces reliance on this temporary
+facade. Retiring the aggregate remains the broader documentation-migration task.

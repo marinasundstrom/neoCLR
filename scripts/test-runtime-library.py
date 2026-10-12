@@ -346,7 +346,7 @@ def main():
     parser.add_argument('--output', type=Path, required=True, help='Fresh build/evidence directory')
     parser.add_argument('--aot', type=Path, default=ROOT / 'tools/aot-poc/target/debug' / ('neoclr-aot-poc.exe' if os.name == 'nt' else 'neoclr-aot-poc'))
     parser.add_argument('--runtime', type=Path, default=ROOT / 'target/release' / ('neoclr.exe' if os.name == 'nt' else 'neoclr'))
-    parser.add_argument('--suite', action='append', choices=('collections', 'collection-construction', 'collection-iteration', 'json-dom', 'json-streams', 'memory-stream', 'string-construction', 'unicode-casing', 'encoding', 'encoding-streams', 'cryptography', 'encoding-boundaries', 'encoding-buffer-limits', 'int64-parsing', 'primitive-parsing', 'path-values', 'http-header-values', 'http-method-values', 'index-range', 'http-text', 'http-lifetime', 'http-route-matching', 'ip-address-values', 'uri-resolution', 'time-parsing', 'duration-offset-parsing', 'instant-parsing', 'zoned-time-parsing', 'discovery-contract', 'runner-contract'),
+    parser.add_argument('--suite', action='append', choices=('collections', 'collection-construction', 'collection-iteration', 'json-dom', 'json-streams', 'memory-stream', 'string-construction', 'unicode-casing', 'encoding', 'encoding-streams', 'cryptography', 'gzip', 'encoding-boundaries', 'encoding-buffer-limits', 'int64-parsing', 'primitive-parsing', 'path-values', 'http-header-values', 'http-method-values', 'index-range', 'http-text', 'http-lifetime', 'http-route-matching', 'ip-address-values', 'uri-resolution', 'time-parsing', 'duration-offset-parsing', 'instant-parsing', 'zoned-time-parsing', 'discovery-contract', 'runner-contract'),
                         help='Run only this suite (repeatable); default runs all suites')
     parser.add_argument("--execution-repetitions", type=int, default=1, help="Repeat the full suite process in each mode for timing; guards/selectors still run once")
     parser.add_argument('--mode', action='append', choices=('native', 'interpreter', 'jit'),
@@ -393,6 +393,7 @@ def main():
         ('encoding-buffer-limits', 0, ''.join('PASS ' + n + '\n' for n in ENCODING_BUFFER_NAMES) + f'Tests: {len(ENCODING_BUFFER_NAMES)}, passed: {len(ENCODING_BUFFER_NAMES)}, failed: 0, skipped: 0\n'),
         ('encoding-boundaries', 0, ''.join('PASS ' + n + '\n' for n in ENCODING_BOUNDARY_NAMES) + f'Tests: {len(ENCODING_BOUNDARY_NAMES)}, passed: {len(ENCODING_BOUNDARY_NAMES)}, failed: 0, skipped: 0\n'),
         ('encoding-streams', 0, ''.join('PASS ' + n + '\n' for n in ENCODING_STREAM_NAMES) + f'Tests: {len(ENCODING_STREAM_NAMES)}, passed: {len(ENCODING_STREAM_NAMES)}, failed: 0, skipped: 0\n'),
+        ('gzip', 0, 'PASS Gzip decodes independent stored fixed dynamic and optional-header members\nPASS Gzip validates checksums truncation headers and quotas before output\nPASS Gzip incrementally compresses repeated writes and finishes once\nPASS Gzip empty finish ownership ranges modes and cancellation are explicit\nPASS Gzip awaits output and poisons interrupted streams without replay\nPASS Gzip handles pending fragmented input and preserves text-reader errors\nTests: 6, passed: 6, failed: 0, skipped: 0\n'),
         ('cryptography', 0, 'PASS SHA256 preserves aliases tails and short destinations\nPASS HMACSHA256 verifies known answers and rejects altered tags\nPASS RandomNumberGenerator accepts empty and writable buffers\nTests: 3, passed: 3, failed: 0, skipped: 0\n'),
         ('encoding', 0, ''.join('PASS ' + n + '\n' for n in ENCODING_NAMES) + f'Tests: {len(ENCODING_NAMES)}, passed: {len(ENCODING_NAMES)}, failed: 0, skipped: 0\n'),
         ('unicode-casing', 0, ''.join('PASS ' + n + '\n' for n in UNICODE_CASING_NAMES) + f'Tests: {len(UNICODE_CASING_NAMES)}, passed: {len(UNICODE_CASING_NAMES)}, failed: 0, skipped: 0\n'),
@@ -438,7 +439,7 @@ def main():
                 report['phases'].append(dict(suite=name, phase='discovery', elapsedSeconds=round(time.perf_counter() - started, 6), details=json.loads((out / (name + '-discovery') / 'timings.json').read_text())))
                 environment['NeoClrTestRegistry'] = str(registry)
             # Async memory tests need Task/cancellation lifecycle bindings (including TimerCancel).
-            profile = 'http' if name in ('http-text', 'http-lifetime', 'memory-stream', 'json-streams', 'encoding-streams', 'encoding-boundaries') else 'console'
+            profile = 'http' if name in ('http-text', 'http-lifetime', 'memory-stream', 'gzip', 'json-streams', 'encoding-streams', 'encoding-boundaries') else 'console'
             if os.name == 'nt':
                 profile = 'windows-' + profile
             if 'native' in modes:
@@ -447,6 +448,8 @@ def main():
                            '--bundle', bundle, '--aot', args.aot.resolve(), '--output', build]
                 if name in ("encoding-buffer-limits", "http-text"):
                     command += ["--byte-array-limit", "131072"]
+                if name == "gzip":
+                    command += ["--http-heap-bytes", "33554432"]
                 phase = 'native-project-build'
             else:
                 # Raven emits the same metadata assembly directly. JIT/interpreter
@@ -486,9 +489,9 @@ def main():
             interpreter = [args.runtime.resolve(), 'run', build / 'app.dll', '--system', lib / catalog['runtimeSeed'],
                            *[arg for a in catalog['assemblyNames'] for arg in ('--module', lib / (a + '.dll'))],
                            '--object-root', lib / 'System.Runtime.dll', '--instructions', '100000000']
-            if name in ("encoding-buffer-limits", "http-text"):
+            if name in ("encoding-buffer-limits", "http-text", "gzip"):
                 interpreter += ["--array-elements", "1048576", "--array-bytes", "268435456"]
-                report["encodingBufferBudgets"] = dict(nativeByteArrayElements=131072, interpretedLiveArrayElements=1048576, interpretedLogicalArrayBytes=268435456)
+                report["gzipBufferBudgets" if name == "gzip" else "encodingBufferBudgets"] = dict(nativeByteArrayElements=65536 if name == "gzip" else 131072, interpretedLiveArrayElements=1048576, interpretedLogicalArrayBytes=268435456)
             env = {k: v for k, v in os.environ.items() if k.upper() in ('SYSTEMROOT', 'WINDIR', 'TEMP', 'TMP')}
             executions = []
             for mode in modes:
@@ -504,7 +507,7 @@ def main():
             repeated_executions = [(repetition, *execution) for repetition in range(1, args.execution_repetitions + 1) for execution in executions]
             for repetition, mode, command, cwd, environment in repeated_executions:
                 started = time.perf_counter()
-                result = subprocess.run(list(map(str, command)), cwd=cwd, env=environment, capture_output=True, timeout=600 if name == "http-text" else 180)
+                result = subprocess.run(list(map(str, command)), cwd=cwd, env=environment, capture_output=True, timeout=600 if name in ("http-text", "gzip") else 180)
                 record = dict(suite=name, mode=mode, repetition=repetition, exitCode=result.returncode,
                               elapsedSeconds=round(time.perf_counter() - started, 3),
                               stdout=result.stdout.decode('utf-8').replace('\r\n', '\n'),
@@ -563,7 +566,7 @@ def main():
                 for mode, base_command, cwd, environment in executions:
                     command = [*base_command, *(['--'] if mode in ('interpreter', 'jit') else []), *arguments]
                     started = time.perf_counter()
-                    result = subprocess.run(list(map(str, command)), cwd=cwd, env=environment, capture_output=True, timeout=600 if name == "http-text" else 180)
+                    result = subprocess.run(list(map(str, command)), cwd=cwd, env=environment, capture_output=True, timeout=600 if name in ("http-text", "gzip") else 180)
                     record = dict(suite=name, mode=mode, arguments=arguments, exitCode=result.returncode, elapsedSeconds=round(time.perf_counter() - started, 6),
                                   stdout=result.stdout.decode('utf-8').replace('\r\n', '\n'),
                                   stderr=result.stderr.decode('utf-8').replace('\r\n', '\n'))

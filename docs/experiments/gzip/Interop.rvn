@@ -1,0 +1,48 @@
+module GZipInterop
+
+import System.*
+import System.IO.*
+import System.IO.Compression.*
+import System.Result.*
+import System.Concurrency.Tasks.*
+import System.Runtime.CompilerServices.*
+
+async func Main() -> Task<int> {
+    let destination = MemoryStream()
+    let gzip = GZipStream.CreateCompressor(destination, true)
+    let data: byte[] = [for unused in 0..<40000 => (byte)0]
+    var index = 0
+    while index < data.Length {
+        data[index] = (byte)((index * 17 + index / 251) % 256)
+        index += 1
+    }
+    // Two writes with distinct caller ranges cross internal block boundaries.
+    match await gzip.Write(data, 7, 39986) {
+        Ok(_) => { }
+        Error(_) => return 1
+    }
+    match await gzip.Write(data, 0, data.Length) {
+        Ok(_) => { }
+        Error(_) => return 2
+    }
+    match await gzip.Finish() {
+        Ok(_) => { }
+        Error(_) => return 3
+    }
+    gzip.Close()
+    let Ok(length) = destination.GetLength() else {
+        System.Fail("Destination length unavailable")
+    }
+    let encoded: byte[] = [for unused in 0..<65536 => (byte)0]
+    _ = destination.Seek(0)
+    match await destination.Read(encoded, 0, (int)length) {
+        Ok(_) => { }
+        Error(_) => return 5
+    }
+    index = 0
+    while index < (int)length {
+        Console.WriteLine((int)encoded[index])
+        index += 1
+    }
+    return 0
+}

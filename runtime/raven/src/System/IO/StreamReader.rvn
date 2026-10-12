@@ -201,6 +201,7 @@ public class StreamReader : TextReader {
             StreamError.InvalidRange => TextReadError.InvalidRange
             StreamError.LimitExceeded => TextReadError.LimitExceeded
             StreamError.WrongAccess => TextReadError.WrongAccess
+            StreamError.InvalidData => TextReadError.InvalidData
             StreamError.InvalidEncoding => TextReadError.InvalidEncoding
             _ => TextReadError.IoFailure
         }

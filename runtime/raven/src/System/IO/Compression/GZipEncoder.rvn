@@ -1,0 +1,132 @@
+module System.IO.Compression
+
+import System.*
+import System.Collections.*
+import System.Runtime.CompilerServices.*
+
+// RFC 1951 fixed Huffman blocks, with a bounded single-candidate LZ77 matcher.
+// State is per operation; history need not span blocks for interoperable DEFLATE.
+internal class GZipEncoder {
+    private var bytes: List<byte> = ArrayList<byte>()
+    private var bits: int = 0
+    private var bitCount: int = 0
+
+    func Put(value: int, count: int) {
+        bits = bits | (value << bitCount)
+        bitCount += count
+        while bitCount >= 8 {
+            bytes.Add((byte)(bits & 255))
+            bits = bits >> 8
+            bitCount -= 8
+        }
+    }
+
+    private func Code(value: int, count: int) {
+        var code = value
+        var reversed = 0
+        var index = 0
+        while index < count {
+            reversed = (reversed << 1) | (code & 1)
+            code = code >> 1
+            index += 1
+        }
+        Put(reversed, count)
+    }
+
+    private func Symbol(value: int) {
+        if value < 144 {
+            Code(value + 48, 8)
+        } else if value < 256 {
+            Code(value - 144 + 400, 9)
+        } else if value < 280 {
+            Code(value - 256, 7)
+        } else {
+            Code(value - 280 + 192, 8)
+        }
+    }
+
+    func Encode(source: byte[], offset: int, count: int) -> byte[] {
+        let last = CheckedStorage.Reserve<int>(4096)
+        var index = 0
+        while index < last.Length {
+            last[index] = -1
+            index += 1
+        }
+        // Non-final fixed block. A following empty stored block aligns the output.
+        Put(2, 3)
+        index = 0
+        while index < count {
+            var length = 0
+            var distance = 0
+            if index + 2 < count {
+                let hash = (((int)source[offset + index] * 251 + (int)source[offset + index + 1]) * 251 + (int)source[offset + index + 2]) & 4095
+                let previous = last[hash]
+                last[hash] = index
+                if previous >= 0 && index - previous <= 32768 {
+                    while length < 258 && index + length < count && source[offset + previous + length] == source[offset + index + length] {
+                        length += 1
+                    }
+                    distance = index - previous
+                }
+            }
+            if length >= 3 {
+                let lengths: int[] = [3,4,5,6,7,8,9,10,11,13,15,17,19,23,27,31,35,43,51,59,67,83,99,115,131,163,195,227,258]
+                let extras: int[] = [0,0,0,0,0,0,0,0,1,1,1,1,2,2,2,2,3,3,3,3,4,4,4,4,5,5,5,5,0]
+                var code = 28
+                while lengths[code] > length {
+                    code -= 1
+                }
+                Symbol(257 + code)
+                Put(length - lengths[code], extras[code])
+                code = 0
+                var baseDistance = 1
+                var extra = 0
+                while code < 29 {
+                    let width = 1 << extra
+                    if distance < baseDistance + width {
+                        break
+                    }
+                    baseDistance += width
+                    code += 1
+                    if code >= 4 {
+                        extra = code / 2 - 1
+                    }
+                }
+                Code(code, 5)
+                Put(distance - baseDistance, extra)
+                index += length
+            } else {
+                Symbol((int)source[offset + index])
+                index += 1
+            }
+        }
+        Symbol(256)
+        Put(0, 3)
+        if bitCount > 0 {
+            Put(0, 8 - bitCount)
+        }
+        Put(0, 16)
+        Put(65535, 16)
+        let result = CheckedStorage.Reserve<byte>(bytes.Count)
+        index = 0
+        while index < bytes.Count {
+            result[index] = bytes[index]
+            index += 1
+        }
+        return result
+    }
+
+    static func UpdateCrc(crc: int, value: int) -> int {
+        var next = crc ^ value
+        var bit = 0
+        while bit < 8 {
+            if (next & 1) != 0 {
+                next = ((next >> 1) & 2147483647) ^ -306674912
+            } else {
+                next = (next >> 1) & 2147483647
+            }
+            bit += 1
+        }
+        return next
+    }
+}

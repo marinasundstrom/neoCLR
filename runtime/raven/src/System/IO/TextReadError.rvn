@@ -13,6 +13,8 @@ public union TextReadError {
     case IoFailure
     case InvalidUtf8
     case InvalidEncoding
+    /// The underlying byte stream rejected malformed binary content.
+    case InvalidData
 
     override func ToString() -> string {
         return match self {
@@ -25,6 +27,7 @@ public union TextReadError {
             InvalidRange => "InvalidRange"
             LimitExceeded => "LimitExceeded"
             WrongAccess => "WrongAccess"
+            InvalidData => "InvalidData"
             InvalidEncoding => "InvalidEncoding"
             IoFailure => "IoFailure"
             InvalidUtf8 => "InvalidUtf8"

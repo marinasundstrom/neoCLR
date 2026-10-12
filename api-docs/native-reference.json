@@ -1,22 +1,22 @@
 {
   "format": 1,
   "archive": "native-reference.zip",
-  "sha256": "ef1928607ce5e62ebdbe674dad3376d77152714d16f873fc75c9565a0b079bef",
-  "librarySourceRevision": "a4124075f418a38b8195b510920dd9155db7c35f",
+  "sha256": "d5ab2249d6749d9c7d15d2488bf75f2d9662a1580c5a21650b4d325145834158",
+  "librarySourceRevision": "555d68a2d56759df0266d95bd50e6f1c7e7884a0",
   "compilerRevision": "5614397c5",
   "rendererRevision": "5614397c5",
   "libraryArtifacts": {
-    "System.Runtime.dll": "86f66cad7cf0bce1b04d41a0537a0fd8ed6e9734c585b6f55c78166cf5cd885a",
-    "System.Data.dll": "cbf0a345058f128115539c7f155d4cd0dd694ad00351957ad524254cb2dc96f6",
-    "System.Networking.dll": "c79dfbf37671c96b774bf87f34569f2dcda98f4668177f856a17e170fbafd390",
-    "System.Web.dll": "f5fd71b4dd354a0c14157ecd09ef2cfdf3b2c548245816012990d7af18e3d2fb",
-    "System.Data.PostgreSql.dll": "9c477eefad10e9f3187bf0cbc818a44203a9ac3a644e733a1d37acfaf9d2b794",
+    "System.Runtime.dll": "67e1faca24cecdfbac2f040b034d4139ef551e1f80de327a6aa6f014be074d82",
+    "System.Data.dll": "ea6c49cdb25d0176b76ed42c32603e7e04fbed52bf8df307f128034d8e8cab6f",
+    "System.Networking.dll": "7a0510a0951f0cb0fedb14c71f0455f4cff7125c4fff4867f3a3138004d0311a",
+    "System.Web.dll": "e19315da960953692a7ca55663e2a7c3b8bc026895684d3b3f0a773fbf1d0aaf",
+    "System.Data.PostgreSql.dll": "6d30c3d053c2585583e82e9aca755365862cc931e4256c0e15d6166df92c400e",
     "System.runtime.neox": "98a1ae1da85387c87746957e83a4015eb59d0566539a915c69f168d2b511b190",
     "Core.dll": "3d4a676d379067c18a65a9beb8257ed40bf3196fc643a9ba1d559c619ec73fad"
   },
   "renderingEvidence": {
-    "normalized-sidecars.json": "10f02c91238cb6a06159c46c59518ffab9b596b36b75b2a56dc4ffb1096ba556",
-    "restored-xml-comments.json": "fa634eca9269b443d56b6929e60283eaed2388a3e0df91dbc21267787ed7bc71"
+    "normalized-sidecars.json": "de735bd74c411b438905e94cef02c3f113b1b72dd8a23f2187dcde721c69f5b6",
+    "restored-xml-comments.json": "98d1bdc70aaa8a7bf205d2eb1f3382d2514b56d991b72a57a8e6033fcaec9de9"
   },
   "scope": "Reviewed native API rendering; legacy coverage gaps remain explicitly marked by the website overlay."
 }

@@ -3401,5 +3401,62 @@ Connects only to 127.0.0.1. No TLS, password authentication, pooling or automati
     <member name="M:System.Security.Cryptography.HMACSHA256.HashData(System.Byte[],System.Byte[],System.Byte[])"><summary>Computes a 32-byte HMACSHA256 digest.</summary><param name="key">Fully initialized key bytes; empty keys are permitted.</param><param name="data">Fully initialized input bytes; empty data is valid.</param><param name="destination">Writable buffer of at least 32 bytes; may overlap inputs.</param><returns>Ok(32), or DestinationTooSmall without mutation.</returns><remarks>Writes only the first 32 bytes, preserving the tail. Buffers are borrowed and never retained. Invalid storage is a terminal fault. This synchronous computation returns Result instead of throwing for a short destination.</remarks></member>
     <member name="M:System.Security.Cryptography.HMACSHA256.VerifyData(System.Byte[],System.Byte[],System.Byte[])"><summary>Verifies a tag with the provider timing-safe comparison.</summary><param name="key">Fully initialized key bytes.</param><param name="data">Fully initialized message bytes.</param><param name="tag">Fully initialized expected tag.</param><returns>True only for a matching complete 32-byte tag; false for altered or truncated tags.</returns><remarks>Invalid storage is a terminal fault; verification does not compare managed bytes with an early exit.</remarks></member>
     <member name="M:System.Security.Cryptography.RandomNumberGenerator.Fill(System.Byte[])"><summary>Fills an entire buffer with secure random bytes.</summary><param name="destination">Writable output; empty buffers succeed without requesting randomness.</param><returns>Ok(unit), or ProviderFailure after clearing the entire destination.</returns><remarks>Invalid storage is a terminal fault. Synchronous provider operation; no task or scheduling. Randomness tests check storage contracts, not statistical quality.</remarks></member>
+
+<member name="M:System.IO.Compression.GZipStream.Close"><summary>Discards wrapper state and closes the underlying stream unless leaveOpen was selected; idempotent.</summary>
+<remarks>Close never finishes or flushes compression. Await Finish and Flush first to observe errors. Closing during an operation does not cancel the underlying operation.</remarks></member>
+<member name="M:System.IO.Compression.GZipStream.CreateCompressor(System.IO.OutputStream)">
+      <summary>Creates a compressor that owns and closes the output stream.</summary>
+    </member>
+
+<member name="M:System.IO.Compression.GZipStream.CreateCompressor(System.IO.OutputStream,System.Boolean)"><summary>Creates an incremental compressor using fixed Huffman DEFLATE with LZ77 matching.</summary>
+<param name="output">Destination receiving complete gzip framing after Finish.</param>
+<param name="leaveOpen">Preserve the underlying stream when Close is called.</param>
+<returns>An output-mode wrapper; Read returns WrongAccess.</returns></member>
+<member name="M:System.IO.Compression.GZipStream.CreateDecompressor(System.IO.InputStream)">
+      <summary>Creates a decompressor that owns and closes the input stream.</summary>
+    </member>
+
+<member name="M:System.IO.Compression.GZipStream.CreateDecompressor(System.IO.InputStream,System.Boolean)"><summary>Creates a decoder for stored, fixed and dynamic DEFLATE blocks and concatenated gzip members.</summary>
+<param name="input">A gzip-only source ending at EOF; optional headers, CRC32 and sizes are checked.</param>
+<param name="leaveOpen">Preserve the underlying stream when Close is called.</param>
+<returns>An input-mode wrapper; Write, Flush and Finish return WrongAccess.</returns></member>
+<member name="M:System.IO.Compression.GZipStream.Finish">
+      <summary>Finalizes compression with CancellationToken.None.</summary>
+    </member>
+
+<member name="M:System.IO.Compression.GZipStream.Finish(System.Concurrency.CancellationToken)"><summary>Writes the final DEFLATE block, CRC32 and modulo-2^32 input size exactly once, including for empty input.</summary>
+<param name="cancellationToken">Cancellation for trailer output.</param>
+<returns>Success after destination acceptance, or a stream error. Successful repetition is a no-op. Does not flush or close the destination.</returns></member>
+<member name="M:System.IO.Compression.GZipStream.Flush">
+      <summary>Flushes the destination with CancellationToken.None.</summary>
+    </member>
+
+<member name="M:System.IO.Compression.GZipStream.Flush(System.Concurrency.CancellationToken)"><summary>Flushes output already accepted; does not finalize gzip or emit a trailer.</summary>
+<param name="cancellationToken">Cancellation for the destination flush.</param>
+<returns>Destination completion or a stream error. A failed/cancelled flush poisons the wrapper.</returns></member>
+<member name="M:System.IO.Compression.GZipStream.Read(System.Byte[],System.Int32,System.Int32)">
+      <summary>Reads with CancellationToken.None.</summary>
+    </member>
+
+<member name="M:System.IO.Compression.GZipStream.Read(System.Byte[],System.Int32,System.Int32,System.Concurrency.CancellationToken)"><summary>Validates the complete bounded gzip input before exposing decompressed bytes.</summary>
+<param name="buffer">Destination; unchanged on invalid input or quota failure.</param>
+<param name="offset">First writable index.</param>
+<param name="count">Maximum bytes; zero does not consume input.</param>
+<param name="cancellationToken">Pre-cancellation preserves state. Cancellation after input begins poisons the wrapper.</param>
+<returns>Bytes read, zero at EOF, or Closed, WrongAccess, InvalidRange, InvalidData, LimitExceeded or an underlying error. Later calls after failure return IoFailure.</returns></member>
+<member name="M:System.IO.Compression.GZipStream.Write(System.Byte[],System.Int32,System.Int32)">
+      <summary>Writes with CancellationToken.None.</summary>
+    </member>
+
+<member name="M:System.IO.Compression.GZipStream.Write(System.Byte[],System.Int32,System.Int32,System.Concurrency.CancellationToken)"><summary>Compresses the full range in bounded 16384-byte blocks without retaining caller bytes after completion.</summary>
+<param name="buffer">Initialized source bytes, unchanged until the operation settles.</param>
+<param name="offset">First source index.</param>
+<param name="count">Bytes to compress; zero emits nothing.</param>
+<param name="cancellationToken">Cancellation propagates through the destination; interrupted output cannot be retried.</param>
+<returns>Success or Closed, WrongAccess, InvalidRange, IoFailure or an underlying output error.</returns></member>
+<member name="T:System.IO.Compression.GZipStream"><summary>Gzip compression and bounded, validated decompression over asynchronous byte streams.</summary>
+<remarks>Sequential operations only. Compression writes incrementally; await Finish before Close. Decompression buffers to EOF, accepting at most 65536 compressed and 65536 decoded bytes across all members. No seek, compression-level selection or automatic HTTP encoding is supplied.</remarks></member>
+<member name="T:System.IO.StreamError.InvalidData"><summary>Malformed binary content, including invalid or truncated gzip data.</summary></member>
+<member name="T:System.IO.TextReadError.InvalidData"><summary>Malformed binary content, including invalid or truncated gzip data.</summary></member>
 </members>
 </doc>

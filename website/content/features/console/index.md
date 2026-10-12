@@ -26,6 +26,11 @@ Console.In provides a TextReader; Console.Out and Console.Error provide TextWrit
 
 Write and WriteLine are convenient for ordinary output. Use the text writers when a write or flush failure should be returned as a Result. Each property access creates a fresh wrapper; closing it closes that wrapper, not the process channel.
 
+Development [gzip streams](../../docs/compression.html) compose these byte contracts
+with incremental compression and bounded, checksum-validated decompression. Await
+`Finish` before closing compressed output. Automatic HTTP content encoding remains
+future integration work.
+
 [Console members](../../docs/api/System.Console.html) · [TextReader](../../docs/api/System.IO.TextReader.html) · [TextWriter](../../docs/api/System.IO.TextWriter.html)
 
 <a id="limits"></a>

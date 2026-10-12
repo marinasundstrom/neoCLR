@@ -1,0 +1,25 @@
+{
+  "passed": true,
+  "sourceBytes": 79986,
+  "compressedBytes": 3859,
+  "gzipSha256": "7a789b9fa6f4c93456a2141dd16488d9f3d705620bf189298018258428c1e45a",
+  "dotnet": ".NET 10.0.0",
+  "pythonZlib": true,
+  "date": "2026-10-12",
+  "compilerRevision": "5614397c5",
+  "platform": "macOS ARM64",
+  "scope": "Source AOT gzip output decoded by independent Python/zlib and .NET; no HTTP integration",
+  "nativeBuildEvidenceSha256": "29f165d3e506f60dc0e7c999591257dbb6fa15c524402813f0779c2e6e086d16",
+  "artifacts": {
+    "app.dll": "f48c9e585057f49c64659c5a78d2ddbb9ec314c015232feb20b40c728f7f23b4",
+    "app.o": "297e2562f4e6a12a40905d64c3423f9eb1bb824655289dc9e908bbdeae26d048",
+    "app": "796f0c59248229280b46c574f5325fb06a60349a3e5cfb3acf794f94accb601b"
+  },
+  "sources": {
+    "docs/experiments/gzip/Interop.rvn": "b48b6df99359b7245a383920738aecc3c420a6b91d875525e8b9891b976a7e0d",
+    "docs/experiments/gzip/verify.py": "600da8650abc904947377417195004d862a7fbf91df2f80179831c529606865a",
+    "runtime/raven/src/System/IO/Compression/GZipDecoder.rvn": "48ba67fb0a4013d88c6ae752dd657314d5a4c12e37c3818cab799f042af84081",
+    "runtime/raven/src/System/IO/Compression/GZipEncoder.rvn": "68b01949610d51b4c3212c628744c9d511b6305ccde8f2054d9b8a6edf4411d4",
+    "runtime/raven/src/System/IO/Compression/GZipStream.rvn": "81090485ea1ce1d445badd2b995f7c9553d8c968b9c66504597002b4594e592f"
+  }
+}

@@ -15982,6 +15982,26 @@ or runtime-await default switch was performed.
   cases successfully, with 22 website tests and two snapshot checks. Fast-forwarding
   targets neoCLR main and Raven's neoCLR branch; Raven main stays separate.
 
+## 2026-10-12 — Gzip foundation and likely HTTP use
+
+- **Author request:** “Implement foundational APIs in System.IO.Compression for Gzip compression”.
+- **Assistant proposal/actions:** inspect async streams and add a managed gzip wrapper,
+  focused interoperability/lifetime tests and complete API documentation.
+- **Author clarification:** “We will probably use the Gzip in the Http API.”
+- **Assistant response:** use incremental compression and explicit awaited Finish; keep
+  automatic HTTP encoding separate and document bounded decompression.
+- **Author direction:** commit on main when done.
+- **Outcome/evidence:** see [gzip design](gzip-compression.md) and the linked focused
+  suite. HTTP content composition, negotiation and incremental decoding remain open;
+  likely HTTP use is not recorded as approval of every future integration choice.
+
+- **Assistant-reported validation:** six contract groups pass in local AOT/JIT;
+  independent .NET/Python decoders accept the native compressor's output. Pending
+  input, cancellation and text composition pass in an interpreter smoke check. Full
+  interpreter runs time out at 180 and 600 seconds; full coverage remains open.
+  Aggregate/native API snapshots are refreshed and checked. See
+  [retained results](../runtime/raven/tests/gzip-validation.json).
+
 ## 2026-10-12 — Shared security concepts without forced backend reuse
 
 - **Author request:** continue shared managed SSL transport and certificate foundations,

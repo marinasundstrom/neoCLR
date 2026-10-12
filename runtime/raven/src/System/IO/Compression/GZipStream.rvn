@@ -1,0 +1,313 @@
+module System.IO.Compression
+
+import System.*
+import System.Collections.*
+import System.IO.*
+import System.Result.*
+import System.Option.*
+import System.Concurrency.*
+import System.Concurrency.Tasks.*
+import System.Runtime.CompilerServices.*
+
+/// <summary>Gzip compression and bounded, validated decompression over asynchronous byte streams.</summary>
+/// <remarks>Sequential operations only. Compression writes incrementally; await Finish before Close. Decompression buffers to EOF, accepting at most 65536 compressed and 65536 decoded bytes across all members. No seek, compression-level selection or automatic HTTP encoding is supplied.</remarks>
+public class GZipStream : InputStream, OutputStream {
+    private val input: Option<InputStream>
+    private val output: Option<OutputStream>
+    private val leaveOpen: bool
+    private var closed: bool = false
+    private var failed: bool = false
+    private var finished: bool = false
+    private var started: bool = false
+    private var crc: int = -1
+    private var size: long = 0L
+    private var decoded: byte[] = []
+    private var cursor: int = 0
+
+    private init(input: Option<InputStream>, output: Option<OutputStream>, leaveOpen: bool) {
+        self.input = input
+        self.output = output
+        self.leaveOpen = leaveOpen
+    }
+
+    /// Creates a compressor that owns and closes the output stream.
+    static func CreateCompressor(output: OutputStream) -> GZipStream {
+        return CreateCompressor(output, false)
+    }
+
+    /// <summary>Creates an incremental compressor using fixed Huffman DEFLATE with LZ77 matching.</summary>
+    /// <param name="output">Destination receiving complete gzip framing after Finish.</param>
+    /// <param name="leaveOpen">Preserve the underlying stream when Close is called.</param>
+    /// <returns>An output-mode wrapper; Read returns WrongAccess.</returns>
+    static func CreateCompressor(output: OutputStream, leaveOpen: bool) -> GZipStream {
+        return GZipStream(None, Some(output), leaveOpen)
+    }
+
+    /// Creates a decompressor that owns and closes the input stream.
+    static func CreateDecompressor(input: InputStream) -> GZipStream {
+        return CreateDecompressor(input, false)
+    }
+
+    /// <summary>Creates a decoder for stored, fixed and dynamic DEFLATE blocks and concatenated gzip members.</summary>
+    /// <param name="input">A gzip-only source ending at EOF; optional headers, CRC32 and sizes are checked.</param>
+    /// <param name="leaveOpen">Preserve the underlying stream when Close is called.</param>
+    /// <returns>An input-mode wrapper; Write, Flush and Finish return WrongAccess.</returns>
+    static func CreateDecompressor(input: InputStream, leaveOpen: bool) -> GZipStream {
+        return GZipStream(Some(input), None, leaveOpen)
+    }
+
+    /// Reads with CancellationToken.None.
+    func Read(buffer: byte[], offset: int, count: int) -> Task<Result<int, StreamError>> {
+        return Read(buffer, offset, count, CancellationToken.None)
+    }
+
+    /// <summary>Validates the complete bounded gzip input before exposing decompressed bytes.</summary>
+    /// <param name="buffer">Destination; unchanged on invalid input or quota failure.</param>
+    /// <param name="offset">First writable index.</param>
+    /// <param name="count">Maximum bytes; zero does not consume input.</param>
+    /// <param name="cancellationToken">Pre-cancellation preserves state. Cancellation after input begins poisons the wrapper.</param>
+    /// <returns>Bytes read, zero at EOF, or Closed, WrongAccess, InvalidRange, InvalidData, LimitExceeded or an underlying error. Later calls after failure return IoFailure.</returns>
+    async func Read(buffer: byte[], offset: int, count: int, cancellationToken: CancellationToken) -> Task<Result<int, StreamError>> {
+        if cancellationToken.IsCancellationRequested {
+            let promise = Promise<Result<int, StreamError>>()
+            _ = promise.Cancel()
+            return await promise.Task
+        }
+        if self.closed {
+            return Error(StreamError.Closed)
+        }
+        let Some(source) = self.input else {
+            return Error(StreamError.WrongAccess)
+        }
+        if !(offset >= 0) || !(count >= 0) || offset > buffer.Length || count > buffer.Length - offset {
+            return Error(StreamError.InvalidRange)
+        }
+        if self.failed {
+            return Error(StreamError.IoFailure)
+        }
+        if count == 0 {
+            return Ok(0)
+        }
+        if !self.finished {
+            self.failed = true
+            let bytes: List<byte> = ArrayList<byte>()
+            let chunk = CheckedStorage.Reserve<byte>(4096)
+            var eof = false
+            while !eof {
+                let read = match await source.Read(chunk, 0, chunk.Length, cancellationToken) {
+                    Ok(let value) => value
+                    Error(let error) => return Error(error)
+                }
+                if self.closed {
+                    return Error(StreamError.Closed)
+                }
+                if !(read >= 0) || read > chunk.Length {
+                    System.Fail("Invalid gzip input count")
+                }
+                if read > 65536 - bytes.Count {
+                    return Error(StreamError.LimitExceeded)
+                }
+                var index = 0
+                while index < read {
+                    bytes.Add(chunk[index])
+                    index += 1
+                }
+                eof = read == 0
+            }
+            let compressed = CheckedStorage.Reserve<byte>(bytes.Count)
+            var copyIndex = 0
+            while copyIndex < bytes.Count {
+                compressed[copyIndex] = bytes[copyIndex]
+                copyIndex += 1
+            }
+            self.decoded = match GZipDecoder(compressed).Decode() {
+                Ok(let value) => value
+                Error(let error) => return Error(error)
+            }
+            self.finished = true
+            self.failed = false
+        }
+        var copied = 0
+        while copied < count && self.cursor < self.decoded.Length {
+            buffer[offset + copied] = self.decoded[self.cursor]
+            self.cursor += 1
+            copied += 1
+        }
+        return Ok(copied)
+    }
+
+    /// Writes with CancellationToken.None.
+    func Write(buffer: byte[], offset: int, count: int) -> Task<Result<unit, StreamError>> {
+        return Write(buffer, offset, count, CancellationToken.None)
+    }
+
+    /// <summary>Compresses the full range in bounded 16384-byte blocks without retaining caller bytes after completion.</summary>
+    /// <param name="buffer">Initialized source bytes, unchanged until the operation settles.</param>
+    /// <param name="offset">First source index.</param>
+    /// <param name="count">Bytes to compress; zero emits nothing.</param>
+    /// <param name="cancellationToken">Cancellation propagates through the destination; interrupted output cannot be retried.</param>
+    /// <returns>Success or Closed, WrongAccess, InvalidRange, IoFailure or an underlying output error.</returns>
+    async func Write(buffer: byte[], offset: int, count: int, cancellationToken: CancellationToken) -> Task<Result<unit, StreamError>> {
+        if cancellationToken.IsCancellationRequested {
+            let promise = Promise<Result<unit, StreamError>>()
+            _ = promise.Cancel()
+            return await promise.Task
+        }
+        if self.closed {
+            return Error(StreamError.Closed)
+        }
+        let Some(sink) = self.output else {
+            return Error(StreamError.WrongAccess)
+        }
+        if !(offset >= 0) || !(count >= 0) || offset > buffer.Length || count > buffer.Length - offset {
+            return Error(StreamError.InvalidRange)
+        }
+        if self.failed {
+            return Error(StreamError.IoFailure)
+        }
+        if self.finished {
+            return Error(StreamError.WrongAccess)
+        }
+        if count == 0 {
+            return Ok(())
+        }
+        self.failed = true
+        _ = (await self.Header(sink, cancellationToken))?
+        var consumed = 0
+        while consumed < count {
+            let remaining = count - consumed
+            let length = if remaining > 16384 { 16384 } else {
+                remaining
+            }
+            let compressed = GZipEncoder().Encode(buffer, offset + consumed, length)
+            var index = 0
+            while index < length {
+                self.crc = GZipEncoder.UpdateCrc(self.crc, (int)buffer[offset + consumed + index])
+                index += 1
+            }
+            self.size = (self.size + (long)length) % 4294967296L
+            _ = (await sink.Write(compressed, 0, compressed.Length, cancellationToken))?
+            if self.closed {
+                return Error(StreamError.Closed)
+            }
+            consumed += length
+        }
+        self.failed = false
+        return Ok(())
+    }
+
+    private async func Header(sink: OutputStream, cancellationToken: CancellationToken) -> Task<Result<unit, StreamError>> {
+        if !self.started {
+            let header: byte[] = [(byte)31,(byte)139,(byte)8,(byte)0,(byte)0,(byte)0,(byte)0,(byte)0,(byte)0,(byte)255]
+            _ = (await sink.Write(header, 0, header.Length, cancellationToken))?
+            if self.closed {
+                return Error(StreamError.Closed)
+            }
+            self.started = true
+        }
+        return Ok(())
+    }
+
+    /// Finalizes compression with CancellationToken.None.
+    func Finish() -> Task<Result<unit, StreamError>> {
+        return Finish(CancellationToken.None)
+    }
+
+    /// <summary>Writes the final DEFLATE block, CRC32 and modulo-2^32 input size exactly once, including for empty input.</summary>
+    /// <param name="cancellationToken">Cancellation for trailer output.</param>
+    /// <returns>Success after destination acceptance, or a stream error. Successful repetition is a no-op. Does not flush or close the destination.</returns>
+    async func Finish(cancellationToken: CancellationToken) -> Task<Result<unit, StreamError>> {
+        if cancellationToken.IsCancellationRequested {
+            let promise = Promise<Result<unit, StreamError>>()
+            _ = promise.Cancel()
+            return await promise.Task
+        }
+        if self.closed {
+            return Error(StreamError.Closed)
+        }
+        let Some(sink) = self.output else {
+            return Error(StreamError.WrongAccess)
+        }
+        if self.failed {
+            return Error(StreamError.IoFailure)
+        }
+        if self.finished {
+            return Ok(())
+        }
+        self.failed = true
+        _ = (await self.Header(sink, cancellationToken))?
+        let trailer = CheckedStorage.Reserve<byte>(13)
+        trailer[0] = (byte)1
+        trailer[1] = (byte)0
+        trailer[2] = (byte)0
+        trailer[3] = (byte)255
+        trailer[4] = (byte)255
+        var sizeBytes = self.size
+        var index = 0
+        while index < 4 {
+            trailer[5 + index] = (byte)(((self.crc ^ -1) >> (index * 8)) & 255)
+            trailer[9 + index] = (byte)(sizeBytes % 256L)
+            sizeBytes = sizeBytes / 256L
+            index += 1
+        }
+        _ = (await sink.Write(trailer, 0, trailer.Length, cancellationToken))?
+        if self.closed {
+            return Error(StreamError.Closed)
+        }
+        self.finished = true
+        self.failed = false
+        return Ok(())
+    }
+
+    /// Flushes the destination with CancellationToken.None.
+    func Flush() -> Task<Result<unit, StreamError>> {
+        return Flush(CancellationToken.None)
+    }
+
+    /// <summary>Flushes output already accepted; does not finalize gzip or emit a trailer.</summary>
+    /// <param name="cancellationToken">Cancellation for the destination flush.</param>
+    /// <returns>Destination completion or a stream error. A failed/cancelled flush poisons the wrapper.</returns>
+    async func Flush(cancellationToken: CancellationToken) -> Task<Result<unit, StreamError>> {
+        if cancellationToken.IsCancellationRequested {
+            let promise = Promise<Result<unit, StreamError>>()
+            _ = promise.Cancel()
+            return await promise.Task
+        }
+        if self.closed {
+            return Error(StreamError.Closed)
+        }
+        let Some(sink) = self.output else {
+            return Error(StreamError.WrongAccess)
+        }
+        if self.failed {
+            return Error(StreamError.IoFailure)
+        }
+        self.failed = true
+        _ = (await sink.Flush(cancellationToken))?
+        if self.closed {
+            return Error(StreamError.Closed)
+        }
+        self.failed = false
+        return Ok(())
+    }
+
+    /// <summary>Discards wrapper state and closes the underlying stream unless leaveOpen was selected; idempotent.</summary>
+    /// <remarks>Close never finishes or flushes compression. Await Finish and Flush first to observe errors. Closing during an operation does not cancel the underlying operation.</remarks>
+    func Close() {
+        if self.closed {
+            return
+        }
+        self.closed = true
+        self.decoded = []
+        if !self.leaveOpen {
+            match self.input {
+                Some(let source) => source.Close()
+                _ => { }
+            }
+            match self.output {
+                Some(let sink) => sink.Close()
+                _ => { }
+            }
+        }
+    }
+}

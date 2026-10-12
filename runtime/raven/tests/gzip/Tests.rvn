@@ -1,0 +1,207 @@
+module NeoClr.RuntimeTests
+
+import System.*
+import System.IO.*
+import System.IO.Compression.*
+import System.Result.*
+import System.Option.*
+import System.Concurrency.*
+import System.Concurrency.Tasks.*
+import System.Concurrency.Tasks.TaskOutcome.*
+import System.Runtime.CompilerServices.*
+import NeoClr.Testing.*
+
+func CompletedValue<T>(operation: Task<T>) -> T {
+    let Some(Completed(value)) = operation.Outcome else {
+        System.Fail("Expected completed gzip fixture")
+    }
+    return value
+}
+
+func Reader(data: byte[]) -> GZipStream {
+    let source = MemoryStream()
+    _ = CompletedValue(source.Write(data, 0, data.Length))
+    _ = source.Seek(0)
+    return GZipStream.CreateDecompressor(source)
+}
+
+func Count(result: Result<int, StreamError>, expected: int) -> Result<unit, TestFailure> {
+    let Ok(actual) = result else {
+        return Error(TestFailure("Read", "Ok", "Error"))
+    }
+    return Assert.Equal(expected, actual)
+}
+
+func Verify(data: byte[], expected: byte[]) -> Result<unit, TestFailure> {
+    let reader = Reader(data)
+    let buffer: byte[] = [for unused in 0..<4096 => (byte)0]
+    buffer[0] = (byte)165
+    buffer[buffer.Length - 1] = (byte)166
+    _ = Count(CompletedValue(reader.Read(buffer, 1, expected.Length)), expected.Length)?
+    var index = 0
+    while index < expected.Length {
+        _ = Assert.Equal((int)expected[index], (int)buffer[index + 1])?
+        index += 1
+    }
+    _ = Assert.Equal(165, (int)buffer[0])?
+    _ = Assert.Equal(166, (int)buffer[buffer.Length - 1])?
+    _ = Assert.True(CompletedValue(reader.Read(buffer, 0, 1)) is Ok(0), "Validated EOF")?
+    reader.Close()
+    return Ok(())
+}
+
+[Test("Gzip decodes independent stored fixed dynamic and optional-header members")]
+func ADecode() -> Result<unit, TestFailure> {
+    _ = Verify(Stored(), SmallData())?
+    _ = Verify(Fixed(), SmallData())?
+    _ = Verify(Dynamic(), LargeData())?
+    _ = Verify(Optional(), SmallData())?
+    _ = Verify(Concatenated(), DoubleData())?
+    return Verify(Empty(), [])
+}
+
+[Test("Gzip validates checksums truncation headers and quotas before output")]
+func BInvalid() -> Result<unit, TestFailure> {
+    let buffer: byte[] = [(byte)165]
+    let corrupt = Fixed()
+    corrupt[corrupt.Length - 8] = (byte)((int)corrupt[corrupt.Length - 8] ^ 1)
+    _ = Assert.True(CompletedValue(Reader(corrupt).Read(buffer, 0, 1)) is Error(StreamError.InvalidData), "CRC mismatch")?
+    let size = Fixed()
+    size[size.Length - 4] = (byte)0
+    _ = Assert.True(CompletedValue(Reader(size).Read(buffer, 0, 1)) is Error(StreamError.InvalidData), "Size mismatch")?
+    let reserved = Fixed()
+    reserved[3] = (byte)32
+    _ = Assert.True(CompletedValue(Reader(reserved).Read(buffer, 0, 1)) is Error(StreamError.InvalidData), "Reserved header flags")?
+    let header = Optional()
+    header[10] = (byte)1
+    _ = Assert.True(CompletedValue(Reader(header).Read(buffer, 0, 1)) is Error(StreamError.InvalidData), "Header checksum")?
+    let original = Fixed()
+    var length = 0
+    while length < original.Length {
+        let Ok(truncated) = original.Slice(Range(0, length)) else {
+            return Error(TestFailure("Fixture slice", "Ok", "Error"))
+        }
+        _ = Assert.True(CompletedValue(Reader(truncated).Read(buffer, 0, 1)) is Error(StreamError.InvalidData), "Every truncation rejected")?
+        length += 1
+    }
+    _ = Assert.True(CompletedValue(Reader(Bomb()).Read(buffer, 0, 1)) is Error(StreamError.LimitExceeded), "Expanded quota")?
+    _ = Assert.True(CompletedValue(Reader(Trailing()).Read(buffer, 0, 1)) is Error(StreamError.InvalidData), "Trailing junk")?
+    _ = Assert.True(CompletedValue(Reader(ReservedBlock()).Read(buffer, 0, 1)) is Error(StreamError.InvalidData), "Reserved DEFLATE block")?
+    _ = Assert.True(CompletedValue(Reader(EmptyCodeTree()).Read(buffer, 0, 1)) is Error(StreamError.InvalidData), "Empty dynamic code tree")?
+    _ = Assert.True(CompletedValue(Reader(ReservedLiteral()).Read(buffer, 0, 1)) is Error(StreamError.InvalidData), "Reserved fixed literal")?
+    _ = Assert.True(CompletedValue(Reader(MissingHistory()).Read(buffer, 0, 1)) is Error(StreamError.InvalidData), "Distance before history")?
+    _ = Assert.True(CompletedValue(GZipStream.CreateDecompressor(OversizedSource()).Read(buffer, 0, 1)) is Error(StreamError.LimitExceeded), "Compressed input quota")?
+    return Assert.Equal(165, (int)buffer[0])
+}
+
+[Test("Gzip incrementally compresses repeated writes and finishes once")]
+func CCompress() -> Result<unit, TestFailure> {
+    let sink = MemoryStream()
+    let writer = GZipStream.CreateCompressor(sink, true)
+    let data = LargeData()
+    _ = Assert.True(CompletedValue(writer.Write(data, 0, data.Length)) is Ok, "First compressed write")?
+    let Ok(beforeFinish) = sink.GetLength() else {
+        return Error(TestFailure("Length", "Ok", "Error"))
+    }
+    _ = Assert.True(beforeFinish > 10, "Output arrives before Finish")?
+    _ = Assert.True(CompletedValue(writer.Flush()) is Ok, "Flush")?
+    _ = Assert.True(CompletedValue(writer.Write(data, 0, data.Length)) is Ok, "Second compressed write")?
+    _ = Assert.True(CompletedValue(writer.Finish()) is Ok, "Finish")?
+    let Ok(length) = sink.GetLength() else { return Error(TestFailure("Length", "Ok", "Error")) }
+    _ = Assert.True(length < (long)data.Length, "Repeated input is compressed")?
+    _ = Assert.True(CompletedValue(writer.Finish()) is Ok, "Finish is idempotent")?
+    let Ok(afterFinish) = sink.GetLength() else {
+        return Error(TestFailure("Length", "Ok", "Error"))
+    }
+    _ = Assert.True(afterFinish == length, "No duplicate trailer")?
+    writer.Close()
+    _ = Assert.True(sink.Seek(0) is Ok, "leaveOpen preserves sink")?
+    let reader = GZipStream.CreateDecompressor(sink)
+    let output: byte[] = [for unused in 0..<8192 => (byte)0]
+    _ = Count(CompletedValue(reader.Read(output, 0, data.Length * 2)), data.Length * 2)?
+    var index = 0
+    while index < data.Length * 2 {
+        _ = Assert.Equal((int)data[index % data.Length], (int)output[index])?
+        index += 1
+    }
+    return Ok(())
+}
+
+[Test("Gzip empty finish ownership ranges modes and cancellation are explicit")]
+func DContracts() -> Result<unit, TestFailure> {
+    let sink = MemoryStream()
+    let writer = GZipStream.CreateCompressor(sink, true)
+    let bytes: byte[] = [(byte)1]
+    _ = Assert.True(CompletedValue(writer.Write(bytes, -1, 1)) is Error(StreamError.InvalidRange), "Range validation")?
+    _ = Assert.True(CompletedValue(writer.Write(bytes, 0, 0)) is Ok, "Empty write")?
+    _ = Assert.True(sink.GetLength() is Ok(0L), "Empty write emits nothing")?
+    _ = Assert.True(CompletedValue(writer.Read(bytes, 0, 1)) is Error(StreamError.WrongAccess), "Compressor cannot read")?
+    let cancellation = CancellationTokenSource()
+    cancellation.Cancel()
+    _ = Assert.True(writer.Finish(cancellation.Token).IsCancelled, "Pre-cancel finish")?
+    _ = Assert.True(sink.GetLength() is Ok(0L), "Cancellation preserves output")?
+    _ = Assert.True(CompletedValue(writer.Finish()) is Ok, "Empty finish")?
+    _ = Assert.True(CompletedValue(writer.Write(bytes, 0, 1)) is Error(StreamError.WrongAccess), "No writes after finish")?
+    writer.Close()
+    writer.Close()
+    _ = Assert.True(CompletedValue(writer.Finish()) is Error(StreamError.Closed), "Closed finish")?
+    _ = sink.Seek(0)
+    let reader = GZipStream.CreateDecompressor(sink)
+    _ = Assert.True(CompletedValue(reader.Read(bytes, 0, 1)) is Ok(0), "Empty gzip")?
+    _ = Assert.True(CompletedValue(reader.Write(bytes, 0, 1)) is Error(StreamError.WrongAccess), "Decompressor cannot write")?
+    reader.Close()
+    _ = Assert.True(sink.GetLength() is Error(StreamError.Closed), "Default ownership")?
+    let invalid = Reader([])
+    _ = Assert.True(CompletedValue(invalid.Read(bytes, 0, 0)) is Ok(0), "Zero read skips invalid input")?
+    _ = Assert.True(CompletedValue(invalid.Read(bytes, 0, 1)) is Error(StreamError.InvalidData), "Invalid empty source")?
+    return Assert.True(CompletedValue(invalid.Read(bytes, 0, 1)) is Error(StreamError.IoFailure), "Failed wrapper cannot replay")
+}
+
+[Test("Gzip awaits output and poisons interrupted streams without replay")]
+func EPending() -> Result<unit, TestFailure> {
+    let sink = PendingSink()
+    let writer = GZipStream.CreateCompressor(sink)
+    let bytes: byte[] = [(byte)65]
+    let operation = writer.Write(bytes, 0, 1)
+    _ = Assert.True(!operation.IsCompleted, "Header write remains pending")?
+    _ = Assert.True(CompletedValue(writer.Finish()) is Error(StreamError.IoFailure), "Reject overlap")?
+    sink.Complete()
+    TaskQueue.Default.Drain()
+    _ = Assert.True(CompletedValue(operation) is Ok, "Resume write")?
+    _ = Assert.True(CompletedValue(writer.Finish()) is Ok, "Resume finalization")?
+    let cancelledSink = PendingSink()
+    let interrupted = GZipStream.CreateCompressor(cancelledSink)
+    let cancelled = interrupted.Finish()
+    cancelledSink.Cancel()
+    TaskQueue.Default.Drain()
+    _ = Assert.True(cancelled.IsCancelled, "Await propagates cancellation")?
+    _ = Assert.True(CompletedValue(interrupted.Finish()) is Error(StreamError.IoFailure), "Cancelled finalization cannot replay")?
+    let broken = GZipStream.CreateCompressor(FailingSink())
+    _ = Assert.True(CompletedValue(broken.Write(bytes, 0, 1)) is Error(StreamError.AccessDenied), "Underlying error preserved")?
+    return Assert.True(CompletedValue(broken.Finish()) is Error(StreamError.IoFailure), "Failed finalization cannot replay")
+}
+
+[Test("Gzip handles pending fragmented input and preserves text-reader errors")]
+func FInput() -> Result<unit, TestFailure> {
+    let source = FragmentedSource(Fixed())
+    let reader = GZipStream.CreateDecompressor(source)
+    let buffer: byte[] = [(byte)165]
+    let read = reader.Read(buffer, 0, 1)
+    _ = Assert.True(!read.IsCompleted, "Input remains pending")?
+    _ = Assert.Equal(165, (int)buffer[0])?
+    source.Complete()
+    TaskQueue.Default.Drain()
+    _ = Count(CompletedValue(read), 1)?
+    _ = Assert.Equal(97, (int)buffer[0])?
+    let cancelledSource = FragmentedSource(Fixed())
+    let cancelledReader = GZipStream.CreateDecompressor(cancelledSource)
+    let cancelled = cancelledReader.Read(buffer, 0, 1)
+    cancelledSource.Cancel()
+    TaskQueue.Default.Drain()
+    _ = Assert.True(cancelled.IsCancelled, "Input cancellation propagates")?
+    _ = Assert.True(CompletedValue(cancelledReader.Read(buffer, 0, 1)) is Error(StreamError.IoFailure), "Interrupted source cannot replay")?
+    let validText = StreamReader(Reader(Fixed()))
+    _ = Assert.True(CompletedValue(validText.ReadToEnd(32)) is Ok("abcabcabcabc"), "Compose gzip and text decoding")?
+    let text = StreamReader(Reader(Trailing()))
+    return Assert.True(CompletedValue(text.ReadToEnd(32)) is Error(TextReadError.InvalidData), "Preserve binary corruption through text decoding")
+}

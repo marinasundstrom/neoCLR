@@ -12,6 +12,8 @@ public union StreamError {
     case WrongAccess
     case IoFailure
     case InvalidEncoding
+    /// Malformed or truncated binary content, including gzip checksum and format failures.
+    case InvalidData
 
     override func ToString() -> string {
         return match self {
@@ -24,6 +26,7 @@ public union StreamError {
             InvalidRange => "InvalidRange"
             LimitExceeded => "LimitExceeded"
             WrongAccess => "WrongAccess"
+            InvalidData => "InvalidData"
             InvalidEncoding => "InvalidEncoding"
             IoFailure => "IoFailure"
             _ => "Empty"

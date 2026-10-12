@@ -80,6 +80,8 @@
       href: docs/json.md
     - name: "Streams"
       href: docs/streams.md
+    - name: "Gzip compression"
+      href: docs/compression.md
     - name: "Storage"
       href: docs/storage-items.md
     - name: "Transitional async compiler protocol"

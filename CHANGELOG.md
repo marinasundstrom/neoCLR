@@ -22,6 +22,15 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   Document shared HTTP/SQL security concepts without forcing a common native backend;
   managed SSL/certificate ownership and handshake diagnostics remain open.
 
+- Add development `System.IO.Compression.GZipStream` with incremental async gzip
+  compression, explicit Finish, ownership/cancellation handling and bounded validated
+  decompression. Add `StreamError.InvalidData` and preserve it through StreamReader as
+  `TextReadError.InvalidData` (update exhaustive error matches),
+  independent codec fixtures and API documentation. Automatic HTTP encoding and
+  incremental decompression remain gaps. Six contract groups pass in local AOT/JIT;
+  independent .NET/Python interoperability and an interpreter smoke check pass. The
+  full interpreter suite exceeds its 600-second allowance and remains unqualified.
+
 - Add explicit JIT/AOT cryptography bindings and a shared native byte-array adapter,
   preserving initialized-input checks, aliased outputs, short destinations and
   terminal Fault semantics. Twelve identical cases pass in interpreter/JIT/AOT

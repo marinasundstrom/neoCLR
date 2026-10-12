@@ -22,6 +22,7 @@ member for parameters, return values, errors and usage notes.
 | Collections and queries | [System.Collections](xref:System.Collections) · [System.Linq](xref:System.Linq) · [Arrays](arrays.md) |
 | Outcomes and values | [Option](xref:System.Option`1) · [Result](xref:System.Result`2) · [Object and value contracts](objects.md) · [Tuples](tuples.md) |
 | Functions | [Function shapes and objects](functions.md) · [Callbacks](callbacks.md) |
+| Gzip compression | [GZipStream](xref:System.IO.Compression.GZipStream) · [Compression contracts](compression.md) |
 | Streams and files | [System.IO](xref:System.IO) · [System.Storage](xref:System.Storage) · [Stream contracts](streams.md) |
 | Console and environment | [Console](xref:System.Console) · [Environment](xref:System.Environment) · [Standard streams](console.md) |
 | Tasks and concurrency | [System.Concurrency.Tasks](xref:System.Concurrency.Tasks) · [System.Concurrency](xref:System.Concurrency) |

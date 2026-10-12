@@ -67,3 +67,7 @@ implementations choose failure policy. No implicit conversion is introduced.
 
 `System.Runtime` also contains the development [GC](xref:System.Runtime.GC) class;
 see [garbage collection](gc.md) for object counters, explicit collection and lifetime use.
+
+## System.IO.Compression (development)
+
+GZipStream composes async byte streams; see [compression](compression.md).

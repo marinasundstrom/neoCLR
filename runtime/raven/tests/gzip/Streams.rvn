@@ -1,0 +1,107 @@
+module NeoClr.RuntimeTests
+
+import System.*
+import System.IO.*
+import System.Result.*
+import System.Option.*
+import System.Concurrency.*
+import System.Concurrency.Tasks.*
+
+class PendingSink : OutputStream {
+    private val promise = Promise<Result<unit, StreamError>>()
+    func Write(buffer: byte[], offset: int, count: int) -> Task<Result<unit, StreamError>> {
+        return Write(buffer, offset, count, CancellationToken.None)
+    }
+    func Write(buffer: byte[], offset: int, count: int, cancellationToken: CancellationToken) -> Task<Result<unit, StreamError>> {
+        return promise.Task
+    }
+    func Flush() -> Task<Result<unit, StreamError>> {
+        return Flush(CancellationToken.None)
+    }
+    func Flush(cancellationToken: CancellationToken) -> Task<Result<unit, StreamError>> {
+        return Task.FromResult(Result<unit, StreamError>.Ok(()))
+    }
+    func Close() { }
+    func Complete() { _ = promise.Complete(Ok(())) }
+    func Cancel() { _ = promise.Cancel() }
+}
+
+class FailingSink : OutputStream {
+    func Write(buffer: byte[], offset: int, count: int) -> Task<Result<unit, StreamError>> {
+        return Write(buffer, offset, count, CancellationToken.None)
+    }
+    func Write(buffer: byte[], offset: int, count: int, cancellationToken: CancellationToken) -> Task<Result<unit, StreamError>> {
+        return Task.FromResult(Result<unit, StreamError>.Error(StreamError.AccessDenied))
+    }
+    func Flush() -> Task<Result<unit, StreamError>> {
+        return Flush(CancellationToken.None)
+    }
+    func Flush(cancellationToken: CancellationToken) -> Task<Result<unit, StreamError>> {
+        return Task.FromResult(Result<unit, StreamError>.Error(StreamError.AccessDenied))
+    }
+    func Close() { }
+}
+
+// One suspended read followed by three-byte fragments exercises retained buffers.
+class FragmentedSource : InputStream {
+    private val data: byte[]
+    private var position = 0
+    private var first = true
+    private val promise = Promise<Result<int, StreamError>>()
+    private var destination: Option<byte[]> = Option<byte[]>.None
+    private var start = 0
+    private var capacity = 0
+
+    init(data: byte[]) {
+        self.data = data
+    }
+    func Read(buffer: byte[], offset: int, count: int) -> Task<Result<int, StreamError>> {
+        return Read(buffer, offset, count, CancellationToken.None)
+    }
+    func Read(buffer: byte[], offset: int, count: int, cancellationToken: CancellationToken) -> Task<Result<int, StreamError>> {
+        if first {
+            first = false
+            destination = Option<byte[]>.Some(buffer)
+            start = offset
+            capacity = count
+            return promise.Task
+        }
+        return Task.FromResult(ReadCore(buffer, offset, count))
+    }
+    private func ReadCore(buffer: byte[], offset: int, count: int) -> Result<int, StreamError> {
+        var read = 0
+        while read < count && read < 3 && position < data.Length {
+            buffer[offset + read] = data[position]
+            position += 1
+            read += 1
+        }
+        return Ok(read)
+    }
+    func Complete() {
+        if destination is Some(let buffer) {
+            _ = promise.Complete(ReadCore(buffer, start, capacity))
+        }
+    }
+    func Cancel() {
+        _ = promise.Cancel()
+    }
+    func Close() { }
+}
+
+class OversizedSource : InputStream {
+    private var remaining = 65537
+    func Read(buffer: byte[], offset: int, count: int) -> Task<Result<int, StreamError>> {
+        return Read(buffer, offset, count, CancellationToken.None)
+    }
+    func Read(buffer: byte[], offset: int, count: int, cancellationToken: CancellationToken) -> Task<Result<int, StreamError>> {
+        let amount = if count < remaining { count } else { remaining }
+        var index = 0
+        while index < amount {
+            buffer[offset + index] = (byte)0
+            index += 1
+        }
+        remaining -= amount
+        return Task.FromResult(Result<int, StreamError>.Ok(amount))
+    }
+    func Close() { }
+}

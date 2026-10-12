@@ -3,6 +3,8 @@
 **Gzip foundation (2026-10-12):** the author requests System.IO.Compression and
 identifies HTTP as a likely consumer. [GZipStream](gzip-compression.md) adds incremental
 async compression and bounded validated decompression over existing stream contracts.
+[Local qualification](../runtime/raven/tests/gzip-validation.json) covers native/JIT
+contracts and external interoperability; interpreter qualification is recorded separately.
 Automatic HTTP encoding/negotiation and incremental decoding remain follow-through;
 this author-directed slice does not reorder the active milestone.
 
