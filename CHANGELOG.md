@@ -23,6 +23,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   retained session configuration. Twenty-four provider/lifetime checks, fourteen
   service checks and eight collector regressions pass on macOS; Windows CI runs
   the same lifetime checks. Native JIT/AOT TLS bindings and Raven APIs remain open.
+  Add private native collector resource registrations with abortive cleanup after
+  successful tracing, explicit release and teardown guards; collector, host-root,
+  session and pass regressions pass under UndefinedBehaviorSanitizer on macOS.
+  Enable safepoint collection in the Windows collector contract build. Native TLS
+  adapter/lowering integration remains open; AddressSanitizer startup stalled before
+  test execution on the local host.
   Document shared HTTP/SQL security concepts without forcing a common native backend;
   managed SSL/certificate ownership and handshake diagnostics remain open.
 

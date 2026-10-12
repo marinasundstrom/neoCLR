@@ -59,7 +59,7 @@ def main():
         report['collectorExecution'] = dict(exitCode=0, stdout=result.stdout.decode(), stderr='')
         # Existing collector semantics, independently of the new host wrapper.
         run(['cl', '/nologo', '/W4', '/WX', '/std:c11', '/experimental:c11atomics', '/O2', '/MT',
-             '/Fe:collector-contract.exe', base / 'native-gc-test.c', base / 'native-gc.c', base / 'root-probe.c'], 'collector-contract-build')
+             '/DNEOCLR_NATIVE_GC=1', '/Fe:collector-contract.exe', base / 'native-gc-test.c', base / 'native-gc.c', base / 'root-probe.c'], 'collector-contract-build')
         result = run([out / 'collector-contract.exe'], 'collector-contract-execute')
         if result.stdout or result.stderr:
             raise ValueError('Unexpected collector contract output')

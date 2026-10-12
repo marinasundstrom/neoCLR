@@ -52,6 +52,24 @@ int32_t neoclr_gc_host_root_create_owned_v1(neoclr_aot_context *, void *owner,
 int32_t neoclr_gc_host_root_replace_v1(neoclr_aot_context *context, uint64_t handle, void *value);
 int32_t neoclr_gc_host_root_read_v1(neoclr_aot_context *context, uint64_t handle, void **output);
 int32_t neoclr_gc_host_root_release_v1(neoclr_aot_context *context, uint64_t handle);
+/* Private native resource ownership (not guest finalization). Registration is
+ * caller-owned, zero-initialized and stable until release. It does not root owner.
+ * On successful collection of owner, or explicit release, unlink/clear first,
+ * then call cleanup exactly once. Cleanup may free the registration itself.
+ * Cleanup must not perform I/O, call managed code, allocate in the managed heap,
+ * reenter runtime services or fail. This is a trusted adapter contract.
+ * Context and creating thread must outlive every registration. Before discarding
+ * an arena, adapters explicitly release their records; entry reset rejects live
+ * registrations. No callbacks run on failed tracing. Up to 1024 per context. */
+typedef struct neoclr_gc_resource {
+    neoclr_aot_context *context;
+    void *owner, *state;
+    void (*cleanup)(void *);
+    struct neoclr_gc_resource *next;
+} neoclr_gc_resource;
+int32_t neoclr_gc_resource_attach_v1(neoclr_aot_context *, void *owner,
+    neoclr_gc_resource *, void *state, void (*cleanup)(void *));
+int32_t neoclr_gc_resource_release_v1(neoclr_aot_context *, neoclr_gc_resource *);
 /* Entry reset is forbidden while this thread holds roots or guest frames for the context. */
 int32_t neoclr_gc_entry_check_v1(neoclr_aot_context *context);
 /* Quiescent exclusive ownership check. The supplied distinct handles must be

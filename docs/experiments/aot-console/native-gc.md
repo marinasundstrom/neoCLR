@@ -473,3 +473,18 @@ marking starts after that pass, so later blocks cannot have fresh marks cleared.
 The added pass test checks a malformed late descriptor without heap mutation,
 multiple intern entries pointing forward in the heap, repeat collection, and release.
 These changes remove two complete heap traversals without weakening admission.
+
+### Native resource ownership registrations
+
+The private `neoclr_gc_resource_attach_v1` / `neoclr_gc_resource_release_v1` hook
+associates a caller-owned registration with a live managed allocation, without
+rooting it. Successful collection releases registrations whose owners are unmarked.
+Explicit release and collection clear/unlink before running trusted native cleanup,
+which may free its registration. Failed tracing runs no cleanup.
+
+This is not a managed finalizer facility. Cleanup must not block, perform I/O, call
+managed code, allocate managed storage, reenter runtime services or fail. Registrations
+are thread-affine, with a 1024-per-context quota. Entry reset and session ownership
+admission reject outstanding registrations; adapters release them before teardown.
+The [shared security foundation](../../shared-security-provider.md) records the
+SafeHandle comparison, costs, focused evidence and remaining TLS adapter integration.

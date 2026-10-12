@@ -358,3 +358,35 @@ lifetime tests with its disposable certificates on macOS and Windows. Results an
 remaining gates are recorded in the [validation checkpoint](experiments/shared-tls/interpreter-lifetime-validation.json). Full managed
 stream composition still needs ciphertext pumping, pending-operation ownership and
 native JIT/AOT service/collector integration before Raven certificate/SslStream APIs.
+
+## Native collector resource ownership hook (development, 2026-10-12)
+
+The private native collector now supports caller-owned resource registrations with
+a managed owner and a trusted native cleanup function. Registration does not retain
+the owner. Once tracing succeeds, unreachable owners trigger cleanup before sweep;
+explicit release uses the same unlink-and-clear path. Cleanup can destroy its own
+registration, runs once, and must not perform I/O, allocate managed objects, call
+guest code, reenter runtime services or fail. Failed tracing leaves registrations
+untouched. This is resource disposal plumbing, not managed finalization.
+
+The hook addresses the same SafeHandle ownership concern as the interpreter adapter
+above. It differs from CLR finalization by allowing only trusted, abortive native
+cleanup at collection. This avoids a finalizer thread and guest-code execution during
+GC, but requires adapters to provide bounded, nonblocking destruction. Registrations
+are thread-affine and limited to 1024 per context. The collector scans registrations
+without allocating storage; adapters own that storage. No throughput improvement is
+claimed. Before arena teardown, adapters must release their records; entry reset and
+session exclusive-ownership checks reject outstanding registrations.
+
+The collector contract covers rooted/unrooted owners, foreign/invalid owners,
+duplicate attachment, explicit release, failed tracing, address reuse, per-context
+quotas and cleanup that frees its registration. Host-root, collector pass and session
+regressions also pass locally under UndefinedBehaviorSanitizer. AddressSanitizer
+stalled in its runtime initializer before test code executed on this host and is
+not counted as passing. The Windows host workflow runs the collector contract with
+safepoint collection enabled; execution of the new cases remains pending.
+See [native lifetime evidence](experiments/shared-tls/native-lifetime-validation.json).
+
+This hook is not yet wired into a native TLS adapter. Native TLS service lowering,
+adapter teardown, pending-operation roots and shared ciphertext pumping remain
+required before implementing and qualifying Raven certificate/SslStream APIs.

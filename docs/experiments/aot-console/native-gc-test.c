@@ -1,9 +1,83 @@
 #include "native-gc.h"
 #include <string.h>
+#include <stdlib.h>
 #define CHECK(test) do { if (!(test)) return __LINE__; } while (0)
 static void *allocate(neoclr_aot_context *c, uint64_t bytes, uint32_t kind) {
     void *p = NULL;
     return neoclr_gc_allocate_v1(&c->text, bytes, kind, &p) ? NULL : p;
+}
+static void count_cleanup(void *state) { ++*(int *)state; }
+typedef struct { neoclr_gc_resource resource; int *cleaned; } owned_resource;
+static void free_cleanup(void *state) {
+    owned_resource *r = state;
+    /* Clearing must precede a callback that can destroy its registration. */
+    if (r->resource.context || r->resource.owner || r->resource.cleanup || r->resource.next) abort();
+    ++*r->cleaned;
+    free(r);
+}
+
+static int resource_owners(void) {
+    uint64_t buffer[256] = {0}, other_buffer[64] = {0};
+    neoclr_aot_context c = {.text = {(unsigned char *)buffer, sizeof(buffer), 0}};
+    neoclr_aot_context other = {.text = {(unsigned char *)other_buffer, sizeof(other_buffer), 0}};
+    void *owner = allocate(&c, 16, NEOCLR_GC_OBJECT);
+    void *alien = allocate(&other, 16, NEOCLR_GC_OBJECT);
+    neoclr_gc_resource first = {0}, second = {0};
+    int cleaned = 0;
+    CHECK(owner && alien);
+    CHECK(neoclr_gc_resource_attach_v1(&c, alien, &first, &cleaned, count_cleanup) == 3);
+    CHECK(neoclr_gc_resource_attach_v1(&c, NULL, &first, &cleaned, count_cleanup) == 3);
+    CHECK(neoclr_gc_resource_attach_v1(&c, (char *)owner + 8, &first, &cleaned, count_cleanup) == 3);
+    CHECK(neoclr_gc_resource_attach_v1(&c, owner, &first, &cleaned, NULL) == 3);
+    CHECK(!first.context && !cleaned);
+    CHECK(!neoclr_gc_resource_attach_v1(&c, owner, &first, &cleaned, count_cleanup));
+    CHECK(neoclr_gc_resource_attach_v1(&c, owner, &first, &cleaned, count_cleanup) == 3);
+    CHECK(neoclr_gc_resource_release_v1(&other, &first) == 3);
+    CHECK(neoclr_gc_entry_check_v1(&c) == 3);
+    CHECK(neoclr_gc_owned_roots_check_v1(&c, NULL, 0) == 3);
+    uint64_t strong = 0;
+    CHECK(!neoclr_gc_host_root_create_v1(&c, owner, &strong));
+    CHECK(!neoclr_gc_collect_v1(&c, NULL) && !cleaned);
+    CHECK(!neoclr_gc_collect_v1(&other, NULL) && !cleaned);
+    CHECK(!neoclr_gc_host_root_release_v1(&c, strong));
+    /* A tracing failure after mark begins must not run cleanup or sweep. */
+    void *bad = allocate(&c, 16, NEOCLR_GC_STRINGS);
+    CHECK(bad);
+    neoclr_probe_storage slot = {&bad, 8, 0};
+    neoclr_probe_frame frame = {.context = &c, .storage = &slot, .storage_count = 1};
+    CHECK(neoclr_gc_collect_v1(&c, &frame) == 3 && !cleaned && first.context == &c);
+    CHECK(!neoclr_gc_collect_v1(&c, NULL) && cleaned == 1 && !first.context && !c.text.used);
+    CHECK(neoclr_gc_resource_release_v1(&c, &first) == 3 && cleaned == 1);
+    CHECK(!neoclr_gc_entry_check_v1(&c));
+    CHECK(allocate(&c, 16, NEOCLR_GC_OBJECT) == owner);
+    CHECK(!neoclr_gc_collect_v1(&c, NULL) && cleaned == 1); /* no address resurrection */
+    owner = allocate(&c, 16, NEOCLR_GC_OBJECT);
+    CHECK(!neoclr_gc_resource_attach_v1(&c, owner, &first, &cleaned, count_cleanup));
+    CHECK(!neoclr_gc_resource_attach_v1(&c, owner, &second, &cleaned, count_cleanup));
+    CHECK(!neoclr_gc_resource_release_v1(&c, &first) && cleaned == 2);
+    CHECK(!neoclr_gc_collect_v1(&c, NULL) && cleaned == 3 && !second.context);
+    /* Independent per-context quotas; rejection never transfers ownership. */
+    neoclr_gc_resource records[1025] = {0};
+    owner = allocate(&c, 16, NEOCLR_GC_OBJECT);
+    alien = allocate(&other, 16, NEOCLR_GC_OBJECT);
+    CHECK(owner && alien);
+    for (unsigned i = 0; i < 1024; ++i)
+        CHECK(!neoclr_gc_resource_attach_v1(&c, owner, &records[i], &cleaned, count_cleanup));
+    CHECK(neoclr_gc_resource_attach_v1(&c, owner, &records[1024], &cleaned, count_cleanup) == 5);
+    CHECK(!records[1024].context && cleaned == 3);
+    CHECK(!neoclr_gc_resource_attach_v1(&other, alien, &records[1024], &cleaned, count_cleanup));
+    CHECK(!neoclr_gc_collect_v1(&c, NULL) && cleaned == 1027);
+    CHECK(records[1024].context == &other && !neoclr_gc_entry_check_v1(&c));
+    CHECK(!neoclr_gc_resource_release_v1(&other, &records[1024]) && cleaned == 1028);
+    CHECK(!neoclr_gc_entry_check_v1(&other));
+    owner = allocate(&c, 16, NEOCLR_GC_OBJECT);
+    owned_resource *dynamic = calloc(1, sizeof(*dynamic));
+    CHECK(owner && dynamic);
+    dynamic->cleaned = &cleaned;
+    CHECK(!neoclr_gc_resource_attach_v1(&c, owner, &dynamic->resource, dynamic, free_cleanup));
+    CHECK(!neoclr_gc_collect_v1(&c, NULL) && cleaned == 1029);
+    CHECK(!neoclr_gc_collect_v1(&c, NULL) && cleaned == 1029 && !neoclr_gc_entry_check_v1(&c));
+    return 0;
 }
 static int conditional_roots(void) {
     uint64_t storage[256] = {0}, foreign_storage[32] = {0};
@@ -394,5 +468,5 @@ int main(void) {
     if (conditional_status) return conditional_status;
     int owned_status = owned_parked_roots();
     if (owned_status) return owned_status;
-    return 0;
+    return resource_owners();
 }

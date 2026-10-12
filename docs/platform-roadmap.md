@@ -55,7 +55,9 @@ qualification now prepare that boundary. Private pollable close-notify shutdown
 also passes TLS 1.2/1.3 backpressure and lifecycle tests. A checked resource context
 now owns configurations/sessions behind non-reused IDs and bounded quotas; managed
 ownership and runtime-service bindings now work in the interpreter through
-heap-owned tokens. Native JIT/AOT bindings and managed SSL composition remain next. HTTP and SQL may share concepts/types
+heap-owned tokens. The native collector now has tested resource cleanup registrations
+and teardown guards; connecting the TLS adapter, native JIT/AOT bindings and managed
+SSL composition remain next. See [native lifetime evidence](experiments/shared-tls/native-lifetime-validation.json). HTTP and SQL may share concepts/types
 without requiring one native TLS backend; see the [backend boundary](shared-security-provider.md#shared-concepts-independent-backends). A bounded public System.Security.Cryptography facade
 now adds destination-buffer SHA256/HMACSHA256, tag verification and secure random
 fill; allocating/streaming overloads, socket/TLS adapters and certificate APIs

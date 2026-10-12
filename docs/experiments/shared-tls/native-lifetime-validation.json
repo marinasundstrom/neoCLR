@@ -1,0 +1,27 @@
+{
+  "date": "2026-10-12",
+  "platform": "macOS arm64",
+  "scope": "Native collector resource ownership hook; TLS adapter not yet connected",
+  "validation": {
+    "compiler": "Xcode clang, C11, -Wall -Wextra -Werror -DNEOCLR_NATIVE_GC -fsanitize=undefined",
+    "passed": [
+      "native-gc-test",
+      "host-roots-test",
+      "native-session-test",
+      "native-gc-pass-test"
+    ],
+    "cases": "invalid/foreign owners, rooted retention, explicit release, collection, failed tracing, duplicate attachment, address reuse, per-context quota, cleanup freeing its registration, reset guards",
+    "asan": "Not qualified: AddressSanitizer initializer stalled before test code; process stopped after sampling.",
+    "windows": "Pending Windows native host CI; compiler invocation now enables safepoint collection"
+  },
+  "source_sha256": {
+    "docs/experiments/aot-console/native-gc.c": "bc485cb03ef8a157ed9c2aef65416b3e3319ba0308b760fa3d118f9f96ae561f",
+    "docs/experiments/aot-console/native-gc.h": "b5d8a2181fd9dc3cc41cb4cb6b0f731456646ff8b1b25707dad04fe416734de9",
+    "docs/experiments/aot-console/native-gc-test.c": "d9259104b20480fecf1d5f0e0e71d6249bebaa2498cdc107534922c94397a0c9"
+  },
+  "remaining": [
+    "Native TLS service adapter and JIT/AOT lowering",
+    "Adapter teardown and pending-operation ownership",
+    "Raven certificate and SslStream APIs"
+  ]
+}

@@ -62,6 +62,43 @@ static int live_base(const neoclr_aot_text_arena *arena, const void *value) {
     }
     return 0;
 }
+static _Thread_local neoclr_gc_resource *resource_head;
+static _Thread_local int resource_cleanup_active;
+static void resource_cleanup(neoclr_gc_resource **link) {
+    neoclr_gc_resource *resource = *link;
+    void *state = resource->state;
+    void (*cleanup)(void *) = resource->cleanup;
+    *link = resource->next;
+    *resource = (neoclr_gc_resource){0};
+    resource_cleanup_active = 1;
+    cleanup(state);
+    resource_cleanup_active = 0;
+}
+int32_t neoclr_gc_resource_attach_v1(neoclr_aot_context *context, void *owner,
+    neoclr_gc_resource *resource, void *state, void (*cleanup)(void *)) {
+    if (resource_cleanup_active || !context || !owner || !resource || !cleanup ||
+        !blocks_valid(&context->text) || !live_base(&context->text, owner)) return 3;
+    unsigned count = 0;
+    for (neoclr_gc_resource *r = resource_head; r; r = r->next) {
+        if (r == resource) return 3;
+        count += r->context == context;
+    }
+    if (resource->context || resource->owner || resource->state || resource->cleanup || resource->next)
+        return 3;
+    if (count >= 1024) return NEOCLR_AOT_FAULT_NATIVE_MEMORY_LIMIT;
+    *resource = (neoclr_gc_resource){context, owner, state, cleanup, resource_head};
+    resource_head = resource;
+    return 0;
+}
+int32_t neoclr_gc_resource_release_v1(neoclr_aot_context *context, neoclr_gc_resource *resource) {
+    if (resource_cleanup_active || !context || !resource) return 3;
+    for (neoclr_gc_resource **link = &resource_head; *link; link = &(*link)->next)
+        if (*link == resource && (*link)->context == context) {
+            resource_cleanup(link);
+            return 0;
+        }
+    return 3;
+}
 static host_root *find_host_root(neoclr_aot_context *context, uint64_t handle) {
     if (!context || !handle) return NULL;
     for (host_root *root = host_head; root; root = root->next)
@@ -154,6 +191,8 @@ int32_t neoclr_gc_roots_park_owned_v1(neoclr_aot_context *context, void *owner,
     return 0;
 }
 int32_t neoclr_gc_entry_check_v1(neoclr_aot_context *context) {
+    for (neoclr_gc_resource *r = resource_head; r; r = r->next)
+        if (r->context == context) return NEOCLR_AOT_FAULT_RUNTIME_ERROR;
     if (!context) return NEOCLR_AOT_FAULT_RUNTIME_ERROR;
     for (const neoclr_parked_roots *p = neoclr_roots_parked_v1(); p; p = p->next) {
         if (p->owner_context == context) return NEOCLR_AOT_FAULT_RUNTIME_ERROR;
@@ -168,6 +207,8 @@ int32_t neoclr_gc_entry_check_v1(neoclr_aot_context *context) {
     return 0;
 }
 int32_t neoclr_gc_owned_roots_check_v1(neoclr_aot_context *context, const uint64_t *handles, uint32_t count) {
+    for (neoclr_gc_resource *r = resource_head; r; r = r->next)
+        if (r->context == context) return 3;
     if (!context || count > NEOCLR_GC_HOST_ROOT_LIMIT || (count && !handles)) return 3;
     for (const neoclr_parked_roots *p = neoclr_roots_parked_v1(); p; p = p->next) {
         if (p->owner_context == context) return 3;
@@ -286,12 +327,15 @@ int32_t neoclr_gc_collect_v1(neoclr_aot_context *context, const neoclr_probe_fra
 }
 static int32_t collect_conditional(neoclr_aot_context *context,
     const neoclr_probe_frame *head, neoclr_gc_conditional_root *conditional, uint32_t conditional_count) {
-    if (!context) return NEOCLR_AOT_FAULT_RUNTIME_ERROR;
+    if (!context || resource_cleanup_active) return NEOCLR_AOT_FAULT_RUNTIME_ERROR;
     neoclr_aot_text_arena *a = &context->text;
     block_index index;
     if (!build_index(a, &index)) return NEOCLR_AOT_FAULT_RUNTIME_ERROR;
     if (conditional_count > NEOCLR_GC_HOST_ROOT_LIMIT || (conditional_count && !conditional))
         return NEOCLR_AOT_FAULT_RUNTIME_ERROR;
+    for (neoclr_gc_resource *r = resource_head; r; r = r->next)
+        if (r->context == context && (!r->owner || !indexed_live_base(a, &index, r->owner)))
+            return NEOCLR_AOT_FAULT_RUNTIME_ERROR;
     for (uint32_t i = 0; i < conditional_count; i++)
         if ((!conditional[i].owner && conditional[i].value) ||
             !indexed_live_base(a, &index, conditional[i].owner) || !indexed_live_base(a, &index, conditional[i].value))
@@ -392,6 +436,13 @@ static int32_t collect_conditional(neoclr_aot_context *context,
                 mark_frames(context, &index, p->head, &pending);
             }
         if (!pending) break;
+    }
+    for (neoclr_gc_resource **link = &resource_head; *link;) {
+        neoclr_gc_resource *r = *link;
+        if (r->context == context && !(((const block *)r->owner - 1)->state & MARKED))
+            resource_cleanup(link);
+        else
+            link = &r->next;
     }
     for (host_root *root = host_head; root; root = root->next)
         if (root->context == context && root->conditional && !root->expired &&
