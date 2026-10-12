@@ -15981,3 +15981,20 @@ or runtime-await default switch was performed.
   artifacts. The combined bundle repeats all 54 stream executions and eleven HTTP
   cases successfully, with 22 website tests and two snapshot checks. Fast-forwarding
   targets neoCLR main and Raven's neoCLR branch; Raven main stays separate.
+
+## 2026-10-12 — Shared security concepts without forced backend reuse
+
+- **Author request:** continue shared managed SSL transport and certificate foundations,
+  keep macOS/Windows behavior consistent and commit each slice.
+- **Author clarification:** HTTP and SQL can expose the same concepts/types, but
+  “each backing native code might handle it differently”; sharing should not be forced.
+- **Assistant response:** distinguish managed certificate/trust/authentication contracts
+  from concrete transport implementations. Shared Rustls is an option, not a required
+  SQL transport base; unsupported options must be reported rather than ignored.
+- **Action/outcome:** added typed private certificate/configuration errors, preserved
+  existing host entry points and qualified invalid/mismatched credentials plus
+  untrusted/expired/future peer rejection. Thirteen provider tests pass locally;
+  the existing macOS/Windows CI command includes these cases.
+- **Open:** Windows execution of new cases, managed ownership/SSL composition and
+  SQL adapters. [Design and evidence](shared-security-provider.md#certificate-configuration-foundation-development-2026-10-12)
+  distinguish this prerequisite from a completed managed SSL API.

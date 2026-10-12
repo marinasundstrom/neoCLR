@@ -91,7 +91,69 @@ unsafe fn bytes<'a>(data: *const u8, count: u32) -> Option<&'a [u8]> {
     Some(unsafe { std::slice::from_raw_parts(data, count as usize) })
 }
 
-/// Empty ALPN selects no application protocol. Otherwise one 1..255-byte identifier.
+/// Creates an owned configuration or returns a typed private status. Clears output
+/// before validation; the output slot must be writable and must not alias inputs.
+#[unsafe(no_mangle)]
+pub unsafe extern "C" fn neoclr_tls_server_config_create_pem(
+    cert: *const u8,
+    cert_count: u32,
+    key: *const u8,
+    key_count: u32,
+    alpn: *const u8,
+    alpn_count: u32,
+    output: *mut *mut c_void,
+) -> i32 {
+    use configuration::ConfigurationError;
+    if output.is_null() {
+        return ConfigurationError::InvalidInput as i32;
+    }
+    unsafe { *output = std::ptr::null_mut() };
+    let create = || {
+        configuration::server(
+            unsafe { bytes(cert, cert_count) }.ok_or(ConfigurationError::InvalidInput)?,
+            unsafe { bytes(key, key_count) }.ok_or(ConfigurationError::InvalidInput)?,
+            unsafe { bytes(alpn, alpn_count) }.ok_or(ConfigurationError::InvalidInput)?,
+        )
+    };
+    match create() {
+        Ok(config) => {
+            unsafe { *output = Box::into_raw(Box::new(Arc::new(config))).cast() };
+            0
+        }
+        Err(error) => error as i32,
+    }
+}
+
+/// Explicit trust anchors only; output and ownership follow the server constructor.
+#[unsafe(no_mangle)]
+pub unsafe extern "C" fn neoclr_tls_client_config_create_pem(
+    roots: *const u8,
+    roots_count: u32,
+    alpn: *const u8,
+    alpn_count: u32,
+    output: *mut *mut c_void,
+) -> i32 {
+    use configuration::ConfigurationError;
+    if output.is_null() {
+        return ConfigurationError::InvalidInput as i32;
+    }
+    unsafe { *output = std::ptr::null_mut() };
+    let create = || {
+        configuration::client(
+            unsafe { bytes(roots, roots_count) }.ok_or(ConfigurationError::InvalidInput)?,
+            unsafe { bytes(alpn, alpn_count) }.ok_or(ConfigurationError::InvalidInput)?,
+        )
+    };
+    match create() {
+        Ok(config) => {
+            unsafe { *output = Box::into_raw(Box::new(Arc::new(config))).cast() };
+            0
+        }
+        Err(error) => error as i32,
+    }
+}
+
+/// Compatibility entry point for existing hosts. Empty ALPN is protocol-neutral.
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn neoclr_tls_server_config_from_pem(
     cert: *const u8,
@@ -101,21 +163,21 @@ pub unsafe extern "C" fn neoclr_tls_server_config_from_pem(
     alpn: *const u8,
     alpn_count: u32,
 ) -> *mut c_void {
-    let create = || {
-        configuration::server(
-            unsafe { bytes(cert, cert_count) }?,
-            unsafe { bytes(key, key_count) }?,
-            unsafe { bytes(alpn, alpn_count) }?,
+    let mut output = std::ptr::null_mut();
+    unsafe {
+        neoclr_tls_server_config_create_pem(
+            cert,
+            cert_count,
+            key,
+            key_count,
+            alpn,
+            alpn_count,
+            &mut output,
         )
-        .ok()
-        .map(Arc::new)
     };
-    create().map_or(std::ptr::null_mut(), |config| {
-        Box::into_raw(Box::new(config)).cast()
-    })
+    output
 }
 
-/// Explicit PEM trust anchors only: no ambient store, insecure verifier or client identity.
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn neoclr_tls_client_config_from_pem(
     roots: *const u8,
@@ -123,16 +185,11 @@ pub unsafe extern "C" fn neoclr_tls_client_config_from_pem(
     alpn: *const u8,
     alpn_count: u32,
 ) -> *mut c_void {
-    let create = || {
-        configuration::client(unsafe { bytes(roots, roots_count) }?, unsafe {
-            bytes(alpn, alpn_count)
-        }?)
-        .ok()
-        .map(Arc::new)
+    let mut output = std::ptr::null_mut();
+    unsafe {
+        neoclr_tls_client_config_create_pem(roots, roots_count, alpn, alpn_count, &mut output)
     };
-    create().map_or(std::ptr::null_mut(), |config| {
-        Box::into_raw(Box::new(config)).cast()
-    })
+    output
 }
 
 #[unsafe(no_mangle)]
@@ -452,24 +509,42 @@ mod tests {
         b.wire.incoming.extend(a.wire.outgoing.drain(..));
     }
     fn pair(name: &str, protocol: &[u8]) -> (Endpoint, Endpoint) {
+        pair_with_config(name, protocol, |_| {})
+    }
+    fn pair_with_config(
+        name: &str,
+        protocol: &[u8],
+        configure: impl FnOnce(&mut ClientConfig),
+    ) -> (Endpoint, Endpoint) {
         let cert = std::fs::read(std::env::var("NEOCLR_HTTPS_CERTIFICATE").unwrap()).unwrap();
         let key = std::fs::read(std::env::var("NEOCLR_HTTPS_PRIVATE_KEY").unwrap()).unwrap();
         unsafe {
-            let server = neoclr_tls_server_config_from_pem(
-                cert.as_ptr(),
-                cert.len() as u32,
-                key.as_ptr(),
-                key.len() as u32,
-                protocol.as_ptr(),
-                protocol.len() as u32,
+            let mut server = std::ptr::null_mut();
+            assert_eq!(
+                neoclr_tls_server_config_create_pem(
+                    cert.as_ptr(),
+                    cert.len() as u32,
+                    key.as_ptr(),
+                    key.len() as u32,
+                    protocol.as_ptr(),
+                    protocol.len() as u32,
+                    &mut server,
+                ),
+                0
             );
-            let client = neoclr_tls_client_config_from_pem(
-                cert.as_ptr(),
-                cert.len() as u32,
-                protocol.as_ptr(),
-                protocol.len() as u32,
+            let mut client = std::ptr::null_mut();
+            assert_eq!(
+                neoclr_tls_client_config_create_pem(
+                    cert.as_ptr(),
+                    cert.len() as u32,
+                    protocol.as_ptr(),
+                    protocol.len() as u32,
+                    &mut client,
+                ),
+                0
             );
             assert!(!server.is_null() && !client.is_null());
+            configure(Arc::get_mut(&mut *client.cast::<Arc<ClientConfig>>()).unwrap());
             let a = Endpoint::new(neoclr_tls_session_new(server));
             let b = Endpoint::new(neoclr_tls_client_session_new(
                 client,
@@ -563,6 +638,145 @@ mod tests {
             assert!(neoclr_tls_server_config_from_pem(null, 0, null, 0, null, 0).is_null());
             assert!(neoclr_tls_client_session_new(std::ptr::null_mut(), null, 0).is_null());
             assert!(bytes(b"x".as_ptr(), (LIMIT + 1) as u32).is_none());
+        }
+    }
+
+    #[test]
+    fn configuration_status_clears_output_on_failure() {
+        use configuration::ConfigurationError as Error;
+        let null = std::ptr::null();
+        // A non-null sentinel detects stale handle publication, never dereferenced.
+        let mut output = std::ptr::dangling_mut::<c_void>();
+        unsafe {
+            assert_eq!(
+                neoclr_tls_client_config_create_pem(null, 1, null, 0, &mut output),
+                Error::InvalidInput as i32
+            );
+            assert!(output.is_null());
+            assert_eq!(
+                neoclr_tls_client_config_create_pem(null, 0, null, 0, &mut output),
+                Error::InvalidTrustAnchor as i32
+            );
+            assert!(output.is_null());
+            assert_eq!(
+                neoclr_tls_server_config_create_pem(null, 0, null, 0, null, 0, &mut output),
+                Error::InvalidCertificate as i32
+            );
+            assert!(output.is_null());
+            let protocol = [b'x'; 256];
+            assert_eq!(
+                neoclr_tls_client_config_create_pem(null, 0, protocol.as_ptr(), 256, &mut output),
+                Error::InvalidProtocol as i32
+            );
+            assert!(output.is_null());
+            assert_eq!(
+                neoclr_tls_client_config_create_pem(null, 0, null, 0, std::ptr::null_mut()),
+                Error::InvalidInput as i32
+            );
+            assert_eq!(
+                neoclr_tls_server_config_create_pem(
+                    null,
+                    0,
+                    null,
+                    0,
+                    null,
+                    0,
+                    std::ptr::null_mut()
+                ),
+                Error::InvalidInput as i32
+            );
+        }
+    }
+
+    #[test]
+    #[ignore = "run by HTTPS validation with ephemeral certificate/key paths and OpenSSL"]
+    fn certificate_credentials_report_invalid_and_mismatched_keys() {
+        use configuration::ConfigurationError as Error;
+        let cert = std::fs::read(std::env::var("NEOCLR_HTTPS_CERTIFICATE").unwrap()).unwrap();
+        let key = std::fs::read(std::env::var("NEOCLR_HTTPS_PRIVATE_KEY").unwrap()).unwrap();
+        let other = std::process::Command::new("openssl")
+            .args([
+                "genpkey",
+                "-algorithm",
+                "RSA",
+                "-pkeyopt",
+                "rsa_keygen_bits:2048",
+            ])
+            .output()
+            .expect("OpenSSL fixture key generation");
+        assert!(
+            other.status.success(),
+            "OpenSSL fixture key generation failed"
+        );
+        for (credential, expected) in [
+            (&b"not a key"[..], Error::InvalidPrivateKey),
+            (&other.stdout[..], Error::KeyMismatch),
+        ] {
+            let mut output = std::ptr::dangling_mut::<c_void>();
+            let result = unsafe {
+                neoclr_tls_server_config_create_pem(
+                    cert.as_ptr(),
+                    cert.len() as u32,
+                    credential.as_ptr(),
+                    credential.len() as u32,
+                    std::ptr::null(),
+                    0,
+                    &mut output,
+                )
+            };
+            assert_eq!(result, expected as i32);
+            assert!(output.is_null());
+        }
+        let invalid_der = b"-----BEGIN CERTIFICATE-----\nAQID\n-----END CERTIFICATE-----\n";
+        assert!(matches!(
+            configuration::server(invalid_der, &key, b""),
+            Err(Error::InvalidCertificate)
+        ));
+        assert!(matches!(
+            configuration::client(invalid_der, b""),
+            Err(Error::InvalidTrustAnchor)
+        ));
+        // Loading credentials validates their structure/key match, not peer trust.
+        assert!(configuration::server(&cert, &key, b"").is_ok());
+    }
+
+    #[derive(Debug)]
+    struct FixedTime(u64);
+    impl rustls::time_provider::TimeProvider for FixedTime {
+        fn current_time(&self) -> Option<rustls::pki_types::UnixTime> {
+            Some(rustls::pki_types::UnixTime::since_unix_epoch(
+                std::time::Duration::from_secs(self.0),
+            ))
+        }
+    }
+
+    #[test]
+    #[ignore = "run by HTTPS validation with ephemeral certificate/key paths"]
+    fn certificate_verification_rejects_untrusted_expired_and_future_peers() {
+        for scenario in 0..3 {
+            let (mut server, mut client) = pair_with_config("localhost", b"", |config| {
+                match scenario {
+                    0 => {
+                        *config = ClientConfig::builder_with_provider(Arc::new(
+                            rustls::crypto::ring::default_provider(),
+                        ))
+                        .with_safe_default_protocol_versions()
+                        .unwrap()
+                        .with_root_certificates(rustls::RootCertStore::empty())
+                        .with_no_client_auth()
+                    }
+                    1 => config.time_provider = Arc::new(FixedTime(4102444800)), // 2100: fixture expired
+                    _ => config.time_provider = Arc::new(FixedTime(0)), // 1970: fixture not yet valid
+                }
+            });
+            assert!(!authenticate(&mut server, &mut client));
+            assert_eq!(client.handshake(), -2, "rejection stays terminal");
+            assert_eq!(client.transfer(&mut [0; 8], false), -2);
+            assert_eq!(client.transfer(&mut [1; 8], true), -2);
+            // Failure is session-local; fresh valid sessions still exchange data.
+            let (mut valid_server, mut valid_client) = pair("localhost", b"");
+            assert!(authenticate(&mut valid_server, &mut valid_client));
+            deliver(&mut valid_client, &mut valid_server);
         }
     }
 

@@ -48,7 +48,9 @@ TLS dependencies. Prepared JIT bundles now include the provider, with private
 cryptography cases passing through default CLI execution. Windows uses the pending
 CI gates. Source AOT projects now link the provider on demand, with a Raven consumer
 qualified in all three local modes. Packaged build kits and managed
-SSL composition remain next. A bounded public System.Security.Cryptography facade
+SSL composition remain next. Typed private certificate/configuration errors and rejection
+qualification now prepare that boundary. HTTP and SQL may share concepts/types
+without requiring one native TLS backend; see the [backend boundary](shared-security-provider.md#shared-concepts-independent-backends). A bounded public System.Security.Cryptography facade
 now adds destination-buffer SHA256/HMACSHA256, tag verification and secure random
 fill; allocating/streaming overloads, socket/TLS adapters and certificate APIs
 remain open. Compare .NET,

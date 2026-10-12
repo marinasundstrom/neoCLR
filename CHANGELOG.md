@@ -8,6 +8,14 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-12
 
+- Add typed private TLS configuration errors for invalid certificate/key/trust,
+  key mismatch, ALPN and provider setup; clear output handles on failure and retain
+  the existing HTTPS ABI. Qualify credential rejection, untrusted/expired/future
+  peers, terminal failed sessions and recovery alongside transport ownership tests.
+  All thirteen provider tests pass on macOS; Windows uses the existing CI gate.
+  Document shared HTTP/SQL security concepts without forcing a common native backend;
+  managed SSL/certificate ownership and handshake diagnostics remain open.
+
 - Add explicit JIT/AOT cryptography bindings and a shared native byte-array adapter,
   preserving initialized-input checks, aliased outputs, short destinations and
   terminal Fault semantics. Twelve identical cases pass in interpreter/JIT/AOT

@@ -1,0 +1,26 @@
+{
+  "date": "2026-10-12",
+  "passed": true,
+  "platform": "macOS-27.0-arm64-arm-64bit",
+  "command": "python3 scripts/test-native-security.py",
+  "toolchain": "Xcode 26.2 SDK selected explicitly to avoid the local CommandLineTools SDK/linker mismatch",
+  "tests": {
+    "tls": 8,
+    "nativeCryptography": 4,
+    "safeProvider": 1
+  },
+  "openssl": "LibreSSL 3.3.6",
+  "sourcesSha256": {
+    "tools/native-tls/src/configuration.rs": "bdc31ba723370d7f9d84e4ce2f9f0ffee8655a3446e5d205b6fbceeff5291179",
+    "tools/native-tls/src/lib.rs": "400a7760c3af6ecc52afd6179201b37710a59ea78a8e342f9425b0b6ebd25f33",
+    "docs/experiments/https-server/native-tls.h": "c7eb92d89e2240dec1b6cf9655486e0200a6033d48a8c1b0098bf54a9fdde987",
+    "scripts/test-native-security.py": "4f6b6c3d0b71402272be9f6a7be15969b1e654b180db59e6732569bfe43b4c2e",
+    "tools/native-tls/Cargo.lock": "cbc61b43fa2808dfb2b66e4dd1aedae56d23426edf8050344acd65396ba6a3d8"
+  },
+  "limitations": [
+    "Windows runs the same existing CI command; execution of these new cases is pending.",
+    "Provider-level foundation, not managed SslStream or managed certificate objects.",
+    "Handshake errors remain terminal and unclassified.",
+    "No OS trust store, client certificate authentication, revocation or secret-zeroization guarantee."
+  ]
+}
