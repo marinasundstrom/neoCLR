@@ -8,6 +8,15 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-12
 
+- On codex/native-function-pointers, bind native addresses to structural Function
+  values through the interpreter/neoIL function.bind.native instruction. Share ABI
+  validation/marshalling with named imports, retain loaded library owners, reject
+  null/tracked data addresses and preserve trusted-execution checks. Add pointer
+  factory, marshalling, identity, lifetime and binary round-trip coverage. Record
+  the author's AOT import/export sidecar direction; Raven authoring, native backend
+  lowering and export stubs remain unimplemented. New opcodes require a matching
+  runtime; existing named-import metadata is unchanged.
+
 - Record function-pointer mapping as the next proposed FFI slice, distinguishing
   native-address invocation from managed callbacks and their lifetime obligations.
   No pointer-call or callback implementation is claimed.

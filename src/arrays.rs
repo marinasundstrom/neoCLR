@@ -266,14 +266,15 @@ mod tests {
             object_view: false,
             identity: std::sync::Arc::new(()),
             ty: Type::from_name("Callback"),
-            target: crate::metadata::FunctionRef {
+            target: Some(crate::metadata::FunctionRef {
                 definition: None,
                 name: "Receiver.Invoke".into(),
                 owner: None,
                 instance: true,
                 generic_arguments: vec![],
                 parameters: vec![],
-            },
+            }),
+            native: None,
             receiver: Some(Box::new(nested_payload())),
         });
         let limits = Limits::default();

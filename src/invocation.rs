@@ -130,7 +130,8 @@ mod tests {
             object_view: false,
             identity: Arc::new(()),
             ty: crate::assembler::parse_type("fn<Void>").unwrap(),
-            target: crate::assembler::parse_function_ref("Ready()").unwrap(),
+            target: Some(crate::assembler::parse_function_ref("Ready()").unwrap()),
+            native: None,
             receiver: None,
         });
         let mut dispatch = invocation.dispatch.lock().unwrap();
@@ -285,8 +286,9 @@ mod dispatch_tests {
                 object_view: false,
                 identity: std::sync::Arc::new(()),
                 ty: crate::assembler::parse_type("fn<Void>").unwrap(),
-                target: crate::assembler::parse_function_ref("instance Capture::Callback()")
-                    .unwrap(),
+                target: Some(crate::assembler::parse_function_ref("instance Capture::Callback()")
+                    .unwrap()),
+                native: None,
                 receiver: Some(Box::new(object(&mut heap))),
             });
             let Value::Erased(listener) = dispatch

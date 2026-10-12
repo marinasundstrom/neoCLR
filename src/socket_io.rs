@@ -1012,7 +1012,8 @@ mod tests {
             object_view: false,
             identity: std::sync::Arc::new(()),
             ty: crate::assembler::parse_type("fn<Void>").unwrap(),
-            target: crate::assembler::parse_function_ref("Ready()").unwrap(),
+            target: Some(crate::assembler::parse_function_ref("Ready()").unwrap()),
+            native: None,
             receiver: None,
         })
     }

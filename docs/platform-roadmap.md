@@ -13,6 +13,15 @@ contracts and external interoperability; interpreter qualification is recorded s
 Automatic HTTP encoding/negotiation and incremental decoding remain follow-through;
 this author-directed slice does not reorder the active milestone.
 
+**Import/export and AOT sidecar direction (2026-10-12):** the author clarifies that
+neoCLR uses direct structural function signatures, not delegates, and targets AOT
+code artifacts with sidecar public-member and ABI mapping metadata consumable by
+compatible runtimes and native tools. The [contract design](design/native-import-export-contract.md)
+separates public type descriptions from native layouts/entry stubs and records
+versioning, ownership and runtime-entry requirements. The `codex/native-function-pointers`
+branch supplies the first interpreter address-binding experiment; source compiler
+mapping, JIT/AOT, export generation and a stable sidecar remain open.
+
 **Foreign function interface direction (2026-10-12):** the author requests platform
 invocation/FFI beyond a Windows-oriented interface, retains `extern` plus attributes,
 and calls for explicit calling conventions and individual value marshalling. The

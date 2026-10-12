@@ -17,7 +17,7 @@ pub(super) fn submit(
     if !contract.parameters.is_empty() {
         return Err(Fault::new("task callback must have no parameters"));
     }
-    let function = resolve(&module, &binding.target)?;
+    let function = resolve(&module, binding.managed_target()?)?;
     crate::function_objects::compatible(&contract, &function)?;
     options.limits = invocation.limits;
     let worker_invocation = invocation.clone();

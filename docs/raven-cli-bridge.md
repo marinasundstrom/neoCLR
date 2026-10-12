@@ -9135,3 +9135,18 @@ wire representation or Runtime Contract option is introduced. Native metadata ow
 this identity; CLI projection and service admission remain unchanged. The focused
 foreign-import probe now verifies an unbound runtime service without resolving or
 executing it, alongside existing foreign and ordinary managed readback cases.
+
+## Native-address Function experiment (2026-10-12)
+
+The runtime branch codex/native-function-pointers admits function.bind.native with
+a structural Function shape and NativeAbi descriptor. It consumes a native pointer;
+no delegate type or synthetic managed method identity is created. The existing named
+import descriptor is unchanged. New instruction records require a matching runtime.
+
+This slice uses runtime JSON/NEOX and neoIL directly. Raven and the independent C#
+metadata API do not yet emit this instruction, and no CLI projection can represent
+a live address binding. Runtime Contract configuration is unchanged. Interpreter
+validation and native fixture execution own current evidence; compiler mapping and
+shared JIT/AOT lowering remain subsequent work on appropriately isolated branches.
+The proposed AOT sidecar will describe export symbols/signatures/layouts, not serialize
+process-specific live addresses. See [the import/export design](design/native-import-export-contract.md).

@@ -151,7 +151,7 @@ impl Workers {
         if callback.receiver.is_some() {
             return Err(Fault::new("Worker callbacks cannot capture guest state"));
         }
-        let function = crate::vm::resolve(module, &callback.target)?;
+        let function = crate::vm::resolve(module, callback.managed_target()?)?;
         if function.instance
             || function.parameters != [crate::metadata::Type::String]
             || function.returns != crate::metadata::Type::String

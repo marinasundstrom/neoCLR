@@ -408,3 +408,121 @@ fn per_slot_marshalling_preserves_boolean_width_and_mixed_encodings() {
         .calling_convention = neoclr::metadata::CallingConvention::System;
     assert_eq!(fixture.execute(&system).unwrap().value, Value::Int32(42));
 }
+
+#[test]
+fn returned_native_pointer_binds_to_structural_function() {
+    let fixture = Fixture::new();
+    let source = include_str!("../examples/foreign_function_pointer.neoil")
+        .replace("\"./target/native/neoclr_sample\"", &fixture.import);
+    let module = assemble(&source).unwrap();
+    let module = load(&serde_json::to_string(&module).unwrap()).unwrap();
+    let image = neoclr::metadata_container::write_module(&module).unwrap();
+    let module = neoclr::metadata_container::load_envelope(&image).unwrap();
+    assert_eq!(fixture.execute(&module).unwrap().value, Value::Int32(42));
+}
+
+#[test]
+fn native_function_bindings_share_string_and_boolean_marshalling() {
+    let fixture = Fixture::new();
+    for (symbol, shape, parameters, abi, args, returns, expected) in [
+        (
+            "neoclr_get_utf8_pair",
+            "fn<String,Int32,String,Int32>",
+            "String,Int32,String",
+            r#"{"calling_convention":"Cdecl","string_marshalling":"Utf16","parameter_marshalling":{"0":"Utf8","2":"Utf8"}}"#,
+            "ldstr \"hé🦀\"\nldc.i4 41\nldstr \"世界\"",
+            "Int32",
+            Value::Int32(42),
+        ),
+        (
+            "neoclr_get_bool8",
+            "fn<Boolean,Boolean>",
+            "Boolean",
+            r#"{"calling_convention":"System","parameter_marshalling":{"0":"Bool8"},"return_marshalling":"Bool8"}"#,
+            "ldc.bool true",
+            "Boolean",
+            Value::Boolean(true),
+        ),
+    ] {
+        let source = format!(
+            ".module Test\n.entry Main\n.function Factory() -> Void*\n.foreign {} {symbol:?} cdecl\n.end\n.function Main() -> {returns}\ncall Factory()\nfunction.bind.native {shape} = {abi}\n{args}\ncall instance {shape}::Invoke({parameters})\nret\n.end",
+            fixture.import
+        );
+        assert_eq!(
+            fixture.execute(&assemble(&source).unwrap()).unwrap().value,
+            expected
+        );
+    }
+}
+
+#[test]
+fn native_function_binding_rejects_null_data_and_untrusted_execution() {
+    let fixture = Fixture::new();
+    for (pointer, message) in [
+        ("ptr.null Void", "null native function pointer"),
+        ("ldc.i4 1\nheap.alloc Int32", "guest data storage"),
+    ] {
+        let source = format!(
+            ".module Test\n.entry Main\n.function Main() -> fn<Int32>\n{pointer}\nfunction.bind.native fn<Int32> = {{\"calling_convention\":\"Cdecl\"}}\nret\n.end"
+        );
+        let module = assemble(&source).unwrap();
+        assert!(
+            run(&module, Limits::default())
+                .unwrap_err()
+                .message
+                .contains("trusted")
+        );
+        let error = fixture.execute(&module).unwrap_err();
+        assert!(error.message.contains(message), "{error:?}");
+    }
+    for (shape, abi) in [
+        ("fn<Boolean>", r#"{"calling_convention":"Cdecl"}"#),
+        (
+            "fn<String>",
+            r#"{"calling_convention":"Cdecl","return_marshalling":"Utf8"}"#,
+        ),
+        (
+            "fn<Int32>",
+            r#"{"calling_convention":"Cdecl","parameter_marshalling":{"0":"Bool8"}}"#,
+        ),
+        ("Int32", r#"{"calling_convention":"Cdecl"}"#),
+    ] {
+        assert!(assemble(&format!(".module Bad\n.function Main() -> {shape}\nptr.null Void\nfunction.bind.native {shape} = {abi}\nret\n.end")).is_err());
+    }
+}
+
+#[test]
+fn native_function_copies_share_identity_and_have_no_managed_target() {
+    let fixture = Fixture::new();
+    let prefix = format!(
+        ".module Test\n.entry Main\n.function Factory() -> Void*\n.foreign {} \"neoclr_get_add\" cdecl\n.end\n",
+        fixture.import
+    );
+    let binding = "call Factory()\nfunction.bind.native fn<Int32,Int32,Int32> = {\"calling_convention\":\"Cdecl\"}";
+    let equal = assemble(&format!(
+        "{prefix}.function Main() -> Boolean\n{binding}\ndup\nceq\nret\n.end"
+    ))
+    .unwrap();
+    assert_eq!(fixture.execute(&equal).unwrap().value, Value::Boolean(true));
+    let distinct = assemble(&format!(
+        "{prefix}.function Main() -> Boolean\n{binding}\n{binding}\nceq\nret\n.end"
+    ))
+    .unwrap();
+    assert_eq!(
+        fixture.execute(&distinct).unwrap().value,
+        Value::Boolean(false)
+    );
+    let name = assemble(&format!("{prefix}.function Main() -> String\n{binding}\ncall instance fn<Int32,Int32,Int32>::ToString()\nret\n.end")).unwrap();
+    assert_eq!(
+        fixture.execute(&name).unwrap().value,
+        Value::String("native Function".into())
+    );
+    let target = assemble(&format!("{prefix}.function Main() -> Int32\n{binding}\ncall instance fn<Int32,Int32,Int32>::get_Function()\npop\nldc.i4 0\nret\n.end")).unwrap();
+    assert!(
+        fixture
+            .execute(&target)
+            .unwrap_err()
+            .message
+            .contains("no managed method target")
+    );
+}

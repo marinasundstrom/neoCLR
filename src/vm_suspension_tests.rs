@@ -402,10 +402,11 @@ ret
             object_view: false,
             identity: std::sync::Arc::new(()),
             ty: crate::assembler::parse_type("fn<Void>").unwrap(),
-            target: crate::assembler::parse_function_ref(
+            target: Some(crate::assembler::parse_function_ref(
                 "instance System.Concurrency.Tasks.TaskQueue::Drain()",
             )
-            .unwrap(),
+            .unwrap()),
+            native: None,
             receiver: Some(Box::new(queue.clone())),
         });
         let Value::Erased(listener) = state

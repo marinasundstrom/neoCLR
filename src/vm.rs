@@ -1049,6 +1049,10 @@ fn validate_linked_indexed(module: &Module) -> Result<(), Fault> {
                         "cannot rebind or take the address of a managed reference parameter",
                     ));
                 }
+                Op::BindNativeFunction { function_type, abi } => {
+                    check(function_type)?;
+                    crate::interop::indirect_contract(module, function_type, abi)?;
+                }
                 Op::BindFunction {
                     function_type,
                     target,
@@ -2399,7 +2403,7 @@ fn runtime_submission_frame(module: &Module, callback: &Value) -> Result<Frame, 
         return Err(Fault::new("Invalid scheduler callback"));
     };
     let contract = crate::function_objects::contract(module, &binding.ty)?;
-    let callee = resolve(module, &binding.target)?;
+    let callee = resolve(module, binding.managed_target()?)?;
     crate::function_objects::compatible(&contract, &callee)?;
     callback.ensure_heap_references()?;
     let args = binding.receiver.iter().map(|receiver| (**receiver).clone()).collect();
@@ -3219,7 +3223,6 @@ fn interpret_instructions_with_dispatch(
                     if &binding.ty != ty {
                         return Err(Fault::new("Function shape mismatch"));
                     }
-                    let callee = resolve(module, &binding.target)?;
                     if let Some(value) = crate::function_objects::object_dispatch(
                         module,
                         &binding,
@@ -3229,6 +3232,20 @@ fn interpret_instructions_with_dispatch(
                         frame.stack.push(value);
                         return Ok(None);
                     }
+                    if signature.name == "$Function.Invoke" {
+                        if let Some(call) = &binding.native {
+                            if task_atomic::active(module, frames) {
+                                return Err(Fault::new(
+                                    "Task mutation cannot invoke a native Function",
+                                ));
+                            }
+                            host_call = Some(HostCall::indirect(
+                                call.clone(), args, executing_assembly.clone(), context.clone(), pc,
+                            ));
+                            return Ok(None);
+                        }
+                    }
+                    let callee = resolve(module, binding.managed_target()?)?;
                     if signature.name == "$Function.get_Function" {
                         let value =
                             crate::reflection::bound_function(module, &binding, &callee, &limits)?;
@@ -3899,6 +3916,18 @@ fn interpret_instructions_with_dispatch(
                         );
                     }
                     frames.push(child);
+                }
+                Op::BindNativeFunction { function_type, abi } => {
+                    let Value::Pointer(pointer) = frame.pop()? else {
+                        return Err(Fault::new("native binding requires a function pointer"));
+                    };
+                    let libraries = invocation.native_libraries.lock()
+                        .expect("native library lock poisoned");
+                    let libraries = libraries.as_ref().ok_or_else(|| Fault::new(
+                        "native Function binding requires trusted run_with_native execution",
+                    ))?;
+                    let call = libraries.bind_pointer(module, function_type, abi, &pointer)?;
+                    frame.stack.push(crate::function_objects::bind_native(function_type, call));
                 }
                 Op::BindFunction {
                     function_type,
@@ -5556,7 +5585,7 @@ fn debug_value(
         Value::Function(binding) => {
             result.value = debug_text(&format!(
                 "Function {}<{:?}>",
-                binding.target.name, binding.target.generic_arguments
+                binding.target.as_ref().map_or("<native>", |t| t.name.as_str()), binding.target.as_ref().map(|t| &t.generic_arguments)
             ));
             if let Some(receiver) = &binding.receiver {
                 result.children.push((

@@ -10,8 +10,28 @@ pub struct FunctionObject {
     pub(crate) ty: Type,
     pub(crate) object_view: bool,
     pub(crate) identity: std::sync::Arc<()>,
-    pub(crate) target: FunctionRef,
+    pub(crate) target: Option<FunctionRef>,
+    pub(crate) native: Option<std::sync::Arc<crate::interop::NativeCall>>,
     pub(crate) receiver: Option<Box<Value>>,
+}
+
+impl FunctionObject {
+    pub(crate) fn managed_target(&self) -> Result<&FunctionRef, Fault> {
+        self.target
+            .as_ref()
+            .ok_or_else(|| Fault::new("native Function has no managed method target"))
+    }
+}
+
+pub(crate) fn bind_native(ty: &Type, call: crate::interop::NativeCall) -> Value {
+    Value::Function(FunctionObject {
+        ty: ty.clone(),
+        object_view: false,
+        identity: std::sync::Arc::new(()),
+        target: None,
+        receiver: None,
+        native: Some(std::sync::Arc::new(call)),
+    })
 }
 
 impl PartialEq for FunctionObject {
@@ -24,6 +44,11 @@ impl PartialEq for FunctionObject {
         }
         self.ty == other.ty
             && self.target == other.target
+            && match (&self.native, &other.native) {
+                (None, None) => true,
+                (Some(a), Some(b)) => std::sync::Arc::ptr_eq(a, b),
+                _ => false,
+            }
             && match (&self.receiver, &other.receiver) {
                 (None, None) => true,
                 (Some(a), Some(b)) => match (a.as_ref(), b.as_ref()) {
@@ -125,6 +150,9 @@ pub(crate) fn value_hash(binding: &FunctionObject) -> i32 {
     let mut hash = std::collections::hash_map::DefaultHasher::new();
     binding.ty.hash(&mut hash);
     binding.target.hash(&mut hash);
+    if let Some(native) = &binding.native {
+        std::sync::Arc::as_ptr(native).hash(&mut hash);
+    }
     let receiver = binding.receiver.as_deref().and_then(|value| match value {
         Value::ObjectReference(object) => Some(object.allocation_id()),
         Value::SlotReference(slot) | Value::SlotInterface { receiver: slot, .. } => {
@@ -144,9 +172,15 @@ pub(crate) fn object_dispatch(
     args: &[Value],
 ) -> Result<Option<Value>, Fault> {
     Ok(match (name, args) {
-        ("ToString", []) => Some(Value::String(
-            target_display(module, &crate::vm::resolve(module, &binding.target)?)?.into(),
-        )),
+        ("ToString", []) => Some(Value::String(if binding.native.is_some() {
+            "native Function".into()
+        } else {
+            target_display(
+                module,
+                &crate::vm::resolve(module, binding.managed_target()?)?,
+            )?
+            .into()
+        })),
         ("GetHashCode", []) => Some(Value::Int32(value_hash(binding))),
         ("Equals", [other]) => Some(Value::Boolean(
             matches!(other, Value::Function(other) if binding == other),
@@ -411,7 +445,8 @@ fn finish(ty: &Type, callee: Function, receiver: Option<Box<Value>>) -> Value {
         ty: ty.clone(),
         object_view: false,
         identity: std::sync::Arc::new(()),
-        target,
+        target: Some(target),
+        native: None,
         receiver,
     })
 }

@@ -3,7 +3,7 @@ use crate::{
     Fault, Value,
     memory::SharedMemory,
     metadata::{
-        CallingConvention, Function, NativeImport, NativeMarshalling, NativeStringMarshalling, Type,
+        CallingConvention, Function, NativeAbi, NativeMarshalling, NativeStringMarshalling, Type,
     },
 };
 use libffi::middle::{Arg, Cif, CodePtr, Type as FfiType, arg};
@@ -48,6 +48,10 @@ pub(crate) fn validate(function: &Function) -> Result<(), Fault> {
             return Err(Fault::new("invalid native library or entry point"));
         }
     }
+    validate_abi(function, &NativeAbi::from(import))
+}
+
+fn validate_abi(function: &Function, import: &NativeAbi) -> Result<(), Fault> {
     if import.parameter_marshalling.keys().any(|key| {
         key.parse::<usize>().map_or(true, |index| {
             index >= function.parameters.len() || index.to_string() != *key
@@ -73,11 +77,28 @@ pub(crate) fn validate(function: &Function) -> Result<(), Fault> {
     Ok(())
 }
 
-fn parameter_marshalling(
-    import: &NativeImport,
-    index: usize,
+pub(crate) fn indirect_contract(
+    module: &crate::Module,
     ty: &Type,
-) -> Option<NativeMarshalling> {
+    abi: &NativeAbi,
+) -> Result<Function, Fault> {
+    let Type::Function(shape) = ty else {
+        return Err(Fault::new("native binding requires a Function signature"));
+    };
+    shape.validate()?;
+    if !shape.out_parameters.is_empty() || !shape.out_when_true.is_empty() {
+        return Err(Fault::new(
+            "native Function output contracts are not supported",
+        ));
+    }
+    let mut function = crate::function_objects::contract(module, ty)?;
+    function.instance = false;
+    function.owner = None;
+    validate_abi(&function, abi)?;
+    Ok(function)
+}
+
+fn parameter_marshalling(import: &NativeAbi, index: usize, ty: &Type) -> Option<NativeMarshalling> {
     import
         .parameter_marshalling
         .get(&index.to_string())
@@ -147,6 +168,30 @@ pub struct NativeLibraries {
     symbols: HashMap<(String, String), unsafe extern "C" fn()>,
 }
 impl NativeLibraries {
+    pub(crate) fn bind_pointer(
+        &self,
+        module: &crate::Module,
+        ty: &Type,
+        abi: &NativeAbi,
+        pointer: &crate::memory::Pointer,
+    ) -> Result<NativeCall, Fault> {
+        let function = indirect_contract(module, ty, abi)?;
+        if pointer.address == 0 {
+            return Err(Fault::new("cannot bind a null native function pointer"));
+        }
+        if pointer.allocation.is_some() {
+            return Err(Fault::new(
+                "guest data storage cannot be bound as native code",
+            ));
+        }
+        Ok(NativeCall {
+            _libraries: self.libraries.values().cloned().collect(),
+            address: pointer.address,
+            function,
+            abi: abi.clone(),
+        })
+    }
+
     pub fn loaded_count(&self) -> usize {
         self.libraries.len()
     }
@@ -200,17 +245,20 @@ impl NativeLibraries {
             pointer
         };
         Ok(NativeCall {
-            _library: library.clone(),
-            function_pointer,
+            _libraries: vec![library.clone()],
+            address: function_pointer as usize,
+            abi: NativeAbi::from(import),
             function: function.clone(),
         })
     }
 }
 
+#[derive(Debug)]
 pub(crate) struct NativeCall {
-    _library: std::sync::Arc<libloading::Library>,
-    function_pointer: unsafe extern "C" fn(),
-    function: Function,
+    _libraries: Vec<std::sync::Arc<libloading::Library>>,
+    address: usize,
+    pub(crate) function: Function,
+    abi: NativeAbi,
 }
 impl NativeCall {
     /// The caller holds the tracked argument borrow for the entire call.
@@ -220,8 +268,8 @@ impl NativeCall {
         memory: &SharedMemory,
     ) -> Result<Value, Fault> {
         let function = &self.function;
-        let import = function.pinvoke.as_ref().expect("prepared native import");
-        let function_pointer = CodePtr(self.function_pointer as *mut c_void);
+        let import = &self.abi;
+        let function_pointer = CodePtr(self.address as *mut c_void);
         if values.len() != function.parameters.len() {
             return Err(Fault::new("native argument count mismatch"));
         }
@@ -333,5 +381,67 @@ impl NativeCall {
                 _ => return Err(Fault::new("unsupported native return type")),
             })
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn address_binding_retains_library_after_session_drop() {
+        let directory =
+            std::env::temp_dir().join(format!("neoclr-binding-owner-{}", std::process::id()));
+        std::fs::create_dir_all(&directory).unwrap();
+        let path = directory.join(libloading::library_filename("binding_owner"));
+        assert!(
+            std::process::Command::new("rustc")
+                .args([
+                    "--edition=2024",
+                    "--crate-type=cdylib",
+                    "--crate-name=binding_owner"
+                ])
+                .arg(
+                    std::path::Path::new(env!("CARGO_MANIFEST_DIR"))
+                        .join("examples/native/library.rs")
+                )
+                .arg("-o")
+                .arg(&path)
+                .status()
+                .unwrap()
+                .success()
+        );
+        // SAFETY: this is the test fixture compiled above; its initializers and export
+        // signature are controlled by this test. No arbitrary pointer is executed.
+        let library = std::sync::Arc::new(unsafe { libloading::Library::new(&path).unwrap() });
+        let address = unsafe {
+            *library
+                .get::<unsafe extern "C" fn()>(b"neoclr_add")
+                .unwrap()
+        } as usize;
+        let owner = std::sync::Arc::downgrade(&library);
+        let mut libraries = NativeLibraries::default();
+        libraries.libraries.insert("binding_owner".into(), library);
+        let ty = crate::assembler::parse_type("fn<Int32,Int32,Int32>").unwrap();
+        let abi: NativeAbi = serde_json::from_str(r#"{"calling_convention":"Cdecl"}"#).unwrap();
+        let module = crate::assemble(".module Test").unwrap();
+        let call = libraries
+            .bind_pointer(
+                &module,
+                &ty,
+                &abi,
+                &crate::memory::Pointer {
+                    address,
+                    allocation: None,
+                    offset: 0,
+                    target: Type::Void,
+                },
+            )
+            .unwrap();
+        drop(libraries);
+        assert!(owner.upgrade().is_some());
+        drop(call);
+        assert!(owner.upgrade().is_none());
+        std::fs::remove_dir_all(directory).unwrap();
     }
 }

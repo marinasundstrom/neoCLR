@@ -220,3 +220,26 @@ explicit owned handles and release functions; errno/GetLastError capture; verifi
 record layout; callbacks with rooting, thread entry and teardown. Native libraries
 that retain pointers need explicit ownership, not an annotation that extends a temporary
 buffer accidentally. These are gates, not implemented capabilities.
+
+## Structural native Function bindings (feature branch)
+
+The `codex/native-function-pointers` runtime experiment adds the low-level instruction
+`function.bind.native fn<...> = {"calling_convention":"Cdecl"}`. It consumes a native
+pointer and produces an ordinary structural Function value. ABI JSON accepts the same
+string default and parameter/result marshalling descriptors as named imports. No
+delegate or source-level Raven mapping API is introduced in this slice.
+
+The binding retains all libraries already loaded by its native execution session.
+External addresses still require caller-owned lifetime guarantees; retaining those
+libraries cannot prove that an arbitrary address belongs to one of them. Binding and
+invocation require trusted native execution. Null and tracked guest-data pointers are
+rejected. Signature/ABI mismatch with actual machine code remains the caller's risk.
+
+Clones share binding identity; independently mapped native addresses create distinct
+bindings. Shape identity remains structural. ToString identifies a native Function;
+the transitional managed Function property faults because a raw address has no managed
+MethodInfo. Direct scheduler/worker submission requires a managed wrapper. No callbacks,
+exports, JIT/AOT lowering or independent C# metadata authoring is claimed by this slice.
+
+See [the executable example](../examples/foreign_function_pointer.neoil) and the
+[author-directed AOT sidecar design](design/native-import-export-contract.md).

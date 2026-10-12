@@ -16096,3 +16096,27 @@ or runtime-await default switch was performed.
   distinguish both directions and callback rooting. An explicit owning registration
   could reduce accidental collection but still requires a native unregistration
   protocol; its exact API and backend feasibility remain open.
+
+## 2026-10-12 — Structural FFI mappings and AOT sidecars
+
+- **Author:** asks to continue toward a more elaborate importing/exporting interface,
+  explains “We don't have delegates in neoCLR, we directly express function signature”,
+  and describes future AOT output paired with sidecar public-member metadata and
+  annotations so compatible runtimes/native consumers know functions, structures,
+  types and members.
+- **Assistant response:** use the existing structural Function shape plus explicit
+  ABI/ownership mapping, keeping binding instance data separate from shape identity.
+  An AOT sidecar describes code and native layouts; entry stubs/runtime coordination
+  are still required where managed state crosses the boundary.
+- **Action:** isolate the runtime experiment on codex/native-function-pointers. Add
+  a native-address binding instruction, shared ABI validation/marshalling and retained
+  library owners. Native bindings have no managed method target; imports remain
+  distinct from InternalCall. No delegate declaration or Raven source mapping API
+  is introduced. Record the [sidecar design](design/native-import-export-contract.md)
+  as a goal and proposed contract, not an implemented or stable schema.
+- **Open:** Raven/native metadata authoring, JIT/AOT lowering, export stubs, ABI layout
+  manifests, callbacks, ownership/release protocols and platform qualification.
+- **Validation:** 42 focused tests pass (15 interop, 26 existing Function-object
+  checks and library lifetime), as do native backend compilation and API snapshot
+  checks. Included unit fixtures were updated for the explicit managed/native
+  binding distinction. [Evidence](experiments/foreign-interop/pointer-validation.json).

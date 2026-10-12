@@ -2,6 +2,7 @@
 use super::*;
 
 pub(super) struct HostCall {
+    indirect: Option<std::sync::Arc<crate::interop::NativeCall>>,
     callee: crate::metadata::Function,
     args: Vec<Value>,
     assembly: Option<String>,
@@ -13,6 +14,26 @@ pub(super) struct HostCall {
 }
 
 impl HostCall {
+    pub(super) fn indirect(
+        call: std::sync::Arc<crate::interop::NativeCall>,
+        args: Vec<Value>,
+        assembly: Option<String>,
+        context: String,
+        pc: usize,
+    ) -> Self {
+        Self {
+            callee: call.function.clone(),
+            indirect: Some(call),
+            args,
+            assembly,
+            context,
+            pc,
+            patch: None,
+            immediate: None,
+            join: None,
+        }
+    }
+
     pub(super) fn new(
         callee: crate::metadata::Function,
         mut args: Vec<Value>,
@@ -57,6 +78,7 @@ impl HostCall {
             }
         }
         Ok(Self {
+            indirect: None,
             callee,
             args,
             assembly,
@@ -72,7 +94,8 @@ impl HostCall {
         &mut self,
         scheduler: &mut crate::scheduler::Scheduler,
     ) -> Result<(), Fault> {
-        if self.callee.pinvoke.is_none()
+        if self.indirect.is_none()
+            && self.callee.pinvoke.is_none()
             && matches!(
                 crate::native::bind(&self.callee)?,
                 crate::native::Binding::JoinWorker | crate::native::Binding::JoinWorkerResult
@@ -170,7 +193,23 @@ impl HostCall {
             if let Some(value) = &self.immediate {
                 return Ok(value.clone());
             }
-            let value = if self.callee.pinvoke.is_some() {
+            let value = if let Some(call) = &self.indirect {
+                if state
+                    .invocation
+                    .native_libraries
+                    .lock()
+                    .expect("native library lock poisoned")
+                    .is_none()
+                {
+                    return Err(Fault::new(
+                        "native Function invocation requires trusted run_with_native execution",
+                    ));
+                }
+                let _borrow = memory.borrow_native(&self.args)?;
+                // SAFETY: trusted execution covers this address/signature; the binding retains
+                // loaded libraries, and tracked argument memory is borrowed through the call.
+                unsafe { call.invoke(self.args.clone(), memory)? }
+            } else if self.callee.pinvoke.is_some() {
                 let _borrow = memory.borrow_native(&self.args)?;
                 let call = {
                     let mut libraries = state
@@ -247,11 +286,13 @@ impl HostCall {
                 value
             };
             expect(&value, &self.callee.returns)?;
-            Ok(if self.callee.pinvoke.is_some() {
-                value.on_stack()
-            } else {
-                value
-            })
+            Ok(
+                if self.indirect.is_some() || self.callee.pinvoke.is_some() {
+                    value.on_stack()
+                } else {
+                    value
+                },
+            )
         })();
         result.map_err(|mut fault: Fault| {
             fault.function = Some(self.context.clone());

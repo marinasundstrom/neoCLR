@@ -60,3 +60,10 @@ Raven preserves `extern` when reading a native import from another assembly.
 Runtime-owned internal calls remain separate from foreign imports. Both use `extern`,
 while `MethodImpl(InternalCall)` identifies a runtime service and `NativeImport`
 identifies a library/export. Metadata inspection preserves both distinctions.
+
+The `codex/native-function-pointers` feature branch experiments with binding a native
+address to a structural Function signature in the interpreter. It reuses calling
+convention and marshalling descriptors; Raven mapping syntax and JIT/AOT support
+remain next. The longer-term goal is an AOT library plus versioned public-interface
+metadata for runtime and native consumers. Export stubs and that sidecar format are
+not implemented yet.

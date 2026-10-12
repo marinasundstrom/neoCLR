@@ -521,6 +521,33 @@ pub struct NativeImport {
     pub return_marshalling: Option<NativeMarshalling>,
 }
 
+/// ABI and conversion contract shared by named imports and address-bound Functions.
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct NativeAbi {
+    /// Explicit platform C or system ABI.
+    pub calling_convention: CallingConvention,
+    /// Input string default; parameter overrides take precedence.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub string_marshalling: Option<NativeStringMarshalling>,
+    /// Canonical decimal parameter indices mapped to explicit conversions.
+    #[serde(default, skip_serializing_if = "std::collections::BTreeMap::is_empty")]
+    pub parameter_marshalling: std::collections::BTreeMap<String, NativeMarshalling>,
+    /// Result conversion; strings and ownership conversions remain unsupported.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub return_marshalling: Option<NativeMarshalling>,
+}
+impl From<&NativeImport> for NativeAbi {
+    fn from(import: &NativeImport) -> Self {
+        Self {
+            calling_convention: import.calling_convention,
+            string_marshalling: import.string_marshalling,
+            parameter_marshalling: import.parameter_marshalling.clone(),
+            return_marshalling: import.return_marshalling,
+        }
+    }
+}
+
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
 pub enum NativeMarshalling {
     Utf8,
@@ -817,6 +844,8 @@ pub enum Instruction {
     Switch(Vec<usize>),
     #[serde(rename = "call")]
     Call(FunctionRef),
+    #[serde(rename = "function.bind.native")]
+    BindNativeFunction { function_type: Type, abi: NativeAbi },
     #[serde(rename = "function.bind")]
     BindFunction {
         #[serde(rename = "function_type")]
@@ -1244,6 +1273,9 @@ impl Function {
         }
         for op in &mut result.body {
             match op {
+                Instruction::BindNativeFunction { function_type, .. } => {
+                    *function_type = map(function_type)?;
+                }
                 Instruction::BindFunction {
                     function_type,
                     target,

@@ -704,7 +704,8 @@ mod tests {
             object_view: false,
             identity: std::sync::Arc::new(()),
             ty: crate::assembler::parse_type("fn<Void>").unwrap(),
-            target: crate::assembler::parse_function_ref("instance TestOwner::Complete()").unwrap(),
+            target: Some(crate::assembler::parse_function_ref("instance TestOwner::Complete()").unwrap()),
+            native: None,
             receiver: Some(Box::new(receiver)),
         });
         let marker = object(heap, vec![Value::Int32(7)]);

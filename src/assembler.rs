@@ -653,6 +653,16 @@ fn parse_parts(source: &str) -> Result<(Module, Vec<FieldFixup>), Fault> {
                                 serde_json::json!({"borrowed": borrowed, "self_type": parse_type(ty)?, "target": parse_function_ref(target.trim())?}),
                             )
                         }
+                        "function.bind.native" => {
+                            let (ty, abi) = rest.split_once(" = ").ok_or_else(|| {
+                                Fault::new("expected function.bind.native Type = ABI JSON")
+                            })?;
+                            let abi: crate::metadata::NativeAbi =
+                                serde_json::from_str(abi).map_err(|e| Fault::new(e.to_string()))?;
+                            Some(
+                                serde_json::json!({"function_type": parse_type(ty.trim())?, "abi": abi}),
+                            )
+                        }
                         "function.bind" => {
                             let (ty, target) = rest.split_once(" = ").ok_or_else(|| {
                                 Fault::new("expected function.bind Type = Target(...)")

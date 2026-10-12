@@ -124,3 +124,17 @@ pub unsafe extern "C" fn neoclr_mixed_encoding(a: *const std::ffi::c_char, b: *c
         -1
     }
 }
+
+// Address-returning exports exercise structural Function bindings independently of names.
+#[unsafe(no_mangle)]
+pub extern "C" fn neoclr_get_add() -> *const std::ffi::c_void {
+    neoclr_add as *const std::ffi::c_void
+}
+#[unsafe(no_mangle)]
+pub extern "C" fn neoclr_get_utf8_pair() -> *const std::ffi::c_void {
+    neoclr_utf8_pair as *const std::ffi::c_void
+}
+#[unsafe(no_mangle)]
+pub extern "C" fn neoclr_get_bool8() -> *const std::ffi::c_void {
+    neoclr_bool8 as *const std::ffi::c_void
+}

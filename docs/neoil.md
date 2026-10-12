@@ -728,3 +728,13 @@ validation. Closed-interface enforcement and general sealed-leaf enforcement rem
 separate work. No explicit permits-list encoding is introduced. A retained
 UnionAttribute marks a nominal union independently. See the
 [introspection contract](introspection-design.md#type-classification-flags--development-2026-09-24).
+
+### Native Function binding experiment
+
+On `codex/native-function-pointers`, `function.bind.native fn<Int32,Int32,Int32> =
+{"calling_convention":"Cdecl"}` consumes a typed native pointer and returns a
+structural Function. The instruction must be on one line. ABI JSON may additionally
+specify string_marshalling, parameter_marshalling and return_marshalling, as described
+in [native interop](native-interop.md#structural-native-function-bindings-feature-branch).
+Ordinary Function Invoke calls execute it. This is an interpreter experiment;
+Raven authoring and native backend emission are subsequent gates.
