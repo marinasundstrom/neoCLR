@@ -6,6 +6,13 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ## Unreleased
 
+### 2026-10-13
+
+- Repair the source-release notice inventory for shared TLS/security dependencies:
+  cover all 99 locked registry packages and verify 198 retained notice hashes.
+  Include the 20 packages missing from the top-level manifest and correct the
+  obsolete statement that TLS is excluded from the installed runtime.
+
 ### 2026-10-12
 
 - Qualify and install the macOS ARM64 default-JIT preview: extracted collections,

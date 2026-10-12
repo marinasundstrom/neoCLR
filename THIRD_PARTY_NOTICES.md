@@ -90,6 +90,26 @@ windows-link, even though it was not compiled in the local macOS validation.
 | windows-result | 0.4.1 | MIT OR Apache-2.0 | [license-apache-2.0](third-party/licenses/windows-result-0.4.1/license-apache-2.0), [license-mit](third-party/licenses/windows-result-0.4.1/license-mit) |
 | windows-strings | 0.5.1 | MIT OR Apache-2.0 | [license-apache-2.0](third-party/licenses/windows-strings-0.5.1/license-apache-2.0), [license-mit](third-party/licenses/windows-strings-0.5.1/license-mit) |
 | zmij | 1.0.23 | MIT | [LICENSE-MIT](third-party/licenses/zmij-1.0.23/LICENSE-MIT) |
+| getrandom | 0.2.17 | MIT OR Apache-2.0 | [LICENSE-APACHE](third-party/licenses/getrandom-0.2.17/LICENSE-APACHE), [LICENSE-MIT](third-party/licenses/getrandom-0.2.17/LICENSE-MIT) |
+| ring | 0.17.14 | Apache-2.0 AND ISC | [LICENSE](third-party/licenses/ring-0.17.14/LICENSE), [LICENSE-BoringSSL](third-party/licenses/ring-0.17.14/LICENSE-BoringSSL), [LICENSE-other-bits](third-party/licenses/ring-0.17.14/LICENSE-other-bits) |
+| rustls | 0.23.45 | Apache-2.0 OR ISC OR MIT | [LICENSE-APACHE](third-party/licenses/rustls-0.23.45/LICENSE-APACHE), [LICENSE-ISC](third-party/licenses/rustls-0.23.45/LICENSE-ISC), [LICENSE-MIT](third-party/licenses/rustls-0.23.45/LICENSE-MIT) |
+| rustls-pemfile | 2.2.0 | Apache-2.0 OR ISC OR MIT | [LICENSE](third-party/licenses/rustls-pemfile-2.2.0/LICENSE), [LICENSE-APACHE](third-party/licenses/rustls-pemfile-2.2.0/LICENSE-APACHE), [LICENSE-ISC](third-party/licenses/rustls-pemfile-2.2.0/LICENSE-ISC), [LICENSE-MIT](third-party/licenses/rustls-pemfile-2.2.0/LICENSE-MIT) |
+| rustls-pki-types | 1.15.1 | MIT OR Apache-2.0 | [LICENSE-APACHE](third-party/licenses/rustls-pki-types-1.15.1/LICENSE-APACHE), [LICENSE-MIT](third-party/licenses/rustls-pki-types-1.15.1/LICENSE-MIT) |
+| rustls-webpki | 0.103.15 | ISC | [LICENSE](third-party/licenses/rustls-webpki-0.103.15/LICENSE) |
+| subtle | 2.6.1 | BSD-3-Clause | [LICENSE](third-party/licenses/subtle-2.6.1/LICENSE) |
+| untrusted | 0.9.0 | ISC | [LICENSE.txt](third-party/licenses/untrusted-0.9.0/LICENSE.txt) |
+| wasi | 0.11.1+wasi-snapshot-preview1 | Apache-2.0 WITH LLVM-exception OR Apache-2.0 OR MIT | [LICENSE-APACHE](third-party/licenses/wasi-0.11.1+wasi-snapshot-preview1/LICENSE-APACHE), [LICENSE-Apache-2.0_WITH_LLVM-exception](third-party/licenses/wasi-0.11.1+wasi-snapshot-preview1/LICENSE-Apache-2.0_WITH_LLVM-exception), [LICENSE-MIT](third-party/licenses/wasi-0.11.1+wasi-snapshot-preview1/LICENSE-MIT) |
+| windows-sys | 0.52.0 | MIT OR Apache-2.0 | [license-apache-2.0](third-party/licenses/windows-sys-0.52.0/license-apache-2.0), [license-mit](third-party/licenses/windows-sys-0.52.0/license-mit) |
+| windows-targets | 0.52.6 | MIT OR Apache-2.0 | [license-apache-2.0](third-party/licenses/windows-targets-0.52.6/license-apache-2.0), [license-mit](third-party/licenses/windows-targets-0.52.6/license-mit) |
+| windows_aarch64_gnullvm | 0.52.6 | MIT OR Apache-2.0 | [license-apache-2.0](third-party/licenses/windows_aarch64_gnullvm-0.52.6/license-apache-2.0), [license-mit](third-party/licenses/windows_aarch64_gnullvm-0.52.6/license-mit) |
+| windows_aarch64_msvc | 0.52.6 | MIT OR Apache-2.0 | [license-apache-2.0](third-party/licenses/windows_aarch64_msvc-0.52.6/license-apache-2.0), [license-mit](third-party/licenses/windows_aarch64_msvc-0.52.6/license-mit) |
+| windows_i686_gnu | 0.52.6 | MIT OR Apache-2.0 | [license-apache-2.0](third-party/licenses/windows_i686_gnu-0.52.6/license-apache-2.0), [license-mit](third-party/licenses/windows_i686_gnu-0.52.6/license-mit) |
+| windows_i686_gnullvm | 0.52.6 | MIT OR Apache-2.0 | [license-apache-2.0](third-party/licenses/windows_i686_gnullvm-0.52.6/license-apache-2.0), [license-mit](third-party/licenses/windows_i686_gnullvm-0.52.6/license-mit) |
+| windows_i686_msvc | 0.52.6 | MIT OR Apache-2.0 | [license-apache-2.0](third-party/licenses/windows_i686_msvc-0.52.6/license-apache-2.0), [license-mit](third-party/licenses/windows_i686_msvc-0.52.6/license-mit) |
+| windows_x86_64_gnu | 0.52.6 | MIT OR Apache-2.0 | [license-apache-2.0](third-party/licenses/windows_x86_64_gnu-0.52.6/license-apache-2.0), [license-mit](third-party/licenses/windows_x86_64_gnu-0.52.6/license-mit) |
+| windows_x86_64_gnullvm | 0.52.6 | MIT OR Apache-2.0 | [license-apache-2.0](third-party/licenses/windows_x86_64_gnullvm-0.52.6/license-apache-2.0), [license-mit](third-party/licenses/windows_x86_64_gnullvm-0.52.6/license-mit) |
+| windows_x86_64_msvc | 0.52.6 | MIT OR Apache-2.0 | [license-apache-2.0](third-party/licenses/windows_x86_64_msvc-0.52.6/license-apache-2.0), [license-mit](third-party/licenses/windows_x86_64_msvc-0.52.6/license-mit) |
+| zeroize | 1.9.1 | Apache-2.0 OR MIT | [LICENSE-APACHE](third-party/licenses/zeroize-1.9.1/LICENSE-APACHE), [LICENSE-MIT](third-party/licenses/zeroize-1.9.1/LICENSE-MIT) |
 
 ## Native libffi and build tooling
 
@@ -135,6 +155,7 @@ Cranelift 0.121.2 under Apache-2.0 WITH LLVM-exception. These compiler dependenc
 are not added to the runtime distribution. The experiment's emitted scalar object
 has no Cranelift or neoCLR runtime imports.
 
-The optional native HTTPS experiment has a separate pinned dependency inventory and
-[preserved license texts](tools/native-tls/THIRD_PARTY_NOTICES.md). It is not part of
-the installed runtime distribution.
+The runtime now includes the shared native TLS and security providers. Their
+registry dependencies are covered by the top-level inventory above and its manifest.
+The standalone [native TLS inventory](tools/native-tls/THIRD_PARTY_NOTICES.md) also
+describes the private static-library build.
