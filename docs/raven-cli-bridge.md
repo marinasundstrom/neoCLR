@@ -7614,6 +7614,10 @@ or a permanent namespace/module policy.
 ### Guest module-function enumeration (2026-10-10)
 
 The reference bridge exposes ModuleInfo.GetFunctions returning Sequence<MethodInfo>.
+The 2026-10-12 reference repair restores this member in both aggregate C# declaration
+stubs after regeneration omitted it, matching the native source and existing XML.
+This changes reference visibility only; Runtime Contract settings and native
+retention/invocation support are unchanged.
 The source-native library uses ModuleFunctions(String,String) and
 ModuleMemberCustomAttributes(String,String,Int32) InternalCalls. Names identify the
 exact assembly-local namespace contribution; the member token is checked for a unique

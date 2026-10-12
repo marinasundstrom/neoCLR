@@ -391,7 +391,10 @@ checks, including absent DeclaringType, fixed/named descriptions and excluded pa
 targets. Guest ModuleInfo.GetFunctions and method-level attribute queries now pass an
 interpreted Raven consumer using the real TestAttribute, without invoking bodies.
 Open generic signature snapshots remain explicitly unsupported. Native enumeration,
-retention and in-process callable registration are still open. The guest-function
+retention and in-process callable registration are still open. These remaining
+module-function discovery/reflection gaps, including ownerless parameter/return
+attributes, are queued in [issue #27](https://github.com/marinasundstrom/neoCLR/issues/27).
+This follow-up does not change the active milestone priority. The guest-function
 Windows run at 5e4cbd84 exposed an AOT shared-provider binding regression in nominal
 attribute inspection; [the fix passes locally](experiments/native-attributes/shared-provider-validation.json)
 with rebuilt libraries. Windows requalification remains pending.

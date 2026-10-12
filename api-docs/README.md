@@ -1832,7 +1832,17 @@ ownership. The retained-async helper is internal and is not a SQL public API.
 Refresh both snapshots using a class-library build with `--with-postgresql`.
 
 SQL qualification rendered all 22 selected SQL/provider types and both SQL guide pages;
-the aggregate snapshot fingerprint check and native snapshot unit checks pass. The full
-website build currently stops at the existing documented `ModuleInfo.GetFunctions`
-member missing from the generated reference. This is a recorded non-SQL coverage gap,
-not an exclusion of that API or a successful full-site validation.
+the aggregate snapshot fingerprint check and native snapshot unit checks pass. That
+qualification initially stopped at `ModuleInfo.GetFunctions` missing from the
+aggregate reference declaration. The 2026-10-12 repair restores the interface member
+and matching reference-only implementation stub, then regenerates the reference
+assembly and snapshot. Native source, type selection and XML already included it.
+The remaining execution-support gaps are queued in
+[issue #27](https://github.com/marinasundstrom/neoCLR/issues/27); this reference repair
+does not implement native enumeration or invocation.
+
+Reference repair validation (2026-10-12): the snapshot fingerprint check and rendered
+`ModuleInfo.GetFunctions` cross-reference/signature/summary checks pass. Full-site
+validation proceeds past this member, then stops at the separately missing
+`M:System.Web.Http.HttpHandler.#ctor` generated reference entry. No full-site pass
+is claimed; the protected-constructor documentation/rendering mismatch remains open.

@@ -8,6 +8,13 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-12
 
+- Restore ModuleInfo.GetFunctions in the aggregate reference interface and its
+  reference-only implementation stub, matching the existing managed API and XML.
+  Regenerate the API snapshot and queue remaining native discovery/reflection
+  coverage separately in issue #27; no runtime capability is added by this fix.
+  Snapshot and rendered-member checks pass; full-site validation next exposes
+  the separate HttpHandler constructor reference gap.
+
 - Fix native Raven generic async methods and generic state-machine frames, including
   generic owners, captured values and union results. Enable synchronous `use` scopes
   across generated async suspension; preserve reverse disposal before completion or
