@@ -8,6 +8,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-12
 
+- Make ordinary website builds use the committed native API snapshot, preventing
+  stale local audit selections from replacing current module/type pages and menus.
+  Add explicit --native-audit for intentional previews. Verify current
+  System.Concurrency.Tasks navigation and PostgreSql assembly ownership; four
+  selection/publication regressions and a complete 4,305-page build pass locally.
+
 - Repair source release/host checks after the JIT default change: explicitly run
   interpreter-only source and FFI fixtures in interpreter mode; installed default
   JIT remains a separate bundle gate. Apply canonical Rust formatting and bounded

@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 """Build one RavenDoc site from Markdown, reference metadata and tested samples."""
+import argparse
 from html import escape, unescape
 from html.parser import HTMLParser
 from pathlib import Path
@@ -236,15 +237,17 @@ def write_legacy_routes():
             + json.dumps(target) + ');</script></body></html>')
 
 
-def selected_native_preview():
-    if not NATIVE_PREVIEW.exists():
-        if NATIVE_SNAPSHOT.exists():
-            return extract_snapshot(NATIVE_SNAPSHOT, ROOT / 'target/native-api-publication')
-        return None
-    audit = Path(json.loads(NATIVE_PREVIEW.read_text())['audit'])
-    if not audit.is_absolute() or not (audit / 'site/docs/api').is_dir():
-        raise ValueError(f'Selected native API audit is missing: {audit}. Regenerate it or remove {NATIVE_PREVIEW} to use the legacy snapshot.')
-    return audit
+def selected_native_preview(audit=None):
+    # A local audit selection may predate the committed API by months. Ordinary
+    # builds must be reproducible; use an alternate audit only when requested.
+    if audit is not None:
+        audit = Path(audit).resolve()
+        if not (audit / 'site/docs/api').is_dir():
+            raise ValueError(f'Selected native API audit is missing: {audit}')
+        return audit
+    if NATIVE_SNAPSHOT.exists():
+        return extract_snapshot(NATIVE_SNAPSHOT, ROOT / 'target/native-api-publication')
+    return None
 
 
 def publish_site(staging, destination, audit):
@@ -259,7 +262,10 @@ def publish_site(staging, destination, audit):
 def main():
     global OUTPUT
     publish_destination = OUTPUT
-    audit = selected_native_preview()
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--native-audit', type=Path, help='Explicitly preview an uncommitted native API audit')
+    args = parser.parse_args()
+    audit = selected_native_preview(args.native_audit)
     subprocess.run([sys.executable, str(ROOT / 'scripts/build-api-docs.py'), '--check'], check=True)
     OUTPUT = publish_destination.with_name(publish_destination.name + '-next')
     if OUTPUT.exists():

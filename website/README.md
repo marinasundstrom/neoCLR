@@ -17,6 +17,11 @@ python3 -m unittest discover -s scripts -p 'test_build_website.py'
 python3 -m http.server 8765 --directory target/website
 ```
 
+Ordinary builds always use the committed native API snapshot. A stale
+`target/native-api-preview.json` from an earlier experiment cannot override it.
+For an intentional local API preview, use
+`python3 scripts/build-website.py --native-audit /absolute/path/to/audit`.
+
 Run from the repository root. No Raven checkout, Node install or DocFX is required. The metadata-inventory
 helper is built with the .NET SDK on first use; normal SDK restore must be available. The repository carries a checksum-verified portable
 [RavenDoc build](../tools/ravendoc/README.md). The build checks the reference snapshot,

@@ -334,23 +334,22 @@ class PublicMetadataInventory(unittest.TestCase):
 
 
 class NativePreviewPublication(unittest.TestCase):
-    def test_selection_is_optional_but_missing_selected_audit_is_an_error(self):
+    def test_uncommitted_audit_requires_explicit_selection(self):
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)
-            with patch.object(build, 'NATIVE_PREVIEW', root / 'selection.json'), \
-                    patch.object(build, 'NATIVE_SNAPSHOT', root / 'snapshot.json'):
+            with patch.object(build, 'NATIVE_SNAPSHOT', root / 'snapshot.json'):
                 self.assertIsNone(build.selected_native_preview())
-                build.NATIVE_PREVIEW.write_text(json.dumps({'audit': str(root / 'audit')}))
                 with self.assertRaisesRegex(ValueError, 'Selected native API audit is missing'):
-                    build.selected_native_preview()
+                    build.selected_native_preview(root / 'audit')
                 (root / 'audit/site/docs/api').mkdir(parents=True)
-                self.assertEqual(root / 'audit', build.selected_native_preview())
+                self.assertEqual((root / 'audit').resolve(), build.selected_native_preview(root / 'audit'))
 
     def test_clean_checkout_selects_pinned_native_reference(self):
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)
             snapshot = root / 'snapshot.json'
             snapshot.write_text('{}')
+            (root / 'selection.json').write_text(json.dumps({'audit': str(root / 'stale-audit')}))
             with patch.object(build, 'NATIVE_PREVIEW', root / 'selection.json'), \
                     patch.object(build, 'NATIVE_SNAPSHOT', snapshot), \
                     patch.object(build, 'extract_snapshot', return_value=root / 'audit') as extract:

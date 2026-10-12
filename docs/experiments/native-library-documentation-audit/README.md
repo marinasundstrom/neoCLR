@@ -61,12 +61,12 @@ reference at the normal `/docs/api/` URLs, redirects the earlier `/docs/native-a
 refreshes site-wide search. It validates HTML and all local links on a staged copy
 before updating `target/website`. This is a local preview operation; the publishing
 pipeline is unchanged; unmatched old pages remain with a migration-gap notice. The selection is saved locally in ignored `target/native-api-preview.json`.
-Ordinary `scripts/build-website.py` rebuilds integrate and validate that selected audit
-before replacing the visible website, so the legacy CoreProbe pages do not briefly
-replace native pages. A missing selected audit fails the build and preserves the
-visible site; regenerate/reselect the audit after API changes. Delete the selection
-file and rebuild to explicitly return to the legacy snapshot. Clean checkouts and
-publication inputs remain unchanged; selection does not regenerate native metadata.
+Ordinary `scripts/build-website.py` rebuilds use the committed native API snapshot;
+the historical local selection file no longer overrides it. To preview this audit
+through the complete builder, pass `--native-audit /absolute/path/to/audit` explicitly.
+The selected reference is integrated and validated before replacing the visible site.
+A missing explicit audit fails the build and preserves the visible site. Selection
+does not regenerate native metadata or change the committed publication snapshot.
 
 The historical bundle contains XML documentation blocks mislabeled as Markdown.
 For this audit only, the themed mode copies the bundle and converts simple complete

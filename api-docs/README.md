@@ -1370,8 +1370,9 @@ python3 -m unittest discover -s scripts -p test_build_website.py
 python3 scripts/build-website.py
 ```
 
-For publication validation, use a clean checkout without the ignored
-`target/native-api-preview.json` override. Review the resulting website in a browser
+Ordinary builds select this committed snapshot, even if an older ignored
+`target/native-api-preview.json` exists. Use `--native-audit /absolute/path/to/audit`
+only for an intentional alternate local preview. Review the resulting website in a browser
 before committing the snapshot. Rendering still uses the explicit temporary
 primitive bootstrap and reviewed XML restoration described in the audit; this is
 not native-only core bootstrap. The 136 unmatched legacy pages remain visibly
