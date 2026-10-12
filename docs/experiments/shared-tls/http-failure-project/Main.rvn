@@ -1,0 +1,127 @@
+import System.*
+import System.Collections.*
+import System.Result.*
+import System.Option.*
+import System.Time.*
+import System.Concurrency.*
+import System.Concurrency.Tasks.*
+import System.Networking.Sockets.*
+import System.Networking.Security.*
+import System.Web.Http.*
+
+func Url(host: string, port: int) -> string {
+    return String.Concat(String.Concat(String.Concat("https://", host), ":"), port.ToString())
+}
+
+func Respond(request: HttpRequest) -> Task<Result<HttpResponse, HttpError>> {
+    if !request.IsSecure {
+        let error: Result<HttpResponse, HttpError> = Error(HttpError.Handler("Expected secure request"))
+        return Task.FromResult(error)
+    }
+    let response: Result<HttpResponse, HttpError> = Ok(HttpResponse(HttpStatusCode.OK, ArrayList<HttpHeader>(), HttpContent.FromText("recovered").Bytes))
+    return Task.FromResult(response)
+}
+
+async func RejectionAndRecovery(credentials: SslServerAuthenticationOptions, trust: SslClientAuthenticationOptions) -> Task<int> {
+    let options = HttpServerOptions()
+    options.SslOptions = credentials
+    options.RequestReadTimeout = Duration.FromTicks(600000000L)
+    options.ResponseWriteTimeout = Duration.FromTicks(600000000L)
+    let Ok(server) = HttpServer.Listen("127.0.0.1", 0, 8, options) else { return 10 }
+    let Ok(port) = server.GetLocalPort() else { return 11 }
+    use client = HttpClient(HttpSocketHandler(trust))
+    let rejected = server.ServeOne(Respond)
+    // The fixture has DNS:localhost only. Trusting its issuer must not bypass name checking.
+    if let Error(HttpError.Tls(SslError.AuthenticationFailed)) = await client.Get(Url("127.0.0.1", port)) {
+    } else {
+        return 12
+    }
+    if let Error(_) = await rejected {
+    } else {
+        return 13
+    }
+    // Reuse both listener and client after rejection; no stale TLS session may leak into this exchange.
+    let serving = server.ServeOne(Respond)
+    let Ok(response) = await client.Get(Url("localhost", port)) else { return 14 }
+    if response.Content.Bytes.Count != 9 { return 15 }
+    let completed = await serving
+    server.Close()
+    if let Error(_) = completed { return 16 }
+    return 0
+}
+
+async func ClientTimeout(trust: SslClientAuthenticationOptions) -> Task<int> {
+    let Ok(listener) = Socket.Listen("127.0.0.1", 0, 8) else { return 20 }
+    let Ok(port) = listener.GetLocalPort() else { return 21 }
+    let accepting = listener.Accept()
+    use client = HttpClient(HttpSocketHandler(trust))
+    client.Timeout = Some(Duration.FromTicks(50000000L))
+    let pending = client.Get(Url("localhost", port))
+    let Ok(peer) = await accepting else { return 22 }
+    // Observe TLS bytes before waiting: this is a handshake timeout, not a DNS/connect timeout.
+    let hello: byte[] = [(byte)0]
+    let Ok(read) = await peer.Receive(hello, 0, 1) else { return 24 }
+    if read != 1 || hello[0] != (byte)22 { return 25 }
+    let result = await pending
+    peer.Close()
+    listener.Close()
+    if let Error(HttpError.TimedOut) = result { return 0 }
+    return 23
+}
+
+async func ClientCancellation(trust: SslClientAuthenticationOptions) -> Task<int> {
+    let Ok(listener) = Socket.Listen("127.0.0.1", 0, 8) else { return 30 }
+    let Ok(port) = listener.GetLocalPort() else { return 31 }
+    let accepting = listener.Accept()
+    use client = HttpClient(HttpSocketHandler(trust))
+    use cancellation = CancellationTokenSource()
+    let pending = client.Get(Url("localhost", port), cancellation.Token)
+    let Ok(peer) = await accepting else { return 32 }
+    let hello: byte[] = [(byte)0]
+    let Ok(read) = await peer.Receive(hello, 0, 1) else { return 34 }
+    if read != 1 || hello[0] != (byte)22 { return 35 }
+    let observed = Promise<bool>()
+    // This adapter inspects cancellation as data instead of propagating it out of the test.
+    pending.OnCompleted(() => { _ = observed.Complete(pending.IsCancelled) })
+    cancellation.Cancel()
+    let cancelled = await observed.Task
+    peer.Close()
+    listener.Close()
+    if !cancelled { return 33 }
+    return 0
+}
+
+async func ServerDeadline(credentials: SslServerAuthenticationOptions) -> Task<int> {
+    let options = HttpServerOptions()
+    options.SslOptions = credentials
+    options.RequestReadTimeout = Duration.FromTicks(10000000L)
+    let Ok(server) = HttpServer.Listen("127.0.0.1", 0, 8, options) else { return 40 }
+    let Ok(port) = server.GetLocalPort() else { return 41 }
+    let serving = server.ServeOne(Respond)
+    let Ok(peer) = await Socket.Connect("127.0.0.1", port) else { return 42 }
+    let result = await serving
+    peer.Close()
+    server.Close()
+    if let Error(HttpError.TimedOut) = result { return 0 }
+    return 43
+}
+
+async func Main() -> Task<int> {
+    let Ok(credentials) = SslServerAuthenticationOptions.Create(Fixtures.Certificate(), Fixtures.Key()) else { return 1 }
+    use serverCredentials = credentials
+    let Ok(trust) = SslClientAuthenticationOptions.Create(Fixtures.Certificate()) else { return 2 }
+    use clientTrust = trust
+    let recovery = await RejectionAndRecovery(credentials, trust)
+    if recovery != 0 { return recovery }
+    Console.WriteLine("HTTPS rejection and recovery passed")
+    let timeout = await ClientTimeout(trust)
+    if timeout != 0 { return timeout }
+    Console.WriteLine("HTTPS client timeout passed")
+    let cancellation = await ClientCancellation(trust)
+    if cancellation != 0 { return cancellation }
+    Console.WriteLine("HTTPS client cancellation passed")
+    let deadline = await ServerDeadline(credentials)
+    if deadline != 0 { return deadline }
+    Console.WriteLine("HTTPS server deadline passed")
+    return 0
+}

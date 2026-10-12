@@ -22,11 +22,11 @@ public class HttpServerOptions {
     /// <summary>Maximum request header fields, including Host, from one through 100. Defaults to 100.</summary>
     var MaxRequestHeaderCount: int { get; set; } = 100
 
-    /// <summary>Total header/body read budget after accepting a connection. Defaults to 15 seconds.</summary>
+    /// <summary>Total TLS handshake and header/body read budget after accepting a connection. Defaults to 15 seconds.</summary>
     /// <remarks>Must be positive and at most 60 seconds. Fractional milliseconds round upward. Does not limit waiting for a connection or handler execution.</remarks>
     var RequestReadTimeout: Duration { get; set; } = Duration.FromTicks(150000000L)
 
-    /// <summary>Total response write budget after encoding. Defaults to 15 seconds.</summary>
+    /// <summary>Total response write and TLS shutdown budget after encoding. Defaults to 15 seconds.</summary>
     /// <remarks>Must be positive and at most 60 seconds. Fractional milliseconds round upward. The deadline is not renewed per write.</remarks>
     var ResponseWriteTimeout: Duration { get; set; } = Duration.FromTicks(150000000L)
 }

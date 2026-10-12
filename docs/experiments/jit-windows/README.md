@@ -50,6 +50,8 @@ is separate from the earlier explicit-mode results above.
 
 The Windows runner now invokes the same managed SSL/HTTPS JSON consumer used on
 macOS, in interpreter, default JIT and AOT, and uploads its validation/build reports.
+The HTTP failure consumer separately checks hostname rejection/recovery, client
+timeout/cancellation after ClientHello, and the server handshake deadline.
 This extends the earlier private provider/host checks; adding the gate does not mean
 Windows managed qualification has passed.
 

@@ -82,7 +82,10 @@ adopt the same backend.
 
 The local macOS consumer exchanges nested JSON using HttpClient and HttpServer,
 with GC during request handling, in interpreter, default JIT and native AOT modes.
-This is a development checkpoint, not broad protocol or performance certification.
+[HTTP failure checks](../docs/experiments/shared-tls/http-failures-validation.json) also
+pass hostname rejection followed by recovery, client timeout/cancellation after
+ClientHello, and the server handshake deadline in all three modes. This is a
+development checkpoint, not broad protocol or performance certification.
 The interpreter harness uses an optimized runtime and explicit aggregate array
 budgets (1,048,576 elements and 64 MiB of charged payload); native modes use their
 own bounded heap contracts. Runtime defaults are unchanged. Windows managed-stream

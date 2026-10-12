@@ -6,8 +6,9 @@ shared provider. Nested JSON, lifetime checks and GC pass locally in interpreter
 default JIT and standalone AOT; cleartext HTTP also passes. Bounded compiler and
 host admission fixes preserve explicit memory budgets rather than introducing
 trimming. See [qualification and remaining HTTP work](experiments/shared-tls/README.md#managed-ssl-and-http-composition).
-Windows managed qualification, HTTP rejection/deadline/recovery cases and packaged
-build kits remain gates.
+HTTP hostname rejection/recovery, handshake deadlines and caller cancellation also
+pass in all three local modes; see [HTTP evidence](experiments/shared-tls/http-failures-validation.json).
+Windows managed qualification and packaged build kits remain gates.
 
 **Gzip foundation (2026-10-12):** the author requests System.IO.Compression and
 identifies HTTP as a likely consumer. [GZipStream](gzip-compression.md) adds incremental
@@ -77,8 +78,8 @@ Managed pump bindings and SSL composition now pass locally; released build kits 
 [binding evidence](experiments/shared-tls/bindings-validation.json). See [native lifetime evidence](experiments/shared-tls/native-lifetime-validation.json). HTTP and SQL may share concepts/types
 without requiring one native TLS backend; see the [backend boundary](shared-security-provider.md#shared-concepts-independent-backends). A bounded public System.Security.Cryptography facade
 now adds destination-buffer SHA256/HMACSHA256, tag verification and secure random
-fill; allocating/streaming overloads, socket/TLS adapters and certificate APIs
-remain open. Compare .NET,
+fill; allocating/streaming cryptography overloads and broader certificate inspection
+remain open. Explicit PEM credentials and the managed TLS adapter are qualified above. Compare .NET,
 Windows Runtime and other platforms, retaining .NET as the ergonomics target.
 See the [first async contract](stream-design.md#first-async-contract--2026-10-12).
 The subsequent [async-first naming direction](stream-design.md#async-first-naming-direction--2026-10-12)

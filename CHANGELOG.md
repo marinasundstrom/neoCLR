@@ -8,6 +8,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-12
 
+- Qualify managed HTTP TLS hostname rejection/recovery, client handshake timeout
+  and cancellation, and server handshake deadlines in interpreter/JIT/AOT. Observe
+  ClientHello before the client failure checks, document deadline scope, and add
+  the identical consumer to Windows CI (execution pending).
+
 - Add the managed SSL/HTTPS JSON consumer to Windows JIT/AOT/interpreter CI and
   retain its build reports. Pin the required Raven native-async compiler revision;
   publishing that revision and Windows execution remain pending prerequisites.

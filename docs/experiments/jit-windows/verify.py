@@ -79,6 +79,9 @@ def main():
              '--bundle', installed, '--aot', jit, '--output', out/'tls-project'], 'tls-project')
         run([sys.executable, ROOT/'docs/experiments/shared-tls/validate-streams.py',
              '--bundle', installed, '--aot', jit, '--output', out/'tls-streams'], 'tls-streams')
+        run([sys.executable, ROOT/'docs/experiments/shared-tls/validate-streams.py',
+             '--bundle', installed, '--aot', jit, '--output', out/'tls-http-failures',
+             '--http-failures'], 'tls-http-failures')
         run([sys.executable, ROOT/'scripts/test-runtime-library.py', '--bundle', installed,
              '--suite', 'cryptography', '--mode', 'interpreter', '--mode', 'jit', '--mode', 'native',
              '--output', out/'public-cryptography'], 'public-cryptography')

@@ -1,0 +1,52 @@
+{
+  "passed": true,
+  "platform": "macOS-27.0-arm64-arm-64bit",
+  "modes": [
+    "interpreter",
+    "default-jit",
+    "aot"
+  ],
+  "scope": "HTTP TLS rejection/recovery, client timeout/cancellation and server deadline",
+  "timingNote": "Timings include compilation and are not benchmarks.",
+  "sourceHashes": {
+    "runtime/raven/src/System/Networking/Security/SslStream.rvn": "ba54c173d40b73c5eee14f2afce14fe3ae9c36b79990d08c73389a26d34b6442",
+    "runtime/raven/src/System/Networking/Security/SslOptions.rvn": "0630f760039f609d5edbf4cff6bf4eef2b455e7c488441a6fcab0f296537c1e3",
+    "runtime/raven/src/System/Networking/Security/SslError.rvn": "9a12027a85d6023c200b0080ef793a1237e6117fa15d25ddcc15f2a5b99def01",
+    "docs/experiments/shared-tls/http-failure-project/Main.rvn": "354a1c118962034afeef14a4fa88eef8df05242303c2028452a1e6d290e70ae3",
+    "docs/experiments/shared-tls/http-failure-project/App.rvnproj": "7f4ad0af0f55212f6e461df8b346e1f5a76ee1ae295aa068fa06e1ac1249ba6f"
+  },
+  "date": "2026-10-12",
+  "compilerRevision": "6fe7d630a25d0e27f3e9e89b1403987caf30d9d6",
+  "rawReport": "target/ssl-http-failures-v3/validation.json",
+  "cases": [
+    "Hostname rejection then recovery on same client/listener",
+    "Client Timeout while TLS peer stalls after ClientHello",
+    "Caller cancellation after ClientHello remains cancelled Task",
+    "Server read deadline includes silent TLS handshake"
+  ],
+  "windows": "Gate added; execution pending",
+  "results": [
+    {
+      "mode": "interpreter",
+      "exitCode": 0,
+      "stdout": "HTTPS rejection and recovery passed\nHTTPS client timeout passed\nHTTPS client cancellation passed\nHTTPS server deadline passed\n"
+    },
+    {
+      "mode": "default-jit",
+      "exitCode": 0,
+      "stdout": "HTTPS rejection and recovery passed\nHTTPS client timeout passed\nHTTPS client cancellation passed\nHTTPS server deadline passed\n"
+    },
+    {
+      "mode": "aot",
+      "exitCode": 0,
+      "stdout": "HTTPS rejection and recovery passed\nHTTPS client timeout passed\nHTTPS client cancellation passed\nHTTPS server deadline passed\n"
+    }
+  ],
+  "libraries": {
+    "System.Web.dll": "1eca11068ed348e2c6ab9b7678547fcc06429226aab5336f4c93fa7faa7b8486",
+    "System.Networking.dll": "ee8607aad7b8f96e8b2e5d18c396be73bdddaa5c2dcf04c67fcd95f32c5455d1",
+    "System.Runtime.dll": "6ddb1679f964a0a58389fdce6d17e84bbb6a6a5fc0d6caec1e1f6cc600a9b1cd",
+    "System.Data.dll": "2cf796c06f2b22f02a95eda9e26b8421be29c2e5831ac8002e9b2efb2f35508a",
+    "System.Data.PostgreSql.dll": "f31b30756079c0e4bd8236ef740b4090484822fbc68ab4a68877b924104cdece"
+  }
+}

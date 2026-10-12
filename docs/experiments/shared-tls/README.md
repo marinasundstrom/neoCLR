@@ -99,3 +99,17 @@ Windows managed execution remains pending; the earlier native HTTPS host result 
 not qualify this new managed composition. Next are HTTP handshake rejection, timeout,
 cancellation and recovery checks. Full-duplex simultaneous stream operations, OS trust
 stores, general X509 inspection, mTLS and release packaging remain outside this slice.
+
+### HTTP handshake failure checks
+
+Use `--http-failures` with `validate-streams.py` to build the focused HTTP consumer.
+It checks wrong-hostname rejection followed by success on the same client/listener,
+a stalled handshake under HttpClient.Timeout, caller cancellation after ClientHello,
+and the server read deadline while its TLS peer sends nothing. The ClientHello
+observation makes the two client cases handshake checks rather than DNS/connect checks.
+The runner observes cancellation through an explicit outcome adapter so cancelled
+Tasks cannot accidentally skip the remaining assertions.
+
+[Local qualification](http-failures-validation.json) passes all four scenarios in
+interpreter, default JIT and standalone AOT on macOS. Windows uses the same consumer
+in CI; execution is pending. These checks required no additional runtime change.

@@ -19,6 +19,8 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     for name in ('bundle', 'aot', 'output'):
         parser.add_argument('--' + name, type=Path, required=True)
+    parser.add_argument('--http-failures', action='store_true',
+                        help='Qualify HTTP TLS rejection/recovery, deadlines and cancellation')
     args = parser.parse_args()
     bundle, aot, output = (getattr(args, name).resolve() for name in ('bundle', 'aot', 'output'))
     output.mkdir(parents=True, exist_ok=False)
@@ -41,7 +43,8 @@ def main():
         spec.loader.exec_module(helpers)
         cert, key = helpers.create_credentials(output, run)
         project = output / 'project'
-        shutil.copytree(HERE / 'stream-project', project)
+        source_project = HERE / ('http-failure-project' if args.http_failures else 'stream-project')
+        shutil.copytree(source_project, project, ignore=shutil.ignore_patterns('bin', 'obj'))
         fixtures = 'import System.*\n\ninternal static class Fixtures {\n'
         for name, path in [('Certificate', cert), ('Key', key)]:
             fixtures += '    internal static func ' + name + '() -> byte[] {\n        return ['
@@ -67,11 +70,16 @@ def main():
         ]
         for command in commands:
             result = run(command)
-            assert result.stdout == 'Managed HTTPS JSON exchange passed\n', result.stdout
+            expected = ('HTTPS rejection and recovery passed\nHTTPS client timeout passed\n'
+                        'HTTPS client cancellation passed\nHTTPS server deadline passed\n'
+                        if args.http_failures else 'Managed HTTPS JSON exchange passed\n')
+            assert result.stdout == expected, result.stdout
         report.update(passed=True, modes=['interpreter', 'default-jit', 'aot'])
-        report['scope'] = 'Managed lifetime and HTTPS nested-JSON exchange with GC; timings include compilation and are not benchmarks.'
+        report['scope'] = ('HTTP TLS rejection/recovery, client timeout/cancellation and server deadline'
+                           if args.http_failures else 'Managed lifetime and HTTPS nested-JSON exchange with GC')
+        report['timingNote'] = 'Timings include compilation and are not benchmarks.'
         sources = list((ROOT / 'runtime/raven/src/System/Networking/Security').glob('*.rvn'))
-        sources += list((HERE / 'stream-project').glob('*'))
+        sources += list(source_project.glob('*'))
         report['sourceHashes'] = {str(path.relative_to(ROOT)): hashlib.sha256(path.read_bytes()).hexdigest() for path in sources if path.is_file()}
     except Exception as error:
         report['error'] = str(error)

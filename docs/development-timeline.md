@@ -16110,3 +16110,13 @@ GC and lifetime checks; a cleartext HTTP regression passes too. See the
 qualification remains pending. The author then directed: “After this slice, continue
 with the Http case”. The assistant proposed HTTP handshake rejection, timeout,
 cancellation and recovery as the next bounded checks; these are not yet outcomes.
+
+### HTTP follow-through outcome — 2026-10-12
+
+Following the author’s instruction to continue with HTTP after the SSL slice, the
+assistant added executable hostname rejection/recovery, client timeout/cancellation
+and server deadline checks. Client failure checks first observe ClientHello. All four
+scenarios pass locally in interpreter, default JIT and AOT; no further runtime fix
+was required by these cases. [Evidence](experiments/shared-tls/http-failures-validation.json)
+and the identical pending Windows gate distinguish local results from platform
+qualification. Request and response deadline documentation now includes TLS work.
