@@ -15798,3 +15798,17 @@ or runtime-await default switch was performed.
   package or new public secure-stream API is claimed. The next common-API work is
   async byte transport and explicit TLS composition for the server/client JSON
   showcase. Database/application Docker stages remain optional author suggestions.
+
+
+## 2026-10-12 — Managed security foundations for the showcase
+
+- **Author direction:** further development requires async stream APIs,
+  `System.Security.Cryptography` and certificate handling, at least the foundations.
+- **Assistant proposal:** implement common async byte I/O, explicit certificate/key
+  lifetime and trust configuration, then reusable managed TLS for the JSON server
+  and client. Add provider-backed cryptographic primitives as concrete consumers
+  need them; a complete cryptography library is not a prerequisite for TLS.
+- **Action:** recorded the bounded sequence, .NET primary-source comparison,
+  ownership questions and validation requirements in the [stream design](stream-design.md#security-and-certificate-foundations--2026-10-12)
+  and roadmap. This is planning, not completed public API implementation. Certificate
+  stores, issuance and broader algorithm coverage remain later candidates.

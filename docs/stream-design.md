@@ -51,6 +51,51 @@ experiment, not a final public signature. No independent .NET transport alternat
 has been evaluated for this slice; include that review before settling the broader
 secure-stream API. No performance advantage is claimed.
 
+### Security and certificate foundations — 2026-10-12
+
+**Author direction:** further development requires foundational async stream,
+cryptography (`System.Security.Cryptography`) and certificate APIs. The following
+is the proposed implementation sequence, not a set of shipped signatures:
+
+1. Establish common async input/output contracts and a socket adapter, including
+   buffer lifetime, cancellation, partial progress and disposal as described below.
+2. Add certificate loading and inspection under the .NET-aligned
+   `System.Security.Cryptography.X509Certificates` module. Start with explicit
+   PEM/DER inputs and a separately owned server identity containing its certificate
+   chain and private key. Specify malformed-input errors, key/certificate matching,
+   disposal and retention while authentication is pending. Loading is not trust
+   validation; public certificate data must not implicitly expose private key bytes.
+3. Expose explicit client/server authentication through the reusable secure-stream
+   layer in `System.Networking.Security`. Use certificate identities and explicit
+   trust configuration rather than environment variables as the managed contract.
+   Validate hostname, validity and chain policy; select and document the default
+   trust source and revocation limitations before claiming client TLS support.
+4. Grow `System.Security.Cryptography` with concrete consumers: secure random bytes,
+   SHA-256 and HMAC-SHA-256 are initial candidates. Public primitive APIs need not
+   precede certificate/TLS integration when the existing provider already performs
+   those operations internally. Keep provider selection behind runtime contracts;
+   do not implement cryptographic algorithms from scratch for this milestone.
+
+The .NET baseline separates [cryptographic primitives](https://learn.microsoft.com/en-us/dotnet/standard/security/cryptography-model),
+[certificate loading](https://learn.microsoft.com/en-us/dotnet/api/system.security.cryptography.x509certificates.x509certificateloader?view=net-10.0)
+and [PEM certificate/private-key loading](https://learn.microsoft.com/en-us/dotnet/api/system.security.cryptography.x509certificates.x509certificate2.createfrompemfile?view=net-10.0).
+These sources were reviewed on 2026-10-12. Preserve familiar responsibilities and
+names where they fit; the proposed separate identity/key ownership needs comparison
+with X509Certificate2 before settling signatures. It makes lifetime and private-key
+access explicit but adds types and adapters. A shared provider offers consistency;
+OS-backed stores can offer integration but have differing trust and key semantics.
+The current Rustls host proof establishes neither a public provider abstraction nor
+cross-platform certificate-store behavior.
+
+Validate parsing, mismatched keys, untrusted/expired/wrong-host certificates,
+intermediate chains and disposal during pending authentication. Run one managed
+consumer on macOS and Windows with focused interpreter/JIT/AOT coverage as support
+is added. Cryptographic primitives require published known-answer vectors and
+provider error tests; random-byte tests cannot establish cryptographic quality.
+Keep OS certificate stores, certificate issuance, broad algorithm coverage and
+PKCS#12 import as later candidates rather than prerequisites for the JSON showcase.
+No change here adds APIs or warrants an API-reference snapshot update yet.
+
 ### Showcase acceptance target
 
 The author identifies two neoCLR applications exchanging JSON over HTTP as the

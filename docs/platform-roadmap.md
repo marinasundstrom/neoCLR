@@ -11,6 +11,14 @@ are optional later slices; qualify the selected container/runtime target separat
 This records a concrete consumer goal without replacing the active correctness gate
 or claiming Linux JIT/AOT or Docker application support.
 
+**Foundational security APIs (2026-10-12):** the author identifies async streams,
+`System.Security.Cryptography` and certificate handling as necessary foundations
+for further development. Follow the [bounded security API sequence](stream-design.md#security-and-certificate-foundations--2026-10-12):
+common async byte I/O, certificate/key ownership and explicit trust, then managed
+TLS composition and verified client/server JSON. Expose cryptographic primitives
+as reusable capabilities backed by established implementations, with scope driven
+by concrete consumers. These APIs are planned, not implemented by the host proof.
+
 **Windows HTTPS follow-through (2026-10-12):** the author explicitly requests
 Windows behavior consistent with macOS. Source linking and a shared validation
 harness are implemented; a dedicated Windows CI gate now covers TLS versions,
