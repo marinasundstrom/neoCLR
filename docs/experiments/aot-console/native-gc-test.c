@@ -339,6 +339,25 @@ static int owned_parked_roots(void) {
     CHECK(!neoclr_roots_parked_v1() && !neoclr_gc_entry_check_v1(&c));
     return 0;
 }
+/* Wide heap objects must trace references beyond the inline-value lane budget. */
+static int wide_object_roots(void) {
+    uint64_t buffer[1025] = {0}; buffer[1024] = UINT64_C(0x1122334455667788);
+    neoclr_aot_context c = {.text = {(unsigned char *)buffer, 8192, 0}};
+    uint64_t *owner = allocate(&c, NEOCLR_NATIVE_OBJECT_BYTES, NEOCLR_GC_OBJECT);
+    uint64_t *child = allocate(&c, 16, NEOCLR_GC_OBJECT);
+    CHECK(owner && child);
+    owner[NEOCLR_NATIVE_OBJECT_LANES] = (uintptr_t)child;
+    child[1] = 42;
+    neoclr_probe_storage slot = {&owner, 8, 0};
+    neoclr_probe_frame frame = {.context = &c, .storage = &slot, .storage_count = 1};
+    uint64_t used = c.text.used;
+    CHECK(!neoclr_gc_collect_v1(&c, &frame) && c.text.used == used && child[1] == 42);
+    owner = NULL;
+    CHECK(!neoclr_gc_collect_v1(&c, &frame) && !c.text.used);
+    CHECK(buffer[1024] == UINT64_C(0x1122334455667788));
+    return 0;
+}
+
 int main(void) {
     uint64_t buffer[129];
     buffer[128] = UINT64_C(0x1122334455667788);
@@ -468,5 +487,7 @@ int main(void) {
     if (conditional_status) return conditional_status;
     int owned_status = owned_parked_roots();
     if (owned_status) return owned_status;
+    int wide_status = wide_object_roots();
+    if (wide_status) return wide_status;
     return resource_owners();
 }

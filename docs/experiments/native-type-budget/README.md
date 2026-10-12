@@ -36,3 +36,42 @@ installation was performed. Windows validation remains outstanding.
 
 The [archive identity](archive.json) identifies the local candidate; temporary
 extraction paths in evidence are provenance, not portable run instructions.
+
+
+## Separate heap-object and inline-value bounds — 2026-10-12
+
+The 204-lane HTTP async frame is valid managed metadata. The native profile
+incorrectly coupled its heap payload budget to the 128-lane inline-value budget.
+A class still crosses the native call ABI as one pointer regardless of its payload;
+inline records expand into ABI lanes. Optimizing Raven's hoisted fields can reduce
+allocations later, but should not be required to admit this valid heap object.
+
+`OBJECT_LANES`/`NEOCLR_NATIVE_OBJECT_LANES` now permit 256 payload lanes (2056 bytes
+including the header). Inline records and record-array elements stay at 128 lanes.
+The allocator checks the same object maximum before reserving storage. Heap capacity,
+array limits, root descriptors and type limits are unchanged. Rebuild both backend
+and native host: an older helper intentionally rejects a newly admitted wide object.
+There is no metadata, pointer ABI or managed API change.
+
+Compared with .NET, this remains a bounded experimental native profile rather than
+unrestricted class layouts. Separating heap and inline budgets avoids expanding
+value-call signatures just to hold async state. The cost is admitting larger object
+allocations and GC scans; the existing total heap budget still applies. This does
+not claim an async performance improvement or fix compiler field liveness.
+
+Focused macOS ARM64 checks pass:
+
+- 12 native reference tests, including admission at 204/256 lanes and rejection at
+  257 before object emission; maximum-size execution, zero initialization, heap
+  canaries, insufficient capacity and allocator rejection of an oversized object.
+- Two backend/host limit-agreement tests.
+- The unchanged cyclic/unknown/oversized inline-value rejection test.
+- Native GC under undefined-behavior/bounds sanitizers, including a child referenced
+  only from the final lane of a maximum-size object and subsequent full reclamation.
+
+Reproduce with `cargo test --manifest-path tools/aot-poc/Cargo.toml --test console
+reference_`, the `limits::` binary tests and the `values` test
+`cyclic_unknown_and_oversized_inline_layouts_never_emit`. Build `native-gc-test.c`,
+`native-gc.c` and `root-probe.c` with Clang `-std=c11 -Wall -Wextra -Werror
+-fsanitize=undefined,bounds` and run the resulting program. Use the matching platform
+SDK/toolchain. Full extracted HTTP acceptance is recorded separately below.

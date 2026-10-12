@@ -1,0 +1,16 @@
+{
+  "passed": true,
+  "platform": "macOS ARM64",
+  "checks": {
+    "reference": "   Compiling neoclr-aot-poc v0.0.0 (/Users/robert/Projects/neoclr/tools/aot-poc)\n    Finished `test` profile [unoptimized + debuginfo] target(s) in 9.27s\n     Running tests/console.rs (tools/aot-poc/target/debug/deps/console-05af234482ee5b8c)\n\nrunning 12 tests\ntest nominal_reference_array_views_reject_storage_borrows_and_replacement ... ok\ntest native_generic_reference_boxing_preserves_identity_and_interface_access ... ok\ntest nominal_reference_array_views_preserve_exact_dispatch_aliases_and_faults ... ok\ntest native_reference_arrays_preserve_identity_owners_and_faults ... ok\ntest native_default_reference_arrays_preserve_nulls_identity_and_faults ... ok\ntest reference_allocation_at_layout_limit_respects_arena_canaries ... ok\ntest reference_arena_is_explicit_and_admits_closed_world_virtual_calls ... ok\ntest native_reference_arrays_reject_borrows_and_wrong_elements ... ok\ntest thirty_two_lane_reference_allocation_respects_arena_canaries ... ok\ntest native_reflection_arrays_preserve_boolean_string_and_reference_elements ... ok\ntest bounded_reference_aliases_cycles_null_faults_and_reuse_match_interpreter ... ok\ntest reference_field_admission_uses_the_flattened_storage_bound ... ok\n\ntest result: ok. 12 passed; 0 failed; 0 ignored; 0 measured; 132 filtered out; finished in 11.64s\n\n",
+    "limitAgreement": "   Compiling neoclr-aot-poc v0.0.0 (/Users/robert/Projects/neoclr/tools/aot-poc)\n    Finished `test` profile [unoptimized + debuginfo] target(s) in 3.70s\n     Running unittests src/main.rs (tools/aot-poc/target/debug/deps/neoclr_aot_poc-960855335f0fcfb3)\n\nrunning 2 tests\ntest limits::type_budget_matches_native_collector_contract ... ok\ntest limits::layout_budgets_match_native_allocator_contract ... ok\n\ntest result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 49 filtered out; finished in 0.00s\n\n",
+    "inlineRejection": "    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.08s\n     Running tests/values.rs (tools/aot-poc/target/debug/deps/values-59d2245888bc2e02)\n\nrunning 1 test\ntest cyclic_unknown_and_oversized_inline_layouts_never_emit ... ok\n\ntest result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 56 filtered out; finished in 1.24s\n\n",
+    "sanitizedGC": ""
+  },
+  "inputsSha256": {
+    "tools/aot-poc/src/limits.rs": "9257fe5a8b6702162ad19f60c810b358dd013760037d970a0433aae25ad54477",
+    "tools/aot-poc/tests/console.rs": "7d0ba95750bb71e309e1630508b979acb682c0b31e36ff35afbe82f7a30a92d4",
+    "docs/experiments/aot-console/text-arena.h": "f11956770448ece65ee852d0dcc75d86ad45ae68d66355ae64afe702effb5872",
+    "docs/experiments/aot-console/native-gc-test.c": "9e66efd29c1fae48b4ea52170c3b1c6de8e4f06e501d853f111284ef9f934519"
+  }
+}

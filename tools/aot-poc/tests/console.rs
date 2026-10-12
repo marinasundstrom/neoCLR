@@ -1356,8 +1356,8 @@ int main(void) {
 fn reference_allocation_at_layout_limit_respects_arena_canaries() {
     let dir=Temp::new();
     let seed=neoclr::assemble(".module System\n.references ()\n").unwrap();
-    let fields=(0..128).map(|i| format!(".field F{i} Int32\n")).collect::<String>();
-    let source=format!(".module WideObject\n.type Pair\n.field X Int32\n.field Y Int32\n.end\n.type class Wide\n{fields}.method instance .ctor() -> noresult\nldarg 0\nldc.i4 42\nstfld 127\nret\n.end\n.end\n.function Calculate() -> Int32\n.local Wide value\nnewobj.ctor instance Wide::.ctor()\nstloc value\nldloc value\nldfld 0\nldloc value\nldfld 127\nadd\nret\n.end");
+    let fields=(0..256).map(|i| format!(".field F{i} Int32\n")).collect::<String>();
+    let source=format!(".module WideObject\n.type Pair\n.field X Int32\n.field Y Int32\n.end\n.type class Wide\n{fields}.method instance .ctor() -> noresult\nldarg 0\nldc.i4 42\nstfld 255\nret\n.end\n.end\n.function Calculate() -> Int32\n.local Wide value\nnewobj.ctor instance Wide::.ctor()\nstloc value\nldloc value\nldfld 0\nldloc value\nldfld 255\nadd\nret\n.end");
     let r=compile_source(&dir,&seed,&source,&["--compile-system","--reference-arena"],false);
     assert!(r.status.success(),"{}",String::from_utf8_lossy(&r.stderr));
     let base=PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../docs/experiments/aot-console");
@@ -1365,13 +1365,17 @@ fn reference_allocation_at_layout_limit_respects_arena_canaries() {
 #include "text-arena.h"
 #include <string.h>
 int main(void) {
-    uint64_t storage[130];memset(storage,0xa5,sizeof(storage));
-    neoclr_aot_context ctx={.text={(unsigned char*)storage,1032,0}};
+    uint64_t storage[258];memset(storage,0xa5,sizeof(storage));
+    neoclr_aot_context ctx={.text={(unsigned char*)storage,2056,0}};
     int32_t result=-99;
-    if (neoclr_entry_v4(0,&result,&ctx) || result!=42 || ctx.text.used!=1032) return 1;
-    for (unsigned i=1032;i<sizeof(storage);i++) if (((unsigned char*)storage)[i]!=0xa5) return 2;
-    ctx.text.capacity=1031;result=-99;
+    if (neoclr_entry_v4(0,&result,&ctx) || result!=42 || ctx.text.used!=2056) return 1;
+    for (unsigned i=2056;i<sizeof(storage);i++) if (((unsigned char*)storage)[i]!=0xa5) return 2;
+    ctx.text.capacity=2055;result=-99;
     if (neoclr_entry_v4(0,&result,&ctx)!=5 || result!=-99 || ctx.text.used!=0) return 3;
+    void *output=(void*)(uintptr_t)1234;
+    ctx.text.capacity=sizeof(storage);ctx.text.used=0;
+    if (neoclr_allocate_object_v1(&ctx.text,1,NEOCLR_NATIVE_OBJECT_BYTES+8,&output)!=3 ||
+        output!=(void*)(uintptr_t)1234 || ctx.text.used) return 4;
     return 0;
 }
 "#).unwrap();
@@ -6568,15 +6572,15 @@ int main(void) {
 
 #[test]
 fn reference_field_admission_uses_the_flattened_storage_bound() {
-    for count in [17, 32, 128, 129] {
+    for count in [17, 128, 204, 256, 257] {
         let dir = Temp::new();
         let seed = neoclr::assemble(".module System\n.references ()\n").unwrap();
         let fields = (0..count).map(|i| format!(".field F{i} Int32\n")).collect::<String>();
         let source = format!(".module WideObject\n.type class Wide\n{fields}.method instance .ctor() -> noresult\nret\n.end\n.end\n.function Calculate() -> Int32\nnewobj.ctor instance Wide::.ctor()\nldfld {}\nret\n.end\n", count - 1);
         let result = compile_source(&dir, &seed, &source, &["--compile-system", "--reference-arena"], false);
-        assert_eq!(result.status.success(), count <= 128, "{}", String::from_utf8_lossy(&result.stderr));
-        if count > 128 {
-            assert!(String::from_utf8_lossy(&result.stderr).contains("1032-byte native object bound"));
+        assert_eq!(result.status.success(), count <= 256, "{}", String::from_utf8_lossy(&result.stderr));
+        if count > 256 {
+            assert!(String::from_utf8_lossy(&result.stderr).contains("2056-byte native object bound"));
             assert!(!dir.0.join("app.o").exists());
         }
     }

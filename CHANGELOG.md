@@ -8,6 +8,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-12
 
+- Separate native heap-object capacity from inline-value layout: admit 256 payload
+  lanes (2056 bytes with header) while retaining the 128-lane inline/array-element
+  bound. Keep allocator and compiler limits aligned. Native boundary/canary checks
+  and sanitized GC tracing/reclamation of a last-field reference pass; matching
+  backend and host rebuilds are required for newly admitted wide async objects.
+
 - Qualify the updated extracted preview through explicit interpreter execution,
   including independent HTTP JSON requests and the Raven client/server pair. Retain
   the reports alongside the failing default-JIT HTTP result; installation stays
