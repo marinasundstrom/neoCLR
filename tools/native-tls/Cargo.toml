@@ -11,6 +11,7 @@ license = "MIT"
 crate-type = ["staticlib"]
 
 [dependencies]
+ring = "=0.17.14"
 rustls = { version = "=0.23.45", default-features = false, features = ["std", "ring", "tls12"] }
 rustls-pemfile = "=2.2.0"
 

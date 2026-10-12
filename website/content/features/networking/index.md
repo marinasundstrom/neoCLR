@@ -194,6 +194,12 @@ and client exchanging JSON, with optional PostgreSQL/container integration later
 [Host setup, evidence and limits](https://github.com/marinasundstrom/neoCLR/blob/main/docs/experiments/https-server/README.md).
 
 
+The shared private security provider now also has client sessions with explicit trust
+and hostname verification, plus secure random, SHA-256 and HMAC-SHA-256 primitives.
+Local provider tests pass on macOS; the new Windows paths await CI qualification.
+These are foundations for managed SSL and cryptography APIs, not public APIs yet.
+[Provider contract and remaining work](https://github.com/marinasundstrom/neoCLR/blob/main/docs/shared-security-provider.md).
+
 ### Common async stream foundation
 
 Development `System.IO.InputStream` and `OutputStream` use Task-returning `Read`,

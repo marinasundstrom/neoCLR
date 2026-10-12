@@ -35,8 +35,8 @@ host calls still block before returning settled Tasks. System.Tasks has moved to
 identities and consumers; [qualification](task-namespace-migration.md) covers the
 three local execution modes. The [shared private TLS provider](shared-security-provider.md) now supports client/server
 configuration and explicit authentication; its macOS/Windows CI gate is added, with
-local macOS validation complete. Managed SSL and System.Security.Cryptography remain
-next. Socket/TLS adapters
+local macOS validation complete. Private secure-random/SHA-256/HMAC-SHA-256 primitives also pass local provider
+tests. Managed SSL and System.Security.Cryptography projections remain next. Socket/TLS adapters
 and certificate APIs remain open. Compare .NET,
 Windows Runtime and other platforms, retaining .NET as the ergonomics target.
 See the [first async contract](stream-design.md#first-async-contract--2026-10-12).

@@ -8,6 +8,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-12
 
+- Add private ring-backed secure random fill, SHA-256, HMAC-SHA-256 and MAC
+  verification primitives for the forthcoming System.Security.Cryptography projection.
+  Document C ABI ownership/errors and the managed integration still required. Five
+  cryptography tests cover known answers, tampering, buffer bounds and provider failure;
+  all ten security-provider tests pass locally on macOS. Windows uses the same CI gate.
+
 - Generalize the private Rustls transport to client and server sessions, in-memory
   PEM configuration, explicit client trust/peer verification and protocol-neutral
   ALPN. Preserve the HTTPS host ABI and add explicit nonblocking authentication.

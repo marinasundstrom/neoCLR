@@ -48,6 +48,36 @@ provides the actual protocol and verification, using its ring provider. There is
 custom TLS or cryptographic algorithm implementation. The eventual managed facade
 will use canonical async InputStream/OutputStream and System.Concurrency.Tasks.
 
+## Cryptographic primitive foundation
+
+The same private archive now exposes the C declarations in
+`tools/native-tls/include/neoclr_crypto.h`: secure random fill, one-shot SHA-256,
+HMAC-SHA-256 and HMAC verification. All delegate to pinned ring 0.17.14, already
+used by Rustls. There are no guest-facing methods yet; the following managed
+projection remains the next slice, including interpreter/JIT/AOT wiring and API
+reference generation.
+
+The intended baseline is .NET's
+[RandomNumberGenerator.Fill](https://learn.microsoft.com/en-us/dotnet/api/system.security.cryptography.randomnumbergenerator.fill?view=net-10.0),
+[SHA256.HashData](https://learn.microsoft.com/en-us/dotnet/api/system.security.cryptography.sha256.hashdata?view=net-10.0)
+and [HMACSHA256.HashData](https://learn.microsoft.com/en-us/dotnet/api/system.security.cryptography.hmacsha256.hashdata?view=net-10.0).
+These are synchronous CPU/provider operations; no extra task or scheduler is needed
+for each hash. Async stream hashing can compose the stream contract later.
+
+Private ABI input buffers are borrowed. Hash/MAC write exactly 32 bytes into a
+caller-owned destination of at least that capacity, allowing overlap with inputs.
+Empty inputs and keys are valid; null nonempty inputs are rejected. The `u32`
+lengths are a private ABI bound, not a promised managed payload limit. Hash/MAC
+success is 0 and invalid arguments return -1 without altering output. Random fill
+returns -2 on provider failure and clears any partial output. These return codes
+still need projection into the platform's managed Result/error conventions.
+
+[ring SystemRandom](https://docs.rs/ring/0.17.14/ring/rand/index.html) supplies OS
+randomness. [ring HMAC verification](https://docs.rs/ring/0.17.14/ring/hmac/index.html)
+avoids a handwritten early-exit comparison; verification returns 1 for mismatches,
+including truncated tags. No key-length policy, password hashing, encryption,
+exportable key handle, secret-zeroization guarantee or FIPS certification is implied.
+
 ## Validation
 
 Run `python3 scripts/test-native-security.py` with Rust and OpenSSL installed.
@@ -61,3 +91,10 @@ client/server authentication and bidirectional fragmented/backpressured transpor
 No Windows execution of the new client path is claimed by this local checkpoint.
 Before exposing managed TLS, add negative trust/expiry/key-mismatch qualification,
 stream ownership/concurrency tests and application-level JSON round trips.
+
+The cryptography slice adds five passing local tests: SHA-256 known answers with
+empty/multiblock/overlapping inputs; [RFC 4231](https://www.rfc-editor.org/rfc/rfc4231.html)
+HMAC cases 1, 2 and 6 plus altered/truncated tags; invalid arguments preserving output;
+random fill bounds; and injected provider failure clearing partial output. All ten
+provider tests pass together on macOS. The same CI command covers these on Windows;
+Windows execution remains pending. Random tests check behavior, not statistical quality.
