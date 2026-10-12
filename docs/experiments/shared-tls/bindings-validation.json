@@ -1,0 +1,80 @@
+{
+  "date": "2026-10-12",
+  "platform": "macOS-27.0-arm64-arm-64bit",
+  "passed": true,
+  "scope": "Explicit native TLS ownership bindings, not secure stream APIs",
+  "cases": [
+    {
+      "name": "invalid-trust",
+      "interpreter": true,
+      "aot": true,
+      "jit": {
+        "guestExitCode": 0
+      }
+    },
+    {
+      "name": "release-empty",
+      "interpreter": true,
+      "aot": true,
+      "jit": {
+        "guestExitCode": 0
+      }
+    },
+    {
+      "name": "abort-empty",
+      "interpreter": true,
+      "aot": true,
+      "jit": {
+        "guestExitCode": 0
+      }
+    },
+    {
+      "name": "invalid-owner",
+      "interpreter": true,
+      "aot": true,
+      "jit": {
+        "guestExitCode": 103
+      }
+    },
+    {
+      "name": "uninitialized",
+      "interpreter": true,
+      "aot": true,
+      "jit": {
+        "guestExitCode": 103
+      }
+    },
+    {
+      "name": "client-session",
+      "interpreter": true,
+      "aot": true,
+      "jit": {
+        "guestExitCode": 0
+      }
+    },
+    {
+      "name": "server-session",
+      "interpreter": true,
+      "aot": true,
+      "jit": {
+        "guestExitCode": 0
+      }
+    }
+  ],
+  "admission": "Changed managed bodies/signatures/generic declarations rejected; missing binding/GC/arena profiles rejected",
+  "source_sha256": {
+    "tools/aot-poc/src/bindings.rs": "35598dc6b7c54d4b1b662c3fb36516fc49f27c1b53a7f6f38f2bb072ecd69b1e",
+    "tools/aot-poc/src/values.rs": "6d48e225fa065196b2bd7f6d778d2cec897d71276b089602176a1f29f553073e",
+    "tools/aot-poc/src/main.rs": "5a9153983b92b4ac80ec2608ee8a4448821aeea5e9af30c954d8887067dc6051",
+    "tools/aot-poc/src/linking.rs": "6c817edb32f2057e8937c18e4509db7d279c530f23731097dfc544a8cd165060",
+    "tools/aot-poc/src/fault_details.rs": "927236b10860edc725ef1f100d081f480ab75d0c0d467f79c919882f8fe4c39f",
+    "tools/aot-poc/src/gc_points.rs": "84f0ae16f0d4d15d01e49dd54efad9e0c97974fa9174a1f9669f0bd149a75c15",
+    "docs/experiments/shared-tls/host.c": "ef0e71058c9c2e634e78a2e8c04a604ff10da7b1405248d2f4f30115f701438a",
+    "docs/experiments/shared-tls/validate-bindings.py": "5100e5cacadf2df617b8252867d09487d83b09bb3f01d4999be0c8eb228c9de6"
+  },
+  "remaining": [
+    "Windows execution pending CI",
+    "Default JIT/project host packaging",
+    "Ciphertext pumping and Raven certificate/SslStream APIs"
+  ]
+}

@@ -202,10 +202,12 @@ are empty managed byte arrays validated against the current heap; raw provider h
 never cross this boundary. Unreachable owners release their resources during successful
 collection, with abortive cleanup only. See [TLS ownership](shared-security-provider.md#interpreter-service-and-heap-ownership-development-2026-10-12)
 for faults, statuses, quotas, lifetime rules and the remaining native/managed gates.
-These imports do not yet have native JIT/AOT lowering or a public Raven API.
+Native JIT/AOT lowering is opt-in through `--bind-tls`, requiring
+`--compile-system --reference-arena --native-gc`. Only the exact nongeneric
+InternalCall declarations are admitted. There is no public Raven API yet.
 
 The private native TLS owner adapter now validates live packed byte arrays and
 connects native provider resources to the collector's ownership registrations.
 It implements the five ownership operations and explicit abortive host teardown;
-compiler/JIT binding admission and host packaging are not yet enabled. See the
+explicit compiler/JIT binding admission is available; default host packaging remains open. See the
 [shared-provider checkpoint](shared-security-provider.md#native-tls-ownership-adapter-development-2026-10-12).

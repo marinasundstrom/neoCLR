@@ -1246,3 +1246,62 @@ mod cryptography_tests {
         }
     }
 }
+
+/// Private byte-array tls contracts; explicit host binding, no foreign lookup.
+pub fn tls(input: &mut neoclr::Module, selection: &Value) -> Result<Vec<Value>, Error> {
+    let mut bindings = vec![];
+    for row in selection["functions"].as_array().ok_or("missing selection inventory")? {
+        let (operation, arity, result) = match row["name"].as_str() {
+            Some("neoCLR.Runtime.TlsCreateClient") => (1, 3, Type::Int32),
+            Some("neoCLR.Runtime.TlsCreateServer") => (2, 4, Type::Int32),
+            Some("neoCLR.Runtime.TlsCreateSession") => (3, 3, Type::Int32),
+            Some("neoCLR.Runtime.TlsRelease") => (4, 1, Type::Int32),
+            Some("neoCLR.Runtime.TlsAbort") => (5, 1, Type::Int32),
+            _ => continue,
+        };
+        let index = row["compiledIndex"].as_u64().ok_or("missing compiled index")? as usize;
+        let f = &mut input.functions[index];
+        if f.name != row["name"].as_str().unwrap() || f.owner.is_some() || f.instance
+            || f.parameters != vec![Type::ArrayRef(Box::new(Type::Byte)); arity]
+            || f.returns != result || f.no_result || f.impl_flags != 0x1000
+            || !f.body.is_empty() || !f.locals.is_empty() || f.pinvoke.is_some()
+            || f.receiver_byref || f.receiver_readonly || f.is_virtual || f.is_override || f.is_abstract
+            || !f.generic_parameters.is_empty() || !f.generic_arguments.is_empty()
+            || !f.generic_constraints.is_empty() || !f.interface_implementations.is_empty()
+            || !f.out_parameters.is_empty() || !f.out_when_true.is_empty() || !f.readonly_parameters.is_empty() {
+            return Err("native tls binding requires exact nongeneric byte-array InternalCall contracts".into());
+        }
+        f.impl_flags = 0;
+        f.body = vec![if result == Type::Boolean { Op::Bool(false) } else { Op::Int(0) }, Op::Return];
+        bindings.push(json!({"definition":row["definition"], "name":row["name"], "compiledIndex":index,
+            "implementation":"tls-v1", "operation":operation, "symbol":"neoclr_tls_managed_v1"}));
+    }
+    Ok(bindings)
+}
+
+#[cfg(test)]
+mod tls_tests {
+    use super::*;
+    #[test]
+    fn tls_binding_does_not_replace_managed_bodies_or_accept_changed_contracts() {
+        let source = ".module Probe\n.function neoCLR.Runtime.TlsCreateClient(arrayref<Byte> owner,arrayref<Byte> roots,arrayref<Byte> alpn) -> Int32\n.methodimpl InternalCall\n.end";
+        let original = neoclr::assemble(source).unwrap();
+        let selection = json!({"functions":[{"name":"neoCLR.Runtime.TlsCreateClient","compiledIndex":0}]});
+        let mut valid = original.clone();
+        let rows = tls(&mut valid, &selection).unwrap();
+        assert_eq!(rows[0]["operation"], 1);
+        assert_eq!(rows[0]["symbol"], "neoclr_tls_managed_v1");
+        for change in 0..5 {
+            let mut bad = original.clone();
+            let f = &mut bad.functions[0];
+            match change {
+                0 => { f.impl_flags = 0; f.body = vec![Op::Int(42), Op::Return]; },
+                1 => f.parameters[0] = Type::ArrayRef(Box::new(Type::Int32)),
+                2 => f.returns = Type::Boolean,
+                3 => f.generic_parameters.push(Some("T".into())),
+                _ => f.no_result = true,
+            }
+            assert!(tls(&mut bad, &selection).is_err());
+        }
+    }
+}

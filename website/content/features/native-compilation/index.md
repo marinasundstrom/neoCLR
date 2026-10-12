@@ -257,7 +257,11 @@ Windows HTTPS now passes its dedicated AOT/JIT qualification gate: 27 host cases
 and two Rust transport tests. All 15 common project AOT cases match macOS. This
 remains source-host support, without public secure-stream APIs or packaged TLS.
 The shared private provider now distinguishes certificate configuration errors and
-supports pollable graceful shutdown; its managed secure-stream projection remains open.
+supports pollable graceful shutdown. Private TLS ownership bindings now pass seven
+cases in interpreter, JIT and AOT on macOS, with Windows execution pending CI.
+They use GC-owned resources and explicit native compiler opt-in; default TLS host
+packaging and managed certificate/secure-stream APIs remain open.
+[TLS binding checkpoint](https://github.com/marinasundstrom/neoCLR/blob/main/docs/shared-security-provider.md#explicit-native-service-lowering-development-2026-10-12).
 
 Private cryptography service bindings use a standalone provider archive without
 TLS dependencies and now pass twelve cases in interpreter, JIT

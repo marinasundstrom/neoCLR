@@ -34,6 +34,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   The real-provider adapter and 24 provider/interpreter lifetime checks pass on
   macOS; Windows CI builds the same adapter with MSVC. Native compiler admission,
   host packaging and Raven certificate/SslStream APIs remain pending.
+  Add explicit --bind-tls admission/lowering shared by JIT and AOT, requiring the
+  native collector and reference arena. Seven ownership cases pass identically in
+  interpreter/JIT/AOT on macOS (21 executions), with changed-contract and missing
+  binding/profile rejection coverage. Windows runs the same CI harness. Default
+  host packaging and public certificate/SslStream APIs remain open.
   Document shared HTTP/SQL security concepts without forcing a common native backend;
   managed SSL/certificate ownership and handshake diagnostics remain open.
 

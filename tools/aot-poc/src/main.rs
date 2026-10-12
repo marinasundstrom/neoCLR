@@ -145,6 +145,11 @@ fn run() -> Result<(), Box<dyn std::error::Error>> {
     let bind_cryptography = crypto_count == 1;
     args.retain(|a| a != "--bind-cryptography");
     if bind_cryptography && !compile_system { return Err("--bind-cryptography requires --compile-system".into()); }
+    let tls_count = args.iter().filter(|a| *a == "--bind-tls").count();
+    if tls_count > 1 { return Err("duplicate --bind-tls option".into()); }
+    let bind_tls = tls_count == 1;
+    args.retain(|a| a != "--bind-tls");
+    if bind_tls && !compile_system { return Err("--bind-tls requires --compile-system".into()); }
     let stream_output_count = args.iter().filter(|a| *a == "--bind-console-stream-output").count();
     if stream_output_count > 1 { return Err("duplicate --bind-console-stream-output option".into()); }
     let bind_console_stream_output = stream_output_count == 1;
@@ -311,6 +316,7 @@ fn run() -> Result<(), Box<dyn std::error::Error>> {
     if bind_system_culture && !reference_arena { return Err("--bind-system-culture requires --reference-arena".into()); }
     if bind_utf8_text && !reference_arena { return Err("--bind-utf8-text requires --reference-arena".into()); }
     if bind_cryptography && !reference_arena { return Err("--bind-cryptography requires --reference-arena".into()); }
+    if bind_tls && (!reference_arena || !native_gc) { return Err("--bind-tls requires --reference-arena and --native-gc".into()); }
     let fault_details_count = args.iter().filter(|a| *a == "--fault-details").count();
     if fault_details_count > 1 { return Err("duplicate --fault-details option".into()); }
     let fault_details = fault_details_count == 1 || bind_user_fault || bind_console_read_byte || bind_console_write_line || bind_console_stream_output || bind_int32_to_string || bind_system_culture || bind_character_text || bind_integer_text || reference_arena;
@@ -435,6 +441,7 @@ fn run() -> Result<(), Box<dyn std::error::Error>> {
                 bind_console_write_line,
                 bind_console_stream_output,
                 bind_cryptography,
+                bind_tls,
                 bind_int32_to_string,
                 bind_utf8_text,
                 bind_paths,

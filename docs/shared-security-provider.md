@@ -422,3 +422,30 @@ failed construction, explicit/GC/host cleanup, terminal Fault teardown and malfo
 or uninitialized byte arrays. See [adapter evidence](experiments/shared-tls/native-adapter-validation.json).
 Windows execution remains pending. This is a private host adapter: compiler binding
 admission/lowering, host packaging and managed certificate/SslStream APIs remain open.
+
+## Explicit native service lowering (development, 2026-10-12)
+
+The native compiler's `--bind-tls` now admits the five exact private ownership
+InternalCalls. It requires `--compile-system --reference-arena --native-gc`.
+Changed signatures, ordinary managed implementations and generic declarations are
+rejected. Selection records `tls-v1` operations, and JIT/AOT both lower to the
+shared `neoclr_tls_managed_v1` adapter with the active runtime context. Faults and
+provider result codes retain their separate channels. These synchronous ownership
+calls do not suspend or collect while borrowing managed inputs.
+
+The focused host links the shared TLS provider and adapter and performs abortive
+TLS disposal before freeing its heap, including terminal Fault exits. This remains
+explicit opt-in compilation: default JIT bundles, project publishing and packaged
+hosts do not yet install the TLS adapter. No Raven compiler/CLI metadata mapping
+changes are introduced, and no managed certificate or SslStream API is exposed.
+
+Seven identical cases pass in interpreter, JIT and AOT on macOS: invalid trust,
+idempotent empty release, missing session abort, invalid owner, uninitialized input,
+and successful client/server session creation followed by configuration release and
+abort. The harness also rejects unbound imports and profiles missing GC/arena support.
+Provider/collector tests separately cover encrypted transfer and detailed cleanup.
+These seven cases do not qualify a managed TLS stream or HTTPS client.
+The fixture explicitly requests named-curve EC keys; explicit-parameter EC keys are
+unsupported provider input, not a new platform guarantee. The Windows workflow runs
+the same modes; execution is pending.
+See [binding evidence](experiments/shared-tls/bindings-validation.json).
