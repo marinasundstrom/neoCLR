@@ -21,6 +21,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   registration API; names alone establish no retention contract. Record the foreign
   boundary as a trusted agreement between independent memory/security models,
   distinguishing managed rooting from foreign ownership and release obligations.
+  Define unsafe in terms of leaving runtime guarantees, independent of whether the
+  foreign implementation is native or managed by another runtime.
 
 - On codex/native-function-pointers, bind native addresses to structural Function
   values through the interpreter/neoIL function.bind.native instruction. Share ABI

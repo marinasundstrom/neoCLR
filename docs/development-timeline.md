@@ -61,6 +61,13 @@ See the [changelog](../CHANGELOG.md) and linked design documents for technical s
   than enforce a foreign collector or provide a sandbox. Longer-lived mappings do
   not inherently require the native side to adopt a neoCLR registration API.
   This is a contract clarification; no runtime behavior changed.
+- **Author refinement:** unsafe means operating outside the runtime's guarantees,
+  rather than merely being unmanaged; foreign code may be managed elsewhere.
+- **Assistant response and action:** adopt that distinction in the contract design.
+  Another runtime's managed code still requires an explicit cross-runtime agreement;
+  a native runtime service may uphold a safe managed contract. Safe wrappers are a
+  design possibility when they uphold all caller-facing obligations, not a guarantee
+  supplied by attributes alone. Existing trusted execution behavior is unchanged.
 - **Open:** persistent registrations, foreign-thread attachment, richer reverse
   marshalling, Raven attributes/emission and JIT/AOT exports/sidecars. The author
   established the desired two-way interface, not approval of a permanent call-scoped

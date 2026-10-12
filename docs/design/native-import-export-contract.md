@@ -44,6 +44,22 @@ ABI and data contract. neoCLR does not require a foreign receiver to participate
 its GC, use its allocator, or adopt its security model. Metadata describes the
 agreement; it cannot prove foreign code follows it. In-process FFI is not a sandbox.
 
+The author further clarifies that unsafe describes leaving neoCLR's guarantees,
+not an implementation being unmanaged. A foreign implementation may itself use
+another managed runtime, collector or security model; that does not establish
+neoCLR's guarantees across the call. Conversely, a native implementation can belong
+to neoCLR's trusted runtime and uphold a safe managed service contract. InternalCall
+and NativeImport therefore continue to identify different providers rather than
+classify machine code as inherently safe or unsafe.
+
+The design criterion is which ABI, memory, lifetime and runtime-entry obligations
+neoCLR can establish, and which require explicit external trust. A wrapper may
+present a safe interface when its implementation upholds those obligations for all
+permitted inputs; a signature annotation alone cannot establish that. This is a
+contract principle, not a newly implemented source-level unsafe modifier, wrapper
+verification mechanism or security sandbox. The existing trusted execution entry
+points remain the interpreter's enforcement boundary.
+
 Each side remains responsible for storage it owns. Passing a value or address does
 not by itself transfer ownership: the contract distinguishes a borrowed view, an
 independent copy and an ownership transfer, including which allocator or release
