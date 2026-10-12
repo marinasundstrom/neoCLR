@@ -9180,3 +9180,22 @@ changed; do not infer source authoring support from this runtime experiment.
 The author explicitly directed main integration of this bounded FFI slice on
 2026-10-12. Source compiler/native metadata tooling and backend expansion remain
 future work; their previous readiness gate is deferred for this slice only.
+
+## SQL consumer lowering fixes (2026-10-12)
+
+Raven's native compiler line `codex/source-object-metadata-resolution` now lowers
+late runtime-await value blocks at ordinary static/reference-instance call
+boundaries by spilling operands in source order. Discarded terminal blocks also
+survive required-result/conversion wrappers introduced by cleanup lowering.
+System.Data parameter reflection and an inline awaited-query assertion compile
+without the corresponding source workarounds. Ref/out/value receivers retain
+existing restrictions. The unsplit consumer still hits the metadata-writer local
+quota; native execution remains pending independent backend fixes.
+
+This changes native body emission only. Runtime Contract settings, semantic-model
+contracts and the temporary CLI reference projection are unchanged. Raven owns the
+portable lowering; neoCLR owns metadata admission and execution. No additional CLI
+encoding is introduced, and native branches/locals already represent the intended
+semantics. Raven's focused prepared-body, pattern-body and enumeration-cleanup
+regressions pass (22 tests); this does not qualify a new runtime bundle or Windows.
+The affected portable backend files are absent on Raven main, which stays separate.

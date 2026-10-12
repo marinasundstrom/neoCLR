@@ -8,6 +8,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-12
 
+- Record Raven native lowering fixes exposed by SQL parameter reflection and
+  inline awaited queries, with 22 focused compiler regressions passing. Keep the
+  separate native local quota and boxed Int64 execution gaps explicit; no new
+  runtime bundle or Windows qualification is claimed.
+
 - Merge the bounded callable FFI implementation into main at the author's direction.
   Keep its interpreter/neoIL scope and trusted, call-scoped callback contract explicit.
   Record source/compiler metadata integration, richer marshalling/lifetimes,
