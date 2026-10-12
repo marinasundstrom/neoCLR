@@ -25,6 +25,33 @@ available original wording; other text is a summary.
 
 See the [changelog](../CHANGELOG.md) and linked design documents for technical status.
 
+## 2026-10-12 — Working diagnostics before settled tool architecture
+
+**Author:** Requested continuing the profiler attachment milestone: observe GC
+snapshots in the running HTTP showcase while requests continue, committing each
+slice. Clarified that the earlier separate-tool suggestion was not a claim that
+this was necessarily the right architecture. Subsequently emphasized: “our first
+priority is to have tools that work” and that “the runtime should support this kind
+of integration”. Tools can remain provisional while they help runtime development.
+
+**Assistant:** Accepted runtime integration and trustworthy data as the priority,
+with standalone packaging and the transport provisional. Implemented a bounded
+native snapshot service and a separate Python reader as a practical development
+proof, without making its protocol a stable platform contract.
+
+**Actions:** The [first slice](experiments/runtime-diagnostics/README.md) publishes
+owner-thread scalar copies at collection boundaries, marks stale/unavailable data,
+and avoids blocking the runtime on clients. Focused undefined-behavior/bounds tests
+exercise protocol rejection, disconnected/stalled readers and shutdown. The next
+slice qualifies repeated attachment during runtime-async HTTP requests in AOT/JIT
+and records local instrumentation overhead. Normal host cleanup still checks roots,
+heap reclamation and suspended-operation teardown.
+
+**Open:** Installed tooling, Windows transport, interpreter attachment, multi-owner
+aggregation, CPU stack sampling through this endpoint and debugger attachment remain
+unimplemented. No performance parity or finalized architecture is inferred from this
+proof. See the linked validation record for scoped results and timing limitations.
+
 ## 2026-10-12 — Separate attachable debugger and profiler
 
 **Author:** “I want the debugger and profiler to be separate tools that can attach

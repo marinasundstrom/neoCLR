@@ -38,14 +38,17 @@ Readable native profile symbols and warmup-excluded GC summaries now pass a
 diagnostic time; investigate collection work/pacing next with stress-GC validation
 retained. Native debugger stepping, retention paths and causal stacks remain open.
 
-**Attachable diagnostics direction (2026-10-12):** the author requires separate
-external debugger and profiler tools attaching to an opt-in runtime service. The
-[architecture and first attach gate](runtime-diagnostics.md) distinguish current
-in-process/harness tooling from this unimplemented endpoint. Start with coherent
-read-only GC snapshots during HTTP execution, then debugger control. The
+**Attachable diagnostics direction (2026-10-12):** the author requests separate
+tools, then clarifies that working runtime integration and useful provisional
+development tools take priority over standalone packaging or a settled attachment
+architecture. The [architecture and attach gate](runtime-diagnostics.md) remain
+provisional. The [native GC attachment proof](experiments/runtime-diagnostics/README.md)
+now passes repeated attachment during 128 HTTP requests in each of macOS ARM64
+AOT and JIT, with fresh snapshots and verified request progress. Installed tooling,
+other hosts/modes, multi-owner aggregation and debugger control remain open. The
 [payload/pause measurement slice](experiments/runtime-async/native-profiling.md#payload-and-pause-measurements--2026-10-12)
-provides bounded instrumentation and sanitized ownership checks; it does not provide
-attach support or change collection pacing.
+provides bounded instrumentation and sanitized ownership checks; the attachment
+layer builds on it without changing collection pacing.
 
 **Runtime diagnostics direction (2026-10-11):** the author requests profiling the
 remaining native runtime-async gap and building useful profiler/GC/debugger tools.

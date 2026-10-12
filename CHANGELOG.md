@@ -8,6 +8,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-12
 
+- Qualify provisional profiler attachment during the Raven HTTP showcase in
+  macOS ARM64 AOT and JIT: 128 requests per mode, repeated external attachment,
+  fresh coherent GC snapshots and continued request progress. Record exploratory
+  overhead and current scope; prioritize useful runtime diagnostics over settled
+  standalone packaging. Windows/interpreter attachment and debugger control remain open.
+
 - Add a provisional native GC snapshot endpoint and standalone Python profiler.
   Publish owner-thread copies without blocking collection; report stale/unavailable
   data explicitly. Qualify protocol, disconnect and shutdown behavior with focused

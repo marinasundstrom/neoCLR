@@ -1,16 +1,21 @@
 # Attachable runtime diagnostics
 
-Author direction, 2026-10-12: debugger and profiler are separate external tools that
-can attach to a running runtime. This is the intended architecture, not implemented
-attach support. Tool names and protocol encodings remain provisional.
+Author direction, 2026-10-12: useful development tools and runtime integration come
+first. The author requested standalone tools, then clarified that packaging can wait:
+the runtime must expose trustworthy information and provisional tools should help us
+make it work. The architecture below is a working proposal, not a settled endpoint
+or packaging requirement. Tool names and protocol encodings remain provisional.
 
 ## Current implementation and next boundary
 
 The [terminal debugger](debugger.md) runs inside the interpreter command. The
 [native profiler](experiments/runtime-async/native-profiling.md) rebuilds a native
 benchmark host and samples it using macOS tools. Neither supplies a general runtime
-attach service. Managed StackTrace captures current guest frames; it is not a
-remote debugger or a causal async stack.
+attach service. A separate [development attachment proof](experiments/runtime-diagnostics/README.md)
+now provides read-only native GC snapshots over a local socket on macOS ARM64.
+It is opt-in, owner-thread scoped and not part of installed bundles. Managed
+StackTrace captures current guest frames; it is not a remote debugger or a causal
+async stack.
 
 Provide an opt-in runtime diagnostics service and two independently usable clients:
 
@@ -60,9 +65,11 @@ restricted to the runtime's user. Remote networking, stable wire format and univ
 startup-suspend support are not selected in this slice. Transport and protocol
 compatibility, synchronization, buffering and instrumentation all have measurable costs.
 
-## First attach milestone
+## First attach milestone and validation contract
 
-Build a read-only profiler attachment to a long-running native HTTP showcase:
+The [HTTP validation](experiments/runtime-diagnostics/http-validation.json) passes
+the bounded macOS ARM64 AOT/JIT proof below. This is not portable or installed-tool
+qualification; longer overhead measurements and other modes remain open.
 
 1. Enable diagnostics in the host, identify the process instance (not PID alone),
    negotiate protocol version and available counters, then attach after startup.
@@ -88,5 +95,5 @@ threads, suspended logical frames, frame/IL/source mapping, breakpoint ownership
 safe detach while paused. A disconnect must not strand a runtime that the session
 paused; explicit startup wait remains a separate host policy. Multiple readers,
 exclusive debugger control, process exit and reattachment require lifecycle tests.
-Retention paths and causal async stacks remain further work. The current measurement
-slice does not implement any of these attach capabilities.
+Retention paths and causal async stacks remain further work. The provisional GC
+attachment implements no debugger control.

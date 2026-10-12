@@ -71,3 +71,50 @@ unsupported versions/commands, overlong and stalled requests, reader disconnect,
 normal exit cleanup and disabled/invalid configuration. Set `CC` and `CFLAGS` to
 select a matching compiler/SDK. AddressSanitizer on the local macOS 27/Xcode SDK
 combination hung inside sanitizer startup before main; this is not an ASan pass.
+
+## HTTP showcase qualification — 2026-10-12
+
+[Recorded validation](http-validation.json) compiles `HttpProfile.rvn`, a repeated
+version of the existing HttpServer greeting showcase, with Raven runtime async. It
+builds matching native hosts and qualifies AOT and JIT. Both execute 128 loopback
+requests with exact status/body checks and clean host teardown. No application state
+machine, profiler-triggered collection or debugger session is required.
+
+The external client attaches twice after the server has already handled requests,
+reading four snapshots per session. All 16 snapshots were fresh and internally
+consistent. AOT allocation counts advance from 5,813 to 8,802; JIT from 5,218 to
+7,942. HTTP progress is asserted during each capture: AOT requests 9→13 and 13→17;
+JIT 7→11 and 11→15. A stalled diagnostic socket also permits continued HTTP traffic.
+Normal exit removes the endpoint. These checks qualify this native host, not every
+runtime configuration or installed CLI.
+
+Reproduce with a passing native showcase recipe and its matching compiler/bundle:
+
+```sh
+python3 docs/experiments/runtime-diagnostics/validate_http.py \
+  --recipe docs/experiments/runtime-async/collector-walk-showcase.json \
+  --output target/diagnostics-http-new
+```
+
+The output contains the compiled server, JIT host, selection report, commands and
+input hashes. To inspect manually, launch its `server` with a private diagnostics
+directory, then run the profiler command above against its PID. The server prints
+its loopback port and exits after 128 `GET /greeting` requests. Keeping this bounded
+makes teardown checks repeatable; it is a development consumer, not a production host.
+
+Three alternating AOT rounds also compare identical guest code with no instrumentation,
+with instrumented counters but no endpoint, and with an active external reader:
+
+| Configuration | Median time for last 124 requests | Round range |
+| --- | ---: | ---: |
+| Uninstrumented | 2.162 s | 2.091–2.361 s |
+| Instrumented, unattached | 2.154 s | 2.142–2.447 s |
+| Attached | 2.373 s | 2.161–2.401 s |
+
+The first four requests precede timing and attachment; process startup/JIT compilation
+is excluded. The workload uses serial connections, no parallel load or tail-latency
+analysis. Noise and overlapping ranges prevent isolating attachment cost from this
+small run. An earlier local run showed a different relative ordering of instrumented
+variants. Treat these as exploratory overhead data, not a negligible-overhead claim.
+Future tuning should separate timer/histogram cost, publication frequency and transport
+CPU time under a longer matched workload. Collection pacing is unchanged.

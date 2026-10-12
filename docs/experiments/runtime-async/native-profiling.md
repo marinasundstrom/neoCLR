@@ -236,3 +236,8 @@ part of the build-and-sample harness, not a runtime attach protocol.
 
 See [attachable runtime diagnostics](../../runtime-diagnostics.md) for the separate
 external debugger/profiler architecture and the next read-only attachment gate.
+
+The [provisional HTTP attachment proof](../runtime-diagnostics/README.md) now passes
+on macOS ARM64 AOT/JIT: a separate client reads coherent owner-thread snapshots while
+the server handles requests. This complements the build-and-sample workflow; CPU
+stack sampling is not yet exposed through the attachment endpoint.

@@ -1,0 +1,43 @@
+import System.*
+import System.Collections.*
+import System.Result.*
+import System.Tasks.*
+import System.Web.Http.*
+
+func Respond(request: HttpRequest) -> Task<Result<HttpResponse, HttpError>> {
+    if request.Method.Method != "GET" || request.Target != "/greeting" {
+        let errorResult: Result<HttpResponse, HttpError> = Error(HttpError.Handler("Unexpected request"))
+        return Task.FromResult(errorResult)
+    }
+    let headers = ArrayList<HttpHeader>()
+    headers.Add(HttpHeader("Content-Type", "text/plain; charset=utf-8"))
+    let result: Result<HttpResponse, HttpError> = Ok(HttpResponse(200, headers, HttpContent.FromText("Café 🌍").Bytes))
+    return Task.FromResult(result)
+}
+
+async func Serve(server: HttpServer) -> Task<()> {
+    var served = 0
+    while served < 128 {
+        let result = await server.ServeOne(Respond)
+        if let Error(error) = result {
+            System.Fail(error.ToString())
+        }
+        served += 1
+    }
+    server.Close()
+    Console.WriteLine("PASS 128 HTTP requests while profiling")
+}
+
+async func Main() -> Task<()> {
+    if let Ok(server) = HttpServer.Listen("127.0.0.1", 0, 8) {
+        if let Ok(port) = server.GetLocalPort() {
+            Console.WriteLine(port)
+            await Serve(server)
+        } else {
+            server.Close()
+            System.Fail("Local port unavailable")
+        }
+    } else {
+        System.Fail("Listen failed")
+    }
+}
