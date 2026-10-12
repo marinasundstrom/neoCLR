@@ -56,54 +56,31 @@ Generations, byte accounting, finalizers, tuning and no-GC regions are future wo
 [API guide](../../docs/gc.html) · [GC reference](xref:System.Runtime.GC)
 
 
-## Native compilation experiment
+## Native collection and suspended operations
 
-Development ARM64 AOT builds can opt into `--native-gc`, which links a basic nonmoving
-collector into the executable. The tested Raven routing workload completes 1,024 requests
-within 64 KiB while preserving a pattern and captures across requests. No shared managed
-runtime is needed. The separate macOS ARM64 runtime-async POC now binds
-`System.Runtime.GC.Collect()` in JIT/AOT and preserves published roots from suspended
-native stacks. Other public GC controls/counters are not yet bound in this native
-profile; native GC metric parity remains open.
+Development ARM64 JIT/AOT builds can link a non-moving native collector. The
+runtime-async profile binds `GC.Collect()` and preserves published roots from
+suspended native stacks. Other public GC counters and controls are not yet bound
+in this profile.
 
-The initial collector scans object payloads conservatively and collects at every published
-operation boundary. Conservative scanning can retain extra objects, and frequent collection
-can perform excessive work; precise maps and pressure scheduling remain next. An in-header
-mark worklist avoids repeated heap traversal passes. Local measurements improve an adverse
-graph but show no material routing speedup. General host handles, concurrent
-collection and full HTTP-server qualification remain open.
-[Experimental contract and evidence](https://github.com/marinasundstrom/neoCLR/blob/main/docs/experiments/aot-console/native-gc.md).
+The collector conservatively scans object payloads, which can retain extra objects.
+Conditional owner/value roots let live tasks and external completions retain their
+suspended producers without keeping abandoned pending cycles alive. Runnable work
+remains rooted until dispatch. Collection releases unreachable frames and native
+stack mappings; it does not execute managed cleanup. Dispose resources explicitly.
 
+These are development contracts with target-specific qualification. See the
+[native collector contract](https://github.com/marinasundstrom/neoCLR/blob/main/docs/experiments/aot-console/native-gc.md)
+for supported profiles, ownership rules and correctness evidence.
 
-A private native collector experiment now tests conditional owner/value roots:
-reachable owners retain their dependents, while abandoned cycles can be reclaimed.
-Opt-in owned parked-frame registrations now apply this relationship at automatic
-collection safepoints, preventing an abandoned stack from rooting itself. Dependent
-host handles participate in the same graph and require strong ownership for dispatch. This is
-now integrated into the source-local Raven runtime-async provider. In the scoped
-interpreter and macOS ARM64 JIT/AOT experiment, live consumer tasks and external
-completions retain suspended producers; abandoned pending cycles release frames,
-operation slots and native stack mappings. Runnable work stays rooted until dispatch.
-Collection does not execute managed cleanup: use explicit asynchronous disposal for
-resources. This remains experimental, with Windows and performance qualification open.
-[Development contract and evidence](https://github.com/marinasundstrom/neoCLR/blob/main/docs/experiments/aot-console/native-gc.md#conditional-ownervalue-roots--private-experiment-2026-10-11).
+## Inspect the native runtime
 
+A provisional profiler combines symbolized macOS sampling with collector timing,
+allocation/live-payload counters and bounded pause histograms. An external client
+can read copied GC snapshots from an opt-in native host on macOS ARM64. Snapshots
+indicate stale data when no new collection boundary has been reached.
 
-A private native profiling runner now combines symbolized macOS sampling with
-opt-in collector timing, allocation/live-payload counters, bounded pause histograms
-and checked heap/stack teardown. The current terminal debugger runs in-process;
-the sampling profiler is a build-and-sample harness. A provisional external client
-can also read copied GC snapshots from an opt-in native host on macOS ARM64.
-Snapshots identify stale data when no new collection boundary is reached. This
-owner-thread experiment is not installed tooling or process-wide telemetry.
-Useful runtime integration comes first; standalone tool packaging remains provisional.
-Native stepping and logical async-stack inspection remain follow-ups. Profiling identified repeated conditional-root validation searches,
-which now reuse the collector's address index without changing collection frequency.
-[Profiling workflow and measurements](https://github.com/marinasundstrom/neoCLR/blob/main/docs/experiments/runtime-async/native-profiling.md).
-
-**Development follow-up:** native collection now avoids rescanning an activated
-parked stack within one collection and combines two redundant heap walks. Descriptor
-validation, conditional ownership and collection frequency remain unchanged. Local
-AOT comparisons use identical guest objects and verify full heap/stack reclamation;
-these results do not qualify a new collector policy or establish Windows performance.
-The profiling record above retains the benchmark and correctness evidence.
+The terminal debugger runs in-process. Standalone tool packaging, native stepping
+and logical async-stack inspection remain incomplete. These tools help investigate
+the runtime; they are not installed, process-wide telemetry services.
+[Profiling workflow](https://github.com/marinasundstrom/neoCLR/blob/main/docs/experiments/runtime-async/native-profiling.md).

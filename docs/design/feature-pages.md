@@ -272,5 +272,19 @@ Graphs are a presentation option for qualified measurements, not a substitute fo
 raw evidence. Include units, workload/configuration, revision/date, variability,
 a numerical table and reproduction links. Do not combine different historical
 builds, infer HTTP performance from standalone SQL/JSON timings, or render missing
-measurements as zero. Retain historical reports and incoming anchors. Publication
+measurements as zero. Retain historical reports in the repository and preserve useful incoming anchors. Publication
 remains the separate manual workflow described above.
+
+
+## Introductory guides and historical material — author direction, 2026-10-12
+
+Lead with what a reader can do, one tested example and the limitations needed to
+try it. Reveal further detail through focused case pages, API guides and references;
+do not make an introductory feature page double as a development log. Organize the
+guide entry points around application tasks before implementation concepts.
+
+Remove historical website material unless it is needed to use an available version,
+interpret a measurement or understand an unresolved limitation. Keep development
+chronology, superseded experiments and unqualified measurements in repository records
+and Git history. Preserve published release notes and changelog sections. Dates and
+revisions necessary to interpret actual benchmark evidence are not editorial clutter.

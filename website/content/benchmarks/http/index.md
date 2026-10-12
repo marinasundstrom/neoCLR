@@ -8,7 +8,7 @@ the application APIs; this report organizes performance evidence.
 
 | Server workload | Interpreter | JIT | AOT |
 | --- | --- | --- | --- |
-| Plain text: return a fixed UTF-8 response | Exploratory baseline | Exploratory baseline | Exploratory baseline |
+| Plain text: return a fixed UTF-8 response | Pending qualification | Pending qualification | Pending qualification |
 | JSON: serialize a response model | Pending | Pending | Pending |
 | JSON + database: parameterized query, map rows, serialize response | Pending | Pending | Pending |
 
@@ -18,27 +18,10 @@ will record the engine/version, container settings, query, row count, connection
 reuse and dataset. Client benchmarks will be reported separately from server
 throughput so each side's work is identifiable.
 
-## Existing plain-text baseline
+## Publication status
 
-The recorded macOS ARM64 run on Apple M1 (2026-10-11) uses the same Raven server
-assembly in all three modes: HTTP/1.1, a ten-byte Unicode response, sequential
-loopback requests and connection close. Five rounds each measure 24 requests after
-eight discarded requests. Every response is validated.
-
-| Mode | Median requests/s | Median process startup (s) |
-| --- | ---: | ---: |
-| Interpreter | 1.38 | 3.120 |
-| JIT | 53.49 | 3.874 |
-| AOT | 54.31 | 0.010 |
-
-**Exploratory historical result:** background compilation and indexing caused CPU
-contention. These short concurrency-one runs need repetition on a quiet machine
-before they support performance claims or a comparison chart. Startup includes JIT
-compilation; AOT compilation happens before the run. This does not measure server
-capacity or Windows performance.
-
-[Raw samples and build provenance](https://github.com/marinasundstrom/neoCLR/blob/main/benchmarks/jit-http/results.json) ·
-[Workload and reproduction](https://github.com/marinasundstrom/neoCLR/blob/main/benchmarks/jit-http/README.md)
+The current website does not publish a qualified performance score. A matched
+matrix with reproducible results is required before publishing comparison charts.
 
 ## Next measurements
 

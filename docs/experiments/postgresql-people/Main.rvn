@@ -1,0 +1,51 @@
+import System.*
+import System.Data.Sql.*
+import System.Data.PostgreSql.*
+import System.Result.*
+import System.Concurrency.Tasks.*
+
+public class Person {
+    init() { }
+    var id: int { get; set; } = 0
+    var name: string { get; set; } = ""
+    var active: bool { get; set; } = false
+}
+
+async func ShowPeople(connection: SqlConnection) -> Task<Result<unit, SqlError>> {
+    let positional = await SqlMapper.Query<Person>(connection,
+        "SELECT $1::int AS id, $2::text AS name, $3::bool AS active",
+        42, "Café team", true)?
+    for person in positional {
+        Console.WriteLine(person.id.ToString() + ": " + person.name)
+    }
+
+    let parameters = Person()
+    parameters.id = 43
+    parameters.name = "O'Brien"
+    parameters.active = true
+    let named = await SqlMapper.Query<Person>(connection,
+        "SELECT @id::int AS id, @name::text AS name, @active::bool AS active",
+        parameters)?
+    for person in named {
+        Console.WriteLine(person.id.ToString() + ": " + person.name)
+    }
+    return Ok(())
+}
+
+async func ReadPeople(port: int) -> Task<Result<unit, SqlError>> {
+    use connection = await PostgresDatabase("postgres", "postgres", port, 60000).Open()?
+    return await ShowPeople(connection)
+}
+
+async func Main(arguments: string[]) -> Task<()> {
+    if arguments.Length != 1 {
+        System.Fail("Expected the local PostgreSQL port")
+    }
+    let Ok(port) = Int32.Parse(arguments[0]) else {
+        System.Fail("Expected an integer port")
+    }
+    let result = await ReadPeople(port)
+    if let Error(error) = result {
+        System.Fail(error.ToString())
+    }
+}

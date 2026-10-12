@@ -25,6 +25,27 @@ available original wording; other text is a summary.
 
 See the [changelog](../CHANGELOG.md) and linked design documents for technical status.
 
+## 2026-10-12 — Current-state website and progressive guides
+
+**Author:** requests PostgreSQL examples on the SQL page and a website review: the
+navigation is difficult and articles are long reads. Guides should be introductory,
+with additional detail revealed as readers proceed. The author then directs:
+“Historical data should be removed from website unless necessary to keep”.
+
+**Assistant actions:** reorganizes guide navigation around application tasks, shortens
+eight feature introductions, removes the historical benchmark page and superseded
+progress narrative, and adds a PostgreSQL object-query walkthrough with downloadable
+source. The example covers both positional values and a named parameter object.
+Historical evidence remains in repository documentation and Git; published release
+notes remain unchanged. Meaningful benchmark provenance and current limitations stay
+visible. The website policy records this distinction.
+
+**Validation and scope:** the website publisher tests and full link-checked build
+pass locally. The PostgreSQL example executes against a local PostgreSQL 18 database.
+Local website preview is distinct from publication. SDK/editor installation remains
+blocked on extracted HTTP acceptance: the updated compiler exposes native type-count
+and generated async object-size limits. No release or installation is claimed here.
+
 ## 2026-10-12 — Preview installation and provider placement
 
 **Author:** asks to continue toward an experimental preview release, then requests

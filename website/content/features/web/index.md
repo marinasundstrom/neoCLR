@@ -8,9 +8,8 @@ with DNS on the client. HttpClient, HttpServer, request/response types, content 
 handlers live in System.Web.Http. Use async functions and `await` for application
 control flow; handlers and completion adapters can still use callbacks.
 
-For native execution status and the benchmark workbench, see
-[Native compilation](../native-compilation/) for the supported standalone HTTP
-showcases. Broader API availability here does not imply native-backend support.
+Use a matching development toolchain. [Native compilation](../native-compilation/)
+explains supported hosts and execution modes.
 
 ## HttpClient: call an HTTP service
 
@@ -85,536 +84,55 @@ The full case includes the nested station model.
 The walkthrough includes the shared models, routing, client connection setup,
 complete projects, run instructions and expected responses.
 
-## HTTP building blocks
+## Customize requests
 
-The following sections explain the lower-level APIs used by client/server applications.
+Use `HttpRequest`, headers and content when a convenience method is not enough.
+`Send` returns the response even for non-success status codes; `GetString` and
+`GetFromJson<T>` check success before decoding. Method values allow custom names.
 
-## A request and its content
+Derive from `DelegatingHandler` to observe or modify an exchange, then await
+`base.Send(request, cancellationToken)`. The handler pipeline can also replace
+transport for tests. It owns its inner handlers and freezes after sending begins.
 
-```raven
-{{HTTP_CLIENT_SAMPLE}}
-```
+[HTTP API and handler contracts](/docs/api/System/Web/Http/index.html) ·
+[HttpClient](xref:System.Web.Http.HttpClient)
 
-This function comes from the [tested source](/samples/http-client/Main.rvn).
-The sample maps typed HTTP failures to display text at its application boundary; `?` propagates that result; the response exposes headers and byte content.
-ReadText returns a Task/Result and strictly decodes UTF-8. The prototype buffers the
-complete small body before returning a response, so decoding currently finishes
-immediately. Wire lengths count bytes, not characters.
+<a id="own-an-http-exchange"></a>
 
-## Base addresses and URI values
+## Own the exchange
 
-`HttpClient.BaseUri` is an `Option<string>`, initially None. With no base configured,
-`Get` requires an absolute URL. With `Some("http://localhost:8080/api/")`,
-`Get("items")` constructs `/api/items`. A base ending in `/api` instead constructs
-`/items`: the last path segment is replaced, following URI resolution rules.
+Dispose clients when finished. Responses contain buffered content. On the server,
+complete or dispose each request context so its connection is closed. Use async `InputStream`/`OutputStream`
+operations for transfer and explicit encoding when converting bytes to text.
 
-`Get(string)` and `Get(Uri)` have the same behavior. Root-relative paths, parent paths,
-query-only references and empty references use the existing Uri resolver. A configured
-base rejects absolute URLs and `//host/path` references, so helpers cannot replace its
-authority. `Send` takes an already constructed request and does not apply the base.
+`HttpClient.Timeout` sets one cooperative budget across the handler pipeline,
+lookup, connection and response completion. It defaults to 100 seconds. Expiry
+requests cancellation and waits for cleanup; handlers that ignore cancellation
+cannot be forcibly interrupted. Transport phases have their own bounds.
 
-Invalid URI syntax becomes `HttpError.InvalidUri` with its original UriError. Unsupported
-HTTP forms and invalid base/address combinations are reported before handler dispatch.
-Base text is checked when constructing the request; assigning it does not perform I/O.
-Changes affect subsequent requests. Unlike .NET's Uri-valued BaseAddress, this property
-accepts optional text and can change after a request has been sent.
+## HTTPS and current limits
 
-[HttpClient API →](xref:System.Web.Http.HttpClient) · [Uri API →](xref:System.Uri)
+Development HTTPS uses explicit certificate credentials and trust through managed
+`SslStream`. See the [TLS guide](/docs/ssl-streams.html) for setup and supported hosts.
+SQL transport has separate limitations; HTTP TLS support does not imply SQL TLS.
 
-## Attach behavior with handlers
+HTTP/1.1 responses support fixed-length, chunked and connection-close framing.
+The server buffers a request and closes its connection after the exchange. Connection
+pooling, redirects, HTTP/2/3 and WebSocket upgrades are not implemented.
 
-HttpClient delegates `Send(HttpRequest, CancellationToken)` to an `HttpHandler`. Its contract returns
-`Task<Result<HttpResponse, HttpError>>`. Derive middleware from `DelegatingHandler`
-and await `base.Send(request, cancellationToken)` to act before and after the exchange.
-Its `InnerHandler` property owns the next stage and freezes after sending begins. Several handlers can form
-a pipeline, with socket transport at the end. Forwarding handlers pass the token to
-their inner handler. A fake handler can return a response
-without a network connection.
+Bodies, headers, URLs and JSON documents have separate size limits. Supported
+admission bounds are not a throughput guarantee; use the [HTTP API reference](/docs/api/System/Web/Http/index.html)
+for exact limits and error behavior. Choose a matching development toolchain for
+the examples rather than assuming every published package has these APIs.
 
-The sample checks nested before/after ordering, preserves errors and replaces the
-transport in tests. This follows the role of .NET's HttpMessageHandler and
-DelegatingHandler, adapted to Task/Result. Logging, authentication and retry policy
-are possible uses of this boundary; they are not implemented features. In particular,
-retries need decisions about replaying requests and safe methods.
+<a id="json-dom"></a>
 
-## Run the controlled example
+JSON can be represented as typed models or explicit JsonValue nodes. See the
+[JSON guide](/docs/json.html) for nested values, collection mapping and limits.
 
-[Download the client, handler checks and verifier](/samples/http-client.zip).
-The archive includes run instructions and requires matching
-artifacts. A local Python peer fragments headers and a `Café 🌍` body; the verifier
-also runs a .NET comparison client. The peer stays open until the client finishes,
-checking that completion follows Content-Length rather than waiting for EOF.
-Malformed/truncated responses and collection during pending work are exercised too.
+## Read further
 
-## HttpServer: an application-owned accept loop
-
-The basic server model is to listen, accept a request context, and let the
-application decide what to do with it. In schematic form:
-
-```text
-listen
-repeat:
-    await the next HTTP request context
-    apply the application's handling model
-    complete the response, or close the context
-```
-
-`HttpServer.Listen(...)` returns a Result containing the listener. Each
-`await server.Accept()` returns a Result containing an `HttpContext`, with the
-buffered request and an outgoing response. This accepts an HTTP exchange, rather
-than exposing a raw socket. The current implementation uses one connection per
-exchange and closes it afterwards; it does not provide keep-alive request reuse.
-
-The application owns the loop. Inside it, handling can be direct code, route
-matching, union dispatch or an attribute-based mapper. Those models sit above
-HttpServer; none is required by the listener. See the [report server's actual
-accept loop](/cases/http-server/#accept-loop), including its error policy and
-resource cleanup.
-
-Awaiting response completion before accepting again gives sequential handling.
-Concurrent handling requires an explicit dispatch and lifetime policy, within the
-server's outstanding-context limits. `ServeOne` is a convenience for one
-callback-driven exchange; calling it is another way to build an application loop.
-
-## Receive a request and return a response
-
-```raven
-{{HTTP_SERVER_SAMPLE}}
-```
-
-This [server callback](/samples/http-server/Server.rvn) builds a byte response.
-`HttpServer.Listen("127.0.0.1", 0, 4)` binds a loopback listener; `GetLocalPort()`
-reports the selected port. `ServeOne(Respond)` accepts one GET, HEAD, POST, PUT, PATCH or DELETE, awaits the callback,
-sends its response and closes that connection. The caller awaits completion and closes the listener.
-`Close()` stops listening and closes owned exchanges, including pending accepts and callback waits.
-
-The server's async `Main` awaits this exchange helper:
-
-```raven
-{{HTTP_SERVER_AWAIT_SAMPLE}}
-```
-
-[Download the server and interoperability verifier](/samples/http-server.zip).
-It pairs separate neoCLR processes, tests an independent .NET client, and sends
-fragmented and invalid raw requests. Small-heap runs collect during pending work
-and finish with no live managed objects. This is a bounded exchange, not an
-application hosting framework.
-
-Received headers have lowercase names and trimmed surrounding whitespace.
-The server requires exactly one Host. GET/HEAD/DELETE bodies remain unsupported;
-Development POST, PUT and PATCH buffer up to 1 MiB using Content-Length or chunked
-transfer coding before calling the handler. Without either framing field, a request
-has an empty body. It validates application response headers, computes the byte length
-and adds `Connection: close`. Malformed requests or callback errors close the
-connection without an HTTP error response. Final statuses 200–599 are supported in this preview. Statuses 204, 205 and 304 require empty content; the server omits Content-Length for 204/304.
-
-## Own an HTTP exchange
-
-In this preview, `HttpServer.Accept()` returns a context with the buffered request and
-outgoing response. The context keeps their lifetime together:
-
-```raven
-{{HTTP_CONTEXT_SAMPLE}}
-```
-
-`context.Response.Respond(statusCode, content)` sets status and content without sending.
-The status-only overload clears the content. `context.Respond(...)` forwards those
-same operations, while `RespondText` supplies UTF-8 text/plain content. `Complete(token)`
-validates, snapshots and sends the response, returning a Task with a Result. Completion
-ends the scope on success, failure or acknowledged cancellation. `Close()`/`Dispose()`
-ends the scope without sending; both are safe to repeat. Sending twice returns an error.
-
-The server permits at most 16 outstanding accept/context scopes, with one native accept
-pending at a time. Applications can hold two contexts and complete the second before the
-first. `ServeOne` uses this same ownership path. Cancellation can stop waiting for a
-callback but cannot preempt its code; shutdown closes exchanges rather than draining
-handlers. Request reads and response sends have separate provisional 15-second budgets.
-These contracts still use buffered content and one connection per exchange.
-
-See [HttpContext](/docs/api/System/Web/Http/HttpContext/) in the API reference for the
-complete signatures and limits. A future interface split could give inbound and outbound
-requests/responses different capabilities. Today they remain concrete message classes;
-configuring a received client response only changes the local object.
-
-## Current limits
-
-Development HTTP/1.1 supports final statuses 200–599. Client responses use fixed-length,
-chunked or connection-close framing; HEAD and bodyless 204/304 complete after headers.
-The client also consumes up to 16 informational replies before the final response,
-without merging interim headers. Status 101 remains unsupported.
-
-Buffered bodies and known-length uploads admit up to 1 MiB. This is an admission
-ceiling: the native stress-GC host currently exceeds its network deadline for
-1 MiB transfers; smaller transfers are qualified. Headers admit 32 KiB
-and 100 fields; chunk framing has a separate 64 KiB budget. URLs remain limited to
-1,024 bytes. Independent VM/native memory and instruction budgets must be configured
-for larger transfers; the HTTP bounds do not reserve memory. JSON retains its separate
-1 KiB document limit. Published POC downloads retain their older limits.
-
-Ambiguous framing, chunk extensions/trailers, other transfer codings and content
-encodings are rejected. TLS, redirects, pooling, live body streams, unknown-length
-client upload sources and WebSocket upgrades remain open. The server now accepts
-chunked requests but still buffers the complete body and closes after each exchange.
-Text means strict UTF-8. These are steps toward web hosting, not production readiness.
-
-Development `HttpClient.Timeout` configures one cooperative budget across the handler
-pipeline, DNS, connection and buffered response completion. It defaults to
-`Some(Duration.FromTicks(1000000000L))` (100 seconds); `Option<Duration>.None()` disables
-the client countdown. Configure it before sending. Positive durations through
-Int32.MaxValue milliseconds are supported, rounding fractional milliseconds upward.
-
-Expiry requests cancellation and waits for handler cleanup acknowledgement, then returns
-`HttpError.TimedOut`. Caller cancellation and disposal remain cancelled task outcomes.
-A completed response is preserved; a custom handler that ignores cancellation may keep
-running. Timer delivery requires scheduler progress and cannot preempt synchronous code.
-DNS, connection and transfers retain their independent five-second bounds and may fail
-earlier. Direct socket-handler use has only those phase bounds. Server budgets are separate.
-
-The native request host no longer aborts after fifteen seconds; test subprocesses retain
-external watchdogs. See the [Timeout API](/docs/api/System/Web/Http/HttpClient/index.html).
-The transport uses a 256-byte reusable buffer and handles short transfers. This
-is a correctness POC, not a performance benchmark. Generated async states still perform suspension.
-
-## Direction
-
-JSON mapping supports nested objects and typed arrays. RoutePattern lets an existing
-HttpServer handler match paths and extract named values or checked Int32 parameters.
-An application union is an optional convenience for dispatch with match. See the
-[routed station case](/cases/http-server/#development-case-routing-with-typed-parameters)
-and [API guide](/docs/routes.html). WebApplication infrastructure remains deferred.
-SQLite-backed persistence is an optional exploration.
-
-Possible later steps include asynchronous body contracts, response streaming, TLS
-and persistent connections. HTTP/2 and HTTP/3 would also require version-specific
-providers, multiplexing, flow control and independent stream lifetimes. These are
-future directions, not requirements for the bounded POC or promises for the next release.
-See the [client/server tracker](https://github.com/marinasundstrom/neoCLR/blob/main/docs/http-capabilities.md).
-
-Browse the [HTTP API reference](xref:System.Web.Http) for constructors, members,
-parameters and ownership details. The parser and operation adapter remain internal.
-
-HTTP operations return the standard `HttpError` union. Match NameResolution
-and Transport to inspect the original DNS or socket cause. InvalidRequest, Protocol,
-Unsupported and LimitExceeded distinguish validation and message failures; TimedOut
-represents the shared exchange deadline, and Handler can carry an application error.
-InvalidUri is available for URI integration. HTTP statuses remain response values as
-status support expands. ReadText still has its separate provisional string error for
-UTF-8 decoding. Default HttpError is inactive and formats as Empty.
-
-## URI references in this preview
-
-`System.Uri` parses escaped ASCII references and resolves relative references
-against an absolute base. `Parse` returns `Result<Uri, UriError>`; `Resolve` accepts
-either a string or another Uri. A trailing slash matters: resolving `child` against
-`http://example.test/api/` gives `/api/child`, while a base ending in `/api` gives
-`/child`. Query-only references preserve the base path, and literal dot segments are
-removed during resolution.
-
-This first iteration preserves exact text for equality and hashing. It does not
-perform network access, implicit escaping, IDNA conversion or IPv6-literal parsing.
-Input is limited to 4096 bytes. A parsed Uri does not imply transport support.
-UriError is an experimental union with named cases and generated pattern support.
-Match its named cases directly.
-
-The [API reference](/docs/api/System/Uri/) describes both overloads and the limits.
-
-Typed HttpError results, BaseUri resolution and token-aware Send/Get/GetString are
-integrated in this preview. Both string and Uri overloads are available; tokenless
-client overloads use CancellationToken.None. GetString decodes the buffered body as
-strict UTF-8 and preserves HTTP errors. Invalid bytes produce HttpError.Protocol;
-GetString accepts 200–299 and reports other statuses as HttpError.UnsuccessfulStatus
-with the status code. Send/Get return these responses as ordinary response values;
-IsSuccessStatusCode lets callers apply their own policy. Charset handling and response streaming remain future work.
-
-Cancellation tokens are invocation-local. Pre-cancellation skips parsing and handler
-dispatch. During an exchange the socket handler waits for native acknowledgement and
-closes its connection before its Task becomes cancelled. A completed native result
-can survive a later request; cancellation between phases prevents the next operation.
-Separate requests retain separate connections and cancellation state. DNS host work
-may continue after guest cancellation, with its bounded capacity still charged.
-
-Custom handlers derive from HttpHandler and override Send(request, cancellationToken).
-DelegatingHandler supplies middleware forwarding and owned inner-handler disposal;
-overrides can await base.Send(request, cancellationToken).
-HttpClient owns its handler by default; the (handler, false) constructor borrows it.
-Use a reusable client with use or explicit Dispose. Disposal requests cancellation
-of pending sends and rejects new sends, while completed responses remain caller-owned.
-Handlers must acknowledge cancellation after cleanup; a handler ignoring cancellation
-may remain pending. Forwarding handlers dispose owned inner handlers.
-They must forward or honor the token and finish owned cleanup before reporting
-cancellation. The client does not force completion of an uncooperative handler or
-dispose injected handlers.
-
-URI/URL encoding utilities are also planned separately. Their design will distinguish
-path segments, query values and form data; the current Uri parser expects text that
-has already been escaped.
-
-## Inspect response properties
-
-Responses expose `HttpStatusCode` names such as `NotFound`, while
-retaining unnamed numeric status values. `IsSuccessStatusCode` checks the 200–299
-range. Cast the enum to `int` when you need its numeric value.
-
-Property patterns are one option alongside ordinary property access. For a
-`Result<HttpResponse, HttpError>` named `result`, this target-tested form matches a
-status and captures the headers:
-
-```raven
-if let Ok(HttpResponse { StatusCode: HttpStatusCode.NotFound, Headers: headers }) = result {
-    Console.WriteLine(headers.Count)
-}
-```
-
-An `is` pattern places `let` on the capture instead:
-
-```raven
-if result is Ok(HttpResponse { StatusCode: HttpStatusCode.NotFound, Headers: let headers }) {
-    Console.WriteLine(headers.Count)
-}
-```
-
-The outer `let` in a binding or `if let` already supplies capture binding. Both
-forms use readable properties; neither requires `Deconstruct` or value equality.
-Positional deconstruction remains a separate design question. Neither form is a
-preferred style for every caller. The [HTTP API reference](/docs/api/System/Web/Http/)
-describes the response, status enum and errors.
-
-## Post buffered text
-
-POST support uses the same handler pipeline, BaseUri rules and cancellation
-token as GET. This sample propagates HTTP failures on its normal path. It separately
-chooses to reject non-success statuses, then adapts ReadText's provisional string error
-to HttpError at the application boundary.
-
-```raven
-{{HTTP_POST_SAMPLE}}
-```
-
-`HttpContent.FromText` encodes UTF-8 and sets the outbound Content-Type to
-`text/plain; charset=utf-8`. `HttpContent(bytes)` preserves binary bytes without a
-Content-Type; its second constructor accepts one explicitly. `HttpRequest.Content`
-exposes the body to the server handler, and incoming headers retain Content-Type.
-The socket provider computes Content-Length from bytes and snapshots the request
-before DNS. Content sources must remain stable while consumed.
-
-[Download the POST echo example and focused checks](/samples/http-post.zip).
-The checks cover neoCLR peers, an independent raw peer and a .NET client, including
-empty and binary bodies. Header append/remove operations, OPTIONS, unknown-length uploads, streaming responses, compression and Expect/continue are still unsupported.
-
-## Looking up headers
-
-In this preview, requests and responses provide `GetHeaderValues(name)`. Names use
-ASCII case-insensitive comparison. The returned sequence contains every stored matching
-field value in order; it is empty if the name is absent or invalid. Empty values remain
-present, and repeated fields are not joined or split at commas. For example,
-`response.GetHeaderValues("Set-Cookie")` preserves separate cookie fields.
-
-### Known-length stream uploads
-
-`HttpContent.FromStream(stream, length, leaveOpen)` creates one-shot
-upload content for POST, PUT and PATCH. The socket handler sends headers, then reads
-and sends chunks of at most 256 bytes. The entire source is not buffered first.
-Owned sources close at exchange completion, failure or cancellation; borrowed sources
-remain open. Call Dispose if content never enters an exchange. Length is explicit,
-extra source bytes remain unread, and early EOF is a typed content error.
-
-`IsBuffered` and `TryGetBytes` distinguish buffered content from a source. The existing
-`Bytes` accessor is buffered-only and faults for a stream; `ReadText` returns an error
-for stream content. Custom handlers can inspect or forward it, but a general custom
-body-reading contract is still future work. Source reads are synchronous and cannot
-be interrupted mid-read; responses and server request bodies remain buffered.
-
-The [tested upload fixture](https://github.com/marinasundstrom/neoCLR/tree/main/docs/experiments/http-stream-upload)
-checks short reads, binary data, ownership, reuse, cancellation and source errors.
-Future modern HTTP support needs async bodies, independent exchange lifetimes,
-trailers and version-specific providers. HTTP/2 and HTTP/3 are not implemented or
-promised for this release; see the
-[modern HTTP direction](https://github.com/marinasundstrom/neoCLR/blob/main/docs/http-capabilities.md#modern-http-direction).
-
-## Adding request headers
-
-In this preview, `request.WithHeader(name, value)` returns a new request with that
-application header set, replacing existing matches case-insensitively. It returns a
-Result, so request preparation can use `?` before calling `HttpClient.Send`:
-
-```raven
-let acceptsText = request.WithHeader("Accept", "text/plain")?
-```
-
-The original request keeps its headers. Content is shared, so keep it stable during
-use. The current helper validates ASCII names and printable ASCII values; it does not
-parse field-specific syntax. Transport headers such as Host and Content-Length are
-reserved, and Content-Type comes from HttpContent. The development provider allows 97 stored
-application fields and at most 32,768 encoded header bytes. Stream-backed content uses the same header rules.
-
-## Other request methods
-
-HttpClient provides `Put`, `Patch` and `Delete`, with string/Uri addresses and
-optional cancellation tokens. They use the same BaseUri and handler pipeline as Get
-and Post. PUT/PATCH take HttpContent; DELETE has no body in the current API. Non-success
-statuses remain responses, so callers choose their status policy:
-
-```raven
-{{HTTP_VERB_SAMPLE}}
-```
-
-The server accepts these methods and exposes their buffered content to its handler.
-PATCH content is opaque: applications choose its media type and behavior. The library
-does not apply patches. HEAD returns headers with empty content; the server computes representation length from the buffered response without sending its body. OPTIONS is not implemented.
-
-Client responses expose `Request: Option<HttpRequest>`. A response returned
-through `HttpClient.Send` retains the effective request passed to the handler, including when a custom
-handler produced the response. `DefaultRequestHeaders` supplies shared application
-headers; explicit request headers take precedence. Applying defaults creates a new
-request without changing the original. Defaults cannot override transport fields or
-content media types. Standalone and server-created responses start
-with `None`. This is an originating-request reference; redirect tracking is not yet
-implemented. Retaining the response also retains that request and its content.
-
-## Generic JSON client helpers
-
-The development `System.Web.Http.Json` module adds `GetFromJson<T>` and
-`PostAsJson<T>`. GET requires a successful status and reads a supported model;
-POST serializes a model and returns the response for the application to inspect.
-Both use the client's base URI, default headers and handler, with string/Uri and
-cancellation-token overloads. `HttpJsonError` preserves either the HTTP or JSON
-cause. Cancellation remains task cancellation.
-
-The managed report sample fetches a typed report from a neoCLR server, posts it back,
-and reads a JSON acknowledgement. The mapper supports String, Int32 and Boolean
-properties, nested reference objects and typed arrays with the same scalar
-rules, in documents up to 1,024 UTF-8 bytes. Conversion is synchronous over
-buffered HTTP content. Development mapping also supports built-in lists/sequences
-and string-keyed maps, including nested models and explicit JSON nodes. Map reads
-use ordinal string comparison. Per-call header options, nullable mapping and JSON
-converters remain later work. See [the API guide](/docs/json.html) for the exact scope.
-
-## JSON DOM
-
-The `System.Data.Json` API can parse, inspect, construct and write a small
-JSON document through strings or streams. `JsonValue` is a closed hierarchy:
-`JsonObject` and `JsonArray` expose their own container methods; strings, numbers,
-booleans and null have distinct node types. A missing member differs from a present
-JSON null. Numbers retain their JSON spelling until an explicit conversion is requested.
-
-```raven
-{{JSON_DOM_SAMPLE}}
-```
-
-The tested example adds an acknowledgement to an object and propagates failures.
-`JsonSerializer.DeserializeNode` and `SerializeNode` read and write the DOM. Development
-[framework tests](https://github.com/marinasundstrom/neoCLR/tree/main/runtime/raven/tests/json-dom)
-cover node access, duplicate fields, document round trips and error handling in both
-native and interpreted execution. The
-[stream suite](https://github.com/marinasundstrom/neoCLR/tree/main/runtime/raven/tests/json-streams)
-also checks partial I/O, borrowed ownership, errors and UTF-8 document quotas.
-Object mapping uses `Deserialize<T>` and `Serialize`. The stream overloads use
-Task-returning StreamReader/StreamWriter operations and leave supplied streams open;
-await those stream overloads before handling their Result.
-the caller controls flushing and closing. The sample also runs through
-[MemoryStream](/docs/api/System/IO/MemoryStream/) using write, rewind and read.
-
-Documents are buffered up to 1,024 UTF-8 bytes,
-four nested containers and 32 value occurrences. Containers admit 31 children.
-Duplicate names are rejected. A write failure can leave a partial output; cycles
-fail the depth limit. Nodes use reference identity, with shared mutable children.
-
-The shape is closest to .NET's mutable JsonNode model, but neoCLR calls the root
-`JsonValue` and returns Result errors, including nested stream causes. See the
-[JSON API reference](/docs/api/System/Data/Json/) for the current contracts.
-The [object-mapping guide](/docs/json.html) covers the provisional Object/TypeInfo
-overloads and typed `Deserialize<T>` reads for strings and borrowed streams. Broader mapping and
-additional HTTP conveniences remain later work. The development
-`System.Web.Http.Json.JsonContent` helpers create JSON content and read models or
-nodes from buffered content on either peer. They preserve Result errors and leave
-status handling and exchange completion to the application. Reads are synchronous
-and do not consume the content; creation sets the JSON UTF-8 media type.
-
-## Case: attributed catalog routes
-
-Declare the catalog paths on an application union, then dispatch with `match`:
-
-```raven
-{{HTTP_ATTRIBUTED_ROUTES}}
-```
-
-Create `AppRoutesParser` once before listening. Startup reflection validates the
-attributes and caches patterns, capture conversions and constructors; each request
-returns `Result<AppRoutes, RouteMappingError>`. NoMatch is distinct from malformed
-input, invalid parameters and construction failure. HTTP methods and response policy
-stay in the handler. See the [complete server and connecting client](/cases/http-server/#case-attributed-item-routes)
-for the runnable project and expected responses.
-
-This is development sample source with String/Int32 payloads and up to 16 public
-nongeneric cases, not an installed SDK mapper. It rejects structural overlap at
-startup. Requests still decode input and invoke checked constructors; no performance
-advantage is claimed. Source generation remains a future alternative.
-
-### Dynamic JSON content in typed models (development)
-
-Explicit JsonValue properties can hold arbitrary JSON subtrees inside otherwise
-typed objects. JsonObject, JsonArray and scalar node declarations require their
-matching kind. Nodes serialize as JSON content; JsonNull is explicit data, and
-Object-typed properties do not infer nodes. Whole-document limits still apply.
-The [tested NodeEnvelope consumer](https://github.com/marinasundstrom/neoCLR/blob/main/docs/experiments/native-json/Main.rvn)
-uses JsonValue, JsonObject and JsonValue[]; see the [API rules](/docs/json.html).
-List/map mapping remains under development.
-
-
-## Method values in development
-
-Custom method and status values are already supported: `HttpMethod("BREW")`
-preserves the token, and responses can represent unnamed codes such as 418 or 471.
-The server accepts final response codes from 200 through 599. The development
-HTTP value tests exercise these cases through JIT; this does not add the `coffee:`
-transport scheme or claim full HTCPCP support.
-
-`HttpMethod` provides Get, Head, Post, Put, Patch, Delete, Options, Trace, Connect and
-Query. Its constructor accepts custom ASCII HTTP tokens and preserves spelling.
-`HttpMethod.Parse` returns a typed result, canonicalizing known names without changing
-custom spelling. Equality and hashing follow .NET's ordinal-ignore-case behavior;
-read `.Method` or `.ToString()` when exact wire spelling matters.
-
-`HttpRequest.Method` now returns this type. Use `request.Method.Method` for text.
-`HttpRequest.Create(method, url)` and its Uri/content overloads support custom requests;
-the bounded server also accepts valid custom tokens. CONNECT tunnelling and OPTIONS
-asterisk-form requests remain unsupported. A method value does not enable those protocols.
-
-See the [HttpMethod reference](/docs/api/System/Web/Http/HttpMethod/index.html) and the
-[tested custom-method client](https://github.com/marinasundstrom/neoCLR/blob/main/docs/experiments/http-method/Client.rvn).
-
-## Development: JSON directly from content
-
-Import `System.Web.Http.Json.*` to call `await content.ReadFromJson<T>()` on either
-request or response content. A TypeInfo overload supports runtime-selected models;
-`ReadJsonNode()` returns a DOM. Token overloads acknowledge pre-cancellation before
-conversion. All preserve JsonError, enforce strict UTF-8 and keep buffered bytes
-readable. They do not check HTTP status or media type, and stream-backed content is
-not yet read by these helpers.
-
-`context.RespondJson(value)` serializes a model or DOM, selects status 200 and sets
-`application/json; charset=utf-8`. Its status overload allows another final status.
-It returns `Result<unit, JsonError>` and leaves the previous response unchanged on
-serialization failure. Call `await context.Complete()` to send. `JsonContent.Create`
-remains available when constructing explicit requests or responses.
-
-[Content JSON API](/docs/api/System/Web/Http/Json/HttpContentJsonExtensions/) ·
-[Response JSON API](/docs/api/System/Web/Http/Json/HttpContextJsonExtensions/).
-The existing JSON document/mapping limits still apply.
-
-### Server configuration (development)
-
-Pass [HttpServerOptions](/docs/api/System/Web/Http/HttpServerOptions/) to
-`HttpServer.Listen` to lower request body/header limits or select read/write
-deadlines. Listen validates and snapshots the settings; later changes to the
-options object do not affect the server. Existing defaults remain unchanged.
-The read budget covers headers and body after acceptance; the write budget starts
-after encoding. Both accept positive durations through 60 seconds. Host memory,
-stress-GC costs and the 1 MiB transfer qualification gap remain independent limits.
-
-## Request-processing benchmarks
-
-The [HTTP benchmark matrix](/benchmarks/http/) separates plain-text responses,
-JSON serialization and JSON with database access across interpreter, JIT and AOT.
-It distinguishes measured development baselines from workloads still awaiting
-measurement, and keeps startup separate from request processing.
+- [Build the HTTP server case](/cases/http-server/) — models, routes and client calls.
+- [SQL databases](/features/sql/) — query and map application data.
+- [TCP networking](/features/networking/) — lower-level socket operations.
+- [HTTP benchmarks](/benchmarks/http/) — workload matrix and measurement status.

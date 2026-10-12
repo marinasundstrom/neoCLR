@@ -9,14 +9,14 @@ propagate it with `?`.
 
 <a id="development-dynamic-arrays"></a>
 
-## dynamic arrays
+## Dynamic arrays
 
 Separately compiled JSON mapping can use `ArrayReflection` to read managed vector
 lengths and boxed elements, or construct a vector from a runtime-backed array descriptor.
 Reference elements retain identity. These bounded operations use terminal Faults for
 invalid inputs and do not support custom value elements or multidimensional arrays.
 See the [API contract](/docs/reflection.html#dynamic-managed-arrays-development-2026-10-07).
-This is development work after Preview 12; use matching rebuilt libraries.
+Use matching development libraries.
 
 ## Construct and invoke
 

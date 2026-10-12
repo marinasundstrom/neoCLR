@@ -1,28 +1,56 @@
 # SQL databases
 
-Development work adds SQL-first data access under `System.Data.Sql`, with an optional
-`System.Data.PostgreSql` provider. Databases open owned connections; statements carry
-named or positional parameters; results contain buffered rows that survive connection disposal.
-`SqlMapper.Query<T>(connection, sql, params values)` executes and maps to ordinary
-objects. With PostgreSQL, pass plain positional values with `$1` placeholders, or one readable parameter
-object with `@name` placeholders. No SQL primitive wrappers are needed for these calls.
-A small mapper copies columns to scalar properties or calls an explicit row mapper.
-There is no SQL generation or change tracking.
+Write SQL, pass plain values, and map rows to ordinary Raven objects.
+`System.Data.Sql` provides common connections, statements and the `SqlMapper`;
+`System.Data.PostgreSql` supplies the optional PostgreSQL provider.
 
-The first PostgreSQL binding is for local development: IPv4 loopback, trust
-authentication, UTF-8 text results and bounded result sizes. TLS, password authentication,
-remote servers, pooling and streaming are not implemented. This is unreleased work.
+The provider is currently for local development: IPv4 loopback and trust
+authentication. Password authentication, TLS, remote servers, pooling and streaming
+are not implemented. Use a matching development bundle containing the provider.
 
-Transactions have awaited commit/rollback. Disposing an active transaction closes its
-connection and lets PostgreSQL roll back on disconnect; explicitly rolling back permits
-connection reuse. Server errors retain SQLSTATE. Values are bound separately from SQL
-using PostgreSQL `$1` placeholders, with no SQL interpolation.
+## Query objects with PostgreSQL
 
-See the [SQL API reference](/docs/sql.html) for all member contracts and limits, and the
-[compiled consumer](https://github.com/marinasundstrom/neoCLR/blob/main/docs/experiments/sql-postgresql/Main.rvn)
-for property mapping, explicit maps, NULL values, transactions and error recovery.
+This model matches the returned column names:
 
-The common SQL contracts accept named or positional values and preserve SQL text.
-Each provider owns binding syntax; PostgreSQL's `@name` translation stays in that
-provider. Engine-specific interfaces can extend the shared connection contract.
-Only PostgreSQL has an implemented binding; other engines remain future work.
+```raven
+{{SQL_PERSON_MODEL}}
+```
+
+Pass positional values alongside the SQL. `Query<Person>` returns a task containing
+a Result; `?` propagates a `SqlError` to the enclosing async function.
+
+```raven
+{{SQL_POSITIONAL_PEOPLE}}
+```
+
+Values are bound separately from SQL text, including quotes and Unicode. The mapper
+copies columns to scalar properties; it does not generate SQL or track changes.
+
+## Use named parameters
+
+A plain object can supply the values for `@name` placeholders:
+
+```raven
+{{SQL_NAMED_PEOPLE}}
+```
+
+PostgreSQL owns the placeholder translation. The common mapper passes SQL to the
+selected provider without imposing PostgreSQL syntax on other database engines.
+
+[Run the PostgreSQL people example →](/cases/postgresql/)
+The walkthrough includes connection setup, a disposable Docker database and the
+complete downloadable source.
+
+## Connections, errors and transactions
+
+Open a connection with `await database.Open()` and own it with `use`. Query results
+are buffered snapshots and remain readable after the connection closes. Failures
+are `SqlError` values; server errors retain SQLSTATE.
+
+Transactions support awaited commit and rollback. Explicit rollback permits
+connection reuse. Disposing an active transaction closes the connection, allowing
+PostgreSQL to roll it back on disconnect.
+
+[SQL API and mapping rules](/docs/sql.html) ·
+[PostgresDatabase](xref:System.Data.PostgreSql.PostgresDatabase) ·
+[SqlMapper](xref:System.Data.Sql.SqlMapper)

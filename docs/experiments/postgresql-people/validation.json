@@ -1,0 +1,49 @@
+{
+  "passed": true,
+  "commands": [
+    {
+      "command": [
+        "dotnet",
+        "/Users/robert/Projects/neoclr/target/preview-type-budget-candidate/bundle/sdk/tools/rvnc/rvnc.dll",
+        "neoclr",
+        "--project",
+        "/Users/robert/Projects/neoclr/target/preview-postgresql-people-final/App.rvnproj"
+      ],
+      "exitCode": 0,
+      "stdout": "Native build output: /Users/robert/Projects/neoclr/target/preview-postgresql-people-final/bin/neoclr/People.dll\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/preview-type-budget-candidate/bundle/bin/neoclr",
+        "disassemble",
+        "/Users/robert/Projects/neoclr/target/preview-postgresql-people-final/bin/neoclr/People.dll",
+        "/Users/robert/Projects/neoclr/target/preview-postgresql-people-final/bin/neoclr/People.neoil"
+      ],
+      "exitCode": 0,
+      "stdout": "Disassembled /Users/robert/Projects/neoclr/target/preview-postgresql-people-final/bin/neoclr/People.dll -> /Users/robert/Projects/neoclr/target/preview-postgresql-people-final/bin/neoclr/People.neoil\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/preview-type-budget-candidate/bundle/bin/neoclr",
+        "run",
+        "/Users/robert/Projects/neoclr/target/preview-postgresql-people-final/bin/neoclr/People.dll",
+        "--reflection-roots",
+        "/Users/robert/Projects/neoclr/target/preview-postgresql-people-final/bin/neoclr/People.reflection.json",
+        "--",
+        "52728"
+      ],
+      "exitCode": 0,
+      "stdout": "42: Caf\u00e9 team\n43: O'Brien\n",
+      "stderr": ""
+    }
+  ],
+  "inputsSha256": {
+    "/Users/robert/Projects/neoclr/docs/experiments/postgresql-people/run.py": "c1f70ecdcb8cdb91b487c13bb1502f9a8f8c5debceabd8810d8f1847683b23e4",
+    "/Users/robert/Projects/neoclr/docs/experiments/postgresql-people/Main.rvn": "1cf7fbd0c25aeff213bf1186c6add90b2b580cfe27123cd623147a7ca7623d34",
+    "/Users/robert/Projects/neoclr/target/preview-type-budget-candidate/bundle/manifest.json": "56185c6f79b57be24e03d6f579a66a7be4d1474c5ddf6a54fde3eb2c8b0c614c",
+    "/Users/robert/Projects/neoclr/target/preview-type-budget-candidate/bundle/sdk/tools/rvnc/rvnc.dll": "c56bf5da468c40afcd302c186465a83f6374c65d029ee8f6b2157884964d8319",
+    "/Users/robert/Projects/neoclr/target/preview-type-budget-candidate/bundle/bin/neoclr": "19d027f44503dde74731c813fb3f2fac5a43e47b7c9f6498b6d0dadf8085d825"
+  }
+}

@@ -33,10 +33,3 @@ and [external runner](https://github.com/marinasundstrom/neoCLR/tree/main/benchm
 support selectable cases and separate process startup and operation batches.
 Reports distinguish internal operation timing from external timings that include
 validation, protocol and scheduling costs.
-
-<a id="interpreter-and-native-execution"></a>
-<a id="native-collector-comparison"></a>
-<a id="development-measurement-tooling"></a>
-
-[Historical routing, HTTP and collector measurements](/benchmarks/historical/)
-retain their original dates, methods and limitations.

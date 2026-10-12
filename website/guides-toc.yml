@@ -1,17 +1,25 @@
 - name: Guides overview
   href: guides/index.md
-- name: Platform foundations
+- name: Cases
   items:
-    - name: "Architecture"
-      href: architecture/index.md
-    - name: "Metadata format"
-      href: metadata/index.md
-    - name: "neoCLR and .NET"
-      href: comparison/index.md
-    - name: "Modules"
-      href: features/modules/index.md
-    - name: "Library modules"
-      href: docs/namespaces.md
+    - name: "Query PostgreSQL objects"
+      href: cases/postgresql/index.md
+    - name: "Building a Http server app"
+      href: cases/http-server/index.md
+- name: Build applications
+  items:
+    - name: "Web and HTTP"
+      href: features/web/index.md
+    - name: "SQL databases"
+      href: features/sql/index.md
+    - name: "Tasks and async"
+      href: features/tasks/index.md
+    - name: "Files and storage"
+      href: features/files/index.md
+    - name: "Console and streams"
+      href: features/console/index.md
+    - name: "Networking"
+      href: features/networking/index.md
 - name: Everyday code
   items:
     - name: "Raven for neoCLR"
@@ -30,7 +38,7 @@
       href: features/time/index.md
     - name: "Globalization"
       href: features/globalization/index.md
-- name: Runtime services
+- name: Runtime and tools
   items:
     - name: "Native libraries and FFI"
       href: features/native-interop/index.md
@@ -42,30 +50,12 @@
       href: benchmarks/http/index.md
     - name: General execution benchmarks
       href: benchmarks/execution/index.md
-    - name: Historical measurements
-      href: benchmarks/historical/index.md
-    - name: "Tasks and async"
-      href: features/tasks/index.md
-    - name: "Files and storage"
-      href: features/files/index.md
-    - name: "Console and streams"
-      href: features/console/index.md
-    - name: "SQL databases"
-      href: features/sql/index.md
-    - name: "Networking"
-      href: features/networking/index.md
-    - name: "Web and HTTP"
-      href: features/web/index.md
     - name: "Introspection"
       href: features/introspection/index.md
     - name: "Reflection"
       href: features/reflection/index.md
     - name: "Garbage collection"
       href: features/gc/index.md
-- name: Cases
-  items:
-    - name: "Building a Http server app"
-      href: cases/http-server/index.md
 - name: Development walkthroughs
   items:
     - name: "Storage providers"
@@ -144,3 +134,15 @@
       href: docs/sequence-access.md
     - name: TLS streams (development)
       href: docs/ssl-streams.md
+- name: Platform foundations
+  items:
+    - name: "Architecture"
+      href: architecture/index.md
+    - name: "Metadata format"
+      href: metadata/index.md
+    - name: "neoCLR and .NET"
+      href: comparison/index.md
+    - name: "Modules"
+      href: features/modules/index.md
+    - name: "Library modules"
+      href: docs/namespaces.md

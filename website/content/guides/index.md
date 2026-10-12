@@ -4,69 +4,47 @@ toc: false
 
 # Guides
 
-Choose a topic after [building your first project](../try/). Each guide explains
-observable behavior, shows a tested example where useful, and records limits and
-relevant differences from .NET. Use the [API reference](../docs/) to look up exact members.
+Start with a working application, then follow the APIs it uses.
+[Install and run a sample](/try/) if this is your first visit.
 
-Coming from .NET? Start with the [platform comparison](../comparison/) for familiar
-concepts, different contracts and compatibility limits.
+<a id="cases-apis-in-context"></a>
 
-## Platform foundations
+## Build an application
 
-- [Modules](../features/modules/) — organize declarations into modules that form namespaces.
-- [Architecture](../architecture/) — compiler, runtime layers, services and execution modes.
-- [Metadata format](../metadata/) — assembly ownership, PE/NEOX layers and validation.
+| I want to… | Start here | Then explore |
+| --- | --- | --- |
+| Call or serve an HTTP API | [Web and HTTP](/features/web/) | [Server and JSON case](/cases/http-server/) |
+| Query a PostgreSQL database | [SQL databases](/features/sql/) | [Runnable PostgreSQL case](/cases/postgresql/) |
+| Read files and text | [Files and storage](/features/files/) | [Streams](/docs/streams.html) |
+| Coordinate operations | [Tasks and async](/features/tasks/) | [Cancellation and timers](xref:System.Concurrency) |
+| Publish native code | [Native compilation](/features/native-compilation/) | [Performance measurements](/benchmarks/) |
 
-## Cases: APIs in context
+<a id="language-and-everyday-code"></a>
 
-Small, runnable examples show how APIs work together to solve a concrete problem.
-They need only enough application context to explain the choices and results.
+## Work with data
 
-- [Case: Building a Http server app](/cases/http-server/) — accept a station report,
-  connect a client, and return a JSON acknowledgement. Start with the
-  [general HttpClient example](/features/web/) for the client API overview.
+- [Collections and queries](/features/collections/) — lists, maps, sets and transformations.
+- [Arrays](/features/arrays/) and [indexing and slicing](/docs/sequence-access.html).
+- [JSON](/docs/json.html) — nodes, models and serialization.
+- [Strings and UTF-8](/features/strings/) — characters and explicit encoding.
+- [Dates and times](/features/time/) and [globalization](/features/globalization/).
+- [Option and Result](/features/outcomes/) — absence and expected errors.
 
-## Language and everyday code
+## Understand the platform
 
-| Guide | What you’ll learn |
-| --- | --- |
-| [Raven for neoCLR](../raven/) | Read the language examples and distinguish the two targets |
-| [Option and Result](../features/outcomes/) | Match and propagate absence or expected errors |
-| [Function types](../features/functions/) | Delegates evolved: bind methods to structural signature types (development) |
-| [Arrays](../features/arrays/) | Use shared array storage, bounds and collection capabilities |
-| [Collections and queries](../features/collections/) | Read, replace, grow, filter and transform collections |
-| [Strings and UTF-8](../features/strings/) | Distinguish graphemes, scalars and bytes |
-| [Dates and clocks](../features/time/) | Validate civil dates and obtain a clock instant |
-| [Globalization](../features/globalization/) | Cultures, calendars and localized formatting |
+Read [Raven for neoCLR](/raven/) for the language used in the examples.
+Coming from C#? The [.NET comparison](/comparison/) explains familiar concepts
+and deliberate differences.
 
-## Operations and runtime services
+[Modules](/features/modules/) organize declarations.
+[Introspection](/features/introspection/) describes them;
+[reflection](/features/reflection/) can construct objects and invoke members.
+[Architecture](/architecture/) explains the compiler and runtime layers.
 
-| Guide | What you’ll learn |
-| --- | --- |
-| [Native libraries and FFI](../features/native-interop/) | Explicit C ABI imports, text encoding and lifetime contracts |
-| [Native compilation](../features/native-compilation/) | Standalone ARM64 execution, supported workloads and limits |
-| [Native benchmarks](../benchmarks/) | Measurements and methodology for interpreter/native comparisons |
-| [Tasks and async](../features/tasks/) | Await results, complete promises and understand isolated workers |
-| [Files and Storage](../features/files/) | Resolve storage items and use byte/text streams |
-| [Console and standard streams](../features/console/) | Handle input, output, end-of-input and typed errors |
-| [Networking](../features/networking/) | Resolve a hostname and exchange bytes through a TCP client |
-| [Web and HTTP](../features/web/) | Client/server exchanges, handlers, JSON and bounded stream uploads |
-| [Introspection](../features/introspection/) | Discover types and members and understand descriptor identity |
-| [Reflection](../features/reflection/) | Construct objects, invoke methods and access fields and properties |
-| [Garbage collection](../features/gc/) | Understand managed lifetimes and collection controls |
+## Go deeper when you need to
 
-## Development walkthroughs
-
-These examples require the matching development toolchain. They are not promises
-about the latest downloadable bundle.
-
-- [Inspect compiled metadata](https://github.com/marinasundstrom/neoCLR/blob/main/docs/il-inspection.md): development `neoclr disassemble` reads native PE, NEOX and JSON artifacts without executing them; output is diagnostic, not reassemblable.
-- [Storage providers](../docs/storage-experiment.html): run the same workflow on disk
-  and application-owned memory storage.
-- [File Transformer](../docs/file-transformer.html): combine byte streams, text and JSON.
-- [Pending reads](../docs/pending-read.html): inspect the controlled delayed-operation experiment.
-- [Object and value contracts](../docs/objects.html): understand identity, equality and record behavior.
-- [Terminal faults](../docs/faults.html): distinguish host failures from typed application errors.
-
-See [development setup](../try/#development) for toolchain requirements. Broader ideas
-belong in [direction and proposals](../proposals/), separate from implemented guides.
+Use the [API reference](/docs/) for exact signatures, errors and limits.
+Specialized guides cover [TCP networking](/features/networking/),
+[TLS](/docs/ssl-streams.html), [native interop](/features/native-interop/),
+[garbage collection](/features/gc/) and [metadata](/metadata/).
+[Proposals](/proposals/) describe ideas that are not implemented contracts.

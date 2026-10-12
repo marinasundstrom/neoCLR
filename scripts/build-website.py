@@ -276,6 +276,10 @@ def main():
         shutil.copyfile(SOURCE / name, OUTPUT / name)
     raven = 'docs/experiments/raven-target/samples/'
     samples = {
+        'SQL_PERSON_MODEL': ('docs/experiments/postgresql-people/Main.rvn', 'public class Person', '\n}', True),
+        'SQL_POSITIONAL_PEOPLE': ('docs/experiments/postgresql-people/Main.rvn', '    let positional', '\n\n    let parameters', False),
+        'SQL_NAMED_PEOPLE': ('docs/experiments/postgresql-people/Main.rvn', '    let parameters', '\n    return Ok', False),
+        'SQL_PEOPLE_MAIN': ('docs/experiments/postgresql-people/Main.rvn', 'async func ReadPeople', '\n}', True),
         'FUNCTION_OPERATIONS': ('docs/experiments/function-types/Callbacks.rvn', 'public func AddOne', '\npublic func Forward', False),
         'FUNCTION_BINDINGS': ('docs/experiments/function-types/Callbacks.rvn', '    let first:', '\n    let repeated:', False),
         'ATTRIBUTE_ROUTE_DECLARATION': ('docs/experiments/attribute-introspection/Routes.rvn', 'public union CatalogRoutes {', '\n}', True),
@@ -407,6 +411,12 @@ def main():
             shutil.copyfile(ROOT / 'docs/experiments' / directory / name, destination / name)
     shutil.make_archive(str(downloads / 'http-json'), 'zip', json_downloads)
 
+
+    sql_downloads = downloads / 'postgresql-people'
+    sql_downloads.mkdir()
+    for name in ('Main.rvn', 'run.py', 'README.md'):
+        shutil.copyfile(ROOT / 'docs/experiments/postgresql-people' / name, sql_downloads / name)
+    shutil.make_archive(str(downloads / 'postgresql-people'), 'zip', sql_downloads)
 
     socket_downloads = downloads / 'socket-client'
     socket_downloads.mkdir()

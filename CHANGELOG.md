@@ -8,6 +8,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-12
 
+- Make website feature guides introductory and organize navigation around application
+  tasks. Remove the historical benchmark page and superseded development narrative;
+  retain relevant limits and benchmark provenance, with history in repository records.
+  Add a downloadable PostgreSQL object-query case and inline SQL examples for both
+  positional values and named objects, validated against local PostgreSQL 18.
+
 - Raise the bounded native selected/specialized type inventory to 1024 and keep
   typed-reference-array GC admission aligned with it. Boundary tests and sanitized
   GC checks pass; extracted collections, Tasks and JSON pass. HTTP now reaches a
