@@ -62,6 +62,15 @@ static int live_base(const neoclr_aot_text_arena *arena, const void *value) {
     }
     return 0;
 }
+int32_t neoclr_gc_allocation_info_v1(neoclr_aot_context *context, const void *value,
+    uint64_t *bytes, uint32_t *kind) {
+    if (!context || !value || !bytes || !kind || !blocks_valid(&context->text) ||
+        !live_base(&context->text, value)) return NEOCLR_AOT_FAULT_RUNTIME_ERROR;
+    const block *b = (const block *)value - 1;
+    *bytes = b->bytes;
+    *kind = (uint32_t)b->kind;
+    return 0;
+}
 static _Thread_local neoclr_gc_resource *resource_head;
 static _Thread_local int resource_cleanup_active;
 static void resource_cleanup(neoclr_gc_resource **link) {

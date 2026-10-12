@@ -29,6 +29,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   Enable safepoint collection in the Windows collector contract build. Native TLS
   adapter/lowering integration remains open; AddressSanitizer startup stalled before
   test execution on the local host.
+  Connect a private native TLS adapter to the ownership hooks, with checked managed
+  buffers, retained sessions, idempotent release and explicit Fault-exit teardown.
+  The real-provider adapter and 24 provider/interpreter lifetime checks pass on
+  macOS; Windows CI builds the same adapter with MSVC. Native compiler admission,
+  host packaging and Raven certificate/SslStream APIs remain pending.
   Document shared HTTP/SQL security concepts without forcing a common native backend;
   managed SSL/certificate ownership and handshake diagnostics remain open.
 

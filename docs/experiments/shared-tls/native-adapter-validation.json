@@ -1,0 +1,28 @@
+{
+  "date": "2026-10-12",
+  "platform": "macOS arm64",
+  "scope": "Native TLS owner adapter; not compiler dispatch",
+  "validation": [
+    {
+      "command": "python3 scripts/test-native-security.py",
+      "result": "passed",
+      "details": "24 provider/interpreter lifetime tests plus real-provider C adapter"
+    },
+    {
+      "command": "clang -DNEOCLR_NATIVE_GC -fsanitize=undefined native-gc-test.c native-gc.c root-probe.c; execute",
+      "result": "passed"
+    }
+  ],
+  "source_sha256": {
+    "docs/experiments/aot-console/tls-managed.c": "e760c625efa99260c227a77851d9272deef3cfde2fddbbaf1aa9c50064b1c07b",
+    "docs/experiments/aot-console/tls-managed.h": "0e7e412bce3332204da4e92ab9f7292977d34369be586a9c28988dc31bd1b165",
+    "docs/experiments/aot-console/tls-managed-test.c": "854c83f2e26023ed6ab7a4da94495ac0a20b1093096b708df9841146c333b205",
+    "docs/experiments/aot-console/native-gc.c": "b5950483a5dddda3b04f4ed397d4aa27bda666026324da8f94318cf1dc942ef1",
+    "docs/experiments/aot-console/native-gc.h": "7986da3ea16da8fe5af45732b832e219b5e421fb548fcc7c428a3fafc9f8db15"
+  },
+  "remaining": [
+    "Windows execution pending CI",
+    "JIT/AOT compiler binding and host packaging",
+    "Ciphertext pumping and Raven certificate/SslStream APIs"
+  ]
+}

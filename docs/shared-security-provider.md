@@ -390,3 +390,35 @@ See [native lifetime evidence](experiments/shared-tls/native-lifetime-validation
 This hook is not yet wired into a native TLS adapter. Native TLS service lowering,
 adapter teardown, pending-operation roots and shared ciphertext pumping remain
 required before implementing and qualifying Raven certificate/SslStream APIs.
+
+## Native TLS ownership adapter (development, 2026-10-12)
+
+The private `tls-managed.c` adapter now implements the same five owner-token
+operations as the interpreter against the shared provider. It validates exact live
+Byte[] allocation bases, payload bounds and initialization before borrowing bytes.
+Foreign/interior/collected owners fault; empty-token release is idempotent.
+Configuration/session statuses remain provider results, while malformed managed
+arguments remain terminal Faults. Output is unchanged on Fault.
+
+Native configurations and sessions register with the collector. Their associations
+do not root managed owners; sessions retain provider configuration independently.
+Cleanup releases the provider resource and frees the native record. Empty provider
+contexts are released immediately, including failed construction. The host-only
+dispose hook releases all TLS records before arena teardown after guest operations
+have stopped, also on terminal Fault exits. It does not clear Fault state or perform
+I/O. Graceful shutdown and active-operation cancellation are separate responsibilities.
+
+This uses the existing SafeHandle comparison and trusted-abortive-cleanup tradeoff
+above. Each heap gets a bounded provider context (1024 resources), with a native
+allocation and list entry per owner. Owner lookup and collector registration scan
+lists; performance is not yet qualified. HTTP and SQL still need not use the same
+TLS engine.
+
+The unchanged disposable-certificate harness now builds and executes this C adapter
+against the real Rustls archive on macOS and Windows CI. Local macOS execution covers
+server/client construction, retained sessions after configuration collection,
+wrong-kind configuration, invalid/foreign/interior/stale owners, duplicate creation,
+failed construction, explicit/GC/host cleanup, terminal Fault teardown and malformed
+or uninitialized byte arrays. See [adapter evidence](experiments/shared-tls/native-adapter-validation.json).
+Windows execution remains pending. This is a private host adapter: compiler binding
+admission/lowering, host packaging and managed certificate/SslStream APIs remain open.

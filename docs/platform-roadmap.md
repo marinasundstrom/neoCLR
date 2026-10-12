@@ -56,8 +56,8 @@ also passes TLS 1.2/1.3 backpressure and lifecycle tests. A checked resource con
 now owns configurations/sessions behind non-reused IDs and bounded quotas; managed
 ownership and runtime-service bindings now work in the interpreter through
 heap-owned tokens. The native collector now has tested resource cleanup registrations
-and teardown guards; connecting the TLS adapter, native JIT/AOT bindings and managed
-SSL composition remain next. See [native lifetime evidence](experiments/shared-tls/native-lifetime-validation.json). HTTP and SQL may share concepts/types
+and teardown guards. A tested native TLS adapter now connects owner tokens to those
+hooks; native JIT/AOT bindings, host packaging and managed SSL composition remain next. See [native lifetime evidence](experiments/shared-tls/native-lifetime-validation.json). HTTP and SQL may share concepts/types
 without requiring one native TLS backend; see the [backend boundary](shared-security-provider.md#shared-concepts-independent-backends). A bounded public System.Security.Cryptography facade
 now adds destination-buffer SHA256/HMACSHA256, tag verification and secure random
 fill; allocating/streaming overloads, socket/TLS adapters and certificate APIs

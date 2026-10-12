@@ -81,6 +81,10 @@ int32_t neoclr_gc_callback_read_v1(neoclr_aot_context *context, uint64_t handle,
 /* Generated only for images with bound fn<Void> targets. Does not reset the heap,
  * release the root, or clear a prior fault. Host failures return 3 without a guest fault. */
 int32_t neoclr_invoke_void_callback_v1(uint64_t handle, neoclr_aot_context *context);
+/* Private adapter borrow validation: exact live allocation base in this context.
+ * Outputs publish only on success; no roots, allocation or collection. */
+int32_t neoclr_gc_allocation_info_v1(neoclr_aot_context *, const void *,
+    uint64_t *bytes, uint32_t *kind);
 /* Allocation never collects; output is published only on success. */
 int32_t neoclr_gc_allocate_v1(neoclr_aot_text_arena *arena, uint64_t bytes,
                              uint32_t kind, void **output);

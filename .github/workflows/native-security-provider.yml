@@ -9,6 +9,8 @@ on:
       - 'tools/aot-poc/**'
       - 'docs/experiments/native-cryptography/**'
       - 'docs/experiments/aot-console/cryptography.c'
+      - 'docs/experiments/aot-console/tls-managed*'
+      - 'docs/experiments/aot-console/native-gc*'
       - 'src/tls.rs'
       - 'src/gc.rs'
       - 'src/vm.rs'
@@ -31,6 +33,8 @@ on:
       - 'tools/aot-poc/**'
       - 'docs/experiments/native-cryptography/**'
       - 'docs/experiments/aot-console/cryptography.c'
+      - 'docs/experiments/aot-console/tls-managed*'
+      - 'docs/experiments/aot-console/native-gc*'
       - 'src/tls.rs'
       - 'src/gc.rs'
       - 'src/vm.rs'
@@ -66,8 +70,17 @@ jobs:
         shell: pwsh
         run: |
           'C:\Program Files\Git\usr\bin' >> $env:GITHUB_PATH
-      - name: Test shared client, server and primitives
+      - name: Test shared client, server, primitives and managed lifetime
+        if: runner.os != 'Windows'
         run: python scripts/test-native-security.py
+      - name: Test shared security and managed lifetime on Windows
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          $vs = & "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\vswhere.exe" -latest -products '*' -requires Microsoft.VisualStudio.Component.VC.Tools.x86.x64 -property installationPath
+          if (-not $vs) { throw 'MSVC x64 tools not found' }
+          cmd /c "`"$vs\VC\Auxiliary\Build\vcvars64.bat`" && python scripts/test-native-security.py"
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
       - name: Test typed interpreter services
         run: cargo test --locked --test cryptography --test runtime_services --test tls_services
       - name: Build native compiler and test binding admission

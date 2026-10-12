@@ -203,3 +203,9 @@ never cross this boundary. Unreachable owners release their resources during suc
 collection, with abortive cleanup only. See [TLS ownership](shared-security-provider.md#interpreter-service-and-heap-ownership-development-2026-10-12)
 for faults, statuses, quotas, lifetime rules and the remaining native/managed gates.
 These imports do not yet have native JIT/AOT lowering or a public Raven API.
+
+The private native TLS owner adapter now validates live packed byte arrays and
+connects native provider resources to the collector's ownership registrations.
+It implements the five ownership operations and explicit abortive host teardown;
+compiler/JIT binding admission and host packaging are not yet enabled. See the
+[shared-provider checkpoint](shared-security-provider.md#native-tls-ownership-adapter-development-2026-10-12).
