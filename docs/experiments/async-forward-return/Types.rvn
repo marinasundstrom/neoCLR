@@ -1,0 +1,3 @@
+union MappingError {
+    case Schema(message: string)
+}

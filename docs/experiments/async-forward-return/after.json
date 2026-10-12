@@ -1,0 +1,139 @@
+{
+  "passed": true,
+  "compilerSha256": "c56bf5da468c40afcd302c186465a83f6374c65d029ee8f6b2157884964d8319",
+  "codeAnalysisSha256": "7f457ed3bd8174f7f812f60561bb78c36b7449b03ab640e2a1c619ca62d24f01",
+  "commands": [
+    {
+      "command": [
+        "dotnet",
+        "/Users/robert/Projects/neoclr/target/preview-forward-candidate/bundle/sdk/tools/rvnc/rvnc.dll",
+        "neoclr",
+        "--project",
+        "/Users/robert/Projects/neoclr/target/preview-forward-after/0-function-first/App.rvnproj"
+      ],
+      "exitCode": 0,
+      "stdout": "Native build output: /Users/robert/Projects/neoclr/target/preview-forward-after/0-function-first/bin/neoclr/App.dll\n",
+      "stderr": "/Users/robert/Projects/neoclr/target/preview-forward-after/0-function-first/A.rvn(5,1): warning RAV2706: This async method 'Make' has no 'await' and will run synchronously.\n"
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/preview-forward-candidate/bundle/bin/neoclr",
+        "run",
+        "/Users/robert/Projects/neoclr/target/preview-forward-after/0-function-first/bin/neoclr/App.dll"
+      ],
+      "exitCode": 0,
+      "stdout": "Forward async return passed\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "dotnet",
+        "/Users/robert/Projects/neoclr/target/preview-forward-candidate/bundle/sdk/tools/rvnc/rvnc.dll",
+        "neoclr",
+        "--project",
+        "/Users/robert/Projects/neoclr/target/preview-forward-after/1-types-first/App.rvnproj"
+      ],
+      "exitCode": 0,
+      "stdout": "Native build output: /Users/robert/Projects/neoclr/target/preview-forward-after/1-types-first/bin/neoclr/App.dll\n",
+      "stderr": "/Users/robert/Projects/neoclr/target/preview-forward-after/1-types-first/Z.rvn(5,1): warning RAV2706: This async method 'Make' has no 'await' and will run synchronously.\n"
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/preview-forward-candidate/bundle/bin/neoclr",
+        "run",
+        "/Users/robert/Projects/neoclr/target/preview-forward-after/1-types-first/bin/neoclr/App.dll"
+      ],
+      "exitCode": 0,
+      "stdout": "Forward async return passed\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "dotnet",
+        "/Users/robert/Projects/neoclr/target/preview-forward-candidate/bundle/sdk/tools/rvnc/rvnc.dll",
+        "neoclr",
+        "--project",
+        "/Users/robert/Projects/neoclr/target/preview-forward-after/2-function-first/App.rvnproj"
+      ],
+      "exitCode": 0,
+      "stdout": "Native build output: /Users/robert/Projects/neoclr/target/preview-forward-after/2-function-first/bin/neoclr/App.dll\n",
+      "stderr": "/Users/robert/Projects/neoclr/target/preview-forward-after/2-function-first/A.rvn(5,1): warning RAV2706: This async method 'Make' has no 'await' and will run synchronously.\n"
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/preview-forward-candidate/bundle/bin/neoclr",
+        "run",
+        "/Users/robert/Projects/neoclr/target/preview-forward-after/2-function-first/bin/neoclr/App.dll"
+      ],
+      "exitCode": 0,
+      "stdout": "Forward async return passed\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "dotnet",
+        "/Users/robert/Projects/neoclr/target/preview-forward-candidate/bundle/sdk/tools/rvnc/rvnc.dll",
+        "neoclr",
+        "--project",
+        "/Users/robert/Projects/neoclr/target/preview-forward-after/3-types-first/App.rvnproj"
+      ],
+      "exitCode": 0,
+      "stdout": "Native build output: /Users/robert/Projects/neoclr/target/preview-forward-after/3-types-first/bin/neoclr/App.dll\n",
+      "stderr": "/Users/robert/Projects/neoclr/target/preview-forward-after/3-types-first/Z.rvn(5,1): warning RAV2706: This async method 'Make' has no 'await' and will run synchronously.\n"
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/preview-forward-candidate/bundle/bin/neoclr",
+        "run",
+        "/Users/robert/Projects/neoclr/target/preview-forward-after/3-types-first/bin/neoclr/App.dll"
+      ],
+      "exitCode": 0,
+      "stdout": "Forward async return passed\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "dotnet",
+        "/Users/robert/Projects/neoclr/target/preview-forward-candidate/bundle/sdk/tools/rvnc/rvnc.dll",
+        "neoclr",
+        "--project",
+        "/Users/robert/Projects/neoclr/target/preview-forward-after/4-function-first/App.rvnproj"
+      ],
+      "exitCode": 0,
+      "stdout": "Native build output: /Users/robert/Projects/neoclr/target/preview-forward-after/4-function-first/bin/neoclr/App.dll\n",
+      "stderr": "/Users/robert/Projects/neoclr/target/preview-forward-after/4-function-first/A.rvn(5,1): warning RAV2706: This async method 'Make' has no 'await' and will run synchronously.\n"
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/preview-forward-candidate/bundle/bin/neoclr",
+        "run",
+        "/Users/robert/Projects/neoclr/target/preview-forward-after/4-function-first/bin/neoclr/App.dll"
+      ],
+      "exitCode": 0,
+      "stdout": "Forward async return passed\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "dotnet",
+        "/Users/robert/Projects/neoclr/target/preview-forward-candidate/bundle/sdk/tools/rvnc/rvnc.dll",
+        "neoclr",
+        "--project",
+        "/Users/robert/Projects/neoclr/target/preview-forward-after/5-types-first/App.rvnproj"
+      ],
+      "exitCode": 0,
+      "stdout": "Native build output: /Users/robert/Projects/neoclr/target/preview-forward-after/5-types-first/bin/neoclr/App.dll\n",
+      "stderr": "/Users/robert/Projects/neoclr/target/preview-forward-after/5-types-first/Z.rvn(5,1): warning RAV2706: This async method 'Make' has no 'await' and will run synchronously.\n"
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/preview-forward-candidate/bundle/bin/neoclr",
+        "run",
+        "/Users/robert/Projects/neoclr/target/preview-forward-after/5-types-first/bin/neoclr/App.dll"
+      ],
+      "exitCode": 0,
+      "stdout": "Forward async return passed\n",
+      "stderr": ""
+    }
+  ]
+}

@@ -8,6 +8,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-12
 
+- Record Raven main 0ccb9a265 and native carry 6b5e052ce fixing false async-return
+  diagnostics for forward generic union results. Retain the intermittent failing
+  baseline and a six-process, two-source-order default-JIT regression; all six builds
+  and runs pass, alongside 75 general Raven async tests. No metadata/ABI change.
+
 - Refresh packaged Raven demos for async streams and Task.Run, and qualify JIT
   bundles through the CLI's installed default mode with explicit interpreter
   controls. Share sample definitions and JSON reflection roots with VS Code run

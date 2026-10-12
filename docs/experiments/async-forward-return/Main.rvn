@@ -1,0 +1,13 @@
+import System.*
+import System.Concurrency.Tasks.*
+import System.Result.*
+
+async func Make() -> Task<Result<unit, MappingError>> {
+    return Ok(())
+}
+
+async func Main() -> Task<()> {
+    if let Ok(_) = await Make() {
+        Console.WriteLine("Forward async return passed")
+    }
+}

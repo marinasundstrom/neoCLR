@@ -5,6 +5,22 @@
 
 # Raven CLI bridge
 
+## Forward async result declarations — 2026-10-12
+
+The extracted JSON preview exposed intermittent RAV2704 for a valid
+`Task<Result<unit, MappingError>>` return type when the union lived in another
+source file. Signature skeleton lookup could temporarily return an error type;
+eager async validation persisted that provisional failure into final diagnostics.
+Raven main `0ccb9a265` defers unresolved skeleton validation to full binding;
+the native compiler line carries it deliberately in `6b5e052ce`.
+
+No Runtime Contract option, temporary CLI representation, native metadata or
+codegen changes. Raven owns declaration resolution; native semantic intent remains
+an ordinary Task carrying a typed result. The .NET async check passes 75 cases,
+including source-order and invalid/unresolved-return controls. See the
+[reproducer and native qualification](experiments/async-forward-return/README.md).
+This does not qualify another host or imply a compiler branch merge.
+
 ## Method-group overload applicability — 2026-10-12
 
 Extracted preview qualification exposed false ambiguity for the collections sample's

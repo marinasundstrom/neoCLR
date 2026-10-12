@@ -1,0 +1,19 @@
+{
+  "passed": false,
+  "compilerSha256": "35dd95f1238b1ccf0ad6e511c67698e1fd8b9f1c496e83fba47ab51f77149f79",
+  "codeAnalysisSha256": "ecc221774b4880b918c67d1389c72458d2d9555b59215f1cd04f7f41562ad070",
+  "commands": [
+    {
+      "command": [
+        "dotnet",
+        "/Users/robert/Projects/neoclr/target/preview-final-candidate/bundle/sdk/tools/rvnc/rvnc.dll",
+        "neoclr",
+        "--project",
+        "/Users/robert/Projects/neoclr/target/preview-forward-before-repeat/0-function-first/App.rvnproj"
+      ],
+      "exitCode": 1,
+      "stdout": "",
+      "stderr": "/Users/robert/Projects/neoclr/target/preview-forward-before-repeat/0-function-first/A.rvn(5,1): warning RAV2706: This async method 'Make' has no 'await' and will run synchronously.\n/Users/robert/Projects/neoclr/target/preview-forward-before-repeat/0-function-first/A.rvn(5,22): error RAV2704: Async return type 'Task<Result<unit, MappingError>>' is not supported; async functions must return Task-like types such as System.Threading.Tasks.Task, System.Threading.Tasks.Task<T>, System.Threading.Tasks.ValueTask, or System.Threading.Tasks.ValueTask<T>. If you intend to return 'Task<Result<unit, MappingError>>', use 'Error'.\n"
+    }
+  ]
+}
