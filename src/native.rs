@@ -7,6 +7,7 @@ use unicode_segmentation::UnicodeSegmentation;
 
 pub(crate) enum Binding {
     StackTraceCapture,
+    Cryptography(crate::cryptography::Operation),
     GcCollect,
     GcInfo(u8),
     GcKeepAlive,
@@ -236,6 +237,11 @@ pub(crate) fn bind(function: &Function) -> Result<Binding, Fault> {
         } else {
             Binding::GenericCurrentTaskQueue
         });
+    }
+    if function.name.starts_with("neoCLR.Runtime.Crypto")
+        && (!function.generic_parameters.is_empty() || !function.generic_arguments.is_empty()
+            || !function.generic_constraints.is_empty()) {
+        return Err(Fault::new("cryptography service cannot be generic"));
     }
     if function.no_result
         && !matches!(
@@ -591,6 +597,17 @@ pub(crate) fn bind(function: &Function) -> Result<Binding, Fault> {
         }
         ("neoCLR.Runtime.WriteLine", [Type::String]) => (Binding::WriteLine, Type::Void),
         ("neoCLR.Runtime.CharCategory", [Type::UInt32]) => (Binding::CharCategory, Type::Int32),
+        ("neoCLR.Runtime.CryptoSha256", [Type::ArrayRef(data), Type::ArrayRef(output)])
+            if **data == Type::Byte && **output == Type::Byte =>
+            (Binding::Cryptography(crate::cryptography::Operation::Sha256), Type::Int32),
+        ("neoCLR.Runtime.CryptoHmacSha256", [Type::ArrayRef(key), Type::ArrayRef(data), Type::ArrayRef(output)])
+            if **key == Type::Byte && **data == Type::Byte && **output == Type::Byte =>
+            (Binding::Cryptography(crate::cryptography::Operation::HmacSha256), Type::Int32),
+        ("neoCLR.Runtime.CryptoHmacSha256Verify", [Type::ArrayRef(key), Type::ArrayRef(data), Type::ArrayRef(tag)])
+            if **key == Type::Byte && **data == Type::Byte && **tag == Type::Byte =>
+            (Binding::Cryptography(crate::cryptography::Operation::VerifyHmacSha256), Type::Boolean),
+        ("neoCLR.Runtime.CryptoRandomFill", [Type::ArrayRef(output)]) if **output == Type::Byte =>
+            (Binding::Cryptography(crate::cryptography::Operation::RandomFill), Type::Int32),
         ("neoCLR.Runtime.Utf8Encode", [Type::String]) => {
             (Binding::Utf8Encode, Type::Array(Box::new(Type::Byte)))
         }
@@ -1066,6 +1083,9 @@ impl Binding {
         options: &crate::ExecutionOptions,
     ) -> Result<Value, Fault> {
         let console = options.console.as_deref();
+        if let Self::Cryptography(operation) = self {
+            return operation.invoke(&args);
+        }
         if let Self::Math(operation) = self {
             return operation.invoke(&args);
         }

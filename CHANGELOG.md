@@ -8,6 +8,13 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-12
 
+- Connect private typed cryptography services to the interpreter using the shared
+  TLS-independent provider. Require exact byte-array signatures and report
+  Cryptography/ManagedArrays capabilities; preserve aliasing, initialization,
+  destination bounds and terminal Fault semantics. All seven focused integration
+  tests and twelve runtime-service regressions pass locally on macOS. Add the
+  same Windows CI checks; native lowering and public managed APIs remain open.
+
 - Extract the shared cryptographic implementation into a TLS-independent Rust crate,
   preserving native C ABI wrappers and all ten provider tests. Track the shared
   source in both security CI gates and HTTPS project build manifests, preparing

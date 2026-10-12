@@ -55,9 +55,9 @@ The same private archive now exposes the C declarations in
 HMAC-SHA-256 and HMAC verification. All delegate to pinned ring 0.17.14, already
 used by Rustls. Its safe Rust implementation now lives in the separate
 `tools/security-provider` crate, without TLS dependencies; the TLS archive retains
-the existing C ABI wrappers. There are no guest-facing methods yet; the following managed
-projection remains the next slice, including interpreter/JIT/AOT wiring and API
-reference generation.
+the existing C ABI wrappers. There are no public managed methods yet. Private interpreter services now project
+these operations through verified byte-array contracts; JIT/AOT lowering, the public
+managed facade and API reference generation remain open.
 
 The intended baseline is .NET's
 [RandomNumberGenerator.Fill](https://learn.microsoft.com/en-us/dotnet/api/system.security.cryptography.randomnumbergenerator.fill?view=net-10.0),
@@ -104,3 +104,23 @@ Windows execution remains pending. Random tests check behavior, not statistical 
 The extraction checkpoint reruns all ten tests (nine C-ABI/TLS tests and one shared
 provider failure test). Both CI workflows watch the shared crate, and HTTPS project
 build manifests include its source inputs.
+
+## Typed interpreter boundary
+
+`runtime/neoCLR/Runtime/Cryptography.neoil` declares the private SHA-256, HMAC,
+verification and random-fill operations. Their `arrayref<Byte>` arguments and exact
+result signatures are checked before dispatch. The interpreter uses the same safe
+provider crate as the native wrappers, copies initialized inputs and writes into
+caller-owned destinations. It requires the Cryptography and ManagedArrays runtime
+capabilities; it does not dynamically load foreign symbols or pass guest pointers.
+See [runtime service semantics](runtime-services.md#cryptographic-primitives-development-2026-10-12).
+
+Focused integration tests exercise known answers, aliasing, preserved destination
+tails, short buffers, MAC tampering, empty/random buffers, reserved output,
+uninitialized input rejection, exact signatures and capability reporting. These
+are interpreter tests; they do not establish Raven API, JIT or AOT support. The
+macOS/Windows provider workflow includes the same focused interpreter tests.
+
+Local qualification: all seven cryptography integration tests and all twelve
+runtime-service regression tests pass on macOS. Windows is wired into the same
+CI job but has not been executed locally.

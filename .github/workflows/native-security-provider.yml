@@ -5,12 +5,26 @@ on:
     paths:
       - 'tools/native-tls/**'
       - 'tools/security-provider/**'
+      - 'src/cryptography.rs'
+      - 'src/native.rs'
+      - 'src/services.rs'
+      - 'tests/cryptography.rs'
+      - 'runtime/neoCLR/Runtime/Cryptography.neoil'
+      - 'Cargo.toml'
+      - 'Cargo.lock'
       - 'scripts/test-native-security.py'
       - '.github/workflows/native-security-provider.yml'
   pull_request:
     paths:
       - 'tools/native-tls/**'
       - 'tools/security-provider/**'
+      - 'src/cryptography.rs'
+      - 'src/native.rs'
+      - 'src/services.rs'
+      - 'tests/cryptography.rs'
+      - 'runtime/neoCLR/Runtime/Cryptography.neoil'
+      - 'Cargo.toml'
+      - 'Cargo.lock'
       - 'scripts/test-native-security.py'
       - '.github/workflows/native-security-provider.yml'
 permissions:
@@ -22,7 +36,7 @@ jobs:
       matrix:
         os: [macos-14, windows-2022]
     runs-on: ${{ matrix.os }}
-    timeout-minutes: 10
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
       - uses: dtolnay/rust-toolchain@stable
@@ -36,3 +50,5 @@ jobs:
           'C:\Program Files\Git\usr\bin' >> $env:GITHUB_PATH
       - name: Test shared client, server and primitives
         run: python scripts/test-native-security.py
+      - name: Test typed interpreter services
+        run: cargo test --locked --test cryptography --test runtime_services

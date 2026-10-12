@@ -1,0 +1,15 @@
+; Private typed runtime services, not the public managed cryptography API.
+; Outputs are caller-owned byte arrays; digest/MAC write exactly 32 bytes.
+; 0 success, -1 insufficient destination, -2 random provider failure (output cleared).
+.function neoCLR.Runtime.CryptoSha256(arrayref<Byte> data,arrayref<Byte> output) -> Int32
+.methodimpl InternalCall
+.end
+.function neoCLR.Runtime.CryptoHmacSha256(arrayref<Byte> key,arrayref<Byte> data,arrayref<Byte> output) -> Int32
+.methodimpl InternalCall
+.end
+.function neoCLR.Runtime.CryptoHmacSha256Verify(arrayref<Byte> key,arrayref<Byte> data,arrayref<Byte> tag) -> Boolean
+.methodimpl InternalCall
+.end
+.function neoCLR.Runtime.CryptoRandomFill(arrayref<Byte> output) -> Int32
+.methodimpl InternalCall
+.end

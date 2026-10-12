@@ -162,3 +162,28 @@ Development (2026-10-11): private one-shot `neoCLR.Runtime.TimerStart` and
 callbacks are rooted until cancellation or completion handoff. These interpreter
 services do not yet expose a public Timer, CancelAfter or HttpClient.Timeout API.
 See [lifetime/timer constraints](design/http-client-lifetime.md).
+
+## Cryptographic primitives (development, 2026-10-12)
+
+`Cryptography` identifies the private, signature-checked CryptoSha256,
+CryptoHmacSha256, CryptoHmacSha256Verify and CryptoRandomFill services. They also
+require `ManagedArrays`. These are synchronous interpreter services backed by the
+same TLS-independent provider as the native C ABI, not arbitrary native imports.
+Reachability reporting is not a permission grant. The JIT/AOT lowering and public
+managed API remain unimplemented; declaring the capability does not imply support
+in those modes.
+
+Inputs must be initialized byte arrays. Destination arrays must be writable and
+remain guest-owned. Hash/MAC compute from snapshots before writing exactly 32 bytes,
+so destination aliasing is supported and trailing bytes remain untouched. A short
+destination returns -1 unchanged. Invalid storage or uninitialized input is a
+terminal Fault; there is no recovery from a Fault. Random fill writes the whole
+array, returning 0 or -2 with cleared output on provider failure. Verification
+returns false for a mismatched or truncated tag.
+
+The interpreter currently performs these operations under its normal synchronous
+execution/heap discipline. Guest references never reach ring; temporary host buffers
+are copied back through ordinary managed slot writes. This preserves initialization
+and readonly checks but adds copying and holds execution during provider work.
+Native lowering and any future large-buffer optimization must retain these semantics.
+See [shared provider design and validation](shared-security-provider.md).

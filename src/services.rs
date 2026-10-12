@@ -43,6 +43,8 @@ pub enum RuntimeService {
     SocketIo,
     /// Host name resolution; submissions also require TaskDispatch.
     NameResolution,
+    /// Hash/MAC operations and operating-system secure randomness.
+    Cryptography,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -70,6 +72,7 @@ pub(crate) fn uses(module: &crate::Module, function: &Function) -> Result<Vec<Se
     if function.is_internal_call() {
         let binding = crate::native::bind_in(module, function)?;
         let service = match &binding {
+            crate::native::Binding::Cryptography(_) => RuntimeService::Cryptography,
             crate::native::Binding::StackTraceCapture => RuntimeService::StackInspection,
             crate::native::Binding::Socket(_) => RuntimeService::SocketIo,
             crate::native::Binding::Resolve(_) => RuntimeService::NameResolution,
@@ -277,7 +280,8 @@ pub(crate) fn uses(module: &crate::Module, function: &Function) -> Result<Vec<Se
         }
         if matches!(
             &binding,
-            crate::native::Binding::UnixTimeToLocal
+            crate::native::Binding::Cryptography(_)
+                | crate::native::Binding::UnixTimeToLocal
                 | crate::native::Binding::ReflectionCollection(_)
                 | crate::native::Binding::ReflectionMember(_)
                 | crate::native::Binding::ReflectionMemberCheck(_)
