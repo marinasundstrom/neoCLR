@@ -13,7 +13,9 @@ expectations and their passing focused checks. The full run completed with 1,956
 passing tests and those three failures; it remains recorded as failed. A fresh
 source archive passes all 25 smoke programs, seed/notices, native FFI and embedding.
 A clean hosted gate and fresh Windows bundle/editor qualification remain required.
-The local author-testing installation is unchanged; no release has been published.
+The local author-testing installation is unchanged and now passes all 26 real
+VS Code activation/navigation/task checks in an isolated profile. No release has
+been published.
 
 ## Installed default-JIT preview — 2026-10-12
 

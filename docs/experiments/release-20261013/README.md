@@ -44,8 +44,11 @@ the previously installed author-testing bundle has not been replaced in this sli
 3. Qualify the rebuilt Windows default-JIT bundle, HTTP/HTTPS and matching SDK/editor;
    retain archive, payload and compiler hashes. Refresh packaged notices on both
    distribution targets and verify extracted payloads before publication.
-4. Complete installed editor acceptance and review the selected package/release notes.
-   Local SDK language-server probes are not proof of interactive extension activation.
+4. Review the selected package/release notes. Local installed VS Code acceptance
+   now passes all [26 checks](installed-vscode-acceptance.json), including activation,
+   navigation, native/.NET editing and Tasks/await runs; [hashes](installed-vscode-provenance.json)
+   identify the real installed SDK/extension. Windows editor acceptance remains in its
+   hosted package gate.
 
 Reuse the [installed macOS HTTP evidence](../../local-preview-20261012.md) for its
 unchanged binary behavior. Tagging, uploading releases and website publication have

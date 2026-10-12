@@ -1,0 +1,17 @@
+{
+  "date": "2026-10-13",
+  "passed": true,
+  "extensionVersion": "0.1.13-neoclr.20261012.2",
+  "sdkVersion": "0.1.13-neoclr.20261012.2",
+  "scope": "Real installed extension in an isolated VS Code extension-test profile; no development server override; CLI tasks use the qualified SDK/runtime.",
+  "userDataDirectory": "/Users/robert/Projects/neoclr/target/release-editor-profile-20261013",
+  "workspace": "/Users/robert/Projects/neoclr/target/release-editor-20261013.code-workspace",
+  "sha256": {
+    "/Users/robert/.neoclr/experiments/preview-20261012-2/editor-extensions/raven.raven-vscode-0.1.13-neoclr.20261012.2/package.json": "6124f09232e244c2164b4a8f73f71cc547dff7f7ea0de012d024d48e82e73817",
+    "/Users/robert/.neoclr/experiments/preview-20261012-2/editor-extensions/raven.raven-vscode-0.1.13-neoclr.20261012.2/server/Raven.LanguageServer.dll": "5858a48fc0acb378b296cb7e0ce0de19ef14db10ca5aa8fc7007a263aa0baffa",
+    "/Users/robert/.raven/sdk/0.1.13-neoclr.20261012.2/tools/rvnc/rvnc.dll": "c56bf5da468c40afcd302c186465a83f6374c65d029ee8f6b2157884964d8319",
+    "/Users/robert/.neoclr/experiments/preview-20261012-2/bin/neoclr": "19d027f44503dde74731c813fb3f2fac5a43e47b7c9f6498b6d0dadf8085d825",
+    "/Users/robert/Projects/neoclr/scripts/native-vscode-acceptance.cjs": "8425bbefe8da1345774ee4d3f2d33fa8305e10813d5aabc02340a4100873ef42",
+    "/Users/robert/Projects/neoclr/scripts/prepare-native-editor.py": "246752fa64b8233a1d4dc899e859a4100d60ea4f6c7bfbdf934ac9a89d563467"
+  }
+}

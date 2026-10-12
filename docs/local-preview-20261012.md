@@ -58,9 +58,13 @@ consecutive runs through the **installed sample runners** pass, including rebuil
 both projects. Installed catalogue files and the side-by-side SDK match the qualified
 hashes. The VSIX installation/listing confirms the exact version. The installed SDK's
 language server passes [Task and Promise completion probes](experiments/native-type-budget/installed-preview/editor-completions.json)
-over stdio against installed library references. VS Code's CLI reports the opened
-`neoCLR Preview — json` window; interactive extension activation was not independently
-verified through that window.
+over stdio against installed library references. On 13 October the installed extension
+also passes all [26 real VS Code acceptance checks](experiments/release-20261013/installed-vscode-acceptance.json)
+in an isolated test profile: activation, hover/completion/docs, metadata navigation,
+file-watcher invalidation/recovery, build/run and failed-build preservation, .NET
+editing and Tasks/await execution. [Provenance](experiments/release-20261013/installed-vscode-provenance.json)
+identifies the installed extension, SDK/runtime and test harness hashes. This
+closes the earlier activation-verification gap without changing the author profile.
 
 The earlier interpreter control remains valid for unchanged compiler/runtime/library
 inputs. Native layout boundary execution and sanitized GC checks are linked from the

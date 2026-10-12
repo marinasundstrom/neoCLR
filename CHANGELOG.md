@@ -8,6 +8,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-13
 
+- Qualify the installed macOS SDK/VSIX in real VS Code: all 26 activation,
+  documentation/navigation, completion, watcher/recovery, build/run and Tasks/await
+  checks pass in an isolated profile, including ordinary .NET editing. Retain
+  component/harness hashes and close the previous editor-activation evidence gap.
+
 - Align Windows HTTP/JIT and SDK qualification with the locally qualified Raven
   native compiler 6b5e052ce. Prepare and archive a real default-JIT backend/host
   bundle before extracted SDK/editor checks; retain hashes and build logs. Two
