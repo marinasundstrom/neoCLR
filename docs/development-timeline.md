@@ -44,6 +44,11 @@ See the [changelog](../CHANGELOG.md) and linked design documents for technical s
   recovery. Public per-listener configuration, Windows/interpreter and packaging
   remain open. See [compiler evidence](experiments/async-unary-cleanup/README.md)
   and [HTTPS project evidence](experiments/https-server/project-validation.json).
+- **Subsequent continuation:** investigate the wider-suite gaps rather than stopping
+  at the HTTPS fix. Resolve Task through compilation references and declare top-level
+  functions before method emission. Main `86bfabafd`, carried as `371d1d707`, passes
+  all 148 async cases. The native compiler branch's .NET CLI fixture returns 42;
+  native HTTPS emission still succeeds. [Follow-through evidence](experiments/top-level-async-entry/README.md).
 
 ## 2026-10-12 — HTTPS server selected after diagnostics
 

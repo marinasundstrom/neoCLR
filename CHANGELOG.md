@@ -23,6 +23,10 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   resources survive awaited conditions. Record native project and .NET regression
   evidence, remove the need for a source workaround, and identify pre-existing
   broader async test gaps without weakening native verification.
+  Follow through with reference-aware top-level Task lookup and early function
+  declaration in Raven main `86bfabafd` / native line `371d1d707`: all 148 async
+  selection cases pass, closing those baseline gaps. Qualify the native compiler
+  branch's .NET CLI entrypoint with exit code 42 and retain native HTTPS emission.
 
 - Qualify provisional profiler attachment during the Raven HTTP showcase in
   macOS ARM64 AOT and JIT: 128 requests per mode, repeated external attachment,

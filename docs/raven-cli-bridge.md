@@ -9018,3 +9018,13 @@ No new Runtime Contract configuration, temporary CLI representation, metadata
 information loss or native replacement is introduced by this fix. Existing async
 and disposal contracts apply. See [regression and limitations](experiments/async-unary-cleanup/README.md)
 and the compiler-side `docs/compiler/neoclr-cli-bridge.md`.
+
+### Top-level async follow-through
+
+Main `86bfabafd`, carried as native-line `371d1d707`, resolves synthesized .NET
+entrypoint Task types through references and declares compilation-unit functions
+before body emission. All 148 functions/async tests pass, closing the baseline
+gaps recorded in the unary-await slice. The native compiler branch's .NET CLI
+fixture returns exit code 42 and its native HTTPS project still compiles. See
+[qualification and target limits](experiments/top-level-async-entry/README.md).
+Runtime Contracts, native metadata and target-owned Main adaptation are unchanged.

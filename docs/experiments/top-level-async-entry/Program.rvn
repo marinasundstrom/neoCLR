@@ -1,0 +1,12 @@
+import System.Threading.Tasks.*
+
+func Increment(value: int) -> int {
+    value + 1
+}
+
+async func Run() -> Task<int> {
+    await Task.Yield()
+    return Increment(41)
+}
+
+return await Run()

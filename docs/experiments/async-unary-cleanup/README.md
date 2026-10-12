@@ -13,9 +13,9 @@ Tasks, asserting the branch result, no early disposal and exactly-once disposal.
 They all failed before the fix; all 18 resource-lifetime tests now pass.
 
 [Recorded evidence](validation.json) also identifies 15 broader async test failures
-that reproduce with the unchanged walker (132/147 pass with the fix). These remain
-separate main-branch top-level async/closure/entrypoint gaps; this slice does not
-claim the entire async suite passes.
+that reproduce with the unchanged walker (132/147 pass with the fix). These were separate main-branch top-level async/closure/entrypoint gaps at that
+checkpoint. The subsequent [entrypoint fix](../top-level-async-entry/README.md)
+closes them: all 148 cases now pass.
 
 The native fixture compiles through its project with the fixed compiler. The
 original [HTTPS consumer](../https-server/Server.rvn), including its awaited unary

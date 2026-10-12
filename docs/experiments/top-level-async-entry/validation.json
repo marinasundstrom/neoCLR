@@ -1,0 +1,27 @@
+{
+  "date": "2026-10-12",
+  "passed": true,
+  "ravenMain": "86bfabafd",
+  "ravenNativeBase": "c71baae94",
+  "asyncSelection": {
+    "passed": 148,
+    "failed": 0
+  },
+  "cli": {
+    "targetFramework": "net10.0",
+    "before": "RAV1503: Cannot convert from int to ()",
+    "after": {
+      "exitCode": 42,
+      "stdout": "",
+      "stderr": ""
+    }
+  },
+  "inputsSha256": {
+    "docs/experiments/top-level-async-entry/Program.rvn": "fed0ee71027bc6a5c97914945c2e6febaa2eafe5180ca2988f2feccf51f4706f",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll": "1c11bbec4e4f0bb7f823fed83169699e24cd587bca6f74a6a055b72a8c785609",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/Raven.CodeAnalysis.dll": "7988489dfc4cec47f3a8c7dce0c2f095be870ec0e32cec2a515aec4321501145"
+  },
+  "assemblySha256": "0e33227655d01eb2007532e1cc33f0e691ab326284197d05da6907be3f24ddf1",
+  "ravenNative": "371d1d707",
+  "nativeHttpsProject": "compiles with fixed compiler; runtime TLS evidence retained from previous slice"
+}

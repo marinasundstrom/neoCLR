@@ -11,6 +11,9 @@ await capture fix; [project evidence](experiments/https-server/project-validatio
 covers twelve host cases plus fragmented transport. Client and PostgreSQL TLS are not
 implemented by this server slice. This is bounded author-directed networking work;
 the runtime correctness/performance milestone remains active.
+Compiler follow-through also closes the 15 broader .NET async baseline failures:
+[all 148 selected tests pass](experiments/top-level-async-entry/README.md), with
+separate main/native-branch commits and no change to target-owned runtime startup.
 
 **SQL data access direction (2026-10-12):** the author requests a small SQL provider,
 PostgreSQL binding and Dapper-like mapper, explicitly avoiding an ADO.NET-shaped
