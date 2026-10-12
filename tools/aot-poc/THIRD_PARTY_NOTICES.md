@@ -1,9 +1,10 @@
-# Experimental AOT tool dependencies
+# Native JIT/AOT backend dependencies
 
-This compiler is separate from the neoCLR runtime distribution. Its original code
-uses the repository MIT license. Dependencies are downloaded by Cargo, not vendored;
-`Cargo.lock` records source versions and checksums. The emitted scalar object has no
-Cranelift or neoCLR runtime imports. The sample C executable links the host C library.
+This compiler has a separate dependency lockfile and is included in development
+JIT bundles. Its original code uses the repository MIT license. Dependencies are
+downloaded by Cargo, not vendored; `Cargo.lock` records source versions and checksums.
+Generated code does not embed the compiler itself. Native programs additionally
+link their selected runtime host and its dependencies.
 
 The table records package-declared licenses from `cargo metadata --locked` on
 2026-10-07, including transitive, build-time and target-specific dependencies. It is

@@ -8,6 +8,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-13
 
+- Refresh source notices when preparing a development JIT bundle instead of
+  retaining the older bootstrap inventory. Retain the backend and TLS inventories,
+  lockfiles and Cranelift license; record copied notice input hashes in preparation
+  evidence. The stale-inventory/payload-preservation regression passes.
+
 - Repair the source-release notice inventory for shared TLS/security dependencies:
   cover all 99 locked registry packages and verify 198 retained notice hashes.
   Include the 20 packages missing from the top-level manifest and correct the

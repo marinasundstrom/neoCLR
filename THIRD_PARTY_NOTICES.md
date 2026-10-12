@@ -147,13 +147,13 @@ The generated scalar-category and simple-case-fold tables use Unicode data under
 17.0.0 CaseFolding.txt; its pinned source URL and SHA-256 are recorded in
 `scripts/generate-string-case-folding.py` and `src/string_case_folding.rs`.
 
-## Isolated AOT experiment
+## Native compiler backend
 
-The optional source-only [scalar AOT tool](tools/aot-poc/Cargo.toml) has a separate
-lockfile and [dependency inventory](tools/aot-poc/THIRD_PARTY_NOTICES.md), including
-Cranelift 0.121.2 under Apache-2.0 WITH LLVM-exception. These compiler dependencies
-are not added to the runtime distribution. The experiment's emitted scalar object
-has no Cranelift or neoCLR runtime imports.
+The [JIT/AOT backend](tools/aot-poc/THIRD_PARTY_NOTICES.md) has a separate
+lockfile and dependency inventory, including Cranelift 0.121.2 under Apache-2.0
+WITH LLVM-exception. Development JIT bundles include this backend and retain its
+inventory, lockfile and [Cranelift license](tools/aot-poc/CRANELIFT-LICENSE).
+The compiler's dependency set is separate from the runtime's top-level lockfile.
 
 The runtime now includes the shared native TLS and security providers. Their
 registry dependencies are covered by the top-level inventory above and its manifest.

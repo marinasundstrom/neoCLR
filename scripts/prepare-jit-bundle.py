@@ -8,6 +8,7 @@ import platform
 from pathlib import Path
 import shutil
 import subprocess
+from native_bundle_notices import refresh_notices
 from native_bundle_samples import refresh_samples, sample_definitions, configure_editor_tasks
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -184,6 +185,9 @@ try:
     # Acceptance defaults to installed JIT when the bundle advertises it.
     for name in ('verify-native-bundle.py', 'verify-native-http-json.py', 'run-native-sample.py'):
         shutil.copy2(ROOT / 'scripts' / name, bundle / 'tools' / name)
+    report['inputsSha256'].update(refresh_notices(ROOT, bundle))
+    path = ROOT / 'scripts/native_bundle_notices.py'
+    report['inputsSha256'][str(path)] = sha(path)
     manifest['files'] = {path.relative_to(bundle).as_posix(): sha(path)
                          for path in sorted(bundle.rglob('*')) if path.is_file()}
     (bundle / 'manifest.json').write_text(json.dumps(manifest, indent=2) + '\n')
