@@ -16,7 +16,9 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   contain managed faults at the native boundary. Add neoIL authoring and native
   fixture coverage. Retained registration, source compiler attributes and JIT/AOT
   remain open. Optional wire fields require a matching runtime when used; Rust
-  NativeImport/NativeAbi struct literals must include the new fields.
+  NativeImport/NativeAbi struct literals must include the new fields. Clarify that
+  the author's extern examples describe callable parameters/results, not a requested
+  registration API; names alone establish no retention contract.
 
 - On codex/native-function-pointers, bind native addresses to structural Function
   values through the interpreter/neoIL function.bind.native instruction. Share ABI

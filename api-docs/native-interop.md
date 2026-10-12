@@ -86,9 +86,10 @@ runtime retains the captured receiver, generates a call-duration entry stub and
 reenters the same managed invocation on the calling thread. Managed faults are caught
 at the stub, return zero/false to native code and propagate when the foreign call
 returns. Later callbacks in that call do not execute guest code after a fault.
-Native code must not retain the pointer. Retained registration needs a future
-ownership/unregistration API; calling a native function `Register` does not extend
-this lifetime. Suspension and other-thread entry are unsupported.
+Native code must not retain the pointer. Retention beyond the call needs a future
+explicit ownership/release contract. The author's extern examples illustrate callable
+parameters and results; they do not prescribe registration behavior. Suspension and
+other-thread entry are unsupported.
 
 A returned pointer becomes a library-retaining Function using function_return.
 Null, tracked-data and current temporary callback addresses are rejected. Provider

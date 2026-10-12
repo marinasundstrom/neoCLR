@@ -303,9 +303,11 @@ a library does not prove ownership of arbitrary executable addresses. A returned
 Function can itself be passed as a callable parameter, using an adapter with the
 parameter's ABI. ABI descriptor nesting is bounded to eight levels.
 
-An API called `Register` commonly retains its callback. **That use is not supported
-by this call-scoped contract.** It needs an owned registration/handle, explicit
-unregister/release, in-flight-call coordination and foreign-thread attachment.
+The author's `Register` and `GetFunction` declarations are illustrative extern
+functions, not a proposed registration API. Their names imply no callback lifetime.
+If a foreign function retains a callback beyond the call, that use is not supported
+by the current call-scoped contract. Supporting it will require explicit ownership,
+release and in-flight-call coordination, plus thread attachment where applicable.
 Returning a callable that captures native state likewise needs a future context
 and release contract. No retained-callback attribute spelling is being standardized
 by this experiment. Raven attributes/compiler emission, C# metadata authoring,

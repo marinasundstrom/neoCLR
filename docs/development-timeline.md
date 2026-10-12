@@ -44,6 +44,13 @@ See the [changelog](../CHANGELOG.md) and linked design documents for technical s
 - **Validation:** executable native fixtures exercise both directions, captured state
   across GC, repeated entry, scalar widths, fault/thread rejection and returned-callable
   composition. See [evidence](experiments/foreign-interop/README.md#callable-parameters-and-results-2026-10-12).
+- **Author correction:** “The code I showed were just samples of extern function.
+  Not an API for registering anything.” The names illustrate callable parameter
+  and result types; they do not request a registration API or establish retention.
+- **Assistant response:** acknowledge overinterpreting the name Register and correct
+  the contract/API documentation. Callback retention remains a conditional lifetime
+  concern, not an author-requested API or an inferred next priority. No runtime
+  behavior changes in this correction.
 - **Open:** persistent registrations, foreign-thread attachment, richer reverse
   marshalling, Raven attributes/emission and JIT/AOT exports/sidecars. The author
   established the desired two-way interface, not approval of a permanent call-scoped
