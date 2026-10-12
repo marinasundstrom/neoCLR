@@ -36,6 +36,32 @@ conversion. A native consumer may call direct exports by ordinary ABI rules; exp
 that operate on managed state must arrange runtime entry and GC coordination through
 an adapter. Rich metadata does not make an arbitrary native pointer safe to invoke.
 
+## Trust and ownership across the boundary
+
+Author clarification, 2026-10-12: each side can have its own memory management and
+security model. A foreign call trusts the other implementation to honor the agreed
+ABI and data contract. neoCLR does not require a foreign receiver to participate in
+its GC, use its allocator, or adopt its security model. Metadata describes the
+agreement; it cannot prove foreign code follows it. In-process FFI is not a sandbox.
+
+Each side remains responsible for storage it owns. Passing a value or address does
+not by itself transfer ownership: the contract distinguishes a borrowed view, an
+independent copy and an ownership transfer, including which allocator or release
+operation applies. The receiver decides how to use received data within that
+agreement. neoCLR can retain managed references or adapter state while the receiver
+uses a native pointer; foreign retention is not automatically visible to the GC.
+Likewise, wrapping a returned native callable does not make its external state
+managed or establish how that state is released.
+
+Runtime checks protect neoCLR's own invariants and reject locally detectable
+mismatches. They do not validate the foreign implementation's memory or security
+model, or promise recovery from arbitrary native misuse. A callback entering neoCLR
+must still satisfy its runtime-entry and lifetime requirements. The current
+call-scoped adapter is a bounded implementation, not a requirement that every
+foreign interface share that lifetime policy. Longer-lived mappings need an explicit
+way to keep the managed adapter alive and eventually release it; the native side
+can use its own ownership mechanism without adopting a neoCLR registration API.
+
 ## One signature model, several bindings
 
 The structural Function shape describes managed input/output types. A native ABI

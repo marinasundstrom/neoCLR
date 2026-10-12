@@ -51,6 +51,16 @@ See the [changelog](../CHANGELOG.md) and linked design documents for technical s
   the contract/API documentation. Callback retention remains a conditional lifetime
   concern, not an author-requested API or an inferred next priority. No runtime
   behavior changes in this correction.
+- **Author clarification:** crossing a foreign-function boundary requires trusting
+  the receiver, which may have a different memory management and security model;
+  the runtime may still retain references on its side.
+- **Assistant response and action:** record independent ownership/security models
+  in the [design](design/native-import-export-contract.md#trust-and-ownership-across-the-boundary).
+  Distinguish managed rooting from foreign ownership, and borrowing/copying/transfer
+  from merely passing an address. Runtime checks protect local invariants rather
+  than enforce a foreign collector or provide a sandbox. Longer-lived mappings do
+  not inherently require the native side to adopt a neoCLR registration API.
+  This is a contract clarification; no runtime behavior changed.
 - **Open:** persistent registrations, foreign-thread attachment, richer reverse
   marshalling, Raven attributes/emission and JIT/AOT exports/sidecars. The author
   established the desired two-way interface, not approval of a permanent call-scoped

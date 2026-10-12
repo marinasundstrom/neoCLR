@@ -18,7 +18,9 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   remain open. Optional wire fields require a matching runtime when used; Rust
   NativeImport/NativeAbi struct literals must include the new fields. Clarify that
   the author's extern examples describe callable parameters/results, not a requested
-  registration API; names alone establish no retention contract.
+  registration API; names alone establish no retention contract. Record the foreign
+  boundary as a trusted agreement between independent memory/security models,
+  distinguishing managed rooting from foreign ownership and release obligations.
 
 - On codex/native-function-pointers, bind native addresses to structural Function
   values through the interpreter/neoIL function.bind.native instruction. Share ABI

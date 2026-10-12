@@ -324,3 +324,17 @@ for captured callbacks. See the [primary comparison sources](design/native-impor
 The closure storage, widened integer returns and raw entry mechanics were checked
 against libffi 5.2.0 / libffi-sys 4.2.2, including its bundled libffi manual, on
 2026-10-12. Other-platform and executable-memory-policy qualification remains open.
+
+
+### Independent foreign memory and security models
+
+The FFI is a trusted boundary. Foreign code manages its own data under its own
+memory and security model; neoCLR does not impose its collector or allocator on it.
+A passed value can be borrowed, copied or transferred according to the ABI contract.
+Crossing the boundary alone does not select ownership or a release operation.
+neoCLR retaining a managed reference protects the managed object's lifetime; it does
+not manage arbitrary foreign copies, allocations or retained pointers. The same
+separation applies when foreign code returns data or a callable to neoCLR.
+See [the trust and ownership design](design/native-import-export-contract.md#trust-and-ownership-across-the-boundary).
+These principles clarify the intended interface without extending the current
+call-scoped callback implementation or claiming that native misuse is sandboxed.
