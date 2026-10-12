@@ -8,6 +8,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-12
 
+- Qualify the updated extracted preview through explicit interpreter execution,
+  including independent HTTP JSON requests and the Raven client/server pair. Retain
+  the reports alongside the failing default-JIT HTTP result; installation stays
+  gated on resolving native async object layout rather than switching the default.
+
 - Make website feature guides introductory and organize navigation around application
   tasks. Remove the historical benchmark page and superseded development narrative;
   retain relevant limits and benchmark provenance, with history in repository records.

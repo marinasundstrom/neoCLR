@@ -28,6 +28,9 @@ Validation on macOS ARM64:
 `ReportServer`'s generated async state machine has 204 flattened lanes, beyond the
 unchanged 1032-byte/128-lane object bound. Investigate compiler field lifetime/layout
 and the existing runtime-await project contract before increasing layout budgets.
+The [explicit interpreter control](acceptance-interpreter.json) passes the same
+extracted bundle, including [independent HTTP requests and the client/server pair](acceptance-interpreter-http.json).
+This isolates the remaining object-size rejection to native/JIT lowering.
 The type-budget change alone is not release qualification. No SDK or extension
 installation was performed. Windows validation remains outstanding.
 

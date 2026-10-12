@@ -1,0 +1,333 @@
+{
+  "passed": true,
+  "root": "/private/var/folders/5x/5r0dfcnx30lf0cl8kp3sphch0000gn/T/neoCLR extracted preview shswuvfz/neoCLR preview",
+  "commands": [
+    {
+      "command": [
+        "dotnet",
+        "/private/var/folders/5x/5r0dfcnx30lf0cl8kp3sphch0000gn/T/neoCLR extracted preview shswuvfz/neoCLR preview/sdk/tools/rvnc/rvnc.dll",
+        "neoclr",
+        "--project",
+        "/private/var/folders/5x/5r0dfcnx30lf0cl8kp3sphch0000gn/T/neoCLR extracted preview shswuvfz/neoCLR preview/samples/collections/App.rvnproj"
+      ],
+      "exitCode": 0,
+      "stdout": "Native build output: /private/var/folders/5x/5r0dfcnx30lf0cl8kp3sphch0000gn/T/neoCLR extracted preview shswuvfz/neoCLR preview/samples/collections/bin/neoclr/App.dll\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/private/var/folders/5x/5r0dfcnx30lf0cl8kp3sphch0000gn/T/neoCLR extracted preview shswuvfz/neoCLR preview/bin/neoclr",
+        "run",
+        "/private/var/folders/5x/5r0dfcnx30lf0cl8kp3sphch0000gn/T/neoCLR extracted preview shswuvfz/neoCLR preview/samples/collections/bin/neoclr/App.dll",
+        "--execution",
+        "interpreter",
+        "--system",
+        "/private/var/folders/5x/5r0dfcnx30lf0cl8kp3sphch0000gn/T/neoCLR extracted preview shswuvfz/neoCLR preview/lib/System.runtime.neox",
+        "--module",
+        "/private/var/folders/5x/5r0dfcnx30lf0cl8kp3sphch0000gn/T/neoCLR extracted preview shswuvfz/neoCLR preview/lib/System.Runtime.dll",
+        "--module",
+        "/private/var/folders/5x/5r0dfcnx30lf0cl8kp3sphch0000gn/T/neoCLR extracted preview shswuvfz/neoCLR preview/lib/System.Data.dll",
+        "--module",
+        "/private/var/folders/5x/5r0dfcnx30lf0cl8kp3sphch0000gn/T/neoCLR extracted preview shswuvfz/neoCLR preview/lib/System.Networking.dll",
+        "--module",
+        "/private/var/folders/5x/5r0dfcnx30lf0cl8kp3sphch0000gn/T/neoCLR extracted preview shswuvfz/neoCLR preview/lib/System.Web.dll",
+        "--module",
+        "/private/var/folders/5x/5r0dfcnx30lf0cl8kp3sphch0000gn/T/neoCLR extracted preview shswuvfz/neoCLR preview/lib/System.Data.PostgreSql.dll",
+        "--object-root",
+        "/private/var/folders/5x/5r0dfcnx30lf0cl8kp3sphch0000gn/T/neoCLR extracted preview shswuvfz/neoCLR preview/lib/System.Runtime.dll",
+        "--instructions",
+        "100000000"
+      ],
+      "exitCode": 0,
+      "stdout": "Duplicate order rejected\n3\n3\nUnknown order\nOrder already shipped\nMultiple\n2\nFiltered orders share identity\n2\n303\n303\n0\nEmpty\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "dotnet",
+        "/private/var/folders/5x/5r0dfcnx30lf0cl8kp3sphch0000gn/T/neoCLR extracted preview shswuvfz/neoCLR preview/sdk/tools/rvnc/rvnc.dll",
+        "neoclr",
+        "--project",
+        "/private/var/folders/5x/5r0dfcnx30lf0cl8kp3sphch0000gn/T/neoCLR extracted preview shswuvfz/neoCLR preview/samples/tasks/App.rvnproj"
+      ],
+      "exitCode": 0,
+      "stdout": "Native build output: /private/var/folders/5x/5r0dfcnx30lf0cl8kp3sphch0000gn/T/neoCLR extracted preview shswuvfz/neoCLR preview/samples/tasks/bin/neoclr/App.dll\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/private/var/folders/5x/5r0dfcnx30lf0cl8kp3sphch0000gn/T/neoCLR extracted preview shswuvfz/neoCLR preview/bin/neoclr",
+        "run",
+        "/private/var/folders/5x/5r0dfcnx30lf0cl8kp3sphch0000gn/T/neoCLR extracted preview shswuvfz/neoCLR preview/samples/tasks/bin/neoclr/App.dll",
+        "--execution",
+        "interpreter",
+        "--system",
+        "/private/var/folders/5x/5r0dfcnx30lf0cl8kp3sphch0000gn/T/neoCLR extracted preview shswuvfz/neoCLR preview/lib/System.runtime.neox",
+        "--module",
+        "/private/var/folders/5x/5r0dfcnx30lf0cl8kp3sphch0000gn/T/neoCLR extracted preview shswuvfz/neoCLR preview/lib/System.Runtime.dll",
+        "--module",
+        "/private/var/folders/5x/5r0dfcnx30lf0cl8kp3sphch0000gn/T/neoCLR extracted preview shswuvfz/neoCLR preview/lib/System.Data.dll",
+        "--module",
+        "/private/var/folders/5x/5r0dfcnx30lf0cl8kp3sphch0000gn/T/neoCLR extracted preview shswuvfz/neoCLR preview/lib/System.Networking.dll",
+        "--module",
+        "/private/var/folders/5x/5r0dfcnx30lf0cl8kp3sphch0000gn/T/neoCLR extracted preview shswuvfz/neoCLR preview/lib/System.Web.dll",
+        "--module",
+        "/private/var/folders/5x/5r0dfcnx30lf0cl8kp3sphch0000gn/T/neoCLR extracted preview shswuvfz/neoCLR preview/lib/System.Data.PostgreSql.dll",
+        "--object-root",
+        "/private/var/folders/5x/5r0dfcnx30lf0cl8kp3sphch0000gn/T/neoCLR extracted preview shswuvfz/neoCLR preview/lib/System.Runtime.dll",
+        "--instructions",
+        "100000000"
+      ],
+      "exitCode": 0,
+      "stdout": "Suspended\n42\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "dotnet",
+        "/private/var/folders/5x/5r0dfcnx30lf0cl8kp3sphch0000gn/T/neoCLR extracted preview shswuvfz/neoCLR preview/sdk/tools/rvnc/rvnc.dll",
+        "neoclr",
+        "--project",
+        "/private/var/folders/5x/5r0dfcnx30lf0cl8kp3sphch0000gn/T/neoCLR extracted preview shswuvfz/neoCLR preview/samples/json/App.rvnproj"
+      ],
+      "exitCode": 0,
+      "stdout": "Native build output: /private/var/folders/5x/5r0dfcnx30lf0cl8kp3sphch0000gn/T/neoCLR extracted preview shswuvfz/neoCLR preview/samples/json/bin/neoclr/App.dll\n",
+      "stderr": "/private/var/folders/5x/5r0dfcnx30lf0cl8kp3sphch0000gn/T/neoCLR extracted preview shswuvfz/neoCLR preview/samples/json/Main.rvn(14,76): info RAV1506: Result propagation converts errors from 'JsonError' to 'MappingError' via implicit conversion 'static func implicit(error: JsonError) -> MappingError'.\n/private/var/folders/5x/5r0dfcnx30lf0cl8kp3sphch0000gn/T/neoCLR extracted preview shswuvfz/neoCLR preview/samples/json/Main.rvn(19,52): info RAV1506: Result propagation converts errors from 'JsonError' to 'MappingError' via implicit conversion 'static func implicit(error: JsonError) -> MappingError'.\n/private/var/folders/5x/5r0dfcnx30lf0cl8kp3sphch0000gn/T/neoCLR extracted preview shswuvfz/neoCLR preview/samples/json/Main.rvn(24,59): info RAV1506: Result propagation converts errors from 'JsonError' to 'MappingError' via implicit conversion 'static func implicit(error: JsonError) -> MappingError'.\n/private/var/folders/5x/5r0dfcnx30lf0cl8kp3sphch0000gn/T/neoCLR extracted preview shswuvfz/neoCLR preview/samples/json/Main.rvn(26,62): info RAV1506: Result propagation converts errors from 'JsonError' to 'MappingError' via implicit conversion 'static func implicit(error: JsonError) -> MappingError'.\n/private/var/folders/5x/5r0dfcnx30lf0cl8kp3sphch0000gn/T/neoCLR extracted preview shswuvfz/neoCLR preview/samples/json/Main.rvn(34,43): info RAV1506: Result propagation converts errors from 'JsonError' to 'MappingError' via implicit conversion 'static func implicit(error: JsonError) -> MappingError'.\n/private/var/folders/5x/5r0dfcnx30lf0cl8kp3sphch0000gn/T/neoCLR extracted preview shswuvfz/neoCLR preview/samples/json/Mapping.rvn(50,53): info RAV1506: Result propagation converts errors from 'JsonError' to 'MappingError' via implicit conversion 'static func implicit(error: JsonError) -> MappingError'.\n/private/var/folders/5x/5r0dfcnx30lf0cl8kp3sphch0000gn/T/neoCLR extracted preview shswuvfz/neoCLR preview/samples/json/Mapping.rvn(52,66): info RAV1506: Result propagation converts errors from 'ReflectionError' to 'MappingError' via implicit conversion 'static func implicit(error: ReflectionError) -> MappingError'.\n/private/var/folders/5x/5r0dfcnx30lf0cl8kp3sphch0000gn/T/neoCLR extracted preview shswuvfz/neoCLR preview/samples/json/Mapping.rvn(55,61): info RAV1506: Result propagation converts errors from 'ReflectionError' to 'MappingError' via implicit conversion 'static func implicit(error: ReflectionError) -> MappingError'.\n/private/var/folders/5x/5r0dfcnx30lf0cl8kp3sphch0000gn/T/neoCLR extracted preview shswuvfz/neoCLR preview/samples/json/Mapping.rvn(67,42): info RAV1506: Result propagation converts errors from 'ReflectionError' to 'MappingError' via implicit conversion 'static func implicit(error: ReflectionError) -> MappingError'.\n/private/var/folders/5x/5r0dfcnx30lf0cl8kp3sphch0000gn/T/neoCLR extracted preview shswuvfz/neoCLR preview/samples/json/Mapping.rvn(70,57): info RAV1506: Result propagation converts errors from 'JsonError' to 'MappingError' via implicit conversion 'static func implicit(error: JsonError) -> MappingError'.\n"
+    },
+    {
+      "command": [
+        "/private/var/folders/5x/5r0dfcnx30lf0cl8kp3sphch0000gn/T/neoCLR extracted preview shswuvfz/neoCLR preview/bin/neoclr",
+        "run",
+        "/private/var/folders/5x/5r0dfcnx30lf0cl8kp3sphch0000gn/T/neoCLR extracted preview shswuvfz/neoCLR preview/samples/json/bin/neoclr/App.dll",
+        "--execution",
+        "interpreter",
+        "--system",
+        "/private/var/folders/5x/5r0dfcnx30lf0cl8kp3sphch0000gn/T/neoCLR extracted preview shswuvfz/neoCLR preview/lib/System.runtime.neox",
+        "--module",
+        "/private/var/folders/5x/5r0dfcnx30lf0cl8kp3sphch0000gn/T/neoCLR extracted preview shswuvfz/neoCLR preview/lib/System.Runtime.dll",
+        "--module",
+        "/private/var/folders/5x/5r0dfcnx30lf0cl8kp3sphch0000gn/T/neoCLR extracted preview shswuvfz/neoCLR preview/lib/System.Data.dll",
+        "--module",
+        "/private/var/folders/5x/5r0dfcnx30lf0cl8kp3sphch0000gn/T/neoCLR extracted preview shswuvfz/neoCLR preview/lib/System.Networking.dll",
+        "--module",
+        "/private/var/folders/5x/5r0dfcnx30lf0cl8kp3sphch0000gn/T/neoCLR extracted preview shswuvfz/neoCLR preview/lib/System.Web.dll",
+        "--module",
+        "/private/var/folders/5x/5r0dfcnx30lf0cl8kp3sphch0000gn/T/neoCLR extracted preview shswuvfz/neoCLR preview/lib/System.Data.PostgreSql.dll",
+        "--object-root",
+        "/private/var/folders/5x/5r0dfcnx30lf0cl8kp3sphch0000gn/T/neoCLR extracted preview shswuvfz/neoCLR preview/lib/System.Runtime.dll",
+        "--instructions",
+        "100000000"
+      ],
+      "exitCode": 0,
+      "stdout": "JSON object mapping checks passed\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "dotnet",
+        "/private/var/folders/5x/5r0dfcnx30lf0cl8kp3sphch0000gn/T/neoCLR extracted preview shswuvfz/neoCLR preview/sdk/tools/rvnc/rvnc.dll",
+        "neoclr",
+        "--project",
+        "/private/var/folders/5x/5r0dfcnx30lf0cl8kp3sphch0000gn/T/neoCLR extracted preview shswuvfz/neoCLR preview/samples/http-json-server/App.rvnproj"
+      ],
+      "exitCode": 0,
+      "stdout": "Native build output: /private/var/folders/5x/5r0dfcnx30lf0cl8kp3sphch0000gn/T/neoCLR extracted preview shswuvfz/neoCLR preview/samples/http-json-server/bin/neoclr/App.dll\n",
+      "stderr": "/private/var/folders/5x/5r0dfcnx30lf0cl8kp3sphch0000gn/T/neoCLR extracted preview shswuvfz/neoCLR preview/samples/http-json-server/HttpApplication.rvn(64,32): info RAV1506: Result propagation converts errors from 'JsonError' to 'AppError' via implicit conversion 'static func implicit(error: JsonError) -> AppError'.\n/private/var/folders/5x/5r0dfcnx30lf0cl8kp3sphch0000gn/T/neoCLR extracted preview shswuvfz/neoCLR preview/samples/http-json-server/HttpApplication.rvn(65,45): info RAV1506: Result propagation converts errors from 'JsonError' to 'AppError' via implicit conversion 'static func implicit(error: JsonError) -> AppError'.\n/private/var/folders/5x/5r0dfcnx30lf0cl8kp3sphch0000gn/T/neoCLR extracted preview shswuvfz/neoCLR preview/samples/http-json-server/HttpApplication.rvn(70,26): info RAV1506: Result propagation converts errors from 'HttpJsonError' to 'AppError' via implicit conversion 'static func implicit(error: HttpJsonError) -> AppError'.\n/private/var/folders/5x/5r0dfcnx30lf0cl8kp3sphch0000gn/T/neoCLR extracted preview shswuvfz/neoCLR preview/samples/http-json-server/HttpApplication.rvn(74,68): info RAV1506: Result propagation converts errors from 'JsonError' to 'AppError' via implicit conversion 'static func implicit(error: JsonError) -> AppError'.\n/private/var/folders/5x/5r0dfcnx30lf0cl8kp3sphch0000gn/T/neoCLR extracted preview shswuvfz/neoCLR preview/samples/http-json-server/HttpApplication.rvn(76,53): info RAV1506: Result propagation converts errors from 'JsonError' to 'AppError' via implicit conversion 'static func implicit(error: JsonError) -> AppError'.\n/private/var/folders/5x/5r0dfcnx30lf0cl8kp3sphch0000gn/T/neoCLR extracted preview shswuvfz/neoCLR preview/samples/http-json-server/HttpServer.rvn(18,40): info RAV1506: Result propagation converts errors from 'JsonError' to 'AppError' via implicit conversion 'static func implicit(error: JsonError) -> AppError'.\n/private/var/folders/5x/5r0dfcnx30lf0cl8kp3sphch0000gn/T/neoCLR extracted preview shswuvfz/neoCLR preview/samples/http-json-server/HttpServer.rvn(19,53): info RAV1506: Result propagation converts errors from 'JsonError' to 'AppError' via implicit conversion 'static func implicit(error: JsonError) -> AppError'.\n/private/var/folders/5x/5r0dfcnx30lf0cl8kp3sphch0000gn/T/neoCLR extracted preview shswuvfz/neoCLR preview/samples/http-json-server/HttpServer.rvn(82,9): warning RAV0162: Unreachable code\n/private/var/folders/5x/5r0dfcnx30lf0cl8kp3sphch0000gn/T/neoCLR extracted preview shswuvfz/neoCLR preview/samples/http-json-server/HttpServer.rvn(87,9): warning RAV0162: Unreachable code\n"
+    },
+    {
+      "command": [
+        "dotnet",
+        "/private/var/folders/5x/5r0dfcnx30lf0cl8kp3sphch0000gn/T/neoCLR extracted preview shswuvfz/neoCLR preview/sdk/tools/rvnc/rvnc.dll",
+        "neoclr",
+        "--project",
+        "/private/var/folders/5x/5r0dfcnx30lf0cl8kp3sphch0000gn/T/neoCLR extracted preview shswuvfz/neoCLR preview/samples/http-json-client/App.rvnproj"
+      ],
+      "exitCode": 0,
+      "stdout": "Native build output: /private/var/folders/5x/5r0dfcnx30lf0cl8kp3sphch0000gn/T/neoCLR extracted preview shswuvfz/neoCLR preview/samples/http-json-client/bin/neoclr/App.dll\n",
+      "stderr": "/private/var/folders/5x/5r0dfcnx30lf0cl8kp3sphch0000gn/T/neoCLR extracted preview shswuvfz/neoCLR preview/samples/http-json-client/HttpApplication.rvn(64,32): info RAV1506: Result propagation converts errors from 'JsonError' to 'AppError' via implicit conversion 'static func implicit(error: JsonError) -> AppError'.\n/private/var/folders/5x/5r0dfcnx30lf0cl8kp3sphch0000gn/T/neoCLR extracted preview shswuvfz/neoCLR preview/samples/http-json-client/HttpApplication.rvn(65,45): info RAV1506: Result propagation converts errors from 'JsonError' to 'AppError' via implicit conversion 'static func implicit(error: JsonError) -> AppError'.\n/private/var/folders/5x/5r0dfcnx30lf0cl8kp3sphch0000gn/T/neoCLR extracted preview shswuvfz/neoCLR preview/samples/http-json-client/HttpApplication.rvn(70,26): info RAV1506: Result propagation converts errors from 'HttpJsonError' to 'AppError' via implicit conversion 'static func implicit(error: HttpJsonError) -> AppError'.\n/private/var/folders/5x/5r0dfcnx30lf0cl8kp3sphch0000gn/T/neoCLR extracted preview shswuvfz/neoCLR preview/samples/http-json-client/HttpApplication.rvn(74,68): info RAV1506: Result propagation converts errors from 'JsonError' to 'AppError' via implicit conversion 'static func implicit(error: JsonError) -> AppError'.\n/private/var/folders/5x/5r0dfcnx30lf0cl8kp3sphch0000gn/T/neoCLR extracted preview shswuvfz/neoCLR preview/samples/http-json-client/HttpApplication.rvn(76,53): info RAV1506: Result propagation converts errors from 'JsonError' to 'AppError' via implicit conversion 'static func implicit(error: JsonError) -> AppError'.\n/private/var/folders/5x/5r0dfcnx30lf0cl8kp3sphch0000gn/T/neoCLR extracted preview shswuvfz/neoCLR preview/samples/http-json-client/HttpClient.rvn(11,71): info RAV1506: Result propagation converts errors from 'HttpJsonError' to 'AppError' via implicit conversion 'static func implicit(error: HttpJsonError) -> AppError'.\n/private/var/folders/5x/5r0dfcnx30lf0cl8kp3sphch0000gn/T/neoCLR extracted preview shswuvfz/neoCLR preview/samples/http-json-client/HttpClient.rvn(21,9): warning RAV0162: Unreachable code\n"
+    },
+    {
+      "command": [
+        "/Applications/Xcode.app/Contents/Developer/usr/bin/python3",
+        "/private/var/folders/5x/5r0dfcnx30lf0cl8kp3sphch0000gn/T/neoCLR extracted preview shswuvfz/neoCLR preview/tools/verify-native-http-json.py",
+        "--runtime",
+        "/private/var/folders/5x/5r0dfcnx30lf0cl8kp3sphch0000gn/T/neoCLR extracted preview shswuvfz/neoCLR preview/bin/neoclr",
+        "--server",
+        "/private/var/folders/5x/5r0dfcnx30lf0cl8kp3sphch0000gn/T/neoCLR extracted preview shswuvfz/neoCLR preview/samples/http-json-server/bin/neoclr/App.dll",
+        "--client",
+        "/private/var/folders/5x/5r0dfcnx30lf0cl8kp3sphch0000gn/T/neoCLR extracted preview shswuvfz/neoCLR preview/samples/http-json-client/bin/neoclr/App.dll",
+        "--seed",
+        "/private/var/folders/5x/5r0dfcnx30lf0cl8kp3sphch0000gn/T/neoCLR extracted preview shswuvfz/neoCLR preview/lib/System.runtime.neox",
+        "--module",
+        "/private/var/folders/5x/5r0dfcnx30lf0cl8kp3sphch0000gn/T/neoCLR extracted preview shswuvfz/neoCLR preview/lib/System.Runtime.dll",
+        "--module",
+        "/private/var/folders/5x/5r0dfcnx30lf0cl8kp3sphch0000gn/T/neoCLR extracted preview shswuvfz/neoCLR preview/lib/System.Data.dll",
+        "--module",
+        "/private/var/folders/5x/5r0dfcnx30lf0cl8kp3sphch0000gn/T/neoCLR extracted preview shswuvfz/neoCLR preview/lib/System.Networking.dll",
+        "--module",
+        "/private/var/folders/5x/5r0dfcnx30lf0cl8kp3sphch0000gn/T/neoCLR extracted preview shswuvfz/neoCLR preview/lib/System.Web.dll",
+        "--module",
+        "/private/var/folders/5x/5r0dfcnx30lf0cl8kp3sphch0000gn/T/neoCLR extracted preview shswuvfz/neoCLR preview/lib/System.Data.PostgreSql.dll",
+        "--object-root",
+        "/private/var/folders/5x/5r0dfcnx30lf0cl8kp3sphch0000gn/T/neoCLR extracted preview shswuvfz/neoCLR preview/lib/System.Runtime.dll",
+        "--execution",
+        "interpreter",
+        "--output",
+        "/Users/robert/Projects/neoclr/target/preview-type-budget-candidate/acceptance-interpreter-http.json"
+      ],
+      "exitCode": 0,
+      "stdout": "Native HTTP/JSON server requests passed\nNative HTTP/JSON client/server pair passed\n",
+      "stderr": ""
+    }
+  ],
+  "verifiedFiles": 1458,
+  "execution": "interpreter",
+  "http": {
+    "execution": "interpreter",
+    "inputs": {
+      "/private/var/folders/5x/5r0dfcnx30lf0cl8kp3sphch0000gn/T/neoCLR extracted preview shswuvfz/neoCLR preview/bin/neoclr": "19d027f44503dde74731c813fb3f2fac5a43e47b7c9f6498b6d0dadf8085d825",
+      "/private/var/folders/5x/5r0dfcnx30lf0cl8kp3sphch0000gn/T/neoCLR extracted preview shswuvfz/neoCLR preview/samples/http-json-server/bin/neoclr/App.dll": "13d7e63f67a96b5bb70c7245a79be7eb4dfe8c2df044c533574cc85519d4ac12",
+      "/private/var/folders/5x/5r0dfcnx30lf0cl8kp3sphch0000gn/T/neoCLR extracted preview shswuvfz/neoCLR preview/samples/http-json-client/bin/neoclr/App.dll": "18d6a86b7a7c2566d3fe535e519380a9ee8efe5ed08c78de896642db3ed6be08",
+      "/private/var/folders/5x/5r0dfcnx30lf0cl8kp3sphch0000gn/T/neoCLR extracted preview shswuvfz/neoCLR preview/lib/System.runtime.neox": "98a1ae1da85387c87746957e83a4015eb59d0566539a915c69f168d2b511b190",
+      "/private/var/folders/5x/5r0dfcnx30lf0cl8kp3sphch0000gn/T/neoCLR extracted preview shswuvfz/neoCLR preview/lib/System.Runtime.dll": "4e85571b0eaa3e0868f0e6165b0ba9038f2fde89e03c83934f0ad264307276a3",
+      "/private/var/folders/5x/5r0dfcnx30lf0cl8kp3sphch0000gn/T/neoCLR extracted preview shswuvfz/neoCLR preview/lib/System.Data.dll": "a563b65aa74faef25fa3dde618b67a45387d5db719d25dbe6ed6f2120f0314d4",
+      "/private/var/folders/5x/5r0dfcnx30lf0cl8kp3sphch0000gn/T/neoCLR extracted preview shswuvfz/neoCLR preview/lib/System.Networking.dll": "6715aeb443494f9c5a4e1f4f61a807147468a87f1b0980ee51e533f3a076bebb",
+      "/private/var/folders/5x/5r0dfcnx30lf0cl8kp3sphch0000gn/T/neoCLR extracted preview shswuvfz/neoCLR preview/lib/System.Web.dll": "01898aa2b6c028bf8a7af183f403995652459b560e4576f5490b452e346d8a8e",
+      "/private/var/folders/5x/5r0dfcnx30lf0cl8kp3sphch0000gn/T/neoCLR extracted preview shswuvfz/neoCLR preview/lib/System.Data.PostgreSql.dll": "fa12626ce72cb597d44c30fb39970c19b2db6888c9ded996fdaea1a18f6fa3c2"
+    },
+    "runs": [
+      {
+        "serverCommand": [
+          "/private/var/folders/5x/5r0dfcnx30lf0cl8kp3sphch0000gn/T/neoCLR extracted preview shswuvfz/neoCLR preview/bin/neoclr",
+          "run",
+          "/private/var/folders/5x/5r0dfcnx30lf0cl8kp3sphch0000gn/T/neoCLR extracted preview shswuvfz/neoCLR preview/samples/http-json-server/bin/neoclr/App.dll",
+          "--execution",
+          "interpreter",
+          "--system",
+          "/private/var/folders/5x/5r0dfcnx30lf0cl8kp3sphch0000gn/T/neoCLR extracted preview shswuvfz/neoCLR preview/lib/System.runtime.neox",
+          "--instructions",
+          "100000000",
+          "--module",
+          "/private/var/folders/5x/5r0dfcnx30lf0cl8kp3sphch0000gn/T/neoCLR extracted preview shswuvfz/neoCLR preview/lib/System.Runtime.dll",
+          "--module",
+          "/private/var/folders/5x/5r0dfcnx30lf0cl8kp3sphch0000gn/T/neoCLR extracted preview shswuvfz/neoCLR preview/lib/System.Data.dll",
+          "--module",
+          "/private/var/folders/5x/5r0dfcnx30lf0cl8kp3sphch0000gn/T/neoCLR extracted preview shswuvfz/neoCLR preview/lib/System.Networking.dll",
+          "--module",
+          "/private/var/folders/5x/5r0dfcnx30lf0cl8kp3sphch0000gn/T/neoCLR extracted preview shswuvfz/neoCLR preview/lib/System.Web.dll",
+          "--module",
+          "/private/var/folders/5x/5r0dfcnx30lf0cl8kp3sphch0000gn/T/neoCLR extracted preview shswuvfz/neoCLR preview/lib/System.Data.PostgreSql.dll",
+          "--object-root",
+          "/private/var/folders/5x/5r0dfcnx30lf0cl8kp3sphch0000gn/T/neoCLR extracted preview shswuvfz/neoCLR preview/lib/System.Runtime.dll",
+          "--",
+          "4"
+        ],
+        "requests": [
+          {
+            "method": "GET",
+            "path": "/report",
+            "status": 200,
+            "body": {
+              "station": "Caf\u00e9"
+            }
+          },
+          {
+            "method": "POST",
+            "path": "/reports",
+            "status": 201,
+            "body": {
+              "accepted": true
+            }
+          },
+          {
+            "method": "POST",
+            "path": "/reports",
+            "status": 400,
+            "body": {
+              "error": "Invalid report"
+            }
+          },
+          {
+            "method": "GET",
+            "path": "/missing",
+            "status": 404,
+            "body": {
+              "error": "Not found"
+            }
+          }
+        ],
+        "port": "56296",
+        "server": {
+          "exitCode": 0,
+          "stdout": "Reports served\n",
+          "stderr": ""
+        }
+      },
+      {
+        "serverCommand": [
+          "/private/var/folders/5x/5r0dfcnx30lf0cl8kp3sphch0000gn/T/neoCLR extracted preview shswuvfz/neoCLR preview/bin/neoclr",
+          "run",
+          "/private/var/folders/5x/5r0dfcnx30lf0cl8kp3sphch0000gn/T/neoCLR extracted preview shswuvfz/neoCLR preview/samples/http-json-server/bin/neoclr/App.dll",
+          "--execution",
+          "interpreter",
+          "--system",
+          "/private/var/folders/5x/5r0dfcnx30lf0cl8kp3sphch0000gn/T/neoCLR extracted preview shswuvfz/neoCLR preview/lib/System.runtime.neox",
+          "--instructions",
+          "100000000",
+          "--module",
+          "/private/var/folders/5x/5r0dfcnx30lf0cl8kp3sphch0000gn/T/neoCLR extracted preview shswuvfz/neoCLR preview/lib/System.Runtime.dll",
+          "--module",
+          "/private/var/folders/5x/5r0dfcnx30lf0cl8kp3sphch0000gn/T/neoCLR extracted preview shswuvfz/neoCLR preview/lib/System.Data.dll",
+          "--module",
+          "/private/var/folders/5x/5r0dfcnx30lf0cl8kp3sphch0000gn/T/neoCLR extracted preview shswuvfz/neoCLR preview/lib/System.Networking.dll",
+          "--module",
+          "/private/var/folders/5x/5r0dfcnx30lf0cl8kp3sphch0000gn/T/neoCLR extracted preview shswuvfz/neoCLR preview/lib/System.Web.dll",
+          "--module",
+          "/private/var/folders/5x/5r0dfcnx30lf0cl8kp3sphch0000gn/T/neoCLR extracted preview shswuvfz/neoCLR preview/lib/System.Data.PostgreSql.dll",
+          "--object-root",
+          "/private/var/folders/5x/5r0dfcnx30lf0cl8kp3sphch0000gn/T/neoCLR extracted preview shswuvfz/neoCLR preview/lib/System.Runtime.dll",
+          "--",
+          "2"
+        ],
+        "requests": [],
+        "port": "56314",
+        "clientCommand": [
+          "/private/var/folders/5x/5r0dfcnx30lf0cl8kp3sphch0000gn/T/neoCLR extracted preview shswuvfz/neoCLR preview/bin/neoclr",
+          "run",
+          "/private/var/folders/5x/5r0dfcnx30lf0cl8kp3sphch0000gn/T/neoCLR extracted preview shswuvfz/neoCLR preview/samples/http-json-client/bin/neoclr/App.dll",
+          "--execution",
+          "interpreter",
+          "--system",
+          "/private/var/folders/5x/5r0dfcnx30lf0cl8kp3sphch0000gn/T/neoCLR extracted preview shswuvfz/neoCLR preview/lib/System.runtime.neox",
+          "--instructions",
+          "100000000",
+          "--module",
+          "/private/var/folders/5x/5r0dfcnx30lf0cl8kp3sphch0000gn/T/neoCLR extracted preview shswuvfz/neoCLR preview/lib/System.Runtime.dll",
+          "--module",
+          "/private/var/folders/5x/5r0dfcnx30lf0cl8kp3sphch0000gn/T/neoCLR extracted preview shswuvfz/neoCLR preview/lib/System.Data.dll",
+          "--module",
+          "/private/var/folders/5x/5r0dfcnx30lf0cl8kp3sphch0000gn/T/neoCLR extracted preview shswuvfz/neoCLR preview/lib/System.Networking.dll",
+          "--module",
+          "/private/var/folders/5x/5r0dfcnx30lf0cl8kp3sphch0000gn/T/neoCLR extracted preview shswuvfz/neoCLR preview/lib/System.Web.dll",
+          "--module",
+          "/private/var/folders/5x/5r0dfcnx30lf0cl8kp3sphch0000gn/T/neoCLR extracted preview shswuvfz/neoCLR preview/lib/System.Data.PostgreSql.dll",
+          "--object-root",
+          "/private/var/folders/5x/5r0dfcnx30lf0cl8kp3sphch0000gn/T/neoCLR extracted preview shswuvfz/neoCLR preview/lib/System.Runtime.dll",
+          "--",
+          "http://127.0.0.1:56314/"
+        ],
+        "client": {
+          "exitCode": 0,
+          "stdout": "{\"accepted\":true}\n",
+          "stderr": ""
+        },
+        "server": {
+          "exitCode": 0,
+          "stdout": "Reports served\n",
+          "stderr": ""
+        }
+      }
+    ],
+    "passed": true
+  }
+}

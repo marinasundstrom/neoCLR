@@ -1,0 +1,148 @@
+{
+  "execution": "interpreter",
+  "inputs": {
+    "/private/var/folders/5x/5r0dfcnx30lf0cl8kp3sphch0000gn/T/neoCLR extracted preview shswuvfz/neoCLR preview/bin/neoclr": "19d027f44503dde74731c813fb3f2fac5a43e47b7c9f6498b6d0dadf8085d825",
+    "/private/var/folders/5x/5r0dfcnx30lf0cl8kp3sphch0000gn/T/neoCLR extracted preview shswuvfz/neoCLR preview/samples/http-json-server/bin/neoclr/App.dll": "13d7e63f67a96b5bb70c7245a79be7eb4dfe8c2df044c533574cc85519d4ac12",
+    "/private/var/folders/5x/5r0dfcnx30lf0cl8kp3sphch0000gn/T/neoCLR extracted preview shswuvfz/neoCLR preview/samples/http-json-client/bin/neoclr/App.dll": "18d6a86b7a7c2566d3fe535e519380a9ee8efe5ed08c78de896642db3ed6be08",
+    "/private/var/folders/5x/5r0dfcnx30lf0cl8kp3sphch0000gn/T/neoCLR extracted preview shswuvfz/neoCLR preview/lib/System.runtime.neox": "98a1ae1da85387c87746957e83a4015eb59d0566539a915c69f168d2b511b190",
+    "/private/var/folders/5x/5r0dfcnx30lf0cl8kp3sphch0000gn/T/neoCLR extracted preview shswuvfz/neoCLR preview/lib/System.Runtime.dll": "4e85571b0eaa3e0868f0e6165b0ba9038f2fde89e03c83934f0ad264307276a3",
+    "/private/var/folders/5x/5r0dfcnx30lf0cl8kp3sphch0000gn/T/neoCLR extracted preview shswuvfz/neoCLR preview/lib/System.Data.dll": "a563b65aa74faef25fa3dde618b67a45387d5db719d25dbe6ed6f2120f0314d4",
+    "/private/var/folders/5x/5r0dfcnx30lf0cl8kp3sphch0000gn/T/neoCLR extracted preview shswuvfz/neoCLR preview/lib/System.Networking.dll": "6715aeb443494f9c5a4e1f4f61a807147468a87f1b0980ee51e533f3a076bebb",
+    "/private/var/folders/5x/5r0dfcnx30lf0cl8kp3sphch0000gn/T/neoCLR extracted preview shswuvfz/neoCLR preview/lib/System.Web.dll": "01898aa2b6c028bf8a7af183f403995652459b560e4576f5490b452e346d8a8e",
+    "/private/var/folders/5x/5r0dfcnx30lf0cl8kp3sphch0000gn/T/neoCLR extracted preview shswuvfz/neoCLR preview/lib/System.Data.PostgreSql.dll": "fa12626ce72cb597d44c30fb39970c19b2db6888c9ded996fdaea1a18f6fa3c2"
+  },
+  "runs": [
+    {
+      "serverCommand": [
+        "/private/var/folders/5x/5r0dfcnx30lf0cl8kp3sphch0000gn/T/neoCLR extracted preview shswuvfz/neoCLR preview/bin/neoclr",
+        "run",
+        "/private/var/folders/5x/5r0dfcnx30lf0cl8kp3sphch0000gn/T/neoCLR extracted preview shswuvfz/neoCLR preview/samples/http-json-server/bin/neoclr/App.dll",
+        "--execution",
+        "interpreter",
+        "--system",
+        "/private/var/folders/5x/5r0dfcnx30lf0cl8kp3sphch0000gn/T/neoCLR extracted preview shswuvfz/neoCLR preview/lib/System.runtime.neox",
+        "--instructions",
+        "100000000",
+        "--module",
+        "/private/var/folders/5x/5r0dfcnx30lf0cl8kp3sphch0000gn/T/neoCLR extracted preview shswuvfz/neoCLR preview/lib/System.Runtime.dll",
+        "--module",
+        "/private/var/folders/5x/5r0dfcnx30lf0cl8kp3sphch0000gn/T/neoCLR extracted preview shswuvfz/neoCLR preview/lib/System.Data.dll",
+        "--module",
+        "/private/var/folders/5x/5r0dfcnx30lf0cl8kp3sphch0000gn/T/neoCLR extracted preview shswuvfz/neoCLR preview/lib/System.Networking.dll",
+        "--module",
+        "/private/var/folders/5x/5r0dfcnx30lf0cl8kp3sphch0000gn/T/neoCLR extracted preview shswuvfz/neoCLR preview/lib/System.Web.dll",
+        "--module",
+        "/private/var/folders/5x/5r0dfcnx30lf0cl8kp3sphch0000gn/T/neoCLR extracted preview shswuvfz/neoCLR preview/lib/System.Data.PostgreSql.dll",
+        "--object-root",
+        "/private/var/folders/5x/5r0dfcnx30lf0cl8kp3sphch0000gn/T/neoCLR extracted preview shswuvfz/neoCLR preview/lib/System.Runtime.dll",
+        "--",
+        "4"
+      ],
+      "requests": [
+        {
+          "method": "GET",
+          "path": "/report",
+          "status": 200,
+          "body": {
+            "station": "Caf\u00e9"
+          }
+        },
+        {
+          "method": "POST",
+          "path": "/reports",
+          "status": 201,
+          "body": {
+            "accepted": true
+          }
+        },
+        {
+          "method": "POST",
+          "path": "/reports",
+          "status": 400,
+          "body": {
+            "error": "Invalid report"
+          }
+        },
+        {
+          "method": "GET",
+          "path": "/missing",
+          "status": 404,
+          "body": {
+            "error": "Not found"
+          }
+        }
+      ],
+      "port": "56296",
+      "server": {
+        "exitCode": 0,
+        "stdout": "Reports served\n",
+        "stderr": ""
+      }
+    },
+    {
+      "serverCommand": [
+        "/private/var/folders/5x/5r0dfcnx30lf0cl8kp3sphch0000gn/T/neoCLR extracted preview shswuvfz/neoCLR preview/bin/neoclr",
+        "run",
+        "/private/var/folders/5x/5r0dfcnx30lf0cl8kp3sphch0000gn/T/neoCLR extracted preview shswuvfz/neoCLR preview/samples/http-json-server/bin/neoclr/App.dll",
+        "--execution",
+        "interpreter",
+        "--system",
+        "/private/var/folders/5x/5r0dfcnx30lf0cl8kp3sphch0000gn/T/neoCLR extracted preview shswuvfz/neoCLR preview/lib/System.runtime.neox",
+        "--instructions",
+        "100000000",
+        "--module",
+        "/private/var/folders/5x/5r0dfcnx30lf0cl8kp3sphch0000gn/T/neoCLR extracted preview shswuvfz/neoCLR preview/lib/System.Runtime.dll",
+        "--module",
+        "/private/var/folders/5x/5r0dfcnx30lf0cl8kp3sphch0000gn/T/neoCLR extracted preview shswuvfz/neoCLR preview/lib/System.Data.dll",
+        "--module",
+        "/private/var/folders/5x/5r0dfcnx30lf0cl8kp3sphch0000gn/T/neoCLR extracted preview shswuvfz/neoCLR preview/lib/System.Networking.dll",
+        "--module",
+        "/private/var/folders/5x/5r0dfcnx30lf0cl8kp3sphch0000gn/T/neoCLR extracted preview shswuvfz/neoCLR preview/lib/System.Web.dll",
+        "--module",
+        "/private/var/folders/5x/5r0dfcnx30lf0cl8kp3sphch0000gn/T/neoCLR extracted preview shswuvfz/neoCLR preview/lib/System.Data.PostgreSql.dll",
+        "--object-root",
+        "/private/var/folders/5x/5r0dfcnx30lf0cl8kp3sphch0000gn/T/neoCLR extracted preview shswuvfz/neoCLR preview/lib/System.Runtime.dll",
+        "--",
+        "2"
+      ],
+      "requests": [],
+      "port": "56314",
+      "clientCommand": [
+        "/private/var/folders/5x/5r0dfcnx30lf0cl8kp3sphch0000gn/T/neoCLR extracted preview shswuvfz/neoCLR preview/bin/neoclr",
+        "run",
+        "/private/var/folders/5x/5r0dfcnx30lf0cl8kp3sphch0000gn/T/neoCLR extracted preview shswuvfz/neoCLR preview/samples/http-json-client/bin/neoclr/App.dll",
+        "--execution",
+        "interpreter",
+        "--system",
+        "/private/var/folders/5x/5r0dfcnx30lf0cl8kp3sphch0000gn/T/neoCLR extracted preview shswuvfz/neoCLR preview/lib/System.runtime.neox",
+        "--instructions",
+        "100000000",
+        "--module",
+        "/private/var/folders/5x/5r0dfcnx30lf0cl8kp3sphch0000gn/T/neoCLR extracted preview shswuvfz/neoCLR preview/lib/System.Runtime.dll",
+        "--module",
+        "/private/var/folders/5x/5r0dfcnx30lf0cl8kp3sphch0000gn/T/neoCLR extracted preview shswuvfz/neoCLR preview/lib/System.Data.dll",
+        "--module",
+        "/private/var/folders/5x/5r0dfcnx30lf0cl8kp3sphch0000gn/T/neoCLR extracted preview shswuvfz/neoCLR preview/lib/System.Networking.dll",
+        "--module",
+        "/private/var/folders/5x/5r0dfcnx30lf0cl8kp3sphch0000gn/T/neoCLR extracted preview shswuvfz/neoCLR preview/lib/System.Web.dll",
+        "--module",
+        "/private/var/folders/5x/5r0dfcnx30lf0cl8kp3sphch0000gn/T/neoCLR extracted preview shswuvfz/neoCLR preview/lib/System.Data.PostgreSql.dll",
+        "--object-root",
+        "/private/var/folders/5x/5r0dfcnx30lf0cl8kp3sphch0000gn/T/neoCLR extracted preview shswuvfz/neoCLR preview/lib/System.Runtime.dll",
+        "--",
+        "http://127.0.0.1:56314/"
+      ],
+      "client": {
+        "exitCode": 0,
+        "stdout": "{\"accepted\":true}\n",
+        "stderr": ""
+      },
+      "server": {
+        "exitCode": 0,
+        "stdout": "Reports served\n",
+        "stderr": ""
+      }
+    }
+  ],
+  "passed": true
+}

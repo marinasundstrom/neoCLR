@@ -14,7 +14,9 @@ returns Task and Promise completions. Extracted default-JIT collections, Tasks a
 JSON pass. [Native type-budget qualification](../experiments/native-type-budget/README.md)
 raises the bounded inventory consistently with the collector, but HTTP now exposes
 a generated async state machine above the unchanged object-size bound. Installation
-and release remain gated on complete extracted HTTP acceptance; neither happened.
+and release remain gated on complete default-JIT extracted HTTP acceptance; neither
+happened. The matching extracted interpreter control passes, including HTTP requests
+and the client/server pair.
 
 The PostgreSQL website case passes positional and named-object mapping locally.
 General Object display combined with Boolean boxing still reaches the native
