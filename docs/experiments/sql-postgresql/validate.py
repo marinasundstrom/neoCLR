@@ -4,6 +4,7 @@ import argparse
 from contextlib import ExitStack
 import hashlib
 import json
+import os
 from pathlib import Path
 import socket
 import struct
@@ -18,6 +19,8 @@ for name in ('compiler', 'libraries', 'runtime', 'jit-compiler', 'jit-host', 'ou
     p.add_argument('--' + name, type=Path, required=True)
 p.add_argument('--postgres-port', type=int, required=True, help='Disposable trust-authenticated local postgres database/user postgres')
 p.add_argument('--skip-interpreter', action='store_true', help='Run only the routine JIT checks')
+p.add_argument('--queries-only', action='store_true', help='Focused mapper and live PostgreSQL consumer, skipping unchanged wire peers')
+p.add_argument('--aot', action='store_true', help='Also emit and link the SQL consumer against the supplied native host (macOS)')
 a = p.parse_args()
 out = a.output.resolve()
 out.mkdir(parents=True, exist_ok=False)
@@ -146,26 +149,42 @@ def peer(listener, mode, errors):
 
 
 try:
-    for case in ('Main', 'Failures', 'Contracts'):
+    for case in (['Main', 'Contracts'] if a.queries_only else ['Main', 'Failures', 'Contracts']):
         args = base + ['-o', out / (case + '.dll'), HERE / (case + '.rvn')]
-        if case != 'Contracts':
-            args += ['--runtime-async-poc', 'RuntimeAwaitProvider.Bridge', ROOT / 'docs/experiments/runtime-async/RuntimeAsyncBridge.rvn']
+        args += ['--runtime-async-poc', 'RuntimeAwaitProvider.Bridge', ROOT / 'docs/experiments/runtime-async/RuntimeAsyncBridge.rvn']
         run(case + '-compile', args)
     disassembly = out / 'Main.neoil'
     run('metadata', [a.runtime.resolve(), 'disassemble', out / 'Main.dll', disassembly])
     listing = disassembly.read_text()
     module, _ = json.JSONDecoder().raw_decode(listing[listing.index('{'):])
-    people = [index for index, type in enumerate(module['types']) if type['name'].endswith('.T__506572736F6E')]
-    assert len(people) == 1, 'Expected exactly one Person metadata definition'
+    people = [index for index, type in enumerate(module['types']) if type['name'].endswith(('.T__506572736F6E', '.T__57696465506172616D6574657273'))]
+    assert len(people) == 2, 'Expected Person and WideParameters metadata definitions'
     (out / 'reflection.json').write_text(json.dumps(dict(schemaVersion=2, types=[dict(
-        definition=dict(module=module['name'], revision=module['revision'], index=people[0]),
-        construct=True, properties=True, getters=True, setters=True)]), indent=2))
-    run('contracts-jit', command('Contracts', 'jit', []), 'PASS SQL contracts\n')
-    report['cases'].append('owned snapshots, strict access, conversion bounds and explicit maps')
+        definition=dict(module=module['name'], revision=module['revision'], index=index),
+        construct=True, properties=True, getters=True, setters=True) for index in people]), indent=2))
+    for mode in (['jit'] if a.skip_interpreter else ['jit', 'interpreter']):
+        run('contracts-' + mode, command('Contracts', mode, []), 'PASS SQL contracts\n')
+    report['cases'].append('owned named/positional snapshots, strict access, conversion bounds and explicit maps')
     for mode in (['jit'] if a.skip_interpreter else ['jit', 'interpreter']):
         run('postgres-' + mode, command('Main', mode, [str(a.postgres_port)]), 'PASS SQL PostgreSQL\n')
         report['cases'].append('real PostgreSQL: ' + mode)
-    cases = ('authentication', 'startup', 'timeout', 'oversized', 'copy', 'length', 'utf8', 'columns', 'rows', 'fragmented')
+    if a.aot:
+        native = command('Main', 'jit', [])
+        native.remove('--jit-run')
+        native[native.index(a.jit_host.resolve())] = out / 'Main.o'
+        run('postgres-aot-compile', native)
+        (out / 'main.c').write_text(
+            '#include "native-gc.h"\n'
+            'extern int32_t neoclr_entry_args_v1(int32_t,int32_t*,neoclr_aot_context*,const char**);\n'
+            'extern int32_t neoclr_jit_run_v1(const void*,int32_t,int32_t,const char**);\n'
+            'int main(int argc,char**argv) { return neoclr_jit_run_v1((const void*)'
+            'neoclr_entry_args_v1,1,argc,(const char**)argv); }\n')
+        run('postgres-aot-link', [os.environ.get('CC', 'cc'), '-O2', '-I', ROOT / 'docs/experiments/aot-console',
+             out / 'main.c', out / 'Main.o', a.jit_host.resolve(),
+             '-Wl,-rpath,' + str(a.jit_host.resolve().parent), '-o', out / 'app'])
+        run('postgres-aot', [out / 'app', str(a.postgres_port)], 'PASS SQL PostgreSQL\n')
+        report['cases'].append('real PostgreSQL: aot (shared native host)')
+    cases = () if a.queries_only else ('authentication', 'startup', 'timeout', 'oversized', 'copy', 'length', 'utf8', 'columns', 'rows', 'fragmented')
     # One compiled native consumer drives all peers, avoiding repeated JIT compilation.
     with ExitStack() as stack:
         peers = []
@@ -180,7 +199,8 @@ try:
             thread.start()
             peers.append((mode, thread, errors))
             arguments += [str(listener.getsockname()[1]), mode]
-        run('protocol-jit', command('Failures', 'jit', arguments), ''.join('PASS SQL ' + mode + '\n' for mode in cases))
+        if cases:
+            run('protocol-jit', command('Failures', 'jit', arguments), ''.join('PASS SQL ' + mode + '\n' for mode in cases))
         for mode, thread, errors in peers:
             thread.join(5)
             if thread.is_alive() or errors:
@@ -192,4 +212,4 @@ try:
     report['passed'] = True
 finally:
     (out / 'validation.json').write_text(json.dumps(report, indent=2) + '\n')
-print('PASS SQL contracts, real PostgreSQL, and ten protocol/deadline cases')
+print('PASS ' + ', '.join(report['cases']))

@@ -16,7 +16,12 @@ invalid UTF-8, mismatched columns, excessive rows and fragmented successful mess
 Peers verify separate Parse/Bind frames, connection retirement after failures and
 scoped `use` cleanup after the fragmented successful response.
 
-## Reproduce
+## Initial protocol qualification
+
+The following recipe records the original protocol milestone; the common-query
+follow-through below uses a newer compiler and adds native AOT.
+
+### Reproduce
 
 Use a native-enabled Raven compiler with the retained-async adapter. The qualified
 compiler revision is `c1a938ccd`; exact binaries and sources are hashed in the evidence.
@@ -104,3 +109,34 @@ async work exhausted the operation deadline before the row limit. Socket bufferi
 alone did not resolve it. The final provider parses buffered messages synchronously,
 awaits only buffer refills, and passes the unchanged 1025-row rejection case within
 the shared deadline. The disposable test server was removed after qualification.
+
+## Common query and provider boundary follow-through
+
+The expanded Main consumer adds SqlMapper.Query with statements, plain positional
+values and named parameter objects, including 64-bit values and a reflected Int64
+getter. It checks repeated named parameters, quoted/dollar-quoted text and nested
+comments, separate Unicode/injection-shaped values, missing/mixed parameters,
+mapping failures and SQLSTATE recovery. The common mapper preserves SQL text;
+PostgreSQL alone performs named-placeholder rewriting. Contracts also uses a
+recording SqlConnection to verify unchanged `SELECT :id`/`SELECT ?`, snapshot
+ownership, one execution and borrowed connection lifetime without a database.
+
+Use Raven native compiler `7b48ce117` with the 1,024-local metadata writer and
+native Int64 boxing/property adapters. `--queries-only --aot` runs the changed
+contracts and real PostgreSQL consumers in interpreter/JIT, then emits an AOT
+application linked against the same native host library. It skips unchanged hostile
+wire peers; their initial evidence remains applicable. The AOT executable still
+depends on that shared host and is not a self-contained deployment qualification.
+Windows execution and remote/password/TLS SQL support remain unqualified.
+
+**Qualified on macOS ARM64 (2026-10-12):** both contracts and live PostgreSQL
+queries pass interpreter/JIT; the live query consumer also passes shared-host AOT.
+[Query evidence](query-validation.json) records all ten successful build/execution
+steps and unchanged input hashes; [environment](query-environment.json) records the
+PostgreSQL 18.6 container and host. The compiler is frozen at Raven `7b48ce117`;
+the later literal-admission guard at `af994c8d1` has its own compiler regressions
+and does not change this consumer's literal lowering. Native Int64 reflection
+get/set adapters additionally pass ten focused success/fault modes.
+
+The API snapshot and complete website build now pass. This supersedes the earlier
+website limitation above, without rewriting the historical SQL qualification.

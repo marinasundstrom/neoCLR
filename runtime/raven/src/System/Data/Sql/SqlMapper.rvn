@@ -12,6 +12,36 @@ import System.Runtime.Reflection.*
 public class SqlMapper {
     private init() { }
 
+    /// Executes once on the caller-owned connection, then maps the buffered rows.
+    async static func Query<T>(connection: SqlConnection, statement: SqlStatement) -> Task<Result<Sequence<T>, SqlError>> {
+        let executed = await connection.Execute(statement)
+        let result = executed?
+        return Map<T>(result)
+    }
+
+    /// Executes once and maps rows in order; errors produce no partial collection.
+    async static func Query<T>(connection: SqlConnection, statement: SqlStatement, map: (SqlRow) -> Result<T, SqlError>) -> Task<Result<Sequence<T>, SqlError>> {
+        let executed = await connection.Execute(statement)
+        let result = executed?
+        return Map<T>(result, map)
+    }
+
+    /// Binds plain positional values, or snapshots one object with readable named properties. Providers define placeholder syntax.
+    static func Query<T>(connection: SqlConnection, text: string, params parameters: Object?[]) -> Task<Result<Sequence<T>, SqlError>> {
+        return match SqlParameters.Create(text, parameters) {
+            Ok(let statement) => Query<T>(connection, statement)
+            Error(let error) => Task.FromResult(Result<Sequence<T>, SqlError>.Error(error))
+        }
+    }
+
+    /// Binds ordinary values and applies an explicit row mapper on the caller-owned connection.
+    static func Query<T>(connection: SqlConnection, text: string, map: (SqlRow) -> Result<T, SqlError>, params parameters: Object?[]) -> Task<Result<Sequence<T>, SqlError>> {
+        return match SqlParameters.Create(text, parameters) {
+            Ok(let statement) => Query<T>(connection, statement, map)
+            Error(let error) => Task.FromResult(Result<Sequence<T>, SqlError>.Error(error))
+        }
+    }
+
     /// Maps in row order and returns no partial collection on conversion failure.
     static func Map<T>(result: SqlResult, map: (SqlRow) -> Result<T, SqlError>) -> Result<Sequence<T>, SqlError> {
         let output = ArrayList<T>()

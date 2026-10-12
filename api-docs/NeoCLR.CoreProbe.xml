@@ -3251,6 +3251,10 @@ Uses one iterator and does not require constant-time indexed access. No concurre
   <member name="M:System.Data.Sql.SqlError.ToString">
       <summary>Diagnostic category and detail; server messages may contain application data.</summary>
     </member>
+  <member name="M:System.Data.Sql.SqlMapper.Query``1(System.Data.Sql.SqlConnection,System.Data.Sql.SqlStatement)"><summary>Executes once on the caller-owned connection and maps buffered rows to public writable properties.</summary><returns>An awaited buffered mapped collection, or the execution/conversion error. No automatic retry, disposal or transaction.</returns></member>
+  <member name="M:System.Data.Sql.SqlMapper.Query``1(System.Data.Sql.SqlConnection,System.Data.Sql.SqlStatement,System.Func{System.Data.Sql.SqlRow,System.Result{``0,System.Data.Sql.SqlError}})"><summary>Executes once and applies an explicit row mapper in order. Execution and mapping errors return no partial collection.</summary><returns>An awaited buffered mapped collection, or the execution/conversion error. No automatic retry, disposal or transaction.</returns></member>
+  <member name="M:System.Data.Sql.SqlMapper.Query``1(System.Data.Sql.SqlConnection,System.String,System.Object[])"><summary>Binds ordinary positional scalar values or one named property object, executes and maps rows. See the SQL guide for supported values, placeholder rules and native reflection retention.</summary><returns>An awaited buffered mapped collection, or the execution/conversion error. No automatic retry, disposal or transaction.</returns></member>
+  <member name="M:System.Data.Sql.SqlMapper.Query``1(System.Data.Sql.SqlConnection,System.String,System.Func{System.Data.Sql.SqlRow,System.Result{``0,System.Data.Sql.SqlError}},System.Object[])"><summary>Binds ordinary values or a named object and applies an explicit row mapper. Callback precedes variadic parameters; the caller retains connection ownership.</summary><returns>An awaited buffered mapped collection, or the execution/conversion error. No automatic retry, disposal or transaction.</returns></member>
   <member name="M:System.Data.Sql.SqlMapper.Map``1(System.Data.Sql.SqlResult)">
       <summary>Maps exact column names to public writable properties on a nongeneric reference class.
 Requires a public parameterless constructor; supports string, Int32 and Boolean.
@@ -3278,7 +3282,7 @@ Missing/ambiguous columns, SQL NULL and unsupported property types are errors. E
       <summary>Recoverable SQL failures. Server preserves SQLSTATE; transport errors do not imply a safe retry.</summary>
     </member>
   <member name="P:System.Data.Sql.SqlStatement.Text">
-      <summary>SQL is passed unchanged; identifiers and SQL fragments cannot be bound as values.</summary>
+      <summary>SQL text before provider-specific parameter binding; values cannot stand for SQL syntax.</summary>
     </member>
   <member name="P:System.Data.Sql.SqlValue.HasValue">
       <summary>Portable parameter values. Null is SQL NULL, distinct from empty text.</summary>
@@ -3305,7 +3309,7 @@ Missing/ambiguous columns, SQL NULL and unsupported property types are errors. E
       <summary>One serial conversation with a database. Implementations reject overlapping operations.</summary>
     </member>
   <member name="T:System.Data.Sql.SqlStatement">
-      <summary>A statement and an owned snapshot of positional values; the provider defines placeholder syntax.</summary>
+      <summary>SQL text and an owned snapshot of named or positional values; providers define binding syntax.</summary>
     </member>
   <member name="T:System.Data.Sql.SqlTransaction">
       <summary>Explicit transaction lifetime. Disposal before completion abandons the session to guarantee rollback.</summary>
@@ -3458,5 +3462,8 @@ Connects only to 127.0.0.1. No TLS, password authentication, pooling or automati
 <remarks>Sequential operations only. Compression writes incrementally; await Finish before Close. Decompression buffers to EOF, accepting at most 65536 compressed and 65536 decoded bytes across all members. No seek, compression-level selection or automatic HTTP encoding is supplied.</remarks></member>
 <member name="T:System.IO.StreamError.InvalidData"><summary>Malformed binary content, including invalid or truncated gzip data.</summary></member>
 <member name="T:System.IO.TextReadError.InvalidData"><summary>Malformed binary content, including invalid or truncated gzip data.</summary></member>
+  <member name="M:System.Data.Sql.SqlStatement.#ctor(System.String,System.Collections.Sequence{System.Collections.KeyValuePair{System.String,System.Data.Sql.SqlValue}})"><summary>Copies named parameters without interpreting SQL. The provider defines placeholder syntax and validates names.</summary><param name="text">SQL source, with values supplied separately.</param><param name="values">Named value snapshot; inactive union payloads fault.</param></member>
+  <member name="P:System.Data.Sql.SqlStatement.HasNamedParameters"><summary>True for a named snapshot, including an empty one.</summary></member>
+  <member name="M:System.Data.Sql.SqlStatement.ParameterName(System.Int32)"><summary>Returns the exact name for a named parameter, or None for a positional value.</summary><param name="index">Zero-based parameter index; invalid indexes fault.</param><returns>The optional parameter name.</returns></member>
 </members>
 </doc>

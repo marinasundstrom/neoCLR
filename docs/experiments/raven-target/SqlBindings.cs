@@ -26,6 +26,9 @@ public interface SqlTransaction : Disposable {
 public class SqlStatement {
     public SqlStatement(string text) { }
     public SqlStatement(string text, Collections.Sequence<SqlValue> values) { }
+    public SqlStatement(string text, Collections.Sequence<Collections.KeyValuePair<string, SqlValue>> values) { }
+    public bool HasNamedParameters => default;
+    public Option<string> ParameterName(int index) => default;
     public string Text => default;
     public int ParameterCount => default;
     public SqlValue Parameter(int index) => default;
@@ -49,6 +52,10 @@ public class SqlResult {
 }
 public class SqlMapper {
     private SqlMapper() { }
+    public static Concurrency.Tasks.Task<Result<Collections.Sequence<T>, SqlError>> Query<T>(SqlConnection connection, SqlStatement statement) => default;
+    public static Concurrency.Tasks.Task<Result<Collections.Sequence<T>, SqlError>> Query<T>(SqlConnection connection, SqlStatement statement, Func<SqlRow, Result<T, SqlError>> map) => default;
+    public static Concurrency.Tasks.Task<Result<Collections.Sequence<T>, SqlError>> Query<T>(SqlConnection connection, string text, params Object?[] parameters) => default;
+    public static Concurrency.Tasks.Task<Result<Collections.Sequence<T>, SqlError>> Query<T>(SqlConnection connection, string text, Func<SqlRow, Result<T, SqlError>> map, params Object?[] parameters) => default;
     public static Result<Collections.Sequence<T>, SqlError> Map<T>(SqlResult result) => default;
     public static Result<Collections.Sequence<T>, SqlError> Map<T>(SqlResult result, Func<SqlRow, Result<T, SqlError>> map) => default;
 }

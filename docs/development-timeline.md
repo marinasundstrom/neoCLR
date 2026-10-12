@@ -60,6 +60,38 @@ by that check. No deployment was performed.
 - **Validation:** documentation diff and staged whitespace checks only; runtime,
   compiler and public API signatures are unchanged.
 
+## 2026-10-12 — Common SQL providers and ordinary mapper inputs
+
+**Author direction.** Continue PostgreSQL toward the benchmark matrix. Mapper query
+methods should take a connection and command, with SQL-string/params overloads so
+application code can pass plain objects rather than SQL primitives. When asked to
+choose named objects or positional values, the author selected both. The author
+then said “Compiler issues should be fixed” and clarified: “The SQL provider
+interface should fit most sql-like database engines and allow for extensions when
+a particular engine wants to. It’s a common interface.”
+
+**Assistant response and revision.** The initial work put PostgreSQL placeholder
+rewriting beside mapper reflection. After the clarification, the assistant moved
+that lexer into the PostgreSQL provider and made SqlStatement carry a named or
+positional snapshot, preserving SQL text for each provider. SqlConnection remains
+the shared execution contract; provider-specific interfaces/types may extend it.
+This does not claim support for another engine or settle every future SQL type.
+The object mapper now reads public readable properties once before execution,
+including unused ones; provider binding does not invoke reflection getters.
+
+**Performed work.** Raven native call-boundary/terminal-block lowering was fixed
+with 22 focused regressions (`9edc66df4`), without merging Raven main. The metadata
+local budget was aligned with the existing 1,024-local native bound (`a43fd6a41`),
+and native Int64 boxing/type tests/unboxing were added (`1c2d363ca`) with interpreter
+comparisons and GC cleanup checks. A subsequent constant-pattern regression exposed
+a general .NET bug; the assistant fixed it first on main (`ae05c124e`) and carried
+it to the native line with portable lowering (`7b48ce117`, 27 focused tests). The common API/provider integration now passes local PostgreSQL queries in
+interpreter/JIT/shared-host AOT, with immutable input fingerprints retained in
+[query evidence](experiments/sql-postgresql/query-validation.json). Contract tests
+verify provider-neutral SQL and borrowed connection ownership; native Int64
+property access passes ten focused modes. Benchmark numbers remain pending. See [the SQL design](sql-data-access.md) and
+[compiler integration](raven-cli-bridge.md#sql-consumer-lowering-fixes-2026-10-12).
+
 ## 2026-10-12 — Callable foreign parameters and results
 
 - **Author:** requested a foreign parameter expressed as a callable so native code

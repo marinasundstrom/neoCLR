@@ -223,8 +223,8 @@ pub fn bind(
                     if status != 0 {
                         reject(&mut body, check, status);
                     } else {
-                        if !reference && !matches!(p.ty, Type::Int32 | Type::Boolean) {
-                            return Err("native property adapters currently require Int32, Boolean or reference values".into());
+                        if !reference && !matches!(p.ty, Type::Int32 | Type::Int64 | Type::Boolean) {
+                            return Err("native property adapters currently require Int32, Int64, Boolean or reference values".into());
                         }
                         body.extend([
                             Op::Arg(2),

@@ -5980,8 +5980,25 @@ fn native_reflection_arrays_preserve_boolean_string_and_reference_elements() {
 #[test]
 #[cfg(all(target_os = "macos", target_arch = "aarch64"))]
 fn native_retained_property_access_preserves_checks_effects_and_faults() {
-    let seed = neoclr::assemble(".module System\n.references ()\n").unwrap();
+    check_retained_property_access(include_str!("../../../docs/experiments/aot-console/reflection-properties.neoil"));
+}
+
+#[test]
+#[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+fn native_int64_properties_preserve_get_set_width_and_faults() {
     let source = include_str!("../../../docs/experiments/aot-console/reflection-properties.neoil");
+    let (model, operations) = source.split_once(".function neoCLR.Runtime").unwrap();
+    let source = model.replace("Int32", "Int64").replace("ldc.i4", "ldc.i8")
+        + ".function neoCLR.Runtime" + &operations
+            .replace("ldc.i4 40\nbox Int32", "ldc.i8 4294967336\nbox Int64")
+            .replace("ldc.i4 1\nbox Int32", "ldc.i8 1\nbox Int64")
+            .replace("unbox.any Int32", "unbox.any Int64\nldc.i8 4294967296\nsub\nconv.i4");
+    check_retained_property_access(&source);
+}
+
+#[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+fn check_retained_property_access(source: &str) {
+    let seed = neoclr::assemble(".module System\n.references ()\n").unwrap();
     let app = neoclr::assemble(source).unwrap();
     let program = neoclr::LoadedProgram::with_library(&app, &seed).unwrap();
     let method = program.resolve_function(&neoclr::assembler::parse_function_ref("Calculate(Int32)").unwrap()).unwrap();

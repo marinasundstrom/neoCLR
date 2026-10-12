@@ -3,12 +3,37 @@ import System.Collections.*
 import System.Data.Sql.*
 import System.Option.*
 import System.Result.*
+import System.Concurrency.Tasks.*
 
 func Check(condition: bool, message: string) {
     if !condition { System.Fail(message) }
 }
 
-func Main() {
+// A provider-independent consumer: this connection does not parse PostgreSQL SQL.
+class RecordingConnection : SqlConnection {
+    private val result: SqlResult
+    private val named: bool
+    private val text: string
+    var Calls: int { get; private set; } = 0
+    var Closed: bool { get; private set; } = false
+    init(result: SqlResult, named: bool, text: string) {
+        self.result = result
+        self.named = named
+        self.text = text
+    }
+    func Execute(statement: SqlStatement) -> Task<Result<SqlResult, SqlError>> {
+        Calls += 1
+        Check(statement.Text == text, "Mapper preserves provider SQL")
+        Check(statement.HasNamedParameters == named, "Mapper preserves binding kind")
+        Check(statement.Parameter(0) is SqlValue.Integer(42), "Mapper preserves parameter")
+        if named { Check(statement.ParameterName(0) is Some("id"), "Mapper preserves provider name") }
+        return Task.FromResult(Result<SqlResult, SqlError>.Ok(result))
+    }
+    func Begin() -> Task<Result<SqlTransaction, SqlError>> => Task.FromResult(Result<SqlTransaction, SqlError>.Error(SqlError.Unsupported("Test connection")))
+    func Dispose() { Closed = true }
+}
+
+async func Main() -> Task<()> {
     let names = ArrayList<string>()
     names.Add("id")
     let values = ArrayList<Option<string>>()
@@ -28,6 +53,16 @@ func Main() {
     let statement = SqlStatement("SELECT $1", parameters)
     parameters[0] = SqlValue.Null
     Check(statement.Parameter(0) is SqlValue.Text("original"), "Parameter sequence copied")
+    Check(!statement.HasNamedParameters && statement.ParameterName(0) is None, "Positional identity")
+    let namedValues = ArrayList<KeyValuePair<string, SqlValue>>()
+    namedValues.Add(KeyValuePair<string, SqlValue>("id", SqlValue.Integer(42)))
+    let namedStatement = SqlStatement("SELECT :id", namedValues)
+    namedValues[0] = KeyValuePair<string, SqlValue>("changed", SqlValue.Null)
+    Check(namedStatement.HasNamedParameters && namedStatement.Text == "SELECT :id", "Provider-neutral SQL text")
+    Check(namedStatement.ParameterName(0) is Some("id"), "Named keys copied")
+    Check(namedStatement.Parameter(0) is SqlValue.Integer(42), "Named values copied")
+    let emptyNamed = SqlStatement("SELECT 1", ArrayList<KeyValuePair<string, SqlValue>>())
+    Check(emptyNamed.HasNamedParameters && emptyNamed.ParameterCount == 0, "Empty named snapshot")
     let rows = ArrayList<SqlRow>()
     rows.Add(row)
     let result = SqlResult("SELECT 1", rows)
@@ -38,5 +73,13 @@ func Main() {
     let good = SqlMapper.Map<long>(result, value => value.Int64("id"))
     let Ok(mapped) = good else { System.Fail("Explicit Int64 map") }
     Check(mapped[0] == 2147483648L, "Explicit Int64 mapping result")
+    use namedConnection = RecordingConnection(result, true, "SELECT :id")
+    let namedQuery = await SqlMapper.Query<long>(namedConnection, namedStatement, value => value.Int64("id"))
+    Check(namedQuery is Ok(_), "Common named command query")
+    Check(namedConnection.Calls == 1 && !namedConnection.Closed, "Query borrows connection and executes once")
+    use positionalConnection = RecordingConnection(result, false, "SELECT ?")
+    let positionalQuery = await SqlMapper.Query<long>(positionalConnection, "SELECT ?", value => value.Int64("id"), 42)
+    Check(positionalQuery is Ok(_), "Common positional query")
+    Check(positionalConnection.Calls == 1 && !positionalConnection.Closed, "Plain query borrows connection")
     Console.WriteLine("PASS SQL contracts")
 }

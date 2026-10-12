@@ -1,0 +1,158 @@
+module System.Data.PostgreSql
+
+import System.*
+import System.Collections.*
+import System.Data.Sql.*
+import System.Option.*
+import System.Result.*
+import System.Text.*
+
+// Preserve SQL verbatim except real @name tokens. Never substitute a value into SQL.
+internal class PostgresNamedParameters {
+    private val source: string
+    private val statement: SqlStatement
+    private var bytes: Sequence<byte> = ArrayList<byte>()
+    private var position: int = 0
+    private val names: ArrayList<string> = ArrayList<string>()
+    private val values: ArrayList<SqlValue> = ArrayList<SqlValue>()
+
+    init(parameters: SqlStatement) {
+        source = parameters.Text
+        statement = parameters
+    }
+
+    private func At(index: int) -> int {
+        return if index < bytes.Count { (int)bytes[index] } else { -1 }
+    }
+
+    private static func Start(value: int) -> bool {
+        return value == 95 || value >= 65 && value <= 90 || value >= 97 && value <= 122
+    }
+
+    private static func Part(value: int) -> bool {
+        return Start(value) || value >= 48 && value <= 57
+    }
+
+    private func Text(start: int, end: int) -> Result<string, SqlError> {
+        return match source.SliceUtf8(start, end - start) {
+            Ok(let value) => Ok(value)
+            Error(_) => Error(SqlError.InvalidInput("Invalid SQL token boundary"))
+        }
+    }
+
+    private func Parameter(name: string) -> Result<int, SqlError> {
+        for index in 0..<names.Count {
+            if names[index] == name { return Ok(index + 1) }
+        }
+        var found = false
+        var value = SqlValue.Null
+        for index in 0..<statement.ParameterCount {
+            if statement.ParameterName(index) is Some(let candidate) && candidate == name {
+                if found { return Error(SqlError.Mapping("Ambiguous SQL parameter: " + name)) }
+                value = statement.Parameter(index)
+                found = true
+            }
+        }
+        if !found { return Error(SqlError.Mapping("Missing readable parameter: " + name)) }
+        names.Add(name)
+        values.Add(value)
+        return Ok(names.Count)
+    }
+
+    private func Quote(quote: int, escapes: bool) -> Result<unit, SqlError> {
+        position += 1
+        while position < bytes.Count {
+            let value = At(position)
+            position += 1
+            if value == 92 && quote == 39 {
+                // Ordinary string backslashes depend on server configuration; do not
+                // guess token boundaries. E strings have an explicit escape contract.
+                if !escapes { return Error(SqlError.InvalidInput("Use E strings for SQL backslash literals")) }
+                if position < bytes.Count { position += 1 }
+            } else if value == quote {
+                if At(position) == quote { position += 1 } else { return Ok(()) }
+            }
+        }
+        return Error(SqlError.InvalidInput("Unterminated SQL quote"))
+    }
+
+    func Bind() -> Result<SqlStatement, SqlError> {
+        bytes = match Encodings.Utf8.Encode(source) {
+            Ok(let encoded) => encoded
+            Error(_) => return Error(SqlError.LimitExceeded("SQL text exceeds encoding limit"))
+        }
+        let output = StringBuilder()
+        var copied = 0
+        while position < bytes.Count {
+            let value = At(position)
+            let next = At(position + 1)
+            if value == 39 || value == 34 {
+                _ = Quote(value, false)?
+            } else if (value == 69 || value == 101) && next == 39 {
+                position += 1
+                _ = Quote(39, true)?
+            } else if value == 45 && next == 45 {
+                position += 2
+                while position < bytes.Count && At(position) != 10 && At(position) != 13 { position += 1 }
+            } else if value == 47 && next == 42 {
+                position += 2
+                var depth = 1
+                while position < bytes.Count && depth != 0 {
+                    if At(position) == 47 && At(position + 1) == 42 {
+                        depth += 1
+                        position += 2
+                    } else if At(position) == 42 && At(position + 1) == 47 {
+                        depth -= 1
+                        position += 2
+                    } else { position += 1 }
+                }
+                if depth != 0 { return Error(SqlError.InvalidInput("Unterminated SQL comment")) }
+            } else if value == 36 {
+                let start = position
+                position += 1
+                if At(position) >= 48 && At(position) <= 57 {
+                    return Error(SqlError.InvalidInput("Cannot mix named and positional SQL parameters"))
+                }
+                if Start(At(position)) || At(position) >= 128 {
+                    position += 1
+                    while Part(At(position)) || At(position) >= 128 { position += 1 }
+                }
+                if At(position) == 36 {
+                    position += 1
+                    let length = position - start
+                    var closed = false
+                    while position < bytes.Count && !closed {
+                        var same = position + length <= bytes.Count
+                        var index = 0
+                        while same && index < length {
+                            same = At(position + index) == At(start + index)
+                            index += 1
+                        }
+                        if same {
+                            position += length
+                            closed = true
+                        } else { position += 1 }
+                    }
+                    if !closed { return Error(SqlError.InvalidInput("Unterminated dollar quote")) }
+                }
+            } else if value == 64 && next == 64 {
+                position += 2
+            } else if value == 64 && Start(next) {
+                _ = output.Append(Text(copied, position)?)
+                position += 1
+                let start = position
+                while Part(At(position)) { position += 1 }
+                let ordinal = Parameter(Text(start, position)?)?
+                _ = output.Append("$" + ordinal.ToString())
+                copied = position
+            } else if Start(value) || value >= 128 {
+                position += 1
+                while Part(At(position)) || At(position) == 36 || At(position) >= 128 { position += 1 }
+            } else {
+                position += 1
+            }
+        }
+        _ = output.Append(Text(copied, position)?)
+        return Ok(SqlStatement(output.ToString(), values))
+    }
+}

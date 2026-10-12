@@ -6,10 +6,13 @@ import System.Option.*
 import System.Result.*
 import System.Concurrency.Tasks.*
 
-/// A statement and an owned snapshot of positional values; the provider defines placeholder syntax.
+/// SQL text and an owned snapshot of named or positional values; providers define binding syntax.
 public class SqlStatement {
     private val parameters: ArrayList<SqlValue>
-    /// SQL is passed unchanged; identifiers and SQL fragments cannot be bound as values.
+    private val names: ArrayList<string> = ArrayList<string>()
+    /// True for the named constructor, including an empty named snapshot.
+    val HasNamedParameters: bool = false
+    /// SQL text before provider-specific parameter binding; values cannot stand for SQL syntax.
     val Text: string
     init(text: string) {
         Text = text
@@ -18,6 +21,27 @@ public class SqlStatement {
     init(text: string, values: Sequence<SqlValue>) {
         Text = text
         parameters = ArrayList<SqlValue>(values)
+    }
+    /// Copies named values without interpreting SQL or normalizing parameter names.
+    init(text: string, values: Sequence<KeyValuePair<string, SqlValue>>) {
+        Text = text
+        HasNamedParameters = true
+        parameters = ArrayList<SqlValue>()
+        for pair in values {
+            names.Add(pair.Key)
+            match pair.Value {
+                SqlValue.Null => parameters.Add(SqlValue.Null)
+                SqlValue.Text(let text) => parameters.Add(SqlValue.Text(text))
+                SqlValue.Integer(let number) => parameters.Add(SqlValue.Integer(number))
+                SqlValue.Boolean(let flag) => parameters.Add(SqlValue.Boolean(flag))
+                _ => System.Fail("Uninitialized SQL parameter value")
+            }
+        }
+    }
+    /// A name for named values, or None for positional values. Invalid indexes fault.
+    func ParameterName(index: int) -> Option<string> {
+        if index < 0 || index >= parameters.Count { System.Fail("SQL parameter index out of range") }
+        return if HasNamedParameters { Some(names[index]) } else { None }
     }
     val ParameterCount: int => parameters.Count
     /// Zero-based access. An invalid index is a programmer fault.

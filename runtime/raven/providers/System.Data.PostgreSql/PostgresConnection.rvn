@@ -216,7 +216,14 @@ internal class PostgresConnection : SqlConnection {
             return Error(SqlError.InvalidState("Session is closed or busy"))
         }
         // Construct and validate all values before writing any bytes.
-        let requestResult = Request(statement)
+        var bound = statement
+        if statement.HasNamedParameters {
+            let binding = PostgresNamedParameters(statement).Bind()
+            if let Error(error) = binding { return Error(error) }
+            let Ok(value) = binding else { System.Fail("Expected successful parameter binding") }
+            bound = value
+        }
+        let requestResult = Request(bound)
         if let Error(error) = requestResult { return Error(error) }
         let Ok(request) = requestResult else { System.Fail("Expected successful SQL result") }
         busy = true

@@ -8,6 +8,13 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-12
 
+- Add provider-neutral SqlMapper.Query overloads for statements, ordinary positional
+  values and named parameter objects. Snapshot names/values in SqlStatement and
+  keep PostgreSQL placeholder rewriting inside its provider. Support native Int64
+  reflected property access. Qualify contracts and live PostgreSQL queries on macOS
+  interpreter/JIT and shared-host AOT; Windows and standalone SQL deployment remain
+  unqualified. Update the public API reference and retain qualification evidence.
+
 - Organize website benchmarks into an HTTP plain-text/JSON/database workload
   matrix and a general execution report linked from native compilation. Preserve
   historical results and label unmeasured cases and contention-affected timings;

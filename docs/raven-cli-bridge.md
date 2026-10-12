@@ -9206,3 +9206,10 @@ there is no metadata format revision or CLI encoding change. Existing 256-local
 readers require updating for larger artifacts. The last admitted slot executes
 correctly in .NET and the interpreter; 1,025 locals fail both authoring and readback.
 This is bounded capacity, not a claim of local-lifetime allocation optimization.
+
+SQL snapshot checks also exposed Int32 literal patterns against Int64 payloads.
+Raven main `ae05c124e` fixes ordinary .NET emission, which previously compared
+differently typed boxes. Native line `7b48ce117` deliberately carries that fix and
+adds full-width portable pattern comparison. Four main tests and 27 native-line
+focused compiler tests pass. Runtime Contract settings and temporary CLI reference
+encoding do not change. Raven main and the native compiler line remain separate.

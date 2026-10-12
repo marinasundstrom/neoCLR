@@ -13,6 +13,11 @@ public class Person {
     var active: bool { get; set; } = false
 }
 
+public class WideParameters {
+    init() { }
+    val id: long => 2147483648L
+}
+
 func Check(value: bool, message: string) {
     if !value { System.Fail(message) }
 }
@@ -26,12 +31,53 @@ async func Exercise(connection: SqlConnection) -> Task<Result<unit, SqlError>> {
     let executed = await connection.Execute(statement)
     if let Error(error) = executed { return Error(error) }
     let Ok(mappedResult) = executed else { System.Fail("Expected successful SQL result") }
-    let peopleResult = SqlMapper.Map<Person>(mappedResult)
+    let peopleResult = await SqlMapper.Query<Person>(connection, statement)
     if let Error(error) = peopleResult { return Error(error) }
     let Ok(people) = peopleResult else { System.Fail("Expected successful SQL result") }
     Check(people.Count == 1 && people[0].id == 42 && people[0].name == "Café'; SELECT 999; --" && people[0].active, "Mapped row")
-    let selected = SqlMapper.Map<string>(mappedResult, row => row.RequiredText("name"))
+    let selected = await SqlMapper.Query<string>(connection, statement, row => row.RequiredText("name"))
     Check(selected is Ok(_), "Callback mapping")
+    let positional = await SqlMapper.Query<Person>(connection,
+        "SELECT $1::int AS id, $2::text AS name, $3::bool AS active",
+        43, "plain Café'; SELECT 999; --", true)
+    let Ok(plain) = positional else { return Error(SqlError.Mapping("Plain positional query")) }
+    Check(plain.Count == 1 && plain[0].id == 43 && plain[0].name == "plain Café'; SELECT 999; --" && plain[0].active, "Plain positional values")
+    let wide = await SqlMapper.Query<long>(connection, "SELECT $1::bigint AS id", row => row.Int64("id"), 2147483648L)
+    let Ok(wideRows) = wide else { return Error(SqlError.Mapping("Plain Int64 parameter")) }
+    Check(wideRows[0] == 2147483648L, "Int64 parameter preserves width")
+    let wideNamed = await SqlMapper.Query<long>(connection, "SELECT @id::bigint AS id", row => row.Int64("id"), WideParameters())
+    let Ok(wideNamedRows) = wideNamed else { return Error(SqlError.Mapping("Named Int64 parameter")) }
+    Check(wideNamedRows[0] == 2147483648L, "Reflected Int64 parameter preserves width")
+    let parameters = Person()
+    parameters.id = 44
+    parameters.name = "named Café'; SELECT 999; --"
+    parameters.active = true
+    let named = await SqlMapper.Query<Person>(connection,
+        "SELECT @id::int AS id, @name::text AS name, @active::bool AS active WHERE @id::int = @id::int /* @missing /* nested */ */ -- @missing\n",
+        parameters)
+    let Ok(namedPeople) = named else { return Error(SqlError.Mapping("Named object query")) }
+    Check(namedPeople.Count == 1 && namedPeople[0].id == 44 && namedPeople[0].name == parameters.name && namedPeople[0].active, "Named values and repeated parameter")
+    let quoted = await SqlMapper.Query<string>(connection,
+        "SELECT '@missing' || \$\$@missing\$\$ || \$tag\$@missing\$tag\$ AS name, @id::int AS id",
+        row => row.RequiredText("name"), parameters)
+    let Ok(quotedValues) = quoted else { return Error(SqlError.Mapping("Quoted parameter text")) }
+    Check(quotedValues[0] == "@missing@missing@missing", "Quoted text unchanged")
+    let noParameters = await SqlMapper.Query<Person>(connection,
+        "SELECT 45 AS id, 'none'::text AS name, false AS active")
+    Check(noParameters is Ok(_), "Empty params array")
+    let nullParameter = await SqlMapper.Query<string>(connection,
+        "SELECT COALESCE($1::text, 'null') AS name", row => row.RequiredText("name"), (Object?)null)
+    let Ok(nullValue) = nullParameter else { return Error(SqlError.Mapping("Plain null parameter")) }
+    Check(nullValue[0] == "null", "Plain null maps to SQL NULL")
+    let missingParameter = await SqlMapper.Query<Person>(connection, "SELECT @missing", parameters)
+    Check(missingParameter is Error(SqlError.Mapping(_)), "Missing named property")
+    let mixedParameters = await SqlMapper.Query<Person>(connection, "SELECT @id, $1", parameters)
+    Check(mixedParameters is Error(SqlError.InvalidInput(_)), "Mixed placeholders rejected")
+    let badMapping = await SqlMapper.Query<Person>(connection, "SELECT 'wrong'::text AS id")
+    Check(badMapping is Error(SqlError.Mapping(_)), "Query mapping error")
+    let serverError = await SqlMapper.Query<Person>(connection, "SELEC invalid")
+    Check(serverError is Error(SqlError.Server("42601", _)), "Query SQLSTATE preserved")
+    Check(await SqlMapper.Query<Person>(connection, "SELECT 46 AS id, 'recovered'::text AS name, true AS active") is Ok(_), "Query errors preserve caller connection")
     let nulls = ArrayList<SqlValue>()
     nulls.Add(SqlValue.Null)
     nulls.Add(SqlValue.Text(""))

@@ -136,7 +136,12 @@ separate main/native-branch commits and no change to target-owned runtime startu
 PostgreSQL binding and Dapper-like mapper, explicitly avoiding an ADO.NET-shaped
 abstraction, and selects submodules under System.Data. The bounded
 [SQL connection slice](sql-data-access.md) defines common contracts in System.Data.Sql
-and an optional local PostgreSQL provider in System.Data.PostgreSql. Authentication/TLS,
+and an optional local PostgreSQL provider in System.Data.PostgreSql. The author
+clarifies that these are common SQL-engine contracts with explicit provider
+extensions: keep PostgreSQL binding rules out of the mapper. Connection/statement and SQL-string query overloads now accept named-object and
+positional inputs. [Local qualification](experiments/sql-postgresql/query-validation.json)
+passes interpreter/JIT and shared-host AOT against PostgreSQL; standalone packaging
+and Windows SQL remain unqualified. Process-isolated benchmarks remain next. Authentication/TLS,
 remote servers and streaming remain follow-ups; this one-off direction does not
 permanently reprioritize the active runtime milestone.
 

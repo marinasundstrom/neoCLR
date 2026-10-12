@@ -1,0 +1,61 @@
+module System.Data.Sql
+
+import System.*
+import System.Collections.*
+import System.Introspection.*
+import System.Runtime.Reflection.*
+import System.Option.*
+import System.Result.*
+
+// Object conversion is provider-neutral. Providers own SQL syntax and binding.
+internal class SqlParameters {
+    static func Create(text: string, parameters: Object?[]) -> Result<SqlStatement, SqlError> {
+        if parameters.Length == 1 {
+            if parameters[0] is Object present {
+                if !(present is string) && !present.GetType().IsValueType {
+                    return Named(text, present)
+                }
+            }
+        }
+        let values = ArrayList<SqlValue>()
+        for parameter in parameters {
+            values.Add(Convert(parameter)?)
+        }
+        return Ok(SqlStatement(text, values))
+    }
+
+    private static func Named(text: string, owner: Object) -> Result<SqlStatement, SqlError> {
+        if owner.GetType().IsArray || owner.GetType().GenericArgumentCount != 0 {
+            return Error(SqlError.Mapping("Expected a parameter object with readable properties"))
+        }
+        let values = ArrayList<KeyValuePair<string, SqlValue>>()
+        for property in owner.GetType().GetProperties() {
+            if !property.IsStatic && property.GetGetMethod() is Some(_) {
+                if property.GetIndexParameters().Count != 0 {
+                    return Error(SqlError.Mapping("Indexed SQL parameter property: " + property.Name))
+                }
+                for existing in values {
+                    if existing.Key == property.Name {
+                        return Error(SqlError.Mapping("Ambiguous SQL parameter: " + property.Name))
+                    }
+                }
+                let content = match property.GetValue(owner) {
+                    Ok(let item) => item
+                    Error(_) => return Error(SqlError.Mapping("Cannot read parameter: " + property.Name))
+                }
+                values.Add(KeyValuePair<string, SqlValue>(property.Name, Convert(content)?))
+            }
+        }
+        return Ok(SqlStatement(text, values))
+    }
+
+    static func Convert(value: Object?) -> Result<SqlValue, SqlError> {
+        let present = value ?? return Ok(SqlValue.Null)
+        if present is string text { return Ok(SqlValue.Text(text)) }
+        if present is int number { return Ok(SqlValue.Integer(number)) }
+        if present is long wide { return Ok(SqlValue.Integer(wide)) }
+        if present is bool flag { return Ok(SqlValue.Boolean(flag)) }
+        return Error(SqlError.Mapping("Unsupported SQL parameter type"))
+    }
+}
+

@@ -8,9 +8,24 @@ in `System.Data.Sql` (System.Data.dll); the optional binding lives in
 supersedes the SQLite-first sequencing in the older [proposal](proposals/sql-data-access.md),
 without selecting the rest of that proposal or permanently reordering the roadmap.
 
+## Common provider direction
+
+Author clarification (2026-10-12): the SQL interface must fit most SQL-like engines
+and allow engine-specific extensions. SqlDatabase/SqlConnection/SqlStatement and
+buffered results are the shared contract; no PostgreSQL protocol, placeholder scanner
+or server quota belongs in the mapper. Providers may add derived interfaces or
+concrete types for optional capabilities. No universal capability registry or opaque
+provider-value escape hatch is introduced without a concrete consumer. The current
+value subset, buffered rows and transaction policy remain gaps to expand where
+needed, not proof of production compatibility with every SQL engine. No second
+engine has been qualified. As in .NET's DbConnection/provider split, shared callers
+use common operations while provider extensions remain explicit. Unlike ADO.NET,
+this experimental API retains immutable statements, Task/Result operations and
+owned buffered results; the narrower scope trades compatibility for a smaller surface.
+
 ## Implemented model
 
-A `SqlDatabase` opens an owned `SqlConnection`. A `SqlStatement` snapshots its positional
+A `SqlDatabase` opens an owned `SqlConnection`. A `SqlStatement` snapshots its named or positional
 `SqlValue` parameters. `Execute` returns a buffered `SqlResult`; `SqlRow` snapshots
 survive connection disposal. Values never become SQL source. PostgreSQL uses `$1`, `$2`,
 etc.; callers use SQL casts when the server cannot infer a parameter's type. Identifiers
@@ -23,6 +38,32 @@ Dapper API compatibility. `SqlMapper.Map<T>(result, row => ...)` supports explic
 optional fields and domain conversions. Required NULL, missing/duplicate column names,
 unsupported property types and conversion failures are mapping errors. Extra columns
 are ignored. There is no SQL generation, relation loading, identity map or change tracking.
+
+Author clarification (2026-10-12): the mapper should accept a connection and command,
+with a string/params convenience form, without requiring consumers to construct SQL
+primitives. The author selected both plain positional values and named parameter
+objects. `SqlMapper.Query<T>` now composes execution and mapping; its string overloads
+convert scalar values or a single named property object internally. The caller owns
+the connection and transaction. See the [member contract](../api-docs/sql.md) for the
+bounded types, lexical rules and retained-reflection requirements.
+
+[Dapper's query API](https://github.com/DapperLib/Dapper) accepts an SQL string and a
+parameter object; this is the ergonomic baseline (primary source reviewed 2026-10-12).
+neoCLR keeps its existing SqlConnection contract and uses Query without an Async suffix
+under the author-directed async-first policy. Positional params additionally avoid a
+parameter class for simple calls. The cost is overload dispatch: one nonscalar reference
+object means named properties, while scalar arguments mean positional values. Explicit
+SqlStatement overloads preserve control over already-bound requests. No ADO.NET or
+Dapper binary dependency is introduced.
+
+Named binding follows PostgreSQL 18 [lexical structure](https://www.postgresql.org/docs/18/sql-syntax-lexical.html)
+(reviewed 2026-10-12), including nested comments and dollar quotes. Translation belongs to the PostgreSQL provider. The common mapper never parses
+SQL: it reads an ordinary parameter object into named values and passes the original
+text to SqlConnection. Each provider owns its placeholder syntax and native binding. Ordinary backslash-containing strings are rejected during
+named rewriting to avoid assuming the server's standard_conforming_strings setting;
+explicit E strings express escaping. All readable parameter properties are evaluated once before execution, even if
+unreferenced by SQL; this snapshot separates reflection from dialect handling.
+Reflection and scanning add allocations and CPU work; no cached-plan or throughput claim is made by this API slice.
 
 `SqlConnection.Begin()` produces a `SqlTransaction`. Commit and rollback are awaited
 operations. An aborted transaction cannot report a successful commit; it requires
@@ -113,7 +154,7 @@ existing opt-in retained-async compiler helper; this is not a new runtime/compil
 Propagation inside retained async bodies and value-type captures had compiler gaps
 in the original tested bundle. Generic async and synchronous use were subsequently
 fixed on the native compiler line; this slice adopts use without expanding its API.
-The library keeps mapping synchronous, uses explicit Result handling in async methods,
+The library keeps materialization synchronous after awaited execution, uses Result propagation,
 and owns each NetworkDeadline in a reference wrapper. Dynamic native buffers use the
 existing explicitly admitted CheckedStorage intrinsic. These are implementation
 workarounds to revisit, not permanent SQL API semantics.

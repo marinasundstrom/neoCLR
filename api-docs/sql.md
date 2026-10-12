@@ -28,15 +28,20 @@ A transport error can follow a committed statement. No exactly-once guarantee ex
 
 `SqlStatement(text: string)` binds no parameters.
 `SqlStatement(text: string, values: Sequence<SqlValue>)` copies the sequence, preserving
-order. `Text: string`, `ParameterCount: int` and `Parameter(index: int) -> SqlValue`
+order. `SqlStatement(text, values: Sequence<KeyValuePair<string, SqlValue>>)` copies
+named values without interpreting the SQL. `HasNamedParameters: bool` distinguishes
+the constructors even for empty snapshots; `ParameterName(index) -> Option<string>`
+returns Some(name) or None for positional values. Invalid indexes fault; inactive
+SqlValue payloads in a named pair fault. Names are preserved exactly; each provider
+validates its naming rules. `Text: string`, `ParameterCount: int` and `Parameter(index: int) -> SqlValue`
 expose the snapshot. Parameter indexes are zero-based; an invalid index is a programmer
-fault. PostgreSQL SQL uses one-based `$1` placeholders. SQL is never rewritten; use
+fault. PostgreSQL SQL uses one-based `$1` placeholders. This lower-level SQL is passed unchanged; use
 explicit casts when inference is ambiguous. Empty SQL, NUL text and excessive input
 are rejected before network output. A PostgreSQL statement cannot contain a batch.
 
 `SqlValue` is a standard Raven union with `Null`, `Text(value: string)`,
 `Integer(value: long)` and `Boolean(value: bool)`. Null is distinct from empty text.
-All non-null values use UTF-8 text parameter format; other types can be passed as Text
+The PostgreSQL provider uses UTF-8 text parameter format; other types can be passed as Text
 with an explicit SQL cast. Parameter values cannot stand for identifiers or SQL syntax.
 
 ## Rows, results and mapping
@@ -74,8 +79,44 @@ reflection construction/setters through an explicit reflection manifest.
 `SqlMapper.Map<T>(result, map: (SqlRow) -> Result<T, SqlError>)` applies an explicit
 mapper in row order. It supports optional values, constructors and domain validation
 without reflection. Both overloads stop on the first error and return no partial
-collection. Async SQL execution precedes synchronous mapping; generic async convenience
-methods are outside this initial surface.
+collection.
+
+`SqlMapper.Query<T>(connection: SqlConnection, statement: SqlStatement)` and
+`Query<T>(connection, statement, map: (SqlRow) -> Result<T, SqlError>)` return
+`Task<Result<Sequence<T>, SqlError>>`. They execute exactly once, await the buffered
+result and apply the corresponding Map overload. Execution errors pass through
+unchanged. They borrow the connection: no opening, closing, retry or transaction is
+implicit. Mapping errors do not undo executed SQL.
+
+For ordinary application code, `Query<T>(connection, text: string, params parameters: Object?[])`
+accepts plain string, int, long, bool and null values in positional order. The
+provider defines placeholder syntax (`$1`, `$2`, etc. for PostgreSQL). No SqlValue or SqlStatement construction is required. Unsupported values
+return Mapping before executing. Zero parameters is valid. SQL casts may still be
+needed for PostgreSQL type inference.
+
+Passing one reference object instead of scalar values selects named binding: public
+readable non-indexed instance properties supply `@name` parameters. Names are ASCII
+letters/underscore followed by letters/digits/underscore and match property names
+exactly. The mapper reads every public readable instance property once, including
+unused properties, before execution; avoid side-effecting getters. Indexed/ambiguous
+properties and unsupported values return Mapping. PostgreSQL resolves referenced
+names from this snapshot and reports missing names as Mapping. Arrays and generic
+parameter objects are outside this first reflection contract. Retain parameter getters
+as well as result constructors/setters in native reflection manifests.
+
+The PostgreSQL provider (not the common mapper) translates named placeholders to `$1`, `$2`, etc., preserving quoted identifiers,
+single/dollar-quoted text and line/nested block comments. Do not mix `$n` and `@name`
+parameters. Unterminated quotes/comments and ordinary string literals containing
+backslashes return InvalidInput; use explicit PostgreSQL E strings for escapes.
+Other providers receive the original text and named/positional values, and define
+their own placeholder syntax and supported bindings. Engine-specific interfaces or
+types may extend SqlConnection without changing the common mapper. This lexical
+policy is PostgreSQL-specific. Values remain separate protocol parameters, never interpolated SQL.
+
+`Query<T>(connection, text: string, map: (SqlRow) -> Result<T, SqlError>, params parameters: Object?[])`
+provides the same plain-value/named binding with explicit result conversion. Its
+callback precedes the variadic arguments. The statement overloads remain available
+for callers who already have prepared statement values.
 
 ## Errors and limits
 
