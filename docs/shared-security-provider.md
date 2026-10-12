@@ -449,3 +449,35 @@ The fixture explicitly requests named-curve EC keys; explicit-parameter EC keys 
 unsupported provider input, not a new platform guarantee. The Windows workflow runs
 the same modes; execution is pending.
 See [binding evidence](experiments/shared-tls/bindings-validation.json).
+
+## Development host integration (2026-10-12)
+
+Prepared development JIT bundles now include the TLS provider, adapter and cleanup
+hook, with `jit.tlsOwnership` in their manifest. Ordinary `neoclr run` admits the
+exact TLS bindings alongside other native services. Update the runtime, compiler
+and host together; the private ABI is not a compatibility promise for old bundles.
+Source AOT project builds select and link TLS on demand, recording `managedTls`.
+The archive is shared when the project also uses the existing HTTPS host.
+Released native build kits remain unsupported.
+
+JIT and source console/HTTP hosts dispose TLS before freeing their heap. HTTP/JIT
+teardown first stops runtime async work and leaves socket/task scopes, then releases
+TLS before checking exclusive ownership. Retained HTTP sessions release TLS before
+session close. Cleanup remains abortive without I/O; graceful close is separate.
+Windows uses the same sequencing and provider. This follows the existing ownership
+comparison above, without introducing guest finalizers or requiring SQL to adopt
+the TLS engine. Development JIT hosts now carry the provider even for programs that
+do not select TLS, while AOT projects omit it when unused; size/performance have not
+been benchmarked.
+
+Nine default-JIT cases pass locally, including client/server session ownership on
+terminal Fault exit. A Raven test project passes interpreter, default JIT and
+standalone AOT execution; its unused-TLS build omits the adapter/provider.
+The async-Main HTTP host probe and JIT discovery regression also pass. A synchronous
+HTTP-profile probe with no task-queue bindings exposed a missing generated drain
+export; that existing host/compiler gap remains open. Windows has matching
+installed-bundle/project CI checks but has not executed them yet. See
+[host evidence](experiments/shared-tls/host-integration-validation.json).
+
+Next are shared ciphertext pumping and managed certificate/SslStream APIs; none of
+these ownership checks constitutes managed HTTPS client/server qualification.

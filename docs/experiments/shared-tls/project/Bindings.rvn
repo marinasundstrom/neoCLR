@@ -1,0 +1,13 @@
+module neoCLR.Runtime
+
+import System.Runtime.CompilerServices.*
+
+// Test-owned private contracts; no public certificate or SslStream API implied.
+[MethodImpl(MethodImplOptions.InternalCall)]
+internal extern func TlsCreateClient(owner: byte[], roots: byte[], alpn: byte[]) -> int;
+
+[MethodImpl(MethodImplOptions.InternalCall)]
+internal extern func TlsRelease(owner: byte[]) -> int;
+
+[MethodImpl(MethodImplOptions.InternalCall)]
+internal extern func TlsAbort(owner: byte[]) -> int;

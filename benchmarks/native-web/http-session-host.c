@@ -1,3 +1,6 @@
+#ifdef NEOCLR_MANAGED_TLS
+#include "tls-managed.h"
+#endif
 /* Private retained-state HTTP consumer: three sequential dispatches on one
  * listener/object graph. Not a general scheduler or public hosting ABI. */
 #include "native-session.h"
@@ -54,6 +57,9 @@ static int invoke_session(neoclr_aot_context *context, int *failed) {
     if (status && neoclr_aot_render_fault(stderr, &context->fault)) host_error = 1;
     if (neoclr_socket_scope_leave_v1(&sockets)) host_error = 1;
     if (neoclr_task_scope_leave_v1(&tasks)) host_error = 1;
+#ifdef NEOCLR_MANAGED_TLS
+    if (!neoclr_root_probe_head_v1()) neoclr_tls_managed_dispose_v1(context);
+#endif
     if (session.owner) {
         if (neoclr_session_close_v1(&session)) host_error = 1;
     } else {

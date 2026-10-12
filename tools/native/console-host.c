@@ -1,3 +1,6 @@
+#ifdef NEOCLR_MANAGED_TLS
+#include "tls-managed.h"
+#endif
 #include "entry-arguments.h"
 /* Experimental synchronous console profile; private ABI, not a hosting API. */
 #include "native-gc.h"
@@ -16,6 +19,9 @@ int NEOCLR_PROCESS_MAIN(int argc, neoclr_process_char **argv) {
     if (status && neoclr_aot_render_fault(stderr, &context.fault)) host_error = 1;
     if (!host_error && neoclr_gc_collect_v1(&context, NULL)) host_error = 1;
     if (host_error) fputs("neoCLR native console cleanup failed\n", stderr);
+#ifdef NEOCLR_MANAGED_TLS
+    neoclr_tls_managed_dispose_v1(&context);
+#endif
     free(heap);
     return host_error ? 2 : status ? 1 : result;
 }

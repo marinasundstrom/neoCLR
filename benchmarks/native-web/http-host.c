@@ -1,3 +1,6 @@
+#ifdef NEOCLR_MANAGED_TLS
+#include "tls-managed.h"
+#endif
 #include "entry-arguments.h"
 /* One-request HTTP correctness host, not a production scheduler or load benchmark. */
 #include "native-gc.h"
@@ -66,6 +69,9 @@ static int invoke(neoclr_aot_context *context, int *failed, int argc, neoclr_pro
     if (neoclr_root_probe_head_v1()) host_error = 1;
     if (neoclr_socket_scope_leave_v1(&sockets)) host_error = 1;
     if (neoclr_task_scope_leave_v1(&tasks)) host_error = 1;
+#ifdef NEOCLR_MANAGED_TLS
+    if (!neoclr_root_probe_head_v1()) neoclr_tls_managed_dispose_v1(context);
+#endif
     if (status && neoclr_aot_render_fault(stderr, &context->fault)) host_error = 1;
     /* Render before clearing fault roots. A completed invocation retains no
      * guest state: the same host heap/context can then accept another entry. */

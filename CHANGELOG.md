@@ -39,6 +39,13 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   interpreter/JIT/AOT on macOS (21 executions), with changed-contract and missing
   binding/profile rejection coverage. Windows runs the same CI harness. Default
   host packaging and public certificate/SslStream APIs remain open.
+  Integrate ownership services into prepared default JIT bundles and source AOT
+  projects with on-demand provider linking and abortive cleanup before heap teardown.
+  Nine default-JIT cases (including Fault cleanup), a Raven project in three modes,
+  unused-provider omission, an async HTTP-host probe and JIT discovery pass locally.
+  Windows CI adds the same bundle/project checks; execution remains pending. Public
+  certificate/stream APIs and release build kits remain open. A synchronous HTTP
+  profile without queue bindings still lacks its generated drain export.
   Document shared HTTP/SQL security concepts without forcing a common native backend;
   managed SSL/certificate ownership and handshake diagnostics remain open.
 

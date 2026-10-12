@@ -117,6 +117,16 @@ def complete_services(command):
     # A qualified source recipe may already contain the cryptography archive.
     command = [arg for arg in command if 'neoclr_native_crypto' not in str(arg)]
     additions += [ROOT / 'docs/experiments/aot-console/cryptography.c', crypto_archive]
+    for path in project.native_tls_sources():
+        report['inputsSha256'][str(path)] = sha(path)
+    tls_build, tls_archive = project.native_tls_build(windows)
+    run(tls_build)
+    command = [arg for arg in command if 'neoclr_native_tls' not in str(arg)]
+    additions += [ROOT / 'docs/experiments/aot-console/tls-managed.c', tls_archive]
+    tls_flag = '/DNEOCLR_MANAGED_TLS' if windows else '-DNEOCLR_MANAGED_TLS'
+    if tls_flag not in command:
+        command.insert(1, tls_flag)
+
     if windows:
         additions += [name for name in ('Bcrypt.lib', 'Ntdll.lib', 'Userenv.lib', 'Advapi32.lib', 'Ws2_32.lib')
                       if name.lower() not in {str(arg).lower() for arg in command}]
@@ -156,7 +166,7 @@ try:
     manifest['platform'] = platform.platform()
     manifest['runtime'] = 'bin/neoclr' + suffix
     manifest['jit'] = dict(default=True, compiler='bin/neoclr-aot-poc' + suffix,
-                           host='bin/' + helper_name, runtimeAsync=not windows, cryptography=True,
+                           host='bin/' + helper_name, runtimeAsync=not windows, cryptography=True, tlsOwnership=True,
                            heapBytes=a.heap_bytes, byteArrayLimit=a.byte_array_limit)
     # Current verification tools make their interpreter controls explicit.
     for name in ('verify-native-bundle.py', 'verify-native-http-json.py'):

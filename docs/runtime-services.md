@@ -209,5 +209,6 @@ InternalCall declarations are admitted. There is no public Raven API yet.
 The private native TLS owner adapter now validates live packed byte arrays and
 connects native provider resources to the collector's ownership registrations.
 It implements the five ownership operations and explicit abortive host teardown;
-explicit compiler/JIT binding admission is available; default host packaging remains open. See the
+explicit compiler/JIT binding admission and prepared development JIT hosts are available.
+Source AOT projects link the adapter on demand; released native build kits remain open. See the
 [shared-provider checkpoint](shared-security-provider.md#native-tls-ownership-adapter-development-2026-10-12).

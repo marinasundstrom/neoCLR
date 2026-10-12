@@ -1,0 +1,91 @@
+{
+  "date": "2026-10-12",
+  "platform": "macOS-27.0-arm64-arm-64bit",
+  "scope": "Development default JIT and source AOT TLS ownership integration",
+  "passed": true,
+  "installedCases": [
+    {
+      "name": "invalid-trust",
+      "defaultJit": true,
+      "exitCode": 0
+    },
+    {
+      "name": "release-empty",
+      "defaultJit": true,
+      "exitCode": 0
+    },
+    {
+      "name": "abort-empty",
+      "defaultJit": true,
+      "exitCode": 0
+    },
+    {
+      "name": "invalid-owner",
+      "defaultJit": true,
+      "exitCode": 1
+    },
+    {
+      "name": "uninitialized",
+      "defaultJit": true,
+      "exitCode": 1
+    },
+    {
+      "name": "client-session",
+      "defaultJit": true,
+      "exitCode": 0
+    },
+    {
+      "name": "server-session",
+      "defaultJit": true,
+      "exitCode": 0
+    },
+    {
+      "name": "client-session-fault-teardown",
+      "defaultJit": true,
+      "exitCode": 1
+    },
+    {
+      "name": "server-session-fault-teardown",
+      "defaultJit": true,
+      "exitCode": 1
+    }
+  ],
+  "bundleManifestSha256": "f3c26f1180fdb49c88336767027ba46c5af5b4c0b28b3324042914f3c8cc9bee",
+  "project": {
+    "modes": [
+      "interpreter",
+      "default-jit",
+      "aot"
+    ],
+    "standaloneExecution": true,
+    "unusedProviderOmitted": true,
+    "buildManifestSha256": "261f88f458a7668833fd8b34fa60a9fe49e1afdcc6afbf5af15138fb8df4aff1"
+  },
+  "httpHost": {
+    "profile": "http",
+    "asyncMain": true,
+    "exitCode": 0,
+    "buildManifestSha256": "11300ed2d3cb913b7870f7fe93f405e8fcba89b1de06522593e4d1abe40c8d11",
+    "source": "import neoCLR.Runtime.*\nimport System.Concurrency.Tasks.*\n\nasync func Main() -> Task<int> {\n    await Task.CompletedTask\n    let owner: byte[] = []\n    let empty: byte[] = []\n    if TlsCreateClient(owner, empty, empty) != -14 {\n        return 1\n    }\n    if TlsRelease(owner) != 0 || TlsRelease(owner) != 0 {\n        return 2\n    }\n    if TlsAbort(owner) != -18 {\n        return 3\n    }\n    return 0\n}\n"
+  },
+  "jitDiscoveryRegression": "1 passed",
+  "retainedHttpHost": "clang syntax check passed with TLS and native GC enabled; executable retained-session TLS qualification remains open",
+  "sourceSha256": {
+    "src/jit_cli.rs": "91fdcd9234133204798eea072fbb6e6c91f9b741527c083782c05c7552a7c6ee",
+    "scripts/build-native-project.py": "b9bccf1a4230be5c3bafdcb8bf10d9fcc2a60cd188dbd2cc1741cd244029d5cf",
+    "scripts/prepare-jit-bundle.py": "2333139047465c073abeba2095b34f9aae5a02713411c2b28a0f7bf4715bfa4f",
+    "docs/experiments/jit-managed/host.c": "63dd8064cc8aa8c251bd3ec9f9e1dd3888286239f0407e32cee99b3a32739169",
+    "benchmarks/native-web/http-host.c": "eee40800419cdb045e9449218e7b55655217bd7ff5a705e3d55632041b8e5b24",
+    "benchmarks/native-web/http-session-host.c": "f8e7467f51d0b7eb34075ae27fd3f80fd1be1e1b3f7716dd970200212a5552b1",
+    "tools/native/console-host.c": "b1ba5d5f9024344452995716fd30032af2b885c54c61dfcf5b92edd341942f5d",
+    "tools/native/windows-console-host.c": "2d82975334ef040f9a490d35d47ec8acb1668e07eeceaa43baa4fe4d4312bb10",
+    "docs/experiments/shared-tls/validate-bundle.py": "8ff966dc83fb6e22ce2e1cbe65c29cf1eb19a273caf8459918a67032b3f57e63",
+    "docs/experiments/shared-tls/validate-project.py": "8839e62f0d9d0591301d581cb23a21e993273d491d3c1016365d3d79975bacaa"
+  },
+  "limitations": [
+    "Windows execution pending matching CI checks",
+    "Synchronous HTTP profile without task-queue bindings lacks generated drain export; async-Main probe passes",
+    "Released native build kits unsupported",
+    "Ciphertext pumping and public certificate/SslStream APIs remain open"
+  ]
+}

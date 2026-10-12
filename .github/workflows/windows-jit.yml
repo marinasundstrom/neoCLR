@@ -16,6 +16,9 @@ on:
       - 'samples/native-windows/**'
       - 'runtime/raven/**'
       - 'scripts/prepare-jit-bundle.py'
+      - 'tools/native-tls/**'
+      - 'docs/experiments/shared-tls/**'
+      - 'docs/experiments/aot-console/tls-managed*'
       - 'scripts/prepare-native-development-bundle.py'
       - 'scripts/prepare-native-bootstrap.py'
       - 'scripts/build-native-class-library.py'
@@ -44,6 +47,9 @@ on:
       - 'samples/native-windows/**'
       - 'runtime/raven/**'
       - 'scripts/prepare-jit-bundle.py'
+      - 'tools/native-tls/**'
+      - 'docs/experiments/shared-tls/**'
+      - 'docs/experiments/aot-console/tls-managed*'
       - 'scripts/prepare-native-development-bundle.py'
       - 'scripts/prepare-native-bootstrap.py'
       - 'scripts/build-native-class-library.py'
@@ -76,6 +82,10 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
+      - name: Select OpenSSL for disposable TLS fixtures
+        shell: pwsh
+        run: |
+          'C:\Program Files\Git\usr\bin' >> $env:GITHUB_PATH
       - name: Build and qualify Windows JIT HTTP
         shell: pwsh
         run: |
@@ -94,6 +104,9 @@ jobs:
             target/windows-jit-validation/framework/
             target/windows-jit-validation/cryptography/
             target/windows-jit-validation/cryptography-project/
+            target/windows-jit-validation/tls-ownership/validation.json
+            target/windows-jit-validation/tls-project/validation.json
+            target/windows-jit-validation/tls-project/native/build.json
             target/windows-jit-validation/public-cryptography/
             target/windows-jit-validation/native/build.json
             target/windows-jit-validation/async-use/

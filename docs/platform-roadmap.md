@@ -58,7 +58,10 @@ ownership and runtime-service bindings now work in the interpreter through
 heap-owned tokens. The native collector now has tested resource cleanup registrations
 and teardown guards. A tested native TLS adapter now connects owner tokens to those
 hooks. Explicit native JIT/AOT bindings now pass seven cases in all three local
-modes; host packaging and managed SSL composition remain next. See
+modes. Prepared development JIT hosts and source AOT projects now integrate TLS
+ownership/teardown; nine default-JIT cases and a Raven project pass locally.
+Shared ciphertext pumping and managed SSL composition remain next; released build
+kits remain open. See [host evidence](experiments/shared-tls/host-integration-validation.json). See
 [binding evidence](experiments/shared-tls/bindings-validation.json). See [native lifetime evidence](experiments/shared-tls/native-lifetime-validation.json). HTTP and SQL may share concepts/types
 without requiring one native TLS backend; see the [backend boundary](shared-security-provider.md#shared-concepts-independent-backends). A bounded public System.Security.Cryptography facade
 now adds destination-buffer SHA256/HMACSHA256, tag verification and secure random

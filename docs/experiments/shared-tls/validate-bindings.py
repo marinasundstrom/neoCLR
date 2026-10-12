@@ -48,6 +48,20 @@ def cases(cert, key):
         yield role + '-session', body, False
 
 
+def create_credentials(out, run):
+    cert_path, key_path = out / 'cert.pem', out / 'key.pem'
+    openssl_config = out / 'openssl.cnf'
+    openssl_config.write_text('[req]\nprompt=no\ndistinguished_name=dn\n[dn]\nCN=localhost\n')
+    run(['openssl', 'req', '-x509', '-newkey', 'ec', '-pkeyopt', 'ec_paramgen_curve:prime256v1', '-pkeyopt', 'ec_param_enc:named_curve',
+         '-nodes', '-sha256', '-days', '1', '-config', openssl_config,
+         '-addext', 'basicConstraints=critical,CA:FALSE',
+         '-addext', 'keyUsage=critical,digitalSignature',
+         '-addext', 'extendedKeyUsage=serverAuth', '-addext', 'subjectAltName=DNS:localhost',
+         '-keyout', key_path, '-out', cert_path])
+    os.chmod(key_path, 0o600)
+    return cert_path, key_path
+
+
 def main():
     p = argparse.ArgumentParser(description=__doc__)
     p.add_argument('--runtime', type=Path, required=True)
@@ -72,16 +86,7 @@ def main():
         run(['cargo', 'build', '--locked', '--release', '--manifest-path', manifest])
         metadata = json.loads(run(['cargo', 'metadata', '--no-deps', '--format-version', '1', '--manifest-path', manifest]))
         archive = Path(metadata['target_directory']) / 'release' / ('neoclr_native_tls.lib' if windows else 'libneoclr_native_tls.a')
-        cert_path, key_path = out / 'cert.pem', out / 'key.pem'
-        openssl_config = out / 'openssl.cnf'
-        openssl_config.write_text('[req]\nprompt=no\ndistinguished_name=dn\n[dn]\nCN=localhost\n')
-        run(['openssl', 'req', '-x509', '-newkey', 'ec', '-pkeyopt', 'ec_paramgen_curve:prime256v1', '-pkeyopt', 'ec_param_enc:named_curve',
-             '-nodes', '-sha256', '-days', '1', '-config', openssl_config,
-             '-addext', 'basicConstraints=critical,CA:FALSE',
-             '-addext', 'keyUsage=critical,digitalSignature',
-             '-addext', 'extendedKeyUsage=serverAuth', '-addext', 'subjectAltName=DNS:localhost',
-             '-keyout', key_path, '-out', cert_path])
-        os.chmod(key_path, 0o600)
+        cert_path, key_path = create_credentials(out, run)
         base = ROOT / 'docs/experiments/aot-console'
         sources = [HERE / 'host.c', base / 'tls-managed.c', base / 'text-arena.c', base / 'native-gc.c', base / 'root-probe.c']
         sources.append(ROOT / 'tools/native/windows-native-stack.c' if windows else base / 'native-stack.c')

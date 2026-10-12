@@ -1,3 +1,6 @@
+#ifdef NEOCLR_MANAGED_TLS
+#include "tls-managed.h"
+#endif
 /* Private JIT entry host. Managed awaits drain within this call; no state escapes. */
 #include "native-gc.h"
 #ifdef NEOCLR_RUNTIME_ASYNC
@@ -67,8 +70,11 @@ static int32_t run_entry(const void *entry, int32_t with_args, int32_t argc, con
        frame/handle still owns its descriptors. Treat a broken invariant as fatal. */
     if (neoclr_root_probe_head_v1() != NULL ||
         neoclr_socket_scope_leave_v1(&operations) ||
-        neoclr_task_scope_leave_v1(&tasks) ||
-        neoclr_gc_owned_roots_check_v1(&context, NULL, 0) ||
+        neoclr_task_scope_leave_v1(&tasks)) abort();
+#ifdef NEOCLR_MANAGED_TLS
+    neoclr_tls_managed_dispose_v1(&context);
+#endif
+    if (neoclr_gc_owned_roots_check_v1(&context, NULL, 0) ||
         neoclr_gc_collect_v1(&context, NULL)) abort();
 #ifdef NEOCLR_RUNTIME_ASYNC
     memset(&context.fault, 0, sizeof(context.fault));

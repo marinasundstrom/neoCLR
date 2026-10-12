@@ -1,0 +1,16 @@
+import neoCLR.Runtime.*
+
+func Main() -> int {
+    let owner: byte[] = []
+    let empty: byte[] = []
+    if TlsCreateClient(owner, empty, empty) != -14 {
+        return 1
+    }
+    if TlsRelease(owner) != 0 || TlsRelease(owner) != 0 {
+        return 2
+    }
+    if TlsAbort(owner) != -18 {
+        return 3
+    }
+    return 0
+}
