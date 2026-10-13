@@ -1,0 +1,18 @@
+{
+  "date": "2026-10-13",
+  "cpu": "Apple M1",
+  "hostConditions": "Interactive workstation; exploratory, no controlled regression gate. No parallel benchmark/build jobs were launched during these measurements.",
+  "bundleManifestSha256": "06748d41c37f423e7869cb2adcbfc2bc14e48cb18f11264ee93aa5c249ed4bff",
+  "initialProcesses": 45,
+  "largerNativeCpuProcesses": 10,
+  "allChecksumsAndInputHashesPassed": true,
+  "nativeCpuPilot": "16-operation native CPU batches were sub-millisecond and unsuitable as the published baseline. Retained unchanged; rerun with 10000 operations and 20 warmups.",
+  "files": {
+    "build-20261013.json": "b1c49a9f51570eaf096b16a3456ba3a73e901b85c94b4e5be4dad7c81979aa71",
+    "Worker.rvn": "49eca5fff562c08bf7d4af6def40c8b80636b362a6954034399146b066709320",
+    "results-20261013.json": "39d7bc6e1a44681d719ccee4a7bd7f4d952059944650d77cfec0c02ca0ac4d53",
+    "README.md": "907ac8621698d6184b3909843a75588e75f5f42d905e332ba6235448ea355800",
+    "prepare.py": "a0e0ebf9bfe92f3012355405f87a1ef5ad0d7291ccb3cb4eba2e05240f464ada",
+    "cpu-native-results-20261013.json": "0b6934b8705d36aca1d778a6a2d8af41e667aae024c9e00ccaae12cf74af63cd"
+  }
+}

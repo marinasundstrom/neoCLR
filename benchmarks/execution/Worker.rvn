@@ -1,0 +1,50 @@
+import System.*
+import System.Data.Json.*
+import System.Result.*
+import NeoClr.Benchmarking.*
+
+func Main(arguments: string[]) {
+    let text = "{\"name\":\"Café 🌍\",\"station\":{\"active\":true},\"readings\":[21,22,null],\"tags\":[\"indoor\",\"north\"]}"
+    let Ok(node) = JsonSerializer.DeserializeNode(text) else {
+        System.Fail("JSON setup failed")
+    }
+    let Ok(canonical) = JsonSerializer.SerializeNode(node) else {
+        System.Fail("JSON setup serialization failed")
+    }
+    if canonical != text {
+        System.Fail("JSON setup round trip changed the document")
+    }
+    let suite = BenchmarkSuite()
+    suite.Add("json.serialize", () => {
+        let Ok(output) = JsonSerializer.SerializeNode(node) else {
+            System.Fail("Serialization failed")
+        }
+        if output != text {
+            System.Fail("Serialized document changed")
+        }
+        return 1
+    })
+    suite.Add("json.deserialize", () => {
+        let Ok(value) = JsonSerializer.DeserializeNode(text) else {
+            System.Fail("Deserialization failed")
+        }
+        if value is JsonObject document {
+            if document.Count == 4 && document.Field("name") is Ok(JsonString name) && name.Value == "Café 🌍" {
+                return 1
+            }
+        }
+        System.Fail("Deserialized document changed")
+        return 0
+    })
+    suite.Add("cpu.sum", () => {
+        var sum = 0
+        for value in 0..<10000 {
+            sum += value
+        }
+        if sum != 49995000 {
+            System.Fail("CPU checksum changed")
+        }
+        return 1
+    })
+    suite.Run(arguments)
+}

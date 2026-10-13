@@ -8,6 +8,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-13
 
+- Measure current-bundle CPU sums and JSON node serialization/deserialization
+  through the existing benchmark framework: 45 initial processes and ten larger
+  native CPU processes pass output checks and unchanged-input validation. Preserve
+  the sub-millisecond CPU pilot and use explicit 10,000-operation native batches
+  for the baseline; retain interpreter/JSON batch sizes, startup and round ranges.
+
 - Add composed HTTP object-JSON and PostgreSQL/query/map/JSON benchmarks using
   Preview 14 inputs. Each completes 576 validated responses across interpreter,
   JIT and AOT; retain raw latency/startup samples and exact build provenance. SQL
