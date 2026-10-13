@@ -781,3 +781,9 @@ explicit ownership. Native allocation failure is not automatically a reason to r
 the managed collector or replay an external operation. Culture/time-zone snapshots,
 intern/object construction and actual scheduler idle integration remain separate
 admission work before general pacing promotion.
+
+Producer qualification passes all 29 GC/root executions and socket/package checks
+on macOS ARM64 and Windows x64. The shared native-buffer decoder runs on both;
+the counted POSIX file test runs only on macOS. Two local compiled file tests also
+pass. [Retained evidence](../../validation/runtime-product/native-producers/README.md)
+records the exact revision and platform scope.
