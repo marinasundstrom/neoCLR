@@ -299,19 +299,20 @@ int32_t neoclr_gc_allocate_rooted_v1(neoclr_aot_context *context,
 typedef struct { block **start; unsigned capacity, shift; uint64_t blocks; } block_index;
 static int build_index(neoclr_aot_text_arena *a, block_index *index) {
     if (!valid(a)) return 0;
-    index->blocks = 0;
+    uint64_t blocks = 0;
     index->shift = 6;
     while (a->used && ((a->used - 1) >> index->shift) >= index->capacity) index->shift++;
     unsigned bucket = 0;
     for (uint64_t at = 0; at < a->used;) {
         if (!block_valid(a, at)) return 0;
         block *b = (void *)(a->data + at);
-        index->blocks++;
+        blocks++;
         uint64_t end = at + b->span;
         while (bucket < index->capacity && ((uint64_t)bucket << index->shift) < end)
             index->start[bucket++] = b;
         at = end;
     }
+    index->blocks = blocks;
     return 1;
 }
 /* Index lookup preserves exact payload-base validation for host owners/values.

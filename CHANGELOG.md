@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-13
 
+- Keep adaptive-index population counting in a local accumulator until validation finishes, avoiding repeated publication through the index descriptor. Retain the first Windows graph results, including small-control costs, while qualifying the bookkeeping refinement.
+
 - Adapt the native GC address index to dense heaps while retaining the small-heap path and exact root/payload validation. Local matched collection-only graphs improve 4.46–5.24× at 16,384 objects; small/sparse controls remain near baseline. Add interior-root/free-hole tests, a reproducible graph matrix with separate lookup counters, and opt-in Windows/macOS CI measurements. The dense path costs an extra validated walk and 32 KiB of stack; Windows qualification is pending.
 
 - Make the StackTrace pressure-test name fixture explicitly NUL-sized for MSVC warning-as-error builds; its managed text length remains five. The initial Windows gate caught this test-only portability issue.
