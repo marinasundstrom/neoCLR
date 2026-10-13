@@ -140,7 +140,7 @@ public sealed partial class FieldDefinition
     public FieldDefinition(string name, ushort attributes, SignatureType fieldType, int? constant)
     {
         ArgumentNullException.ThrowIfNull(fieldType); CheckName(name);
-        if ((attributes & ~0x27) != 0 && attributes is not (0x606 or 0x8056) || (attributes & 7) is not (1 or 3 or 6) || fieldType.Primitive == PrimitiveType.Void ||
+        if ((attributes & ~0x37) != 0 && attributes is not (0x606 or 0x8056) || (attributes & 7) is not (1 or 3 or 6) || fieldType.Primitive == PrimitiveType.Void ||
             ((attributes & 0x40) != 0) != constant.HasValue)
             throw new ArgumentException("unsupported field attributes or signature");
         this.name = name; Attributes = attributes; FieldType = fieldType; Constant = constant; signature = [];

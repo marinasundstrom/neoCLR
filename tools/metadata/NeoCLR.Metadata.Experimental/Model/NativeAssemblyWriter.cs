@@ -222,6 +222,8 @@ public sealed partial class AssemblyBuilder
             "call.constrained" => new { op = "callself", arg = new { borrowed = !instruction.Target!.IsStatic, self_type = SignatureValue(instruction.Type!), target = new { name = FunctionName(instruction.Target!), owner = instruction.ConstrainedConstructedReference is { } constrained ? SignatureValue(constrained.DeclaringType) : Owner(instruction.Target!), instance = !instruction.Target.IsStatic, parameters = instruction.ConstructedTarget is { } constrainedTarget ? constrainedTarget.Signature.ParameterTypes.Select(SignatureValue).ToArray() : Parameters(instruction.Target!) } } },
             "call.virtual" or "call" or "new.object" => new { op = instruction.Op == "call.virtual" ? "callvirt" : instruction.Op == "call" ? "call" : "newobj.ctor", arg = (object)new { name = FunctionName(instruction.Target!), owner = Owner(instruction.Target!), instance = !instruction.Target!.IsStatic, parameters = Parameters(instruction.Target!) } },
             "duplicate" => new { op = "dup" },
+            "field.import.load" or "field.import.store" when instruction.ImportedField!.IsStatic => new { op = instruction.Op == "field.import.load" ? "ldsfld" : "stsfld", arg = (object)new { owner = SignatureValue(instruction.Type ?? (SignatureType)instruction.ImportedField.DeclaringType), index = instruction.ImportedField.NativeIndex ?? throw new InvalidDataException("native static field requires a native ordinal") } },
+            "field.load" or "field.store" when instruction.Field!.IsStatic => new { op = instruction.Op == "field.load" ? "ldsfld" : "stsfld", arg = (object)new { owner = TypeOwner(instruction.Field.DeclaringType, instruction.ConstructedField?.DeclaringType.TypeArguments ?? instruction.Field.DeclaringType.GenericParameterNames.Select((_, i) => SignatureType.TypeParameter(i)).ToArray()), index = instruction.Field.Index } },
             "field.import.load" or "field.import.store" => new { op = instruction.Op == "field.import.load" ? "ldfld" : "stfld", arg = (object)(instruction.ImportedField!.NativeIndex ?? throw new InvalidDataException("native field emission requires a native layout ordinal")) },
             "field.address" or "field.load" or "field.store" => new { op = instruction.Op == "field.address" ? "ldflda" : instruction.Op == "field.load" ? "ldfld" : "stfld", arg = (object)(instruction.Field!.DeclaringType.InheritedFieldCount + instruction.Field.Index) },
             "argument.address" => new { op = "ldarga", arg = (object)instruction.Value },
@@ -255,7 +257,7 @@ public sealed partial class AssemblyBuilder
                 return new[] { Instruction(instruction), new { op = "pop" } };
             // Legacy native stores through managed references return an inhabited Void.
             // The producer contract follows CLI stfld, which leaves no stack value.
-            if (instruction.Op == "field.store" && instruction.Field!.DeclaringType.IsValueType)
+            if (instruction.Op == "field.store" && !instruction.Field!.IsStatic && instruction.Field.DeclaringType.IsValueType)
                 return new[] { Instruction(instruction), new { op = "pop" } };
             if (instruction.Op == "native.call")
             {
@@ -424,7 +426,8 @@ public sealed partial class AssemblyBuilder
                 TypeOrigin(type, index), type.Definition.IsNativePrimitiveReference, type.ExternalBase is { } externalBase ? SignatureValue(externalBase) : type.LocalBase is { } baseType ? SignatureValue(baseType.OpenSignature) : null, type.IsInterface ? "Interface" : (type.NativePrimitive is not null || type.NativeGrapheme) ? "Runtime" : null,
                 !type.InterfaceSignatures.Any() ? null : type.InterfaceSignatures.Select(SignatureValue).ToArray(),
                 type.Visibility == TypeVisibility.Internal ? "internal" : null,
-                type.Properties.Count == 0 ? null : type.Properties.Select(p => (object)new NativeProperty(p.Name, !p.IsStatic, p.ParameterTypes.Select(SignatureValue).ToArray(), SignatureValue(p.PropertyType), Accessor(p.GetMethod), Accessor(p.SetMethod), p.Definition.IsInitOnly)).ToArray(), type.GenericParameterNames.Count == 0 ? null : type.GenericParameterNames.ToArray(), Constraints(type), type.Definition.DeclaringType is { } parent ? new { module = ModuleName(this), revision = Identity.Version.ToString(), index = types.IndexOf(parent.Producer!) } : null, TypeAttributes(type), type.IsEnum ? new { underlying = "Int32", flags = type.IsFlagsEnum, members = type.MetadataFields.Where(f => f.Definition.IsLiteral).Select(f => new { name = f.Name, value = f.Definition.Constant!.Value }).ToArray() } : null)).ToArray(),
+                type.Properties.Count == 0 ? null : type.Properties.Select(p => (object)new NativeProperty(p.Name, !p.IsStatic, p.ParameterTypes.Select(SignatureValue).ToArray(), SignatureValue(p.PropertyType), Accessor(p.GetMethod), Accessor(p.SetMethod), p.Definition.IsInitOnly)).ToArray(), type.GenericParameterNames.Count == 0 ? null : type.GenericParameterNames.ToArray(), Constraints(type), type.Definition.DeclaringType is { } parent ? new { module = ModuleName(this), revision = Identity.Version.ToString(), index = types.IndexOf(parent.Producer!) } : null, TypeAttributes(type), type.IsEnum ? new { underlying = "Int32", flags = type.IsFlagsEnum, members = type.MetadataFields.Where(f => f.Definition.IsLiteral).Select(f => new { name = f.Name, value = f.Definition.Constant!.Value }).ToArray() } : null,
+                type.StaticFields.Count == 0 ? null : type.StaticFields.Select(f => (object)new { name = f.Name, ty = SignatureValue(f.FieldType), visibility = f.Visibility.ToString().ToLowerInvariant(), @readonly = f.IsReadOnly }).ToArray())).ToArray(),
             functions = methods.Select((method, index) => new NativeMethodRow(
                 FunctionName(method), Owner(method), Parameters(method),
                 method.Locals.Select(local => SignatureValue(local.SignatureType)).ToArray(),
@@ -497,6 +500,8 @@ public sealed partial class AssemblyBuilder
         [property: System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
         object[]? custom_attributes,
         [property: System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
-        object? enum_info);
+        object? enum_info,
+        [property: System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
+        object[]? static_fields);
 
 }

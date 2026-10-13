@@ -4,6 +4,8 @@ using System.Reflection.PortableExecutable;
 using NeoCLR.Metadata.Experimental.Model;
 using AssemblyDefinition = NeoCLR.Metadata.Experimental.Model.AssemblyDefinition;
 
+if (args is ["--static-fields"]) { StaticFieldChecks.Run(); return 0; }
+
 if (args is ["--local-budget", var localOutput]) { LocalBudgetChecks.Run(localOutput); return 0; }
 
 if (args is ["--foreign-imports"]) { ForeignImportChecks.Run(); return 0; }

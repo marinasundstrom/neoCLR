@@ -4,9 +4,9 @@ namespace NeoCLR.Metadata.Experimental.Model;
 public sealed partial class ImportedFieldReference
 {
     internal ImportedFieldReference(AssemblyBuilder owner, ImportedTypeReference declaringType, FieldDefinition definition, SignatureType type, int index)
-    { Owner = owner; DeclaringType = declaringType; Name = definition.Name; FieldType = type; IsReadOnly = (definition.Attributes & 0x20) != 0; NativeIndex = definition.Module.Assembly.IsNative ? index : null; }
-    internal ImportedFieldReference(AssemblyBuilder owner, ImportedTypeReference declaringType, string name, SignatureType type, int index, bool readOnly)
-    { Owner = owner; DeclaringType = declaringType; Name = name; FieldType = type; NativeIndex = index; IsReadOnly = readOnly; }
+    { Owner = owner; DeclaringType = declaringType; Name = definition.Name; FieldType = type; IsReadOnly = (definition.Attributes & 0x20) != 0; IsStatic = (definition.Attributes & 0x10) != 0; NativeIndex = definition.Module.Assembly.IsNative ? index : null; }
+    internal ImportedFieldReference(AssemblyBuilder owner, ImportedTypeReference declaringType, string name, SignatureType type, int index, bool readOnly, bool isStatic = false)
+    { Owner = owner; DeclaringType = declaringType; Name = name; FieldType = type; NativeIndex = index; IsReadOnly = readOnly; IsStatic = isStatic; }
     /// <summary>Gets the consuming builder.</summary>
     public AssemblyBuilder Owner { get; }
     /// <summary>Gets the exact external declaring type.</summary>
@@ -17,6 +17,8 @@ public sealed partial class ImportedFieldReference
     public SignatureType FieldType { get; }
     /// <summary>Gets whether stores from this external consumer are forbidden.</summary>
     public bool IsReadOnly { get; }
+    /// <summary>Gets whether the field has type-owned static storage.</summary>
+    public bool IsStatic { get; }
     internal int? NativeIndex { get; }
 }
 
@@ -29,7 +31,7 @@ public sealed partial class AssemblyBuilder
     /// <returns>An interned reference owned by this builder.</returns>
     /// <exception cref="ArgumentNullException">A required argument is null.</exception>
     /// <exception cref="InvalidDataException">Unsupported owner/signature/access/layout, incompatible core/snapshot, translated binding or limit.</exception>
-    /// <remarks>CLI output uses a MemberRef. Native output requires a native definition snapshot and uses its validated field ordinal. CLI input fields support CLI output only. Static fields and translated layouts are not admitted. Generic native owners bind through MakeConstructedReference. Readonly loads are supported; readonly stores and value-type owner stores fail body validation.</remarks>
+    /// <remarks>CLI output uses a MemberRef. Native output requires a native definition snapshot and uses its validated field ordinal. CLI input fields support CLI output only. Static fields use a separate native ordinal; translated layouts are not admitted. Generic native owners bind through MakeConstructedReference. Readonly loads are supported; readonly stores and value-type owner stores fail body validation.</remarks>
     public ImportedFieldReference ImportReference(FieldDefinition definition, AssemblyIdentity dependencyCoreLibrary)
         => ImportReference(definition, dependencyCoreLibrary, null);
 
@@ -45,9 +47,9 @@ public sealed partial class AssemblyBuilder
         if (definition.Module is null || definition.Module.Assembly.Producer is not null)
             throw new InvalidDataException("field import requires a loaded immutable snapshot");
         var type = definition.DeclaringType;
-        if ((definition.Attributes & 7) != 6 || (definition.Attributes & ~0x27) != 0 ||
+        if ((definition.Attributes & 7) != 6 || (definition.Attributes & ~0x37) != 0 ||
             !definition.TryGetSignature(out var signature) || type.IsValueType && !definition.Module.Assembly.IsNative || type.GenericArity != 0 && !definition.Module.Assembly.IsNative || type.DeclaringType is not null ||
-            (type.Attributes & 0x20) != 0 || type.Fields.Any(field => (field.Attributes & 0x10) != 0) || NativeBindingFor(type.Module.Assembly.Identity) is not null)
+            (type.Attributes & 0x20) != 0 || NativeBindingFor(type.Module.Assembly.Identity) is not null)
             throw new InvalidDataException("unsupported imported field contract");
         var owner = ImportReference(type, dependencyCoreLibrary);
         var storage = ImportNativeSignatureType(signature!, dependencyCoreLibrary, resolver);
@@ -59,7 +61,7 @@ public sealed partial class AssemblyBuilder
             return existing;
         }
         if (importedFields.Count + authoredFields.Count >= 4096) throw new InvalidDataException("too many imported fields");
-        var index = type.Fields.IndexOf(definition);
+        var index = type.Fields.Where(f => (f.Attributes & 0x10) == (definition.Attributes & 0x10)).ToList().IndexOf(definition);
         if (index < 0) throw new InvalidDataException("field is not owned by its declaring snapshot");
         var reference = new ImportedFieldReference(this, owner, definition, storage, index);
         importedFields.Add(key, reference);

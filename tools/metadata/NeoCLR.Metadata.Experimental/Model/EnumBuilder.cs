@@ -33,7 +33,7 @@ public sealed partial class AssemblyBuilder
 public sealed partial class TypeBuilder
 {
     private readonly List<FieldBuilder> literalFields = [];
-    internal IEnumerable<FieldBuilder> MetadataFields => fields.Concat(literalFields);
+    internal IEnumerable<FieldBuilder> MetadataFields => fields.Concat(staticFields).Concat(literalFields);
     /// <summary>Gets whether this type directly extends the selected core System.Enum.</summary>
     public bool IsEnum => Definition.IsEnum;
     /// <summary>Adds a public static literal with this enum's nominal type and an Int32 constant.</summary>

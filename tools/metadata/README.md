@@ -301,3 +301,19 @@ Nested generic class authoring and generic enclosing scopes are now supported.
 See the [API contract](../../api-docs/experimental-metadata.md#nested-generic-lexical-owners-development-2026-10-11).
 Run the focused `--generic-nested-types` contract group for CLI execution, native
 round-trip and translated dependency scope validation.
+
+### Static storage authoring (development, 2026-10-14)
+
+`TypeBuilder.AddField(..., isStatic: true)` places the field in `StaticFields`,
+separate from instance `Fields`. `LoadField`/`StoreField` select static opcodes
+from the operand's storage kind; constructed references retain the closed owner.
+`CreateFieldReference(..., isStatic: true)` asserts a static ordinal (not an
+instance offset). Imported definitions preserve CLI Static and InitOnly flags.
+
+Native rows use `static_fields`; CLI output uses ordinary static field opcodes.
+Only default storage and later mutable assignment are admitted in this slice.
+There is no type-initializer execution or static readonly initialization yet;
+readonly stores, static field addresses and custom attributes on static fields
+are rejected. See [runtime storage](../../docs/runtime-static-storage.md).
+
+Focused check: `dotnet run --project tools/metadata/NeoCLR.Metadata.Experimental.Tests -- --static-fields`.

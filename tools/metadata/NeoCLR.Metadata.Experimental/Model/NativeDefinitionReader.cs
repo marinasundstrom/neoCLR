@@ -39,7 +39,7 @@ public sealed partial class NativeAssemblyDefinition
             type.ArrayElement is { } element && SupportedMethod(element) || Supported(type);
         static bool Supported(SignatureType type) => SupportedScalar(type) || type.ArrayElement is { } element && Supported(element);
         // Fail closed rather than returning a partial assembly with silently missing types.
-        if (properties.Any(p => p.Parameters.Any(parameter => !Supported(parameter)) || !Supported(p.Type)) || types.Any(t => (t.GenericNames.Length != 0 && t.IsStatic) || t.Fields.Any(f => !Supported(f.Signature!)) || t.InterfaceSignatures.Any(i => !Supported(i)) || t.Constraints.Length != 0 || t.SpecialConstraints.Count != 0) ||
+        if (properties.Any(p => p.Parameters.Any(parameter => !Supported(parameter)) || !Supported(p.Type)) || types.Any(t => t.Fields.Concat(t.StaticFields).Any(f => !Supported(f.Signature!)) || t.InterfaceSignatures.Any(i => !Supported(i)) || t.Constraints.Length != 0 || t.SpecialConstraints.Count != 0) ||
             methods.Any(m => (m.Owner < 0 && m.Visibility is not (MethodVisibility.Public or MethodVisibility.Internal)) ||
             (m.Name == ".ctor" && m.Signature.ParameterTypes.Any(p => p.ByReferenceElement is not null)) ||
             (m.Instance && m.Signature.GenericParameterNames.Count != 0) || !SupportedMethod(m.Signature.ReturnType) ||
@@ -87,6 +87,9 @@ public sealed partial class NativeAssemblyDefinition
                 fieldRows.Add(new(0x04000001u + (uint)fieldRows.Count, 0x02000002u + (uint)owner, field.Name,
                     (ushort)((types[owner].EnumMembers is not null ? 0x600 : 0) | (field.IsReadOnly ? 0x20 : 0) | (field.Visibility == FieldVisibility.Public ? 6 : field.Visibility == FieldVisibility.Internal ? 3 : 1)),
                     [], Copy(field.Signature!)));
+            foreach (var field in types[owner].StaticFields)
+                fieldRows.Add(new(0x04000001u + (uint)fieldRows.Count, 0x02000002u + (uint)owner, field.Name,
+                    (ushort)(0x10 | (field.IsReadOnly ? 0x20 : 0) | (field.Visibility == FieldVisibility.Public ? 6 : field.Visibility == FieldVisibility.Internal ? 3 : 1)), [], Copy(field.Signature!)));
             if (types[owner].EnumMembers is { } members)
                 foreach (var member in members)
                     fieldRows.Add(new(0x04000001u + (uint)fieldRows.Count, 0x02000002u + (uint)owner, member.Name,

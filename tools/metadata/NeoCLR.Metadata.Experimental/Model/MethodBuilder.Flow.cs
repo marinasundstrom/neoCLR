@@ -127,9 +127,14 @@ public sealed partial class MethodBuilder
                     var importedField = instruction.ImportedField!;
                     if (instruction.Op == "field.import.store")
                     {
-                        if (importedField.DeclaringType.IsValueType) throw new InvalidDataException("external value-type field stores are unsupported");
+                        if (!importedField.IsStatic && importedField.DeclaringType.IsValueType) throw new InvalidDataException("external value-type field stores are unsupported");
                         if (importedField.IsReadOnly) throw new InvalidDataException("cannot store an external readonly field");
                         Pop(instruction.ImportedConstructedField?.FieldType ?? importedField.FieldType);
+                    }
+                    if (importedField.IsStatic)
+                    {
+                        if (instruction.Op == "field.import.load") stack.Add(instruction.ImportedConstructedField?.FieldType ?? importedField.FieldType);
+                        break;
                     }
                     var importedFieldOwner = instruction.Type ?? (SignatureType)importedField.DeclaringType;
                     if (importedField.DeclaringType.IsValueType && stack.Count > 0 && stack[^1].AddressedLocal is { } importedReceiverLocal)
@@ -152,9 +157,15 @@ public sealed partial class MethodBuilder
                 case "field.store":
                     if (instruction.Op == "field.store")
                     {
-                        if (instruction.Field!.IsReadOnly && (!(IsConstructor || IsInitOnlySetter) || !ReferenceEquals(DeclaringType, instruction.Field.DeclaringType)))
+                        if (instruction.Field!.IsReadOnly && (instruction.Field.IsStatic || !(IsConstructor || IsInitOnlySetter) || !ReferenceEquals(DeclaringType, instruction.Field.DeclaringType)))
                             throw new InvalidDataException("readonly field requires its declaring constructor or init accessor");
                         Pop(instruction.ConstructedField?.FieldType ?? instruction.Field.FieldType);
+                    }
+                    if (instruction.Field!.IsStatic)
+                    {
+                        if (instruction.Op == "field.address") throw new InvalidDataException("static field addresses are not admitted");
+                        if (instruction.Op == "field.load") stack.Add(instruction.ConstructedField?.FieldType ?? instruction.Field.FieldType);
+                        break;
                     }
                     SignatureType fieldOwner = instruction.ConstructedField is { } fieldReference
                         ? fieldReference.DeclaringType : instruction.Field!.DeclaringType.OpenSignature;

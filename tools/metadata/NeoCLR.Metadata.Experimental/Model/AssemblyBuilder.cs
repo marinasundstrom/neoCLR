@@ -794,12 +794,12 @@ public sealed partial class AssemblyBuilder
                     case "new.object": code.WriteByte(0x73); code.WriteInt32(ImportMethod(instruction.Target!)); break;
                     case "field.import.load":
                     case "field.import.store":
-                        code.WriteByte(instruction.Op == "field.import.load" ? (byte)0x7b : (byte)0x7d);
+                        code.WriteByte(instruction.ImportedField!.IsStatic ? (instruction.Op == "field.import.load" ? (byte)0x7e : (byte)0x80) : instruction.Op == "field.import.load" ? (byte)0x7b : (byte)0x7d);
                         code.WriteInt32(ImportedFieldToken(instruction.ImportedField!, instruction.ImportedConstructedField)); break;
                     case "field.address":
                     case "field.load":
                     case "field.store":
-                        code.WriteByte(instruction.Op == "field.address" ? (byte)0x7c : instruction.Op == "field.load" ? (byte)0x7b : (byte)0x7d);
+                        code.WriteByte(instruction.Field!.IsStatic ? (instruction.Op == "field.load" ? (byte)0x7e : (byte)0x80) : instruction.Op == "field.address" ? (byte)0x7c : instruction.Op == "field.load" ? (byte)0x7b : (byte)0x7d);
                         code.WriteInt32(instruction.ConstructedField is { } fieldReference ? ConstructedFieldToken(fieldReference) : MetadataTokens.GetToken(fieldHandles[instruction.Field!])); break;
                     case "negate": code.WriteByte(0x65); break;
                     case "complement": code.WriteByte(0x66); break;
