@@ -841,3 +841,22 @@ GC/root executions pass, along with Windows socket/package checks and the local
 compiled consumers described above. The current hosted macOS job remains queued;
 the preceding preference job was cancelled without steps. See [retained evidence](../../validation/runtime-product/native-object-lifetimes/README.md)
 for exact revision, commands, hashes and scope.
+
+## Scheduler idle admission — 2026-10-13
+
+Native scheduler acquire now collects at its validated boundary before returning
+Idle or Pending, before the host waits or exits a drain. It never collects while
+transferring a ready callback into the delivery ticket. Pending operations retain
+their handles; abandoned owned stacks and resources are reclaimed exactly once.
+Invalid acquisitions neither collect nor replace the caller's ticket. Native hosts
+must root managed values reused across acquire; the entry-delivery test now does
+so explicitly. The lower-level poll/step and OS wait remain noncollecting.
+
+This is runtime integration, shared by native JIT/AOT hosts, not a managed scheduler
+API change. Unlike CLR's independently scheduled GC, this single-owner collector
+uses a synchronous safe boundary. It guarantees cleanup before waiting at the cost
+of a full collection on each non-ready acquire, including repeated pending polls;
+further throttling needs a reliable reachability-change signal. The interpreter's
+existing allocation-pressure/completion policy is unchanged. Local macOS socket
+contracts cover pending timer retention, owned suspended-stack abandonment, idle
+cleanup, fault delivery and invalid boundaries; hosted Windows qualification follows.

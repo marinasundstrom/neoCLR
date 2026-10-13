@@ -129,6 +129,9 @@ int32_t neoclr_scheduler_submit_managed_v1(void *, neoclr_aot_context *, int32_t
  * it releases dispatch ownership, not the operation result. Stale/wrong tickets
  * return 3; scope leave abandons an outstanding delivery. Acquisition failure is
  * terminal: tear down the scope. These are private host contracts, not stable ABI. */
+/* Non-ready acquisition is a collecting boundary before idle/pending wait.
+ * Hosts must publish all managed values they will reuse. Pending operation and
+ * owned suspended-stack roots remain traced; invalid acquisition never collects. */
 int32_t neoclr_scheduler_acquire_v1(neoclr_aot_context *, uint64_t *, const neoclr_probe_frame *);
 int32_t neoclr_scheduler_complete_v1(neoclr_aot_context *, uint64_t, const neoclr_probe_frame *);
 /* Quiescent owner-thread poll: 0 no ready work, 1 publishes one retained callback

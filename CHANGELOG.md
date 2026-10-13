@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-13
 
+- Integrate collection at validated native scheduler Idle/Pending acquisition boundaries before waiting. Retain pending callback handles and owned suspended stacks, reclaim abandoned owners/resources exactly once, and leave ready delivery and invalid acquisition untouched. Document host rooting obligations and the cost of repeated pending collections; focused local macOS socket contracts pass.
+
 - Enable rooted object-allocation retry in generated native-GC code, preserving constructor arguments, receiver roots and initialization before publication. Keep raw/non-GC allocation noncollecting and reject null arena/output arguments. Add forced-pressure object and compiled constructor/callback lifetime checks. All 32 local macOS ARM64 and hosted Windows x64 GC/root executions pass, along with Windows socket/package checks and focused local compiled consumers. Retain evidence with normalized report line endings and log terminators; hosted macOS is still queued. General pacing remains disabled.
 
 - Protect native string-intern inputs during collecting allocation retry. Preserve intern identity, quotas, entry-reset lifetime and the noncollecting raw helper. Add pressure, exhaustion and generated-consumer coverage; local macOS GC/root qualification passes. Hosted Windows x64 qualification now passes with the object-lifetime slice; retain reports and generated-consumer logs. No public API or collection-pacing change.

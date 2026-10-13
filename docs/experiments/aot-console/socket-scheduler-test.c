@@ -12,6 +12,40 @@ static int32_t reject_completion(neoclr_aot_context *c, uint64_t ticket,
     (void)c; (void)ticket; (void)boundary;
     return 3;
 }
+static void idle_cleanup(void *state) { ++*(int *)state; }
+static int idle_collection_contract(void) {
+    uint64_t buffer[256]={0};
+    neoclr_aot_context c={.text={(unsigned char*)buffer,sizeof(buffer),0}};
+    neoclr_socket_scope scope;
+    CHECK(!neoclr_socket_scope_enter_v1(&scope,&c));
+    void *owner=NULL,*value=NULL,*callback=NULL;
+    CHECK(!neoclr_allocate_object_v1(&c.text,1,16,&owner));
+    CHECK(!neoclr_allocate_object_v1(&c.text,2,16,&value));
+    *(uint64_t *)((unsigned char*)value+8)=42;
+    int cleaned=0;
+    neoclr_gc_resource resource={0};
+    CHECK(!neoclr_gc_resource_attach_v1(&c,owner,&resource,&cleaned,idle_cleanup));
+    uint64_t root=0,ticket=123;
+    CHECK(!neoclr_gc_host_root_create_v1(&c,owner,&root));
+    neoclr_probe_storage slot={&value,8,0};neoclr_probe_frame frame;
+    neoclr_probe_enter_v3(&frame,&c,0,&slot,1,"{}",2);
+    neoclr_parked_roots parked={0};
+    CHECK(!neoclr_gc_roots_park_owned_v1(&c,owner,&parked));
+    CHECK(!neoclr_allocate_object_v1(&c.text,UINT32_MAX,24,&callback));
+    ((uint64_t*)callback)[1]=1;
+    int64_t timer=0;CHECK(!neoclr_timer_start_v1(60000,callback,&c,&timer));
+    CHECK(neoclr_scheduler_acquire_v1(&c,&ticket,NULL)==NEOCLR_SCHEDULER_PENDING);
+    CHECK(ticket==123 && !cleaned && !parked.expired && ((uint64_t*)value)[1]==42);
+    CHECK(!neoclr_gc_host_root_release_v1(&c,root));
+    CHECK(neoclr_scheduler_acquire_v1(&c,&ticket,NULL)==NEOCLR_SCHEDULER_PENDING);
+    CHECK(cleaned==1 && parked.expired && ((uint64_t*)callback)[1]==1);
+    neoclr_roots_discard_v1(&parked);
+    int32_t ignored=0;CHECK(!neoclr_timer_cancel_v1(timer,&c,&ignored));
+    CHECK(neoclr_scheduler_acquire_v1(&c,&ticket,NULL)==NEOCLR_SCHEDULER_IDLE);
+    CHECK(!c.text.used && cleaned==1 && ticket==123);
+    CHECK(!neoclr_socket_scope_leave_v1(&scope));
+    return 0;
+}
 static int entry_delivery_contract(void) {
     uint64_t buffer[128] = {0};
     neoclr_aot_context c = {.text = {(unsigned char *)buffer, sizeof(buffer), 0}};
@@ -24,6 +58,8 @@ static int entry_delivery_contract(void) {
     void *callback = NULL, *read = NULL;
     CHECK(!neoclr_allocate_object_v1(&c.text, UINT32_MAX, 24, &callback));
     ((uint64_t *)callback)[1] = 1;
+    uint64_t keep=0;
+    CHECK(!neoclr_gc_host_root_create_v1(&c,callback,&keep));
     int64_t timer;
     CHECK(!neoclr_timer_start_v1(0, callback, &c, &timer));
     neoclr_probe_frame entry, child;
@@ -56,6 +92,7 @@ static int entry_delivery_contract(void) {
     CHECK(!neoclr_socket_scope_leave_v1(&sockets));
     CHECK(!neoclr_task_scope_leave_v1(&tasks));
     c.fault.code = 0;
+    CHECK(!neoclr_gc_host_root_release_v1(&c,keep));
     CHECK(!neoclr_gc_collect_v1(&c, NULL) && !c.text.used);
     /* A failing completion hook is terminal and reported by scope leave. */
     CHECK(!neoclr_socket_scope_enter_v1(&sockets, &c));
@@ -283,6 +320,7 @@ static int backlog_and_sources_contract(void) {
 }
 
 int main(void) {
+    CHECK(!idle_collection_contract());
     CHECK(!backlog_and_sources_contract());
     CHECK(!registration_contract());
     CHECK(!destination_contract());

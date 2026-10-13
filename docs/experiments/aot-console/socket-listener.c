@@ -661,7 +661,14 @@ int32_t neoclr_scheduler_acquire_v1(neoclr_aot_context *context, uint64_t *deliv
     if (!delivery) return -3;
     uint64_t source = 0, owned = 0;
     int32_t progress = neoclr_scheduler_step_v1(context, &source, boundary);
-    if (progress != NEOCLR_SCHEDULER_READY) return progress;
+    if (progress != NEOCLR_SCHEDULER_READY) {
+        /* No unrooted delivery is in flight. Collect before the host waits or
+         * exits its drain, retaining pending operation handles and parked stacks.
+         * Invalid calls must neither collect nor change the caller's ticket. */
+        if ((progress == NEOCLR_SCHEDULER_IDLE || progress == NEOCLR_SCHEDULER_PENDING) &&
+            neoclr_gc_collect_v1(context, boundary)) return -3;
+        return progress;
+    }
     neoclr_socket_scope *scope = find_scope(context);
     if (scope->runnable_delivery == source) {
         // Runnable work has no independently consumable source result. Transfer
