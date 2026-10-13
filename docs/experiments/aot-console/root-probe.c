@@ -157,8 +157,10 @@ void neoclr_roots_discard_v1(neoclr_parked_roots *record) {
 
 #ifdef NEOCLR_NATIVE_GC
 /* Capture published logical frames, never machine-stack bytes or local values.
- * Allocation cannot collect, so saved frame/name addresses remain valid through
- * the copy. Output is published only after a complete owned snapshot is written. */
+ * Saved frames are active native stack records; names belong to the immutable
+ * image, not the managed heap. With a complete current-context boundary this
+ * single allocation may collect/retry. No managed intermediate survives across
+ * it. Publish output only after a complete owned snapshot has been written. */
 int32_t neoclr_stack_trace_capture_v1(int32_t skip, neoclr_aot_context *context,
     const neoclr_aot_text **output, const neoclr_aot_text *const *names, uint32_t count) {
     if (skip < 0 || !context || !output || !names) return 3;
@@ -184,7 +186,11 @@ int32_t neoclr_stack_trace_capture_v1(int32_t skip, neoclr_aot_context *context,
     }
     if (truncated) length += sizeof(marker) - 1;
     void *allocation = NULL;
-    int32_t status = neoclr_gc_allocate_v1(&context->text, 8 + length, NEOCLR_GC_TEXT, &allocation);
+    /* A host may capture an ancestor context while another context is active.
+     * Preserve that noncollecting path: it is not a current-context retry boundary. */
+    int32_t status = !head || head->context == context
+        ? neoclr_gc_allocate_rooted_v1(context, head, 8 + length, NEOCLR_GC_TEXT, &allocation)
+        : neoclr_gc_allocate_v1(&context->text, 8 + length, NEOCLR_GC_TEXT, &allocation);
     if (status) return status;
     neoclr_aot_text *text = allocation;
     text->length = length;

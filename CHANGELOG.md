@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-13
 
+- Allow native StackTrace capture to collect and retry its sole output allocation at an admitted rooted boundary. Preserve terminal exhaustion, foreign-context behavior and failure outputs; pressure/lifetime tests, fresh JIT/AOT consumers and the API snapshot pass locally. Other arena-only helpers remain noncollecting.
+
 - Update the GC benchmark website with the Windows wait/collector breakdown,
   matched JIT/AOT improvements, immutable raw evidence and preserved benchmark
   history. The complete site build and link checks pass; publication remains on hold.

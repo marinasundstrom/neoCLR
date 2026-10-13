@@ -16585,3 +16585,15 @@ qualification. Request and response deadline documentation now includes TLS work
 - **Next step proposed by assistant:** audit complete helper roots and integrate
   size-aware allocation/retry in a bounded helper before reducing collection frequency.
   Publication remains on hold; no collector policy change is implied by the wait fix.
+
+## 2026-10-13 — Runtime-wide GC performance
+
+The author directed continued GC work after Windows wait profiling and clarified
+that general runtime performance, rather than HTTP alone, is the target. The
+author subsequently requested continuing until a major improvement is reached.
+The assistant proposed allocation pressure, reference-heavy graphs, suspended
+operations and cleanup as complementary validation workloads. The first action
+audits StackTrace capture for rooted allocation retry; that is correctness
+groundwork, not a throughput claim. Dense graph lookup experiments remain under
+evaluation. See the [roadmap](platform-roadmap.md) and
+[capture audit](experiments/stack-trace/README.md).

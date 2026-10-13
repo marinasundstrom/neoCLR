@@ -93,8 +93,10 @@ prior transient result views. Suspended callers still expose arguments, locals, 
 snapshots and constructor/pending-result storage. A stack borrow's owner storage is already
 published by its active owning frame; a heap borrow recovers its allocation by range.
 No borrowed pointee is read without that owner. Native wrappers expose argument copies,
-and their services never collect: temporary UTF-8 pointers, output buffers and partially
-written objects therefore cannot be interrupted by this collector. After an allocation,
+and unaudited arena-only services never collect: temporary UTF-8 pointers, output
+buffers and partially written objects must not be interrupted by this collector.
+The explicitly audited stack-capture helper can retry its single output allocation
+at a complete boundary; see the helper audit below. After an allocation,
 its output reaches published storage before the next collection boundary. The compiler's
 existing byref/output and escape restrictions continue to apply.
 
@@ -512,3 +514,25 @@ payload survival, hole reuse without heap growth, tail trimming, exact reclamati
 counts/bytes and poisoning. Existing descriptor-failure, conditional owner, cycle,
 precise-boundary and retained-stack checks remain active. This is macOS ARM64
 validation, not refreshed Windows or AddressSanitizer evidence.
+
+
+## Collecting-helper audit — 2026-10-13
+
+Runtime performance work covers allocation-heavy, reference-heavy and asynchronous
+workloads, not only HTTP. Before changing native collection frequency, admit
+allocation-pressure collection only where every live reference is accounted for.
+The private rooted allocator's boundary identity check alone cannot prove this.
+
+| Helper family | Live native state across allocation | Admission |
+| --- | --- | --- |
+| Current stack capture | Active frame records and immutable image names; no managed intermediate | Single allocation may collect/retry with current-context complete roots or quiescent host |
+| Capture of ancestor context under a foreign frame | Frames outside the current-context boundary | Keep noncollecting allocation |
+| Arena-only text/object/array helpers | Caller operands, borrowed buffers and sometimes partially constructed outputs | Remain noncollecting; context-aware entry and temporary-root audits still needed |
+| Multi-allocation producers and native callbacks | Intermediate objects and externally retained values | Remain noncollecting; publish each intermediate before any collecting call |
+
+`native-gc-helper-test.c` forces capture retry in a 512-byte heap, verifies live
+payload and Fault preservation, genuine exhaustion, impossible snapshots, foreign
+context fallback and quiescent retry. Existing stack-capture tests cover truncation
+and owned snapshots after source frames return. The collection policy at compiler
+boundaries is unchanged. Broader collection pacing and collector replacement remain
+separate milestones, evaluated against general runtime workloads as well as HTTP.

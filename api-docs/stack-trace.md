@@ -17,7 +17,8 @@ Console.WriteLine(trace.ToString())
 | `ToString() -> string` | Returns the captured method names and IL instruction indexes. |
 
 Snapshots survive return and GC. Capture is bounded to 64 frames and 64 KiB UTF-8,
-with explicit truncation. Allocation exhaustion remains a terminal Fault. No local
+with explicit truncation. Native capture may first collect and retry its output
+allocation; unrecoverable allocation exhaustion remains a terminal Fault. No local
 values or arguments are retained. Source lines, structured frame access, native
 unwinding, cross-thread capture and suspended async callers are not implemented.
 Generated async-body names may appear. Native capture requires a matching development

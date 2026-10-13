@@ -1,5 +1,11 @@
 # neoCLR platform roadmap
 
+**Runtime-wide performance scope (author clarification, 2026-10-13):** optimize GC
+and other runtime components for general workloads. HTTP is an important consumer
+and benchmark, not the sole performance target. Include allocation pressure,
+reference-heavy live graphs, suspended operations and cleanup in validation;
+separate runtime gains from HTTP protocol/library improvements.
+
 **Windows wait attribution (2026-10-13):** [matched diagnostics and benchmarks](../benchmarks/http-scheduling/README.md#matched-windows-results--2026-10-13)
 identify unconditional scheduler sleeps as a major avoidable cost. Bounded socket
 readiness waits improve plain HTTP by 2.09–2.23× and JSON by 1.58–1.64× in paired

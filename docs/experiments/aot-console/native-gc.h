@@ -28,7 +28,10 @@ void neoclr_gc_profile_reset_v1(void);
 /* Explicit managed collection uses the current published root chain. */
 int32_t neoclr_gc_collect_managed_v1(neoclr_aot_context *, void *output);
 /* Private current logical-stack capture; names are immutable current-image text.
- * Caller supplies published roots. Returns owned text; never changes Fault state. */
+ * Caller supplies complete published roots. One output allocation may collect/retry
+ * when the top frame belongs to this context (or the host is quiescent). Capturing
+ * an ancestor context under a foreign top frame stays noncollecting. Returns owned
+ * text; output publishes only on success and Fault state is unchanged. */
 int32_t neoclr_stack_trace_capture_v1(int32_t skip, neoclr_aot_context *,
     const neoclr_aot_text **output, const neoclr_aot_text *const *names, uint32_t count);
 /* Private thread-affine strong handles for future host-held callbacks/buffers.

@@ -44,8 +44,10 @@ nonnegative skip count. The managed constructor skips its own frame. Interpreter
 execution supplies the current VM frames. Native builds use published logical root
 frames and an immutable image table of method names, requiring `--native-gc` and
 explicit `--bind-stack-trace` admission. The standard JIT CLI supplies that admission.
-Capture never scans machine-stack memory and allocation never collects in the native
-service; the returned text becomes ordinary managed storage. Invalid native inputs
+Capture never scans machine-stack memory. Native capture may collect and retry its
+single output allocation at a complete current-context boundary or in a quiescent
+host; ancestor-context capture beneath a foreign frame remains noncollecting.
+The returned text becomes ordinary managed storage. Invalid native inputs
 preserve the output pointer and Fault context. No stable hosting ABI is introduced.
 
 Original source names are preferred when present. A diagnostic-only decoder handles
@@ -81,3 +83,32 @@ revision alone is not the complete library provenance. Raven compiler code is
 A compiler gap observed during authoring remains deferred: spelling this class
 `sealed` caused RAV0611 at construction in the tested native compiler. The ordinary
 public class used here compiles and executes; no sealed-class fix is claimed.
+
+## Rooted allocation integration — 2026-10-13
+
+Capture is the first explicitly audited native helper to use size-aware allocation
+retry. Its saved frame pointers address active native stack records; method names
+are immutable image data. It has no managed intermediate allocation. The caller's
+complete published roots retain live managed values during a retry collection.
+The output is copied and published after successful allocation, with no collecting
+call between allocation and publication. Capture does not rerun after side effects.
+
+A recoverable capacity failure collects once and retries only the allocation.
+Impossible requests do not collect; a genuinely full live heap still reports the
+same terminal memory-limit Fault. Invalid arguments and failures preserve the
+output pointer and Fault snapshot. Nested foreign-context capture preserves the
+old noncollecting behavior because its active head is not this context's admitted
+retry boundary. No Raven lowering, Runtime Contract setting, metadata, native
+service signature or managed API changes are needed.
+
+This follows ordinary managed allocation semantics in the existing .NET comparison:
+collection may free unreachable storage before allocation fails. It does not relax
+Fault semantics or enable generational/concurrent collection. Other arena-only
+helpers remain noncollecting until individually audited. This slice makes no
+HTTP or general throughput claim; pressure and lifetime behavior are its criteria.
+
+Local qualification (2026-10-13): the native GC/root runner passes all 16
+executions, including the new pressure cases under sanitizers and profiling.
+Fresh ordinary and async StackTrace consumers built against the current SDK
+pass in JIT and AOT (four cases); the legacy native capture regression and API
+snapshot check also pass. These checks do not qualify other allocating helpers.
