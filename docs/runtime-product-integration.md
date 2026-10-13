@@ -45,7 +45,8 @@ archive target directories are retained where packaging requires them. The separ
 text/crypto static-library workspaces remain migration work, including preserving
 text LTO/size settings. This is not a completed source-layout or packaging migration. `src/jit_cli.rs`
 still launches the backend process; workspace membership alone does not create an
-in-process JIT service or a complete embedding API.
+in-process JIT service or a complete embedding API. The next library slice below
+provides the backend side of that boundary without changing the installed launcher.
 
 ## Native collector source ownership — 2026-10-13
 
@@ -137,6 +138,38 @@ support manifests does not link or enable it in ordinary hosts. Windows attachme
 support and a stable diagnostics ABI remain gaps. Existing profiler protocol and
 owner-thread snapshot publication are unchanged. No public API or website
 capability changes accompany this source relocation.
+
+## Backend library and hosting driver — 2026-10-13
+
+The backend now has a library target. Its executable is a thin adapter over
+`neoclr_aot_poc::run(Vec<OsString>)`, which accepts the existing backend arguments
+and returns a status or driver error. JIT and AOT use the same selection, verification,
+lowering and ownership code as before. `--jit-run` returns the guest status after
+native cleanup instead of calling `process::exit` inside the backend. Only the
+executable decides its process exit status. Guest faults still terminate the current
+invocation; this does not make faults recoverable inside managed code.
+
+This Rust entry point is an internal, provisional synchronous driver, not a stable
+managed API or language-neutral hosting ABI. It retains CLI stdout/stderr and artifact
+behavior. Calls serialize around native helper state; callback reentry is unsupported.
+Native host aborts still terminate the process. Code and helper-library ownership
+remain inside each invocation; no callback, task or code pointer may outlive it.
+There is no compilation cache, tiering or concurrent-session claim.
+
+The dependency direction remains backend → runtime; interpreter-only builds still
+exclude compiler dependencies. The installed runtime CLI still launches the backend
+process. Moving that CLI in-process requires a separate composition layer (or a
+shared runtime-core split), not a cyclic runtime → backend → runtime dependency.
+AOT remains a separate publishing entry point into the same backend library.
+This follows the runtime-service/compilation-layer separation in the .NET comparison
+above; implementation of an embedding surface is still incomplete.
+
+A hosting integration test invokes the library repeatedly, checks rejected writes
+preserve artifacts, compares library/CLI AOT bytes, exercises success/fault/success
+scalar JIT calls and rejects foreign targets. Existing scalar tests check interpreter,
+JIT and AOT result/fault parity. This first slice does not qualify repeated managed
+HTTP sessions inside one embedding process. Hosted macOS/Windows qualification is
+pending. Public execution defaults and website capabilities are unchanged.
 
 ## Memory management is a runtime service
 

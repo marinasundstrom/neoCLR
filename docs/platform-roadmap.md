@@ -8,7 +8,9 @@ macOS/Windows. The shared native collector and root-frame services now live unde
 and arena/context services under `runtime/native/memory`, with compatibility
 forwarding paths and GC/non-GC package relocation checks. Fault layout/rendering
 and opt-in POSIX diagnostics also have runtime-owned sources; remaining native
-services, JIT hosting and package consolidation follow. Memory management must permit future build-selected collectors and
+services and package consolidation follow. The JIT/AOT backend now exposes an
+internal synchronous library driver; installed CLI execution remains process-based
+until its composition/hosting boundary is integrated and qualified. Memory management must permit future build-selected collectors and
 constrained profiles without requiring tracing GC; no live collector swapping is
 planned. Alternate profiles remain future work with explicit lifetime/capability
 requirements. This integration direction complements the performance work below;

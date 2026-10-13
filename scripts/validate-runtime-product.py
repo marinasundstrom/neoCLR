@@ -47,6 +47,7 @@ def main():
         report['noticePackages'], report['noticeFiles'] = release.audit_notices(ROOT)
         run('build', ['cargo', 'build', '--locked', '--workspace'])
         run('cli', ['cargo', 'test', '--locked', '-p', 'neoclr', '--test', 'cli', 'cli_execution_selection'])
+        run('hosting', ['cargo', 'test', '--locked', '-p', 'neoclr-aot-poc', '--test', 'hosting'])
         run('execution', ['cargo', 'test', '--locked', '-p', 'neoclr-aot-poc', '--test', 'scalar'])
         if platform.system() == 'Darwin' and platform.machine() == 'arm64':
             run('compiled-roots', ['cargo', 'test', '--locked', '-p', 'neoclr-aot-poc', '--test', 'console', 'utf8_text_slices_preserve'])
