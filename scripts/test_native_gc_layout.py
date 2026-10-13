@@ -48,6 +48,6 @@ class NativeGcLayoutTests(unittest.TestCase):
             command, _ = phases.instrument(root, root, [str(base / 'native-gc.c'), str(base / 'root-probe.c')])
             for source in command[:2]:
                 output = root / (Path(source).stem + ('.obj' if windows else '.o'))
-                flags = ['/c', '/Fo:' + str(output)] if windows else ['-c', '-o', str(output)]
+                flags = ['/c', '/Fo' + str(output)] if windows else ['-c', '-o', str(output)]
                 result = subprocess.run(cc + flags + [source], cwd=root, capture_output=True, text=True, timeout=60)
                 self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
