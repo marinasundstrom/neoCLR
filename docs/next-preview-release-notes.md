@@ -37,8 +37,10 @@ SDK prerequisites described in the [package procedure](experiments/raven-target/
 - **HTTP, TLS and JSON:** asynchronous streams compose through managed `SslStream`
   and shared certificate/security foundations. The SSL consumer checks HTTPS
   nested-object exchange, and separate failure cases cover rejection/recovery,
-  deadlines and cancellation. Qualification is recorded per platform and mode;
-  local success does not establish Windows success.
+  deadlines and cancellation. These checks pass on macOS ARM64 and Windows x64
+  in interpreter, JIT and AOT modes. Windows also passes 12 independent TLS 1.2/1.3
+  interoperability cases. This qualifies the tested applications and configurations,
+  not arbitrary native programs.
 - **SQL mapping:** the optional PostgreSQL library supports query mapping with plain
   positional values or named parameter objects. The shared mapper takes a
   connection and statement; PostgreSQL placeholder handling belongs to its provider.

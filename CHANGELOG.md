@@ -8,6 +8,10 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-13
 
+- Review draft release notes against the completed macOS ARM64 and Windows x64
+  HTTPS qualification; state tested execution modes and independent TLS
+  interoperability coverage without implying publication or unrestricted support.
+
 - Align private Windows AOT heap admission with the shared native HTTP build's
   configured byte budget instead of silently rejecting heaps above 1 MiB. Preserve
   guard pages and ownership, add 8/32 MiB lifecycle coverage to the Windows HTTP
