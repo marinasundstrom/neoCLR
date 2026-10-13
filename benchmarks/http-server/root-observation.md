@@ -118,3 +118,19 @@ and [JSON](root-observation-streaming-json-profile-20261013.json) runs validate 
 with zero collector failures. Peak arena extents are 13,216 / 19,672 bytes, matching
 the prior stress-policy fixture evidence. The optimization reduces root observation
 work rather than the number of allocations or collection boundaries.
+
+## Windows qualification in progress
+
+The Windows check exposed a profiler-only portability gap: `NEOCLR_GC_PROFILE`
+used POSIX `clock_gettime` unconditionally. Windows now measures collection intervals
+with `QueryPerformanceCounter` and a per-thread cached frequency; macOS retains
+`CLOCK_MONOTONIC`. Both report nanoseconds and the same histogram/accounting contract.
+This follows the Windows timing basis used by .NET `Stopwatch`, as described by
+[Microsoft's high-resolution timestamp guidance](https://learn.microsoft.com/en-us/windows/win32/sysinfo/acquiring-high-resolution-time-stamps)
+(retrieved 2026-10-13). Whole seconds are separated before converting remaining ticks
+to nanoseconds to avoid multiplying the full counter delta by a billion. Diagnostic
+timing remains opt-in; no clock calls are added to ordinary collection builds.
+
+Windows socket contracts and uninstrumented GC/admission checks passed before this
+fix. Profiler-enabled and malformed-root checks are being rerun; HTTP JIT/AOT
+qualification is separate. No Windows throughput improvement is claimed yet.

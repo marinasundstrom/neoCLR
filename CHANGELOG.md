@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-13
 
+- Fix Windows native GC profiling: use QueryPerformanceCounter for monotonic collection intervals instead of the unavailable POSIX clock_gettime. Normal non-profiled builds retain no timing overhead; Windows profiler qualification is being rerun.
+
 - Enable MSVC C11 atomics in the Windows GC contract runner, matching the existing native socket build; the first CI attempt stopped before executing GC tests because this compiler flag was absent.
 
 - Add Windows CI coverage for native collector, rooted allocation admission and malformed root descriptors, including probe-only builds. The shared validation controller also supports macOS; Windows qualification results are pending.

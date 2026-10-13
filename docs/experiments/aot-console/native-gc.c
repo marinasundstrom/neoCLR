@@ -5,8 +5,13 @@
 #include <string.h>
 #include <stdatomic.h>
 #ifdef NEOCLR_GC_PROFILE
-#include <time.h>
 #include <stdlib.h>
+#ifdef _WIN32
+#define WIN32_LEAN_AND_MEAN
+#include <windows.h>
+#else
+#include <time.h>
+#endif
 #endif
 static _Thread_local neoclr_gc_profile profile;
 neoclr_gc_profile neoclr_gc_profile_v1(void) { return profile; }
@@ -537,14 +542,31 @@ invalid_descriptor:
 int32_t neoclr_gc_collect_conditional_v1(neoclr_aot_context *context,
     const neoclr_probe_frame *head, neoclr_gc_conditional_root *conditional, uint32_t count) {
 #ifdef NEOCLR_GC_PROFILE
+#ifdef _WIN32
+    static _Thread_local LARGE_INTEGER frequency;
+    LARGE_INTEGER before, after;
+    if (!frequency.QuadPart &&
+        (!QueryPerformanceFrequency(&frequency) || frequency.QuadPart <= 0)) abort();
+    if (!QueryPerformanceCounter(&before)) abort();
+#else
     struct timespec before, after;
     if (clock_gettime(CLOCK_MONOTONIC, &before)) abort();
 #endif
+#endif
     int32_t status = collect_conditional(context, head, conditional, count);
 #ifdef NEOCLR_GC_PROFILE
+#ifdef _WIN32
+    if (!QueryPerformanceCounter(&after) || after.QuadPart < before.QuadPart) abort();
+    uint64_t ticks = (uint64_t)(after.QuadPart - before.QuadPart);
+    uint64_t hz = (uint64_t)frequency.QuadPart;
+    /* Split whole seconds before scaling to avoid overflowing ticks * 1e9. */
+    uint64_t ns = (ticks / hz) * UINT64_C(1000000000) +
+        (uint64_t)((double)(ticks % hz) * 1000000000.0 / (double)hz);
+#else
     if (clock_gettime(CLOCK_MONOTONIC, &after)) abort();
     uint64_t ns = (uint64_t)((int64_t)(after.tv_sec - before.tv_sec) * INT64_C(1000000000)
                            + after.tv_nsec - before.tv_nsec);
+#endif
     unsigned bucket = 0;
     for (uint64_t remaining = ns; remaining > 1; remaining >>= 1) bucket++;
     profile.pause_buckets[bucket]++;
