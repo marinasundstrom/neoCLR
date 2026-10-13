@@ -1,0 +1,14 @@
+   Compiling neoclr-aot-poc v0.0.0 (/Users/robert/Projects/neoclr/tools/aot-poc)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 11.97s
+     Running tests/console.rs (target/debug/deps/console-dafeb0f53eda77bd)
+
+running 6 tests
+test rooted_boxed_int32_display_matches_interpreter ... ok
+test rooted_string_intern_executes_and_retains_identity ... ok
+test rooted_integer_formatting_matches_interpreter ... ok
+test rooted_native_preferences_execute_and_reclaim ... ok
+test rooted_object_construction_preserves_arguments_and_receiver ... ok
+test rooted_byte_arrays_bounds_borrows_and_faults_match_interpreter ... ok
+
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 153 filtered out; finished in 5.71s
+

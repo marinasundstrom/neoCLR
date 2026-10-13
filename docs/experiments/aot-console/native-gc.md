@@ -835,3 +835,9 @@ a constructor, then forces callback-binding collection and reads its reference a
 the bound receiver; the non-GC/interpreter controls
 return the same result. This closes the named intern/object helper audit, not the
 separate scheduler-idle or managed pacing qualification.
+
+Intern/object qualification: all 32 local macOS ARM64 and hosted Windows x64
+GC/root executions pass, along with Windows socket/package checks and the local
+compiled consumers described above. The current hosted macOS job remains queued;
+the preceding preference job was cancelled without steps. See [retained evidence](../../validation/runtime-product/native-object-lifetimes/README.md)
+for exact revision, commands, hashes and scope.

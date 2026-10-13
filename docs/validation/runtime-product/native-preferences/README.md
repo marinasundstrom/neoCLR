@@ -15,3 +15,7 @@ resolution and a local toolchain-path typo were corrected before the retained ru
 [Hosted Windows run 38452171576](https://github.com/marinasundstrom/neoCLR/actions/runs/38452171576) passes at `2f61c085f5ffe960cca34f3480be7f226fe415a5`: all 30 GC/root executions, socket and relocated-package checks on Windows x64. Reports retain source hashes and command provenance. Local macOS ARM64 validation is recorded above. The hosted macOS job remained queued for a runner when this evidence was saved; the overall hosted workflow is not yet qualified. No fresh managed Windows/JIT/HTTP or Windows ARM64 matrix is claimed. Linux culture implementation remains
 unsupported and explicitly diagnosed; this does not claim Linux ARM64 support or
 change public managed contracts or collection pacing.
+
+Follow-up: the hosted macOS job subsequently ended cancelled without running any
+steps. It did not produce qualification. The next intern/object run and its local
+macOS/hosted Windows evidence are recorded [here](../native-object-lifetimes/README.md).
