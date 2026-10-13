@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-13
 
+- Enable MSVC C11 atomics in the Windows GC contract runner, matching the existing native socket build; the first CI attempt stopped before executing GC tests because this compiler flag was absent.
+
 - Add Windows CI coverage for native collector, rooted allocation admission and malformed root descriptors, including probe-only builds. The shared validation controller also supports macOS; Windows qualification results are pending.
 
 - Confirm the native root-observation optimization on newer streaming HTTP fixtures: five-round AOT comparisons show 27.5% plain-text and 30.4% JSON gains with 768 validated responses. Retain separate evidence and add an explicit AOT-only comparison mode; newer-fixture JIT qualification remains open.

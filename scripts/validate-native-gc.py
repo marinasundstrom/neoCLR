@@ -34,7 +34,7 @@ def main():
     try:
         report['revision'] = run('revision', ['git', '-C', ROOT, 'rev-parse', 'HEAD'])
         if windows:
-            cc = ['cl', '/nologo', '/W4', '/WX', '/std:c11', '/O2', '/MT']
+            cc = ['cl', '/nologo', '/W4', '/WX', '/std:c11', '/experimental:c11atomics', '/O2', '/MT']
         elif platform.system() == 'Darwin':
             clang = run('clang', ['xcrun', '--sdk', 'macosx', '--find', 'clang'])
             sdk = run('sdk', ['xcrun', '--sdk', 'macosx', '--show-sdk-path'])
