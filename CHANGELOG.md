@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-13
 
+- Protect native string-intern inputs during collecting allocation retry. Preserve intern identity, quotas, entry-reset lifetime and the noncollecting raw helper. Add pressure, exhaustion and generated-consumer coverage; local macOS GC/root qualification passes. Windows qualification follows on the focused platform gate. No public API or collection-pacing change.
+
 - Add rooted native-GC output allocation for captured system-culture preferences and the pinned time-zone database version. Keep native snapshots/static bytes alive through retry, preserve noncollecting raw/non-GC entry points and reject unsupported culture platforms explicitly instead of assuming macOS. All 30 GC/root executions pass locally on macOS ARM64 and in hosted Windows x64; the generated GC/non-GC consumer passes locally, and Windows socket/package gates pass. Retain the evidence; hosted macOS qualification remains queued for a runner. No public API or pacing change.
 
 - Record the author’s platform-abstraction proposal and an incremental design direction based on existing OS boundaries, with a .NET PAL comparison, ownership/capability contracts, tradeoffs and platform validation needs. Record Linux ARM64 as an explicit future target, separating OS services from CPU/ABI qualification and packaging. A general PAL and Linux ARM64 qualification remain future work; current GC/admission priorities are unchanged.

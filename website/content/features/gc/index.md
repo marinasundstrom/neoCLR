@@ -109,3 +109,7 @@ text conversion. The development POSIX file-input adapter can retry final manage
 allocation after the file is closed. Culture and time-zone text producers retain
 native data while retrying their output allocation. Broader collection pacing remains experimental;
 see the [allocation benchmark and qualification](/benchmarks/gc/#allocation-throughput-2026-10-13).
+
+Development builds also preserve string-intern inputs through allocation retry,
+including pool identity and entry-reset lifetime. This does not change the public
+API or enable general collection pacing.

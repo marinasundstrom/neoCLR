@@ -637,8 +637,8 @@ int32_t neoclr_gc_collect_conditional_v1(neoclr_aot_context *context,
 }
 neoclr_gc_statistics neoclr_gc_statistics_v1(void) { return statistics; }
 
-int32_t neoclr_string_intern_v1(const neoclr_aot_text *text, neoclr_aot_text_arena *arena,
-                               const neoclr_aot_text **output) {
+static int32_t string_intern(const neoclr_aot_text *text, neoclr_aot_text_arena *arena,
+                               const neoclr_aot_text **output, int rooted) {
     if (!text || !output || !blocks_valid(arena)) return 3;
     uint64_t count = 0, bytes = 0;
     for (uint64_t at = 0; at < arena->used;) {
@@ -658,12 +658,26 @@ int32_t neoclr_string_intern_v1(const neoclr_aot_text *text, neoclr_aot_text_are
     }
     if (count >= 4096 || text->length > UINT64_C(1048576) - bytes) return 10;
     void *entry;
-    int32_t status = neoclr_gc_allocate_v1(arena,8,NEOCLR_GC_INTERN,&entry);
+    int32_t status;
+    if (rooted) {
+        const neoclr_probe_frame *head = neoclr_root_probe_head_v1();
+        neoclr_aot_context *context = head ? (neoclr_aot_context *)head->context : NULL;
+        if (!context || &context->text != arena) return 3;
+        const void *owner = text;
+        status = neoclr_gc_allocate_rooted_values_v1(context, head, &owner, 1, 8, NEOCLR_GC_INTERN, &entry);
+    } else {
+        status = neoclr_gc_allocate_v1(arena,8,NEOCLR_GC_INTERN,&entry);
+    }
     if (status) return status;
     memcpy(entry,&text,8);
     *output = text;
     return 0;
 }
+
+int32_t neoclr_string_intern_v1(const neoclr_aot_text *text, neoclr_aot_text_arena *arena,
+    const neoclr_aot_text **output) { return string_intern(text, arena, output, 0); }
+int32_t neoclr_string_intern_rooted_v1(const neoclr_aot_text *text, neoclr_aot_text_arena *arena,
+    const neoclr_aot_text **output) { return string_intern(text, arena, output, 1); }
 
 /* Managed GC.Collect is available independently of runtime suspension. */
 int32_t neoclr_gc_collect_managed_v1(neoclr_aot_context *c, void *out) {

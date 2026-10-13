@@ -6984,3 +6984,37 @@ int main(void) {
         assert!(result.status.success(), "{result:?}");
     }
 }
+
+#[test]
+#[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+fn rooted_string_intern_executes_and_retains_identity() {
+    let dir = Temp::new();
+    let service = ".function neoCLR.Runtime.StringIntern(String value) -> String\n.methodimpl InternalCall\n.end\n";
+    let seed = neoclr::assemble(&format!(".module System\n.references ()\n{service}")).unwrap();
+    let source = format!(".module Intern\n{service}\n.function Calculate() -> Int32\nldstr \"hello\"\ncall neoCLR.Runtime.StringIntern(String)\npop\nldstr \"hello\"\ncall neoCLR.Runtime.StringIntern(String)\npop\nldc.i4 42\nret\n.end\n");
+    let r = compile_source(&dir, &seed, &source, &["--compile-system", "--reference-arena", "--native-gc", "--bind-utf8-text"], false);
+    assert!(r.status.success(), "{}", String::from_utf8_lossy(&r.stderr));
+    let base = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../docs/experiments/aot-console");
+    fs::write(dir.0.join("host.c"), r#"
+#include "native-gc.h"
+int main(void) {
+    uint64_t heap[32]={0};
+    neoclr_aot_context ctx={.text={(unsigned char*)heap,sizeof(heap),0}};
+    int32_t result=0;
+    if(neoclr_entry_v4(0,&result,&ctx) || result!=42 || neoclr_root_probe_head_v1()) return 1;
+    if(neoclr_gc_collect_v1(&ctx,NULL) || ctx.text.used!=40) return 2;
+    if(neoclr_gc_entry_check_v1(&ctx)) return 3;
+    ctx.text.used=0;
+    return neoclr_gc_collect_v1(&ctx,NULL);
+}
+"#).unwrap();
+    let symbols = Command::new("nm").arg(dir.0.join("app.o")).output().unwrap();
+    assert!(String::from_utf8_lossy(&symbols.stdout).contains("neoclr_string_intern_rooted_v1"));
+    let r = Command::new("clang").args(["-std=c11", "-Wall", "-Wextra", "-Werror", "-DNEOCLR_NATIVE_GC", "-I"])
+        .arg(&base).arg(dir.0.join("host.c")).arg(base.join("native-gc.c")).arg(base.join("root-probe.c"))
+        .arg(base.join("../aot-fault-details/render.c")).arg(dir.0.join("app.o"))
+        .arg("-o").arg(dir.0.join("host")).output().unwrap();
+    assert!(r.status.success(), "{}", String::from_utf8_lossy(&r.stderr));
+    let r = Command::new(dir.0.join("host")).output().unwrap();
+    assert!(r.status.success(), "{r:?}");
+}

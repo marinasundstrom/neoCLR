@@ -41,7 +41,7 @@ def main():
             cc = [clang, '-isysroot', sdk, '-std=c11', '-O2', '-Wall', '-Wextra', '-Werror', '-fsanitize=undefined,bounds']
         else:
             raise ValueError('Requires Windows or macOS')
-        names = ['native-gc-test', 'native-gc-base-test', 'native-gc-format-test', 'native-gc-primitive-test', 'native-gc-reference-test', 'native-gc-borrowed-test', 'native-gc-utf8-test', 'native-gc-unicode-test', 'native-gc-arguments-test', 'native-gc-producer-test', 'native-gc-preference-test', 'native-gc-admission-test', 'native-gc-allocation-test', 'native-gc-helper-test', 'native-gc-text-helper-test', 'native-gc-index-test', 'native-gc-dense-test', 'native-gc-pass-test', 'native-gc-profile-test']
+        names = ['native-gc-test', 'native-gc-intern-test', 'native-gc-base-test', 'native-gc-format-test', 'native-gc-primitive-test', 'native-gc-reference-test', 'native-gc-borrowed-test', 'native-gc-utf8-test', 'native-gc-unicode-test', 'native-gc-arguments-test', 'native-gc-producer-test', 'native-gc-preference-test', 'native-gc-admission-test', 'native-gc-allocation-test', 'native-gc-helper-test', 'native-gc-text-helper-test', 'native-gc-index-test', 'native-gc-dense-test', 'native-gc-pass-test', 'native-gc-profile-test']
         text_crate = ROOT / 'tools/aot-native-text'
         run('unicode-library', ['cargo', 'build', '--locked', '--release', '--features', 'time-zone-rules', '--manifest-path', text_crate / 'Cargo.toml'], timeout=300)
         text_library = text_crate / 'target/release' / ('neoclr_aot_native_text.lib' if windows else 'libneoclr_aot_native_text.a')

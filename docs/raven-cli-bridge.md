@@ -9279,7 +9279,7 @@ remain separate qualification work. See neoCLR's
 
 The neoCLR native backend now selects rooted concat/join, UTF-8 slice,
 Int32/Int64/UInt64 formatting, primitive-array allocation/reservation and managed
-UTF-8 encode/decode, reference-array construction, lexical path, ordinal replacement and Unicode construction and process-argument and POSIX file-input, culture-name and time-zone-version helpers for
+UTF-8 encode/decode, reference-array construction, lexical path, ordinal replacement and Unicode construction and process-argument and POSIX file-input, culture-name, time-zone-version and string-intern helpers for
 `--native-gc`, retaining noncollecting symbols for non-GC code. Temporary inputs
 are protected during a single allocation retry. This is native codegen/runtime
 integration: Raven Runtime Contract configuration, bridge representation, metadata

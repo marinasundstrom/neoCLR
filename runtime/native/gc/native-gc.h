@@ -144,6 +144,8 @@ neoclr_gc_statistics neoclr_gc_statistics_v1(void);
 /* Per-entry strong String pool: 4096 entries / 1 MiB UTF-8 payload, matching
  * interpreter defaults. Hits remain available at quota. No collection/reentry.
  * Failure preserves output; reset at the next admitted entry releases the pool. */
+int32_t neoclr_string_intern_rooted_v1(const neoclr_aot_text *, neoclr_aot_text_arena *,
+    const neoclr_aot_text **);
 int32_t neoclr_string_intern_v1(const neoclr_aot_text *text, neoclr_aot_text_arena *arena,
                                const neoclr_aot_text **output);
 /* Private entry-pump reader: the owner must validate its saved suspension boundary. */

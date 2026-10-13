@@ -806,3 +806,15 @@ short test. All 30 local macOS ARM64 and hosted Windows x64 GC/root checks pass,
 alongside local GC/non-GC generated execution and Windows socket/package checks.
 The hosted macOS job remains queued; this is not a complete hosted matrix. See
 [retained evidence](../../validation/runtime-product/native-preferences/README.md).
+
+String interning follow-up (2026-10-13): generated GC bindings select a rooted
+helper that explicitly retains the input while allocating its pool entry. Existing
+entries remain collector roots until the admitted entry reset; equal byte strings
+(including embedded NUL) return the existing identity. Lookup and quota failure
+need no allocation boundary; a new entry requires the matching active context.
+Allocation initializes the entry before publication without callbacks. The old raw
+helper remains noncollecting. This preserves the CLR-style intern identity/lifetime
+principle within neoCLR's existing bounded, per-entry pool rather than widening it
+to a process-global pool. Quotas and fault behavior are unchanged. Forced-pressure
+tests check a source absent from caller roots, retained live exhaustion, unchanged
+failure outputs, duplicate lookup and entry reset. General pacing remains disabled.

@@ -531,7 +531,7 @@ pub(crate) fn compile_into(
             (&d.string_compare_ignore_case, "neoclr_string_compare_ignore_case_v1", vec![types::I64, types::I64, types::I64]),
             (&d.string_hash_ordinal, "neoclr_string_hash_ordinal_v1", vec![types::I64, types::I64]),
             (&d.string_hash_ignore_case, "neoclr_string_hash_ignore_case_v1", vec![types::I64, types::I64]),
-            (&d.string_intern, "neoclr_string_intern_v1", vec![types::I64, types::I64, types::I64]),
+            (&d.string_intern, "neoclr_string_intern_rooted_v1", vec![types::I64, types::I64, types::I64]),
             (&d.string_byte_count, "neoclr_string_byte_count_v1", vec![types::I64, types::I64]),
             (&d.string_slice_graphemes, if d.native_gc { "neoclr_string_slice_graphemes_rooted_v1" } else { "neoclr_string_slice_graphemes_v1" }, vec![types::I64, types::I32, types::I32, types::I64, types::I64]),
             (&d.string_slice_utf8, if d.native_gc { "neoclr_string_slice_utf8_rooted_v1" } else { "neoclr_string_slice_utf8_v1" }, vec![types::I64, types::I32, types::I32, types::I64, types::I64]),
