@@ -75,7 +75,7 @@ def main():
         result = run([out / 'host-stack.exe'], 'stack-execute')
         stack = json.loads(result.stdout)
         if (result.stderr or stack.get('passed') is not True
-                or stack.get('smallStackRejected') is not True or stack.get('fiberRejected') is not True
+                or stack.get('smallStackRejected') is not True or stack.get('fiberAccepted') is not True
                 or not 1 < stack.get('depth512KiB', 0) < stack.get('depth1MiB', 0) < 64):
             raise ValueError('Stack acceptance did not complete boundary and return checks')
         report['stackExecution'] = stack
