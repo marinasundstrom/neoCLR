@@ -8,6 +8,13 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-13
 
+- Add a reproducible Preview 14 HTTP server benchmark using the same Raven
+  assembly in interpreter/JIT and native AOT, with package hash checks, rotated
+  rounds, validated responses and separate startup timing. Record 576 successful
+  requests across 18 processes on macOS ARM64; retain raw latency samples and
+  provenance. Label the short run exploratory because desktop/indexing load was
+  active; JSON/database and controlled-host performance remain unmeasured.
+
 - Publish Preview 14 with exact qualified macOS ARM64/Windows x64 bundles,
   separately packaged matching SDK/VSIX and notices, source qualification archive,
   checksums and per-revision evidence. Verify all 11 uploaded asset digests and the
