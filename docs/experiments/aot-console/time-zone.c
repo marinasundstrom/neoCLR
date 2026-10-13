@@ -17,15 +17,23 @@ int32_t neoclr_time_zone_offset_v1(const neoclr_aot_text *id, int64_t ticks, int
     *output = neoclr_tz_offset_v1(id->bytes, (size_t)id->length, ticks);
     return 0;
 }
-int32_t neoclr_time_zone_version_v1(neoclr_aot_text_arena *arena, const neoclr_aot_text **output) {
+static int32_t time_zone_version(neoclr_aot_text_arena *arena, const neoclr_aot_text **output, int rooted) {
     if (!arena || !output) return 3;
     size_t length = 0;
     const unsigned char *bytes = neoclr_tz_version_v1(&length);
     if (!bytes) return 3;
     neoclr_aot_text *result;
-    int32_t status = neoclr_text_allocate_v1(arena, length, &result);
+    int32_t status = (rooted ? neoclr_text_allocate_rooted_values_v1(arena, length, NULL, 0, &result) : neoclr_text_allocate_v1(arena, length, &result));
     if (status) return status;
     memcpy(result->bytes, bytes, length);
     *output = result;
     return 0;
+}
+
+int32_t neoclr_time_zone_version_v1(neoclr_aot_text_arena *arena, const neoclr_aot_text **output) {
+    return time_zone_version(arena, output, 0);
+}
+
+int32_t neoclr_time_zone_version_rooted_v1(neoclr_aot_text_arena *arena, const neoclr_aot_text **output) {
+    return time_zone_version(arena, output, 1);
 }

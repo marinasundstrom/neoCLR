@@ -41,11 +41,11 @@ def main():
             cc = [clang, '-isysroot', sdk, '-std=c11', '-O2', '-Wall', '-Wextra', '-Werror', '-fsanitize=undefined,bounds']
         else:
             raise ValueError('Requires Windows or macOS')
-        names = ['native-gc-test', 'native-gc-base-test', 'native-gc-format-test', 'native-gc-primitive-test', 'native-gc-reference-test', 'native-gc-borrowed-test', 'native-gc-utf8-test', 'native-gc-unicode-test', 'native-gc-arguments-test', 'native-gc-producer-test', 'native-gc-admission-test', 'native-gc-allocation-test', 'native-gc-helper-test', 'native-gc-text-helper-test', 'native-gc-index-test', 'native-gc-dense-test', 'native-gc-pass-test', 'native-gc-profile-test']
+        names = ['native-gc-test', 'native-gc-base-test', 'native-gc-format-test', 'native-gc-primitive-test', 'native-gc-reference-test', 'native-gc-borrowed-test', 'native-gc-utf8-test', 'native-gc-unicode-test', 'native-gc-arguments-test', 'native-gc-producer-test', 'native-gc-preference-test', 'native-gc-admission-test', 'native-gc-allocation-test', 'native-gc-helper-test', 'native-gc-text-helper-test', 'native-gc-index-test', 'native-gc-dense-test', 'native-gc-pass-test', 'native-gc-profile-test']
         text_crate = ROOT / 'tools/aot-native-text'
-        run('unicode-library', ['cargo', 'build', '--locked', '--release', '--manifest-path', text_crate / 'Cargo.toml'], timeout=300)
+        run('unicode-library', ['cargo', 'build', '--locked', '--release', '--features', 'time-zone-rules', '--manifest-path', text_crate / 'Cargo.toml'], timeout=300)
         text_library = text_crate / 'target/release' / ('neoclr_aot_native_text.lib' if windows else 'libneoclr_aot_native_text.a')
-        inputs = [BASE / 'file-input.c', ROOT / 'tools/native/entry-arguments.c', BASE / 'string-unicode.c', text_crate / 'Cargo.toml', text_crate / 'Cargo.lock', *sorted((text_crate / 'src').glob('*.rs')), *sorted((ROOT / 'runtime/native').rglob('*.[ch]')), Path(__file__).resolve(), *BASE.glob('*.h'), BASE / 'native-gc.c', BASE / 'root-probe.c', BASE / 'text-arena.c',
+        inputs = [BASE / 'system-culture.c', BASE / 'time-zone.c', BASE / 'file-input.c', ROOT / 'tools/native/entry-arguments.c', BASE / 'string-unicode.c', text_crate / 'Cargo.toml', text_crate / 'Cargo.lock', *sorted((text_crate / 'src').glob('*.rs')), *sorted((ROOT / 'runtime/native').rglob('*.[ch]')), Path(__file__).resolve(), *BASE.glob('*.h'), BASE / 'native-gc.c', BASE / 'root-probe.c', BASE / 'text-arena.c',
                   BASE / 'root-validation-test.c', BASE.parent / 'aot-fault-details/fault-details.h',
                   *[BASE / (name + '.c') for name in names]]
         report['inputs'] = {str(p.relative_to(ROOT)): hashlib.sha256(p.read_bytes()).hexdigest() for p in inputs}
@@ -58,6 +58,10 @@ def main():
                 sources.append(BASE / 'native-gc.c')
             if source in ['native-gc-text-helper-test', 'native-gc-format-test', 'native-gc-primitive-test', 'native-gc-reference-test', 'native-gc-borrowed-test', 'native-gc-utf8-test']:
                 sources.append(BASE / 'text-arena.c')
+            if source == 'native-gc-preference-test':
+                sources.extend([BASE / 'text-arena.c', BASE / 'system-culture.c', BASE / 'time-zone.c', text_library])
+                if not windows:
+                    sources.extend(['-framework', 'CoreFoundation'])
             if source == 'native-gc-producer-test':
                 sources.append(BASE / 'text-arena.c')
             if source == 'native-gc-arguments-test':

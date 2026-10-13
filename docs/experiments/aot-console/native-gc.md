@@ -600,7 +600,8 @@ Remaining admission audit:
 | POSIX file input | Close descriptor before allocation; keep malloc-owned bytes alive; never replay read | Generated GC calls use rooted final decode; Windows binding remains excluded |
 | Socket/TLS/crypto adapters | No managed allocation within adapters; preserve caller buffers, host roots and native resource ownership | Noncollecting by contract; no allocation retry to migrate |
 | PostgreSQL | Managed Raven protocol over socket/encoding APIs; no native SQL allocator | Uses managed roots and underlying socket ownership |
-| Culture/time-zone text and intern/object helpers | Audit native preference snapshots, static bytes and intermediate objects | Remaining allocation audit |
+| Culture/time-zone text | Retain captured native preferences/static version bytes through sole output allocation | Generated GC calls use rooted retry |
+| Intern/object helpers | Audit intermediate managed values | Remaining allocation audit |
 | Constructors / reflection invocation | Retain initialized receiver and every native result scratch until publication | Existing explicit generated roots; admission migration still needed |
 
 These are coverage gaps, not permanent lifetime semantics. The existing .NET
@@ -787,3 +788,18 @@ on macOS ARM64 and Windows x64. The shared native-buffer decoder runs on both;
 the counted POSIX file test runs only on macOS. Two local compiled file tests also
 pass. [Retained evidence](../../validation/runtime-product/native-producers/README.md)
 records the exact revision and platform scope.
+
+Native preference follow-up (2026-10-13): generated GC calls use rooted culture-name
+and time-zone-version output allocation. Culture lookup retains its Windows native
+buffer or CoreFoundation snapshot through conversion and releases it on allocation
+failure and success. No host query is repeated as part of allocation retry. The
+pinned time-zone version borrows static native bytes. Existing native/non-GC entries
+remain noncollecting, and lookup/offset APIs remain allocation-free. Linux culture
+support requires an explicit implementation rather than falling through to macOS.
+This preserves the .NET-style separation between host preference acquisition and
+managed result ownership; private UTF-8 storage and rooted helper symbols are
+neoCLR implementation details. Generated objects require matching native helpers.
+Tests use real host preferences and the pinned time-zone library, force exhaustion
+and retry, reject missing/foreign boundaries, preserve outputs and reclaim results.
+The preference comparison assumes no concurrent user preference change during the
+short test. Platform qualification is pending.

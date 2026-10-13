@@ -59,8 +59,8 @@ path/replacement tests passing. Unicode casing, grapheme access and sequence con
 results through retry. Process-argument construction now roots its partial array and native decode
 scratch is kept stable. POSIX file input now retries only final decoding after closing the descriptor.
 Socket/TLS/crypto adapters do not allocate managed results; PostgreSQL uses the
-managed socket/encoding layers. Culture/time-zone and intern/object helpers remain
-to audit (see the producer ownership inventory). Then qualify a managed pacing policy across execution modes before promotion.
+managed socket/encoding layers. Culture/time-zone producers now retain native snapshots through rooted output
+allocation. Intern/object helpers remain to audit (see the producer ownership inventory). Then qualify a managed pacing policy across execution modes before promotion.
 The author also proposed a [platform abstraction layer](platform-direction.md#platform-abstraction-direction--2026-10-13); evolve existing OS boundaries incrementally without replacing this milestone. Linux ARM64 is an explicit future expansion target; separate OS and CPU/ABI concerns without claiming current support.
 The author additionally proposed generations to reduce collection pressure/latency;
 [the next architecture evaluation](runtime-gc.md#generational-collection-evaluation--2026-10-13)

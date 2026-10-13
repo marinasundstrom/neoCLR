@@ -6937,3 +6937,50 @@ int main(int argc,char **argv) {
         assert_eq!(r.stdout,expected.stdout);assert!(r.stderr.is_empty());
     }
 }
+
+#[test]
+#[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+fn rooted_native_preferences_execute_and_reclaim() {
+    let seed = neoclr::assemble(&format!(".module System\n.references ()\n{}\n{}",
+        include_str!("../../../runtime/neoCLR/Runtime/SystemCultureName.neoil"),
+        include_str!("../../../runtime/neoCLR/Runtime/TimeZones.neoil"))).unwrap();
+    for gc in [false, true] {
+        let dir = Temp::new();
+        let source = ".module Preferences\n.function Calculate() -> Int32\ncall neoCLR.Runtime.SystemCultureName()\npop\ncall neoCLR.Runtime.TimeZoneDatabaseVersion()\npop\nldc.i4 42\nret\n.end\n";
+        let mut flags = vec!["--compile-system", "--reference-arena", "--bind-system-culture", "--bind-time-zone-rules"];
+        if gc { flags.push("--native-gc"); }
+        let source = format!("{source}\n{}\n{}", include_str!("../../../runtime/neoCLR/Runtime/SystemCultureName.neoil"), include_str!("../../../runtime/neoCLR/Runtime/TimeZones.neoil"));
+        let result = compile_source(&dir, &seed, &source, &flags, false);
+        assert!(result.status.success(), "{}", String::from_utf8_lossy(&result.stderr));
+        let base = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../docs/experiments/aot-console");
+        let symbols = Command::new("nm").arg(dir.0.join("app.o")).output().unwrap();
+        assert!(symbols.status.success());
+        for name in ["system_culture_name", "time_zone_version"] {
+            assert!(String::from_utf8_lossy(&symbols.stdout).contains(&format!("neoclr_{name}{}_v1", if gc { "_rooted" } else { "" })));
+        }
+        fs::write(dir.0.join("host.c"), r#"
+#include "native-gc.h"
+int main(void) {
+    uint64_t heap[1024]={0};
+    neoclr_aot_context ctx={.text={(unsigned char*)heap,sizeof(heap),0}};
+    int32_t result=0;
+    if(neoclr_entry_v4(0,&result,&ctx) || result!=42) return 1;
+#ifdef NEOCLR_NATIVE_GC
+    if(neoclr_root_probe_head_v1() || neoclr_gc_collect_v1(&ctx,NULL) || ctx.text.used) return 2;
+#endif
+    return 0;
+}
+"#).unwrap();
+        let mut command = Command::new("clang");
+        command.args(["-std=c11", "-Wall", "-Wextra", "-Werror", "-I"]).arg(&base);
+        if gc { command.arg("-DNEOCLR_NATIVE_GC").arg(base.join("native-gc.c")).arg(base.join("root-probe.c")); }
+        let result = command.arg(dir.0.join("host.c")).arg(base.join("text-arena.c"))
+            .arg(base.join("system-culture.c")).arg(base.join("time-zone.c"))
+            .arg(base.join("../aot-fault-details/render.c")).arg(dir.0.join("app.o"))
+            .arg(base.join("../../../tools/aot-native-text/target/release/libneoclr_aot_native_text.a"))
+            .args(["-framework", "CoreFoundation", "-o"]).arg(dir.0.join("host")).output().unwrap();
+        assert!(result.status.success(), "{}", String::from_utf8_lossy(&result.stderr));
+        let result = Command::new(dir.0.join("host")).output().unwrap();
+        assert!(result.status.success(), "{result:?}");
+    }
+}
