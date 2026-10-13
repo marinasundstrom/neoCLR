@@ -1,5 +1,13 @@
 # neoCLR platform roadmap
 
+**HTTP benchmark baseline (2026-10-13):** The author requested measurements for the
+HTTP request-processing page. A [Preview 14 plain-text baseline](../benchmarks/http-server/README.md)
+now records interpreter/JIT/AOT requests, latency and startup on macOS ARM64, with
+576 validated responses and exact bundle inputs. Desktop/indexing contention makes
+this exploratory evidence; quiet-host repeats, composed JSON/database workloads,
+Windows and cross-runtime comparisons remain open. This measurement slice does not
+reorder the active runtime milestone.
+
 **Release preflight (2026-10-13):** [qualification evidence](experiments/release-20261013/README.md)
 now includes passing hosted source/format/Clippy, minimum-Rust and macOS/Windows
 host gates. The mixed-callback backend repair passes focused Windows object and

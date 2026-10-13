@@ -8,6 +8,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-13
 
+- Replace the HTTP benchmark page placeholder with the recorded Preview 14
+  plain-text baseline: throughput/range, latency percentiles, separate startup,
+  raw evidence and reproduction steps. Keep host contention and unmeasured JSON/SQL
+  explicit. Verify table values against raw results and build/check all 4,305
+  website pages; record remaining measurement work in the roadmap.
+
 - Add a reproducible Preview 14 HTTP server benchmark using the same Raven
   assembly in interpreter/JIT and native AOT, with package hash checks, rotated
   rounds, validated responses and separate startup timing. Record 576 successful
