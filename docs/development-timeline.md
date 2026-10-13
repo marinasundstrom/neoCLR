@@ -37,8 +37,9 @@ See the [changelog](../CHANGELOG.md) and linked design documents for technical s
   an explicit project override retains state machines.
 - **Validation so far:** native GC/root gates pass on macOS and Windows, including
   owned suspended bodies and abandonment. Windows stack-host acceptance passes
-  after replacing its obsolete fiber-rejection expectation. Full SDK application
-  qualification is recorded in the [integration evidence](validation/runtime-product/runtime-await-sdk/).
+  after replacing its obsolete fiber-rejection expectation. All 21 SDK cases pass
+  on both platforms in interpreter/JIT/AOT after correcting console-profile
+  admission. Exact qualification is recorded in the [integration evidence](validation/runtime-product/runtime-await-sdk/).
 - **Author follow-up:** asks whether this yields an integrated runtime containing
   the former experiment/POC components. **Assistant response:** yes: shared build
   and packaging paths, defined boundaries and qualification make them maintained

@@ -44,7 +44,20 @@ source hashes in `macos-sdk-20261013.json`. The gate checks those hashes again
 after execution. `macos-sdk-build-provenance.json` extracts exact invocations,
 input/toolchain identities and artifacts from passing native/JIT build reports;
 large stdout/stderr fields are replaced by their SHA-256 hashes, and original
-report hashes are retained. Windows application qualification is still running.
+report hashes are retained.
+
+All 21 Windows cases pass in [run 38467065990](https://github.com/marinasundstrom/neoCLR/actions/runs/38467065990)
+at `f2e35e6d9`, using matching compiler/library inputs from run `38464730911`
+and a rebuilt backend. `windows-sdk-38467065990.json` retains case results and
+input hashes; `windows-sdk-build-provenance-38467065990.json` uses the same
+provenance extraction as macOS. The preceding run passed its base HTTP project
+checks but exposed an obsolete console-profile scheduler admission guard. The
+backend fix preserves rooted-stack requirements and file/socket exclusions.
+`windows-http-project-38464730911.json` retains those base HTTP checks; the
+console-admission log and cross-compilation report retain the focused fix checks.
+
+The subsequent [component naming gate](../codegen-naming/) qualifies the renamed
+backend and newly staged Windows JIT helper with an async-console cleanup case.
 
 The initial local gate exposed two harness issues: interpreter execution of an
 external assembly needed explicit module paths, and the Python HTTP peer needed

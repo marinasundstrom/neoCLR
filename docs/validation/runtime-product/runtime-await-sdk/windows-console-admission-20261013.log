@@ -1,0 +1,13 @@
+   Compiling neoclr-aot-poc v0.0.0 (/Users/robert/Projects/neoclr/tools/aot-poc)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 3.73s
+     Running tests/windows_stack.rs (target/debug/deps/windows_stack-034aa241f02111c1)
+
+running 6 tests
+test console_experiment_requires_windows_context_and_rejects_unqualified_services ... ok
+test http_experiment_requires_complete_windows_service_contract ... ok
+test recursive_windows_object_has_inline_page_probe_and_context_entry ... ok
+test windows_stack_requires_explicit_complete_opt_in_and_rejects_managed_types ... ok
+test console_admits_scheduler_and_runtime_await_with_rooted_stack_contract ... ok
+test heap_experiment_admits_only_int32_arrays_and_matches_interpreter ... ok
+
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 2.31s

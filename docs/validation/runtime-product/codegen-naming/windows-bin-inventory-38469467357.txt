@@ -1,0 +1,3 @@
+runtime-await-sdk-rerun/installed/bundle/bin/neoclr-codegen.exe
+runtime-await-sdk-rerun/installed/bundle/bin/neoclr-jit-host.dll
+runtime-await-sdk-rerun/installed/bundle/bin/neoclr.exe

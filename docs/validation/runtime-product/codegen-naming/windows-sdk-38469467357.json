@@ -1,0 +1,163 @@
+{
+  "passed": true,
+  "platform": "Windows-2022Server-10.0.20348-SP0",
+  "commands": [
+    {
+      "command": [
+        "C:\\hostedtoolcache\\windows\\Python\\3.12.10\\x64\\python.exe",
+        "D:\\a\\neoCLR\\neoCLR\\scripts\\build-native-project.py",
+        "--profile",
+        "windows-console",
+        "--project",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-http-project-validation\\runtime-await-sdk-rerun\\cleanup\\App.rvnproj",
+        "--bundle",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-http-project-validation\\development toolchain\\bundle",
+        "--aot",
+        "D:\\a\\neoCLR\\neoCLR\\target\\debug\\neoclr-codegen.exe",
+        "--output",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-http-project-validation\\runtime-await-sdk-rerun\\cleanup\\native"
+      ],
+      "exitCode": 0,
+      "stdout": "D:\\a\\neoCLR\\neoCLR\\target\\windows-http-project-validation\\runtime-await-sdk-rerun\\cleanup\\native\\app.exe\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\debug\\neoclr.exe",
+        "disassemble",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-http-project-validation\\runtime-await-sdk-rerun\\cleanup\\native\\app.dll",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-http-project-validation\\runtime-await-sdk-rerun\\cleanup\\app.neoil"
+      ],
+      "exitCode": 0,
+      "stdout": "Disassembled D:\\a\\neoCLR\\neoCLR\\target\\windows-http-project-validation\\runtime-await-sdk-rerun\\cleanup\\native\\app.dll -> D:\\a\\neoCLR\\neoCLR\\target\\windows-http-project-validation\\runtime-await-sdk-rerun\\cleanup\\app.neoil\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "C:\\hostedtoolcache\\windows\\Python\\3.12.10\\x64\\python.exe",
+        "D:\\a\\neoCLR\\neoCLR\\scripts\\prepare-jit-bundle.py",
+        "--bundle",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-http-project-validation\\development toolchain\\bundle",
+        "--runtime",
+        "D:\\a\\neoCLR\\neoCLR\\target\\debug\\neoclr.exe",
+        "--jit-compiler",
+        "D:\\a\\neoCLR\\neoCLR\\target\\debug\\neoclr-codegen.exe",
+        "--host-recipe",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-http-project-validation\\runtime-await-sdk-rerun\\cleanup\\native\\build.json",
+        "--output",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-http-project-validation\\runtime-await-sdk-rerun\\installed"
+      ],
+      "exitCode": 0,
+      "stdout": "D:\\a\\neoCLR\\neoCLR\\target\\windows-http-project-validation\\runtime-await-sdk-rerun\\installed\\bundle\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-http-project-validation\\runtime-await-sdk-rerun\\cleanup\\native\\app.exe"
+      ],
+      "exitCode": 0,
+      "stdout": "PASS runtime async scoped cleanup\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-http-project-validation\\runtime-await-sdk-rerun\\installed\\bundle\\bin\\neoclr.exe",
+        "run",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-http-project-validation\\runtime-await-sdk-rerun\\cleanup\\native\\app.dll",
+        "--execution",
+        "interpreter",
+        "--instructions",
+        "100000000",
+        "--system",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-http-project-validation\\runtime-await-sdk-rerun\\installed\\bundle\\lib\\System.runtime.neox",
+        "--object-root",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-http-project-validation\\runtime-await-sdk-rerun\\installed\\bundle\\lib\\System.Runtime.dll",
+        "--module",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-http-project-validation\\runtime-await-sdk-rerun\\installed\\bundle\\lib\\System.Runtime.dll",
+        "--module",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-http-project-validation\\runtime-await-sdk-rerun\\installed\\bundle\\lib\\System.Data.dll",
+        "--module",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-http-project-validation\\runtime-await-sdk-rerun\\installed\\bundle\\lib\\System.Networking.dll",
+        "--module",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-http-project-validation\\runtime-await-sdk-rerun\\installed\\bundle\\lib\\System.Web.dll"
+      ],
+      "exitCode": 0,
+      "stdout": "PASS runtime async scoped cleanup\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-http-project-validation\\runtime-await-sdk-rerun\\installed\\bundle\\bin\\neoclr.exe",
+        "run",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-http-project-validation\\runtime-await-sdk-rerun\\cleanup\\native\\app.dll"
+      ],
+      "exitCode": 0,
+      "stdout": "PASS runtime async scoped cleanup\n",
+      "stderr": ""
+    }
+  ],
+  "cases": [
+    {
+      "name": "cleanup",
+      "mode": "aot",
+      "passed": true,
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-http-project-validation\\runtime-await-sdk-rerun\\cleanup\\native\\app.exe"
+      ]
+    },
+    {
+      "name": "cleanup",
+      "mode": "interpreter",
+      "passed": true,
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-http-project-validation\\runtime-await-sdk-rerun\\installed\\bundle\\bin\\neoclr.exe",
+        "run",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-http-project-validation\\runtime-await-sdk-rerun\\cleanup\\native\\app.dll",
+        "--execution",
+        "interpreter",
+        "--instructions",
+        "100000000",
+        "--system",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-http-project-validation\\runtime-await-sdk-rerun\\installed\\bundle\\lib\\System.runtime.neox",
+        "--object-root",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-http-project-validation\\runtime-await-sdk-rerun\\installed\\bundle\\lib\\System.Runtime.dll",
+        "--module",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-http-project-validation\\runtime-await-sdk-rerun\\installed\\bundle\\lib\\System.Runtime.dll",
+        "--module",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-http-project-validation\\runtime-await-sdk-rerun\\installed\\bundle\\lib\\System.Data.dll",
+        "--module",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-http-project-validation\\runtime-await-sdk-rerun\\installed\\bundle\\lib\\System.Networking.dll",
+        "--module",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-http-project-validation\\runtime-await-sdk-rerun\\installed\\bundle\\lib\\System.Web.dll"
+      ]
+    },
+    {
+      "name": "cleanup",
+      "mode": "jit",
+      "passed": true,
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-http-project-validation\\runtime-await-sdk-rerun\\installed\\bundle\\bin\\neoclr.exe",
+        "run",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-http-project-validation\\runtime-await-sdk-rerun\\cleanup\\native\\app.dll"
+      ]
+    }
+  ],
+  "inputs": {
+    "D:\\a\\neoCLR\\neoCLR\\scripts\\validate-runtime-await-sdk.py": "5ccbae490fa0ed3e7d3787353c1fd9365ed1389068c884aee37444b5826b71e4",
+    "D:\\a\\neoCLR\\neoCLR\\runtime\\raven\\compiler-services\\RuntimeAwait.rvn": "0dc6b0883f1b2a44ef78089405b53e709808c9d0d50b81f77ad11b48f7a05721",
+    "D:\\a\\neoCLR\\neoCLR\\runtime\\raven\\compiler-services\\RuntimeGenerator.rvn": "39ff24308871096baf1c89c954a91d89e937b6959f5bcf9d5e47ad09125af695",
+    "D:\\a\\neoCLR\\neoCLR\\runtime\\native\\async\\native-runtime.c": "3e468fdf02f2e124b293b4303c85d4bb0de33ca445181070704259567968d29e",
+    "D:\\a\\neoCLR\\neoCLR\\runtime\\native\\async\\native-runtime.h": "f77577df4c154f00bcd53ca9749f1250f4b928753d835c5cd40aa4a0fcf6b642",
+    "D:\\a\\neoCLR\\neoCLR\\runtime\\native\\diagnostics\\attach.c": "464882fc743dbc761a81c5e4e4f0a73bb48490b02287b1d130b0d51e59bed7fc",
+    "D:\\a\\neoCLR\\neoCLR\\runtime\\native\\diagnostics\\attach.h": "d2c89948e8eb7447919b954db31a3b00eb518611aa65fc4362d244b452a7a3ac",
+    "D:\\a\\neoCLR\\neoCLR\\runtime\\native\\faults\\fault-details.h": "ff09aee456b338eef6c123ebcc60f428acea32720b7bef45910e22b9953c5ed9",
+    "D:\\a\\neoCLR\\neoCLR\\runtime\\native\\faults\\render.c": "e650b004a256f448509d80d8c574873520a469a6801cd32f8e7b99c3fb30a439",
+    "D:\\a\\neoCLR\\neoCLR\\runtime\\native\\gc\\native-gc.c": "468ede57b234d8f47b27ae182becf2644fe835349a27028aab957ce06fc98f70",
+    "D:\\a\\neoCLR\\neoCLR\\runtime\\native\\gc\\native-gc.h": "8bef670cce85582df053d6195a15aeff7ccf9cf61aec4bcce43f8ca1710f422a",
+    "D:\\a\\neoCLR\\neoCLR\\runtime\\native\\gc\\root-probe.c": "cd0ef22e957cb969f12d2230eaac7cf7c39c1be4124fe56507b0c6ece77cbf97",
+    "D:\\a\\neoCLR\\neoCLR\\runtime\\native\\gc\\root-probe.h": "0861c1d4c6c96abb346948fa081e619d2b4a546c08fca031969bf7377e8bb841",
+    "D:\\a\\neoCLR\\neoCLR\\runtime\\native\\memory\\text-arena.c": "b0c59381eba6400a32406bc0492a9909b05cf745fe1bf9ab1ae8c1c4e677a696",
+    "D:\\a\\neoCLR\\neoCLR\\runtime\\native\\memory\\text-arena.h": "9647faf4be2ff2295e745f3825460fe27b207eab360c979ac05b8f6d799fa00b",
+    "docs/experiments/runtime-async/RuntimeUse.rvn": "dd4ccb314cf0902e903a03831ecc4af7631b7938a4e3f628efef4a77885630bc"
+  }
+}

@@ -24,8 +24,9 @@ prototype pacing and unqualified targets are not promoted by packaging changes.
 **SDK runtime-await integration (author direction, 2026-10-13):** rebuilt SDKs
 select the existing explicit native compiler contract and carry the private await
 and generator providers. The runtime-owned carrier now includes Windows x64 fibers
-alongside macOS ARM64; GC/root and Windows stack-host gates pass. Application
-qualification and exact build requirements are tracked in the
+alongside macOS ARM64; GC/root and Windows stack-host gates pass. All 21 SDK
+application cases pass on both platforms in interpreter/JIT/AOT. Exact build
+requirements and qualification are tracked in the
 [integration record](runtime-product-integration.md#sdk-default-runtime-await-integration--2026-10-13).
 Keep explicit state-machine fallback and existing library bootstrap lowering.
 Ordinary Raven/.NET lowering and collection pacing defaults are unchanged.
