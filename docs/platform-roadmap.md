@@ -1,5 +1,14 @@
 # neoCLR platform roadmap
 
+**Runtime suspension follow-up (2026-10-13):** [matched application lowerings and idle-drain correction](../benchmarks/http-scheduling/README.md#idle-drain-correction--2026-10-13)
+qualify the same concurrent HTTP fixture with state machines and runtime suspension.
+The macOS carrier now avoids draining after empty polls; retained-stack/collector
+checks pass and idle drain fibers fall from 358–359 to 90. Alternating uninstrumented
+runs show no established throughput improvement. The author also requested learning
+from other collectors: phase attribution and collection-pressure policy are the next
+research targets, with .NET/Go/V8 references and tradeoffs recorded; no replacement
+collector has been selected. JIT/interpreter comparisons remain open.
+
 **Scheduling diagnosis (2026-10-13):** [retained diagnostic tooling and results](../benchmarks/http-scheduling/README.md)
 now separate native socket polling, host pauses, process CPU and GC counters.
 Eight AOT processes validate 192 responses and complete allocation reclamation.

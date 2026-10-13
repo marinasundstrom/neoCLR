@@ -16523,3 +16523,18 @@ qualification. Request and response deadline documentation now includes TLS work
 - **Outcome/open:** [roadmap](platform-roadmap.md) records the investigation criteria.
   The incoming-stream slice is committed as `b95150c87`; scheduler instrumentation,
   matched concurrency measurements and any resulting optimization remain open.
+
+## 2026-10-13 — Scheduler and collector optimization research
+
+- **Author:** suggested substantial gains may come from scheduler and GC optimization,
+  including looking at other collectors.
+- **Assistant:** agreed to compare allocation, barriers, pacing and collection costs
+  against measurements before selecting a replacement. Consulted primary .NET, Go
+  and V8 collector references; recorded tradeoffs and source-version limits in the
+  [scheduling investigation](../benchmarks/http-scheduling/README.md#collector-research-direction--2026-10-13).
+- **Observed:** matched application lowerings pass the concurrent HTTP fixture; the
+  runtime carrier creates queue-draining fibers even after idle polls. Diagnostic
+  evidence motivates removing that specific redundant work, not claiming scheduling
+  is the dominant HTTP cost. Dependency libraries remain unchanged in this comparison.
+- **Open:** collector phase attribution and an allocation-pressure policy experiment,
+  with explicit stress collection retained; no collector replacement was selected.

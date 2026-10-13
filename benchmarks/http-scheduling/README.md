@@ -101,3 +101,74 @@ iteration did not execute guest code. Skipping these redundant drains is a focus
 optimization candidate. It must still drain after callbacks and resumed bodies, and
 preserve suspended drain fibers, roots, faults and cancellation. JIT and interpreter
 comparisons and direct readiness timestamps remain open.
+
+## Collector research direction — 2026-10-13
+
+The author proposed investigating other collectors alongside scheduling. This is
+research guidance, not a decision to replace neoCLR's collector. The current native
+probe deliberately collects at root boundaries; its stress policy must not be
+mistaken for an unavoidable cost of nonmoving collection.
+
+| Reference | What to investigate for neoCLR | Cost or prerequisite to validate |
+| --- | --- | --- |
+| [.NET/CoreCLR collector design](https://github.com/dotnet/runtime/blob/main/docs/design/coreclr/botr/garbage-collection.md) | Allocation contexts, generational collection and collecting short-lived objects without repeatedly tracing the whole live graph | Generations require remembered references; movement requires updating roots/interior references and native interop rules |
+| [Go GC guide](https://go.dev/doc/gc-guide) | Allocation-driven pacing, heap/CPU tradeoffs and nonmoving mark/sweep as an alternative to movement | Concurrent tracing requires barriers and coordination with suspended stacks; memory headroom and assist costs need measurement |
+| [V8 collector design](https://chromium.googlesource.com/v8/v8/+/main/docs/heap/garbage-collection.md) | Young-generation treatment, incremental/concurrent marking and remembered-set discipline | Barrier cost, moving-object support and platform/compiler integration cannot be assumed free |
+
+Sources accessed 2026-10-13. These are architecture references, not benchmark results
+for current releases; the Go guide explicitly identifies its described baseline as
+Go 1.19. The applicability and costs above are neoCLR investigation points, not
+claims that adopting a particular design will improve this runtime.
+
+Start by separating boundary checks from actual collection cycles and measuring
+root publication, root/heap scanning, sweeping and allocation separately. Then test
+an allocation-pressure policy while retaining explicit/stress collection and tight
+memory-limit behavior. Compare CPU, pause distributions, allocation rate, live heap,
+peak reserved memory and request latency together. Only after that evidence should
+we select between optimizing the existing nonmoving design, adding generations or
+adding concurrent phases. Parked stacks, dependent owners, cancellation, JIT/AOT root
+maps and future native interop are correctness constraints throughout.
+
+## Idle drain correction — 2026-10-13
+
+The macOS retained-stack pump now drains initially and after resumed bodies or
+scheduler callbacks can produce managed work. Empty polls alone do not create a new
+drain fiber. An existing suspended drain remains owned and resumes normally. This
+relies on the carrier's existing single-owner-thread contract; future cross-thread
+managed queue producers must signal ready work rather than rely on periodic draining.
+No scheduler delivery, root ownership, timer or cancellation API changed.
+
+[Candidate diagnostics](idle-drain-profile-20261013.json) reduce drain fibers from
+358–359 to 90 with four 100 ms holds, and from 93–95 to 89 without holds. All four
+16-response processes pass; each fully reclaims its 14,760 or 14,823 allocations.
+The reduction is native fiber setup work, not fewer managed allocations.
+
+[Focused sanitizer checks](idle-drain-gc-validation-20261013.json) pass collector,
+root ownership, 320 retained-body lifetimes and the new idle-drain regression. That
+regression exercises pending polls, callback-generated work and a drain that itself
+suspends. It [fails against the old carrier](idle-drain-baseline-regression-20261013.json).
+Reproduce with `validate_conditional_roots.py --owned-bodies` and its existing recipe.
+
+[Uninstrumented comparison](idle-drain-comparison-20261013.json) relinks identical
+runtime-async guest objects with the old and new carrier. Four alternating rounds
+follow warmups for each hold/variant combination: 320 responses across 20 processes
+all validate. No builds or profiler runs were active during these measured rounds;
+this remains an uncontrolled desktop-host experiment.
+
+| Case | Baseline median process time (range) | Candidate median process time (range) |
+| --- | --- | --- |
+| No intentional idle | 724 ms (712–760) | 727 ms (709–747) |
+| Four 100 ms holds | 1,114 ms (1,105–1,116) | 1,131 ms (1,114–1,184) |
+
+The ranges overlap and candidate medians are slightly higher. This establishes no
+HTTP speedup and does not exclude a small regression. The stable result is removal
+of redundant native fiber creation; broader throughput and tail-latency qualification
+remain open. Whole-process CPU medians are 711/715 ms without holds and 769/765 ms
+with holds, baseline/candidate respectively. Do not turn these into request throughput.
+
+Reproduce the comparison with a saved baseline carrier source and a passing matched
+runtime build from `compare-lowerings.py`:
+
+```sh
+python3 benchmarks/http-scheduling/compare-carrier.py --build RUNTIME_BUILD/build.json --baseline OLD_NATIVE_RUNTIME_C --output NEW_DIRECTORY
+```

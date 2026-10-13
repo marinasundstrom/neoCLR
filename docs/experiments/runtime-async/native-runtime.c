@@ -351,6 +351,9 @@ int32_t neoclr_runtime_async_pump_v1(neoclr_aot_context *c, neoclr_async_callbac
     neoclr_parked_roots entry = {0};
     neoclr_roots_park_v1(&entry);
     int status = 0;
+    /* This carrier is owner-thread only. An empty poll cannot enqueue managed
+     * work; drain again only after a body/callback could have produced it. */
+    int drain_needed = 1;
     while (!status) {
         reap_expired();
         int draining = 0;
@@ -360,13 +363,15 @@ int32_t neoclr_runtime_async_pump_v1(neoclr_aot_context *c, neoclr_async_callbac
             operation *op = find(f->waiting);
             if (op && op->complete) {
                 status = resume(f);
+                drain_needed = 1;
                 reap_expired();
             }
             if (status) break;
             draining |= f->mapping && f->drain;
         }
         if (status) break;
-        if (!draining) {
+        if (!draining && drain_needed) {
+            drain_needed = 0;
             fiber *f = allocate_fiber(0, 0, 1);
             if (!f) { status = 5; break; }
             status = resume(f);
@@ -393,6 +398,7 @@ int32_t neoclr_runtime_async_pump_v1(neoclr_aot_context *c, neoclr_async_callbac
             fiber *f = allocate_fiber(root, 0, 0);
             if (!f) { neoclr_gc_host_root_release_v1(c, root); status = 5; break; }
             status = resume(f);
+            drain_needed = 1;
         } else if (progress == NEOCLR_SCHEDULER_PENDING) {
             if (!ready) neoclr_os_pause();
         }

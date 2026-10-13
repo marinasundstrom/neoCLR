@@ -1,0 +1,28 @@
+{
+  "command": [
+    "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang",
+    "-isysroot",
+    "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.2.sdk",
+    "-std=c11",
+    "-O2",
+    "-Wall",
+    "-Wextra",
+    "-Werror",
+    "-DNEOCLR_NATIVE_GC",
+    "-fsanitize=undefined,bounds",
+    "-I",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-console",
+    "-Wno-deprecated-declarations",
+    "-I",
+    "/Users/robert/Projects/neoclr/docs/experiments/runtime-async",
+    "/Users/robert/Projects/neoclr/docs/experiments/runtime-async/native-idle-drain-test.c",
+    "/Users/robert/Projects/neoclr/target/http-carrier-baseline-20261013/native-runtime.c",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-gc.c",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-console/root-probe.c",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-stack.c",
+    "-o",
+    "/Users/robert/Projects/neoclr/target/http-idle-drain-baseline-test"
+  ],
+  "exitCode": 1,
+  "stderr": "check failed at 49\n"
+}

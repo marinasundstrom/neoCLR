@@ -31,7 +31,7 @@ def main():
               ROOT / 'docs/experiments/aot-fault-details/fault-details.h']
     if args.owned_bodies:
         inputs += [ROOT / 'docs/experiments/runtime-async' / name for name in
-                   ('native-runtime.c', 'native-runtime.h', 'native-owned-body-test.c')]
+                   ('native-runtime.c', 'native-runtime.h', 'native-owned-body-test.c', 'native-idle-drain-test.c')]
         inputs += [BASE / name for name in ('native-stack.c', 'socket-listener.h', 'socket-os.h')]
     report = {'passed': False, 'commands': [], 'inputsSha256': {
         str(path): hashlib.sha256(path.read_bytes()).hexdigest() for path in inputs}}
@@ -56,11 +56,12 @@ def main():
         run('profile-enabled-execute', [binary])
         if args.owned_bodies:
             carrier = ROOT / 'docs/experiments/runtime-async'
-            binary = out / 'native-owned-body-test'
-            run('owned-body-build', [*cc, '-Wno-deprecated-declarations',
-                '-I', carrier, carrier / 'native-owned-body-test.c', carrier / 'native-runtime.c',
-                BASE / 'native-gc.c', BASE / 'root-probe.c', BASE / 'native-stack.c', '-o', binary])
-            run('owned-body-execute', [binary])
+            for name in ('native-owned-body-test', 'native-idle-drain-test'):
+                binary = out / name
+                run(name + '-build', [*cc, '-Wno-deprecated-declarations',
+                    '-I', carrier, carrier / (name + '.c'), carrier / 'native-runtime.c',
+                    BASE / 'native-gc.c', BASE / 'root-probe.c', BASE / 'native-stack.c', '-o', binary])
+                run(name + '-execute', [binary])
         report['passed'] = True
     finally:
         (out / 'validation.json').write_text(json.dumps(report, indent=2) + '\n')

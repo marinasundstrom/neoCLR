@@ -1086,3 +1086,16 @@ method/owner cases; synchronous `use` also works across state-machine suspension
 [Scope mapping, cleanup semantics and qualification](generic-cleanup/README.md)
 record the compiler/bundle revisions and remaining bounds. This does not enable
 Windows runtime suspension or awaited state-machine disposal.
+
+## Idle polling no longer creates redundant drain fibers — 2026-10-13
+
+The macOS owner-thread carrier drains initially and after guest resumption or a
+scheduler callback. An empty native poll cannot add managed queue work, so it no
+longer triggers a new drain fiber. Suspended drains still resume and retain their
+roots. The focused idle-drain regression joins the conditional-root validation runner.
+
+[Matched HTTP evidence](../../../benchmarks/http-scheduling/README.md#idle-drain-correction--2026-10-13)
+records the reduced fiber count, GC/lifetime checks and uninstrumented timings. It
+shows no established HTTP speedup. This is a private carrier implementation change;
+no Raven lowering, Runtime Contract configuration, managed API or metadata changes.
+The comparison changes application lowering only, keeping library lowering fixed.

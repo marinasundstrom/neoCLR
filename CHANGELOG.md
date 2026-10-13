@@ -8,6 +8,14 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-13
 
+- Avoid creating queue-draining fibers after empty polls in the macOS native
+  runtime-async carrier; still drain after callbacks/resumptions and retain suspended
+  drains. Add a regression that fails on the previous carrier, sanitizer/ownership
+  evidence, complete HTTP GC reclamation and a matched uninstrumented comparison.
+  Idle drain fibers fall from 358–359 to 90, but timing ranges overlap and candidate
+  medians are slightly higher: no HTTP speedup claimed. Record .NET/Go/V8 collector
+  research tradeoffs and the author's GC investigation direction.
+
 - Add a matched HTTP application-lowering probe that verifies native runtime-async
   bindings and holds dependency libraries fixed. Both state-machine and suspension
   builds pass concurrency/cancellation checks and instrumented GC reclamation.

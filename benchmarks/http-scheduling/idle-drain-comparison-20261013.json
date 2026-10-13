@@ -1,0 +1,1593 @@
+{
+  "passed": true,
+  "inputs": {
+    "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang": "be5518e9c6736cda8dfc3486ce11e8112a2e08045084260691cf41f57a653f59",
+    "/Users/robert/Projects/neoclr/benchmarks/native-web/http-host.c": "cc11b74b5122fe62d208a51b27d81861109bfd03658d61f52500fca8cb16d61a",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-console/root-probe.c": "576c0fdd7a1e4c16a957f85a308be33e2fc932d0c9bf2d40acecdcefe3a0fa3c",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-gc.c": "fd5eb12777d87d985a9d3b431d21f82a857aa7e2270233ca7fd117d47b54210b",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-console/text-arena.c": "63a69338de7aee04c22481cbea4124dd5ba57373ac8c201ace12a07a3e6aec99",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-console/console.c": "fdc9b345a77b347dba16561394dd9f0ae8bb270478ccfb7d6fed3071404e1769",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-stack.c": "8bf08bed38457c8a48dcb6fecf784c764651dd75f192a9a8cb4d340b3d638121",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-scalar/console.c": "e1caabedff378df882385fd05325f635732e91b968d8dc987e5734fee26e49ae",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-fault-details/render.c": "f1e561bfb6b73ac3e4a7078d5bc9e9905eea9637f545ac3178273698d08efb96",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-console/task-queue.c": "84b7d3e7d0f635622c6b066b57868969e22170e6aea3c500fab7e06297a5f7f4",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-console/socket-listener.c": "e96bc843d7851cb78c9b225ff8e78b4b57b7c1d07096dccc409f36d9b4a03724",
+    "/Users/robert/Projects/neoclr/tools/native/entry-arguments.c": "4fdc632b75d590057fad61e42fe6526b8278b60d908cc0467bb611d7a0c582a3",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-console/string-unicode.c": "80dadd71e3df0bc16f4082a209bc7c37bb07a85ccddb6350c9ee3cf2254399fe",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-console/tls-managed.c": "bf3212c83b1f16eca7833b30b9f5eb126e1e6d26d0e258d7cdfa5624ee329d2f",
+    "/Users/robert/Projects/neoclr/target/http-lowerings-20261013/runtime/app.o": "dcf02102f248c74684e64c5e40229da74212270990698f72940271b7830c993f",
+    "/Users/robert/Projects/neoclr/tools/aot-native-text/target/text-only/aarch64-apple-darwin/release/libneoclr_aot_native_text.a": "8dbbf86e3cdf0659d73d8d5a9aa277cbc0ac5e95b99a1ff15e5974ce5d9169ad",
+    "/Users/robert/Projects/neoclr/tools/native-tls/target/aarch64-apple-darwin/release/libneoclr_native_tls.a": "bfedb0a494dc7d77f65937845f8cd84b1211b8ce0d372051e7931fe9a94df950",
+    "/Users/robert/Projects/neoclr/target/http-lowerings-20261013/runtime/app": "c1fbe3f0249c4316f2f0fb5b751b9178b1c97b0dbb8ce85bd9ce69d8df6ee95f",
+    "/Users/robert/Projects/neoclr/docs/experiments/runtime-async/native-runtime.c": "e6a456cc2c10157386b6d2c2e17bb8eb93094726b55f82891057bdb3785c0ade",
+    "/Users/robert/Projects/neoclr/target/http-lowerings-20261013/runtime/build.json": "6652308301140f1594de5b0a00106ebbb35bf98504c52913e650d4da98c5a43c",
+    "/Users/robert/Projects/neoclr/target/http-carrier-baseline-20261013/native-runtime.c": "8390b65590213bb8dc30551cb88aa3e6f7ab7aacc512d48e27a9feeaa7fe18d6",
+    "/Users/robert/Projects/neoclr/benchmarks/http-scheduling/compare-carrier.py": "fb42211b73720c671c938db8baaa5f9d718aabecea62b8787c4a15bebb92af4c",
+    "/Users/robert/Projects/neoclr/benchmarks/http-concurrency/validate.py": "4726d63cf44315ca24658ad659ddead601dcfa2578ac32616d5257a38b784e8a",
+    "/Users/robert/Projects/neoclr/target/http-carrier-comparison-v2-20261013/baseline": "bccf75456c99f020cfac57f2e82df64648da61b5014aa4b01e0ca1fc905020a3",
+    "/Users/robert/Projects/neoclr/target/http-carrier-comparison-v2-20261013/candidate": "ae5e7777a2f14250296590d052ba8f2e85f1ffeecb1645dc60d427e6be37b6c0"
+  },
+  "commands": [
+    [
+      "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang",
+      "-isysroot",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.2.sdk",
+      "-arch",
+      "arm64",
+      "-std=c11",
+      "-O2",
+      "-Wall",
+      "-Wextra",
+      "-Werror",
+      "-DNEOCLR_NATIVE_GC",
+      "-DNEOCLR_MANAGED_TLS",
+      "-DNEOCLR_HTTP_HEAP_BYTES=33554432",
+      "-DNEOCLR_NATIVE_BYTE_ARRAY_LIMIT=4194304",
+      "-I",
+      "/Users/robert/Projects/neoclr/docs/experiments/aot-console",
+      "/Users/robert/Projects/neoclr/benchmarks/native-web/http-host.c",
+      "/Users/robert/Projects/neoclr/docs/experiments/aot-console/root-probe.c",
+      "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-gc.c",
+      "/Users/robert/Projects/neoclr/docs/experiments/aot-console/text-arena.c",
+      "/Users/robert/Projects/neoclr/docs/experiments/aot-console/console.c",
+      "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-stack.c",
+      "/Users/robert/Projects/neoclr/docs/experiments/aot-scalar/console.c",
+      "/Users/robert/Projects/neoclr/docs/experiments/aot-fault-details/render.c",
+      "/Users/robert/Projects/neoclr/docs/experiments/aot-console/task-queue.c",
+      "/Users/robert/Projects/neoclr/docs/experiments/aot-console/socket-listener.c",
+      "/Users/robert/Projects/neoclr/tools/native/entry-arguments.c",
+      "/Users/robert/Projects/neoclr/docs/experiments/aot-console/string-unicode.c",
+      "/Users/robert/Projects/neoclr/docs/experiments/aot-console/tls-managed.c",
+      "/Users/robert/Projects/neoclr/target/http-lowerings-20261013/runtime/app.o",
+      "/Users/robert/Projects/neoclr/tools/aot-native-text/target/text-only/aarch64-apple-darwin/release/libneoclr_aot_native_text.a",
+      "/Users/robert/Projects/neoclr/tools/native-tls/target/aarch64-apple-darwin/release/libneoclr_native_tls.a",
+      "-o",
+      "/Users/robert/Projects/neoclr/target/http-carrier-comparison-v2-20261013/baseline",
+      "-DNEOCLR_RUNTIME_ASYNC",
+      "-I",
+      "/Users/robert/Projects/neoclr/docs/experiments/runtime-async",
+      "/Users/robert/Projects/neoclr/target/http-carrier-baseline-20261013/native-runtime.c",
+      "-Wno-deprecated-declarations"
+    ],
+    [
+      "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang",
+      "-isysroot",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.2.sdk",
+      "-arch",
+      "arm64",
+      "-std=c11",
+      "-O2",
+      "-Wall",
+      "-Wextra",
+      "-Werror",
+      "-DNEOCLR_NATIVE_GC",
+      "-DNEOCLR_MANAGED_TLS",
+      "-DNEOCLR_HTTP_HEAP_BYTES=33554432",
+      "-DNEOCLR_NATIVE_BYTE_ARRAY_LIMIT=4194304",
+      "-I",
+      "/Users/robert/Projects/neoclr/docs/experiments/aot-console",
+      "/Users/robert/Projects/neoclr/benchmarks/native-web/http-host.c",
+      "/Users/robert/Projects/neoclr/docs/experiments/aot-console/root-probe.c",
+      "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-gc.c",
+      "/Users/robert/Projects/neoclr/docs/experiments/aot-console/text-arena.c",
+      "/Users/robert/Projects/neoclr/docs/experiments/aot-console/console.c",
+      "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-stack.c",
+      "/Users/robert/Projects/neoclr/docs/experiments/aot-scalar/console.c",
+      "/Users/robert/Projects/neoclr/docs/experiments/aot-fault-details/render.c",
+      "/Users/robert/Projects/neoclr/docs/experiments/aot-console/task-queue.c",
+      "/Users/robert/Projects/neoclr/docs/experiments/aot-console/socket-listener.c",
+      "/Users/robert/Projects/neoclr/tools/native/entry-arguments.c",
+      "/Users/robert/Projects/neoclr/docs/experiments/aot-console/string-unicode.c",
+      "/Users/robert/Projects/neoclr/docs/experiments/aot-console/tls-managed.c",
+      "/Users/robert/Projects/neoclr/target/http-lowerings-20261013/runtime/app.o",
+      "/Users/robert/Projects/neoclr/tools/aot-native-text/target/text-only/aarch64-apple-darwin/release/libneoclr_aot_native_text.a",
+      "/Users/robert/Projects/neoclr/tools/native-tls/target/aarch64-apple-darwin/release/libneoclr_native_tls.a",
+      "-o",
+      "/Users/robert/Projects/neoclr/target/http-carrier-comparison-v2-20261013/candidate",
+      "-DNEOCLR_RUNTIME_ASYNC",
+      "-I",
+      "/Users/robert/Projects/neoclr/docs/experiments/runtime-async",
+      "/Users/robert/Projects/neoclr/docs/experiments/runtime-async/native-runtime.c",
+      "-Wno-deprecated-declarations"
+    ]
+  ],
+  "runs": [
+    {
+      "round": -1,
+      "warmup": true,
+      "variant": "candidate",
+      "holdSecondsPerPhase": 0,
+      "processSeconds": 0.9827807500000003,
+      "processCpuSeconds": 0.7431649999999994,
+      "validation": {
+        "passed": true,
+        "startupSeconds": 0.232295417,
+        "cases": [
+          {
+            "case": "headers",
+            "fastCompletionSeconds": [
+              0.04131429200000003,
+              0.06780237499999986,
+              0.08995520899999976
+            ],
+            "slowHeldSeconds": 0.08997287499999995,
+            "intentionalIdleSeconds": 0,
+            "slowFinishSeconds": 0.01618970899999983,
+            "fastResponsesBeforeSlowRelease": 3,
+            "passed": true
+          },
+          {
+            "case": "fixed-body",
+            "fastCompletionSeconds": [
+              0.05022879199999997,
+              0.07860579199999984,
+              0.10235987499999988
+            ],
+            "slowHeldSeconds": 0.10237733399999982,
+            "intentionalIdleSeconds": 0,
+            "slowFinishSeconds": 0.005243000000000109,
+            "fastResponsesBeforeSlowRelease": 3,
+            "passed": true
+          },
+          {
+            "case": "chunked-body",
+            "fastCompletionSeconds": [
+              0.05345449999999996,
+              0.0822890420000002,
+              0.1066180000000001
+            ],
+            "slowHeldSeconds": 0.10663674999999984,
+            "intentionalIdleSeconds": 0,
+            "slowFinishSeconds": 0.006107959000000385,
+            "fastResponsesBeforeSlowRelease": 3,
+            "passed": true
+          },
+          {
+            "case": "large-header",
+            "fastCompletionSeconds": [
+              0.06105441700000025,
+              0.09839804200000035,
+              0.12987762500000022
+            ],
+            "slowHeldSeconds": 0.1298960840000003,
+            "intentionalIdleSeconds": 0,
+            "slowFinishSeconds": 0.14556329099999976,
+            "fastResponsesBeforeSlowRelease": 3,
+            "passed": true
+          }
+        ],
+        "checkedResponses": 16,
+        "width": 4,
+        "queuedCancellations": 140,
+        "shutdownCancelledAccepts": 16,
+        "admissionLimit": 16
+      }
+    },
+    {
+      "round": -1,
+      "warmup": true,
+      "variant": "baseline",
+      "holdSecondsPerPhase": 0,
+      "processSeconds": 0.9636115420000002,
+      "processCpuSeconds": 0.7617140000000002,
+      "validation": {
+        "passed": true,
+        "startupSeconds": 0.17242299999999977,
+        "cases": [
+          {
+            "case": "headers",
+            "fastCompletionSeconds": [
+              0.0646428750000001,
+              0.09896641600000011,
+              0.12367729099999991
+            ],
+            "slowHeldSeconds": 0.12370020800000026,
+            "intentionalIdleSeconds": 0,
+            "slowFinishSeconds": 0.017958917000000074,
+            "fastResponsesBeforeSlowRelease": 3,
+            "passed": true
+          },
+          {
+            "case": "fixed-body",
+            "fastCompletionSeconds": [
+              0.05121495900000017,
+              0.07878154199999976,
+              0.10226541699999991
+            ],
+            "slowHeldSeconds": 0.10228070899999953,
+            "intentionalIdleSeconds": 0,
+            "slowFinishSeconds": 0.0052025410000000605,
+            "fastResponsesBeforeSlowRelease": 3,
+            "passed": true
+          },
+          {
+            "case": "chunked-body",
+            "fastCompletionSeconds": [
+              0.054271458999999744,
+              0.08401454200000025,
+              0.10930404199999977
+            ],
+            "slowHeldSeconds": 0.10932299999999984,
+            "intentionalIdleSeconds": 0,
+            "slowFinishSeconds": 0.005857209000000196,
+            "fastResponsesBeforeSlowRelease": 3,
+            "passed": true
+          },
+          {
+            "case": "large-header",
+            "fastCompletionSeconds": [
+              0.06409995899999998,
+              0.10344091699999947,
+              0.1357406249999995
+            ],
+            "slowHeldSeconds": 0.13575720900000032,
+            "intentionalIdleSeconds": 0,
+            "slowFinishSeconds": 0.14343641599999923,
+            "fastResponsesBeforeSlowRelease": 3,
+            "passed": true
+          }
+        ],
+        "checkedResponses": 16,
+        "width": 4,
+        "queuedCancellations": 140,
+        "shutdownCancelledAccepts": 16,
+        "admissionLimit": 16
+      }
+    },
+    {
+      "round": -1,
+      "warmup": true,
+      "variant": "candidate",
+      "holdSecondsPerPhase": 0.1,
+      "processSeconds": 1.1099680410000001,
+      "processCpuSeconds": 0.7520769999999997,
+      "validation": {
+        "passed": true,
+        "startupSeconds": 0.005254833000000403,
+        "cases": [
+          {
+            "case": "headers",
+            "fastCompletionSeconds": [
+              0.034087416000000204,
+              0.062412790999999856,
+              0.08589754100000047
+            ],
+            "slowHeldSeconds": 0.19020949999999992,
+            "intentionalIdleSeconds": 0.1,
+            "slowFinishSeconds": 0.025880749999999786,
+            "fastResponsesBeforeSlowRelease": 3,
+            "passed": true
+          },
+          {
+            "case": "fixed-body",
+            "fastCompletionSeconds": [
+              0.05286408300000023,
+              0.08174420799999993,
+              0.10610404100000004
+            ],
+            "slowHeldSeconds": 0.21043462499999954,
+            "intentionalIdleSeconds": 0.1,
+            "slowFinishSeconds": 0.006706832999999968,
+            "fastResponsesBeforeSlowRelease": 3,
+            "passed": true
+          },
+          {
+            "case": "chunked-body",
+            "fastCompletionSeconds": [
+              0.0551276249999999,
+              0.08467762500000031,
+              0.11081800000000008
+            ],
+            "slowHeldSeconds": 0.21386708300000024,
+            "intentionalIdleSeconds": 0.1,
+            "slowFinishSeconds": 0.006475499999999634,
+            "fastResponsesBeforeSlowRelease": 3,
+            "passed": true
+          },
+          {
+            "case": "large-header",
+            "fastCompletionSeconds": [
+              0.06354233400000009,
+              0.10162925000000023,
+              0.13364579200000026
+            ],
+            "slowHeldSeconds": 0.23871695900000045,
+            "intentionalIdleSeconds": 0.1,
+            "slowFinishSeconds": 0.08018637499999937,
+            "fastResponsesBeforeSlowRelease": 3,
+            "passed": true
+          }
+        ],
+        "checkedResponses": 16,
+        "width": 4,
+        "queuedCancellations": 140,
+        "shutdownCancelledAccepts": 16,
+        "admissionLimit": 16
+      }
+    },
+    {
+      "round": -1,
+      "warmup": true,
+      "variant": "baseline",
+      "holdSecondsPerPhase": 0.1,
+      "processSeconds": 1.1294690840000001,
+      "processCpuSeconds": 0.7802579999999999,
+      "validation": {
+        "passed": true,
+        "startupSeconds": 0.004930417000000631,
+        "cases": [
+          {
+            "case": "headers",
+            "fastCompletionSeconds": [
+              0.03535958300000086,
+              0.0633088750000006,
+              0.08542462500000081
+            ],
+            "slowHeldSeconds": 0.1901597500000003,
+            "intentionalIdleSeconds": 0.1,
+            "slowFinishSeconds": 0.027189208000000242,
+            "fastResponsesBeforeSlowRelease": 3,
+            "passed": true
+          },
+          {
+            "case": "fixed-body",
+            "fastCompletionSeconds": [
+              0.050353375000000256,
+              0.07766512500000022,
+              0.10095333400000062
+            ],
+            "slowHeldSeconds": 0.20250575000000026,
+            "intentionalIdleSeconds": 0.1,
+            "slowFinishSeconds": 0.0102900840000002,
+            "fastResponsesBeforeSlowRelease": 3,
+            "passed": true
+          },
+          {
+            "case": "chunked-body",
+            "fastCompletionSeconds": [
+              0.05352229200000025,
+              0.08121912499999961,
+              0.10478495899999984
+            ],
+            "slowHeldSeconds": 0.20995670900000007,
+            "intentionalIdleSeconds": 0.1,
+            "slowFinishSeconds": 0.010171208000000043,
+            "fastResponsesBeforeSlowRelease": 3,
+            "passed": true
+          },
+          {
+            "case": "large-header",
+            "fastCompletionSeconds": [
+              0.06251958299999938,
+              0.10097308299999952,
+              0.13252537500000017
+            ],
+            "slowHeldSeconds": 0.23759541599999956,
+            "intentionalIdleSeconds": 0.1,
+            "slowFinishSeconds": 0.08045533399999982,
+            "fastResponsesBeforeSlowRelease": 3,
+            "passed": true
+          }
+        ],
+        "checkedResponses": 16,
+        "width": 4,
+        "queuedCancellations": 140,
+        "shutdownCancelledAccepts": 16,
+        "admissionLimit": 16
+      }
+    },
+    {
+      "round": 0,
+      "warmup": false,
+      "variant": "baseline",
+      "holdSecondsPerPhase": 0,
+      "processSeconds": 0.7185736249999994,
+      "processCpuSeconds": 0.7062769999999998,
+      "validation": {
+        "passed": true,
+        "startupSeconds": 0.004173875000000216,
+        "cases": [
+          {
+            "case": "headers",
+            "fastCompletionSeconds": [
+              0.03253062500000059,
+              0.05845245900000062,
+              0.08034374999999994
+            ],
+            "slowHeldSeconds": 0.08035725000000049,
+            "intentionalIdleSeconds": 0,
+            "slowFinishSeconds": 0.01631579199999944,
+            "fastResponsesBeforeSlowRelease": 3,
+            "passed": true
+          },
+          {
+            "case": "fixed-body",
+            "fastCompletionSeconds": [
+              0.05033354099999965,
+              0.07836583299999944,
+              0.1016944999999998
+            ],
+            "slowHeldSeconds": 0.1017177079999998,
+            "intentionalIdleSeconds": 0,
+            "slowFinishSeconds": 0.0052293749999998695,
+            "fastResponsesBeforeSlowRelease": 3,
+            "passed": true
+          },
+          {
+            "case": "chunked-body",
+            "fastCompletionSeconds": [
+              0.05171162500000026,
+              0.07956908299999998,
+              0.10306091600000045
+            ],
+            "slowHeldSeconds": 0.10307279099999977,
+            "intentionalIdleSeconds": 0,
+            "slowFinishSeconds": 0.0056936250000001465,
+            "fastResponsesBeforeSlowRelease": 3,
+            "passed": true
+          },
+          {
+            "case": "large-header",
+            "fastCompletionSeconds": [
+              0.06012470900000011,
+              0.0970387920000002,
+              0.12822787500000032
+            ],
+            "slowHeldSeconds": 0.1282397089999998,
+            "intentionalIdleSeconds": 0,
+            "slowFinishSeconds": 0.14211004100000046,
+            "fastResponsesBeforeSlowRelease": 3,
+            "passed": true
+          }
+        ],
+        "checkedResponses": 16,
+        "width": 4,
+        "queuedCancellations": 140,
+        "shutdownCancelledAccepts": 16,
+        "admissionLimit": 16
+      }
+    },
+    {
+      "round": 0,
+      "warmup": false,
+      "variant": "candidate",
+      "holdSecondsPerPhase": 0,
+      "processSeconds": 0.7146755419999993,
+      "processCpuSeconds": 0.7063860000000002,
+      "validation": {
+        "passed": true,
+        "startupSeconds": 0.004374624999999632,
+        "cases": [
+          {
+            "case": "headers",
+            "fastCompletionSeconds": [
+              0.03316858300000014,
+              0.059916707999999375,
+              0.08183887499999987
+            ],
+            "slowHeldSeconds": 0.0818607499999997,
+            "intentionalIdleSeconds": 0,
+            "slowFinishSeconds": 0.016411125000000304,
+            "fastResponsesBeforeSlowRelease": 3,
+            "passed": true
+          },
+          {
+            "case": "fixed-body",
+            "fastCompletionSeconds": [
+              0.049315499999999624,
+              0.07663083399999948,
+              0.09990062500000008
+            ],
+            "slowHeldSeconds": 0.09991429200000024,
+            "intentionalIdleSeconds": 0,
+            "slowFinishSeconds": 0.005228666999999909,
+            "fastResponsesBeforeSlowRelease": 3,
+            "passed": true
+          },
+          {
+            "case": "chunked-body",
+            "fastCompletionSeconds": [
+              0.051630917000000665,
+              0.07954633400000066,
+              0.10325925000000069
+            ],
+            "slowHeldSeconds": 0.10327262500000067,
+            "intentionalIdleSeconds": 0,
+            "slowFinishSeconds": 0.0057914999999999495,
+            "fastResponsesBeforeSlowRelease": 3,
+            "passed": true
+          },
+          {
+            "case": "large-header",
+            "fastCompletionSeconds": [
+              0.06019270799999887,
+              0.09740508299999995,
+              0.12892412499999928
+            ],
+            "slowHeldSeconds": 0.12894608299999888,
+            "intentionalIdleSeconds": 0,
+            "slowFinishSeconds": 0.1424219579999999,
+            "fastResponsesBeforeSlowRelease": 3,
+            "passed": true
+          }
+        ],
+        "checkedResponses": 16,
+        "width": 4,
+        "queuedCancellations": 140,
+        "shutdownCancelledAccepts": 16,
+        "admissionLimit": 16
+      }
+    },
+    {
+      "round": 0,
+      "warmup": false,
+      "variant": "baseline",
+      "holdSecondsPerPhase": 0.1,
+      "processSeconds": 1.1159393340000001,
+      "processCpuSeconds": 0.7692399999999995,
+      "validation": {
+        "passed": true,
+        "startupSeconds": 0.004874040999998996,
+        "cases": [
+          {
+            "case": "headers",
+            "fastCompletionSeconds": [
+              0.033348375000000985,
+              0.05959025000000118,
+              0.0816639170000002
+            ],
+            "slowHeldSeconds": 0.1867590840000002,
+            "intentionalIdleSeconds": 0.1,
+            "slowFinishSeconds": 0.027223875000000675,
+            "fastResponsesBeforeSlowRelease": 3,
+            "passed": true
+          },
+          {
+            "case": "fixed-body",
+            "fastCompletionSeconds": [
+              0.050335667000000583,
+              0.07766045800000043,
+              0.10085954200000025
+            ],
+            "slowHeldSeconds": 0.20129308300000126,
+            "intentionalIdleSeconds": 0.1,
+            "slowFinishSeconds": 0.010653624999999778,
+            "fastResponsesBeforeSlowRelease": 3,
+            "passed": true
+          },
+          {
+            "case": "chunked-body",
+            "fastCompletionSeconds": [
+              0.0545523750000001,
+              0.08242624999999926,
+              0.10682308400000018
+            ],
+            "slowHeldSeconds": 0.20738512500000006,
+            "intentionalIdleSeconds": 0.1,
+            "slowFinishSeconds": 0.010148499999999672,
+            "fastResponsesBeforeSlowRelease": 3,
+            "passed": true
+          },
+          {
+            "case": "large-header",
+            "fastCompletionSeconds": [
+              0.06193541600000074,
+              0.0990907080000003,
+              0.13085358300000038
+            ],
+            "slowHeldSeconds": 0.23565362499999942,
+            "intentionalIdleSeconds": 0.1,
+            "slowFinishSeconds": 0.08029620800000004,
+            "fastResponsesBeforeSlowRelease": 3,
+            "passed": true
+          }
+        ],
+        "checkedResponses": 16,
+        "width": 4,
+        "queuedCancellations": 140,
+        "shutdownCancelledAccepts": 16,
+        "admissionLimit": 16
+      }
+    },
+    {
+      "round": 0,
+      "warmup": false,
+      "variant": "candidate",
+      "holdSecondsPerPhase": 0.1,
+      "processSeconds": 1.1450036659999991,
+      "processCpuSeconds": 0.7947189999999997,
+      "validation": {
+        "passed": true,
+        "startupSeconds": 0.0043824999999984016,
+        "cases": [
+          {
+            "case": "headers",
+            "fastCompletionSeconds": [
+              0.03324562499999928,
+              0.05955708299999962,
+              0.08179908299999994
+            ],
+            "slowHeldSeconds": 0.18684316699999926,
+            "intentionalIdleSeconds": 0.1,
+            "slowFinishSeconds": 0.028640291000000317,
+            "fastResponsesBeforeSlowRelease": 3,
+            "passed": true
+          },
+          {
+            "case": "fixed-body",
+            "fastCompletionSeconds": [
+              0.05241245799999916,
+              0.08050412499999915,
+              0.10441529200000055
+            ],
+            "slowHeldSeconds": 0.20732133299999944,
+            "intentionalIdleSeconds": 0.1,
+            "slowFinishSeconds": 0.012240792000000056,
+            "fastResponsesBeforeSlowRelease": 3,
+            "passed": true
+          },
+          {
+            "case": "chunked-body",
+            "fastCompletionSeconds": [
+              0.05779654200000017,
+              0.08693295800000023,
+              0.11327245800000085
+            ],
+            "slowHeldSeconds": 0.21582087500000036,
+            "intentionalIdleSeconds": 0.1,
+            "slowFinishSeconds": 0.01112566699999995,
+            "fastResponsesBeforeSlowRelease": 3,
+            "passed": true
+          },
+          {
+            "case": "large-header",
+            "fastCompletionSeconds": [
+              0.06493699999999869,
+              0.1027299579999994,
+              0.1360518329999998
+            ],
+            "slowHeldSeconds": 0.23800374999999896,
+            "intentionalIdleSeconds": 0.1,
+            "slowFinishSeconds": 0.09281649999999964,
+            "fastResponsesBeforeSlowRelease": 3,
+            "passed": true
+          }
+        ],
+        "checkedResponses": 16,
+        "width": 4,
+        "queuedCancellations": 140,
+        "shutdownCancelledAccepts": 16,
+        "admissionLimit": 16
+      }
+    },
+    {
+      "round": 1,
+      "warmup": false,
+      "variant": "candidate",
+      "holdSecondsPerPhase": 0,
+      "processSeconds": 0.7467216249999993,
+      "processCpuSeconds": 0.7236620000000007,
+      "validation": {
+        "passed": true,
+        "startupSeconds": 0.004600291999999229,
+        "cases": [
+          {
+            "case": "headers",
+            "fastCompletionSeconds": [
+              0.03333020799999886,
+              0.059409457999999304,
+              0.08156279099999963
+            ],
+            "slowHeldSeconds": 0.0815783329999995,
+            "intentionalIdleSeconds": 0,
+            "slowFinishSeconds": 0.016619374999999437,
+            "fastResponsesBeforeSlowRelease": 3,
+            "passed": true
+          },
+          {
+            "case": "fixed-body",
+            "fastCompletionSeconds": [
+              0.04953120899999952,
+              0.07817816699999902,
+              0.10475362499999896
+            ],
+            "slowHeldSeconds": 0.10476908399999907,
+            "intentionalIdleSeconds": 0,
+            "slowFinishSeconds": 0.005236333000000926,
+            "fastResponsesBeforeSlowRelease": 3,
+            "passed": true
+          },
+          {
+            "case": "chunked-body",
+            "fastCompletionSeconds": [
+              0.05175491700000023,
+              0.07986091700000131,
+              0.10539437500000126
+            ],
+            "slowHeldSeconds": 0.10541325000000157,
+            "intentionalIdleSeconds": 0,
+            "slowFinishSeconds": 0.005833124999998773,
+            "fastResponsesBeforeSlowRelease": 3,
+            "passed": true
+          },
+          {
+            "case": "large-header",
+            "fastCompletionSeconds": [
+              0.062162584000001075,
+              0.09914116700000086,
+              0.13073137499999987
+            ],
+            "slowHeldSeconds": 0.13074870900000057,
+            "intentionalIdleSeconds": 0,
+            "slowFinishSeconds": 0.15068958300000013,
+            "fastResponsesBeforeSlowRelease": 3,
+            "passed": true
+          }
+        ],
+        "checkedResponses": 16,
+        "width": 4,
+        "queuedCancellations": 140,
+        "shutdownCancelledAccepts": 16,
+        "admissionLimit": 16
+      }
+    },
+    {
+      "round": 1,
+      "warmup": false,
+      "variant": "baseline",
+      "holdSecondsPerPhase": 0,
+      "processSeconds": 0.7603823750000007,
+      "processCpuSeconds": 0.7276669999999993,
+      "validation": {
+        "passed": true,
+        "startupSeconds": 0.004914708000001156,
+        "cases": [
+          {
+            "case": "headers",
+            "fastCompletionSeconds": [
+              0.03783079099999931,
+              0.06889974999999993,
+              0.10906241599999866
+            ],
+            "slowHeldSeconds": 0.10908187499999933,
+            "intentionalIdleSeconds": 0,
+            "slowFinishSeconds": 0.01758974999999907,
+            "fastResponsesBeforeSlowRelease": 3,
+            "passed": true
+          },
+          {
+            "case": "fixed-body",
+            "fastCompletionSeconds": [
+              0.05336254199999857,
+              0.08583308299999892,
+              0.10958870799999865
+            ],
+            "slowHeldSeconds": 0.10960416699999875,
+            "intentionalIdleSeconds": 0,
+            "slowFinishSeconds": 0.005417250000000706,
+            "fastResponsesBeforeSlowRelease": 3,
+            "passed": true
+          },
+          {
+            "case": "chunked-body",
+            "fastCompletionSeconds": [
+              0.052187041999999906,
+              0.08107954199999945,
+              0.1051094999999993
+            ],
+            "slowHeldSeconds": 0.10512716700000091,
+            "intentionalIdleSeconds": 0,
+            "slowFinishSeconds": 0.005704165999999233,
+            "fastResponsesBeforeSlowRelease": 3,
+            "passed": true
+          },
+          {
+            "case": "large-header",
+            "fastCompletionSeconds": [
+              0.06053058400000033,
+              0.09839083399999993,
+              0.12974720899999959
+            ],
+            "slowHeldSeconds": 0.12976962499999978,
+            "intentionalIdleSeconds": 0,
+            "slowFinishSeconds": 0.14506404199999956,
+            "fastResponsesBeforeSlowRelease": 3,
+            "passed": true
+          }
+        ],
+        "checkedResponses": 16,
+        "width": 4,
+        "queuedCancellations": 140,
+        "shutdownCancelledAccepts": 16,
+        "admissionLimit": 16
+      }
+    },
+    {
+      "round": 1,
+      "warmup": false,
+      "variant": "candidate",
+      "holdSecondsPerPhase": 0.1,
+      "processSeconds": 1.1144746249999997,
+      "processCpuSeconds": 0.7662480000000009,
+      "validation": {
+        "passed": true,
+        "startupSeconds": 0.004749290999999545,
+        "cases": [
+          {
+            "case": "headers",
+            "fastCompletionSeconds": [
+              0.03287370799999856,
+              0.058993415999999854,
+              0.08220854099999997
+            ],
+            "slowHeldSeconds": 0.18280991600000007,
+            "intentionalIdleSeconds": 0.1,
+            "slowFinishSeconds": 0.02708320899999883,
+            "fastResponsesBeforeSlowRelease": 3,
+            "passed": true
+          },
+          {
+            "case": "fixed-body",
+            "fastCompletionSeconds": [
+              0.050467666999999494,
+              0.07777916700000098,
+              0.10098679200000049
+            ],
+            "slowHeldSeconds": 0.20282274999999927,
+            "intentionalIdleSeconds": 0.1,
+            "slowFinishSeconds": 0.009736583000000465,
+            "fastResponsesBeforeSlowRelease": 3,
+            "passed": true
+          },
+          {
+            "case": "chunked-body",
+            "fastCompletionSeconds": [
+              0.05384879100000006,
+              0.08172583300000014,
+              0.10522212499999917
+            ],
+            "slowHeldSeconds": 0.20902524999999983,
+            "intentionalIdleSeconds": 0.1,
+            "slowFinishSeconds": 0.011274124999999913,
+            "fastResponsesBeforeSlowRelease": 3,
+            "passed": true
+          },
+          {
+            "case": "large-header",
+            "fastCompletionSeconds": [
+              0.06304504199999883,
+              0.10068908399999899,
+              0.13225495899999906
+            ],
+            "slowHeldSeconds": 0.23737791699999988,
+            "intentionalIdleSeconds": 0.1,
+            "slowFinishSeconds": 0.07972649999999959,
+            "fastResponsesBeforeSlowRelease": 3,
+            "passed": true
+          }
+        ],
+        "checkedResponses": 16,
+        "width": 4,
+        "queuedCancellations": 140,
+        "shutdownCancelledAccepts": 16,
+        "admissionLimit": 16
+      }
+    },
+    {
+      "round": 1,
+      "warmup": false,
+      "variant": "baseline",
+      "holdSecondsPerPhase": 0.1,
+      "processSeconds": 1.1160820420000004,
+      "processCpuSeconds": 0.7681889999999996,
+      "validation": {
+        "passed": true,
+        "startupSeconds": 0.004227416999999178,
+        "cases": [
+          {
+            "case": "headers",
+            "fastCompletionSeconds": [
+              0.032579625000000334,
+              0.05852291699999945,
+              0.08061425
+            ],
+            "slowHeldSeconds": 0.18486420800000047,
+            "intentionalIdleSeconds": 0.1,
+            "slowFinishSeconds": 0.027829416999999523,
+            "fastResponsesBeforeSlowRelease": 3,
+            "passed": true
+          },
+          {
+            "case": "fixed-body",
+            "fastCompletionSeconds": [
+              0.05040070899999982,
+              0.07768291700000063,
+              0.10084383400000085
+            ],
+            "slowHeldSeconds": 0.20590495899999972,
+            "intentionalIdleSeconds": 0.1,
+            "slowFinishSeconds": 0.009821625000000722,
+            "fastResponsesBeforeSlowRelease": 3,
+            "passed": true
+          },
+          {
+            "case": "chunked-body",
+            "fastCompletionSeconds": [
+              0.0541139589999986,
+              0.08195729200000024,
+              0.10583100000000023
+            ],
+            "slowHeldSeconds": 0.20602108399999963,
+            "intentionalIdleSeconds": 0.1,
+            "slowFinishSeconds": 0.010484957999999267,
+            "fastResponsesBeforeSlowRelease": 3,
+            "passed": true
+          },
+          {
+            "case": "large-header",
+            "fastCompletionSeconds": [
+              0.06407495900000093,
+              0.10111125000000065,
+              0.1324310000000004
+            ],
+            "slowHeldSeconds": 0.23647725000000008,
+            "intentionalIdleSeconds": 0.1,
+            "slowFinishSeconds": 0.08091608400000005,
+            "fastResponsesBeforeSlowRelease": 3,
+            "passed": true
+          }
+        ],
+        "checkedResponses": 16,
+        "width": 4,
+        "queuedCancellations": 140,
+        "shutdownCancelledAccepts": 16,
+        "admissionLimit": 16
+      }
+    },
+    {
+      "round": 2,
+      "warmup": false,
+      "variant": "baseline",
+      "holdSecondsPerPhase": 0,
+      "processSeconds": 0.7120083749999999,
+      "processCpuSeconds": 0.7025909999999995,
+      "validation": {
+        "passed": true,
+        "startupSeconds": 0.0042084589999991096,
+        "cases": [
+          {
+            "case": "headers",
+            "fastCompletionSeconds": [
+              0.032559750000000776,
+              0.058465333000000896,
+              0.08038220799999962
+            ],
+            "slowHeldSeconds": 0.08039624999999972,
+            "intentionalIdleSeconds": 0,
+            "slowFinishSeconds": 0.01609570799999993,
+            "fastResponsesBeforeSlowRelease": 3,
+            "passed": true
+          },
+          {
+            "case": "fixed-body",
+            "fastCompletionSeconds": [
+              0.04922416700000021,
+              0.07638433300000003,
+              0.0996000420000005
+            ],
+            "slowHeldSeconds": 0.09961241700000123,
+            "intentionalIdleSeconds": 0,
+            "slowFinishSeconds": 0.005258874999999108,
+            "fastResponsesBeforeSlowRelease": 3,
+            "passed": true
+          },
+          {
+            "case": "chunked-body",
+            "fastCompletionSeconds": [
+              0.05152724999999947,
+              0.07915549999999882,
+              0.1027092500000002
+            ],
+            "slowHeldSeconds": 0.10272229199999927,
+            "intentionalIdleSeconds": 0,
+            "slowFinishSeconds": 0.005718958000000995,
+            "fastResponsesBeforeSlowRelease": 3,
+            "passed": true
+          },
+          {
+            "case": "large-header",
+            "fastCompletionSeconds": [
+              0.061148082999999076,
+              0.09861062499999917,
+              0.12990049999999975
+            ],
+            "slowHeldSeconds": 0.12991666599999974,
+            "intentionalIdleSeconds": 0,
+            "slowFinishSeconds": 0.1430657919999998,
+            "fastResponsesBeforeSlowRelease": 3,
+            "passed": true
+          }
+        ],
+        "checkedResponses": 16,
+        "width": 4,
+        "queuedCancellations": 140,
+        "shutdownCancelledAccepts": 16,
+        "admissionLimit": 16
+      }
+    },
+    {
+      "round": 2,
+      "warmup": false,
+      "variant": "candidate",
+      "holdSecondsPerPhase": 0,
+      "processSeconds": 0.7088542090000001,
+      "processCpuSeconds": 0.7003109999999986,
+      "validation": {
+        "passed": true,
+        "startupSeconds": 0.004384874999999511,
+        "cases": [
+          {
+            "case": "headers",
+            "fastCompletionSeconds": [
+              0.032650832999999935,
+              0.058540083000000465,
+              0.0806553749999992
+            ],
+            "slowHeldSeconds": 0.08067074999999946,
+            "intentionalIdleSeconds": 0,
+            "slowFinishSeconds": 0.0162882910000004,
+            "fastResponsesBeforeSlowRelease": 3,
+            "passed": true
+          },
+          {
+            "case": "fixed-body",
+            "fastCompletionSeconds": [
+              0.049162582999999316,
+              0.07633920800000027,
+              0.09939325000000032
+            ],
+            "slowHeldSeconds": 0.09940445800000042,
+            "intentionalIdleSeconds": 0,
+            "slowFinishSeconds": 0.005269791999999995,
+            "fastResponsesBeforeSlowRelease": 3,
+            "passed": true
+          },
+          {
+            "case": "chunked-body",
+            "fastCompletionSeconds": [
+              0.05128049999999895,
+              0.07891808399999967,
+              0.10255916699999901
+            ],
+            "slowHeldSeconds": 0.10257424999999998,
+            "intentionalIdleSeconds": 0,
+            "slowFinishSeconds": 0.005741749999998547,
+            "fastResponsesBeforeSlowRelease": 3,
+            "passed": true
+          },
+          {
+            "case": "large-header",
+            "fastCompletionSeconds": [
+              0.060127292000000665,
+              0.09687491700000095,
+              0.12801445800000089
+            ],
+            "slowHeldSeconds": 0.128026792,
+            "intentionalIdleSeconds": 0,
+            "slowFinishSeconds": 0.14229287500000076,
+            "fastResponsesBeforeSlowRelease": 3,
+            "passed": true
+          }
+        ],
+        "checkedResponses": 16,
+        "width": 4,
+        "queuedCancellations": 140,
+        "shutdownCancelledAccepts": 16,
+        "admissionLimit": 16
+      }
+    },
+    {
+      "round": 2,
+      "warmup": false,
+      "variant": "baseline",
+      "holdSecondsPerPhase": 0.1,
+      "processSeconds": 1.1120311670000014,
+      "processCpuSeconds": 0.7719160000000005,
+      "validation": {
+        "passed": true,
+        "startupSeconds": 0.004286249999999825,
+        "cases": [
+          {
+            "case": "headers",
+            "fastCompletionSeconds": [
+              0.033026583999999914,
+              0.05901683399999946,
+              0.08095529200000051
+            ],
+            "slowHeldSeconds": 0.18119091700000034,
+            "intentionalIdleSeconds": 0.1,
+            "slowFinishSeconds": 0.026301374999999183,
+            "fastResponsesBeforeSlowRelease": 3,
+            "passed": true
+          },
+          {
+            "case": "fixed-body",
+            "fastCompletionSeconds": [
+              0.05194712499999987,
+              0.07978054199999995,
+              0.10294266700000243
+            ],
+            "slowHeldSeconds": 0.20346325000000043,
+            "intentionalIdleSeconds": 0.1,
+            "slowFinishSeconds": 0.010873583999998715,
+            "fastResponsesBeforeSlowRelease": 3,
+            "passed": true
+          },
+          {
+            "case": "chunked-body",
+            "fastCompletionSeconds": [
+              0.05365979200000126,
+              0.08279312500000202,
+              0.1065794579999988
+            ],
+            "slowHeldSeconds": 0.21138391699999914,
+            "intentionalIdleSeconds": 0.1,
+            "slowFinishSeconds": 0.011715625000000784,
+            "fastResponsesBeforeSlowRelease": 3,
+            "passed": true
+          },
+          {
+            "case": "large-header",
+            "fastCompletionSeconds": [
+              0.06282408299999886,
+              0.10123512499999876,
+              0.1326377910000005
+            ],
+            "slowHeldSeconds": 0.23286412499999898,
+            "intentionalIdleSeconds": 0.1,
+            "slowFinishSeconds": 0.07946395800000161,
+            "fastResponsesBeforeSlowRelease": 3,
+            "passed": true
+          }
+        ],
+        "checkedResponses": 16,
+        "width": 4,
+        "queuedCancellations": 140,
+        "shutdownCancelledAccepts": 16,
+        "admissionLimit": 16
+      }
+    },
+    {
+      "round": 2,
+      "warmup": false,
+      "variant": "candidate",
+      "holdSecondsPerPhase": 0.1,
+      "processSeconds": 1.116799167,
+      "processCpuSeconds": 0.7630610000000008,
+      "validation": {
+        "passed": true,
+        "startupSeconds": 0.004057875000000877,
+        "cases": [
+          {
+            "case": "headers",
+            "fastCompletionSeconds": [
+              0.03312866699999972,
+              0.060365125000000575,
+              0.0828596250000011
+            ],
+            "slowHeldSeconds": 0.18455320800000052,
+            "intentionalIdleSeconds": 0.1,
+            "slowFinishSeconds": 0.024439749999999094,
+            "fastResponsesBeforeSlowRelease": 3,
+            "passed": true
+          },
+          {
+            "case": "fixed-body",
+            "fastCompletionSeconds": [
+              0.05141270800000086,
+              0.07906937499999955,
+              0.10242870800000148
+            ],
+            "slowHeldSeconds": 0.20752225000000024,
+            "intentionalIdleSeconds": 0.1,
+            "slowFinishSeconds": 0.011725041999998354,
+            "fastResponsesBeforeSlowRelease": 3,
+            "passed": true
+          },
+          {
+            "case": "chunked-body",
+            "fastCompletionSeconds": [
+              0.05565095899999761,
+              0.08452620899999985,
+              0.10964583399999839
+            ],
+            "slowHeldSeconds": 0.2111494169999979,
+            "intentionalIdleSeconds": 0.1,
+            "slowFinishSeconds": 0.008219083000000182,
+            "fastResponsesBeforeSlowRelease": 3,
+            "passed": true
+          },
+          {
+            "case": "large-header",
+            "fastCompletionSeconds": [
+              0.06328462500000143,
+              0.10238258400000078,
+              0.1347024999999995
+            ],
+            "slowHeldSeconds": 0.23748383399999895,
+            "intentionalIdleSeconds": 0.1,
+            "slowFinishSeconds": 0.08042500000000175,
+            "fastResponsesBeforeSlowRelease": 3,
+            "passed": true
+          }
+        ],
+        "checkedResponses": 16,
+        "width": 4,
+        "queuedCancellations": 140,
+        "shutdownCancelledAccepts": 16,
+        "admissionLimit": 16
+      }
+    },
+    {
+      "round": 3,
+      "warmup": false,
+      "variant": "candidate",
+      "holdSecondsPerPhase": 0,
+      "processSeconds": 0.7385530409999994,
+      "processCpuSeconds": 0.725577999999999,
+      "validation": {
+        "passed": true,
+        "startupSeconds": 0.004104749999999768,
+        "cases": [
+          {
+            "case": "headers",
+            "fastCompletionSeconds": [
+              0.033020291999999785,
+              0.06322358300000275,
+              0.08678862500000051
+            ],
+            "slowHeldSeconds": 0.08680620800000227,
+            "intentionalIdleSeconds": 0,
+            "slowFinishSeconds": 0.017416791999998793,
+            "fastResponsesBeforeSlowRelease": 3,
+            "passed": true
+          },
+          {
+            "case": "fixed-body",
+            "fastCompletionSeconds": [
+              0.05324233400000011,
+              0.08138537499999998,
+              0.10594862499999991
+            ],
+            "slowHeldSeconds": 0.10597170899999853,
+            "intentionalIdleSeconds": 0,
+            "slowFinishSeconds": 0.005791250000001469,
+            "fastResponsesBeforeSlowRelease": 3,
+            "passed": true
+          },
+          {
+            "case": "chunked-body",
+            "fastCompletionSeconds": [
+              0.05362329199999749,
+              0.08306695799999986,
+              0.10725629199999887
+            ],
+            "slowHeldSeconds": 0.10727454199999897,
+            "intentionalIdleSeconds": 0,
+            "slowFinishSeconds": 0.0057207079999983534,
+            "fastResponsesBeforeSlowRelease": 3,
+            "passed": true
+          },
+          {
+            "case": "large-header",
+            "fastCompletionSeconds": [
+              0.06120087499999727,
+              0.09870533399999815,
+              0.131991124999999
+            ],
+            "slowHeldSeconds": 0.1320065839999991,
+            "intentionalIdleSeconds": 0,
+            "slowFinishSeconds": 0.14507479099999898,
+            "fastResponsesBeforeSlowRelease": 3,
+            "passed": true
+          }
+        ],
+        "checkedResponses": 16,
+        "width": 4,
+        "queuedCancellations": 140,
+        "shutdownCancelledAccepts": 16,
+        "admissionLimit": 16
+      }
+    },
+    {
+      "round": 3,
+      "warmup": false,
+      "variant": "baseline",
+      "holdSecondsPerPhase": 0,
+      "processSeconds": 0.7285078750000018,
+      "processCpuSeconds": 0.7163670000000012,
+      "validation": {
+        "passed": true,
+        "startupSeconds": 0.004649583000002622,
+        "cases": [
+          {
+            "case": "headers",
+            "fastCompletionSeconds": [
+              0.03342941700000068,
+              0.0598635829999985,
+              0.08201712500000014
+            ],
+            "slowHeldSeconds": 0.08203733299999882,
+            "intentionalIdleSeconds": 0,
+            "slowFinishSeconds": 0.016521541999999556,
+            "fastResponsesBeforeSlowRelease": 3,
+            "passed": true
+          },
+          {
+            "case": "fixed-body",
+            "fastCompletionSeconds": [
+              0.05120616600000005,
+              0.07952537499999934,
+              0.103813916
+            ],
+            "slowHeldSeconds": 0.10383941599999957,
+            "intentionalIdleSeconds": 0,
+            "slowFinishSeconds": 0.00558358400000003,
+            "fastResponsesBeforeSlowRelease": 3,
+            "passed": true
+          },
+          {
+            "case": "chunked-body",
+            "fastCompletionSeconds": [
+              0.05218612500000219,
+              0.08003662500000175,
+              0.1042613750000001
+            ],
+            "slowHeldSeconds": 0.10428375000000045,
+            "intentionalIdleSeconds": 0,
+            "slowFinishSeconds": 0.005824500000002786,
+            "fastResponsesBeforeSlowRelease": 3,
+            "passed": true
+          },
+          {
+            "case": "large-header",
+            "fastCompletionSeconds": [
+              0.06032595799999996,
+              0.09745950000000292,
+              0.1291204580000027
+            ],
+            "slowHeldSeconds": 0.12913483300000195,
+            "intentionalIdleSeconds": 0,
+            "slowFinishSeconds": 0.14494491700000012,
+            "fastResponsesBeforeSlowRelease": 3,
+            "passed": true
+          }
+        ],
+        "checkedResponses": 16,
+        "width": 4,
+        "queuedCancellations": 140,
+        "shutdownCancelledAccepts": 16,
+        "admissionLimit": 16
+      }
+    },
+    {
+      "round": 3,
+      "warmup": false,
+      "variant": "candidate",
+      "holdSecondsPerPhase": 0.1,
+      "processSeconds": 1.1836280409999986,
+      "processCpuSeconds": 0.7559209999999988,
+      "validation": {
+        "passed": true,
+        "startupSeconds": 0.0046237079999968955,
+        "cases": [
+          {
+            "case": "headers",
+            "fastCompletionSeconds": [
+              0.03464204200000154,
+              0.06113270900000245,
+              0.08443025000000048
+            ],
+            "slowHeldSeconds": 0.1895438750000018,
+            "intentionalIdleSeconds": 0.1,
+            "slowFinishSeconds": 0.018675874999999564,
+            "fastResponsesBeforeSlowRelease": 3,
+            "passed": true
+          },
+          {
+            "case": "fixed-body",
+            "fastCompletionSeconds": [
+              0.04984033299999879,
+              0.07800087500000075,
+              0.10220183299999874
+            ],
+            "slowHeldSeconds": 0.20317504199999803,
+            "intentionalIdleSeconds": 0.1,
+            "slowFinishSeconds": 0.013019333000002575,
+            "fastResponsesBeforeSlowRelease": 3,
+            "passed": true
+          },
+          {
+            "case": "chunked-body",
+            "fastCompletionSeconds": [
+              0.06894050000000007,
+              0.0977203330000016,
+              0.12220704200000299
+            ],
+            "slowHeldSeconds": 0.2272766250000018,
+            "intentionalIdleSeconds": 0.1,
+            "slowFinishSeconds": 0.00827045799999837,
+            "fastResponsesBeforeSlowRelease": 3,
+            "passed": true
+          },
+          {
+            "case": "large-header",
+            "fastCompletionSeconds": [
+              0.06157908400000167,
+              0.09985204200000197,
+              0.13415633400000004
+            ],
+            "slowHeldSeconds": 0.23633045900000127,
+            "intentionalIdleSeconds": 0.1,
+            "slowFinishSeconds": 0.08158483300000086,
+            "fastResponsesBeforeSlowRelease": 3,
+            "passed": true
+          }
+        ],
+        "checkedResponses": 16,
+        "width": 4,
+        "queuedCancellations": 140,
+        "shutdownCancelledAccepts": 16,
+        "admissionLimit": 16
+      }
+    },
+    {
+      "round": 3,
+      "warmup": false,
+      "variant": "baseline",
+      "holdSecondsPerPhase": 0.1,
+      "processSeconds": 1.1045420000000021,
+      "processCpuSeconds": 0.7615209999999984,
+      "validation": {
+        "passed": true,
+        "startupSeconds": 0.004618250000000046,
+        "cases": [
+          {
+            "case": "headers",
+            "fastCompletionSeconds": [
+              0.03282787500000239,
+              0.05956937500000237,
+              0.08250137499999965
+            ],
+            "slowHeldSeconds": 0.18757004100000074,
+            "intentionalIdleSeconds": 0.1,
+            "slowFinishSeconds": 0.020274499999999307,
+            "fastResponsesBeforeSlowRelease": 3,
+            "passed": true
+          },
+          {
+            "case": "fixed-body",
+            "fastCompletionSeconds": [
+              0.051660459000000714,
+              0.08014900000000225,
+              0.104375000000001
+            ],
+            "slowHeldSeconds": 0.20889812500000104,
+            "intentionalIdleSeconds": 0.1,
+            "slowFinishSeconds": 0.007866583999998511,
+            "fastResponsesBeforeSlowRelease": 3,
+            "passed": true
+          },
+          {
+            "case": "chunked-body",
+            "fastCompletionSeconds": [
+              0.053305125000001397,
+              0.08125833300000096,
+              0.10511662500000085
+            ],
+            "slowHeldSeconds": 0.210204375,
+            "intentionalIdleSeconds": 0.1,
+            "slowFinishSeconds": 0.010609458000001126,
+            "fastResponsesBeforeSlowRelease": 3,
+            "passed": true
+          },
+          {
+            "case": "large-header",
+            "fastCompletionSeconds": [
+              0.06341304200000053,
+              0.10141229199999913,
+              0.1335676250000013
+            ],
+            "slowHeldSeconds": 0.23414891699999885,
+            "intentionalIdleSeconds": 0.1,
+            "slowFinishSeconds": 0.07823016700000096,
+            "fastResponsesBeforeSlowRelease": 3,
+            "passed": true
+          }
+        ],
+        "checkedResponses": 16,
+        "width": 4,
+        "queuedCancellations": 140,
+        "shutdownCancelledAccepts": 16,
+        "admissionLimit": 16
+      }
+    }
+  ],
+  "summaries": [
+    {
+      "holdSecondsPerPhase": 0,
+      "baseline": {
+        "processSeconds": {
+          "median": 0.7235407500000006,
+          "minimum": 0.7120083749999999,
+          "maximum": 0.7603823750000007
+        },
+        "processCpuSeconds": {
+          "median": 0.7113220000000005,
+          "minimum": 0.7025909999999995,
+          "maximum": 0.7276669999999993
+        }
+      },
+      "candidate": {
+        "processSeconds": {
+          "median": 0.7266142914999993,
+          "minimum": 0.7088542090000001,
+          "maximum": 0.7467216249999993
+        },
+        "processCpuSeconds": {
+          "median": 0.7150240000000004,
+          "minimum": 0.7003109999999986,
+          "maximum": 0.725577999999999
+        }
+      }
+    },
+    {
+      "holdSecondsPerPhase": 0.1,
+      "baseline": {
+        "processSeconds": {
+          "median": 1.1139852505000007,
+          "minimum": 1.1045420000000021,
+          "maximum": 1.1160820420000004
+        },
+        "processCpuSeconds": {
+          "median": 0.7687144999999995,
+          "minimum": 0.7615209999999984,
+          "maximum": 0.7719160000000005
+        }
+      },
+      "candidate": {
+        "processSeconds": {
+          "median": 1.1309014164999995,
+          "minimum": 1.1144746249999997,
+          "maximum": 1.1836280409999986
+        },
+        "processCpuSeconds": {
+          "median": 0.7646545000000009,
+          "minimum": 0.7559209999999988,
+          "maximum": 0.7947189999999997
+        }
+      }
+    }
+  ],
+  "scope": "Uninstrumented AOT matched carrier comparison, identical runtime-async application and libraries. Process CPU/wall include startup and teardown; phase durations are client-observed, not OS readiness latency. Four rounds alternate order after warmups."
+}
