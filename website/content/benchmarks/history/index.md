@@ -40,5 +40,7 @@ based on observed noise. A small change in one short run is not proof of an impr
 or regression. No automatic statistical acceptance gate is active yet.
 
 See the [benchmark history policy](https://github.com/marinasundstrom/neoCLR/blob/main/docs/benchmark-history.md)
-for provenance and comparison requirements. Windows and equivalent .NET, Go and
-JavaScript results remain future measurements.
+for provenance and comparison requirements. Windows and sustained cross-runtime
+measurements remain future work. A [local development comparison](/benchmarks/http-comparison/)
+now retains Kestrel, Go and Node pilot results; publication is on hold pending
+neoCLR HTTP improvements.

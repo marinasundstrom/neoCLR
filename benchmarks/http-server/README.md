@@ -144,3 +144,9 @@ or persistent dataset. The temporary benchmark container was stopped after the r
 
 [Bulk decoder entry, direct response framing and allocation measurements](byte-paths.md)
 record a matched development comparison; published Preview 14 baseline data remains unchanged.
+
+## Retained cross-runtime comparisons
+
+[Kestrel, Go and Node direct-handler projects and pilot results](platforms.md)
+are maintained as the HTTP comparison matrix. Routing is excluded. Also see the
+[fixed ASCII framing follow-up](ascii-framing.md) for the latest allocation evidence.

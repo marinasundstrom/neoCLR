@@ -43,6 +43,14 @@ from `/samples/`. Preserve release-specific examples in `samples/preview9/` unti
 new release changes that baseline. See [API maintenance](../api-docs/README.md) for
 snapshot refresh and coverage.
 
+## Current publication hold — 2026-10-13
+
+The author requests retaining the HTTP cross-runtime comparisons on the local
+website but publishing nothing until neoCLR HTTP API/handling improvements are
+ready. Do not dispatch the Pages workflow for these changes. Small allocation
+gains and a successful local build do not lift this hold. See
+[comparison scope](../benchmarks/http-server/platforms.md).
+
 ## Documentation can precede a release
 
 The site tracks development and can be published before the corresponding runtime

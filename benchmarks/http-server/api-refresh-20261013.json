@@ -1,0 +1,22 @@
+{
+  "bridgeCommand": [
+    "dotnet",
+    "build",
+    "docs/experiments/raven-target/Probe.csproj",
+    "-p:RavenRoot=/Users/robert/Projects/raven",
+    "-p:BuildProjectReferences=false",
+    "-p:WarningLevel=0"
+  ],
+  "referenceCommand": [
+    "dotnet",
+    "docs/experiments/raven-target/bin/Debug/net11.0/Probe.dll",
+    "--reference-core",
+    "target/http-comparison-api-20261013/NeoCLR.CoreProbe.dll"
+  ],
+  "compilerRevision": "6b5e052ce3648f9247ac76aba275587a3a5a1bb4",
+  "bridgeBuildOutput": "  Determining projects to restore...\n  Restored /Users/robert/Projects/raven/src/Raven.CodeAnalysis/Raven.CodeAnalysis.csproj (in 139 ms).\n  1 of 2 projects are up-to-date for restore.\n/usr/local/share/dotnet/sdk/11.0.100-rc.1.26425.128/Sdks/Microsoft.NET.Sdk/targets/Microsoft.NET.RuntimeIdentifierInference.targets(385,5): message NETSDK1057: You are using a preview version of .NET. See: https://aka.ms/dotnet-support-policy [/Users/robert/Projects/neoclr/docs/experiments/raven-target/Probe.csproj]\n  Probe -> /Users/robert/Projects/neoclr/docs/experiments/raven-target/bin/Debug/net11.0/Probe.dll\n\nBuild succeeded.\n    0 Warning(s)\n    0 Error(s)\n\nTime Elapsed 00:00:04.91\n",
+  "snapshotCheckOutput": "Checked RavenDoc reference assembly and source fingerprints\n",
+  "referenceSha256": "9633f96b13902048201d52f3ea74b727f02a18895972d5de2e281464988a2957",
+  "note": "Fresh bridge output is byte-identical to committed reference; public inventory unchanged. Only HttpServer source fingerprint changes.",
+  "websiteBuild": "Passed: built and checked 4307 RavenDoc pages; comparison table/hold text checked in rendered HTML."
+}

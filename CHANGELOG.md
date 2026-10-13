@@ -8,6 +8,14 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-13
 
+- Retain the first six-configuration HTTP terminal-handler pilot: all 2,304
+  responses pass across neoCLR, Kestrel, Go and Node. Record ranges, startup,
+  serializer/hosting differences and short-run warmup limits; neoCLR's large gap
+  keeps runtime overhead investigation urgent. Add local website tables/methodology
+  and record the author's publication hold pending HTTP API/handling improvements.
+  Regenerate the API bridge (unchanged reference assembly/public inventory) to
+  refresh the internal HTTP source fingerprint. Published baselines are unchanged.
+
 - Add retained HTTP comparison applications for terminal Kestrel (.NET JIT and
   Native AOT), direct Go net/http and Node http.createServer, without routers or
   application frameworks. Keep plain-text/JSON payloads, preparation tools and

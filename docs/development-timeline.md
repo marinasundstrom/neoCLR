@@ -16411,3 +16411,31 @@ qualification. Request and response deadline documentation now includes TLS work
   are unchanged. [Measurement details](../benchmarks/http-server/byte-paths.md)
   retain raw results and limitations. Website HTTP content was reviewed: its
   buffered-body description remains accurate; no public API documentation changed.
+
+## 2026-10-13 — Retained HTTP comparisons before routing
+
+- **Author request:** Compare with an equivalent ASP.NET Core app in JIT and AOT.
+  The author clarified that comparing framework/router overhead would be unfair:
+  measure receiving requests before routing. The author then requested that these
+  setups remain in the project as ongoing benchmarks, and added Go and Node.js.
+- **Assistant response and action:** Replaced the initial routed candidate with a
+  terminal Kestrel delegate, added direct net/http and http.createServer applications,
+  and retained all sources/preparation tools plus a common rotating controller.
+  Payloads are created per request. Kestrel hosting/HttpContext, JSON strategy and
+  runtime defaults remain visible differences; this is not a raw socket comparison.
+- **Observed outcome:** The six configurations pass 2,304 checked responses. neoCLR
+  is roughly 74–77 req/s plain and 39–41 JSON in this pilot; other configurations
+  are in the thousands. The assistant identifies collector/root-boundary overhead
+  from existing profiles as the next investigation, not a cause proven by this
+  comparison alone. Fixed framing separately reduces allocations to 510/1,198 per
+  plain/JSON request with full reclamation.
+- **Limits and next work:** Short fixed-count runs do not establish warmed JIT,
+  saturation, production capacity or a general ranking of the other runtimes.
+  Retain dated history and build provenance; longer calibrated runs and concurrency
+  need a separate workload series. [Projects, results and reproduction](../benchmarks/http-server/platforms.md).
+  Website source now links the development comparison; publication and installation
+  have not been performed in this slice.
+- **Subsequent author direction:** Keep these benchmarks on the website as well,
+  but publish nothing until there are neoCLR HTTP API/handling improvements. The
+  assistant adds a local development comparison page and records the publication
+  hold; current small allocation gains do not lift it.

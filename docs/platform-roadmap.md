@@ -1,5 +1,13 @@
 # neoCLR platform roadmap
 
+**HTTP comparison matrix (2026-10-13):** Author-directed [retained direct-handler projects](../benchmarks/http-server/platforms.md)
+cover neoCLR JIT/AOT, Kestrel JIT/AOT, Go native and Node V8 without routing. All
+2,304 pilot responses pass. The large observed neoCLR gap reinforces investigation
+of collector/root-boundary overhead; short-run results are not saturation rankings.
+[Fixed ASCII framing](../benchmarks/http-server/ascii-framing.md) lowers allocations
+further to 510/plain and 1,198/JSON request, with full diagnostic reclamation.
+Published baselines remain unchanged; no permanent milestone reorder is inferred.
+
 **HTTP byte paths (2026-10-13):** [matched allocation and throughput evidence](../benchmarks/http-server/byte-paths.md)
 records block decoder entry and direct byte response framing. Warm AOT allocations
 fall from 559 to 519 per plain request and 1,256 to 1,210 per JSON request. Native

@@ -101,8 +101,13 @@ controlled hosts, calibrated durations and noise-aware regression checks come ne
 These exploratory baselines cannot yet enforce that goal.
 
 Longer quiet-host runs, guest CPU/peak memory, Windows, HTTPS, connection reuse,
-concurrency sweeps and equivalent .NET/Go/JavaScript measurements remain open. Use a
+concurrency sweeps and sustained cross-runtime measurements remain open. Use a
 separate load generator before making saturation claims.
+
+Development now retains [direct-handler comparison projects and pilot results](/benchmarks/http-comparison/)
+for Kestrel (.NET JIT/AOT), Go and Node.js alongside neoCLR. Routing is excluded.
+Those short-run development comparisons do not replace the published baseline above.
+They remain local, with publication on hold pending neoCLR HTTP improvements.
 
 [HTTP server case](/cases/http-server/) · [SQL databases](/features/sql/) ·
 [General execution benchmarks](/benchmarks/execution/)
