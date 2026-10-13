@@ -1,0 +1,96 @@
+import System.*
+import System.Collections.*
+import System.Data.Sql.*
+import System.Data.PostgreSql.*
+import System.Concurrency.Tasks.*
+import System.Result.*
+
+public class BenchmarkRow {
+    init() { }
+    var id: int { get; set; } = 0
+    var name: string { get; set; } = ""
+    var active: bool { get; set; } = false
+}
+
+public class QueryParameters {
+    init() { }
+    val count: int => 32
+}
+
+func Query(connection: SqlConnection, name: string, parameters: QueryParameters) -> Task<Result<Sequence<BenchmarkRow>, SqlError>> {
+    if name == "postgres.positional-1" {
+        return SqlMapper.Query<BenchmarkRow>(connection,
+            "SELECT i AS id, 'row'::text AS name, true AS active FROM generate_series(1, $1::int) i", 1)
+    }
+    return SqlMapper.Query<BenchmarkRow>(connection,
+        "SELECT i AS id, 'row'::text AS name, true AS active FROM generate_series(1, @count::int) i", parameters)
+}
+
+async func Run(connection: SqlConnection, name: string, parameters: QueryParameters) -> Task<int> {
+    let result = await Query(connection, name, parameters)
+    let Ok(rows) = result else {
+        System.Fail("PostgreSQL benchmark query failed")
+    }
+    let count = if name == "postgres.positional-1" { 1 } else { 32 }
+    if rows.Count != count {
+        System.Fail("PostgreSQL benchmark row count")
+    }
+    var sum = 0
+    for row in rows {
+        if row.name != "row" || !row.active {
+            System.Fail("PostgreSQL benchmark row content")
+        }
+        sum += row.id
+    }
+    if sum != count * (count + 1) / 2 {
+        System.Fail("PostgreSQL benchmark checksum")
+    }
+    return 1
+}
+
+// Explicit async worker until benchmark discovery supports Task-returning cases.
+async func Main(arguments: string[]) -> Task<()> {
+    if arguments.Length != 3 {
+        System.Fail("Expected case, warmups and operations")
+    }
+    let name = arguments[0]
+    if name != "postgres.positional-1" && name != "postgres.named-32" {
+        System.Fail("Unknown PostgreSQL case")
+    }
+    let Ok(warmups) = Int32.Parse(arguments[1]) else {
+        System.Fail("Invalid warmups")
+    }
+    let Ok(operations) = Int32.Parse(arguments[2]) else {
+        System.Fail("Invalid operations")
+    }
+    if warmups < 0 {
+        System.Fail("Invalid counts")
+    }
+    if warmups > 10000 {
+        System.Fail("Invalid counts")
+    }
+    if operations < 1 {
+        System.Fail("Invalid counts")
+    }
+    if operations > 10000 {
+        System.Fail("Invalid counts")
+    }
+    let opened = await PostgresDatabase("postgres", "postgres", Configuration.Port, 60000).Open()
+    let Ok(session) = opened else {
+        System.Fail("Cannot open benchmark database")
+    }
+    use connection = session
+    let parameters = QueryParameters()
+    Console.WriteLine("NEOBENCH/1 READY")
+    for index in 0..<warmups {
+        _ = await Run(connection, name, parameters)
+    }
+    Console.WriteLine("NEOBENCH/1 BEGIN")
+    var checksum = 0
+    for index in 0..<operations {
+        let completed = await Run(connection, name, parameters)
+        checksum += completed
+    }
+    Console.WriteLine("NEOBENCH/1 END")
+    Console.WriteLine(checksum.ToString())
+}

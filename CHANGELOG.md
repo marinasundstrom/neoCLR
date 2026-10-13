@@ -8,6 +8,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-13
 
+- Track the standalone PostgreSQL mapper benchmark project, covering positional
+  parameters and named-object parameters with row validation and process markers.
+  Reject changed qualification inputs before preparation. Compile the worker with
+  Preview 14 and check preparation-script syntax; document compiler source-form
+  limitations and that mapper-only timing/full preparation remain unqualified.
+
 - Measure current-bundle CPU sums and JSON node serialization/deserialization
   through the existing benchmark framework: 45 initial processes and ten larger
   native CPU processes pass output checks and unchanged-input validation. Preserve
