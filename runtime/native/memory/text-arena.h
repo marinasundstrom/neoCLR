@@ -55,6 +55,9 @@ int32_t neoclr_string_slice_utf8_v1(const neoclr_aot_text *text, int32_t start, 
 int32_t neoclr_string_slice_utf8_rooted_v1(const neoclr_aot_text *text, int32_t start, int32_t length,
                                    neoclr_aot_text_arena *arena, void *output);
 /* Immutable Byte[] snapshot, length <=65536; copied values share read-only storage. */
+/* Audited managed inputs remain rooted through allocation retry. */
+int32_t neoclr_utf8_encode_rooted_v1(const neoclr_aot_text *, neoclr_aot_text_arena *, const void **);
+int32_t neoclr_utf8_decode_rooted_v1(const void *, neoclr_aot_text_arena *, void *);
 int32_t neoclr_utf8_encode_v1(const neoclr_aot_text *text, neoclr_aot_text_arena *arena,
                              const void **output);
 /* Internal object allocation for the explicit reference-arena profile. Header is

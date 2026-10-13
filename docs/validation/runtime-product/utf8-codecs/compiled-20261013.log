@@ -1,0 +1,22 @@
+   Compiling neoclr v0.1.0-preview.13 (/Users/robert/Projects/neoclr)
+   Compiling neoclr-aot-poc v0.0.0 (/Users/robert/Projects/neoclr/tools/aot-poc)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 19.86s
+     Running tests/console.rs (target/debug/deps/console-dafeb0f53eda77bd)
+
+running 14 tests
+test utf8_decoder_rejects_unbound_or_noncontract_services ... ok
+test utf8_text_arena_bounds_and_failure_publication ... ok
+test utf8_text_arena_explicit_byte_budget_preserves_initialization_and_outputs ... ok
+test utf8_encoding_snapshots_and_managed_copy_match_interpreter ... ok
+test utf8_encoding_snapshots_and_managed_copy_match_interpreter_native_gc ... ok
+test file_input_matches_interpreter_limits_utf8_and_cleanup ... ok
+test line_output_preserves_utf8_nul_and_fault_caller_frames ... ok
+test utf8_text_services_require_exact_opt_in ... ok
+test utf8_value_snapshots_reject_mutation_and_default_initialization ... ok
+test utf8_text_slices_preserve_bytes_boundaries_and_faults ... ok
+test utf8_text_slices_preserve_bytes_boundaries_and_faults_native_gc ... ok
+test ordinal_string_predicates_preserve_utf8_nulls_and_allocation_independence ... ok
+test utf8_decode_matches_strict_interpreter_validation ... ok
+test utf8_decode_matches_strict_interpreter_validation_native_gc ... ok
+
+test result: ok. 14 passed; 0 failed; 0 ignored; 0 measured; 140 filtered out; finished in 7.59s

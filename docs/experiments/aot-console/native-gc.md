@@ -591,7 +591,8 @@ Remaining admission audit:
 | Int32/Int64/UInt64 formatting | Native stack scratch; complete caller boundary; publish result before next allocation | Generated GC calls use rooted retry |
 | Byte/scalar array allocation and reservation | No managed inputs; finish header, zeroing and initialization flags before publication | Generated GC calls use rooted retry |
 | Other scalar formatting / reference arrays | Complete caller boundary; audit construction inputs and intermediates | Noncollecting |
-| Grapheme slicing, encoding, replacement and paths | Retain borrowed inputs and any backing arrays | Noncollecting |
+| Managed UTF-8 encode/decode | Retain source text or full byte-array owner through allocation/copy | Generated GC calls use rooted retry |
+| Grapheme slicing, other encoding, replacement and paths | Retain borrowed inputs and any backing arrays | Noncollecting |
 | Unicode sequence construction | Retain partially initialized result arrays and each constructed element | Noncollecting |
 | Native file/network/TLS/SQL producers | Retain managed intermediates; keep native handles/buffers alive; never replay I/O to retry allocation | Noncollecting |
 | Constructors / reflection invocation | Retain initialized receiver and every native result scratch until publication | Existing explicit generated roots; admission migration still needed |
@@ -653,3 +654,23 @@ and 107 compiled byte/scalar comparisons with interpreter results/faults.
 [Retained evidence](../../validation/runtime-product/primitive-arrays/README.md).
 The hosted macOS/Windows gate also passes all 23 GC/root executions, socket
 contracts and relocated-package checks; macOS profiler attachment passes.
+
+UTF-8 codec follow-up (2026-10-13): generated native-GC encode/decode calls use
+private rooted symbols. Encoding retains its source String while constructing a
+byte snapshot; decoding retains the complete source array while copying from its
+interior. Validation finishes before the sole allocation. Reserved-slot failures
+precede UTF-8 validation, and malformed UTF-8 returns the existing error without
+collecting. Copying and result publication perform no further collecting calls.
+
+The current nonmoving collector keeps these borrowed addresses stable. This does
+not establish moving-GC pinning semantics. As with CLR native helpers, the owner of
+a borrowed managed buffer must remain visible across a collecting allocation.
+Raw native-buffer decoding and existing native callers retain noncollecting entry
+points because their owner/lifetime contracts have not been audited. No encoding
+format, snapshot mutability, public API, Raven metadata or collection policy changes.
+New GC objects require the matching native helper symbols. Broader encoding,
+reference-array construction and scheduler idle integration remain separate work.
+
+Local qualification passes 24 GC/root checks, package checks and 14 focused
+compiled tests. [Retained evidence](../../validation/runtime-product/utf8-codecs/README.md).
+Native platform qualification is pending.
