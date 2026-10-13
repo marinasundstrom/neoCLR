@@ -107,8 +107,17 @@ The package test now runs the same arena contract through direct and compatibili
 paths, both with GC and with no collector linked. It verifies zero initialization,
 alignment, unchanged outputs on errors, allocation limits, UTF-8 including embedded
 NUL, separate context storage, collector reclamation and non-GC caller-owned reset.
-Hosted macOS/Windows qualification of this follow-up is pending. This is source
-integration, not a performance optimization or a new public memory-manager API.
+The [hosted gate](https://github.com/marinasundstrom/neoCLR/actions/runs/38436090755)
+at `8355c040a` passes on macOS and Windows, including all four arena contract
+combinations (direct/compatibility, GC/non-GC), existing relocation/instrumentation
+checks and socket contracts; Windows also passes the full native GC/root gate.
+Local validation includes 20 GC/root executions, two compiled GC/non-GC UTF-8
+consumers and two profiler attachment tests. [Raw reports](validation/runtime-product/arena-source-layout/)
+retain source hashes and hosted job outcomes. The local report predates the commit
+and fingerprints the tested canonical sources. This is source integration, not a
+performance optimization or a new public memory-manager API. Fault layout and
+diagnostic attachment remain the next native dependencies to consolidate; the
+backend process/hosting boundary remains separate follow-up work.
 
 ## Memory management is a runtime service
 
