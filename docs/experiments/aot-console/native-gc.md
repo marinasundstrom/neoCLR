@@ -607,3 +607,7 @@ and faults, and the GC object imports the rooted symbol. This internal UTF-8 hel
 does not change public character/grapheme indexing or slicing semantics. The
 existing CLR comparison motivates protecting borrowed native references; this
 slice adds no collector policy, moving objects or public API.
+
+The [platform follow-up](https://github.com/marinasundstrom/neoCLR/actions/runs/38425599711)
+at `38b2240d2` passes the 20 Windows GC/root executions and both platform socket
+contracts. Reports are retained with the [allocation/admission evidence](../../../benchmarks/gc-allocation/README.md#utf-8-slice-admission-follow-up).

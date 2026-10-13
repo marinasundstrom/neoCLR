@@ -61,3 +61,21 @@ nested-JSON exchange in interpreter/JIT/AOT. The three
 reports retain the result and invocation evidence. This is a focused HTTP/SSL gate,
 not a full runtime-library suite. Subsequent changes only align comments/profiler
 markers and add documentation/evidence; they do not alter helper execution.
+
+## UTF-8 slice admission follow-up
+
+At `38b2240d2`, generated native-GC slicing uses a private rooted helper while
+existing arena-only callers remain noncollecting. The focused
+[platform gate](https://github.com/marinasundstrom/neoCLR/actions/runs/38425599711)
+passes all 20 Windows GC/root executions and macOS/Windows socket contracts.
+`rooted-slice-*-38425599711.json` retains those reports. Local sanitized execution
+of the same 20 GC/root checks is retained in `rooted-slice-local-contracts-20261013.json`;
+its revision identifies the precommit parent, with exact tested source hashes.
+
+The two `utf8_text_slices_preserve_bytes_boundaries_and_faults` compiler tests
+(with/without native GC) pass 135 interpreter comparisons each. Pressure coverage
+includes an unregistered borrowed source, multibyte characters, embedded NUL,
+validation error precedence, genuine exhaustion, failure output preservation and
+final reclamation. This is lifetime correctness qualification, not a performance
+benchmark, broader helper audit completion or a new Windows managed HTTP run.
+The managed contract and general collection policy are unchanged.

@@ -14,7 +14,8 @@ abandonment. It is not enabled for general managed execution: remaining helper
 coverage and actual scheduler idle integration are still prerequisites. Continue
 with the [helper-family audit](experiments/aot-console/native-gc.md#explicit-helper-temporary-values)
 (UTF-8 slicing now also protects borrowed input through retry; local pressure tests
-and 270 compiled GC/non-GC comparisons pass),
+and 270 compiled GC/non-GC comparisons pass; Windows GC/root and both-platform
+socket checks also pass),
 then qualify a managed pacing policy across execution modes before promotion.
 The author additionally proposed generations to reduce collection pressure/latency;
 [the next architecture evaluation](runtime-gc.md#generational-collection-evaluation--2026-10-13)
