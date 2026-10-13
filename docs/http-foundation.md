@@ -157,6 +157,10 @@ Primary-source review (accessed 2026-10-14):
   materializes the request line and a MIME header map. Go is useful as an ergonomic
   and performance comparison, not evidence that all successful servers avoid strings.
 
+The [URI byte-parsing refinement](../benchmarks/http-server/uri-byte-parsing.md)
+removes the first measured parser hot spot with matched allocation and throughput
+evidence. Header ownership and lazy decoding remain future work.
+
 Proposed sequence: first measure byte/string allocations per request by stage, then
 remove lowercase-name intermediates using ASCII byte comparison and known-name
 identities. Next retain bounded owned header storage with offsets, decode/cache

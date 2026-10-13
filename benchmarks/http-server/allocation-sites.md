@@ -69,3 +69,7 @@ reconciliation failure. Run:
 ```sh
 python3 -m unittest discover -s benchmarks/http-server -p test_allocation_sites.py
 ```
+
+The subsequent [URI byte-parsing refinement](uri-byte-parsing.md) rebuilds matched
+libraries, removes the parser temporaries and records separate timing/correctness
+evidence. The original attribution profiles above remain unchanged.

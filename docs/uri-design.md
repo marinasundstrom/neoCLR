@@ -38,12 +38,24 @@ identity as an origin/access-control comparison. The benefit is a transparent,
 stable contract while canonicalization is unresolved; the cost is that multiple
 spellings of a resource are distinct keys. Parse preserves text; Resolve performs
 only the documented reference-resolution transformations. All storage is ordinary
-managed references; there are no native handles or new GC roots. Copying and repeated
-UTF-8 slicing make this a POC parser, not a throughput claim. The initial boundary
-probe exposed repeated runtime array-resource scans while a temporary byte array
-was live. The parser now reads one-byte string slices instead of retaining an
-encoded array. Runtime array-accounting cost remains a separate investigation; this
-is not a change to GC policy or a general performance result.
+managed references; there are no native handles or new GC roots.
+
+### Byte parsing refinement — 2026-10-14
+
+`Parse` now encodes one temporary UTF-8 buffer after checking the 4,096-byte quota.
+ASCII grammar probes compare byte values; only actual URI components become string
+slices. This preserves error ordering, percent triplets, lexical identity and the
+existing non-ASCII/bracketed-authority restrictions. It does not add normalization
+or expand the subset toward full .NET `Uri` behavior.
+
+The initial implementation avoided a retained array after an interpreter resource
+accounting bottleneck. Native allocation profiling now identifies the replacement
+one-byte string probes as substantial overhead. The bounded buffer trades one
+copy and a managed array lifetime for fewer temporary strings; interpreter, JIT
+and AOT validation remains required. Resolution's dot-segment helpers still use
+string slices. See the [matched HTTP evidence](../benchmarks/http-server/uri-byte-parsing.md);
+this refinement does not change GC policy, intern arbitrary strings, or introduce
+shared/pool ownership.
 
 ## Comparison and alternatives
 

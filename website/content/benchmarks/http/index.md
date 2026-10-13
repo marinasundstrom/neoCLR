@@ -12,6 +12,16 @@ claims. All **1,728 responses across 54 processes** passed validation, with zero
 <a id="plain-text-baseline"></a>
 <a id="publication-status"></a>
 
+## Development follow-up
+
+A source-build URI parser refinement on 14 October reduces managed allocations per
+request by **24% for plain text** and **32% for JSON**. Matched AOT runs improve
+sequential throughput by **1.56×** and **1.24×**, respectively, with 1,024 validated
+responses and complete reclamation in separate GC profiles. These use stress GC
+and explicit state-machine fixtures on macOS; they are not new SDK matrix results,
+Windows qualification or sustained server-capacity figures.
+[Method and raw development evidence](https://github.com/marinasundstrom/neoclr/blob/main/benchmarks/http-server/uri-byte-parsing.md).
+
 ## Workload matrix
 
 Median successful requests per second across five rounds:

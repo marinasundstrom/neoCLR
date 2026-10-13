@@ -320,6 +320,7 @@ IP_ADDRESS_VALUES_NAMES = [
 ]
 URI_RESOLUTION_NAMES = [
     'URI resolution handles authority and path bases and rejects relative bases',
+    'URI byte parsing preserves ASCII boundaries and encoded Unicode',
     'URI classification and equality preserve literal identity',
     'URI parsing rejects every invalid grammar corpus input',
     'URI parsing and resolution enforce the byte quota',

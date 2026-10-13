@@ -40,18 +40,16 @@ public class Uri : EquatableTo<Uri> {
         return ""
     }
 
-    private static func Alpha(value: string) -> bool {
-        return (String.CompareOrdinal(value, "A") >= 0 && String.CompareOrdinal(value, "Z") <= 0) ||
-            (String.CompareOrdinal(value, "a") >= 0 && String.CompareOrdinal(value, "z") <= 0)
+    private static func Alpha(value: byte) -> bool {
+        return (value >= 65 && value <= 90) || (value >= 97 && value <= 122)
     }
 
-    private static func Digit(value: string) -> bool {
-        return String.CompareOrdinal(value, "0") >= 0 && String.CompareOrdinal(value, "9") <= 0
+    private static func Digit(value: byte) -> bool {
+        return value >= 48 && value <= 57
     }
 
-    private static func Hex(value: string) -> bool {
-        return Digit(value) || (String.CompareOrdinal(value, "A") >= 0 && String.CompareOrdinal(value, "F") <= 0) ||
-            (String.CompareOrdinal(value, "a") >= 0 && String.CompareOrdinal(value, "f") <= 0)
+    private static func Hex(value: byte) -> bool {
+        return Digit(value) || (value >= 65 && value <= 70) || (value >= 97 && value <= 102)
     }
 
     static func Parse(text: string) -> Result<Uri, UriError> {
@@ -59,21 +57,23 @@ public class Uri : EquatableTo<Uri> {
             return Error(UriError.TooLong())
         }
         let count = text.GetUtf8ByteCount()
+        // Encode once after the byte quota check; all grammar probes use ASCII bytes.
+        let bytes = System.Text.Utf8.Encode(text)
         var index = 0
         while index < count {
-            let value = At(text, index)
-            if value == "%" {
-                if index + 2 >= count || !Hex(At(text, index + 1)) || !Hex(At(text, index + 2)) {
+            let value = bytes[index]
+            if value == 37 {
+                if index + 2 >= count || !Hex(bytes[index + 1]) || !Hex(bytes[index + 2]) {
                     return Error(UriError.InvalidFormat())
                 }
                 index += 3
                 continue
             }
-            if !(Alpha(value) || Digit(value) || value == "-" || value == "." || value == "_" || value == "~" ||
-                value == ":" || value == "/" || value == "?" || value == "#" || value == "@" ||
-                value == "!" || value == "$" || value == "&" || value == "'" || value == "(" || value == ")" ||
-                value == "*" || value == "+" || value == "," || value == ";" || value == "=") {
-                if value == "[" || value == "]" {
+            if !(Alpha(value) || Digit(value) || value == 45 || value == 46 || value == 95 || value == 126 ||
+                value == 58 || value == 47 || value == 63 || value == 35 || value == 64 ||
+                value == 33 || value == 36 || value == 38 || value == 39 || value == 40 || value == 41 ||
+                value == 42 || value == 43 || value == 44 || value == 59 || value == 61) {
+                if value == 91 || value == 93 {
                     return Error(UriError.UnsupportedAuthority())
                 }
                 return Error(UriError.InvalidFormat())
@@ -86,15 +86,15 @@ public class Uri : EquatableTo<Uri> {
         var parsedFragment = ""
         var start = 0
         index = 0
-        while index < count && At(text, index) != "/" && At(text, index) != "?" && At(text, index) != "#" {
-            if At(text, index) == ":" {
-                if index == 0 || !Alpha(At(text, 0)) {
+        while index < count && bytes[index] != 47 && bytes[index] != 63 && bytes[index] != 35 {
+            if bytes[index] == 58 {
+                if index == 0 || !Alpha(bytes[0]) {
                     return Error(UriError.InvalidFormat())
                 }
                 var position = 1
                 while position < index {
-                    let value = At(text, position)
-                    if !(Alpha(value) || Digit(value) || value == "+" || value == "-" || value == ".") {
+                    let value = bytes[position]
+                    if !(Alpha(value) || Digit(value) || value == 43 || value == 45 || value == 46) {
                         return Error(UriError.InvalidFormat())
                     }
                     position += 1
@@ -105,18 +105,18 @@ public class Uri : EquatableTo<Uri> {
             }
             index += 1
         }
-        if start + 1 < count && At(text, start) == "/" && At(text, start + 1) == "/" {
+        if start + 1 < count && bytes[start] == 47 && bytes[start + 1] == 47 {
             index = start + 2
             var at = -1
             var colon = -1
-            while index < count && At(text, index) != "/" && At(text, index) != "?" && At(text, index) != "#" {
-                if At(text, index) == "@" {
+            while index < count && bytes[index] != 47 && bytes[index] != 63 && bytes[index] != 35 {
+                if bytes[index] == 64 {
                     if at >= 0 {
                         return Error(UriError.InvalidFormat())
                     }
                     at = index
                     colon = -1
-                } else if At(text, index) == ":" {
+                } else if bytes[index] == 58 {
                     colon = index
                 }
                 index += 1
@@ -127,10 +127,10 @@ public class Uri : EquatableTo<Uri> {
                 position = at + 1
             }
             while position < index {
-                if At(text, position) == ":" && position != colon {
+                if bytes[position] == 58 && position != colon {
                     return Error(UriError.InvalidFormat())
                 }
-                if colon >= 0 && position > colon && !Digit(At(text, position)) {
+                if colon >= 0 && position > colon && !Digit(bytes[position]) {
                     return Error(UriError.InvalidFormat())
                 }
                 position += 1
@@ -139,14 +139,14 @@ public class Uri : EquatableTo<Uri> {
             start = index
         }
         index = start
-        while index < count && At(text, index) != "?" && At(text, index) != "#" {
+        while index < count && bytes[index] != 63 && bytes[index] != 35 {
             index += 1
         }
         let parsedPath = Part(text, start, index)
-        if index < count && At(text, index) == "?" {
+        if index < count && bytes[index] == 63 {
             start = index
             index += 1
-            while index < count && At(text, index) != "#" {
+            while index < count && bytes[index] != 35 {
                 index += 1
             }
             parsedQuery = Part(text, start, index)
@@ -155,7 +155,7 @@ public class Uri : EquatableTo<Uri> {
             start = index
             index += 1
             while index < count {
-                if At(text, index) == "#" {
+                if bytes[index] == 35 {
                     return Error(UriError.InvalidFormat())
                 }
                 index += 1

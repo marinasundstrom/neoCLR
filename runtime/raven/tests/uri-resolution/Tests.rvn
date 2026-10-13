@@ -101,6 +101,22 @@ func UriInvalid() -> Result<unit, TestFailure> {
     return Assert.True(true, "Invalid grammar corpus rejected")
 }
 
+[Test("URI byte parsing preserves ASCII boundaries and encoded Unicode")]
+func UriByteGrammar() -> Result<unit, TestFailure> {
+    for text in ["AZaz09+.-:a", "http://user:secret@example.test:80/a%2Fb?q=%C3%A9#%fF", "/-._~!$&'()*+,;=@/?:#", "%00%7F%80%ff"] {
+        let uri = RequiredUri(text)?
+        _ = Assert.Equal(text, uri.Text)?
+    }
+    for text in ["a%0G", "a%G0", "a%/0", "a%:0", "a%`0", "a%g0", "a%é", "http://a/雪", "http://a/?😀", "http://a/#é", "a\t", "a\r"] {
+        if Uri.Parse(text) is Error(let error) {
+            _ = Assert.True(error is UriError.InvalidFormat, "Byte grammar must reject raw non-ASCII and invalid hex")?
+        } else {
+            return Assert.True(false, "Invalid byte grammar accepted: " + text)
+        }
+    }
+    return Assert.True(true, "ASCII boundaries and encoded bytes preserved")
+}
+
 [Test("URI classification and equality preserve literal identity")]
 func UriClassification() -> Result<unit, TestFailure> {
     let empty = RequiredUri("")?
