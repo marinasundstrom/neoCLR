@@ -50,7 +50,8 @@ retry in generated GC code, with 22 macOS/Windows GC/root checks and focused
 compiled/boxed consumers passing. Byte/scalar array allocation and reservation
 now also use rooted retry, with 23 macOS/Windows GC/root checks and 107 local
 compiled interpreter comparisons passing. Managed UTF-8 encode/decode now retain
-the source text/array through allocation retry; raw native-buffer callers remain
+the source text/array through allocation retry, with 24 macOS/Windows GC/root
+checks and 14 local compiled tests passing; raw native-buffer callers remain
 noncollecting. Reference arrays and other borrowed-input helpers remain to audit. Then qualify a managed pacing policy across execution modes before promotion.
 The author additionally proposed generations to reduce collection pressure/latency;
 [the next architecture evaluation](runtime-gc.md#generational-collection-evaluation--2026-10-13)

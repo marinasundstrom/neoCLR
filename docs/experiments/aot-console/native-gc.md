@@ -673,4 +673,6 @@ reference-array construction and scheduler idle integration remain separate work
 
 Local qualification passes 24 GC/root checks, package checks and 14 focused
 compiled tests. [Retained evidence](../../validation/runtime-product/utf8-codecs/README.md).
-Native platform qualification is pending.
+Hosted macOS ARM64 and Windows x64 qualification passes all 24 GC/root executions,
+socket contracts and relocated-package checks; macOS profiler attachment also passes.
+The retained evidence identifies the tested revision and source hashes.

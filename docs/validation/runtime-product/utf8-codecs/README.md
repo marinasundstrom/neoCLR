@@ -26,6 +26,10 @@ python3 -m unittest discover -s scripts -p test_native_gc_layout.py
 cargo test --locked -p neoclr-aot-poc --test console utf8_
 ```
 
-Native platform qualification is pending. The C gate does not imply a fresh managed
-Windows/JIT/HTTP matrix. No Raven Runtime Contract, bridge metadata or managed API
+[Hosted run 38445516126](https://github.com/marinasundstrom/neoCLR/actions/runs/38445516126)
+passes at `e466f2b6466e06e5d64c5b732bffa6b46906818d`: all 24 GC/root
+executions, socket contracts and relocated-package checks on macOS ARM64 and
+Windows x64, plus macOS profiler attachment. The retained reports include source
+hashes and command provenance. This does not imply a fresh managed Windows/JIT/HTTP
+matrix or Windows ARM64 qualification. No Raven Runtime Contract, bridge metadata or managed API
 changes. This is lifetime/admission work, not a throughput or collection-pacing claim.
