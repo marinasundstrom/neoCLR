@@ -19,6 +19,7 @@ def main():
     p = argparse.ArgumentParser(description=__doc__)
     p.add_argument('--build', type=Path, required=True)
     p.add_argument('--workload', choices=['concurrent', 'plain', 'json'], default='concurrent')
+    p.add_argument('--gc-phases', action='store_true')
     p.add_argument('--output', type=Path, required=True)
     a = p.parse_args()
     out = a.output.resolve()
@@ -84,13 +85,17 @@ static int32_t socket_poll_inner(neoclr_aot_context *context, uint64_t *callback
             .replace(fiber_hook, fiber_hook+'\n    neoclr_schedule_profile_fiber(drain);'))
         command = [str(carrier_copy) if v == str(carrier) else v for v in command]
         inputs[str(carrier_copy)] = sha(carrier_copy)
+    if a.gc_phases:
+        import gc_phases
+        command, extra = gc_phases.instrument(ROOT, out, command)
+        for path in extra: inputs[str(path)] = sha(path)
     benchmark = None
     if a.workload != 'concurrent':
         import sys
         sys.path.insert(0, str(ROOT/'benchmarks/http-server'))
         import benchmark
         inputs[str(Path(benchmark.__file__).resolve())] = sha(benchmark.__file__)
-    report = dict(passed=False, inputs=inputs, command=command, workload=a.workload, runtimeAsyncCarrierLinked=runtime_async, runs=[],
+    report = dict(passed=False, inputs=inputs, command=command, workload=a.workload, runtimeAsyncCarrierLinked=runtime_async, gcPhaseProfiling=a.gc_phases, runs=[],
                   scope='Instrumented AOT polling diagnosis; identical guest objects. Carrier presence alone does not establish guest lowering; pair with verified backend binding evidence. Not throughput, wakeup-to-resume latency, JIT or interpreter evidence. GC and clock hooks perturb timings.')
     try:
         subprocess.run(command, check=True, capture_output=True, text=True)
@@ -100,6 +105,8 @@ static int32_t socket_poll_inner(neoclr_aot_context *context, uint64_t *callback
             counters, gc = out/f'polls-{index}.json', out/f'gc-{index}.json'
             run_command = ['/usr/bin/env', 'NEOCLR_SCHEDULING_PROFILE_OUTPUT='+str(counters),
                 'NEOCLR_HTTP_PROFILE_OUTPUT='+str(gc), str(out/'app')]
+            phase_file = out/f'phases-{index}.json'
+            if a.gc_phases: run_command.insert(2, 'NEOCLR_GC_PHASE_OUTPUT='+str(phase_file))
             result = (validation.run_case(run_command, slow_hold_seconds=hold)
                       if a.workload == 'concurrent' else benchmark.server_sample(run_command, a.workload))
             poll = json.loads(counters.read_text())
@@ -108,6 +115,11 @@ static int32_t socket_poll_inner(neoclr_aot_context *context, uint64_t *callback
             assert poll['ready'] > 0 and poll['errors'] == 0
             assert collector['allocations'] == collector['reclaimed'] and collector['failures'] == 0
             report['runs'].append(dict(holdSecondsPerPhase=hold, validation=result, scheduler=poll, gc=collector))
+            if a.gc_phases:
+                phases = json.loads(phase_file.read_text())
+                assert phases['collections'] == collector['attempts'] and phases['failures'] == 0
+                assert 0 < phases['boundaryCalls'] <= phases['collections']
+                report['runs'][-1]['gcPhases'] = phases
             print(index, hold, poll, flush=True)
         for path, digest in inputs.items():
             assert sha(path) == digest, path

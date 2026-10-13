@@ -1,5 +1,13 @@
 # neoCLR platform roadmap
 
+**Collector phase attribution (2026-10-13):** [diagnostic HTTP evidence](../benchmarks/http-scheduling/README.md#boundary-and-collector-phase-attribution--2026-10-13)
+separates root-boundary observation from validation, root seeding, tracing, owner
+cleanup and sweep. Eight AOT runs validate 192 responses and complete reclamation;
+86–91% of collections have no intervening allocation, which is not proof they can
+be skipped. Next evaluate a pressure policy with explicit/stress collection, bounded
+memory and idle/owner cleanup intact. Author-requested .NET generations and Java ZGC
+research is recorded alongside Go/V8; collector replacement remains unselected.
+
 **Runtime suspension follow-up (2026-10-13):** [matched application lowerings and idle-drain correction](../benchmarks/http-scheduling/README.md#idle-drain-correction--2026-10-13)
 qualify the same concurrent HTTP fixture with state machines and runtime suspension.
 The macOS carrier now avoids draining after empty polls; retained-stack/collector

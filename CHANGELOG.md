@@ -8,6 +8,13 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-13
 
+- Add opt-in native HTTP GC phase diagnostics separating boundary validation, index
+  validation, root seeding, tracing, owner cleanup and sweep. Retain eight passing
+  AOT processes (192 responses), complete reclamation and a sanitizer-checked failed
+  collection accounting case. Record .NET generations and Java Generational ZGC
+  research; unchanged-allocation counts are not permission to skip collection.
+  Shipping collector policy and profile ABI remain unchanged.
+
 - Avoid creating queue-draining fibers after empty polls in the macOS native
   runtime-async carrier; still drain after callbacks/resumptions and retain suspended
   drains. Add a regression that fails on the previous carrier, sanitizer/ownership

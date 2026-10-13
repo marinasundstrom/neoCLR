@@ -1,0 +1,511 @@
+{
+  "passed": true,
+  "inputs": {
+    "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang": "be5518e9c6736cda8dfc3486ce11e8112a2e08045084260691cf41f57a653f59",
+    "/Users/robert/Projects/neoclr/benchmarks/native-web/http-host.c": "cc11b74b5122fe62d208a51b27d81861109bfd03658d61f52500fca8cb16d61a",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-console/root-probe.c": "576c0fdd7a1e4c16a957f85a308be33e2fc932d0c9bf2d40acecdcefe3a0fa3c",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-gc.c": "fd5eb12777d87d985a9d3b431d21f82a857aa7e2270233ca7fd117d47b54210b",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-console/text-arena.c": "63a69338de7aee04c22481cbea4124dd5ba57373ac8c201ace12a07a3e6aec99",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-console/console.c": "fdc9b345a77b347dba16561394dd9f0ae8bb270478ccfb7d6fed3071404e1769",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-stack.c": "8bf08bed38457c8a48dcb6fecf784c764651dd75f192a9a8cb4d340b3d638121",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-scalar/console.c": "e1caabedff378df882385fd05325f635732e91b968d8dc987e5734fee26e49ae",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-fault-details/render.c": "f1e561bfb6b73ac3e4a7078d5bc9e9905eea9637f545ac3178273698d08efb96",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-console/task-queue.c": "84b7d3e7d0f635622c6b066b57868969e22170e6aea3c500fab7e06297a5f7f4",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-console/socket-listener.c": "e96bc843d7851cb78c9b225ff8e78b4b57b7c1d07096dccc409f36d9b4a03724",
+    "/Users/robert/Projects/neoclr/tools/native/entry-arguments.c": "4fdc632b75d590057fad61e42fe6526b8278b60d908cc0467bb611d7a0c582a3",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-console/string-unicode.c": "80dadd71e3df0bc16f4082a209bc7c37bb07a85ccddb6350c9ee3cf2254399fe",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-console/tls-managed.c": "bf3212c83b1f16eca7833b30b9f5eb126e1e6d26d0e258d7cdfa5624ee329d2f",
+    "/Users/robert/Projects/neoclr/target/http-lowerings-20261013/runtime/app.o": "dcf02102f248c74684e64c5e40229da74212270990698f72940271b7830c993f",
+    "/Users/robert/Projects/neoclr/tools/aot-native-text/target/text-only/aarch64-apple-darwin/release/libneoclr_aot_native_text.a": "8dbbf86e3cdf0659d73d8d5a9aa277cbc0ac5e95b99a1ff15e5974ce5d9169ad",
+    "/Users/robert/Projects/neoclr/tools/native-tls/target/aarch64-apple-darwin/release/libneoclr_native_tls.a": "bfedb0a494dc7d77f65937845f8cd84b1211b8ce0d372051e7931fe9a94df950",
+    "/Users/robert/Projects/neoclr/docs/experiments/runtime-async/native-runtime.c": "e6a456cc2c10157386b6d2c2e17bb8eb93094726b55f82891057bdb3785c0ade",
+    "/Users/robert/Projects/neoclr/target/http-lowerings-20261013/runtime/build.json": "6652308301140f1594de5b0a00106ebbb35bf98504c52913e650d4da98c5a43c",
+    "/Users/robert/Projects/neoclr/benchmarks/http-scheduling/profile.py": "87ecd000f710ac448632b6f02d62baaf37715c18191ddfd52e4bd6cfab722ec7",
+    "/Users/robert/Projects/neoclr/benchmarks/http-concurrency/validate.py": "4726d63cf44315ca24658ad659ddead601dcfa2578ac32616d5257a38b784e8a",
+    "/Users/robert/Projects/neoclr/benchmarks/http-scheduling/counters.c": "e1253513bee1aa5d34d1b8efc7df57073a2b7d8cb2e93c88cd1d2a085d73a905",
+    "/Users/robert/Projects/neoclr/benchmarks/http-server/profile-gc.c": "eac78372a3795246ae0ec7341358355c5b87384573fa75f70f250bda1a097e2f",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-console/entry-arguments.h": "85f5c7d90edfd08cc4bf8db1a220028cf9dab39e4e16a05d1210f2ee18de6c80",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-console/console.h": "1f5be96a30639c5e63781637d95d1abb28ab605962caee50ae91a5a0d5bd8068",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-console/root-probe.h": "04ba9b0aaef06bcbeb3408bb5072bae0ef0d2ae346ebb3b193340adc9622a565",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-console/socket-listener.h": "1e2526e5f4d33776c56b3345ef76fb3ffce2a14a8673876e4e4ce908ffea1b66",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-console/string-unicode.h": "707e7dc31d0c5993873f53166862da5a53c3779a1f2e15fdb3b4c59086210f1c",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-console/task-queue.h": "cf7d1ded7df30016c353fbb24bb40cb4771bb1c735352bd6bb56d5dea78fa738",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-console/file-input.h": "a1a9840482a2b50f20ba5080eb96453a46e4416238b3403343e03e9c2c84d3f4",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-console/tls-managed.h": "073b109a56895fc15fcb49dfea061cae4ebc228bfe42fcd11f9f2f1041b4eade",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-console/socket-client-internal.h": "e2771ecbe8b74c0e696af297651cd5158755c8ed6e6cc25b1d9bde837a57dddb",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-session.h": "b221dc77da887518e90210bbbfb8ac6ffd6d14416c41faa199ecd2fb43bef7bd",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-console/socket-os.h": "a01419c62fa8a1d3d9131282c5af182f200ba149a440d52c81104e2a156f7ef0",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-stack.h": "d4b1bbc542c3c8b3338d186a64554e5a0c0d4bc3a94d6b6a48900c49f2da0d13",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-gc.h": "7986da3ea16da8fe5af45732b832e219b5e421fb548fcc7c428a3fafc9f8db15",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-console/text-arena.h": "f11956770448ece65ee852d0dcc75d86ad45ae68d66355ae64afe702effb5872",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-console/file-output.h": "f13171699f402f05ea2ab0e4e1686f227bbe48d65c8b48a62e5f94200605e88e",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-fault-details/fault-details.h": "8acf145dd10c8050c7d4c9266a73dec171009cea570aeb2f5473ac39cbfa4370",
+    "/Users/robert/Projects/neoclr/docs/experiments/runtime-async/native-runtime.h": "64e14645f52615ef557c9defdf1ca076d1dfe96319caa829dbd544bf01d922ba",
+    "/Users/robert/Projects/neoclr/target/http-gc-phases-runtime-20261013/socket-profile.c": "16ff8889f4fada0845807202b93643274df6c3fc6a275788d31b7c7f31b62201",
+    "/Users/robert/Projects/neoclr/target/http-gc-phases-runtime-20261013/host-profile.c": "6a58045d328ab15d58fb9c1355d334e608569d1ac893ab0fe8219c63566cf0d9",
+    "/Users/robert/Projects/neoclr/target/http-gc-phases-runtime-20261013/carrier-profile.c": "6d523b1dd9fbc2d98197a66e84fbbf64ba0c2de3020c3daeadbee73f9e28c8ce",
+    "/Users/robert/Projects/neoclr/target/http-gc-phases-runtime-20261013/gc-phases-collector.c": "c9f84249ab6dffada3755c739462fb16e86632bdd0847442da51e8f0ecb2d9e6",
+    "/Users/robert/Projects/neoclr/target/http-gc-phases-runtime-20261013/gc-phases-probe.c": "ce952f9e29a034b7af64877c20b5a524c85f9bf239d1a5963bf71fd871aad9c9",
+    "/Users/robert/Projects/neoclr/benchmarks/http-scheduling/gc-phases.c": "aacfb928c1f238c84bf446503bff56abd10a0bb126dc959d3c474a079236f143",
+    "/Users/robert/Projects/neoclr/benchmarks/http-scheduling/gc_phases.py": "76c0a8b04e785b41889bc428513328ccf94de540b8e17423b4b59f2b57f268a0"
+  },
+  "command": [
+    "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang",
+    "-isysroot",
+    "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.2.sdk",
+    "-arch",
+    "arm64",
+    "-std=c11",
+    "-O2",
+    "-Wall",
+    "-Wextra",
+    "-Werror",
+    "-DNEOCLR_NATIVE_GC",
+    "-DNEOCLR_MANAGED_TLS",
+    "-DNEOCLR_HTTP_HEAP_BYTES=33554432",
+    "-DNEOCLR_NATIVE_BYTE_ARRAY_LIMIT=4194304",
+    "-I",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-console",
+    "/Users/robert/Projects/neoclr/target/http-gc-phases-runtime-20261013/host-profile.c",
+    "/Users/robert/Projects/neoclr/target/http-gc-phases-runtime-20261013/gc-phases-probe.c",
+    "/Users/robert/Projects/neoclr/target/http-gc-phases-runtime-20261013/gc-phases-collector.c",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-console/text-arena.c",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-console/console.c",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-stack.c",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-scalar/console.c",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-fault-details/render.c",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-console/task-queue.c",
+    "/Users/robert/Projects/neoclr/target/http-gc-phases-runtime-20261013/socket-profile.c",
+    "/Users/robert/Projects/neoclr/tools/native/entry-arguments.c",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-console/string-unicode.c",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-console/tls-managed.c",
+    "/Users/robert/Projects/neoclr/target/http-lowerings-20261013/runtime/app.o",
+    "/Users/robert/Projects/neoclr/tools/aot-native-text/target/text-only/aarch64-apple-darwin/release/libneoclr_aot_native_text.a",
+    "/Users/robert/Projects/neoclr/tools/native-tls/target/aarch64-apple-darwin/release/libneoclr_native_tls.a",
+    "-o",
+    "/Users/robert/Projects/neoclr/target/http-gc-phases-runtime-20261013/app",
+    "-DNEOCLR_RUNTIME_ASYNC",
+    "-I",
+    "/Users/robert/Projects/neoclr/docs/experiments/runtime-async",
+    "/Users/robert/Projects/neoclr/target/http-gc-phases-runtime-20261013/carrier-profile.c",
+    "-Wno-deprecated-declarations",
+    "-DNEOCLR_GC_PROFILE",
+    "/Users/robert/Projects/neoclr/benchmarks/http-server/profile-gc.c",
+    "/Users/robert/Projects/neoclr/benchmarks/http-scheduling/counters.c",
+    "/Users/robert/Projects/neoclr/benchmarks/http-scheduling/gc-phases.c"
+  ],
+  "workload": "concurrent",
+  "runtimeAsyncCarrierLinked": true,
+  "gcPhaseProfiling": true,
+  "runs": [
+    {
+      "holdSecondsPerPhase": 0,
+      "validation": {
+        "passed": true,
+        "startupSeconds": 0.27711550000000007,
+        "cases": [
+          {
+            "case": "headers",
+            "fastCompletionSeconds": [
+              0.03856137500000001,
+              0.06827574999999997,
+              0.09214695799999983
+            ],
+            "slowHeldSeconds": 0.09215924999999991,
+            "intentionalIdleSeconds": 0,
+            "slowFinishSeconds": 0.017773583000000093,
+            "fastResponsesBeforeSlowRelease": 3,
+            "passed": true
+          },
+          {
+            "case": "fixed-body",
+            "fastCompletionSeconds": [
+              0.05309425000000001,
+              0.08256766699999996,
+              0.10727916699999995
+            ],
+            "slowHeldSeconds": 0.107289792,
+            "intentionalIdleSeconds": 0,
+            "slowFinishSeconds": 0.005611916000000106,
+            "fastResponsesBeforeSlowRelease": 3,
+            "passed": true
+          },
+          {
+            "case": "chunked-body",
+            "fastCompletionSeconds": [
+              0.055231625000000006,
+              0.08475566599999995,
+              0.11030570800000006
+            ],
+            "slowHeldSeconds": 0.11031575000000005,
+            "intentionalIdleSeconds": 0,
+            "slowFinishSeconds": 0.006190915999999991,
+            "fastResponsesBeforeSlowRelease": 3,
+            "passed": true
+          },
+          {
+            "case": "large-header",
+            "fastCompletionSeconds": [
+              0.06435183300000014,
+              0.10348616700000002,
+              0.1368642080000002
+            ],
+            "slowHeldSeconds": 0.13687550000000015,
+            "intentionalIdleSeconds": 0,
+            "slowFinishSeconds": 0.15677470799999993,
+            "fastResponsesBeforeSlowRelease": 3,
+            "passed": true
+          }
+        ],
+        "checkedResponses": 16,
+        "width": 4,
+        "queuedCancellations": 140,
+        "shutdownCancelledAccepts": 16,
+        "admissionLimit": 16
+      },
+      "scheduler": {
+        "polls": 95,
+        "ready": 68,
+        "empty": 27,
+        "errors": 0,
+        "pollNanoseconds": 494000,
+        "longestEmptyStreak": 18,
+        "pauses": 5,
+        "pauseNanoseconds": 7540000,
+        "bodyFibers": 69,
+        "drainFibers": 89,
+        "processUserSeconds": 0.75937,
+        "processSystemSeconds": 0.012826
+      },
+      "gc": {
+        "attempts": 166921,
+        "gcNanoseconds": 597388000,
+        "failures": 0,
+        "allocations": 14760,
+        "reclaimed": 14760,
+        "allocatedBytes": 893553,
+        "peakLiveBytes": 39373,
+        "peakArenaBytes": 62968
+      },
+      "gcPhases": {
+        "collections": 166921,
+        "failures": 0,
+        "noInterveningAllocations": 152160,
+        "boundaryCalls": 166920,
+        "boundaryValidationNanoseconds": 125023000,
+        "indexValidationNanoseconds": 97598000,
+        "rootSeedingNanoseconds": 125097000,
+        "tracingNanoseconds": 273465000,
+        "ownerCleanupNanoseconds": 4890000,
+        "sweepNanoseconds": 88638000
+      }
+    },
+    {
+      "holdSecondsPerPhase": 0.1,
+      "validation": {
+        "passed": true,
+        "startupSeconds": 0.005403292000000004,
+        "cases": [
+          {
+            "case": "headers",
+            "fastCompletionSeconds": [
+              0.03442533400000025,
+              0.061549999999999994,
+              0.08471141700000029
+            ],
+            "slowHeldSeconds": 0.1947565,
+            "intentionalIdleSeconds": 0.1,
+            "slowFinishSeconds": 0.03041016700000032,
+            "fastResponsesBeforeSlowRelease": 3,
+            "passed": true
+          },
+          {
+            "case": "fixed-body",
+            "fastCompletionSeconds": [
+              0.05395145800000023,
+              0.08309275000000005,
+              0.10795283300000014
+            ],
+            "slowHeldSeconds": 0.2180183750000002,
+            "intentionalIdleSeconds": 0.1,
+            "slowFinishSeconds": 0.011191832999999818,
+            "fastResponsesBeforeSlowRelease": 3,
+            "passed": true
+          },
+          {
+            "case": "chunked-body",
+            "fastCompletionSeconds": [
+              0.05704204199999996,
+              0.0864548329999999,
+              0.11162445799999965
+            ],
+            "slowHeldSeconds": 0.2216586249999999,
+            "intentionalIdleSeconds": 0.1,
+            "slowFinishSeconds": 0.012044416999999807,
+            "fastResponsesBeforeSlowRelease": 3,
+            "passed": true
+          },
+          {
+            "case": "large-header",
+            "fastCompletionSeconds": [
+              0.06691833299999983,
+              0.10646874999999989,
+              0.1397395829999999
+            ],
+            "slowHeldSeconds": 0.2432958329999999,
+            "intentionalIdleSeconds": 0.1,
+            "slowFinishSeconds": 0.08367837499999986,
+            "fastResponsesBeforeSlowRelease": 3,
+            "passed": true
+          }
+        ],
+        "checkedResponses": 16,
+        "width": 4,
+        "queuedCancellations": 140,
+        "shutdownCancelledAccepts": 16,
+        "admissionLimit": 16
+      },
+      "scheduler": {
+        "polls": 330,
+        "ready": 69,
+        "empty": 261,
+        "errors": 0,
+        "pollNanoseconds": 991000,
+        "longestEmptyStreak": 73,
+        "pauses": 239,
+        "pauseNanoseconds": 360485000,
+        "bodyFibers": 70,
+        "drainFibers": 90,
+        "processUserSeconds": 0.815228,
+        "processSystemSeconds": 0.006249
+      },
+      "gc": {
+        "attempts": 167225,
+        "gcNanoseconds": 642618000,
+        "failures": 0,
+        "allocations": 14823,
+        "reclaimed": 14823,
+        "allocatedBytes": 896548,
+        "peakLiveBytes": 39373,
+        "peakArenaBytes": 62968
+      },
+      "gcPhases": {
+        "collections": 167225,
+        "failures": 0,
+        "noInterveningAllocations": 152401,
+        "boundaryCalls": 167224,
+        "boundaryValidationNanoseconds": 131966000,
+        "indexValidationNanoseconds": 103966000,
+        "rootSeedingNanoseconds": 135945000,
+        "tracingNanoseconds": 293074000,
+        "ownerCleanupNanoseconds": 5272000,
+        "sweepNanoseconds": 95364000
+      }
+    },
+    {
+      "holdSecondsPerPhase": 0.1,
+      "validation": {
+        "passed": true,
+        "startupSeconds": 0.005863874999999741,
+        "cases": [
+          {
+            "case": "headers",
+            "fastCompletionSeconds": [
+              0.035270375000000076,
+              0.06310116700000012,
+              0.08608870900000021
+            ],
+            "slowHeldSeconds": 0.1938047919999999,
+            "intentionalIdleSeconds": 0.1,
+            "slowFinishSeconds": 0.03161058299999997,
+            "fastResponsesBeforeSlowRelease": 3,
+            "passed": true
+          },
+          {
+            "case": "fixed-body",
+            "fastCompletionSeconds": [
+              0.05370425000000001,
+              0.0829835830000003,
+              0.10792295800000007
+            ],
+            "slowHeldSeconds": 0.2179542080000001,
+            "intentionalIdleSeconds": 0.1,
+            "slowFinishSeconds": 0.011081874999999908,
+            "fastResponsesBeforeSlowRelease": 3,
+            "passed": true
+          },
+          {
+            "case": "chunked-body",
+            "fastCompletionSeconds": [
+              0.05707041700000026,
+              0.086278042,
+              0.11198983299999998
+            ],
+            "slowHeldSeconds": 0.2149235420000002,
+            "intentionalIdleSeconds": 0.1,
+            "slowFinishSeconds": 0.011020832999999897,
+            "fastResponsesBeforeSlowRelease": 3,
+            "passed": true
+          },
+          {
+            "case": "large-header",
+            "fastCompletionSeconds": [
+              0.06641483400000059,
+              0.10599620900000062,
+              0.13927733399999997
+            ],
+            "slowHeldSeconds": 0.24012829200000052,
+            "intentionalIdleSeconds": 0.1,
+            "slowFinishSeconds": 0.08541091699999992,
+            "fastResponsesBeforeSlowRelease": 3,
+            "passed": true
+          }
+        ],
+        "checkedResponses": 16,
+        "width": 4,
+        "queuedCancellations": 140,
+        "shutdownCancelledAccepts": 16,
+        "admissionLimit": 16
+      },
+      "scheduler": {
+        "polls": 324,
+        "ready": 69,
+        "empty": 255,
+        "errors": 0,
+        "pollNanoseconds": 983000,
+        "longestEmptyStreak": 73,
+        "pauses": 233,
+        "pauseNanoseconds": 351386000,
+        "bodyFibers": 70,
+        "drainFibers": 90,
+        "processUserSeconds": 0.812716,
+        "processSystemSeconds": 0.006983
+      },
+      "gc": {
+        "attempts": 167225,
+        "gcNanoseconds": 640105000,
+        "failures": 0,
+        "allocations": 14823,
+        "reclaimed": 14823,
+        "allocatedBytes": 896548,
+        "peakLiveBytes": 39373,
+        "peakArenaBytes": 62968
+      },
+      "gcPhases": {
+        "collections": 167225,
+        "failures": 0,
+        "noInterveningAllocations": 152401,
+        "boundaryCalls": 167224,
+        "boundaryValidationNanoseconds": 132584000,
+        "indexValidationNanoseconds": 104018000,
+        "rootSeedingNanoseconds": 134824000,
+        "tracingNanoseconds": 292819000,
+        "ownerCleanupNanoseconds": 5360000,
+        "sweepNanoseconds": 94685000
+      }
+    },
+    {
+      "holdSecondsPerPhase": 0,
+      "validation": {
+        "passed": true,
+        "startupSeconds": 0.005299458000000534,
+        "cases": [
+          {
+            "case": "headers",
+            "fastCompletionSeconds": [
+              0.034744041000000614,
+              0.06221004100000016,
+              0.0856460410000004
+            ],
+            "slowHeldSeconds": 0.08565487500000035,
+            "intentionalIdleSeconds": 0,
+            "slowFinishSeconds": 0.01772574999999943,
+            "fastResponsesBeforeSlowRelease": 3,
+            "passed": true
+          },
+          {
+            "case": "fixed-body",
+            "fastCompletionSeconds": [
+              0.05309683399999976,
+              0.08233754200000032,
+              0.10697354200000042
+            ],
+            "slowHeldSeconds": 0.10698462499999994,
+            "intentionalIdleSeconds": 0,
+            "slowFinishSeconds": 0.005997834000000424,
+            "fastResponsesBeforeSlowRelease": 3,
+            "passed": true
+          },
+          {
+            "case": "chunked-body",
+            "fastCompletionSeconds": [
+              0.05500070900000065,
+              0.08461991700000038,
+              0.11007466700000013
+            ],
+            "slowHeldSeconds": 0.11008462500000071,
+            "intentionalIdleSeconds": 0,
+            "slowFinishSeconds": 0.006115124999999999,
+            "fastResponsesBeforeSlowRelease": 3,
+            "passed": true
+          },
+          {
+            "case": "large-header",
+            "fastCompletionSeconds": [
+              0.06498979100000035,
+              0.10434995800000024,
+              0.13762074999999996
+            ],
+            "slowHeldSeconds": 0.13763191600000013,
+            "intentionalIdleSeconds": 0,
+            "slowFinishSeconds": 0.15613412500000035,
+            "fastResponsesBeforeSlowRelease": 3,
+            "passed": true
+          }
+        ],
+        "checkedResponses": 16,
+        "width": 4,
+        "queuedCancellations": 140,
+        "shutdownCancelledAccepts": 16,
+        "admissionLimit": 16
+      },
+      "scheduler": {
+        "polls": 94,
+        "ready": 68,
+        "empty": 26,
+        "errors": 0,
+        "pollNanoseconds": 370000,
+        "longestEmptyStreak": 18,
+        "pauses": 4,
+        "pauseNanoseconds": 6023000,
+        "bodyFibers": 69,
+        "drainFibers": 89,
+        "processUserSeconds": 0.753213,
+        "processSystemSeconds": 0.004574
+      },
+      "gc": {
+        "attempts": 166921,
+        "gcNanoseconds": 594670000,
+        "failures": 0,
+        "allocations": 14760,
+        "reclaimed": 14760,
+        "allocatedBytes": 893553,
+        "peakLiveBytes": 39373,
+        "peakArenaBytes": 62968
+      },
+      "gcPhases": {
+        "collections": 166921,
+        "failures": 0,
+        "noInterveningAllocations": 152160,
+        "boundaryCalls": 166920,
+        "boundaryValidationNanoseconds": 123393000,
+        "indexValidationNanoseconds": 97159000,
+        "rootSeedingNanoseconds": 124744000,
+        "tracingNanoseconds": 272411000,
+        "ownerCleanupNanoseconds": 4972000,
+        "sweepNanoseconds": 87875000
+      }
+    }
+  ],
+  "scope": "Instrumented AOT polling diagnosis; identical guest objects. Carrier presence alone does not establish guest lowering; pair with verified backend binding evidence. Not throughput, wakeup-to-resume latency, JIT or interpreter evidence. GC and clock hooks perturb timings."
+}

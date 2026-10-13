@@ -1,0 +1,48 @@
+{
+  "passed": true,
+  "command": [
+    "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang",
+    "-isysroot",
+    "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.2.sdk",
+    "-std=c11",
+    "-O2",
+    "-Wall",
+    "-Wextra",
+    "-Werror",
+    "-DNEOCLR_NATIVE_GC",
+    "-fsanitize=undefined,bounds",
+    "-I",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-console",
+    "-DNEOCLR_GC_PROFILE",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-gc-profile-test.c",
+    "/Users/robert/Projects/neoclr/target/http-gc-phases-plain-20261013/gc-phases-collector.c",
+    "/Users/robert/Projects/neoclr/target/http-gc-phases-plain-20261013/gc-phases-probe.c",
+    "-pthread",
+    "-o",
+    "/Users/robert/Projects/neoclr/target/http-gc-phases-contract-20261013/test",
+    "benchmarks/http-scheduling/counters.c",
+    "benchmarks/http-scheduling/gc-phases.c"
+  ],
+  "inputs": {
+    "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang": "be5518e9c6736cda8dfc3486ce11e8112a2e08045084260691cf41f57a653f59",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-gc-profile-test.c": "8f2e8af9c1dad95a77e786196ab90f1beea1f371e350feba2020f062b4c0d3a9",
+    "/Users/robert/Projects/neoclr/target/http-gc-phases-plain-20261013/gc-phases-collector.c": "c9f84249ab6dffada3755c739462fb16e86632bdd0847442da51e8f0ecb2d9e6",
+    "/Users/robert/Projects/neoclr/target/http-gc-phases-plain-20261013/gc-phases-probe.c": "ce952f9e29a034b7af64877c20b5a524c85f9bf239d1a5963bf71fd871aad9c9",
+    "/Users/robert/Projects/neoclr/target/http-gc-phases-contract-20261013/test": "87979344067ddf08dd1df646de24ecd081bab6622d1d597d25084e2c6338cc22",
+    "/Users/robert/Projects/neoclr/benchmarks/http-scheduling/counters.c": "e1253513bee1aa5d34d1b8efc7df57073a2b7d8cb2e93c88cd1d2a085d73a905",
+    "/Users/robert/Projects/neoclr/benchmarks/http-scheduling/gc-phases.c": "aacfb928c1f238c84bf446503bff56abd10a0bb126dc959d3c474a079236f143"
+  },
+  "phases": {
+    "collections": 4,
+    "failures": 1,
+    "noInterveningAllocations": 3,
+    "boundaryCalls": 0,
+    "boundaryValidationNanoseconds": 0,
+    "indexValidationNanoseconds": 1000,
+    "rootSeedingNanoseconds": 0,
+    "tracingNanoseconds": 0,
+    "ownerCleanupNanoseconds": 0,
+    "sweepNanoseconds": 1000
+  },
+  "stderr": ""
+}

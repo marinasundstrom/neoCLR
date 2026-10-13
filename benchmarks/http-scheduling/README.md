@@ -172,3 +172,75 @@ runtime build from `compare-lowerings.py`:
 ```sh
 python3 benchmarks/http-scheduling/compare-carrier.py --build RUNTIME_BUILD/build.json --baseline OLD_NATIVE_RUNTIME_C --output NEW_DIRECTORY
 ```
+
+## Boundary and collector phase attribution — 2026-10-13
+
+Add `--gc-phases` to `profile.py` to build diagnostic copies of `root-probe.c` and
+`native-gc.c`. Exact source markers are checked before insertion; source drift fails
+rather than silently moving a measurement. No shipping runtime or collector policy
+changes. The existing profile ABI remains unchanged.
+
+The tool separates pre-collection root-boundary validation from five collector
+phases: heap index/owner validation; initial root seeding; transitive tracing plus
+conditional-root closure; owner/resource cleanup; sweeping/coalescing. Phase elapsed
+sums exclude some wrapper overhead and must not be treated as CPU samples. Added
+clock calls especially perturb short phases. Boundary time includes the observer's
+whole-frame-chain reads; it excludes generated spilling and other enter/leave work.
+
+| Diagnostic workload | Collections/process | No intervening allocation | Boundary validation | Root seeding | Transitive tracing | Sweep/coalescing |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| Plain text, 32 sequential requests | 177,095–177,098 | 90.8% | 132–143 ms | 77–82 ms | 101–107 ms | 39–42 ms |
+| JSON, 32 sequential requests | 271,943–271,945 | 85.9% | 273–298 ms | 153–163 ms | 195–207 ms | 79–82 ms |
+| Runtime-suspension application, 16 concurrent requests plus cancellation/shutdown | 166,921–167,225 | 91.1–91.2% | 123–133 ms | 125–136 ms | 272–293 ms | 88–95 ms |
+
+[Plain evidence](gc-phases-plain-20261013.json), [JSON evidence](gc-phases-json-20261013.json)
+and [runtime evidence](gc-phases-runtime-20261013.json) cover eight successful
+processes and 192 validated responses, with complete allocation reclamation and no
+collector failures. They reuse the previously identified guest/library versions;
+they are not a cross-lowering or throughput comparison. The
+[diagnostic accounting contract](gc-phases-contract-20261013.json) runs the existing
+collector-profile test with sanitizer instrumentation, including an invalid-context
+collection: four attempts, one expected failure, three without a new allocation.
+
+The current native boundary observer actually performs a full collection at each
+root boundary. The no-allocation counter means no intervening successful managed
+allocation on the thread; it does **not** prove unchanged roots, unchanged object
+edges, no dead objects or safe omission of a collection. In particular dependent
+owners, abandoned fibers and resource cleanup can change without new allocation.
+
+The evidence supports testing collection pacing and reducing repeated root work
+before selecting a new collector. A pressure-policy experiment must retain explicit
+collection, bounded heap/failure behavior, stress mode, dependent-owner correctness,
+and a defined quiescent/idle reclamation path. It must measure retained memory and
+resource cleanup latency alongside speed. Allocation itself currently cannot
+collect, so allocation-failure retry needs a verified published-root boundary; merely
+skipping calls or inserting collection into allocation would not establish correctness.
+
+## Generations and ZGC research — 2026-10-13
+
+The author explicitly requested considering .NET's generations and Java's ZGC.
+.NET's small-object heap uses generations 0, 1 and 2, allowing young collections
+without revisiting the entire older heap ([Microsoft fundamentals](https://learn.microsoft.com/en-us/dotnet/standard/garbage-collection/fundamentals)).
+Oracle's [Generational ZGC explanation](https://inside.java/2023/11/28/gen-zgc-explainer/)
+describes the JDK 21 addition of young/old generations to its largely concurrent
+collector. ZGC targets low pauses, not zero GC work; concurrency consumes resources
+that would otherwise be available to the application. These are compatible design
+axes: generational does not mean stop-the-world, and concurrent does not mean
+non-generational. Neither requires neoCLR to copy a specific generation count.
+
+For neoCLR, first measure allocation lifetimes/survival, old-to-young writes and
+root scanning under realistic long-lived HTTP servers. A generational nonmoving
+collector is one candidate; moving young objects is another. Remembered sets/barriers
+must cover interpreter, JIT, AOT and host writes before collecting only young objects.
+Moving objects additionally require precise relocation-capable references and a
+native pinning/interior-reference contract; the current conservative object-word
+scan cannot simply become a relocating scan. Concurrent collection further requires
+barrier and safepoint coordination with parked stacks and host services.
+
+This is a research comparison, not a chosen architecture or an implementation of
+generations. Sources accessed 2026-10-13. The Oracle explanation is pinned to JDK 21;
+no claim about the latest JVM defaults is inferred from it. Direct JEP retrieval was
+unavailable during this review, so release-history claims beyond that source are
+not used. The next bounded experiment remains allocation-pressure pacing with
+correctness gates, while gathering the survival/barrier evidence needed to choose
+whether generations justify their complexity.

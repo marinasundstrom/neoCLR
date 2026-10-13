@@ -16538,3 +16538,20 @@ qualification. Request and response deadline documentation now includes TLS work
   is the dominant HTTP cost. Dependency libraries remain unchanged in this comparison.
 - **Open:** collector phase attribution and an allocation-pressure policy experiment,
   with explicit stress collection retained; no collector replacement was selected.
+
+## 2026-10-13 — Generational collection and Java ZGC
+
+- **Author:** pointed out that .NET uses generational collection and asked to consider
+  it, and Java's “zero GC thing,” in the collector investigation.
+- **Assistant:** identified ZGC as the likely reference, reviewed Microsoft generation
+  documentation and Oracle's JDK 21 Generational ZGC explanation, and distinguished
+  generations, concurrent execution and relocation as separate design choices.
+- **Performed:** added opt-in diagnostic phase attribution without changing shipping
+  collector policy. Eight AOT HTTP processes validate 192 responses and complete
+  reclamation; roughly 86–91% of collections have no intervening allocation. Root
+  changes without allocation mean that observation alone cannot justify skipping GC.
+- **Next/open:** pressure-based collection with correctness gates, plus object-survival
+  and old-to-young-write measurements before selecting generations or concurrency.
+  [Research and evidence](../benchmarks/http-scheduling/README.md#generations-and-zgc-research--2026-10-13)
+  record tradeoffs and limits. No replacement collector or JVM-default equivalence
+  was selected; direct JEP access failed, so the review uses the dated Oracle source.
