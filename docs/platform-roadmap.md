@@ -1,5 +1,14 @@
 # neoCLR platform roadmap
 
+**Collection pacing experiment (2026-10-13):** [isolated AOT evidence](../benchmarks/http-gc-pacing/README.md)
+shows substantial plain/JSON HTTP potential from collecting less often, but the
+reserve/count policy is **rejected for production**: it faults on a large allocation
+that the stress collector admits. Final HTTP reclamation and the small-arena fallback
+pass; paced abandonment and idle cleanup remain unqualified. Next define and test
+size-aware rooted allocation admission/retry, including native helper temporaries,
+while preserving explicit/stress collection. No shipping GC policy or published
+benchmark changed; generational/concurrent collector selection remains open.
+
 **Collector phase attribution (2026-10-13):** [diagnostic HTTP evidence](../benchmarks/http-scheduling/README.md#boundary-and-collector-phase-attribution--2026-10-13)
 separates root-boundary observation from validation, root seeding, tracing, owner
 cleanup and sweep. Eight AOT runs validate 192 responses and complete reclamation;

@@ -8,6 +8,13 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-13
 
+- Retain an isolated native collection-pacing experiment, matched plain/JSON HTTP
+  timings and a sanitizer-checked large-allocation counterexample. The candidate
+  improves these local throughput measurements but is explicitly rejected for
+  production: reserve/count pacing can fault where stress collection succeeds.
+  Record complete HTTP reclamation, fallback ownership checks and unresolved
+  allocation-admission/idle-cleanup contracts. Shipping GC policy stays unchanged.
+
 - Add opt-in native HTTP GC phase diagnostics separating boundary validation, index
   validation, root seeding, tracing, owner cleanup and sweep. Retain eight passing
   AOT processes (192 responses), complete reclamation and a sanitizer-checked failed

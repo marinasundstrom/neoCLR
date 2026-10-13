@@ -244,3 +244,10 @@ unavailable during this review, so release-history claims beyond that source are
 not used. The next bounded experiment remains allocation-pressure pacing with
 correctness gates, while gathering the survival/barrier evidence needed to choose
 whether generations justify their complexity.
+
+## Collection-pacing follow-up
+
+The [isolated pacing experiment](../http-gc-pacing/README.md) measures large HTTP
+improvements but rejects its candidate on a reproducible large-allocation admission
+counterexample. It identifies the next correctness contract; it does not change the
+shipping collector or establish the value of generational collection.
