@@ -3285,6 +3285,7 @@ fn check_gc_borrowed_and_erased(source: &str) {
     let imports = Command::new("nm").arg("-u").arg(dir.0.join("app.o")).output().unwrap();
     let imports = String::from_utf8_lossy(&imports.stdout);
     assert!(imports.contains("neoclr_gc_stack_roots_v1") && !imports.contains("neoclr_probe_stack_roots_v2"));
+    assert!(imports.contains("neoclr_int32_to_string_rooted_v1"), "{imports}");
     let base = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../docs/experiments/aot-console");
     fs::write(dir.0.join("host.c"), r#"
 #include "native-gc.h"
@@ -6692,4 +6693,51 @@ fn native_int64_boxing_preserves_width_and_exact_type_checks() {
 #[cfg(all(target_os = "macos", target_arch = "aarch64"))]
 fn native_int64_type_test_without_box_producer_returns_null() {
     check_reference_execution(".module NoWideBox\n.type class abstract System.Object\n.end\n.function Calculate(Int32 mode) -> Int32\nldc.i4 1\nbox Int32\nisinst Int64\nref.isnull\nbrfalse Fail\nldc.i4 42\nret\nFail:\nldc.i4 99\nret\n.end\n", 1, b"", &[0]);
+}
+
+#[test]
+#[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+fn rooted_integer_formatting_matches_interpreter() {
+    let dir = Temp::new();
+    let seed = neoclr::assemble(&format!("{TEXT_SEED}\n{INTEGER_SEED}")).unwrap();
+    let source = include_str!("../../../docs/experiments/aot-console/wide-integers.neoil");
+    let flags = ["--compile-system", "--reference-arena", "--bind-user-fault", "--bind-integer-text", "--native-gc"];
+    let r = compile_source(&dir, &seed, source, &flags, false);
+    assert!(r.status.success(), "{}", String::from_utf8_lossy(&r.stderr));
+    let imports = Command::new("nm").arg("-u").arg(dir.0.join("app.o")).output().unwrap();
+    let imports = String::from_utf8_lossy(&imports.stdout);
+    assert!(imports.contains("neoclr_int64_to_string_rooted_v1") && imports.contains("neoclr_uint64_to_string_rooted_v1"), "{imports}");
+    let base = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../docs/experiments/aot-console");
+    fs::write(dir.0.join("host.c"), r#"
+#include "native-gc.h"
+#include <stdlib.h>
+int main(int argc, char **argv) {
+    uint64_t storage[512] = {0};
+    neoclr_aot_context ctx = {.text = {(unsigned char *)storage, sizeof(storage), 0}};
+    int32_t result = -99;
+    int status = neoclr_entry_v4(argc > 1 ? atoi(argv[1]) : 0, &result, &ctx);
+    if (status != 4 || result != -99 || ctx.fault.code != 4) return 1;
+    if (neoclr_gc_collect_v1(&ctx, NULL)) return 2;
+    if (neoclr_aot_render_fault(stderr, &ctx.fault)) return 3;
+    ctx.fault = (neoclr_aot_fault){0};
+    if (neoclr_gc_collect_v1(&ctx, NULL) || ctx.text.used || neoclr_gc_entry_check_v1(&ctx)) return 4;
+    return 0;
+}
+"#).unwrap();
+    let r = Command::new("clang")
+        .args(["-arch", "arm64", "-std=c11", "-Wall", "-Wextra", "-Werror", "-DNEOCLR_NATIVE_GC", "-fsanitize=undefined,bounds", "-I"])
+        .arg(&base).arg(dir.0.join("host.c"))
+        .arg(base.join("root-probe.c")).arg(base.join("native-gc.c")).arg(base.join("text-arena.c"))
+        .arg(base.join("../aot-fault-details/render.c")).arg(dir.0.join("app.o"))
+        .arg("-o").arg(dir.0.join("host")).output().unwrap();
+    assert!(r.status.success(), "{}", String::from_utf8_lossy(&r.stderr));
+    let app = neoclr::assemble(source).unwrap();
+    let program = neoclr::LoadedProgram::with_library(&app, &seed).unwrap();
+    let method = program.resolve_function(&neoclr::assembler::parse_function_ref("Calculate(Int32)").unwrap()).unwrap();
+    for value in [0,1,2,3,4,5,6,7,8,9,10,11,-1,i32::MIN,i32::MAX] {
+        let fault = method.invoke(vec![neoclr::Value::Int32(value)], neoclr::Limits::default()).unwrap_err();
+        let r = Command::new(dir.0.join("host")).arg(value.to_string()).env_clear().output().unwrap();
+        assert!(r.status.success(), "{value}: {r:?}");
+        assert_eq!(String::from_utf8_lossy(&r.stderr), fault.diagnostic().to_string(), "{value}");
+    }
 }

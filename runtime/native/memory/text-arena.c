@@ -49,13 +49,13 @@ static int32_t reserve_text_inputs(neoclr_aot_text_arena *arena, uint64_t bytes,
     return reserve_storage(arena, bytes, TEXT_STORAGE, output);
 }
 
-static int32_t store_text(const char *buffer, size_t length,
-                          neoclr_aot_text_arena *arena, const neoclr_aot_text **output) {
+static int32_t store_scalar_text(const char *buffer, size_t length,
+                          neoclr_aot_text_arena *arena, const neoclr_aot_text **output, int rooted) {
     if (arena->used > arena->capacity || (arena->capacity && !arena->data) ||
         ((uintptr_t)arena->data & 7)) return NEOCLR_AOT_FAULT_RUNTIME_ERROR;
     if (length > UINT64_MAX - 8) return NEOCLR_AOT_FAULT_NATIVE_MEMORY_LIMIT;
     void *storage;
-    int32_t status = reserve_storage(arena, 8 + (uint64_t)length, TEXT_STORAGE, &storage);
+    int32_t status = reserve_text_inputs(arena, 8 + (uint64_t)length, &storage, rooted, NULL, NULL);
     if (status) return status;
     neoclr_aot_text *text = storage;
     text->length = (uint64_t)length;
@@ -64,28 +64,60 @@ static int32_t store_text(const char *buffer, size_t length,
     return NEOCLR_AOT_FAULT_NONE;
 }
 
-int32_t neoclr_int32_to_string_v1(int32_t value, neoclr_aot_text_arena *arena,
-                                const neoclr_aot_text **output) {
+static int32_t store_text(const char *buffer, size_t length,
+    neoclr_aot_text_arena *arena, const neoclr_aot_text **output) {
+    return store_scalar_text(buffer, length, arena, output, 0);
+}
+
+static int32_t int32_to_string(int32_t value, neoclr_aot_text_arena *arena,
+                                const neoclr_aot_text **output, int rooted) {
     char buffer[12]; /* sign + ten digits + terminator */
     int length = snprintf(buffer, sizeof(buffer), "%" PRId32, value);
     if (length < 0 || (size_t)length >= sizeof(buffer)) return NEOCLR_AOT_FAULT_RUNTIME_ERROR;
-    return store_text(buffer, (size_t)length, arena, output);
+    return store_scalar_text(buffer, (size_t)length, arena, output, rooted);
 }
 
-int32_t neoclr_int64_to_string_v1(int64_t value, neoclr_aot_text_arena *arena,
-                                const neoclr_aot_text **output) {
+int32_t neoclr_int32_to_string_v1(int32_t value, neoclr_aot_text_arena *arena,
+    const neoclr_aot_text **output) {
+    return int32_to_string(value, arena, output, 0);
+}
+int32_t neoclr_int32_to_string_rooted_v1(int32_t value, neoclr_aot_text_arena *arena,
+    const neoclr_aot_text **output) {
+    return int32_to_string(value, arena, output, 1);
+}
+
+static int32_t int64_to_string(int64_t value, neoclr_aot_text_arena *arena,
+                                const neoclr_aot_text **output, int rooted) {
     char buffer[21]; /* sign + nineteen digits + terminator */
     int length = snprintf(buffer, sizeof(buffer), "%" PRId64, value);
     if (length < 0 || (size_t)length >= sizeof(buffer)) return NEOCLR_AOT_FAULT_RUNTIME_ERROR;
-    return store_text(buffer, (size_t)length, arena, output);
+    return store_scalar_text(buffer, (size_t)length, arena, output, rooted);
 }
 
-int32_t neoclr_uint64_to_string_v1(uint64_t value, neoclr_aot_text_arena *arena,
-                                 const neoclr_aot_text **output) {
+int32_t neoclr_int64_to_string_v1(int64_t value, neoclr_aot_text_arena *arena,
+    const neoclr_aot_text **output) {
+    return int64_to_string(value, arena, output, 0);
+}
+int32_t neoclr_int64_to_string_rooted_v1(int64_t value, neoclr_aot_text_arena *arena,
+    const neoclr_aot_text **output) {
+    return int64_to_string(value, arena, output, 1);
+}
+
+static int32_t uint64_to_string(uint64_t value, neoclr_aot_text_arena *arena,
+                                 const neoclr_aot_text **output, int rooted) {
     char buffer[21]; /* twenty digits + terminator */
     int length = snprintf(buffer, sizeof(buffer), "%" PRIu64, value);
     if (length < 0 || (size_t)length >= sizeof(buffer)) return NEOCLR_AOT_FAULT_RUNTIME_ERROR;
-    return store_text(buffer, (size_t)length, arena, output);
+    return store_scalar_text(buffer, (size_t)length, arena, output, rooted);
+}
+
+int32_t neoclr_uint64_to_string_v1(uint64_t value, neoclr_aot_text_arena *arena,
+    const neoclr_aot_text **output) {
+    return uint64_to_string(value, arena, output, 0);
+}
+int32_t neoclr_uint64_to_string_rooted_v1(uint64_t value, neoclr_aot_text_arena *arena,
+    const neoclr_aot_text **output) {
+    return uint64_to_string(value, arena, output, 1);
 }
 
 int32_t neoclr_allocate_object_v1(neoclr_aot_text_arena *arena, uint32_t type,

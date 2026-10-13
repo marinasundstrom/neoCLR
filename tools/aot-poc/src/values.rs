@@ -549,11 +549,11 @@ pub(crate) fn compile_into(
         let mut sig = module.make_signature();
         sig.params.extend([AbiParam::new(types::I32), AbiParam::new(types::I64), AbiParam::new(types::I64)]);
         sig.returns.push(AbiParam::new(types::I32));
-        Some(module.declare_function("neoclr_int32_to_string_v1", Linkage::Import, &sig)?)
+        Some(module.declare_function(if details.is_some_and(|d| d.native_gc) { "neoclr_int32_to_string_rooted_v1" } else { "neoclr_int32_to_string_v1" }, Linkage::Import, &sig)?)
     } else { None };
     let mut wide_format_services = std::collections::HashMap::new();
     if let Some(d) = details {
-        for (indices, symbol) in [(&d.int64_to_string, "neoclr_int64_to_string_v1"), (&d.uint64_to_string, "neoclr_uint64_to_string_v1")] {
+        for (indices, symbol) in [(&d.int64_to_string, if d.native_gc { "neoclr_int64_to_string_rooted_v1" } else { "neoclr_int64_to_string_v1" }), (&d.uint64_to_string, if d.native_gc { "neoclr_uint64_to_string_rooted_v1" } else { "neoclr_uint64_to_string_v1" })] {
             if indices.is_empty() { continue; }
             let mut sig = module.make_signature();
             sig.params.extend([types::I64, types::I64, types::I64].map(AbiParam::new));

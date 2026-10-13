@@ -37,6 +37,10 @@ int32_t neoclr_entry_v4(int32_t value, int32_t *result, neoclr_aot_context *cont
 /* No allocation outside the caller buffer. Success alone publishes output.
  * Exhaustion returns 5; malformed arena/formatting failures return 3.
  */
+/* Audited scalar scratch only: allocation may collect at the current boundary. */
+int32_t neoclr_int32_to_string_rooted_v1(int32_t, neoclr_aot_text_arena *, const neoclr_aot_text **);
+int32_t neoclr_int64_to_string_rooted_v1(int64_t, neoclr_aot_text_arena *, const neoclr_aot_text **);
+int32_t neoclr_uint64_to_string_rooted_v1(uint64_t, neoclr_aot_text_arena *, const neoclr_aot_text **);
 int32_t neoclr_int32_to_string_v1(int32_t value, neoclr_aot_text_arena *arena,
                                 const neoclr_aot_text **output);
 int32_t neoclr_int64_to_string_v1(int64_t value, neoclr_aot_text_arena *arena,

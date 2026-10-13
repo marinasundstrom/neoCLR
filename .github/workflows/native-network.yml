@@ -83,7 +83,7 @@ jobs:
         if: runner.os == 'macOS'
         run: python3 scripts/validate-native-network.py --output target/native-network-validation
       - name: Run macOS GC and root contracts
-        if: runner.os == 'macOS' && inputs.benchmark_gc_handles
+        if: runner.os == 'macOS'
         run: python3 scripts/validate-native-gc.py --output target/native-gc-validation
       - name: Qualify relocated macOS collector package
         if: runner.os == 'macOS'

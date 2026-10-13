@@ -588,7 +588,8 @@ Remaining admission audit:
 
 | Family | Required protection before opting in | Current policy |
 | --- | --- | --- |
-| Scalar formatting / primitive arrays | Complete caller boundary, publish result before next allocation | Noncollecting |
+| Int32/Int64/UInt64 formatting | Native stack scratch; complete caller boundary; publish result before next allocation | Generated GC calls use rooted retry |
+| Other scalar formatting / primitive arrays | Complete caller boundary, publish result before next allocation | Noncollecting |
 | Grapheme slicing, encoding, replacement and paths | Retain borrowed inputs and any backing arrays | Noncollecting |
 | Unicode sequence construction | Retain partially initialized result arrays and each constructed element | Noncollecting |
 | Native file/network/TLS/SQL producers | Retain managed intermediates; keep native handles/buffers alive; never replay I/O to retry allocation | Noncollecting |
@@ -611,3 +612,19 @@ slice adds no collector policy, moving objects or public API.
 The [platform follow-up](https://github.com/marinasundstrom/neoCLR/actions/runs/38425599711)
 at `38b2240d2` passes the 20 Windows GC/root executions and both platform socket
 contracts. Reports are retained with the [allocation/admission evidence](../../../benchmarks/gc-allocation/README.md#utf-8-slice-admission-follow-up).
+
+Integer formatting follow-up (2026-10-13): generated native-GC calls, including
+boxed Int32 display, select the private `*_to_string_rooted_v1` helpers. Formatting
+finishes in native stack scratch before the sole managed allocation; retry repeats
+only allocation, and copying/publication cannot collect. Existing arena-only entry
+points and non-GC emission remain noncollecting. A valid active boundary must own
+the supplied arena; no boundary or a foreign arena returns RuntimeError. True live
+exhaustion still faults and preserves the output. This follows CLR's requirement to
+protect managed values across collecting allocations; there is no managed API,
+formatting, fault-recovery or general pacing change. Newly generated GC objects
+require a matching native host; existing objects remain compatible.
+
+Local qualification passes all 22 native GC/root executions, relocated GC/non-GC
+package checks and three focused compiled consumers (including 30 wide-integer
+interpreter comparisons). [Retained evidence](../../validation/runtime-product/integer-formatting/README.md).
+Windows qualification is pending.
