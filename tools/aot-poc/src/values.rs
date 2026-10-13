@@ -598,21 +598,21 @@ pub(crate) fn compile_into(
         let mut sig = module.make_signature();
         sig.params.extend([types::I64, types::I32, types::I64].map(AbiParam::new));
         sig.returns.push(AbiParam::new(types::I32));
-        Some(module.declare_function("neoclr_allocate_references_v1", Linkage::Import, &sig)?)
+        Some(module.declare_function(if details.is_some_and(|d| d.native_gc) { "neoclr_allocate_references_rooted_v1" } else { "neoclr_allocate_references_v1" }, Linkage::Import, &sig)?)
     } else { None };
     let record_array_service = if references && input.functions.iter().any(|f| f.body.iter().any(|op|
         matches!(op, Op::ReserveArray(neoclr::metadata::Type::Named(_))))) {
         let mut sig = module.make_signature();
         sig.params.extend([types::I64, types::I32, types::I32, types::I64].map(AbiParam::new));
         sig.returns.push(AbiParam::new(types::I32));
-        Some(module.declare_function("neoclr_reserve_records_v1", Linkage::Import, &sig)?)
+        Some(module.declare_function(if details.is_some_and(|d| d.native_gc) { "neoclr_reserve_records_rooted_v1" } else { "neoclr_reserve_records_v1" }, Linkage::Import, &sig)?)
     } else { None };
     let reference_array_service = if references && input.functions.iter().any(|f| f.body.iter().any(|op|
         matches!(op, Op::NewArray(t) | Op::ReserveArray(t) if matches!(t, neoclr::metadata::Type::String | neoclr::metadata::Type::Char | neoclr::metadata::Type::Function(_))))) {
         let mut sig = module.make_signature();
         sig.params.extend([types::I64, types::I32, types::I32, types::I64].map(AbiParam::new));
         sig.returns.push(AbiParam::new(types::I32));
-        Some(module.declare_function("neoclr_allocate_strings_v1", Linkage::Import, &sig)?)
+        Some(module.declare_function(if details.is_some_and(|d| d.native_gc) { "neoclr_allocate_strings_rooted_v1" } else { "neoclr_allocate_strings_v1" }, Linkage::Import, &sig)?)
     } else { None };
     let initialized_service = if reservations && details.is_some_and(|d| !d.console_write_bytes.is_empty()) {
         let mut sig = module.make_signature();

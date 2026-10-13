@@ -1,0 +1,21 @@
+   Compiling neoclr-aot-poc v0.0.0 (/Users/robert/Projects/neoclr/tools/aot-poc)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 8.87s
+     Running tests/console.rs (target/debug/deps/console-dafeb0f53eda77bd)
+
+running 14 tests
+test native_callback_arrays_reject_element_borrows_and_shape_substitution ... ok
+test native_record_arrays_require_reservation_and_indexed_value_access ... ok
+test native_default_reference_arrays_preserve_nulls_identity_and_faults ... ok
+test native_callback_arrays_trace_initialized_slots_and_release_replacements ... ok
+test native_reference_arrays_preserve_identity_owners_and_faults ... ok
+test native_record_arrays_preserve_snapshots_nested_references_and_faults ... ok
+test native_reference_arrays_reject_borrows_and_wrong_elements ... ok
+test native_reflection_arrays_preserve_creation_values_and_checked_faults ... ok
+test native_scalar_arrays_reject_element_borrows_and_incompatible_elements ... ok
+test native_interface_arrays_preserve_dispatch_identity_and_faults ... ok
+test packed_byte_arrays_bounds_borrows_and_faults_match_interpreter ... ok
+test native_reflection_arrays_preserve_boolean_string_and_reference_elements ... ok
+test rooted_byte_arrays_bounds_borrows_and_faults_match_interpreter ... ok
+test native_scalar_arrays_preserve_types_defaults_roots_and_faults ... ok
+
+test result: ok. 14 passed; 0 failed; 0 ignored; 0 measured; 140 filtered out; finished in 18.90s

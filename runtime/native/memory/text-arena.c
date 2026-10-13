@@ -547,15 +547,15 @@ int32_t neoclr_string_contains_ordinal_v1(const neoclr_aot_text *text,
 }
 
 
-int32_t neoclr_allocate_strings_v1(neoclr_aot_text_arena *arena, int32_t length,
-                                  int32_t reserved, void **output) {
+static int32_t allocate_strings(neoclr_aot_text_arena *arena, int32_t length,
+                                  int32_t reserved, void **output, int rooted) {
     if (length < 0) return NEOCLR_AOT_FAULT_RUNTIME_ERROR;
     if (length > 65536) return NEOCLR_AOT_FAULT_ARRAY_LIMIT;
     if (!arena || !output || (reserved != 0 && reserved != 1) ||
         arena->used > arena->capacity || (arena->capacity && !arena->data) ||
         ((uintptr_t)arena->data & 7)) return NEOCLR_AOT_FAULT_RUNTIME_ERROR;
     void *storage;
-    int32_t status = reserve_storage(arena, 16 + (uint64_t)length * (reserved ? 9 : 8), STRINGS_STORAGE, &storage);
+    int32_t status = reserve_inputs(arena, 16 + (uint64_t)length * (reserved ? 9 : 8), STRINGS_STORAGE, &storage, rooted, NULL, NULL);
     if (status) return status;
     unsigned char *array = storage;
     uint64_t kind = reserved ? UINT64_C(0x80000004) : UINT64_C(0x80000003);
@@ -568,15 +568,15 @@ int32_t neoclr_allocate_strings_v1(neoclr_aot_text_arena *arena, int32_t length,
 }
 
 /* Private checked value-array storage: header, length, padded lane count, snapshots,
- * then one initialization byte per element. No collection occurs inside allocation. */
-int32_t neoclr_reserve_records_v1(neoclr_aot_text_arena *arena, int32_t length,
-                                uint32_t lanes, void **output) {
+ * then one initialization byte per element. Initialization does not collect. */
+static int32_t reserve_records(neoclr_aot_text_arena *arena, int32_t length,
+                                uint32_t lanes, void **output, int rooted) {
     if (length < 0) return NEOCLR_AOT_FAULT_RUNTIME_ERROR;
     if (length > 65536) return NEOCLR_AOT_FAULT_ARRAY_LIMIT;
     if (!arena || !output || !lanes || lanes > NEOCLR_NATIVE_LAYOUT_LANES) return NEOCLR_AOT_FAULT_RUNTIME_ERROR;
     void *storage;
     uint64_t bytes = 24 + (uint64_t)length * (8 * lanes + 1);
-    int32_t status = reserve_storage(arena, bytes, RECORDS_STORAGE, &storage);
+    int32_t status = reserve_inputs(arena, bytes, RECORDS_STORAGE, &storage, rooted, NULL, NULL);
     if (status) return status;
     uint64_t header[] = {UINT64_C(0x80000005), (uint64_t)length, lanes};
     memcpy(storage, header, sizeof(header));
@@ -587,15 +587,34 @@ int32_t neoclr_reserve_records_v1(neoclr_aot_text_arena *arena, int32_t length,
 
 /* Ordinary nominal reference arrays use the same traced one-lane record layout.
  * Mark null slots initialized before publication; reservation remains unchanged. */
-int32_t neoclr_allocate_references_v1(neoclr_aot_text_arena *arena, int32_t length,
-                                    void **output) {
+static int32_t allocate_references(neoclr_aot_text_arena *arena, int32_t length,
+                                    void **output, int rooted) {
     if (!output) return NEOCLR_AOT_FAULT_RUNTIME_ERROR;
     void *storage;
-    int32_t status = neoclr_reserve_records_v1(arena, length, 1, &storage);
+    int32_t status = reserve_records(arena, length, 1, &storage, rooted);
     if (status) return status;
     memset((unsigned char *)storage + 24 + (size_t)length * 8, 1, (size_t)length);
     *output = storage;
     return NEOCLR_AOT_FAULT_NONE;
+}
+
+int32_t neoclr_allocate_strings_v1(neoclr_aot_text_arena *arena, int32_t length, int32_t reserved, void **output) {
+    return allocate_strings(arena, length, reserved, output, 0);
+}
+int32_t neoclr_allocate_strings_rooted_v1(neoclr_aot_text_arena *arena, int32_t length, int32_t reserved, void **output) {
+    return allocate_strings(arena, length, reserved, output, 1);
+}
+int32_t neoclr_reserve_records_v1(neoclr_aot_text_arena *arena, int32_t length, uint32_t lanes, void **output) {
+    return reserve_records(arena, length, lanes, output, 0);
+}
+int32_t neoclr_reserve_records_rooted_v1(neoclr_aot_text_arena *arena, int32_t length, uint32_t lanes, void **output) {
+    return reserve_records(arena, length, lanes, output, 1);
+}
+int32_t neoclr_allocate_references_v1(neoclr_aot_text_arena *arena, int32_t length, void **output) {
+    return allocate_references(arena, length, output, 0);
+}
+int32_t neoclr_allocate_references_rooted_v1(neoclr_aot_text_arena *arena, int32_t length, void **output) {
+    return allocate_references(arena, length, output, 1);
 }
 
 static int32_t allocate_scalars(neoclr_aot_text_arena *arena, int32_t length,

@@ -4027,6 +4027,10 @@ newarr Counter"#);
     let flags = ["--compile-system", "--reference-arena", "--native-gc"];
     let r = compile_source(&dir, &seed, &source, &flags, false);
     assert!(r.status.success(), "{}", String::from_utf8_lossy(&r.stderr));
+    let symbols = Command::new("nm").arg(dir.0.join("app.o")).output().unwrap();
+    assert!(symbols.status.success());
+    let symbols = String::from_utf8_lossy(&symbols.stdout);
+    assert!(symbols.contains(if default_initialized { "neoclr_allocate_references_rooted_v1" } else { "neoclr_reserve_records_rooted_v1" }));
     let base = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../docs/experiments/aot-console");
     fs::write(dir.0.join("host.c"), r#"
 #include "native-gc.h"

@@ -71,6 +71,9 @@ int32_t neoclr_allocate_object_v1(neoclr_aot_text_arena *arena, uint32_t type,
 /* Audited primitive construction: initialize fully before publishing. */
 int32_t neoclr_allocate_bytes_rooted_v1(neoclr_aot_text_arena *, int32_t, void **);
 int32_t neoclr_reserve_bytes_rooted_v1(neoclr_aot_text_arena *, int32_t, void **);
+int32_t neoclr_allocate_strings_rooted_v1(neoclr_aot_text_arena *, int32_t, int32_t, void **);
+int32_t neoclr_reserve_records_rooted_v1(neoclr_aot_text_arena *, int32_t, uint32_t, void **);
+int32_t neoclr_allocate_references_rooted_v1(neoclr_aot_text_arena *, int32_t, void **);
 int32_t neoclr_allocate_scalars_rooted_v1(neoclr_aot_text_arena *, int32_t, int32_t, void **);
 int32_t neoclr_allocate_bytes_v1(neoclr_aot_text_arena *arena, int32_t length, void **output);
 /* Checked reserved capacity uses one initialization byte per payload byte.

@@ -590,7 +590,8 @@ Remaining admission audit:
 | --- | --- | --- |
 | Int32/Int64/UInt64 formatting | Native stack scratch; complete caller boundary; publish result before next allocation | Generated GC calls use rooted retry |
 | Byte/scalar array allocation and reservation | No managed inputs; finish header, zeroing and initialization flags before publication | Generated GC calls use rooted retry |
-| Other scalar formatting / reference arrays | Complete caller boundary; audit construction inputs and intermediates | Noncollecting |
+| Reference/string/function arrays and reserved records | No managed inputs; finish headers, null payloads and flags before publication | Generated GC calls use rooted retry |
+| Other scalar formatting | Complete caller boundary; audit intermediates | Noncollecting |
 | Managed UTF-8 encode/decode | Retain source text or full byte-array owner through allocation/copy | Generated GC calls use rooted retry |
 | Grapheme slicing, other encoding, replacement and paths | Retain borrowed inputs and any backing arrays | Noncollecting |
 | Unicode sequence construction | Retain partially initialized result arrays and each constructed element | Noncollecting |
@@ -676,3 +677,14 @@ compiled tests. [Retained evidence](../../validation/runtime-product/utf8-codecs
 Hosted macOS ARM64 and Windows x64 qualification passes all 24 GC/root executions,
 socket contracts and relocated-package checks; macOS profiler attachment also passes.
 The retained evidence identifies the tested revision and source hashes.
+
+Reference-array follow-up (2026-10-13): string/function arrays, nominal reference
+arrays and reserved records now select rooted allocation in GC code. No managed
+input is passed into construction; zeroing, layout headers and initialization flags
+complete before publishing the result without reentry. Traced storage kinds remain
+unchanged. Existing native symbols remain noncollecting. This follows the CLR
+principle that managed references must be observable at collecting boundaries;
+private neoCLR storage and helper symbols remain implementation details.
+The pressure fixture checks referent retention through the newly published array,
+context rejection, unchanged failure outputs, live exhaustion and final cleanup.
+Platform qualification is pending.

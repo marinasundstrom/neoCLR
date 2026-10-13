@@ -101,5 +101,6 @@ retrying an output allocation. Integer formatting can also retry its sole output
 allocation after formatting into native stack storage. Byte and scalar array
 construction can retry allocation before initializing and publishing the array.
 Managed UTF-8 encoding/decoding retain their source text or array through allocation
-retry. Broader collection pacing remains experimental;
+retry. Reference-array construction also supports retry before publishing initialized
+storage. Broader collection pacing remains experimental;
 see the [allocation benchmark and qualification](/benchmarks/gc/#allocation-throughput-2026-10-13).
