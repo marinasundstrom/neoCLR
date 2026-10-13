@@ -12,5 +12,5 @@ arguments, partial exhaustion, unchanged failure outputs and complete reclamatio
 Two compiled tests pass: actual macOS entry behavior/failure parity and Windows
 object import/ABI selection. The native helper must match generated symbols.
 
-Hosted macOS/Windows qualification is pending. This does not enable collecting
+[Hosted run 38449399768](https://github.com/marinasundstrom/neoCLR/actions/runs/38449399768) passes at `df256c9c63d5ba61a49e79a522aaead45c1785e6`: all 28 GC/root executions, sockets and relocated-package checks on macOS ARM64 and Windows x64, plus macOS profiler attachment. The native fixture exercises strict Windows UTF-16 conversion as well as Unix UTF-8. Reports retain source hashes and command provenance. This is not a fresh managed Windows/JIT/HTTP or Windows ARM64 matrix. This does not enable collecting
 file/network/TLS/SQL producers, nor change public managed APIs or general pacing.

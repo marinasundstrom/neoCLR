@@ -741,3 +741,8 @@ See [process-entry ownership](../../native-entry-arguments.md).
 File/network/TLS/SQL producers remain noncollecting pending their own result/handle
 and cancellation audits. Their caller scratch and registered native resources cannot
 be assumed to have the process-argument lifetime.
+
+Process-argument qualification passes all 28 GC/root checks plus socket/package
+checks on macOS ARM64 and Windows x64, including native UTF-16 conversion. Two
+local compiled entry tests also pass. [Retained evidence](../../validation/runtime-product/native-arguments/README.md)
+identifies the tested revision and scope; general pacing remains disabled.

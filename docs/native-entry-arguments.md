@@ -97,6 +97,6 @@ and insertion into the array have no intervening allocation. Faults remain termi
 The native pressure fixture covers UTF-8/UTF-16 Unicode, empty arguments, reclaimed
 dead heap, noncollecting controls, partial-array exhaustion, invalid text/null input,
 frame cleanup and complete reclamation. Local compiled tests cover process entry,
-invalid-text/failure parity and the Windows ABI import. Platform qualification is
-pending. Raven metadata, Runtime Contract and .NET lowering are unchanged; generated
+invalid-text/failure parity and the Windows ABI import. All 28 GC/root checks and socket/package gates pass on macOS ARM64 and Windows
+x64. See [retained qualification](validation/runtime-product/native-arguments/README.md). Raven metadata, Runtime Contract and .NET lowering are unchanged; generated
 objects require the matching native host helpers.
