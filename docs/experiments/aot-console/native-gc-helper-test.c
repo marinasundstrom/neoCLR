@@ -2,7 +2,7 @@
 #include <string.h>
 #include <stdio.h>
 #define CHECK(x) do { if (!(x)) { fprintf(stderr, "failed line %d\n", __LINE__); return 1; } } while (0)
-static const struct { uint64_t length; char bytes[5]; } name = {5, "Inner"};
+static const struct { uint64_t length; char bytes[6]; } name = {5, "Inner"};
 int main(void) {
     uint64_t memory[64] = {0};
     neoclr_aot_context c = {.text = {(unsigned char *)memory, sizeof(memory), 0}};

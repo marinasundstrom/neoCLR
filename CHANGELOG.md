@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-13
 
+- Make the StackTrace pressure-test name fixture explicitly NUL-sized for MSVC warning-as-error builds; its managed text length remains five. The initial Windows gate caught this test-only portability issue.
+
 - Allow native StackTrace capture to collect and retry its sole output allocation at an admitted rooted boundary. Preserve terminal exhaustion, foreign-context behavior and failure outputs; pressure/lifetime tests, fresh JIT/AOT consumers and the API snapshot pass locally. Other arena-only helpers remain noncollecting.
 
 - Update the GC benchmark website with the Windows wait/collector breakdown,
