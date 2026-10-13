@@ -9424,3 +9424,17 @@ The native runtime-await lowerer now expands propagation before wrapping its ear
 returns in TaskOutcome. This preserves completion and cleanup handling for `?`
 inside async functions; the ordinary .NET state-machine path is unchanged. The HTTP
 JSON async regression covers a suspended success and both awaited error alternatives.
+
+
+### Explicit readonly instance fields (2026-10-14)
+
+Raven native branch `codex/source-object-metadata-resolution` commit `b0b2a1d6e`
+accepts explicit `readonly field` declarations. Existing InitOnly native metadata
+and CLI reference projection preserve the contract, as already used by private
+`val` storage. Initializers/constructors may assign; ordinary source and imported
+writes are rejected. No Runtime Contract or temporary encoding change is needed.
+The fix is native-emitter admission; ordinary Raven/.NET behavior is unchanged.
+[Focused evidence](readonly-fields-validation-20261014.json) covers native metadata,
+imports, verification and interpreter execution, plus existing .NET diagnostics.
+The HTTP SDK has not yet been rebuilt with this compiler. Static storage is separate
+and remains under implementation; this check is not JIT/AOT/Windows qualification.

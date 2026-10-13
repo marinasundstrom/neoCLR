@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-14
 
+- Integrate Raven’s explicit readonly instance-field admission fix (`b0b2a1d6e`): retain InitOnly metadata/imported symbols and reject ordinary writes. Record passing separate-library verification/interpreter execution and five existing compiler diagnostic tests. This does not add static storage or update the installed SDK.
+
 - Record the author’s larger header catalog, readonly-field and lazy-property proposals. Confirm native static readonly storage is rejected by the pinned Raven compiler; retain the probe and document context-owned rooting, once-initialized publication and the .NET Lazy comparison. Shared-name storage and expanded coverage remain pending; no compiler/runtime support is claimed.
 
 - Match seven common request header names directly from validated ASCII bytes, avoiding lowercase buffers and decoding while preserving unknown names and all framing checks. All 87 wire checks pass in interpreter/JIT/AOT with runtime-await; matched AOT profiles save 10 plain / 8 JSON allocations per request and fully reclaim memory. Retain 1,024 timing responses, small exploratory gains, object-size cost and the remaining literal-copy distinction; permanent shared names and Windows qualification remain open.

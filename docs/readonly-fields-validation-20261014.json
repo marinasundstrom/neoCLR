@@ -1,0 +1,18 @@
+{
+  "scope": "Explicit readonly instance fields; static storage not implemented by this check",
+  "compilerCommit": "b0b2a1d6e2eed09e9b9d23e744c23b066f299231",
+  "passed": true,
+  "checks": [
+    "Five AssignmentExpressionSemanticTests pass on .NET 11",
+    "Native InitOnly metadata retained for public/internal/private fields",
+    "Native imported symbol retains IsReadOnly",
+    "Separate-library verification and interpreter execution return 42",
+    "Source and imported ordinary assignments rejected with RAV0191"
+  ],
+  "inputs": {
+    "/Users/robert/Projects/Raven/tools/NeoClrMetadataProbe/bin/Debug/net10.0/NeoClrMetadataProbe.dll": "0a24e44fbb3033cb690ace90d5483a172f1a00b11fac37b5a3cd7055477d8541",
+    "/Users/robert/Projects/neoclr/target/release/neoclr": "57e1551815390c17044a73b87a3e4bb663406d00549d6adb3bcdcd5c9b9f7ebb",
+    "/Users/robert/Projects/neoclr/target/readonly-fields-20261014c/ReadonlyLibrary.dll": "7a897fc44a11c3e524ea5cfe107c7f7d3bcaebb815fcca30cf7ac47b18eba9a2",
+    "/Users/robert/Projects/neoclr/target/readonly-fields-20261014c/ReadonlyConsumer.dll": "a43cb4ea51521115d523304aa8d30b07fd5ec58dc377671780bdfe2ffd8c5f83"
+  }
+}
