@@ -40,7 +40,7 @@ def native_kernel_build(target, time_zone_rules=False):
 
 
 def native_tls_sources():
-    return [ROOT / 'tools/native-tls/Cargo.toml', ROOT / 'tools/native-tls/Cargo.lock',
+    return [ROOT / 'tools/native-tls/Cargo.toml', ROOT / 'Cargo.toml', ROOT / 'Cargo.lock',
             *(ROOT / 'tools/native-tls/src').glob('*.rs'),
             ROOT / 'docs/experiments/https-server/native-tls.h',
             ROOT / 'docs/experiments/aot-console/tls-managed.c',
@@ -51,12 +51,12 @@ def native_tls_build(windows=False):
     manifest = ROOT / 'tools/native-tls/Cargo.toml'
     target = 'x86_64-pc-windows-msvc' if windows else 'aarch64-apple-darwin'
     directory = manifest.parent / 'target'
-    command = ['cargo', 'build', '--locked', '--release', '--target', target,
+    command = ['cargo', 'build', '--locked', '--profile', 'native-ffi', '--target', target,
                '--target-dir', directory, '--manifest-path', manifest]
     if windows:
         # Match the host's /MT CRT; TLS must not add a redistributable dependency.
         command += ['--config', 'target.x86_64-pc-windows-msvc.rustflags=["-C","target-feature=+crt-static"]']
-    return command, directory / target / 'release' / ('neoclr_native_tls.lib' if windows else 'libneoclr_native_tls.a')
+    return command, directory / target / 'native-ffi' / ('neoclr_native_tls.lib' if windows else 'libneoclr_native_tls.a')
 
 
 def native_crypto_sources():

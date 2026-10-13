@@ -75,7 +75,7 @@ def main():
     parser.add_argument('--recipe', type=Path, required=True, help='Passing runtime-await HTTP source validation.json')
     parser.add_argument('--native-build', type=Path, required=True, help='Passing macOS HTTP build.json, used only as a command recipe')
     parser.add_argument('--output', type=Path, required=True)
-    parser.add_argument('--backend', type=Path, default=ROOT / 'tools/aot-poc/target/release/neoclr-aot-poc')
+    parser.add_argument('--backend', type=Path, default=ROOT / 'target/release/neoclr-aot-poc')
     parser.add_argument('--text-archive', type=Path, default=ROOT / 'tools/aot-native-text/target/text-only/aarch64-apple-darwin/release/libneoclr_aot_native_text.a')
     args = parser.parse_args()
     if platform.system() != 'Darwin' or platform.machine() != 'arm64':

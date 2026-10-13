@@ -36,7 +36,7 @@ def main():
         '--format-version', '1', '--manifest-path', str(cargo_manifest)], cwd=ROOT, text=True))
     sources = [*ROOT.joinpath('src').rglob('*.rs'), *ROOT.joinpath('tools/aot-poc/src').rglob('*.rs'),
                ROOT / 'docs/experiments/http-server/Server.rvn',
-               ROOT / 'Cargo.toml', ROOT / 'Cargo.lock', cargo_manifest, cargo_manifest.parent / 'Cargo.lock',
+               ROOT / 'Cargo.toml', ROOT / 'Cargo.lock', cargo_manifest,
                Path(__file__).resolve(), *builder.support_files(), *builder.native_text_sources()]
     inputs = {str(p.relative_to(ROOT)): builder.sha(p) for p in sources}
     command = ['cargo', 'build', '--locked', '--manifest-path', str(cargo_manifest), '--message-format=json']
@@ -80,7 +80,7 @@ def main():
     copy(ROOT / 'tools/native/samples/hello/App.rvnproj', 'samples/http/App.rvnproj')
     copy(ROOT / 'docs/experiments/http-server/Server.rvn', 'samples/http/Main.rvn')
     copy(ROOT / 'LICENSE', 'LICENSE')
-    copy(cargo_manifest.parent / 'Cargo.lock', 'aot-Cargo.lock')
+    copy(ROOT / 'Cargo.lock', 'aot-Cargo.lock')
     licenses = []
     for package in metadata['packages']:
         if not package['source']:

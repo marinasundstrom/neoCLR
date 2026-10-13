@@ -128,7 +128,7 @@ def main():
         else:
             raise ValueError('--bundle is required on macOS')
         run(['cargo', 'build', '--locked', '--manifest-path', ROOT / 'tools/aot-poc/Cargo.toml'], 'aot-build')
-        aot = ROOT / ('tools/aot-poc/target/debug/neoclr-aot-poc' + ('.exe' if windows else ''))
+        aot = ROOT / ('target/debug/neoclr-aot-poc' + ('.exe' if windows else ''))
         report['aotSha256'] = sha(aot)
         interpreter = build_interpreter(run, windows)
         report['interpreterSha256'] = sha(interpreter)

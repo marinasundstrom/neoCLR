@@ -5,14 +5,9 @@ edition = "2024"
 publish = false
 license = "MIT"
 
-[workspace]
-
 [lib]
 crate-type = ["staticlib", "rlib"]
 
 [dependencies]
 rustls = { version = "=0.23.45", default-features = false, features = ["std", "ring", "tls12"] }
 rustls-pemfile = "=2.2.0"
-
-[profile.release]
-panic = "abort"

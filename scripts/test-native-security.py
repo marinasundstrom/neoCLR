@@ -13,13 +13,13 @@ ROOT = Path(__file__).resolve().parents[1]
 
 def native_adapter(path, cert, key):
     manifest = ROOT / 'tools/native-tls/Cargo.toml'
-    subprocess.run(['cargo', 'build', '--locked', '--release', '--manifest-path', str(manifest)],
+    subprocess.run(['cargo', 'build', '--locked', '--profile', 'native-ffi', '--manifest-path', str(manifest)],
                    check=True, timeout=600)
     metadata = json.loads(subprocess.check_output(
         ['cargo', 'metadata', '--no-deps', '--format-version', '1', '--manifest-path', str(manifest)],
         text=True))
     windows = platform.system() == 'Windows'
-    archive = Path(metadata['target_directory']) / 'release' / (
+    archive = Path(metadata['target_directory']) / 'native-ffi' / (
         'neoclr_native_tls.lib' if windows else 'libneoclr_native_tls.a')
     base = ROOT / 'docs/experiments/aot-console'
     sources = [str(base / name) for name in

@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-13
 
+- Integrate the runtime, JIT/AOT backend and shared TLS/security packages into one Cargo workspace and lockfile. Update compiler output paths, native TLS build profiles, packaging provenance and dependency notices; add a shared product validation command and macOS/Windows CI entry point. Existing backend binaries retain their name; separate native text/crypto archive builds and native source-layout consolidation remain follow-up work. Record build-selected memory managers and specialized collector distributions as architectural direction, not implemented alternative collectors or live GC replacement.
+
 - Retain the passing Windows application qualification for rooted concat/join helpers: eight default-JIT HTTP cases and managed SSL-stream HTTPS JSON in interpreter/JIT/AOT. Native GC/root/socket and isolated pacing qualification also pass on their documented platforms. These focused gates do not imply a full library-suite run or promotion of the pacing experiment.
 
 - Update GC benchmark and history pages with allocation-only macOS/Windows comparisons and clearly separated experimental pacing results. The website build and link checks pass for 4,382 pages; publication remains on hold. Retain the completed hosted macOS pacing run (3.83–3.91× in its closed native workloads) and socket-contract evidence.

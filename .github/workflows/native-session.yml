@@ -40,14 +40,14 @@ jobs:
       - run: cargo build --locked --manifest-path tools/aot-poc/Cargo.toml
       - name: Run macOS session contracts
         if: runner.os == 'macOS'
-        run: python3 scripts/validate-native-session.py --aot tools/aot-poc/target/debug/neoclr-aot-poc --output target/native-session-validation
+        run: python3 scripts/validate-native-session.py --aot target/debug/neoclr-aot-poc --output target/native-session-validation
       - name: Run Windows session contracts
         if: runner.os == 'Windows'
         shell: pwsh
         run: |
           $vs = & "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\vswhere.exe" -latest -products '*' -requires Microsoft.VisualStudio.Component.VC.Tools.x86.x64 -property installationPath
           if (-not $vs) { throw 'MSVC x64 tools not found' }
-          cmd /c "`"$vs\VC\Auxiliary\Build\vcvars64.bat`" && python scripts/validate-native-session.py --aot tools/aot-poc/target/debug/neoclr-aot-poc.exe --output target/native-session-validation"
+          cmd /c "`"$vs\VC\Auxiliary\Build\vcvars64.bat`" && python scripts/validate-native-session.py --aot target/debug/neoclr-aot-poc.exe --output target/native-session-validation"
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
       - uses: actions/upload-artifact@v4
         if: always()

@@ -61,7 +61,7 @@ def main():
         for label, flags in [('https', ['--https-server']), ('cleartext', [])]:
             run(label + '-build', [sys.executable, ROOT / 'scripts/build-native-project.py', '--profile', 'windows-http',
                 '--project', ROOT / 'docs/experiments/https-server/Native.rvnproj', '--bundle', bundle,
-                '--aot', ROOT / 'tools/aot-poc/target/debug/neoclr-aot-poc.exe',
+                '--aot', ROOT / 'target/debug/neoclr-aot-poc.exe',
                 '--output', out / label, *flags])
         run('https-validation', [sys.executable, ROOT / 'docs/experiments/https-server/validate.py',
             '--bundle', bundle, '--project-build', out / 'https', '--cleartext-build', out / 'cleartext',

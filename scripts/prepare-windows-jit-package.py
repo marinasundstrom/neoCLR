@@ -57,7 +57,7 @@ def main():
 
     try:
         run('backend', ['cargo', 'build', '--locked', '--release', '--manifest-path', ROOT / 'tools/aot-poc/Cargo.toml'])
-        backend = ROOT / 'tools/aot-poc/target/release/neoclr-aot-poc.exe'
+        backend = ROOT / 'target/release/neoclr-aot-poc.exe'
         project = out / 'host-source'
         project.mkdir()
         (project / 'App.rvnproj').write_text('<Project Sdk="Microsoft.NET.Sdk"><Import Project="$(NeoClrBundleRoot)/lib/NeoCLR.ClassLibrary.props"/><PropertyGroup><TargetFramework>net10.0</TargetFramework><OutputType>Exe</OutputType><AssemblyName>JitHttp</AssemblyName></PropertyGroup></Project>', encoding='utf-8')

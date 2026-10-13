@@ -104,13 +104,13 @@ def main():
                 jit[5] = str(host)
                 invocations.append(('jit', jit))
         else:
-            run('tls-build', ['cargo', 'build', '--locked', '--release', '--manifest-path', str(ROOT / 'tools/native-tls/Cargo.toml')])
+            run('tls-build', ['cargo', 'build', '--locked', '--profile', 'native-ffi', '--manifest-path', str(ROOT / 'tools/native-tls/Cargo.toml')])
             source = command('language-source')
             source[source.index('-o') + 1] = str(out / 'server.dll'); source[-2] = str(HERE / 'Server.rvn')
             run('source', source)
             native = command('server-native-compile'); native[2], native[4] = str(out / 'server.dll'), str(out / 'server.o')
             run('native', native)
-            archive = str(ROOT / 'tools/native-tls/target/release/libneoclr_native_tls.a')
+            archive = str(ROOT / 'target/native-ffi/libneoclr_native_tls.a')
             link = command('server-link')
             link = [str(out / 'server.o') if v.endswith('/server.o') else v for v in link]
             link[link.index('-o') + 1] = str(out / 'server')
@@ -130,7 +130,7 @@ def main():
             for p in folder.iterdir():
                 if p.suffix in ('.c', '.h', '.rs', '.rvn', '.py'): report['inputsSha256'][str(p)] = sha(p)
         report['inputsSha256'][str(ROOT / 'scripts/verify-native-http-json.py')] = sha(ROOT / 'scripts/verify-native-http-json.py')
-        report['inputsSha256'][str(ROOT / 'tools/native-tls/Cargo.lock')] = sha(ROOT / 'tools/native-tls/Cargo.lock')
+        report['inputsSha256'][str(ROOT / 'Cargo.lock')] = sha(ROOT / 'Cargo.lock')
         with tempfile.TemporaryDirectory(prefix='nc-https-Café-🌍-') as directory:
             cert, key = Path(directory) / 'cert.pem', Path(directory) / 'key.pem'
             # Do not inherit platform OpenSSL defaults (some mark self-signed certs as CAs).

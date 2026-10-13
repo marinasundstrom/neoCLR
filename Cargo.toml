@@ -1,3 +1,10 @@
+[workspace]
+members = [".", "tools/aot-poc", "tools/native-tls", "tools/security-provider"]
+default-members = ["."]
+# Provider static libraries retain their platform-specific build profiles.
+exclude = ["tools/native-crypto", "tools/aot-native-text"]
+resolver = "3"
+
 [package]
 name = "neoclr"
 version = "0.1.0-preview.13"
@@ -31,5 +38,10 @@ libc = "0.2"
 windows-sys = { version = "=0.60.2", features = ["Win32_Networking_WinSock"] }
 
 [features]
-# Private compiler experiment; not part of the installed Raven runtime API.
+# Internal metadata support shared with the JIT/AOT backend; not a public Raven API.
 native-metadata = []
+
+# Native TLS adapters retain their existing abort-on-panic C ABI build policy.
+[profile.native-ffi]
+inherits = "release"
+panic = "abort"

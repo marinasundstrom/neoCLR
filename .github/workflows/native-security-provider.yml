@@ -93,25 +93,25 @@ jobs:
           cargo test --locked --manifest-path tools/aot-poc/Cargo.toml tls_tests --bin neoclr-aot-poc
       - name: Qualify macOS execution modes
         if: runner.os == 'macOS'
-        run: python docs/experiments/native-cryptography/validate.py --runtime target/debug/neoclr --compiler tools/aot-poc/target/debug/neoclr-aot-poc --output target/native-cryptography
+        run: python docs/experiments/native-cryptography/validate.py --runtime target/debug/neoclr --compiler target/debug/neoclr-aot-poc --output target/native-cryptography
       - name: Qualify Windows execution modes
         if: runner.os == 'Windows'
         shell: pwsh
         run: |
           $vs = & "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\vswhere.exe" -latest -products '*' -requires Microsoft.VisualStudio.Component.VC.Tools.x86.x64 -property installationPath
           if (-not $vs) { throw 'MSVC x64 tools not found' }
-          cmd /c "`"$vs\VC\Auxiliary\Build\vcvars64.bat`" && python docs/experiments/native-cryptography/validate.py --runtime target/debug/neoclr.exe --compiler tools/aot-poc/target/debug/neoclr-aot-poc.exe --output target/native-cryptography"
+          cmd /c "`"$vs\VC\Auxiliary\Build\vcvars64.bat`" && python docs/experiments/native-cryptography/validate.py --runtime target/debug/neoclr.exe --compiler target/debug/neoclr-aot-poc.exe --output target/native-cryptography"
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
       - name: Qualify macOS TLS binding modes
         if: runner.os == 'macOS'
-        run: python docs/experiments/shared-tls/validate-bindings.py --runtime target/debug/neoclr --compiler tools/aot-poc/target/debug/neoclr-aot-poc --output target/tls-bindings
+        run: python docs/experiments/shared-tls/validate-bindings.py --runtime target/debug/neoclr --compiler target/debug/neoclr-aot-poc --output target/tls-bindings
       - name: Qualify Windows TLS binding modes
         if: runner.os == 'Windows'
         shell: pwsh
         run: |
           $vs = & "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\vswhere.exe" -latest -products '*' -requires Microsoft.VisualStudio.Component.VC.Tools.x86.x64 -property installationPath
           if (-not $vs) { throw 'MSVC x64 tools not found' }
-          cmd /c "`"$vs\VC\Auxiliary\Build\vcvars64.bat`" && python docs/experiments/shared-tls/validate-bindings.py --runtime target/debug/neoclr.exe --compiler tools/aot-poc/target/debug/neoclr-aot-poc.exe --output target/tls-bindings"
+          cmd /c "`"$vs\VC\Auxiliary\Build\vcvars64.bat`" && python docs/experiments/shared-tls/validate-bindings.py --runtime target/debug/neoclr.exe --compiler target/debug/neoclr-aot-poc.exe --output target/tls-bindings"
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
       - uses: actions/upload-artifact@v4
         if: always()

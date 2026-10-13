@@ -159,3 +159,51 @@ The runtime now includes the shared native TLS and security providers. Their
 registry dependencies are covered by the top-level inventory above and its manifest.
 The standalone [native TLS inventory](tools/native-tls/THIRD_PARTY_NOTICES.md) also
 describes the private static-library build.
+
+## Integrated JIT/AOT workspace dependencies
+
+The shared workspace lockfile also includes the compiler dependencies below.
+Interpreter-only package builds do not link Cranelift.
+
+| Package | Locked version | Declared license expression | Preserved texts |
+| --- | --- | --- | --- |
+| allocator-api2 | 0.2.21 | MIT OR Apache-2.0 | [LICENSE-APACHE](third-party/licenses/allocator-api2-0.2.21/LICENSE-APACHE), [LICENSE-MIT](third-party/licenses/allocator-api2-0.2.21/LICENSE-MIT) |
+| anyhow | 1.0.104 | MIT OR Apache-2.0 | [LICENSE-APACHE](third-party/licenses/anyhow-1.0.104/LICENSE-APACHE), [LICENSE-MIT](third-party/licenses/anyhow-1.0.104/LICENSE-MIT) |
+| arbitrary | 1.5.0 | MIT OR Apache-2.0 | [LICENSE-APACHE](third-party/licenses/arbitrary-1.5.0/LICENSE-APACHE), [LICENSE-MIT](third-party/licenses/arbitrary-1.5.0/LICENSE-MIT) |
+| bitflags | 1.3.2 | MIT/Apache-2.0 | [LICENSE-APACHE](third-party/licenses/bitflags-1.3.2/LICENSE-APACHE), [LICENSE-MIT](third-party/licenses/bitflags-1.3.2/LICENSE-MIT) |
+| cranelift-assembler-x64 | 0.121.2 | Apache-2.0 WITH LLVM-exception | [CRANELIFT-LICENSE](tools/aot-poc/CRANELIFT-LICENSE) |
+| cranelift-assembler-x64-meta | 0.121.2 | Apache-2.0 WITH LLVM-exception | [CRANELIFT-LICENSE](tools/aot-poc/CRANELIFT-LICENSE) |
+| cranelift-bforest | 0.121.2 | Apache-2.0 WITH LLVM-exception | [LICENSE](third-party/licenses/cranelift-bforest-0.121.2/LICENSE) |
+| cranelift-bitset | 0.121.2 | Apache-2.0 WITH LLVM-exception | [CRANELIFT-LICENSE](tools/aot-poc/CRANELIFT-LICENSE) |
+| cranelift-codegen | 0.121.2 | Apache-2.0 WITH LLVM-exception | [LICENSE](third-party/licenses/cranelift-codegen-0.121.2/LICENSE) |
+| cranelift-codegen-meta | 0.121.2 | Apache-2.0 WITH LLVM-exception | [LICENSE](third-party/licenses/cranelift-codegen-meta-0.121.2/LICENSE) |
+| cranelift-codegen-shared | 0.121.2 | Apache-2.0 WITH LLVM-exception | [LICENSE](third-party/licenses/cranelift-codegen-shared-0.121.2/LICENSE) |
+| cranelift-control | 0.121.2 | Apache-2.0 WITH LLVM-exception | [LICENSE](third-party/licenses/cranelift-control-0.121.2/LICENSE) |
+| cranelift-entity | 0.121.2 | Apache-2.0 WITH LLVM-exception | [LICENSE](third-party/licenses/cranelift-entity-0.121.2/LICENSE) |
+| cranelift-frontend | 0.121.2 | Apache-2.0 WITH LLVM-exception | [LICENSE](third-party/licenses/cranelift-frontend-0.121.2/LICENSE) |
+| cranelift-isle | 0.121.2 | Apache-2.0 WITH LLVM-exception | [CRANELIFT-LICENSE](tools/aot-poc/CRANELIFT-LICENSE) |
+| cranelift-jit | 0.121.2 | Apache-2.0 WITH LLVM-exception | [LICENSE](third-party/licenses/cranelift-jit-0.121.2/LICENSE) |
+| cranelift-module | 0.121.2 | Apache-2.0 WITH LLVM-exception | [LICENSE](third-party/licenses/cranelift-module-0.121.2/LICENSE) |
+| cranelift-native | 0.121.2 | Apache-2.0 WITH LLVM-exception | [LICENSE](third-party/licenses/cranelift-native-0.121.2/LICENSE) |
+| cranelift-object | 0.121.2 | Apache-2.0 WITH LLVM-exception | [LICENSE](third-party/licenses/cranelift-object-0.121.2/LICENSE) |
+| cranelift-srcgen | 0.121.2 | Apache-2.0 WITH LLVM-exception | [CRANELIFT-LICENSE](tools/aot-poc/CRANELIFT-LICENSE) |
+| crc32fast | 1.5.2 | MIT OR Apache-2.0 | [LICENSE-APACHE](third-party/licenses/crc32fast-1.5.2/LICENSE-APACHE), [LICENSE-MIT](third-party/licenses/crc32fast-1.5.2/LICENSE-MIT) |
+| equivalent | 1.0.2 | Apache-2.0 OR MIT | [LICENSE-APACHE](third-party/licenses/equivalent-1.0.2/LICENSE-APACHE), [LICENSE-MIT](third-party/licenses/equivalent-1.0.2/LICENSE-MIT) |
+| fallible-iterator | 0.3.0 | MIT/Apache-2.0 | [LICENSE-APACHE](third-party/licenses/fallible-iterator-0.3.0/LICENSE-APACHE), [LICENSE-MIT](third-party/licenses/fallible-iterator-0.3.0/LICENSE-MIT) |
+| foldhash | 0.1.5 | Zlib | [LICENSE](third-party/licenses/foldhash-0.1.5/LICENSE) |
+| gimli | 0.31.1 | MIT OR Apache-2.0 | [LICENSE-APACHE](third-party/licenses/gimli-0.31.1/LICENSE-APACHE), [LICENSE-MIT](third-party/licenses/gimli-0.31.1/LICENSE-MIT) |
+| hashbrown | 0.15.5 | MIT OR Apache-2.0 | [LICENSE-APACHE](third-party/licenses/hashbrown-0.15.5/LICENSE-APACHE), [LICENSE-MIT](third-party/licenses/hashbrown-0.15.5/LICENSE-MIT) |
+| hashbrown | 0.17.1 | MIT OR Apache-2.0 | [LICENSE-APACHE](third-party/licenses/hashbrown-0.17.1/LICENSE-APACHE), [LICENSE-MIT](third-party/licenses/hashbrown-0.17.1/LICENSE-MIT) |
+| indexmap | 2.14.2 | Apache-2.0 OR MIT | [LICENSE-APACHE](third-party/licenses/indexmap-2.14.2/LICENSE-APACHE), [LICENSE-MIT](third-party/licenses/indexmap-2.14.2/LICENSE-MIT) |
+| libm | 0.2.16 | MIT | [LICENSE.txt](third-party/licenses/libm-0.2.16/LICENSE.txt) |
+| mach2 | 0.4.3 | BSD-2-Clause OR MIT OR Apache-2.0 | [LICENSE-APACHE](third-party/licenses/mach2-0.4.3/LICENSE-APACHE), [LICENSE-BSD](third-party/licenses/mach2-0.4.3/LICENSE-BSD), [LICENSE-MIT](third-party/licenses/mach2-0.4.3/LICENSE-MIT) |
+| object | 0.36.7 | Apache-2.0 OR MIT | [LICENSE-APACHE](third-party/licenses/object-0.36.7/LICENSE-APACHE), [LICENSE-MIT](third-party/licenses/object-0.36.7/LICENSE-MIT) |
+| regalloc2 | 0.12.2 | Apache-2.0 WITH LLVM-exception | [LICENSE](third-party/licenses/regalloc2-0.12.2/LICENSE) |
+| region | 3.0.2 | MIT | [LICENSE](third-party/licenses/region-3.0.2/LICENSE) |
+| rustc-hash | 2.1.3 | Apache-2.0 OR MIT | [LICENSE-APACHE](third-party/licenses/rustc-hash-2.1.3/LICENSE-APACHE), [LICENSE-MIT](third-party/licenses/rustc-hash-2.1.3/LICENSE-MIT) |
+| smallvec | 1.16.2 | MIT OR Apache-2.0 | [LICENSE-APACHE](third-party/licenses/smallvec-1.16.2/LICENSE-APACHE), [LICENSE-MIT](third-party/licenses/smallvec-1.16.2/LICENSE-MIT) |
+| stable_deref_trait | 1.2.1 | MIT OR Apache-2.0 | [LICENSE-APACHE](third-party/licenses/stable_deref_trait-1.2.1/LICENSE-APACHE), [LICENSE-MIT](third-party/licenses/stable_deref_trait-1.2.1/LICENSE-MIT) |
+| target-lexicon | 0.13.5 | Apache-2.0 WITH LLVM-exception | [LICENSE](third-party/licenses/target-lexicon-0.13.5/LICENSE) |
+| wasmtime-jit-icache-coherence | 34.0.2 | Apache-2.0 WITH LLVM-exception | [CRANELIFT-LICENSE](tools/aot-poc/CRANELIFT-LICENSE) |
+| wasmtime-math | 34.0.2 | Apache-2.0 WITH LLVM-exception | [CRANELIFT-LICENSE](tools/aot-poc/CRANELIFT-LICENSE) |
+| windows-sys | 0.59.0 | MIT OR Apache-2.0 | [license-apache-2.0](third-party/licenses/windows-sys-0.59.0/license-apache-2.0), [license-mit](third-party/licenses/windows-sys-0.59.0/license-mit) |

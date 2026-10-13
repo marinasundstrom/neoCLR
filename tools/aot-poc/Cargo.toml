@@ -5,9 +5,7 @@ edition = "2024"
 publish = false
 license = "MIT"
 
-# Isolate the experimental compiler dependencies from the runtime distribution.
-[workspace]
-
+# Shared runtime workspace; compiler dependencies stay out of interpreter-only builds.
 [dependencies]
 neoclr = { path = "../..", features = ["native-metadata"] }
 serde_json = "1"

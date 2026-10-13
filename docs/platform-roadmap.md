@@ -1,5 +1,15 @@
 # neoCLR platform roadmap
 
+**Integrated runtime product (author direction, 2026-10-13):** interpreter, JIT,
+AOT and GC are maintained as one platform, rather than independent experiments.
+The [integration direction](runtime-product-integration.md) starts with a shared
+workspace/build and validation entry point, then native implementation and package
+consolidation. Memory management must permit future build-selected collectors and
+constrained profiles without requiring tracing GC; no live collector swapping is
+planned. Alternate profiles remain future work with explicit lifetime/capability
+requirements. This integration direction complements the performance work below;
+prototype pacing and unqualified targets are not promoted by packaging changes.
+
 **Allocation and admission follow-up (2026-10-13):** [single-walk allocation](../benchmarks/gc-allocation/README.md)
 retains complete heap validation while removing the repeated first-fit search:
 matched hosted gains are 1.18–1.60× on macOS and 1.32–1.84× on Windows. Native-GC

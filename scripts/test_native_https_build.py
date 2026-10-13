@@ -25,6 +25,8 @@ class HttpsBuildPolicyTests(unittest.TestCase):
             command, path = build.native_tls_build(windows)
             self.assertEqual(command[command.index('--target') + 1], target)
             self.assertEqual(path.name, archive)
+            self.assertEqual(command[command.index("--profile") + 1], "native-ffi")
+            self.assertEqual(path.parent.name, "native-ffi")
             self.assertEqual('--config' in command, windows)
 
     def test_ordinary_builds_do_not_gain_tls_requirements(self):

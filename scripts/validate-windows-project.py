@@ -60,7 +60,7 @@ def main():
         report['bundle'] = dict(url=URL, sha256=BUNDLE_SHA, manifestSha256=sha(bundle / 'manifest.json'))
         report['dotnet'] = run(['dotnet', '--info'], 'dotnet').stdout.decode(errors='replace')
         run(['cargo', 'build', '--locked', '--manifest-path', ROOT / 'tools/aot-poc/Cargo.toml'], 'aot-build', cwd=ROOT)
-        aot = ROOT / 'tools/aot-poc/target/debug/neoclr-aot-poc.exe'
+        aot = ROOT / 'target/debug/neoclr-aot-poc.exe'
         report['aotSha256'] = sha(aot)
         lib = bundle / 'lib'
         catalog = json.loads((lib / 'bundle.json').read_text())

@@ -161,6 +161,13 @@ without an intermediate JSON file. JSON remains the default (`--format json`).
 Both outputs refuse overwrites. See [module-set assembly](docs/cli-module-sets.md).
 
 Use `cargo build --locked --release` for an optimized build in `target/release`.
+
+For the integrated runtime and JIT/AOT backend, use `cargo build --locked --workspace`.
+Both executable tools now build into the root `target` directory with one lockfile.
+Run `python3 scripts/validate-runtime-product.py --output target/runtime-product-check`
+for the focused macOS/Windows conformance checks (Windows requires the MSVC developer
+shell). See [runtime integration and memory-management direction](docs/runtime-product-integration.md)
+for build profiles, migration details and remaining integration work.
 On macOS, the selected SDK must match the installed compiler/linker. If libffi's
 configure step reports an unsupported architecture in `libSystem.B.tbd`, select a
 compatible installed SDK through command-local `SDKROOT`/`DEVELOPER_DIR`; see the

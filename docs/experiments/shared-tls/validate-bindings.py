@@ -88,9 +88,9 @@ def main():
         return result.stdout
     try:
         manifest = ROOT / 'tools/native-tls/Cargo.toml'
-        run(['cargo', 'build', '--locked', '--release', '--manifest-path', manifest])
+        run(['cargo', 'build', '--locked', '--profile', 'native-ffi', '--manifest-path', manifest])
         metadata = json.loads(run(['cargo', 'metadata', '--no-deps', '--format-version', '1', '--manifest-path', manifest]))
-        archive = Path(metadata['target_directory']) / 'release' / ('neoclr_native_tls.lib' if windows else 'libneoclr_native_tls.a')
+        archive = Path(metadata['target_directory']) / 'native-ffi' / ('neoclr_native_tls.lib' if windows else 'libneoclr_native_tls.a')
         cert_path, key_path = create_credentials(out, run)
         base = ROOT / 'docs/experiments/aot-console'
         sources = [HERE / 'host.c', base / 'tls-managed.c', base / 'text-arena.c', base / 'native-gc.c', base / 'root-probe.c']

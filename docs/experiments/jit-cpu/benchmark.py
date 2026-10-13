@@ -30,7 +30,7 @@ def main():
     args = parser.parse_args()
     out = args.output.resolve()
     out.mkdir(parents=True, exist_ok=False)
-    jit = ROOT / 'tools/aot-poc/target/release/neoclr-aot-poc'
+    jit = ROOT / 'target/release/neoclr-aot-poc'
     interpreter = ROOT / 'target/release/examples/jit_cpu_interpreter'
     source = HERE / 'workload.neoil'
     obj, aot = out / 'workload.o', out / 'workload'

@@ -1,0 +1,66 @@
+name: Runtime product integration
+on:
+  workflow_dispatch:
+  workflow_call:
+  push:
+    paths:
+      - 'Cargo.toml'
+      - 'Cargo.lock'
+      - 'tools/aot-poc/Cargo.toml'
+      - 'tools/native-tls/Cargo.toml'
+      - 'tools/security-provider/Cargo.toml'
+      - 'scripts/validate-runtime-product.py'
+      - 'scripts/native_bundle_notices.py'
+      - 'scripts/build-native-project.py'
+      - '.github/workflows/runtime-product.yml'
+  pull_request:
+    paths:
+      - 'Cargo.toml'
+      - 'Cargo.lock'
+      - 'tools/aot-poc/Cargo.toml'
+      - 'tools/native-tls/Cargo.toml'
+      - 'tools/security-provider/Cargo.toml'
+      - 'scripts/validate-runtime-product.py'
+      - 'scripts/native_bundle_notices.py'
+      - 'scripts/build-native-project.py'
+      - '.github/workflows/runtime-product.yml'
+permissions:
+  contents: read
+jobs:
+  qualify:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [macos-latest, windows-2022]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 35
+    env:
+      CARGO_BUILD_JOBS: '2'
+      PYTHONUTF8: '1'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Qualify macOS runtime product
+        if: runner.os == 'macOS'
+        run: python3 scripts/validate-runtime-product.py --output target/runtime-product-validation
+      - name: Qualify Windows runtime product
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          $env:PATH = "C:\Program Files\Git\usr\bin;" + $env:PATH
+          $vs = & "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\vswhere.exe" -latest -products '*' -requires Microsoft.VisualStudio.Component.VC.Tools.x86.x64 -property installationPath
+          if (-not $vs) { throw 'MSVC x64 tools not found' }
+          cmd /c "`"$vs\VC\Auxiliary\Build\vcvars64.bat`" && python scripts/validate-runtime-product.py --output target/runtime-product-validation"
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: runtime-product-${{ matrix.os }}-${{ github.run_id }}
+          path: |
+            target/runtime-product-validation/*.json
+            target/runtime-product-validation/*.log
+            target/runtime-product-validation/gc/*.json
+            target/runtime-product-validation/gc/*.log

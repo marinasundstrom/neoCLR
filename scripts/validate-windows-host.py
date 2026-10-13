@@ -81,14 +81,14 @@ def main():
         generated_inputs = [ROOT / 'tools/native' / name for name in
                             ('windows-generated-stack.neoil', 'windows-generated-stack-test.c')]
         generated_inputs += list((ROOT / 'tools/aot-poc/src').glob('*.rs'))
-        generated_inputs += [ROOT / 'tools/aot-poc/Cargo.toml', ROOT / 'tools/aot-poc/Cargo.lock']
+        generated_inputs += [ROOT / 'tools/aot-poc/Cargo.toml', ROOT / 'Cargo.lock']
         report['inputs'].update({p.relative_to(ROOT).as_posix(): hashlib.sha256(p.read_bytes()).hexdigest() for p in generated_inputs})
         (out / generated_inputs[0].name).write_bytes(generated_inputs[0].read_bytes())
         manifest = ROOT / 'tools/aot-poc/Cargo.toml'
         run(['rustc', '--version', '--verbose'], 'rust-toolchain')
         run(['cargo', 'test', '--locked', '--manifest-path', manifest, '--test', 'windows_stack'], 'generated-contract')
         run(['cargo', 'test', '--locked', '--manifest-path', manifest, '--bin', 'neoclr-aot-poc', 'windows_final_frame_limit'], 'generated-frame-boundary')
-        compiler = ROOT / 'tools/aot-poc/target/debug/neoclr-aot-poc.exe'
+        compiler = ROOT / 'target/debug/neoclr-aot-poc.exe'
         report['compilerSha256'] = hashlib.sha256(compiler.read_bytes()).hexdigest()
         run([compiler, generated_inputs[0], 'Calculate', out / 'generated-stack.obj',
              '--target', 'x86_64-pc-windows-msvc', '--windows-stack-experiment',

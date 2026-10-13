@@ -31,7 +31,7 @@ def main():
     prior = json.loads(args.console_qualification.read_text())
     if not prior['passed']:
         raise ValueError('Requires successful console qualification')
-    jit = ROOT / 'tools/aot-poc/target/release/neoclr-aot-poc'
+    jit = ROOT / 'target/release/neoclr-aot-poc'
     runtime = ROOT / 'target/release/neoclr'
     compiler = bundle / 'sdk/tools/rvnc/rvnc.dll'
     lib = bundle / 'lib'

@@ -30,7 +30,7 @@ def run(command, expected=0):
 
 artifacts = output / 'artifacts'
 runtime = ROOT / 'target/debug/neoclr'
-aot = ROOT / 'tools/aot-poc/target/debug/neoclr-aot-poc'
+aot = ROOT / 'target/debug/neoclr-aot-poc'
 run(['dotnet', 'run', '--project', HERE / 'Probe.csproj', '-p:RavenRoot=' + str(args.raven.resolve()),
      '-p:NeoClrMetadataProject=' + str(ROOT / 'tools/metadata/NeoCLR.Metadata.Experimental/NeoCLR.Metadata.Experimental.csproj'),
      '-p:WarningLevel=0', '--', artifacts, '--source-string'])

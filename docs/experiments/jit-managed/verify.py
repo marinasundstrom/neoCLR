@@ -18,7 +18,7 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--build', type=Path, required=True)
     parser.add_argument('--output', type=Path, required=True)
-    parser.add_argument('--jit', type=Path, default=ROOT / 'tools/aot-poc/target/release/neoclr-aot-poc')
+    parser.add_argument('--jit', type=Path, default=ROOT / 'target/release/neoclr-aot-poc')
     parser.add_argument('--runtime', type=Path, default=ROOT / 'target/release/neoclr')
     args = parser.parse_args()
     build, out = args.build.resolve(), args.output.resolve()

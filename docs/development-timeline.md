@@ -16639,3 +16639,19 @@ with survival, promotion, pause and memory measurements. This is an exploratory
 candidate, not a completed collector or a promise of lower latency; existing root
 and cleanup work remains necessary. No user decision selecting a moving collector
 or particular generation count is recorded.
+
+## 2026-10-13 — One runtime product, selectable memory management
+
+The author asked to continue until a level of improvement was reached, then clarified
+that JIT, GC and AOT should stop being separate experiments and be developed as an
+integrated runtime product. The assistant proposed unifying build/validation first
+and separating historical packaging from genuinely unqualified capabilities.
+
+The author subsequently asked to leave room for non-GC memory management on small
+devices, and clarified that future specialized collectors belong in different
+runtime distributions, not a collector swapped during execution. The assistant
+proposed a build-selected memory-manager boundary covering allocation, roots,
+barriers, suspension, cleanup and capability validation, with GC still the managed
+default. Arenas/regions were assistant-proposed candidates with explicit escape and
+lifetime constraints; no alternate implementation has been selected or delivered.
+See [integration direction and remaining work](runtime-product-integration.md).

@@ -69,7 +69,7 @@ def main():
              '--test', 'scalar', 'jit_'], 'scalar-jit')
         run(['cargo', 'test', '--locked', '--release', '--test', 'cli',
              'cli_execution_selection'], 'cli-selection')
-        jit = ROOT/'tools/aot-poc/target/release/neoclr-aot-poc.exe'
+        jit = ROOT/'target/release/neoclr-aot-poc.exe'
         project = out/'server-source'
         project.mkdir()
         (project/'App.rvnproj').write_text('<Project Sdk="Microsoft.NET.Sdk"><Import Project="$(NeoClrBundleRoot)/lib/NeoCLR.ClassLibrary.props"/><PropertyGroup><TargetFramework>net10.0</TargetFramework><OutputType>Exe</OutputType><AssemblyName>JitHttp</AssemblyName></PropertyGroup></Project>')

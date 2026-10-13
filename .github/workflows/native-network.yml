@@ -2,6 +2,10 @@ name: Native network parity
 on:
   workflow_dispatch:
     inputs:
+      runtime_product:
+        description: Run the integrated runtime/backend and memory contract checks
+        type: boolean
+        default: false
       benchmark_rooted_pacing:
         description: Qualify the closed rooted-admission pacing experiment
         type: boolean
@@ -39,7 +43,11 @@ on:
 permissions:
   contents: read
 jobs:
+  runtime-product:
+    if: inputs.runtime_product
+    uses: ./.github/workflows/runtime-product.yml
   contracts:
+    if: ${{ !inputs.runtime_product }}
     strategy:
       fail-fast: false
       matrix:
