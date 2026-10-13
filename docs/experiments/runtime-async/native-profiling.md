@@ -27,6 +27,14 @@ They include validation, marking and sweeping, including failed attempts, but ex
 root publication and allocation. Timers compile out of normal builds. Sampled timing
 is diagnostic: startup, sampling overhead, clock calls and OS scheduling can distort
 it. Rerun `benchmark_modes.py` without instrumentation for performance conclusions.
+The private collector counters are also qualified on Windows x64 as of 2026-10-13:
+Windows uses `QueryPerformanceCounter`, while macOS uses `CLOCK_MONOTONIC`.
+`python scripts/validate-native-gc.py --output NEW_DIRECTORY` runs the accounting,
+root rejection and allocation-admission checks (on Windows, use an MSVC developer
+prompt). [Retained Windows evidence](../../../benchmarks/http-server/windows-root-gc-validation-20261013.json)
+checks both profiling-enabled and ordinary builds. This does not port the macOS
+sampling driver or Unix-socket attachment transport to Windows.
+
 The readable sample adds guest method names beside generated function numbers.
 Native instruction/source mapping and suspended logical stacks remain open.
 

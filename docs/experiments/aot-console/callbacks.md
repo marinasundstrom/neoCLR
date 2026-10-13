@@ -19,8 +19,11 @@ invocation-owned heap to a native scheduler or host handle in this slice.
 
 Invocation emits a bounded dispatch chain over selected bindings of the exact Function
 shape, followed by an ordinary typed native call. Target IDs are private to the image,
-not addresses, stable symbols or an external ABI. At most 32 possible targets per invoked
-shape are admitted. The default profile rejects recursive call graphs, including conservative callback
+not addresses, stable symbols or an external ABI. Targets are bounded by the native
+selected-function budget. The former independent 32-target-per-shape restriction was
+removed on 2026-10-13 after it rejected managed SSL streams; dispatch has no fixed-size
+32-entry table. More candidates still increase linear dispatch cost and generated code.
+The default profile rejects recursive call graphs, including conservative callback
 edges; this can reject an acyclic dynamic path. The explicit
 [native stack budget](native-stack.md) now admits guarded recursion. Borrowed/output signatures, callback operations inside
 output-parameter methods, virtual class methods, borrowed/value interface receivers, Function equality,
@@ -59,7 +62,10 @@ no interpreter optimization or behavior change is implied by this work.
 callback stored in another object, callback returns, 1,000 discarded bindings in 2 KiB,
 returned references, no-result/Void distinction, null faults and divide-by-zero trace
 parity. Sanitized host checks cover heap canaries, frame unlinking and quiescent collection.
-Negative tests reject recursion, borrowed signatures and excessive dispatch candidates.
+Negative tests reject recursion and borrowed signatures; ordinary selected-function
+budget checks remain. Follow-up tests emit 65 same-signature targets for ARM64 Mach-O
+and Windows x64 COFF, and execute late targets in larger host callback sets with
+sanitized ownership/fault checks. See [Windows qualification](../jit-windows/README.md#per-shape-callback-admission--2026-10-13).
 
 The [Raven callback samples](../../../benchmarks/native-web/README.md) compile through
 PE/#Neo, run in both modes, and compare exact success/fault output. The standalone image

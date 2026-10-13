@@ -119,7 +119,7 @@ with zero collector failures. Peak arena extents are 13,216 / 19,672 bytes, matc
 the prior stress-policy fixture evidence. The optimization reduces root observation
 work rather than the number of allocations or collection boundaries.
 
-## Windows qualification in progress
+## Windows qualification — 2026-10-13
 
 The Windows check exposed a profiler-only portability gap: `NEOCLR_GC_PROFILE`
 used POSIX `clock_gettime` unconditionally. Windows now measures collection intervals
@@ -131,6 +131,39 @@ This follows the Windows timing basis used by .NET `Stopwatch`, as described by
 to nanoseconds to avoid multiplying the full counter delta by a billion. Diagnostic
 timing remains opt-in; no clock calls are added to ordinary collection builds.
 
-Windows socket contracts and uninstrumented GC/admission checks passed before this
-fix. Profiler-enabled and malformed-root checks are being rerun; HTTP JIT/AOT
-qualification is separate. No Windows throughput improvement is claimed yet.
+Windows x64 checks now pass on GitHub Actions Windows Server 2022/MSVC:
+
+- [GC/root report](windows-root-gc-validation-20261013.json): five collector/admission/
+  profile executions and ten expected root-validation aborts in GC/probe-only modes.
+- [Socket report](windows-root-network-validation-20261013.json): six socket contracts.
+  These two reports test `f20627cc2`, including the profiler clock fix, in
+  [run 38400195997](https://github.com/marinasundstrom/neoCLR/actions/runs/38400195997).
+- [Native HTTP report](windows-root-http-validation-20261013.json): five AOT/interpreter
+  outcome comparisons (greeting, fragmented request, duplicate length, handler error,
+  callback fault), plus standalone packaging and stale-output handling. This tests
+  `80261b56d`, which contains the root optimization, in
+  [run 38399685619](https://github.com/marinasundstrom/neoCLR/actions/runs/38399685619).
+  The subsequent clock fix is inside profiling-only preprocessor guards, unused here.
+
+The first full JIT gate passed preparation, scalar JIT, cryptography and direct TLS,
+but failed compiling SSL streams at the old per-shape 32-target callback restriction
+([run 38399690376](https://github.com/marinasundstrom/neoCLR/actions/runs/38399690376)).
+[Retained failure detail](windows-root-initial-tls-failure-20261013.json) records the
+compilation rejection. This is separate from root observation. The backend correction at `55b53daed`
+removes the redundant restriction while retaining the selected-function bound;
+five focused callback tests pass locally, including Windows COFF generation and
+sanitized host invocation on macOS. The focused Windows rerun at `55b53daed` passes
+([run 38403029211](https://github.com/marinasundstrom/neoCLR/actions/runs/38403029211)):
+
+- [Scoped JIT gate](windows-root-jit-validation-20261013.json): shared preparation,
+  scalar JIT and CLI checks, then the two consumers below. Scope is explicitly
+  `http-and-ssl-streams`, not a full library-suite result.
+- [SSL stream consumer](windows-root-tls-validation-20261013.json): managed HTTPS
+  nested-JSON exchange with GC in interpreter, default JIT and AOT.
+- [Default-JIT HTTP](windows-root-jit-http-validation-20261013.json): eight cases,
+  covering greeting, fragmentation, duplicate length, handler error/fault, DNS,
+  client timeout cleanup and delayed success with timeout disabled.
+ These are correctness results, not
+Windows throughput measurements or ARM64 qualification. The macOS sampling driver
+and Unix-socket profiler attachment remain platform-specific. Main was not pushed
+and the website was not published; CI uses `codex/windows-root-observation`.

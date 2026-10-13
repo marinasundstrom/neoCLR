@@ -1,0 +1,66 @@
+{
+  "passed": false,
+  "platform": "Windows-2022Server-10.0.20348-SP0",
+  "commands": [
+    {
+      "command": [
+        "openssl",
+        "req",
+        "-x509",
+        "-newkey",
+        "ec",
+        "-pkeyopt",
+        "ec_paramgen_curve:prime256v1",
+        "-pkeyopt",
+        "ec_param_enc:named_curve",
+        "-nodes",
+        "-sha256",
+        "-days",
+        "1",
+        "-config",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\tls-streams\\openssl.cnf",
+        "-addext",
+        "basicConstraints=critical,CA:FALSE",
+        "-addext",
+        "keyUsage=critical,digitalSignature",
+        "-addext",
+        "extendedKeyUsage=serverAuth",
+        "-addext",
+        "subjectAltName=DNS:localhost",
+        "-keyout",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\tls-streams\\key.pem",
+        "-out",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\tls-streams\\cert.pem"
+      ],
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": "-----\n",
+      "elapsedSeconds": 0.015
+    },
+    {
+      "command": [
+        "C:\\hostedtoolcache\\windows\\Python\\3.12.10\\x64\\python.exe",
+        "D:\\a\\neoCLR\\neoCLR\\scripts\\build-native-project.py",
+        "--profile",
+        "windows-http",
+        "--project",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\tls-streams\\project\\App.rvnproj",
+        "--bundle",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\jit-install\\bundle",
+        "--aot",
+        "D:\\a\\neoCLR\\neoCLR\\tools\\aot-poc\\target\\release\\neoclr-aot-poc.exe",
+        "--output",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\tls-streams\\native",
+        "--http-heap-bytes",
+        "8388608",
+        "--command-timeout",
+        "600"
+      ],
+      "exitCode": 1,
+      "stdout": "",
+      "stderr": "native build: aot-poc: native callback shape exceeds 32 possible targets\n\n",
+      "elapsedSeconds": 14.688
+    }
+  ],
+  "error": "native build: aot-poc: native callback shape exceeds 32 possible targets\n\n"
+}

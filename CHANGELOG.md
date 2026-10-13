@@ -8,13 +8,13 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-13
 
-- Remove the native backend’s redundant 32-target-per-callback-shape restriction exposed by Windows SSL stream compilation; dispatch remains bounded by the selected-function limit. Add larger-target regressions and an explicitly scoped Windows HTTP/SSL-stream CI rerun option.
+- Remove the native backend’s redundant 32-target-per-callback-shape restriction exposed by Windows SSL stream compilation; dispatch remains bounded by the selected-function limit. Add larger-target regressions and an explicitly scoped Windows HTTP/SSL-stream CI rerun option; five local callback tests and the focused Windows execution gate pass.
 
-- Fix Windows native GC profiling: use QueryPerformanceCounter for monotonic collection intervals instead of the unavailable POSIX clock_gettime. Normal non-profiled builds retain no timing overhead; Windows profiler qualification is being rerun.
+- Fix Windows native GC profiling: use QueryPerformanceCounter for monotonic collection intervals instead of the unavailable POSIX clock_gettime. Normal non-profiled builds retain no timing overhead; Windows profiler accounting checks pass; the macOS sampling/attachment tools remain platform-specific.
 
 - Enable MSVC C11 atomics in the Windows GC contract runner, matching the existing native socket build; the first CI attempt stopped before executing GC tests because this compiler flag was absent.
 
-- Add Windows CI coverage for native collector, rooted allocation admission and malformed root descriptors, including probe-only builds. The shared validation controller also supports macOS; Windows qualification results are pending.
+- Add Windows CI coverage for native collector, rooted allocation admission and malformed root descriptors, including probe-only builds. The shared validation controller also supports macOS; Windows x64 GC/root and network qualification passes; retained reports also cover native HTTP, eight default-JIT HTTP cases and HTTPS nested JSON in interpreter/JIT/AOT.
 
 - Confirm the native root-observation optimization on newer streaming HTTP fixtures: five-round AOT comparisons show 27.5% plain-text and 30.4% JSON gains with 768 validated responses. Retain separate evidence and add an explicit AOT-only comparison mode; newer-fixture JIT qualification remains open.
 

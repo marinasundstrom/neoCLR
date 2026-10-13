@@ -1,5 +1,12 @@
 # neoCLR platform roadmap
 
+**Windows root/HTTP qualification (2026-10-13):** [retained Windows x64 evidence](../benchmarks/http-server/root-observation.md#windows-qualification--2026-10-13)
+passes GC/root/profiler and socket contracts, native HTTP, eight default-JIT HTTP
+cases, and managed SSL-stream HTTPS JSON in interpreter/JIT/AOT. This exposed and
+fixed a POSIX-only profiler clock and the obsolete native per-shape 32-callback cap;
+the existing selected-function budget remains. The JIT rerun is explicitly focused,
+not a full library-suite pass. Windows throughput and ARM64 remain unmeasured.
+
 **Root observation improvement (2026-10-13):** [matched JIT/AOT evidence](../benchmarks/http-server/root-observation.md)
 shows 29–35% higher plain/JSON HTTP throughput after removing duplicate diagnostic
 root-value reads. Validation and full collection boundaries remain; all 1,536 timed

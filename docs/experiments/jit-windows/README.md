@@ -161,3 +161,11 @@ Hosted SSL stream and HTTP execution is required in addition to object generatio
 scalar/CLI checks, SSL streams and default-JIT HTTP. It records scope
 `http-and-ssl-streams`; it does not claim the skipped full library suite passed.
 The ordinary full gate remains the default.
+
+The focused rerun at `55b53daed` now passes on Windows Server 2022 x64/MSVC
+([run 38403029211](https://github.com/marinasundstrom/neoCLR/actions/runs/38403029211)).
+It validates the formerly rejected SSL-stream HTTPS JSON consumer in interpreter,
+default JIT and AOT, plus eight default-JIT HTTP cases. Shared JIT preparation,
+scalar and CLI checks also pass. [Retained reports and scope](../../../benchmarks/http-server/root-observation.md#windows-qualification--2026-10-13)
+keep the initial full-gate failure distinct from the focused rerun; the skipped
+library suites are not newly qualified. Windows performance and ARM64 remain open.
