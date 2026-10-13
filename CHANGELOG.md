@@ -8,6 +8,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-13
 
+- Write fixed HTTP response framing as ASCII bytes without per-request codec
+  calls. Warm AOT allocations/request fall 519→510 (plain) and 1,210→1,198 (JSON),
+  with full reclamation and 24 passing response checks. Retain matched timing
+  evidence and the code-size tradeoff; small median gains remain exploratory.
+  See `benchmarks/http-server/ascii-framing.md`.
+
 - Retain matched HTTP byte-path benchmarks and warm allocation captures: plain
   allocations/request fall 559→519 and JSON 1,256→1,210. Local native median
   throughput improves 4.5–11.5% (plain JIT ranges overlap); all 1,536 comparison

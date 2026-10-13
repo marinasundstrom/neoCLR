@@ -370,7 +370,7 @@ public class HttpServer {
             return Error(HttpError.LimitExceeded("Response header count exceeded"))
         }
         let result = ArrayList<byte>()
-        AppendWire(result, HttpText.Encode("HTTP/1.1 "))
+        AppendStatusPrefix(result)
         AppendDecimal(result, status)
         result.Add((byte)32)
         if status == 200 {
@@ -378,10 +378,10 @@ public class HttpServer {
             result.Add((byte)75)
         }
         if status != 204 && status != 304 {
-            AppendWire(result, HttpText.Encode("\r\nContent-Length: "))
+            AppendLengthPrefix(result)
             AppendDecimal(result, count)
         }
-        AppendWire(result, HttpText.Encode("\r\nConnection: close\r\n"))
+        AppendConnectionClose(result)
         var index = 0
         while index < fields.Count {
             let header = fields[index]
@@ -435,6 +435,64 @@ public class HttpServer {
         }
         let bytes: Sequence<byte> = result
         return Ok(bytes)
+    }
+
+    // Fixed ASCII protocol fragments need no text codec or temporary byte storage.
+    private static func AppendStatusPrefix(output: ArrayList<byte>) {
+        output.Add((byte)72)
+        output.Add((byte)84)
+        output.Add((byte)84)
+        output.Add((byte)80)
+        output.Add((byte)47)
+        output.Add((byte)49)
+        output.Add((byte)46)
+        output.Add((byte)49)
+        output.Add((byte)32)
+    }
+
+    private static func AppendLengthPrefix(output: ArrayList<byte>) {
+        output.Add((byte)13)
+        output.Add((byte)10)
+        output.Add((byte)67)
+        output.Add((byte)111)
+        output.Add((byte)110)
+        output.Add((byte)116)
+        output.Add((byte)101)
+        output.Add((byte)110)
+        output.Add((byte)116)
+        output.Add((byte)45)
+        output.Add((byte)76)
+        output.Add((byte)101)
+        output.Add((byte)110)
+        output.Add((byte)103)
+        output.Add((byte)116)
+        output.Add((byte)104)
+        output.Add((byte)58)
+        output.Add((byte)32)
+    }
+
+    private static func AppendConnectionClose(output: ArrayList<byte>) {
+        output.Add((byte)13)
+        output.Add((byte)10)
+        output.Add((byte)67)
+        output.Add((byte)111)
+        output.Add((byte)110)
+        output.Add((byte)110)
+        output.Add((byte)101)
+        output.Add((byte)99)
+        output.Add((byte)116)
+        output.Add((byte)105)
+        output.Add((byte)111)
+        output.Add((byte)110)
+        output.Add((byte)58)
+        output.Add((byte)32)
+        output.Add((byte)99)
+        output.Add((byte)108)
+        output.Add((byte)111)
+        output.Add((byte)115)
+        output.Add((byte)101)
+        output.Add((byte)13)
+        output.Add((byte)10)
     }
 
     private static func AppendWire(output: ArrayList<byte>, bytes: Sequence<byte>) {

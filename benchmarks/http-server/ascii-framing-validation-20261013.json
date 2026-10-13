@@ -1,0 +1,189 @@
+{
+  "passed": true,
+  "commands": {
+    "interpreter": [
+      "/Users/robert/Projects/neoclr/target/http-ascii-candidate-20261013/bundle/bin/neoclr",
+      "run",
+      "/Users/robert/Projects/neoclr/target/http-ascii-responses-20261013/app.dll",
+      "--execution",
+      "interpreter",
+      "--instructions",
+      "200000000",
+      "--system",
+      "/Users/robert/Projects/neoclr/target/http-ascii-candidate-20261013/bundle/lib/System.runtime.neox",
+      "--object-root",
+      "/Users/robert/Projects/neoclr/target/http-ascii-candidate-20261013/bundle/lib/System.Runtime.dll",
+      "--module",
+      "/Users/robert/Projects/neoclr/target/http-ascii-candidate-20261013/bundle/lib/System.Runtime.dll",
+      "--module",
+      "/Users/robert/Projects/neoclr/target/http-ascii-candidate-20261013/bundle/lib/System.Data.dll",
+      "--module",
+      "/Users/robert/Projects/neoclr/target/http-ascii-candidate-20261013/bundle/lib/System.Networking.dll",
+      "--module",
+      "/Users/robert/Projects/neoclr/target/http-ascii-candidate-20261013/bundle/lib/System.Web.dll",
+      "--module",
+      "/Users/robert/Projects/neoclr/target/http-ascii-candidate-20261013/bundle/lib/System.Data.PostgreSql.dll"
+    ],
+    "jit": [
+      "/Users/robert/Projects/neoclr/target/http-ascii-candidate-20261013/bundle/bin/neoclr",
+      "run",
+      "/Users/robert/Projects/neoclr/target/http-ascii-responses-20261013/app.dll"
+    ],
+    "aot": [
+      "/Users/robert/Projects/neoclr/target/http-ascii-responses-20261013/app"
+    ]
+  },
+  "cases": [
+    {
+      "mode": "interpreter",
+      "method": "GET",
+      "target": "/",
+      "passed": true
+    },
+    {
+      "mode": "interpreter",
+      "method": "HEAD",
+      "target": "/",
+      "passed": true
+    },
+    {
+      "mode": "interpreter",
+      "method": "GET",
+      "target": "/204",
+      "passed": true
+    },
+    {
+      "mode": "interpreter",
+      "method": "GET",
+      "target": "/205",
+      "passed": true
+    },
+    {
+      "mode": "interpreter",
+      "method": "GET",
+      "target": "/304",
+      "passed": true
+    },
+    {
+      "mode": "interpreter",
+      "method": "GET",
+      "target": "/299",
+      "passed": true
+    },
+    {
+      "mode": "interpreter",
+      "method": "GET",
+      "target": "/reserved",
+      "passed": true
+    },
+    {
+      "mode": "interpreter",
+      "method": "GET",
+      "target": "/injection",
+      "passed": true
+    },
+    {
+      "mode": "jit",
+      "method": "GET",
+      "target": "/",
+      "passed": true
+    },
+    {
+      "mode": "jit",
+      "method": "HEAD",
+      "target": "/",
+      "passed": true
+    },
+    {
+      "mode": "jit",
+      "method": "GET",
+      "target": "/204",
+      "passed": true
+    },
+    {
+      "mode": "jit",
+      "method": "GET",
+      "target": "/205",
+      "passed": true
+    },
+    {
+      "mode": "jit",
+      "method": "GET",
+      "target": "/304",
+      "passed": true
+    },
+    {
+      "mode": "jit",
+      "method": "GET",
+      "target": "/299",
+      "passed": true
+    },
+    {
+      "mode": "jit",
+      "method": "GET",
+      "target": "/reserved",
+      "passed": true
+    },
+    {
+      "mode": "jit",
+      "method": "GET",
+      "target": "/injection",
+      "passed": true
+    },
+    {
+      "mode": "aot",
+      "method": "GET",
+      "target": "/",
+      "passed": true
+    },
+    {
+      "mode": "aot",
+      "method": "HEAD",
+      "target": "/",
+      "passed": true
+    },
+    {
+      "mode": "aot",
+      "method": "GET",
+      "target": "/204",
+      "passed": true
+    },
+    {
+      "mode": "aot",
+      "method": "GET",
+      "target": "/205",
+      "passed": true
+    },
+    {
+      "mode": "aot",
+      "method": "GET",
+      "target": "/304",
+      "passed": true
+    },
+    {
+      "mode": "aot",
+      "method": "GET",
+      "target": "/299",
+      "passed": true
+    },
+    {
+      "mode": "aot",
+      "method": "GET",
+      "target": "/reserved",
+      "passed": true
+    },
+    {
+      "mode": "aot",
+      "method": "GET",
+      "target": "/injection",
+      "passed": true
+    }
+  ],
+  "inputs": {
+    "/Users/robert/Projects/neoclr/docs/experiments/http-byte-paths/validate.py": "0c29d3378b4b000325c0b8489f67d9bb0273797fb9707b240b940e28584cf145",
+    "/Users/robert/Projects/neoclr/docs/experiments/http-byte-paths/Server.rvn": "8e944ba67a0ea05835824c19c9a91fa80843a949890ed15911fe003df9b714c0",
+    "/Users/robert/Projects/neoclr/target/http-ascii-responses-20261013/app.dll": "27eafa9e9bc1139add234620c4105e3271856121ab005a8d08426bc9db8ed686",
+    "/Users/robert/Projects/neoclr/target/http-ascii-responses-20261013/app": "f2e7c47c7de88ce43f2e21ec1f94154f8b09127e59d4e2f55cb48b727902c5a2",
+    "/Users/robert/Projects/neoclr/target/http-ascii-candidate-20261013/bundle/manifest.json": "07f9383f1b0ac3cee4d3ed5d001615b224f03010b904b0ea9f255a0d207343d3"
+  }
+}
