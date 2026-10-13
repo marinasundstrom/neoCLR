@@ -25,6 +25,8 @@ on:
   push:
     paths:
       - 'docs/experiments/aot-console/socket-*'
+      - 'runtime/native/gc/**'
+      - 'scripts/test_native_gc_layout.py'
       - 'docs/experiments/aot-console/native-gc*'
       - 'docs/experiments/aot-console/root-probe*'
       - 'docs/experiments/aot-console/text-arena*'
@@ -36,6 +38,8 @@ on:
   pull_request:
     paths:
       - 'docs/experiments/aot-console/socket-*'
+      - 'runtime/native/gc/**'
+      - 'scripts/test_native_gc_layout.py'
       - 'docs/experiments/aot-console/native-gc*'
       - 'docs/experiments/aot-console/root-probe*'
       - 'docs/experiments/aot-console/text-arena*'
@@ -70,6 +74,9 @@ jobs:
       - name: Run macOS socket contracts
         if: runner.os == 'macOS'
         run: python3 scripts/validate-native-network.py --output target/native-network-validation
+      - name: Qualify relocated macOS collector package
+        if: runner.os == 'macOS'
+        run: python3 -m unittest discover -s scripts -p test_native_gc_layout.py
       - name: Run Windows socket contracts
         if: runner.os == 'Windows'
         shell: pwsh
@@ -84,7 +91,7 @@ jobs:
         run: |
           $vs = & "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\vswhere.exe" -latest -products '*' -requires Microsoft.VisualStudio.Component.VC.Tools.x86.x64 -property installationPath
           if (-not $vs) { throw 'MSVC x64 tools not found' }
-          cmd /c "`"$vs\VC\Auxiliary\Build\vcvars64.bat`" && python scripts/validate-native-gc.py --output target/native-gc-validation"
+          cmd /c "`"$vs\VC\Auxiliary\Build\vcvars64.bat`" && python scripts/validate-native-gc.py --output target/native-gc-validation && python -m unittest discover -s scripts -p test_native_gc_layout.py"
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
       - name: Benchmark macOS GC graph lookup
         if: runner.os == 'macOS' && inputs.benchmark_gc_index

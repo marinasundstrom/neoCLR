@@ -52,7 +52,7 @@ def main():
             run('compiled-roots', ['cargo', 'test', '--locked', '-p', 'neoclr-aot-poc', '--test', 'console', 'utf8_text_slices_preserve'])
         run('native-gc', [sys.executable, ROOT / 'scripts/validate-native-gc.py', '--output', out / 'gc'])
         run('native-security', [sys.executable, ROOT / 'scripts/test-native-security.py'])
-        for name in ['test_native_bundle_notices.py', 'test_native_https_build.py']:
+        for name in ['test_native_gc_layout.py', 'test_native_bundle_notices.py', 'test_native_https_build.py']:
             run(name, [sys.executable, '-m', 'unittest', 'discover', '-s', 'scripts', '-p', name])
         report['passed'] = True
     except Exception as error:

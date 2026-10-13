@@ -26,11 +26,17 @@ def main():
     if a.rounds<5: p.error('At least five rounds required')
     out=a.output.resolve();out.mkdir(parents=True,exist_ok=False)
     old=out/('baseline-'+a.source)
-    old.write_bytes(subprocess.check_output(['git','show',a.baseline+':docs/experiments/aot-console/'+a.source],cwd=ROOT))
+    baseline_path = 'docs/experiments/aot-console/' + a.source
+    if a.source == 'native-gc.c':
+        canonical_path = 'runtime/native/gc/native-gc.c'
+        if subprocess.run(['git', 'cat-file', '-e', a.baseline + ':' + canonical_path], cwd=ROOT,
+                          stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL).returncode == 0:
+            baseline_path = canonical_path
+    old.write_bytes(subprocess.check_output(['git','show',a.baseline+':' + baseline_path],cwd=ROOT))
     gc=ROOT/'docs/experiments/aot-console'/a.source
     report=dict(passed=False,baselineRevision=subprocess.check_output(['git','rev-parse',a.baseline],text=True).strip(),
       changedSource=a.source,modes=modes,commands=[],inputs={},warmups=[],samples=[],summary={},scope=f'Same guest assemblies/AOT objects and host sources; only selected GC source differs. 32 requests per process, eight discarded, {a.rounds} alternating rounds. No instrumentation or sampling during timings.')
-    for path in [Path(__file__).resolve(),Path(benchmark.__file__),a.plain,a.json,old,gc,*([a.host] if a.host else [])]:
+    for path in [*sorted((ROOT/'runtime/native/gc').glob('*.[ch]')),Path(__file__).resolve(),Path(benchmark.__file__),a.plain,a.json,old,gc,*([a.host] if a.host else [])]:
         report['inputs'][str(path.resolve())]=sha(path)
     for directory in ['aot-console','aot-fault-details','runtime-async','jit-managed']:
         for path in (ROOT/'docs/experiments'/directory).glob('*.h'): report['inputs'][str(path)]=sha(path)

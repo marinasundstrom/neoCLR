@@ -45,6 +45,7 @@ def main():
         base = ROOT / 'docs/experiments/aot-console'
         collector_inputs = [ROOT / 'tools/native' / name for name in
                             ('windows-gc-host.c', 'windows-gc-host.h', 'windows-gc-host-test.c', 'windows-native-stack.c')]
+        collector_inputs += sorted((ROOT / 'runtime/native/gc').glob('*.[ch]'))
         collector_inputs += [base / name for name in ('native-gc.c', 'native-gc-test.c', 'root-probe.c', 'native-gc.h', 'root-probe.h', 'text-arena.h', 'native-stack.h')]
         collector_inputs += [ROOT / 'docs/experiments/aot-fault-details/fault-details.h']
         report['inputs'].update({p.relative_to(ROOT).as_posix(): hashlib.sha256(p.read_bytes()).hexdigest() for p in collector_inputs})

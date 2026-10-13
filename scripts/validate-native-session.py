@@ -45,6 +45,7 @@ def main():
             clang = run(['xcrun', '--find', 'clang'], 'clang').stdout.decode().strip()
             sdk = run(['xcrun', '--sdk', 'macosx', '--show-sdk-path'], 'sdk').stdout.decode().strip()
             cc = [clang, '-isysroot', sdk, '-std=c11', '-O2', '-Wall', '-Wextra', '-Werror', '-DNEOCLR_NATIVE_GC', '-I', base, '-fsanitize=undefined,bounds']
+        inputs += sorted((ROOT / 'runtime/native/gc').glob('*.[ch]'))
         report['inputs'] = {p.relative_to(ROOT).as_posix(): sha(p) for p in inputs}
         report['aotSha256'] = sha(aot)
         seed = out / 'System.neoil'; seed.write_text('.module System\n.references ()\n')

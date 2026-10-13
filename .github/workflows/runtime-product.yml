@@ -13,6 +13,9 @@ on:
         default: false
   push:
     paths:
+      - 'runtime/native/**'
+      - 'docs/experiments/aot-console/native-gc.*'
+      - 'scripts/test_native_gc_layout.py'
       - 'Cargo.toml'
       - 'Cargo.lock'
       - 'tools/aot-poc/Cargo.toml'
@@ -24,6 +27,9 @@ on:
       - '.github/workflows/runtime-product.yml'
   pull_request:
     paths:
+      - 'runtime/native/**'
+      - 'docs/experiments/aot-console/native-gc.*'
+      - 'scripts/test_native_gc_layout.py'
       - 'Cargo.toml'
       - 'Cargo.lock'
       - 'tools/aot-poc/Cargo.toml'

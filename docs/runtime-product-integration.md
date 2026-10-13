@@ -47,6 +47,29 @@ text LTO/size settings. This is not a completed source-layout or packaging migra
 still launches the backend process; workspace membership alone does not create an
 in-process JIT service or a complete embedding API.
 
+## Native collector source ownership — 2026-10-13
+
+The shared native collector implementation and private header now live in
+`runtime/native/gc`. JIT and AOT host recipes still accept the former
+`docs/experiments/aot-console/native-gc.c` and `.h` paths through forwarding files;
+there is one implementation, not a second collector. Build-kit support manifests
+include the canonical files, and current profiling tools instrument their contents.
+Benchmark baseline lookup supports both the historical and current source paths.
+
+This bounded migration leaves root descriptors, arena/context types, diagnostics
+and other native services in their existing locations. The private header names
+those dependencies explicitly; it is not a stable or collector-independent ABI.
+The integrated validator includes a relocated-package test that compiles and runs
+the collector through the forwarding path, directly, and from a profiler-style
+copy using only packaged support sources. Native GC/root validation fingerprints
+the canonical implementation as well as the compatibility files.
+
+Local GC/root contracts, package relocation and allocation-benchmark instrumentation
+checks pass. The one-round benchmark is a tooling smoke check, not performance
+evidence: collector algorithms and policy are unchanged. Hosted qualification is
+pending for this source-layout slice. Website capabilities and public APIs are
+unchanged; no publication is part of this work.
+
 ## Memory management is a runtime service
 
 **Architectural direction, not a new public ABI.** GC remains the default memory

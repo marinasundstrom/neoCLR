@@ -10,7 +10,7 @@ def instrument(root, out, command):
     collector = root/'docs/experiments/aot-console/native-gc.c'
     probe = root/'docs/experiments/aot-console/root-probe.c'
     assert str(collector) in command and str(probe) in command
-    text = collector.read_text()
+    text = (root/'runtime/native/gc/native-gc.c').read_text()
     text = '#include <stdint.h>\nextern void neoclr_gc_phase_begin(uint64_t);\nextern void neoclr_gc_phase_next(unsigned);\nextern void neoclr_gc_phase_end(int32_t);\n' + text
     hook = '    int32_t status = collect_conditional(context, head, conditional, count);'
     text = replace_once(text, hook, '    neoclr_gc_phase_begin(statistics.allocations);\n'+hook+'\n    neoclr_gc_phase_end(status);')
@@ -32,4 +32,4 @@ def instrument(root, out, command):
     command = [str(gc_copy) if v == str(collector) else str(probe_copy) if v == str(probe) else v for v in command]
     support = Path(__file__).with_name('gc-phases.c').resolve()
     command.append(str(support))
-    return command, [gc_copy, probe_copy, support, Path(__file__).resolve()]
+    return command, [*sorted((root/'runtime/native/gc').glob('*.[ch]')), gc_copy, probe_copy, support, Path(__file__).resolve()]

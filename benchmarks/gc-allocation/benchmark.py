@@ -41,8 +41,12 @@ def main():
                 cc[0] = run(['xcrun', '--sdk', 'macosx', '--find', 'clang']).strip()
                 cc += ['-isysroot', run(['xcrun', '--sdk', 'macosx', '--show-sdk-path']).strip()]
         report['revision'] = run(['git', '-C', ROOT, 'rev-parse', 'HEAD']).strip()
-        sources = {'baseline': run(['git', '-C', ROOT, 'show', args.baseline + ':docs/experiments/aot-console/native-gc.c']),
-                   'candidate': (BASE / 'native-gc.c').read_text()}
+        baseline_path = 'runtime/native/gc/native-gc.c'
+        if subprocess.run(['git', '-C', ROOT, 'cat-file', '-e', args.baseline + ':' + baseline_path],
+                          stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL).returncode:
+            baseline_path = 'docs/experiments/aot-console/native-gc.c'
+        sources = {'baseline': run(['git', '-C', ROOT, 'show', args.baseline + ':' + baseline_path]),
+                   'candidate': (ROOT / 'runtime/native/gc/native-gc.c').read_text()}
         report['sourceHashes'] = {k: hashlib.sha256(v.encode()).hexdigest() for k, v in sources.items()}
         report['sourceHashes']['workload'] = hashlib.sha256(Path(__file__).with_name('workload.c').read_bytes()).hexdigest()
         executables = {}

@@ -73,6 +73,8 @@ report = dict(passed=False, commands=[], originalManifestSha256=sha(source / 'ma
     replacementLibraries=bool(a.libraries), inputsSha256={str(a.host_recipe.resolve()): sha(a.host_recipe),
     str(a.runtime.resolve()): sha(a.runtime), str(a.jit_compiler.resolve()): sha(a.jit_compiler),
     str(Path(__file__).resolve()): sha(__file__)})
+for path in (ROOT / 'runtime/native/gc').glob('*.[ch]'):
+    report['inputsSha256'][str(path)] = sha(path)
 for directory in ('aot-console', 'aot-fault-details', 'runtime-async', 'jit-managed'):
     for path in (ROOT / 'docs/experiments' / directory).iterdir():
         if path.suffix in ('.c', '.h'):
