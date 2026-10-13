@@ -1,0 +1,132 @@
+{
+  "passed": true,
+  "platform": "macOS-27.0-arm64-arm-64bit",
+  "commands": [
+    {
+      "label": "revision",
+      "command": [
+        "git",
+        "rev-parse",
+        "HEAD"
+      ],
+      "exitCode": 0
+    },
+    {
+      "label": "workspace",
+      "command": [
+        "cargo",
+        "metadata",
+        "--locked",
+        "--format-version",
+        "1",
+        "--no-deps"
+      ],
+      "exitCode": 0
+    },
+    {
+      "label": "build",
+      "command": [
+        "cargo",
+        "build",
+        "--locked",
+        "--workspace"
+      ],
+      "exitCode": 0
+    },
+    {
+      "label": "cli",
+      "command": [
+        "cargo",
+        "test",
+        "--locked",
+        "-p",
+        "neoclr",
+        "--test",
+        "cli",
+        "cli_execution_selection"
+      ],
+      "exitCode": 0
+    },
+    {
+      "label": "execution",
+      "command": [
+        "cargo",
+        "test",
+        "--locked",
+        "-p",
+        "neoclr-aot-poc",
+        "--test",
+        "scalar"
+      ],
+      "exitCode": 0
+    },
+    {
+      "label": "compiled-roots",
+      "command": [
+        "cargo",
+        "test",
+        "--locked",
+        "-p",
+        "neoclr-aot-poc",
+        "--test",
+        "console",
+        "utf8_text_slices_preserve"
+      ],
+      "exitCode": 0
+    },
+    {
+      "label": "native-gc",
+      "command": [
+        "/Applications/Xcode.app/Contents/Developer/usr/bin/python3",
+        "/Users/robert/Projects/neoclr/scripts/validate-native-gc.py",
+        "--output",
+        "/Users/robert/Projects/neoclr/target/runtime-product-20261013/gc"
+      ],
+      "exitCode": 0
+    },
+    {
+      "label": "native-security",
+      "command": [
+        "/Applications/Xcode.app/Contents/Developer/usr/bin/python3",
+        "/Users/robert/Projects/neoclr/scripts/test-native-security.py"
+      ],
+      "exitCode": 0
+    },
+    {
+      "label": "test_native_bundle_notices.py",
+      "command": [
+        "/Applications/Xcode.app/Contents/Developer/usr/bin/python3",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "scripts",
+        "-p",
+        "test_native_bundle_notices.py"
+      ],
+      "exitCode": 0
+    },
+    {
+      "label": "test_native_https_build.py",
+      "command": [
+        "/Applications/Xcode.app/Contents/Developer/usr/bin/python3",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "scripts",
+        "-p",
+        "test_native_https_build.py"
+      ],
+      "exitCode": 0
+    }
+  ],
+  "scope": "workspace build, CLI selection, scalar interpreter/JIT/AOT parity, native roots and TLS adapter",
+  "revision": "14905f5dd93079549fe41ff98659eeec1527986b",
+  "members": [
+    "neoclr",
+    "neoclr-aot-poc",
+    "neoclr-native-tls",
+    "neoclr-security-provider"
+  ]
+}

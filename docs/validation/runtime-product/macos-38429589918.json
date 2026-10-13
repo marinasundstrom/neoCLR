@@ -1,0 +1,141 @@
+{
+  "passed": true,
+  "platform": "macOS-26.6.2-arm64-arm-64bit",
+  "commands": [
+    {
+      "label": "revision",
+      "command": [
+        "git",
+        "rev-parse",
+        "HEAD"
+      ],
+      "exitCode": 0
+    },
+    {
+      "label": "workspace",
+      "command": [
+        "cargo",
+        "metadata",
+        "--locked",
+        "--format-version",
+        "1",
+        "--no-deps"
+      ],
+      "exitCode": 0
+    },
+    {
+      "label": "build",
+      "command": [
+        "cargo",
+        "build",
+        "--locked",
+        "--workspace"
+      ],
+      "exitCode": 0
+    },
+    {
+      "label": "cli",
+      "command": [
+        "cargo",
+        "test",
+        "--locked",
+        "-p",
+        "neoclr",
+        "--test",
+        "cli",
+        "cli_execution_selection"
+      ],
+      "exitCode": 0
+    },
+    {
+      "label": "execution",
+      "command": [
+        "cargo",
+        "test",
+        "--locked",
+        "-p",
+        "neoclr-aot-poc",
+        "--test",
+        "scalar"
+      ],
+      "exitCode": 0
+    },
+    {
+      "label": "compiled-roots",
+      "command": [
+        "cargo",
+        "test",
+        "--locked",
+        "-p",
+        "neoclr-aot-poc",
+        "--test",
+        "console",
+        "utf8_text_slices_preserve"
+      ],
+      "exitCode": 0
+    },
+    {
+      "label": "native-gc",
+      "command": [
+        "/Library/Frameworks/Python.framework/Versions/3.12/bin/python3",
+        "/Users/runner/work/neoCLR/neoCLR/scripts/validate-native-gc.py",
+        "--output",
+        "/Users/runner/work/neoCLR/neoCLR/target/runtime-product-validation/gc"
+      ],
+      "exitCode": 0
+    },
+    {
+      "label": "native-security",
+      "command": [
+        "/Library/Frameworks/Python.framework/Versions/3.12/bin/python3",
+        "/Users/runner/work/neoCLR/neoCLR/scripts/test-native-security.py"
+      ],
+      "exitCode": 0
+    },
+    {
+      "label": "test_native_bundle_notices.py",
+      "command": [
+        "/Library/Frameworks/Python.framework/Versions/3.12/bin/python3",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "scripts",
+        "-p",
+        "test_native_bundle_notices.py"
+      ],
+      "exitCode": 0
+    },
+    {
+      "label": "test_native_https_build.py",
+      "command": [
+        "/Library/Frameworks/Python.framework/Versions/3.12/bin/python3",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "scripts",
+        "-p",
+        "test_native_https_build.py"
+      ],
+      "exitCode": 0
+    }
+  ],
+  "scope": "workspace build, CLI selection, scalar interpreter/JIT/AOT parity, native roots and TLS adapter",
+  "revision": "bb5a3d2b0ac2823293c473f11311985f66be1baf",
+  "members": [
+    "neoclr",
+    "neoclr-aot-poc",
+    "neoclr-native-tls",
+    "neoclr-security-provider"
+  ],
+  "inputs": {
+    "Cargo.toml": "5796d3825f348566061a4b93468e3901a0305cdfe70179595bf93229235d8db1",
+    "Cargo.lock": "b8e0b7fa72610a4f08bbb93bdcc59945efee448a6412e01f2492d7f93df687ec",
+    "scripts/validate-runtime-product.py": "450597a5355348d5928d72f642f45e7d92f0500bf7cad0338c2150b3242da6c4",
+    "tools/aot-poc/Cargo.toml": "de98307ff05110c0c25f207dfca0b6559a8cbb1caee872659d5e1f07dd4d623a",
+    "tools/native-tls/Cargo.toml": "257a25271b648c302556120a86264349a50dbad2aa18d9fb2177d7988beaf16d"
+  },
+  "noticePackages": 139,
+  "noticeFiles": 256
+}

@@ -115,3 +115,20 @@ No alternative collector or no-GC device distribution is implemented by this sli
    then qualify build-selected implementations. Finish current helper-root and idle
    cleanup work before changing pacing; measure improvements independently of this
    build integration. Generational GC remains a candidate, not a selected policy.
+
+## Qualification — 2026-10-13
+
+The local integrated gate and the hosted macOS job at `bb5a3d2b0` pass: workspace
+build, CLI selection, 24 scalar execution/compiler tests, two compiled rooted-text
+tests, 20 native GC/root executions, security/TLS adapter checks and packaging
+policy tests. Reports are retained in [validation/runtime-product](validation/runtime-product/).
+The local report predates the implementation commit; hosted evidence has the exact
+revision and input hashes. The root-only dependency graph excludes Cranelift.
+
+The first Windows run exposed line-ending conversion of the hashed Cranelift
+license, fixed by preserving notice bytes in checkout. The next run passed notice
+checks, the workspace build and CLI selection, but exposed a CRLF-sensitive
+negative compiler fixture. That fixture now normalizes line endings and verifies
+each invalid-input mutation is effective; the focused local rerun passes. Windows
+completion remains pending until the integrated rerun finishes. These are build/test
+integration fixes, not a measured runtime throughput improvement.

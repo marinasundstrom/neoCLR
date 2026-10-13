@@ -40,52 +40,54 @@ const SOURCE: &str = include_str!("../../../docs/experiments/aot-scalar/scalar.n
 
 #[test]
 fn unsupported_or_invalid_programs_never_emit_an_object() {
+    let normalized = SOURCE.replace("\r\n", "\n");
     let cases = [
         (
-            SOURCE.replace("    mul", "    xor"),
+            normalized.replace("    mul", "    xor"),
             "unsupported instruction",
         ),
         (
-            SOURCE.replace("    ldarg value\n    ldc.i4 2", "    ldc.i4 2"),
+            normalized.replace("    ldarg value\n    ldc.i4 2", "    ldc.i4 2"),
             "stack underflow",
         ),
         (
-            SOURCE.replace("    call Twice(Int32)", "    call Calculate(Int32)"),
+            normalized.replace("    call Twice(Int32)", "    call Calculate(Int32)"),
             "recursive calls",
         ),
         (
-            SOURCE.replace("    call Twice(Int32)", "    call Missing(Int32)"),
+            normalized.replace("    call Twice(Int32)", "    call Missing(Int32)"),
             "unknown function overload Missing",
         ),
         (
-            SOURCE.replace("    call Twice(Int32)", "    call Twice(Int32, Int32)"),
+            normalized.replace("    call Twice(Int32)", "    call Twice(Int32, Int32)"),
             "unknown function overload Twice",
         ),
         (
-            SOURCE.replace("    mul", "    mul\n    ldc.i4 0"),
+            normalized.replace("    mul", "    mul\n    ldc.i4 0"),
             "invalid return",
         ),
         (
-            SOURCE.replace("    ldarg value", "    ldarg 99"),
+            normalized.replace("    ldarg value", "    ldarg 99"),
             "argument index outside signature",
         ),
         (
-            SOURCE.replace("    mul", "    pop\n    pop"),
+            normalized.replace("    mul", "    pop\n    pop"),
             "invalid return",
         ),
         (
-            SOURCE.replace(
+            normalized.replace(
                 ".function Twice(Int32 value) -> Int32",
                 ".function Twice(Int32 value) -> Int64",
             ),
             "scalar profile",
         ),
         (
-            format!("{SOURCE}\n.function Unused() -> Int32\nldc.i4 1\nldc.i4 0\nxor\nret\n.end\n"),
+            format!("{normalized}\n.function Unused() -> Int32\nldc.i4 1\nldc.i4 0\nxor\nret\n.end\n"),
             "unsupported instruction",
         ),
     ];
     for (source, expected) in cases {
+        assert_ne!(source, normalized, "invalid case must alter the fixture: {expected}");
         let temp = Temp::new();
         let path = temp.0.join("rejected.o");
         let result = compile(&source, &path);
