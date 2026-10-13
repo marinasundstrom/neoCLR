@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-13
 
+- Extend the dense-heap GC regression to cover conditional values, rejection of interior owner pointers and exactly-once resource cleanup before final reclamation. All 18 local GC/root executions pass. Normalize retained Windows evidence to LF without changing JSON values.
+
 - Qualify adaptive native GC lookup on macOS ARM64 and Windows x64: final hosted dense-chain/wide collection gains are 4.48–4.90× and 4.63–5.19× respectively, with all graph, GC/root and socket checks passing. Retain small-control costs and variability, allocation/reclamation profiles, suspended-owner cleanup checks and the 1,536-response local HTTP comparison (within 2%, overlapping ranges). This is a general graph-tracing improvement, not an HTTP speedup or a universal non-regression claim.
 
 - Keep adaptive-index population counting in a local accumulator until validation finishes, avoiding repeated publication through the index descriptor. Retain the first Windows graph results, including small-control costs, while qualifying the bookkeeping refinement.
