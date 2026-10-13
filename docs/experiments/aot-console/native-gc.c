@@ -241,16 +241,21 @@ int32_t neoclr_gc_owned_roots_check_v1(neoclr_aot_context *context, const uint64
 }
 int32_t neoclr_gc_allocate_v1(neoclr_aot_text_arena *a, uint64_t bytes,
                              uint32_t kind, void **output) {
-    if (!output || !blocks_valid(a) || !bytes || kind < NEOCLR_GC_TEXT || kind > NEOCLR_GC_INTERN)
+    if (!output || !valid(a) || !bytes || kind < NEOCLR_GC_TEXT || kind > NEOCLR_GC_INTERN)
         return NEOCLR_AOT_FAULT_RUNTIME_ERROR;
-    if (bytes > UINT64_MAX - sizeof(block) - 7) return NEOCLR_AOT_FAULT_NATIVE_MEMORY_LIMIT;
-    uint64_t needed = sizeof(block) + ((bytes + 7) & ~UINT64_C(7));
+    int oversized = bytes > UINT64_MAX - sizeof(block) - 7;
+    uint64_t needed = oversized ? UINT64_MAX : sizeof(block) + ((bytes + 7) & ~UINT64_C(7));
     block *chosen = NULL;
+    /* Validate every span even after finding a fit: malformed trailing headers
+     * must fail before any heap/output mutation. Remember first-fit during that
+     * same walk rather than searching the entire heap again. */
     for (uint64_t at = 0; at < a->used;) {
+        if (!block_valid(a, at)) return NEOCLR_AOT_FAULT_RUNTIME_ERROR;
         block *b = (void *)(a->data + at);
-        if (!b->state && b->span >= needed) { chosen = b; break; }
+        if (!chosen && !b->state && b->span >= needed) chosen = b;
         at += b->span;
     }
+    if (oversized) return NEOCLR_AOT_FAULT_NATIVE_MEMORY_LIMIT;
     if (chosen) {
         if (chosen->span - needed >= sizeof(block) + 8) {
             block *rest = (void *)((unsigned char *)chosen + needed);

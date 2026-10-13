@@ -41,7 +41,7 @@ def main():
             cc = [clang, '-isysroot', sdk, '-std=c11', '-O2', '-Wall', '-Wextra', '-Werror', '-fsanitize=undefined,bounds']
         else:
             raise ValueError('Requires Windows or macOS')
-        names = ['native-gc-test', 'native-gc-admission-test', 'native-gc-helper-test', 'native-gc-index-test', 'native-gc-dense-test', 'native-gc-pass-test', 'native-gc-profile-test']
+        names = ['native-gc-test', 'native-gc-admission-test', 'native-gc-allocation-test', 'native-gc-helper-test', 'native-gc-index-test', 'native-gc-dense-test', 'native-gc-pass-test', 'native-gc-profile-test']
         inputs = [Path(__file__).resolve(), *BASE.glob('*.h'), BASE / 'native-gc.c', BASE / 'root-probe.c',
                   BASE / 'root-validation-test.c', BASE.parent / 'aot-fault-details/fault-details.h',
                   *[BASE / (name + '.c') for name in names]]

@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-13
 
+- Combine native allocation validation and first-fit search into one complete heap walk, preserving trailing-corruption checks, failure outputs and fault precedence. Local allocation-only benchmarks improve 1.49–1.89×; all 19 GC/root checks pass. Add reproducible object, string-sized, buffer and fragmented-heap benchmarks with optional platform CI. Full validation remains linear; collection policy is unchanged.
+
 - Update the GC benchmark website with dense-graph results, cross-platform qualification, stack costs, slower small controls and preserved history. Retain the passing focused Windows HTTP/HTTPS gate (eight default-JIT HTTP cases and SSL JSON in interpreter/JIT/AOT). The website build/link check passes for 4,382 pages; publication remains on hold.
 
 - Extend the dense-heap GC regression to cover conditional values, rejection of interior owner pointers and exactly-once resource cleanup before final reclamation. All 18 local GC/root executions pass. Normalize retained Windows evidence to LF without changing JSON values.

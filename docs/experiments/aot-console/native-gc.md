@@ -545,3 +545,11 @@ reduces repeated header walks while retaining exact interior/base-pointer checks
 and all validation, marking, conditional ownership and cleanup semantics. The
 dense path costs another validated heap walk and 32 KiB of stack; no allocation
 or collection pacing changes are involved. See the [graph matrix and tradeoffs](../../../benchmarks/gc-index/README.md).
+
+### Allocation validation and first-fit search
+
+Allocation now combines full span validation and first-fit selection in one walk.
+Finding a hole does not terminate validation: a corrupt later block rejects the
+call before heap/output mutation. Overflow and malformed-heap precedence remain
+unchanged. [Allocation-only evidence](../../../benchmarks/gc-allocation/README.md)
+measures the gain and records the remaining linear validation cost.
