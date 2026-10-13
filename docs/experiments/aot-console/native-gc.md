@@ -593,7 +593,8 @@ Remaining admission audit:
 | Reference/string/function arrays and reserved records | No managed inputs; finish headers, null payloads and flags before publication | Generated GC calls use rooted retry |
 | Other scalar formatting | Complete caller boundary; audit intermediates | Noncollecting |
 | Managed UTF-8 encode/decode | Retain source text or full byte-array owner through allocation/copy | Generated GC calls use rooted retry |
-| Grapheme slicing, other encoding, replacement and paths | Retain borrowed inputs and any backing arrays | Noncollecting |
+| Lexical paths and ordinal replacement | Retain every string read after allocation; no-op replacement preserves identity | Generated GC calls use rooted retry |
+| Grapheme slicing and other encoding | Retain borrowed inputs and any backing arrays | Noncollecting |
 | Unicode sequence construction | Retain partially initialized result arrays and each constructed element | Noncollecting |
 | Native file/network/TLS/SQL producers | Retain managed intermediates; keep native handles/buffers alive; never replay I/O to retry allocation | Noncollecting |
 | Constructors / reflection invocation | Retain initialized receiver and every native result scratch until publication | Existing explicit generated roots; admission migration still needed |
@@ -689,3 +690,20 @@ The pressure fixture checks referent retention through the newly published array
 context rejection, unchanged failure outputs, live exhaustion and final cleanup.
 All 25 macOS/Windows GC/root checks, socket/package checks and 14 local compiled
 array tests pass. See [retained qualification](../../validation/runtime-product/reference-arrays/README.md).
+
+Borrowed path/replacement follow-up (2026-10-13): generated native-GC lexical path
+combination and file-name extraction retain the string owners of copied byte ranges.
+Ordinal replacement retains source, search and replacement strings through its
+single allocation retry; all three are read during the copy pass. Validation and
+no-op identity behavior precede allocation. Native entry points stay noncollecting.
+The nonmoving collector preserves byte addresses; this is no moving-GC pinning
+contract. Unix lexical path semantics are unchanged on both host platforms.
+
+The remaining Unicode kernels in `string-unicode.c` are explicitly noncollecting:
+casing reads its source in two passes; grapheme access/slicing copy an interior
+range; `StringFromChars` reads an array and its elements; sequence construction must
+retain both its source and a partially filled result across each element allocation.
+The Rust visitor borrows source bytes during callbacks, so a future moving collector
+would additionally need a stable-borrow/pinning contract. Other encoding kernels and
+native file/network/TLS/SQL producers require their own owner/scratch audit; no
+blanket change to the raw allocation service is safe. General pacing stays disabled.

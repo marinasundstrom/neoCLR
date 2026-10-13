@@ -50,20 +50,25 @@ static int32_t reserve_primitive_storage(neoclr_aot_text_arena *arena, uint64_t 
 
 /* Explicitly selected only by audited generated calls. Arena-only native callers
  * retain the noncollecting services until their entire temporary lifetime is audited. */
-static int32_t reserve_inputs(neoclr_aot_text_arena *arena, uint64_t bytes, uint32_t kind,
-    void **output, int rooted, const void *left, const void *right) {
+static int32_t reserve_values(neoclr_aot_text_arena *arena, uint64_t bytes, uint32_t kind,
+    void **output, int rooted, const void *const *values, uint32_t count) {
 #ifdef NEOCLR_NATIVE_GC
     if (rooted) {
         const neoclr_probe_frame *head = neoclr_root_probe_head_v1();
         neoclr_aot_context *context = head ? (neoclr_aot_context *)head->context : NULL;
         if (!context || &context->text != arena) return NEOCLR_AOT_FAULT_RUNTIME_ERROR;
-        const void *values[] = {left, right};
-        return neoclr_gc_allocate_rooted_values_v1(context, head, values, 2, bytes, kind, output);
+        return neoclr_gc_allocate_rooted_values_v1(context, head, values, count, bytes, kind, output);
     }
 #else
-    (void)rooted; (void)left; (void)right;
+    (void)rooted; (void)values; (void)count;
 #endif
     return reserve_storage(arena, bytes, kind, output);
+}
+
+static int32_t reserve_inputs(neoclr_aot_text_arena *arena, uint64_t bytes, uint32_t kind,
+    void **output, int rooted, const void *left, const void *right) {
+    const void *values[] = {left, right};
+    return reserve_values(arena, bytes, kind, output, rooted, values, 2);
 }
 
 static int32_t reserve_text_inputs(neoclr_aot_text_arena *arena, uint64_t bytes,
@@ -84,11 +89,6 @@ static int32_t store_text_input(const char *buffer, size_t length,
     memcpy(text->bytes, buffer, length);
     *output = text;
     return NEOCLR_AOT_FAULT_NONE;
-}
-
-static int32_t store_text(const char *buffer, size_t length,
-    neoclr_aot_text_arena *arena, const neoclr_aot_text **output) {
-    return store_text_input(buffer, length, arena, output, 0, NULL);
 }
 
 static int32_t int32_to_string(int32_t value, neoclr_aot_text_arena *arena,
@@ -655,19 +655,19 @@ int32_t neoclr_string_compare_ordinal_v1(const neoclr_aot_text *left,
 }
 
 
-int32_t neoclr_path_combine_unix_v1(const neoclr_aot_text *left, const neoclr_aot_text *right,
-    neoclr_aot_text_arena *arena, const neoclr_aot_text **output) {
+static int32_t path_combine_unix(const neoclr_aot_text *left, const neoclr_aot_text *right,
+    neoclr_aot_text_arena *arena, const neoclr_aot_text **output, int rooted) {
     if (!left || !right || !arena || !output) return NEOCLR_AOT_FAULT_RUNTIME_ERROR;
     if (!left->length || (right->length && right->bytes[0] == '/'))
-        return store_text((const char *)right->bytes, (size_t)right->length, arena, output);
+        return store_text_input((const char *)right->bytes, (size_t)right->length, arena, output, rooted, right);
     if (!right->length)
-        return store_text((const char *)left->bytes, (size_t)left->length, arena, output);
+        return store_text_input((const char *)left->bytes, (size_t)left->length, arena, output, rooted, left);
     if (left->length > UINT64_MAX - 9 || right->length > UINT64_MAX - 9 - left->length)
         return NEOCLR_AOT_FAULT_NATIVE_MEMORY_LIMIT;
     int separator = left->bytes[left->length - 1] != '/';
     uint64_t length = left->length + right->length + (uint64_t)separator;
     void *storage;
-    int32_t status = reserve_storage(arena, 8 + length, TEXT_STORAGE, &storage);
+    int32_t status = reserve_text_inputs(arena, 8 + length, &storage, rooted, left, right);
     if (status) return status;
     neoclr_aot_text *text = storage;
     text->length = length;
@@ -678,18 +678,18 @@ int32_t neoclr_path_combine_unix_v1(const neoclr_aot_text *left, const neoclr_ao
     return NEOCLR_AOT_FAULT_NONE;
 }
 
-int32_t neoclr_path_file_name_unix_v1(const neoclr_aot_text *path,
-    neoclr_aot_text_arena *arena, const neoclr_aot_text **output) {
+static int32_t path_file_name_unix(const neoclr_aot_text *path,
+    neoclr_aot_text_arena *arena, const neoclr_aot_text **output, int rooted) {
     if (!path || !arena || !output) return NEOCLR_AOT_FAULT_RUNTIME_ERROR;
     uint64_t start = path->length;
     while (start && path->bytes[start - 1] != '/') start--;
-    return store_text((const char *)path->bytes + start, (size_t)(path->length - start), arena, output);
+    return store_text_input((const char *)path->bytes + start, (size_t)(path->length - start), arena, output, rooted, path);
 }
 
 
-int32_t neoclr_string_replace_ordinal_v1(const neoclr_aot_text *text,
+static int32_t string_replace_ordinal(const neoclr_aot_text *text,
     const neoclr_aot_text *old_value, const neoclr_aot_text *new_value,
-    neoclr_aot_text_arena *arena, const neoclr_aot_text **output) {
+    neoclr_aot_text_arena *arena, const neoclr_aot_text **output, int rooted) {
     if (!text || !old_value || !new_value || !old_value->length || !arena || !output ||
         arena->used > arena->capacity || (arena->capacity && !arena->data) ||
         ((uintptr_t)arena->data & 7)) return NEOCLR_AOT_FAULT_RUNTIME_ERROR;
@@ -713,7 +713,8 @@ int32_t neoclr_string_replace_ordinal_v1(const neoclr_aot_text *text,
     if (!count) { *output = text; return 0; }
     if (length > UINT64_MAX - 8) return NEOCLR_AOT_FAULT_NATIVE_MEMORY_LIMIT;
     void *storage;
-    int32_t status = reserve_storage(arena, 8 + length, TEXT_STORAGE, &storage);
+    const void *values[] = {text, old_value, new_value};
+    int32_t status = reserve_values(arena, 8 + length, TEXT_STORAGE, &storage, rooted, values, 3);
     if (status) return status;
     neoclr_aot_text *result = storage;
     result->length = length;
@@ -730,6 +731,31 @@ int32_t neoclr_string_replace_ordinal_v1(const neoclr_aot_text *text,
     memcpy(result->bytes + written, text->bytes + start, (size_t)(text->length - start));
     *output = result;
     return 0;
+}
+
+int32_t neoclr_path_combine_unix_v1(const neoclr_aot_text *left, const neoclr_aot_text *right,
+    neoclr_aot_text_arena *arena, const neoclr_aot_text **output) {
+    return path_combine_unix(left, right, arena, output, 0);
+}
+int32_t neoclr_path_combine_unix_rooted_v1(const neoclr_aot_text *left, const neoclr_aot_text *right,
+    neoclr_aot_text_arena *arena, const neoclr_aot_text **output) {
+    return path_combine_unix(left, right, arena, output, 1);
+}
+int32_t neoclr_path_file_name_unix_v1(const neoclr_aot_text *path,
+    neoclr_aot_text_arena *arena, const neoclr_aot_text **output) {
+    return path_file_name_unix(path, arena, output, 0);
+}
+int32_t neoclr_path_file_name_unix_rooted_v1(const neoclr_aot_text *path,
+    neoclr_aot_text_arena *arena, const neoclr_aot_text **output) {
+    return path_file_name_unix(path, arena, output, 1);
+}
+int32_t neoclr_string_replace_ordinal_v1(const neoclr_aot_text *text, const neoclr_aot_text *old_value, const neoclr_aot_text *new_value,
+    neoclr_aot_text_arena *arena, const neoclr_aot_text **output) {
+    return string_replace_ordinal(text, old_value, new_value, arena, output, 0);
+}
+int32_t neoclr_string_replace_ordinal_rooted_v1(const neoclr_aot_text *text, const neoclr_aot_text *old_value, const neoclr_aot_text *new_value,
+    neoclr_aot_text_arena *arena, const neoclr_aot_text **output) {
+    return string_replace_ordinal(text, old_value, new_value, arena, output, 1);
 }
 
 /* Private writable construction buffer. The caller initializes every byte before

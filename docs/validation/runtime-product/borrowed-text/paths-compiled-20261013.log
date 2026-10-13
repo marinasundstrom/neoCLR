@@ -1,0 +1,10 @@
+   Compiling neoclr v0.1.0-preview.13 (/Users/robert/Projects/neoclr)
+   Compiling neoclr-aot-poc v0.0.0 (/Users/robert/Projects/neoclr/tools/aot-poc)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 27.12s
+     Running tests/console.rs (target/debug/deps/console-dafeb0f53eda77bd)
+
+running 2 tests
+test lexical_paths_require_exact_opt_in_contracts ... ok
+test lexical_paths_match_interpreter_bytes_faults_and_gc_ownership ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 152 filtered out; finished in 2.28s

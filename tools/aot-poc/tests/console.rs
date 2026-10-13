@@ -5512,6 +5512,17 @@ ret
 #[test]
 #[cfg(all(target_os = "macos", target_arch = "aarch64"))]
 fn string_replace_ordinal_matches_interpreter_and_checks_admission() {
+    check_string_replace_ordinal(false);
+}
+
+#[test]
+#[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+fn string_replace_ordinal_native_gc_matches_interpreter() {
+    check_string_replace_ordinal(true);
+}
+
+#[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+fn check_string_replace_ordinal(gc: bool) {
     let seed = neoclr::assemble(&format!(
         ".module System\n.references ()\n{}\n{}",
         include_str!("../../../runtime/neoCLR/Runtime/StringReplaceOrdinal.neoil"),
@@ -5565,7 +5576,7 @@ fn string_replace_ordinal_matches_interpreter_and_checks_admission() {
             &dir,
             &seed,
             &app,
-            &["--compile-system", "--reference-arena", "--bind-utf8-text"],
+            &if gc { vec!["--compile-system", "--reference-arena", "--bind-utf8-text", "--native-gc"] } else { vec!["--compile-system", "--reference-arena", "--bind-utf8-text"] },
         );
         assert!(
             result.status.success(),
@@ -5573,9 +5584,20 @@ fn string_replace_ordinal_matches_interpreter_and_checks_admission() {
             String::from_utf8_lossy(&result.stderr)
         );
         let base = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../docs/experiments");
-        let result = Command::new("clang")
+        let host = if gc {
+            let source = fs::read_to_string(base.join("aot-console/text-host.c")).unwrap()
+                .replace("#include \"text-arena.h\"", "#include \"native-gc.h\"")
+                .replace("        return neoclr_aot_render_fault(stderr, &context.fault) ? 2 : 1;", "        if (neoclr_gc_collect_v1(&context, NULL)) return 5;\n        if (neoclr_aot_render_fault(stderr, &context.fault)) return 2;\n        context.fault = (neoclr_aot_fault){0};\n        if (neoclr_gc_collect_v1(&context, NULL) || context.text.used) return 6;\n        return 1;")
+                .replace("    return result;", "    if (neoclr_gc_collect_v1(&context, NULL) || context.text.used) return 7;\n    return result;");
+            fs::write(dir.0.join("host.c"), source).unwrap();
+            dir.0.join("host.c")
+        } else { base.join("aot-console/text-host.c") };
+        let mut command = Command::new("clang");
+        if gc { command.arg("-DNEOCLR_NATIVE_GC").arg("-I").arg(base.join("aot-console"))
+            .arg(base.join("aot-console/native-gc.c")).arg(base.join("aot-console/root-probe.c")); }
+        let result = command
             .args(["-arch", "arm64", "-std=c11", "-Wall", "-Wextra", "-Werror"])
-            .arg(base.join("aot-console/text-host.c"))
+            .arg(host)
             .arg(base.join("aot-console/text-arena.c"))
             .arg(base.join("aot-fault-details/render.c"))
             .arg(dir.0.join("app.o"))
