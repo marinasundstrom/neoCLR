@@ -259,6 +259,19 @@ not prove every lifetime path is correct. The experiment record links the raw
 profiles and checks. GC pause distributions and Windows allocation-per-request
 measurements are not yet presented as a comparable benchmark series.
 
+## Development: dense collection refinement
+
+A 2026-10-14 macOS ARM64 comparison reuses validated heap spans when building the
+larger native GC lookup table. Seven alternating pairs with longer timing intervals
+show 2.1–3.3% higher collection throughput on dense object graphs; small/sparse
+controls are within 1%. Windows paired results improve 3.6–6.9% on dense cases. Both platforms pass
+correctness checks; noisy hosted macOS results are retained separately.
+Full validation and collection policy remain unchanged.
+This is a collection-only result, not an HTTP speedup. The accompanying HTTP
+regression check validates 768 responses with overlapping timing ranges.
+[Methodology, correctness checks and raw results](https://github.com/marinasundstrom/neoCLR/tree/main/benchmarks/gc-index#reuse-validated-spans-for-the-dense-index--2026-10-14)
+are retained separately from published release benchmarks.
+
 ## What the results guide
 
 The matched wait experiment above separates a large Windows waiting cost from

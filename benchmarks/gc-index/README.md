@@ -12,12 +12,12 @@ payload bounds. Large populations of small objects make those repeated walks
 expensive, even though the worklist visits each live object only once.
 
 The candidate counts blocks during the existing validation pass. Above 2,048
-blocks it rebuilds a 4,096-entry index before tracing. Smaller populations retain
+blocks it rebuilds a 4,096-entry index before tracing, reusing validated spans. Smaller populations retain
 the 256-entry index. A no-inline helper confines the additional 32 KiB stack
 reservation to the dense path. There is no native or managed allocation, retained
 index, new object header, write barrier, or change to collection frequency.
 
-Costs: dense collections perform another validated header walk and temporarily
+Costs: dense collections perform another bucket-building header walk and temporarily
 use an additional 32 KiB of native stack. The threshold and capacity are provisional,
 measured engineering choices, not managed contracts. Populations include free
 spans. A fixed maximum index does not remove asymptotic lookup growth for very
@@ -161,4 +161,36 @@ corruption rejection with byte-for-byte heap preservation, unchanged conditional
 outputs, no resource cleanup, and successful collection after repair. Existing
 interior roots, holes, suspended ownership, abandonment and full reclamation pass.
 Use `--collection-scale 10` to reproduce longer timing intervals. Hosted platform
-qualification and the matched HTTP regression check follow separately.
+qualification follows separately.
+
+The matched AOT plain/JSON HTTP comparison passes all 768 responses (five
+alternating pairs plus warmups) with no observed regression. Ranges overlap; the
+1.01× JSON and 1.04× plain medians do not establish an application gain. These
+small-heap, state-machine guest fixtures control the shared collector change; they
+are not fresh runtime-await SDK or saturation benchmarks. The two separate phase
+profiles per workload pass another 128 responses with complete reclamation and
+zero collector/poll failures. Input identities and all timings are retained.
+
+The profiles still show 86–91% of stress collections with no intervening allocation:
+160,756–160,760 of roughly 177,100 plain collections, and 233,588–233,590 of
+roughly 271,950 JSON collections. Root seeding/tracing remain larger intervals than
+index construction. This supports the existing next priority of sustained/concurrent
+pacing qualification rather than inferring that dense lookup tuning solves HTTP
+throughput. No collection can be skipped solely because allocation has not changed:
+roots and ownership may have changed, and idle cleanup must remain reliable.
+
+Hosted [run 38475210948, attempt 1](https://github.com/marinasundstrom/neoCLR/actions/runs/38475210948/attempts/1)
+at `eb0223df1` passes macOS and Windows GC/root and socket/package gates. Windows
+dense collection throughput improves 3.6–6.9%; small controls are within 0.1%.
+All reported diagnostic visits/reclamation counts preserve the expected invariants.
+Hosted macOS timings are noisy, including a sparse atomic median ratio of 0.794
+with baseline 0.081–0.198 s and candidate 0.074–0.126 s. These samples are retained;
+no hosted macOS speedup or regression-free claim is made from this attempt. A
+macOS-only repeat checks the unresolved variability without discarding this run.
+
+The macOS-only repeat (attempt 2) also passes all contracts. Dense ratios range
+1.04–1.22×, while the sparse control is 0.988×; small controls range 0.970–1.063×.
+The reversal and variability confirm that hosted macOS is unsuitable for resolving
+this small effect precisely. Retain both attempts; use the stable local seven-pair
+macOS run and hosted Windows pairs for the bounded improvement claim. Neither
+platform run changes pacing defaults. Website content is updated locally only.
