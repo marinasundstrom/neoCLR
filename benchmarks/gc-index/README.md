@@ -126,3 +126,13 @@ The final dense conditional-owner/cleanup regression also passes Windows in
 [run 38417769718](https://github.com/marinasundstrom/neoCLR/actions/runs/38417769718),
 with all 18 GC/root executions and macOS/Windows socket contracts successful.
 `windows-final-contracts-38417769718.json` retains the exact tested input hashes.
+
+## Index construction profiling — 2026-10-14
+
+Diagnostic copies now count header validation as well as address-lookup visits,
+with counters reset after construction and before timed collections. Ordinary
+measurement binaries remain uninstrumented. The identical-source control in
+`validation-profile-macos-20261014.json` confirms one validation per block on
+small heaps and two on dense heaps: a 16,384-object chain validates 32,768
+headers per collection. This identifies redundant validation work, not its exact
+CPU share or a measured optimization. Small control timings remain noisy.

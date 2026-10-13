@@ -57,7 +57,11 @@ def main():
                     marker = '        if (offset < at + b->span) return b;'
                     if source.count(marker) != 1:
                         raise ValueError('lookup diagnostic hook moved')
-                    source_copy = '#include <stdint.h>\nuint64_t lookup_steps;\n' + source.replace(marker, '        lookup_steps++;\n' + marker)
+                    validation_marker = 'static int block_valid(const neoclr_aot_text_arena *a, uint64_t at) {'
+                    if source.count(validation_marker) != 1:
+                        raise ValueError('header validation diagnostic hook moved')
+                    source_copy = '#include <stdint.h>\nuint64_t lookup_steps, validation_steps;\n' + source.replace(marker, '        lookup_steps++;\n' + marker)
+                    source_copy = source_copy.replace(validation_marker, validation_marker + '\n    validation_steps++;')
                 else:
                     source_copy = source
                 src = out / (label + '.c')

@@ -20,7 +20,7 @@ static double seconds(void) {
 }
 #endif
 #ifdef LOOKUP_DIAGNOSTICS
-extern uint64_t lookup_steps;
+extern uint64_t lookup_steps, validation_steps;
 #endif
 int main(int argc, char **argv) {
     if (argc != 4) return 1;
@@ -49,15 +49,15 @@ int main(int argc, char **argv) {
     neoclr_probe_frame frame = {.context = &c, .storage = &slot, .storage_count = 1};
     if (neoclr_gc_collect_v1(&c, &frame)) return 4;
 #ifdef LOOKUP_DIAGNOSTICS
-    lookup_steps = 0;
+    lookup_steps = validation_steps = 0;
 #endif
     double start = seconds();
     for (int i = 0; i < rounds; i++) if (neoclr_gc_collect_v1(&c, &frame)) return 4;
     double elapsed = seconds() - start;
 #ifdef LOOKUP_DIAGNOSTICS
-    uint64_t steps = lookup_steps;
+    uint64_t steps = lookup_steps, validations = validation_steps;
 #else
-    uint64_t steps = 0;
+    uint64_t steps = 0, validations = 0;
 #endif
     uint64_t cursor = root;
     for (int i = 0; i < nodes; i++) {
@@ -73,8 +73,8 @@ int main(int argc, char **argv) {
     root = 0;
     if (neoclr_gc_collect_v1(&c, &frame) || c.text.used ||
         neoclr_gc_statistics_v1().allocations != neoclr_gc_statistics_v1().reclaimed_allocations) return 6;
-    printf("{\"seconds\":%.9f,\"lookupSteps\":%llu,\"reclaimed\":%llu}\n", elapsed,
-        (unsigned long long)steps, (unsigned long long)neoclr_gc_statistics_v1().reclaimed_allocations);
+    printf("{\"seconds\":%.9f,\"lookupSteps\":%llu,\"validationSteps\":%llu,\"reclaimed\":%llu}\n", elapsed,
+        (unsigned long long)steps, (unsigned long long)validations, (unsigned long long)neoclr_gc_statistics_v1().reclaimed_allocations);
     free(buffer);
     return 0;
 }

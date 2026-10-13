@@ -6,6 +6,10 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ## Unreleased
 
+### 2026-10-14
+
+- Add collection header-validation counters to the native GC graph profiler, separate from uninstrumented timing. Retain identical-source controls confirming duplicate dense-heap validation; no runtime behavior change.
+
 ### 2026-10-13
 
 - Replace development HTTP JSON client helper error signatures with HttpError | JsonError and propagate the original causes directly. Retain domain unions and the legacy HttpJsonError type for explicit contracts. This requires rebuilding consumers and updating wrapper patterns; update report samples and API/website documentation. Fix Raven constructor-expression union binding on main and the native branch, removing the temporary alias workaround. Fix native runtime-await propagation completion and cleanup, and expand style guidance with tested composition examples. Both compiler lines pass 16 focused tests; eight native consumers compile/verify, four execute, and API snapshot plus 11 website checks pass.
