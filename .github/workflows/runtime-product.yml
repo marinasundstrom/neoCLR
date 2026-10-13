@@ -1,7 +1,16 @@
 name: Runtime product integration
 on:
   workflow_dispatch:
+    inputs:
+      windows_only:
+        description: Run only the Windows qualification after a platform-specific fix
+        type: boolean
+        default: false
   workflow_call:
+    inputs:
+      windows_only:
+        type: boolean
+        default: false
   push:
     paths:
       - 'Cargo.toml'
@@ -31,7 +40,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [macos-latest, windows-2022]
+        os: ${{ fromJSON(inputs.windows_only && '["windows-2022"]' || '["macos-latest", "windows-2022"]') }}
     runs-on: ${{ matrix.os }}
     timeout-minutes: 35
     env:
