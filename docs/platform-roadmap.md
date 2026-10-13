@@ -5,7 +5,8 @@ shows 29–35% higher plain/JSON HTTP throughput after removing duplicate diagno
 root-value reads. Validation and full collection boundaries remain; all 1,536 timed
 comparison responses, 192 diagnostic responses and focused native lifetime/root
 checks pass. These fixed-fixture macOS results are development evidence, not new
-published release numbers. The rooted admission primitive is implemented and tested,
+published release numbers. A separate newer streaming-library AOT comparison also
+passes 768 responses and shows 27.5% plain/30.4% JSON improvement. The rooted admission primitive is implemented and tested,
 but helper-root integration is still required before reconsidering GC pacing.
 
 **Collection pacing experiment (2026-10-13):** [isolated AOT evidence](../benchmarks/http-gc-pacing/README.md)

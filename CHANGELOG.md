@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-13
 
+- Confirm the native root-observation optimization on newer streaming HTTP fixtures: five-round AOT comparisons show 27.5% plain-text and 30.4% JSON gains with 768 validated responses. Retain separate evidence and add an explicit AOT-only comparison mode; newer-fixture JIT qualification remains open.
+
 - Remove duplicate diagnostic root-value reads in native GC builds while preserving descriptor/fault validation and full collection boundaries. Retained five-round macOS HTTP comparisons show 29–35% higher JIT/AOT plain/JSON throughput; sanitizer, malformed-root rejection and complete HTTP reclamation checks pass. Results are development evidence, not published release benchmarks.
 
 - Add a private, opt-in rooted native allocation admission/retry primitive and sanitizer checks for pressure, preserved roots and invalid boundaries. Existing allocation helpers remain non-collecting; GC pacing is still disabled pending complete helper-root integration.

@@ -80,3 +80,41 @@ The preparation report and linked guest objects must still be available. Raw
 reports retain commands and input hashes. Use `validate_conditional_roots.py
 --owned-bodies` for focused native checks, and `benchmarks/http-scheduling/profile.py
 --gc-phases` with matching native build reports for reclamation/phase diagnostics.
+
+## Streaming-library follow-up
+
+The [separate streaming-fixture comparison](root-observation-streaming-comparison-20261013.json)
+uses the newer `http-concurrent-plain/json-20261013` native build records, including
+the streaming HTTP library. These workloads are still sequential plain/JSON request
+processing, not a concurrent throughput benchmark. The same five-round protocol
+and pre-optimization baseline apply; only `root-probe.c` differs within each pair.
+
+| Workload | Mode | Baseline median requests/s (range) | Candidate median requests/s (range) | Gain |
+| --- | --- | ---: | ---: | ---: |
+| Plain text | AOT | 79.30 (72.98–80.10) | 101.11 (86.99–102.76) | 27.5% |
+| Object JSON | AOT | 40.93 (36.91–41.05) | 53.36 (48.79–53.67) | 30.4% |
+
+All 768 responses passed, including 480 timed requests. This confirms the improvement
+with the newer library. The retained full benchmark reports for these newer fixtures
+are not passing JIT qualifications, so this follow-up deliberately consumes their
+passing native build records with `--aot-only`. It makes no new JIT claim; the earlier
+matched JIT result above remains valid for its own fixtures. No failed aggregate
+report is relabeled as passing. MacOS ARM64 only; website publication remains on hold.
+
+```sh
+python3 benchmarks/http-server/compare-gc.py --aot-only \
+  --plain target/http-concurrent-plain-20261013/native/build.json \
+  --json target/http-concurrent-json-20261013/native/build.json \
+  --baseline 9cd74b374 --source root-probe.c --output NEW_DIRECTORY
+```
+
+The controller now supports explicit AOT-only comparisons from native build reports,
+requires the selected source in each link command, and records measured modes and
+round count. JIT comparisons still require a passing host preparation report.
+
+Separate instrumented [plain](root-observation-streaming-plain-profile-20261013.json)
+and [JSON](root-observation-streaming-json-profile-20261013.json) runs validate another
+128 responses. All 16,340 plain / 38,358 JSON allocations per process are reclaimed,
+with zero collector failures. Peak arena extents are 13,216 / 19,672 bytes, matching
+the prior stress-policy fixture evidence. The optimization reduces root observation
+work rather than the number of allocations or collection boundaries.
