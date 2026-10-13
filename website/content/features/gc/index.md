@@ -98,5 +98,7 @@ changes lookup work, not managed lifetime semantics or collection frequency.
 Native allocation now combines full heap validation with free-space selection in
 one walk. Audited concat/join and UTF-8 slicing helpers can retain their inputs while collecting and
 retrying an output allocation. Integer formatting can also retry its sole output
-allocation after formatting into native stack storage. Broader collection pacing remains experimental;
+allocation after formatting into native stack storage. Byte and scalar array
+construction can retry allocation before initializing and publishing the array.
+Broader collection pacing remains experimental;
 see the [allocation benchmark and qualification](/benchmarks/gc/#allocation-throughput-2026-10-13).

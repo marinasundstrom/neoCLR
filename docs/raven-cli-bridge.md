@@ -9277,7 +9277,8 @@ remain separate qualification work. See neoCLR's
 
 ## Native collector helper specialization — 2026-10-13
 
-The neoCLR native backend now selects rooted concat/join, UTF-8 slice and Int32/Int64/UInt64 formatting helper symbols for
+The neoCLR native backend now selects rooted concat/join, UTF-8 slice,
+Int32/Int64/UInt64 formatting and primitive-array allocation/reservation helpers for
 `--native-gc`, retaining noncollecting symbols for non-GC code. Temporary inputs
 are protected during a single allocation retry. This is native codegen/runtime
 integration: Raven Runtime Contract configuration, bridge representation, metadata

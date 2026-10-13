@@ -704,24 +704,46 @@ fn reference_arena_is_explicit_and_admits_closed_world_virtual_calls() {
 #[test]
 #[cfg(all(target_os = "macos", target_arch = "aarch64"))]
 fn packed_byte_arrays_bounds_borrows_and_faults_match_interpreter() {
+    check_packed_byte_arrays(false, false);
+}
+
+#[test]
+#[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+fn rooted_byte_arrays_bounds_borrows_and_faults_match_interpreter() {
+    check_packed_byte_arrays(true, false);
+    check_packed_byte_arrays(true, true);
+}
+
+#[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+fn check_packed_byte_arrays(native_gc: bool, reserved: bool) {
     let dir=Temp::new();
     let source=include_str!("../../../docs/experiments/aot-console/byte-array.neoil");
+    let source=if reserved {
+        // Reserved arrays require initialization-aware indexed stores, not element borrows.
+        source.replace("newarr Byte", "array.reserve Byte")
+            .replace("ldelema Byte\nldc.i4 255\ncall Fill(Byte&, Int32)\npop", "ldc.i4 255\nconv.u1\nstelem Byte")
+            .replace("ldelema Byte\nldc.i4 511\ncall Fill(Byte&, Int32)\npop", "ldc.i4 511\nconv.u1\nstelem Byte")
+    } else { source.to_owned() };
     let seed=neoclr::assemble(".module System\n.references ()\n").unwrap();
-    let denied=compile_source(&dir,&seed,source,&["--compile-system"],false);
+    let denied=compile_source(&dir,&seed,&source,&["--compile-system"],false);
     assert!(!denied.status.success() && !dir.0.join("app.o").exists());
-    let r=compile_source(&dir,&seed,source,&["--compile-system","--reference-arena"],false);
+    let mut flags=vec!["--compile-system","--reference-arena"];
+    if native_gc { flags.push("--native-gc"); }
+    let r=compile_source(&dir,&seed,&source,&flags,false);
     assert!(r.status.success(),"{}",String::from_utf8_lossy(&r.stderr));
     let base=PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../docs/experiments");
     fs::write(dir.0.join("host.c"),r#"
-#include "text-arena.h"
+#include "native-gc.h"
 #include <stdlib.h>
 #include <string.h>
 int main(int argc, char **argv) {
     uint64_t storage[16]; memset(storage,0xa5,sizeof(storage));
     neoclr_aot_context ctx={ .text={(unsigned char*)storage,17,0} };
     int32_t result=-99;
+    #ifndef NEOCLR_NATIVE_GC
     if (neoclr_entry_v4(42,&result,&ctx) || result!=255 || ctx.text.used!=17) return 90;
     for (unsigned i=17;i<sizeof(storage);i++) if (((unsigned char*)storage)[i]!=0xa5) return 91;
+    #endif
     ctx.text.capacity=sizeof(storage);result=-99;
     int input=argc>1 ? atoi(argv[1]) : 0;
     int status=neoclr_entry_v4(input,&result,&ctx);
@@ -729,14 +751,24 @@ int main(int argc, char **argv) {
         if (result!=-99 || ctx.fault.code!=(uint32_t)status) return 92;
         neoclr_aot_render_fault(stderr,&ctx.fault);return 1;
     }
+    #ifdef NEOCLR_NATIVE_GC
+    if (neoclr_gc_collect_v1(&ctx, NULL) || ctx.text.used || neoclr_gc_entry_check_v1(&ctx)) return 93;
+    #endif
     printf("%d\n",result);return 0;
 }
 "#).unwrap();
-    let r=Command::new("clang").args(["-arch","arm64","-std=c11","-Wall","-Wextra","-Werror","-I"]).arg(base.join("aot-console"))
+    let mut cc=Command::new("clang");
+    if native_gc {
+        cc.arg("-DNEOCLR_NATIVE_GC").arg(base.join("aot-console/root-probe.c")).arg(base.join("aot-console/native-gc.c"));
+        let imports=Command::new("nm").arg("-u").arg(dir.0.join("app.o")).output().unwrap();
+        let symbol=if reserved { "neoclr_reserve_bytes_rooted_v1" } else { "neoclr_allocate_bytes_rooted_v1" };
+        assert!(String::from_utf8_lossy(&imports.stdout).contains(symbol));
+    }
+    let r=cc.args(["-arch","arm64","-std=c11","-Wall","-Wextra","-Werror","-I"]).arg(base.join("aot-console"))
         .arg(dir.0.join("host.c")).arg(base.join("aot-console/text-arena.c")).arg(base.join("aot-fault-details/render.c"))
         .arg(dir.0.join("app.o")).arg("-o").arg(dir.0.join("app")).output().unwrap();
     assert!(r.status.success(),"{}",String::from_utf8_lossy(&r.stderr));
-    let app=neoclr::assemble(source).unwrap();
+    let app=neoclr::assemble(&source).unwrap();
     let program=neoclr::LoadedProgram::with_library(&app,&seed).unwrap();
     let method=program.resolve_function(&neoclr::assembler::parse_function_ref("Calculate(Int32)").unwrap()).unwrap();
     for value in [-4,-3,-2,-1,0,1,2,3,4,42] {
@@ -4720,6 +4752,8 @@ ret
         let dir = Temp::new();
         let r = compile_source(&dir, &seed, &source, &["--compile-system", "--reference-arena", "--native-gc"], false);
         assert!(r.status.success(), "{ty}: {}", String::from_utf8_lossy(&r.stderr));
+        let imports=Command::new("nm").arg("-u").arg(dir.0.join("app.o")).output().unwrap();
+        assert!(String::from_utf8_lossy(&imports.stdout).contains("neoclr_allocate_scalars_rooted_v1"));
         fs::write(dir.0.join("host.c"), r#"
 #include "native-gc.h"
 int main(void) {

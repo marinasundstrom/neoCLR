@@ -31,6 +31,23 @@ static int32_t reserve_storage(neoclr_aot_text_arena *arena, uint64_t bytes,
 #endif
 }
 
+/* Primitive-array initialization has no managed inputs and performs no callbacks.
+ * Only generated calls with a complete active boundary opt into collection. */
+static int32_t reserve_primitive_storage(neoclr_aot_text_arena *arena, uint64_t bytes,
+    void **output, int rooted) {
+#ifdef NEOCLR_NATIVE_GC
+    if (rooted) {
+        const neoclr_probe_frame *head = neoclr_root_probe_head_v1();
+        neoclr_aot_context *context = head ? (neoclr_aot_context *)head->context : NULL;
+        if (!context || &context->text != arena) return NEOCLR_AOT_FAULT_RUNTIME_ERROR;
+        return neoclr_gc_allocate_rooted_v1(context, head, bytes, BYTES_STORAGE, output);
+    }
+#else
+    (void)rooted;
+#endif
+    return reserve_storage(arena, bytes, BYTES_STORAGE, output);
+}
+
 /* Explicitly selected only by audited generated calls. Arena-only native callers
  * retain the noncollecting services until their entire temporary lifetime is audited. */
 static int32_t reserve_text_inputs(neoclr_aot_text_arena *arena, uint64_t bytes,
@@ -136,13 +153,13 @@ int32_t neoclr_allocate_object_v1(neoclr_aot_text_arena *arena, uint32_t type,
     return NEOCLR_AOT_FAULT_NONE;
 }
 
-static int32_t allocate_bytes(neoclr_aot_text_arena *arena, int32_t length, int reserved, void **output) {
+static int32_t allocate_bytes(neoclr_aot_text_arena *arena, int32_t length, int reserved, void **output, int rooted) {
     if (length < 0) return NEOCLR_AOT_FAULT_RUNTIME_ERROR;
     if (length > NEOCLR_NATIVE_BYTE_ARRAY_LIMIT) return NEOCLR_AOT_FAULT_ARRAY_LIMIT;
     if (arena->used > arena->capacity || (arena->capacity && !arena->data) ||
         ((uintptr_t)arena->data & 7)) return NEOCLR_AOT_FAULT_RUNTIME_ERROR;
     void *storage;
-    int32_t status = reserve_storage(arena, 16 + (uint64_t)length * (reserved ? 2 : 1), BYTES_STORAGE, &storage);
+    int32_t status = reserve_primitive_storage(arena, 16 + (uint64_t)length * (reserved ? 2 : 1), &storage, rooted);
     if (status) return status;
     unsigned char *array = storage;
     uint64_t kind = reserved ? UINT64_C(0x80000002) : UINT64_C(0x80000001), count = (uint64_t)length;
@@ -154,10 +171,17 @@ static int32_t allocate_bytes(neoclr_aot_text_arena *arena, int32_t length, int 
 }
 
 int32_t neoclr_allocate_bytes_v1(neoclr_aot_text_arena *arena, int32_t length, void **output) {
-    return allocate_bytes(arena, length, 0, output);
+    return allocate_bytes(arena, length, 0, output, 0);
 }
 int32_t neoclr_reserve_bytes_v1(neoclr_aot_text_arena *arena, int32_t length, void **output) {
-    return allocate_bytes(arena, length, 1, output);
+    return allocate_bytes(arena, length, 1, output, 0);
+}
+
+int32_t neoclr_allocate_bytes_rooted_v1(neoclr_aot_text_arena *arena, int32_t length, void **output) {
+    return allocate_bytes(arena, length, 0, output, 1);
+}
+int32_t neoclr_reserve_bytes_rooted_v1(neoclr_aot_text_arena *arena, int32_t length, void **output) {
+    return allocate_bytes(arena, length, 1, output, 1);
 }
 
 static int32_t check_bytes_initialized(const void *array, int32_t offset, int32_t count) {
@@ -233,7 +257,7 @@ int32_t neoclr_utf8_encode_v1(const neoclr_aot_text *text, neoclr_aot_text_arena
     if (!text) return NEOCLR_AOT_FAULT_RUNTIME_ERROR;
     if (text->length > NEOCLR_NATIVE_BYTE_ARRAY_LIMIT) return NEOCLR_AOT_FAULT_ARRAY_LIMIT;
     void *array;
-    int32_t status = allocate_bytes(arena, (int32_t)text->length, 0, &array);
+    int32_t status = allocate_bytes(arena, (int32_t)text->length, 0, &array, 0);
     if (status) return status;
     /* Distinct private kind. No admitted operation mutates these value snapshots;
      * copies can safely share storage until the invocation arena is released. */
@@ -542,15 +566,15 @@ int32_t neoclr_allocate_references_v1(neoclr_aot_text_arena *arena, int32_t leng
     return NEOCLR_AOT_FAULT_NONE;
 }
 
-int32_t neoclr_allocate_scalars_v1(neoclr_aot_text_arena *arena, int32_t length,
-                                 int32_t reserved, void **output) {
+static int32_t allocate_scalars(neoclr_aot_text_arena *arena, int32_t length,
+                                 int32_t reserved, void **output, int rooted) {
     if (length < 0 || !arena || !output || (reserved != 0 && reserved != 1))
         return NEOCLR_AOT_FAULT_RUNTIME_ERROR;
     if (length > 65536) return NEOCLR_AOT_FAULT_ARRAY_LIMIT;
     void *storage;
     uint64_t bytes = 24 + (uint64_t)length * 9;
     /* Scalar bits, even pointer-shaped integers, must not retain other objects. */
-    int32_t status = reserve_storage(arena, bytes, BYTES_STORAGE, &storage);
+    int32_t status = reserve_primitive_storage(arena, bytes, &storage, rooted);
     if (status) return status;
     uint64_t header[] = {UINT64_C(0x80000006), (uint64_t)length, 1};
     memcpy(storage, header, sizeof(header));
@@ -558,6 +582,15 @@ int32_t neoclr_allocate_scalars_v1(neoclr_aot_text_arena *arena, int32_t length,
     memset((unsigned char *)storage + 24 + (size_t)length * 8, reserved ? 0 : 1, (size_t)length);
     *output = storage;
     return NEOCLR_AOT_FAULT_NONE;
+}
+
+int32_t neoclr_allocate_scalars_v1(neoclr_aot_text_arena *arena, int32_t length,
+    int32_t reserved, void **output) {
+    return allocate_scalars(arena, length, reserved, output, 0);
+}
+int32_t neoclr_allocate_scalars_rooted_v1(neoclr_aot_text_arena *arena, int32_t length,
+    int32_t reserved, void **output) {
+    return allocate_scalars(arena, length, reserved, output, 1);
 }
 
 int32_t neoclr_string_compare_ordinal_v1(const neoclr_aot_text *left,

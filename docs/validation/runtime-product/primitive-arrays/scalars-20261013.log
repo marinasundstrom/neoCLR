@@ -1,0 +1,7 @@
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.07s
+     Running tests/console.rs (target/debug/deps/console-dafeb0f53eda77bd)
+
+running 1 test
+test native_scalar_arrays_preserve_types_defaults_roots_and_faults ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 151 filtered out; finished in 13.56s

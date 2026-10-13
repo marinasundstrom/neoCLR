@@ -1,0 +1,9 @@
+   Compiling neoclr-aot-poc v0.0.0 (/Users/robert/Projects/neoclr/tools/aot-poc)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 9.24s
+     Running tests/console.rs (target/debug/deps/console-dafeb0f53eda77bd)
+
+running 2 tests
+test packed_byte_arrays_bounds_borrows_and_faults_match_interpreter ... ok
+test rooted_byte_arrays_bounds_borrows_and_faults_match_interpreter ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 150 filtered out; finished in 3.49s

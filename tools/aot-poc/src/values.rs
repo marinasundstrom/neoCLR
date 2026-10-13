@@ -578,20 +578,20 @@ pub(crate) fn compile_into(
         let mut sig = module.make_signature();
         sig.params.extend([AbiParam::new(types::I64), AbiParam::new(types::I32), AbiParam::new(types::I64)]);
         sig.returns.push(AbiParam::new(types::I32));
-        Some(module.declare_function("neoclr_allocate_bytes_v1", Linkage::Import, &sig)?)
+        Some(module.declare_function(if details.is_some_and(|d| d.native_gc) { "neoclr_allocate_bytes_rooted_v1" } else { "neoclr_allocate_bytes_v1" }, Linkage::Import, &sig)?)
     } else { None };
     let reserve_service = if references && input.functions.iter().any(|f| f.body.iter().any(|op| matches!(op, Op::ReserveArray(neoclr::metadata::Type::Byte)))) {
         let mut sig = module.make_signature();
         sig.params.extend([types::I64, types::I32, types::I64].map(AbiParam::new));
         sig.returns.push(AbiParam::new(types::I32));
-        Some(module.declare_function("neoclr_reserve_bytes_v1", Linkage::Import, &sig)?)
+        Some(module.declare_function(if details.is_some_and(|d| d.native_gc) { "neoclr_reserve_bytes_rooted_v1" } else { "neoclr_reserve_bytes_v1" }, Linkage::Import, &sig)?)
     } else { None };
     let scalar_array_service = if references && input.functions.iter().any(|f| f.body.iter().any(|op|
         matches!(op, Op::NewArray(t) | Op::ReserveArray(t) if crate::selection::scalar_array_element(t)))) {
         let mut sig = module.make_signature();
         sig.params.extend([types::I64, types::I32, types::I32, types::I64].map(AbiParam::new));
         sig.returns.push(AbiParam::new(types::I32));
-        Some(module.declare_function("neoclr_allocate_scalars_v1", Linkage::Import, &sig)?)
+        Some(module.declare_function(if details.is_some_and(|d| d.native_gc) { "neoclr_allocate_scalars_rooted_v1" } else { "neoclr_allocate_scalars_v1" }, Linkage::Import, &sig)?)
     } else { None };
     let default_reference_array_service = if references && input.functions.iter().any(|f| f.body.iter().any(|op|
         matches!(op, Op::NewArray(neoclr::metadata::Type::Named(_))))) {

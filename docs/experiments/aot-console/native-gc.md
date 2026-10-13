@@ -589,7 +589,8 @@ Remaining admission audit:
 | Family | Required protection before opting in | Current policy |
 | --- | --- | --- |
 | Int32/Int64/UInt64 formatting | Native stack scratch; complete caller boundary; publish result before next allocation | Generated GC calls use rooted retry |
-| Other scalar formatting / primitive arrays | Complete caller boundary, publish result before next allocation | Noncollecting |
+| Byte/scalar array allocation and reservation | No managed inputs; finish header, zeroing and initialization flags before publication | Generated GC calls use rooted retry |
+| Other scalar formatting / reference arrays | Complete caller boundary; audit construction inputs and intermediates | Noncollecting |
 | Grapheme slicing, encoding, replacement and paths | Retain borrowed inputs and any backing arrays | Noncollecting |
 | Unicode sequence construction | Retain partially initialized result arrays and each constructed element | Noncollecting |
 | Native file/network/TLS/SQL producers | Retain managed intermediates; keep native handles/buffers alive; never replay I/O to retry allocation | Noncollecting |
@@ -629,3 +630,25 @@ package checks and four focused compiled consumers (including 30 wide-integer
 interpreter comparisons). [Retained evidence](../../validation/runtime-product/integer-formatting/README.md).
 The hosted macOS/Windows gate also passes all 22 GC/root checks, socket contracts
 and package checks; the evidence records its exact revision and scope.
+
+Primitive-array follow-up (2026-10-13): generated native-GC byte allocation,
+byte reservation and scalar-array construction select private rooted entry points.
+They retry only storage allocation at the complete caller boundary, initialize the
+header/payload/initialization map without reentry, and publish before any further
+collection. Validation errors still precede allocation, and real live exhaustion
+remains a terminal resource fault. Reserved elements remain unreadable until written;
+ordinary arrays preserve zero/default initialization. Atomic GC storage prevents
+pointer-shaped numeric payloads from retaining managed objects.
+
+Existing native entry points, non-GC emission and UTF-8 encoding's borrowed-input
+caller remain noncollecting. Reference/string/record arrays are outside this audit.
+As with CLR array allocation, a collecting allocation requires the caller's managed
+references to be visible; the private layout and native symbols are neoCLR details,
+not a new language contract or public API. No Raven Runtime Contract, bridge
+metadata or .NET behavior changes. Newly generated GC objects need matching native
+hosts. General pacing remains disabled pending the remaining helper and idle audit.
+
+Local qualification passes 23 GC/root checks, GC/non-GC relocated-package checks
+and 107 compiled byte/scalar comparisons with interpreter results/faults.
+[Retained evidence](../../validation/runtime-product/primitive-arrays/README.md).
+Hosted macOS/Windows qualification is pending.
