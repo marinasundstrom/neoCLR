@@ -14,6 +14,10 @@ on:
         description: Qualify the closed rooted-admission pacing experiment
         type: boolean
         default: false
+      benchmark_gc_handles:
+        description: Run matched GC handle admission benchmarks
+        type: boolean
+        default: false
       benchmark_gc_allocation:
         description: Run matched allocation traversal benchmarks
         type: boolean
@@ -78,6 +82,9 @@ jobs:
       - name: Run macOS socket contracts
         if: runner.os == 'macOS'
         run: python3 scripts/validate-native-network.py --output target/native-network-validation
+      - name: Run macOS GC and root contracts
+        if: runner.os == 'macOS' && inputs.benchmark_gc_handles
+        run: python3 scripts/validate-native-gc.py --output target/native-gc-validation
       - name: Qualify relocated macOS collector package
         if: runner.os == 'macOS'
         run: python3 -m unittest discover -s scripts -p test_native_gc_layout.py
@@ -111,6 +118,17 @@ jobs:
           if (-not $vs) { throw 'MSVC x64 tools not found' }
           cmd /c "`"$vs\VC\Auxiliary\Build\vcvars64.bat`" && python benchmarks/gc-index/benchmark.py --baseline 924b45110 --output target/gc-index-benchmark"
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+      - name: Benchmark macOS GC handle admission
+        if: runner.os == 'macOS' && inputs.benchmark_gc_handles
+        run: python3 benchmarks/gc-handles/benchmark.py --baseline cf342fb8c --output target/gc-handles-benchmark
+      - name: Benchmark Windows GC handle admission
+        if: runner.os == 'Windows' && inputs.benchmark_gc_handles
+        shell: pwsh
+        run: |
+          $vs = & "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\vswhere.exe" -latest -products '*' -requires Microsoft.VisualStudio.Component.VC.Tools.x86.x64 -property installationPath
+          if (-not $vs) { throw 'MSVC x64 tools not found' }
+          cmd /c "`"$vs\VC\Auxiliary\Build\vcvars64.bat`" && python benchmarks/gc-handles/benchmark.py --baseline cf342fb8c --output target/gc-handles-benchmark"
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
       - name: Benchmark macOS GC allocation
         if: runner.os == 'macOS' && inputs.benchmark_gc_allocation
         run: python3 benchmarks/gc-allocation/benchmark.py --baseline 13edfa189 --output target/gc-allocation-benchmark
@@ -142,6 +160,7 @@ jobs:
             target/native-gc-validation/
             target/gc-index-benchmark/
             target/gc-allocation-benchmark/
+            target/gc-handles-benchmark/
             target/rooted-pacing/
           retention-days: 14
           if-no-files-found: warn

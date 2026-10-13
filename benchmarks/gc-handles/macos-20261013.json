@@ -1,0 +1,3824 @@
+{
+  "passed": true,
+  "platform": "macOS-27.0-arm64-arm-64bit",
+  "machine": "arm64",
+  "baseline": "cf342fb8c",
+  "commands": [
+    {
+      "command": [
+        "xcrun",
+        "--sdk",
+        "macosx",
+        "--find",
+        "clang"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "xcrun",
+        "--sdk",
+        "macosx",
+        "--show-sdk-path"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "git",
+        "-C",
+        "/Users/robert/Projects/neoclr",
+        "rev-parse",
+        "HEAD"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "git",
+        "-C",
+        "/Users/robert/Projects/neoclr",
+        "show",
+        "cf342fb8c:runtime/native/gc/native-gc.c"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang",
+        "--version"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang",
+        "-std=c11",
+        "-O2",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-DNEOCLR_NATIVE_GC",
+        "-I",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console",
+        "-isysroot",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.2.sdk",
+        "/Users/robert/Projects/neoclr/benchmarks/gc-handles/workload.c",
+        "/Users/robert/Projects/neoclr/target/gc-handles-final-20261013/baseline.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/root-probe.c",
+        "-o",
+        "/Users/robert/Projects/neoclr/target/gc-handles-final-20261013/baseline"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang",
+        "-std=c11",
+        "-O2",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-DNEOCLR_NATIVE_GC",
+        "-I",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console",
+        "-isysroot",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.2.sdk",
+        "/Users/robert/Projects/neoclr/benchmarks/gc-handles/workload.c",
+        "/Users/robert/Projects/neoclr/target/gc-handles-final-20261013/candidate.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/root-probe.c",
+        "-o",
+        "/Users/robert/Projects/neoclr/target/gc-handles-final-20261013/candidate"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-handles-final-20261013/baseline",
+        "16",
+        "1250000",
+        "0",
+        "-1"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-handles-final-20261013/candidate",
+        "16",
+        "1250000",
+        "0",
+        "-1"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-handles-final-20261013/baseline",
+        "16",
+        "1250000",
+        "0",
+        "-1"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-handles-final-20261013/candidate",
+        "16",
+        "1250000",
+        "0",
+        "-1"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-handles-final-20261013/candidate",
+        "16",
+        "1250000",
+        "0",
+        "-1"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-handles-final-20261013/baseline",
+        "16",
+        "1250000",
+        "0",
+        "-1"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-handles-final-20261013/baseline",
+        "16",
+        "1250000",
+        "0",
+        "-1"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-handles-final-20261013/candidate",
+        "16",
+        "1250000",
+        "0",
+        "-1"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-handles-final-20261013/candidate",
+        "16",
+        "1250000",
+        "0",
+        "-1"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-handles-final-20261013/baseline",
+        "16",
+        "1250000",
+        "0",
+        "-1"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-handles-final-20261013/baseline",
+        "16",
+        "1250000",
+        "0",
+        "-1"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-handles-final-20261013/candidate",
+        "16",
+        "1250000",
+        "0",
+        "-1"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-handles-final-20261013/baseline",
+        "16",
+        "1250000",
+        "15",
+        "-1"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-handles-final-20261013/candidate",
+        "16",
+        "1250000",
+        "15",
+        "-1"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-handles-final-20261013/baseline",
+        "16",
+        "1250000",
+        "15",
+        "-1"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-handles-final-20261013/candidate",
+        "16",
+        "1250000",
+        "15",
+        "-1"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-handles-final-20261013/candidate",
+        "16",
+        "1250000",
+        "15",
+        "-1"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-handles-final-20261013/baseline",
+        "16",
+        "1250000",
+        "15",
+        "-1"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-handles-final-20261013/baseline",
+        "16",
+        "1250000",
+        "15",
+        "-1"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-handles-final-20261013/candidate",
+        "16",
+        "1250000",
+        "15",
+        "-1"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-handles-final-20261013/candidate",
+        "16",
+        "1250000",
+        "15",
+        "-1"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-handles-final-20261013/baseline",
+        "16",
+        "1250000",
+        "15",
+        "-1"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-handles-final-20261013/baseline",
+        "16",
+        "1250000",
+        "15",
+        "-1"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-handles-final-20261013/candidate",
+        "16",
+        "1250000",
+        "15",
+        "-1"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-handles-final-20261013/baseline",
+        "16",
+        "1250000",
+        "0",
+        "0"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-handles-final-20261013/candidate",
+        "16",
+        "1250000",
+        "0",
+        "0"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-handles-final-20261013/baseline",
+        "16",
+        "1250000",
+        "0",
+        "0"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-handles-final-20261013/candidate",
+        "16",
+        "1250000",
+        "0",
+        "0"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-handles-final-20261013/candidate",
+        "16",
+        "1250000",
+        "0",
+        "0"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-handles-final-20261013/baseline",
+        "16",
+        "1250000",
+        "0",
+        "0"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-handles-final-20261013/baseline",
+        "16",
+        "1250000",
+        "0",
+        "0"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-handles-final-20261013/candidate",
+        "16",
+        "1250000",
+        "0",
+        "0"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-handles-final-20261013/candidate",
+        "16",
+        "1250000",
+        "0",
+        "0"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-handles-final-20261013/baseline",
+        "16",
+        "1250000",
+        "0",
+        "0"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-handles-final-20261013/baseline",
+        "16",
+        "1250000",
+        "0",
+        "0"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-handles-final-20261013/candidate",
+        "16",
+        "1250000",
+        "0",
+        "0"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-handles-final-20261013/baseline",
+        "16",
+        "1250000",
+        "0",
+        "15"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-handles-final-20261013/candidate",
+        "16",
+        "1250000",
+        "0",
+        "15"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-handles-final-20261013/baseline",
+        "16",
+        "1250000",
+        "0",
+        "15"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-handles-final-20261013/candidate",
+        "16",
+        "1250000",
+        "0",
+        "15"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-handles-final-20261013/candidate",
+        "16",
+        "1250000",
+        "0",
+        "15"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-handles-final-20261013/baseline",
+        "16",
+        "1250000",
+        "0",
+        "15"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-handles-final-20261013/baseline",
+        "16",
+        "1250000",
+        "0",
+        "15"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-handles-final-20261013/candidate",
+        "16",
+        "1250000",
+        "0",
+        "15"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-handles-final-20261013/candidate",
+        "16",
+        "1250000",
+        "0",
+        "15"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-handles-final-20261013/baseline",
+        "16",
+        "1250000",
+        "0",
+        "15"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-handles-final-20261013/baseline",
+        "16",
+        "1250000",
+        "0",
+        "15"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-handles-final-20261013/candidate",
+        "16",
+        "1250000",
+        "0",
+        "15"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-handles-final-20261013/baseline",
+        "16",
+        "1250000",
+        "8",
+        "15"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-handles-final-20261013/candidate",
+        "16",
+        "1250000",
+        "8",
+        "15"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-handles-final-20261013/baseline",
+        "16",
+        "1250000",
+        "8",
+        "15"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-handles-final-20261013/candidate",
+        "16",
+        "1250000",
+        "8",
+        "15"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-handles-final-20261013/candidate",
+        "16",
+        "1250000",
+        "8",
+        "15"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-handles-final-20261013/baseline",
+        "16",
+        "1250000",
+        "8",
+        "15"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-handles-final-20261013/baseline",
+        "16",
+        "1250000",
+        "8",
+        "15"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-handles-final-20261013/candidate",
+        "16",
+        "1250000",
+        "8",
+        "15"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-handles-final-20261013/candidate",
+        "16",
+        "1250000",
+        "8",
+        "15"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-handles-final-20261013/baseline",
+        "16",
+        "1250000",
+        "8",
+        "15"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-handles-final-20261013/baseline",
+        "16",
+        "1250000",
+        "8",
+        "15"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-handles-final-20261013/candidate",
+        "16",
+        "1250000",
+        "8",
+        "15"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-handles-final-20261013/baseline",
+        "16",
+        "1250000",
+        "15",
+        "15"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-handles-final-20261013/candidate",
+        "16",
+        "1250000",
+        "15",
+        "15"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-handles-final-20261013/baseline",
+        "16",
+        "1250000",
+        "15",
+        "15"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-handles-final-20261013/candidate",
+        "16",
+        "1250000",
+        "15",
+        "15"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-handles-final-20261013/candidate",
+        "16",
+        "1250000",
+        "15",
+        "15"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-handles-final-20261013/baseline",
+        "16",
+        "1250000",
+        "15",
+        "15"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-handles-final-20261013/baseline",
+        "16",
+        "1250000",
+        "15",
+        "15"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-handles-final-20261013/candidate",
+        "16",
+        "1250000",
+        "15",
+        "15"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-handles-final-20261013/candidate",
+        "16",
+        "1250000",
+        "15",
+        "15"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-handles-final-20261013/baseline",
+        "16",
+        "1250000",
+        "15",
+        "15"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-handles-final-20261013/baseline",
+        "16",
+        "1250000",
+        "15",
+        "15"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-handles-final-20261013/candidate",
+        "16",
+        "1250000",
+        "15",
+        "15"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-handles-final-20261013/baseline",
+        "256",
+        "78125",
+        "0",
+        "-1"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-handles-final-20261013/candidate",
+        "256",
+        "78125",
+        "0",
+        "-1"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-handles-final-20261013/baseline",
+        "256",
+        "78125",
+        "0",
+        "-1"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-handles-final-20261013/candidate",
+        "256",
+        "78125",
+        "0",
+        "-1"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-handles-final-20261013/candidate",
+        "256",
+        "78125",
+        "0",
+        "-1"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-handles-final-20261013/baseline",
+        "256",
+        "78125",
+        "0",
+        "-1"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-handles-final-20261013/baseline",
+        "256",
+        "78125",
+        "0",
+        "-1"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-handles-final-20261013/candidate",
+        "256",
+        "78125",
+        "0",
+        "-1"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-handles-final-20261013/candidate",
+        "256",
+        "78125",
+        "0",
+        "-1"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-handles-final-20261013/baseline",
+        "256",
+        "78125",
+        "0",
+        "-1"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-handles-final-20261013/baseline",
+        "256",
+        "78125",
+        "0",
+        "-1"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-handles-final-20261013/candidate",
+        "256",
+        "78125",
+        "0",
+        "-1"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-handles-final-20261013/baseline",
+        "256",
+        "78125",
+        "255",
+        "-1"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-handles-final-20261013/candidate",
+        "256",
+        "78125",
+        "255",
+        "-1"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-handles-final-20261013/baseline",
+        "256",
+        "78125",
+        "255",
+        "-1"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-handles-final-20261013/candidate",
+        "256",
+        "78125",
+        "255",
+        "-1"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-handles-final-20261013/candidate",
+        "256",
+        "78125",
+        "255",
+        "-1"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-handles-final-20261013/baseline",
+        "256",
+        "78125",
+        "255",
+        "-1"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-handles-final-20261013/baseline",
+        "256",
+        "78125",
+        "255",
+        "-1"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-handles-final-20261013/candidate",
+        "256",
+        "78125",
+        "255",
+        "-1"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-handles-final-20261013/candidate",
+        "256",
+        "78125",
+        "255",
+        "-1"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-handles-final-20261013/baseline",
+        "256",
+        "78125",
+        "255",
+        "-1"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-handles-final-20261013/baseline",
+        "256",
+        "78125",
+        "255",
+        "-1"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-handles-final-20261013/candidate",
+        "256",
+        "78125",
+        "255",
+        "-1"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-handles-final-20261013/baseline",
+        "256",
+        "78125",
+        "0",
+        "0"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-handles-final-20261013/candidate",
+        "256",
+        "78125",
+        "0",
+        "0"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-handles-final-20261013/baseline",
+        "256",
+        "78125",
+        "0",
+        "0"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-handles-final-20261013/candidate",
+        "256",
+        "78125",
+        "0",
+        "0"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-handles-final-20261013/candidate",
+        "256",
+        "78125",
+        "0",
+        "0"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-handles-final-20261013/baseline",
+        "256",
+        "78125",
+        "0",
+        "0"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-handles-final-20261013/baseline",
+        "256",
+        "78125",
+        "0",
+        "0"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-handles-final-20261013/candidate",
+        "256",
+        "78125",
+        "0",
+        "0"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-handles-final-20261013/candidate",
+        "256",
+        "78125",
+        "0",
+        "0"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-handles-final-20261013/baseline",
+        "256",
+        "78125",
+        "0",
+        "0"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-handles-final-20261013/baseline",
+        "256",
+        "78125",
+        "0",
+        "0"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-handles-final-20261013/candidate",
+        "256",
+        "78125",
+        "0",
+        "0"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-handles-final-20261013/baseline",
+        "256",
+        "78125",
+        "0",
+        "255"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-handles-final-20261013/candidate",
+        "256",
+        "78125",
+        "0",
+        "255"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-handles-final-20261013/baseline",
+        "256",
+        "78125",
+        "0",
+        "255"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-handles-final-20261013/candidate",
+        "256",
+        "78125",
+        "0",
+        "255"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-handles-final-20261013/candidate",
+        "256",
+        "78125",
+        "0",
+        "255"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-handles-final-20261013/baseline",
+        "256",
+        "78125",
+        "0",
+        "255"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-handles-final-20261013/baseline",
+        "256",
+        "78125",
+        "0",
+        "255"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-handles-final-20261013/candidate",
+        "256",
+        "78125",
+        "0",
+        "255"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-handles-final-20261013/candidate",
+        "256",
+        "78125",
+        "0",
+        "255"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-handles-final-20261013/baseline",
+        "256",
+        "78125",
+        "0",
+        "255"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-handles-final-20261013/baseline",
+        "256",
+        "78125",
+        "0",
+        "255"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-handles-final-20261013/candidate",
+        "256",
+        "78125",
+        "0",
+        "255"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-handles-final-20261013/baseline",
+        "256",
+        "78125",
+        "128",
+        "255"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-handles-final-20261013/candidate",
+        "256",
+        "78125",
+        "128",
+        "255"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-handles-final-20261013/baseline",
+        "256",
+        "78125",
+        "128",
+        "255"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-handles-final-20261013/candidate",
+        "256",
+        "78125",
+        "128",
+        "255"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-handles-final-20261013/candidate",
+        "256",
+        "78125",
+        "128",
+        "255"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-handles-final-20261013/baseline",
+        "256",
+        "78125",
+        "128",
+        "255"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-handles-final-20261013/baseline",
+        "256",
+        "78125",
+        "128",
+        "255"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-handles-final-20261013/candidate",
+        "256",
+        "78125",
+        "128",
+        "255"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-handles-final-20261013/candidate",
+        "256",
+        "78125",
+        "128",
+        "255"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-handles-final-20261013/baseline",
+        "256",
+        "78125",
+        "128",
+        "255"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-handles-final-20261013/baseline",
+        "256",
+        "78125",
+        "128",
+        "255"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-handles-final-20261013/candidate",
+        "256",
+        "78125",
+        "128",
+        "255"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-handles-final-20261013/baseline",
+        "256",
+        "78125",
+        "255",
+        "255"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-handles-final-20261013/candidate",
+        "256",
+        "78125",
+        "255",
+        "255"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-handles-final-20261013/baseline",
+        "256",
+        "78125",
+        "255",
+        "255"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-handles-final-20261013/candidate",
+        "256",
+        "78125",
+        "255",
+        "255"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-handles-final-20261013/candidate",
+        "256",
+        "78125",
+        "255",
+        "255"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-handles-final-20261013/baseline",
+        "256",
+        "78125",
+        "255",
+        "255"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-handles-final-20261013/baseline",
+        "256",
+        "78125",
+        "255",
+        "255"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-handles-final-20261013/candidate",
+        "256",
+        "78125",
+        "255",
+        "255"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-handles-final-20261013/candidate",
+        "256",
+        "78125",
+        "255",
+        "255"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-handles-final-20261013/baseline",
+        "256",
+        "78125",
+        "255",
+        "255"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-handles-final-20261013/baseline",
+        "256",
+        "78125",
+        "255",
+        "255"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-handles-final-20261013/candidate",
+        "256",
+        "78125",
+        "255",
+        "255"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-handles-final-20261013/baseline",
+        "4096",
+        "10000",
+        "0",
+        "-1"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-handles-final-20261013/candidate",
+        "4096",
+        "10000",
+        "0",
+        "-1"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-handles-final-20261013/baseline",
+        "4096",
+        "10000",
+        "0",
+        "-1"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-handles-final-20261013/candidate",
+        "4096",
+        "10000",
+        "0",
+        "-1"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-handles-final-20261013/candidate",
+        "4096",
+        "10000",
+        "0",
+        "-1"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-handles-final-20261013/baseline",
+        "4096",
+        "10000",
+        "0",
+        "-1"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-handles-final-20261013/baseline",
+        "4096",
+        "10000",
+        "0",
+        "-1"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-handles-final-20261013/candidate",
+        "4096",
+        "10000",
+        "0",
+        "-1"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-handles-final-20261013/candidate",
+        "4096",
+        "10000",
+        "0",
+        "-1"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-handles-final-20261013/baseline",
+        "4096",
+        "10000",
+        "0",
+        "-1"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-handles-final-20261013/baseline",
+        "4096",
+        "10000",
+        "0",
+        "-1"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-handles-final-20261013/candidate",
+        "4096",
+        "10000",
+        "0",
+        "-1"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-handles-final-20261013/baseline",
+        "4096",
+        "10000",
+        "4095",
+        "-1"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-handles-final-20261013/candidate",
+        "4096",
+        "10000",
+        "4095",
+        "-1"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-handles-final-20261013/baseline",
+        "4096",
+        "10000",
+        "4095",
+        "-1"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-handles-final-20261013/candidate",
+        "4096",
+        "10000",
+        "4095",
+        "-1"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-handles-final-20261013/candidate",
+        "4096",
+        "10000",
+        "4095",
+        "-1"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-handles-final-20261013/baseline",
+        "4096",
+        "10000",
+        "4095",
+        "-1"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-handles-final-20261013/baseline",
+        "4096",
+        "10000",
+        "4095",
+        "-1"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-handles-final-20261013/candidate",
+        "4096",
+        "10000",
+        "4095",
+        "-1"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-handles-final-20261013/candidate",
+        "4096",
+        "10000",
+        "4095",
+        "-1"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-handles-final-20261013/baseline",
+        "4096",
+        "10000",
+        "4095",
+        "-1"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-handles-final-20261013/baseline",
+        "4096",
+        "10000",
+        "4095",
+        "-1"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-handles-final-20261013/candidate",
+        "4096",
+        "10000",
+        "4095",
+        "-1"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-handles-final-20261013/baseline",
+        "4096",
+        "10000",
+        "0",
+        "0"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-handles-final-20261013/candidate",
+        "4096",
+        "10000",
+        "0",
+        "0"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-handles-final-20261013/baseline",
+        "4096",
+        "10000",
+        "0",
+        "0"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-handles-final-20261013/candidate",
+        "4096",
+        "10000",
+        "0",
+        "0"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-handles-final-20261013/candidate",
+        "4096",
+        "10000",
+        "0",
+        "0"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-handles-final-20261013/baseline",
+        "4096",
+        "10000",
+        "0",
+        "0"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-handles-final-20261013/baseline",
+        "4096",
+        "10000",
+        "0",
+        "0"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-handles-final-20261013/candidate",
+        "4096",
+        "10000",
+        "0",
+        "0"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-handles-final-20261013/candidate",
+        "4096",
+        "10000",
+        "0",
+        "0"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-handles-final-20261013/baseline",
+        "4096",
+        "10000",
+        "0",
+        "0"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-handles-final-20261013/baseline",
+        "4096",
+        "10000",
+        "0",
+        "0"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-handles-final-20261013/candidate",
+        "4096",
+        "10000",
+        "0",
+        "0"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-handles-final-20261013/baseline",
+        "4096",
+        "10000",
+        "0",
+        "4095"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-handles-final-20261013/candidate",
+        "4096",
+        "10000",
+        "0",
+        "4095"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-handles-final-20261013/baseline",
+        "4096",
+        "10000",
+        "0",
+        "4095"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-handles-final-20261013/candidate",
+        "4096",
+        "10000",
+        "0",
+        "4095"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-handles-final-20261013/candidate",
+        "4096",
+        "10000",
+        "0",
+        "4095"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-handles-final-20261013/baseline",
+        "4096",
+        "10000",
+        "0",
+        "4095"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-handles-final-20261013/baseline",
+        "4096",
+        "10000",
+        "0",
+        "4095"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-handles-final-20261013/candidate",
+        "4096",
+        "10000",
+        "0",
+        "4095"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-handles-final-20261013/candidate",
+        "4096",
+        "10000",
+        "0",
+        "4095"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-handles-final-20261013/baseline",
+        "4096",
+        "10000",
+        "0",
+        "4095"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-handles-final-20261013/baseline",
+        "4096",
+        "10000",
+        "0",
+        "4095"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-handles-final-20261013/candidate",
+        "4096",
+        "10000",
+        "0",
+        "4095"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-handles-final-20261013/baseline",
+        "4096",
+        "10000",
+        "2048",
+        "4095"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-handles-final-20261013/candidate",
+        "4096",
+        "10000",
+        "2048",
+        "4095"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-handles-final-20261013/baseline",
+        "4096",
+        "10000",
+        "2048",
+        "4095"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-handles-final-20261013/candidate",
+        "4096",
+        "10000",
+        "2048",
+        "4095"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-handles-final-20261013/candidate",
+        "4096",
+        "10000",
+        "2048",
+        "4095"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-handles-final-20261013/baseline",
+        "4096",
+        "10000",
+        "2048",
+        "4095"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-handles-final-20261013/baseline",
+        "4096",
+        "10000",
+        "2048",
+        "4095"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-handles-final-20261013/candidate",
+        "4096",
+        "10000",
+        "2048",
+        "4095"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-handles-final-20261013/candidate",
+        "4096",
+        "10000",
+        "2048",
+        "4095"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-handles-final-20261013/baseline",
+        "4096",
+        "10000",
+        "2048",
+        "4095"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-handles-final-20261013/baseline",
+        "4096",
+        "10000",
+        "2048",
+        "4095"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-handles-final-20261013/candidate",
+        "4096",
+        "10000",
+        "2048",
+        "4095"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-handles-final-20261013/baseline",
+        "4096",
+        "10000",
+        "4095",
+        "4095"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-handles-final-20261013/candidate",
+        "4096",
+        "10000",
+        "4095",
+        "4095"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-handles-final-20261013/baseline",
+        "4096",
+        "10000",
+        "4095",
+        "4095"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-handles-final-20261013/candidate",
+        "4096",
+        "10000",
+        "4095",
+        "4095"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-handles-final-20261013/candidate",
+        "4096",
+        "10000",
+        "4095",
+        "4095"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-handles-final-20261013/baseline",
+        "4096",
+        "10000",
+        "4095",
+        "4095"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-handles-final-20261013/baseline",
+        "4096",
+        "10000",
+        "4095",
+        "4095"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-handles-final-20261013/candidate",
+        "4096",
+        "10000",
+        "4095",
+        "4095"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-handles-final-20261013/candidate",
+        "4096",
+        "10000",
+        "4095",
+        "4095"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-handles-final-20261013/baseline",
+        "4096",
+        "10000",
+        "4095",
+        "4095"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-handles-final-20261013/baseline",
+        "4096",
+        "10000",
+        "4095",
+        "4095"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-handles-final-20261013/candidate",
+        "4096",
+        "10000",
+        "4095",
+        "4095"
+      ],
+      "exitCode": 0
+    }
+  ],
+  "cases": [
+    {
+      "nodes": 16,
+      "position": 0,
+      "ownerPosition": -1,
+      "iterations": 1250000,
+      "samples": [
+        {
+          "round": 0,
+          "mode": "baseline",
+          "seconds": 0.047868,
+          "operations": 1250000
+        },
+        {
+          "round": 0,
+          "mode": "candidate",
+          "seconds": 0.048113,
+          "operations": 1250000
+        },
+        {
+          "round": 1,
+          "mode": "candidate",
+          "seconds": 0.048009,
+          "operations": 1250000
+        },
+        {
+          "round": 1,
+          "mode": "baseline",
+          "seconds": 0.047873,
+          "operations": 1250000
+        },
+        {
+          "round": 2,
+          "mode": "baseline",
+          "seconds": 0.048931,
+          "operations": 1250000
+        },
+        {
+          "round": 2,
+          "mode": "candidate",
+          "seconds": 0.050171,
+          "operations": 1250000
+        },
+        {
+          "round": 3,
+          "mode": "candidate",
+          "seconds": 0.048073,
+          "operations": 1250000
+        },
+        {
+          "round": 3,
+          "mode": "baseline",
+          "seconds": 0.047909,
+          "operations": 1250000
+        },
+        {
+          "round": 4,
+          "mode": "baseline",
+          "seconds": 0.047815,
+          "operations": 1250000
+        },
+        {
+          "round": 4,
+          "mode": "candidate",
+          "seconds": 0.048953,
+          "operations": 1250000
+        }
+      ],
+      "warmup": [
+        {
+          "mode": "baseline",
+          "seconds": 0.049763,
+          "operations": 1250000
+        },
+        {
+          "mode": "candidate",
+          "seconds": 0.056128,
+          "operations": 1250000
+        }
+      ],
+      "medians": {
+        "baseline": 0.047873,
+        "candidate": 0.048113
+      },
+      "speedup": 0.9950117431879117
+    },
+    {
+      "nodes": 16,
+      "position": 15,
+      "ownerPosition": -1,
+      "iterations": 1250000,
+      "samples": [
+        {
+          "round": 0,
+          "mode": "baseline",
+          "seconds": 0.060412,
+          "operations": 1250000
+        },
+        {
+          "round": 0,
+          "mode": "candidate",
+          "seconds": 0.053343,
+          "operations": 1250000
+        },
+        {
+          "round": 1,
+          "mode": "candidate",
+          "seconds": 0.053357,
+          "operations": 1250000
+        },
+        {
+          "round": 1,
+          "mode": "baseline",
+          "seconds": 0.060413,
+          "operations": 1250000
+        },
+        {
+          "round": 2,
+          "mode": "baseline",
+          "seconds": 0.060446,
+          "operations": 1250000
+        },
+        {
+          "round": 2,
+          "mode": "candidate",
+          "seconds": 0.053384,
+          "operations": 1250000
+        },
+        {
+          "round": 3,
+          "mode": "candidate",
+          "seconds": 0.053405,
+          "operations": 1250000
+        },
+        {
+          "round": 3,
+          "mode": "baseline",
+          "seconds": 0.060383,
+          "operations": 1250000
+        },
+        {
+          "round": 4,
+          "mode": "baseline",
+          "seconds": 0.060729,
+          "operations": 1250000
+        },
+        {
+          "round": 4,
+          "mode": "candidate",
+          "seconds": 0.053372,
+          "operations": 1250000
+        }
+      ],
+      "warmup": [
+        {
+          "mode": "baseline",
+          "seconds": 0.060484,
+          "operations": 1250000
+        },
+        {
+          "mode": "candidate",
+          "seconds": 0.053383,
+          "operations": 1250000
+        }
+      ],
+      "medians": {
+        "baseline": 0.060413,
+        "candidate": 0.053372
+      },
+      "speedup": 1.1319231057483323
+    },
+    {
+      "nodes": 16,
+      "position": 0,
+      "ownerPosition": 0,
+      "iterations": 1250000,
+      "samples": [
+        {
+          "round": 0,
+          "mode": "baseline",
+          "seconds": 0.050235,
+          "operations": 1250000
+        },
+        {
+          "round": 0,
+          "mode": "candidate",
+          "seconds": 0.048761,
+          "operations": 1250000
+        },
+        {
+          "round": 1,
+          "mode": "candidate",
+          "seconds": 0.048729,
+          "operations": 1250000
+        },
+        {
+          "round": 1,
+          "mode": "baseline",
+          "seconds": 0.050068,
+          "operations": 1250000
+        },
+        {
+          "round": 2,
+          "mode": "baseline",
+          "seconds": 0.05004,
+          "operations": 1250000
+        },
+        {
+          "round": 2,
+          "mode": "candidate",
+          "seconds": 0.048693,
+          "operations": 1250000
+        },
+        {
+          "round": 3,
+          "mode": "candidate",
+          "seconds": 0.048751,
+          "operations": 1250000
+        },
+        {
+          "round": 3,
+          "mode": "baseline",
+          "seconds": 0.050017,
+          "operations": 1250000
+        },
+        {
+          "round": 4,
+          "mode": "baseline",
+          "seconds": 0.050027,
+          "operations": 1250000
+        },
+        {
+          "round": 4,
+          "mode": "candidate",
+          "seconds": 0.04864,
+          "operations": 1250000
+        }
+      ],
+      "warmup": [
+        {
+          "mode": "baseline",
+          "seconds": 0.050808,
+          "operations": 1250000
+        },
+        {
+          "mode": "candidate",
+          "seconds": 0.048914,
+          "operations": 1250000
+        }
+      ],
+      "medians": {
+        "baseline": 0.05004,
+        "candidate": 0.048729
+      },
+      "speedup": 1.0269038970633504
+    },
+    {
+      "nodes": 16,
+      "position": 0,
+      "ownerPosition": 15,
+      "iterations": 1250000,
+      "samples": [
+        {
+          "round": 0,
+          "mode": "baseline",
+          "seconds": 0.061525,
+          "operations": 1250000
+        },
+        {
+          "round": 0,
+          "mode": "candidate",
+          "seconds": 0.057844,
+          "operations": 1250000
+        },
+        {
+          "round": 1,
+          "mode": "candidate",
+          "seconds": 0.05816,
+          "operations": 1250000
+        },
+        {
+          "round": 1,
+          "mode": "baseline",
+          "seconds": 0.06118,
+          "operations": 1250000
+        },
+        {
+          "round": 2,
+          "mode": "baseline",
+          "seconds": 0.061338,
+          "operations": 1250000
+        },
+        {
+          "round": 2,
+          "mode": "candidate",
+          "seconds": 0.057796,
+          "operations": 1250000
+        },
+        {
+          "round": 3,
+          "mode": "candidate",
+          "seconds": 0.057938,
+          "operations": 1250000
+        },
+        {
+          "round": 3,
+          "mode": "baseline",
+          "seconds": 0.063352,
+          "operations": 1250000
+        },
+        {
+          "round": 4,
+          "mode": "baseline",
+          "seconds": 0.062966,
+          "operations": 1250000
+        },
+        {
+          "round": 4,
+          "mode": "candidate",
+          "seconds": 0.057787,
+          "operations": 1250000
+        }
+      ],
+      "warmup": [
+        {
+          "mode": "baseline",
+          "seconds": 0.061231,
+          "operations": 1250000
+        },
+        {
+          "mode": "candidate",
+          "seconds": 0.057701,
+          "operations": 1250000
+        }
+      ],
+      "medians": {
+        "baseline": 0.061525,
+        "candidate": 0.057844
+      },
+      "speedup": 1.0636366779614135
+    },
+    {
+      "nodes": 16,
+      "position": 8,
+      "ownerPosition": 15,
+      "iterations": 1250000,
+      "samples": [
+        {
+          "round": 0,
+          "mode": "baseline",
+          "seconds": 0.066614,
+          "operations": 1250000
+        },
+        {
+          "round": 0,
+          "mode": "candidate",
+          "seconds": 0.054988,
+          "operations": 1250000
+        },
+        {
+          "round": 1,
+          "mode": "candidate",
+          "seconds": 0.054969,
+          "operations": 1250000
+        },
+        {
+          "round": 1,
+          "mode": "baseline",
+          "seconds": 0.066621,
+          "operations": 1250000
+        },
+        {
+          "round": 2,
+          "mode": "baseline",
+          "seconds": 0.066693,
+          "operations": 1250000
+        },
+        {
+          "round": 2,
+          "mode": "candidate",
+          "seconds": 0.055546,
+          "operations": 1250000
+        },
+        {
+          "round": 3,
+          "mode": "candidate",
+          "seconds": 0.057575,
+          "operations": 1250000
+        },
+        {
+          "round": 3,
+          "mode": "baseline",
+          "seconds": 0.06811,
+          "operations": 1250000
+        },
+        {
+          "round": 4,
+          "mode": "baseline",
+          "seconds": 0.067496,
+          "operations": 1250000
+        },
+        {
+          "round": 4,
+          "mode": "candidate",
+          "seconds": 0.055026,
+          "operations": 1250000
+        }
+      ],
+      "warmup": [
+        {
+          "mode": "baseline",
+          "seconds": 0.066656,
+          "operations": 1250000
+        },
+        {
+          "mode": "candidate",
+          "seconds": 0.05512,
+          "operations": 1250000
+        }
+      ],
+      "medians": {
+        "baseline": 0.066693,
+        "candidate": 0.055026
+      },
+      "speedup": 1.2120270417620762
+    },
+    {
+      "nodes": 16,
+      "position": 15,
+      "ownerPosition": 15,
+      "iterations": 1250000,
+      "samples": [
+        {
+          "round": 0,
+          "mode": "baseline",
+          "seconds": 0.076179,
+          "operations": 1250000
+        },
+        {
+          "round": 0,
+          "mode": "candidate",
+          "seconds": 0.054181,
+          "operations": 1250000
+        },
+        {
+          "round": 1,
+          "mode": "candidate",
+          "seconds": 0.054126,
+          "operations": 1250000
+        },
+        {
+          "round": 1,
+          "mode": "baseline",
+          "seconds": 0.075649,
+          "operations": 1250000
+        },
+        {
+          "round": 2,
+          "mode": "baseline",
+          "seconds": 0.075236,
+          "operations": 1250000
+        },
+        {
+          "round": 2,
+          "mode": "candidate",
+          "seconds": 0.054986,
+          "operations": 1250000
+        },
+        {
+          "round": 3,
+          "mode": "candidate",
+          "seconds": 0.054152,
+          "operations": 1250000
+        },
+        {
+          "round": 3,
+          "mode": "baseline",
+          "seconds": 0.0761,
+          "operations": 1250000
+        },
+        {
+          "round": 4,
+          "mode": "baseline",
+          "seconds": 0.075248,
+          "operations": 1250000
+        },
+        {
+          "round": 4,
+          "mode": "candidate",
+          "seconds": 0.054416,
+          "operations": 1250000
+        }
+      ],
+      "warmup": [
+        {
+          "mode": "baseline",
+          "seconds": 0.075661,
+          "operations": 1250000
+        },
+        {
+          "mode": "candidate",
+          "seconds": 0.054123,
+          "operations": 1250000
+        }
+      ],
+      "medians": {
+        "baseline": 0.075649,
+        "candidate": 0.054181
+      },
+      "speedup": 1.3962274598106346
+    },
+    {
+      "nodes": 256,
+      "position": 0,
+      "ownerPosition": -1,
+      "iterations": 78125,
+      "samples": [
+        {
+          "round": 0,
+          "mode": "baseline",
+          "seconds": 0.046239,
+          "operations": 78125
+        },
+        {
+          "round": 0,
+          "mode": "candidate",
+          "seconds": 0.045198,
+          "operations": 78125
+        },
+        {
+          "round": 1,
+          "mode": "candidate",
+          "seconds": 0.045025,
+          "operations": 78125
+        },
+        {
+          "round": 1,
+          "mode": "baseline",
+          "seconds": 0.046115,
+          "operations": 78125
+        },
+        {
+          "round": 2,
+          "mode": "baseline",
+          "seconds": 0.047117,
+          "operations": 78125
+        },
+        {
+          "round": 2,
+          "mode": "candidate",
+          "seconds": 0.045538,
+          "operations": 78125
+        },
+        {
+          "round": 3,
+          "mode": "candidate",
+          "seconds": 0.045001,
+          "operations": 78125
+        },
+        {
+          "round": 3,
+          "mode": "baseline",
+          "seconds": 0.046421,
+          "operations": 78125
+        },
+        {
+          "round": 4,
+          "mode": "baseline",
+          "seconds": 0.046584,
+          "operations": 78125
+        },
+        {
+          "round": 4,
+          "mode": "candidate",
+          "seconds": 0.045058,
+          "operations": 78125
+        }
+      ],
+      "warmup": [
+        {
+          "mode": "baseline",
+          "seconds": 0.046495,
+          "operations": 78125
+        },
+        {
+          "mode": "candidate",
+          "seconds": 0.045295,
+          "operations": 78125
+        }
+      ],
+      "medians": {
+        "baseline": 0.046421,
+        "candidate": 0.045058
+      },
+      "speedup": 1.0302499001287229
+    },
+    {
+      "nodes": 256,
+      "position": 255,
+      "ownerPosition": -1,
+      "iterations": 78125,
+      "samples": [
+        {
+          "round": 0,
+          "mode": "baseline",
+          "seconds": 0.085254,
+          "operations": 78125
+        },
+        {
+          "round": 0,
+          "mode": "candidate",
+          "seconds": 0.04818,
+          "operations": 78125
+        },
+        {
+          "round": 1,
+          "mode": "candidate",
+          "seconds": 0.048208,
+          "operations": 78125
+        },
+        {
+          "round": 1,
+          "mode": "baseline",
+          "seconds": 0.085613,
+          "operations": 78125
+        },
+        {
+          "round": 2,
+          "mode": "baseline",
+          "seconds": 0.098005,
+          "operations": 78125
+        },
+        {
+          "round": 2,
+          "mode": "candidate",
+          "seconds": 0.048242,
+          "operations": 78125
+        },
+        {
+          "round": 3,
+          "mode": "candidate",
+          "seconds": 0.048298,
+          "operations": 78125
+        },
+        {
+          "round": 3,
+          "mode": "baseline",
+          "seconds": 0.085232,
+          "operations": 78125
+        },
+        {
+          "round": 4,
+          "mode": "baseline",
+          "seconds": 0.085152,
+          "operations": 78125
+        },
+        {
+          "round": 4,
+          "mode": "candidate",
+          "seconds": 0.048312,
+          "operations": 78125
+        }
+      ],
+      "warmup": [
+        {
+          "mode": "baseline",
+          "seconds": 0.08716,
+          "operations": 78125
+        },
+        {
+          "mode": "candidate",
+          "seconds": 0.048267,
+          "operations": 78125
+        }
+      ],
+      "medians": {
+        "baseline": 0.085254,
+        "candidate": 0.048242
+      },
+      "speedup": 1.7672152895816922
+    },
+    {
+      "nodes": 256,
+      "position": 0,
+      "ownerPosition": 0,
+      "iterations": 78125,
+      "samples": [
+        {
+          "round": 0,
+          "mode": "baseline",
+          "seconds": 0.044951,
+          "operations": 78125
+        },
+        {
+          "round": 0,
+          "mode": "candidate",
+          "seconds": 0.046696,
+          "operations": 78125
+        },
+        {
+          "round": 1,
+          "mode": "candidate",
+          "seconds": 0.045123,
+          "operations": 78125
+        },
+        {
+          "round": 1,
+          "mode": "baseline",
+          "seconds": 0.045098,
+          "operations": 78125
+        },
+        {
+          "round": 2,
+          "mode": "baseline",
+          "seconds": 0.044956,
+          "operations": 78125
+        },
+        {
+          "round": 2,
+          "mode": "candidate",
+          "seconds": 0.044947,
+          "operations": 78125
+        },
+        {
+          "round": 3,
+          "mode": "candidate",
+          "seconds": 0.044954,
+          "operations": 78125
+        },
+        {
+          "round": 3,
+          "mode": "baseline",
+          "seconds": 0.04497,
+          "operations": 78125
+        },
+        {
+          "round": 4,
+          "mode": "baseline",
+          "seconds": 0.044964,
+          "operations": 78125
+        },
+        {
+          "round": 4,
+          "mode": "candidate",
+          "seconds": 0.045257,
+          "operations": 78125
+        }
+      ],
+      "warmup": [
+        {
+          "mode": "baseline",
+          "seconds": 0.044933,
+          "operations": 78125
+        },
+        {
+          "mode": "candidate",
+          "seconds": 0.044965,
+          "operations": 78125
+        }
+      ],
+      "medians": {
+        "baseline": 0.044964,
+        "candidate": 0.045123
+      },
+      "speedup": 0.996476298118476
+    },
+    {
+      "nodes": 256,
+      "position": 0,
+      "ownerPosition": 255,
+      "iterations": 78125,
+      "samples": [
+        {
+          "round": 0,
+          "mode": "baseline",
+          "seconds": 0.085829,
+          "operations": 78125
+        },
+        {
+          "round": 0,
+          "mode": "candidate",
+          "seconds": 0.047156,
+          "operations": 78125
+        },
+        {
+          "round": 1,
+          "mode": "candidate",
+          "seconds": 0.046704,
+          "operations": 78125
+        },
+        {
+          "round": 1,
+          "mode": "baseline",
+          "seconds": 0.086481,
+          "operations": 78125
+        },
+        {
+          "round": 2,
+          "mode": "baseline",
+          "seconds": 0.085618,
+          "operations": 78125
+        },
+        {
+          "round": 2,
+          "mode": "candidate",
+          "seconds": 0.04512,
+          "operations": 78125
+        },
+        {
+          "round": 3,
+          "mode": "candidate",
+          "seconds": 0.045155,
+          "operations": 78125
+        },
+        {
+          "round": 3,
+          "mode": "baseline",
+          "seconds": 0.085728,
+          "operations": 78125
+        },
+        {
+          "round": 4,
+          "mode": "baseline",
+          "seconds": 0.085669,
+          "operations": 78125
+        },
+        {
+          "round": 4,
+          "mode": "candidate",
+          "seconds": 0.045139,
+          "operations": 78125
+        }
+      ],
+      "warmup": [
+        {
+          "mode": "baseline",
+          "seconds": 0.086157,
+          "operations": 78125
+        },
+        {
+          "mode": "candidate",
+          "seconds": 0.045189,
+          "operations": 78125
+        }
+      ],
+      "medians": {
+        "baseline": 0.085728,
+        "candidate": 0.045155
+      },
+      "speedup": 1.8985272948732144
+    },
+    {
+      "nodes": 256,
+      "position": 128,
+      "ownerPosition": 255,
+      "iterations": 78125,
+      "samples": [
+        {
+          "round": 0,
+          "mode": "baseline",
+          "seconds": 0.105273,
+          "operations": 78125
+        },
+        {
+          "round": 0,
+          "mode": "candidate",
+          "seconds": 0.047205,
+          "operations": 78125
+        },
+        {
+          "round": 1,
+          "mode": "candidate",
+          "seconds": 0.047351,
+          "operations": 78125
+        },
+        {
+          "round": 1,
+          "mode": "baseline",
+          "seconds": 0.105195,
+          "operations": 78125
+        },
+        {
+          "round": 2,
+          "mode": "baseline",
+          "seconds": 0.105122,
+          "operations": 78125
+        },
+        {
+          "round": 2,
+          "mode": "candidate",
+          "seconds": 0.047272,
+          "operations": 78125
+        },
+        {
+          "round": 3,
+          "mode": "candidate",
+          "seconds": 0.047243,
+          "operations": 78125
+        },
+        {
+          "round": 3,
+          "mode": "baseline",
+          "seconds": 0.105099,
+          "operations": 78125
+        },
+        {
+          "round": 4,
+          "mode": "baseline",
+          "seconds": 0.105046,
+          "operations": 78125
+        },
+        {
+          "round": 4,
+          "mode": "candidate",
+          "seconds": 0.047391,
+          "operations": 78125
+        }
+      ],
+      "warmup": [
+        {
+          "mode": "baseline",
+          "seconds": 0.105867,
+          "operations": 78125
+        },
+        {
+          "mode": "candidate",
+          "seconds": 0.047641,
+          "operations": 78125
+        }
+      ],
+      "medians": {
+        "baseline": 0.105122,
+        "candidate": 0.047272
+      },
+      "speedup": 2.223768827212726
+    },
+    {
+      "nodes": 256,
+      "position": 255,
+      "ownerPosition": 255,
+      "iterations": 78125,
+      "samples": [
+        {
+          "round": 0,
+          "mode": "baseline",
+          "seconds": 0.125662,
+          "operations": 78125
+        },
+        {
+          "round": 0,
+          "mode": "candidate",
+          "seconds": 0.04819,
+          "operations": 78125
+        },
+        {
+          "round": 1,
+          "mode": "candidate",
+          "seconds": 0.048805,
+          "operations": 78125
+        },
+        {
+          "round": 1,
+          "mode": "baseline",
+          "seconds": 0.125014,
+          "operations": 78125
+        },
+        {
+          "round": 2,
+          "mode": "baseline",
+          "seconds": 0.126137,
+          "operations": 78125
+        },
+        {
+          "round": 2,
+          "mode": "candidate",
+          "seconds": 0.048307,
+          "operations": 78125
+        },
+        {
+          "round": 3,
+          "mode": "candidate",
+          "seconds": 0.048292,
+          "operations": 78125
+        },
+        {
+          "round": 3,
+          "mode": "baseline",
+          "seconds": 0.125084,
+          "operations": 78125
+        },
+        {
+          "round": 4,
+          "mode": "baseline",
+          "seconds": 0.125143,
+          "operations": 78125
+        },
+        {
+          "round": 4,
+          "mode": "candidate",
+          "seconds": 0.048274,
+          "operations": 78125
+        }
+      ],
+      "warmup": [
+        {
+          "mode": "baseline",
+          "seconds": 0.125262,
+          "operations": 78125
+        },
+        {
+          "mode": "candidate",
+          "seconds": 0.048244,
+          "operations": 78125
+        }
+      ],
+      "medians": {
+        "baseline": 0.125143,
+        "candidate": 0.048292
+      },
+      "speedup": 2.591381595295287
+    },
+    {
+      "nodes": 4096,
+      "position": 0,
+      "ownerPosition": -1,
+      "iterations": 10000,
+      "samples": [
+        {
+          "round": 0,
+          "mode": "baseline",
+          "seconds": 0.093703,
+          "operations": 10000
+        },
+        {
+          "round": 0,
+          "mode": "candidate",
+          "seconds": 0.094008,
+          "operations": 10000
+        },
+        {
+          "round": 1,
+          "mode": "candidate",
+          "seconds": 0.093056,
+          "operations": 10000
+        },
+        {
+          "round": 1,
+          "mode": "baseline",
+          "seconds": 0.093201,
+          "operations": 10000
+        },
+        {
+          "round": 2,
+          "mode": "baseline",
+          "seconds": 0.09322,
+          "operations": 10000
+        },
+        {
+          "round": 2,
+          "mode": "candidate",
+          "seconds": 0.092473,
+          "operations": 10000
+        },
+        {
+          "round": 3,
+          "mode": "candidate",
+          "seconds": 0.091241,
+          "operations": 10000
+        },
+        {
+          "round": 3,
+          "mode": "baseline",
+          "seconds": 0.093586,
+          "operations": 10000
+        },
+        {
+          "round": 4,
+          "mode": "baseline",
+          "seconds": 0.091924,
+          "operations": 10000
+        },
+        {
+          "round": 4,
+          "mode": "candidate",
+          "seconds": 0.093094,
+          "operations": 10000
+        }
+      ],
+      "warmup": [
+        {
+          "mode": "baseline",
+          "seconds": 0.093542,
+          "operations": 10000
+        },
+        {
+          "mode": "candidate",
+          "seconds": 0.093147,
+          "operations": 10000
+        }
+      ],
+      "medians": {
+        "baseline": 0.09322,
+        "candidate": 0.093056
+      },
+      "speedup": 1.0017623796423658
+    },
+    {
+      "nodes": 4096,
+      "position": 4095,
+      "ownerPosition": -1,
+      "iterations": 10000,
+      "samples": [
+        {
+          "round": 0,
+          "mode": "baseline",
+          "seconds": 0.172981,
+          "operations": 10000
+        },
+        {
+          "round": 0,
+          "mode": "candidate",
+          "seconds": 0.09844,
+          "operations": 10000
+        },
+        {
+          "round": 1,
+          "mode": "candidate",
+          "seconds": 0.098632,
+          "operations": 10000
+        },
+        {
+          "round": 1,
+          "mode": "baseline",
+          "seconds": 0.173393,
+          "operations": 10000
+        },
+        {
+          "round": 2,
+          "mode": "baseline",
+          "seconds": 0.176789,
+          "operations": 10000
+        },
+        {
+          "round": 2,
+          "mode": "candidate",
+          "seconds": 0.104645,
+          "operations": 10000
+        },
+        {
+          "round": 3,
+          "mode": "candidate",
+          "seconds": 0.101876,
+          "operations": 10000
+        },
+        {
+          "round": 3,
+          "mode": "baseline",
+          "seconds": 0.177542,
+          "operations": 10000
+        },
+        {
+          "round": 4,
+          "mode": "baseline",
+          "seconds": 0.173487,
+          "operations": 10000
+        },
+        {
+          "round": 4,
+          "mode": "candidate",
+          "seconds": 0.098634,
+          "operations": 10000
+        }
+      ],
+      "warmup": [
+        {
+          "mode": "baseline",
+          "seconds": 0.173596,
+          "operations": 10000
+        },
+        {
+          "mode": "candidate",
+          "seconds": 0.098291,
+          "operations": 10000
+        }
+      ],
+      "medians": {
+        "baseline": 0.173487,
+        "candidate": 0.098634
+      },
+      "speedup": 1.7588965265527101
+    },
+    {
+      "nodes": 4096,
+      "position": 0,
+      "ownerPosition": 0,
+      "iterations": 10000,
+      "samples": [
+        {
+          "round": 0,
+          "mode": "baseline",
+          "seconds": 0.094098,
+          "operations": 10000
+        },
+        {
+          "round": 0,
+          "mode": "candidate",
+          "seconds": 0.093078,
+          "operations": 10000
+        },
+        {
+          "round": 1,
+          "mode": "candidate",
+          "seconds": 0.092996,
+          "operations": 10000
+        },
+        {
+          "round": 1,
+          "mode": "baseline",
+          "seconds": 0.092784,
+          "operations": 10000
+        },
+        {
+          "round": 2,
+          "mode": "baseline",
+          "seconds": 0.093159,
+          "operations": 10000
+        },
+        {
+          "round": 2,
+          "mode": "candidate",
+          "seconds": 0.093735,
+          "operations": 10000
+        },
+        {
+          "round": 3,
+          "mode": "candidate",
+          "seconds": 0.092953,
+          "operations": 10000
+        },
+        {
+          "round": 3,
+          "mode": "baseline",
+          "seconds": 0.093164,
+          "operations": 10000
+        },
+        {
+          "round": 4,
+          "mode": "baseline",
+          "seconds": 0.093184,
+          "operations": 10000
+        },
+        {
+          "round": 4,
+          "mode": "candidate",
+          "seconds": 0.093065,
+          "operations": 10000
+        }
+      ],
+      "warmup": [
+        {
+          "mode": "baseline",
+          "seconds": 0.090986,
+          "operations": 10000
+        },
+        {
+          "mode": "candidate",
+          "seconds": 0.092541,
+          "operations": 10000
+        }
+      ],
+      "medians": {
+        "baseline": 0.093164,
+        "candidate": 0.093065
+      },
+      "speedup": 1.0010637726320315
+    },
+    {
+      "nodes": 4096,
+      "position": 0,
+      "ownerPosition": 4095,
+      "iterations": 10000,
+      "samples": [
+        {
+          "round": 0,
+          "mode": "baseline",
+          "seconds": 0.173412,
+          "operations": 10000
+        },
+        {
+          "round": 0,
+          "mode": "candidate",
+          "seconds": 0.092848,
+          "operations": 10000
+        },
+        {
+          "round": 1,
+          "mode": "candidate",
+          "seconds": 0.092914,
+          "operations": 10000
+        },
+        {
+          "round": 1,
+          "mode": "baseline",
+          "seconds": 0.173293,
+          "operations": 10000
+        },
+        {
+          "round": 2,
+          "mode": "baseline",
+          "seconds": 0.171427,
+          "operations": 10000
+        },
+        {
+          "round": 2,
+          "mode": "candidate",
+          "seconds": 0.092921,
+          "operations": 10000
+        },
+        {
+          "round": 3,
+          "mode": "candidate",
+          "seconds": 0.092834,
+          "operations": 10000
+        },
+        {
+          "round": 3,
+          "mode": "baseline",
+          "seconds": 0.173381,
+          "operations": 10000
+        },
+        {
+          "round": 4,
+          "mode": "baseline",
+          "seconds": 0.173443,
+          "operations": 10000
+        },
+        {
+          "round": 4,
+          "mode": "candidate",
+          "seconds": 0.09285,
+          "operations": 10000
+        }
+      ],
+      "warmup": [
+        {
+          "mode": "baseline",
+          "seconds": 0.175624,
+          "operations": 10000
+        },
+        {
+          "mode": "candidate",
+          "seconds": 0.092886,
+          "operations": 10000
+        }
+      ],
+      "medians": {
+        "baseline": 0.173381,
+        "candidate": 0.09285
+      },
+      "speedup": 1.8673236402800215
+    },
+    {
+      "nodes": 4096,
+      "position": 2048,
+      "ownerPosition": 4095,
+      "iterations": 10000,
+      "samples": [
+        {
+          "round": 0,
+          "mode": "baseline",
+          "seconds": 0.212463,
+          "operations": 10000
+        },
+        {
+          "round": 0,
+          "mode": "candidate",
+          "seconds": 0.095588,
+          "operations": 10000
+        },
+        {
+          "round": 1,
+          "mode": "candidate",
+          "seconds": 0.095611,
+          "operations": 10000
+        },
+        {
+          "round": 1,
+          "mode": "baseline",
+          "seconds": 0.213318,
+          "operations": 10000
+        },
+        {
+          "round": 2,
+          "mode": "baseline",
+          "seconds": 0.212301,
+          "operations": 10000
+        },
+        {
+          "round": 2,
+          "mode": "candidate",
+          "seconds": 0.095589,
+          "operations": 10000
+        },
+        {
+          "round": 3,
+          "mode": "candidate",
+          "seconds": 0.095518,
+          "operations": 10000
+        },
+        {
+          "round": 3,
+          "mode": "baseline",
+          "seconds": 0.212546,
+          "operations": 10000
+        },
+        {
+          "round": 4,
+          "mode": "baseline",
+          "seconds": 0.213551,
+          "operations": 10000
+        },
+        {
+          "round": 4,
+          "mode": "candidate",
+          "seconds": 0.09558,
+          "operations": 10000
+        }
+      ],
+      "warmup": [
+        {
+          "mode": "baseline",
+          "seconds": 0.213326,
+          "operations": 10000
+        },
+        {
+          "mode": "candidate",
+          "seconds": 0.095724,
+          "operations": 10000
+        }
+      ],
+      "medians": {
+        "baseline": 0.212546,
+        "candidate": 0.095588
+      },
+      "speedup": 2.2235636272335437
+    },
+    {
+      "nodes": 4096,
+      "position": 4095,
+      "ownerPosition": 4095,
+      "iterations": 10000,
+      "samples": [
+        {
+          "round": 0,
+          "mode": "baseline",
+          "seconds": 0.253333,
+          "operations": 10000
+        },
+        {
+          "round": 0,
+          "mode": "candidate",
+          "seconds": 0.098455,
+          "operations": 10000
+        },
+        {
+          "round": 1,
+          "mode": "candidate",
+          "seconds": 0.098466,
+          "operations": 10000
+        },
+        {
+          "round": 1,
+          "mode": "baseline",
+          "seconds": 0.252245,
+          "operations": 10000
+        },
+        {
+          "round": 2,
+          "mode": "baseline",
+          "seconds": 0.25081,
+          "operations": 10000
+        },
+        {
+          "round": 2,
+          "mode": "candidate",
+          "seconds": 0.098652,
+          "operations": 10000
+        },
+        {
+          "round": 3,
+          "mode": "candidate",
+          "seconds": 0.098491,
+          "operations": 10000
+        },
+        {
+          "round": 3,
+          "mode": "baseline",
+          "seconds": 0.252947,
+          "operations": 10000
+        },
+        {
+          "round": 4,
+          "mode": "baseline",
+          "seconds": 0.252925,
+          "operations": 10000
+        },
+        {
+          "round": 4,
+          "mode": "candidate",
+          "seconds": 0.098362,
+          "operations": 10000
+        }
+      ],
+      "warmup": [
+        {
+          "mode": "baseline",
+          "seconds": 0.25282,
+          "operations": 10000
+        },
+        {
+          "mode": "candidate",
+          "seconds": 0.09844,
+          "operations": 10000
+        }
+      ],
+      "medians": {
+        "baseline": 0.252925,
+        "candidate": 0.098466
+      },
+      "speedup": 2.568653139154632
+    }
+  ],
+  "revision": "cf342fb8cbc9a8bbf9ce1ab2198984128ec2f527",
+  "sourceHashes": {
+    "baseline": "225083ab2baf62510737ece4c08c1d33d5ff9c59d25864fc76a4567cc2b4afb9",
+    "candidate": "fd1a151394602a23effd105a2d91cb85f586e82149a1e2ef64f620926c6571e8",
+    "workload": "bf4675335f5f2a2b281f1acefa15bc9a17eec10bff3ef6b94d5d22391deff226"
+  },
+  "inputs": {
+    "benchmarks/gc-handles/benchmark.py": "3767af790b87f26d6049bbf2efe925fceaebdfb3e2d3d6760766da4b4ea7f764",
+    "runtime/native/diagnostics/attach.c": "945aebf06af7e79e4bb31ed1e70d1977da498597c6cb56237b220812931baaeb",
+    "runtime/native/diagnostics/attach.h": "8c9e805d2d01055cdcea88dba433474b7ed165b0325a82b1bd93acaef94880c0",
+    "runtime/native/faults/fault-details.h": "8acf145dd10c8050c7d4c9266a73dec171009cea570aeb2f5473ac39cbfa4370",
+    "runtime/native/faults/render.c": "f1e561bfb6b73ac3e4a7078d5bc9e9905eea9637f545ac3178273698d08efb96",
+    "runtime/native/gc/native-gc.c": "fd1a151394602a23effd105a2d91cb85f586e82149a1e2ef64f620926c6571e8",
+    "runtime/native/gc/native-gc.h": "603bc4385f577ea21832947d949eb69c41ddf1bab0bad3cdfc385bbaca4f454a",
+    "runtime/native/gc/root-probe.c": "aa72d2550211dfae759643751da997974a9e23c6a0ab222b96f46f6a86a9ade8",
+    "runtime/native/gc/root-probe.h": "48d530392dc1c2f8b91a2c01581974902d0653037ef705900b19fffd9b9b75b6",
+    "runtime/native/memory/text-arena.c": "6c8581d96933260594a48d7c24fac4b6a8703a72da5640cbfd1a2275bed1099a",
+    "runtime/native/memory/text-arena.h": "ef929c9be0a52147a4284967a5c0d4c24bb98bc58d21905008b39a6c8cf8bdd6",
+    "docs/experiments/aot-console/root-probe.c": "2863b5f63849e9d78185909b893e8ed8e452dec7d1cc8693bd7a77813944310d",
+    "docs/experiments/aot-console/entry-arguments.h": "85f5c7d90edfd08cc4bf8db1a220028cf9dab39e4e16a05d1210f2ee18de6c80",
+    "docs/experiments/aot-console/console.h": "1f5be96a30639c5e63781637d95d1abb28ab605962caee50ae91a5a0d5bd8068",
+    "docs/experiments/aot-console/root-probe.h": "deabdaa930d39c16ad67b8a0efbbe9b4305daf6fe04861dd217462bd1ebff4ce",
+    "docs/experiments/aot-console/socket-listener.h": "268927942a47e47210d29f6bc8a7c891ae077352c35fc3855c2dce8fd407fb2a",
+    "docs/experiments/aot-console/string-unicode.h": "707e7dc31d0c5993873f53166862da5a53c3779a1f2e15fdb3b4c59086210f1c",
+    "docs/experiments/aot-console/task-queue.h": "cf7d1ded7df30016c353fbb24bb40cb4771bb1c735352bd6bb56d5dea78fa738",
+    "docs/experiments/aot-console/file-input.h": "a1a9840482a2b50f20ba5080eb96453a46e4416238b3403343e03e9c2c84d3f4",
+    "docs/experiments/aot-console/tls-managed.h": "073b109a56895fc15fcb49dfea061cae4ebc228bfe42fcd11f9f2f1041b4eade",
+    "docs/experiments/aot-console/socket-client-internal.h": "e2771ecbe8b74c0e696af297651cd5158755c8ed6e6cc25b1d9bde837a57dddb",
+    "docs/experiments/aot-console/native-session.h": "b221dc77da887518e90210bbbfb8ac6ffd6d14416c41faa199ecd2fb43bef7bd",
+    "docs/experiments/aot-console/socket-os.h": "a01419c62fa8a1d3d9131282c5af182f200ba149a440d52c81104e2a156f7ef0",
+    "docs/experiments/aot-console/native-stack.h": "d4b1bbc542c3c8b3338d186a64554e5a0c0d4bc3a94d6b6a48900c49f2da0d13",
+    "docs/experiments/aot-console/native-gc.h": "e995832d18f5f4b2cedeef0fc03f4841db5c48c0e37e8a9d483fd1ac65db1a06",
+    "docs/experiments/aot-console/text-arena.h": "3840086fc3cffb71d2053c225f95526519ec81d76d3375425fd4d62bf8f0fb05",
+    "docs/experiments/aot-console/file-output.h": "f13171699f402f05ea2ab0e4e1686f227bbe48d65c8b48a62e5f94200605e88e"
+  },
+  "compiler": "Apple clang version 17.0.0 (clang-1700.6.3.2)\nTarget: arm64-apple-darwin27.0.0\nThread model: posix\nInstalledDir: /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin\n"
+}

@@ -20,6 +20,13 @@ integration qualification is complete (2026-10-13); this is not an open-ended
 restructuring prerequisite. This integration direction complements the performance work below;
 prototype pacing and unqualified targets are not promoted by packaging changes.
 
+**Native handle admission (2026-10-13):** [one-walk exact-base admission](../benchmarks/gc-handles/README.md)
+removes repeated heap walks for host handles and related owner checks while retaining
+trailing-corruption rejection and failure atomicity. Local late-base cases improve
+1.76–2.59× at 256/4,096 objects; early-base controls remain near baseline. All 21
+local GC/root checks pass. Hosted platform qualification is pending. This bounded
+runtime improvement does not establish an HTTP gain or change collection pacing.
+
 **Allocation and admission follow-up (2026-10-13):** [single-walk allocation](../benchmarks/gc-allocation/README.md)
 retains complete heap validation while removing the repeated first-fit search:
 matched hosted gains are 1.18–1.60× on macOS and 1.32–1.84× on Windows. Native-GC

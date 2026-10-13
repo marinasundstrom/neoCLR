@@ -160,3 +160,21 @@ The next bounded evaluation should:
 
 Finish helper-root coverage and scheduler idle cleanup qualification independently;
 those correctness requirements remain relevant under any collection architecture.
+
+## Native exact-base admission — 2026-10-13
+
+Host handles, resource owners, callback entry and owned suspended roots retain
+neoCLR's full heap-integrity check before accepting an exact allocation base.
+Validation and membership lookup now share one walk; after matching the requested
+bases, the rest of the walk performs integrity checks only. Matching an early block
+cannot hide trailing corruption, and failed calls do not publish outputs or mutate
+registrations. Null values remain valid strong roots; owners must be live exact bases.
+
+This is an internal optimization of the existing bounded host-handle contract,
+comparable in purpose to CLR native handle rooting, but not an implementation of
+CLR's handle tables or a new managed GCHandle API. No persistent lookup structure,
+write barrier, GC policy or public ABI is introduced. Costs remain linear in heap
+blocks; a trusted persistent index would need a separate integrity/lifetime design.
+The [matched admission benchmark](../benchmarks/gc-handles/README.md) includes early
+bases and small heaps so repeated-walk savings are not confused with universal gains.
+The full collector, suspension ownership and non-GC arena behavior are unchanged.

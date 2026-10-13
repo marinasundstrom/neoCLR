@@ -55,19 +55,33 @@ typedef struct host_root {
 static _Thread_local host_root host_roots[NEOCLR_GC_HOST_ROOT_LIMIT];
 static _Thread_local host_root *host_head;
 static _Atomic uint64_t next_host_handle = 1;
-static int live_base(const neoclr_aot_text_arena *arena, const void *value) {
-    if (!value) return 1;
-    for (uint64_t at = 0; at < arena->used;) {
+/* Validate every span while finding exact bases. Never publish a result or
+ * stop validation early: a matching prefix cannot hide a corrupt trailing block.
+ * Null values retain their existing admitted-root meaning. */
+static int validated_bases(const neoclr_aot_text_arena *arena, const void *value, const void *owner) {
+    if (!valid(arena)) return 0;
+    int found_value = !value, found_owner = !owner;
+    uint64_t at = 0;
+    while (at < arena->used && !(found_value && found_owner)) {
+        if (!block_valid(arena, at)) return 0;
         const block *b = (const void *)(arena->data + at);
-        if ((b->state & ALLOCATED) && value == (const void *)(b + 1)) return 1;
+        if (b->state & ALLOCATED) {
+            found_value |= value == (const void *)(b + 1);
+            found_owner |= owner == (const void *)(b + 1);
+        }
         at += b->span;
     }
-    return 0;
+    /* Once both bases match, the remaining walk only needs integrity checks. */
+    for (; at < arena->used;) {
+        if (!block_valid(arena, at)) return 0;
+        const block *b = (const void *)(arena->data + at);
+        at += b->span;
+    }
+    return found_value && found_owner;
 }
 int32_t neoclr_gc_allocation_info_v1(neoclr_aot_context *context, const void *value,
     uint64_t *bytes, uint32_t *kind) {
-    if (!context || !value || !bytes || !kind || !blocks_valid(&context->text) ||
-        !live_base(&context->text, value)) return NEOCLR_AOT_FAULT_RUNTIME_ERROR;
+    if (!context || !value || !bytes || !kind || !validated_bases(&context->text, value, NULL)) return NEOCLR_AOT_FAULT_RUNTIME_ERROR;
     const block *b = (const block *)value - 1;
     *bytes = b->bytes;
     *kind = (uint32_t)b->kind;
@@ -88,7 +102,7 @@ static void resource_cleanup(neoclr_gc_resource **link) {
 int32_t neoclr_gc_resource_attach_v1(neoclr_aot_context *context, void *owner,
     neoclr_gc_resource *resource, void *state, void (*cleanup)(void *)) {
     if (resource_cleanup_active || !context || !owner || !resource || !cleanup ||
-        !blocks_valid(&context->text) || !live_base(&context->text, owner)) return 3;
+        !validated_bases(&context->text, owner, NULL)) return 3;
     unsigned count = 0;
     for (neoclr_gc_resource *r = resource_head; r; r = r->next) {
         if (r == resource) return 3;
@@ -118,8 +132,8 @@ static host_root *find_host_root(neoclr_aot_context *context, uint64_t handle) {
 }
 static int32_t host_root_create(neoclr_aot_context *context, void *owner, void *value,
     int conditional, uint64_t *output) {
-    if (!context || !output || !blocks_valid(&context->text) || !live_base(&context->text, value) ||
-        (conditional && (!owner || !live_base(&context->text, owner))))
+    if (!context || !output || (conditional && !owner) ||
+        !validated_bases(&context->text, value, conditional ? owner : NULL))
         return NEOCLR_AOT_FAULT_RUNTIME_ERROR;
     host_root *available = NULL;
     for (uint32_t i = 0; i < NEOCLR_GC_HOST_ROOT_LIMIT; i++)
@@ -146,7 +160,7 @@ int32_t neoclr_gc_host_root_create_owned_v1(neoclr_aot_context *context, void *o
 }
 int32_t neoclr_gc_host_root_replace_v1(neoclr_aot_context *context, uint64_t handle, void *value) {
     host_root *root = find_host_root(context, handle);
-    if (!root || root->expired || !blocks_valid(&context->text) || !live_base(&context->text, value)) return NEOCLR_AOT_FAULT_RUNTIME_ERROR;
+    if (!root || root->expired || !validated_bases(&context->text, value, NULL)) return NEOCLR_AOT_FAULT_RUNTIME_ERROR;
     root->value = value;
     return 0;
 }
@@ -168,7 +182,7 @@ int32_t neoclr_gc_host_root_release_v1(neoclr_aot_context *context, uint64_t han
 static int32_t callback_read(neoclr_aot_context *context, uint64_t handle, void **output) {
     host_root *root = find_host_root(context, handle);
     if (!root || root->conditional || !output || !root->value || context->fault.code ||
-        !blocks_valid(&context->text) || !live_base(&context->text, root->value)) return 3;
+        !validated_bases(&context->text, root->value, NULL)) return 3;
     const block *allocation = (const block *)root->value - 1;
     uint64_t kind;
     if (allocation->kind != NEOCLR_GC_OBJECT || allocation->bytes != 24) return 3;
@@ -189,8 +203,7 @@ int32_t neoclr_gc_callback_read_suspended_v1(neoclr_aot_context *context, uint64
 }
 int32_t neoclr_gc_roots_park_owned_v1(neoclr_aot_context *context, void *owner,
     neoclr_parked_roots *record) {
-    if (!context || !owner || !record || !blocks_valid(&context->text) ||
-        !live_base(&context->text, owner) || record->head || record->next ||
+    if (!context || !owner || !record || !validated_bases(&context->text, owner, NULL) || record->head || record->next ||
         record->owner_context || record->owner || record->expired) return 3;
     for (const neoclr_parked_roots *p = neoclr_roots_parked_v1(); p; p = p->next)
         if (p == record) return 3;
