@@ -113,10 +113,10 @@ cannot be forcibly interrupted. Transport phases have their own bounds.
 ## HTTPS and current limits
 
 Development HTTPS uses explicit certificate credentials and trust through managed
-`SslStream`. The development candidate passes shared HTTPS/JSON and failure checks
+`SslStream`. Preview 14 passes shared HTTPS/JSON and failure checks
 on macOS ARM64 and Windows x64 in interpreter, JIT and AOT modes. See the
 [TLS guide](/docs/ssl-streams.html) for setup and
-[development availability](/try/#development) for matching tools.
+[release availability](/try/#development) for matching tools.
 SQL transport has separate limitations; HTTP TLS support does not imply SQL TLS.
 
 HTTP/1.1 responses support fixed-length, chunked and connection-close framing.

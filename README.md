@@ -1,7 +1,7 @@
 # neoCLR
 
 [![CI](https://github.com/marinasundstrom/neoCLR/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/marinasundstrom/neoCLR/actions/workflows/ci.yml)
-[![Preview 13](https://img.shields.io/badge/release-v0.1.0--preview.13-blue)](https://github.com/marinasundstrom/neoCLR/releases/tag/v0.1.0-preview.13)
+[![Preview 14](https://img.shields.io/badge/release-v0.1.0--preview.14-blue)](https://github.com/marinasundstrom/neoCLR/releases/tag/v0.1.0-preview.14)
 [![MIT license](https://img.shields.io/badge/license-MIT-green)](LICENSE)
 [![Rust 1.85+](https://img.shields.io/badge/Rust-1.85%2B-orange)](Cargo.toml)
 
@@ -54,10 +54,10 @@ native PE/#Neo metadata assemblies; JSON remains a legacy/intermediate input. Se
 
 ## Try the runtime and Raven experiment
 
-**Preview 13** supplies matched Windows x64 and macOS ARM64 bundles with Raven compiler,
-language server, VS Code extension, runtime, source-built libraries and executable
+**Preview 14** supplies matched Windows x64 and macOS ARM64 bundles with Raven compiler,
+language server, VS Code extension, default-JIT runtime, source-built libraries and executable
 collections, Tasks, JSON and HTTP samples. Install and verify using the
-[Preview 13 release notes](docs/preview-13-release-notes.md). Library symbols come
+[Preview 14 release notes](docs/preview-14-release-notes.md). Library symbols come
 from native metadata. The primitive core and retained runtime seed remain explicit
 bootstrap inputs; the full System library is not yet independently bootstrapped.
 
@@ -66,7 +66,7 @@ Development native compilation now builds ordinary Raven projects into standalon
 passes managed arrays/text, binary I/O, fault parity and executable-only deployment.
 See [native project build instructions](docs/native-poc-bundle.md#windows-x64-console-source-checkout)
 and [Windows execution evidence](docs/windows-native-project-validation.json).
-These are source-checkout development workflows, separate from Preview 13 packaging.
+These are source-checkout development workflows, separate from Preview 14 packaging.
 
 The following Preview 11 instructions describe the older bridge distribution.
 

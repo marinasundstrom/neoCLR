@@ -1,0 +1,52 @@
+{
+  "release": "v0.1.0-preview.14",
+  "date": "2026-10-13",
+  "assets": {
+    "SHA256SUMS": {
+      "sha256": "0e660839f899e78f1f4209de2bf910f34c622243e5ee04fc0382d2caf062e5b3",
+      "bytes": 1053
+    },
+    "neoclr-preview14-osx-arm64.tar.gz": {
+      "sha256": "b428643cad87b8e8d6ebd5c44db0eb784affc90ae35defde08d1f3011ac649aa",
+      "bytes": 54246978
+    },
+    "neoclr-preview14-qualified-source.tar": {
+      "sha256": "598235e0146b57e3365cdd14e14b2772d6b5d8e4747dacd434a096fe27256d92",
+      "bytes": 144476160
+    },
+    "neoclr-preview14-win-x64.tar.gz": {
+      "sha256": "03e33ee877a6bf8ec7e38d7c608a2abcb4f1d5513ba0de235ede0e0486f85736",
+      "bytes": 53907575
+    },
+    "preview-14-validation.json": {
+      "sha256": "dc74480eda4b50e6df7b625c0f18264ec4277afacee669f7bf9c2c8edc4c3ce7",
+      "bytes": 970586
+    },
+    "raven-0.1.13-neoclr.20261012.2-osx-arm64.vsix": {
+      "sha256": "5c496d3f164e47a33216eff02f4a5084b6f52ed396e89cba504d65f266ae4a48",
+      "bytes": 10755723
+    },
+    "raven-0.1.13-neoclr.20261013.1-win-x64.vsix": {
+      "sha256": "c6420d85cc266d5220a25df7f0bb5605a5bdc2eed14332073fabe1449eb1d257",
+      "bytes": 10780109
+    },
+    "raven-sdk-0.1.13-neoclr.20261012.2-osx-arm64.tar.gz": {
+      "sha256": "d80b21918ad9a88400a7ec9d963d63d673019add5e9cf06408c605d5a41dea5b",
+      "bytes": 32647055
+    },
+    "raven-sdk-0.1.13-neoclr.20261013.1-win-x64.tar.gz": {
+      "sha256": "ec5faf4251b404d518321eacbd781052c37e5c0350676a61fba45e2f36a4cf00",
+      "bytes": 32736640
+    },
+    "raven-tool-notices-osx-arm64.tar.gz": {
+      "sha256": "ad423f9d9a164b78069e90f12b2e30a5fa701c2f60811120366387bd7c9e08f9",
+      "bytes": 208800
+    },
+    "raven-tool-notices-win-x64.tar.gz": {
+      "sha256": "a4d043b540881963039d7d6a031c72140f9d9cd59a7971d711e917fd0a8b77c1",
+      "bytes": 206744
+    }
+  },
+  "qualification": "experiments/release-20261013/README.md",
+  "bundlesUnchangedFromQualification": true
+}

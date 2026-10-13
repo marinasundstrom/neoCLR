@@ -1,9 +1,9 @@
 # Install neoCLR
 
 The matched bundle includes the runtime, Raven compiler, VS Code extension and samples.
-Preview 13 provides matching packages for **Windows x64** and **macOS on Apple silicon**.
-The interpreter and native-metadata compiler workflow are available on both.
-ARM64 ahead-of-time compilation remains a separate source-build POC on macOS.
+Preview 14 provides matching packages for **Windows x64** and **macOS on Apple silicon**.
+JIT is the default on both; interpreter execution remains available explicitly.
+AOT is a separate experimental publishing workflow for supported applications.
 
 ## 1. Install prerequisites
 
@@ -17,8 +17,8 @@ not by neoCLR itself.
 
 ## 2. Download and extract
 
-- [Download for macOS ARM64](https://github.com/marinasundstrom/neoCLR/releases/download/v0.1.0-preview.13/neoclr-preview13-osx-arm64.tar.gz)
-- [Download for Windows x64](https://github.com/marinasundstrom/neoCLR/releases/download/v0.1.0-preview.13/neoclr-preview13-win-x64.tar.gz)
+- [Download for macOS ARM64](https://github.com/marinasundstrom/neoCLR/releases/download/v0.1.0-preview.14/neoclr-preview14-osx-arm64.tar.gz)
+- [Download for Windows x64](https://github.com/marinasundstrom/neoCLR/releases/download/v0.1.0-preview.14/neoclr-preview14-win-x64.tar.gz)
 
 Extract the archive and keep its folders together.
 
@@ -69,25 +69,26 @@ python3 tools/verify-native-bundle.py --report ../acceptance.json
 On Windows, use `python` in place of `python3`. It compiles and runs the bundled
 collections, Tasks, JSON and HTTP examples.
 
-[Release notes and downloads](https://github.com/marinasundstrom/neoCLR/releases/tag/v0.1.0-preview.13)
+[Release notes and downloads](https://github.com/marinasundstrom/neoCLR/releases/tag/v0.1.0-preview.14)
 include the exact supported toolchain and limitations. Older installation instructions
 belong to their [matching release](https://github.com/marinasundstrom/neoCLR/releases).
 
 <a id="development"></a>
 
-## Development candidate
+## Preview 14 capabilities
 
-The next candidate uses JIT by default on macOS ARM64 and Windows x64. Its HTTP
-client/server, typed JSON and HTTPS checks pass in interpreter, JIT and AOT modes
-on those hosts. Windows uses compiler-generated async state machines; runtime-owned
-suspension remains a separate development path.
+HTTP client/server, typed JSON and HTTPS checks pass in interpreter, JIT and AOT
+modes on macOS ARM64 and Windows x64. Windows JIT uses compiler-generated async
+state machines; runtime-owned suspension has separate target-specific coverage.
 
-These changes are not in the Preview 13 downloads above. Candidate packages have
-not been published as a release. Contributors can use the
-[development build instructions](https://github.com/marinasundstrom/neoCLR/blob/main/docs/native-poc-bundle.md)
-with matching compiler, runtime and libraries. The optional PostgreSQL provider is
-included in the macOS development bundle; the Windows candidate contains the four
-base libraries without that provider.
+The optional PostgreSQL provider is included in the macOS bundle. The Windows
+bundle contains the four base libraries without that provider. Start with the
+[PostgreSQL sample](/cases/postgresql/) for local database queries.
 
-[Candidate release notes](https://github.com/marinasundstrom/neoCLR/blob/main/docs/next-preview-release-notes.md) ·
-[Qualification results](https://github.com/marinasundstrom/neoCLR/blob/main/docs/experiments/release-20261013/README.md)
+For native publishing, follow the
+[project build instructions](https://github.com/marinasundstrom/neoCLR/blob/v0.1.0-preview.14/docs/native-poc-bundle.md)
+with the matching compiler, runtime, libraries and host tools. AOT remains bounded;
+JIT package acceptance does not imply every application can be published natively.
+
+[Preview 14 release notes](https://github.com/marinasundstrom/neoCLR/releases/tag/v0.1.0-preview.14) ·
+[Qualification results](https://github.com/marinasundstrom/neoCLR/blob/v0.1.0-preview.14/docs/experiments/release-20261013/README.md)

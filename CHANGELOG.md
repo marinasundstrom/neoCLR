@@ -8,6 +8,15 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-13
 
+- Prepare Preview 14 publication with exact qualified macOS ARM64/Windows x64
+  bundles, separately packaged matching SDK/VSIX and notices, source qualification
+  archive, checksums and per-revision evidence. Update release/install guidance and
+  select version 0.1.0-preview.14; retain prior published history unchanged.
+
+## 0.1.0-preview.14 — 2026-10-13
+
+### 2026-10-13
+
 - Refresh the website for release review: correct homepage execution/host coverage,
   document qualified Windows/macOS HTTPS, distinguish the development candidate
   from Preview 13 downloads, and correct array/sequence slicing status. Preserve
