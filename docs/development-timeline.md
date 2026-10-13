@@ -16930,3 +16930,18 @@ website sources are updated; publication was not performed.
   adapters. API snapshot and 11 focused website checks pass. The native metadata
   bridge remains temporary; no new structural union or live network qualification
   is claimed. See [retained validation](experiments/http-json-client/validation-20261013.json).
+
+## 2026-10-14 — Shared HTTP bytes and lazy materialization
+
+The author suggested shared byte buffers, avoiding string allocations and being as
+lazy as useful, while learning from other languages. The assistant inspected the
+current request parser and found existing byte scanning followed by eager name/value
+decoding and a temporary lowercase-name byte list. It compared Kestrel's byte-span
+parser, .NET pipeline ownership/backpressure and Go's string/header-map parsing.
+
+The assistant proposed byte-based known-header matching first, followed by bounded
+owned header storage and lazy cached values, preserving eager framing validation
+and lifetime across await. It called out retained-buffer/pool memory costs and
+continued pull-driven bodies. This is a proposed sequence, not author approval of
+every API detail or a performance result. [Research and tradeoffs](http-foundation.md#byte-ownership-and-lazy-materialization-direction--2026-10-14)
+record what remains to implement and measure. The current GC profiling slice continues.

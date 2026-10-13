@@ -131,3 +131,57 @@ probe uses an oversized DOM string to exercise a recoverable serialization error
 ## Validation
 
 See [reproduction and recorded results](experiments/http-foundation/README.md).
+
+## Byte ownership and lazy materialization direction — 2026-10-14
+
+Author direction: aim for shared byte buffers and fewer temporary strings, making
+HTTP work lazy where useful. This is a proposed implementation direction, not a
+new public buffer API or a measured speedup. It complements runtime GC/pacing work.
+
+Current `HttpRequestDecoder` already scans bytes, but copies received header bytes
+into `ArrayList<byte>`, eagerly decodes each header name/value, and constructs
+another byte list to lowercase each name. `HttpByteWindow` is a bounded view, but
+the codec owns a snapshot. `HttpRequest.Headers` exposes string-valued `HttpHeader`
+objects. Streaming request content already has a context-bound lifetime; header
+strings currently have ordinary independent managed lifetimes.
+
+Primary-source review (accessed 2026-10-14):
+
+- [Kestrel HttpParser](https://github.com/dotnet/aspnetcore/blob/main/src/Servers/Kestrel/Core/src/Internal/Http/HttpParser.cs)
+  scans byte spans/sequences and passes header slices to its handler. This parser
+  boundary does not imply the whole framework is zero-copy.
+- [.NET pipelines](https://learn.microsoft.com/en-us/dotnet/standard/io/pipelines)
+  make buffer consumption, ownership and backpressure explicit. Pooling reduces
+  allocations but readers must respect buffer lifetimes.
+- [Go request parsing](https://go.dev/src/net/http/request.go) uses a buffered reader,
+  materializes the request line and a MIME header map. Go is useful as an ergonomic
+  and performance comparison, not evidence that all successful servers avoid strings.
+
+Proposed sequence: first measure byte/string allocations per request by stage, then
+remove lowercase-name intermediates using ASCII byte comparison and known-name
+identities. Next retain bounded owned header storage with offsets, decode/cache
+values only when demanded, and compare that with eagerly owned small strings.
+Keep request framing, duplicate framing headers, syntax and configured bounds
+validated before dispatch even if the handler never accesses a header. Lazy decoding
+must not defer protocol rejection until application access. Do not use grapheme
+indexing for wire grammar; body encoding remains a content concern.
+
+Shared means shared ownership of bounded storage within an exchange/connection,
+not a mutable global receive buffer. A view surviving `await` must retain its owner;
+a buffer cannot return to a pool while any consumer can read it. A retained request
+can otherwise pin a whole large buffer, so copy small escaping values or retain a
+compact immutable snapshot where that is cheaper. Pool retention itself needs a
+cap. Cancellation, shutdown, abandoned operations and fault cleanup must release
+ownership; test slow peers alongside fast peers and fragmented input.
+
+Keep streaming bodies pull-driven with bounded read-ahead and preserve bytes already
+received after the header terminator. Do not buffer entire bodies to enable views.
+Response headers and payloads should be written from bytes without constructing
+whole-message strings. Start with private owned byte-array/range helpers; a public
+Span/Memory/Pipelines equivalent needs broader contracts and is not a prerequisite.
+
+Validate same-fixture allocations/request, copied bytes, throughput and latency,
+peak retained memory and GC cleanup in native JIT/AOT plus an interpreter correctness
+control. Preserve metadata/header lifetime semantics or document a deliberate API
+change with matching reference documentation. No pooling or lazy-header behavior
+is implemented by this design note.

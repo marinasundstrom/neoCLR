@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-14
 
+- Record the author-directed HTTP byte-buffer/lazy-string direction, current eager header allocations, Kestrel/.NET/Go comparisons, ownership and backpressure tradeoffs, and staged validation needs. This is design guidance; no pooling or lazy-header behavior is implemented yet.
+
 - Reuse already validated spans when refining the dense native GC lookup table. Preserve full initial validation, root/owner checks, corruption failure atomicity and collection policy. All 35 local GC/root checks pass; longer paired dense-graph measurements improve collection throughput by 2.1–3.3%, with small/sparse controls within 1%. Add longer benchmark intervals and selectable hosted comparison revisions; platform and HTTP qualification follow separately.
 
 - Add collection header-validation counters to the native GC graph profiler, separate from uninstrumented timing. Retain identical-source controls confirming duplicate dense-heap validation; no runtime behavior change.
