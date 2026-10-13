@@ -1,0 +1,8 @@
+   Compiling neoclr-aot-poc v0.0.0 (/Users/robert/Projects/neoclr/tools/aot-poc)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 13.61s
+     Running tests/console.rs (target/debug/deps/console-dafeb0f53eda77bd)
+
+running 1 test
+test rooted_boxed_int32_display_matches_interpreter ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 150 filtered out; finished in 1.43s

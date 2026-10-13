@@ -19,15 +19,24 @@ Reproduce with the selected platform toolchain:
 ```
 python3 scripts/validate-native-gc.py --output NEW_DIRECTORY
 python3 -m unittest discover -s scripts -p test_native_gc_layout.py
+cargo test --locked -p neoclr-aot-poc --test console rooted_boxed_int32_display_matches_interpreter
 cargo test --locked -p neoclr-aot-poc --test console rooted_integer_formatting_matches_interpreter
 cargo test --locked -p neoclr-aot-poc --test console native_gc_preserves_borrowed_owners_erased_results_and_fault_messages
 cargo test --locked -p neoclr-aot-poc --test console wide_integer_text_conversions_records_and_lifetime_match_interpreter
 ```
 
-All three focused compiler tests pass locally: 15 GC and 15 non-GC wide-integer
+All four focused compiler tests pass locally: 15 GC and 15 non-GC wide-integer
 comparisons preserve interpreter faults, and the borrowed/erased Int32 consumer
 retains its values through repeated collections. GC imports explicitly select
-the rooted symbols. Compiler tests are macOS ARM64 consumers. Windows helper qualification is separate;
+the rooted symbols. The boxed Int32 virtual-display consumer compares six inputs
+(including both signed limits) with interpreter stdout, checks distinct box identity
+and verifies complete final reclamation. Compiler tests are macOS ARM64 consumers. Windows helper qualification is separate;
 passing the C contract does not establish a fresh managed Windows or HTTP run.
 This is correctness/admission work, not a performance claim. No new managed API or
 Raven bridge contract is introduced. See the [audit](../../../experiments/aot-console/native-gc.md#explicit-helper-temporary-values).
+
+[Hosted run 38442798510](https://github.com/marinasundstrom/neoCLR/actions/runs/38442798510)
+at `c90923e30` passes 22 GC/root checks on both macOS ARM64 and Windows x64, plus
+both socket suites and relocated-package checks. macOS profiler attachment also
+passes. Raw reports and job outcomes are retained here. The subsequent boxed test
+adds local coverage without changing the qualified runtime implementation.

@@ -46,7 +46,8 @@ with the [helper-family audit](experiments/aot-console/native-gc.md#explicit-hel
 (UTF-8 slicing now also protects borrowed input through retry; local pressure tests
 and 270 compiled GC/non-GC comparisons pass; Windows GC/root and both-platform
 socket checks also pass). Integer formatting now has audited stack-scratch allocation
-retry in generated GC code; other formatting, arrays and borrowed-input families
+retry in generated GC code, with 22 macOS/Windows GC/root checks and focused
+compiled/boxed consumers passing; other formatting, arrays and borrowed-input families
 remain to audit. Then qualify a managed pacing policy across execution modes before promotion.
 The author additionally proposed generations to reduce collection pressure/latency;
 [the next architecture evaluation](runtime-gc.md#generational-collection-evaluation--2026-10-13)

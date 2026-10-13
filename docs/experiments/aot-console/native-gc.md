@@ -625,6 +625,7 @@ formatting, fault-recovery or general pacing change. Newly generated GC objects
 require a matching native host; existing objects remain compatible.
 
 Local qualification passes all 22 native GC/root executions, relocated GC/non-GC
-package checks and three focused compiled consumers (including 30 wide-integer
+package checks and four focused compiled consumers (including 30 wide-integer
 interpreter comparisons). [Retained evidence](../../validation/runtime-product/integer-formatting/README.md).
-Windows qualification is pending.
+The hosted macOS/Windows gate also passes all 22 GC/root checks, socket contracts
+and package checks; the evidence records its exact revision and scope.
