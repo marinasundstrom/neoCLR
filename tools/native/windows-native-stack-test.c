@@ -89,15 +89,14 @@ int main(void) {
     run_thread(512 * 1024, worker, &shallow);
     run_thread(1024 * 1024, worker, &deep);
     assert(deep > shallow);
-    /* Explicitly reject even a converted thread: fiber/activation ownership is
-     * not qualified by this system-thread stack contract. */
+    /* Preserve stack budgeting on host-owned fibers as well as OS threads. */
     assert(ConvertThreadToFiber(NULL) != NULL);
-    assert(neoclr_native_stack_check_v1() == 9);
+    assert(neoclr_native_stack_check_v1() == 0);
     neoclr_windows_gc_host fiber_host = {0};
-    assert(neoclr_windows_gc_host_open(&fiber_host, 4096) == 9);
-    assert(!fiber_host.heap.reservation && !fiber_host.thread_id);
+    assert(neoclr_windows_gc_host_open(&fiber_host, 4096) == 0);
+    assert(neoclr_windows_gc_host_close(&fiber_host) == 0);
     assert(ConvertFiberToThread());
     assert(neoclr_native_stack_check_v1() == 0);
-    printf("{\"passed\":true,\"smallStackRejected\":true,\"fiberRejected\":true,\"depth512KiB\":%u,\"depth1MiB\":%u}\n", shallow, deep);
+    printf("{\"passed\":true,\"smallStackRejected\":true,\"fiberAccepted\":true,\"depth512KiB\":%u,\"depth1MiB\":%u}\n", shallow, deep);
     return 0;
 }

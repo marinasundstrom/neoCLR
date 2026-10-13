@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-13
 
+- Move the private suspension carrier into runtime/native/async with compatibility forwarding paths. Add a Windows fiber carrier beneath shared operation/root ownership, preserve host-owned fiber conversion, and release Windows stacks on completion/abandonment. Extend stack budgeting and shared GC lifetime tests to fibers. All 35 local macOS GC/root checks pass; Windows qualification is pending and compiler/SDK defaults are unchanged.
+
 - Retain passing macOS paced runtime-await evidence: all 24 JIT/AOT language, cleanup, lifetime, stress, HTTP and fault/recovery cases, plus interpreter lifetime and repeated-entry controls. Verify recorded input hashes after execution. This qualifies the current macOS carrier with paced collection, not Windows suspension or a default switch; no additional runtime fix was required.
 
 - Record the supplied GC overview and primary-source review of Go/.NET collector choices. Keep generational, concurrent and relocation work exploratory; prioritize survival, allocation and pause measurements, with throughput evaluated against latency and memory limits. No collector or policy change.

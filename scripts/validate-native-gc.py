@@ -84,13 +84,15 @@ def main():
             binary = build(name, 'root-validation-test', gc=gc)
             for case in ['address', 'width', 'flags', 'fault', 'transient']:
                 run(name + '-' + case, [binary, case], 3 if windows else -signal.SIGABRT)
-        if not windows:
-            for name in ['native-owned-body-test', 'native-idle-drain-test']:
-                binary = out / name
-                run(name + '-build', [*cc, '-DNEOCLR_NATIVE_GC', '-Wno-deprecated-declarations',
-                    '-I', BASE, '-I', carrier, carrier / (name + '.c'), carrier / 'native-runtime.c',
-                    BASE / 'native-gc.c', BASE / 'root-probe.c', BASE / 'native-stack.c', '-o', binary])
-                run(name, [binary])
+        for name in ['native-owned-body-test', 'native-idle-drain-test']:
+            binary = out / (name + ('.exe' if windows else ''))
+            flags = ['/DNEOCLR_NATIVE_GC', '/I' + str(BASE), '/I' + str(carrier)] if windows else ['-DNEOCLR_NATIVE_GC', '-Wno-deprecated-declarations', '-I', BASE, '-I', carrier]
+            stack = ROOT / 'tools/native/windows-native-stack.c' if windows else BASE / 'native-stack.c'
+            run(name + '-build', [*cc, *flags, carrier / (name + '.c'), carrier / 'native-runtime.c',
+                BASE / 'native-gc.c', BASE / 'root-probe.c', stack, *(['/Fe:' + str(binary)] if windows else ['-o', binary])])
+            run(name, [binary])
+            if windows and name == 'native-owned-body-test':
+                run(name + '-host-fiber', [binary, '--host-fiber'])
         report['passed'] = True
     except Exception as error:
         report['error'] = str(error)

@@ -2,6 +2,11 @@
 #include "native-runtime.h"
 #include "socket-listener.h"
 #include <stdio.h>
+#include "native-stack.h"
+#ifdef _WIN32
+#define WIN32_LEAN_AND_MEAN
+#include <windows.h>
+#endif
 #define CHECK(x) do { if (!(x)) { fprintf(stderr, "check failed at %d\n", __LINE__); return 1; } } while (0)
 static uint64_t signal_id;
 static int entered, resumed, managed, collect_at_idle;
@@ -16,6 +21,7 @@ int32_t neoclr_scheduler_complete_v1(neoclr_aot_context *c, uint64_t id, const n
     return 3;
 }
 static int32_t invoke(uint64_t handle, neoclr_aot_context *c) {
+    CHECK(!neoclr_native_stack_check_v1());
     void *callback = NULL;
     CHECK(!neoclr_gc_callback_read_v1(c, handle, &callback));
     void *owner = NULL;
@@ -31,6 +37,7 @@ static int32_t invoke(uint64_t handle, neoclr_aot_context *c) {
     int32_t result;
     CHECK(!neoclr_runtime_async_waitcompletion_v1(signal_id, c, &result));
     CHECK(result && local[1] == 42);
+    CHECK(!neoclr_native_stack_check_v1());
     CHECK(!neoclr_gc_collect_v1(c, neoclr_root_probe_head_v1()));
     ++resumed;
     neoclr_probe_leave_v1(&frame);
@@ -41,7 +48,14 @@ static void *allocate(neoclr_aot_context *c) {
     void *p = NULL;
     return neoclr_gc_allocate_v1(&c->text, 24, NEOCLR_GC_OBJECT, &p) ? NULL : p;
 }
-int main(void) {
+int main(int argc, char **argv) {
+    (void)argv;
+#ifdef _WIN32
+    if (argc > 1) CHECK(ConvertThreadToFiberEx(NULL, FIBER_FLAG_FLOAT_SWITCH));
+    int host_fiber = !!IsThreadAFiber();
+#else
+    (void)argc;
+#endif
     uint64_t storage[1024] = {0};
     neoclr_aot_context c = {.text = {(unsigned char *)storage, sizeof(storage), 0}};
     for (int i = 0; i < 320; ++i) {
@@ -126,6 +140,10 @@ int main(void) {
     CHECK(!neoclr_gc_collect_v1(&c, NULL) && !c.text.used);
     CHECK(!neoclr_gc_entry_check_v1(&c));
     CHECK(!neoclr_runtime_async_shutdown_v1(&c));
+#ifdef _WIN32
+    CHECK(!!IsThreadAFiber() == host_fiber);
+    if (host_fiber) CHECK(ConvertFiberToThread());
+#endif
     neoclr_async_statistics stats = neoclr_runtime_async_statistics_v1();
     CHECK(!stats.reserved_bytes && stats.mappings == stats.unmappings);
     printf("{\"entered\":%d,\"resumed\":%d,\"abandoned\":%d,\"reservedBytesAfterShutdown\":%llu}\n",

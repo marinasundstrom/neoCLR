@@ -288,3 +288,26 @@ at `4d1efde54` passes the full integrated gate, including all 12 applicable scal
 compiler/JIT tests, 20 GC/root executions, TLS/security and packaging checks.
 The retained Windows reports include exact inputs and commands. These are build/test
 integration fixes, not a measured runtime throughput improvement.
+
+## Runtime-owned suspension carrier — 2026-10-13
+
+The cooperative carrier now lives in `runtime/native/async`, with forwarding files
+at the historical experiment paths. macOS retains its existing `ucontext` carrier.
+Windows uses [CreateFiberEx](https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-createfiberex)
+and [ConvertThreadToFiberEx](https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-convertthreadtofiberex),
+reviewed on this date, beneath the same operation, scheduling and parked-root
+logic. Unlike .NET compiler state machines, these application activations retain
+native stacks; the benefit is ordinary call-chain suspension, at a stack reservation
+and switching cost. This is private runtime support, not a new public ABI.
+
+The Windows carrier is thread-affine and uses a 1 MiB reservation per activation.
+It preserves pre-existing host fiber conversion and only undoes conversion it owns.
+Completed/abandoned Windows fibers are deleted, not cached; Windows stack caching
+needs a separately qualified reusable entry loop. macOS guarded-stack caching is
+unchanged. Stack probes validate actual thread/fiber bounds and preserve the stack
+reserve, rather than rejecting all Windows fibers.
+
+The shared GC gate runs owned-body survival, abandonment, pressure rollback and
+idle-drain tests on both OS carriers, plus a Windows host-owned-fiber case. Local
+macOS passes all 35 GC/root cases after migration. Windows qualification is pending
+for this slice; backend admission and SDK defaults remain unchanged until qualified.

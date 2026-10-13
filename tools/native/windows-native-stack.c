@@ -1,5 +1,4 @@
-/* Private Windows x64 host probe. Generated Windows managed code is not yet
- * admitted. The helper requires an initially usable native host stack. */
+/* Private Windows x64 thread/fiber stack budget probe. */
 #ifndef _WIN32_WINNT
 #define _WIN32_WINNT 0x0602
 #endif
@@ -11,6 +10,12 @@
 #error "Windows stack probe requires x64 MSVC"
 #endif
 
+static _Thread_local uintptr_t retained_lower, retained_upper;
+void neoclr_native_stack_bounds_v1(uintptr_t lower, uintptr_t upper) {
+    retained_lower = lower;
+    retained_upper = upper;
+}
+
 __declspec(noinline) int32_t neoclr_native_stack_check_v1(void) {
     /* This slot is just below the caller's stack position after we return.
      * We inspect its address, never its contents or adjacent arguments. */
@@ -18,7 +23,6 @@ __declspec(noinline) int32_t neoclr_native_stack_check_v1(void) {
     ULONG_PTR low, high;
     MEMORY_BASIC_INFORMATION region;
     SYSTEM_INFO system;
-    if (IsThreadAFiber()) return 9;
     GetCurrentThreadStackLimits(&low, &high);
     if (!low || low >= high || position < low || position >= high) return 9;
     if (VirtualQuery((const void *)position, &region, sizeof(region)) != sizeof(region) ||
@@ -28,6 +32,8 @@ __declspec(noinline) int32_t neoclr_native_stack_check_v1(void) {
      * using the current committed boundary would reject normal fresh stacks. */
     uintptr_t base = (uintptr_t)region.AllocationBase;
     if (!base || base > low || position < base) return 9;
+    if ((retained_lower || retained_upper) &&
+        (retained_lower != base || retained_upper != high)) return 9;
     GetSystemInfo(&system);
     if (!system.dwPageSize || system.dwPageSize > NEOCLR_NATIVE_STACK_RESERVE) return 9;
     /* Leave the existing 256 KiB budget plus a bottom guard-page margin. This
