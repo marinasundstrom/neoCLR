@@ -49,6 +49,8 @@ def main():
         run('cli', ['cargo', 'test', '--locked', '-p', 'neoclr', '--test', 'cli', 'cli_execution_selection'])
         run('hosting', ['cargo', 'test', '--locked', '-p', 'neoclr-aot-poc', '--test', 'hosting'])
         run('execution', ['cargo', 'test', '--locked', '-p', 'neoclr-aot-poc', '--test', 'scalar'])
+        if platform.system() == 'Windows':
+            run('windows-aot-execution', ['cargo', 'test', '--locked', '-p', 'neoclr-aot-poc', '--test', 'windows_scalar', 'windows_c_consumer_executes_calls_branches_faults_and_utf8'])
         if platform.system() == 'Darwin' and platform.machine() == 'arm64':
             run('compiled-roots', ['cargo', 'test', '--locked', '-p', 'neoclr-aot-poc', '--test', 'console', 'utf8_text_slices_preserve'])
         run('native-gc', [sys.executable, ROOT / 'scripts/validate-native-gc.py', '--output', out / 'gc'])
