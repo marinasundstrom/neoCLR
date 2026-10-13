@@ -687,4 +687,5 @@ principle that managed references must be observable at collecting boundaries;
 private neoCLR storage and helper symbols remain implementation details.
 The pressure fixture checks referent retention through the newly published array,
 context rejection, unchanged failure outputs, live exhaustion and final cleanup.
-Platform qualification is pending.
+All 25 macOS/Windows GC/root checks, socket/package checks and 14 local compiled
+array tests pass. See [retained qualification](../../validation/runtime-product/reference-arrays/README.md).
