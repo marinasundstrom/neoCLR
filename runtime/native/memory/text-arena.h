@@ -62,8 +62,11 @@ int32_t neoclr_utf8_encode_v1(const neoclr_aot_text *text, neoclr_aot_text_arena
                              const void **output);
 /* Internal object allocation for the explicit reference-arena profile. Header is
  * a private type index; bytes includes header and padded payload (8..NEOCLR_NATIVE_OBJECT_BYTES bytes).
- * The arena owns objects and cycles until the next entry/reset, just like text.
+ * GC builds trace live objects; non-GC objects expire at entry/reset. The rooted
+ * variant requires the matching published caller boundary in GC builds.
  */
+int32_t neoclr_allocate_object_rooted_v1(neoclr_aot_text_arena *arena, uint32_t type,
+    uint32_t bytes, void **output);
 int32_t neoclr_allocate_object_v1(neoclr_aot_text_arena *arena, uint32_t type,
                                 uint32_t bytes, void **output);
 /* Packed byte arrays, zero-initialized, length 0..65536. Negative length is

@@ -572,7 +572,7 @@ pub(crate) fn compile_into(
         let mut sig = module.make_signature();
         sig.params.extend([AbiParam::new(types::I64), AbiParam::new(types::I32), AbiParam::new(types::I32), AbiParam::new(types::I64)]);
         sig.returns.push(AbiParam::new(types::I32));
-        Some(module.declare_function("neoclr_allocate_object_v1", Linkage::Import, &sig)?)
+        Some(module.declare_function(if details.is_some_and(|d| d.native_gc) { "neoclr_allocate_object_rooted_v1" } else { "neoclr_allocate_object_v1" }, Linkage::Import, &sig)?)
     } else { None };
     let array_service = if references && input.functions.iter().any(|f| f.body.iter().any(|op| matches!(op, Op::NewArray(neoclr::metadata::Type::Byte)))) {
         let mut sig = module.make_signature();

@@ -818,3 +818,20 @@ principle within neoCLR's existing bounded, per-entry pool rather than widening 
 to a process-global pool. Quotas and fault behavior are unchanged. Forced-pressure
 tests check a source absent from caller roots, retained live exhaustion, unchanged
 failure outputs, duplicate lookup and entry reset. General pacing remains disabled.
+
+Object construction follow-up (2026-10-13): generated GC object allocations now
+use rooted retry. The helper has no managed input and completes the type header
+and zeroed payload before returning, without collecting calls in between. The
+IL-boundary spill retains pending constructor arguments and bound-function receivers
+before the allocation. The generated constructor path publishes its new receiver
+before entering managed constructor code; scalar boxing and callback descriptors
+finish their scalar/reference writes without an intervening collection. Existing
+raw/non-GC allocation remains noncollecting. Invalid arena/output arguments fault
+without dereference. This follows CLR's requirement to report live references at
+collecting allocation boundaries; neoCLR retains its own nonmoving arena/root ABI.
+Pressure tests cover initialized payloads, receiver retention, exhaustion, unchanged
+outputs and reclamation. A compiled consumer forces collection before and inside
+a constructor, then forces callback-binding collection and reads its reference argument through
+the bound receiver; the non-GC/interpreter controls
+return the same result. This closes the named intern/object helper audit, not the
+separate scheduler-idle or managed pacing qualification.

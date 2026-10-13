@@ -7018,3 +7018,95 @@ int main(void) {
     let r = Command::new(dir.0.join("host")).output().unwrap();
     assert!(r.status.success(), "{r:?}");
 }
+
+#[test]
+#[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+fn rooted_object_construction_preserves_arguments_and_receiver() {
+    let seed = neoclr::assemble(".module System\n.references ()\n").unwrap();
+    let source = r#"
+.module Construction
+.type class Cell
+.field Data arrayref<Byte>
+.method instance .ctor(arrayref<Byte> data) -> noresult
+ldc.i4 80
+newarr Byte
+pop
+ldc.i4 80
+newarr Byte
+pop
+ldarg 0
+ldarg data
+stfld Cell::Data
+ret
+.end
+.method instance Read() -> Int32
+ldarg 0
+ldfld Cell::Data
+ldc.i4 0
+ldelem Byte
+conv.i4
+ret
+.end
+.end
+.function Calculate() -> Int32
+ldc.i4 8
+newarr Byte
+dup
+ldc.i4 0
+ldc.i4 42
+conv.u1
+stelem Byte
+ldc.i4 104
+newarr Byte
+pop
+newobj.ctor instance Cell::.ctor(arrayref<Byte>)
+function.bind fn<Int32> = instance Cell::Read()
+callvirt instance fn<Int32>::Invoke()
+ret
+.end
+"#;
+    for gc in [false, true] {
+        let dir = Temp::new();
+        let mut flags = vec!["--compile-system", "--reference-arena"];
+        if gc { flags.push("--native-gc"); }
+        let r = compile_source(&dir, &seed, source, &flags, false);
+        assert!(r.status.success(), "{}", String::from_utf8_lossy(&r.stderr));
+        let base = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../docs/experiments/aot-console");
+        fs::write(dir.0.join("host.c"), r#"
+#include "native-gc.h"
+int main(void) {
+    uint64_t heap[512]={0};
+#ifdef NEOCLR_NATIVE_GC
+    unsigned capacity=256;
+#else
+    unsigned capacity=sizeof(heap);
+#endif
+    neoclr_aot_context ctx={.text={(unsigned char*)heap,capacity,0}};
+    int32_t result=0;
+    int status=neoclr_entry_v4(0,&result,&ctx);
+    if(status) {neoclr_aot_render_fault(stderr,&ctx.fault);return 1;}
+    if(result!=42)return 2;
+#ifdef NEOCLR_NATIVE_GC
+    if(neoclr_gc_statistics_v1().collections<3 || neoclr_root_probe_head_v1()) return 3;
+    if(neoclr_gc_collect_v1(&ctx,NULL) || ctx.text.used) return 4;
+#endif
+    return 0;
+}
+"#).unwrap();
+        let symbols = Command::new("nm").arg(dir.0.join("app.o")).output().unwrap();
+        assert!(String::from_utf8_lossy(&symbols.stdout).contains(if gc { "neoclr_allocate_object_rooted_v1" } else { "neoclr_allocate_object_v1" }));
+        let mut command = Command::new("clang");
+        command.args(["-std=c11", "-Wall", "-Wextra", "-Werror", "-fsanitize=undefined,bounds", "-I"]).arg(&base);
+        if gc { command.arg("-DNEOCLR_NATIVE_GC").arg(base.join("native-gc.c")).arg(base.join("root-probe.c")); }
+        let r = command.arg(dir.0.join("host.c")).arg(base.join("text-arena.c"))
+            .arg(base.join("../aot-fault-details/render.c")).arg(dir.0.join("app.o"))
+            .arg("-o").arg(dir.0.join("host")).output().unwrap();
+        assert!(r.status.success(), "{}", String::from_utf8_lossy(&r.stderr));
+        let r = Command::new(dir.0.join("host")).output().unwrap();
+        assert!(r.status.success(), "{r:?}");
+    }
+    let app = neoclr::assemble(source).unwrap();
+    let program = neoclr::LoadedProgram::with_library(&app, &seed).unwrap();
+    let method = program.resolve_function(&neoclr::assembler::parse_function_ref("Calculate()").unwrap()).unwrap();
+    assert_eq!(method.invoke(vec![], neoclr::Limits::default()).unwrap().value, neoclr::Value::Int32(42));
+}

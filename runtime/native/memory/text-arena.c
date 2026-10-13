@@ -142,13 +142,13 @@ int32_t neoclr_uint64_to_string_rooted_v1(uint64_t value, neoclr_aot_text_arena 
     return uint64_to_string(value, arena, output, 1);
 }
 
-int32_t neoclr_allocate_object_v1(neoclr_aot_text_arena *arena, uint32_t type,
-                                uint32_t bytes, void **output) {
-    if (arena->used > arena->capacity || (arena->capacity && !arena->data) ||
+static int32_t allocate_object(neoclr_aot_text_arena *arena, uint32_t type,
+                                uint32_t bytes, void **output, int rooted) {
+    if (!arena || !output || arena->used > arena->capacity || (arena->capacity && !arena->data) ||
         ((uintptr_t)arena->data & 7) || bytes < 8 || bytes > NEOCLR_NATIVE_OBJECT_BYTES || (bytes & 7))
         return NEOCLR_AOT_FAULT_RUNTIME_ERROR;
     void *storage;
-    int32_t status = reserve_storage(arena, bytes, OBJECT_STORAGE, &storage);
+    int32_t status = reserve_values(arena, bytes, OBJECT_STORAGE, &storage, rooted, NULL, 0);
     if (status) return status;
     unsigned char *object = storage;
     uint64_t identity = type;
@@ -157,6 +157,13 @@ int32_t neoclr_allocate_object_v1(neoclr_aot_text_arena *arena, uint32_t type,
     *output = object;
     return NEOCLR_AOT_FAULT_NONE;
 }
+
+/* No callbacks or collecting work may occur between reservation, zeroing and
+ * publication. Generated caller frames retain constructor arguments/receivers. */
+int32_t neoclr_allocate_object_v1(neoclr_aot_text_arena *arena, uint32_t type,
+    uint32_t bytes, void **output) { return allocate_object(arena, type, bytes, output, 0); }
+int32_t neoclr_allocate_object_rooted_v1(neoclr_aot_text_arena *arena, uint32_t type,
+    uint32_t bytes, void **output) { return allocate_object(arena, type, bytes, output, 1); }
 
 static int32_t allocate_bytes(neoclr_aot_text_arena *arena, int32_t length, int reserved, void **output, int rooted, const void *input) {
     if (length < 0) return NEOCLR_AOT_FAULT_RUNTIME_ERROR;
