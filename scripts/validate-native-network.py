@@ -46,19 +46,20 @@ def main():
             clang = run(['xcrun', '--sdk', 'macosx', '--find', 'clang'], 'clang').stdout.decode().strip()
             sdk = run(['xcrun', '--sdk', 'macosx', '--show-sdk-path'], 'sdk').stdout.decode().strip()
             compiler = [clang, '-isysroot', sdk, '-std=c11', '-O2', '-Wall', '-Wextra', '-Werror', '-DNEOCLR_NATIVE_GC', '-DNEOCLR_CLIENT_TEST', '-fsanitize=undefined,bounds']
-        for name in ('listener', 'accept', 'transfer', 'client', 'timer', 'scheduler'):
+        for name in ('listener', 'accept', 'transfer', 'client', 'timer', 'scheduler', 'scheduler-paced'):
             binary = out / (name + ('.exe' if windows else ''))
-            sources = [base / ('socket-' + name + '-test.c'), base / 'socket-listener.c',
+            sources = [base / ('socket-' + name.removesuffix('-paced') + '-test.c'), base / 'socket-listener.c',
                        base / 'native-gc.c', base / 'root-probe.c', base / 'text-arena.c']
-            if name == 'scheduler':
+            if name.startswith('scheduler'):
                 sources.append(base / 'task-queue.c')
             output = ['/Fe:' + str(binary), '/link', 'Ws2_32.lib'] if windows else ['-o', binary]
-            run([*compiler, *sources, *output], name + '-build')
+            defines = [('/D' if windows else '-D') + 'NEOCLR_GC_PACED'] if name.endswith('-paced') else []
+            run([*compiler, *defines, *sources, *output], name + '-build')
             result = run([binary], name + '-execute')
             if result.stdout or result.stderr:
                 raise ValueError('Unexpected contract output: ' + name)
             report['cases'].append(dict(name=name, passed=True))
-        report['passed'] = len(report['cases']) == 6
+        report['passed'] = len(report['cases']) == 7
     except Exception as error:
         report['error'] = str(error)
     finally:

@@ -860,3 +860,31 @@ further throttling needs a reliable reachability-change signal. The interpreter'
 existing allocation-pressure/completion policy is unchanged. Local macOS socket
 contracts cover pending timer retention, owned suspended-stack abandonment, idle
 cleanup, fault delivery and invalid boundaries; hosted Windows qualification follows.
+
+## Integrated opt-in pacing — 2026-10-13
+
+Build the root observer with `NEOCLR_NATIVE_GC` and `NEOCLR_GC_PACED` to select
+the runtime-owned boundary policy. Stress collection remains the default for
+installed JIT/AOT hosts; there is no new managed API or CLI option. This replaces
+the isolated experiment's policy copy for opt-in builds, retaining all generated
+root publication and validation. Collect after 16 allocations or 64 progressing
+boundaries, on context changes or an unexpected collection epoch. Rooted allocation
+retry handles large requests and fragmentation; explicit collection remains forced.
+Scheduler Idle/Pending acquisition forces collection and resets the pacing budget.
+Repeated pending polls still collect; these thresholds do not promise a wall-clock
+latency bound or independently running collector. No concurrent execution is added.
+
+The .NET comparison is allocation-pressure budgeting and safe-point root reporting,
+not a copy of its generational/concurrent collector. The benefit is fewer redundant
+full sweeps; costs are increased retained arena extent and synchronous pauses. The
+16/64 thresholds are provisional. The interpreter already has an independent
+allocation-pressure/completion policy; this change neither replaces it nor claims
+equal collection timing across execution modes. Default promotion still requires
+managed HTTP/runtime-async, sustained-load and JIT/AOT qualification.
+
+The focused gate checks the actual paced root observer, pressure admission,
+no-allocation reachability changes, explicit collection epochs, missing/foreign
+boundaries and the real scheduler in both modes. The constructor/callback consumer
+runs non-GC, stress-GC and paced-GC variants against the interpreter result. The
+closed benchmark can now use `evaluate-rooted.py --integrated`; the historical
+experiment remains reproducible without that flag. Platform evidence follows.

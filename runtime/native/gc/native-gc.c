@@ -635,6 +635,30 @@ int32_t neoclr_gc_collect_conditional_v1(neoclr_aot_context *context,
 #endif
     return status;
 }
+/* Opt-in generated-boundary pacing; private per-owner-thread state, not ABI.
+ * Unexpected global collection epochs force a sweep instead of indefinitely
+ * postponing cleanup across contexts. Rooted admission handles actual pressure. */
+static _Thread_local struct {
+    const neoclr_aot_context *context;
+    uint64_t allocations, collections, boundaries;
+} pacing;
+int32_t neoclr_gc_idle_v1(neoclr_aot_context *context, const neoclr_probe_frame *boundary) {
+    int32_t status = neoclr_gc_collect_v1(context, boundary);
+    if (!status) {
+        pacing.context = context;
+        pacing.allocations = statistics.allocations;
+        pacing.collections = statistics.collections;
+        pacing.boundaries = 0;
+    }
+    return status;
+}
+int32_t neoclr_gc_boundary_v1(neoclr_aot_context *context, const neoclr_probe_frame *boundary) {
+    if (!context || resource_cleanup_active || boundary != neoclr_root_probe_head_v1() ||
+        (boundary && boundary->context != context)) return 3;
+    if (pacing.context == context && statistics.collections == pacing.collections &&
+        statistics.allocations - pacing.allocations < 16 && ++pacing.boundaries < 64) return 0;
+    return neoclr_gc_idle_v1(context, boundary);
+}
 neoclr_gc_statistics neoclr_gc_statistics_v1(void) { return statistics; }
 
 static int32_t string_intern(const neoclr_aot_text *text, neoclr_aot_text_arena *arena,

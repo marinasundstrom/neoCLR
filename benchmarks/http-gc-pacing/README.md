@@ -169,3 +169,13 @@ passed. The subsequently completed [hosted macOS ARM64 run](rooted-macos-latest-
 also passes, improving objects 3.91× and strings 3.83×. Both jobs and their socket
 contracts pass; the hosted macOS job does not run the separate GC validator, whose
 20 local macOS executions are retained in the allocation evidence.
+
+## Integrated native policy qualification — 2026-10-13
+
+`evaluate-rooted.py --integrated --output NEW_DIRECTORY` now exercises the
+runtime-owned policy used by `NEOCLR_GC_PACED` builds, preserving the historical
+experiment when the option is omitted. Actual scheduler acquisition forces cleanup
+before returning Idle/Pending; root-observer and scheduler tests run both variants.
+Stress collection remains the installed-host default. The closed workload evidence
+does not establish managed HTTP or whole-runtime throughput or justify promotion
+by itself. Source hashes and separate diagnostic results accompany timing reports.

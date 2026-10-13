@@ -1,3 +1,16 @@
+#ifdef NEOCLR_INTEGRATED_PACING
+#include "native-gc.h"
+typedef struct { int unused; } rooted_pacing_state;
+static int rooted_pacing_boundary(neoclr_aot_context *c, const neoclr_probe_frame *h,
+    rooted_pacing_state *state, int stress) {
+    (void)state;
+    return stress ? neoclr_gc_idle_v1(c,h) : neoclr_gc_boundary_v1(c,h);
+}
+static int rooted_pacing_idle(neoclr_aot_context *c, const neoclr_probe_frame *h,
+    rooted_pacing_state *state) {
+    (void)state; return neoclr_gc_idle_v1(c,h);
+}
+#else
 /* Closed-workload experiment only. Every allocating path MUST use rooted
  * admission. Not selected by generated code, installed hosts or the SDK. */
 #include "native-gc.h"
@@ -33,3 +46,5 @@ static int rooted_pacing_idle(neoclr_aot_context *context, const neoclr_probe_fr
     rooted_pacing_state *state) {
     return rooted_pacing_collect(context, head, state);
 }
+
+#endif

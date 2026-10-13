@@ -7065,7 +7065,7 @@ callvirt instance fn<Int32>::Invoke()
 ret
 .end
 "#;
-    for gc in [false, true] {
+    for (gc, paced) in [(false, false), (true, false), (true, true)] {
         let dir = Temp::new();
         let mut flags = vec!["--compile-system", "--reference-arena"];
         if gc { flags.push("--native-gc"); }
@@ -7098,6 +7098,7 @@ int main(void) {
         let mut command = Command::new("clang");
         command.args(["-std=c11", "-Wall", "-Wextra", "-Werror", "-fsanitize=undefined,bounds", "-I"]).arg(&base);
         if gc { command.arg("-DNEOCLR_NATIVE_GC").arg(base.join("native-gc.c")).arg(base.join("root-probe.c")); }
+        if paced { command.arg("-DNEOCLR_GC_PACED"); }
         let r = command.arg(dir.0.join("host.c")).arg(base.join("text-arena.c"))
             .arg(base.join("../aot-fault-details/render.c")).arg(dir.0.join("app.o"))
             .arg("-o").arg(dir.0.join("host")).output().unwrap();

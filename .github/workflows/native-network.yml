@@ -156,14 +156,14 @@ jobs:
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
       - name: Evaluate macOS rooted pacing
         if: runner.os == 'macOS' && inputs.benchmark_rooted_pacing
-        run: python3 benchmarks/http-gc-pacing/evaluate-rooted.py --output target/rooted-pacing
+        run: python3 benchmarks/http-gc-pacing/evaluate-rooted.py --integrated --output target/rooted-pacing
       - name: Evaluate Windows rooted pacing
         if: runner.os == 'Windows' && inputs.benchmark_rooted_pacing
         shell: pwsh
         run: |
           $vs = & "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\vswhere.exe" -latest -products '*' -requires Microsoft.VisualStudio.Component.VC.Tools.x86.x64 -property installationPath
           if (-not $vs) { throw 'MSVC x64 tools not found' }
-          cmd /c "`"$vs\VC\Auxiliary\Build\vcvars64.bat`" && python benchmarks/http-gc-pacing/evaluate-rooted.py --output target/rooted-pacing"
+          cmd /c "`"$vs\VC\Auxiliary\Build\vcvars64.bat`" && python benchmarks/http-gc-pacing/evaluate-rooted.py --integrated --output target/rooted-pacing"
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
       - uses: actions/upload-artifact@v4
         if: always()

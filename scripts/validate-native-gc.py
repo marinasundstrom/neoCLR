@@ -41,7 +41,7 @@ def main():
             cc = [clang, '-isysroot', sdk, '-std=c11', '-O2', '-Wall', '-Wextra', '-Werror', '-fsanitize=undefined,bounds']
         else:
             raise ValueError('Requires Windows or macOS')
-        names = ['native-gc-test', 'native-gc-intern-test', 'native-gc-object-test', 'native-gc-base-test', 'native-gc-format-test', 'native-gc-primitive-test', 'native-gc-reference-test', 'native-gc-borrowed-test', 'native-gc-utf8-test', 'native-gc-unicode-test', 'native-gc-arguments-test', 'native-gc-producer-test', 'native-gc-preference-test', 'native-gc-admission-test', 'native-gc-allocation-test', 'native-gc-helper-test', 'native-gc-text-helper-test', 'native-gc-index-test', 'native-gc-dense-test', 'native-gc-pass-test', 'native-gc-profile-test']
+        names = ['native-gc-pacing-test', 'native-gc-test', 'native-gc-intern-test', 'native-gc-object-test', 'native-gc-base-test', 'native-gc-format-test', 'native-gc-primitive-test', 'native-gc-reference-test', 'native-gc-borrowed-test', 'native-gc-utf8-test', 'native-gc-unicode-test', 'native-gc-arguments-test', 'native-gc-producer-test', 'native-gc-preference-test', 'native-gc-admission-test', 'native-gc-allocation-test', 'native-gc-helper-test', 'native-gc-text-helper-test', 'native-gc-index-test', 'native-gc-dense-test', 'native-gc-pass-test', 'native-gc-profile-test']
         text_crate = ROOT / 'tools/aot-native-text'
         run('unicode-library', ['cargo', 'build', '--locked', '--release', '--features', 'time-zone-rules', '--manifest-path', text_crate / 'Cargo.toml'], timeout=300)
         text_library = text_crate / 'target/release' / ('neoclr_aot_native_text.lib' if windows else 'libneoclr_aot_native_text.a')
@@ -53,10 +53,11 @@ def main():
         def build(name, source, gc=True, profile=False):
             binary = out / (name + ('.exe' if windows else ''))
             defines = (['NEOCLR_NATIVE_GC'] if gc else []) + (['NEOCLR_GC_PROFILE'] if profile else [])
+            if source == 'native-gc-pacing-test': defines += ['NEOCLR_GC_PACED']
             sources = [BASE / (source + '.c'), BASE / 'root-probe.c']
             if gc:
                 sources.append(BASE / 'native-gc.c')
-            if source in ['native-gc-object-test', 'native-gc-text-helper-test', 'native-gc-format-test', 'native-gc-primitive-test', 'native-gc-reference-test', 'native-gc-borrowed-test', 'native-gc-utf8-test']:
+            if source in ['native-gc-pacing-test', 'native-gc-object-test', 'native-gc-text-helper-test', 'native-gc-format-test', 'native-gc-primitive-test', 'native-gc-reference-test', 'native-gc-borrowed-test', 'native-gc-utf8-test']:
                 sources.append(BASE / 'text-arena.c')
             if source == 'native-gc-preference-test':
                 sources.extend([BASE / 'text-arena.c', BASE / 'system-culture.c', BASE / 'time-zone.c', text_library])

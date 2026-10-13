@@ -96,7 +96,11 @@ void neoclr_probe_stack_roots_v2(neoclr_probe_frame *frame, uint32_t instruction
     calls++;
 #ifdef NEOCLR_NATIVE_GC
     /* Complete snapshot: audited allocating helpers additionally protect their temporaries. */
+#ifdef NEOCLR_GC_PACED
+    if (neoclr_gc_boundary_v1((neoclr_aot_context *)frame->context, head)) abort();
+#else
     if (neoclr_gc_collect_v1((neoclr_aot_context *)frame->context, head)) abort();
+#endif
 #endif
 }
 void neoclr_probe_transient_v2(neoclr_probe_frame *frame, uint32_t phase,

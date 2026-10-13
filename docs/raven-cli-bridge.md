@@ -9288,3 +9288,15 @@ New native objects need matching private host symbols. The native metadata/servi
 contract already describes the same operations, so no new bridge workaround or
 replacement encoding is needed. See the [temporary-root audit](experiments/aot-console/native-gc.md#explicit-helper-temporary-values)
 for owner, validation and incomplete helper coverage.
+
+## Native scheduler pacing opt-in — 2026-10-13
+
+`NEOCLR_GC_PACED` selects a private runtime boundary policy in native host builds.
+Generated root plans and the recently audited rooted helpers are unchanged. Raven
+Runtime Contract settings, temporary CLI representations, native metadata and .NET
+emission do not change; no compiler branch update or bridge encoding is needed.
+JIT/AOT hosts still use stress collection by default. Scheduler acquire is now a
+collecting boundary when returning Idle/Pending, so native adapters must publish
+any managed values reused afterward. The interpreter retains its own pressure
+policy. See the [GC contract](experiments/aot-console/native-gc.md#integrated-opt-in-pacing--2026-10-13)
+for tests, provisional thresholds and promotion limits.

@@ -127,6 +127,10 @@ typedef struct {
     void *owner, *value;
     int32_t retained;
 } neoclr_gc_conditional_root;
+/* Private opt-in generated-boundary policy; explicit/idle collection bypass it.
+ * Caller must publish a complete current root boundary. */
+int32_t neoclr_gc_idle_v1(neoclr_aot_context *, const neoclr_probe_frame *);
+int32_t neoclr_gc_boundary_v1(neoclr_aot_context *, const neoclr_probe_frame *);
 int32_t neoclr_gc_collect_conditional_v1(neoclr_aot_context *,
     const neoclr_probe_frame *, neoclr_gc_conditional_root *, uint32_t);
 /* Private conditional parked-stack registration. Park the active chain only if

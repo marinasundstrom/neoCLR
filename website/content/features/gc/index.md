@@ -115,3 +115,8 @@ including pool identity and entry-reset lifetime. Object construction retains
 arguments and receivers at collecting allocation boundaries and initializes payloads
 before publication. This does not change the public
 API or enable general collection pacing.
+
+Native scheduler acquisition now collects before returning idle or pending, retaining
+waiting operations and reclaiming abandoned owners. Development host builds can
+opt into bounded collection pacing; installed JIT/AOT hosts retain stress collection
+as the default while managed-workload qualification continues.

@@ -666,7 +666,7 @@ int32_t neoclr_scheduler_acquire_v1(neoclr_aot_context *context, uint64_t *deliv
          * exits its drain, retaining pending operation handles and parked stacks.
          * Invalid calls must neither collect nor change the caller's ticket. */
         if ((progress == NEOCLR_SCHEDULER_IDLE || progress == NEOCLR_SCHEDULER_PENDING) &&
-            neoclr_gc_collect_v1(context, boundary)) return -3;
+            neoclr_gc_idle_v1(context, boundary)) return -3;
         return progress;
     }
     neoclr_socket_scope *scope = find_scope(context);
