@@ -565,12 +565,14 @@ stack. No persistent handle, allocation or callback is involved. The caller must
 still provide a complete current boundary and protect all other native temporaries.
 The returned result must be published before another collecting call.
 
-Native GC code generation selects `neoclr_string_concat_rooted_v1` and
-`neoclr_string_join_parts_rooted_v1`; their signatures retain the existing arena
+Native GC code generation selects `neoclr_string_concat_rooted_v1`,
+`neoclr_string_join_parts_rooted_v1` and `neoclr_string_slice_utf8_rooted_v1`; their signatures retain the existing arena
 argument and require its identity to match the active frame's context. Concatenation
 roots both inputs; joining roots the parts array and separator, with normal array
-tracing retaining initialized elements. Both validate lengths before their sole
-allocation and finish copying without another collection. They never retry a whole
+tracing retaining initialized elements. All validate lengths before their sole
+allocation and finish copying without another collection. UTF-8 slicing retains
+the complete source object, including when the copied bytes begin inside it. Range
+and UTF-8-boundary errors are returned before allocation and do not collect. They never retry a whole
 operation. Non-GC code and existing native helper callers retain noncollecting v1
 entry points. New generated native objects require a matching host with these
 private symbols; old objects remain usable with the new host.
@@ -587,7 +589,7 @@ Remaining admission audit:
 | Family | Required protection before opting in | Current policy |
 | --- | --- | --- |
 | Scalar formatting / primitive arrays | Complete caller boundary, publish result before next allocation | Noncollecting |
-| Text slicing, encoding, replacement and paths | Retain borrowed inputs and any backing arrays | Noncollecting |
+| Grapheme slicing, encoding, replacement and paths | Retain borrowed inputs and any backing arrays | Noncollecting |
 | Unicode sequence construction | Retain partially initialized result arrays and each constructed element | Noncollecting |
 | Native file/network/TLS/SQL producers | Retain managed intermediates; keep native handles/buffers alive; never replay I/O to retry allocation | Noncollecting |
 | Constructors / reflection invocation | Retain initialized receiver and every native result scratch until publication | Existing explicit generated roots; admission migration still needed |
@@ -595,3 +597,13 @@ Remaining admission audit:
 These are coverage gaps, not permanent lifetime semantics. The existing .NET
 allocation comparison remains applicable: collecting to satisfy an allocation is
 normal, while exposing unrooted native intermediates to that collection is invalid.
+
+UTF-8 slice follow-up (2026-10-13): the native pressure test includes multibyte
+scalars, embedded NUL, a source omitted from caller roots, real live-heap exhaustion,
+unchanged failure output, range-error precedence and no active caller boundary.
+All 20 local GC/root executions pass with undefined-behavior/bounds sanitizers.
+Compiled GC and non-GC consumers each compare 135 inputs with interpreter results
+and faults, and the GC object imports the rooted symbol. This internal UTF-8 helper
+does not change public character/grapheme indexing or slicing semantics. The
+existing CLR comparison motivates protecting borrowed native references; this
+slice adds no collector policy, moving objects or public API.

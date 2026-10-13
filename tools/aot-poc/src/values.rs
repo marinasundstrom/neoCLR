@@ -534,7 +534,7 @@ pub(crate) fn compile_into(
             (&d.string_intern, "neoclr_string_intern_v1", vec![types::I64, types::I64, types::I64]),
             (&d.string_byte_count, "neoclr_string_byte_count_v1", vec![types::I64, types::I64]),
             (&d.string_slice_graphemes, "neoclr_string_slice_graphemes_v1", vec![types::I64, types::I32, types::I32, types::I64, types::I64]),
-            (&d.string_slice_utf8, "neoclr_string_slice_utf8_v1", vec![types::I64, types::I32, types::I32, types::I64, types::I64]),
+            (&d.string_slice_utf8, if d.native_gc { "neoclr_string_slice_utf8_rooted_v1" } else { "neoclr_string_slice_utf8_v1" }, vec![types::I64, types::I32, types::I32, types::I64, types::I64]),
         ] {
             if indices.is_empty() { continue; }
             let mut sig = module.make_signature();

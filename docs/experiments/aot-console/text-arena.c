@@ -156,8 +156,8 @@ int32_t neoclr_string_byte_count_v1(const neoclr_aot_text *text, int32_t *output
     return NEOCLR_AOT_FAULT_NONE;
 }
 
-int32_t neoclr_string_slice_utf8_v1(const neoclr_aot_text *text, int32_t start, int32_t length,
-                                   neoclr_aot_text_arena *arena, void *output) {
+static int32_t string_slice_utf8(const neoclr_aot_text *text, int32_t start, int32_t length,
+    neoclr_aot_text_arena *arena, void *output, int rooted) {
     if (!text) return NEOCLR_AOT_FAULT_RUNTIME_ERROR;
     uint32_t tag = 2; /* private erased Byte */
     uint64_t payload;
@@ -171,9 +171,13 @@ int32_t neoclr_string_slice_utf8_v1(const neoclr_aot_text *text, int32_t start, 
             (end < text->length && (text->bytes[end] & 0xc0) == 0x80)) {
             payload = 2; /* InvalidBoundary */
         } else {
-            const neoclr_aot_text *slice;
-            int32_t status = store_text((const char *)text->bytes + start, (size_t)length, arena, &slice);
+            void *storage;
+            int32_t status = reserve_text_inputs(arena, 8 + (uint64_t)length,
+                &storage, rooted, text, NULL);
             if (status) return status;
+            neoclr_aot_text *slice = storage;
+            slice->length = (uint64_t)length;
+            memcpy(slice->bytes, text->bytes + start, (size_t)length);
             tag = 4; /* private erased String; preserve full pointer width */
             payload = (uint64_t)(uintptr_t)slice;
         }
@@ -181,6 +185,15 @@ int32_t neoclr_string_slice_utf8_v1(const neoclr_aot_text *text, int32_t start, 
     memcpy(output, &tag, sizeof(tag));
     memcpy((unsigned char *)output + 8, &payload, sizeof(payload));
     return NEOCLR_AOT_FAULT_NONE;
+}
+
+int32_t neoclr_string_slice_utf8_v1(const neoclr_aot_text *text, int32_t start, int32_t length,
+    neoclr_aot_text_arena *arena, void *output) {
+    return string_slice_utf8(text, start, length, arena, output, 0);
+}
+int32_t neoclr_string_slice_utf8_rooted_v1(const neoclr_aot_text *text, int32_t start, int32_t length,
+    neoclr_aot_text_arena *arena, void *output) {
+    return string_slice_utf8(text, start, length, arena, output, 1);
 }
 
 int32_t neoclr_utf8_encode_v1(const neoclr_aot_text *text, neoclr_aot_text_arena *arena,

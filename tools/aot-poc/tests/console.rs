@@ -1478,11 +1478,27 @@ fn utf8_text_services_require_exact_opt_in() {
 #[test]
 #[cfg(all(target_os = "macos", target_arch = "aarch64"))]
 fn utf8_text_slices_preserve_bytes_boundaries_and_faults() {
+    check_utf8_text_slices(false);
+}
+#[test]
+#[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+fn utf8_text_slices_preserve_bytes_boundaries_and_faults_native_gc() {
+    check_utf8_text_slices(true);
+}
+#[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+fn check_utf8_text_slices(native_gc: bool) {
     let dir=Temp::new();
     let seed=neoclr::assemble(UTF8_SEED).unwrap();
     let source=include_str!("../../../docs/experiments/aot-console/utf8-text.neoil");
-    let r=compile_source(&dir,&seed,source,&["--compile-system","--reference-arena","--bind-user-fault","--bind-utf8-text"],false);
+    let mut flags = vec!["--compile-system","--reference-arena","--bind-user-fault","--bind-utf8-text"];
+    if native_gc { flags.push("--native-gc"); }
+    let r=compile_source(&dir,&seed,source,&flags,false);
     assert!(r.status.success(),"{}",String::from_utf8_lossy(&r.stderr));
+    if native_gc {
+        let object = fs::read(dir.0.join("app.o")).unwrap();
+        assert!(object.windows(b"neoclr_string_slice_utf8_rooted_v1".len())
+            .any(|w| w == b"neoclr_string_slice_utf8_rooted_v1"));
+    }
     let base=PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../docs/experiments");
     fs::write(dir.0.join("host.c"),r#"
 #include "text-arena.h"
@@ -1502,6 +1518,8 @@ int main(int argc, char **argv) {
     let r=Command::new("clang").args(["-arch","arm64","-std=c11","-Wall","-Wextra","-Werror","-I"])
         .arg(base.join("aot-console")).arg(dir.0.join("host.c"))
         .arg(base.join("aot-console/text-arena.c")).arg(base.join("aot-fault-details/render.c"))
+        .args(if native_gc { vec!["-DNEOCLR_NATIVE_GC", "-fsanitize=undefined,bounds"] } else { vec![] })
+        .args(if native_gc { vec![base.join("aot-console/native-gc.c"), base.join("aot-console/root-probe.c")] } else { vec![] })
         .arg(dir.0.join("app.o")).arg("-o").arg(dir.0.join("app")).output().unwrap();
     assert!(r.status.success(),"{}",String::from_utf8_lossy(&r.stderr));
     let app=neoclr::assemble(source).unwrap();
