@@ -443,6 +443,57 @@ int32_t neoclr_socket_send_until_v1(uint64_t socket, void *array, int32_t offset
     if (deadline_ns(stamp, &deadline)) return 3;
     return transfer(1, deadline, socket, array, offset, count, callback, context, output);
 }
+/* Owner-thread wait only: no completion, root transfer, collection or guest call.
+ * Readiness is a hint; the ordinary poll remains the authority for outcomes. */
+void neoclr_scheduler_wait_v1(neoclr_aot_context *context) {
+#if defined(_WIN32) && !defined(NEOCLR_SCHEDULER_LEGACY_WAIT)
+    neoclr_socket_scope *scope = find_scope(context);
+    if (!scope || context->fault.code || scope->scheduler_delivery || scope->runnable_head) return;
+    fd_set reads, writes, errors;
+    FD_ZERO(&reads); FD_ZERO(&writes); FD_ZERO(&errors);
+    uint64_t now = monotonic_ns(), delay = UINT64_C(1000000);
+    if (!now) { neoclr_os_pause(); return; }
+    unsigned watched = 0;
+    for (unsigned i = 0; i < 64; i++) {
+        uint32_t state = scope->operations[i].state, kind = scope->operations[i].kind;
+        if (state == 2) return;
+        if (state != 1 || kind == 8) continue;
+        if (kind >= 2 && kind <= 6) {
+            uint64_t deadline = scope->operations[i].deadline;
+            if (deadline <= now) return;
+            if (deadline - now < delay) delay = deadline - now;
+        }
+        neoclr_socket_descriptor fd = NEOCLR_INVALID_SOCKET;
+        if (kind >= 1 && kind <= 3) {
+            unsigned slot = 0;
+            while (slot < 64 && scope->slots[slot].id != scope->operations[i].listener) slot++;
+            if (slot == 64) return; /* Let poll report the broken operation. */
+#ifdef NEOCLR_HTTPS_SERVER
+            /* Legacy native TLS does not expose its desired I/O direction yet. */
+            if (scope->slots[slot].tls) continue;
+#endif
+            fd = scope->slots[slot].descriptor;
+        } else if (kind == 4) fd = scope->operations[i].connecting;
+        if (fd == NEOCLR_INVALID_SOCKET) continue;
+        if (kind <= 2) FD_SET(fd, &reads);
+        else FD_SET(fd, &writes);
+        if (kind == 4) FD_SET(fd, &errors);
+        watched++;
+    }
+    if (!watched) { neoclr_os_pause(); return; }
+    /* At most 64 pending operations, matching Winsock's default fd_set capacity.
+     * Keep the existing 1 ms poll cap for DNS, timers and legacy TLS, which do not
+     * yet have a shared wakeup event. OS scheduling can exceed this requested cap. */
+    struct timeval timeout = {0, (long)((delay + 999) / 1000)};
+    int result = select(0, reads.fd_count ? &reads : NULL,
+        writes.fd_count ? &writes : NULL, errors.fd_count ? &errors : NULL, &timeout);
+    if (result == SOCKET_ERROR) neoclr_os_pause(); /* Avoid spinning on provider errors. */
+#else
+    (void)context;
+    neoclr_os_pause();
+#endif
+}
+
 static int32_t socket_poll(neoclr_aot_context *, uint64_t *);
 int32_t neoclr_socket_poll_v1(neoclr_aot_context *context, uint64_t *callback) {
     for (const neoclr_probe_frame *f = neoclr_root_probe_head_v1(); f; f = f->previous)

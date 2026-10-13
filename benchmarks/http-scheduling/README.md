@@ -266,3 +266,30 @@ required. Results will determine whether collector work or waiting warrants the
 next change. This extends existing diagnostic tooling, not the public profiler ABI
 or managed Scheduler contract; .NET/CLR comparison and collector research above
 remain applicable. No production scheduling policy changes in this slice.
+
+### Windows readiness-wait candidate
+
+The host can now wait on pending accept/read/write/connect descriptors before
+polling again, instead of sleeping regardless of readiness. This is a private
+owner-thread integration hook used by JIT and AOT; it never consumes a completion,
+changes roots or invokes guest code. Existing arbitration and fault delivery stay
+in the poller. The requested timeout is capped at 1 ms and shortened for pending
+deadlines. DNS-only, timer-only and legacy native TLS waits retain the old pause;
+these sources still lack a shared readiness event. OS scheduling can overrun either
+requested timeout. macOS retains its prior wait policy in this slice.
+
+This is a bounded optimization of the existing 64-operation adapter, not a scalable
+reactor replacement. Unlike .NET's Windows IOCP implementation, it uses Winsock
+`select`; eventual completion-port integration remains open. Benefit to validate:
+socket arrival can wake the owner immediately. Costs: rebuilding descriptor sets,
+provider restrictions and continued polling for other sources. It does not change
+managed async semantics. Primary sources consulted 2026-10-13:
+[Winsock select](https://learn.microsoft.com/en-us/windows/win32/api/winsock2/nf-winsock2-select),
+[Sleep](https://learn.microsoft.com/en-us/windows/win32/api/synchapi/nf-synchapi-sleep),
+and [.NET Socket source](https://source.dot.net/System.Net.Sockets/System/Net/Sockets/Socket.cs.html).
+
+`benchmark_waits=true` selects five alternating uninstrumented JIT/AOT rounds using
+identical sources/guests, differing only by the private diagnostic build switch
+`NEOCLR_SCHEDULER_LEGACY_WAIT`. Separate instrumented AOT runs qualify both policies,
+including final reclamation. The old policy is a benchmark control, not an SDK option.
+Results determine acceptance; no gain is assumed from the implementation alone.

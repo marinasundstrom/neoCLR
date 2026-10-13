@@ -32,7 +32,7 @@ static int32_t poll_entry(neoclr_aot_context *context, uint64_t *callback,
     const neoclr_probe_frame *boundary, void *state) {
     (void)state;
     int32_t progress = neoclr_scheduler_acquire_v1(context, callback, boundary);
-    if (progress == NEOCLR_SCHEDULER_PENDING) neoclr_os_pause();
+    if (progress == NEOCLR_SCHEDULER_PENDING) neoclr_scheduler_wait_v1(context);
     return progress;
 }
 

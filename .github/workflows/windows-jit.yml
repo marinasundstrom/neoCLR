@@ -2,6 +2,10 @@ name: Windows JIT HTTP
 on:
   workflow_dispatch:
     inputs:
+      benchmark_waits:
+        description: Compare and profile legacy sleeps versus socket readiness waits
+        type: boolean
+        default: false
       benchmark_roots:
         description: Run matched JIT/AOT HTTP root-observation benchmarks
         type: boolean
@@ -81,6 +85,7 @@ jobs:
     env:
       PYTHONUTF8: '1'
       HTTP_FOCUS: ${{ inputs.http_focus }}
+      BENCHMARK_WAITS: ${{ inputs.benchmark_waits }}
       BENCHMARK_ROOTS: ${{ inputs.benchmark_roots }}
     steps:
       - uses: actions/checkout@v4
@@ -96,7 +101,7 @@ jobs:
         with:
           python-version: '3.12'
       - name: Check benchmark controller and process cleanup
-        if: inputs.benchmark_roots
+        if: inputs.benchmark_roots || inputs.benchmark_waits
         run: |
           python -m unittest discover -s benchmarks/http-server -p test_windows_root_observation.py
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
@@ -112,7 +117,7 @@ jobs:
           $vs = & "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\vswhere.exe" -latest -products '*' -requires Microsoft.VisualStudio.Component.VC.Tools.x86.x64 -property installationPath
           if (-not $vs) { throw 'MSVC x64 tools not found' }
           if ($env:HTTP_FOCUS -eq 'true' -and $env:BENCHMARK_ROOTS -eq 'true') { throw 'Choose one scope' }
-          $focus = if ($env:HTTP_FOCUS -eq 'true') { '--http-focus' } elseif ($env:BENCHMARK_ROOTS -eq 'true') { '--benchmark-roots' } else { '' }
+          $focus = if ($env:BENCHMARK_WAITS -eq 'true') { '--benchmark-waits' } elseif ($env:HTTP_FOCUS -eq 'true') { '--http-focus' } elseif ($env:BENCHMARK_ROOTS -eq 'true') { '--benchmark-roots' } else { '' }
           cmd /c "`"$vs\VC\Auxiliary\Build\vcvars64.bat`" && python docs/experiments/jit-windows/verify.py --output target/windows-jit-validation $focus"
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
       - uses: actions/upload-artifact@v4

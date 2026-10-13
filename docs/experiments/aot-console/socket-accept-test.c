@@ -26,10 +26,13 @@ int main(void) {
     CHECK(neoclr_socket_connect_result_v1(operation, &c, result) == 3 && result[0] == 99);
     neoclr_socket_descriptor peer = socket(AF_INET, SOCK_STREAM, 0);
     CHECK(peer != NEOCLR_INVALID_SOCKET && !connect(peer, (const void *)&endpoint, sizeof(endpoint)));
+    neoclr_scheduler_wait_v1(&c);
+    CHECK(root == 999 && !c.fault.code);
+    CHECK(!neoclr_gc_collect_v1(&c, NULL) && c.text.used);
     int ready = 0;
     for (unsigned retry = 0; retry < 5000 && !ready; retry++) {
         ready = neoclr_socket_poll_v1(&c, &root);
-        if (!ready) neoclr_os_pause();
+        if (!ready) neoclr_scheduler_wait_v1(&c);
     }
     CHECK(ready == 1);
     void *read = NULL;

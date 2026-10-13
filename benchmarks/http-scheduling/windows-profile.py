@@ -17,6 +17,7 @@ def main():
     p = argparse.ArgumentParser(description=__doc__)
     p.add_argument('--build', type=Path, required=True)
     p.add_argument('--workload', choices=['plain', 'json'], required=True)
+    p.add_argument('--legacy-wait', action='store_true')
     p.add_argument('--output', type=Path, required=True)
     a = p.parse_args()
     out = a.output.resolve()
@@ -47,8 +48,12 @@ static int32_t socket_poll(neoclr_aot_context *context, uint64_t *callback) {
 }
 static int32_t socket_poll_inner(neoclr_aot_context *context, uint64_t *callback) {''')
         else:
-            assert 'neoclr_os_pause()' in text
-            text = text.replace('neoclr_os_pause()', 'neoclr_wait_profile_pause()')
+            if 'neoclr_scheduler_wait_v1(context)' in text:
+                text = text.replace('neoclr_scheduler_wait_v1(context)', 'neoclr_wait_profile_context(context)')
+                text = text.replace('#include \"socket-listener.h\"', '#include \"socket-listener.h\"\nextern void neoclr_wait_profile_context(neoclr_aot_context *);')
+            else:
+                assert 'neoclr_os_pause()' in text
+                text = text.replace('neoclr_os_pause()', 'neoclr_wait_profile_pause()')
         if name.endswith('http-host.c'):
             main = 'int NEOCLR_PROCESS_MAIN(int argc, neoclr_process_char **argv) {'
             assert text.count(main) == 1
@@ -62,6 +67,7 @@ static int32_t socket_poll_inner(neoclr_aot_context *context, uint64_t *callback
     counters = Path(__file__).with_name('windows-counters.c').resolve()
     position = cmd.index('/link')
     cmd[position:position] = ['/DNEOCLR_GC_PROFILE', str(counters)]
+    if a.legacy_wait: cmd.insert(1, '/DNEOCLR_SCHEDULER_LEGACY_WAIT')
     for folder in ['aot-console', 'runtime-async', 'aot-fault-details']:
         for path in (ROOT/'docs/experiments'/folder).glob('*.h'): inputs[str(path)] = benchmark.sha(path)
     for path in [Path(__file__).resolve(), counters, a.build.resolve(), *out.glob('*.c')]:

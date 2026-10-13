@@ -106,6 +106,10 @@ int32_t neoclr_scheduler_activate_managed_v1(int64_t, neoclr_aot_context *, int3
 int32_t neoclr_scheduler_cancel_managed_v1(int64_t, neoclr_aot_context *, int32_t *);
 int32_t neoclr_scheduler_capture_managed_v1(neoclr_aot_context *, int64_t *);
 int32_t neoclr_scheduler_submit_to_managed_v1(int64_t, void *, neoclr_aot_context *, int32_t *);
+/* Private owner-thread host wait after PENDING. Windows observes socket readiness
+ * with a requested <=1 ms timeout; other platforms retain their existing pause.
+ * No callbacks, collection or scope mutation. Timers/DNS retain bounded polling. */
+void neoclr_scheduler_wait_v1(neoclr_aot_context *);
 int32_t neoclr_scheduler_step_v1(neoclr_aot_context *, uint64_t *, const neoclr_probe_frame *);
 /* Private runtime submission prototype. Clone a rooted image-local fn<Void>
  * into this owner-thread scope; success means admitted, never inline execution.

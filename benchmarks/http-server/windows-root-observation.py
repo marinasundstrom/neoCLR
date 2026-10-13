@@ -31,6 +31,7 @@ def main():
     p.add_argument('--output', type=Path, required=True)
     p.add_argument('--baseline', default='9cd74b374')
     p.add_argument('--rounds', type=int, default=5)
+    p.add_argument('--compare-waits', action='store_true', help='Compare legacy Sleep with readiness wait using identical current sources')
     a = p.parse_args()
     if platform.system() != 'Windows' or a.rounds < 5:
         p.error('Requires Windows and at least five alternating rounds')
@@ -40,14 +41,15 @@ def main():
     manifest = json.loads((bundle / 'manifest.json').read_text())
     host = json.loads(a.host_recipe.read_text())
     assert host['passed'] and manifest['jit']['default']
-    observer = ROOT / 'docs/experiments/aot-console/root-probe.c'
+    observer = ROOT / ('docs/experiments/aot-console/socket-listener.c' if a.compare_waits else 'docs/experiments/aot-console/root-probe.c')
     old = out / 'baseline-root-probe.c'
-    old.write_bytes(subprocess.check_output(['git', 'show', a.baseline + ':docs/experiments/aot-console/root-probe.c'], cwd=ROOT))
+    old.write_bytes(observer.read_bytes() if a.compare_waits else subprocess.check_output(['git', 'show', a.baseline + ':docs/experiments/aot-console/root-probe.c'], cwd=ROOT))
     report = dict(passed=False, revision=subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=ROOT, text=True).strip(),
-        baselineRevision=subprocess.check_output(['git', 'rev-parse', a.baseline], cwd=ROOT, text=True).strip(),
+        baselineRevision=None if a.compare_waits else subprocess.check_output(['git', 'rev-parse', a.baseline], cwd=ROOT, text=True).strip(),
+        comparison='legacy-sleep-versus-readiness' if a.compare_waits else 'root-observation',
         platform=platform.platform(), machine=platform.machine(), processor=os.environ.get('PROCESSOR_IDENTIFIER'),
         rounds=a.rounds, commands=[], inputs={}, warmups=[], samples=[], summary={},
-        scope='Windows x64 hosted runner. Same guest assemblies/AOT objects; only root-probe.c differs. HTTP/1.1 loopback, connection close, concurrency one. 32 validated requests/process, eight discarded; build/JIT startup excluded. No profiling during timings. Short local regression comparison, not saturation or cross-platform ranking.')
+        scope='Windows x64 hosted runner. Same guest assemblies/AOT objects; ' + ('only NEOCLR_SCHEDULER_LEGACY_WAIT differs.' if a.compare_waits else 'only root-probe.c differs.') + ' HTTP/1.1 loopback, connection close, concurrency one. 32 validated requests/process, eight discarded; build/JIT startup excluded. No profiling during timings. Short local regression comparison, not saturation or cross-platform ranking.')
 
     def remember(path):
         path = Path(path).resolve()
@@ -86,6 +88,7 @@ def main():
             directory.mkdir()
             obj = directory / 'root-probe.obj'
             cmd = [str(old) if v == str(observer) and variant == 'baseline' else v for v in host_compile]
+            if a.compare_waits and variant == 'baseline': cmd.insert(1, '/DNEOCLR_SCHEDULER_LEGACY_WAIT')
             cmd = replace_option(cmd, '/Fo', obj)
             run(cmd)
             dll = directory / 'host.dll'
@@ -129,6 +132,7 @@ def main():
                 directory.mkdir()
                 app = directory / 'app.exe'
                 cmd = [str(old) if v == str(observer) and variant == 'baseline' else v for v in link]
+                if a.compare_waits and variant == 'baseline': cmd.insert(1, '/DNEOCLR_SCHEDULER_LEGACY_WAIT')
                 cmd = replace_option(replace_option(cmd, '/Fe:', app), '/Fo', str(directory) + '/')
                 for value in cmd: remember(value)
                 run(cmd)

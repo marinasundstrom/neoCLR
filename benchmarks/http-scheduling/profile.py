@@ -57,14 +57,14 @@ static int32_t socket_poll_inner(neoclr_aot_context *context, uint64_t *callback
     assert str(host) in command
     host_copy = out/'host-profile.c'
     host_source = host.read_text()
-    assert 'neoclr_os_pause()' in host_source
-    host_copy.write_text('static void neoclr_schedule_profile_pause(void);\n' +
-        host_source.replace('neoclr_os_pause()', 'neoclr_schedule_profile_pause()') +
+    assert 'neoclr_scheduler_wait_v1(context)' in host_source
+    host_copy.write_text('#include \"socket-listener.h\"\nstatic void neoclr_schedule_profile_pause(neoclr_aot_context *);\n' +
+        host_source.replace('neoclr_scheduler_wait_v1(context)', 'neoclr_schedule_profile_pause(context)') +
         '\nextern uint64_t neoclr_schedule_profile_now(void);\n'
         'extern void neoclr_schedule_profile_paused(uint64_t);\n'
-        'static void neoclr_schedule_profile_pause(void) {\n'
+        'static void neoclr_schedule_profile_pause(neoclr_aot_context *context) {\n'
         '    uint64_t start = neoclr_schedule_profile_now();\n'
-        '    neoclr_os_pause();\n'
+        '    neoclr_scheduler_wait_v1(context);\n'
         '    neoclr_schedule_profile_paused(start);\n}\n')
     command = [str(host_copy) if v == str(host) else v for v in command]
     inputs[str(host_copy)] = sha(host_copy)

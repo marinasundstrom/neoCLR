@@ -8,6 +8,13 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-13
 
+- Add a bounded Windows socket-readiness wait candidate to the private JIT/AOT host
+  scheduler, preserving callback/root ownership and existing deadline polling.
+  Retain legacy waits for unsupported readiness sources and macOS; add matched
+  legacy/readiness benchmarking and diagnostic runs to establish its effect.
+  The focused macOS socket contracts and benchmark-controller tests pass; Windows
+  qualification and measured improvement are pending.
+
 - Add opt-in Windows AOT HTTP attribution runs after the matched benchmark, recording
   whole-process collector time, socket-poll time, scheduler pauses and process CPU.
   Validate response output, poll accounting and complete final reclamation; diagnostic

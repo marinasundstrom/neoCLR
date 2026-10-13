@@ -1,6 +1,7 @@
 /* Diagnostic-only Windows worker counters, never linked into shipping hosts. */
 #include "socket-os.h"
 #include "native-gc.h"
+#include "socket-listener.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <inttypes.h>
@@ -19,16 +20,23 @@ void neoclr_wait_profile_pause(void) {
     waiting += neoclr_wait_profile_now() - start;
     pauses++;
 }
+void neoclr_wait_profile_context(neoclr_aot_context *context) {
+    uint64_t start = neoclr_wait_profile_now();
+    neoclr_scheduler_wait_v1(context);
+    waiting += neoclr_wait_profile_now() - start;
+    pauses++;
+}
 static uint64_t ticks(FILETIME time) {
     return ((uint64_t)time.dwHighDateTime << 32) | time.dwLowDateTime;
 }
 static void report(void) {
     FILETIME created, exited, kernel, user;
     if (!GetProcessTimes(GetCurrentProcess(), &created, &exited, &kernel, &user)) abort();
-    const char *path = getenv("NEOCLR_WAIT_PROFILE_OUTPUT");
-    if (!path) abort();
-    FILE *file = fopen(path, "w");
-    if (!file) abort();
+    char *path = NULL;
+    if (_dupenv_s(&path, NULL, "NEOCLR_WAIT_PROFILE_OUTPUT") || !path) abort();
+    FILE *file = NULL;
+    if (fopen_s(&file, path, "w") || !file) abort();
+    free(path);
     neoclr_gc_profile p = neoclr_gc_profile_v1();
     neoclr_gc_statistics s = neoclr_gc_statistics_v1();
     fprintf(file, "{\"wallNanoseconds\":%" PRIu64 ",\"processCpuNanoseconds\":%" PRIu64

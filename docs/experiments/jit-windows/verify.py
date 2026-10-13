@@ -25,8 +25,9 @@ def main():
     parser.add_argument('--output', type=Path, required=True)
     parser.add_argument('--http-focus', action='store_true', help='Qualify HTTP and SSL streams after shared JIT preparation; skip unrelated library suites')
     parser.add_argument('--benchmark-roots', action='store_true', help='Run matched root-observation HTTP benchmarks after shared preparation')
+    parser.add_argument('--benchmark-waits', action='store_true', help='Compare legacy sleeps with readiness waits and profile both')
     args = parser.parse_args()
-    if args.http_focus and args.benchmark_roots:
+    if sum([args.http_focus, args.benchmark_roots, args.benchmark_waits]) > 1:
         parser.error('Choose HTTP qualification or benchmark scope')
     if platform.system() != 'Windows' or platform.machine().lower() not in ('amd64', 'x86_64'):
         raise ValueError('This gate requires Windows x64 with MSVC')
@@ -34,7 +35,7 @@ def main():
     out.mkdir(parents=True, exist_ok=False)
     prerequisite = load('windows_prerequisite', ROOT/'scripts/validate-windows-project.py')
     http = load('http_prerequisite', ROOT/'scripts/validate-native-http-project.py')
-    report = dict(passed=False, scope='root-observation-benchmark' if args.benchmark_roots else 'http-and-ssl-streams' if args.http_focus else 'full', commands=[])
+    report = dict(passed=False, scope='scheduler-wait-benchmark' if args.benchmark_waits else 'root-observation-benchmark' if args.benchmark_roots else 'http-and-ssl-streams' if args.http_focus else 'full', commands=[])
 
     def run(command, name):
         print('START '+name, flush=True)
@@ -80,14 +81,19 @@ def main():
              '--runtime', ROOT/'target/release/neoclr.exe', '--jit-compiler', jit,
              '--host-recipe', out/'native/build.json', '--output', out/'jit-install'], 'prepare-default-jit')
         installed = out/'jit-install/bundle'
-        if args.benchmark_roots:
+        if args.benchmark_roots or args.benchmark_waits:
             run([sys.executable, ROOT/'benchmarks/http-server/windows-root-observation.py',
                  '--bundle', installed, '--host-recipe', out/'jit-install/preparation.json',
-                 '--output', out/'http-benchmark'], 'http-benchmark')
+                 '--output', out/'http-benchmark', *(['--compare-waits'] if args.benchmark_waits else [])], 'http-benchmark')
             for case in ['plain', 'json']:
                 run([sys.executable, ROOT/'benchmarks/http-scheduling/windows-profile.py',
                      '--build', out/'http-benchmark'/f'{case}-native/build.json',
                      '--workload', case, '--output', out/f'{case}-wait-profile'], f'{case}-wait-profile')
+            if args.benchmark_waits:
+                for case in ['plain', 'json']:
+                    run([sys.executable, ROOT/'benchmarks/http-scheduling/windows-profile.py',
+                         '--build', out/'http-benchmark'/f'{case}-native/build.json',
+                         '--workload', case, '--legacy-wait', '--output', out/f'{case}-legacy-wait-profile'], f'{case}-legacy-wait-profile')
             report['passed'] = True
             return
         if args.http_focus:
