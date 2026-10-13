@@ -1,0 +1,36 @@
+import System.*
+import System.Collections.*
+import System.Result.*
+import System.Concurrency.Tasks.*
+import System.Web.Http.*
+
+func InspectHeaders(request: HttpRequest) -> Task<Result<HttpResponse, HttpError>> {
+    var text = ""
+    for header in request.Headers {
+        text = text + header.Name + "=" + header.Value + "\n"
+    }
+    return Task.FromResult(Result<HttpResponse, HttpError>.Ok(
+        HttpResponse(200, ArrayList<HttpHeader>(), HttpContent.FromText(text).Bytes)))
+}
+
+async func Main() -> Task<()> {
+    let Ok(server) = HttpServer.Listen("127.0.0.1", 0, 4) else {
+        System.Fail("Listen failed")
+    }
+    let Ok(port) = server.GetLocalPort() else {
+        System.Fail("Port unavailable")
+    }
+    Console.WriteLine(port)
+    var index = 0
+    while index < HeaderCases.Count {
+        let result = await server.ServeOne(InspectHeaders)
+        if let Error(error) = result {
+            Console.WriteLine("ERROR:" + error.ToString())
+        } else {
+            Console.WriteLine("OK")
+        }
+        index += 1
+    }
+    server.Close()
+    Console.WriteLine("DONE")
+}

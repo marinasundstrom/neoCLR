@@ -1,0 +1,643 @@
+{
+  "passed": true,
+  "cases": [
+    {
+      "mode": "aot",
+      "name": "mixed-known",
+      "passed": true,
+      "responseHex": "485454502f312e3120323030204f4b0d0a436f6e74656e742d4c656e6774683a2037330d0a436f6e6e656374696f6e3a20636c6f73650d0a0d0a686f73743d6c6f63616c686f73740a636f6e6e656374696f6e3d636c6f73650a636f6e74656e742d6c656e6774683d300a636f6e74656e742d747970653d746578742f706c61696e0a",
+      "outcome": "OK"
+    },
+    {
+      "mode": "aot",
+      "name": "known-uppercase",
+      "passed": true,
+      "responseHex": "485454502f312e3120323030204f4b0d0a436f6e74656e742d4c656e6774683a2037330d0a436f6e6e656374696f6e3a20636c6f73650d0a0d0a686f73743d6c6f63616c686f73740a636f6e6e656374696f6e3d636c6f73650a636f6e74656e742d6c656e6774683d300a636f6e74656e742d747970653d746578742f706c61696e0a",
+      "outcome": "OK"
+    },
+    {
+      "mode": "aot",
+      "name": "chunked",
+      "passed": true,
+      "responseHex": "485454502f312e3120323030204f4b0d0a436f6e74656e742d4c656e6774683a2034310d0a436f6e6e656374696f6e3a20636c6f73650d0a0d0a686f73743d6c6f63616c686f73740a7472616e736665722d656e636f64696e673d6368756e6b65640a",
+      "outcome": "OK"
+    },
+    {
+      "mode": "aot",
+      "name": "unknown-and-empty",
+      "passed": true,
+      "responseHex": "485454502f312e3120323030204f4b0d0a436f6e74656e742d4c656e6774683a2035390d0a436f6e6e656374696f6e3a20636c6f73650d0a0d0a686f73743d6c6f63616c686f73740a782d637573746f6d3d74776f20776f7264730a782d656d7074793d0a782d637573746f6d3d7365636f6e640a",
+      "outcome": "OK"
+    },
+    {
+      "mode": "aot",
+      "name": "near-host",
+      "passed": true,
+      "responseHex": "485454502f312e3120323030204f4b0d0a436f6e74656e742d4c656e6774683a2032360d0a436f6e6e656374696f6e3a20636c6f73650d0a0d0a686f73743d6c6f63616c686f73740a686f73783d76616c75650a",
+      "outcome": "OK"
+    },
+    {
+      "mode": "aot",
+      "name": "long-host",
+      "passed": true,
+      "responseHex": "485454502f312e3120323030204f4b0d0a436f6e74656e742d4c656e6774683a2032370d0a436f6e6e656374696f6e3a20636c6f73650d0a0d0a686f73743d6c6f63616c686f73740a686f7374783d76616c75650a",
+      "outcome": "OK"
+    },
+    {
+      "mode": "aot",
+      "name": "near-connection",
+      "passed": true,
+      "responseHex": "485454502f312e3120323030204f4b0d0a436f6e74656e742d4c656e6774683a2033320d0a436f6e6e656374696f6e3a20636c6f73650d0a0d0a686f73743d6c6f63616c686f73740a636f6e6e656374696f783d76616c75650a",
+      "outcome": "OK"
+    },
+    {
+      "mode": "aot",
+      "name": "long-connection",
+      "passed": true,
+      "responseHex": "485454502f312e3120323030204f4b0d0a436f6e74656e742d4c656e6774683a2033330d0a436f6e6e656374696f6e3a20636c6f73650d0a0d0a686f73743d6c6f63616c686f73740a636f6e6e656374696f6e783d76616c75650a",
+      "outcome": "OK"
+    },
+    {
+      "mode": "aot",
+      "name": "near-content-length",
+      "passed": true,
+      "responseHex": "485454502f312e3120323030204f4b0d0a436f6e74656e742d4c656e6774683a2033360d0a436f6e6e656374696f6e3a20636c6f73650d0a0d0a686f73743d6c6f63616c686f73740a636f6e74656e742d6c656e6774783d76616c75650a",
+      "outcome": "OK"
+    },
+    {
+      "mode": "aot",
+      "name": "long-content-length",
+      "passed": true,
+      "responseHex": "485454502f312e3120323030204f4b0d0a436f6e74656e742d4c656e6774683a2033370d0a436f6e6e656374696f6e3a20636c6f73650d0a0d0a686f73743d6c6f63616c686f73740a636f6e74656e742d6c656e677468783d76616c75650a",
+      "outcome": "OK"
+    },
+    {
+      "mode": "aot",
+      "name": "near-transfer-encoding",
+      "passed": true,
+      "responseHex": "485454502f312e3120323030204f4b0d0a436f6e74656e742d4c656e6774683a2033390d0a436f6e6e656374696f6e3a20636c6f73650d0a0d0a686f73743d6c6f63616c686f73740a7472616e736665722d656e636f64696e783d76616c75650a",
+      "outcome": "OK"
+    },
+    {
+      "mode": "aot",
+      "name": "long-transfer-encoding",
+      "passed": true,
+      "responseHex": "485454502f312e3120323030204f4b0d0a436f6e74656e742d4c656e6774683a2034300d0a436f6e6e656374696f6e3a20636c6f73650d0a0d0a686f73743d6c6f63616c686f73740a7472616e736665722d656e636f64696e67783d76616c75650a",
+      "outcome": "OK"
+    },
+    {
+      "mode": "aot",
+      "name": "near-expect",
+      "passed": true,
+      "responseHex": "485454502f312e3120323030204f4b0d0a436f6e74656e742d4c656e6774683a2032380d0a436f6e6e656374696f6e3a20636c6f73650d0a0d0a686f73743d6c6f63616c686f73740a6578706563783d76616c75650a",
+      "outcome": "OK"
+    },
+    {
+      "mode": "aot",
+      "name": "long-expect",
+      "passed": true,
+      "responseHex": "485454502f312e3120323030204f4b0d0a436f6e74656e742d4c656e6774683a2032390d0a436f6e6e656374696f6e3a20636c6f73650d0a0d0a686f73743d6c6f63616c686f73740a657870656374783d76616c75650a",
+      "outcome": "OK"
+    },
+    {
+      "mode": "aot",
+      "name": "near-content-encoding",
+      "passed": true,
+      "responseHex": "485454502f312e3120323030204f4b0d0a436f6e74656e742d4c656e6774683a2033380d0a436f6e6e656374696f6e3a20636c6f73650d0a0d0a686f73743d6c6f63616c686f73740a636f6e74656e742d656e636f64696e783d76616c75650a",
+      "outcome": "OK"
+    },
+    {
+      "mode": "aot",
+      "name": "long-content-encoding",
+      "passed": true,
+      "responseHex": "485454502f312e3120323030204f4b0d0a436f6e74656e742d4c656e6774683a2033390d0a436f6e6e656374696f6e3a20636c6f73650d0a0d0a686f73743d6c6f63616c686f73740a636f6e74656e742d656e636f64696e67783d76616c75650a",
+      "outcome": "OK"
+    },
+    {
+      "mode": "aot",
+      "name": "near-content-type",
+      "passed": true,
+      "responseHex": "485454502f312e3120323030204f4b0d0a436f6e74656e742d4c656e6774683a2033340d0a436f6e6e656374696f6e3a20636c6f73650d0a0d0a686f73743d6c6f63616c686f73740a636f6e74656e742d747970783d76616c75650a",
+      "outcome": "OK"
+    },
+    {
+      "mode": "aot",
+      "name": "long-content-type",
+      "passed": true,
+      "responseHex": "485454502f312e3120323030204f4b0d0a436f6e74656e742d4c656e6774683a2033350d0a436f6e6e656374696f6e3a20636c6f73650d0a0d0a686f73743d6c6f63616c686f73740a636f6e74656e742d74797065783d76616c75650a",
+      "outcome": "OK"
+    },
+    {
+      "mode": "aot",
+      "name": "unsupported-ExPeCt",
+      "passed": true,
+      "responseHex": "",
+      "outcome": "ERROR:Request expectation or content encoding unsupported"
+    },
+    {
+      "mode": "aot",
+      "name": "unsupported-CoNtEnT-EnCoDiNg",
+      "passed": true,
+      "responseHex": "",
+      "outcome": "ERROR:Request expectation or content encoding unsupported"
+    },
+    {
+      "mode": "aot",
+      "name": "duplicate-host",
+      "passed": true,
+      "responseHex": "",
+      "outcome": "ERROR:Duplicate Host"
+    },
+    {
+      "mode": "aot",
+      "name": "duplicate-length",
+      "passed": true,
+      "responseHex": "",
+      "outcome": "ERROR:Duplicate request Content-Length"
+    },
+    {
+      "mode": "aot",
+      "name": "duplicate-transfer",
+      "passed": true,
+      "responseHex": "",
+      "outcome": "ERROR:Duplicate request Transfer-Encoding"
+    },
+    {
+      "mode": "aot",
+      "name": "ambiguous",
+      "passed": true,
+      "responseHex": "",
+      "outcome": "ERROR:Ambiguous request framing"
+    },
+    {
+      "mode": "aot",
+      "name": "invalid-length",
+      "passed": true,
+      "responseHex": "",
+      "outcome": "ERROR:Invalid request Content-Length"
+    },
+    {
+      "mode": "aot",
+      "name": "invalid-transfer",
+      "passed": true,
+      "responseHex": "",
+      "outcome": "ERROR:Request transfer encoding unsupported"
+    },
+    {
+      "mode": "aot",
+      "name": "empty-host",
+      "passed": true,
+      "responseHex": "",
+      "outcome": "ERROR:Empty Host"
+    },
+    {
+      "mode": "aot",
+      "name": "space-in-name",
+      "passed": true,
+      "responseHex": "",
+      "outcome": "ERROR:Invalid request header name"
+    },
+    {
+      "mode": "aot",
+      "name": "underscore-not-hyphen",
+      "passed": true,
+      "responseHex": "485454502f312e3120323030204f4b0d0a436f6e74656e742d4c656e6774683a2033320d0a436f6e6e656374696f6e3a20636c6f73650d0a0d0a686f73743d6c6f63616c686f73740a636f6e74656e745f6c656e6774683d300a",
+      "outcome": "OK"
+    },
+    {
+      "mode": "interpreter",
+      "name": "mixed-known",
+      "passed": true,
+      "responseHex": "485454502f312e3120323030204f4b0d0a436f6e74656e742d4c656e6774683a2037330d0a436f6e6e656374696f6e3a20636c6f73650d0a0d0a686f73743d6c6f63616c686f73740a636f6e6e656374696f6e3d636c6f73650a636f6e74656e742d6c656e6774683d300a636f6e74656e742d747970653d746578742f706c61696e0a",
+      "outcome": "OK"
+    },
+    {
+      "mode": "interpreter",
+      "name": "known-uppercase",
+      "passed": true,
+      "responseHex": "485454502f312e3120323030204f4b0d0a436f6e74656e742d4c656e6774683a2037330d0a436f6e6e656374696f6e3a20636c6f73650d0a0d0a686f73743d6c6f63616c686f73740a636f6e6e656374696f6e3d636c6f73650a636f6e74656e742d6c656e6774683d300a636f6e74656e742d747970653d746578742f706c61696e0a",
+      "outcome": "OK"
+    },
+    {
+      "mode": "interpreter",
+      "name": "chunked",
+      "passed": true,
+      "responseHex": "485454502f312e3120323030204f4b0d0a436f6e74656e742d4c656e6774683a2034310d0a436f6e6e656374696f6e3a20636c6f73650d0a0d0a686f73743d6c6f63616c686f73740a7472616e736665722d656e636f64696e673d6368756e6b65640a",
+      "outcome": "OK"
+    },
+    {
+      "mode": "interpreter",
+      "name": "unknown-and-empty",
+      "passed": true,
+      "responseHex": "485454502f312e3120323030204f4b0d0a436f6e74656e742d4c656e6774683a2035390d0a436f6e6e656374696f6e3a20636c6f73650d0a0d0a686f73743d6c6f63616c686f73740a782d637573746f6d3d74776f20776f7264730a782d656d7074793d0a782d637573746f6d3d7365636f6e640a",
+      "outcome": "OK"
+    },
+    {
+      "mode": "interpreter",
+      "name": "near-host",
+      "passed": true,
+      "responseHex": "485454502f312e3120323030204f4b0d0a436f6e74656e742d4c656e6774683a2032360d0a436f6e6e656374696f6e3a20636c6f73650d0a0d0a686f73743d6c6f63616c686f73740a686f73783d76616c75650a",
+      "outcome": "OK"
+    },
+    {
+      "mode": "interpreter",
+      "name": "long-host",
+      "passed": true,
+      "responseHex": "485454502f312e3120323030204f4b0d0a436f6e74656e742d4c656e6774683a2032370d0a436f6e6e656374696f6e3a20636c6f73650d0a0d0a686f73743d6c6f63616c686f73740a686f7374783d76616c75650a",
+      "outcome": "OK"
+    },
+    {
+      "mode": "interpreter",
+      "name": "near-connection",
+      "passed": true,
+      "responseHex": "485454502f312e3120323030204f4b0d0a436f6e74656e742d4c656e6774683a2033320d0a436f6e6e656374696f6e3a20636c6f73650d0a0d0a686f73743d6c6f63616c686f73740a636f6e6e656374696f783d76616c75650a",
+      "outcome": "OK"
+    },
+    {
+      "mode": "interpreter",
+      "name": "long-connection",
+      "passed": true,
+      "responseHex": "485454502f312e3120323030204f4b0d0a436f6e74656e742d4c656e6774683a2033330d0a436f6e6e656374696f6e3a20636c6f73650d0a0d0a686f73743d6c6f63616c686f73740a636f6e6e656374696f6e783d76616c75650a",
+      "outcome": "OK"
+    },
+    {
+      "mode": "interpreter",
+      "name": "near-content-length",
+      "passed": true,
+      "responseHex": "485454502f312e3120323030204f4b0d0a436f6e74656e742d4c656e6774683a2033360d0a436f6e6e656374696f6e3a20636c6f73650d0a0d0a686f73743d6c6f63616c686f73740a636f6e74656e742d6c656e6774783d76616c75650a",
+      "outcome": "OK"
+    },
+    {
+      "mode": "interpreter",
+      "name": "long-content-length",
+      "passed": true,
+      "responseHex": "485454502f312e3120323030204f4b0d0a436f6e74656e742d4c656e6774683a2033370d0a436f6e6e656374696f6e3a20636c6f73650d0a0d0a686f73743d6c6f63616c686f73740a636f6e74656e742d6c656e677468783d76616c75650a",
+      "outcome": "OK"
+    },
+    {
+      "mode": "interpreter",
+      "name": "near-transfer-encoding",
+      "passed": true,
+      "responseHex": "485454502f312e3120323030204f4b0d0a436f6e74656e742d4c656e6774683a2033390d0a436f6e6e656374696f6e3a20636c6f73650d0a0d0a686f73743d6c6f63616c686f73740a7472616e736665722d656e636f64696e783d76616c75650a",
+      "outcome": "OK"
+    },
+    {
+      "mode": "interpreter",
+      "name": "long-transfer-encoding",
+      "passed": true,
+      "responseHex": "485454502f312e3120323030204f4b0d0a436f6e74656e742d4c656e6774683a2034300d0a436f6e6e656374696f6e3a20636c6f73650d0a0d0a686f73743d6c6f63616c686f73740a7472616e736665722d656e636f64696e67783d76616c75650a",
+      "outcome": "OK"
+    },
+    {
+      "mode": "interpreter",
+      "name": "near-expect",
+      "passed": true,
+      "responseHex": "485454502f312e3120323030204f4b0d0a436f6e74656e742d4c656e6774683a2032380d0a436f6e6e656374696f6e3a20636c6f73650d0a0d0a686f73743d6c6f63616c686f73740a6578706563783d76616c75650a",
+      "outcome": "OK"
+    },
+    {
+      "mode": "interpreter",
+      "name": "long-expect",
+      "passed": true,
+      "responseHex": "485454502f312e3120323030204f4b0d0a436f6e74656e742d4c656e6774683a2032390d0a436f6e6e656374696f6e3a20636c6f73650d0a0d0a686f73743d6c6f63616c686f73740a657870656374783d76616c75650a",
+      "outcome": "OK"
+    },
+    {
+      "mode": "interpreter",
+      "name": "near-content-encoding",
+      "passed": true,
+      "responseHex": "485454502f312e3120323030204f4b0d0a436f6e74656e742d4c656e6774683a2033380d0a436f6e6e656374696f6e3a20636c6f73650d0a0d0a686f73743d6c6f63616c686f73740a636f6e74656e742d656e636f64696e783d76616c75650a",
+      "outcome": "OK"
+    },
+    {
+      "mode": "interpreter",
+      "name": "long-content-encoding",
+      "passed": true,
+      "responseHex": "485454502f312e3120323030204f4b0d0a436f6e74656e742d4c656e6774683a2033390d0a436f6e6e656374696f6e3a20636c6f73650d0a0d0a686f73743d6c6f63616c686f73740a636f6e74656e742d656e636f64696e67783d76616c75650a",
+      "outcome": "OK"
+    },
+    {
+      "mode": "interpreter",
+      "name": "near-content-type",
+      "passed": true,
+      "responseHex": "485454502f312e3120323030204f4b0d0a436f6e74656e742d4c656e6774683a2033340d0a436f6e6e656374696f6e3a20636c6f73650d0a0d0a686f73743d6c6f63616c686f73740a636f6e74656e742d747970783d76616c75650a",
+      "outcome": "OK"
+    },
+    {
+      "mode": "interpreter",
+      "name": "long-content-type",
+      "passed": true,
+      "responseHex": "485454502f312e3120323030204f4b0d0a436f6e74656e742d4c656e6774683a2033350d0a436f6e6e656374696f6e3a20636c6f73650d0a0d0a686f73743d6c6f63616c686f73740a636f6e74656e742d74797065783d76616c75650a",
+      "outcome": "OK"
+    },
+    {
+      "mode": "interpreter",
+      "name": "unsupported-ExPeCt",
+      "passed": true,
+      "responseHex": "",
+      "outcome": "ERROR:Request expectation or content encoding unsupported"
+    },
+    {
+      "mode": "interpreter",
+      "name": "unsupported-CoNtEnT-EnCoDiNg",
+      "passed": true,
+      "responseHex": "",
+      "outcome": "ERROR:Request expectation or content encoding unsupported"
+    },
+    {
+      "mode": "interpreter",
+      "name": "duplicate-host",
+      "passed": true,
+      "responseHex": "",
+      "outcome": "ERROR:Duplicate Host"
+    },
+    {
+      "mode": "interpreter",
+      "name": "duplicate-length",
+      "passed": true,
+      "responseHex": "",
+      "outcome": "ERROR:Duplicate request Content-Length"
+    },
+    {
+      "mode": "interpreter",
+      "name": "duplicate-transfer",
+      "passed": true,
+      "responseHex": "",
+      "outcome": "ERROR:Duplicate request Transfer-Encoding"
+    },
+    {
+      "mode": "interpreter",
+      "name": "ambiguous",
+      "passed": true,
+      "responseHex": "",
+      "outcome": "ERROR:Ambiguous request framing"
+    },
+    {
+      "mode": "interpreter",
+      "name": "invalid-length",
+      "passed": true,
+      "responseHex": "",
+      "outcome": "ERROR:Invalid request Content-Length"
+    },
+    {
+      "mode": "interpreter",
+      "name": "invalid-transfer",
+      "passed": true,
+      "responseHex": "",
+      "outcome": "ERROR:Request transfer encoding unsupported"
+    },
+    {
+      "mode": "interpreter",
+      "name": "empty-host",
+      "passed": true,
+      "responseHex": "",
+      "outcome": "ERROR:Empty Host"
+    },
+    {
+      "mode": "interpreter",
+      "name": "space-in-name",
+      "passed": true,
+      "responseHex": "",
+      "outcome": "ERROR:Invalid request header name"
+    },
+    {
+      "mode": "interpreter",
+      "name": "underscore-not-hyphen",
+      "passed": true,
+      "responseHex": "485454502f312e3120323030204f4b0d0a436f6e74656e742d4c656e6774683a2033320d0a436f6e6e656374696f6e3a20636c6f73650d0a0d0a686f73743d6c6f63616c686f73740a636f6e74656e745f6c656e6774683d300a",
+      "outcome": "OK"
+    },
+    {
+      "mode": "jit",
+      "name": "mixed-known",
+      "passed": true,
+      "responseHex": "485454502f312e3120323030204f4b0d0a436f6e74656e742d4c656e6774683a2037330d0a436f6e6e656374696f6e3a20636c6f73650d0a0d0a686f73743d6c6f63616c686f73740a636f6e6e656374696f6e3d636c6f73650a636f6e74656e742d6c656e6774683d300a636f6e74656e742d747970653d746578742f706c61696e0a",
+      "outcome": "OK"
+    },
+    {
+      "mode": "jit",
+      "name": "known-uppercase",
+      "passed": true,
+      "responseHex": "485454502f312e3120323030204f4b0d0a436f6e74656e742d4c656e6774683a2037330d0a436f6e6e656374696f6e3a20636c6f73650d0a0d0a686f73743d6c6f63616c686f73740a636f6e6e656374696f6e3d636c6f73650a636f6e74656e742d6c656e6774683d300a636f6e74656e742d747970653d746578742f706c61696e0a",
+      "outcome": "OK"
+    },
+    {
+      "mode": "jit",
+      "name": "chunked",
+      "passed": true,
+      "responseHex": "485454502f312e3120323030204f4b0d0a436f6e74656e742d4c656e6774683a2034310d0a436f6e6e656374696f6e3a20636c6f73650d0a0d0a686f73743d6c6f63616c686f73740a7472616e736665722d656e636f64696e673d6368756e6b65640a",
+      "outcome": "OK"
+    },
+    {
+      "mode": "jit",
+      "name": "unknown-and-empty",
+      "passed": true,
+      "responseHex": "485454502f312e3120323030204f4b0d0a436f6e74656e742d4c656e6774683a2035390d0a436f6e6e656374696f6e3a20636c6f73650d0a0d0a686f73743d6c6f63616c686f73740a782d637573746f6d3d74776f20776f7264730a782d656d7074793d0a782d637573746f6d3d7365636f6e640a",
+      "outcome": "OK"
+    },
+    {
+      "mode": "jit",
+      "name": "near-host",
+      "passed": true,
+      "responseHex": "485454502f312e3120323030204f4b0d0a436f6e74656e742d4c656e6774683a2032360d0a436f6e6e656374696f6e3a20636c6f73650d0a0d0a686f73743d6c6f63616c686f73740a686f73783d76616c75650a",
+      "outcome": "OK"
+    },
+    {
+      "mode": "jit",
+      "name": "long-host",
+      "passed": true,
+      "responseHex": "485454502f312e3120323030204f4b0d0a436f6e74656e742d4c656e6774683a2032370d0a436f6e6e656374696f6e3a20636c6f73650d0a0d0a686f73743d6c6f63616c686f73740a686f7374783d76616c75650a",
+      "outcome": "OK"
+    },
+    {
+      "mode": "jit",
+      "name": "near-connection",
+      "passed": true,
+      "responseHex": "485454502f312e3120323030204f4b0d0a436f6e74656e742d4c656e6774683a2033320d0a436f6e6e656374696f6e3a20636c6f73650d0a0d0a686f73743d6c6f63616c686f73740a636f6e6e656374696f783d76616c75650a",
+      "outcome": "OK"
+    },
+    {
+      "mode": "jit",
+      "name": "long-connection",
+      "passed": true,
+      "responseHex": "485454502f312e3120323030204f4b0d0a436f6e74656e742d4c656e6774683a2033330d0a436f6e6e656374696f6e3a20636c6f73650d0a0d0a686f73743d6c6f63616c686f73740a636f6e6e656374696f6e783d76616c75650a",
+      "outcome": "OK"
+    },
+    {
+      "mode": "jit",
+      "name": "near-content-length",
+      "passed": true,
+      "responseHex": "485454502f312e3120323030204f4b0d0a436f6e74656e742d4c656e6774683a2033360d0a436f6e6e656374696f6e3a20636c6f73650d0a0d0a686f73743d6c6f63616c686f73740a636f6e74656e742d6c656e6774783d76616c75650a",
+      "outcome": "OK"
+    },
+    {
+      "mode": "jit",
+      "name": "long-content-length",
+      "passed": true,
+      "responseHex": "485454502f312e3120323030204f4b0d0a436f6e74656e742d4c656e6774683a2033370d0a436f6e6e656374696f6e3a20636c6f73650d0a0d0a686f73743d6c6f63616c686f73740a636f6e74656e742d6c656e677468783d76616c75650a",
+      "outcome": "OK"
+    },
+    {
+      "mode": "jit",
+      "name": "near-transfer-encoding",
+      "passed": true,
+      "responseHex": "485454502f312e3120323030204f4b0d0a436f6e74656e742d4c656e6774683a2033390d0a436f6e6e656374696f6e3a20636c6f73650d0a0d0a686f73743d6c6f63616c686f73740a7472616e736665722d656e636f64696e783d76616c75650a",
+      "outcome": "OK"
+    },
+    {
+      "mode": "jit",
+      "name": "long-transfer-encoding",
+      "passed": true,
+      "responseHex": "485454502f312e3120323030204f4b0d0a436f6e74656e742d4c656e6774683a2034300d0a436f6e6e656374696f6e3a20636c6f73650d0a0d0a686f73743d6c6f63616c686f73740a7472616e736665722d656e636f64696e67783d76616c75650a",
+      "outcome": "OK"
+    },
+    {
+      "mode": "jit",
+      "name": "near-expect",
+      "passed": true,
+      "responseHex": "485454502f312e3120323030204f4b0d0a436f6e74656e742d4c656e6774683a2032380d0a436f6e6e656374696f6e3a20636c6f73650d0a0d0a686f73743d6c6f63616c686f73740a6578706563783d76616c75650a",
+      "outcome": "OK"
+    },
+    {
+      "mode": "jit",
+      "name": "long-expect",
+      "passed": true,
+      "responseHex": "485454502f312e3120323030204f4b0d0a436f6e74656e742d4c656e6774683a2032390d0a436f6e6e656374696f6e3a20636c6f73650d0a0d0a686f73743d6c6f63616c686f73740a657870656374783d76616c75650a",
+      "outcome": "OK"
+    },
+    {
+      "mode": "jit",
+      "name": "near-content-encoding",
+      "passed": true,
+      "responseHex": "485454502f312e3120323030204f4b0d0a436f6e74656e742d4c656e6774683a2033380d0a436f6e6e656374696f6e3a20636c6f73650d0a0d0a686f73743d6c6f63616c686f73740a636f6e74656e742d656e636f64696e783d76616c75650a",
+      "outcome": "OK"
+    },
+    {
+      "mode": "jit",
+      "name": "long-content-encoding",
+      "passed": true,
+      "responseHex": "485454502f312e3120323030204f4b0d0a436f6e74656e742d4c656e6774683a2033390d0a436f6e6e656374696f6e3a20636c6f73650d0a0d0a686f73743d6c6f63616c686f73740a636f6e74656e742d656e636f64696e67783d76616c75650a",
+      "outcome": "OK"
+    },
+    {
+      "mode": "jit",
+      "name": "near-content-type",
+      "passed": true,
+      "responseHex": "485454502f312e3120323030204f4b0d0a436f6e74656e742d4c656e6774683a2033340d0a436f6e6e656374696f6e3a20636c6f73650d0a0d0a686f73743d6c6f63616c686f73740a636f6e74656e742d747970783d76616c75650a",
+      "outcome": "OK"
+    },
+    {
+      "mode": "jit",
+      "name": "long-content-type",
+      "passed": true,
+      "responseHex": "485454502f312e3120323030204f4b0d0a436f6e74656e742d4c656e6774683a2033350d0a436f6e6e656374696f6e3a20636c6f73650d0a0d0a686f73743d6c6f63616c686f73740a636f6e74656e742d74797065783d76616c75650a",
+      "outcome": "OK"
+    },
+    {
+      "mode": "jit",
+      "name": "unsupported-ExPeCt",
+      "passed": true,
+      "responseHex": "",
+      "outcome": "ERROR:Request expectation or content encoding unsupported"
+    },
+    {
+      "mode": "jit",
+      "name": "unsupported-CoNtEnT-EnCoDiNg",
+      "passed": true,
+      "responseHex": "",
+      "outcome": "ERROR:Request expectation or content encoding unsupported"
+    },
+    {
+      "mode": "jit",
+      "name": "duplicate-host",
+      "passed": true,
+      "responseHex": "",
+      "outcome": "ERROR:Duplicate Host"
+    },
+    {
+      "mode": "jit",
+      "name": "duplicate-length",
+      "passed": true,
+      "responseHex": "",
+      "outcome": "ERROR:Duplicate request Content-Length"
+    },
+    {
+      "mode": "jit",
+      "name": "duplicate-transfer",
+      "passed": true,
+      "responseHex": "",
+      "outcome": "ERROR:Duplicate request Transfer-Encoding"
+    },
+    {
+      "mode": "jit",
+      "name": "ambiguous",
+      "passed": true,
+      "responseHex": "",
+      "outcome": "ERROR:Ambiguous request framing"
+    },
+    {
+      "mode": "jit",
+      "name": "invalid-length",
+      "passed": true,
+      "responseHex": "",
+      "outcome": "ERROR:Invalid request Content-Length"
+    },
+    {
+      "mode": "jit",
+      "name": "invalid-transfer",
+      "passed": true,
+      "responseHex": "",
+      "outcome": "ERROR:Request transfer encoding unsupported"
+    },
+    {
+      "mode": "jit",
+      "name": "empty-host",
+      "passed": true,
+      "responseHex": "",
+      "outcome": "ERROR:Empty Host"
+    },
+    {
+      "mode": "jit",
+      "name": "space-in-name",
+      "passed": true,
+      "responseHex": "",
+      "outcome": "ERROR:Invalid request header name"
+    },
+    {
+      "mode": "jit",
+      "name": "underscore-not-hyphen",
+      "passed": true,
+      "responseHex": "485454502f312e3120323030204f4b0d0a436f6e74656e742d4c656e6774683a2033320d0a436f6e6e656374696f6e3a20636c6f73650d0a0d0a686f73743d6c6f63616c686f73740a636f6e74656e745f6c656e6774683d300a",
+      "outcome": "OK"
+    }
+  ],
+  "commands": [
+    {
+      "command": [
+        "python3",
+        "/Users/robert/Projects/neoclr/scripts/build-native-project.py",
+        "--profile",
+        "http",
+        "--project",
+        "/Users/robert/Projects/neoclr/target/header-names-validation-20261014/project/App.rvnproj",
+        "--bundle",
+        "/Users/robert/Projects/neoclr/target/header-names-candidate-bundle-20261014",
+        "--aot",
+        "/Users/robert/Projects/neoclr/target/debug/neoclr-codegen",
+        "--output",
+        "/Users/robert/Projects/neoclr/target/header-names-validation-20261014/native"
+      ],
+      "exitCode": 0,
+      "stdout": "/Users/robert/Projects/neoclr/target/header-names-validation-20261014/native/app\n",
+      "stderr": ""
+    }
+  ],
+  "inputs": {
+    "/Users/robert/Projects/neoclr/benchmarks/http-server/check-header-names.py": "c9bb8cc28cb38064bef2a0ef1d855de8f4c7739fb564b7668c966b793bdccf29",
+    "/Users/robert/Projects/neoclr/benchmarks/http-server/HeaderNames.rvn": "95e694cf68a4988d139b691a54d9374fed25cf6a9034367f241db8b2c5b13c0f",
+    "/Users/robert/Projects/neoclr/target/header-names-candidate-bundle-20261014/manifest.json": "0ea4f86feef1e33f0bcf54b3fb766e0bbecea2c49d2a60e1d8c002bba063e7e8",
+    "/Users/robert/Projects/neoclr/target/header-names-validation-20261014/native/build.json": "562e208bf8f4c7dd1cfce8d1fd26d57a19113bca09b9039d1fe54b70b8231a15",
+    "/Users/robert/Projects/neoclr/target/header-names-candidate-bundle-20261014/bin/neoclr": "7ba458ff0eb72e7a37aec94872cbe1bc0426c53e2be3a11a7fc7095c1e5dc486",
+    "/Users/robert/Projects/neoclr/target/debug/neoclr-codegen": "b65d1b534fa691acdb0284ad8ef4eca448627a70969c3d05a300ade0e4d141ef"
+  }
+}

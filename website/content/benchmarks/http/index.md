@@ -22,6 +22,8 @@ and explicit state-machine fixtures on macOS; they are not new SDK matrix result
 Windows qualification or sustained server-capacity figures.
 [Method and raw development evidence](https://github.com/marinasundstrom/neoclr/blob/main/benchmarks/http-server/uri-byte-parsing.md).
 
+A further [known-header byte matching slice](https://github.com/marinasundstrom/neoclr/blob/main/benchmarks/http-server/header-name-bytes.md) saves another 10 plain-text / 8 JSON allocations per request. All 87 wire checks pass across execution modes; the small timing changes remain exploratory.
+
 ## Workload matrix
 
 Median successful requests per second across five rounds:

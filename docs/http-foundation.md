@@ -198,3 +198,11 @@ otherwise the value is decoded while appending the header. This is not universal
 lazy decoding or global interning of arbitrary network input. neoCLR should start
 with fixed known-name identities; bounded value reuse and lazy materialization are
 separate choices to measure.
+
+### Known-name implementation — 2026-10-14
+
+[Fixed-name byte matching](../benchmarks/http-server/header-name-bytes.md) now avoids
+lowercase buffers and name decoding for seven common request headers. Unknown
+names use the existing path; value decoding and all protocol checks stay eager.
+This is not permanent interning: the backend may copy literals when text identity
+is observable. Shared constant ownership and broader name coverage remain follow-ups.

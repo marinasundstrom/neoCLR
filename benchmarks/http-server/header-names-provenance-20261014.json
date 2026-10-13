@@ -1,0 +1,1248 @@
+{
+  "compilerRevision": "cb4721e7d",
+  "baselineSourceRevision": "ac901423f4187adf0c58d7dbf804123993d3d4db",
+  "candidateSourceRevision": "3806653486f9b563b80337b236746157c4e47a0f",
+  "changedInputs": [
+    "/Users/robert/Projects/neoclr/runtime/raven/src/System/Web/Http/HttpServer.rvn"
+  ],
+  "commonInputs": {
+    "/Users/robert/Projects/neoclr/runtime/raven/compiler-services/RuntimeAwait.rvn": {
+      "baseline": "5a22359686ad1ffaec28b212e2821a1b09f08a2811393e31a07666a3703d161a",
+      "candidate": "5a22359686ad1ffaec28b212e2821a1b09f08a2811393e31a07666a3703d161a"
+    },
+    "/Users/robert/Projects/neoclr/runtime/raven/compiler-services/RuntimeGenerator.rvn": {
+      "baseline": "ac1209d4d1e7ab7d7a8483a2451ecf09d460c00d217bb9ba2f3563f15cacc423",
+      "candidate": "ac1209d4d1e7ab7d7a8483a2451ecf09d460c00d217bb9ba2f3563f15cacc423"
+    },
+    "/Users/robert/Projects/neoclr/runtime/raven/native/NativeAllocation.rvn": {
+      "baseline": "674fe492186c123830cebc383b461f155b9cb6b7a59db71fb4782252178658e2",
+      "candidate": "674fe492186c123830cebc383b461f155b9cb6b7a59db71fb4782252178658e2"
+    },
+    "/Users/robert/Projects/neoclr/runtime/raven/native/NativeObject.rvn": {
+      "baseline": "76eaefe71b46d1bac65f720801f15ff52db81256dadbea0a32b4c748dfdf400f",
+      "candidate": "76eaefe71b46d1bac65f720801f15ff52db81256dadbea0a32b4c748dfdf400f"
+    },
+    "/Users/robert/Projects/neoclr/runtime/raven/native/NativeReflection.rvn": {
+      "baseline": "f0a9d1940daf08dedde102051f3abdcebabcc27dcd723fa182ab5ed9c67419d4",
+      "candidate": "f0a9d1940daf08dedde102051f3abdcebabcc27dcd723fa182ab5ed9c67419d4"
+    },
+    "/Users/robert/Projects/neoclr/runtime/raven/native/ObjectIntrospection.rvn": {
+      "baseline": "6a7658a3001d917d99217b72a213f3c5507037fb00b7ad147b8bac9c7f812460",
+      "candidate": "6a7658a3001d917d99217b72a213f3c5507037fb00b7ad147b8bac9c7f812460"
+    },
+    "/Users/robert/Projects/neoclr/runtime/raven/native/ParameterSnapshot.rvn": {
+      "baseline": "a2a2099886059ada48aa5c0cd292a6d3ab73bcb4fdb0b858bb68303aa63ae743",
+      "candidate": "a2a2099886059ada48aa5c0cd292a6d3ab73bcb4fdb0b858bb68303aa63ae743"
+    },
+    "/Users/robert/Projects/neoclr/runtime/raven/native/RuntimeConsoleCalls.rvn": {
+      "baseline": "cab4a6be22f50ab0986cad600bd6b68c92bf8c4fdf7fffedb4c5969b8a7fdd99",
+      "candidate": "cab4a6be22f50ab0986cad600bd6b68c92bf8c4fdf7fffedb4c5969b8a7fdd99"
+    },
+    "/Users/robert/Projects/neoclr/runtime/raven/native/RuntimeConsoleServices.rvn": {
+      "baseline": "ecb07867547bee4c8417ddb318c78f36179fad54b9d93c36c04e5d611c0813d3",
+      "candidate": "ecb07867547bee4c8417ddb318c78f36179fad54b9d93c36c04e5d611c0813d3"
+    },
+    "/Users/robert/Projects/neoclr/runtime/raven/native/RuntimeConstructionCalls.rvn": {
+      "baseline": "16788d4fb12bda38b7f916f6c3c326df1cdedec0a474a577c6ffd832d0df4951",
+      "candidate": "16788d4fb12bda38b7f916f6c3c326df1cdedec0a474a577c6ffd832d0df4951"
+    },
+    "/Users/robert/Projects/neoclr/runtime/raven/native/RuntimeCryptographyCalls.rvn": {
+      "baseline": "9fbc54f2513cfb6205ecc00717cab535e77aca88a8db8d4946dfbbbbe69e5d17",
+      "candidate": "9fbc54f2513cfb6205ecc00717cab535e77aca88a8db8d4946dfbbbbe69e5d17"
+    },
+    "/Users/robert/Projects/neoclr/runtime/raven/native/RuntimeDiagnosticsCalls.rvn": {
+      "baseline": "21ba25d872a68aee71a45203b266ec1f0237cbeec870a3af393f837d46fd778f",
+      "candidate": "21ba25d872a68aee71a45203b266ec1f0237cbeec870a3af393f837d46fd778f"
+    },
+    "/Users/robert/Projects/neoclr/runtime/raven/native/RuntimeEnvironmentCalls.rvn": {
+      "baseline": "0814303a5469ae8b0e4926277f24e55074b3a2771348b8f4643aee825f7dbe53",
+      "candidate": "0814303a5469ae8b0e4926277f24e55074b3a2771348b8f4643aee825f7dbe53"
+    },
+    "/Users/robert/Projects/neoclr/runtime/raven/native/RuntimeEnvironmentServices.rvn": {
+      "baseline": "146fcbb208b255e3de9f3243d77621faeb6fa61becba8acf26343f6d32564461",
+      "candidate": "146fcbb208b255e3de9f3243d77621faeb6fa61becba8acf26343f6d32564461"
+    },
+    "/Users/robert/Projects/neoclr/runtime/raven/native/RuntimeFailure.rvn": {
+      "baseline": "b8a2e8bfce35835ed276bc2d935f35a382052bf707438f5c2c21191c01c8bc7a",
+      "candidate": "b8a2e8bfce35835ed276bc2d935f35a382052bf707438f5c2c21191c01c8bc7a"
+    },
+    "/Users/robert/Projects/neoclr/runtime/raven/native/RuntimeFailureCalls.rvn": {
+      "baseline": "9408d20b11b05bc2b9bb1bda593f5003d66211087137f6d3703056e1b1bc393e",
+      "candidate": "9408d20b11b05bc2b9bb1bda593f5003d66211087137f6d3703056e1b1bc393e"
+    },
+    "/Users/robert/Projects/neoclr/runtime/raven/native/RuntimeFileTextServices.rvn": {
+      "baseline": "76cbaa83faac32a391da8682ef10fefbb84e6243ea732b5caecc15680d56dc21",
+      "candidate": "76cbaa83faac32a391da8682ef10fefbb84e6243ea732b5caecc15680d56dc21"
+    },
+    "/Users/robert/Projects/neoclr/runtime/raven/native/RuntimeHandleServices.rvn": {
+      "baseline": "a2fc7297752a3d6b047a5d4ca2c0145fc383d6af47758e17c0c038e8fcb55361",
+      "candidate": "a2fc7297752a3d6b047a5d4ca2c0145fc383d6af47758e17c0c038e8fcb55361"
+    },
+    "/Users/robert/Projects/neoclr/runtime/raven/native/RuntimeHeapCalls.rvn": {
+      "baseline": "c590d4658b97e18a1061ddd56b2455c30c79edc21fe627862d688febdacab38b",
+      "candidate": "c590d4658b97e18a1061ddd56b2455c30c79edc21fe627862d688febdacab38b"
+    },
+    "/Users/robert/Projects/neoclr/runtime/raven/native/RuntimeHeapServices.rvn": {
+      "baseline": "575046a715fb787c4414abdda522cb3320211dd75dac09af74bfa91e861b3907",
+      "candidate": "575046a715fb787c4414abdda522cb3320211dd75dac09af74bfa91e861b3907"
+    },
+    "/Users/robert/Projects/neoclr/runtime/raven/native/RuntimeIntrospectionCalls.rvn": {
+      "baseline": "2dffed83ce72539b916af47a133bb059005b8ac0290007fc9a8d92954d464732",
+      "candidate": "2dffed83ce72539b916af47a133bb059005b8ac0290007fc9a8d92954d464732"
+    },
+    "/Users/robert/Projects/neoclr/runtime/raven/native/RuntimeIntrospectionServices.rvn": {
+      "baseline": "f5edcde3deddfa661009cfbe63565f7cc978aaac2644bf2833d442cdba057e11",
+      "candidate": "f5edcde3deddfa661009cfbe63565f7cc978aaac2644bf2833d442cdba057e11"
+    },
+    "/Users/robert/Projects/neoclr/runtime/raven/native/RuntimeMathCalls.rvn": {
+      "baseline": "0a7c207d3ece7ef40edd288814e7527b998da9948d932d7baf0347e1645663ab",
+      "candidate": "0a7c207d3ece7ef40edd288814e7527b998da9948d932d7baf0347e1645663ab"
+    },
+    "/Users/robert/Projects/neoclr/runtime/raven/native/RuntimeMathServices.rvn": {
+      "baseline": "a8a80b19ae6c584580e57079fde243249c7b5cd849c6fd9f12bcde21dd247854",
+      "candidate": "a8a80b19ae6c584580e57079fde243249c7b5cd849c6fd9f12bcde21dd247854"
+    },
+    "/Users/robert/Projects/neoclr/runtime/raven/native/RuntimeNativeAllocationCalls.rvn": {
+      "baseline": "8895150e6601bc7df03ea1eb43b72ad6440d2419109ce58bd698e893e2aa0bd8",
+      "candidate": "8895150e6601bc7df03ea1eb43b72ad6440d2419109ce58bd698e893e2aa0bd8"
+    },
+    "/Users/robert/Projects/neoclr/runtime/raven/native/RuntimeNativeIntegerCalls.rvn": {
+      "baseline": "363b3b409d0dc7683ed19106461138bed2bac997dfbdf74c876b30cfc989ed81",
+      "candidate": "363b3b409d0dc7683ed19106461138bed2bac997dfbdf74c876b30cfc989ed81"
+    },
+    "/Users/robert/Projects/neoclr/runtime/raven/native/RuntimeNativeIntegerServices.rvn": {
+      "baseline": "9850e5e21ef5dc2beee622d5a0058d132e80f61224710fd11eab465f9878871d",
+      "candidate": "9850e5e21ef5dc2beee622d5a0058d132e80f61224710fd11eab465f9878871d"
+    },
+    "/Users/robert/Projects/neoclr/runtime/raven/native/RuntimeNetworkCalls.rvn": {
+      "baseline": "debc48221c65e1da3dfb7d390e8b03c2818c55834a22892d0605bfab664da020",
+      "candidate": "debc48221c65e1da3dfb7d390e8b03c2818c55834a22892d0605bfab664da020"
+    },
+    "/Users/robert/Projects/neoclr/runtime/raven/native/RuntimeNetworkServices.rvn": {
+      "baseline": "defff4f4c4c430a681cb9180b595c57189e1a9e1a1e9184ecc844522e39f6373",
+      "candidate": "defff4f4c4c430a681cb9180b595c57189e1a9e1a1e9184ecc844522e39f6373"
+    },
+    "/Users/robert/Projects/neoclr/runtime/raven/native/RuntimeObjectCalls.rvn": {
+      "baseline": "6d569c686b004f128d23a82d0b7114c68081ba6be2971f459c2262898233a055",
+      "candidate": "6d569c686b004f128d23a82d0b7114c68081ba6be2971f459c2262898233a055"
+    },
+    "/Users/robert/Projects/neoclr/runtime/raven/native/RuntimeObjectServices.rvn": {
+      "baseline": "5e8435ea3e421389caf3bfd68d9673c2e7afef97ea5626ced9ac80d3cb3bb15c",
+      "candidate": "5e8435ea3e421389caf3bfd68d9673c2e7afef97ea5626ced9ac80d3cb3bb15c"
+    },
+    "/Users/robert/Projects/neoclr/runtime/raven/native/RuntimeStorageCalls.rvn": {
+      "baseline": "07f757abbf65c0b3e8d48625a93f0118e9fe3a4f14bc8bdef7f37de8f9e42d8a",
+      "candidate": "07f757abbf65c0b3e8d48625a93f0118e9fe3a4f14bc8bdef7f37de8f9e42d8a"
+    },
+    "/Users/robert/Projects/neoclr/runtime/raven/native/RuntimeStorageServices.rvn": {
+      "baseline": "a14fd3f263143748b6ee087e2afb2437b4ef7b21ddc4f4995e7891b063cf2b89",
+      "candidate": "a14fd3f263143748b6ee087e2afb2437b4ef7b21ddc4f4995e7891b063cf2b89"
+    },
+    "/Users/robert/Projects/neoclr/runtime/raven/native/RuntimeStringCalls.rvn": {
+      "baseline": "05023da09dd1b92a6536c3a2b2a979bd07804b3a0134bed362b1f0283c80d72b",
+      "candidate": "05023da09dd1b92a6536c3a2b2a979bd07804b3a0134bed362b1f0283c80d72b"
+    },
+    "/Users/robert/Projects/neoclr/runtime/raven/native/RuntimeStringServices.rvn": {
+      "baseline": "b167101929df1d6b7cf123f4bd455dbf31bc6a00d01d6abaac408d4c1c23562a",
+      "candidate": "b167101929df1d6b7cf123f4bd455dbf31bc6a00d01d6abaac408d4c1c23562a"
+    },
+    "/Users/robert/Projects/neoclr/runtime/raven/native/RuntimeStringSliceCalls.rvn": {
+      "baseline": "8592a6d97b582ab79e43e0485ec47105ffe484609496a1957d544a434b554b1a",
+      "candidate": "8592a6d97b582ab79e43e0485ec47105ffe484609496a1957d544a434b554b1a"
+    },
+    "/Users/robert/Projects/neoclr/runtime/raven/native/RuntimeTimeZoneCalls.rvn": {
+      "baseline": "29e45562038f85526564db0a0523f377f64d0aa4edfe07f91ac83cc626843e2c",
+      "candidate": "29e45562038f85526564db0a0523f377f64d0aa4edfe07f91ac83cc626843e2c"
+    },
+    "/Users/robert/Projects/neoclr/runtime/raven/native/RuntimeTimeZoneServices.rvn": {
+      "baseline": "b8542033c7a5d6dcc50fc67412c851ba526d6e5c219b95413d9130e2a45ae311",
+      "candidate": "b8542033c7a5d6dcc50fc67412c851ba526d6e5c219b95413d9130e2a45ae311"
+    },
+    "/Users/robert/Projects/neoclr/runtime/raven/native/RuntimeTimerCalls.rvn": {
+      "baseline": "33264c1dc3c6e4a5cbea62879f55c719104613820622acc73aebfa8bf2274c20",
+      "candidate": "33264c1dc3c6e4a5cbea62879f55c719104613820622acc73aebfa8bf2274c20"
+    },
+    "/Users/robert/Projects/neoclr/runtime/raven/projects/NativeLibrary.props": {
+      "baseline": "1834531f061a2927a1aa86ab46f99320dd0b6decb5a9b9a8b451555d3f9d7a09",
+      "candidate": "1834531f061a2927a1aa86ab46f99320dd0b6decb5a9b9a8b451555d3f9d7a09"
+    },
+    "/Users/robert/Projects/neoclr/runtime/raven/projects/System.Data.PostgreSql/System.Data.PostgreSql.rvnproj": {
+      "baseline": "0e2f5f2ab9072b2747429f53f1fbe4d7eb31a2bdd2b11fc85f82bff1352b266d",
+      "candidate": "0e2f5f2ab9072b2747429f53f1fbe4d7eb31a2bdd2b11fc85f82bff1352b266d"
+    },
+    "/Users/robert/Projects/neoclr/runtime/raven/projects/System.Data/System.Data.rvnproj": {
+      "baseline": "8d4f8cadabd2bfe6b2ad2b8676ca25e30ae0f1c4b946a31b8c0e9a4337616826",
+      "candidate": "8d4f8cadabd2bfe6b2ad2b8676ca25e30ae0f1c4b946a31b8c0e9a4337616826"
+    },
+    "/Users/robert/Projects/neoclr/runtime/raven/projects/System.Networking/System.Networking.rvnproj": {
+      "baseline": "e6af3e75bcb7dbdd2c80d0f41fd45cdad01554617469618f8cca53228dd75776",
+      "candidate": "e6af3e75bcb7dbdd2c80d0f41fd45cdad01554617469618f8cca53228dd75776"
+    },
+    "/Users/robert/Projects/neoclr/runtime/raven/projects/System.Runtime/System.Runtime.rvnproj": {
+      "baseline": "10d9fc8a640c7fd15b660cb15fb5067bdce9b87d307c3bdb391ef940ac657edc",
+      "candidate": "10d9fc8a640c7fd15b660cb15fb5067bdce9b87d307c3bdb391ef940ac657edc"
+    },
+    "/Users/robert/Projects/neoclr/runtime/raven/projects/System.Runtime/ownership.json": {
+      "baseline": "691bc51df44e8c11d62a8ac814cab45b43e48423719a91efd5c3bbc951c65419",
+      "candidate": "691bc51df44e8c11d62a8ac814cab45b43e48423719a91efd5c3bbc951c65419"
+    },
+    "/Users/robert/Projects/neoclr/runtime/raven/projects/System.Web/System.Web.rvnproj": {
+      "baseline": "d81efc853824b947e1a3a72f7530b4499e77a6263bbd76177caad99fa540c8e2",
+      "candidate": "d81efc853824b947e1a3a72f7530b4499e77a6263bbd76177caad99fa540c8e2"
+    },
+    "/Users/robert/Projects/neoclr/runtime/raven/src/System/Array.rvn": {
+      "baseline": "580cfd0ba77776a09e83e966a07193131fb11dfe7e4582b3263a800a3a2f1ca6",
+      "candidate": "580cfd0ba77776a09e83e966a07193131fb11dfe7e4582b3263a800a3a2f1ca6"
+    },
+    "/Users/robert/Projects/neoclr/runtime/raven/src/System/AsyncDisposable.rvn": {
+      "baseline": "dd881f8a525fea4f8dbf031df0107f4e14ced0689449a0dacd0293e4687076c0",
+      "candidate": "dd881f8a525fea4f8dbf031df0107f4e14ced0689449a0dacd0293e4687076c0"
+    },
+    "/Users/robert/Projects/neoclr/runtime/raven/src/System/Attribute.rvn": {
+      "baseline": "cc1251acf3d1cff070b980be7847611ebdaed261fabbe756d4a85fac39de0fb8",
+      "candidate": "cc1251acf3d1cff070b980be7847611ebdaed261fabbe756d4a85fac39de0fb8"
+    },
+    "/Users/robert/Projects/neoclr/runtime/raven/src/System/AttributeTargets.rvn": {
+      "baseline": "5a921efd1775faf4d2431d19ac824569b34ad560a6047c6f0c09203b3bce8b1b",
+      "candidate": "5a921efd1775faf4d2431d19ac824569b34ad560a6047c6f0c09203b3bce8b1b"
+    },
+    "/Users/robert/Projects/neoclr/runtime/raven/src/System/AttributeUsageAttribute.rvn": {
+      "baseline": "bc98c636ee2aded70179789b34c0c5e1fa677c88b322c4ddbb20d0281f13009e",
+      "candidate": "bc98c636ee2aded70179789b34c0c5e1fa677c88b322c4ddbb20d0281f13009e"
+    },
+    "/Users/robert/Projects/neoclr/runtime/raven/src/System/Boolean.rvn": {
+      "baseline": "79439bf8ec8a7822c48da00c16c31db53efaa1c11672855224bccc463a058fad",
+      "candidate": "79439bf8ec8a7822c48da00c16c31db53efaa1c11672855224bccc463a058fad"
+    },
+    "/Users/robert/Projects/neoclr/runtime/raven/src/System/BooleanParseError.rvn": {
+      "baseline": "d73021f4a603a98b337aa6b3479aa1cc19a775e24501449a701e2924791b135c",
+      "candidate": "d73021f4a603a98b337aa6b3479aa1cc19a775e24501449a701e2924791b135c"
+    },
+    "/Users/robert/Projects/neoclr/runtime/raven/src/System/Byte.rvn": {
+      "baseline": "d482136c8cb60e4c4d37efaea2679e4488346cd6b664c1e8ce939b8d1622b899",
+      "candidate": "d482136c8cb60e4c4d37efaea2679e4488346cd6b664c1e8ce939b8d1622b899"
+    },
+    "/Users/robert/Projects/neoclr/runtime/raven/src/System/Char.rvn": {
+      "baseline": "68658f496c6c619d8fe6e2100c5ab0ffabefa6b4ce2b248f001c8411673314e0",
+      "candidate": "68658f496c6c619d8fe6e2100c5ab0ffabefa6b4ce2b248f001c8411673314e0"
+    },
+    "/Users/robert/Projects/neoclr/runtime/raven/src/System/Clonable.rvn": {
+      "baseline": "086936fd3ff514a3429a93b15d8af74267f31570092e56bf4450689d692cb012",
+      "candidate": "086936fd3ff514a3429a93b15d8af74267f31570092e56bf4450689d692cb012"
+    },
+    "/Users/robert/Projects/neoclr/runtime/raven/src/System/Closable.rvn": {
+      "baseline": "3e0f9e1e55d0b3839c6eb0d2683b5534415a124730902d9f14be73955727f521",
+      "candidate": "3e0f9e1e55d0b3839c6eb0d2683b5534415a124730902d9f14be73955727f521"
+    },
+    "/Users/robert/Projects/neoclr/runtime/raven/src/System/Collections/ArrayList.rvn": {
+      "baseline": "0b2f4cbefba808b062816a454a8e7965c89d9739f3fed487491eb43fd8eb6e24",
+      "candidate": "0b2f4cbefba808b062816a454a8e7965c89d9739f3fed487491eb43fd8eb6e24"
+    },
+    "/Users/robert/Projects/neoclr/runtime/raven/src/System/Collections/ArrayQueue.rvn": {
+      "baseline": "41cad0dcaee5be57b900461de3df9be056c39445f4928c8615b4501666b02a09",
+      "candidate": "41cad0dcaee5be57b900461de3df9be056c39445f4928c8615b4501666b02a09"
+    },
+    "/Users/robert/Projects/neoclr/runtime/raven/src/System/Collections/ArrayStack.rvn": {
+      "baseline": "6b105c12748b95fa5794e831960662ba89e2cba5fe808f326da9df793789d423",
+      "candidate": "6b105c12748b95fa5794e831960662ba89e2cba5fe808f326da9df793789d423"
+    },
+    "/Users/robert/Projects/neoclr/runtime/raven/src/System/Collections/AsyncIterable.rvn": {
+      "baseline": "f19a9219e47f5d36c720a1e2f2704f0de89af4278d071ab2cc4111f54fd661a4",
+      "candidate": "f19a9219e47f5d36c720a1e2f2704f0de89af4278d071ab2cc4111f54fd661a4"
+    },
+    "/Users/robert/Projects/neoclr/runtime/raven/src/System/Collections/AsyncIterator.rvn": {
+      "baseline": "ac35702bd8803baf06f8383de2ed2449ef321cc2bd19a2d968ef2f522be5330c",
+      "candidate": "ac35702bd8803baf06f8383de2ed2449ef321cc2bd19a2d968ef2f522be5330c"
+    },
+    "/Users/robert/Projects/neoclr/runtime/raven/src/System/Collections/Collection.rvn": {
+      "baseline": "663b468aba413efbc8ac1ab7aa8c12fb134d80eb3152f83adc72054b6fd32732",
+      "candidate": "663b468aba413efbc8ac1ab7aa8c12fb134d80eb3152f83adc72054b6fd32732"
+    },
+    "/Users/robert/Projects/neoclr/runtime/raven/src/System/Collections/Comparer.rvn": {
+      "baseline": "03b7653b7d50955fc58f7e4c22e0e797ef61934e4b61674d830839b78d2df8aa",
+      "candidate": "03b7653b7d50955fc58f7e4c22e0e797ef61934e4b61674d830839b78d2df8aa"
+    },
+    "/Users/robert/Projects/neoclr/runtime/raven/src/System/Collections/EqualityComparer.rvn": {
+      "baseline": "09edf5b888c76867b5a2ab5cd3b36d5d5f09f04e2639b5a9ed77e040ebfa93b5",
+      "candidate": "09edf5b888c76867b5a2ab5cd3b36d5d5f09f04e2639b5a9ed77e040ebfa93b5"
+    },
+    "/Users/robert/Projects/neoclr/runtime/raven/src/System/Collections/FunctionComparer.rvn": {
+      "baseline": "4ffcc50ae6375b7426e74931f6620f5625b4ce49d2cb3eb7e9b2e4c12b5e7536",
+      "candidate": "4ffcc50ae6375b7426e74931f6620f5625b4ce49d2cb3eb7e9b2e4c12b5e7536"
+    },
+    "/Users/robert/Projects/neoclr/runtime/raven/src/System/Collections/FunctionEqualityComparer.rvn": {
+      "baseline": "e758257263e10d6f7570cee0428667990fd1b2e0fa3c3f7aeef9d53196b50769",
+      "candidate": "e758257263e10d6f7570cee0428667990fd1b2e0fa3c3f7aeef9d53196b50769"
+    },
+    "/Users/robert/Projects/neoclr/runtime/raven/src/System/Collections/HashMap.rvn": {
+      "baseline": "43965770311013b516d4c29183db5707086e1f2f9dbdbf71c53c3dec266a407c",
+      "candidate": "43965770311013b516d4c29183db5707086e1f2f9dbdbf71c53c3dec266a407c"
+    },
+    "/Users/robert/Projects/neoclr/runtime/raven/src/System/Collections/HashSet.rvn": {
+      "baseline": "0422b88e6c2ca3835f9613c6b8438ecc21d4d088a486cf1cacba6391525f12e2",
+      "candidate": "0422b88e6c2ca3835f9613c6b8438ecc21d4d088a486cf1cacba6391525f12e2"
+    },
+    "/Users/robert/Projects/neoclr/runtime/raven/src/System/Collections/Iterable.rvn": {
+      "baseline": "02651f1e51818b64177fbada8b58ffca6352763aca3755b260d03a287bb49225",
+      "candidate": "02651f1e51818b64177fbada8b58ffca6352763aca3755b260d03a287bb49225"
+    },
+    "/Users/robert/Projects/neoclr/runtime/raven/src/System/Collections/Iterator.rvn": {
+      "baseline": "70ad1ac0c1645aa619b6acddccfc0493ed436aa3cb78b8933ecfa85faee463cd",
+      "candidate": "70ad1ac0c1645aa619b6acddccfc0493ed436aa3cb78b8933ecfa85faee463cd"
+    },
+    "/Users/robert/Projects/neoclr/runtime/raven/src/System/Collections/KeyValuePair.rvn": {
+      "baseline": "ad9dd3da496e9513c67b627f7e4903ee1e1eb94d3d5dc1ef19a15459593f1a92",
+      "candidate": "ad9dd3da496e9513c67b627f7e4903ee1e1eb94d3d5dc1ef19a15459593f1a92"
+    },
+    "/Users/robert/Projects/neoclr/runtime/raven/src/System/Collections/List.rvn": {
+      "baseline": "85a950727c3f5fcb3296b5fe1a0dc6cb66ad602cc7b3ddaa6530352c7b38cae1",
+      "candidate": "85a950727c3f5fcb3296b5fe1a0dc6cb66ad602cc7b3ddaa6530352c7b38cae1"
+    },
+    "/Users/robert/Projects/neoclr/runtime/raven/src/System/Collections/Map.rvn": {
+      "baseline": "1b9b238e996eff182bdb105efda2d433c4ed871f72823537e6734e080732b24a",
+      "candidate": "1b9b238e996eff182bdb105efda2d433c4ed871f72823537e6734e080732b24a"
+    },
+    "/Users/robert/Projects/neoclr/runtime/raven/src/System/Collections/MutableMap.rvn": {
+      "baseline": "55b30a7b120436e06b220d7cebb03cc09f2861621b2ab146e5dc98f4d9c6324c",
+      "candidate": "55b30a7b120436e06b220d7cebb03cc09f2861621b2ab146e5dc98f4d9c6324c"
+    },
+    "/Users/robert/Projects/neoclr/runtime/raven/src/System/Collections/MutableSequence.rvn": {
+      "baseline": "c81883844897149f399e0cfc9e999799f871efbd6d08da8f5397a5f8e7043a57",
+      "candidate": "c81883844897149f399e0cfc9e999799f871efbd6d08da8f5397a5f8e7043a57"
+    },
+    "/Users/robert/Projects/neoclr/runtime/raven/src/System/Collections/MutableSet.rvn": {
+      "baseline": "1e1d02b0feb8a3b2440f2248342eb03cfaba20dc0e00e011cd0080246510a326",
+      "candidate": "1e1d02b0feb8a3b2440f2248342eb03cfaba20dc0e00e011cd0080246510a326"
+    },
+    "/Users/robert/Projects/neoclr/runtime/raven/src/System/Collections/Queue.rvn": {
+      "baseline": "4aef902e2ca2e200ad20509f7ebd5f4e98517fbe25046badcdbba3182955ac9d",
+      "candidate": "4aef902e2ca2e200ad20509f7ebd5f4e98517fbe25046badcdbba3182955ac9d"
+    },
+    "/Users/robert/Projects/neoclr/runtime/raven/src/System/Collections/Sequence.rvn": {
+      "baseline": "c6caf558d2f3760aab1f342b2393777a82413778d0b5271bf0f18e5dc85f8c93",
+      "candidate": "c6caf558d2f3760aab1f342b2393777a82413778d0b5271bf0f18e5dc85f8c93"
+    },
+    "/Users/robert/Projects/neoclr/runtime/raven/src/System/Collections/SequenceAccess.rvn": {
+      "baseline": "1f8df038e5467edb5001df60afeddd3738438104950fffc41cb8b2a5672111e7",
+      "candidate": "1f8df038e5467edb5001df60afeddd3738438104950fffc41cb8b2a5672111e7"
+    },
+    "/Users/robert/Projects/neoclr/runtime/raven/src/System/Collections/Set.rvn": {
+      "baseline": "89a654454f334c995a73dc4c7dc8dad7197019d07d7d5527176022cf741708d3",
+      "candidate": "89a654454f334c995a73dc4c7dc8dad7197019d07d7d5527176022cf741708d3"
+    },
+    "/Users/robert/Projects/neoclr/runtime/raven/src/System/Collections/Stack.rvn": {
+      "baseline": "37a4cb12a0b54c261bafe628da84d214d439a031f6a96999c86a3fec260a9f21",
+      "candidate": "37a4cb12a0b54c261bafe628da84d214d439a031f6a96999c86a3fec260a9f21"
+    },
+    "/Users/robert/Projects/neoclr/runtime/raven/src/System/ComparableTo.rvn": {
+      "baseline": "9bbc2ebf408b061b76de41bcfbb33805caded2fd2b8e15ed25ac821b6b080c5a",
+      "candidate": "9bbc2ebf408b061b76de41bcfbb33805caded2fd2b8e15ed25ac821b6b080c5a"
+    },
+    "/Users/robert/Projects/neoclr/runtime/raven/src/System/Concurrency/Cancellation.rvn": {
+      "baseline": "e489208fd300ae61d48f8d319945feec7ca5d973fedd46a78a34e2bd1fa4e261",
+      "candidate": "e489208fd300ae61d48f8d319945feec7ca5d973fedd46a78a34e2bd1fa4e261"
+    },
+    "/Users/robert/Projects/neoclr/runtime/raven/src/System/Concurrency/Tasks/TaskOperators.rvn": {
+      "baseline": "9ea09f546b234ecb4a1fa0a5e1338aa81b3da7603b87ae844781548d9152c095",
+      "candidate": "9ea09f546b234ecb4a1fa0a5e1338aa81b3da7603b87ae844781548d9152c095"
+    },
+    "/Users/robert/Projects/neoclr/runtime/raven/src/System/Concurrency/Tasks/TaskOutcome.rvn": {
+      "baseline": "231efc8e319d8ba1bb91bb2a1b1b5f77cb940ca8413a60878b8fcdac5cf3a586",
+      "candidate": "231efc8e319d8ba1bb91bb2a1b1b5f77cb940ca8413a60878b8fcdac5cf3a586"
+    },
+    "/Users/robert/Projects/neoclr/runtime/raven/src/System/Concurrency/Tasks/TaskState.rvn": {
+      "baseline": "24c4208f46cf1d6cda5297f7e9034a8bc5f4f979bdc8b1c86e21d6fd57d3e439",
+      "candidate": "24c4208f46cf1d6cda5297f7e9034a8bc5f4f979bdc8b1c86e21d6fd57d3e439"
+    },
+    "/Users/robert/Projects/neoclr/runtime/raven/src/System/Concurrency/Tasks/Tasks.rvn": {
+      "baseline": "43db2e81088925c84adbe5a14d93f6db9a190e5a5c37cf816f35c8a856f9fbd4",
+      "candidate": "43db2e81088925c84adbe5a14d93f6db9a190e5a5c37cf816f35c8a856f9fbd4"
+    },
+    "/Users/robert/Projects/neoclr/runtime/raven/src/System/Concurrency/Timer.rvn": {
+      "baseline": "069f05b947c7bb2debb87374b8f700d5bce1cbeecd84ca39465223e24d7a7ea3",
+      "candidate": "069f05b947c7bb2debb87374b8f700d5bce1cbeecd84ca39465223e24d7a7ea3"
+    },
+    "/Users/robert/Projects/neoclr/runtime/raven/src/System/Concurrency/Workers.rvn": {
+      "baseline": "27ef8be5a7124f130916903efe4cf26ef7f201cab55ddeee27771b1048677b5d",
+      "candidate": "27ef8be5a7124f130916903efe4cf26ef7f201cab55ddeee27771b1048677b5d"
+    },
+    "/Users/robert/Projects/neoclr/runtime/raven/src/System/Console/Console.rvn": {
+      "baseline": "3e530fbab14bf57d85f70bcb14ea336e3583ec7fc0e9599b6471c6c2b1d0a80a",
+      "candidate": "3e530fbab14bf57d85f70bcb14ea336e3583ec7fc0e9599b6471c6c2b1d0a80a"
+    },
+    "/Users/robert/Projects/neoclr/runtime/raven/src/System/Console/Streams.rvn": {
+      "baseline": "9d79e0a5e33d35b2252541b985869096cad5d96e2818d929bdf519f7369281f7",
+      "candidate": "9d79e0a5e33d35b2252541b985869096cad5d96e2818d929bdf519f7369281f7"
+    },
+    "/Users/robert/Projects/neoclr/runtime/raven/src/System/ConsoleReadError.rvn": {
+      "baseline": "7e2be132a2c7cc6c60b41d7edf2e12ab79a6bb58e85c2174ef31afed8cdcbc3f",
+      "candidate": "7e2be132a2c7cc6c60b41d7edf2e12ab79a6bb58e85c2174ef31afed8cdcbc3f"
+    },
+    "/Users/robert/Projects/neoclr/runtime/raven/src/System/ConvertibleInto.rvn": {
+      "baseline": "0599bedef5fbf4f73eda37d26e57754c10f3cd4504780a141f9051c811d150cb",
+      "candidate": "0599bedef5fbf4f73eda37d26e57754c10f3cd4504780a141f9051c811d150cb"
+    },
+    "/Users/robert/Projects/neoclr/runtime/raven/src/System/Data/Json/CollectionAdapters.rvn": {
+      "baseline": "e0866933289b2f597e2ed13840796b1730c692475aeba9c753bcdbb1e7892da9",
+      "candidate": "e0866933289b2f597e2ed13840796b1730c692475aeba9c753bcdbb1e7892da9"
+    },
+    "/Users/robert/Projects/neoclr/runtime/raven/src/System/Data/Json/CollectionCalls.rvn": {
+      "baseline": "1de0763f9e856afc654343b324202ee5a4361fe9049067b73f4b8d0226b17cd4",
+      "candidate": "1de0763f9e856afc654343b324202ee5a4361fe9049067b73f4b8d0226b17cd4"
+    },
+    "/Users/robert/Projects/neoclr/runtime/raven/src/System/Data/Json/JsonDocument.rvn": {
+      "baseline": "3945682f936e79dcb25a5844cef41c0002bb140f3262a082e0cfc92a22bd120e",
+      "candidate": "3945682f936e79dcb25a5844cef41c0002bb140f3262a082e0cfc92a22bd120e"
+    },
+    "/Users/robert/Projects/neoclr/runtime/raven/src/System/Data/Json/JsonError.rvn": {
+      "baseline": "e289fc6887c5043b7292517fb552e0297c2998a1c53a39eb2d537524fce5e50b",
+      "candidate": "e289fc6887c5043b7292517fb552e0297c2998a1c53a39eb2d537524fce5e50b"
+    },
+    "/Users/robert/Projects/neoclr/runtime/raven/src/System/Data/Json/JsonSerializer.rvn": {
+      "baseline": "23ba86087a733661e781893cef3ed3079122acff8e3e9cbc824e135be1157399",
+      "candidate": "23ba86087a733661e781893cef3ed3079122acff8e3e9cbc824e135be1157399"
+    },
+    "/Users/robert/Projects/neoclr/runtime/raven/src/System/Data/Json/JsonSyntax.rvn": {
+      "baseline": "4080b007156c89ac11bbdfc81e1c8985a3e931eae8753e849479c3541063af92",
+      "candidate": "4080b007156c89ac11bbdfc81e1c8985a3e931eae8753e849479c3541063af92"
+    },
+    "/Users/robert/Projects/neoclr/runtime/raven/src/System/Data/Json/JsonValue.rvn": {
+      "baseline": "d1112cffe6cd8bf1eb39313061af276979a38b9a59b4f7507f60c2ee3d0f97e1",
+      "candidate": "d1112cffe6cd8bf1eb39313061af276979a38b9a59b4f7507f60c2ee3d0f97e1"
+    },
+    "/Users/robert/Projects/neoclr/runtime/raven/src/System/Data/Json/ObjectMapper.rvn": {
+      "baseline": "298db0a19e8d88549e6ef5f3ca39e1ece2dd4ce38e385b92991912dcaa50fc75",
+      "candidate": "298db0a19e8d88549e6ef5f3ca39e1ece2dd4ce38e385b92991912dcaa50fc75"
+    },
+    "/Users/robert/Projects/neoclr/runtime/raven/src/System/Data/Sql/Sql.rvn": {
+      "baseline": "58bec0f8f217a7d915534fe45a514be6436c545e7d71125064ccd09c7617f5e1",
+      "candidate": "58bec0f8f217a7d915534fe45a514be6436c545e7d71125064ccd09c7617f5e1"
+    },
+    "/Users/robert/Projects/neoclr/runtime/raven/src/System/Data/Sql/SqlError.rvn": {
+      "baseline": "7a479384fb20f8887a43aa7079d3804dc28a8b550a4135ea9664f27da195108e",
+      "candidate": "7a479384fb20f8887a43aa7079d3804dc28a8b550a4135ea9664f27da195108e"
+    },
+    "/Users/robert/Projects/neoclr/runtime/raven/src/System/Data/Sql/SqlMapper.rvn": {
+      "baseline": "b8ec2773c9b0b0ee26f545c0a909b4934de4928bd05ae0e7085a4869d7872d47",
+      "candidate": "b8ec2773c9b0b0ee26f545c0a909b4934de4928bd05ae0e7085a4869d7872d47"
+    },
+    "/Users/robert/Projects/neoclr/runtime/raven/src/System/Data/Sql/SqlParameters.rvn": {
+      "baseline": "dcee3546804b673cd2f9e19d19e3a0f810990017ffea179291b0f92db22e096e",
+      "candidate": "dcee3546804b673cd2f9e19d19e3a0f810990017ffea179291b0f92db22e096e"
+    },
+    "/Users/robert/Projects/neoclr/runtime/raven/src/System/Data/Sql/SqlValue.rvn": {
+      "baseline": "36d24d801cfc15524e0567333bd3bd87f9968a6d0fa4fd4c050a6c83b5e01ade",
+      "candidate": "36d24d801cfc15524e0567333bd3bd87f9968a6d0fa4fd4c050a6c83b5e01ade"
+    },
+    "/Users/robert/Projects/neoclr/runtime/raven/src/System/Diagnostics/StackTrace.rvn": {
+      "baseline": "4f6a25436c6f772e0e8c20607160ec7493d7a0d7ca96cb23a9d58dd2f73f89ac",
+      "candidate": "4f6a25436c6f772e0e8c20607160ec7493d7a0d7ca96cb23a9d58dd2f73f89ac"
+    },
+    "/Users/robert/Projects/neoclr/runtime/raven/src/System/Disposable.rvn": {
+      "baseline": "c25420ff01885d43e81c874bc6bb9e908a1ce8d03071ceb2e51073e236702bbb",
+      "candidate": "c25420ff01885d43e81c874bc6bb9e908a1ce8d03071ceb2e51073e236702bbb"
+    },
+    "/Users/robert/Projects/neoclr/runtime/raven/src/System/Double.rvn": {
+      "baseline": "4dbbb92acdfe541595392edde7b1ccc61459d3b8290ea3c22ff368f0a9af83ed",
+      "candidate": "4dbbb92acdfe541595392edde7b1ccc61459d3b8290ea3c22ff368f0a9af83ed"
+    },
+    "/Users/robert/Projects/neoclr/runtime/raven/src/System/Environment/Functions.rvn": {
+      "baseline": "3222e8664b03ba7725355ee7569a77934e78e9476f3f9001770c19becc3e32f3",
+      "candidate": "3222e8664b03ba7725355ee7569a77934e78e9476f3f9001770c19becc3e32f3"
+    },
+    "/Users/robert/Projects/neoclr/runtime/raven/src/System/EnvironmentError.rvn": {
+      "baseline": "4f7e18173eec5ce80ccc9bbdf76a177ff0a004a7979f777599cf86163fad40c4",
+      "candidate": "4f7e18173eec5ce80ccc9bbdf76a177ff0a004a7979f777599cf86163fad40c4"
+    },
+    "/Users/robert/Projects/neoclr/runtime/raven/src/System/EquatableTo.rvn": {
+      "baseline": "9ad8d658a4a3c9c377c98b278df767412c4ff9335693fd6b081ada354b147025",
+      "candidate": "9ad8d658a4a3c9c377c98b278df767412c4ff9335693fd6b081ada354b147025"
+    },
+    "/Users/robert/Projects/neoclr/runtime/raven/src/System/Functions.rvn": {
+      "baseline": "3920a3115ff60cc79a8ab7acb1f1ed05629719ff9671699d9abf2cabf1236c88",
+      "candidate": "3920a3115ff60cc79a8ab7acb1f1ed05629719ff9671699d9abf2cabf1236c88"
+    },
+    "/Users/robert/Projects/neoclr/runtime/raven/src/System/Globalization/Culture.rvn": {
+      "baseline": "035e31c3cc6242a8a9713c314d9c4d9f075cfe2710423bf425aa727368ec2283",
+      "candidate": "035e31c3cc6242a8a9713c314d9c4d9f075cfe2710423bf425aa727368ec2283"
+    },
+    "/Users/robert/Projects/neoclr/runtime/raven/src/System/Globalization/CultureProvider.rvn": {
+      "baseline": "590386b66a45d87f1d55402589af7a63e45289de24005bbe659fe7a6c7820cca",
+      "candidate": "590386b66a45d87f1d55402589af7a63e45289de24005bbe659fe7a6c7820cca"
+    },
+    "/Users/robert/Projects/neoclr/runtime/raven/src/System/Globalization/DateTimeFormat.rvn": {
+      "baseline": "74283a5aebfa9adebe3e4e2d2c187310a2b96be0096951ad320e246e33c8a09b",
+      "candidate": "74283a5aebfa9adebe3e4e2d2c187310a2b96be0096951ad320e246e33c8a09b"
+    },
+    "/Users/robert/Projects/neoclr/runtime/raven/src/System/Globalization/DateTimeFormatDigits.rvn": {
+      "baseline": "85bc5c54166998600fdecc2b43083fb9e2770aeb90b55490fbffc5c5488cb0d8",
+      "candidate": "85bc5c54166998600fdecc2b43083fb9e2770aeb90b55490fbffc5c5488cb0d8"
+    },
+    "/Users/robert/Projects/neoclr/runtime/raven/src/System/Globalization/FixedCultureProvider.rvn": {
+      "baseline": "56f7ecef7aea3692209d8affc90c9ec547d9381b0f32fe738a51e26618502914",
+      "candidate": "56f7ecef7aea3692209d8affc90c9ec547d9381b0f32fe738a51e26618502914"
+    },
+    "/Users/robert/Projects/neoclr/runtime/raven/src/System/Globalization/HebrewDateTimeFormat.rvn": {
+      "baseline": "843c89be91ac0b07bcab2949aa869730fb3833164677005feb2fe0c550a2dd30",
+      "candidate": "843c89be91ac0b07bcab2949aa869730fb3833164677005feb2fe0c550a2dd30"
+    },
+    "/Users/robert/Projects/neoclr/runtime/raven/src/System/Globalization/InvariantDateTimeFormat.rvn": {
+      "baseline": "932568879a98ad9f538d2f882ac0b98e849e9899f12fdc19e8bb6b9d3b429942",
+      "candidate": "932568879a98ad9f538d2f882ac0b98e849e9899f12fdc19e8bb6b9d3b429942"
+    },
+    "/Users/robert/Projects/neoclr/runtime/raven/src/System/Globalization/Language.rvn": {
+      "baseline": "fea13d5d101fee8eae34c21afc17710809e8c06b70ebc0c4c99587ed0ecb94f0",
+      "candidate": "fea13d5d101fee8eae34c21afc17710809e8c06b70ebc0c4c99587ed0ecb94f0"
+    },
+    "/Users/robert/Projects/neoclr/runtime/raven/src/System/Globalization/SwedishDateTimeFormat.rvn": {
+      "baseline": "508ea39c3fe8840c85e915b5d39f45aa0d950c94698e89875a63b2945c77d9fe",
+      "candidate": "508ea39c3fe8840c85e915b5d39f45aa0d950c94698e89875a63b2945c77d9fe"
+    },
+    "/Users/robert/Projects/neoclr/runtime/raven/src/System/Globalization/SystemCultureProvider.rvn": {
+      "baseline": "7d894f5dd3f8ad6c83a151f5b3534e78222f76a18421ad5153a113edaac89a5a",
+      "candidate": "7d894f5dd3f8ad6c83a151f5b3534e78222f76a18421ad5153a113edaac89a5a"
+    },
+    "/Users/robert/Projects/neoclr/runtime/raven/src/System/HashCode.rvn": {
+      "baseline": "d97b6ff7fb77f8e553729e6afa715bddd5db02de54850a2bde58e0768cae60b1",
+      "candidate": "d97b6ff7fb77f8e553729e6afa715bddd5db02de54850a2bde58e0768cae60b1"
+    },
+    "/Users/robert/Projects/neoclr/runtime/raven/src/System/IO/Compression/GZipDecoder.rvn": {
+      "baseline": "48ba67fb0a4013d88c6ae752dd657314d5a4c12e37c3818cab799f042af84081",
+      "candidate": "48ba67fb0a4013d88c6ae752dd657314d5a4c12e37c3818cab799f042af84081"
+    },
+    "/Users/robert/Projects/neoclr/runtime/raven/src/System/IO/Compression/GZipEncoder.rvn": {
+      "baseline": "68b01949610d51b4c3212c628744c9d511b6305ccde8f2054d9b8a6edf4411d4",
+      "candidate": "68b01949610d51b4c3212c628744c9d511b6305ccde8f2054d9b8a6edf4411d4"
+    },
+    "/Users/robert/Projects/neoclr/runtime/raven/src/System/IO/Compression/GZipStream.rvn": {
+      "baseline": "81090485ea1ce1d445badd2b995f7c9553d8c968b9c66504597002b4594e592f",
+      "candidate": "81090485ea1ce1d445badd2b995f7c9553d8c968b9c66504597002b4594e592f"
+    },
+    "/Users/robert/Projects/neoclr/runtime/raven/src/System/IO/FileInputStream.rvn": {
+      "baseline": "29bbfd9dde80045be84a4cdf1161410f95056e4d5b262808bb8f3bb0ef501a27",
+      "candidate": "29bbfd9dde80045be84a4cdf1161410f95056e4d5b262808bb8f3bb0ef501a27"
+    },
+    "/Users/robert/Projects/neoclr/runtime/raven/src/System/IO/FileOutputStream.rvn": {
+      "baseline": "e959ae7ac71581985eaead34d7bbdba7eeb427960dedbb76d495036c929e6539",
+      "candidate": "e959ae7ac71581985eaead34d7bbdba7eeb427960dedbb76d495036c929e6539"
+    },
+    "/Users/robert/Projects/neoclr/runtime/raven/src/System/IO/InputStream.rvn": {
+      "baseline": "92f97a6fe6a32a90ed10cc337e24d23cab4ca4a806bbdb4a8a37a6de595a980f",
+      "candidate": "92f97a6fe6a32a90ed10cc337e24d23cab4ca4a806bbdb4a8a37a6de595a980f"
+    },
+    "/Users/robert/Projects/neoclr/runtime/raven/src/System/IO/MemoryStream.rvn": {
+      "baseline": "fac6eb97e5e55b6944e463f342f60e5123284bcecb8c151a62ddf2deca501db3",
+      "candidate": "fac6eb97e5e55b6944e463f342f60e5123284bcecb8c151a62ddf2deca501db3"
+    },
+    "/Users/robert/Projects/neoclr/runtime/raven/src/System/IO/OutputStream.rvn": {
+      "baseline": "4396cfa095184f3e61786da62ec586c93da056ae994057bf331ec020995b8868",
+      "candidate": "4396cfa095184f3e61786da62ec586c93da056ae994057bf331ec020995b8868"
+    },
+    "/Users/robert/Projects/neoclr/runtime/raven/src/System/IO/SeekableStream.rvn": {
+      "baseline": "2538d50246688267a34f6cfed53214840422aebbba5c1060c167ac1c0996a2c5",
+      "candidate": "2538d50246688267a34f6cfed53214840422aebbba5c1060c167ac1c0996a2c5"
+    },
+    "/Users/robert/Projects/neoclr/runtime/raven/src/System/IO/StreamError.rvn": {
+      "baseline": "c9756386806382c8dc4e233879f2cfbe5ea756f816d26b304e7c82cec77a73b3",
+      "candidate": "c9756386806382c8dc4e233879f2cfbe5ea756f816d26b304e7c82cec77a73b3"
+    },
+    "/Users/robert/Projects/neoclr/runtime/raven/src/System/IO/StreamReader.rvn": {
+      "baseline": "f76ca794b9bc0bbf9f67140e89f6e717b3015d9a8294fac909f8420e6022dd4f",
+      "candidate": "f76ca794b9bc0bbf9f67140e89f6e717b3015d9a8294fac909f8420e6022dd4f"
+    },
+    "/Users/robert/Projects/neoclr/runtime/raven/src/System/IO/StreamWriter.rvn": {
+      "baseline": "4728d61ec186223bbea6dca94d35ff22e876ebef2fcd8b0247b541a597257164",
+      "candidate": "4728d61ec186223bbea6dca94d35ff22e876ebef2fcd8b0247b541a597257164"
+    },
+    "/Users/robert/Projects/neoclr/runtime/raven/src/System/IO/TextReadError.rvn": {
+      "baseline": "6c7075b52a6f931530dcd75859647a4d5fc3664045ab5803d0943b2fa0378b8b",
+      "candidate": "6c7075b52a6f931530dcd75859647a4d5fc3664045ab5803d0943b2fa0378b8b"
+    },
+    "/Users/robert/Projects/neoclr/runtime/raven/src/System/IO/TextReader.rvn": {
+      "baseline": "1e4c02d8a65465e8fff7410474f75d28cfe116dd312a4b213f4e3c8bb50d2224",
+      "candidate": "1e4c02d8a65465e8fff7410474f75d28cfe116dd312a4b213f4e3c8bb50d2224"
+    },
+    "/Users/robert/Projects/neoclr/runtime/raven/src/System/IO/TextWriter.rvn": {
+      "baseline": "f37f9dfdd74296793d4290e3dc278b776625a664bcf7954880350f47b6086be4",
+      "candidate": "f37f9dfdd74296793d4290e3dc278b776625a664bcf7954880350f47b6086be4"
+    },
+    "/Users/robert/Projects/neoclr/runtime/raven/src/System/Index.rvn": {
+      "baseline": "ea2b34dc293e7db75e9f64e5badc9a44a5e64f18dc8e21ef5511aefa820a1da2",
+      "candidate": "ea2b34dc293e7db75e9f64e5badc9a44a5e64f18dc8e21ef5511aefa820a1da2"
+    },
+    "/Users/robert/Projects/neoclr/runtime/raven/src/System/Int16.rvn": {
+      "baseline": "fc8efbda78ffece8ab5d90da73d71b44a89783ef62e911d4422fb8e1191241a4",
+      "candidate": "fc8efbda78ffece8ab5d90da73d71b44a89783ef62e911d4422fb8e1191241a4"
+    },
+    "/Users/robert/Projects/neoclr/runtime/raven/src/System/Int32.rvn": {
+      "baseline": "b62b2ba6c6ab228d5613f37a1cfc03e2ff93648d1107f9bbb617f3ae82df9258",
+      "candidate": "b62b2ba6c6ab228d5613f37a1cfc03e2ff93648d1107f9bbb617f3ae82df9258"
+    },
+    "/Users/robert/Projects/neoclr/runtime/raven/src/System/Int64.rvn": {
+      "baseline": "abbbf999cbbc83b22447550db607cdfa7815b49a6287814ddbe6acc69a7800cf",
+      "candidate": "abbbf999cbbc83b22447550db607cdfa7815b49a6287814ddbe6acc69a7800cf"
+    },
+    "/Users/robert/Projects/neoclr/runtime/raven/src/System/IntPtr.rvn": {
+      "baseline": "129226f00441c8b49a5abbc8f1de9e98486abe3b8c8a7b4a22325f507fd9984c",
+      "candidate": "129226f00441c8b49a5abbc8f1de9e98486abe3b8c8a7b4a22325f507fd9984c"
+    },
+    "/Users/robert/Projects/neoclr/runtime/raven/src/System/IntegerDivisionError.rvn": {
+      "baseline": "ca2887117c7c770829f676404139424e7d72d1547268467c2049ae368e038ed2",
+      "candidate": "ca2887117c7c770829f676404139424e7d72d1547268467c2049ae368e038ed2"
+    },
+    "/Users/robert/Projects/neoclr/runtime/raven/src/System/Introspection/AssemblyInfo.rvn": {
+      "baseline": "a99c4f08ae8e0a80fcb0f66d5ddae345568470331c48ee47db478ac9e3074bcd",
+      "candidate": "a99c4f08ae8e0a80fcb0f66d5ddae345568470331c48ee47db478ac9e3074bcd"
+    },
+    "/Users/robert/Projects/neoclr/runtime/raven/src/System/Introspection/BindingFlags.rvn": {
+      "baseline": "6a57074c9a681ffe2fccb8b74588a61858df8a266ded3d624d0571bd1617f234",
+      "candidate": "6a57074c9a681ffe2fccb8b74588a61858df8a266ded3d624d0571bd1617f234"
+    },
+    "/Users/robert/Projects/neoclr/runtime/raven/src/System/Introspection/Descriptors.rvn": {
+      "baseline": "f21653913c03431975aecca87ee32efecd97aca2a2db5e784f553beca8daa9b0",
+      "candidate": "f21653913c03431975aecca87ee32efecd97aca2a2db5e784f553beca8daa9b0"
+    },
+    "/Users/robert/Projects/neoclr/runtime/raven/src/System/Introspection/ModuleInfo.rvn": {
+      "baseline": "3db8c6711a37ed94490114f5dd36226509c30e0f5e87fac0239c0462e3c0d21c",
+      "candidate": "3db8c6711a37ed94490114f5dd36226509c30e0f5e87fac0239c0462e3c0d21c"
+    },
+    "/Users/robert/Projects/neoclr/runtime/raven/src/System/Introspection/ParameterInfo.rvn": {
+      "baseline": "54c796506e9bc9481026f4b33620540c6321e5c247747180d6e9ba1ef3d82253",
+      "candidate": "54c796506e9bc9481026f4b33620540c6321e5c247747180d6e9ba1ef3d82253"
+    },
+    "/Users/robert/Projects/neoclr/runtime/raven/src/System/InvalidRangeError.rvn": {
+      "baseline": "03aa854901c89d343f874a69fac7571f49c9712f8cbd7e9fb7eb587f77cc2c7e",
+      "candidate": "03aa854901c89d343f874a69fac7571f49c9712f8cbd7e9fb7eb587f77cc2c7e"
+    },
+    "/Users/robert/Projects/neoclr/runtime/raven/src/System/Linq/MapOperators.rvn": {
+      "baseline": "d7cd368daa9be07bbf1df64683e9ecf8bbee02bd175046b1d2928277bea74773",
+      "candidate": "d7cd368daa9be07bbf1df64683e9ecf8bbee02bd175046b1d2928277bea74773"
+    },
+    "/Users/robert/Projects/neoclr/runtime/raven/src/System/Linq/Operators.rvn": {
+      "baseline": "e1ac97d27f5c71e539aff4022f9f10d64537e1c945292bbb26e57f8b8901a022",
+      "candidate": "e1ac97d27f5c71e539aff4022f9f10d64537e1c945292bbb26e57f8b8901a022"
+    },
+    "/Users/robert/Projects/neoclr/runtime/raven/src/System/Linq/SingleError.rvn": {
+      "baseline": "f359b98a26ae9fbd60368e3095b4d2034cc7b4a6e141e280223e2ebd5968cb3e",
+      "candidate": "f359b98a26ae9fbd60368e3095b4d2034cc7b4a6e141e280223e2ebd5968cb3e"
+    },
+    "/Users/robert/Projects/neoclr/runtime/raven/src/System/Math/Functions.rvn": {
+      "baseline": "9107cc9847b213b854d5e6b76fd3ab0b31fd7a23c0065b70928f29f55eab8f11",
+      "candidate": "9107cc9847b213b854d5e6b76fd3ab0b31fd7a23c0065b70928f29f55eab8f11"
+    },
+    "/Users/robert/Projects/neoclr/runtime/raven/src/System/Networking/Dns.rvn": {
+      "baseline": "b679d8ed7ada37862d51fe2794b7e918562ce8d69e4f1075bad5775027bd0904",
+      "candidate": "b679d8ed7ada37862d51fe2794b7e918562ce8d69e4f1075bad5775027bd0904"
+    },
+    "/Users/robert/Projects/neoclr/runtime/raven/src/System/Networking/DnsError.rvn": {
+      "baseline": "7afebc9a98cde376ed90604871f725a432d972622d2dce187f405bb38eadf909",
+      "candidate": "7afebc9a98cde376ed90604871f725a432d972622d2dce187f405bb38eadf909"
+    },
+    "/Users/robert/Projects/neoclr/runtime/raven/src/System/Networking/IPAddress.rvn": {
+      "baseline": "b55b2d1013049967edb66c8cc8e0e3e6a0aff06e73bbc82a9ac7f213a0051bb3",
+      "candidate": "b55b2d1013049967edb66c8cc8e0e3e6a0aff06e73bbc82a9ac7f213a0051bb3"
+    },
+    "/Users/robert/Projects/neoclr/runtime/raven/src/System/Networking/IPAddressError.rvn": {
+      "baseline": "4b25c5f05c9674316abd80d5a052738b48f713cf218f4889807fcf1b4158d09f",
+      "candidate": "4b25c5f05c9674316abd80d5a052738b48f713cf218f4889807fcf1b4158d09f"
+    },
+    "/Users/robert/Projects/neoclr/runtime/raven/src/System/Networking/NetworkDeadline.rvn": {
+      "baseline": "d99e8239f22b61f2d90a3bf90cb16693a8d08c35f058e53bf305d8e3a166bb44",
+      "candidate": "d99e8239f22b61f2d90a3bf90cb16693a8d08c35f058e53bf305d8e3a166bb44"
+    },
+    "/Users/robert/Projects/neoclr/runtime/raven/src/System/Networking/Security/SslError.rvn": {
+      "baseline": "9a12027a85d6023c200b0080ef793a1237e6117fa15d25ddcc15f2a5b99def01",
+      "candidate": "9a12027a85d6023c200b0080ef793a1237e6117fa15d25ddcc15f2a5b99def01"
+    },
+    "/Users/robert/Projects/neoclr/runtime/raven/src/System/Networking/Security/SslOptions.rvn": {
+      "baseline": "0630f760039f609d5edbf4cff6bf4eef2b455e7c488441a6fcab0f296537c1e3",
+      "candidate": "0630f760039f609d5edbf4cff6bf4eef2b455e7c488441a6fcab0f296537c1e3"
+    },
+    "/Users/robert/Projects/neoclr/runtime/raven/src/System/Networking/Security/SslStream.rvn": {
+      "baseline": "c42c7b37601a5721530bee64a52d50c905db69583d0f282755432587b4a502ea",
+      "candidate": "c42c7b37601a5721530bee64a52d50c905db69583d0f282755432587b4a502ea"
+    },
+    "/Users/robert/Projects/neoclr/runtime/raven/src/System/Networking/Sockets/Socket.rvn": {
+      "baseline": "f2551d36259435421ad1f7512ca44b701f21352734959f529f2694f103db9fa6",
+      "candidate": "f2551d36259435421ad1f7512ca44b701f21352734959f529f2694f103db9fa6"
+    },
+    "/Users/robert/Projects/neoclr/runtime/raven/src/System/Networking/Sockets/SocketError.rvn": {
+      "baseline": "5c809932e71129e4a5589d07253e95ebdc4db245689860b1d45269b3ce740cc6",
+      "candidate": "5c809932e71129e4a5589d07253e95ebdc4db245689860b1d45269b3ce740cc6"
+    },
+    "/Users/robert/Projects/neoclr/runtime/raven/src/System/Number.rvn": {
+      "baseline": "726467d55de2a2f5302ec70695c9a3cb2fb8a6eeaadfe8d1bbb61d8819068631",
+      "candidate": "726467d55de2a2f5302ec70695c9a3cb2fb8a6eeaadfe8d1bbb61d8819068631"
+    },
+    "/Users/robert/Projects/neoclr/runtime/raven/src/System/NumberParseError.rvn": {
+      "baseline": "0f0ba9a9e04258eea7185478ea4bdac298feb94f3ff394d4331dd9824a33b81a",
+      "candidate": "0f0ba9a9e04258eea7185478ea4bdac298feb94f3ff394d4331dd9824a33b81a"
+    },
+    "/Users/robert/Projects/neoclr/runtime/raven/src/System/Object.rvn": {
+      "baseline": "54cd27425bb9798fffc63c5b6705cb16d7da4ba314dcb5a126c057c71a181045",
+      "candidate": "54cd27425bb9798fffc63c5b6705cb16d7da4ba314dcb5a126c057c71a181045"
+    },
+    "/Users/robert/Projects/neoclr/runtime/raven/src/System/ObsoleteAttribute.rvn": {
+      "baseline": "7607a186f6ae836715a1b90775fa37b903a6366249d8587e697792b465fbe6dc",
+      "candidate": "7607a186f6ae836715a1b90775fa37b903a6366249d8587e697792b465fbe6dc"
+    },
+    "/Users/robert/Projects/neoclr/runtime/raven/src/System/Option.rvn": {
+      "baseline": "87e80859ea65ac43bb5648b0c88691749b42060ba81d32ce7b7ddcef27ccfc2e",
+      "candidate": "87e80859ea65ac43bb5648b0c88691749b42060ba81d32ce7b7ddcef27ccfc2e"
+    },
+    "/Users/robert/Projects/neoclr/runtime/raven/src/System/OptionOperators.rvn": {
+      "baseline": "95bf66a68e05d667c8ff23870f543f8ed75c19263399720d8c1d7bf736d78317",
+      "candidate": "95bf66a68e05d667c8ff23870f543f8ed75c19263399720d8c1d7bf736d78317"
+    },
+    "/Users/robert/Projects/neoclr/runtime/raven/src/System/OverflowError.rvn": {
+      "baseline": "18424c1c47999dbe932836e72dba29af791232d038de12557ba378a6918e29ec",
+      "candidate": "18424c1c47999dbe932836e72dba29af791232d038de12557ba378a6918e29ec"
+    },
+    "/Users/robert/Projects/neoclr/runtime/raven/src/System/Propagatable.rvn": {
+      "baseline": "cdc7e83fbbfc15011a8af720c4030a9296edd7346a667c715316409d706d9306",
+      "candidate": "cdc7e83fbbfc15011a8af720c4030a9296edd7346a667c715316409d706d9306"
+    },
+    "/Users/robert/Projects/neoclr/runtime/raven/src/System/Range.rvn": {
+      "baseline": "09533d53ba7eb672cabcdd6b5fff27f7ec2fcdbbd8f580e8c104601300853ed6",
+      "candidate": "09533d53ba7eb672cabcdd6b5fff27f7ec2fcdbbd8f580e8c104601300853ed6"
+    },
+    "/Users/robert/Projects/neoclr/runtime/raven/src/System/Result.rvn": {
+      "baseline": "158b26e68f165b1232dea5a6344a4dc0c23385a25bb1a46db78f2a9fe8af26a6",
+      "candidate": "158b26e68f165b1232dea5a6344a4dc0c23385a25bb1a46db78f2a9fe8af26a6"
+    },
+    "/Users/robert/Projects/neoclr/runtime/raven/src/System/ResultOperators.rvn": {
+      "baseline": "f33e543a1b2bed7861e9c318a45b74ea04f581e143dc40236036e858d63e1759",
+      "candidate": "f33e543a1b2bed7861e9c318a45b74ea04f581e143dc40236036e858d63e1759"
+    },
+    "/Users/robert/Projects/neoclr/runtime/raven/src/System/Runtime/CompilerServices/InternalsVisibleToAttribute.rvn": {
+      "baseline": "662d2fefe08de66c28842076ba0ebbf2fdb9dd9d10f67491d9decc3d6b26303d",
+      "candidate": "662d2fefe08de66c28842076ba0ebbf2fdb9dd9d10f67491d9decc3d6b26303d"
+    },
+    "/Users/robert/Projects/neoclr/runtime/raven/src/System/Runtime/CompilerServices/RuntimeHelpers.rvn": {
+      "baseline": "51e258144c97624a309fb6bdb2cc561bd1b37b06d8bff2dc69b3faab741a862d",
+      "candidate": "51e258144c97624a309fb6bdb2cc561bd1b37b06d8bff2dc69b3faab741a862d"
+    },
+    "/Users/robert/Projects/neoclr/runtime/raven/src/System/Runtime/CompilerServices/UnionAttribute.rvn": {
+      "baseline": "2fed6432058b14fd985e944f18bfd307093ea4f105262c92eaeb47adfda664b8",
+      "candidate": "2fed6432058b14fd985e944f18bfd307093ea4f105262c92eaeb47adfda664b8"
+    },
+    "/Users/robert/Projects/neoclr/runtime/raven/src/System/Runtime/GC.rvn": {
+      "baseline": "3ad5260aa81430f0ae20b5f82627224a2a1f0fc36e39127404b50ef224a9e1c2",
+      "candidate": "3ad5260aa81430f0ae20b5f82627224a2a1f0fc36e39127404b50ef224a9e1c2"
+    },
+    "/Users/robert/Projects/neoclr/runtime/raven/src/System/Runtime/InteropServices/NativeImportAttribute.rvn": {
+      "baseline": "29ac8bc0caed07aed5a5f418e9fefc108c4c5282f61df9c67eca17d5dfef42a4",
+      "candidate": "29ac8bc0caed07aed5a5f418e9fefc108c4c5282f61df9c67eca17d5dfef42a4"
+    },
+    "/Users/robert/Projects/neoclr/runtime/raven/src/System/Runtime/InteropServices/NativeMemory/Functions.rvn": {
+      "baseline": "8dddea02f1007e2a57a915ede05cf1fc6c1832b398ba39e3ddea580e8efc1414",
+      "candidate": "8dddea02f1007e2a57a915ede05cf1fc6c1832b398ba39e3ddea580e8efc1414"
+    },
+    "/Users/robert/Projects/neoclr/runtime/raven/src/System/Runtime/Reflection/ArrayReflection.rvn": {
+      "baseline": "541a8753d26b7ea0e2d7aac0361467530334052db5976b05b240c4057b36d841",
+      "candidate": "541a8753d26b7ea0e2d7aac0361467530334052db5976b05b240c4057b36d841"
+    },
+    "/Users/robert/Projects/neoclr/runtime/raven/src/System/Runtime/Reflection/ReflectionError.rvn": {
+      "baseline": "60c58971d7c11f1938c68061b1be6f44cfa5300242189cd53b3c453baecafb35",
+      "candidate": "60c58971d7c11f1938c68061b1be6f44cfa5300242189cd53b3c453baecafb35"
+    },
+    "/Users/robert/Projects/neoclr/runtime/raven/src/System/Runtime/Reflection/ReflectionExtensions.rvn": {
+      "baseline": "9af8bc168fd98dbcb255f0e648d744074360a3e3feaf9ca03a17c8a4b837fb1c",
+      "candidate": "9af8bc168fd98dbcb255f0e648d744074360a3e3feaf9ca03a17c8a4b837fb1c"
+    },
+    "/Users/robert/Projects/neoclr/runtime/raven/src/System/Runtime/RuntimeContext.rvn": {
+      "baseline": "a354c52968ee5632f0a6820a46be06c3b907b0940e4685098795efac33832c87",
+      "candidate": "a354c52968ee5632f0a6820a46be06c3b907b0940e4685098795efac33832c87"
+    },
+    "/Users/robert/Projects/neoclr/runtime/raven/src/System/RuntimeTypeHandle.rvn": {
+      "baseline": "7100042389d7201f88e51974130deec96a813b25a469210e39e11d542e63143b",
+      "candidate": "7100042389d7201f88e51974130deec96a813b25a469210e39e11d542e63143b"
+    },
+    "/Users/robert/Projects/neoclr/runtime/raven/src/System/SByte.rvn": {
+      "baseline": "ba5f60c05af52834b06760770fc0d156427b34aa34c05d0eb42679c8c4790a46",
+      "candidate": "ba5f60c05af52834b06760770fc0d156427b34aa34c05d0eb42679c8c4790a46"
+    },
+    "/Users/robert/Projects/neoclr/runtime/raven/src/System/Security/Cryptography/CryptographyError.rvn": {
+      "baseline": "45a12b2a7b3cb43aa0324a2ca2c479bd8f6423a4198a678609c72dfc370b9ac0",
+      "candidate": "45a12b2a7b3cb43aa0324a2ca2c479bd8f6423a4198a678609c72dfc370b9ac0"
+    },
+    "/Users/robert/Projects/neoclr/runtime/raven/src/System/Security/Cryptography/HMACSHA256.rvn": {
+      "baseline": "79c426360a3eac90f843b8d158b9f5b0b1471902dcecd86a44d1b49beda46fd8",
+      "candidate": "79c426360a3eac90f843b8d158b9f5b0b1471902dcecd86a44d1b49beda46fd8"
+    },
+    "/Users/robert/Projects/neoclr/runtime/raven/src/System/Security/Cryptography/RandomNumberGenerator.rvn": {
+      "baseline": "54f5a595d72c54097937119fb0d3c79a763cee25283ac95c325237c2d728397c",
+      "candidate": "54f5a595d72c54097937119fb0d3c79a763cee25283ac95c325237c2d728397c"
+    },
+    "/Users/robert/Projects/neoclr/runtime/raven/src/System/Security/Cryptography/SHA256.rvn": {
+      "baseline": "2e00e1b5fb1384d27cbfda77fe356bdf685878df620d19eb628b16856f4186a6",
+      "candidate": "2e00e1b5fb1384d27cbfda77fe356bdf685878df620d19eb628b16856f4186a6"
+    },
+    "/Users/robert/Projects/neoclr/runtime/raven/src/System/Single.rvn": {
+      "baseline": "fdfd1090b9a8215f1f27f3885fc09255ee5a1b44812cfeea3de867eff81dbf00",
+      "candidate": "fdfd1090b9a8215f1f27f3885fc09255ee5a1b44812cfeea3de867eff81dbf00"
+    },
+    "/Users/robert/Projects/neoclr/runtime/raven/src/System/Storage/EntryKind.rvn": {
+      "baseline": "e6a8c29af46c22cfe2dde518acaae40c02de1bf18c824b7fe98aeecebc8c061b",
+      "candidate": "e6a8c29af46c22cfe2dde518acaae40c02de1bf18c824b7fe98aeecebc8c061b"
+    },
+    "/Users/robert/Projects/neoclr/runtime/raven/src/System/Storage/FileReadError.rvn": {
+      "baseline": "120022dae115deaad019b7d75a475afc344f17d75959f3696fd6d5cff5b82e0f",
+      "candidate": "120022dae115deaad019b7d75a475afc344f17d75959f3696fd6d5cff5b82e0f"
+    },
+    "/Users/robert/Projects/neoclr/runtime/raven/src/System/Storage/FileSystem.rvn": {
+      "baseline": "7c5e574814e242069e5764024735ae4e1b952f51a59bf6ec0bf19a987950dd96",
+      "candidate": "7c5e574814e242069e5764024735ae4e1b952f51a59bf6ec0bf19a987950dd96"
+    },
+    "/Users/robert/Projects/neoclr/runtime/raven/src/System/Storage/FileText.rvn": {
+      "baseline": "63debd331168137e0f94c55ba52a96ce579c63a20cd0096d90cfe131c742a232",
+      "candidate": "63debd331168137e0f94c55ba52a96ce579c63a20cd0096d90cfe131c742a232"
+    },
+    "/Users/robert/Projects/neoclr/runtime/raven/src/System/Storage/FileWriteError.rvn": {
+      "baseline": "5c999e61f8a6794b5636952420be555f57dbf79c6ab5b71857ded703e88fd425",
+      "candidate": "5c999e61f8a6794b5636952420be555f57dbf79c6ab5b71857ded703e88fd425"
+    },
+    "/Users/robert/Projects/neoclr/runtime/raven/src/System/Storage/InvalidPathError.rvn": {
+      "baseline": "b2b44392089907a4f95290fb7448c0ea7d6008e6389463535ba2d3628cfa5f77",
+      "candidate": "b2b44392089907a4f95290fb7448c0ea7d6008e6389463535ba2d3628cfa5f77"
+    },
+    "/Users/robert/Projects/neoclr/runtime/raven/src/System/Storage/Metadata.rvn": {
+      "baseline": "90f0272a6e1a81648ff0e08a2eb2aa299cab031406ab7d64f12a3bef3924a223",
+      "candidate": "90f0272a6e1a81648ff0e08a2eb2aa299cab031406ab7d64f12a3bef3924a223"
+    },
+    "/Users/robert/Projects/neoclr/runtime/raven/src/System/Storage/Path.rvn": {
+      "baseline": "cc666231b3295ae36beda40fe7c7257847e8411e42ff839eb880c8d17189038d",
+      "candidate": "cc666231b3295ae36beda40fe7c7257847e8411e42ff839eb880c8d17189038d"
+    },
+    "/Users/robert/Projects/neoclr/runtime/raven/src/System/Storage/StorageItems.rvn": {
+      "baseline": "8e05d749029725996c559811df628221f1b6bc4f73feb25ca097f469007f4d87",
+      "candidate": "8e05d749029725996c559811df628221f1b6bc4f73feb25ca097f469007f4d87"
+    },
+    "/Users/robert/Projects/neoclr/runtime/raven/src/System/Storage/StorageLookupError.rvn": {
+      "baseline": "0df62fd2cece07be009732764bfa67d876ea855d2cbdaaf35b51ac326dd91466",
+      "candidate": "0df62fd2cece07be009732764bfa67d876ea855d2cbdaaf35b51ac326dd91466"
+    },
+    "/Users/robert/Projects/neoclr/runtime/raven/src/System/Storage/StorageProvider.rvn": {
+      "baseline": "f2bf9dbfb1ea5d1fc58049acf2f75b96b6f9ee0d95864030f4ea805c74286598",
+      "candidate": "f2bf9dbfb1ea5d1fc58049acf2f75b96b6f9ee0d95864030f4ea805c74286598"
+    },
+    "/Users/robert/Projects/neoclr/runtime/raven/src/System/String.rvn": {
+      "baseline": "3ee847b555de399f7aef68f89faa35f05fbce3f39630d1bdb95feca2d9886f95",
+      "candidate": "3ee847b555de399f7aef68f89faa35f05fbce3f39630d1bdb95feca2d9886f95"
+    },
+    "/Users/robert/Projects/neoclr/runtime/raven/src/System/StringComparer.rvn": {
+      "baseline": "afb4b9a30fa83275fae22c28906c3465ca4889c259d2cfc6cf48c769db99ae14",
+      "candidate": "afb4b9a30fa83275fae22c28906c3465ca4889c259d2cfc6cf48c769db99ae14"
+    },
+    "/Users/robert/Projects/neoclr/runtime/raven/src/System/StringComparison.rvn": {
+      "baseline": "eb6feb68328b17e388777ee22a3b70718b6c225055403f133873af133abc106f",
+      "candidate": "eb6feb68328b17e388777ee22a3b70718b6c225055403f133873af133abc106f"
+    },
+    "/Users/robert/Projects/neoclr/runtime/raven/src/System/StringHashCalls.rvn": {
+      "baseline": "ab8e3ddc6c0eadadca4a755df36c45b5434e8c4993c05e0bb2dc6612c681933c",
+      "candidate": "ab8e3ddc6c0eadadca4a755df36c45b5434e8c4993c05e0bb2dc6612c681933c"
+    },
+    "/Users/robert/Projects/neoclr/runtime/raven/src/System/Text/Decoder.rvn": {
+      "baseline": "1f8de2cf63ad5229dbdb52930d45d7828c33c55225c848a6ccd1c72404eaa507",
+      "candidate": "1f8de2cf63ad5229dbdb52930d45d7828c33c55225c848a6ccd1c72404eaa507"
+    },
+    "/Users/robert/Projects/neoclr/runtime/raven/src/System/Text/Encoder.rvn": {
+      "baseline": "03b3611b989335fea40971bac8bc876c6eab3a68c9bea6a56cd37539e19f18b2",
+      "candidate": "03b3611b989335fea40971bac8bc876c6eab3a68c9bea6a56cd37539e19f18b2"
+    },
+    "/Users/robert/Projects/neoclr/runtime/raven/src/System/Text/EncoderProgress.rvn": {
+      "baseline": "dc1d373a0cebffd8358443cffe7596b91c4d42121c21d8bc6eb4a0aff3d70cf3",
+      "candidate": "dc1d373a0cebffd8358443cffe7596b91c4d42121c21d8bc6eb4a0aff3d70cf3"
+    },
+    "/Users/robert/Projects/neoclr/runtime/raven/src/System/Text/EncoderState.rvn": {
+      "baseline": "f075bf6588623b61012b3f662586fd79e679d85b89bfdad1dfdfaa98481b78ca",
+      "candidate": "f075bf6588623b61012b3f662586fd79e679d85b89bfdad1dfdfaa98481b78ca"
+    },
+    "/Users/robert/Projects/neoclr/runtime/raven/src/System/Text/Encoding.rvn": {
+      "baseline": "7a8c310feb512e600d2ca258368996b362f0f84b8c9da9500a664a4a95ee17e8",
+      "candidate": "7a8c310feb512e600d2ca258368996b362f0f84b8c9da9500a664a4a95ee17e8"
+    },
+    "/Users/robert/Projects/neoclr/runtime/raven/src/System/Text/EncodingError.rvn": {
+      "baseline": "a5dba7e2c9d72e094b875c90c3c538f9eab4424daeebd792b0a5f7bafd5389a7",
+      "candidate": "a5dba7e2c9d72e094b875c90c3c538f9eab4424daeebd792b0a5f7bafd5389a7"
+    },
+    "/Users/robert/Projects/neoclr/runtime/raven/src/System/Text/Encodings.rvn": {
+      "baseline": "feb1a45027f738a5116377fd0ebf773ffb3f2ff719045a283bb373bf0c8e0a11",
+      "candidate": "feb1a45027f738a5116377fd0ebf773ffb3f2ff719045a283bb373bf0c8e0a11"
+    },
+    "/Users/robert/Projects/neoclr/runtime/raven/src/System/Text/InvalidUtf8Error.rvn": {
+      "baseline": "027f7ab63561a9462f8450555d0002dba208184581bb35c36156bbc38598029f",
+      "candidate": "027f7ab63561a9462f8450555d0002dba208184581bb35c36156bbc38598029f"
+    },
+    "/Users/robert/Projects/neoclr/runtime/raven/src/System/Text/StringBuilder.rvn": {
+      "baseline": "0efe0ef71577e190313d0374ab5513a4bee3a52374e8def369c7f4c03e2f010d",
+      "candidate": "0efe0ef71577e190313d0374ab5513a4bee3a52374e8def369c7f4c03e2f010d"
+    },
+    "/Users/robert/Projects/neoclr/runtime/raven/src/System/Text/UnicodeScalar.rvn": {
+      "baseline": "928d1d7270ac4e34d3967c9d225802058b3f18fee4269d4b138c6c7ace01aea9",
+      "candidate": "928d1d7270ac4e34d3967c9d225802058b3f18fee4269d4b138c6c7ace01aea9"
+    },
+    "/Users/robert/Projects/neoclr/runtime/raven/src/System/Text/Utf8.rvn": {
+      "baseline": "bb0be661e9e065a37e5600fa2865c6b82c66cc3fb97836d11be6ed1d7b109431",
+      "candidate": "bb0be661e9e065a37e5600fa2865c6b82c66cc3fb97836d11be6ed1d7b109431"
+    },
+    "/Users/robert/Projects/neoclr/runtime/raven/src/System/Text/Utf8SliceError.rvn": {
+      "baseline": "6e19990c91a9125d7c2c964c0ccbc249c4e7465c17cb4cdedab6f871f49817fa",
+      "candidate": "6e19990c91a9125d7c2c964c0ccbc249c4e7465c17cb4cdedab6f871f49817fa"
+    },
+    "/Users/robert/Projects/neoclr/runtime/raven/src/System/Time/Calendar.rvn": {
+      "baseline": "562ba55e050ff4a9f5dfeef94f69351017bbbf3fba34f303a65fba76a2967c40",
+      "candidate": "562ba55e050ff4a9f5dfeef94f69351017bbbf3fba34f303a65fba76a2967c40"
+    },
+    "/Users/robert/Projects/neoclr/runtime/raven/src/System/Time/CivilParser.rvn": {
+      "baseline": "bd1ca11a74bf82a72bae82b5026962beb0247b821b64e96e3fc1929acc044fe6",
+      "candidate": "bd1ca11a74bf82a72bae82b5026962beb0247b821b64e96e3fc1929acc044fe6"
+    },
+    "/Users/robert/Projects/neoclr/runtime/raven/src/System/Time/Clock.rvn": {
+      "baseline": "f86ba9f217484468fcae360c33b7c66eb8ab35d40319700897c20356c0f69aad",
+      "candidate": "f86ba9f217484468fcae360c33b7c66eb8ab35d40319700897c20356c0f69aad"
+    },
+    "/Users/robert/Projects/neoclr/runtime/raven/src/System/Time/Date.rvn": {
+      "baseline": "312a3458f7be37d32fd4ccdd727a24d318c209f7fe74c0018a4dcc0c97ae93b9",
+      "candidate": "312a3458f7be37d32fd4ccdd727a24d318c209f7fe74c0018a4dcc0c97ae93b9"
+    },
+    "/Users/robert/Projects/neoclr/runtime/raven/src/System/Time/DateTime.rvn": {
+      "baseline": "765bac6c47404bcfb67213051edf770a00141aa570d8653e64a22cb2dae4eeae",
+      "candidate": "765bac6c47404bcfb67213051edf770a00141aa570d8653e64a22cb2dae4eeae"
+    },
+    "/Users/robert/Projects/neoclr/runtime/raven/src/System/Time/DateTimeParseError.rvn": {
+      "baseline": "592eeec2188bc8854a455732dceada75a95538a488f22f920221ab9c4b63a9e3",
+      "candidate": "592eeec2188bc8854a455732dceada75a95538a488f22f920221ab9c4b63a9e3"
+    },
+    "/Users/robert/Projects/neoclr/runtime/raven/src/System/Time/Duration.rvn": {
+      "baseline": "13fbdb304b0257fec7c44b3346a95e201af702ddb8035fa307b7a723ddf3c6ad",
+      "candidate": "13fbdb304b0257fec7c44b3346a95e201af702ddb8035fa307b7a723ddf3c6ad"
+    },
+    "/Users/robert/Projects/neoclr/runtime/raven/src/System/Time/GregorianCalendar.rvn": {
+      "baseline": "d044d0f768ce33f115575df85fc0368ddd3567d43235ff3407ebbc5703d2d821",
+      "candidate": "d044d0f768ce33f115575df85fc0368ddd3567d43235ff3407ebbc5703d2d821"
+    },
+    "/Users/robert/Projects/neoclr/runtime/raven/src/System/Time/HebrewCalendar.rvn": {
+      "baseline": "3b8c8d2e421873bb025c30bbcf2c3b5e14c93669f9c882c417e9cede7b17e736",
+      "candidate": "3b8c8d2e421873bb025c30bbcf2c3b5e14c93669f9c882c417e9cede7b17e736"
+    },
+    "/Users/robert/Projects/neoclr/runtime/raven/src/System/Time/Instant.rvn": {
+      "baseline": "47bec9c2595cdd2c690ac5711f35fc658842eaac942883dc0fa01f1c0078e146",
+      "candidate": "47bec9c2595cdd2c690ac5711f35fc658842eaac942883dc0fa01f1c0078e146"
+    },
+    "/Users/robert/Projects/neoclr/runtime/raven/src/System/Time/InvalidDateError.rvn": {
+      "baseline": "7524a6427e3a55bca94df7a0dc113fc5cfac74dc5ad45b984890ff991c6ac099",
+      "candidate": "7524a6427e3a55bca94df7a0dc113fc5cfac74dc5ad45b984890ff991c6ac099"
+    },
+    "/Users/robert/Projects/neoclr/runtime/raven/src/System/Time/InvalidTimeError.rvn": {
+      "baseline": "d420ebf2ee70e2fcf657a7965d87aabc44d967bced77eaafa8ec2f1f67f0a371",
+      "candidate": "d420ebf2ee70e2fcf657a7965d87aabc44d967bced77eaafa8ec2f1f67f0a371"
+    },
+    "/Users/robert/Projects/neoclr/runtime/raven/src/System/Time/LocalDateTime.rvn": {
+      "baseline": "98aa4a58ca30871baccfdfe67d335611a84da0ae268be704e9a1ef0cb016eb64",
+      "candidate": "98aa4a58ca30871baccfdfe67d335611a84da0ae268be704e9a1ef0cb016eb64"
+    },
+    "/Users/robert/Projects/neoclr/runtime/raven/src/System/Time/LocalTimeMapping.rvn": {
+      "baseline": "91a4e5a4540ff80179221bf870bdb6c3f23869935ce4ecb32f3ee1d18c7ab829",
+      "candidate": "91a4e5a4540ff80179221bf870bdb6c3f23869935ce4ecb32f3ee1d18c7ab829"
+    },
+    "/Users/robert/Projects/neoclr/runtime/raven/src/System/Time/SystemClock.rvn": {
+      "baseline": "e9afaf17aa7b91918a924d84e73624a720209c53db1d1dcff9c5e4c6466a4063",
+      "candidate": "e9afaf17aa7b91918a924d84e73624a720209c53db1d1dcff9c5e4c6466a4063"
+    },
+    "/Users/robert/Projects/neoclr/runtime/raven/src/System/Time/TimeOfDay.rvn": {
+      "baseline": "2e6803327d5fec269187b8706c9993767b351232654e94347496e8db68c3e892",
+      "candidate": "2e6803327d5fec269187b8706c9993767b351232654e94347496e8db68c3e892"
+    },
+    "/Users/robert/Projects/neoclr/runtime/raven/src/System/Time/TimeOffset.rvn": {
+      "baseline": "d14aa2a9ae5a599bf56a34804d2c121b7ca6ee2962b0939198dad2ff6a16b7e9",
+      "candidate": "d14aa2a9ae5a599bf56a34804d2c121b7ca6ee2962b0939198dad2ff6a16b7e9"
+    },
+    "/Users/robert/Projects/neoclr/runtime/raven/src/System/Time/TimeZone.rvn": {
+      "baseline": "e8d7341780a82b5c6341f0c36997c87205e31c847c854806a4d59eadb29a46cb",
+      "candidate": "e8d7341780a82b5c6341f0c36997c87205e31c847c854806a4d59eadb29a46cb"
+    },
+    "/Users/robert/Projects/neoclr/runtime/raven/src/System/Time/TimeZoneError.rvn": {
+      "baseline": "2c75ed5f103239f6a3748a0e0adc287ce3007e041b9f96a5bb8365e5fdf054ad",
+      "candidate": "2c75ed5f103239f6a3748a0e0adc287ce3007e041b9f96a5bb8365e5fdf054ad"
+    },
+    "/Users/robert/Projects/neoclr/runtime/raven/src/System/Time/ZonedDateTime.rvn": {
+      "baseline": "92c5ce6ddfa33e30adb3a2d87d0965e27cd01a7fe8905860fc9f71d6349146a0",
+      "candidate": "92c5ce6ddfa33e30adb3a2d87d0965e27cd01a7fe8905860fc9f71d6349146a0"
+    },
+    "/Users/robert/Projects/neoclr/runtime/raven/src/System/Tuple.rvn": {
+      "baseline": "ebe549f02b1ba89fddcab2bfb715ebccd11fdf78be52e80d185df146add1e1c0",
+      "candidate": "ebe549f02b1ba89fddcab2bfb715ebccd11fdf78be52e80d185df146add1e1c0"
+    },
+    "/Users/robert/Projects/neoclr/runtime/raven/src/System/UInt16.rvn": {
+      "baseline": "083ff5673f739e7951c1482fd1aaea97c17026da38720bc43dbb149ae6c557fe",
+      "candidate": "083ff5673f739e7951c1482fd1aaea97c17026da38720bc43dbb149ae6c557fe"
+    },
+    "/Users/robert/Projects/neoclr/runtime/raven/src/System/UInt32.rvn": {
+      "baseline": "c4766a3a5a992e957f34c20d7ef7df857f3a04a6a21bbd9bc485d67017be5d5c",
+      "candidate": "c4766a3a5a992e957f34c20d7ef7df857f3a04a6a21bbd9bc485d67017be5d5c"
+    },
+    "/Users/robert/Projects/neoclr/runtime/raven/src/System/UInt64.rvn": {
+      "baseline": "bb0cb4837358a626e6602c22ef639a126429b9baa12dc2786b19c9d61643be0c",
+      "candidate": "bb0cb4837358a626e6602c22ef639a126429b9baa12dc2786b19c9d61643be0c"
+    },
+    "/Users/robert/Projects/neoclr/runtime/raven/src/System/UIntPtr.rvn": {
+      "baseline": "d8da5db4600cec7c8a5eea42d258bb592fedd2a58334d2e6a65b8e2a5ee03727",
+      "candidate": "d8da5db4600cec7c8a5eea42d258bb592fedd2a58334d2e6a65b8e2a5ee03727"
+    },
+    "/Users/robert/Projects/neoclr/runtime/raven/src/System/Union.rvn": {
+      "baseline": "cd2b1ef9c4d94ec29ba0b079d1a6b212d17b68c10cd9874ba34c3935fb8c8fcb",
+      "candidate": "cd2b1ef9c4d94ec29ba0b079d1a6b212d17b68c10cd9874ba34c3935fb8c8fcb"
+    },
+    "/Users/robert/Projects/neoclr/runtime/raven/src/System/Uri.rvn": {
+      "baseline": "1ca55ecccb14587c2e3e5fec2a153bedee14224234c0634f3e3f61a9d1b8c4f8",
+      "candidate": "1ca55ecccb14587c2e3e5fec2a153bedee14224234c0634f3e3f61a9d1b8c4f8"
+    },
+    "/Users/robert/Projects/neoclr/runtime/raven/src/System/UriError.rvn": {
+      "baseline": "7827af304d1df8c476dab87f7dfd6e4f41e5f434f2e5bd26fcf340147052a1ba",
+      "candidate": "7827af304d1df8c476dab87f7dfd6e4f41e5f434f2e5bd26fcf340147052a1ba"
+    },
+    "/Users/robert/Projects/neoclr/runtime/raven/src/System/Value.rvn": {
+      "baseline": "29178eeeb815a738293b3c5e675ba67fed7cfe906d19876bd4f501908625632b",
+      "candidate": "29178eeeb815a738293b3c5e675ba67fed7cfe906d19876bd4f501908625632b"
+    },
+    "/Users/robert/Projects/neoclr/runtime/raven/src/System/Void.rvn": {
+      "baseline": "260060b042e17bb4d8ebcd7bfd8e4fd05cebfaa3621335b6ea9920212d8ca5f7",
+      "candidate": "260060b042e17bb4d8ebcd7bfd8e4fd05cebfaa3621335b6ea9920212d8ca5f7"
+    },
+    "/Users/robert/Projects/neoclr/runtime/raven/src/System/Web/Http/HttpBodyInput.rvn": {
+      "baseline": "b137c67c811ee3dae69c1ba45e8b931b26c3901af3c68b1eefd87ac0c7c777b8",
+      "candidate": "b137c67c811ee3dae69c1ba45e8b931b26c3901af3c68b1eefd87ac0c7c777b8"
+    },
+    "/Users/robert/Projects/neoclr/runtime/raven/src/System/Web/Http/HttpClient.rvn": {
+      "baseline": "69807a7ac7c86e2e83897e6c30cc6763b1a981d97dd3d93a79da8773132f3c8e",
+      "candidate": "69807a7ac7c86e2e83897e6c30cc6763b1a981d97dd3d93a79da8773132f3c8e"
+    },
+    "/Users/robert/Projects/neoclr/runtime/raven/src/System/Web/Http/HttpCompletionOption.rvn": {
+      "baseline": "33fee7c6d2c2a635121b8f619a56923073289a6e693a52afce36444029ad019d",
+      "candidate": "33fee7c6d2c2a635121b8f619a56923073289a6e693a52afce36444029ad019d"
+    },
+    "/Users/robert/Projects/neoclr/runtime/raven/src/System/Web/Http/HttpConnection.rvn": {
+      "baseline": "44d3fb69f8b022411138e393381d4215454755f462cf4396ad185b4acbecf139",
+      "candidate": "44d3fb69f8b022411138e393381d4215454755f462cf4396ad185b4acbecf139"
+    },
+    "/Users/robert/Projects/neoclr/runtime/raven/src/System/Web/Http/HttpError.rvn": {
+      "baseline": "100b6d9bc18fe08b1f941f11722e617b460b2dfa40fd5ddca2f5508bee9d3561",
+      "candidate": "100b6d9bc18fe08b1f941f11722e617b460b2dfa40fd5ddca2f5508bee9d3561"
+    },
+    "/Users/robert/Projects/neoclr/runtime/raven/src/System/Web/Http/HttpMethod.rvn": {
+      "baseline": "90efa846555dc2f4b4077aa3d3648592347410deadfc88476da1169ec36874ae",
+      "candidate": "90efa846555dc2f4b4077aa3d3648592347410deadfc88476da1169ec36874ae"
+    },
+    "/Users/robert/Projects/neoclr/runtime/raven/src/System/Web/Http/HttpServer.rvn": {
+      "baseline": "010b565779d74a26ef7381992623e3d00ef9faaa2ca583d5115e73a92d61cdc0",
+      "candidate": "a9e3321b700a28354cd6720b8de1dab091e26903dd91858e33b1e97cf959bdbf"
+    },
+    "/Users/robert/Projects/neoclr/runtime/raven/src/System/Web/Http/HttpServerOptions.rvn": {
+      "baseline": "72304b1b1481354c31a2c921af5b0b6c1f4827b817976d9c9f426286c2a45f9a",
+      "candidate": "72304b1b1481354c31a2c921af5b0b6c1f4827b817976d9c9f426286c2a45f9a"
+    },
+    "/Users/robert/Projects/neoclr/runtime/raven/src/System/Web/Http/HttpStatusCode.rvn": {
+      "baseline": "793a7145655e008ed29d1245205504e5e0333964320e4a036e5a857c111201dd",
+      "candidate": "793a7145655e008ed29d1245205504e5e0333964320e4a036e5a857c111201dd"
+    },
+    "/Users/robert/Projects/neoclr/runtime/raven/src/System/Web/Http/HttpText.rvn": {
+      "baseline": "58a1736096c902f63112dd6cc0c914b0026a7120c8dcadcddfe6e09bf77dd19d",
+      "candidate": "58a1736096c902f63112dd6cc0c914b0026a7120c8dcadcddfe6e09bf77dd19d"
+    },
+    "/Users/robert/Projects/neoclr/runtime/raven/src/System/Web/Http/HttpWire.rvn": {
+      "baseline": "6fadd1d14b9a4a43c7b1d41297957658918c2fa593908c0a6e76452bba5cd729",
+      "candidate": "6fadd1d14b9a4a43c7b1d41297957658918c2fa593908c0a6e76452bba5cd729"
+    },
+    "/Users/robert/Projects/neoclr/runtime/raven/src/System/Web/Http/Json/HttpClientJsonExtensions.rvn": {
+      "baseline": "827c2930b683a1d9a259ea8c3f8522a6f83713dc25ab4227d5e6a111c160ce51",
+      "candidate": "827c2930b683a1d9a259ea8c3f8522a6f83713dc25ab4227d5e6a111c160ce51"
+    },
+    "/Users/robert/Projects/neoclr/runtime/raven/src/System/Web/Http/Json/HttpContentJsonExtensions.rvn": {
+      "baseline": "8b10b25d32210e0a5fb55270f0d8fefda3b356d133e8eb34096cbd8f16549524",
+      "candidate": "8b10b25d32210e0a5fb55270f0d8fefda3b356d133e8eb34096cbd8f16549524"
+    },
+    "/Users/robert/Projects/neoclr/runtime/raven/src/System/Web/Http/Json/HttpContextJsonExtensions.rvn": {
+      "baseline": "4a4554c50be5d3b5fb930de113b122fa3e2c4f66a1ef0108b1ece3d1e432727e",
+      "candidate": "4a4554c50be5d3b5fb930de113b122fa3e2c4f66a1ef0108b1ece3d1e432727e"
+    },
+    "/Users/robert/Projects/neoclr/runtime/raven/src/System/Web/Http/Json/HttpJsonError.rvn": {
+      "baseline": "066127a97015d35248bc94a45f65c77863a7e1dc6c6da618447b87c240edf929",
+      "candidate": "066127a97015d35248bc94a45f65c77863a7e1dc6c6da618447b87c240edf929"
+    },
+    "/Users/robert/Projects/neoclr/runtime/raven/src/System/Web/Http/Json/JsonClientOperations.rvn": {
+      "baseline": "32d78dcebf892e717b3d4124606b7f3cf78d20808cc146812683ca2fd3aa7c97",
+      "candidate": "32d78dcebf892e717b3d4124606b7f3cf78d20808cc146812683ca2fd3aa7c97"
+    },
+    "/Users/robert/Projects/neoclr/runtime/raven/src/System/Web/Http/Json/JsonContent.rvn": {
+      "baseline": "513f7ef9e6ab9168b9b4903a29fc75d38efd0c429c299c071534e748ce916472",
+      "candidate": "513f7ef9e6ab9168b9b4903a29fc75d38efd0c429c299c071534e748ce916472"
+    },
+    "/Users/robert/Projects/neoclr/runtime/raven/src/System/Web/Http/Routes.rvn": {
+      "baseline": "38450212ad033a17a95575379f4f30b1340ef801caaef7ef6f42084bf75a9c94",
+      "candidate": "38450212ad033a17a95575379f4f30b1340ef801caaef7ef6f42084bf75a9c94"
+    },
+    "/Users/robert/Projects/neoclr/scripts/build-native-class-library.py": {
+      "baseline": "d9ec6887a2342cf346572707c871c8534e6812b5a4583b16c4c36558886609fb",
+      "candidate": "d9ec6887a2342cf346572707c871c8534e6812b5a4583b16c4c36558886609fb"
+    },
+    "/Users/robert/Projects/neoclr/target/http-json-union-compiler-20261013b/NeoCLR.Metadata.Experimental.dll": {
+      "baseline": "54e1422d8e182d1cdc24aad81c1757699bbbdede31861ce4d7698436e1b1d2bb",
+      "candidate": "54e1422d8e182d1cdc24aad81c1757699bbbdede31861ce4d7698436e1b1d2bb"
+    },
+    "/Users/robert/Projects/neoclr/target/http-json-union-compiler-20261013b/Raven.CodeAnalysis.NeoClr.dll": {
+      "baseline": "7c2b5840730f617f5380c119cb7430aeabcd92dd2901e9b7fcddb5a5d10afebf",
+      "candidate": "7c2b5840730f617f5380c119cb7430aeabcd92dd2901e9b7fcddb5a5d10afebf"
+    },
+    "/Users/robert/Projects/neoclr/target/http-json-union-compiler-20261013b/Raven.CodeAnalysis.dll": {
+      "baseline": "6e1fc137b7ce79f198be9ede2df17e3c31bc45e3e4dd88871bfe9e29a4837aa0",
+      "candidate": "6e1fc137b7ce79f198be9ede2df17e3c31bc45e3e4dd88871bfe9e29a4837aa0"
+    },
+    "/Users/robert/Projects/neoclr/target/http-json-union-compiler-20261013b/rvnc.dll": {
+      "baseline": "f9b50cf90476382f71490c435dc63f12f1e2efc58e4187dc8dfecadf7c13b3dc",
+      "candidate": "f9b50cf90476382f71490c435dc63f12f1e2efc58e4187dc8dfecadf7c13b3dc"
+    },
+    "/Users/robert/Projects/neoclr/target/runtime-await-generators-sdk-20261013/bootstrap/Core.dll": {
+      "baseline": "3d4a676d379067c18a65a9beb8257ed40bf3196fc643a9ba1d559c619ec73fad",
+      "candidate": "3d4a676d379067c18a65a9beb8257ed40bf3196fc643a9ba1d559c619ec73fad"
+    },
+    "/Users/robert/Projects/neoclr/target/runtime-await-generators-sdk-20261013/bootstrap/System.neox": {
+      "baseline": "8629f237ad3774035d06a61c321441d4a54a21f01a0e248077896257b7a2fec1",
+      "candidate": "8629f237ad3774035d06a61c321441d4a54a21f01a0e248077896257b7a2fec1"
+    },
+    "/Users/robert/Projects/neoclr/target/runtime-await-generators-sdk-20261013/bootstrap/System.retained.json": {
+      "baseline": "53eb0ae60a65a2c378255dd78bc07904e9cee5ed21ef2b9a8978fb8cb88a8237",
+      "candidate": "53eb0ae60a65a2c378255dd78bc07904e9cee5ed21ef2b9a8978fb8cb88a8237"
+    },
+    "/Users/robert/Projects/neoclr/target/runtime-await-generators-sdk-20261013/bootstrap/bootstrap.json": {
+      "baseline": "d4a9efa7a4f24db246ce0195c2e92807bea71f66653bdc06a3c8313879eb41ab",
+      "candidate": "d4a9efa7a4f24db246ce0195c2e92807bea71f66653bdc06a3c8313879eb41ab"
+    },
+    "/Users/robert/Projects/neoclr/target/runtime-await-generators-sdk-20261013/bootstrap/preparation-evidence.json": {
+      "baseline": "94973c7efb339d010c4c9b49559ea23208a4aef4c35e4d17331ef2338107ed67",
+      "candidate": "94973c7efb339d010c4c9b49559ea23208a4aef4c35e4d17331ef2338107ed67"
+    },
+    "/Users/robert/Projects/neoclr/tools/metadata/NeoCLR.Metadata.Translate/bin/Release/net10.0/NeoCLR.Metadata.Experimental.dll": {
+      "baseline": "271bcadd4e0a280a82392da779844846b8b7b6263de468d9e520e98eb695aca5",
+      "candidate": "271bcadd4e0a280a82392da779844846b8b7b6263de468d9e520e98eb695aca5"
+    },
+    "/Users/robert/Projects/neoclr/tools/metadata/NeoCLR.Metadata.Translate/bin/Release/net10.0/NeoCLR.Metadata.Translate.dll": {
+      "baseline": "aa1f5e3b8bf31728d3d8ebe96d2b70fc2a9c4916aa88e9933a7b45668b11e887",
+      "candidate": "aa1f5e3b8bf31728d3d8ebe96d2b70fc2a9c4916aa88e9933a7b45668b11e887"
+    }
+  },
+  "commands": {
+    "baseline": [
+      {
+        "command": [
+          "dotnet",
+          "/Users/robert/Projects/neoclr/target/http-json-union-compiler-20261013b/rvnc.dll",
+          "neoclr",
+          "--project",
+          "/Users/robert/Projects/neoclr/runtime/raven/projects/System.Runtime/System.Runtime.rvnproj"
+        ],
+        "exitCode": 0
+      },
+      {
+        "command": [
+          "dotnet",
+          "/Users/robert/Projects/neoclr/tools/metadata/NeoCLR.Metadata.Translate/bin/Release/net10.0/NeoCLR.Metadata.Translate.dll",
+          "/Users/robert/Projects/neoclr/target/runtime-await-generators-sdk-20261013/bootstrap/System.retained.json",
+          "/Users/robert/Projects/neoclr/target/uri-bytes-candidate-20261014/System.runtime.neox",
+          "--reference",
+          "/Users/robert/Projects/neoclr/runtime/raven/projects/System.Runtime/bin/neoclr/System.Runtime.dll"
+        ],
+        "exitCode": 0
+      },
+      {
+        "command": [
+          "dotnet",
+          "/Users/robert/Projects/neoclr/target/http-json-union-compiler-20261013b/rvnc.dll",
+          "neoclr",
+          "--project",
+          "/Users/robert/Projects/neoclr/runtime/raven/projects/System.Data/System.Data.rvnproj",
+          "--no-build-references"
+        ],
+        "exitCode": 0
+      },
+      {
+        "command": [
+          "dotnet",
+          "/Users/robert/Projects/neoclr/target/http-json-union-compiler-20261013b/rvnc.dll",
+          "neoclr",
+          "--project",
+          "/Users/robert/Projects/neoclr/runtime/raven/projects/System.Networking/System.Networking.rvnproj",
+          "--no-build-references"
+        ],
+        "exitCode": 0
+      },
+      {
+        "command": [
+          "dotnet",
+          "/Users/robert/Projects/neoclr/target/http-json-union-compiler-20261013b/rvnc.dll",
+          "neoclr",
+          "--project",
+          "/Users/robert/Projects/neoclr/runtime/raven/projects/System.Web/System.Web.rvnproj",
+          "--no-build-references"
+        ],
+        "exitCode": 0
+      }
+    ],
+    "candidate": [
+      {
+        "command": [
+          "dotnet",
+          "/Users/robert/Projects/neoclr/target/http-json-union-compiler-20261013b/rvnc.dll",
+          "neoclr",
+          "--project",
+          "/Users/robert/Projects/neoclr/runtime/raven/projects/System.Runtime/System.Runtime.rvnproj"
+        ],
+        "exitCode": 0
+      },
+      {
+        "command": [
+          "dotnet",
+          "/Users/robert/Projects/neoclr/tools/metadata/NeoCLR.Metadata.Translate/bin/Release/net10.0/NeoCLR.Metadata.Translate.dll",
+          "/Users/robert/Projects/neoclr/target/runtime-await-generators-sdk-20261013/bootstrap/System.retained.json",
+          "/Users/robert/Projects/neoclr/target/header-names-candidate-20261014/System.runtime.neox",
+          "--reference",
+          "/Users/robert/Projects/neoclr/runtime/raven/projects/System.Runtime/bin/neoclr/System.Runtime.dll"
+        ],
+        "exitCode": 0
+      },
+      {
+        "command": [
+          "dotnet",
+          "/Users/robert/Projects/neoclr/target/http-json-union-compiler-20261013b/rvnc.dll",
+          "neoclr",
+          "--project",
+          "/Users/robert/Projects/neoclr/runtime/raven/projects/System.Data/System.Data.rvnproj",
+          "--no-build-references"
+        ],
+        "exitCode": 0
+      },
+      {
+        "command": [
+          "dotnet",
+          "/Users/robert/Projects/neoclr/target/http-json-union-compiler-20261013b/rvnc.dll",
+          "neoclr",
+          "--project",
+          "/Users/robert/Projects/neoclr/runtime/raven/projects/System.Networking/System.Networking.rvnproj",
+          "--no-build-references"
+        ],
+        "exitCode": 0
+      },
+      {
+        "command": [
+          "dotnet",
+          "/Users/robert/Projects/neoclr/target/http-json-union-compiler-20261013b/rvnc.dll",
+          "neoclr",
+          "--project",
+          "/Users/robert/Projects/neoclr/runtime/raven/projects/System.Web/System.Web.rvnproj",
+          "--no-build-references"
+        ],
+        "exitCode": 0
+      }
+    ]
+  }
+}
