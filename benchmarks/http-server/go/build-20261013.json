@@ -1,0 +1,78 @@
+{
+  "prepared": true,
+  "inputs": {
+    "/Users/robert/Projects/neoclr/benchmarks/http-server/go/main.go": "31c535eb69dccee90362f0904b91d5f842f9aaec5121e3544358e70f34879107",
+    "/Users/robert/Projects/neoclr/benchmarks/http-server/go/go.mod": "a1da0ae6b68c56f452c99eae89a87d929bdcc7c933310ff37079dc0c940a2a5a",
+    "/Users/robert/Projects/neoclr/benchmarks/http-server/go/prepare.py": "c715fa613bdb818dd58a48dcdc3e2a6883d6ad210df6340bd98974e1208a7ad9"
+  },
+  "outputs": {
+    "/Users/robert/Projects/neoclr/target/http-go-terminal-20261013/http-comparison": "8d2e594e436d9e3e79ad54f05388a8a9de256c3c97133972ba5eda48429b73a8"
+  },
+  "platform": "macOS-27.0-arm64-arm-64bit",
+  "version": "go version go1.26.3 darwin/arm64",
+  "environment": {
+    "AR": "ar",
+    "CC": "clang",
+    "CGO_CFLAGS": "-O2 -g",
+    "CGO_CPPFLAGS": "",
+    "CGO_CXXFLAGS": "-O2 -g",
+    "CGO_ENABLED": "1",
+    "CGO_FFLAGS": "-O2 -g",
+    "CGO_LDFLAGS": "-O2 -g",
+    "CXX": "clang++",
+    "GCCGO": "gccgo",
+    "GO111MODULE": "",
+    "GOARCH": "arm64",
+    "GOARM64": "v8.0",
+    "GOAUTH": "netrc",
+    "GOBIN": "",
+    "GOCACHE": "/Users/robert/Library/Caches/go-build",
+    "GOCACHEPROG": "",
+    "GODEBUG": "",
+    "GOENV": "/Users/robert/Library/Application Support/go/env",
+    "GOEXE": "",
+    "GOEXPERIMENT": "",
+    "GOFIPS140": "off",
+    "GOFLAGS": "",
+    "GOGCCFLAGS": "-fPIC -arch arm64 -pthread -fno-caret-diagnostics -Qunused-arguments -fmessage-length=0 -ffile-prefix-map=/var/folders/5x/5r0dfcnx30lf0cl8kp3sphch0000gn/T/go-build182429124=/tmp/go-build -gno-record-gcc-switches -fno-common",
+    "GOHOSTARCH": "arm64",
+    "GOHOSTOS": "darwin",
+    "GOINSECURE": "",
+    "GOMOD": "/Users/robert/Projects/neoclr/benchmarks/http-server/go/go.mod",
+    "GOMODCACHE": "/Users/robert/go/pkg/mod",
+    "GONOPROXY": "",
+    "GONOSUMDB": "",
+    "GOOS": "darwin",
+    "GOPATH": "/Users/robert/go",
+    "GOPRIVATE": "",
+    "GOPROXY": "https://proxy.golang.org,direct",
+    "GOROOT": "/usr/local/go",
+    "GOSUMDB": "sum.golang.org",
+    "GOTELEMETRY": "local",
+    "GOTELEMETRYDIR": "/Users/robert/Library/Application Support/go/telemetry",
+    "GOTMPDIR": "",
+    "GOTOOLCHAIN": "local",
+    "GOTOOLDIR": "/usr/local/go/pkg/tool/darwin_arm64",
+    "GOVCS": "",
+    "GOVERSION": "go1.26.3",
+    "GOWORK": "",
+    "PKG_CONFIG": "pkg-config"
+  },
+  "build": {
+    "command": [
+      "go",
+      "build",
+      "-trimpath",
+      "-o",
+      "/Users/robert/Projects/neoclr/target/http-go-terminal-20261013/http-comparison",
+      "."
+    ],
+    "cwd": "/Users/robert/Projects/neoclr/benchmarks/http-server/go",
+    "exitCode": 0,
+    "stdout": "",
+    "stderr": ""
+  },
+  "command": [
+    "/Users/robert/Projects/neoclr/target/http-go-terminal-20261013/http-comparison"
+  ]
+}

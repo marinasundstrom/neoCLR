@@ -1,0 +1,48 @@
+{
+  "prepared": true,
+  "inputs": {
+    "/Users/robert/.nvm/versions/node/v22.21.0/bin/node": "64bcb939f5f8c921d104b02d0eb960781c13b49b9133d1d71a768eadd62da401",
+    "/Users/robert/Projects/neoclr/benchmarks/http-server/node/server.mjs": "0d8c24261f2f0318b34d8c9b63081713df9795dc49594897df1ea7a575dacfa0",
+    "/Users/robert/Projects/neoclr/benchmarks/http-server/node/package.json": "c61117aeee95ff6cab5a882aece835d618af4065d073f5ca0c434583218b2b73",
+    "/Users/robert/Projects/neoclr/benchmarks/http-server/node/prepare.py": "c57204a3d97139be70ecf6d420d775afbd2e4a961d7b5251f8e2f0052eb5cac8"
+  },
+  "outputs": {},
+  "versions": {
+    "node": "22.21.0",
+    "acorn": "8.15.0",
+    "ada": "2.9.2",
+    "amaro": "1.1.4",
+    "ares": "1.34.5",
+    "brotli": "1.1.0",
+    "cjs_module_lexer": "2.1.0",
+    "cldr": "47.0",
+    "icu": "77.1",
+    "llhttp": "9.3.0",
+    "modules": "127",
+    "napi": "10",
+    "nbytes": "0.1.1",
+    "ncrypto": "0.0.1",
+    "nghttp2": "1.64.0",
+    "openssl": "3.5.4",
+    "simdjson": "3.13.0",
+    "simdutf": "6.4.2",
+    "sqlite": "3.50.4",
+    "tz": "2025b",
+    "undici": "6.22.0",
+    "unicode": "16.0",
+    "uv": "1.51.0",
+    "uvwasi": "0.0.23",
+    "v8": "12.4.254.21-node.33",
+    "zlib": "1.3.1-470d3a2",
+    "zstd": "1.5.7"
+  },
+  "check": [
+    "/Users/robert/.nvm/versions/node/v22.21.0/bin/node",
+    "--check",
+    "/Users/robert/Projects/neoclr/benchmarks/http-server/node/server.mjs"
+  ],
+  "command": [
+    "/Users/robert/.nvm/versions/node/v22.21.0/bin/node",
+    "/Users/robert/Projects/neoclr/benchmarks/http-server/node/server.mjs"
+  ]
+}

@@ -1,0 +1,75 @@
+{
+  "prepared": true,
+  "platform": "macOS-27.0-arm64-arm-64bit",
+  "builds": [
+    {
+      "command": [
+        "dotnet",
+        "publish",
+        "-c",
+        "Release",
+        "-r",
+        "osx-arm64",
+        "--self-contained",
+        "false",
+        "-p:PublishAot=false",
+        "-o",
+        "/Users/robert/Projects/neoclr/target/http-kestrel-terminal-20261013/jit"
+      ],
+      "cwd": "/Users/robert/Projects/neoclr/benchmarks/http-server/aspnet",
+      "exitCode": 0,
+      "stdout": "  Determining projects to restore...\n  Restored /Users/robert/Projects/neoclr/benchmarks/http-server/aspnet/HttpComparison.csproj (in 53 ms).\n  HttpComparison -> /Users/robert/Projects/neoclr/benchmarks/http-server/aspnet/bin/Release/net10.0/osx-arm64/HttpComparison.dll\n  HttpComparison -> /Users/robert/Projects/neoclr/target/http-kestrel-terminal-20261013/jit/\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "dotnet",
+        "publish",
+        "-c",
+        "Release",
+        "-r",
+        "osx-arm64",
+        "--self-contained",
+        "true",
+        "-p:PublishAot=true",
+        "-o",
+        "/Users/robert/Projects/neoclr/target/http-kestrel-terminal-20261013/aot"
+      ],
+      "cwd": "/Users/robert/Projects/neoclr/benchmarks/http-server/aspnet",
+      "exitCode": 0,
+      "stdout": "  Determining projects to restore...\n  Restored /Users/robert/Projects/neoclr/benchmarks/http-server/aspnet/HttpComparison.csproj (in 142 ms).\n  HttpComparison -> /Users/robert/Projects/neoclr/benchmarks/http-server/aspnet/bin/Release/net10.0/osx-arm64/HttpComparison.dll\n  Generating native code\n  HttpComparison -> /Users/robert/Projects/neoclr/target/http-kestrel-terminal-20261013/aot/\n",
+      "stderr": ""
+    }
+  ],
+  "inputs": {
+    "/Users/robert/Projects/neoclr/benchmarks/http-server/aspnet/Program.cs": "ab251ffc7aa916cca6d82fdccc0c3eb8d5e68bbe5cb714a68bde60887621f305",
+    "/Users/robert/Projects/neoclr/benchmarks/http-server/aspnet/HttpComparison.csproj": "978f0360d395cec02e3ce7311a8593c170543a439a1adf2abdadcbb8202dd750",
+    "/Users/robert/Projects/neoclr/benchmarks/http-server/aspnet/global.json": "3539053fdc4cd4e9c9e32e64351bdd2ae68557e926a9d78a1eb3f8b86883737d",
+    "/Users/robert/Projects/neoclr/benchmarks/http-server/aspnet/prepare.py": "cc878fec1fd5088cbe6abb25c62236c6894a3f3cc177088671752b6fe326a1a8"
+  },
+  "outputs": {
+    "/Users/robert/Projects/neoclr/target/http-kestrel-terminal-20261013/jit/HttpComparison.pdb": "1470c9c103b06028e662e3a8dc93c11d5470651107c943e1e0ab422cae44e6b6",
+    "/Users/robert/Projects/neoclr/target/http-kestrel-terminal-20261013/jit/HttpComparison": "fea8d65340b5516d8f29c134da244962c245f8f1bcf72dbb48d24d658dd64d34",
+    "/Users/robert/Projects/neoclr/target/http-kestrel-terminal-20261013/jit/HttpComparison.dll": "9ccf07da018e00cd5d46296a444e17376cfcc3fc3ae4cf68155b2ce11e268cfb",
+    "/Users/robert/Projects/neoclr/target/http-kestrel-terminal-20261013/jit/HttpComparison.runtimeconfig.json": "b6ff750c28b190cdfc0f842c8a68d638224d26fff946a246ff18b7d3c213da98",
+    "/Users/robert/Projects/neoclr/target/http-kestrel-terminal-20261013/jit/HttpComparison.deps.json": "7755c6c77e4c81ab00d21f0d3b3455ae642cb8c0762e0aed69269f00d74dc2a5",
+    "/Users/robert/Projects/neoclr/target/http-kestrel-terminal-20261013/jit/HttpComparison.staticwebassets.endpoints.json": "c1686417e8d5c31bba969f12b6f3d2b35e6609adb5ca42f212261a3a02771aac",
+    "/Users/robert/Projects/neoclr/target/http-kestrel-terminal-20261013/jit/global.json": "3539053fdc4cd4e9c9e32e64351bdd2ae68557e926a9d78a1eb3f8b86883737d",
+    "/Users/robert/Projects/neoclr/target/http-kestrel-terminal-20261013/aot/HttpComparison": "65d2685cdaa287e79281cffcf5286b0723a0766e5533dc2662c391866899f122",
+    "/Users/robert/Projects/neoclr/target/http-kestrel-terminal-20261013/aot/HttpComparison.staticwebassets.endpoints.json": "c1686417e8d5c31bba969f12b6f3d2b35e6609adb5ca42f212261a3a02771aac",
+    "/Users/robert/Projects/neoclr/target/http-kestrel-terminal-20261013/aot/global.json": "3539053fdc4cd4e9c9e32e64351bdd2ae68557e926a9d78a1eb3f8b86883737d",
+    "/Users/robert/Projects/neoclr/target/http-kestrel-terminal-20261013/aot/HttpComparison.dSYM/Contents/Info.plist": "8aff658ca3115ba0381e0cd6f33a0b02c359fbfa29d393b56c18834813f38792",
+    "/Users/robert/Projects/neoclr/target/http-kestrel-terminal-20261013/aot/HttpComparison.dSYM/Contents/Resources/Relocations/aarch64/HttpComparison.yml": "d6c20ef94e54ff0b111408d3ba881a756cba3e69065d7a82025660783e02b933",
+    "/Users/robert/Projects/neoclr/target/http-kestrel-terminal-20261013/aot/HttpComparison.dSYM/Contents/Resources/DWARF/HttpComparison": "30934978138de137187514cb9f03bdb569694bf9722a9e5d3743d99023a9f0ca"
+  },
+  "dotnetInfo": ".NET SDK:\n Version:           10.0.100\n Commit:            b0f34d51fc\n Workload version:  10.0.100-manifests.7f3d6568\n MSBuild version:   18.0.2+b0f34d51f\n\nRuntime Environment:\n OS Name:     Mac OS X\n OS Version:  27.0\n OS Platform: Darwin\n RID:         osx-arm64\n Base Path:   /usr/local/share/dotnet/sdk/10.0.100/\n\n.NET workloads installed:\n [wasm-tools]\n   Installation Source: SDK 10.0.100\n   Manifest Version:    10.0.111/10.0.100\n   Manifest Path:       /usr/local/share/dotnet/sdk-manifests/10.0.100/microsoft.net.workload.mono.toolchain.current/10.0.111/WorkloadManifest.json\n   Install Type:        FileBased\n\n [maccatalyst]\n   Installation Source: SDK 10.0.100\n   Manifest Version:    26.5.10315/10.0.100\n   Manifest Path:       /usr/local/share/dotnet/sdk-manifests/10.0.100/microsoft.net.sdk.maccatalyst/26.5.10315/WorkloadManifest.json\n   Install Type:        FileBased\n\n [maui]\n   Installation Source: SDK 10.0.100\n   Manifest Version:    10.0.20/10.0.100\n   Manifest Path:       /usr/local/share/dotnet/sdk-manifests/10.0.100/microsoft.net.sdk.maui/10.0.20/WorkloadManifest.json\n   Install Type:        FileBased\n\n [mobile-librarybuilder]\n   Installation Source: SDK 10.0.100\n   Manifest Version:    10.0.111/10.0.100\n   Manifest Path:       /usr/local/share/dotnet/sdk-manifests/10.0.100/microsoft.net.workload.mono.toolchain.current/10.0.111/WorkloadManifest.json\n   Install Type:        FileBased\n\nConfigured to use workload sets when installing new manifests.\nNo workload sets are installed. Run \"dotnet workload restore\" to install a workload set.\n\nHost:\n  Version:      11.0.0-rc.1.26425.128\n  Architecture: arm64\n  Commit:       3551975be0\n\n.NET SDKs installed:\n  8.0.414 [/usr/local/share/dotnet/sdk]\n  9.0.305 [/usr/local/share/dotnet/sdk]\n  10.0.100-rc.1.25451.107 [/usr/local/share/dotnet/sdk]\n  10.0.100-rc.2.25502.107 [/usr/local/share/dotnet/sdk]\n  10.0.100 [/usr/local/share/dotnet/sdk]\n  11.0.100-preview.1.26104.118 [/usr/local/share/dotnet/sdk]\n  11.0.100-preview.3.26207.106 [/usr/local/share/dotnet/sdk]\n  11.0.100-preview.4.26230.115 [/usr/local/share/dotnet/sdk]\n  11.0.100-preview.5.26302.115 [/usr/local/share/dotnet/sdk]\n  11.0.100-preview.6.26359.118 [/usr/local/share/dotnet/sdk]\n  11.0.100-preview.7.26381.103 [/usr/local/share/dotnet/sdk]\n  11.0.100-rc.1.26425.128 [/usr/local/share/dotnet/sdk]\n\n.NET runtimes installed:\n  Microsoft.AspNetCore.App 8.0.20 [/usr/local/share/dotnet/shared/Microsoft.AspNetCore.App]\n  Microsoft.AspNetCore.App 9.0.9 [/usr/local/share/dotnet/shared/Microsoft.AspNetCore.App]\n  Microsoft.AspNetCore.App 10.0.0-rc.1.25451.107 [/usr/local/share/dotnet/shared/Microsoft.AspNetCore.App]\n  Microsoft.AspNetCore.App 10.0.0-rc.2.25502.107 [/usr/local/share/dotnet/shared/Microsoft.AspNetCore.App]\n  Microsoft.AspNetCore.App 10.0.0 [/usr/local/share/dotnet/shared/Microsoft.AspNetCore.App]\n  Microsoft.AspNetCore.App 11.0.0-preview.1.26104.118 [/usr/local/share/dotnet/shared/Microsoft.AspNetCore.App]\n  Microsoft.AspNetCore.App 11.0.0-preview.3.26207.106 [/usr/local/share/dotnet/shared/Microsoft.AspNetCore.App]\n  Microsoft.AspNetCore.App 11.0.0-preview.4.26230.115 [/usr/local/share/dotnet/shared/Microsoft.AspNetCore.App]\n  Microsoft.AspNetCore.App 11.0.0-preview.5.26302.115 [/usr/local/share/dotnet/shared/Microsoft.AspNetCore.App]\n  Microsoft.AspNetCore.App 11.0.0-preview.6.26359.118 [/usr/local/share/dotnet/shared/Microsoft.AspNetCore.App]\n  Microsoft.AspNetCore.App 11.0.0-preview.7.26381.103 [/usr/local/share/dotnet/shared/Microsoft.AspNetCore.App]\n  Microsoft.AspNetCore.App 11.0.0-rc.1.26425.128 [/usr/local/share/dotnet/shared/Microsoft.AspNetCore.App]\n  Microsoft.NETCore.App 8.0.20 [/usr/local/share/dotnet/shared/Microsoft.NETCore.App]\n  Microsoft.NETCore.App 9.0.9 [/usr/local/share/dotnet/shared/Microsoft.NETCore.App]\n  Microsoft.NETCore.App 10.0.0-rc.1.25451.107 [/usr/local/share/dotnet/shared/Microsoft.NETCore.App]\n  Microsoft.NETCore.App 10.0.0-rc.2.25502.107 [/usr/local/share/dotnet/shared/Microsoft.NETCore.App]\n  Microsoft.NETCore.App 10.0.0 [/usr/local/share/dotnet/shared/Microsoft.NETCore.App]\n  Microsoft.NETCore.App 11.0.0-preview.1.26104.118 [/usr/local/share/dotnet/shared/Microsoft.NETCore.App]\n  Microsoft.NETCore.App 11.0.0-preview.3.26207.106 [/usr/local/share/dotnet/shared/Microsoft.NETCore.App]\n  Microsoft.NETCore.App 11.0.0-preview.4.26230.115 [/usr/local/share/dotnet/shared/Microsoft.NETCore.App]\n  Microsoft.NETCore.App 11.0.0-preview.5.26302.115 [/usr/local/share/dotnet/shared/Microsoft.NETCore.App]\n  Microsoft.NETCore.App 11.0.0-preview.6.26359.118 [/usr/local/share/dotnet/shared/Microsoft.NETCore.App]\n  Microsoft.NETCore.App 11.0.0-preview.7.26381.103 [/usr/local/share/dotnet/shared/Microsoft.NETCore.App]\n  Microsoft.NETCore.App 11.0.0-rc.1.26425.128 [/usr/local/share/dotnet/shared/Microsoft.NETCore.App]\n\nOther architectures found:\n  None\n\nEnvironment variables:\n  Not set\n\nglobal.json file:\n  /Users/robert/Projects/neoclr/benchmarks/http-server/aspnet/global.json\n\nLearn more:\n  https://aka.ms/dotnet/info\n\nDownload .NET:\n  https://aka.ms/dotnet/download\n",
+  "commands": {
+    "jit": [
+      "dotnet",
+      "/Users/robert/Projects/neoclr/target/http-kestrel-terminal-20261013/jit/HttpComparison.dll"
+    ],
+    "aot": [
+      "/Users/robert/Projects/neoclr/target/http-kestrel-terminal-20261013/aot/HttpComparison"
+    ]
+  }
+}

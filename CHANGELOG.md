@@ -8,6 +8,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-13
 
+- Add retained HTTP comparison applications for terminal Kestrel (.NET JIT and
+  Native AOT), direct Go net/http and Node http.createServer, without routers or
+  application frameworks. Keep plain-text/JSON payloads, preparation tools and
+  a shared rotating comparison controller in the repository; retain build versions
+  and hashes. These are short-run comparison fixtures, not saturation tests.
+
 - Write fixed HTTP response framing as ASCII bytes without per-request codec
   calls. Warm AOT allocations/request fall 519→510 (plain) and 1,210→1,198 (JSON),
   with full reclamation and 24 passing response checks. Retain matched timing

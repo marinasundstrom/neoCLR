@@ -1,0 +1,7 @@
+{
+  "name": "neoclr-http-comparison",
+  "private": true,
+  "type": "module",
+  "engines": { "node": ">=22" },
+  "scripts": { "plain": "node server.mjs plain", "json": "node server.mjs json" }
+}
