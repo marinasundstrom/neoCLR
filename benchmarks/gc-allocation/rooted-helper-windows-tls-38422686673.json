@@ -1,0 +1,130 @@
+{
+  "passed": true,
+  "platform": "Windows-2022Server-10.0.20348-SP0",
+  "commands": [
+    {
+      "command": [
+        "openssl",
+        "req",
+        "-x509",
+        "-newkey",
+        "ec",
+        "-pkeyopt",
+        "ec_paramgen_curve:prime256v1",
+        "-pkeyopt",
+        "ec_param_enc:named_curve",
+        "-nodes",
+        "-sha256",
+        "-days",
+        "1",
+        "-config",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\tls-streams\\openssl.cnf",
+        "-addext",
+        "basicConstraints=critical,CA:FALSE",
+        "-addext",
+        "keyUsage=critical,digitalSignature",
+        "-addext",
+        "extendedKeyUsage=serverAuth",
+        "-addext",
+        "subjectAltName=DNS:localhost",
+        "-keyout",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\tls-streams\\key.pem",
+        "-out",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\tls-streams\\cert.pem"
+      ],
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": "-----\n",
+      "elapsedSeconds": 0.5
+    },
+    {
+      "command": [
+        "C:\\hostedtoolcache\\windows\\Python\\3.12.10\\x64\\python.exe",
+        "D:\\a\\neoCLR\\neoCLR\\scripts\\build-native-project.py",
+        "--profile",
+        "windows-http",
+        "--project",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\tls-streams\\project\\App.rvnproj",
+        "--bundle",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\jit-install\\bundle",
+        "--aot",
+        "D:\\a\\neoCLR\\neoCLR\\tools\\aot-poc\\target\\release\\neoclr-aot-poc.exe",
+        "--output",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\tls-streams\\native",
+        "--http-heap-bytes",
+        "8388608",
+        "--command-timeout",
+        "600"
+      ],
+      "exitCode": 0,
+      "stdout": "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\tls-streams\\native\\app.exe\n",
+      "stderr": "",
+      "elapsedSeconds": 24.484
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\jit-install\\bundle\\bin\\neoclr.exe",
+        "run",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\tls-streams\\native\\app.dll",
+        "--execution",
+        "interpreter",
+        "--instructions",
+        "100000000",
+        "--array-elements",
+        "1048576",
+        "--array-bytes",
+        "67108864",
+        "--system",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\jit-install\\bundle\\lib\\System.runtime.neox",
+        "--object-root",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\jit-install\\bundle\\lib\\System.Runtime.dll",
+        "--module",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\jit-install\\bundle\\lib\\System.Runtime.dll",
+        "--module",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\jit-install\\bundle\\lib\\System.Data.dll",
+        "--module",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\jit-install\\bundle\\lib\\System.Networking.dll",
+        "--module",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\jit-install\\bundle\\lib\\System.Web.dll"
+      ],
+      "exitCode": 0,
+      "stdout": "Managed HTTPS JSON exchange passed\n",
+      "stderr": "",
+      "elapsedSeconds": 15.281
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\jit-install\\bundle\\bin\\neoclr.exe",
+        "run",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\tls-streams\\native\\app.dll"
+      ],
+      "exitCode": 0,
+      "stdout": "Managed HTTPS JSON exchange passed\n",
+      "stderr": "",
+      "elapsedSeconds": 12.688
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\tls-streams\\native\\app.exe"
+      ],
+      "exitCode": 0,
+      "stdout": "Managed HTTPS JSON exchange passed\n",
+      "stderr": "",
+      "elapsedSeconds": 0.281
+    }
+  ],
+  "modes": [
+    "interpreter",
+    "default-jit",
+    "aot"
+  ],
+  "scope": "Managed lifetime and HTTPS nested-JSON exchange with GC",
+  "timingNote": "Timings include compilation and are not benchmarks.",
+  "sourceHashes": {
+    "runtime\\raven\\src\\System\\Networking\\Security\\SslError.rvn": "9a12027a85d6023c200b0080ef793a1237e6117fa15d25ddcc15f2a5b99def01",
+    "runtime\\raven\\src\\System\\Networking\\Security\\SslOptions.rvn": "0630f760039f609d5edbf4cff6bf4eef2b455e7c488441a6fcab0f296537c1e3",
+    "runtime\\raven\\src\\System\\Networking\\Security\\SslStream.rvn": "c42c7b37601a5721530bee64a52d50c905db69583d0f282755432587b4a502ea",
+    "docs\\experiments\\shared-tls\\stream-project\\App.rvnproj": "5f1d6b9ff9eef58a3267b8e3dc15b55771d56657ca7fd6f36a2f67aad180109f",
+    "docs\\experiments\\shared-tls\\stream-project\\Main.rvn": "8d1c97eee1971b30cb406668bef2d1bbd2923b98bd124400cc51c04299de6683"
+  }
+}

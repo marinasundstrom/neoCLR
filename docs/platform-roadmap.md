@@ -5,7 +5,9 @@ retains complete heap validation while removing the repeated first-fit search:
 matched hosted gains are 1.18–1.60× on macOS and 1.32–1.84× on Windows. Native-GC
 code generation now selects concat/join helpers that protect borrowed inputs during
 allocation retry; noncollecting native entry points remain available. Local compiled
-GC/non-GC tests and 128 fresh JIT/AOT HTTP responses pass. The
+GC/non-GC tests and 128 fresh JIT/AOT HTTP responses pass. The focused Windows
+application gate also passes eight default-JIT HTTP cases and SSL-stream HTTPS JSON
+in interpreter/JIT/AOT. The
 [closed rooted pacing experiment](../benchmarks/http-gc-pacing/README.md#rooted-closed-workload-pacing-follow-up-2026-10-13)
 passes large-request admission, exhaustion, explicit idle cleanup and suspended-owner
 abandonment. It is not enabled for general managed execution: remaining helper

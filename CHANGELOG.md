@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-13
 
+- Retain the passing Windows application qualification for rooted concat/join helpers: eight default-JIT HTTP cases and managed SSL-stream HTTPS JSON in interpreter/JIT/AOT. Native GC/root/socket and isolated pacing qualification also pass on their documented platforms. These focused gates do not imply a full library-suite run or promotion of the pacing experiment.
+
 - Update GC benchmark and history pages with allocation-only macOS/Windows comparisons and clearly separated experimental pacing results. The website build and link checks pass for 4,382 pages; publication remains on hold. Retain the completed hosted macOS pacing run (3.83–3.91× in its closed native workloads) and socket-contract evidence.
 
 - Retain paired macOS/Windows allocation benchmarks and rooted-helper correctness evidence. The closed rooted pacing experiment improves its local/Windows workloads 3.57–4.25× with roughly 23% higher peak arena extent; it remains disabled for general managed execution. Align profiler instrumentation with collecting audited helpers and verify 64 HTTP responses. Record generational GC as an exploratory candidate with lifetime, barrier, pause and memory validation requirements, not an implemented collector.

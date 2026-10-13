@@ -53,3 +53,11 @@ also passes two 32-response plain HTTP runs after its source marker was aligned
 with the audited-helper collection contract (`rooted-helper-phase-check-20261013.json`).
 That check uses an existing guest fixture with current native helpers; it establishes
 tool compatibility, not an application speedup.
+
+The focused [Windows application gate](https://github.com/marinasundstrom/neoCLR/actions/runs/38422686673)
+at `4ba0a60d` passes eight default-JIT HTTP cases and managed SSL-stream HTTPS
+nested-JSON exchange in interpreter/JIT/AOT. The three
+`rooted-helper-windows-*-38422686673.json`/`rooted-helper-windows-38422686673.json`
+reports retain the result and invocation evidence. This is a focused HTTP/SSL gate,
+not a full runtime-library suite. Subsequent changes only align comments/profiler
+markers and add documentation/evidence; they do not alter helper execution.
