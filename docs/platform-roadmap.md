@@ -1,21 +1,19 @@
 # neoCLR platform roadmap
 
-**Static storage (author direction, 2026-10-14):** implement a static header catalog
-on runtime-owned storage, including separate storage/initialization for each closed
-generic type. [The first interpreter storage slice](runtime-static-storage.md) covers
-identity, defaults, access checks, GC roots and array accounting. Type initialization,
-metadata tooling, Raven emission and JIT/AOT remain required before the HTTP catalog
-can use it. Explicit readonly instance fields are separately fixed in Raven's native
-emitter. The per-server workaround was withdrawn; this bounded author-directed work
-does not replace the performance milestone.
-
-**Shared-name follow-up (author discussion, 2026-10-14):** [read-only lazy properties](http-foundation.md#read-only-lazy-shared-names--author-discussion-2026-10-14) are the proposed direction for a larger fixed catalog. A retained compiler probe confirms native static readonly fields are not admitted. Establish context-owned static storage, initialization/publication and GC lifetime before claiming shared values; literal-only getters are insufficient. This is a recorded prerequisite, not completed static-storage support.
-
-**Known header byte matching (2026-10-14):** [seven fixed names](../benchmarks/http-server/header-name-bytes.md) bypass lowercase buffers and decoding. All 87 public wire checks pass across interpreter/JIT/AOT with runtime-await; matched profiles save 10/8 allocations per plain/JSON request with complete reclamation. Small sequential timing gains remain exploratory. Permanent shared strings remain separate because native literal identity can require copies; Windows qualification remains open.
+**Static HTTP header catalog (author direction, 2026-10-14):** the internal static
+catalog now lazily shares 13 known names. Interpreter and native contexts own the
+static roots, including separate storage for closed generic types; Raven native
+branch `fac4ac736` emits the fields. All 132 HTTP checks pass across interpreter,
+JIT and AOT with runtime-await. [Storage scope and remaining gaps](runtime-static-storage.md)
+include type initialization/readonly static writes and Windows execution qualification.
+[Measurements](../benchmarks/http-server/header-static-names.md) distinguish the
+new shared values from the earlier seven-name byte matcher. The catalog uses
+fixed-name intern publication on cache misses, not a general Lazy implementation.
+This author-directed work remains part of the performance milestone.
 
 **URI allocation refinement (2026-10-14):** [matched rebuilt HTTP fixtures](../benchmarks/http-server/uri-byte-parsing.md) replace per-character URI substrings with one bounded encoded buffer. Plain/JSON allocations decrease 23.9%/31.6%; seven alternating AOT rounds improve sequential throughput 1.56×/1.24× with 1,024 validated responses. All 12 URI tests pass in interpreter/JIT/AOT and four HTTP profiles reclaim every allocation. This is macOS stress-GC, state-machine fixture evidence, not Windows, sustained-load or runtime-await performance qualification. The following header matching slice is recorded above.
 
-**HTTP allocation attribution (2026-10-14):** [published-frame diagnostics](../benchmarks/http-server/allocation-sites.md) reconcile every measured allocation and identify URI one-byte substrings (124 allocations/request in retained plain/JSON fixtures) before header decoding (26/request). Prioritize removing parser temporaries and fixed known-header identities within the author-directed HTTP byte-buffer work; preserve eager framing validation and ownership across await. The URI candidate is now implemented and validated above; header byte matching is implemented above, with permanent identities still pending. Neither replaces sustained/concurrent GC pacing qualification.
+**HTTP allocation attribution (2026-10-14):** [published-frame diagnostics](../benchmarks/http-server/allocation-sites.md) reconcile every measured allocation and identify URI one-byte substrings (124 allocations/request in retained plain/JSON fixtures) before header decoding (26/request). Prioritize removing parser temporaries and fixed known-header identities within the author-directed HTTP byte-buffer work; preserve eager framing validation and ownership across await. The URI candidate is now implemented and validated above; header byte matching and shared fixed identities are implemented above. Neither replaces sustained/concurrent GC pacing qualification.
 
 **Profiling follow-up (2026-10-14):** [dense index refinement](../benchmarks/gc-index/README.md#reuse-validated-spans-for-the-dense-index--2026-10-14) reuses the first complete validation pass within a synchronous collection. Longer local paired measurements improve dense collection throughput by 2.1–3.3%, with small/sparse controls within 1%; all 35 local GC/root checks pass. The matched HTTP regression check passes 768 responses with overlapping timing ranges; hosted macOS/Windows correctness gates pass. Windows dense gains are 3.6–6.9%; noisy hosted macOS timings are retained without a precise speedup claim. This bounded improvement preserves collection policy and does not establish application throughput gains.
 

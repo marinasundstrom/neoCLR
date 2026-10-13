@@ -214,6 +214,22 @@ int32_t neoclr_gc_roots_park_owned_v1(neoclr_aot_context *context, void *owner,
     record->owner = owner;
     return 0;
 }
+int32_t neoclr_gc_complete_invocation_v1(neoclr_aot_context *context) {
+    if (!context || !blocks_valid(&context->text)) return 3;
+    for (const neoclr_probe_frame *frame = neoclr_root_probe_head_v1(); frame; frame = frame->previous)
+        if (frame->context == context) return 3;
+    /* Removing pool ownership never frees an exposed String. Any host/managed
+     * roots still retain the original value normally until their own release. */
+    for (uint64_t at = 0; at < context->text.used;) {
+        block *b = (void *)(context->text.data + at);
+        if ((b->state & ALLOCATED) && b->kind == NEOCLR_GC_INTERN)
+            b->kind = NEOCLR_GC_BYTES;
+        at += b->span;
+    }
+    context->static_storage = NULL;
+    return 0;
+}
+
 int32_t neoclr_gc_entry_check_v1(neoclr_aot_context *context) {
     for (neoclr_gc_resource *r = resource_head; r; r = r->next)
         if (r->context == context) return NEOCLR_AOT_FAULT_RUNTIME_ERROR;
@@ -429,6 +445,7 @@ static int32_t collect_indexed(neoclr_aot_context *context,
     for (host_root *root = host_head; root; root = root->next)
         if (root->context == context && !root->conditional)
             mark(a, &index, (uintptr_t)root->value, &pending);
+    mark(a, &index, (uintptr_t)context->static_storage, &pending);
     mark_frames(context, &index, head, &pending);
     for (const neoclr_parked_roots *p = neoclr_roots_parked_v1(); p; p = p->next)
         if (!p->owner_context) mark_frames(context, &index, p->head, &pending);

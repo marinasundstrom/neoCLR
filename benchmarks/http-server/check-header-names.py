@@ -20,10 +20,14 @@ def cases():
         rows.append(dict(name=name, request=request, expected=expected, error=error, fragmented=fragmented))
     add('mixed-known', b'hOsT: localhost\r\ncOnNeCtIoN: close\r\ncOnTeNt-LeNgTh: 0\r\nCoNtEnT-TyPe: text/plain\r\n', fragmented=True)
     add('known-uppercase', b'HOST: localhost\r\nCONNECTION: close\r\nCONTENT-LENGTH: 0\r\nCONTENT-TYPE: text/plain\r\n')
+    catalog = b'Host: localhost\r\nConnection: close\r\nContent-Length: 0\r\nContent-Type: text/plain\r\nAccept: */*\r\nAccept-Encoding: identity\r\nAuthorization: Example token\r\nCookie: a=b\r\nUser-Agent: test\r\nCache-Control: no-cache\r\n'
+    add('catalog-first', catalog)
+    add('catalog-uppercase', b'\r\n'.join(line.split(b':', 1)[0].upper() + b':' + line.split(b':', 1)[1] for line in catalog.split(b'\r\n') if line) + b'\r\n')
+    add('catalog-fragmented', catalog, fragmented=True)
     add('chunked', b'Host: localhost\r\nTrAnSfEr-EnCoDiNg: chunked\r\n', body=b'0\r\n\r\n', fragmented=True)
     add('unknown-and-empty', b'Host: localhost\r\nX-Custom:  two words \t\r\nX-Empty:\r\nX-Custom: second\r\n')
     # Exact-length lookalikes exercise failed dispatch without changing the fallback spelling.
-    for original in ['host', 'connection', 'content-length', 'transfer-encoding', 'expect', 'content-encoding', 'content-type']:
+    for original in ['host', 'connection', 'content-length', 'transfer-encoding', 'expect', 'content-encoding', 'content-type', 'accept', 'accept-encoding', 'authorization', 'cookie', 'user-agent', 'cache-control']:
         near = original[:-1] + 'x'
         add('near-' + original, b'Host: localhost\r\n' + near.upper().encode() + b': value\r\n')
         add('long-' + original, b'Host: localhost\r\n' + original.upper().encode() + b'X: value\r\n')

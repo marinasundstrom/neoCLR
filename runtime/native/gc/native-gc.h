@@ -76,6 +76,10 @@ typedef struct neoclr_gc_resource {
 int32_t neoclr_gc_resource_attach_v1(neoclr_aot_context *, void *owner,
     neoclr_gc_resource *, void *state, void (*cleanup)(void *));
 int32_t neoclr_gc_resource_release_v1(neoclr_aot_context *, neoclr_gc_resource *);
+/* Called after an ordinary entry unwinds. Interned values remain ordinary managed
+ * values, but the completed invocation no longer owns permanent intern roots.
+ * Bootstrap/callback hosting keeps its context live and does not call this hook. */
+int32_t neoclr_gc_complete_invocation_v1(neoclr_aot_context *);
 /* Entry reset is forbidden while this thread holds roots or guest frames for the context. */
 int32_t neoclr_gc_entry_check_v1(neoclr_aot_context *context);
 /* Quiescent exclusive ownership check. The supplied distinct handles must be

@@ -9438,3 +9438,21 @@ The fix is native-emitter admission; ordinary Raven/.NET behavior is unchanged.
 imports, verification and interpreter execution, plus existing .NET diagnostics.
 The HTTP SDK has not yet been rebuilt with this compiler. Static storage is separate
 and remains under implementation; this check is not JIT/AOT/Windows qualification.
+
+## Native static storage integration — 2026-10-14
+
+Raven native branch `fac4ac736` and the matching experimental metadata toolkit
+admit default static fields and implemented lazy static properties. The shared
+body plan opts in explicitly; reads/writes omit an instance receiver and retain
+the closed declaring owner. Native `static_fields` and `ldsfld`/`stsfld` are
+authoritative. CLI projections preserve Static/InitOnly flags with independent
+static ordinals. No Runtime Contract setting or ordinary .NET default changes.
+
+[Runtime ownership, remaining limits and validation](runtime-static-storage.md)
+include separate `Cache<int>`/`Cache<string>` counters, cross-assembly field imports,
+GC and non-GC native reset, and the 132 HTTP checks. Static constructors/initializers,
+readonly static initialization, addresses and static-field attributes are still
+gaps. The native owner representation for generic static classes is also pending;
+this does not restrict the runtime's closed-type storage identity. These changes
+are on the native compiler branch, not Raven main. Rebuild native hosts for the
+expanded private context layout.

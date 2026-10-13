@@ -583,6 +583,30 @@ impl<'a> Profile<'a> {
         }
     }
     pub fn object_bytes(&self, index: usize) -> u32 { 8 + self.widths[index] as u32 * 8 }
+    pub fn static_field(&self, owner: &Type, index: usize) -> Result<(usize, Ty, usize, usize), Error> {
+        let i = self.input.types.iter().position(|t| Some(t.name.as_str()) == owner.definition_name()).ok_or("missing closed static owner")?;
+        let fields = &self.input.types[i].static_fields;
+        let mut offset = 0; let mut selected = None;
+        for (n, field) in fields.iter().enumerate() {
+            let ty = self.ty(&field.ty)?;
+            fn zero_initializable(p: &Profile<'_>, ty: &Ty) -> bool {
+                match ty {
+                    Ty::Record(i) => p.input.types[*i].fields.iter().all(|f|
+                        p.ty(&f.ty).is_ok_and(|t| zero_initializable(p, &t))),
+                    Ty::Erased | Ty::ByteValues | Ty::CharacterValues | Ty::Character | Ty::Unit | Ty::TypeToken | Ty::Address(_) => false,
+                    _ => true,
+                }
+            }
+            if !zero_initializable(self, &ty) {
+                return Err("native static storage requires a zero-initializable field".into());
+            }
+            if n == index { selected = Some((ty.clone(), offset)); }
+            offset += self.lanes(&ty);
+        }
+        if offset > 256 { return Err("native static storage exceeds object lane limit".into()); }
+        let (ty, slot) = selected.ok_or("static field index out of range")?;
+        Ok((i, ty, 8 + slot * 8, 8 + offset * 8))
+    }
     pub fn field_offset(&self, t: &Ty, index: usize) -> usize {
         let t = if let Ty::Address(t) = t {
             t.as_ref()
@@ -729,6 +753,8 @@ impl<'a> Profile<'a> {
                         state.assigned[n] = true;
                     }
                 }
+                Op::StaticField { .. } => state.stack.push(None),
+                Op::SetStaticField { .. } => { readable(state.stack.pop().unwrap(), &state.assigned)?; }
                 Op::Field(_) | Op::FieldAddress(_) | Op::LoadObject(_) => {
                     readable(state.stack.pop().unwrap(), &state.assigned)?;
                     state.stack.push(None);
@@ -891,6 +917,8 @@ impl<'a> Profile<'a> {
                 | Op::LoadTypeToken(_)
                 | Op::Dup
                 | Op::Pop
+                | Op::StaticField { .. }
+                | Op::SetStaticField { .. }
                 | Op::Field(_)
                 | Op::SetField(_)
                 | Op::FieldAddress(_)
@@ -1148,6 +1176,15 @@ impl<'a> Profile<'a> {
                     take(&mut stack, &Ty::Int)?;
                     take(&mut stack, &Ty::Int)?;
                     take(&mut stack, &Ty::ByteArray)?;
+                }
+                Op::StaticField { owner, index } => {
+                    stack.push(Self::stack_type(&self.static_field(owner, *index)?.1));
+                }
+                Op::SetStaticField { owner, index } => {
+                    let (_, ty, _, _) = self.static_field(owner, *index)?;
+                    let value = pop(&mut stack)?;
+                    let expected = Self::stack_type(&ty);
+                    if expected != value && !self.reference_assignable(&value, &expected) { return Err(fail(pc, "static field store type mismatch")); }
                 }
                 Op::Field(n) | Op::FieldAddress(n) => {
                     let owner = pop(&mut stack)?;

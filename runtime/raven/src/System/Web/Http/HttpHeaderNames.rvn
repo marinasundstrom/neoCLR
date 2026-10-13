@@ -1,0 +1,165 @@
+module System.Web.Http
+
+import System.*
+
+// Fixed, bounded catalog. Interning only on a cache miss makes competing first
+// readers publish the same immutable string. Later reads need no intern lookup.
+// Storage and the intern pool belong to the runtime invocation, not the process.
+internal static class HttpHeaderNames {
+    private static var host: string?
+    private static var connection: string?
+    private static var contentLength: string?
+    private static var transferEncoding: string?
+    private static var expect: string?
+    private static var contentEncoding: string?
+    private static var contentType: string?
+    private static var accept: string?
+    private static var acceptEncoding: string?
+    private static var authorization: string?
+    private static var cookie: string?
+    private static var userAgent: string?
+    private static var cacheControl: string?
+
+    static val Host: string {
+        get {
+            if host is string cached {
+                return cached
+            }
+            let value = String.Intern("host")
+            host = value
+            return value
+        }
+    }
+
+    static val Connection: string {
+        get {
+            if connection is string cached {
+                return cached
+            }
+            let value = String.Intern("connection")
+            connection = value
+            return value
+        }
+    }
+
+    static val ContentLength: string {
+        get {
+            if contentLength is string cached {
+                return cached
+            }
+            let value = String.Intern("content-length")
+            contentLength = value
+            return value
+        }
+    }
+
+    static val TransferEncoding: string {
+        get {
+            if transferEncoding is string cached {
+                return cached
+            }
+            let value = String.Intern("transfer-encoding")
+            transferEncoding = value
+            return value
+        }
+    }
+
+    static val Expect: string {
+        get {
+            if expect is string cached {
+                return cached
+            }
+            let value = String.Intern("expect")
+            expect = value
+            return value
+        }
+    }
+
+    static val ContentEncoding: string {
+        get {
+            if contentEncoding is string cached {
+                return cached
+            }
+            let value = String.Intern("content-encoding")
+            contentEncoding = value
+            return value
+        }
+    }
+
+    static val ContentType: string {
+        get {
+            if contentType is string cached {
+                return cached
+            }
+            let value = String.Intern("content-type")
+            contentType = value
+            return value
+        }
+    }
+
+    static val Accept: string {
+        get {
+            if accept is string cached {
+                return cached
+            }
+            let value = String.Intern("accept")
+            accept = value
+            return value
+        }
+    }
+
+    static val AcceptEncoding: string {
+        get {
+            if acceptEncoding is string cached {
+                return cached
+            }
+            let value = String.Intern("accept-encoding")
+            acceptEncoding = value
+            return value
+        }
+    }
+
+    static val Authorization: string {
+        get {
+            if authorization is string cached {
+                return cached
+            }
+            let value = String.Intern("authorization")
+            authorization = value
+            return value
+        }
+    }
+
+    static val Cookie: string {
+        get {
+            if cookie is string cached {
+                return cached
+            }
+            let value = String.Intern("cookie")
+            cookie = value
+            return value
+        }
+    }
+
+    static val UserAgent: string {
+        get {
+            if userAgent is string cached {
+                return cached
+            }
+            let value = String.Intern("user-agent")
+            userAgent = value
+            return value
+        }
+    }
+
+    static val CacheControl: string {
+        get {
+            if cacheControl is string cached {
+                return cached
+            }
+            let value = String.Intern("cache-control")
+            cacheControl = value
+            return value
+        }
+    }
+}

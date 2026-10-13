@@ -568,6 +568,13 @@ pub(crate) fn compile_into(
         sig.returns.push(AbiParam::new(types::I32));
         Some(module.declare_function("neoclr_is_single_grapheme_v1", Linkage::Import, &sig)?)
     } else { None };
+    let static_service = if input.functions.iter().any(|f| f.body.iter().any(|op| matches!(op, Op::StaticField { .. } | Op::SetStaticField { .. }))) {
+        if !references { return Err("static storage requires a native context".into()); }
+        let mut sig = module.make_signature();
+        sig.params.extend([types::I64, types::I32, types::I32, types::I32, types::I64].map(AbiParam::new));
+        sig.returns.push(AbiParam::new(types::I32));
+        Some(module.declare_function(if details.is_some_and(|d| d.native_gc) { "neoclr_static_storage_rooted_v1" } else { "neoclr_static_storage_v1" }, Linkage::Import, &sig)?)
+    } else { None };
     let object_service = if references && (input.functions.iter().any(|f| f.body.iter().any(|op| matches!(op, Op::BindFunction { .. }))) || input.types.iter().any(|t| t.is_reference_type && !crate::selection::static_owner(t)) || details.is_some_and(|d| !d.empty_record_boxes.is_empty())) {
         let mut sig = module.make_signature();
         sig.params.extend([AbiParam::new(types::I64), AbiParam::new(types::I32), AbiParam::new(types::I32), AbiParam::new(types::I64)]);
@@ -1482,8 +1489,10 @@ pub(crate) fn compile_into(
                     if let Some(site) = site.as_mut() { site.remap_instruction(0); }
                 }
 
-                if let (Some(probes), Some(spill)) = (&root_probes, root_spill) {
-                    probes.emit(module, &mut b, i, pc, spill, probe_frame.unwrap(), &stack);
+                if !matches!(op, Op::StaticField { .. } | Op::SetStaticField { .. }) {
+                    if let (Some(probes), Some(spill)) = (&root_probes, root_spill) {
+                        probes.emit(module, &mut b, i, pc, spill, probe_frame.unwrap(), &stack);
+                    }
                 }
                 match op {
                     Op::Int(v) => stack.push(b.ins().iconst(types::I32, i64::from(*v))),
@@ -1894,6 +1903,50 @@ pub(crate) fn compile_into(
                             stack.push(if pointers { value } else { b.ins().uextend(types::I32, value) });
                         }
                     }
+                    Op::StaticField { owner, index } | Op::SetStaticField { owner, index } => {
+                        let (owner_index, ty, offset, bytes) = p.static_field(owner, *index)?;
+                        // Dense static-owner ordinals avoid retaining/scanning empty
+                        // slots for every unrelated selected type on each collection.
+                        let type_index = input.types[..owner_index].iter().filter(|t| !t.static_fields.is_empty()).count();
+                        let static_count = input.types.iter().filter(|t| !t.static_fields.is_empty()).count();
+                        // Warm static access neither allocates nor calls managed code.
+                        // Publish the pending operands only on the cold allocation path.
+                        let cold = b.create_block();
+                        let lookup = b.create_block();
+                        let ready = b.create_block();
+                        b.append_block_param(ready, types::I64);
+                        let table = b.ins().load(types::I64, MemFlags::new(), fault_context.unwrap(), 1072);
+                        let missing = b.ins().icmp_imm(IntCC::Equal, table, 0);
+                        b.ins().brif(missing, cold, &[], lookup, &[]);
+                        b.switch_to_block(lookup);
+                        let cached = b.ins().load(types::I64, MemFlags::new(), table, ((type_index + 1) * 8) as i32);
+                        let missing = b.ins().icmp_imm(IntCC::Equal, cached, 0);
+                        b.ins().brif(missing, cold, &[], ready, &[cached.into()]);
+                        b.switch_to_block(cold);
+                        if let (Some(probes), Some(spill)) = (&root_probes, root_spill) {
+                            probes.emit(module, &mut b, i, pc, spill, probe_frame.unwrap(), &stack);
+                        }
+                        let output_slot = slot(&mut b, 8);
+                        let output = b.ins().stack_addr(types::I64, output_slot, 0);
+                        let service = module.declare_func_in_func(static_service.unwrap(), b.func);
+                        let type_id = b.ins().iconst(types::I32, type_index as i64);
+                        let count = b.ins().iconst(types::I32, static_count as i64);
+                        let bytes = b.ins().iconst(types::I32, bytes as i64);
+                        let call = b.ins().call(service, &[fault_context.unwrap(), type_id, count, bytes, output]);
+                        let status = b.inst_results(call)[0];
+                        let failed = b.ins().icmp_imm(IntCC::NotEqual, status, 0);
+                        return_if_detailed(&mut b, failed, status, site.as_ref());
+                        let storage = b.ins().load(types::I64, MemFlags::new(), output, 0);
+                        b.ins().jump(ready, &[storage.into()]);
+                        b.switch_to_block(ready);
+                        let storage = b.block_params(ready)[0];
+                        let address = b.ins().iadd_imm(storage, offset as i64);
+                        if matches!(op, Op::SetStaticField { .. }) {
+                            let value = stack.split_off(stack.len() - p.lanes(top()));
+                            let value = normalize(&mut b, &p, &ty, &value);
+                            write_typed(&mut b, &p, &ty, address, &value);
+                        } else { stack.extend(read(&mut b, &p, &ty, address)); }
+                    }
                     Op::Field(n) | Op::FieldAddress(n) => {
                         let field = p.field(top(), *n)?;
                         let offset = p.field_offset(top(), *n);
@@ -2260,6 +2313,12 @@ pub(crate) fn compile_into(
         signature.returns.push(AbiParam::new(types::I32));
         Some(module.declare_function(if details.is_some_and(|d| d.native_gc) { "neoclr_process_arguments_rooted_v1" } else { "neoclr_process_arguments_v1" }, Linkage::Import, &signature)?)
     } else { None };
+    let complete_invocation = if details.is_some_and(|d| d.native_gc) && !bootstrap {
+        let mut signature = module.make_signature();
+        signature.params.push(AbiParam::new(types::I64));
+        signature.returns.push(AbiParam::new(types::I32));
+        Some(module.declare_function("neoclr_gc_complete_invocation_v1", Linkage::Import, &signature)?)
+    } else { None };
     let export_root = if bootstrap {
         let mut signature = module.make_signature();
         signature.params = vec![AbiParam::new(types::I64); 3];
@@ -2322,6 +2381,7 @@ pub(crate) fn compile_into(
             // dynamic text, including fault messages, expires on this next call.
             let zero = b.ins().iconst(types::I64, 0);
             b.ins().store(MemFlags::new(), zero, params[2], 1064);
+            b.ins().store(MemFlags::new(), zero, params[2], 1072);
         }
         let mut call_args = vec![];
         if let Some(service) = argument_service {
@@ -2375,6 +2435,19 @@ pub(crate) fn compile_into(
             let status = b.inst_results(call)[0];
             b.ins().return_(&[status]);
         } else {
+            let status = if let Some(complete) = complete_invocation {
+                let complete = module.declare_func_in_func(complete, b.func);
+                let call = b.ins().call(complete, &[params[2]]);
+                let completed = b.inst_results(call)[0];
+                let failed = b.ins().icmp_imm(IntCC::NotEqual, status, 0);
+                b.ins().select(failed, status, completed)
+            } else {
+                if text_arena {
+                    let zero = b.ins().iconst(types::I64, 0);
+                    b.ins().store(MemFlags::new(), zero, params[2], 1072);
+                }
+                status
+            };
             if unit_result {
                 let success = b.create_block();
                 let done = b.create_block();

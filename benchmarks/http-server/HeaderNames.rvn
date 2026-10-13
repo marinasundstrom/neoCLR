@@ -4,7 +4,33 @@ import System.Result.*
 import System.Concurrency.Tasks.*
 import System.Web.Http.*
 
+internal static class HeaderIdentity {
+    private static var previous: HttpRequest?
+
+    static func Check(request: HttpRequest) {
+        System.Runtime.GC.Collect()
+        if previous is HttpRequest last {
+            for header in request.Headers {
+                let name = header.Name
+                let known = name == "host" || name == "connection" || name == "content-length" ||
+                    name == "transfer-encoding" || name == "content-type" || name == "accept" ||
+                    name == "accept-encoding" || name == "authorization" || name == "cookie" ||
+                    name == "user-agent" || name == "cache-control"
+                if known {
+                    for old in last.Headers {
+                        if old.Name == name && !Object.ReferenceEquals(old.Name, name) {
+                            System.Fail("Known header name identity changed")
+                        }
+                    }
+                }
+            }
+        }
+        previous = request
+    }
+}
+
 func InspectHeaders(request: HttpRequest) -> Task<Result<HttpResponse, HttpError>> {
+    HeaderIdentity.Check(request)
     var text = ""
     for header in request.Headers {
         text = text + header.Name + "=" + header.Value + "\n"

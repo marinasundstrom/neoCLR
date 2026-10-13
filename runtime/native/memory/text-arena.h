@@ -29,10 +29,14 @@ typedef struct {
 typedef struct {
     neoclr_aot_fault fault;
     neoclr_aot_text_arena text;
+    /* Private image-local closed-type storage table; owned by this context. */
+    void *static_storage;
 } neoclr_aot_context;
 _Static_assert(offsetof(neoclr_aot_context, text) == 1048, "arena offset");
 _Static_assert(offsetof(neoclr_aot_context, text.used) == 1064, "cursor offset");
-_Static_assert(sizeof(neoclr_aot_context) == 1072, "context size");
+_Static_assert(sizeof(neoclr_aot_context) == 1080, "context size");
+int32_t neoclr_static_storage_v1(neoclr_aot_context *, uint32_t type, uint32_t count, uint32_t bytes, void **output);
+int32_t neoclr_static_storage_rooted_v1(neoclr_aot_context *, uint32_t type, uint32_t count, uint32_t bytes, void **output);
 int32_t neoclr_entry_v4(int32_t value, int32_t *result, neoclr_aot_context *context);
 /* No allocation outside the caller buffer. Success alone publishes output.
  * Exhaustion returns 5; malformed arena/formatting failures return 3.

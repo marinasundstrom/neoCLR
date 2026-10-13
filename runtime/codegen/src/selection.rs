@@ -439,6 +439,7 @@ fn retained_types(input: &neoclr::Module, functions: &BTreeSet<usize>, reference
         pending_types.extend(f.parameters.iter().chain(&f.locals).cloned());
         pending_types.push(f.returns.clone());
         for op in &f.body {
+            if let Op::StaticField { owner, .. } | Op::SetStaticField { owner, .. } = op { pending_types.push(owner.clone()); }
             if matches!(op, Op::BoxValue(_)) { pending_types.push(Type::Named("System.Object".into())); }
             if let Op::BindFunction { function_type, .. } = op { pending_types.push(function_type.clone()); }
             if let Op::New(t)
@@ -477,6 +478,7 @@ fn retained_types(input: &neoclr::Module, functions: &BTreeSet<usize>, reference
                 }
                 let t = &input.types[*i];
                 pending_types.extend(t.fields.iter().map(|f| f.ty.clone()));
+                pending_types.extend(t.static_fields.iter().map(|f| f.ty.clone()));
                 pending_types.extend(t.base.iter().chain(&t.implements).cloned());
                 if let Some(owner) = &t.declaring_type {
                     if owner.module != input.name || owner.revision != input.revision {

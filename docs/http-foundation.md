@@ -245,4 +245,19 @@ static storage restrictions and metadata field-access admission must be addresse
 a superficial spelling change would not provide shared storage. Broader matching
 coverage, such as Accept, Accept-Encoding, Authorization, Cookie, User-Agent and
 Cache-Control, remains a candidate after this foundation and code-size review.
-No new shared-name class or static-storage support is claimed.
+At that checkpoint no shared-name class or static-storage support was implemented.
+
+### Shared catalog implementation — 2026-10-14
+
+The subsequent [static catalog](../benchmarks/http-server/header-static-names.md)
+adds Accept, Accept-Encoding, Authorization, Cookie, User-Agent and Cache-Control,
+and shares all 13 known names. It is an internal static class with read-only lazy
+properties, backed by invocation/context-owned static storage. Fixed-literal interning
+on a cache miss provides canonical publication; warm reads use the field directly.
+Unknown names and values retain their existing decoding and validation.
+
+This is implemented storage/publication, not full static constructor support.
+[Costs and remaining gaps](runtime-static-storage.md) include bounded intern-pool
+usage, possible discarded first-use literals, generic static-class owner emission
+and Windows execution qualification. The public wire suite verifies 132 cases
+across interpreter/JIT/AOT, including identity reuse across explicit collections.

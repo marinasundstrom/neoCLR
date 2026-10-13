@@ -24,6 +24,8 @@ Windows qualification or sustained server-capacity figures.
 
 A further [known-header byte matching slice](https://github.com/marinasundstrom/neoclr/blob/main/benchmarks/http-server/header-name-bytes.md) saves another 10 plain-text / 8 JSON allocations per request. All 87 wire checks pass across execution modes; the small timing changes remain exploratory.
 
+The subsequent [static catalog](https://github.com/marinasundstrom/neoclr/blob/main/benchmarks/http-server/header-static-names.md) shares 13 names across requests, with all 132 wire checks passing across execution modes and complete reclamation in separate profiles. JSON saves two more text allocations per request; plain-text allocations are unchanged. The matched stress-GC AOT runs are about 4% slower, so this is a functionality/allocation result, not a throughput improvement. These development results do not replace the released matrix below.
+
 ## Workload matrix
 
 Median successful requests per second across five rounds:

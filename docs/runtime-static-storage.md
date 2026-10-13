@@ -50,25 +50,67 @@ layout independence, non-verifying rejection, array budgets, and full reclamatio
 21 objects under a three-live-object limit. These are local macOS interpreter checks,
 not native JIT/AOT or Windows qualification. No HTTP performance claim follows.
 
-## Remaining slices before using the catalog
+## Native execution and Raven integration
 
-1. Type initialization: zero storage before execution; once-only state for each closed
-   type; owner/reentrancy, competing contexts, cycles and fault propagation. Faults
-   stay non-recoverable. Readonly stores require an admitted initializer context.
-2. C# metadata writer/reader/reference projection and Raven lowering for static fields,
-   auto-storage and static constructors. Preserve CLI-shaped Static/InitOnly flags;
-   ordinary Raven/.NET behavior remains separate. Generic class support must not be
-   reduced to a nongeneric special case. Textual neoIL syntax is also pending.
-3. JIT/AOT storage, precise native GC roots, context reset and matching initialization.
-   Closed-type data must remain distinct even where method code is shared. The current
-   native backend does not implement the new operations; it must not silently
-   substitute process globals or an interpreter fallback.
-4. Static lazy HTTP catalog, repeated-identity and concurrency/GC checks, then matched
-   allocation/throughput measurements and Windows validation. The earlier per-server
-   catalog draft was removed; it is not the implemented API or final architecture.
+Raven native branch `fac4ac736` opts into static-field lowering. The metadata
+writer/reader preserves Static/InitOnly flags and separate static ordinals;
+loads and stores retain the closed owner. Default private static `var` storage
+and implemented static properties work. This does not change Raven main or
+ordinary .NET defaults, and requires no new Runtime Contract setting.
+
+JIT and AOT use one image-local table per native context, indexed by the selected
+closed type among declarations with static fields (unrelated types consume no slot). Generic specialization includes static signatures and owner operands.
+A table entry owns an independently allocated field block; instance layout stays
+unchanged. Warm accesses load/store directly. Only a missing table/block publishes
+pending operands and calls the allocating helper. Native storage currently admits
+zero-initializable scalar/reference/record layouts; checked-uninitialized inline
+arrays, runtime type handles and erased values remain a native admission gap.
+
+The table and children use the native collector's existing conservative object-word
+tracing. This is not a new precise or generational collector. A context root keeps
+them alive across collection; ordinary entry completion releases static and intern
+pool ownership. A rooted interned String remains alive through its other roots.
+Bootstrap/callback hosting retains the context until its owner completes it.
+The private native context grows from 1,072 to 1,080 bytes: **rebuild native hosts**
+with the matching header/backend. Entry names remain experimental, not a stable ABI.
+GC and non-GC native tests cover isolation, child retention, failure output stability,
+generic separation and three repeated entries with full reclamation. The adjacent
+collector test now explicitly enables collector hooks instead of diagnostic hooks.
+
+## HTTP catalog
+
+`System.Web.Http.HttpHeaderNames` is internal and static, with 13 read-only lazy
+properties and private mutable backing fields. The getter interns its fixed literal
+only on a cache miss, then caches the canonical result. The existing runtime intern
+operation makes competing first readers return the same immutable value; first-use
+races may still create discarded temporary literals. This is publication through
+interning, **not** an implementation of `Lazy<T>.ExecutionAndPublication` or `.cctor`.
+No request-provided names or values enter the intern pool.
+
+Costs include the context table, field block, canonical strings and pool records;
+up to 13 fixed names consume the existing invocation intern quota. Warm reads do
+not look up the pool. Untouched names have no String/pool allocation, although the
+field block contains all nullable slots. Type-initializer/atomic publication support
+could later remove the pool coupling; measure that separately.
+
+The 44 public HTTP wire cases pass in interpreter, JIT and AOT (132 checks), including
+identity reuse across explicit collections, mixed casing, fragmented input, fallback
+lookalikes and framing rejection. These are sequential macOS checks with runtime-await,
+not concurrent first-read stress or Windows execution qualification. Windows x64
+emission of the separate-library generic/static consumer also succeeds; execution
+on Windows remains to be qualified. See the [header evidence](../benchmarks/http-server/header-static-names.md).
+
+## Remaining work
+
+- Type initialization: once-only state per closed type, recursion, competing contexts,
+  cycles and non-recoverable fault propagation. Source static initializers and readonly
+  static writes remain rejected; there is no constructor-name privilege bypass.
+- Static field addresses, attributes/origin tokens, textual neoIL authoring, and the
+  compiler's constructed-field owner representation for generic **static classes**.
+  Ordinary generic classes with static members are tested and have separate storage.
+- Native layouts that need checked-uninitialized defaults, concurrent first-read
+  stress, Windows execution, and a public hosting completion contract.
 
 The [static constructor guidance](https://learn.microsoft.com/en-us/dotnet/csharp/programming-guide/classes-and-structs/static-constructors)
-is the comparison for initialization. Thread-safe type initialization alone does not
-make an arbitrary nullable-field lazy property thread-safe. Prefer per-name initialization
-holders or an explicit publication primitive when integrating the catalog; do not
-silently allow competing allocations or partially published values.
+remains the initialization comparison. Thread-safe type initialization alone does
+not make an arbitrary nullable-field getter thread-safe.

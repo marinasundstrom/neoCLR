@@ -107,6 +107,8 @@ pub(super) fn native_body(p: &Profile<'_>, i: usize, details: Option<&crate::fau
 
 pub(super) fn point(p: &Profile<'_>, op: &Op, stack: &[Ty]) -> Result<Option<Value>, Error> {
     let (consumed, kind, result, receiver) = match op {
+        Op::StaticField { owner, index } => (0, "static-storage", Some(p.static_field(owner, *index)?.1), None),
+        Op::SetStaticField { .. } => (1, "static-storage", None, None),
         Op::BindFunction { function_type, target } => (
             usize::from(target.instance), "callback-bind", Some(p.ty(function_type)?), None,
         ),

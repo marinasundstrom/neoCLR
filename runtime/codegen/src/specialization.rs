@@ -167,6 +167,7 @@ impl Specializer<'_> {
         for field in &definition.fields {
             self.close(&field.ty, &arguments)?;
         }
+        for field in &definition.static_fields { self.close(&field.ty, &arguments)?; }
         for base in definition.base.iter().chain(&definition.implements) {
             self.close(base, &arguments)?;
         }
@@ -329,6 +330,9 @@ impl Specializer<'_> {
             }
             if let Op::BindFunction { function_type, .. } = op {
                 *function_type = self.lower(&substitute(function_type, arguments, methods).map_err(|e| e.to_string())?)?;
+            }
+            if let Op::StaticField { owner, .. } | Op::SetStaticField { owner, .. } = op {
+                *owner = self.lower(&substitute(owner, arguments, methods).map_err(|e| e.to_string())?)?;
             }
             let virtual_call = matches!(op, Op::CallVirtual(_));
             match op {
@@ -638,6 +642,7 @@ pub fn expand_with_host_roots(input: &neoclr::Module, root: &str, host_roots: &[
         }
         t.generic_parameters.clear();
         for field in &mut t.fields { field.ty = context.close(&field.ty, &shape.arguments)?; }
+        for field in &mut t.static_fields { field.ty = context.close(&field.ty, &shape.arguments)?; }
         t.base = t.base.as_ref().map(|t| context.close(t, &shape.arguments)).transpose()?;
         t.implements = t.implements.iter().map(|t| context.close(t, &shape.arguments)).collect::<Result<_, _>>()?;
         // Keep construction authority attached to the exact specialized setter.

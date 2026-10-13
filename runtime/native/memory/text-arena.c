@@ -158,6 +158,39 @@ static int32_t allocate_object(neoclr_aot_text_arena *arena, uint32_t type,
     return NEOCLR_AOT_FAULT_NONE;
 }
 
+/* Static data has the same nonmoving, conservative word tracing as ordinary
+ * object storage. The table is a context root, never a process-global dictionary.
+ * Generated code supplies the specialized image's exact type index and lane count.
+ * Context execution is thread-affine; no callback/yield occurs during publication. */
+static int32_t static_storage(neoclr_aot_context *context, uint32_t type,
+    uint32_t count, uint32_t bytes, void **output, int rooted) {
+    if (!context || !output || !count || count > NEOCLR_NATIVE_TYPE_LIMIT || type >= count ||
+        bytes < 8 || bytes > NEOCLR_NATIVE_OBJECT_BYTES || (bytes & 7)) return 3;
+    if (!context->static_storage) {
+        void *table;
+        int32_t status = reserve_values(&context->text, 8 + 8 * (uint64_t)count,
+            OBJECT_STORAGE, &table, rooted, NULL, 0);
+        if (status) return status;
+        memset(table, 0, 8 + 8 * (size_t)count);
+        uint64_t length = count; memcpy(table, &length, 8);
+        context->static_storage = table;
+    }
+    uint64_t *table = context->static_storage;
+    if (table[0] != count) return 3;
+    if (!table[type + 1]) {
+        void *storage;
+        int32_t status = allocate_object(&context->text, type, bytes, &storage, rooted);
+        if (status) return status;
+        table[type + 1] = (uintptr_t)storage;
+    }
+    *output = (void *)(uintptr_t)table[type + 1];
+    return 0;
+}
+int32_t neoclr_static_storage_v1(neoclr_aot_context *c, uint32_t type, uint32_t count,
+    uint32_t bytes, void **output) { return static_storage(c, type, count, bytes, output, 0); }
+int32_t neoclr_static_storage_rooted_v1(neoclr_aot_context *c, uint32_t type, uint32_t count,
+    uint32_t bytes, void **output) { return static_storage(c, type, count, bytes, output, 1); }
+
 /* No callbacks or collecting work may occur between reservation, zeroing and
  * publication. Generated caller frames retain constructor arguments/receivers. */
 int32_t neoclr_allocate_object_v1(neoclr_aot_text_arena *arena, uint32_t type,

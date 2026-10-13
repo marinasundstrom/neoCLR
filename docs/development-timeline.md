@@ -16993,3 +16993,32 @@ open, not an approved complete implementation or a permanent roadmap reprioritiz
   header catalog. Do not infer completion from the interpreter storage groundwork.
   See [implementation record](runtime-static-storage.md) and
   [readonly evidence](readonly-fields-validation-20261014.json).
+
+### 2026-10-14 — Complete the static HTTP header catalog
+
+- **Author:** “Continue till you have implemented the HTTP headers stuff.” This
+  follows the correction to use a static class and to keep generic instantiations'
+  static storage separate.
+- **Assistant implementation:** added invocation-owned interpreter storage, native
+  metadata/compiler emission and JIT/AOT context storage. Raven native commit
+  `fac4ac736` preserves closed owners and keeps ordinary .NET defaults unchanged.
+  Added the internal 13-name static catalog with read-only lazy properties.
+- **Publication choice:** use the existing interner only for fixed names on a miss;
+  cache its canonical result. This permits discarded first-use temporaries and uses
+  the invocation's bounded intern quota. It is not full type initialization or a
+  general Lazy API. Static constructors and readonly static initialization remain open.
+- **Observed and fixed:** all AOT responses initially passed, but shutdown exposed
+  intern roots outliving entry completion. Added explicit completion of invocation
+  ownership while preserving independently rooted Strings. Profiling then motivated
+  a direct initialized-storage path, keeping allocation root publication cold.
+- **Validation:** 44 wire cases per interpreter/JIT/AOT (132 total), identity through
+  explicit collection, generic separation, native context isolation/reset and full
+  reclamation. Windows x64 object emission succeeds; no Windows execution result
+  is claimed. Measurements and limits are retained in the
+  [header report](../benchmarks/http-server/header-static-names.md).
+- **Still open:** type initialization, additional static metadata/authoring surfaces,
+  generic static-class field owner emission, native non-zero/default-uninitialized
+  layouts, concurrent first-reader stress and Windows qualification. This bounded
+  author-directed work does not replace the broader runtime performance milestone.
+
+- **Assistant validation outcome:** the first static table retained slots for all selected types and regressed short AOT HTTP timings by 15–16%. Compacting it to static owners reduced that regression to about 4%. All 132 wire checks still pass; all four profiles reclaim every allocation. JSON saves two text allocations/request, plain allocations are unchanged, and each fixture retains 144 extra live bytes. This remaining cost is recorded for subsequent profiling, not presented as a throughput improvement. [Retained measurements](../benchmarks/http-server/header-static-names.md).

@@ -7,8 +7,8 @@ fn bounded_nonmoving_heap_reclaims_cycles_and_preserves_interior_and_fault_roots
     fs::create_dir_all(&dir).unwrap();
     let base = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../docs/experiments/aot-console");
     let binary = dir.join("heap");
-    let r = Command::new("clang")
-        .args(["-arch", "arm64", "-std=c11", "-Wall", "-Wextra", "-Werror", "-fsanitize=undefined,bounds"])
+    let r = Command::new("xcrun")
+        .args(["--sdk", "macosx", "clang", "-DNEOCLR_NATIVE_GC", "-arch", "arm64", "-std=c11", "-Wall", "-Wextra", "-Werror", "-fsanitize=undefined,bounds"])
         .arg(base.join("native-gc-test.c"))
         .arg(base.join("native-gc.c"))
         .arg(base.join("root-probe.c"))

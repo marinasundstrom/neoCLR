@@ -27,7 +27,7 @@ public sealed partial class FieldBuilder
     public SignatureType FieldType => Definition.FieldType!;
     /// <summary>Gets declared accessibility.</summary>
     public FieldVisibility Visibility => (Definition.Attributes & 7) switch { 6 => FieldVisibility.Public, 3 => FieldVisibility.Internal, _ => FieldVisibility.Private };
-    /// <summary>Gets whether stores are restricted to constructors of the declaring type.</summary>
+    /// <summary>Gets whether storage belongs to the declaring type rather than an instance.</summary>
     public bool IsStatic => (Definition.Attributes & 0x10) != 0;
     /// <summary>Gets whether stores are restricted to constructors of the declaring type.</summary>
     public bool IsReadOnly => (Definition.Attributes & 0x20) != 0;
