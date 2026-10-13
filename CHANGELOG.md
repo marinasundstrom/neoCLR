@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-13
 
+- Admit scheduler, timer and task bindings for the integrated Windows async console host, preserving rooted-stack requirements and file/socket exclusions. Hosted HTTP and three-mode language checks passed before exposing this stale backend guard; six focused Windows code-generation/admission tests pass. Add an SDK-only workflow rerun using retained matching toolchain/runtime artifacts and a freshly rebuilt backend.
+
 - Retain carrier/stack-host and macOS SDK qualification with build provenance; update architecture, roadmap, website development status and provider migration guidance. Watch canonical runtime sources in Windows host CI. Record the existing HTTP/1.0 client-response gap separately from runtime-await. Published SDKs and website publication remain unchanged.
 
 - Package the existing assembly-private async-generator companion with the SDK runtime-await provider, so yield/await-for authoring no longer needs an experiment source include. Rebuilt SDK generation passes; add three-mode generator qualification and selected-case reruns. Correct the HTTP client fixture to emit the supported HTTP/1.1 protocol. The 21-case macOS gate passes; Windows application qualification continues.

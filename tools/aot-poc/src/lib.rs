@@ -290,9 +290,9 @@ pub fn run(arguments: Vec<std::ffi::OsString>) -> Result<i32, Box<dyn std::error
         || !native_gc || !native_stack_budget || !reference_arena) {
         return Err("Windows console experiment requires Windows x64, --compile-system, --reference-arena, --native-gc and --native-stack-budget".into());
     }
-    if windows_console && (bind_paths || bind_file_input || bind_file_output || bind_task_queue
-        || bind_socket_listener || bind_socket_accept || bind_socket_transfer || bind_socket_client || bind_timers || bind_scheduler) {
-        return Err("Windows console experiment does not support file, path, task or socket services".into());
+    if windows_console && (bind_paths || bind_file_input || bind_file_output
+        || bind_socket_listener || bind_socket_accept || bind_socket_transfer || bind_socket_client) {
+        return Err("Windows console experiment does not support file, path or socket services".into());
     }
     if windows_http && (target != compiler::Target::WindowsX64 || !compile_system
         || !native_gc || !native_stack_budget || !reference_arena

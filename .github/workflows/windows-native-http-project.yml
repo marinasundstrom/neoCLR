@@ -2,6 +2,10 @@ name: Windows native HTTP project
 on:
   workflow_dispatch:
     inputs:
+      reuse_bundle_run:
+        description: Prior successful toolchain artifact run for SDK-only qualification with a rebuilt backend
+        type: string
+        default: ""
       runtime_await:
         description: Qualify SDK-default runtime await in interpreter, installed JIT and AOT
         type: boolean
@@ -52,6 +56,7 @@ on:
       - 'docs/experiments/http-server/Server.rvn'
 permissions:
   contents: read
+  actions: read
 jobs:
   http-project:
     runs-on: windows-2022
@@ -69,7 +74,19 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
+      - name: Restore matching SDK qualification inputs
+        if: inputs.reuse_bundle_run != ''
+        uses: actions/download-artifact@v4
+        with:
+          github-token: ${{ github.token }}
+          run-id: ${{ inputs.reuse_bundle_run }}
+          name: windows-native-http-project-${{ inputs.reuse_bundle_run }}-1
+          path: target/windows-http-project-validation/
+      - name: Rebuild backend for focused SDK qualification
+        if: inputs.reuse_bundle_run != ''
+        run: cargo build --locked -p neoclr-aot-poc
       - name: Build and execute standalone Raven projects
+        if: inputs.reuse_bundle_run == ''
         shell: pwsh
         run: |
           $vs = & "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\vswhere.exe" -latest -products '*' -requires Microsoft.VisualStudio.Component.VC.Tools.x86.x64 -property installationPath
@@ -77,18 +94,25 @@ jobs:
           cmd /c "`"$vs\VC\Auxiliary\Build\vcvars64.bat`" && python scripts/validate-native-http-project.py --output target/windows-http-project-validation"
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
       - name: Qualify managed HTTP collection pacing
-        if: inputs.paced_gc
+        if: inputs.paced_gc && inputs.reuse_bundle_run == ''
         shell: pwsh
         run: |
           $vs = & "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\vswhere.exe" -latest -products '*' -requires Microsoft.VisualStudio.Component.VC.Tools.x86.x64 -property installationPath
           cmd /c "`"$vs\VC\Auxiliary\Build\vcvars64.bat`" && python benchmarks/http-gc-pacing/qualify-managed.py --bundle `"target/windows-http-project-validation/development toolchain/bundle`" --aot target/debug/neoclr-aot-poc.exe --output target/windows-http-project-validation/managed-pacing"
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
       - name: Qualify SDK-default runtime await
-        if: inputs.runtime_await
+        if: inputs.runtime_await && inputs.reuse_bundle_run == ''
         shell: pwsh
         run: |
           $vs = & "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\vswhere.exe" -latest -products '*' -requires Microsoft.VisualStudio.Component.VC.Tools.x86.x64 -property installationPath
           cmd /c "`"$vs\VC\Auxiliary\Build\vcvars64.bat`" && python scripts/validate-runtime-await-sdk.py --bundle `"target/windows-http-project-validation/development toolchain/bundle`" --runtime target/release/neoclr.exe --aot target/debug/neoclr-aot-poc.exe --output target/windows-http-project-validation/runtime-await-sdk"
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+      - name: Qualify SDK-default runtime await with retained inputs
+        if: inputs.reuse_bundle_run != ''
+        shell: pwsh
+        run: |
+          $vs = & "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\vswhere.exe" -latest -products '*' -requires Microsoft.VisualStudio.Component.VC.Tools.x86.x64 -property installationPath
+          cmd /c "`"$vs\VC\Auxiliary\Build\vcvars64.bat`" && python scripts/validate-runtime-await-sdk.py --bundle `"target/windows-http-project-validation/development toolchain/bundle`" --runtime target/windows-http-project-validation/runtime-await-sdk/installed/bundle/bin/neoclr.exe --aot target/debug/neoclr-aot-poc.exe --output target/windows-http-project-validation/runtime-await-sdk-rerun"
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
       - uses: actions/upload-artifact@v4
         if: always()

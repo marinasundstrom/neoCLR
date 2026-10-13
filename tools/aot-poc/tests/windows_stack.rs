@@ -90,7 +90,7 @@ fn console_experiment_requires_windows_context_and_rejects_unqualified_services(
         vec!["--target", "x86_64-pc-windows-msvc", "--windows-console-experiment"],
         vec!["--target", "aarch64-apple-darwin", "--windows-console-experiment", "--compile-system", "--reference-arena", "--native-gc", "--native-stack-budget"],
         vec!["--target", "x86_64-pc-windows-msvc", "--windows-console-experiment", "--compile-system", "--reference-arena", "--native-gc", "--native-stack-budget", "--bind-paths"],
-        vec!["--target", "x86_64-pc-windows-msvc", "--windows-console-experiment", "--compile-system", "--reference-arena", "--native-gc", "--native-stack-budget", "--bind-task-queue"],
+        vec!["--target", "x86_64-pc-windows-msvc", "--windows-console-experiment", "--compile-system", "--reference-arena", "--native-gc", "--native-stack-budget", "--bind-socket-listener"],
     ] {
         let result = compile(&dir, SOURCE, &flags);
         assert!(!result.status.success());
@@ -122,4 +122,29 @@ fn http_experiment_requires_complete_windows_service_contract() {
     let selected: Vec<_> = flags.iter().map(|f| if *f == "x86_64-pc-windows-msvc" { "aarch64-apple-darwin" } else { *f }).collect();
     assert!(!compile(&dir, SOURCE, &selected).status.success());
     assert!(!dir.0.join("app.obj").exists());
+}
+
+#[test]
+fn console_admits_scheduler_and_runtime_await_with_rooted_stack_contract() {
+    let dir = Temp::new();
+    let seed = neoclr::assemble(".module System\n.references ()\n").unwrap();
+    let seed_path = dir.0.join("seed.neox");
+    fs::write(&seed_path, neoclr::metadata_container::write_module(&seed).unwrap()).unwrap();
+    let library = dir.0.join("library.neoil");
+    fs::write(&library, ".module Helpers\n.references ()\n").unwrap();
+    let flags = ["--system", seed_path.to_str().unwrap(), "--module", library.to_str().unwrap(),"--target", "x86_64-pc-windows-msvc", "--windows-console-experiment",
+        "--compile-system", "--reference-arena", "--native-gc", "--native-stack-budget",
+        "--bind-task-queue", "--bind-scheduler", "--bind-timers", "--bind-runtime-async"];
+    fs::write(dir.0.join("input.neoil"), SOURCE).unwrap();
+    let result = Command::new(env!("CARGO_BIN_EXE_neoclr-aot-poc"))
+        .arg("--closed-world").arg(dir.0.join("input.neoil"))
+        .arg("Calculate").arg(dir.0.join("app.obj"))
+        .args(flags).output().unwrap();
+    assert!(result.status.success(), "{}", String::from_utf8_lossy(&result.stderr));
+    let bytes = fs::read(dir.0.join("app.obj")).unwrap();
+    let obj = object::File::parse(bytes.as_slice()).unwrap();
+    assert_eq!(obj.format(), object::BinaryFormat::Coff);
+    let names: Vec<_> = obj.symbols().filter_map(|s| s.name().ok()).collect();
+    assert!(names.contains(&"neoclr_native_stack_check_v1"));
+    assert!(names.contains(&"neoclr_gc_stack_roots_v1"));
 }

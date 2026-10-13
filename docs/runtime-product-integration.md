@@ -368,3 +368,11 @@ gate with `runtime_await=true`. All 21 macOS SDK cases pass, including generator
 fallback; source hashes remain unchanged through execution. Windows application
 qualification is running. The raw carrier gate passes on both platforms. See
 [retained evidence](https://github.com/marinasundstrom/neoCLR/tree/main/docs/validation/runtime-product/runtime-await-sdk).
+
+The Windows application gate exposed a remaining console-profile admission guard:
+task/scheduler/timer bindings are now accepted for its integrated async host, while
+file/socket exclusions and rooted-stack prerequisites remain. Six cross-target
+backend checks cover admission, GC publication and stack probing. The HTTP workflow
+can reuse a prior matching toolchain/runtime artifact via `reuse_bundle_run` for an
+SDK-only rerun with a freshly rebuilt backend; this does not qualify arbitrary
+mixtures of runtime ABI versions.
