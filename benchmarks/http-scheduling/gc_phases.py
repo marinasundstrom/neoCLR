@@ -21,7 +21,7 @@ def instrument(root, out, command):
         text = replace_once(text, marker, f'    neoclr_gc_phase_next({phase});\n'+marker)
     gc_copy = out/'gc-phases-collector.c'
     gc_copy.write_text(text)
-    text = probe.read_text()
+    text = (root/'runtime/native/gc/root-probe.c').read_text()
     text = '#include <stdint.h>\nextern uint64_t neoclr_schedule_profile_now(void);\nextern void neoclr_gc_boundary_end(uint64_t);\n' + text
     marker = '    if (!frame || head != frame || instruction >= 8192'
     text = replace_once(text, marker, '    uint64_t phase_start = neoclr_schedule_profile_now();\n'+marker)

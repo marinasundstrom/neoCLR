@@ -43,7 +43,12 @@ def main():
     assert host['passed'] and manifest['jit']['default']
     observer = ROOT / ('docs/experiments/aot-console/socket-listener.c' if a.compare_waits else 'docs/experiments/aot-console/root-probe.c')
     old = out / 'baseline-root-probe.c'
-    old.write_bytes(observer.read_bytes() if a.compare_waits else subprocess.check_output(['git', 'show', a.baseline + ':docs/experiments/aot-console/root-probe.c'], cwd=ROOT))
+    baseline_path = 'runtime/native/gc/root-probe.c'
+    if not a.compare_waits and subprocess.run(['git', 'cat-file', '-e', a.baseline + ':' + baseline_path],
+            cwd=ROOT, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL).returncode:
+        baseline_path = 'docs/experiments/aot-console/root-probe.c'
+    old.write_bytes(observer.read_bytes() if a.compare_waits else subprocess.check_output(
+        ['git', 'show', a.baseline + ':' + baseline_path], cwd=ROOT))
     report = dict(passed=False, revision=subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=ROOT, text=True).strip(),
         baselineRevision=None if a.compare_waits else subprocess.check_output(['git', 'rev-parse', a.baseline], cwd=ROOT, text=True).strip(),
         comparison='legacy-sleep-versus-readiness' if a.compare_waits else 'root-observation',
@@ -58,6 +63,9 @@ def main():
             if str(path) in report['inputs'] and report['inputs'][str(path)] != digest:
                 raise ValueError('Input changed: ' + str(path))
             report['inputs'][str(path)] = digest
+
+    for path in (ROOT / 'runtime/native/gc').glob('*.[ch]'):
+        remember(path)
 
     def run(command):
         command = list(map(str, command))

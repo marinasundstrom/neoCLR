@@ -35,7 +35,8 @@ class NativeGcLayoutTests(unittest.TestCase):
                 '    statistics.allocations += 1;'))
             for name, source in [('compatibility', base / 'native-gc.c'), ('canonical', canonical), ('profile', copied)]:
                 binary = root / (name + ('.exe' if windows else ''))
-                command = cc + [str(source), str(base / 'root-probe.c'), str(base / 'native-gc-test.c')]
+                probe = base / 'root-probe.c' if name == 'compatibility' else root / 'runtime/native/gc/root-probe.c'
+                command = cc + [str(source), str(probe), str(base / 'native-gc-test.c')]
                 command += ['/Fe:' + str(binary)] if windows else ['-o', str(binary)]
                 result = subprocess.run(command, cwd=root, capture_output=True, text=True, timeout=60)
                 self.assertEqual(result.returncode, 0, result.stdout + result.stderr)

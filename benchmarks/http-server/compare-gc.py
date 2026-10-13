@@ -27,8 +27,8 @@ def main():
     out=a.output.resolve();out.mkdir(parents=True,exist_ok=False)
     old=out/('baseline-'+a.source)
     baseline_path = 'docs/experiments/aot-console/' + a.source
-    if a.source == 'native-gc.c':
-        canonical_path = 'runtime/native/gc/native-gc.c'
+    if a.source in ('native-gc.c', 'root-probe.c'):
+        canonical_path = 'runtime/native/gc/' + a.source
         if subprocess.run(['git', 'cat-file', '-e', a.baseline + ':' + canonical_path], cwd=ROOT,
                           stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL).returncode == 0:
             baseline_path = canonical_path

@@ -56,7 +56,15 @@ there is one implementation, not a second collector. Build-kit support manifests
 include the canonical files, and current profiling tools instrument their contents.
 Benchmark baseline lookup supports both the historical and current source paths.
 
-This bounded migration leaves root descriptors, arena/context types, diagnostics
+Root-frame publication, root descriptors and fault-root enumeration now also live
+in `runtime/native/gc/root-probe.c` and `.h`, with forwarding files at the former
+paths. The collector includes the canonical root header directly. Profiler and
+pacing instrumentation read the canonical implementation; historical benchmark
+lookup understands both layouts. The packaged support closure includes these
+files automatically, and relocation checks compile roots both directly and through
+the compatibility path. The root implementation is unchanged apart from includes.
+
+This bounded migration leaves arena/context types, fault layout, diagnostics
 and other native services in their existing locations. The private header names
 those dependencies explicitly; it is not a stable or collector-independent ABI.
 The integrated validator includes a relocated-package test that compiles and runs
@@ -75,6 +83,11 @@ predates the implementation commit but fingerprints the relocated sources. The
 superseded initial hosted run was cancelled after an MSVC command spelling correction.
 Website capabilities and public APIs are
 unchanged; no publication is part of this work.
+
+The root-source follow-up passes local GC/root and relocated-package checks; its
+hosted qualification is pending. Root ABI sizes, suspension ownership, collection
+policy and fault behavior are unchanged. No Raven metadata/Runtime Contract change
+is required, and this slice does not alter the non-GC execution profile.
 
 ## Memory management is a runtime service
 

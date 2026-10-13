@@ -4,7 +4,7 @@
 #include "../../../docs/experiments/runtime-diagnostics/attach.h"
 #endif
 #include "../../../docs/experiments/aot-console/text-arena.h"
-#include "../../../docs/experiments/aot-console/root-probe.h"
+#include "root-probe.h"
 /* Private nonmoving heap in the caller buffer. No malloc, external runtime or
  * arbitrary native-stack scan. All entry/arena lifetime restrictions still apply. */
 enum { NEOCLR_GC_TEXT = 1, NEOCLR_GC_OBJECT = 2, NEOCLR_GC_BYTES = 3, NEOCLR_GC_STRINGS = 4, NEOCLR_GC_RECORDS = 5, NEOCLR_GC_INTERN = 6 };
