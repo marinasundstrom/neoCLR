@@ -1,0 +1,21 @@
+import System.*
+import System.Collections.*
+import System.Data.Json.*
+import System.Result.*
+import System.Web.Http.*
+
+public class Person {
+    init() { }
+    var id: int { get; set; } = 0
+    var name: string { get; set; } = ""
+    var active: bool { get; set; } = false
+}
+
+func RespondWithPerson(person: Person) -> Result<HttpResponse, HttpError> {
+    let Ok(text) = JsonSerializer.Serialize(person) else {
+        System.Fail("JSON serialization failed")
+    }
+    let headers = ArrayList<HttpHeader>()
+    headers.Add(HttpHeader("Content-Type", "application/json; charset=utf-8"))
+    return Ok(HttpResponse(200, headers, HttpContent.FromText(text).Bytes))
+}

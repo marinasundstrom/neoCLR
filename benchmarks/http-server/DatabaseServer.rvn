@@ -1,0 +1,59 @@
+import System.*
+import System.Data.Sql.*
+import System.Data.PostgreSql.*
+import System.Result.*
+import System.Concurrency.Tasks.*
+import System.Web.Http.*
+
+class DatabaseHandler {
+    private val connection: SqlConnection
+
+    init(connection: SqlConnection) {
+        self.connection = connection
+    }
+
+    async func Respond(request: HttpRequest) -> Task<Result<HttpResponse, HttpError>> {
+        if request.Method.Method != "GET" || request.Target != "/greeting" {
+            System.Fail("Unexpected benchmark request")
+        }
+        let result = await SqlMapper.Query<Person>(connection,
+            "SELECT $1::int AS id, $2::text AS name, $3::bool AS active",
+            42, "Café team", true)
+        let Ok(rows) = result else {
+            System.Fail("Database query failed")
+        }
+        if rows.Count != 1 {
+            System.Fail("Unexpected row count")
+        }
+        for person in rows {
+            return RespondWithPerson(person)
+        }
+        System.Fail("Missing row")
+        return Error(HttpError.InvalidRequest("Missing row"))
+    }
+}
+
+async func Main() -> Task<()> {
+    let opened = await PostgresDatabase("postgres", "postgres", DatabaseConfiguration.Port, 60000).Open()
+    let Ok(session) = opened else {
+        System.Fail("Database open failed")
+    }
+    use connection = session
+    let handler = DatabaseHandler(connection)
+    let Ok(server) = HttpServer.Listen("127.0.0.1", 0, 4) else {
+        System.Fail("Listen failed")
+    }
+    let Ok(port) = server.GetLocalPort() else {
+        System.Fail("Local port unavailable")
+    }
+    Console.WriteLine(port)
+    for index in 0..<32 {
+        let result = await server.ServeOne(handler.Respond)
+        if let Error(error) = result {
+            server.Close()
+            System.Fail(error.ToString())
+        }
+    }
+    server.Close()
+    Console.WriteLine("DONE")
+}

@@ -8,6 +8,13 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-13
 
+- Add composed HTTP object-JSON and PostgreSQL/query/map/JSON benchmarks using
+  Preview 14 inputs. Each completes 576 validated responses across interpreter,
+  JIT and AOT; retain raw latency/startup samples and exact build provenance. SQL
+  AOT links the qualified shared runtime-async host and does not imply standalone
+  deployment. Record PostgreSQL 18.6 container resources/query/reuse policy and
+  preserve the original JSON controller snapshot; stop the owned database afterward.
+
 - Record author direction to preserve public benchmark history and require
   stable or improving performance. Define immutable runs, versioned comparable
   workloads and proposed noise-aware regression acceptance; controlled repeatability
