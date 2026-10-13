@@ -52,7 +52,6 @@ Libraries can supply XML or Markdown documentation beside their assemblies.
 Source debugging on neoCLR is not available; use the run task and printed output.
 
 <a id="limits"></a>
-<a id="development"></a>
 
 ## Help and verification
 
@@ -73,3 +72,22 @@ collections, Tasks, JSON and HTTP examples.
 [Release notes and downloads](https://github.com/marinasundstrom/neoCLR/releases/tag/v0.1.0-preview.13)
 include the exact supported toolchain and limitations. Older installation instructions
 belong to their [matching release](https://github.com/marinasundstrom/neoCLR/releases).
+
+<a id="development"></a>
+
+## Development candidate
+
+The next candidate uses JIT by default on macOS ARM64 and Windows x64. Its HTTP
+client/server, typed JSON and HTTPS checks pass in interpreter, JIT and AOT modes
+on those hosts. Windows uses compiler-generated async state machines; runtime-owned
+suspension remains a separate development path.
+
+These changes are not in the Preview 13 downloads above. Candidate packages have
+not been published as a release. Contributors can use the
+[development build instructions](https://github.com/marinasundstrom/neoCLR/blob/main/docs/native-poc-bundle.md)
+with matching compiler, runtime and libraries. The optional PostgreSQL provider is
+included in the macOS development bundle; the Windows candidate contains the four
+base libraries without that provider.
+
+[Candidate release notes](https://github.com/marinasundstrom/neoCLR/blob/main/docs/next-preview-release-notes.md) ·
+[Qualification results](https://github.com/marinasundstrom/neoCLR/blob/main/docs/experiments/release-20261013/README.md)

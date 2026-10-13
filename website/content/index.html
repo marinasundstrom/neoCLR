@@ -9,7 +9,7 @@ toc: false
     <h1 id="hero-title">A managed runtime<br>for Raven applications.</h1>
     <p class="landing-lead">neoCLR is an experimental application platform with its own runtime, class library and development tools. Write Raven programs using familiar .NET concepts, UTF-8 text and APIs for collections, files, async work and HTTP.</p>
     <div class="landing-actions"><a class="primary-action" href="try/">Get started →</a><a href="https://github.com/marinasundstrom/neoCLR">View source on GitHub</a></div>
-    <p class="landing-note">MIT license · Garbage-collected memory · macOS arm64 toolchain</p>
+    <p class="landing-note">MIT license · Garbage-collected memory · macOS ARM64 and Windows x64 toolchains</p>
   </div>
   <div class="landing-example">
     <p class="landing-eyebrow">RAVEN EXAMPLE</p>
@@ -44,8 +44,8 @@ toc: false
 <a id="api-proposals"></a>
 <a id="exploring"></a>
 <section class="landing-section landing-split" aria-labelledby="platform-title">
-  <div><h2 id="platform-title">Runtime, library and tools</h2><p>The runtime executes compiled Raven programs with automatic memory management. The class library is organized into modules that form namespaces. The toolchain includes a compiler, project support and a VS Code extension.</p><p>Programs run in the interpreter. An ARM64 ahead-of-time compiler also produces standalone executables for a supported subset of applications.</p><a href="architecture/">How neoCLR fits together →</a></div>
-  <div><h2 id="status-title">Try the project</h2><p>The downloadable macOS arm64 bundle includes the tools and runnable collections, Tasks, JSON and HTTP samples. Start with a bundled project, then explore the library.</p><p>neoCLR is experimental and APIs can change. It has its own runtime and libraries; it does not run arbitrary .NET applications. Native compilation has narrower coverage than the interpreter.</p><a href="try/">Installation and requirements →</a></div>
+  <div><h2 id="platform-title">Runtime, library and tools</h2><p>The runtime executes compiled Raven programs with automatic memory management. The class library is organized into modules that form namespaces. The toolchain includes a compiler, project support and a VS Code extension.</p><p>Development bundles run programs with JIT by default on macOS ARM64 and Windows x64. Interpreter execution remains available; ahead-of-time compilation produces native executables for supported applications.</p><a href="architecture/">How neoCLR fits together →</a></div>
+  <div><h2 id="status-title">Try the project</h2><p>The published macOS ARM64 and Windows x64 bundles include the tools and runnable collections, Tasks, JSON and HTTP samples. Start with a bundled project, then explore the library.</p><p>neoCLR is experimental and APIs can change. It has its own runtime and libraries; it does not run arbitrary .NET applications. Native compilation has narrower coverage than the interpreter.</p><a href="try/">Installation and requirements →</a></div>
 </section>
 <section class="landing-section" aria-labelledby="features-title">
   <div class="landing-section-heading"><h2 id="features-title">Explore neoCLR</h2><a href="guides/">All guides →</a></div>
@@ -54,7 +54,7 @@ toc: false
     <a class="feature-box" href="features/modules/"><span class="feature-category">PLATFORM FOUNDATIONS</span><h3>Organize code with modules</h3><p>Modules form namespaces for types, functions and constants. Assemblies package them for use.</p><span class="feature-more">Modules and imports →</span></a>
     <a class="feature-box" href="guides/#language-and-everyday-code"><span class="feature-category">EVERYDAY APIS</span><h3>Work with data and text</h3><p>Collections and queries, UTF-8 strings, dates, optional values and errors.</p><span class="feature-more">Library guides →</span></a>
     <a class="feature-box" href="features/web/"><span class="feature-category">APPLICATION DEVELOPMENT</span><h3>Build an HTTP application</h3><p>Connect a client and server, route requests and exchange typed JSON.</p><span class="feature-more">HTTP clients and servers →</span></a>
-    <a class="feature-box" href="features/native-compilation/"><span class="feature-category">EXECUTION</span><h3>Compile to native code</h3><p>Explore standalone ARM64 execution, supported workloads and current limitations.</p><span class="feature-more">Native compilation →</span></a>
+    <a class="feature-box" href="features/native-compilation/"><span class="feature-category">EXECUTION</span><h3>Compile to native code</h3><p>Explore JIT and standalone native execution, supported targets and current limitations.</p><span class="feature-more">Native compilation →</span></a>
     <a class="feature-box" href="docs/"><span class="feature-category">API REFERENCE</span><h3>Look up an API</h3><p>Browse library modules, type and member signatures, parameters and behavior.</p><span class="feature-more">Browse the reference →</span></a>
   </div>
 </section>

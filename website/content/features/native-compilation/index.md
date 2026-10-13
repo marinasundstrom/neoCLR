@@ -61,6 +61,19 @@ Use matching compiler and library builds for native JSON, attributes and reflect
 Qualified examples cover specific supported shapes; they do not imply unrestricted
 .NET reflection or support for arbitrary library code.
 
+## Qualified HTTP workloads
+
+The development candidate passes the shared HTTPS/JSON consumer and HTTPS failure
+checks on macOS ARM64 and Windows x64 in interpreter, JIT and AOT modes. The checks
+cover certificate rejection and recovery, deadlines and cancellation. Windows also
+passes independent TLS 1.2/1.3 interoperability cases.
+
+Windows JIT uses compiler-generated async state machines. Runtime-owned suspension
+has separate target coverage; these results do not enable it on Windows. See
+[development availability](/try/#development) and the
+[qualification record](https://github.com/marinasundstrom/neoCLR/blob/main/docs/experiments/release-20261013/README.md)
+for the matching builds and tested scope.
+
 ## Current limits
 
 Native support remains experimental. Generic virtual dispatch and some runtime

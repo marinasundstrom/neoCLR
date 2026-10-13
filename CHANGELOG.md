@@ -8,6 +8,13 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-13
 
+- Refresh the website for release review: correct homepage execution/host coverage,
+  document qualified Windows/macOS HTTPS, distinguish the development candidate
+  from Preview 13 downloads, and correct array/sequence slicing status. Preserve
+  PostgreSQL sample navigation and clarify candidate provider availability. All 22
+  website tests and the complete 4,305-page build/link checks pass; publication
+  remains separate. Existing API-description coverage warnings remain visible.
+
 - Review draft release notes against the completed macOS ARM64 and Windows x64
   HTTPS qualification; state tested execution modes and independent TLS
   interoperability coverage without implying publication or unrestricted support.

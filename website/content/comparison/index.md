@@ -48,7 +48,7 @@ conversion or application work.
 | [Toolchain](../try/) | Raven compilation, the import bridge, MSBuild and language tooling use .NET. Guest execution uses neoCLR without a .NET runtime. The importer supports a bounded CLI subset; compile against the matching neoCLR reference library. |
 | Libraries | Collections, queries, text, time, streams, storage, tasks, networking and HTTP/JSON support useful small programs. The [guides](../guides/) and [API reference](../docs/) define the actual surface; familiar names do not imply full .NET API parity. |
 | Work submission | **Development:** `Task.Run` supports shared captures and returns an awaitable task. Guest instruction intervals share a managed graph gate, so this does not promise parallel guest CPU execution. Earlier isolated-worker APIs have different sharing rules. See [Tasks](../features/tasks/#task-run). |
-| Web applications | neoCLR supports bounded typed JSON client/server exchanges, nested JSON, typed arrays and routing. Cleartext HTTP/1.1 and bounded payloads are not an ASP.NET Core replacement. See the [HTTP guide](../features/web/) and [server case](../cases/http-server/). |
+| Web applications | neoCLR supports bounded typed JSON client/server exchanges, nested JSON, typed arrays and routing. Development HTTPS uses managed SslStream with explicit credentials and trust, qualified on macOS ARM64 and Windows x64 in interpreter/JIT/AOT. Bounded HTTP/1.1 and payload handling are not an ASP.NET Core replacement. See the [HTTP guide](../features/web/) and [server case](../cases/http-server/). |
 | Readiness | Experimental contracts and bounded validation. Import coverage, async shapes, terminal-fault cleanup and packaging still need work. This is a platform to investigate through working cases, not a production compatibility layer. |
 
 ## Coming from .NET
@@ -65,7 +65,8 @@ proposals](../proposals/), not capabilities to depend on today.
 The linked feature pages own detailed contracts and limitations. This comparison
 is reviewed when those contracts or release availability change; its review date
 records the last check, not a release date. Microsoft references above were
-consulted on 27 September 2026.
+consulted on 27 September 2026. neoCLR execution and HTTPS qualification were
+reviewed on 13 October 2026.
 
 ## Function types: delegates evolved (development)
 

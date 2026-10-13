@@ -88,8 +88,9 @@ Indexing and slicing syntax are convenience APIs that may fault on invalid bound
 callers must establish valid input. `values.Get(index)` returns an `Option<T>` for
 an integer or Index. `values.Slice(range)` returns `Result<T[], InvalidRangeError>`.
 Index and Range describe positions and boundaries; applying them determines validity.
-The array contract is tested in interpreter and macOS native AOT. Windows execution
-is pending. String range support is available in the matching development libraries, using
-grapheme boundaries. Sequence range support and borrowed views remain future work.
+The array contract is tested in interpreter and macOS native AOT; the Windows JIT
+framework checks also cover array and string Index/Range operations. String range support is available in the matching development libraries, using
+grapheme boundaries. [Sequences and lists](../collections/) also support indexing
+and slicing. Borrowed views remain future work.
 
 [Array API reference →](../../docs/api/System/Array%601/index.html)
