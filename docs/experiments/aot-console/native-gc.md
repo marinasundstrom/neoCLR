@@ -707,3 +707,8 @@ The Rust visitor borrows source bytes during callbacks, so a future moving colle
 would additionally need a stable-borrow/pinning contract. Other encoding kernels and
 native file/network/TLS/SQL producers require their own owner/scratch audit; no
 blanket change to the raw allocation service is safe. General pacing stays disabled.
+
+Path/replacement qualification: all 26 GC/root checks, sockets and relocated-package
+checks pass on macOS ARM64 and Windows x64. Four local compiled path/replacement
+tests compare interpreter behavior, including GC/non-GC replacement and fault
+cleanup. See [retained evidence](../../validation/runtime-product/borrowed-text/README.md).

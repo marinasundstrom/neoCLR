@@ -17,5 +17,5 @@ cases in both GC and non-GC modes, including no-op identity paths, Unicode/NUL,
 expansion/shrinking and invalid empty search. GC hosts collect before rendering
 faults and check complete reclamation after clearing the fault.
 
-Hosted platform qualification is pending. Unix lexical semantics are unchanged on
+[Hosted run 38447179411](https://github.com/marinasundstrom/neoCLR/actions/runs/38447179411) passes at `c2ca5e9165f7d967b9cf49f1c240b02f10da78f9`: all 26 GC/root executions, socket and relocated-package checks on macOS ARM64 and Windows x64, plus macOS profiler attachment. Reports retain source hashes and commands. This is not a fresh managed Windows/JIT/HTTP or Windows ARM64 matrix. Unix lexical semantics are unchanged on
 Windows; these are not host-filesystem operations. No pacing or performance claim.
