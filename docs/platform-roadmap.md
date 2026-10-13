@@ -1,12 +1,15 @@
 # neoCLR platform roadmap
 
-**HTTP benchmark baseline (2026-10-13):** The author requested measurements for the
-HTTP request-processing page. A [Preview 14 plain-text baseline](../benchmarks/http-server/README.md)
-now records interpreter/JIT/AOT requests, latency and startup on macOS ARM64, with
-576 validated responses and exact bundle inputs. Desktop/indexing contention makes
-this exploratory evidence; quiet-host repeats, composed JSON/database workloads,
-Windows and cross-runtime comparisons remain open. This measurement slice does not
-reorder the active runtime milestone.
+**Benchmark baselines (2026-10-13):** The author requested published measurements
+and retained history. [Preview 14 HTTP baselines](../benchmarks/http-server/README.md)
+now cover plain text, object JSON and PostgreSQL/query/map/JSON across interpreter,
+JIT and AOT, with 1,728 validated responses. [CPU and JSON node measurements](../benchmarks/execution/README.md)
+retain startup, round ranges and the short native CPU pilot alongside longer batches.
+The [public history](../website/content/benchmarks/history/index.md) and
+[history policy](benchmark-history.md) preserve evidence and define comparable series.
+Desktop/indexing contention makes these exploratory; controlled-host repeatability,
+regression thresholds, Windows and cross-runtime comparisons remain open. SQL AOT
+uses the shared native host. This measurement slice does not reorder the active milestone.
 
 **Release preflight (2026-10-13):** [qualification evidence](experiments/release-20261013/README.md)
 now includes passing hosted source/format/Clippy, minimum-Rust and macOS/Windows

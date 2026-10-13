@@ -1,86 +1,108 @@
 # HTTP request-processing benchmarks
 
-Measure the complete request path: receive a request, perform the application work,
-and send a validated response. Our first recorded baseline runs the same Raven
-plain-text server through interpreter, JIT and native AOT using the Preview 14
-macOS ARM64 toolchain.
+Three Raven server cases measure the complete request path: plain text, object JSON,
+and a PostgreSQL query mapped to an object and serialized as JSON. Each case runs
+in interpreter, JIT and AOT using the Preview 14 macOS ARM64 tools.
 
-## Plain-text baseline
+**Exploratory baseline — 13 October 2026, Apple M1, macOS 27.0.** The Python client
+shares the machine with the server. Desktop/indexing activity was present. These
+short, fixed-count runs are not controlled regression gates or production-capacity
+claims. All **1,728 responses across 54 processes** passed validation, with zero errors.
 
-**Exploratory local measurement — 13 October 2026.** Apple M1, macOS 27.0.
-The Python load generator shares the machine with the server. Desktop applications
-and macOS indexing were active, so the figures include uncontrolled host contention.
-They are not sustained-throughput, production-capacity or cross-runtime claims.
-
-The server responds to `GET /greeting` with ten UTF-8 bytes (`Café 🌍`). Requests
-use HTTP/1.1 over loopback, concurrency one, no TLS and a new connection each time.
-All **576 requests across 18 processes** returned the expected response; no errors
-were observed.
-
-| Execution mode | Median requests/s | Range across five rounds | Median startup (s) |
-| --- | ---: | ---: | ---: |
-| Interpreter | 1.71 | 1.61–1.83 | 2.510 |
-| JIT | 60.96 | 44.52–61.30 | 4.313 |
-| AOT | 63.43 | 57.77–64.11 | 0.018 |
-
-Startup is measured separately, from process launch to the listening-port message.
-It includes JIT compilation and metadata loading; native build time is excluded.
-The similar JIT/AOT medians in this run do not establish equivalent performance
-across other workloads. The wider JIT range is one reason to retain every sample.
-
-### Request latency
-
-Latency includes connection setup, transfer, server processing, response validation
-and connection close. It is not an isolated handler execution time.
-
-| Execution mode | p50 (ms) | p95 (ms) | p99 (ms) |
-| --- | ---: | ---: | ---: |
-| Interpreter | 562.83 | 670.24 | 796.22 |
-| JIT | 16.36 | 19.64 | 31.09 |
-| AOT | 15.80 | 17.68 | 18.73 |
-
-Percentiles use nearest rank across 120 measured requests per mode. With this small
-sample, p99 is a coarse estimate. Longer runs on a quiet host are needed for stronger
-claims; guest CPU and peak memory have not yet been measured.
-
-### How to reproduce
-
-One complete process per mode warms the host before five measured rounds with
-rotating mode order. Each process handles 32 requests, discards the first eight and
-measures the remaining 24. Throughput is measured requests divided by their total
-wall time; the table reports the median and observed range across rounds.
-
-The harness verifies the released bundle's file hashes, builds one Raven assembly
-for all three modes and checks every response's status, bytes, length and connection
-closure. Native heap admission is 32 MiB for JIT and AOT; interpreter GC policy differs.
-
-[Run the benchmark](https://github.com/marinasundstrom/neoCLR/blob/fd84b143/benchmarks/http-server/README.md) ·
-[Raw samples, build commands and provenance](https://github.com/marinasundstrom/neoCLR/blob/fd84b143/benchmarks/http-server/results-20261013.json) ·
-[Server source](https://github.com/marinasundstrom/neoCLR/blob/fd84b143/benchmarks/jit-http/Server.rvn)
+<a id="plain-text-baseline"></a>
+<a id="publication-status"></a>
 
 ## Workload matrix
 
+Median successful requests per second across five rounds:
+
 | Server workload | Interpreter | JIT | AOT |
-| --- | --- | --- | --- |
-| Plain text: return a fixed UTF-8 response | Baseline above | Baseline above | Baseline above |
-| JSON: serialize a response model | Not measured | Not measured | Not measured |
-| JSON + database: query, map rows, serialize response | Not measured | Not measured | Not measured |
+| --- | ---: | ---: | ---: |
+| Plain text | 1.71 | 60.96 | 63.43 |
+| Object JSON | 0.93 | 33.36 | 34.76 |
+| PostgreSQL + JSON | 0.55 | 15.65 | 16.06 |
 
-These are separate workloads, not additive estimates. Standalone JSON serialization
-or PostgreSQL timings cannot predict the composed HTTP result. The database case
-will record engine/version, container settings, query, row count, connection reuse
-and dataset. Client benchmarks will be reported separately from server throughput.
+The database's AOT executable links precompiled guest code to the released **shared
+native host** for runtime-async services. It performs no guest JIT compilation, but
+this is not a standalone SQL deployment qualification. Plain-text and object-JSON
+AOT use the standalone HTTP host. Compare modes within their recorded workload;
+do not subtract rows to infer an isolated database or serialization cost.
 
-## Next measurements
+### What each request does
 
-Repeat with longer measurement windows on a quiet host, then add JSON serialization
-and database access using matched payloads and connection policy. Measure CPU and
-peak memory alongside successful requests/s, latency, errors and startup. HTTPS,
-keep-alive and concurrency sweeps require separately labeled runs.
+- **Plain text:** returns ten UTF-8 bytes, `Café 🌍`.
+- **Object JSON:** creates a `Person` and serializes `id: 42`, `name: "Café team"`,
+  and `active: true` for every request. This includes construction and reflection.
+- **PostgreSQL + JSON:** executes a parameterized SELECT returning those three
+  values, maps one buffered row to `Person`, then uses the same JSON response code.
+  One database connection is opened before readiness and reused for 32 requests.
 
-Windows and equivalent .NET, Go and JavaScript measurements remain unreported.
-Use a separate load-generator host before making saturation claims. Comparison
-charts will need matched, qualified runs with raw samples alongside the graphs.
+PostgreSQL **18.6** runs in an ARM64 Docker container with **2 CPUs and 512 MiB**,
+using loopback-only trust authentication. The image digest is in the raw report.
+The query uses no table or persistent dataset; this is a query/map/serialize baseline,
+not disk-backed database scalability. The benchmark's container was stopped afterward.
+
+## Variability and startup
+
+Ranges include every measured round. Startup is process launch to the listening-port
+message, including metadata loading, JIT compilation and database connection setup
+where applicable. Native builds are excluded from startup and request timing.
+
+| Workload | Mode | Requests/s range | Median startup (s) |
+| --- | --- | ---: | ---: |
+| Plain text | Interpreter | 1.61–1.83 | 2.510 |
+| Plain text | JIT | 44.52–61.30 | 4.313 |
+| Plain text | AOT | 57.77–64.11 | 0.018 |
+| Object JSON | Interpreter | 0.92–0.94 | 2.432 |
+| Object JSON | JIT | 30.77–33.77 | 6.095 |
+| Object JSON | AOT | 17.71–35.32 | 0.013 |
+| PostgreSQL + JSON | Interpreter | 0.55–0.56 | 3.255 |
+| PostgreSQL + JSON | JIT | 13.21–15.82 | 8.241 |
+| PostgreSQL + JSON | AOT (shared host) | 15.83–16.09 | 0.083 |
+
+## Request latency
+
+Latency includes connection setup, request/response transfer, server processing,
+client validation and connection close. Each row pools 120 measured requests.
+Percentiles use nearest rank; p99 is a coarse estimate at this sample size.
+
+| Workload | Mode | p50 (ms) | p95 (ms) | p99 (ms) |
+| --- | --- | ---: | ---: | ---: |
+| Plain text | interpreter | 562.83 | 670.24 | 796.22 |
+| Plain text | jit | 16.36 | 19.64 | 31.09 |
+| Plain text | aot | 15.80 | 17.68 | 18.73 |
+| Object JSON | interpreter | 1052.18 | 1228.85 | 1385.10 |
+| Object JSON | jit | 30.03 | 32.40 | 35.22 |
+| Object JSON | aot | 28.60 | 38.58 | 78.94 |
+| PostgreSQL + JSON | interpreter | 1770.58 | 2068.41 | 2260.97 |
+| PostgreSQL + JSON | jit | 63.56 | 68.12 | 111.48 |
+| PostgreSQL + JSON | aot | 62.35 | 63.77 | 64.91 |
+
+## How to reproduce
+
+All requests use HTTP/1.1, no TLS, concurrency one and a new loopback connection.
+One full 32-request process per mode warms the host. Five measured rounds rotate
+mode order. Each process discards eight requests and measures the remaining 24.
+Throughput is measured requests divided by their total wall time; tables report
+medians and observed ranges rather than selecting the fastest round.
+
+The harness verifies bundle hashes, builds one assembly per workload for all three
+modes and validates every response. Text is byte-checked; JSON is parsed and its
+complete three-field value checked. Native heap admission is 32 MiB. Interpreter
+GC policy differs. No concurrent benchmark/build was launched during measurement.
+
+[Reproduction instructions and source](https://github.com/marinasundstrom/neoCLR/blob/c713d0ce/benchmarks/http-server/README.md). Raw reports: [Plain text](https://github.com/marinasundstrom/neoCLR/blob/c713d0ce/benchmarks/http-server/results-20261013.json) · [Object JSON](https://github.com/marinasundstrom/neoCLR/blob/c713d0ce/benchmarks/http-server/json-results-20261013.json) · [PostgreSQL + JSON](https://github.com/marinasundstrom/neoCLR/blob/c713d0ce/benchmarks/http-server/database-results-20261013.json).
+
+## History and next measurements
+
+[Benchmark history](/benchmarks/history/) preserves dated runs and their workload
+versions. The goal is stable or improving performance under comparable conditions;
+controlled hosts, calibrated durations and noise-aware regression checks come next.
+These exploratory baselines cannot yet enforce that goal.
+
+Longer quiet-host runs, guest CPU/peak memory, Windows, HTTPS, connection reuse,
+concurrency sweeps and equivalent .NET/Go/JavaScript measurements remain open. Use a
+separate load generator before making saturation claims.
 
 [HTTP server case](/cases/http-server/) · [SQL databases](/features/sql/) ·
 [General execution benchmarks](/benchmarks/execution/)

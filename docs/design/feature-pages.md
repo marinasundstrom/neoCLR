@@ -288,3 +288,12 @@ interpret a measurement or understand an unresolved limitation. Keep development
 chronology, superseded experiments and unqualified measurements in repository records
 and Git history. Preserve published release notes and changelog sections. Dates and
 revisions necessary to interpret actual benchmark evidence are not editorial clutter.
+
+## Public benchmark history — author direction, 2026-10-13
+
+Retain a browsable [benchmark history](../../website/content/benchmarks/history/index.md)
+as an explicit exception to removing historical website material. Keep introductory
+feature pages focused on current behavior; link dated measurements and immutable raw
+runs from benchmark reports. Preserve slower runs as well as improvements. Follow the
+[history and regression policy](../benchmark-history.md): compare stable workloads
+under matching conditions, and do not turn noisy exploratory runs into regression gates.

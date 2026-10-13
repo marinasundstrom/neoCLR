@@ -8,6 +8,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-13
 
+- Publish benchmark-page data for HTTP plain text, object JSON, PostgreSQL + JSON,
+  CPU sums and JSON node operations, with measured ranges, startup and raw reports.
+  Add a browsable immutable-history index and navigation, update roadmap evidence
+  and preserve exploratory/shared-host caveats. All 22 website tests and the full
+  4,306-page build/link checks pass; existing API-description warnings remain.
+
 - Track the standalone PostgreSQL mapper benchmark project, covering positional
   parameters and named-object parameters with row validation and process markers.
   Reject changed qualification inputs before preparation. Compile the worker with

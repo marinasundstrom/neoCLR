@@ -50,6 +50,8 @@
       href: benchmarks/http/index.md
     - name: General execution benchmarks
       href: benchmarks/execution/index.md
+    - name: Benchmark history
+      href: benchmarks/history/index.md
     - name: "Introspection"
       href: features/introspection/index.md
     - name: "Reflection"
