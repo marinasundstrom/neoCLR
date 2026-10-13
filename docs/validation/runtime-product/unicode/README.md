@@ -14,4 +14,4 @@ pass, including GC/non-GC interpreter comparisons and fault retention/reclamatio
 The initial test setup omitted a link input, then left an unused source unrooted in
 its full-heap control; both fixture issues were corrected before retained passing runs.
 
-Hosted macOS/Windows qualification is pending. No new throughput or pacing claim.
+[Hosted run 38448803103](https://github.com/marinasundstrom/neoCLR/actions/runs/38448803103) passes at `d87af0477b74f6e2fab036697a5ef2652b1f1e84`: 27 GC/root executions (including the real pinned Unicode library), sockets and relocated-package checks on macOS ARM64 and Windows x64, plus macOS profiler attachment. Reports retain source hashes and command provenance; this is not a new managed Windows/JIT/HTTP or Windows ARM64 matrix. No new throughput or pacing claim.

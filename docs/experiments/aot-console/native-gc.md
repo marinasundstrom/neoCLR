@@ -728,5 +728,5 @@ original native symbols remain noncollecting. Public UTF-8 and strict ASCII enco
 in `Encodings.rvn` already compose the audited managed UTF-8/byte-array operations;
 there is no separate native ASCII codec needing a new allocation path. Incremental
 managed encoder/decoder behavior retains its existing tests and is not redefined.
-Native producer scratch/results and general pacing remain open. Platform qualification
-for this slice is pending.
+Native producer scratch/results and general pacing remain open. All 27 macOS/Windows GC/root checks and socket/package gates pass, alongside six
+local compiled character tests. See [retained evidence](../../validation/runtime-product/unicode/README.md).
