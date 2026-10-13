@@ -2,6 +2,10 @@ name: Windows JIT HTTP
 on:
   workflow_dispatch:
     inputs:
+      benchmark_roots:
+        description: Run matched JIT/AOT HTTP root-observation benchmarks
+        type: boolean
+        default: false
       http_focus:
         description: Qualify HTTP and SSL streams without unrelated library suites
         type: boolean
@@ -77,8 +81,11 @@ jobs:
     env:
       PYTHONUTF8: '1'
       HTTP_FOCUS: ${{ inputs.http_focus }}
+      BENCHMARK_ROOTS: ${{ inputs.benchmark_roots }}
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - uses: actions/setup-dotnet@v4
         with:
           dotnet-version: |
@@ -88,6 +95,13 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
+      - name: Check benchmark controller and process cleanup
+        if: inputs.benchmark_roots
+        run: |
+          python -m unittest discover -s benchmarks/http-server -p test_windows_root_observation.py
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          python -m unittest discover -s benchmarks/framework -p test_process.py
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
       - name: Select OpenSSL for disposable TLS fixtures
         shell: pwsh
         run: |
@@ -97,7 +111,8 @@ jobs:
         run: |
           $vs = & "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\vswhere.exe" -latest -products '*' -requires Microsoft.VisualStudio.Component.VC.Tools.x86.x64 -property installationPath
           if (-not $vs) { throw 'MSVC x64 tools not found' }
-          $focus = if ($env:HTTP_FOCUS -eq 'true') { '--http-focus' } else { '' }
+          if ($env:HTTP_FOCUS -eq 'true' -and $env:BENCHMARK_ROOTS -eq 'true') { throw 'Choose one scope' }
+          $focus = if ($env:HTTP_FOCUS -eq 'true') { '--http-focus' } elseif ($env:BENCHMARK_ROOTS -eq 'true') { '--benchmark-roots' } else { '' }
           cmd /c "`"$vs\VC\Auxiliary\Build\vcvars64.bat`" && python docs/experiments/jit-windows/verify.py --output target/windows-jit-validation $focus"
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
       - uses: actions/upload-artifact@v4
@@ -108,6 +123,8 @@ jobs:
             target/windows-jit-validation/*.json
             target/windows-jit-validation/*.log
             target/windows-jit-validation/http/
+            target/windows-jit-validation/http-benchmark/results.json
+            target/windows-jit-validation/http-benchmark/*-native/build.json
             target/windows-jit-validation/framework/
             target/windows-jit-validation/cryptography/
             target/windows-jit-validation/cryptography-project/

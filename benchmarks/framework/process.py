@@ -51,7 +51,11 @@ class Guest:
 
     def close(self):
         if self.process.poll() is None:
-            os.killpg(self.process.pid, signal.SIGKILL)
+            if os.name == 'nt':
+                subprocess.run(['taskkill', '/PID', str(self.process.pid), '/T', '/F'],
+                               stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, timeout=10)
+            else:
+                os.killpg(self.process.pid, signal.SIGKILL)
             self.process.wait(timeout=10)
         self.reader.join(timeout=5)
         self.process.stdout.close()

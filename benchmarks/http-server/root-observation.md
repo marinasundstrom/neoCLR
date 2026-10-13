@@ -167,3 +167,26 @@ sanitized host invocation on macOS. The focused Windows rerun at `55b53daed` pas
 Windows throughput measurements or ARM64 qualification. The macOS sampling driver
 and Unix-socket profiler attachment remain platform-specific. Main was not pushed
 and the website was not published; CI uses `codex/windows-root-observation`.
+
+## Matched Windows benchmark controller
+
+`windows-root-observation.py` reuses a prepared Windows JIT host recipe and the
+existing plain/JSON Raven fixtures. It builds each guest once, then relinks two
+AOT executables and JIT host DLLs differing only in `root-probe.c` from baseline
+`9cd74b374` versus the current source. Headers, compiler, guest objects, other helper
+objects and Rust libraries remain identical within each pair. Inputs, build commands
+and output hashes are retained. Profiling is disabled during measurement.
+
+Use `windows-jit.yml` with `benchmark_roots=true` and `http_focus=false` to prepare
+and run it on Windows x64. This is a separate benchmark scope; it does not claim
+full library-suite qualification. All builds complete before warmups and five
+alternating rounds. Each process handles 32 validated requests, with the first eight
+excluded; startup/JIT compilation is reported separately from request timings.
+GitHub-hosted runner variability and the short, concurrency-one loopback workload
+limit interpretation. Compare baseline and candidate on the same host; do not use
+these numbers to rank Windows against the existing macOS measurements. Results are
+pending. Website publication remains on hold.
+
+The shared benchmark worker now kills its own Windows process tree on failed runs,
+rather than calling Unix `killpg`; successful-process behavior is unchanged. Focused
+controller/cleanup tests run locally and in the benchmark CI scope.

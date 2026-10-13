@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-13
 
+- Add a matched Windows JIT/AOT plain-text and JSON HTTP benchmark controller and manual CI scope for root-observation comparisons. Retain identical guest inputs and change only the root observer between pairs; Windows measurements are pending. Make failed benchmark-worker cleanup use Windows process-tree termination and add focused checks.
+
 - Remove the native backend’s redundant 32-target-per-callback-shape restriction exposed by Windows SSL stream compilation; dispatch remains bounded by the selected-function limit. Add larger-target regressions and an explicitly scoped Windows HTTP/SSL-stream CI rerun option; five local callback tests and the focused Windows execution gate pass.
 
 - Fix Windows native GC profiling: use QueryPerformanceCounter for monotonic collection intervals instead of the unavailable POSIX clock_gettime. Normal non-profiled builds retain no timing overhead; Windows profiler accounting checks pass; the macOS sampling/attachment tools remain platform-specific.
