@@ -78,3 +78,26 @@ validation behavior. The profiler explicitly adds 100 ms only after the three fa
 peers have completed and before releasing the fourth request. Timing it does not
 establish starvation bounds or fairness under sustained load. No website publication
 is performed; the publication hold remains in force.
+
+## Matched application lowering — 2026-10-13
+
+`compare-lowerings.py --recipe PASSING_HTTP_BUILD_JSON --bundle BUNDLE --output NEW_DIR`
+now builds the same concurrent plain-text consumer twice against identical libraries.
+It verifies backend runtime-async bindings are present only for the opted-in application.
+Both hosts link the same retained-stack carrier; the state-machine guest never uses it.
+Only application bodies change lowering: this is not a runtime-async rebuild of System.Web.
+
+[Qualification](lowerings-20261013.json) passes four 16-response processes including
+cancellation/shutdown and slow-peer holds. [State-machine counters](lowering-state-profile-20261013.json)
+and [runtime counters](lowering-runtime-profile-20261013.json) add four instrumented
+processes per lowering, all passing with full reclamation and zero collector errors.
+These are grouped diagnostic runs, not alternating throughput samples. Historical
+reports retain the script hashes used then; current profiler revisions add fiber counters.
+
+Runtime suspension creates 93–95 drain fibers with no intentional idle and 358–359
+with four 100 ms holds, whereas state-machine runs create none. The native pump
+currently allocates a drain fiber for every loop iteration even when the preceding
+iteration did not execute guest code. Skipping these redundant drains is a focused
+optimization candidate. It must still drain after callbacks and resumed bodies, and
+preserve suspended drain fibers, roots, faults and cancellation. JIT and interpreter
+comparisons and direct readiness timestamps remain open.

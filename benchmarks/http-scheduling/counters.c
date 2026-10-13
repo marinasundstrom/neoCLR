@@ -6,6 +6,10 @@
 #include <time.h>
 #include <sys/resource.h>
 static uint64_t calls, ready, empty, errors, elapsed, streak, longest, pauses, paused;
+static uint64_t body_fibers, drain_fibers;
+void neoclr_schedule_profile_fiber(int drain) {
+    if (drain) drain_fibers++; else body_fibers++;
+}
 uint64_t neoclr_schedule_profile_now(void) {
     struct timespec t;
     if (clock_gettime(CLOCK_MONOTONIC, &t)) abort();
@@ -33,8 +37,9 @@ static void report(void) {
         ",\"empty\":%" PRIu64 ",\"errors\":%" PRIu64
         ",\"pollNanoseconds\":%" PRIu64 ",\"longestEmptyStreak\":%" PRIu64
         ",\"pauses\":%" PRIu64 ",\"pauseNanoseconds\":%" PRIu64
+        ",\"bodyFibers\":%" PRIu64 ",\"drainFibers\":%" PRIu64
         ",\"processUserSeconds\":%.6f,\"processSystemSeconds\":%.6f}\n",
-        calls, ready, empty, errors, elapsed, longest, pauses, paused,
+        calls, ready, empty, errors, elapsed, longest, pauses, paused, body_fibers, drain_fibers,
         usage.ru_utime.tv_sec + usage.ru_utime.tv_usec / 1e6,
         usage.ru_stime.tv_sec + usage.ru_stime.tv_usec / 1e6);
     if (fclose(file)) abort();

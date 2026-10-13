@@ -8,6 +8,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-13
 
+- Add a matched HTTP application-lowering probe that verifies native runtime-async
+  bindings and holds dependency libraries fixed. Both state-machine and suspension
+  builds pass concurrency/cancellation checks and instrumented GC reclamation.
+  Extend diagnostic counters to retained-stack fiber creation and carrier sleeps;
+  identify redundant idle-loop drain fibers without claiming a throughput gain.
+
 - Add a diagnostic native HTTP scheduling profiler with socket-poll outcomes,
   consecutive empty polls, host sleeps, process CPU and GC counters. Retain eight
   AOT runs validating 192 responses and complete reclamation; an optional slow-peer

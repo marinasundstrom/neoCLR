@@ -67,14 +67,31 @@ static int32_t socket_poll_inner(neoclr_aot_context *context, uint64_t *callback
         '    neoclr_schedule_profile_paused(start);\n}\n')
     command = [str(host_copy) if v == str(host) else v for v in command]
     inputs[str(host_copy)] = sha(host_copy)
+    carrier = ROOT/'docs/experiments/runtime-async/native-runtime.c'
+    runtime_async = str(carrier) in command
+    if runtime_async:
+        carrier_source = carrier.read_text()
+        pause_hook = 'if (!ready) neoclr_os_pause();'
+        fiber_hook = '    ++statistics.fibers;'
+        assert carrier_source.count(pause_hook) == carrier_source.count(fiber_hook) == 1
+        carrier_copy = out/'carrier-profile.c'
+        carrier_copy.write_text(carrier_source.replace('#define LIMIT 128',
+            'extern uint64_t neoclr_schedule_profile_now(void);\n'
+            'extern void neoclr_schedule_profile_paused(uint64_t);\n'
+            'extern void neoclr_schedule_profile_fiber(int);\n#define LIMIT 128')
+            .replace(pause_hook, 'if (!ready) { uint64_t start = neoclr_schedule_profile_now(); '
+                'neoclr_os_pause(); neoclr_schedule_profile_paused(start); }')
+            .replace(fiber_hook, fiber_hook+'\n    neoclr_schedule_profile_fiber(drain);'))
+        command = [str(carrier_copy) if v == str(carrier) else v for v in command]
+        inputs[str(carrier_copy)] = sha(carrier_copy)
     benchmark = None
     if a.workload != 'concurrent':
         import sys
         sys.path.insert(0, str(ROOT/'benchmarks/http-server'))
         import benchmark
         inputs[str(Path(benchmark.__file__).resolve())] = sha(benchmark.__file__)
-    report = dict(passed=False, inputs=inputs, command=command, workload=a.workload, runs=[],
-                  scope='Instrumented AOT polling diagnosis; identical guest objects. State-machine guest unless explicitly identified otherwise by build. Not throughput, wakeup-to-resume latency, JIT or interpreter evidence. GC and clock hooks perturb timings.')
+    report = dict(passed=False, inputs=inputs, command=command, workload=a.workload, runtimeAsyncCarrierLinked=runtime_async, runs=[],
+                  scope='Instrumented AOT polling diagnosis; identical guest objects. Carrier presence alone does not establish guest lowering; pair with verified backend binding evidence. Not throughput, wakeup-to-resume latency, JIT or interpreter evidence. GC and clock hooks perturb timings.')
     try:
         subprocess.run(command, check=True, capture_output=True, text=True)
         # Repeat both scenarios; the intentional delay applies only after all fast
