@@ -40,7 +40,7 @@ The sanitized native GC/root gate passes all 21 executions. The added regression
 covers corruption after an otherwise-valid match across all shared admission paths,
 unchanged outputs and registrations on failure, interior/foreign/free pointers,
 null roots, successful callback admission and exactly-once resource cleanup.
-Platform qualification is pending. Optional `benchmark_gc_handles` dispatch in
+Optional `benchmark_gc_handles` dispatch in
 `native-network.yml` runs the same matrix and GC/root contracts on macOS/Windows.
 
 The relocated native package test also passes with the selected Xcode 26.2 SDK.
@@ -50,3 +50,21 @@ explicit `SDKROOT` rerun resolves that local toolchain selection issue.
 after warmup, 768 verified responses). Plain/JSON medians remain within 0.3% of
 baseline. It relinks current native helpers against retained rooted-helper guest
 objects; it is not a fresh compiler or JIT qualification, nor an HTTP speedup claim.
+
+## Hosted platform qualification
+
+[Run 38441368441](https://github.com/marinasundstrom/neoCLR/actions/runs/38441368441)
+qualifies `3424ae55d` on macOS ARM64 and Windows x64. Both pass all 21 native GC/root
+executions, socket contracts and relocated-package checks; macOS also passes
+profiler attachment. These are focused native gates, not a fresh managed JIT or
+full library-suite qualification. Retained `*-38441368441.json` reports preserve
+commands, exact input hashes, all timing rounds and job outcomes.
+
+At 256/4,096 objects, later-base cases improve 1.56–2.60× on hosted macOS and
+1.43–2.26× on Windows. Windows first-base controls range 0.974–1.004×; hosted macOS
+controls range 0.882–1.110×. The slower macOS medians have overlapping sample ranges:
+for 16-object first owner/value, baseline 54.7–69.7 ms versus candidate 52.6–70.9 ms;
+for 256-object first strong root, baseline 50.4–92.0 ms versus candidate 55.0–72.3 ms.
+The longer local controls remain near baseline, but these hosted results do not
+establish universal non-regression. Ratios compare paired variants on each host,
+not platforms against each other. Windows ARM64 is unmeasured.

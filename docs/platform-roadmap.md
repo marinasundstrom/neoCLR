@@ -24,8 +24,11 @@ prototype pacing and unqualified targets are not promoted by packaging changes.
 removes repeated heap walks for host handles and related owner checks while retaining
 trailing-corruption rejection and failure atomicity. Local late-base cases improve
 1.76–2.59× at 256/4,096 objects; early-base controls remain near baseline. All 21
-local GC/root checks pass. Hosted platform qualification is pending. This bounded
-runtime improvement does not establish an HTTP gain or change collection pacing.
+local GC/root checks pass, and hosted macOS/Windows GC/root, socket and package
+gates pass. Hosted late-base gains are 1.56–2.60×/1.43–2.26× respectively; early-base
+control costs and variation remain documented. The AOT HTTP comparison is within
+0.3% of baseline. This bounded runtime improvement does not establish an HTTP gain
+or change collection pacing.
 
 **Allocation and admission follow-up (2026-10-13):** [single-walk allocation](../benchmarks/gc-allocation/README.md)
 retains complete heap validation while removing the repeated first-fit search:

@@ -1,0 +1,3794 @@
+{
+  "passed": true,
+  "platform": "Windows-2022Server-10.0.20348-SP0",
+  "machine": "AMD64",
+  "baseline": "cf342fb8c",
+  "commands": [
+    {
+      "command": [
+        "git",
+        "-C",
+        "D:\\a\\neoCLR\\neoCLR",
+        "rev-parse",
+        "HEAD"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "git",
+        "-C",
+        "D:\\a\\neoCLR\\neoCLR",
+        "show",
+        "cf342fb8c:runtime/native/gc/native-gc.c"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "cl",
+        "/nologo",
+        "/W4",
+        "/WX",
+        "/O2",
+        "/std:c11",
+        "/experimental:c11atomics",
+        "/MT",
+        "/DNEOCLR_NATIVE_GC",
+        "/ID:\\a\\neoCLR\\neoCLR\\docs\\experiments\\aot-console",
+        "D:\\a\\neoCLR\\neoCLR\\benchmarks\\gc-handles\\workload.c",
+        "D:\\a\\neoCLR\\neoCLR\\target\\gc-handles-benchmark\\baseline.c",
+        "D:\\a\\neoCLR\\neoCLR\\docs\\experiments\\aot-console\\root-probe.c",
+        "/Fe:D:\\a\\neoCLR\\neoCLR\\target\\gc-handles-benchmark\\baseline.exe"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "cl",
+        "/nologo",
+        "/W4",
+        "/WX",
+        "/O2",
+        "/std:c11",
+        "/experimental:c11atomics",
+        "/MT",
+        "/DNEOCLR_NATIVE_GC",
+        "/ID:\\a\\neoCLR\\neoCLR\\docs\\experiments\\aot-console",
+        "D:\\a\\neoCLR\\neoCLR\\benchmarks\\gc-handles\\workload.c",
+        "D:\\a\\neoCLR\\neoCLR\\target\\gc-handles-benchmark\\candidate.c",
+        "D:\\a\\neoCLR\\neoCLR\\docs\\experiments\\aot-console\\root-probe.c",
+        "/Fe:D:\\a\\neoCLR\\neoCLR\\target\\gc-handles-benchmark\\candidate.exe"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\gc-handles-benchmark\\baseline.exe",
+        "16",
+        "1250000",
+        "0",
+        "-1"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\gc-handles-benchmark\\candidate.exe",
+        "16",
+        "1250000",
+        "0",
+        "-1"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\gc-handles-benchmark\\baseline.exe",
+        "16",
+        "1250000",
+        "0",
+        "-1"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\gc-handles-benchmark\\candidate.exe",
+        "16",
+        "1250000",
+        "0",
+        "-1"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\gc-handles-benchmark\\candidate.exe",
+        "16",
+        "1250000",
+        "0",
+        "-1"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\gc-handles-benchmark\\baseline.exe",
+        "16",
+        "1250000",
+        "0",
+        "-1"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\gc-handles-benchmark\\baseline.exe",
+        "16",
+        "1250000",
+        "0",
+        "-1"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\gc-handles-benchmark\\candidate.exe",
+        "16",
+        "1250000",
+        "0",
+        "-1"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\gc-handles-benchmark\\candidate.exe",
+        "16",
+        "1250000",
+        "0",
+        "-1"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\gc-handles-benchmark\\baseline.exe",
+        "16",
+        "1250000",
+        "0",
+        "-1"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\gc-handles-benchmark\\baseline.exe",
+        "16",
+        "1250000",
+        "0",
+        "-1"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\gc-handles-benchmark\\candidate.exe",
+        "16",
+        "1250000",
+        "0",
+        "-1"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\gc-handles-benchmark\\baseline.exe",
+        "16",
+        "1250000",
+        "15",
+        "-1"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\gc-handles-benchmark\\candidate.exe",
+        "16",
+        "1250000",
+        "15",
+        "-1"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\gc-handles-benchmark\\baseline.exe",
+        "16",
+        "1250000",
+        "15",
+        "-1"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\gc-handles-benchmark\\candidate.exe",
+        "16",
+        "1250000",
+        "15",
+        "-1"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\gc-handles-benchmark\\candidate.exe",
+        "16",
+        "1250000",
+        "15",
+        "-1"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\gc-handles-benchmark\\baseline.exe",
+        "16",
+        "1250000",
+        "15",
+        "-1"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\gc-handles-benchmark\\baseline.exe",
+        "16",
+        "1250000",
+        "15",
+        "-1"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\gc-handles-benchmark\\candidate.exe",
+        "16",
+        "1250000",
+        "15",
+        "-1"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\gc-handles-benchmark\\candidate.exe",
+        "16",
+        "1250000",
+        "15",
+        "-1"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\gc-handles-benchmark\\baseline.exe",
+        "16",
+        "1250000",
+        "15",
+        "-1"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\gc-handles-benchmark\\baseline.exe",
+        "16",
+        "1250000",
+        "15",
+        "-1"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\gc-handles-benchmark\\candidate.exe",
+        "16",
+        "1250000",
+        "15",
+        "-1"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\gc-handles-benchmark\\baseline.exe",
+        "16",
+        "1250000",
+        "0",
+        "0"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\gc-handles-benchmark\\candidate.exe",
+        "16",
+        "1250000",
+        "0",
+        "0"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\gc-handles-benchmark\\baseline.exe",
+        "16",
+        "1250000",
+        "0",
+        "0"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\gc-handles-benchmark\\candidate.exe",
+        "16",
+        "1250000",
+        "0",
+        "0"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\gc-handles-benchmark\\candidate.exe",
+        "16",
+        "1250000",
+        "0",
+        "0"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\gc-handles-benchmark\\baseline.exe",
+        "16",
+        "1250000",
+        "0",
+        "0"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\gc-handles-benchmark\\baseline.exe",
+        "16",
+        "1250000",
+        "0",
+        "0"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\gc-handles-benchmark\\candidate.exe",
+        "16",
+        "1250000",
+        "0",
+        "0"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\gc-handles-benchmark\\candidate.exe",
+        "16",
+        "1250000",
+        "0",
+        "0"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\gc-handles-benchmark\\baseline.exe",
+        "16",
+        "1250000",
+        "0",
+        "0"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\gc-handles-benchmark\\baseline.exe",
+        "16",
+        "1250000",
+        "0",
+        "0"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\gc-handles-benchmark\\candidate.exe",
+        "16",
+        "1250000",
+        "0",
+        "0"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\gc-handles-benchmark\\baseline.exe",
+        "16",
+        "1250000",
+        "0",
+        "15"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\gc-handles-benchmark\\candidate.exe",
+        "16",
+        "1250000",
+        "0",
+        "15"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\gc-handles-benchmark\\baseline.exe",
+        "16",
+        "1250000",
+        "0",
+        "15"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\gc-handles-benchmark\\candidate.exe",
+        "16",
+        "1250000",
+        "0",
+        "15"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\gc-handles-benchmark\\candidate.exe",
+        "16",
+        "1250000",
+        "0",
+        "15"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\gc-handles-benchmark\\baseline.exe",
+        "16",
+        "1250000",
+        "0",
+        "15"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\gc-handles-benchmark\\baseline.exe",
+        "16",
+        "1250000",
+        "0",
+        "15"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\gc-handles-benchmark\\candidate.exe",
+        "16",
+        "1250000",
+        "0",
+        "15"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\gc-handles-benchmark\\candidate.exe",
+        "16",
+        "1250000",
+        "0",
+        "15"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\gc-handles-benchmark\\baseline.exe",
+        "16",
+        "1250000",
+        "0",
+        "15"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\gc-handles-benchmark\\baseline.exe",
+        "16",
+        "1250000",
+        "0",
+        "15"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\gc-handles-benchmark\\candidate.exe",
+        "16",
+        "1250000",
+        "0",
+        "15"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\gc-handles-benchmark\\baseline.exe",
+        "16",
+        "1250000",
+        "8",
+        "15"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\gc-handles-benchmark\\candidate.exe",
+        "16",
+        "1250000",
+        "8",
+        "15"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\gc-handles-benchmark\\baseline.exe",
+        "16",
+        "1250000",
+        "8",
+        "15"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\gc-handles-benchmark\\candidate.exe",
+        "16",
+        "1250000",
+        "8",
+        "15"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\gc-handles-benchmark\\candidate.exe",
+        "16",
+        "1250000",
+        "8",
+        "15"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\gc-handles-benchmark\\baseline.exe",
+        "16",
+        "1250000",
+        "8",
+        "15"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\gc-handles-benchmark\\baseline.exe",
+        "16",
+        "1250000",
+        "8",
+        "15"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\gc-handles-benchmark\\candidate.exe",
+        "16",
+        "1250000",
+        "8",
+        "15"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\gc-handles-benchmark\\candidate.exe",
+        "16",
+        "1250000",
+        "8",
+        "15"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\gc-handles-benchmark\\baseline.exe",
+        "16",
+        "1250000",
+        "8",
+        "15"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\gc-handles-benchmark\\baseline.exe",
+        "16",
+        "1250000",
+        "8",
+        "15"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\gc-handles-benchmark\\candidate.exe",
+        "16",
+        "1250000",
+        "8",
+        "15"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\gc-handles-benchmark\\baseline.exe",
+        "16",
+        "1250000",
+        "15",
+        "15"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\gc-handles-benchmark\\candidate.exe",
+        "16",
+        "1250000",
+        "15",
+        "15"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\gc-handles-benchmark\\baseline.exe",
+        "16",
+        "1250000",
+        "15",
+        "15"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\gc-handles-benchmark\\candidate.exe",
+        "16",
+        "1250000",
+        "15",
+        "15"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\gc-handles-benchmark\\candidate.exe",
+        "16",
+        "1250000",
+        "15",
+        "15"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\gc-handles-benchmark\\baseline.exe",
+        "16",
+        "1250000",
+        "15",
+        "15"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\gc-handles-benchmark\\baseline.exe",
+        "16",
+        "1250000",
+        "15",
+        "15"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\gc-handles-benchmark\\candidate.exe",
+        "16",
+        "1250000",
+        "15",
+        "15"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\gc-handles-benchmark\\candidate.exe",
+        "16",
+        "1250000",
+        "15",
+        "15"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\gc-handles-benchmark\\baseline.exe",
+        "16",
+        "1250000",
+        "15",
+        "15"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\gc-handles-benchmark\\baseline.exe",
+        "16",
+        "1250000",
+        "15",
+        "15"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\gc-handles-benchmark\\candidate.exe",
+        "16",
+        "1250000",
+        "15",
+        "15"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\gc-handles-benchmark\\baseline.exe",
+        "256",
+        "78125",
+        "0",
+        "-1"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\gc-handles-benchmark\\candidate.exe",
+        "256",
+        "78125",
+        "0",
+        "-1"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\gc-handles-benchmark\\baseline.exe",
+        "256",
+        "78125",
+        "0",
+        "-1"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\gc-handles-benchmark\\candidate.exe",
+        "256",
+        "78125",
+        "0",
+        "-1"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\gc-handles-benchmark\\candidate.exe",
+        "256",
+        "78125",
+        "0",
+        "-1"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\gc-handles-benchmark\\baseline.exe",
+        "256",
+        "78125",
+        "0",
+        "-1"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\gc-handles-benchmark\\baseline.exe",
+        "256",
+        "78125",
+        "0",
+        "-1"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\gc-handles-benchmark\\candidate.exe",
+        "256",
+        "78125",
+        "0",
+        "-1"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\gc-handles-benchmark\\candidate.exe",
+        "256",
+        "78125",
+        "0",
+        "-1"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\gc-handles-benchmark\\baseline.exe",
+        "256",
+        "78125",
+        "0",
+        "-1"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\gc-handles-benchmark\\baseline.exe",
+        "256",
+        "78125",
+        "0",
+        "-1"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\gc-handles-benchmark\\candidate.exe",
+        "256",
+        "78125",
+        "0",
+        "-1"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\gc-handles-benchmark\\baseline.exe",
+        "256",
+        "78125",
+        "255",
+        "-1"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\gc-handles-benchmark\\candidate.exe",
+        "256",
+        "78125",
+        "255",
+        "-1"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\gc-handles-benchmark\\baseline.exe",
+        "256",
+        "78125",
+        "255",
+        "-1"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\gc-handles-benchmark\\candidate.exe",
+        "256",
+        "78125",
+        "255",
+        "-1"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\gc-handles-benchmark\\candidate.exe",
+        "256",
+        "78125",
+        "255",
+        "-1"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\gc-handles-benchmark\\baseline.exe",
+        "256",
+        "78125",
+        "255",
+        "-1"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\gc-handles-benchmark\\baseline.exe",
+        "256",
+        "78125",
+        "255",
+        "-1"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\gc-handles-benchmark\\candidate.exe",
+        "256",
+        "78125",
+        "255",
+        "-1"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\gc-handles-benchmark\\candidate.exe",
+        "256",
+        "78125",
+        "255",
+        "-1"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\gc-handles-benchmark\\baseline.exe",
+        "256",
+        "78125",
+        "255",
+        "-1"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\gc-handles-benchmark\\baseline.exe",
+        "256",
+        "78125",
+        "255",
+        "-1"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\gc-handles-benchmark\\candidate.exe",
+        "256",
+        "78125",
+        "255",
+        "-1"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\gc-handles-benchmark\\baseline.exe",
+        "256",
+        "78125",
+        "0",
+        "0"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\gc-handles-benchmark\\candidate.exe",
+        "256",
+        "78125",
+        "0",
+        "0"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\gc-handles-benchmark\\baseline.exe",
+        "256",
+        "78125",
+        "0",
+        "0"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\gc-handles-benchmark\\candidate.exe",
+        "256",
+        "78125",
+        "0",
+        "0"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\gc-handles-benchmark\\candidate.exe",
+        "256",
+        "78125",
+        "0",
+        "0"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\gc-handles-benchmark\\baseline.exe",
+        "256",
+        "78125",
+        "0",
+        "0"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\gc-handles-benchmark\\baseline.exe",
+        "256",
+        "78125",
+        "0",
+        "0"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\gc-handles-benchmark\\candidate.exe",
+        "256",
+        "78125",
+        "0",
+        "0"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\gc-handles-benchmark\\candidate.exe",
+        "256",
+        "78125",
+        "0",
+        "0"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\gc-handles-benchmark\\baseline.exe",
+        "256",
+        "78125",
+        "0",
+        "0"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\gc-handles-benchmark\\baseline.exe",
+        "256",
+        "78125",
+        "0",
+        "0"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\gc-handles-benchmark\\candidate.exe",
+        "256",
+        "78125",
+        "0",
+        "0"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\gc-handles-benchmark\\baseline.exe",
+        "256",
+        "78125",
+        "0",
+        "255"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\gc-handles-benchmark\\candidate.exe",
+        "256",
+        "78125",
+        "0",
+        "255"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\gc-handles-benchmark\\baseline.exe",
+        "256",
+        "78125",
+        "0",
+        "255"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\gc-handles-benchmark\\candidate.exe",
+        "256",
+        "78125",
+        "0",
+        "255"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\gc-handles-benchmark\\candidate.exe",
+        "256",
+        "78125",
+        "0",
+        "255"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\gc-handles-benchmark\\baseline.exe",
+        "256",
+        "78125",
+        "0",
+        "255"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\gc-handles-benchmark\\baseline.exe",
+        "256",
+        "78125",
+        "0",
+        "255"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\gc-handles-benchmark\\candidate.exe",
+        "256",
+        "78125",
+        "0",
+        "255"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\gc-handles-benchmark\\candidate.exe",
+        "256",
+        "78125",
+        "0",
+        "255"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\gc-handles-benchmark\\baseline.exe",
+        "256",
+        "78125",
+        "0",
+        "255"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\gc-handles-benchmark\\baseline.exe",
+        "256",
+        "78125",
+        "0",
+        "255"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\gc-handles-benchmark\\candidate.exe",
+        "256",
+        "78125",
+        "0",
+        "255"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\gc-handles-benchmark\\baseline.exe",
+        "256",
+        "78125",
+        "128",
+        "255"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\gc-handles-benchmark\\candidate.exe",
+        "256",
+        "78125",
+        "128",
+        "255"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\gc-handles-benchmark\\baseline.exe",
+        "256",
+        "78125",
+        "128",
+        "255"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\gc-handles-benchmark\\candidate.exe",
+        "256",
+        "78125",
+        "128",
+        "255"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\gc-handles-benchmark\\candidate.exe",
+        "256",
+        "78125",
+        "128",
+        "255"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\gc-handles-benchmark\\baseline.exe",
+        "256",
+        "78125",
+        "128",
+        "255"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\gc-handles-benchmark\\baseline.exe",
+        "256",
+        "78125",
+        "128",
+        "255"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\gc-handles-benchmark\\candidate.exe",
+        "256",
+        "78125",
+        "128",
+        "255"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\gc-handles-benchmark\\candidate.exe",
+        "256",
+        "78125",
+        "128",
+        "255"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\gc-handles-benchmark\\baseline.exe",
+        "256",
+        "78125",
+        "128",
+        "255"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\gc-handles-benchmark\\baseline.exe",
+        "256",
+        "78125",
+        "128",
+        "255"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\gc-handles-benchmark\\candidate.exe",
+        "256",
+        "78125",
+        "128",
+        "255"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\gc-handles-benchmark\\baseline.exe",
+        "256",
+        "78125",
+        "255",
+        "255"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\gc-handles-benchmark\\candidate.exe",
+        "256",
+        "78125",
+        "255",
+        "255"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\gc-handles-benchmark\\baseline.exe",
+        "256",
+        "78125",
+        "255",
+        "255"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\gc-handles-benchmark\\candidate.exe",
+        "256",
+        "78125",
+        "255",
+        "255"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\gc-handles-benchmark\\candidate.exe",
+        "256",
+        "78125",
+        "255",
+        "255"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\gc-handles-benchmark\\baseline.exe",
+        "256",
+        "78125",
+        "255",
+        "255"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\gc-handles-benchmark\\baseline.exe",
+        "256",
+        "78125",
+        "255",
+        "255"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\gc-handles-benchmark\\candidate.exe",
+        "256",
+        "78125",
+        "255",
+        "255"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\gc-handles-benchmark\\candidate.exe",
+        "256",
+        "78125",
+        "255",
+        "255"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\gc-handles-benchmark\\baseline.exe",
+        "256",
+        "78125",
+        "255",
+        "255"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\gc-handles-benchmark\\baseline.exe",
+        "256",
+        "78125",
+        "255",
+        "255"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\gc-handles-benchmark\\candidate.exe",
+        "256",
+        "78125",
+        "255",
+        "255"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\gc-handles-benchmark\\baseline.exe",
+        "4096",
+        "10000",
+        "0",
+        "-1"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\gc-handles-benchmark\\candidate.exe",
+        "4096",
+        "10000",
+        "0",
+        "-1"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\gc-handles-benchmark\\baseline.exe",
+        "4096",
+        "10000",
+        "0",
+        "-1"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\gc-handles-benchmark\\candidate.exe",
+        "4096",
+        "10000",
+        "0",
+        "-1"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\gc-handles-benchmark\\candidate.exe",
+        "4096",
+        "10000",
+        "0",
+        "-1"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\gc-handles-benchmark\\baseline.exe",
+        "4096",
+        "10000",
+        "0",
+        "-1"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\gc-handles-benchmark\\baseline.exe",
+        "4096",
+        "10000",
+        "0",
+        "-1"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\gc-handles-benchmark\\candidate.exe",
+        "4096",
+        "10000",
+        "0",
+        "-1"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\gc-handles-benchmark\\candidate.exe",
+        "4096",
+        "10000",
+        "0",
+        "-1"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\gc-handles-benchmark\\baseline.exe",
+        "4096",
+        "10000",
+        "0",
+        "-1"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\gc-handles-benchmark\\baseline.exe",
+        "4096",
+        "10000",
+        "0",
+        "-1"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\gc-handles-benchmark\\candidate.exe",
+        "4096",
+        "10000",
+        "0",
+        "-1"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\gc-handles-benchmark\\baseline.exe",
+        "4096",
+        "10000",
+        "4095",
+        "-1"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\gc-handles-benchmark\\candidate.exe",
+        "4096",
+        "10000",
+        "4095",
+        "-1"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\gc-handles-benchmark\\baseline.exe",
+        "4096",
+        "10000",
+        "4095",
+        "-1"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\gc-handles-benchmark\\candidate.exe",
+        "4096",
+        "10000",
+        "4095",
+        "-1"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\gc-handles-benchmark\\candidate.exe",
+        "4096",
+        "10000",
+        "4095",
+        "-1"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\gc-handles-benchmark\\baseline.exe",
+        "4096",
+        "10000",
+        "4095",
+        "-1"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\gc-handles-benchmark\\baseline.exe",
+        "4096",
+        "10000",
+        "4095",
+        "-1"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\gc-handles-benchmark\\candidate.exe",
+        "4096",
+        "10000",
+        "4095",
+        "-1"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\gc-handles-benchmark\\candidate.exe",
+        "4096",
+        "10000",
+        "4095",
+        "-1"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\gc-handles-benchmark\\baseline.exe",
+        "4096",
+        "10000",
+        "4095",
+        "-1"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\gc-handles-benchmark\\baseline.exe",
+        "4096",
+        "10000",
+        "4095",
+        "-1"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\gc-handles-benchmark\\candidate.exe",
+        "4096",
+        "10000",
+        "4095",
+        "-1"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\gc-handles-benchmark\\baseline.exe",
+        "4096",
+        "10000",
+        "0",
+        "0"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\gc-handles-benchmark\\candidate.exe",
+        "4096",
+        "10000",
+        "0",
+        "0"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\gc-handles-benchmark\\baseline.exe",
+        "4096",
+        "10000",
+        "0",
+        "0"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\gc-handles-benchmark\\candidate.exe",
+        "4096",
+        "10000",
+        "0",
+        "0"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\gc-handles-benchmark\\candidate.exe",
+        "4096",
+        "10000",
+        "0",
+        "0"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\gc-handles-benchmark\\baseline.exe",
+        "4096",
+        "10000",
+        "0",
+        "0"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\gc-handles-benchmark\\baseline.exe",
+        "4096",
+        "10000",
+        "0",
+        "0"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\gc-handles-benchmark\\candidate.exe",
+        "4096",
+        "10000",
+        "0",
+        "0"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\gc-handles-benchmark\\candidate.exe",
+        "4096",
+        "10000",
+        "0",
+        "0"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\gc-handles-benchmark\\baseline.exe",
+        "4096",
+        "10000",
+        "0",
+        "0"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\gc-handles-benchmark\\baseline.exe",
+        "4096",
+        "10000",
+        "0",
+        "0"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\gc-handles-benchmark\\candidate.exe",
+        "4096",
+        "10000",
+        "0",
+        "0"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\gc-handles-benchmark\\baseline.exe",
+        "4096",
+        "10000",
+        "0",
+        "4095"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\gc-handles-benchmark\\candidate.exe",
+        "4096",
+        "10000",
+        "0",
+        "4095"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\gc-handles-benchmark\\baseline.exe",
+        "4096",
+        "10000",
+        "0",
+        "4095"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\gc-handles-benchmark\\candidate.exe",
+        "4096",
+        "10000",
+        "0",
+        "4095"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\gc-handles-benchmark\\candidate.exe",
+        "4096",
+        "10000",
+        "0",
+        "4095"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\gc-handles-benchmark\\baseline.exe",
+        "4096",
+        "10000",
+        "0",
+        "4095"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\gc-handles-benchmark\\baseline.exe",
+        "4096",
+        "10000",
+        "0",
+        "4095"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\gc-handles-benchmark\\candidate.exe",
+        "4096",
+        "10000",
+        "0",
+        "4095"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\gc-handles-benchmark\\candidate.exe",
+        "4096",
+        "10000",
+        "0",
+        "4095"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\gc-handles-benchmark\\baseline.exe",
+        "4096",
+        "10000",
+        "0",
+        "4095"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\gc-handles-benchmark\\baseline.exe",
+        "4096",
+        "10000",
+        "0",
+        "4095"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\gc-handles-benchmark\\candidate.exe",
+        "4096",
+        "10000",
+        "0",
+        "4095"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\gc-handles-benchmark\\baseline.exe",
+        "4096",
+        "10000",
+        "2048",
+        "4095"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\gc-handles-benchmark\\candidate.exe",
+        "4096",
+        "10000",
+        "2048",
+        "4095"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\gc-handles-benchmark\\baseline.exe",
+        "4096",
+        "10000",
+        "2048",
+        "4095"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\gc-handles-benchmark\\candidate.exe",
+        "4096",
+        "10000",
+        "2048",
+        "4095"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\gc-handles-benchmark\\candidate.exe",
+        "4096",
+        "10000",
+        "2048",
+        "4095"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\gc-handles-benchmark\\baseline.exe",
+        "4096",
+        "10000",
+        "2048",
+        "4095"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\gc-handles-benchmark\\baseline.exe",
+        "4096",
+        "10000",
+        "2048",
+        "4095"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\gc-handles-benchmark\\candidate.exe",
+        "4096",
+        "10000",
+        "2048",
+        "4095"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\gc-handles-benchmark\\candidate.exe",
+        "4096",
+        "10000",
+        "2048",
+        "4095"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\gc-handles-benchmark\\baseline.exe",
+        "4096",
+        "10000",
+        "2048",
+        "4095"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\gc-handles-benchmark\\baseline.exe",
+        "4096",
+        "10000",
+        "2048",
+        "4095"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\gc-handles-benchmark\\candidate.exe",
+        "4096",
+        "10000",
+        "2048",
+        "4095"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\gc-handles-benchmark\\baseline.exe",
+        "4096",
+        "10000",
+        "4095",
+        "4095"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\gc-handles-benchmark\\candidate.exe",
+        "4096",
+        "10000",
+        "4095",
+        "4095"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\gc-handles-benchmark\\baseline.exe",
+        "4096",
+        "10000",
+        "4095",
+        "4095"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\gc-handles-benchmark\\candidate.exe",
+        "4096",
+        "10000",
+        "4095",
+        "4095"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\gc-handles-benchmark\\candidate.exe",
+        "4096",
+        "10000",
+        "4095",
+        "4095"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\gc-handles-benchmark\\baseline.exe",
+        "4096",
+        "10000",
+        "4095",
+        "4095"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\gc-handles-benchmark\\baseline.exe",
+        "4096",
+        "10000",
+        "4095",
+        "4095"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\gc-handles-benchmark\\candidate.exe",
+        "4096",
+        "10000",
+        "4095",
+        "4095"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\gc-handles-benchmark\\candidate.exe",
+        "4096",
+        "10000",
+        "4095",
+        "4095"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\gc-handles-benchmark\\baseline.exe",
+        "4096",
+        "10000",
+        "4095",
+        "4095"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\gc-handles-benchmark\\baseline.exe",
+        "4096",
+        "10000",
+        "4095",
+        "4095"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\gc-handles-benchmark\\candidate.exe",
+        "4096",
+        "10000",
+        "4095",
+        "4095"
+      ],
+      "exitCode": 0
+    }
+  ],
+  "cases": [
+    {
+      "nodes": 16,
+      "position": 0,
+      "ownerPosition": -1,
+      "iterations": 1250000,
+      "samples": [
+        {
+          "round": 0,
+          "mode": "baseline",
+          "seconds": 0.0521014,
+          "operations": 1250000
+        },
+        {
+          "round": 0,
+          "mode": "candidate",
+          "seconds": 0.0514613,
+          "operations": 1250000
+        },
+        {
+          "round": 1,
+          "mode": "candidate",
+          "seconds": 0.0517356,
+          "operations": 1250000
+        },
+        {
+          "round": 1,
+          "mode": "baseline",
+          "seconds": 0.0512268,
+          "operations": 1250000
+        },
+        {
+          "round": 2,
+          "mode": "baseline",
+          "seconds": 0.0510943,
+          "operations": 1250000
+        },
+        {
+          "round": 2,
+          "mode": "candidate",
+          "seconds": 0.0514422,
+          "operations": 1250000
+        },
+        {
+          "round": 3,
+          "mode": "candidate",
+          "seconds": 0.0514267,
+          "operations": 1250000
+        },
+        {
+          "round": 3,
+          "mode": "baseline",
+          "seconds": 0.0534872,
+          "operations": 1250000
+        },
+        {
+          "round": 4,
+          "mode": "baseline",
+          "seconds": 0.0513519,
+          "operations": 1250000
+        },
+        {
+          "round": 4,
+          "mode": "candidate",
+          "seconds": 0.0514603,
+          "operations": 1250000
+        }
+      ],
+      "warmup": [
+        {
+          "mode": "baseline",
+          "seconds": 0.0510681,
+          "operations": 1250000
+        },
+        {
+          "mode": "candidate",
+          "seconds": 0.0527485,
+          "operations": 1250000
+        }
+      ],
+      "medians": {
+        "baseline": 0.0513519,
+        "candidate": 0.0514603
+      },
+      "speedup": 0.9978935218022437
+    },
+    {
+      "nodes": 16,
+      "position": 15,
+      "ownerPosition": -1,
+      "iterations": 1250000,
+      "samples": [
+        {
+          "round": 0,
+          "mode": "baseline",
+          "seconds": 0.0778061,
+          "operations": 1250000
+        },
+        {
+          "round": 0,
+          "mode": "candidate",
+          "seconds": 0.066109,
+          "operations": 1250000
+        },
+        {
+          "round": 1,
+          "mode": "candidate",
+          "seconds": 0.0656391,
+          "operations": 1250000
+        },
+        {
+          "round": 1,
+          "mode": "baseline",
+          "seconds": 0.0780317,
+          "operations": 1250000
+        },
+        {
+          "round": 2,
+          "mode": "baseline",
+          "seconds": 0.0830047,
+          "operations": 1250000
+        },
+        {
+          "round": 2,
+          "mode": "candidate",
+          "seconds": 0.0657195,
+          "operations": 1250000
+        },
+        {
+          "round": 3,
+          "mode": "candidate",
+          "seconds": 0.0691265,
+          "operations": 1250000
+        },
+        {
+          "round": 3,
+          "mode": "baseline",
+          "seconds": 0.0779462,
+          "operations": 1250000
+        },
+        {
+          "round": 4,
+          "mode": "baseline",
+          "seconds": 0.0783369,
+          "operations": 1250000
+        },
+        {
+          "round": 4,
+          "mode": "candidate",
+          "seconds": 0.0669034,
+          "operations": 1250000
+        }
+      ],
+      "warmup": [
+        {
+          "mode": "baseline",
+          "seconds": 0.0780732,
+          "operations": 1250000
+        },
+        {
+          "mode": "candidate",
+          "seconds": 0.0695338,
+          "operations": 1250000
+        }
+      ],
+      "medians": {
+        "baseline": 0.0780317,
+        "candidate": 0.066109
+      },
+      "speedup": 1.1803491203920797
+    },
+    {
+      "nodes": 16,
+      "position": 0,
+      "ownerPosition": 0,
+      "iterations": 1250000,
+      "samples": [
+        {
+          "round": 0,
+          "mode": "baseline",
+          "seconds": 0.0520502,
+          "operations": 1250000
+        },
+        {
+          "round": 0,
+          "mode": "candidate",
+          "seconds": 0.0518596,
+          "operations": 1250000
+        },
+        {
+          "round": 1,
+          "mode": "candidate",
+          "seconds": 0.0517781,
+          "operations": 1250000
+        },
+        {
+          "round": 1,
+          "mode": "baseline",
+          "seconds": 0.0520955,
+          "operations": 1250000
+        },
+        {
+          "round": 2,
+          "mode": "baseline",
+          "seconds": 0.0518655,
+          "operations": 1250000
+        },
+        {
+          "round": 2,
+          "mode": "candidate",
+          "seconds": 0.0558346,
+          "operations": 1250000
+        },
+        {
+          "round": 3,
+          "mode": "candidate",
+          "seconds": 0.0520983,
+          "operations": 1250000
+        },
+        {
+          "round": 3,
+          "mode": "baseline",
+          "seconds": 0.0518163,
+          "operations": 1250000
+        },
+        {
+          "round": 4,
+          "mode": "baseline",
+          "seconds": 0.0582789,
+          "operations": 1250000
+        },
+        {
+          "round": 4,
+          "mode": "candidate",
+          "seconds": 0.05195,
+          "operations": 1250000
+        }
+      ],
+      "warmup": [
+        {
+          "mode": "baseline",
+          "seconds": 0.0525958,
+          "operations": 1250000
+        },
+        {
+          "mode": "candidate",
+          "seconds": 0.0544488,
+          "operations": 1250000
+        }
+      ],
+      "medians": {
+        "baseline": 0.0520502,
+        "candidate": 0.05195
+      },
+      "speedup": 1.0019287776708372
+    },
+    {
+      "nodes": 16,
+      "position": 0,
+      "ownerPosition": 15,
+      "iterations": 1250000,
+      "samples": [
+        {
+          "round": 0,
+          "mode": "baseline",
+          "seconds": 0.0804993,
+          "operations": 1250000
+        },
+        {
+          "round": 0,
+          "mode": "candidate",
+          "seconds": 0.0699806,
+          "operations": 1250000
+        },
+        {
+          "round": 1,
+          "mode": "candidate",
+          "seconds": 0.0683666,
+          "operations": 1250000
+        },
+        {
+          "round": 1,
+          "mode": "baseline",
+          "seconds": 0.0802495,
+          "operations": 1250000
+        },
+        {
+          "round": 2,
+          "mode": "baseline",
+          "seconds": 0.0802409,
+          "operations": 1250000
+        },
+        {
+          "round": 2,
+          "mode": "candidate",
+          "seconds": 0.0665185,
+          "operations": 1250000
+        },
+        {
+          "round": 3,
+          "mode": "candidate",
+          "seconds": 0.0664264,
+          "operations": 1250000
+        },
+        {
+          "round": 3,
+          "mode": "baseline",
+          "seconds": 0.0807352,
+          "operations": 1250000
+        },
+        {
+          "round": 4,
+          "mode": "baseline",
+          "seconds": 0.079978,
+          "operations": 1250000
+        },
+        {
+          "round": 4,
+          "mode": "candidate",
+          "seconds": 0.0671033,
+          "operations": 1250000
+        }
+      ],
+      "warmup": [
+        {
+          "mode": "baseline",
+          "seconds": 0.0815159,
+          "operations": 1250000
+        },
+        {
+          "mode": "candidate",
+          "seconds": 0.069984,
+          "operations": 1250000
+        }
+      ],
+      "medians": {
+        "baseline": 0.0802495,
+        "candidate": 0.0671033
+      },
+      "speedup": 1.1959098881873171
+    },
+    {
+      "nodes": 16,
+      "position": 8,
+      "ownerPosition": 15,
+      "iterations": 1250000,
+      "samples": [
+        {
+          "round": 0,
+          "mode": "baseline",
+          "seconds": 0.0884525,
+          "operations": 1250000
+        },
+        {
+          "round": 0,
+          "mode": "candidate",
+          "seconds": 0.0661836,
+          "operations": 1250000
+        },
+        {
+          "round": 1,
+          "mode": "candidate",
+          "seconds": 0.0676997,
+          "operations": 1250000
+        },
+        {
+          "round": 1,
+          "mode": "baseline",
+          "seconds": 0.0849107,
+          "operations": 1250000
+        },
+        {
+          "round": 2,
+          "mode": "baseline",
+          "seconds": 0.084875,
+          "operations": 1250000
+        },
+        {
+          "round": 2,
+          "mode": "candidate",
+          "seconds": 0.066385,
+          "operations": 1250000
+        },
+        {
+          "round": 3,
+          "mode": "candidate",
+          "seconds": 0.066221,
+          "operations": 1250000
+        },
+        {
+          "round": 3,
+          "mode": "baseline",
+          "seconds": 0.0850936,
+          "operations": 1250000
+        },
+        {
+          "round": 4,
+          "mode": "baseline",
+          "seconds": 0.0847378,
+          "operations": 1250000
+        },
+        {
+          "round": 4,
+          "mode": "candidate",
+          "seconds": 0.0662739,
+          "operations": 1250000
+        }
+      ],
+      "warmup": [
+        {
+          "mode": "baseline",
+          "seconds": 0.0841741,
+          "operations": 1250000
+        },
+        {
+          "mode": "candidate",
+          "seconds": 0.066286,
+          "operations": 1250000
+        }
+      ],
+      "medians": {
+        "baseline": 0.0849107,
+        "candidate": 0.0662739
+      },
+      "speedup": 1.2812087412993654
+    },
+    {
+      "nodes": 16,
+      "position": 15,
+      "ownerPosition": 15,
+      "iterations": 1250000,
+      "samples": [
+        {
+          "round": 0,
+          "mode": "baseline",
+          "seconds": 0.0986262,
+          "operations": 1250000
+        },
+        {
+          "round": 0,
+          "mode": "candidate",
+          "seconds": 0.0670403,
+          "operations": 1250000
+        },
+        {
+          "round": 1,
+          "mode": "candidate",
+          "seconds": 0.0667638,
+          "operations": 1250000
+        },
+        {
+          "round": 1,
+          "mode": "baseline",
+          "seconds": 0.099952,
+          "operations": 1250000
+        },
+        {
+          "round": 2,
+          "mode": "baseline",
+          "seconds": 0.1009991,
+          "operations": 1250000
+        },
+        {
+          "round": 2,
+          "mode": "candidate",
+          "seconds": 0.0669725,
+          "operations": 1250000
+        },
+        {
+          "round": 3,
+          "mode": "candidate",
+          "seconds": 0.0661211,
+          "operations": 1250000
+        },
+        {
+          "round": 3,
+          "mode": "baseline",
+          "seconds": 0.1001449,
+          "operations": 1250000
+        },
+        {
+          "round": 4,
+          "mode": "baseline",
+          "seconds": 0.1007799,
+          "operations": 1250000
+        },
+        {
+          "round": 4,
+          "mode": "candidate",
+          "seconds": 0.0660068,
+          "operations": 1250000
+        }
+      ],
+      "warmup": [
+        {
+          "mode": "baseline",
+          "seconds": 0.0997208,
+          "operations": 1250000
+        },
+        {
+          "mode": "candidate",
+          "seconds": 0.068107,
+          "operations": 1250000
+        }
+      ],
+      "medians": {
+        "baseline": 0.1001449,
+        "candidate": 0.0667638
+      },
+      "speedup": 1.499988017458563
+    },
+    {
+      "nodes": 256,
+      "position": 0,
+      "ownerPosition": -1,
+      "iterations": 78125,
+      "samples": [
+        {
+          "round": 0,
+          "mode": "baseline",
+          "seconds": 0.0375382,
+          "operations": 78125
+        },
+        {
+          "round": 0,
+          "mode": "candidate",
+          "seconds": 0.0391443,
+          "operations": 78125
+        },
+        {
+          "round": 1,
+          "mode": "candidate",
+          "seconds": 0.037347,
+          "operations": 78125
+        },
+        {
+          "round": 1,
+          "mode": "baseline",
+          "seconds": 0.0380277,
+          "operations": 78125
+        },
+        {
+          "round": 2,
+          "mode": "baseline",
+          "seconds": 0.0374326,
+          "operations": 78125
+        },
+        {
+          "round": 2,
+          "mode": "candidate",
+          "seconds": 0.0373503,
+          "operations": 78125
+        },
+        {
+          "round": 3,
+          "mode": "candidate",
+          "seconds": 0.0374125,
+          "operations": 78125
+        },
+        {
+          "round": 3,
+          "mode": "baseline",
+          "seconds": 0.0373666,
+          "operations": 78125
+        },
+        {
+          "round": 4,
+          "mode": "baseline",
+          "seconds": 0.0377471,
+          "operations": 78125
+        },
+        {
+          "round": 4,
+          "mode": "candidate",
+          "seconds": 0.0377664,
+          "operations": 78125
+        }
+      ],
+      "warmup": [
+        {
+          "mode": "baseline",
+          "seconds": 0.0374354,
+          "operations": 78125
+        },
+        {
+          "mode": "candidate",
+          "seconds": 0.037358,
+          "operations": 78125
+        }
+      ],
+      "medians": {
+        "baseline": 0.0375382,
+        "candidate": 0.0374125
+      },
+      "speedup": 1.0033598396257934
+    },
+    {
+      "nodes": 256,
+      "position": 255,
+      "ownerPosition": -1,
+      "iterations": 78125,
+      "samples": [
+        {
+          "round": 0,
+          "mode": "baseline",
+          "seconds": 0.076433,
+          "operations": 78125
+        },
+        {
+          "round": 0,
+          "mode": "candidate",
+          "seconds": 0.0534953,
+          "operations": 78125
+        },
+        {
+          "round": 1,
+          "mode": "candidate",
+          "seconds": 0.053585,
+          "operations": 78125
+        },
+        {
+          "round": 1,
+          "mode": "baseline",
+          "seconds": 0.0760627,
+          "operations": 78125
+        },
+        {
+          "round": 2,
+          "mode": "baseline",
+          "seconds": 0.0781273,
+          "operations": 78125
+        },
+        {
+          "round": 2,
+          "mode": "candidate",
+          "seconds": 0.053591,
+          "operations": 78125
+        },
+        {
+          "round": 3,
+          "mode": "candidate",
+          "seconds": 0.0536188,
+          "operations": 78125
+        },
+        {
+          "round": 3,
+          "mode": "baseline",
+          "seconds": 0.0762129,
+          "operations": 78125
+        },
+        {
+          "round": 4,
+          "mode": "baseline",
+          "seconds": 0.0795825,
+          "operations": 78125
+        },
+        {
+          "round": 4,
+          "mode": "candidate",
+          "seconds": 0.0530449,
+          "operations": 78125
+        }
+      ],
+      "warmup": [
+        {
+          "mode": "baseline",
+          "seconds": 0.0777023,
+          "operations": 78125
+        },
+        {
+          "mode": "candidate",
+          "seconds": 0.0537495,
+          "operations": 78125
+        }
+      ],
+      "medians": {
+        "baseline": 0.076433,
+        "candidate": 0.053585
+      },
+      "speedup": 1.4263879817112999
+    },
+    {
+      "nodes": 256,
+      "position": 0,
+      "ownerPosition": 0,
+      "iterations": 78125,
+      "samples": [
+        {
+          "round": 0,
+          "mode": "baseline",
+          "seconds": 0.037527,
+          "operations": 78125
+        },
+        {
+          "round": 0,
+          "mode": "candidate",
+          "seconds": 0.0373956,
+          "operations": 78125
+        },
+        {
+          "round": 1,
+          "mode": "candidate",
+          "seconds": 0.0375364,
+          "operations": 78125
+        },
+        {
+          "round": 1,
+          "mode": "baseline",
+          "seconds": 0.0391134,
+          "operations": 78125
+        },
+        {
+          "round": 2,
+          "mode": "baseline",
+          "seconds": 0.0375529,
+          "operations": 78125
+        },
+        {
+          "round": 2,
+          "mode": "candidate",
+          "seconds": 0.0373166,
+          "operations": 78125
+        },
+        {
+          "round": 3,
+          "mode": "candidate",
+          "seconds": 0.0373879,
+          "operations": 78125
+        },
+        {
+          "round": 3,
+          "mode": "baseline",
+          "seconds": 0.0376556,
+          "operations": 78125
+        },
+        {
+          "round": 4,
+          "mode": "baseline",
+          "seconds": 0.0375285,
+          "operations": 78125
+        },
+        {
+          "round": 4,
+          "mode": "candidate",
+          "seconds": 0.0373733,
+          "operations": 78125
+        }
+      ],
+      "warmup": [
+        {
+          "mode": "baseline",
+          "seconds": 0.0383853,
+          "operations": 78125
+        },
+        {
+          "mode": "candidate",
+          "seconds": 0.0372869,
+          "operations": 78125
+        }
+      ],
+      "medians": {
+        "baseline": 0.0375529,
+        "candidate": 0.0373879
+      },
+      "speedup": 1.004413192503457
+    },
+    {
+      "nodes": 256,
+      "position": 0,
+      "ownerPosition": 255,
+      "iterations": 78125,
+      "samples": [
+        {
+          "round": 0,
+          "mode": "baseline",
+          "seconds": 0.0783404,
+          "operations": 78125
+        },
+        {
+          "round": 0,
+          "mode": "candidate",
+          "seconds": 0.0547002,
+          "operations": 78125
+        },
+        {
+          "round": 1,
+          "mode": "candidate",
+          "seconds": 0.052478,
+          "operations": 78125
+        },
+        {
+          "round": 1,
+          "mode": "baseline",
+          "seconds": 0.0771412,
+          "operations": 78125
+        },
+        {
+          "round": 2,
+          "mode": "baseline",
+          "seconds": 0.0768421,
+          "operations": 78125
+        },
+        {
+          "round": 2,
+          "mode": "candidate",
+          "seconds": 0.0524619,
+          "operations": 78125
+        },
+        {
+          "round": 3,
+          "mode": "candidate",
+          "seconds": 0.0525631,
+          "operations": 78125
+        },
+        {
+          "round": 3,
+          "mode": "baseline",
+          "seconds": 0.0767638,
+          "operations": 78125
+        },
+        {
+          "round": 4,
+          "mode": "baseline",
+          "seconds": 0.0779724,
+          "operations": 78125
+        },
+        {
+          "round": 4,
+          "mode": "candidate",
+          "seconds": 0.0523306,
+          "operations": 78125
+        }
+      ],
+      "warmup": [
+        {
+          "mode": "baseline",
+          "seconds": 0.0767268,
+          "operations": 78125
+        },
+        {
+          "mode": "candidate",
+          "seconds": 0.0523425,
+          "operations": 78125
+        }
+      ],
+      "medians": {
+        "baseline": 0.0771412,
+        "candidate": 0.052478
+      },
+      "speedup": 1.4699721788177902
+    },
+    {
+      "nodes": 256,
+      "position": 128,
+      "ownerPosition": 255,
+      "iterations": 78125,
+      "samples": [
+        {
+          "round": 0,
+          "mode": "baseline",
+          "seconds": 0.0974908,
+          "operations": 78125
+        },
+        {
+          "round": 0,
+          "mode": "candidate",
+          "seconds": 0.053723,
+          "operations": 78125
+        },
+        {
+          "round": 1,
+          "mode": "candidate",
+          "seconds": 0.0536747,
+          "operations": 78125
+        },
+        {
+          "round": 1,
+          "mode": "baseline",
+          "seconds": 0.0977402,
+          "operations": 78125
+        },
+        {
+          "round": 2,
+          "mode": "baseline",
+          "seconds": 0.0975163,
+          "operations": 78125
+        },
+        {
+          "round": 2,
+          "mode": "candidate",
+          "seconds": 0.0537712,
+          "operations": 78125
+        },
+        {
+          "round": 3,
+          "mode": "candidate",
+          "seconds": 0.0538252,
+          "operations": 78125
+        },
+        {
+          "round": 3,
+          "mode": "baseline",
+          "seconds": 0.0985317,
+          "operations": 78125
+        },
+        {
+          "round": 4,
+          "mode": "baseline",
+          "seconds": 0.0992186,
+          "operations": 78125
+        },
+        {
+          "round": 4,
+          "mode": "candidate",
+          "seconds": 0.0540325,
+          "operations": 78125
+        }
+      ],
+      "warmup": [
+        {
+          "mode": "baseline",
+          "seconds": 0.0976834,
+          "operations": 78125
+        },
+        {
+          "mode": "candidate",
+          "seconds": 0.0540699,
+          "operations": 78125
+        }
+      ],
+      "medians": {
+        "baseline": 0.0977402,
+        "candidate": 0.0537712
+      },
+      "speedup": 1.8177053887582943
+    },
+    {
+      "nodes": 256,
+      "position": 255,
+      "ownerPosition": 255,
+      "iterations": 78125,
+      "samples": [
+        {
+          "round": 0,
+          "mode": "baseline",
+          "seconds": 0.1180337,
+          "operations": 78125
+        },
+        {
+          "round": 0,
+          "mode": "candidate",
+          "seconds": 0.0573509,
+          "operations": 78125
+        },
+        {
+          "round": 1,
+          "mode": "candidate",
+          "seconds": 0.0527801,
+          "operations": 78125
+        },
+        {
+          "round": 1,
+          "mode": "baseline",
+          "seconds": 0.1176199,
+          "operations": 78125
+        },
+        {
+          "round": 2,
+          "mode": "baseline",
+          "seconds": 0.1181866,
+          "operations": 78125
+        },
+        {
+          "round": 2,
+          "mode": "candidate",
+          "seconds": 0.0537646,
+          "operations": 78125
+        },
+        {
+          "round": 3,
+          "mode": "candidate",
+          "seconds": 0.0549872,
+          "operations": 78125
+        },
+        {
+          "round": 3,
+          "mode": "baseline",
+          "seconds": 0.1175273,
+          "operations": 78125
+        },
+        {
+          "round": 4,
+          "mode": "baseline",
+          "seconds": 0.1174314,
+          "operations": 78125
+        },
+        {
+          "round": 4,
+          "mode": "candidate",
+          "seconds": 0.0535713,
+          "operations": 78125
+        }
+      ],
+      "warmup": [
+        {
+          "mode": "baseline",
+          "seconds": 0.1174297,
+          "operations": 78125
+        },
+        {
+          "mode": "candidate",
+          "seconds": 0.0538953,
+          "operations": 78125
+        }
+      ],
+      "medians": {
+        "baseline": 0.1176199,
+        "candidate": 0.0537646
+      },
+      "speedup": 2.18768297355509
+    },
+    {
+      "nodes": 4096,
+      "position": 0,
+      "ownerPosition": -1,
+      "iterations": 10000,
+      "samples": [
+        {
+          "round": 0,
+          "mode": "baseline",
+          "seconds": 0.0759663,
+          "operations": 10000
+        },
+        {
+          "round": 0,
+          "mode": "candidate",
+          "seconds": 0.0760897,
+          "operations": 10000
+        },
+        {
+          "round": 1,
+          "mode": "candidate",
+          "seconds": 0.0763534,
+          "operations": 10000
+        },
+        {
+          "round": 1,
+          "mode": "baseline",
+          "seconds": 0.0748347,
+          "operations": 10000
+        },
+        {
+          "round": 2,
+          "mode": "baseline",
+          "seconds": 0.0764358,
+          "operations": 10000
+        },
+        {
+          "round": 2,
+          "mode": "candidate",
+          "seconds": 0.0764415,
+          "operations": 10000
+        },
+        {
+          "round": 3,
+          "mode": "candidate",
+          "seconds": 0.0778055,
+          "operations": 10000
+        },
+        {
+          "round": 3,
+          "mode": "baseline",
+          "seconds": 0.0756553,
+          "operations": 10000
+        },
+        {
+          "round": 4,
+          "mode": "baseline",
+          "seconds": 0.0747875,
+          "operations": 10000
+        },
+        {
+          "round": 4,
+          "mode": "candidate",
+          "seconds": 0.0753273,
+          "operations": 10000
+        }
+      ],
+      "warmup": [
+        {
+          "mode": "baseline",
+          "seconds": 0.0758212,
+          "operations": 10000
+        },
+        {
+          "mode": "candidate",
+          "seconds": 0.0756387,
+          "operations": 10000
+        }
+      ],
+      "medians": {
+        "baseline": 0.0756553,
+        "candidate": 0.0763534
+      },
+      "speedup": 0.9908569886868167
+    },
+    {
+      "nodes": 4096,
+      "position": 4095,
+      "ownerPosition": -1,
+      "iterations": 10000,
+      "samples": [
+        {
+          "round": 0,
+          "mode": "baseline",
+          "seconds": 0.1578288,
+          "operations": 10000
+        },
+        {
+          "round": 0,
+          "mode": "candidate",
+          "seconds": 0.1071817,
+          "operations": 10000
+        },
+        {
+          "round": 1,
+          "mode": "candidate",
+          "seconds": 0.1065859,
+          "operations": 10000
+        },
+        {
+          "round": 1,
+          "mode": "baseline",
+          "seconds": 0.1565898,
+          "operations": 10000
+        },
+        {
+          "round": 2,
+          "mode": "baseline",
+          "seconds": 0.1605202,
+          "operations": 10000
+        },
+        {
+          "round": 2,
+          "mode": "candidate",
+          "seconds": 0.1075533,
+          "operations": 10000
+        },
+        {
+          "round": 3,
+          "mode": "candidate",
+          "seconds": 0.1066322,
+          "operations": 10000
+        },
+        {
+          "round": 3,
+          "mode": "baseline",
+          "seconds": 0.1568594,
+          "operations": 10000
+        },
+        {
+          "round": 4,
+          "mode": "baseline",
+          "seconds": 0.1573585,
+          "operations": 10000
+        },
+        {
+          "round": 4,
+          "mode": "candidate",
+          "seconds": 0.1063474,
+          "operations": 10000
+        }
+      ],
+      "warmup": [
+        {
+          "mode": "baseline",
+          "seconds": 0.157398,
+          "operations": 10000
+        },
+        {
+          "mode": "candidate",
+          "seconds": 0.1062288,
+          "operations": 10000
+        }
+      ],
+      "medians": {
+        "baseline": 0.1573585,
+        "candidate": 0.1066322
+      },
+      "speedup": 1.47571277719113
+    },
+    {
+      "nodes": 4096,
+      "position": 0,
+      "ownerPosition": 0,
+      "iterations": 10000,
+      "samples": [
+        {
+          "round": 0,
+          "mode": "baseline",
+          "seconds": 0.0769797,
+          "operations": 10000
+        },
+        {
+          "round": 0,
+          "mode": "candidate",
+          "seconds": 0.0957642,
+          "operations": 10000
+        },
+        {
+          "round": 1,
+          "mode": "candidate",
+          "seconds": 0.0771375,
+          "operations": 10000
+        },
+        {
+          "round": 1,
+          "mode": "baseline",
+          "seconds": 0.0778009,
+          "operations": 10000
+        },
+        {
+          "round": 2,
+          "mode": "baseline",
+          "seconds": 0.0749462,
+          "operations": 10000
+        },
+        {
+          "round": 2,
+          "mode": "candidate",
+          "seconds": 0.0786014,
+          "operations": 10000
+        },
+        {
+          "round": 3,
+          "mode": "candidate",
+          "seconds": 0.0785545,
+          "operations": 10000
+        },
+        {
+          "round": 3,
+          "mode": "baseline",
+          "seconds": 0.0752636,
+          "operations": 10000
+        },
+        {
+          "round": 4,
+          "mode": "baseline",
+          "seconds": 0.0765049,
+          "operations": 10000
+        },
+        {
+          "round": 4,
+          "mode": "candidate",
+          "seconds": 0.0768394,
+          "operations": 10000
+        }
+      ],
+      "warmup": [
+        {
+          "mode": "baseline",
+          "seconds": 0.0768344,
+          "operations": 10000
+        },
+        {
+          "mode": "candidate",
+          "seconds": 0.0791422,
+          "operations": 10000
+        }
+      ],
+      "medians": {
+        "baseline": 0.0765049,
+        "candidate": 0.0785545
+      },
+      "speedup": 0.9739085602989008
+    },
+    {
+      "nodes": 4096,
+      "position": 0,
+      "ownerPosition": 4095,
+      "iterations": 10000,
+      "samples": [
+        {
+          "round": 0,
+          "mode": "baseline",
+          "seconds": 0.1586897,
+          "operations": 10000
+        },
+        {
+          "round": 0,
+          "mode": "candidate",
+          "seconds": 0.1066975,
+          "operations": 10000
+        },
+        {
+          "round": 1,
+          "mode": "candidate",
+          "seconds": 0.1052232,
+          "operations": 10000
+        },
+        {
+          "round": 1,
+          "mode": "baseline",
+          "seconds": 0.1583095,
+          "operations": 10000
+        },
+        {
+          "round": 2,
+          "mode": "baseline",
+          "seconds": 0.1571411,
+          "operations": 10000
+        },
+        {
+          "round": 2,
+          "mode": "candidate",
+          "seconds": 0.1057565,
+          "operations": 10000
+        },
+        {
+          "round": 3,
+          "mode": "candidate",
+          "seconds": 0.1061562,
+          "operations": 10000
+        },
+        {
+          "round": 3,
+          "mode": "baseline",
+          "seconds": 0.1566315,
+          "operations": 10000
+        },
+        {
+          "round": 4,
+          "mode": "baseline",
+          "seconds": 0.1581977,
+          "operations": 10000
+        },
+        {
+          "round": 4,
+          "mode": "candidate",
+          "seconds": 0.1053927,
+          "operations": 10000
+        }
+      ],
+      "warmup": [
+        {
+          "mode": "baseline",
+          "seconds": 0.1586647,
+          "operations": 10000
+        },
+        {
+          "mode": "candidate",
+          "seconds": 0.1046132,
+          "operations": 10000
+        }
+      ],
+      "medians": {
+        "baseline": 0.1581977,
+        "candidate": 0.1057565
+      },
+      "speedup": 1.495867393493544
+    },
+    {
+      "nodes": 4096,
+      "position": 2048,
+      "ownerPosition": 4095,
+      "iterations": 10000,
+      "samples": [
+        {
+          "round": 0,
+          "mode": "baseline",
+          "seconds": 0.1985944,
+          "operations": 10000
+        },
+        {
+          "round": 0,
+          "mode": "candidate",
+          "seconds": 0.1059873,
+          "operations": 10000
+        },
+        {
+          "round": 1,
+          "mode": "candidate",
+          "seconds": 0.1059977,
+          "operations": 10000
+        },
+        {
+          "round": 1,
+          "mode": "baseline",
+          "seconds": 0.1990944,
+          "operations": 10000
+        },
+        {
+          "round": 2,
+          "mode": "baseline",
+          "seconds": 0.2374307,
+          "operations": 10000
+        },
+        {
+          "round": 2,
+          "mode": "candidate",
+          "seconds": 0.1067275,
+          "operations": 10000
+        },
+        {
+          "round": 3,
+          "mode": "candidate",
+          "seconds": 0.1059241,
+          "operations": 10000
+        },
+        {
+          "round": 3,
+          "mode": "baseline",
+          "seconds": 0.1980381,
+          "operations": 10000
+        },
+        {
+          "round": 4,
+          "mode": "baseline",
+          "seconds": 0.198486,
+          "operations": 10000
+        },
+        {
+          "round": 4,
+          "mode": "candidate",
+          "seconds": 0.1059876,
+          "operations": 10000
+        }
+      ],
+      "warmup": [
+        {
+          "mode": "baseline",
+          "seconds": 0.1978996,
+          "operations": 10000
+        },
+        {
+          "mode": "candidate",
+          "seconds": 0.1061357,
+          "operations": 10000
+        }
+      ],
+      "medians": {
+        "baseline": 0.1985944,
+        "candidate": 0.1059876
+      },
+      "speedup": 1.8737512690163756
+    },
+    {
+      "nodes": 4096,
+      "position": 4095,
+      "ownerPosition": 4095,
+      "iterations": 10000,
+      "samples": [
+        {
+          "round": 0,
+          "mode": "baseline",
+          "seconds": 0.2400663,
+          "operations": 10000
+        },
+        {
+          "round": 0,
+          "mode": "candidate",
+          "seconds": 0.1061908,
+          "operations": 10000
+        },
+        {
+          "round": 1,
+          "mode": "candidate",
+          "seconds": 0.1072626,
+          "operations": 10000
+        },
+        {
+          "round": 1,
+          "mode": "baseline",
+          "seconds": 0.2406719,
+          "operations": 10000
+        },
+        {
+          "round": 2,
+          "mode": "baseline",
+          "seconds": 0.2393197,
+          "operations": 10000
+        },
+        {
+          "round": 2,
+          "mode": "candidate",
+          "seconds": 0.1061885,
+          "operations": 10000
+        },
+        {
+          "round": 3,
+          "mode": "candidate",
+          "seconds": 0.1066357,
+          "operations": 10000
+        },
+        {
+          "round": 3,
+          "mode": "baseline",
+          "seconds": 0.2421555,
+          "operations": 10000
+        },
+        {
+          "round": 4,
+          "mode": "baseline",
+          "seconds": 0.2385939,
+          "operations": 10000
+        },
+        {
+          "round": 4,
+          "mode": "candidate",
+          "seconds": 0.1059861,
+          "operations": 10000
+        }
+      ],
+      "warmup": [
+        {
+          "mode": "baseline",
+          "seconds": 0.24239,
+          "operations": 10000
+        },
+        {
+          "mode": "candidate",
+          "seconds": 0.1070936,
+          "operations": 10000
+        }
+      ],
+      "medians": {
+        "baseline": 0.2400663,
+        "candidate": 0.1061908
+      },
+      "speedup": 2.260707142238311
+    }
+  ],
+  "revision": "3424ae55dcd139575fb044ed06007a074912dcfe",
+  "sourceHashes": {
+    "baseline": "225083ab2baf62510737ece4c08c1d33d5ff9c59d25864fc76a4567cc2b4afb9",
+    "candidate": "fd1a151394602a23effd105a2d91cb85f586e82149a1e2ef64f620926c6571e8",
+    "workload": "8abc1d08344dc210de2b979ca4b349090155a4365d60ba20390cf6cdd042edf9"
+  },
+  "inputs": {
+    "benchmarks\\gc-handles\\benchmark.py": "19c17ec1bea2e5f4dbb35e1b93653ee733125f9ef24f3264a0b44b4a0d5abe4f",
+    "runtime\\native\\diagnostics\\attach.c": "464882fc743dbc761a81c5e4e4f0a73bb48490b02287b1d130b0d51e59bed7fc",
+    "runtime\\native\\diagnostics\\attach.h": "d2c89948e8eb7447919b954db31a3b00eb518611aa65fc4362d244b452a7a3ac",
+    "runtime\\native\\faults\\fault-details.h": "ff09aee456b338eef6c123ebcc60f428acea32720b7bef45910e22b9953c5ed9",
+    "runtime\\native\\faults\\render.c": "e650b004a256f448509d80d8c574873520a469a6801cd32f8e7b99c3fb30a439",
+    "runtime\\native\\gc\\native-gc.c": "7533a0dcc89813011222eac3823fb16afb926e29bb55139ccf2ecec1b52cd407",
+    "runtime\\native\\gc\\native-gc.h": "55075aac79e8ce37e15c210bfa9b2ae5820c58bc88cd604e865fbd7c8b13e972",
+    "runtime\\native\\gc\\root-probe.c": "01c3b9b11eebe5348041b90c4f649b64d41b2f32d727c897c6b09a32f2c539df",
+    "runtime\\native\\gc\\root-probe.h": "ea3c8ea415619121ec354deda550e27055ceabbe05a489c8a2f631568e9acfb7",
+    "runtime\\native\\memory\\text-arena.c": "f9da149115461bcec9eae27eb79b827620e26d13cb3bdd30d37eb43ba4987b3b",
+    "runtime\\native\\memory\\text-arena.h": "911688643a0fd926279a1e3bb8eb969dc5631dc143daa1d39f744ab6b6488d96",
+    "docs\\experiments\\aot-console\\root-probe.c": "5c97b9cb3f2ba2b262e3749d73fe3d6fe6004e1dcd54b09af975fbd22ccdc0b2",
+    "docs\\experiments\\aot-console\\console.h": "9a0669bebeb7e94e7e284cfa670327394c9d47bfe1c6b0a3482ae5b2a01b13d3",
+    "docs\\experiments\\aot-console\\entry-arguments.h": "14a54ff9b8da1d54849bb9ab2e23d2638841534db74f809610e8958392166477",
+    "docs\\experiments\\aot-console\\file-input.h": "1d9417f18a7b6437aabdd19a5d1274b4b9d9a365ca88a71d6255140d31780753",
+    "docs\\experiments\\aot-console\\file-output.h": "fdd1420cdf244d11046883d67b11c221e905d328c266b27cd37ac95c35704e8f",
+    "docs\\experiments\\aot-console\\native-gc.h": "f3589dff32ac56191ad3f9b77e116ec69dc8197f84317424518e19d307a5bd67",
+    "docs\\experiments\\aot-console\\native-session.h": "f42dd75215ff55cca439bace75b28b07fb0a972bc1fa7cad253601f715f70335",
+    "docs\\experiments\\aot-console\\native-stack.h": "e4cec17c036469051fd10b934c04e7b7af06e4f1c5db2f73cd339f4180583105",
+    "docs\\experiments\\aot-console\\root-probe.h": "d2a8e481d39cd528d9c67f4f3026d9ac611ff0d636078a5f20dbb6884996ed8c",
+    "docs\\experiments\\aot-console\\socket-client-internal.h": "cd81752f5cecca33b74d306feb311485340b810f8951fb82d3f91f635b16fc0c",
+    "docs\\experiments\\aot-console\\socket-listener.h": "e311b00e5a60a13587c8f4ced908ba0a62c2d08c2d8d8a64673e7b7b7e90d1e8",
+    "docs\\experiments\\aot-console\\socket-os.h": "c2851391b925acf6a362906b835e14bdb28a562e999cc88479a11a0c65a9736e",
+    "docs\\experiments\\aot-console\\string-unicode.h": "0460fd3921d2226a07a529b46f477fbe7190c62f0927706bbd6eda368ccaf53f",
+    "docs\\experiments\\aot-console\\task-queue.h": "b28695014eed2fa8304b078d7bba002ebbd8d71bb86a4643e0092b794cfe3654",
+    "docs\\experiments\\aot-console\\text-arena.h": "1bdeed01520a810d71d88c4c0e9a814323cc55d363554f6888e162cbee9e3a52",
+    "docs\\experiments\\aot-console\\tls-managed.h": "4429514dddad09403b50838c6db90e9c5db540f5ffcb06768dc3df3fe1de6890"
+  },
+  "compiler": "MSVC: see build commands"
+}
