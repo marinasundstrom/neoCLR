@@ -5,7 +5,8 @@ AOT and GC are maintained as one platform, rather than independent experiments.
 The [integration direction](runtime-product-integration.md) starts with a shared
 workspace/build and validation entry point, now qualified locally and on hosted
 macOS/Windows. The shared native collector and root-frame services now live under `runtime/native/gc`,
-with compatibility forwarding paths and package relocation checks; remaining native
+and arena/context services under `runtime/native/memory`, with compatibility
+forwarding paths and GC/non-GC package relocation checks; remaining native
 services, JIT hosting and package consolidation follow. Memory management must permit future build-selected collectors and
 constrained profiles without requiring tracing GC; no live collector swapping is
 planned. Alternate profiles remain future work with explicit lifetime/capability

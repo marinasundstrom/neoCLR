@@ -64,8 +64,16 @@ lookup understands both layouts. The packaged support closure includes these
 files automatically, and relocation checks compile roots both directly and through
 the compatibility path. The root implementation is unchanged apart from includes.
 
-This bounded migration leaves arena/context types, fault layout, diagnostics
-and other native services in their existing locations. The private header names
+Arena/context types and allocation/text services now live in
+`runtime/native/memory/text-arena.c` and `.h`. The old paths forward to these files,
+and the collector includes the canonical memory header directly. GC builds retain
+their collector allocation path; non-GC builds retain aligned arena allocation
+and caller-owned reset lifetimes. The implementation and private ABI sizes are
+unchanged. Native support manifests and profiling/validation provenance cover both
+source trees.
+
+This bounded migration leaves fault layout, diagnostics and other native services
+in their existing locations. The private header names
 those dependencies explicitly; it is not a stable or collector-independent ABI.
 The integrated validator includes a relocated-package test that compiles and runs
 the collector through the forwarding path, directly, and from a profiler-style
@@ -93,6 +101,14 @@ retain commands, source hashes and job outcomes. The local report predates the
 commit and identifies the tested source through its input hashes. Root ABI sizes, suspension ownership, collection
 policy and fault behavior are unchanged. No Raven metadata/Runtime Contract change
 is required, and this slice does not alter the non-GC execution profile.
+
+The arena/context follow-up passes local GC/root and relocated-package checks.
+The package test now runs the same arena contract through direct and compatibility
+paths, both with GC and with no collector linked. It verifies zero initialization,
+alignment, unchanged outputs on errors, allocation limits, UTF-8 including embedded
+NUL, separate context storage, collector reclamation and non-GC caller-owned reset.
+Hosted macOS/Windows qualification of this follow-up is pending. This is source
+integration, not a performance optimization or a new public memory-manager API.
 
 ## Memory management is a runtime service
 

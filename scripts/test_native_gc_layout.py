@@ -43,6 +43,24 @@ class NativeGcLayoutTests(unittest.TestCase):
                 result = subprocess.run([str(binary)], capture_output=True, text=True, timeout=30)
                 self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
 
+            fixture = root / 'arena-context-test.c'
+            shutil.copy2(ROOT / 'tools/native/arena-context-test.c', fixture)
+            for gc in [False, True]:
+                for direct in [False, True]:
+                    with self.subTest(gc=gc, direct=direct):
+                        arena = (root / 'runtime/native/memory' if direct else base) / 'text-arena.c'
+                        command = [arg for arg in cc if gc or arg not in ('-DNEOCLR_NATIVE_GC', '/DNEOCLR_NATIVE_GC')]
+                        command += [str(arena), str(fixture)]
+                        if gc:
+                            source_dir = root / 'runtime/native/gc' if direct else base
+                            command += [str(source_dir / name) for name in ('native-gc.c', 'root-probe.c')]
+                        binary = root / ('arena-' + str(gc) + '-' + str(direct) + ('.exe' if windows else ''))
+                        command += ['/Fe:' + str(binary)] if windows else ['-o', str(binary)]
+                        result = subprocess.run(command, cwd=root, capture_output=True, text=True, timeout=60)
+                        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+                        result = subprocess.run([str(binary)], capture_output=True, text=True, timeout=30)
+                        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+
             spec = importlib.util.spec_from_file_location('gc_phases', ROOT / 'benchmarks/http-scheduling/gc_phases.py')
             phases = importlib.util.module_from_spec(spec)
             spec.loader.exec_module(phases)

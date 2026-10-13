@@ -36,7 +36,7 @@ def main():
     gc=ROOT/'docs/experiments/aot-console'/a.source
     report=dict(passed=False,baselineRevision=subprocess.check_output(['git','rev-parse',a.baseline],text=True).strip(),
       changedSource=a.source,modes=modes,commands=[],inputs={},warmups=[],samples=[],summary={},scope=f'Same guest assemblies/AOT objects and host sources; only selected GC source differs. 32 requests per process, eight discarded, {a.rounds} alternating rounds. No instrumentation or sampling during timings.')
-    for path in [*sorted((ROOT/'runtime/native/gc').glob('*.[ch]')),Path(__file__).resolve(),Path(benchmark.__file__),a.plain,a.json,old,gc,*([a.host] if a.host else [])]:
+    for path in [*sorted((ROOT/'runtime/native').rglob('*.[ch]')),Path(__file__).resolve(),Path(benchmark.__file__),a.plain,a.json,old,gc,*([a.host] if a.host else [])]:
         report['inputs'][str(path.resolve())]=sha(path)
     for directory in ['aot-console','aot-fault-details','runtime-async','jit-managed']:
         for path in (ROOT/'docs/experiments'/directory).glob('*.h'): report['inputs'][str(path)]=sha(path)

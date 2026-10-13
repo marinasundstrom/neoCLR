@@ -30,7 +30,7 @@ candidate.write_text('#include "'+str(HERE/'policy.h')+'"\n'+text.replace(marker
     '    if (pacing_collect((neoclr_aot_context *)frame->context)) {\n'+marker+'\n    }'))
 report = dict(passed=False, promotionEligible=False, workload=a.workload, commands=[], inputs={}, runs=[],
     scope='Isolated AOT allocation-count/reserve pacing hypothesis. Shipping stress collector unchanged. Timing cannot override the admission counterexample.')
-for v in [*sorted((ROOT/'runtime/native/gc').glob('*.[ch]')), *base, str(a.build), __file__, str(HERE/'policy.h'), str(HERE/'pressure-test.c'), str(candidate), benchmark.__file__]:
+for v in [*sorted((ROOT/'runtime/native').rglob('*.[ch]')), *base, str(a.build), __file__, str(HERE/'policy.h'), str(HERE/'pressure-test.c'), str(candidate), benchmark.__file__]:
     if Path(v).is_file(): report['inputs'][str(Path(v).resolve())] = sha(v)
 for directory in ['aot-console','aot-fault-details']:
     for path in (ROOT/'docs/experiments'/directory).glob('*.h'): report['inputs'][str(path)]=sha(path)

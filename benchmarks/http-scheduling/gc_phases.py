@@ -32,4 +32,4 @@ def instrument(root, out, command):
     command = [str(gc_copy) if v == str(collector) else str(probe_copy) if v == str(probe) else v for v in command]
     support = Path(__file__).with_name('gc-phases.c').resolve()
     command.append(str(support))
-    return command, [*sorted((root/'runtime/native/gc').glob('*.[ch]')), gc_copy, probe_copy, support, Path(__file__).resolve()]
+    return command, [*sorted((root/'runtime/native').rglob('*.[ch]')), gc_copy, probe_copy, support, Path(__file__).resolve()]

@@ -93,7 +93,7 @@ def support_files():
     return [ROOT / 'scripts/build-native-project.py', ROOT / 'tools/native/console-host.c', ROOT / 'tools/native/entry-arguments.c',
             ROOT / 'benchmarks/native-web/http-host.c', ROOT / 'benchmarks/native-web/http-session-host.c',
             base / 'aot-console/native-session.c',
-            *sorted((ROOT / 'runtime/native/gc').glob('*.[ch]')),
+            *sorted((ROOT / 'runtime/native').rglob('*.[ch]')),
             *sorted((ROOT / 'tools/native').glob('windows-*.h')),
             *[ROOT / 'tools/native' / name for name in
               ('windows-console-host.c', 'windows-gc-host.c', 'windows-host-memory.c', 'windows-native-stack.c')],
@@ -231,7 +231,7 @@ def build(project, bundle, aot, output, profile=PROFILE, bootstrap_root=None, re
             adapters = [ROOT / 'benchmarks/native-web/http-session-host.c' if p == ROOT / 'benchmarks/native-web/http-host.c' else p for p in adapters]
             adapters += [base / 'native-session.c']
         adapters.append(ROOT / 'tools/native/entry-arguments.c')
-        inputs = [*sorted((ROOT / 'runtime/native/gc').glob('*.[ch]')), Path(__file__).resolve(), project, catalog_path, aot, *required, *adapters,
+        inputs = [*sorted((ROOT / 'runtime/native').rglob('*.[ch]')), Path(__file__).resolve(), project, catalog_path, aot, *required, *adapters,
                   *base.glob('*.h'), *base.parent.joinpath('aot-scalar').glob('*.h'),
                   *base.parent.joinpath('aot-fault-details').glob('*.h'),
                   *compiler.parent.glob('*.dll'), *compiler.parent.glob('*.json')]

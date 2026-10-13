@@ -39,7 +39,7 @@ def main():
     collector_copy.write_text('#include <stdint.h>\nextern void neoclr_http_profile_allocated(uint32_t, uint64_t);\n'+original.replace(hook,
         hook+'\n    neoclr_http_profile_allocated(kind, bytes);'))
     cmd=[str(socket_copy) if v==str(socket_source) else str(collector_copy) if v==str(collector) else v for v in cmd]
-    for path in [socket_copy,collector_copy,*sorted((ROOT/'runtime/native/gc').glob('*.[ch]'))]: inputs[str(path)]=sha(path)
+    for path in [socket_copy,collector_copy,*sorted((ROOT/'runtime/native').rglob('*.[ch]'))]: inputs[str(path)]=sha(path)
     for directory in ['aot-console','aot-fault-details','runtime-async']:
         for path in (ROOT/'docs/experiments'/directory).glob('*.h'): inputs[str(path)]=sha(path)
     report=dict(passed=False,workload=a.workload,command=cmd,inputs=inputs,

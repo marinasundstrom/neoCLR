@@ -64,7 +64,7 @@ def main():
                 raise ValueError('Input changed: ' + str(path))
             report['inputs'][str(path)] = digest
 
-    for path in (ROOT / 'runtime/native/gc').glob('*.[ch]'):
+    for path in (ROOT / 'runtime/native').rglob('*.[ch]'):
         remember(path)
 
     def run(command):

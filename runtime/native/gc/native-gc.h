@@ -3,7 +3,7 @@
 #ifdef NEOCLR_DIAGNOSTICS
 #include "../../../docs/experiments/runtime-diagnostics/attach.h"
 #endif
-#include "../../../docs/experiments/aot-console/text-arena.h"
+#include "../memory/text-arena.h"
 #include "root-probe.h"
 /* Private nonmoving heap in the caller buffer. No malloc, external runtime or
  * arbitrary native-stack scan. All entry/arena lifetime restrictions still apply. */

@@ -15,7 +15,7 @@ def main():
     out=a.output.resolve();out.mkdir(parents=True,exist_ok=False)
     report=dict(passed=False,promotionEligible=False,platform=platform.platform(),commands=[],samples=[],diagnostics=[],summary={},
         scope='Closed native workload only: every allocating path uses rooted admission. General managed/HTTP pacing remains disabled pending helper coverage and scheduler idle integration.')
-    inputs=[*sorted((ROOT/'runtime/native/gc').glob('*.[ch]')),Path(__file__),HERE/'rooted-policy.h',HERE/'rooted-policy-test.c',HERE/'rooted-workload.c',BASE/'native-gc.c',BASE/'root-probe.c',BASE/'text-arena.c',*BASE.glob('*.h')]
+    inputs=[*sorted((ROOT/'runtime/native').rglob('*.[ch]')),Path(__file__),HERE/'rooted-policy.h',HERE/'rooted-policy-test.c',HERE/'rooted-workload.c',BASE/'native-gc.c',BASE/'root-probe.c',BASE/'text-arena.c',*BASE.glob('*.h')]
     report['inputs']={str(x):hashlib.sha256(x.read_bytes()).hexdigest() for x in inputs}
     def run(cmd):
         cmd=list(map(str,cmd));r=subprocess.run(cmd,capture_output=True,text=True,timeout=120)
