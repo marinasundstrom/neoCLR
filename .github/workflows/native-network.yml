@@ -9,6 +9,8 @@ on:
       - 'docs/experiments/aot-console/text-arena*'
       - 'docs/experiments/aot-fault-details/fault-details.h'
       - 'scripts/validate-native-network.py'
+      - 'scripts/validate-native-gc.py'
+      - 'docs/experiments/aot-console/root-validation-test.c'
       - '.github/workflows/native-network.yml'
   pull_request:
     paths:
@@ -18,6 +20,8 @@ on:
       - 'docs/experiments/aot-console/text-arena*'
       - 'docs/experiments/aot-fault-details/fault-details.h'
       - 'scripts/validate-native-network.py'
+      - 'scripts/validate-native-gc.py'
+      - 'docs/experiments/aot-console/root-validation-test.c'
       - '.github/workflows/native-network.yml'
 permissions:
   contents: read
@@ -45,10 +49,20 @@ jobs:
           if (-not $vs) { throw 'MSVC x64 tools not found' }
           cmd /c "`"$vs\VC\Auxiliary\Build\vcvars64.bat`" && python scripts/validate-native-network.py --output target/native-network-validation"
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+      - name: Run Windows GC and root contracts
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          $vs = & "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\vswhere.exe" -latest -products '*' -requires Microsoft.VisualStudio.Component.VC.Tools.x86.x64 -property installationPath
+          if (-not $vs) { throw 'MSVC x64 tools not found' }
+          cmd /c "`"$vs\VC\Auxiliary\Build\vcvars64.bat`" && python scripts/validate-native-gc.py --output target/native-gc-validation"
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
       - uses: actions/upload-artifact@v4
         if: always()
         with:
           name: native-network-${{ matrix.os }}-${{ github.run_id }}-${{ github.run_attempt }}
-          path: target/native-network-validation/
+          path: |
+            target/native-network-validation/
+            target/native-gc-validation/
           retention-days: 14
           if-no-files-found: warn

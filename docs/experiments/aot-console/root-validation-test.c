@@ -3,7 +3,14 @@
 #include "root-probe.h"
 #include "text-arena.h"
 #include <string.h>
+#ifdef _WIN32
+#include <stdlib.h>
+#endif
 int main(int argc, char **argv) {
+#ifdef _WIN32
+    /* Expected aborts must not open Windows crash-reporting dialogs in CI. */
+    _set_abort_behavior(0, _WRITE_ABORT_MSG | _CALL_REPORTFAULT);
+#endif
     if (argc != 2) return 2;
     neoclr_aot_context outer = {0}, inner = {0};
     uint64_t word = 0, lanes[1] = {0};
