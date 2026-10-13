@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-13
 
+- Qualify adaptive native GC lookup on macOS ARM64 and Windows x64: final hosted dense-chain/wide collection gains are 4.48–4.90× and 4.63–5.19× respectively, with all graph, GC/root and socket checks passing. Retain small-control costs and variability, allocation/reclamation profiles, suspended-owner cleanup checks and the 1,536-response local HTTP comparison (within 2%, overlapping ranges). This is a general graph-tracing improvement, not an HTTP speedup or a universal non-regression claim.
+
 - Keep adaptive-index population counting in a local accumulator until validation finishes, avoiding repeated publication through the index descriptor. Retain the first Windows graph results, including small-control costs, while qualifying the bookkeeping refinement.
 
 - Adapt the native GC address index to dense heaps while retaining the small-heap path and exact root/payload validation. Local matched collection-only graphs improve 4.46–5.24× at 16,384 objects; small/sparse controls remain near baseline. Add interior-root/free-hole tests, a reproducible graph matrix with separate lookup counters, and opt-in Windows/macOS CI measurements. The dense path costs an extra validated walk and 32 KiB of stack; Windows qualification is pending.

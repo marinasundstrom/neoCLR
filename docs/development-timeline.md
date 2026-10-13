@@ -16597,3 +16597,15 @@ audits StackTrace capture for rooted allocation retry; that is correctness
 groundwork, not a throughput claim. Dense graph lookup experiments remain under
 evaluation. See the [roadmap](platform-roadmap.md) and
 [capture audit](experiments/stack-trace/README.md).
+
+The assistant subsequently isolated repeated block-header lookup on dense object
+graphs and implemented a population-adaptive index, followed by local bookkeeping.
+Matched native graph benchmarks show roughly 4.4–5.2× faster collection for large
+chains/wide graphs in final local/Windows runs. Small controls include slower
+samples (including hosted macOS regressions); these are retained and explained,
+not presented as universal gains. GC/root/socket contracts and suspended-owner
+cleanup pass; a separate local JIT/AOT HTTP matrix passes 1,536 responses with
+throughput within 2% of baseline. The [evidence record](../benchmarks/gc-index/README.md)
+links protocols, raw rounds and limitations. Generational GC, allocation throughput
+and pressure-based collection remain open; this milestone changes native lookup
+work rather than those contracts.

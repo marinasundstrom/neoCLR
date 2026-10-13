@@ -1,0 +1,445 @@
+{
+  "passed": true,
+  "platform": "macOS-27.0-arm64-arm-64bit",
+  "machine": "arm64",
+  "commands": [
+    {
+      "label": "revision",
+      "command": [
+        "git",
+        "-C",
+        "/Users/robert/Projects/neoclr",
+        "rev-parse",
+        "HEAD"
+      ],
+      "exitCode": 0,
+      "expected": 0
+    },
+    {
+      "label": "clang",
+      "command": [
+        "xcrun",
+        "--sdk",
+        "macosx",
+        "--find",
+        "clang"
+      ],
+      "exitCode": 0,
+      "expected": 0
+    },
+    {
+      "label": "sdk",
+      "command": [
+        "xcrun",
+        "--sdk",
+        "macosx",
+        "--show-sdk-path"
+      ],
+      "exitCode": 0,
+      "expected": 0
+    },
+    {
+      "label": "native-gc-test-build",
+      "command": [
+        "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang",
+        "-isysroot",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.2.sdk",
+        "-std=c11",
+        "-O2",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-fsanitize=undefined,bounds",
+        "-DNEOCLR_NATIVE_GC",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-gc-test.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/root-probe.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-gc.c",
+        "-o",
+        "/Users/robert/Projects/neoclr/target/gc-dense-contracts-20261013/native-gc-test"
+      ],
+      "exitCode": 0,
+      "expected": 0
+    },
+    {
+      "label": "native-gc-test",
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-dense-contracts-20261013/native-gc-test"
+      ],
+      "exitCode": 0,
+      "expected": 0
+    },
+    {
+      "label": "native-gc-admission-test-build",
+      "command": [
+        "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang",
+        "-isysroot",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.2.sdk",
+        "-std=c11",
+        "-O2",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-fsanitize=undefined,bounds",
+        "-DNEOCLR_NATIVE_GC",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-gc-admission-test.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/root-probe.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-gc.c",
+        "-o",
+        "/Users/robert/Projects/neoclr/target/gc-dense-contracts-20261013/native-gc-admission-test"
+      ],
+      "exitCode": 0,
+      "expected": 0
+    },
+    {
+      "label": "native-gc-admission-test",
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-dense-contracts-20261013/native-gc-admission-test"
+      ],
+      "exitCode": 0,
+      "expected": 0
+    },
+    {
+      "label": "native-gc-helper-test-build",
+      "command": [
+        "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang",
+        "-isysroot",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.2.sdk",
+        "-std=c11",
+        "-O2",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-fsanitize=undefined,bounds",
+        "-DNEOCLR_NATIVE_GC",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-gc-helper-test.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/root-probe.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-gc.c",
+        "-o",
+        "/Users/robert/Projects/neoclr/target/gc-dense-contracts-20261013/native-gc-helper-test"
+      ],
+      "exitCode": 0,
+      "expected": 0
+    },
+    {
+      "label": "native-gc-helper-test",
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-dense-contracts-20261013/native-gc-helper-test"
+      ],
+      "exitCode": 0,
+      "expected": 0
+    },
+    {
+      "label": "native-gc-index-test-build",
+      "command": [
+        "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang",
+        "-isysroot",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.2.sdk",
+        "-std=c11",
+        "-O2",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-fsanitize=undefined,bounds",
+        "-DNEOCLR_NATIVE_GC",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-gc-index-test.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/root-probe.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-gc.c",
+        "-o",
+        "/Users/robert/Projects/neoclr/target/gc-dense-contracts-20261013/native-gc-index-test"
+      ],
+      "exitCode": 0,
+      "expected": 0
+    },
+    {
+      "label": "native-gc-index-test",
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-dense-contracts-20261013/native-gc-index-test"
+      ],
+      "exitCode": 0,
+      "expected": 0
+    },
+    {
+      "label": "native-gc-dense-test-build",
+      "command": [
+        "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang",
+        "-isysroot",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.2.sdk",
+        "-std=c11",
+        "-O2",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-fsanitize=undefined,bounds",
+        "-DNEOCLR_NATIVE_GC",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-gc-dense-test.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/root-probe.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-gc.c",
+        "-o",
+        "/Users/robert/Projects/neoclr/target/gc-dense-contracts-20261013/native-gc-dense-test"
+      ],
+      "exitCode": 0,
+      "expected": 0
+    },
+    {
+      "label": "native-gc-dense-test",
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-dense-contracts-20261013/native-gc-dense-test"
+      ],
+      "exitCode": 0,
+      "expected": 0
+    },
+    {
+      "label": "native-gc-pass-test-build",
+      "command": [
+        "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang",
+        "-isysroot",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.2.sdk",
+        "-std=c11",
+        "-O2",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-fsanitize=undefined,bounds",
+        "-DNEOCLR_NATIVE_GC",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-gc-pass-test.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/root-probe.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-gc.c",
+        "-o",
+        "/Users/robert/Projects/neoclr/target/gc-dense-contracts-20261013/native-gc-pass-test"
+      ],
+      "exitCode": 0,
+      "expected": 0
+    },
+    {
+      "label": "native-gc-pass-test",
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-dense-contracts-20261013/native-gc-pass-test"
+      ],
+      "exitCode": 0,
+      "expected": 0
+    },
+    {
+      "label": "native-gc-profile-test-build",
+      "command": [
+        "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang",
+        "-isysroot",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.2.sdk",
+        "-std=c11",
+        "-O2",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-fsanitize=undefined,bounds",
+        "-DNEOCLR_NATIVE_GC",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-gc-profile-test.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/root-probe.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-gc.c",
+        "-o",
+        "/Users/robert/Projects/neoclr/target/gc-dense-contracts-20261013/native-gc-profile-test"
+      ],
+      "exitCode": 0,
+      "expected": 0
+    },
+    {
+      "label": "native-gc-profile-test",
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-dense-contracts-20261013/native-gc-profile-test"
+      ],
+      "exitCode": 0,
+      "expected": 0
+    },
+    {
+      "label": "profile-enabled-build",
+      "command": [
+        "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang",
+        "-isysroot",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.2.sdk",
+        "-std=c11",
+        "-O2",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-fsanitize=undefined,bounds",
+        "-DNEOCLR_NATIVE_GC",
+        "-DNEOCLR_GC_PROFILE",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-gc-profile-test.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/root-probe.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-gc.c",
+        "-o",
+        "/Users/robert/Projects/neoclr/target/gc-dense-contracts-20261013/profile-enabled"
+      ],
+      "exitCode": 0,
+      "expected": 0
+    },
+    {
+      "label": "profile-enabled",
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-dense-contracts-20261013/profile-enabled"
+      ],
+      "exitCode": 0,
+      "expected": 0
+    },
+    {
+      "label": "root-validation-probe-build",
+      "command": [
+        "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang",
+        "-isysroot",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.2.sdk",
+        "-std=c11",
+        "-O2",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-fsanitize=undefined,bounds",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/root-validation-test.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/root-probe.c",
+        "-o",
+        "/Users/robert/Projects/neoclr/target/gc-dense-contracts-20261013/root-validation-probe"
+      ],
+      "exitCode": 0,
+      "expected": 0
+    },
+    {
+      "label": "root-validation-probe-address",
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-dense-contracts-20261013/root-validation-probe",
+        "address"
+      ],
+      "exitCode": -6,
+      "expected": -6
+    },
+    {
+      "label": "root-validation-probe-width",
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-dense-contracts-20261013/root-validation-probe",
+        "width"
+      ],
+      "exitCode": -6,
+      "expected": -6
+    },
+    {
+      "label": "root-validation-probe-flags",
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-dense-contracts-20261013/root-validation-probe",
+        "flags"
+      ],
+      "exitCode": -6,
+      "expected": -6
+    },
+    {
+      "label": "root-validation-probe-fault",
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-dense-contracts-20261013/root-validation-probe",
+        "fault"
+      ],
+      "exitCode": -6,
+      "expected": -6
+    },
+    {
+      "label": "root-validation-probe-transient",
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-dense-contracts-20261013/root-validation-probe",
+        "transient"
+      ],
+      "exitCode": -6,
+      "expected": -6
+    },
+    {
+      "label": "root-validation-gc-build",
+      "command": [
+        "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang",
+        "-isysroot",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.2.sdk",
+        "-std=c11",
+        "-O2",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-fsanitize=undefined,bounds",
+        "-DNEOCLR_NATIVE_GC",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/root-validation-test.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/root-probe.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-gc.c",
+        "-o",
+        "/Users/robert/Projects/neoclr/target/gc-dense-contracts-20261013/root-validation-gc"
+      ],
+      "exitCode": 0,
+      "expected": 0
+    },
+    {
+      "label": "root-validation-gc-address",
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-dense-contracts-20261013/root-validation-gc",
+        "address"
+      ],
+      "exitCode": -6,
+      "expected": -6
+    },
+    {
+      "label": "root-validation-gc-width",
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-dense-contracts-20261013/root-validation-gc",
+        "width"
+      ],
+      "exitCode": -6,
+      "expected": -6
+    },
+    {
+      "label": "root-validation-gc-flags",
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-dense-contracts-20261013/root-validation-gc",
+        "flags"
+      ],
+      "exitCode": -6,
+      "expected": -6
+    },
+    {
+      "label": "root-validation-gc-fault",
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-dense-contracts-20261013/root-validation-gc",
+        "fault"
+      ],
+      "exitCode": -6,
+      "expected": -6
+    },
+    {
+      "label": "root-validation-gc-transient",
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-dense-contracts-20261013/root-validation-gc",
+        "transient"
+      ],
+      "exitCode": -6,
+      "expected": -6
+    }
+  ],
+  "revision": "924b45110e03df67acd9d234f983f8b6cd51d10f",
+  "inputs": {
+    "scripts/validate-native-gc.py": "55671015eb2fc5668727d07f5ed1149e105692a85f658c97de64b19bf529a4f6",
+    "docs/experiments/aot-console/entry-arguments.h": "85f5c7d90edfd08cc4bf8db1a220028cf9dab39e4e16a05d1210f2ee18de6c80",
+    "docs/experiments/aot-console/console.h": "1f5be96a30639c5e63781637d95d1abb28ab605962caee50ae91a5a0d5bd8068",
+    "docs/experiments/aot-console/root-probe.h": "04ba9b0aaef06bcbeb3408bb5072bae0ef0d2ae346ebb3b193340adc9622a565",
+    "docs/experiments/aot-console/socket-listener.h": "268927942a47e47210d29f6bc8a7c891ae077352c35fc3855c2dce8fd407fb2a",
+    "docs/experiments/aot-console/string-unicode.h": "707e7dc31d0c5993873f53166862da5a53c3779a1f2e15fdb3b4c59086210f1c",
+    "docs/experiments/aot-console/task-queue.h": "cf7d1ded7df30016c353fbb24bb40cb4771bb1c735352bd6bb56d5dea78fa738",
+    "docs/experiments/aot-console/file-input.h": "a1a9840482a2b50f20ba5080eb96453a46e4416238b3403343e03e9c2c84d3f4",
+    "docs/experiments/aot-console/tls-managed.h": "073b109a56895fc15fcb49dfea061cae4ebc228bfe42fcd11f9f2f1041b4eade",
+    "docs/experiments/aot-console/socket-client-internal.h": "e2771ecbe8b74c0e696af297651cd5158755c8ed6e6cc25b1d9bde837a57dddb",
+    "docs/experiments/aot-console/native-session.h": "b221dc77da887518e90210bbbfb8ac6ffd6d14416c41faa199ecd2fb43bef7bd",
+    "docs/experiments/aot-console/socket-os.h": "a01419c62fa8a1d3d9131282c5af182f200ba149a440d52c81104e2a156f7ef0",
+    "docs/experiments/aot-console/native-stack.h": "d4b1bbc542c3c8b3338d186a64554e5a0c0d4bc3a94d6b6a48900c49f2da0d13",
+    "docs/experiments/aot-console/native-gc.h": "981b02dd70f2ae7928896881b8f0c38b4cc9fb7914c9dfde1ac79dd0f93fa3ee",
+    "docs/experiments/aot-console/text-arena.h": "f11956770448ece65ee852d0dcc75d86ad45ae68d66355ae64afe702effb5872",
+    "docs/experiments/aot-console/file-output.h": "f13171699f402f05ea2ab0e4e1686f227bbe48d65c8b48a62e5f94200605e88e",
+    "docs/experiments/aot-console/native-gc.c": "54ea598223082f225a778ee5effba4152c31d7f54bf568968da3636bf3b03f1a",
+    "docs/experiments/aot-console/root-probe.c": "fffec95149fe874705100566446916ab5d4d6cec05ee6bcf5291b67479b31586",
+    "docs/experiments/aot-console/root-validation-test.c": "00b92d44d4eddc71d5217590758bdb1fc50f10707f608dc325b64b42e5080e52",
+    "docs/experiments/aot-fault-details/fault-details.h": "8acf145dd10c8050c7d4c9266a73dec171009cea570aeb2f5473ac39cbfa4370",
+    "docs/experiments/aot-console/native-gc-test.c": "e346e3f6ab1b3aaef9e58484044db171223819c5aec8a35120fb4d9328561d3b",
+    "docs/experiments/aot-console/native-gc-admission-test.c": "86ea4a10fc0385c0e1cb6331df27007b0edd2cd676d0e009a5601f9f9ab2f620",
+    "docs/experiments/aot-console/native-gc-helper-test.c": "b4cbccb8d8b8b1e5e34f31d27c0f09a4db9f41de0441443aa1048e1359fefa22",
+    "docs/experiments/aot-console/native-gc-index-test.c": "4806255c230cf04ec8e7defb7e6fbd66a86e733f8d52b295d40738366c41294e",
+    "docs/experiments/aot-console/native-gc-dense-test.c": "3b8bd7e0eff03da857782c2d0b842005bc1032be2470cd8b81082e316e8d930e",
+    "docs/experiments/aot-console/native-gc-pass-test.c": "ad5c29cb271afe49a03c25ef2df99e5fe950345c502485d1a7b60b27947abdb6",
+    "docs/experiments/aot-console/native-gc-profile-test.c": "8f2e8af9c1dad95a77e786196ab90f1beea1f371e350feba2020f062b4c0d3a9"
+  }
+}
