@@ -96,7 +96,7 @@ void neoclr_probe_stack_roots_v2(neoclr_probe_frame *frame, uint32_t instruction
 #endif
     calls++;
 #ifdef NEOCLR_NATIVE_GC
-    /* Full initialized snapshot is published. Allocation services never collect. */
+    /* Complete snapshot: audited allocating helpers additionally protect their temporaries. */
     if (neoclr_gc_collect_v1((neoclr_aot_context *)frame->context, head)) abort();
 #endif
 }

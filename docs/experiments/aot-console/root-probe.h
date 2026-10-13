@@ -13,8 +13,9 @@
 /* Private published frame chain, not a stable hosting ABI.
  * Frame storage belongs to the active native function. Diagnostic mode forbids
  * allocation, reentry, pointer mutation and collection in all callbacks.
- * NEOCLR_NATIVE_GC selects distinct hooks: only the completed stack snapshot hook
- * collects, using the nonmoving heap contract. Enter/leave/transient never collect.
+ * NEOCLR_NATIVE_GC selects distinct hooks: completed stack snapshots collect.
+ * Audited allocation helpers may also collect with a complete caller boundary and
+ * their own temporary roots. Enter/leave/transient never collect.
  * Ancestor snapshots
  * represent suspended pre-operation stacks, not all locals/arguments/results.
  * JSON belongs to the image; numeric holes are zero. Output-borrow pointees may be

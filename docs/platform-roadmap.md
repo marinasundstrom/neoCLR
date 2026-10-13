@@ -1,5 +1,22 @@
 # neoCLR platform roadmap
 
+**Allocation and admission follow-up (2026-10-13):** [single-walk allocation](../benchmarks/gc-allocation/README.md)
+retains complete heap validation while removing the repeated first-fit search:
+matched hosted gains are 1.18–1.60× on macOS and 1.32–1.84× on Windows. Native-GC
+code generation now selects concat/join helpers that protect borrowed inputs during
+allocation retry; noncollecting native entry points remain available. Local compiled
+GC/non-GC tests and 128 fresh JIT/AOT HTTP responses pass. The
+[closed rooted pacing experiment](../benchmarks/http-gc-pacing/README.md#rooted-closed-workload-pacing-follow-up-2026-10-13)
+passes large-request admission, exhaustion, explicit idle cleanup and suspended-owner
+abandonment. It is not enabled for general managed execution: remaining helper
+coverage and actual scheduler idle integration are still prerequisites. Continue
+with the [helper-family audit](experiments/aot-console/native-gc.md#explicit-helper-temporary-values),
+then qualify a managed pacing policy across execution modes before promotion.
+The author additionally proposed generations to reduce collection pressure/latency;
+[the next architecture evaluation](runtime-gc.md#generational-collection-evaluation--2026-10-13)
+compares survival, write barriers, promotion and pauses. It does not yet select or
+implement a generational collector.
+
 **Dense graph GC milestone (2026-10-13):** [adaptive lookup and retained evidence](../benchmarks/gc-index/README.md)
 reduce native collection time by about 4.4–5.2× on 16,384-object chains/wide graphs
 in final local/Windows runs. Exact root/payload validation, suspension ownership,

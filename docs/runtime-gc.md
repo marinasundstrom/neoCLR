@@ -111,3 +111,52 @@ inside a queued callback and after async Main resumes: captured objects survive,
 and Collect itself does not pump callbacks. Pending integer and Task<Result> error
 entries also pass. The public reference assembly is byte-identical across this last
 integration; library hashes and updated website sample templates pass checks.
+
+## Generational collection evaluation — 2026-10-13
+
+**Exploratory next architecture candidate, not implemented behavior.** The author
+suggested that a generational collector could relieve collection pressure and
+latency. This complements the allocation/root-admission work; it does not establish
+that the current workloads have the lifetime distribution needed for a net gain.
+
+The [.NET generation model](https://learn.microsoft.com/en-us/dotnet/standard/garbage-collection/fundamentals#generations)
+collects younger portions more often and promotes survivors. The
+[CLR collector design](https://github.com/dotnet/runtime/blob/main/docs/design/coreclr/botr/garbage-collection.md)
+explains the allocation/collection split and generational machinery. These describe
+shipped CLR behavior, reviewed 2026-10-13, rather than a neoCLR implementation plan.
+Existing [Go/V8 comparisons](../benchmarks/http-scheduling/README.md) remain relevant:
+generations, concurrent collection and collection pacing are different choices.
+A generational collector can still pause for a full collection.
+
+The intended benefit is less tracing **and** reclamation work during young
+collections, especially with a large stable live graph and many short-lived
+allocations. Merely sweeping young blocks while retracing the full old graph would
+leave much of that cost. Avoiding the old graph requires recording references from
+old objects into young ones, normally through write barriers and a remembered set.
+Costs include reference-store overhead, remembered-set memory, promotion work and
+more collection paths to validate. Generations alone do not remove the current
+native allocator's whole-heap integrity walk.
+
+Compare the current nonmoving full collector with a provisional nonmoving young/old
+prototype before considering a copying nursery. Nonmoving generations could preserve
+current address stability but retain fragmentation; relocation would require precise,
+updatable roots or explicit pinning/handles for interior and borrowed native pointers.
+Neither alternative is selected yet. A public generation API is premature.
+
+The next bounded evaluation should:
+
+- Measure survival by allocation age, bytes retained, collection duration distributions
+  and full-GC frequency on allocation churn, stable graphs, mixed lifetimes, suspended
+  operations and HTTP. Measure promotion volume once a prototype actually promotes.
+- Audit reference writes in interpreter, JIT, AOT and native helpers, including arrays,
+  bulk copies and references inside value types. A missing old-to-young edge is a
+  correctness failure; runtime roots and suspended frames must also remain visible.
+- Test old-to-young updates, cycles, promotion, large allocations, interior references,
+  ownership abandonment and exactly-once cleanup. Keep a full-collection oracle and
+  stress mode; compare retained objects and complete final reclamation.
+- Compare throughput, pause percentiles/maxima, peak memory and barrier cost against
+  the full collector and safe pacing separately. Include high-survival and frequent
+  mutation controls that might lose. Keep macOS/Windows and all execution modes explicit.
+
+Finish helper-root coverage and scheduler idle cleanup qualification independently;
+those correctness requirements remain relevant under any collection architecture.

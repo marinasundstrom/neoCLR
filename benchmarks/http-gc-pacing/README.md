@@ -151,3 +151,18 @@ full collector; it implements no generations, barriers or concurrent marking.
 Acceptance for a future managed policy additionally requires complete allocating
 helper coverage, explicit interpreter/JIT/AOT policy behavior, real scheduler idle
 cleanup and sustained/concurrent workload qualification.
+
+The [isolated local run](rooted-macos-20261013.json), taken after other local
+compilation/validation completed, improves the object workload 3.98× and the string
+workload 3.57×. Each worker reclaims all 20,000 allocations. Separate diagnostic
+runs reduce collections from 20,001 to 1,251, with peak arena extent rising from
+4,160 to 5,120 bytes for objects and 3,120 to 3,840 for strings. The roughly 23%
+space increase is a real tradeoff. Results cover this explicit rooted native
+harness only; there is no claim that general helper coverage is complete.
+
+The [Windows x64 run](rooted-windows-38422680168.json) at `4ba0a60d` improves
+objects 4.25× and strings 3.98×, with the same allocation/reclamation counts,
+collection counts and peak-extent tradeoff. Its focused native GC/root and socket
+contracts pass. These are within-machine comparisons, not a ranking of operating
+systems. The Windows job in [run 38422680168](https://github.com/marinasundstrom/neoCLR/actions/runs/38422680168)
+passed; its hosted macOS job was still queued when this evidence was recorded.

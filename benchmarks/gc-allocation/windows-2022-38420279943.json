@@ -1,0 +1,1518 @@
+{
+  "passed": true,
+  "platform": "Windows-2022Server-10.0.20348-SP0",
+  "machine": "AMD64",
+  "baseline": "13edfa189",
+  "commands": [
+    {
+      "command": [
+        "git",
+        "-C",
+        "D:\\a\\neoCLR\\neoCLR",
+        "rev-parse",
+        "HEAD"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "git",
+        "-C",
+        "D:\\a\\neoCLR\\neoCLR",
+        "show",
+        "13edfa189:docs/experiments/aot-console/native-gc.c"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "cl",
+        "/nologo",
+        "/W4",
+        "/WX",
+        "/O2",
+        "/std:c11",
+        "/experimental:c11atomics",
+        "/MT",
+        "/DNEOCLR_NATIVE_GC",
+        "/ID:\\a\\neoCLR\\neoCLR\\docs\\experiments\\aot-console",
+        "D:\\a\\neoCLR\\neoCLR\\benchmarks\\gc-allocation\\workload.c",
+        "D:\\a\\neoCLR\\neoCLR\\target\\gc-allocation-benchmark\\baseline.c",
+        "D:\\a\\neoCLR\\neoCLR\\docs\\experiments\\aot-console\\root-probe.c",
+        "/Fe:D:\\a\\neoCLR\\neoCLR\\target\\gc-allocation-benchmark\\baseline.exe"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "cl",
+        "/nologo",
+        "/W4",
+        "/WX",
+        "/O2",
+        "/std:c11",
+        "/experimental:c11atomics",
+        "/MT",
+        "/DNEOCLR_NATIVE_GC",
+        "/ID:\\a\\neoCLR\\neoCLR\\docs\\experiments\\aot-console",
+        "/DLOOKUP_DIAGNOSTICS",
+        "D:\\a\\neoCLR\\neoCLR\\benchmarks\\gc-allocation\\workload.c",
+        "D:\\a\\neoCLR\\neoCLR\\target\\gc-allocation-benchmark\\baseline-diagnostic.c",
+        "D:\\a\\neoCLR\\neoCLR\\docs\\experiments\\aot-console\\root-probe.c",
+        "/Fe:D:\\a\\neoCLR\\neoCLR\\target\\gc-allocation-benchmark\\baseline-diagnostic.exe"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "cl",
+        "/nologo",
+        "/W4",
+        "/WX",
+        "/O2",
+        "/std:c11",
+        "/experimental:c11atomics",
+        "/MT",
+        "/DNEOCLR_NATIVE_GC",
+        "/ID:\\a\\neoCLR\\neoCLR\\docs\\experiments\\aot-console",
+        "D:\\a\\neoCLR\\neoCLR\\benchmarks\\gc-allocation\\workload.c",
+        "D:\\a\\neoCLR\\neoCLR\\target\\gc-allocation-benchmark\\candidate.c",
+        "D:\\a\\neoCLR\\neoCLR\\docs\\experiments\\aot-console\\root-probe.c",
+        "/Fe:D:\\a\\neoCLR\\neoCLR\\target\\gc-allocation-benchmark\\candidate.exe"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "cl",
+        "/nologo",
+        "/W4",
+        "/WX",
+        "/O2",
+        "/std:c11",
+        "/experimental:c11atomics",
+        "/MT",
+        "/DNEOCLR_NATIVE_GC",
+        "/ID:\\a\\neoCLR\\neoCLR\\docs\\experiments\\aot-console",
+        "/DLOOKUP_DIAGNOSTICS",
+        "D:\\a\\neoCLR\\neoCLR\\benchmarks\\gc-allocation\\workload.c",
+        "D:\\a\\neoCLR\\neoCLR\\target\\gc-allocation-benchmark\\candidate-diagnostic.c",
+        "D:\\a\\neoCLR\\neoCLR\\docs\\experiments\\aot-console\\root-probe.c",
+        "/Fe:D:\\a\\neoCLR\\neoCLR\\target\\gc-allocation-benchmark\\candidate-diagnostic.exe"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\gc-allocation-benchmark\\baseline.exe",
+        "64",
+        "200",
+        "objects"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\gc-allocation-benchmark\\candidate.exe",
+        "64",
+        "200",
+        "objects"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\gc-allocation-benchmark\\baseline.exe",
+        "64",
+        "200",
+        "objects"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\gc-allocation-benchmark\\candidate.exe",
+        "64",
+        "200",
+        "objects"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\gc-allocation-benchmark\\candidate.exe",
+        "64",
+        "200",
+        "objects"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\gc-allocation-benchmark\\baseline.exe",
+        "64",
+        "200",
+        "objects"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\gc-allocation-benchmark\\baseline.exe",
+        "64",
+        "200",
+        "objects"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\gc-allocation-benchmark\\candidate.exe",
+        "64",
+        "200",
+        "objects"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\gc-allocation-benchmark\\candidate.exe",
+        "64",
+        "200",
+        "objects"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\gc-allocation-benchmark\\baseline.exe",
+        "64",
+        "200",
+        "objects"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\gc-allocation-benchmark\\baseline.exe",
+        "64",
+        "200",
+        "objects"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\gc-allocation-benchmark\\candidate.exe",
+        "64",
+        "200",
+        "objects"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\gc-allocation-benchmark\\baseline-diagnostic.exe",
+        "64",
+        "200",
+        "objects"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\gc-allocation-benchmark\\candidate-diagnostic.exe",
+        "64",
+        "200",
+        "objects"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\gc-allocation-benchmark\\baseline.exe",
+        "1024",
+        "8",
+        "objects"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\gc-allocation-benchmark\\candidate.exe",
+        "1024",
+        "8",
+        "objects"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\gc-allocation-benchmark\\baseline.exe",
+        "1024",
+        "8",
+        "objects"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\gc-allocation-benchmark\\candidate.exe",
+        "1024",
+        "8",
+        "objects"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\gc-allocation-benchmark\\candidate.exe",
+        "1024",
+        "8",
+        "objects"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\gc-allocation-benchmark\\baseline.exe",
+        "1024",
+        "8",
+        "objects"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\gc-allocation-benchmark\\baseline.exe",
+        "1024",
+        "8",
+        "objects"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\gc-allocation-benchmark\\candidate.exe",
+        "1024",
+        "8",
+        "objects"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\gc-allocation-benchmark\\candidate.exe",
+        "1024",
+        "8",
+        "objects"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\gc-allocation-benchmark\\baseline.exe",
+        "1024",
+        "8",
+        "objects"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\gc-allocation-benchmark\\baseline.exe",
+        "1024",
+        "8",
+        "objects"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\gc-allocation-benchmark\\candidate.exe",
+        "1024",
+        "8",
+        "objects"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\gc-allocation-benchmark\\baseline-diagnostic.exe",
+        "1024",
+        "8",
+        "objects"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\gc-allocation-benchmark\\candidate-diagnostic.exe",
+        "1024",
+        "8",
+        "objects"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\gc-allocation-benchmark\\baseline.exe",
+        "4096",
+        "2",
+        "objects"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\gc-allocation-benchmark\\candidate.exe",
+        "4096",
+        "2",
+        "objects"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\gc-allocation-benchmark\\baseline.exe",
+        "4096",
+        "2",
+        "objects"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\gc-allocation-benchmark\\candidate.exe",
+        "4096",
+        "2",
+        "objects"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\gc-allocation-benchmark\\candidate.exe",
+        "4096",
+        "2",
+        "objects"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\gc-allocation-benchmark\\baseline.exe",
+        "4096",
+        "2",
+        "objects"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\gc-allocation-benchmark\\baseline.exe",
+        "4096",
+        "2",
+        "objects"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\gc-allocation-benchmark\\candidate.exe",
+        "4096",
+        "2",
+        "objects"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\gc-allocation-benchmark\\candidate.exe",
+        "4096",
+        "2",
+        "objects"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\gc-allocation-benchmark\\baseline.exe",
+        "4096",
+        "2",
+        "objects"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\gc-allocation-benchmark\\baseline.exe",
+        "4096",
+        "2",
+        "objects"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\gc-allocation-benchmark\\candidate.exe",
+        "4096",
+        "2",
+        "objects"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\gc-allocation-benchmark\\baseline-diagnostic.exe",
+        "4096",
+        "2",
+        "objects"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\gc-allocation-benchmark\\candidate-diagnostic.exe",
+        "4096",
+        "2",
+        "objects"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\gc-allocation-benchmark\\baseline.exe",
+        "1024",
+        "8",
+        "strings"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\gc-allocation-benchmark\\candidate.exe",
+        "1024",
+        "8",
+        "strings"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\gc-allocation-benchmark\\baseline.exe",
+        "1024",
+        "8",
+        "strings"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\gc-allocation-benchmark\\candidate.exe",
+        "1024",
+        "8",
+        "strings"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\gc-allocation-benchmark\\candidate.exe",
+        "1024",
+        "8",
+        "strings"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\gc-allocation-benchmark\\baseline.exe",
+        "1024",
+        "8",
+        "strings"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\gc-allocation-benchmark\\baseline.exe",
+        "1024",
+        "8",
+        "strings"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\gc-allocation-benchmark\\candidate.exe",
+        "1024",
+        "8",
+        "strings"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\gc-allocation-benchmark\\candidate.exe",
+        "1024",
+        "8",
+        "strings"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\gc-allocation-benchmark\\baseline.exe",
+        "1024",
+        "8",
+        "strings"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\gc-allocation-benchmark\\baseline.exe",
+        "1024",
+        "8",
+        "strings"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\gc-allocation-benchmark\\candidate.exe",
+        "1024",
+        "8",
+        "strings"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\gc-allocation-benchmark\\baseline-diagnostic.exe",
+        "1024",
+        "8",
+        "strings"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\gc-allocation-benchmark\\candidate-diagnostic.exe",
+        "1024",
+        "8",
+        "strings"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\gc-allocation-benchmark\\baseline.exe",
+        "256",
+        "8",
+        "buffers"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\gc-allocation-benchmark\\candidate.exe",
+        "256",
+        "8",
+        "buffers"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\gc-allocation-benchmark\\baseline.exe",
+        "256",
+        "8",
+        "buffers"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\gc-allocation-benchmark\\candidate.exe",
+        "256",
+        "8",
+        "buffers"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\gc-allocation-benchmark\\candidate.exe",
+        "256",
+        "8",
+        "buffers"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\gc-allocation-benchmark\\baseline.exe",
+        "256",
+        "8",
+        "buffers"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\gc-allocation-benchmark\\baseline.exe",
+        "256",
+        "8",
+        "buffers"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\gc-allocation-benchmark\\candidate.exe",
+        "256",
+        "8",
+        "buffers"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\gc-allocation-benchmark\\candidate.exe",
+        "256",
+        "8",
+        "buffers"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\gc-allocation-benchmark\\baseline.exe",
+        "256",
+        "8",
+        "buffers"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\gc-allocation-benchmark\\baseline.exe",
+        "256",
+        "8",
+        "buffers"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\gc-allocation-benchmark\\candidate.exe",
+        "256",
+        "8",
+        "buffers"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\gc-allocation-benchmark\\baseline-diagnostic.exe",
+        "256",
+        "8",
+        "buffers"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\gc-allocation-benchmark\\candidate-diagnostic.exe",
+        "256",
+        "8",
+        "buffers"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\gc-allocation-benchmark\\baseline.exe",
+        "1024",
+        "4",
+        "holes"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\gc-allocation-benchmark\\candidate.exe",
+        "1024",
+        "4",
+        "holes"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\gc-allocation-benchmark\\baseline.exe",
+        "1024",
+        "4",
+        "holes"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\gc-allocation-benchmark\\candidate.exe",
+        "1024",
+        "4",
+        "holes"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\gc-allocation-benchmark\\candidate.exe",
+        "1024",
+        "4",
+        "holes"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\gc-allocation-benchmark\\baseline.exe",
+        "1024",
+        "4",
+        "holes"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\gc-allocation-benchmark\\baseline.exe",
+        "1024",
+        "4",
+        "holes"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\gc-allocation-benchmark\\candidate.exe",
+        "1024",
+        "4",
+        "holes"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\gc-allocation-benchmark\\candidate.exe",
+        "1024",
+        "4",
+        "holes"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\gc-allocation-benchmark\\baseline.exe",
+        "1024",
+        "4",
+        "holes"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\gc-allocation-benchmark\\baseline.exe",
+        "1024",
+        "4",
+        "holes"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\gc-allocation-benchmark\\candidate.exe",
+        "1024",
+        "4",
+        "holes"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\gc-allocation-benchmark\\baseline-diagnostic.exe",
+        "1024",
+        "4",
+        "holes"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\gc-allocation-benchmark\\candidate-diagnostic.exe",
+        "1024",
+        "4",
+        "holes"
+      ],
+      "exitCode": 0
+    }
+  ],
+  "cases": [
+    {
+      "shape": "objects",
+      "nodes": 64,
+      "allocationBatches": 200,
+      "samples": [
+        {
+          "round": 0,
+          "mode": "baseline",
+          "seconds": 0.0015685,
+          "lookupSteps": 0,
+          "reclaimed": 12800
+        },
+        {
+          "round": 0,
+          "mode": "candidate",
+          "seconds": 0.0011286,
+          "lookupSteps": 0,
+          "reclaimed": 12800
+        },
+        {
+          "round": 1,
+          "mode": "candidate",
+          "seconds": 0.0011291,
+          "lookupSteps": 0,
+          "reclaimed": 12800
+        },
+        {
+          "round": 1,
+          "mode": "baseline",
+          "seconds": 0.0015491,
+          "lookupSteps": 0,
+          "reclaimed": 12800
+        },
+        {
+          "round": 2,
+          "mode": "baseline",
+          "seconds": 0.0015556,
+          "lookupSteps": 0,
+          "reclaimed": 12800
+        },
+        {
+          "round": 2,
+          "mode": "candidate",
+          "seconds": 0.0011281,
+          "lookupSteps": 0,
+          "reclaimed": 12800
+        },
+        {
+          "round": 3,
+          "mode": "candidate",
+          "seconds": 0.0011266,
+          "lookupSteps": 0,
+          "reclaimed": 12800
+        },
+        {
+          "round": 3,
+          "mode": "baseline",
+          "seconds": 0.0015429,
+          "lookupSteps": 0,
+          "reclaimed": 12800
+        },
+        {
+          "round": 4,
+          "mode": "baseline",
+          "seconds": 0.0015478,
+          "lookupSteps": 0,
+          "reclaimed": 12800
+        },
+        {
+          "round": 4,
+          "mode": "candidate",
+          "seconds": 0.0012672,
+          "lookupSteps": 0,
+          "reclaimed": 12800
+        }
+      ],
+      "warmup": [
+        {
+          "mode": "baseline",
+          "seconds": 0.0015607,
+          "lookupSteps": 0,
+          "reclaimed": 12800
+        },
+        {
+          "mode": "candidate",
+          "seconds": 0.0011234,
+          "lookupSteps": 0,
+          "reclaimed": 12800
+        }
+      ],
+      "diagnostics": {
+        "baseline": {
+          "seconds": 0.0016885,
+          "lookupSteps": 806400,
+          "reclaimed": 12800
+        },
+        "candidate": {
+          "seconds": 0.0011996,
+          "lookupSteps": 403200,
+          "reclaimed": 12800
+        }
+      },
+      "medians": {
+        "baseline": 0.0015491,
+        "candidate": 0.0011286
+      },
+      "speedup": 1.3725855041644517
+    },
+    {
+      "shape": "objects",
+      "nodes": 1024,
+      "allocationBatches": 8,
+      "samples": [
+        {
+          "round": 0,
+          "mode": "baseline",
+          "seconds": 0.0179297,
+          "lookupSteps": 0,
+          "reclaimed": 8192
+        },
+        {
+          "round": 0,
+          "mode": "candidate",
+          "seconds": 0.0105605,
+          "lookupSteps": 0,
+          "reclaimed": 8192
+        },
+        {
+          "round": 1,
+          "mode": "candidate",
+          "seconds": 0.0105673,
+          "lookupSteps": 0,
+          "reclaimed": 8192
+        },
+        {
+          "round": 1,
+          "mode": "baseline",
+          "seconds": 0.0178766,
+          "lookupSteps": 0,
+          "reclaimed": 8192
+        },
+        {
+          "round": 2,
+          "mode": "baseline",
+          "seconds": 0.0181899,
+          "lookupSteps": 0,
+          "reclaimed": 8192
+        },
+        {
+          "round": 2,
+          "mode": "candidate",
+          "seconds": 0.0105893,
+          "lookupSteps": 0,
+          "reclaimed": 8192
+        },
+        {
+          "round": 3,
+          "mode": "candidate",
+          "seconds": 0.0105115,
+          "lookupSteps": 0,
+          "reclaimed": 8192
+        },
+        {
+          "round": 3,
+          "mode": "baseline",
+          "seconds": 0.0179785,
+          "lookupSteps": 0,
+          "reclaimed": 8192
+        },
+        {
+          "round": 4,
+          "mode": "baseline",
+          "seconds": 0.0195075,
+          "lookupSteps": 0,
+          "reclaimed": 8192
+        },
+        {
+          "round": 4,
+          "mode": "candidate",
+          "seconds": 0.0106218,
+          "lookupSteps": 0,
+          "reclaimed": 8192
+        }
+      ],
+      "warmup": [
+        {
+          "mode": "baseline",
+          "seconds": 0.017907,
+          "lookupSteps": 0,
+          "reclaimed": 8192
+        },
+        {
+          "mode": "candidate",
+          "seconds": 0.0105659,
+          "lookupSteps": 0,
+          "reclaimed": 8192
+        }
+      ],
+      "diagnostics": {
+        "baseline": {
+          "seconds": 0.0196471,
+          "lookupSteps": 8380416,
+          "reclaimed": 8192
+        },
+        "candidate": {
+          "seconds": 0.0110425,
+          "lookupSteps": 4190208,
+          "reclaimed": 8192
+        }
+      },
+      "medians": {
+        "baseline": 0.0179785,
+        "candidate": 0.0105673
+      },
+      "speedup": 1.701333358568414
+    },
+    {
+      "shape": "objects",
+      "nodes": 4096,
+      "allocationBatches": 2,
+      "samples": [
+        {
+          "round": 0,
+          "mode": "baseline",
+          "seconds": 0.0777508,
+          "lookupSteps": 0,
+          "reclaimed": 8192
+        },
+        {
+          "round": 0,
+          "mode": "candidate",
+          "seconds": 0.0426336,
+          "lookupSteps": 0,
+          "reclaimed": 8192
+        },
+        {
+          "round": 1,
+          "mode": "candidate",
+          "seconds": 0.0422824,
+          "lookupSteps": 0,
+          "reclaimed": 8192
+        },
+        {
+          "round": 1,
+          "mode": "baseline",
+          "seconds": 0.0780509,
+          "lookupSteps": 0,
+          "reclaimed": 8192
+        },
+        {
+          "round": 2,
+          "mode": "baseline",
+          "seconds": 0.0774504,
+          "lookupSteps": 0,
+          "reclaimed": 8192
+        },
+        {
+          "round": 2,
+          "mode": "candidate",
+          "seconds": 0.0424598,
+          "lookupSteps": 0,
+          "reclaimed": 8192
+        },
+        {
+          "round": 3,
+          "mode": "candidate",
+          "seconds": 0.0422219,
+          "lookupSteps": 0,
+          "reclaimed": 8192
+        },
+        {
+          "round": 3,
+          "mode": "baseline",
+          "seconds": 0.0770484,
+          "lookupSteps": 0,
+          "reclaimed": 8192
+        },
+        {
+          "round": 4,
+          "mode": "baseline",
+          "seconds": 0.0771378,
+          "lookupSteps": 0,
+          "reclaimed": 8192
+        },
+        {
+          "round": 4,
+          "mode": "candidate",
+          "seconds": 0.042571,
+          "lookupSteps": 0,
+          "reclaimed": 8192
+        }
+      ],
+      "warmup": [
+        {
+          "mode": "baseline",
+          "seconds": 0.0771788,
+          "lookupSteps": 0,
+          "reclaimed": 8192
+        },
+        {
+          "mode": "candidate",
+          "seconds": 0.0422559,
+          "lookupSteps": 0,
+          "reclaimed": 8192
+        }
+      ],
+      "diagnostics": {
+        "baseline": {
+          "seconds": 0.0799859,
+          "lookupSteps": 33546240,
+          "reclaimed": 8192
+        },
+        "candidate": {
+          "seconds": 0.046154,
+          "lookupSteps": 16773120,
+          "reclaimed": 8192
+        }
+      },
+      "medians": {
+        "baseline": 0.0774504,
+        "candidate": 0.0424598
+      },
+      "speedup": 1.8240877253307837
+    },
+    {
+      "shape": "strings",
+      "nodes": 1024,
+      "allocationBatches": 8,
+      "samples": [
+        {
+          "round": 0,
+          "mode": "baseline",
+          "seconds": 0.0269521,
+          "lookupSteps": 0,
+          "reclaimed": 8192
+        },
+        {
+          "round": 0,
+          "mode": "candidate",
+          "seconds": 0.0144094,
+          "lookupSteps": 0,
+          "reclaimed": 8192
+        },
+        {
+          "round": 1,
+          "mode": "candidate",
+          "seconds": 0.0146343,
+          "lookupSteps": 0,
+          "reclaimed": 8192
+        },
+        {
+          "round": 1,
+          "mode": "baseline",
+          "seconds": 0.0258322,
+          "lookupSteps": 0,
+          "reclaimed": 8192
+        },
+        {
+          "round": 2,
+          "mode": "baseline",
+          "seconds": 0.0267312,
+          "lookupSteps": 0,
+          "reclaimed": 8192
+        },
+        {
+          "round": 2,
+          "mode": "candidate",
+          "seconds": 0.0148327,
+          "lookupSteps": 0,
+          "reclaimed": 8192
+        },
+        {
+          "round": 3,
+          "mode": "candidate",
+          "seconds": 0.0140808,
+          "lookupSteps": 0,
+          "reclaimed": 8192
+        },
+        {
+          "round": 3,
+          "mode": "baseline",
+          "seconds": 0.0287861,
+          "lookupSteps": 0,
+          "reclaimed": 8192
+        },
+        {
+          "round": 4,
+          "mode": "baseline",
+          "seconds": 0.0274164,
+          "lookupSteps": 0,
+          "reclaimed": 8192
+        },
+        {
+          "round": 4,
+          "mode": "candidate",
+          "seconds": 0.0155989,
+          "lookupSteps": 0,
+          "reclaimed": 8192
+        }
+      ],
+      "warmup": [
+        {
+          "mode": "baseline",
+          "seconds": 0.0278364,
+          "lookupSteps": 0,
+          "reclaimed": 8192
+        },
+        {
+          "mode": "candidate",
+          "seconds": 0.0144518,
+          "lookupSteps": 0,
+          "reclaimed": 8192
+        }
+      ],
+      "diagnostics": {
+        "baseline": {
+          "seconds": 0.0282852,
+          "lookupSteps": 8380416,
+          "reclaimed": 8192
+        },
+        "candidate": {
+          "seconds": 0.0169147,
+          "lookupSteps": 4190208,
+          "reclaimed": 8192
+        }
+      },
+      "medians": {
+        "baseline": 0.0269521,
+        "candidate": 0.0146343
+      },
+      "speedup": 1.8417074954046317
+    },
+    {
+      "shape": "buffers",
+      "nodes": 256,
+      "allocationBatches": 8,
+      "samples": [
+        {
+          "round": 0,
+          "mode": "baseline",
+          "seconds": 0.0043781,
+          "lookupSteps": 0,
+          "reclaimed": 2048
+        },
+        {
+          "round": 0,
+          "mode": "candidate",
+          "seconds": 0.0027229,
+          "lookupSteps": 0,
+          "reclaimed": 2048
+        },
+        {
+          "round": 1,
+          "mode": "candidate",
+          "seconds": 0.0025166,
+          "lookupSteps": 0,
+          "reclaimed": 2048
+        },
+        {
+          "round": 1,
+          "mode": "baseline",
+          "seconds": 0.0036947,
+          "lookupSteps": 0,
+          "reclaimed": 2048
+        },
+        {
+          "round": 2,
+          "mode": "baseline",
+          "seconds": 0.0035908,
+          "lookupSteps": 0,
+          "reclaimed": 2048
+        },
+        {
+          "round": 2,
+          "mode": "candidate",
+          "seconds": 0.0049934,
+          "lookupSteps": 0,
+          "reclaimed": 2048
+        },
+        {
+          "round": 3,
+          "mode": "candidate",
+          "seconds": 0.0035777,
+          "lookupSteps": 0,
+          "reclaimed": 2048
+        },
+        {
+          "round": 3,
+          "mode": "baseline",
+          "seconds": 0.005417,
+          "lookupSteps": 0,
+          "reclaimed": 2048
+        },
+        {
+          "round": 4,
+          "mode": "baseline",
+          "seconds": 0.0043126,
+          "lookupSteps": 0,
+          "reclaimed": 2048
+        },
+        {
+          "round": 4,
+          "mode": "candidate",
+          "seconds": 0.0031092,
+          "lookupSteps": 0,
+          "reclaimed": 2048
+        }
+      ],
+      "warmup": [
+        {
+          "mode": "baseline",
+          "seconds": 0.0033907,
+          "lookupSteps": 0,
+          "reclaimed": 2048
+        },
+        {
+          "mode": "candidate",
+          "seconds": 0.0021231,
+          "lookupSteps": 0,
+          "reclaimed": 2048
+        }
+      ],
+      "diagnostics": {
+        "baseline": {
+          "seconds": 0.0055377,
+          "lookupSteps": 522240,
+          "reclaimed": 2048
+        },
+        "candidate": {
+          "seconds": 0.0032976,
+          "lookupSteps": 261120,
+          "reclaimed": 2048
+        }
+      },
+      "medians": {
+        "baseline": 0.0043126,
+        "candidate": 0.0031092
+      },
+      "speedup": 1.3870448990093915
+    },
+    {
+      "shape": "holes",
+      "nodes": 1024,
+      "allocationBatches": 4,
+      "samples": [
+        {
+          "round": 0,
+          "mode": "baseline",
+          "seconds": 0.0280252,
+          "lookupSteps": 0,
+          "reclaimed": 12288
+        },
+        {
+          "round": 0,
+          "mode": "candidate",
+          "seconds": 0.0209193,
+          "lookupSteps": 0,
+          "reclaimed": 12288
+        },
+        {
+          "round": 1,
+          "mode": "candidate",
+          "seconds": 0.0224339,
+          "lookupSteps": 0,
+          "reclaimed": 12288
+        },
+        {
+          "round": 1,
+          "mode": "baseline",
+          "seconds": 0.0279764,
+          "lookupSteps": 0,
+          "reclaimed": 12288
+        },
+        {
+          "round": 2,
+          "mode": "baseline",
+          "seconds": 0.0276316,
+          "lookupSteps": 0,
+          "reclaimed": 12288
+        },
+        {
+          "round": 2,
+          "mode": "candidate",
+          "seconds": 0.0209564,
+          "lookupSteps": 0,
+          "reclaimed": 12288
+        },
+        {
+          "round": 3,
+          "mode": "candidate",
+          "seconds": 0.0211656,
+          "lookupSteps": 0,
+          "reclaimed": 12288
+        },
+        {
+          "round": 3,
+          "mode": "baseline",
+          "seconds": 0.0279765,
+          "lookupSteps": 0,
+          "reclaimed": 12288
+        },
+        {
+          "round": 4,
+          "mode": "baseline",
+          "seconds": 0.0281551,
+          "lookupSteps": 0,
+          "reclaimed": 12288
+        },
+        {
+          "round": 4,
+          "mode": "candidate",
+          "seconds": 0.0211315,
+          "lookupSteps": 0,
+          "reclaimed": 12288
+        }
+      ],
+      "warmup": [
+        {
+          "mode": "baseline",
+          "seconds": 0.027594,
+          "lookupSteps": 0,
+          "reclaimed": 12288
+        },
+        {
+          "mode": "candidate",
+          "seconds": 0.0210325,
+          "lookupSteps": 0,
+          "reclaimed": 12288
+        }
+      ],
+      "diagnostics": {
+        "baseline": {
+          "seconds": 0.0298598,
+          "lookupSteps": 12582912,
+          "reclaimed": 12288
+        },
+        "candidate": {
+          "seconds": 0.0222029,
+          "lookupSteps": 8388608,
+          "reclaimed": 12288
+        }
+      },
+      "medians": {
+        "baseline": 0.0279765,
+        "candidate": 0.0211315
+      },
+      "speedup": 1.3239239997160637
+    }
+  ],
+  "revision": "2bfe8c6964d3018cf5d8456e349c8b75c8b5c607",
+  "sourceHashes": {
+    "baseline": "5150020d0c53e92e9ff5af3afad1cdadce01498f7f1213d9a42b497da3c453a3",
+    "candidate": "14d69ab68c52e3d23b0c644128659a0f102a7c4bbd1a8521387cba074ccaa6b3",
+    "workload": "62aa6498a85889d9dcaa72f86d878b790409e993d604168a53bfa2eb105d92fc"
+  }
+}

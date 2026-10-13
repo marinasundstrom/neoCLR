@@ -16609,3 +16609,33 @@ throughput within 2% of baseline. The [evidence record](../benchmarks/gc-index/R
 links protocols, raw rounds and limitations. Generational GC, allocation throughput
 and pressure-based collection remain open; this milestone changes native lookup
 work rather than those contracts.
+
+## 2026-10-13 — Allocation, helper roots and revisiting pacing
+
+After the dense-graph milestone, the author asked what was next. The assistant
+proposed allocation throughput, native-helper temporary protection, then safe
+collection pacing. The author directed: “Proceed with those slices”. The assistant
+combined allocation validation and first-fit search without weakening corruption
+checks, then added explicit rooted concat/join variants selected by native-GC
+codegen. Matched allocation benchmarks improve on both macOS and Windows; fresh
+JIT/AOT HTTP functional checks pass.
+
+The assistant also implemented a closed native pacing experiment with rooted
+admission on every allocation, periodic collection during active execution and an
+explicit idle hook. Large-request admission, genuine exhaustion, resource cleanup
+and owned suspended-stack abandonment pass locally. The assistant keeps general
+managed/HTTP pacing disabled: helper-family coverage is incomplete, and the real
+scheduler has not adopted the experiment's idle contract. The author has not
+approved these provisional thresholds as permanent API semantics. See
+[allocation evidence](../benchmarks/gc-allocation/README.md) and
+[pacing scope and tradeoffs](../benchmarks/http-gc-pacing/README.md).
+
+The author then suggested: “Sweeping in a generational GC would perhaps relieve
+the pressure and latency more”. The assistant agreed that collecting younger
+objects separately could reduce work, distinguished this from faster sweeping,
+and identified promotion and old-to-young reference tracking as requirements.
+The assistant recorded a [generational evaluation](runtime-gc.md#generational-collection-evaluation--2026-10-13)
+with survival, promotion, pause and memory measurements. This is an exploratory
+candidate, not a completed collector or a promise of lower latency; existing root
+and cleanup work remains necessary. No user decision selecting a moving collector
+or particular generation count is recorded.

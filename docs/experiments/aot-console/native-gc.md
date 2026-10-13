@@ -61,9 +61,10 @@ techniques in the [Boehm collector overview](https://www.hboehm.info/gc/gcdescr.
 or scan arbitrary machine stacks/registers. It relies on neoCLR's explicit published
 storage and closed entry contract.
 
-Collection runs only at complete pre-operation boundaries, never in allocation
-services or between result writes. That avoids collecting native service temporaries
-and partly initialized data. The initial stress policy collects at every such boundary;
+Collection runs at complete pre-operation boundaries, and audited allocation
+helpers may also collect/retry while explicitly protecting their temporaries.
+Unaudited native services remain noncollecting; copying/publishing result data
+does not introduce collection points. The stress policy collects at every boundary;
 precise object maps and an allocation-pressure schedule remain follow-up work. No speed,
 pause-time or production-server claim follows from this design.
 

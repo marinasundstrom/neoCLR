@@ -27,3 +27,29 @@ Local macOS ARM64 results in `macos-20261013.json` show 1.66–1.89× object all
 These short microbenchmarks exclude collection time and do not predict application
 speedups. All rounds, source hashes and commands are retained. The new corruption
 regression and existing GC/root contracts pass locally (19 executions).
+
+## Platform qualification
+
+[Run 38420279943](https://github.com/marinasundstrom/neoCLR/actions/runs/38420279943)
+passes Windows GC/root contracts and macOS/Windows socket contracts. The matched
+allocation matrix improves 1.18–1.60× on hosted macOS ARM64 and 1.32–1.84× on
+Windows x64. Separate local macOS results above use their own paired baseline;
+ratios do not rank platforms. All raw rounds and contract reports are retained.
+
+The subsequent rooted-helper integration passes 20 local GC/root checks, and
+compiled concat/join tests in both GC and non-GC modes preserve interpreter
+results and faults. Fresh backend compilation and host relinking validate 128
+plain/JSON HTTP responses across JIT/AOT (`rooted-helper-http-20261013.json`).
+The direct JIT tool emits one expected `JIT_RESULT` diagnostic; the validation
+adapter parses it and requires guest exit zero, rejecting other stderr. An initial
+controller run rejected this successful diagnostic as unexpected stderr; the
+retained passing rerun uses that explicit adapter. This is functional qualification,
+not a matched application speedup claim.
+
+At `4ba0a60d`, Windows passes all 20 native GC/root executions, including borrowed
+concat/join inputs under allocation pressure, and the socket contracts (retained
+`rooted-helper-windows-*-38422680168.json`). The local phase-profiler hook check
+also passes two 32-response plain HTTP runs after its source marker was aligned
+with the audited-helper collection contract (`rooted-helper-phase-check-20261013.json`).
+That check uses an existing guest fixture with current native helpers; it establishes
+tool compatibility, not an application speedup.

@@ -1,0 +1,1545 @@
+{
+  "passed": true,
+  "platform": "macOS-26.6.2-arm64-arm-64bit",
+  "machine": "arm64",
+  "baseline": "13edfa189",
+  "commands": [
+    {
+      "command": [
+        "xcrun",
+        "--sdk",
+        "macosx",
+        "--find",
+        "clang"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "xcrun",
+        "--sdk",
+        "macosx",
+        "--show-sdk-path"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "git",
+        "-C",
+        "/Users/runner/work/neoCLR/neoCLR",
+        "rev-parse",
+        "HEAD"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "git",
+        "-C",
+        "/Users/runner/work/neoCLR/neoCLR",
+        "show",
+        "13edfa189:docs/experiments/aot-console/native-gc.c"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Applications/Xcode_26.6.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang",
+        "-std=c11",
+        "-O2",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-DNEOCLR_NATIVE_GC",
+        "-I",
+        "/Users/runner/work/neoCLR/neoCLR/docs/experiments/aot-console",
+        "-isysroot",
+        "/Applications/Xcode_26.6.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.5.sdk",
+        "/Users/runner/work/neoCLR/neoCLR/benchmarks/gc-allocation/workload.c",
+        "/Users/runner/work/neoCLR/neoCLR/target/gc-allocation-benchmark/baseline.c",
+        "/Users/runner/work/neoCLR/neoCLR/docs/experiments/aot-console/root-probe.c",
+        "-o",
+        "/Users/runner/work/neoCLR/neoCLR/target/gc-allocation-benchmark/baseline"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Applications/Xcode_26.6.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang",
+        "-std=c11",
+        "-O2",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-DNEOCLR_NATIVE_GC",
+        "-I",
+        "/Users/runner/work/neoCLR/neoCLR/docs/experiments/aot-console",
+        "-isysroot",
+        "/Applications/Xcode_26.6.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.5.sdk",
+        "-DLOOKUP_DIAGNOSTICS",
+        "/Users/runner/work/neoCLR/neoCLR/benchmarks/gc-allocation/workload.c",
+        "/Users/runner/work/neoCLR/neoCLR/target/gc-allocation-benchmark/baseline-diagnostic.c",
+        "/Users/runner/work/neoCLR/neoCLR/docs/experiments/aot-console/root-probe.c",
+        "-o",
+        "/Users/runner/work/neoCLR/neoCLR/target/gc-allocation-benchmark/baseline-diagnostic"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Applications/Xcode_26.6.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang",
+        "-std=c11",
+        "-O2",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-DNEOCLR_NATIVE_GC",
+        "-I",
+        "/Users/runner/work/neoCLR/neoCLR/docs/experiments/aot-console",
+        "-isysroot",
+        "/Applications/Xcode_26.6.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.5.sdk",
+        "/Users/runner/work/neoCLR/neoCLR/benchmarks/gc-allocation/workload.c",
+        "/Users/runner/work/neoCLR/neoCLR/target/gc-allocation-benchmark/candidate.c",
+        "/Users/runner/work/neoCLR/neoCLR/docs/experiments/aot-console/root-probe.c",
+        "-o",
+        "/Users/runner/work/neoCLR/neoCLR/target/gc-allocation-benchmark/candidate"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Applications/Xcode_26.6.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang",
+        "-std=c11",
+        "-O2",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-DNEOCLR_NATIVE_GC",
+        "-I",
+        "/Users/runner/work/neoCLR/neoCLR/docs/experiments/aot-console",
+        "-isysroot",
+        "/Applications/Xcode_26.6.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.5.sdk",
+        "-DLOOKUP_DIAGNOSTICS",
+        "/Users/runner/work/neoCLR/neoCLR/benchmarks/gc-allocation/workload.c",
+        "/Users/runner/work/neoCLR/neoCLR/target/gc-allocation-benchmark/candidate-diagnostic.c",
+        "/Users/runner/work/neoCLR/neoCLR/docs/experiments/aot-console/root-probe.c",
+        "-o",
+        "/Users/runner/work/neoCLR/neoCLR/target/gc-allocation-benchmark/candidate-diagnostic"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/runner/work/neoCLR/neoCLR/target/gc-allocation-benchmark/baseline",
+        "64",
+        "200",
+        "objects"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/runner/work/neoCLR/neoCLR/target/gc-allocation-benchmark/candidate",
+        "64",
+        "200",
+        "objects"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/runner/work/neoCLR/neoCLR/target/gc-allocation-benchmark/baseline",
+        "64",
+        "200",
+        "objects"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/runner/work/neoCLR/neoCLR/target/gc-allocation-benchmark/candidate",
+        "64",
+        "200",
+        "objects"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/runner/work/neoCLR/neoCLR/target/gc-allocation-benchmark/candidate",
+        "64",
+        "200",
+        "objects"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/runner/work/neoCLR/neoCLR/target/gc-allocation-benchmark/baseline",
+        "64",
+        "200",
+        "objects"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/runner/work/neoCLR/neoCLR/target/gc-allocation-benchmark/baseline",
+        "64",
+        "200",
+        "objects"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/runner/work/neoCLR/neoCLR/target/gc-allocation-benchmark/candidate",
+        "64",
+        "200",
+        "objects"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/runner/work/neoCLR/neoCLR/target/gc-allocation-benchmark/candidate",
+        "64",
+        "200",
+        "objects"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/runner/work/neoCLR/neoCLR/target/gc-allocation-benchmark/baseline",
+        "64",
+        "200",
+        "objects"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/runner/work/neoCLR/neoCLR/target/gc-allocation-benchmark/baseline",
+        "64",
+        "200",
+        "objects"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/runner/work/neoCLR/neoCLR/target/gc-allocation-benchmark/candidate",
+        "64",
+        "200",
+        "objects"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/runner/work/neoCLR/neoCLR/target/gc-allocation-benchmark/baseline-diagnostic",
+        "64",
+        "200",
+        "objects"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/runner/work/neoCLR/neoCLR/target/gc-allocation-benchmark/candidate-diagnostic",
+        "64",
+        "200",
+        "objects"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/runner/work/neoCLR/neoCLR/target/gc-allocation-benchmark/baseline",
+        "1024",
+        "8",
+        "objects"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/runner/work/neoCLR/neoCLR/target/gc-allocation-benchmark/candidate",
+        "1024",
+        "8",
+        "objects"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/runner/work/neoCLR/neoCLR/target/gc-allocation-benchmark/baseline",
+        "1024",
+        "8",
+        "objects"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/runner/work/neoCLR/neoCLR/target/gc-allocation-benchmark/candidate",
+        "1024",
+        "8",
+        "objects"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/runner/work/neoCLR/neoCLR/target/gc-allocation-benchmark/candidate",
+        "1024",
+        "8",
+        "objects"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/runner/work/neoCLR/neoCLR/target/gc-allocation-benchmark/baseline",
+        "1024",
+        "8",
+        "objects"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/runner/work/neoCLR/neoCLR/target/gc-allocation-benchmark/baseline",
+        "1024",
+        "8",
+        "objects"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/runner/work/neoCLR/neoCLR/target/gc-allocation-benchmark/candidate",
+        "1024",
+        "8",
+        "objects"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/runner/work/neoCLR/neoCLR/target/gc-allocation-benchmark/candidate",
+        "1024",
+        "8",
+        "objects"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/runner/work/neoCLR/neoCLR/target/gc-allocation-benchmark/baseline",
+        "1024",
+        "8",
+        "objects"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/runner/work/neoCLR/neoCLR/target/gc-allocation-benchmark/baseline",
+        "1024",
+        "8",
+        "objects"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/runner/work/neoCLR/neoCLR/target/gc-allocation-benchmark/candidate",
+        "1024",
+        "8",
+        "objects"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/runner/work/neoCLR/neoCLR/target/gc-allocation-benchmark/baseline-diagnostic",
+        "1024",
+        "8",
+        "objects"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/runner/work/neoCLR/neoCLR/target/gc-allocation-benchmark/candidate-diagnostic",
+        "1024",
+        "8",
+        "objects"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/runner/work/neoCLR/neoCLR/target/gc-allocation-benchmark/baseline",
+        "4096",
+        "2",
+        "objects"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/runner/work/neoCLR/neoCLR/target/gc-allocation-benchmark/candidate",
+        "4096",
+        "2",
+        "objects"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/runner/work/neoCLR/neoCLR/target/gc-allocation-benchmark/baseline",
+        "4096",
+        "2",
+        "objects"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/runner/work/neoCLR/neoCLR/target/gc-allocation-benchmark/candidate",
+        "4096",
+        "2",
+        "objects"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/runner/work/neoCLR/neoCLR/target/gc-allocation-benchmark/candidate",
+        "4096",
+        "2",
+        "objects"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/runner/work/neoCLR/neoCLR/target/gc-allocation-benchmark/baseline",
+        "4096",
+        "2",
+        "objects"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/runner/work/neoCLR/neoCLR/target/gc-allocation-benchmark/baseline",
+        "4096",
+        "2",
+        "objects"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/runner/work/neoCLR/neoCLR/target/gc-allocation-benchmark/candidate",
+        "4096",
+        "2",
+        "objects"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/runner/work/neoCLR/neoCLR/target/gc-allocation-benchmark/candidate",
+        "4096",
+        "2",
+        "objects"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/runner/work/neoCLR/neoCLR/target/gc-allocation-benchmark/baseline",
+        "4096",
+        "2",
+        "objects"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/runner/work/neoCLR/neoCLR/target/gc-allocation-benchmark/baseline",
+        "4096",
+        "2",
+        "objects"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/runner/work/neoCLR/neoCLR/target/gc-allocation-benchmark/candidate",
+        "4096",
+        "2",
+        "objects"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/runner/work/neoCLR/neoCLR/target/gc-allocation-benchmark/baseline-diagnostic",
+        "4096",
+        "2",
+        "objects"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/runner/work/neoCLR/neoCLR/target/gc-allocation-benchmark/candidate-diagnostic",
+        "4096",
+        "2",
+        "objects"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/runner/work/neoCLR/neoCLR/target/gc-allocation-benchmark/baseline",
+        "1024",
+        "8",
+        "strings"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/runner/work/neoCLR/neoCLR/target/gc-allocation-benchmark/candidate",
+        "1024",
+        "8",
+        "strings"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/runner/work/neoCLR/neoCLR/target/gc-allocation-benchmark/baseline",
+        "1024",
+        "8",
+        "strings"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/runner/work/neoCLR/neoCLR/target/gc-allocation-benchmark/candidate",
+        "1024",
+        "8",
+        "strings"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/runner/work/neoCLR/neoCLR/target/gc-allocation-benchmark/candidate",
+        "1024",
+        "8",
+        "strings"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/runner/work/neoCLR/neoCLR/target/gc-allocation-benchmark/baseline",
+        "1024",
+        "8",
+        "strings"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/runner/work/neoCLR/neoCLR/target/gc-allocation-benchmark/baseline",
+        "1024",
+        "8",
+        "strings"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/runner/work/neoCLR/neoCLR/target/gc-allocation-benchmark/candidate",
+        "1024",
+        "8",
+        "strings"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/runner/work/neoCLR/neoCLR/target/gc-allocation-benchmark/candidate",
+        "1024",
+        "8",
+        "strings"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/runner/work/neoCLR/neoCLR/target/gc-allocation-benchmark/baseline",
+        "1024",
+        "8",
+        "strings"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/runner/work/neoCLR/neoCLR/target/gc-allocation-benchmark/baseline",
+        "1024",
+        "8",
+        "strings"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/runner/work/neoCLR/neoCLR/target/gc-allocation-benchmark/candidate",
+        "1024",
+        "8",
+        "strings"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/runner/work/neoCLR/neoCLR/target/gc-allocation-benchmark/baseline-diagnostic",
+        "1024",
+        "8",
+        "strings"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/runner/work/neoCLR/neoCLR/target/gc-allocation-benchmark/candidate-diagnostic",
+        "1024",
+        "8",
+        "strings"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/runner/work/neoCLR/neoCLR/target/gc-allocation-benchmark/baseline",
+        "256",
+        "8",
+        "buffers"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/runner/work/neoCLR/neoCLR/target/gc-allocation-benchmark/candidate",
+        "256",
+        "8",
+        "buffers"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/runner/work/neoCLR/neoCLR/target/gc-allocation-benchmark/baseline",
+        "256",
+        "8",
+        "buffers"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/runner/work/neoCLR/neoCLR/target/gc-allocation-benchmark/candidate",
+        "256",
+        "8",
+        "buffers"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/runner/work/neoCLR/neoCLR/target/gc-allocation-benchmark/candidate",
+        "256",
+        "8",
+        "buffers"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/runner/work/neoCLR/neoCLR/target/gc-allocation-benchmark/baseline",
+        "256",
+        "8",
+        "buffers"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/runner/work/neoCLR/neoCLR/target/gc-allocation-benchmark/baseline",
+        "256",
+        "8",
+        "buffers"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/runner/work/neoCLR/neoCLR/target/gc-allocation-benchmark/candidate",
+        "256",
+        "8",
+        "buffers"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/runner/work/neoCLR/neoCLR/target/gc-allocation-benchmark/candidate",
+        "256",
+        "8",
+        "buffers"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/runner/work/neoCLR/neoCLR/target/gc-allocation-benchmark/baseline",
+        "256",
+        "8",
+        "buffers"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/runner/work/neoCLR/neoCLR/target/gc-allocation-benchmark/baseline",
+        "256",
+        "8",
+        "buffers"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/runner/work/neoCLR/neoCLR/target/gc-allocation-benchmark/candidate",
+        "256",
+        "8",
+        "buffers"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/runner/work/neoCLR/neoCLR/target/gc-allocation-benchmark/baseline-diagnostic",
+        "256",
+        "8",
+        "buffers"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/runner/work/neoCLR/neoCLR/target/gc-allocation-benchmark/candidate-diagnostic",
+        "256",
+        "8",
+        "buffers"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/runner/work/neoCLR/neoCLR/target/gc-allocation-benchmark/baseline",
+        "1024",
+        "4",
+        "holes"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/runner/work/neoCLR/neoCLR/target/gc-allocation-benchmark/candidate",
+        "1024",
+        "4",
+        "holes"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/runner/work/neoCLR/neoCLR/target/gc-allocation-benchmark/baseline",
+        "1024",
+        "4",
+        "holes"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/runner/work/neoCLR/neoCLR/target/gc-allocation-benchmark/candidate",
+        "1024",
+        "4",
+        "holes"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/runner/work/neoCLR/neoCLR/target/gc-allocation-benchmark/candidate",
+        "1024",
+        "4",
+        "holes"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/runner/work/neoCLR/neoCLR/target/gc-allocation-benchmark/baseline",
+        "1024",
+        "4",
+        "holes"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/runner/work/neoCLR/neoCLR/target/gc-allocation-benchmark/baseline",
+        "1024",
+        "4",
+        "holes"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/runner/work/neoCLR/neoCLR/target/gc-allocation-benchmark/candidate",
+        "1024",
+        "4",
+        "holes"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/runner/work/neoCLR/neoCLR/target/gc-allocation-benchmark/candidate",
+        "1024",
+        "4",
+        "holes"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/runner/work/neoCLR/neoCLR/target/gc-allocation-benchmark/baseline",
+        "1024",
+        "4",
+        "holes"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/runner/work/neoCLR/neoCLR/target/gc-allocation-benchmark/baseline",
+        "1024",
+        "4",
+        "holes"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/runner/work/neoCLR/neoCLR/target/gc-allocation-benchmark/candidate",
+        "1024",
+        "4",
+        "holes"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/runner/work/neoCLR/neoCLR/target/gc-allocation-benchmark/baseline-diagnostic",
+        "1024",
+        "4",
+        "holes"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/runner/work/neoCLR/neoCLR/target/gc-allocation-benchmark/candidate-diagnostic",
+        "1024",
+        "4",
+        "holes"
+      ],
+      "exitCode": 0
+    }
+  ],
+  "cases": [
+    {
+      "shape": "objects",
+      "nodes": 64,
+      "allocationBatches": 200,
+      "samples": [
+        {
+          "round": 0,
+          "mode": "baseline",
+          "seconds": 0.001506,
+          "lookupSteps": 0,
+          "reclaimed": 12800
+        },
+        {
+          "round": 0,
+          "mode": "candidate",
+          "seconds": 0.000967,
+          "lookupSteps": 0,
+          "reclaimed": 12800
+        },
+        {
+          "round": 1,
+          "mode": "candidate",
+          "seconds": 0.000987,
+          "lookupSteps": 0,
+          "reclaimed": 12800
+        },
+        {
+          "round": 1,
+          "mode": "baseline",
+          "seconds": 0.001476,
+          "lookupSteps": 0,
+          "reclaimed": 12800
+        },
+        {
+          "round": 2,
+          "mode": "baseline",
+          "seconds": 0.001833,
+          "lookupSteps": 0,
+          "reclaimed": 12800
+        },
+        {
+          "round": 2,
+          "mode": "candidate",
+          "seconds": 0.001123,
+          "lookupSteps": 0,
+          "reclaimed": 12800
+        },
+        {
+          "round": 3,
+          "mode": "candidate",
+          "seconds": 0.001105,
+          "lookupSteps": 0,
+          "reclaimed": 12800
+        },
+        {
+          "round": 3,
+          "mode": "baseline",
+          "seconds": 0.001517,
+          "lookupSteps": 0,
+          "reclaimed": 12800
+        },
+        {
+          "round": 4,
+          "mode": "baseline",
+          "seconds": 0.001646,
+          "lookupSteps": 0,
+          "reclaimed": 12800
+        },
+        {
+          "round": 4,
+          "mode": "candidate",
+          "seconds": 0.001122,
+          "lookupSteps": 0,
+          "reclaimed": 12800
+        }
+      ],
+      "warmup": [
+        {
+          "mode": "baseline",
+          "seconds": 0.001397,
+          "lookupSteps": 0,
+          "reclaimed": 12800
+        },
+        {
+          "mode": "candidate",
+          "seconds": 0.001024,
+          "lookupSteps": 0,
+          "reclaimed": 12800
+        }
+      ],
+      "diagnostics": {
+        "baseline": {
+          "seconds": 0.001522,
+          "lookupSteps": 806400,
+          "reclaimed": 12800
+        },
+        "candidate": {
+          "seconds": 0.001062,
+          "lookupSteps": 403200,
+          "reclaimed": 12800
+        }
+      },
+      "medians": {
+        "baseline": 0.001517,
+        "candidate": 0.001105
+      },
+      "speedup": 1.3728506787330315
+    },
+    {
+      "shape": "objects",
+      "nodes": 1024,
+      "allocationBatches": 8,
+      "samples": [
+        {
+          "round": 0,
+          "mode": "baseline",
+          "seconds": 0.010159,
+          "lookupSteps": 0,
+          "reclaimed": 8192
+        },
+        {
+          "round": 0,
+          "mode": "candidate",
+          "seconds": 0.008907,
+          "lookupSteps": 0,
+          "reclaimed": 8192
+        },
+        {
+          "round": 1,
+          "mode": "candidate",
+          "seconds": 0.007852,
+          "lookupSteps": 0,
+          "reclaimed": 8192
+        },
+        {
+          "round": 1,
+          "mode": "baseline",
+          "seconds": 0.011288,
+          "lookupSteps": 0,
+          "reclaimed": 8192
+        },
+        {
+          "round": 2,
+          "mode": "baseline",
+          "seconds": 0.008894,
+          "lookupSteps": 0,
+          "reclaimed": 8192
+        },
+        {
+          "round": 2,
+          "mode": "candidate",
+          "seconds": 0.00851,
+          "lookupSteps": 0,
+          "reclaimed": 8192
+        },
+        {
+          "round": 3,
+          "mode": "candidate",
+          "seconds": 0.008537,
+          "lookupSteps": 0,
+          "reclaimed": 8192
+        },
+        {
+          "round": 3,
+          "mode": "baseline",
+          "seconds": 0.011719,
+          "lookupSteps": 0,
+          "reclaimed": 8192
+        },
+        {
+          "round": 4,
+          "mode": "baseline",
+          "seconds": 0.011576,
+          "lookupSteps": 0,
+          "reclaimed": 8192
+        },
+        {
+          "round": 4,
+          "mode": "candidate",
+          "seconds": 0.008618,
+          "lookupSteps": 0,
+          "reclaimed": 8192
+        }
+      ],
+      "warmup": [
+        {
+          "mode": "baseline",
+          "seconds": 0.012257,
+          "lookupSteps": 0,
+          "reclaimed": 8192
+        },
+        {
+          "mode": "candidate",
+          "seconds": 0.00887,
+          "lookupSteps": 0,
+          "reclaimed": 8192
+        }
+      ],
+      "diagnostics": {
+        "baseline": {
+          "seconds": 0.011483,
+          "lookupSteps": 8380416,
+          "reclaimed": 8192
+        },
+        "candidate": {
+          "seconds": 0.012712,
+          "lookupSteps": 4190208,
+          "reclaimed": 8192
+        }
+      },
+      "medians": {
+        "baseline": 0.011288,
+        "candidate": 0.008537
+      },
+      "speedup": 1.3222443481316621
+    },
+    {
+      "shape": "objects",
+      "nodes": 4096,
+      "allocationBatches": 2,
+      "samples": [
+        {
+          "round": 0,
+          "mode": "baseline",
+          "seconds": 0.059473,
+          "lookupSteps": 0,
+          "reclaimed": 8192
+        },
+        {
+          "round": 0,
+          "mode": "candidate",
+          "seconds": 0.035852,
+          "lookupSteps": 0,
+          "reclaimed": 8192
+        },
+        {
+          "round": 1,
+          "mode": "candidate",
+          "seconds": 0.039775,
+          "lookupSteps": 0,
+          "reclaimed": 8192
+        },
+        {
+          "round": 1,
+          "mode": "baseline",
+          "seconds": 0.06162,
+          "lookupSteps": 0,
+          "reclaimed": 8192
+        },
+        {
+          "round": 2,
+          "mode": "baseline",
+          "seconds": 0.058273,
+          "lookupSteps": 0,
+          "reclaimed": 8192
+        },
+        {
+          "round": 2,
+          "mode": "candidate",
+          "seconds": 0.037095,
+          "lookupSteps": 0,
+          "reclaimed": 8192
+        },
+        {
+          "round": 3,
+          "mode": "candidate",
+          "seconds": 0.037928,
+          "lookupSteps": 0,
+          "reclaimed": 8192
+        },
+        {
+          "round": 3,
+          "mode": "baseline",
+          "seconds": 0.059021,
+          "lookupSteps": 0,
+          "reclaimed": 8192
+        },
+        {
+          "round": 4,
+          "mode": "baseline",
+          "seconds": 0.059284,
+          "lookupSteps": 0,
+          "reclaimed": 8192
+        },
+        {
+          "round": 4,
+          "mode": "candidate",
+          "seconds": 0.0349,
+          "lookupSteps": 0,
+          "reclaimed": 8192
+        }
+      ],
+      "warmup": [
+        {
+          "mode": "baseline",
+          "seconds": 0.061678,
+          "lookupSteps": 0,
+          "reclaimed": 8192
+        },
+        {
+          "mode": "candidate",
+          "seconds": 0.040832,
+          "lookupSteps": 0,
+          "reclaimed": 8192
+        }
+      ],
+      "diagnostics": {
+        "baseline": {
+          "seconds": 0.06002,
+          "lookupSteps": 33546240,
+          "reclaimed": 8192
+        },
+        "candidate": {
+          "seconds": 0.045808,
+          "lookupSteps": 16773120,
+          "reclaimed": 8192
+        }
+      },
+      "medians": {
+        "baseline": 0.059284,
+        "candidate": 0.037095
+      },
+      "speedup": 1.5981668688502493
+    },
+    {
+      "shape": "strings",
+      "nodes": 1024,
+      "allocationBatches": 8,
+      "samples": [
+        {
+          "round": 0,
+          "mode": "baseline",
+          "seconds": 0.010717,
+          "lookupSteps": 0,
+          "reclaimed": 8192
+        },
+        {
+          "round": 0,
+          "mode": "candidate",
+          "seconds": 0.007992,
+          "lookupSteps": 0,
+          "reclaimed": 8192
+        },
+        {
+          "round": 1,
+          "mode": "candidate",
+          "seconds": 0.00784,
+          "lookupSteps": 0,
+          "reclaimed": 8192
+        },
+        {
+          "round": 1,
+          "mode": "baseline",
+          "seconds": 0.011468,
+          "lookupSteps": 0,
+          "reclaimed": 8192
+        },
+        {
+          "round": 2,
+          "mode": "baseline",
+          "seconds": 0.009859,
+          "lookupSteps": 0,
+          "reclaimed": 8192
+        },
+        {
+          "round": 2,
+          "mode": "candidate",
+          "seconds": 0.008588,
+          "lookupSteps": 0,
+          "reclaimed": 8192
+        },
+        {
+          "round": 3,
+          "mode": "candidate",
+          "seconds": 0.008579,
+          "lookupSteps": 0,
+          "reclaimed": 8192
+        },
+        {
+          "round": 3,
+          "mode": "baseline",
+          "seconds": 0.010892,
+          "lookupSteps": 0,
+          "reclaimed": 8192
+        },
+        {
+          "round": 4,
+          "mode": "baseline",
+          "seconds": 0.009795,
+          "lookupSteps": 0,
+          "reclaimed": 8192
+        },
+        {
+          "round": 4,
+          "mode": "candidate",
+          "seconds": 0.007508,
+          "lookupSteps": 0,
+          "reclaimed": 8192
+        }
+      ],
+      "warmup": [
+        {
+          "mode": "baseline",
+          "seconds": 0.011099,
+          "lookupSteps": 0,
+          "reclaimed": 8192
+        },
+        {
+          "mode": "candidate",
+          "seconds": 0.008245,
+          "lookupSteps": 0,
+          "reclaimed": 8192
+        }
+      ],
+      "diagnostics": {
+        "baseline": {
+          "seconds": 0.010007,
+          "lookupSteps": 8380416,
+          "reclaimed": 8192
+        },
+        "candidate": {
+          "seconds": 0.010255,
+          "lookupSteps": 4190208,
+          "reclaimed": 8192
+        }
+      },
+      "medians": {
+        "baseline": 0.010717,
+        "candidate": 0.007992
+      },
+      "speedup": 1.3409659659659658
+    },
+    {
+      "shape": "buffers",
+      "nodes": 256,
+      "allocationBatches": 8,
+      "samples": [
+        {
+          "round": 0,
+          "mode": "baseline",
+          "seconds": 0.002111,
+          "lookupSteps": 0,
+          "reclaimed": 2048
+        },
+        {
+          "round": 0,
+          "mode": "candidate",
+          "seconds": 0.001256,
+          "lookupSteps": 0,
+          "reclaimed": 2048
+        },
+        {
+          "round": 1,
+          "mode": "candidate",
+          "seconds": 0.001244,
+          "lookupSteps": 0,
+          "reclaimed": 2048
+        },
+        {
+          "round": 1,
+          "mode": "baseline",
+          "seconds": 0.00191,
+          "lookupSteps": 0,
+          "reclaimed": 2048
+        },
+        {
+          "round": 2,
+          "mode": "baseline",
+          "seconds": 0.001533,
+          "lookupSteps": 0,
+          "reclaimed": 2048
+        },
+        {
+          "round": 2,
+          "mode": "candidate",
+          "seconds": 0.001073,
+          "lookupSteps": 0,
+          "reclaimed": 2048
+        },
+        {
+          "round": 3,
+          "mode": "candidate",
+          "seconds": 0.001212,
+          "lookupSteps": 0,
+          "reclaimed": 2048
+        },
+        {
+          "round": 3,
+          "mode": "baseline",
+          "seconds": 0.001925,
+          "lookupSteps": 0,
+          "reclaimed": 2048
+        },
+        {
+          "round": 4,
+          "mode": "baseline",
+          "seconds": 0.001788,
+          "lookupSteps": 0,
+          "reclaimed": 2048
+        },
+        {
+          "round": 4,
+          "mode": "candidate",
+          "seconds": 0.001062,
+          "lookupSteps": 0,
+          "reclaimed": 2048
+        }
+      ],
+      "warmup": [
+        {
+          "mode": "baseline",
+          "seconds": 0.001824,
+          "lookupSteps": 0,
+          "reclaimed": 2048
+        },
+        {
+          "mode": "candidate",
+          "seconds": 0.001293,
+          "lookupSteps": 0,
+          "reclaimed": 2048
+        }
+      ],
+      "diagnostics": {
+        "baseline": {
+          "seconds": 0.0015,
+          "lookupSteps": 522240,
+          "reclaimed": 2048
+        },
+        "candidate": {
+          "seconds": 0.001242,
+          "lookupSteps": 261120,
+          "reclaimed": 2048
+        }
+      },
+      "medians": {
+        "baseline": 0.00191,
+        "candidate": 0.001212
+      },
+      "speedup": 1.575907590759076
+    },
+    {
+      "shape": "holes",
+      "nodes": 1024,
+      "allocationBatches": 4,
+      "samples": [
+        {
+          "round": 0,
+          "mode": "baseline",
+          "seconds": 0.015152,
+          "lookupSteps": 0,
+          "reclaimed": 12288
+        },
+        {
+          "round": 0,
+          "mode": "candidate",
+          "seconds": 0.012252,
+          "lookupSteps": 0,
+          "reclaimed": 12288
+        },
+        {
+          "round": 1,
+          "mode": "candidate",
+          "seconds": 0.012712,
+          "lookupSteps": 0,
+          "reclaimed": 12288
+        },
+        {
+          "round": 1,
+          "mode": "baseline",
+          "seconds": 0.01495,
+          "lookupSteps": 0,
+          "reclaimed": 12288
+        },
+        {
+          "round": 2,
+          "mode": "baseline",
+          "seconds": 0.015425,
+          "lookupSteps": 0,
+          "reclaimed": 12288
+        },
+        {
+          "round": 2,
+          "mode": "candidate",
+          "seconds": 0.013248,
+          "lookupSteps": 0,
+          "reclaimed": 12288
+        },
+        {
+          "round": 3,
+          "mode": "candidate",
+          "seconds": 0.012616,
+          "lookupSteps": 0,
+          "reclaimed": 12288
+        },
+        {
+          "round": 3,
+          "mode": "baseline",
+          "seconds": 0.014582,
+          "lookupSteps": 0,
+          "reclaimed": 12288
+        },
+        {
+          "round": 4,
+          "mode": "baseline",
+          "seconds": 0.01395,
+          "lookupSteps": 0,
+          "reclaimed": 12288
+        },
+        {
+          "round": 4,
+          "mode": "candidate",
+          "seconds": 0.012684,
+          "lookupSteps": 0,
+          "reclaimed": 12288
+        }
+      ],
+      "warmup": [
+        {
+          "mode": "baseline",
+          "seconds": 0.015924,
+          "lookupSteps": 0,
+          "reclaimed": 12288
+        },
+        {
+          "mode": "candidate",
+          "seconds": 0.012435,
+          "lookupSteps": 0,
+          "reclaimed": 12288
+        }
+      ],
+      "diagnostics": {
+        "baseline": {
+          "seconds": 0.014086,
+          "lookupSteps": 12582912,
+          "reclaimed": 12288
+        },
+        "candidate": {
+          "seconds": 0.015652,
+          "lookupSteps": 8388608,
+          "reclaimed": 12288
+        }
+      },
+      "medians": {
+        "baseline": 0.01495,
+        "candidate": 0.012684
+      },
+      "speedup": 1.1786502680542414
+    }
+  ],
+  "revision": "2bfe8c6964d3018cf5d8456e349c8b75c8b5c607",
+  "sourceHashes": {
+    "baseline": "5150020d0c53e92e9ff5af3afad1cdadce01498f7f1213d9a42b497da3c453a3",
+    "candidate": "14d69ab68c52e3d23b0c644128659a0f102a7c4bbd1a8521387cba074ccaa6b3",
+    "workload": "29d4000bacb04539f4789315ae0e3147dff125508e202147666a4fce0cb5e7d0"
+  }
+}

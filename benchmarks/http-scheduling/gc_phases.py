@@ -25,7 +25,7 @@ def instrument(root, out, command):
     text = '#include <stdint.h>\nextern uint64_t neoclr_schedule_profile_now(void);\nextern void neoclr_gc_boundary_end(uint64_t);\n' + text
     marker = '    if (!frame || head != frame || instruction >= 8192'
     text = replace_once(text, marker, '    uint64_t phase_start = neoclr_schedule_profile_now();\n'+marker)
-    marker = '    /* Full initialized snapshot is published. Allocation services never collect. */'
+    marker = '    /* Complete snapshot: audited allocating helpers additionally protect their temporaries. */'
     text = replace_once(text, marker, '    neoclr_gc_boundary_end(phase_start);\n'+marker)
     probe_copy = out/'gc-phases-probe.c'
     probe_copy.write_text(text)
