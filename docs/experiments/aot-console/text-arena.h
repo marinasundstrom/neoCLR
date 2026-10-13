@@ -82,6 +82,14 @@ int32_t neoclr_string_concat_v1(const neoclr_aot_text *left, const neoclr_aot_te
 int32_t neoclr_string_join_parts_v1(const void *parts, int32_t count, const neoclr_aot_text *separator, int32_t expected,
                                   neoclr_aot_text_arena *arena, const neoclr_aot_text **output);
 
+/* Private GC-generated-call variants. Require an active complete same-context
+ * root boundary. Protect input text/parts through a single allocation retry;
+ * no operation replay or additional collection after construction starts. */
+int32_t neoclr_string_concat_rooted_v1(const neoclr_aot_text *, const neoclr_aot_text *,
+    neoclr_aot_text_arena *, const neoclr_aot_text **);
+int32_t neoclr_string_join_parts_rooted_v1(const void *, int32_t, const neoclr_aot_text *,
+    int32_t, neoclr_aot_text_arena *, const neoclr_aot_text **);
+
 /* Exact ASCII [+-]?[0-9]+; complete grammar validation precedes range.
  * Publishes erased Int32 or Byte(1=InvalidFormat, 2=Overflow), no allocation.
  * Null arguments fault without publishing output. */

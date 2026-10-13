@@ -527,7 +527,8 @@ The private rooted allocator's boundary identity check alone cannot prove this.
 | --- | --- | --- |
 | Current stack capture | Active frame records and immutable image names; no managed intermediate | Single allocation may collect/retry with current-context complete roots or quiescent host |
 | Capture of ancestor context under a foreign frame | Frames outside the current-context boundary | Keep noncollecting allocation |
-| Arena-only text/object/array helpers | Caller operands, borrowed buffers and sometimes partially constructed outputs | Remain noncollecting; context-aware entry and temporary-root audits still needed |
+| GC-generated concat/join variants | Borrowed text inputs or parts array and separator | Protect values during allocation retry; parts tracing retains its text elements |
+| Other arena-only text/object/array helpers | Caller operands, borrowed buffers and sometimes partially constructed outputs | Remain noncollecting; context-aware entry and temporary-root audits still needed |
 | Multi-allocation producers and native callbacks | Intermediate objects and externally retained values | Remain noncollecting; publish each intermediate before any collecting call |
 
 `native-gc-helper-test.c` forces capture retry in a 512-byte heap, verifies live
@@ -553,3 +554,43 @@ Finding a hole does not terminate validation: a corrupt later block rejects the
 call before heap/output mutation. Overflow and malformed-heap precedence remain
 unchanged. [Allocation-only evidence](../../../benchmarks/gc-allocation/README.md)
 measures the gain and records the remaining linear validation cost.
+
+### Explicit helper temporary values
+
+`neoclr_gc_allocate_rooted_values_v1` extends admitted allocation retry with up to
+16 explicitly supplied temporary managed values. The collector sees a stack-local
+root record only during retry collection; it is not added to the logical call
+stack. No persistent handle, allocation or callback is involved. The caller must
+still provide a complete current boundary and protect all other native temporaries.
+The returned result must be published before another collecting call.
+
+Native GC code generation selects `neoclr_string_concat_rooted_v1` and
+`neoclr_string_join_parts_rooted_v1`; their signatures retain the existing arena
+argument and require its identity to match the active frame's context. Concatenation
+roots both inputs; joining roots the parts array and separator, with normal array
+tracing retaining initialized elements. Both validate lengths before their sole
+allocation and finish copying without another collection. They never retry a whole
+operation. Non-GC code and existing native helper callers retain noncollecting v1
+entry points. New generated native objects require a matching host with these
+private symbols; old objects remain usable with the new host.
+
+The native backend owns this specialization. Raven's Runtime Contract options,
+CLI bridge metadata, service signatures and ordinary .NET lowering do not change.
+No additional bridge encoding or metadata information is introduced or lost.
+Pressure tests intentionally omit helper inputs from caller roots to check local
+protection; compiled tests exercise both GC and non-GC paths and preserve interpreter
+results/faults. General helper coverage and global pacing remain incomplete.
+
+Remaining admission audit:
+
+| Family | Required protection before opting in | Current policy |
+| --- | --- | --- |
+| Scalar formatting / primitive arrays | Complete caller boundary, publish result before next allocation | Noncollecting |
+| Text slicing, encoding, replacement and paths | Retain borrowed inputs and any backing arrays | Noncollecting |
+| Unicode sequence construction | Retain partially initialized result arrays and each constructed element | Noncollecting |
+| Native file/network/TLS/SQL producers | Retain managed intermediates; keep native handles/buffers alive; never replay I/O to retry allocation | Noncollecting |
+| Constructors / reflection invocation | Retain initialized receiver and every native result scratch until publication | Existing explicit generated roots; admission migration still needed |
+
+These are coverage gaps, not permanent lifetime semantics. The existing .NET
+allocation comparison remains applicable: collecting to satisfy an allocation is
+normal, while exposing unrooted native intermediates to that collection is invalid.

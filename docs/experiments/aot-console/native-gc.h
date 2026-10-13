@@ -102,6 +102,12 @@ int32_t neoclr_gc_allocate_v1(neoclr_aot_text_arena *arena, uint64_t bytes,
  * is implicitly opted in by adding this internal contract. */
 int32_t neoclr_gc_allocate_rooted_v1(neoclr_aot_context *, const neoclr_probe_frame *,
     uint64_t bytes, uint32_t kind, void **output);
+/* Same admission contract, plus up to 16 borrowed managed values/temporaries
+ * protected for this allocation attempt. Values may be null, image literals or
+ * interior pointers. The caller must publish the returned result before another
+ * collecting operation. This does not protect other native caller temporaries. */
+int32_t neoclr_gc_allocate_rooted_values_v1(neoclr_aot_context *, const neoclr_probe_frame *,
+    const void *const *, uint32_t count, uint64_t bytes, uint32_t kind, void **output);
 /* Only at a complete compiler root boundary, or quiescent host with no guest
  * frames. Root addresses are observed, never rewritten. No reentry/concurrency
  * on this context. Service temporaries must not be live at a collection boundary. */

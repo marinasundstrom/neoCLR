@@ -281,9 +281,10 @@ int32_t neoclr_gc_allocate_v1(neoclr_aot_text_arena *a, uint64_t bytes,
 /* Opt-in admission for callers that have published every live reference.
  * Keep the arena-only allocator non-collecting: native helpers may retain
  * unregistered intermediates between its calls. Never retry a whole operation. */
-int32_t neoclr_gc_allocate_rooted_v1(neoclr_aot_context *context,
-    const neoclr_probe_frame *boundary, uint64_t bytes, uint32_t kind, void **output) {
-    if (!context || resource_cleanup_active || boundary != neoclr_root_probe_head_v1() ||
+int32_t neoclr_gc_allocate_rooted_values_v1(neoclr_aot_context *context,
+    const neoclr_probe_frame *boundary, const void *const *values, uint32_t count,
+    uint64_t bytes, uint32_t kind, void **output) {
+    if (count > 16 || (count && !values) || !context || resource_cleanup_active || boundary != neoclr_root_probe_head_v1() ||
         (boundary && boundary->context != context)) return NEOCLR_AOT_FAULT_RUNTIME_ERROR;
     int32_t status = neoclr_gc_allocate_v1(&context->text, bytes, kind, output);
     if (status != NEOCLR_AOT_FAULT_NATIVE_MEMORY_LIMIT) return status;
@@ -291,9 +292,21 @@ int32_t neoclr_gc_allocate_rooted_v1(neoclr_aot_context *context,
      * mirrors the allocator, including descriptor and alignment overhead. */
     if (bytes > UINT64_MAX - sizeof(block) - 7 ||
         sizeof(block) + ((bytes + 7) & ~UINT64_C(7)) > context->text.capacity) return status;
-    status = neoclr_gc_collect_v1(context, boundary);
+    /* Private helper roots are visible only to this collection, not logical stack
+     * tracing. Values include every borrowed input and intermediate needed after
+     * allocation; their slots remain live on this synchronous C call's stack. */
+    neoclr_probe_storage slots[16];
+    for (uint32_t i = 0; i < count; i++) slots[i] = (neoclr_probe_storage){&values[i], 8, 0};
+    neoclr_probe_frame helper = {.previous = (neoclr_probe_frame *)boundary,
+        .context = context, .storage = slots, .storage_count = count};
+    status = neoclr_gc_collect_v1(context, count ? &helper : boundary);
     if (status) return status;
     return neoclr_gc_allocate_v1(&context->text, bytes, kind, output);
+}
+
+int32_t neoclr_gc_allocate_rooted_v1(neoclr_aot_context *context, const neoclr_probe_frame *boundary,
+    uint64_t bytes, uint32_t kind, void **output) {
+    return neoclr_gc_allocate_rooted_values_v1(context, boundary, NULL, 0, bytes, kind, output);
 }
 
 /* Sparse byte-range index rebuilt from validated spans for each collection.

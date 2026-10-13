@@ -9274,3 +9274,15 @@ no unavailable packaged git revision is inferred. RavenDoc rendering uses native
 branch 6b5e052ce3648f9247ac76aba275587a3a5a1bb4. Windows and TLS streaming runs
 remain separate qualification work. See neoCLR's
 `docs/experiments/http-body-stream/README.md` for evidence and limits.
+
+## Native collector helper specialization — 2026-10-13
+
+The neoCLR native backend now selects rooted concat/join helper symbols for
+`--native-gc`, retaining noncollecting symbols for non-GC code. Temporary inputs
+are protected during a single allocation retry. This is native codegen/runtime
+integration: Raven Runtime Contract configuration, bridge representation, metadata
+and .NET lowering are unchanged; no Raven compiler branch change is required.
+New native objects need matching private host symbols. The native metadata/service
+contract already describes the same operations, so no new bridge workaround or
+replacement encoding is needed. See the [temporary-root audit](experiments/aot-console/native-gc.md#explicit-helper-temporary-values)
+for owner, validation and incomplete helper coverage.

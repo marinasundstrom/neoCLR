@@ -365,7 +365,7 @@ pub(crate) fn compile_into(
         let mut sig = module.make_signature();
         sig.params.extend([types::I64; 4].map(AbiParam::new));
         sig.returns.push(AbiParam::new(types::I32));
-        Some((module.declare_function("neoclr_string_concat_v1", Linkage::Import, &sig)?, id))
+        Some((module.declare_function(if details.is_some_and(|d| d.native_gc) { "neoclr_string_concat_rooted_v1" } else { "neoclr_string_concat_v1" }, Linkage::Import, &sig)?, id))
     } else { None };
     let diagnostic_data = details.map(|options| crate::fault_details::Data::new(module, input, options)).transpose()?;
     let input_service = if details.is_some_and(|d| !d.console_read_byte.is_empty()) {
@@ -514,9 +514,9 @@ pub(crate) fn compile_into(
             (&d.parse_int32, "neoclr_parse_int32_v1", vec![types::I64, types::I64]),
             (&d.utf8_encode, "neoclr_utf8_encode_v1", vec![types::I64, types::I64, types::I64]),
             (&d.utf8_decode, "neoclr_utf8_decode_v1", vec![types::I64, types::I64, types::I64]),
-            (&d.string_join_parts, "neoclr_string_join_parts_v1", vec![types::I64, types::I32, types::I64, types::I32, types::I64, types::I64]),
+            (&d.string_join_parts, if d.native_gc { "neoclr_string_join_parts_rooted_v1" } else { "neoclr_string_join_parts_v1" }, vec![types::I64, types::I32, types::I64, types::I32, types::I64, types::I64]),
             (&d.string_replace_ordinal, "neoclr_string_replace_ordinal_v1", vec![types::I64, types::I64, types::I64, types::I64, types::I64]),
-            (&d.string_concat, "neoclr_string_concat_v1", vec![types::I64, types::I64, types::I64, types::I64]),
+            (&d.string_concat, if d.native_gc { "neoclr_string_concat_rooted_v1" } else { "neoclr_string_concat_v1" }, vec![types::I64, types::I64, types::I64, types::I64]),
             (&d.string_grapheme_count, "neoclr_string_grapheme_count_v1", vec![types::I64, types::I64]),
             (&d.string_grapheme_at, "neoclr_string_grapheme_at_v1", vec![types::I64, types::I32, types::I64, types::I64]),
             (&d.string_graphemes, "neoclr_string_graphemes_v1", vec![types::I64, types::I64, types::I64]),

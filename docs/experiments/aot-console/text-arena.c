@@ -31,6 +31,24 @@ static int32_t reserve_storage(neoclr_aot_text_arena *arena, uint64_t bytes,
 #endif
 }
 
+/* Explicitly selected only by audited generated calls. Arena-only native callers
+ * retain the noncollecting services until their entire temporary lifetime is audited. */
+static int32_t reserve_text_inputs(neoclr_aot_text_arena *arena, uint64_t bytes,
+    void **output, int rooted, const void *left, const void *right) {
+#ifdef NEOCLR_NATIVE_GC
+    if (rooted) {
+        const neoclr_probe_frame *head = neoclr_root_probe_head_v1();
+        neoclr_aot_context *context = head ? (neoclr_aot_context *)head->context : NULL;
+        if (!context || &context->text != arena) return NEOCLR_AOT_FAULT_RUNTIME_ERROR;
+        const void *values[] = {left, right};
+        return neoclr_gc_allocate_rooted_values_v1(context, head, values, 2, bytes, TEXT_STORAGE, output);
+    }
+#else
+    (void)rooted; (void)left; (void)right;
+#endif
+    return reserve_storage(arena, bytes, TEXT_STORAGE, output);
+}
+
 static int32_t store_text(const char *buffer, size_t length,
                           neoclr_aot_text_arena *arena, const neoclr_aot_text **output) {
     if (arena->used > arena->capacity || (arena->capacity && !arena->data) ||
@@ -242,8 +260,8 @@ int32_t neoclr_text_decode_utf8_bytes_v1(const unsigned char *bytes, uint64_t le
     return NEOCLR_AOT_FAULT_NONE;
 }
 
-int32_t neoclr_string_concat_v1(const neoclr_aot_text *left, const neoclr_aot_text *right,
-                               neoclr_aot_text_arena *arena, const neoclr_aot_text **output) {
+static int32_t string_concat(const neoclr_aot_text *left, const neoclr_aot_text *right,
+                               neoclr_aot_text_arena *arena, const neoclr_aot_text **output, int rooted) {
     if (!left || !right || !arena || !output || arena->used > arena->capacity ||
         (arena->capacity && !arena->data) || ((uintptr_t)arena->data & 7))
         return NEOCLR_AOT_FAULT_RUNTIME_ERROR;
@@ -252,7 +270,7 @@ int32_t neoclr_string_concat_v1(const neoclr_aot_text *left, const neoclr_aot_te
     uint64_t length = left->length + right->length;
     if (length > UINT64_MAX - 8) return NEOCLR_AOT_FAULT_NATIVE_MEMORY_LIMIT;
     void *storage;
-    int32_t status = reserve_storage(arena, 8 + length, TEXT_STORAGE, &storage);
+    int32_t status = reserve_text_inputs(arena, 8 + length, &storage, rooted, left, right);
     if (status) return status;
     neoclr_aot_text *text = storage;
     text->length = length;
@@ -263,8 +281,17 @@ int32_t neoclr_string_concat_v1(const neoclr_aot_text *left, const neoclr_aot_te
 }
 
 
-int32_t neoclr_string_join_parts_v1(const void *parts, int32_t count, const neoclr_aot_text *separator, int32_t expected,
-                                  neoclr_aot_text_arena *arena, const neoclr_aot_text **output) {
+int32_t neoclr_string_concat_v1(const neoclr_aot_text *left, const neoclr_aot_text *right,
+    neoclr_aot_text_arena *arena, const neoclr_aot_text **output) {
+    return string_concat(left, right, arena, output, 0);
+}
+int32_t neoclr_string_concat_rooted_v1(const neoclr_aot_text *left, const neoclr_aot_text *right,
+    neoclr_aot_text_arena *arena, const neoclr_aot_text **output) {
+    return string_concat(left, right, arena, output, 1);
+}
+
+static int32_t string_join_parts(const void *parts, int32_t count, const neoclr_aot_text *separator, int32_t expected,
+                                  neoclr_aot_text_arena *arena, const neoclr_aot_text **output, int rooted) {
     if (!parts || !separator || !output || count < 0 || expected < 0)
         return NEOCLR_AOT_FAULT_RUNTIME_ERROR;
     const unsigned char *array = parts;
@@ -290,7 +317,7 @@ int32_t neoclr_string_join_parts_v1(const void *parts, int32_t count, const neoc
     }
     if (length != (uint64_t)expected) return NEOCLR_AOT_FAULT_RUNTIME_ERROR;
     void *storage;
-    int32_t status = reserve_storage(arena, 8 + length, TEXT_STORAGE, &storage);
+    int32_t status = reserve_text_inputs(arena, 8 + length, &storage, rooted, parts, separator);
     if (status) return status;
     neoclr_aot_text *text = storage;
     text->length = length;
@@ -309,6 +336,15 @@ int32_t neoclr_string_join_parts_v1(const void *parts, int32_t count, const neoc
     return NEOCLR_AOT_FAULT_NONE;
 }
 
+
+int32_t neoclr_string_join_parts_v1(const void *parts, int32_t count, const neoclr_aot_text *separator,
+    int32_t expected, neoclr_aot_text_arena *arena, const neoclr_aot_text **output) {
+    return string_join_parts(parts, count, separator, expected, arena, output, 0);
+}
+int32_t neoclr_string_join_parts_rooted_v1(const void *parts, int32_t count, const neoclr_aot_text *separator,
+    int32_t expected, neoclr_aot_text_arena *arena, const neoclr_aot_text **output) {
+    return string_join_parts(parts, count, separator, expected, arena, output, 1);
+}
 
 int32_t neoclr_parse_int32_v1(const neoclr_aot_text *text, void *output) {
     if (!text || !output) return NEOCLR_AOT_FAULT_RUNTIME_ERROR;
