@@ -11,4 +11,3 @@ test rooted_object_construction_preserves_arguments_and_receiver ... ok
 test rooted_byte_arrays_bounds_borrows_and_faults_match_interpreter ... ok
 
 test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 153 filtered out; finished in 5.71s
-
