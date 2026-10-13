@@ -1,0 +1,87 @@
+{
+  "passed": true,
+  "commands": [
+    {
+      "command": [
+        "dotnet",
+        "/Users/robert/Projects/neoclr/target/http-concurrent-candidate-20261013/bundle/sdk/tools/rvnc/rvnc.dll",
+        "neoclr",
+        "--core-reference",
+        "/Users/robert/Projects/neoclr/target/http-concurrent-candidate-20261013/bundle/lib/Core.dll",
+        "--runtime-seed",
+        "/Users/robert/Projects/neoclr/target/http-concurrent-candidate-20261013/bundle/lib/System.runtime.neox",
+        "--bootstrap-intrinsics",
+        "--bootstrap-ownership",
+        "/Users/robert/Projects/neoclr/target/http-concurrent-candidate-20261013/bundle/lib/ownership.json",
+        "--object-library",
+        "System.Runtime",
+        "--async-library",
+        "System.Runtime",
+        "--runtime-async-poc",
+        "RuntimeAwaitProvider.Bridge",
+        "--reference",
+        "/Users/robert/Projects/neoclr/target/http-concurrent-candidate-20261013/bundle/lib/System.Runtime.dll",
+        "--reference",
+        "/Users/robert/Projects/neoclr/target/http-concurrent-candidate-20261013/bundle/lib/System.Data.dll",
+        "--reference",
+        "/Users/robert/Projects/neoclr/target/http-concurrent-candidate-20261013/bundle/lib/System.Networking.dll",
+        "--reference",
+        "/Users/robert/Projects/neoclr/target/http-concurrent-candidate-20261013/bundle/lib/System.Web.dll",
+        "-o",
+        "/Users/robert/Projects/neoclr/target/gc-paced-runtime-source-20261013/app.dll",
+        "/Users/robert/Projects/neoclr/docs/experiments/runtime-async/RuntimeHttp.rvn",
+        "/Users/robert/Projects/neoclr/docs/experiments/runtime-async/RuntimeAsyncBridge.rvn"
+      ],
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/release/neoclr",
+        "run",
+        "/Users/robert/Projects/neoclr/target/gc-paced-runtime-source-20261013/app.dll",
+        "--execution",
+        "interpreter",
+        "--system",
+        "/Users/robert/Projects/neoclr/target/http-concurrent-candidate-20261013/bundle/lib/System.runtime.neox",
+        "--instructions",
+        "100000000",
+        "--object-root",
+        "/Users/robert/Projects/neoclr/target/http-concurrent-candidate-20261013/bundle/lib/System.Runtime.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/http-concurrent-candidate-20261013/bundle/lib/System.Runtime.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/http-concurrent-candidate-20261013/bundle/lib/System.Data.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/http-concurrent-candidate-20261013/bundle/lib/System.Networking.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/http-concurrent-candidate-20261013/bundle/lib/System.Web.dll"
+      ],
+      "exitCode": 0,
+      "stdout": "PASS runtime async HTTP client and server\n",
+      "stderr": ""
+    }
+  ],
+  "sha256": {
+    "/Users/robert/Projects/neoclr/docs/experiments/runtime-async/RuntimeHttp.rvn": "680442c8c5339d1d280cc18a40111607363d3ab6fb69a4102bbb909fa52c39dd",
+    "/Users/robert/Projects/neoclr/docs/experiments/runtime-async/RuntimeAsyncBridge.rvn": "16b5effa64125b66d66959fd64dfcec6a93985532e8b8f7633421964005cd7ff",
+    "/Users/robert/Projects/neoclr/target/release/neoclr": "57e1551815390c17044a73b87a3e4bb663406d00549d6adb3bcdcd5c9b9f7ebb",
+    "/Users/robert/Projects/neoclr/target/http-concurrent-candidate-20261013/bundle/sdk/tools/rvnc/rvnc.dll": "c56bf5da468c40afcd302c186465a83f6374c65d029ee8f6b2157884964d8319",
+    "/Users/robert/Projects/neoclr/target/http-concurrent-candidate-20261013/bundle/sdk/tools/rvnc/Raven.CodeAnalysis.dll": "7f457ed3bd8174f7f812f60561bb78c36b7449b03ab640e2a1c619ca62d24f01",
+    "/Users/robert/Projects/neoclr/target/http-concurrent-candidate-20261013/bundle/sdk/tools/rvnc/Raven.CodeAnalysis.NeoClr.dll": "218125bd271cc4c691970c7994a59e6756f9f58b7c1d353b6ceac0d40d81710e",
+    "/Users/robert/Projects/neoclr/target/http-concurrent-candidate-20261013/bundle/sdk/tools/rvnc/NeoCLR.Metadata.Experimental.dll": "37ca4fa4469fa0f341dc997b9ce513b8ed77a6f5f862dcd19a11695604c3d959",
+    "/Users/robert/Projects/neoclr/target/http-concurrent-candidate-20261013/bundle/lib/ownership.json": "0b609b986f2d54a504bb55ec673460191124f06c5a7d14c6f1bade6f0b3f6c5a",
+    "/Users/robert/Projects/neoclr/target/http-concurrent-candidate-20261013/bundle/lib/Core.dll": "3d4a676d379067c18a65a9beb8257ed40bf3196fc643a9ba1d559c619ec73fad",
+    "/Users/robert/Projects/neoclr/target/http-concurrent-candidate-20261013/bundle/lib/System.runtime.neox": "98a1ae1da85387c87746957e83a4015eb59d0566539a915c69f168d2b511b190",
+    "/Users/robert/Projects/neoclr/target/http-concurrent-candidate-20261013/bundle/lib/System.Runtime.dll": "4e85571b0eaa3e0868f0e6165b0ba9038f2fde89e03c83934f0ad264307276a3",
+    "/Users/robert/Projects/neoclr/target/http-concurrent-candidate-20261013/bundle/lib/System.Data.dll": "a563b65aa74faef25fa3dde618b67a45387d5db719d25dbe6ed6f2120f0314d4",
+    "/Users/robert/Projects/neoclr/target/http-concurrent-candidate-20261013/bundle/lib/System.Networking.dll": "6715aeb443494f9c5a4e1f4f61a807147468a87f1b0980ee51e533f3a076bebb",
+    "/Users/robert/Projects/neoclr/target/http-concurrent-candidate-20261013/bundle/lib/System.Web.dll": "a8098569fe25f6b04e47c1b344eb67841afe8d040e5bc6a7043dad4af9fa5e15"
+  },
+  "metadataInspection": {
+    "exitCode": 0,
+    "stderr": "",
+    "stateMachineMentions": 0
+  }
+}

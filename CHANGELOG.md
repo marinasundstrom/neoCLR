@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-13
 
+- Retain passing macOS paced runtime-await evidence: all 24 JIT/AOT language, cleanup, lifetime, stress, HTTP and fault/recovery cases, plus interpreter lifetime and repeated-entry controls. Verify recorded input hashes after execution. This qualifies the current macOS carrier with paced collection, not Windows suspension or a default switch; no additional runtime fix was required.
+
 - Record the supplied GC overview and primary-source review of Go/.NET collector choices. Keep generational, concurrent and relocation work exploratory; prioritize survival, allocation and pause measurements, with throughput evaluated against latency and memory limits. No collector or policy change.
 
 - Retain managed HTTP pacing qualification on macOS ARM64 and Windows x64: each validates 640 responses with complete diagnostic reclamation. Windows short sequential throughput improves 2.20× for plain text and 2.64× for JSON; peak arena extent grows modestly. Local timings overlapped compiler work and are not an isolated speedup qualification. Keep stress GC as default, update roadmap/website status, and record the author’s AOT HTTP competitiveness objective without claiming saturation throughput or cross-platform parity.

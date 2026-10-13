@@ -65,3 +65,19 @@ and benchmark reports record the platform and commands. Both macOS and Windows
 validate 640 responses and full reclamation. Windows short sequential medians
 improve 2.20× plain and 2.64× JSON; local timings overlapped compiler work and
 remain diagnostic context rather than isolated performance evidence.
+
+The fresh [paced runtime-await report](runtime-await-paced-macos-20261013.json)
+passes all 24 JIT/AOT cases on macOS ARM64: language, async cleanup, operation
+lifetime, stress, stack reuse, terminal fault, HTTP client/server, timeout,
+cancellation, protocol recovery and HTTP continuation fault. The same run also
+passes the interpreter lifetime control and four same-heap entries for language,
+cleanup and stack-reuse consumers. All recorded input hashes still matched after
+the run. The [source recipe](runtime-await-source-macos-20261013.json) independently
+passes the combined HTTP interpreter consumer. These reports use current libraries
+and application runtime-await lowering; referenced libraries retain their existing
+lowering. They do not qualify Windows native suspension or a general default flip.
+
+The corrected run completes after the stale sample and readiness-window fixes
+committed in `d63cf9dd8`. No further collector or scheduler change was needed for
+these managed workload checks. Sustained/concurrent load, library/provider
+integration and platform-wide runtime-await defaults remain separate gates.
