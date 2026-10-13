@@ -179,3 +179,20 @@ before returning Idle/Pending; root-observer and scheduler tests run both varian
 Stress collection remains the installed-host default. The closed workload evidence
 does not establish managed HTTP or whole-runtime throughput or justify promotion
 by itself. Source hashes and separate diagnostic results accompany timing reports.
+
+The integrated policy passes admission and ownership contracts in
+[run 38455945430](https://github.com/marinasundstrom/neoCLR/actions/runs/38455945430)
+at `f547c875b`. Five alternating measured pairs follow warmup for each workload;
+diagnostic runs are separate. These are within-host comparisons, not an OS ranking.
+
+| Environment | Object workload speedup | String workload speedup | Evidence |
+| --- | ---: | ---: | --- |
+| Local macOS ARM64 | 3.36× | 3.43× | [Report](integrated-local-20261013.json) |
+| Hosted macOS ARM64 | 4.14× | 3.61× | [Report](integrated-macos-latest-38455945430.json) |
+| Hosted Windows x64 | 4.10× | 3.81× | [Report](integrated-windows-2022-38455945430.json) |
+
+Every worker reclaims all 20,000 allocations. Collections fall from 20,001 to
+1,251. Peak arena extent grows from 4,160 to 5,120 bytes for objects and 3,120 to
+3,840 bytes for strings (about 23%). Timings exclude final idle cleanup; these are
+not scheduler-poll latency or sustained/concurrent application measurements. See
+[qualification and limitations](../../docs/validation/runtime-product/native-scheduler-pacing/README.md).

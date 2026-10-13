@@ -40,9 +40,9 @@ application gate also passes eight default-JIT HTTP cases and SSL-stream HTTPS J
 in interpreter/JIT/AOT. The
 [closed rooted pacing experiment](../benchmarks/http-gc-pacing/README.md#rooted-closed-workload-pacing-follow-up-2026-10-13)
 passes large-request admission, exhaustion, explicit idle cleanup and suspended-owner
-abandonment. It is not enabled for general managed execution: remaining helper
-coverage and actual scheduler idle integration are still prerequisites. Continue
-with the [helper-family audit](experiments/aot-console/native-gc.md#explicit-helper-temporary-values)
+abandonment. The follow-up integrates the audited helpers and actual scheduler idle
+cleanup into an opt-in runtime policy. Default promotion still requires managed
+workload qualification. The completed [helper-family audit](experiments/aot-console/native-gc.md#explicit-helper-temporary-values)
 (UTF-8 slicing now also protects borrowed input through retry; local pressure tests
 and 270 compiled GC/non-GC comparisons pass; Windows GC/root and both-platform
 socket checks also pass). Integer formatting now has audited stack-scratch allocation
@@ -60,7 +60,7 @@ results through retry. Process-argument construction now roots its partial array
 scratch is kept stable. POSIX file input now retries only final decoding after closing the descriptor.
 Socket/TLS/crypto adapters do not allocate managed results; PostgreSQL uses the
 managed socket/encoding layers. Culture/time-zone producers now retain native snapshots through rooted output
-allocation. Interning now retains its source during pool-entry allocation; object allocation now retries with published argument/receiver roots and initialized payloads (see the producer ownership inventory). All 32 local macOS/hosted Windows GC/root checks and local compiled lifetime consumers pass ([evidence](validation/runtime-product/native-object-lifetimes/README.md)); hosted macOS remains queued. Native scheduler acquisition now collects before returning Idle/Pending, with pending/abandoned-owner lifetime tests. The retained-stack pump refreshes ownership/readiness after idle collection to avoid diagnosing expired bodies as unresolved work. The runtime now supplies an opt-in 16-allocation/64-boundary policy with unconditional idle collection. Local GC/root and stress/paced scheduler checks pass; platform evidence and managed workload qualification precede default promotion. Interpreter policy remains independent.
+allocation. Interning now retains its source during pool-entry allocation; object allocation now retries with published argument/receiver roots and initialized payloads (see the producer ownership inventory). The subsequent pacing gate passes all 33 GC/root executions on hosted macOS and Windows, including these helper checks ([evidence](validation/runtime-product/native-scheduler-pacing/README.md)). Native scheduler acquisition now collects before returning Idle/Pending, with pending/abandoned-owner lifetime tests. The retained-stack pump refreshes ownership/readiness after idle collection to avoid diagnosing expired bodies as unresolved work. The runtime now supplies an opt-in 16-allocation/64-boundary policy with unconditional idle collection. Hosted macOS/Windows GC/root and stress/paced scheduler checks pass; integrated closed-workload gains are 3.61–4.14× with about 23% more peak arena extent. Managed workload qualification precedes default promotion. Interpreter policy remains independent.
 The author also proposed a [platform abstraction layer](platform-direction.md#platform-abstraction-direction--2026-10-13); evolve existing OS boundaries incrementally without replacing this milestone. Linux ARM64 is an explicit future expansion target; separate OS and CPU/ABI concerns without claiming current support.
 The author additionally proposed generations to reduce collection pressure/latency;
 [the next architecture evaluation](runtime-gc.md#generational-collection-evaluation--2026-10-13)

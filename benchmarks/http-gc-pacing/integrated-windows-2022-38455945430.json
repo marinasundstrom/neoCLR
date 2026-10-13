@@ -1,0 +1,669 @@
+{
+  "passed": true,
+  "promotionEligible": false,
+  "platform": "Windows-2022Server-10.0.20348-SP0",
+  "commands": [
+    {
+      "command": [
+        "cl",
+        "/nologo",
+        "/W4",
+        "/WX",
+        "/std:c11",
+        "/experimental:c11atomics",
+        "/O2",
+        "/MT",
+        "/DNEOCLR_NATIVE_GC",
+        "/ID:\\a\\neoCLR\\neoCLR\\docs\\experiments\\aot-console",
+        "/DNEOCLR_INTEGRATED_PACING",
+        "/DNEOCLR_GC_PACED",
+        "D:\\a\\neoCLR\\neoCLR\\benchmarks\\http-gc-pacing\\rooted-policy-test.c",
+        "D:\\a\\neoCLR\\neoCLR\\docs\\experiments\\aot-console\\native-gc.c",
+        "D:\\a\\neoCLR\\neoCLR\\docs\\experiments\\aot-console\\root-probe.c",
+        "D:\\a\\neoCLR\\neoCLR\\docs\\experiments\\aot-console\\text-arena.c",
+        "/Fe:D:\\a\\neoCLR\\neoCLR\\target\\rooted-pacing\\contracts.exe"
+      ],
+      "exitCode": 0,
+      "stderr": ""
+    },
+    {
+      "command": [
+        "cl",
+        "/nologo",
+        "/W4",
+        "/WX",
+        "/std:c11",
+        "/experimental:c11atomics",
+        "/O2",
+        "/MT",
+        "/DNEOCLR_NATIVE_GC",
+        "/ID:\\a\\neoCLR\\neoCLR\\docs\\experiments\\aot-console",
+        "/DNEOCLR_INTEGRATED_PACING",
+        "/DNEOCLR_GC_PACED",
+        "D:\\a\\neoCLR\\neoCLR\\benchmarks\\http-gc-pacing\\rooted-workload.c",
+        "D:\\a\\neoCLR\\neoCLR\\docs\\experiments\\aot-console\\native-gc.c",
+        "D:\\a\\neoCLR\\neoCLR\\docs\\experiments\\aot-console\\root-probe.c",
+        "D:\\a\\neoCLR\\neoCLR\\docs\\experiments\\aot-console\\text-arena.c",
+        "/Fe:D:\\a\\neoCLR\\neoCLR\\target\\rooted-pacing\\timed.exe"
+      ],
+      "exitCode": 0,
+      "stderr": ""
+    },
+    {
+      "command": [
+        "cl",
+        "/nologo",
+        "/W4",
+        "/WX",
+        "/std:c11",
+        "/experimental:c11atomics",
+        "/O2",
+        "/MT",
+        "/DNEOCLR_NATIVE_GC",
+        "/ID:\\a\\neoCLR\\neoCLR\\docs\\experiments\\aot-console",
+        "/DNEOCLR_INTEGRATED_PACING",
+        "/DNEOCLR_GC_PACED",
+        "/DNEOCLR_GC_PROFILE",
+        "D:\\a\\neoCLR\\neoCLR\\benchmarks\\http-gc-pacing\\rooted-workload.c",
+        "D:\\a\\neoCLR\\neoCLR\\docs\\experiments\\aot-console\\native-gc.c",
+        "D:\\a\\neoCLR\\neoCLR\\docs\\experiments\\aot-console\\root-probe.c",
+        "D:\\a\\neoCLR\\neoCLR\\docs\\experiments\\aot-console\\text-arena.c",
+        "/Fe:D:\\a\\neoCLR\\neoCLR\\target\\rooted-pacing\\diagnostic.exe"
+      ],
+      "exitCode": 0,
+      "stderr": ""
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\rooted-pacing\\contracts.exe"
+      ],
+      "exitCode": 0,
+      "stderr": ""
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\rooted-pacing\\timed.exe",
+        "0",
+        "objects"
+      ],
+      "exitCode": 0,
+      "stderr": ""
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\rooted-pacing\\timed.exe",
+        "1",
+        "objects"
+      ],
+      "exitCode": 0,
+      "stderr": ""
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\rooted-pacing\\timed.exe",
+        "1",
+        "objects"
+      ],
+      "exitCode": 0,
+      "stderr": ""
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\rooted-pacing\\timed.exe",
+        "0",
+        "objects"
+      ],
+      "exitCode": 0,
+      "stderr": ""
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\rooted-pacing\\timed.exe",
+        "0",
+        "objects"
+      ],
+      "exitCode": 0,
+      "stderr": ""
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\rooted-pacing\\timed.exe",
+        "1",
+        "objects"
+      ],
+      "exitCode": 0,
+      "stderr": ""
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\rooted-pacing\\timed.exe",
+        "1",
+        "objects"
+      ],
+      "exitCode": 0,
+      "stderr": ""
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\rooted-pacing\\timed.exe",
+        "0",
+        "objects"
+      ],
+      "exitCode": 0,
+      "stderr": ""
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\rooted-pacing\\timed.exe",
+        "0",
+        "objects"
+      ],
+      "exitCode": 0,
+      "stderr": ""
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\rooted-pacing\\timed.exe",
+        "1",
+        "objects"
+      ],
+      "exitCode": 0,
+      "stderr": ""
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\rooted-pacing\\timed.exe",
+        "1",
+        "objects"
+      ],
+      "exitCode": 0,
+      "stderr": ""
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\rooted-pacing\\timed.exe",
+        "0",
+        "objects"
+      ],
+      "exitCode": 0,
+      "stderr": ""
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\rooted-pacing\\diagnostic.exe",
+        "1",
+        "objects"
+      ],
+      "exitCode": 0,
+      "stderr": ""
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\rooted-pacing\\diagnostic.exe",
+        "0",
+        "objects"
+      ],
+      "exitCode": 0,
+      "stderr": ""
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\rooted-pacing\\timed.exe",
+        "0",
+        "strings"
+      ],
+      "exitCode": 0,
+      "stderr": ""
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\rooted-pacing\\timed.exe",
+        "1",
+        "strings"
+      ],
+      "exitCode": 0,
+      "stderr": ""
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\rooted-pacing\\timed.exe",
+        "1",
+        "strings"
+      ],
+      "exitCode": 0,
+      "stderr": ""
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\rooted-pacing\\timed.exe",
+        "0",
+        "strings"
+      ],
+      "exitCode": 0,
+      "stderr": ""
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\rooted-pacing\\timed.exe",
+        "0",
+        "strings"
+      ],
+      "exitCode": 0,
+      "stderr": ""
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\rooted-pacing\\timed.exe",
+        "1",
+        "strings"
+      ],
+      "exitCode": 0,
+      "stderr": ""
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\rooted-pacing\\timed.exe",
+        "1",
+        "strings"
+      ],
+      "exitCode": 0,
+      "stderr": ""
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\rooted-pacing\\timed.exe",
+        "0",
+        "strings"
+      ],
+      "exitCode": 0,
+      "stderr": ""
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\rooted-pacing\\timed.exe",
+        "0",
+        "strings"
+      ],
+      "exitCode": 0,
+      "stderr": ""
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\rooted-pacing\\timed.exe",
+        "1",
+        "strings"
+      ],
+      "exitCode": 0,
+      "stderr": ""
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\rooted-pacing\\timed.exe",
+        "1",
+        "strings"
+      ],
+      "exitCode": 0,
+      "stderr": ""
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\rooted-pacing\\timed.exe",
+        "0",
+        "strings"
+      ],
+      "exitCode": 0,
+      "stderr": ""
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\rooted-pacing\\diagnostic.exe",
+        "1",
+        "strings"
+      ],
+      "exitCode": 0,
+      "stderr": ""
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\rooted-pacing\\diagnostic.exe",
+        "0",
+        "strings"
+      ],
+      "exitCode": 0,
+      "stderr": ""
+    }
+  ],
+  "samples": [
+    {
+      "workload": "objects",
+      "mode": "paced",
+      "round": -1,
+      "seconds": 0.0053819,
+      "collections": 1251,
+      "allocations": 20000,
+      "reclaimed": 20000,
+      "peakArenaBytes": 0
+    },
+    {
+      "workload": "objects",
+      "mode": "stress",
+      "round": -1,
+      "seconds": 0.0219558,
+      "collections": 20001,
+      "allocations": 20000,
+      "reclaimed": 20000,
+      "peakArenaBytes": 0
+    },
+    {
+      "workload": "objects",
+      "mode": "stress",
+      "round": 0,
+      "seconds": 0.0221287,
+      "collections": 20001,
+      "allocations": 20000,
+      "reclaimed": 20000,
+      "peakArenaBytes": 0
+    },
+    {
+      "workload": "objects",
+      "mode": "paced",
+      "round": 0,
+      "seconds": 0.0054082,
+      "collections": 1251,
+      "allocations": 20000,
+      "reclaimed": 20000,
+      "peakArenaBytes": 0
+    },
+    {
+      "workload": "objects",
+      "mode": "paced",
+      "round": 1,
+      "seconds": 0.005395,
+      "collections": 1251,
+      "allocations": 20000,
+      "reclaimed": 20000,
+      "peakArenaBytes": 0
+    },
+    {
+      "workload": "objects",
+      "mode": "stress",
+      "round": 1,
+      "seconds": 0.0225792,
+      "collections": 20001,
+      "allocations": 20000,
+      "reclaimed": 20000,
+      "peakArenaBytes": 0
+    },
+    {
+      "workload": "objects",
+      "mode": "stress",
+      "round": 2,
+      "seconds": 0.0220066,
+      "collections": 20001,
+      "allocations": 20000,
+      "reclaimed": 20000,
+      "peakArenaBytes": 0
+    },
+    {
+      "workload": "objects",
+      "mode": "paced",
+      "round": 2,
+      "seconds": 0.0053987,
+      "collections": 1251,
+      "allocations": 20000,
+      "reclaimed": 20000,
+      "peakArenaBytes": 0
+    },
+    {
+      "workload": "objects",
+      "mode": "paced",
+      "round": 3,
+      "seconds": 0.0053929,
+      "collections": 1251,
+      "allocations": 20000,
+      "reclaimed": 20000,
+      "peakArenaBytes": 0
+    },
+    {
+      "workload": "objects",
+      "mode": "stress",
+      "round": 3,
+      "seconds": 0.0220083,
+      "collections": 20001,
+      "allocations": 20000,
+      "reclaimed": 20000,
+      "peakArenaBytes": 0
+    },
+    {
+      "workload": "objects",
+      "mode": "stress",
+      "round": 4,
+      "seconds": 0.0225376,
+      "collections": 20001,
+      "allocations": 20000,
+      "reclaimed": 20000,
+      "peakArenaBytes": 0
+    },
+    {
+      "workload": "objects",
+      "mode": "paced",
+      "round": 4,
+      "seconds": 0.0053781,
+      "collections": 1251,
+      "allocations": 20000,
+      "reclaimed": 20000,
+      "peakArenaBytes": 0
+    },
+    {
+      "workload": "strings",
+      "mode": "paced",
+      "round": -1,
+      "seconds": 0.0054223,
+      "collections": 1251,
+      "allocations": 20000,
+      "reclaimed": 20000,
+      "peakArenaBytes": 0
+    },
+    {
+      "workload": "strings",
+      "mode": "stress",
+      "round": -1,
+      "seconds": 0.0207619,
+      "collections": 20001,
+      "allocations": 20000,
+      "reclaimed": 20000,
+      "peakArenaBytes": 0
+    },
+    {
+      "workload": "strings",
+      "mode": "stress",
+      "round": 0,
+      "seconds": 0.0208795,
+      "collections": 20001,
+      "allocations": 20000,
+      "reclaimed": 20000,
+      "peakArenaBytes": 0
+    },
+    {
+      "workload": "strings",
+      "mode": "paced",
+      "round": 0,
+      "seconds": 0.0054435,
+      "collections": 1251,
+      "allocations": 20000,
+      "reclaimed": 20000,
+      "peakArenaBytes": 0
+    },
+    {
+      "workload": "strings",
+      "mode": "paced",
+      "round": 1,
+      "seconds": 0.0054654,
+      "collections": 1251,
+      "allocations": 20000,
+      "reclaimed": 20000,
+      "peakArenaBytes": 0
+    },
+    {
+      "workload": "strings",
+      "mode": "stress",
+      "round": 1,
+      "seconds": 0.0207894,
+      "collections": 20001,
+      "allocations": 20000,
+      "reclaimed": 20000,
+      "peakArenaBytes": 0
+    },
+    {
+      "workload": "strings",
+      "mode": "stress",
+      "round": 2,
+      "seconds": 0.0207835,
+      "collections": 20001,
+      "allocations": 20000,
+      "reclaimed": 20000,
+      "peakArenaBytes": 0
+    },
+    {
+      "workload": "strings",
+      "mode": "paced",
+      "round": 2,
+      "seconds": 0.0055571,
+      "collections": 1251,
+      "allocations": 20000,
+      "reclaimed": 20000,
+      "peakArenaBytes": 0
+    },
+    {
+      "workload": "strings",
+      "mode": "paced",
+      "round": 3,
+      "seconds": 0.0054323,
+      "collections": 1251,
+      "allocations": 20000,
+      "reclaimed": 20000,
+      "peakArenaBytes": 0
+    },
+    {
+      "workload": "strings",
+      "mode": "stress",
+      "round": 3,
+      "seconds": 0.0207698,
+      "collections": 20001,
+      "allocations": 20000,
+      "reclaimed": 20000,
+      "peakArenaBytes": 0
+    },
+    {
+      "workload": "strings",
+      "mode": "stress",
+      "round": 4,
+      "seconds": 0.0207813,
+      "collections": 20001,
+      "allocations": 20000,
+      "reclaimed": 20000,
+      "peakArenaBytes": 0
+    },
+    {
+      "workload": "strings",
+      "mode": "paced",
+      "round": 4,
+      "seconds": 0.0054482,
+      "collections": 1251,
+      "allocations": 20000,
+      "reclaimed": 20000,
+      "peakArenaBytes": 0
+    }
+  ],
+  "diagnostics": [
+    {
+      "workload": "objects",
+      "mode": "stress",
+      "seconds": 0.023216,
+      "collections": 20001,
+      "allocations": 20000,
+      "reclaimed": 20000,
+      "peakArenaBytes": 4160
+    },
+    {
+      "workload": "objects",
+      "mode": "paced",
+      "seconds": 0.0054923,
+      "collections": 1251,
+      "allocations": 20000,
+      "reclaimed": 20000,
+      "peakArenaBytes": 5120
+    },
+    {
+      "workload": "strings",
+      "mode": "stress",
+      "seconds": 0.0220819,
+      "collections": 20001,
+      "allocations": 20000,
+      "reclaimed": 20000,
+      "peakArenaBytes": 3120
+    },
+    {
+      "workload": "strings",
+      "mode": "paced",
+      "seconds": 0.0055422,
+      "collections": 1251,
+      "allocations": 20000,
+      "reclaimed": 20000,
+      "peakArenaBytes": 3840
+    }
+  ],
+  "summary": {
+    "objects": {
+      "medians": {
+        "stress": 0.0221287,
+        "paced": 0.005395
+      },
+      "speedup": 4.101705282669139
+    },
+    "strings": {
+      "medians": {
+        "stress": 0.0207835,
+        "paced": 0.0054482
+      },
+      "speedup": 3.814746154693293
+    }
+  },
+  "scope": "Integrated opt-in native boundary policy; closed workload timings, not managed HTTP/default qualification.",
+  "inputs": {
+    "D:\\a\\neoCLR\\neoCLR\\runtime\\native\\diagnostics\\attach.c": "464882fc743dbc761a81c5e4e4f0a73bb48490b02287b1d130b0d51e59bed7fc",
+    "D:\\a\\neoCLR\\neoCLR\\runtime\\native\\diagnostics\\attach.h": "d2c89948e8eb7447919b954db31a3b00eb518611aa65fc4362d244b452a7a3ac",
+    "D:\\a\\neoCLR\\neoCLR\\runtime\\native\\faults\\fault-details.h": "ff09aee456b338eef6c123ebcc60f428acea32720b7bef45910e22b9953c5ed9",
+    "D:\\a\\neoCLR\\neoCLR\\runtime\\native\\faults\\render.c": "e650b004a256f448509d80d8c574873520a469a6801cd32f8e7b99c3fb30a439",
+    "D:\\a\\neoCLR\\neoCLR\\runtime\\native\\gc\\native-gc.c": "468ede57b234d8f47b27ae182becf2644fe835349a27028aab957ce06fc98f70",
+    "D:\\a\\neoCLR\\neoCLR\\runtime\\native\\gc\\native-gc.h": "8bef670cce85582df053d6195a15aeff7ccf9cf61aec4bcce43f8ca1710f422a",
+    "D:\\a\\neoCLR\\neoCLR\\runtime\\native\\gc\\root-probe.c": "cd0ef22e957cb969f12d2230eaac7cf7c39c1be4124fe56507b0c6ece77cbf97",
+    "D:\\a\\neoCLR\\neoCLR\\runtime\\native\\gc\\root-probe.h": "ea3c8ea415619121ec354deda550e27055ceabbe05a489c8a2f631568e9acfb7",
+    "D:\\a\\neoCLR\\neoCLR\\runtime\\native\\memory\\text-arena.c": "b0c59381eba6400a32406bc0492a9909b05cf745fe1bf9ab1ae8c1c4e677a696",
+    "D:\\a\\neoCLR\\neoCLR\\runtime\\native\\memory\\text-arena.h": "4ef9b06c89581eee4cbdcb52b85e2d84c798a885830511ee077641f66e1ba056",
+    "D:\\a\\neoCLR\\neoCLR\\benchmarks\\http-gc-pacing\\evaluate-rooted.py": "6b12ca138fa9a484918ebad8ce9bc3eab60617309f1ef2ded0e085476611d5d9",
+    "D:\\a\\neoCLR\\neoCLR\\benchmarks\\http-gc-pacing\\rooted-policy.h": "6596ba83126f9bbb548b9b57bd13b4091a0c05e11ec00051bea9bfa8ba7019a5",
+    "D:\\a\\neoCLR\\neoCLR\\benchmarks\\http-gc-pacing\\rooted-policy-test.c": "7a570ad784b636d73dea5c17a1c9a63f7db7da3f3c9c6af4d513895037e6408d",
+    "D:\\a\\neoCLR\\neoCLR\\benchmarks\\http-gc-pacing\\rooted-workload.c": "64bf9c9c7fb9418beba68cb564897bc4f62c65eb1ecc69df17aee00ff22c3f65",
+    "D:\\a\\neoCLR\\neoCLR\\docs\\experiments\\aot-console\\native-gc.c": "fb16012609473203b6a17315c3294c69cc7a07f9dc0d4182854b921ae22601d5",
+    "D:\\a\\neoCLR\\neoCLR\\docs\\experiments\\aot-console\\root-probe.c": "5c97b9cb3f2ba2b262e3749d73fe3d6fe6004e1dcd54b09af975fbd22ccdc0b2",
+    "D:\\a\\neoCLR\\neoCLR\\docs\\experiments\\aot-console\\text-arena.c": "bdf8aee6550ce283afda67a3236d0da9a6295c4cd28a24f33ed80ef2e219c2e8",
+    "D:\\a\\neoCLR\\neoCLR\\docs\\experiments\\aot-console\\console.h": "9a0669bebeb7e94e7e284cfa670327394c9d47bfe1c6b0a3482ae5b2a01b13d3",
+    "D:\\a\\neoCLR\\neoCLR\\docs\\experiments\\aot-console\\entry-arguments.h": "c3c00d2501901d5ee1fc1d5562f8898850eb4cf262e23eec36ff43e443128666",
+    "D:\\a\\neoCLR\\neoCLR\\docs\\experiments\\aot-console\\file-input.h": "c82b4561603a8f1233835bd09a1a6e771523418cdeead664fc090e14d2019a03",
+    "D:\\a\\neoCLR\\neoCLR\\docs\\experiments\\aot-console\\file-output.h": "fdd1420cdf244d11046883d67b11c221e905d328c266b27cd37ac95c35704e8f",
+    "D:\\a\\neoCLR\\neoCLR\\docs\\experiments\\aot-console\\native-gc.h": "f3589dff32ac56191ad3f9b77e116ec69dc8197f84317424518e19d307a5bd67",
+    "D:\\a\\neoCLR\\neoCLR\\docs\\experiments\\aot-console\\native-session.h": "f42dd75215ff55cca439bace75b28b07fb0a972bc1fa7cad253601f715f70335",
+    "D:\\a\\neoCLR\\neoCLR\\docs\\experiments\\aot-console\\native-stack.h": "e4cec17c036469051fd10b934c04e7b7af06e4f1c5db2f73cd339f4180583105",
+    "D:\\a\\neoCLR\\neoCLR\\docs\\experiments\\aot-console\\root-probe.h": "d2a8e481d39cd528d9c67f4f3026d9ac611ff0d636078a5f20dbb6884996ed8c",
+    "D:\\a\\neoCLR\\neoCLR\\docs\\experiments\\aot-console\\socket-client-internal.h": "cd81752f5cecca33b74d306feb311485340b810f8951fb82d3f91f635b16fc0c",
+    "D:\\a\\neoCLR\\neoCLR\\docs\\experiments\\aot-console\\socket-listener.h": "4b08f431e82986b13092786b8c7a431408c4c7d5172f3815499546a1b531268b",
+    "D:\\a\\neoCLR\\neoCLR\\docs\\experiments\\aot-console\\socket-os.h": "c2851391b925acf6a362906b835e14bdb28a562e999cc88479a11a0c65a9736e",
+    "D:\\a\\neoCLR\\neoCLR\\docs\\experiments\\aot-console\\string-unicode.h": "60a697df91c1021f94af85daede5f655d6385425c65c454157a44d1ebf186706",
+    "D:\\a\\neoCLR\\neoCLR\\docs\\experiments\\aot-console\\task-queue.h": "b28695014eed2fa8304b078d7bba002ebbd8d71bb86a4643e0092b794cfe3654",
+    "D:\\a\\neoCLR\\neoCLR\\docs\\experiments\\aot-console\\text-arena.h": "1bdeed01520a810d71d88c4c0e9a814323cc55d363554f6888e162cbee9e3a52",
+    "D:\\a\\neoCLR\\neoCLR\\docs\\experiments\\aot-console\\tls-managed.h": "4429514dddad09403b50838c6db90e9c5db540f5ffcb06768dc3df3fe1de6890"
+  },
+  "integrated": true,
+  "contractsPassed": true
+}

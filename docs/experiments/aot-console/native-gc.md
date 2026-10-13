@@ -896,3 +896,10 @@ recomputes waiting/ready state after acquisition, avoiding a false unresolved-wo
 fault. A real suspended-body regression fails before this fix and passes afterward.
 Its ownership and idle-drain tests now run in the macOS GC gate; the carrier is not
 a Windows implementation. Shared scheduler/collector tests run on both systems.
+
+[Qualification](../../validation/runtime-product/native-scheduler-pacing/README.md)
+retains passing hosted macOS/Windows GC/root, stress/paced scheduler and package
+checks. The integrated closed workloads improve 3.61–4.14× on those hosts with
+approximately 23% larger peak arena extent and complete final reclamation. These
+are not managed HTTP results; the separate retained-stack follow-up is identified
+by its own revision and evidence.
