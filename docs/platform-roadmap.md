@@ -1,5 +1,12 @@
 # neoCLR platform roadmap
 
+**HTTP collector optimization (2026-10-13):** Author-directed profiling identifies
+collection as the shared plain-text/JSON cost. A [single-pass sweep/coalescing change](../benchmarks/http-server/profiling.md)
+improves matched local JIT/AOT throughput by 7–8% with identical guest inputs and
+unchanged collection policy. All 1,536 responses and sanitized GC/retained-stack
+checks pass. Interpreter behavior, Windows qualification and published Preview 14
+baselines are unchanged. Root-boundary overhead and safe pacing remain follow-ups.
+
 **Benchmark baselines (2026-10-13):** The author requested published measurements
 and retained history. [Preview 14 HTTP baselines](../benchmarks/http-server/README.md)
 now cover plain text, object JSON and PostgreSQL/query/map/JSON across interpreter,

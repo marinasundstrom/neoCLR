@@ -25,6 +25,22 @@ available original wording; other text is a summary.
 
 See the [changelog](../CHANGELOG.md) and linked design documents for technical status.
 
+## 2026-10-13 — Profile HTTP and reduce shared collection work
+
+- **Author:** asks to profile plain-text and JSON HTTP cases, fix the dominant
+  shared bottleneck, verify GC correctness, rerun benchmarks and commit each slice.
+- **Assistant investigation:** native GC counters and stack sampling identify
+  collection as the shared hot spot. The assistant selects a single-pass sweep and
+  free-span coalescing change, retaining boundary collection and poisoning rather
+  than changing allocation-pressure behavior without a safe retry/rooting contract.
+- **Performed outcome:** [profiles and matched comparison](../benchmarks/http-server/profiling.md)
+  retain 1,536 validated responses and show 7–8% higher median throughput in all four
+  local JIT/AOT workload combinations. Sanitized collector tests and owned native
+  suspension checks pass; profiles reclaim every allocation. These are local
+  development results, not refreshed Windows qualification or statistical gates.
+- **Open:** root-boundary traversal and collection pacing remain important costs.
+  The installed Preview 14 SDK and published baseline data remain unchanged.
+
 ## 2026-10-13 — Historical benchmarks and performance stability
 
 **Author:** asks to retain historical benchmarks so both maintainers and visitors

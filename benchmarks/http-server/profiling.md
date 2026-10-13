@@ -38,3 +38,53 @@ python3 benchmarks/http-server/profile.py \
 
 The profiler is provisional development tooling. It does not change installed SDKs,
 public APIs or published benchmark history.
+
+## Matched sweep/coalescing result
+
+The collector now sweeps and merges adjacent free spans in one forward pass. Its
+rooting, collection boundaries, failure behavior, poisoning and allocation limits
+are unchanged. Baseline and candidate hosts were freshly linked from the same
+sources with only `native-gc.c` substituted; each AOT pair uses the identical object,
+and JIT pairs use the same assembly and released compiler. Instrumentation and
+sampling were disabled for the comparison. No concurrent builds were launched.
+
+Five alternating rounds plus one warmup process for each variant/case/mode validate
+**1,536 responses across 48 processes**, with 960 requests retained for timing.
+
+| Workload/mode | Baseline requests/s | Candidate requests/s | Observed increase |
+| --- | ---: | ---: | ---: |
+| Plain text / JIT | 61.27 | 65.68 | 7.2% |
+| Plain text / AOT | 63.83 | 68.84 | 7.9% |
+| Object JSON / JIT | 33.58 | 36.12 | 7.5% |
+| Object JSON / AOT | 35.04 | 37.80 | 7.9% |
+
+These are medians within this comparison, not ratios against earlier published runs.
+All four candidate ranges sit above their corresponding baseline ranges. This is
+useful local evidence, not cross-host statistical qualification. GC remains a major
+cost; this does not close the overall runtime performance gap.
+
+[Raw rounds and inputs](gc-sweep-comparison-20261013.json) retain all request timings,
+startup and ranges. [GC validation](gc-sweep-validation-20261013.json) includes the
+new mixed-hole test and retained suspension checks. Post-change diagnostics for
+[plain text](profile-plain-sweep-20261013.json) and
+[JSON](profile-json-sweep-20261013.json) reclaim all 17,908/40,214 allocations,
+with identical allocated payload and peak live/arena bytes. Collection attempts
+are 201,545/296,393 versus 201,546/296,391 before: scheduling/poll boundaries vary,
+but collection policy is unchanged. Instrumented elapsed GC times are noisy (the
+plain-text profile increased); performance claims use the uninstrumented comparison.
+[Baseline and candidate native stack captures](profiles/) are retained separately.
+
+Reproduce the matched comparison using a passing bundle preparation record:
+
+```sh
+python3 benchmarks/http-server/compare-gc.py \
+  --plain benchmarks/http-server/results-20261013.json \
+  --json benchmarks/http-server/json-results-20261013.json \
+  --host target/release-callback-bundle-20261013/preparation.json \
+  --baseline c1d16de6 --output target/http-gc-comparison-new
+```
+
+The interpreter collector is unchanged and was not rerun. Windows was not requalified.
+The installed Preview 14 SDK and public baseline pages remain unchanged; this result
+belongs to development history. Next investigate root-boundary traversal and safe
+allocation-pressure scheduling, preserving explicit collection and stress coverage.

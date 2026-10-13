@@ -8,6 +8,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-13
 
+- Record matched HTTP collector reruns: five alternating JIT/AOT rounds show
+  7–8% higher median plain-text/object-JSON throughput with identical guest inputs.
+  Validate 1,536 responses; retain every timing, native stack captures and input
+  hashes. Post-change profiles retain allocation/heap totals and full reclamation;
+  diagnostic timings remain noisy. Published Preview 14 baselines stay unchanged.
+
 - Reduce shared native JIT/AOT collector work by combining sweeping and free-span
   coalescing into one pass. Preserve collection frequency, roots, poisoning, cleanup
   order and allocation limits. Sanitized collector/host-root/profile checks and
