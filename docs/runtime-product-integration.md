@@ -84,8 +84,13 @@ superseded initial hosted run was cancelled after an MSVC command spelling corre
 Website capabilities and public APIs are
 unchanged; no publication is part of this work.
 
-The root-source follow-up passes local GC/root and relocated-package checks; its
-hosted qualification is pending. Root ABI sizes, suspension ownership, collection
+The root-source follow-up passes 20 local GC/root executions, two compiled
+GC/non-GC UTF-8 tests, two profiler attachment tests and relocated-package checks.
+The [hosted gate](https://github.com/marinasundstrom/neoCLR/actions/runs/38435362775)
+at `ab9aa0a2f` passes socket and relocated-package checks on macOS and Windows,
+plus Windows GC/root checks. [Raw root-migration reports](validation/runtime-product/root-source-layout/)
+retain commands, source hashes and job outcomes. The local report predates the
+commit and identifies the tested source through its input hashes. Root ABI sizes, suspension ownership, collection
 policy and fault behavior are unchanged. No Raven metadata/Runtime Contract change
 is required, and this slice does not alter the non-GC execution profile.
 
