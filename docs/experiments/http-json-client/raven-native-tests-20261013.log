@@ -1,0 +1,4 @@
+Test run for /Users/robert/Projects/Raven/test/Raven.CodeAnalysis.Tests/bin/Debug/net11.0/Raven.CodeAnalysis.Tests.dll (.NETCoreApp,Version=v11.0)
+A total of 1 test files matched the specified pattern.
+
+Passed!  - Failed:     0, Passed:    16, Skipped:     0, Total:    16, Duration: 5 s - Raven.CodeAnalysis.Tests.dll (net11.0)

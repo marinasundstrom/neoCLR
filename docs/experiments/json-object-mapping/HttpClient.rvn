@@ -8,7 +8,8 @@ import System.Web.Http.Json.*
 
 class ReportClient {
     async func SubmitReport(client: HttpClient) -> Task<Result<string, AppError>> {
-        let report = await client.GetFromJson<ReportPayload>("report")?
+        let fetched = await client.GetFromJson<ReportPayload>("report")
+        let report = AdaptClientResult(fetched)?
         let response = await client.PostAsJson("reports", report)
         return ReadReply(response)
     }

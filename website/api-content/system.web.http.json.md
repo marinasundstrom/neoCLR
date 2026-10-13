@@ -4,8 +4,12 @@ uid: N:System.Web.Http.Json
 ## JSON over HTTP
 
 JsonContent and HttpClientJsonExtensions connect HTTP content and client operations
-to System.Data.Json. HttpJsonError retains the distinction between HTTP failures,
-JSON failures and unsuccessful response status.
+to System.Data.Json. Development client helpers return `HttpError | JsonError`,
+exposing the original alternatives without an aggregation wrapper. GET rejects
+unsuccessful status as HttpError.UnsuccessfulStatus before JSON decoding.
+This changes the previous HttpJsonError return signatures; rebuild consumers and
+match the typed alternatives after extracting Error. Nominal error contracts
+remain useful where their cases add domain meaning.
 
 See [Web](/features/web/) and [JSON](/docs/json.html). These helpers retain the
 underlying HTTP and JSON bounds and supported mapping shapes; they do not add a

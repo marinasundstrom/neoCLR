@@ -16,6 +16,8 @@ static class UnionDeclarations
             }
         }
         public struct PropagationUnit { }
+        // Replaced by the source union projection before documentation consumption.
+        public struct Union<T1, T2> { }
         [System.Runtime.CompilerServices.Union]
         public struct Option<T> : Propagatable<Option<T>, T, PropagationUnit> {
             public bool IsSome => false;

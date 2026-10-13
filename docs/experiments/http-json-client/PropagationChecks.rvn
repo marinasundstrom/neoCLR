@@ -1,0 +1,70 @@
+import System.*
+import System.Result.*
+import System.Concurrency.Tasks.*
+import System.Data.Json.*
+import System.Web.Http.*
+
+class Progress {
+    var Steps: int = 0
+    var Disposed: int = 0
+}
+
+class Scope : Disposable {
+    private val progress: Progress
+    init(progress: Progress) {
+        self.progress = progress
+    }
+    func Dispose() {
+        progress.Disposed += 1
+    }
+}
+
+async func Compose(first: Task<Result<int, HttpError>>, second: Task<Result<int, JsonError>>, progress: Progress) -> Task<Result<int, HttpError | JsonError>> {
+    use scope = Scope(progress)
+    let one = await first?
+    progress.Steps += 1
+    let two = await second?
+    progress.Steps += 1
+    return Ok(one + two)
+}
+
+func ReadyJson(value: Result<int, JsonError>) -> Task<Result<int, JsonError>> {
+    let completion = Promise<Result<int, JsonError>>()
+    _ = completion.Complete(value)
+    return completion.Task
+}
+
+func Check(condition: bool) {
+    if !condition {
+        System.Fail("Async union propagation assertion failed")
+    }
+}
+
+async func Main() -> Task<int> {
+    let source = Promise<Result<int, HttpError>>()
+    let progress = Progress()
+    let pending = Compose(source.Task, ReadyJson(Ok(2)), progress)
+    Check(!pending.IsCompleted && progress.Steps == 0 && progress.Disposed == 0)
+    _ = source.Complete(Ok(40))
+    let success = await pending
+    Check(success is Ok(42))
+    Check(progress.Steps == 2 && progress.Disposed == 1)
+
+    let failed = Promise<Result<int, HttpError>>()
+    _ = failed.Complete(Error(HttpError.TimedOut))
+    let httpProgress = Progress()
+    let http = Compose(failed.Task, ReadyJson(Ok(2)), httpProgress)
+    let Error(httpError) = await http else {
+        System.Fail("HTTP residual lost")
+    }
+    Check(httpError is HttpError && httpProgress.Steps == 0 && httpProgress.Disposed == 1)
+
+    let jsonProgress = Progress()
+    let json = Compose(source.Task, ReadyJson(Error(JsonError.Syntax("invalid"))), jsonProgress)
+    let Error(jsonError) = await json else {
+        System.Fail("JSON residual lost")
+    }
+    Check(jsonError is JsonError && jsonProgress.Steps == 1 && jsonProgress.Disposed == 1)
+    Console.WriteLine("HTTP JSON async propagation checks passed")
+    return 0
+}

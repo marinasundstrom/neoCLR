@@ -27,15 +27,6 @@ extension JsonErrorConversion for JsonError {
     static func implicit(error: JsonError) -> AppError => AppError.Json(error)
 }
 
-extension HttpJsonErrorConversion for HttpJsonError {
-    static func implicit(error: HttpJsonError) -> AppError {
-        return match error {
-            HttpJsonError.Http(let reason) => AppError.Http(reason)
-            HttpJsonError.Json(let reason) => AppError.Json(reason)
-        }
-    }
-}
-
 // Development nested station case. Property names are the wire contract.
 public class Station {
     init() { }
@@ -74,8 +65,19 @@ func PrepareReport() -> Result<HttpContent, AppError> {
     return Ok(content)
 }
 
-func ReadReply(result: Result<HttpResponse, HttpJsonError>) -> Result<string, AppError> {
-    let response = result?
+// The application owns this domain mapping; the client library preserves causes.
+func AdaptClientResult<T>(result: Result<T, HttpError | JsonError>) -> Result<T, AppError> {
+    return match result {
+        Ok(let value) => Ok(value)
+        Error(let error) => match error {
+            HttpError reason => Error(AppError.Http(reason))
+            JsonError reason => Error(AppError.Json(reason))
+        }
+    }
+}
+
+func ReadReply(result: Result<HttpResponse, HttpError | JsonError>) -> Result<string, AppError> {
+    let response = AdaptClientResult(result)?
     if response.StatusCode != HttpStatusCode.Created {
         return Error(AppError.Http(HttpError.UnsuccessfulStatus(response.StatusCode)))
     }

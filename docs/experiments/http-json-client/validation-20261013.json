@@ -1,0 +1,415 @@
+{
+  "passed": true,
+  "commands": [
+    {
+      "command": [
+        "dotnet",
+        "/Users/robert/Projects/neoclr/target/http-json-union-compiler-20261013b/rvnc.dll",
+        "neoclr",
+        "--project",
+        "/Users/robert/Projects/neoclr/target/http-json-adhoc-native-20261013f/HttpJsonConsumer/HttpJsonConsumer.rvnproj"
+      ],
+      "exitCode": 0,
+      "stdout": "Native build output: /Users/robert/Projects/neoclr/target/http-json-adhoc-native-20261013f/HttpJsonConsumer/bin/neoclr/HttpJsonConsumer.dll\n",
+      "stderr": "/Users/robert/Projects/neoclr/docs/experiments/http-json-client/Main.rvn(121,36): warning RAV0168: 'httpError' shadows a previous declaration.\n/Users/robert/Projects/neoclr/docs/experiments/http-json-client/Main.rvn(145,34): warning RAV0168: 'jsonError' shadows a previous declaration.\n"
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/release/neoclr",
+        "verify",
+        "/Users/robert/Projects/neoclr/target/http-json-adhoc-native-20261013f/HttpJsonConsumer/bin/neoclr/HttpJsonConsumer.dll",
+        "--system",
+        "/Users/robert/Projects/neoclr/target/http-json-adhoc-libraries-20261013d/System.runtime.neox",
+        "--object-root",
+        "/Users/robert/Projects/neoclr/target/http-json-adhoc-libraries-20261013d/System.Runtime.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/http-json-adhoc-libraries-20261013d/System.Runtime.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/http-json-adhoc-libraries-20261013d/System.Data.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/http-json-adhoc-libraries-20261013d/System.Networking.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/http-json-adhoc-libraries-20261013d/System.Web.dll"
+      ],
+      "exitCode": 0,
+      "stdout": "NeoMetadata_658454FFFEE6B9E863324C321E06092411FF03EE9A92D88DFDC5166945C181A0: typed-stack/control-flow verification passed (3327 IL functions; maximum stack 10; runtime value checks remain)\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/release/neoclr",
+        "run",
+        "/Users/robert/Projects/neoclr/target/http-json-adhoc-native-20261013f/HttpJsonConsumer/bin/neoclr/HttpJsonConsumer.dll",
+        "--execution",
+        "interpreter",
+        "--instructions",
+        "100000000",
+        "--system",
+        "/Users/robert/Projects/neoclr/target/http-json-adhoc-libraries-20261013d/System.runtime.neox",
+        "--object-root",
+        "/Users/robert/Projects/neoclr/target/http-json-adhoc-libraries-20261013d/System.Runtime.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/http-json-adhoc-libraries-20261013d/System.Runtime.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/http-json-adhoc-libraries-20261013d/System.Data.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/http-json-adhoc-libraries-20261013d/System.Networking.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/http-json-adhoc-libraries-20261013d/System.Web.dll"
+      ],
+      "exitCode": 0,
+      "stdout": "HTTP JSON client checks passed\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "dotnet",
+        "/Users/robert/Projects/neoclr/target/http-json-union-compiler-20261013b/rvnc.dll",
+        "neoclr",
+        "--project",
+        "/Users/robert/Projects/neoclr/target/http-json-adhoc-native-20261013f/AsyncPropagation/AsyncPropagation.rvnproj"
+      ],
+      "exitCode": 0,
+      "stdout": "Native build output: /Users/robert/Projects/neoclr/target/http-json-adhoc-native-20261013f/AsyncPropagation/bin/neoclr/AsyncPropagation.dll\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/release/neoclr",
+        "verify",
+        "/Users/robert/Projects/neoclr/target/http-json-adhoc-native-20261013f/AsyncPropagation/bin/neoclr/AsyncPropagation.dll",
+        "--system",
+        "/Users/robert/Projects/neoclr/target/http-json-adhoc-libraries-20261013d/System.runtime.neox",
+        "--object-root",
+        "/Users/robert/Projects/neoclr/target/http-json-adhoc-libraries-20261013d/System.Runtime.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/http-json-adhoc-libraries-20261013d/System.Runtime.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/http-json-adhoc-libraries-20261013d/System.Data.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/http-json-adhoc-libraries-20261013d/System.Networking.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/http-json-adhoc-libraries-20261013d/System.Web.dll"
+      ],
+      "exitCode": 0,
+      "stdout": "NeoMetadata_46E895B9860BA3F9C8FE57B3604711635852E71F833B1ECFF96DD3B9FAC634A8: typed-stack/control-flow verification passed (3327 IL functions; maximum stack 10; runtime value checks remain)\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/release/neoclr",
+        "run",
+        "/Users/robert/Projects/neoclr/target/http-json-adhoc-native-20261013f/AsyncPropagation/bin/neoclr/AsyncPropagation.dll",
+        "--execution",
+        "interpreter",
+        "--instructions",
+        "100000000",
+        "--system",
+        "/Users/robert/Projects/neoclr/target/http-json-adhoc-libraries-20261013d/System.runtime.neox",
+        "--object-root",
+        "/Users/robert/Projects/neoclr/target/http-json-adhoc-libraries-20261013d/System.Runtime.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/http-json-adhoc-libraries-20261013d/System.Runtime.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/http-json-adhoc-libraries-20261013d/System.Data.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/http-json-adhoc-libraries-20261013d/System.Networking.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/http-json-adhoc-libraries-20261013d/System.Web.dll"
+      ],
+      "exitCode": 0,
+      "stdout": "HTTP JSON async propagation checks passed\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "dotnet",
+        "/Users/robert/Projects/neoclr/target/http-json-union-compiler-20261013b/rvnc.dll",
+        "neoclr",
+        "--project",
+        "/Users/robert/Projects/neoclr/target/http-json-adhoc-native-20261013f/FlatClient/FlatClient.rvnproj"
+      ],
+      "exitCode": 0,
+      "stdout": "Native build output: /Users/robert/Projects/neoclr/target/http-json-adhoc-native-20261013f/FlatClient/bin/neoclr/FlatClient.dll\n",
+      "stderr": "/Users/robert/Projects/neoclr/docs/experiments/json-object-mapping/HttpApplication.rvn(55,32): info RAV1506: Result propagation converts errors from 'JsonError' to 'AppError' via implicit conversion 'static func implicit(error: JsonError) -> AppError'.\n/Users/robert/Projects/neoclr/docs/experiments/json-object-mapping/HttpApplication.rvn(56,45): info RAV1506: Result propagation converts errors from 'JsonError' to 'AppError' via implicit conversion 'static func implicit(error: JsonError) -> AppError'.\n/Users/robert/Projects/neoclr/docs/experiments/json-object-mapping/HttpApplication.rvn(76,68): info RAV1506: Result propagation converts errors from 'JsonError' to 'AppError' via implicit conversion 'static func implicit(error: JsonError) -> AppError'.\n/Users/robert/Projects/neoclr/docs/experiments/json-object-mapping/HttpApplication.rvn(78,53): info RAV1506: Result propagation converts errors from 'JsonError' to 'AppError' via implicit conversion 'static func implicit(error: JsonError) -> AppError'.\n/Users/robert/Projects/neoclr/docs/experiments/json-object-mapping/HttpClient.rvn(22,9): warning RAV0162: Unreachable code\n"
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/release/neoclr",
+        "verify",
+        "/Users/robert/Projects/neoclr/target/http-json-adhoc-native-20261013f/FlatClient/bin/neoclr/FlatClient.dll",
+        "--system",
+        "/Users/robert/Projects/neoclr/target/http-json-adhoc-libraries-20261013d/System.runtime.neox",
+        "--object-root",
+        "/Users/robert/Projects/neoclr/target/http-json-adhoc-libraries-20261013d/System.Runtime.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/http-json-adhoc-libraries-20261013d/System.Runtime.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/http-json-adhoc-libraries-20261013d/System.Data.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/http-json-adhoc-libraries-20261013d/System.Networking.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/http-json-adhoc-libraries-20261013d/System.Web.dll"
+      ],
+      "exitCode": 0,
+      "stdout": "NeoMetadata_D63FCEC990C62839E5EEA5510AA012E66D9D69907EEB3330BFD5C8DCA03F9564: typed-stack/control-flow verification passed (3362 IL functions; maximum stack 10; runtime value checks remain)\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "dotnet",
+        "/Users/robert/Projects/neoclr/target/http-json-union-compiler-20261013b/rvnc.dll",
+        "neoclr",
+        "--project",
+        "/Users/robert/Projects/neoclr/target/http-json-adhoc-native-20261013f/FlatServer/FlatServer.rvnproj"
+      ],
+      "exitCode": 0,
+      "stdout": "Native build output: /Users/robert/Projects/neoclr/target/http-json-adhoc-native-20261013f/FlatServer/bin/neoclr/FlatServer.dll\n",
+      "stderr": "/Users/robert/Projects/neoclr/docs/experiments/json-object-mapping/HttpApplication.rvn(55,32): info RAV1506: Result propagation converts errors from 'JsonError' to 'AppError' via implicit conversion 'static func implicit(error: JsonError) -> AppError'.\n/Users/robert/Projects/neoclr/docs/experiments/json-object-mapping/HttpApplication.rvn(56,45): info RAV1506: Result propagation converts errors from 'JsonError' to 'AppError' via implicit conversion 'static func implicit(error: JsonError) -> AppError'.\n/Users/robert/Projects/neoclr/docs/experiments/json-object-mapping/HttpApplication.rvn(76,68): info RAV1506: Result propagation converts errors from 'JsonError' to 'AppError' via implicit conversion 'static func implicit(error: JsonError) -> AppError'.\n/Users/robert/Projects/neoclr/docs/experiments/json-object-mapping/HttpApplication.rvn(78,53): info RAV1506: Result propagation converts errors from 'JsonError' to 'AppError' via implicit conversion 'static func implicit(error: JsonError) -> AppError'.\n/Users/robert/Projects/neoclr/docs/experiments/json-object-mapping/HttpServer.rvn(18,40): info RAV1506: Result propagation converts errors from 'JsonError' to 'AppError' via implicit conversion 'static func implicit(error: JsonError) -> AppError'.\n/Users/robert/Projects/neoclr/docs/experiments/json-object-mapping/HttpServer.rvn(19,53): info RAV1506: Result propagation converts errors from 'JsonError' to 'AppError' via implicit conversion 'static func implicit(error: JsonError) -> AppError'.\n/Users/robert/Projects/neoclr/docs/experiments/json-object-mapping/HttpServer.rvn(82,9): warning RAV0162: Unreachable code\n/Users/robert/Projects/neoclr/docs/experiments/json-object-mapping/HttpServer.rvn(87,9): warning RAV0162: Unreachable code\n"
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/release/neoclr",
+        "verify",
+        "/Users/robert/Projects/neoclr/target/http-json-adhoc-native-20261013f/FlatServer/bin/neoclr/FlatServer.dll",
+        "--system",
+        "/Users/robert/Projects/neoclr/target/http-json-adhoc-libraries-20261013d/System.runtime.neox",
+        "--object-root",
+        "/Users/robert/Projects/neoclr/target/http-json-adhoc-libraries-20261013d/System.Runtime.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/http-json-adhoc-libraries-20261013d/System.Runtime.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/http-json-adhoc-libraries-20261013d/System.Data.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/http-json-adhoc-libraries-20261013d/System.Networking.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/http-json-adhoc-libraries-20261013d/System.Web.dll"
+      ],
+      "exitCode": 0,
+      "stdout": "NeoMetadata_2104E905584ADACFF58E4415940FF920F6AF8DC178CE2B3178BC9CD814A66BBF: typed-stack/control-flow verification passed (3368 IL functions; maximum stack 10; runtime value checks remain)\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "dotnet",
+        "/Users/robert/Projects/neoclr/target/http-json-union-compiler-20261013b/rvnc.dll",
+        "neoclr",
+        "--project",
+        "/Users/robert/Projects/neoclr/target/http-json-adhoc-native-20261013f/FlatDomainErrors/FlatDomainErrors.rvnproj"
+      ],
+      "exitCode": 0,
+      "stdout": "Native build output: /Users/robert/Projects/neoclr/target/http-json-adhoc-native-20261013f/FlatDomainErrors/bin/neoclr/FlatDomainErrors.dll\n",
+      "stderr": "/Users/robert/Projects/neoclr/docs/experiments/json-object-mapping/HttpApplication.rvn(55,32): info RAV1506: Result propagation converts errors from 'JsonError' to 'AppError' via implicit conversion 'static func implicit(error: JsonError) -> AppError'.\n/Users/robert/Projects/neoclr/docs/experiments/json-object-mapping/HttpApplication.rvn(56,45): info RAV1506: Result propagation converts errors from 'JsonError' to 'AppError' via implicit conversion 'static func implicit(error: JsonError) -> AppError'.\n/Users/robert/Projects/neoclr/docs/experiments/json-object-mapping/HttpApplication.rvn(76,68): info RAV1506: Result propagation converts errors from 'JsonError' to 'AppError' via implicit conversion 'static func implicit(error: JsonError) -> AppError'.\n/Users/robert/Projects/neoclr/docs/experiments/json-object-mapping/HttpApplication.rvn(78,53): info RAV1506: Result propagation converts errors from 'JsonError' to 'AppError' via implicit conversion 'static func implicit(error: JsonError) -> AppError'.\n"
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/release/neoclr",
+        "verify",
+        "/Users/robert/Projects/neoclr/target/http-json-adhoc-native-20261013f/FlatDomainErrors/bin/neoclr/FlatDomainErrors.dll",
+        "--system",
+        "/Users/robert/Projects/neoclr/target/http-json-adhoc-libraries-20261013d/System.runtime.neox",
+        "--object-root",
+        "/Users/robert/Projects/neoclr/target/http-json-adhoc-libraries-20261013d/System.Runtime.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/http-json-adhoc-libraries-20261013d/System.Runtime.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/http-json-adhoc-libraries-20261013d/System.Data.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/http-json-adhoc-libraries-20261013d/System.Networking.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/http-json-adhoc-libraries-20261013d/System.Web.dll"
+      ],
+      "exitCode": 0,
+      "stdout": "NeoMetadata_AC7F57C1D79644727B5CCF1DFAAF443693EBDC18DF7AB244A6BDE9FCE415FBEE: typed-stack/control-flow verification passed (3356 IL functions; maximum stack 10; runtime value checks remain)\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/release/neoclr",
+        "run",
+        "/Users/robert/Projects/neoclr/target/http-json-adhoc-native-20261013f/FlatDomainErrors/bin/neoclr/FlatDomainErrors.dll",
+        "--execution",
+        "interpreter",
+        "--instructions",
+        "100000000",
+        "--system",
+        "/Users/robert/Projects/neoclr/target/http-json-adhoc-libraries-20261013d/System.runtime.neox",
+        "--object-root",
+        "/Users/robert/Projects/neoclr/target/http-json-adhoc-libraries-20261013d/System.Runtime.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/http-json-adhoc-libraries-20261013d/System.Runtime.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/http-json-adhoc-libraries-20261013d/System.Data.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/http-json-adhoc-libraries-20261013d/System.Networking.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/http-json-adhoc-libraries-20261013d/System.Web.dll"
+      ],
+      "exitCode": 0,
+      "stdout": "HTTP JSON domain adapter checks passed\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "dotnet",
+        "/Users/robert/Projects/neoclr/target/http-json-union-compiler-20261013b/rvnc.dll",
+        "neoclr",
+        "--project",
+        "/Users/robert/Projects/neoclr/target/http-json-adhoc-native-20261013f/NestedClient/NestedClient.rvnproj"
+      ],
+      "exitCode": 0,
+      "stdout": "Native build output: /Users/robert/Projects/neoclr/target/http-json-adhoc-native-20261013f/NestedClient/bin/neoclr/NestedClient.dll\n",
+      "stderr": "/Users/robert/Projects/neoclr/docs/experiments/json-object-mapping/HttpClient.rvn(22,9): warning RAV0162: Unreachable code\n/Users/robert/Projects/neoclr/docs/experiments/json-object-mapping/NestedHttpApplication.rvn(63,32): info RAV1506: Result propagation converts errors from 'JsonError' to 'AppError' via implicit conversion 'static func implicit(error: JsonError) -> AppError'.\n/Users/robert/Projects/neoclr/docs/experiments/json-object-mapping/NestedHttpApplication.rvn(64,45): info RAV1506: Result propagation converts errors from 'JsonError' to 'AppError' via implicit conversion 'static func implicit(error: JsonError) -> AppError'.\n/Users/robert/Projects/neoclr/docs/experiments/json-object-mapping/NestedHttpApplication.rvn(84,68): info RAV1506: Result propagation converts errors from 'JsonError' to 'AppError' via implicit conversion 'static func implicit(error: JsonError) -> AppError'.\n/Users/robert/Projects/neoclr/docs/experiments/json-object-mapping/NestedHttpApplication.rvn(86,53): info RAV1506: Result propagation converts errors from 'JsonError' to 'AppError' via implicit conversion 'static func implicit(error: JsonError) -> AppError'.\n"
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/release/neoclr",
+        "verify",
+        "/Users/robert/Projects/neoclr/target/http-json-adhoc-native-20261013f/NestedClient/bin/neoclr/NestedClient.dll",
+        "--system",
+        "/Users/robert/Projects/neoclr/target/http-json-adhoc-libraries-20261013d/System.runtime.neox",
+        "--object-root",
+        "/Users/robert/Projects/neoclr/target/http-json-adhoc-libraries-20261013d/System.Runtime.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/http-json-adhoc-libraries-20261013d/System.Runtime.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/http-json-adhoc-libraries-20261013d/System.Data.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/http-json-adhoc-libraries-20261013d/System.Networking.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/http-json-adhoc-libraries-20261013d/System.Web.dll"
+      ],
+      "exitCode": 0,
+      "stdout": "NeoMetadata_8F4D2F3B21E04FAEF72094939B76488D3A96A7B8D0654E5E725AC87502F05973: typed-stack/control-flow verification passed (3369 IL functions; maximum stack 10; runtime value checks remain)\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "dotnet",
+        "/Users/robert/Projects/neoclr/target/http-json-union-compiler-20261013b/rvnc.dll",
+        "neoclr",
+        "--project",
+        "/Users/robert/Projects/neoclr/target/http-json-adhoc-native-20261013f/NestedServer/NestedServer.rvnproj"
+      ],
+      "exitCode": 0,
+      "stdout": "Native build output: /Users/robert/Projects/neoclr/target/http-json-adhoc-native-20261013f/NestedServer/bin/neoclr/NestedServer.dll\n",
+      "stderr": "/Users/robert/Projects/neoclr/docs/experiments/json-object-mapping/HttpServer.rvn(18,40): info RAV1506: Result propagation converts errors from 'JsonError' to 'AppError' via implicit conversion 'static func implicit(error: JsonError) -> AppError'.\n/Users/robert/Projects/neoclr/docs/experiments/json-object-mapping/HttpServer.rvn(19,53): info RAV1506: Result propagation converts errors from 'JsonError' to 'AppError' via implicit conversion 'static func implicit(error: JsonError) -> AppError'.\n/Users/robert/Projects/neoclr/docs/experiments/json-object-mapping/HttpServer.rvn(82,9): warning RAV0162: Unreachable code\n/Users/robert/Projects/neoclr/docs/experiments/json-object-mapping/HttpServer.rvn(87,9): warning RAV0162: Unreachable code\n/Users/robert/Projects/neoclr/docs/experiments/json-object-mapping/NestedHttpApplication.rvn(63,32): info RAV1506: Result propagation converts errors from 'JsonError' to 'AppError' via implicit conversion 'static func implicit(error: JsonError) -> AppError'.\n/Users/robert/Projects/neoclr/docs/experiments/json-object-mapping/NestedHttpApplication.rvn(64,45): info RAV1506: Result propagation converts errors from 'JsonError' to 'AppError' via implicit conversion 'static func implicit(error: JsonError) -> AppError'.\n/Users/robert/Projects/neoclr/docs/experiments/json-object-mapping/NestedHttpApplication.rvn(84,68): info RAV1506: Result propagation converts errors from 'JsonError' to 'AppError' via implicit conversion 'static func implicit(error: JsonError) -> AppError'.\n/Users/robert/Projects/neoclr/docs/experiments/json-object-mapping/NestedHttpApplication.rvn(86,53): info RAV1506: Result propagation converts errors from 'JsonError' to 'AppError' via implicit conversion 'static func implicit(error: JsonError) -> AppError'.\n"
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/release/neoclr",
+        "verify",
+        "/Users/robert/Projects/neoclr/target/http-json-adhoc-native-20261013f/NestedServer/bin/neoclr/NestedServer.dll",
+        "--system",
+        "/Users/robert/Projects/neoclr/target/http-json-adhoc-libraries-20261013d/System.runtime.neox",
+        "--object-root",
+        "/Users/robert/Projects/neoclr/target/http-json-adhoc-libraries-20261013d/System.Runtime.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/http-json-adhoc-libraries-20261013d/System.Runtime.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/http-json-adhoc-libraries-20261013d/System.Data.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/http-json-adhoc-libraries-20261013d/System.Networking.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/http-json-adhoc-libraries-20261013d/System.Web.dll"
+      ],
+      "exitCode": 0,
+      "stdout": "NeoMetadata_CEEE42ABB5594AA4091D46963DDB0031D6EF8DE2EF44C0F80FF08B1B13FBB281: typed-stack/control-flow verification passed (3375 IL functions; maximum stack 10; runtime value checks remain)\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "dotnet",
+        "/Users/robert/Projects/neoclr/target/http-json-union-compiler-20261013b/rvnc.dll",
+        "neoclr",
+        "--project",
+        "/Users/robert/Projects/neoclr/target/http-json-adhoc-native-20261013f/NestedDomainErrors/NestedDomainErrors.rvnproj"
+      ],
+      "exitCode": 0,
+      "stdout": "Native build output: /Users/robert/Projects/neoclr/target/http-json-adhoc-native-20261013f/NestedDomainErrors/bin/neoclr/NestedDomainErrors.dll\n",
+      "stderr": "/Users/robert/Projects/neoclr/docs/experiments/json-object-mapping/NestedHttpApplication.rvn(63,32): info RAV1506: Result propagation converts errors from 'JsonError' to 'AppError' via implicit conversion 'static func implicit(error: JsonError) -> AppError'.\n/Users/robert/Projects/neoclr/docs/experiments/json-object-mapping/NestedHttpApplication.rvn(64,45): info RAV1506: Result propagation converts errors from 'JsonError' to 'AppError' via implicit conversion 'static func implicit(error: JsonError) -> AppError'.\n/Users/robert/Projects/neoclr/docs/experiments/json-object-mapping/NestedHttpApplication.rvn(84,68): info RAV1506: Result propagation converts errors from 'JsonError' to 'AppError' via implicit conversion 'static func implicit(error: JsonError) -> AppError'.\n/Users/robert/Projects/neoclr/docs/experiments/json-object-mapping/NestedHttpApplication.rvn(86,53): info RAV1506: Result propagation converts errors from 'JsonError' to 'AppError' via implicit conversion 'static func implicit(error: JsonError) -> AppError'.\n"
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/release/neoclr",
+        "verify",
+        "/Users/robert/Projects/neoclr/target/http-json-adhoc-native-20261013f/NestedDomainErrors/bin/neoclr/NestedDomainErrors.dll",
+        "--system",
+        "/Users/robert/Projects/neoclr/target/http-json-adhoc-libraries-20261013d/System.runtime.neox",
+        "--object-root",
+        "/Users/robert/Projects/neoclr/target/http-json-adhoc-libraries-20261013d/System.Runtime.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/http-json-adhoc-libraries-20261013d/System.Runtime.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/http-json-adhoc-libraries-20261013d/System.Data.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/http-json-adhoc-libraries-20261013d/System.Networking.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/http-json-adhoc-libraries-20261013d/System.Web.dll"
+      ],
+      "exitCode": 0,
+      "stdout": "NeoMetadata_7764A35872EDE5BBEACD010864EA9ACCA7F2C93D76747D05BB0F2FB0E6DE47B8: typed-stack/control-flow verification passed (3363 IL functions; maximum stack 10; runtime value checks remain)\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/release/neoclr",
+        "run",
+        "/Users/robert/Projects/neoclr/target/http-json-adhoc-native-20261013f/NestedDomainErrors/bin/neoclr/NestedDomainErrors.dll",
+        "--execution",
+        "interpreter",
+        "--instructions",
+        "100000000",
+        "--system",
+        "/Users/robert/Projects/neoclr/target/http-json-adhoc-libraries-20261013d/System.runtime.neox",
+        "--object-root",
+        "/Users/robert/Projects/neoclr/target/http-json-adhoc-libraries-20261013d/System.Runtime.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/http-json-adhoc-libraries-20261013d/System.Runtime.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/http-json-adhoc-libraries-20261013d/System.Data.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/http-json-adhoc-libraries-20261013d/System.Networking.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/http-json-adhoc-libraries-20261013d/System.Web.dll"
+      ],
+      "exitCode": 0,
+      "stdout": "HTTP JSON domain adapter checks passed\n",
+      "stderr": ""
+    }
+  ],
+  "inputs": {
+    "/Users/robert/Projects/neoclr/docs/experiments/http-json-client/verify-native.py": "4fc9de38b7e075bfcbe28f1991774a58f1324187c613d8fd212e7b92b4ba9cdf",
+    "/Users/robert/Projects/neoclr/target/http-json-union-compiler-20261013b/rvnc.dll": "f9b50cf90476382f71490c435dc63f12f1e2efc58e4187dc8dfecadf7c13b3dc",
+    "/Users/robert/Projects/neoclr/target/release/neoclr": "57e1551815390c17044a73b87a3e4bb663406d00549d6adb3bcdcd5c9b9f7ebb",
+    "/Users/robert/Projects/neoclr/target/http-json-adhoc-libraries-20261013d/bundle.json": "f1a9a6d104f59f122352b631f35c88ac7ce3dae158d1692a79767ce9cae59130",
+    "/Users/robert/Projects/neoclr/target/http-json-adhoc-libraries-20261013d/System.runtime.neox": "98a1ae1da85387c87746957e83a4015eb59d0566539a915c69f168d2b511b190",
+    "/Users/robert/Projects/neoclr/target/http-json-adhoc-libraries-20261013d/NeoCLR.ClassLibrary.props": "4676969ee1e381f9bbe0cfce799cfe5503a1a7f77968a174782c35a24752e5b7",
+    "/Users/robert/Projects/neoclr/target/http-json-adhoc-libraries-20261013d/RuntimeAwait.rvn": "5a22359686ad1ffaec28b212e2821a1b09f08a2811393e31a07666a3703d161a",
+    "/Users/robert/Projects/neoclr/target/http-json-adhoc-libraries-20261013d/RuntimeGenerator.rvn": "ac1209d4d1e7ab7d7a8483a2451ecf09d460c00d217bb9ba2f3563f15cacc423",
+    "/Users/robert/Projects/neoclr/target/http-json-union-compiler-20261013b/Raven.CodeAnalysis.dll": "6e1fc137b7ce79f198be9ede2df17e3c31bc45e3e4dd88871bfe9e29a4837aa0",
+    "/Users/robert/Projects/neoclr/target/http-json-union-compiler-20261013b/Raven.CodeAnalysis.NeoClr.dll": "7c2b5840730f617f5380c119cb7430aeabcd92dd2901e9b7fcddb5a5d10afebf",
+    "/Users/robert/Projects/neoclr/target/http-json-adhoc-libraries-20261013d/System.Runtime.dll": "a9f6386f12c28bf328dfbd3753ef6be98dd1a548e41a28a774c5ddd4d568a577",
+    "/Users/robert/Projects/neoclr/target/http-json-adhoc-libraries-20261013d/System.Data.dll": "35e76128c0180212fcf99b48573ea550d236cfbebe65cf15a653f92b4c555a91",
+    "/Users/robert/Projects/neoclr/target/http-json-adhoc-libraries-20261013d/System.Networking.dll": "0dd0e8f046b6ed0dc62e9c4bfce3798133e7a5fe088bcefdedd1d464c9d4c8ea",
+    "/Users/robert/Projects/neoclr/target/http-json-adhoc-libraries-20261013d/System.Web.dll": "a4ef7102d0ba24a9251ed40ad50c7ec52a7a193b39241273e07167e72bf2f154",
+    "/Users/robert/Projects/neoclr/docs/experiments/http-json-client/Main.rvn": "011d158714d61d9f0163f657115d87bd0c80e44d5fc57a23dd9a40b07733d423",
+    "/Users/robert/Projects/neoclr/target/http-json-adhoc-native-20261013f/HttpJsonConsumer/bin/neoclr/HttpJsonConsumer.dll": "0632e13e58358361dd0e61d8d40d034328a0aa321af926e8162ff06d42275369",
+    "/Users/robert/Projects/neoclr/docs/experiments/http-json-client/PropagationChecks.rvn": "89f125a3785c0f626896d7aede9300dc31b404d2eb646d20f15d724f08f10066",
+    "/Users/robert/Projects/neoclr/target/http-json-adhoc-native-20261013f/AsyncPropagation/bin/neoclr/AsyncPropagation.dll": "b9ebca0d9bff2b3f2887f08a1a98f3ca086355c8ea9489f774bd3143e1f3c55c",
+    "/Users/robert/Projects/neoclr/docs/experiments/json-object-mapping/HttpApplication.rvn": "1287a0dfd883da0c74b2dcb3a8683a28c695d3d77a5601beb812f6b61f95a1e8",
+    "/Users/robert/Projects/neoclr/docs/experiments/json-object-mapping/HttpClient.rvn": "3cec8a0f1ada5dfa8a2f15c8c8eec1bfabc4a792df90b5f41ef1d3c13ff0e557",
+    "/Users/robert/Projects/neoclr/target/http-json-adhoc-native-20261013f/FlatClient/bin/neoclr/FlatClient.dll": "21ba4405013263ed9f88b55eb77b756d5d11ddc26f76d6f28d7a67c339ac4f07",
+    "/Users/robert/Projects/neoclr/docs/experiments/json-object-mapping/HttpServer.rvn": "81803dbdd9cf4f2f34f6417bdbd394c9a93555f0dcb29cb96ac2d8fa6c06acdb",
+    "/Users/robert/Projects/neoclr/target/http-json-adhoc-native-20261013f/FlatServer/bin/neoclr/FlatServer.dll": "f591f694b7f864beb3720360c36865c68f04cd3ffa687e3847e5a0e0ea506f14",
+    "/Users/robert/Projects/neoclr/docs/experiments/http-json-client/ApplicationChecks.rvn": "6a1a0199ad816032f1f90e856ed204c4f213e30fef2bf5e5066eb4457306a008",
+    "/Users/robert/Projects/neoclr/target/http-json-adhoc-native-20261013f/FlatDomainErrors/bin/neoclr/FlatDomainErrors.dll": "0fcd180750e83f346464bfa67baba676a5acb28fca28d1b5ceaac75eb4af23ff",
+    "/Users/robert/Projects/neoclr/docs/experiments/json-object-mapping/NestedHttpApplication.rvn": "d0a477e0231f9b7573d7841bf06d977a878c2f3641e2f3e8fcaa3b3702d08d8f",
+    "/Users/robert/Projects/neoclr/target/http-json-adhoc-native-20261013f/NestedClient/bin/neoclr/NestedClient.dll": "714c8e6d2c1d98c3f3b116174d56280ca8ba450ef57def63278dc64807967653",
+    "/Users/robert/Projects/neoclr/target/http-json-adhoc-native-20261013f/NestedServer/bin/neoclr/NestedServer.dll": "6efe0d1966a3671c714f85578f3293c8581424540adfa33cb6708ad20a5350bb",
+    "/Users/robert/Projects/neoclr/target/http-json-adhoc-native-20261013f/NestedDomainErrors/bin/neoclr/NestedDomainErrors.dll": "84e00cfe579f7fa85c91b06f1143f0cfac0624015b2086b6e3a809927ca5f760"
+  },
+  "scope": "native metadata; interpreter consumer/domain-adapter checks; report applications compile and verify only",
+  "ravenMainRevision": "2b372ddc7",
+  "ravenNativeRevision": "cb4721e7d"
+}

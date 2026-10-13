@@ -4530,3 +4530,16 @@ mode ([values](../runtime/raven/tests/http-method-values/validation.json),
 [wire](experiments/http-method/validation.json)). CONNECT tunnelling remains unsupported.
 Windows CI is configured, execution pending. The requested timeout/HttpMethod increment
 is complete locally; Index/Range remains the next author-directed feature.
+
+
+### Author-directed error composition follow-up (2026-10-13)
+
+The bounded API review following ad-hoc error propagation selects HTTP JSON client
+helpers: they combine independent HttpError and JsonError streams without adding a
+new domain. Their development signatures now expose those alternatives directly;
+nominal domain errors and application boundaries remain. The style guide and tested
+examples describe when this improves readability. Raven main fixes inline generic
+union binding; the native branch carries it and fixes runtime-await residual-return
+completion. See [review decisions](raven-error-api.md#review-existing-api-aggregation)
+and [focused validation](experiments/http-json-client/README.md). This author-directed
+slice does not change milestone sequencing or claim native structural union support.

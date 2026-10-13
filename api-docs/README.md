@@ -1954,3 +1954,15 @@ bodies. Native structural union identity and representation remain future work.
 Refresh the reference, XML, inventory and source snapshot together; no carrier is
 silently excluded. The website outcome example is extracted from the separately
 compiled configuration consumer fixture.
+
+
+### HTTP JSON ad-hoc error migration — 2026-10-13
+
+Current native GetFromJson/PostAsJson helpers return HttpError | JsonError in Result,
+replacing their HttpJsonError return signatures. Rebuild development consumers and
+match the original typed alternatives. The report examples retain AppError and
+explicitly adapt those alternatives at their application boundary. The old nominal
+wrapper is retained for explicit contracts; earlier validation remains historical.
+See the current HTTP JSON consumer and the Raven error API review for scope and
+validation. The API reference snapshot includes the new generic System.Union shape;
+legacy CLI execution of these helpers is not qualified for that representation.

@@ -84,7 +84,11 @@ Use a converter when it performs that intentional domain mapping.
 Existing APIs are candidates too. Review wrappers that only combine unchanged
 errors: an ad-hoc union may make them simpler and their alternatives easier to
 discover. Changing an existing public signature still needs a compatibility review,
-and named cases may carry domain meaning worth preserving.
+and named cases may carry domain meaning worth preserving. The development
+HTTP JSON client helpers now use `HttpError | JsonError`: they compose transport
+and serialization errors directly. This replaces their HttpJsonError return type;
+rebuild consumers and update wrapper patterns. HttpError and JsonError keep their
+meaningful nominal cases. See [HTTP JSON APIs](../../docs/json.html).
 
 The matching development library temporarily backs two through five alternatives
 with nominal `System.Union` carriers. Native structural union values are planned;

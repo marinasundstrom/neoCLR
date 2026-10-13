@@ -1377,3 +1377,15 @@ this is not general admission of arbitrary generic application methods. The publ
 HttpJsonError uses standard union syntax and preserves HTTP/JSON causes. Runtime
 `box T` accepts reference instantiations and preserves identity; intrinsic String
 retains its existing Object-handle representation cost. Value boxing still copies.
+
+
+### HTTP JSON ad-hoc error migration — 2026-10-13
+
+Current native GetFromJson/PostAsJson helpers return HttpError | JsonError in Result,
+replacing their HttpJsonError return signatures. Rebuild development consumers and
+match the original typed alternatives. The report examples retain AppError and
+explicitly adapt those alternatives at their application boundary. The old nominal
+wrapper is retained for explicit contracts; earlier validation remains historical.
+See the current HTTP JSON consumer and the Raven error API review for scope and
+validation. The API reference snapshot includes the new generic System.Union shape;
+legacy CLI execution of these helpers is not qualified for that representation.

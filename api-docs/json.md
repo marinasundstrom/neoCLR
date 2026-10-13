@@ -190,14 +190,17 @@ model before sending and returns `HttpResponse`, preserving non-success statuses
 and content for the application to inspect. Both accept string or Uri addresses,
 with optional CancellationToken overloads, and honor BaseUri and DefaultRequestHeaders.
 
-Failures return [HttpJsonError](xref:System.Web.Http.Json.HttpJsonError): `Http(reason)`
-retains HTTP/transport/status errors; `Json(reason)` retains mapping, syntax, UTF-8
-and limit failures. Cancellation remains task cancellation. No per-call headers,
+Development failures return `HttpError | JsonError` directly: HttpError retains
+HTTP/transport/status errors; JsonError retains mapping, syntax, UTF-8 and limit
+failures. This replaces the previous HttpJsonError return signature; rebuild
+consumers and use typed patterns after extracting Error. The nominal
+[HttpJsonError](xref:System.Web.Http.Json.HttpJsonError) remains available for
+explicit application contracts. Cancellation remains task cancellation. No per-call headers,
 serializer options, streaming codec or asynchronous serialization are introduced.
 
 The managed report sample gets a typed report, posts it back, then reads the
-acknowledgement from the response. Application-owned implicit error converters
-allow `?` to propagate either cause into its AppError union. The response's Request
+acknowledgement from the response. The application explicitly adapts the two client error alternatives into its
+AppError union; single-cause operations retain application-owned converters. The response's Request
 property identifies the effective POST, including client default headers.
 
 ## DOM collection views (development)

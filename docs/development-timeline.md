@@ -16884,3 +16884,49 @@ The completed support slice passes the interpreter config loader, native-GC JIT/
 carrier/error consumer, unrelated-error rejection and API snapshot checks. Raven
 main `3abc0c954` and native `b6557ab85` preserve separate branch ownership. Both
 website sources are updated; publication was not performed.
+
+
+### HTTP JSON composition review — 2026-10-13
+
+- **Author direction:** after the support slice, continue reviewing and fixing strong
+  existing API candidates. The author clarified that the strongest candidates compose
+  independent operations with different error types, agreed HTTP JSON is one, and
+  reiterated keeping nominal types where they matter.
+- **Assistant review/action:** migrated native HTTP JSON client helper signatures to
+  HttpError | JsonError, forwarding causes directly. Retained HttpError, JsonError,
+  parsing/reading domain errors and the report application's AppError because their
+  cases carry meaning. No other equally strong aggregator emerged from the bounded
+  runtime-source error-union review. The old HttpJsonError type remains available
+  for explicitly declared contracts, but is no longer returned by the helpers.
+- **Compatibility:** development consumers must rebuild and update wrapper patterns.
+  The report applications explicitly adapt original alternatives at their domain
+  boundary. Native structural values remain future work; this uses the tested bridge.
+- **Evidence:** see [the HTTP JSON checkpoint](experiments/http-json-client/README.md)
+  for focused consumer/API validation and its limits. Website publication remains
+  separate. This bounded review does not reprioritize unrelated roadmap work.
+
+
+- **Compiler follow-up:** the assistant initially isolated a constructor-expression
+  binding gap and proposed a file-local alias. The author explicitly directed fixing
+  the compiler issue. The assistant added UnionTypeSyntax handling to expression-side
+  type binding on Raven main and carried it separately to the native branch, added
+  direct/nested constructor and generic-call execution regressions, then removed the
+  alias workaround from HTTP JSON. Focused compiler tests pass on both lines; the
+  native library builds with the inline syntax. No Runtime Contract change is needed.
+
+- **Native follow-up:** validation then exposed runtime-await completion rewriting
+  running before propagation introduced early returns. The assistant fixed that
+  target-specific ordering and added an awaited two-error regression; the general
+  constructor fix remains shared with main, while this native lowering stays on
+  the neoCLR branch.
+- **Style direction:** the author requested mentioning ad-hoc error propagation in
+  neoCLR's style guide and adopting it in samples/tests where simpler and clearer.
+  The assistant expanded the conventions with the composition criterion, typed
+  matching, nominal-boundary guidance and links to executable config/HTTP examples.
+
+- **Completed evidence:** Raven main `2b372ddc7` and native `cb4721e7d` each pass
+  16 focused tests. The HTTP JSON native gate compiles/verifies eight programs and
+  executes four consumers, including async residual cleanup and both report-domain
+  adapters. API snapshot and 11 focused website checks pass. The native metadata
+  bridge remains temporary; no new structural union or live network qualification
+  is claimed. See [retained validation](experiments/http-json-client/validation-20261013.json).

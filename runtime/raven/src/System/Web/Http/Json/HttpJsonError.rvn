@@ -3,7 +3,8 @@ module System.Web.Http.Json
 import System.Data.Json.*
 import System.Web.Http.*
 
-/// Preserves the HTTP or JSON cause of a JSON client operation failure.
+/// Legacy nominal HTTP/JSON wrapper retained for explicitly declared contracts.
+/// Current JSON client helpers return HttpError | JsonError directly.
 public union HttpJsonError {
     case Http(reason: HttpError)
     case Json(reason: JsonError)

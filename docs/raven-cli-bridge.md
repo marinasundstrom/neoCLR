@@ -9407,3 +9407,20 @@ See [source, commands and validation](experiments/adhoc-error-unions/README.md),
 [Union member reference](../api-docs/unions.md) and
 [structural design proposal](proposals/runtime-unions-and-intersection-types.md).
 The proposal remains exploratory; the bridge does not claim to implement it.
+
+
+### HTTP JSON composition consumer (2026-10-13)
+
+The native System.Web helpers now compose HttpError and JsonError directly through
+System.Union, retaining native semantic intent and the two-to-five carrier limit
+above. No Runtime Contract setting changes. Raven's general expression type binder now handles UnionTypeSyntax, including nested
+constructor and generic-method arguments. This fixes inline promise construction
+without aliases; develop/test on main and carry deliberately to the native branch.
+The temporary carrier representation and native structural metadata/codegen
+replacement remain unchanged. Compiler owner: Raven; runtime owner: System.Runtime.
+See [consumer validation](experiments/http-json-client/README.md).
+
+The native runtime-await lowerer now expands propagation before wrapping its early
+returns in TaskOutcome. This preserves completion and cleanup handling for `?`
+inside async functions; the ordinary .NET state-machine path is unchanged. The HTTP
+JSON async regression covers a suspended success and both awaited error alternatives.

@@ -96,12 +96,33 @@ func JsonVerbs() {
     let transportResult = HttpClient(transport).GetFromJson<Report>(uri)
     _ = transport.Completion.Complete(Error(HttpError.TimedOut))
     TaskQueue.Default.Drain()
-    let Error(HttpJsonError.Http(HttpError.UnsuccessfulStatus(code))) = rejection.GetResult() else {
+    let Error(statusError) = rejection.GetResult() else {
         System.Fail("Status error missing")
     }
-    Check(code == HttpStatusCode.NotFound)
-    Check(malformed.GetResult() is Error(HttpJsonError.Json(JsonError.Syntax(_))))
-    Check(transportResult.GetResult() is Error(HttpJsonError.Http(HttpError.TimedOut)))
+    if statusError is HttpError httpError {
+        let HttpError.UnsuccessfulStatus(code) = httpError else {
+            System.Fail("Status cause missing")
+        }
+        Check(code == HttpStatusCode.NotFound)
+    } else {
+        System.Fail("Status alternative missing")
+    }
+    let Error(parseError) = malformed.GetResult() else {
+        System.Fail("JSON error missing")
+    }
+    if parseError is JsonError jsonError {
+        Check(jsonError is JsonError.Syntax(_))
+    } else {
+        System.Fail("JSON alternative missing")
+    }
+    let Error(transportError) = transportResult.GetResult() else {
+        System.Fail("Transport error missing")
+    }
+    if transportError is HttpError httpError {
+        Check(httpError is HttpError.TimedOut)
+    } else {
+        System.Fail("Transport alternative missing")
+    }
 
     let scalarHandler = ReplyHandler(200, "{}", false)
     let scalar = HttpClient(scalarHandler).PostAsJson("http://example.test/", 42)
@@ -118,7 +139,14 @@ func JsonVerbs() {
 
     let unsupported = ReplyHandler(200, "{}", false)
     let badModel = HttpClient(unsupported).PostAsJson("http://example.test/", (byte)42)
-    Check(badModel.GetResult() is Error(HttpJsonError.Json(JsonError.UnsupportedMapping(_))))
+    let Error(mappingError) = badModel.GetResult() else {
+        System.Fail("Mapping error missing")
+    }
+    if mappingError is JsonError jsonError {
+        Check(jsonError is JsonError.UnsupportedMapping(_))
+    } else {
+        System.Fail("Mapping alternative missing")
+    }
     Check(unsupported.Calls == 0)
 
     let stopped = CancellationTokenSource()

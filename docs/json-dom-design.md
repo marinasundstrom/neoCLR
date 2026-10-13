@@ -615,3 +615,17 @@ cannot be caught by the test framework. Compiler Runtime Contract settings and w
 format are unchanged; native interfaces are emitted normally. The CLI documentation
 facade uses ordinary Sequence implementation and getter metadata; it is not the
 executable runtime implementation.
+
+
+### Composing HTTP and JSON errors — development, 2026-10-13
+
+The native client helpers now expose `HttpError | JsonError` directly. The earlier
+HttpJsonError wrapper only aggregated those independent causes; retaining both types
+in the signature removes a redundant case layer. GET status handling, POST response
+preservation and task cancellation retain the behavior described above. Compared
+with .NET's exception-based HTTP JSON APIs, neoCLR continues its established typed
+Result contract; this changes its error composition, not transport/serializer policy.
+The cost is a breaking development signature/pattern change and explicit dependency
+exposure. Domain errors remain nominal. See [the API review](raven-error-api.md) and
+[validation](experiments/http-json-client/README.md). The nominal wrapper remains
+available for explicit contracts; older checkpoint evidence retains its original form.

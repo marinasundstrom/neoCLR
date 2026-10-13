@@ -46,11 +46,29 @@ also improve existing APIs despite the preference for many nominal public error
 contracts. Evaluate each API's meaning and compatibility rather than categorically
 reserving ad-hoc unions for private code.
 
-A concrete review candidate is `HttpJsonError`: it currently carries either
-`HttpError` or `JsonError` and forwards the cause's formatted description. An
-ad-hoc `HttpError | JsonError` could expose those alternatives directly and remove
-wrapping/converter boilerplate. Costs include changing public return signatures,
-existing Http/Json case patterns and their named domain boundary. This is an
-assistant-proposed candidate, not an approved migration; the current HttpJsonError
-API is unchanged. Errors such as NumberParseError.InvalidFormat/Overflow retain
-useful domain cases and are not aggregation-only wrappers.
+The first migration is the development HTTP JSON client surface: all GetFromJson
+and PostAsJson overloads now return `Result<..., HttpError | JsonError>` inside
+Task. HttpJsonError merely labeled those existing types and forwarded ToString;
+its extra layer added no distinct failure meaning. GET now propagates transport
+and decode errors with `?`; POST preserves the original serialization/HTTP error.
+Cancellation remains task cancellation and GET status rejection still precedes
+decoding. The nominal HttpJsonError type remains available for explicitly declared
+contracts but is no longer returned by these helpers. This is a breaking development
+signature change: rebuild consumers and replace wrapper patterns with typed matching.
+
+The review retains HttpError and JsonError: both define domain failures as well
+as typed causes. In particular, HttpError.Content and SecureTransport carry the
+same StreamError type with different meanings; an ad-hoc union would lose that
+distinction. NumberParseError.InvalidFormat/Overflow and TextReadError likewise
+name domain outcomes. The report sample retains AppError because its Body case
+belongs to the application, and explicitly adapts library alternatives at that
+boundary. No further aggregation-only public error wrapper was found in this
+bounded review of the current runtime Raven source unions.
+
+See [HTTP JSON validation](experiments/http-json-client/README.md). Relative to
+.NET's HTTP JSON conveniences, this changes neoCLR's existing typed Result error
+contract, not HTTP status, decoding or cancellation semantics. The established
+[JSON design comparison](json-dom-design.md) still applies. Benefits are visible
+alternatives and less forwarding code; costs are signature/pattern migration and
+exposing both dependencies in the public contract. Native structural unions remain
+planned; the temporary System.Union bridge and its limits are unchanged.

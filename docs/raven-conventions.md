@@ -416,17 +416,32 @@ when inner propagation is intended. Use a matching compiler when verifying sampl
 
 ## Propagating several existing error types
 
-Prefer an ad-hoc union such as `Result<Config, FileReadError | NumberParseError>`
-when the function should preserve those existing errors. Each compatible error
-propagates with `?`; no implicit converter is needed merely to include a listed
-alternative. The signature makes the alternatives discoverable and typed patterns
-can distinguish them. Use a nominal union or dedicated type for many public APIs,
-where domain meaning and an independent contract matter more than exposing the
-underlying operations. See [the executable configuration loader](experiments/adhoc-error-unions/README.md).
+Prefer an ad-hoc union when a function composes independent operations with different
+error types and callers should see the original causes. For example,
+`Result<Config, FileReadError | NumberParseError>` allows either error to propagate
+with `?`, without a shared base type or converters written only for forwarding.
+The alternatives remain discoverable in the signature. Apply this to implementations,
+examples and tests when it reduces boilerplate and makes their intent easier to read.
 
-The current neoCLR development implementation uses temporary nominal carriers for
-two through five alternatives, pending native structural union values. Match the
-compiler and class library; this is not a claim about older SDKs or structural identity.
+Use the same spelling directly in generic constructors and method type arguments;
+no alias is needed. After extracting `Error(let error)`, narrow with a typed pattern
+such as `error is FileReadError fileError`, then inspect the nominal error's cases.
+
+See the [configuration loader](experiments/adhoc-error-unions/Config.rvn), the
+[HTTP JSON implementation](../runtime/raven/src/System/Web/Http/Json/JsonClientOperations.rvn)
+and [async composition regression](experiments/http-json-client/PropagationChecks.rvn).
+HTTP JSON is a strong existing API example: it combines transport and serialization
+errors. The focused tests use those alternatives directly rather than reconstructing
+an aggregation-only wrapper.
+
+Keep nominal error types or unions where their cases add domain meaning, context,
+encapsulation or a stable public boundary. They remain preferable for many public
+APIs. Do not flatten distinct cases merely because they contain other error types;
+HttpError.Content and SecureTransport both carry StreamError but mean different
+things. Use implicit converters or an explicit adapter for intentional domain
+mapping, as the report application's AppError boundary does. Compatibility matters
+when changing existing signatures. Native structural union values remain planned;
+the current bridge uses System.Union carriers with two through five alternatives.
 
 ## Propagating errors through conversions
 
