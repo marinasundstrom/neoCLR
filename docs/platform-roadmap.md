@@ -60,7 +60,7 @@ results through retry. Process-argument construction now roots its partial array
 scratch is kept stable. POSIX file input now retries only final decoding after closing the descriptor.
 Socket/TLS/crypto adapters do not allocate managed results; PostgreSQL uses the
 managed socket/encoding layers. Culture/time-zone producers now retain native snapshots through rooted output
-allocation. Interning now retains its source during pool-entry allocation; object allocation now retries with published argument/receiver roots and initialized payloads (see the producer ownership inventory). The subsequent pacing gate passes all 33 GC/root executions on hosted macOS and Windows, including these helper checks ([evidence](validation/runtime-product/native-scheduler-pacing/README.md)). Native scheduler acquisition now collects before returning Idle/Pending, with pending/abandoned-owner lifetime tests. The retained-stack pump refreshes ownership/readiness after idle collection to avoid diagnosing expired bodies as unresolved work. The runtime now supplies an opt-in 16-allocation/64-boundary policy with unconditional idle collection. Hosted macOS/Windows GC/root and stress/paced scheduler checks pass; integrated closed-workload gains are 3.61–4.14× with about 23% more peak arena extent. Managed workload qualification precedes default promotion. Interpreter policy remains independent.
+allocation. Interning now retains its source during pool-entry allocation; object allocation now retries with published argument/receiver roots and initialized payloads (see the producer ownership inventory). The subsequent pacing gate passes all 33 GC/root executions on hosted macOS and Windows, including these helper checks ([evidence](validation/runtime-product/native-scheduler-pacing/README.md)). Native scheduler acquisition now collects before returning Idle/Pending, with pending/abandoned-owner lifetime tests. The retained-stack pump refreshes ownership/readiness after idle collection to avoid diagnosing expired bodies as unresolved work. The runtime now supplies an opt-in 16-allocation/64-boundary policy with unconditional idle collection. Hosted macOS/Windows GC/root and stress/paced scheduler checks pass; integrated closed-workload gains are 3.61–4.14× with about 23% more peak arena extent. Fresh macOS and Windows managed plain-text/JSON AOT HTTP qualification each pass 640 response checks and complete diagnostic reclamation under both policies ([evidence](../benchmarks/http-gc-pacing/README.md#managed-http-qualification)); local timing overlaps compiler work and is not a speedup qualification. Hosted Windows measures 2.20× plain-text and 2.64× JSON gains on short sequential workloads with bounded peak arena growth. Broader managed workload qualification precedes default promotion. Interpreter policy remains independent.
 The author also proposed a [platform abstraction layer](platform-direction.md#platform-abstraction-direction--2026-10-13); evolve existing OS boundaries incrementally without replacing this milestone. Linux ARM64 is an explicit future expansion target; separate OS and CPU/ABI concerns without claiming current support.
 The author additionally proposed generations to reduce collection pressure/latency;
 [the next architecture evaluation](runtime-gc.md#generational-collection-evaluation--2026-10-13)
@@ -91,6 +91,23 @@ final reclamation is complete with zero GC/poll failures. GC elapsed time is lar
 unchanged and remains the next large work interval. DNS/timer-only and legacy TLS
 waits retain bounded polling; macOS policy is unchanged. Hosted, sequential results
 do not qualify sustained concurrency or Windows ARM64.
+
+**HTTP performance objective (2026-10-13):** the author targets competitive
+throughput with Go and .NET, especially AOT; landing between their equivalent
+implementations is an aspiration, not a current result. Retain sequential
+connection-close controls and extend matched same-host comparisons to persistent
+connections and concurrency sweeps, including latency, CPU, allocations, GC pauses
+and response correctness. Short pacing measurements do not establish saturation
+capacity. This objective does not skip the runtime-await integration gates below.
+
+**Author clarification — runtime-await default (2026-10-13):** runtime-await is
+our intended default neoCLR lowering, independently of collection pacing.
+Compiler state machines remain an explicit fallback; Raven/.NET defaults stay
+separate. After this scheduler/pacing qualification, integrate the source-included
+provider behind the runtime capability contract, qualify native Windows suspension
+and library lowering, then switch SDK/project defaults. The current macOS ARM64
+carrier gate does not authorize a platform-wide default flip; unsupported targets
+must have explicit capability behavior. See the [conversation record](development-timeline.md#2026-10-13--runtime-await-as-the-default-lowering).
 
 **Windows root/HTTP qualification (2026-10-13):** [retained Windows x64 evidence](../benchmarks/http-server/root-observation.md#windows-qualification--2026-10-13)
 passes GC/root/profiler and socket contracts, native HTTP, eight default-JIT HTTP

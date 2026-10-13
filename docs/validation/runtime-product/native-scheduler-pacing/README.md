@@ -43,3 +43,25 @@ passes Windows x64 GC/root and socket/package gates at
 when saved. Local macOS validates the carrier fix and all 35 GC/root executions;
 run 38455945430 supplies completed hosted macOS qualification of the shared policy.
 The follow-up workflow as a whole is not reported as complete.
+
+## Managed workload follow-up
+
+The [managed HTTP qualifier](../../../../benchmarks/http-gc-pacing/README.md#managed-http-qualification)
+rebuilds current Raven plain-text and JSON applications, then uses identical native
+objects for stress and paced hosts. The initial JSON attempt lacked reflection
+roots; the harness now obtains them using the existing native-sample discovery
+procedure. The failed attempt is not passing evidence.
+
+Runtime-await qualification required refreshing an obsolete bundle recipe and
+awaiting the current asynchronous `Console.ReadLine` API in the client sample.
+The first fresh run passed all AOT cases and the first seven JIT cases, then hit
+the server-readiness timeout while JIT compilation was still running. Startup and
+peer acceptance now allow the same bounded compilation window as the other JIT
+invocations. These are qualification-tool/sample corrections, not GC fixes.
+
+[Windows managed HTTP run 38458148179](https://github.com/marinasundstrom/neoCLR/actions/runs/38458148179)
+passes at `2a22f1f460842960a0dedd84b8f1b6759f06f978`; the retained run metadata
+and benchmark reports record the platform and commands. Both macOS and Windows
+validate 640 responses and full reclamation. Windows short sequential medians
+improve 2.20× plain and 2.64× JSON; local timings overlapped compiler work and
+remain diagnostic context rather than isolated performance evidence.

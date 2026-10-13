@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-13
 
+- Retain managed HTTP pacing qualification on macOS ARM64 and Windows x64: each validates 640 responses with complete diagnostic reclamation. Windows short sequential throughput improves 2.20× for plain text and 2.64× for JSON; peak arena extent grows modestly. Local timings overlapped compiler work and are not an isolated speedup qualification. Keep stress GC as default, update roadmap/website status, and record the author’s AOT HTTP competitiveness objective without claiming saturation throughput or cross-platform parity.
+
 - Refresh architectural diagrams and explanations around execution engines (JIT/interpreter), memory management, and scheduling/suspension. Show AOT as a publishing target using runtime services. Correct stale JIT status and record the author’s runtime-await-default direction with provider/SDK and Windows carrier prerequisites; no default or runtime contract changes in this documentation slice.
 
 - Add an explicit stress/paced host choice and canonical runtime source hashes to the runtime-await JIT/AOT validator. Update the HTTP client sample to await the current asynchronous console input API, removing an obsolete synchronous call that prevented fresh project qualification. Allow the bounded JIT compilation window before server readiness/peer acceptance. Installed policy and compiler contracts are unchanged.

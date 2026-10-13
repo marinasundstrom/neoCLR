@@ -215,3 +215,27 @@ concurrency, HTTPS or generic JIT performance. Installed defaults are unchanged.
 The .NET comparison remains allocation-pressure budgeting at reported root
 boundaries; this does not add generations or concurrent collection. The expected
 tradeoff is fewer full sweeps versus more retained bytes and synchronous pauses.
+
+Local macOS ARM64 [managed HTTP evidence](managed-macos-20261013.json) validates
+640 responses across both workloads and policies. Separate 32-request diagnostics
+report complete reclamation: plain-text allocates/reclaims 16,340 objects, JSON
+38,358. Collections fall from 177,097 to 2,822 (plain) and 271,945 to 4,357 (JSON);
+peak arena extent rises from 13,216 to 13,944 bytes and 19,672 to 20,168 bytes.
+This run overlapped runtime-await compiler work: its retained timings are not an
+isolated performance comparison and are not used to qualify a speedup.
+
+Hosted Windows x64 [run 38458148179](https://github.com/marinasundstrom/neoCLR/actions/runs/38458148179)
+passes both the standalone HTTP project gate and the fresh pacing qualification at
+`2a22f1f460842960a0dedd84b8f1b6759f06f978`. The
+[raw managed report](managed-windows-38458148179.json) retains 640 validated responses,
+three measured alternating pairs per workload and separate diagnostics:
+
+| Workload | Stress requests/s | Paced requests/s | Ratio | Peak arena bytes, stress → paced |
+| --- | ---: | ---: | ---: | ---: |
+| Plain text | 46.24 | 101.87 | 2.20× | 13,336 → 13,960 |
+| JSON | 26.14 | 68.95 | 2.64× | 19,776 → 20,272 |
+
+Each diagnostic run reclaims every allocation (16,340 plain; 38,358 JSON).
+Collections fall from 178,213 to 2,843 and 273,077 to 4,370 respectively. These
+short hosted-runner results are not saturation capacity, a cross-platform ranking
+or evidence for Windows ARM64, runtime-await Windows support or default promotion.

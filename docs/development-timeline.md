@@ -25,6 +25,24 @@ available original wording; other text is a summary.
 
 See the [changelog](../CHANGELOG.md) and linked design documents for technical status.
 
+## 2026-10-13 — HTTP throughput target after collection pacing
+
+- **Author:** asks how many requests the runtime now handles, then directs higher
+  HTTP throughput to compete with .NET and Go, especially AOT, with performance
+  between them as an aspiration.
+- **Assistant-reported measurements:** the short local sequential run measured
+  approximately 248 plain-text and 178 JSON requests/s with pacing, but overlapped
+  compiler work. Hosted Windows measured approximately 102 and 69 requests/s,
+  versus 46 and 26 with stress collection. These are different machines and are
+  not saturation capacity or a cross-platform ranking.
+- **Assistant proposal:** retain connection-close controls and qualify persistent
+  connections and concurrency sweeps against equivalent Go and ASP.NET Core
+  servers on the same host. Measure throughput together with latency, CPU,
+  allocation, GC pauses and correctness. The relative performance goal is not yet
+  demonstrated. See [retained pacing evidence](../benchmarks/http-gc-pacing/README.md#managed-http-qualification).
+- **Scope:** this performance objective does not silently replace the ongoing
+  scheduler/pacing qualification or runtime-await integration prerequisites.
+
 ## 2026-10-13 — Name the integrated runtime components
 
 - **Author:** proposes Execution (JIT, interpreter), GC, Scheduler including

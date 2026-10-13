@@ -119,4 +119,7 @@ API or enable general collection pacing.
 Native scheduler acquisition now collects before returning idle or pending, retaining
 waiting operations and reclaiming abandoned owners. Development host builds can
 opt into bounded collection pacing; installed JIT/AOT hosts retain stress collection
-as the default while managed-workload qualification continues.
+as the default while managed-workload qualification continues. Short local
+plain-text and JSON HTTP checks reclaim every allocation under both policies;
+pacing greatly reduces full-collection counts, with modestly higher peak arena
+extent. Sustained and concurrent load remain qualification work.
