@@ -8,6 +8,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-13
 
+- Record author direction to preserve public benchmark history and require
+  stable or improving performance. Define immutable runs, versioned comparable
+  workloads and proposed noise-aware regression acceptance; controlled repeatability
+  and statistical gating remain future work, not claims of the current runner.
+
 - Replace the HTTP benchmark page placeholder with the recorded Preview 14
   plain-text baseline: throughput/range, latency percentiles, separate startup,
   raw evidence and reproduction steps. Keep host contention and unmeasured JSON/SQL

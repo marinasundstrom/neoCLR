@@ -25,6 +25,24 @@ available original wording; other text is a summary.
 
 See the [changelog](../CHANGELOG.md) and linked design documents for technical status.
 
+## 2026-10-13 — Historical benchmarks and performance stability
+
+**Author:** asks to retain historical benchmarks so both maintainers and visitors
+can compare, and states: "The criteria is that benchmarks should be stable and
+results not degrade. Only improve."
+
+**Assistant response:** agrees to preserve dated workload/toolchain/environment
+records and raw samples, with current baselines and links to history on the website.
+Proposes no statistically meaningful regression under comparable conditions rather
+than treating timing noise as a regression; explains that interactive short runs
+cannot establish a reliable gate yet. No statistical tolerance or waiver was approved.
+
+**Actions:** records the [benchmark history and regression policy](benchmark-history.md).
+The current [HTTP baseline](../benchmarks/http-server/README.md) retains per-round
+samples, response validation and exact build inputs. Additional composed HTTP and
+CPU/JSON runs are in progress at this point; their results will be reported separately.
+Controlled hosts, calibration and automated regression enforcement remain open.
+
 ## 2026-10-12 — Default-JIT HTTP preview installed
 
 **Author:** asks to continue fixing the native async object-size limit, rerun HTTP
