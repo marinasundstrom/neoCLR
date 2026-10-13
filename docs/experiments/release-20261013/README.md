@@ -1,5 +1,10 @@
 # Release preflight — 2026-10-13
 
+**Publication update:** These qualified bundles were published as
+[Preview 14](https://github.com/marinasundstrom/neoCLR/releases/tag/v0.1.0-preview.14)
+on 2026-10-13. See the [publication record](../../preview-14-publication.json).
+The pre-publication chronology and per-revision results below are retained.
+
 Hosted source qualification now passes on `a9adc97cb`, including the full Linux
 archive suite, macOS/Windows host boundaries and the minimum-Rust matrix. Backend
 repair `566fb34dc` has focused Windows object-generation and macOS execution

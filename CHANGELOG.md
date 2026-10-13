@@ -8,10 +8,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-13
 
-- Prepare Preview 14 publication with exact qualified macOS ARM64/Windows x64
-  bundles, separately packaged matching SDK/VSIX and notices, source qualification
-  archive, checksums and per-revision evidence. Update release/install guidance and
-  select version 0.1.0-preview.14; retain prior published history unchanged.
+- Publish Preview 14 with exact qualified macOS ARM64/Windows x64 bundles,
+  separately packaged matching SDK/VSIX and notices, source qualification archive,
+  checksums and per-revision evidence. Verify all 11 uploaded asset digests and the
+  public checksum download. Deploy the website successfully and verify its live
+  Preview 14 download/default-JIT guidance. Retain the publication record; prior
+  published release notes and changelog sections remain unchanged.
 
 ## 0.1.0-preview.14 — 2026-10-13
 
