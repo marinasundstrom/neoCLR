@@ -124,7 +124,14 @@ The fault/diagnostics follow-up preserves fault codes, context/frame layouts,
 first-fault behavior and output rendering. A relocated-package test checks both
 rendering entry paths, including no-fault output, embedded NUL, instruction indices,
 truncation text and unchanged input context. Local rendering and POSIX attachment
-lifecycle/disabled-endpoint tests pass; hosted qualification is pending.
+lifecycle/disabled-endpoint tests pass. Six compiled fault-detail tests and 20 native
+GC/root executions also pass locally. The [hosted gate](https://github.com/marinasundstrom/neoCLR/actions/runs/38436723275)
+at `fe27a8995` passes package rendering and socket checks on macOS and Windows,
+Windows GC/root checks and macOS attachment lifecycle/disabled-endpoint checks.
+[Raw reports](validation/runtime-product/fault-diagnostics-layout/) retain source
+hashes and hosted job outcomes. The local report predates the commit and records
+the tested inputs. The consolidated native services no longer include headers from
+`docs/experiments`; forwarding files preserve existing host recipes.
 The diagnostic transport remains opt-in and POSIX-only; including its source in
 support manifests does not link or enable it in ordinary hosts. Windows attachment
 support and a stable diagnostics ABI remain gaps. Existing profiler protocol and
