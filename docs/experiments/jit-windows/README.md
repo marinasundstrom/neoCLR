@@ -168,4 +168,5 @@ It validates the formerly rejected SSL-stream HTTPS JSON consumer in interpreter
 default JIT and AOT, plus eight default-JIT HTTP cases. Shared JIT preparation,
 scalar and CLI checks also pass. [Retained reports and scope](../../../benchmarks/http-server/root-observation.md#windows-qualification--2026-10-13)
 keep the initial full-gate failure distinct from the focused rerun; the skipped
-library suites are not newly qualified. Windows performance and ARM64 remain open.
+library suites are not newly qualified. A later [matched Windows HTTP wait comparison](../../../benchmarks/http-scheduling/README.md#matched-windows-results--2026-10-13)
+records JIT/AOT throughput and GC/wait attribution. ARM64 remains open.

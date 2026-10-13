@@ -1,5 +1,14 @@
 # neoCLR platform roadmap
 
+**Windows wait attribution (2026-10-13):** [matched diagnostics and benchmarks](../benchmarks/http-scheduling/README.md#matched-windows-results--2026-10-13)
+identify unconditional scheduler sleeps as a major avoidable cost. Bounded socket
+readiness waits improve plain HTTP by 2.09–2.23× and JSON by 1.58–1.64× in paired
+Windows x64 JIT/AOT runs. All 1,536 comparison and 256 diagnostic responses pass;
+final reclamation is complete with zero GC/poll failures. GC elapsed time is largely
+unchanged and remains the next large work interval. DNS/timer-only and legacy TLS
+waits retain bounded polling; macOS policy is unchanged. Hosted, sequential results
+do not qualify sustained concurrency or Windows ARM64.
+
 **Windows root/HTTP qualification (2026-10-13):** [retained Windows x64 evidence](../benchmarks/http-server/root-observation.md#windows-qualification--2026-10-13)
 passes GC/root/profiler and socket contracts, native HTTP, eight default-JIT HTTP
 cases, and managed SSL-stream HTTPS JSON in interpreter/JIT/AOT. This exposed and

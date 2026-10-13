@@ -293,3 +293,80 @@ identical sources/guests, differing only by the private diagnostic build switch
 `NEOCLR_SCHEDULER_LEGACY_WAIT`. Separate instrumented AOT runs qualify both policies,
 including final reclamation. The old policy is a benchmark control, not an SDK option.
 Results determine acceptance; no gain is assumed from the implementation alone.
+
+### Matched Windows results — 2026-10-13
+
+[Run 38410199440](https://github.com/marinasundstrom/neoCLR/actions/runs/38410199440)
+passes at `58279fe05` on Windows Server 2022 x64, GitHub-hosted AMD virtual machine.
+[Raw uninstrumented report](windows-waits-20261013.json) retains all five alternating
+rounds, eight warmup processes, input hashes and build commands. Same guest objects
+and source bytes within each pair; only the legacy-wait compile switch differs.
+Each process validates 32 sequential loopback responses on fresh connections and
+excludes the first eight from timing. All 1,536 responses pass, including 960 timed
+requests. Startup/JIT compilation is outside request timings.
+
+| Workload | Mode | Sleep requests/s (range) | Readiness requests/s (range) | Median ratio |
+| --- | --- | ---: | ---: | ---: |
+| Plain text | JIT | 40.10 (37.07–42.30) | 89.30 (82.63–93.46) | 2.23× |
+| Plain text | AOT | 41.77 (37.47–47.44) | 87.19 (58.55–91.94) | 2.09× |
+| Object JSON | JIT | 29.95 (26.94–33.21) | 47.36 (45.84–49.51) | 1.58× |
+| Object JSON | AOT | 28.45 (25.12–33.21) | 46.73 (46.25–47.74) | 1.64× |
+
+Ranges do not overlap in these runs. The plain AOT candidate has a slower round,
+which remains in the report. This is a short, concurrency-one CI comparison, not
+sustained throughput or a cross-runtime/platform ranking. In particular, compare
+within this run, not with the slower prior Windows VM's absolute results.
+
+Separate AOT diagnostics, two runs per policy/workload, validate another 256
+responses. All 16,340 plain / 38,358 JSON allocations per process are reclaimed;
+all collector and poll error counts are zero.
+
+| Whole-process elapsed interval | Plain sleep | Plain readiness | JSON sleep | JSON readiness |
+| --- | ---: | ---: | ---: | ---: |
+| Scheduler waits | 424–443 ms | 24–27 ms | 386–489 ms | 51–63 ms |
+| Collector | 191–196 ms | 195–198 ms | 359–361 ms | 355–356 ms |
+| Socket polling | 1.95–2.13 ms | 1.66–1.77 ms | 2.11–2.20 ms | 1.79–1.82 ms |
+| Worker wall time | 776–810 ms | 386–387 ms | 1,023–1,118 ms | 675–678 ms |
+
+Raw profiles: [plain sleep](windows-plain-sleep-20261013.json),
+[plain readiness](windows-plain-readiness-20261013.json),
+[JSON sleep](windows-json-sleep-20261013.json),
+[JSON readiness](windows-json-readiness-20261013.json).
+These clocks measure elapsed intervals, not an exclusive CPU breakdown. Polling
+may nest runtime work; process CPU accounting on this VM is coarse and is retained
+as diagnostic data rather than used to infer utilization. Instrumented variants
+run separately, not in alternating throughput rounds. The uninstrumented experiment
+is the speedup evidence.
+
+The result identifies unconditional sleeping as the dominant avoidable waiting cost
+in these Windows cases. Collection time and allocation volume are essentially
+unchanged while waits fall sharply. Collection remains the largest measured work
+interval after this fix; complete helper-root coverage remains prerequisite to
+safer pressure-based collection. Socket-table scanning is small here. DNS/TLS
+readiness integration, idle efficiency and concurrent saturation still need their
+own measurements; this result does not select a new collector or scheduler design.
+
+Correctness evidence: [Windows socket contracts](windows-wait-socket-validation-20261013.json),
+[Windows GC/root contracts](windows-wait-gc-validation-20261013.json), both from
+[run 38410204548](https://github.com/marinasundstrom/neoCLR/actions/runs/38410204548),
+which also passes macOS socket checks. The [macOS profiler regression](macos-wait-hook-profile-20261013.json)
+passes 64 responses with complete reclamation; its wait behavior is unchanged.
+The private Windows wait does not invoke callbacks, consume results or move roots;
+the accept contract verifies that published callback ownership survives waiting
+and an intervening collection.
+
+The earlier [diagnostic run 38409478850](https://github.com/marinasundstrom/neoCLR/actions/runs/38409478850)
+also passes at `10727135f`: [plain](windows-initial-plain-profile-38409478850.json)
+and [JSON](windows-initial-json-profile-38409478850.json) show 684–791 / 676–748 ms
+in sleeps versus 349–350 / 650 ms in collection. It ran on a different hosted VM;
+do not subtract its intervals from the candidate run. Its accompanying
+[root-observation repeat](windows-root-repeat-38409478850.json) is retained, including
+smaller median changes and slower samples. This repeat reinforces the limitation
+of short hosted measurements and is not the readiness-wait comparison.
+
+The focused [HTTP/SSL gate 38410209858](https://github.com/marinasundstrom/neoCLR/actions/runs/38410209858)
+also passes at `58279fe05`: [eight default-JIT HTTP cases](windows-wait-http-20261013.json)
+include fragmentation, duplicate lengths, handler error/fault, DNS, timeout cleanup
+and delayed success; [managed SSL streams](windows-wait-tls-20261013.json) exchange
+nested JSON with GC in interpreter/JIT/AOT. The [gate report](windows-wait-http-gate-20261013.json)
+is explicitly focused, not a new full-library-suite result.

@@ -1,0 +1,192 @@
+{
+  "passed": true,
+  "scope": "scheduler-wait-benchmark",
+  "commands": [
+    {
+      "command": [
+        "cl",
+        "/nologo",
+        "/W4",
+        "/WX",
+        "/std:c11",
+        "/O2",
+        "/MT",
+        "/FoD:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation/",
+        "/Fe:D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\guarded-heap.exe",
+        "D:\\a\\neoCLR\\neoCLR\\tools\\native\\windows-host-memory.c",
+        "D:\\a\\neoCLR\\neoCLR\\tools\\native\\windows-host-memory-test.c"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\guarded-heap.exe"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "C:\\hostedtoolcache\\windows\\Python\\3.12.10\\x64\\python.exe",
+        "D:\\a\\neoCLR\\neoCLR\\scripts\\prepare-native-development-bundle.py",
+        "--bundle",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\neoclr-native-poc",
+        "--output",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\development",
+        "--build-compiler",
+        "--compiler-revision",
+        "6b5e052ce3648f9247ac76aba275587a3a5a1bb4"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "cargo",
+        "build",
+        "--locked",
+        "--release",
+        "--manifest-path",
+        "D:\\a\\neoCLR\\neoCLR\\tools\\aot-poc\\Cargo.toml"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "cargo",
+        "build",
+        "--locked",
+        "--release",
+        "--bin",
+        "neoclr"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "cargo",
+        "test",
+        "--locked",
+        "--release",
+        "--manifest-path",
+        "D:\\a\\neoCLR\\neoCLR\\tools\\aot-poc\\Cargo.toml",
+        "--test",
+        "scalar",
+        "jit_"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "cargo",
+        "test",
+        "--locked",
+        "--release",
+        "--test",
+        "cli",
+        "cli_execution_selection"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "C:\\hostedtoolcache\\windows\\Python\\3.12.10\\x64\\python.exe",
+        "D:\\a\\neoCLR\\neoCLR\\scripts\\build-native-project.py",
+        "--profile",
+        "windows-http",
+        "--project",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\server-source\\App.rvnproj",
+        "--bundle",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\development\\bundle",
+        "--aot",
+        "D:\\a\\neoCLR\\neoCLR\\tools\\aot-poc\\target\\release\\neoclr-aot-poc.exe",
+        "--output",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\native"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "C:\\hostedtoolcache\\windows\\Python\\3.12.10\\x64\\python.exe",
+        "D:\\a\\neoCLR\\neoCLR\\scripts\\prepare-jit-bundle.py",
+        "--bundle",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\development\\bundle",
+        "--runtime",
+        "D:\\a\\neoCLR\\neoCLR\\target\\release\\neoclr.exe",
+        "--jit-compiler",
+        "D:\\a\\neoCLR\\neoCLR\\tools\\aot-poc\\target\\release\\neoclr-aot-poc.exe",
+        "--host-recipe",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\native\\build.json",
+        "--output",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\jit-install"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "C:\\hostedtoolcache\\windows\\Python\\3.12.10\\x64\\python.exe",
+        "D:\\a\\neoCLR\\neoCLR\\benchmarks\\http-server\\windows-root-observation.py",
+        "--bundle",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\jit-install\\bundle",
+        "--host-recipe",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\jit-install\\preparation.json",
+        "--output",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\http-benchmark",
+        "--compare-waits"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "C:\\hostedtoolcache\\windows\\Python\\3.12.10\\x64\\python.exe",
+        "D:\\a\\neoCLR\\neoCLR\\benchmarks\\http-scheduling\\windows-profile.py",
+        "--build",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\http-benchmark\\plain-native\\build.json",
+        "--workload",
+        "plain",
+        "--output",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\plain-wait-profile"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "C:\\hostedtoolcache\\windows\\Python\\3.12.10\\x64\\python.exe",
+        "D:\\a\\neoCLR\\neoCLR\\benchmarks\\http-scheduling\\windows-profile.py",
+        "--build",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\http-benchmark\\json-native\\build.json",
+        "--workload",
+        "json",
+        "--output",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\json-wait-profile"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "C:\\hostedtoolcache\\windows\\Python\\3.12.10\\x64\\python.exe",
+        "D:\\a\\neoCLR\\neoCLR\\benchmarks\\http-scheduling\\windows-profile.py",
+        "--build",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\http-benchmark\\plain-native\\build.json",
+        "--workload",
+        "plain",
+        "--legacy-wait",
+        "--output",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\plain-legacy-wait-profile"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "C:\\hostedtoolcache\\windows\\Python\\3.12.10\\x64\\python.exe",
+        "D:\\a\\neoCLR\\neoCLR\\benchmarks\\http-scheduling\\windows-profile.py",
+        "--build",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\http-benchmark\\json-native\\build.json",
+        "--workload",
+        "json",
+        "--legacy-wait",
+        "--output",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-jit-validation\\json-legacy-wait-profile"
+      ],
+      "exitCode": 0
+    }
+  ]
+}

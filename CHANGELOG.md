@@ -8,12 +8,18 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-13
 
+- Qualify Windows readiness waits with matched JIT/AOT HTTP results: 2.09–2.23×
+  plain-text and 1.58–1.64× JSON throughput, with non-overlapping observed ranges.
+  Separate diagnostics attribute the gain to reduced waiting, retain unchanged
+  allocation volume and complete reclamation, and report zero collector/poll errors.
+  Preserve all raw rounds, initial profiling and platform contract evidence.
+
 - Add a bounded Windows socket-readiness wait candidate to the private JIT/AOT host
   scheduler, preserving callback/root ownership and existing deadline polling.
   Retain legacy waits for unsupported readiness sources and macOS; add matched
   legacy/readiness benchmarking and diagnostic runs to establish its effect.
-  The focused macOS socket contracts and benchmark-controller tests pass; Windows
-  qualification and measured improvement are pending.
+  Focused macOS/Windows socket and GC contracts and the matched Windows performance
+  qualification pass; see the retained evidence entry for scope and limitations.
 
 - Add opt-in Windows AOT HTTP attribution runs after the matched benchmark, recording
   whole-process collector time, socket-poll time, scheduler pauses and process CPU.
