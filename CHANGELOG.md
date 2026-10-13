@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-13
 
+- Revisit collection pacing in an isolated native workload using rooted admission for every allocation. The former large-request counterexample, true exhaustion, root-only cleanup, idle cleanup and owned suspended-stack abandonment pass locally. Add alternating stress/paced benchmarks and optional platform CI. General managed/HTTP pacing stays disabled: remaining helper coverage and actual scheduler idle integration are still required; this is an experiment, not a shipping policy.
+
 - Add private temporary-value protection for allocation retry and select rooted string concat/join helpers in native-GC code generation. Borrowed inputs and join elements survive pressure collection; only the allocation is retried. Non-GC and unaudited native helper callers retain noncollecting entry points. Twenty local GC/root checks and four compiled GC/non-GC text tests pass. New native objects require matching host symbols; Raven metadata and Runtime Contract configuration are unchanged.
 
 - Combine native allocation validation and first-fit search into one complete heap walk, preserving trailing-corruption checks, failure outputs and fault precedence. Local allocation-only benchmarks improve 1.49–1.89×; all 19 GC/root checks pass. Add reproducible object, string-sized, buffer and fragmented-heap benchmarks with optional platform CI. Full validation remains linear; collection policy is unchanged.

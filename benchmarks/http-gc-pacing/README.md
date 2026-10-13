@@ -107,8 +107,9 @@ The private `neoclr_gc_allocate_rooted_v1` entry point now admits an allocation,
 collects once on capacity pressure, and retries before reporting a language fault.
 It requires a complete current root boundary (or a quiescent host), including all
 native helper temporaries. Boundary identity checks do not prove completeness.
-The existing arena-only allocator remains non-collecting; no helper or compiler
-path opts in yet, and the rejected pacing policy remains disabled.
+The existing arena-only allocator remains non-collecting. StackTrace capture and
+GC-generated concat/join now opt in through audited paths; the rejected general
+pacing policy remains disabled.
 
 `native-gc-admission-test.c` covers preserved live roots, stale/wrong boundaries,
 impossible requests, genuine exhaustion and the retained 4 MiB pressure example.
@@ -116,3 +117,37 @@ The conditional-roots validator passes all eight focused checks with undefined
 behavior/bounds sanitizers, including owned-body and idle-drain checks
 (`target/http-gc-rooted-admission-20261013/validation.json`). This is an admission
 primitive, not a throughput improvement or completed helper-lifetime audit.
+
+## Rooted closed-workload pacing follow-up — 2026-10-13
+
+`evaluate-rooted.py --output NEW_DIRECTORY` evaluates a separate native workload
+where **every allocation uses rooted admission**, including the new concat helper.
+It does not change generated-code boundary policy, HTTP hosts or installed SDKs.
+Its report deliberately retains `promotionEligible: false`: unaudited helpers and
+real scheduler idle integration still prevent general promotion.
+
+The candidate collects after 16 allocations or 64 progressing root boundaries;
+it always collects on an explicit idle/shutdown call. It does not guess a free-space
+reserve. An allocation that cannot fit collects with published roots and retries
+once, preserving large-request admission. Unexpected collection epochs force
+collection rather than resetting the cleanup budget indefinitely across contexts.
+The threshold is an experiment, not a managed API contract or wall-clock guarantee.
+
+Contracts cover the former 4 MiB pressure counterexample, true live-heap exhaustion,
+root-only reachability changes, exactly-once resource cleanup, explicit idle
+cleanup and owned suspended-stack retention/abandonment. They supplement helper
+pressure tests that preserve borrowed strings and array elements during retry.
+
+The workload keeps 64 live objects or strings while performing 20,000 allocations
+in a 64 KiB arena. One binary executes both policies; five alternating measured
+pairs follow warmups. Timings include allocation and boundary collection, excluding
+final idle cleanup. Separate profiled runs verify bounded arena extent, counts
+and complete reclamation. This is neither a managed JIT/AOT application comparison
+nor an HTTP throughput result. Keep the original rejected experiment above intact.
+
+The existing [.NET/Go/V8 research](../http-scheduling/README.md) motivates measuring
+allocation pressure and cleanup separately. This experiment remains a nonmoving
+full collector; it implements no generations, barriers or concurrent marking.
+Acceptance for a future managed policy additionally requires complete allocating
+helper coverage, explicit interpreter/JIT/AOT policy behavior, real scheduler idle
+cleanup and sustained/concurrent workload qualification.
