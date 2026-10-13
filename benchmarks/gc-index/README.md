@@ -136,3 +136,29 @@ measurement binaries remain uninstrumented. The identical-source control in
 small heaps and two on dense heaps: a 16,384-object chain validates 32,768
 headers per collection. This identifies redundant validation work, not its exact
 CPU share or a measured optimization. Small control timings remain noisy.
+
+## Reuse validated spans for the dense index — 2026-10-14
+
+The dense lookup table now reuses the complete validation performed immediately
+before refinement in the same synchronous collection. No guest code, cleanup
+callback or heap mutation intervenes. Its bucket-building walk remains; it skips
+only redundant header validation and population counting. Small heaps retain the
+existing path. This is a refinement of neoCLR's current nonmoving implementation,
+not a change to the .NET-style reachability contract, collection policy, generations
+or public APIs. The cost is a separate private table-fill loop whose precondition
+must remain explicit if the collector becomes concurrent.
+
+The seven-pair, tenfold-duration macOS repeat
+(`validation-reuse-macos-20261014.json`) measures 2.1–3.3% higher collection
+throughput on dense chains, wide graphs and fragmented heaps. Small/sparse controls
+are within 1%. Validation calls halve on dense heaps; lookup visits and reclaimed
+counts are unchanged. This modest microbenchmark gain does not establish HTTP or
+whole-runtime improvement. The shorter pilot is also retained; it overlapped GC
+contract compilation and is superseded for timing conclusions by the longer run.
+
+All 35 sanitized local GC/root executions pass, including trailing dense-heap
+corruption rejection with byte-for-byte heap preservation, unchanged conditional
+outputs, no resource cleanup, and successful collection after repair. Existing
+interior roots, holes, suspended ownership, abandonment and full reclamation pass.
+Use `--collection-scale 10` to reproduce longer timing intervals. Hosted platform
+qualification and the matched HTTP regression check follow separately.

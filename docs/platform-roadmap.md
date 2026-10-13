@@ -1,5 +1,7 @@
 # neoCLR platform roadmap
 
+**Profiling follow-up (2026-10-14):** [dense index refinement](../benchmarks/gc-index/README.md#reuse-validated-spans-for-the-dense-index--2026-10-14) reuses the first complete validation pass within a synchronous collection. Longer local paired measurements improve dense collection throughput by 2.1–3.3%, with small/sparse controls within 1%; all 35 local GC/root checks pass. Hosted qualification and the HTTP regression check remain separate. This bounded improvement preserves collection policy and does not establish application throughput gains.
+
 **Integrated runtime product (author direction, 2026-10-13):** interpreter, JIT,
 AOT and GC are maintained as one platform, rather than independent experiments.
 The [integration direction](runtime-product-integration.md) starts with a shared

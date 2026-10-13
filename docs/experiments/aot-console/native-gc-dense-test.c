@@ -2,6 +2,7 @@
 #include "native-gc.h"
 #include <stdlib.h>
 #include <stdint.h>
+#include <string.h>
 static void cleaned(void *state) { ++*(int *)state; }
 int main(void) {
     enum { COUNT = 4097, SPAN = 48 };
@@ -25,6 +26,22 @@ int main(void) {
     neoclr_gc_resource resource = {0};
     int cleanup_count = 0;
     if (neoclr_gc_resource_attach_v1(&c, conditional.owner, &resource, &cleanup_count, cleaned)) return 7;
+    /* Corruption after a valid dense prefix must fail before marks, resource
+     * cleanup or conditional outputs change. Repair and collect the same heap. */
+    unsigned char *snapshot = malloc((size_t)c.text.used);
+    if (!snapshot) return 9;
+    uint64_t *last_header = (uint64_t *)conditional_value - 4;
+    uint64_t saved_span = last_header[0];
+    last_header[0] = c.text.used + 8;
+    memcpy(snapshot, buffer, (size_t)c.text.used);
+    neoclr_gc_statistics before = neoclr_gc_statistics_v1();
+    if (neoclr_gc_collect_conditional_v1(&c, &frame, &conditional, 1) != 3 ||
+        memcmp(snapshot, buffer, (size_t)c.text.used) || cleanup_count ||
+        conditional.owner != (void *)(uintptr_t)(root - 8) ||
+        conditional.value != conditional_value || conditional.retained ||
+        neoclr_gc_statistics_v1().reclaimed_allocations != before.reclaimed_allocations) return 10;
+    last_header[0] = saved_span;
+    free(snapshot);
     /* A dense index must still reject an interior owner without mutating entries. */
     void *owner = conditional.owner;
     conditional.owner = (unsigned char *)owner + 1;

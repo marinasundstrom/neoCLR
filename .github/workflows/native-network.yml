@@ -22,6 +22,10 @@ on:
         description: Run matched allocation traversal benchmarks
         type: boolean
         default: false
+      gc_index_baseline:
+        description: Git revision for the matched GC graph baseline
+        type: string
+        default: '924b45110'
       benchmark_gc_index:
         description: Run matched GC graph benchmarks after contract checks
         type: boolean
@@ -123,14 +127,18 @@ jobs:
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
       - name: Benchmark macOS GC graph lookup
         if: runner.os == 'macOS' && inputs.benchmark_gc_index
-        run: python3 benchmarks/gc-index/benchmark.py --baseline 924b45110 --output target/gc-index-benchmark
+        env:
+          GC_INDEX_BASELINE: ${{ inputs.gc_index_baseline || '924b45110' }}
+        run: python3 benchmarks/gc-index/benchmark.py --baseline "$GC_INDEX_BASELINE" --output target/gc-index-benchmark --collection-scale 10
       - name: Benchmark Windows GC graph lookup
+        env:
+          GC_INDEX_BASELINE: ${{ inputs.gc_index_baseline || '924b45110' }}
         if: runner.os == 'Windows' && inputs.benchmark_gc_index
         shell: pwsh
         run: |
           $vs = & "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\vswhere.exe" -latest -products '*' -requires Microsoft.VisualStudio.Component.VC.Tools.x86.x64 -property installationPath
           if (-not $vs) { throw 'MSVC x64 tools not found' }
-          cmd /c "`"$vs\VC\Auxiliary\Build\vcvars64.bat`" && python benchmarks/gc-index/benchmark.py --baseline 924b45110 --output target/gc-index-benchmark"
+          cmd /c "`"$vs\VC\Auxiliary\Build\vcvars64.bat`" && python benchmarks/gc-index/benchmark.py --baseline %GC_INDEX_BASELINE% --output target/gc-index-benchmark --collection-scale 10"
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
       - name: Benchmark macOS GC handle admission
         if: runner.os == 'macOS' && inputs.benchmark_gc_handles

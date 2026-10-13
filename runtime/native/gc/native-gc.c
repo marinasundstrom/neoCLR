@@ -580,7 +580,20 @@ static int32_t collect_dense(neoclr_aot_context *context,
     const neoclr_probe_frame *head, neoclr_gc_conditional_root *conditional, uint32_t count) {
     block *starts[4096];
     block_index index = {.start = starts, .capacity = 4096};
-    if (!build_index(&context->text, &index)) return NEOCLR_AOT_FAULT_RUNTIME_ERROR;
+    /* The caller has validated every span in this synchronous collection.
+     * No guest code, cleanup callback or heap mutation runs between the walks.
+     * Rebuild only bucket starts; do not repeat validation or population counting. */
+    neoclr_aot_text_arena *a = &context->text;
+    index.shift = 6;
+    while (a->used && ((a->used - 1) >> index.shift) >= index.capacity) index.shift++;
+    unsigned bucket = 0;
+    for (uint64_t at = 0; at < a->used;) {
+        block *b = (void *)(a->data + at);
+        uint64_t end = at + b->span;
+        while (bucket < index.capacity && ((uint64_t)bucket << index.shift) < end)
+            index.start[bucket++] = b;
+        at = end;
+    }
     return collect_indexed(context, head, conditional, count, index);
 }
 static int32_t collect_conditional(neoclr_aot_context *context,

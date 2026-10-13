@@ -17,6 +17,7 @@ def main():
     parser.add_argument('--baseline', required=True)
     parser.add_argument('--output', type=Path, required=True)
     parser.add_argument('--rounds', type=int, default=5)
+    parser.add_argument('--collection-scale', type=int, default=1, choices=range(1, 11), help='Multiply collection counts for longer timing intervals')
     args = parser.parse_args()
     out = args.output.resolve()
     out.mkdir(parents=True, exist_ok=False)
@@ -76,6 +77,7 @@ def main():
                   ('chain', 2049, 500), ('chain', 4096, 300), ('chain', 16384, 100),
                   ('wide', 16384, 100), ('holes', 4096, 300), ('atomic', 64, 10000)]
         for shape, nodes, collections in matrix:
+            collections *= args.collection_scale
             case = dict(shape=shape, nodes=nodes, collections=collections, samples=[], warmup=[], diagnostics={})
             report['cases'].append(case)
             for name in sources:
