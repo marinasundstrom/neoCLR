@@ -15,6 +15,7 @@ pub(crate) struct Invocation {
     pub(crate) budget: Arc<Budget>,
     pub(crate) files: Mutex<crate::file_streams::Files>,
     pub(crate) interned: Mutex<crate::string_interning::Pool>,
+    pub(crate) statics: Mutex<crate::static_storage::Storage>,
 }
 pub(crate) struct Dispatch {
     pub(crate) scheduler: crate::scheduler::Scheduler,
@@ -107,6 +108,7 @@ impl Invocation {
             limits,
             budget: Budget::new(limits),
             files: Mutex::new(Default::default()),
+            statics: Mutex::new(Default::default()),
             interned: Mutex::new(crate::string_interning::Pool::new(
                 limits.intern_entries,
                 limits.intern_bytes,

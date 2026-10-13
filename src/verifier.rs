@@ -667,6 +667,8 @@ fn effect(
         | SizeOf(_)
         | AlignOf(_)
         | NullPointer(_) => (0, 1),
+        StaticField { .. } => (0, 1),
+        SetStaticField { .. } => (1, 0),
         Return => (usize::from(!function.no_result), 0),
         Pop | Store(_) | StoreArg(_) | BranchTrue(_) | BranchFalse(_) | Switch(_)
         | InitializeObject(_) => (1, 0),
@@ -1285,6 +1287,15 @@ fn typed_effect(
                 stored(module, value, &field.ty)?;
             }
             one(ty.clone())
+        }
+        StaticField { owner, index } => {
+            let field = crate::access::static_field(module, function, owner, *index, false)?;
+            Ok(vec![loaded(&field.ty)])
+        }
+        SetStaticField { owner, index } => {
+            let field = crate::access::static_field(module, function, owner, *index, true)?;
+            stored(module, &values[0], &field.ty)?;
+            Ok(vec![])
         }
         Field(index) => {
             let owner = exact(&values[0])?;

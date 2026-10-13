@@ -174,6 +174,9 @@ fn validate_uses_indexed(linked: &Module, source: &Module) -> Result<(), Fault> 
         for ty in &definition.implements {
             check_type(linked, source, ty)?;
         }
+        for field in &definition.static_fields {
+            check_type(linked, source, &field.ty)?;
+        }
         for field in &definition.fields {
             check_type(linked, source, &field.ty)?;
         }

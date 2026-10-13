@@ -522,6 +522,8 @@ fn instruction_services(op: &Op) -> &'static [RuntimeService] {
         | Op::AlignOf(..)
         | Op::NullPointer(..)
         | Op::PointerCast(..)
+        | Op::StaticField { .. }
+        | Op::SetStaticField { .. }
         | Op::Fault(..) => &[],
     }
 }

@@ -401,3 +401,62 @@ pub(crate) fn validate_types(module: &Module) -> Result<(), Fault> {
     }
     Ok(())
 }
+
+pub(crate) fn static_field(
+    module: &Module,
+    caller: &Function,
+    owner: &Type,
+    index: usize,
+    write: bool,
+) -> Result<crate::metadata::StaticField, Fault> {
+    check_owner(module, scope(caller), owner)?;
+    let definition = module
+        .type_definition(owner)
+        .ok_or_else(|| Fault::new("static owner has no definition"))?;
+    let field = definition
+        .static_fields
+        .get(index)
+        .ok_or_else(|| Fault::new("static field index out of range"))?;
+    let same_module = definition
+        .definition
+        .as_ref()
+        .zip(caller.definition.as_ref())
+        .is_some_and(|(a, b)| a.module == b.module && a.revision == b.revision);
+    let allowed = match field.visibility {
+        Visibility::Public => true,
+        Visibility::Internal => {
+            same_module
+                || crate::friend_access::permits(
+                    module,
+                    scope(caller),
+                    definition
+                        .definition
+                        .as_ref()
+                        .map(|d| (d.module.as_str(), d.revision.as_deref())),
+                )
+        }
+        Visibility::Private => {
+            same_module
+                && definition
+                    .definition
+                    .as_ref()
+                    .is_some_and(|d| within_owner(module, caller, d))
+        }
+        Visibility::Protected => false,
+    };
+    if !allowed {
+        return Err(Fault::new("static field access denied"));
+    }
+    // Initializer writes will be admitted together with once-only type initialization.
+    if write && field.readonly {
+        return Err(Fault::new(
+            "readonly static field cannot be assigned outside type initialization",
+        ));
+    }
+    let mut field = field.clone();
+    field.ty = field
+        .ty
+        .substitute_type_parameters(owner.generic_arguments())?;
+    check_type(module, scope(caller), &field.ty)?;
+    Ok(field)
+}

@@ -502,6 +502,22 @@ fn validate_linked_indexed(module: &Module) -> Result<(), Fault> {
                 0,
             )?;
         }
+        let mut static_names = HashSet::new();
+        if def.static_fields.len() > 256 {
+            return Err(Fault::new("too many static fields"));
+        }
+        for field in &def.static_fields {
+            if field.name.is_empty()
+                || !static_names.insert(&field.name)
+                || matches!(
+                    field.ty,
+                    Type::ByRef(_) | Type::ReadOnlyByRef(_) | Type::Void | Type::SelfType
+                )
+            {
+                return Err(Fault::new("invalid static field declaration"));
+            }
+            check_type_context(&field.ty, module, def.generic_parameters.len(), 0)?;
+        }
         let mut fields = HashSet::new();
         for field in &def.fields {
             if field.visibility == crate::metadata::Visibility::Protected {
@@ -967,6 +983,16 @@ fn validate_linked_indexed(module: &Module) -> Result<(), Fault> {
         };
         for (pc, op) in function.body.iter().enumerate() {
             match op {
+                Op::StaticField { owner, index } | Op::SetStaticField { owner, index } => {
+                    check(owner)?;
+                    crate::access::static_field(
+                        module,
+                        function,
+                        owner,
+                        *index,
+                        matches!(op, Op::SetStaticField { .. }),
+                    )?;
+                }
                 Op::Unaligned(alignment) => {
                     if !matches!(alignment, 1 | 2 | 4) {
                         return Err(Fault::new("unaligned. requires alignment 1, 2, or 4"));
@@ -5185,6 +5211,25 @@ fn interpret_instructions_with_dispatch(
                     } else {
                         value
                     });
+                }
+                Op::StaticField { owner, index } => {
+                    crate::access::static_field(module, &function, owner, *index, false)?;
+                    let value = invocation
+                        .statics
+                        .lock()
+                        .unwrap()
+                        .read(module, owner, *index, heap, &limits)?;
+                    frame.stack.push(value.on_stack());
+                }
+                Op::SetStaticField { owner, index } => {
+                    let field =
+                        crate::access::static_field(module, &function, owner, *index, true)?;
+                    let value = frame.pop()?.for_storage_in(module, &field.ty)?;
+                    invocation
+                        .statics
+                        .lock()
+                        .unwrap()
+                        .write(module, owner, *index, value, heap, &limits)?;
                 }
                 Op::Field(i) => {
                     if matches!(frame.stack.last(), Some(Value::NullObjectReference(_))) {

@@ -69,6 +69,7 @@ mod scope;
 mod services;
 mod stack_trace;
 mod string_interning;
+mod static_storage;
 mod string_value;
 pub use services::{MissingService, RuntimeService, ServiceUse};
 #[doc(hidden)]

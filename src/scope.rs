@@ -121,6 +121,9 @@ pub(crate) fn normalize_module(context: &Module, source: &Module) -> Result<Modu
         for property in &mut definition.properties {
             property.map_types(|ty| normalize_type(context, ty))?;
         }
+        for field in &mut definition.static_fields {
+            field.ty = normalize_type(context, &field.ty)?;
+        }
         for field in &mut definition.fields {
             field.ty = normalize_type(context, &field.ty)?;
         }

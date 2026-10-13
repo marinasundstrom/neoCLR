@@ -1,5 +1,14 @@
 # neoCLR platform roadmap
 
+**Static storage (author direction, 2026-10-14):** implement a static header catalog
+on runtime-owned storage, including separate storage/initialization for each closed
+generic type. [The first interpreter storage slice](runtime-static-storage.md) covers
+identity, defaults, access checks, GC roots and array accounting. Type initialization,
+metadata tooling, Raven emission and JIT/AOT remain required before the HTTP catalog
+can use it. Explicit readonly instance fields are separately fixed in Raven's native
+emitter. The per-server workaround was withdrawn; this bounded author-directed work
+does not replace the performance milestone.
+
 **Shared-name follow-up (author discussion, 2026-10-14):** [read-only lazy properties](http-foundation.md#read-only-lazy-shared-names--author-discussion-2026-10-14) are the proposed direction for a larger fixed catalog. A retained compiler probe confirms native static readonly fields are not admitted. Establish context-owned static storage, initialization/publication and GC lifetime before claiming shared values; literal-only getters are insufficient. This is a recorded prerequisite, not completed static-storage support.
 
 **Known header byte matching (2026-10-14):** [seven fixed names](../benchmarks/http-server/header-name-bytes.md) bypass lowercase buffers and decoding. All 87 public wire checks pass across interpreter/JIT/AOT with runtime-await; matched profiles save 10/8 allocations per plain/JSON request with complete reclamation. Small sequential timing gains remain exploratory. Permanent shared strings remain separate because native literal identity can require copies; Windows qualification remains open.

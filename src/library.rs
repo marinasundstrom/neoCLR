@@ -306,6 +306,7 @@ fn resolve_primitive_references(module: &mut Module) -> Result<(), Fault> {
             || !ty.is_primitive()
             || ty == crate::metadata::Type::Char
             || !reference.fields.is_empty()
+            || !reference.static_fields.is_empty()
             || !reference.implements.is_empty()
             || !reference.properties.is_empty()
             || !reference.generic_parameters.is_empty()

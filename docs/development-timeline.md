@@ -16971,3 +16971,25 @@ assistant recorded that prerequisite rather than claiming a shared-name class wa
 implemented. [Design, comparison and remaining validation](http-foundation.md#read-only-lazy-shared-names--author-discussion-2026-10-14)
 retain these proposals; static storage, broader names and lazy publication remain
 open, not an approved complete implementation or a permanent roadmap reprioritization.
+
+
+### 2026-10-14 — Static header catalog and closed generic storage
+
+- **Author:** asked to implement lazy shared header names, then explicitly requested
+  fixing readonly fields and static storage. Corrected the instance-catalog approach:
+  “The class should be static, I believe.” Clarified that each generic class closed
+  over different type arguments needs its own static members.
+- **Assistant proposal/correction:** first drafted a per-server catalog to work around
+  missing native statics. After the correction, withdrew that draft and selected
+  runtime-owned static storage keyed by closed type identity, including module and
+  generic arguments. Thread/context ownership and GC roots belong to the runtime,
+  independent of shared compiled code.
+- **Performed:** Raven native emitter now admits explicit readonly instance fields
+  (`b0b2a1d6e`); metadata/import, separate-library interpreter execution and mutation
+  diagnostics pass. Added the first interpreter static-storage slice, separate from
+  instance layout, with closed-generic identity and invocation-owned roots/accounting.
+- **Open:** type-initializer coordination and readonly writes, native metadata tooling,
+  Raven static lowering, JIT/AOT, Windows qualification, and the actual static lazy
+  header catalog. Do not infer completion from the interpreter storage groundwork.
+  See [implementation record](runtime-static-storage.md) and
+  [readonly evidence](readonly-fields-validation-20261014.json).

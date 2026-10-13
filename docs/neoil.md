@@ -749,3 +749,13 @@ rejected. Both use the NativeAbi object, including its required calling_conventi
 `function.bind.native` also accepts callback_parameters and function_return inside
 its ABI JSON. The [tested sample](../examples/foreign_callable.neoil) covers both
 directions; see [callback lifetime and error rules](native-interop.md#callable-parameters-and-results-development).
+
+
+### Development static-field operations
+
+The structured native runtime model admits `ldsfld` / `stsfld` with
+`{ "owner": <type signature>, "index": <static field ordinal> }` operands,
+separate from instance layout. Stack effects are 0→1 and 1→0. Textual assembly
+syntax and type initialization are not yet implemented. These operations are
+currently interpreter-only; see [static storage progress](runtime-static-storage.md)
+for GC ownership, generic identity, restrictions and the remaining compiler/backend work.

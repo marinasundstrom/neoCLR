@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-14
 
+- Add the first interpreter static-storage layer: separate metadata rows and structured load/store operations, one lazily defaulted storage set per resolved closed type per invocation, access/readonly checks, GC roots and inline-array budget accounting. Test generic separation/substitution, reset, rejection and reclamation. Type initialization, native metadata tooling, Raven static emission and JIT/AOT remain pending; withdraw the per-server header-cache draft in favor of the author-requested static class. This is development groundwork, not a completed HTTP optimization.
+
 - Integrate Raven’s explicit readonly instance-field admission fix (`b0b2a1d6e`): retain InitOnly metadata/imported symbols and reject ordinary writes. Record passing separate-library verification/interpreter execution and five existing compiler diagnostic tests. This does not add static storage or update the installed SDK.
 
 - Record the author’s larger header catalog, readonly-field and lazy-property proposals. Confirm native static readonly storage is rejected by the pinned Raven compiler; retain the probe and document context-owned rooting, once-initialized publication and the .NET Lazy comparison. Shared-name storage and expanded coverage remain pending; no compiler/runtime support is claimed.

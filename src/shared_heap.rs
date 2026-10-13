@@ -68,6 +68,23 @@ pub(crate) struct RootSet {
     registration: Arc<Registration>,
 }
 impl RootSet {
+    /// Publish service-owned inline payloads as well as managed object roots.
+    pub(crate) fn publish_payload(
+        &self,
+        access: &mut Access<'_>,
+        roots: Vec<usize>,
+        usage: crate::arrays::Usage,
+    ) -> Result<(), Fault> {
+        self.publish(access, roots)?;
+        *self
+            .registration
+            .arrays
+            .lock()
+            .expect("service array accounting lock poisoned") = usage;
+        access.state.arrays_used |= !usage.is_empty();
+        Ok(())
+    }
+
     pub(crate) fn publish(&self, access: &mut Access<'_>, roots: Vec<usize>) -> Result<(), Fault> {
         if !Arc::ptr_eq(&self.shared, access.shared) {
             return Err(Fault::new(
@@ -220,6 +237,17 @@ impl Access<'_> {
                         limits,
                     )?;
                 }
+            }
+        }
+        for entry in &self.state.service_roots {
+            if let Some(entry) = entry.upgrade() {
+                current.add(
+                    *entry
+                        .arrays
+                        .lock()
+                        .expect("service array accounting lock poisoned"),
+                    limits,
+                )?;
             }
         }
         self.state.heap.array_usage(&mut current, limits)

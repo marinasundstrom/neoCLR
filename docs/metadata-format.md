@@ -147,3 +147,16 @@ field-write privilege. It adds no runtime freeze or new call instruction. Older
 strict readers reject the new field. Both container codecs preserve the semantic
 model. See [init accessors](init-accessors.md) for CLI projection, enforcement limits
 and migration requirements.
+
+
+## Development static storage (2026-10-14)
+
+The runtime model now admits optional `static_fields` rows on a type, separate from
+its instance `fields`. Each has `name`, `ty`, optional `visibility` (public by
+default), and optional `readonly` (false by default). Structured `ldsfld`/`stsfld`
+operands contain `owner` (a type signature) and `index` (static ordinal); their
+stack effects are 0→1 and 1→0. Generic signatures substitute the declaring owner's
+arguments. See [implementation scope and remaining layers](runtime-static-storage.md).
+This initial interpreter slice does not yet implement type initializers, textual
+assembler syntax, the C# metadata tooling, Raven emission or JIT/AOT operations.
+It is not a new wire-version guarantee; matching development tools are required.

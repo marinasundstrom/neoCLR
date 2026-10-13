@@ -276,6 +276,9 @@ pub struct TypeDef {
     pub custom_attributes: Vec<CustomAttribute>,
     pub name: String,
     pub fields: Vec<Field>,
+    /// Per-closed-type storage; never part of an instance's layout.
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub static_fields: Vec<StaticField>,
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub implements: Vec<Type>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -399,6 +402,18 @@ pub struct Field {
     pub visibility: Visibility,
     pub name: String,
     pub ty: Type,
+}
+
+/// A static field declaration. Storage belongs to a closed type in one runtime context.
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct StaticField {
+    pub name: String,
+    pub ty: Type,
+    #[serde(default, skip_serializing_if = "Visibility::is_public")]
+    pub visibility: Visibility,
+    #[serde(default, skip_serializing_if = "std::ops::Not::not")]
+    pub readonly: bool,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -932,6 +947,10 @@ pub enum Instruction {
     Return,
     #[serde(rename = "newobj")]
     New(#[serde(with = "construction_type")] Type),
+    #[serde(rename = "ldsfld")]
+    StaticField { owner: Type, index: usize },
+    #[serde(rename = "stsfld")]
+    SetStaticField { owner: Type, index: usize },
     #[serde(rename = "ldfld")]
     Field(usize),
     #[serde(rename = "stfld")]
@@ -1287,6 +1306,10 @@ impl Function {
         }
         for op in &mut result.body {
             match op {
+                Instruction::StaticField { owner, .. }
+                | Instruction::SetStaticField { owner, .. } => {
+                    *owner = map(owner)?;
+                }
                 Instruction::BindNativeFunction { function_type, .. } => {
                     *function_type = map(function_type)?;
                 }
