@@ -16569,3 +16569,19 @@ qualification. Request and response deadline documentation now includes TLS work
   JSON medians rise 9–10% with overlapping ranges. The macOS series remains separate.
   Collector-versus-wait attribution is the next investigation, not a measured cause.
   The existing website publication hold remains in effect.
+
+## 2026-10-13 — distinguish Windows waits from collector work
+
+- **Author:** directed profiling to separate GC, socket and scheduler waiting,
+  fix the dominant bottleneck, verify correctness and rerun benchmarks in slices.
+  After the measured result, requested continued GC work.
+- **Assistant action:** added Windows attribution tooling and a bounded readiness
+  wait in the private JIT/AOT hosts, preserving callback/root ownership and existing
+  timer/DNS polling fallbacks. Retained independent baseline and paired experiments.
+- **Observed outcome:** paired plain HTTP improves 2.09–2.23× and JSON 1.58–1.64×;
+  waits fall sharply while GC intervals and allocation counts remain similar.
+  Socket/root/GC and focused HTTP/HTTPS checks pass. These are short hosted runs,
+  not cross-runtime or saturation claims. [Evidence](../benchmarks/http-scheduling/README.md#matched-windows-results--2026-10-13).
+- **Next step proposed by assistant:** audit complete helper roots and integrate
+  size-aware allocation/retry in a bounded helper before reducing collection frequency.
+  Publication remains on hold; no collector policy change is implied by the wait fix.

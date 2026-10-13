@@ -1,14 +1,56 @@
 # Garbage collector benchmarks
 
-Removing a duplicate root-reading pass improved macOS HTTP throughput by 29–35%
-in matched JIT/AOT runs. The Windows comparison showed little change for plain
-text and 9–10% higher JSON medians, with overlapping ranges. These development
-measurements help identify where to profile next; they are not release guarantees.
+Runtime profiling separates collection work from socket processing and scheduler
+waits. The latest matched Windows experiment improved HTTP throughput by 1.58–2.23×
+by waiting for socket readiness instead of sleeping after an empty poll. Collection
+time stayed largely unchanged, making it the next substantial measured cost.
 
-These are application benchmarks of a collector-path change, rather than isolated
-GC pause benchmarks. Each request exercises allocation, collection, HTTP processing
-and scheduling. See [HTTP benchmarks](/benchmarks/http/) for the application baseline
-and [garbage collection](/features/gc/) for the runtime model.
+These development application benchmarks measure collector and scheduling changes,
+not isolated GC pauses or release guarantees. See [HTTP benchmarks](/benchmarks/http/)
+for the application baseline and [garbage collection](/features/gc/) for the runtime
+model. Earlier collector-path results remain below for comparison within their own
+recorded conditions.
+
+## Windows GC versus waits — 2026-10-13
+
+Same guest objects and runtime sources, with a build switch selecting the old sleep
+policy or the new bounded readiness wait. Windows Server 2022 x64 on one GitHub-hosted
+AMD VM; five alternating rounds, with ranges shown alongside medians. This is a
+separate series from the root-observation experiment below.
+
+| Workload | Mode | Sleep requests/s (range) | Readiness requests/s (range) | Median ratio |
+| --- | --- | ---: | ---: | ---: |
+| Plain text | JIT | 40.10 (37.07–42.30) | 89.30 (82.63–93.46) | 2.23× |
+| Plain text | AOT | 41.77 (37.47–47.44) | 87.19 (58.55–91.94) | 2.09× |
+| Object JSON | JIT | 29.95 (26.94–33.21) | 47.36 (45.84–49.51) | 1.58× |
+| Object JSON | AOT | 28.45 (25.12–33.21) | 46.73 (46.25–47.74) | 1.64× |
+
+All 1,536 responses passed, including 960 timed requests. Observed ranges do not
+overlap; the slower plain-text AOT candidate round remains included. The short,
+sequential protocol measures neither saturation nor parity with .NET or Go.
+[Immutable raw run](https://github.com/marinasundstrom/neoCLR/blob/4c6573147/benchmarks/http-scheduling/windows-waits-20261013.json).
+
+Separate instrumented AOT runs explain the improvement. These are elapsed intervals
+for the whole process, including warmup and shutdown, not per-request pauses or an
+exclusive CPU breakdown.
+
+| Measured interval | Plain text, sleep → readiness | JSON, sleep → readiness |
+| --- | ---: | ---: |
+| Scheduler waits | 424–443 → 24–27 ms | 386–489 → 51–63 ms |
+| Collection | 191–196 → 195–198 ms | 359–361 → 355–356 ms |
+| Socket polling | 1.95–2.13 → 1.66–1.77 ms | 2.11–2.20 → 1.79–1.82 ms |
+
+All 256 diagnostic responses passed. Every process reclaimed all its tracked
+allocations: 16,340 for plain text and 38,358 for JSON, with no GC or scheduler errors.
+Socket/GC contracts and the HTTP/HTTPS execution checks also pass. The
+[diagnostic record](https://github.com/marinasundstrom/neoCLR/blob/4c6573147/benchmarks/http-scheduling/README.md#matched-windows-results--2026-10-13)
+links every raw profile and correctness report.
+
+The Windows host now waits for socket readiness with a requested timeout of at most
+one millisecond. DNS-only, timer-only and legacy TLS waits retain their fallback;
+macOS waiting is unchanged. Callbacks still pass through the same scheduler, and
+GC policy is unchanged. A follow-up needs to investigate collection pressure and
+complete temporary-root coverage before reducing collections.
 
 ## Root observation — 2026-10-13
 
@@ -104,9 +146,9 @@ measurements are not yet presented as a comparable benchmark series.
 
 ## What the results guide
 
-The Windows result warrants separating collector CPU time from socket and scheduler
-wait time before choosing another optimization. Collection-pressure changes need
-complete temporary-root coverage first: an earlier pacing experiment was rejected
+The matched wait experiment above separates a large Windows waiting cost from
+collector work. Collection-pressure changes still need complete temporary-root
+coverage first: an earlier pacing experiment was rejected
 because it could fault on an allocation accepted by the existing collector.
 Generational or concurrent collection remains a design option, not an implemented
 result.

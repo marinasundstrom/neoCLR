@@ -83,6 +83,8 @@ indicate stale data when no new collection boundary has been reached.
 The terminal debugger runs in-process. Standalone tool packaging, native stepping
 and logical async-stack inspection remain incomplete. These tools help investigate
 the runtime; they are not installed, process-wide telemetry services.
+Windows x64 also has diagnostic HTTP runs separating collection, socket polling
+and scheduler wait intervals; remote profiler attachment remains macOS-specific.
 [Profiling workflow](https://github.com/marinasundstrom/neoCLR/blob/main/docs/experiments/runtime-async/native-profiling.md).
 
 [GC benchmarks](/benchmarks/gc/) retain application throughput comparisons,

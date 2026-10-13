@@ -35,6 +35,11 @@ JIT/AOT. Each links immutable raw runs, including slower candidate samples. Only
 the root observer changes within each pair. These are development experiments,
 not new Preview 14 release measurements or cross-platform rankings.
 
+The later [Windows GC-versus-wait series](/benchmarks/gc/#windows-gc-versus-waits-2026-10-13)
+compares legacy sleep and readiness waits on the same VM, with separate diagnostics.
+It retains all rounds and the earlier independent profiling run. Its absolute rates
+must not be compared against a different hosted VM's root-observation results.
+
 ## How history will grow
 
 Keep raw runs immutable, including slower results. Corrections and replacement runs

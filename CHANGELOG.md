@@ -8,6 +8,10 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-13
 
+- Update the GC benchmark website with the Windows wait/collector breakdown,
+  matched JIT/AOT improvements, immutable raw evidence and preserved benchmark
+  history. The complete site build and link checks pass; publication remains on hold.
+
 - Qualify Windows readiness waits with matched JIT/AOT HTTP results: 2.09–2.23×
   plain-text and 1.58–1.64× JSON throughput, with non-overlapping observed ranges.
   Separate diagnostics attribute the gain to reduced waiting, retain unchanged
