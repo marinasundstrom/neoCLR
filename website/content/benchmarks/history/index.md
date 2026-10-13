@@ -67,3 +67,8 @@ The [allocation-throughput series](/benchmarks/gc/#allocation-throughput-2026-10
 compares complete validation plus separate search against a combined walk. Its
 allocation-only timings exclude final collection; the linked pacing experiment
 remains separate and is not a shipping or HTTP performance claim.
+
+The [host-handle admission series](/benchmarks/gc/#host-handle-admission-2026-10-13)
+compares separate validation/membership walks with a combined walk. Early/late-base
+and small-heap controls remain visible. It measures root creation/read/release,
+not collection time; its separate AOT HTTP comparison shows no material gain.

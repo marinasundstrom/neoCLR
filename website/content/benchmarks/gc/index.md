@@ -1,13 +1,45 @@
 # Garbage collector benchmarks
 
-GC work targets general runtime workloads as well as HTTP. The latest allocation
-change removes a repeated heap walk while preserving complete validation. Earlier
-series measure large object graphs, root observation and scheduler waits.
+GC work targets general runtime workloads as well as HTTP. Recent changes remove
+repeated heap walks during allocation and host-handle admission while preserving
+complete validation. Earlier series measure object graphs, roots and scheduler waits.
 
 These are development measurements, not release guarantees. See
 [HTTP benchmarks](/benchmarks/http/) for application results and
 [garbage collection](/features/gc/) for the runtime model. Each historical series
 retains its own conditions and raw evidence.
+
+## Host-handle admission — 2026-10-13
+
+Creating a native host root formerly validated the heap, then searched it again
+for the referenced object and owner. One walk now does both. It still validates
+every trailing header before registering the root, even when the objects are found
+early. This helps native lifetime integration without changing collection policy.
+
+Local macOS ARM64, five alternating pairs after warmup; baseline/candidate elapsed
+time ratios. Each timed operation creates, reads and releases one root. Heap
+construction and final reclamation are excluded.
+
+| Case | 16 objects | 256 objects | 4,096 objects |
+| --- | ---: | ---: | ---: |
+| Strong root, first object | 1.00× | 1.03× | 1.00× |
+| Strong root, last object | 1.13× | 1.77× | 1.76× |
+| Owner and value first | 1.03× | 1.00× | 1.00× |
+| Owner last, value first | 1.06× | 1.90× | 1.87× |
+| Owner last, value middle | 1.21× | 2.22× | 2.22× |
+| Owner and value last | 1.40× | 2.59× | 2.57× |
+
+Early-object controls remain near baseline; later objects benefit from fewer heap
+walks. A separate AOT HTTP comparison passes 768 responses with plain/JSON medians
+within 0.3% of baseline. **This is not an HTTP throughput improvement.**
+[Protocol, raw rounds and correctness checks](https://github.com/marinasundstrom/neoCLR/blob/ca995dc2e/benchmarks/gc-handles/README.md).
+
+Hosted macOS/Windows GC, socket and native-package checks pass. At 256/4,096
+objects, later-entry gains are 1.56–2.60× on hosted macOS and 1.43–2.26× on Windows.
+Windows early-entry controls are 0.974–1.004×; hosted macOS controls are
+0.882–1.110×, including slower medians with overlapping ranges. All rounds remain
+in the linked record. These are within-host comparisons, not a platform ranking
+or a universal non-regression guarantee. Windows ARM64 remains unmeasured.
 
 ## Allocation throughput — 2026-10-13
 
