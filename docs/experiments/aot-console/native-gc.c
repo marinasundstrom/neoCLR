@@ -475,31 +475,33 @@ static int32_t collect_conditional(neoclr_aot_context *context,
 #ifdef NEOCLR_GC_PROFILE
     uint64_t live_bytes = 0, live_blocks = 0;
 #endif
+    /* Sweep and coalesce in one forward walk. Preserve the original span before
+     * extending a preceding free run; no later lookup uses the marking index. */
+    block *free_run = NULL;
+    uint64_t free_at = 0;
     for (uint64_t at = 0; at < a->used;) {
         block *b = (void *)(a->data + at);
+        uint64_t span = b->span;
         if (b->state && !(b->state & MARKED)) {
             statistics.reclaimed_allocations++; statistics.reclaimed_bytes += b->bytes;
             /* Poison reclaimed contents so stale reads fail functional stress tests. */
-            memset(b + 1, 0xdd, (size_t)(b->span - sizeof(block)));
+            memset(b + 1, 0xdd, (size_t)(span - sizeof(block)));
             b->state = 0; b->bytes = 0; b->kind = 0;
         } else b->state &= ALLOCATED;
 #ifdef NEOCLR_GC_PROFILE
         if (b->state) { live_bytes += b->bytes; live_blocks++; }
 #endif
-        at += b->span;
-    }
-    for (uint64_t at = 0; at < a->used;) {
-        block *b = (void *)(a->data + at);
-        if (!b->state) {
-            while (at + b->span < a->used) {
-                block *next = (void *)(a->data + at + b->span);
-                if (next->state) break;
-                b->span += next->span;
-            }
-            if (at + b->span == a->used) { a->used = at; break; }
+        if (b->state) {
+            free_run = NULL;
+        } else if (free_run) {
+            free_run->span += span;
+        } else {
+            free_run = b;
+            free_at = at;
         }
-        at += b->span;
+        at += span;
     }
+    if (free_run) a->used = free_at;
     statistics.collections++;
 #ifdef NEOCLR_GC_PROFILE
     profile.live_bytes = live_bytes; profile.live_blocks = live_blocks;

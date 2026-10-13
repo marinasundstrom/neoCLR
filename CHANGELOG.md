@@ -8,6 +8,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-13
 
+- Reduce shared native JIT/AOT collector work by combining sweeping and free-span
+  coalescing into one pass. Preserve collection frequency, roots, poisoning, cleanup
+  order and allocation limits. Sanitized collector/host-root/profile checks and
+  320 owned suspensions pass, including new mixed-hole reuse and tail-trimming tests.
+
 - Profile the identical plain-text/object-JSON HTTP guest objects with native GC
   counters and stack sampling. Record 201,546/296,391 collection attempts, complete
   allocation reclamation and collector hot spots; keep diagnostic timings separate

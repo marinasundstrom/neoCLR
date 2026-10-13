@@ -16,6 +16,44 @@ static void free_cleanup(void *state) {
     free(r);
 }
 
+/* Adjacent old holes and newly dead blocks must merge without crossing live
+ * payloads, and a trailing run must lower used even when it began as an old hole. */
+static int mixed_free_runs(void) {
+    uint64_t buffer[64] = {0};
+    neoclr_aot_context c = {.text = {(unsigned char *)buffer, sizeof(buffer), 0}};
+    uint64_t *items[6];
+    for (unsigned i = 0; i < 6; i++) {
+        items[i] = allocate(&c, 8, NEOCLR_GC_BYTES);
+        CHECK(items[i]);
+        *items[i] = 100 + i;
+    }
+    void *roots[] = {items[0], items[2], items[4], items[5]};
+    neoclr_probe_storage slots[4];
+    for (unsigned i = 0; i < 4; i++) slots[i] = (neoclr_probe_storage){&roots[i], 8, 0};
+    neoclr_probe_frame frame = {.context = &c, .storage = slots, .storage_count = 4};
+    uint64_t extent = c.text.used;
+    neoclr_gc_statistics before = neoclr_gc_statistics_v1();
+    CHECK(!neoclr_gc_collect_v1(&c, &frame));
+    CHECK(c.text.used == extent && *items[0] == 100 && *items[4] == 104);
+    roots[1] = NULL;
+    CHECK(!neoclr_gc_collect_v1(&c, &frame));
+    CHECK(*items[2] == UINT64_C(0xdddddddddddddddd));
+    void *merged = allocate(&c, 80, NEOCLR_GC_BYTES);
+    CHECK(merged == items[1] && c.text.used == extent);
+    roots[1] = merged;
+    roots[2] = roots[3] = NULL;
+    CHECK(!neoclr_gc_collect_v1(&c, &frame));
+    CHECK(c.text.used < extent && *items[0] == 100);
+    roots[0] = roots[1] = NULL;
+    CHECK(!neoclr_gc_collect_v1(&c, &frame) && !c.text.used);
+    neoclr_gc_statistics after = neoclr_gc_statistics_v1();
+    CHECK(after.allocations - before.allocations == 1);
+    CHECK(after.reclaimed_allocations - before.reclaimed_allocations == 7);
+    CHECK(after.reclaimed_bytes - before.reclaimed_bytes == 128);
+    CHECK(!neoclr_gc_collect_v1(&c, NULL) && !c.text.used);
+    return 0;
+}
+
 static int resource_owners(void) {
     uint64_t buffer[256] = {0}, other_buffer[64] = {0};
     neoclr_aot_context c = {.text = {(unsigned char *)buffer, sizeof(buffer), 0}};
@@ -489,5 +527,7 @@ int main(void) {
     if (owned_status) return owned_status;
     int wide_status = wide_object_roots();
     if (wide_status) return wide_status;
+    int mixed_status = mixed_free_runs();
+    if (mixed_status) return mixed_status;
     return resource_owners();
 }

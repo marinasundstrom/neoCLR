@@ -9,7 +9,9 @@ interpreter collector or establish a production native hosting ABI.
 `native-gc.c` implements nonmoving mark-and-sweep inside the host's bounded arena.
 A 32-byte allocation descriptor records block span, logical payload size, allocation
 kind and mark state. Reclaimed adjacent blocks coalesce and allocations reuse holes;
-all payload addresses remain stable. No malloc or shared managed runtime is required.
+all payload addresses remain stable. Sweep and coalescing share one forward pass:
+each block is reclaimed/poisoned once, adjacent free spans merge as they are visited,
+and a trailing free run lowers the arena extent. No malloc or shared managed runtime is required.
 Allocation itself never collects and publishes its output only on success.
 
 Roots come from compiler-published argument/local slots, initialized stack snapshots,
@@ -488,3 +490,25 @@ are thread-affine, with a 1024-per-context quota. Entry reset and session owners
 admission reject outstanding registrations; adapters release them before teardown.
 The [shared security foundation](../../shared-security-provider.md) records the
 SafeHandle comparison, costs, focused evidence and remaining TLS adapter integration.
+
+## HTTP-driven sweep optimization — 2026-10-13
+
+[HTTP profiles](../../../benchmarks/http-server/profiling.md) identify collection as
+the shared plain-text/JSON cost. Combining sweep and coalescing removes one heap
+walk without changing collection frequency, allocation admission, roots, failure
+atomicity, poisoning or native-resource cleanup order. This is an internal algorithm
+optimization, with no native ABI, Raven bridge or public API change.
+
+The [.NET comparison](../../runtime-gc.md#comparison-and-provisional-design-decision)
+remains applicable: preserve observable reachability and explicit full collection;
+this does not add CLR generations/compaction or claim competitive CLR performance.
+Pressure-based pacing remains separate because allocation services cannot collect
+while their native temporaries are unrooted.
+
+[Sanitized validation](../../../benchmarks/http-server/gc-sweep-validation-20261013.json)
+passes collector/host-root/profile tests and 320 owned native suspensions. The new
+mixed-free-region test verifies merging old holes with newly dead blocks, live
+payload survival, hole reuse without heap growth, tail trimming, exact reclamation
+counts/bytes and poisoning. Existing descriptor-failure, conditional owner, cycle,
+precise-boundary and retained-stack checks remain active. This is macOS ARM64
+validation, not refreshed Windows or AddressSanitizer evidence.
