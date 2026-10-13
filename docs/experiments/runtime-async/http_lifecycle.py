@@ -18,7 +18,7 @@ if not recipe['passed']:
 output = args.output.resolve()
 output.mkdir(parents=True, exist_ok=True)
 source = Path(__file__).with_name('RuntimeHttpLifecycle.rvn').resolve()
-provider = source.with_name('RuntimeAsyncBridge.rvn')
+provider = Path(__file__).resolve().parents[3] / 'runtime/raven/compiler-services/RuntimeAwait.rvn'
 assembly = output / 'lifecycle.dll'
 assembly.unlink(missing_ok=True)
 base = recipe['commands'][0]['command']

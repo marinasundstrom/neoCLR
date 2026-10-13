@@ -152,9 +152,7 @@ pub(crate) fn run(
         "--bind-socket-transfer",
         "--bind-socket-client",
     ]);
-    if !windows {
-        command.arg("--bind-runtime-async");
-    }
+    command.arg("--bind-runtime-async");
     if windows {
         command.args([
             "--target",

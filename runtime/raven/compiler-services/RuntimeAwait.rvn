@@ -1,4 +1,5 @@
-// Source-included experimental provider for the compiler's explicit native contract.
+// SDK-owned source provider for Raven's explicit neoCLR runtime-await contract.
+// Internal to the consuming assembly; not a public managed API.
 module RuntimeAwaitProvider {
     import System.*
     import System.Concurrency.Tasks.*

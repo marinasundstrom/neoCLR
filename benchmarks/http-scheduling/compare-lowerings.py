@@ -25,7 +25,7 @@ def main():
     assert recipe['passed'] and recipe['profile'] == 'macos-arm64-http-v1'
     bundle, out = a.bundle.resolve(), a.output.resolve()
     out.mkdir(parents=True, exist_ok=False)
-    provider = ROOT/'docs/experiments/runtime-async/RuntimeAsyncBridge.rvn'
+    provider = ROOT/'runtime/raven/compiler-services/RuntimeAwait.rvn'
     carrier = ROOT/'docs/experiments/runtime-async/native-runtime.c'
     compiler = bundle/'sdk/tools/rvnc/rvnc.dll'
     report = dict(passed=False, commands=[], inputs={}, lowerings={}, runs=[],
@@ -48,14 +48,14 @@ def main():
         for lowering in ['state-machine', 'runtime']:
             directory = out/lowering
             directory.mkdir()
-            helper = '<RavenNeoClrRuntimeAsyncHelper>RuntimeAwaitProvider.Bridge</RavenNeoClrRuntimeAsyncHelper>' if lowering == 'runtime' else ''
+            helper = '<RavenNeoClrRuntimeAsyncHelper>RuntimeAwaitProvider.Bridge</RavenNeoClrRuntimeAsyncHelper>' if lowering == 'runtime' else '<RavenNeoClrRuntimeAsyncHelper></RavenNeoClrRuntimeAsyncHelper>'
             project = directory/'Probe.rvnproj'
             project.write_text(f'''<Project Sdk="Microsoft.NET.Sdk">
 <Import Project="{bundle}/lib/NeoCLR.ClassLibrary.props" />
 <PropertyGroup><TargetFramework>net10.0</TargetFramework><OutputType>Exe</OutputType>
 <AssemblyName>HttpScheduling</AssemblyName>{helper}</PropertyGroup>
 <ItemGroup><Compile Include="{ROOT}/benchmarks/http-concurrency/Server.rvn" />
-<Compile Include="{provider}" /></ItemGroup></Project>''')
+<Compile Include="{provider}" Condition="'$(RavenNeoClrRuntimeAsyncProviderImported)' != 'true'" /></ItemGroup></Project>''')
             env = dict(os.environ, NeoClrBundleRoot=str(bundle))
             stdout = run(['dotnet', compiler, 'neoclr', '--project', project], lowering+'-source', env)
             paths = [line.removeprefix('Native build output: ') for line in stdout.splitlines() if line.startswith('Native build output: ')]

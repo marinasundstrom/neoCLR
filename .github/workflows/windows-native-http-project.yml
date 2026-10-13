@@ -2,6 +2,10 @@ name: Windows native HTTP project
 on:
   workflow_dispatch:
     inputs:
+      runtime_await:
+        description: Qualify SDK-default runtime await in interpreter, installed JIT and AOT
+        type: boolean
+        default: false
       paced_gc:
         description: Compare stress/paced managed HTTP and retain GC diagnostics
         type: boolean
@@ -51,7 +55,7 @@ permissions:
 jobs:
   http-project:
     runs-on: windows-2022
-    timeout-minutes: 30
+    timeout-minutes: 45
     env:
       PYTHONUTF8: '1'
     steps:
@@ -78,6 +82,13 @@ jobs:
         run: |
           $vs = & "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\vswhere.exe" -latest -products '*' -requires Microsoft.VisualStudio.Component.VC.Tools.x86.x64 -property installationPath
           cmd /c "`"$vs\VC\Auxiliary\Build\vcvars64.bat`" && python benchmarks/http-gc-pacing/qualify-managed.py --bundle `"target/windows-http-project-validation/development toolchain/bundle`" --aot target/debug/neoclr-aot-poc.exe --output target/windows-http-project-validation/managed-pacing"
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+      - name: Qualify SDK-default runtime await
+        if: inputs.runtime_await
+        shell: pwsh
+        run: |
+          $vs = & "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\vswhere.exe" -latest -products '*' -requires Microsoft.VisualStudio.Component.VC.Tools.x86.x64 -property installationPath
+          cmd /c "`"$vs\VC\Auxiliary\Build\vcvars64.bat`" && python scripts/validate-runtime-await-sdk.py --bundle `"target/windows-http-project-validation/development toolchain/bundle`" --runtime target/release/neoclr.exe --aot target/debug/neoclr-aot-poc.exe --output target/windows-http-project-validation/runtime-await-sdk"
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
       - uses: actions/upload-artifact@v4
         if: always()

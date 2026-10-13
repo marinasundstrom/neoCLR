@@ -123,7 +123,7 @@ int NEOCLR_PROCESS_MAIN(int argc, neoclr_process_char **argv) {
             (project / 'Main.rvn').write_bytes(source.read_bytes())
             if workload == 'json':
                 (project / 'Model.rvn').write_bytes((ROOT / 'benchmarks/http-server/Model.rvn').read_bytes())
-            (project / 'App.rvnproj').write_text('<Project Sdk="Microsoft.NET.Sdk"><Import Project="$(NeoClrBundleRoot)/lib/NeoCLR.ClassLibrary.props"/><PropertyGroup><TargetFramework>net10.0</TargetFramework><OutputType>Exe</OutputType><AssemblyName>App</AssemblyName></PropertyGroup></Project>')
+            (project / 'App.rvnproj').write_text('<Project Sdk="Microsoft.NET.Sdk"><Import Project="$(NeoClrBundleRoot)/lib/NeoCLR.ClassLibrary.props"/><PropertyGroup><TargetFramework>net10.0</TargetFramework><OutputType>Exe</OutputType><AssemblyName>App</AssemblyName><RavenNeoClrRuntimeAsyncHelper></RavenNeoClrRuntimeAsyncHelper></PropertyGroup></Project>')
             roots = []
             if workload == 'json':
                 run(['dotnet', args.bundle.resolve() / 'sdk/tools/rvnc/rvnc.dll', 'neoclr', '--project', project / 'App.rvnproj'])

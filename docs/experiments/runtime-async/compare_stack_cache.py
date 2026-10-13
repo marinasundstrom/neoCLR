@@ -20,7 +20,7 @@ for limit, data in loaded.items():
         p.error('requires passing runs with cache bounds 0 and 8')
 # Both experiments must use the same carrier, measurement host and input program.
 for suffix in ['native-runtime.c', 'native-runtime.h', 'native-benchmark-host.c',
-               'RuntimeAwaitBenchmark.rvn', 'RuntimeAsyncBridge.rvn']:
+               'RuntimeAwaitBenchmark.rvn', 'RuntimeAwait.rvn']:
     hashes = [next(v for k, v in data['inputsSha256'].items() if k.endswith('/' + suffix))
               for data in loaded.values()]
     if len(set(hashes)) != 1:

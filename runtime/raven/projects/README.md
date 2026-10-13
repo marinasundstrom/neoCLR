@@ -146,7 +146,11 @@ Pass `--with-postgresql` to `build-native-class-library.py` to build and stage
 System.Data.PostgreSql after the ordinary four libraries. It references Runtime,
 Data and Networking; Data's common `System.Data.Sql` contracts do not depend on
 Networking. The provider uses the existing explicit retained-async helper from
-`docs/experiments/runtime-async/RuntimeAsyncBridge.rvn`. Its project selects
+`runtime/raven/compiler-services/RuntimeAwait.rvn`. Its project selects
 `RavenNeoClrRuntimeAsyncHelper=RuntimeAwaitProvider.Bridge`; ordinary projects/.NET
 semantics are unchanged. It currently supports local trust authentication only.
 See [SQL data access](../../../docs/sql-data-access.md) for contracts and validation.
+
+Rebuilt SDK imports now default consuming projects to runtime-await and include the
+SDK-owned provider; bootstrap library projects keep their explicit configuration.
+See [integration and fallback](../../../docs/runtime-product-integration.md#sdk-default-runtime-await-integration--2026-10-13).

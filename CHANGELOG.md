@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-13
 
+- Integrate the assembly-private await provider into rebuilt SDKs and select runtime-await by default for consuming projects. Preserve an explicit state-machine project override and existing library bootstrap lowering. Wire runtime suspension into AOT console/HTTP hosts and installed JIT on macOS ARM64 and Windows x64; require matching SDK/runtime/helper binaries. Add a three-mode SDK/HTTP qualification gate and keep benchmark state-machine controls explicit. Raw carrier gates pass on both platforms; application qualification is pending.
+
 - Move the private suspension carrier into runtime/native/async with compatibility forwarding paths. Add a Windows fiber carrier beneath shared operation/root ownership, preserve host-owned fiber conversion, and release Windows stacks on completion/abandonment. Extend stack budgeting and shared GC lifetime tests to fibers. All 35 local macOS GC/root checks pass; Windows qualification is pending and compiler/SDK defaults are unchanged.
 
 - Retain passing macOS paced runtime-await evidence: all 24 JIT/AOT language, cleanup, lifetime, stress, HTTP and fault/recovery cases, plus interpreter lifetime and repeated-entry controls. Verify recorded input hashes after execution. This qualifies the current macOS carrier with paced collection, not Windows suspension or a default switch; no additional runtime fix was required.

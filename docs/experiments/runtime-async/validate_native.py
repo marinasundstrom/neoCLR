@@ -180,7 +180,7 @@ def main():
                 row['environment'] = {k: env[k] for k in ['NeoClrBundleRoot', 'RavenNeoClrRuntimeAsyncHelper']}
                 shutil.copyfile(artifact, assembly)
             else:
-                run([*compile_source[:compile_source.index('-o')], '-o', assembly, source, HERE / 'RuntimeAsyncBridge.rvn'], name + '-source')
+                run([*compile_source[:compile_source.index('-o')], '-o', assembly, source, ROOT / 'runtime/raven/compiler-services/RuntimeAwait.rvn'], name + '-source')
             report['inputsSha256'][str(source)] = sha(source)
             listing = out / (name + '.neoil')
             run([interpreter, 'disassemble', assembly, listing], name + '-listing')

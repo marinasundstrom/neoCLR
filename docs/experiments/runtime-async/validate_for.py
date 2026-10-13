@@ -72,7 +72,7 @@ def main():
                 label = lowering + '-' + name
                 assembly, obj, app = [out / (label + suffix) for suffix in ('.dll', '.o', '')]
                 source = command('stack-reuse-source')
-                source[source.index('-o') + 1:] = [str(assembly), str(HERE / filename), str(HERE / 'RuntimeAsyncBridge.rvn')]
+                source[source.index('-o') + 1:] = [str(assembly), str(HERE / filename), str(ROOT / 'runtime/raven/compiler-services/RuntimeAwait.rvn')]
                 if lowering == 'state-machine':
                     i = source.index('--runtime-async-poc')
                     del source[i:i + 2]

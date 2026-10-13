@@ -28,7 +28,7 @@ lib = a.libraries.resolve()
 sha = lambda path: hashlib.sha256(Path(path).read_bytes()).hexdigest()
 report = dict(passed=False, commands=[], cases=[], inputs={})
 for path in [Path(__file__), *HERE.glob('*.rvn'), a.compiler, a.runtime, a.jit_compiler, a.jit_host,
-             ROOT / 'docs/experiments/runtime-async/RuntimeAsyncBridge.rvn',
+             ROOT / 'runtime/raven/compiler-services/RuntimeAwait.rvn',
              *(a.compiler.parent / name for name in ('Raven.CodeAnalysis.dll', 'Raven.CodeAnalysis.NeoClr.dll', 'NeoCLR.Metadata.Experimental.dll')),
              *lib.glob('*.dll'), lib / 'System.runtime.neox', lib / 'bundle.json',
              *(ROOT / 'runtime/raven/src/System/Data/Sql').glob('*.rvn'),
@@ -151,7 +151,7 @@ def peer(listener, mode, errors):
 try:
     for case in (['Main', 'Contracts'] if a.queries_only else ['Main', 'Failures', 'Contracts']):
         args = base + ['-o', out / (case + '.dll'), HERE / (case + '.rvn')]
-        args += ['--runtime-async-poc', 'RuntimeAwaitProvider.Bridge', ROOT / 'docs/experiments/runtime-async/RuntimeAsyncBridge.rvn']
+        args += ['--runtime-async-poc', 'RuntimeAwaitProvider.Bridge', ROOT / 'runtime/raven/compiler-services/RuntimeAwait.rvn']
         run(case + '-compile', args)
     disassembly = out / 'Main.neoil'
     run('metadata', [a.runtime.resolve(), 'disassemble', out / 'Main.dll', disassembly])

@@ -91,6 +91,16 @@ def main():
                            RavenNeoClrObjectLibrary='System.Runtime', RavenNeoClrAsyncLibrary='System.Runtime',
                            RavenNeoClrSourceObjectRoot='false', RavenNeoClrBootstrapIntrinsics='false').items():
         ET.SubElement(properties, name).text = value
+    # SDK-owned, assembly-private source bridge. An explicit empty helper property
+    # after this import retains compiler state-machine lowering.
+    ET.SubElement(properties, 'RavenNeoClrRuntimeAsyncHelper',
+                  Condition="'$(RavenNeoClrRuntimeAsyncHelper)' == ''").text = 'RuntimeAwaitProvider.Bridge'
+    ET.SubElement(properties, 'RavenNeoClrRuntimeAsyncProviderImported').text = 'true'
+    provider = output / 'RuntimeAwait.rvn'
+    shutil.copyfile(ROOT / 'runtime/raven/compiler-services/RuntimeAwait.rvn', provider)
+    items = ET.SubElement(configuration, 'ItemGroup')
+    ET.SubElement(items, 'Compile', Include='$(MSBuildThisFileDirectory)RuntimeAwait.rvn',
+                  Condition="'$(RavenNeoClrRuntimeAsyncHelper)' == 'RuntimeAwaitProvider.Bridge'")
     references = ET.SubElement(configuration, 'ItemGroup')
     for name in names:
         reference = ET.SubElement(references, 'Reference', Include=name)
@@ -98,7 +108,7 @@ def main():
     configuration_path = output / 'NeoCLR.ClassLibrary.props'
     ET.indent(configuration)
     ET.ElementTree(configuration).write(configuration_path, encoding='unicode')
-    artifacts = [output / (name + '.dll') for name in names] + [seed, output / 'Core.dll', output / 'ownership.json', configuration_path]
+    artifacts = [output / (name + '.dll') for name in names] + [seed, output / 'Core.dll', output / 'ownership.json', configuration_path, provider]
     for name in names:
         artifacts.append(output / documentation[name]['xml'])
         artifacts.extend(sorted((output / documentation[name]['markdown']).rglob('*')))
@@ -113,9 +123,9 @@ def main():
         inputs += [bootstrap_manifest, bootstrap / 'preparation-evidence.json']
     inputs += list(PROJECTS.glob('*/*.rvnproj')) + [PROJECTS / 'NativeLibrary.props', PROJECTS / 'System.Runtime/ownership.json']
     inputs += list((ROOT / 'runtime/raven/src/System').rglob('*.rvn')) + list((ROOT / 'runtime/raven/native').glob('*.rvn'))
+    inputs += [ROOT / 'runtime/raven/compiler-services/RuntimeAwait.rvn']
     if args.with_postgresql:
         inputs += list((ROOT / 'runtime/raven/providers/System.Data.PostgreSql').glob('*.rvn'))
-        inputs += [ROOT / 'docs/experiments/runtime-async/RuntimeAsyncBridge.rvn']
     inputs += [args.translator.parent / 'NeoCLR.Metadata.Experimental.dll']
     inputs += [args.compiler.parent / name for name in ('Raven.CodeAnalysis.dll', 'Raven.CodeAnalysis.NeoClr.dll', 'NeoCLR.Metadata.Experimental.dll')]
     report['hashes'] = {str(path.resolve()): sha(path) for path in inputs + artifacts}

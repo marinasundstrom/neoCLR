@@ -61,7 +61,7 @@ try:
     # Pin current compiler, runtime helpers and references, rather than assuming
     # old qualification artifacts describe the binaries measured today.
     for value in [*q['inputsSha256'], *base, *link, *compile_native, str(a.host), str(a.recipe), str(a.qualification),
-                  str(HERE / 'RuntimeAsyncBridge.rvn'), str(HERE / 'RuntimeAwaitBenchmark.rvn'),
+                  str(ROOT / 'runtime/raven/compiler-services/RuntimeAwait.rvn'), str(HERE / 'RuntimeAwaitBenchmark.rvn'),
                   str(HERE / 'native-benchmark-host.c'), __file__]:
         path = Path(value)
         if path.is_file():
@@ -80,7 +80,7 @@ try:
             invocations = {}
             for lowering in ['state-machine', 'runtime']:
                 assembly = out / f'{case}-{lowering}.dll'
-                command = base[:base.index('-o')] + ['-o', str(assembly), str(source), str(HERE / 'RuntimeAsyncBridge.rvn')]
+                command = base[:base.index('-o')] + ['-o', str(assembly), str(source), str(ROOT / 'runtime/raven/compiler-services/RuntimeAwait.rvn')]
                 if lowering == 'state-machine':
                     flag = command.index('--runtime-async-poc')
                     del command[flag:flag + 2]

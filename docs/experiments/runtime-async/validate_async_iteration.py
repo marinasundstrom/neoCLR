@@ -91,7 +91,7 @@ def main():
                 assembly, obj, app = [out / (label + suffix) for suffix in ('.dll', '.o', '')]
                 source = command('stack-reuse-source')
                 source[1] = str(compiler)
-                source[source.index('-o') + 1:] = [str(assembly), str(HERE / filename), str(HERE / 'RuntimeAsyncBridge.rvn')]
+                source[source.index('-o') + 1:] = [str(assembly), str(HERE / filename), str(ROOT / 'runtime/raven/compiler-services/RuntimeAwait.rvn')]
                 if args.generator_language:
                     source.append(str(HERE / 'RuntimeGeneratorBridge.rvn'))
                 if lowering == 'state-machine':

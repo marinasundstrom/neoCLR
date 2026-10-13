@@ -1,3 +1,9 @@
+> Development integration (2026-10-13): the SDK now owns the runtime-await source
+> provider and selects it by default in rebuilt SDKs. The native carrier lives in
+> `runtime/native/async` with macOS and Windows implementations. See
+> [integration status and explicit fallback](../../runtime-product-integration.md#sdk-default-runtime-await-integration--2026-10-13).
+> Historical experiments below describe earlier opt-in behavior.
+
 # Interpreter runtime-async experiments
 
 **Current priority (author correction, 2026-10-11):** make managed programs compiled
@@ -469,7 +475,7 @@ JIT/AOT, automatic lowering/default selection and comparative benchmarks remain 
 The native Raven compiler now supports ordinary `async`/`await` through
 `--runtime-async-poc RuntimeAwaitProvider.Bridge`, with explicit
 `--async-library System.Runtime` and the source-included
-[provider](RuntimeAsyncBridge.rvn). The [language sample](RuntimeAwait.rvn) uses
+[provider](../../../runtime/raven/compiler-services/RuntimeAwait.rvn). The [language sample](RuntimeAwait.rvn) uses
 ordinary async module functions and an instance method, including async Main.
 There is no hand-written per-method async wrapper in that sample and metadata
 inspection finds no AsyncStateMachine references. This meets the bounded

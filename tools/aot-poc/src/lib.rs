@@ -258,9 +258,6 @@ pub fn run(arguments: Vec<std::ffi::OsString>) -> Result<i32, Box<dyn std::error
     if runtime_async_count > 1 { return Err("duplicate --bind-runtime-async".into()); }
     let bind_runtime_async = runtime_async_count == 1;
     args.retain(|a| a != "--bind-runtime-async");
-    if bind_runtime_async && target != compiler::Target::MacosArm64 {
-        return Err("runtime-async stack carrier currently requires macOS ARM64".into());
-    }
     if bind_runtime_async && (!compile_system || !native_gc || !native_stack_budget) {
         return Err("--bind-runtime-async requires compiled System, GC and stack budget".into());
     }

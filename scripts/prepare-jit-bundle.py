@@ -134,6 +134,16 @@ def complete_services(command):
     if tls_flag not in command:
         command.insert(1, tls_flag)
 
+    async_source = ROOT / 'runtime/native/async/native-runtime.c'
+    for flag in (('/D' if windows else '-D') + 'NEOCLR_RUNTIME_ASYNC',
+                 ('/I' if windows else '-I') + str(async_source.parent)):
+        if flag not in command:
+            command.insert(1, flag)
+    if not any(Path(arg).name == 'native-runtime.c' for arg in command):
+        additions.append(async_source)
+    if not windows and '-Wno-deprecated-declarations' not in command:
+        command.insert(1, '-Wno-deprecated-declarations')
+
     if windows:
         additions += [name for name in ('Bcrypt.lib', 'Ntdll.lib', 'Userenv.lib', 'Advapi32.lib', 'Ws2_32.lib')
                       if name.lower() not in {str(arg).lower() for arg in command}]
@@ -155,7 +165,13 @@ try:
         command = budget_command(command, '/D')
         helper = module.build_host(command, out, run)
     else:
-        command = next(row['command'].copy() for row in recipe['commands'] if row.get('label') == 'jit-host-build')
+        command = next((row['command'].copy() for row in recipe['commands'] if row.get('label') == 'jit-host-build'), None)
+        if command is None:
+            command = next(row['command'].copy() for row in recipe['commands'] if row.get('phase') == 'host-compile-link')
+            native = next(row['command'] for row in recipe['commands'] if row.get('phase') == 'native-compilation')
+            command = [str(ROOT / 'docs/experiments/jit-managed/host.c') if Path(arg).name == 'http-host.c' else arg
+                       for arg in command if arg != native[4]]
+            command.append('-dynamiclib')
         helper = out / 'host.dylib'
         command[command.index('-o') + 1] = str(helper)
         command = complete_services(command)
@@ -173,7 +189,7 @@ try:
     manifest['platform'] = platform.platform()
     manifest['runtime'] = 'bin/neoclr' + suffix
     manifest['jit'] = dict(default=True, compiler='bin/neoclr-aot-poc' + suffix,
-                           host='bin/' + helper_name, runtimeAsync=not windows, cryptography=True, tlsOwnership=True,
+                           host='bin/' + helper_name, runtimeAsync=True, cryptography=True, tlsOwnership=True,
                            heapBytes=a.heap_bytes, byteArrayLimit=a.byte_array_limit)
     if a.refresh_samples:
         refresh_samples(bundle, manifest)
