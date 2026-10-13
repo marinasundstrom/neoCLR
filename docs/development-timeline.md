@@ -16667,6 +16667,7 @@ no runtime throughput or alternative-memory-manager implementation is claimed.
 The next assistant implementation slice moved the shared native collector and its
 private header to `runtime/native/gc`, retaining forwarding paths for existing
 recipes and preserving historical benchmark source lookup. Local collector/root,
-relocated-package and instrumentation checks pass; hosted checks for this slice
-remain pending. This consolidates source ownership without changing collection
+relocated-package and instrumentation checks pass. The hosted macOS/Windows
+socket and relocated-package checks and Windows GC/root checks also pass at
+`ad3292e8a`; reports are linked from the integration direction. This consolidates source ownership without changing collection
 policy or claiming an alternative memory-manager implementation.

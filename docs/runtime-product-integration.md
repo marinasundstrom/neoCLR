@@ -64,10 +64,16 @@ the collector through the forwarding path, directly, and from a profiler-style
 copy using only packaged support sources. Native GC/root validation fingerprints
 the canonical implementation as well as the compatibility files.
 
-Local GC/root contracts, package relocation and allocation-benchmark instrumentation
-checks pass. The one-round benchmark is a tooling smoke check, not performance
-evidence: collector algorithms and policy are unchanged. Hosted qualification is
-pending for this source-layout slice. Website capabilities and public APIs are
+Local GC/root contracts, two compiled UTF-8 GC/non-GC tests, package relocation and
+allocation/graph benchmark instrumentation checks pass. The one-round benchmarks
+are tooling smoke checks, not performance evidence: collector algorithms and policy
+are unchanged. The [hosted gate](https://github.com/marinasundstrom/neoCLR/actions/runs/38434699266)
+at `ad3292e8a` passes socket and relocated-package checks on macOS and Windows,
+plus Windows GC/root checks. [Raw reports](validation/runtime-product/gc-source-layout/)
+retain command/input provenance and hosted job/step outcomes. The local report
+predates the implementation commit but fingerprints the relocated sources. The
+superseded initial hosted run was cancelled after an MSVC command spelling correction.
+Website capabilities and public APIs are
 unchanged; no publication is part of this work.
 
 ## Memory management is a runtime service
