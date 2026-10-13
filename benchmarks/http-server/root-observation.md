@@ -184,9 +184,31 @@ alternating rounds. Each process handles 32 validated requests, with the first e
 excluded; startup/JIT compilation is reported separately from request timings.
 GitHub-hosted runner variability and the short, concurrency-one loopback workload
 limit interpretation. Compare baseline and candidate on the same host; do not use
-these numbers to rank Windows against the existing macOS measurements. Results are
-pending. Website publication remains on hold.
+these numbers to rank Windows against the existing macOS measurements. Results are recorded below. Website publication remains on hold.
 
 The shared benchmark worker now kills its own Windows process tree on failed runs,
 rather than calling Unix `killpg`; successful-process behavior is unchanged. Focused
 controller/cleanup tests run locally and in the benchmark CI scope.
+
+## Windows measurements — 2026-10-13
+
+[Raw report](windows-root-observation-comparison-20261013.json), tested revision
+`88f522c1c`, [passing CI run](https://github.com/marinasundstrom/neoCLR/actions/runs/38405932978).
+Windows Server 2022 x64, GitHub-hosted AMD Family 25 Model 1 virtual machine.
+The five-round protocol above passed all 1,536 responses, including 960 timed
+requests. All recorded input hashes remained unchanged during the run.
+
+| Workload | Mode | Baseline requests/s (range) | Candidate requests/s (range) | Median change |
+| --- | --- | ---: | ---: | ---: |
+| Plain text | JIT | 25.81 (24.33–29.26) | 26.01 (24.39–27.36) | 0.8% |
+| Plain text | AOT | 24.72 (23.63–26.48) | 24.80 (23.17–26.88) | 0.3% |
+| Object JSON | JIT | 18.06 (16.41–19.52) | 19.88 (19.40–20.47) | 10.1% |
+| Object JSON | AOT | 18.07 (17.29–18.72) | 19.68 (18.65–20.95) | 8.9% |
+
+Plain-text differences are within observed variability; no speedup is established.
+JSON medians increase by 9–10%, but baseline/candidate ranges still overlap.
+These are exploratory results, not statistical confidence intervals or regression
+thresholds. The larger macOS improvement does not transfer directly to this host.
+Next profile Windows wall time versus collector time and socket/scheduler waits;
+the current report cannot attribute the remaining overhead. Preserve all rounds,
+including slower candidate samples. Windows ARM64 remains unmeasured.

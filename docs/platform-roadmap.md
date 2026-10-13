@@ -5,7 +5,10 @@ passes GC/root/profiler and socket contracts, native HTTP, eight default-JIT HTT
 cases, and managed SSL-stream HTTPS JSON in interpreter/JIT/AOT. This exposed and
 fixed a POSIX-only profiler clock and the obsolete native per-shape 32-callback cap;
 the existing selected-function budget remains. The JIT rerun is explicitly focused,
-not a full library-suite pass. Windows throughput and ARM64 remain unmeasured.
+not a full library-suite pass. A [matched Windows x64 benchmark](../benchmarks/http-server/root-observation.md#windows-measurements--2026-10-13)
+passes 1,536 responses: plain-text throughput is unchanged within variability; JSON
+medians rise 9–10% with overlapping ranges. Next attribute Windows collector versus
+socket/scheduler wait time before choosing an optimization. ARM64 remains unmeasured.
 
 **Root observation improvement (2026-10-13):** [matched JIT/AOT evidence](../benchmarks/http-server/root-observation.md)
 shows 29–35% higher plain/JSON HTTP throughput after removing duplicate diagnostic
