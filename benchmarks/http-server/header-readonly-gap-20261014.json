@@ -1,0 +1,23 @@
+{
+  "status": "confirmed unsupported; not an implemented feature",
+  "date": "2026-10-14",
+  "compilerRevision": "cb4721e7d",
+  "command": [
+    "dotnet",
+    "/Users/robert/Projects/neoclr/target/http-json-union-compiler-20261013b/rvnc.dll",
+    "neoclr",
+    "--project",
+    "/Users/robert/Projects/neoclr/target/header-readonly-probe-20261014/App.rvnproj"
+  ],
+  "exitCode": 1,
+  "stdout": "",
+  "stderr": "/Users/robert/Projects/neoclr/target/header-readonly-probe-20261014/Main.rvn(4,5): error NEOMETA001: Native emission does not support only ordinary primitive methods, explicit constructors and auto-properties.\n",
+  "source": "import System.*\n\ninternal static class HttpHeaderNames {\n    static readonly field Host: string = \"host\"\n}\n\nfunc Main() {\n    Console.WriteLine(HttpHeaderNames.Host)\n}\n",
+  "project": "<Project Sdk=\"Microsoft.NET.Sdk\"><Import Project=\"$(NeoClrBundleRoot)/lib/NeoCLR.ClassLibrary.props\"/><PropertyGroup><TargetFramework>net10.0</TargetFramework><OutputType>Exe</OutputType><AssemblyName>HeaderReadonlyProbe</AssemblyName></PropertyGroup></Project>\n",
+  "hashes": {
+    "/Users/robert/Projects/neoclr/target/http-json-union-compiler-20261013b/rvnc.dll": "f9b50cf90476382f71490c435dc63f12f1e2efc58e4187dc8dfecadf7c13b3dc",
+    "/Users/robert/Projects/neoclr/target/http-json-union-compiler-20261013b/Raven.CodeAnalysis.dll": "6e1fc137b7ce79f198be9ede2df17e3c31bc45e3e4dd88871bfe9e29a4837aa0",
+    "/Users/robert/Projects/neoclr/target/http-json-union-compiler-20261013b/Raven.CodeAnalysis.NeoClr.dll": "7c2b5840730f617f5380c119cb7430aeabcd92dd2901e9b7fcddb5a5d10afebf",
+    "/Users/robert/Projects/neoclr/target/header-names-candidate-bundle-20261014/manifest.json": "0ea4f86feef1e33f0bcf54b3fb766e0bbecea2c49d2a60e1d8c002bba063e7e8"
+  }
+}

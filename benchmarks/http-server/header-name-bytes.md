@@ -83,3 +83,5 @@ Use `--workload json` for the JSON profile. Timing roots contain matching
 `plain/native/build.json` and `json/native/build.json`, as described in the
 [URI refinement](uri-byte-parsing.md). The existing JIT/AOT comparison controller
 remains available independently. Public API reference signatures are unchanged.
+
+The author subsequently proposed [read-only lazy name properties](../../docs/http-foundation.md#read-only-lazy-shared-names--author-discussion-2026-10-14). The retained native compiler probe confirms the static-storage gap; the shared catalog and broader coverage remain pending.

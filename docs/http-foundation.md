@@ -206,3 +206,43 @@ lowercase buffers and name decoding for seven common request headers. Unknown
 names use the existing path; value decoding and all protocol checks stay eager.
 This is not permanent interning: the backend may copy literals when text identity
 is observable. Shared constant ownership and broader name coverage remain follow-ups.
+
+### Read-only, lazy shared names — author discussion, 2026-10-14
+
+The author proposed a larger header catalog with constant fields, then suggested
+read-only strings and properties that initialize backing storage on first access.
+The assistant recommends an internal `HttpHeaderNames` catalog with read-only
+properties and once-initialized private storage as the direction to evaluate.
+It is not implemented by the seven-name byte matching slice.
+
+A source constant is substituted at its use site and therefore does not solve the
+backend's literal-copy policy. A static read-only field can retain a shared value,
+but ordinary type initialization can initialize the whole catalog together.
+Per-name lazy properties avoid constructing unused names. Their backing cache is
+privately mutable during initialization; it cannot simply be an ordinary readonly
+field assigned from an arbitrary getter. A getter returning a literal on every
+call is not a cache.
+
+The .NET comparison is [`Lazy<T>` initialization](https://learn.microsoft.com/en-us/dotnet/framework/performance/lazy-initialization)
+and [`ExecutionAndPublication`](https://learn.microsoft.com/en-us/dotnet/api/system.threading.lazythreadsafetymode):
+serialize first initialization and publish the fully initialized value for reuse.
+This is a semantic reference, not a commitment to adding a general Lazy API or
+copying .NET exception caching. neoCLR faults remain non-recoverable.
+
+Required foundation: native static field metadata/access, read-only enforcement,
+initialization/publication, and context-owned GC roots and teardown. Cache lifetime
+must belong to its owning runtime context, not a process-global pointer that can
+outlive an arena or cross independent runtime instances. First-use checks and
+retained roots have costs; measure them against the small eager catalog alternative.
+Cover concurrent first reads, identity reuse, collection during initialization,
+repeated reads without allocation, context reset and unused-name nonallocation
+in interpreter, JIT and AOT, then compare HTTP throughput and retained memory.
+
+The [retained probe](../benchmarks/http-server/header-readonly-gap-20261014.json)
+confirms `static readonly field Host: string = "host"` is recognized but rejected
+by Raven native emission (`NEOMETA001`, compiler `cb4721e7d`). The native emitter's
+static storage restrictions and metadata field-access admission must be addressed;
+a superficial spelling change would not provide shared storage. Broader matching
+coverage, such as Accept, Accept-Encoding, Authorization, Cookie, User-Agent and
+Cache-Control, remains a candidate after this foundation and code-size review.
+No new shared-name class or static-storage support is claimed.

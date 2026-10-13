@@ -16953,3 +16953,21 @@ that from universal lazy values or unbounded global interning. It refined the
 comparison accordingly. Allocation attribution subsequently identified URI character
 substrings as a larger source of allocations than header decoding in the retained
 plain HTTP fixture; that is a measured candidate, not yet an implemented URI fix.
+
+The URI refinement subsequently shipped in development commit `380665348`, with
+three-mode tests and matched allocation/timing evidence. The seven-name matching
+slice `ce0c8a82b` then passed 87 public wire checks across interpreter/JIT/AOT,
+reduced measured plain/JSON allocations by 10/8 per request, and retained modest
+exploratory timings. It does not guarantee shared string identity.
+
+The author next suggested more names and constant fields in a class, refined this
+to readonly strings, then proposed getters that initialize backing fields only
+when used. The assistant distinguished compile-time substitution from stored
+values and proposed read-only lazy properties backed by synchronized, context-owned
+storage. It explained that private backing storage is mutable during initialization
+and must remain rooted; literal-only getters are not caching. A direct compiler
+probe confirmed the current native emitter rejects a static readonly field. The
+assistant recorded that prerequisite rather than claiming a shared-name class was
+implemented. [Design, comparison and remaining validation](http-foundation.md#read-only-lazy-shared-names--author-discussion-2026-10-14)
+retain these proposals; static storage, broader names and lazy publication remain
+open, not an approved complete implementation or a permanent roadmap reprioritization.
