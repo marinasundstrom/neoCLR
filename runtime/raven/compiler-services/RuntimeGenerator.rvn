@@ -1,4 +1,4 @@
-// Source-included prototype contract for native Raven yield lowering.
+// SDK-owned, assembly-private provider for native Raven yield lowering.
 module RuntimeAwaitProvider
 
 import System.*

@@ -9348,3 +9348,9 @@ matching installed JIT bundle, then exercises interpreter/JIT/AOT language, clea
 fault, HTTP server and client cases. The hosted Windows HTTP workflow can run this
 gate with `runtime_await=true`. Full gate evidence is pending while this integration
 is qualified; the preceding raw carrier gate passes on macOS and Windows.
+
+The SDK runtime-await source provider includes the companion `RuntimeGenerator.rvn`
+for the existing `BridgeGenerator` compiler contract. It remains internal to each
+consumer assembly and preserves demand-driven yield, cancellation and disposal;
+this packaging does not introduce a new public generator API or change CLI encoding.
+The SDK gate includes the existing generator lifetime/GC sample in all three modes.

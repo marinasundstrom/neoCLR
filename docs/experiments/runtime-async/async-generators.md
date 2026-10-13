@@ -187,7 +187,7 @@ Remaining work before native Raven `yield` support:
 ## Native Raven yield checkpoint (2026-10-11)
 
 [Native language consumer](RuntimeGeneratorLanguage.rvn) now uses ordinary `yield`
-and `yield from` with the [source-included generic provider](RuntimeGeneratorBridge.rvn).
+and `yield from` with the [source-included generic provider](../../../runtime/raven/compiler-services/RuntimeGenerator.rvn).
 The explicit runtime-async compiler option enables the selected generator-body
 capability. Compilation expands delegation and lexical cleanup before replacing yield
 with a suspension/demand handshake. Iterable acquisition is lazy and independent;

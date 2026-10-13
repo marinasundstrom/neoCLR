@@ -20,6 +20,7 @@ from process import Guest
 BODY = 'Café 🌍'.encode()
 
 class Peer(http.server.BaseHTTPRequestHandler):
+    protocol_version = "HTTP/1.1"
     def do_GET(self):
         assert self.path == '/greeting'
         self.send_response(200)
@@ -33,6 +34,7 @@ def main():
     p = argparse.ArgumentParser(description=__doc__)
     for name in ('bundle', 'runtime', 'aot', 'output'):
         p.add_argument('--' + name, type=Path, required=True)
+    p.add_argument('--cases', nargs='+', choices=('language', 'cleanup', 'fault', 'server', 'client', 'state-machine', 'generator'), help='Run only selected cases; default is all')
     a = p.parse_args()
     out = a.output.resolve()
     out.mkdir(parents=True, exist_ok=False)
@@ -47,14 +49,17 @@ def main():
             raise RuntimeError(result.stderr or result.stdout)
         return result
     try:
-        for path in [Path(__file__), ROOT / 'runtime/raven/compiler-services/RuntimeAwait.rvn', *sorted((ROOT / 'runtime/native').rglob('*.[ch]'))]:
+        for path in [Path(__file__), *sorted((ROOT / 'runtime/raven/compiler-services').glob('*.rvn')), *sorted((ROOT / 'runtime/native').rglob('*.[ch]'))]:
             report['inputs'][str(path)] = hashlib.sha256(path.read_bytes()).hexdigest()
         cases = [('language', 'docs/experiments/runtime-async/RuntimeAwait.rvn'),
                  ('cleanup', 'docs/experiments/runtime-async/RuntimeUse.rvn'),
                  ('fault', 'docs/experiments/runtime-async/RuntimeAwaitFault.rvn'),
                  ('server', 'docs/experiments/http-server/Server.rvn'),
                  ('client', 'docs/experiments/native-http-client/Client.rvn'),
-                 ('state-machine', None)]
+                 ('state-machine', None),
+                 ('generator', 'docs/experiments/runtime-async/RuntimeGeneratorLanguage.rvn')]
+        if a.cases:
+            cases = [(name, source) for name, source in cases if name in a.cases]
         installed = None
         for name, source in cases:
             project = out / name

@@ -93,7 +93,7 @@ def main():
                 source[1] = str(compiler)
                 source[source.index('-o') + 1:] = [str(assembly), str(HERE / filename), str(ROOT / 'runtime/raven/compiler-services/RuntimeAwait.rvn')]
                 if args.generator_language:
-                    source.append(str(HERE / 'RuntimeGeneratorBridge.rvn'))
+                    source.append(str(ROOT / 'runtime/raven/compiler-services/RuntimeGenerator.rvn'))
                 if lowering == 'state-machine':
                     i = source.index('--runtime-async-poc')
                     del source[i:i + 2]
