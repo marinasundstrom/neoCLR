@@ -594,8 +594,8 @@ Remaining admission audit:
 | Other scalar formatting | Complete caller boundary; audit intermediates | Noncollecting |
 | Managed UTF-8 encode/decode | Retain source text or full byte-array owner through allocation/copy | Generated GC calls use rooted retry |
 | Lexical paths and ordinal replacement | Retain every string read after allocation; no-op replacement preserves identity | Generated GC calls use rooted retry |
-| Grapheme slicing and other encoding | Retain borrowed inputs and any backing arrays | Noncollecting |
-| Unicode sequence construction | Retain partially initialized result arrays and each constructed element | Noncollecting |
+| Unicode casing, access/slicing and character assembly | Retain source text or owning array through allocation/copy | Generated GC calls use rooted retry |
+| Unicode sequence construction | Retain source and partially initialized array; publish each element before the next allocation | Generated GC calls use rooted retry |
 | Native file/network/TLS/SQL producers | Retain managed intermediates; keep native handles/buffers alive; never replay I/O to retry allocation | Noncollecting |
 | Constructors / reflection invocation | Retain initialized receiver and every native result scratch until publication | Existing explicit generated roots; admission migration still needed |
 
@@ -712,3 +712,21 @@ Path/replacement qualification: all 26 GC/root checks, sockets and relocated-pac
 checks pass on macOS ARM64 and Windows x64. Four local compiled path/replacement
 tests compare interpreter behavior, including GC/non-GC replacement and fault
 cleanup. See [retained evidence](../../validation/runtime-product/borrowed-text/README.md).
+
+Unicode follow-up (2026-10-13): rooted casing, grapheme access/slicing and character
+assembly retain the complete source owner during their sole allocation retry.
+Sequence construction publishes a temporary frame for its source and initialized
+result-array pointer; each new grapheme is copied and inserted before another
+allocation. All exits remove the frame, including partial-result exhaustion.
+The current nonmoving collector keeps the Rust visitor's borrowed source stable;
+a moving collector would require an explicit pinning or copied-buffer contract.
+Like CLR native helpers, these adapters must report every live managed reference at
+collecting boundaries. The private frame and UTF-8 layout remain neoCLR details.
+
+The earlier noncollecting Unicode audit above is superseded for generated GC calls;
+original native symbols remain noncollecting. Public UTF-8 and strict ASCII encodings
+in `Encodings.rvn` already compose the audited managed UTF-8/byte-array operations;
+there is no separate native ASCII codec needing a new allocation path. Incremental
+managed encoder/decoder behavior retains its existing tests and is not redefined.
+Native producer scratch/results and general pacing remain open. Platform qualification
+for this slice is pending.

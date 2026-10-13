@@ -1,0 +1,14 @@
+   Compiling neoclr v0.1.0-preview.13 (/Users/robert/Projects/neoclr)
+   Compiling neoclr-aot-poc v0.0.0 (/Users/robert/Projects/neoclr/tools/aot-poc)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 13.40s
+     Running tests/console.rs (target/debug/deps/console-dafeb0f53eda77bd)
+
+running 6 tests
+test character_binding_requires_exact_opted_in_services ... ok
+test character_value_snapshots_reject_mutation_and_borrows ... ok
+test character_text_preserves_fresh_string_identity_and_faults ... ok
+test character_value_snapshots_and_managed_copy_match_interpreter ... ok
+test character_graphemes_defaults_borrows_and_faults_match_interpreter ... ok
+test character_values_native_gc_match_interpreter ... ok
+
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 150 filtered out; finished in 2.23s

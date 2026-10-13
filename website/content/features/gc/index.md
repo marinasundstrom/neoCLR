@@ -103,5 +103,6 @@ construction can retry allocation before initializing and publishing the array.
 Managed UTF-8 encoding/decoding retain their source text or array through allocation
 retry. Reference-array construction also supports retry before publishing initialized
 storage. Lexical path and ordinal replacement helpers retain their string inputs
-through retry. Broader collection pacing remains experimental;
+through retry. Unicode helpers also retain source strings and partially constructed
+sequences. Broader collection pacing remains experimental;
 see the [allocation benchmark and qualification](/benchmarks/gc/#allocation-throughput-2026-10-13).

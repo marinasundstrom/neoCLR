@@ -6466,10 +6466,21 @@ ret
 #[test]
 #[cfg(all(target_os = "macos", target_arch = "aarch64"))]
 fn character_value_snapshots_and_managed_copy_match_interpreter() {
+    check_character_values(false);
+}
+#[test]
+#[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+fn character_values_native_gc_match_interpreter() {
+    check_character_values(true);
+}
+#[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+fn check_character_values(gc: bool) {
     let dir=Temp::new();
     let seed=neoclr::assemble(&format!("{UTF8_SEED}\n{CHARACTER_SEED}")).unwrap();
     let source=include_str!("../../../docs/experiments/aot-console/character-values.neoil");
-    let r=compile_source(&dir,&seed,source,&["--compile-system","--reference-arena","--bind-user-fault","--bind-utf8-text","--bind-character-text"],false);
+    let mut flags=vec!["--compile-system","--reference-arena","--bind-user-fault","--bind-utf8-text","--bind-character-text"];
+    if gc { flags.push("--native-gc"); }
+    let r=compile_source(&dir,&seed,source,&flags,false);
     assert!(r.status.success(),"{}",String::from_utf8_lossy(&r.stderr));
     let base=PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../docs/experiments");
     fs::write(dir.0.join("host.c"),r#"
@@ -6487,7 +6498,16 @@ int main(int argc, char **argv) {
     printf("%d\n",result);return 0;
 }
 "#).unwrap();
-    let r=Command::new("clang").args(["-arch","arm64","-std=c11","-Wall","-Wextra","-Werror","-I"])
+    if gc {
+        let host=fs::read_to_string(dir.0.join("host.c")).unwrap()
+            .replace("#include \"text-arena.h\"", "#include \"native-gc.h\"")
+            .replace("        neoclr_aot_render_fault(stderr,&ctx.fault);return 1;", "        if (neoclr_gc_collect_v1(&ctx,NULL)) return 93;\n        neoclr_aot_render_fault(stderr,&ctx.fault);\n        ctx.fault=(neoclr_aot_fault){0};\n        if (neoclr_gc_collect_v1(&ctx,NULL) || ctx.text.used) return 94;\n        return 1;")
+            .replace("    printf(\"%d\\n\",result);return 0;", "    if (neoclr_gc_collect_v1(&ctx,NULL) || ctx.text.used) return 95;\n    printf(\"%d\\n\",result);return 0;");
+        fs::write(dir.0.join("host.c"),host).unwrap();
+    }
+    let mut command=Command::new("clang");
+    if gc { command.arg("-DNEOCLR_NATIVE_GC").arg(base.join("aot-console/native-gc.c")).arg(base.join("aot-console/root-probe.c")); }
+    let r=command.args(["-arch","arm64","-std=c11","-Wall","-Wextra","-Werror","-I"])
         .arg(base.join("aot-console")).arg(dir.0.join("host.c"))
         .arg(base.join("aot-console/text-arena.c")).arg(base.join("aot-console/string-unicode.c")).arg(base.join("aot-fault-details/render.c"))
         .arg(dir.0.join("app.o")).arg(base.join("../../tools/aot-native-text/target/release/libneoclr_aot_native_text.a")).arg("-o").arg(dir.0.join("app")).output().unwrap();

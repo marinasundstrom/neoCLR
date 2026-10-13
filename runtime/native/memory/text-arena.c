@@ -771,3 +771,17 @@ int32_t neoclr_text_allocate_v1(neoclr_aot_text_arena *arena, uint64_t length,
     *output = text;
     return 0;
 }
+
+/* Writable text construction with explicit borrowed owners. No collection may
+ * occur between returning this buffer and initializing/publishing its payload. */
+int32_t neoclr_text_allocate_rooted_values_v1(neoclr_aot_text_arena *arena,
+    uint64_t length, const void *const *owners, uint32_t count, neoclr_aot_text **output) {
+    if (!output || length > INT32_MAX) return NEOCLR_AOT_FAULT_RUNTIME_ERROR;
+    void *storage;
+    int32_t status = reserve_values(arena, 8 + length, TEXT_STORAGE, &storage, 1, owners, count);
+    if (status) return status;
+    neoclr_aot_text *text = storage;
+    text->length = length;
+    *output = text;
+    return 0;
+}

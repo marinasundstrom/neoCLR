@@ -55,7 +55,8 @@ checks and 14 local compiled tests passing; raw native-buffer callers remain
 noncollecting. Reference-array construction now also uses rooted retry, with header/payload
 initialization completed before publication. Lexical paths and ordinal replacement now retain all copied string inputs
 through retry, with 26 macOS/Windows GC/root checks and four local compiled
-path/replacement tests passing. Unicode/other encoding and native producer intermediates remain to audit. Then qualify a managed pacing policy across execution modes before promotion.
+path/replacement tests passing. Unicode casing, grapheme access and sequence construction now retain source/partial
+results through retry. Native producer intermediates remain to audit. Then qualify a managed pacing policy across execution modes before promotion.
 The author additionally proposed generations to reduce collection pressure/latency;
 [the next architecture evaluation](runtime-gc.md#generational-collection-evaluation--2026-10-13)
 compares survival, write barriers, promotion and pauses. It does not yet select or

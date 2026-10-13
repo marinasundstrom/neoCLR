@@ -74,6 +74,8 @@ int32_t neoclr_reserve_bytes_rooted_v1(neoclr_aot_text_arena *, int32_t, void **
 int32_t neoclr_path_combine_unix_rooted_v1(const neoclr_aot_text *, const neoclr_aot_text *, neoclr_aot_text_arena *, const neoclr_aot_text **);
 int32_t neoclr_path_file_name_unix_rooted_v1(const neoclr_aot_text *, neoclr_aot_text_arena *, const neoclr_aot_text **);
 int32_t neoclr_string_replace_ordinal_rooted_v1(const neoclr_aot_text *, const neoclr_aot_text *, const neoclr_aot_text *, neoclr_aot_text_arena *, const neoclr_aot_text **);
+int32_t neoclr_text_allocate_rooted_values_v1(neoclr_aot_text_arena *, uint64_t,
+    const void *const *, uint32_t, neoclr_aot_text **);
 int32_t neoclr_allocate_strings_rooted_v1(neoclr_aot_text_arena *, int32_t, int32_t, void **);
 int32_t neoclr_reserve_records_rooted_v1(neoclr_aot_text_arena *, int32_t, uint32_t, void **);
 int32_t neoclr_allocate_references_rooted_v1(neoclr_aot_text_arena *, int32_t, void **);
