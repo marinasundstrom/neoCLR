@@ -65,9 +65,26 @@ static class RavenUnionMetadata
                 && p.GetMethod is { IsPublic: true, IsStatic: false } && p.SetMethod is null);
     }
 
+    // Documentation-reference projection only: exact temporary System.Union arities.
+    // This does not admit additional executable CLI imports.
+    public static bool IsAdhocUnionCarrier(TypeDefinition type)
+    {
+        var arity = type.GenericParameters.Count;
+        if (arity is < 2 or > 5 || type.FullName != $"System.Union`{arity}"
+            || !type.IsPublic || !type.IsValueType || !type.IsSealed || type.HasNestedTypes
+            || Cases(type).Length != 0
+            || !type.CustomAttributes.Any(a => a.AttributeType.FullName == "System.Runtime.CompilerServices.UnionAttribute"))
+            return false;
+        var constructors = type.Methods.Where(m => m.IsConstructor && m.IsPublic && !m.IsStatic).ToArray();
+        return constructors.Length == arity && constructors.All(m => m.Parameters.Count == 1
+                && m.Parameters[0].ParameterType is GenericParameter p && p.Owner == type)
+            && constructors.Select(m => ((GenericParameter)m.Parameters[0].ParameterType).Position).Order()
+                .SequenceEqual(Enumerable.Range(0, arity));
+    }
+
     public static TypeDefinition[] Family(TypeDefinition carrier)
     {
-        if (IsDateTimeUnion(carrier)) return [carrier];
+        if (IsDateTimeUnion(carrier) || IsAdhocUnionCarrier(carrier)) return [carrier];
         var cases = Cases(carrier);
         if (cases.Length == 0 || cases.Where((c, i) => c.Ordinal != i).Any())
             throw new InvalidDataException("Incomplete Raven union case metadata.");
@@ -138,7 +155,8 @@ static class RavenUnionMetadataChecks
                 if (caseType.DeclaringType != carrier && RavenUnionMetadata.CompanionTarget(caseType.DeclaringType) != carrier.FullName)
                     throw new InvalidDataException("Raven union companion does not identify the case carrier.");
             }
-            Console.WriteLine(System.Text.Json.JsonSerializer.Serialize(new {
+            Console.WriteLine(System.Text.Json.JsonSerializer.Serialize(new
+            {
                 Carrier = carrier.FullName,
                 Cases = cases,
                 Companions = module.Types.Where(t => RavenUnionMetadata.CompanionTarget(t) == carrier.FullName).Select(t => t.FullName).ToArray()

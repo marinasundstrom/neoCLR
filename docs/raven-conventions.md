@@ -414,6 +414,20 @@ Propagation applies to the complete await or try expression; `(await Foo())?` an
 `(try Foo())?` do not need the outer parentheses. Parenthesize the operand only
 when inner propagation is intended. Use a matching compiler when verifying samples.
 
+## Propagating several existing error types
+
+Prefer an ad-hoc union such as `Result<Config, FileReadError | NumberParseError>`
+when the function should preserve those existing errors. Each compatible error
+propagates with `?`; no implicit converter is needed merely to include a listed
+alternative. The signature makes the alternatives discoverable and typed patterns
+can distinguish them. Use a nominal union or dedicated type for many public APIs,
+where domain meaning and an independent contract matter more than exposing the
+underlying operations. See [the executable configuration loader](experiments/adhoc-error-unions/README.md).
+
+The current neoCLR development implementation uses temporary nominal carriers for
+two through five alternatives, pending native structural union values. Match the
+compiler and class library; this is not a claim about older SDKs or structural identity.
+
 ## Propagating errors through conversions
 
 Raven's `?` can implicitly convert the error to the enclosing Result's error type,

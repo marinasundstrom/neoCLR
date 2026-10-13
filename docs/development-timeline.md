@@ -16839,3 +16839,48 @@ It recorded actual-target execution, GC, suspension, diagnostics, native depende
 and execution-mode parity as future qualification needs. No Linux implementation
 or qualification was performed in this documentation slice; current priorities
 remain unchanged. See [Linux ARM64 direction](platform-direction.md#future-linux-arm64-target).
+
+
+## 2026-10-13 — Ad-hoc union error propagation
+
+- **Author question:** asked whether Raven on neoCLR supports a configuration
+  loader returning `Result<Config, IOError | ParseError>`, so distinct errors do
+  not require inheritance or interfaces; requested documentation and usage.
+- **Assistant investigation:** found Raven's existing System.Union carrier mapping,
+  absent neoCLR carriers, and a native emission gap for synthesized residual union
+  conversions. Ordinary Raven/.NET success and both error paths passed before the
+  normalization change.
+- **Author direction:** requested implementation on the neoCLR-specific Raven
+  branch and propagation validation on main. Clarified that neoCLR currently lacks
+  union types and native structural union values are the eventual plan.
+- **Assistant action:** normalized residual conversion lowering on both branches,
+  added temporary runtime-owned nominal carriers, and fixed native emission of
+  unwanted parenthesized-union companions. Added a separate config-library consumer
+  and tests rather than assuming ordinary .NET execution proves native support.
+- **Author clarification:** requested commits and documentation on both websites;
+  ad-hoc unions should be presented as an alternative to one specific error type
+  or a nominal union, avoiding converters used only for forwarding and exposing
+  discoverable alternatives. Nominal unions or dedicated types remain preferable
+  for many public APIs.
+- **Scope:** this implements the bounded error-composition bridge; native structural
+  identity, representation and introspection remain open. It does not permanently
+  reprioritize runtime-performance work. Final validation and artifact provenance
+  are recorded in [the fixture record](experiments/adhoc-error-unions/README.md).
+
+
+The author further observed that ad-hoc unions, later structural unions, may improve
+existing APIs even where nominal unions are generally preferred. The assistant
+proposed reviewing aggregation-only wrappers while preserving nominal cases that
+add domain meaning, and identified HttpJsonError as a concrete review candidate.
+No public API migration was authorized or performed by that observation; compare
+source compatibility and dependency exposure before choosing one. See
+[the recorded review criterion](raven-error-api.md#review-existing-api-aggregation).
+
+
+The author then requested continuing the review after this support slice and fixing
+strong existing API candidates. The assistant will perform that as a following
+bounded migration, with explicit compatibility notes and consumer validation.
+The completed support slice passes the interpreter config loader, native-GC JIT/AOT
+carrier/error consumer, unrelated-error rejection and API snapshot checks. Raven
+main `3abc0c954` and native `b6557ab85` preserve separate branch ownership. Both
+website sources are updated; publication was not performed.

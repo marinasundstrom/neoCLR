@@ -314,6 +314,7 @@ def main():
         'SOCKET_SERVER_SAMPLE': ('docs/experiments/socket-echo/Server.rvn', 'async func Serve(', '\n}', True),
         'DNS_RESOLVE_SAMPLE': ('docs/experiments/socket-client/Main.rvn', 'async func ResolveHost()', '\n}', True),
         'OBJECT_DISPLAY_SAMPLE': ('docs/experiments/object-display/Main.rvn', 'open class Plain', '\nfunc Main()', False),
+        'ADHOC_ERROR_UNION_SAMPLE': ('docs/experiments/adhoc-error-unions/Config.rvn', 'public func LoadConfig(', '\n}', True),
         'CONSOLE_PROPAGATION_SAMPLE': ('docs/experiments/console-streams/Propagation.rvn', 'async func ReadInput()', '\nasync func Main()', False),
         'CONSOLE_IF_LET_SAMPLE': ('docs/experiments/console-streams/IfLet.rvn', 'async func ReadInput()', '\nasync func Main()', False),
         'STORAGE_POC_SAMPLE': ('docs/experiments/storage-poc/Main.rvn', 'async func Main()', '\n}', True),

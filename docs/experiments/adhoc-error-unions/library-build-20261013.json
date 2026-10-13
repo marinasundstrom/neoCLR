@@ -1,0 +1,79 @@
+{
+  "sourceRevision": "1b25375d1c61b21c3005bd5c9f6e7a4a288f18d5",
+  "compilerRevision": "c1cf9b815+adhoc-union-lowering",
+  "builds": [
+    {
+      "command": [
+        "dotnet",
+        "/Users/robert/Projects/neoclr/target/adhoc-union-compiler-20261013/rvnc.dll",
+        "neoclr",
+        "--project",
+        "/Users/robert/Projects/neoclr/runtime/raven/projects/System.Runtime/System.Runtime.rvnproj"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "dotnet",
+        "/Users/robert/Projects/neoclr/tools/metadata/NeoCLR.Metadata.Translate/bin/Release/net10.0/NeoCLR.Metadata.Translate.dll",
+        "/Users/robert/Projects/neoclr/target/runtime-await-generators-sdk-20261013/bootstrap/System.retained.json",
+        "/Users/robert/Projects/neoclr/target/adhoc-error-union-libraries-20261013d/System.runtime.neox",
+        "--reference",
+        "/Users/robert/Projects/neoclr/runtime/raven/projects/System.Runtime/bin/neoclr/System.Runtime.dll"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "dotnet",
+        "/Users/robert/Projects/neoclr/target/adhoc-union-compiler-20261013/rvnc.dll",
+        "neoclr",
+        "--project",
+        "/Users/robert/Projects/neoclr/runtime/raven/projects/System.Data/System.Data.rvnproj",
+        "--no-build-references"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "dotnet",
+        "/Users/robert/Projects/neoclr/target/adhoc-union-compiler-20261013/rvnc.dll",
+        "neoclr",
+        "--project",
+        "/Users/robert/Projects/neoclr/runtime/raven/projects/System.Networking/System.Networking.rvnproj",
+        "--no-build-references"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "dotnet",
+        "/Users/robert/Projects/neoclr/target/adhoc-union-compiler-20261013/rvnc.dll",
+        "neoclr",
+        "--project",
+        "/Users/robert/Projects/neoclr/runtime/raven/projects/System.Web/System.Web.rvnproj",
+        "--no-build-references"
+      ],
+      "exitCode": 0
+    }
+  ],
+  "sourceHashes": {
+    "/Users/robert/Projects/neoclr/target/adhoc-union-compiler-20261013/rvnc.dll": "81c9448cb8f6f479c09b96659c612009376e829efcd6bdda0cc0aeb7b8db3ec2",
+    "/Users/robert/Projects/neoclr/runtime/raven/projects/System.Runtime/ownership.json": "691bc51df44e8c11d62a8ac814cab45b43e48423719a91efd5c3bbc951c65419",
+    "/Users/robert/Projects/neoclr/runtime/raven/src/System/Union.rvn": "cd2b1ef9c4d94ec29ba0b079d1a6b212d17b68c10cd9874ba34c3935fb8c8fcb",
+    "/Users/robert/Projects/neoclr/target/adhoc-union-compiler-20261013/Raven.CodeAnalysis.dll": "0f8fc977b77c68d7cfdb3fbf10ce7310ae14fa390ad8793c2b812c32f7d6514d",
+    "/Users/robert/Projects/neoclr/target/adhoc-union-compiler-20261013/Raven.CodeAnalysis.NeoClr.dll": "60d8368814c0e6c004f1093b530326b16e9b223826a5f6a518102d8d8d96df5b",
+    "/Users/robert/Projects/neoclr/target/adhoc-union-compiler-20261013/NeoCLR.Metadata.Experimental.dll": "a0d1afd35746e778dcd9d4527c8139dca37ccf6296b78104a4ce5c26a7c0efe1",
+    "/Users/robert/Projects/neoclr/target/adhoc-error-union-libraries-20261013d/ownership.json": "691bc51df44e8c11d62a8ac814cab45b43e48423719a91efd5c3bbc951c65419"
+  },
+  "artifacts": {
+    "System.Runtime.dll": "be390749f6f37f23f0e790d9521dcf8d53c1e2505e03c66862fbdda399c8d3fa",
+    "System.Data.dll": "8ead1ba0cd0e46adbaf247d4f377d624cdcd02628a88e0d8cc142a988de45eaa",
+    "System.Networking.dll": "3b9e011da0286838a5919d68ff15da03494dbc006786e90096e5988991104f80",
+    "System.Web.dll": "d20d178f4f7176f99c8559ee7ae3ee9a22e6e63b7095b2e9579220e360b52652",
+    "System.runtime.neox": "98a1ae1da85387c87746957e83a4015eb59d0566539a915c69f168d2b511b190",
+    "Core.dll": "3d4a676d379067c18a65a9beb8257ed40bf3196fc643a9ba1d559c619ec73fad",
+    "ownership.json": "691bc51df44e8c11d62a8ac814cab45b43e48423719a91efd5c3bbc951c65419",
+    "NeoCLR.ClassLibrary.props": "4676969ee1e381f9bbe0cfce799cfe5503a1a7f77968a174782c35a24752e5b7"
+  }
+}

@@ -1,0 +1,44 @@
+import System.*
+import System.Result.*
+import System.Storage.*
+
+func Check(value: bool) {
+    if !value {
+        System.Fail("ad-hoc union carrier check failed")
+    }
+}
+
+func Combine(input: Result<int, FileReadError>, text: string) -> Result<int, FileReadError | NumberParseError> {
+    let first = input?
+    let second = Int32.Parse(text)?
+    return Ok(first + second)
+}
+
+func Main() {
+    Check(Combine(Ok(2), "40") is Ok(42))
+    match Combine(Error(FileReadError.NotFound()), "40") {
+        Error(let error) => {
+            Check(error is FileReadError)
+            if error is FileReadError fileError {
+                Check(fileError is FileReadError.NotFound)
+            }
+        }
+        Ok(_) => System.Fail("file failure was lost")
+    }
+    match Combine(Ok(2), "invalid") {
+        Error(let error) => {
+            Check(error is NumberParseError)
+            if error is NumberParseError parseError {
+                Check(parseError is NumberParseError.InvalidFormat)
+            }
+        }
+        Ok(_) => System.Fail("parse failure was lost")
+    }
+    let three: int | bool | string = 42
+    let four: int | bool | string | FileReadError = true
+    let five: int | bool | string | FileReadError | NumberParseError = "five"
+    Check(three is int)
+    Check(four is bool)
+    Check(five is string)
+    Console.WriteLine("PASS native union propagation and arities 2 through 5")
+}

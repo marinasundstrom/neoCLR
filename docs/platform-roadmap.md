@@ -2264,6 +2264,16 @@ The unchanged inheritance sample remains blocked: ordinary virtual/abstract meth
 slots, Raven admission and dispatch still need coordinated completion. The sample
 count remains nine of ten. [Focused evidence](experiments/extended-cli-metadata/abstract-classes-2026-10-05.md).
 
+## Ad-hoc error composition (author-directed, 2026-10-13)
+
+The [configuration-loader slice](experiments/adhoc-error-unions/README.md) supports
+propagating either existing error into `Result<T, E1 | E2>` using temporary nominal
+carriers. It follows Raven's .NET carrier approach and needs no shared error base
+or converter-only aggregation. Native structural union identity and values remain
+future work; nominal domain errors remain preferable for many public APIs.
+This bounded author-directed integration does not change the active performance
+priority. Validation, compiler branches and replacement limits are linked above.
+
 ## Union reference-producer regression closed (2026-10-05)
 
 Raven's lexical union case repair is integrated independently on main and the native

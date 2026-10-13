@@ -57,6 +57,43 @@ Use a string for a simple message or a dedicated error type when callers need to
 
 With imported Result cases and an expected type, write `let failure: Result<int, string> = Error("Unavailable")`, as in the tested example above.
 
+<a id="adhoc-errors"></a>
+
+## Preserve several error types
+
+**Development:** an ad-hoc error union makes the possible error types visible in
+the function signature. It avoids a shared base class, interface, or implicit
+converters written only to forward an existing error. This tested configuration
+loader preserves either the file-read error or the numeric parse error:
+
+```raven
+{{ADHOC_ERROR_UNION_SAMPLE}}
+```
+
+`?` returns immediately on either failure. After matching `Error(let error)`, use
+`error is FileReadError` or `error is NumberParseError` to distinguish the listed
+alternatives and inspect their cases. An unrelated error cannot propagate into
+this union. The final `Ok(config)` constructs the successful Result.
+
+This is an alternative to propagating one particular error type or converting
+errors into a nominal union. Dedicated error types and nominal unions remain
+preferable for many public APIs: they give errors a domain name and meaningful
+cases, and keep the contract independent of lower-level implementation choices.
+Use a converter when it performs that intentional domain mapping.
+
+Existing APIs are candidates too. Review wrappers that only combine unchanged
+errors: an ad-hoc union may make them simpler and their alternatives easier to
+discover. Changing an existing public signature still needs a compatibility review,
+and named cases may carry domain meaning worth preserving.
+
+The matching development library temporarily backs two through five alternatives
+with nominal `System.Union` carriers. Native structural union values are planned;
+this bridge does not implement structural identity or normalization. Existing SDKs
+need rebuilding with the matching compiler/library changes.
+
+[Union API and bridge limits](../../docs/unions.html) ·
+[Tested configuration loader and validation](https://github.com/marinasundstrom/neoCLR/tree/main/docs/experiments/adhoc-error-unions)
+
 <a id="operator-list"></a>
 
 ## The current operator set

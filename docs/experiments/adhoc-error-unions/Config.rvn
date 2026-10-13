@@ -1,0 +1,23 @@
+import System.*
+import System.Result.*
+import System.Storage.*
+
+public class Config {
+    val Port: int
+
+    init(port: int) {
+        Port = port
+    }
+}
+
+public func ParseConfig(text: string) -> Result<Config, NumberParseError> {
+    let port = Int32.Parse(text)?
+    return Ok(Config(port))
+}
+
+// Preserve both error types without requiring a shared base class or interface.
+public func LoadConfig(path: string) -> Result<Config, FileReadError | NumberParseError> {
+    let text = FileText.ReadAllText(path, 4096)?
+    let config = ParseConfig(text)?
+    return Ok(config)
+}

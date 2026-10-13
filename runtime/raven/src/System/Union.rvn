@@ -1,0 +1,30 @@
+module System
+
+// Temporary nominal backing for Raven's A | B spelling. Native structural union
+// values will replace this bridge; callers should author the union expression.
+
+/// Represents one of 2 alternative types for Raven ad-hoc union expressions.
+/// @typeparam T1 Alternative 1.
+/// @typeparam T2 Alternative 2.
+public union Union<T1, T2>(T1 | T2)
+
+/// Represents one of 3 alternative types for Raven ad-hoc union expressions.
+/// @typeparam T1 Alternative 1.
+/// @typeparam T2 Alternative 2.
+/// @typeparam T3 Alternative 3.
+public union Union<T1, T2, T3>(T1 | T2 | T3)
+
+/// Represents one of 4 alternative types for Raven ad-hoc union expressions.
+/// @typeparam T1 Alternative 1.
+/// @typeparam T2 Alternative 2.
+/// @typeparam T3 Alternative 3.
+/// @typeparam T4 Alternative 4.
+public union Union<T1, T2, T3, T4>(T1 | T2 | T3 | T4)
+
+/// Represents one of 5 alternative types for Raven ad-hoc union expressions.
+/// @typeparam T1 Alternative 1.
+/// @typeparam T2 Alternative 2.
+/// @typeparam T3 Alternative 3.
+/// @typeparam T4 Alternative 4.
+/// @typeparam T5 Alternative 5.
+public union Union<T1, T2, T3, T4, T5>(T1 | T2 | T3 | T4 | T5)

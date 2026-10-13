@@ -1,0 +1,35 @@
+import System.*
+import System.Result.*
+import System.Storage.*
+
+func Check(value: bool, message: string) {
+    if !value {
+        System.Fail(message)
+    }
+}
+
+func Main() {
+    match LoadConfig("valid.cfg") {
+        Ok(let config) => Check(config.Port == 4242, "config value")
+        Error(_) => System.Fail("valid config failed")
+    }
+    match LoadConfig("missing.cfg") {
+        Error(let error) => {
+            Check(error is FileReadError, "file alternative")
+            if error is FileReadError fileError {
+                Check(fileError is FileReadError.NotFound, "file payload")
+            }
+        }
+        Ok(_) => System.Fail("missing config succeeded")
+    }
+    match LoadConfig("invalid.cfg") {
+        Error(let error) => {
+            Check(error is NumberParseError, "parse alternative")
+            if error is NumberParseError parseError {
+                Check(parseError is NumberParseError.InvalidFormat, "parse payload")
+            }
+        }
+        Ok(_) => System.Fail("invalid config succeeded")
+    }
+    Console.WriteLine("PASS config success, file error and parse error")
+}

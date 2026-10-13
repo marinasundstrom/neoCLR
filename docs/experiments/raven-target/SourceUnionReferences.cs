@@ -22,7 +22,7 @@ static class SourceUnionReferences
         "System.NumberParseError",
         "System.Time.DateTimeParseError",
         "System.Linq.SingleError",
-        "System.Runtime.Reflection.ReflectionError", "System.IntegerDivisionError", "System.Web.Http.HttpError", "System.Data.Json.JsonError", "System.Web.Http.Json.HttpJsonError", "System.Data.Sql.SqlError", "System.Data.Sql.SqlValue", "System.Option`1", "System.Result`2", "System.Concurrency.Tasks.TaskOutcome`1"];
+        "System.Runtime.Reflection.ReflectionError", "System.IntegerDivisionError", "System.Web.Http.HttpError", "System.Data.Json.JsonError", "System.Web.Http.Json.HttpJsonError", "System.Data.Sql.SqlError", "System.Data.Sql.SqlValue", "System.Option`1", "System.Result`2", "System.Union`2", "System.Union`3", "System.Union`4", "System.Union`5", "System.Concurrency.Tasks.TaskOutcome`1"];
 
     public static void Project(string corePath)
     {
@@ -32,7 +32,8 @@ static class SourceUnionReferences
         {
             var seed = Path.Combine(directory, CoreDeclarations.Identity + ".dll");
             File.Copy(corePath, seed);
-            var trees = Owners.Select(owner => {
+            var trees = Owners.Select(owner =>
+            {
                 var resource = "NeoCLR." + owner.Split('.').Last().Split('`')[0] + ".rvn";
                 using var sourceStream = typeof(SourceUnionReferences).Assembly.GetManifestResourceStream(resource)
                     ?? throw new InvalidDataException("Missing union reference source: " + resource);

@@ -15,10 +15,12 @@ static class StandardUnionReference
         var module = core.MainModule;
         var originals = module.AssemblyReferences.ToHashSet();
         var root = source.MainModule.GetType(owner) ?? throw new InvalidDataException("Missing source union.");
-        if (!ApplicationTypes.IsStandardLibraryUnion(root))
+        if (!ApplicationTypes.IsStandardLibraryUnion(root) && !RavenUnionMetadata.IsAdhocUnionCarrier(root))
             throw new InvalidDataException("Only supported standard unions can be projected.");
         var family = RavenUnionMetadata.Family(root);
-        var supportNames = new[] { StandardUnionLibrary.ProtocolName, RavenUnionMetadata.CaseAttribute }.Concat(root.HasGenericParameters ? new[] { RavenUnionMetadata.CompanionAttribute } : []);
+        var supportNames = RavenUnionMetadata.IsAdhocUnionCarrier(root)
+            ? new[] { StandardUnionLibrary.ProtocolName }
+            : new[] { StandardUnionLibrary.ProtocolName, RavenUnionMetadata.CaseAttribute }.Concat(root.HasGenericParameters ? new[] { RavenUnionMetadata.CompanionAttribute } : []);
         var selected = family.Concat(supportNames
             .Where(name => module.GetType(name) is null).Select(name => source.MainModule.GetType(name)
                 ?? throw new InvalidDataException("Missing union reference support type: " + name))).ToArray();
@@ -111,7 +113,8 @@ static class StandardUnionReference
                 methods.Add(method, copy);
             }
             foreach (var property in type.Properties)
-                clone.Properties.Add(new PropertyDefinition(property.Name, property.Attributes, Map(property.PropertyType, storage: true)) {
+                clone.Properties.Add(new PropertyDefinition(property.Name, property.Attributes, Map(property.PropertyType, storage: true))
+                {
                     GetMethod = property.GetMethod is null ? null : methods[property.GetMethod],
                     SetMethod = property.SetMethod is null ? null : methods[property.SetMethod]
                 });

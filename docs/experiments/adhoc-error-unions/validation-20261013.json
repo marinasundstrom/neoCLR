@@ -1,0 +1,167 @@
+{
+  "passed": true,
+  "commands": [
+    {
+      "command": [
+        "dotnet",
+        "/Users/robert/Projects/neoclr/target/adhoc-union-compiler-20261013/rvnc.dll",
+        "neoclr",
+        "--project",
+        "/Users/robert/Projects/neoclr/target/adhoc-error-union-validation-20261013b/ConfigLibrary/ConfigLibrary.rvnproj"
+      ],
+      "exitCode": 0,
+      "stdout": "Native build output: /Users/robert/Projects/neoclr/target/adhoc-error-union-validation-20261013b/ConfigLibrary/bin/neoclr/ConfigLibrary.dll\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "dotnet",
+        "/Users/robert/Projects/neoclr/target/adhoc-union-compiler-20261013/rvnc.dll",
+        "neoclr",
+        "--project",
+        "/Users/robert/Projects/neoclr/target/adhoc-error-union-validation-20261013b/ConfigConsumer/ConfigConsumer.rvnproj"
+      ],
+      "exitCode": 0,
+      "stdout": "Native build output: /Users/robert/Projects/neoclr/target/adhoc-error-union-validation-20261013b/ConfigConsumer/bin/neoclr/ConfigConsumer.dll\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/release/neoclr",
+        "verify",
+        "/Users/robert/Projects/neoclr/target/adhoc-error-union-validation-20261013b/ConfigConsumer/bin/neoclr/ConfigConsumer.dll",
+        "--system",
+        "/Users/robert/Projects/neoclr/target/adhoc-error-union-bundle-20261013/lib/System.runtime.neox",
+        "--object-root",
+        "/Users/robert/Projects/neoclr/target/adhoc-error-union-bundle-20261013/lib/System.Runtime.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/adhoc-error-union-bundle-20261013/lib/System.Runtime.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/adhoc-error-union-bundle-20261013/lib/System.Data.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/adhoc-error-union-bundle-20261013/lib/System.Networking.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/adhoc-error-union-bundle-20261013/lib/System.Web.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/adhoc-error-union-validation-20261013b/ConfigLibrary/bin/neoclr/ConfigLibrary.dll"
+      ],
+      "exitCode": 0,
+      "stdout": "NeoMetadata_A387CF1C2C207EBA947F1ACD3B7D08B8BF5ADAED12B26A20C6401BC137A1AC77: typed-stack/control-flow verification passed (3343 IL functions; maximum stack 10; runtime value checks remain)\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/release/neoclr",
+        "run",
+        "/Users/robert/Projects/neoclr/target/adhoc-error-union-validation-20261013b/ConfigConsumer/bin/neoclr/ConfigConsumer.dll",
+        "--execution",
+        "interpreter",
+        "--system",
+        "/Users/robert/Projects/neoclr/target/adhoc-error-union-bundle-20261013/lib/System.runtime.neox",
+        "--object-root",
+        "/Users/robert/Projects/neoclr/target/adhoc-error-union-bundle-20261013/lib/System.Runtime.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/adhoc-error-union-bundle-20261013/lib/System.Runtime.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/adhoc-error-union-bundle-20261013/lib/System.Data.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/adhoc-error-union-bundle-20261013/lib/System.Networking.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/adhoc-error-union-bundle-20261013/lib/System.Web.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/adhoc-error-union-validation-20261013b/ConfigLibrary/bin/neoclr/ConfigLibrary.dll"
+      ],
+      "exitCode": 0,
+      "stdout": "PASS config success, file error and parse error\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "dotnet",
+        "/Users/robert/Projects/neoclr/target/adhoc-union-compiler-20261013/rvnc.dll",
+        "neoclr",
+        "--project",
+        "/Users/robert/Projects/neoclr/target/adhoc-error-union-validation-20261013b/UnrelatedError/UnrelatedError.rvnproj"
+      ],
+      "exitCode": 1,
+      "stdout": "",
+      "stderr": "/Users/robert/Projects/neoclr/target/adhoc-error-union-validation-20261013b/UnrelatedError/Main.rvn(4,23): error RAV1503: Cannot convert from 'BooleanParseError' to 'FileReadError | NumberParseError'\n"
+    },
+    {
+      "command": [
+        "/Applications/Xcode.app/Contents/Developer/usr/bin/python3",
+        "/Users/robert/Projects/neoclr/scripts/build-native-project.py",
+        "--profile",
+        "console",
+        "--project",
+        "/Users/robert/Projects/neoclr/target/adhoc-error-union-validation-20261013b/CarrierChecks/CarrierChecks.rvnproj",
+        "--bundle",
+        "/Users/robert/Projects/neoclr/target/adhoc-error-union-validation-20261013b/native-bundle",
+        "--aot",
+        "/Users/robert/Projects/neoclr/target/unified-codegen-sdk-20261013/installed/bundle/bin/neoclr-codegen",
+        "--output",
+        "/Users/robert/Projects/neoclr/target/adhoc-error-union-validation-20261013b/native"
+      ],
+      "exitCode": 0,
+      "stdout": "/Users/robert/Projects/neoclr/target/adhoc-error-union-validation-20261013b/native/app\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/adhoc-error-union-validation-20261013b/native/app"
+      ],
+      "exitCode": 0,
+      "stdout": "PASS native union propagation and arities 2 through 5\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/release/neoclr",
+        "run",
+        "/Users/robert/Projects/neoclr/target/adhoc-error-union-validation-20261013b/native/app.dll",
+        "--execution",
+        "jit",
+        "--jit-host",
+        "/Users/robert/Projects/neoclr/target/unified-codegen-sdk-20261013/installed/bundle/bin/neoclr-jit-host.dylib",
+        "--jit-compiler",
+        "/Users/robert/Projects/neoclr/target/unified-codegen-sdk-20261013/installed/bundle/bin/neoclr-codegen",
+        "--system",
+        "/Users/robert/Projects/neoclr/target/adhoc-error-union-bundle-20261013/lib/System.runtime.neox",
+        "--object-root",
+        "/Users/robert/Projects/neoclr/target/adhoc-error-union-bundle-20261013/lib/System.Runtime.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/adhoc-error-union-bundle-20261013/lib/System.Runtime.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/adhoc-error-union-bundle-20261013/lib/System.Data.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/adhoc-error-union-bundle-20261013/lib/System.Networking.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/adhoc-error-union-bundle-20261013/lib/System.Web.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/adhoc-error-union-validation-20261013b/ConfigLibrary/bin/neoclr/ConfigLibrary.dll"
+      ],
+      "exitCode": 0,
+      "stdout": "PASS native union propagation and arities 2 through 5\n",
+      "stderr": ""
+    }
+  ],
+  "inputs": {
+    "/Users/robert/Projects/neoclr/docs/experiments/adhoc-error-unions/verify.py": "24aee3f354d3e2ca208c09d7fb7a93227513db1a373b50dbae99e75edb72254c",
+    "/Users/robert/Projects/neoclr/docs/experiments/adhoc-error-unions/Config.rvn": "002f63b7cfe7b4049b9b652a61f7eec33fc6839d3beaa2ed6c964ab9bde49028",
+    "/Users/robert/Projects/neoclr/docs/experiments/adhoc-error-unions/Main.rvn": "d893f79321a6bc36273442012d8b31fead8fe26e66be0d7feb2371918db829aa",
+    "/Users/robert/Projects/neoclr/target/adhoc-union-compiler-20261013/rvnc.dll": "81c9448cb8f6f479c09b96659c612009376e829efcd6bdda0cc0aeb7b8db3ec2",
+    "/Users/robert/Projects/neoclr/target/release/neoclr": "57e1551815390c17044a73b87a3e4bb663406d00549d6adb3bcdcd5c9b9f7ebb",
+    "/Users/robert/Projects/neoclr/target/adhoc-union-compiler-20261013/Raven.CodeAnalysis.dll": "0f8fc977b77c68d7cfdb3fbf10ce7310ae14fa390ad8793c2b812c32f7d6514d",
+    "/Users/robert/Projects/neoclr/target/adhoc-union-compiler-20261013/Raven.CodeAnalysis.NeoClr.dll": "60d8368814c0e6c004f1093b530326b16e9b223826a5f6a518102d8d8d96df5b",
+    "/Users/robert/Projects/neoclr/target/adhoc-error-union-bundle-20261013/lib/bundle.json": "a9d4e19ac87c728807bc53e6fadc5b34e5ba4584b0db72183964c756e39624d6",
+    "/Users/robert/Projects/neoclr/target/adhoc-error-union-bundle-20261013/lib/System.runtime.neox": "98a1ae1da85387c87746957e83a4015eb59d0566539a915c69f168d2b511b190",
+    "/Users/robert/Projects/neoclr/target/adhoc-error-union-bundle-20261013/lib/System.Runtime.dll": "be390749f6f37f23f0e790d9521dcf8d53c1e2505e03c66862fbdda399c8d3fa",
+    "/Users/robert/Projects/neoclr/target/adhoc-error-union-bundle-20261013/lib/System.Data.dll": "8ead1ba0cd0e46adbaf247d4f377d624cdcd02628a88e0d8cc142a988de45eaa",
+    "/Users/robert/Projects/neoclr/target/adhoc-error-union-bundle-20261013/lib/System.Networking.dll": "3b9e011da0286838a5919d68ff15da03494dbc006786e90096e5988991104f80",
+    "/Users/robert/Projects/neoclr/target/adhoc-error-union-bundle-20261013/lib/System.Web.dll": "d20d178f4f7176f99c8559ee7ae3ee9a22e6e63b7095b2e9579220e360b52652",
+    "/Users/robert/Projects/neoclr/target/unified-codegen-sdk-20261013/installed/bundle/bin/neoclr-codegen": "b65d1b534fa691acdb0284ad8ef4eca448627a70969c3d05a300ade0e4d141ef",
+    "/Users/robert/Projects/neoclr/target/unified-codegen-sdk-20261013/installed/bundle/bin/neoclr-jit-host.dylib": "92a56f44d219f978621ea7b94eef9aa9eea10b96a963d2262e197b44ec769c27",
+    "/Users/robert/Projects/neoclr/docs/experiments/adhoc-error-unions/CarrierChecks.rvn": "f6d363542125f395805fa85514d5da0106f76e31e9129ac4f3ace4c17ea42365"
+  },
+  "scope": "native metadata, separate library import, interpreter; native-GC AOT/JIT propagation and carrier arities (no file I/O)"
+}

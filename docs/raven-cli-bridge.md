@@ -9360,3 +9360,50 @@ for the existing `BridgeGenerator` compiler contract. It remains internal to eac
 consumer assembly and preserves demand-driven yield, cancellation and disposal;
 this packaging does not introduce a new public generator API or change CLI encoding.
 The SDK gate includes the existing generator lifetime/GC sample in all three modes.
+
+
+## Ad-hoc error union bridge (2026-10-13)
+
+Author-directed scope: permit `Result<T, E1 | E2>` and `?` propagation of either
+compatible error, without an inheritance/interface requirement or converters
+written solely to aggregate errors. Named domain errors and nominal unions remain
+preferable for many public APIs. This is a bounded integration task, not a change
+to the platform roadmap's ongoing runtime-performance priority.
+
+**Native intent:** structural union values retain an active value from the listed
+types and expose the alternatives in the contract. The native structural metadata,
+identity/normalization and backend operations remain future work.
+
+**Temporary representation:** Raven's existing `A | B` binding resolves ordinary
+`System.Union<A, B>` (arities two through five). The development System.Runtime
+library now owns source-authored parenthesized nominal carriers. Native emission
+uses ordinary generic nominal metadata, typed payload fields, constructors,
+extractors and the union marker; it does not introduce a structural runtime type.
+The documentation-only CLI reference projects those same declarations. Legacy
+executable CLI importer admission is unchanged.
+
+**Compiler ownership:** Raven main already executes the two-alternative error
+propagation on .NET. Shared lowering now reduces newly synthesized residual union
+conversions to carrier constructors. That general normalization is carried
+separately to `codex/source-object-metadata-resolution`; no branch merge is needed.
+Main commit `3abc0c954` and native commit `b6557ab85` retain the implementation.
+The native branch also omits case companions for parenthesized unions: they have
+existing type alternatives, not generated case declarations. Emitting a shared
+empty companion for several arities previously produced conflicting metadata.
+No Runtime Contract option is added; the existing explicit core/object/propagation
+configuration and selected System.Runtime reference still govern native compilation.
+
+**Costs and limits:** this follows Raven's .NET carrier semantics instead of adding
+runtime type machinery for the immediate language use case. It retains a nominal,
+ordered generic representation and an inactive default value, and callers may
+expose low-level errors as API dependencies. It does not establish structural
+normalization, arbitrary arity, union flattening or structural introspection.
+No allocation or performance improvement is claimed. Native structural TypeSpec
+and value operations must replace these carriers with a coordinated compiler,
+metadata, verifier, interpreter/JIT/AOT and introspection migration; rebuild
+consumers against matching artifacts when representation changes.
+
+See [source, commands and validation](experiments/adhoc-error-unions/README.md),
+[Union member reference](../api-docs/unions.md) and
+[structural design proposal](proposals/runtime-unions-and-intersection-types.md).
+The proposal remains exploratory; the bridge does not claim to implement it.

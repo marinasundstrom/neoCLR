@@ -1940,3 +1940,17 @@ It records exact HTTP source-set and compiler binary hashes instead of claiming 
 unavailable git revision; per-library artifact hashes retain the mixed bundle's
 identity. The audit retains the build evidence and normalized/restored sidecars.
 This is documentation provenance, not new runtime/compiler capability.
+
+
+### Ad-hoc error union carriers (2026-10-13)
+
+The aggregate reference now projects the source-authored temporary System.Union
+carriers of arities two through five. All four are included in the public type
+inventory, with constructor/extractor/HasValue/Value/ToString documentation and
+links from the [Union family page](unions.md). The bounded CLI projection accepts
+these exact parenthesized carriers for reference generation; executable legacy
+CLI importer admission is unchanged. Native libraries own their executable
+bodies. Native structural union identity and representation remain future work.
+Refresh the reference, XML, inventory and source snapshot together; no carrier is
+silently excluded. The website outcome example is extracted from the separately
+compiled configuration consumer fixture.
