@@ -16671,3 +16671,16 @@ relocated-package and instrumentation checks pass. The hosted macOS/Windows
 socket and relocated-package checks and Windows GC/root checks also pass at
 `ad3292e8a`; reports are linked from the integration direction. This consolidates source ownership without changing collection
 policy or claiming an alternative memory-manager implementation.
+
+### 2026-10-13 — Integrated product does not require one component or process
+
+The author clarified: “The point is that the experiments/POCs should be integrated
+so we can better optimize them. They can still be separate components in the
+architecture”. The assistant had described an in-process CLI composition boundary
+as remaining integration work. In response, the assistant corrected that framing:
+shared maintenance, contracts, builds, diagnostics and validation define integration;
+component/process consolidation requires its own demonstrated benefit. The existing
+backend library extraction remains useful, but replacing the CLI launcher is not a
+mandatory end state. Roadmap and integration guidance were updated accordingly.
+The library slice passed local hosting and execution-parity tests; its macOS/Windows
+product qualification was still running at the time of this clarification.

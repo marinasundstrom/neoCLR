@@ -45,8 +45,10 @@ archive target directories are retained where packaging requires them. The separ
 text/crypto static-library workspaces remain migration work, including preserving
 text LTO/size settings. This is not a completed source-layout or packaging migration. `src/jit_cli.rs`
 still launches the backend process; workspace membership alone does not create an
-in-process JIT service or a complete embedding API. The next library slice below
-provides the backend side of that boundary without changing the installed launcher.
+in-process JIT service or a complete embedding API. Neither is required merely
+to call the product integrated: the author clarified that architectural components
+may remain separate. The library slice below improves shared ownership and testing
+without changing the installed launcher.
 
 ## Native collector source ownership — 2026-10-13
 
@@ -158,11 +160,15 @@ There is no compilation cache, tiering or concurrent-session claim.
 
 The dependency direction remains backend → runtime; interpreter-only builds still
 exclude compiler dependencies. The installed runtime CLI still launches the backend
-process. Moving that CLI in-process requires a separate composition layer (or a
-shared runtime-core split), not a cyclic runtime → backend → runtime dependency.
+process. **Author clarification, 2026-10-13:** experiments/POCs should become
+integrated product components so they can be optimized together; they may remain
+separate architectural components. A process boundary is not by itself a defect.
+Evaluate any in-process composition or runtime-core split against measured startup,
+throughput, memory, observability and lifetime needs, rather than making it a
+mandatory migration. Avoid a cyclic runtime → backend → runtime dependency.
 AOT remains a separate publishing entry point into the same backend library.
-This follows the runtime-service/compilation-layer separation in the .NET comparison
-above; implementation of an embedding surface is still incomplete.
+The .NET runtime/compilation-layer comparison remains relevant, without prescribing
+identical component or process boundaries. A full embedding surface is future work.
 
 A hosting integration test invokes the library repeatedly, checks rejected writes
 preserve artifacts, compares library/CLI AOT bytes, exercises success/fault/success
@@ -236,11 +242,10 @@ No alternative collector or no-GC device distribution is implemented by this sli
 2. Move shared native runtime implementation out of documentation experiment paths,
    keeping fixtures and historical evidence separate. Update packaging/import recipes
    together; do not duplicate implementations or promote incomplete APIs by renaming.
-3. Extract the backend library/hosting boundary from the provisional CLI launcher;
-   a runtime-owned execution contract must account for session, fault and resource
-   lifetime. Avoid a runtime/backend dependency cycle: common metadata and runtime
-   services must be usable without importing the compiler. The exact crate split is
-   still to be selected. AOT can remain a separate publishing tool in the same product.
+3. Maintain the shared backend library and explicit hosting/lifetime contract.
+   Optimize component boundaries using measurements; a single process or crate is
+   not a completion criterion. Keep source ownership, build/release provenance,
+   diagnostics and execution-mode conformance integrated across components.
 4. Consolidate static-library builds, distribution manifests and backend naming.
 5. Extract the memory-manager contract from current allocation/root/cleanup behavior,
    then qualify build-selected implementations. Finish current helper-root and idle

@@ -9,8 +9,10 @@ and arena/context services under `runtime/native/memory`, with compatibility
 forwarding paths and GC/non-GC package relocation checks. Fault layout/rendering
 and opt-in POSIX diagnostics also have runtime-owned sources; remaining native
 services and package consolidation follow. The JIT/AOT backend now exposes an
-internal synchronous library driver; installed CLI execution remains process-based
-until its composition/hosting boundary is integrated and qualified. Memory management must permit future build-selected collectors and
+internal synchronous library driver. Integration means one maintained, measurable
+product, not one component or process (author clarification, 2026-10-13). Keep
+separate components where useful; the installed process-based launcher is not
+itself an integration defect. Memory management must permit future build-selected collectors and
 constrained profiles without requiring tracing GC; no live collector swapping is
 planned. Alternate profiles remain future work with explicit lifetime/capability
 requirements. This integration direction complements the performance work below;
