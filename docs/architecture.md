@@ -1,6 +1,6 @@
 # neoCLR architecture
 
-Current implementation overview, reviewed 2026-10-09. This describes the development
+Current implementation overview, reviewed 2026-10-13. This describes the development
 checkout, not a guarantee that every capability is in the published bundle. The
 [platform roadmap](platform-roadmap.md) remains the sequencing authority.
 
@@ -63,16 +63,35 @@ Implementation entry points: [container reader](../src/metadata_container.rs),
 
 ![Library, managed runtime, host services and OS layers](../website/runtime-layers.svg)
 
-The boxes group responsibilities, not process boundaries or an exhaustive service
-inventory. Interpreter and AOT coverage can differ. An HTTP library call ultimately
-uses socket adapters and OS resources while managed execution maintains its objects.
+The runtime has three central component groups:
 
-The Rust interpreter executes the prepared instruction model. It supplies managed
-storage and garbage collection, call/dispatch behavior, initialization, text and
-numeric operations, and explicit access to console, files, sockets and scheduling.
-The Raven library builds application APIs over these primitives and service contracts.
-A library method and a runtime service are different implementation layers even when
-both appear under familiar `System` names.
+| Component | Responsibility |
+| --- | --- |
+| Execution engines | JIT and interpreter execute the shared program model, preserving calls, control flow and runtime contracts. |
+| Memory management | Allocation, root publication, object/resource lifetime and collection. GC is the current managed policy; arena/context foundations do not yet provide interchangeable collectors. |
+| Scheduling and suspension | Dispatch ready work, integrate I/O waits, suspend activations and resume them while their live state remains rooted. |
+
+Metadata/loading, type services, initialization, faults, diagnostics and platform
+service bindings support these components. Boundaries describe responsibilities,
+not necessarily processes, crates or one implementation shared by every engine.
+The interpreter and native code currently use different internal memory machinery.
+JIT backend hosting can be in-process through the private component API, while the
+installed CLI still invokes a separate eager-compilation backend process. See
+[integration status](runtime-product-integration.md).
+
+Managed `Task` represents an operation, `Promise` its producer side, and `Scheduler`
+projects scheduling services. These APIs sit above the runtime's scheduling and
+suspension machinery. Suspended activations must publish their roots; resumption,
+collection and abandonment must preserve ownership and exactly-once cleanup.
+Runtime-await is the intended default neoCLR lowering; provider/SDK integration,
+library coverage and native Windows suspension qualification precede that switch.
+Compiler state machines remain a supported explicit fallback. The current native
+retained-stack carrier is macOS ARM64-specific, not a promise of target parity.
+
+The Raven library builds application APIs over these contracts. An HTTP operation
+uses socket adapters and OS resources while the scheduler tracks readiness and
+memory management keeps live request state reachable. Text and numeric primitives
+are runtime services too; a familiar `System` API need not be implemented in the VM.
 
 The current Raven target uses copied values and reference-semantic classes and managed
 arrays. Managed byrefs denote slots; unmanaged pointers belong to a separate interop
@@ -83,18 +102,19 @@ and [library/runtime boundary](raven-cli-bridge.md).
 
 ## Native compilation
 
-The [ARM64 AOT proof of concept](../tools/aot-poc/) consumes native metadata/IL,
-lowers its supported subset and links the required runtime support into an executable.
-Checked workloads include library routing and bounded HTTP serving; this is broader
-than the initial scalar experiment, but not general native parity. Unsupported
-instructions, metadata or service contracts must remain visible limitations.
-Self-contained deployment still needs GC, text, I/O and fault implementations and
-an explicit policy for OS/foreign dependencies.
+AOT is a **compilation and publishing target**, not a third execution engine.
+The [shared native backend](../tools/aot-poc/) lowers admitted metadata/IL for both
+JIT and AOT. Publishing links a native image with the runtime services it requires;
+running that image needs neither the JIT compiler nor interpreter. GC, scheduling,
+text, I/O and fault services still exist in the published program.
 
-JIT, general native AOT, native hot reload and a stable hosting ABI remain open.
-Trimming is future work; compiling a dependency set does not establish safe removal
-of dynamically used code or metadata. See [execution architecture requirements](execution-architecture.md)
-and [current native evidence](../benchmarks/native-web/README.md).
+JIT and AOT are integrated product components despite historical POC directory and
+binary names. Their supported profiles and workloads remain bounded; packaging does
+not establish general native parity. Development JIT bundles select JIT on macOS
+ARM64 and Windows x64, with explicit interpreter execution retained. See the
+[execution architecture](execution-architecture.md), [integration evidence](runtime-product-integration.md)
+and [roadmap](platform-roadmap.md) for target-specific status. Native hot reload,
+trimming and a stable public hosting ABI remain separate work.
 
 ## Bootstrap and compatibility boundaries
 

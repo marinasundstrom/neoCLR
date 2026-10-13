@@ -1,32 +1,43 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 660" role="img" aria-labelledby="title desc">
-<title id="title">Runtime layers and services</title>
-<desc id="desc">Applications use Raven library APIs. Library code executes through the interpreter or supported AOT backend. Managed execution provides calls, storage and GC, text and numbers, and task scheduling. Service adapters connect console, files, sockets and native interop to OS resources. Layers show responsibilities, not separate processes.</desc>
-<rect width="720" height="660" rx="12" fill="#f5f7fb"/>
-<style>text{font-family:system-ui,sans-serif;fill:#14283e;text-anchor:middle}.label{font-size:18px;font-weight:600}.item{font-size:16px}.box{fill:white;stroke:#5279a5;stroke-width:1.5}.band{fill:#e5edf7;stroke:#b3c6dd}</style>
-<text x="360" y="32" class="label">Runtime layers and services</text>
-<rect class="box" x="20" y="52" width="680" height="57" rx="8"/>
-<text x="360" y="87" class="label">Applications · Raven programs</text>
-<path d="M360 111v18m-6-6 6 6 6-6" fill="none" stroke="#365b86" stroke-width="2"/>
-<rect class="band" x="20" y="135" width="680" height="95" rx="8"/>
-<text x="360" y="162" class="label">Raven class library · modules</text>
-<rect class="box" x="34" y="175" width="210" height="40" rx="5"/><text class="item" x="139" y="201">Collections · JSON</text>
-<rect class="box" x="254" y="175" width="210" height="40" rx="5"/><text class="item" x="359" y="201">Tasks · Storage</text>
-<rect class="box" x="474" y="175" width="210" height="40" rx="5"/><text class="item" x="579" y="201">Networking · HTTP</text>
-<path d="M360 233v18m-6-6 6 6 6-6" fill="none" stroke="#365b86" stroke-width="2"/>
-<rect class="band" x="20" y="257" width="680" height="174" rx="8"/>
-<text x="360" y="284" class="label">Managed execution and runtime primitives</text>
-<text x="360" y="309" class="item">Interpreter / supported ARM64 AOT code + linked support</text>
-<rect class="box" x="34" y="323" width="320" height="42" rx="5"/><text class="item" x="194" y="350">Calls · dispatch · initialization</text>
-<rect class="box" x="366" y="323" width="320" height="42" rx="5"/><text class="item" x="526" y="350">Managed storage · roots · GC</text>
-<rect class="box" x="34" y="375" width="320" height="42" rx="5"/><text class="item" x="194" y="402">UTF-8 text · numeric operations</text>
-<rect class="box" x="366" y="375" width="320" height="42" rx="5"/><text class="item" x="526" y="402">Queues · scheduling · Faults</text>
-<path d="M360 434v18m-6-6 6 6 6-6" fill="none" stroke="#365b86" stroke-width="2"/>
-<rect class="band" x="20" y="458" width="680" height="93" rx="8"/>
-<text x="360" y="485" class="label">Host service and interop boundary</text>
-<rect class="box" x="34" y="499" width="210" height="38" rx="5"/><text class="item" x="139" y="524">Console · files</text>
-<rect class="box" x="254" y="499" width="210" height="38" rx="5"/><text class="item" x="359" y="524">DNS · sockets · clocks</text>
-<rect class="box" x="474" y="499" width="210" height="38" rx="5"/><text class="item" x="579" y="524">Native interop</text>
-<path d="M360 554v18m-6-6 6 6 6-6" fill="none" stroke="#365b86" stroke-width="2"/>
-<rect class="box" x="20" y="578" width="680" height="57" rx="8"/>
-<text x="360" y="612" class="label">Operating system and explicit foreign libraries</text>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 855" role="img" aria-labelledby="title desc">
+<title id="title">Runtime components and service boundaries</title><desc id="desc">Applications and managed libraries use execution engines, memory management and scheduling with suspension and resumption. JIT and interpreter are execution engines. AOT-produced native code uses runtime services without requiring either engine. Platform services connect the runtime to the operating system.</desc>
+<rect width="900" height="855" rx="12" fill="#f5f7fb"/>
+<style>text{font-family:system-ui,sans-serif;fill:#14283e;text-anchor:middle}.title{font-size:23px;font-weight:600}.label{font-size:19px;font-weight:600}.item{font-size:16px}.box{fill:white;stroke:#5279a5;stroke-width:1.5}.band{fill:#e5edf7;stroke:#b3c6dd}.arrow{fill:none;stroke:#365b86;stroke-width:2;marker-end:url(#arrow)}</style>
+<defs><marker id="arrow" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0 0 L8 4 L0 8Z" fill="#365b86"/></marker></defs>
+<text x="450" y="36" class="title">Runtime components and service boundaries</text>
+<rect class="box" x="30" y="60" width="840" height="76" rx="8"/>
+<text x="450.0" y="89" class="label">Applications and managed libraries</text>
+<text x="450.0" y="115" class="item">Tasks and Promises · collections · JSON · streams · HTTP · SQL</text>
+<path d="M450 138 V164" class="arrow"/>
+<rect class="band" x="20" y="170" width="860" height="380" rx="10"/>
+<text x="450" y="200" class="label">neoCLR runtime · integrated, modular components</text>
+<rect class="box" x="35" y="220" width="270" height="140" rx="8"/>
+<text x="170.0" y="249" class="label">Execution engines</text>
+<text x="170.0" y="275" class="item">JIT · interpreter</text>
+<text x="170.0" y="299" class="item">Calls and control flow</text>
+<text x="170.0" y="323" class="item">Native code generation</text>
+<rect class="box" x="315" y="220" width="270" height="140" rx="8"/>
+<text x="450.0" y="249" class="label">Memory management</text>
+<text x="450.0" y="275" class="item">Allocation · roots · GC</text>
+<text x="450.0" y="299" class="item">Object/resource lifetimes</text>
+<text x="450.0" y="323" class="item">Arena/context foundations</text>
+<rect class="box" x="595" y="220" width="270" height="140" rx="8"/>
+<text x="730.0" y="249" class="label">Scheduling &amp; suspension</text>
+<text x="730.0" y="275" class="item">Ready work and I/O waits</text>
+<text x="730.0" y="299" class="item">Suspend · retain · resume</text>
+<text x="730.0" y="323" class="item">Runtime-owned scheduling</text>
+<rect class="box" x="35" y="378" width="830" height="76" rx="8"/>
+<text x="450.0" y="407" class="label">Shared runtime contracts</text>
+<text x="450.0" y="433" class="item">Metadata and types · initialization · faults · diagnostics · service bindings</text>
+<text x="450" y="484" class="item">Suspended activations publish roots; memory management preserves live state.</text>
+<text x="450" y="514" class="item">Managed Task/Promise APIs project operations over these runtime services.</text>
+<path d="M450 552 V574" class="arrow"/>
+<rect class="box" x="30" y="580" width="840" height="76" rx="8"/>
+<text x="450.0" y="609" class="label">Platform services and interop</text>
+<text x="450.0" y="635" class="item">Console · files · sockets · clocks · security · explicit native libraries</text>
+<path d="M450 658 V684" class="arrow"/>
+<rect class="box" x="30" y="690" width="840" height="76" rx="8"/>
+<text x="450.0" y="719" class="label">Operating system</text>
+<text x="450.0" y="745" class="item">Platform-specific implementations behind runtime contracts</text>
+<text x="450" y="805" class="item">AOT-produced code also uses runtime services; it does not require an execution engine.</text>
+<text x="450" y="832" class="item">This component model does not imply equal coverage or interchangeable GC implementations.</text>
 </svg>

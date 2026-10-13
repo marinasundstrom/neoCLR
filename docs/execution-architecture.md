@@ -4,17 +4,18 @@ For a current implementation overview and service-layer diagrams, start with
 [neoCLR architecture](architecture.md). This document retains the architectural
 requirements and the sequence of native experiments.
 
-Status (2026-10-11): interpretation and bounded native AOT profiles are implemented;
-see the [roadmap](platform-roadmap.md) for platform/workload qualification. Private
-[scalar and managed JIT probes](experiments/jit-managed/README.md) now share native
-lowering on macOS ARM64. General embedding and hot reload remain design work. Earlier
-experiment descriptions below preserve their historical scope.
+Status (2026-10-13): JIT and interpreter are execution engines in the integrated
+runtime; native AOT is a compilation/publishing target using the same native backend
+and runtime service contracts. Memory management and scheduling/suspension are
+separate collaborating components. See the [component diagrams](architecture.md)
+and [integration status](runtime-product-integration.md). Implementation and target
+coverage differ; historical experiment descriptions below retain their original scope.
 
-The [latest author direction](platform-direction.md#execution-direction-clarified-2026-10-11)
-selects JIT as the eventual supported-platform default and AOT as the preferred deployment
-target, retaining full interpreter support. Explicit future AOT/interpreter hybrids may
-serve dynamic-code use where platform policy permits; constrained-device targets and
-cross-target hot reload require separate qualification. Current CLI defaults are unchanged.
+Development JIT bundles select JIT on macOS ARM64 and Windows x64. Explicit
+interpreter execution remains supported. AOT is the preferred deployment direction.
+Runtime-await is the intended default neoCLR lowering, independently of engine and
+collector policy; provider/SDK and Windows carrier qualification remain prerequisites.
+General embedding, hot reload and constrained-device profiles require separate work.
 
 Interpretation, JIT, and native AOT are platform-wide architectural concerns. They
 influence the type system, metadata, instructions, linking, verification, library,

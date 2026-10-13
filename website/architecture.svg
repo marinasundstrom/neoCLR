@@ -1,29 +1,41 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 660 720" role="img" aria-labelledby="title desc">
-<title id="title">From source to execution</title><desc id="desc">Source is compiled into metadata and instructions, decoded and linked, then verified. Execution uses the interpreter or the bounded ARM64 AOT backend and runtime services.</desc>
-<rect width="660" height="720" rx="12" fill="#f5f7fb"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 825" role="img" aria-labelledby="title desc">
+<title id="title">From source to execution and publishing</title><desc id="desc">Verified neoCLR code runs through JIT or interpreter execution engines, or is published through AOT into a native image. Both paths use runtime memory, scheduling and platform services. AOT is a publishing target, not a third runtime engine.</desc>
+<rect width="900" height="825" rx="12" fill="#f5f7fb"/>
+<style>text{font-family:system-ui,sans-serif;fill:#14283e;text-anchor:middle}.title{font-size:23px;font-weight:600}.label{font-size:19px;font-weight:600}.item{font-size:16px}.box{fill:white;stroke:#5279a5;stroke-width:1.5}.band{fill:#e5edf7;stroke:#b3c6dd}.arrow{fill:none;stroke:#365b86;stroke-width:2;marker-end:url(#arrow)}</style>
 <defs><marker id="arrow" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0 0 L8 4 L0 8Z" fill="#365b86"/></marker></defs>
-<text x="330" y="35" text-anchor="middle" font-family="system-ui, sans-serif" font-size="20" fill="#14283e">From source to execution</text>
-<rect x="25" y="60" width="610" height="76" rx="8" fill="#ffffff" stroke="#5279a5"/>
-<text x="330" y="89" text-anchor="middle" font-family="system-ui, sans-serif" font-size="19" font-weight="600" fill="#14283e">Raven source / neoIL source</text>
-<text x="330" y="115" text-anchor="middle" font-family="system-ui, sans-serif" font-size="16" fill="#304b66">Compiler with native target / assembler</text>
-<path d="M330 138 V161" stroke="#365b86" stroke-width="2" marker-end="url(#arrow)"/>
-<rect x="25" y="165" width="610" height="76" rx="8" fill="#ffffff" stroke="#5279a5"/>
-<text x="330" y="194" text-anchor="middle" font-family="system-ui, sans-serif" font-size="19" font-weight="600" fill="#14283e">Native metadata + instruction bodies</text>
-<text x="330" y="220" text-anchor="middle" font-family="system-ui, sans-serif" font-size="16" fill="#304b66">PE with #Neo or standalone NEOX; JSON for tooling</text>
-<path d="M330 243 V266" stroke="#365b86" stroke-width="2" marker-end="url(#arrow)"/>
-<rect x="25" y="270" width="610" height="76" rx="8" fill="#ffffff" stroke="#5279a5"/>
-<text x="330" y="299" text-anchor="middle" font-family="system-ui, sans-serif" font-size="19" font-weight="600" fill="#14283e">Decode, resolve and prepare</text>
-<text x="330" y="325" text-anchor="middle" font-family="system-ui, sans-serif" font-size="16" fill="#304b66">Explicit dependencies, identities and bound references</text>
-<path d="M330 348 V371" stroke="#365b86" stroke-width="2" marker-end="url(#arrow)"/>
-<rect x="25" y="375" width="610" height="76" rx="8" fill="#ffffff" stroke="#5279a5"/>
-<text x="330" y="404" text-anchor="middle" font-family="system-ui, sans-serif" font-size="19" font-weight="600" fill="#14283e">Typed verification</text>
-<text x="330" y="430" text-anchor="middle" font-family="system-ui, sans-serif" font-size="16" fill="#304b66">Check instructions, stack types and call contracts</text>
-<path d="M330 453 V476" stroke="#365b86" stroke-width="2" marker-end="url(#arrow)"/>
-<rect x="25" y="480" width="610" height="76" rx="8" fill="#ffffff" stroke="#5279a5"/>
-<text x="330" y="509" text-anchor="middle" font-family="system-ui, sans-serif" font-size="19" font-weight="600" fill="#14283e">Interpreter / ARM64 AOT proof of concept</text>
-<text x="330" y="535" text-anchor="middle" font-family="system-ui, sans-serif" font-size="16" fill="#304b66">AOT lowers supported code and links a native executable</text>
-<path d="M330 558 V581" stroke="#365b86" stroke-width="2" marker-end="url(#arrow)"/>
-<rect x="25" y="585" width="610" height="76" rx="8" fill="#ffffff" stroke="#5279a5"/>
-<text x="330" y="614" text-anchor="middle" font-family="system-ui, sans-serif" font-size="19" font-weight="600" fill="#14283e">Runtime services and operating system</text>
-<text x="330" y="640" text-anchor="middle" font-family="system-ui, sans-serif" font-size="16" fill="#304b66">Managed storage, GC, text, queues, I/O and native interop</text>
+<text x="450" y="36" class="title">From source to execution and publishing</text>
+<rect class="box" x="30" y="60" width="840" height="76" rx="8"/>
+<text x="450.0" y="89" class="label">Raven compiler / neoIL assembler</text>
+<text x="450.0" y="115" class="item">Language semantics → neoCLR metadata and IL</text>
+<path d="M450 138 V164" class="arrow"/>
+<rect class="box" x="30" y="170" width="840" height="76" rx="8"/>
+<text x="450.0" y="199" class="label">Load, resolve and verify</text>
+<text x="450.0" y="225" class="item">Shared metadata identity, type rules and capability contracts</text>
+<path d="M450 248 V263 H235 V284" class="arrow"/>
+<path d="M450 263 H665 V284" class="arrow"/>
+<rect class="box" x="30" y="290" width="410" height="118" rx="8"/>
+<text x="235.0" y="319" class="label">Execution engines</text>
+<text x="235.0" y="345" class="item">Interpreter: execute IL</text>
+<text x="235.0" y="369" class="item">JIT: compile and execute native code</text>
+<text x="235.0" y="393" class="item">Selected when running the program</text>
+<rect class="box" x="460" y="290" width="410" height="118" rx="8"/>
+<text x="665.0" y="319" class="label">AOT compilation / publishing</text>
+<text x="665.0" y="345" class="item">Compile ahead of execution</text>
+<text x="665.0" y="369" class="item">Link a native image with runtime support</text>
+<text x="665.0" y="393" class="item">Selected when publishing the program</text>
+<path d="M665 410 V434" class="arrow"/>
+<rect class="box" x="460" y="440" width="410" height="76" rx="8"/>
+<text x="665.0" y="469" class="label">AOT native image</text>
+<text x="665.0" y="495" class="item">Runs without a JIT or interpreter</text>
+<path d="M235 410 V550" class="arrow"/>
+<path d="M665 518 V534 H665 V550" class="arrow"/>
+<rect class="band" x="30" y="556" width="840" height="100" rx="8"/>
+<text x="450.0" y="585" class="label">Runtime contracts and services</text>
+<text x="450.0" y="611" class="item">Memory management · scheduling, suspension and resumption</text>
+<text x="450.0" y="635" class="item">Type services · faults · diagnostics · I/O and interop</text>
+<path d="M450 658 V684" class="arrow"/>
+<rect class="box" x="30" y="690" width="840" height="76" rx="8"/>
+<text x="450.0" y="719" class="label">Platform services</text>
+<text x="450.0" y="745" class="item">Operating system and explicit native dependencies</text>
+<text x="450" y="803" class="item">Logical architecture; capabilities and implementations vary by target.</text>
 </svg>

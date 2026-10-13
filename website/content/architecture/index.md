@@ -21,12 +21,19 @@ explains declarations, imports, ownership and the current limits.
 
 ![Applications, library, managed execution, host services and operating system](../runtime-layers.svg)
 
-The boxes group responsibilities, not separate processes or an exhaustive API inventory.
-Applications call Raven library code for collections, JSON, Tasks, Storage and HTTP.
-That code runs through the interpreter or supported native backend. Runtime primitives
-provide calls, managed storage, garbage collection, text, numeric operations and queues.
-Host adapters connect those operations to external resources such as files and sockets.
-Not every service has identical interpreter and AOT coverage yet.
+The runtime separates three central responsibilities:
+
+- **Execution engines:** JIT and interpreter execute managed programs.
+- **Memory management:** allocation, roots, GC and object lifetimes.
+- **Scheduling and suspension:** ready work, I/O waits, suspension and resumption.
+
+Managed Tasks and Promises describe operations above these services. A suspended
+operation keeps its live state rooted until it resumes or is abandoned. Metadata,
+types, faults, diagnostics and platform adapters support the components.
+
+**AOT is a publishing target.** Its output uses the runtime services it needs without
+requiring a JIT or interpreter. Integration keeps these components part of one product;
+it does not require one implementation or identical coverage on every target.
 
 For example, an HTTP handler uses the Web library to parse and route a request. Library
 code uses networking services to read and write bytes; runtime support maintains managed
@@ -53,8 +60,11 @@ code; execution creates the live objects and other program state. Read
 | --- | --- |
 | Compiler and project tools | Source semantics, native symbol import, target emission and editor integration |
 | Metadata, loader and verifier | Definition identity, dependencies, signatures and executable-code checks |
-| Execution backend | Calls, control flow, storage operations and the selected execution mode |
-| Runtime primitives and services | GC, text/numbers, initialization, scheduling, Faults and host resource access |
+| Execution engines | JIT and interpreter; calls, control flow and execution contracts |
+| Memory management | Allocation, roots, object lifetimes and collection |
+| Scheduling and suspension | Ready work, I/O waits and suspended activation lifetimes |
+| AOT publishing | Native compilation and linking with required runtime support |
+| Supporting runtime services | Type services, text/numbers, initialization, faults, diagnostics and host resource access |
 | Raven library | Modules organizing application APIs, built from library code and explicit service contracts |
 
 The current Raven target has copied values and reference-semantic classes and arrays.
@@ -69,10 +79,10 @@ verification and backend code, not just Raven syntax.
 
 The Rust interpreter runs the native instruction model without requiring .NET to be
 installed. Raven's compiler and editor tooling have their own .NET dependency.
-The [ARM64 AOT proof of concept](../features/native-compilation/) lowers supported
+The [native AOT target](../features/native-compilation/) lowers supported
 metadata/IL and links runtime support into a standalone executable. Checked cases
 include routing and bounded HTTP serving; general interpreter/native parity is open.
-A native executable still needs implementations of GC, text, queues, I/O and Faults.
+A native executable still needs implementations of memory management, scheduling, text, I/O and faults.
 
 **Development:** JIT bundles default to native JIT execution on macOS ARM64 and
 Windows x64. Interpreter execution remains available explicitly and is the default
@@ -80,6 +90,13 @@ on other hosts. JIT currently compiles eagerly through a separate backend proces
 Broader native parity, native hot reload and trimming remain future work.
 [Setup](../try/) describes the available toolchain, and
 [native compilation](../features/native-compilation/) lists its execution limits.
+
+**Direction:** runtime-await is the intended default for neoCLR. The current native
+retained-stack carrier is qualified on macOS ARM64; Windows suspension and the
+provider/SDK integration remain work before a general default switch. Compiler
+state machines remain an explicit fallback. This is independent of GC pacing.
+Memory-management boundaries also leave room for future specialized distributions;
+swappable collectors or general non-GC managed execution are not current features.
 
 ## Relationship to .NET
 

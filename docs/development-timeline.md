@@ -25,6 +25,39 @@ available original wording; other text is a summary.
 
 See the [changelog](../CHANGELOG.md) and linked design documents for technical status.
 
+## 2026-10-13 — Name the integrated runtime components
+
+- **Author:** proposes Execution (JIT, interpreter), GC, Scheduler including
+  suspension/resumption, and AOT as a target; asks for better names and updated
+  architectural diagrams.
+- **Assistant proposal and implementation:** use **Execution engines**, **Memory
+  management**, and **Scheduling and suspension** as component groups; show **AOT
+  compilation/publishing** as a separate path whose output uses runtime services.
+  Keep metadata/type services, faults, diagnostics and platform bindings visible.
+  Update both [architecture diagrams](architecture.md) and the website explanation.
+- **Boundary:** component integration preserves modularity. Memory management is a
+  broader responsibility than GC, but this wording does not claim interchangeable
+  collectors, a new stable ABI or equal backend/platform coverage. Managed
+  Task/Promise/Scheduler APIs remain projections above runtime mechanisms.
+
+## 2026-10-13 — Runtime-await as the default lowering
+
+- **Author:** during scheduler idle/pacing qualification, reiterates: “we want
+  runtime-await lowering to be default”.
+- **Assistant response:** agrees that runtime-await is the intended neoCLR default,
+  distinct from the collector pacing choice; compiler state machines remain an
+  explicit fallback. Ordinary Raven/.NET lowering stays separate.
+- **Inspection:** native projects still explicitly select
+  `RavenNeoClrRuntimeAsyncHelper`; the provider is source-included and the current
+  native retained-stack carrier is gated to macOS ARM64. A project-default flip
+  alone would not provide Windows execution support.
+- **Next work:** integrate the provider/runtime capability contract, qualify the
+  Windows carrier and library lowering, then change SDK/project defaults with an
+  explicit state-machine fallback. Current managed HTTP/state-machine checks and
+  macOS runtime-await checks are complementary evidence, not platform-wide default
+  qualification. See the [runtime-await contract](experiments/runtime-async/README.md)
+  and [active roadmap](platform-roadmap.md).
+
 ## 2026-10-13 — HTTP byte processing and comparison with Go
 
 - **Author:** reiterates the goal of comparing neoCLR with Go and proposes examining
