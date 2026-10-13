@@ -1,5 +1,23 @@
 # neoCLR platform roadmap
 
+**Concurrent execution direction (2026-10-13):** the author asks to inspect runtime
+scheduling alongside HTTP work: scheduling and suspension are intended to improve
+concurrent asynchronous execution. Evaluate wakeup-to-resume latency, ready-work
+fairness, idle CPU, dispatch/GC boundary costs and HTTP throughput together. Runtime
+suspension must release execution capacity while waiting; it does not by itself
+prove a speedup or parallel execution. Preserve completed-task fast paths and
+compare equivalent pending-work cases with compiler state machines.
+
+Initial source inspection finds that `src/scheduler.rs` uses a 10 ms fallback:
+socket readiness does not signal its wake latch. `src/invocation.rs` parks without
+holding graph or dispatch access. The native host's `socket-listener.c` separately
+polls its operation table and delivers one callback per safe boundary. These are
+optimization candidates, not measured causes of JIT/AOT HTTP overhead. Next gather
+ready/empty poll counts, wakeup latency, resumes and boundary costs under concurrent
+plain-text/JSON requests, including slow peers. Compare execution modes separately;
+do not replace waits with busy spinning or batch deliveries across unverified root
+ownership boundaries. No scheduler implementation change or speedup is claimed.
+
 **HTTP direction (2026-10-13):** the author reaffirms HTTP specification compliance
 and established byte-oriented, bounded-I/O optimizations. [Streaming evidence and
 next conformance slice](experiments/http-body-stream/README.md#author-direction-protocol-first)

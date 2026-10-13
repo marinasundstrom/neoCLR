@@ -8,6 +8,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-13
 
+- Record the author-directed scheduling/suspension evaluation alongside concurrent
+  HTTP work, distinguishing source-inspected polling gaps from unmeasured performance
+  hypotheses. Define latency, fairness, idle CPU and dispatch/GC measurement criteria;
+  no scheduler optimization or speedup is claimed.
+
 - Add demand-driven incoming HTTP body streams through client headers-first completion
   and server AcceptHeaders, retaining bounded read-ahead, framing validation,
   cancellation and explicit response/content ownership. Buffered calls remain the

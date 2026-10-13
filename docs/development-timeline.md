@@ -16506,3 +16506,20 @@ qualification. Request and response deadline documentation now includes TLS work
 - **Open:** chunk extensions/trailers, other HTTP conformance gaps, Windows/TLS
   streaming qualification, unknown-length output, streaming JSON and performance
   work. Website publication remains held; no new cross-platform speed claim.
+
+## 2026-10-13 — Scheduling and suspension must benefit concurrent work
+
+- **Author:** asked to inspect runtime scheduling because it affects program
+  throughput, then clarified that scheduling and suspension are supposed to improve
+  execution of concurrent asynchronous work.
+- **Assistant:** agreed to assess prompt/fair dispatch, release of execution capacity
+  during waits and efficient resumption, alongside HTTP parsing, I/O and GC. Proposed
+  measurements of wakeup latency, dispatch overhead, idle CPU and concurrent HTTP
+  throughput rather than assuming scheduling is the dominant cost.
+- **Inspected:** the VM scheduler has a 10 ms fallback because socket readiness does
+  not signal its wake latch; invocation parking releases graph/dispatch access.
+  The native socket host has separate operation-table polling and callback ownership
+  rules. These observations are not a measured cross-mode bottleneck diagnosis.
+- **Outcome/open:** [roadmap](platform-roadmap.md) records the investigation criteria.
+  The incoming-stream slice is committed as `b95150c87`; scheduler instrumentation,
+  matched concurrency measurements and any resulting optimization remain open.
