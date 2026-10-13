@@ -123,6 +123,7 @@ jobs:
             target/windows-jit-validation/*.json
             target/windows-jit-validation/*.log
             target/windows-jit-validation/http/
+            target/windows-jit-validation/*-wait-profile/*.json
             target/windows-jit-validation/http-benchmark/results.json
             target/windows-jit-validation/http-benchmark/*-native/build.json
             target/windows-jit-validation/framework/

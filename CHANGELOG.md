@@ -8,6 +8,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-13
 
+- Add opt-in Windows AOT HTTP attribution runs after the matched benchmark, recording
+  whole-process collector time, socket-poll time, scheduler pauses and process CPU.
+  Validate response output, poll accounting and complete final reclamation; diagnostic
+  runs are separate from uninstrumented throughput and do not change shipping hosts.
+
 - Add a dedicated website GC benchmark report with separate macOS and Windows
   paired HTTP results, allocation/reclamation diagnostics, methodology and immutable
   raw evidence. Link it from benchmark history, overview, guides and the GC page;

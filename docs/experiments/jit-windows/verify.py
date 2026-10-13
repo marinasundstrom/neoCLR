@@ -84,6 +84,10 @@ def main():
             run([sys.executable, ROOT/'benchmarks/http-server/windows-root-observation.py',
                  '--bundle', installed, '--host-recipe', out/'jit-install/preparation.json',
                  '--output', out/'http-benchmark'], 'http-benchmark')
+            for case in ['plain', 'json']:
+                run([sys.executable, ROOT/'benchmarks/http-scheduling/windows-profile.py',
+                     '--build', out/'http-benchmark'/f'{case}-native/build.json',
+                     '--workload', case, '--output', out/f'{case}-wait-profile'], f'{case}-wait-profile')
             report['passed'] = True
             return
         if args.http_focus:

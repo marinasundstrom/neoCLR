@@ -251,3 +251,18 @@ The [isolated pacing experiment](../http-gc-pacing/README.md) measures large HTT
 improvements but rejects its candidate on a reproducible large-allocation admission
 counterexample. It identifies the next correctness contract; it does not change the
 shipping collector or establish the value of generational collection.
+
+## Windows wait attribution
+
+The Windows JIT workflow's `benchmark_roots` scope now follows uninstrumented
+measurements with two diagnostic AOT runs each for plain text and JSON.
+`windows-profile.py` consumes the passing native build record and relinks identical
+guest objects with private clock hooks. `windows-counters.c` uses QPC wall intervals
+and process CPU counters; it records socket polling, host scheduler pauses and GC.
+These are whole-worker counters including startup, warmup and shutdown. Poll time
+can include nested runtime work; categories must not be blindly summed. Response
+validation, poll accounting, zero collector failures and final reclamation are
+required. Results will determine whether collector work or waiting warrants the
+next change. This extends existing diagnostic tooling, not the public profiler ABI
+or managed Scheduler contract; .NET/CLR comparison and collector research above
+remain applicable. No production scheduling policy changes in this slice.
