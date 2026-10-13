@@ -181,7 +181,7 @@ def main():
         for folder in [HERE, HERE.parent / 'aot-console', HERE.parent / 'runtime-async', HERE.parent / 'aot-fault-details']:
             for path in folder.iterdir():
                 if path.suffix in ('.h', '.c'): report['inputsSha256'][str(path)] = sha(path)
-        for path in [Path(__file__).resolve(), CLIENT]: report['inputsSha256'][str(path)] = sha(path)
+        for path in [*sorted((ROOT / 'runtime/native').rglob('*.[ch]')), Path(__file__).resolve(), CLIENT]: report['inputsSha256'][str(path)] = sha(path)
         aot = [str(out / 'server')]
         jit = [native[0], '--jit-run', *native[1:]]
         jit[5] = str(out / 'host.dylib')

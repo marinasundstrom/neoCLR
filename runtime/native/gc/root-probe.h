@@ -2,7 +2,7 @@
 #define NEOCLR_AOT_ROOT_PROBE_H
 /* Match the compiler selected-function budget in tools/aot-poc/src/limits.rs. */
 #define NEOCLR_NATIVE_FUNCTION_LIMIT 2048
-#include "../../../docs/experiments/aot-fault-details/fault-details.h"
+#include "../faults/fault-details.h"
 #include <stdint.h>
 #include <stddef.h>
 #ifdef NEOCLR_NATIVE_GC

@@ -28,6 +28,7 @@ on:
       - 'runtime/native/**'
       - 'scripts/test_native_gc_layout.py'
       - 'tools/native/arena-context-test.c'
+      - 'tools/native/fault-render-test.c'
       - 'docs/experiments/aot-console/native-gc*'
       - 'docs/experiments/aot-console/root-probe*'
       - 'docs/experiments/aot-console/text-arena*'
@@ -42,6 +43,7 @@ on:
       - 'runtime/native/**'
       - 'scripts/test_native_gc_layout.py'
       - 'tools/native/arena-context-test.c'
+      - 'tools/native/fault-render-test.c'
       - 'docs/experiments/aot-console/native-gc*'
       - 'docs/experiments/aot-console/root-probe*'
       - 'docs/experiments/aot-console/text-arena*'
@@ -79,6 +81,9 @@ jobs:
       - name: Qualify relocated macOS collector package
         if: runner.os == 'macOS'
         run: python3 -m unittest discover -s scripts -p test_native_gc_layout.py
+      - name: Qualify macOS profiler attachment
+        if: runner.os == 'macOS'
+        run: python3 docs/experiments/runtime-diagnostics/test_attach.py
       - name: Run Windows socket contracts
         if: runner.os == 'Windows'
         shell: pwsh

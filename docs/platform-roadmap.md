@@ -6,7 +6,8 @@ The [integration direction](runtime-product-integration.md) starts with a shared
 workspace/build and validation entry point, now qualified locally and on hosted
 macOS/Windows. The shared native collector and root-frame services now live under `runtime/native/gc`,
 and arena/context services under `runtime/native/memory`, with compatibility
-forwarding paths and GC/non-GC package relocation checks; remaining native
+forwarding paths and GC/non-GC package relocation checks. Fault layout/rendering
+and opt-in POSIX diagnostics also have runtime-owned sources; remaining native
 services, JIT hosting and package consolidation follow. Memory management must permit future build-selected collectors and
 constrained profiles without requiring tracing GC; no live collector swapping is
 planned. Alternate profiles remain future work with explicit lifetime/capability

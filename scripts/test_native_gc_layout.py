@@ -61,6 +61,19 @@ class NativeGcLayoutTests(unittest.TestCase):
                         result = subprocess.run([str(binary)], capture_output=True, text=True, timeout=30)
                         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
 
+            fixture = root / 'fault-render-test.c'
+            shutil.copy2(ROOT / 'tools/native/fault-render-test.c', fixture)
+            for direct in [False, True]:
+                fault_dir = root / ('runtime/native/faults' if direct else 'docs/experiments/aot-fault-details')
+                binary = root / ('fault-' + str(direct) + ('.exe' if windows else ''))
+                includes = ['/I' + str(fault_dir)] if windows else ['-I', str(fault_dir)]
+                command = cc + includes + [str(fault_dir / 'render.c'), str(fixture)]
+                command += ['/Fe:' + str(binary)] if windows else ['-o', str(binary)]
+                result = subprocess.run(command, cwd=root, capture_output=True, text=True, timeout=60)
+                self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+                result = subprocess.run([str(binary)], capture_output=True, text=True, timeout=30)
+                self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+
             spec = importlib.util.spec_from_file_location('gc_phases', ROOT / 'benchmarks/http-scheduling/gc_phases.py')
             phases = importlib.util.module_from_spec(spec)
             spec.loader.exec_module(phases)

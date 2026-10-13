@@ -30,7 +30,7 @@ class AttachTests(unittest.TestCase):
         subprocess.run([*shlex.split(os.environ.get('CC', 'clang')),
                         *shlex.split(os.environ.get('CFLAGS', '')), '-std=c11', '-g', '-O1', '-Wall', '-Wextra', '-Werror',
                         '-fsanitize=undefined,bounds', '-DNEOCLR_GC_PROFILE', '-DNEOCLR_DIAGNOSTICS',
-                        str(HERE / 'host-test.c'), str(HERE / 'attach.c'), str(native / 'native-gc.c'),
+                        str(HERE / 'host-test.c'), str(ROOT / 'runtime/native/diagnostics/attach.c'), str(native / 'native-gc.c'),
                         str(native / 'root-probe.c'), '-pthread', '-o', cls.binary], check=True)
 
     @classmethod

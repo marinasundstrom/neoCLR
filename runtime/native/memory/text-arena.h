@@ -1,6 +1,6 @@
 #ifndef NEOCLR_AOT_TEXT_ARENA_H
 #define NEOCLR_AOT_TEXT_ARENA_H
-#include "../../../docs/experiments/aot-fault-details/fault-details.h"
+#include "../faults/fault-details.h"
 #ifndef NEOCLR_NATIVE_BYTE_ARRAY_LIMIT
 #define NEOCLR_NATIVE_BYTE_ARRAY_LIMIT 65536
 #endif

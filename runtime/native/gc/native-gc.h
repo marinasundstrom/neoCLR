@@ -1,7 +1,7 @@
 #ifndef NEOCLR_NATIVE_GC_H
 #define NEOCLR_NATIVE_GC_H
 #ifdef NEOCLR_DIAGNOSTICS
-#include "../../../docs/experiments/runtime-diagnostics/attach.h"
+#include "../diagnostics/attach.h"
 #endif
 #include "../memory/text-arena.h"
 #include "root-probe.h"

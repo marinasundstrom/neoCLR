@@ -6,6 +6,11 @@ experimental and are not included in installed bundles. The goal is useful runti
 integration during development; standalone packaging and the wire protocol are not
 settled architecture. See the [design comparison](../../runtime-diagnostics.md).
 
+The transport source is maintained in `runtime/native/diagnostics`; these experiment
+paths retain forwarding files and validation fixtures. Source support packages may
+include it, but ordinary hosts do not link or enable the endpoint automatically.
+The current transport is POSIX-only; Windows attachment remains unsupported.
+
 ## Build and use
 
 Compile the native host/collector with `-DNEOCLR_GC_PROFILE -DNEOCLR_DIAGNOSTICS`

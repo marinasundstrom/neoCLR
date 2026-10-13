@@ -72,8 +72,11 @@ and caller-owned reset lifetimes. The implementation and private ABI sizes are
 unchanged. Native support manifests and profiling/validation provenance cover both
 source trees.
 
-This bounded migration leaves fault layout, diagnostics and other native services
-in their existing locations. The private header names
+Fault layout/rendering now live under `runtime/native/faults` and the provisional
+POSIX attachment transport under `runtime/native/diagnostics`. Their former paths
+forward to the canonical implementation. Native GC, roots and arena headers now
+reference runtime-owned headers directly, without dependencies on documentation
+experiment headers. Remaining native services are still migration work. The private header names
 those dependencies explicitly; it is not a stable or collector-independent ABI.
 The integrated validator includes a relocated-package test that compiles and runs
 the collector through the forwarding path, directly, and from a profiler-style
@@ -115,9 +118,18 @@ Local validation includes 20 GC/root executions, two compiled GC/non-GC UTF-8
 consumers and two profiler attachment tests. [Raw reports](validation/runtime-product/arena-source-layout/)
 retain source hashes and hosted job outcomes. The local report predates the commit
 and fingerprints the tested canonical sources. This is source integration, not a
-performance optimization or a new public memory-manager API. Fault layout and
-diagnostic attachment remain the next native dependencies to consolidate; the
-backend process/hosting boundary remains separate follow-up work.
+performance optimization or a new public memory-manager API. The backend process/hosting boundary remains separate follow-up work.
+
+The fault/diagnostics follow-up preserves fault codes, context/frame layouts,
+first-fault behavior and output rendering. A relocated-package test checks both
+rendering entry paths, including no-fault output, embedded NUL, instruction indices,
+truncation text and unchanged input context. Local rendering and POSIX attachment
+lifecycle/disabled-endpoint tests pass; hosted qualification is pending.
+The diagnostic transport remains opt-in and POSIX-only; including its source in
+support manifests does not link or enable it in ordinary hosts. Windows attachment
+support and a stable diagnostics ABI remain gaps. Existing profiler protocol and
+owner-thread snapshot publication are unchanged. No public API or website
+capability changes accompany this source relocation.
 
 ## Memory management is a runtime service
 
