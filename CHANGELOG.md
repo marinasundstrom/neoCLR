@@ -8,6 +8,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-13
 
+- Retain matched HTTP byte-path benchmarks and warm allocation captures: plain
+  allocations/request fall 559→519 and JSON 1,256→1,210. Local native median
+  throughput improves 4.5–11.5% (plain JIT ranges overlap); all 1,536 comparison
+  responses pass and diagnostic runs fully reclaim allocations. Published baselines
+  remain unchanged. See `benchmarks/http-server/byte-paths.md` for scope and limits.
+
 - HTTP server decoding now accepts received byte blocks, avoids temporary header
   copies/version strings, and writes response framing directly as bytes. Public
   APIs and protocol limits are unchanged; bodies remain buffered. All 63 focused

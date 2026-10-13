@@ -139,3 +139,8 @@ were run during measurement.
 PostgreSQL 18.6, ARM64 Docker image digest recorded in the report, 2 CPUs/512 MiB,
 one reused connection per process and one parameterized row per request. No table
 or persistent dataset. The temporary benchmark container was stopped after the run.
+
+## Development byte-path comparison
+
+[Bulk decoder entry, direct response framing and allocation measurements](byte-paths.md)
+record a matched development comparison; published Preview 14 baseline data remains unchanged.

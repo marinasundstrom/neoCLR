@@ -16389,3 +16389,25 @@ qualification. Request and response deadline documentation now includes TLS work
   checks and library lifetime), as do native backend compilation and API snapshot
   checks. Included unit fixtures were updated for the explicit managed/native
   binding distinction. [Evidence](experiments/foreign-interop/pointer-validation.json).
+
+## 2026-10-13 — HTTP bulk byte paths and measured allocation reduction
+
+- **Author request:** Continue bulk byte parsing and direct response writing,
+  reduce temporary strings, measure allocations per request, rerun HTTP benchmarks
+  and commit each slice. This follows the author's Go comparison and string-allocation
+  concerns; it does not mandate a public Span/Memory API.
+- **Assistant implementation:** Added warm request allocation counters and matched
+  library comparison tooling, then block decoder entry, internal byte windows and
+  direct byte response framing. Bodies remain buffered and copied; ownership and
+  public APIs are unchanged. The tooling also corrects an interpreter-labelled
+  check that previously relied on the runtime's default execution mode.
+- **Observed outcome:** 63 focused protocol/JSON/response-wire checks pass across
+  applicable local interpreter/JIT/AOT modes. The native comparison validates 1,536
+  responses. Diagnostic AOT allocations/request fall 559→519 plain and 1,256→1,210
+  JSON; every allocation is reclaimed at process completion. Native throughput
+  gains are exploratory (4.5–11.5%); plain JIT ranges overlap.
+- **Remaining:** Quieter timing repetitions, Windows qualification and ownership
+  design before future buffer pooling/views. Installed SDK and public baselines
+  are unchanged. [Measurement details](../benchmarks/http-server/byte-paths.md)
+  retain raw results and limitations. Website HTTP content was reviewed: its
+  buffered-body description remains accurate; no public API documentation changed.

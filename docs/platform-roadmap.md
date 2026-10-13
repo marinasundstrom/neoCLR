@@ -1,5 +1,13 @@
 # neoCLR platform roadmap
 
+**HTTP byte paths (2026-10-13):** [matched allocation and throughput evidence](../benchmarks/http-server/byte-paths.md)
+records block decoder entry and direct byte response framing. Warm AOT allocations
+fall from 559 to 519 per plain request and 1,256 to 1,210 per JSON request. Native
+throughput improves locally, with overlapping plain-JIT ranges requiring a quieter
+repeat. All 63 focused checks and 1,536 comparison responses pass; full reclamation
+is observed in four diagnostic runs. Public APIs, installed SDK and published
+baselines are unchanged. Buffer views/pooling remain future design work.
+
 **HTTP collector optimization (2026-10-13):** Author-directed profiling identifies
 collection as the shared plain-text/JSON cost. A [single-pass sweep/coalescing change](../benchmarks/http-server/profiling.md)
 improves matched local JIT/AOT throughput by 7–8% with identical guest inputs and
