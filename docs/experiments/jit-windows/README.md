@@ -139,3 +139,25 @@ all 26 installed VS Code checks pass separately on `566fb34dc` in
 See the [release qualification record](../release-20261013/README.md) for retained
 reports, component hashes and precise revision boundaries. This is qualification,
 not release publication or Windows ARM64 support.
+
+### Per-shape callback admission — 2026-10-13
+
+The root-observation Windows qualification passed native HTTP but exposed the
+remaining per-signature 32-target restriction while compiling managed SSL streams
+([run 38399690376](https://github.com/marinasundstrom/neoCLR/actions/runs/38399690376)).
+Remove that redundant restriction too: dispatch emits branches, with targets bounded
+by the existing 2,048 selected-function limit. This aligns with .NET delegate
+semantics: linking another callback with the same signature does not invalidate an
+invocation. More targets can increase generated code and compilation time; selected
+function, type, stack and heap bounds still apply. No callback ABI, Raven lowering
+or CLI bridge encoding changes. This is a native backend admission correction.
+
+Focused tests cover 65 same-signature targets for managed invocation in ARM64 Mach-O
+and Windows x64 COFF, plus host invocation with more than 32 targets per unit/no-result
+shape, retained roots and fault propagation. Recursion/borrowed-shape rejection remains.
+Hosted SSL stream and HTTP execution is required in addition to object generation.
+
+`windows-jit.yml` accepts `http_focus=true` for a bounded rerun: shared JIT preparation,
+scalar/CLI checks, SSL streams and default-JIT HTTP. It records scope
+`http-and-ssl-streams`; it does not claim the skipped full library suite passed.
+The ordinary full gate remains the default.

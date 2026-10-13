@@ -3448,17 +3448,35 @@ int main(void) {
 }
 
 #[test]
-fn native_callbacks_reject_recursion_borrows_and_excess_dispatch_targets() {
+fn native_callbacks_admit_many_targets_per_shape() {
+    let seed = neoclr::assemble(".module System\n.references ()\n").unwrap();
+    let mut source = String::from(".module Many\n");
+    for i in 0..65 {
+        source.push_str(&format!(".function Target{i}() -> Int32\nldc.i4 {i}\nret\n.end\n"));
+    }
+    source.push_str(".function Calculate() -> Int32\n");
+    for i in 0..65 {
+        source.push_str(&format!("function.bind fn<Int32> = Target{i}()\npop\n"));
+    }
+    source.push_str("function.bind fn<Int32> = Target64()\ncallvirt instance fn<Int32>::Invoke()\nret\n.end\n");
+    for target in ["aarch64-apple-darwin", "x86_64-pc-windows-msvc"] {
+        let dir = Temp::new();
+        let mut flags = vec!["--compile-system", "--reference-arena", "--native-gc", "--target", target];
+        if target.contains("windows") {
+            flags.extend(["--windows-console-experiment", "--native-stack-budget"]);
+        }
+        let result = compile_source(&dir, &seed, &source, &flags, false);
+        assert!(result.status.success(), "{}", String::from_utf8_lossy(&result.stderr));
+    }
+}
+
+#[test]
+fn native_callbacks_reject_recursion_and_borrows() {
     let seed = neoclr::assemble(".module System\n.references ()\n").unwrap();
     let flags = ["--compile-system", "--reference-arena", "--native-gc"];
     let recursive = ".module Recursive\n.function Again() -> Int32\nfunction.bind fn<Int32> = Again()\ncall instance fn<Int32>::Invoke()\nret\n.end\n.function Calculate() -> Int32\ncall Again()\nret\n.end";
     let borrowed = ".module Borrowed\n.function Read(Int32& value) -> Int32\nldarg value\nldobj Int32\nret\n.end\n.function Calculate() -> Int32\nfunction.bind fn<Int32&,Int32> = Read(Int32&)\npop\nldc.i4 0\nret\n.end";
-    let mut many = String::from(".module Many\n");
-    for i in 0..33 { many.push_str(&format!(".function Target{i}() -> Int32\nldc.i4 {i}\nret\n.end\n")); }
-    many.push_str(".function Calculate() -> Int32\n");
-    for i in 0..33 { many.push_str(&format!("function.bind fn<Int32> = Target{i}()\npop\n")); }
-    many.push_str("function.bind fn<Int32> = Target0()\ncallvirt instance fn<Int32>::Invoke()\nret\n.end\n");
-    for (source, message) in [(recursive, "recursive calls"), (borrowed, "borrowed"), (many.as_str(), "32 possible targets")] {
+    for (source, message) in [(recursive, "recursive calls"), (borrowed, "borrowed")] {
         let dir = Temp::new();
         let r = compile_source(&dir, &seed, source, &flags, false);
         assert!(!r.status.success());
@@ -4012,8 +4030,7 @@ fn native_host_bootstrap_requires_explicit_exact_contract() {
     assert!(!dir.0.join("app.o").exists());
 }
 
-// Keep each callback shape below its independent admission bound while the
-// combined host dispatcher exceeds 32. Bind the late targets so closed-world
+// Exercise more than 32 targets per shape as well as their combined host dispatcher. Bind the late targets so closed-world
 // selection retains them, and execute the last target through the host session.
 fn mixed_host_callback_source(no_result: bool) -> String {
     let mut source = include_str!("../../../docs/experiments/aot-console/host-callbacks.neoil").to_owned();
@@ -4022,13 +4039,13 @@ fn mixed_host_callback_source(no_result: bool) -> String {
             .replace("fn<Void>", "fn<noresult Void>").replace("call Fail()\npop", "call Fail()");
     }
     let mut bindings = String::new();
-    for i in 0..20 {
+    for i in 0..40 {
         source.push_str(&format!("\n.function Unit{i}() -> Void\nldvoid\nret\n.end\n.function Empty{i}() -> noresult\nret\n.end\n"));
         bindings.push_str(&format!("function.bind fn<Void> = Unit{i}()\npop\nfunction.bind fn<noresult Void> = Empty{i}()\npop\n"));
     }
     source = source.replace("ldarg mode\n", &format!("{bindings}ldarg mode\n"));
-    source.replace("function.bind fn<Void> = Unit()", "function.bind fn<Void> = Unit19()")
-        .replace("function.bind fn<noresult Void> = Unit()", "function.bind fn<noresult Void> = Empty19()")
+    source.replace("function.bind fn<Void> = Unit()", "function.bind fn<Void> = Unit39()")
+        .replace("function.bind fn<noresult Void> = Unit()", "function.bind fn<noresult Void> = Empty39()")
 }
 
 #[test]

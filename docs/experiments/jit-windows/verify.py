@@ -23,6 +23,7 @@ def load(name, path):
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--output', type=Path, required=True)
+    parser.add_argument('--http-focus', action='store_true', help='Qualify HTTP and SSL streams after shared JIT preparation; skip unrelated library suites')
     args = parser.parse_args()
     if platform.system() != 'Windows' or platform.machine().lower() not in ('amd64', 'x86_64'):
         raise ValueError('This gate requires Windows x64 with MSVC')
@@ -30,7 +31,7 @@ def main():
     out.mkdir(parents=True, exist_ok=False)
     prerequisite = load('windows_prerequisite', ROOT/'scripts/validate-windows-project.py')
     http = load('http_prerequisite', ROOT/'scripts/validate-native-http-project.py')
-    report = dict(passed=False, commands=[])
+    report = dict(passed=False, scope='http-and-ssl-streams' if args.http_focus else 'full', commands=[])
 
     def run(command, name):
         print('START '+name, flush=True)
@@ -76,6 +77,14 @@ def main():
              '--runtime', ROOT/'target/release/neoclr.exe', '--jit-compiler', jit,
              '--host-recipe', out/'native/build.json', '--output', out/'jit-install'], 'prepare-default-jit')
         installed = out/'jit-install/bundle'
+        if args.http_focus:
+            run([sys.executable, ROOT/'docs/experiments/shared-tls/validate-streams.py',
+                 '--bundle', installed, '--aot', jit, '--output', out/'tls-streams'], 'tls-streams')
+            run([sys.executable, ROOT/'docs/experiments/jit-http/verify.py', '--bundle', installed,
+                 '--windows-build', out/'native/build.json', '--default-cli', '--mode', 'jit',
+                 '--output', out/'http'], 'http-default-jit')
+            report['passed'] = True
+            return
         run([sys.executable, ROOT/'docs/experiments/native-cryptography/validate-bundle.py',
              '--bundle', installed, '--output', out/'cryptography'], 'cryptography-default-jit')
         run([sys.executable, ROOT/'docs/experiments/native-cryptography/validate-project.py',

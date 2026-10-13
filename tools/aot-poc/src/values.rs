@@ -2425,7 +2425,7 @@ fn compile_host_callbacks(module: &mut impl Module, p: &Profile<'_>, ids: &[cran
     for target in p.callable_targets(&no_result)? {
         if !targets.contains(&target) { targets.push(target); }
     }
-    // Each shape is admitted independently by callable_targets. Their union
+    // Callable targets are bounded by selected functions. Their union
     // needs no separate cap: this dispatcher emits branches, not a fixed-size
     // host table. Mixed unit/no-result continuations can exceed either shape.
     // Hosts link this ABI even when no guest callback is reachable. Keep the

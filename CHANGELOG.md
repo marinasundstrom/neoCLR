@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-13
 
+- Remove the native backend’s redundant 32-target-per-callback-shape restriction exposed by Windows SSL stream compilation; dispatch remains bounded by the selected-function limit. Add larger-target regressions and an explicitly scoped Windows HTTP/SSL-stream CI rerun option.
+
 - Fix Windows native GC profiling: use QueryPerformanceCounter for monotonic collection intervals instead of the unavailable POSIX clock_gettime. Normal non-profiled builds retain no timing overhead; Windows profiler qualification is being rerun.
 
 - Enable MSVC C11 atomics in the Windows GC contract runner, matching the existing native socket build; the first CI attempt stopped before executing GC tests because this compiler flag was absent.

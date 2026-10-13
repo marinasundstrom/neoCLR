@@ -418,7 +418,9 @@ impl<'a> Profile<'a> {
                 }
             }
         }
-        if targets.len() > 32 { return Err("native callback shape exceeds 32 possible targets".into()); }
+        // Dispatch emits branches, not a 32-entry table. The selected-function
+        // budget already bounds this set; unrelated callbacks must not reject
+        // otherwise valid async/TLS programs merely by sharing a signature.
         Ok(targets)
     }
     pub fn ty(&self, t: &Type) -> Result<Ty, Error> {

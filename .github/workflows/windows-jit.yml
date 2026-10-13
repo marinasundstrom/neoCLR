@@ -1,6 +1,11 @@
 name: Windows JIT HTTP
 on:
   workflow_dispatch:
+    inputs:
+      http_focus:
+        description: Qualify HTTP and SSL streams without unrelated library suites
+        type: boolean
+        default: false
   push:
     paths:
       - 'src/**'
@@ -71,6 +76,7 @@ jobs:
     timeout-minutes: 45
     env:
       PYTHONUTF8: '1'
+      HTTP_FOCUS: ${{ inputs.http_focus }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-dotnet@v4
@@ -91,7 +97,8 @@ jobs:
         run: |
           $vs = & "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\vswhere.exe" -latest -products '*' -requires Microsoft.VisualStudio.Component.VC.Tools.x86.x64 -property installationPath
           if (-not $vs) { throw 'MSVC x64 tools not found' }
-          cmd /c "`"$vs\VC\Auxiliary\Build\vcvars64.bat`" && python docs/experiments/jit-windows/verify.py --output target/windows-jit-validation"
+          $focus = if ($env:HTTP_FOCUS -eq 'true') { '--http-focus' } else { '' }
+          cmd /c "`"$vs\VC\Auxiliary\Build\vcvars64.bat`" && python docs/experiments/jit-windows/verify.py --output target/windows-jit-validation $focus"
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
       - uses: actions/upload-artifact@v4
         if: always()
