@@ -262,3 +262,24 @@ must be explicit capabilities. OS parity does not by itself establish CPU ABI/AR
 support. Keep interpreter/JIT/AOT semantics aligned without requiring identical OS
 implementations or collapsing modular components. This work does not replace the
 active GC/admission milestone or authorize a broad restructuring prerequisite.
+
+### Future Linux ARM64 target
+
+The author explicitly identified Linux ARM64 as a future expansion target on
+2026-10-13. Design the PAL and packaging boundaries to admit that combination;
+this is not a claim of current Linux JIT/AOT, suspension or native-service support,
+nor a reprioritization of the active milestone.
+
+Separate OS services from architecture/ABI responsibilities. Avoid treating every
+non-Windows host as macOS: shared POSIX operations may be reusable, while polling,
+host preferences, security providers and executable-memory facilities need explicit
+platform implementations or capability results. Keep CPU calling conventions,
+stack switching/unwinding, code generation and instruction-cache synchronization
+in their appropriate backend/runtime components rather than assuming existing
+macOS ARM64 support establishes Linux ARM64 compatibility.
+
+Use the existing CLR porting comparison above to guide qualification: compile and
+run on the actual target, then verify native ownership/GC, interpreter/JIT/AOT
+parity, suspension, diagnostics and native dependencies. Cross-compilation alone
+is insufficient. Shared contracts reduce duplication but add another supported
+platform matrix and packaging burden; Linux ARM64 performance remains unmeasured.

@@ -16727,3 +16727,11 @@ At this point the file-input allocation slice had passed hosted macOS/Windows ga
 Windows exercised shared decoding, while the POSIX file binding remained excluded.
 See [producer evidence](validation/runtime-product/native-producers/README.md).
 A general PAL and Windows file implementation remain proposed work.
+
+The author then clarified: “We want to be able to expand to Linux ARM64 in the
+future”. The assistant recorded this as a future target and proposed separating OS
+services from architecture/ABI work, avoiding non-Windows-equals-macOS assumptions.
+It recorded actual-target execution, GC, suspension, diagnostics, native dependencies
+and execution-mode parity as future qualification needs. No Linux implementation
+or qualification was performed in this documentation slice; current priorities
+remain unchanged. See [Linux ARM64 direction](platform-direction.md#future-linux-arm64-target).

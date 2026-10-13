@@ -8,7 +8,7 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-13
 
-- Record the author’s platform-abstraction proposal and an incremental design direction based on existing OS boundaries, with a .NET PAL comparison, ownership/capability contracts, tradeoffs and platform validation needs. A general PAL remains proposed; current GC/admission priorities are unchanged.
+- Record the author’s platform-abstraction proposal and an incremental design direction based on existing OS boundaries, with a .NET PAL comparison, ownership/capability contracts, tradeoffs and platform validation needs. Record Linux ARM64 as an explicit future target, separating OS services from CPU/ABI qualification and packaging. A general PAL and Linux ARM64 qualification remain future work; current GC/admission priorities are unchanged.
 
 - Retry only final managed allocation in the native-GC POSIX file-input helper, after closing the descriptor and while retaining native-owned bytes. Preserve raw/non-GC behavior, strict decoding, limits and error precedence; never replay reads. Add counted read/close pressure tests on macOS and shared native-buffer decode checks on both hosts. Document the existing Windows file-binding exclusion and distinguish nonallocating socket/TLS/crypto adapters and managed PostgreSQL from pending allocation audits. All 29 GC/root executions, socket and package checks pass on macOS ARM64 and Windows x64; two local compiled file-input tests and macOS profiler attachment also pass. Retain exact platform scope and raw reports.
 
