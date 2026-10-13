@@ -26,7 +26,7 @@ require an access diagnostic and no object file. Run from the neoCLR root:
 
 ```sh
 SDKROOT=$(xcrun --sdk macosx --show-sdk-path) cargo test \
-  --manifest-path tools/aot-poc/Cargo.toml --test friend_assemblies
+  --manifest-path runtime/codegen/Cargo.toml --test friend_assemblies
 ```
 
 The SDK selection avoids a host CommandLineTools linker search-path mismatch. The

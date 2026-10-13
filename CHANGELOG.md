@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-13
 
+- Stage Windows JIT helpers from either HTTP or async-console build recipes, requiring the shared asynchronous invocation host. Preserve rejection of synchronous/incomplete recipes. The full 21-case Windows SDK runtime-await gate passes; the focused renamed-package gate exposed this remaining recipe-label restriction.
+
 - Rename the shared JIT/AOT backend package and executable to neoclr-codegen and move its sources to runtime/codegen. Migrate active CLI, SDK, package, benchmark-tool and CI references without an old-name executable alias; preserve historical results. A freshly staged JIT bundle replaces the prior compiler role instead of retaining its old executable. Hosting, scalar execution, Windows admission, installed CLI discovery, notice/archive checks and a fresh three-mode macOS SDK cleanup consumer pass. Record the author’s context-specific naming and no-compatibility constraint.
 
 - Admit scheduler, timer and task bindings for the integrated Windows async console host, preserving rooted-stack requirements and file/socket exclusions. Hosted HTTP and three-mode language checks passed before exposing this stale backend guard; six focused Windows code-generation/admission tests pass. Add an SDK-only workflow rerun using retained matching toolchain/runtime artifacts and a freshly rebuilt backend.

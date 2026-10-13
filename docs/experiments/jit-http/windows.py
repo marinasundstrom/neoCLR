@@ -4,14 +4,17 @@ import re
 
 
 def recipe(prior, root, output):
-    if not prior.get('passed') or prior.get('profile') != 'windows-x64-http-v1':
-        raise ValueError('Requires a successful Windows HTTP build report')
+    if not prior.get('passed') or prior.get('profile') not in ('windows-x64-http-v1', 'windows-x64-console-v1'):
+        raise ValueError('Requires a successful Windows native host build report')
     native = next(item['command'] for item in prior['commands']
                   if item['phase'] == 'native-compilation')
     link = next(item['command'] for item in prior['commands']
                 if item['phase'] == 'host-compile-link')
+    if '/DNEOCLR_HTTP_HOST' not in link or not any(
+            part.replace('\\', '/').endswith('/http-host.c') for part in link):
+        raise ValueError('JIT helper requires the shared asynchronous invocation host')
     host_source = str(root / 'docs/experiments/jit-managed/host.c')
-    link = [host_source if part.endswith('benchmarks/native-web/http-host.c') else part
+    link = [host_source if part.replace('\\', '/').endswith('/http-host.c') else part
             for part in link]
     # pathlib uses Windows separators when producing the original build command.
     link = [host_source if Path(part).name == 'http-host.c' else part for part in link]
