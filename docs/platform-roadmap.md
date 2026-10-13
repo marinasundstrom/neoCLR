@@ -1,5 +1,13 @@
 # neoCLR platform roadmap
 
+**Scheduling diagnosis (2026-10-13):** [retained diagnostic tooling and results](../benchmarks/http-scheduling/README.md)
+now separate native socket polling, host pauses, process CPU and GC counters.
+Eight AOT processes validate 192 responses and complete allocation reclamation.
+Socket polling is small in these runs; slow peers trigger the expected 1 ms sleeps.
+These guest builds use compiler state machines, so runtime-suspension comparisons,
+readiness-to-resume latency and JIT/interpreter instrumentation remain open. No
+scheduler optimization or throughput gain is claimed from this diagnostic slice.
+
 **Concurrent execution direction (2026-10-13):** the author asks to inspect runtime
 scheduling alongside HTTP work: scheduling and suspension are intended to improve
 concurrent asynchronous execution. Evaluate wakeup-to-resume latency, ready-work

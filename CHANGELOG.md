@@ -8,6 +8,13 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-13
 
+- Add a diagnostic native HTTP scheduling profiler with socket-poll outcomes,
+  consecutive empty polls, host sleeps, process CPU and GC counters. Retain eight
+  AOT runs validating 192 responses and complete reclamation; an optional slow-peer
+  hold confirms pending work sleeps rather than tight-spins. The retained guests
+  use compiler state machines. Runtime-suspension/JIT/interpreter comparisons and
+  readiness latency remain open; no production scheduler or throughput claim changes.
+
 - Record the author-directed scheduling/suspension evaluation alongside concurrent
   HTTP work, distinguishing source-inspected polling gaps from unmeasured performance
   hypotheses. Define latency, fairness, idle CPU and dispatch/GC measurement criteria;

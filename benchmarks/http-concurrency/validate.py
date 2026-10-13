@@ -40,7 +40,7 @@ def response(peer):
     assert body == BODY, body
 
 
-def run_case(command, workload=None, width=4):
+def run_case(command, workload=None, width=4, slow_hold_seconds=0):
     guest = Guest(command, timeout=180)
     results = []
     try:
@@ -64,11 +64,14 @@ def run_case(command, workload=None, width=4):
                     response(peer)
                     completions.append(time.perf_counter()-started)
                 # Every fast peer completed while the first request was incomplete.
+                if slow_hold_seconds:
+                    time.sleep(slow_hold_seconds)
                 slow.sendall(suffix)
                 released = time.perf_counter()
                 response(slow)
                 results.append(dict(case=name, fastCompletionSeconds=completions,
                                     slowHeldSeconds=released-started,
+                                    intentionalIdleSeconds=slow_hold_seconds,
                                     slowFinishSeconds=time.perf_counter()-released,
                                     fastResponsesBeforeSlowRelease=width-1, passed=True))
             finally:

@@ -88,3 +88,10 @@ The interpreter collector is unchanged and was not rerun. Windows was not requal
 The installed Preview 14 SDK and public baseline pages remain unchanged; this result
 belongs to development history. Next investigate root-boundary traversal and safe
 allocation-pressure scheduling, preserving explicit collection and stress coverage.
+
+## Scheduler diagnostics (2026-10-13)
+
+The [separate scheduling probe](../http-scheduling/README.md) retains native poll,
+pause, CPU and GC counters for plain/JSON responses and a concurrent slow-peer test.
+It measures compiler-state-machine AOT guests, not the runtime-suspension carrier;
+results do not establish a JIT/interpreter or throughput comparison.
