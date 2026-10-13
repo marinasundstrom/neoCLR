@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Matched HTTP comparison: identical guest inputs, only native-gc.c differs."""
+"""Matched HTTP comparison: identical guest inputs, only the selected native GC source differs."""
 import argparse
 import json
 from pathlib import Path
@@ -16,16 +16,17 @@ def main():
     p.add_argument('--json',type=Path,required=True,help='Passing JSON HTTP benchmark report')
     p.add_argument('--host',type=Path,required=True,help='Passing JIT bundle preparation report')
     p.add_argument('--baseline',required=True)
+    p.add_argument('--source', choices=['native-gc.c', 'root-probe.c'], default='native-gc.c')
     p.add_argument('--output',type=Path,required=True)
     p.add_argument('--rounds',type=int,default=5)
     a=p.parse_args()
     if a.rounds<5: p.error('At least five rounds required')
     out=a.output.resolve();out.mkdir(parents=True,exist_ok=False)
-    old=out/'baseline-gc.c'
-    old.write_bytes(subprocess.check_output(['git','show',a.baseline+':docs/experiments/aot-console/native-gc.c'],cwd=ROOT))
-    gc=ROOT/'docs/experiments/aot-console/native-gc.c'
+    old=out/('baseline-'+a.source)
+    old.write_bytes(subprocess.check_output(['git','show',a.baseline+':docs/experiments/aot-console/'+a.source],cwd=ROOT))
+    gc=ROOT/'docs/experiments/aot-console'/a.source
     report=dict(passed=False,baselineRevision=subprocess.check_output(['git','rev-parse',a.baseline],text=True).strip(),
-      commands=[],inputs={},warmups=[],samples=[],summary={},scope='Same guest assemblies/AOT objects and host sources; only collector differs. 32 requests per process, eight discarded, five alternating rounds. No instrumentation or sampling during timings.')
+      changedSource=a.source,commands=[],inputs={},warmups=[],samples=[],summary={},scope='Same guest assemblies/AOT objects and host sources; only selected GC source differs. 32 requests per process, eight discarded, five alternating rounds. No instrumentation or sampling during timings.')
     for path in [Path(__file__).resolve(),Path(benchmark.__file__),a.plain,a.json,a.host,old,gc]:
         report['inputs'][str(path.resolve())]=sha(path)
     for directory in ['aot-console','aot-fault-details','runtime-async','jit-managed']:

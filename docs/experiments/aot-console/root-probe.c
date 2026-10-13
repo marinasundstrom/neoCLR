@@ -23,6 +23,7 @@ static void observe_fault(const void *context) {
     neoclr_probe_storage slots[65];
     int32_t count = neoclr_probe_fault_roots_v1(context, slots, 65);
     if (count < 0) abort();
+#ifndef NEOCLR_NATIVE_GC
     volatile uint64_t observed = 0;
     for (int32_t i = 0; i < count; i++) {
         uint64_t word;
@@ -30,6 +31,7 @@ static void observe_fault(const void *context) {
         observed ^= word;
     }
     (void)observed;
+#endif
 }
 void neoclr_probe_enter_v3(neoclr_probe_frame *frame, const void *context, uint32_t function,
     const neoclr_probe_storage *storage, uint32_t count, const char *plan, uint32_t length) {
@@ -62,24 +64,36 @@ void neoclr_probe_stack_roots_v2(neoclr_probe_frame *frame, uint32_t instruction
     frame->lane_count = lane_count;
     frame->plan = plan;
     frame->length = length;
+    /* The collector consumes root values after publication. Keep descriptor and
+     * fault validation here, but reserve volatile observation for probe-only builds. */
+#ifndef NEOCLR_NATIVE_GC
     volatile uint64_t value = 0;
+#endif
     for (const neoclr_probe_frame *f = head; f; f = f->previous) {
         observe_fault(f->context);
         for (uint32_t i = 0; i < f->storage_count; i++) {
             const neoclr_probe_storage *s = &f->storage[i];
             if (!s->address || (s->read_bytes != 4 && s->read_bytes != 8) || s->flags > 2) abort();
+#ifndef NEOCLR_NATIVE_GC
             uint64_t word = 0;
             memcpy(&word, s->address, s->read_bytes);
             value ^= word; /* Observe the slot only; never follow a borrowed pointee. */
+#endif
         }
         for (uint32_t i = 0; i < f->transient_count; i++) {
             const neoclr_probe_storage *s = &f->transient[i];
             if (!s->address || (s->read_bytes != 4 && s->read_bytes != 8)) abort();
+#ifndef NEOCLR_NATIVE_GC
             uint64_t word = 0; memcpy(&word, s->address, s->read_bytes); value ^= word;
+#endif
         }
+#ifndef NEOCLR_NATIVE_GC
         for (uint32_t i = 0; i < f->lane_count; i++) value ^= f->lanes[i];
+#endif
     }
+#ifndef NEOCLR_NATIVE_GC
     (void)value;
+#endif
     calls++;
 #ifdef NEOCLR_NATIVE_GC
     /* Full initialized snapshot is published. Allocation services never collect. */
@@ -91,13 +105,19 @@ void neoclr_probe_transient_v2(neoclr_probe_frame *frame, uint32_t phase,
     if (head != frame || (phase != 1 && phase != 2 && phase != 3) || !storage || !plan || strlen(plan) != length) abort();
     frame->transient = storage; frame->transient_count = count;
     frame->transient_plan = plan; frame->transient_length = length; frame->transient_phase = phase;
+#ifndef NEOCLR_NATIVE_GC
     volatile uint64_t observed = 0;
+#endif
     for (uint32_t i = 0; i < count; i++) {
         if (!storage[i].address || (storage[i].read_bytes != 4 && storage[i].read_bytes != 8)) abort();
+#ifndef NEOCLR_NATIVE_GC
         uint64_t word = 0; memcpy(&word, storage[i].address, storage[i].read_bytes);
         observed ^= word;
+#endif
     }
+#ifndef NEOCLR_NATIVE_GC
     (void)observed;
+#endif
 }
 const neoclr_probe_frame *neoclr_root_probe_head_v1(void) { return head; }
 uint64_t neoclr_root_probe_count_v1(void) { return calls; }

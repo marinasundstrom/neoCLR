@@ -150,3 +150,10 @@ record a matched development comparison; published Preview 14 baseline data rema
 [Kestrel, Go and Node direct-handler projects and pilot results](platforms.md)
 are maintained as the HTTP comparison matrix. Routing is excluded. Also see the
 [fixed ASCII framing follow-up](ascii-framing.md) for the latest allocation evidence.
+
+## Native root observation improvement
+
+[Matched JIT/AOT plain-text and JSON results](root-observation.md) show a 29–35%
+local throughput improvement from removing duplicate diagnostic root reads while
+retaining validation and full collection. Raw evidence and correctness limits are
+recorded separately from published release benchmarks.

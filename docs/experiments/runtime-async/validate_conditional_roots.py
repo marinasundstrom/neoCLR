@@ -5,6 +5,7 @@ import hashlib
 import json
 from pathlib import Path
 import subprocess
+import signal
 
 ROOT = Path(__file__).resolve().parents[3]
 BASE = ROOT / 'docs/experiments/aot-console'
@@ -27,7 +28,7 @@ def main():
     out.mkdir(parents=True, exist_ok=False)
     inputs = [Path(__file__).resolve(), args.recipe.resolve(),
               *[BASE / name for name in ('native-gc.c', 'native-gc.h', 'native-gc-test.c', 'native-gc-admission-test.c', 'native-gc-pass-test.c', 'native-gc-profile-test.c',
-                'host-roots-test.c', 'root-probe.c', 'root-probe.h', 'text-arena.h', 'native-stack.h')],
+                'host-roots-test.c', 'root-validation-test.c', 'root-probe.c', 'root-probe.h', 'text-arena.h', 'native-stack.h')],
               ROOT / 'docs/experiments/aot-fault-details/fault-details.h']
     if args.owned_bodies:
         inputs += [ROOT / 'docs/experiments/runtime-async' / name for name in
@@ -50,6 +51,20 @@ def main():
             run(name + '-build', [*cc, BASE / (name + '.c'), BASE / 'native-gc.c',
                                  BASE / 'root-probe.c', '-pthread', '-o', binary])
             run(name + '-execute', [binary])
+        for gc_enabled in (False, True):
+            label = 'root-validation-' + ('gc' if gc_enabled else 'probe')
+            binary = out / label
+            flags = cc if gc_enabled else [arg for arg in cc if arg != '-DNEOCLR_NATIVE_GC']
+            sources = [BASE / 'root-validation-test.c', BASE / 'root-probe.c']
+            if gc_enabled:
+                sources.append(BASE / 'native-gc.c')
+            run(label + '-build', [*flags, *sources, '-pthread', '-o', binary])
+            for case in ('address', 'width', 'flags', 'fault', 'transient'):
+                result = subprocess.run([str(binary), case], capture_output=True, text=True, timeout=10)
+                report['commands'].append(dict(label=label+'-'+case, command=[str(binary), case],
+                    exitCode=result.returncode, expectedSignal='SIGABRT', stderr=result.stderr))
+                if result.returncode != -signal.SIGABRT or result.stderr:
+                    raise RuntimeError(f'{label}/{case}: expected clean validation abort, got {result.returncode} {result.stderr}')
         binary = out / 'native-gc-profile-enabled'
         run('profile-enabled-build', [*cc, '-DNEOCLR_GC_PROFILE', BASE / 'native-gc-profile-test.c',
                                      BASE / 'native-gc.c', BASE / 'root-probe.c', '-pthread', '-o', binary])

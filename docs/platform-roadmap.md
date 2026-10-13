@@ -1,5 +1,13 @@
 # neoCLR platform roadmap
 
+**Root observation improvement (2026-10-13):** [matched JIT/AOT evidence](../benchmarks/http-server/root-observation.md)
+shows 29–35% higher plain/JSON HTTP throughput after removing duplicate diagnostic
+root-value reads. Validation and full collection boundaries remain; all 1,536 timed
+comparison responses, 192 diagnostic responses and focused native lifetime/root
+checks pass. These fixed-fixture macOS results are development evidence, not new
+published release numbers. The rooted admission primitive is implemented and tested,
+but helper-root integration is still required before reconsidering GC pacing.
+
 **Collection pacing experiment (2026-10-13):** [isolated AOT evidence](../benchmarks/http-gc-pacing/README.md)
 shows substantial plain/JSON HTTP potential from collecting less often, but the
 reserve/count policy is **rejected for production**: it faults on a large allocation
