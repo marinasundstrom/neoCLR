@@ -25,6 +25,24 @@ available original wording; other text is a summary.
 
 See the [changelog](../CHANGELOG.md) and linked design documents for technical status.
 
+## 2026-10-13 — Supplied overview of modern garbage collectors
+
+- **Author:** shares a ChatGPT text discussing throughput/latency, generations,
+  thread-local allocation, barriers, parallel/concurrent collection and relocation;
+  the text proposes a staged collector evolution for neoCLR.
+- **Author clarification:** ChatGPT does not know the existing implementation;
+  the supplied text is not a plan.
+- **Assistant assessment:** supports the memory-management boundary but does not
+  adopt the proposed algorithm sequence automatically. Existing tracing/root
+  machinery, native pointer lifetimes and worker ownership matter. Go provides a
+  concrete non-generational concurrent counterexample; .NET background collection
+  still has suspension points.
+- **Recorded next evaluation:** measure survival, allocation cost and pause
+  distributions; compare nonmoving generations and allocation/pacing improvements
+  before copying/concurrent relocation. Optimize throughput within tail-latency and
+  memory limits. The [GC design review](runtime-gc.md#review-of-the-supplied-collector-overview--2026-10-13)
+  links primary sources and distinguishes proposals from implemented behavior.
+
 ## 2026-10-13 — HTTP throughput target after collection pacing
 
 - **Author:** asks how many requests the runtime now handles, then directs higher

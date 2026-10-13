@@ -161,6 +161,35 @@ The next bounded evaluation should:
 Finish helper-root coverage and scheduler idle cleanup qualification independently;
 those correctness requirements remain relevant under any collection architecture.
 
+### Review of the supplied collector overview — 2026-10-13
+
+The author supplied a ChatGPT overview recommending precise tracing, fast local
+allocation, generations, parallel collection, concurrent marking and eventually
+relocation. Treat that ordering as an exploratory proposal, not an adopted sequence.
+neoCLR already has tracing/root machinery: the interpreter uses Rust-managed state
+and native JIT/AOT support includes a C collector. It is not a single all-Rust heap
+waiting for its first collector.
+
+Primary-source checks support separating the choices. The [Go runtime collector](https://go.dev/src/runtime/mgc.go)
+describes concurrent non-generational, non-compacting mark/sweep and size-segregated
+per-processor allocation areas. [.NET background GC](https://learn.microsoft.com/en-us/dotnet/standard/garbage-collection/background-gc)
+allows generation-2 work alongside application execution while ephemeral collections
+still require suspension. These are shipped designs, reviewed on this date; neither
+establishes the best neoCLR collector. Generations are not a prerequisite for concurrency,
+and concurrent work consumes CPU/bandwidth and requires mutation/root coordination.
+
+The provisional evaluation remains survival/pause/allocation measurement followed
+by a nonmoving generation candidate against the current full collector and safe
+pacing. Fast allocation can be evaluated independently. Worker-local allocation
+should follow actual heap/worker ownership; a buffer per green thread is not implied.
+A copying nursery would need updatable references or pinning/handles, including
+suspended activations, interior references and borrowed native inputs. Merely adding
+an abstraction around pointers does not establish relocation correctness.
+
+For the server workload, compare throughput **subject to explicit tail-latency and
+memory limits**. Report unfavorable high-survival/mutation cases too. This does not
+select multiple shipping collectors, a public barrier ABI or a new default policy.
+
 ## Native exact-base admission — 2026-10-13
 
 Host handles, resource owners, callback entry and owned suspended roots retain
