@@ -802,4 +802,7 @@ neoCLR implementation details. Generated objects require matching native helpers
 Tests use real host preferences and the pinned time-zone library, force exhaustion
 and retry, reject missing/foreign boundaries, preserve outputs and reclaim results.
 The preference comparison assumes no concurrent user preference change during the
-short test. Platform qualification is pending.
+short test. All 30 local macOS ARM64 and hosted Windows x64 GC/root checks pass,
+alongside local GC/non-GC generated execution and Windows socket/package checks.
+The hosted macOS job remains queued; this is not a complete hosted matrix. See
+[retained evidence](../../validation/runtime-product/native-preferences/README.md).

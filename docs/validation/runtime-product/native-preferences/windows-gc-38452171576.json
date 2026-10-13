@@ -1,0 +1,822 @@
+{
+  "passed": true,
+  "platform": "Windows-2022Server-10.0.20348-SP0",
+  "machine": "AMD64",
+  "commands": [
+    {
+      "label": "revision",
+      "command": [
+        "git",
+        "-C",
+        "D:\\a\\neoCLR\\neoCLR",
+        "rev-parse",
+        "HEAD"
+      ],
+      "exitCode": 0,
+      "expected": 0
+    },
+    {
+      "label": "unicode-library",
+      "command": [
+        "cargo",
+        "build",
+        "--locked",
+        "--release",
+        "--features",
+        "time-zone-rules",
+        "--manifest-path",
+        "D:\\a\\neoCLR\\neoCLR\\tools\\aot-native-text\\Cargo.toml"
+      ],
+      "exitCode": 0,
+      "expected": 0
+    },
+    {
+      "label": "native-gc-test-build",
+      "command": [
+        "cl",
+        "/nologo",
+        "/W4",
+        "/WX",
+        "/std:c11",
+        "/experimental:c11atomics",
+        "/O2",
+        "/MT",
+        "/ID:\\a\\neoCLR\\neoCLR\\docs\\experiments\\aot-console",
+        "/DNEOCLR_NATIVE_GC",
+        "D:\\a\\neoCLR\\neoCLR\\docs\\experiments\\aot-console\\native-gc-test.c",
+        "D:\\a\\neoCLR\\neoCLR\\docs\\experiments\\aot-console\\root-probe.c",
+        "D:\\a\\neoCLR\\neoCLR\\docs\\experiments\\aot-console\\native-gc.c",
+        "/Fe:D:\\a\\neoCLR\\neoCLR\\target\\native-gc-validation\\native-gc-test.exe"
+      ],
+      "exitCode": 0,
+      "expected": 0
+    },
+    {
+      "label": "native-gc-test",
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\native-gc-validation\\native-gc-test.exe"
+      ],
+      "exitCode": 0,
+      "expected": 0
+    },
+    {
+      "label": "native-gc-base-test-build",
+      "command": [
+        "cl",
+        "/nologo",
+        "/W4",
+        "/WX",
+        "/std:c11",
+        "/experimental:c11atomics",
+        "/O2",
+        "/MT",
+        "/ID:\\a\\neoCLR\\neoCLR\\docs\\experiments\\aot-console",
+        "/DNEOCLR_NATIVE_GC",
+        "D:\\a\\neoCLR\\neoCLR\\docs\\experiments\\aot-console\\native-gc-base-test.c",
+        "D:\\a\\neoCLR\\neoCLR\\docs\\experiments\\aot-console\\root-probe.c",
+        "D:\\a\\neoCLR\\neoCLR\\docs\\experiments\\aot-console\\native-gc.c",
+        "/Fe:D:\\a\\neoCLR\\neoCLR\\target\\native-gc-validation\\native-gc-base-test.exe"
+      ],
+      "exitCode": 0,
+      "expected": 0
+    },
+    {
+      "label": "native-gc-base-test",
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\native-gc-validation\\native-gc-base-test.exe"
+      ],
+      "exitCode": 0,
+      "expected": 0
+    },
+    {
+      "label": "native-gc-format-test-build",
+      "command": [
+        "cl",
+        "/nologo",
+        "/W4",
+        "/WX",
+        "/std:c11",
+        "/experimental:c11atomics",
+        "/O2",
+        "/MT",
+        "/ID:\\a\\neoCLR\\neoCLR\\docs\\experiments\\aot-console",
+        "/DNEOCLR_NATIVE_GC",
+        "D:\\a\\neoCLR\\neoCLR\\docs\\experiments\\aot-console\\native-gc-format-test.c",
+        "D:\\a\\neoCLR\\neoCLR\\docs\\experiments\\aot-console\\root-probe.c",
+        "D:\\a\\neoCLR\\neoCLR\\docs\\experiments\\aot-console\\native-gc.c",
+        "D:\\a\\neoCLR\\neoCLR\\docs\\experiments\\aot-console\\text-arena.c",
+        "/Fe:D:\\a\\neoCLR\\neoCLR\\target\\native-gc-validation\\native-gc-format-test.exe"
+      ],
+      "exitCode": 0,
+      "expected": 0
+    },
+    {
+      "label": "native-gc-format-test",
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\native-gc-validation\\native-gc-format-test.exe"
+      ],
+      "exitCode": 0,
+      "expected": 0
+    },
+    {
+      "label": "native-gc-primitive-test-build",
+      "command": [
+        "cl",
+        "/nologo",
+        "/W4",
+        "/WX",
+        "/std:c11",
+        "/experimental:c11atomics",
+        "/O2",
+        "/MT",
+        "/ID:\\a\\neoCLR\\neoCLR\\docs\\experiments\\aot-console",
+        "/DNEOCLR_NATIVE_GC",
+        "D:\\a\\neoCLR\\neoCLR\\docs\\experiments\\aot-console\\native-gc-primitive-test.c",
+        "D:\\a\\neoCLR\\neoCLR\\docs\\experiments\\aot-console\\root-probe.c",
+        "D:\\a\\neoCLR\\neoCLR\\docs\\experiments\\aot-console\\native-gc.c",
+        "D:\\a\\neoCLR\\neoCLR\\docs\\experiments\\aot-console\\text-arena.c",
+        "/Fe:D:\\a\\neoCLR\\neoCLR\\target\\native-gc-validation\\native-gc-primitive-test.exe"
+      ],
+      "exitCode": 0,
+      "expected": 0
+    },
+    {
+      "label": "native-gc-primitive-test",
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\native-gc-validation\\native-gc-primitive-test.exe"
+      ],
+      "exitCode": 0,
+      "expected": 0
+    },
+    {
+      "label": "native-gc-reference-test-build",
+      "command": [
+        "cl",
+        "/nologo",
+        "/W4",
+        "/WX",
+        "/std:c11",
+        "/experimental:c11atomics",
+        "/O2",
+        "/MT",
+        "/ID:\\a\\neoCLR\\neoCLR\\docs\\experiments\\aot-console",
+        "/DNEOCLR_NATIVE_GC",
+        "D:\\a\\neoCLR\\neoCLR\\docs\\experiments\\aot-console\\native-gc-reference-test.c",
+        "D:\\a\\neoCLR\\neoCLR\\docs\\experiments\\aot-console\\root-probe.c",
+        "D:\\a\\neoCLR\\neoCLR\\docs\\experiments\\aot-console\\native-gc.c",
+        "D:\\a\\neoCLR\\neoCLR\\docs\\experiments\\aot-console\\text-arena.c",
+        "/Fe:D:\\a\\neoCLR\\neoCLR\\target\\native-gc-validation\\native-gc-reference-test.exe"
+      ],
+      "exitCode": 0,
+      "expected": 0
+    },
+    {
+      "label": "native-gc-reference-test",
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\native-gc-validation\\native-gc-reference-test.exe"
+      ],
+      "exitCode": 0,
+      "expected": 0
+    },
+    {
+      "label": "native-gc-borrowed-test-build",
+      "command": [
+        "cl",
+        "/nologo",
+        "/W4",
+        "/WX",
+        "/std:c11",
+        "/experimental:c11atomics",
+        "/O2",
+        "/MT",
+        "/ID:\\a\\neoCLR\\neoCLR\\docs\\experiments\\aot-console",
+        "/DNEOCLR_NATIVE_GC",
+        "D:\\a\\neoCLR\\neoCLR\\docs\\experiments\\aot-console\\native-gc-borrowed-test.c",
+        "D:\\a\\neoCLR\\neoCLR\\docs\\experiments\\aot-console\\root-probe.c",
+        "D:\\a\\neoCLR\\neoCLR\\docs\\experiments\\aot-console\\native-gc.c",
+        "D:\\a\\neoCLR\\neoCLR\\docs\\experiments\\aot-console\\text-arena.c",
+        "/Fe:D:\\a\\neoCLR\\neoCLR\\target\\native-gc-validation\\native-gc-borrowed-test.exe"
+      ],
+      "exitCode": 0,
+      "expected": 0
+    },
+    {
+      "label": "native-gc-borrowed-test",
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\native-gc-validation\\native-gc-borrowed-test.exe"
+      ],
+      "exitCode": 0,
+      "expected": 0
+    },
+    {
+      "label": "native-gc-utf8-test-build",
+      "command": [
+        "cl",
+        "/nologo",
+        "/W4",
+        "/WX",
+        "/std:c11",
+        "/experimental:c11atomics",
+        "/O2",
+        "/MT",
+        "/ID:\\a\\neoCLR\\neoCLR\\docs\\experiments\\aot-console",
+        "/DNEOCLR_NATIVE_GC",
+        "D:\\a\\neoCLR\\neoCLR\\docs\\experiments\\aot-console\\native-gc-utf8-test.c",
+        "D:\\a\\neoCLR\\neoCLR\\docs\\experiments\\aot-console\\root-probe.c",
+        "D:\\a\\neoCLR\\neoCLR\\docs\\experiments\\aot-console\\native-gc.c",
+        "D:\\a\\neoCLR\\neoCLR\\docs\\experiments\\aot-console\\text-arena.c",
+        "/Fe:D:\\a\\neoCLR\\neoCLR\\target\\native-gc-validation\\native-gc-utf8-test.exe"
+      ],
+      "exitCode": 0,
+      "expected": 0
+    },
+    {
+      "label": "native-gc-utf8-test",
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\native-gc-validation\\native-gc-utf8-test.exe"
+      ],
+      "exitCode": 0,
+      "expected": 0
+    },
+    {
+      "label": "native-gc-unicode-test-build",
+      "command": [
+        "cl",
+        "/nologo",
+        "/W4",
+        "/WX",
+        "/std:c11",
+        "/experimental:c11atomics",
+        "/O2",
+        "/MT",
+        "/ID:\\a\\neoCLR\\neoCLR\\docs\\experiments\\aot-console",
+        "/DNEOCLR_NATIVE_GC",
+        "D:\\a\\neoCLR\\neoCLR\\docs\\experiments\\aot-console\\native-gc-unicode-test.c",
+        "D:\\a\\neoCLR\\neoCLR\\docs\\experiments\\aot-console\\root-probe.c",
+        "D:\\a\\neoCLR\\neoCLR\\docs\\experiments\\aot-console\\native-gc.c",
+        "D:\\a\\neoCLR\\neoCLR\\docs\\experiments\\aot-console\\text-arena.c",
+        "D:\\a\\neoCLR\\neoCLR\\docs\\experiments\\aot-console\\string-unicode.c",
+        "D:\\a\\neoCLR\\neoCLR\\tools\\aot-native-text\\target\\release\\neoclr_aot_native_text.lib",
+        "/Fe:D:\\a\\neoCLR\\neoCLR\\target\\native-gc-validation\\native-gc-unicode-test.exe"
+      ],
+      "exitCode": 0,
+      "expected": 0
+    },
+    {
+      "label": "native-gc-unicode-test",
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\native-gc-validation\\native-gc-unicode-test.exe"
+      ],
+      "exitCode": 0,
+      "expected": 0
+    },
+    {
+      "label": "native-gc-arguments-test-build",
+      "command": [
+        "cl",
+        "/nologo",
+        "/W4",
+        "/WX",
+        "/std:c11",
+        "/experimental:c11atomics",
+        "/O2",
+        "/MT",
+        "/ID:\\a\\neoCLR\\neoCLR\\docs\\experiments\\aot-console",
+        "/DNEOCLR_NATIVE_GC",
+        "D:\\a\\neoCLR\\neoCLR\\docs\\experiments\\aot-console\\native-gc-arguments-test.c",
+        "D:\\a\\neoCLR\\neoCLR\\docs\\experiments\\aot-console\\root-probe.c",
+        "D:\\a\\neoCLR\\neoCLR\\docs\\experiments\\aot-console\\native-gc.c",
+        "D:\\a\\neoCLR\\neoCLR\\docs\\experiments\\aot-console\\text-arena.c",
+        "D:\\a\\neoCLR\\neoCLR\\tools\\native\\entry-arguments.c",
+        "/Fe:D:\\a\\neoCLR\\neoCLR\\target\\native-gc-validation\\native-gc-arguments-test.exe"
+      ],
+      "exitCode": 0,
+      "expected": 0
+    },
+    {
+      "label": "native-gc-arguments-test",
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\native-gc-validation\\native-gc-arguments-test.exe"
+      ],
+      "exitCode": 0,
+      "expected": 0
+    },
+    {
+      "label": "native-gc-producer-test-build",
+      "command": [
+        "cl",
+        "/nologo",
+        "/W4",
+        "/WX",
+        "/std:c11",
+        "/experimental:c11atomics",
+        "/O2",
+        "/MT",
+        "/ID:\\a\\neoCLR\\neoCLR\\docs\\experiments\\aot-console",
+        "/DNEOCLR_NATIVE_GC",
+        "D:\\a\\neoCLR\\neoCLR\\docs\\experiments\\aot-console\\native-gc-producer-test.c",
+        "D:\\a\\neoCLR\\neoCLR\\docs\\experiments\\aot-console\\root-probe.c",
+        "D:\\a\\neoCLR\\neoCLR\\docs\\experiments\\aot-console\\native-gc.c",
+        "D:\\a\\neoCLR\\neoCLR\\docs\\experiments\\aot-console\\text-arena.c",
+        "/Fe:D:\\a\\neoCLR\\neoCLR\\target\\native-gc-validation\\native-gc-producer-test.exe"
+      ],
+      "exitCode": 0,
+      "expected": 0
+    },
+    {
+      "label": "native-gc-producer-test",
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\native-gc-validation\\native-gc-producer-test.exe"
+      ],
+      "exitCode": 0,
+      "expected": 0
+    },
+    {
+      "label": "native-gc-preference-test-build",
+      "command": [
+        "cl",
+        "/nologo",
+        "/W4",
+        "/WX",
+        "/std:c11",
+        "/experimental:c11atomics",
+        "/O2",
+        "/MT",
+        "/ID:\\a\\neoCLR\\neoCLR\\docs\\experiments\\aot-console",
+        "/DNEOCLR_NATIVE_GC",
+        "D:\\a\\neoCLR\\neoCLR\\docs\\experiments\\aot-console\\native-gc-preference-test.c",
+        "D:\\a\\neoCLR\\neoCLR\\docs\\experiments\\aot-console\\root-probe.c",
+        "D:\\a\\neoCLR\\neoCLR\\docs\\experiments\\aot-console\\native-gc.c",
+        "D:\\a\\neoCLR\\neoCLR\\docs\\experiments\\aot-console\\text-arena.c",
+        "D:\\a\\neoCLR\\neoCLR\\docs\\experiments\\aot-console\\system-culture.c",
+        "D:\\a\\neoCLR\\neoCLR\\docs\\experiments\\aot-console\\time-zone.c",
+        "D:\\a\\neoCLR\\neoCLR\\tools\\aot-native-text\\target\\release\\neoclr_aot_native_text.lib",
+        "/Fe:D:\\a\\neoCLR\\neoCLR\\target\\native-gc-validation\\native-gc-preference-test.exe"
+      ],
+      "exitCode": 0,
+      "expected": 0
+    },
+    {
+      "label": "native-gc-preference-test",
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\native-gc-validation\\native-gc-preference-test.exe"
+      ],
+      "exitCode": 0,
+      "expected": 0
+    },
+    {
+      "label": "native-gc-admission-test-build",
+      "command": [
+        "cl",
+        "/nologo",
+        "/W4",
+        "/WX",
+        "/std:c11",
+        "/experimental:c11atomics",
+        "/O2",
+        "/MT",
+        "/ID:\\a\\neoCLR\\neoCLR\\docs\\experiments\\aot-console",
+        "/DNEOCLR_NATIVE_GC",
+        "D:\\a\\neoCLR\\neoCLR\\docs\\experiments\\aot-console\\native-gc-admission-test.c",
+        "D:\\a\\neoCLR\\neoCLR\\docs\\experiments\\aot-console\\root-probe.c",
+        "D:\\a\\neoCLR\\neoCLR\\docs\\experiments\\aot-console\\native-gc.c",
+        "/Fe:D:\\a\\neoCLR\\neoCLR\\target\\native-gc-validation\\native-gc-admission-test.exe"
+      ],
+      "exitCode": 0,
+      "expected": 0
+    },
+    {
+      "label": "native-gc-admission-test",
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\native-gc-validation\\native-gc-admission-test.exe"
+      ],
+      "exitCode": 0,
+      "expected": 0
+    },
+    {
+      "label": "native-gc-allocation-test-build",
+      "command": [
+        "cl",
+        "/nologo",
+        "/W4",
+        "/WX",
+        "/std:c11",
+        "/experimental:c11atomics",
+        "/O2",
+        "/MT",
+        "/ID:\\a\\neoCLR\\neoCLR\\docs\\experiments\\aot-console",
+        "/DNEOCLR_NATIVE_GC",
+        "D:\\a\\neoCLR\\neoCLR\\docs\\experiments\\aot-console\\native-gc-allocation-test.c",
+        "D:\\a\\neoCLR\\neoCLR\\docs\\experiments\\aot-console\\root-probe.c",
+        "D:\\a\\neoCLR\\neoCLR\\docs\\experiments\\aot-console\\native-gc.c",
+        "/Fe:D:\\a\\neoCLR\\neoCLR\\target\\native-gc-validation\\native-gc-allocation-test.exe"
+      ],
+      "exitCode": 0,
+      "expected": 0
+    },
+    {
+      "label": "native-gc-allocation-test",
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\native-gc-validation\\native-gc-allocation-test.exe"
+      ],
+      "exitCode": 0,
+      "expected": 0
+    },
+    {
+      "label": "native-gc-helper-test-build",
+      "command": [
+        "cl",
+        "/nologo",
+        "/W4",
+        "/WX",
+        "/std:c11",
+        "/experimental:c11atomics",
+        "/O2",
+        "/MT",
+        "/ID:\\a\\neoCLR\\neoCLR\\docs\\experiments\\aot-console",
+        "/DNEOCLR_NATIVE_GC",
+        "D:\\a\\neoCLR\\neoCLR\\docs\\experiments\\aot-console\\native-gc-helper-test.c",
+        "D:\\a\\neoCLR\\neoCLR\\docs\\experiments\\aot-console\\root-probe.c",
+        "D:\\a\\neoCLR\\neoCLR\\docs\\experiments\\aot-console\\native-gc.c",
+        "/Fe:D:\\a\\neoCLR\\neoCLR\\target\\native-gc-validation\\native-gc-helper-test.exe"
+      ],
+      "exitCode": 0,
+      "expected": 0
+    },
+    {
+      "label": "native-gc-helper-test",
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\native-gc-validation\\native-gc-helper-test.exe"
+      ],
+      "exitCode": 0,
+      "expected": 0
+    },
+    {
+      "label": "native-gc-text-helper-test-build",
+      "command": [
+        "cl",
+        "/nologo",
+        "/W4",
+        "/WX",
+        "/std:c11",
+        "/experimental:c11atomics",
+        "/O2",
+        "/MT",
+        "/ID:\\a\\neoCLR\\neoCLR\\docs\\experiments\\aot-console",
+        "/DNEOCLR_NATIVE_GC",
+        "D:\\a\\neoCLR\\neoCLR\\docs\\experiments\\aot-console\\native-gc-text-helper-test.c",
+        "D:\\a\\neoCLR\\neoCLR\\docs\\experiments\\aot-console\\root-probe.c",
+        "D:\\a\\neoCLR\\neoCLR\\docs\\experiments\\aot-console\\native-gc.c",
+        "D:\\a\\neoCLR\\neoCLR\\docs\\experiments\\aot-console\\text-arena.c",
+        "/Fe:D:\\a\\neoCLR\\neoCLR\\target\\native-gc-validation\\native-gc-text-helper-test.exe"
+      ],
+      "exitCode": 0,
+      "expected": 0
+    },
+    {
+      "label": "native-gc-text-helper-test",
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\native-gc-validation\\native-gc-text-helper-test.exe"
+      ],
+      "exitCode": 0,
+      "expected": 0
+    },
+    {
+      "label": "native-gc-index-test-build",
+      "command": [
+        "cl",
+        "/nologo",
+        "/W4",
+        "/WX",
+        "/std:c11",
+        "/experimental:c11atomics",
+        "/O2",
+        "/MT",
+        "/ID:\\a\\neoCLR\\neoCLR\\docs\\experiments\\aot-console",
+        "/DNEOCLR_NATIVE_GC",
+        "D:\\a\\neoCLR\\neoCLR\\docs\\experiments\\aot-console\\native-gc-index-test.c",
+        "D:\\a\\neoCLR\\neoCLR\\docs\\experiments\\aot-console\\root-probe.c",
+        "D:\\a\\neoCLR\\neoCLR\\docs\\experiments\\aot-console\\native-gc.c",
+        "/Fe:D:\\a\\neoCLR\\neoCLR\\target\\native-gc-validation\\native-gc-index-test.exe"
+      ],
+      "exitCode": 0,
+      "expected": 0
+    },
+    {
+      "label": "native-gc-index-test",
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\native-gc-validation\\native-gc-index-test.exe"
+      ],
+      "exitCode": 0,
+      "expected": 0
+    },
+    {
+      "label": "native-gc-dense-test-build",
+      "command": [
+        "cl",
+        "/nologo",
+        "/W4",
+        "/WX",
+        "/std:c11",
+        "/experimental:c11atomics",
+        "/O2",
+        "/MT",
+        "/ID:\\a\\neoCLR\\neoCLR\\docs\\experiments\\aot-console",
+        "/DNEOCLR_NATIVE_GC",
+        "D:\\a\\neoCLR\\neoCLR\\docs\\experiments\\aot-console\\native-gc-dense-test.c",
+        "D:\\a\\neoCLR\\neoCLR\\docs\\experiments\\aot-console\\root-probe.c",
+        "D:\\a\\neoCLR\\neoCLR\\docs\\experiments\\aot-console\\native-gc.c",
+        "/Fe:D:\\a\\neoCLR\\neoCLR\\target\\native-gc-validation\\native-gc-dense-test.exe"
+      ],
+      "exitCode": 0,
+      "expected": 0
+    },
+    {
+      "label": "native-gc-dense-test",
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\native-gc-validation\\native-gc-dense-test.exe"
+      ],
+      "exitCode": 0,
+      "expected": 0
+    },
+    {
+      "label": "native-gc-pass-test-build",
+      "command": [
+        "cl",
+        "/nologo",
+        "/W4",
+        "/WX",
+        "/std:c11",
+        "/experimental:c11atomics",
+        "/O2",
+        "/MT",
+        "/ID:\\a\\neoCLR\\neoCLR\\docs\\experiments\\aot-console",
+        "/DNEOCLR_NATIVE_GC",
+        "D:\\a\\neoCLR\\neoCLR\\docs\\experiments\\aot-console\\native-gc-pass-test.c",
+        "D:\\a\\neoCLR\\neoCLR\\docs\\experiments\\aot-console\\root-probe.c",
+        "D:\\a\\neoCLR\\neoCLR\\docs\\experiments\\aot-console\\native-gc.c",
+        "/Fe:D:\\a\\neoCLR\\neoCLR\\target\\native-gc-validation\\native-gc-pass-test.exe"
+      ],
+      "exitCode": 0,
+      "expected": 0
+    },
+    {
+      "label": "native-gc-pass-test",
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\native-gc-validation\\native-gc-pass-test.exe"
+      ],
+      "exitCode": 0,
+      "expected": 0
+    },
+    {
+      "label": "native-gc-profile-test-build",
+      "command": [
+        "cl",
+        "/nologo",
+        "/W4",
+        "/WX",
+        "/std:c11",
+        "/experimental:c11atomics",
+        "/O2",
+        "/MT",
+        "/ID:\\a\\neoCLR\\neoCLR\\docs\\experiments\\aot-console",
+        "/DNEOCLR_NATIVE_GC",
+        "D:\\a\\neoCLR\\neoCLR\\docs\\experiments\\aot-console\\native-gc-profile-test.c",
+        "D:\\a\\neoCLR\\neoCLR\\docs\\experiments\\aot-console\\root-probe.c",
+        "D:\\a\\neoCLR\\neoCLR\\docs\\experiments\\aot-console\\native-gc.c",
+        "/Fe:D:\\a\\neoCLR\\neoCLR\\target\\native-gc-validation\\native-gc-profile-test.exe"
+      ],
+      "exitCode": 0,
+      "expected": 0
+    },
+    {
+      "label": "native-gc-profile-test",
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\native-gc-validation\\native-gc-profile-test.exe"
+      ],
+      "exitCode": 0,
+      "expected": 0
+    },
+    {
+      "label": "profile-enabled-build",
+      "command": [
+        "cl",
+        "/nologo",
+        "/W4",
+        "/WX",
+        "/std:c11",
+        "/experimental:c11atomics",
+        "/O2",
+        "/MT",
+        "/ID:\\a\\neoCLR\\neoCLR\\docs\\experiments\\aot-console",
+        "/DNEOCLR_NATIVE_GC",
+        "/DNEOCLR_GC_PROFILE",
+        "D:\\a\\neoCLR\\neoCLR\\docs\\experiments\\aot-console\\native-gc-profile-test.c",
+        "D:\\a\\neoCLR\\neoCLR\\docs\\experiments\\aot-console\\root-probe.c",
+        "D:\\a\\neoCLR\\neoCLR\\docs\\experiments\\aot-console\\native-gc.c",
+        "/Fe:D:\\a\\neoCLR\\neoCLR\\target\\native-gc-validation\\profile-enabled.exe"
+      ],
+      "exitCode": 0,
+      "expected": 0
+    },
+    {
+      "label": "profile-enabled",
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\native-gc-validation\\profile-enabled.exe"
+      ],
+      "exitCode": 0,
+      "expected": 0
+    },
+    {
+      "label": "root-validation-probe-build",
+      "command": [
+        "cl",
+        "/nologo",
+        "/W4",
+        "/WX",
+        "/std:c11",
+        "/experimental:c11atomics",
+        "/O2",
+        "/MT",
+        "/ID:\\a\\neoCLR\\neoCLR\\docs\\experiments\\aot-console",
+        "D:\\a\\neoCLR\\neoCLR\\docs\\experiments\\aot-console\\root-validation-test.c",
+        "D:\\a\\neoCLR\\neoCLR\\docs\\experiments\\aot-console\\root-probe.c",
+        "/Fe:D:\\a\\neoCLR\\neoCLR\\target\\native-gc-validation\\root-validation-probe.exe"
+      ],
+      "exitCode": 0,
+      "expected": 0
+    },
+    {
+      "label": "root-validation-probe-address",
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\native-gc-validation\\root-validation-probe.exe",
+        "address"
+      ],
+      "exitCode": 3,
+      "expected": 3
+    },
+    {
+      "label": "root-validation-probe-width",
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\native-gc-validation\\root-validation-probe.exe",
+        "width"
+      ],
+      "exitCode": 3,
+      "expected": 3
+    },
+    {
+      "label": "root-validation-probe-flags",
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\native-gc-validation\\root-validation-probe.exe",
+        "flags"
+      ],
+      "exitCode": 3,
+      "expected": 3
+    },
+    {
+      "label": "root-validation-probe-fault",
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\native-gc-validation\\root-validation-probe.exe",
+        "fault"
+      ],
+      "exitCode": 3,
+      "expected": 3
+    },
+    {
+      "label": "root-validation-probe-transient",
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\native-gc-validation\\root-validation-probe.exe",
+        "transient"
+      ],
+      "exitCode": 3,
+      "expected": 3
+    },
+    {
+      "label": "root-validation-gc-build",
+      "command": [
+        "cl",
+        "/nologo",
+        "/W4",
+        "/WX",
+        "/std:c11",
+        "/experimental:c11atomics",
+        "/O2",
+        "/MT",
+        "/ID:\\a\\neoCLR\\neoCLR\\docs\\experiments\\aot-console",
+        "/DNEOCLR_NATIVE_GC",
+        "D:\\a\\neoCLR\\neoCLR\\docs\\experiments\\aot-console\\root-validation-test.c",
+        "D:\\a\\neoCLR\\neoCLR\\docs\\experiments\\aot-console\\root-probe.c",
+        "D:\\a\\neoCLR\\neoCLR\\docs\\experiments\\aot-console\\native-gc.c",
+        "/Fe:D:\\a\\neoCLR\\neoCLR\\target\\native-gc-validation\\root-validation-gc.exe"
+      ],
+      "exitCode": 0,
+      "expected": 0
+    },
+    {
+      "label": "root-validation-gc-address",
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\native-gc-validation\\root-validation-gc.exe",
+        "address"
+      ],
+      "exitCode": 3,
+      "expected": 3
+    },
+    {
+      "label": "root-validation-gc-width",
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\native-gc-validation\\root-validation-gc.exe",
+        "width"
+      ],
+      "exitCode": 3,
+      "expected": 3
+    },
+    {
+      "label": "root-validation-gc-flags",
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\native-gc-validation\\root-validation-gc.exe",
+        "flags"
+      ],
+      "exitCode": 3,
+      "expected": 3
+    },
+    {
+      "label": "root-validation-gc-fault",
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\native-gc-validation\\root-validation-gc.exe",
+        "fault"
+      ],
+      "exitCode": 3,
+      "expected": 3
+    },
+    {
+      "label": "root-validation-gc-transient",
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\native-gc-validation\\root-validation-gc.exe",
+        "transient"
+      ],
+      "exitCode": 3,
+      "expected": 3
+    }
+  ],
+  "revision": "2f61c085f5ffe960cca34f3480be7f226fe415a5",
+  "inputs": {
+    "docs\\experiments\\aot-console\\system-culture.c": "abe067709d0d2fbd7ad41ca484d398bd65826180ef65a751a87724ffdf62cc5d",
+    "docs\\experiments\\aot-console\\time-zone.c": "ceb6adacdc57e82a4931f9b40f0b121c07c0731c69a6fd558a37b3fdd12601b5",
+    "docs\\experiments\\aot-console\\file-input.c": "cda93d87a3754fbee8a5836356979aa2be6a20d403f87f6f5abd969db059877c",
+    "tools\\native\\entry-arguments.c": "07e9a8b700e6f6c19b6d41ba9c828db8aa11d616696247a9bb03eb68d068c3e2",
+    "docs\\experiments\\aot-console\\string-unicode.c": "5a24e7c62832dccfc2be5831f37a10557badd726bd58bf8ce895d4d1c6fc67e2",
+    "tools\\aot-native-text\\Cargo.toml": "b9370cf254e1e3c071ee20303ab085a8389302737520658df2ff1678633145de",
+    "tools\\aot-native-text\\Cargo.lock": "317a89585a5936b8724190ceac0972204047643a4ceffaff2003d41e06c78ae0",
+    "tools\\aot-native-text\\src\\lib.rs": "18700c3dc8dbb6c475c33eecf6ff27b1f9497e21c6d405540b5aa9ed6cae2deb",
+    "runtime\\native\\diagnostics\\attach.c": "464882fc743dbc761a81c5e4e4f0a73bb48490b02287b1d130b0d51e59bed7fc",
+    "runtime\\native\\diagnostics\\attach.h": "d2c89948e8eb7447919b954db31a3b00eb518611aa65fc4362d244b452a7a3ac",
+    "runtime\\native\\faults\\fault-details.h": "ff09aee456b338eef6c123ebcc60f428acea32720b7bef45910e22b9953c5ed9",
+    "runtime\\native\\faults\\render.c": "e650b004a256f448509d80d8c574873520a469a6801cd32f8e7b99c3fb30a439",
+    "runtime\\native\\gc\\native-gc.c": "7533a0dcc89813011222eac3823fb16afb926e29bb55139ccf2ecec1b52cd407",
+    "runtime\\native\\gc\\native-gc.h": "55075aac79e8ce37e15c210bfa9b2ae5820c58bc88cd604e865fbd7c8b13e972",
+    "runtime\\native\\gc\\root-probe.c": "01c3b9b11eebe5348041b90c4f649b64d41b2f32d727c897c6b09a32f2c539df",
+    "runtime\\native\\gc\\root-probe.h": "ea3c8ea415619121ec354deda550e27055ceabbe05a489c8a2f631568e9acfb7",
+    "runtime\\native\\memory\\text-arena.c": "14a9f364eb5ea4cbc38136c8e7ebec0c0e4a08482bb25c31721263fe77c1f917",
+    "runtime\\native\\memory\\text-arena.h": "d60e4481e61aa6c522dcfe1e17e93decdbf2547013fd066ae2e297f42e9023a7",
+    "scripts\\validate-native-gc.py": "ffd5e0b836e0d91b0713685faa0be789bc3fdef6a9993c1b9c5d2d072c7cd6f7",
+    "docs\\experiments\\aot-console\\console.h": "9a0669bebeb7e94e7e284cfa670327394c9d47bfe1c6b0a3482ae5b2a01b13d3",
+    "docs\\experiments\\aot-console\\entry-arguments.h": "c3c00d2501901d5ee1fc1d5562f8898850eb4cf262e23eec36ff43e443128666",
+    "docs\\experiments\\aot-console\\file-input.h": "c82b4561603a8f1233835bd09a1a6e771523418cdeead664fc090e14d2019a03",
+    "docs\\experiments\\aot-console\\file-output.h": "fdd1420cdf244d11046883d67b11c221e905d328c266b27cd37ac95c35704e8f",
+    "docs\\experiments\\aot-console\\native-gc.h": "f3589dff32ac56191ad3f9b77e116ec69dc8197f84317424518e19d307a5bd67",
+    "docs\\experiments\\aot-console\\native-session.h": "f42dd75215ff55cca439bace75b28b07fb0a972bc1fa7cad253601f715f70335",
+    "docs\\experiments\\aot-console\\native-stack.h": "e4cec17c036469051fd10b934c04e7b7af06e4f1c5db2f73cd339f4180583105",
+    "docs\\experiments\\aot-console\\root-probe.h": "d2a8e481d39cd528d9c67f4f3026d9ac611ff0d636078a5f20dbb6884996ed8c",
+    "docs\\experiments\\aot-console\\socket-client-internal.h": "cd81752f5cecca33b74d306feb311485340b810f8951fb82d3f91f635b16fc0c",
+    "docs\\experiments\\aot-console\\socket-listener.h": "e311b00e5a60a13587c8f4ced908ba0a62c2d08c2d8d8a64673e7b7b7e90d1e8",
+    "docs\\experiments\\aot-console\\socket-os.h": "c2851391b925acf6a362906b835e14bdb28a562e999cc88479a11a0c65a9736e",
+    "docs\\experiments\\aot-console\\string-unicode.h": "60a697df91c1021f94af85daede5f655d6385425c65c454157a44d1ebf186706",
+    "docs\\experiments\\aot-console\\task-queue.h": "b28695014eed2fa8304b078d7bba002ebbd8d71bb86a4643e0092b794cfe3654",
+    "docs\\experiments\\aot-console\\text-arena.h": "1bdeed01520a810d71d88c4c0e9a814323cc55d363554f6888e162cbee9e3a52",
+    "docs\\experiments\\aot-console\\tls-managed.h": "4429514dddad09403b50838c6db90e9c5db540f5ffcb06768dc3df3fe1de6890",
+    "docs\\experiments\\aot-console\\native-gc.c": "fb16012609473203b6a17315c3294c69cc7a07f9dc0d4182854b921ae22601d5",
+    "docs\\experiments\\aot-console\\root-probe.c": "5c97b9cb3f2ba2b262e3749d73fe3d6fe6004e1dcd54b09af975fbd22ccdc0b2",
+    "docs\\experiments\\aot-console\\text-arena.c": "bdf8aee6550ce283afda67a3236d0da9a6295c4cd28a24f33ed80ef2e219c2e8",
+    "docs\\experiments\\aot-console\\root-validation-test.c": "6b1001ce3147bd3655e645158e05ddde988444865f094fcf534454f5b654aa50",
+    "docs\\experiments\\aot-fault-details\\fault-details.h": "dd4a9e47bdc95e95cce57065bccebfcdbd6af113bd67db3606274f0184d9f346",
+    "docs\\experiments\\aot-console\\native-gc-test.c": "1dab35c9a8afee918ab77ae1752ff150c2820737dc52c6450dbc7c425faf463f",
+    "docs\\experiments\\aot-console\\native-gc-base-test.c": "d038a0aab95bfc0f6e7a023f85d9fcd861559435ff30945f48ef57aba3143af4",
+    "docs\\experiments\\aot-console\\native-gc-format-test.c": "61a99dd61c35552cb47e868f7422c37b6c710f12a341d4aa83a28039b7410ef0",
+    "docs\\experiments\\aot-console\\native-gc-primitive-test.c": "4080296d2b440a1b068a8ea8e344890ba0876a616d07d39c282622662fdfc0e8",
+    "docs\\experiments\\aot-console\\native-gc-reference-test.c": "29a8a24fb5bb3d85cb8caaa747f86dd66c2c0fe3a22bd3aee794f4483a16df1a",
+    "docs\\experiments\\aot-console\\native-gc-borrowed-test.c": "848f50d3c401f7dc34dc8557164f0df1be195cc77368d0ad27192ff251151947",
+    "docs\\experiments\\aot-console\\native-gc-utf8-test.c": "26ad89179664ab493622c808b959b92f9f3114706eae47e531aeef033ebf7226",
+    "docs\\experiments\\aot-console\\native-gc-unicode-test.c": "fb67ffeddc7e5134ea8500f6b988919e7b4d29d50b3fb0e93aac153e1e50658b",
+    "docs\\experiments\\aot-console\\native-gc-arguments-test.c": "40e402fba1258fb8b0c74a7dbbc59e19bf5a09b6b17a7e3f8ff586764dfe5edb",
+    "docs\\experiments\\aot-console\\native-gc-producer-test.c": "e2313f0889ed6b3ec9ed0140076f9be55a917513b4b9d8d1b4d4e48599889e9a",
+    "docs\\experiments\\aot-console\\native-gc-preference-test.c": "60c601af1d7ef311477c4156c9e0cd1b21e88a60dfaab67babca21e50aee2199",
+    "docs\\experiments\\aot-console\\native-gc-admission-test.c": "5b8d220f8a503d0dad5ae8001f44d5bf4e78302847fc3fe8b1514daa6e4f7b5b",
+    "docs\\experiments\\aot-console\\native-gc-allocation-test.c": "24f3b1b842b191735b6ce731daea3d9f161ebe860a7734a2a6a631f9ae8984a7",
+    "docs\\experiments\\aot-console\\native-gc-helper-test.c": "1d372a722e8f2730f6a47845596b0f897ea718a5b8843bfc90b9e366d05dcc71",
+    "docs\\experiments\\aot-console\\native-gc-text-helper-test.c": "40f695d82e7e314c1bc013c2489388d957bcf617afd7790e563e0ac44e9d585a",
+    "docs\\experiments\\aot-console\\native-gc-index-test.c": "895425a3555fcc789e64574f4d1fe78603d5c57187fdb0f678de4627faf97ec4",
+    "docs\\experiments\\aot-console\\native-gc-dense-test.c": "f49fac3b5e1715f243fc263565fae6d9ccb5411c1909ae9a0b8f7fed6202ea9f",
+    "docs\\experiments\\aot-console\\native-gc-pass-test.c": "5c1454f71810a4fd0a9aca4e4e6b9b2ce8a936ca3e279e13a4140734430bd855",
+    "docs\\experiments\\aot-console\\native-gc-profile-test.c": "c59394d6d076eabefbb043f8449d7e2ae09e406109732bf6d0fbd2771a9b1e2e"
+  }
+}
