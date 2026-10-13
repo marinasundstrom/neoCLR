@@ -1,5 +1,11 @@
 # neoCLR platform roadmap
 
+**HTTP admission (2026-10-13):** [concurrent exchange evidence](../benchmarks/http-concurrency/README.md)
+qualifies bounded FIFO acceptance, cancellation and shutdown in interpreter, JIT
+and AOT on macOS. Slow headers and bodies no longer prevent other admitted
+connections from completing. Streaming request/response bodies are the next
+author-directed step; current request completion still buffers the full body.
+
 **HTTP comparison matrix (2026-10-13):** Author-directed [retained direct-handler projects](../benchmarks/http-server/platforms.md)
 cover neoCLR JIT/AOT, Kestrel JIT/AOT, Go native and Node V8 without routing. All
 2,304 pilot responses pass. The large observed neoCLR gap reinforces investigation

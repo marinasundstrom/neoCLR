@@ -8,6 +8,14 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-13
 
+- Queue concurrent HTTP accepts within the existing 16-exchange admission limit,
+  starting the next native accept before TLS/request parsing on earlier sockets.
+  Cancel queued calls immediately and cover head/middle/tail removal, shutdown,
+  slow headers and fixed/chunked bodies in interpreter, JIT and AOT. Diagnostic
+  AOT reclaims all 14,737 allocations; 1,536 matched sequential responses pass,
+  with near-baseline throughput and a small negative JSON-AOT shift. Retain
+  evidence and document the next streaming-body work; no website publication.
+
 - Record the author's HTTP concurrency direction alongside GC investigation:
   proposed phase/scheduler instrumentation and a separate concurrent workload.
   Distinguish existing async I/O from cross-request scheduling; no runtime behavior

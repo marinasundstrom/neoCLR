@@ -1,0 +1,224 @@
+{
+  "passed": true,
+  "commands": {
+    "jit": [
+      "/Users/robert/Projects/neoclr/target/http-concurrent-candidate-20261013/bundle/bin/neoclr",
+      "run",
+      "/Users/robert/Projects/neoclr/target/http-concurrent-server-v4-20261013/app.dll"
+    ],
+    "aot": [
+      "/Users/robert/Projects/neoclr/target/http-concurrent-server-v4-20261013/app"
+    ],
+    "interpreter": [
+      "/Users/robert/Projects/neoclr/target/http-concurrent-candidate-20261013/bundle/bin/neoclr",
+      "run",
+      "/Users/robert/Projects/neoclr/target/http-concurrent-server-v4-20261013/app.dll",
+      "--execution",
+      "interpreter",
+      "--instructions",
+      "2000000000",
+      "--system",
+      "/Users/robert/Projects/neoclr/target/http-concurrent-candidate-20261013/bundle/lib/System.runtime.neox",
+      "--object-root",
+      "/Users/robert/Projects/neoclr/target/http-concurrent-candidate-20261013/bundle/lib/System.Runtime.dll",
+      "--module",
+      "/Users/robert/Projects/neoclr/target/http-concurrent-candidate-20261013/bundle/lib/System.Runtime.dll",
+      "--module",
+      "/Users/robert/Projects/neoclr/target/http-concurrent-candidate-20261013/bundle/lib/System.Data.dll",
+      "--module",
+      "/Users/robert/Projects/neoclr/target/http-concurrent-candidate-20261013/bundle/lib/System.Networking.dll",
+      "--module",
+      "/Users/robert/Projects/neoclr/target/http-concurrent-candidate-20261013/bundle/lib/System.Web.dll",
+      "--module",
+      "/Users/robert/Projects/neoclr/target/http-concurrent-candidate-20261013/bundle/lib/System.Data.PostgreSql.dll"
+    ]
+  },
+  "modes": {
+    "jit": {
+      "passed": true,
+      "startupSeconds": 4.326272833,
+      "cases": [
+        {
+          "case": "headers",
+          "fastCompletionSeconds": [
+            0.035182959000000125,
+            0.06391429200000065,
+            0.08697762500000028
+          ],
+          "slowHeldSeconds": 0.08698800000000073,
+          "slowFinishSeconds": 0.01729574999999972,
+          "fastResponsesBeforeSlowRelease": 3,
+          "passed": true
+        },
+        {
+          "case": "fixed-body",
+          "fastCompletionSeconds": [
+            0.052425083999999345,
+            0.08234766699999962,
+            0.10770658399999977
+          ],
+          "slowHeldSeconds": 0.10771741699999993,
+          "slowFinishSeconds": 0.005536166999999814,
+          "fastResponsesBeforeSlowRelease": 3,
+          "passed": true
+        },
+        {
+          "case": "chunked-body",
+          "fastCompletionSeconds": [
+            0.05355404099999994,
+            0.08342970799999971,
+            0.10868579100000009
+          ],
+          "slowHeldSeconds": 0.10869570799999995,
+          "slowFinishSeconds": 0.005774875000000179,
+          "fastResponsesBeforeSlowRelease": 3,
+          "passed": true
+        },
+        {
+          "case": "large-header",
+          "fastCompletionSeconds": [
+            0.06556162499999996,
+            0.10594149999999924,
+            0.13975091699999975
+          ],
+          "slowHeldSeconds": 0.13976091699999937,
+          "slowFinishSeconds": 0.15160958299999994,
+          "fastResponsesBeforeSlowRelease": 3,
+          "passed": true
+        }
+      ],
+      "checkedResponses": 16,
+      "width": 4,
+      "queuedCancellations": 140,
+      "shutdownCancelledAccepts": 16,
+      "admissionLimit": 16
+    },
+    "aot": {
+      "passed": true,
+      "startupSeconds": 0.37880966699999963,
+      "cases": [
+        {
+          "case": "headers",
+          "fastCompletionSeconds": [
+            0.0351117090000006,
+            0.06083495900000013,
+            0.08113954200000073
+          ],
+          "slowHeldSeconds": 0.08115416700000022,
+          "slowFinishSeconds": 0.015253500000000031,
+          "fastResponsesBeforeSlowRelease": 3,
+          "passed": true
+        },
+        {
+          "case": "fixed-body",
+          "fastCompletionSeconds": [
+            0.04616958300000018,
+            0.07239929099999998,
+            0.0947437080000002
+          ],
+          "slowHeldSeconds": 0.0947542910000001,
+          "slowFinishSeconds": 0.004903624999999856,
+          "fastResponsesBeforeSlowRelease": 3,
+          "passed": true
+        },
+        {
+          "case": "chunked-body",
+          "fastCompletionSeconds": [
+            0.0471301249999998,
+            0.07332637499999972,
+            0.09590116700000006
+          ],
+          "slowHeldSeconds": 0.09591283299999986,
+          "slowFinishSeconds": 0.005150916999999922,
+          "fastResponsesBeforeSlowRelease": 3,
+          "passed": true
+        },
+        {
+          "case": "large-header",
+          "fastCompletionSeconds": [
+            0.05757791599999962,
+            0.09296362500000033,
+            0.12270237500000025
+          ],
+          "slowHeldSeconds": 0.12271216600000034,
+          "slowFinishSeconds": 0.13270191699999945,
+          "fastResponsesBeforeSlowRelease": 3,
+          "passed": true
+        }
+      ],
+      "checkedResponses": 16,
+      "width": 4,
+      "queuedCancellations": 140,
+      "shutdownCancelledAccepts": 16,
+      "admissionLimit": 16
+    },
+    "interpreter": {
+      "passed": true,
+      "startupSeconds": 2.398574250000001,
+      "cases": [
+        {
+          "case": "headers",
+          "fastCompletionSeconds": [
+            1.7312343749999997,
+            1.883178666000001,
+            1.9175943750000002
+          ],
+          "slowHeldSeconds": 1.9176104580000004,
+          "slowFinishSeconds": 0.5469054579999995,
+          "fastResponsesBeforeSlowRelease": 3,
+          "passed": true
+        },
+        {
+          "case": "fixed-body",
+          "fastCompletionSeconds": [
+            2.0015920000000005,
+            2.0396412920000007,
+            2.0678828750000005
+          ],
+          "slowHeldSeconds": 2.0679005000000004,
+          "slowFinishSeconds": 0.2585110000000004,
+          "fastResponsesBeforeSlowRelease": 3,
+          "passed": true
+        },
+        {
+          "case": "chunked-body",
+          "fastCompletionSeconds": [
+            1.9321689169999985,
+            2.109183999999999,
+            2.1419787919999997
+          ],
+          "slowHeldSeconds": 2.1419976249999984,
+          "slowFinishSeconds": 0.27034975000000117,
+          "fastResponsesBeforeSlowRelease": 3,
+          "passed": true
+        },
+        {
+          "case": "large-header",
+          "fastCompletionSeconds": [
+            2.5332462909999975,
+            2.5814783749999997,
+            2.615450374999998
+          ],
+          "slowHeldSeconds": 2.6154664999999966,
+          "slowFinishSeconds": 4.367228583000003,
+          "fastResponsesBeforeSlowRelease": 3,
+          "passed": true
+        }
+      ],
+      "checkedResponses": 16,
+      "width": 4,
+      "queuedCancellations": 140,
+      "shutdownCancelledAccepts": 16,
+      "admissionLimit": 16
+    }
+  },
+  "inputs": {
+    "/Users/robert/Projects/neoclr/benchmarks/http-concurrency/validate.py": "6604d20d3bc78b14121689d3dceda7ac60b40c98263b65c5fc9db9977de7e47f",
+    "/Users/robert/Projects/neoclr/benchmarks/http-concurrency/Server.rvn": "f5e511063d3671d3c6dfa7af714197a40b2c7da82784060f45b16c9229849383",
+    "/Users/robert/Projects/neoclr/target/http-concurrent-server-v4-20261013/app.dll": "fbcfaad06e882666628a50e862e9559b442405c1d00fc6e67991c1b15a04303c",
+    "/Users/robert/Projects/neoclr/target/http-concurrent-server-v4-20261013/app": "1b1a1c636b030287e9d498d9e0245a97c9e52b09587d1356e4201b61911deecc",
+    "/Users/robert/Projects/neoclr/target/http-concurrent-server-v4-20261013/build.json": "4caf9854077e4802ace59e2a857b18754376f3da267e25249733f20aad2f0e83",
+    "/Users/robert/Projects/neoclr/target/http-concurrent-candidate-20261013/bundle/manifest.json": "30c0923c8377e73058799c875d08bce6f91725d6b098d251713b5fc2a7085acc"
+  },
+  "scope": "http-concurrency-v1: four batches: width four in all modes to stay below the five-second transport read ceiling; withhold first request suffix until all other responses complete. Includes cancellation/admission/shutdown assertions. Client phase durations, not isolated runtime/parser time or throughput."
+}

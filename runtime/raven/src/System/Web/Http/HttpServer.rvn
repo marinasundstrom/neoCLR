@@ -265,6 +265,59 @@ public class HttpServer {
     private var listener: Socket
     private var shutdown: CancellationTokenSource = CancellationTokenSource()
     private var active: int = 0
+    private var accepting: bool = false
+    private var acceptHead: HttpServerExchange? = null
+    private var acceptTail: HttpServerExchange? = null
+
+    // The socket contract allows one pending accept. Advance this queue when a
+    // socket is accepted, independently of that connection's TLS/read/parse work.
+    internal func BeginAccept(exchange: HttpServerExchange) {
+        if accepting {
+            if acceptTail is HttpServerExchange tail {
+                tail.SetNextAccept(exchange)
+            } else {
+                acceptHead = exchange
+            }
+            acceptTail = exchange
+            return
+        }
+        accepting = true
+        exchange.StartAccept()
+    }
+
+    internal func EndAccept() {
+        accepting = false
+        if acceptHead is HttpServerExchange next {
+            acceptHead = next.TakeNextAccept()
+            if acceptHead is null {
+                acceptTail = null
+            }
+            accepting = true
+            next.StartAccept()
+        }
+    }
+
+    internal func RemoveAccept(exchange: HttpServerExchange) -> bool {
+        var previous: HttpServerExchange? = null
+        var cursor = acceptHead
+        while cursor is HttpServerExchange current {
+            if Object.ReferenceEquals(current, exchange) {
+                let remaining = current.TakeNextAccept()
+                if previous is HttpServerExchange preceding {
+                    preceding.SetNextAccept(remaining)
+                } else {
+                    acceptHead = remaining
+                }
+                if Object.ReferenceEquals(acceptTail, current) {
+                    acceptTail = previous
+                }
+                return true
+            }
+            previous = current
+            cursor = current.NextAccept
+        }
+        return false
+    }
     private var closed: bool = false
 
     internal val StopToken: CancellationToken => shutdown.Token
@@ -701,6 +754,19 @@ public class HttpContext : Disposable {
 }
 
 internal class HttpServerExchange {
+    private var nextAccept: HttpServerExchange? = null
+    internal val NextAccept: HttpServerExchange? => nextAccept
+
+    internal func SetNextAccept(value: HttpServerExchange?) {
+        nextAccept = value
+    }
+
+    internal func TakeNextAccept() -> HttpServerExchange? {
+        let next = nextAccept
+        nextAccept = null
+        return next
+    }
+
     private var owner: HttpServer
     private var listener: Socket
     private var cancellation: CancellationTokenSource = CancellationTokenSource()
@@ -724,13 +790,20 @@ internal class HttpServerExchange {
 
     private func RequestCancellation() {
         cancellation.Cancel()
+        if owner.RemoveAccept(self) {
+            Fail(HttpError.InvalidRequest("Accept cancelled"))
+        }
     }
 
     internal func Start() -> Task<Result<HttpContext, HttpError>> {
+        owner.BeginAccept(self)
+        return source.Task
+    }
+
+    internal func StartAccept() {
         let pending = listener.Accept(cancellation.Token)
         accepting = Some(pending)
         pending.OnCompleted(self.OnAccepted)
-        return source.Task
     }
 
     private func Cleanup() {
@@ -767,6 +840,7 @@ internal class HttpServerExchange {
     private func OnAccepted() {
         if let Some(pending) = accepting {
             accepting = None()
+            owner.EndAccept()
             if pending.IsCancelled {
                 Fail(HttpError.InvalidRequest("Accept cancelled"))
                 return

@@ -16468,3 +16468,21 @@ qualification. Request and response deadline documentation now includes TLS work
   [Node event-loop blocking](https://nodejs.org/en/learn/asynchronous-work/dont-block-the-event-loop).
   These differ in scheduling model; they do not imply every parser yields midway
   through each token or that parsing must live in a native runtime service.
+
+## 2026-10-13 — Bounded HTTP concurrency and streaming direction
+
+- **Author:** asked that each processing phase read only what it needs, avoid
+  unnecessary buffering, and let handlers consume body data on demand. Then
+  directed: “After this, continue with streaming body both for client and server.”
+- **Assistant:** distinguished bounded read-ahead (a receive can cross the header
+  boundary) from eager whole-body buffering. Proposed preserving read-ahead bytes,
+  explicit lifetime/cancellation, body limits and backpressure for both directions.
+- **Implemented first:** bounded FIFO HTTP admission over the existing single
+  native accept. The next connection can progress while an earlier connection
+  awaits headers or body bytes. Queue cancellation releases admission immediately.
+  [Retained checks](../benchmarks/http-concurrency/README.md) pass interpreter,
+  JIT and AOT on macOS, including whole-process diagnostic reclamation.
+- **Open:** live body integration, Windows qualification and consistent deadlines.
+  A preliminary eight-connection interpreter check crossed the existing five-second
+  transfer ceiling; the final comparable fixture uses four in every mode. This is
+  not evidence of a parsing defect. Website publication remains held.
