@@ -13,7 +13,7 @@ on:
       - 'docs/experiments/aot-console/native-gc*'
       - 'docs/experiments/aot-console/root-probe*'
       - 'tools/native/windows-native-stack.c'
-      - 'tools/aot-poc/**'
+      - 'runtime/codegen/**'
       - 'scripts/validate-native-type-tokens.py'
       - '.github/workflows/native-type-tokens.yml'
   pull_request:
@@ -28,7 +28,7 @@ on:
       - 'docs/experiments/aot-console/native-gc*'
       - 'docs/experiments/aot-console/root-probe*'
       - 'tools/native/windows-native-stack.c'
-      - 'tools/aot-poc/**'
+      - 'runtime/codegen/**'
       - 'scripts/validate-native-type-tokens.py'
       - '.github/workflows/native-type-tokens.yml'
 permissions:
@@ -47,39 +47,39 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-      - run: cargo build --locked --manifest-path tools/aot-poc/Cargo.toml
+      - run: cargo build --locked --manifest-path runtime/codegen/Cargo.toml
       - name: Run macOS type token contracts
         if: runner.os == 'macOS'
         run: |
-          python3 scripts/validate-native-type-tokens.py --aot target/debug/neoclr-aot-poc --output target/native-type-tokens-validation
-          python3 scripts/validate-native-type-tokens.py --aot target/debug/neoclr-aot-poc --output target/native-type-equality-validation --runtime-equality
-          python3 scripts/validate-native-type-tokens.py --aot target/debug/neoclr-aot-poc --output target/native-type-descriptors-validation --descriptor-queries
-          python3 scripts/validate-native-type-tokens.py --aot target/debug/neoclr-aot-poc --output target/native-primitive-boxes-validation --primitive-boxes
-          python3 scripts/validate-native-type-tokens.py --aot target/debug/neoclr-aot-poc --output target/native-object-types-validation --object-types
-          python3 scripts/validate-native-type-tokens.py --aot target/debug/neoclr-aot-poc --output target/native-reflection-construction-validation --reflection-construction
-          python3 scripts/validate-native-type-tokens.py --aot target/debug/neoclr-aot-poc --output target/native-reflection-arrays-validation --reflection-arrays
-          python3 scripts/validate-native-type-tokens.py --aot target/debug/neoclr-aot-poc --output target/native-reflection-properties-validation --reflection-properties
+          python3 scripts/validate-native-type-tokens.py --aot target/debug/neoclr-codegen --output target/native-type-tokens-validation
+          python3 scripts/validate-native-type-tokens.py --aot target/debug/neoclr-codegen --output target/native-type-equality-validation --runtime-equality
+          python3 scripts/validate-native-type-tokens.py --aot target/debug/neoclr-codegen --output target/native-type-descriptors-validation --descriptor-queries
+          python3 scripts/validate-native-type-tokens.py --aot target/debug/neoclr-codegen --output target/native-primitive-boxes-validation --primitive-boxes
+          python3 scripts/validate-native-type-tokens.py --aot target/debug/neoclr-codegen --output target/native-object-types-validation --object-types
+          python3 scripts/validate-native-type-tokens.py --aot target/debug/neoclr-codegen --output target/native-reflection-construction-validation --reflection-construction
+          python3 scripts/validate-native-type-tokens.py --aot target/debug/neoclr-codegen --output target/native-reflection-arrays-validation --reflection-arrays
+          python3 scripts/validate-native-type-tokens.py --aot target/debug/neoclr-codegen --output target/native-reflection-properties-validation --reflection-properties
       - name: Run Windows type token contracts
         if: runner.os == 'Windows'
         shell: pwsh
         run: |
           $vs = & "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\vswhere.exe" -latest -products '*' -requires Microsoft.VisualStudio.Component.VC.Tools.x86.x64 -property installationPath
           if (-not $vs) { throw 'MSVC x64 tools not found' }
-          cmd /c "`"$vs\VC\Auxiliary\Build\vcvars64.bat`" && python scripts/validate-native-type-tokens.py --aot target/debug/neoclr-aot-poc.exe --output target/native-type-tokens-validation"
+          cmd /c "`"$vs\VC\Auxiliary\Build\vcvars64.bat`" && python scripts/validate-native-type-tokens.py --aot target/debug/neoclr-codegen.exe --output target/native-type-tokens-validation"
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
-          cmd /c "`"$vs\VC\Auxiliary\Build\vcvars64.bat`" && python scripts/validate-native-type-tokens.py --aot target/debug/neoclr-aot-poc.exe --output target/native-type-equality-validation --runtime-equality"
+          cmd /c "`"$vs\VC\Auxiliary\Build\vcvars64.bat`" && python scripts/validate-native-type-tokens.py --aot target/debug/neoclr-codegen.exe --output target/native-type-equality-validation --runtime-equality"
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
-          cmd /c "`"$vs\VC\Auxiliary\Build\vcvars64.bat`" && python scripts/validate-native-type-tokens.py --aot target/debug/neoclr-aot-poc.exe --output target/native-type-descriptors-validation --descriptor-queries"
+          cmd /c "`"$vs\VC\Auxiliary\Build\vcvars64.bat`" && python scripts/validate-native-type-tokens.py --aot target/debug/neoclr-codegen.exe --output target/native-type-descriptors-validation --descriptor-queries"
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
-          cmd /c "`"$vs\VC\Auxiliary\Build\vcvars64.bat`" && python scripts/validate-native-type-tokens.py --aot target/debug/neoclr-aot-poc.exe --output target/native-primitive-boxes-validation --primitive-boxes"
+          cmd /c "`"$vs\VC\Auxiliary\Build\vcvars64.bat`" && python scripts/validate-native-type-tokens.py --aot target/debug/neoclr-codegen.exe --output target/native-primitive-boxes-validation --primitive-boxes"
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
-          cmd /c "`"$vs\VC\Auxiliary\Build\vcvars64.bat`" && python scripts/validate-native-type-tokens.py --aot target/debug/neoclr-aot-poc.exe --output target/native-object-types-validation --object-types"
+          cmd /c "`"$vs\VC\Auxiliary\Build\vcvars64.bat`" && python scripts/validate-native-type-tokens.py --aot target/debug/neoclr-codegen.exe --output target/native-object-types-validation --object-types"
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
-          cmd /c "`"$vs\VC\Auxiliary\Build\vcvars64.bat`" && python scripts/validate-native-type-tokens.py --aot target/debug/neoclr-aot-poc.exe --output target/native-reflection-construction-validation --reflection-construction"
+          cmd /c "`"$vs\VC\Auxiliary\Build\vcvars64.bat`" && python scripts/validate-native-type-tokens.py --aot target/debug/neoclr-codegen.exe --output target/native-reflection-construction-validation --reflection-construction"
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
-          cmd /c "`"$vs\VC\Auxiliary\Build\vcvars64.bat`" && python scripts/validate-native-type-tokens.py --aot target/debug/neoclr-aot-poc.exe --output target/native-reflection-arrays-validation --reflection-arrays"
+          cmd /c "`"$vs\VC\Auxiliary\Build\vcvars64.bat`" && python scripts/validate-native-type-tokens.py --aot target/debug/neoclr-codegen.exe --output target/native-reflection-arrays-validation --reflection-arrays"
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
-          cmd /c "`"$vs\VC\Auxiliary\Build\vcvars64.bat`" && python scripts/validate-native-type-tokens.py --aot target/debug/neoclr-aot-poc.exe --output target/native-reflection-properties-validation --reflection-properties"
+          cmd /c "`"$vs\VC\Auxiliary\Build\vcvars64.bat`" && python scripts/validate-native-type-tokens.py --aot target/debug/neoclr-codegen.exe --output target/native-reflection-properties-validation --reflection-properties"
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
       - uses: actions/upload-artifact@v4
         if: always()

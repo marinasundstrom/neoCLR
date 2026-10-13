@@ -173,10 +173,10 @@ def build(project, bundle, aot, output, profile=PROFILE, bootstrap_root=None, re
             if (kit.get('format') != 'neoclr-native-build-kit-v1'
                     or profile not in kit.get('profiles', [kit.get('profile')])):
                 raise ValueError('Unsupported native build kit')
-            if bundle != ROOT / 'bundle' or aot != ROOT / 'bin/neoclr-aot-poc':
+            if bundle != ROOT / 'bundle' or aot != ROOT / 'bin/neoclr-codegen':
                 raise ValueError('Packaged builds require the kit-owned bundle and AOT tool')
             required_files = {p.relative_to(ROOT).as_posix() for p in support_files()}
-            required_files |= {'bin/neoclr-aot-poc', 'bundle/manifest.json', 'bundle/lib/bundle.json'}
+            required_files |= {'bin/neoclr-codegen', 'bundle/manifest.json', 'bundle/lib/bundle.json'}
             if not required_files <= kit['files'].keys():
                 raise ValueError('Native build kit omits required inputs')
             verify_files(ROOT, kit['files'])
@@ -409,7 +409,7 @@ def main():
         parser.add_argument('--' + name, type=Path, required=True)
     packaged = (ROOT / 'native-build-kit.json').is_file()
     parser.add_argument('--bundle', type=Path, required=not packaged, default=ROOT / 'bundle' if packaged else None)
-    parser.add_argument('--aot', type=Path, required=not packaged, default=ROOT / 'bin/neoclr-aot-poc' if packaged else None)
+    parser.add_argument('--aot', type=Path, required=not packaged, default=ROOT / 'bin/neoclr-codegen' if packaged else None)
     parser.add_argument('--command-timeout', type=int, default=180, help='Per-build-command timeout in seconds, from 1 through 3600')
     parser.add_argument('--http-heap-bytes', type=int, default=1048576, help='HTTP native host managed heap capacity, in bytes (multiple of eight)')
     args = parser.parse_args()

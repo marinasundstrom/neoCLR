@@ -17,7 +17,7 @@ class BundleNoticesTests(unittest.TestCase):
             hashes = refresh_notices(ROOT, bundle)
             self.assertEqual((bundle / 'program.dll').read_bytes(), b'keep caller payload')
             for relative in ('THIRD_PARTY_NOTICES.md', 'third-party/manifest.json',
-                             'tools/aot-poc/CRANELIFT-LICENSE', 'Cargo.lock',
+                             'runtime/codegen/CRANELIFT-LICENSE', 'Cargo.lock',
                              'tools/native-tls/THIRD_PARTY_NOTICES.md'):
                 source = ROOT / relative
                 self.assertEqual((bundle / relative).read_bytes(), source.read_bytes())

@@ -92,7 +92,7 @@ def main():
             run(['dotnet', compiler, 'neoclr', '-o', destination, source], log_name)
             if not destination.is_file():
                 raise ValueError('Raven compiler did not produce fresh native metadata')
-        command = ['cargo', 'test', '--locked', '--manifest-path', 'tools/aot-poc/Cargo.toml',
+        command = ['cargo', 'test', '--locked', '--manifest-path', 'runtime/codegen/Cargo.toml',
                    '--test', 'windows_scalar', '--', '--nocapture']
         run(command, 'tests')
         report['execution'] = require_execution(evidence / 'windows-execution.json')

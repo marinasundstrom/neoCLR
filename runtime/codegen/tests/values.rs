@@ -32,7 +32,7 @@ fn compile_root(bytes: &[u8], temp: &Temp, root: &str) -> std::process::Output {
 fn compile_mode(bytes: &[u8], temp: &Temp, root: &str, closed: bool) -> std::process::Output {
     let input = temp.0.join("input.bin");
     fs::write(&input, bytes).unwrap();
-    let mut command = Command::new(env!("CARGO_BIN_EXE_neoclr-aot-poc"));
+    let mut command = Command::new(env!("CARGO_BIN_EXE_neoclr-codegen"));
     if closed {
         command.arg("--closed-world");
     }
@@ -1560,7 +1560,7 @@ fn erased_profile_rejects_defaults_uninitialized_slots_and_unsupported_payloads(
         let temp = Temp::new();
         let input = temp.0.join("invalid.neoil");
         fs::write(&input, source).unwrap();
-        let compiled = Command::new(env!("CARGO_BIN_EXE_neoclr-aot-poc"))
+        let compiled = Command::new(env!("CARGO_BIN_EXE_neoclr-codegen"))
             .arg("--closed-world")
             .arg(input)
             .arg("@entry")

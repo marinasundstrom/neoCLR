@@ -54,7 +54,7 @@ ret
     .unwrap();
     for probe in [false, true] {
         let output = dir.0.join(if probe { "probe.o" } else { "plain.o" });
-        let mut cmd = Command::new(env!("CARGO_BIN_EXE_neoclr-aot-poc"));
+        let mut cmd = Command::new(env!("CARGO_BIN_EXE_neoclr-codegen"));
         cmd.arg(&input)
             .arg("Main")
             .arg(&output)
@@ -196,7 +196,7 @@ fn probes_require_context_and_reject_duplicates() {
         vec!["--probe-stack-roots"],
         vec!["--probe-stack-roots", "--probe-stack-roots"],
     ] {
-        let r = Command::new(env!("CARGO_BIN_EXE_neoclr-aot-poc"))
+        let r = Command::new(env!("CARGO_BIN_EXE_neoclr-codegen"))
             .args(flags)
             .output()
             .unwrap();
@@ -310,7 +310,7 @@ ret
     )
     .unwrap();
     let object = dir.0.join("app.o");
-    let r = Command::new(env!("CARGO_BIN_EXE_neoclr-aot-poc"))
+    let r = Command::new(env!("CARGO_BIN_EXE_neoclr-codegen"))
         .arg(input)
         .arg("Main")
         .arg(&object)

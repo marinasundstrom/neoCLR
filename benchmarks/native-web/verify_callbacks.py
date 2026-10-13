@@ -39,7 +39,7 @@ def run(command, status=0, cwd=ROOT):
     return r
 
 for f in [Path(__file__), compiler, runtime, aot, core, seed, ownership, *libs, *adapters,
-          *ROOT.joinpath('tools/aot-poc/src').glob('*.rs'), *base.glob('*.h'), *base.parent.joinpath('aot-fault-details').glob('*.h'), *compiler.parent.glob('*.dll')]:
+          *ROOT.joinpath('runtime/codegen/src').glob('*.rs'), *base.glob('*.h'), *base.parent.joinpath('aot-fault-details').glob('*.h'), *compiler.parent.glob('*.dll')]:
     report['inputs'][str(f)] = hashlib.sha256(f.read_bytes()).hexdigest()
 for name in (a.case or ('Callbacks', 'CallbackFault', 'CallbackList', 'ResultList')):
     source = {

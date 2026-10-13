@@ -40,7 +40,7 @@ def main():
     prior = json.loads((a.windows_build or a.console_qualification).read_text())
     if not prior['passed']:
         raise ValueError('Console qualification required')
-    jit = ROOT/'target/release/neoclr-aot-poc'
+    jit = ROOT/'target/release/neoclr-codegen'
     runtime = ROOT/('target/release/neoclr.exe' if windows else 'target/release/neoclr')
     if a.default_cli:
         runtime = bundle / ('bin/neoclr.exe' if windows else 'bin/neoclr')

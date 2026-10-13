@@ -121,7 +121,7 @@ def main():
             assert list(standalone.iterdir()) == [standalone / 'app']
             report['execution'] = dict(exitCode=0, stdout=native.stdout.decode(), executableOnlyDirectory=True,
                                        emptyEnvironment=True, buildWithoutCargo=True, checkoutPathsAbsent=True)
-            for name, relative in [('adapter', 'tools/native/console-host.c'), ('backend', 'bin/neoclr-aot-poc'),
+            for name, relative in [('adapter', 'tools/native/console-host.c'), ('backend', 'bin/neoclr-codegen'),
                                    ('compiler', 'bundle/sdk/tools/rvnc/rvnc.runtimeconfig.json')]:
                 path = kit / relative
                 size = path.stat().st_size

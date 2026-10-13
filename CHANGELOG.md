@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-13
 
+- Rename the shared JIT/AOT backend package and executable to neoclr-codegen and move its sources to runtime/codegen. Migrate active CLI, SDK, package, benchmark-tool and CI references without an old-name executable alias; preserve historical results. A freshly staged JIT bundle replaces the prior compiler role instead of retaining its old executable. Hosting, scalar execution, Windows admission, installed CLI discovery, notice/archive checks and a fresh three-mode macOS SDK cleanup consumer pass. Record the author’s context-specific naming and no-compatibility constraint.
+
 - Admit scheduler, timer and task bindings for the integrated Windows async console host, preserving rooted-stack requirements and file/socket exclusions. Hosted HTTP and three-mode language checks passed before exposing this stale backend guard; six focused Windows code-generation/admission tests pass. Add an SDK-only workflow rerun using retained matching toolchain/runtime artifacts and a freshly rebuilt backend.
 
 - Retain carrier/stack-host and macOS SDK qualification with build provenance; update architecture, roadmap, website development status and provider migration guidance. Watch canonical runtime sources in Windows host CI. Record the existing HTTP/1.0 client-response gap separately from runtime-await. Published SDKs and website publication remain unchanged.

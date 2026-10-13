@@ -35,7 +35,7 @@ const FAULTS: &str = include_str!("../../../docs/experiments/aot-scalar/faults.n
 const CONSOLE: &str = include_str!("../../../docs/experiments/aot-scalar/console.neoil");
 fn compile(dir: &Temp, source: &str, flags: &[&str]) -> std::process::Output {
     fs::write(dir.0.join("input.neoil"), source).unwrap();
-    Command::new(env!("CARGO_BIN_EXE_neoclr-aot-poc"))
+    Command::new(env!("CARGO_BIN_EXE_neoclr-codegen"))
         .args([
             dir.0.join("input.neoil"),
             PathBuf::from("Calculate"),
@@ -88,7 +88,7 @@ fn raven_metadata_hello_emits_windows_object() {
         include_bytes!("../../../docs/experiments/aot-hello/RavenHello.pe"),
     )
     .unwrap();
-    let result = Command::new(env!("CARGO_BIN_EXE_neoclr-aot-poc"))
+    let result = Command::new(env!("CARGO_BIN_EXE_neoclr-codegen"))
         .arg(input)
         .arg("@entry")
         .arg(dir.0.join("app.obj"))
@@ -115,7 +115,7 @@ fn unsupported_windows_profiles_and_targets_publish_nothing() {
     for mode in ["--inspect", "--closed-world"] {
         let dir = Temp::new();
         fs::write(dir.0.join("input.neoil"), SCALAR).unwrap();
-        let result = Command::new(env!("CARGO_BIN_EXE_neoclr-aot-poc"))
+        let result = Command::new(env!("CARGO_BIN_EXE_neoclr-codegen"))
             .arg(mode)
             .args([
                 dir.0.join("input.neoil"),
@@ -150,7 +150,7 @@ fn unsupported_windows_profiles_and_targets_publish_nothing() {
     }
     let dir = Temp::new();
     fs::write(dir.0.join("input.neoil"), SCALAR).unwrap();
-    let result = Command::new(env!("CARGO_BIN_EXE_neoclr-aot-poc"))
+    let result = Command::new(env!("CARGO_BIN_EXE_neoclr-codegen"))
         .args([
             dir.0.join("input.neoil"),
             PathBuf::from("Calculate"),
@@ -363,7 +363,7 @@ fn assert_windows_program(fixture: &[u8], marker: &str, expected_stdout: &[u8]) 
         let dir = Temp::new();
         let input = dir.0.join("raven.bin");
         fs::write(&input, bytes).unwrap();
-        let compiled = Command::new(env!("CARGO_BIN_EXE_neoclr-aot-poc"))
+        let compiled = Command::new(env!("CARGO_BIN_EXE_neoclr-codegen"))
             .arg(&input)
             .arg("@entry")
             .arg(dir.0.join("app.obj"))

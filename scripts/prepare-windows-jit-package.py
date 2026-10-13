@@ -56,8 +56,8 @@ def main():
             raise RuntimeError(name + ' failed; see retained logs')
 
     try:
-        run('backend', ['cargo', 'build', '--locked', '--release', '--manifest-path', ROOT / 'tools/aot-poc/Cargo.toml'])
-        backend = ROOT / 'target/release/neoclr-aot-poc.exe'
+        run('backend', ['cargo', 'build', '--locked', '--release', '--manifest-path', ROOT / 'runtime/codegen/Cargo.toml'])
+        backend = ROOT / 'target/release/neoclr-codegen.exe'
         project = out / 'host-source'
         project.mkdir()
         (project / 'App.rvnproj').write_text('<Project Sdk="Microsoft.NET.Sdk"><Import Project="$(NeoClrBundleRoot)/lib/NeoCLR.ClassLibrary.props"/><PropertyGroup><TargetFramework>net10.0</TargetFramework><OutputType>Exe</OutputType><AssemblyName>JitHttp</AssemblyName></PropertyGroup></Project>', encoding='utf-8')

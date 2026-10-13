@@ -25,7 +25,7 @@ impl Drop for Temp {
 fn invoke(dir: &Temp, app: &[u8], libraries: &[Vec<u8>], root: &str, inspect: bool) -> Output {
     let input = dir.0.join("app.neox");
     fs::write(&input, app).unwrap();
-    let mut c = Command::new(env!("CARGO_BIN_EXE_neoclr-aot-poc"));
+    let mut c = Command::new(env!("CARGO_BIN_EXE_neoclr-codegen"));
     if inspect {
         c.arg("--inspect")
             .arg(input)
@@ -382,7 +382,7 @@ fn invoke_context(
     fs::write(&app, encode(&m[0])).unwrap();
     fs::write(&lib, encode(&m[1])).unwrap();
     fs::write(&system, encode(seed)).unwrap();
-    let mut c = Command::new(env!("CARGO_BIN_EXE_neoclr-aot-poc"));
+    let mut c = Command::new(env!("CARGO_BIN_EXE_neoclr-codegen"));
     if inspect {
         c.arg("--inspect")
             .arg(&app)

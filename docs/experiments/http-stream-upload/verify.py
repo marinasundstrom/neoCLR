@@ -96,7 +96,7 @@ with tempfile.TemporaryDirectory(prefix='neoclr-stream-upload-') as folder:
                     command += ['--gc-stats', '--instructions', '100000000']
                 else:
                     suffix = '.dll' if os.name == 'nt' else '.dylib'
-                    command += ['--jit-compiler', str(runner.with_name('neoclr-aot-poc.exe' if os.name == 'nt' else 'neoclr-aot-poc')),
+                    command += ['--jit-compiler', str(runner.with_name('neoclr-codegen.exe' if os.name == 'nt' else 'neoclr-codegen')),
                                 '--jit-host', str(runner.with_name('neoclr-jit-host' + suffix))]
                 for library in args.native_library:
                     command += ['--module', str(library.resolve())]

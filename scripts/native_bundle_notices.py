@@ -9,7 +9,7 @@ def refresh_notices(root, bundle):
     paths = [root / 'LICENSE', root / 'THIRD_PARTY_NOTICES.md', root / 'Cargo.lock']
     paths += sorted(path for path in (root / 'third-party').rglob('*') if path.is_file())
     for directory, names in (
-        ('tools/aot-poc', ('THIRD_PARTY_NOTICES.md', 'CRANELIFT-LICENSE')),
+        ('runtime/codegen', ('THIRD_PARTY_NOTICES.md', 'CRANELIFT-LICENSE')),
         ('tools/native-tls', ('THIRD_PARTY_NOTICES.md',)),
     ):
         paths += [root / directory / name for name in names]

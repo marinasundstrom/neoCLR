@@ -30,7 +30,7 @@ fn native_gc_requires_explicit_heap_contract_and_distinct_mode() {
         vec!["--native-gc", "--probe-stack-roots"],
         vec!["--native-gc", "--reference-arena"],
     ] {
-        let r = Command::new(env!("CARGO_BIN_EXE_neoclr-aot-poc"))
+        let r = Command::new(env!("CARGO_BIN_EXE_neoclr-codegen"))
             .args(flags).output().unwrap();
         assert!(!r.status.success());
         let error = String::from_utf8_lossy(&r.stderr);

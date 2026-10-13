@@ -31,10 +31,10 @@ def main():
         parser.error('Expected a native POC toolchain bundle')
     builder.verify_files(bundle, manifest['files'])
     output.mkdir(parents=True, exist_ok=False)
-    cargo_manifest = ROOT / 'tools/aot-poc/Cargo.toml'
+    cargo_manifest = ROOT / 'runtime/codegen/Cargo.toml'
     metadata = json.loads(subprocess.check_output(['cargo', 'metadata', '--locked', '--offline',
         '--format-version', '1', '--manifest-path', str(cargo_manifest)], cwd=ROOT, text=True))
-    sources = [*ROOT.joinpath('src').rglob('*.rs'), *ROOT.joinpath('tools/aot-poc/src').rglob('*.rs'),
+    sources = [*ROOT.joinpath('src').rglob('*.rs'), *ROOT.joinpath('runtime/codegen/src').rglob('*.rs'),
                ROOT / 'docs/experiments/http-server/Server.rvn',
                ROOT / 'Cargo.toml', ROOT / 'Cargo.lock', cargo_manifest,
                Path(__file__).resolve(), *builder.support_files(), *builder.native_text_sources()]
@@ -43,7 +43,7 @@ def main():
     result = subprocess.run(command, cwd=ROOT, capture_output=True, text=True, check=True, env=build_env)
     artifacts = [json.loads(line) for line in result.stdout.splitlines() if line.startswith('{')]
     binaries = [Path(a['executable']) for a in artifacts if a.get('reason') == 'compiler-artifact'
-                and a.get('target', {}).get('name') == 'neoclr-aot-poc' and a.get('executable')]
+                and a.get('target', {}).get('name') == 'neoclr-codegen' and a.get('executable')]
     if len(binaries) != 1:
         raise ValueError('Cargo did not identify one AOT executable')
     aot = binaries[0]
@@ -66,7 +66,7 @@ def main():
         copy(bundle / relative, 'bundle/' + relative)
     copy(bundle / 'manifest.json', 'bundle/manifest.json')
     builder.verify_files(staged / 'bundle', manifest['files'])
-    copy(aot, 'bin/neoclr-aot-poc')
+    copy(aot, 'bin/neoclr-codegen')
     # Keep pure text and pinned-rule kernels separate so text-only consumers do
     # not inherit the timezone data merely because they need Unicode operations.
     for time_zone_rules in (False, True):
@@ -93,7 +93,7 @@ def main():
         if preserved.is_dir():
             texts += [p for p in preserved.rglob('*') if p.is_file()]
         if not texts and package['license'] == 'Apache-2.0 WITH LLVM-exception':
-            texts = [ROOT / 'tools/aot-poc/CRANELIFT-LICENSE']
+            texts = [ROOT / 'runtime/codegen/CRANELIFT-LICENSE']
         if not texts:
             raise ValueError('Missing preserved license text: ' + name)
         paths = []

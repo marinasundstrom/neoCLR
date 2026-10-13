@@ -19,7 +19,7 @@ def run(command):
     if result.returncode:
         raise RuntimeError(result.stdout + result.stderr)
     return result.stdout
-run(['python3', 'scripts/build-native-project.py', '--project', Path(__file__).with_name('Interop.rvnproj'), '--bundle', a.bundle.resolve(), '--aot', a.bundle.resolve()/'bin/neoclr-aot-poc', '--output', out/'native', '--profile', 'http', '--http-heap-bytes', '33554432'])
+run(['python3', 'scripts/build-native-project.py', '--project', Path(__file__).with_name('Interop.rvnproj'), '--bundle', a.bundle.resolve(), '--aot', a.bundle.resolve()/'bin/neoclr-codegen', '--output', out/'native', '--profile', 'http', '--http-heap-bytes', '33554432'])
 encoded = bytes(int(line) for line in run([out/'native/app']).splitlines())
 (out/'output.gz').write_bytes(encoded)
 data = bytes((i*17+i//251)%256 for i in range(40000))

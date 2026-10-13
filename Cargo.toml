@@ -1,5 +1,5 @@
 [workspace]
-members = [".", "tools/aot-poc", "tools/native-tls", "tools/security-provider"]
+members = [".", "runtime/codegen", "tools/native-tls", "tools/security-provider"]
 default-members = ["."]
 # Provider static libraries retain their platform-specific build profiles.
 exclude = ["tools/native-crypto", "tools/aot-native-text"]

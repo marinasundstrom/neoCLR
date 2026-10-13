@@ -21,7 +21,7 @@ def main():
     p = argparse.ArgumentParser(description=__doc__)
     p.add_argument('--bundle', type=Path, required=True)
     p.add_argument('--compiler', type=Path, required=True)
-    p.add_argument('--backend', type=Path, default=ROOT / 'target/release/neoclr-aot-poc')
+    p.add_argument('--backend', type=Path, default=ROOT / 'target/release/neoclr-codegen')
     p.add_argument('--recipe', type=Path, default=HERE / 'collector-walk-showcase.json')
     p.add_argument('--output', type=Path, required=True)
     p.add_argument('--case', action='append', choices=('use', 'generic-use'), help='Run only selected fixtures')

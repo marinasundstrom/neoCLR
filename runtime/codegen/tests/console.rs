@@ -69,7 +69,7 @@ fn compile_source(
     .unwrap();
     fs::write(dir.0.join("app.neoil"), app).unwrap();
     fs::write(dir.0.join("lib.neoil"), ".module Helpers\n.references ()\n").unwrap();
-    let mut c = Command::new(env!("CARGO_BIN_EXE_neoclr-aot-poc"));
+    let mut c = Command::new(env!("CARGO_BIN_EXE_neoclr-codegen"));
     c.arg(if inspect {
         "--inspect"
     } else {
@@ -198,7 +198,7 @@ fn duplicate_service_declarations_keep_the_callers_module_identity() {
         )
         .unwrap();
     }
-    let r = Command::new(env!("CARGO_BIN_EXE_neoclr-aot-poc"))
+    let r = Command::new(env!("CARGO_BIN_EXE_neoclr-codegen"))
         .arg("--inspect")
         .arg(dir.0.join("app.neox"))
         .args([
@@ -1841,7 +1841,7 @@ ret
     fs::write(dir.0.join("app.neox"),neoclr::metadata_container::write_module(app).unwrap()).unwrap();
     fs::write(dir.0.join("seed.neox"),neoclr::metadata_container::write_module(&seed).unwrap()).unwrap();
     fs::write(dir.0.join("empty.neoil"),".module Empty\n.references ()\n").unwrap();
-    let r=Command::new(env!("CARGO_BIN_EXE_neoclr-aot-poc")).arg("--closed-world")
+    let r=Command::new(env!("CARGO_BIN_EXE_neoclr-codegen")).arg("--closed-world")
         .arg(dir.0.join("app.neox")).arg("Calculate").arg(dir.0.join("app.o"))
         .arg("--system").arg(dir.0.join("seed.neox")).arg("--module").arg(dir.0.join("empty.neoil"))
         .args(["--compile-system","--reference-arena","--bind-utf8-text"]).output().unwrap();
@@ -1926,7 +1926,7 @@ fn compile_linked_module(dir:&Temp, seed:&neoclr::Module, app:&neoclr::Module, f
     fs::write(dir.0.join("app.neox"),neoclr::metadata_container::write_module(app).unwrap()).unwrap();
     fs::write(dir.0.join("seed.neox"),neoclr::metadata_container::write_module(seed).unwrap()).unwrap();
     fs::write(dir.0.join("empty.neoil"),".module Empty\n.references ()\n").unwrap();
-    Command::new(env!("CARGO_BIN_EXE_neoclr-aot-poc")).arg("--closed-world")
+    Command::new(env!("CARGO_BIN_EXE_neoclr-codegen")).arg("--closed-world")
         .arg(dir.0.join("app.neox")).arg("Calculate").arg(dir.0.join("app.o"))
         .arg("--system").arg(dir.0.join("seed.neox")).arg("--module").arg(dir.0.join("empty.neoil"))
         .args(flags).output().unwrap()
@@ -6666,7 +6666,7 @@ fn system_culture_binding_requires_explicit_host_context() {
         (vec!["--compile-system", "--bind-system-culture"], "requires --reference-arena"),
         (vec!["--bind-system-culture", "--bind-system-culture"], "duplicate --bind-system-culture"),
     ] {
-        let result = std::process::Command::new(env!("CARGO_BIN_EXE_neoclr-aot-poc"))
+        let result = std::process::Command::new(env!("CARGO_BIN_EXE_neoclr-codegen"))
             .args(flags).output().unwrap();
         assert!(!result.status.success());
         assert!(String::from_utf8_lossy(&result.stderr).contains(message));
@@ -6716,7 +6716,7 @@ fn time_zone_binding_requires_explicit_context() {
         (vec!["--compile-system", "--bind-time-zone-rules"], "requires --reference-arena"),
         (vec!["--bind-time-zone-rules", "--bind-time-zone-rules"], "duplicate --bind-time-zone-rules"),
     ] {
-        let result = std::process::Command::new(env!("CARGO_BIN_EXE_neoclr-aot-poc"))
+        let result = std::process::Command::new(env!("CARGO_BIN_EXE_neoclr-codegen"))
             .args(flags).output().unwrap();
         assert!(!result.status.success());
         assert!(String::from_utf8_lossy(&result.stderr).contains(message));

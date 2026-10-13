@@ -23,7 +23,7 @@ fn installed_default_jit_discovers_trusted_siblings_and_preserves_arguments() {
     ] {
         fs::write(root.join(name), []).unwrap();
     }
-    let compiler = root.join("bin/neoclr-aot-poc");
+    let compiler = root.join("bin/neoclr-codegen");
     fs::write(
         &compiler,
         "#!/bin/sh\nprintf '%s\\n' \"$@\" > \"$NEO_TEST_ARGS\"\nexit 37\n",

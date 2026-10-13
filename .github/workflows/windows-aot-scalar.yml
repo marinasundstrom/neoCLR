@@ -10,7 +10,7 @@ on:
     paths:
       - 'src/**'
       - 'Cargo.*'
-      - 'tools/aot-poc/**'
+      - 'runtime/codegen/**'
       - 'tools/metadata/**'
       - 'tools/native/windows-scalar-host.c'
       - 'scripts/validate-windows-aot.py'
@@ -22,7 +22,7 @@ on:
     paths:
       - 'src/**'
       - 'Cargo.*'
-      - 'tools/aot-poc/**'
+      - 'runtime/codegen/**'
       - 'tools/metadata/**'
       - 'tools/native/windows-scalar-host.c'
       - 'scripts/validate-windows-aot.py'

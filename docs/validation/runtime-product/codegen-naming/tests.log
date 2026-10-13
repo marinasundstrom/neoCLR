@@ -1,0 +1,51 @@
+   Compiling neoclr v0.1.0-preview.13 (/Users/robert/Projects/neoclr)
+   Compiling neoclr-codegen v0.0.0 (/Users/robert/Projects/neoclr/runtime/codegen)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 28.78s
+     Running tests/hosting.rs (target/debug/deps/hosting-4dc914528c455e96)
+
+running 1 test
+test driver_returns_to_host_after_errors_compilation_and_jit_invocations ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 3.36s
+
+     Running tests/scalar.rs (target/debug/deps/scalar-5cc69f1cdcc9fb98)
+
+running 24 tests
+test fault_does_not_hide_unsupported_dead_instructions ... ok
+test jit_rejects_a_foreign_target_before_loading_inputs ... ok
+test jit_native_container_matches_source_and_rejects_corruption ... ok
+test emits_macho_and_refuses_to_overwrite ... ok
+test jit_rejects_expanded_aot_features_and_external_services ... ok
+test jit_parameterless_entry_and_argument_validation ... ok
+test console_capability_and_literal_types_are_checked ... ok
+test invalid_control_flow_is_rejected_before_emission ... ok
+test jit_reuses_owned_code_for_successful_and_faulting_invocations ... ok
+test native_input_rejects_corruption_and_unsupported_il_before_emission ... ok
+test native_console_preserves_utf8_bytes_and_propagates_service_failure ... ok
+test parameterless_entry_adapter_preserves_fault_and_result_pointer ... ok
+test raven_native_metadata_hello_runs_as_standalone_machine_code ... ok
+test first_fault_wins_across_compiled_calls ... ok
+test scalar_boolean_values_do_not_become_int32_operands ... ok
+test standalone_hello_world_has_no_managed_runtime_dependency ... ok
+test explicit_user_faults_match_interpreter_and_preserve_first_fault ... ok
+test native_c_consumer_matches_interpreter_for_runtime_inputs ... ok
+test native_loops_locals_calls_and_early_returns_match_interpreter ... ok
+test native_truth_branches_merge_locals_and_loop_carried_stack ... ok
+test unsupported_or_invalid_programs_never_emit_an_object ... ok
+test scalar_boolean_comparisons_match_interpreter_at_int32_boundaries ... ok
+test native_comparison_branches_preserve_signedness ... ok
+test native_arithmetic_faults_match_interpreter_and_preserve_output ... ok
+
+test result: ok. 24 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 60.69s
+
+     Running tests/windows_stack.rs (target/debug/deps/windows_stack-1ef13bcff83be262)
+
+running 6 tests
+test console_experiment_requires_windows_context_and_rejects_unqualified_services ... ok
+test http_experiment_requires_complete_windows_service_contract ... ok
+test recursive_windows_object_has_inline_page_probe_and_context_entry ... ok
+test windows_stack_requires_explicit_complete_opt_in_and_rejects_managed_types ... ok
+test console_admits_scheduler_and_runtime_await_with_rooted_stack_contract ... ok
+test heap_experiment_admits_only_int32_arrays_and_matches_interpreter ... ok
+
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.69s

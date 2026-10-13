@@ -5,7 +5,7 @@ on:
     paths:
       - 'src/**'
       - 'Cargo.*'
-      - 'tools/aot-poc/**'
+      - 'runtime/codegen/**'
       - 'tools/aot-native-text/**'
       - 'tools/native/windows-*'
       - 'docs/experiments/aot-console/**'
@@ -26,7 +26,7 @@ on:
     paths:
       - 'src/**'
       - 'Cargo.*'
-      - 'tools/aot-poc/**'
+      - 'runtime/codegen/**'
       - 'tools/aot-native-text/**'
       - 'tools/native/windows-*'
       - 'docs/experiments/aot-console/**'

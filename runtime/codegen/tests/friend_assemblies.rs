@@ -54,7 +54,7 @@ fn compile(dir: &Temp, friend: Option<&str>, private_method: bool) -> std::proce
     )
     .unwrap();
     fs::write(dir.0.join("seed.neoil"), ".module System\n.references ()\n").unwrap();
-    Command::new(env!("CARGO_BIN_EXE_neoclr-aot-poc"))
+    Command::new(env!("CARGO_BIN_EXE_neoclr-codegen"))
         .arg("--closed-world")
         .arg(dir.0.join("consumer.neox"))
         .arg("@entry")

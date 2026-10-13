@@ -25,7 +25,7 @@ impl Drop for Temp {
 fn compile(dir: &Temp, source: &str) -> Output {
     let path = dir.0.join("input.neoil");
     fs::write(&path, source).unwrap();
-    Command::new(env!("CARGO_BIN_EXE_neoclr-aot-poc"))
+    Command::new(env!("CARGO_BIN_EXE_neoclr-codegen"))
         .args(["--fault-details"])
         .arg(path)
         .arg("Calculate")
@@ -159,7 +159,7 @@ fn binding(dir: &Temp, seed: &neoclr::Module, app: &str, flags: &[&str], inspect
     .unwrap();
     fs::write(dir.0.join("app.neoil"), app).unwrap();
     fs::write(dir.0.join("lib.neoil"), ".module Helpers\n.references ()\n").unwrap();
-    let mut c = Command::new(env!("CARGO_BIN_EXE_neoclr-aot-poc"));
+    let mut c = Command::new(env!("CARGO_BIN_EXE_neoclr-codegen"));
     if inspect {
         c.arg("--inspect")
             .arg(dir.0.join("app.neoil"))
@@ -333,7 +333,7 @@ fn source_owned_noresult_failure_uses_its_original_identity() {
         neoclr::metadata_container::write_module(&modules[0]).unwrap(),
     )
     .unwrap();
-    let r = Command::new(env!("CARGO_BIN_EXE_neoclr-aot-poc"))
+    let r = Command::new(env!("CARGO_BIN_EXE_neoclr-codegen"))
         .arg("--closed-world")
         .arg(dir.0.join("app.neox"))
         .arg("Calculate")

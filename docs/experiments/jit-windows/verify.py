@@ -63,13 +63,13 @@ def main():
         with tarfile.open(archive) as source:
             source.extractall(out, filter='data')
         bundle = http.rebuild_libraries(run, out/'neoclr-native-poc', out/'development')
-        run(['cargo', 'build', '--locked', '--release', '--manifest-path', ROOT/'tools/aot-poc/Cargo.toml'], 'jit-build')
+        run(['cargo', 'build', '--locked', '--release', '--manifest-path', ROOT/'runtime/codegen/Cargo.toml'], 'jit-build')
         run(['cargo', 'build', '--locked', '--release', '--bin', 'neoclr'], 'runtime-build')
-        run(['cargo', 'test', '--locked', '--release', '--manifest-path', ROOT/'tools/aot-poc/Cargo.toml',
+        run(['cargo', 'test', '--locked', '--release', '--manifest-path', ROOT/'runtime/codegen/Cargo.toml',
              '--test', 'scalar', 'jit_'], 'scalar-jit')
         run(['cargo', 'test', '--locked', '--release', '--test', 'cli',
              'cli_execution_selection'], 'cli-selection')
-        jit = ROOT/'target/release/neoclr-aot-poc.exe'
+        jit = ROOT/'target/release/neoclr-codegen.exe'
         project = out/'server-source'
         project.mkdir()
         (project/'App.rvnproj').write_text('<Project Sdk="Microsoft.NET.Sdk"><Import Project="$(NeoClrBundleRoot)/lib/NeoCLR.ClassLibrary.props"/><PropertyGroup><TargetFramework>net10.0</TargetFramework><OutputType>Exe</OutputType><AssemblyName>JitHttp</AssemblyName></PropertyGroup></Project>')

@@ -14,7 +14,7 @@ root Cargo workspace and lockfile. Build both executable tools with:
 cargo build --locked --workspace
 ```
 
-Outputs are `target/debug/neoclr` and `target/debug/neoclr-aot-poc` (with `.exe` on
+Outputs are `target/debug/neoclr` and `target/debug/neoclr-codegen` (with `.exe` on
 Windows). `--release` selects `target/release`. Existing backend manifest commands
 also use this workspace and output directory. Old files under
 `tools/aot-poc/target` are stale build artifacts, not fallback executables.
@@ -32,10 +32,17 @@ contracts and TLS native-adapter checks. ARM64 macOS also runs compiled rooted U
 slicing. Platform-specific test guards still apply; this is not full HTTP, Windows
 ARM64 or whole-library qualification. CI uses this same entry point.
 
-The backend package/binary retains its existing name for bundle compatibility in
-this slice. `cargo build -p neoclr` and the default root build still omit compiler
-packages from the selected build; interpreter-only consumers do not acquire a
-Cranelift dependency. Compiler dependencies remain in the shared lockfile.
+The shared backend package and executable are `neoclr-codegen`, with sources in
+`runtime/codegen`. Rebuilt SDK manifests and CLI discovery use that name without
+an old-name alias. Historical reports retain their original tool names. Component
+names describe roles: execution engines run code; code generation serves JIT/AOT;
+memory management includes the current GC; scheduling/suspension manages progress.
+Managed namespaces describe language-facing contracts rather than mirroring the
+internal directory tree. This naming follows the author's integration clarification.
+
+`cargo build -p neoclr` and the default root build still omit compiler packages
+from the selected build; interpreter-only consumers do not acquire a Cranelift
+dependency. Compiler dependencies remain in the shared lockfile.
 The runtime's existing resolved dependency versions are retained; common backend
 dependencies align with that resolution instead of carrying a second lockfile.
 
@@ -314,6 +321,13 @@ idle-drain tests on both OS carriers, plus a Windows host-owned-fiber case. Loca
 macOS passes all 35 GC/root cases after migration. The hosted macOS/Windows [carrier gate](https://github.com/marinasundstrom/neoCLR/actions/runs/38462503102)
 also passes, including Windows host-owned fibers. See the [retained reports](validation/runtime-product/runtime-await-sdk/).
 
+Author clarification: backward compatibility is not a constraint for this
+experimental integration. Existing forwarding paths serve active internal recipes
+during migration; they are not supported external contracts. Consumers may move
+together with the runtime. State-machine lowering is retained as a validation and
+benchmark control, without a long-term compatibility commitment. Matching build
+requirements still matter for correctness.
+
 ## SDK-default runtime-await integration — 2026-10-13
 
 Development SDK builds now set `RavenNeoClrRuntimeAsyncHelper` to
@@ -374,5 +388,6 @@ task/scheduler/timer bindings are now accepted for its integrated async host, wh
 file/socket exclusions and rooted-stack prerequisites remain. Six cross-target
 backend checks cover admission, GC publication and stack probing. The HTTP workflow
 can reuse a prior matching toolchain/runtime artifact via `reuse_bundle_run` for an
-SDK-only rerun with a freshly rebuilt backend; this does not qualify arbitrary
+SDK-only rerun with freshly rebuilt runtime/backend tools; `sdk_smoke_only` limits
+a naming/package rerun to the cleanup consumer in all three modes. This does not qualify arbitrary
 mixtures of runtime ABI versions.

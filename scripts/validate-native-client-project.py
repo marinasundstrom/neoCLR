@@ -131,8 +131,8 @@ def main():
             report['bundle'] = dict(url=dependency.URL, sha256=sha(archive))
         else: raise ValueError('--bundle is required on macOS')
         if not args.client_build or not args.server_build:
-            run(['cargo', 'build', '--locked', '--manifest-path', ROOT / 'tools/aot-poc/Cargo.toml'], 'aot-build')
-        aot = ROOT / ('target/debug/neoclr-aot-poc' + ('.exe' if windows else ''))
+            run(['cargo', 'build', '--locked', '--manifest-path', ROOT / 'runtime/codegen/Cargo.toml'], 'aot-build')
+        aot = ROOT / ('target/debug/neoclr-codegen' + ('.exe' if windows else ''))
         report['aotSha256'] = sha(aot)
         if windows and not args.bundle:
             bundle = http.rebuild_libraries(run, bundle, out / 'development toolchain')

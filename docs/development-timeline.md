@@ -39,6 +39,21 @@ See the [changelog](../CHANGELOG.md) and linked design documents for technical s
   owned suspended bodies and abandonment. Windows stack-host acceptance passes
   after replacing its obsolete fiber-rejection expectation. Full SDK application
   qualification is recorded in the [integration evidence](validation/runtime-product/runtime-await-sdk/).
+- **Author follow-up:** asks whether this yields an integrated runtime containing
+  the former experiment/POC components. **Assistant response:** yes: shared build
+  and packaging paths, defined boundaries and qualification make them maintained
+  components of one product; internal modularity remains. AOT is a publishing
+  target using runtime services. Legacy names/forwarding paths are compatibility
+  entry points, not a separate implementation.
+- **Author clarification:** compatibility should not constrain this experimental
+  integration. **Assistant response:** prioritize the coherent product and migrate
+  consumers when needed. State-machine lowering remains useful for validation and
+  benchmark comparisons, without promising long-term compatibility.
+- **Author naming direction:** align names with the unified model, using suitable
+  names for components, modules and boundaries in their respective contexts.
+  **Assistant action:** rename the shared backend/package to `neoclr-codegen` in
+  `runtime/codegen`, migrating active build, CLI and SDK references. Historical
+  evidence keeps its recorded names; no old-name executable alias is added.
 - **Scope:** existing library bootstrap lowering is retained; matching rebuilt
   runtime/backend/JIT helpers are required. Windows ARM64 and reusable Windows
   fiber stacks remain unqualified. This is integration work, not a measured

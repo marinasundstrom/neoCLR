@@ -48,7 +48,7 @@ def main():
     sha = lambda f: hashlib.sha256(f.read_bytes()).hexdigest()
     inputs = [Path(__file__), compiler, runtime, aot, core, seed, ownership, *refs, *adapters,
               ROOT / 'benchmarks/native-web/http-host.c', *base.glob('*.h'),
-              *compiler.parent.glob('*.dll'), *ROOT.joinpath('tools/aot-poc/src').glob('*.rs')]
+              *compiler.parent.glob('*.dll'), *ROOT.joinpath('runtime/codegen/src').glob('*.rs')]
     report = dict(scope='104-case development-bundle survey; first blockers only, not full platform coverage or release qualification',
                   revision=subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=ROOT, text=True).strip(),
                   dirty=subprocess.check_output(['git', 'status', '--short'], cwd=ROOT, text=True),

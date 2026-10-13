@@ -14,7 +14,7 @@ const SOURCE: &str = include_str!("../../../tools/native/windows-generated-stack
 const FLAGS: &[&str] = &["--target", "x86_64-pc-windows-msvc", "--windows-stack-experiment", "--reference-arena", "--native-gc", "--native-stack-budget"];
 fn compile(dir: &Temp, source: &str, flags: &[&str]) -> std::process::Output {
     fs::write(dir.0.join("input.neoil"), source).unwrap();
-    Command::new(env!("CARGO_BIN_EXE_neoclr-aot-poc"))
+    Command::new(env!("CARGO_BIN_EXE_neoclr-codegen"))
         .arg(dir.0.join("input.neoil")).arg("Calculate").arg(dir.0.join("app.obj"))
         .args(flags).output().unwrap()
 }
@@ -136,7 +136,7 @@ fn console_admits_scheduler_and_runtime_await_with_rooted_stack_contract() {
         "--compile-system", "--reference-arena", "--native-gc", "--native-stack-budget",
         "--bind-task-queue", "--bind-scheduler", "--bind-timers", "--bind-runtime-async"];
     fs::write(dir.0.join("input.neoil"), SOURCE).unwrap();
-    let result = Command::new(env!("CARGO_BIN_EXE_neoclr-aot-poc"))
+    let result = Command::new(env!("CARGO_BIN_EXE_neoclr-codegen"))
         .arg("--closed-world").arg(dir.0.join("input.neoil"))
         .arg("Calculate").arg(dir.0.join("app.obj"))
         .args(flags).output().unwrap();

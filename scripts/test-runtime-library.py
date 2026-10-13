@@ -344,7 +344,7 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--bundle', type=Path, required=True, help='Matching native development bundle')
     parser.add_argument('--output', type=Path, required=True, help='Fresh build/evidence directory')
-    parser.add_argument('--aot', type=Path, default=ROOT / 'target/debug' / ('neoclr-aot-poc.exe' if os.name == 'nt' else 'neoclr-aot-poc'))
+    parser.add_argument('--aot', type=Path, default=ROOT / 'target/debug' / ('neoclr-codegen.exe' if os.name == 'nt' else 'neoclr-codegen'))
     parser.add_argument('--runtime', type=Path, default=ROOT / 'target/release' / ('neoclr.exe' if os.name == 'nt' else 'neoclr'))
     parser.add_argument('--suite', action='append', choices=('collections', 'collection-construction', 'collection-iteration', 'json-dom', 'json-streams', 'memory-stream', 'string-construction', 'unicode-casing', 'encoding', 'encoding-streams', 'cryptography', 'gzip', 'encoding-boundaries', 'encoding-buffer-limits', 'int64-parsing', 'primitive-parsing', 'path-values', 'http-header-values', 'http-method-values', 'index-range', 'http-text', 'http-lifetime', 'http-route-matching', 'ip-address-values', 'uri-resolution', 'time-parsing', 'duration-offset-parsing', 'instant-parsing', 'zoned-time-parsing', 'discovery-contract', 'runner-contract'),
                         help='Run only this suite (repeatable); default runs all suites')
@@ -359,7 +359,7 @@ def main():
         if args.runtime == parser.get_default('runtime'):
             args.runtime = bundled_bin / ('neoclr.exe' if os.name == 'nt' else 'neoclr')
         if args.aot == parser.get_default('aot'):
-            args.aot = bundled_bin / ('neoclr-aot-poc.exe' if os.name == 'nt' else 'neoclr-aot-poc')
+            args.aot = bundled_bin / ('neoclr-codegen.exe' if os.name == 'nt' else 'neoclr-codegen')
     if 'jit' in modes and not args.jit_host:
         args.jit_host = bundled_bin / ('neoclr-jit-host.dll' if os.name == 'nt' else 'neoclr-jit-host.dylib')
     if 'jit' in modes and not args.jit_host.is_file():

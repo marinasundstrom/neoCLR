@@ -36,6 +36,8 @@ source, out = a.bundle.resolve(), a.output.resolve()
 manifest = json.loads((source / 'manifest.json').read_text())
 retained = {relative: digest for relative, digest in manifest['files'].items()
             if not (a.libraries and (relative.startswith('lib/') or relative.startswith('sdk/tools/rvnc/')))}
+# The compiler role is replaced, including when its product name changes.
+retained.pop(manifest.get("jit", {}).get("compiler"), None)
 for relative, expected in retained.items():
     path = (source / relative).resolve()
     if source not in path.parents or sha(path) != expected:
@@ -179,7 +181,7 @@ try:
         run(command)
     suffix = '.exe' if windows else ''
     shutil.copy2(a.runtime, bundle / ('bin/neoclr' + suffix))
-    shutil.copy2(a.jit_compiler, bundle / ('bin/neoclr-aot-poc' + suffix))
+    shutil.copy2(a.jit_compiler, bundle / ('bin/neoclr-codegen' + suffix))
     helper_name = 'neoclr-jit-host.dll' if windows else 'neoclr-jit-host.dylib'
     shutil.copy2(helper, bundle / 'bin' / helper_name)
     original_metadata = {key: value for key, value in manifest.items() if key != 'files'}
@@ -188,7 +190,7 @@ try:
     manifest['developmentComposition'] = 'Installed default JIT; binaries and compiler/library inputs identified by file hashes'
     manifest['platform'] = platform.platform()
     manifest['runtime'] = 'bin/neoclr' + suffix
-    manifest['jit'] = dict(default=True, compiler='bin/neoclr-aot-poc' + suffix,
+    manifest['jit'] = dict(default=True, compiler='bin/neoclr-codegen' + suffix,
                            host='bin/' + helper_name, runtimeAsync=True, cryptography=True, tlsOwnership=True,
                            heapBytes=a.heap_bytes, byteArrayLimit=a.byte_array_limit)
     if a.refresh_samples:

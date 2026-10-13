@@ -75,7 +75,7 @@ def main():
     parser.add_argument('--recipe', type=Path, required=True, help='Passing runtime-await HTTP source validation.json')
     parser.add_argument('--native-build', type=Path, required=True, help='Passing macOS HTTP build.json, used only as a command recipe')
     parser.add_argument('--output', type=Path, required=True)
-    parser.add_argument('--backend', type=Path, default=ROOT / 'target/release/neoclr-aot-poc')
+    parser.add_argument('--backend', type=Path, default=ROOT / 'target/release/neoclr-codegen')
     parser.add_argument('--text-archive', type=Path, default=ROOT / 'tools/aot-native-text/target/text-only/aarch64-apple-darwin/release/libneoclr_aot_native_text.a')
     parser.add_argument('--gc-policy', choices=['stress', 'paced'], default='stress', help='Private native host qualification policy; installed defaults are unchanged')
     args = parser.parse_args()
@@ -154,7 +154,7 @@ def main():
         for folder in [HERE, ROOT / 'docs/experiments/aot-console', ROOT / 'docs/experiments/aot-fault-details']:
             for path in folder.glob('*.h'):
                 report['inputsSha256'][str(path)] = sha(path)
-        for path in (ROOT / 'tools/aot-poc/src').glob('*.rs'):
+        for path in (ROOT / 'runtime/codegen/src').glob('*.rs'):
             report['inputsSha256'][str(path)] = sha(path)
         report['inputsSha256'][str(Path(__file__).resolve())] = sha(__file__)
         for path in Path(compile_source[1]).parent.glob('*.dll'):

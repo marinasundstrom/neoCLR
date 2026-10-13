@@ -1,8 +1,8 @@
 fn main() {
-    let status = match neoclr_aot_poc::run(std::env::args_os().skip(1).collect()) {
+    let status = match neoclr_codegen::run(std::env::args_os().skip(1).collect()) {
         Ok(status) => status,
         Err(error) => {
-            eprintln!("aot-poc: {error}");
+            eprintln!("neoclr-codegen: {error}");
             1
         }
     };

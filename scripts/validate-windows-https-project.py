@@ -57,11 +57,11 @@ def main():
                 '--bundle', out / 'neoclr-native-poc', '--output', out / 'development',
                 '--build-compiler', '--compiler-revision', COMPILER])
             bundle = out / 'development/bundle'
-        run('aot-build', ['cargo', 'build', '--locked', '--manifest-path', ROOT / 'tools/aot-poc/Cargo.toml'])
+        run('aot-build', ['cargo', 'build', '--locked', '--manifest-path', ROOT / 'runtime/codegen/Cargo.toml'])
         for label, flags in [('https', ['--https-server']), ('cleartext', [])]:
             run(label + '-build', [sys.executable, ROOT / 'scripts/build-native-project.py', '--profile', 'windows-http',
                 '--project', ROOT / 'docs/experiments/https-server/Native.rvnproj', '--bundle', bundle,
-                '--aot', ROOT / 'target/debug/neoclr-aot-poc.exe',
+                '--aot', ROOT / 'target/debug/neoclr-codegen.exe',
                 '--output', out / label, *flags])
         run('https-validation', [sys.executable, ROOT / 'docs/experiments/https-server/validate.py',
             '--bundle', bundle, '--project-build', out / 'https', '--cleartext-build', out / 'cleartext',

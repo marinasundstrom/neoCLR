@@ -104,13 +104,13 @@ and [library/runtime boundary](raven-cli-bridge.md).
 ## Native compilation
 
 AOT is a **compilation and publishing target**, not a third execution engine.
-The [shared native backend](../tools/aot-poc/) lowers admitted metadata/IL for both
-JIT and AOT. Publishing links a native image with the runtime services it requires;
+The [shared native backend](../runtime/codegen/), packaged as `neoclr-codegen`,
+lowers admitted metadata/IL for both JIT and AOT. Publishing links a native image with the runtime services it requires;
 running that image needs neither the JIT compiler nor interpreter. GC, scheduling,
 text, I/O and fault services still exist in the published program.
 
-JIT and AOT are integrated product components despite historical POC directory and
-binary names. Their supported profiles and workloads remain bounded; packaging does
+JIT and AOT share the integrated code-generation component. Historical reports
+retain their original POC names. Supported profiles remain bounded; packaging does
 not establish general native parity. Development JIT bundles select JIT on macOS
 ARM64 and Windows x64, with explicit interpreter execution retained. See the
 [execution architecture](execution-architecture.md), [integration evidence](runtime-product-integration.md)

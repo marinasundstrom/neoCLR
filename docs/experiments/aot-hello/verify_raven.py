@@ -17,7 +17,7 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--compiler', type=Path, required=True, help='Native-enabled rvnc.dll')
     parser.add_argument('--compiler-revision', required=True, help='Source revision of the selected compiler')
-    parser.add_argument('--aot', type=Path, required=True, help='Built neoclr-aot-poc executable')
+    parser.add_argument('--aot', type=Path, required=True, help='Built neoclr-codegen executable')
     parser.add_argument('--output', type=Path, required=True, help='Fresh evidence/artifact directory')
     args = parser.parse_args()
     if platform.system() != 'Darwin' or platform.machine() != 'arm64':

@@ -29,7 +29,7 @@ fn inspect_mode(bytes: &[u8], closed: bool) -> serde_json::Value {
     let dir = Temp::new();
     let input = dir.0.join("input.pe");
     fs::write(&input, bytes).unwrap();
-    let mut command = Command::new(env!("CARGO_BIN_EXE_neoclr-aot-poc"));
+    let mut command = Command::new(env!("CARGO_BIN_EXE_neoclr-codegen"));
     command.args(["--inspect", input.to_str().unwrap(), "@entry"]);
     if closed {
         command.arg("--closed-world");
@@ -117,7 +117,7 @@ fn inspection_rejects_corrupt_metadata_instead_of_reporting_admission() {
     let dir = Temp::new();
     let input = dir.0.join("bad.pe");
     fs::write(&input, b"MZbroken").unwrap();
-    let result = Command::new(env!("CARGO_BIN_EXE_neoclr-aot-poc"))
+    let result = Command::new(env!("CARGO_BIN_EXE_neoclr-codegen"))
         .args(["--inspect", input.to_str().unwrap(), "@entry"])
         .output()
         .unwrap();
@@ -151,7 +151,7 @@ fn closed_world_inspection_uses_emission_preparation_and_keeps_full_inventory() 
     let dir = Temp::new();
     let input = dir.0.join("input.pe");
     fs::write(&input, bytes).unwrap();
-    let emitted = Command::new(env!("CARGO_BIN_EXE_neoclr-aot-poc"))
+    let emitted = Command::new(env!("CARGO_BIN_EXE_neoclr-codegen"))
         .arg("--closed-world")
         .arg(input)
         .arg("@entry")

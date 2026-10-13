@@ -59,8 +59,8 @@ def main():
                 source.extractall(prerequisites, filter='data')
         report['bundle'] = dict(url=URL, sha256=BUNDLE_SHA, manifestSha256=sha(bundle / 'manifest.json'))
         report['dotnet'] = run(['dotnet', '--info'], 'dotnet').stdout.decode(errors='replace')
-        run(['cargo', 'build', '--locked', '--manifest-path', ROOT / 'tools/aot-poc/Cargo.toml'], 'aot-build', cwd=ROOT)
-        aot = ROOT / 'target/debug/neoclr-aot-poc.exe'
+        run(['cargo', 'build', '--locked', '--manifest-path', ROOT / 'runtime/codegen/Cargo.toml'], 'aot-build', cwd=ROOT)
+        aot = ROOT / 'target/debug/neoclr-codegen.exe'
         report['aotSha256'] = sha(aot)
         lib = bundle / 'lib'
         catalog = json.loads((lib / 'bundle.json').read_text())

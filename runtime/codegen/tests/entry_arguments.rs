@@ -39,7 +39,7 @@ fn compile(dir: &Temp, source: &str, flags: &[&str]) -> std::process::Output {
         ".module Helpers\n.references ()\n",
     )
     .unwrap();
-    Command::new(env!("CARGO_BIN_EXE_neoclr-aot-poc"))
+    Command::new(env!("CARGO_BIN_EXE_neoclr-codegen"))
         .arg("--closed-world")
         .arg(dir.0.join("input.neoil"))
         .arg("Calculate")

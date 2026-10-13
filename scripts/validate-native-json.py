@@ -71,8 +71,8 @@ def main():
         else:
             raise ValueError('--bundle is required on macOS')
         report['bundleManifestSha256'] = sha(bundle / 'manifest.json')
-        run(['cargo', 'build', '--locked', '--manifest-path', ROOT / 'tools/aot-poc/Cargo.toml'], 'aot-build')
-        aot = ROOT / ('target/debug/neoclr-aot-poc' + ('.exe' if windows else ''))
+        run(['cargo', 'build', '--locked', '--manifest-path', ROOT / 'runtime/codegen/Cargo.toml'], 'aot-build')
+        aot = ROOT / ('target/debug/neoclr-codegen' + ('.exe' if windows else ''))
         report['aotSha256'] = sha(aot)
         run(['cargo', 'build', '--locked', '--release', '--bin', 'neoclr'], 'interpreter-build')
         runtime = ROOT / ('target/release/neoclr' + ('.exe' if windows else ''))

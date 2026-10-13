@@ -68,7 +68,7 @@ def run(command):
 
 for f in [Path(__file__), source, compiler, runtime, aot, core, seed, ownership, *libs, *adapters,
           *base.glob('*.h'), *base.parent.joinpath('aot-fault-details').glob('*.h'),
-          *ROOT.joinpath('tools/aot-poc/src').glob('*.rs'), *compiler.parent.glob('*.dll')]:
+          *ROOT.joinpath('runtime/codegen/src').glob('*.rs'), *compiler.parent.glob('*.dll')]:
     report['inputs'][str(f)] = digest(f)
 assembly, obj = output / 'Server.dll', output / 'Server.o'
 if a.reuse_build:
@@ -78,7 +78,7 @@ if a.reuse_build:
     assert manifest.get('passed'), 'Reuse requires successful recorded validation'
     # Backend and compiler inputs must match. C adapters are intentionally rebuilt.
     required = [source, compiler, runtime, aot, core, seed, ownership, *libs,
-                *ROOT.joinpath('tools/aot-poc/src').glob('*.rs'), *compiler.parent.glob('*.dll')]
+                *ROOT.joinpath('runtime/codegen/src').glob('*.rs'), *compiler.parent.glob('*.dll')]
     for path in required:
         assert digest(path) == manifest['inputs'].get(str(path)), f'Reused build input changed: {path}'
     for name, key, destination in [('Server.dll', 'assemblySha256', assembly), ('Server.o', 'objectSha256', obj)]:

@@ -8,7 +8,7 @@ on:
       - 'docs/experiments/aot-console/root-probe*'
       - 'docs/experiments/aot-console/host-callbacks.neoil'
       - 'tools/native/windows-native-stack.c'
-      - 'tools/aot-poc/**'
+      - 'runtime/codegen/**'
       - 'scripts/validate-native-session.py'
       - '.github/workflows/native-session.yml'
   pull_request:
@@ -18,7 +18,7 @@ on:
       - 'docs/experiments/aot-console/root-probe*'
       - 'docs/experiments/aot-console/host-callbacks.neoil'
       - 'tools/native/windows-native-stack.c'
-      - 'tools/aot-poc/**'
+      - 'runtime/codegen/**'
       - 'scripts/validate-native-session.py'
       - '.github/workflows/native-session.yml'
 permissions:
@@ -37,17 +37,17 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-      - run: cargo build --locked --manifest-path tools/aot-poc/Cargo.toml
+      - run: cargo build --locked --manifest-path runtime/codegen/Cargo.toml
       - name: Run macOS session contracts
         if: runner.os == 'macOS'
-        run: python3 scripts/validate-native-session.py --aot target/debug/neoclr-aot-poc --output target/native-session-validation
+        run: python3 scripts/validate-native-session.py --aot target/debug/neoclr-codegen --output target/native-session-validation
       - name: Run Windows session contracts
         if: runner.os == 'Windows'
         shell: pwsh
         run: |
           $vs = & "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\vswhere.exe" -latest -products '*' -requires Microsoft.VisualStudio.Component.VC.Tools.x86.x64 -property installationPath
           if (-not $vs) { throw 'MSVC x64 tools not found' }
-          cmd /c "`"$vs\VC\Auxiliary\Build\vcvars64.bat`" && python scripts/validate-native-session.py --aot target/debug/neoclr-aot-poc.exe --output target/native-session-validation"
+          cmd /c "`"$vs\VC\Auxiliary\Build\vcvars64.bat`" && python scripts/validate-native-session.py --aot target/debug/neoclr-codegen.exe --output target/native-session-validation"
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
       - uses: actions/upload-artifact@v4
         if: always()

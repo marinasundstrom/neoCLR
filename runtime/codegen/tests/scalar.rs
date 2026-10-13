@@ -29,7 +29,7 @@ fn compile(source: &str, output: &Path) -> std::process::Output {
 fn compile_with_console(source: &str, output: &Path, console: bool) -> std::process::Output {
     let input = output.with_extension("neoil");
     fs::write(&input, source).unwrap();
-    let mut command = Command::new(env!("CARGO_BIN_EXE_neoclr-aot-poc"));
+    let mut command = Command::new(env!("CARGO_BIN_EXE_neoclr-codegen"));
     command.arg(input).arg("Calculate").arg(output);
     if console {
         command.arg("--console");
@@ -100,7 +100,7 @@ fn unsupported_or_invalid_programs_never_emit_an_object() {
         assert!(!path.exists());
         #[cfg(all(target_os = "macos", target_arch = "aarch64"))]
         {
-            let jit = Command::new(env!("CARGO_BIN_EXE_neoclr-aot-poc"))
+            let jit = Command::new(env!("CARGO_BIN_EXE_neoclr-codegen"))
                 .arg("--jit-scalar").arg(path.with_extension("neoil"))
                 .args(["Calculate", "0"]).output().unwrap();
             assert!(!jit.status.success(), "invalid input must not execute through JIT");
@@ -207,7 +207,7 @@ fn assert_native_outcomes(source: &str, inputs: &[i32], oracle: Option<&dyn Fn(i
             .arg(input.to_string())
             .output()
             .unwrap();
-        let jit = Command::new(env!("CARGO_BIN_EXE_neoclr-aot-poc"))
+        let jit = Command::new(env!("CARGO_BIN_EXE_neoclr-codegen"))
             .arg("--jit-scalar").arg(object.with_extension("neoil"))
             .arg("Calculate").arg(input.to_string()).output().unwrap();
         assert!(jit.status.success(), "{}", String::from_utf8_lossy(&jit.stderr));
@@ -590,7 +590,7 @@ fn standalone_hello_world_has_no_managed_runtime_dependency() {
 fn assert_standalone_hello(temp: &Temp, input: &Path, entry: &str) {
     let root = Path::new(env!("CARGO_MANIFEST_DIR")).join("../..");
     let object = temp.0.join("hello.o");
-    let result = Command::new(env!("CARGO_BIN_EXE_neoclr-aot-poc"))
+    let result = Command::new(env!("CARGO_BIN_EXE_neoclr-codegen"))
         .arg(input)
         .arg(entry)
         .arg(&object)
@@ -722,7 +722,7 @@ fn native_input_rejects_corruption_and_unsupported_il_before_emission() {
         let input = temp.0.join("input.neox");
         let output = temp.0.join("rejected.o");
         fs::write(&input, bytes).unwrap();
-        let result = Command::new(env!("CARGO_BIN_EXE_neoclr-aot-poc"))
+        let result = Command::new(env!("CARGO_BIN_EXE_neoclr-codegen"))
             .arg(&input)
             .arg("@entry")
             .arg(&output)
@@ -742,7 +742,7 @@ fn native_input_rejects_corruption_and_unsupported_il_before_emission() {
     let output = temp.0.join("preserved.o");
     fs::write(&input, envelope).unwrap();
     // Capability policy applies to binary inputs as well as text.
-    let result = Command::new(env!("CARGO_BIN_EXE_neoclr-aot-poc"))
+    let result = Command::new(env!("CARGO_BIN_EXE_neoclr-codegen"))
         .arg(&input)
         .arg("@entry")
         .arg(&output)
@@ -752,7 +752,7 @@ fn native_input_rejects_corruption_and_unsupported_il_before_emission() {
     assert!(String::from_utf8_lossy(&result.stderr).contains("--console"));
     assert!(!output.exists());
     fs::write(&output, b"existing artifact").unwrap();
-    let result = Command::new(env!("CARGO_BIN_EXE_neoclr-aot-poc"))
+    let result = Command::new(env!("CARGO_BIN_EXE_neoclr-codegen"))
         .arg(&input)
         .arg("@entry")
         .arg(&output)
@@ -777,7 +777,7 @@ fn parameterless_entry_adapter_preserves_fault_and_result_pointer() {
         neoclr::metadata_container::write_module(&module).unwrap(),
     )
     .unwrap();
-    let result = Command::new(env!("CARGO_BIN_EXE_neoclr-aot-poc"))
+    let result = Command::new(env!("CARGO_BIN_EXE_neoclr-codegen"))
         .arg(&input)
         .arg("@entry")
         .arg(&object)
@@ -881,14 +881,14 @@ fn jit_parameterless_entry_and_argument_validation() {
     let temp = Temp::new();
     let input = temp.0.join("main.neoil");
     fs::write(&input, ".module Main\n.function Main() -> Int32\nldc.i4 42\nret\n.end\n").unwrap();
-    let result = Command::new(env!("CARGO_BIN_EXE_neoclr-aot-poc"))
+    let result = Command::new(env!("CARGO_BIN_EXE_neoclr-codegen"))
         .arg("--jit-scalar").arg(&input).args(["Main", "99"]).output().unwrap();
     assert!(result.status.success(), "{}", String::from_utf8_lossy(&result.stderr));
     let result: serde_json::Value = serde_json::from_slice(&result.stdout).unwrap();
     assert_eq!(result["status"], 0);
     assert_eq!(result["value"], 42);
     for argument in ["2147483648", "no", ""] {
-        let result = Command::new(env!("CARGO_BIN_EXE_neoclr-aot-poc"))
+        let result = Command::new(env!("CARGO_BIN_EXE_neoclr-codegen"))
             .arg("--jit-scalar").arg(&input).args(["Main", argument]).output().unwrap();
         assert!(!result.status.success());
         assert!(result.stdout.is_empty());
@@ -906,7 +906,7 @@ fn jit_rejects_expanded_aot_features_and_external_services() {
         ".module Unsupported\n.function Calculate() -> Int64\nldc.i8 1\nret\n.end\n".to_owned(),
     ] {
         fs::write(&input, source).unwrap();
-        let result = Command::new(env!("CARGO_BIN_EXE_neoclr-aot-poc"))
+        let result = Command::new(env!("CARGO_BIN_EXE_neoclr-codegen"))
             .arg("--jit-scalar").arg(&input).args(["Calculate", "0"]).output().unwrap();
         assert!(!result.status.success());
         assert!(result.stdout.is_empty());
@@ -921,14 +921,14 @@ fn jit_native_container_matches_source_and_rejects_corruption() {
     let module = neoclr::assemble(SOURCE).unwrap();
     let bytes = neoclr::metadata_container::write_module(&module).unwrap();
     fs::write(&input, &bytes).unwrap();
-    let result = Command::new(env!("CARGO_BIN_EXE_neoclr-aot-poc"))
+    let result = Command::new(env!("CARGO_BIN_EXE_neoclr-codegen"))
         .arg("--jit-scalar").arg(&input).args(["Calculate", "20"]).output().unwrap();
     assert!(result.status.success(), "{}", String::from_utf8_lossy(&result.stderr));
     let result: serde_json::Value = serde_json::from_slice(&result.stdout).unwrap();
     assert_eq!(result["status"], 0);
     assert_eq!(result["value"], 42);
     fs::write(&input, &bytes[..bytes.len() - 1]).unwrap();
-    let result = Command::new(env!("CARGO_BIN_EXE_neoclr-aot-poc"))
+    let result = Command::new(env!("CARGO_BIN_EXE_neoclr-codegen"))
         .arg("--jit-scalar").arg(&input).args(["Calculate", "20"]).output().unwrap();
     assert!(!result.status.success());
     assert!(result.stdout.is_empty());
@@ -941,7 +941,7 @@ fn jit_reuses_owned_code_for_successful_and_faulting_invocations() {
     let input = temp.0.join("repeat.neoil");
     fs::write(&input, ".module Repeat\n.function Calculate(Int32 value) -> Int32\nldc.i4 12\nldarg value\ndiv\nret\n.end\n").unwrap();
     for (argument, status, value) in [("4", 0, Some(3)), ("0", 1, None)] {
-        let result = Command::new(env!("CARGO_BIN_EXE_neoclr-aot-poc"))
+        let result = Command::new(env!("CARGO_BIN_EXE_neoclr-codegen"))
             .arg("--jit-scalar").arg(&input)
             .args(["Calculate", argument, "--repetitions", "3"]).output().unwrap();
         assert!(result.status.success(), "{}", String::from_utf8_lossy(&result.stderr));
@@ -954,7 +954,7 @@ fn jit_reuses_owned_code_for_successful_and_faulting_invocations() {
         }
     }
     for repetitions in ["0", "1001"] {
-        let result = Command::new(env!("CARGO_BIN_EXE_neoclr-aot-poc"))
+        let result = Command::new(env!("CARGO_BIN_EXE_neoclr-codegen"))
             .arg("--jit-scalar").arg(&input)
             .args(["Calculate", "4", "--repetitions", repetitions]).output().unwrap();
         assert!(!result.status.success());
@@ -967,7 +967,7 @@ fn jit_reuses_owned_code_for_successful_and_faulting_invocations() {
 #[cfg(any(all(target_os = "macos", target_arch = "aarch64"), all(target_os = "windows", target_arch = "x86_64")))]
 fn jit_rejects_a_foreign_target_before_loading_inputs() {
     let target = if cfg!(windows) { "aarch64-apple-darwin" } else { "x86_64-pc-windows-msvc" };
-    let output = Command::new(env!("CARGO_BIN_EXE_neoclr-aot-poc"))
+    let output = Command::new(env!("CARGO_BIN_EXE_neoclr-codegen"))
         .args(["--jit-managed", "--target", target, "--closed-world", "missing.dll", "@entry", "missing-host"])
         .output().unwrap();
     assert!(!output.status.success());

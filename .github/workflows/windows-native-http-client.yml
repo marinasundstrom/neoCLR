@@ -5,7 +5,7 @@ on:
     paths:
       - 'src/**'
       - 'Cargo.*'
-      - 'tools/aot-poc/**'
+      - 'runtime/codegen/**'
       - 'tools/native/windows-*'
       - 'docs/experiments/aot-console/**'
       - 'docs/experiments/aot-fault-details/**'
@@ -29,7 +29,7 @@ on:
     paths:
       - 'src/**'
       - 'Cargo.*'
-      - 'tools/aot-poc/**'
+      - 'runtime/codegen/**'
       - 'tools/native/windows-*'
       - 'docs/experiments/aot-console/**'
       - 'docs/experiments/aot-fault-details/**'

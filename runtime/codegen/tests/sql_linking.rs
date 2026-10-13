@@ -21,7 +21,7 @@ fn separately_declared_runtime_async_services_keep_distinct_native_identities() 
     fs::write(&library, neoclr::metadata_container::write_module(&modules[0]).unwrap()).unwrap();
     fs::write(&app, neoclr::metadata_container::write_module(&modules[1]).unwrap()).unwrap();
     let run = |admit| {
-        let mut command = Command::new(env!("CARGO_BIN_EXE_neoclr-aot-poc"));
+        let mut command = Command::new(env!("CARGO_BIN_EXE_neoclr-codegen"));
         command.args(["--closed-world"]).arg(&app).arg("Main").arg(&output)
             .arg("--system").arg(&system)
             .arg("--module").arg(&library)

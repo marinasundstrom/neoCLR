@@ -9,7 +9,8 @@ and arena/context services under `runtime/native/memory`, with compatibility
 forwarding paths and GC/non-GC package relocation checks. Fault layout/rendering
 and opt-in POSIX diagnostics also have runtime-owned sources; remaining native
 services and package consolidation follow. The JIT/AOT backend now exposes an
-internal synchronous library driver. Integration means one maintained, measurable
+internal synchronous library driver. Its product package/tool is `neoclr-codegen`,
+owned under `runtime/codegen`; active SDK and build paths use that name. Integration means one maintained, measurable
 product, not one component or process (author clarification, 2026-10-13). Keep
 separate components where useful; the installed process-based launcher is not
 itself an integration defect. Memory management must permit future build-selected collectors and

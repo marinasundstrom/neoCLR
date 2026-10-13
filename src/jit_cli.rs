@@ -93,9 +93,9 @@ pub(crate) fn run(
     });
     let compiler = compiler.map(PathBuf::from).unwrap_or_else(|| {
         bin.join(if windows {
-            "neoclr-aot-poc.exe"
+            "neoclr-codegen.exe"
         } else {
-            "neoclr-aot-poc"
+            "neoclr-codegen"
         })
     });
     for (role, path) in [
