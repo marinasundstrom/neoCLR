@@ -84,3 +84,6 @@ The terminal debugger runs in-process. Standalone tool packaging, native steppin
 and logical async-stack inspection remain incomplete. These tools help investigate
 the runtime; they are not installed, process-wide telemetry services.
 [Profiling workflow](https://github.com/marinasundstrom/neoCLR/blob/main/docs/experiments/runtime-async/native-profiling.md).
+
+[GC benchmarks](/benchmarks/gc/) retain application throughput comparisons,
+allocation/reclamation evidence and measurement limits for macOS and Windows.

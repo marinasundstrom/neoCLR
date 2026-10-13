@@ -27,6 +27,14 @@ the initial raw run as pilot data; the report uses the subsequent 10,000-operati
 native batches. Interpreter CPU and JSON cases use 16-operation batches. This
 measurement-setting difference is explicit and must be retained in later comparisons.
 
+## 2026-10-13 — development GC comparisons
+
+The [GC benchmark report](/benchmarks/gc/) keeps three distinct paired series:
+fixed-fixture macOS JIT/AOT, newer streaming-library macOS AOT, and Windows x64
+JIT/AOT. Each links immutable raw runs, including slower candidate samples. Only
+the root observer changes within each pair. These are development experiments,
+not new Preview 14 release measurements or cross-platform rankings.
+
 ## How history will grow
 
 Keep raw runs immutable, including slower results. Corrections and replacement runs
@@ -40,7 +48,7 @@ based on observed noise. A small change in one short run is not proof of an impr
 or regression. No automatic statistical acceptance gate is active yet.
 
 See the [benchmark history policy](https://github.com/marinasundstrom/neoCLR/blob/main/docs/benchmark-history.md)
-for provenance and comparison requirements. Windows and sustained cross-runtime
-measurements remain future work. A [local development comparison](/benchmarks/http-comparison/)
+for provenance and comparison requirements. Windows x64 GC comparisons are now recorded separately above; Windows ARM64 and
+sustained cross-runtime measurements remain future work. A [local development comparison](/benchmarks/http-comparison/)
 now retains Kestrel, Go and Node pilot results; publication is on hold pending
 neoCLR HTTP improvements.

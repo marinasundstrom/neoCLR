@@ -16555,3 +16555,17 @@ qualification. Request and response deadline documentation now includes TLS work
   [Research and evidence](../benchmarks/http-scheduling/README.md#generations-and-zgc-research--2026-10-13)
   record tradeoffs and limits. No replacement collector or JVM-default equivalence
   was selected; direct JEP access failed, so the review uses the dated Oracle source.
+
+## 2026-10-13 — retain GC benchmarks on the website
+
+- **Author:** said that Windows results will guide further improvements, then
+  requested: “We need to keep GC benchmarks also on the website”.
+- **Assistant action:** retained the passing Windows comparison and added a
+  [GC benchmark page](../website/content/benchmarks/gc/index.md), linked from the
+  benchmark overview, history, guide navigation and GC feature page. It separates
+  matched throughput results from instrumented reclamation evidence and preserves
+  immutable raw runs, including slower samples.
+- **Observed result:** Windows plain-text differences are within variability;
+  JSON medians rise 9–10% with overlapping ranges. The macOS series remains separate.
+  Collector-versus-wait attribution is the next investigation, not a measured cause.
+  The existing website publication hold remains in effect.

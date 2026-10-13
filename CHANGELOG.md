@@ -8,6 +8,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-13
 
+- Add a dedicated website GC benchmark report with separate macOS and Windows
+  paired HTTP results, allocation/reclamation diagnostics, methodology and immutable
+  raw evidence. Link it from benchmark history, overview, guides and the GC page;
+  retain slower samples and the existing publication hold.
+
 - Retain the matched Windows x64 root-observation HTTP benchmark: all 1,536
   responses pass, plain-text throughput is unchanged within variability, and JSON
   medians rise 9–10% with overlapping ranges. Record the exact CI revision, raw

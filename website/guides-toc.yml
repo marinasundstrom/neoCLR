@@ -48,6 +48,8 @@
       href: benchmarks/index.md
     - name: HTTP request benchmarks
       href: benchmarks/http/index.md
+    - name: Garbage collector benchmarks
+      href: benchmarks/gc/index.md
     - name: General execution benchmarks
       href: benchmarks/execution/index.md
     - name: Benchmark history
