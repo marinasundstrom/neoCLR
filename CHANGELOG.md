@@ -8,6 +8,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-13
 
+- Profile the identical plain-text/object-JSON HTTP guest objects with native GC
+  counters and stack sampling. Record 201,546/296,391 collection attempts, complete
+  allocation reclamation and collector hot spots; keep diagnostic timings separate
+  from benchmarks. Add a reproducible provisional profiling controller.
+
 - Publish benchmark-page data for HTTP plain text, object JSON, PostgreSQL + JSON,
   CPU sums and JSON node operations, with measured ranges, startup and raw reports.
   Add a browsable immutable-history index and navigation, update roadmap evidence
