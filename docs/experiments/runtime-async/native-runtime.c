@@ -378,16 +378,19 @@ int32_t neoclr_runtime_async_pump_v1(neoclr_aot_context *c, neoclr_async_callbac
             if (status) break;
         }
         reap_expired();
+        /* Ready continuations must not starve scheduler deliveries: those may
+         * release completed body operations and keep bounded ownership reusable. */
+        uint64_t delivery = 0;
+        int progress = neoclr_scheduler_acquire_v1(c, &delivery, NULL);
+        /* Idle acquisition may collect and expire owned stacks. Refresh both
+         * mapping ownership and readiness before diagnosing unresolved work. */
+        reap_expired();
         int waiting = 0, ready = 0;
         for (unsigned i = 0; i < LIMIT; ++i) if (state.fibers[i].mapping) {
             waiting = 1;
             operation *op = find(state.fibers[i].waiting);
             ready |= op && op->complete;
         }
-        /* Ready continuations must not starve scheduler deliveries: those may
-         * release completed body operations and keep bounded ownership reusable. */
-        uint64_t delivery = 0;
-        int progress = neoclr_scheduler_acquire_v1(c, &delivery, NULL);
         if (progress == NEOCLR_SCHEDULER_READY) {
             /* Transfer dispatch ownership into an independently parked fiber. */
             void *callback = NULL;

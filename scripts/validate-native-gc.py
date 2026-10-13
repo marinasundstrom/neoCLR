@@ -48,6 +48,9 @@ def main():
         inputs = [BASE / 'system-culture.c', BASE / 'time-zone.c', BASE / 'file-input.c', ROOT / 'tools/native/entry-arguments.c', BASE / 'string-unicode.c', text_crate / 'Cargo.toml', text_crate / 'Cargo.lock', *sorted((text_crate / 'src').glob('*.rs')), *sorted((ROOT / 'runtime/native').rglob('*.[ch]')), Path(__file__).resolve(), *BASE.glob('*.h'), BASE / 'native-gc.c', BASE / 'root-probe.c', BASE / 'text-arena.c',
                   BASE / 'root-validation-test.c', BASE.parent / 'aot-fault-details/fault-details.h',
                   *[BASE / (name + '.c') for name in names]]
+        carrier = ROOT / 'docs/experiments/runtime-async'
+        inputs += [BASE / 'native-stack.c']
+        inputs += [carrier / name for name in ['native-runtime.c', 'native-runtime.h', 'native-owned-body-test.c', 'native-idle-drain-test.c']]
         report['inputs'] = {str(p.relative_to(ROOT)): hashlib.sha256(p.read_bytes()).hexdigest() for p in inputs}
 
         def build(name, source, gc=True, profile=False):
@@ -81,6 +84,13 @@ def main():
             binary = build(name, 'root-validation-test', gc=gc)
             for case in ['address', 'width', 'flags', 'fault', 'transient']:
                 run(name + '-' + case, [binary, case], 3 if windows else -signal.SIGABRT)
+        if not windows:
+            for name in ['native-owned-body-test', 'native-idle-drain-test']:
+                binary = out / name
+                run(name + '-build', [*cc, '-DNEOCLR_NATIVE_GC', '-Wno-deprecated-declarations',
+                    '-I', BASE, '-I', carrier, carrier / (name + '.c'), carrier / 'native-runtime.c',
+                    BASE / 'native-gc.c', BASE / 'root-probe.c', BASE / 'native-stack.c', '-o', binary])
+                run(name, [binary])
         report['passed'] = True
     except Exception as error:
         report['error'] = str(error)

@@ -863,6 +863,7 @@ cleanup, fault delivery and invalid boundaries; hosted Windows qualification fol
 
 ## Integrated opt-in pacing — 2026-10-13
 
+Use matching current generated objects with audited rooted helper imports.
 Build the root observer with `NEOCLR_NATIVE_GC` and `NEOCLR_GC_PACED` to select
 the runtime-owned boundary policy. Stress collection remains the default for
 installed JIT/AOT hosts; there is no new managed API or CLI option. This replaces
@@ -888,3 +889,10 @@ boundaries and the real scheduler in both modes. The constructor/callback consum
 runs non-GC, stress-GC and paced-GC variants against the interpreter result. The
 closed benchmark can now use `evaluate-rooted.py --integrated`; the historical
 experiment remains reproducible without that flag. Platform evidence follows.
+
+Retained-stack follow-up: acquisition can expire owned fibers after the async pump
+has counted them. The macOS retained-stack carrier now reaps expired owners and
+recomputes waiting/ready state after acquisition, avoiding a false unresolved-work
+fault. A real suspended-body regression fails before this fix and passes afterward.
+Its ownership and idle-drain tests now run in the macOS GC gate; the carrier is not
+a Windows implementation. Shared scheduler/collector tests run on both systems.

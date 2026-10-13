@@ -4,10 +4,11 @@
 #include <stdio.h>
 #define CHECK(x) do { if (!(x)) { fprintf(stderr, "check failed at %d\n", __LINE__); return 1; } } while (0)
 static uint64_t signal_id;
-static int entered, resumed, managed;
+static int entered, resumed, managed, collect_at_idle;
 static uint64_t *payload;
 int32_t neoclr_scheduler_acquire_v1(neoclr_aot_context *c, uint64_t *out, const neoclr_probe_frame *f) {
-    (void)c; (void)out; (void)f;
+    (void)out;
+    if (collect_at_idle && neoclr_gc_idle_v1(c,f)) return -3;
     return NEOCLR_SCHEDULER_IDLE;
 }
 int32_t neoclr_scheduler_complete_v1(neoclr_aot_context *c, uint64_t id, const neoclr_probe_frame *f) {
@@ -92,6 +93,24 @@ int main(void) {
         if (!managed) CHECK(!neoclr_runtime_async_release_v1(signal_id, &c, &result) && result);
         CHECK(!neoclr_gc_entry_check_v1(&c));
     }
+    /* Owner expires inside scheduler acquire, after the pump's first scan. */
+    {
+        void *owner=allocate(&c); uint64_t *callback=allocate(&c);
+        payload=allocate(&c); CHECK(owner && callback && payload);
+        callback[0]=UINT32_MAX;callback[1]=(uintptr_t)owner;
+        payload[1]=42;payload[2]=(uintptr_t)owner;
+        uint64_t keep,body;
+        CHECK(!neoclr_gc_host_root_create_v1(&c,owner,&keep));
+        CHECK(!neoclr_runtime_async_startmanaged_v1(owner,callback,&c,&body,invoke));
+        CHECK(!neoclr_gc_host_root_release_v1(&c,keep));
+        collect_at_idle=1;
+        CHECK(!neoclr_runtime_async_pump_v1(&c,invoke,drain));
+        collect_at_idle=0;
+        int32_t result;
+        CHECK(neoclr_runtime_async_iscompleted_v1(body,&c,&result)==3);
+        CHECK(!neoclr_runtime_async_completeunit_v1(signal_id,&c,&result) && !result);
+        CHECK(!c.text.used && entered==321 && resumed==160);
+    }
     /* Exhaust strong activation capacity after dependent-handle allocation. */
     void *owner = allocate(&c);
     uint64_t *callback = allocate(&c);
@@ -101,7 +120,7 @@ int main(void) {
     for (unsigned i = 0; i < 254; ++i)
         CHECK(!neoclr_gc_host_root_create_v1(&c, NULL, &handles[i]));
     CHECK(neoclr_runtime_async_start_owned_v1(owner, callback, &c, &rejected, invoke) == 5);
-    CHECK(rejected == 777 && entered == 320);
+    CHECK(rejected == 777 && entered == 321);
     for (unsigned i = 0; i < 254; ++i)
         CHECK(!neoclr_gc_host_root_release_v1(&c, handles[i]));
     CHECK(!neoclr_gc_collect_v1(&c, NULL) && !c.text.used);

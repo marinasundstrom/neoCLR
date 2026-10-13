@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-13
 
+- Refresh retained-stack async pump readiness after scheduler acquisition can collect. Reap owners that expire during idle acquisition before deciding whether unresolved work remains. Add a regression that failed before the fix and now passes, and include the macOS retained-stack ownership/idle-drain tests in the platform GC gate. This carrier is macOS-specific; Windows shared scheduler contracts remain separate.
+
 - Add opt-in runtime-owned native collection pacing (`NEOCLR_GC_PACED`): retain complete root publication, collect after bounded allocation/boundary counts, preserve rooted pressure retry and force scheduler idle cleanup. Keep stress collection as the installed JIT/AOT default and interpreter policy unchanged. Add actual paced-observer and stress/paced scheduler gates, extend the compiled constructor/callback consumer, and measure the integrated policy through the retained closed-workload benchmark. Local GC/root and socket/package checks pass; hosted qualification follows.
 
 - Integrate collection at validated native scheduler Idle/Pending acquisition boundaries before waiting. Retain pending callback handles and owned suspended stacks, reclaim abandoned owners/resources exactly once, and leave ready delivery and invalid acquisition untouched. Document host rooting obligations and the cost of repeated pending collections; focused local macOS socket contracts pass.
