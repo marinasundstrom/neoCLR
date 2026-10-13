@@ -8,6 +8,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-13
 
+- Record author direction to investigate HTTP byte processing and buffer lifetimes
+  toward comparison with Go. Identify existing parser/output copying and string
+  construction; distinguish proposed buffer views from implemented APIs and retain
+  HTTP octet-parsing and async ownership requirements from primary sources.
+
 - Record matched HTTP collector reruns: five alternating JIT/AOT rounds show
   7–8% higher median plain-text/object-JSON throughput with identical guest inputs.
   Validate 1,536 responses; retain every timing, native stack captures and input

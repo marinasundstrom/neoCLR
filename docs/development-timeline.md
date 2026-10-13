@@ -25,6 +25,31 @@ available original wording; other text is a summary.
 
 See the [changelog](../CHANGELOG.md) and linked design documents for technical status.
 
+## 2026-10-13 — HTTP byte processing and comparison with Go
+
+- **Author:** reiterates the goal of comparing neoCLR with Go and proposes examining
+  HTTP-library architecture, Span/Memory-like capabilities, encoding/decoding and
+  possibly grapheme indexing. Notes Kestrel's scanning of HTTP framing as bytes.
+  neoCLR need not copy .NET's exact types or historical constraints.
+- **Assistant findings:** the current `HttpRequestDecoder` already recognizes framing
+  as bytes, but feeds one byte at a time into `ArrayList<byte>`. Its `Text` helper
+  copies ranges before decoding. `EncodeResponse` concatenates strings, encodes
+  header names/values for validation and copies header/body bytes into another list.
+  These are concrete optimization candidates, not measured cost attribution yet.
+- **Research:** [RFC 9112 section 2.2](https://www.rfc-editor.org/rfc/rfc9112.html#section-2.2)
+  requires octet-based HTTP/1.1 parsing; not all field values or bodies are ASCII,
+  and bodies need not be text. [Kestrel's parser](https://github.com/dotnet/aspnetcore/blob/main/src/Servers/Kestrel/Core/src/Internal/Http/HttpParser.cs)
+  scans byte spans and sequences. [.NET Pipelines](https://learn.microsoft.com/en-us/dotnet/standard/io/pipelines)
+  illustrates buffer ownership, segmented input and backpressure.
+- **Assistant proposal:** prioritize bulk byte parsing, comparisons without temporary
+  strings, direct byte output and explicit buffer lifetime across await. Explore a
+  GC-tracked owner plus offset/length view before committing to a public Span/Memory
+  family. Read-only views alone do not guarantee immutable backing storage; pooling
+  must not recycle buffers retained by requests or suspended operations. Grapheme
+  segmentation has no role in HTTP framing. Benchmark these changes separately
+  from collector changes, then add equivalent Go cases and concurrent/keep-alive
+  workloads. No new API design or performance claim is approved by this discussion.
+
 ## 2026-10-13 — Profile HTTP and reduce shared collection work
 
 - **Author:** asks to profile plain-text and JSON HTTP cases, fix the dominant
