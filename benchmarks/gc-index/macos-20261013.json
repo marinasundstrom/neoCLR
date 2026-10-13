@@ -1,0 +1,2247 @@
+{
+  "passed": true,
+  "platform": "macOS-27.0-arm64-arm-64bit",
+  "machine": "arm64",
+  "baseline": "924b45110",
+  "commands": [
+    {
+      "command": [
+        "xcrun",
+        "--sdk",
+        "macosx",
+        "--find",
+        "clang"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "xcrun",
+        "--sdk",
+        "macosx",
+        "--show-sdk-path"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "git",
+        "-C",
+        "/Users/robert/Projects/neoclr",
+        "rev-parse",
+        "HEAD"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "git",
+        "-C",
+        "/Users/robert/Projects/neoclr",
+        "show",
+        "924b45110:docs/experiments/aot-console/native-gc.c"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang",
+        "-std=c11",
+        "-O2",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-DNEOCLR_NATIVE_GC",
+        "-I",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console",
+        "-isysroot",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.2.sdk",
+        "/Users/robert/Projects/neoclr/benchmarks/gc-index/workload.c",
+        "/Users/robert/Projects/neoclr/target/gc-index-matched-20261013/baseline.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/root-probe.c",
+        "-o",
+        "/Users/robert/Projects/neoclr/target/gc-index-matched-20261013/baseline"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang",
+        "-std=c11",
+        "-O2",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-DNEOCLR_NATIVE_GC",
+        "-I",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console",
+        "-isysroot",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.2.sdk",
+        "-DLOOKUP_DIAGNOSTICS",
+        "/Users/robert/Projects/neoclr/benchmarks/gc-index/workload.c",
+        "/Users/robert/Projects/neoclr/target/gc-index-matched-20261013/baseline-diagnostic.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/root-probe.c",
+        "-o",
+        "/Users/robert/Projects/neoclr/target/gc-index-matched-20261013/baseline-diagnostic"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang",
+        "-std=c11",
+        "-O2",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-DNEOCLR_NATIVE_GC",
+        "-I",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console",
+        "-isysroot",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.2.sdk",
+        "/Users/robert/Projects/neoclr/benchmarks/gc-index/workload.c",
+        "/Users/robert/Projects/neoclr/target/gc-index-matched-20261013/candidate.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/root-probe.c",
+        "-o",
+        "/Users/robert/Projects/neoclr/target/gc-index-matched-20261013/candidate"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang",
+        "-std=c11",
+        "-O2",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-DNEOCLR_NATIVE_GC",
+        "-I",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console",
+        "-isysroot",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.2.sdk",
+        "-DLOOKUP_DIAGNOSTICS",
+        "/Users/robert/Projects/neoclr/benchmarks/gc-index/workload.c",
+        "/Users/robert/Projects/neoclr/target/gc-index-matched-20261013/candidate-diagnostic.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/root-probe.c",
+        "-o",
+        "/Users/robert/Projects/neoclr/target/gc-index-matched-20261013/candidate-diagnostic"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-index-matched-20261013/baseline",
+        "64",
+        "10000",
+        "chain"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-index-matched-20261013/candidate",
+        "64",
+        "10000",
+        "chain"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-index-matched-20261013/baseline",
+        "64",
+        "10000",
+        "chain"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-index-matched-20261013/candidate",
+        "64",
+        "10000",
+        "chain"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-index-matched-20261013/candidate",
+        "64",
+        "10000",
+        "chain"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-index-matched-20261013/baseline",
+        "64",
+        "10000",
+        "chain"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-index-matched-20261013/baseline",
+        "64",
+        "10000",
+        "chain"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-index-matched-20261013/candidate",
+        "64",
+        "10000",
+        "chain"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-index-matched-20261013/candidate",
+        "64",
+        "10000",
+        "chain"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-index-matched-20261013/baseline",
+        "64",
+        "10000",
+        "chain"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-index-matched-20261013/baseline",
+        "64",
+        "10000",
+        "chain"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-index-matched-20261013/candidate",
+        "64",
+        "10000",
+        "chain"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-index-matched-20261013/baseline-diagnostic",
+        "64",
+        "10000",
+        "chain"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-index-matched-20261013/candidate-diagnostic",
+        "64",
+        "10000",
+        "chain"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-index-matched-20261013/baseline",
+        "1024",
+        "1000",
+        "chain"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-index-matched-20261013/candidate",
+        "1024",
+        "1000",
+        "chain"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-index-matched-20261013/baseline",
+        "1024",
+        "1000",
+        "chain"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-index-matched-20261013/candidate",
+        "1024",
+        "1000",
+        "chain"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-index-matched-20261013/candidate",
+        "1024",
+        "1000",
+        "chain"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-index-matched-20261013/baseline",
+        "1024",
+        "1000",
+        "chain"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-index-matched-20261013/baseline",
+        "1024",
+        "1000",
+        "chain"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-index-matched-20261013/candidate",
+        "1024",
+        "1000",
+        "chain"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-index-matched-20261013/candidate",
+        "1024",
+        "1000",
+        "chain"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-index-matched-20261013/baseline",
+        "1024",
+        "1000",
+        "chain"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-index-matched-20261013/baseline",
+        "1024",
+        "1000",
+        "chain"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-index-matched-20261013/candidate",
+        "1024",
+        "1000",
+        "chain"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-index-matched-20261013/baseline-diagnostic",
+        "1024",
+        "1000",
+        "chain"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-index-matched-20261013/candidate-diagnostic",
+        "1024",
+        "1000",
+        "chain"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-index-matched-20261013/baseline",
+        "2048",
+        "500",
+        "chain"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-index-matched-20261013/candidate",
+        "2048",
+        "500",
+        "chain"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-index-matched-20261013/baseline",
+        "2048",
+        "500",
+        "chain"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-index-matched-20261013/candidate",
+        "2048",
+        "500",
+        "chain"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-index-matched-20261013/candidate",
+        "2048",
+        "500",
+        "chain"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-index-matched-20261013/baseline",
+        "2048",
+        "500",
+        "chain"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-index-matched-20261013/baseline",
+        "2048",
+        "500",
+        "chain"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-index-matched-20261013/candidate",
+        "2048",
+        "500",
+        "chain"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-index-matched-20261013/candidate",
+        "2048",
+        "500",
+        "chain"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-index-matched-20261013/baseline",
+        "2048",
+        "500",
+        "chain"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-index-matched-20261013/baseline",
+        "2048",
+        "500",
+        "chain"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-index-matched-20261013/candidate",
+        "2048",
+        "500",
+        "chain"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-index-matched-20261013/baseline-diagnostic",
+        "2048",
+        "500",
+        "chain"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-index-matched-20261013/candidate-diagnostic",
+        "2048",
+        "500",
+        "chain"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-index-matched-20261013/baseline",
+        "2049",
+        "500",
+        "chain"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-index-matched-20261013/candidate",
+        "2049",
+        "500",
+        "chain"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-index-matched-20261013/baseline",
+        "2049",
+        "500",
+        "chain"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-index-matched-20261013/candidate",
+        "2049",
+        "500",
+        "chain"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-index-matched-20261013/candidate",
+        "2049",
+        "500",
+        "chain"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-index-matched-20261013/baseline",
+        "2049",
+        "500",
+        "chain"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-index-matched-20261013/baseline",
+        "2049",
+        "500",
+        "chain"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-index-matched-20261013/candidate",
+        "2049",
+        "500",
+        "chain"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-index-matched-20261013/candidate",
+        "2049",
+        "500",
+        "chain"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-index-matched-20261013/baseline",
+        "2049",
+        "500",
+        "chain"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-index-matched-20261013/baseline",
+        "2049",
+        "500",
+        "chain"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-index-matched-20261013/candidate",
+        "2049",
+        "500",
+        "chain"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-index-matched-20261013/baseline-diagnostic",
+        "2049",
+        "500",
+        "chain"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-index-matched-20261013/candidate-diagnostic",
+        "2049",
+        "500",
+        "chain"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-index-matched-20261013/baseline",
+        "4096",
+        "300",
+        "chain"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-index-matched-20261013/candidate",
+        "4096",
+        "300",
+        "chain"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-index-matched-20261013/baseline",
+        "4096",
+        "300",
+        "chain"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-index-matched-20261013/candidate",
+        "4096",
+        "300",
+        "chain"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-index-matched-20261013/candidate",
+        "4096",
+        "300",
+        "chain"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-index-matched-20261013/baseline",
+        "4096",
+        "300",
+        "chain"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-index-matched-20261013/baseline",
+        "4096",
+        "300",
+        "chain"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-index-matched-20261013/candidate",
+        "4096",
+        "300",
+        "chain"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-index-matched-20261013/candidate",
+        "4096",
+        "300",
+        "chain"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-index-matched-20261013/baseline",
+        "4096",
+        "300",
+        "chain"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-index-matched-20261013/baseline",
+        "4096",
+        "300",
+        "chain"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-index-matched-20261013/candidate",
+        "4096",
+        "300",
+        "chain"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-index-matched-20261013/baseline-diagnostic",
+        "4096",
+        "300",
+        "chain"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-index-matched-20261013/candidate-diagnostic",
+        "4096",
+        "300",
+        "chain"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-index-matched-20261013/baseline",
+        "16384",
+        "100",
+        "chain"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-index-matched-20261013/candidate",
+        "16384",
+        "100",
+        "chain"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-index-matched-20261013/baseline",
+        "16384",
+        "100",
+        "chain"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-index-matched-20261013/candidate",
+        "16384",
+        "100",
+        "chain"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-index-matched-20261013/candidate",
+        "16384",
+        "100",
+        "chain"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-index-matched-20261013/baseline",
+        "16384",
+        "100",
+        "chain"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-index-matched-20261013/baseline",
+        "16384",
+        "100",
+        "chain"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-index-matched-20261013/candidate",
+        "16384",
+        "100",
+        "chain"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-index-matched-20261013/candidate",
+        "16384",
+        "100",
+        "chain"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-index-matched-20261013/baseline",
+        "16384",
+        "100",
+        "chain"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-index-matched-20261013/baseline",
+        "16384",
+        "100",
+        "chain"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-index-matched-20261013/candidate",
+        "16384",
+        "100",
+        "chain"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-index-matched-20261013/baseline-diagnostic",
+        "16384",
+        "100",
+        "chain"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-index-matched-20261013/candidate-diagnostic",
+        "16384",
+        "100",
+        "chain"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-index-matched-20261013/baseline",
+        "16384",
+        "100",
+        "wide"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-index-matched-20261013/candidate",
+        "16384",
+        "100",
+        "wide"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-index-matched-20261013/baseline",
+        "16384",
+        "100",
+        "wide"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-index-matched-20261013/candidate",
+        "16384",
+        "100",
+        "wide"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-index-matched-20261013/candidate",
+        "16384",
+        "100",
+        "wide"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-index-matched-20261013/baseline",
+        "16384",
+        "100",
+        "wide"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-index-matched-20261013/baseline",
+        "16384",
+        "100",
+        "wide"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-index-matched-20261013/candidate",
+        "16384",
+        "100",
+        "wide"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-index-matched-20261013/candidate",
+        "16384",
+        "100",
+        "wide"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-index-matched-20261013/baseline",
+        "16384",
+        "100",
+        "wide"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-index-matched-20261013/baseline",
+        "16384",
+        "100",
+        "wide"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-index-matched-20261013/candidate",
+        "16384",
+        "100",
+        "wide"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-index-matched-20261013/baseline-diagnostic",
+        "16384",
+        "100",
+        "wide"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-index-matched-20261013/candidate-diagnostic",
+        "16384",
+        "100",
+        "wide"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-index-matched-20261013/baseline",
+        "4096",
+        "300",
+        "holes"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-index-matched-20261013/candidate",
+        "4096",
+        "300",
+        "holes"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-index-matched-20261013/baseline",
+        "4096",
+        "300",
+        "holes"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-index-matched-20261013/candidate",
+        "4096",
+        "300",
+        "holes"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-index-matched-20261013/candidate",
+        "4096",
+        "300",
+        "holes"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-index-matched-20261013/baseline",
+        "4096",
+        "300",
+        "holes"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-index-matched-20261013/baseline",
+        "4096",
+        "300",
+        "holes"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-index-matched-20261013/candidate",
+        "4096",
+        "300",
+        "holes"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-index-matched-20261013/candidate",
+        "4096",
+        "300",
+        "holes"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-index-matched-20261013/baseline",
+        "4096",
+        "300",
+        "holes"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-index-matched-20261013/baseline",
+        "4096",
+        "300",
+        "holes"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-index-matched-20261013/candidate",
+        "4096",
+        "300",
+        "holes"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-index-matched-20261013/baseline-diagnostic",
+        "4096",
+        "300",
+        "holes"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-index-matched-20261013/candidate-diagnostic",
+        "4096",
+        "300",
+        "holes"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-index-matched-20261013/baseline",
+        "64",
+        "10000",
+        "atomic"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-index-matched-20261013/candidate",
+        "64",
+        "10000",
+        "atomic"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-index-matched-20261013/baseline",
+        "64",
+        "10000",
+        "atomic"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-index-matched-20261013/candidate",
+        "64",
+        "10000",
+        "atomic"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-index-matched-20261013/candidate",
+        "64",
+        "10000",
+        "atomic"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-index-matched-20261013/baseline",
+        "64",
+        "10000",
+        "atomic"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-index-matched-20261013/baseline",
+        "64",
+        "10000",
+        "atomic"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-index-matched-20261013/candidate",
+        "64",
+        "10000",
+        "atomic"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-index-matched-20261013/candidate",
+        "64",
+        "10000",
+        "atomic"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-index-matched-20261013/baseline",
+        "64",
+        "10000",
+        "atomic"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-index-matched-20261013/baseline",
+        "64",
+        "10000",
+        "atomic"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-index-matched-20261013/candidate",
+        "64",
+        "10000",
+        "atomic"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-index-matched-20261013/baseline-diagnostic",
+        "64",
+        "10000",
+        "atomic"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/gc-index-matched-20261013/candidate-diagnostic",
+        "64",
+        "10000",
+        "atomic"
+      ],
+      "exitCode": 0
+    }
+  ],
+  "cases": [
+    {
+      "shape": "chain",
+      "nodes": 64,
+      "collections": 10000,
+      "samples": [
+        {
+          "round": 0,
+          "mode": "baseline",
+          "seconds": 0.015368,
+          "lookupSteps": 0,
+          "reclaimed": 64
+        },
+        {
+          "round": 0,
+          "mode": "candidate",
+          "seconds": 0.012214,
+          "lookupSteps": 0,
+          "reclaimed": 64
+        },
+        {
+          "round": 1,
+          "mode": "candidate",
+          "seconds": 0.010111,
+          "lookupSteps": 0,
+          "reclaimed": 64
+        },
+        {
+          "round": 1,
+          "mode": "baseline",
+          "seconds": 0.008805,
+          "lookupSteps": 0,
+          "reclaimed": 64
+        },
+        {
+          "round": 2,
+          "mode": "baseline",
+          "seconds": 0.008167,
+          "lookupSteps": 0,
+          "reclaimed": 64
+        },
+        {
+          "round": 2,
+          "mode": "candidate",
+          "seconds": 0.008047,
+          "lookupSteps": 0,
+          "reclaimed": 64
+        },
+        {
+          "round": 3,
+          "mode": "candidate",
+          "seconds": 0.007858,
+          "lookupSteps": 0,
+          "reclaimed": 64
+        },
+        {
+          "round": 3,
+          "mode": "baseline",
+          "seconds": 0.007609,
+          "lookupSteps": 0,
+          "reclaimed": 64
+        },
+        {
+          "round": 4,
+          "mode": "baseline",
+          "seconds": 0.007622,
+          "lookupSteps": 0,
+          "reclaimed": 64
+        },
+        {
+          "round": 4,
+          "mode": "candidate",
+          "seconds": 0.007964,
+          "lookupSteps": 0,
+          "reclaimed": 64
+        }
+      ],
+      "warmup": [
+        {
+          "mode": "baseline",
+          "seconds": 0.021829,
+          "lookupSteps": 0,
+          "reclaimed": 64
+        },
+        {
+          "mode": "candidate",
+          "seconds": 0.022047,
+          "lookupSteps": 0,
+          "reclaimed": 64
+        }
+      ],
+      "diagnostics": {
+        "baseline": {
+          "seconds": 0.020175,
+          "lookupSteps": 800000,
+          "reclaimed": 64
+        },
+        "candidate": {
+          "seconds": 0.021554,
+          "lookupSteps": 800000,
+          "reclaimed": 64
+        }
+      },
+      "medians": {
+        "baseline": 0.008167,
+        "candidate": 0.008047
+      },
+      "speedup": 1.014912389710451
+    },
+    {
+      "shape": "chain",
+      "nodes": 1024,
+      "collections": 1000,
+      "samples": [
+        {
+          "round": 0,
+          "mode": "baseline",
+          "seconds": 0.01634,
+          "lookupSteps": 0,
+          "reclaimed": 1024
+        },
+        {
+          "round": 0,
+          "mode": "candidate",
+          "seconds": 0.015536,
+          "lookupSteps": 0,
+          "reclaimed": 1024
+        },
+        {
+          "round": 1,
+          "mode": "candidate",
+          "seconds": 0.015483,
+          "lookupSteps": 0,
+          "reclaimed": 1024
+        },
+        {
+          "round": 1,
+          "mode": "baseline",
+          "seconds": 0.015494,
+          "lookupSteps": 0,
+          "reclaimed": 1024
+        },
+        {
+          "round": 2,
+          "mode": "baseline",
+          "seconds": 0.015466,
+          "lookupSteps": 0,
+          "reclaimed": 1024
+        },
+        {
+          "round": 2,
+          "mode": "candidate",
+          "seconds": 0.015503,
+          "lookupSteps": 0,
+          "reclaimed": 1024
+        },
+        {
+          "round": 3,
+          "mode": "candidate",
+          "seconds": 0.015499,
+          "lookupSteps": 0,
+          "reclaimed": 1024
+        },
+        {
+          "round": 3,
+          "mode": "baseline",
+          "seconds": 0.015457,
+          "lookupSteps": 0,
+          "reclaimed": 1024
+        },
+        {
+          "round": 4,
+          "mode": "baseline",
+          "seconds": 0.015448,
+          "lookupSteps": 0,
+          "reclaimed": 1024
+        },
+        {
+          "round": 4,
+          "mode": "candidate",
+          "seconds": 0.015475,
+          "lookupSteps": 0,
+          "reclaimed": 1024
+        }
+      ],
+      "warmup": [
+        {
+          "mode": "baseline",
+          "seconds": 0.026693,
+          "lookupSteps": 0,
+          "reclaimed": 1024
+        },
+        {
+          "mode": "candidate",
+          "seconds": 0.018895,
+          "lookupSteps": 0,
+          "reclaimed": 1024
+        }
+      ],
+      "diagnostics": {
+        "baseline": {
+          "seconds": 0.015402,
+          "lookupSteps": 3264000,
+          "reclaimed": 1024
+        },
+        "candidate": {
+          "seconds": 0.015526,
+          "lookupSteps": 3264000,
+          "reclaimed": 1024
+        }
+      },
+      "medians": {
+        "baseline": 0.015466,
+        "candidate": 0.015499
+      },
+      "speedup": 0.9978708303761533
+    },
+    {
+      "shape": "chain",
+      "nodes": 2048,
+      "collections": 500,
+      "samples": [
+        {
+          "round": 0,
+          "mode": "baseline",
+          "seconds": 0.019834,
+          "lookupSteps": 0,
+          "reclaimed": 2048
+        },
+        {
+          "round": 0,
+          "mode": "candidate",
+          "seconds": 0.01979,
+          "lookupSteps": 0,
+          "reclaimed": 2048
+        },
+        {
+          "round": 1,
+          "mode": "candidate",
+          "seconds": 0.019818,
+          "lookupSteps": 0,
+          "reclaimed": 2048
+        },
+        {
+          "round": 1,
+          "mode": "baseline",
+          "seconds": 0.019867,
+          "lookupSteps": 0,
+          "reclaimed": 2048
+        },
+        {
+          "round": 2,
+          "mode": "baseline",
+          "seconds": 0.019871,
+          "lookupSteps": 0,
+          "reclaimed": 2048
+        },
+        {
+          "round": 2,
+          "mode": "candidate",
+          "seconds": 0.019817,
+          "lookupSteps": 0,
+          "reclaimed": 2048
+        },
+        {
+          "round": 3,
+          "mode": "candidate",
+          "seconds": 0.019875,
+          "lookupSteps": 0,
+          "reclaimed": 2048
+        },
+        {
+          "round": 3,
+          "mode": "baseline",
+          "seconds": 0.019851,
+          "lookupSteps": 0,
+          "reclaimed": 2048
+        },
+        {
+          "round": 4,
+          "mode": "baseline",
+          "seconds": 0.01987,
+          "lookupSteps": 0,
+          "reclaimed": 2048
+        },
+        {
+          "round": 4,
+          "mode": "candidate",
+          "seconds": 0.019814,
+          "lookupSteps": 0,
+          "reclaimed": 2048
+        }
+      ],
+      "warmup": [
+        {
+          "mode": "baseline",
+          "seconds": 0.019878,
+          "lookupSteps": 0,
+          "reclaimed": 2048
+        },
+        {
+          "mode": "candidate",
+          "seconds": 0.01979,
+          "lookupSteps": 0,
+          "reclaimed": 2048
+        }
+      ],
+      "diagnostics": {
+        "baseline": {
+          "seconds": 0.019992,
+          "lookupSteps": 5984000,
+          "reclaimed": 2048
+        },
+        "candidate": {
+          "seconds": 0.019795,
+          "lookupSteps": 5984000,
+          "reclaimed": 2048
+        }
+      },
+      "medians": {
+        "baseline": 0.019867,
+        "candidate": 0.019817
+      },
+      "speedup": 1.0025230862390875
+    },
+    {
+      "shape": "chain",
+      "nodes": 2049,
+      "collections": 500,
+      "samples": [
+        {
+          "round": 0,
+          "mode": "baseline",
+          "seconds": 0.019879,
+          "lookupSteps": 0,
+          "reclaimed": 2049
+        },
+        {
+          "round": 0,
+          "mode": "candidate",
+          "seconds": 0.014726,
+          "lookupSteps": 0,
+          "reclaimed": 2049
+        },
+        {
+          "round": 1,
+          "mode": "candidate",
+          "seconds": 0.014724,
+          "lookupSteps": 0,
+          "reclaimed": 2049
+        },
+        {
+          "round": 1,
+          "mode": "baseline",
+          "seconds": 0.019898,
+          "lookupSteps": 0,
+          "reclaimed": 2049
+        },
+        {
+          "round": 2,
+          "mode": "baseline",
+          "seconds": 0.019909,
+          "lookupSteps": 0,
+          "reclaimed": 2049
+        },
+        {
+          "round": 2,
+          "mode": "candidate",
+          "seconds": 0.014716,
+          "lookupSteps": 0,
+          "reclaimed": 2049
+        },
+        {
+          "round": 3,
+          "mode": "candidate",
+          "seconds": 0.015994,
+          "lookupSteps": 0,
+          "reclaimed": 2049
+        },
+        {
+          "round": 3,
+          "mode": "baseline",
+          "seconds": 0.021671,
+          "lookupSteps": 0,
+          "reclaimed": 2049
+        },
+        {
+          "round": 4,
+          "mode": "baseline",
+          "seconds": 0.021429,
+          "lookupSteps": 0,
+          "reclaimed": 2049
+        },
+        {
+          "round": 4,
+          "mode": "candidate",
+          "seconds": 0.01478,
+          "lookupSteps": 0,
+          "reclaimed": 2049
+        }
+      ],
+      "warmup": [
+        {
+          "mode": "baseline",
+          "seconds": 0.019893,
+          "lookupSteps": 0,
+          "reclaimed": 2049
+        },
+        {
+          "mode": "candidate",
+          "seconds": 0.014716,
+          "lookupSteps": 0,
+          "reclaimed": 2049
+        }
+      ],
+      "diagnostics": {
+        "baseline": {
+          "seconds": 0.019902,
+          "lookupSteps": 5984500,
+          "reclaimed": 2049
+        },
+        "candidate": {
+          "seconds": 0.015016,
+          "lookupSteps": 1280500,
+          "reclaimed": 2049
+        }
+      },
+      "medians": {
+        "baseline": 0.019909,
+        "candidate": 0.014726
+      },
+      "speedup": 1.3519625152790982
+    },
+    {
+      "shape": "chain",
+      "nodes": 4096,
+      "collections": 300,
+      "samples": [
+        {
+          "round": 0,
+          "mode": "baseline",
+          "seconds": 0.035352,
+          "lookupSteps": 0,
+          "reclaimed": 4096
+        },
+        {
+          "round": 0,
+          "mode": "candidate",
+          "seconds": 0.018633,
+          "lookupSteps": 0,
+          "reclaimed": 4096
+        },
+        {
+          "round": 1,
+          "mode": "candidate",
+          "seconds": 0.018663,
+          "lookupSteps": 0,
+          "reclaimed": 4096
+        },
+        {
+          "round": 1,
+          "mode": "baseline",
+          "seconds": 0.035548,
+          "lookupSteps": 0,
+          "reclaimed": 4096
+        },
+        {
+          "round": 2,
+          "mode": "baseline",
+          "seconds": 0.035333,
+          "lookupSteps": 0,
+          "reclaimed": 4096
+        },
+        {
+          "round": 2,
+          "mode": "candidate",
+          "seconds": 0.018898,
+          "lookupSteps": 0,
+          "reclaimed": 4096
+        },
+        {
+          "round": 3,
+          "mode": "candidate",
+          "seconds": 0.019668,
+          "lookupSteps": 0,
+          "reclaimed": 4096
+        },
+        {
+          "round": 3,
+          "mode": "baseline",
+          "seconds": 0.035362,
+          "lookupSteps": 0,
+          "reclaimed": 4096
+        },
+        {
+          "round": 4,
+          "mode": "baseline",
+          "seconds": 0.035307,
+          "lookupSteps": 0,
+          "reclaimed": 4096
+        },
+        {
+          "round": 4,
+          "mode": "candidate",
+          "seconds": 0.018621,
+          "lookupSteps": 0,
+          "reclaimed": 4096
+        }
+      ],
+      "warmup": [
+        {
+          "mode": "baseline",
+          "seconds": 0.035281,
+          "lookupSteps": 0,
+          "reclaimed": 4096
+        },
+        {
+          "mode": "candidate",
+          "seconds": 0.018649,
+          "lookupSteps": 0,
+          "reclaimed": 4096
+        }
+      ],
+      "diagnostics": {
+        "baseline": {
+          "seconds": 0.035579,
+          "lookupSteps": 13728000,
+          "reclaimed": 4096
+        },
+        "candidate": {
+          "seconds": 0.018726,
+          "lookupSteps": 1536000,
+          "reclaimed": 4096
+        }
+      },
+      "medians": {
+        "baseline": 0.035352,
+        "candidate": 0.018663
+      },
+      "speedup": 1.8942292235974925
+    },
+    {
+      "shape": "chain",
+      "nodes": 16384,
+      "collections": 100,
+      "samples": [
+        {
+          "round": 0,
+          "mode": "baseline",
+          "seconds": 0.135604,
+          "lookupSteps": 0,
+          "reclaimed": 16384
+        },
+        {
+          "round": 0,
+          "mode": "candidate",
+          "seconds": 0.030401,
+          "lookupSteps": 0,
+          "reclaimed": 16384
+        },
+        {
+          "round": 1,
+          "mode": "candidate",
+          "seconds": 0.03036,
+          "lookupSteps": 0,
+          "reclaimed": 16384
+        },
+        {
+          "round": 1,
+          "mode": "baseline",
+          "seconds": 0.135126,
+          "lookupSteps": 0,
+          "reclaimed": 16384
+        },
+        {
+          "round": 2,
+          "mode": "baseline",
+          "seconds": 0.139921,
+          "lookupSteps": 0,
+          "reclaimed": 16384
+        },
+        {
+          "round": 2,
+          "mode": "candidate",
+          "seconds": 0.033238,
+          "lookupSteps": 0,
+          "reclaimed": 16384
+        },
+        {
+          "round": 3,
+          "mode": "candidate",
+          "seconds": 0.031374,
+          "lookupSteps": 0,
+          "reclaimed": 16384
+        },
+        {
+          "round": 3,
+          "mode": "baseline",
+          "seconds": 0.139884,
+          "lookupSteps": 0,
+          "reclaimed": 16384
+        },
+        {
+          "round": 4,
+          "mode": "baseline",
+          "seconds": 0.139751,
+          "lookupSteps": 0,
+          "reclaimed": 16384
+        },
+        {
+          "round": 4,
+          "mode": "candidate",
+          "seconds": 0.031369,
+          "lookupSteps": 0,
+          "reclaimed": 16384
+        }
+      ],
+      "warmup": [
+        {
+          "mode": "baseline",
+          "seconds": 0.134853,
+          "lookupSteps": 0,
+          "reclaimed": 16384
+        },
+        {
+          "mode": "candidate",
+          "seconds": 0.030404,
+          "lookupSteps": 0,
+          "reclaimed": 16384
+        }
+      ],
+      "diagnostics": {
+        "baseline": {
+          "seconds": 0.146155,
+          "lookupSteps": 70726400,
+          "reclaimed": 16384
+        },
+        "candidate": {
+          "seconds": 0.031569,
+          "lookupSteps": 5222400,
+          "reclaimed": 16384
+        }
+      },
+      "medians": {
+        "baseline": 0.139751,
+        "candidate": 0.031369
+      },
+      "speedup": 4.455067104466192
+    },
+    {
+      "shape": "wide",
+      "nodes": 16384,
+      "collections": 100,
+      "samples": [
+        {
+          "round": 0,
+          "mode": "baseline",
+          "seconds": 0.121787,
+          "lookupSteps": 0,
+          "reclaimed": 16385
+        },
+        {
+          "round": 0,
+          "mode": "candidate",
+          "seconds": 0.023231,
+          "lookupSteps": 0,
+          "reclaimed": 16385
+        },
+        {
+          "round": 1,
+          "mode": "candidate",
+          "seconds": 0.023239,
+          "lookupSteps": 0,
+          "reclaimed": 16385
+        },
+        {
+          "round": 1,
+          "mode": "baseline",
+          "seconds": 0.165544,
+          "lookupSteps": 0,
+          "reclaimed": 16385
+        },
+        {
+          "round": 2,
+          "mode": "baseline",
+          "seconds": 0.202044,
+          "lookupSteps": 0,
+          "reclaimed": 16385
+        },
+        {
+          "round": 2,
+          "mode": "candidate",
+          "seconds": 0.043425,
+          "lookupSteps": 0,
+          "reclaimed": 16385
+        },
+        {
+          "round": 3,
+          "mode": "candidate",
+          "seconds": 0.02493,
+          "lookupSteps": 0,
+          "reclaimed": 16385
+        },
+        {
+          "round": 3,
+          "mode": "baseline",
+          "seconds": 0.129734,
+          "lookupSteps": 0,
+          "reclaimed": 16385
+        },
+        {
+          "round": 4,
+          "mode": "baseline",
+          "seconds": 0.129656,
+          "lookupSteps": 0,
+          "reclaimed": 16385
+        },
+        {
+          "round": 4,
+          "mode": "candidate",
+          "seconds": 0.024753,
+          "lookupSteps": 0,
+          "reclaimed": 16385
+        }
+      ],
+      "warmup": [
+        {
+          "mode": "baseline",
+          "seconds": 0.126493,
+          "lookupSteps": 0,
+          "reclaimed": 16385
+        },
+        {
+          "mode": "candidate",
+          "seconds": 0.02326,
+          "lookupSteps": 0,
+          "reclaimed": 16385
+        }
+      ],
+      "diagnostics": {
+        "baseline": {
+          "seconds": 0.127121,
+          "lookupSteps": 71270500,
+          "reclaimed": 16385
+        },
+        "candidate": {
+          "seconds": 0.025258,
+          "lookupSteps": 5734500,
+          "reclaimed": 16385
+        }
+      },
+      "medians": {
+        "baseline": 0.129734,
+        "candidate": 0.024753
+      },
+      "speedup": 5.241142487779259
+    },
+    {
+      "shape": "holes",
+      "nodes": 4096,
+      "collections": 300,
+      "samples": [
+        {
+          "round": 0,
+          "mode": "baseline",
+          "seconds": 0.065921,
+          "lookupSteps": 0,
+          "reclaimed": 8192
+        },
+        {
+          "round": 0,
+          "mode": "candidate",
+          "seconds": 0.030666,
+          "lookupSteps": 0,
+          "reclaimed": 8192
+        },
+        {
+          "round": 1,
+          "mode": "candidate",
+          "seconds": 0.030737,
+          "lookupSteps": 0,
+          "reclaimed": 8192
+        },
+        {
+          "round": 1,
+          "mode": "baseline",
+          "seconds": 0.065991,
+          "lookupSteps": 0,
+          "reclaimed": 8192
+        },
+        {
+          "round": 2,
+          "mode": "baseline",
+          "seconds": 0.065898,
+          "lookupSteps": 0,
+          "reclaimed": 8192
+        },
+        {
+          "round": 2,
+          "mode": "candidate",
+          "seconds": 0.030321,
+          "lookupSteps": 0,
+          "reclaimed": 8192
+        },
+        {
+          "round": 3,
+          "mode": "candidate",
+          "seconds": 0.030324,
+          "lookupSteps": 0,
+          "reclaimed": 8192
+        },
+        {
+          "round": 3,
+          "mode": "baseline",
+          "seconds": 0.065985,
+          "lookupSteps": 0,
+          "reclaimed": 8192
+        },
+        {
+          "round": 4,
+          "mode": "baseline",
+          "seconds": 0.065964,
+          "lookupSteps": 0,
+          "reclaimed": 8192
+        },
+        {
+          "round": 4,
+          "mode": "candidate",
+          "seconds": 0.03052,
+          "lookupSteps": 0,
+          "reclaimed": 8192
+        }
+      ],
+      "warmup": [
+        {
+          "mode": "baseline",
+          "seconds": 0.068543,
+          "lookupSteps": 0,
+          "reclaimed": 8192
+        },
+        {
+          "mode": "candidate",
+          "seconds": 0.031969,
+          "lookupSteps": 0,
+          "reclaimed": 8192
+        }
+      ],
+      "diagnostics": {
+        "baseline": {
+          "seconds": 0.066055,
+          "lookupSteps": 26630400,
+          "reclaimed": 8192
+        },
+        "candidate": {
+          "seconds": 0.030675,
+          "lookupSteps": 2150400,
+          "reclaimed": 8192
+        }
+      },
+      "medians": {
+        "baseline": 0.065964,
+        "candidate": 0.03052
+      },
+      "speedup": 2.1613368283093055
+    },
+    {
+      "shape": "atomic",
+      "nodes": 64,
+      "collections": 10000,
+      "samples": [
+        {
+          "round": 0,
+          "mode": "baseline",
+          "seconds": 0.006459,
+          "lookupSteps": 0,
+          "reclaimed": 65
+        },
+        {
+          "round": 0,
+          "mode": "candidate",
+          "seconds": 0.006563,
+          "lookupSteps": 0,
+          "reclaimed": 65
+        },
+        {
+          "round": 1,
+          "mode": "candidate",
+          "seconds": 0.006561,
+          "lookupSteps": 0,
+          "reclaimed": 65
+        },
+        {
+          "round": 1,
+          "mode": "baseline",
+          "seconds": 0.006454,
+          "lookupSteps": 0,
+          "reclaimed": 65
+        },
+        {
+          "round": 2,
+          "mode": "baseline",
+          "seconds": 0.006441,
+          "lookupSteps": 0,
+          "reclaimed": 65
+        },
+        {
+          "round": 2,
+          "mode": "candidate",
+          "seconds": 0.006556,
+          "lookupSteps": 0,
+          "reclaimed": 65
+        },
+        {
+          "round": 3,
+          "mode": "candidate",
+          "seconds": 0.006568,
+          "lookupSteps": 0,
+          "reclaimed": 65
+        },
+        {
+          "round": 3,
+          "mode": "baseline",
+          "seconds": 0.006442,
+          "lookupSteps": 0,
+          "reclaimed": 65
+        },
+        {
+          "round": 4,
+          "mode": "baseline",
+          "seconds": 0.006449,
+          "lookupSteps": 0,
+          "reclaimed": 65
+        },
+        {
+          "round": 4,
+          "mode": "candidate",
+          "seconds": 0.006556,
+          "lookupSteps": 0,
+          "reclaimed": 65
+        }
+      ],
+      "warmup": [
+        {
+          "mode": "baseline",
+          "seconds": 0.006457,
+          "lookupSteps": 0,
+          "reclaimed": 65
+        },
+        {
+          "mode": "candidate",
+          "seconds": 0.00657,
+          "lookupSteps": 0,
+          "reclaimed": 65
+        }
+      ],
+      "diagnostics": {
+        "baseline": {
+          "seconds": 0.006523,
+          "lookupSteps": 1290000,
+          "reclaimed": 65
+        },
+        "candidate": {
+          "seconds": 0.006596,
+          "lookupSteps": 1290000,
+          "reclaimed": 65
+        }
+      },
+      "medians": {
+        "baseline": 0.006449,
+        "candidate": 0.006561
+      },
+      "speedup": 0.9829294314891023
+    }
+  ],
+  "revision": "924b45110e03df67acd9d234f983f8b6cd51d10f",
+  "sourceHashes": {
+    "baseline": "f646ebe5a2560cbd4771303807f8552cd2a15b531a505f8dae469274e5454508",
+    "candidate": "54ea598223082f225a778ee5effba4152c31d7f54bf568968da3636bf3b03f1a",
+    "workload": "8d49aab6c7a9f16cdfd4df384d5280339be026b2178132a4837cd3a86c3591dd"
+  }
+}

@@ -292,20 +292,23 @@ int32_t neoclr_gc_allocate_rooted_v1(neoclr_aot_context *context,
 }
 
 /* Sparse byte-range index rebuilt from validated spans for each collection.
- * Bounded 2 KiB stack storage; no allocation, retained addresses or heap ABI change.
+ * Small heaps use 2 KiB; dense heaps temporarily use another 32 KiB.
+ * No allocation, retained addresses or heap ABI change.
  * A bucket points to the block containing its first byte, including free spans.
  * Interior/tagged candidates still require the exact allocated payload bounds. */
-typedef struct { block *start[256]; unsigned shift; } block_index;
+typedef struct { block **start; unsigned capacity, shift; uint64_t blocks; } block_index;
 static int build_index(neoclr_aot_text_arena *a, block_index *index) {
     if (!valid(a)) return 0;
+    index->blocks = 0;
     index->shift = 6;
-    while (a->used && ((a->used - 1) >> index->shift) >= 256) index->shift++;
+    while (a->used && ((a->used - 1) >> index->shift) >= index->capacity) index->shift++;
     unsigned bucket = 0;
     for (uint64_t at = 0; at < a->used;) {
         if (!block_valid(a, at)) return 0;
         block *b = (void *)(a->data + at);
+        index->blocks++;
         uint64_t end = at + b->span;
-        while (bucket < 256 && ((uint64_t)bucket << index->shift) < end)
+        while (bucket < index->capacity && ((uint64_t)bucket << index->shift) < end)
             index->start[bucket++] = b;
         at = end;
     }
@@ -357,12 +360,10 @@ static void mark_frames(neoclr_aot_context *context, const block_index *index,
 int32_t neoclr_gc_collect_v1(neoclr_aot_context *context, const neoclr_probe_frame *head) {
     return neoclr_gc_collect_conditional_v1(context, head, NULL, 0);
 }
-static int32_t collect_conditional(neoclr_aot_context *context,
-    const neoclr_probe_frame *head, neoclr_gc_conditional_root *conditional, uint32_t conditional_count) {
-    if (!context || resource_cleanup_active) return NEOCLR_AOT_FAULT_RUNTIME_ERROR;
+static int32_t collect_indexed(neoclr_aot_context *context,
+    const neoclr_probe_frame *head, neoclr_gc_conditional_root *conditional, uint32_t conditional_count,
+    block_index index) {
     neoclr_aot_text_arena *a = &context->text;
-    block_index index;
-    if (!build_index(a, &index)) return NEOCLR_AOT_FAULT_RUNTIME_ERROR;
     if (conditional_count > NEOCLR_GC_HOST_ROOT_LIMIT || (conditional_count && !conditional))
         return NEOCLR_AOT_FAULT_RUNTIME_ERROR;
     for (neoclr_gc_resource *r = resource_head; r; r = r->next)
@@ -538,6 +539,31 @@ invalid_descriptor:
         block *b = (void *)(a->data + at); b->state &= ALLOCATED; at += b->span;
     }
     return NEOCLR_AOT_FAULT_RUNTIME_ERROR;
+}
+/* Keep the larger stack reservation off the common small-heap path, including
+ * compilers that would otherwise inline the helper and reserve it unconditionally. */
+#ifdef _MSC_VER
+__declspec(noinline)
+#else
+__attribute__((noinline))
+#endif
+static int32_t collect_dense(neoclr_aot_context *context,
+    const neoclr_probe_frame *head, neoclr_gc_conditional_root *conditional, uint32_t count) {
+    block *starts[4096];
+    block_index index = {.start = starts, .capacity = 4096};
+    if (!build_index(&context->text, &index)) return NEOCLR_AOT_FAULT_RUNTIME_ERROR;
+    return collect_indexed(context, head, conditional, count, index);
+}
+static int32_t collect_conditional(neoclr_aot_context *context,
+    const neoclr_probe_frame *head, neoclr_gc_conditional_root *conditional, uint32_t count) {
+    if (!context || resource_cleanup_active) return NEOCLR_AOT_FAULT_RUNTIME_ERROR;
+    block *starts[256];
+    block_index index = {.start = starts, .capacity = 256};
+    if (!build_index(&context->text, &index)) return NEOCLR_AOT_FAULT_RUNTIME_ERROR;
+    /* Population, not arena size: a few large atomic buffers do not warrant a
+     * denser table. Rebuild only before any marks or cleanup state are changed. */
+    if (index.blocks > 2048) return collect_dense(context, head, conditional, count);
+    return collect_indexed(context, head, conditional, count, index);
 }
 int32_t neoclr_gc_collect_conditional_v1(neoclr_aot_context *context,
     const neoclr_probe_frame *head, neoclr_gc_conditional_root *conditional, uint32_t count) {

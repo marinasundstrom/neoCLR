@@ -536,3 +536,12 @@ context fallback and quiescent retry. Existing stack-capture tests cover truncat
 and owned snapshots after source frames return. The collection policy at compiler
 boundaries is unchanged. Broader collection pacing and collector replacement remain
 separate milestones, evaluated against general runtime workloads as well as HTTP.
+
+### Adaptive address index (2026-10-13)
+
+The collector retains its 256-entry index for at most 2,048 validated spans. Larger
+populations use a temporary 4,096-entry index through a non-inlined helper. This
+reduces repeated header walks while retaining exact interior/base-pointer checks
+and all validation, marking, conditional ownership and cleanup semantics. The
+dense path costs another validated heap walk and 32 KiB of stack; no allocation
+or collection pacing changes are involved. See the [graph matrix and tradeoffs](../../../benchmarks/gc-index/README.md).
