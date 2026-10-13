@@ -1,0 +1,29 @@
+
+running 24 tests
+test emits_macho_and_refuses_to_overwrite ... ok
+test console_capability_and_literal_types_are_checked ... ok
+test fault_does_not_hide_unsupported_dead_instructions ... ok
+test invalid_control_flow_is_rejected_before_emission ... ok
+test jit_native_container_matches_source_and_rejects_corruption ... ok
+test jit_parameterless_entry_and_argument_validation ... ok
+test jit_rejects_a_foreign_target_before_loading_inputs ... ok
+test first_fault_wins_across_compiled_calls ... ok
+test jit_rejects_expanded_aot_features_and_external_services ... ok
+test jit_reuses_owned_code_for_successful_and_faulting_invocations ... ok
+test explicit_user_faults_match_interpreter_and_preserve_first_fault ... ok
+test native_c_consumer_matches_interpreter_for_runtime_inputs ... ok
+test native_console_preserves_utf8_bytes_and_propagates_service_failure ... ok
+test native_input_rejects_corruption_and_unsupported_il_before_emission ... ok
+test native_loops_locals_calls_and_early_returns_match_interpreter ... ok
+test native_truth_branches_merge_locals_and_loop_carried_stack ... ok
+test parameterless_entry_adapter_preserves_fault_and_result_pointer ... ok
+test raven_native_metadata_hello_runs_as_standalone_machine_code ... ok
+test scalar_boolean_comparisons_match_interpreter_at_int32_boundaries ... ok
+test scalar_boolean_values_do_not_become_int32_operands ... ok
+test native_comparison_branches_preserve_signedness ... ok
+test standalone_hello_world_has_no_managed_runtime_dependency ... ok
+test unsupported_or_invalid_programs_never_emit_an_object ... ok
+test native_arithmetic_faults_match_interpreter_and_preserve_output has been running for over 60 seconds
+test native_arithmetic_faults_match_interpreter_and_preserve_output ... ok
+
+test result: ok. 24 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 76.82s

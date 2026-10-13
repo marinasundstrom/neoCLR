@@ -160,9 +160,14 @@ There is no compilation cache, tiering or concurrent-session claim.
 
 The dependency direction remains backend → runtime; interpreter-only builds still
 exclude compiler dependencies. The installed runtime CLI still launches the backend
-process. **Author clarification, 2026-10-13:** experiments/POCs should become
+process. **Integration does not negate modularity.**
+**Author clarification, 2026-10-13:** experiments/POCs should become
 integrated product components so they can be optimized together; they may remain
 separate architectural components. A process boundary is not by itself a defect.
+The author also emphasized that integration should make profiling and debugging
+tools easier to build incrementally. Keep runtime observation points reusable by
+separate tools; add measurements needed for the current performance question
+without making a complete tooling suite a prerequisite.
 Evaluate any in-process composition or runtime-core split against measured startup,
 throughput, memory, observability and lifetime needs, rather than making it a
 mandatory migration. Avoid a cyclic runtime → backend → runtime dependency.
@@ -174,8 +179,21 @@ A hosting integration test invokes the library repeatedly, checks rejected write
 preserve artifacts, compares library/CLI AOT bytes, exercises success/fault/success
 scalar JIT calls and rejects foreign targets. Existing scalar tests check interpreter,
 JIT and AOT result/fault parity. This first slice does not qualify repeated managed
-HTTP sessions inside one embedding process. Hosted macOS/Windows qualification is
-pending. Public execution defaults and website capabilities are unchanged.
+HTTP sessions inside one embedding process. The [macOS/Windows product gate](https://github.com/marinasundstrom/neoCLR/actions/runs/38437665710)
+at `2d2eab607` passes. The [expanded Windows gate](https://github.com/marinasundstrom/neoCLR/actions/runs/38438253770)
+at `8c4e930bb` also passes, adding native execution through the Windows AOT C host.
+[Reports and focused test logs](validation/runtime-product/backend-hosting/) retain
+exact revisions and commands. The gates include workspace build, CLI selection,
+hosting reuse/artifact checks, platform-applicable scalar execution tests, GC/root,
+TLS/security and package checks; macOS also runs compiled rooted UTF-8 tests.
+The Windows AOT fixture covers calls, branches, faults and UTF-8 output. This does
+not imply full managed HTTP embedding/session qualification. Public execution
+defaults and website capabilities are unchanged.
+
+This closes the current integration qualification. Per author direction, return to
+profiling-led runtime performance work rather than extending structural migration
+as a prerequisite. Keep useful component boundaries and add reusable observation
+points for separate profiler/debugger tools as concrete measurements require them.
 
 ## Memory management is a runtime service
 

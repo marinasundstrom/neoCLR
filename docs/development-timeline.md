@@ -16684,3 +16684,30 @@ backend library extraction remains useful, but replacing the CLI launcher is not
 mandatory end state. Roadmap and integration guidance were updated accordingly.
 The library slice passed local hosting and execution-parity tests; its macOS/Windows
 product qualification was still running at the time of this clarification.
+
+The author then delegated the implementation choice to the assistant and directed:
+“When we are done, we should return to our work trying to improve performance.”
+The assistant committed to close the current cross-platform integration qualification
+and return to profiling-led runtime optimization, checking throughput, latency,
+memory and GC correctness together rather than extending restructuring indefinitely.
+The current product gate gained explicit Windows AOT C-host execution coverage;
+hosted qualification remained in progress at this point.
+
+The author added that integrating the pieces also makes profiling and debugging
+tools easier to build as needed. The assistant agreed that shared runtime contracts
+and observation points should support separate tools for execution, allocation/GC,
+scheduling and suspension, developed incrementally around measured needs rather
+than as a prerequisite full tooling suite. This is architectural direction, not a
+claim that all of those observation APIs are already implemented.
+
+The assistant completed the backend library extraction and retained passing product
+qualification on macOS and Windows, then added and passed explicit Windows AOT
+C-host execution. See [backend hosting evidence](validation/runtime-product/backend-hosting/).
+The installed CLI process boundary remains; the library driver is provisional and
+repeated managed HTTP embedding sessions are not claimed qualified. The current
+integration slice is closed, with profiling-led performance work the next priority.
+
+The author reiterated: “Integration doesnt negate modularity”. The assistant
+confirmed that explicit component boundaries remain compatible with shared
+contracts, validation, observability and product optimization. Integration is not
+a requirement to collapse modules, tools or processes.

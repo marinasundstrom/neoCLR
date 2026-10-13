@@ -1,0 +1,16 @@
+
+running 12 tests
+test fault_does_not_hide_unsupported_dead_instructions ... ok
+test jit_native_container_matches_source_and_rejects_corruption ... ok
+test emits_macho_and_refuses_to_overwrite ... ok
+test jit_rejects_a_foreign_target_before_loading_inputs ... ok
+test console_capability_and_literal_types_are_checked ... ok
+test invalid_control_flow_is_rejected_before_emission ... ok
+test jit_rejects_expanded_aot_features_and_external_services ... ok
+test native_input_rejects_corruption_and_unsupported_il_before_emission ... ok
+test jit_reuses_owned_code_for_successful_and_faulting_invocations ... ok
+test jit_parameterless_entry_and_argument_validation ... ok
+test scalar_boolean_values_do_not_become_int32_operands ... ok
+test unsupported_or_invalid_programs_never_emit_an_object ... ok
+
+test result: ok. 12 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 7.38s

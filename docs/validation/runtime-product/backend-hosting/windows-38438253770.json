@@ -1,0 +1,168 @@
+{
+  "passed": true,
+  "platform": "Windows-2022Server-10.0.20348-SP0",
+  "commands": [
+    {
+      "label": "revision",
+      "command": [
+        "git",
+        "rev-parse",
+        "HEAD"
+      ],
+      "exitCode": 0
+    },
+    {
+      "label": "workspace",
+      "command": [
+        "cargo",
+        "metadata",
+        "--locked",
+        "--format-version",
+        "1",
+        "--no-deps"
+      ],
+      "exitCode": 0
+    },
+    {
+      "label": "build",
+      "command": [
+        "cargo",
+        "build",
+        "--locked",
+        "--workspace"
+      ],
+      "exitCode": 0
+    },
+    {
+      "label": "cli",
+      "command": [
+        "cargo",
+        "test",
+        "--locked",
+        "-p",
+        "neoclr",
+        "--test",
+        "cli",
+        "cli_execution_selection"
+      ],
+      "exitCode": 0
+    },
+    {
+      "label": "hosting",
+      "command": [
+        "cargo",
+        "test",
+        "--locked",
+        "-p",
+        "neoclr-aot-poc",
+        "--test",
+        "hosting"
+      ],
+      "exitCode": 0
+    },
+    {
+      "label": "execution",
+      "command": [
+        "cargo",
+        "test",
+        "--locked",
+        "-p",
+        "neoclr-aot-poc",
+        "--test",
+        "scalar"
+      ],
+      "exitCode": 0
+    },
+    {
+      "label": "windows-aot-execution",
+      "command": [
+        "cargo",
+        "test",
+        "--locked",
+        "-p",
+        "neoclr-aot-poc",
+        "--test",
+        "windows_scalar",
+        "windows_c_consumer_executes_calls_branches_faults_and_utf8"
+      ],
+      "exitCode": 0
+    },
+    {
+      "label": "native-gc",
+      "command": [
+        "C:\\hostedtoolcache\\windows\\Python\\3.12.10\\x64\\python.exe",
+        "D:\\a\\neoCLR\\neoCLR\\scripts\\validate-native-gc.py",
+        "--output",
+        "D:\\a\\neoCLR\\neoCLR\\target\\runtime-product-validation\\gc"
+      ],
+      "exitCode": 0
+    },
+    {
+      "label": "native-security",
+      "command": [
+        "C:\\hostedtoolcache\\windows\\Python\\3.12.10\\x64\\python.exe",
+        "D:\\a\\neoCLR\\neoCLR\\scripts\\test-native-security.py"
+      ],
+      "exitCode": 0
+    },
+    {
+      "label": "test_native_gc_layout.py",
+      "command": [
+        "C:\\hostedtoolcache\\windows\\Python\\3.12.10\\x64\\python.exe",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "scripts",
+        "-p",
+        "test_native_gc_layout.py"
+      ],
+      "exitCode": 0
+    },
+    {
+      "label": "test_native_bundle_notices.py",
+      "command": [
+        "C:\\hostedtoolcache\\windows\\Python\\3.12.10\\x64\\python.exe",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "scripts",
+        "-p",
+        "test_native_bundle_notices.py"
+      ],
+      "exitCode": 0
+    },
+    {
+      "label": "test_native_https_build.py",
+      "command": [
+        "C:\\hostedtoolcache\\windows\\Python\\3.12.10\\x64\\python.exe",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "scripts",
+        "-p",
+        "test_native_https_build.py"
+      ],
+      "exitCode": 0
+    }
+  ],
+  "scope": "workspace build, CLI selection, scalar interpreter/JIT/AOT parity, native roots and TLS adapter",
+  "revision": "8c4e930bb4cd3f43861336fd680fbbb41db99c9a",
+  "members": [
+    "neoclr",
+    "neoclr-aot-poc",
+    "neoclr-native-tls",
+    "neoclr-security-provider"
+  ],
+  "inputs": {
+    "Cargo.toml": "9056f43477fb26b9c6781fb2f06c50ad512fb59cf40c9dd2e7f3ae21c09c0579",
+    "Cargo.lock": "95e09bfe931477388fb0d0da7a8f3ba1e4650036e81beb1bd41f1063912cba6a",
+    "scripts\\validate-runtime-product.py": "33d7ef132bed4ab657f39d4f6de75588231f5f23d71db105d09bf0d775bcd65a",
+    "tools\\aot-poc\\Cargo.toml": "6b2cef26df54fe1bfeb079e995c9fb801af760425f190368fb9a5026a7ab7f92",
+    "tools\\native-tls\\Cargo.toml": "9f0d9eaffabc6c1b1fe516c2a8676478e49fda8c36f2662b462dd7baaaeb766f"
+  },
+  "noticePackages": 139,
+  "noticeFiles": 256
+}

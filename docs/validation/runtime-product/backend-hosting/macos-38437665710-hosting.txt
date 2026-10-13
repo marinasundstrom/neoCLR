@@ -1,0 +1,5 @@
+
+running 1 test
+test driver_returns_to_host_after_errors_compilation_and_jit_invocations ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 4.04s

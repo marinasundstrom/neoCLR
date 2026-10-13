@@ -15,7 +15,9 @@ separate components where useful; the installed process-based launcher is not
 itself an integration defect. Memory management must permit future build-selected collectors and
 constrained profiles without requiring tracing GC; no live collector swapping is
 planned. Alternate profiles remain future work with explicit lifetime/capability
-requirements. This integration direction complements the performance work below;
+requirements. The author directed returning to measured runtime performance work once the current
+integration qualification is complete (2026-10-13); this is not an open-ended
+restructuring prerequisite. This integration direction complements the performance work below;
 prototype pacing and unqualified targets are not promoted by packaging changes.
 
 **Allocation and admission follow-up (2026-10-13):** [single-walk allocation](../benchmarks/gc-allocation/README.md)
