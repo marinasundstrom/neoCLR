@@ -596,6 +596,7 @@ Remaining admission audit:
 | Lexical paths and ordinal replacement | Retain every string read after allocation; no-op replacement preserves identity | Generated GC calls use rooted retry |
 | Unicode casing, access/slicing and character assembly | Retain source text or owning array through allocation/copy | Generated GC calls use rooted retry |
 | Unicode sequence construction | Retain source and partially initialized array; publish each element before the next allocation | Generated GC calls use rooted retry |
+| Native process arguments | Temporary construction frame retains partial array; native argv/conversion scratch remains stable | Generated GC entry uses rooted retry |
 | Native file/network/TLS/SQL producers | Retain managed intermediates; keep native handles/buffers alive; never replay I/O to retry allocation | Noncollecting |
 | Constructors / reflection invocation | Retain initialized receiver and every native result scratch until publication | Existing explicit generated roots; admission migration still needed |
 
@@ -730,3 +731,13 @@ there is no separate native ASCII codec needing a new allocation path. Increment
 managed encoder/decoder behavior retains its existing tests and is not redefined.
 Native producer scratch/results and general pacing remain open. All 27 macOS/Windows GC/root checks and socket/package gates pass, alongside six
 local compiled character tests. See [retained evidence](../../validation/runtime-product/unicode/README.md).
+
+Native-producer follow-up (2026-10-13): process arguments now own a temporary frame
+before guest startup, retaining the partial array through every native-byte decode.
+The new decoder explicitly requires stable native-owned bytes; raw managed interior
+pointers remain prohibited. This does not widen the old raw decoder's contract.
+No input acquisition or external operation is replayed to retry an allocation.
+See [process-entry ownership](../../native-entry-arguments.md).
+File/network/TLS/SQL producers remain noncollecting pending their own result/handle
+and cancellation audits. Their caller scratch and registered native resources cannot
+be assumed to have the process-argument lifetime.

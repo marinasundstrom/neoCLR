@@ -16,6 +16,8 @@ int32_t neoclr_entry_args_v1(int32_t argc, int32_t *result,
     neoclr_aot_context *context, neoclr_process_char **argv);
 int32_t neoclr_process_arguments_v1(int32_t argc, neoclr_process_char **argv,
     neoclr_aot_context *context, void **output);
+int32_t neoclr_process_arguments_rooted_v1(int32_t, neoclr_process_char **,
+    neoclr_aot_context *, void **);
 static inline int32_t neoclr_process_entry(int argc, neoclr_process_char **argv,
     int32_t *result, neoclr_aot_context *context) {
 #ifdef NEOCLR_ENTRY_ARGUMENTS

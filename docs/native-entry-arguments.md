@@ -44,9 +44,12 @@ host. Parameterless/scalar exports retain their existing ABI; a mismatched legac
 host fails to link rather than calling an incompatible signature.
 
 The private generated adapter checks entry admission, clears diagnostics/resets the
-invocation heap, then invokes `neoclr_process_arguments_v1`. That service copies
-argv[1..] into the managed String[] and text allocations, publishes the array only
-on success and never collects. Guest entry prologues then publish normal GC roots.
+invocation heap, then invokes `neoclr_process_arguments_rooted_v1`. That service roots the partial
+array in a temporary construction frame while copying argv[1..] into managed strings.
+Only managed allocation may retry after collection; native arguments/conversion
+buffers remain alive and stable during decoding. The frame is removed on every exit
+and the completed array is published only on success. The original private
+`neoclr_process_arguments_v1` remains noncollecting for explicit native callers. Guest entry prologues then publish normal GC roots.
 No host pointers escape into guest values. The copies share ordinary managed-array
 and string lifetime; there is no special command-line object model. Startup costs
 one array and one string allocation per argument, plus temporary Windows conversion
@@ -81,3 +84,19 @@ Local qualification: both focused backend tests pass, including Int32, unit and
 no-result entry execution on macOS ARM64 and Windows x64 COFF generation. The Raven
 suite qualification is recorded with the filtering follow-up. Windows execution of
 this revision remains pending its GitHub action; no Windows pass is inferred here.
+
+## Rooted construction qualification — 2026-10-13
+
+The native adapter retains the partial String[] while each decoded argument is
+allocated. Windows malloc-backed UTF-8 conversion scratch is freed after decoding
+on success and failure; Unix argv bytes belong to the native process. Neither is a
+managed interior pointer. The rooted native-byte decoder must not be used for
+managed interior pointers without an owner-retaining contract. Output publication
+and insertion into the array have no intervening allocation. Faults remain terminal.
+
+The native pressure fixture covers UTF-8/UTF-16 Unicode, empty arguments, reclaimed
+dead heap, noncollecting controls, partial-array exhaustion, invalid text/null input,
+frame cleanup and complete reclamation. Local compiled tests cover process entry,
+invalid-text/failure parity and the Windows ABI import. Platform qualification is
+pending. Raven metadata, Runtime Contract and .NET lowering are unchanged; generated
+objects require the matching native host helpers.

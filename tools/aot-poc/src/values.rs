@@ -2258,7 +2258,7 @@ pub(crate) fn compile_into(
         let mut signature = module.make_signature();
         signature.params = [types::I32, types::I64, types::I64, types::I64].map(AbiParam::new).to_vec();
         signature.returns.push(AbiParam::new(types::I32));
-        Some(module.declare_function("neoclr_process_arguments_v1", Linkage::Import, &signature)?)
+        Some(module.declare_function(if details.is_some_and(|d| d.native_gc) { "neoclr_process_arguments_rooted_v1" } else { "neoclr_process_arguments_v1" }, Linkage::Import, &signature)?)
     } else { None };
     let export_root = if bootstrap {
         let mut signature = module.make_signature();

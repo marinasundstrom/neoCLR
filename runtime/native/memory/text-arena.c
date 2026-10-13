@@ -361,6 +361,13 @@ int32_t neoclr_text_decode_utf8_bytes_v1(const unsigned char *bytes, uint64_t le
     return text_decode_utf8_bytes(bytes, length, arena, output, 0, NULL);
 }
 
+/* Native-owned bytes must stay alive and stable for the duration of this call.
+ * Managed interior pointers must use the owner-retaining decoder instead. */
+int32_t neoclr_text_decode_utf8_host_bytes_rooted_v1(const unsigned char *bytes,
+    uint64_t length, neoclr_aot_text_arena *arena, void *output) {
+    return text_decode_utf8_bytes(bytes, length, arena, output, 1, NULL);
+}
+
 static int32_t string_concat(const neoclr_aot_text *left, const neoclr_aot_text *right,
                                neoclr_aot_text_arena *arena, const neoclr_aot_text **output, int rooted) {
     if (!left || !right || !arena || !output || arena->used > arena->capacity ||

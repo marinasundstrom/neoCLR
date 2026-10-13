@@ -1,0 +1,10 @@
+   Compiling neoclr v0.1.0-preview.13 (/Users/robert/Projects/neoclr)
+   Compiling neoclr-aot-poc v0.0.0 (/Users/robert/Projects/neoclr/tools/aot-poc)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 13.71s
+     Running tests/entry_arguments.rs (target/debug/deps/entry_arguments-e22d742cd0939721)
+
+running 2 tests
+test string_array_entry_emits_windows_abi_and_requires_gc ... ok
+test entry_copies_arguments_rejects_invalid_text_and_preserves_output_on_failure ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 3.56s

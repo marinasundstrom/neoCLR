@@ -104,5 +104,6 @@ Managed UTF-8 encoding/decoding retain their source text or array through alloca
 retry. Reference-array construction also supports retry before publishing initialized
 storage. Lexical path and ordinal replacement helpers retain their string inputs
 through retry. Unicode helpers also retain source strings and partially constructed
-sequences. Broader collection pacing remains experimental;
+sequences. Process startup retains partially built argument arrays during native
+text conversion. Broader collection pacing remains experimental;
 see the [allocation benchmark and qualification](/benchmarks/gc/#allocation-throughput-2026-10-13).
