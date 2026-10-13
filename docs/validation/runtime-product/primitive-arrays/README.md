@@ -32,3 +32,9 @@ imports for GC builds and compare results/faults with the interpreter. No Raven
 bridge metadata, Runtime Contract option or public managed API changes.
 Windows qualification is separate; a native C gate is not a fresh managed Windows
 or HTTP run. This is admission correctness work, not a benchmark or pacing claim.
+
+[Hosted run 38444176481](https://github.com/marinasundstrom/neoCLR/actions/runs/38444176481)
+at `e91f5f384` passes 23 GC/root executions, socket contracts and relocated-package
+checks on both macOS ARM64 and Windows x64. macOS profiler attachment also passes.
+The retained reports include exact source hashes and commands; this focused native
+gate does not claim a fresh managed Windows, JIT, HTTP or ARM64-Windows matrix.

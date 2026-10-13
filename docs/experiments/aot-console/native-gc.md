@@ -651,4 +651,5 @@ hosts. General pacing remains disabled pending the remaining helper and idle aud
 Local qualification passes 23 GC/root checks, GC/non-GC relocated-package checks
 and 107 compiled byte/scalar comparisons with interpreter results/faults.
 [Retained evidence](../../validation/runtime-product/primitive-arrays/README.md).
-Hosted macOS/Windows qualification is pending.
+The hosted macOS/Windows gate also passes all 23 GC/root executions, socket
+contracts and relocated-package checks; macOS profiler attachment passes.
