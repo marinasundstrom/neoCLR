@@ -43,7 +43,9 @@ Native TLS static-library builds use `--profile native-ffi` to retain abort-on-p
 behavior. Ordinary runtime builds keep their existing panic policy. Explicit native
 archive target directories are retained where packaging requires them. The separate
 text/crypto static-library workspaces remain migration work, including preserving
-text LTO/size settings. This is not a completed source-layout or packaging migration.
+text LTO/size settings. This is not a completed source-layout or packaging migration. `src/jit_cli.rs`
+still launches the backend process; workspace membership alone does not create an
+in-process JIT service or a complete embedding API.
 
 ## Memory management is a runtime service
 
@@ -110,8 +112,13 @@ No alternative collector or no-GC device distribution is implemented by this sli
 2. Move shared native runtime implementation out of documentation experiment paths,
    keeping fixtures and historical evidence separate. Update packaging/import recipes
    together; do not duplicate implementations or promote incomplete APIs by renaming.
-3. Consolidate static-library builds, distribution manifests and backend naming.
-4. Extract the memory-manager contract from current allocation/root/cleanup behavior,
+3. Extract the backend library/hosting boundary from the provisional CLI launcher;
+   a runtime-owned execution contract must account for session, fault and resource
+   lifetime. Avoid a runtime/backend dependency cycle: common metadata and runtime
+   services must be usable without importing the compiler. The exact crate split is
+   still to be selected. AOT can remain a separate publishing tool in the same product.
+4. Consolidate static-library builds, distribution manifests and backend naming.
+5. Extract the memory-manager contract from current allocation/root/cleanup behavior,
    then qualify build-selected implementations. Finish current helper-root and idle
    cleanup work before changing pacing; measure improvements independently of this
    build integration. Generational GC remains a candidate, not a selected policy.
@@ -129,6 +136,8 @@ The first Windows run exposed line-ending conversion of the hashed Cranelift
 license, fixed by preserving notice bytes in checkout. The next run passed notice
 checks, the workspace build and CLI selection, but exposed a CRLF-sensitive
 negative compiler fixture. That fixture now normalizes line endings and verifies
-each invalid-input mutation is effective; the focused local rerun passes. Windows
-completion remains pending until the integrated rerun finishes. These are build/test
+each invalid-input mutation is effective; the focused local rerun passes. The [Windows rerun](https://github.com/marinasundstrom/neoCLR/actions/runs/38431039111)
+at `4d1efde54` passes the full integrated gate, including all 12 applicable scalar
+compiler/JIT tests, 20 GC/root executions, TLS/security and packaging checks.
+The retained Windows reports include exact inputs and commands. These are build/test
 integration fixes, not a measured runtime throughput improvement.

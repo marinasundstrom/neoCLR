@@ -16655,3 +16655,11 @@ barriers, suspension, cleanup and capability validation, with GC still the manag
 default. Arenas/regions were assistant-proposed candidates with explicit escape and
 lifetime constraints; no alternate implementation has been selected or delivered.
 See [integration direction and remaining work](runtime-product-integration.md).
+
+The assistant implemented the shared Cargo workspace/lockfile and product validation
+entry point, preserving the runtime-only dependency graph and TLS adapter panic
+policy. Local and hosted macOS checks passed; Windows qualification exposed exact
+notice-byte checkout and CRLF fixture-mutation issues, which were fixed in separate
+commits. The corrected Windows gate passes. Native implementation paths, the CLI's
+backend-process adapter and remaining archive builds still need consolidation;
+no runtime throughput or alternative-memory-manager implementation is claimed.
