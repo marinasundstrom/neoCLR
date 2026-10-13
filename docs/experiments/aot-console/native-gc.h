@@ -88,6 +88,17 @@ int32_t neoclr_gc_allocation_info_v1(neoclr_aot_context *, const void *,
 /* Allocation never collects; output is published only on success. */
 int32_t neoclr_gc_allocate_v1(neoclr_aot_text_arena *arena, uint64_t bytes,
                              uint32_t kind, void **output);
+/* Private opt-in admission: try allocation, collect once on recoverable arena
+ * exhaustion, then retry that allocation only. Output publishes only on success.
+ * boundary must be the current complete root chain (and match this context), or
+ * NULL in a quiescent host. The caller MUST publish all live operands and native
+ * temporaries in frame storage or host roots before calling. Identity checks do
+ * not prove root completeness. Returned storage must be rooted before another
+ * collecting call. No reentry/concurrency or calls from resource cleanup.
+ * The arena-only allocator above remains non-collecting. No helper/compiler path
+ * is implicitly opted in by adding this internal contract. */
+int32_t neoclr_gc_allocate_rooted_v1(neoclr_aot_context *, const neoclr_probe_frame *,
+    uint64_t bytes, uint32_t kind, void **output);
 /* Only at a complete compiler root boundary, or quiescent host with no guest
  * frames. Root addresses are observed, never rewritten. No reentry/concurrency
  * on this context. Service temporaries must not be live at a collection boundary. */

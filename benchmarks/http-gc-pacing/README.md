@@ -100,3 +100,19 @@ python3 benchmarks/http-gc-pacing/validate-policy.py --evaluation EVALUATION_JSO
 The ownership recipe is a passing `validate_conditional_roots.py --owned-bodies`
 report including the idle-drain test. Evaluation emits an isolated observer copy;
 no SDK, public API, production source or website publication changes.
+
+## Rooted admission foundation — 2026-10-13
+
+The private `neoclr_gc_allocate_rooted_v1` entry point now admits an allocation,
+collects once on capacity pressure, and retries before reporting a language fault.
+It requires a complete current root boundary (or a quiescent host), including all
+native helper temporaries. Boundary identity checks do not prove completeness.
+The existing arena-only allocator remains non-collecting; no helper or compiler
+path opts in yet, and the rejected pacing policy remains disabled.
+
+`native-gc-admission-test.c` covers preserved live roots, stale/wrong boundaries,
+impossible requests, genuine exhaustion and the retained 4 MiB pressure example.
+The conditional-roots validator passes all eight focused checks with undefined
+behavior/bounds sanitizers, including owned-body and idle-drain checks
+(`target/http-gc-rooted-admission-20261013/validation.json`). This is an admission
+primitive, not a throughput improvement or completed helper-lifetime audit.

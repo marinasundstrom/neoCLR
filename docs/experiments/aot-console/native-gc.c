@@ -268,6 +268,24 @@ int32_t neoclr_gc_allocate_v1(neoclr_aot_text_arena *a, uint64_t bytes,
 #endif
     return 0;
 }
+/* Opt-in admission for callers that have published every live reference.
+ * Keep the arena-only allocator non-collecting: native helpers may retain
+ * unregistered intermediates between its calls. Never retry a whole operation. */
+int32_t neoclr_gc_allocate_rooted_v1(neoclr_aot_context *context,
+    const neoclr_probe_frame *boundary, uint64_t bytes, uint32_t kind, void **output) {
+    if (!context || resource_cleanup_active || boundary != neoclr_root_probe_head_v1() ||
+        (boundary && boundary->context != context)) return NEOCLR_AOT_FAULT_RUNTIME_ERROR;
+    int32_t status = neoclr_gc_allocate_v1(&context->text, bytes, kind, output);
+    if (status != NEOCLR_AOT_FAULT_NATIVE_MEMORY_LIMIT) return status;
+    /* An impossible single block cannot benefit from collection. Arithmetic
+     * mirrors the allocator, including descriptor and alignment overhead. */
+    if (bytes > UINT64_MAX - sizeof(block) - 7 ||
+        sizeof(block) + ((bytes + 7) & ~UINT64_C(7)) > context->text.capacity) return status;
+    status = neoclr_gc_collect_v1(context, boundary);
+    if (status) return status;
+    return neoclr_gc_allocate_v1(&context->text, bytes, kind, output);
+}
+
 /* Sparse byte-range index rebuilt from validated spans for each collection.
  * Bounded 2 KiB stack storage; no allocation, retained addresses or heap ABI change.
  * A bucket points to the block containing its first byte, including free spans.

@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-13
 
+- Add a private, opt-in rooted native allocation admission/retry primitive and sanitizer checks for pressure, preserved roots and invalid boundaries. Existing allocation helpers remain non-collecting; GC pacing is still disabled pending complete helper-root integration.
+
 - Retain an isolated native collection-pacing experiment, matched plain/JSON HTTP
   timings and a sanitizer-checked large-allocation counterexample. The candidate
   improves these local throughput measurements but is explicitly rejected for
