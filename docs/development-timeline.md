@@ -16439,3 +16439,32 @@ qualification. Request and response deadline documentation now includes TLS work
   but publish nothing until there are neoCLR HTTP API/handling improvements. The
   assistant adds a local development comparison page and records the publication
   hold; current small allocation gains do not lift it.
+
+## 2026-10-13 — HTTP execution phases and runtime concurrency
+
+- **Author observation:** Other servers can advance different requests through
+  asynchronous processing phases; neoCLR should consider HTTP-layer scheduling
+  and runtime infrastructure as well as GC. This is a proposed architectural
+  direction, not approval of a particular native parser or scheduling design.
+- **Assistant assessment:** Agrees that I/O readiness, bounded parsing work,
+  backpressure and inexpensive suspension/resumption are separate concerns from
+  allocation. Yielding at every parsing step would add overhead; process available
+  bytes in batches and suspend when waiting or when a fairness budget is exhausted.
+  HTTP protocol state can remain in the library while generic I/O, scheduler and
+  buffer-lifetime services belong in the runtime.
+- **Current evidence:** HttpServer already composes asynchronous accept/receive/send,
+  but receives in 256-byte blocks and uses explicit outcome adapters. The retained
+  Raven benchmark awaits ServeOne serially and the common client has concurrency
+  one, so the pilot does not measure cross-request interleaving. Interleaving alone
+  cannot explain or remove its single-request latency gap. Existing profiles point
+  to GC/root overhead but do not exclude HTTP control-flow/buffering costs.
+- **Proposed next bounded work:** Keep the current baseline; add a separate concurrent
+  workload with slow/fragmented peers, per-phase timing, scheduler/continuation and
+  I/O operation counts. Use those measurements to evaluate bounded concurrent
+  serving, larger batched reads and fairness/backpressure across managed/native
+  execution modes. No new runtime API or implementation is introduced here.
+- **Primary comparisons:** [.NET pipelines and backpressure](https://learn.microsoft.com/en-us/dotnet/standard/io/pipelines),
+  [Go connection goroutines](https://go.dev/pkg/net/http/?m=old), and
+  [Node event-loop blocking](https://nodejs.org/en/learn/asynchronous-work/dont-block-the-event-loop).
+  These differ in scheduling model; they do not imply every parser yields midway
+  through each token or that parsing must live in a native runtime service.

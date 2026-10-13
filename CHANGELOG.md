@@ -8,6 +8,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-13
 
+- Record the author's HTTP concurrency direction alongside GC investigation:
+  proposed phase/scheduler instrumentation and a separate concurrent workload.
+  Distinguish existing async I/O from cross-request scheduling; no runtime behavior
+  or public API changes are implemented in this documentation slice.
+
 - Retain the first six-configuration HTTP terminal-handler pilot: all 2,304
   responses pass across neoCLR, Kestrel, Go and Node. Record ranges, startup,
   serializer/hosting differences and short-run warmup limits; neoCLR's large gap
