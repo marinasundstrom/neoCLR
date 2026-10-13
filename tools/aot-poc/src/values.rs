@@ -502,7 +502,7 @@ pub(crate) fn compile_into(
     }
     if let Some(d) = details {
         for (indices, symbol, parameters) in [
-            (&d.file_input, "neoclr_file_read_utf8_v1", vec![types::I64, types::I32, types::I64, types::I64]),
+            (&d.file_input, if d.native_gc { "neoclr_file_read_utf8_rooted_v1" } else { "neoclr_file_read_utf8_v1" }, vec![types::I64, types::I32, types::I64, types::I64]),
             (&d.file_output, "neoclr_file_write_utf8_v1", vec![types::I64, types::I64, types::I32, types::I64]),
             (&d.path_combine, if d.native_gc { "neoclr_path_combine_unix_rooted_v1" } else { "neoclr_path_combine_unix_v1" }, vec![types::I64, types::I64, types::I64, types::I64]),
             (&d.path_file_name, if d.native_gc { "neoclr_path_file_name_unix_rooted_v1" } else { "neoclr_path_file_name_unix_v1" }, vec![types::I64, types::I64, types::I64]),

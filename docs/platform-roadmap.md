@@ -57,7 +57,10 @@ initialization completed before publication. Lexical paths and ordinal replaceme
 through retry, with 26 macOS/Windows GC/root checks and four local compiled
 path/replacement tests passing. Unicode casing, grapheme access and sequence construction now retain source/partial
 results through retry. Process-argument construction now roots its partial array and native decode
-scratch is kept stable. File/network/TLS/SQL producer intermediates remain to audit. Then qualify a managed pacing policy across execution modes before promotion.
+scratch is kept stable. POSIX file input now retries only final decoding after closing the descriptor.
+Socket/TLS/crypto adapters do not allocate managed results; PostgreSQL uses the
+managed socket/encoding layers. Culture/time-zone and intern/object helpers remain
+to audit (see the producer ownership inventory). Then qualify a managed pacing policy across execution modes before promotion.
 The author additionally proposed generations to reduce collection pressure/latency;
 [the next architecture evaluation](runtime-gc.md#generational-collection-evaluation--2026-10-13)
 compares survival, write barriers, promotion and pauses. It does not yet select or

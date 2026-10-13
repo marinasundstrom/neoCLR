@@ -597,7 +597,10 @@ Remaining admission audit:
 | Unicode casing, access/slicing and character assembly | Retain source text or owning array through allocation/copy | Generated GC calls use rooted retry |
 | Unicode sequence construction | Retain source and partially initialized array; publish each element before the next allocation | Generated GC calls use rooted retry |
 | Native process arguments | Temporary construction frame retains partial array; native argv/conversion scratch remains stable | Generated GC entry uses rooted retry |
-| Native file/network/TLS/SQL producers | Retain managed intermediates; keep native handles/buffers alive; never replay I/O to retry allocation | Noncollecting |
+| POSIX file input | Close descriptor before allocation; keep malloc-owned bytes alive; never replay read | Generated GC calls use rooted final decode; Windows binding remains excluded |
+| Socket/TLS/crypto adapters | No managed allocation within adapters; preserve caller buffers, host roots and native resource ownership | Noncollecting by contract; no allocation retry to migrate |
+| PostgreSQL | Managed Raven protocol over socket/encoding APIs; no native SQL allocator | Uses managed roots and underlying socket ownership |
+| Culture/time-zone text and intern/object helpers | Audit native preference snapshots, static bytes and intermediate objects | Remaining allocation audit |
 | Constructors / reflection invocation | Retain initialized receiver and every native result scratch until publication | Existing explicit generated roots; admission migration still needed |
 
 These are coverage gaps, not permanent lifetime semantics. The existing .NET
@@ -746,3 +749,35 @@ Process-argument qualification passes all 28 GC/root checks plus socket/package
 checks on macOS ARM64 and Windows x64, including native UTF-16 conversion. Two
 local compiled entry tests also pass. [Retained evidence](../../validation/runtime-product/native-arguments/README.md)
 identifies the tested revision and scope; general pacing remains disabled.
+
+Native-producer audit correction (2026-10-13): the earlier blanket pending entry for
+file/network/TLS/SQL conflated distinct layers. Reviewed current implementations:
+
+- `file-input.c` reads into native malloc/realloc storage and closes the descriptor
+  before decoding. Its new generated-GC entry retries only managed output allocation.
+  The native bytes remain owned until decoding returns; the managed path is no longer
+  read after acquisition. Original native/non-GC calls remain noncollecting. The
+  compiler already excludes this POSIX binding on Windows; this slice does not add
+  Windows file input. Counted read/close tests establish no I/O replay on macOS.
+- `socket-listener.c` allocates native operation buffers, copies sends, and retains
+  receive destinations/callbacks via host roots. Completion copies into the existing
+  managed array before releasing the buffer/root. Cancellation and disposal use the
+  same release paths. It does not allocate a new managed result inside the adapter.
+- `tls-managed.c` validates existing arrays, writes pump output into those arrays,
+  and attaches native provider handles to managed owner tokens. Provider creation
+  uses native allocation; resource attach failure releases the provider handle.
+  Calls do not collect or invoke managed code while borrowing array bytes.
+- `cryptography.c` synchronously fills caller-provided arrays and retains no borrowed
+  pointers. It has no managed allocation needing retry.
+- `runtime/raven/providers/System.Data.PostgreSql` implements the wire protocol in
+  managed Raven over sockets and encoding. There is no native SQL result allocator.
+
+This is a source-level ownership audit of unchanged socket/TLS/crypto/SQL behavior,
+not fresh TLS/SQL workload qualification. Existing socket gates remain relevant;
+TLS resource and provider tests remain in `scripts/test-native-security.py`.
+Like CLR interop adapters, noncollecting native calls can borrow managed buffers
+only while the runtime excludes collection/reentry; pending operations instead need
+explicit ownership. Native allocation failure is not automatically a reason to run
+the managed collector or replay an external operation. Culture/time-zone snapshots,
+intern/object construction and actual scheduler idle integration remain separate
+admission work before general pacing promotion.

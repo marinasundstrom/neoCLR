@@ -21,8 +21,8 @@ static int32_t publish_error(void *output, uint64_t error) {
     return 0;
 }
 
-int32_t neoclr_file_read_utf8_v1(const neoclr_aot_text *path, int32_t limit,
-    neoclr_aot_text_arena *arena, void *output) {
+static int32_t file_read_utf8(const neoclr_aot_text *path, int32_t limit,
+    neoclr_aot_text_arena *arena, void *output, int rooted) {
     if (!path || !arena || !output) return 3;
     if (limit < 0) return publish_error(output, 1);
     if (path->length > SIZE_MAX - 1) return 5;
@@ -76,10 +76,19 @@ int32_t neoclr_file_read_utf8_v1(const neoclr_aot_text *path, int32_t limit,
     /* The file limit is checked before decoding, and the descriptor is already
      * closed before managed allocation can collect or exhaust the arena. */
     static const unsigned char empty = 0;
-    fault = neoclr_text_decode_utf8_bytes_v1(bytes ? bytes : &empty, length, arena, result);
+    fault = (rooted ? neoclr_text_decode_utf8_host_bytes_rooted_v1 : neoclr_text_decode_utf8_bytes_v1)(bytes ? bytes : &empty, length, arena, result);
     free(bytes);
     if (fault) return fault;
     if (result[0] == 2) return publish_error(output, 8);
     memcpy(output, result, sizeof(result));
     return 0;
+}
+
+int32_t neoclr_file_read_utf8_v1(const neoclr_aot_text *path, int32_t limit,
+    neoclr_aot_text_arena *arena, void *output) {
+    return file_read_utf8(path, limit, arena, output, 0);
+}
+int32_t neoclr_file_read_utf8_rooted_v1(const neoclr_aot_text *path, int32_t limit,
+    neoclr_aot_text_arena *arena, void *output) {
+    return file_read_utf8(path, limit, arena, output, 1);
 }

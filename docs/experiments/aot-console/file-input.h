@@ -7,4 +7,7 @@
  * Text is copied to managed arena storage; host buffers/handles are released. */
 int32_t neoclr_file_read_utf8_v1(const neoclr_aot_text *path, int32_t limit,
     neoclr_aot_text_arena *arena, void *output);
+/* Collects only during final decoding, after closing the descriptor. */
+int32_t neoclr_file_read_utf8_rooted_v1(const neoclr_aot_text *, int32_t,
+    neoclr_aot_text_arena *, void *);
 #endif

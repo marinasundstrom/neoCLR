@@ -105,5 +105,6 @@ retry. Reference-array construction also supports retry before publishing initia
 storage. Lexical path and ordinal replacement helpers retain their string inputs
 through retry. Unicode helpers also retain source strings and partially constructed
 sequences. Process startup retains partially built argument arrays during native
-text conversion. Broader collection pacing remains experimental;
+text conversion. The development POSIX file-input adapter can retry final managed
+allocation after the file is closed. Broader collection pacing remains experimental;
 see the [allocation benchmark and qualification](/benchmarks/gc/#allocation-throughput-2026-10-13).
