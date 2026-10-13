@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-13
 
+- Add an explicit stress/paced host choice and canonical runtime source hashes to the runtime-await JIT/AOT validator. Update the HTTP client sample to await the current asynchronous console input API, removing an obsolete synchronous call that prevented fresh project qualification. Allow the bounded JIT compilation window before server readiness/peer acceptance. Installed policy and compiler contracts are unchanged.
+
 - Add fresh managed plain-text/JSON HTTP qualification for stress versus paced native hosts, using identical generated objects, explicit JSON reflection roots, independently checked responses and separate allocation/reclamation diagnostics. Add an optional Windows workflow gate. The harness retains exact commands and input hashes; short sequential measurements do not qualify default promotion or sustained/concurrent traffic.
 
 - Refresh retained-stack async pump readiness after scheduler acquisition can collect. Reap owners that expire during idle acquisition before deciding whether unresolved work remains. Add a regression that failed before the fix and now passes, and include the macOS retained-stack ownership/idle-drain tests in the platform GC gate. All 35 local macOS GC/root executions pass, including the carrier tests. Windows follow-up GC/root and socket/package checks pass; hosted macOS follow-up remains queued. This carrier is macOS-specific; Windows shared scheduler contracts remain separate.

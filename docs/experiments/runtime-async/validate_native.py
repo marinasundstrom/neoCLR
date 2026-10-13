@@ -77,6 +77,7 @@ def main():
     parser.add_argument('--output', type=Path, required=True)
     parser.add_argument('--backend', type=Path, default=ROOT / 'target/release/neoclr-aot-poc')
     parser.add_argument('--text-archive', type=Path, default=ROOT / 'tools/aot-native-text/target/text-only/aarch64-apple-darwin/release/libneoclr_aot_native_text.a')
+    parser.add_argument('--gc-policy', choices=['stress', 'paced'], default='stress', help='Private native host qualification policy; installed defaults are unchanged')
     args = parser.parse_args()
     if platform.system() != 'Darwin' or platform.machine() != 'arm64':
         raise RuntimeError('The experimental stack carrier requires macOS ARM64')
@@ -86,7 +87,7 @@ def main():
         raise RuntimeError('Requires passing source and native HTTP command recipes')
     out = args.output.resolve()
     out.mkdir(parents=True, exist_ok=False)
-    report = {'passed': False, 'platform': platform.platform(), 'commands': [], 'cases': [], 'applications': {},
+    report = {'passed': False, 'gcPolicy': args.gc_policy, 'platform': platform.platform(), 'commands': [], 'cases': [], 'applications': {},
               'recipeSha256': sha(args.recipe), 'nativeRecipeSha256': sha(args.native_build),
               'inputsSha256': {}}
 
@@ -136,6 +137,8 @@ def main():
             run([executable], name + '-run')
 
         link = [item for item in original_link if item != '-DNEOCLR_ENTRY_ARGUMENTS']
+        if args.gc_policy == 'paced':
+            link += ['-DNEOCLR_GC_PACED']
         link += ['-DNEOCLR_RUNTIME_ASYNC', '-I', str(HERE), str(HERE / 'native-runtime.c'), '-Wno-deprecated-declarations']
         unicode_source = str(ROOT / 'docs/experiments/aot-console/string-unicode.c')
         if unicode_source not in link:
@@ -146,6 +149,8 @@ def main():
         jit_link = [str(ROOT / 'docs/experiments/jit-managed/host.c') if item.endswith('/http-host.c')
                     else str(host) if item == original_app else item for item in link if item != original_object]
         run([*jit_link, '-dynamiclib'], 'jit-host-build')
+        for path in (ROOT / 'runtime/native').rglob('*.[ch]'):
+            report['inputsSha256'][str(path)] = sha(path)
         for folder in [HERE, ROOT / 'docs/experiments/aot-console', ROOT / 'docs/experiments/aot-fault-details']:
             for path in folder.glob('*.h'):
                 report['inputsSha256'][str(path)] = sha(path)
@@ -234,7 +239,7 @@ def main():
             try:
                 with selectors.DefaultSelector() as selector:
                     selector.register(process.stdout, selectors.EVENT_READ)
-                    if not selector.select(timeout=30):
+                    if not selector.select(timeout=120):
                         raise TimeoutError('Server did not publish its port')
                     port_line = process.stdout.readline()
                 peer = http.client.HTTPConnection('127.0.0.1', int(port_line.strip()), timeout=30)
@@ -258,14 +263,14 @@ def main():
                 with socket.socket() as listener:
                     listener.bind(('127.0.0.1', 0))
                     listener.listen()
-                    listener.settimeout(30)
+                    listener.settimeout(120)
                     worker = threading.Thread(target=lifecycle_peer, args=(listener, scenario, observed), daemon=True)
                     worker.start()
                     url = f'http://127.0.0.1:{listener.getsockname()[1]}/greeting'
                     try:
                         row = run(invocation('lifecycle', [url, scenario, url]), mode + '-http-' + scenario, expected=1 if scenario == 'fault' else 0)
                     finally:
-                        worker.join(timeout=35)
+                        worker.join(timeout=125)
                 good = not observed.get('error') and observed.get('firstSocketClosed')
                 if scenario == 'fault':
                     good = good and 'UserFault: runtime HTTP continuation fault' in row['stderr'] and not row['stdout']

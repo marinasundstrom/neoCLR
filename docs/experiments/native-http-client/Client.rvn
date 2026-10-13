@@ -5,8 +5,8 @@ import System.Concurrency.Tasks.*
 import System.Concurrency.*
 import System.Web.Http.*
 
-func ReadInput(limit: int) -> string {
-    if let Ok(Some(text)) = Console.ReadLine(limit) {
+async func ReadInput(limit: int) -> Task<string> {
+    if let Ok(Some(text)) = await Console.ReadLine(limit) {
         return text
     }
     System.Fail("Expected input on stdin")
@@ -14,8 +14,8 @@ func ReadInput(limit: int) -> string {
 }
 
 async func Main() -> Task<()> {
-    let url = ReadInput(1024)
-    let mode = ReadInput(32)
+    let url = await ReadInput(1024)
+    let mode = await ReadInput(32)
     let cancellation = CancellationTokenSource()
     if mode == "pre-cancel" {
         cancellation.Cancel()

@@ -839,6 +839,13 @@ artifacts are not accepted as new evidence. `--backend` and `--text-archive` sel
 explicit tool locations. Native generation fails without the opt-in service bindings;
 this does not alter normal compiler or execution defaults.
 
+For collection-pacing qualification, pass `--gc-policy paced` to rebuild both
+native hosts with the runtime-owned policy. The default remains `stress`. Reports
+record the selected policy and canonical native runtime source hashes, including
+sources reached through forwarding adapters. This macOS ARM64 carrier gate does
+not qualify Windows runtime suspension. The HTTP client sample awaits console
+input as well as the request, matching the asynchronous console contract.
+
 ### Architecture comparison and provisional decision
 
 The existing [.NET comparison](../../runtime-scheduling-design.md) separates compiler
