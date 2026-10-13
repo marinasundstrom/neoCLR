@@ -1,0 +1,189 @@
+{
+  "passed": true,
+  "commands": {
+    "interpreter": [
+      "/Users/robert/Projects/neoclr/target/http-byte-candidate-v2-20261013/bundle/bin/neoclr",
+      "run",
+      "/Users/robert/Projects/neoclr/target/http-byte-response-cases-v2-20261013/app.dll",
+      "--execution",
+      "interpreter",
+      "--instructions",
+      "200000000",
+      "--system",
+      "/Users/robert/Projects/neoclr/target/http-byte-candidate-v2-20261013/bundle/lib/System.runtime.neox",
+      "--object-root",
+      "/Users/robert/Projects/neoclr/target/http-byte-candidate-v2-20261013/bundle/lib/System.Runtime.dll",
+      "--module",
+      "/Users/robert/Projects/neoclr/target/http-byte-candidate-v2-20261013/bundle/lib/System.Runtime.dll",
+      "--module",
+      "/Users/robert/Projects/neoclr/target/http-byte-candidate-v2-20261013/bundle/lib/System.Data.dll",
+      "--module",
+      "/Users/robert/Projects/neoclr/target/http-byte-candidate-v2-20261013/bundle/lib/System.Networking.dll",
+      "--module",
+      "/Users/robert/Projects/neoclr/target/http-byte-candidate-v2-20261013/bundle/lib/System.Web.dll",
+      "--module",
+      "/Users/robert/Projects/neoclr/target/http-byte-candidate-v2-20261013/bundle/lib/System.Data.PostgreSql.dll"
+    ],
+    "jit": [
+      "/Users/robert/Projects/neoclr/target/http-byte-candidate-v2-20261013/bundle/bin/neoclr",
+      "run",
+      "/Users/robert/Projects/neoclr/target/http-byte-response-cases-v2-20261013/app.dll"
+    ],
+    "aot": [
+      "/Users/robert/Projects/neoclr/target/http-byte-response-cases-v2-20261013/app"
+    ]
+  },
+  "cases": [
+    {
+      "mode": "interpreter",
+      "method": "GET",
+      "target": "/",
+      "passed": true
+    },
+    {
+      "mode": "interpreter",
+      "method": "HEAD",
+      "target": "/",
+      "passed": true
+    },
+    {
+      "mode": "interpreter",
+      "method": "GET",
+      "target": "/204",
+      "passed": true
+    },
+    {
+      "mode": "interpreter",
+      "method": "GET",
+      "target": "/205",
+      "passed": true
+    },
+    {
+      "mode": "interpreter",
+      "method": "GET",
+      "target": "/304",
+      "passed": true
+    },
+    {
+      "mode": "interpreter",
+      "method": "GET",
+      "target": "/299",
+      "passed": true
+    },
+    {
+      "mode": "interpreter",
+      "method": "GET",
+      "target": "/reserved",
+      "passed": true
+    },
+    {
+      "mode": "interpreter",
+      "method": "GET",
+      "target": "/injection",
+      "passed": true
+    },
+    {
+      "mode": "jit",
+      "method": "GET",
+      "target": "/",
+      "passed": true
+    },
+    {
+      "mode": "jit",
+      "method": "HEAD",
+      "target": "/",
+      "passed": true
+    },
+    {
+      "mode": "jit",
+      "method": "GET",
+      "target": "/204",
+      "passed": true
+    },
+    {
+      "mode": "jit",
+      "method": "GET",
+      "target": "/205",
+      "passed": true
+    },
+    {
+      "mode": "jit",
+      "method": "GET",
+      "target": "/304",
+      "passed": true
+    },
+    {
+      "mode": "jit",
+      "method": "GET",
+      "target": "/299",
+      "passed": true
+    },
+    {
+      "mode": "jit",
+      "method": "GET",
+      "target": "/reserved",
+      "passed": true
+    },
+    {
+      "mode": "jit",
+      "method": "GET",
+      "target": "/injection",
+      "passed": true
+    },
+    {
+      "mode": "aot",
+      "method": "GET",
+      "target": "/",
+      "passed": true
+    },
+    {
+      "mode": "aot",
+      "method": "HEAD",
+      "target": "/",
+      "passed": true
+    },
+    {
+      "mode": "aot",
+      "method": "GET",
+      "target": "/204",
+      "passed": true
+    },
+    {
+      "mode": "aot",
+      "method": "GET",
+      "target": "/205",
+      "passed": true
+    },
+    {
+      "mode": "aot",
+      "method": "GET",
+      "target": "/304",
+      "passed": true
+    },
+    {
+      "mode": "aot",
+      "method": "GET",
+      "target": "/299",
+      "passed": true
+    },
+    {
+      "mode": "aot",
+      "method": "GET",
+      "target": "/reserved",
+      "passed": true
+    },
+    {
+      "mode": "aot",
+      "method": "GET",
+      "target": "/injection",
+      "passed": true
+    }
+  ],
+  "inputs": {
+    "/Users/robert/Projects/neoclr/docs/experiments/http-byte-paths/validate.py": "0c29d3378b4b000325c0b8489f67d9bb0273797fb9707b240b940e28584cf145",
+    "/Users/robert/Projects/neoclr/docs/experiments/http-byte-paths/Server.rvn": "8e944ba67a0ea05835824c19c9a91fa80843a949890ed15911fe003df9b714c0",
+    "/Users/robert/Projects/neoclr/target/http-byte-response-cases-v2-20261013/app.dll": "a1299dcb71b70fec77f707ae90e6a884588a465e1342279af9e4ee771f64d823",
+    "/Users/robert/Projects/neoclr/target/http-byte-response-cases-v2-20261013/app": "61e43a5554f3cd3cc720b6a5b299b1dbd873769a448b3f9a4d06aff69f6da271",
+    "/Users/robert/Projects/neoclr/target/http-byte-candidate-v2-20261013/bundle/manifest.json": "3c407365e59ee79e9700bed9d7e82f84e669a4c816b5e79aee8f05b66814ad26"
+  }
+}

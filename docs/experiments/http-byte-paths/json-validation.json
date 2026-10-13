@@ -1,0 +1,69 @@
+{
+  "passed": true,
+  "platform": "macOS-27.0-arm64-arm-64bit",
+  "cases": [
+    {
+      "case": "json-content",
+      "mode": "interpreter",
+      "exitCode": 0,
+      "stdout": "PASS JSON content reads, typed errors, repeatability and cancellation\n",
+      "stderr": ""
+    },
+    {
+      "case": "json-server",
+      "mode": "interpreter",
+      "exitCode": 0,
+      "stdout": "PASS atomic JSON response configuration\n",
+      "stderr": ""
+    },
+    {
+      "case": "json-content",
+      "mode": "native",
+      "exitCode": 0,
+      "stdout": "PASS JSON content reads, typed errors, repeatability and cancellation\n",
+      "stderr": ""
+    },
+    {
+      "case": "json-server",
+      "mode": "native",
+      "exitCode": 0,
+      "stdout": "PASS atomic JSON response configuration\n",
+      "stderr": ""
+    }
+  ],
+  "skips": [],
+  "sources": {
+    "scripts/validate-http-foundation.py": "49e46dc3ef8ab82a8cc65961cde3c247f1d8cf835122736ea74258bc65478182",
+    "docs/experiments/http-foundation/JsonServer.rvn": "815e4c7385ac4024b5119acd26ded637a256f9afe6c28c8e495558b96a88c335",
+    "docs/experiments/http-foundation/Client.rvn": "ac27a2f4951a8a6ef0602356e1c2ebaa16c0f4031804063cffecb98c0c1072f2",
+    "docs/experiments/http-foundation/Json.rvn": "e1a00359f60a9140b3c9e70faf62ee3b43806f96c4beb5a611346427f53b875c",
+    "docs/experiments/http-foundation/Server.rvn": "d9ff388bd45253c32ae5e13a27956c78a8753b2b714c3e5a72a858873909fee6",
+    "docs/experiments/http-foundation/Errors.rvn": "ec06d05d0fc0a0e1d3fc8cda08ea76c2fd22055eec6506c963c8b998f5224f14",
+    "docs/experiments/http-foundation/Json.rvnproj": "d9b5119b093e76dbb1bb383ba232a7e6004672d25264002b29ff0ac3b7c5f064",
+    "docs/experiments/http-foundation/Server.rvnproj": "fa233e9ab7540a5370553d31b5aa90e9edc2d727e8bc041e73ea33b5cdabbaaf",
+    "docs/experiments/http-foundation/Client.rvnproj": "a19bdddb0cbccf66327fc651f86de73b088e2ca62255f5484d8d1be7745b4665",
+    "docs/experiments/http-foundation/JsonServer.rvnproj": "f9a6099652450f2018c24bc305c4b86d643ae21954037c4db6a1d4453fd35cf1",
+    "docs/experiments/http-foundation/JsonServer.reflection-roots.json": "44f7d8c8a5f2fd45480dd14f827a7299c1ae4f44a9315f1461297c10f4f60fef",
+    "docs/experiments/http-foundation/Json.reflection-roots.json": "21cf65dd6bad728f078c050dc4dd3ca8376fed9a7eeaee3ae1ef5a8529574fda",
+    "docs/experiments/http-foundation/validation.json": "586aa5cf1cc56bad5837072c9423d81a15886a81177c36b6b97f8e754855410a",
+    "runtime/raven/src/System/Web/Http/HttpServer.rvn": "962494ac77ac688c16f1fe4ac4feade7b0796e63765d887a964fee2d14971707",
+    "runtime/raven/src/System/Web/Http/Routes.rvn": "38450212ad033a17a95575379f4f30b1340ef801caaef7ef6f42084bf75a9c94",
+    "runtime/raven/src/System/Web/Http/HttpConnection.rvn": "44d3fb69f8b022411138e393381d4215454755f462cf4396ad185b4acbecf139",
+    "runtime/raven/src/System/Web/Http/HttpMethod.rvn": "90efa846555dc2f4b4077aa3d3648592347410deadfc88476da1169ec36874ae",
+    "runtime/raven/src/System/Web/Http/HttpError.rvn": "100b6d9bc18fe08b1f941f11722e617b460b2dfa40fd5ddca2f5508bee9d3561",
+    "runtime/raven/src/System/Web/Http/HttpStatusCode.rvn": "793a7145655e008ed29d1245205504e5e0333964320e4a036e5a857c111201dd",
+    "runtime/raven/src/System/Web/Http/HttpText.rvn": "58a1736096c902f63112dd6cc0c914b0026a7120c8dcadcddfe6e09bf77dd19d",
+    "runtime/raven/src/System/Web/Http/HttpClient.rvn": "f372facc8ccaa33700725fbf23efcfe59b9be9cb8bc22f325b2d8e6899858daa",
+    "runtime/raven/src/System/Web/Http/HttpWire.rvn": "dbe8fc07c031951bb81f5b9a153c98ef8d9f8024ed351785b0dd291e3c0df870",
+    "runtime/raven/src/System/Web/Http/HttpServerOptions.rvn": "72304b1b1481354c31a2c921af5b0b6c1f4827b817976d9c9f426286c2a45f9a",
+    "runtime/raven/src/System/Web/Http/Json/HttpContentJsonExtensions.rvn": "8b10b25d32210e0a5fb55270f0d8fefda3b356d133e8eb34096cbd8f16549524",
+    "runtime/raven/src/System/Web/Http/Json/JsonContent.rvn": "513f7ef9e6ab9168b9b4903a29fc75d38efd0c429c299c071534e748ce916472",
+    "runtime/raven/src/System/Web/Http/Json/HttpClientJsonExtensions.rvn": "b0e8b270cff46092653a05b97496d5ad252626ef1182f319f604848cae281ecd",
+    "runtime/raven/src/System/Web/Http/Json/JsonClientOperations.rvn": "c1891663a7e1f35e41fb68ab010b2f59b61e74608ad10b2639320cab465c9acf",
+    "runtime/raven/src/System/Web/Http/Json/HttpJsonError.rvn": "0dc519f713f6e3cdd5e7418b4dd50105ef7d124398520ec7ac551a62d158ca99",
+    "runtime/raven/src/System/Web/Http/Json/HttpContextJsonExtensions.rvn": "4a4554c50be5d3b5fb930de113b122fa3e2c4f66a1ef0108b1ece3d1e432727e"
+  },
+  "runtimeSha256": "57e1551815390c17044a73b87a3e4bb663406d00549d6adb3bcdcd5c9b9f7ebb",
+  "aotSha256": "76972bc0e4b722c2f0f27b859afdbddad3b7e6c1154c9cdd8ecaf39f0261baca",
+  "bundleManifestSha256": "3c407365e59ee79e9700bed9d7e82f84e669a4c816b5e79aee8f05b66814ad26"
+}

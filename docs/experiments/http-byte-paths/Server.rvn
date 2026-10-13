@@ -1,0 +1,56 @@
+import System.*
+import System.Collections.*
+import System.Result.*
+import System.Concurrency.Tasks.*
+import System.Web.Http.*
+
+func Respond(request: HttpRequest) -> Task<Result<HttpResponse, HttpError>> {
+    let headers = ArrayList<HttpHeader>()
+    var status = 200
+    var body = HttpContent.FromText("Café 🌍").Bytes
+    if request.Target == "/204" {
+        status = 204
+        body = HttpContent.FromText("").Bytes
+    }
+    if request.Target == "/205" {
+        status = 205
+        body = HttpContent.FromText("").Bytes
+    }
+    if request.Target == "/304" {
+        status = 304
+        body = HttpContent.FromText("").Bytes
+    }
+    if request.Target == "/299" {
+        status = 299
+    }
+    if request.Target == "/reserved" {
+        headers.Add(HttpHeader("CoNtEnT-LeNgTh", "10"))
+    }
+    if request.Target == "/injection" {
+        headers.Add(HttpHeader("X-Test", "good\r\nInjected: bad"))
+    }
+    headers.Add(HttpHeader("X-Test", "ok"))
+    return Task.FromResult<Result<HttpResponse, HttpError>>(System.Result<HttpResponse, HttpError>.Ok(HttpResponse(status, headers, body)))
+}
+
+async func Main() -> Task<()> {
+    let Ok(server) = HttpServer.Listen("127.0.0.1", 0, 4) else {
+        System.Fail("Listen failed")
+    }
+    let Ok(port) = server.GetLocalPort() else {
+        System.Fail("Port failed")
+    }
+    Console.WriteLine(port)
+    for index in 0..<8 {
+        let result = await server.ServeOne(Respond)
+        if let Error(_) = result {
+            if index < 6 {
+                System.Fail("Valid response failed")
+            }
+        } else if index >= 6 {
+            System.Fail("Invalid response accepted")
+        }
+    }
+    server.Close()
+    Console.WriteLine("DONE")
+}

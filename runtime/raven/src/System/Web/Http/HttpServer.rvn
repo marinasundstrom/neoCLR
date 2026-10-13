@@ -31,49 +31,56 @@ internal class HttpRequestDecoder {
     }
     internal val Complete: bool => complete && !failed
 
-    internal func Push(value: byte) -> Result<bool, HttpError> {
+    internal func Push(buffer: byte[], count: int) -> Result<bool, HttpError> {
         if failed {
             return Error(HttpError.Protocol("Decoder already failed"))
         }
-        let result = PushCore(value)
+        let result = PushCore(buffer, count)
         if let Error(_) = result {
             failed = true
         }
         return result
     }
 
-    private func PushCore(value: byte) -> Result<bool, HttpError> {
+    // One result per received block; input is borrowed only for this call.
+    // Header/body storage owns copied bytes before the receive buffer is reused.
+    private func PushCore(buffer: byte[], count: int) -> Result<bool, HttpError> {
         if complete {
             return Error(HttpError.Protocol("Request already complete"))
         }
-        if chunks is HttpChunkDecoder decoder {
-            complete = decoder.Push(value)?
-            return Ok(complete)
-        }
-        if expected >= 0 {
-            body.Add(value)
-            complete = body.Count == expected
-            return Ok(complete)
-        }
-        if head.Count >= settings.HeaderBytes {
-            return Error(HttpError.LimitExceeded("Request header limit exceeded"))
-        }
-        let count = head.Count
-        if value == 10 && (count == 0 || head[count - 1] != 13) {
-            return Error(HttpError.Protocol("Bare LF in request"))
-        }
-        if count > 0 && head[count - 1] == 13 && value != 10 {
-            return Error(HttpError.Protocol("Bare CR in request"))
-        }
-        if value != 9 && value != 10 && value != 13 && !(value >= 32 && value <= 126) {
-            return Error(HttpError.Protocol("Invalid request byte"))
-        }
-        head.Add(value)
-        let size = head.Count
-        if size >= 4 && head[size - 4] == 13 && head[size - 3] == 10 && head[size - 2] == 13 && head[size - 1] == 10 {
-            let parsed = Parse()?
-            request = Some(parsed)
-            complete = !chunked && expected == 0
+        var index = 0
+        while index < count && !complete {
+            let value = buffer[index]
+            index += 1
+            if chunks is HttpChunkDecoder decoder {
+                complete = decoder.Push(value)?
+                continue
+            }
+            if expected >= 0 {
+                body.Add(value)
+                complete = body.Count == expected
+                continue
+            }
+            if head.Count >= settings.HeaderBytes {
+                return Error(HttpError.LimitExceeded("Request header limit exceeded"))
+            }
+            let count = head.Count
+            if value == 10 && (count == 0 || head[count - 1] != 13) {
+                return Error(HttpError.Protocol("Bare LF in request"))
+            }
+            if count > 0 && head[count - 1] == 13 && value != 10 {
+                return Error(HttpError.Protocol("Bare CR in request"))
+            }
+            if value != 9 && value != 10 && value != 13 && !(value >= 32 && value <= 126) {
+                return Error(HttpError.Protocol("Invalid request byte"))
+            }
+            head.Add(value)
+            let size = head.Count
+            if size >= 4 && head[size - 4] == 13 && head[size - 3] == 10 && head[size - 2] == 13 && head[size - 1] == 10 {
+                let parsed = Parse()?
+                request = Some(parsed)
+                complete = !chunked && expected == 0
+            }
         }
         return Ok(complete)
     }
@@ -97,7 +104,13 @@ internal class HttpRequestDecoder {
     }
 
     private func Text(start: int, end: int, lower: int) -> Result<string, HttpError> {
-        let bytes = ArrayList<byte>()
+        if lower == 0 {
+            if let Ok(text) = HttpText.Decode(HttpByteWindow(head, start, end - start)) {
+                return Ok(text)
+            }
+            return Error(HttpError.Protocol("Invalid header text"))
+        }
+        let bytes = ArrayList<byte>(end - start)
         var index = start
         while index < end {
             var value = head[index]
@@ -133,7 +146,9 @@ internal class HttpRequestDecoder {
                 while methodEnd < end && head[methodEnd] != 32 {
                     methodEnd += 1
                 }
-                if end < methodEnd + 11 || Text(end - 9, end, 0)? != " HTTP/1.1" {
+                if end < methodEnd + 11 || !(head[end - 9] == 32 && head[end - 8] == 72 && head[end - 7] == 84 &&
+                    head[end - 6] == 84 && head[end - 5] == 80 && head[end - 4] == 47 &&
+                    head[end - 3] == 49 && head[end - 2] == 46 && head[end - 1] == 49) {
                     return Error(HttpError.Unsupported("Unsupported request line"))
                 }
                 method = Text(0, methodEnd, 0)?
@@ -207,7 +222,7 @@ internal class HttpRequestDecoder {
                     if chunked {
                         return Error(HttpError.Protocol("Duplicate request Transfer-Encoding"))
                     }
-                    if Text(first, last, 1)? != "chunked" {
+                    if String.CompareOrdinalIgnoreCase(value, "chunked") != 0 {
                         return Error(HttpError.Unsupported("Request transfer encoding unsupported"))
                     }
                     chunked = true
@@ -354,12 +369,19 @@ public class HttpServer {
         if fields.Count > HttpWireLimits.HeaderCount - 2 {
             return Error(HttpError.LimitExceeded("Response header count exceeded"))
         }
-        let reason = if status == 200 { "OK" } else { "" }
-        var wire = String.Concat(String.Concat("HTTP/1.1 ", status.ToString()), String.Concat(" ", reason))
-        if status != 204 && status != 304 {
-            wire = String.Concat(wire, String.Concat("\r\nContent-Length: ", count.ToString()))
+        let result = ArrayList<byte>()
+        AppendWire(result, HttpText.Encode("HTTP/1.1 "))
+        AppendDecimal(result, status)
+        result.Add((byte)32)
+        if status == 200 {
+            result.Add((byte)79)
+            result.Add((byte)75)
         }
-        wire = String.Concat(wire, "\r\nConnection: close\r\n")
+        if status != 204 && status != 304 {
+            AppendWire(result, HttpText.Encode("\r\nContent-Length: "))
+            AppendDecimal(result, count)
+        }
+        AppendWire(result, HttpText.Encode("\r\nConnection: close\r\n"))
         var index = 0
         while index < fields.Count {
             let header = fields[index]
@@ -370,21 +392,18 @@ public class HttpServer {
             if name.Count == 0 {
                 return Error(HttpError.Protocol("Empty response header name"))
             }
-            let lower = ArrayList<byte>()
             var part = 0
             while part < name.Count {
-                var value = name[part]
+                let value = name[part]
                 if !HeaderToken(value) {
                     return Error(HttpError.Protocol("Invalid response header name"))
                 }
-                if value >= 65 && value <= 90 {
-                    value = (byte)(value + 32)
-                }
-                lower.Add(value)
                 part += 1
             }
-            let normalized = DecodeAscii(lower)?
-            if normalized == "content-length" || normalized == "connection" || normalized == "transfer-encoding" || normalized == "content-encoding" {
+            if String.CompareOrdinalIgnoreCase(header.Name, "content-length") == 0 ||
+               String.CompareOrdinalIgnoreCase(header.Name, "connection") == 0 ||
+               String.CompareOrdinalIgnoreCase(header.Name, "transfer-encoding") == 0 ||
+               String.CompareOrdinalIgnoreCase(header.Name, "content-encoding") == 0 {
                 return Error(HttpError.Protocol("Response framing headers are server-owned"))
             }
             let valueBytes = HttpText.Encode(header.Value)
@@ -396,20 +415,19 @@ public class HttpServer {
                 }
                 part += 1
             }
-            wire = String.Concat(wire, String.Concat(String.Concat(header.Name, ": "), String.Concat(header.Value, "\r\n")))
-            if wire.GetUtf8ByteCount() > HttpWireLimits.HeaderBytes - 2 {
+            AppendWire(result, name)
+            result.Add((byte)58)
+            result.Add((byte)32)
+            AppendWire(result, valueBytes)
+            result.Add((byte)13)
+            result.Add((byte)10)
+            if result.Count > HttpWireLimits.HeaderBytes - 2 {
                 return Error(HttpError.LimitExceeded("Response header limit exceeded"))
             }
             index += 1
         }
-        wire = String.Concat(wire, "\r\n")
-        let result = ArrayList<byte>()
-        let head = HttpText.Encode(wire)
-        index = 0
-        while index < head.Count {
-            result.Add(head[index])
-            index += 1
-        }
+        result.Add((byte)13)
+        result.Add((byte)10)
         index = 0
         while index < count && headOnly == 0 {
             result.Add(body[index])
@@ -419,11 +437,26 @@ public class HttpServer {
         return Ok(bytes)
     }
 
-    private static func DecodeAscii(bytes: Sequence<byte>) -> Result<string, HttpError> {
-        if let Ok(text) = HttpText.Decode(bytes) {
-            return Ok(text)
+    private static func AppendWire(output: ArrayList<byte>, bytes: Sequence<byte>) {
+        var index = 0
+        while index < bytes.Count {
+            output.Add(bytes[index])
+            index += 1
         }
-        return Error(HttpError.Protocol("Invalid response header"))
+    }
+
+    // Protocol integers are nonnegative and emitted directly as ASCII digits.
+    private static func AppendDecimal(output: ArrayList<byte>, value: int) {
+        var divisor = 1
+        while value / divisor >= 10 {
+            divisor *= 10
+        }
+        var remaining = value
+        while divisor > 0 {
+            output.Add((byte)(48 + remaining / divisor))
+            remaining = remaining % divisor
+            divisor = divisor / 10
+        }
     }
 
     private static func HeaderToken(value: byte) -> bool {
@@ -734,13 +767,9 @@ internal class HttpServerExchange {
                     Fail(HttpError.Protocol("EOF before complete request"))
                     return
                 }
-                var index = 0
-                while index < count && !decoder.Complete {
-                    if let Error(reason) = decoder.Push(buffer[index]) {
-                        Fail(reason)
-                        return
-                    }
-                    index += 1
+                if let Error(reason) = decoder.Push(buffer, count) {
+                    Fail(reason)
+                    return
                 }
                 if decoder.Complete {
                     if let Ok(request) = decoder.Finish() {

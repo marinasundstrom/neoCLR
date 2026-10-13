@@ -8,6 +8,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-13
 
+- HTTP server decoding now accepts received byte blocks, avoids temporary header
+  copies/version strings, and writes response framing directly as bytes. Public
+  APIs and protocol limits are unchanged; bodies remain buffered. All 63 focused
+  macOS interpreter/JIT/AOT protocol, JSON and response-wire checks pass; Windows
+  qualification remains separate. See `docs/experiments/http-byte-paths/README.md`.
+
 - Add HTTP preparation-only and matched-library comparison tools, plus diagnostic
   allocation/text-storage snapshots between accepted-connection closes 8 and 32.
   Keep instrumented allocation captures separate from throughput runs. Correct the
