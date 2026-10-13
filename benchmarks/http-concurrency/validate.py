@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Hold one request incomplete while seven peers must finish; never a throughput score."""
+"""Hold one request incomplete while the other peers must finish; never a throughput score."""
 import argparse
 import hashlib
 import json

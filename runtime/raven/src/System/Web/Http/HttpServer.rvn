@@ -7,6 +7,7 @@ import System.Collections.*
 import System.Concurrency.Tasks.*
 import System.Concurrency.*
 import System.Text.*
+import System.Time.*
 import System.Networking.*
 import System.Networking.Security.*
 import System.Networking.Sockets.*
@@ -382,7 +383,7 @@ public class HttpServer {
         return HttpServerExchange(self, listener, cancellationToken).Start()
     }
 
-    /// Handles one accepted context and sends the callback's buffered response.
+    /// Handles one accepted context and sends the callback's buffered or known-length stream response.
     func ServeOne(handler: (HttpRequest) -> Task<Result<HttpResponse, HttpError>>) -> Task<Result<System.Void, HttpError>> {
         return ServeOne(handler, CancellationToken.None)
     }
@@ -407,11 +408,7 @@ public class HttpServer {
         if !(status >= 200 && status <= 599) {
             return Error(HttpError.InvalidRequest("A final response status from 200 through 599 is required"))
         }
-        if !response.Content.IsBuffered {
-            return Error(HttpError.Unsupported("Stream-backed responses are not implemented"))
-        }
-        let body = response.Content.Bytes
-        let count = body.Count
+        let count = response.Content.Length
         if (status == 204 || status == 205 || status == 304) && count != 0 {
             return Error(HttpError.InvalidRequest("This response status cannot contain content"))
         }
@@ -481,10 +478,13 @@ public class HttpServer {
         }
         result.Add((byte)13)
         result.Add((byte)10)
-        index = 0
-        while index < count && headOnly == 0 {
-            result.Add(body[index])
-            index += 1
+        if response.Content.IsBuffered && headOnly == 0 {
+            let body = response.Content.Bytes
+            index = 0
+            while index < count {
+                result.Add(body[index])
+                index += 1
+            }
         }
         let bytes: Sequence<byte> = result
         return Ok(bytes)
@@ -595,6 +595,15 @@ public class HttpContext : Disposable {
     private var sent: int = 0
     private var token: CancellationToken = CancellationToken.None
     private var deadline = NetworkDeadline.Expired
+    private var writeCancellation: CancellationTokenSource? = null
+    private var writeCaller: CancellationRegistration? = null
+    private var callerToken = CancellationToken.None
+    private var sendingContent: HttpContent? = null
+    private var ownsContent = false
+    private var remainingContent = 0
+    private var contentCount = 0
+    private var contentOffset = 0
+    private var readingContent: Task<Result<int, HttpError>>? = null
 
     internal init(owner: HttpServer, connection: HttpConnection, request: HttpRequest) {
         self.owner = owner
@@ -629,7 +638,7 @@ public class HttpContext : Disposable {
         response.Respond(statusCode, HttpContent.FromText(text))
     }
 
-    /// Snapshots and sends the configured response, then closes the exchange.
+    /// Snapshots response headers and sends buffered bytes or a known-length stream, then closes the exchange.
     func Complete() -> Task<Result<System.Void, HttpError>> {
         return Complete(CancellationToken.None)
     }
@@ -648,6 +657,7 @@ public class HttpContext : Disposable {
         started = true
         self.response = response
         token = cancellationToken
+        callerToken = cancellationToken
         if token.IsCancellationRequested {
             Close()
             _ = source.Cancel()
@@ -655,8 +665,26 @@ public class HttpContext : Disposable {
         }
         let encoded = HttpServer.EncodeResponse(response, if request.Method.Method == "HEAD" { 1 } else { 0 })
         if let Ok(bytes) = encoded {
+            if let Error(reason) = response.Content.BeginUpload() {
+                Finish(Error(reason))
+                return source.Task
+            }
+            if !response.Content.IsBuffered {
+                ownsContent = true
+                sendingContent = response.Content
+                if request.Method.Method != "HEAD" {
+                    remainingContent = response.Content.Length
+                }
+            }
             outgoing = bytes
             deadline = NetworkDeadline.AfterMilliseconds(owner.Settings.WriteMilliseconds)
+            if ownsContent {
+                let cancellation = CancellationTokenSource()
+                writeCancellation = cancellation
+                writeCaller = callerToken.Register(() => { cancellation.Cancel() })
+                token = cancellation.Token
+                cancellation.CancelAfter(Duration.FromTicks((long)owner.Settings.WriteMilliseconds * 10000L))
+            }
             SendNext()
         } else if let Error(reason) = encoded {
             Finish(Error(reason))
@@ -671,6 +699,24 @@ public class HttpContext : Disposable {
         }
         closed = true
         connection.Close()
+        let caller = writeCaller
+        writeCaller = null
+        if caller is CancellationRegistration callerSubscription {
+            callerSubscription.Dispose()
+        }
+        let cancellation = writeCancellation
+        writeCancellation = null
+        if cancellation is CancellationTokenSource activeCancellation {
+            activeCancellation.Cancel()
+            activeCancellation.Dispose()
+        }
+        if ownsContent {
+            ownsContent = false
+            if sendingContent is HttpContent content {
+                content.Dispose()
+            }
+            sendingContent = null
+        }
         let registration = shutdownRegistration
         shutdownRegistration = null
         if registration is CancellationRegistration active {
@@ -691,6 +737,10 @@ public class HttpContext : Disposable {
     }
 
     private func SendNext() {
+        if !closed && !callerToken.IsCancellationRequested && deadline.IsExpired {
+            Finish(Error(HttpError.TimedOut))
+            return
+        }
         if closed || token.IsCancellationRequested {
             Close()
             outgoing = ArrayList<byte>()
@@ -699,6 +749,23 @@ public class HttpContext : Disposable {
         }
         if deadline.IsExpired {
             Finish(Error(HttpError.TimedOut))
+            return
+        }
+        if sent == outgoing.Count && remainingContent > 0 {
+            if contentOffset < contentCount {
+                let bodyWrite = connection.SendUntil(buffer, contentOffset, contentCount - contentOffset, deadline, token)
+                transfer = Some(bodyWrite)
+                bodyWrite.OnCompleted(self.OnSent)
+            } else {
+                let wanted = if remainingContent < 256 { remainingContent } else { 256 }
+                if sendingContent is HttpContent content {
+                    let bodyRead = content.ReadUpload(buffer, wanted, token)
+                    readingContent = bodyRead
+                    bodyRead.OnCompleted(self.OnContentRead)
+                } else {
+                    Finish(Error(HttpError.InvalidRequest("Missing response content")))
+                }
+            }
             return
         }
         if sent == outgoing.Count {
@@ -717,6 +784,30 @@ public class HttpContext : Disposable {
         pending.OnCompleted(self.OnSent)
     }
 
+    // Outcome adapter keeps the borrowed buffer alive through producer completion
+    // and maps cancellation before releasing exchange ownership.
+    private func OnContentRead() {
+        if readingContent is Task<Result<int, HttpError>> pending {
+            readingContent = null
+            if !closed && !callerToken.IsCancellationRequested && deadline.IsExpired {
+                Finish(Error(HttpError.TimedOut))
+                return
+            }
+            if pending.IsCancelled || closed || token.IsCancellationRequested {
+                Close()
+                _ = source.Cancel()
+                return
+            }
+            if let Ok(count) = pending.GetResult() {
+                contentCount = count
+                contentOffset = 0
+                SendNext()
+            } else if let Error(reason) = pending.GetResult() {
+                Finish(Error(reason))
+            }
+        }
+    }
+
     private var finishing: Task<Result<unit, HttpError>>? = null
     private func OnShutdown() {
         if finishing is Task<Result<unit, HttpError>> pending {
@@ -729,6 +820,10 @@ public class HttpContext : Disposable {
     private func OnSent() {
         if let Some(pending) = transfer {
             transfer = None()
+            if !closed && !callerToken.IsCancellationRequested && deadline.IsExpired {
+                Finish(Error(HttpError.TimedOut))
+                return
+            }
             if pending.IsCancelled || closed || token.IsCancellationRequested {
                 Close()
                 outgoing = ArrayList<byte>()
@@ -744,7 +839,12 @@ public class HttpContext : Disposable {
                     Finish(Error(HttpError.Protocol("Response send made no progress")))
                     return
                 }
-                sent += count
+                if sent == outgoing.Count && remainingContent > 0 {
+                    contentOffset += count
+                    remainingContent -= count
+                } else {
+                    sent += count
+                }
                 SendNext()
             } else if let Error(reason) = pending.GetResult() {
                 Finish(Error(reason))

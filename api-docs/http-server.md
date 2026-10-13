@@ -22,5 +22,32 @@ The request deadline begins after connection acceptance. Each pending socket
 transfer also has the existing five-second ceiling, so a longer configured request
 timeout does not remove that shorter bound. Waiting for a connection has no deadline.
 
-Streaming bodies are under development, not yet part of this contract. Headers and
-bodies remain bounded, and this change does not introduce connection reuse.
+## Stream-backed responses
+
+`HttpContent.FromStream(input, length, leaveOpen)` can supply a server response
+through `context.Respond(status, content)` followed by `await context.Complete()`.
+The same content contract supplies client uploads. Length is required and bounded
+by 1 MiB. HTTP framing headers are validated before the producer is read.
+
+The server sends the headers first, then requests at most 256 bytes at a time.
+It waits for each write before reading again. Short reads are valid; zero before
+the declared length, or a count larger than requested, returns
+`HttpError.Content(StreamError.IoFailure)`. Producer errors retain their
+`StreamError`. Once headers have been sent, a failure closes the connection;
+it cannot replace the already-started response with an error status.
+
+A successfully admitted stream is one-shot. Completion/failure/cancellation closes
+owned sources once; `leaveOpen` preserves borrowed sources. HEAD advertises the
+length without reading the source. Zero-length content is also never read.
+Response disposal still follows context ownership. Validation failures before
+consumption do not take ownership of the source.
+
+The response-write deadline also cancels a pending producer read. Producers must
+honor the supplied cancellation token and settle their task; cancellation remains
+cooperative. Caller cancellation returns a cancelled task; deadline expiry returns
+`HttpError.TimedOut` after acknowledgement. Close cancels the pending producer and
+closes owned content. No unbounded producer queue or complete body copy is created.
+
+Incoming body streaming and unknown-length output remain under development.
+Requests and client responses are still fully buffered. This does not introduce
+connection reuse. See the [stream contract](streams.md) for buffer ownership.

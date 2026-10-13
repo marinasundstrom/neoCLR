@@ -8,6 +8,14 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-13
 
+- Support known-length InputStream response bodies through existing HttpContent
+  and HttpContext APIs, sharing the client upload contract. Send headers first,
+  retain the admitted source, and alternate bounded 256-byte reads/writes without
+  assembling a complete response body. Honor producer cancellation and the write
+  deadline; preserve borrowed streams and close owned sources once. All 30 local
+  interpreter/JIT/AOT cases pass; diagnostic AOT reclaims all 7,822 allocations.
+  Incoming bodies, unknown-length output and Windows qualification remain open.
+
 - Queue concurrent HTTP accepts within the existing 16-exchange admission limit,
   starting the next native accept before TLS/request parsing on earlier sockets.
   Cancel queued calls immediately and cover head/middle/tail removal, shutdown,

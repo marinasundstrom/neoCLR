@@ -1,0 +1,212 @@
+{
+  "passed": true,
+  "commands": {
+    "jit": [
+      "/Users/robert/Projects/neoclr/target/http-response-stream-candidate-v6-20261013/bundle/bin/neoclr",
+      "run",
+      "/Users/robert/Projects/neoclr/target/http-response-stream-server-v5-20261013/app.dll"
+    ],
+    "aot": [
+      "/Users/robert/Projects/neoclr/target/http-response-stream-server-v5-20261013/app"
+    ],
+    "interpreter": [
+      "/Users/robert/Projects/neoclr/target/http-response-stream-candidate-v6-20261013/bundle/bin/neoclr",
+      "run",
+      "/Users/robert/Projects/neoclr/target/http-response-stream-server-v5-20261013/app.dll",
+      "--execution",
+      "interpreter",
+      "--instructions",
+      "2000000000",
+      "--system",
+      "/Users/robert/Projects/neoclr/target/http-response-stream-candidate-v6-20261013/bundle/lib/System.runtime.neox",
+      "--object-root",
+      "/Users/robert/Projects/neoclr/target/http-response-stream-candidate-v6-20261013/bundle/lib/System.Runtime.dll",
+      "--module",
+      "/Users/robert/Projects/neoclr/target/http-response-stream-candidate-v6-20261013/bundle/lib/System.Runtime.dll",
+      "--module",
+      "/Users/robert/Projects/neoclr/target/http-response-stream-candidate-v6-20261013/bundle/lib/System.Data.dll",
+      "--module",
+      "/Users/robert/Projects/neoclr/target/http-response-stream-candidate-v6-20261013/bundle/lib/System.Networking.dll",
+      "--module",
+      "/Users/robert/Projects/neoclr/target/http-response-stream-candidate-v6-20261013/bundle/lib/System.Web.dll",
+      "--module",
+      "/Users/robert/Projects/neoclr/target/http-response-stream-candidate-v6-20261013/bundle/lib/System.Data.PostgreSql.dll"
+    ]
+  },
+  "modes": {
+    "jit": {
+      "passed": true,
+      "cases": [
+        {
+          "case": 0,
+          "passed": true,
+          "wireBytes": 1085
+        },
+        {
+          "case": 1,
+          "passed": true,
+          "wireBytes": 1085
+        },
+        {
+          "case": 2,
+          "passed": true,
+          "wireBytes": 60
+        },
+        {
+          "case": 3,
+          "passed": true,
+          "wireBytes": 57
+        },
+        {
+          "case": 4,
+          "passed": true,
+          "wireBytes": 60
+        },
+        {
+          "case": 5,
+          "passed": true,
+          "wireBytes": 60
+        },
+        {
+          "case": 6,
+          "passed": true,
+          "wireBytes": 60
+        },
+        {
+          "case": 7,
+          "passed": true,
+          "wireBytes": 0
+        },
+        {
+          "case": 8,
+          "passed": true,
+          "wireBytes": 60
+        },
+        {
+          "case": 9,
+          "passed": true,
+          "wireBytes": 60
+        }
+      ]
+    },
+    "aot": {
+      "passed": true,
+      "cases": [
+        {
+          "case": 0,
+          "passed": true,
+          "wireBytes": 1085
+        },
+        {
+          "case": 1,
+          "passed": true,
+          "wireBytes": 1085
+        },
+        {
+          "case": 2,
+          "passed": true,
+          "wireBytes": 60
+        },
+        {
+          "case": 3,
+          "passed": true,
+          "wireBytes": 57
+        },
+        {
+          "case": 4,
+          "passed": true,
+          "wireBytes": 60
+        },
+        {
+          "case": 5,
+          "passed": true,
+          "wireBytes": 60
+        },
+        {
+          "case": 6,
+          "passed": true,
+          "wireBytes": 60
+        },
+        {
+          "case": 7,
+          "passed": true,
+          "wireBytes": 0
+        },
+        {
+          "case": 8,
+          "passed": true,
+          "wireBytes": 60
+        },
+        {
+          "case": 9,
+          "passed": true,
+          "wireBytes": 60
+        }
+      ]
+    },
+    "interpreter": {
+      "passed": true,
+      "cases": [
+        {
+          "case": 0,
+          "passed": true,
+          "wireBytes": 1085
+        },
+        {
+          "case": 1,
+          "passed": true,
+          "wireBytes": 1085
+        },
+        {
+          "case": 2,
+          "passed": true,
+          "wireBytes": 60
+        },
+        {
+          "case": 3,
+          "passed": true,
+          "wireBytes": 57
+        },
+        {
+          "case": 4,
+          "passed": true,
+          "wireBytes": 60
+        },
+        {
+          "case": 5,
+          "passed": true,
+          "wireBytes": 60
+        },
+        {
+          "case": 6,
+          "passed": true,
+          "wireBytes": 60
+        },
+        {
+          "case": 7,
+          "passed": true,
+          "wireBytes": 0
+        },
+        {
+          "case": 8,
+          "passed": true,
+          "wireBytes": 60
+        },
+        {
+          "case": 9,
+          "passed": true,
+          "wireBytes": 60
+        }
+      ]
+    }
+  },
+  "inputs": {
+    "/Users/robert/Projects/neoclr/docs/experiments/http-stream-response/validate.py": "cd59c5da42fd7c7f027e3d982c55e297ff2ed887289c42b8063a748bddc74bf3",
+    "/Users/robert/Projects/neoclr/docs/experiments/http-stream-response/Server.rvn": "c41c52cff5a20ff59df231d6e913d4caa77c4cf87a5d136cda939920fe0c9c89",
+    "/Users/robert/Projects/neoclr/target/http-response-stream-server-v5-20261013/app.dll": "d2d2537efd8b8ee1637ef37ddc53098a4b20639dd4aa3357d2b6d82f4ffa1b3f",
+    "/Users/robert/Projects/neoclr/target/http-response-stream-server-v5-20261013/app": "5730f5122c36ba7313d7e0b0bb43dd1ebd654abc736e62616f9254daf890e031",
+    "/Users/robert/Projects/neoclr/target/http-response-stream-server-v5-20261013/build.json": "57e122038bd74f27467d13774df195b4b9441ee4f3ca80db52710ec051a9a90d",
+    "/Users/robert/Projects/neoclr/target/http-response-stream-candidate-v6-20261013/bundle/manifest.json": "d3d0012b13ad7e29084e4a0960b17113b120cbf5eb9783e37bd66177b2ced52d"
+  },
+  "scope": "Known-length server response streams: deferred short reads, owned/borrowed sources, HEAD, empty body, premature EOF, source error, overread disposed content, caller cancellation and deadline cancellation of a waiting producer; not a throughput measurement"
+}
