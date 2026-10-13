@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-14
 
+- Add opt-in HTTP allocation attribution by published managed function, with exclusive/inclusive accounting, recursion deduplication, generated-helper identities and counter reconciliation. Plain/JSON AOT profiles validate 64 responses and full reclamation; identify 124 per-request URI character-probe allocations versus 26 under header decoding in the retained fixtures. Add focused attribution tests and refine the Kestrel known-name/value-reuse comparison. URI and header optimizations remain next candidates, not implemented behavior.
+
 - Record the author-directed HTTP byte-buffer/lazy-string direction, current eager header allocations, Kestrel/.NET/Go comparisons, ownership and backpressure tradeoffs, and staged validation needs. This is design guidance; no pooling or lazy-header behavior is implemented yet.
 
 - Reuse already validated spans when refining the dense native GC lookup table. Preserve full initial validation, root/owner checks, corruption failure atomicity and collection policy. All 35 local GC/root checks pass; longer paired dense-graph measurements improve collection throughput by 2.1–3.3%, with small/sparse controls within 1%. Add longer benchmark intervals and selectable hosted comparison revisions; hosted macOS/Windows correctness gates pass, with Windows dense gains of 3.6–6.9% and noisy hosted macOS controls retained. The matched HTTP regression passes 768 responses and separate profiles pass 128 with full reclamation; no HTTP speedup is claimed. Update local website benchmark content; 22 website checks pass.

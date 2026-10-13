@@ -16945,3 +16945,11 @@ and lifetime across await. It called out retained-buffer/pool memory costs and
 continued pull-driven bodies. This is a proposed sequence, not author approval of
 every API detail or a performance result. [Research and tradeoffs](http-foundation.md#byte-ownership-and-lazy-materialization-direction--2026-10-14)
 record what remains to implement and measure. The current GC profiling slice continues.
+
+The author then clarified Kestrel's use of known byte patterns and shared/interned
+header-name constants. The assistant checked generated request-header code and
+confirmed canonical names and eligible previous ASCII value reuse, distinguishing
+that from universal lazy values or unbounded global interning. It refined the
+comparison accordingly. Allocation attribution subsequently identified URI character
+substrings as a larger source of allocations than header decoding in the retained
+plain HTTP fixture; that is a measured candidate, not yet an implemented URI fix.

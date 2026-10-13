@@ -1,5 +1,7 @@
 # neoCLR platform roadmap
 
+**HTTP allocation attribution (2026-10-14):** [published-frame diagnostics](../benchmarks/http-server/allocation-sites.md) reconcile every measured allocation and identify URI one-byte substrings (124 allocations/request in retained plain/JSON fixtures) before header decoding (26/request). Prioritize removing parser temporaries and fixed known-header identities within the author-directed HTTP byte-buffer work; preserve eager framing validation and ownership across await. These are measured candidates, not implemented optimizations, and do not replace sustained/concurrent GC pacing qualification.
+
 **Profiling follow-up (2026-10-14):** [dense index refinement](../benchmarks/gc-index/README.md#reuse-validated-spans-for-the-dense-index--2026-10-14) reuses the first complete validation pass within a synchronous collection. Longer local paired measurements improve dense collection throughput by 2.1–3.3%, with small/sparse controls within 1%; all 35 local GC/root checks pass. The matched HTTP regression check passes 768 responses with overlapping timing ranges; hosted macOS/Windows correctness gates pass. Windows dense gains are 3.6–6.9%; noisy hosted macOS timings are retained without a precise speedup claim. This bounded improvement preserves collection policy and does not establish application throughput gains.
 
 **Integrated runtime product (author direction, 2026-10-13):** interpreter, JIT,

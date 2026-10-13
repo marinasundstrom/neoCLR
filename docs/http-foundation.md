@@ -185,3 +185,12 @@ peak retained memory and GC cleanup in native JIT/AOT plus an interpreter correc
 control. Preserve metadata/header lifetime semantics or document a deliberate API
 change with matching reference documentation. No pooling or lazy-header behavior
 is implemented by this design note.
+
+The author clarified that Kestrel recognizes known header bytes and reuses constant
+name strings. Its [generated request-header implementation](https://github.com/dotnet/aspnetcore/blob/main/src/Servers/Kestrel/Core/src/Internal/Http/HttpHeaders.Generated.cs)
+confirms known-name matching, canonical `HeaderNames` strings and dedicated fields.
+It also reuses an eligible previous single ASCII value when the bytes match;
+otherwise the value is decoded while appending the header. This is not universal
+lazy decoding or global interning of arbitrary network input. neoCLR should start
+with fixed known-name identities; bounded value reuse and lazy materialization are
+separate choices to measure.
