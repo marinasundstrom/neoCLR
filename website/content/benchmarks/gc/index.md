@@ -1,14 +1,52 @@
 # Garbage collector benchmarks
 
-GC work targets general runtime workloads as well as HTTP. The latest local
-collection-only experiment improves large object-graph tracing by 4.46–5.24×;
-small and sparse heaps remain near baseline. Earlier HTTP experiments separately
-measure root observation and scheduler waits.
+GC work targets general runtime workloads as well as HTTP. The latest allocation
+change removes a repeated heap walk while preserving complete validation. Earlier
+series measure large object graphs, root observation and scheduler waits.
 
 These are development measurements, not release guarantees. See
 [HTTP benchmarks](/benchmarks/http/) for application results and
 [garbage collection](/features/gc/) for the runtime model. Each historical series
 retains its own conditions and raw evidence.
+
+## Allocation throughput — 2026-10-13
+
+Allocation formerly walked heap headers once for validation, then again to find
+free space. It now selects the first suitable hole during the validation walk.
+Every header is still checked before the heap changes, including headers after a
+usable hole. Failure outputs, corruption detection and collection policy remain.
+
+The table shows baseline/candidate elapsed-time ratios from five alternating
+pairs after warmup. Construction of fragmented heaps and final collection are
+outside timing. Each column is a separate paired run, not a platform ranking.
+
+| Workload | Allocations per batch | Local macOS ARM64 | Hosted macOS ARM64 | Windows x64 |
+| --- | ---: | ---: | ---: | ---: |
+| Objects | 64 | 1.66× | 1.37× | 1.37× |
+| Objects | 1,024 | 1.88× | 1.32× | 1.70× |
+| Objects | 4,096 | 1.89× | 1.60× | 1.82× |
+| String-sized blocks | 1,024 | 1.87× | 1.34× | 1.84× |
+| Byte buffers | 256 | 1.52× | 1.58× | 1.39× |
+| Fragmented refill | 1,024 | 1.49× | 1.18× | 1.32× |
+
+String-sized blocks are 128-byte atomic allocations; this does not measure encoding
+or string API throughput. Object payloads are 16 bytes and buffers 8,192 bytes.
+All workers check retained contents and final reclamation. Full validation is still
+linear per allocation, so this does not establish constant-time allocation.
+[Protocol and all raw rounds](https://github.com/marinasundstrom/neoCLR/blob/524ca0b22e6ca772010ae791da7099399b326329/benchmarks/gc-allocation/README.md).
+
+<details>
+<summary>Experimental follow-up: collection pacing</summary>
+
+A separate closed native workload protects every allocation with rooted admission.
+Its local object/string runs are 3.98×/3.57× faster with less frequent collection,
+while peak arena extent rises about 23%. The pressure counterexample that rejected
+the previous reserve-based policy now passes, alongside cleanup and suspended-owner
+checks. This is **not enabled for general managed or HTTP execution**. Remaining
+helper-root coverage and real scheduler idle integration are required first.
+[Experimental evidence and limitations](https://github.com/marinasundstrom/neoCLR/blob/524ca0b22e6ca772010ae791da7099399b326329/benchmarks/http-gc-pacing/README.md#rooted-closed-workload-pacing-follow-up-2026-10-13).
+
+</details>
 
 ## Dense object graphs — 2026-10-13
 

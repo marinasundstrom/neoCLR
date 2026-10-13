@@ -62,3 +62,8 @@ The [dense object-graph series](/benchmarks/gc/#dense-object-graphs-2026-10-13)
 is a separate collection-only native runtime benchmark. It includes chain, wide,
 free-hole and sparse-buffer controls; it must not be combined with HTTP throughput
 or cross-platform ratios.
+
+The [allocation-throughput series](/benchmarks/gc/#allocation-throughput-2026-10-13)
+compares complete validation plus separate search against a combined walk. Its
+allocation-only timings exclude final collection; the linked pacing experiment
+remains separate and is not a shipping or HTTP performance claim.

@@ -165,4 +165,7 @@ objects 4.25× and strings 3.98×, with the same allocation/reclamation counts,
 collection counts and peak-extent tradeoff. Its focused native GC/root and socket
 contracts pass. These are within-machine comparisons, not a ranking of operating
 systems. The Windows job in [run 38422680168](https://github.com/marinasundstrom/neoCLR/actions/runs/38422680168)
-passed; its hosted macOS job was still queued when this evidence was recorded.
+passed. The subsequently completed [hosted macOS ARM64 run](rooted-macos-latest-38422680168.json)
+also passes, improving objects 3.91× and strings 3.83×. Both jobs and their socket
+contracts pass; the hosted macOS job does not run the separate GC validator, whose
+20 local macOS executions are retained in the allocation evidence.
