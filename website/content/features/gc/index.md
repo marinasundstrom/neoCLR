@@ -89,3 +89,8 @@ and scheduler wait intervals; remote profiler attachment remains macOS-specific.
 
 [GC benchmarks](/benchmarks/gc/) retain application throughput comparisons,
 allocation/reclamation evidence and measurement limits for macOS and Windows.
+
+Native JIT/AOT development builds adapt the collector's address index for dense
+heaps. The [GC benchmark report](/benchmarks/gc/#dense-object-graphs-2026-10-13)
+records general object-graph gains, small/sparse controls and memory costs. This
+changes lookup work, not managed lifetime semantics or collection frequency.

@@ -112,3 +112,17 @@ and atomic buffers 4.6% slower, while the 1,024-node chain is 1.1% faster. Those
 results are retained, not reclassified as improvements; local longer controls
 are supplemental evidence, not grounds to discard hosted results. All dense gains
 have non-overlapping observed ranges. No universal non-regression claim is made.
+
+[Windows HTTP/HTTPS gate 38416342406](https://github.com/marinasundstrom/neoCLR/actions/runs/38416342406)
+passes at `00e34b5c5`: eight default-JIT HTTP cases cover greeting, fragmented
+input, duplicate length, handler error/fault, DNS, timeout cleanup and delayed
+success; nested JSON over managed SSL streams passes interpreter/default-JIT/AOT.
+This is the focused HTTP gate, not a full runtime-library suite. The later population
+accumulator refinement is independently covered by final GC/socket qualification.
+The new dense conditional-owner/cleanup regression also passes all 18 local
+GC/root executions (`local-final-contracts-20261013.json`).
+
+The final dense conditional-owner/cleanup regression also passes Windows in
+[run 38417769718](https://github.com/marinasundstrom/neoCLR/actions/runs/38417769718),
+with all 18 GC/root executions and macOS/Windows socket contracts successful.
+`windows-final-contracts-38417769718.json` retains the exact tested input hashes.

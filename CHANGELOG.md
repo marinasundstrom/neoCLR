@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-13
 
+- Update the GC benchmark website with dense-graph results, cross-platform qualification, stack costs, slower small controls and preserved history. Retain the passing focused Windows HTTP/HTTPS gate (eight default-JIT HTTP cases and SSL JSON in interpreter/JIT/AOT). The website build/link check passes for 4,382 pages; publication remains on hold.
+
 - Extend the dense-heap GC regression to cover conditional values, rejection of interior owner pointers and exactly-once resource cleanup before final reclamation. All 18 local GC/root executions pass. Normalize retained Windows evidence to LF without changing JSON values.
 
 - Qualify adaptive native GC lookup on macOS ARM64 and Windows x64: final hosted dense-chain/wide collection gains are 4.48–4.90× and 4.63–5.19× respectively, with all graph, GC/root and socket checks passing. Retain small-control costs and variability, allocation/reclamation profiles, suspended-owner cleanup checks and the 1,536-response local HTTP comparison (within 2%, overlapping ranges). This is a general graph-tracing improvement, not an HTTP speedup or a universal non-regression claim.

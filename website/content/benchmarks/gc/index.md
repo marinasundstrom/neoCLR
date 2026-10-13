@@ -1,15 +1,60 @@
 # Garbage collector benchmarks
 
-Runtime profiling separates collection work from socket processing and scheduler
-waits. The latest matched Windows experiment improved HTTP throughput by 1.58–2.23×
-by waiting for socket readiness instead of sleeping after an empty poll. Collection
-time stayed largely unchanged, making it the next substantial measured cost.
+GC work targets general runtime workloads as well as HTTP. The latest local
+collection-only experiment improves large object-graph tracing by 4.46–5.24×;
+small and sparse heaps remain near baseline. Earlier HTTP experiments separately
+measure root observation and scheduler waits.
 
-These development application benchmarks measure collector and scheduling changes,
-not isolated GC pauses or release guarantees. See [HTTP benchmarks](/benchmarks/http/)
-for the application baseline and [garbage collection](/features/gc/) for the runtime
-model. Earlier collector-path results remain below for comparison within their own
-recorded conditions.
+These are development measurements, not release guarantees. See
+[HTTP benchmarks](/benchmarks/http/) for application results and
+[garbage collection](/features/gc/) for the runtime model. Each historical series
+retains its own conditions and raw evidence.
+
+## Dense object graphs — 2026-10-13
+
+The native collector now uses a denser address index above 2,048 heap spans.
+This reduces repeated block-header searches while keeping exact payload checks,
+root ownership and collection frequency unchanged. The extra index costs 32 KiB
+of temporary native stack and one additional validated heap walk on the dense path.
+
+Initial local candidate: macOS ARM64, Xcode Clang `-O2`; five alternating pairs after warmup.
+Values below are milliseconds per full collection: median (observed minimum–maximum).
+Graph construction and final reclamation are outside the timed interval.
+
+| Shape | Live objects | Baseline ms | Adaptive ms | Ratio |
+| --- | ---: | ---: | ---: | ---: |
+| Chain | 64 | 0.0008 (0.0008–0.0015) | 0.0008 (0.0008–0.0012) | 1.01× |
+| Chain | 1,024 | 0.0155 (0.0154–0.0163) | 0.0155 (0.0155–0.0155) | 1.00× |
+| Chain | 2,048 | 0.0397 (0.0397–0.0397) | 0.0396 (0.0396–0.0398) | 1.00× |
+| Chain | 2,049 | 0.0398 (0.0398–0.0433) | 0.0295 (0.0294–0.0320) | 1.35× |
+| Chain | 4,096 | 0.1178 (0.1177–0.1185) | 0.0622 (0.0621–0.0656) | 1.89× |
+| Chain | 16,384 | 1.3975 (1.3513–1.3992) | 0.3137 (0.3036–0.3324) | 4.46× |
+| Wide | 16,384 | 1.2973 (1.2179–2.0204) | 0.2475 (0.2323–0.4342) | 5.24× |
+| Holes | 4,096 | 0.2199 (0.2197–0.2200) | 0.1017 (0.1011–0.1025) | 2.16× |
+| Atomic | 64 | 0.0006 (0.0006–0.0006) | 0.0007 (0.0007–0.0007) | 0.98× |
+
+The 16,384-object chain and wide graph collect **4.46× and 5.24× faster**.
+Separate diagnostic runs reduce chain lookup-header visits from 70.7 million to
+5.2 million over 100 collections. Small/sparse controls remain near baseline;
+their slight changes are not evidence of a gain. All workers verify their live
+graphs and complete final reclamation.
+
+This is a collection-only test of the shared JIT/AOT native collector. It does not
+measure allocation throughput, interpreter GC, concurrent load or parity with
+.NET/Go. A separate local HTTP regression comparison passes all 1,536 responses:
+plain/JSON JIT/AOT median throughput stays within 2% of baseline, with overlapping
+ranges. The graph improvement does not translate into a material HTTP gain here.
+
+[Raw graph rounds](https://github.com/marinasundstrom/neoCLR/blob/00e34b5c5/benchmarks/gc-index/macos-20261013.json)
+and [methodology and costs](https://github.com/marinasundstrom/neoCLR/blob/00e34b5c5/benchmarks/gc-index/README.md).
+The final bookkeeping refinement also passes hosted macOS/Windows GC and socket
+contracts. Its large-chain/wide speedups are **4.48×/4.90× on macOS ARM64** and
+**4.63×/5.19× on Windows x64**. These are within-machine comparisons, not platform
+rankings. Final Windows small-control costs are under 2%; hosted macOS short
+controls include up to a 12.5% slowdown. Longer local controls cost roughly
+0.3–1.5%. The benchmark record retains all rounds: the dense-graph gain does not
+promise improvement for every workload.
+[Final evidence and limitations](https://github.com/marinasundstrom/neoCLR/blob/81da188cc/benchmarks/gc-index/README.md#qualification-and-retained-controls).
 
 ## Windows GC versus waits — 2026-10-13
 

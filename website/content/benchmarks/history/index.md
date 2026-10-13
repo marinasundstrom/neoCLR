@@ -29,7 +29,7 @@ measurement-setting difference is explicit and must be retained in later compari
 
 ## 2026-10-13 — development GC comparisons
 
-The [GC benchmark report](/benchmarks/gc/) keeps three distinct paired series:
+The [GC benchmark report](/benchmarks/gc/) keeps distinct paired series:
 fixed-fixture macOS JIT/AOT, newer streaming-library macOS AOT, and Windows x64
 JIT/AOT. Each links immutable raw runs, including slower candidate samples. Only
 the root observer changes within each pair. These are development experiments,
@@ -57,3 +57,8 @@ for provenance and comparison requirements. Windows x64 GC comparisons are now r
 sustained cross-runtime measurements remain future work. A [local development comparison](/benchmarks/http-comparison/)
 now retains Kestrel, Go and Node pilot results; publication is on hold pending
 neoCLR HTTP improvements.
+
+The [dense object-graph series](/benchmarks/gc/#dense-object-graphs-2026-10-13)
+is a separate collection-only native runtime benchmark. It includes chain, wide,
+free-hole and sparse-buffer controls; it must not be combined with HTTP throughput
+or cross-platform ratios.

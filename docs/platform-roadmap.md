@@ -6,7 +6,7 @@ in final local/Windows runs. Exact root/payload validation, suspension ownership
 cleanup and collection frequency are preserved. Smaller controls expose bookkeeping
 costs and hosted variability; this is not a universal speedup. The separate local
 HTTP regression stays within 2% with overlapping ranges. The dense path adds a
-validated walk and 32 KiB of stack. All platform GC/socket contracts pass. Next
+validated walk and 32 KiB of stack. All platform GC/socket contracts and the focused Windows HTTP/HTTPS gate pass. Next
 investigate allocation and root-publication overhead across general workloads;
 complete temporary-root admission before changing collection pacing.
 
