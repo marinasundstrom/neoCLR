@@ -300,7 +300,9 @@ logic. Unlike .NET compiler state machines, these application activations retain
 native stacks; the benefit is ordinary call-chain suspension, at a stack reservation
 and switching cost. This is private runtime support, not a new public ABI.
 
-The Windows carrier is thread-affine and uses a 1 MiB reservation per activation.
+The carrier still has fixed private tables of 128 operations and 128 activations;
+this integration does not remove those capacity limits. The Windows carrier is
+thread-affine and uses a 1 MiB reservation per activation.
 It preserves pre-existing host fiber conversion and only undoes conversion it owns.
 Completed/abandoned Windows fibers are deleted, not cached; Windows stack caching
 needs a separately qualified reusable entry loop. macOS guarded-stack caching is
@@ -309,19 +311,24 @@ reserve, rather than rejecting all Windows fibers.
 
 The shared GC gate runs owned-body survival, abandonment, pressure rollback and
 idle-drain tests on both OS carriers, plus a Windows host-owned-fiber case. Local
-macOS passes all 35 GC/root cases after migration. Windows qualification is pending
-for this slice; backend admission and SDK defaults remain unchanged until qualified.
+macOS passes all 35 GC/root cases after migration. The hosted macOS/Windows [carrier gate](https://github.com/marinasundstrom/neoCLR/actions/runs/38462503102)
+also passes, including Windows host-owned fibers. See the [retained reports](validation/runtime-product/runtime-await-sdk/).
 
 ## SDK-default runtime-await integration — 2026-10-13
 
 Development SDK builds now set `RavenNeoClrRuntimeAsyncHelper` to
 `RuntimeAwaitProvider.Bridge` in `NeoCLR.ClassLibrary.props` and include the matching
-`RuntimeAwait.rvn` from the SDK library directory. Its canonical source is
-`runtime/raven/compiler-services/RuntimeAwait.rvn`; callers no longer copy an
-experiment file. This source-included, assembly-private provider uses the existing
-explicit Raven Runtime Contract. It does not add public managed API or change
+`RuntimeAwait.rvn` and its `RuntimeGenerator.rvn` companion from the SDK library
+directory. Their canonical sources live in `runtime/raven/compiler-services`;
+callers no longer copy experiment files. The companion supplies the existing demand-driven `yield`/`await for`
+contract, including cancellation and disposal. These source-included,
+assembly-private providers use the existing explicit Raven Runtime Contract. They do not add public managed API or change
 ordinary Raven/.NET lowering. Existing source-provider type names remain private
 compatibility details, not a new module-authoring convention.
+Remove manually copied provider sources when upgrading; otherwise the SDK and
+project would declare the same helper types. Projects supporting old and rebuilt
+bundles can condition their legacy source include on
+`RavenNeoClrRuntimeAsyncProviderImported != true`.
 
 To select compiler state machines explicitly, place this property **after** the SDK
 import in the project (an empty environment variable alone is not an override):
@@ -356,6 +363,8 @@ does not redefine ordinary .NET async behavior or promise Windows ARM64 support.
 Validation: `scripts/validate-runtime-await-sdk.py` rebuilds SDK-default applications
 and an explicit state-machine control, inspects application lowering, stages a
 matching installed JIT bundle, then exercises interpreter/JIT/AOT language, cleanup,
-fault, HTTP server and client cases. The hosted Windows HTTP workflow can run this
-gate with `runtime_await=true`. Full gate evidence is pending while this integration
-is qualified; the preceding raw carrier gate passes on macOS and Windows.
+fault, HTTP server/client and generator cases. The hosted Windows HTTP workflow can run this
+gate with `runtime_await=true`. All 21 macOS SDK cases pass, including generators and the explicit state-machine
+fallback; source hashes remain unchanged through execution. Windows application
+qualification is running. The raw carrier gate passes on both platforms. See
+[retained evidence](https://github.com/marinasundstrom/neoCLR/tree/main/docs/validation/runtime-product/runtime-await-sdk).

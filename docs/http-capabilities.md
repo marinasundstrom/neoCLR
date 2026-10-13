@@ -16,6 +16,14 @@ Statuses: **Implemented** means development source with linked focused evidence;
 **Complete** records a satisfied POC gate; **Deferred** is outside this POC.
 It does not imply inclusion in published Preview 9 or production readiness.
 
+## HTTP version compatibility gap — 2026-10-13
+
+The current managed client status parser accepts `HTTP/1.1` responses only. The
+SDK runtime-await fixture now explicitly uses HTTP/1.1; Python’s default HTTP/1.0
+response was rejected as an invalid status line. HTTP/1.0 response compatibility
+remains a gap, not a change to HTTP protocol semantics. It is separate from the
+current runtime-await integration gate.
+
 ## HTTPS server follow-up — 2026-10-12
 
 The author selects server TLS first. The [native proof](experiments/https-server/README.md)

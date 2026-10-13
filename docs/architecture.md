@@ -83,10 +83,11 @@ Managed `Task` represents an operation, `Promise` its producer side, and `Schedu
 projects scheduling services. These APIs sit above the runtime's scheduling and
 suspension machinery. Suspended activations must publish their roots; resumption,
 collection and abandonment must preserve ownership and exactly-once cleanup.
-Runtime-await is the intended default neoCLR lowering; provider/SDK integration,
-library coverage and native Windows suspension qualification precede that switch.
-Compiler state machines remain a supported explicit fallback. The current native
-retained-stack carrier is macOS ARM64-specific, not a promise of target parity.
+Rebuilt development SDKs select runtime-await for neoCLR applications. The native
+carrier supports macOS ARM64 and Windows x64; the interpreter retains its own
+activation machinery. Compiler state machines remain a supported explicit fallback,
+and existing bootstrap libraries keep their current lowering. See the matching
+build requirements and [qualification](runtime-product-integration.md#sdk-default-runtime-await-integration--2026-10-13).
 
 The Raven library builds application APIs over these contracts. An HTTP operation
 uses socket adapters and OS resources while the scheduler tracks readiness and

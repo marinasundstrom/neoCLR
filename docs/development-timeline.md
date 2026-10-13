@@ -25,6 +25,25 @@ available original wording; other text is a summary.
 
 See the [changelog](../CHANGELOG.md) and linked design documents for technical status.
 
+## 2026-10-13 — Integrate SDK runtime-await and Windows suspension
+
+- **Author:** directs continuing SDK/runtime integration, including Windows
+  suspension, with runtime-await becoming the default, GC correctness preserved
+  and each slice committed.
+- **Assistant implementation:** moves the carrier into runtime-owned sources,
+  adds Windows fibers beneath existing ownership/root parking, packages the
+  assembly-private await and generator providers, and selects that contract in
+  rebuilt SDK project imports. Ordinary Raven/.NET lowering stays unchanged;
+  an explicit project override retains state machines.
+- **Validation so far:** native GC/root gates pass on macOS and Windows, including
+  owned suspended bodies and abandonment. Windows stack-host acceptance passes
+  after replacing its obsolete fiber-rejection expectation. Full SDK application
+  qualification is recorded in the [integration evidence](validation/runtime-product/runtime-await-sdk/).
+- **Scope:** existing library bootstrap lowering is retained; matching rebuilt
+  runtime/backend/JIT helpers are required. Windows ARM64 and reusable Windows
+  fiber stacks remain unqualified. This is integration work, not a measured
+  performance improvement or a published SDK release.
+
 ## 2026-10-13 — Supplied overview of modern garbage collectors
 
 - **Author:** shares a ChatGPT text discussing throughput/latency, generations,

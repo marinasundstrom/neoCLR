@@ -1,0 +1,408 @@
+{
+  "passed": true,
+  "scope": "Private Windows x64 guarded heap and collector/root lifecycle; bounded native stack probe; generated stack and Int32-array heap experiments; no managed console qualification",
+  "platform": "Windows-2022Server-10.0.20348-SP0",
+  "commands": [
+    {
+      "command": [
+        "git",
+        "-C",
+        "D:\\a\\neoCLR\\neoCLR",
+        "rev-parse",
+        "HEAD"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "cl",
+        "/nologo",
+        "/W4",
+        "/WX",
+        "/std:c11",
+        "/O2",
+        "/MT",
+        "/Fe:host-memory.exe",
+        "D:\\a\\neoCLR\\neoCLR\\tools\\native\\windows-host-memory.c",
+        "D:\\a\\neoCLR\\neoCLR\\tools\\native\\windows-host-memory-test.c"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-host-validation\\host-memory.exe"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "cl",
+        "/nologo",
+        "/W4",
+        "/WX",
+        "/std:c11",
+        "/experimental:c11atomics",
+        "/O2",
+        "/MT",
+        "/Fe:host-collector.exe",
+        "D:\\a\\neoCLR\\neoCLR\\tools\\native\\windows-gc-host-test.c",
+        "D:\\a\\neoCLR\\neoCLR\\tools\\native\\windows-gc-host.c",
+        "D:\\a\\neoCLR\\neoCLR\\tools\\native\\windows-native-stack.c",
+        "D:\\a\\neoCLR\\neoCLR\\tools\\native\\windows-host-memory.c",
+        "D:\\a\\neoCLR\\neoCLR\\docs\\experiments\\aot-console\\native-gc.c",
+        "D:\\a\\neoCLR\\neoCLR\\docs\\experiments\\aot-console\\root-probe.c"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-host-validation\\host-collector.exe"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "cl",
+        "/nologo",
+        "/W4",
+        "/WX",
+        "/std:c11",
+        "/experimental:c11atomics",
+        "/O2",
+        "/MT",
+        "/DNEOCLR_NATIVE_GC=1",
+        "/Fe:collector-contract.exe",
+        "D:\\a\\neoCLR\\neoCLR\\docs\\experiments\\aot-console\\native-gc-test.c",
+        "D:\\a\\neoCLR\\neoCLR\\docs\\experiments\\aot-console\\native-gc.c",
+        "D:\\a\\neoCLR\\neoCLR\\docs\\experiments\\aot-console\\root-probe.c"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-host-validation\\collector-contract.exe"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "cl",
+        "/nologo",
+        "/W4",
+        "/WX",
+        "/std:c11",
+        "/experimental:c11atomics",
+        "/O2",
+        "/MT",
+        "/Fe:host-stack.exe",
+        "D:\\a\\neoCLR\\neoCLR\\tools\\native\\windows-native-stack.c",
+        "D:\\a\\neoCLR\\neoCLR\\tools\\native\\windows-native-stack-test.c",
+        "D:\\a\\neoCLR\\neoCLR\\tools\\native\\windows-gc-host.c",
+        "D:\\a\\neoCLR\\neoCLR\\tools\\native\\windows-host-memory.c",
+        "D:\\a\\neoCLR\\neoCLR\\docs\\experiments\\aot-console\\native-gc.c",
+        "D:\\a\\neoCLR\\neoCLR\\docs\\experiments\\aot-console\\root-probe.c"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-host-validation\\host-stack.exe"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "rustc",
+        "--version",
+        "--verbose"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "cargo",
+        "test",
+        "--locked",
+        "--manifest-path",
+        "D:\\a\\neoCLR\\neoCLR\\tools\\aot-poc\\Cargo.toml",
+        "--test",
+        "windows_stack"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "cargo",
+        "test",
+        "--locked",
+        "--manifest-path",
+        "D:\\a\\neoCLR\\neoCLR\\tools\\aot-poc\\Cargo.toml",
+        "--bin",
+        "neoclr-aot-poc",
+        "windows_final_frame_limit"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\debug\\neoclr-aot-poc.exe",
+        "D:\\a\\neoCLR\\neoCLR\\tools\\native\\windows-generated-stack.neoil",
+        "Calculate",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-host-validation\\generated-stack.obj",
+        "--target",
+        "x86_64-pc-windows-msvc",
+        "--windows-stack-experiment",
+        "--reference-arena",
+        "--native-gc",
+        "--native-stack-budget"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "dumpbin",
+        "/disasm",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-host-validation\\generated-stack.obj"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "cl",
+        "/nologo",
+        "/W4",
+        "/WX",
+        "/std:c11",
+        "/experimental:c11atomics",
+        "/O2",
+        "/MT",
+        "/DNEOCLR_NATIVE_GC",
+        "/Fe:generated-stack.exe",
+        "D:\\a\\neoCLR\\neoCLR\\tools\\native\\windows-generated-stack-test.c",
+        "D:\\a\\neoCLR\\neoCLR\\tools\\native\\windows-gc-host.c",
+        "D:\\a\\neoCLR\\neoCLR\\tools\\native\\windows-native-stack.c",
+        "D:\\a\\neoCLR\\neoCLR\\tools\\native\\windows-host-memory.c",
+        "D:\\a\\neoCLR\\neoCLR\\docs\\experiments\\aot-console\\native-gc.c",
+        "D:\\a\\neoCLR\\neoCLR\\docs\\experiments\\aot-console\\root-probe.c",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-host-validation\\generated-stack.obj"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-host-validation\\generated-stack.exe"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\debug\\neoclr-aot-poc.exe",
+        "D:\\a\\neoCLR\\neoCLR\\tools\\native\\windows-generated-heap.neoil",
+        "Calculate",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-host-validation\\generated-heap.obj",
+        "--target",
+        "x86_64-pc-windows-msvc",
+        "--windows-heap-experiment",
+        "--reference-arena",
+        "--native-gc",
+        "--native-stack-budget"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "cl",
+        "/nologo",
+        "/W4",
+        "/WX",
+        "/std:c11",
+        "/experimental:c11atomics",
+        "/O2",
+        "/MT",
+        "/DNEOCLR_NATIVE_GC",
+        "/Fe:generated-heap.exe",
+        "D:\\a\\neoCLR\\neoCLR\\tools\\native\\windows-generated-heap-test.c",
+        "D:\\a\\neoCLR\\neoCLR\\tools\\native\\windows-gc-host.c",
+        "D:\\a\\neoCLR\\neoCLR\\tools\\native\\windows-native-stack.c",
+        "D:\\a\\neoCLR\\neoCLR\\tools\\native\\windows-host-memory.c",
+        "D:\\a\\neoCLR\\neoCLR\\docs\\experiments\\aot-console\\native-gc.c",
+        "D:\\a\\neoCLR\\neoCLR\\docs\\experiments\\aot-console\\root-probe.c",
+        "D:\\a\\neoCLR\\neoCLR\\docs\\experiments\\aot-console\\text-arena.c",
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-host-validation\\generated-heap.obj"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\windows-host-validation\\generated-heap.exe"
+      ],
+      "exitCode": 0
+    }
+  ],
+  "revision": "fcc077d7fd011c1bf82eb7fc6268a3bca733a808",
+  "inputs": {
+    "tools/native/windows-host-memory.c": "ad68495b2bee5a2a0050cad91bea79f767579bf70f01fca15d4727cd5a6ea7e7",
+    "tools/native/windows-host-memory.h": "55fe190e0cc03b5463c1f8566a93ff6685468312c2cb7eb32bf1d7d14f7b5fcc",
+    "tools/native/windows-host-memory-test.c": "3b448644760a82f4786ff938fbee39829418334feeb7d6963d08d9c1ce0b2d1f",
+    "tools/native/windows-gc-host.c": "1af29df8568c25d43fc95c24be354e7486b09901878b5b99cb6e8b2d190ef03a",
+    "tools/native/windows-gc-host.h": "f9e0d59e9b4811e6ea7f0f5fe5d13824d1e16c14f5c0532dbbe1357a75f8987e",
+    "tools/native/windows-gc-host-test.c": "daacecfc7e71fce637e8b3ce9c96221a59864f00cf674c6b7eaca8936762759d",
+    "tools/native/windows-native-stack.c": "86f4ecaaf6a161e943c63976f96c441cc6385394b29640c72fddede3d8efe4ec",
+    "runtime/native/async/native-runtime.c": "3e468fdf02f2e124b293b4303c85d4bb0de33ca445181070704259567968d29e",
+    "runtime/native/async/native-runtime.h": "f77577df4c154f00bcd53ca9749f1250f4b928753d835c5cd40aa4a0fcf6b642",
+    "runtime/native/diagnostics/attach.c": "464882fc743dbc761a81c5e4e4f0a73bb48490b02287b1d130b0d51e59bed7fc",
+    "runtime/native/diagnostics/attach.h": "d2c89948e8eb7447919b954db31a3b00eb518611aa65fc4362d244b452a7a3ac",
+    "runtime/native/faults/fault-details.h": "ff09aee456b338eef6c123ebcc60f428acea32720b7bef45910e22b9953c5ed9",
+    "runtime/native/faults/render.c": "e650b004a256f448509d80d8c574873520a469a6801cd32f8e7b99c3fb30a439",
+    "runtime/native/gc/native-gc.c": "468ede57b234d8f47b27ae182becf2644fe835349a27028aab957ce06fc98f70",
+    "runtime/native/gc/native-gc.h": "8bef670cce85582df053d6195a15aeff7ccf9cf61aec4bcce43f8ca1710f422a",
+    "runtime/native/gc/root-probe.c": "cd0ef22e957cb969f12d2230eaac7cf7c39c1be4124fe56507b0c6ece77cbf97",
+    "runtime/native/gc/root-probe.h": "ea3c8ea415619121ec354deda550e27055ceabbe05a489c8a2f631568e9acfb7",
+    "runtime/native/memory/text-arena.c": "b0c59381eba6400a32406bc0492a9909b05cf745fe1bf9ab1ae8c1c4e677a696",
+    "runtime/native/memory/text-arena.h": "4ef9b06c89581eee4cbdcb52b85e2d84c798a885830511ee077641f66e1ba056",
+    "docs/experiments/aot-console/native-gc.c": "fb16012609473203b6a17315c3294c69cc7a07f9dc0d4182854b921ae22601d5",
+    "docs/experiments/aot-console/native-gc-test.c": "1dab35c9a8afee918ab77ae1752ff150c2820737dc52c6450dbc7c425faf463f",
+    "docs/experiments/aot-console/root-probe.c": "5c97b9cb3f2ba2b262e3749d73fe3d6fe6004e1dcd54b09af975fbd22ccdc0b2",
+    "docs/experiments/aot-console/native-gc.h": "f3589dff32ac56191ad3f9b77e116ec69dc8197f84317424518e19d307a5bd67",
+    "docs/experiments/aot-console/root-probe.h": "d2a8e481d39cd528d9c67f4f3026d9ac611ff0d636078a5f20dbb6884996ed8c",
+    "docs/experiments/aot-console/text-arena.h": "1bdeed01520a810d71d88c4c0e9a814323cc55d363554f6888e162cbee9e3a52",
+    "docs/experiments/aot-console/native-stack.h": "e4cec17c036469051fd10b934c04e7b7af06e4f1c5db2f73cd339f4180583105",
+    "docs/experiments/aot-fault-details/fault-details.h": "dd4a9e47bdc95e95cce57065bccebfcdbd6af113bd67db3606274f0184d9f346",
+    "tools/native/windows-native-stack-test.c": "fbcb311c72e58e7a016dc66f97c3dad249e296b51517bce0534b336d8ba71d5c",
+    "tools/native/windows-generated-stack.neoil": "ff0605007b8ca41ad64ecc57cd42bcb7d6a5da74c7ad05acd895d9af9263ce13",
+    "tools/native/windows-generated-stack-test.c": "3c5524c5bcdd08911e385f8e84a329e6dc64530851ba0d73f6a7cdbc4ce4cfe2",
+    "tools/aot-poc/src/bindings.rs": "27cbf48c62da3907731bb241e4bb75f1215d70b7dbd7a4418cc55d2b16673109",
+    "tools/aot-poc/src/boxing.rs": "e10436da5a1ff869c0a17b5c179f2d2d8da17b3adb1f62eb0646c283d695f965",
+    "tools/aot-poc/src/class_dispatch.rs": "1da31be7ac6c93cc70afda2081b8b1eaf5f349c0b413d49f116122ebbf9f1425",
+    "tools/aot-poc/src/compiler.rs": "887255b4972a5630fb6c6b7c5f83f8aa25855e5f920df55c0cfc13d019792a23",
+    "tools/aot-poc/src/fault_details.rs": "861428ea581404778efcc7c5f36a8dde183d0a979ae1aa92168b5413bc0192db",
+    "tools/aot-poc/src/flow.rs": "8f06e74b3c5b0eefcb936906a861879de12703e35c0d22d590247fbd07fc30d2",
+    "tools/aot-poc/src/gc_layout.rs": "56356d81509ccd38d811fae982e2ce150b031a5c1a76001dd90638054f227ffe",
+    "tools/aot-poc/src/gc_points.rs": "72223d38389436b09f47d7f4e7925e7eb2544131da7a84708c80daaccc15cb27",
+    "tools/aot-poc/src/gc_probe.rs": "e51ff29e756ad2425a0efeeb734fb361193c89bf44f848e9119bf1e6e43ba016",
+    "tools/aot-poc/src/inspection.rs": "8cd793d0ee7a68bf3000d4bbbe66b903721ed268d526d26623359b8cf57d092c",
+    "tools/aot-poc/src/jit.rs": "767eb49df53ffb5fe8b20f13a5289b1957bf64bf0e0f9925d9879aba462cf024",
+    "tools/aot-poc/src/lib.rs": "77b5b5446003f6c77aa849c57973e0bb93237486325c01fefaedfad14b3eaf3e",
+    "tools/aot-poc/src/limits.rs": "4b44f20d524884ac26fee727b25e51a9b0acd37ab7325db41408fc30a6c5aa4d",
+    "tools/aot-poc/src/linking.rs": "1bac2d36aafb80b91c6a228cd85e374c47a77ee46e6456860d3718f671213599",
+    "tools/aot-poc/src/main.rs": "3b33d78ee37382b3311f932363cd2639a976097ba125dcfd113875e4652322c1",
+    "tools/aot-poc/src/object_upcasts.rs": "5db44a52abed6c65c7e51377642a9d2b1c0473537e12ee82a298d659d7bdb7bb",
+    "tools/aot-poc/src/reflection_arrays.rs": "b2f04fd75c48d092f67ef11a11a0ae2b9ab23086d37b1eeafda73903d3a8ca22",
+    "tools/aot-poc/src/reflection_collections.rs": "6f7f705b5cd9d33a8440a8a107d0168c3beb427401c09387e992cf0f81167404",
+    "tools/aot-poc/src/reflection_construction.rs": "7affb6063010c752174341215d85a5d08f67cebf669ad3394141b81dc5323495",
+    "tools/aot-poc/src/reflection_metadata.rs": "43a9c6dbca13b3c67ef660cb58257c1ea130bde5dce781ee82f1588eedad5d7a",
+    "tools/aot-poc/src/reflection_properties.rs": "31013c417b8b55610403a0109c1c8cad88cea154d3f2001d8244e78c37f5aa9a",
+    "tools/aot-poc/src/reflection_snapshots.rs": "dee11a11dedfd76cfde54faa2e2e32aa78faf221c5e63eea8107a87316d7cdb7",
+    "tools/aot-poc/src/runtime_context.rs": "76f67dd8a629720228bae9f5c920e4c2f42a7cfd7669ab13c853eb9eb0ba5f4a",
+    "tools/aot-poc/src/selection.rs": "c4c7064a288ded918c0cdca0414bf43173b594816482f6bea4bebdbc23381f88",
+    "tools/aot-poc/src/specialization.rs": "1edb795959fb84c08c63009ae81bf82c34a331639c95aad6f87c6e394084615e",
+    "tools/aot-poc/src/string_projection.rs": "2a0c5ed30df235b6bace4d4082d38159822ceb171242aa1c91cc05240bad4cba",
+    "tools/aot-poc/src/values.rs": "f3757eea4b314415a16fd9f8c1cd89030249f3b777e7cf1f1c84baf7dd6c109e",
+    "tools/aot-poc/src/value_profile.rs": "9572dd3b5d41153d0fc12ea8c1631a05754e9d922e077573ea60593faa9bd5c7",
+    "tools/aot-poc/Cargo.toml": "6b2cef26df54fe1bfeb079e995c9fb801af760425f190368fb9a5026a7ab7f92",
+    "Cargo.lock": "95e09bfe931477388fb0d0da7a8f3ba1e4650036e81beb1bd41f1063912cba6a",
+    "tools/native/windows-generated-heap.neoil": "649e01abe26b3663231911ec64435b93511ef3239b923b7908922b1a73524dcb",
+    "tools/native/windows-generated-heap-test.c": "8cccf190c0245e5580fa1e27e2bcfa1e370c241c7fc0c970b4d8597b7a3157c7",
+    "docs/experiments/aot-console/text-arena.c": "bdf8aee6550ce283afda67a3236d0da9a6295c4cd28a24f33ed80ef2e219c2e8"
+  },
+  "execution": {
+    "exitCode": 0,
+    "stdout": "Windows guarded heap: 18 allocation lifecycles passed\r\n",
+    "stderr": "",
+    "allocationLifecycles": 18
+  },
+  "collectorExecution": {
+    "exitCode": 0,
+    "stdout": "Windows collector: rooted graph, frame handoff, thread isolation, exhaustion and cleanup passed\r\n",
+    "stderr": ""
+  },
+  "collectorContract": {
+    "exitCode": 0
+  },
+  "stackExecution": {
+    "passed": true,
+    "smallStackRejected": true,
+    "fiberAccepted": true,
+    "depth512KiB": 15,
+    "depth1MiB": 46
+  },
+  "compilerSha256": "5ccd5c3315a169d081b182fd2b4e15471ba3c5b8a1bdaf9b98c6972f90c22033",
+  "generatedStackExecution": {
+    "passed": true,
+    "smallStackRejected": true,
+    "snapshots512KiB": 54,
+    "snapshots1MiB": 166,
+    "reusePassed": true
+  },
+  "generatedHeapExecution": {
+    "passed": true,
+    "invocations": 4,
+    "allocations": 408,
+    "heapBytes": 2048,
+    "liveRootsPreserved": true,
+    "faultCleanup": true,
+    "reusePassed": true
+  },
+  "files": {
+    "build.stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "build.stdout.log": "6ffe2c3c4d89c5349ba24d6b40ca8a333e5f5b28a5d6df835247500ed75bc65d",
+    "collector-build.stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "collector-build.stdout.log": "b3b4b0b3d51951b35165d78c42c259072efb006962bc7e657344bd21a111e053",
+    "collector-contract-build.stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "collector-contract-build.stdout.log": "43382405b027e5d7f7422cba2a504c986e483141fddb9fde86cc2f4221f1a744",
+    "collector-contract-execute.stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "collector-contract-execute.stdout.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "collector-contract.exe": "d824cb9899b2a7b8627416d53eaa0252460a1c85c0809e1c95cebe3e29f1671e",
+    "collector-execute.stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "collector-execute.stdout.log": "989810d33565bee0a0e5bedb0354f266c94b27c562f190287b998bcaafa10277",
+    "execute.stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "execute.stdout.log": "da832bf6672e6f3df9a81c748e18c42148ff82cb4dfc66c3a39b29ad5ee2dfb4",
+    "generated-build.stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "generated-build.stdout.log": "f394bf75b54bddc45fc07e750c367a6b3b03a5fd91e3ecc7d644f7271d564fec",
+    "generated-compile.stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "generated-compile.stdout.log": "bd07ca7892c41220783e44eb866b31be143458b1bb300e12e1bfd88cda3d26b2",
+    "generated-contract.stderr.log": "937937f64ce9fd9d4782059b2ab76a7544886e670739ce1d5d9d468973131fd9",
+    "generated-contract.stdout.log": "2e9c0f2ac73bca4213d647f03f88f23050b97e5ae160fb50b63cfa68a67c9265",
+    "generated-disassembly.stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "generated-disassembly.stdout.log": "1345f82233ae341e96a18b7aac39ced6a82b485600ef853b8b52d121c513ddaa",
+    "generated-execute.stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "generated-execute.stdout.log": "0cb8e39f9be9ee731875d29caebd15b8c7fd442532b58494e601e07d8d1f7eb2",
+    "generated-frame-boundary.stderr.log": "aa9c172598df99b65259e7ca8f1e9ddad45c9d0ccb70c2ba594c4e52974bacaf",
+    "generated-frame-boundary.stdout.log": "df166913f47ff1f04202cae9b31df67ed272d692d99a0023a8117dc3029100dd",
+    "generated-heap.exe": "b0f25c30d627242322eeb42b3f32b3bff020c9b936cec8d7356f9e9932eb042a",
+    "generated-heap.obj": "28430e7463a555abc87583aa427b7a13daec5f7365df78beedc2085686ea105d",
+    "generated-stack.exe": "6fd75f61e143f3468c7c14d397cf766d85ec04b717a924b9d59c19d967bb23b9",
+    "generated-stack.obj": "1d3c8ec3ee9a2abff264c8e99bfd7e2f4fccf6dd44a59325b2b52d4e2d1aec94",
+    "heap-build.stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "heap-build.stdout.log": "c504e2239acbd375aa244b7b60c9d2ba8bc643e5fdf3be8644df0189a0e89979",
+    "heap-compile.stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "heap-compile.stdout.log": "bd07ca7892c41220783e44eb866b31be143458b1bb300e12e1bfd88cda3d26b2",
+    "heap-execute.stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "heap-execute.stdout.log": "b246db297825eca9a0e8a84e44e81a21cfd8269cf80ae74f0557725a2d5b230e",
+    "host-collector.exe": "fcb8ef6badaf52f91b629a9ed7bea1df21645557ad56d36e37a6ab7fd1567ff9",
+    "host-memory.exe": "a39dc1bd533d3e176d8fb24185c6e5575148c61f3cfddfdc0c0d3bc5f0f2d6aa",
+    "host-stack.exe": "c1abd33f2cf7bbcbdd76a32f5fc34054b14db5aedcdffd65a5f76cdb69f1ef22",
+    "native-gc-test.obj": "42c6e1cd4e6a1a27ac72d73cdd6fc93621ab4340c726e24f528d9990bc6b6bcc",
+    "native-gc.obj": "dfb86583853b578c15cebcd1d0d75d32738c8b32be03f55d105eb62f1cecf491",
+    "revision.stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "revision.stdout.log": "4a9d1ea16e8c008590216b29ad13e8a10cb49312d06acaebd675d32a0f79dc89",
+    "root-probe.obj": "9cd16430006915ea673ef10813f7e233b2e05d474a1167025ba84141298f732a",
+    "rust-toolchain.stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "rust-toolchain.stdout.log": "5477f9bad65b15c4c5b31fc050fc72feba651ea1b330bc75cf356a4d6b0fbc80",
+    "stack-build.stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stack-build.stdout.log": "b10b3848e105e39e16a172887cd95148230376b4237a3b6b467ebee838451193",
+    "stack-execute.stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stack-execute.stdout.log": "ee51903ac7143e4e8c378df32052b4d71150678e99846cd0b6716522592e7d05",
+    "text-arena.obj": "5ffcec351177a9994a4dd69b2764403b73aea6ab934408350381738f533e37a1",
+    "windows-gc-host-test.obj": "bc1e0fc728225d044fd6644950f30f85d9d3106693c862b91075b11ae3e9c8bf",
+    "windows-gc-host.obj": "68770e96799da7f1054b66d674effca194345950edba1be847a6a32d4e5f3a84",
+    "windows-generated-heap-test.obj": "fa1e5afa359310043a0c9658178c1d637fdcbde6cd169b489e3e8bd0a315ce69",
+    "windows-generated-heap.neoil": "649e01abe26b3663231911ec64435b93511ef3239b923b7908922b1a73524dcb",
+    "windows-generated-stack-test.obj": "158f18b9b7feab4273e07f213b918d25d87f89d1c5c243f394fbe1cdb98af0fe",
+    "windows-generated-stack.neoil": "ff0605007b8ca41ad64ecc57cd42bcb7d6a5da74c7ad05acd895d9af9263ce13",
+    "windows-host-memory-test.obj": "1e93ca68cf257a2e90d0a20c959b6777c4bb14a4066d9625594afa437c60d4e1",
+    "windows-host-memory.obj": "b9c6f81e5efc282d84b05cbd510ad3ce59e9a6a707c7db99adcd28e3060b3c80",
+    "windows-native-stack-test.obj": "b754c6732e362a58679a6df7705447d57306e3d1819aff25612dd6f7f4534e40",
+    "windows-native-stack.obj": "884e370f69d76f4777bf92d455668a5b82ecef6a2af076990db7434c6e22ef27"
+  }
+}

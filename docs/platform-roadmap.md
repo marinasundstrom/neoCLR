@@ -20,6 +20,15 @@ integration qualification is complete (2026-10-13); this is not an open-ended
 restructuring prerequisite. This integration direction complements the performance work below;
 prototype pacing and unqualified targets are not promoted by packaging changes.
 
+**SDK runtime-await integration (author direction, 2026-10-13):** rebuilt SDKs
+select the existing explicit native compiler contract and carry the private await
+and generator providers. The runtime-owned carrier now includes Windows x64 fibers
+alongside macOS ARM64; GC/root and Windows stack-host gates pass. Application
+qualification and exact build requirements are tracked in the
+[integration record](runtime-product-integration.md#sdk-default-runtime-await-integration--2026-10-13).
+Keep explicit state-machine fallback and existing library bootstrap lowering.
+Ordinary Raven/.NET lowering and collection pacing defaults are unchanged.
+
 **Native handle admission (2026-10-13):** [one-walk exact-base admission](../benchmarks/gc-handles/README.md)
 removes repeated heap walks for host handles and related owner checks while retaining
 trailing-corruption rejection and failure atomicity. Local late-base cases improve

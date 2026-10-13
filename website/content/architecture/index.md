@@ -91,10 +91,12 @@ Broader native parity, native hot reload and trimming remain future work.
 [Setup](../try/) describes the available toolchain, and
 [native compilation](../features/native-compilation/) lists its execution limits.
 
-**Direction:** runtime-await is the intended default for neoCLR. The current native
-retained-stack carrier is qualified on macOS ARM64; Windows suspension and the
-provider/SDK integration remain work before a general default switch. Compiler
-state machines remain an explicit fallback. This is independent of GC pacing.
+**Development:** rebuilt SDKs select runtime-await for neoCLR applications, with
+native carriers for macOS ARM64 and Windows x64. Matching runtime and JIT helpers
+are required; this does not update already installed SDKs. Compiler state machines
+remain an explicit fallback, and existing library bootstrap lowering is retained.
+See the [integration qualification](https://github.com/marinasundstrom/neoCLR/blob/main/docs/runtime-product-integration.md#sdk-default-runtime-await-integration--2026-10-13).
+This is independent of GC pacing.
 Memory-management boundaries also leave room for future specialized distributions;
 swappable collectors or general non-GC managed execution are not current features.
 

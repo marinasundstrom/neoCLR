@@ -68,8 +68,10 @@ checks on macOS ARM64 and Windows x64 in interpreter, JIT and AOT modes. The che
 cover certificate rejection and recovery, deadlines and cancellation. Windows also
 passes independent TLS 1.2/1.3 interoperability cases.
 
-Windows JIT uses compiler-generated async state machines. Runtime-owned suspension
-has separate target coverage; these results do not enable it on Windows. See
+Those published Windows JIT checks use compiler-generated async state machines.
+Rebuilt development SDKs now select runtime-owned suspension with matching Windows
+x64 and macOS ARM64 hosts; see the separate [development qualification](https://github.com/marinasundstrom/neoCLR/blob/main/docs/runtime-product-integration.md#sdk-default-runtime-await-integration--2026-10-13).
+The published Preview 14 evidence does not qualify that newer lowering. See
 [release availability](/try/#development) and the
 [qualification record](https://github.com/marinasundstrom/neoCLR/blob/main/docs/experiments/release-20261013/README.md)
 for the matching builds and tested scope.

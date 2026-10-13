@@ -1,0 +1,338 @@
+{
+  "passed": true,
+  "platform": "Windows-2022Server-10.0.20348-SP0",
+  "machine": "AMD64",
+  "commands": [
+    {
+      "command": [
+        "git",
+        "-C",
+        "D:\\a\\neoCLR\\neoCLR",
+        "rev-parse",
+        "HEAD"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "cl",
+        "/nologo",
+        "/W4",
+        "/WX",
+        "/std:c11",
+        "/experimental:c11atomics",
+        "/O2",
+        "/MT",
+        "/DNEOCLR_NATIVE_GC",
+        "/DNEOCLR_CLIENT_TEST",
+        "D:\\a\\neoCLR\\neoCLR\\docs\\experiments\\aot-console\\socket-listener-test.c",
+        "D:\\a\\neoCLR\\neoCLR\\docs\\experiments\\aot-console\\socket-listener.c",
+        "D:\\a\\neoCLR\\neoCLR\\docs\\experiments\\aot-console\\native-gc.c",
+        "D:\\a\\neoCLR\\neoCLR\\docs\\experiments\\aot-console\\root-probe.c",
+        "D:\\a\\neoCLR\\neoCLR\\docs\\experiments\\aot-console\\text-arena.c",
+        "/Fe:D:\\a\\neoCLR\\neoCLR\\target\\native-network-validation\\listener.exe",
+        "/link",
+        "Ws2_32.lib"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\native-network-validation\\listener.exe"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "cl",
+        "/nologo",
+        "/W4",
+        "/WX",
+        "/std:c11",
+        "/experimental:c11atomics",
+        "/O2",
+        "/MT",
+        "/DNEOCLR_NATIVE_GC",
+        "/DNEOCLR_CLIENT_TEST",
+        "D:\\a\\neoCLR\\neoCLR\\docs\\experiments\\aot-console\\socket-accept-test.c",
+        "D:\\a\\neoCLR\\neoCLR\\docs\\experiments\\aot-console\\socket-listener.c",
+        "D:\\a\\neoCLR\\neoCLR\\docs\\experiments\\aot-console\\native-gc.c",
+        "D:\\a\\neoCLR\\neoCLR\\docs\\experiments\\aot-console\\root-probe.c",
+        "D:\\a\\neoCLR\\neoCLR\\docs\\experiments\\aot-console\\text-arena.c",
+        "/Fe:D:\\a\\neoCLR\\neoCLR\\target\\native-network-validation\\accept.exe",
+        "/link",
+        "Ws2_32.lib"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\native-network-validation\\accept.exe"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "cl",
+        "/nologo",
+        "/W4",
+        "/WX",
+        "/std:c11",
+        "/experimental:c11atomics",
+        "/O2",
+        "/MT",
+        "/DNEOCLR_NATIVE_GC",
+        "/DNEOCLR_CLIENT_TEST",
+        "D:\\a\\neoCLR\\neoCLR\\docs\\experiments\\aot-console\\socket-transfer-test.c",
+        "D:\\a\\neoCLR\\neoCLR\\docs\\experiments\\aot-console\\socket-listener.c",
+        "D:\\a\\neoCLR\\neoCLR\\docs\\experiments\\aot-console\\native-gc.c",
+        "D:\\a\\neoCLR\\neoCLR\\docs\\experiments\\aot-console\\root-probe.c",
+        "D:\\a\\neoCLR\\neoCLR\\docs\\experiments\\aot-console\\text-arena.c",
+        "/Fe:D:\\a\\neoCLR\\neoCLR\\target\\native-network-validation\\transfer.exe",
+        "/link",
+        "Ws2_32.lib"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\native-network-validation\\transfer.exe"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "cl",
+        "/nologo",
+        "/W4",
+        "/WX",
+        "/std:c11",
+        "/experimental:c11atomics",
+        "/O2",
+        "/MT",
+        "/DNEOCLR_NATIVE_GC",
+        "/DNEOCLR_CLIENT_TEST",
+        "D:\\a\\neoCLR\\neoCLR\\docs\\experiments\\aot-console\\socket-client-test.c",
+        "D:\\a\\neoCLR\\neoCLR\\docs\\experiments\\aot-console\\socket-listener.c",
+        "D:\\a\\neoCLR\\neoCLR\\docs\\experiments\\aot-console\\native-gc.c",
+        "D:\\a\\neoCLR\\neoCLR\\docs\\experiments\\aot-console\\root-probe.c",
+        "D:\\a\\neoCLR\\neoCLR\\docs\\experiments\\aot-console\\text-arena.c",
+        "/Fe:D:\\a\\neoCLR\\neoCLR\\target\\native-network-validation\\client.exe",
+        "/link",
+        "Ws2_32.lib"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\native-network-validation\\client.exe"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "cl",
+        "/nologo",
+        "/W4",
+        "/WX",
+        "/std:c11",
+        "/experimental:c11atomics",
+        "/O2",
+        "/MT",
+        "/DNEOCLR_NATIVE_GC",
+        "/DNEOCLR_CLIENT_TEST",
+        "D:\\a\\neoCLR\\neoCLR\\docs\\experiments\\aot-console\\socket-timer-test.c",
+        "D:\\a\\neoCLR\\neoCLR\\docs\\experiments\\aot-console\\socket-listener.c",
+        "D:\\a\\neoCLR\\neoCLR\\docs\\experiments\\aot-console\\native-gc.c",
+        "D:\\a\\neoCLR\\neoCLR\\docs\\experiments\\aot-console\\root-probe.c",
+        "D:\\a\\neoCLR\\neoCLR\\docs\\experiments\\aot-console\\text-arena.c",
+        "/Fe:D:\\a\\neoCLR\\neoCLR\\target\\native-network-validation\\timer.exe",
+        "/link",
+        "Ws2_32.lib"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\native-network-validation\\timer.exe"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "cl",
+        "/nologo",
+        "/W4",
+        "/WX",
+        "/std:c11",
+        "/experimental:c11atomics",
+        "/O2",
+        "/MT",
+        "/DNEOCLR_NATIVE_GC",
+        "/DNEOCLR_CLIENT_TEST",
+        "D:\\a\\neoCLR\\neoCLR\\docs\\experiments\\aot-console\\socket-scheduler-test.c",
+        "D:\\a\\neoCLR\\neoCLR\\docs\\experiments\\aot-console\\socket-listener.c",
+        "D:\\a\\neoCLR\\neoCLR\\docs\\experiments\\aot-console\\native-gc.c",
+        "D:\\a\\neoCLR\\neoCLR\\docs\\experiments\\aot-console\\root-probe.c",
+        "D:\\a\\neoCLR\\neoCLR\\docs\\experiments\\aot-console\\text-arena.c",
+        "D:\\a\\neoCLR\\neoCLR\\docs\\experiments\\aot-console\\task-queue.c",
+        "/Fe:D:\\a\\neoCLR\\neoCLR\\target\\native-network-validation\\scheduler.exe",
+        "/link",
+        "Ws2_32.lib"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\native-network-validation\\scheduler.exe"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "cl",
+        "/nologo",
+        "/W4",
+        "/WX",
+        "/std:c11",
+        "/experimental:c11atomics",
+        "/O2",
+        "/MT",
+        "/DNEOCLR_NATIVE_GC",
+        "/DNEOCLR_CLIENT_TEST",
+        "/DNEOCLR_GC_PACED",
+        "D:\\a\\neoCLR\\neoCLR\\docs\\experiments\\aot-console\\socket-scheduler-test.c",
+        "D:\\a\\neoCLR\\neoCLR\\docs\\experiments\\aot-console\\socket-listener.c",
+        "D:\\a\\neoCLR\\neoCLR\\docs\\experiments\\aot-console\\native-gc.c",
+        "D:\\a\\neoCLR\\neoCLR\\docs\\experiments\\aot-console\\root-probe.c",
+        "D:\\a\\neoCLR\\neoCLR\\docs\\experiments\\aot-console\\text-arena.c",
+        "D:\\a\\neoCLR\\neoCLR\\docs\\experiments\\aot-console\\task-queue.c",
+        "/Fe:D:\\a\\neoCLR\\neoCLR\\target\\native-network-validation\\scheduler-paced.exe",
+        "/link",
+        "Ws2_32.lib"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "D:\\a\\neoCLR\\neoCLR\\target\\native-network-validation\\scheduler-paced.exe"
+      ],
+      "exitCode": 0
+    }
+  ],
+  "cases": [
+    {
+      "name": "listener",
+      "passed": true
+    },
+    {
+      "name": "accept",
+      "passed": true
+    },
+    {
+      "name": "transfer",
+      "passed": true
+    },
+    {
+      "name": "client",
+      "passed": true
+    },
+    {
+      "name": "timer",
+      "passed": true
+    },
+    {
+      "name": "scheduler",
+      "passed": true
+    },
+    {
+      "name": "scheduler-paced",
+      "passed": true
+    }
+  ],
+  "revision": "aaab0f9cfd4f31e400b46977075b0cb6afadb19b",
+  "inputs": {
+    "docs/experiments/aot-console/socket-os.h": "c2851391b925acf6a362906b835e14bdb28a562e999cc88479a11a0c65a9736e",
+    "docs/experiments/aot-console/socket-client-internal.h": "cd81752f5cecca33b74d306feb311485340b810f8951fb82d3f91f635b16fc0c",
+    "docs/experiments/aot-console/socket-client-test.c": "2697a693363d7a9746f3eb535f9eac40fd3fa6c0befe2cec3f53f80b024cc86a",
+    "docs/experiments/aot-console/socket-listener.h": "4b08f431e82986b13092786b8c7a431408c4c7d5172f3815499546a1b531268b",
+    "docs/experiments/aot-console/socket-listener.c": "b0fba32ec1436698f530a89f96509759f9d39b224b34ade1b496a1a73389e292",
+    "docs/experiments/aot-console/socket-listener-test.c": "526374f956bf91c5bf1d62f6dc5ffe1eb1099166bb0b896926d38ec1312856a1",
+    "docs/experiments/aot-console/socket-accept-test.c": "2c81d32a629ff7a7796d0ca18a99d56b085929b2df3b2f56da8714b6526daeba",
+    "docs/experiments/aot-console/socket-transfer-test.c": "8232c018b5ddfe34091f9c255b7f673b126e0597428bafdc0b86cdfe5b14ced6",
+    "docs/experiments/aot-console/socket-timer-test.c": "787aa4a681fba3b474e10a4c6809edbf082a6c3be388500f3de6b5d3b155c135",
+    "docs/experiments/aot-console/socket-scheduler-test.c": "8a4cd19b44b808b756d105b1427a0f7cb6023222ab67beb54b211e922d8923e8",
+    "docs/experiments/aot-console/task-queue.c": "a23468e0a0bf0ebc8221802c7683c25eb3b73ab190f49aba17db5df6d399f017",
+    "docs/experiments/aot-console/task-queue.h": "b28695014eed2fa8304b078d7bba002ebbd8d71bb86a4643e0092b794cfe3654",
+    "docs/experiments/aot-console/native-gc.c": "fb16012609473203b6a17315c3294c69cc7a07f9dc0d4182854b921ae22601d5",
+    "docs/experiments/aot-console/native-gc.h": "f3589dff32ac56191ad3f9b77e116ec69dc8197f84317424518e19d307a5bd67",
+    "docs/experiments/aot-console/root-probe.c": "5c97b9cb3f2ba2b262e3749d73fe3d6fe6004e1dcd54b09af975fbd22ccdc0b2",
+    "docs/experiments/aot-console/root-probe.h": "d2a8e481d39cd528d9c67f4f3026d9ac611ff0d636078a5f20dbb6884996ed8c",
+    "docs/experiments/aot-console/text-arena.c": "bdf8aee6550ce283afda67a3236d0da9a6295c4cd28a24f33ed80ef2e219c2e8",
+    "docs/experiments/aot-console/text-arena.h": "1bdeed01520a810d71d88c4c0e9a814323cc55d363554f6888e162cbee9e3a52",
+    "docs/experiments/aot-fault-details/fault-details.h": "dd4a9e47bdc95e95cce57065bccebfcdbd6af113bd67db3606274f0184d9f346",
+    "scripts/validate-native-network.py": "35b49ddeca1dc0ef4beb1d4929dc300ad378bc4a0399c6a069089f44d8916e2e",
+    "runtime/native/async/native-runtime.c": "3e468fdf02f2e124b293b4303c85d4bb0de33ca445181070704259567968d29e",
+    "runtime/native/async/native-runtime.h": "f77577df4c154f00bcd53ca9749f1250f4b928753d835c5cd40aa4a0fcf6b642",
+    "runtime/native/diagnostics/attach.c": "464882fc743dbc761a81c5e4e4f0a73bb48490b02287b1d130b0d51e59bed7fc",
+    "runtime/native/diagnostics/attach.h": "d2c89948e8eb7447919b954db31a3b00eb518611aa65fc4362d244b452a7a3ac",
+    "runtime/native/faults/fault-details.h": "ff09aee456b338eef6c123ebcc60f428acea32720b7bef45910e22b9953c5ed9",
+    "runtime/native/faults/render.c": "e650b004a256f448509d80d8c574873520a469a6801cd32f8e7b99c3fb30a439",
+    "runtime/native/gc/native-gc.c": "468ede57b234d8f47b27ae182becf2644fe835349a27028aab957ce06fc98f70",
+    "runtime/native/gc/native-gc.h": "8bef670cce85582df053d6195a15aeff7ccf9cf61aec4bcce43f8ca1710f422a",
+    "runtime/native/gc/root-probe.c": "cd0ef22e957cb969f12d2230eaac7cf7c39c1be4124fe56507b0c6ece77cbf97",
+    "runtime/native/gc/root-probe.h": "ea3c8ea415619121ec354deda550e27055ceabbe05a489c8a2f631568e9acfb7",
+    "runtime/native/memory/text-arena.c": "b0c59381eba6400a32406bc0492a9909b05cf745fe1bf9ab1ae8c1c4e677a696",
+    "runtime/native/memory/text-arena.h": "4ef9b06c89581eee4cbdcb52b85e2d84c798a885830511ee077641f66e1ba056"
+  },
+  "files": {
+    "accept-build.stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "accept-build.stdout.log": "3f4d415bb8d1148a73a7554fffe0b4b6202e6223d72ce67508706fc72d09f215",
+    "accept-execute.stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "accept-execute.stdout.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "accept.exe": "d49b05c7b2d4f188efda8b294e3e7653d0ce15030c783752c36d3d9631b2642a",
+    "client-build.stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "client-build.stdout.log": "efa90bddba57b4e194d22b9e945efada4fca1bff5200f7f60126d58a34d6d293",
+    "client-execute.stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "client-execute.stdout.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "client.exe": "c57261ba1dc6a0998b95adc8adb13e9e99990eba3e1a4a07219f3bebbdd9642f",
+    "listener-build.stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "listener-build.stdout.log": "8e2a12741c36b383580b3984eb0e32dbbb7de88490e5ad115fd3ca2bd3ba62f8",
+    "listener-execute.stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "listener-execute.stdout.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "listener.exe": "153715781eb97be4250a7b29cb189f5886e0950f27c883d4abdf76d5f5c18c0a",
+    "native-gc.obj": "82eb36307c2bd64522289334a4c3581bd8e0e215e9c7df4f5ca2f34128fdd635",
+    "revision.stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "revision.stdout.log": "5d509f2cbc0a3e91db6eeb37bc7c8b23f13e51b0726fe5791aeabd9180e793be",
+    "root-probe.obj": "8dcdb366202bbe788978d3792c13b1ea422cbfd27e3f7a8a732b3efb975c1a85",
+    "scheduler-build.stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "scheduler-build.stdout.log": "3213cf655a76feacbfc6085425437da94df0cb7195d1eaa85aa8dd0345ce4120",
+    "scheduler-execute.stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "scheduler-execute.stdout.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "scheduler-paced-build.stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "scheduler-paced-build.stdout.log": "3213cf655a76feacbfc6085425437da94df0cb7195d1eaa85aa8dd0345ce4120",
+    "scheduler-paced-execute.stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "scheduler-paced-execute.stdout.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "scheduler-paced.exe": "c016bc48a51d04dfa7a0b7a9f4b68206671d321cb6f8ab69e259e7db0856021b",
+    "scheduler.exe": "79dfa0abd60ae11ad38f0511a1710bc7848e5fe080de739d197f91daa968dcf4",
+    "socket-accept-test.obj": "e0754e56fe565527a33a9a72a671155c6df47febd6e55b5e92ef8224cf9fae60",
+    "socket-client-test.obj": "032c693ae72e8a35c776b41f37633e92aa20ec0970c714bf785a6fa516fa4a95",
+    "socket-listener-test.obj": "d5cc773743259cdbe5bfbfb545fe5acdafe08d30f7e30e7daf1ff718baf4aafb",
+    "socket-listener.obj": "bb7ed6684a2e8f6828685ee4a691124ddc6510038391a556430a0abad65bb8b5",
+    "socket-scheduler-test.obj": "0added640a0064f2a5eb220b5ed6d2f906de6567bf81ffef9a11a28444e91952",
+    "socket-timer-test.obj": "7b8953224194ab6d9f4bb2b3fdfec7c320ffe0e923bfcb28129945ac78a80c36",
+    "socket-transfer-test.obj": "03709db06cda5ed027852c5c676f2b2fd0cf3db0dea87db5f483e1ed29d8f41a",
+    "task-queue.obj": "804f2d31f8f16cb4da1b0a905bfb42b7d35b12fa088165d13aa5dd1bcc15a252",
+    "text-arena.obj": "2c1a08f64219d1447c2604c317c3f9cd55cf3cb333c303cae7daa8565c821fc8",
+    "timer-build.stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "timer-build.stdout.log": "68532488406ed2353bf269cc9d453d3018e926025536b492eeda2fa996b924ae",
+    "timer-execute.stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "timer-execute.stdout.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "timer.exe": "9dcc63ff54012220713e97be9aef17b85fc027f1a95c35ea472212969558d767",
+    "transfer-build.stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "transfer-build.stdout.log": "0cb840bbfd4fa8e83966e42a9973fb901a5117ce8d2bf21ebe3ff3f2e5d7344d",
+    "transfer-execute.stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "transfer-execute.stdout.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "transfer.exe": "cec01ac83bee54e280f8f4ceecd7fb423e75b8b532ddf3bd5e1bcc9f844b6413"
+  }
+}

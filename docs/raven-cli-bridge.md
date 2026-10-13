@@ -9311,6 +9311,10 @@ experiment file. This source-included, assembly-private provider uses the existi
 explicit Raven Runtime Contract. It does not add public managed API or change
 ordinary Raven/.NET lowering. Existing source-provider type names remain private
 compatibility details, not a new module-authoring convention.
+Remove manually copied provider sources when upgrading; otherwise the SDK and
+project would declare the same helper types. Projects supporting old and rebuilt
+bundles can condition their legacy source include on
+`RavenNeoClrRuntimeAsyncProviderImported != true`.
 
 To select compiler state machines explicitly, place this property **after** the SDK
 import in the project (an empty environment variable alone is not an override):
@@ -9345,9 +9349,11 @@ does not redefine ordinary .NET async behavior or promise Windows ARM64 support.
 Validation: `scripts/validate-runtime-await-sdk.py` rebuilds SDK-default applications
 and an explicit state-machine control, inspects application lowering, stages a
 matching installed JIT bundle, then exercises interpreter/JIT/AOT language, cleanup,
-fault, HTTP server and client cases. The hosted Windows HTTP workflow can run this
-gate with `runtime_await=true`. Full gate evidence is pending while this integration
-is qualified; the preceding raw carrier gate passes on macOS and Windows.
+fault, HTTP server/client and generator cases. The hosted Windows HTTP workflow can run this
+gate with `runtime_await=true`. All 21 macOS SDK cases pass, including generators and the explicit state-machine
+fallback; source hashes remain unchanged through execution. Windows application
+qualification is running. The raw carrier gate passes on both platforms. See
+[retained evidence](https://github.com/marinasundstrom/neoCLR/tree/main/docs/validation/runtime-product/runtime-await-sdk).
 
 The SDK runtime-await source provider includes the companion `RuntimeGenerator.rvn`
 for the existing `BridgeGenerator` compiler contract. It remains internal to each

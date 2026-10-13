@@ -3,6 +3,7 @@ on:
   workflow_dispatch:
   push:
     paths:
+      - 'runtime/native/**'
       - 'tools/native/windows-host-memory*'
       - 'tools/native/windows-gc-host*'
       - 'tools/native/windows-native-stack*'
@@ -21,6 +22,7 @@ on:
       - '.github/workflows/windows-native-host.yml'
   pull_request:
     paths:
+      - 'runtime/native/**'
       - 'tools/native/windows-host-memory*'
       - 'tools/native/windows-gc-host*'
       - 'tools/native/windows-native-stack*'
