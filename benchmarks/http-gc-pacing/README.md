@@ -196,3 +196,22 @@ Every worker reclaims all 20,000 allocations. Collections fall from 20,001 to
 3,840 bytes for strings (about 23%). Timings exclude final idle cleanup; these are
 not scheduler-poll latency or sustained/concurrent application measurements. See
 [qualification and limitations](../../docs/validation/runtime-product/native-scheduler-pacing/README.md).
+
+## Managed HTTP qualification
+
+`qualify-managed.py --bundle BUNDLE --aot BACKEND --runtime RUNTIME --output NEW_DIRECTORY`
+freshly compiles the plain-text and JSON Raven servers, then links identical guest
+objects into stress and paced AOT hosts. JSON uses explicit discovered reflection
+roots, matching the existing benchmark contract. Both variants process the same
+32 requests per process with independent framing/body validation. A warmup pair
+precedes at least three alternating measured pairs; the first eight request times
+in each process are excluded. Separate instrumented processes check allocation
+counts, reclamation and peak arena extent after host teardown. Build commands and
+input hashes are retained. The Windows HTTP project workflow offers `paced_gc` to
+run the same qualification after preparing a matching toolchain.
+
+This measures short sequential, connection-close HTTP, not sustained saturation,
+concurrency, HTTPS or generic JIT performance. Installed defaults are unchanged.
+The .NET comparison remains allocation-pressure budgeting at reported root
+boundaries; this does not add generations or concurrent collection. The expected
+tradeoff is fewer full sweeps versus more retained bytes and synchronous pauses.

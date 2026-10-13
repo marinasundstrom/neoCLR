@@ -1,6 +1,11 @@
 name: Windows native HTTP project
 on:
   workflow_dispatch:
+    inputs:
+      paced_gc:
+        description: Compare stress/paced managed HTTP and retain GC diagnostics
+        type: boolean
+        default: false
   push:
     paths:
       - 'src/**'
@@ -66,6 +71,13 @@ jobs:
           $vs = & "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\vswhere.exe" -latest -products '*' -requires Microsoft.VisualStudio.Component.VC.Tools.x86.x64 -property installationPath
           if (-not $vs) { throw 'MSVC x64 tools not found' }
           cmd /c "`"$vs\VC\Auxiliary\Build\vcvars64.bat`" && python scripts/validate-native-http-project.py --output target/windows-http-project-validation"
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+      - name: Qualify managed HTTP collection pacing
+        if: inputs.paced_gc
+        shell: pwsh
+        run: |
+          $vs = & "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\vswhere.exe" -latest -products '*' -requires Microsoft.VisualStudio.Component.VC.Tools.x86.x64 -property installationPath
+          cmd /c "`"$vs\VC\Auxiliary\Build\vcvars64.bat`" && python benchmarks/http-gc-pacing/qualify-managed.py --bundle `"target/windows-http-project-validation/development toolchain/bundle`" --aot target/debug/neoclr-aot-poc.exe --output target/windows-http-project-validation/managed-pacing"
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
       - uses: actions/upload-artifact@v4
         if: always()
