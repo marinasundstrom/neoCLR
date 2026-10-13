@@ -1923,3 +1923,20 @@ EOF/truncation, abortive disposal, graceful shutdown and current certificate-pol
 gaps. HTTP handler/server options, IsSecure and TLS error cases have member entries.
 These are development APIs; Windows host TLS evidence does not qualify the new
 managed composition. No public SSL type is excluded from RavenDoc selection.
+
+### Incoming HTTP body streams (2026-10-13)
+
+HttpCompletionOption, the Send completion overloads, HttpServer.AcceptHeaders,
+HttpContent.TryGetStream and HttpResponse.Dispose have both aggregate reference
+signatures and native rendered member pages. No new exclusion is needed. The
+[HTTP body guide](http-body-streams.md) describes ownership, error mapping,
+read-ahead and the explicit buffered defaults. Length may now be -1 for an incoming
+unknown-length body; forwarding that content as output remains unsupported.
+
+The native snapshot comes from a verified partial System.Web rebuild over the
+qualified bundle. `update-native-api-snapshot.py` can consume its
+http-foundation-build.json when a whole-library build-evidence.json is absent.
+It records exact HTTP source-set and compiler binary hashes instead of claiming an
+unavailable git revision; per-library artifact hashes retain the mixed bundle's
+identity. The audit retains the build evidence and normalized/restored sidecars.
+This is documentation provenance, not new runtime/compiler capability.

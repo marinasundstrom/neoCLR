@@ -1,12 +1,19 @@
 # neoCLR platform roadmap
 
+**HTTP direction (2026-10-13):** the author reaffirms HTTP specification compliance
+and established byte-oriented, bounded-I/O optimizations. [Streaming evidence and
+next conformance slice](experiments/http-body-stream/README.md#author-direction-protocol-first)
+distinguish current gaps from intended semantics; no relaxation for benchmark gains.
+
 **HTTP admission (2026-10-13):** [concurrent exchange evidence](../benchmarks/http-concurrency/README.md)
 qualifies bounded FIFO acceptance, cancellation and shutdown in interpreter, JIT
 and AOT on macOS. Slow headers and bodies no longer prevent other admitted
 connections from completing. Streaming request/response bodies are the next
 author-directed step. [Known-length server response streams](experiments/http-stream-response/README.md)
-now reuse the client-upload content contract; incoming requests and client responses
-still buffer the full body.
+now reuse the client-upload content contract. [Incoming streams](experiments/http-body-stream/README.md)
+add explicit headers-first APIs on both sides, qualified by 54 local interpreter/JIT/AOT
+cases, buffered controls and full diagnostic reclamation. Existing default calls
+remain buffered; Windows/TLS streaming qualification and streaming JSON are open.
 
 **HTTP comparison matrix (2026-10-13):** Author-directed [retained direct-handler projects](../benchmarks/http-server/platforms.md)
 cover neoCLR JIT/AOT, Kestrel JIT/AOT, Go native and Node V8 without routing. All

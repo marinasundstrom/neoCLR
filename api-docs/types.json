@@ -427,6 +427,7 @@
   "System.Void",
   "System.Web.Http.DelegatingHandler",
   "System.Web.Http.HttpClient",
+  "System.Web.Http.HttpCompletionOption",
   "System.Web.Http.HttpContent",
   "System.Web.Http.HttpContext",
   "System.Web.Http.HttpError",

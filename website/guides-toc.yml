@@ -134,6 +134,10 @@
       href: docs/stack-trace.md
     - name: "Sequence access"
       href: docs/sequence-access.md
+    - name: HTTP body streams (development)
+      href: docs/http-body-streams.md
+    - name: HTTP server lifetime and concurrency
+      href: docs/http-server.md
     - name: TLS streams (development)
       href: docs/ssl-streams.md
 - name: Platform foundations

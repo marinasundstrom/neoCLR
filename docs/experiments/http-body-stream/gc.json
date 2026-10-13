@@ -1,0 +1,264 @@
+{
+  "passed": true,
+  "cases": {
+    "client": {
+      "validation": {
+        "passed": true,
+        "cases": [
+          {
+            "case": 0,
+            "passed": true,
+            "headersBeforeBody": true
+          },
+          {
+            "case": 1,
+            "passed": true,
+            "headersBeforeBody": true
+          },
+          {
+            "case": 2,
+            "passed": true,
+            "headersBeforeBody": true
+          },
+          {
+            "case": 3,
+            "passed": true,
+            "headersBeforeBody": true
+          },
+          {
+            "case": 4,
+            "passed": true,
+            "headersBeforeBody": true
+          },
+          {
+            "case": 5,
+            "passed": true,
+            "headersBeforeBody": true
+          },
+          {
+            "case": 6,
+            "passed": true,
+            "headersBeforeBody": true
+          },
+          {
+            "case": 7,
+            "passed": true,
+            "headersBeforeBody": true
+          },
+          {
+            "case": 8,
+            "passed": true,
+            "headersBeforeBody": true
+          }
+        ],
+        "command": [
+          "/usr/bin/env",
+          "NEOCLR_HTTP_PROFILE_OUTPUT=/Users/robert/Projects/neoclr/target/http-body-stream-gc-v2-20261013/client.json",
+          "/Users/robert/Projects/neoclr/target/http-body-stream-gc-v2-20261013/client",
+          "http://127.0.0.1:61568/"
+        ]
+      },
+      "gc": {
+        "attempts": 100157,
+        "gcNanoseconds": 217377000,
+        "failures": 0,
+        "allocations": 12165,
+        "reclaimed": 12165,
+        "allocatedBytes": 480546,
+        "peakLiveBytes": 12969,
+        "peakArenaBytes": 20648
+      },
+      "command": [
+        "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang",
+        "-isysroot",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.2.sdk",
+        "-arch",
+        "arm64",
+        "-std=c11",
+        "-O2",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-DNEOCLR_NATIVE_GC",
+        "-DNEOCLR_MANAGED_TLS",
+        "-DNEOCLR_HTTP_HEAP_BYTES=33554432",
+        "-DNEOCLR_NATIVE_BYTE_ARRAY_LIMIT=4194304",
+        "-DNEOCLR_ENTRY_ARGUMENTS",
+        "-I",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console",
+        "/Users/robert/Projects/neoclr/benchmarks/native-web/http-host.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/root-probe.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-gc.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/text-arena.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/console.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-stack.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-scalar/console.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-fault-details/render.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/task-queue.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/socket-listener.c",
+        "/Users/robert/Projects/neoclr/tools/native/entry-arguments.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/string-unicode.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/tls-managed.c",
+        "/Users/robert/Projects/neoclr/target/http-body-stream-client-v4-20261013/app.o",
+        "/Users/robert/Projects/neoclr/tools/aot-native-text/target/text-only/aarch64-apple-darwin/release/libneoclr_aot_native_text.a",
+        "/Users/robert/Projects/neoclr/tools/native-tls/target/aarch64-apple-darwin/release/libneoclr_native_tls.a",
+        "-o",
+        "/Users/robert/Projects/neoclr/target/http-body-stream-gc-v2-20261013/client",
+        "-DNEOCLR_GC_PROFILE",
+        "/Users/robert/Projects/neoclr/benchmarks/http-server/profile-gc.c"
+      ],
+      "inputs": {
+        "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang": "be5518e9c6736cda8dfc3486ce11e8112a2e08045084260691cf41f57a653f59",
+        "/Users/robert/Projects/neoclr/benchmarks/native-web/http-host.c": "cc11b74b5122fe62d208a51b27d81861109bfd03658d61f52500fca8cb16d61a",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/root-probe.c": "576c0fdd7a1e4c16a957f85a308be33e2fc932d0c9bf2d40acecdcefe3a0fa3c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-gc.c": "fd5eb12777d87d985a9d3b431d21f82a857aa7e2270233ca7fd117d47b54210b",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/text-arena.c": "63a69338de7aee04c22481cbea4124dd5ba57373ac8c201ace12a07a3e6aec99",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/console.c": "fdc9b345a77b347dba16561394dd9f0ae8bb270478ccfb7d6fed3071404e1769",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-stack.c": "8bf08bed38457c8a48dcb6fecf784c764651dd75f192a9a8cb4d340b3d638121",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-scalar/console.c": "e1caabedff378df882385fd05325f635732e91b968d8dc987e5734fee26e49ae",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-fault-details/render.c": "f1e561bfb6b73ac3e4a7078d5bc9e9905eea9637f545ac3178273698d08efb96",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/task-queue.c": "84b7d3e7d0f635622c6b066b57868969e22170e6aea3c500fab7e06297a5f7f4",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/socket-listener.c": "e96bc843d7851cb78c9b225ff8e78b4b57b7c1d07096dccc409f36d9b4a03724",
+        "/Users/robert/Projects/neoclr/tools/native/entry-arguments.c": "4fdc632b75d590057fad61e42fe6526b8278b60d908cc0467bb611d7a0c582a3",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/string-unicode.c": "80dadd71e3df0bc16f4082a209bc7c37bb07a85ccddb6350c9ee3cf2254399fe",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/tls-managed.c": "bf3212c83b1f16eca7833b30b9f5eb126e1e6d26d0e258d7cdfa5624ee329d2f",
+        "/Users/robert/Projects/neoclr/target/http-body-stream-client-v4-20261013/app.o": "d9436c5ee3433d7727a502e900925fa5638eff6b785831d174377064e76b8a09",
+        "/Users/robert/Projects/neoclr/tools/aot-native-text/target/text-only/aarch64-apple-darwin/release/libneoclr_aot_native_text.a": "8dbbf86e3cdf0659d73d8d5a9aa277cbc0ac5e95b99a1ff15e5974ce5d9169ad",
+        "/Users/robert/Projects/neoclr/tools/native-tls/target/aarch64-apple-darwin/release/libneoclr_native_tls.a": "bfedb0a494dc7d77f65937845f8cd84b1211b8ce0d372051e7931fe9a94df950",
+        "/Users/robert/Projects/neoclr/benchmarks/http-server/profile-gc.c": "eac78372a3795246ae0ec7341358355c5b87384573fa75f70f250bda1a097e2f",
+        "/Users/robert/Projects/neoclr/docs/experiments/http-body-stream/profile.py": "21d240d9e611e34ee3d4dc43b928435e2c6b65e4c0ab96c3bae730ee6887ad7d",
+        "/Users/robert/Projects/neoclr/docs/experiments/http-body-stream/validate.py": "c3207ed6232e50efd07b2e8f1217afd42393a3ddb05779b869c0c4fd51b2ee5e",
+        "/Users/robert/Projects/neoclr/target/http-body-stream-client-v4-20261013/build.json": "34042529b3be03913419b2d22972c92b36d541fb039f1efa28ddfbef7d499144"
+      }
+    },
+    "server": {
+      "validation": {
+        "passed": true,
+        "cases": [
+          {
+            "case": 0,
+            "passed": true,
+            "headersBeforeBody": true
+          },
+          {
+            "case": 1,
+            "passed": true,
+            "headersBeforeBody": true
+          },
+          {
+            "case": 2,
+            "passed": true,
+            "headersBeforeBody": true
+          },
+          {
+            "case": 3,
+            "passed": true,
+            "headersBeforeBody": true
+          },
+          {
+            "case": 4,
+            "passed": true,
+            "headersBeforeBody": true
+          },
+          {
+            "case": 5,
+            "passed": true,
+            "headersBeforeBody": true
+          },
+          {
+            "case": 6,
+            "passed": true,
+            "headersBeforeBody": true
+          },
+          {
+            "case": 7,
+            "passed": true,
+            "headersBeforeBody": true
+          },
+          {
+            "case": 8,
+            "passed": true,
+            "headersBeforeBody": true
+          }
+        ],
+        "command": [
+          "/usr/bin/env",
+          "NEOCLR_HTTP_PROFILE_OUTPUT=/Users/robert/Projects/neoclr/target/http-body-stream-gc-v2-20261013/server.json",
+          "/Users/robert/Projects/neoclr/target/http-body-stream-gc-v2-20261013/server"
+        ]
+      },
+      "gc": {
+        "attempts": 77812,
+        "gcNanoseconds": 154584000,
+        "failures": 0,
+        "allocations": 9891,
+        "reclaimed": 9891,
+        "allocatedBytes": 429272,
+        "peakLiveBytes": 10682,
+        "peakArenaBytes": 16912
+      },
+      "command": [
+        "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang",
+        "-isysroot",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.2.sdk",
+        "-arch",
+        "arm64",
+        "-std=c11",
+        "-O2",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-DNEOCLR_NATIVE_GC",
+        "-DNEOCLR_MANAGED_TLS",
+        "-DNEOCLR_HTTP_HEAP_BYTES=33554432",
+        "-DNEOCLR_NATIVE_BYTE_ARRAY_LIMIT=4194304",
+        "-I",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console",
+        "/Users/robert/Projects/neoclr/benchmarks/native-web/http-host.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/root-probe.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-gc.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/text-arena.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/console.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-stack.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-scalar/console.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-fault-details/render.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/task-queue.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/socket-listener.c",
+        "/Users/robert/Projects/neoclr/tools/native/entry-arguments.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/string-unicode.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/tls-managed.c",
+        "/Users/robert/Projects/neoclr/target/http-body-stream-server-v4-20261013/app.o",
+        "/Users/robert/Projects/neoclr/tools/aot-native-text/target/text-only/aarch64-apple-darwin/release/libneoclr_aot_native_text.a",
+        "/Users/robert/Projects/neoclr/tools/native-tls/target/aarch64-apple-darwin/release/libneoclr_native_tls.a",
+        "-o",
+        "/Users/robert/Projects/neoclr/target/http-body-stream-gc-v2-20261013/server",
+        "-DNEOCLR_GC_PROFILE",
+        "/Users/robert/Projects/neoclr/benchmarks/http-server/profile-gc.c"
+      ],
+      "inputs": {
+        "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang": "be5518e9c6736cda8dfc3486ce11e8112a2e08045084260691cf41f57a653f59",
+        "/Users/robert/Projects/neoclr/benchmarks/native-web/http-host.c": "cc11b74b5122fe62d208a51b27d81861109bfd03658d61f52500fca8cb16d61a",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/root-probe.c": "576c0fdd7a1e4c16a957f85a308be33e2fc932d0c9bf2d40acecdcefe3a0fa3c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-gc.c": "fd5eb12777d87d985a9d3b431d21f82a857aa7e2270233ca7fd117d47b54210b",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/text-arena.c": "63a69338de7aee04c22481cbea4124dd5ba57373ac8c201ace12a07a3e6aec99",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/console.c": "fdc9b345a77b347dba16561394dd9f0ae8bb270478ccfb7d6fed3071404e1769",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-stack.c": "8bf08bed38457c8a48dcb6fecf784c764651dd75f192a9a8cb4d340b3d638121",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-scalar/console.c": "e1caabedff378df882385fd05325f635732e91b968d8dc987e5734fee26e49ae",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-fault-details/render.c": "f1e561bfb6b73ac3e4a7078d5bc9e9905eea9637f545ac3178273698d08efb96",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/task-queue.c": "84b7d3e7d0f635622c6b066b57868969e22170e6aea3c500fab7e06297a5f7f4",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/socket-listener.c": "e96bc843d7851cb78c9b225ff8e78b4b57b7c1d07096dccc409f36d9b4a03724",
+        "/Users/robert/Projects/neoclr/tools/native/entry-arguments.c": "4fdc632b75d590057fad61e42fe6526b8278b60d908cc0467bb611d7a0c582a3",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/string-unicode.c": "80dadd71e3df0bc16f4082a209bc7c37bb07a85ccddb6350c9ee3cf2254399fe",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/tls-managed.c": "bf3212c83b1f16eca7833b30b9f5eb126e1e6d26d0e258d7cdfa5624ee329d2f",
+        "/Users/robert/Projects/neoclr/target/http-body-stream-server-v4-20261013/app.o": "5a42aabe68d22cffd5e973f2042f653e879e36c0c19590e149cb42871932a945",
+        "/Users/robert/Projects/neoclr/tools/aot-native-text/target/text-only/aarch64-apple-darwin/release/libneoclr_aot_native_text.a": "8dbbf86e3cdf0659d73d8d5a9aa277cbc0ac5e95b99a1ff15e5974ce5d9169ad",
+        "/Users/robert/Projects/neoclr/tools/native-tls/target/aarch64-apple-darwin/release/libneoclr_native_tls.a": "bfedb0a494dc7d77f65937845f8cd84b1211b8ce0d372051e7931fe9a94df950",
+        "/Users/robert/Projects/neoclr/benchmarks/http-server/profile-gc.c": "eac78372a3795246ae0ec7341358355c5b87384573fa75f70f250bda1a097e2f",
+        "/Users/robert/Projects/neoclr/docs/experiments/http-body-stream/profile.py": "21d240d9e611e34ee3d4dc43b928435e2c6b65e4c0ab96c3bae730ee6887ad7d",
+        "/Users/robert/Projects/neoclr/docs/experiments/http-body-stream/validate.py": "c3207ed6232e50efd07b2e8f1217afd42393a3ddb05779b869c0c4fd51b2ee5e",
+        "/Users/robert/Projects/neoclr/target/http-body-stream-server-v4-20261013/build.json": "f23e6f8464a950abfefea97096437763a04f93a62276803a44d81f093d6ebf28"
+      }
+    }
+  },
+  "scope": "Whole-process diagnostic GC including errors and cancellation, not throughput or allocations per request."
+}

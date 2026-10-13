@@ -15,7 +15,19 @@ def main():
     parser.add_argument('--renderer-revision', required=True)
     args = parser.parse_args()
     source = args.audit / 'site/docs/api'
-    build = json.loads((args.audit / 'inputs/build-evidence.json').read_text())
+    evidence_path = args.audit / 'inputs/build-evidence.json'
+    if evidence_path.is_file():
+        build = json.loads(evidence_path.read_text())
+    else:
+        # A verified HTTP-only rebuild preserves the other bundled libraries.
+        # It records exact source/compiler hashes rather than inventing git IDs.
+        evidence_path = args.audit / 'inputs/http-foundation-build.json'
+        evidence = json.loads(evidence_path.read_text())
+        if evidence['exitCode'] != 0:
+            raise ValueError('HTTP library build did not pass')
+        source_hash = hashlib.sha256(json.dumps(evidence['sources'], sort_keys=True).encode()).hexdigest()
+        build = dict(sourceRevision='http-source-sha256:' + source_hash,
+                     compilerRevision=evidence.get('compilerRevision') or 'binary-sha256:' + evidence['compilerSha256'])
     bundle = json.loads((args.audit / 'inputs/bundle.json').read_text())
     for relative in ('System/Object/index.html', 'System/Math/field_Pi.html',
                      'System/Linq/Operators/index.html', 'api-navigation.html'):
@@ -33,6 +45,7 @@ def main():
                     sha256=hashlib.sha256(archive.read_bytes()).hexdigest(),
                     librarySourceRevision=build['sourceRevision'],
                     compilerRevision=build['compilerRevision'],
+                    libraryBuildEvidence=dict(file=evidence_path.name, sha256=hashlib.sha256(evidence_path.read_bytes()).hexdigest()),
                     rendererRevision=args.renderer_revision,
                     libraryArtifacts={name: digest for name, digest in bundle['files'].items()
                                       if name.endswith(('.dll', '.neox'))},

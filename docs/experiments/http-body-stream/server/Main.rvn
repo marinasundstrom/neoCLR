@@ -1,0 +1,25 @@
+import System.*
+import System.Concurrency.Tasks.*
+import System.Option.*
+import System.Result.*
+import System.Web.Http.*
+
+async func Main() -> Task<()> {
+    let Ok(server) = HttpServer.Listen("127.0.0.1", 0, 16) else { System.Fail("Listen failed") }
+    let Ok(port) = server.GetLocalPort() else { System.Fail("Port failed") }
+    Console.WriteLine(port)
+    for mode in 0..<9 {
+        let Ok(context) = await server.AcceptHeaders() else { System.Fail("Headers failed") }
+        let Some(stream) = context.Request.Content.TryGetStream() else { System.Fail("Missing stream") }
+        // Request bodies cannot be EOF delimited; case two is fixed length here.
+        await Consume(stream, mode)
+        if mode < 3 {
+            context.RespondText("OK")
+            Check((await context.Complete()) is Ok(_))
+        }
+        context.Dispose()
+        Console.WriteLine("CASE")
+    }
+    server.Close()
+    Console.WriteLine("DONE")
+}

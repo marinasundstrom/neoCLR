@@ -1,0 +1,68 @@
+import System.*
+import System.Concurrency.*
+import System.Concurrency.Tasks.*
+import System.IO.*
+import System.Result.*
+import System.Time.*
+
+func Check(value: bool) {
+    if !value { System.Fail("Incoming body contract failed") }
+}
+
+func ObserveCancellation(pending: Task<Result<int, StreamError>>) -> Task<bool> {
+    let completion = Promise<bool>()
+    pending.OnCompleted(() => { _ = completion.Complete(pending.IsCancelled) })
+    return completion.Task
+}
+
+async func Consume(stream: InputStream, mode: int) -> Task<()> {
+    let buffer: byte[] = [(byte)0, (byte)0, (byte)0, (byte)0, (byte)0, (byte)0, (byte)0, (byte)0, (byte)0, (byte)0, (byte)0, (byte)0, (byte)0, (byte)0, (byte)0, (byte)0, (byte)0, (byte)0, (byte)0]
+    buffer[0] = (byte)77
+    buffer[18] = (byte)99
+    Check((await stream.Read(buffer, 1, 0)) is Ok(0))
+    Check((await stream.Read(buffer, -1, 1)) is Error(StreamError.InvalidRange))
+    let stop = CancellationTokenSource()
+    stop.Cancel()
+    Check(await ObserveCancellation(stream.Read(buffer, 1, 17, stop.Token)))
+    stop.Dispose()
+    Console.WriteLine("HEADERS")
+    if mode == 6 {
+        let cancellation = CancellationTokenSource()
+        cancellation.CancelAfter(Duration.FromTicks(1000000L))
+        let reading = stream.Read(buffer, 1, 17, cancellation.Token)
+        Check((await stream.Read(buffer, 1, 17)) is Error(StreamError.WrongAccess))
+        Check(await ObserveCancellation(reading))
+        cancellation.Dispose()
+        return
+    }
+    if mode == 7 {
+        let reading = stream.Read(buffer, 1, 17)
+        Check((await stream.Read(buffer, 1, 17)) is Error(StreamError.WrongAccess))
+        stream.Close()
+        Check((await reading) is Error(StreamError.Closed))
+        Check((await stream.Read(buffer, 1, 17)) is Error(StreamError.Closed))
+        return
+    }
+    var total = 0
+    while true {
+        let result = await stream.Read(buffer, 1, 17)
+        Check(buffer[0] == 77 && buffer[18] == 99)
+        if let Error(error) = result {
+            if mode == 5 {
+                Check(error is StreamError.LimitExceeded)
+            } else {
+                Check((mode == 3 || mode == 4 || mode == 8) && error is StreamError.InvalidData)
+            }
+            break
+        }
+        let Ok(count) = result else { System.Fail("Missing read outcome") }
+        if count == 0 {
+            Check(mode < 3 && total == 513)
+            Check((await stream.Read(buffer, 1, 17)) is Ok(0))
+            break
+        }
+        for index in 0..<count { Check(buffer[index + 1] == 120) }
+        total += count
+        Check(total <= 513)
+    }
+}

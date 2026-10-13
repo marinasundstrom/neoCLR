@@ -48,6 +48,7 @@ cooperative. Caller cancellation returns a cancelled task; deadline expiry retur
 `HttpError.TimedOut` after acknowledgement. Close cancels the pending producer and
 closes owned content. No unbounded producer queue or complete body copy is created.
 
-Incoming body streaming and unknown-length output remain under development.
-Requests and client responses are still fully buffered. This does not introduce
+Incoming bodies can now be read through [headers-first APIs](http-body-streams.md).
+Accept/ServeOne and default client Send remain buffered; unknown-length output
+is still unsupported. This does not introduce
 connection reuse. See the [stream contract](streams.md) for buffer ownership.

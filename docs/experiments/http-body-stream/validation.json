@@ -1,0 +1,445 @@
+{
+  "passed": true,
+  "commands": {
+    "client-jit": [
+      "/Users/robert/Projects/neoclr/target/http-body-stream-candidate-v4-20261013/bundle/bin/neoclr",
+      "run",
+      "/Users/robert/Projects/neoclr/target/http-body-stream-client-v4-20261013/app.dll"
+    ],
+    "client-aot": [
+      "/Users/robert/Projects/neoclr/target/http-body-stream-client-v4-20261013/app"
+    ],
+    "client-interpreter": [
+      "/Users/robert/Projects/neoclr/target/http-body-stream-candidate-v4-20261013/bundle/bin/neoclr",
+      "run",
+      "/Users/robert/Projects/neoclr/target/http-body-stream-client-v4-20261013/app.dll",
+      "--execution",
+      "interpreter",
+      "--instructions",
+      "2000000000",
+      "--system",
+      "/Users/robert/Projects/neoclr/target/http-body-stream-candidate-v4-20261013/bundle/lib/System.runtime.neox",
+      "--object-root",
+      "/Users/robert/Projects/neoclr/target/http-body-stream-candidate-v4-20261013/bundle/lib/System.Runtime.dll",
+      "--module",
+      "/Users/robert/Projects/neoclr/target/http-body-stream-candidate-v4-20261013/bundle/lib/System.Runtime.dll",
+      "--module",
+      "/Users/robert/Projects/neoclr/target/http-body-stream-candidate-v4-20261013/bundle/lib/System.Data.dll",
+      "--module",
+      "/Users/robert/Projects/neoclr/target/http-body-stream-candidate-v4-20261013/bundle/lib/System.Networking.dll",
+      "--module",
+      "/Users/robert/Projects/neoclr/target/http-body-stream-candidate-v4-20261013/bundle/lib/System.Web.dll",
+      "--module",
+      "/Users/robert/Projects/neoclr/target/http-body-stream-candidate-v4-20261013/bundle/lib/System.Data.PostgreSql.dll"
+    ],
+    "server-jit": [
+      "/Users/robert/Projects/neoclr/target/http-body-stream-candidate-v4-20261013/bundle/bin/neoclr",
+      "run",
+      "/Users/robert/Projects/neoclr/target/http-body-stream-server-v4-20261013/app.dll"
+    ],
+    "server-aot": [
+      "/Users/robert/Projects/neoclr/target/http-body-stream-server-v4-20261013/app"
+    ],
+    "server-interpreter": [
+      "/Users/robert/Projects/neoclr/target/http-body-stream-candidate-v4-20261013/bundle/bin/neoclr",
+      "run",
+      "/Users/robert/Projects/neoclr/target/http-body-stream-server-v4-20261013/app.dll",
+      "--execution",
+      "interpreter",
+      "--instructions",
+      "2000000000",
+      "--system",
+      "/Users/robert/Projects/neoclr/target/http-body-stream-candidate-v4-20261013/bundle/lib/System.runtime.neox",
+      "--object-root",
+      "/Users/robert/Projects/neoclr/target/http-body-stream-candidate-v4-20261013/bundle/lib/System.Runtime.dll",
+      "--module",
+      "/Users/robert/Projects/neoclr/target/http-body-stream-candidate-v4-20261013/bundle/lib/System.Runtime.dll",
+      "--module",
+      "/Users/robert/Projects/neoclr/target/http-body-stream-candidate-v4-20261013/bundle/lib/System.Data.dll",
+      "--module",
+      "/Users/robert/Projects/neoclr/target/http-body-stream-candidate-v4-20261013/bundle/lib/System.Networking.dll",
+      "--module",
+      "/Users/robert/Projects/neoclr/target/http-body-stream-candidate-v4-20261013/bundle/lib/System.Web.dll",
+      "--module",
+      "/Users/robert/Projects/neoclr/target/http-body-stream-candidate-v4-20261013/bundle/lib/System.Data.PostgreSql.dll"
+    ]
+  },
+  "cases": {
+    "client-jit": {
+      "passed": true,
+      "cases": [
+        {
+          "case": 0,
+          "passed": true,
+          "headersBeforeBody": true
+        },
+        {
+          "case": 1,
+          "passed": true,
+          "headersBeforeBody": true
+        },
+        {
+          "case": 2,
+          "passed": true,
+          "headersBeforeBody": true
+        },
+        {
+          "case": 3,
+          "passed": true,
+          "headersBeforeBody": true
+        },
+        {
+          "case": 4,
+          "passed": true,
+          "headersBeforeBody": true
+        },
+        {
+          "case": 5,
+          "passed": true,
+          "headersBeforeBody": true
+        },
+        {
+          "case": 6,
+          "passed": true,
+          "headersBeforeBody": true
+        },
+        {
+          "case": 7,
+          "passed": true,
+          "headersBeforeBody": true
+        },
+        {
+          "case": 8,
+          "passed": true,
+          "headersBeforeBody": true
+        }
+      ],
+      "command": [
+        "/Users/robert/Projects/neoclr/target/http-body-stream-candidate-v4-20261013/bundle/bin/neoclr",
+        "run",
+        "/Users/robert/Projects/neoclr/target/http-body-stream-client-v4-20261013/app.dll",
+        "--",
+        "http://127.0.0.1:61500/"
+      ]
+    },
+    "client-aot": {
+      "passed": true,
+      "cases": [
+        {
+          "case": 0,
+          "passed": true,
+          "headersBeforeBody": true
+        },
+        {
+          "case": 1,
+          "passed": true,
+          "headersBeforeBody": true
+        },
+        {
+          "case": 2,
+          "passed": true,
+          "headersBeforeBody": true
+        },
+        {
+          "case": 3,
+          "passed": true,
+          "headersBeforeBody": true
+        },
+        {
+          "case": 4,
+          "passed": true,
+          "headersBeforeBody": true
+        },
+        {
+          "case": 5,
+          "passed": true,
+          "headersBeforeBody": true
+        },
+        {
+          "case": 6,
+          "passed": true,
+          "headersBeforeBody": true
+        },
+        {
+          "case": 7,
+          "passed": true,
+          "headersBeforeBody": true
+        },
+        {
+          "case": 8,
+          "passed": true,
+          "headersBeforeBody": true
+        }
+      ],
+      "command": [
+        "/Users/robert/Projects/neoclr/target/http-body-stream-client-v4-20261013/app",
+        "http://127.0.0.1:61510/"
+      ]
+    },
+    "client-interpreter": {
+      "passed": true,
+      "cases": [
+        {
+          "case": 0,
+          "passed": true,
+          "headersBeforeBody": true
+        },
+        {
+          "case": 1,
+          "passed": true,
+          "headersBeforeBody": true
+        },
+        {
+          "case": 2,
+          "passed": true,
+          "headersBeforeBody": true
+        },
+        {
+          "case": 3,
+          "passed": true,
+          "headersBeforeBody": true
+        },
+        {
+          "case": 4,
+          "passed": true,
+          "headersBeforeBody": true
+        },
+        {
+          "case": 5,
+          "passed": true,
+          "headersBeforeBody": true
+        },
+        {
+          "case": 6,
+          "passed": true,
+          "headersBeforeBody": true
+        },
+        {
+          "case": 7,
+          "passed": true,
+          "headersBeforeBody": true
+        },
+        {
+          "case": 8,
+          "passed": true,
+          "headersBeforeBody": true
+        }
+      ],
+      "command": [
+        "/Users/robert/Projects/neoclr/target/http-body-stream-candidate-v4-20261013/bundle/bin/neoclr",
+        "run",
+        "/Users/robert/Projects/neoclr/target/http-body-stream-client-v4-20261013/app.dll",
+        "--execution",
+        "interpreter",
+        "--instructions",
+        "2000000000",
+        "--system",
+        "/Users/robert/Projects/neoclr/target/http-body-stream-candidate-v4-20261013/bundle/lib/System.runtime.neox",
+        "--object-root",
+        "/Users/robert/Projects/neoclr/target/http-body-stream-candidate-v4-20261013/bundle/lib/System.Runtime.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/http-body-stream-candidate-v4-20261013/bundle/lib/System.Runtime.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/http-body-stream-candidate-v4-20261013/bundle/lib/System.Data.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/http-body-stream-candidate-v4-20261013/bundle/lib/System.Networking.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/http-body-stream-candidate-v4-20261013/bundle/lib/System.Web.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/http-body-stream-candidate-v4-20261013/bundle/lib/System.Data.PostgreSql.dll",
+        "--",
+        "http://127.0.0.1:61520/"
+      ]
+    },
+    "server-jit": {
+      "passed": true,
+      "cases": [
+        {
+          "case": 0,
+          "passed": true,
+          "headersBeforeBody": true
+        },
+        {
+          "case": 1,
+          "passed": true,
+          "headersBeforeBody": true
+        },
+        {
+          "case": 2,
+          "passed": true,
+          "headersBeforeBody": true
+        },
+        {
+          "case": 3,
+          "passed": true,
+          "headersBeforeBody": true
+        },
+        {
+          "case": 4,
+          "passed": true,
+          "headersBeforeBody": true
+        },
+        {
+          "case": 5,
+          "passed": true,
+          "headersBeforeBody": true
+        },
+        {
+          "case": 6,
+          "passed": true,
+          "headersBeforeBody": true
+        },
+        {
+          "case": 7,
+          "passed": true,
+          "headersBeforeBody": true
+        },
+        {
+          "case": 8,
+          "passed": true,
+          "headersBeforeBody": true
+        }
+      ],
+      "command": [
+        "/Users/robert/Projects/neoclr/target/http-body-stream-candidate-v4-20261013/bundle/bin/neoclr",
+        "run",
+        "/Users/robert/Projects/neoclr/target/http-body-stream-server-v4-20261013/app.dll"
+      ]
+    },
+    "server-aot": {
+      "passed": true,
+      "cases": [
+        {
+          "case": 0,
+          "passed": true,
+          "headersBeforeBody": true
+        },
+        {
+          "case": 1,
+          "passed": true,
+          "headersBeforeBody": true
+        },
+        {
+          "case": 2,
+          "passed": true,
+          "headersBeforeBody": true
+        },
+        {
+          "case": 3,
+          "passed": true,
+          "headersBeforeBody": true
+        },
+        {
+          "case": 4,
+          "passed": true,
+          "headersBeforeBody": true
+        },
+        {
+          "case": 5,
+          "passed": true,
+          "headersBeforeBody": true
+        },
+        {
+          "case": 6,
+          "passed": true,
+          "headersBeforeBody": true
+        },
+        {
+          "case": 7,
+          "passed": true,
+          "headersBeforeBody": true
+        },
+        {
+          "case": 8,
+          "passed": true,
+          "headersBeforeBody": true
+        }
+      ],
+      "command": [
+        "/Users/robert/Projects/neoclr/target/http-body-stream-server-v4-20261013/app"
+      ]
+    },
+    "server-interpreter": {
+      "passed": true,
+      "cases": [
+        {
+          "case": 0,
+          "passed": true,
+          "headersBeforeBody": true
+        },
+        {
+          "case": 1,
+          "passed": true,
+          "headersBeforeBody": true
+        },
+        {
+          "case": 2,
+          "passed": true,
+          "headersBeforeBody": true
+        },
+        {
+          "case": 3,
+          "passed": true,
+          "headersBeforeBody": true
+        },
+        {
+          "case": 4,
+          "passed": true,
+          "headersBeforeBody": true
+        },
+        {
+          "case": 5,
+          "passed": true,
+          "headersBeforeBody": true
+        },
+        {
+          "case": 6,
+          "passed": true,
+          "headersBeforeBody": true
+        },
+        {
+          "case": 7,
+          "passed": true,
+          "headersBeforeBody": true
+        },
+        {
+          "case": 8,
+          "passed": true,
+          "headersBeforeBody": true
+        }
+      ],
+      "command": [
+        "/Users/robert/Projects/neoclr/target/http-body-stream-candidate-v4-20261013/bundle/bin/neoclr",
+        "run",
+        "/Users/robert/Projects/neoclr/target/http-body-stream-server-v4-20261013/app.dll",
+        "--execution",
+        "interpreter",
+        "--instructions",
+        "2000000000",
+        "--system",
+        "/Users/robert/Projects/neoclr/target/http-body-stream-candidate-v4-20261013/bundle/lib/System.runtime.neox",
+        "--object-root",
+        "/Users/robert/Projects/neoclr/target/http-body-stream-candidate-v4-20261013/bundle/lib/System.Runtime.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/http-body-stream-candidate-v4-20261013/bundle/lib/System.Runtime.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/http-body-stream-candidate-v4-20261013/bundle/lib/System.Data.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/http-body-stream-candidate-v4-20261013/bundle/lib/System.Networking.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/http-body-stream-candidate-v4-20261013/bundle/lib/System.Web.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/http-body-stream-candidate-v4-20261013/bundle/lib/System.Data.PostgreSql.dll"
+      ]
+    }
+  },
+  "inputs": {
+    "/Users/robert/Projects/neoclr/target/http-body-stream-client-v4-20261013/app": "903dfbd7d104da03267f6282723afc0dfc787dc03245985b69f6d0805eb2e158",
+    "/Users/robert/Projects/neoclr/target/http-body-stream-client-v4-20261013/app.dll": "11b48ae3fbe2bf3eaa40f6739e8f6fe832e12242259b51f65f858bdea4326c96",
+    "/Users/robert/Projects/neoclr/target/http-body-stream-client-v4-20261013/build.json": "34042529b3be03913419b2d22972c92b36d541fb039f1efa28ddfbef7d499144",
+    "/Users/robert/Projects/neoclr/target/http-body-stream-server-v4-20261013/app": "3f610e93439fd907823cb4e07870ae825ec752043b53c927b2468cfd396d5173",
+    "/Users/robert/Projects/neoclr/target/http-body-stream-server-v4-20261013/app.dll": "950f36b0ad190f67ec8fa1ac5a47ece0fbead95b1a2fd1c2a3282af453cc52fc",
+    "/Users/robert/Projects/neoclr/target/http-body-stream-server-v4-20261013/build.json": "f23e6f8464a950abfefea97096437763a04f93a62276803a44d81f093d6ebf28"
+  },
+  "scope": "Headers-first streaming request and response body contract, not a performance measurement."
+}

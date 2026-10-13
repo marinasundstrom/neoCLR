@@ -1,0 +1,224 @@
+{
+  "passed": true,
+  "commands": {
+    "jit": [
+      "/Users/robert/Projects/neoclr/target/http-body-stream-candidate-v3-20261013/bundle/bin/neoclr",
+      "run",
+      "/Users/robert/Projects/neoclr/target/http-body-stream-buffered-control-20261013/app.dll"
+    ],
+    "aot": [
+      "/Users/robert/Projects/neoclr/target/http-body-stream-buffered-control-20261013/app"
+    ],
+    "interpreter": [
+      "/Users/robert/Projects/neoclr/target/http-body-stream-candidate-v3-20261013/bundle/bin/neoclr",
+      "run",
+      "/Users/robert/Projects/neoclr/target/http-body-stream-buffered-control-20261013/app.dll",
+      "--execution",
+      "interpreter",
+      "--instructions",
+      "2000000000",
+      "--system",
+      "/Users/robert/Projects/neoclr/target/http-body-stream-candidate-v3-20261013/bundle/lib/System.runtime.neox",
+      "--object-root",
+      "/Users/robert/Projects/neoclr/target/http-body-stream-candidate-v3-20261013/bundle/lib/System.Runtime.dll",
+      "--module",
+      "/Users/robert/Projects/neoclr/target/http-body-stream-candidate-v3-20261013/bundle/lib/System.Runtime.dll",
+      "--module",
+      "/Users/robert/Projects/neoclr/target/http-body-stream-candidate-v3-20261013/bundle/lib/System.Data.dll",
+      "--module",
+      "/Users/robert/Projects/neoclr/target/http-body-stream-candidate-v3-20261013/bundle/lib/System.Networking.dll",
+      "--module",
+      "/Users/robert/Projects/neoclr/target/http-body-stream-candidate-v3-20261013/bundle/lib/System.Web.dll",
+      "--module",
+      "/Users/robert/Projects/neoclr/target/http-body-stream-candidate-v3-20261013/bundle/lib/System.Data.PostgreSql.dll"
+    ]
+  },
+  "modes": {
+    "jit": {
+      "passed": true,
+      "startupSeconds": 6.106648125,
+      "cases": [
+        {
+          "case": "headers",
+          "fastCompletionSeconds": [
+            0.04084824999999981,
+            0.07346825000000035,
+            0.10132112500000012
+          ],
+          "slowHeldSeconds": 0.10134516699999985,
+          "slowFinishSeconds": 0.02019416700000054,
+          "fastResponsesBeforeSlowRelease": 3,
+          "passed": true
+        },
+        {
+          "case": "fixed-body",
+          "fastCompletionSeconds": [
+            0.060280416000000336,
+            0.09588004100000003,
+            0.12462724999999963
+          ],
+          "slowHeldSeconds": 0.12464583299999976,
+          "slowFinishSeconds": 0.006432542000000652,
+          "fastResponsesBeforeSlowRelease": 3,
+          "passed": true
+        },
+        {
+          "case": "chunked-body",
+          "fastCompletionSeconds": [
+            0.06108912500000052,
+            0.09501370900000072,
+            0.12364129200000029
+          ],
+          "slowHeldSeconds": 0.12366066700000022,
+          "slowFinishSeconds": 0.007253916999999888,
+          "fastResponsesBeforeSlowRelease": 3,
+          "passed": true
+        },
+        {
+          "case": "large-header",
+          "fastCompletionSeconds": [
+            0.07331162500000055,
+            0.11849383400000058,
+            0.1568729590000002
+          ],
+          "slowHeldSeconds": 0.15693316700000004,
+          "slowFinishSeconds": 0.18366116700000035,
+          "fastResponsesBeforeSlowRelease": 3,
+          "passed": true
+        }
+      ],
+      "checkedResponses": 16,
+      "width": 4,
+      "queuedCancellations": 140,
+      "shutdownCancelledAccepts": 16,
+      "admissionLimit": 16
+    },
+    "aot": {
+      "passed": true,
+      "startupSeconds": 0.2624895409999999,
+      "cases": [
+        {
+          "case": "headers",
+          "fastCompletionSeconds": [
+            0.03982520799999989,
+            0.07055699999999998,
+            0.09505145799999948
+          ],
+          "slowHeldSeconds": 0.09508737499999942,
+          "slowFinishSeconds": 0.01789245800000039,
+          "fastResponsesBeforeSlowRelease": 3,
+          "passed": true
+        },
+        {
+          "case": "fixed-body",
+          "fastCompletionSeconds": [
+            0.05404850000000039,
+            0.08430104100000069,
+            0.109758083
+          ],
+          "slowHeldSeconds": 0.10978050000000028,
+          "slowFinishSeconds": 0.006360875000000377,
+          "fastResponsesBeforeSlowRelease": 3,
+          "passed": true
+        },
+        {
+          "case": "chunked-body",
+          "fastCompletionSeconds": [
+            0.05527591700000034,
+            0.0852040839999999,
+            0.11052183400000004
+          ],
+          "slowHeldSeconds": 0.11054141700000031,
+          "slowFinishSeconds": 0.006070000000000242,
+          "fastResponsesBeforeSlowRelease": 3,
+          "passed": true
+        },
+        {
+          "case": "large-header",
+          "fastCompletionSeconds": [
+            0.0650196670000005,
+            0.10528433400000026,
+            0.13856270900000034
+          ],
+          "slowHeldSeconds": 0.13863254199999986,
+          "slowFinishSeconds": 0.1476507920000003,
+          "fastResponsesBeforeSlowRelease": 3,
+          "passed": true
+        }
+      ],
+      "checkedResponses": 16,
+      "width": 4,
+      "queuedCancellations": 140,
+      "shutdownCancelledAccepts": 16,
+      "admissionLimit": 16
+    },
+    "interpreter": {
+      "passed": true,
+      "startupSeconds": 4.06584675,
+      "cases": [
+        {
+          "case": "headers",
+          "fastCompletionSeconds": [
+            2.045027166999999,
+            2.2192002079999984,
+            2.2596461249999997
+          ],
+          "slowHeldSeconds": 2.2596672919999996,
+          "slowFinishSeconds": 0.6085567080000001,
+          "fastResponsesBeforeSlowRelease": 3,
+          "passed": true
+        },
+        {
+          "case": "fixed-body",
+          "fastCompletionSeconds": [
+            2.1940213329999985,
+            2.234897791999998,
+            2.2654953330000005
+          ],
+          "slowHeldSeconds": 2.265515167,
+          "slowFinishSeconds": 0.2775732909999995,
+          "fastResponsesBeforeSlowRelease": 3,
+          "passed": true
+        },
+        {
+          "case": "chunked-body",
+          "fastCompletionSeconds": [
+            2.046550083000003,
+            2.2698130000000027,
+            2.3126424580000027
+          ],
+          "slowHeldSeconds": 2.3126644580000004,
+          "slowFinishSeconds": 0.2868107500000008,
+          "fastResponsesBeforeSlowRelease": 3,
+          "passed": true
+        },
+        {
+          "case": "large-header",
+          "fastCompletionSeconds": [
+            3.179623582999998,
+            3.230352707999998,
+            3.2689943329999984
+          ],
+          "slowHeldSeconds": 3.2690150419999995,
+          "slowFinishSeconds": 4.779789832999999,
+          "fastResponsesBeforeSlowRelease": 3,
+          "passed": true
+        }
+      ],
+      "checkedResponses": 16,
+      "width": 4,
+      "queuedCancellations": 140,
+      "shutdownCancelledAccepts": 16,
+      "admissionLimit": 16
+    }
+  },
+  "inputs": {
+    "/Users/robert/Projects/neoclr/benchmarks/http-concurrency/validate.py": "040ef57182fe2c541b2ba448757a1674279d7a610c52f4bf3bac057547046ad0",
+    "/Users/robert/Projects/neoclr/benchmarks/http-concurrency/Server.rvn": "f5e511063d3671d3c6dfa7af714197a40b2c7da82784060f45b16c9229849383",
+    "/Users/robert/Projects/neoclr/target/http-body-stream-buffered-control-20261013/app.dll": "2d94f807a689e91ffdfe6c151944ff94fc073679438d9b33d4751984d0832632",
+    "/Users/robert/Projects/neoclr/target/http-body-stream-buffered-control-20261013/app": "240b5b101eeccf0934c974ac78c0acd5d3a1be73be136959d4b4ee27a54faa28",
+    "/Users/robert/Projects/neoclr/target/http-body-stream-buffered-control-20261013/build.json": "3155696371efb6e506064e8f2b58f7bbd02ffe25aab2931c0d7d02e944390b21",
+    "/Users/robert/Projects/neoclr/target/http-body-stream-candidate-v3-20261013/bundle/manifest.json": "d476d2fb6790016d5a64481233dc95b5169bfc8d3acbf143ede684f379be707c"
+  },
+  "scope": "http-concurrency-v1: four batches: width four in all modes to stay below the five-second transport read ceiling; withhold first request suffix until all other responses complete. Includes cancellation/admission/shutdown assertions. Client phase durations, not isolated runtime/parser time or throughput."
+}

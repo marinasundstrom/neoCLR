@@ -1,0 +1,27 @@
+import System.*
+import System.Concurrency.Tasks.*
+import System.Option.*
+import System.Result.*
+import System.Web.Http.*
+
+async func Main(arguments: string[]) -> Task<()> {
+    let client = HttpClient()
+    for mode in 0..<9 {
+        let Ok(request) = HttpRequest.Get(arguments[0]) else { System.Fail("Request failed") }
+        let Ok(response) = await client.Send(request, HttpCompletionOption.ResponseHeadersRead) else {
+            System.Fail("Headers failed")
+        }
+        Check(!response.Content.IsBuffered)
+        let Some(stream) = response.Content.TryGetStream() else { System.Fail("Missing body stream") }
+        if mode == 1 {
+            let Ok(forward) = HttpRequest.Post(arguments[0], response.Content) else { System.Fail("Forward preparation failed") }
+            Check((await client.Send(forward)) is Error(HttpError.Unsupported(_)))
+        }
+        await Consume(stream, mode)
+        response.Dispose()
+        response.Dispose()
+        Console.WriteLine("CASE")
+    }
+    client.Dispose()
+    Console.WriteLine("DONE")
+}

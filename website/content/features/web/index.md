@@ -44,6 +44,7 @@ An async entry point awaits the operation and handles its Result:
 | Cancel work | Token overloads cover lookup, connection and transfer |
 | Customize sending | HttpHandler supports forwarding behavior and replacement transports for tests |
 | Upload content | Buffered bytes/text or a known-length InputStream source with explicit ownership |
+| Stream incoming content | Development: Send with ResponseHeadersRead; read Content.TryGetStream and dispose the response |
 
 Import `System.Web.Http.Json.*` for JSON helpers. These are bounded experimental
 HTTP/1.1 APIs. Development HTTPS uses explicit trust/credentials and managed SslStream; connection pooling and HTTP/2/3 remain unsupported. See the [TLS reference](/docs/ssl-streams.html) and limits below.
@@ -84,6 +85,23 @@ The full case includes the nested station model.
 The walkthrough includes the shared models, routing, client connection setup,
 complete projects, run instructions and expected responses.
 
+## Streaming bodies — development
+
+`Send(request, HttpCompletionOption.ResponseHeadersRead)` returns after final
+response headers. `HttpServer.AcceptHeaders()` does the same for incoming requests.
+Use `Content.TryGetStream()` to consume their bytes on demand. The shared reader
+retains a bounded 256-byte transport block, including read-ahead from header parsing.
+
+Both client uploads and server responses accept known-length `HttpContent.FromStream`
+sources. Default Get/Send, Accept and ServeOne remain buffered, so the JSON showcase
+continues to use its existing content helpers. Incoming streaming works with fixed
+and chunked framing, plus close-delimited client responses; unknown-length outgoing
+bodies are still unsupported.
+
+[Body ownership, cancellation and limits](/docs/http-body-streams.html). This is
+post-Preview-14 development with local macOS interpreter/JIT/AOT qualification;
+fresh Windows and TLS streaming checks remain open.
+
 ## Customize requests
 
 Use `HttpRequest`, headers and content when a convenience method is not enough.
@@ -101,7 +119,8 @@ transport for tests. It owns its inner handlers and freezes after sending begins
 
 ## Own the exchange
 
-Dispose clients when finished. Responses contain buffered content. On the server,
+Dispose clients when finished. Default calls buffer responses; headers-first calls
+transfer a body stream that the response owns. Dispose streaming responses as well. On the server,
 complete or dispose each request context so its connection is closed. Use async `InputStream`/`OutputStream`
 operations for transfer and explicit encoding when converting bytes to text.
 

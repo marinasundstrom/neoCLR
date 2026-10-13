@@ -16486,3 +16486,23 @@ qualification. Request and response deadline documentation now includes TLS work
   A preliminary eight-connection interpreter check crossed the existing five-second
   transfer ceiling; the final comparable fixture uses four in every mode. This is
   not evidence of a parsing defect. Website publication remains held.
+
+## 2026-10-13 — Incoming streams and HTTP specification baseline
+
+- **Author:** requested streaming bodies for both client and server after bounded
+  concurrency work; then clarified the general direction is to abide by the “HTTP
+  specification” and use the obvious optimizations established by other frameworks.
+  The correction from “HTTPS specifications” explicitly refers to HTTP generally.
+- **Assistant:** adopted protocol compliance as the contract and treated current
+  unsupported framing as gaps, not deliberate runtime semantics. Proposed bounded
+  chunk-extension/trailer conformance as the next focused protocol slice, with
+  byte parsing, bounded read-ahead, demand-driven reads and fewer copies as the
+  implementation direction. No permission to trade correctness for speed inferred.
+- **Implemented:** known-length server output and shared incoming body streams;
+  explicit headers-first client/server APIs preserve the current buffered defaults
+  while JSON helpers remain buffer-only. [Evidence](experiments/http-body-stream/README.md)
+  covers 54 independent-peer cases, buffered controls and complete diagnostic
+  reclamation on macOS interpreter/JIT/AOT. API reference and local website updated.
+- **Open:** chunk extensions/trailers, other HTTP conformance gaps, Windows/TLS
+  streaming qualification, unknown-length output, streaming JSON and performance
+  work. Website publication remains held; no new cross-platform speed claim.

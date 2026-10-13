@@ -70,7 +70,11 @@ public class HttpHeader {
     }
 }
 
-public class HttpResponse {
+public class HttpResponse : Disposable {
+    /// Closes owned response content, including an unread streaming connection.
+    func Dispose() { storedContent.Dispose() }
+
+    internal func SetContent(content: HttpContent) { storedContent = content }
     private var originatingRequest: Option<HttpRequest> = None()
     /// The effective client request passed to the handler, including applied defaults.
     val Request: Option<HttpRequest> {
@@ -158,6 +162,13 @@ internal class HttpResponseDecoder {
     private var expected: int = -1
     private var statusCode: int = 0
     private var failed: bool = false
+
+    internal val HeadersComplete: bool => expected != -1 && !failed
+    internal val BodyLength: int => expected
+    internal val EmptyOnly: bool => statusCode == 205
+    internal func FinishHeaders() -> HttpResponse {
+        return HttpResponse(statusCode, headers, ArrayList<byte>())
+    }
 
     internal val Complete: bool => (ended || (expected >= 0 && body.Count == expected)) && !failed
 
@@ -486,7 +497,7 @@ public class HttpContent : Disposable {
 
     /// True when content already has a complete byte sequence.
     val IsBuffered: bool => input is None
-    /// Declared byte count; stream content begins at the source's current position.
+    /// Declared byte count, or -1 for incoming chunked/close-delimited content.
     val Length: int {
         get {
             if IsBuffered {
@@ -509,6 +520,21 @@ public class HttpContent : Disposable {
         content.inputLength = length
         content.leaveOpen = leaveOpen
         return Ok(content)
+    }
+
+    internal static func Incoming(stream: InputStream, length: int) -> HttpContent {
+        let content = HttpContent(ArrayList<byte>())
+        content.input = Some(stream)
+        content.inputLength = length
+        content.leaveOpen = false
+        return content
+    }
+
+    /// Returns the one-shot input stream, or None for buffered content. Does not read.
+    /// The content owns the stream unless FromStream was passed leaveOpen=true.
+    func TryGetStream() -> Option<InputStream> {
+        if let Some(stream) = input { return Some(stream) }
+        return None()
     }
 
     /// Returns buffered bytes without reading or consuming an input stream.
@@ -611,6 +637,8 @@ public class HttpContent : Disposable {
 }
 
 public class HttpRequest {
+    internal var HeadersOnly: bool = false
+    internal func SetContent(content: HttpContent) { storedContent = content }
     private var storedContent: HttpContent = HttpContent(ArrayList<byte>())
     /// Buffered request content; empty for GET requests.
     val Content: HttpContent => storedContent
@@ -835,6 +863,7 @@ public class HttpRequest {
         request.storedMethod = storedMethod
         request.storedContent = storedContent
         request.storedHeaders = headers
+        request.HeadersOnly = HeadersOnly
         return Ok(request)
     }
 
@@ -885,6 +914,9 @@ public class HttpRequest {
             return Error(HttpError.Unsupported("CONNECT tunnelling is not supported"))
         }
         let count = storedContent.Length
+        if count < 0 {
+            return Error(HttpError.Unsupported("Unknown-length uploads are not implemented"))
+        }
         if storedContent.IsBuffered && count > HttpWireLimits.BodyBytes {
             return Error(HttpError.LimitExceeded("Request body limit exceeded"))
         }
@@ -1168,7 +1200,20 @@ public class HttpClient : Disposable {
 
     /// Sends a prepared request, forwarding the token through the handler pipeline.
     func Send(request: HttpRequest, cancellationToken: CancellationToken) -> Task<Result<HttpResponse, HttpError>> {
+        return Send(request, HttpCompletionOption.ResponseContentRead, cancellationToken)
+    }
+
+    /// Selects buffered completion or ownership transfer at final response headers.
+    func Send(request: HttpRequest, completionOption: HttpCompletionOption) -> Task<Result<HttpResponse, HttpError>> {
+        return Send(request, completionOption, CancellationToken.None)
+    }
+
+    /// Headers-only completion ends the client timeout; body reads require their own token.
+    func Send(request: HttpRequest, completionOption: HttpCompletionOption, cancellationToken: CancellationToken) -> Task<Result<HttpResponse, HttpError>> {
         EnsureUsable()
+        if completionOption != HttpCompletionOption.ResponseContentRead && completionOption != HttpCompletionOption.ResponseHeadersRead {
+            return Failure(HttpError.InvalidRequest("Unknown HTTP completion option"))
+        }
         started = true
         if cancellationToken.IsCancellationRequested {
             started = true
@@ -1181,6 +1226,7 @@ public class HttpClient : Disposable {
         let Ok(outgoing) = prepared else {
             System.Fail("Request preparation returned no outcome")
         }
+        outgoing.HeadersOnly = completionOption == HttpCompletionOption.ResponseHeadersRead
         let operation = HttpSendScope(outgoing, cancellationToken, lifetime.Token)
         if let Some(delay) = timeout {
             operation.StartTimeout(delay)
@@ -1841,7 +1887,7 @@ internal class HttpExchange {
                     return
                 }
                 var index = 0
-                while index < count && !decoder.Complete {
+                while index < count && !decoder.Complete && !(request.HeadersOnly && decoder.HeadersComplete) {
                     let progress = decoder.Push(buffer[index])
                     if let Error(message) = progress {
                         Finish(Error(message))
@@ -1849,7 +1895,17 @@ internal class HttpExchange {
                     }
                     index += 1
                 }
-                if decoder.Complete {
+                if request.HeadersOnly && decoder.HeadersComplete {
+                    if let Some(connection) = socket {
+                        let length = decoder.BodyLength
+                        let stream = HttpBodyInput(connection, buffer, index, count, length,
+                            HttpWireLimits.BodyBytes, None(), true, decoder.EmptyOnly)
+                        let response = decoder.FinishHeaders()
+                        response.SetContent(HttpContent.Incoming(stream, if length < 0 { -1 } else { length }))
+                        socket = None()
+                        Finish(Ok(response))
+                    }
+                } else if decoder.Complete {
                     Finish(decoder.Finish())
                 } else {
                     ReceiveNext()

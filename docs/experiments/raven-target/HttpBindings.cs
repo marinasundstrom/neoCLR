@@ -12,6 +12,7 @@ static class HttpBindings
         && IsName(left.FullName) && RuntimeSignatures.IsCore(left.Scope) && ApplicationTypes.IsLibrary(right);
     public const string Declarations = """
         namespace Web.Http {
+            public enum HttpCompletionOption { ResponseContentRead = 0, ResponseHeadersRead = 1 }
             public enum HttpStatusCode { Continue = 100, SwitchingProtocols = 101, OK = 200, Created = 201, Accepted = 202, NoContent = 204, ResetContent = 205, PartialContent = 206, MultipleChoices = 300, MovedPermanently = 301, Found = 302, SeeOther = 303, NotModified = 304, TemporaryRedirect = 307, PermanentRedirect = 308, BadRequest = 400, Unauthorized = 401, Forbidden = 403, NotFound = 404, MethodNotAllowed = 405, RequestTimeout = 408, Conflict = 409, Gone = 410, LengthRequired = 411, PreconditionFailed = 412, RequestEntityTooLarge = 413, RequestUriTooLong = 414, UnsupportedMediaType = 415, RequestedRangeNotSatisfiable = 416, ExpectationFailed = 417, UnprocessableContent = 422, TooManyRequests = 429, InternalServerError = 500, NotImplemented = 501, BadGateway = 502, ServiceUnavailable = 503, GatewayTimeout = 504, HttpVersionNotSupported = 505 }
             public struct HttpError { public struct InvalidUri { } public struct NameResolution { } public struct Transport { } public struct Content { } public struct InvalidRequest { } public struct Protocol { } public struct Unsupported { } public struct LimitExceeded { } public struct TimedOut { } public struct Tls { } public struct SecureTransport { } public struct Handler { } public struct UnsuccessfulStatus { } }
             public abstract class HttpHandler : Disposable {
@@ -76,6 +77,8 @@ static class HttpBindings
                 public Concurrency.Tasks.Task<Result<HttpResponse, HttpError>> Head(Uri uri, Concurrency.CancellationToken cancellationToken) => default;
                 public Concurrency.Tasks.Task<Result<HttpResponse, HttpError>> Send(HttpRequest request) => default;
                 public Concurrency.Tasks.Task<Result<HttpResponse, HttpError>> Send(HttpRequest request, Concurrency.CancellationToken cancellationToken) => default;
+                public Concurrency.Tasks.Task<Result<HttpResponse, HttpError>> Send(HttpRequest request, HttpCompletionOption completionOption) => default;
+                public Concurrency.Tasks.Task<Result<HttpResponse, HttpError>> Send(HttpRequest request, HttpCompletionOption completionOption, Concurrency.CancellationToken cancellationToken) => default;
             }
             public sealed class HttpSocketHandler : HttpHandler {
                 public HttpSocketHandler() { }
@@ -140,7 +143,8 @@ static class HttpBindings
                 public int Port => default;
                 public string Target => default;
             }
-            public sealed class HttpResponse {
+            public sealed class HttpResponse : Disposable {
+                public void Dispose() { }
                 public Option<HttpRequest> Request => default;
                 public void Associate(HttpRequest request) { }
                 public HttpResponse(int statusCode, Collections.Sequence<HttpHeader> headers, Collections.Sequence<byte> body) { }
@@ -161,6 +165,7 @@ static class HttpBindings
                 public bool IsBuffered => default;
                 public int Length => default;
                 public Option<Collections.Sequence<byte>> TryGetBytes() => default;
+                public Option<IO.InputStream> TryGetStream() => default;
                 public void Dispose() { }
                 public Result<PropagationUnit, HttpError> BeginUpload() => default;
                 public Result<int, HttpError> ReadUpload(byte[] buffer, int count) => default;
@@ -184,6 +189,8 @@ static class HttpBindings
                 public Result<int, HttpError> GetLocalPort() => default;
                 public Concurrency.Tasks.Task<Result<HttpContext, HttpError>> Accept() => default;
                 public Concurrency.Tasks.Task<Result<HttpContext, HttpError>> Accept(Concurrency.CancellationToken cancellationToken) => default;
+                public Concurrency.Tasks.Task<Result<HttpContext, HttpError>> AcceptHeaders() => default;
+                public Concurrency.Tasks.Task<Result<HttpContext, HttpError>> AcceptHeaders(Concurrency.CancellationToken cancellationToken) => default;
                 public Concurrency.CancellationToken StopToken => default;
                 public void Release() { }
                 public Concurrency.Tasks.Task<Result<PropagationUnit, HttpError>> ServeOne(Func<HttpRequest, Concurrency.Tasks.Task<Result<HttpResponse, HttpError>>> handler) => default;

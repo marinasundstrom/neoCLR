@@ -15,7 +15,7 @@ internal static class HttpWireLimits {
 }
 
 internal class HttpChunkDecoder {
-    private val body: ArrayList<byte>
+    private val body: ArrayList<byte>?
     private val emptyOnly: bool
     private val bodyLimit: int
     private var chunkState = 0
@@ -23,8 +23,13 @@ internal class HttpChunkDecoder {
     private var chunkDigits = 0
     private var framingBytes = 0
     private var ended = false
+    private var decodedCount = 0
+    private var available = false
+    private var output: byte = (byte)0
+    internal val HasByte: bool => available
+    internal val Byte: byte => output
 
-    internal init(body: ArrayList<byte>, emptyOnly: bool, bodyLimit: int) {
+    internal init(body: ArrayList<byte>?, emptyOnly: bool, bodyLimit: int) {
         self.body = body
         self.emptyOnly = emptyOnly
         self.bodyLimit = bodyLimit
@@ -33,6 +38,7 @@ internal class HttpChunkDecoder {
     // Chunk metadata is bounded separately from decoded content. This first
     // implementation explicitly rejects extensions and nonempty trailers.
     internal func Push(value: byte) -> Result<bool, HttpError> {
+        available = false
         if chunkState != 2 {
             framingBytes += 1
             if framingBytes > HttpWireLimits.ChunkFramingBytes {
@@ -60,7 +66,7 @@ internal class HttpChunkDecoder {
             if digit < 0 {
                 return Error(HttpError.Protocol("Invalid chunk size"))
             }
-            if chunkSize > (bodyLimit - body.Count - digit) / 16 || digit > bodyLimit - body.Count {
+            if chunkSize > (bodyLimit - decodedCount - digit) / 16 || digit > bodyLimit - decodedCount {
                 return Error(HttpError.LimitExceeded("Body limit exceeded"))
             }
             chunkSize = chunkSize * 16 + digit
@@ -74,7 +80,12 @@ internal class HttpChunkDecoder {
             }
             chunkState = if chunkSize == 0 { 5 } else { 2 }
         } else if chunkState == 2 {
-            body.Add(value)
+            if body is ArrayList<byte> destination {
+                destination.Add(value)
+            }
+            output = value
+            available = true
+            decodedCount += 1
             chunkSize -= 1
             if chunkSize == 0 {
                 chunkState = 3

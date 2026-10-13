@@ -1,0 +1,188 @@
+module System.Web.Http
+
+import System.*
+import System.Collections.*
+import System.Concurrency.*
+import System.Concurrency.Tasks.*
+import System.IO.*
+import System.Networking.*
+import System.Option.*
+import System.Result.*
+
+// One consumer, one borrowed output range and one transport block. Header read-ahead
+// transfers into this object; no further receives happen until Read requests data.
+internal class HttpBodyInput : InputStream {
+    private val connection: HttpConnection
+    private val buffer: byte[]
+    private var position: int
+    private var extent: int
+    private var remaining: int
+    private val limit: int
+    private val deadline: Option<NetworkDeadline>
+    private val ownsConnection: bool
+    private val emptyOnly: bool
+    private var chunks: HttpChunkDecoder? = null
+    private var total = 0
+    private var ended = false
+    private var closed = false
+    private var busy = false
+    private var output: byte[]? = null
+    private var outputOffset = 0
+    private var outputCount = 0
+    private var written = 0
+    private var token = CancellationToken.None
+    private var source: Promise<Result<int, StreamError>>? = null
+    private var receiving: Task<Result<int, HttpError>>? = null
+
+    internal init(connection: HttpConnection, buffer: byte[], start: int, end: int,
+        length: int, limit: int, deadline: Option<NetworkDeadline>, ownsConnection: bool, emptyOnly: bool) {
+        self.connection = connection
+        self.buffer = buffer
+        position = start
+        extent = end
+        remaining = length
+        self.limit = limit
+        self.deadline = deadline
+        self.ownsConnection = ownsConnection
+        self.emptyOnly = emptyOnly
+        ended = length == 0
+        if length == -3 {
+            chunks = HttpChunkDecoder(null, emptyOnly, limit)
+        }
+    }
+
+    func Read(buffer: byte[], offset: int, count: int) -> Task<Result<int, StreamError>> {
+        return Read(buffer, offset, count, CancellationToken.None)
+    }
+
+    func Read(buffer: byte[], offset: int, count: int, cancellationToken: CancellationToken) -> Task<Result<int, StreamError>> {
+        let result = Promise<Result<int, StreamError>>()
+        if cancellationToken.IsCancellationRequested {
+            _ = result.Cancel()
+        } else if closed {
+            _ = result.Complete(Error(StreamError.Closed))
+        } else if busy {
+            _ = result.Complete(Error(StreamError.WrongAccess))
+        } else if !(offset >= 0 && count >= 0 && offset <= buffer.Length && count <= buffer.Length - offset) {
+            _ = result.Complete(Error(StreamError.InvalidRange))
+        } else if count == 0 || ended {
+            _ = result.Complete(Ok(0))
+        } else {
+            busy = true
+            source = result
+            output = buffer
+            outputOffset = offset
+            outputCount = count
+            written = 0
+            token = cancellationToken
+            Drain()
+        }
+        return result.Task
+    }
+
+    func Close() {
+        if closed { return }
+        closed = true
+        connection.Close()
+    }
+
+    private func Finish(result: Result<int, StreamError>) {
+        let completion = source
+        source = null
+        output = null
+        busy = false
+        if ended && ownsConnection { connection.Close() }
+        if completion is Promise<Result<int, StreamError>> pending {
+            _ = pending.Complete(result)
+        }
+    }
+
+    private func Fail(error: StreamError) {
+        Close()
+        Finish(Error(error))
+    }
+
+    private func Cancel() {
+        Close()
+        let completion = source
+        source = null
+        output = null
+        busy = false
+        if completion is Promise<Result<int, StreamError>> pending {
+            _ = pending.Cancel()
+        }
+    }
+
+    private func Drain() {
+        if token.IsCancellationRequested { Cancel(); return }
+        if closed { Fail(StreamError.Closed); return }
+        if let Some(until) = deadline {
+            if until.IsExpired { Fail(StreamError.IoFailure); return }
+        }
+        if output is byte[] destination {
+            while position < extent && written < outputCount && !ended {
+                let value = buffer[position]
+                position += 1
+                var available = true
+                var decoded = value
+                if chunks is HttpChunkDecoder decoder {
+                    let progress = decoder.Push(value)
+                    if let Error(HttpError.LimitExceeded(_)) = progress {
+                        Fail(StreamError.LimitExceeded)
+                        return
+                    }
+                    if let Error(_) = progress { Fail(StreamError.InvalidData); return }
+                    if let Ok(done) = progress { ended = done }
+                    available = decoder.HasByte
+                    decoded = decoder.Byte
+                } else {
+                    if remaining > 0 {
+                        remaining -= 1
+                        ended = remaining == 0
+                    }
+                }
+                if available {
+                    if total >= limit { Fail(StreamError.LimitExceeded); return }
+                    if emptyOnly { Fail(StreamError.InvalidData); return }
+                    destination[outputOffset + written] = decoded
+                    written += 1
+                    total += 1
+                }
+            }
+        }
+        if written > 0 || ended { Finish(Ok(written)); return }
+        var wanted = 256
+        if remaining > 0 && remaining < wanted { wanted = remaining }
+        if chunks is null && outputCount < wanted { wanted = outputCount }
+        if let Some(until) = deadline {
+            let pending = connection.ReceiveUntil(buffer, 0, wanted, until, token)
+            receiving = pending
+            pending.OnCompleted(self.OnReceived)
+        } else {
+            let pending = connection.Receive(buffer, 0, wanted, token)
+            receiving = pending
+            pending.OnCompleted(self.OnReceived)
+        }
+    }
+
+    // Cancellation/outcome adapter releases borrowed output on every completion.
+    private func OnReceived() {
+        if receiving is Task<Result<int, HttpError>> pending {
+            receiving = null
+            if pending.IsCancelled || token.IsCancellationRequested { Cancel(); return }
+            if closed { Fail(StreamError.Closed); return }
+            if let Error(_) = pending.GetResult() { Fail(StreamError.IoFailure); return }
+            if let Ok(count) = pending.GetResult() {
+                if count == 0 {
+                    if remaining != -2 { Fail(StreamError.InvalidData); return }
+                    ended = true
+                    Finish(Ok(0))
+                } else {
+                    position = 0
+                    extent = count
+                    Drain()
+                }
+            }
+        }
+    }
+}

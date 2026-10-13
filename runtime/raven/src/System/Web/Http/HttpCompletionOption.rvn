@@ -1,0 +1,7 @@
+module System.Web.Http
+
+/// Selects when HttpClient.Send completes. Body reads after headers need their own cancellation.
+public enum HttpCompletionOption {
+    ResponseContentRead = 0
+    ResponseHeadersRead = 1
+}

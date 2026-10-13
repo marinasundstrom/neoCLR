@@ -8,6 +8,16 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-13
 
+- Add demand-driven incoming HTTP body streams through client headers-first completion
+  and server AcceptHeaders, retaining bounded read-ahead, framing validation,
+  cancellation and explicit response/content ownership. Buffered calls remain the
+  default; unknown-length outgoing content and streaming JSON remain unsupported.
+  Refresh the public API reference and local website, with verified partial-library
+  build provenance. Qualify 54 independent-peer cases across macOS interpreter/JIT/AOT,
+  buffered concurrency controls, and complete reclamation of 22,056 diagnostic AOT
+  allocations. Windows/TLS streaming qualification remains open; no throughput or
+  publication claim. Record HTTP conformance gaps and the next protocol work.
+
 - Support known-length InputStream response bodies through existing HttpContent
   and HttpContext APIs, sharing the client upload contract. Send headers first,
   retain the admitted source, and alternate bounded 256-byte reads/writes without

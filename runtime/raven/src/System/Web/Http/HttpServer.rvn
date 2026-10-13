@@ -14,6 +14,17 @@ import System.Networking.Sockets.*
 import System.Runtime.CompilerServices.*
 
 internal class HttpRequestDecoder {
+    private var headersOnly = false
+    private var headersComplete = false
+    private var consumed = 0
+    internal val HeadersComplete: bool => headersComplete && !failed
+    internal val Consumed: int => consumed
+    internal val BodyLength: int => if chunked { -3 } else { expected }
+    internal func EnableStreaming() { headersOnly = true }
+    internal func FinishHeaders() -> Result<HttpRequest, HttpError> {
+        if let Some(parsed) = request { return Ok(parsed) }
+        return Error(HttpError.Protocol("Incomplete headers"))
+    }
     private var head: ArrayList<byte> = ArrayList<byte>()
     private var request: Option<HttpRequest> = None()
     private var complete: bool = false
@@ -50,7 +61,7 @@ internal class HttpRequestDecoder {
             return Error(HttpError.Protocol("Request already complete"))
         }
         var index = 0
-        while index < count && !complete {
+        while index < count && !complete && !(headersOnly && headersComplete) {
             let value = buffer[index]
             index += 1
             if chunks is HttpChunkDecoder decoder {
@@ -80,9 +91,11 @@ internal class HttpRequestDecoder {
             if size >= 4 && head[size - 4] == 13 && head[size - 3] == 10 && head[size - 2] == 13 && head[size - 1] == 10 {
                 let parsed = Parse()?
                 request = Some(parsed)
+                headersComplete = true
                 complete = !chunked && expected == 0
             }
         }
+        consumed = index
         return Ok(complete)
     }
 
@@ -366,6 +379,20 @@ public class HttpServer {
 
     /// Cancellation covers waiting for a connection and reading the complete request.
     func Accept(cancellationToken: CancellationToken) -> Task<Result<HttpContext, HttpError>> {
+        return AcceptCore(cancellationToken, false)
+    }
+
+    /// Returns after valid headers; the caller reads Request.Content's stream on demand.
+    func AcceptHeaders() -> Task<Result<HttpContext, HttpError>> {
+        return AcceptHeaders(CancellationToken.None)
+    }
+
+    /// Cancellation covers acceptance and headers. Pass a token to later body reads.
+    func AcceptHeaders(cancellationToken: CancellationToken) -> Task<Result<HttpContext, HttpError>> {
+        return AcceptCore(cancellationToken, true)
+    }
+
+    private func AcceptCore(cancellationToken: CancellationToken, streaming: bool) -> Task<Result<HttpContext, HttpError>> {
         let rejected = Promise<Result<HttpContext, HttpError>>()
         if cancellationToken.IsCancellationRequested {
             _ = rejected.Cancel()
@@ -380,7 +407,7 @@ public class HttpServer {
             return rejected.Task
         }
         active += 1
-        return HttpServerExchange(self, listener, cancellationToken).Start()
+        return HttpServerExchange(self, listener, cancellationToken, streaming).Start()
     }
 
     /// Handles one accepted context and sends the callback's buffered or known-length stream response.
@@ -409,6 +436,9 @@ public class HttpServer {
             return Error(HttpError.InvalidRequest("A final response status from 200 through 599 is required"))
         }
         let count = response.Content.Length
+        if count < 0 {
+            return Error(HttpError.Unsupported("Unknown-length response output is not implemented"))
+        }
         if (status == 204 || status == 205 || status == 304) && count != 0 {
             return Error(HttpError.InvalidRequest("This response status cannot contain content"))
         }
@@ -612,7 +642,7 @@ public class HttpContext : Disposable {
         shutdownRegistration = owner.StopToken.Register(self.Close)
     }
 
-    /// The fully buffered incoming request; readable after the context closes.
+    /// The incoming request. AcceptHeaders supplies content readable only during this context's lifetime.
     val Request: HttpRequest => request
 
     /// The outgoing response configuration. Initially status 200 with empty content.
@@ -698,6 +728,7 @@ public class HttpContext : Disposable {
             return
         }
         closed = true
+        request.Content.Dispose()
         connection.Close()
         let caller = writeCaller
         writeCaller = null
@@ -854,6 +885,7 @@ public class HttpContext : Disposable {
 }
 
 internal class HttpServerExchange {
+    private val streaming: bool
     private var nextAccept: HttpServerExchange? = null
     internal val NextAccept: HttpServerExchange? => nextAccept
 
@@ -880,8 +912,10 @@ internal class HttpServerExchange {
     private var buffer: byte[] = CheckedStorage.Reserve<byte>(256)
     private var deadline = NetworkDeadline.Expired
 
-    internal init(owner: HttpServer, listener: Socket, token: CancellationToken) {
+    internal init(owner: HttpServer, listener: Socket, token: CancellationToken, streaming: bool) {
+        self.streaming = streaming
         decoder = HttpRequestDecoder(owner.Settings, owner.SslOptions is SslServerAuthenticationOptions)
+        if streaming { decoder.EnableStreaming() }
         self.owner = owner
         self.listener = listener
         callerRegistration = token.Register(self.RequestCancellation)
@@ -1003,7 +1037,21 @@ internal class HttpServerExchange {
                     Fail(reason)
                     return
                 }
-                if decoder.Complete {
+                if streaming && decoder.HeadersComplete {
+                    if let Ok(request) = decoder.FinishHeaders() {
+                        if let Some(connection) = socket {
+                            let length = decoder.BodyLength
+                            let stream = HttpBodyInput(connection, buffer, decoder.Consumed, count, length,
+                                owner.Settings.BodyBytes, Some(deadline), false,
+                                request.Method.Method == "GET" || request.Method.Method == "DELETE" || request.Method.Method == "HEAD")
+                            request.SetContent(HttpContent.Incoming(stream, if length < 0 { -1 } else { length }))
+                            let context = HttpContext(owner, connection, request)
+                            socket = None()
+                            Cleanup()
+                            _ = source.Complete(Ok(context))
+                        }
+                    }
+                } else if decoder.Complete {
                     if let Ok(request) = decoder.Finish() {
                         if let Some(connection) = socket {
                             let context = HttpContext(owner, connection, request)
