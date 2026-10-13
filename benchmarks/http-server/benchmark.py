@@ -64,6 +64,7 @@ def main():
     parser.add_argument('--bundle', type=Path, required=True)
     parser.add_argument('--output', type=Path, required=True)
     parser.add_argument('--rounds', type=int, default=5)
+    parser.add_argument('--prepare-only', action='store_true', help='Build inputs without measuring; prepared is not a passing benchmark')
     parser.add_argument('--workload', choices=['plain','json','database'], default='plain')
     parser.add_argument('--postgres-port', type=int)
     parser.add_argument('--postgres-container')
@@ -172,6 +173,9 @@ def main():
         report['commands']={'interpreter':[runtime,'run',str(assembly),'--execution','interpreter','--instructions','100000000',*context],
                             'jit':[runtime,'run',str(assembly),*roots],'aot':[str(native/'app')]}
         report['bundleManifest']=manifest
+        if args.prepare_only:
+            report['prepared']=True
+            return
         report['loadBefore']=os.getloadavg()
         report['hostProcessesBefore']=subprocess.check_output(['ps','-axo','%cpu,comm'],text=True)
         modes=['interpreter','jit','aot']

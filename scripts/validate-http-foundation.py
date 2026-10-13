@@ -36,10 +36,13 @@ def main():
     parser.add_argument('--runtime', type=Path, required=True)
     parser.add_argument('--aot', type=Path, required=True)
     parser.add_argument('--mode', action='append', choices=('interpreter', 'native'), default=None)
+    parser.add_argument('--case', action='append', help='Select named cases, e.g. server-fixed-0')
     parser.add_argument('--large-bodies', action='store_true', help='Also attempt 1 MiB native transfers; currently limited by stress-GC/deadline interaction')
     parser.add_argument('--part', choices=('all', 'transport', 'json', 'client', 'server'), default='all')
     parser.add_argument('--reuse-builds', type=Path, help='Reuse source/hash-verified builds from a prior validation directory')
     args = parser.parse_args()
+    if args.case and args.part != 'server':
+        parser.error('--case currently requires --part server')
     modes = args.mode or ['interpreter', 'native']
     bundle, out = args.bundle.resolve(), args.output.resolve()
     out.mkdir(parents=True, exist_ok=False)
@@ -95,7 +98,7 @@ def main():
                 if result.returncode:
                     raise RuntimeError(project + ' build failed; see logs')
             lib = bundle / 'lib'
-            interpreter = [str(args.runtime.resolve()), 'run', str(build / 'app.dll'), '--system', str(lib / 'System.runtime.neox'),
+            interpreter = [str(args.runtime.resolve()), 'run', str(build / 'app.dll'), '--execution', 'interpreter', '--system', str(lib / 'System.runtime.neox'),
                            '--object-root', str(lib / 'System.Runtime.dll'), '--instructions', '2000000000',
                            '--array-elements', '16777216', '--array-bytes', '33554432']
             for name in ('System.Runtime', 'System.Data', 'System.Networking', 'System.Web'):
@@ -203,6 +206,10 @@ def main():
                     (f'fixed-{size}', b'Content-Length: ' + str(size).encode() + b'\r\n\r\n' + body, body, 'ok'),
                     (f'chunked-{size}', b'Transfer-Encoding: ChUnKeD\r\n\r\n' + chunks(body), body, 'ok')]
             server_cases += [
+                ('bare-lf', b'X: value\n\r\n', b'', 'protocol'),
+                ('bare-cr', b'X: value\rX\r\n\r\n', b'', 'protocol'),
+                ('invalid-header-name', b'Bad Name: value\r\n\r\n', b'', 'protocol'),
+                ('non-ascii-header', b'X: \xff\r\n\r\n', b'', 'protocol'),
                 ('many-headers', b''.join(f'X-{i}: value\r\n'.encode() for i in range(30)) + b'Content-Length: 0\r\n\r\n', b'', 'ok'),
                 ('large-header', b'X-Padding: ' + b'a' * 4096 + b'\r\n\r\n', b'', 'ok'),
                 ('ambiguous', b'Content-Length: 0\r\nTransfer-Encoding: chunked\r\n\r\n', b'', 'protocol'),
@@ -220,7 +227,11 @@ def main():
                 ('header-count-limit', b'X: a\r\n' * 100 + b'\r\n', b'', 'limit'),
                 ('header-byte-limit', b'X: ' + b'a' * 32768, b'', 'limit'),
             ]
+            if args.case and set(args.case) - {'server-' + c[0] for c in server_cases}:
+                raise ValueError('Unknown or unavailable server case')
             for name, message, body, expected in ([] if args.part == 'client' else server_cases):
+                if args.case and 'server-' + name not in args.case:
+                    continue
                 if mode == 'interpreter' and name == 'header-byte-limit':
                     report['skips'].append(dict(case='server-' + name, mode=mode, reason='32 KiB parsing exceeds fixed transport deadline; covered in native mode'))
                     continue

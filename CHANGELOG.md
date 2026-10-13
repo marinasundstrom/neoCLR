@@ -8,6 +8,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-13
 
+- Add HTTP preparation-only and matched-library comparison tools, plus diagnostic
+  allocation/text-storage snapshots between accepted-connection closes 8 and 32.
+  Keep instrumented allocation captures separate from throughput runs. Correct the
+  foundation runner to explicitly select interpreter mode, add bounded case selection
+  and check malformed CR/LF, header names and non-ASCII input in interpreter/AOT.
+
 - Record author direction to investigate HTTP byte processing and buffer lifetimes
   toward comparison with Go. Identify existing parser/output copying and string
   construction; distinguish proposed buffer views from implemented APIs and retain
