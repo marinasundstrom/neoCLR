@@ -16711,3 +16711,19 @@ The author reiterated: “Integration doesnt negate modularity”. The assistant
 confirmed that explicit component boundaries remain compatible with shared
 contracts, validation, observability and product optimization. Integration is not
 a requirement to collapse modules, tools or processes.
+
+## 2026-10-13 — Platform abstraction proposal during the producer audit
+
+The author said: “I imagine we can build a Platform Abstraction Layer - or similar”.
+The assistant proposed evolving the existing `neoclr_os_*` socket/timing boundary:
+OS files/sockets/clocks/polling and native handles below, managed roots/object
+construction and scheduling policy above. It proposed shared contracts with separate
+macOS/Windows implementations, developed incrementally rather than as a broad rewrite.
+No later author approval of that detailed design is recorded here.
+
+The assistant recorded the proposal, .NET PAL comparison, costs and validation needs
+in [platform direction](platform-direction.md#platform-abstraction-direction--2026-10-13).
+At this point the file-input allocation slice had passed hosted macOS/Windows gates;
+Windows exercised shared decoding, while the POSIX file binding remained excluded.
+See [producer evidence](validation/runtime-product/native-producers/README.md).
+A general PAL and Windows file implementation remain proposed work.

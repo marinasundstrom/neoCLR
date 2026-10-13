@@ -228,3 +228,37 @@ Primary baselines consulted 2026-09-13:
 [.NET Task-based asynchronous pattern](https://learn.microsoft.com/en-us/dotnet/standard/asynchronous-programming-patterns/task-based-asynchronous-pattern-tap)
 and [TimeProvider](https://learn.microsoft.com/en-us/dotnet/standard/datetime/timeprovider-overview).
 These establish public API precedents, not a chosen runtime suspension implementation.
+
+## Platform abstraction direction — 2026-10-13
+
+Author proposal: build a Platform Abstraction Layer or similar. The assistant
+recommends evolving the existing private `socket-os.h` boundary into small,
+runtime-owned platform components as concrete work requires them. This is a
+proposal and sequencing direction, not an implemented general PAL or stable ABI.
+
+The initial boundary should cover OS handles, file/socket operations, clocks and
+waiting/polling. Later consumers may justify memory mapping, thread and diagnostic
+primitives. Keep managed roots, object construction, Task/Scheduler policy and GC
+policy above it. Native operations should return explicit counts/status and preserve
+partial transfers, EOF, would-block and cancellation distinctions. Caller-owned
+buffers and explicit native ownership avoid hidden managed allocation and reentry.
+TLS/crypto providers can remain separate components with their own platform backing.
+
+.NET comparison: CoreCLR has a PAL and dedicated PAL tests, described in its
+[porting guide](https://github.com/dotnet/runtime/blob/main/docs/design/coreclr/botr/guide-for-porting.md).
+The useful precedent is an independently testable OS boundary. neoCLR need not adopt
+a Windows-shaped compatibility surface: its existing socket adapter already keeps
+operation/root policy above native handle/error translation. This proposed narrower
+scope reduces duplicated adapters but costs explicit capability/error contracts and
+cross-platform conformance tests; it is not evidence of a performance improvement.
+Prefer build-selected direct calls or inlining where appropriate, and measure any
+added dispatch/copying instead of assuming abstraction is free.
+
+Grow incrementally: preserve the qualified socket boundary, then design shared file
+operations before lifting the existing Windows file-binding exclusion. Test EOF,
+short reads/writes, errors, cancellation, close ownership and encoding on macOS and
+Windows, with GC lifetime tests at the managed adapter boundary. Unsupported services
+must be explicit capabilities. OS parity does not by itself establish CPU ABI/ARM64
+support. Keep interpreter/JIT/AOT semantics aligned without requiring identical OS
+implementations or collapsing modular components. This work does not replace the
+active GC/admission milestone or authorize a broad restructuring prerequisite.
