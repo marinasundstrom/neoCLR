@@ -82,7 +82,7 @@ public sealed partial class MethodBuilder
             var stack = state.Stack.ToList(); var assigned = (bool[])state.Assigned.Clone();
             var instruction = Instructions[index];
             // Preserve native primitive identity across stack operations and joins.
-            void Pop(BodyValueType type, bool output = false)
+            void Pop(BodyValueType type, bool output = false, bool intersectionCall = false)
             {
                 if (stack.Count > 0 && stack[^1].ConstructionReceiver)
                     throw new InvalidDataException("construction receiver cannot escape or be used for ordinary access");
@@ -103,6 +103,9 @@ public sealed partial class MethodBuilder
                      type.ImportedType is { } externalInterface && instance.ConformsTo(externalInterface));
                 var importedConformance = stack.Count > 0 && stack[^1].ImportedType is { } importedActual && type.ImportedType is { } importedTarget &&
                     (Assembly.HasNativeInterfaceConversion(importedActual, importedTarget) || Assembly.HasDeclaredClassBase(importedActual, importedTarget));
+                var intersectionConformance = intersectionCall && stack.Count > 0 &&
+                    stack[^1].Composition is { } actualComposition && type.Composition is { } targetComposition &&
+                    Assembly.HasExperimentalIntersectionCallConversion(actualComposition, targetComposition);
                 var externalRootConformance = stack.Count > 0 && Assembly.ExternalObjectRoot is { } selectedRoot &&
                     Equals(type.ImportedType, selectedRoot) &&
                     (stack[^1].Class is { IsValueType: false, IsStatic: false } ||
@@ -113,7 +116,7 @@ public sealed partial class MethodBuilder
                 if (stack.Count > 0 && (stack[^1].Class?.IsValueType == true || stack[^1].GenericInstance?.Definition.IsValueType == true || stack[^1].ImportedType?.IsValueType == true) &&
                     (type.Class?.IsInterface == true || type.GenericInstance?.Definition.IsInterface == true || type.ImportedType is { IsValueType: false }))
                     throw new InvalidDataException("value-to-interface conversion requires explicit boxing or constrained dispatch");
-                if (stack.Count == 0 || stack[^1] != type && !(stack[^1].Class is { } derived && type.Class is { } ancestor && derived.DerivesFrom(ancestor)) && !externalRootConformance && !importedConformance && !constructedConformance && !localExternalConformance && !(type.Class is { IsInterface: true } contract && stack[^1].Class is { } actual && actual.ConformsTo(contract)) && !(type.GenericInstance is { Definition.IsInterface: true } constructed && stack[^1].Class is { } concrete && concrete.ConformsTo(constructed))) throw new InvalidDataException($"evaluation stack type mismatch or underflow at {index} ({instruction.Op}): expected {type}, actual {(stack.Count == 0 ? "<empty>" : stack[^1].ToString())}");
+                if (stack.Count == 0 || stack[^1] != type && !(stack[^1].Class is { } derived && type.Class is { } ancestor && derived.DerivesFrom(ancestor)) && !intersectionConformance && !externalRootConformance && !importedConformance && !constructedConformance && !localExternalConformance && !(type.Class is { IsInterface: true } contract && stack[^1].Class is { } actual && actual.ConformsTo(contract)) && !(type.GenericInstance is { Definition.IsInterface: true } constructed && stack[^1].Class is { } concrete && concrete.ConformsTo(constructed))) throw new InvalidDataException($"evaluation stack type mismatch or underflow at {index} ({instruction.Op}): expected {type}, actual {(stack.Count == 0 ? "<empty>" : stack[^1].ToString())}");
                 stack.RemoveAt(stack.Count - 1);
             }
             switch (instruction.Op)
@@ -393,7 +396,7 @@ public sealed partial class MethodBuilder
                             if (stack[^1].AddressedLocal is { } slot) outputs.Add(slot);
                             if (stack[^1].AddressedParameter is { } parameter) outputs.Add(locals.Count + parameter);
                         }
-                        Pop(callSignature.ParameterTypes[i], output);
+                        Pop(callSignature.ParameterTypes[i], output, intersectionCall: true);
                     }
                     if (instruction.Target.IsConstructor)
                     {

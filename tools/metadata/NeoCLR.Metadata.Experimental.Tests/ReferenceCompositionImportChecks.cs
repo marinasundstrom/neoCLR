@@ -12,7 +12,9 @@ internal static class ReferenceCompositionImportChecks
         var a = provider.AddInterface("Example", "A");
         var b = provider.AddInterface("Example", "B");
         var both = provider.AddClass("Example", "Both");
-        both.AddInterfaceImplementation(a); both.AddInterfaceImplementation(b);
+        var derivedB = provider.AddInterface("Example", "DerivedB");
+        derivedB.AddBaseInterface(b);
+        both.AddInterfaceImplementation(a); both.AddInterfaceImplementation(derivedB);
         var ctor = both.AddConstructor(Array.Empty<PrimitiveType>()); ctor.Return();
         var produce = provider.AddFunction("Produce", new MethodSignature(a, Array.Empty<SignatureType>()));
         produce.NewObject(ctor); produce.Return();
@@ -66,6 +68,33 @@ internal static class ReferenceCompositionImportChecks
                 File.WriteAllBytes(Path.Combine(output, scenario.Label + "Consumer.neox"), NativeModuleContainer.WriteLibraryBinary(json));
             }
         }
+        // Proof uses metadata guarantees, never the factory body's concrete allocation.
+        foreach (var scenario in new[] {
+            (Name: "Equivalent", Source: new[] { 0, 2 }, Target: new[] { 1, 2 }, Accepted: true),
+            (Name: "EquivalentReverse", Source: new[] { 1, 2 }, Target: new[] { 0, 2 }, Accepted: true),
+            (Name: "Weaken", Source: new[] { 0, 2 }, Target: new[] { 0, 1 }, Accepted: true),
+            (Name: "Strengthen", Source: new[] { 0, 1 }, Target: new[] { 0, 2 }, Accepted: false) })
+        {
+            JsonNode Intersection(int[] indices) => new JsonObject { ["Intersection"] = new JsonArray(indices.Select(Bound).ToArray()) };
+            var root = source.DeepClone();
+            root["functions"]![0]!["returns"] = Intersection(scenario.Source);
+            root["functions"]![1]!["parameters"]![0] = Intersection(scenario.Target);
+            root["functions"]![1]!["returns"] = Intersection(scenario.Target);
+            var image = NativeModuleContainer.WriteLibraryBinary(Encoding.UTF8.GetBytes(root.ToJsonString()));
+            var snapshot = AssemblyDefinition.ReadNativeAssembly(image, true);
+            var consumer = new AssemblyBuilder(new("Proof" + scenario.Name, new Version(1, 0, 0, 0)), core);
+            var main = consumer.AddFunction("Main"); consumer.EntryPoint = main;
+            main.Call(consumer.ImportExperimentalCompositionReference(snapshot.MainModule.Functions.Single(m => m.Name == "Produce"), core));
+            main.Call(consumer.ImportExperimentalCompositionReference(snapshot.MainModule.Functions.Single(m => m.Name == "Echo"), core));
+            main.Emit(OpCode.Pop); main.LoadConstant(42); main.Return();
+            if (!scenario.Accepted) { Reject(() => consumer.WriteNativeAssembly()); continue; }
+            var json = consumer.WriteNativeAssembly();
+            if (output is not null)
+            {
+                File.WriteAllBytes(Path.Combine(output, scenario.Name + "Provider.neox"), image);
+                File.WriteAllBytes(Path.Combine(output, scenario.Name + "Consumer.neox"), NativeModuleContainer.WriteLibraryBinary(json));
+            }
+        }
         var mismatched = AssemblyDefinition.ReadNativeAssembly(Image("Union", "Intersection"), true);
         var bad = new AssemblyBuilder(new("BadCompositionCall", new Version(1, 0, 0, 0)), core);
         var badMain = bad.AddFunction("Main"); bad.EntryPoint = badMain;
@@ -73,7 +102,7 @@ internal static class ReferenceCompositionImportChecks
         badMain.Call(bad.ImportExperimentalCompositionReference(mismatched.MainModule.Functions.Single(m => m.Name == "Echo"), core));
         badMain.Emit(OpCode.Pop); badMain.LoadConstant(42); badMain.Return();
         Reject(() => bad.WriteNativeAssembly());
-        Console.WriteLine("PASS experimental composition callable imports, native serialization, exact stack identity and closed CLI/storage gates");
+        Console.WriteLine("PASS experimental composition callable imports, native serialization, intersection call entailment and closed CLI/storage gates");
     }
     private static void Check(bool condition, string message) { if (!condition) throw new Exception(message); }
     private static void Reject(Action action)

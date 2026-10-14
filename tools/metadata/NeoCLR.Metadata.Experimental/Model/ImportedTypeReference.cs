@@ -53,6 +53,19 @@ public sealed partial class AssemblyBuilder
     private readonly Dictionary<(AssemblyIdentity, string, string, ImportedTypeReference?), ImportedTypeReference> importedNominalTypes = [];
     private readonly Dictionary<ImportedTypeReference, TypeDefinition> nativeImportedDefinitions = [];
     private readonly Dictionary<(ImportedTypeReference, ImportedTypeReference), bool> nativeInterfaceConversions = [];
+    // Call-only proof: every required bound must follow from one guaranteed bound.
+    // Keep descriptors intact; mixed compositions and nominal storage use separate rules.
+    internal bool HasExperimentalIntersectionCallConversion(ReferenceCompositionSignature actual, ReferenceCompositionSignature target)
+    {
+        if (actual.Kind != ReferenceCompositionKind.Intersection || target.Kind != ReferenceCompositionKind.Intersection)
+            return false;
+        bool Supported(SignatureType type) => type.ImportedType is { IsValueType: false, GenericArity: 0, TypeArguments.Count: 0 } imported &&
+            ReferenceEquals(imported.Owner, this);
+        if (!actual.Constituents.All(Supported) || !target.Constituents.All(Supported))
+            return false;
+        return target.Constituents.All(required => actual.Constituents.Any(guaranteed =>
+            guaranteed == required || HasNativeInterfaceConversion(guaranteed.ImportedType!, required.ImportedType!)));
+    }
     internal bool HasNativeInterfaceConversion(ImportedTypeReference actual, ImportedTypeReference target)
     {
         if (IsAuthoredInterface(target) && HasAuthoredInterfaceConversion(actual, target)) return true;

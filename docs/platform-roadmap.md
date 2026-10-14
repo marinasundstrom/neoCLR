@@ -5,7 +5,7 @@
 `codex/structural-union-intersection` reuse metadata identity and runtime reference
 services. The companion Raven branch `codex/neoclr-union-intersection` now has
 semantic symbols/conversions, source generic-constraint conjunctions and opt-in
-native intersection call forwarding. Four Raven-generated callers return 42 while
+native intersection call forwarding with bounded interface entailment. Five Raven-generated callers return 42 while
 preserving raw native descriptors; general authored compound storage remains
 pending. An explicit build feature admits reference-only compound signatures in
 the interpreter; JIT/AOT reject them. This does not change the active

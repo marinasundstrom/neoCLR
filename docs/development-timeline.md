@@ -17291,3 +17291,18 @@ open, not an approved complete implementation or a permanent roadmap reprioritiz
   normalized nominal type reject before output. The 24 focused compiler tests and
   existing native import/nullable controls pass. Default and PE emission remain
   gated; authored storage, broader conversions and JIT/AOT remain open.
+
+- **Intersection argument proof follow-through:** on continuation, the assistant
+  closes the exact-identity gap for flat native intersection call arguments using
+  scoped nominal identity and declared interface relationships. Three additional
+  host consumers and Raven's equivalent-contract consumer return 42; strengthening
+  without a guaranteed bound still rejects. Original descriptors and storage/PE
+  gates remain intact. Class-base traversal and broader composition conversions
+  remain open; this does not reprioritize the active platform milestone.
+
+- **Metadata model question:** the author asks how definitions and specifications
+  are stored and which extensions neoCLR adds. The assistant explains the separate
+  nominal declaration/reference and recursive signature layers, distinguishes CLI
+  TypeDef/TypeRef/TypeSpec projection from native TypeDef/Type expression storage,
+  and separates executable branch features from the broader structural codec/design.
+  No new representation or permanent feature priority is selected by this question.

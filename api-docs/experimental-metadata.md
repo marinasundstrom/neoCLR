@@ -8474,8 +8474,12 @@ No new public compound signature factory or authored storage capability is added
 The native writer serializes compound call operands with their imported nominal
 identities. Body validation retains the descriptor as a stack type: exact compound
 results can feed equivalent compound parameters, including reordered bounds.
-This slice adds no host-verifier proof rules for injection/projection between
-nominal and compound types or between different compounds. A union result cannot
+For call arguments only, flat nominal-reference intersections also admit a bounded
+proof: each required bound must equal a source bound or follow through its declared
+interface graph. Thus `A & Both` can feed `B & Both` or `A & B` when Both implements
+both interfaces. The reverse strengthening from `A & B` to `A & Both` rejects.
+Descriptors remain unchanged. This adds no nominal/compound injection/projection,
+class-base traversal, mixed-composition proof, storage or boxing conversion. A union result cannot
 be passed to an intersection parameter just because their bounds match.
 
 `AssemblyBuilder.Write()` and its reference-image path reject graphs containing

@@ -62,8 +62,8 @@ Raven's native emitters reject compound references by default (NEOMETA001).
 Raven `dc750c659` adds `NeoClrEmitOptions.AllowExperimentalIntersectionCalls` to opt native JSON emission
 into direct imported call forwarding. Calls resolve the original metadata token
 and descriptor, including when a signature simplifies to a nominal compiler type.
-PE/#Neo and general authored storage remain gated. Different raw compound stack
-contracts are rejected with NEOMETA003 rather than silently erased. Both
+PE/#Neo and general authored storage remain gated. Flat intersection call arguments now use a bounded nominal-interface proof while
+preserving both raw contracts; unsatisfied bounds still reject before output. Both
 metadata schemas pass cold/warm symbol/type queries, reduction/retention checks,
 union/default-reader rejection and emission rejection without changing output.
 The existing native nullable-symbol control also passes. These checks add semantic

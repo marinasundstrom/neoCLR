@@ -414,10 +414,9 @@ Redundant `A & Both` bounds remain in call operands after compiler normalization
 Four generated programs (nested calls and discarded results, each with ordinary or
 redundant bounds) return `Int32(42)` in the opt-in interpreter. The compiler fixture
 also verifies default and PE/#Neo rejection, inferred-local rejection, unchanged
-output on failure, and rejection when two different raw contracts simplify to the
-same nominal compiler type. That last case reports NEOMETA003 because the host
-verifier currently requires exact compound stack identity; this is an incomplete
-conversion proof, not a restriction on the intended reference semantics.
+output on failure. The follow-up below closes the initial exact-identity gap for
+flat intersection call arguments, including contracts that simplify to the same
+nominal compiler type.
 
 From the Raven companion worktree, generate the programs with:
 
@@ -443,3 +442,30 @@ as a project/CLI switch or Runtime Contract setting, and does not enable PE outp
 locals/spills, authored compound signatures, structural unions or JIT/AOT. Imported
 cross-dependency bounds requiring a resolver and broader reference conversions
 remain follow-up work. Default .NET behavior and milestone sequencing are unchanged.
+
+## Intersection call entailment — 2026-10-14
+
+The host verifier now accepts a flat reference intersection argument when every
+required nominal bound is guaranteed by a source bound: either identical scoped
+identity or a declared interface relationship (including transitive interfaces).
+For example, with Both implementing A and B, `A & Both` can feed `B & Both` or
+`A & B`. The reverse strengthening from `A & B` to `A & Both` rejects regardless
+of the concrete object returned by the fixture. Union-to-intersection remains
+rejected. Original descriptors survive; this is a verification proof, not erasure.
+
+This rule applies only while consuming call parameters. General storage,
+nominal/compound projection, mixed composition proofs, class-base traversal and
+cross-dependency resolver support remain gaps. Existing graph and descriptor
+bounds apply; no new Runtime Contract or transport encoding is introduced.
+The same-reference semantics build on the existing .NET nominal interface relation;
+first-class intersection signatures remain the documented native-only divergence.
+The metadata toolkit owns the proof, Raven owns admission/diagnostics, and the
+runtime independently validates the emitted contracts. Wider native verification
+and backend support must replace these bounded admission gaps before expansion.
+
+The focused host probe adds three executable positive cases (equivalent contracts
+in both directions and weakening) plus a rejected strengthening. All three return
+42, including a transitive interface guarantee. Raven's `--intersection-calls`
+now emits `ReducedCallsEquivalent.neox`, which returns 42 with
+`ReducedCallsProvider.neox`; its four earlier consumers and default/PE/storage
+controls still pass. No compiler semantic conversion rule changed.
