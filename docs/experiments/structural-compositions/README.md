@@ -311,3 +311,19 @@ change; the same two existing failures are `Native Object root authoring` and
 `Int32 local ownership initialization and execution`. No new failure is introduced.
 `python3 scripts/build-api-docs.py --check` passes. Runtime and Raven compiler
 behavior are unchanged, so their earlier executable evidence is retained.
+
+## Canonical metadata inspection — 2026-10-14
+
+`ReferenceCompositionTypeInfo` now exposes admitted signatures through the host
+metadata facade. Reordered bounds reuse a context-owned view; nominal bounds reuse
+the same catalog identities. Separate contexts remain distinct, constituent lists
+are immutable, and mixed kinds stay nested. Missing snapshot/dependency resolution
+fails explicitly. No subtype reduction, member synthesis or compiler admission is
+added. Unlike .NET reflection, this native-only view can preserve a compound
+signature; the cost remains an explicit import/emission boundary.
+
+The focused `--reference-compositions` check passes for both binary schemas,
+including canonical function result discovery, reordered bounds, context isolation,
+immutable bounds and mixed nesting. Public XML documentation builds and the guest
+API snapshot check pass. Runtime evidence above is unaffected. Raven still uses
+the default reader; semantic import and emission remain open.

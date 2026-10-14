@@ -2,6 +2,7 @@ using System.Text;
 using System.Text.Json.Nodes;
 using NeoCLR.Metadata.Experimental;
 using NeoCLR.Metadata.Experimental.Model;
+using NeoCLR.Metadata.Experimental.Introspection;
 
 internal static class ReferenceCompositionChecks
 {
@@ -47,6 +48,20 @@ internal static class ReferenceCompositionChecks
                 Check(input.Composition!.Kind.ToString() == kind && input.Composition.Constituents.Count == 2, "kind and constituents");
                 Check(input.Composition.Constituents[0].ReferencedType!.Resolve().Name == "A", "snapshot-owned bound");
                 Check(input.ToString().Contains(kind), "diagnostic display");
+                var context = new MetadataLoadContext([snapshot]);
+                var view = (ReferenceCompositionTypeInfo)context.ResolveSignature(input);
+                Check(ReferenceEquals(view, context.ResolveSignature(signature.ReturnType)), "canonical reordered view");
+                Check(view.Kind == input.Composition.Kind && !view.IsNominalType, "non-nominal composition view");
+                Check(ReferenceEquals(view.Constituents[0], context.Resolve(input.Composition.Constituents[0].ReferencedType!)), "canonical nominal view");
+                Check(view.DisplayName.Contains(kind), "composition view display");
+                var functionView = context.GetModules().SelectMany(m => m.GetFunctions()).Single(m => m.Name == "Echo");
+                Check(ReferenceEquals(view, functionView.ReturnType), "function discovery projects canonical result");
+
+                try { ((IList<TypeInfo>)view.Constituents).Clear(); throw new Exception("mutable view bounds"); }
+                catch (NotSupportedException) { }
+                Check(!ReferenceEquals(view, new MetadataLoadContext([snapshot]).ResolveSignature(input)), "context-scoped view identity");
+                Reject(() => new MetadataLoadContext([]).ResolveSignature(input));
+
                 try { ((IList<SignatureType>)input.Composition.Constituents).Clear(); throw new Exception("mutable constituents"); }
                 catch (NotSupportedException) { }
                 Reject(() => RuntimeAssemblyContainer.Write(NativeModuleContainer.Read(image), core));
@@ -57,9 +72,18 @@ internal static class ReferenceCompositionChecks
                 Check(another.MainModule.Functions[0].TryGetSignature(out var other), "separate snapshot");
                 Check(input != other!.ParameterTypes[0], "snapshot identity is not display-name identity");
             }
+            var distinctKinds = AssemblyDefinition.ReadNativeAssembly(Image(SetSignature(bound,
+                Compose(kind == "Union" ? "Intersection" : "Union", originalType, otherType))), true);
+            Check(distinctKinds.MainModule.Functions[0].TryGetSignature(out var distinctSignature), "distinct kind signature");
+            var distinctContext = new MetadataLoadContext([distinctKinds]);
+            Check(!ReferenceEquals(distinctContext.ResolveSignature(distinctSignature!.ReturnType),
+                distinctContext.ResolveSignature(distinctSignature.ParameterTypes[0])), "kind participates in canonical identity");
             var mixed = Compose(kind, originalType, Compose(kind == "Union" ? "Intersection" : "Union", originalType, otherType));
             var mixedRead = AssemblyDefinition.ReadNativeAssembly(Image(SetSignature(mixed)), true);
             Check(mixedRead.MainModule.Functions[0].TryGetSignature(out var mixedSignature) && mixedSignature!.ReturnType.Composition!.Constituents[1].Composition is not null, "preserve mixed composition");
+            var mixedContext = new MetadataLoadContext([mixedRead]);
+            var mixedView = (ReferenceCompositionTypeInfo)mixedContext.ResolveSignature(mixedSignature!.ReturnType);
+            Check(mixedView.Constituents[1] is ReferenceCompositionTypeInfo inner && inner.Kind != mixedView.Kind, "mixed view retains distinct kinds");
             var nested = Compose(kind, originalType, Compose(kind, otherType, originalType));
             var read = AssemblyDefinition.ReadNativeAssembly(Image(SetSignature(nested, bound)), true);
             Check(read.MainModule.Functions[0].TryGetSignature(out var flattened) && flattened!.ReturnType == flattened.ParameterTypes[0], "flatten and deduplicate");

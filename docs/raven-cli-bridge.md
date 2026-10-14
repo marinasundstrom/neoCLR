@@ -28,6 +28,12 @@ not. Reconcile descriptor identity before metadata import/export.
 Raven main and the native line remain separate; older structural/intersection work
 is an input for selective reuse, not a wholesale merge.
 
+The metadata facade exposes admitted descriptors as canonical
+`ReferenceCompositionTypeInfo` views, including function results and parameters.
+This preserves kind and nominal identity without adding compiler symbol mapping,
+Runtime Contract capabilities or emission. Focused host checks cover reordered
+bounds, mixed nesting and context isolation.
+
 The host declaration reader can now opt into read-only compound free-function
 signatures via `ReadNativeAssembly(image, true)`. Raven still uses the default
 reader. Native callable import and CLI projection remain explicitly rejected;

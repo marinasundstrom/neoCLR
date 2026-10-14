@@ -8428,3 +8428,23 @@ code generation. Raven's current adapter uses the default reader and therefore
 still rejects compound declarations. See the
 [experiment record](../docs/experiments/structural-compositions/README.md) for
 validation, remaining identity differences and the next compiler slice.
+
+The `NeoCLR.Metadata.Experimental.Introspection` facade exposes these loaded
+signatures through `MetadataLoadContext.ResolveSignature` and function result/
+parameter discovery. It performs catalog resolution without loading or executing
+assemblies. Missing dependencies or foreign snapshots throw `InvalidDataException`.
+The reader opt-in remains the admission boundary; no second switch is needed to
+inspect an already admitted immutable snapshot.
+
+| API | Contract |
+| --- | --- |
+| `ReferenceCompositionTypeInfo : TypeInfo` | Context-owned, read-only view; no public constructor. Reference equality is canonical within one context, including reordered bounds. Separate contexts remain distinct. |
+| `ReferenceCompositionTypeInfo.Kind : ReferenceCompositionKind` | Preserves union versus intersection, including mixed nesting. |
+| `ReferenceCompositionTypeInfo.Constituents : IReadOnlyList<TypeInfo>` | Immutable canonical nominal/composition bounds, in the first projected signature's order. Resolved duplicate bounds collapse; a singleton resolves directly to its constituent view. No nominal subtype reduction or distributive rewriting. |
+| `ReferenceCompositionTypeInfo.DisplayName : string` | Diagnostic kind/bound display; not a binding identity or stable serialization. |
+| `ReferenceCompositionTypeInfo.IsNominalType : bool` | Always `false`; the composition does not invent a nominal declaration. |
+
+Composition projection retains the reader's depth limit of 32. It adds no
+assignability, synthesized members, callable import or code generation. Existing
+non-composition projection limits remain unchanged. Raven symbol mapping and
+native emission are still pending.

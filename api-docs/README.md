@@ -544,6 +544,7 @@ the snapshot is now regenerated from the merged Function bridge with System.Fail
 and top-level functions), `TypeBuilder` and
 `MethodBuilder`, `PrimitiveType`, `PrimitiveMethodSignature`, `MethodSignature`, `SignatureType`,
 `ReferenceCompositionKind`, `ReferenceCompositionSignature`, `LocalDefinition`, `BranchLabel` and `OpCode` in that Model namespace,
+along with `NeoCLR.Metadata.Experimental.Introspection.ReferenceCompositionTypeInfo`,
 are .NET-host-only types in
 `tools/metadata/NeoCLR.Metadata.Experimental`, not types in NeoCLR.CoreProbe or the
 Raven guest library. They therefore cannot be added to that assembly's RavenDoc type

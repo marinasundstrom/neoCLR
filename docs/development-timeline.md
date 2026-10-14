@@ -17255,3 +17255,9 @@ open, not an approved complete implementation or a permanent roadmap reprioritiz
   checks pass; the metadata harness changes from 169/171 to 170/172 with the same
   two pre-existing failures. Manual host API documentation and guest snapshot check
   are updated; compiler storage/capability mapping remains the next slice.
+
+- **Metadata inspection follow-through:** on continuation, the assistant adds
+  canonical read-only union/intersection views to the metadata facade, exposing
+  admitted signatures through function discovery. Focused checks cover reordered
+  identity, context isolation, immutable bounds and mixed nesting. This is another
+  native compiler prerequisite; Raven import and emission remain unimplemented.
