@@ -1,0 +1,32 @@
+{
+  "date": "2026-10-14",
+  "ravenCommit": "5ea64d26c",
+  "runtimeCommit": "3345b9316",
+  "profile": "Opt-in Raven source-local scalar/nested tuples; native names pending",
+  "exitCode": 42,
+  "expectedExitCode": 42,
+  "checks": [
+    "Native ordered tuple parameters/results and no local nominal tuple declaration",
+    "Source-local named and positional reads, renamed tuple compatibility, nesting and copies",
+    "Default and unsupported mutation/open-element rejection without output",
+    "Source union/intersection native signatures, catalog roundtrip, consumer emission and default gate pass"
+  ],
+  "commands": [
+    "dotnet run --project tools/NeoClrMetadataProbe -p:NeoClrMetadataProject=/Users/robert/Projects/neoclr/tools/metadata/NeoCLR.Metadata.Experimental/NeoCLR.Metadata.Experimental.csproj -- --source-tuples /Users/robert/Projects/neoclr/target/tuple-info-libraries-v2 /Users/robert/Projects/neoclr/target/raven-source-tuples",
+    "target/debug/neoclr run target/raven-source-tuples/SourceTuple.neox --system target/tuple-info-libraries-v2/System.runtime.neox --object-root target/tuple-info-libraries-v2/System.Runtime.dll --module target/tuple-info-libraries-v2/System.Runtime.dll --execution interpreter --instructions 100000000",
+    "dotnet run --no-build --project tools/NeoClrMetadataProbe -- --source-compositions /Users/robert/Projects/neoclr/target/tuple-info-libraries-v2 /Users/robert/Projects/neoclr/target/raven-tuple-composition-regression"
+  ],
+  "sha256": {
+    "target/raven-source-tuples/SourceTuple.neox": "dacad88d71fca29522cc61dd78d20efea2fb0f9870bead7d4a6bc089a383bea2",
+    "docs/experiments/structural-tuples/SourceTuples.rvn": "66b7e4572dfa2ad795a594c4d54da017f6a05949852906a0026dced46b36c5b8",
+    "target/tuple-info-libraries-v2/Core.dll": "3f7cfa9db7c4feb551e2e97b0edb89c4dcf4c64d8eccf01bd006848dcacfd3f4",
+    "target/tuple-info-libraries-v2/System.Runtime.dll": "deb2198044a184d87c2925ab76ec96c9d785cab3a20638f8b579b74513769811",
+    "target/tuple-info-libraries-v2/System.runtime.neox": "98a1ae1da85387c87746957e83a4015eb59d0566539a915c69f168d2b511b190",
+    "Raven/tools/NeoClrMetadataProbe/SourceTupleChecks.cs": "393beeea28dfa794eb335cf22b7f837b87b16816ce4a144a62065544d52310aa"
+  },
+  "limitations": [
+    "Native tuple node still stores element types only; native names/import/reflection remain required",
+    "Source binding still depends on nominal tuple family",
+    "Mutation/address lowering, broader elements and tuple wrappers remain outside this compiler profile"
+  ]
+}

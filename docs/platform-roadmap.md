@@ -3926,8 +3926,10 @@ Guest ordered element introspection is available through `TupleTypeInfo`, and
 native C# signature authoring, opt-in snapshots and callable imports preserve ordered
 tuple shapes with CLI rejection. C# construction/element operations execute nested
 tuples across imported calls with copy semantics;
-Raven migration, native layout/backends and
-nominal family removal remain staged follow-ups on the experimental branches.
+Raven source-local scalar/nested tuple lowering executes named/positional reads
+and copies (42), while native element-name preservation, compiler imports/mutation,
+carrier-independent binding, native layout/backends and nominal family removal
+remain staged follow-ups on the experimental branches.
 
 ## Theme trackers
 

@@ -17658,3 +17658,22 @@ native tests and the default-profile rejection test. Additional host and Raven
 regressions reject matching-member classes without the required interface declaration.
 The [retained report](experiments/structural-poc/results.json) distinguishes the main
 acceptance run from this clarification follow-up.
+
+
+### 2026-10-14 — Native tuple element names
+
+The author said, “You should still be able to name tuple elements.” The assistant
+validated source-local named member access but described names as aliases outside
+structural identity. The author corrected that framing: “But structural types can
+actually set real names and not just fake them by attributes”. The assistant agreed
+that names belong directly in native tuple metadata and reflection, without
+`TupleElementNamesAttribute` or a nominal carrier. It asked whether names should
+participate in identity or retain positional compatibility. The author selected:
+“No, preserve names but keep positional type compatibility”. Names must survive
+native import/reflection, while renaming elements must not break compatibility.
+The author further clarified that tuples are equal because they have the same
+structure and names are not part of structure in that sense. The assistant
+confirmed ordered element types determine type equality; names are native metadata
+for member access, tooling and reflection.
+The existing positional runtime node and source-local lowering are groundwork, not
+completion of this named-element requirement. See [the migration](structural-tuples.md).

@@ -13,8 +13,14 @@ Position, duplicates and nesting matter: `(int, string)` differs from `(string, 
 metadata shape remains distinct from its element; this does not introduce source
 syntax for single-element tuples. Empty source `()` retains the existing unit rule.
 
-The assistant's migration defaults preserve mutable positional elements and value
-copying, with label aliases excluded from type identity. Nominal interfaces still
+The assistant initially proposed mutable positional elements and value copying,
+with labels excluded from identity. The author subsequently clarified that element
+names must be real native structural metadata, not attribute-based aliases. Native
+name storage and reflection are required follow-up work. The author selected
+preserved names with positional type compatibility: renaming elements must not
+break compatibility or type equality. The author clarified that tuple type equality
+follows the ordered element structure; names are metadata, not part of that equality. The current positional node
+does not yet fulfill this named-element contract. Nominal interfaces still
 require declared conformance; tuple shape does not implicitly implement arbitrary
 interfaces. Synthesized positional access and deconstruction are runtime operations,
 not proof of nominal interface conformance. Boxing, equality, interface contracts,
@@ -210,3 +216,36 @@ for managed addresses is unchanged.
 
 [Operation validation](experiments/structural-tuples/operation-results.json) records
 the producer/consumer and test-source hashes, commands and expected result.
+
+
+### Source-local tuple lowering — 2026-10-14
+
+The experimental Raven host option `NeoClrEmitOptions.AllowExperimentalTuples`
+(default false) admits tuple literals, parameters/results, locals/copies and named
+or positional reads for scalar and nested tuple elements. Native output uses Tuple
+signatures, aggregate construction and positional loads, without a nominal tuple
+TypeDef/constructor/field. The tuple capability does not enable composition calls.
+There is no new CLI/project property; Runtime Contract configuration is unchanged.
+Ordinary .NET ValueTuple emission is unchanged. Unlike .NET's nominal carrier and
+name attributes, the intended neoCLR contract stores names directly in native
+metadata while preserving positional type equality and compatibility.
+
+This slice still binds through the configured nominal tuple family. Source-local
+names work, but the current native Tuple node stores element types only: preserving
+names across metadata import and reflection is required follow-up work, not completed
+by this slice. Do not remove the nominal family yet. Native compiler imports,
+element mutation/address lowering, non-scalar elements, tuple arrays/byref parameters
+and open generic tuple elements remain outside this compiler profile.
+
+Validation: `NeoClrMetadataProbe --source-tuples <bundle> <output>` emits a nested
+tuple consumer using named reads and copies; the matching experimental interpreter
+returns 42. The probe checks ordered native signatures, absence of a local nominal
+tuple declaration, default rejection, and atomic rejection of mutation/open tuples.
+The source composition regression also passes. The runtime library fixture is
+`target/tuple-info-libraries-v2` from compiler
+`793219d855b17f01fb805e215968b78871eb3804`; the emitting compiler is the dedicated
+`codex/neoclr-union-intersection` branch, runtime `codex/structural-union-intersection`.
+
+[Source validation](experiments/structural-tuples/source-results.json) records the
+compiler revision, fixture hashes and commands. The [tested source](experiments/structural-tuples/SourceTuples.rvn)
+includes renamed element access with unchanged positional type compatibility.

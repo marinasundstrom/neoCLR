@@ -92,6 +92,8 @@ Development direction: structural tuple signatures will replace the nominal tupl
 family. The feature branch currently preserves ordered tuple signatures in native
 metadata and provides opt-in native interpreter values with positional element
 access. Host inspection exposes resolved identities and ordered element descriptors.
-Guest `TupleTypeInfo.ElementTypes` exposes ordered recursive snapshots. Raven source
-tuples still use the nominal implementation while compiler migration is completed. See the
+Guest `TupleTypeInfo.ElementTypes` exposes ordered recursive snapshots. An explicit
+experimental Raven host option emits scalar/nested source tuples natively, including
+source-local named reads. Binding still depends on the nominal family. Native name
+preservation/import/reflection and the remaining compiler migration are pending. See the
 [tuple API reference](/docs/tuples.md) for the current boundary.
