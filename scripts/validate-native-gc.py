@@ -49,7 +49,7 @@ def main():
                   BASE / 'root-validation-test.c', BASE.parent / 'aot-fault-details/fault-details.h',
                   *[BASE / (name + '.c') for name in names]]
         carrier = ROOT / 'docs/experiments/runtime-async'
-        inputs += [BASE / 'native-stack.c']
+        inputs += [BASE / 'native-stack.c', ROOT / 'runtime/native/memory/static-storage-test.c']
         inputs += [carrier / name for name in ['native-runtime.c', 'native-runtime.h', 'native-owned-body-test.c', 'native-idle-drain-test.c']]
         report['inputs'] = {str(p.relative_to(ROOT)): hashlib.sha256(p.read_bytes()).hexdigest() for p in inputs}
 
@@ -93,6 +93,15 @@ def main():
             run(name, [binary])
             if windows and name == 'native-owned-body-test':
                 run(name + '-host-fiber', [binary, '--host-fiber'])
+        for gc in [False, True]:
+            name = 'static-storage-' + ('gc' if gc else 'arena')
+            binary = out / (name + ('.exe' if windows else ''))
+            flags = (['/DNEOCLR_NATIVE_GC'] if windows else ['-DNEOCLR_NATIVE_GC']) if gc else []
+            sources = [ROOT / 'runtime/native/memory/static-storage-test.c', BASE / 'text-arena.c']
+            if gc:
+                sources += [BASE / 'native-gc.c', BASE / 'root-probe.c']
+            run(name + '-build', [*cc, *flags, *sources, *(['/Fe:' + str(binary)] if windows else ['-o', binary])])
+            run(name, [binary])
         report['passed'] = True
     except Exception as error:
         report['error'] = str(error)

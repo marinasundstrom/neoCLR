@@ -6,6 +6,7 @@ import os
 from pathlib import Path
 import socket
 import subprocess
+import sys
 import benchmark
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -66,7 +67,7 @@ def main():
         (project / 'Cases.rvn').write_text(f'class HeaderCases {{ static val Count: int => {len(rows)} }}\n')
         (project / 'App.rvnproj').write_text('<Project Sdk="Microsoft.NET.Sdk"><Import Project="$(NeoClrBundleRoot)/lib/NeoCLR.ClassLibrary.props"/><PropertyGroup><TargetFramework>net10.0</TargetFramework><OutputType>Exe</OutputType><AssemblyName>HeaderNames</AssemblyName></PropertyGroup></Project>')
         native = out / 'native'
-        run(['python3', ROOT / 'scripts/build-native-project.py', '--profile', 'windows-http' if os.name == 'nt' else 'http', '--project', project / 'App.rvnproj', '--bundle', bundle, '--aot', a.aot.resolve(), '--output', native])
+        run([sys.executable, ROOT / 'scripts/build-native-project.py', '--profile', 'windows-http' if os.name == 'nt' else 'http', '--project', project / 'App.rvnproj', '--bundle', bundle, '--aot', a.aot.resolve(), '--output', native])
         manifest = json.loads((bundle / 'manifest.json').read_text())
         lib = bundle / 'lib'; catalog = json.loads((lib / 'bundle.json').read_text())
         context = ['--system', str(lib / catalog['runtimeSeed']), '--object-root', str(lib / 'System.Runtime.dll')]

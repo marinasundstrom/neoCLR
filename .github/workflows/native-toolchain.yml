@@ -10,7 +10,7 @@ on:
       raven_revision:
         description: Exact Raven commit to qualify with this neoCLR revision
         required: true
-        default: 6b5e052ce3648f9247ac76aba275587a3a5a1bb4
+        default: fac4ac736024800151d6b285e68407ded864f655
       bundle_run:
         description: Optional prior run whose packaged bundle should receive editor-only requalification
         required: false
@@ -20,10 +20,10 @@ permissions:
 jobs:
   windows-native:
     runs-on: windows-latest
-    timeout-minutes: 60
+    timeout-minutes: 90
     env:
       PYTHONUTF8: '1'
-      PACKAGE_VERSION: 0.1.13-neoclr.20261013.1
+      PACKAGE_VERSION: 0.1.15-neoclr.20261014.1
     steps:
       - uses: actions/checkout@v4
         with:
@@ -32,7 +32,7 @@ jobs:
         if: ${{ !inputs.bundle_run }}
         with:
           repository: marinasundstrom/raven
-          ref: ${{ inputs.raven_revision || '6b5e052ce3648f9247ac76aba275587a3a5a1bb4' }}
+          ref: ${{ inputs.raven_revision || 'fac4ac736024800151d6b285e68407ded864f655' }}
           path: raven
       - uses: dtolnay/rust-toolchain@stable
         if: ${{ !inputs.bundle_run }}
@@ -118,6 +118,20 @@ jobs:
           if ($LASTEXITCODE) { exit $LASTEXITCODE }
           python 'target/extracted bundle/neoclr-native-poc/tools/verify-native-bundle.py' --report target/windows-native-acceptance.json
           if ($LASTEXITCODE) { exit $LASTEXITCODE }
+      - name: Qualify current runtime and extracted SDK contracts
+        if: ${{ !inputs.bundle_run }}
+        shell: pwsh
+        working-directory: neoclr
+        run: |
+          $vs = & "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\vswhere.exe" -latest -products '*' -requires Microsoft.VisualStudio.Component.VC.Tools.x86.x64 -property installationPath
+          if (!$vs) { throw 'MSVC x64 tools not found' }
+          $bundle = "$PWD/target/extracted bundle/neoclr-native-poc"
+          cmd /c "`"$vs\VC\Auxiliary\Build\vcvars64.bat`" && python scripts/validate-native-gc.py --output target/release-gc"
+          if ($LASTEXITCODE) { exit $LASTEXITCODE }
+          cmd /c "`"$vs\VC\Auxiliary\Build\vcvars64.bat`" && python scripts/validate-runtime-await-sdk.py --bundle `"$bundle`" --runtime `"$bundle/bin/neoclr.exe`" --aot target/release/neoclr-codegen.exe --output target/release-runtime-await"
+          if ($LASTEXITCODE) { exit $LASTEXITCODE }
+          cmd /c "`"$vs\VC\Auxiliary\Build\vcvars64.bat`" && python benchmarks/http-server/check-header-names.py --bundle `"$bundle`" --aot target/release/neoclr-codegen.exe --output target/release-headers"
+          if ($LASTEXITCODE) { exit $LASTEXITCODE }
       - uses: actions/download-artifact@v4
         if: ${{ inputs.bundle_run != '' }}
         with:
@@ -166,6 +180,11 @@ jobs:
         with:
           name: windows-native-qualification
           path: |
+            neoclr/target/release-gc/*.json
+            neoclr/target/release-gc/*.log
+            neoclr/target/release-runtime-await/**/*.json
+            neoclr/target/release-runtime-await/**/*.log
+            neoclr/target/release-headers/results.json
             neoclr/target/windows-native-acceptance*.json
             neoclr/target/bootstrap/*.json
             neoclr/target/libraries/*evidence.json

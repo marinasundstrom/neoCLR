@@ -56,3 +56,14 @@ from fixed defects.
 The validator does not publish or deploy. Runtime release and manual website
 publication are separate operations. Earlier release notes and validation records
 remain frozen evidence for their own revisions.
+
+## Current qualification follow-up — 2026-10-14
+
+The Windows toolchain workflow now selects Raven native compiler
+`fac4ac736024800151d6b285e68407ded864f655` and candidate package build
+`0.1.15-neoclr.20261014.1`. This is a qualification build, not a published release.
+The extracted package must pass the shared GC/arena static-storage checks, all
+SDK runtime-await cases and the three-mode HTTP header wire checks before editor
+acceptance. Local macOS GC validation passes, including both static-storage modes;
+its report is `target/release-static-contracts-20261014/report.json`.
+Hosted results and matching macOS package acceptance remain required.
