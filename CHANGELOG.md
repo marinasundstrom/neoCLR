@@ -8,7 +8,7 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-14
 
-- Adopt the TypeInfo predicates in JSON node compatibility and generic reflection result guards; update acquisition/reflection samples and add a focused native-source constructor fixture. Keep exact scalar mapping checks unchanged. JSON passes interpreter/JIT/AOT; typed construction and acquisition pass interpreted execution. Retain qualification evidence and existing legacy-harness/native-display limits.
+- Adopt the TypeInfo predicates in JSON node compatibility and generic reflection result guards; update acquisition/reflection samples and add a focused native-source constructor fixture. Keep exact scalar mapping checks unchanged. JSON passes interpreter/JIT/AOT; typed construction and acquisition pass interpreted execution. Retain qualification evidence and existing legacy-harness/native-display limits. Both implementation slices are integrated into local main; publication remains separate.
 
 - Add TypeInfo.AssignableTo/AssignableFrom with required non-null type arguments, plus strict IsSubclassOf and nullable-object IsInstanceOfType. All descriptor implementations share runtime relationship rules; interpreter, JIT and AOT pass six managed cases. Add runtime/lowering checks, document variance/compiler limits, and refresh both API references with source links.
 
