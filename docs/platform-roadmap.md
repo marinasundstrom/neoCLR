@@ -4648,3 +4648,6 @@ host builder; Raven source-local/await integration remains pending. Structural t
 are intended as fully introspectable runtime types: tuples (later), unions,
 intersections and functions, with arrays retaining Array<T> backing.
 [Result-local evidence and type model](experiments/structural-compositions/README.md#imported-composition-result-locals--2026-10-14).
+
+The companion compiler now executes imported-result source locals/copies; fourteen
+paired consumers pass. Await/state-machine composition storage remains the next slice.

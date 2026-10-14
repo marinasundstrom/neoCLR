@@ -22,7 +22,7 @@ subprocess.run(['dotnet', 'run', '--project', 'tools/NeoClrMetadataProbe',
 results = []
 for profile in ['', 'generic']:
     directory = output / profile
-    for name in ['First', 'Second', 'Direct', 'Discard']:
+    for name in ['First', 'Second', 'Direct', 'Discard', 'Local']:
         run = subprocess.run([str(ROOT / 'target/debug/neoclr'), 'run', str(directory / f'{name}.neox'),
             '--module', str(directory / 'CompositionPocProvider.neox'), '--execution', 'interpreter', '--show-result'],
             cwd=ROOT, capture_output=True, text=True)
