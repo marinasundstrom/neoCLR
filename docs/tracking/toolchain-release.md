@@ -5,6 +5,28 @@ This page owns shared integration/delivery status. The [HTTP tracker](../http-ca
 owns whether its packaged sample passes and whether the POC is complete; do not
 maintain a second HTTP completion checklist here.
 
+## Next release: ad-hoc union hover — 2026-10-14
+
+Author-reported editor issue, deliberately deferred beyond Preview 15: hovering
+an alternative in `StreamError | JsonError | MappingError` displays the complete
+`System.Union<...>` carrier and recursively expands every named union's cases.
+The screenshot was supplied from the newly installed preview.
+
+Expected behavior:
+
+- Hover on each named alternative resolves that type independently, with its own
+  signature and documentation.
+- A combined union display uses Raven syntax, such as
+  `StreamError | JsonError | MappingError`, without expanding nested named unions.
+- Keep hover ranges local to the selected alternative; test every alternative in
+  a nested `Task<Result<unit, ...>>` return annotation, including metadata types.
+
+This is a Raven language-service symbol selection/display issue to investigate;
+the screenshot does not establish which layer causes it. Develop the general fix
+on Raven main, then carry and validate it on the neoCLR compiler line. Preserve
+ordinary named-union hover details when that union itself is the selected type.
+No implementation or compiler change is included in Preview 15 for this issue.
+
 ## Current candidate qualification — 2026-10-14
 
 The 132-lane JSON composed-error carrier is now admitted by the bounded 256-lane

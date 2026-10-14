@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-14
 
+- Track the author-reported ad-hoc union hover issue for the next release: resolve each alternative independently and keep composed union displays compact. This is planned editor work, not a Preview 15 fix.
+
 - Prepare the qualified Preview 15 source tag and publication assets; release and website publication are recorded separately once completed.
 
 ## 0.1.0-preview.15 — 2026-10-14

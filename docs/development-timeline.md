@@ -17109,3 +17109,17 @@ open, not an approved complete implementation or a permanent roadmap reprioritiz
 - **Author:** required correct API source links when publishing. The snapshot guard
   now checks the new JSON type/member links alongside existing HTTP, Tasks and
   PostgreSQL links. Publication and installation outcomes belong in release tracking.
+
+
+### 2026-10-14 — ad-hoc union hover deferred to the next release
+
+- **Author:** supplied a screenshot of hover expanding `StreamError`, `JsonError`
+  and `MappingError` into a verbose `System.Union` carrier. Directed that each
+  alternative in ad-hoc union syntax should display as an independent type when
+  hovered, and explicitly assigned this to the next release.
+- **Assistant:** agreed to record per-alternative hover and compact combined-union
+  display as the next editor fix. Preview 15 had already been published; website
+  deployment was still running. No compiler/editor patch was made for this issue.
+- **Follow-up:** investigate symbol selection and display on Raven main, then carry
+  the validated general fix to the neoCLR line. Acceptance is recorded in the
+  [toolchain tracker](tracking/toolchain-release.md#next-release-ad-hoc-union-hover--2026-10-14).
