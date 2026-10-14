@@ -9,6 +9,12 @@ interfaces/non-sealed reference classes. General authored storage and JIT/AOT
 remain closed. Full open/closed generic type integration is the author-requested
 next experimental step; this does not change the active performance milestone.
 
+**Type relationships (author direction, 2026-10-14):** TypeInfo assignment, subclass
+and instance predicates share runtime semantics across interpreter/JIT/AOT. The
+[focused qualification](validation/type-relationships-20261014/README.md) records
+macOS checks and remaining compiler/variance limits. This bounded API addition does
+not reprioritize the integrated-runtime performance milestone.
+
 **Preview 15 published (2026-10-14):** the composed JSON error carrier now fits a
 shared 256-lane native inline-value bound. GC and runtime-product qualification pass
 on macOS and Windows; local three-mode JSON and 132 HTTP checks pass. The

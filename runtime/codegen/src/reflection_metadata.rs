@@ -324,6 +324,8 @@ pub fn bind_queries(
                         | "neoCLR.Runtime.TypeMetadataToken"
                         | "neoCLR.Runtime.TypeArgument"
                         | "neoCLR.Runtime.TypeShape"
+                        | "neoCLR.Runtime.ReflectionAssignable"
+                        | "neoCLR.Runtime.ReflectionSubclass"
                 )
             )
         })
@@ -369,6 +371,7 @@ pub fn bind_queries(
         next += 1;
     }
     let mut descriptors = vec![];
+    let mut semantic_types = vec![];
     for token in &tokens {
         let (name, count, semantic_type) = if token.is_primitive() {
             let declaration = source
@@ -450,11 +453,31 @@ pub fn bind_queries(
         } else {
             0
         };
+        semantic_types.push(semantic_type);
         descriptors.push((token.clone(), name, count, shapes, metadata_token));
     }
     let mut bindings = vec![];
     for row in queries {
         let index = row["compiledIndex"].as_u64().ok_or("missing query index")? as usize;
+        let assignable = row["name"] == "neoCLR.Runtime.ReflectionAssignable";
+        let subclass = row["name"] == "neoCLR.Runtime.ReflectionSubclass";
+        let relationship = assignable || subclass;
+        let mut related = vec![Vec::new(); semantic_types.len()];
+        if relationship {
+            for (i, source_type) in semantic_types.iter().enumerate() {
+                for (j, target_type) in semantic_types.iter().enumerate() {
+                    let matches = if assignable {
+                        neoclr::native_metadata::assignable(source, source_type, target_type)
+                    } else {
+                        neoclr::native_metadata::subclass(source, source_type, target_type)
+                    }
+                    .map_err(|e| e.to_string())?;
+                    if matches {
+                        related[i].push(j);
+                    }
+                }
+            }
+        }
         let f = &mut input.functions[index];
         let metadata_tokens = row["name"] == "neoCLR.Runtime.TypeMetadataToken";
         let names = row["name"] == "neoCLR.Runtime.TypeName";
@@ -464,12 +487,14 @@ pub fn bind_queries(
             Type::String
         } else if arguments {
             Type::RuntimeTypeHandle
-        } else if shapes {
+        } else if shapes || relationship {
             Type::Boolean
         } else {
             Type::Int32
         };
-        let parameters = if shapes || arguments {
+        let parameters = if relationship {
+            vec![Type::RuntimeTypeHandle, Type::RuntimeTypeHandle]
+        } else if shapes || arguments {
             vec![Type::RuntimeTypeHandle, Type::Int32]
         } else {
             vec![Type::RuntimeTypeHandle]
@@ -497,7 +522,7 @@ pub fn bind_queries(
             || !f.out_when_true.is_empty()
             || !f.readonly_parameters.is_empty()
         {
-            return Err("native descriptor query requires exact reserved TypeName/TypeArgumentCount/TypeArgument/TypeShape/TypeMetadataToken InternalCall contract".into());
+            return Err("native descriptor query requires exact reserved TypeName/TypeArgumentCount/TypeArgument/TypeShape/TypeMetadataToken/ReflectionAssignable/ReflectionSubclass InternalCall contract".into());
         }
         // Validate the selector once, then emit only true flags per descriptor.
         // Emitting all fourteen Boolean branches exceeded the bounded backend's
@@ -528,7 +553,20 @@ pub fn bind_queries(
                 Op::Equal,
                 Op::BranchFalse(0),
             ]);
-            if arguments {
+            if relationship {
+                for target in &related[descriptor] {
+                    let next = body.len() + 6;
+                    body.extend([
+                        Op::Arg(1),
+                        Op::LoadTypeToken(descriptors[*target].0.clone()),
+                        Op::Equal,
+                        Op::BranchFalse(next),
+                        Op::Bool(true),
+                        Op::Return,
+                    ]);
+                }
+                body.extend([Op::Bool(false), Op::Return]);
+            } else if arguments {
                 for (index, token) in argument_rows[descriptor].iter().enumerate() {
                     let next = body.len() + 6;
                     body.extend([
@@ -577,7 +615,7 @@ pub fn bind_queries(
         f.impl_flags = 0;
         f.body = body;
         bindings.push(json!({"definition":row["definition"],"name":row["name"],"compiledIndex":index,
-            "implementation":if metadata_tokens { "type-metadata-token-closed-v1" } else if names { "type-name-closed-v1" } else if shapes { "type-shape-closed-v1" } else if arguments { "type-argument-closed-v1" } else { "type-argument-count-closed-v1" },
+            "implementation":if assignable { "type-assignable-closed-v1" } else if subclass { "type-subclass-closed-v1" } else if metadata_tokens { "type-metadata-token-closed-v1" } else if names { "type-name-closed-v1" } else if shapes { "type-shape-closed-v1" } else if arguments { "type-argument-closed-v1" } else { "type-argument-count-closed-v1" },
             "descriptorCount":descriptors.len(),"policy":"closed token producers; semantic source names; no accessor reachability"}));
     }
     Ok(bindings)
@@ -593,6 +631,40 @@ mod tests {
         let report = json!({"functions":[{"name":"neoCLR.Runtime.TypeName","compiledIndex":0}],
             "sourceMetadata":{"types":[{"compiledTypeIndex":0,"name":"Original","origin":{"name":"Café"},"typeArguments":[]}]}});
         (module, report)
+    }
+
+    #[test]
+    fn relationship_queries_bind_identity_and_reject_inexact_contracts() {
+        for (name, expected) in [
+            ("ReflectionAssignable", true),
+            ("ReflectionSubclass", false),
+        ] {
+            let (mut input, mut report) = query();
+            input.functions[0].name = format!("neoCLR.Runtime.{name}");
+            input.functions[0].parameters = vec![Type::RuntimeTypeHandle; 2];
+            input.functions[0].returns = Type::Boolean;
+            report["functions"][0]["name"] = json!(input.functions[0].name);
+            let mut source = input.clone();
+            source.types[0].name = "Original".into();
+            let mut invalid = input.clone();
+            invalid.functions[0].parameters[1] = Type::Int32;
+            assert!(bind_queries(&mut invalid, &source, &report).is_err());
+            bind_queries(&mut input, &source, &report).unwrap();
+            assert_eq!(input.functions[0].impl_flags, 0);
+            assert_eq!(
+                input.functions[0]
+                    .body
+                    .iter()
+                    .any(|op| matches!(op, Op::Bool(true))),
+                expected
+            );
+            assert!(
+                input.functions[0]
+                    .body
+                    .iter()
+                    .any(|op| matches!(op, Op::Bool(false)))
+            );
+        }
     }
 
     #[test]

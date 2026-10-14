@@ -37,6 +37,7 @@ pub(crate) enum Binding {
     ReflectionMember(u8),
     ReflectionMemberCheck(u8),
     ReflectionAssignable,
+    ReflectionSubclass,
     ReflectionArray(u8),
     ReflectionCollection(u8),
     ReflectionPropertyCheck(bool),
@@ -1159,6 +1160,10 @@ pub(crate) fn bind(function: &Function) -> Result<Binding, Fault> {
             (Binding::ObjectTypeHandle, Type::RuntimeTypeHandle)
         }
         ("neoCLR.Runtime.TypeName", [Type::RuntimeTypeHandle]) => (Binding::TypeName, Type::String),
+        (
+            "neoCLR.Runtime.ReflectionSubclass",
+            [Type::RuntimeTypeHandle, Type::RuntimeTypeHandle],
+        ) => (Binding::ReflectionSubclass, Type::Boolean),
         ("neoCLR.Runtime.TypeEquals", [Type::RuntimeTypeHandle, Type::RuntimeTypeHandle]) => {
             (Binding::TypeEquals, Type::Boolean)
         }
@@ -1224,6 +1229,15 @@ impl Binding {
         }
         match (self, args.as_slice()) {
             (Self::GcKeepAlive, [_]) => Ok(Value::Void),
+            (Self::ReflectionSubclass, [source, target]) => {
+                let source = crate::reflection_execution::bound_type(module, source)
+                    .map_err(|_| Fault::new("invalid source type handle"))?;
+                let target = crate::reflection_execution::bound_type(module, target)
+                    .map_err(|_| Fault::new("invalid target type handle"))?;
+                Ok(Value::Boolean(crate::type_relationships::subclass(
+                    module, &source, &target,
+                )?))
+            }
             (Self::ReflectionAssignable, args) => Ok(Value::Boolean(
                 crate::reflection_members::assignable(module, args),
             )),

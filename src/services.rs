@@ -163,6 +163,7 @@ pub(crate) fn uses(module: &crate::Module, function: &Function) -> Result<Vec<Se
             crate::native::Binding::ReflectionConstructionCheck
             | crate::native::Binding::ReflectionMemberCheck(_)
             | crate::native::Binding::ReflectionAssignable
+            | crate::native::Binding::ReflectionSubclass
             | crate::native::Binding::ReflectionPropertyCheck(_)
             | crate::native::Binding::Reflection(_)
             | crate::native::Binding::AssemblyInfo(_)

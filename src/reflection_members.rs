@@ -307,6 +307,5 @@ pub(crate) fn assignable(module: &Module, args: &[Value]) -> bool {
     let Ok(target) = crate::reflection_execution::bound_type(module, &args[1]) else {
         return false;
     };
-    module.reference_assignable(&source, &target)
-        || crate::interfaces::ensure_implementation(module, &source, &target).is_ok()
+    crate::type_relationships::assignable(module, &source, &target).unwrap_or(false)
 }

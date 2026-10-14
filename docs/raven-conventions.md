@@ -9,6 +9,16 @@ neoCLR's target API and bootstrap have narrower capabilities than ordinary Raven
 on .NET. Compile examples against the target rather than assuming similar syntax
 or host APIs work here.
 
+## Required and optional API arguments (2026-10-14)
+
+Use a non-null parameter type when an operation requires a value. Do not accept
+nullable arguments merely to return false or introduce a runtime absence check.
+For example, `TypeInfo.Equals`, `AssignableTo`, `AssignableFrom` and `IsSubclassOf`
+all require another `TypeInfo`. Use Option for meaningful absence in typed domain
+contracts. Nullable object boundaries remain appropriate when null itself has
+specified behavior, such as `Object.Equals(Object?)` and
+`TypeInfo.IsInstanceOfType(Object?)`.
+
 ## Await asynchronous work (2026-10-09)
 
 Author direction: use `await` by default, including an async `Main`. Prefer ordinary

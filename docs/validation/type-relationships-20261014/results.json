@@ -1,0 +1,41 @@
+{
+  "passed": true,
+  "platform": "macOS-27.0-arm64-arm-64bit",
+  "modes": [
+    "interpreter",
+    "jit",
+    "native"
+  ],
+  "cases": [
+    {
+      "suite": "type-relations",
+      "mode": "interpreter",
+      "repetition": 1,
+      "exitCode": 0,
+      "elapsedSeconds": 25.507,
+      "stdout": "PASS Arrays preserve element identity\nPASS Closed generic types remain distinct\nPASS Type identity and assignment direction\nPASS Boxing and instance checks reject null\nPASS Interface assignment includes inherited contracts\nPASS Subclass checks are strict and exclude interfaces\nTests: 6, passed: 6, failed: 0, skipped: 0\n",
+      "stderr": ""
+    },
+    {
+      "suite": "type-relations",
+      "mode": "jit",
+      "repetition": 1,
+      "exitCode": 0,
+      "elapsedSeconds": 20.384,
+      "stdout": "PASS Arrays preserve element identity\nPASS Closed generic types remain distinct\nPASS Type identity and assignment direction\nPASS Boxing and instance checks reject null\nPASS Interface assignment includes inherited contracts\nPASS Subclass checks are strict and exclude interfaces\nTests: 6, passed: 6, failed: 0, skipped: 0\n",
+      "stderr": ""
+    },
+    {
+      "suite": "type-relations",
+      "mode": "native",
+      "repetition": 1,
+      "exitCode": 0,
+      "elapsedSeconds": 0.163,
+      "stdout": "PASS Arrays preserve element identity\nPASS Closed generic types remain distinct\nPASS Type identity and assignment direction\nPASS Boxing and instance checks reject null\nPASS Interface assignment includes inherited contracts\nPASS Subclass checks are strict and exclude interfaces\nTests: 6, passed: 6, failed: 0, skipped: 0\n",
+      "stderr": ""
+    }
+  ],
+  "bundleManifestSha256": "39f4a34169eaf84b662660b0e6a841b02fb34fe41e1327344d21cb43ef00498e",
+  "aotSha256": "e865158afed653bd22eb81da252fffc87d3a9973329706bb162abee142e6c64b",
+  "interpreterSha256": "50d4fe3fa6c805585514a80c9f4f88d3e7799862943986bd9ab380929efdaeb3"
+}

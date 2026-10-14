@@ -1,3 +1,7 @@
+.function neoCLR.Runtime.ReflectionSubclass(System.RuntimeTypeHandle source, System.RuntimeTypeHandle target) -> Boolean
+.methodimpl InternalCall
+.end
+
 .function neoCLR.Runtime.ReflectionAssignable(System.RuntimeTypeHandle source, System.RuntimeTypeHandle target) -> Boolean
 .methodimpl InternalCall
 .end

@@ -44,6 +44,9 @@ internal extern func ReflectionArrayLength(arg0: System.Object) -> int;
 internal extern func ReflectionAssignable(arg0: System.RuntimeTypeHandle, arg1: System.RuntimeTypeHandle) -> bool;
 
 [MethodImpl(MethodImplOptions.InternalCall)]
+internal extern func ReflectionSubclass(arg0: System.RuntimeTypeHandle, arg1: System.RuntimeTypeHandle) -> bool;
+
+[MethodImpl(MethodImplOptions.InternalCall)]
 internal extern func ReflectionConstructArgs(arg0: System.RuntimeTypeHandle, arg1: int, arg2: Object?, arg3: Object?[]) -> System.Object;
 
 [MethodImpl(MethodImplOptions.InternalCall)]

@@ -2005,3 +2005,13 @@ under the existing host metadata exclusion. It does not add a guest reference ty
 the guest snapshot and assembly remain unchanged.
 
 The host-only [composition storage admission API](experimental-metadata.md#imported-composition-storage-admission-2026-10-14-development) is manually documented; it remains outside the guest RavenDoc assembly selection.
+
+### Type relationship queries (development, 2026-10-14)
+
+TypeInfo now includes AssignableTo, AssignableFrom, IsSubclassOf and IsInstanceOfType.
+Type operands are required/non-null; instance testing explicitly accepts Object?.
+The existing selected TypeInfo, NominalTypeInfo and FunctionTypeInfo expose these
+members without new public implementation types. The aggregate bridge and native
+rendered reference are refreshed together. See [introspection](introspection.md)
+for usage and [runtime semantics](../docs/design/type-relationships.md) for supported
+relationships, .NET differences and compiler qualification limits.

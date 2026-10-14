@@ -17483,3 +17483,20 @@ open, not an approved complete implementation or a permanent roadmap reprioritiz
 - Validation also exposed a .NET readonly-receiver control returning 3 rather than 2;
   the assistant reproduced it with pre-slice shared compiler files and recorded it as
   a separate general Raven candidate instead of attributing it to composition support.
+
+## 2026-10-14 — Type relationship queries and explicit argument presence
+
+- **Author:** requested a worktree from main, `AssignableTo`/`AssignableFrom` on
+  TypeInfo and its implementations, and related useful methods.
+- **Assistant:** created `codex/typeinfo-assignability`; proposed strict subclass
+  and instance checks alongside assignment checks, using .NET behavior as reference.
+- **Author:** questioned nullable type arguments and clarified that required inputs
+  should be explicit. **Assistant:** changed the type-to-type methods to non-null
+  TypeInfo, matching typed equality; retained nullable Object for instance testing,
+  where null intentionally returns false.
+- **Author:** requested a review of existing code, samples and tests for adoption.
+  **Assistant:** identified the reflection construction result guard and JSON node
+  compatibility checks as candidates; exact scalar mapping checks still require identity.
+- **Implementation:** shared runtime relationship rules, projected through all three
+  descriptor implementations; native lowering uses the same rules on semantic types.
+  Validation and adoption are recorded with the implementation changes.

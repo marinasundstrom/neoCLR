@@ -421,6 +421,14 @@ public sealed interface TypeInfo : EquatableTo<TypeInfo> {
     val GenericArgumentCount: int { get }
     func GetGenericArgument(index: int) -> TypeInfo
     func Equals(other: TypeInfo) -> bool
+    /// Returns whether this type can be assigned to a variable of target's type.
+    func AssignableTo(target: TypeInfo) -> bool
+    /// Returns whether source can be assigned to a variable of this type.
+    func AssignableFrom(source: TypeInfo) -> bool
+    /// Returns whether this type strictly derives from target; interfaces are excluded.
+    func IsSubclassOf(target: TypeInfo) -> bool
+    /// Returns whether a non-null value can be assigned to a variable of this type.
+    func IsInstanceOfType(value: Object?) -> bool
     val IsArray: bool { get }
     val IsByRef: bool { get }
     val IsPointer: bool { get }
@@ -468,6 +476,25 @@ internal class RuntimeTypeInfo : TypeInfo {
             return RuntimeFunctionTypeInfo.FromHandle(handle)
         }
         return RuntimeTypeInfo(handle)
+    }
+
+    func AssignableTo(target: TypeInfo) -> bool {
+        return TypeRelationships.Assignable(self, target)
+    }
+
+    func AssignableFrom(source: TypeInfo) -> bool {
+        return TypeRelationships.Assignable(source, self)
+    }
+
+    func IsSubclassOf(target: TypeInfo) -> bool {
+        return TypeRelationships.Subclass(self, target)
+    }
+
+    func IsInstanceOfType(value: Object?) -> bool {
+        if value is Object instance {
+            return TypeRelationships.Assignable(instance.GetType(), self)
+        }
+        return false
     }
 
     val BaseType: Option<TypeInfo> => RuntimeServices.TypeBaseType(Handle)
@@ -594,6 +621,25 @@ internal class RuntimeNominalTypeInfo : NominalTypeInfo {
 
     internal static func FromHandle(handle: RuntimeTypeHandle) -> TypeInfo {
         return RuntimeNominalTypeInfo(handle)
+    }
+
+    func AssignableTo(target: TypeInfo) -> bool {
+        return TypeRelationships.Assignable(self, target)
+    }
+
+    func AssignableFrom(source: TypeInfo) -> bool {
+        return TypeRelationships.Assignable(source, self)
+    }
+
+    func IsSubclassOf(target: TypeInfo) -> bool {
+        return TypeRelationships.Subclass(self, target)
+    }
+
+    func IsInstanceOfType(value: Object?) -> bool {
+        if value is Object instance {
+            return TypeRelationships.Assignable(instance.GetType(), self)
+        }
+        return false
     }
 
     val BaseType: Option<TypeInfo> => RuntimeServices.TypeBaseType(Handle)
@@ -817,6 +863,25 @@ internal class RuntimeFunctionTypeInfo : FunctionTypeInfo {
         }
     }
 
+    func AssignableTo(target: TypeInfo) -> bool {
+        return TypeRelationships.Assignable(self, target)
+    }
+
+    func AssignableFrom(source: TypeInfo) -> bool {
+        return TypeRelationships.Assignable(source, self)
+    }
+
+    func IsSubclassOf(target: TypeInfo) -> bool {
+        return TypeRelationships.Subclass(self, target)
+    }
+
+    func IsInstanceOfType(value: Object?) -> bool {
+        if value is Object instance {
+            return TypeRelationships.Assignable(instance.GetType(), self)
+        }
+        return false
+    }
+
     val BaseType: Option<TypeInfo> => RuntimeServices.TypeBaseType(Handle)
 
     func GetInterfaces() -> Sequence<TypeInfo> {
@@ -923,5 +988,26 @@ internal class RuntimeFunctionTypeInfo : FunctionTypeInfo {
 
     func GetElementType() -> Option<TypeInfo> {
         return RuntimeServices.TypeElementType(Handle)
+    }
+}
+
+// Keep assignment semantics in the runtime; descriptors only project the contract.
+internal static class TypeRelationships {
+    private static func Handle(type: TypeInfo) -> RuntimeTypeHandle {
+        if type is RuntimeNominalTypeInfo nominal {
+            return nominal.ExecutionHandle
+        }
+        if type is RuntimeFunctionTypeInfo function {
+            return function.ExecutionHandle
+        }
+        return ((RuntimeTypeInfo)type).ExecutionHandle
+    }
+
+    static func Assignable(source: TypeInfo, target: TypeInfo) -> bool {
+        return RuntimeServices.ReflectionAssignable(Handle(source), Handle(target))
+    }
+
+    static func Subclass(source: TypeInfo, target: TypeInfo) -> bool {
+        return RuntimeServices.ReflectionSubclass(Handle(source), Handle(target))
     }
 }
