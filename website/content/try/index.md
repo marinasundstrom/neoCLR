@@ -1,7 +1,7 @@
 # Install neoCLR
 
 The matched bundle includes the runtime, Raven compiler, VS Code extension and samples.
-Preview 14 provides matching packages for **Windows x64** and **macOS on Apple silicon**.
+Preview 15 provides matching packages for **Windows x64** and **macOS on Apple silicon**.
 JIT is the default on both; interpreter execution remains available explicitly.
 AOT is a separate experimental publishing workflow for supported applications.
 
@@ -17,8 +17,8 @@ not by neoCLR itself.
 
 ## 2. Download and extract
 
-- [Download for macOS ARM64](https://github.com/marinasundstrom/neoCLR/releases/download/v0.1.0-preview.14/neoclr-preview14-osx-arm64.tar.gz)
-- [Download for Windows x64](https://github.com/marinasundstrom/neoCLR/releases/download/v0.1.0-preview.14/neoclr-preview14-win-x64.tar.gz)
+- [Download for macOS ARM64](https://github.com/marinasundstrom/neoCLR/releases/download/v0.1.0-preview.15/neoclr-preview15-osx-arm64.tar.gz)
+- [Download for Windows x64](https://github.com/marinasundstrom/neoCLR/releases/download/v0.1.0-preview.15/neoclr-preview15-win-x64.tar.gz)
 
 Extract the archive and keep its folders together.
 
@@ -69,26 +69,26 @@ python3 tools/verify-native-bundle.py --report ../acceptance.json
 On Windows, use `python` in place of `python3`. It compiles and runs the bundled
 collections, Tasks, JSON and HTTP examples.
 
-[Release notes and downloads](https://github.com/marinasundstrom/neoCLR/releases/tag/v0.1.0-preview.14)
+[Release notes and downloads](https://github.com/marinasundstrom/neoCLR/releases/tag/v0.1.0-preview.15)
 include the exact supported toolchain and limitations. Older installation instructions
 belong to their [matching release](https://github.com/marinasundstrom/neoCLR/releases).
 
 <a id="development"></a>
 
-## Preview 14 capabilities
+## Preview 15 capabilities
 
 HTTP client/server, typed JSON and HTTPS checks pass in interpreter, JIT and AOT
-modes on macOS ARM64 and Windows x64. Windows JIT uses compiler-generated async
-state machines; runtime-owned suspension has separate target-specific coverage.
+modes on macOS ARM64 and Windows x64. Runtime-owned suspension and resumption
+are the default for Raven async code on both platforms.
 
 The optional PostgreSQL provider is included in the macOS bundle. The Windows
 bundle contains the four base libraries without that provider. Start with the
 [PostgreSQL sample](/cases/postgresql/) for local database queries.
 
 For native publishing, follow the
-[project build instructions](https://github.com/marinasundstrom/neoCLR/blob/v0.1.0-preview.14/docs/native-poc-bundle.md)
+[project build instructions](https://github.com/marinasundstrom/neoCLR/blob/v0.1.0-preview.15/docs/native-poc-bundle.md)
 with the matching compiler, runtime, libraries and host tools. AOT remains bounded;
 JIT package acceptance does not imply every application can be published natively.
 
-[Preview 14 release notes](https://github.com/marinasundstrom/neoCLR/releases/tag/v0.1.0-preview.14) ·
-[Qualification results](https://github.com/marinasundstrom/neoCLR/blob/v0.1.0-preview.14/docs/experiments/release-20261013/README.md)
+[Preview 15 release notes](https://github.com/marinasundstrom/neoCLR/releases/tag/v0.1.0-preview.15) ·
+[Qualification results](https://github.com/marinasundstrom/neoCLR/blob/v0.1.0-preview.15/docs/validation/release-20261014/README.md)
