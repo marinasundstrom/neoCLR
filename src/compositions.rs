@@ -250,6 +250,16 @@ pub(crate) fn validate_surface(module: &Module) -> Result<(), Fault> {
                     return Err(Fault::new("compound argument addresses are not supported"));
                 }
                 Op::CastClass(_) | Op::IsInstance(_) => (),
+                Op::NewArray(ty)
+                | Op::ReserveArray(ty)
+                | Op::ArrayElement(ty)
+                | Op::StoreArrayElement(ty)
+                    if contains(ty) =>
+                {
+                    // Reference vectors reuse checked element storage and exact
+                    // element identity. Element addresses/value arrays stay gated.
+                    crate::vm::check_type(&Type::ArrayRef(Box::new(ty.clone())), module)?;
+                }
                 Op::New(ty) if matches!(ty, Type::Constructed { .. }) && contains(ty) => {
                     crate::vm::check_type(ty, module)?;
                 }

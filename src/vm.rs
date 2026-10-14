@@ -1198,7 +1198,19 @@ fn validate_linked_indexed(module: &Module) -> Result<(), Fault> {
                 | Op::ArrayElement(ty)
                 | Op::StoreArrayElement(ty)
                 | Op::ArrayAddress(ty) => {
-                    check(&Type::Array(Box::new(ty.clone())))?;
+                    if crate::compositions::contains(ty)
+                        && matches!(
+                            op,
+                            Op::NewArray(_)
+                                | Op::ReserveArray(_)
+                                | Op::ArrayElement(_)
+                                | Op::StoreArrayElement(_)
+                        )
+                    {
+                        check(&Type::ArrayRef(Box::new(ty.clone())))?;
+                    } else {
+                        check(&Type::Array(Box::new(ty.clone())))?;
+                    }
                     if matches!(op, Op::ArrayAddress(_))
                         && matches!(ty, Type::ByRef(_) | Type::ReadOnlyByRef(_))
                     {
@@ -1474,11 +1486,11 @@ fn check_type_context_seen(
     }
     if cfg!(feature = "experimental-compositions")
         && !crate::compositions::is_compound(ty)
-        && !matches!(ty, Type::Constructed { .. })
+        && !matches!(ty, Type::Constructed { .. } | Type::ArrayRef(_))
         && crate::compositions::contains(ty)
     {
         return Err(Fault::new(
-            "compound wrappers other than constructed reference classes are not supported",
+            "compound wrappers require constructed reference classes or reference arrays",
         ));
     }
     if !seen.insert(ty.clone()) {
@@ -1541,7 +1553,7 @@ fn check_type_context_seen(
                     ));
                 }
                 // Validate storage after substitution too: a declaration's T[] or T&
-                // must not bypass the current compound array/byref restrictions.
+                // must not bypass the current compound value-array/byref restrictions.
                 for field in &def.fields {
                     nested(&field.ty.substitute_type_parameters(arguments)?)?;
                 }

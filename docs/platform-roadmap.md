@@ -4615,3 +4615,9 @@ paths, with twelve executable host/Raven consumers. Native constraints, open
 parameters, source storage and real Task integration remain pending. Intersection
 use-site guidance does not restrict return types.
 [Checkpoint](experiments/structural-compositions/README.md#wrapped-composition-metadata-and-raven-calls--2026-10-14).
+
+
+The isolated composition interpreter now admits checked reference-array payloads
+and substituted generic array fields, a prerequisite for Task's ArrayList-backed
+result slot. Compiler/host array transport and actual Task execution remain open.
+[Runtime array checkpoint](experiments/structural-compositions/README.md#runtime-reference-array-storage--2026-10-14).

@@ -816,3 +816,43 @@ and the API-reference snapshot check.
 
 Companion compiler/probe revision: Raven `30576332a`; pair it with the metadata
 reader/importer and runner changes in this checkpoint.
+
+
+## Runtime reference-array storage — 2026-10-14
+
+The next Task prerequisite is reference-vector storage: the Raven Task implementation
+uses Promise<T>, whose result slot is an ArrayList<T> backed by arrayref<T>. The
+experimental interpreter now admits arrayref of closed reference compositions,
+including substituted generic wrapper fields. It admits newarr, array.reserve,
+ldelem and stelem with those elements, reusing checked runtime storage and exact
+element identity. New arrays contain typed nulls; reserved slots must be written
+before reading. Entering an element preserves its object and GC reachability.
+
+This deliberately retains invariant array element identity, unlike CLR reference
+array covariance: the existing neoCLR array policy remains unchanged, avoiding
+additional composition covariance rules. Compound element addresses, owned/value
+arrays, byrefs, direct authored compound fields and generic interface wrappers
+remain gated. Ordinary host metadata and Raven source storage gates are unchanged;
+this is runtime neoIL evidence, not compiler-emitted Task or async support. Task
+integration still needs generic interface admission and the library's remaining
+substituted operations checked; this slice does not claim ArrayList<T> integration.
+
+Focused coverage exercises union/intersection default values, reordered element
+identity, invalid writes and mismatched accesses with and without verification,
+wrapper method substitution, reserved-slot initialization, bounds, collection with
+live array payloads, and serialized default-off admission. Existing reference-array,
+reserved-array and generic-class controls accompany these checks. No public API or
+Runtime Contract setting changes; the website's planned native-structural-value
+status remains accurate. Existing ECMA/array design research and the prior native
+composition rationale apply; JIT/AOT and stable ABI work remain deferred.
+
+Validation commands (use the matching local SDKROOT where required):
+
+```sh
+cargo test --features experimental-compositions --test structural_compositions --test reference_arrays --test reserved_arrays --test generic_classes
+cargo test --test structural_compositions
+```
+
+The feature-enabled composition suite passes 29 tests; ordinary controls pass 15
+reference-array, three reserved-array and 13 generic-class tests. All three
+default-off serialized-signature checks pass.

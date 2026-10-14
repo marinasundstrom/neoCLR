@@ -107,7 +107,7 @@ fn unsupported_shapes_and_address_operations_fail_admission() {
         "union<Missing,Left>",
         "union<Left>",
         "union<Left,Right>&",
-        "arrayref<union<Left,Right>>",
+        "arrayref<union<Left,Right>>&",
         "fn<union<Left,Right>,Int32>",
     ] {
         let source = format!(
@@ -119,6 +119,8 @@ fn unsupported_shapes_and_address_operations_fail_admission() {
         ".local union<Left,Right> value\nldloca value\npop",
         "ldtoken union<Left,Right>\npop",
         "sizeof union<Left,Right>\npop",
+        "ldc.i4 1\nnewarr union<Left,Right>\nldc.i4 0\nldelema union<Left,Right>\npop",
+        "ldc.i4 1\narray.alloc union<Left,Right>\npop",
     ] {
         let source = format!(
             ".module Bad\n.entry Main\n{TYPES}\n.function Main() -> Int32\n{body}\nldc.i4 0\nret\n.end"
@@ -475,7 +477,7 @@ ret
 #[cfg(feature = "experimental-compositions")]
 #[test]
 fn composition_wrappers_reject_unsupported_storage_after_substitution() {
-    for (kind, field) in [("class", "arrayref<T>"), ("class", "T&"), ("", "T")] {
+    for (kind, field) in [("class", "T&"), ("", "T")] {
         let source = format!(".module InvalidWrapper\n.entry Main\n{TYPES}\n.type {kind} Wrapper<T>\n.field Value {field}\n.end\n.function Main() -> Int32\n.local Wrapper<union<Left,Right>> value\nldc.i4 42\nret\n.end");
         assert!(assemble(&source).is_err(), "{kind} {field}");
     }
@@ -681,4 +683,153 @@ fn wrapper_call_admission_deduplicates_recursive_specializations() {
     let module = assemble(&source).unwrap();
     LoadedProgram::new(&module).unwrap().verify().unwrap();
     // This body recurses at execution; admission must finish without executing it.
+}
+
+#[cfg(feature = "experimental-compositions")]
+#[test]
+fn reference_composition_arrays_preserve_payloads_and_gc_roots() {
+    for kind in ["union", "intersection"] {
+        let allocations = "newobj Neither\npop\n".repeat(8);
+        let body = format!(
+            r#"
+.local arrayref<{kind}<Left,Right>> values
+ldc.i4 1
+newarr {kind}<Left,Right>
+stloc values
+ldloc values
+ldc.i4 0
+ldelem {kind}<Right,Left>
+ref.isnull
+brtrue empty
+fault "array default must be null"
+empty:
+ldloc values
+ldc.i4 0
+ldc.i4 42
+newobj Both
+stelem {kind}<Right,Left>
+{allocations}
+ldloc values
+ldc.i4 0
+ldelem {kind}<Left,Right>
+castclass Left
+callvirt instance Left::Get()
+"#
+        );
+        let p = program(&body, "");
+        p.verify().unwrap();
+        let result = p
+            .run(Limits {
+                heap_objects: 3,
+                ..Limits::default()
+            })
+            .unwrap();
+        assert_eq!(result.value, Value::Int32(42));
+        assert!(result.heap.collections() > 1);
+        assert!(result.heap.reclaimed_objects() >= 8);
+    }
+}
+
+#[cfg(feature = "experimental-compositions")]
+#[test]
+fn composition_array_writes_and_element_identity_are_checked() {
+    for operation in [
+        "newobj Neither\nstelem union<Left,Right>",
+        "ldelem intersection<Left,Right>\npop",
+        "ldelem Left\npop",
+    ] {
+        let body = format!("ldc.i4 1\nnewarr union<Left,Right>\nldc.i4 0\n{operation}\nldc.i4 42");
+        let p = program(&body, "");
+        assert!(p.verify().is_err(), "{operation}");
+        assert!(p.run(Limits::default()).is_err(), "{operation}");
+    }
+    let p = program(
+        "ldc.i4 1\nnewarr union<Left,Right>\ncall Need(arrayref<intersection<Left,Right>>) ",
+        ".function Need(arrayref<intersection<Left,Right>> values) -> Int32\nldc.i4 42\nret\n.end",
+    );
+    assert!(p.verify().is_err());
+    assert!(p.run(Limits::default()).is_err());
+}
+
+#[cfg(feature = "experimental-compositions")]
+#[test]
+fn substituted_array_storage_uses_checked_reference_vectors() {
+    let methods = r#"
+.type class Buffer<T>
+.field Values arrayref<T>
+.method instance .ctor(T value) -> noresult
+ldarg this
+ldc.i4 1
+array.reserve T
+stfld Buffer<T>::Values
+ldarg this
+ldfld Buffer<T>::Values
+ldc.i4 0
+ldarg value
+stelem T
+ret
+.end
+.method instance Get() -> T
+ldarg this
+ldfld Buffer<T>::Values
+ldc.i4 0
+ldelem T
+ret
+.end
+.end
+"#;
+    for kind in ["union", "intersection"] {
+        let p = program(
+            &format!(
+                "ldc.i4 42\nnewobj Both\nnewobj instance Buffer<{kind}<Left,Right>>::.ctor({kind}<Left,Right>)\ncall instance Buffer<{kind}<Left,Right>>::Get()\ncastclass Left\ncallvirt instance Left::Get()"
+            ),
+            methods,
+        );
+        p.verify().unwrap();
+        assert_eq!(p.run(Limits::default()).unwrap().value, Value::Int32(42));
+    }
+}
+
+#[cfg(feature = "experimental-compositions")]
+#[test]
+fn reserved_composition_array_slots_require_initialization_and_bounds() {
+    for (body, expected) in [
+        (
+            "ldc.i4 1\narray.reserve union<Left,Right>\nldc.i4 0\nldelem union<Left,Right>\npop\nldc.i4 42",
+            "uninitialized",
+        ),
+        (
+            "ldc.i4 1\nnewarr union<Left,Right>\nldc.i4 1\nldelem union<Left,Right>\npop\nldc.i4 42",
+            "index",
+        ),
+    ] {
+        let p = program(body, "");
+        p.verify().unwrap();
+        let error = p.run(Limits::default()).unwrap_err().to_string();
+        assert!(error.contains(expected), "{error}");
+    }
+}
+
+#[test]
+fn serialized_composition_array_retains_feature_gate() {
+    let mut module = assemble(&format!(
+        ".module ArrayRaw\n.entry Main\n{TYPES}\n.function Main() -> Int32\nldc.i4 42\nret\n.end"
+    ))
+    .unwrap();
+    module
+        .functions
+        .iter_mut()
+        .find(|f| f.name == "Main")
+        .unwrap()
+        .locals
+        .push(Type::ArrayRef(Box::new(Type::Union(vec![
+            Type::from_name("Left"),
+            Type::from_name("Right"),
+        ]))));
+    let result = neoclr::load(&serde_json::to_string(&module).unwrap());
+    assert_eq!(
+        result.is_ok(),
+        cfg!(feature = "experimental-compositions"),
+        "{result:?}"
+    );
 }
