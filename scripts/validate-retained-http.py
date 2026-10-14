@@ -140,7 +140,7 @@ def main():
         shutil.copy2(destination / executable.name, executable)
         lib = bundle / 'lib'
         catalog = json.loads((lib / 'bundle.json').read_text())
-        vm = [interpreter, 'run', destination / 'app.dll',
+        vm = [interpreter, 'run', destination / 'app.dll', '--execution', 'interpreter',
               '--system', lib / catalog['runtimeSeed'],
               *[arg for name in catalog['assemblyNames'] for arg in ('--module', lib / (name + '.dll'))],
               '--object-root', lib / 'System.Runtime.dll', '--instructions', '100000000']

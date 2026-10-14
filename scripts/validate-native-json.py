@@ -95,7 +95,7 @@ def main():
             shutil.copy2(dest / exe.name, exe)
             lib = bundle / 'lib'
             catalog = json.loads((lib / 'bundle.json').read_text())
-            interpreter = [runtime, 'run', dest / 'app.dll',
+            interpreter = [runtime, 'run', dest / 'app.dll', '--execution', 'interpreter',
                            '--system', lib / catalog['runtimeSeed'],
                            *[arg for assembly in catalog['assemblyNames'] for arg in ('--module', lib / (assembly + '.dll'))],
                            '--object-root', lib / 'System.Runtime.dll', '--instructions', '100000000']

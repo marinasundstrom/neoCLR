@@ -27,6 +27,13 @@ the installed executable directory explicitly. Canonical source checks and other
 hosted qualification repairs remain under review. Preview 14 remains published;
 no new installation or release has occurred.
 
+Additional source parity fixtures need review: their interpreter controls now select
+that execution mode explicitly, and the local collections/imported-init gate passes
+(`target/release-inline-collections-20261014/report.json`). The older introspection
+fixture stops at static-owner value admission; retained HTTP stops at the
+`RuntimeAsyncStartManaged` contract when built through its explicit bootstrap root.
+These are separate from the passing packaged JSON and HTTP consumers.
+
 The earlier [failed candidate](../validation/release-20261014/candidate.json) is
 retained for provenance. It is superseded by the inline-value fix, not rewritten.
 

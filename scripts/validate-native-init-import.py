@@ -58,7 +58,7 @@ def main():
         consumer = compile_project(out / 'raven/Native.rvnproj', 'consumer')
         lib = bundle / 'lib'
         catalog = json.loads((lib / 'bundle.json').read_text())
-        result = execute([runtime, 'run', consumer, '--system', lib / catalog['runtimeSeed'],
+        result = execute([runtime, 'run', consumer, '--execution', 'interpreter', '--system', lib / catalog['runtimeSeed'],
                           *[arg for name in catalog['assemblyNames'] for arg in ('--module', lib / (name + '.dll'))],
                           '--module', library, '--object-root', lib / 'System.Runtime.dll'], 'interpreter')
         if (result.returncode, result.stdout, result.stderr) != (0, 'Init accessors passed\n', ''):

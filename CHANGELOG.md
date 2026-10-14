@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-14
 
+- Select interpreter execution explicitly in collections, imported-init, JSON and retained-HTTP control runs. These fixtures must keep testing interpreter/native parity when ordinary execution defaults to JIT; the Windows collections failure was JIT rejecting interpreter-only limits. The complete local collections/imported-init gate passes; older introspection and retained-HTTP fixtures still stop at independent native-build gaps.
+
 - Apply the current GC cleanup/rooted-allocation export contract to the Windows TLS binding fixture as well. Windows cryptography now executes successfully; TLS linking exposed the same obsolete probe exports. Syntax validation passes; hosted TLS requalification remains required.
 
 - Update stale native value-function and generic-clone boundary tests to the existing 2,048-function budget, retaining rejection immediately above the limit. All 58 native value tests now pass on macOS; the runtime budget is unchanged.
