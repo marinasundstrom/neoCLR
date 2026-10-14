@@ -8611,3 +8611,10 @@ The compiled host checks exercise union, intersection, redundant intersection an
 wrapper result locals; Raven source-local emission is not enabled by this host API.
 The API adds controlled storage of an existing type contract, not a distinct kind of
 type or a restriction on structural types' eventual introspection support.
+
+
+External reference wrappers with closed composition arguments can now be read in the
+experimental profile. ImportExperimentalCompositionReference requires an explicit
+IAssemblyResolver for their dependencies; the exact resolved definition must be an
+unconstrained reference class. Missing or incompatible definitions fail import.
+Default readers and CLI output remain rejected.

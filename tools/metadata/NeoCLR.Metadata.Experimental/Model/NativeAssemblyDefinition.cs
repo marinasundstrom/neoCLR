@@ -560,8 +560,19 @@ public sealed partial class NativeAssemblyDefinition
                     {
                         // Read-only snapshot construction; ordinary builder construction
                         // deliberately continues to reject composition storage.
-                        Require(allowExperimentalCompositions && allowComposition && definition >= 0,
-                            "composition wrappers require a resolved local reference class");
+                        Require(allowExperimentalCompositions && allowComposition,
+                            "composition wrappers require experimental signature admission");
+                        if (definition < 0)
+                        {
+                            var external = ImportExternalType(signatureGraph, Text(construction, "definition"), arguments.Length,
+                                referenceIdentities, valueTypeReferences, nativeTypeAliases);
+                            Require(!external.IsValueType && arguments.All(a => a.NestingDepth < 16),
+                                "composition wrappers require a reference type");
+                            // Declaration kind and constraints are checked against the exact resolved
+                            // dependency before callable import. The reader retains its identity only.
+                            return new ImportedTypeReference(signatureGraph, external.AssemblyIdentity, external.Namespace,
+                                external.Name, external.GenericArity, arguments, external.IsValueType, external.DeclaringType);
+                        }
                         var wrapper = signatureOwners[definition];
                         Require(!wrapper.IsValueType && !wrapper.IsInterface && !wrapper.IsStatic &&
                             wrapper.GenericParameterNames.Count == arguments.Length &&
