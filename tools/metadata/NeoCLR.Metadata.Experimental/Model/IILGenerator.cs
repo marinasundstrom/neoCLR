@@ -6,6 +6,28 @@ namespace NeoCLR.Metadata.Experimental.Model;
 /// This does not edit loaded opaque bodies or provide instruction insertion/reordering.</remarks>
 public interface IILGenerator
 {
+    /// <summary>Consumes tuple elements in declaration order and pushes a structural tuple value.</summary>
+    /// <param name="type">An explicitly admitted output-owned tuple signature.</param>
+    /// <exception cref="ArgumentException">Signature is not an admitted tuple.</exception>
+    /// <exception cref="ArgumentNullException">Signature is null.</exception>
+    /// <exception cref="InvalidDataException">Instruction budget exceeded; stack mismatch is checked on write.</exception>
+    void NewTuple(SignatureType type);
+    /// <summary>Consumes a tuple value and pushes its element at a zero-based position.</summary>
+    /// <param name="type">The exact admitted tuple signature.</param>
+    /// <param name="index">Zero-based element position.</param>
+    /// <exception cref="ArgumentException">Tuple is invalid, foreign or index is outside its arity.</exception>
+    /// <exception cref="ArgumentNullException">Signature is null.</exception>
+    /// <exception cref="InvalidDataException">Instruction budget exceeded; stack mismatch is checked on write.</exception>
+    void LoadTupleElement(SignatureType type, int index);
+    /// <summary>Consumes a tuple value followed by an element value and pushes the updated tuple copy.</summary>
+    /// <param name="type">The exact admitted tuple signature.</param>
+    /// <param name="index">Zero-based element position.</param>
+    /// <remarks>Does not mutate the source local; store the returned tuple to replace it. Native-only.</remarks>
+    /// <exception cref="ArgumentException">Tuple is invalid, foreign or index is outside its arity.</exception>
+    /// <exception cref="ArgumentNullException">Signature is null.</exception>
+    /// <exception cref="InvalidDataException">Instruction budget exceeded; stack mismatch is checked on write.</exception>
+    void StoreTupleElement(SignatureType type, int index);
+
     /// <summary>Loads the runtime type handle for a supported output-owned type or scoped generic parameter.</summary>
     /// <param name="type">Non-Void, non-byref type signature; Self is not a concrete token operand.</param>
     /// <exception cref="ArgumentException">Foreign/unscoped type or unsupported operand category.</exception>

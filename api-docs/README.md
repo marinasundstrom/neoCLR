@@ -2088,3 +2088,9 @@ The host-only `ReadExperimentalTupleAssembly` and `ImportExperimentalTupleRefere
 APIs are documented in [native tuple reading/import](experimental-metadata.md#reading-and-importing-native-tuples-2026-10-14-development).
 They are excluded from guest RavenDoc selection because they belong to C# metadata
 tooling. Guest API signatures and reference snapshots are unchanged.
+
+
+Host `IILGenerator.NewTuple`, `LoadTupleElement` and `StoreTupleElement` are documented
+in [native tuple value operations](experimental-metadata.md#native-tuple-value-operations-2026-10-14-development).
+These C# tooling members are outside guest RavenDoc selection. No guest public API or
+reference snapshot changes in this slice.

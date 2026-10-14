@@ -3924,7 +3924,8 @@ substitution are implemented, followed by opt-in closed tuple values and positio
 access in the interpreter, resolved host identities and ordered element descriptors.
 Guest ordered element introspection is available through `TupleTypeInfo`, and
 native C# signature authoring, opt-in snapshots and callable imports preserve ordered
-tuple shapes with CLI rejection;
+tuple shapes with CLI rejection. C# construction/element operations execute nested
+tuples across imported calls with copy semantics;
 Raven migration, native layout/backends and
 nominal family removal remain staged follow-ups on the experimental branches.
 

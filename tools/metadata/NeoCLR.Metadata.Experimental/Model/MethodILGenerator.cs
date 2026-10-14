@@ -93,6 +93,19 @@ internal sealed class MethodILGenerator(MethodBuilder bodyBuilder) : IILGenerato
 
     public void ClearBody() => Definition.Body.ClearInstructions();
 
+    public void NewTuple(SignatureType type) => TupleOperation(type, null, "tuple.new");
+    public void LoadTupleElement(SignatureType type, int index) => TupleOperation(type, index, "tuple.load");
+    public void StoreTupleElement(SignatureType type, int index) => TupleOperation(type, index, "tuple.store");
+    private void TupleOperation(SignatureType type, int? index, string operation)
+    {
+        ArgumentNullException.ThrowIfNull(type);
+        type.ValidateOwner(Assembly);
+        if (type.Tuple is not { } tuple) throw new ArgumentException("requires an admitted tuple", nameof(type));
+        if (index is { } position && (position < 0 || position >= tuple.ElementTypes.Count))
+            throw new ArgumentOutOfRangeException(nameof(index));
+        Append(new(operation, Value: index ?? 0, Type: type));
+    }
+
     private void Append(Operation operation)
     {
         if (Instructions.Count >= 4096) throw new InvalidDataException("method instruction limit exceeded");

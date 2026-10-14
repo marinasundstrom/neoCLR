@@ -202,6 +202,15 @@ public sealed partial class MethodBuilder
                     if (instruction.Op == "field.load") stack.Add(instruction.ConstructedField?.FieldType ?? instruction.Field!.FieldType);
                     if (instruction.Op == "field.address") stack.Add(SignatureType.ByReference(instruction.ConstructedField?.FieldType ?? instruction.Field!.FieldType));
                     break;
+                case "tuple.new":
+                    foreach (var element in instruction.Type!.Tuple!.ElementTypes.Reverse()) Pop(element);
+                    stack.Add(instruction.Type); break;
+                case "tuple.load":
+                case "tuple.store":
+                    var tupleElement = instruction.Type!.Tuple!.ElementTypes[instruction.Value];
+                    if (instruction.Op == "tuple.store") Pop(tupleElement);
+                    Pop(instruction.Type);
+                    stack.Add(instruction.Op == "tuple.load" ? tupleElement : instruction.Type); break;
                 case "array.new":
                 case "array.reserve":
                     Pop(PrimitiveType.Int32); stack.Add(SignatureType.ArrayOf(instruction.Type!)); break;

@@ -36,7 +36,20 @@ internal static class TupleImportChecks
         // Importing once must not make the ordinary API admit tuples through its cache.
         Reject(() => consumer.ImportReference(echo, core));
         var main = consumer.AddFunction("Main");
-        main.Call(consumer.ImportReference(snapshot.MainModule.Functions.Single(m => m.Name == "Main"), core));
+        var callable = consumer.ImportExperimentalTupleReference(echo, core);
+        var tuple = callable.Signature.ReturnType;
+        var pair = tuple.Tuple!.ElementTypes[0];
+        var original = main.DeclareLocal(tuple);
+        var il = main.GetILGenerator();
+        main.LoadConstant(40); il.Emit(OpCode.Ldstr, "payload"); il.NewTuple(pair);
+        main.LoadConstant(2); main.LoadConstant(0); il.NewTuple(tuple);
+        main.Call(callable); main.StoreLocal(original);
+        main.LoadLocal(original); main.LoadConstant(7); il.StoreTupleElement(tuple, 1);
+        il.LoadTupleElement(tuple, 1);
+        main.LoadLocal(original); il.LoadTupleElement(tuple, 0); il.LoadTupleElement(pair, 0);
+        main.Emit(OpCode.Add);
+        main.LoadLocal(original); il.LoadTupleElement(tuple, 1); main.Emit(OpCode.Add);
+        main.LoadConstant(7); main.Emit(OpCode.Sub);
         main.Return(); consumer.EntryPoint = main;
         var consumerImage = consumer.WriteNativeAssembly();
         File.WriteAllBytes(Path.Combine(output, "TupleConsumer.neox"), NativeModuleContainer.WriteBinary(consumerImage));
@@ -57,8 +70,40 @@ internal static class TupleImportChecks
             changed["functions"]![0]!["returns"] = new JsonObject { ["Tuple"] = invalid.DeepClone() };
             Reject(() => AssemblyDefinition.ReadExperimentalTupleAssembly(NativeModuleContainer.WriteBinary(System.Text.Encoding.UTF8.GetBytes(changed.ToJsonString()))));
         }
-        Console.WriteLine("PASS native tuple snapshots and explicit callable imports");
+        CheckInvalidOperations(core);
+        Console.WriteLine("PASS native tuple snapshots, imports and value operations");
     }
+    private static void CheckInvalidOperations(AssemblyIdentity core)
+    {
+        foreach (var operation in new[] { "construct", "store", "receiver" })
+        {
+            var builder = new AssemblyBuilder(new("InvalidTupleOps", new Version(1, 0, 0, 0)), core);
+            var tuple = builder.CreateExperimentalTuple(PrimitiveType.Int32, PrimitiveType.String);
+            var main = builder.AddFunction("Main");
+            var il = main.GetILGenerator();
+            Reject(() => il.NewTuple(PrimitiveType.Int32));
+            Reject(() => il.LoadTupleElement(tuple, -1));
+            Reject(() => il.StoreTupleElement(tuple, 2));
+            var foreign = new AssemblyBuilder(new("ForeignTuple", new Version(1, 0, 0, 0)), core).CreateExperimentalTuple(PrimitiveType.Int32);
+            Reject(() => il.NewTuple(foreign));
+            if (operation == "receiver")
+            {
+                main.LoadConstant(1); il.LoadTupleElement(tuple, 0);
+            }
+            else
+            {
+                main.LoadConstant(1);
+                if (operation == "construct") main.LoadConstant(2);
+                else il.Emit(OpCode.Ldstr, "text");
+                il.NewTuple(tuple);
+                if (operation == "store") { main.LoadConstant(2); il.StoreTupleElement(tuple, 1); }
+                main.Emit(OpCode.Pop); main.LoadConstant(0);
+            }
+            main.Return();
+            Reject(() => builder.WriteNativeAssembly());
+        }
+    }
+
     private static void Reject(Action action)
     {
         try { action(); } catch (Exception e) when (e is InvalidDataException or ArgumentException or NotSupportedException) { return; }

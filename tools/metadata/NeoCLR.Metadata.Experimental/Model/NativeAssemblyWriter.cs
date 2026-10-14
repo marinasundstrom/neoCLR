@@ -191,6 +191,8 @@ public sealed partial class AssemblyBuilder
             "greater.unordered" => new { op = "cgt.un" },
             "greater" => new { op = "cgt" },
             "constant" => new { op = "ldc.i4", arg = (object)instruction.Value },
+            "tuple.new" => new { op = "newobj", arg = SignatureValue(instruction.Type!) },
+            "tuple.load" or "tuple.store" => new { op = instruction.Op == "tuple.load" ? "ldfld" : "stfld", arg = (object)instruction.Value },
             "enum.from" => new { op = "newobj", arg = SignatureValue(instruction.Type!) },
             "enum.to" => new { op = "conv.i4" },
             "argument.store" => new { op = "starg", arg = (object)instruction.Value },

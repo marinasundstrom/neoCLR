@@ -8967,3 +8967,36 @@ external dependencies, default/composition-only rejection and malformed/open tup
 The separate native consumer returns 42 through an imported producer function and
 contains verified tuple-forwarding methods. Tuple values are not yet constructed by
 the C# builder in this fixture; construction/element APIs and Raven lowering remain.
+
+
+## Native tuple value operations (2026-10-14 development)
+
+`MethodBuilder.GetILGenerator()` now exposes these native-only operations:
+
+- `NewTuple(SignatureType type)` consumes one value per element, pushed in declaration
+  order, and pushes the structural tuple value.
+- `LoadTupleElement(SignatureType type, int index)` consumes an exact tuple value and
+  pushes its element at the zero-based index.
+- `StoreTupleElement(SignatureType type, int index)` consumes a tuple followed by a new
+  element value and pushes the updated tuple copy. It does not write the original
+  local; store the result explicitly to replace that local.
+
+All three require an explicitly admitted, output-owned tuple signature. Null signatures
+throw ArgumentNullException; non-tuples/foreign signatures throw ArgumentException;
+out-of-range positions throw ArgumentOutOfRangeException. Instruction-budget and
+stack/type mismatches throw InvalidDataException (stack checks occur on native write).
+Exact receiver and element identity are enforced by the existing typed body checker.
+
+Native encoding uses aggregate `newobj` and indexed `ldfld`/`stfld`, without nominal
+constructors or FieldDefs. The updated-copy store is a deliberate authoring contract:
+unlike CLR ValueTuple field mutation through an address, it returns the replacement
+value. It preserves value copying but requires explicit assignment by the caller.
+Managed element-address authoring is not added here. CLI projection still rejects
+outputs with admitted tuples; runtime execution requires `experimental-tuples`.
+
+The separate producer/consumer fixture now executes nested tuple construction,
+imported echo, element reads and copy update, returning 42 only when the original
+local remains unchanged. Negative checks reject malformed operand signatures,
+indices, receivers, constructor elements and replacement values. This supersedes the
+earlier fixture limitation that only tuple-forwarding signatures were verified.
+Raven lowering remains a subsequent compiler slice.

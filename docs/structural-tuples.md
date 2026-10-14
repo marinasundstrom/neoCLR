@@ -191,3 +191,22 @@ C# tuple value construction/element operations and Raven source lowering remain 
 The [import validation record](experiments/structural-tuples/import-results.json)
 contains the producer/consumer hashes and commands. Existing composition reader
 regressions and the API snapshot check pass.
+
+
+## Executable metadata-builder tuple operations
+
+`IILGenerator` now supports `NewTuple`, `LoadTupleElement` and `StoreTupleElement`.
+The store consumes a tuple and replacement element, returning an updated value copy;
+it never implicitly writes a source local. Typed bodies check exact receiver/element
+signatures, while operand admission checks ownership and zero-based position bounds.
+Native output reuses aggregate construction and indexed fields, not nominal members.
+
+The separate consumer now constructs a nested tuple, calls the imported echo with
+that value, reads elements and changes a copy. It returns 42, checking that the
+original remains unchanged. Negative checks cover wrong constructors/receivers/stores,
+non-tuple and foreign signatures, and invalid positions. Managed element-address
+builder APIs and Raven source lowering remain pending. Existing interpreter support
+for managed addresses is unchanged.
+
+[Operation validation](experiments/structural-tuples/operation-results.json) records
+the producer/consumer and test-source hashes, commands and expected result.
