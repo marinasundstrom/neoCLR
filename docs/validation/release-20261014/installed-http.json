@@ -1,0 +1,102 @@
+{
+  "execution": "default",
+  "inputs": {
+    "/Users/robert/.neoclr/experiments/preview-20261014-15/bin/neoclr": "ba01e6b87330c81612e86465f1f28dde6cd147d815939035bb3fa86467207878",
+    "/Users/robert/.neoclr/experiments/preview-20261014-15/samples/http-json-server/bin/neoclr/App.dll": "04e64f936c5c933cab723fc3f32b966a721791b2576354d5e18f9173e1ae32a8",
+    "/Users/robert/.neoclr/experiments/preview-20261014-15/samples/http-json-client/bin/neoclr/App.dll": "3fb2087a5deb222e68120050491faf097453c62c733a20478e0ec9a5d321fec4",
+    "/Users/robert/.neoclr/experiments/preview-20261014-15/lib/System.runtime.neox": "98a1ae1da85387c87746957e83a4015eb59d0566539a915c69f168d2b511b190",
+    "/Users/robert/.neoclr/experiments/preview-20261014-15/lib/System.Runtime.dll": "9d23c455fc6f680151bddc091940541a2f77fb3a514d623496b6acb3a4864de0",
+    "/Users/robert/.neoclr/experiments/preview-20261014-15/lib/System.Data.dll": "ee1599ac7d8a4828a893e2a556ff0c69b61d75038c9cd5e4cc61d8de2a71303e",
+    "/Users/robert/.neoclr/experiments/preview-20261014-15/lib/System.Networking.dll": "741a1e68009b08b1eaa325ae1c5dcb717df403f6a1ad7a5354c7b35e523fb224",
+    "/Users/robert/.neoclr/experiments/preview-20261014-15/lib/System.Web.dll": "3ec43cfcf404167deda8086ad17e89ec27f0a48a41783bc617026f2c6420972e",
+    "/Users/robert/.neoclr/experiments/preview-20261014-15/lib/System.Data.PostgreSql.dll": "4918c46d21080b6862c53aa915c64358725104cb23d00727f197caed243ff3dd",
+    "/Users/robert/.neoclr/experiments/preview-20261014-15/samples/http-json-server/bin/neoclr/App.reflection.json": "7b5f0fa6496763b241e15867e8db86e6e850dbda005ad528cd709ae75248329b",
+    "/Users/robert/.neoclr/experiments/preview-20261014-15/samples/http-json-client/bin/neoclr/App.reflection.json": "70b58551becdceb3196042e9fef87e964b8bb35bd52e04f88b0f05a1102a3521"
+  },
+  "runs": [
+    {
+      "serverCommand": [
+        "/Users/robert/.neoclr/experiments/preview-20261014-15/bin/neoclr",
+        "run",
+        "/Users/robert/.neoclr/experiments/preview-20261014-15/samples/http-json-server/bin/neoclr/App.dll",
+        "--reflection-roots",
+        "/Users/robert/.neoclr/experiments/preview-20261014-15/samples/http-json-server/bin/neoclr/App.reflection.json",
+        "--",
+        "4"
+      ],
+      "requests": [
+        {
+          "method": "GET",
+          "path": "/report",
+          "status": 200,
+          "body": {
+            "station": "Caf\u00e9"
+          }
+        },
+        {
+          "method": "POST",
+          "path": "/reports",
+          "status": 201,
+          "body": {
+            "accepted": true
+          }
+        },
+        {
+          "method": "POST",
+          "path": "/reports",
+          "status": 400,
+          "body": {
+            "error": "Invalid report"
+          }
+        },
+        {
+          "method": "GET",
+          "path": "/missing",
+          "status": 404,
+          "body": {
+            "error": "Not found"
+          }
+        }
+      ],
+      "port": "63917",
+      "server": {
+        "exitCode": 0,
+        "stdout": "Reports served\n",
+        "stderr": ""
+      }
+    },
+    {
+      "serverCommand": [
+        "/Users/robert/.neoclr/experiments/preview-20261014-15/bin/neoclr",
+        "run",
+        "/Users/robert/.neoclr/experiments/preview-20261014-15/samples/http-json-server/bin/neoclr/App.dll",
+        "--reflection-roots",
+        "/Users/robert/.neoclr/experiments/preview-20261014-15/samples/http-json-server/bin/neoclr/App.reflection.json",
+        "--",
+        "2"
+      ],
+      "requests": [],
+      "port": "63924",
+      "clientCommand": [
+        "/Users/robert/.neoclr/experiments/preview-20261014-15/bin/neoclr",
+        "run",
+        "/Users/robert/.neoclr/experiments/preview-20261014-15/samples/http-json-client/bin/neoclr/App.dll",
+        "--reflection-roots",
+        "/Users/robert/.neoclr/experiments/preview-20261014-15/samples/http-json-client/bin/neoclr/App.reflection.json",
+        "--",
+        "http://127.0.0.1:63924/"
+      ],
+      "client": {
+        "exitCode": 0,
+        "stdout": "{\"accepted\":true}\n",
+        "stderr": ""
+      },
+      "server": {
+        "exitCode": 0,
+        "stdout": "Reports served\n",
+        "stderr": ""
+      }
+    }
+  ],
+  "passed": true
+}

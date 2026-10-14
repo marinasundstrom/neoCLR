@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-14
 
+- Complete final Windows JSON/editor qualification and install SDK `0.1.15-neoclr.20261014.2` with extension `.3` in the dedicated author preview. Installed catalogue checks, sample builds and default-JIT JSON/HTTP execution pass; preserve exact component and report hashes.
+
 - Prepare Preview 15 release notes and download pages around the unified runtime, with runtime await on both supported hosts and linked qualification/source documentation.
 
 - Record completed Windows SDK `.2` qualification, matching inlay regressions, retained HTTP on Windows and TLS/security on both hosts. Retain successful focused macOS JSON/editor evidence and the 4,438-page website build with declaration-source links. Installation awaits only the Windows JSON/editor delta.

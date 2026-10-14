@@ -39,10 +39,13 @@ hover across four edits, and inlay stability pass against the matching packaged
 SDK server. The new JSON text/indentation API passes focused DOM/stream checks in
 interpreter/JIT/AOT on macOS. The [final gates record](../validation/release-20261014/final-gates.json)
 and [JSON record](../validation/release-20261014/json-formatting.json) identify evidence.
-Only the focused Windows JSON/editor delta remains pending before installation;
-no broad runtime requalification is required for those API/client changes.
+The focused Windows JSON/editor delta passes in run 38547814472, including all
+three execution modes and the final packaged editor. No broad runtime
+requalification is required for those API/client changes.
 The website build validates 4,438 pages and checks real declaration source links,
-including new JSON members. No new installation or publication has occurred yet.
+including new JSON members. The [new local installation](../local-preview-20261014.md)
+passes catalogue checks, all bundled sample builds, default-JIT collections/Tasks/JSON
+and the HTTP client/server checks. Release and website publication are next.
 
 The earlier [failed candidate](../validation/release-20261014/candidate.json) is
 retained for provenance. It is superseded by the inline-value fix, not rewritten.

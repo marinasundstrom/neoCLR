@@ -8,7 +8,8 @@
   "editorVersion": "0.1.15-neoclr.20261014.3",
   "hostedRuns": {
     "retainedHttp": 38545373921,
-    "securityTls": 38545373900
+    "securityTls": 38545373900,
+    "canonicalSource": 38545373946
   },
   "reports": {
     "windowsEditor": {
@@ -35,7 +36,39 @@
       "path": "target/release-editor-watcher-20261014/vscode-inlay-acceptance.json",
       "sha256": "b1efa6837afe3617e4377be3699f376eb11464058306458d13e86cd80b43f0ca",
       "passed": true
+    },
+    "installedMac": {
+      "path": "target/preview15-installed-acceptance.json",
+      "sha256": "deef57c15b527cbbbab035b531de7dedad3044f4384cb44209477fd7e960b671",
+      "passed": true
+    },
+    "canonicalSource": {
+      "path": "target/release-source-final-20261014/canonical-source-validation/report.json",
+      "sha256": "c6a7c90865df429c7246db2d15da8a6547f2ee151c245b7b8e047acd3e3aea6a",
+      "passed": true
+    },
+    "windowsFinalconfiguration": {
+      "path": "target/release-windows-delta-final-20261014/editor-delta/vscode-configuration-acceptance.json",
+      "sha256": "39268ad4e7f87afb09d7995600731b2ddd7b4cb5091f9bd05225a940d5534bc4",
+      "passed": true
+    },
+    "windowsFinalmember-hover": {
+      "path": "target/release-windows-delta-final-20261014/editor-delta/vscode-member-hover-acceptance.json",
+      "sha256": "bfc271a8a563a29c1b2d276766b6f013bfc864e06b7d10aafa8c4ae7b782d7b3",
+      "passed": true
+    },
+    "windowsFinalinlay": {
+      "path": "target/release-windows-delta-final-20261014/editor-delta/vscode-inlay-acceptance.json",
+      "sha256": "de1f7ba2b0e9d435cace2815fc2aca619baf4a44ef7a7b174fc4712c02ce70c0",
+      "passed": true
+    },
+    "windowsFinalJson": {
+      "path": "target/release-windows-delta-final-20261014/delta-tests/report.json",
+      "sha256": "55576da83473484605c986f31dd18eef82fc525dd1204a82ae77ae842e52fc5f",
+      "passed": true
     }
   },
-  "pending": "Focused Windows JSON/editor delta 38547814472; installation and publication not performed."
+  "pending": "Release and website publication.",
+  "windowsDeltaRun": 38547814472,
+  "windowsDeltaConclusion": "success"
 }

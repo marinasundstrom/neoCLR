@@ -1,0 +1,16 @@
+{
+  "date": "2026-10-14",
+  "previewRoot": "/Users/robert/.neoclr/experiments/preview-20261014-15",
+  "sdkPath": "/Users/robert/.raven/sdk/0.1.15-neoclr.20261014.2",
+  "sdkVersion": "0.1.15-neoclr.20261014.2",
+  "extensionPath": "/Users/robert/.neoclr/experiments/preview-20261014-15/editor-extensions/raven.raven-vscode-0.1.15-neoclr.20261014.3",
+  "extensionVersion": "0.1.15-neoclr.20261014.3",
+  "sdkFilesMatchQualifiedBundle": true,
+  "sampleAcceptance": {
+    "path": "target/preview15-installed-acceptance.json",
+    "sha256": "deef57c15b527cbbbab035b531de7dedad3044f4384cb44209477fd7e960b671",
+    "passed": true
+  },
+  "defaultExecution": "jit",
+  "globalSdkDefaultChanged": false
+}

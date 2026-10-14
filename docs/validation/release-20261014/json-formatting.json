@@ -84,6 +84,18 @@
     "runtime/raven/src/System/Data/Json/ObjectMapper.rvn": "298db0a19e8d88549e6ef5f3ca39e1ece2dd4ce38e385b92991912dcaa50fc75",
     "runtime/raven/src/System/Data/Json/JsonValue.rvn": "8444a5a2f0d7fa37418815419c8a3ad568470c6a81a572fb86a323de2cb1b934"
   },
-  "windows": "Focused release-delta workflow pending",
+  "windows": {
+    "run": 38547814472,
+    "conclusion": "success",
+    "modes": [
+      "interpreter",
+      "jit",
+      "native"
+    ],
+    "suites": [
+      "json-dom",
+      "json-streams"
+    ]
+  },
   "unrelatedRuntimeQualification": "Reused existing GC/HTTP/source and Windows SDK evidence; no collector, JIT or scheduler code changed."
 }

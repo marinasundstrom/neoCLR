@@ -11,7 +11,7 @@ ARM64 and Windows x64. SDK version: `0.1.15-neoclr.20261014.2`; VS Code extensio
 - [Windows SDK/package](https://github.com/marinasundstrom/neoCLR/actions/runs/38542979837): passed default-JIT package acceptance, three-mode JSON, HTTP, runtime await, GC, editor and inlay checks.
 - [TLS and cryptography on both hosts](https://github.com/marinasundstrom/neoCLR/actions/runs/38545373900): passed.
 - [Retained Windows HTTP host](https://github.com/marinasundstrom/neoCLR/actions/runs/38545373921): passed.
-- [Final JSON and editor delta](https://github.com/marinasundstrom/neoCLR/actions/runs/38547814472): checks changed libraries in interpreter, JIT and AOT and the packaged configuration watcher, member hover and inlays.
+- [Final JSON and editor delta](https://github.com/marinasundstrom/neoCLR/actions/runs/38547814472): passed changed-library checks in interpreter, JIT and AOT and packaged configuration watcher, member hover and inlays.
 - [JSON formatting evidence](json-formatting.json) records macOS DOM and stream checks across all three modes.
 - [Final gates](final-gates.json) records component revisions and report hashes. Earlier candidate failures remain in this directory as development evidence; they are not the shipped package's qualification.
 
