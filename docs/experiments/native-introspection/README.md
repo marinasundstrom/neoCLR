@@ -10,9 +10,9 @@ been run on Windows.
 ```sh
 python3 scripts/build-native-project.py --profile console \
   --project docs/experiments/native-introspection/Native.rvnproj \
-  --reflection-roots docs/experiments/native-introspection/reflection-roots.json \
+  --reflection-type Report \
   --bundle /absolute/path/to/development/bundle \
-  --aot tools/aot-poc/target/debug/neoclr-aot-poc \
+  --aot target/debug/neoclr-codegen \
   --output target/my-native-introspection
 ```
 

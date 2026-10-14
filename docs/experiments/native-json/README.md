@@ -9,16 +9,15 @@ Use a matching development bundle:
 ```sh
 python3 scripts/build-native-project.py --profile console \
   --project docs/experiments/native-json/Native.rvnproj \
-  --reflection-roots docs/experiments/native-json/reflection-roots.json \
+  --reflection-type Report --reflection-type Guarded --reflection-type Bulletin --reflection-type NodeEnvelope --reflection-type GuardedNode --reflection-type CollectionEnvelope \
   --bundle /absolute/path/to/development/bundle \
-  --aot tools/aot-poc/target/debug/neoclr-aot-poc \
+  --aot target/debug/neoclr-codegen \
   --output target/native-json-admission
 ```
 
 The flat typed round trip now passes on macOS in both execution modes. The probe
 also covers invalid syntax, missing/null/wrongly typed values, no constructor execution
-for invalid input, escaped UTF-8 text, false and Int32.MinValue. Source identities in
-the private roots file must match the compiler artifact. Use the console profile;
+for invalid input, escaped UTF-8 text, false and Int32.MinValue. The builder resolves named reflection roots against the freshly compiled artifact. Use the console profile;
 the HTTP profile expects task-pump exports.
 
 Run `scripts/validate-native-json.py --output target/my-json-validation --bundle

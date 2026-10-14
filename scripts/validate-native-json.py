@@ -51,7 +51,7 @@ def main():
                   ROOT / 'scripts/validate-native-http-project.py', ROOT / 'scripts/validate-windows-project.py',
                   ROOT / 'scripts/prepare-native-development-bundle.py']
         for _, sample, _ in samples:
-            inputs += [ROOT / 'docs/experiments' / sample / n for n in ('Main.rvn', 'Native.rvnproj', 'reflection-roots.json')]
+            inputs += [ROOT / 'docs/experiments' / sample / n for n in ('Main.rvn', 'Native.rvnproj')]
         report['inputs'] = {p.relative_to(ROOT).as_posix(): sha(p) for p in inputs}
         if args.bundle:
             bundle = args.bundle.resolve()
@@ -80,11 +80,12 @@ def main():
         for name, sample, expected in samples:
             project = out / (name + ' project with spaces')
             project.mkdir()
-            for file in ('Main.rvn', 'Native.rvnproj', 'reflection-roots.json'):
+            for file in ('Main.rvn', 'Native.rvnproj'):
                 shutil.copy2(ROOT / 'docs/experiments' / sample / file, project / file)
             dest = out / (name + ' native output')
+            roots = ['Report'] if name == 'introspection' else ['Report', 'Guarded', 'Bulletin', 'NodeEnvelope', 'GuardedNode', 'CollectionEnvelope']
             run([sys.executable, ROOT / 'scripts/build-native-project.py', '--profile', 'windows-console' if windows else 'console',
-                 '--project', project / 'Native.rvnproj', '--reflection-roots', project / 'reflection-roots.json',
+                 '--project', project / 'Native.rvnproj', *[arg for root in roots for arg in ('--reflection-type', root)],
                  '--bundle', bundle, '--aot', aot, '--output', dest], name + '-build')
             build = json.loads((dest / 'build.json').read_text())
             if not build['passed']:

@@ -29,8 +29,9 @@ no new installation or release has occurred.
 
 Additional source parity fixtures need review: their interpreter controls now select
 that execution mode explicitly, and the local collections/imported-init gate passes
-(`target/release-inline-collections-20261014/report.json`). The older introspection
-fixture stops at static-owner value admission; retained HTTP stops at the
+(`target/release-inline-collections-20261014/report.json`). The introspection/JSON controls now also pass locally after regenerating
+reflection roots from the compiled artifact; the stale roots had selected a
+generated static owner. Retained HTTP still stops at the
 `RuntimeAsyncStartManaged` contract when built through its explicit bootstrap root.
 These are separate from the passing packaged JSON and HTTP consumers.
 
