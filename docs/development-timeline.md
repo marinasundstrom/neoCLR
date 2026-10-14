@@ -17574,3 +17574,15 @@ Intersection source support is the next requested slice. See
 [source evidence](experiments/source-structural-unions/README.md).
 
 Outcome update: the requested Raven intersection slice now passes source trait dispatch, structural reflection and cross-library execution. The compiler retains the author’s distinction between Raven sealed hierarchies and CLR-final classes. See [intersection evidence](experiments/source-structural-intersections/README.md).
+
+### 2026-10-14 — Renewed structural constraint-position requirement
+
+The author said, “We also need to consider unions and intersections in type
+constraint position”. The assistant inspected Raven's constraint analyzer and tests:
+existing intersection syntax flattens into conjunctive nominal bounds; the new
+source-storage work does not supply native structural constraint support. The
+assistant proposed preserving any-of/all-of semantics, full-argument coverage for
+union arguments, generic substitution and reflected grouping, and recorded the
+next bounded implementation sequence. These are design proposals and pending work,
+not a claim of implementation or author approval of every detail. See the
+[constraint follow-up](experiments/structural-compositions/README.md#constraint-position-follow-up-after-source-storage--2026-10-14).

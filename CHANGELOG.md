@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-14
 
+- Record renewed author direction for structural union/intersection type constraints, distinguishing existing conjunctive Raven constraints from pending native encoding, argument checking, substitution and reflection. Document proposed semantics without claiming implementation.
+
 - Validate companion Raven source intersection parameters, returns, locals, trait dispatch, structural reflection and generic-wrapper identity. Retain executable source/evidence and document explicit native configuration, cross-library union/intersection consumers and remaining POC limitations.
 
 - Admit nongeneric static methods on nominal owners with composition parameters, retaining transitive body validation and generic/wrapper restrictions. Validate source-authored Task<Response | HttpError | JsonError> signatures, native awaits for all alternatives and structural reflection with the companion compiler.

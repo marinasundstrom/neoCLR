@@ -1318,3 +1318,38 @@ Owners are `codex/neoclr-union-intersection` and `codex/structural-union-interse
 Evidence: `docs/experiments/source-structural-unions` and
 `docs/experiments/source-structural-intersections`, including runners and hashes.
 This supersedes earlier source-authoring/type-token gaps, not other runtime limits.
+
+## Constraint-position follow-up after source storage — 2026-10-14
+
+The author explicitly renewed the requirement to consider both unions and
+intersections in type-constraint positions after the source-storage POC. That POC
+does not complete the constraint contract. Current Raven flattens intersection
+constraint syntax into conjunctive nominal bounds; native structural constraint
+metadata and disjunction checking remain separate work.
+
+Proposed semantic contract, pending implementation:
+
+- `T : A & B` requires the argument type to satisfy both bounds. A concrete class
+  closed to extension can satisfy this constraint even though it cannot be written
+  as an intersection bound. Raven sealed hierarchy roots remain valid bounds.
+- `T : A | B` requires the argument type to be assignable to the union. For a nominal
+  argument, satisfying either alternative is sufficient. For a structural union
+  argument, every possible alternative must satisfy the bound; accepting one
+  overlapping alternative would be unsound. Use type membership/subtyping, not
+  numeric or user-defined value conversions.
+- Generic code may use all guaranteed traits of an intersection; union constraints
+  only guarantee capabilities common to every permitted alternative until narrowed.
+  The type parameter remains T, preserving caller-selected identity.
+- Preserve disjunction grouping in native metadata and reflection. An ordinary CLR
+  constraint list is conjunctive: flattening a union into that list is incorrect.
+  Existing CLR-compatible nominal conjunction lowering can remain where equivalent.
+- Substitute owner/method parameters recursively in bounds such as
+  `T : Response<U> | HttpError | JsonError` before checking arguments. Define cycle
+  rejection and bounded complexity without expanding mixed formulas into a potentially
+  exponential normal form. Mixed constraints are follow-up work, not enabled syntax.
+
+The next bounded implementation slice should establish native constraint encoding,
+roundtrip/reflection and argument satisfaction together, with positive and negative
+any-of/all-of checks, then compiler generic-body use and substitution. Reuse existing
+relationship research and the CLR comparison above. Keep default/unsupported backend
+rejection explicit; do not weaken constraints to Object or nominal carriers.
