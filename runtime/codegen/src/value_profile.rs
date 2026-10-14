@@ -621,6 +621,11 @@ impl<'a> Profile<'a> {
     }
     pub fn ty(&self, t: &Type) -> Result<Ty, Error> {
         Ok(match t {
+            Type::Tuple(_) => {
+                return Err(
+                    "structural tuple signatures are interpreter-only in this experiment".into(),
+                );
+            }
             Type::Union(_) | Type::Intersection(_) => {
                 return Err(
                     "compound reference signatures are interpreter-only in this experiment".into(),

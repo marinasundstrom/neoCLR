@@ -245,6 +245,18 @@ pub(crate) fn record_fields(
     let nominal = module.array_nominal(ty);
     let ty = nominal.as_ref().unwrap_or(ty);
     check_type_context(ty, module, arity, 0)?;
+    if let Type::Tuple(elements) = ty {
+        return Ok(elements
+            .iter()
+            .enumerate()
+            .map(|(index, ty)| crate::metadata::Field {
+                name: format!("Item{}", index + 1),
+                ty: ty.clone(),
+                visibility: crate::metadata::Visibility::Public,
+                deferred: false,
+            })
+            .collect());
+    }
     let (name, arguments): (&str, &[Type]) = match ty {
         Type::Named(name) => (name, &[]),
         Type::Constructed {
@@ -1498,9 +1510,32 @@ fn check_type_context_seen(
     }
     let mut nested = |ty: &Type| check_type_context_seen(ty, module, arity, depth + 1, seen);
     match ty {
-        Type::Tuple(_) => Err(Fault::new(
-            "structural tuple execution is not yet supported",
-        )),
+        Type::Tuple(parts) => {
+            if !cfg!(feature = "experimental-tuples") {
+                return Err(Fault::new(
+                    "structural tuple execution requires experimental-tuples",
+                ));
+            }
+            if parts.is_empty() || parts.len() > 256 {
+                return Err(Fault::new("tuple signature requires one to 256 elements"));
+            }
+            for part in parts {
+                if crate::constraints::symbolic(part)
+                    || matches!(part, Type::Void | Type::Value | Type::RuntimeTypeHandle)
+                    || !(part.is_primitive()
+                        || matches!(
+                            part,
+                            Type::Tuple(_) | Type::Named(_) | Type::Constructed { .. }
+                        ))
+                {
+                    return Err(Fault::new(
+                        "tuple elements require closed scalar, nominal or tuple types",
+                    ));
+                }
+                nested(part)?;
+            }
+            Ok(())
+        }
         Type::Union(_) | Type::Intersection(_) => crate::compositions::validate(module, ty),
         Type::Function(shape) => {
             shape.validate()?;

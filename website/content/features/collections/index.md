@@ -90,6 +90,7 @@ and hashing. Avoid changing a key in ways that affect equality while it is store
 
 Development direction: structural tuple signatures will replace the nominal tuple
 family. The feature branch currently preserves ordered tuple signatures in native
-metadata; executable tuples still use the existing nominal implementation while
-runtime storage, introspection and compiler migration are completed. See the
+metadata and provides opt-in native interpreter values with positional element
+access. Raven source tuples still use the nominal implementation while
+introspection and compiler migration are completed. See the
 [tuple API reference](/docs/tuples.md) for the current boundary.

@@ -40,8 +40,10 @@ with the existing nominal tuple family.
    Type/method/Self substitution traverses elements and retains the depth budget.
    Scope binding preserves order, duplicates and nesting, with one to 256 elements.
    This is metadata syntax, not yet a resolved runtime tuple descriptor.
-2. **Runtime values (next):** checked construction, positional reads/writes,
-   deconstruction, value copying, nested/reference element lifetimes and layout.
+2. **Runtime values (bounded interpreter slice):** opt-in construction, positional
+   reads/writes, managed element addresses, default initialization, copying and
+   nested/reference elements now use structural signatures. Native memory layout,
+   synthesized Deconstruct reflection and broader element forms remain pending.
 3. **Introspection and authoring:** native host signature authoring/import, resolved
    tuple identity and `TupleTypeInfo`, synthesized members and generic substitution.
 4. **Raven:** carrier-independent tuple symbols and native lowering/import, preserving
@@ -52,9 +54,12 @@ with the existing nominal tuple family.
    and legacy admission after the replacement consumer passes. Explicit nominal
    constructor uses must migrate; do not silently reinterpret old binaries.
 
-Native executable admission currently rejects tuple signatures, including array
-wrappers, with `structural tuple execution is not yet supported`. Enabling
-`experimental-compositions` does not authorize tuple execution. Decoding a native
+Native executable admission requires `experimental-tuples` for tuple signatures,
+including wrappers. Enabling `experimental-compositions` alone does not authorize
+tuple execution. The interpreter slice admits closed scalar, nominal and nested
+structural tuple elements. It rejects Void, erased Value, RuntimeTypeHandle, open
+parameters, byrefs, pointers, arrays, functions and compositions as direct elements;
+these are bounded implementation gaps, not permanent type-system restrictions. Decoding a native
 metadata document alone does not validate storage or executable bodies. Old nominal
 Tuple signatures remain distinct and usable until stage 5. Existing installed VS
 Code kit binaries remain the validated union/intersection snapshot.
@@ -65,10 +70,41 @@ Code kit binaries remain the validated union/intersection snapshot.
 signature equality, nested type/method/Self substitution, missing arguments, depth
 and arity limits, and explicit executable rejection. Use
 `cargo test --test structural_tuples --features experimental-compositions`.
-Native runtime tuple execution, guest reflection, Raven lowering and nominal-family
-removal are still pending; these checks do not claim those stages are complete.
+That configuration tests the default execution gate. With
+`--features experimental-tuples,experimental-compositions`, the same target also
+checks construction, nested fields, copy mutation, managed element addressing,
+reference-element survival across GC and invalid element/index/store rejection.
+Guest reflection, Raven lowering and nominal-family removal remain pending.
 
-Validated 2026-10-14: all six structural tuple tests pass with the composition
-feature enabled; the existing binary/JSON metadata equivalence test passes;
+Metadata foundation validation (2026-10-14): all six structural tuple tests pass
+with the composition feature enabled; the existing binary/JSON metadata equivalence test passes;
 `cargo check -p neoclr-codegen` and the API snapshot check pass. No runtime tuple
-execution is claimed by this metadata-only slice.
+execution was claimed by that metadata-only slice. The follow-up interpreter
+configuration passes 12 checks; the default gate still passes six checks.
+
+## Interpreter storage slice
+
+`tuple<Int32,String>` in neoIL produces a structural signature. Existing `newobj`
+aggregate construction and indexed `ldfld`/`stfld`/`ldflda` operations work against
+synthesized public positional members (`Item1`, `Item2`, ...), without a nominal
+constructor or field declaration. `Module::instantiated_fields` returns those
+synthesized host field views. The interpreter uses its existing value aggregate
+storage, retaining structural type identity in the value. Reusing storage is not
+mapping the signature to a nominal Tuple family.
+
+Copies recursively copy value aggregates; managed reference elements retain object
+identity. Typed verification checks element order/types and ordinal bounds. Existing
+managed slot access enforces readonly borrowing. GC traces element values through
+its existing aggregate traversal. Default initialization recursively initializes
+supported elements. The resource limits from the signature stage remain in force.
+JIT/AOT selection explicitly rejects tuple signatures, including nested uses. Native
+layout, guest TupleTypeInfo and compiler lowering are still separate work.
+
+The [native value example](experiments/structural-tuples/values.neoil) constructs a
+pair, modifies a copy, and returns 42 from the original. Run it with a runtime built
+using `--features experimental-tuples`; the ordinary runtime rejects the signature.
+This is a native runtime example, not yet a Raven source sample.
+
+The interpreter [validation record](experiments/structural-tuples/results.json)
+records 12 opt-in tests, six default-gate tests, one native-selection rejection test
+and the example's expected exit code 42. API snapshot validation also passes.

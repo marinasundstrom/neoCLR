@@ -55,8 +55,14 @@ preserves order, duplicates and nesting; it is not a claim of resolved runtime
 assignability. Missing substitution arguments and excessive substitution depth
 return a host Fault. Scope normalization rejects zero or more than 256 elements.
 
-This Rust host metadata node is not a guest TupleTypeInfo API. Executable loading
-rejects structural tuples until storage and element operations are implemented,
-including when the union/intersection experiment is enabled. Existing nominal
-Tuple APIs remain available during migration; their removal is planned. No new
+This Rust host metadata node is not a guest TupleTypeInfo API. The interpreter now
+admits closed scalar, nominal and nested tuple elements with `experimental-tuples`.
+The union/intersection feature alone does not enable tuple execution. Existing
+`Module::instantiated_fields` returns synthesized public `ItemN` views; these have
+no nominal FieldDef. Native aggregate construction, indexed element reads/writes,
+managed element addresses and default initialization preserve value copying and
+reference-element identity. Invalid element types, positions and stores fault.
+JIT/AOT and native layout remain unsupported. Open, byref, pointer, array, function
+and composition direct elements are not admitted in this bounded slice. Existing nominal
+Tuple APIs remain available during migration; their removal is planned. No new Raven
 source syntax, CLI tuple projection or guest reflection member is shipped here.

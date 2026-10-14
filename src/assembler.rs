@@ -1071,7 +1071,12 @@ fn resolve_fields(
         // Field fixups need layout, not full interface validation: standalone source
         // has not been linked with System yet. Complete signature checks follow linking.
         crate::constraints::check_known_type(&context, &owner, 0)?;
-        let fields = crate::inheritance::fields(&context, &owner).map_err(|e| {
+        let fields = (if matches!(owner, Type::Tuple(_)) {
+            crate::vm::record_fields(&context, &owner, 0)
+        } else {
+            crate::inheritance::fields(&context, &owner)
+        })
+        .map_err(|e| {
             Fault::new(format!(
                 "line {line}: invalid field owner {owner:?}: {}",
                 e.message
@@ -1226,6 +1231,17 @@ pub fn parse_type(text: &str) -> Result<Type, Fault> {
             }
             parts.push(&args[start..]);
             return match (name.trim(), parts.as_slice()) {
+                ("tuple", parts) => {
+                    if parts.is_empty() || parts.len() > 256 {
+                        return Err(Fault::new("tuple signature requires one to 256 elements"));
+                    }
+                    Ok(Type::Tuple(
+                        parts
+                            .iter()
+                            .map(|p| parse(p, depth + 1))
+                            .collect::<Result<Vec<_>, _>>()?,
+                    ))
+                }
                 ("union" | "intersection", parts) => {
                     let parts = parts
                         .iter()
@@ -1600,6 +1616,12 @@ fn bind_type_parameters(ty: Type, names: &[Option<String>]) -> Type {
 }
 pub(crate) fn bind_parameters(ty: Type, names: &[Option<String>], method: bool) -> Type {
     match ty {
+        Type::Tuple(parts) => Type::Tuple(
+            parts
+                .into_iter()
+                .map(|t| bind_parameters(t, names, method))
+                .collect(),
+        ),
         Type::Function(mut shape) => {
             shape.parameters = shape
                 .parameters

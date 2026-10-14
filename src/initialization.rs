@@ -54,11 +54,13 @@ fn build_default(module: &Module, ty: &Type, allow_uninitialized: bool) -> Resul
             Type::Single => Value::Single(0.0),
             Type::Double => Value::Double(0.0),
             Type::Ptr(target) => Value::Pointer(crate::memory::Pointer::null((**target).clone())),
-            Type::Named(_) | Type::Constructed { .. } => {
+            Type::Named(_) | Type::Constructed { .. } | Type::Tuple(_) => {
                 if path.contains(ty) {
                     return Err(Fault::new("recursive default initialization"));
                 }
-                crate::inheritance::require_concrete(module, ty)?;
+                if !matches!(ty, Type::Tuple(_)) {
+                    crate::inheritance::require_concrete(module, ty)?;
+                }
                 let definitions = crate::vm::record_fields(module, ty, 0)?;
                 path.push(ty.clone());
                 let fields = definitions

@@ -81,14 +81,16 @@ pub(crate) fn bounds(constraints: &[GenericConstraint]) -> impl Iterator<Item = 
     })
 }
 
-fn symbolic(ty: &Type) -> bool {
+pub(crate) fn symbolic(ty: &Type) -> bool {
     match ty {
         Type::Function(shape) => shape.parameters.iter().any(symbolic) || symbolic(&shape.returns),
         Type::TypeParameter(_) | Type::MethodTypeParameter(_) | Type::SelfType => true,
         Type::Constructed { arguments, .. } | Type::Scoped { arguments, .. } => {
             arguments.iter().any(symbolic)
         }
-        Type::Union(parts) | Type::Intersection(parts) => parts.iter().any(symbolic),
+        Type::Union(parts) | Type::Intersection(parts) | Type::Tuple(parts) => {
+            parts.iter().any(symbolic)
+        }
         Type::ByRef(t)
         | Type::ReadOnlyByRef(t)
         | Type::InterfaceRef(t)
@@ -342,6 +344,11 @@ fn check_known_type_seen(
         return Err(Fault::new("type nesting exceeds 32"));
     }
     match ty {
+        Type::Tuple(parts) => {
+            for part in parts {
+                check_known_type_seen(module, part, depth + 1, seen)?;
+            }
+        }
         Type::Function(shape) => {
             for part in shape
                 .parameters
