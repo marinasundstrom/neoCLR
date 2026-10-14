@@ -17381,3 +17381,31 @@ open, not an approved complete implementation or a permanent roadmap reprioritiz
   probes now preserve both contracts; twelve executable consumers pass. This does
   not establish real Task execution or source-authored compound storage.
   [Evidence and remaining scope](experiments/structural-compositions/README.md#wrapped-composition-metadata-and-raven-calls--2026-10-14).
+
+
+### 2026-10-14 — Assessment of native composition direction
+
+- Author asked whether the direction is sound and whether neoCLR should support
+  unions and intersections. Assistant recommends continuing both as native type
+  specifications with conservative, explicit rules. This is a recommendation,
+  not a newly approved production contract or a formal soundness result.
+- Rationale: preserve alternatives and combined trait requirements across assembly
+  and generic boundaries. Scala provides established language precedents for
+  [unions](https://docs.scala-lang.org/scala3/reference/new-types/union-types.html)
+  and [intersections](https://docs.scala-lang.org/scala3/reference/new-types/intersection-types.html);
+  [.NET generic constraints](https://learn.microsoft.com/en-us/dotnet/csharp/programming-guide/generics/constraints-on-type-parameters)
+  already express conjunctions of interfaces, while the proposed compositions
+  extend the available signature contracts. Language precedents alone do not
+  establish the need for native runtime support; cross-language preservation is
+  the intended benefit, with added loader, verifier, reflection and backend cost.
+- Assistant cautions: overlapping union alternatives do not preserve a selected
+  case (for example, substituting HttpError for T); use tagged unions when case
+  identity matters. The author's sealed-bound restriction is a simplification
+  policy, not a mathematical requirement, and does not alone exclude impossible
+  intersections of unrelated classes. Intersection returns remain valid.
+- Recommended next evidence: executable Task<Response<T> | HttpError | JsonError>
+  paths, substitution/constraint rejection tests, and closure of representation
+  gaps before stabilizing metadata/ABI. Existing bounded interpreter consumers
+  demonstrate feasibility, not production completeness; value storage, nullability,
+  member conflicts, variance, reflection and JIT/AOT still need specified coverage.
+  [Current POC evidence](experiments/structural-compositions/README.md).
