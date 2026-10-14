@@ -133,9 +133,21 @@ public sealed partial class AssemblyBuilder
                     var signature = method.Definition.ConstraintSignature(bound.InterfaceType);
                     if (signature.ImportedType is { } external) _ = ExternalInterfaceMethods(external).ToArray();
                 }
-                foreach (var local in method.Locals) local.SignatureType.ValidateOwner(this, method.Signature.GenericParameterNames.Count, arity, complete: true);
+                foreach (var local in method.Locals)
+                {
+                    if (local.CompositionSource is { } producer)
+                    {
+                        if (!ReferenceEquals(producer.Owner, this) || local.SignatureType != producer.Signature.ReturnType ||
+                            !local.SignatureType.ContainsComposition || method.DeclaringType is not null || method.Signature.GenericParameterNames.Count != 0)
+                            throw new InvalidDataException("invalid experimental composition result local");
+                    }
+                    else local.SignatureType.ValidateOwner(this, method.Signature.GenericParameterNames.Count, arity, complete: true);
+                }
                 foreach (var instruction in method.Instructions)
                 {
+                    if (instruction.Op == "local.address" && instruction.Value >= 0 && instruction.Value < method.Locals.Count &&
+                        method.Locals[instruction.Value].CompositionSource is not null)
+                        throw new InvalidDataException("experimental composition result local addresses are not supported");
                     if (instruction.Op is "new.object" or "new.constructed" && instruction.Target?.DeclaringType?.IsAbstract == true)
                         throw new InvalidDataException("abstract classes cannot be constructed");
                     if ((instruction.Target ?? instruction.ConstructedTarget?.Definition ?? instruction.GenericTarget?.Definition) is { Visibility: MethodVisibility.Protected } familyTarget &&

@@ -1002,3 +1002,46 @@ in the experiment's intersection policy mean non-final in the CLR sense.
 Validation: 35 composition runtime tests and 12 Raven intersection symbol tests
 pass, including rejection of imported System.String as a CLR-final bound. The
 compiler build and API documentation snapshot checks also pass.
+
+
+## Imported composition result locals — 2026-10-14
+
+The host metadata builder now provides an explicit result-local API tied to an
+output-owned experimental callable import. Its exact return descriptor supplies the
+local type, including closed reference wrappers. Native body verification checks
+stores, initialization and loads; local addresses are explicitly rejected. Ordinary
+local construction and CLI projection stay closed. This is a bounded prerequisite
+for compiler-authored locals, not completed Raven local/await integration.
+
+The API reuses .NET-style typed locals and definite assignment while preserving a
+native structural signature that CLI cannot encode. Its provenance requirement
+avoids introducing arbitrary composition construction before that authoring profile
+is validated. No Runtime Contract or temporary CLI encoding changes. The runtime
+already supports these reference locals. The host manual covers the new public API;
+website proposal status remains accurate and no site build is needed.
+
+Validation: host import checks pass; three flat-result consumers (union, intersection,
+redundant intersection) store/load their imported result and return 42. The paired
+POC runner passes all twelve consumers, including two host wrapper consumers now
+using result locals; Raven's source-local rejection tests remain in place. Negative
+checks cover null/foreign/scalar producers, generic body owners, wrong stores,
+uninitialized reads, addresses, ordinary construction and CLI rejection.
+
+## Structural runtime type model — author clarification, 2026-10-14
+
+Nominal and structural types are both first-class runtime-known types, with full
+introspection as the intended contract. A nominal type has its own declaration;
+a structural type is described at the metadata signature/type-specification level
+without requiring a separate nominal declaration. Its type information and identity
+remain available to the runtime. A composition is not merely an erased compiler
+annotation, and the current POC's import/storage/reflection gates are implementation
+gaps, not a definition of structural typing.
+
+The author identified tuples (later), unions, intersections and function types as
+structural forms. Arrays are special: their signature form retains its relationship
+to the nominal Array<T> backing. Runtime representation and backing do not eliminate
+type introspection. Kind-specific information includes composition constituents and
+function parameter/result types; future tuples need their own shape information.
+This records the intended model, not completed tuple support or a new finalized
+reflection API. Existing host composition TypeInfo views supply partial evidence;
+full guest/runtime introspection remains work to complete.

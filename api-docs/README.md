@@ -1997,3 +1997,9 @@ options. Formatting, Result failures and output quotas are documented in
 cover the JsonValue type/member and options type/property, in addition to existing
 Tasks, Object, HTTP and PostgreSQL declaration links. Compiler-generated private
 backing fields are not public API documentation entries.
+
+
+The host-only `MethodBuilder.DeclareExperimentalCompositionResultLocal` API is
+covered by the [manual result-local reference](experimental-metadata.md#imported-composition-result-locals-2026-10-14-development)
+under the existing host metadata exclusion. It does not add a guest reference type;
+the guest snapshot and assembly remain unchanged.

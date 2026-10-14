@@ -8569,3 +8569,45 @@ native-only emission and ordinary-import/storage rejection. It requires local
 unconstrained reference-class definitions; value/interface wrappers and compositions
 inside a composition bound's generic arguments remain outside this reader profile.
 [Wrapped composition contracts and validation](../docs/experiments/structural-compositions/README.md#wrapped-composition-metadata-and-raven-calls--2026-10-14).
+
+
+### Imported composition result locals (2026-10-14 development)
+
+```csharp
+public LocalDefinition MethodBuilder.DeclareExperimentalCompositionResultLocal(
+    ImportedMethodReference producer);
+```
+
+Declares a local with exactly `producer.Signature.ReturnType`, including a closed
+reference wrapper containing union/intersection arguments. The producer must belong
+to the current output assembly and have been imported through the experimental native
+composition callable profile. Its result must contain a composition; an ordinary
+scalar result is rejected. The declaring body must be a nongeneric free function.
+The returned local belongs to that method, keeps its zero-based slot index, and
+retains the exact imported descriptor without nominal subtype reduction.
+
+Null producers throw `ArgumentNullException`; foreign producers, non-composition
+results and unsupported body owners throw `ArgumentException`. The existing 1024
+local limit throws `InvalidDataException`. Use `StoreLocal` before `LoadLocal` on
+every reachable path; wrong-value stores and uninitialized reads fail native body
+validation. Taking the local's address is rejected when writing. `ClearBody` retains
+locals but does not retain definite initialization. Ordinary `DeclareLocal`, authored
+composition signatures/fields and CLI projection stay gated. Runtime execution
+requires the experimental-compositions interpreter profile.
+
+```csharp
+var producer = output.ImportExperimentalCompositionReference(factoryDefinition, core);
+var slot = main.DeclareExperimentalCompositionResultLocal(producer);
+main.Call(producer);
+main.StoreLocal(slot);
+main.LoadLocal(slot);
+main.Call(output.ImportExperimentalCompositionReference(echoDefinition, core));
+main.Emit(OpCode.Pop);
+main.LoadConstant(42);
+main.Return();
+```
+
+The compiled host checks exercise union, intersection, redundant intersection and
+wrapper result locals; Raven source-local emission is not enabled by this host API.
+The API adds controlled storage of an existing type contract, not a distinct kind of
+type or a restriction on structural types' eventual introspection support.

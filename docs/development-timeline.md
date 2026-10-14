@@ -17445,3 +17445,19 @@ open, not an approved complete implementation or a permanent roadmap reprioritiz
 - The next compiler-consumption prerequisite remains explicit local storage for
   imported composition results; this clarification was addressed before opening it.
   [Clarified contract](experiments/structural-compositions/README.md#clarification-final-classes-versus-sealed-hierarchies--2026-10-14).
+
+
+### 2026-10-14 — Structural types are runtime types
+
+- Author emphasized that structural and nominal types are both types and can be
+  fully introspected. Structural types live at the metadata signature level without
+  their own nominal declaration, but remain known by the runtime and expose type
+  information. Author then identified tuples (later), unions, intersections and
+  function types, with arrays special because they remain backed by Array<T>.
+- Assistant agreed and distinguished this intended model from the POC's temporary
+  import/storage/reflection limitations. Existing host TypeInfo views are partial
+  implementation evidence, not completion of full runtime introspection or tuples.
+- During the exchange, the explicit imported-result local API passed host checks,
+  three flat executable consumers and the twelve-consumer paired POC, including
+  host wrapper locals. Raven source-local emission remains the next integration
+  step. [Model and evidence](experiments/structural-compositions/README.md#structural-runtime-type-model--author-clarification-2026-10-14).

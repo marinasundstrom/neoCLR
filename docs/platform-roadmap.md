@@ -4641,3 +4641,10 @@ alternative of Task<Response | HttpError | JsonError>, preserving payload identi
 first-completion semantics and GC retention. Pending/cancelled reads and out-of-union
 payloads remain rejected. Raven source/await integration is still a separate step.
 [Task delivery evidence](experiments/structural-compositions/README.md#real-task-union-completion-and-result-delivery--2026-10-14).
+
+
+Explicit imported-result locals now preserve native composition signatures in the
+host builder; Raven source-local/await integration remains pending. Structural types
+are intended as fully introspectable runtime types: tuples (later), unions,
+intersections and functions, with arrays retaining Array<T> backing.
+[Result-local evidence and type model](experiments/structural-compositions/README.md#imported-composition-result-locals--2026-10-14).
