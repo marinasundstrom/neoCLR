@@ -5,6 +5,23 @@ This page owns shared integration/delivery status. The [HTTP tracker](../http-ca
 owns whether its packaged sample passes and whether the POC is complete; do not
 maintain a second HTTP completion checklist here.
 
+## Current candidate qualification — 2026-10-14
+
+Candidate SDK/VSIX build: `0.1.15-neoclr.20261014.1`; Raven native compiler:
+`fac4ac736024800151d6b285e68407ded864f655`. Preview 14 remains published.
+[Windows package qualification](https://github.com/marinasundstrom/neoCLR/actions/runs/38534244631)
+is running on `aff7c001b`; fresh macOS packaging is in progress.
+The [validation procedure](../next-preview-validation.md) owns the required checks.
+No new installation, release tag or website publication has occurred.
+
+Local GC/static-storage checks pass. Workspace formatting is corrected; strict
+Clippy exposed missing private TLS ABI safety documentation, now being validated.
+Current Windows static-storage/header execution, extracted packages and editor
+acceptance remain open. Source type initializers, readonly static writes and
+constructed generic static classes remain gaps. Native hosts require rebuilding
+for the 1,080-byte context. No expanded SQL platform qualification is claimed.
+Keep this qualification detail here rather than in reader-facing release notes.
+
 ## Release preflight — 2026-10-13
 
 [Local qualification evidence](../experiments/release-20261013/README.md) records the

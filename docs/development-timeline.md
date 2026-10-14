@@ -17040,3 +17040,12 @@ open, not an approved complete implementation or a permanent roadmap reprioritiz
   successfully with matching pinned artifacts. No platform API/compiler change or
   new JIT/AOT claim. See [review decisions](raven-error-api.md)
   and [validation](experiments/json-object-mapping/error-composition-validation-20261014.json).
+
+## 2026-10-14 — Reader-facing documentation
+
+- **Author:** “We don't want historical details and caveats in docs.”
+- **Assistant response:** proposed keeping reader-facing documentation focused on
+  current behavior and usage, with qualification evidence in internal tracking.
+- **Action:** simplified the next-preview notes and moved build revisions, pending
+  gates and qualification boundaries into the toolchain release tracker. Published
+  release notes remain unchanged. A broader content cleanup remains open.

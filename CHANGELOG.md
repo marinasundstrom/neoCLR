@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-14
 
+- Simplify next-preview notes to current behavior and migration guidance following author feedback. Move candidate provenance and pending qualification into internal release tracking; preserve published release records.
+
 - Draft next-preview notes covering runtime-await, integrated components, HTTP/GC refinements, error composition and restored source links. Record migration requirements and pending package/source gates without changing published Preview 14 notes or claiming a new release.
 
 - Apply canonical Rust formatting to the integrated codegen component and runtime module ordering so the workspace formatting gate passes. This is a formatting-only slice; strict Clippy additionally exposed missing TLS ABI safety documentation, tracked for the next qualification fix.
