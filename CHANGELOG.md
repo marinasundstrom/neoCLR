@@ -8,7 +8,7 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-14
 
-- Admit resolved external intersection operands in native method constraints and add an explicit resolver overload for native metadata reads. Preserve nominal conformance, reject unresolved/final/value bounds, and keep Raven sealed hierarchies distinct from final classes. Wire opt-in Raven catalog resolution and closed generic interface conjunction emission; add host and separate-consumer checks.
+- Admit resolved external intersection operands in native method constraints and add an explicit resolver overload for native metadata reads. Preserve nominal conformance, reject unresolved/final/value bounds, and keep Raven sealed hierarchies distinct from final classes. Wire opt-in Raven catalog resolution and closed generic interface conjunction emission; add host and separate-consumer checks. Add explicit dependency resolution to Raven’s intersection-only reader, preserving union-profile and missing-dependency rejection.
 
 - Admit imported closed reference alternatives in native method union constraints, preserving external identity and exact generic arguments. Retain explicit nominal conformance and whole-union coverage; external intersection operands and open bounds remain rejected. Add host roundtrip/negative checks and a three-assembly Raven integration probe.
 

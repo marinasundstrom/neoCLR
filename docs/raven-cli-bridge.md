@@ -9975,3 +9975,19 @@ profile. Open operands, generic owner constraint emission, guest constraint refl
 and JIT/AOT qualification remain follow-up work. Like CLR nominal interfaces, declared
 relationships govern membership; unlike a CLR constraint list, native metadata also
 retains structural grouping and an introspectable intersection signature.
+
+The intersection-only Raven reader also provides
+`ReadExperimentalIntersectionAssembly(image, bootstrap, resolver)` for callers that
+supply dependency snapshots directly instead of using a catalog. It uses the same
+external-operand eligibility checks and preserves method-bound grouping, while still
+rejecting unions in exposed signatures or bounds. Its existing overload remains
+available and rejects unresolved external intersections. The structural-constraint
+probe checks the direct reader, missing-resolver rejection and union-profile rejection.
+No Runtime Contract setting, CLI encoding or nominal conformance rule changes.
+
+Validated with Raven `9f06b4ecb`: `NeoClrMetadataProbe --structural-constraints`
+against `target/composition-info-libraries-v2`, writing artifacts to
+`target/intersection-reader-constraints`. The direct-reader profile checks and
+existing source/import constraint checks pass. This reader-only follow-up does not
+change emitted code or runtime execution; the preceding external-intersection
+consumer result remains the runtime evidence.
