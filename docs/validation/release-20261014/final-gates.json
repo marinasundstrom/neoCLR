@@ -1,0 +1,41 @@
+{
+  "date": "2026-10-14",
+  "windowsPackageRun": 38542979837,
+  "windowsPackageConclusion": "success",
+  "sdkVersion": "0.1.15-neoclr.20261014.2",
+  "compilerRevision": "793219d855b17f01fb805e215968b78871eb3804",
+  "editorClientRevision": "507f35571ea40076df49193433d0b242a462cea7",
+  "editorVersion": "0.1.15-neoclr.20261014.3",
+  "hostedRuns": {
+    "retainedHttp": 38545373921,
+    "securityTls": 38545373900
+  },
+  "reports": {
+    "windowsEditor": {
+      "path": "target/release-windows-fixed-20261014/editor-acceptance/vscode-acceptance.json",
+      "sha256": "d609d48096ee0f8ac6917e594d58f3f2670271de31c647fb2ab31768940c6726",
+      "passed": true
+    },
+    "windowsInlays": {
+      "path": "target/release-windows-fixed-20261014/editor-acceptance/vscode-inlay-acceptance.json",
+      "sha256": "0cb90b45ccdc1cc224744a51c7bc1cd4051cf67b8f19adb844e37ef206e3463f",
+      "passed": true
+    },
+    "macConfiguration": {
+      "path": "target/release-editor-watcher-20261014/vscode-configuration-acceptance.json",
+      "sha256": "39268ad4e7f87afb09d7995600731b2ddd7b4cb5091f9bd05225a940d5534bc4",
+      "passed": true
+    },
+    "macFindHover": {
+      "path": "target/release-editor-watcher-20261014/vscode-member-hover-acceptance.json",
+      "sha256": "007729f612031f0d17f81b6875985d6b9244194b176e5007aa843c889834113d",
+      "passed": true
+    },
+    "macInlays": {
+      "path": "target/release-editor-watcher-20261014/vscode-inlay-acceptance.json",
+      "sha256": "b1efa6837afe3617e4377be3699f376eb11464058306458d13e86cd80b43f0ca",
+      "passed": true
+    }
+  },
+  "pending": "Focused Windows JSON/editor delta 38547814472; installation and publication not performed."
+}

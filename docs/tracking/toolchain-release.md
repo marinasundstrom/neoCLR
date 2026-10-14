@@ -18,32 +18,31 @@ The native project builder can derive reflection roots from the freshly compiled
 artifact using `--reflection-type`. This avoids retaining the wrong artifact's
 reflection identity when the project is rebuilt during AOT qualification.
 
-SDK/VSIX `0.1.15-neoclr.20261014.1` uses Raven native compiler
-`fac4ac736024800151d6b285e68407ded864f655`. The
-[expanded Windows package gate](https://github.com/marinasundstrom/neoCLR/actions/runs/38539514281)
-is still required for three-mode JSON, runtime-await, HTTP and editor acceptance.
-Earlier package attempts exposed a missing ZIP PATH; the workflow now exports
-the installed executable directory explicitly. Canonical source checks and other
-hosted qualification repairs remain under review. Preview 14 remains published;
-no new installation or release has occurred.
+SDK `0.1.15-neoclr.20261014.2` uses Raven native compiler
+`793219d855b17f01fb805e215968b78871eb3804`. Its
+[Windows package gate](https://github.com/marinasundstrom/neoCLR/actions/runs/38542979837)
+passes three-mode JSON, runtime-await, 132 HTTP cases, GC, all 26 editor checks
+and the inlay stability regression. The original `.1` gate also passed; its VSIX
+predates the inlay repair. Keep the artifact cohorts distinct.
 
-Additional source parity fixtures need review: their interpreter controls now select
-that execution mode explicitly, and the local collections/imported-init gate passes
-(`target/release-inline-collections-20261014/report.json`). The introspection/JSON controls now also pass locally after regenerating
-reflection roots from the compiled artifact; the stale roots had selected a
-generated static owner. Retained HTTP now binds and pumps runtime async for its explicit bootstrap root;
-all three local parity/cleanup cases pass. Fresh Windows qualification remains pending.
-These are separate from the passing packaged JSON and HTTP consumers.
+Local collections/imported-init and expanded introspection/JSON controls pass.
+Retained HTTP now binds and pumps runtime async for its bootstrap root; all three
+macOS and [Windows cases](https://github.com/marinasundstrom/neoCLR/actions/runs/38545373921)
+pass, including faults and GC cleanup. Updated
+[TLS/security validation](https://github.com/marinasundstrom/neoCLR/actions/runs/38545373900)
+passes on both hosts. Canonical source/host evidence and Windows JIT HTTP/HTTPS
+from the earlier qualified runtime are retained.
 
-The [editor qualification record](../validation/release-20261014/editor-validation.json)
-records all 26 macOS editor checks, native and .NET inlay regressions, matching
-SDK/VSIX language-server payloads and fresh extracted default-JIT acceptance.
-The inlay failure was fixed on Raven main and carried separately to its native
-branch. The updated `.2` Windows candidate includes that regression; the original
-`.1` package passes three-mode JSON, 132 HTTP checks, 21 runtime-await cases,
-GC validation and all 26 editor checks. Canonical source/host checks and Windows JIT HTTP/HTTPS now pass.
-Installation/publication still awaits the updated Windows candidate and final
-matching-asset review. The retained-bootstrap repair awaits its Windows gate.
+The final editor client `.3` adds explicit props/targets watching, fixing an
+intermittent configuration-recovery failure. Three local recovery cycles, Find
+hover across four edits, and inlay stability pass against the matching packaged
+SDK server. The new JSON text/indentation API passes focused DOM/stream checks in
+interpreter/JIT/AOT on macOS. The [final gates record](../validation/release-20261014/final-gates.json)
+and [JSON record](../validation/release-20261014/json-formatting.json) identify evidence.
+Only the focused Windows JSON/editor delta remains pending before installation;
+no broad runtime requalification is required for those API/client changes.
+The website build validates 4,438 pages and checks real declaration source links,
+including new JSON members. No new installation or publication has occurred yet.
 
 The earlier [failed candidate](../validation/release-20261014/candidate.json) is
 retained for provenance. It is superseded by the inline-value fix, not rewritten.
