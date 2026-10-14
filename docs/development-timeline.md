@@ -17560,3 +17560,15 @@ open, not an approved complete implementation or a permanent roadmap reprioritiz
   Raven typeof still emits nominal union carriers, so the executable probe substitutes
   native tokens explicitly. This is experimental runtime support, not full compiler
   or backend completion. See [the probe](experiments/composition-type-info/README.md).
+
+### 2026-10-14 — Source structural signatures and Raven intersections
+
+The author requested replacing ad hoc nominal union carriers with real structural
+metadata types, then adding intersection support in Raven. The assistant implemented
+an explicit native source contract, preserving declared nominal unions and ordinary
+.NET behavior, and committed the metadata authoring and compiler union slices.
+A source-only Task<Response | HttpError | JsonError> consumer now passes all three
+completed await alternatives and structural introspection. The temporary Wait<T>
+bridge is disabled for this experiment; generic method specialization remains open.
+Intersection source support is the next requested slice. See
+[source evidence](experiments/source-structural-unions/README.md).

@@ -9785,3 +9785,5 @@ replacement; compiler and runtime maintainers own that integration. The ordinary
 previously recorded stream/array/typeof bridge gaps; its providers are not qualified.
 JIT/AOT composition execution remains gated. See the
 [probe](experiments/composition-type-info/README.md) for reproducible validation.
+
+2026-10-14 author-directed experiment: companion Raven now emits opt-in source union signatures to standalone NEOX, with native Task result delivery and reflection validated. See [source union evidence](experiments/source-structural-unions/README.md). This does not enable published/default builds or JIT/AOT.

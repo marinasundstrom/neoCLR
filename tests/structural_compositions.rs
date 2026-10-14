@@ -1021,3 +1021,15 @@ fn composition_type_tokens_are_runtime_known() {
         assert_eq!(p.run(Limits::default()).unwrap().value, Value::Int32(42));
     }
 }
+
+#[cfg(feature = "experimental-compositions")]
+#[test]
+fn nominal_static_methods_preserve_composition_parameters_and_returns() {
+    for kind in ["union", "intersection"] {
+        let helpers = format!(".type class Helpers\n.method static Echo({kind}<Left,Right> value) -> {kind}<Left,Right>\nldarg value\nret\n.end\n.end");
+        let body = format!("ldc.i4 42\nnewobj Both\ncall Helpers::Echo({kind}<Left,Right>)\ncastclass Left\ncallvirt instance Left::Get()");
+        let p = program(&body, &helpers);
+        p.verify().unwrap();
+        assert_eq!(p.run(Limits::default()).unwrap().value, Value::Int32(42));
+    }
+}

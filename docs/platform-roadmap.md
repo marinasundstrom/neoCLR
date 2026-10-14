@@ -4685,3 +4685,5 @@ Guest UnionTypeInfo and IntersectionTypeInfo now expose direct constituent snaps
 in the experimental interpreter. This supersedes the guest-provider gates in the
 preceding checkpoints. Member/hierarchy queries, source structural typeof emission
 and backend support remain open. [Descriptor probe](experiments/composition-type-info/README.md).
+
+2026-10-14 author-directed experiment: companion Raven now emits opt-in source union signatures to standalone NEOX, with native Task result delivery and reflection validated. See [source union evidence](experiments/source-structural-unions/README.md). This does not enable published/default builds or JIT/AOT.

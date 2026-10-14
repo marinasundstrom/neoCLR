@@ -299,10 +299,12 @@ pub(crate) fn validate_surface(module: &Module) -> Result<(), Fault> {
                         && (target.owner.as_ref().is_some_and(contains)
                             || target.parameters.iter().any(contains)) =>
                 {
-                    if !target.instance || !target.generic_arguments.is_empty() {
-                        return Err(Fault::new(
-                            "composition wrapper calls require nongeneric instance methods",
-                        ));
+                    if !target.generic_arguments.is_empty()
+                        || (!target.instance && target.owner.as_ref().is_some_and(contains))
+                    {
+                        return Err(Fault::new(format!(
+                            "composition calls require nongeneric methods and instance wrapper receivers: {target:?}",
+                        )));
                     }
                     let owner = target.owner.as_ref().unwrap();
                     crate::vm::check_type(owner, module)?;
