@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-14
 
+- Expose focused release-delta checks through the existing native-toolchain dispatch entry point, avoiding a prerequisite default-branch publication for the new reusable workflow.
+
 - Archive the focused Windows release-delta bundle only after JSON and editor checks pass, updating its VSIX hash while preserving the qualified runtime and SDK. Broad runtime validation is reused for this API/client-only delta.
 
 - Add JsonValue.ToJsonString and JsonSerializerOptions.WriteIndented, with compact defaults and two-space/LF indentation shared by string and stream serializer overloads. Preserve typed errors, escaping, document quotas and preflight-before-write behavior. JSON DOM/stream tests pass in interpreter, JIT and AOT on macOS; focused Windows qualification follows. Refresh both API references and guard JSON type/member GitHub source links.

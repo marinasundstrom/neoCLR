@@ -11,6 +11,10 @@ on:
         description: Exact Raven commit to qualify with this neoCLR revision
         required: true
         default: 793219d855b17f01fb805e215968b78871eb3804
+      delta_only:
+        description: Reuse qualified SDK/runtime and check only JSON/editor release deltas
+        type: boolean
+        default: false
       bundle_run:
         description: Optional prior run whose packaged bundle should receive editor-only requalification
         required: false
@@ -18,7 +22,13 @@ permissions:
   contents: read
   actions: read
 jobs:
+  release-delta:
+    if: ${{ inputs.delta_only }}
+    uses: ./.github/workflows/release-delta.yml
+    with:
+      bundle_run: ${{ inputs.bundle_run }}
   windows-native:
+    if: ${{ !inputs.delta_only }}
     runs-on: windows-latest
     timeout-minutes: 90
     env:

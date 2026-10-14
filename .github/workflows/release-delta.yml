@@ -1,5 +1,10 @@
 name: Focused release delta qualification
 on:
+  workflow_call:
+    inputs:
+      bundle_run:
+        type: string
+        required: true
   workflow_dispatch:
     inputs:
       bundle_run:
