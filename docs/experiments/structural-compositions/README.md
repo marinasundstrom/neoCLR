@@ -937,3 +937,45 @@ controls and three default-off serialized-signature checks pass. Commands:
 cargo test --features experimental-compositions --test structural_compositions --test managed_initialization
 cargo test --test structural_compositions
 ```
+
+
+## Real Task union completion and result delivery — 2026-10-14
+
+The real Raven-authored Task/Promise/ArrayList library now completes and delivers
+Task<Response | HttpError | JsonError> in the opt-in interpreter. The consumer
+constructs each alternative, completes its Promise, observes IsCompleted, and calls
+GetResult to recover the same object and payload value. A second completion with a
+different object returns false and preserves the first result. HttpError and
+JsonError are sealed classes here; both are ordinary successful Task payloads,
+not task faults or cancellation. This distinguishes application error alternatives
+from the Task lifecycle, as for a nominal result carrier on .NET.
+
+The consumer clears its own payload reference and creates allocation pressure before
+reading the result again, checking that the Task/Promise/ArrayList graph retains the
+payload across collection. Negative checks preserve the library's pending/cancelled
+GetResult faults, and reject a value outside the union both in the verifier and when
+executing without verification. Existing ordinary Task capability/access, cancellation,
+identity and invariant-payload tests remain controls.
+
+This is real library execution from native neoIL, with no special Task implementation,
+carrier wrapper or altered System library. The preceding runtime initialization slice
+is the implementation change; this checkpoint supplies end-to-end evidence. Raven
+source-authored structural signatures, compiler async/await consumption of these
+results, TaskOutcome<T> carrier access, native composition constraints, value-union
+storage and JIT/AOT are not established by these tests. Runtime Contract/CLI encoding
+and the narrower host metadata profile are unchanged; publication remains separate.
+The website's planned/native-experiment status is still accurate.
+
+Consumer: `tests/tasks.rs::structural_union_task_delivers_each_alternative`.
+Negative lifecycle/storage coverage:
+`tests/tasks.rs::structural_union_task_checks_pending_cancelled_and_invalid_payloads`.
+
+```sh
+cargo test --features experimental-compositions --test tasks
+```
+
+Validation: all ten Task tests pass. After adding explicit GC pressure, the delivery
+test was rerun separately and passed for all three alternatives. The preceding
+runtime slice also passed 34 composition checks, nine initialization controls and
+three default-off checks. No website build or public API snapshot update is required:
+this adds gated runtime admission and test evidence, with no public API changes.

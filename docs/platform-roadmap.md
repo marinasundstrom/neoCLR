@@ -4634,3 +4634,10 @@ The composition interpreter now admits exact, immediate managed-local default
 initialization after substitution, removing the observed ArrayList/Task completion
 blocker while retaining general byref gates.
 [Initialization checkpoint](experiments/structural-compositions/README.md#immediate-compound-local-initialization--2026-10-14).
+
+
+The real Task/Promise/ArrayList interpreter consumer now completes and reads each
+alternative of Task<Response | HttpError | JsonError>, preserving payload identity,
+first-completion semantics and GC retention. Pending/cancelled reads and out-of-union
+payloads remain rejected. Raven source/await integration is still a separate step.
+[Task delivery evidence](experiments/structural-compositions/README.md#real-task-union-completion-and-result-delivery--2026-10-14).

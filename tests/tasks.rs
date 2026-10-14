@@ -17,6 +17,11 @@ fn load(body: &str) -> Result<LoadedProgram, String> {
     load_with_types(body, "")
 }
 fn load_with_types(body: &str, types: &str) -> Result<LoadedProgram, String> {
+    let program = load_unverified_with_types(body, types)?;
+    program.verify().map_err(|error| error.to_string())?;
+    Ok(program)
+}
+fn load_unverified_with_types(body: &str, types: &str) -> Result<LoadedProgram, String> {
     let source = format!(".module App\n.entry Main\n.function Main() -> Int32\n{body}\nret\n.end")
         .replace("Tasks.", "System.Concurrency.Tasks.")
         + "\n"
@@ -30,7 +35,6 @@ fn load_with_types(body: &str, types: &str) -> Result<LoadedProgram, String> {
     .remove(0);
     let program =
         LoadedProgram::with_library(&app, library()).map_err(|error| error.to_string())?;
-    program.verify().map_err(|error| error.to_string())?;
     Ok(program)
 }
 const SOURCE: &str = r#"
@@ -242,4 +246,102 @@ fault "Task identity or pending state changed"
             .value,
         Value::Int32(42)
     );
+}
+
+#[cfg(feature = "experimental-compositions")]
+const STRUCTURAL_TASK_TYPES: &str = "\n.type class Response\n.field Value Int32\n.end\n.type class HttpError\n.sealed\n.field Value Int32\n.end\n.type class JsonError\n.sealed\n.field Value Int32\n.end\n.type class Outside\n.end\n";
+
+#[cfg(feature = "experimental-compositions")]
+#[test]
+fn structural_union_task_delivers_each_alternative() {
+    let ty = "union<Response,HttpError,JsonError>";
+    let types = STRUCTURAL_TASK_TYPES;
+    let allocations = "newobj Outside\npop\n".repeat(128);
+    for alternative in ["Response", "HttpError", "JsonError"] {
+        let body = format!(
+            r#"
+.local Tasks.Promise<{ty}> source
+.local {alternative} payload
+newobj instance Tasks.TaskQueue::.ctor()
+newobj instance Tasks.Promise<{ty}>::.ctor(Tasks.TaskQueue)
+stloc source
+ldc.i4 42
+newobj {alternative}
+stloc payload
+ldloc source
+ldloc payload
+call instance Tasks.Promise<{ty}>::Complete({ty})
+brfalse Bad
+ldloc source
+ldc.i4 99
+newobj {alternative}
+call instance Tasks.Promise<{ty}>::Complete({ty})
+brtrue Bad
+ldloc source
+call instance Tasks.Promise<{ty}>::get_Task()
+call instance Tasks.Task<{ty}>::get_IsCompleted()
+brfalse Bad
+ldloc source
+call instance Tasks.Promise<{ty}>::get_Task()
+call instance Tasks.Task<{ty}>::GetResult()
+castclass {alternative}
+ldloc payload
+ref.eq
+brfalse Bad
+ldloca payload
+initobj {alternative}
+{allocations}
+ldloc source
+call instance Tasks.Promise<{ty}>::get_Task()
+call instance Tasks.Task<{ty}>::GetResult()
+castclass {alternative}
+ldfld {alternative}::Value
+ret
+Bad:
+fault "Task completion or payload identity failed"
+"#
+        );
+        let result = load_with_types(&body, types)
+            .unwrap()
+            .run(Limits {
+                heap_objects: 64,
+                ..Limits::default()
+            })
+            .unwrap();
+        assert_eq!(result.value, Value::Int32(42), "{alternative}");
+        assert!(result.heap.collections() > 0, "{alternative}");
+    }
+}
+
+#[cfg(feature = "experimental-compositions")]
+#[test]
+fn structural_union_task_checks_pending_cancelled_and_invalid_payloads() {
+    let ty = "union<Response,HttpError,JsonError>";
+    let setup = format!(
+        ".local Tasks.Promise<{ty}> source\nnewobj instance Tasks.TaskQueue::.ctor()\nnewobj instance Tasks.Promise<{ty}>::.ctor(Tasks.TaskQueue)\nstloc source\n"
+    );
+    for (cancel, expected) in [
+        ("", "pending"),
+        (
+            "ldloc source\ncall instance Tasks.Promise<PAYLOAD>::Cancel()\npop\n",
+            "cancelled",
+        ),
+    ] {
+        let cancel = cancel.replace("PAYLOAD", ty);
+        let body = format!(
+            "{setup}{cancel}ldloc source\ncall instance Tasks.Promise<{ty}>::get_Task()\ncall instance Tasks.Task<{ty}>::GetResult()\npop\nldc.i4 42"
+        );
+        let error = load_with_types(&body, STRUCTURAL_TASK_TYPES)
+            .unwrap()
+            .run(Limits::default())
+            .unwrap_err()
+            .to_string();
+        assert!(error.contains(expected), "{error}");
+    }
+    let body = format!(
+        "{setup}ldloc source\nnewobj Outside\ncall instance Tasks.Promise<{ty}>::Complete({ty})\npop\nldc.i4 42"
+    );
+    let p = load_unverified_with_types(&body, STRUCTURAL_TASK_TYPES).unwrap();
+    assert!(p.verify().is_err());
+    assert!(p.run(Limits::default()).is_err());
 }

@@ -17409,3 +17409,22 @@ open, not an approved complete implementation or a permanent roadmap reprioritiz
   demonstrate feasibility, not production completeness; value storage, nullability,
   member conflicts, variance, reflection and JIT/AOT still need specified coverage.
   [Current POC evidence](experiments/structural-compositions/README.md).
+
+
+### 2026-10-14 — Task union completion and result delivery
+
+- Author directed continued work toward completion and result delivery for
+  `Task<Response | HttpError | JsonError>`, with each slice committed.
+- Assistant traced the remaining blocker to the existing compiler's immediate
+  local-address/default-initialization idiom in instantiated ArrayList code. Added
+  a bounded admission rule with exact-type, adjacency and address-escape checks;
+  committed the runtime slice as `3e83c870a`.
+- Real-library native consumers complete each union alternative, recover payload
+  identity/value, retain the first result after repeated completion, and check
+  pending/cancelled reads and invalid-payload rejection without verification.
+  The error alternatives are successful Task payload values, separate from lifecycle
+  cancellation or faults. GC-retention coverage clears the caller's payload reference
+  before collection and reads it again through the Task.
+- This is interpreter/native-IL evidence. Raven source-authored composition signatures,
+  async/await integration and TaskOutcome carrier access remain open; no new published
+  support is implied. [Scope and checks](experiments/structural-compositions/README.md#real-task-union-completion-and-result-delivery--2026-10-14).
