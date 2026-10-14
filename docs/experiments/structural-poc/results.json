@@ -1,0 +1,458 @@
+{
+  "status": "passed",
+  "scope": "Closed-reference interpreter POC",
+  "checks": [
+    {
+      "label": "Default runtime rejects compositions",
+      "command": [
+        "cargo",
+        "test",
+        "-p",
+        "neoclr",
+        "--test",
+        "composition_constraints"
+      ],
+      "cwd": "/Users/robert/Projects/neoclr",
+      "expectedExitCode": 0,
+      "log": "/Users/robert/Projects/neoclr/target/structural-poc/01.log",
+      "exitCode": 0,
+      "seconds": 14.13
+    },
+    {
+      "label": "Native structural semantics and constraint proofs",
+      "command": [
+        "cargo",
+        "test",
+        "-p",
+        "neoclr",
+        "--features",
+        "experimental-compositions",
+        "--test",
+        "structural_compositions",
+        "--test",
+        "composition_constraints",
+        "--test",
+        "self_types",
+        "--test",
+        "generic_bounds"
+      ],
+      "cwd": "/Users/robert/Projects/neoclr",
+      "expectedExitCode": 0,
+      "log": "/Users/robert/Projects/neoclr/target/structural-poc/02.log",
+      "exitCode": 0,
+      "seconds": 53.77
+    },
+    {
+      "label": "Build experimental interpreter",
+      "command": [
+        "cargo",
+        "build",
+        "-p",
+        "neoclr",
+        "--features",
+        "experimental-compositions",
+        "--bin",
+        "neoclr"
+      ],
+      "cwd": "/Users/robert/Projects/neoclr",
+      "expectedExitCode": 0,
+      "log": "/Users/robert/Projects/neoclr/target/structural-poc/03.log",
+      "exitCode": 0,
+      "seconds": 450.84
+    },
+    {
+      "label": "Metadata authoring and negative constraints",
+      "command": [
+        "dotnet",
+        "run",
+        "--project",
+        "tools/metadata/NeoCLR.Metadata.Experimental.Tests",
+        "--",
+        "--authored-structural-constraints",
+        "/Users/robert/Projects/neoclr/target/structural-poc/Authored.neox"
+      ],
+      "cwd": "/Users/robert/Projects/neoclr",
+      "expectedExitCode": 0,
+      "log": "/Users/robert/Projects/neoclr/target/structural-poc/04.log",
+      "exitCode": 0,
+      "seconds": 13.03
+    },
+    {
+      "label": "Metadata --structural-method-constraints",
+      "command": [
+        "dotnet",
+        "run",
+        "--project",
+        "tools/metadata/NeoCLR.Metadata.Experimental.Tests",
+        "--no-build",
+        "--",
+        "--structural-method-constraints"
+      ],
+      "cwd": "/Users/robert/Projects/neoclr",
+      "expectedExitCode": 0,
+      "log": "/Users/robert/Projects/neoclr/target/structural-poc/05.log",
+      "exitCode": 0,
+      "seconds": 1.03
+    },
+    {
+      "label": "Metadata --open-constrained-calls",
+      "command": [
+        "dotnet",
+        "run",
+        "--project",
+        "tools/metadata/NeoCLR.Metadata.Experimental.Tests",
+        "--no-build",
+        "--",
+        "--open-constrained-calls"
+      ],
+      "cwd": "/Users/robert/Projects/neoclr",
+      "expectedExitCode": 0,
+      "log": "/Users/robert/Projects/neoclr/target/structural-poc/06.log",
+      "exitCode": 0,
+      "seconds": 1.28
+    },
+    {
+      "label": "Build matching Raven compiler",
+      "command": [
+        "dotnet",
+        "build",
+        "src/Raven.Compiler/Raven.Compiler.csproj",
+        "-p:NeoClrMetadataProject=/Users/robert/Projects/neoclr/tools/metadata/NeoCLR.Metadata.Experimental/NeoCLR.Metadata.Experimental.csproj",
+        "-p:UseRavenCoreReference=false",
+        "-p:WarningLevel=0"
+      ],
+      "cwd": "/Users/robert/Projects/raven-union-intersection",
+      "expectedExitCode": 0,
+      "log": "/Users/robert/Projects/neoclr/target/structural-poc/07.log",
+      "exitCode": 0,
+      "seconds": 35.63
+    },
+    {
+      "label": "Raven native constraint emission and import",
+      "command": [
+        "dotnet",
+        "run",
+        "--project",
+        "tools/NeoClrMetadataProbe",
+        "-p:NeoClrMetadataProject=/Users/robert/Projects/neoclr/tools/metadata/NeoCLR.Metadata.Experimental/NeoCLR.Metadata.Experimental.csproj",
+        "-p:UseRavenCoreReference=false",
+        "-p:WarningLevel=0",
+        "--",
+        "--structural-constraints",
+        "/Users/robert/Projects/neoclr/target/composition-info-libraries-v2",
+        "/Users/robert/Projects/neoclr/target/structural-poc/constraints"
+      ],
+      "cwd": "/Users/robert/Projects/raven-union-intersection",
+      "expectedExitCode": 0,
+      "log": "/Users/robert/Projects/neoclr/target/structural-poc/08.log",
+      "exitCode": 0,
+      "seconds": 13.02
+    },
+    {
+      "label": "Raven native source signature roundtrip",
+      "command": [
+        "dotnet",
+        "run",
+        "--project",
+        "tools/NeoClrMetadataProbe",
+        "--no-build",
+        "--",
+        "--source-compositions",
+        "/Users/robert/Projects/neoclr/target/composition-info-libraries-v2",
+        "/Users/robert/Projects/neoclr/target/structural-poc/signatures"
+      ],
+      "cwd": "/Users/robert/Projects/raven-union-intersection",
+      "expectedExitCode": 0,
+      "log": "/Users/robert/Projects/neoclr/target/structural-poc/09.log",
+      "exitCode": 0,
+      "seconds": 6.48
+    },
+    {
+      "label": "Source structural unions",
+      "command": [
+        "python3",
+        "/Users/robert/Projects/neoclr/docs/experiments/source-structural-unions/verify.py",
+        "--compiler",
+        "/Users/robert/Projects/raven-union-intersection/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+        "--library",
+        "/Users/robert/Projects/neoclr/target/composition-info-libraries-v2",
+        "--output",
+        "/Users/robert/Projects/neoclr/target/structural-poc/unions"
+      ],
+      "cwd": "/Users/robert/Projects/neoclr",
+      "expectedExitCode": 0,
+      "log": "/Users/robert/Projects/neoclr/target/structural-poc/10.log",
+      "exitCode": 0,
+      "seconds": 17.13
+    },
+    {
+      "label": "Source structural intersections",
+      "command": [
+        "python3",
+        "/Users/robert/Projects/neoclr/docs/experiments/source-structural-intersections/verify.py",
+        "--compiler",
+        "/Users/robert/Projects/raven-union-intersection/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+        "--library",
+        "/Users/robert/Projects/neoclr/target/composition-info-libraries-v2",
+        "--output",
+        "/Users/robert/Projects/neoclr/target/structural-poc/intersections"
+      ],
+      "cwd": "/Users/robert/Projects/neoclr",
+      "expectedExitCode": 0,
+      "log": "/Users/robert/Projects/neoclr/target/structural-poc/11.log",
+      "exitCode": 0,
+      "seconds": 15.55
+    },
+    {
+      "label": "ConstraintSource execution",
+      "command": [
+        "/Users/robert/Projects/neoclr/target/debug/neoclr",
+        "run",
+        "/Users/robert/Projects/neoclr/target/structural-poc/constraints/ConstraintSource.neox",
+        "--system",
+        "/Users/robert/Projects/neoclr/target/composition-info-libraries-v2/System.runtime.neox",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/composition-info-libraries-v2/System.Runtime.dll",
+        "--object-root",
+        "/Users/robert/Projects/neoclr/target/composition-info-libraries-v2/System.Runtime.dll",
+        "--execution",
+        "interpreter",
+        "--instructions",
+        "100000000"
+      ],
+      "cwd": "/Users/robert/Projects/neoclr",
+      "expectedExitCode": 42,
+      "log": "/Users/robert/Projects/neoclr/target/structural-poc/12.log",
+      "exitCode": 42,
+      "seconds": 10.82
+    },
+    {
+      "label": "ConstraintConsumer execution",
+      "command": [
+        "/Users/robert/Projects/neoclr/target/debug/neoclr",
+        "run",
+        "/Users/robert/Projects/neoclr/target/structural-poc/constraints/ConstraintConsumer.neox",
+        "--system",
+        "/Users/robert/Projects/neoclr/target/composition-info-libraries-v2/System.runtime.neox",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/composition-info-libraries-v2/System.Runtime.dll",
+        "--object-root",
+        "/Users/robert/Projects/neoclr/target/composition-info-libraries-v2/System.Runtime.dll",
+        "--execution",
+        "interpreter",
+        "--instructions",
+        "100000000",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/structural-poc/constraints/ConstraintLibrary.neox"
+      ],
+      "cwd": "/Users/robert/Projects/neoclr",
+      "expectedExitCode": 42,
+      "log": "/Users/robert/Projects/neoclr/target/structural-poc/13.log",
+      "exitCode": 42,
+      "seconds": 11.11
+    },
+    {
+      "label": "TraitSource execution",
+      "command": [
+        "/Users/robert/Projects/neoclr/target/debug/neoclr",
+        "run",
+        "/Users/robert/Projects/neoclr/target/structural-poc/constraints/TraitSource.neox",
+        "--system",
+        "/Users/robert/Projects/neoclr/target/composition-info-libraries-v2/System.runtime.neox",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/composition-info-libraries-v2/System.Runtime.dll",
+        "--object-root",
+        "/Users/robert/Projects/neoclr/target/composition-info-libraries-v2/System.Runtime.dll",
+        "--execution",
+        "interpreter",
+        "--instructions",
+        "100000000"
+      ],
+      "cwd": "/Users/robert/Projects/neoclr",
+      "expectedExitCode": 42,
+      "log": "/Users/robert/Projects/neoclr/target/structural-poc/14.log",
+      "exitCode": 42,
+      "seconds": 11.12
+    },
+    {
+      "label": "ExternalTraits execution",
+      "command": [
+        "/Users/robert/Projects/neoclr/target/debug/neoclr",
+        "run",
+        "/Users/robert/Projects/neoclr/target/structural-poc/constraints/ExternalTraits.neox",
+        "--system",
+        "/Users/robert/Projects/neoclr/target/composition-info-libraries-v2/System.runtime.neox",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/composition-info-libraries-v2/System.Runtime.dll",
+        "--object-root",
+        "/Users/robert/Projects/neoclr/target/composition-info-libraries-v2/System.Runtime.dll",
+        "--execution",
+        "interpreter",
+        "--instructions",
+        "100000000",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/structural-poc/constraints/TraitLibrary.neox"
+      ],
+      "cwd": "/Users/robert/Projects/neoclr",
+      "expectedExitCode": 42,
+      "log": "/Users/robert/Projects/neoclr/target/structural-poc/15.log",
+      "exitCode": 42,
+      "seconds": 11.16
+    },
+    {
+      "label": "ConstructedTraits execution",
+      "command": [
+        "/Users/robert/Projects/neoclr/target/debug/neoclr",
+        "run",
+        "/Users/robert/Projects/neoclr/target/structural-poc/constraints/ConstructedTraits.neox",
+        "--system",
+        "/Users/robert/Projects/neoclr/target/composition-info-libraries-v2/System.runtime.neox",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/composition-info-libraries-v2/System.Runtime.dll",
+        "--object-root",
+        "/Users/robert/Projects/neoclr/target/composition-info-libraries-v2/System.Runtime.dll",
+        "--execution",
+        "interpreter",
+        "--instructions",
+        "100000000",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/structural-poc/constraints/TraitLibrary.neox"
+      ],
+      "cwd": "/Users/robert/Projects/neoclr",
+      "expectedExitCode": 42,
+      "log": "/Users/robert/Projects/neoclr/target/structural-poc/16.log",
+      "exitCode": 42,
+      "seconds": 11.22
+    },
+    {
+      "label": "Union separate consumer execution",
+      "command": [
+        "/Users/robert/Projects/neoclr/target/debug/neoclr",
+        "run",
+        "/Users/robert/Projects/neoclr/target/structural-poc/signatures/AuthoredUnionConsumer.neox",
+        "--system",
+        "/Users/robert/Projects/neoclr/target/composition-info-libraries-v2/System.runtime.neox",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/composition-info-libraries-v2/System.Runtime.dll",
+        "--object-root",
+        "/Users/robert/Projects/neoclr/target/composition-info-libraries-v2/System.Runtime.dll",
+        "--execution",
+        "interpreter",
+        "--instructions",
+        "100000000",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/structural-poc/signatures/AuthoredUnion.neox"
+      ],
+      "cwd": "/Users/robert/Projects/neoclr",
+      "expectedExitCode": 42,
+      "log": "/Users/robert/Projects/neoclr/target/structural-poc/17.log",
+      "exitCode": 42,
+      "seconds": 10.44
+    },
+    {
+      "label": "Intersection separate consumer execution",
+      "command": [
+        "/Users/robert/Projects/neoclr/target/debug/neoclr",
+        "run",
+        "/Users/robert/Projects/neoclr/target/structural-poc/signatures/AuthoredIntersectionConsumer.neox",
+        "--system",
+        "/Users/robert/Projects/neoclr/target/composition-info-libraries-v2/System.runtime.neox",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/composition-info-libraries-v2/System.Runtime.dll",
+        "--object-root",
+        "/Users/robert/Projects/neoclr/target/composition-info-libraries-v2/System.Runtime.dll",
+        "--execution",
+        "interpreter",
+        "--instructions",
+        "100000000",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/structural-poc/signatures/AuthoredIntersection.neox"
+      ],
+      "cwd": "/Users/robert/Projects/neoclr",
+      "expectedExitCode": 42,
+      "log": "/Users/robert/Projects/neoclr/target/structural-poc/18.log",
+      "exitCode": 42,
+      "seconds": 10.43
+    },
+    {
+      "label": "Host-authored constraints execution",
+      "command": [
+        "/Users/robert/Projects/neoclr/target/debug/neoclr",
+        "run",
+        "/Users/robert/Projects/neoclr/target/structural-poc/Authored.neox",
+        "--execution",
+        "interpreter"
+      ],
+      "cwd": "/Users/robert/Projects/neoclr",
+      "expectedExitCode": 42,
+      "log": "/Users/robert/Projects/neoclr/target/structural-poc/19.log",
+      "exitCode": 42,
+      "seconds": 0.51
+    },
+    {
+      "label": "API documentation snapshot",
+      "command": [
+        "python3",
+        "scripts/build-api-docs.py",
+        "--check"
+      ],
+      "cwd": "/Users/robert/Projects/neoclr",
+      "expectedExitCode": 0,
+      "log": "/Users/robert/Projects/neoclr/target/structural-poc/20.log",
+      "exitCode": 0,
+      "seconds": 0.5
+    }
+  ],
+  "revisions": {
+    "neoclr": "1ca1615428045085b9ba9911b3f5f8290e6537b8",
+    "raven": "c3363e9e0cd3088b31e59e7feb98569c393ced98"
+  },
+  "workingTreeChanges": {
+    "neoclr": " M docs/experiments/source-structural-unions/Main.rvn\n?? docs/experiments/structural-poc/\n",
+    "raven": ""
+  },
+  "sha256": {
+    "/Users/robert/Projects/neoclr/target/debug/neoclr": "a5a512335059ed78cf2768785c77b18c6efc4dbdd42908f81818058a03a70b2d",
+    "/Users/robert/Projects/raven-union-intersection/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll": "853c693e3bfaa3e1c1873c1fe6d66e7e151e8470373e3ac92126881bbb8e6ec0",
+    "/Users/robert/Projects/neoclr/tools/metadata/NeoCLR.Metadata.Experimental/Model/MethodILGenerator.cs": "866c2141b10bf6315610b4ad88f930f64ca82744118fa7403f1a98255d9420bd",
+    "/Users/robert/Projects/neoclr/docs/experiments/source-structural-unions/Main.rvn": "fc19aa863254165a6e8fd516010deda13d6f2220b166960e9310651a658e34c2",
+    "/Users/robert/Projects/neoclr/docs/experiments/source-structural-intersections/Main.rvn": "c6bbc63140d3a09c7cb3d39d00254a9e84499ce8e2fccbb19c8793e29815658e",
+    "/Users/robert/Projects/raven-union-intersection/tools/NeoClrMetadataProbe/StructuralConstraintChecks.cs": "0ed25e83c10b7a79e05505e66e7e9088a82206300b8af44e11f5a8ff1b26693f",
+    "/Users/robert/Projects/neoclr/target/composition-info-libraries-v2/Core.dll": "3d4a676d379067c18a65a9beb8257ed40bf3196fc643a9ba1d559c619ec73fad",
+    "/Users/robert/Projects/neoclr/target/composition-info-libraries-v2/System.Runtime.dll": "f5c790a1aeb5f56d83a8b5903555a0889c1d84f19f9cc7158026531d6c2532c3",
+    "/Users/robert/Projects/neoclr/target/composition-info-libraries-v2/System.runtime.neox": "98a1ae1da85387c87746957e83a4015eb59d0566539a915c69f168d2b511b190",
+    "/Users/robert/Projects/neoclr/target/structural-poc/constraints/TraitSource.neox": "70c77c2d922ef5dd5d1ef0003b8abec712f97b6b0796188c090a98c18c312223",
+    "/Users/robert/Projects/neoclr/target/structural-poc/constraints/ConstraintSource.neox": "6134a788043625e9583fdae2227f8ddcb7c4350b88a6f412085def8092e8b9af",
+    "/Users/robert/Projects/neoclr/target/structural-poc/constraints/TraitLibrary.neox": "44808cb8123a09cdbf159e0f2185b3544ebc9b3c87571c7fb64255766729e067",
+    "/Users/robert/Projects/neoclr/target/structural-poc/constraints/ConstructedTraits.neox": "a90773fe1d25bc9bacf576bd5e407de17cf1f2ee93f38a56db90316af0c50040",
+    "/Users/robert/Projects/neoclr/target/structural-poc/constraints/ConstraintLibrary.neox": "5a7cb536ff4bc8e477dc1b770bcca6c2608cc097823bd69d5f1de17f2e36773e",
+    "/Users/robert/Projects/neoclr/target/structural-poc/constraints/ConstraintConsumer.neox": "66841f860aa7d80e214795c2c79e84e87bcd900583b579706d3b28691b1918b8",
+    "/Users/robert/Projects/neoclr/target/structural-poc/constraints/ExternalTraits.neox": "f2638ef10baebe1015083f81dff5f35c8ba9dbe901f4c5349448cb585a782f6b",
+    "/Users/robert/Projects/neoclr/target/structural-poc/signatures/AuthoredIntersection.neox": "1391f668a7d457a49561ec3261b127d07aec90a514d5d6f126523965a1212020",
+    "/Users/robert/Projects/neoclr/target/structural-poc/signatures/AuthoredUnion.neox": "4263c788d4128e44bf8c4c219da77d8a9eb35582db57ae69d644ca1f18324597",
+    "/Users/robert/Projects/neoclr/target/structural-poc/signatures/AuthoredUnionConsumer.neox": "5d7d49ea4ba2f89a3736e94060d59d75851df869be21333cfa1de254923b77f1",
+    "/Users/robert/Projects/neoclr/target/structural-poc/signatures/AuthoredIntersectionConsumer.neox": "c23f45a9ab6632f977b20f0e20b072fa0a10197cbc6132ac1cc65140781afae0"
+  },
+  "nativeTestSummary": {
+    "experimental": 72,
+    "defaultGate": 1
+  },
+  "validationDate": "2026-10-14",
+  "sourceDeliveryCommit": "a82c9d289",
+  "notes": [
+    "The acceptance run built both compiler target frameworks. The delivered runner narrows that command to net10.0, whose executable was used by every source check.",
+    "Source queued-await changes were committed during the run; source hashes and initial working-tree changes are retained."
+  ],
+  "nominalConformanceFollowup": {
+    "result": "passed",
+    "contract": "Matching member shape does not replace explicit nominal interface implementation",
+    "checks": [
+      "dotnet run --project tools/metadata/NeoCLR.Metadata.Experimental.Tests -- --authored-structural-constraints target/authored-structural-constraints.neox",
+      "Raven NeoClrMetadataProbe --structural-constraints target/composition-info-libraries-v2 target/structural-poc/nominal-followup"
+    ],
+    "sha256": {
+      "tools/metadata/NeoCLR.Metadata.Experimental.Tests/AuthoredStructuralConstraintChecks.cs": "a04a3dfee510cc47bf7fb459ff281931555c60a4080848f2a4ee23e985845c58",
+      "/Users/robert/Projects/raven-union-intersection/tools/NeoClrMetadataProbe/StructuralConstraintChecks.cs": "cd35cc6f0a65ce028a956d6f44efa9fad744095dc7d959add43f7f5d7706ec60"
+    }
+  }
+}

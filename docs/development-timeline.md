@@ -17607,3 +17607,38 @@ native neoCLR metadata”. The assistant implemented host inspection of structur
 method constraints without a CLI projection. This preserves signature-level grouping
 and type introspection; compiler emission/import and guest constraint reflection
 remain open. See the [metadata constraint reference](../api-docs/experimental-metadata.md#structural-method-constraint-inspection-2026-10-14-development).
+
+### 2026-10-14 — Structural POC acceptance and delivery
+
+The author directed, “Continue until you have reached completion”. The assistant
+used the earlier author distinction between a working POC and subsequent full
+open-generic support to define a closed-reference interpreter acceptance contract;
+this scope choice is the assistant's interpretation, not a new author approval of
+every remaining restriction. The assistant extended structural generic-body calls
+to closed constructed imported interfaces (neoCLR `1ca161542`, Raven `c3363e9e0`),
+rejecting mismatched constructions and weak union guarantees. The separate native
+consumer returned 42. It then added source-authored queued Task union delivery
+(neoCLR `a82c9d289`): all three alternatives pass completed and queued awaits with
+payload checks, without signature rewriting.
+
+The [consolidated acceptance contract](experiments/structural-poc/README.md) records
+the runnable command, feature-branch ownership and exact boundaries. Full open
+generics, direct external structural-bound authoring, guest constraint reflection
+and JIT/AOT remain implementation/qualification work; completion of the bounded
+POC must not be read as completion of those capabilities or a roadmap milestone.
+The linked acceptance report records the performed checks and their outcome.
+
+
+During acceptance the author clarified that neoCLR is “not really creating Rust-like
+traits”; intersections make nominal interfaces more useful while types still
+implement them explicitly. The author mentioned possible compiler-level simulation
+of trait characteristics as a future possibility. The assistant confirmed that the
+current implementation checks declared nominal interface relationships and treats
+only their composition as structural. Documentation now states this distinction;
+no implicit member-shape conformance or runtime trait feature was added or promised.
+
+Acceptance outcome: all 20 consolidated checks passed, including 72 experimental
+native tests and the default-profile rejection test. Additional host and Raven
+regressions reject matching-member classes without the required interface declaration.
+The [retained report](experiments/structural-poc/results.json) distinguishes the main
+acceptance run from this clarification follow-up.

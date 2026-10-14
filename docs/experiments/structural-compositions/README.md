@@ -1,5 +1,9 @@
 # Structural union/intersection experiment
 
+Current bounded acceptance contract: [native structural types POC](../structural-poc/README.md).
+Earlier checkpoints below are retained as historical evidence.
+
+
 Status: branch-only interpreter signatures behind `experimental-compositions`,
 2026-10-14. Raven supports explicit native call-only intersection consumers; general
 authored compound storage, JIT/AOT storage, public reflection APIs and a stable ABI

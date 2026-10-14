@@ -9893,3 +9893,21 @@ nominal/Self constrained calls retain their prior path. Raven's `ConstructedTrai
 probe inherits `ImportedReads<int>` through a local intersection constituent and
 calls it using the existing borrowed native dispatch. No CLI encoding is added.
 Direct external structural-bound authoring and open operands remain unsupported.
+
+
+The [closed-reference POC acceptance runner](experiments/structural-poc/README.md)
+consolidates the current feature-branch contract and records compiler/runtime/library
+hashes. Source Task delivery now includes both completed and queued union results;
+all alternatives are checked after native `await`. No temporary CLI representation
+is introduced. The acceptance contract separates implemented method constraints
+and host inspection from pending guest constraint reflection and full open generics.
+
+
+Nominal interface contract (author clarification, 2026-10-14): intersections make
+existing nominal interfaces composable. Types must explicitly implement those
+interfaces, directly or through declared inheritance. Structural identity belongs
+to the union/intersection signature; it does not introduce member-shape matching,
+implicit conformance or Rust-style traits. References to “traits” in earlier probe
+notes describe guaranteed interface capabilities, not a separate runtime trait
+system. A future compiler-level feature simulating trait characteristics is an
+exploratory possibility, not an implementation commitment or a runtime contract.

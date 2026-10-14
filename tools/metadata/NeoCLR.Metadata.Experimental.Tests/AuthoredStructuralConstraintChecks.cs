@@ -126,6 +126,12 @@ internal static class AuthoredStructuralConstraintChecks
         il.LoadArgumentAddress(0);
         il.CallConstrained(parameter, read);
         il.Return();
+        // Matching members do not establish a nominal interface relationship.
+        var shapeOnly = graph.AddClass("Example", "ShapeOnly");
+        shapeOnly.AddInterfaceImplementation(b);
+        var shapeRead = shapeOnly.AddInstanceMethod("Read", new MethodSignature(PrimitiveType.Int32, []));
+        shapeRead.LoadConstant(42); shapeRead.Return();
+        Reject(() => strong.MakeGenericInstance(shapeOnly));
         var weak = graph.AddFunction("Weak", new MethodSignature(PrimitiveType.Int32, [parameter], ["T"]));
         weak.AddExperimentalStructuralConstraint(0, ReferenceCompositionKind.Union, a, b);
         Reject(() => weak.GetILGenerator().CallConstrained(parameter, read));

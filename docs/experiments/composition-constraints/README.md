@@ -1,5 +1,8 @@
 # Structural generic constraints — development slice, 2026-10-14
 
+Current acceptance scope and consolidated reproduction: [closed-reference POC](../structural-poc/README.md).
+The sections below retain historical implementation checkpoints.
+
 The experimental interpreter admits closed reference union/intersection signatures
 inside the existing `GenericConstraint.TypeBound` metadata field, for both type and
 method parameters. No schema version or nominal carrier is added. JSON and native
@@ -124,3 +127,13 @@ nominal/Self constrained calls retain their prior path. Raven's `ConstructedTrai
 probe inherits `ImportedReads<int>` through a local intersection constituent and
 calls it using the existing borrowed native dispatch. No CLI encoding is added.
 Direct external structural-bound authoring and open operands remain unsupported.
+
+
+Nominal interface contract (author clarification, 2026-10-14): intersections make
+existing nominal interfaces composable. Types must explicitly implement those
+interfaces, directly or through declared inheritance. Structural identity belongs
+to the union/intersection signature; it does not introduce member-shape matching,
+implicit conformance or Rust-style traits. References to “traits” in earlier probe
+notes describe guaranteed interface capabilities, not a separate runtime trait
+system. A future compiler-level feature simulating trait characteristics is an
+exploratory possibility, not an implementation commitment or a runtime contract.

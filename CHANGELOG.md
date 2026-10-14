@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-14
 
+- Add a consolidated acceptance runner and delivery guide for the closed-reference structural POC, recording native/host/source checks and exact artifact hashes. Clarify that intersections compose explicitly implemented nominal interfaces rather than introducing Rust-style traits or structural member matching; add host/compiler regression checks rejecting member-only lookalikes. Update experimental roadmap and website status; retain explicit open-generic, external-bound, guest constraint-reflection and JIT/AOT gaps.
+
 - Extend the source structural Task example to queued delivery for every union alternative. All six completed/queued awaits check payload type and value through native async state machines; no signature rewriting or nominal carrier is used.
 
 - Admit owned nongeneric interface calls through structurally constrained method parameters. Prove intersection traits and union-wide guarantees in the metadata builder/runtime verifier, retaining borrowed dispatch and nominal Self semantics. Add Raven execution and native positive/negative tests. Extend this to completed imported nongeneric targets, with a separate Raven library/consumer returning 42 and weak-union rejection. Also admit closed constructed imported targets with invariant argument checking; mismatched constructions and weak unions reject. Direct external bounds and open operands remain limited.

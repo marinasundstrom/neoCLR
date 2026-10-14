@@ -1,13 +1,15 @@
 # neoCLR platform roadmap
 
-**Structural composition experiment (author direction, 2026-10-14):** isolated
-[union/intersection POC](experiments/structural-compositions/README.md) on
+**Structural composition experiment (author direction, 2026-10-14):** the isolated
+[closed-reference POC](experiments/structural-poc/README.md) on
 `codex/structural-union-intersection` and Raven `codex/neoclr-union-intersection`
-now runs four Raven-generated union/intersection call consumers in the opt-in
-interpreter, preserving native descriptors. Written intersection bounds require
-interfaces/non-sealed reference classes. General authored storage and JIT/AOT
-remain closed. Full open/closed generic type integration is the author-requested
-next experimental step; this does not change the active performance milestone.
+covers source native signatures, structural descriptors, Task union delivery,
+intersection trait calls and closed method constraints with separate consumers.
+Written intersection bounds require interfaces or classes open to extension;
+Raven sealed hierarchies remain valid. Full open-generic integration, broader
+constraint authoring/reflection and JIT/AOT remain follow-up work. The consolidated
+acceptance runner records the exact tested artifacts. This author-directed
+experiment does not change the active performance milestone.
 
 **Type relationships (author direction, 2026-10-14):** TypeInfo assignment, subclass
 and instance predicates share runtime semantics across interpreter/JIT/AOT. The
