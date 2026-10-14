@@ -18,7 +18,7 @@ public sealed partial class AssemblyDefinition
     /// <param name="image">Complete PE/#Neo or standalone NEOX native assembly image.</param>
     /// <param name="allowExperimentalCompositions">Explicitly admits bounded read-only Union/Intersection signatures; false preserves the default profile.</param>
     /// <returns>An immutable declaration snapshot retaining the original image.</returns>
-    /// <remarks>Only nongeneric free-function signatures/locals admit compositions. Emission and callable import remain unsupported; bodies remain opaque.</remarks>
+    /// <remarks>The experimental profile admits closed reference compositions in nongeneric free-function and reference-class member signatures, locals and reference-class instance fields. Bodies remain opaque. Callable import and storage require their separate explicit APIs.</remarks>
     /// <exception cref="InvalidDataException">The image or composition is invalid or outside the admitted subset.</exception>
     public static AssemblyDefinition ReadNativeAssembly(ReadOnlySpan<byte> image, bool allowExperimentalCompositions)
     {
@@ -50,7 +50,7 @@ public sealed partial class NativeAssemblyDefinition
             type.ArrayElement is { } element && SupportedMethod(element) || Supported(type);
         static bool Supported(SignatureType type) => SupportedScalar(type) || type.ArrayElement is { } element && Supported(element);
         // Fail closed rather than returning a partial assembly with silently missing types.
-        if (properties.Any(p => p.Parameters.Any(parameter => !Supported(parameter)) || !Supported(p.Type)) || types.Any(t => t.Fields.Concat(t.StaticFields).Any(f => !Supported(f.Signature!)) || t.InterfaceSignatures.Any(i => !Supported(i)) || t.Constraints.Length != 0 || t.SpecialConstraints.Count != 0) ||
+        if (properties.Any(p => p.Parameters.Any(parameter => !Supported(parameter)) || !Supported(p.Type)) || types.Any(t => t.Fields.Concat(t.StaticFields).Any(f => !SupportedMethod(f.Signature!)) || t.InterfaceSignatures.Any(i => !Supported(i)) || t.Constraints.Length != 0 || t.SpecialConstraints.Count != 0) ||
             methods.Any(m => (m.Owner < 0 && m.Visibility is not (MethodVisibility.Public or MethodVisibility.Internal)) ||
             (m.Name == ".ctor" && m.Signature.ParameterTypes.Any(p => p.ByReferenceElement is not null)) ||
             (m.Instance && m.Signature.GenericParameterNames.Count != 0) || !SupportedMethod(m.Signature.ReturnType) ||

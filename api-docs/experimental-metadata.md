@@ -8618,3 +8618,29 @@ experimental profile. ImportExperimentalCompositionReference requires an explici
 IAssemblyResolver for their dependencies; the exact resolved definition must be an
 unconstrained reference class. Missing or incompatible definitions fail import.
 Default readers and CLI output remain rejected.
+
+
+### Imported composition storage admission (2026-10-14 development)
+
+```csharp
+public void AssemblyBuilder.EnableExperimentalCompositionStorage(ImportedMethodReference producer);
+```
+
+Registers the exact closed reference compositions reachable through an imported
+result, including its constructed reference-wrapper arguments, for this output only.
+The producer must belong to this assembly and its return must contain a composition.
+Null throws ArgumentNullException; foreign or non-composition producers throw
+ArgumentException. Repeated registration is idempotent. This does not construct new
+compositions, reduce nominal bounds or admit open composition operands.
+
+After registration, those descriptors work with ordinary DeclareLocal, reference-class
+instance AddField, MethodSignature and generic construction/substitution. Native body
+validation checks stores and reads. Compound byref parameters, value/static composition
+fields and CLI projection remain rejected. Runtime field addresses also reject, with
+or without verification. Use the experimental-compositions interpreter profile.
+
+The experimental native reader now admits composition reference-class fields and
+nongeneric owned method signatures; the default reader remains closed. External
+intersection bounds still require finality resolution unavailable in this reader profile.
+Raven's generated async state machines use this storage admission with the exact imported
+Task result contract. See the linked composition experiment for executable evidence.

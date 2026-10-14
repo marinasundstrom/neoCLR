@@ -5495,6 +5495,9 @@ fn interpret_instructions_with_dispatch(
                             .ok_or_else(|| Fault::new("field index out of range"))?
                             .ty
                             .clone();
+                        if crate::compositions::contains(&target) {
+                            return Err(Fault::new("compound field addresses are not supported"));
+                        }
                         let mut reference = object.reference.field(*index, target)?;
                         if crate::access::field_is_readonly(
                             module,
@@ -5516,6 +5519,9 @@ fn interpret_instructions_with_dispatch(
                             .ok_or_else(|| Fault::new("field index out of range"))?
                             .ty
                             .clone();
+                        if crate::compositions::contains(&target) {
+                            return Err(Fault::new("compound field addresses are not supported"));
+                        }
                         let readonly = crate::access::field_is_readonly(
                             module,
                             &function,

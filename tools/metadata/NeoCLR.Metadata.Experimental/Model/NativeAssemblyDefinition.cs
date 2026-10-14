@@ -661,7 +661,8 @@ public sealed partial class NativeAssemblyDefinition
                 for (int fieldIndex = 0; fieldIndex < type.Fields.Length; fieldIndex++)
                 {
                     var field = type.Fields[fieldIndex];
-                    var storage = ReadType(field.Type, false);
+                    var storage = ReadType(field.Type, false, allowComposition: allowExperimentalCompositions && !type.IsValueType && !type.IsInterface);
+                    if (storage.ContainsComposition) signatureGraph.RegisterCompositionStorage(storage);
                     type.Fields[fieldIndex] = field with { Signature = storage };
                     if (type.EnumMembers is null) signatureOwners[typeIndex].AddField(field.Name, storage, field.Visibility, field.IsReadOnly);
                 }
@@ -770,7 +771,8 @@ public sealed partial class NativeAssemblyDefinition
                 else Require(methods.All(m => m.Owner < 0), "global functions must precede type methods");
                 Require(methods.Count == 0 || methods[^1].Owner <= ownerIndex, "native owner declaration order mismatch");
                 typeArity = ownerIndex < 0 ? 0 : types[ownerIndex].GenericNames.Length;
-                var allowComposition = ownerIndex < 0 && genericArity == 0 && implementationAttributes == 0 && nativeImport is null;
+                var allowComposition = (ownerIndex < 0 || !types[ownerIndex].IsValueType && !types[ownerIndex].IsInterface && !types[ownerIndex].IsStatic) &&
+                    genericArity == 0 && implementationAttributes == 0 && nativeImport is null;
                 if (method.TryGetProperty("locals", out _))
                     foreach (var local in Array(method, "locals", 1024)) _ = ReadType(local, false, allowComposition: allowComposition);
                 var parameters = Array(method, "parameters", 256);

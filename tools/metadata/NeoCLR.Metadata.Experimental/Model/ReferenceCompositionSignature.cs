@@ -9,7 +9,7 @@ public enum ReferenceCompositionKind
     Intersection
 }
 
-/// <summary>A read-only experimental native signature; it does not authorize compiler storage or emission.</summary>
+/// <summary>An immutable experimental native signature; storage requires explicit imported-contract admission.</summary>
 public sealed class ReferenceCompositionSignature : IEquatable<ReferenceCompositionSignature>
 {
     internal ReferenceCompositionSignature(ReferenceCompositionKind kind, SignatureType[] constituents)
@@ -39,7 +39,7 @@ public sealed class ReferenceCompositionSignature : IEquatable<ReferenceComposit
 
 public sealed partial record SignatureType
 {
-    /// <summary>Gets the opt-in native reference composition, or null. Such signatures are read-only.</summary>
+    /// <summary>Gets the opt-in native reference composition, or null. Storage requires explicit imported-contract admission.</summary>
     public ReferenceCompositionSignature? Composition { get; }
     internal bool ContainsComposition => Composition is not null ||
         GenericInstance?.TypeArguments.Any(t => t.ContainsComposition) == true ||
@@ -53,5 +53,35 @@ public sealed partial record SignatureType
     {
         var flattened = types.SelectMany(t => t.Composition is { } c && c.Kind == kind ? c.Constituents : new[] { t }).Distinct().ToArray();
         return flattened.Length == 1 ? flattened[0] : new(null, null, composition: new(kind, flattened));
+    }
+}
+
+
+public sealed partial class AssemblyBuilder
+{
+    private readonly HashSet<ReferenceCompositionSignature> experimentalStorageCompositions = [];
+    internal bool AdmitsCompositionStorage(ReferenceCompositionSignature composition) => experimentalStorageCompositions.Contains(composition);
+
+    /// <summary>Admits the closed reference compositions in an owned imported result for native storage and generic substitution.</summary>
+    /// <param name="producer">An experimental imported callable owned by this output.</param>
+    /// <exception cref="ArgumentNullException">Producer is null.</exception>
+    /// <exception cref="ArgumentException">Producer is foreign or its result contains no composition.</exception>
+    /// <remarks>CLI projection remains disabled. The imported exact constituent contracts are retained; arbitrary structural authoring is not enabled.</remarks>
+    public void EnableExperimentalCompositionStorage(ImportedMethodReference producer)
+    {
+        ArgumentNullException.ThrowIfNull(producer);
+        if (!ReferenceEquals(producer.Owner, this) || !producer.Signature.ReturnType.ContainsComposition)
+            throw new ArgumentException("requires an owned imported composition result", nameof(producer));
+        RegisterCompositionStorage(producer.Signature.ReturnType);
+    }
+    internal void RegisterCompositionStorage(SignatureType type)
+    {
+        if (type.Composition is { } composition)
+        {
+            experimentalStorageCompositions.Add(composition);
+            foreach (var bound in composition.Constituents) RegisterCompositionStorage(bound);
+        }
+        if (type.ImportedType is { } imported) foreach (var argument in imported.TypeArguments) RegisterCompositionStorage(argument);
+        if (type.GenericInstance is { } instance) foreach (var argument in instance.TypeArguments) RegisterCompositionStorage(argument);
     }
 }

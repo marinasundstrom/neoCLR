@@ -94,13 +94,17 @@ public sealed partial record SignatureType
     internal int NestingDepth => Composition is { } composition ? 1 + composition.Constituents.Max(t => t.NestingDepth) : PointerElement is { } pointer ? 1 + pointer.NestingDepth : ReferencedGenericInstance is { } loaded ? 1 + loaded.TypeArguments.Max(t => t.NestingDepth) : FunctionSignature is { } shape ? 1 + shape.ParameterTypes.Append(shape.ReturnType).Max(t => t.NestingDepth) : ByReferenceElement is { } target ? 1 + target.NestingDepth : ImportedType is { TypeArguments.Count: > 0 } imported ? 1 + imported.TypeArguments.Max(t => t.NestingDepth) : GenericInstance is { } instance ? 1 + instance.TypeArguments.Max(t => t.NestingDepth) : ArrayElement is { } element ? 1 + element.NestingDepth : 0;
     internal void ValidateOwner(AssemblyBuilder assembly, int genericArity = 0, int typeArity = 0, bool complete = false, bool allowByReference = false, bool allowSelf = false)
     {
-        if (Composition is not null) throw new ArgumentException("experimental composition signatures are read-only");
+        if (Composition is { } composition)
+        {
+            if (!assembly.AdmitsCompositionStorage(composition)) throw new ArgumentException("experimental composition signatures require explicit storage admission");
+            foreach (var bound in composition.Constituents) bound.ValidateOwner(assembly, genericArity, typeArity, complete);
+        }
         if (IsSelf && !allowSelf) throw new ArgumentException("Self requires an interface contract signature");
         if (ReferencedType is not null || ReferencedGenericInstance is not null) throw new ArgumentException("loaded nominal signatures must be imported before emission");
         if (FunctionSignature is { } function) foreach (var type in function.ParameterTypes.Append(function.ReturnType)) type.ValidateOwner(assembly, genericArity, typeArity, complete);
         if (ByReferenceElement is { } target)
         {
-            if (!allowByReference) throw new ArgumentException("managed references are supported only as method parameters");
+            if (!allowByReference || target.ContainsComposition) throw new ArgumentException("managed references require supported non-composition method parameters");
             target.ValidateOwner(assembly, genericArity, typeArity, complete, allowSelf: allowSelf);
         }
         if (ImportedType is { } imported)

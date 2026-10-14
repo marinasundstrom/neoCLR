@@ -17461,3 +17461,25 @@ open, not an approved complete implementation or a permanent roadmap reprioritiz
   three flat executable consumers and the twelve-consumer paired POC, including
   host wrapper locals. Raven source-local emission remains the next integration
   step. [Model and evidence](experiments/structural-compositions/README.md#structural-runtime-type-model--author-clarification-2026-10-14).
+
+
+### 2026-10-14 — Raven locals and real Task union awaits
+
+- Author requested continued Raven source-local and await integration for
+  Task<Response | HttpError | JsonError>, with each slice committed.
+- Assistant implemented and committed imported-result local/copy transport
+  (Raven cba00f2a0, neoCLR 16ce9d006), then exact cross-assembly wrapper imports
+  (Raven 4d34e3505, neoCLR 43c7ff034). Fourteen composition consumers and a real
+  Task local consumer passed. The await probe first reached generated-field storage.
+- The subsequent working implementation retains imported composition descriptors in
+  reference-class state fields and Task calls. Six completed/pending await consumers
+  deliver all three alternatives, keep the payload across another pending await, and
+  check its concrete type. The provider is a native signature fixture using the real
+  Task library; consumer code is ordinary Raven with inferred locals and await.
+- Source-authored structural return syntax, full open generic support, guest reflection
+  and JIT/AOT remain open. This outcome does not reprioritize the mainline roadmap.
+  [Implementation and repeatable evidence](experiments/structural-compositions/README.md#raven-composition-await-delivery--2026-10-14).
+
+- Validation also exposed a .NET readonly-receiver control returning 3 rather than 2;
+  the assistant reproduced it with pre-slice shared compiler files and recorded it as
+  a separate general Raven candidate instead of attributing it to composition support.

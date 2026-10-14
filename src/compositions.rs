@@ -195,18 +195,23 @@ pub(crate) fn validate_surface(module: &Module) -> Result<(), Fault> {
     }
     use crate::metadata::Instruction as Op;
     for def in &module.types {
-        if def
-            .fields
-            .iter()
-            .map(|f| &f.ty)
-            .chain(def.static_fields.iter().map(|f| &f.ty))
-            .any(contains)
+        if def.static_fields.iter().any(|f| contains(&f.ty))
             || def.base.iter().chain(&def.implements).any(contains)
             || crate::constraints::bounds(&def.generic_constraints).any(contains)
         {
             return Err(Fault::new(
-                "compound fields, inheritance and constraints are not supported",
+                "compound static fields, inheritance and constraints are not supported",
             ));
+        }
+        for field in &def.fields {
+            if contains(&field.ty) {
+                if !def.is_reference_type || def.representation != Representation::Record {
+                    return Err(Fault::new(
+                        "compound fields require reference-class storage",
+                    ));
+                }
+                crate::vm::check_type(&field.ty, module)?;
+            }
         }
     }
     // Inspect closed bodies as well as source definitions: substituting T can
@@ -226,13 +231,17 @@ pub(crate) fn validate_surface(module: &Module) -> Result<(), Fault> {
         if !has_compound {
             continue;
         }
-        if function.owner.is_some() && !instantiated
-            || !function.generic_parameters.is_empty()
+        if function.owner.as_ref().is_some_and(|owner| {
+            !instantiated
+                && !module.type_definition(owner).is_some_and(|def| {
+                    def.is_reference_type && def.representation == Representation::Record
+                })
+        }) || !function.generic_parameters.is_empty()
             || function.is_internal_call()
             || function.pinvoke.is_some()
         {
             return Err(Fault::new(
-                "compound signatures currently require nongeneric managed free functions",
+                "compound signatures require nongeneric managed free functions or reference-class methods",
             ));
         }
         if instantiated {
@@ -283,7 +292,9 @@ pub(crate) fn validate_surface(module: &Module) -> Result<(), Fault> {
                     crate::vm::check_type(ty, module)?;
                 }
                 Op::Construct(target) | Op::Call(target) | Op::CallVirtual(target)
-                    if target.owner.as_ref().is_some_and(contains) =>
+                    if target.owner.is_some()
+                        && (target.owner.as_ref().is_some_and(contains)
+                            || target.parameters.iter().any(contains)) =>
                 {
                     if !target.instance || !target.generic_arguments.is_empty() {
                         return Err(Fault::new(

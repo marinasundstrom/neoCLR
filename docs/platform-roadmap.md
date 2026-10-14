@@ -4651,3 +4651,8 @@ intersections and functions, with arrays retaining Array<T> backing.
 
 The companion compiler now executes imported-result source locals/copies; fourteen
 paired consumers pass. Await/state-machine composition storage remains the next slice.
+
+The author-directed composition experiment now integrates Raven await lowering with
+imported Task union contracts and native reference-class state storage. See
+[await delivery](experiments/structural-compositions/README.md#raven-composition-await-delivery--2026-10-14)
+for scope and validation; this does not change mainline milestone priorities.

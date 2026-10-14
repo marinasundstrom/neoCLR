@@ -2003,3 +2003,5 @@ The host-only `MethodBuilder.DeclareExperimentalCompositionResultLocal` API is
 covered by the [manual result-local reference](experimental-metadata.md#imported-composition-result-locals-2026-10-14-development)
 under the existing host metadata exclusion. It does not add a guest reference type;
 the guest snapshot and assembly remain unchanged.
+
+The host-only [composition storage admission API](experimental-metadata.md#imported-composition-storage-admission-2026-10-14-development) is manually documented; it remains outside the guest RavenDoc assembly selection.

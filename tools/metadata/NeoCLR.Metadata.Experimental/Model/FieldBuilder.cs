@@ -71,6 +71,8 @@ public sealed partial class TypeBuilder
             var literal = new FieldBuilder(this, definition, -1); literalFields.Add(literal); definition.Producer = literal; return literal;
         }
         var isStatic = (definition.Attributes & 0x10) != 0;
+        if (type.ContainsComposition && (isStatic || IsValueType || IsInterface))
+            throw new ArgumentException("composition fields require reference-class instance storage", nameof(definition));
         var storage = isStatic ? staticFields : fields;
         if (!isStatic && IsValueType && ReferenceEquals(type.ClassType ?? type.GenericInstance?.Definition, this)) throw new ArgumentException("recursive value-type storage", nameof(type));
         if (!isStatic && IsStatic || IsInterface) throw new InvalidOperationException("instance fields require a reference class");

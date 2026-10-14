@@ -128,7 +128,7 @@ fn unsupported_shapes_and_address_operations_fail_admission() {
         assert!(assemble(&source).is_err(), "{body}");
     }
     let source = format!(
-        ".module Bad\n.entry Main\n{TYPES}\n.type class Holder\n.field Value union<Left,Right>\n.end\n.function Main() -> Int32\nldc.i4 0\nret\n.end"
+        ".module Bad\n.entry Main\n{TYPES}\n.type Holder\n.field Value union<Left,Right>\n.end\n.function Main() -> Int32\nldc.i4 0\nret\n.end"
     );
     assert!(assemble(&source).is_err());
 }
@@ -974,4 +974,41 @@ fn closed_hierarchies_are_valid_intersection_bounds() {
     let p = program(".local intersection<Family,Trait> value\nnewobj Member\nstloc value\nldloc value\ncastclass Family\npop\nldc.i4 42", helpers);
     p.verify().unwrap();
     assert_eq!(p.run(Limits::default()).unwrap().value, Value::Int32(42));
+}
+
+#[cfg(feature = "experimental-compositions")]
+#[test]
+fn reference_class_composition_fields_preserve_payload_and_reject_addresses() {
+    for shape in ["union<Left,Right>", "intersection<Left,Right>"] {
+        let helper = format!(
+            ".type class Holder\n.field Value {shape}\n.method instance Get() -> {shape}\nldarg this\nldfld Holder::Value\nret\n.end\n.end"
+        );
+        let allocations = "newobj Neither\npop\n".repeat(128);
+        let p = program(
+            &format!(
+                ".local Holder holder\nldc.i4 42\nnewobj Both\nnewobj Holder\nstloc holder\n{allocations}\nldloc holder\ncall instance Holder::Get()\ncastclass Both\nldfld Both::Number"
+            ),
+            &helper,
+        );
+        p.verify().unwrap();
+        let result = p
+            .run(Limits {
+                heap_objects: 64,
+                ..Limits::default()
+            })
+            .unwrap();
+        assert_eq!(result.value, Value::Int32(42));
+        assert!(result.heap.collections() > 0);
+        for operation in [
+            "ldflda Holder::Value\npop",
+            "newobj Neither\nstfld Holder::Value",
+        ] {
+            let bad = program(
+                &format!("ldc.i4 42\nnewobj Both\nnewobj Holder\n{operation}\nldc.i4 42"),
+                &helper,
+            );
+            assert!(bad.verify().is_err(), "{operation}");
+            assert!(bad.run(Limits::default()).is_err(), "{operation}");
+        }
+    }
 }

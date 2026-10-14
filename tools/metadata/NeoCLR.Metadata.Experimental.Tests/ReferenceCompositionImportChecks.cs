@@ -84,6 +84,21 @@ internal static class ReferenceCompositionImportChecks
             var parameter = written["functions"]![0]!["body"]!.AsArray()
                 .Single(i => i!["op"]!.GetValue<string>() == "call" && i["arg"]!["parameters"]!.AsArray().Count == 1)!["arg"]!["parameters"]![0]!;
             Check(parameter[kind]!.AsArray().Count == 2, "native call preserves compound parameter descriptor");
+            Reject(() => consumer.EnableExperimentalCompositionStorage(null!));
+            Reject(() => consumer.EnableExperimentalCompositionStorage(scalar));
+            Reject(() => foreign.Assembly.EnableExperimentalCompositionStorage(importedFactory));
+            consumer.EnableExperimentalCompositionStorage(importedFactory);
+            var holder = consumer.AddClass("", "CompositionState");
+            Reject(() => holder.AddField("StaticValue", result, isStatic: true));
+            var valueHolder = consumer.AddValueType("", "ValueState");
+            Reject(() => valueHolder.AddField("Value", result));
+            var storedField = holder.AddField("Value", result);
+            var getter = holder.AddInstanceMethod("Get", new MethodSignature(result, []));
+            getter.LoadArgument(0); getter.LoadField(storedField); getter.Return();
+            var storedImage = NativeModuleContainer.WriteLibraryBinary(consumer.WriteNativeAssembly());
+            if (kind == "Union") _ = AssemblyDefinition.ReadNativeAssembly(storedImage, true);
+            else Reject(() => AssemblyDefinition.ReadNativeAssembly(storedImage, true)); // external intersection bounds still need resolved finality
+            Reject(() => AssemblyDefinition.ReadNativeAssembly(storedImage));
             Reject(() => consumer.Write());
             Reject(() => RuntimeAssemblyContainer.Write(NativeModuleContainer.Read(image), core));
             Reject(() => new AssemblyBuilder(new("Other", new Version(1, 0, 0, 0)), core)
