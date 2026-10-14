@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-14
 
+- Match the Windows TLS prerequisite probe to the compiler’s earlier Windows-profile rejection. Continue requiring a failed compilation and no object output when arena/GC prerequisites are missing; TLS execution and GC contracts are unchanged.
+
 - Record the fixed VSIX passing all 26 macOS editor checks plus native and ordinary .NET inlay stability probes, with matching SDK server payloads. Retain passing source/host and Windows JIT HTTP/HTTPS evidence. Updated Windows editor/package qualification remains pending; no normal-profile installation or publication occurred.
 
 - Resolve the introspection and JSON parity fixtures’ reflection roots by type name after compilation. Fixed artifact identities had drifted onto the generated static owner; regenerate roots instead of requesting construction of that owner. Update the executable probe instructions. Both introspection and the expanded nested-object/collection/JSON-node consumer pass native/interpreter parity on macOS.

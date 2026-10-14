@@ -133,7 +133,9 @@ def main():
                 for omitted in [('--native-gc', '--native-stack-budget'), ('--reference-arena',)]:
                     output = run([compiler, '--closed-world', binary, 'Main', obj,
                                   *[flag for flag in flags if flag not in omitted]], expected=1)
-                    if 'requires --reference-arena' not in report['commands'][-1]['stderr']:
+                    rejection = ('Windows console experiment requires Windows x64, --compile-system, --reference-arena, --native-gc and --native-stack-budget'
+                                 if windows and '--native-gc' in omitted else 'requires --reference-arena')
+                    if rejection not in report['commands'][-1]['stderr']:
                         raise RuntimeError('TLS prerequisite rejection missing')
                     if obj.exists(): raise RuntimeError('invalid TLS profile published an object')
 
