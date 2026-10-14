@@ -9850,3 +9850,12 @@ bounds; invalid imported arguments reject. The metadata-level consumer also retu
 42. Default/CLI gates remain closed, with no bridge approximation or new runtime
 bundle. Open operands/forwarding, generic-body trait calls, class-parameter constraints
 and constrained instance-method imports remain pending on these experimental branches.
+
+Closed-bound forwarding follow-up, 2026-10-14: the native metadata checker now proves
+forwarded method arguments from all recorded caller bounds. This admits local Raven
+generic wrappers over union/intersection constraints and nominal-to-intersection
+forwarding when all traits are guaranteed. Missing/weak guarantees reject at call
+emission and serialization; no CLI encoding or new Runtime Contract switch is added.
+The metadata and Raven forwarding fixtures return 42, including a separately
+compiled consumer invoking the exported wrappers. This does not admit open bound
+operands, owner-parameter forwarding, external-bound authoring or generic-body traits.

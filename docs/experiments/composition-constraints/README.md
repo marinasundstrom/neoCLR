@@ -80,3 +80,13 @@ Run `ConstraintConsumer.neox` with `ConstraintLibrary.neox` as a module plus the
 matching System runtime seed/module/object root. See results.json for commands.
 The existing source composition probe and metadata nominal/composition regressions
 pass; there are no syntax or token classification changes in this wiring slice.
+
+Closed-bound method forwarding checkpoint: native call admission now derives a
+method parameter’s guarantee from the conjunction of its caller’s declared bounds.
+Union-to-union and intersection-to-intersection forwarding pass; separate nominal
+interface bounds can jointly prove an intersection. Union-to-intersection and
+unconstrained forwarding reject. Nominal callee bounds retain existing Self handling
+unless a structural caller requires structural entailment. The metadata fixture
+and Raven exported wrappers execute with result 42. This supersedes the blanket
+method-forwarding gap above, while open bound operands, owner parameters, external
+bound authoring and generic-body trait calls remain outside this profile.

@@ -4706,3 +4706,8 @@ external/open bounds and guest constraint reflection remain pending; see the
 library consumption, including a closed generic bound and interpreter result 42.
 Open bounds/forwarding, class constraints, generic-body traits and broader backends
 remain experimental gaps; [evidence](experiments/composition-constraints/README.md).
+
+2026-10-14 constrained method wrappers now forward parameters when their closed
+bounds imply the callee’s requirements. Native and Raven library-consumer execution
+return 42; [evidence](experiments/composition-constraints/README.md). Open operands,
+owner-parameter forwarding and generic-body traits remain separate gaps.

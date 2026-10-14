@@ -148,14 +148,28 @@ public sealed partial class MethodBuilder
             : bound.GenericInstance is { Definition.IsInterface: true } constructed && local.ConformsTo(constructed);
     }
 
+    private bool ForwardedBoundsSatisfy(MethodBuilder? caller, int parameter, SignatureType required)
+    {
+        if (caller is null || parameter < 0 || parameter >= caller.Signature.GenericParameterNames.Count) return false;
+        var bounds = caller.Definition.TypeConstraints.Where(c => c.ParameterIndex == parameter).Select(c => c.Bound).ToArray();
+        if (bounds.Length == 0) return false;
+        var guarantee = bounds.Length == 1 ? bounds[0] : SignatureType.FromComposition(ReferenceCompositionKind.Intersection, bounds);
+        return SatisfiesStructuralBound(guarantee, required);
+    }
+
     internal void ValidateMethodArguments(IReadOnlyList<SignatureType> arguments, MethodBuilder? caller = null, bool deferOpen = false)
     {
         foreach (var constraint in Definition.AuthoredStructuralConstraints)
         {
             var argument = arguments[constraint.ParameterIndex];
-            if (argument.MethodParameterIndex is not null && caller is null && deferOpen) continue;
+            if (argument.MethodParameterIndex is { } parameter)
+            {
+                if (caller is null && deferOpen) continue;
+                if (ForwardedBoundsSatisfy(caller, parameter, constraint.Bound)) continue;
+                throw new ArgumentException("forwarded method argument lacks required structural bounds");
+            }
             if (!SatisfiesStructuralBound(argument, constraint.Bound))
-                throw new ArgumentException("generic method argument does not satisfy its structural bound; open forwarding is unsupported");
+                throw new ArgumentException("generic method argument does not satisfy its structural bound");
         }
         foreach (var constraint in Definition.NominalInterfaceConstraints)
         {
@@ -164,6 +178,11 @@ public sealed partial class MethodBuilder
             {
                 if (caller is null && deferOpen) continue;
                 var required = Definition.ConstraintSignature(constraint.InterfaceType);
+                if (caller?.Definition.AuthoredStructuralConstraints.Any(c => c.ParameterIndex == parameter) == true)
+                {
+                    if (ForwardedBoundsSatisfy(caller, parameter, required)) continue;
+                    throw new ArgumentException("forwarded method argument lacks required interface bounds");
+                }
                 if (caller is not null && parameter < caller.Signature.GenericParameterNames.Count &&
                     caller.InterfaceConstraints.Any(c => c.ParameterIndex == parameter &&
                         (required.ClassType is { } requiredLocal ? caller.Definition.ConstraintSignature(c.InterfaceType).ClassType?.ConformsTo(requiredLocal) == true

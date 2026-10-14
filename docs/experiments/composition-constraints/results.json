@@ -107,5 +107,41 @@
       "tools/metadata/NeoCLR.Metadata.Experimental.Tests/AuthoredStructuralConstraintChecks.cs": "a820a5a210a90dea4d1f99d6345f39484d3800204843ba30c60001a6f2bed83e",
       "Raven/tools/NeoClrMetadataProbe/StructuralConstraintChecks.cs": "4522a00774e69e235f72af1e425ef2df1fd7dbcf5a41d07cf59c40927dc6862f"
     }
+  },
+  "closedBoundForwarding": {
+    "date": "2026-10-14",
+    "scope": "Method parameters whose declared closed bounds imply callee bounds; owner parameters and open bound operands remain unsupported",
+    "checks": [
+      {
+        "command": "metadata checks --authored-structural-constraints",
+        "result": "pass; union/intersection forwarding, combined nominal guarantees, nominal target, weak/unbounded rejection and late revalidation"
+      },
+      {
+        "command": "metadata checks --structural-method-constraints",
+        "result": "pass, including nominal regressions"
+      },
+      {
+        "command": "NeoClrMetadataProbe --structural-constraints",
+        "result": "pass; exported forwarding wrappers, invalid weakening, library/consumer emission"
+      },
+      {
+        "command": "target/debug/neoclr run target/source-constraints/ConstraintConsumer.neox --system target/composition-info-libraries-v2/System.runtime.neox --module target/composition-info-libraries-v2/System.Runtime.dll --module target/source-constraints/ConstraintLibrary.neox --object-root target/composition-info-libraries-v2/System.Runtime.dll --execution interpreter --instructions 100000000",
+        "exitCode": 42
+      },
+      {
+        "command": "target/debug/neoclr run target/authored-structural-constraints.neox --execution interpreter",
+        "exitCode": 42
+      },
+      {
+        "command": "python3 scripts/build-api-docs.py --check",
+        "result": "pass"
+      }
+    ],
+    "sha256": {
+      "tools/metadata/NeoCLR.Metadata.Experimental.Tests/AuthoredStructuralConstraintChecks.cs": "e55c90b12f6005d0e7f1982c454d9a03998a8bfb6816cc1f21cbf80f0a537608",
+      "target/source-constraints/ConstraintConsumer.neox": "66841f860aa7d80e214795c2c79e84e87bcd900583b579706d3b28691b1918b8",
+      "target/source-constraints/ConstraintLibrary.neox": "5a7cb536ff4bc8e477dc1b770bcca6c2608cc097823bd69d5f1de17f2e36773e",
+      "Raven/tools/NeoClrMetadataProbe/StructuralConstraintChecks.cs": "5624fe108748d0822bf8fedb67b4d9a216a53ef2e121ce802c0acbc76b130a51"
+    }
   }
 }

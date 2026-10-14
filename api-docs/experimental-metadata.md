@@ -8721,9 +8721,9 @@ bounds, while the nominal-interface query rejects methods containing these bound
 and graph serialization. Target unions require any alternative, target intersections
 all constituents, and source unions require complete alternative coverage. Nominal
 leaf checks use local inheritance/interface relationships and invariant closed
-construction identity. Closed classes can satisfy interface intersections. Open
-method forwarding and generic-body trait dispatch remain unsupported; a provisional
-open call reference is rejected when emitted. Generic inherited class relationships
+construction identity. Closed classes can satisfy interface intersections. Forwarded method parameters are checked against the conjunction of the caller’s
+declared bounds at emission and serialization. Missing or weaker guarantees reject.
+Generic-body trait dispatch remains unsupported. Generic inherited class relationships
 beyond the existing local nominal model are not inferred. No conversions or variance
 are added by this API. Adding a bound after emitting a call cannot bypass validation.
 
@@ -8754,8 +8754,8 @@ The returned `ImportedMethodReference.MakeGenericInstance` checks all imported b
 against consumer-scoped arguments. Call emission and serialization check them again.
 Interface conformance uses registered native definitions; class ancestry uses the
 existing explicit base contracts. Closed generic identity remains invariant. Source
-union arguments need complete coverage. Open method forwarding and generic-body trait
-calls remain unavailable. The import does not synthesize a nominal carrier or a CLI
+union arguments need complete coverage. Forwarded method parameters require sufficient declared caller bounds; generic-body
+trait calls remain unavailable. The import does not synthesize a nominal carrier or a CLI
 projection. Existing unconstrained imports retain their behavior. Native execution
 still requires the experimental runtime feature and runtime verification.
 
@@ -8765,3 +8765,20 @@ constraint regression checks and existing composition import checks. Companion R
 uses this API for opt-in native free-function calls; source and separately compiled
 consumers cover interface union/intersection bounds and a closed `Response<A> | B`
 bound. This supersedes the pending native import statements above only for this profile.
+
+### Forwarding method parameters with closed structural bounds
+
+A method whose parameter is constrained by `A | B` can forward that parameter to
+another method requiring `A | B`. A caller guaranteeing `A & B` can forward to a
+callee requiring both traits or a single guaranteed interface. Separate nominal
+bounds are considered together as a conjunction. A union guarantee does not imply
+an intersection; an unconstrained parameter does not imply either guarantee.
+
+This uses bounded structural entailment over the existing closed bound signatures;
+it does not admit open operands such as `Response<T> | Error`. Provisional method
+references can carry caller parameters, but emission and serialization must prove
+those parameters from the caller’s recorded constraints. External-bound source
+authoring, generic-body trait calls and owner/type-parameter forwarding remain
+unsupported. The metadata fixture and the Raven source/library-consumer fixture
+execute through forwarded generic calls with result 42. Earlier blanket statements
+that method forwarding is unsupported are superseded by this bounded profile.

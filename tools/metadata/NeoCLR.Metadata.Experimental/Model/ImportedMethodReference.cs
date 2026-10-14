@@ -83,7 +83,7 @@ public sealed partial class AssemblyBuilder
     }
 
     /// <summary>Imports a native generic free function with closed structural type bounds and an ordinary executable signature.</summary>
-    /// <remarks>Explicit experimental contract; CLI projection and open forwarding remain unsupported. Dependencies must resolve to exact registered snapshots.</remarks>
+    /// <remarks>Explicit experimental contract; CLI projection and open structural bound operands remain unsupported. Forwarded method parameters require sufficient caller bounds. Dependencies must resolve to exact registered snapshots.</remarks>
     /// <exception cref="InvalidDataException">Not a supported native generic function or its metadata/dependencies are invalid.</exception>
     /// <exception cref="ArgumentNullException">Definition or core identity is null.</exception>
     public ImportedMethodReference ImportExperimentalConstrainedReference(MethodDefinition definition, AssemblyIdentity dependencyCoreLibrary, IAssemblyResolver? resolver = null)
