@@ -1,0 +1,20 @@
+{
+  "date": "2026-10-14",
+  "ravenRevision": "9f06b4ecb50d148685b0854082cb758db5a250c2",
+  "neoclrRevision": "f12e93e298487dd95629e0cb43e7b98cfcd13ceb",
+  "sampleResults": {
+    "Unions": 0,
+    "Intersections": 0,
+    "ExternalBounds": 0,
+    "omittedInterface": "RAV0320"
+  },
+  "sha256": {
+    "tools/rvnc/rvnc.dll": "cb58669726a566c8f575956db2f9a5433d2667386961ab30cfa501f05eadebb8",
+    "tools/rvnc/Raven.CodeAnalysis.dll": "8df31fa046e7a9bf4ead263389dc7802914519b15cb1a342571719c5063ecefe",
+    "tools/rvnc/NeoCLR.Metadata.Experimental.dll": "c56e0751bdacd22e886454acbe807400c600d186af35827b8c68f5ec16dcd831",
+    "tools/language-server/Raven.LanguageServer.dll": "8dcd9d01fa635d3b3ec61b573279237dc0d1db69c17b121cc179dff15ca76b9c",
+    "runtime/neoclr": "a5a512335059ed78cf2768785c77b18c6efc4dbdd42908f81818058a03a70b2d",
+    "library/System.Runtime.dll": "f5c790a1aeb5f56d83a8b5903555a0889c1d84f19f9cc7158026531d6c2532c3",
+    "raven-structural.vsix": "cd48145aef38234d1278d02d2b1197cb5c6438f2888f43ea96878fd61c6e1bd7"
+  }
+}

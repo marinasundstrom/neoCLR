@@ -99,3 +99,10 @@ Resolved closed external intersection bounds are also supported. Their native re
 require an explicit dependency resolver; the Raven catalog supplies selected snapshots.
 The follow-up consumer checks nominal conformance and reverse dependency ordering.
 See the [resolved intersection checkpoint](../composition-constraints/README.md#resolved-external-intersection-bounds--2026-10-14-development).
+
+## Local VS Code testing
+
+The [structural VS Code test kit](../structural-vscode/README.md) provides editable
+Task-union, intersection and external-bound samples with matching compiler/server
+selection and interpreter tasks. Its local editor and execution evidence is separate
+from the consolidated acceptance report above.
