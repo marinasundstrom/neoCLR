@@ -14,3 +14,13 @@ instance/static invocation, nullable void results, field read/write, source acce
 and read-only rejection, exact scalar validation and incompatible typed activation.
 It uses the public library extensions, not application copies. See the
 [contract and limitations](../../reflection-members.md).
+
+## Native typed-construction relationship check
+
+`TypeRelationships.rvnproj` exercises the updated public result guard through the
+native source libraries: exact result type, Object widening and incompatible string
+rejection. Build with the matching `NeoClrBundleRoot` and execute the emitted native
+metadata using the interpreter with that bundle's modules. This focused fixture
+avoids unrelated invocation and field-access paths in the older bridge consumer.
+The broader fixture retains explicit TypeInfo assignment/instance assertions too;
+its old CLI harness is not qualification of the current native compiler.

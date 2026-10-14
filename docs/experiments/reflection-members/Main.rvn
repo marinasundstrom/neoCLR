@@ -53,7 +53,10 @@ func Exercise() -> Result<(), ReflectionError> {
     Check(constructor.GetParameters().Count == 1)
     Check(constructor.GetParameters()[0].ParameterType.Equals(typeof(int)))
     Check(constructor.MetadataToken is Some(let token) && token != 0)
+    Check(type.AssignableTo(typeof(Object)))
+    Check(!type.AssignableTo(typeof(string)))
     let model = type.CreateInstance<Model>(17)?
+    Check(type.IsInstanceOfType(model))
     Check(model.Count == 17)
     let added = Method("Add").Invoke(model, 25)?
     Check(added is int value && value == 42)

@@ -17500,3 +17500,16 @@ open, not an approved complete implementation or a permanent roadmap reprioritiz
 - **Implementation:** shared runtime relationship rules, projected through all three
   descriptor implementations; native lowering uses the same rules on semantic types.
   Validation and adoption are recorded with the implementation changes.
+
+### Follow-through: consumers and main
+
+- **Author:** explicitly requested fixing the identified consumers and returning the
+  completed work to main.
+- **Assistant:** committed the predicates independently, then replaced JSON's
+  hand-written node hierarchy checks and the generic reflection result guard with
+  the public APIs. Added a focused typed-construction consumer and updated the
+  acquisition/reflection samples. Exact scalar equality remains intentional.
+- **Validation:** predicate suite passes in three execution modes. Consumer results
+  and remaining unrelated compiler/backend limits are retained in the
+  [qualification record](validation/type-relationships-20261014/README.md).
+  Main integration is recorded when performed; no publication is implied.
