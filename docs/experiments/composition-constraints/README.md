@@ -52,3 +52,13 @@ them. Dedicated metadata checks pass, including final-class rejection with close
 hierarchy acceptance and the existing nominal method-constraint regression checks.
 This is host inspection only; native authoring/import, Raven emission, generic-class
 constraint materialization and guest reflected constraints remain pending.
+
+Native method authoring follow-up: `MethodBuilder.AddExperimentalStructuralConstraint`
+now emits closed, local structural bounds directly as TypeBound signatures. Nominal
+inheritance/interface checks and closed construction identity support any-of/all-of
+proofs with complete source-union coverage. Calls are checked again at serialization,
+so late constraint changes cannot bypass admission. External bounds, open forwarding,
+generic trait calls and Raven compiler emission/import remain unsupported. The
+`AuthoredStructuralConstraintChecks` fixture executes with result 42; focused authoring,
+inspection and nominal constraint regression checks pass. This completes the bounded
+host method-authoring step, not end-to-end Raven constraint compilation.

@@ -8701,3 +8701,36 @@ and explicit grouping; the cost is an opt-in native-only consumption contract.
 Validation: `--structural-method-constraints` in the metadata test executable covers
 JSON/binary roundtrip, context identity, mixed grouping, normalization, nominal
 compatibility, invalid bounds/ordinals/duplicates and unsupported consumer gates.
+
+### Native structural method constraint authoring
+
+`MethodBuilder.AddExperimentalStructuralConstraint(int parameterIndex,
+ReferenceCompositionKind kind, params SignatureType[] constituents)` adds a
+native-only closed bound to a method parameter. The zero-based ordinal must exist;
+constituents are normalized using the assembly composition factory and must retain
+at least two distinct constituents. Local reference
+classes/interfaces and closed local generic reference constructions are admitted.
+External constituents, open operands, value operands and final classes written in
+intersections reject. Null constituent arrays throw `ArgumentNullException`; invalid
+ordinals, duplicates, foreign/unsupported operands or a combined constraint count
+above 128 throw `ArgumentException`. Native output uses `GenericConstraint.TypeBound`;
+CLI output remains unavailable. `MethodDefinition.TypeConstraints` includes authored
+bounds, while the nominal-interface query rejects methods containing these bounds.
+
+`MakeGenericInstance` checks structural bounds, and calls are rechecked on emission
+and graph serialization. Target unions require any alternative, target intersections
+all constituents, and source unions require complete alternative coverage. Nominal
+leaf checks use local inheritance/interface relationships and invariant closed
+construction identity. Closed classes can satisfy interface intersections. Open
+method forwarding and generic-body trait dispatch remain unsupported; a provisional
+open call reference is rejected when emitted. Generic inherited class relationships
+beyond the existing local nominal model are not inferred. No conversions or variance
+are added by this API. Adding a bound after emitting a call cannot bypass validation.
+
+Example: `method.AddExperimentalStructuralConstraint(0,
+ReferenceCompositionKind.Union, responseType, errorType)` writes a structural bound
+for the first method parameter, without generating a nominal carrier.
+The authored constraint fixture runs in the experimental interpreter with result 42.
+Raven emission/import, external constraints, class constraint authoring and guest
+constraint reflection remain pending; this supersedes only the method-authoring gap
+in the preceding inspection section.

@@ -2038,3 +2038,7 @@ The host-only `GenericMethodTypeConstraint`, `MethodDefinition.TypeConstraints` 
 [manual structural constraint reference](experimental-metadata.md#structural-method-constraint-inspection-2026-10-14-development).
 They are C# tooling APIs, excluded from guest RavenDoc selection; no guest assembly
 or generated API snapshot changes in this slice. The snapshot check passes.
+
+`MethodBuilder.AddExperimentalStructuralConstraint` is a host-only C# tooling API,
+covered in the [native constraint authoring reference](experimental-metadata.md#native-structural-method-constraint-authoring).
+It is excluded from guest RavenDoc selection; the unchanged guest API snapshot check passes.

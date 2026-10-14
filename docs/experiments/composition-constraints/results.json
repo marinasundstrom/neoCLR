@@ -42,5 +42,32 @@
       }
     ],
     "testSha256": "d1a578056b4f0494730740a34ed1f7b465835da3389ca5aa82365392e529d8c0"
+  },
+  "metadataAuthoring": {
+    "date": "2026-10-14",
+    "scope": "Local closed native method bounds; compiler wiring and external/open bounds pending",
+    "checks": [
+      {
+        "command": "dotnet run --project tools/metadata/NeoCLR.Metadata.Experimental.Tests -- --authored-structural-constraints target/authored-structural-constraints.neox",
+        "result": "pass"
+      },
+      {
+        "command": "target/debug/neoclr run target/authored-structural-constraints.neox --execution interpreter",
+        "exitCode": 42
+      },
+      {
+        "command": "dotnet run --project tools/metadata/NeoCLR.Metadata.Experimental.Tests --no-build -- --structural-method-constraints",
+        "result": "pass, including nominal constraint regressions"
+      },
+      {
+        "command": "dotnet run --project tools/metadata/NeoCLR.Metadata.Experimental.Tests --no-build -- --authored-compositions",
+        "result": "pass"
+      },
+      {
+        "command": "python3 scripts/build-api-docs.py --check",
+        "result": "pass"
+      }
+    ],
+    "testSha256": "6f07f0cfa89ac89bd108941e27e97aca084f216cbe13ab3ed607e947b4615ffe"
   }
 }

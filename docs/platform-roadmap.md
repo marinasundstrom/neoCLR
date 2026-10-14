@@ -4696,3 +4696,8 @@ and backend support remain open. [Descriptor probe](experiments/composition-type
 structural method bounds and exposes their complete type views. Native authoring,
 Raven emission/import, class constraint materialization and guest constraint reflection
 remain pending; [focused evidence](experiments/composition-constraints/README.md).
+
+2026-10-14 bounded native method constraint authoring is implemented with local closed
+reference bounds, checked instantiation and interpreter result 42. Compiler wiring,
+external/open bounds and guest constraint reflection remain pending; see the
+[constraint evidence](experiments/composition-constraints/README.md).

@@ -13,6 +13,8 @@ public sealed record GenericMethodTypeConstraint(int ParameterIndex, SignatureTy
 public sealed partial class MethodDefinition
 {
     private readonly List<GenericMethodInterfaceConstraint> authoredInterfaceConstraints = [];
+    internal readonly List<GenericMethodTypeConstraint> AuthoredStructuralConstraints = [];
+    internal IReadOnlyList<GenericMethodInterfaceConstraint> NominalInterfaceConstraints => authoredInterfaceConstraints;
     private AssemblyDefinition.MethodConstraintRow[] loadedInterfaceConstraints = [];
     private AssemblyDefinition.StructuralMethodConstraintRow[] loadedStructuralConstraints = [];
 
@@ -22,14 +24,14 @@ public sealed partial class MethodDefinition
     public IReadOnlyList<GenericMethodTypeConstraint> TypeConstraints => unsupportedGenericParameters
         ? throw new InvalidDataException("method has unsupported generic parameter constraints")
         : Array.AsReadOnly((AuthoredSignature is not null
-            ? authoredInterfaceConstraints.Select(c => new GenericMethodTypeConstraint(c.ParameterIndex, ConstraintSignature(c.InterfaceType)))
+            ? authoredInterfaceConstraints.Select(c => new GenericMethodTypeConstraint(c.ParameterIndex, ConstraintSignature(c.InterfaceType))).Concat(AuthoredStructuralConstraints)
             : loadedInterfaceConstraints.Select(c => new GenericMethodTypeConstraint(c.Parameter, Module.GetNativeSignatureType(c.Interface)))
                 .Concat(loadedStructuralConstraints.Select(c => new GenericMethodTypeConstraint(c.Parameter, c.Bound.Materialize(Module)))))
             .ToArray());
     /// <summary>Gets method-scoped interface bounds, preserving parameter ordinals.</summary>
     /// <remarks>Supports nominal nongeneric interfaces only; use TypeConstraints for structural bounds. A structural bound causes this query to throw rather than return an incomplete set.</remarks>
     /// <exception cref="InvalidDataException">Loaded metadata contains unsupported constraints; no partial constraint set is returned.</exception>
-    public IReadOnlyList<GenericMethodInterfaceConstraint> InterfaceConstraints => unsupportedGenericParameters || loadedStructuralConstraints.Length != 0
+    public IReadOnlyList<GenericMethodInterfaceConstraint> InterfaceConstraints => unsupportedGenericParameters || loadedStructuralConstraints.Length != 0 || AuthoredStructuralConstraints.Count != 0
         ? throw new InvalidDataException("method has unsupported generic parameter constraints")
         : AuthoredSignature is not null
         ? authoredInterfaceConstraints.AsReadOnly()
@@ -58,8 +60,8 @@ public sealed partial class MethodDefinition
         ArgumentNullException.ThrowIfNull(interfaceType);
         if (AuthoredSignature is null) throw new InvalidOperationException("loaded method constraints are immutable");
         var signature = ConstraintSignature(interfaceType);
-        if (authoredInterfaceConstraints.Count >= 128 || parameterIndex < 0 || parameterIndex >= GenericArity ||
-            authoredInterfaceConstraints.Any(c => c.ParameterIndex == parameterIndex && Equals(ConstraintSignature(c.InterfaceType), signature)))
+        if (authoredInterfaceConstraints.Count + AuthoredStructuralConstraints.Count >= 128 || parameterIndex < 0 || parameterIndex >= GenericArity ||
+            TypeConstraints.Any(c => c.ParameterIndex == parameterIndex && c.Bound == signature))
             throw new ArgumentException("invalid method interface constraint");
         authoredInterfaceConstraints.Add(new(parameterIndex, interfaceType));
     }
@@ -96,9 +98,55 @@ public sealed partial class MethodBuilder
         Definition.AddInterfaceConstraint(parameterIndex, Assembly.Definition.MainModule.ImportReference(interfaceType.AssemblyIdentity, interfaceType.Namespace, interfaceType.Name));
     }
 
+    /// <summary>Adds a native-only closed structural bound on a method type parameter.</summary>
+    /// <remarks>Constituents must be output-owned local reference types. CLI emission, external bounds and open structural operands are unsupported.</remarks>
+    /// <exception cref="ArgumentException">Invalid ordinal, kind, duplicate, foreign/open/value/final intersection operand or excessive constraints.</exception>
+    /// <exception cref="ArgumentNullException">Constituents are null.</exception>
+    public void AddExperimentalStructuralConstraint(int parameterIndex, ReferenceCompositionKind kind, params SignatureType[] constituents)
+    {
+        ArgumentNullException.ThrowIfNull(constituents);
+        if (parameterIndex < 0 || parameterIndex >= Signature.GenericParameterNames.Count || Definition.TypeConstraints.Count >= 128)
+            throw new ArgumentException("invalid method constraint ordinal or count");
+        bool Local(SignatureType type) => type.Composition is { } c ? c.Constituents.All(Local)
+            : type.ClassType is not null || type.GenericInstance is not null;
+        if (constituents.Any(t => t is null || !Local(t)))
+            throw new ArgumentException("structural method bounds require local reference constituents");
+        var bound = Assembly.CreateExperimentalReferenceComposition(kind, constituents);
+        if (bound.Composition is null)
+            throw new ArgumentException("structural method bounds require at least two distinct constituents");
+        if (Definition.TypeConstraints.Any(c => c.ParameterIndex == parameterIndex && c.Bound == bound))
+            throw new ArgumentException("duplicate method type bound");
+        Definition.AuthoredStructuralConstraints.Add(new(parameterIndex, bound));
+    }
+
+    private bool SatisfiesStructuralBound(SignatureType actual, SignatureType bound, int depth = 0)
+    {
+        if (depth >= 64) return false;
+        if (actual.Composition is { Kind: ReferenceCompositionKind.Union } sourceUnion)
+            return sourceUnion.Constituents.All(t => SatisfiesStructuralBound(t, bound, depth + 1));
+        if (bound.Composition is { Kind: ReferenceCompositionKind.Intersection } targetIntersection)
+            return targetIntersection.Constituents.All(t => SatisfiesStructuralBound(actual, t, depth + 1));
+        if (bound.Composition is { Kind: ReferenceCompositionKind.Union } targetUnion)
+            return targetUnion.Constituents.Any(t => SatisfiesStructuralBound(actual, t, depth + 1));
+        if (actual.Composition is { Kind: ReferenceCompositionKind.Intersection } sourceIntersection)
+            return sourceIntersection.Constituents.Any(t => SatisfiesStructuralBound(t, bound, depth + 1));
+        if (actual == bound) return true;
+        if (actual.GenericInstance is { } instance) return instance.ConformsTo(bound);
+        if (actual.ClassType is not { } local) return false;
+        return bound.ClassType is { } nominal ? nominal.IsInterface ? local.ConformsTo(nominal) : local.DerivesFrom(nominal)
+            : bound.GenericInstance is { Definition.IsInterface: true } constructed && local.ConformsTo(constructed);
+    }
+
     internal void ValidateMethodArguments(IReadOnlyList<SignatureType> arguments, MethodBuilder? caller = null, bool deferOpen = false)
     {
-        foreach (var constraint in InterfaceConstraints)
+        foreach (var constraint in Definition.AuthoredStructuralConstraints)
+        {
+            var argument = arguments[constraint.ParameterIndex];
+            if (argument.MethodParameterIndex is not null && caller is null && deferOpen) continue;
+            if (!SatisfiesStructuralBound(argument, constraint.Bound))
+                throw new ArgumentException("generic method argument does not satisfy its structural bound; open forwarding is unsupported");
+        }
+        foreach (var constraint in Definition.NominalInterfaceConstraints)
         {
             var argument = arguments[constraint.ParameterIndex];
             if (argument.MethodParameterIndex is { } parameter)

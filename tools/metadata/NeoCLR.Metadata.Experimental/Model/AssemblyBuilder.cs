@@ -129,7 +129,7 @@ public sealed partial class AssemblyBuilder
                 if (method.IsImplicitObjectOverride && !MethodDefinition.IsObjectOverride(method.Name, method.Signature, CoreLibrary, NativeObjectRoot, ExternalObjectRoot))
                     throw new InvalidDataException("Object override does not match the selected root signature");
                 method.Signature.ValidateOwner(this, arity, complete: true, allowSelf: method.DeclaringType?.IsInterface == true);
-                foreach (var bound in method.InterfaceConstraints)
+                foreach (var bound in method.Definition.NominalInterfaceConstraints)
                 {
                     var signature = method.Definition.ConstraintSignature(bound.InterfaceType);
                     if (signature.ImportedType is { } external) _ = ExternalInterfaceMethods(external).ToArray();

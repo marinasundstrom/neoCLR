@@ -9820,3 +9820,12 @@ remains the compiler opt-in; compiler constraint emission/import still needs wir
 The host reader and introspection layers own this slice on the paired experimental
 branches; JSON/binary roundtrip, grouping, invalid operands and nominal compatibility
 pass focused metadata tests. No new runtime bundle is required or claimed.
+
+Native authoring follow-up, 2026-10-14: `MethodBuilder.AddExperimentalStructuralConstraint`
+writes closed local method bounds directly to native TypeBound signatures. Native
+interpreter execution of the authored fixture returns 42; focused checks cover
+full union coverage, intersections, closed generics and late-bound revalidation.
+The host metadata library owns this step. There is no CLI encoding; external bounds,
+open forwarding and compiler emission/import remain pending. The existing explicit
+Raven structural Runtime Contract switch and paired experimental branches remain
+unchanged. No runtime library bundle change is required.
