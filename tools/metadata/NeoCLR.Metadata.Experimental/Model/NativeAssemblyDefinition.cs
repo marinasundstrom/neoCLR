@@ -501,10 +501,16 @@ public sealed partial class NativeAssemblyDefinition
                                 operands.Select(child => ReadComposition(child, depth + 1, intersectionBound || key == "Intersection")).ToArray());
                         }
                         var leaf = ReadType(value, false);
-                        Require(leaf.ClassType is { IsStatic: false, IsValueType: false, GenericParameterNames.Count: 0 } ||
-                            leaf.ImportedType is { IsValueType: false, GenericArity: 0 }, "composition requires nongeneric nominal reference bounds");
+                        bool ClosedArgument(SignatureType argument) => argument.Primitive is { } primitive ? primitive != PrimitiveType.Void
+                            : argument.ArrayElement is { } element ? ClosedArgument(element)
+                            : argument.GenericInstance is { } generic ? generic.TypeArguments.All(ClosedArgument)
+                            : argument.ClassType is { GenericParameterNames.Count: 0 }
+                            || argument.ImportedType is { } imported && imported.TypeArguments.Count == imported.GenericArity && imported.TypeArguments.All(ClosedArgument);
+                        var localBound = leaf.ClassType ?? leaf.GenericInstance?.Definition;
+                        Require(localBound is { IsStatic: false, IsValueType: false } && ClosedArgument(leaf) ||
+                            leaf.ImportedType is { IsValueType: false } && ClosedArgument(leaf), "composition requires closed nominal reference bounds");
                         if (intersectionBound)
-                            Require(leaf.ClassType is { } bound && !types[System.Array.IndexOf(signatureOwners, bound)].IsSealedClass,
+                            Require(localBound is { } bound && !types[System.Array.IndexOf(signatureOwners, bound)].IsSealedClass,
                                 "intersection bounds require resolved interfaces or non-sealed reference classes");
                         return leaf;
                     }

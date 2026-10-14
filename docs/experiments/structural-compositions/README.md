@@ -624,3 +624,42 @@ owners are the paired feature branches `codex/structural-union-intersection` and
 Compiler slice: Raven `f277f2a47`; runtime slice is the commit containing this
 section and the closed-generic composition tests. Website proposal status remains
 accurate: this is isolated development work, not a published capability.
+
+
+## Closed generic composition call integration — 2026-10-14
+
+The native metadata composition reader and Raven imported-call profile now admit
+closed constructed reference bounds. Local intersection definitions must still be
+resolved interfaces/non-sealed classes; external intersection extendability remains
+resolver-limited. Type arguments may be ordinary closed value/reference types or
+vectors, but not open parameters, Void, or another composition. Existing nominal
+arity/constraint validation applies. Rejection precedes duplicate normalization.
+
+Call entailment now retains invariant constructed argument identity and follows
+existing nominal interface relationships. `A<int>` cannot prove `A<bool>`.
+Raw native descriptors survive semantic import and call emission; generic functions,
+compound source storage, composition arguments such as `Task<Response<T> | HttpError
+| JsonError>`, value-union representation and JIT/AOT remain unsupported. The four
+author examples from the previous slice still have semantic substitution coverage.
+
+The repeatable POC runner now executes eight consumers: the original four and a
+`generic/` variant using `A<Int32> & B<Int32>` and `A<Int32> | B<Int32>`, with two
+sealed concrete producers implementing both constructed interfaces. All return 42.
+The probe rejects mismatched generic arguments at both host writer and compiler,
+open/Void/composition arguments, wrong arity, sealed generic intersection bounds
+(including duplicates), default and old intersection-only reader/emitter paths,
+PE output, unsafe narrowing and authored storage. Sealed generic union bounds read
+successfully. Existing host composition-import controls also pass.
+
+This continues the native signature extension rather than altering .NET generic
+identity, Runtime Contract configuration or the temporary CLI carrier encoding.
+Reusing nominal construction/import avoids a second generic identity model, while
+requiring separate adapter and backend validation. Native metadata/codegen support
+for compositions inside generic arguments is the next missing layer for Task of a
+union. Owners remain the paired experimental branches; published/main support is
+unchanged. No website build is needed: the proposals page still labels this work
+as exploratory, and the experimental API reference documents the widened profile.
+
+Validated companion compiler slice: Raven `c996229e5`, paired with the metadata
+reader/proof and runner changes in this checkpoint. The runner records exact input
+revisions, dirty state, source consumers and artifact hashes in validation.json.

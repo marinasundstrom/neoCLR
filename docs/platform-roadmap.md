@@ -4593,3 +4593,7 @@ examples semantically and execute closed generic reference bounds in runtime tes
 Full generic metadata/compiler/storage integration remains open. This experiment
 does not change active milestone sequencing or enable compositions on main.
 [Scope and focused evidence](experiments/structural-compositions/README.md#generic-composition-first-slice--2026-10-14).
+
+Follow-through: closed generic reference bounds now cross the native metadata
+adapter and Raven call emitter, with eight passing interpreter consumers. Generic
+argument composition/storage remains open; see the [call-integration checkpoint](experiments/structural-compositions/README.md#closed-generic-composition-call-integration--2026-10-14).

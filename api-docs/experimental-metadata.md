@@ -8407,8 +8407,11 @@ not change the generated RavenDoc snapshot.
 Only nongeneric, non-native free-function parameter/result signatures and local
 signature declarations admit compositions. Each encoded compound has 2–256
 operands, at most 4,096 nodes per root and a depth limit of 32; existing transport
-limits also apply and may reject an image earlier. Leaves must be nongeneric nominal
-reference classes/interfaces. Primitive/value, array, byref, generic parameter,
+limits also apply and may reject an image earlier. Leaves must be closed nominal
+reference classes/interfaces, including constructed generic types. Generic arguments
+may be closed nominal/value types, non-Void primitives or vectors; arity and existing
+nominal construction validation apply. Open and composition arguments reject.
+Primitive/value, array, byref, generic parameter,
 Function and Self leaves are rejected, as are compositions nested inside those
 wrappers, fields, owned methods and native/InternalCall signatures. Validation
 precedes normalization, so collapsing duplicate bounds cannot hide an invalid leaf.
@@ -8545,6 +8548,12 @@ Member merging is deferred. These are compiler host APIs, not guest RavenDoc API
 
 [POC and commands](../docs/experiments/structural-compositions/README.md#working-raven-consumer-poc--2026-10-14)
 record four interpreter results and negative gates. Full open/closed generic native
-integration remains incomplete; the adapter still admits nongeneric calls only.
+integration remains incomplete; the adapter admits closed generic reference bounds
+in nongeneric free-function calls. Open parameters and compositions inside generic
+arguments remain unsupported.
 The runtime separately supports closed generic reference bounds; see the
 [generic slice](../docs/experiments/structural-compositions/README.md#generic-composition-first-slice--2026-10-14).
+
+
+Closed generic bound call integration is covered by eight Raven interpreter consumers
+and host/compiler mismatch rejection; see the [current profile and evidence](../docs/experiments/structural-compositions/README.md#closed-generic-composition-call-integration--2026-10-14).

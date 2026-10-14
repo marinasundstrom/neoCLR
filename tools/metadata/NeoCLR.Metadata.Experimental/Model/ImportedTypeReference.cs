@@ -56,8 +56,11 @@ public sealed partial class AssemblyBuilder
     // Call-only proof over flat reference compositions. Retain the original descriptors.
     internal bool HasExperimentalCompositionCallConversion(ReferenceCompositionSignature actual, ReferenceCompositionSignature target)
     {
-        bool Supported(SignatureType type) => type.ImportedType is { IsValueType: false, GenericArity: 0, TypeArguments.Count: 0 } imported &&
-            ReferenceEquals(imported.Owner, this);
+        bool Closed(SignatureType type) => type.Primitive is { } primitive ? primitive != PrimitiveType.Void
+            : type.ArrayElement is { } element ? Closed(element)
+            : type.ImportedType is { } imported && ReferenceEquals(imported.Owner, this) &&
+                imported.TypeArguments.Count == imported.GenericArity && imported.TypeArguments.All(Closed);
+        bool Supported(SignatureType type) => type.ImportedType is { IsValueType: false } && Closed(type);
         if (!actual.Constituents.All(Supported) || !target.Constituents.All(Supported))
             return false;
         bool Nominal(SignatureType source, SignatureType destination) => source == destination ||

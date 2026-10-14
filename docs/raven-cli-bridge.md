@@ -9573,3 +9573,12 @@ closed constructed reference runtime bounds. The host adapter still exposes only
 the nongeneric call POC; Task of a union is semantic coverage, not native execution.
 Runtime Contract and CLI carrier encoding are unchanged. See the
 [scope, comparison, owners and validation](experiments/structural-compositions/README.md#generic-composition-first-slice--2026-10-14).
+
+
+### Closed generic composition calls — 2026-10-14
+
+The experimental adapter/compiler now preserves closed constructed reference bounds
+in imported free-function calls, with eight passing interpreter consumers. Generic
+argument mismatches reject at host and compiler. Runtime Contract and CLI encoding
+are unchanged; Task of a union still requires native generic-argument storage work.
+[Current profile and validation](experiments/structural-compositions/README.md#closed-generic-composition-call-integration--2026-10-14).
