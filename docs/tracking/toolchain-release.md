@@ -40,8 +40,8 @@ records all 26 macOS editor checks, native and .NET inlay regressions, matching
 SDK/VSIX language-server payloads and fresh extracted default-JIT acceptance.
 The inlay failure was fixed on Raven main and carried separately to its native
 branch. The updated `.2` Windows candidate includes that regression; the original
-`.1` package has passed runtime/JSON/HTTP qualification and is completing editor
-acceptance. Canonical source/host checks and Windows JIT HTTP/HTTPS now pass.
+`.1` package passes three-mode JSON, 132 HTTP checks, 21 runtime-await cases,
+GC validation and all 26 editor checks. Canonical source/host checks and Windows JIT HTTP/HTTPS now pass.
 Installation/publication still awaits the updated Windows candidate and final
 matching-asset review. The retained-bootstrap probe remains an internal gap.
 

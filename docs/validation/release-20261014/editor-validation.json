@@ -50,13 +50,35 @@
   "hostedPassed": {
     "sourceAndHosts": "https://github.com/marinasundstrom/neoCLR/actions/runs/38540056084",
     "windowsJitHttp": "https://github.com/marinasundstrom/neoCLR/actions/runs/38539119108",
-    "windowsHttps": "https://github.com/marinasundstrom/neoCLR/actions/runs/38539118878"
+    "windowsHttps": "https://github.com/marinasundstrom/neoCLR/actions/runs/38539118878",
+    "originalWindowsPackage": "https://github.com/marinasundstrom/neoCLR/actions/runs/38539514281"
   },
   "pending": {
-    "originalWindowsPackage": "https://github.com/marinasundstrom/neoCLR/actions/runs/38539514281",
     "updatedWindowsPackageAndInlays": "https://github.com/marinasundstrom/neoCLR/actions/runs/38542979837",
-    "windowsTlsFixtureRepair": "https://github.com/marinasundstrom/neoCLR/actions/runs/38542979875"
+    "windowsTlsFixtureRepair": "The Windows export repair passed linking; prerequisite diagnostic expectation fixed in 60472b5a8, hosted execution rerun required."
   },
   "installedIntoNormalProfile": false,
-  "published": false
+  "published": false,
+  "windowsOriginalCandidate": {
+    "release-json/results.json": {
+      "passed": true,
+      "sha256": "ea27d074146b3ca69c667b772ac3e0a9de163c47b2a9174af0d0be0a4062dc18"
+    },
+    "release-headers/results.json": {
+      "passed": true,
+      "sha256": "f239693df79fd2b6eb14deff5e04809a01380f1400217f168881e1acf7b3b240"
+    },
+    "release-runtime-await/validation.json": {
+      "passed": true,
+      "sha256": "d0ec249144e906b036a1496dd001f5b25282976d261ba5bf93356514e9a8b14a"
+    },
+    "release-gc/report.json": {
+      "passed": true,
+      "sha256": "636759893ade0ac6d96886c944a51d2d69af9ea747fbb9a50555b0701f1fb918"
+    },
+    "editor-acceptance/vscode-acceptance.json": {
+      "passed": true,
+      "sha256": "ec2b759059721a1415813cbf7c77665b600b7ba095c64378583dc582ebfc3c2a"
+    }
+  }
 }

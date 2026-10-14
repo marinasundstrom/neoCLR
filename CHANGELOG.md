@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-14
 
+- Record the original Windows candidate passing three-mode JSON, 132 HTTP checks, 21 runtime-await cases, GC validation and all 26 editor checks. Keep the inlay-fixed `.2` candidate distinct and pending its own packaged qualification.
+
 - Match the Windows TLS prerequisite probe to the compiler’s earlier Windows-profile rejection. Continue requiring a failed compilation and no object output when arena/GC prerequisites are missing; TLS execution and GC contracts are unchanged.
 
 - Record the fixed VSIX passing all 26 macOS editor checks plus native and ordinary .NET inlay stability probes, with matching SDK server payloads. Retain passing source/host and Windows JIT HTTP/HTTPS evidence. Updated Windows editor/package qualification remains pending; no normal-profile installation or publication occurred.
