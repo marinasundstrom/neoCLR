@@ -271,7 +271,15 @@ pub(crate) fn validate_surface(module: &Module) -> Result<(), Fault> {
                             "composition wrapper calls require nongeneric instance methods",
                         ));
                     }
-                    crate::vm::check_type(target.owner.as_ref().unwrap(), module)?;
+                    let owner = target.owner.as_ref().unwrap();
+                    crate::vm::check_type(owner, module)?;
+                    if module.type_definition(owner).is_some_and(|definition| {
+                        definition.representation == Representation::Interface
+                    }) {
+                        return Err(Fault::new(
+                            "composition argument interface dispatch is not supported",
+                        ));
+                    }
                     if visited.insert(target.clone()) {
                         if visited.len() > 256 {
                             return Err(Fault::new("composition wrapper call graph exceeds limit"));

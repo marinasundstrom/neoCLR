@@ -14,10 +14,14 @@ fn library() -> &'static Module {
     })
 }
 fn load(body: &str) -> Result<LoadedProgram, String> {
+    load_with_types(body, "")
+}
+fn load_with_types(body: &str, types: &str) -> Result<LoadedProgram, String> {
     let source = format!(".module App\n.entry Main\n.function Main() -> Int32\n{body}\nret\n.end")
         .replace("Tasks.", "System.Concurrency.Tasks.")
         + "\n"
-        + include_str!("fixtures/union-patterns.neoil");
+        + include_str!("fixtures/union-patterns.neoil")
+        + types;
     let app = neoclr::assembler::read_modules(
         &[neoclr::assembler::ModuleInput::Source(&source)],
         library(),
@@ -199,5 +203,43 @@ fault "Cancellation contract failed"
     assert_eq!(
         load(&body).unwrap().run(Limits::default()).unwrap().value,
         Value::Int32(1)
+    );
+}
+
+#[cfg(feature = "experimental-compositions")]
+#[test]
+fn structural_union_task_construction_preserves_identity_and_pending_state() {
+    let ty = "union<Response<Int32>,HttpError,JsonError>";
+    let types = "\n.type class Response<T>\n.field Value T\n.end\n.type class HttpError\n.sealed\n.end\n.type class JsonError\n.sealed\n.end\n";
+    let body = format!(
+        r#"
+.local Tasks.Promise<{ty}> source
+newobj instance Tasks.TaskQueue::.ctor()
+newobj instance Tasks.Promise<{ty}>::.ctor(Tasks.TaskQueue)
+stloc source
+ldloc source
+call instance Tasks.Promise<{ty}>::get_Task()
+call instance Tasks.Task<{ty}>::GetAwaiter()
+ldloc source
+call instance Tasks.Promise<{ty}>::get_Task()
+ref.eq
+brfalse Bad
+ldloc source
+call instance Tasks.Promise<{ty}>::get_Task()
+call instance Tasks.Task<{ty}>::get_IsCompleted()
+brtrue Bad
+ldc.i4 42
+ret
+Bad:
+fault "Task identity or pending state changed"
+"#
+    );
+    assert_eq!(
+        load_with_types(&body, types)
+            .unwrap()
+            .run(Limits::default())
+            .unwrap()
+            .value,
+        Value::Int32(42)
     );
 }

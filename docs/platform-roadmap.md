@@ -4621,3 +4621,10 @@ The isolated composition interpreter now admits checked reference-array payloads
 and substituted generic array fields, a prerequisite for Task's ArrayList-backed
 result slot. Compiler/host array transport and actual Task execution remain open.
 [Runtime array checkpoint](experiments/structural-compositions/README.md#runtime-reference-array-storage--2026-10-14).
+
+
+The interpreter now admits composition arguments in generic interface identities,
+allowing the real Task/Promise/ArrayList construction path for the nested union
+example. Completion remains blocked by substituted managed-local initialization;
+interface dispatch and compiler transport remain separate work.
+[Task construction checkpoint](experiments/structural-compositions/README.md#generic-interface-composition-arguments-and-task-construction--2026-10-14).

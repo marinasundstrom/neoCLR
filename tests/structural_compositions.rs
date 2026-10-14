@@ -373,7 +373,6 @@ fn generic_composition_rejects_invalid_arguments_and_sealed_bounds() {
         "intersection<ValueCell<Int32>,Marker<Int32>>",
         "union<Read<Void>,Marker<Int32>>",
         "intersection<Read<Int32,Int32>,Marker<Int32>>",
-        "union<Read<union<Read<Int32>,Marker<Int32>>>,Marker<Int32>>",
     ] {
         let source = format!(".module InvalidGeneric\n.entry Main\n{GENERIC_TYPES}\n.function Main() -> Int32\n.local {ty} value\nldc.i4 42\nret\n.end");
         assert!(assemble(&source).is_err(), "{ty}");
@@ -382,6 +381,7 @@ fn generic_composition_rejects_invalid_arguments_and_sealed_bounds() {
         ("intersection<Cell<Int32>,Marker<Int32>>", false),
         ("intersection<Cell<Int32>,Cell<Int32>>", false),
         ("union<Cell<Int32>,Marker<Int32>>", true),
+        ("union<Read<union<Read<Int32>,Marker<Int32>>>,Marker<Int32>>", true),
         ("intersection<Read<Cell<Int32>>,Marker<Cell<Int32>>>", true),
     ] {
         let types = GENERIC_TYPES.replace(".type class Cell<T>", ".type class Cell<T>\n.sealed");
@@ -832,4 +832,79 @@ fn serialized_composition_array_retains_feature_gate() {
         cfg!(feature = "experimental-compositions"),
         "{result:?}"
     );
+}
+
+#[cfg(feature = "experimental-compositions")]
+const COMPOSITION_INTERFACE_WRAPPER: &str = r#"
+.interface Reader<T>
+.method instance Get() -> T
+.end
+.end
+.interface DerivedReader<T>
+.implements Reader<T>
+.end
+.type class Cell<T>
+.implements DerivedReader<T>
+.field Value T
+.method instance Get() -> T
+ldarg this
+ldfld Cell<T>::Value
+ret
+.end
+.end
+"#;
+
+#[cfg(feature = "experimental-compositions")]
+#[test]
+fn composition_arguments_preserve_inherited_interface_identity() {
+    for kind in ["union", "intersection"] {
+        let body = format!(
+            r#"
+.local Reader<{kind}<Left,Right>> reader
+ldc.i4 42
+newobj Both
+newobj Cell<{kind}<Left,Right>>
+castclass DerivedReader<{kind}<Right,Left>>
+stloc reader
+ldloc reader
+castclass Cell<{kind}<Right,Left>>
+call instance Cell<{kind}<Left,Right>>::Get()
+castclass Left
+callvirt instance Left::Get()
+"#
+        );
+        let p = program(&body, COMPOSITION_INTERFACE_WRAPPER);
+        p.verify().unwrap();
+        assert_eq!(p.run(Limits::default()).unwrap().value, Value::Int32(42));
+    }
+}
+
+#[cfg(feature = "experimental-compositions")]
+#[test]
+fn composition_interface_arguments_remain_invariant() {
+    let make = "ldc.i4 42\nnewobj Both\nnewobj Cell<union<Left,Right>>";
+    for target in ["Reader<intersection<Left,Right>>", "Reader<Left>"] {
+        let p = program(
+            &format!("{make}\ncastclass {target}\npop\nldc.i4 42"),
+            COMPOSITION_INTERFACE_WRAPPER,
+        );
+        p.verify().unwrap();
+        assert!(p.run(Limits::default()).is_err(), "{target}");
+        let p = program(
+            &format!(".local {target} reader\n{make}\nstloc reader\nldc.i4 42"),
+            COMPOSITION_INTERFACE_WRAPPER,
+        );
+        assert!(p.verify().is_err(), "{target}");
+        assert!(p.run(Limits::default()).is_err(), "{target}");
+    }
+}
+
+#[cfg(feature = "experimental-compositions")]
+#[test]
+fn composition_argument_interface_calls_remain_gated() {
+    let source = format!(
+        ".module InterfaceCall\n.entry Main\n{TYPES}\n{COMPOSITION_INTERFACE_WRAPPER}\n.function Main() -> Int32\nldc.i4 42\nnewobj Both\nnewobj Cell<union<Left,Right>>\ncallvirt instance Reader<union<Left,Right>>::Get()\npop\nldc.i4 42\nret\n.end"
+    );
+    let error = assemble(&source).unwrap_err().to_string();
+    assert!(error.contains("interface dispatch"), "{error}");
 }

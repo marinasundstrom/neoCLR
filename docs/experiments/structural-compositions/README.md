@@ -856,3 +856,55 @@ cargo test --test structural_compositions
 The feature-enabled composition suite passes 29 tests; ordinary controls pass 15
 reference-array, three reserved-array and 13 generic-class tests. All three
 default-off serialized-signature checks pass.
+
+
+## Generic interface composition arguments and Task construction — 2026-10-14
+
+The interpreter now admits closed composition arguments in nominal interface types,
+including interfaces inherited by constructed reference classes. This lets the real
+ArrayList<T> result slot retain its collection interface identities when T is a
+reference composition. Reference fields remain checked after substitution; generic
+value wrappers remain unsupported. Existing nominal interface closure and invariant
+generic identity are reused: reordered composition bounds agree, but different
+bounds or union/intersection kinds do not become interchangeable interface arguments.
+Calls whose declared interface owner contains composition arguments are explicitly
+rejected until instantiated dispatch bodies receive their own validation. This is
+not a claim of general virtual/interface dispatch support for composition arguments.
+
+The executable Task probe uses the existing Raven-authored System library and
+constructs Promise<Response<Int32> | HttpError | JsonError>, retrieves its Task,
+checks GetAwaiter preserves identity and verifies IsCompleted is false. It exercises
+the actual Promise/Task/ArrayList constructors and pending-state methods, without
+altering or replacing that library. Both error classes are sealed union alternatives.
+This establishes construction and pending observation only. A completion probe
+reached the existing compound-local-address rejection in the instantiated library;
+Complete/GetResult, async suspension, source-authored composition signatures and
+open executable type parameters remain follow-up work.
+
+This retains .NET-style nominal generic interface contracts and task identity;
+the deliberate extension is native composition type arguments. Reusing interface
+closure avoids a second conformance model, but does not remove the need to validate
+dispatch and remaining substituted operations. Runtime Contract configuration and
+CLI bridge encoding are unchanged. The host/Raven metadata profile still excludes
+interface wrappers carrying composition arguments; no corresponding compiler or
+published/main capability is implied. Website proposal/planned status stays accurate.
+
+Focused checks cover inherited interface projection, direct concrete method calls,
+invariant casts and stores (also without verification), dispatch rejection and the
+real Task construction consumer. Ordinary class/interface inheritance and Task
+contract tests remain the controls; the default-off composition gates are retained.
+
+
+Validation: 32 composition tests, eight real-library Task tests, eleven interface
+inheritance tests and seven class-interface tests pass. Run with:
+
+```sh
+cargo test --features experimental-compositions --test structural_compositions --test tasks --test interface_inheritance --test class_interfaces
+```
+
+The Task consumer is
+`tests/tasks.rs::structural_union_task_construction_preserves_identity_and_pending_state`.
+The nested interface-bound admission assertion is also checked separately after
+moving that formerly unsupported shape to positive coverage.
+
+All three default-off serialized composition checks also pass.

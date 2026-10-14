@@ -1547,9 +1547,11 @@ fn check_type_context_seen(
             }
             if crate::compositions::contains(ty) {
                 crate::compositions::check_shape(ty)?;
-                if !def.is_reference_type || def.representation != Representation::Record {
+                if def.representation != Representation::Interface
+                    && (!def.is_reference_type || def.representation != Representation::Record)
+                {
                     return Err(Fault::new(
-                        "composition arguments require a reference class wrapper",
+                        "composition arguments require a reference class or interface wrapper",
                     ));
                 }
                 // Validate storage after substitution too: a declaration's T[] or T&
