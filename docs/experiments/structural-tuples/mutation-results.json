@@ -1,0 +1,19 @@
+{
+  "probe": "NeoClrMetadataProbe --source-tuples target/tuple-names-libraries-v2 target/tuple-mutation",
+  "probeExitCode": 0,
+  "interpreterExitCode": 42,
+  "coverage": [
+    "direct named local write",
+    "nested positional writeback",
+    "earlier copies unchanged",
+    "parameter-root mutation rejection",
+    "default gate and open element rejection"
+  ],
+  "sha256": {
+    "target/tuple-mutation/TupleMutation.neox": "fab3e2af2adc1d8ac87e710f3a1da81ab006e3c4a71f58a391455841e3a03b44",
+    "target/tuple-names-libraries-v2/System.Runtime.dll": "4903656b9e0abac7be3b949ce853344fe481a5b41d76a27506b1132b59f61a51",
+    "target/tuple-names-libraries-v2/System.runtime.neox": "98a1ae1da85387c87746957e83a4015eb59d0566539a915c69f168d2b511b190",
+    "target/debug/neoclr": "cd5ab9bf16065b27a12509bb339bf405aff504af52f43e32ef2ea0ba378c27b4",
+    "/Users/robert/Projects/raven-union-intersection/tools/NeoClrMetadataProbe/SourceTupleChecks.cs": "cc8cf372142feeac5d44aea9769a70b2b20fa643ed918922b57d16f2e96a3ae2"
+  }
+}

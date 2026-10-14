@@ -97,6 +97,7 @@ experimental Raven host option emits scalar/nested source tuples natively, inclu
 source-local named reads. Binding still depends on the nominal family. Native Rust
 signatures and host descriptors preserve element names without affecting type
 equality. C# authoring/import and Raven emission preserve those names. Guest `ElementNames` exposes per-signature names with positional defaults; names
-do not affect equality. Remaining compiler migration is pending. An explicit Raven host API
+do not affect equality. Local tuple element mutation supports nested writeback while preserving earlier
+copies. Remaining compiler migration is pending. An explicit Raven host API
 imports named scalar/nested tuples across library boundaries. See the
 [tuple API reference](/docs/tuples.md) for the current boundary.
