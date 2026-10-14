@@ -2121,3 +2121,11 @@ and snapshot. Its ordered effective-name snapshots retain per-signature metadata
 and supply ItemN for unnamed positions. The host nullable-name API remains distinct;
 see [tuple reference](tuples.md). Focused native query and guest reflection consumers
 validate renamed equal types and nested names.
+
+### Native compiler tuple binding — 2026-10-14
+
+The compiler-host `MetadataImportOptions.UseStructuralTuples` and
+`WithStructuralTuples(bool)` contract is documented manually in [tuples](tuples.md),
+with its emission gate and symbol semantics. These Raven APIs are not guest
+class-library types and are not selected for the neoCLR RavenDoc reference. No
+guest API/reference snapshot changed; the existing snapshot check still passes.

@@ -3930,8 +3930,8 @@ Raven source-local scalar/nested tuple lowering executes named/positional reads
 and copies (42). Native Rust signatures and host descriptors now preserve names
 without changing structural equality. C# authoring/import and Raven emission retain
 native names, and explicit Raven tuple imports execute across libraries (42). Guest
-name queries now preserve per-signature names with positional defaults. Raven local tuple mutation now preserves copies through nested writeback (42). Nonlocal mutation, project/catalog opt-in,
-carrier-independent binding, native layout/backends and nominal family removal
+name queries now preserve per-signature names with positional defaults. Raven local tuple mutation now preserves copies through nested writeback (42). Native structural binding now removes nominal carrier lookup, including nine-element execution (42). Nonlocal mutation, project/catalog opt-in,
+native layout/backends and removal of legacy runtime tuple declarations
 remain staged follow-ups on the experimental branches.
 
 ## Theme trackers

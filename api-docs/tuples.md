@@ -1,12 +1,14 @@
 # Tuple
 
-Raven source tuples currently use nominal generic value declarations,
-`System.Tuple<T1,...,TN>` for one through seven components. These remain nominal
-in introspection. The experimental native runtime also supports structural tuple
-signatures, values and `TupleTypeInfo` descriptors, documented below; source
-emission and nominal-family removal are still pending.
+The experimental native profile binds and emits Raven tuples as structural
+signatures, with native names, value copies and `TupleTypeInfo` introspection.
+It requires explicit compiler/runtime opt-in; see the native binding contract below.
 
-## Current representation
+The legacy CLI bridge still uses nominal generic `System.Tuple<T1,...,TN>` value
+declarations for one through seven components. These remain nominal in introspection
+and remain in the runtime library pending migration of existing consumers.
+
+## Legacy nominal representation
 
 `System.Tuple<T1,...,TN>` is neoCLR's value-tuple
 family, corresponding to .NET `System.ValueTuple`. One through seven components
@@ -159,3 +161,20 @@ C# authoring/reading/import and Raven native emission now preserve names; see
 queries and execution remain supported. Focused tests prove exact name roundtrips,
 equal identity/hash under renaming, name-preserving substitution, host descriptors,
 invalid-name rejection and interpreter parameter compatibility (result 42).
+
+## Raven native binding contract (development)
+
+Raven hosts now select `MetadataImportOptions.WithStructuralTuples()` alongside
+`NeoClrEmitOptions.AllowExperimentalTuples`. The binding option defaults to false
+and is neoCLR-only; the emitter requires both options. `ITupleTypeSymbol` exposes
+ordered fields and names with `UnderlyingTupleType == null`, no nominal declaration
+or constructors, and empty TypeArguments. Positional ItemN aliases are available.
+Names do not affect structural equality/hash; substitution preserves names. CLI
+emission rejects this profile. Ordinary .NET tuple APIs are unchanged.
+
+Local-rooted element mutation supports nested writeback and preserves copies;
+immutable let roots and nonlocal roots are rejected. The current native emitter
+still admits only closed scalar/nested elements. Legacy runtime tuple declarations
+remain for CLI bridge consumers but are not used by native structural binding.
+These are compiler-host contracts, documented in Raven's runtime-contract and
+neoCLR integration guides; they do not add a guest class-library API.

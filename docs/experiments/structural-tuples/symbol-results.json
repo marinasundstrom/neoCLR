@@ -1,0 +1,40 @@
+{
+  "profile": "WithStructuralTuples + AllowExperimentalTuples, experimental-tuples interpreter",
+  "sourceProbe": "PASS --source-tuples target/tuple-names-libraries-v2 target/structural-tuple-symbols",
+  "focusedTests": {
+    "before": 16,
+    "after": 20,
+    "failed": 0,
+    "filter": "StructuralTupleTypeSymbolTests | TupleTypeSemanticTests | NeoClrTupleTypeTests | TupleElementNamesAttributeEmissionTests",
+    "target": "net11.0"
+  },
+  "interpreterExitCodes": {
+    "CarrierFreeTuple": 42,
+    "TupleMutation": 42,
+    "TupleImportConsumer": 42
+  },
+  "coverage": [
+    "native symbols without references or nominal tuple definitions",
+    "9-element mutation without System.Tuple`9",
+    "ordered recursive identity/hash excludes names",
+    "type-parameter substitution preserves names",
+    "source/import names and positional access",
+    "immutable local, CLI, wrong target, mismatched binding/emission rejection",
+    "ordinary .NET nominal tuple regressions"
+  ],
+  "limitations": [
+    "closed scalar/nested emitter profile",
+    "local-rooted mutation only",
+    "legacy runtime tuple declarations retained for CLI consumers"
+  ],
+  "sha256": {
+    "target/debug/neoclr": "cd5ab9bf16065b27a12509bb339bf405aff504af52f43e32ef2ea0ba378c27b4",
+    "target/structural-tuple-symbols/CarrierFreeTuple.neox": "21955c651660695f8a8df40b935a0935c934d3bed8bb0882adbedfe755b99846",
+    "target/structural-tuple-symbols/TupleMutation.neox": "fab3e2af2adc1d8ac87e710f3a1da81ab006e3c4a71f58a391455841e3a03b44",
+    "target/structural-tuple-symbols/TupleLibrary.neox": "78bc158a6444e06ef02f5395d4e1a696eb882d7029f632198c089b5ceb4318a3",
+    "target/structural-tuple-symbols/TupleImportConsumer.neox": "17ca7d251b3a347a4e7cf76f09148c24330a78cdaf66743b54f2d485f82fa6df",
+    "target/tuple-names-libraries-v2/bundle.json": "dcc790800b658db19d7dd820d6db0c6f264765f920173660535d04397e6ac11f",
+    "/Users/robert/Projects/raven-union-intersection/tools/NeoClrMetadataProbe/SourceTupleChecks.cs": "94c0facc8a60fa402508cc942ef8fa980f59b23953ab2f1ebc01f5c545eaaacc",
+    "/Users/robert/Projects/raven-union-intersection/test/Raven.CodeAnalysis.Tests/Symbols/StructuralTupleTypeSymbolTests.cs": "5a18500e1ec843952eae539c63212dcb0d60f6d98b94dce7ad5881bb1f8069bd"
+  }
+}
