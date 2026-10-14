@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-14
 
+- Extend the source structural Task example to queued delivery for every union alternative. All six completed/queued awaits check payload type and value through native async state machines; no signature rewriting or nominal carrier is used.
+
 - Admit owned nongeneric interface calls through structurally constrained method parameters. Prove intersection traits and union-wide guarantees in the metadata builder/runtime verifier, retaining borrowed dispatch and nominal Self semantics. Add Raven execution and native positive/negative tests. Extend this to completed imported nongeneric targets, with a separate Raven library/consumer returning 42 and weak-union rejection. Also admit closed constructed imported targets with invariant argument checking; mismatched constructions and weak unions reject. Direct external bounds and open operands remain limited.
 
 - Prove forwarded generic method arguments from closed structural caller bounds, combining conjunctive nominal guarantees and preserving whole-union coverage. Reject absent/weaker bounds at emission and serialization; validate native and Raven wrapper execution. Open bound operands and owner-parameter forwarding remain unsupported.

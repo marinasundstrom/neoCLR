@@ -763,5 +763,20 @@
     "System.Data.PostgreSql.docs/invariant/symbols/M/853ad7c51ee9761173f85e95131c7d689f7d37207f511eba9ef282d8c4be589e.md": "5f38236656dc98d8ac48cfedd3caf8fb891fc218a5d07d968dd5db66d1774bef",
     "System.Data.PostgreSql.docs/invariant/symbols/T/af9401b84c0531ab87619468a23059e7ba7cbe25dcb760f01893974050e129dd.md": "1cbee2fd4fe660e9be43c9e448343687ccf9f41866935859b63f26d6503e908b",
     "System.Data.PostgreSql.docs/manifest.json": "26446e413267d36627c50f3507890cecac9100d609c6140ba96cb265c714ed72"
+  },
+  "queuedSourceDelivery": {
+    "exitCode": 0,
+    "stdout": "Source structural union Task delivery passed\n",
+    "stderr": "",
+    "profile": "Source-authored native signatures and native async state machines; no token substitutions",
+    "sha256": {
+      "target/debug/neoclr": "a5a512335059ed78cf2768785c77b18c6efc4dbdd42908f81818058a03a70b2d",
+      "target/source-union-pending-check/bin/neoclr/SourceComposition.dll": "b448fe670c6436f8227abb8e7e47f5dacd7c263139974fb8a2ba5246bfe981ab",
+      "docs/experiments/source-structural-unions/Main.rvn": "fc19aa863254165a6e8fd516010deda13d6f2220b166960e9310651a658e34c2",
+      "target/composition-info-libraries-v2/Core.dll": "3d4a676d379067c18a65a9beb8257ed40bf3196fc643a9ba1d559c619ec73fad",
+      "target/composition-info-libraries-v2/System.Runtime.dll": "f5c790a1aeb5f56d83a8b5903555a0889c1d84f19f9cc7158026531d6c2532c3",
+      "target/composition-info-libraries-v2/System.runtime.neox": "98a1ae1da85387c87746957e83a4015eb59d0566539a915c69f168d2b511b190"
+    },
+    "scope": "Three completed and three queued source-authored union awaits, preserving actual payload type and value"
   }
 }

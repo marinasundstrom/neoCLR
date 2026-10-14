@@ -13,6 +13,7 @@ include UnionTypeInfo/IntersectionTypeInfo. See results.json for artifact hashes
 
 The project explicitly disables the temporary generic Wait<T> bridge and uses native
 async state machines. Complete uses Promise<T>; generic-method specialization such as
-Task.FromResult<union> remains unsupported. This probe covers completed awaits;
-existing imported Task probes retain pending/GC evidence. CLI projection, mixed
+Task.FromResult<union> remains unsupported. This probe covers completed and queued awaits for all three alternatives;
+each checks the delivered payload type and value. Existing imported Task probes
+retain additional GC evidence. CLI projection, mixed
 nested bounds, open/value alternatives and JIT/AOT remain outside this profile.
