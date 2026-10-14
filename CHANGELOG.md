@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-14
 
+- Repair integrated codegen license paths in the dependency notice inventory. The source notice audit passes with the runtime-owned Cranelift license; historical benchmark/provenance records remain unchanged.
+
 - Simplify next-preview notes to current behavior and migration guidance following author feedback. Move candidate provenance and pending qualification into internal release tracking; retain concise user-relevant limits and document the distinction from implementation caveats. Preserve published release records.
 
 - Draft next-preview notes covering runtime-await, integrated components, HTTP/GC refinements, error composition and restored source links. Record migration requirements and pending package/source gates without changing published Preview 14 notes or claiming a new release.

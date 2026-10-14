@@ -9,7 +9,7 @@ maintain a second HTTP completion checklist here.
 
 Candidate SDK/VSIX build: `0.1.15-neoclr.20261014.1`; Raven native compiler:
 `fac4ac736024800151d6b285e68407ded864f655`. Preview 14 remains published.
-[Windows package qualification](https://github.com/marinasundstrom/neoCLR/actions/runs/38534244631)
+[Windows package qualification](https://github.com/marinasundstrom/neoCLR/actions/runs/38534235500)
 is running on `aff7c001b`; fresh macOS packaging is in progress.
 The [validation procedure](../next-preview-validation.md) owns the required checks.
 No new installation, release tag or website publication has occurred.

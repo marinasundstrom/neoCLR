@@ -330,7 +330,7 @@
       "checksum": "2ce81edaca6167d1f78da026afa92d7ff957a80aa82a79076e11cd34cde20165",
       "notices": [
         {
-          "path": "tools/aot-poc/CRANELIFT-LICENSE",
+          "path": "runtime/codegen/CRANELIFT-LICENSE",
           "sha256": "a6c48161a09acc75a0e25503bab66a731eb5fba5392ed4bb4743e4ba5085327a",
           "origin": "retained Wasmtime/Cranelift Apache-2.0 WITH LLVM-exception license"
         }
@@ -345,7 +345,7 @@
       "checksum": "4d0d51e12f958551165969c6e8767e1e461729f6c1ccae923b0ba1d5cbcbbbf8",
       "notices": [
         {
-          "path": "tools/aot-poc/CRANELIFT-LICENSE",
+          "path": "runtime/codegen/CRANELIFT-LICENSE",
           "sha256": "a6c48161a09acc75a0e25503bab66a731eb5fba5392ed4bb4743e4ba5085327a",
           "origin": "retained Wasmtime/Cranelift Apache-2.0 WITH LLVM-exception license"
         }
@@ -375,7 +375,7 @@
       "checksum": "ebb6f5d0df5bd0d02c63ec48e8f2e38a176b123f59e084f22caf89a0d0593e7e",
       "notices": [
         {
-          "path": "tools/aot-poc/CRANELIFT-LICENSE",
+          "path": "runtime/codegen/CRANELIFT-LICENSE",
           "sha256": "a6c48161a09acc75a0e25503bab66a731eb5fba5392ed4bb4743e4ba5085327a",
           "origin": "retained Wasmtime/Cranelift Apache-2.0 WITH LLVM-exception license"
         }
@@ -480,7 +480,7 @@
       "checksum": "cff02dcecae2e7e9c61b713f1fb46eabecdca9f55b49f99859ceb1a3e7f4a9cb",
       "notices": [
         {
-          "path": "tools/aot-poc/CRANELIFT-LICENSE",
+          "path": "runtime/codegen/CRANELIFT-LICENSE",
           "sha256": "a6c48161a09acc75a0e25503bab66a731eb5fba5392ed4bb4743e4ba5085327a",
           "origin": "retained Wasmtime/Cranelift Apache-2.0 WITH LLVM-exception license"
         }
@@ -555,7 +555,7 @@
       "checksum": "8c3d9071bc5ee5573e723d9d84a45b7025a29e8f2c5ad81b3b9d0293129541d9",
       "notices": [
         {
-          "path": "tools/aot-poc/CRANELIFT-LICENSE",
+          "path": "runtime/codegen/CRANELIFT-LICENSE",
           "sha256": "a6c48161a09acc75a0e25503bab66a731eb5fba5392ed4bb4743e4ba5085327a",
           "origin": "retained Wasmtime/Cranelift Apache-2.0 WITH LLVM-exception license"
         }
@@ -2025,7 +2025,7 @@
       "checksum": "8ea6b740d1a35f2cebfe88e013ac8a4a84ff8dabc3a392df920abf554e871cf2",
       "notices": [
         {
-          "path": "tools/aot-poc/CRANELIFT-LICENSE",
+          "path": "runtime/codegen/CRANELIFT-LICENSE",
           "sha256": "a6c48161a09acc75a0e25503bab66a731eb5fba5392ed4bb4743e4ba5085327a",
           "origin": "retained Wasmtime/Cranelift Apache-2.0 WITH LLVM-exception license"
         }
@@ -2040,7 +2040,7 @@
       "checksum": "62fa317691aedc64aae3a86b3d786e4b2b0007bc0b56e0b6098b8b5a85ab2134",
       "notices": [
         {
-          "path": "tools/aot-poc/CRANELIFT-LICENSE",
+          "path": "runtime/codegen/CRANELIFT-LICENSE",
           "sha256": "a6c48161a09acc75a0e25503bab66a731eb5fba5392ed4bb4743e4ba5085327a",
           "origin": "retained Wasmtime/Cranelift Apache-2.0 WITH LLVM-exception license"
         }
