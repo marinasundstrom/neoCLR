@@ -85,7 +85,7 @@ public sealed partial class NativeAssemblyDefinition
         var externalTokens = new Dictionary<(AssemblyIdentity, string, string, uint), uint>();
         AssemblyDefinition.NativeSignatureTypeRow Copy(SignatureType type)
         {
-            if (type.Tuple is { } tuple) return new(null, 0, TupleElements: tuple.ElementTypes.Select(Copy).ToArray());
+            if (type.Tuple is { } tuple) return new(null, 0, TupleElements: tuple.ElementTypes.Select(Copy).ToArray(), TupleNames: tuple.ElementNames.ToArray());
             if (type.Composition is { } composition) return new(null, 0, CompositionKind: composition.Kind, Constituents: composition.Constituents.Select(Copy).ToArray());
             if (type.FunctionSignature is { } function) return new(null, 0, Function: new(Copy(function.ReturnType), function.ParameterTypes.Select(Copy).ToArray()));
             if (type.PointerElement is { } pointer) return new(null, 0, Copy(pointer), IsPointer: true);

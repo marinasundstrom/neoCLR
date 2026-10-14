@@ -96,6 +96,6 @@ Guest `TupleTypeInfo.ElementTypes` exposes ordered recursive snapshots. An expli
 experimental Raven host option emits scalar/nested source tuples natively, including
 source-local named reads. Binding still depends on the nominal family. Native Rust
 signatures and host descriptors preserve element names without affecting type
-equality. C#/Raven name wiring, guest name queries and remaining compiler migration
-are pending. See the
+equality. C# authoring/import and Raven emission preserve those names. Guest name
+queries, Raven tuple imports and remaining compiler migration are pending. See the
 [tuple API reference](/docs/tuples.md) for the current boundary.

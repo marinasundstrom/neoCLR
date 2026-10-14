@@ -128,7 +128,8 @@ The existing one-to-256-element and nesting checks still apply during normalizat
 
 Named signatures encode as `{"Tuple":{"elements":["Int32","Int32"],"names":["x","y"]}}`.
 Unnamed signatures retain `{"Tuple":["Int32","Int32"]}`. Matching native readers are
-required for the new object payload; older C# readers currently reject it. This is
+required for the new object payload; the updated experimental C# reader supports
+it while older readers reject it. This is
 direct signature metadata, without a nominal carrier or tuple-name attribute.
 
 Equality/hashing of TupleSignature and Type ignore names recursively; TypeIdentity
@@ -145,8 +146,9 @@ declared names with the existing `ItemN` fallback.
 Unlike the CLR's ValueTuple/name-attribute representation, native names need no
 attribute decoding. The cost is an expanded signature payload and explicit separation
 of descriptive metadata from equality. This slice adds host inspection, not a new
-guest API: guest name queries, C# builder/reader names, Raven name emission/import
-and named assembler syntax remain follow-ups. Existing positional guest element
+guest API: guest name queries, Raven tuple import and named assembler syntax remain follow-ups.
+C# authoring/reading/import and Raven native emission now preserve names; see
+[the C# contract](experimental-metadata.md#native-tuple-names-in-c-authoringimport-2026-10-14-development). Existing positional guest element
 queries and execution remain supported. Focused tests prove exact name roundtrips,
 equal identity/hash under renaming, name-preserving substitution, host descriptors,
 invalid-name rejection and interpreter parameter compatibility (result 42).

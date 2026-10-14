@@ -263,3 +263,33 @@ the earlier source-local test does not yet emit names.
 
 [Native-name validation](experiments/structural-tuples/name-results.json) records
 the focused test counts, commands and source hashes.
+
+
+### Native tuple names: C# and Raven emission — 2026-10-14
+
+The C# tuple builder now accepts ordered optional names; native writing, experimental
+reading and callable import preserve them recursively. Names remain excluded from
+SignatureType/TupleSignature equality and hashing. Per-signature descriptors retain
+different names on structurally equal parameters and results; admission sets do not
+intern away those names. Unnamed encoding remains compatible, and the explicit
+experimental reader/CLI-output gates remain in place.
+
+Raven's existing `NeoClrEmitOptions.AllowExperimentalTuples` host opt-in now emits
+element names directly in native Tuple payloads. It emits each bound element's
+effective name, including default `ItemN` names. A parameter `(left: int, right: int)`
+and result `(x: int, y: int)` retain their respective names and remain type-equal.
+No name attributes or nominal carriers are emitted. Runtime Contract settings and
+ordinary .NET behavior are unchanged; no CLI/project option is added.
+
+The C# separate producer/consumer and Raven source-local consumer both execute with
+result 42 on the matching `experimental-tuples` runtime. Checks cover recursive name
+preservation, rename equality/hash, immutable input, invalid names/serialized shapes,
+ordinary-reader rejection and unsupported-source gates. Raven native tuple import
+and guest name queries still require separate implementation. Nominal tuple symbols
+remain a binding dependency; tuple mutation/open elements remain outside this
+compiler profile. The tested library bundle remains `target/tuple-info-libraries-v2`
+from compiler `793219d855b17f01fb805e215968b78871eb3804`; emitting compiler and runtime
+remain on their dedicated structural feature branches.
+
+[Emitted-name validation](experiments/structural-tuples/emitted-name-results.json)
+records both executable outcomes, source/image hashes and commands.

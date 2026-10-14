@@ -9000,3 +9000,32 @@ local remains unchanged. Negative checks reject malformed operand signatures,
 indices, receivers, constructor elements and replacement values. This supersedes the
 earlier fixture limitation that only tuple-forwarding signatures were verified.
 Raven lowering remains a subsequent compiler slice.
+
+
+## Native tuple names in C# authoring/import (2026-10-14 development)
+
+`AssemblyBuilder.CreateExperimentalTuple(SignatureType[] elements, string?[] elementNames)`
+copies both arrays and preserves native element names. `TupleSignature.ElementNames`
+is an immutable ordered `IReadOnlyList<string?>`; empty means all elements are unnamed.
+The original `params SignatureType[]` overload remains supported and emits the original
+unnamed array payload. The named overload uses the native `{ elements, names }` payload.
+
+A nonempty name array must match element count. Each present name must be nonempty,
+NUL-free, valid UTF-16 representable as UTF-8, at most 1024 UTF-8 bytes and unique among
+effective names (unnamed positions use `ItemN`). Invalid names/counts throw
+ArgumentException; null arrays throw ArgumentNullException. Existing element
+ownership, closedness, nesting and node-budget rules still apply.
+
+Names do not affect TupleSignature or SignatureType equality/hashing. Named and
+unnamed tuples of the same ordered element types remain equal. The builder preserves
+each descriptive signature independently; callers must not use type equality to
+assert that names survived a round trip. `ReadExperimentalTupleAssembly` and
+`ImportExperimentalTupleReference` preserve names recursively, including differently
+named parameters/results with equal structural types. Native snapshots expose names
+through `MethodDefinition.TryGetSignature`. Invalid named shapes are rejected;
+ordinary readers and CLI output continue rejecting tuple contracts.
+
+Compared with CLR ValueTuple plus TupleElementNamesAttribute, this stores names in
+the signature itself. New named payloads need matching tools; old unnamed payloads
+remain readable. Guest reflection name APIs and Raven native tuple import are not
+added here. The C# imported-call consumer returns 42 with named nested tuple values.

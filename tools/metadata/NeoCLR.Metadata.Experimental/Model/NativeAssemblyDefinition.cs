@@ -500,10 +500,18 @@ public sealed partial class NativeAssemblyDefinition
                     }
                     return ReadPrimitive(element.GetString(), allowVoid);
                 }
-                if (element.TryGetProperty("Tuple", out _))
+                if (element.TryGetProperty("Tuple", out var tupleShape))
                 {
                     Require(allowExperimentalTuples && element.EnumerateObject().Count() == 1, "experimental tuple is disabled or malformed");
-                    return signatureGraph.CreateExperimentalTuple(Array(element, "Tuple", 256).Select(t => ReadType(t, false)).ToArray());
+                    if (tupleShape.ValueKind == JsonValueKind.Array)
+                        return signatureGraph.CreateExperimentalTuple(Array(element, "Tuple", 256).Select(t => ReadType(t, false)).ToArray());
+                    Require(tupleShape.ValueKind == JsonValueKind.Object && tupleShape.EnumerateObject().Count() == 2 && tupleShape.TryGetProperty("elements", out _) && tupleShape.TryGetProperty("names", out _), "malformed named tuple");
+                    var tupleNames = Array(tupleShape, "names", 256).Select(n =>
+                    {
+                        Require(n.ValueKind is JsonValueKind.String or JsonValueKind.Null, "invalid tuple name");
+                        return n.ValueKind == JsonValueKind.Null ? null : n.GetString();
+                    }).ToArray();
+                    return signatureGraph.CreateExperimentalTuple(Array(tupleShape, "elements", 256).Select(t => ReadType(t, false)).ToArray(), tupleNames);
                 }
                 if (element.TryGetProperty("Union", out _) || element.TryGetProperty("Intersection", out _))
                 {

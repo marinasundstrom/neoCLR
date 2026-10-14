@@ -27,7 +27,7 @@ internal static class TupleImportChecks
         var core = new AssemblyIdentity("Core", new Version(1, 0, 0, 0));
         var consumer = new AssemblyBuilder(new("TupleConsumer", new Version(1, 0, 0, 0)), core);
         Reject(() => consumer.ImportReference(echo, core));
-        foreach (var name in new[] { "Echo", "EchoClosed" })
+        foreach (var name in new[] { "Echo", "EchoClosed", "EchoNamed" })
         {
             var imported = consumer.ImportExperimentalTupleReference(snapshot.MainModule.Functions.Single(m => m.Name == name), core);
             var wrapper = consumer.AddFunction(name, imported.Signature);
@@ -36,7 +36,8 @@ internal static class TupleImportChecks
         // Importing once must not make the ordinary API admit tuples through its cache.
         Reject(() => consumer.ImportReference(echo, core));
         var main = consumer.AddFunction("Main");
-        var callable = consumer.ImportExperimentalTupleReference(echo, core);
+        var callable = consumer.ImportExperimentalTupleReference(snapshot.MainModule.Functions.Single(m => m.Name == "EchoNamed"), core);
+        CheckNames(callable.Signature);
         var tuple = callable.Signature.ReturnType;
         var pair = tuple.Tuple!.ElementTypes[0];
         var original = main.DeclareLocal(tuple);
@@ -57,6 +58,8 @@ internal static class TupleImportChecks
         var reread = AssemblyDefinition.ReadExperimentalTupleAssembly(NativeModuleContainer.WriteBinary(consumerImage));
         if (!reread.MainModule.Functions.Single(m => m.Name == "Echo").TryGetSignature(out var copied) || copied!.ReturnType != signature.ReturnType)
             throw new Exception("imported tuple signature changed");
+        if (!reread.MainModule.Functions.Single(m => m.Name == "EchoNamed").TryGetSignature(out var namedCopy)) throw new Exception("named echo missing");
+        CheckNames(namedCopy!);
         var third = new AssemblyBuilder(new("TupleThird", new Version(1, 0, 0, 0)), core);
         var external = reread.MainModule.Functions.Single(m => m.Name == "EchoClosed");
         Reject(() => third.ImportExperimentalTupleReference(external, core));
@@ -64,7 +67,10 @@ internal static class TupleImportChecks
         if (resolved.Signature.ReturnType.Tuple?.ElementTypes[0].ImportedType?.TypeArguments.Count != 1)
             throw new Exception("resolved external generic tuple element lost");
         var json = JsonNode.Parse(NativeModuleContainer.Read(image))!;
-        foreach (var invalid in new JsonNode[] { new JsonArray(), new JsonArray("Void"), new JsonArray(new JsonObject { ["MethodTypeParameter"] = 0 }) })
+        foreach (var invalid in new JsonNode[] { new JsonArray(), new JsonArray("Void"), new JsonArray(new JsonObject { ["MethodTypeParameter"] = 0 }),
+            JsonNode.Parse("""{"elements":["Int32"],"names":[1]}""")!,
+            JsonNode.Parse("""{"elements":["Int32"],"names":["x","y"]}""")!,
+            JsonNode.Parse("""{"elements":["Int32"],"names":["x"],"extra":true}""")! })
         {
             var changed = json.DeepClone();
             changed["functions"]![0]!["returns"] = new JsonObject { ["Tuple"] = invalid.DeepClone() };
@@ -72,6 +78,14 @@ internal static class TupleImportChecks
         }
         CheckInvalidOperations(core);
         Console.WriteLine("PASS native tuple snapshots, imports and value operations");
+    }
+    private static void CheckNames(MethodSignature signature)
+    {
+        if (signature.ReturnType != signature.ParameterTypes[0] ||
+            !signature.ReturnType.Tuple!.ElementNames.SequenceEqual(new string?[] { "payload", "offset", null }) ||
+            !signature.ParameterTypes[0].Tuple!.ElementNames.SequenceEqual(new string?[] { "data", "position", "unused" }) ||
+            !signature.ReturnType.Tuple.ElementTypes[0].Tuple!.ElementNames.SequenceEqual(new[] { "count", "text" }))
+            throw new Exception("per-signature names lost across snapshot/import");
     }
     private static void CheckInvalidOperations(AssemblyIdentity core)
     {

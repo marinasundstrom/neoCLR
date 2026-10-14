@@ -3,7 +3,23 @@ namespace NeoCLR.Metadata.Experimental.Model;
 /// <summary>An ordered, immutable native structural tuple signature with value semantics.</summary>
 public sealed class TupleSignature : IEquatable<TupleSignature>
 {
-    internal TupleSignature(SignatureType[] elements) => ElementTypes = Array.AsReadOnly(elements.ToArray());
+    internal TupleSignature(SignatureType[] elements, string?[]? names = null)
+    {
+        names ??= [];
+        if (names.Length != 0 && names.Length != elements.Length) throw new ArgumentException("tuple names must match element count", nameof(names));
+        var seen = new HashSet<string>(StringComparer.Ordinal);
+        var utf8 = new System.Text.UTF8Encoding(false, true);
+        for (var i = 0; i < names.Length; i++)
+        {
+            if (names[i] is { } name && (name.Length == 0 || name.Contains('\0') || utf8.GetByteCount(name) > 1024))
+                throw new ArgumentException("tuple names must be nonempty, NUL-free and at most 1024 UTF-8 bytes", nameof(names));
+            if (!seen.Add(names[i] ?? $"Item{i + 1}")) throw new ArgumentException("tuple names must be unique", nameof(names));
+        }
+        ElementTypes = Array.AsReadOnly(elements.ToArray());
+        ElementNames = Array.AsReadOnly(names.ToArray());
+    }
+    /// <summary>Gets native names by position; empty means all elements are unnamed. Names do not affect equality or hashing.</summary>
+    public IReadOnlyList<string?> ElementNames { get; }
     /// <summary>Gets positional element signatures, preserving duplicates and nesting.</summary>
     public IReadOnlyList<SignatureType> ElementTypes { get; }
     /// <summary>Compares elements in order; a one-element tuple is not its element.</summary>
@@ -33,7 +49,7 @@ public sealed partial class AssemblyBuilder
     internal bool AdmitsTuple(TupleSignature tuple) => experimentalTuples.Contains(tuple);
     private void ValidateAuthoredTuples()
     {
-        foreach (var tuple in experimentalTuples.ToArray()) CreateExperimentalTuple(tuple.ElementTypes.ToArray());
+        foreach (var tuple in experimentalTuples.ToArray()) CreateExperimentalTuple(tuple.ElementTypes.ToArray(), tuple.ElementNames.ToArray());
     }
 
     /// <summary>Creates and admits a closed structural tuple for native signatures and storage.</summary>
@@ -42,8 +58,18 @@ public sealed partial class AssemblyBuilder
     /// <exception cref="ArgumentNullException">The element array is null.</exception>
     /// <exception cref="ArgumentException">An element is foreign, open, unsupported, or exceeds resource limits.</exception>
     /// <remarks>Native-only. Supports scalars, closed nominal types and nested tuples; excludes Void, erased Value, handles, borrows, arrays, pointers, functions and compositions. Maximum nesting is 16 and the validation budget is 4096 nodes.</remarks>
-    public SignatureType CreateExperimentalTuple(params SignatureType[] elements)
+    public SignatureType CreateExperimentalTuple(params SignatureType[] elements) => CreateExperimentalTuple(elements, []);
+
+    /// <summary>Creates a native tuple retaining element names independently of structural equality.</summary>
+    /// <param name="elements">One to 256 ordered element signatures, copied.</param>
+    /// <param name="elementNames">Empty for unnamed elements, or one optional name per element, copied.</param>
+    /// <returns>An output-owned native tuple signature.</returns>
+    /// <exception cref="ArgumentNullException">An array is null.</exception>
+    /// <exception cref="ArgumentException">Elements are unsupported or names have invalid count, duplicate effective names, empty/NUL content, invalid UTF-16 or more than 1024 UTF-8 bytes.</exception>
+    /// <remarks>Names are native metadata, not attributes; CLI projection remains unsupported.</remarks>
+    public SignatureType CreateExperimentalTuple(SignatureType[] elements, string?[] elementNames)
     {
+        ArgumentNullException.ThrowIfNull(elementNames);
         ArgumentNullException.ThrowIfNull(elements);
         if (elements.Length is < 1 or > 256) throw new ArgumentException("tuple requires one to 256 elements", nameof(elements));
         var nodes = 0;
@@ -60,7 +86,7 @@ public sealed partial class AssemblyBuilder
             throw new ArgumentException("tuple requires scalar, closed nominal or nested tuple elements", nameof(elements));
         }
         foreach (var element in elements) Validate(element);
-        var shape = new TupleSignature(elements);
+        var shape = new TupleSignature(elements, elementNames);
         experimentalTuples.Add(shape);
         return SignatureType.FromTuple(shape);
     }

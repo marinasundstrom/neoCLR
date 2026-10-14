@@ -2101,3 +2101,9 @@ The Rust host `metadata::TupleSignature` constructor/accessors and
 [tuple reference](tuples.md#native-tuple-element-names-2026-10-14-development).
 They are excluded from RavenDoc because they are Rust host APIs, not guest Raven
 types. No guest reference assembly or snapshot signatures change in this slice.
+
+
+The C# named `CreateExperimentalTuple` overload and `TupleSignature.ElementNames`
+are covered in [native tuple names](experimental-metadata.md#native-tuple-names-in-c-authoringimport-2026-10-14-development).
+They remain host metadata APIs outside RavenDoc's guest reference assembly; no
+guest API snapshot signatures change in this slice.

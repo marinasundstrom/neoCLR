@@ -36,6 +36,16 @@ internal static class AuthoredTupleChecks
         Reject(() => builder.CreateExperimentalTuple(box.MakeGenericInstance(SignatureType.TypeParameter(0))));
         var closedEcho = builder.AddFunction("EchoClosed", new MethodSignature(closed, [closed]));
         closedEcho.LoadArgument(0); closedEcho.Return();
+        string?[] names = ["count", "text"];
+        var namedPair = builder.CreateExperimentalTuple([PrimitiveType.Int32, PrimitiveType.String], names);
+        names[0] = "changed";
+        if (namedPair.Tuple!.ElementNames[0] != "count" || namedPair != pair || namedPair.GetHashCode() != pair.GetHashCode()) throw new Exception("names affected identity or retained mutable input");
+        var named = builder.CreateExperimentalTuple([namedPair, PrimitiveType.Int32, PrimitiveType.Int32], ["payload", "offset", null]);
+        var renamed = builder.CreateExperimentalTuple([pair, PrimitiveType.Int32, PrimitiveType.Int32], ["data", "position", "unused"]);
+        var namedEcho = builder.AddFunction("EchoNamed", new MethodSignature(named, [renamed]));
+        namedEcho.LoadArgument(0); namedEcho.Return();
+        foreach (var invalidNames in new string?[][] { ["only"], ["", null], ["x", "x"], ["Item2", null], ["x\0y", null], [new string('é', 513), null], ["\ud800", null] })
+            Reject(() => builder.CreateExperimentalTuple([PrimitiveType.Int32, PrimitiveType.Int32], invalidNames));
         File.WriteAllBytes(Path.Combine(output, "AuthoredTuples.neox"), NativeModuleContainer.WriteBinary(builder.WriteNativeAssembly()));
         Reject(() => builder.CreateExperimentalTuple(Enumerable.Repeat<SignatureType>(PrimitiveType.Int32, 257).ToArray()));
         foreach (SignatureType invalid in new SignatureType[] { PrimitiveType.Void, PrimitiveType.RuntimeTypeHandle, SignatureType.TypeParameter(0), SignatureType.ArrayOf(PrimitiveType.Int32), SignatureType.ByReference(PrimitiveType.Int32) }) Reject(() => builder.CreateExperimentalTuple(invalid));

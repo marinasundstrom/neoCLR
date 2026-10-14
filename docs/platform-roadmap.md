@@ -3928,7 +3928,8 @@ tuple shapes with CLI rejection. C# construction/element operations execute nest
 tuples across imported calls with copy semantics;
 Raven source-local scalar/nested tuple lowering executes named/positional reads
 and copies (42). Native Rust signatures and host descriptors now preserve names
-without changing structural equality. C#/Raven name wiring, guest name queries, compiler imports/mutation,
+without changing structural equality. C# authoring/import and Raven emission now retain native names. Guest name queries,
+Raven tuple imports/mutation,
 carrier-independent binding, native layout/backends and nominal family removal
 remain staged follow-ups on the experimental branches.
 
