@@ -35,6 +35,16 @@ generated static owner. Retained HTTP still stops at the
 `RuntimeAsyncStartManaged` contract when built through its explicit bootstrap root.
 These are separate from the passing packaged JSON and HTTP consumers.
 
+The [editor qualification record](../validation/release-20261014/editor-validation.json)
+records all 26 macOS editor checks, native and .NET inlay regressions, matching
+SDK/VSIX language-server payloads and fresh extracted default-JIT acceptance.
+The inlay failure was fixed on Raven main and carried separately to its native
+branch. The updated `.2` Windows candidate includes that regression; the original
+`.1` package has passed runtime/JSON/HTTP qualification and is completing editor
+acceptance. Canonical source/host checks and Windows JIT HTTP/HTTPS now pass.
+Installation/publication still awaits the updated Windows candidate and final
+matching-asset review. The retained-bootstrap probe remains an internal gap.
+
 The earlier [failed candidate](../validation/release-20261014/candidate.json) is
 retained for provenance. It is superseded by the inline-value fix, not rewritten.
 

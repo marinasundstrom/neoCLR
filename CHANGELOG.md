@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-14
 
+- Record the fixed VSIX passing all 26 macOS editor checks plus native and ordinary .NET inlay stability probes, with matching SDK server payloads. Retain passing source/host and Windows JIT HTTP/HTTPS evidence. Updated Windows editor/package qualification remains pending; no normal-profile installation or publication occurred.
+
 - Resolve the introspection and JSON parity fixtures’ reflection roots by type name after compilation. Fixed artifact identities had drifted onto the generated static owner; regenerate roots instead of requesting construction of that owner. Update the executable probe instructions. Both introspection and the expanded nested-object/collection/JSON-node consumer pass native/interpreter parity on macOS.
 
 - Add packaged VS Code inlay stability checks for comment edits and concurrent visible ranges. The original candidate loses one concurrent range; Raven main 6a2c55db4 fixes range-scoped supersession, carried to the native branch as 793219d85. The rebuilt `.2` VSIX passes the focused macOS repro. Advance the Windows candidate pin and include the regression in editor acceptance; hosted validation remains required.

@@ -1,0 +1,62 @@
+{
+  "date": "2026-10-14",
+  "runtimeCodeRevision": "89724ddd4935b43e3980f5b2b82339cc8d3ffb2f",
+  "ravenCompilerRevision": "fac4ac736024800151d6b285e68407ded864f655",
+  "ravenExtensionRevision": "793219d855b17f01fb805e215968b78871eb3804",
+  "generalFixOnRavenMain": "6a2c55db4",
+  "vsix": {
+    "path": "target/release-packages-20261014/raven-vscode-inlay-fixed.vsix",
+    "sha256": "34bb6f0e58285d36d9fe0ffe4d7fea791e257f793d77d9f09acca5bc32d80ef5",
+    "version": "0.1.15-neoclr.20261014.2",
+    "matchingSdkLanguageServerFiles": 87
+  },
+  "macOS": {
+    "extractedBundle": {
+      "path": "target/release-final-inline-extracted-acceptance-20261014b.json",
+      "sha256": "9765a8908bb57c7743b13978d7555345d2850f611970b22a4305240c569611eb",
+      "passed": true
+    },
+    "editor": {
+      "path": "target/release-editor-fixed-20261014/vscode-acceptance.json",
+      "sha256": "0e337db267595227016177d2a6209bd03e7a38992c0ad509c926ded8bd445cb7",
+      "passed": true
+    },
+    "nativeInlays": {
+      "path": "target/release-editor-20261014/vscode-inlay-fixed-package.json",
+      "sha256": "9cb47ad135f969223e3b90c44351613d6e2cf04e033a817225811c6056d26d7c",
+      "passed": true
+    },
+    "dotnetInlays": {
+      "path": "target/release-editor-fixed-20261014-dotnet/vscode-inlay-acceptance.json",
+      "sha256": "05ab70d3388b9094a5af050bad9e370c5910cf6bbf8619c8e57351d78e6cbae2",
+      "passed": true
+    },
+    "failingInlayBaseline": {
+      "path": "target/release-editor-20261014/vscode-inlay-before.json",
+      "sha256": "f7058e3073b11c1b1472be8ed8dd0dbced2225f31c6582ba4b85312d2295b9a2",
+      "passed": false
+    },
+    "collections": {
+      "path": "target/release-inline-collections-20261014/report.json",
+      "sha256": "6156182a051c64285a26ed32fbf6a6cb229b8811eb9b41cf44788e4baa34e760",
+      "passed": true
+    },
+    "reflectionAndJson": {
+      "path": "target/release-inline-json-control-20261014b/report.json",
+      "sha256": "9fbdfd7ca2916539253e805f26e6b660be621bf31c0f1ec4fb5d9f4ac1d057bd",
+      "passed": true
+    }
+  },
+  "hostedPassed": {
+    "sourceAndHosts": "https://github.com/marinasundstrom/neoCLR/actions/runs/38540056084",
+    "windowsJitHttp": "https://github.com/marinasundstrom/neoCLR/actions/runs/38539119108",
+    "windowsHttps": "https://github.com/marinasundstrom/neoCLR/actions/runs/38539118878"
+  },
+  "pending": {
+    "originalWindowsPackage": "https://github.com/marinasundstrom/neoCLR/actions/runs/38539514281",
+    "updatedWindowsPackageAndInlays": "https://github.com/marinasundstrom/neoCLR/actions/runs/38542979837",
+    "windowsTlsFixtureRepair": "https://github.com/marinasundstrom/neoCLR/actions/runs/38542979875"
+  },
+  "installedIntoNormalProfile": false,
+  "published": false
+}
