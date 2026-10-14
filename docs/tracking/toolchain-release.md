@@ -31,8 +31,8 @@ Additional source parity fixtures need review: their interpreter controls now se
 that execution mode explicitly, and the local collections/imported-init gate passes
 (`target/release-inline-collections-20261014/report.json`). The introspection/JSON controls now also pass locally after regenerating
 reflection roots from the compiled artifact; the stale roots had selected a
-generated static owner. Retained HTTP still stops at the
-`RuntimeAsyncStartManaged` contract when built through its explicit bootstrap root.
+generated static owner. Retained HTTP now binds and pumps runtime async for its explicit bootstrap root;
+all three local parity/cleanup cases pass. Fresh Windows qualification remains pending.
 These are separate from the passing packaged JSON and HTTP consumers.
 
 The [editor qualification record](../validation/release-20261014/editor-validation.json)
@@ -43,7 +43,7 @@ branch. The updated `.2` Windows candidate includes that regression; the origina
 `.1` package passes three-mode JSON, 132 HTTP checks, 21 runtime-await cases,
 GC validation and all 26 editor checks. Canonical source/host checks and Windows JIT HTTP/HTTPS now pass.
 Installation/publication still awaits the updated Windows candidate and final
-matching-asset review. The retained-bootstrap probe remains an internal gap.
+matching-asset review. The retained-bootstrap repair awaits its Windows gate.
 
 The earlier [failed candidate](../validation/release-20261014/candidate.json) is
 retained for provenance. It is superseded by the inline-value fix, not rewritten.

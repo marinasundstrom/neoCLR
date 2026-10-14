@@ -14,7 +14,7 @@ python3 scripts/build-native-project.py --profile http \
   --bootstrap-root Bootstrap \
   --project docs/experiments/retained-http/Native.rvnproj \
   --bundle /absolute/path/to/development/bundle \
-  --aot tools/aot-poc/target/debug/neoclr-aot-poc \
+  --aot target/debug/neoclr-codegen \
   --output target/retained-http-build
 ```
 
@@ -33,11 +33,12 @@ Raven semantics, Runtime Contract configuration and CLI emission are unchanged.
 The ordinary project entry and all builds without this option retain their behavior.
 
 The exchange uses `await`. `Dispatch` is the one deliberate synchronous adapter: the
-current C callback ABI returns unit, so it starts `Exchange` and the host drives the
-existing queue/socket completion loop. Idle queue plus no pending socket operations
-is sufficient for this closed consumer; it is **not** a general task-completion
-contract. Exporting/observing an async result is still needed for arbitrary tasks,
-external completion sources and scheduling integration.
+current C callback ABI returns unit, so it starts `Exchange` and retains the returned
+Task in the session. The host pumps runtime suspension/resumption and scheduler
+deliveries before the next dispatch. Runtime async is bound even when selecting an
+explicit bootstrap root. The compiler-state-machine path retains its queue/socket
+pump. Exporting/observing an async result is still needed for arbitrary tasks and
+external completion sources; this remains a closed, sequential consumer.
 
 The socket and task scopes live for the whole session. Bootstrap creates no task
 queue or pending operations, allowing exclusive callback adoption. On success or
@@ -67,10 +68,10 @@ python3 scripts/validate-retained-http.py \
 The Windows action obtains the pinned compiler bundle and rebuilds current libraries.
 Both platforms run the same cases: three requests, fragmented requests and a handler
 fault after one success. Native and interpreter responses, completion counts, exit
-codes and guest fault frames must match. The interpreter additionally records its
-outer DrainEntryTasks/async-entry frames, which do not exist for a quiescent native
-host dispatch. The gate checks exactly those two expected frames against the
-artifact entry name and retains both complete traces. The native executable runs alone without managed-runtime
+codes and terminal fault identity must match. Each fault trace must contain the
+Respond handler; engine-specific metadata spellings and outer frames may differ.
+The gate retains both complete traces rather than requiring obsolete
+compiler-state-machine entry frames. The native executable runs alone without managed-runtime
 search paths. The host checks session cleanup; the test checks listener shutdown.
 Reports retain source, toolchain and artifact hashes. See
 [qualification evidence](../../native-retained-http-validation.json). All three cases
@@ -107,3 +108,13 @@ inputs (allowing checkout line endings). Isolated executable hashes match the bu
 outputs; the reused-client host was linked directly in its isolation directory.
 The native executables depend on KERNEL32/WS2_32. These runs predate the init-accessor
 compiler update and qualify the matching-interpreter repair specifically.
+
+## Runtime-await integration — 2026-10-14
+
+All three cases pass on macOS ARM64 with the current runtime-await compiler and
+matching libraries (`target/release-retained-runtime-await-20261014d/report.json`).
+The host collects between exchanges, shuts down suspended execution before leaving
+service scopes, and requires complete session reclamation. Bootstrap leaves the
+nullable Task owner empty so exclusive adoption occurs before asynchronous work.
+Fresh Windows qualification for this change remains required; earlier Windows
+results above cover their recorded revisions.

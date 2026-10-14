@@ -266,8 +266,7 @@ def build(project, bundle, aot, output, profile=PROFILE, bootstrap_root=None, re
         if not kit_path.exists():
             flags += ['--bind-cryptography', '--bind-tls']
         flags += ['--bind-scheduler', '--bind-task-queue', '--bind-timers']
-        if not bootstrap_root:
-            flags += ['--bind-runtime-async']
+        flags += ['--bind-runtime-async']
         if http:
             flags += [
                       '--bind-socket-listener', '--bind-socket-accept', '--bind-socket-transfer', '--bind-socket-client']

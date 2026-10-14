@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-14
 
+- Bind runtime async for retained HTTP bootstrap hosts, retain each exchange Task, pump suspension/resumption and shut down async execution before session teardown. Check terminal fault identity and handler frames without obsolete state-machine wrapper assumptions. All three macOS native/interpreter wire and cleanup cases pass; Windows requalification remains pending.
+
 - Make the unified runtime the headline of the next-preview notes: integrated interpreter/JIT execution, GC and scheduler/suspension, with native AOT as the publishing target and preserved component boundaries. Record the author's release direction; published notes remain unchanged.
 
 - Record the original Windows candidate passing three-mode JSON, 132 HTTP checks, 21 runtime-await cases, GC validation and all 26 editor checks. Keep the inlay-fixed `.2` candidate distinct and pending its own packaged qualification.

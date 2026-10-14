@@ -8,6 +8,7 @@ import System.Web.Http.*
 class HttpSession {
     private val server: HttpServer
     private var count: int = 0
+    private var pending: Task<()>? = null
 
     init(server: HttpServer) {
         self.server = server
@@ -35,8 +36,9 @@ class HttpSession {
 
     func Dispatch() {
         // The private C export accepts a synchronous unit callback. It starts one
-        // exchange; the host owns and drains its continuations before dispatching again.
-        _ = Exchange()
+        // exchange. Retain its owner while the host pumps runtime suspension and
+        // scheduler deliveries before dispatching again.
+        pending = Exchange()
     }
 
     func Close() {

@@ -160,16 +160,20 @@ def main():
                          b'Content-Type: text/plain; charset=utf-8\r\n\r\nRequest ' + str(n).encode()).hex()
                         for n in range(1, 4)]
             reference = dict(row['interpreter'])
+            native = dict(row['native'])
             if name == 'fault-after-success':
-                # The same guest frames fault under different outer lifetimes:
-                # interpreter async Main versus a quiescent native host dispatch.
-                tail = ('   at System.Runtime.CompilerServices.RuntimeServices.DrainEntryTasks [instruction 0]\n'
-                        + '   at ' + module['entry'] + ' [instruction 1]\n')
-                if not reference['stderr'].endswith(tail):
-                    raise ValueError('Unexpected interpreter fault boundary')
-                reference['stderr'] = reference['stderr'][:-len(tail)]
-                row['expectedInterpreterBoundary'] = tail
-            if row['native'] != reference:
+                # Engines render native metadata names differently and runtime-await
+                # no longer adds the old compiler-state-machine entry frames.
+                for outcome in (reference, native):
+                    lines = outcome['stderr'].splitlines()
+                    handler_names = ('.Respond [', '.M_' + 'Respond'.encode().hex().upper() + ' [')
+                    if (len(lines) < 2 or lines[0] != 'UserFault: Retained HTTP handler fault'
+                            or any(not line.startswith('   at ') for line in lines[1:])
+                            or not any(name in line for name in handler_names for line in lines[1:])):
+                        raise ValueError('Missing terminal fault identity or handler frame')
+                    outcome['stderr'] = lines[0]
+                row['faultComparison'] = 'Fault identity, handler frame and observable outcome; full engine traces retained'
+            if native != reference:
                 raise ValueError(name + ': native/interpreter mismatch')
             result = row['native']
             if name == 'fault-after-success':

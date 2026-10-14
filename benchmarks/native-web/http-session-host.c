@@ -4,6 +4,9 @@
 /* Private retained-state HTTP consumer: three sequential dispatches on one
  * listener/object graph. Not a general scheduler or public hosting ABI. */
 #include "native-session.h"
+#ifdef NEOCLR_RUNTIME_ASYNC
+#include "native-runtime.h"
+#endif
 #include "task-queue.h"
 #include "socket-listener.h"
 #include <stdlib.h>
@@ -13,10 +16,12 @@
 #include <fcntl.h>
 #include <io.h>
 #endif
+#ifndef NEOCLR_RUNTIME_ASYNC
 static uint64_t milliseconds(void) {
     uint64_t now = neoclr_os_monotonic_ns();
     return now ? now / UINT64_C(1000000) : UINT64_MAX;
 }
+#endif
 static int invoke_session(neoclr_aot_context *context, int *failed) {
     neoclr_socket_scope sockets;
     neoclr_task_scope tasks;
@@ -33,6 +38,10 @@ static int invoke_session(neoclr_aot_context *context, int *failed) {
         /* Submit the retained managed callback through the runtime service.
          * The session retains its own root; dispatch owns a separate admission. */
         if (neoclr_scheduler_submit_v1(context, callback, NULL)) host_error = 1;
+#ifdef NEOCLR_RUNTIME_ASYNC
+        if (!host_error) status = neoclr_runtime_async_pump_v1(context,
+            neoclr_invoke_void_callback_v1, neoclr_drain_default_queue_v1);
+#else
         uint64_t started = milliseconds();
         while (!status && !host_error) {
             status = neoclr_drain_default_queue_v1(context);
@@ -49,10 +58,14 @@ static int invoke_session(neoclr_aot_context *context, int *failed) {
             uint64_t now = milliseconds();
             if (now == UINT64_MAX || started == UINT64_MAX || now - started > 15000) host_error = 1;
         }
+#endif
         /* A service callback fault is terminal for this host too: never dispatch
          * again or clear diagnostics. Tear down services before session close. */
         if (!status && !host_error && neoclr_session_collect_v1(&session)) host_error = 1;
     }
+#ifdef NEOCLR_RUNTIME_ASYNC
+    if (neoclr_runtime_async_shutdown_v1(context)) host_error = 1;
+#endif
     if (neoclr_root_probe_head_v1()) host_error = 1;
     if (status && neoclr_aot_render_fault(stderr, &context->fault)) host_error = 1;
     if (neoclr_socket_scope_leave_v1(&sockets)) host_error = 1;
