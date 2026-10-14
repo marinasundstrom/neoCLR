@@ -2075,3 +2075,10 @@ RavenDoc's type selection, XML summaries and the refreshed matching reference br
 The [tuple reference](tuples.md#tupletypeinfo-development) records experimental
 admission and remaining member/emission limitations. This supersedes the earlier
 pending guest descriptor note without changing the nominal tuple migration boundary.
+
+
+The C# host `TupleSignature`, `SignatureType.Tuple` and
+`AssemblyBuilder.CreateExperimentalTuple` APIs are manually documented in
+[authored structural tuples](experimental-metadata.md#authored-structural-tuple-signatures-2026-10-14-development).
+These tooling-only APIs are outside guest RavenDoc selection. The guest reference
+assembly and TupleTypeInfo contract are unchanged by this authoring slice.

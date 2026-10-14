@@ -46,7 +46,7 @@ with the existing nominal tuple family.
    synthesized Deconstruct reflection and broader element forms remain pending.
 3. **Introspection and authoring (host identity implemented):** resolved tuple
    identities and ordered host element descriptors are available. Guest `TupleTypeInfo.ElementTypes` exposes recursive ordered snapshots. Native C#
-   signature authoring/import and synthesized member reflection remain.
+   signature authoring is implemented below; reader/import and synthesized member reflection remain.
 4. **Raven:** carrier-independent tuple symbols and native lowering/import, preserving
    labels and .NET target behavior behind explicit capabilities. No CLI approximation
    should be mistaken for native tuple identity.
@@ -150,3 +150,23 @@ nominal handle by the tuple element query. Six default-feature tests preserve
 explicit opt-in rejection. The matching API reference snapshot check
 passes. [Artifact hashes and results](experiments/structural-tuples/type-info-results.json)
 record the tested source-library bundle, runtime, fixture and consumer.
+
+
+## Native C# authoring slice
+
+The metadata builder now creates ordered native tuples through
+`CreateExperimentalTuple`, exposes immutable `TupleSignature.ElementTypes`, checks
+exact tuple identities in typed bodies and emits native tuple nodes. It copies input
+arrays, validates closed supported elements/ownership and resource limits, rechecks
+the graph on write, and rejects CLI projection. The focused authoring fixture includes
+nested/repeated elements, a closed generic nominal element, an exact-signature echo
+and a tuple type token; its native binary runs with expected result 42.
+
+Native C# reader/import, tuple construction/element-operation builder APIs, and Raven
+source lowering remain pending. This completes the signature authoring portion of
+stage 3, not the complete compiler path. See the manual host API reference for the
+16-level tooling limit; it is narrower than the native metadata nesting budget.
+
+[Authoring validation](experiments/structural-tuples/authored-results.json) records
+the native image and test-source hashes. Existing authored composition checks and
+the API snapshot check also pass. No website build is needed for this host API slice.

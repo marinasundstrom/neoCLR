@@ -8900,3 +8900,36 @@ profile. Open operands, generic owner constraint emission, guest constraint refl
 and JIT/AOT qualification remain follow-up work. Like CLR nominal interfaces, declared
 relationships govern membership; unlike a CLR constraint list, native metadata also
 retains structural grouping and an introspectable intersection signature.
+
+
+## Authored structural tuple signatures (2026-10-14 development)
+
+`AssemblyBuilder.CreateExperimentalTuple(params SignatureType[] elements)` returns
+an owned, opt-in native `SignatureType`. Its `Tuple` property is a `TupleSignature`
+with read-only `ElementTypes: IReadOnlyList<SignatureType>`. Other signature kinds
+have a null `Tuple`. The builder copies inputs; callers cannot mutate the shape.
+`TupleSignature.Equals`, `GetHashCode` and enclosing signature equality preserve
+position, duplicates and nesting. `ToString()` is diagnostic, not serialized identity.
+
+The factory accepts one through 256 elements: supported scalars, owned/imported closed
+nominal signatures and already admitted nested tuples. Open parameters, Void, erased
+Value, RuntimeTypeHandle, arrays, borrows, pointers, functions and compositions are
+rejected as elements and as nested nominal type arguments in this bounded factory.
+This tooling profile has a 16-level nesting bound and a 4096-node
+validation budget. Null arrays throw ArgumentNullException; invalid/foreign elements
+and resource violations throw ArgumentException. Graph validation rechecks admission
+before serialization, including nominal owners whose metadata changed after creation.
+
+`WriteNativeAssembly()` writes the ordered native `Tuple` signature node, without a
+Tuple TypeDef. Parameters, returns and locals retain exact tuple identity through
+body checking; reordered shapes do not implicitly convert. `Write()` and reference
+CLI projection reject an output that has admitted tuples with InvalidDataException.
+Unlike .NET ValueTuple authoring, this does not construct a generic nominal carrier.
+Use a runtime built with `experimental-tuples`. Native C# reader/import support and
+Raven lowering are not implemented by this authoring slice. Tuple constructor and
+positional-operation builder APIs also remain follow-ups; the executable fixture
+validates authored signatures and a native tuple type token.
+
+Run `dotnet run --project tools/metadata/NeoCLR.Metadata.Experimental.Tests --
+--authored-tuples target/authored-tuples`, then run the emitted `AuthoredTuples.neox`
+with the experimental interpreter (expected exit 42).

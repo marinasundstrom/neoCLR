@@ -4,6 +4,8 @@ using System.Reflection.PortableExecutable;
 using NeoCLR.Metadata.Experimental.Model;
 using AssemblyDefinition = NeoCLR.Metadata.Experimental.Model.AssemblyDefinition;
 
+if (args is ["--authored-tuples", var tupleOutput]) { AuthoredTupleChecks.Run(tupleOutput); return 0; }
+
 if (args is ["--composition-imports", var compositionOutput]) { ReferenceCompositionImportChecks.Run(compositionOutput); return 0; }
 
 if (args is ["--authored-structural-constraints", var constraintOutput]) { AuthoredStructuralConstraintChecks.Run(constraintOutput); ExternalIntersectionConstraintChecks.Run(); return 0; }

@@ -81,6 +81,7 @@ public sealed partial class AssemblyBuilder
     internal MethodBuilder[] ValidateGraph(bool validateBodies = true)
     {
         ValidateAuthoredCompositionBounds();
+        ValidateAuthoredTuples();
         var methods = functions.Concat(types.SelectMany(t => t.Methods)).ToArray();
         if (methods.Sum(method => (long)method.Instructions.Count) > 131072) throw new InvalidDataException("assembly instruction limit exceeded");
         if (methods.SelectMany(method => method.Instructions).Sum(instruction =>
@@ -363,6 +364,7 @@ public sealed partial class AssemblyBuilder
 
     private byte[] WriteImage(bool referenceOnly)
     {
+        if (experimentalTuples.Count != 0) throw new InvalidDataException("structural tuples require native emission without CLI projection");
         if (experimentalStorageCompositions.Count != 0 || importedReferences.Values.Any(reference => reference.Signature.ParameterTypes.Append(reference.Signature.ReturnType).Any(t => t.ContainsComposition)))
             throw new InvalidDataException("experimental composition signatures require native emission without CLI projection");
         if (!referenceOnly && assemblyConstants.Count != 0)
