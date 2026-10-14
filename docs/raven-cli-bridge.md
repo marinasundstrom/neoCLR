@@ -19,7 +19,10 @@ Contract option is selected. Ordinary Raven ad-hoc unions still use their existi
 carrier path. The companion Raven branch `codex/neoclr-union-intersection`, based
 on native `caa787a96`, selectively carries compiler-created intersection symbols,
 substitution/display and reference conversions from `02d669acd`/`c4d57d282`.
-Source binding and native emission remain disabled. Compiler normalization removes
+Source conjunctions now bind in generic constraints, retaining ordinary nominal
+bounds. Value storage is rejected with RAV0363; native compound emission remains
+disabled. This uses archived parser/constraint changes `08b53d8c4`, `41b684e3f` and
+`c6a303f0d`, with no new Runtime Contract switch. Compiler normalization removes
 nominal supertypes as well as duplicate bounds; runtime syntax normalization does
 not. Reconcile descriptor identity before metadata import/export.
 Raven main and the native line remain separate; older structural/intersection work

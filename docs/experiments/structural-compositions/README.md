@@ -88,8 +88,9 @@ Windows or performance qualification. No allocation or speed advantage is assume
 
 ## Next bounded slice
 
-1. Build source binding and native metadata mapping on the selectively reused
-   intersection symbol/conversion foundation, behind an explicit target capability.
+1. Build value-storage binding and native metadata mapping on the selectively reused
+   intersection symbol/conversion and source-constraint foundation, behind an explicit
+   target capability.
    Keep existing ad-hoc union carriers until structural union policy is selected.
    Compiler symbols remove nominal supertypes; runtime signature normalization
    currently does not. Resolve that distinction before importing/exporting identity.
@@ -262,3 +263,24 @@ were removed and their exact tips retained as annotated archive tags:
 The historical branch names above identify inspected work. Uncarried commits
 remain accessible through the tags. Active experiment branches, main/native
 lines and remote branches are unchanged. Archive tags are local and were not pushed.
+
+## Raven source constraint checkpoint — 2026-10-14
+
+Raven commit `620695e16` reuses `08b53d8c4`, `41b684e3f` and `c6a303f0d` from
+the archive, following semantic foundation `f4d6f0681`. The runtime checkpoint is
+`3d61b17b6`; this source slice changes no runtime implementation.
+Raven parses intersection syntax and binds conjunctions in generic constraints to
+ordinary nominal bounds. Public semantic queries expose the normalized compound
+while `ConstraintTypes` remains flattened. RAV0363 diagnoses value storage;
+RAV0364 diagnoses unsupported bounds. No native compound emitter or Runtime
+Contract switch is enabled. This is a source/semantic prerequisite, not evidence
+of a Raven-generated neoCLR composition program. Ordinary .NET constraint emission
+uses CLI generic bounds, with no intersection carrier or new ABI.
+
+The source-slice compiler build script and 1,199 focused net11.0 tests pass,
+including syntax/incremental recovery, cold constraint queries, storage rejection,
+ordinary CLI constraint metadata, separate compilation consumers and two .NET
+execution cases returning 42. The broad pre-change baseline stops at two existing
+documentation-ID failures after 1,346 passes. Its 93-case failing batch reproduces
+the same 91 passes/two failures after the change; no full-green baseline is claimed.
+No runtime code changes were needed for this compiler-only slice.

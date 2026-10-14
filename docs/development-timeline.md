@@ -17230,3 +17230,19 @@ open, not an approved complete implementation or a permanent roadmap reprioritiz
   `intersection-constraints` and Raven `neoclr-structural-types`. The experiment
   record lists recovery tags and revisions. Remote branches/tags are unchanged;
   active experiment branches and Raven main/native lines remain separate.
+
+- **Author workflow direction:** asks, “Commit each slice.” The assistant commits
+  the completed runtime experiment as `3d61b17b6` and Raven semantic foundation as
+  `f4d6f0681`, then proceeds with a separately validated source-constraint slice.
+  The broader pre-change baseline stops at two existing documentation-ID failures
+  after 1,346 passes; this is recorded rather than presented as a green baseline.
+
+- **Source-constraint outcome:** selectively carries archived parser/constraint
+  commits `08b53d8c4`, `41b684e3f` and `c6a303f0d` to the native experiment.
+  The build script and 1,199 focused tests pass, including .NET metadata/consumer
+  execution and incremental parser recovery. Source intersections bind only as
+  generic-constraint conjunctions; runtime value storage/native compound emission
+  remain gated. Commits this source slice as Raven `620695e16`; the failing
+  documentation control batch is unchanged (91 passes/two failures). The assistant
+  records ordinary .NET constraint behavior separately
+  from native runtime support and keeps main/native lines separate.
