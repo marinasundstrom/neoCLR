@@ -293,3 +293,38 @@ remain on their dedicated structural feature branches.
 
 [Emitted-name validation](experiments/structural-tuples/emitted-name-results.json)
 records both executable outcomes, source/image hashes and commands.
+
+
+### Raven native tuple import — 2026-10-14
+
+`NeoClrMetadataReference.ReadExperimentalTupleAssembly(image, bootstrap, resolver)`
+now reads named native tuple contracts for semantic import. Register the reference,
+its matching primitive bootstrap and dependencies explicitly; this does not add a
+project/catalog flag or admit compositions. Default native readers still reject
+tuples. Emission of this reference requires `AllowExperimentalTuples`; without it
+the emitter reports NEOMETA001 before output. Imported nongeneric tuple-bearing free functions use the exact
+reader snapshot through `ImportExperimentalTupleReference`, preserving names and
+preventing a signature-erasing fallback.
+
+C# `Introspection.TupleTypeInfo` projects ordered element types and names into Raven
+tuple symbols. Parameters `(left: int, right: int)` and results `(x: int, y: int)`
+retain different names but compare structurally equal. A separate native producer
+and consumer exercise nested named tuples, string elements, local reads and calls;
+the interpreter returns 42. Ordinary-reader and disabled-emitter rejection are
+covered, alongside an ordinary generic function in the same library. Runtime Contract settings and ordinary .NET behavior remain unchanged.
+
+The bounded compiler profile supports scalar/nested tuples with the configured
+nominal tuple family still supplying binding symbols. Open elements, tuple mutation,
+carrier-independent symbols, project/catalog integration and guest reflection name
+queries remain follow-ups. The matching fixture uses `target/tuple-info-libraries-v2`
+from compiler `793219d855b17f01fb805e215968b78871eb3804`, with the current structural
+feature branches for emitter and runtime.
+
+Deferred general candidate: calling `Compilation.GetAssemblyOrModuleSymbol` on a
+new compilation before reference initialization exposed a NullReferenceException.
+This slice reads that symbol after the emit pipeline has initialized references;
+it does not claim to fix or validate the cold assembly-query API. A general fix
+should be validated independently on Raven main before deliberate carry-over.
+
+[Import validation](experiments/structural-tuples/raven-import-results.json) records
+the separate consumer, fixture hashes and focused checks.

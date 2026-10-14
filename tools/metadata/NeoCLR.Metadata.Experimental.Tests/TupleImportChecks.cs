@@ -1,6 +1,7 @@
 using System.Text.Json.Nodes;
 using NeoCLR.Metadata.Experimental;
 using NeoCLR.Metadata.Experimental.Model;
+using NeoCLR.Metadata.Experimental.Introspection;
 
 internal static class TupleImportChecks
 {
@@ -38,6 +39,12 @@ internal static class TupleImportChecks
         var main = consumer.AddFunction("Main");
         var callable = consumer.ImportExperimentalTupleReference(snapshot.MainModule.Functions.Single(m => m.Name == "EchoNamed"), core);
         CheckNames(callable.Signature);
+        var metadata = new MetadataLoadContext([snapshot]);
+        var resultView = (TupleTypeInfo)metadata.ResolveSignature(callable.Signature.ReturnType);
+        var parameterView = (TupleTypeInfo)metadata.ResolveSignature(callable.Signature.ParameterTypes[0]);
+        if (resultView.IsNominalType || resultView.ElementNames[0] != "payload" || parameterView.ElementNames[0] != "data" ||
+            resultView.ElementTypes[0] is not TupleTypeInfo inner || inner.ElementNames[0] != "count")
+            throw new Exception("descriptive tuple views lost native names or nesting");
         var tuple = callable.Signature.ReturnType;
         var pair = tuple.Tuple!.ElementTypes[0];
         var original = main.DeclareLocal(tuple);

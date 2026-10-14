@@ -2107,3 +2107,9 @@ The C# named `CreateExperimentalTuple` overload and `TupleSignature.ElementNames
 are covered in [native tuple names](experimental-metadata.md#native-tuple-names-in-c-authoringimport-2026-10-14-development).
 They remain host metadata APIs outside RavenDoc's guest reference assembly; no
 guest API snapshot signatures change in this slice.
+
+
+The C# `Introspection.TupleTypeInfo` view is covered in
+[tuple introspection views](experimental-metadata.md#c-tuple-introspection-views-2026-10-14-development).
+It is a host C# API excluded from the guest RavenDoc type selection. No guest
+reference assembly or API snapshot signatures change in this slice.

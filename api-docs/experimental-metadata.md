@@ -9029,3 +9029,25 @@ Compared with CLR ValueTuple plus TupleElementNamesAttribute, this stores names 
 the signature itself. New named payloads need matching tools; old unnamed payloads
 remain readable. Guest reflection name APIs and Raven native tuple import are not
 added here. The C# imported-call consumer returns 42 with named nested tuple values.
+
+
+## C# tuple introspection views (2026-10-14 development)
+
+`NeoCLR.Metadata.Experimental.Introspection.TupleTypeInfo` is a read-only,
+non-nominal signature view returned by `MetadataLoadContext.ResolveSignature` and
+method parameter/result inspection. `ElementTypes: IReadOnlyList<TypeInfo>` keeps
+order, duplicates and nesting. `ElementNames: IReadOnlyList<string?>` has one entry
+per element, including null for unnamed elements. Both lists are immutable copies.
+`DisplayName` is `tuple<...>` using element displays; `IsNominalType` is false.
+
+Views retain descriptive names for each signature rather than interning by structural
+equality. Reference equality of these views is not a structural-type equality API;
+SignatureType equality and runtime TypeIdentity remain positional. Projection uses
+this metadata context's explicit dependency catalog and owner/method substitutions;
+unsupported or excessive nesting fails with InvalidDataException. No nominal tuple
+declaration, fields or constructors are synthesized in this host API.
+
+The view enables Raven's explicit native tuple import. It is distinct from guest
+`System.Introspection.TupleTypeInfo`, whose element-name query is still pending.
+Focused tests cover nested views and distinct return/parameter names on equal types;
+the separate Raven consumer executes imported named tuples with result 42.
