@@ -31,3 +31,10 @@ compiler tool is now named `neoclr-codegen`.
 
 Task APIs live in `System.Concurrency.Tasks`. Stream operations return tasks;
 use `await` to consume them.
+
+## Scope
+
+neoCLR is experimental: APIs and metadata may change. The release targets macOS
+ARM64 and Windows x64. HTTP supports HTTP/1.1; HTTP/2/3 and connection pooling
+are not available. PostgreSQL is a local development provider with loopback/trust
+authentication, not a general production database connection.

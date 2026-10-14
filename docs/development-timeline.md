@@ -17049,3 +17049,7 @@ open, not an approved complete implementation or a permanent roadmap reprioritiz
 - **Action:** simplified the next-preview notes and moved build revisions, pending
   gates and qualification boundaries into the toolchain release tracker. Published
   release notes remain unchanged. A broader content cleanup remains open.
+- **Author clarification:** limits and disclaimers belong in user documentation,
+  but not on every implementation detail; those details belong in repo docs.
+- **Follow-up:** retained concise platform/HTTP/database scope in the draft notes
+  and recorded the distinction in the website maintenance guide.

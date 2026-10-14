@@ -28,6 +28,12 @@ criticism without inventing an established contributor community, governance pro
 or commitment to proposed APIs. The overview page explains background and goals;
 the homepage provides current status and feature entry points.
 
+Author clarification, 2026-10-14: website and release documentation should retain
+limits and disclaimers that affect platform selection or practical usage. Avoid
+attaching caveats to every implementation detail. Keep implementation restrictions,
+qualification history and detailed evidence in the repository's technical docs,
+linked where useful rather than repeated throughout the site.
+
 ## Current-state presentation — 2026-09-27
 
 At the author's direction, feature pages describe current behavior, useful examples
