@@ -67,3 +67,10 @@ SDK runtime-await cases and the three-mode HTTP header wire checks before editor
 acceptance. Local macOS GC validation passes, including both static-storage modes;
 its report is `target/release-static-contracts-20261014/report.json`.
 Hosted results and matching macOS package acceptance remain required.
+
+For the packaged JSON mapping sample, run `scripts/validate-native-json-sample.py`
+with `--bundle`, `--aot` and a fresh `--output`. It checks composed stream, JSON
+and mapping errors in interpreter, JIT and AOT. Native project builds can select
+application reflection roots with repeated `--reflection-type TypeName` options;
+these resolve against the freshly compiled assembly. Use `--reflection-roots`
+only for an exact matching artifact. The two options are mutually exclusive.

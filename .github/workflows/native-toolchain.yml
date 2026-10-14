@@ -130,6 +130,8 @@ jobs:
           if ($LASTEXITCODE) { exit $LASTEXITCODE }
           cmd /c "`"$vs\VC\Auxiliary\Build\vcvars64.bat`" && python scripts/validate-runtime-await-sdk.py --bundle `"$bundle`" --runtime `"$bundle/bin/neoclr.exe`" --aot target/release/neoclr-codegen.exe --output target/release-runtime-await"
           if ($LASTEXITCODE) { exit $LASTEXITCODE }
+          cmd /c "`"$vs\VC\Auxiliary\Build\vcvars64.bat`" && python scripts/validate-native-json-sample.py --bundle `"$bundle`" --aot target/release/neoclr-codegen.exe --output target/release-json"
+          if ($LASTEXITCODE) { exit $LASTEXITCODE }
           cmd /c "`"$vs\VC\Auxiliary\Build\vcvars64.bat`" && python benchmarks/http-server/check-header-names.py --bundle `"$bundle`" --aot target/release/neoclr-codegen.exe --output target/release-headers"
           if ($LASTEXITCODE) { exit $LASTEXITCODE }
       - uses: actions/download-artifact@v4
@@ -185,6 +187,8 @@ jobs:
             neoclr/target/release-runtime-await/**/*.json
             neoclr/target/release-runtime-await/**/*.log
             neoclr/target/release-headers/results.json
+            neoclr/target/release-json/results.json
+            neoclr/target/release-json/native/build.json
             neoclr/target/windows-native-acceptance*.json
             neoclr/target/bootstrap/*.json
             neoclr/target/libraries/*evidence.json

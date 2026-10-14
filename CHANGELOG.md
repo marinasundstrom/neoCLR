@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-14
 
+- Generate named application reflection roots from the freshly compiled native artifact via `--reflection-type`, avoiding stale roots after project rebuilds. Add a packaged JSON/error-composition gate for interpreter, JIT and AOT; all three modes pass on macOS alongside 132 HTTP header checks. Include the JSON gate in Windows package qualification.
+
 - Admit inline native values and record-array elements up to 256 lanes, matching backend and GC validation, to support the 132-lane composed JSON error carrier. Preserve heap-object and root-frame bounds. Add final-lane value/copy and GC retention, uninitialized-element reclamation and oversized-layout rejection checks. Rebuild native helpers with the backend.
 
 - Retain fresh macOS candidate hashes and failed extracted-package evidence: collections/tasks pass default JIT, but composed JSON errors exceed the 128-lane native inline limit at 132 lanes. Interpreter JSON passes. Record the release blocker without installing or publishing the candidate.
