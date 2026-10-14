@@ -58,6 +58,30 @@ The executable integration fixture also checks constructed generic types, arrays
 wrong types, null at the Object boundary, HashMap callbacks and retention through GC.
 There is no general default comparer or cross-program descriptor identity contract.
 
+## Type relationships (development)
+
+Use `source.AssignableTo(target)` or `target.AssignableFrom(source)` when you need
+to know whether a value can be used as another type. Both require non-null
+`TypeInfo` arguments, just like typed `Equals`. They include identity, base classes,
+implemented interfaces and boxing to Object; they do not perform conversions.
+
+`IsSubclassOf(target)` checks strict class ancestry: the same type and interfaces
+return false. `IsInstanceOfType(value)` checks an actual object's runtime type;
+its `Object?` argument intentionally permits null, which returns false.
+
+```raven
+let list = typeof(ArrayList<int>)
+list.AssignableTo(typeof(List<int>))
+typeof(List<int>).AssignableFrom(list)
+typeof(Object).IsInstanceOfType(42)
+```
+
+Closed generic arguments and array elements remain invariant in the current runtime.
+Function shapes compare by identity and are assignable to Object. Generic variance,
+array covariance and open-generic constraint queries are not supported yet.
+These queries inspect types available in the loaded program; they do not load types
+or authorize reflective construction or invocation.
+
 ## Logical modules (development, 2026-10-10)
 
 `RuntimeContext.Current.ExecutingAssembly.GetModules()` now returns flat logical

@@ -1993,3 +1993,13 @@ options. Formatting, Result failures and output quotas are documented in
 cover the JsonValue type/member and options type/property, in addition to existing
 Tasks, Object, HTTP and PostgreSQL declaration links. Compiler-generated private
 backing fields are not public API documentation entries.
+
+### Type relationship queries (development, 2026-10-14)
+
+TypeInfo now includes AssignableTo, AssignableFrom, IsSubclassOf and IsInstanceOfType.
+Type operands are required/non-null; instance testing explicitly accepts Object?.
+The existing selected TypeInfo, NominalTypeInfo and FunctionTypeInfo expose these
+members without new public implementation types. The aggregate bridge and native
+rendered reference are refreshed together. See [introspection](introspection.md)
+for usage and [runtime semantics](../docs/design/type-relationships.md) for supported
+relationships, .NET differences and compiler qualification limits.

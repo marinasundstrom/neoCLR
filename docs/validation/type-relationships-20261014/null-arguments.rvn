@@ -1,0 +1,7 @@
+import System.*
+func Main() {
+    let type = typeof(int)
+    type.AssignableTo(null)
+    type.AssignableFrom(null)
+    type.IsSubclassOf(null)
+}

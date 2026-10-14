@@ -80,6 +80,7 @@ mod invocation;
 mod invocation_budget;
 mod invocation_work;
 mod type_identity;
+mod type_relationships;
 pub mod value;
 mod vm;
 mod workers;

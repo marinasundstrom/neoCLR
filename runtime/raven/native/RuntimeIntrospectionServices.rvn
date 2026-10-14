@@ -67,6 +67,10 @@ internal extension IntrospectionRuntimeServices for RuntimeServices {
         return neoCLR.Runtime.ReflectionAssignable(arg0, arg1)
     }
 
+    static func ReflectionSubclass(arg0: System.RuntimeTypeHandle, arg1: System.RuntimeTypeHandle) -> bool {
+        return neoCLR.Runtime.ReflectionSubclass(arg0, arg1)
+    }
+
     static func ReflectionConstructArgs(arg0: System.RuntimeTypeHandle, arg1: int, arg2: Object?, arg3: Object?[]) -> System.Object {
         return neoCLR.Runtime.ReflectionConstructArgs(arg0, arg1, arg2, arg3)
     }

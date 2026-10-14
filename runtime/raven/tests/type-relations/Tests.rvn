@@ -1,0 +1,77 @@
+module NeoClr.RuntimeTests
+
+import System.*
+import System.Collections.*
+import System.Introspection.*
+import System.Result.*
+import NeoClr.Testing.*
+
+interface Named {
+    val Name: string { get }
+}
+
+interface Tagged : Named {
+    val Tag: int { get }
+}
+
+open class Parent : Tagged {
+    val Name: string => "parent"
+    val Tag: int => 1
+}
+
+class Child : Parent { }
+class Other { }
+
+[Test("Type identity and assignment direction")]
+func Identity() -> Result<unit, TestFailure> {
+    let parent = typeof(Parent)
+    let child = typeof(Child)
+    _ = Assert.True(parent.AssignableFrom(child), "derived to base")?
+    _ = Assert.True(child.AssignableTo(parent), "inverse spelling")?
+    _ = Assert.True(child.AssignableFrom(child), "identity")?
+    _ = Assert.True(!parent.AssignableTo(child), "base to derived")?
+    return Assert.True(!child.AssignableTo(typeof(Other)), "unrelated")
+}
+
+[Test("Interface assignment includes inherited contracts")]
+func Interfaces() -> Result<unit, TestFailure> {
+    _ = Assert.True(typeof(Child).AssignableTo(typeof(Tagged)), "inherited interface")?
+    _ = Assert.True(typeof(Child).AssignableTo(typeof(Named)), "base interface")?
+    _ = Assert.True(typeof(Tagged).AssignableTo(typeof(Named)), "interface inheritance")?
+    _ = Assert.True(typeof(Tagged).AssignableTo(typeof(Object)), "interface to object")?
+    return Assert.True(!typeof(Named).AssignableTo(typeof(Child)), "interface to class")
+}
+
+[Test("Boxing and instance checks reject null")]
+func Instances() -> Result<unit, TestFailure> {
+    _ = Assert.True(typeof(int).AssignableTo(typeof(Object)), "boxing")?
+    _ = Assert.True(!typeof(int).AssignableTo(typeof(long)), "no numeric conversion")?
+    _ = Assert.True(typeof(int).IsInstanceOfType(42), "boxed integer")?
+    _ = Assert.True(typeof(Parent).IsInstanceOfType(Child()), "derived instance")?
+    _ = Assert.True(typeof(Named).IsInstanceOfType(Child()), "interface instance")?
+    _ = Assert.True(!typeof(Child).IsInstanceOfType(Parent()), "base instance")?
+    return Assert.True(!typeof(Object).IsInstanceOfType(null), "null is no instance")
+}
+
+[Test("Closed generic types remain distinct")]
+func Generics() -> Result<unit, TestFailure> {
+    _ = Assert.True(typeof(ArrayList<int>).AssignableTo(typeof(List<int>)), "constructed interface")?
+    _ = Assert.True(!typeof(ArrayList<int>).AssignableTo(typeof(List<string>)), "different arguments")?
+    return Assert.True(!typeof(ArrayList<string>).AssignableTo(typeof(ArrayList<Object>)), "invariant class")
+}
+
+[Test("Arrays preserve element identity")]
+func Arrays() -> Result<unit, TestFailure> {
+    _ = Assert.True(typeof(int[]).AssignableTo(typeof(int[])), "array identity")?
+    _ = Assert.True(typeof(int[]).AssignableTo(typeof(Object)), "array object")?
+    return Assert.True(!typeof(int[]).AssignableTo(typeof(string[])), "array element mismatch")
+}
+
+[Test("Subclass checks are strict and exclude interfaces")]
+func Subclasses() -> Result<unit, TestFailure> {
+    _ = Assert.True(typeof(Child).IsSubclassOf(typeof(Parent)), "direct base")?
+    _ = Assert.True(typeof(Child).IsSubclassOf(typeof(Object)), "transitive base")?
+    _ = Assert.True(!typeof(Child).IsSubclassOf(typeof(Child)), "self")?
+    _ = Assert.True(!typeof(Child).IsSubclassOf(typeof(Named)), "implemented interface")?
+    return Assert.True(!typeof(Tagged).IsSubclassOf(typeof(Named)), "inherited interface")
+}

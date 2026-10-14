@@ -17146,3 +17146,20 @@ open, not an approved complete implementation or a permanent roadmap reprioritiz
   real-editor run passes individual and combined JSON union hovers before and
   after an edit. [Retained evidence](validation/union-hover-20261014/README.md).
   Preview 15 and the author's installed release remain unchanged.
+
+## 2026-10-14 — Type relationship queries and explicit argument presence
+
+- **Author:** requested a worktree from main, `AssignableTo`/`AssignableFrom` on
+  TypeInfo and its implementations, and related useful methods.
+- **Assistant:** created `codex/typeinfo-assignability`; proposed strict subclass
+  and instance checks alongside assignment checks, using .NET behavior as reference.
+- **Author:** questioned nullable type arguments and clarified that required inputs
+  should be explicit. **Assistant:** changed the type-to-type methods to non-null
+  TypeInfo, matching typed equality; retained nullable Object for instance testing,
+  where null intentionally returns false.
+- **Author:** requested a review of existing code, samples and tests for adoption.
+  **Assistant:** identified the reflection construction result guard and JSON node
+  compatibility checks as candidates; exact scalar mapping checks still require identity.
+- **Implementation:** shared runtime relationship rules, projected through all three
+  descriptor implementations; native lowering uses the same rules on semantic types.
+  Validation and adoption are recorded with the implementation changes.

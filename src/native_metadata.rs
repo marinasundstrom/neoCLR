@@ -3,6 +3,16 @@
 //! It does not invoke user code or grant executable reflection rights.
 use crate::{Fault, Limits, Module, Value, metadata::Type};
 
+/// Use the runtime's relationship rules before native identity lowering.
+pub fn assignable(module: &Module, source: &Type, target: &Type) -> Result<bool, Fault> {
+    crate::type_relationships::assignable(module, source, target)
+}
+
+/// Strict ancestry shares the interpreter's definition and implicit Object root.
+pub fn subclass(module: &Module, source: &Type, target: &Type) -> Result<bool, Fault> {
+    crate::type_relationships::subclass(module, source, target)
+}
+
 /// Return the logical property snapshot recipe, before runtime allocation.
 pub fn properties(module: &Module, owner: &Type) -> Result<Value, Fault> {
     crate::reflection::Query::Properties.invoke_profile(

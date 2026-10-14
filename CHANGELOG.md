@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-14
 
+- Add TypeInfo.AssignableTo/AssignableFrom with required non-null type arguments, plus strict IsSubclassOf and nullable-object IsInstanceOfType. All descriptor implementations share runtime relationship rules; interpreter, JIT and AOT pass six managed cases. Add runtime/lowering checks, document variance/compiler limits, and refresh both API references with source links.
+
 - Close the next-release union hover issue: carry separate Raven main display/selection fixes to the native compiler line and retain passing compiler, hover and real VS Code JSON-sample checks. Nominal alternatives show their own types; combined unions stay compact before and after edits. Preview 15 assets and the installed release are unchanged.
 
 - Record Preview 15 publication, all 11 verified asset hashes and successful website deployment. Live installation pages show the release and JSON/PostgreSQL source links resolve. SDK and extension are installed for author testing; the tagged release content remains unchanged.
