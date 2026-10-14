@@ -629,3 +629,20 @@ The cost is a breaking development signature/pattern change and explicit depende
 exposure. Domain errors remain nominal. See [the API review](raven-error-api.md) and
 [validation](experiments/http-json-client/README.md). The nominal wrapper remains
 available for explicit contracts; older checkpoint evidence retains its original form.
+
+## Node text formatting — 2026-10-14
+
+Author requested JSON text conversion from a JsonValue, with optional indentation.
+The .NET comparison is [JsonNode.ToJsonString(options)](https://learn.microsoft.com/en-us/dotnet/api/system.text.json.nodes.jsonnode.tojsonstring?view=net-10.0)
+and [JsonSerializerOptions.WriteIndented](https://learn.microsoft.com/en-us/dotnet/api/system.text.json.jsonserializeroptions.writeindented?view=net-10.0).
+neoCLR follows those names and compact-by-default behavior. Its existing closed
+DOM uses JsonValue as the node root, so the instance method belongs there.
+
+Deliberate differences: return Result<string, JsonError> to preserve existing
+recoverable validation/quota failures; use fixed two-space/LF formatting across
+platforms rather than exposing indentation/newline customization in this slice.
+The latter keeps the initial options surface small but cannot select tabs, custom
+indent widths or CRLF. The existing escaping policy and document limits remain;
+formatting whitespace counts against the output quota. Options are sampled at
+serialization entry and are neither frozen nor cached. Stream overloads preflight
+the whole output before writes. Converters and naming policies remain separate work.

@@ -177,6 +177,7 @@ JSON_NAMES = [
     'JSON nested documents round trip with Unicode and number spelling',
     'JSON document round trip removes surrounding whitespace',
     'JSON parsing rejects escaped aliases of duplicate names',
+    'JSON node text supports compact and indented round trips',
     'JSON parsing rejects trailing commas and truncated input',
     'Empty JSON objects support empty map snapshots and safe lookup',
     'JSON map lookup distinguishes null absence and ordinal keys',
@@ -196,6 +197,7 @@ JSON_NAMES = [
 JSON_STREAM_NAMES = [
     'JSON stream serialization detects cycles before writing',
     'JSON stream output quota includes escaping and validates before writes',
+    'JSON indented stream output matches node text and preflights quotas',
     'JSON stream reads reject split invalid UTF-8',
     'JSON memory stream round trip preserves document content',
     'JSON number document quota preserves long number spelling',

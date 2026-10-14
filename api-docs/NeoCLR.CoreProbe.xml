@@ -3519,5 +3519,56 @@ Connects only to 127.0.0.1. No TLS, password authentication, pooling or automati
 <member name="M:System.Web.Http.HttpClient.Send(System.Web.Http.HttpRequest,System.Web.Http.HttpCompletionOption,System.Concurrency.CancellationToken)"><summary>Sends through the handler pipeline, optionally completing at final headers.</summary><param name="request">Request; the effective copy carries the completion preference through delegating handlers.</param><param name="completionOption">ResponseContentRead or ResponseHeadersRead; other values return InvalidRequest.</param><param name="cancellationToken">Covers Send until the selected completion point. Later body reads take their own token.</param><returns>A response, HttpError, or acknowledged cancellation.</returns><remarks>The socket handler supports streaming completion. Custom handlers may return already-buffered content. Client timeout ends when Send completes; socket body reads retain their own five-second transfer ceiling. Dispose streaming responses even when abandoning the body. Closing the client after successful headers does not own the transferred response connection.</remarks></member>
 <member name="M:System.Web.Http.HttpServer.AcceptHeaders"><summary>Accepts and validates request headers, returning a context with streaming content.</summary><returns>A context or typed HTTP error. Complete or dispose the context.</returns><remarks>Uses CancellationToken.None. The body may be incomplete. TryGetStream returns its input stream; no further receive occurs until a read asks for data. Bounded read-ahead is retained.</remarks></member>
 <member name="M:System.Web.Http.HttpServer.AcceptHeaders(System.Concurrency.CancellationToken)"><summary>Accepts headers and transfers body-read ownership to the context.</summary><param name="cancellationToken">Covers waiting, TLS and headers; pass a token separately to body reads.</param><returns>A context, typed HTTP error, or acknowledged cancellation.</returns><remarks>Uses the same admission queue and limits as Accept. The request read deadline continues during body consumption. Complete/Close closes the body without draining it. Explicit body Close aborts the connection. Fixed-length and bounded chunked bodies are supported; EOF-delimited request bodies are not.</remarks></member>
+<member name="M:System.Data.Json.JsonSerializer.Serialize(System.IO.OutputStream,System.Object,System.Data.Json.JsonSerializerOptions)">
+      <summary>&lt;summary&gt;Serializes an object or JSON node with selected formatting to a stream left open.&lt;/summary&gt;
+&lt;param name="output"&gt;Destination stream.&lt;/param&gt;
+&lt;param name="value"&gt;The supported object or JSON node.&lt;/param&gt;
+&lt;param name="options"&gt;Output formatting options.&lt;/param&gt;
+&lt;returns&gt;Success or a mapping, validation, quota or stream error.&lt;/returns&gt;</summary>
+    </member>
+
+<member name="M:System.Data.Json.JsonSerializer.Serialize(System.Object,System.Data.Json.JsonSerializerOptions)">
+      <summary>&lt;summary&gt;Serializes an object or JSON node using the selected output formatting.&lt;/summary&gt;
+&lt;param name="value"&gt;The supported object or JSON node.&lt;/param&gt;
+&lt;param name="options"&gt;Output formatting options.&lt;/param&gt;
+&lt;returns&gt;JSON text or a mapping, validation or quota error.&lt;/returns&gt;</summary>
+    </member>
+
+<member name="M:System.Data.Json.JsonSerializer.SerializeNode(System.Data.Json.JsonValue,System.Data.Json.JsonSerializerOptions)">
+      <summary>&lt;summary&gt;Serializes a JSON node with compact or indented formatting.&lt;/summary&gt;
+&lt;param name="value"&gt;The node to serialize.&lt;/param&gt;
+&lt;param name="options"&gt;Output formatting options.&lt;/param&gt;
+&lt;returns&gt;JSON text or a validation/quota error. Formatting counts toward the UTF-8 output limit.&lt;/returns&gt;</summary>
+    </member>
+
+<member name="M:System.Data.Json.JsonSerializer.SerializeNode(System.IO.OutputStream,System.Data.Json.JsonValue,System.Data.Json.JsonSerializerOptions)">
+      <summary>&lt;summary&gt;Validates and serializes a node with the selected formatting before writing to the stream.&lt;/summary&gt;
+&lt;param name="output"&gt;Destination stream, left open.&lt;/param&gt;
+&lt;param name="value"&gt;The node to serialize.&lt;/param&gt;
+&lt;param name="options"&gt;Output formatting options.&lt;/param&gt;
+&lt;returns&gt;Success or a validation, quota or stream error.&lt;/returns&gt;</summary>
+    </member>
+
+<member name="M:System.Data.Json.JsonValue.ToJsonString">
+      <summary>&lt;summary&gt;Converts this node to compact JSON text, including JSON quoting and escaping for strings.&lt;/summary&gt;
+&lt;returns&gt;JSON text or a validation/quota error. This does not return an unquoted scalar display value.&lt;/returns&gt;</summary>
+    </member>
+
+<member name="M:System.Data.Json.JsonValue.ToJsonString(System.Data.Json.JsonSerializerOptions)">
+      <summary>&lt;summary&gt;Converts this node to JSON text using the selected formatting.&lt;/summary&gt;
+&lt;param name="options"&gt;Formatting options; WriteIndented enables two-space indentation and LF newlines.&lt;/param&gt;
+&lt;returns&gt;JSON text or a validation/quota error, including when formatting exceeds the output byte limit.&lt;/returns&gt;</summary>
+    </member>
+
+<member name="P:System.Data.Json.JsonSerializerOptions.WriteIndented">
+      <summary>&lt;summary&gt;Gets or sets whether to indent nested containers. The default is false (compact JSON).&lt;/summary&gt;</summary>
+    </member>
+
+<member name="T:System.Data.Json.JsonSerializerOptions">
+      <summary>&lt;summary&gt;Controls JSON output formatting.&lt;/summary&gt;
+&lt;remarks&gt;Options are read at the start of serialization. Indentation uses two spaces and LF newlines on every platform. Existing document quotas include formatting whitespace.&lt;/remarks&gt;</summary>
+    </member>
+
+<member name="M:System.Data.Json.JsonSerializerOptions.#ctor"><summary>Creates compact-output formatting options.</summary></member>
 </members>
 </doc>

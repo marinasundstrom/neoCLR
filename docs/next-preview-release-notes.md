@@ -31,6 +31,10 @@ byte buffers. Allocation helpers preserve live inputs when collection occurs.
 
 ## Libraries and tools
 
+JSON values can produce compact or indented JSON through `ToJsonString` and
+`JsonSerializerOptions.WriteIndented`. String and stream serializers share the
+same formatting options.
+
 HTTP JSON helpers preserve `HttpError | JsonError`, and object-mapping examples
 retain the original error. The API reference includes links to declaration files
 on GitHub, including PostgreSQL APIs.

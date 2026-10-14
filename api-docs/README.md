@@ -1982,3 +1982,14 @@ Those richer source-map contracts remain the separate work described above.
 Snapshot packaging and extraction now require representative links for ordinary and
 generic types, members and the provider. A failing extraction preserves the previous
 snapshot. The complete local site is rebuilt and checked; publication remains manual.
+
+
+### JSON text formatting (2026-10-14)
+
+JsonValue.ToJsonString and JsonSerializerOptions.WriteIndented are included in both
+reference snapshots, alongside string and stream serializer overloads accepting
+options. Formatting, Result failures and output quotas are documented in
+[the JSON reference](json.md#json-text-and-indentation). Native source-link checks
+cover the JsonValue type/member and options type/property, in addition to existing
+Tasks, Object, HTTP and PostgreSQL declaration links. Compiler-generated private
+backing fields are not public API documentation entries.

@@ -7,6 +7,19 @@ import System.Result.*
 // Closed reference hierarchy. Members belong to the kind that supports them.
 public sealed class JsonValue {
     protected init() { }
+
+    /// <summary>Converts this node to compact JSON text, including JSON quoting and escaping for strings.</summary>
+    /// <returns>JSON text or a validation/quota error. This does not return an unquoted scalar display value.</returns>
+    func ToJsonString() -> Result<string, JsonError> {
+        return JsonSerializer.SerializeNode(self)
+    }
+
+    /// <summary>Converts this node to JSON text using the selected formatting.</summary>
+    /// <param name="options">Formatting options; WriteIndented enables two-space indentation and LF newlines.</param>
+    /// <returns>JSON text or a validation/quota error, including when formatting exceeds the output byte limit.</returns>
+    func ToJsonString(options: JsonSerializerOptions) -> Result<string, JsonError> {
+        return JsonSerializer.SerializeNode(self, options)
+    }
 }
 
 /// <summary>A JSON object with ordinal field names and a read-only map view.</summary>

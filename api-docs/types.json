@@ -86,6 +86,7 @@
   "System.Data.Json.JsonNumber",
   "System.Data.Json.JsonObject",
   "System.Data.Json.JsonSerializer",
+  "System.Data.Json.JsonSerializerOptions",
   "System.Data.Json.JsonString",
   "System.Data.Json.JsonValue",
   "System.Data.PostgreSql.PostgresDatabase",

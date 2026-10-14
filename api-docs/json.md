@@ -8,17 +8,39 @@ and maps supported objects and arrays. Use JsonValue for a document tree, or the
 typed overloads for nongeneric reference objects, typed arrays and root String,
 Int32 or Boolean values.
 
-Operations are synchronous and return Result with
+In-memory operations return Result with
 [JsonError](xref:System.Data.Json.JsonError). The mapping rules and size limits
-below define the supported subset.
+below define the supported subset. Stream operations return Tasks; use `await`.
+
+
+## JSON text and indentation
+
+`JsonValue.ToJsonString()` returns compact JSON, including quotes and escaping for
+string values. Pass [JsonSerializerOptions](xref:System.Data.Json.JsonSerializerOptions)
+with `WriteIndented = true` for two-space indentation and LF newlines on every platform.
+Empty containers remain `{}` and `[]`; no trailing newline is added.
+
+```raven
+func FormatJson(value: JsonValue) -> Result<string, JsonError> {
+    let options = JsonSerializerOptions()
+    options.WriteIndented = true
+    return value.ToJsonString(options)
+}
+```
+
+`JsonSerializer.SerializeNode(value, options)` and `Serialize(value, options)` use
+the same formatting. Their output-stream overloads also accept options and return
+Tasks. Options are read when serialization begins. Complete validation precedes
+stream writes; the stream remains open. Formatting counts toward the existing
+1,024 UTF-8 byte output limit. Invalid graphs and exceeded quotas return `JsonError`.
 
 Use the explicit Node methods for the DOM boundary:
 
 ```text
 DeserializeNode(text: string) -> Result<JsonValue, JsonError>
-DeserializeNode(input: InputStream) -> Result<JsonValue, JsonError>
+DeserializeNode(input: InputStream) -> Task<Result<JsonValue, JsonError>>
 SerializeNode(value: JsonValue) -> Result<string, JsonError>
-SerializeNode(output: OutputStream, value: JsonValue) -> Result<unit, JsonError>
+SerializeNode(output: OutputStream, value: JsonValue) -> Task<Result<unit, JsonError>>
 ```
 
 Object mapping uses these methods:

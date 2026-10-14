@@ -11,6 +11,10 @@ import zipfile
 
 
 SOURCE_LINK_CHECKS = {
+    'System/Data/Json/JsonValue/index.html': 'runtime/raven/src/System/Data/Json/JsonValue.rvn',
+    'System/Data/Json/JsonValue/method_ToJsonString.html': 'runtime/raven/src/System/Data/Json/JsonValue.rvn',
+    'System/Data/Json/JsonSerializerOptions/index.html': 'runtime/raven/src/System/Data/Json/JsonSerializerOptions.rvn',
+    'System/Data/Json/JsonSerializerOptions/property_WriteIndented.html': 'runtime/raven/src/System/Data/Json/JsonSerializerOptions.rvn',
     'System/Concurrency/Tasks/Task`1/index.html': 'runtime/raven/src/System/Concurrency/Tasks/Tasks.rvn',
     'System/Data/PostgreSql/PostgresDatabase/index.html': 'runtime/raven/providers/System.Data.PostgreSql/PostgresDatabase.rvn',
     'System/Object/index.html': 'runtime/raven/src/System/Object.rvn',

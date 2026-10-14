@@ -1,0 +1,10 @@
+module System.Data.Json
+
+/// <summary>Controls JSON output formatting.</summary>
+/// <remarks>Options are read at the start of serialization. Indentation uses two spaces and LF newlines on every platform. Existing document quotas include formatting whitespace.</remarks>
+public class JsonSerializerOptions {
+    init() { }
+
+    /// <summary>Gets or sets whether to indent nested containers. The default is false (compact JSON).</summary>
+    var WriteIndented: bool { get; set; }
+}

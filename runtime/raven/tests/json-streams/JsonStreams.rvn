@@ -231,3 +231,33 @@ func CompletedValue<T>(operation: System.Concurrency.Tasks.Task<T>) -> T {
     }
     return value
 }
+
+[Test("JSON indented stream output matches node text and preflights quotas")]
+func StreamIndented() -> Result<unit, TestFailure> {
+    let Ok(node) = JsonSerializer.DeserializeNode("{\"items\":[1,null]}") else {
+        return Assert.True(false, "Parse source")
+    }
+    let options = JsonSerializerOptions()
+    options.WriteIndented = true
+    let expected = "{\n  \"items\": [\n    1,\n    null\n  ]\n}"
+    let output = ShortOutput(-1, false)
+    _ = Assert.True(CompletedValue(JsonSerializer.SerializeNode(output, node, options)) is Ok(_), "Write indented node")?
+    let Ok(actual) = Encodings.Utf8.Decode(output.Bytes) else {
+        return Assert.True(false, "Decode output")
+    }
+    _ = Assert.Equal(expected, actual)?
+    _ = Assert.True(!output.Closed, "Leave output open")?
+    let objectOutput = ShortOutput(-1, false)
+    _ = Assert.True(CompletedValue(JsonSerializer.Serialize(objectOutput, node, options)) is Ok(_), "Write object overload")?
+    _ = Assert.Equal(output.Count, objectOutput.Count)?
+    let large = JsonArray()
+    var text = ""
+    for index in 0..<1018 {
+        text += "a"
+    }
+    _ = large.Add(JsonString(text))
+    let rejected = ShortOutput(-1, false)
+    _ = Assert.True(CompletedValue(JsonSerializer.SerializeNode(rejected, large, options)) is Error(JsonError.LimitExceeded(_)), "Reject formatted output quota")?
+    _ = Assert.Equal(0, rejected.Count)?
+    return Assert.True(!rejected.Closed, "Rejected output remains open")
+}

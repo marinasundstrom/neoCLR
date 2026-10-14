@@ -17086,3 +17086,26 @@ open, not an approved complete implementation or a permanent roadmap reprioritiz
   reprioritization. Qualification and installation remain tracked in the
   [release tracker](tracking/toolchain-release.md); the draft does not announce
   publication or assign a release version or date.
+
+
+## 2026-10-14 — JSON text conversion and focused release follow-through
+
+- **Author:** requested converting JsonValue back to compact or indented JSON and
+  asked for the .NET-like API. Directed validation of the changed API without
+  repeating unrelated release qualification, then continuation through release.
+- **Assistant:** compared JsonNode.ToJsonString and JsonSerializerOptions.WriteIndented;
+  implemented those names on neoCLR's JsonValue root with the existing Result error
+  contract. Added shared formatting for serializer string/stream overloads and
+  focused JSON tests. [Design comparison](json-dom-design.md#node-text-formatting--2026-10-14).
+- **Author:** asked whether JsonValue should implement Equatable<T>.
+  **Assistant proposal:** keep reference identity and consider explicit DeepEquals
+  separately, because mutable graphs require equality/hash, numeric and cycle rules.
+  The author then directed continuation with release; no structural equality change
+  was implemented or inferred as approved.
+- **Author:** reported missing Find hover, then said it appeared to work. The focused
+  check observes the method after workspace loading and retains it through four
+  immediate comment edits. An independent configuration recovery failure exposed
+  missing props/targets watches; the client fix passes three restoration cycles.
+- **Author:** required correct API source links when publishing. The snapshot guard
+  now checks the new JSON type/member links alongside existing HTTP, Tasks and
+  PostgreSQL links. Publication and installation outcomes belong in release tracking.

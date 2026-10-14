@@ -277,3 +277,49 @@ func JsonSequenceSerialization() -> Result<unit, TestFailure> {
     }
     return Assert.True(false, "Expected array root")
 }
+
+[Test("JSON node text supports compact and indented round trips")]
+func JsonFormatting() -> Result<unit, TestFailure> {
+    let compact = "{\"text\":\"Café\\u000a\\\"雪\",\"items\":[true,null,{},[]]}"
+    let pretty = "{\n  \"text\": \"Café\\u000a\\\"雪\",\n  \"items\": [\n    true,\n    null,\n    {},\n    []\n  ]\n}"
+    let Ok(node) = JsonSerializer.DeserializeNode(compact) else {
+        return Assert.True(false, "Parse formatting source")
+    }
+    let options = JsonSerializerOptions()
+    _ = Assert.True(!options.WriteIndented, "Compact is the default")?
+    let Ok(defaultText) = node.ToJsonString() else {
+        return Assert.True(false, "Serialize node")
+    }
+    _ = Assert.Equal(compact, defaultText)?
+    options.WriteIndented = true
+    let Ok(formatted) = node.ToJsonString(options) else {
+        return Assert.True(false, "Indent node")
+    }
+    _ = Assert.Equal(pretty, formatted)?
+    let Ok(mapped) = JsonSerializer.Serialize(node, options) else {
+        return Assert.True(false, "Object overload preserves node semantics")
+    }
+    _ = Assert.Equal(pretty, mapped)?
+    let Ok(restored) = JsonSerializer.DeserializeNode(formatted) else {
+        return Assert.True(false, "Read indented JSON")
+    }
+    let Ok(roundTrip) = restored.ToJsonString() else {
+        return Assert.True(false, "Compact restored JSON")
+    }
+    _ = Assert.Equal(compact, roundTrip)?
+    let Ok(scalar) = JsonString("hello").ToJsonString(options) else {
+        return Assert.True(false, "Serialize string scalar")
+    }
+    _ = Assert.Equal("\"hello\"", scalar)?
+    let cycle = JsonArray()
+    _ = cycle.Add(cycle)
+    _ = Assert.True(cycle.ToJsonString(options) is Error(JsonError.LimitExceeded(_)), "Reject cycles")?
+    let large = JsonArray()
+    var text = ""
+    for index in 0..<1018 {
+        text += "a"
+    }
+    _ = large.Add(JsonString(text))
+    _ = Assert.True(large.ToJsonString() is Ok(_), "Compact fits the byte quota")?
+    return Assert.True(large.ToJsonString(options) is Error(JsonError.LimitExceeded(_)), "Indentation counts toward the byte quota")
+}

@@ -28,12 +28,37 @@ public class JsonSerializer {
     }
 
     static func SerializeNode(value: JsonValue) -> Result<string, JsonError> {
-        return DocumentWriter().Write(value)
+        return DocumentWriter(false).Write(value)
+    }
+
+    /// <summary>Serializes a JSON node with compact or indented formatting.</summary>
+    /// <param name="value">The node to serialize.</param>
+    /// <param name="options">Output formatting options.</param>
+    /// <returns>JSON text or a validation/quota error. Formatting counts toward the UTF-8 output limit.</returns>
+    static func SerializeNode(value: JsonValue, options: JsonSerializerOptions) -> Result<string, JsonError> {
+        return DocumentWriter(options.WriteIndented).Write(value)
     }
 
     async static func SerializeNode(output: OutputStream, value: JsonValue) -> Task<Result<unit, JsonError>> {
-        // Validate the whole document before writing any bytes.
+        // Keep the default path free of an options allocation.
         let text = SerializeNode(value)?
+        let writer = StreamWriter(output, true)
+        let result = await writer.Write(text)
+        writer.Close()
+        return match result {
+            Ok(_) => Ok(())
+            Error(let error) => Error(JsonError.Write(error))
+        }
+    }
+
+    /// <summary>Validates and serializes a node with the selected formatting before writing to the stream.</summary>
+    /// <param name="output">Destination stream, left open.</param>
+    /// <param name="value">The node to serialize.</param>
+    /// <param name="options">Output formatting options.</param>
+    /// <returns>Success or a validation, quota or stream error.</returns>
+    async static func SerializeNode(output: OutputStream, value: JsonValue, options: JsonSerializerOptions) -> Task<Result<unit, JsonError>> {
+        // Validate the whole document before writing any bytes.
+        let text = SerializeNode(value, options)?
         let writer = StreamWriter(output, true)
         let result = await writer.Write(text)
         writer.Close()
@@ -71,6 +96,18 @@ public class JsonSerializer {
         return SerializeNode(mapped)
     }
 
+    /// <summary>Serializes an object or JSON node using the selected output formatting.</summary>
+    /// <param name="value">The supported object or JSON node.</param>
+    /// <param name="options">Output formatting options.</param>
+    /// <returns>JSON text or a mapping, validation or quota error.</returns>
+    static func Serialize(value: Object, options: JsonSerializerOptions) -> Result<string, JsonError> {
+        if value is JsonValue document {
+            return SerializeNode(document, options)
+        }
+        let mapped = ObjectMapper.Write(value)?
+        return SerializeNode(mapped, options)
+    }
+
     async static func Serialize(output: OutputStream, value: Object) -> Task<Result<unit, JsonError>> {
         if value is JsonValue document {
             return await SerializeNode(output, document)
@@ -78,4 +115,18 @@ public class JsonSerializer {
         let mapped = ObjectMapper.Write(value)?
         return await SerializeNode(output, mapped)
     }
+
+    /// <summary>Serializes an object or JSON node with selected formatting to a stream left open.</summary>
+    /// <param name="output">Destination stream.</param>
+    /// <param name="value">The supported object or JSON node.</param>
+    /// <param name="options">Output formatting options.</param>
+    /// <returns>Success or a mapping, validation, quota or stream error.</returns>
+    async static func Serialize(output: OutputStream, value: Object, options: JsonSerializerOptions) -> Task<Result<unit, JsonError>> {
+        if value is JsonValue document {
+            return await SerializeNode(output, document, options)
+        }
+        let mapped = ObjectMapper.Write(value)?
+        return await SerializeNode(output, mapped, options)
+    }
+
 }

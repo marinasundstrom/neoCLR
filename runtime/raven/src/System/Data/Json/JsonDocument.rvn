@@ -151,8 +151,10 @@ internal class DocumentReader {
 internal class DocumentWriter {
     private var nodes: int
     private var output: string
+    private val indented: bool
 
-    init() {
+    init(indented: bool) {
+        self.indented = indented
         nodes = 0
         output = ""
     }
@@ -162,6 +164,16 @@ internal class DocumentWriter {
             return Error(JsonError.LimitExceeded("Document exceeds 1024 UTF-8 bytes"))
         }
         output = String.Concat(output, text)
+        return Ok(())
+    }
+
+    private func Line(depth: int) -> Result<unit, JsonError> {
+        if indented {
+            _ = Append("\n")?
+            for index in 0..<depth {
+                _ = Append("  ")?
+            }
+        }
         return Ok(())
     }
 
@@ -208,11 +220,12 @@ internal class DocumentWriter {
             if index > 0 {
                 _ = Append(",")?
             }
+            _ = Line(depth + 1)?
             if objectValue {
                 let name = ((JsonObject)value).Name(index)?
                 let quoted = JsonSyntax.WriteMessage(name)?
                 _ = Append(quoted)?
-                _ = Append(":")?
+                _ = Append(if indented { ": " } else { ":" })?
             }
             let child = if objectValue {
                 ((JsonObject)value).Item(index)?
@@ -220,6 +233,9 @@ internal class DocumentWriter {
                 ((JsonArray)value).Item(index)?
             }
             _ = Value(child, depth + 1)?
+        }
+        if count > 0 {
+            _ = Line(depth)?
         }
         if objectValue {
             return Append("}")

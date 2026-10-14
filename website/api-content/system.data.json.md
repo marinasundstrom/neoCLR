@@ -25,3 +25,8 @@ Negative and past-end indexer accesses cause a terminal Fault. `for` iteration
 captures a shallow ordered snapshot: later additions are excluded, while child
 nodes remain shared. Count and indexing read the current array. Mutation continues
 to use quota-aware `Add`; `MutableSequence` is not implemented.
+
+Use `node.ToJsonString()` for compact JSON text. For readable output, pass a
+`JsonSerializerOptions` with `WriteIndented = true`. The same option is available
+on `JsonSerializer.SerializeNode` and `Serialize`, including stream overloads.
+[Formatting and limits](/docs/json.html#json-text-and-indentation).

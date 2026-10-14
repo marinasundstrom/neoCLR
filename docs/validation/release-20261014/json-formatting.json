@@ -1,0 +1,89 @@
+{
+  "date": "2026-10-14",
+  "scope": "JSON node text conversion and compact/indented string/stream formatting",
+  "reports": {
+    "domAndStreams": {
+      "path": "target/release-json-format-tests-20261014b/report.json",
+      "sha256": "bcfc7f9c405fdcafa8c1e91275ec4e6e3a4bf3af8954a59ce7894d2580eef9ae",
+      "passed": true,
+      "modes": [
+        "interpreter",
+        "jit",
+        "native"
+      ],
+      "cases": [
+        {
+          "suite": "json-dom",
+          "mode": "interpreter",
+          "exitCode": 0
+        },
+        {
+          "suite": "json-dom",
+          "mode": "jit",
+          "exitCode": 0
+        },
+        {
+          "suite": "json-dom",
+          "mode": "native",
+          "exitCode": 0
+        },
+        {
+          "suite": "json-streams",
+          "mode": "interpreter",
+          "exitCode": 0
+        },
+        {
+          "suite": "json-streams",
+          "mode": "jit",
+          "exitCode": 0
+        },
+        {
+          "suite": "json-streams",
+          "mode": "native",
+          "exitCode": 0
+        }
+      ]
+    },
+    "finalStreams": {
+      "path": "target/release-json-final-streams-20261014/report.json",
+      "sha256": "6ccf57356ca63c2959a02e5636b49c03a8edd04db166e21b34068e4200ba683b",
+      "passed": true,
+      "modes": [
+        "interpreter",
+        "jit",
+        "native"
+      ],
+      "cases": [
+        {
+          "suite": "json-streams",
+          "mode": "interpreter",
+          "exitCode": 0
+        },
+        {
+          "suite": "json-streams",
+          "mode": "jit",
+          "exitCode": 0
+        },
+        {
+          "suite": "json-streams",
+          "mode": "native",
+          "exitCode": 0
+        }
+      ]
+    }
+  },
+  "finalDelta": "Default stream overload retains its previous no-options-allocation path; final stream suite rerun in all three modes. DOM writer and node methods unchanged from passing DOM suite.",
+  "sources": {
+    "runtime/raven/src/System/Data/Json/JsonError.rvn": "e289fc6887c5043b7292517fb552e0297c2998a1c53a39eb2d537524fce5e50b",
+    "runtime/raven/src/System/Data/Json/CollectionCalls.rvn": "1de0763f9e856afc654343b324202ee5a4361fe9049067b73f4b8d0226b17cd4",
+    "runtime/raven/src/System/Data/Json/JsonSyntax.rvn": "4080b007156c89ac11bbdfc81e1c8985a3e931eae8753e849479c3541063af92",
+    "runtime/raven/src/System/Data/Json/JsonDocument.rvn": "61f6908b09712dc3d98a6a0d207fdba0b2d76f4f257c769980a4cfe1e8e61ae0",
+    "runtime/raven/src/System/Data/Json/JsonSerializer.rvn": "8c9a598d38270e8129a60fb2016078d651c2efd80692cceccfb0c2336d01b0eb",
+    "runtime/raven/src/System/Data/Json/JsonSerializerOptions.rvn": "5a3a34ab095ca5edf227246a9ca0b92bc226f1cee1286f118bb75e7711ee575f",
+    "runtime/raven/src/System/Data/Json/CollectionAdapters.rvn": "e0866933289b2f597e2ed13840796b1730c692475aeba9c753bcdbb1e7892da9",
+    "runtime/raven/src/System/Data/Json/ObjectMapper.rvn": "298db0a19e8d88549e6ef5f3ca39e1ece2dd4ce38e385b92991912dcaa50fc75",
+    "runtime/raven/src/System/Data/Json/JsonValue.rvn": "8444a5a2f0d7fa37418815419c8a3ad568470c6a81a572fb86a323de2cb1b934"
+  },
+  "windows": "Focused release-delta workflow pending",
+  "unrelatedRuntimeQualification": "Reused existing GC/HTTP/source and Windows SDK evidence; no collector, JIT or scheduler code changed."
+}

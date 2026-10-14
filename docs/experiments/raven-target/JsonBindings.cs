@@ -6,7 +6,7 @@ static class JsonBindings {
     public const string Content = "System.Web.Http.Json.JsonContent";
     public const string Prefix = "System.Data.Json.";
     public static readonly string[] Leaves = new[] { "JsonObject", "JsonArray", "JsonString", "JsonNumber", "JsonBoolean", "JsonNull" }.Select(n => Prefix + n).ToArray();
-    public static readonly string[] Names = new[] { Root, Prefix + "JsonSerializer", Prefix + "ObjectMapper", Prefix + "DocumentReader", Prefix + "DocumentWriter", Prefix + "MessageReader", Prefix + "JsonSyntax" }.Concat(Leaves).Append(Content).Concat(HttpJsonBindings.Names).ToArray();
+    public static readonly string[] Names = new[] { Root, Prefix + "JsonSerializer", Prefix + "JsonSerializerOptions", Prefix + "ObjectMapper", Prefix + "DocumentReader", Prefix + "DocumentWriter", Prefix + "MessageReader", Prefix + "JsonSyntax" }.Concat(Leaves).Append(Content).Concat(HttpJsonBindings.Names).ToArray();
     const string Marker = "System.Runtime.CompilerServices.ClosedHierarchyAttribute";
     public static bool Assignable(string source, string target) => target == Root && Leaves.Contains(source);
     public static bool IsName(string name) => Names.Contains(name);
@@ -18,6 +18,8 @@ namespace Data.Json {
 public struct JsonError { public struct Syntax { } public struct LimitExceeded { } public struct TypeMismatch { } public struct MissingField { } public struct DuplicateField { } public struct InvalidIndex { } public struct InvalidNumber { } public struct NumberOutOfRange { } public struct Read { } public struct Write { } public struct Reflection { } public struct UnsupportedMapping { } }
 public abstract class JsonValue {
     protected JsonValue() { }
+    public Result<string, JsonError> ToJsonString() => default;
+    public Result<string, JsonError> ToJsonString(JsonSerializerOptions options) => default;
 }
 public sealed class JsonObject : JsonValue, Collections.Map<string, JsonValue> {
     public JsonObject() { }
@@ -57,8 +59,16 @@ public sealed class JsonBoolean : JsonValue {
 public sealed class JsonNull : JsonValue {
     public JsonNull() { }
 }
+public sealed class JsonSerializerOptions {
+    public JsonSerializerOptions() { }
+    public bool WriteIndented { get; set; }
+}
 public sealed class JsonSerializer {
     private JsonSerializer() { }
+    public static Result<string, JsonError> Serialize(object value, JsonSerializerOptions options) => default;
+    public static Concurrency.Tasks.Task<Result<PropagationUnit, JsonError>> Serialize(IO.OutputStream output, object value, JsonSerializerOptions options) => default;
+    public static Result<string, JsonError> SerializeNode(JsonValue value, JsonSerializerOptions options) => default;
+    public static Concurrency.Tasks.Task<Result<PropagationUnit, JsonError>> SerializeNode(IO.OutputStream output, JsonValue value, JsonSerializerOptions options) => default;
     public static Result<T, JsonError> Deserialize<T>(string text) => default;
     public static Concurrency.Tasks.Task<Result<T, JsonError>> Deserialize<T>(IO.InputStream input) => default;
     public static Result<object, JsonError> Deserialize(string text, Introspection.TypeInfo type) => default;
@@ -76,7 +86,7 @@ internal sealed class ObjectMapper {
     public static Result<object, JsonError> Read(JsonValue value, Introspection.TypeInfo type) => default;
 }
 internal sealed class DocumentReader { public DocumentReader(string text) { } public Result<JsonValue, JsonError> Read() => default; }
-internal sealed class DocumentWriter { public DocumentWriter() { } public Result<string, JsonError> Write(JsonValue value) => default; }
+internal sealed class DocumentWriter { public DocumentWriter(bool indented) { } public Result<string, JsonError> Write(JsonValue value) => default; }
 internal sealed class MessageReader { public MessageReader(string text) { } public Result<string, JsonError> Read() => default; }
 internal sealed class JsonSyntax {
     public JsonSyntax() { }
