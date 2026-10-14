@@ -47,6 +47,8 @@ pub struct TypeDescriptor {
     pub constituents: Vec<TypeDescriptor>,
     /// Ordered tuple elements, preserving duplicates and nesting; empty otherwise.
     pub tuple_elements: Vec<TypeDescriptor>,
+    /// Native element names at this signature use, excluded from type identity.
+    pub tuple_element_names: Vec<Option<String>>,
     pub declaring_type: Option<TypeDefId>,
 }
 
@@ -125,6 +127,12 @@ fn describe_validated(module: &Module, normalized: &Type) -> Result<TypeDescript
         generic_arguments,
         constituents,
         tuple_elements,
+        tuple_element_names: match normalized {
+            Type::Tuple(parts) => (0..parts.len())
+                .map(|i| parts.names().get(i).cloned().flatten())
+                .collect(),
+            _ => vec![],
+        },
         declaring_type,
     })
 }
@@ -331,6 +339,7 @@ pub(crate) fn describe_definition(
                 generic_arguments: vec![],
                 constituents: vec![],
                 tuple_elements: vec![],
+                tuple_element_names: vec![],
                 declaring_type: None,
             })
         })
@@ -347,6 +356,7 @@ pub(crate) fn describe_definition(
         generic_arguments: arguments,
         constituents: vec![],
         tuple_elements: vec![],
+        tuple_element_names: vec![],
         declaring_type: declaring_definition(module, definition).and_then(|p| p.definition.clone()),
     })
 }
@@ -453,7 +463,7 @@ mod tuple_tests {
         };
         let first = make("first");
         let second = make("second");
-        let ty = Type::Tuple(vec![Type::from_name("Cell")]);
+        let ty = Type::Tuple(vec![Type::from_name("Cell")].into());
         let first_identity = resolve(&first, &ty).unwrap();
         assert_ne!(first_identity, resolve(&second, &ty).unwrap());
         assert!(crate::reflection::from_identity(&second, &first_identity).is_err());
@@ -468,11 +478,14 @@ mod tuple_tests {
         let program = crate::LoadedProgram::new(&source).unwrap();
         let linked = crate::library::link(&source, crate::library::system().unwrap()).unwrap();
         let module = &linked;
-        let ty = Type::Tuple(vec![
-            Type::Int32,
-            Type::String,
-            Type::Tuple(vec![Type::Int32, Type::Int32]),
-        ]);
+        let ty = Type::Tuple(
+            vec![
+                Type::Int32,
+                Type::String,
+                Type::Tuple(vec![Type::Int32, Type::Int32].into()),
+            ]
+            .into(),
+        );
         let descriptor = program.describe_type(&ty).unwrap();
         assert_eq!(
             descriptor.name,
@@ -531,17 +544,23 @@ mod tuple_tests {
             0
         );
         for different in [
-            Type::Tuple(vec![
-                Type::String,
-                Type::Int32,
-                Type::Tuple(vec![Type::Int32, Type::Int32]),
-            ]),
-            Type::Tuple(vec![Type::Int32, Type::String, Type::Int32, Type::Int32]),
-            Type::Tuple(vec![
-                Type::Int32,
-                Type::String,
-                Type::Tuple(vec![Type::Int32]),
-            ]),
+            Type::Tuple(
+                vec![
+                    Type::String,
+                    Type::Int32,
+                    Type::Tuple(vec![Type::Int32, Type::Int32].into()),
+                ]
+                .into(),
+            ),
+            Type::Tuple(vec![Type::Int32, Type::String, Type::Int32, Type::Int32].into()),
+            Type::Tuple(
+                vec![
+                    Type::Int32,
+                    Type::String,
+                    Type::Tuple(vec![Type::Int32].into()),
+                ]
+                .into(),
+            ),
         ] {
             assert_ne!(
                 descriptor.identity,
@@ -550,7 +569,7 @@ mod tuple_tests {
         }
         assert_ne!(
             program
-                .resolve_type_identity(&Type::Tuple(vec![Type::Int32]))
+                .resolve_type_identity(&Type::Tuple(vec![Type::Int32].into()))
                 .unwrap(),
             program.resolve_type_identity(&Type::Int32).unwrap()
         );

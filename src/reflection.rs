@@ -1261,7 +1261,8 @@ pub(crate) fn from_identity(module: &Module, identity: &TypeIdentity) -> Result<
             parts
                 .iter()
                 .map(|t| from_identity(module, t))
-                .collect::<Result<_, _>>()?,
+                .collect::<Result<Vec<_>, _>>()?
+                .into(),
         ),
         TypeIdentity::Union(parts) | TypeIdentity::Intersection(parts) => {
             let parts = parts

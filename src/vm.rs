@@ -250,7 +250,9 @@ pub(crate) fn record_fields(
             .iter()
             .enumerate()
             .map(|(index, ty)| crate::metadata::Field {
-                name: format!("Item{}", index + 1),
+                name: elements
+                    .element_name(index)
+                    .expect("valid tuple element index"),
                 ty: ty.clone(),
                 visibility: crate::metadata::Visibility::Public,
                 deferred: false,

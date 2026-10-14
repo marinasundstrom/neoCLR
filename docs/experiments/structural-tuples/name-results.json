@@ -1,0 +1,27 @@
+{
+  "date": "2026-10-14",
+  "profile": "Native tuple names in Rust metadata and per-signature host descriptors",
+  "checks": {
+    "experimentalTupleTests": 16,
+    "hostTupleTests": 2,
+    "defaultProfileTests": 8,
+    "apiSnapshot": "passed",
+    "renamedParameterResult": 42
+  },
+  "commands": [
+    "cargo test --features experimental-tuples --test structural_tuples",
+    "cargo test --features experimental-tuples --lib tuple",
+    "cargo test --test structural_tuples",
+    "python3 scripts/build-api-docs.py --check"
+  ],
+  "sha256": {
+    "src/tuple_signature.rs": "cd27449af0ee3212c6d638e318c3721510eaa334eacad11c4bed42843e15ae16",
+    "src/type_identity.rs": "e72fce1f329341e7d8e77d4a40e2f18ff06dbba2b2eb9b75cf2b7d488f558344",
+    "tests/structural_tuples.rs": "1964c918201147e15b0a3e449e6de919c9fe754980fcf113ba5bad08c641ed3e"
+  },
+  "limitations": [
+    "C# builder/reader names and Raven name emission/import pending",
+    "Guest name-query API and named assembler syntax pending",
+    "Structural identity excludes names; retain descriptive signatures/host descriptors for names"
+  ]
+}

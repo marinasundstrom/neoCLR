@@ -19,8 +19,8 @@ names must be real native structural metadata, not attribute-based aliases. Nati
 name storage and reflection are required follow-up work. The author selected
 preserved names with positional type compatibility: renaming elements must not
 break compatibility or type equality. The author clarified that tuple type equality
-follows the ordered element structure; names are metadata, not part of that equality. The current positional node
-does not yet fulfill this named-element contract. Nominal interfaces still
+follows the ordered element structure; names are metadata, not part of that equality. The positional-only node at that point did not fulfill this contract; the native
+name slice below now stores names, with compiler/guest wiring still pending. Nominal interfaces still
 require declared conformance; tuple shape does not implicitly implement arbitrary
 interfaces. Synthesized positional access and deconstruction are runtime operations,
 not proof of nominal interface conformance. Boxing, equality, interface contracts,
@@ -41,7 +41,7 @@ with the existing nominal tuple family.
 
 ## Sequenced migration
 
-1. **Native signature foundation (implemented):** `Type::Tuple(Vec<Type>)` survives
+1. **Native signature foundation (implemented):** `Type::Tuple(TupleSignature)` survives
    native JSON and schema-3/4 binary envelope roundtrips without nominal declarations.
    Type/method/Self substitution traverses elements and retains the depth budget.
    Scope binding preserves order, duplicates and nesting, with one to 256 elements.
@@ -249,3 +249,17 @@ The source composition regression also passes. The runtime library fixture is
 [Source validation](experiments/structural-tuples/source-results.json) records the
 compiler revision, fixture hashes and commands. The [tested source](experiments/structural-tuples/SourceTuples.rvn)
 includes renamed element access with unchanged positional type compatibility.
+
+
+### Native names: runtime metadata and host inspection
+
+The next slice implements direct native names in Rust TupleSignature, preserving
+legacy unnamed encoding. Type equality/hash and resolved identity ignore names;
+per-signature host descriptors retain them. Names survive substitution and native
+roundtrips, and renamed parameter contracts execute (42). See the
+[API and validation boundaries](../api-docs/tuples.md#native-tuple-element-names-2026-10-14-development).
+C# authoring/reading, Raven emission/import and guest name queries still need wiring;
+the earlier source-local test does not yet emit names.
+
+[Native-name validation](experiments/structural-tuples/name-results.json) records
+the focused test counts, commands and source hashes.

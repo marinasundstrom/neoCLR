@@ -19,11 +19,14 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         for instruction in &mut function.body {
             if let Instruction::LoadTypeToken(ty) = instruction {
                 if ty == &Type::from_name(&token) {
-                    *ty = Type::Tuple(vec![
-                        Type::Int32,
-                        Type::Int32,
-                        Type::Tuple(vec![Type::String]),
-                    ]);
+                    *ty = Type::Tuple(
+                        vec![
+                            Type::Int32,
+                            Type::Int32,
+                            Type::Tuple(vec![Type::String].into()),
+                        ]
+                        .into(),
+                    );
                     count += 1;
                 }
             }

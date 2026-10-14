@@ -2058,7 +2058,7 @@ intersection operands is host C# tooling, excluded from the guest RavenDoc selec
 and covered in the [manual metadata reference](experimental-metadata.md#resolved-external-intersection-bounds--2026-10-14-development).
 No guest public API or reference snapshot changes in this slice.
 
-The structural tuple migration's Rust `metadata::Type::Tuple(Vec<Type>)` node is
+The structural tuple migration's Rust `metadata::Type::Tuple(TupleSignature)` node is
 covered by the [manual tuple reference](tuples.md), including the opt-in interpreter
 value/element operations and synthesized host field views. These Rust APIs remain
 outside RavenDoc's guest assembly selection; no guest API signature or reference
@@ -2094,3 +2094,10 @@ Host `IILGenerator.NewTuple`, `LoadTupleElement` and `StoreTupleElement` are doc
 in [native tuple value operations](experimental-metadata.md#native-tuple-value-operations-2026-10-14-development).
 These C# tooling members are outside guest RavenDoc selection. No guest public API or
 reference snapshot changes in this slice.
+
+
+The Rust host `metadata::TupleSignature` constructor/accessors and
+`TypeDescriptor::tuple_element_names` are covered in the
+[tuple reference](tuples.md#native-tuple-element-names-2026-10-14-development).
+They are excluded from RavenDoc because they are Rust host APIs, not guest Raven
+types. No guest reference assembly or snapshot signatures change in this slice.

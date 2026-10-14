@@ -88,9 +88,8 @@ pub(crate) fn symbolic(ty: &Type) -> bool {
         Type::Constructed { arguments, .. } | Type::Scoped { arguments, .. } => {
             arguments.iter().any(symbolic)
         }
-        Type::Union(parts) | Type::Intersection(parts) | Type::Tuple(parts) => {
-            parts.iter().any(symbolic)
-        }
+        Type::Tuple(parts) => parts.iter().any(symbolic),
+        Type::Union(parts) | Type::Intersection(parts) => parts.iter().any(symbolic),
         Type::ByRef(t)
         | Type::ReadOnlyByRef(t)
         | Type::InterfaceRef(t)

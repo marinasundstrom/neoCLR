@@ -294,7 +294,12 @@ fn check_type(module: &Module, source: Scope<'_>, ty: &Type) -> Result<(), Fault
         }
         let nested = |ty| visit(module, source, ty, depth + 1);
         match ty {
-            Type::Union(parts) | Type::Intersection(parts) | Type::Tuple(parts) => {
+            Type::Tuple(parts) => {
+                for part in parts {
+                    nested(part)?;
+                }
+            }
+            Type::Union(parts) | Type::Intersection(parts) => {
                 for part in parts {
                     nested(part)?;
                 }

@@ -49,7 +49,7 @@ own contracts. Function's Object inheritance does not decide tuple inheritance.
 ## Structural migration: host metadata foundation
 
 The 2026-10-14 experimental runtime model adds
-`neoclr::metadata::Type::Tuple(Vec<Type>)`. Its ordered element signatures have no
+`neoclr::metadata::Type::Tuple(TupleSignature)`. Its ordered element signatures have no
 nominal definition name. JSON and native binary metadata decoding preserve that
 shape, and type/method/Self substitution traverses its elements. Signature equality
 preserves order, duplicates and nesting; it is not a claim of resolved runtime
@@ -107,3 +107,46 @@ The executable [Raven consumer](../docs/experiments/structural-tuples/TypeInfo.r
 checks ordered duplicates, a nested single-element tuple, value classification and
 repeated snapshot queries. A documented test fixture substitutes one native token;
 this validates guest introspection, not compiler tuple lowering.
+
+
+## Native tuple element names (2026-10-14 development)
+
+Rust `metadata::Type::Tuple` now contains `metadata::TupleSignature`. Its
+`new(elements: Vec<Type>, names: Vec<Option<String>>) -> Result<Self, Fault>`
+constructor stores native names directly. `names() -> &[Option<String>]` returns
+the declared names; empty means entirely unnamed. `element_name(index: usize) ->
+Option<String>` returns the declared name or positional `ItemN`, and returns None
+for an out-of-range index. `From<Vec<Type>>` creates an unnamed signature; callers
+constructing the old variant migrate to `Type::Tuple(elements.into())`. Deref and
+borrowed iteration expose the ordered element types.
+
+A nonempty name vector must have one entry per element. Names must be nonempty,
+NUL-free, at most 1024 UTF-8 bytes and unique after unnamed positions receive their
+`ItemN` fallback. These bounded validation rules are provisional development limits.
+Invalid names/counts return Fault; malformed named serialized shapes fail decoding.
+The existing one-to-256-element and nesting checks still apply during normalization.
+
+Named signatures encode as `{"Tuple":{"elements":["Int32","Int32"],"names":["x","y"]}}`.
+Unnamed signatures retain `{"Tuple":["Int32","Int32"]}`. Matching native readers are
+required for the new object payload; older C# readers currently reject it. This is
+direct signature metadata, without a nominal carrier or tuple-name attribute.
+
+Equality/hashing of TupleSignature and Type ignore names recursively; TypeIdentity
+also remains the ordered element identities. Names are preserved through native
+serialization, scope binding and type/method/Self substitution.
+`TypeDescriptor::tuple_element_names: Vec<Option<String>>` returns names in the same
+order as `tuple_elements`, including None for unnamed elements; non-tuples return
+an empty vector. Descriptors obtained from differently named signatures retain their
+respective names while their `identity` values compare equal. Identity alone cannot
+recover names: consumers must retain the descriptive signature/descriptor rather
+than intern it solely by structural identity. Synthesized runtime field layouts use
+declared names with the existing `ItemN` fallback.
+
+Unlike the CLR's ValueTuple/name-attribute representation, native names need no
+attribute decoding. The cost is an expanded signature payload and explicit separation
+of descriptive metadata from equality. This slice adds host inspection, not a new
+guest API: guest name queries, C# builder/reader names, Raven name emission/import
+and named assembler syntax remain follow-ups. Existing positional guest element
+queries and execution remain supported. Focused tests prove exact name roundtrips,
+equal identity/hash under renaming, name-preserving substitution, host descriptors,
+invalid-name rejection and interpreter parameter compatibility (result 42).

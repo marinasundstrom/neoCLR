@@ -17677,3 +17677,11 @@ confirmed ordered element types determine type equality; names are native metada
 for member access, tooling and reflection.
 The existing positional runtime node and source-local lowering are groundwork, not
 completion of this named-element requirement. See [the migration](structural-tuples.md).
+
+
+Follow-up outcome: after committing source-local Raven lowering, the author directed
+continuing to the next slice. The assistant implemented native Rust tuple name
+metadata and per-signature host names, preserving positional equality/hash and
+identity. Tests verify named roundtrips, substitution, equal identities with distinct
+descriptive names and renamed parameter execution (42). C#/Raven name wiring and
+guest name queries are still pending; no attribute encoding was introduced.

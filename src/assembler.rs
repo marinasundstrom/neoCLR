@@ -1239,7 +1239,8 @@ pub fn parse_type(text: &str) -> Result<Type, Fault> {
                         parts
                             .iter()
                             .map(|p| parse(p, depth + 1))
-                            .collect::<Result<Vec<_>, _>>()?,
+                            .collect::<Result<Vec<_>, _>>()?
+                            .into(),
                     ))
                 }
                 ("union" | "intersection", parts) => {
@@ -1618,9 +1619,8 @@ pub(crate) fn bind_parameters(ty: Type, names: &[Option<String>], method: bool) 
     match ty {
         Type::Tuple(parts) => Type::Tuple(
             parts
-                .into_iter()
-                .map(|t| bind_parameters(t, names, method))
-                .collect(),
+                .map_types(|t| Ok(bind_parameters(t.clone(), names, method)))
+                .expect("valid tuple names"),
         ),
         Type::Function(mut shape) => {
             shape.parameters = shape

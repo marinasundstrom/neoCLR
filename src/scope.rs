@@ -15,7 +15,7 @@ pub(crate) fn normalize_type(context: &Module, ty: &Type) -> Result<Type, Fault>
                 if parts.is_empty() || parts.len() > 256 {
                     return Err(Fault::new("tuple signature requires one to 256 elements"));
                 }
-                Type::Tuple(parts.iter().map(nested).collect::<Result<_, _>>()?)
+                Type::Tuple(parts.map_types(nested)?)
             }
             Type::Union(parts) | Type::Intersection(parts) => {
                 crate::compositions::check_shape(ty)?;
