@@ -9591,3 +9591,14 @@ wrappers through assembled neoIL, with substituted-field validation and GC cover
 The compiler/host transport and owned-call paths remain gated, so this does not yet
 execute the author's Task examples. Runtime Contract and CLI encoding are unchanged.
 [Current scope](experiments/structural-compositions/README.md#runtime-composition-argument-storage--2026-10-14).
+
+
+### Wrapper calls and constraint direction — 2026-10-14
+
+The runtime now supports closed composition-wrapper instance constructors and
+nonvirtual methods, inspecting substituted transitive bodies. Host/compiler wrapper
+transport and Task execution remain pending. The author additionally requires unions
+as generic constraints alongside intersections; disjunction must remain an any-of
+contract, not become separate conjunctive CLI constraints. Native constraint support
+is planned, not enabled. Runtime Contract/CLI encoding are unchanged.
+[Checkpoint and direction](experiments/structural-compositions/README.md#runtime-wrapper-constructormethod-calls--2026-10-14).

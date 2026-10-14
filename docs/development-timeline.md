@@ -17353,3 +17353,19 @@ open, not an approved complete implementation or a permanent roadmap reprioritiz
 - Remaining: generic metadata adapter/compiler execution, composition arguments
   and value union storage. Task examples currently establish semantic shape and
   substitution only. [Scope/evidence](experiments/structural-compositions/README.md#generic-composition-first-slice--2026-10-14).
+
+
+### 2026-10-14 — Composition use sites and generic constraints
+
+- Author said structural unions can be used in more places than intersections,
+  describing intersections as usually inputs such as parameters and type constraints,
+  and explicitly included unions as constraints too.
+- Assistant interpreted “usually” as guidance rather than banning intersection
+  outputs. Proposed any-of union constraints and all-of intersection constraints,
+  preserving disjunction instead of emitting separate conjunctive CLI bounds. The
+  author has not separately confirmed concrete syntax or member-conflict rules.
+- Action: recorded union constraints as required follow-up work and distinguished
+  constraint semantics from value storage and current backend limits. During this
+  exchange the runtime wrapper-call slice passed 24 composition tests and 13 generic
+  controls; native constraints, host/compiler wrapper transport and Task execution
+  remain unimplemented. [Details](experiments/structural-compositions/README.md#author-direction-value-positions-and-constraints--2026-10-14).

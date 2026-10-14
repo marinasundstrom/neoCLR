@@ -209,7 +209,15 @@ pub(crate) fn validate_surface(module: &Module) -> Result<(), Fault> {
             ));
         }
     }
-    for function in &module.functions {
+    // Inspect closed bodies as well as source definitions: substituting T can
+    // introduce compound addresses or unsupported instructions in an ordinary method.
+    let mut pending: std::collections::VecDeque<_> = module
+        .functions
+        .iter()
+        .map(|function| (std::borrow::Cow::Borrowed(function), false))
+        .collect();
+    let mut visited = std::collections::HashSet::new();
+    while let Some((function, instantiated)) = pending.pop_front() {
         let mut has_compound = false;
         function.map_types(|ty| {
             has_compound |= contains(ty);
@@ -218,7 +226,7 @@ pub(crate) fn validate_surface(module: &Module) -> Result<(), Fault> {
         if !has_compound {
             continue;
         }
-        if function.owner.is_some()
+        if function.owner.is_some() && !instantiated
             || !function.generic_parameters.is_empty()
             || function.is_internal_call()
             || function.pinvoke.is_some()
@@ -226,6 +234,12 @@ pub(crate) fn validate_surface(module: &Module) -> Result<(), Fault> {
             return Err(Fault::new(
                 "compound signatures currently require nongeneric managed free functions",
             ));
+        }
+        if instantiated {
+            function.map_types(|ty| {
+                crate::vm::check_type(ty, module)?;
+                Ok(ty.clone())
+            })?;
         }
         for op in &function.body {
             match op {
@@ -239,6 +253,37 @@ pub(crate) fn validate_surface(module: &Module) -> Result<(), Fault> {
                 Op::New(ty) if matches!(ty, Type::Constructed { .. }) && contains(ty) => {
                     crate::vm::check_type(ty, module)?;
                 }
+                Op::Construct(target) | Op::Call(target) | Op::CallVirtual(target)
+                    if target.owner.as_ref().is_some_and(contains) =>
+                {
+                    if !target.instance || !target.generic_arguments.is_empty() {
+                        return Err(Fault::new(
+                            "composition wrapper calls require nongeneric instance methods",
+                        ));
+                    }
+                    crate::vm::check_type(target.owner.as_ref().unwrap(), module)?;
+                    if visited.insert(target.clone()) {
+                        if visited.len() > 256 {
+                            return Err(Fault::new("composition wrapper call graph exceeds limit"));
+                        }
+                        let body = if matches!(op, Op::Construct(_)) {
+                            crate::vm::resolve_constructor(module, target)?
+                        } else {
+                            crate::vm::resolve(module, target)?
+                        };
+                        if body.is_virtual
+                            || body.is_override
+                            || body.is_abstract
+                            || body.is_internal_call()
+                            || body.pinvoke.is_some()
+                        {
+                            return Err(Fault::new(
+                                "composition wrapper calls require nonvirtual managed bodies",
+                            ));
+                        }
+                        pending.push_back((std::borrow::Cow::Owned(body), true));
+                    }
+                }
                 Op::Call(target)
                     if target.owner.is_none() && target.generic_arguments.is_empty() =>
                 {
@@ -247,7 +292,7 @@ pub(crate) fn validate_surface(module: &Module) -> Result<(), Fault> {
                 _ => {
                     // Reuse the authoritative operand traversal. Only functions
                     // containing compounds enter this path; product code avoids it.
-                    let mut operand = function.clone();
+                    let mut operand = function.as_ref().clone();
                     operand.owner = None;
                     operand.parameters.clear();
                     operand.locals.clear();

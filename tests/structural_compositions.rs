@@ -521,3 +521,164 @@ fn serialized_wrapper_composition_retains_feature_gate() {
         "{result:?}"
     );
 }
+
+#[cfg(feature = "experimental-compositions")]
+const WRAPPER_METHODS: &str = r#"
+.type class Wrapper<T>
+.field Value T
+.method instance .ctor(T value) -> noresult
+ldarg this
+ldarg value
+stfld Wrapper<T>::Value
+ret
+.end
+.method instance Get() -> T
+ldarg this
+ldfld Wrapper<T>::Value
+ret
+.end
+.method instance Set(T value) -> noresult
+ldarg this
+ldarg value
+stfld Wrapper<T>::Value
+ret
+.end
+.method instance Forward() -> T
+ldarg this
+call instance Wrapper<T>::Get()
+ret
+.end
+.end
+"#;
+
+#[cfg(feature = "experimental-compositions")]
+#[test]
+fn composition_wrapper_constructor_and_instance_calls_preserve_payloads() {
+    for kind in ["union", "intersection"] {
+        let source = format!(
+            r#"
+.module WrapperCalls
+.entry Main
+{TYPES}
+{WRAPPER_METHODS}
+.function Main() -> Int32
+.local Wrapper<{kind}<Left,Right>> wrapper
+ldc.i4 7
+newobj Both
+newobj instance Wrapper<{kind}<Left,Right>>::.ctor({kind}<Right,Left>)
+stloc wrapper
+ldloc wrapper
+ldc.i4 42
+newobj Both
+callvirt instance Wrapper<{kind}<Right,Left>>::Set({kind}<Left,Right>)
+ldloc wrapper
+callvirt instance Wrapper<{kind}<Left,Right>>::Forward()
+castclass Left
+callvirt instance Left::Get()
+ret
+.end
+"#
+        );
+        let module = assemble(&source).unwrap();
+        let module = neoclr::load(&serde_json::to_string(&module).unwrap()).unwrap();
+        let p = LoadedProgram::new(&module).unwrap();
+        p.verify().unwrap();
+        assert_eq!(p.run(Limits::default()).unwrap().value, Value::Int32(42));
+    }
+}
+
+#[cfg(feature = "experimental-compositions")]
+#[test]
+fn wrapper_method_substitution_checks_transitive_bodies() {
+    for operation in [
+        ".local T temporary\nldloca temporary\npop\n",
+        "ldtoken T\npop\n",
+    ] {
+        let methods = WRAPPER_METHODS.replace(
+            ".method instance Get() -> T\n",
+            &format!(".method instance Get() -> T\n{operation}"),
+        );
+        let source = format!(".module HiddenCompound\n.entry Main\n{TYPES}\n{methods}\n.function Main() -> Int32\nldc.i4 42\nnewobj Both\nnewobj instance Wrapper<union<Left,Right>>::.ctor(union<Left,Right>)\ncallvirt instance Wrapper<union<Left,Right>>::Forward()\npop\nldc.i4 42\nret\n.end");
+        // The operation is legal for an ordinary reference argument; only closing
+        // over a composition triggers the additional experimental admission rule.
+        assert!(assemble(&source.replace("union<Left,Right>", "Both")).is_ok());
+        let error = assemble(&source).unwrap_err().to_string();
+        assert!(error.contains("compound"), "{operation}: {error}");
+    }
+}
+
+#[cfg(feature = "experimental-compositions")]
+#[test]
+fn wrapper_calls_reject_wrong_receiver_payload_and_null() {
+    for body in [
+        "newobj Neither\nnewobj instance Wrapper<union<Left,Right>>::.ctor(union<Left,Right>)\npop",
+        "ldc.i4 42\nnewobj Both\nnewobj instance Wrapper<union<Left,Right>>::.ctor(union<Left,Right>)\ncallvirt instance Wrapper<intersection<Left,Right>>::Get()\npop",
+    ] {
+        let source = format!(".module WrongCall\n.entry Main\n{TYPES}\n{WRAPPER_METHODS}\n.function Main() -> Int32\n{body}\nldc.i4 42\nret\n.end");
+        let module = assemble(&source).unwrap();
+        let p = LoadedProgram::new(&module).unwrap();
+        assert!(p.verify().is_err());
+        assert!(p.run(Limits::default()).is_err());
+    }
+    let source = format!(".module NullCall\n.entry Main\n{TYPES}\n{WRAPPER_METHODS}\n.function Main() -> Int32\nnewobj Neither\nisinst Wrapper<union<Left,Right>>\ncallvirt instance Wrapper<union<Left,Right>>::Forward()\npop\nldc.i4 42\nret\n.end");
+    let module = assemble(&source).unwrap();
+    let p = LoadedProgram::new(&module).unwrap();
+    p.verify().unwrap();
+    assert!(p
+        .run(Limits::default())
+        .unwrap_err()
+        .to_string()
+        .contains("null class receiver"));
+}
+
+#[cfg(feature = "experimental-compositions")]
+#[test]
+fn nested_wrapper_method_payload_survives_collection() {
+    let allocations = "newobj Neither\npop\n".repeat(8);
+    let source = format!(
+        r#"
+.module NestedWrapperCalls
+.entry Main
+{TYPES}
+{WRAPPER_METHODS}
+.function Main() -> Int32
+.local Wrapper<union<Wrapper<Int32>,Left>> result
+ldc.i4 42
+newobj instance Wrapper<Int32>::.ctor(Int32)
+newobj instance Wrapper<union<Wrapper<Int32>,Left>>::.ctor(union<Wrapper<Int32>,Left>)
+stloc result
+{allocations}
+ldloc result
+callvirt instance Wrapper<union<Wrapper<Int32>,Left>>::Forward()
+castclass Wrapper<Int32>
+callvirt instance Wrapper<Int32>::Get()
+ret
+.end
+"#
+    );
+    let module = assemble(&source).unwrap();
+    let p = LoadedProgram::new(&module).unwrap();
+    p.verify().unwrap();
+    let result = p
+        .run(Limits {
+            heap_objects: 3,
+            ..Limits::default()
+        })
+        .unwrap();
+    assert_eq!(result.value, Value::Int32(42));
+    assert!(result.heap.collections() > 1);
+    assert!(result.heap.reclaimed_objects() >= 8);
+}
+
+#[cfg(feature = "experimental-compositions")]
+#[test]
+fn wrapper_call_admission_deduplicates_recursive_specializations() {
+    let methods = WRAPPER_METHODS.replace(
+        "call instance Wrapper<T>::Get()",
+        "call instance Wrapper<T>::Forward()",
+    );
+    let source = format!(".module RecursiveWrapper\n.entry Main\n{TYPES}\n{methods}\n.function Main() -> Int32\nldc.i4 42\nnewobj Both\nnewobj instance Wrapper<union<Left,Right>>::.ctor(union<Left,Right>)\ncallvirt instance Wrapper<union<Left,Right>>::Forward()\npop\nldc.i4 42\nret\n.end");
+    let module = assemble(&source).unwrap();
+    LoadedProgram::new(&module).unwrap().verify().unwrap();
+    // This body recurses at execution; admission must finish without executing it.
+}

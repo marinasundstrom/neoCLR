@@ -4602,3 +4602,10 @@ The next bounded runtime slice stores closed reference compositions as arguments
 reference-class wrappers, including nested payloads across GC. Host/compiler wrapper
 transport and owned calls remain open; this is not Task execution.
 [Checkpoint](experiments/structural-compositions/README.md#runtime-composition-argument-storage--2026-10-14).
+
+Runtime wrapper constructors/nonvirtual methods now pass focused execution and
+substituted-body checks. The author also explicitly requires union constraints,
+with intersections especially useful for inputs and constraints. Union disjunction
+and intersection conjunction must remain distinct; native constraint integration
+is pending. This does not change milestone sequencing.
+[Checkpoint and direction](experiments/structural-compositions/README.md#runtime-wrapper-constructormethod-calls--2026-10-14).
