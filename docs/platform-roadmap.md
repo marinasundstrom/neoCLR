@@ -4662,3 +4662,7 @@ The author-directed composition experiment now integrates Raven await lowering w
 imported Task union contracts and native reference-class state storage. See
 [await delivery](experiments/structural-compositions/README.md#raven-composition-await-delivery--2026-10-14)
 for scope and validation; this does not change mainline milestone priorities.
+
+The experiment's shared reflection relationship core now preserves composition
+assignment guarantees and nominal-only strict ancestry; guest descriptors remain
+open. [Bounded relationship slice](experiments/structural-compositions/README.md#composition-relationship-core--2026-10-14).

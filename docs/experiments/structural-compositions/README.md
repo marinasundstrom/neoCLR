@@ -1181,3 +1181,23 @@ This checks compatibility with the already-qualified Task contract; it does not
 claim composition reflection support. Local detailed reports are
 `target/reflection-integration-type-relations/report.json` and
 `target/task-composition-await-reflection/validation.json`.
+
+## Composition relationship core — 2026-10-14
+
+The shared TypeInfo relationship implementation now reuses composition assignment
+rules for validated union/intersection signatures. It preserves wrapper invariance,
+rejects invalid or disabled signatures before identity/Object shortcuts, and keeps
+strict subclass relationships nominal. Guest composition handles/descriptors remain
+the next reflection boundary; this does not claim callable guest composition
+introspection. See [semantics and .NET comparison](../../design/type-relationships.md#experimental-composition-relationship-core-2026-10-14).
+
+No metadata encoding, Raven Runtime Contract setting, guest public API or CLI bridge
+changes. Website capability status remains unchanged; no website build is needed.
+
+Validation: `cargo test -p neoclr --lib type_relationships` passes four checks
+with the feature disabled; adding `--features experimental-compositions` passes
+five. Cases cover mixed compositions, both assignment directions, unsafe narrowing,
+Object widening, strict ancestry, invariant wrapper arguments, malformed nested
+signatures and the feature gate. Existing nominal, boxing, array and Function
+controls pass in both configurations. The already-qualified await and guest API
+snapshots are unaffected by this internal-only change.
