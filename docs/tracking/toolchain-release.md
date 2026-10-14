@@ -5,7 +5,7 @@ This page owns shared integration/delivery status. The [HTTP tracker](../http-ca
 owns whether its packaged sample passes and whether the POC is complete; do not
 maintain a second HTTP completion checklist here.
 
-## Next release: ad-hoc union hover — 2026-10-14
+## Fixed for next release: ad-hoc union hover — 2026-10-14
 
 Author-reported editor issue, deliberately deferred beyond Preview 15: hovering
 an alternative in `StreamError | JsonError | MappingError` displays the complete
@@ -21,11 +21,13 @@ Expected behavior:
 - Keep hover ranges local to the selected alternative; test every alternative in
   a nested `Task<Result<unit, ...>>` return annotation, including metadata types.
 
-This is a Raven language-service symbol selection/display issue to investigate;
-the screenshot does not establish which layer causes it. Develop the general fix
-on Raven main, then carry and validate it on the neoCLR compiler line. Preserve
-ordinary named-union hover details when that union itself is the selected type.
-No implementation or compiler change is included in Preview 15 for this issue.
+Implemented as separate Raven main commits `0dff7d7ee` (compiler display) and
+`889e1cdd9` (hover selection), carried as `fd45a35b6` and `ced0b8d46` on the native
+compiler line. Main passes 41 display and 124 hover/resolution tests; native passes
+41 and 127 respectively, with three existing skips on each line. The real-editor
+JSON sample passes all three alternative and both separator hovers before and
+after an edit. [Evidence](../validation/union-hover-20261014/README.md).
+These changes are for the next toolchain release; Preview 15 assets remain frozen.
 
 ## Preview 15 qualification and publication — 2026-10-14
 

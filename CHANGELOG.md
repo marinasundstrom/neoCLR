@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-14
 
+- Close the next-release union hover issue: carry separate Raven main display/selection fixes to the native compiler line and retain passing compiler, hover and real VS Code JSON-sample checks. Nominal alternatives show their own types; combined unions stay compact before and after edits. Preview 15 assets and the installed release are unchanged.
+
 - Record Preview 15 publication, all 11 verified asset hashes and successful website deployment. Live installation pages show the release and JSON/PostgreSQL source links resolve. SDK and extension are installed for author testing; the tagged release content remains unchanged.
 
 - Track the author-reported ad-hoc union hover issue for the next release: resolve each alternative independently and keep composed union displays compact. This is planned editor work, not a Preview 15 fix.

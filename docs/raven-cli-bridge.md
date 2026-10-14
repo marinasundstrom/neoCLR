@@ -9456,3 +9456,20 @@ gaps. The native owner representation for generic static classes is also pending
 this does not restrict the runtime's closed-type storage identity. These changes
 are on the native compiler branch, not Raven main. Rebuild native hosts for the
 expanded private context layout.
+
+
+### Union display and hover validation — 2026-10-14
+
+The shared compiler owns nominal/ad-hoc union display: named alternatives remain
+named, while the standard carrier displays as `A | B`. The language server resolves
+each type syntax alternative independently, including inside nested generic return
+annotations. It uses compiler display for the combined type. No Runtime Contract,
+CLI/native metadata, runtime behavior or code generation changes are involved;
+the temporary carrier and eventual structural metadata replacement are unchanged.
+
+Raven main `0dff7d7ee`/`889e1cdd9` were carried individually as
+`fd45a35b6`/`ced0b8d46`; branches remain separate. [Validation](validation/union-hover-20261014/README.md)
+covers source/imported nominal types and the real JSON sample. Native editor probes
+must build the server with `NeoClrMetadataProject`; a plain host cannot qualify a
+native project. Preview 15 is unchanged; the next SDK/extension must include these
+compiler/server revisions together.

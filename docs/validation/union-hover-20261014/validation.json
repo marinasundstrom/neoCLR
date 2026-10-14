@@ -1,0 +1,41 @@
+{
+  "date": "2026-10-14",
+  "mainCommits": [
+    "0dff7d7ee",
+    "889e1cdd9"
+  ],
+  "nativeCommits": [
+    "fd45a35b6",
+    "ced0b8d46"
+  ],
+  "main": {
+    "displayPassed": 41,
+    "hoverAndResolverPassed": 124,
+    "existingSkipped": 3
+  },
+  "native": {
+    "displayPassed": 41,
+    "hoverAndResolverPassed": 127,
+    "existingSkipped": 3
+  },
+  "editor": {
+    "passed": true,
+    "fixture": "Preview 15 JSON sample; RoundTrip return annotation",
+    "checks": "Three alternatives and both separators, before and after an edit; ranges exclude neighboring alternatives",
+    "nativeHostAdapter": true,
+    "profile": "fresh isolated profile",
+    "report": "vscode.json"
+  },
+  "logs": {
+    "client": {
+      "path": "target/union-hover-20261014/profile-native/logs/20261014T124427/window1/exthost/output_logging_20261014T124429/1-Raven.log",
+      "sha256": "8686b5df1f3275af2da54242d6fc6065479c2e1d073d87e09cdd9909151c9b7c"
+    },
+    "server": {
+      "path": "target/union-hover-20261014/profile-native/User/globalStorage/raven.raven-vscode/language-server/5d2c768c203b/logs/raven-lsp.log",
+      "sha256": "1196d4b1bc8ad5bcc502efe26f8ddca86cc9e36d248f000995cc4e2b5920a4f5"
+    }
+  },
+  "firstEditorAttempt": "Unqualified plain server omitted NeoClrMetadataProject and rejected the native project. Retried with the native adapter and fresh profile; no language workaround.",
+  "platform": "macOS ARM64; no runtime code or emission changes"
+}

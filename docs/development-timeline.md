@@ -17122,4 +17122,27 @@ open, not an approved complete implementation or a permanent roadmap reprioritiz
   deployment was still running. No compiler/editor patch was made for this issue.
 - **Follow-up:** investigate symbol selection and display on Raven main, then carry
   the validated general fix to the neoCLR line. Acceptance is recorded in the
-  [toolchain tracker](tracking/toolchain-release.md#next-release-ad-hoc-union-hover--2026-10-14).
+  [toolchain tracker](tracking/toolchain-release.md#fixed-for-next-release-ad-hoc-union-hover--2026-10-14).
+
+
+### 2026-10-14 — compiler-owned union display and precise hover
+
+- **Author:** directed fixing both issues on Raven main and carrying separate
+  commits to the neoCLR compiler branch. Clarified that nominal versus ad-hoc
+  union formatting must be consistent in `ToDisplayString`, while hovering an
+  alternative must resolve that specific type. Asked to continue until both work.
+- **Assistant:** isolated a type-argument early return that selected the complete
+  union, and a top-level symbol-display path that decorated structural unions as
+  nominal declarations. Committed the shared display fix and the LSP selection
+  fix separately, then carried both without merging the compiler branches.
+- **Author:** suggested a dangling language-server process when the first native
+  editor check returned no hovers. **Investigation:** client logs showed the local
+  server was built without the native metadata host adapter; project loading
+  failed and used an inferred workspace. Retrying uses an explicit native-enabled
+  build and fresh editor profile. This was test setup, not evidence of a new
+  union-display regression.
+
+- **Outcome:** both fixes pass on both compiler branches. A fresh native-enabled
+  real-editor run passes individual and combined JSON union hovers before and
+  after an edit. [Retained evidence](validation/union-hover-20261014/README.md).
+  Preview 15 and the author's installed release remain unchanged.
