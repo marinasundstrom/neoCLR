@@ -9,18 +9,24 @@ maintain a second HTTP completion checklist here.
 
 Candidate SDK/VSIX build: `0.1.15-neoclr.20261014.1`; Raven native compiler:
 `fac4ac736024800151d6b285e68407ded864f655`. Preview 14 remains published.
-[Windows package qualification](https://github.com/marinasundstrom/neoCLR/actions/runs/38534235500)
-is running on `aff7c001b`; fresh macOS packaging is in progress.
-The [validation procedure](../next-preview-validation.md) owns the required checks.
-No new installation, release tag or website publication has occurred.
+The macOS SDK, matching-server VSIX, five libraries and runtime/backend are built.
+[Candidate evidence and asset hashes](../validation/release-20261014/candidate.json)
+record extraction to a path containing spaces and the failed package gate:
+collections and async tasks pass in default JIT, but JSON's composed error carrier
+requires 132 inline lanes against the current 128-lane limit. The same JSON
+sample passes in the interpreter. Fix native value-layout admission before
+installation; do not substitute an interpreter-only acceptance result.
 
-Local GC/static-storage checks pass. Workspace formatting is corrected; strict
-Clippy exposed missing private TLS ABI safety documentation, now being validated.
-Current Windows static-storage/header execution, extracted packages and editor
-acceptance remain open. Source type initializers, readonly static writes and
-constructed generic static classes remain gaps. Native hosts require rebuilding
-for the 1,080-byte context. No expanded SQL platform qualification is claimed.
-Keep this qualification detail here rather than in reader-facing release notes.
+Local GC/static-storage, formatting, strict Clippy, notice audit, certificate-backed
+TLS and native lifetime checks pass. Hosted qualification exposed stale license
+paths, test-host paths, a GC instrumentation marker, old HTTP compiler pins and
+cryptography host exports. Repairs are committed separately and require hosted
+requalification. The package run on `aff7c001b` is retained as an earlier candidate,
+not evidence for later source fixes. Follow the [validation procedure](../next-preview-validation.md).
+
+No new installation, release tag or website publication has occurred. Detailed
+implementation gaps remain in their technical records; reader-facing notes retain
+only practical usage and scope information.
 
 ## Release preflight — 2026-10-13
 

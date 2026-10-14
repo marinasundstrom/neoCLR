@@ -1,0 +1,30 @@
+{
+  "runtimeRevision": "3e34c7218",
+  "compilerRevision": "fac4ac736024800151d6b285e68407ded864f655",
+  "packageVersion": "0.1.15-neoclr.20261014.1",
+  "platform": "macOS ARM64",
+  "passed": false,
+  "verifiedFiles": 1542,
+  "failedCommand": {
+    "command": [
+      "/Users/robert/Projects/neoclr/target/release extracted 20261014/neoclr-native-poc/bin/neoclr",
+      "run",
+      "/Users/robert/Projects/neoclr/target/release extracted 20261014/neoclr-native-poc/samples/json/bin/neoclr/App.dll",
+      "--reflection-roots",
+      "/Users/robert/Projects/neoclr/target/release extracted 20261014/neoclr-native-poc/samples/json/bin/neoclr/App.reflection.json"
+    ],
+    "exitCode": 1,
+    "stdout": "",
+    "stderr": "neoclr-codegen: NeoMetadata_FA566E42DA73C41D0ED223A539A12D10E8367B0894994E7B5C2FF433E6686E17.T_53797374656D_556E696F6E6033: value layout exceeds 128 flattened lanes (132)\n"
+  },
+  "interpreterJson": {
+    "exitCode": 0,
+    "stdout": "JSON object mapping checks passed\n"
+  },
+  "assets": {
+    "neoclr-preview-candidate-osx-arm64.tar.gz": "b3b502c8fffd8abf93886b99672251ac46f53c685efdab12648f4c575445bc10",
+    "raven-sdk-0.1.15-neoclr.20261014.1-osx-arm64.tar.gz": "eec7d1d82ccaaf5519e0b5da288e1728f902b2f3d88f5e51f2f473e03b1c6276",
+    "raven-vscode.vsix": "2d9e255906045633c709dee5fe911f62494eb0f8950bf82ceda471605163188c"
+  },
+  "status": "Not installed or published; JIT JSON value-layout admission blocks package acceptance."
+}

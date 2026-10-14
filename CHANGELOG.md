@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-14
 
+- Retain fresh macOS candidate hashes and failed extracted-package evidence: collections/tasks pass default JIT, but composed JSON errors exceed the 128-lane native inline limit at 132 lanes. Interpreter JSON passes. Record the release blocker without installing or publishing the candidate.
+
 - Update integrated runtime validation to read the owned allocator header, locate Windows scalar hosts after the codegen move, and instrument the current leaf-marking phase. Both native layout-budget tests and the relocated/instrumented GC test pass locally; Windows scalar execution is queued for requalification.
 
 - Align HTTP/HTTPS source qualification with Raven native compiler `fac4ac736`, matching the candidate SDK and current union/static-field library metadata. Fresh macOS libraries compile; old Windows pins failed during library rebuild. Hosted HTTP/HTTPS requalification is required.
