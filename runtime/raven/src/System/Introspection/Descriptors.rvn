@@ -410,6 +410,8 @@ internal class RuntimePropertyInfo : RuntimeMemberInfo, PropertyInfo {
 }
 
 public sealed interface NominalTypeInfo : TypeInfo, MemberInfo {
+    /// Tests whether this declaration carries nominal union metadata.
+    val IsUnionDeclaration: bool { get }
     val FullName: string { get }
     val Namespace: string { get }
 }
@@ -591,7 +593,7 @@ internal class RuntimeTypeInfo : TypeInfo {
     val IsAbstract: bool => RuntimeServices.TypeShape(Handle, 5)
     val IsOpen: bool => RuntimeServices.TypeShape(Handle, 8)
     val IsClosedHierarchy: bool => RuntimeServices.TypeShape(Handle, 9)
-    val IsUnion: bool => RuntimeServices.TypeShape(Handle, 10)
+    val IsUnion: bool => RuntimeServices.TypeShape(Handle, 14)
     val IsEnum: bool => RuntimeServices.TypeShape(Handle, 6)
     val IsValueType: bool => RuntimeServices.TypeShape(Handle, 7)
     val IsVisible: bool => RuntimeServices.TypeShape(Handle, 11)
@@ -742,7 +744,8 @@ internal class RuntimeNominalTypeInfo : NominalTypeInfo {
     val IsAbstract: bool => RuntimeServices.TypeShape(Handle, 5)
     val IsOpen: bool => RuntimeServices.TypeShape(Handle, 8)
     val IsClosedHierarchy: bool => RuntimeServices.TypeShape(Handle, 9)
-    val IsUnion: bool => RuntimeServices.TypeShape(Handle, 10)
+    val IsUnionDeclaration: bool => RuntimeServices.TypeShape(Handle, 10)
+    val IsUnion: bool => RuntimeServices.TypeShape(Handle, 14)
     val IsEnum: bool => RuntimeServices.TypeShape(Handle, 6)
     val IsValueType: bool => RuntimeServices.TypeShape(Handle, 7)
     val IsVisible: bool => RuntimeServices.TypeShape(Handle, 11)
@@ -976,7 +979,7 @@ internal class RuntimeFunctionTypeInfo : FunctionTypeInfo {
     val IsAbstract: bool => RuntimeServices.TypeShape(Handle, 5)
     val IsOpen: bool => RuntimeServices.TypeShape(Handle, 8)
     val IsClosedHierarchy: bool => RuntimeServices.TypeShape(Handle, 9)
-    val IsUnion: bool => RuntimeServices.TypeShape(Handle, 10)
+    val IsUnion: bool => RuntimeServices.TypeShape(Handle, 14)
     val IsEnum: bool => RuntimeServices.TypeShape(Handle, 6)
     val IsValueType: bool => RuntimeServices.TypeShape(Handle, 7)
     val IsVisible: bool => RuntimeServices.TypeShape(Handle, 11)

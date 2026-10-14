@@ -9743,3 +9743,26 @@ files to the pre-slice revision (4d34e3505); this is not reported as a passing c
 Its general readonly-receiver behavior is deferred for independent reproduction/fix on
 Raven main and deliberate carry-forward, outside this structural-type experiment.
 No website build was needed; published capability status remains unchanged.
+
+### Union classification split (2026-10-14, experimental branch)
+
+Author direction reserves TypeInfo.IsUnion for structural unions. NominalTypeInfo
+now exposes IsUnionDeclaration for UnionAttribute-based declaration classification.
+Nominal callers must obtain the nominal view and use that helper; Option/Result
+declarations and their cases are not structural unions. Other nominal-helper
+reorganization remains separate work.
+
+The existing TypeShape runtime service keeps nominal marker slot 10 and adds
+structural identity slot 14. Native lowering admits the extra slot but continues to
+reject composition metadata; its currently admitted nominal/Function shapes return
+false for slot 14. Match the new source library to this runtime/backend. There is
+no CLI signature encoding or compiler Runtime Contract selection change. Guest
+composition handle creation remains gated independently of the predicate semantics.
+
+The aggregate CLI assembly is only the temporary compiler/documentation reference.
+Both that reference and native rendered API snapshots are regenerated. The obsolete
+CLI runtime-slice generator cannot refresh Descriptors: it encounters the existing
+Type-versus-TypeInfo bootstrap mismatch, then missing ArrayReflection slice input
+and obsolete stream capability validation when tried with temporary adaptations.
+Those adaptations were reverted; no stale output is represented as freshly generated.
+Qualification uses matching source-built native libraries and migrated consumers.

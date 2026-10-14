@@ -365,6 +365,18 @@ mod composition_tests {
             assert!(describe(&module, &ty).is_err());
             assert!(describe_loaded(&module, &ty).is_err());
             assert!(describe_host(&module, &ty).is_ok());
+            let descriptor = describe_host(&module, &ty).unwrap();
+            let result = crate::reflection::Query::Shape
+                .invoke(
+                    &module,
+                    &[
+                        crate::Value::RuntimeTypeHandle(Box::new(descriptor)),
+                        crate::Value::Int32(14),
+                    ],
+                    &crate::Limits::default(),
+                )
+                .unwrap();
+            assert_eq!(result, crate::Value::Boolean(matches!(ty, Type::Union(_))));
             let identity = resolve(&module, &ty).unwrap();
             assert_eq!(
                 crate::reflection::from_identity(&module, &identity).unwrap(),

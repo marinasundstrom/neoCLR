@@ -4674,3 +4674,8 @@ arguments without nominal definition tokens. Guest descriptors remain pending.
 The experiment now exposes recursive host composition descriptors, including
 constituents within closed generic arguments; guest providers remain gated.
 [Host descriptor checkpoint](experiments/structural-compositions/README.md#host-composition-descriptors--2026-10-14).
+
+Author correction reserves TypeInfo.IsUnion for structural identity and separates
+nominal detection as NominalTypeInfo.IsUnionDeclaration. Existing nominal consumers
+are migrated; broader nominal-helper grouping and guest structural providers remain
+follow-up work. [Classification correction](experiments/structural-compositions/README.md#author-correction-structural-isunion--2026-10-14).

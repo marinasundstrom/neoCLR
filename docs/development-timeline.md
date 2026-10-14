@@ -17530,3 +17530,20 @@ open, not an approved complete implementation or a permanent roadmap reprioritiz
   not by themselves complete structural union/intersection introspection.
 - **Validation:** see the integration checkpoint in the
   [composition experiment](experiments/structural-compositions/README.md#main-reflection-integration--2026-10-14).
+
+### 2026-10-14 — separate structural union identity from nominal classification
+
+- **Author:** clarified that IsUnion should be reserved for structural unions, with
+  nominal structure/rule checks in a separate group of helpers ("East Union" was
+  interpreted in context as IsUnion).
+- **Assistant correction:** the earlier decision to retain nominal IsUnion semantics
+  was provisional and is superseded. Reserve TypeInfo.IsUnion for structural identity;
+  move marker-based union detection to NominalTypeInfo.IsUnionDeclaration. Other
+  nominal-helper grouping remains follow-up work, not a completed API reorganization.
+- **Action:** update runtime classification, the native lowering table, source
+  descriptors, bridge declarations and nominal consumers; refresh API documentation.
+  Guest structural descriptor construction remains independently gated.
+- **Outcome:** both migrated native consumers pass in the interpreter, with direct
+  structural/nominal checks and native lowering regression coverage. Retained
+  [evidence](validation/union-classification-20261014/results.json) records artifact
+  hashes and the separately blocked legacy CLI bootstrap.

@@ -1,3 +1,8 @@
+> Author correction (2026-10-14): `IsUnion` is reserved for structural unions.
+> Nominal union detection belongs to nominal helpers; the experimental implementation
+> now exposes `NominalTypeInfo.IsUnionDeclaration`. The earlier status and examples
+> below are historical and do not override this distinction.
+
 # NeoCLR Introspection Model — Capability-Oriented Metadata Proposal
 
 ## Author clarification — 2026-09-24

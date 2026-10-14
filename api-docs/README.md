@@ -2025,3 +2025,8 @@ Host `TypeDescriptor.constituents` and composition-aware `LoadedProgram::describ
 are documented in the [runtime hosting reference](runtime-hosting.md#host-composition-descriptors-development-2026-10-14).
 They remain outside the guest RavenDoc selection; guest descriptor gates and the
 matching guest API snapshot are unchanged.
+
+Union classification correction (2026-10-14): TypeInfo.IsUnion is structural-only;
+NominalTypeInfo.IsUnionDeclaration covers nominal markers. The aggregate reference
+and native API render are rebuilt from matching development library sources, with
+XML migration notes. The existing nominal type selection covers the new member.

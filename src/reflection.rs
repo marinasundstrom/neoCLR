@@ -199,6 +199,7 @@ impl Query {
             Self::Shape => Ok(Value::Boolean(match argument {
                 12 => matches!(handle.identity, TypeIdentity::Definition { .. }),
                 13 => matches!(handle.identity, TypeIdentity::Function { .. }),
+                14 => matches!(handle.identity, TypeIdentity::Union(_)),
                 8 => definition.is_some_and(|d| {
                     (d.is_reference_type || d.representation == Representation::Interface)
                         && !d.is_sealed
@@ -212,7 +213,7 @@ impl Query {
                                 .constructor
                                 .owner
                                 .as_ref()
-                                .and_then(Type::definition_name)
+                                .and_then(|owner| crate::reflection_source::name(module, owner))
                                 == Some("System.Runtime.CompilerServices.UnionAttribute")
                     })
                 }),
@@ -1569,6 +1570,31 @@ fn publicly_visible(module: &Module, ty: &Type) -> bool {
 #[cfg(test)]
 mod visibility_tests {
     use super::*;
+
+    #[test]
+    fn nominal_union_marker_uses_source_identity_and_is_not_structural() {
+        let mut module = crate::assemble(
+            ".module Flags\n.type class Choice\n.end\n.type class InternalMarker\n.end\n",
+        )
+        .unwrap();
+        module.types[1].origin = Some(serde_json::from_value(serde_json::json!({"assembly":"Runtime","module":"Runtime.dll","name":"System.Runtime.CompilerServices.UnionAttribute","token":33554433})).unwrap());
+        module.types[0].custom_attributes.push(serde_json::from_value(serde_json::json!({"constructor":{"name":".ctor","owner":{"Named":"InternalMarker"},"instance":true,"parameters":[]}})).unwrap());
+        let descriptor =
+            crate::type_identity::describe_host(&module, &Type::from_name("Choice")).unwrap();
+        for (selector, expected) in [(10, true), (14, false)] {
+            let result = Query::Shape
+                .invoke(
+                    &module,
+                    &[
+                        Value::RuntimeTypeHandle(Box::new(descriptor.clone())),
+                        Value::Int32(selector),
+                    ],
+                    &Limits::default(),
+                )
+                .unwrap();
+            assert_eq!(result, Value::Boolean(expected));
+        }
+    }
 
     #[test]
     fn visibility_respects_source_nesting_and_compound_types() {

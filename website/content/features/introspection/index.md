@@ -92,3 +92,10 @@ The tour covers type identity, modules, metadata tokens and member classificatio
 <a id="feedback"></a>
 
 <a id="development-case-inspecting-route-declarations-at-startup"></a>
+
+### Development: union classification
+
+On the structural-type experimental branch, `TypeInfo.IsUnion` is reserved for
+structural unions. Use `NominalTypeInfo.IsUnionDeclaration` to detect nominal Raven
+union declarations. Guest structural descriptors remain under development; this
+change is not part of the published release.

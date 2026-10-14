@@ -252,8 +252,11 @@ traversal or grant member invocation access.
 TypeInfo exposes IsAbstract, IsOpen, IsClosedHierarchy, IsUnion, IsEnum and
 IsValueType. IsOpen means unrestricted inheritance/implementation, not generic
 openness. A closed family reports IsClosedHierarchy, while an ordinary leaf reports
-neither IsOpen nor IsClosedHierarchy. IsUnion identifies nominal union declarations
-(including constructed Option/Result), not their cases or ad-hoc union expressions.
+neither IsOpen nor IsClosedHierarchy. IsUnion is reserved for structural union
+identity. Nominal union declarations (including constructed Option/Result) are
+identified separately by NominalTypeInfo.IsUnionDeclaration; cases return false.
+This development change replaces the former nominal meaning of IsUnion. Guest
+structural descriptor construction remains gated on the experimental branch.
 ClosedHierarchy describes the direct family; permitted open subtypes may themselves
 have descendants. These are descriptive metadata queries, not added raw-IL enforcement.
 

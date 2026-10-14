@@ -67,3 +67,7 @@ fixture records importer rejection separately from startup mapper rejection.
 
 The .NET comparison and design tradeoffs are recorded in
 [route parsing](../../route-parsing.md#runtime-attributed-union-mapper).
+
+Development migration (2026-10-14): preparation checks the nominal view and
+IsUnionDeclaration. TypeInfo.IsUnion is reserved for structural unions and is not
+a route-carrier predicate. Use matching development library/runtime artifacts.

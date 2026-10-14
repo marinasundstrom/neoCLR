@@ -1,0 +1,42 @@
+{
+  "passed": true,
+  "platform": "macOS ARM64",
+  "mode": "interpreter",
+  "cases": [
+    {
+      "name": "Flags",
+      "exitCode": 0,
+      "stdout": "TypeInfo flags passed\n",
+      "stderr": ""
+    },
+    {
+      "name": "Mapper",
+      "exitCode": 0,
+      "stdout": "Runtime route mapper checks passed\n",
+      "stderr": ""
+    }
+  ],
+  "runtimeSha256": "659c80816320656714bd3a653edbbd7a18d8e136068b9f335e200681a08c6944",
+  "compilerRevision": "793219d855b17f01fb805e215968b78871eb3804",
+  "sha256": {
+    "runtime/raven/src/System/Introspection/Descriptors.rvn": "bd1173dc7dd423b4e932fcd73687ce9a064a43082242a21817ce0fab75ee405d",
+    "docs/experiments/introspection-flags/Main.rvn": "2064169355b0bd11260cb02a4a9cb2364e689fa17d249fd528c0d73f986b2b92",
+    "docs/experiments/runtime-route-mapper/Mapper.rvn": "3defd568a6a692dc309b186f73822e1e6acaf40015a8f1cf02887351e59bbe54",
+    "target/union-shape-native-libraries/System.Runtime.dll": "43d0704ffa344bf8986d59c40d9ba138a3e24a45cc48f63aa807de383386aee7",
+    "target/union-shape-native-libraries/System.runtime.neox": "98a1ae1da85387c87746957e83a4015eb59d0566539a915c69f168d2b511b190",
+    "target/union-shape-consumers/Flags/bin/neoclr/Flags.dll": "3189e31604d2127fece2ca4db7aff04d8ba7cd828f2f427945f48b232983e0ef",
+    "target/union-shape-consumers/Mapper/bin/neoclr/Mapper.dll": "4ce713a1c8d353a115ef316eeb4fcd0bf9e4beb6e36da9b3ebe8fdf9d39915f6"
+  },
+  "checks": {
+    "structuralShape": 1,
+    "nominalMarker": 1,
+    "nativeDescriptorLowering": 7,
+    "nativeApiSnapshot": 4,
+    "apiFingerprint": "passed"
+  },
+  "limitations": [
+    "Guest structural TypeInfo construction remains gated.",
+    "Legacy CLI runtime-slice regeneration remains blocked by existing bootstrap/importer mismatches; native libraries are qualified.",
+    "No new JIT/AOT consumer or Windows execution qualification."
+  ]
+}

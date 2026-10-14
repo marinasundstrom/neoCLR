@@ -137,6 +137,7 @@ executes guest code nor grants construction/invocation rights. Rust callers
 constructing TypeDescriptor literals must initialize the new field.
 
 Guest type-token and TypeInfo providers retain the existing gate. In particular,
-the Raven `TypeInfo.IsUnion` property still describes nominal union declarations;
-this host addition does not repurpose it for structural unions. The guest API
+the Raven `TypeInfo.IsUnion` property is now reserved for structural unions, while
+`NominalTypeInfo.IsUnionDeclaration` checks nominal metadata. Host description does
+not by itself enable guest structural descriptors. The guest API
 snapshot, native metadata encoding and CLI bridge are unchanged.

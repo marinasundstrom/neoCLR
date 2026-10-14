@@ -1255,3 +1255,36 @@ inspection, generic wrappers/bounds, canonicalization and invalid inputs; guest
 construction remains rejected while the same host snapshot succeeds. The guest API
 reference/source fingerprint check passes.
 All seven default-build identity checks also pass, including the disabled composition descriptor gate.
+
+## Author correction: structural IsUnion — 2026-10-14
+
+This supersedes the earlier checkpoint's choice to retain nominal IsUnion semantics.
+TypeInfo.IsUnion now means structural Union identity only. Nominal marker checks
+belong to NominalTypeInfo.IsUnionDeclaration. The route mapper and classification
+sample use the nominal helper. Structural intersections and nominal declarations
+return false from IsUnion. Guest composition descriptor creation remains gated;
+the predicate can already be checked directly against a resolved host handle.
+
+The internal shape selector adds slot 14 for structural union identity and retains
+slot 10 for nominal markers. Native lowering expands its bounds-checked table and
+keeps composition/backend gates. Public API snapshots and manual docs are refreshed.
+The legacy CLI bootstrap gap and matching-artifact requirement are recorded in
+[the bridge notes](../../raven-cli-bridge.md#union-classification-split-2026-10-14-experimental-branch).
+
+The native consumer exposed a pre-existing nominal marker lookup issue: linked
+attribute owners have private names. The nominal helper now uses retained source
+identity, matching the semantic marker before private renaming. Interpreter and
+backend regression checks cover this case without classifying it as structural.
+
+Validation uses native library sources compiled with Raven
+`793219d855b17f01fb805e215968b78871eb3804`, fresh bridge/API references and the
+source-built runtime. The direct structural predicate check, nominal linked-marker
+check, seven native descriptor-lowering checks, four snapshot checks and API
+fingerprint validation pass. The migrated classification sample executes successfully
+against `target/union-shape-native-libraries`; evidence is retained under
+`target/union-shape-consumers`. No guest structural-descriptor or native composition
+execution support is inferred from these tests.
+
+The migrated route mapper also executes successfully. Both consumer outputs and
+matching source/runtime/library hashes are retained in
+[the classification evidence](../../validation/union-classification-20261014/results.json).
