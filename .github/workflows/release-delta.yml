@@ -96,6 +96,17 @@ jobs:
             while (!(Test-Path $report) -and (Get-Date) -lt $deadline) { Start-Sleep -Seconds 2 }
             if (!(Test-Path $report) -or !(Get-Content $report | ConvertFrom-Json).passed) { throw "$kind acceptance failed" }
           }
+      - name: Archive the qualified delta bundle
+        shell: pwsh
+        working-directory: neoclr
+        run: |
+          Copy-Item target/raven-vscode.vsix target/delta/bundle/editor/raven-vscode.vsix -Force
+          python -c "import pathlib,json,hashlib; p=pathlib.Path('target/delta/bundle'); m=json.loads((p/'manifest.json').read_text()); m['files']['editor/raven-vscode.vsix']=hashlib.sha256((p/'editor/raven-vscode.vsix').read_bytes()).hexdigest(); (p/'manifest.json').write_text(json.dumps(m,indent=2)+'\n')"
+          if ($LASTEXITCODE) { exit $LASTEXITCODE }
+          New-Item -ItemType Directory target/release
+          Copy-Item target/delta/bundle target/release/neoclr-native-poc -Recurse
+          tar -czf target/neoclr-native-poc-win-x64.tar.gz -C target/release neoclr-native-poc
+          if ($LASTEXITCODE) { exit $LASTEXITCODE }
       - uses: actions/upload-artifact@v4
         if: always()
         with:
@@ -108,3 +119,4 @@ jobs:
             neoclr/target/delta/preparation.json
             neoclr/target/delta/libraries/build-evidence.json
             neoclr/target/raven-vscode.vsix
+            neoclr/target/neoclr-native-poc-win-x64.tar.gz

@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-14
 
+- Archive the focused Windows release-delta bundle only after JSON and editor checks pass, updating its VSIX hash while preserving the qualified runtime and SDK. Broad runtime validation is reused for this API/client-only delta.
+
 - Add JsonValue.ToJsonString and JsonSerializerOptions.WriteIndented, with compact defaults and two-space/LF indentation shared by string and stream serializer overloads. Preserve typed errors, escaping, document quotas and preflight-before-write behavior. JSON DOM/stream tests pass in interpreter, JIT and AOT on macOS; focused Windows qualification follows. Refresh both API references and guard JSON type/member GitHub source links.
 
 - Add focused release-delta qualification using the already-qualified Windows SDK/runtime: rebuild changed libraries and check JSON plus configuration recovery, member hover and inlays. Preserve the optional PostgreSQL library when refreshing a bundle. Raven main 2aa6c7388 adds explicit props/targets watching, carried as 507f35571; three local recovery cycles and Find hover through four edits pass.
