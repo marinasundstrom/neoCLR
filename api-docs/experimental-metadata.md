@@ -8424,8 +8424,9 @@ reader still treats bodies as opaque, and this API is not a runtime verifier.
 .NET/CLI has no equivalent first-class union/intersection signature. Reading the
 native shape preserves constituent information without inventing a carrier ABI;
 the cost is an explicit boundary before compiler import, authored storage and
-code generation. Raven's current adapter uses the default reader and therefore
-still rejects compound declarations. See the
+code generation. Raven's default adapter still rejects compound declarations. Its separate
+experimental intersection API now supports semantic inspection while rejecting
+structural unions and keeping native emission gated. See the
 [experiment record](../docs/experiments/structural-compositions/README.md) for
 validation, remaining identity differences and the next compiler slice.
 
@@ -8446,5 +8447,5 @@ inspect an already admitted immutable snapshot.
 
 Composition projection retains the reader's depth limit of 32. It adds no
 assignability, synthesized members, callable import or code generation. Existing
-non-composition projection limits remain unchanged. Raven symbol mapping and
-native emission are still pending.
+non-composition projection limits remain unchanged. Raven's explicit experimental API now maps intersection views to semantic symbols;
+structural union import and native emission remain pending.

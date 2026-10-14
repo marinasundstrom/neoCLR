@@ -20,33 +20,44 @@ carrier path. The companion Raven branch `codex/neoclr-union-intersection`, base
 on native `caa787a96`, selectively carries compiler-created intersection symbols,
 substitution/display and reference conversions from `02d669acd`/`c4d57d282`.
 Source conjunctions now bind in generic constraints, retaining ordinary nominal
-bounds. Value storage is rejected with RAV0363; native compound emission remains
+bounds. Explicit intersection value syntax is rejected with RAV0363; native compound emission remains
 disabled. This uses archived parser/constraint changes `08b53d8c4`, `41b684e3f` and
 `c6a303f0d`, with no new Runtime Contract switch. Compiler normalization removes
 nominal supertypes as well as duplicate bounds; runtime syntax normalization does
-not. Reconcile descriptor identity before metadata import/export.
+not. Experimental semantic import retains native descriptors separately; native export still requires descriptor agreement.
 Raven main and the native line remain separate; older structural/intersection work
 is an input for selective reuse, not a wholesale merge.
 
 The metadata facade exposes admitted descriptors as canonical
 `ReferenceCompositionTypeInfo` views, including function results and parameters.
-This preserves kind and nominal identity without adding compiler symbol mapping,
-Runtime Contract capabilities or emission. Focused host checks cover reordered
-bounds, mixed nesting and context isolation.
+This preserves kind and nominal identity. Raven `50037e711` now maps intersection views through
+an explicit semantic-only `ReadExperimentalIntersectionAssembly(image, bootstrap)`
+API; default readers remain closed. The compiler retains native descriptors
+separately from symbols, whose normalization can remove nominal supertypes.
+Normalized structural unions, including nested unions, are rejected. No Runtime
+Contract capability or emission mapping is enabled.
 
 The host declaration reader can now opt into read-only compound free-function
-signatures via `ReadNativeAssembly(image, true)`. Raven still uses the default
-reader. Native callable import and CLI projection remain explicitly rejected;
+signatures via `ReadNativeAssembly(image, true)`. Ordinary Raven project/CLI loading
+still uses the default reader. Native callable import and CLI projection remain explicitly rejected;
 loaded snapshots preserve original bytes without verifying bodies. See the
 [host API reference](../api-docs/experimental-metadata.md#read-only-reference-compositions-experiment-2026-10-14).
 
-Lost/restricted information: no compiler import/export, compound reflection
+Lost/restricted information: no structural-union compiler import or compound export, compound reflection
 construction, generic/value/intrinsic-reference composition, member merging or
 native backend layout. Non-null compound values currently require class allocations;
 boxed/intrinsic references can fail despite a compatible static Object/interface
 view. This is a temporary support gap, not the intended general semantics. Typed
 nulls follow existing reference cast/storage behavior. JIT/AOT explicitly reject
 compounds; default interpreter builds reject the opt-in signatures too.
+
+Raven's native emitters reject compilations with any reference containing compound
+callables (NEOMETA001), including signatures normalized to a nominal compiler type.
+This conservative reference-wide gate prevents silent signature erasure. Both
+metadata schemas pass cold/warm symbol/type queries, reduction/retention checks,
+union/default-reader rejection and emission rejection without changing output.
+The existing native nullable-symbol control also passes. These checks add semantic
+import evidence, not Raven-generated compound execution.
 
 Replacement owners: Raven must preserve semantic symbols and diagnostics through
 an explicit native target capability; the neoCLR metadata library must supply the

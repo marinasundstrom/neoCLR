@@ -327,3 +327,28 @@ including canonical function result discovery, reordered bounds, context isolati
 immutable bounds and mixed nesting. Public XML documentation builds and the guest
 API snapshot check pass. Runtime evidence above is unaffected. Raven still uses
 the default reader; semantic import and emission remain open.
+
+## Raven semantic import — 2026-10-14
+
+The companion compiler at Raven `50037e711` now provides an explicit
+`NeoClrMetadataReference.ReadExperimentalIntersectionAssembly` API. It maps native
+intersection views to compiler-owned symbols for cold/warm semantic queries and
+inferred local types. Default readers/project loading remain closed. Normalized
+structural unions are rejected, including those nested inside intersections.
+Native descriptors retain bounds that compiler nominal-supertype reduction removes.
+
+A focused probe exposed an emission hole for a reduced `A & Derived` signature:
+the compiler could previously emit using only the nominal symbol. The new
+reference-wide NEOMETA001 guard rejects native emission whenever a reference
+contains compound callables, even if unused or normalized to a nominal type.
+Both emit entry points preserve output on rejection. This is a deliberate temporary
+restriction, not a compound ABI or an executable Raven composition program.
+
+Validation: Raven `NeoClrMetadataProbe --intersection-symbols <core.dll>` passes
+schema-2/schema-3 inputs, cold/post-diagnostics queries, reordered canonical identity,
+nominal reduction with raw descriptor retention, insufficient-bound rejection,
+union/default-reader rejection and emitter output preservation. The existing
+`--nullable-symbols` probe passes before/after, using this repository's
+`api-docs/reference/NeoCLR.CoreProbe.dll` and metadata checkpoint `97bbcf76b`.
+Native storage/call emission is the next capability; structural union symbols and
+receiver merging remain open. Runtime evidence above is unchanged.

@@ -17261,3 +17261,14 @@ open, not an approved complete implementation or a permanent roadmap reprioritiz
   admitted signatures through function discovery. Focused checks cover reordered
   identity, context isolation, immutable bounds and mixed nesting. This is another
   native compiler prerequisite; Raven import and emission remain unimplemented.
+
+- **Native semantic import follow-through:** on continuation, the assistant adds
+  Raven's explicit experimental intersection-reference API (`50037e711`) and canonical view-to-
+  symbol mapping. The probe finds that nominal-supertype reduction could let a
+  compound signature reach emission as a nominal signature; a reference-wide
+  NEOMETA001 guard now prevents that erasure. Both schema variants pass cold/warm
+  queries, descriptor-retention and emission/no-output checks; the existing nullable
+  control passes before/after. Default loading remains closed, structural unions
+  are rejected, and runnable Raven compound emission is still open. An unrelated
+  cold assembly-symbol API setup failure is recorded in Raven's experiment notes
+  as a deferred general-main candidate, not folded into this target slice.
