@@ -356,7 +356,7 @@ public sealed partial class MethodBuilder
                 case "reference.cast":
                 case "object.unbox":
                     if (stack.Count == 0 || stack[^1] is not { ConstructionReceiver: false, ByReferenceElement: null, AddressedLocal: null, AddressedParameter: null } value ||
-                        !(value.Primitive == PrimitiveType.String || value.ArrayElement is not null || value.Class is { IsValueType: false, IsStatic: false } || value.GenericInstance?.Definition is { IsValueType: false, IsStatic: false } || value.ImportedType is { IsValueType: false }))
+                        !(value.Composition is not null || value.Primitive == PrimitiveType.String || value.ArrayElement is not null || value.Class is { IsValueType: false, IsStatic: false } || value.GenericInstance?.Definition is { IsValueType: false, IsStatic: false } || value.ImportedType is { IsValueType: false }))
                         throw new InvalidDataException("reference operation requires a reference value");
                     if (instruction.Op == "reference.isnull") MaxStack = Math.Max(MaxStack, stack.Count + 1);
                     stack.RemoveAt(stack.Count - 1);

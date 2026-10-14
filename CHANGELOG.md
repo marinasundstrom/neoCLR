@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-14
 
+- Add explicit native reference composition authoring to the experimental metadata builder, including closed generic bounds, checked reference operations and finality revalidation. Reject CLI projection; document the host API and validate native signature roundtrip and invalid operands.
+
 - Add experimental UnionTypeInfo and IntersectionTypeInfo with direct constituent
   snapshots, shared identity/assignment behavior and native interpreter descriptor
   construction. Keep direct composition member/hierarchy queries explicitly

@@ -8644,3 +8644,24 @@ nongeneric owned method signatures; the default reader remains closed. External
 intersection bounds still require finality resolution unavailable in this reader profile.
 Raven's generated async state machines use this storage admission with the exact imported
 Task result contract. See the linked composition experiment for executable evidence.
+
+### Authored reference compositions (2026-10-14 development)
+
+`AssemblyBuilder.CreateExperimentalReferenceComposition(ReferenceCompositionKind kind,
+params SignatureType[] types)` returns an output-owned structural signature. Supply
+2–256 closed nominal reference bounds; same-kind nesting flattens, duplicates collapse
+and a singleton becomes its remaining type. Closed generic reference bounds and
+composition arguments in closed reference wrappers are supported. Intersection bounds
+must be interfaces or classes open to extension (CLR final is rejected, including a
+local class made final after signature creation). Open, value, pointer and function
+bounds are outside this profile. Foreign or invalid operands throw ArgumentException;
+invalid graph mutations fail emission. Input arrays are copied.
+
+The returned signature is admitted for native parameters, returns, locals, reference
+casts and type tokens. Emit with WriteNativeAssembly and optionally the NEOX binary
+container. CLI and PE reference projection reject admitted compositions. This is an
+explicit experimental extension to CLR signatures, which have no native union or
+intersection element type; no nominal carrier declaration is synthesized. Native
+interpreter execution requires experimental-compositions; JIT/AOT remain gated.
+Validation: the host test runner's `--authored-compositions` checks native roundtrip,
+normalization, ownership, unsupported bounds and finality mutation.

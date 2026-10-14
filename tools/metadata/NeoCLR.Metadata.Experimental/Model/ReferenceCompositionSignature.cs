@@ -9,7 +9,7 @@ public enum ReferenceCompositionKind
     Intersection
 }
 
-/// <summary>An immutable experimental native signature; storage requires explicit imported-contract admission.</summary>
+/// <summary>An immutable experimental native signature; storage requires explicit authoring or imported-contract admission.</summary>
 public sealed class ReferenceCompositionSignature : IEquatable<ReferenceCompositionSignature>
 {
     internal ReferenceCompositionSignature(ReferenceCompositionKind kind, SignatureType[] constituents)
@@ -39,7 +39,7 @@ public sealed class ReferenceCompositionSignature : IEquatable<ReferenceComposit
 
 public sealed partial record SignatureType
 {
-    /// <summary>Gets the opt-in native reference composition, or null. Storage requires explicit imported-contract admission.</summary>
+    /// <summary>Gets the opt-in native reference composition, or null. Storage requires explicit authoring or imported-contract admission.</summary>
     public ReferenceCompositionSignature? Composition { get; }
     internal bool ContainsComposition => Composition is not null ||
         GenericInstance?.TypeArguments.Any(t => t.ContainsComposition) == true ||
@@ -59,6 +59,70 @@ public sealed partial record SignatureType
 
 public sealed partial class AssemblyBuilder
 {
+    /// <summary>Creates and admits an experimental closed reference union or intersection for native signatures and storage.</summary>
+    /// <param name="kind">Union or intersection membership.</param>
+    /// <param name="types">Two to 256 output-owned constituents; copied and normalized.</param>
+    /// <returns>The structural signature, or the surviving constituent after duplicate normalization.</returns>
+    /// <exception cref="ArgumentException">A constituent is foreign, open, unsupported, or a final intersection bound.</exception>
+    /// <remarks>Native-only; CLI projection remains disabled. Value, pointer and function bounds are not admitted.</remarks>
+    public SignatureType CreateExperimentalReferenceComposition(ReferenceCompositionKind kind, params SignatureType[] types)
+    {
+        ArgumentNullException.ThrowIfNull(types);
+        if (!Enum.IsDefined(kind) || types.Length is < 2 or > 256)
+            throw new ArgumentException("composition requires a supported kind and two to 256 constituents", nameof(types));
+        var nodes = 0;
+        bool Closed(SignatureType type) => type.Composition is { } composition ? composition.Constituents.All(Closed)
+            : type.Primitive is { } primitive ? primitive != PrimitiveType.Void
+            : type.ArrayElement is { } element ? Closed(element)
+            : type.GenericInstance is { } instance ? instance.TypeArguments.All(Closed)
+            : type.ClassType is { GenericParameterNames.Count: 0 }
+            || type.ImportedType is { } imported && imported.GenericArity == imported.TypeArguments.Count && imported.TypeArguments.All(Closed);
+        void Validate(SignatureType type, bool intersection, int depth)
+        {
+            if (type is null || ++nodes > 4096 || depth > 32 || !Closed(type))
+                throw new ArgumentException("composition requires bounded closed constituents", nameof(types));
+            type.ValidateOwner(this);
+            if (type.Composition is { } composition)
+            {
+                foreach (var bound in composition.Constituents)
+                    Validate(bound, intersection || composition.Kind == ReferenceCompositionKind.Intersection, depth + 1);
+                return;
+            }
+            var local = type.ClassType ?? type.GenericInstance?.Definition;
+            if (local is not { IsStatic: false, IsValueType: false } && type.ImportedType is not { IsValueType: false })
+                throw new ArgumentException("composition requires nominal reference bounds", nameof(types));
+            if (intersection)
+            {
+                var extendable = local is not null ? (local.Definition.Attributes & 0x100) == 0
+                    : nativeImportedDefinitions.TryGetValue(InterfaceDefinition(type.ImportedType!), out var definition)
+                        && (definition.Attributes & 0x100) == 0;
+                if (!extendable) throw new ArgumentException("intersection bounds must be resolved and extendable", nameof(types));
+            }
+        }
+        foreach (var type in types) Validate(type, kind == ReferenceCompositionKind.Intersection, 0);
+        var result = SignatureType.FromComposition(kind, types);
+        RegisterCompositionStorage(result);
+        return result;
+    }
+
+    private void ValidateAuthoredCompositionBounds()
+    {
+        void Check(SignatureType type, bool intersection)
+        {
+            if (type.Composition is { } composition)
+            {
+                foreach (var bound in composition.Constituents)
+                    Check(bound, intersection || composition.Kind == ReferenceCompositionKind.Intersection);
+            }
+            else if (intersection && (type.ClassType ?? type.GenericInstance?.Definition) is { } local
+                && (local.Definition.Attributes & 0x100) != 0)
+                throw new InvalidDataException("intersection bound became final after composition construction");
+        }
+        foreach (var composition in experimentalStorageCompositions)
+            foreach (var bound in composition.Constituents)
+                Check(bound, composition.Kind == ReferenceCompositionKind.Intersection);
+    }
+
     private readonly HashSet<ReferenceCompositionSignature> experimentalStorageCompositions = [];
     internal bool AdmitsCompositionStorage(ReferenceCompositionSignature composition) => experimentalStorageCompositions.Contains(composition);
 

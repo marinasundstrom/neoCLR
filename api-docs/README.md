@@ -2030,3 +2030,5 @@ Union classification correction (2026-10-14): TypeInfo.IsUnion is structural-onl
 NominalTypeInfo.IsUnionDeclaration covers nominal markers. The aggregate reference
 and native API render are rebuilt from matching development library sources, with
 XML migration notes. The existing nominal type selection covers the new member.
+
+The host-only [authored reference composition API](experimental-metadata.md#authored-reference-compositions-2026-10-14-development) is manually documented and excluded from guest RavenDoc selection.

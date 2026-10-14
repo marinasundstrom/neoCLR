@@ -6,6 +6,7 @@ using AssemblyDefinition = NeoCLR.Metadata.Experimental.Model.AssemblyDefinition
 
 if (args is ["--composition-imports", var compositionOutput]) { ReferenceCompositionImportChecks.Run(compositionOutput); return 0; }
 
+if (args is ["--authored-compositions"]) { AuthoredCompositionChecks.Run(); return 0; }
 if (args is ["--reference-compositions"]) { ReferenceCompositionChecks.Run(); Console.WriteLine("PASS read-only reference compositions"); return 0; }
 
 if (args is ["--static-fields"]) { StaticFieldChecks.Run(); return 0; }
