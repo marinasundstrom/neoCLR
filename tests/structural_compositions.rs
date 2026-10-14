@@ -1,9 +1,9 @@
-#[cfg(feature = "experimental-compositions")]
-use neoclr::{Limits, LoadedProgram, Value};
 use neoclr::{
     assemble,
     metadata::{Instruction, Type},
 };
+#[cfg(feature = "experimental-compositions")]
+use neoclr::{Limits, LoadedProgram, Value};
 
 const TYPES: &str = "\
 .type class abstract System.Object\n.end\n\
@@ -50,12 +50,11 @@ fn union_requires_narrowing_and_checks_concrete_object() {
         "",
     );
     bad.verify().unwrap();
-    assert!(
-        bad.run(Limits::default())
-            .unwrap_err()
-            .to_string()
-            .contains("does not satisfy")
-    );
+    assert!(bad
+        .run(Limits::default())
+        .unwrap_err()
+        .to_string()
+        .contains("does not satisfy"));
     let bad_static = program(
         ".local union<Left,Right> value\nnewobj LeftOnly\nstloc value\nldloc value\ncallvirt instance Left::Get()",
         "",
@@ -254,4 +253,20 @@ fn saved_consumer_roundtrips_native_envelope_and_executes() {
         program.run(Limits::default()).unwrap().value,
         Value::Int32(42)
     );
+}
+
+#[cfg(feature = "experimental-compositions")]
+#[test]
+fn sealed_intersection_bounds_reject_before_normalization() {
+    for ty in [
+        "intersection<Both,Left>",
+        "intersection<Both,Both>",
+        "intersection<Left,union<Both,Right>>",
+    ] {
+        let source = format!(".module Bad\n.entry Main\n{TYPES}\n.function Main() -> Int32\n.local {ty} value\nldc.i4 0\nret\n.end");
+        let source = source.replace(".type class Both", ".type class Both\n.sealed");
+        assert!(assemble(&source).is_err(), "{ty}");
+    }
+    let source = format!(".module Good\n.entry Main\n{TYPES}\n.function Main() -> Int32\n.local union<Both,Left> value\nldc.i4 42\nret\n.end").replace(".type class Both", ".type class Both\n.sealed");
+    assert!(assemble(&source).is_ok());
 }

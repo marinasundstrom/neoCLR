@@ -8464,6 +8464,13 @@ implementations are rejected. Null definition/core arguments throw
 missing/mismatched dependencies and normal import limits throw `InvalidDataException`.
 The optional resolver supplies exact nominal dependencies without implicit loading.
 
+Intersection bounds must be resolved interfaces or non-sealed reference classes;
+sealed bounds reject before normalization, including duplicate/singleton reduction.
+Value types remain excluded. Sealed union alternatives remain supported. The
+bounded reader rejects external intersection bounds whose extendability it cannot
+establish; resolving those dependencies during reading remains a gap. This narrows
+the unpublished experimental profile following the author's 2026-10-14 clarification.
+
 The returned `Signature` preserves union/intersection kind and all normalized
 native bounds, imported into the output builder's identity scope. Same-kind
 flattening/deduplication remains unchanged; nominal-supertype reduction is not

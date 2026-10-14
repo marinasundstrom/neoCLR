@@ -74,6 +74,13 @@ import evidence. Four Raven-generated native call-only programs additionally ret
 42 in the interpreter: nested calls and discarded results, with distinct and
 redundant bounds. See the linked experiment for commands and remaining limits.
 
+Author clarification (2026-10-14): written intersection bounds must be interfaces
+or non-sealed reference classes. Sealed classes reject before normalization;
+sealed objects can still satisfy interface bounds. Runtime/host validation enforces
+this and Raven must match it. External bounds unresolved by the bounded host reader
+fail closed pending resolver-aware admission. No Runtime Contract or CLI encoding
+changes. See the experiment record for the Animal/Quacks and Dog/Barks distinction.
+
 Replacement owners: Raven must preserve semantic symbols and diagnostics through
 an explicit native target capability; the neoCLR metadata library must supply the
 final resolved descriptor/encoding; runtime verification and codegen must agree on

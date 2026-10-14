@@ -17314,3 +17314,12 @@ open, not an approved complete implementation or a permanent roadmap reprioritiz
   guarantees and unsafe narrowing reject. Raven's intersection call controls pass;
   structural-union compiler import and broader storage remain open. No permanent
   reprioritization or new representation is inferred from this continuation.
+
+- **Working POC and bound restriction:** the author requests continuing until a
+  working union/intersection POC, then clarifies that intersections may contain
+  interfaces and extendable reference types, not sealed classes or value types.
+  The concrete examples are Animal (abstract/non-sealed) & Quacks (interface),
+  accepted, and Dog (sealed) & Barks (interface), rejected. The assistant applies
+  validation before normalization and distinguishes written bounds from concrete
+  objects satisfying them. Runtime and host rejection checks pass; compiler and
+  reproducible POC validation are recorded in the subsequent slice.

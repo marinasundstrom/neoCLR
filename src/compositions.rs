@@ -1,7 +1,7 @@
 //! Branch-only reference compositions. No value layout, byref or backend ABI.
 use crate::{
-    Fault, Module,
     metadata::{Representation, Type},
+    Fault, Module,
 };
 
 pub(crate) fn is_compound(ty: &Type) -> bool {
@@ -88,11 +88,15 @@ pub(crate) fn resolved(module: &Module, ty: &Type) -> bool {
 
 pub(crate) fn validate(module: &Module, ty: &Type) -> Result<(), Fault> {
     check_shape(ty)?;
-    fn visit(module: &Module, ty: &Type) -> Result<(), Fault> {
+    fn visit(module: &Module, ty: &Type, intersection_bound: bool) -> Result<(), Fault> {
         match ty {
             Type::Union(parts) | Type::Intersection(parts) => {
                 for part in parts {
-                    visit(module, part)?;
+                    visit(
+                        module,
+                        part,
+                        intersection_bound || matches!(ty, Type::Intersection(_)),
+                    )?;
                 }
                 Ok(())
             }
@@ -101,6 +105,11 @@ pub(crate) fn validate(module: &Module, ty: &Type) -> Result<(), Fault> {
                 let def = module
                     .type_definition(ty)
                     .ok_or_else(|| Fault::new("unknown compound constituent"))?;
+                if intersection_bound && def.is_sealed {
+                    return Err(Fault::new(
+                        "intersection bounds must be interfaces or non-sealed reference classes",
+                    ));
+                }
                 if def.representation == Representation::Interface
                     || (def.representation == Representation::Record && def.is_reference_type)
                 {
@@ -114,7 +123,7 @@ pub(crate) fn validate(module: &Module, ty: &Type) -> Result<(), Fault> {
             _ => Err(Fault::new("unresolved compound constituent")),
         }
     }
-    visit(module, ty)
+    visit(module, ty, false)
 }
 
 pub(crate) fn assignable(module: &Module, source: &Type, target: &Type) -> bool {

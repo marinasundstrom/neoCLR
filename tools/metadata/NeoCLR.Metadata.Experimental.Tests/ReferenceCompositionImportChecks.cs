@@ -104,6 +104,19 @@ internal static class ReferenceCompositionImportChecks
                 File.WriteAllBytes(Path.Combine(output, scenario.Name + "Consumer.neox"), NativeModuleContainer.WriteLibraryBinary(json));
             }
         }
+        // Sealed classes remain valid union alternatives, but never written intersection bounds.
+        foreach (var kind in new[] { "Union", "Intersection" })
+        {
+            var sealedRoot = source.DeepClone();
+            sealedRoot["types"]![2]!["is_sealed"] = true;
+            sealedRoot["functions"]![0]!["returns"] = Compound(kind, second: 2);
+            var sealedImage = NativeModuleContainer.WriteLibraryBinary(Encoding.UTF8.GetBytes(sealedRoot.ToJsonString()));
+            if (kind == "Intersection") Reject(() => AssemblyDefinition.ReadNativeAssembly(sealedImage, true));
+            else Check(AssemblyDefinition.ReadNativeAssembly(sealedImage, true) is not null, "sealed union alternative");
+            sealedRoot["functions"]![0]!["returns"] = new JsonObject { [kind] = new JsonArray(Bound(2), Bound(2)) };
+            sealedImage = NativeModuleContainer.WriteLibraryBinary(Encoding.UTF8.GetBytes(sealedRoot.ToJsonString()));
+            if (kind == "Intersection") Reject(() => AssemblyDefinition.ReadNativeAssembly(sealedImage, true));
+        }
         var mismatched = AssemblyDefinition.ReadNativeAssembly(Image("Union", "Intersection"), true);
         var bad = new AssemblyBuilder(new("BadCompositionCall", new Version(1, 0, 0, 0)), core);
         var badMain = bad.AddFunction("Main"); bad.EntryPoint = badMain;

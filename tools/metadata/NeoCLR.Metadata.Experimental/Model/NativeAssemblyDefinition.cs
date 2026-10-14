@@ -487,8 +487,8 @@ public sealed partial class NativeAssemblyDefinition
                 {
                     Require(allowExperimentalCompositions && allowComposition, "experimental composition is disabled or unsupported in this position");
                     var nodes = 0;
-                    return ReadComposition(element, 0);
-                    SignatureType ReadComposition(JsonElement value, int depth)
+                    return ReadComposition(element, 0, false);
+                    SignatureType ReadComposition(JsonElement value, int depth, bool intersectionBound)
                     {
                         Require(++nodes <= 4096 && depth <= 32, "composition exceeds signature budget");
                         if (value.ValueKind == JsonValueKind.Object && (value.TryGetProperty("Union", out _) || value.TryGetProperty("Intersection", out _)))
@@ -498,11 +498,14 @@ public sealed partial class NativeAssemblyDefinition
                             var operands = Array(value, key, 256);
                             Require(operands.Length >= 2, "composition requires at least two operands");
                             return SignatureType.FromComposition(key == "Union" ? ReferenceCompositionKind.Union : ReferenceCompositionKind.Intersection,
-                                operands.Select(child => ReadComposition(child, depth + 1)).ToArray());
+                                operands.Select(child => ReadComposition(child, depth + 1, intersectionBound || key == "Intersection")).ToArray());
                         }
                         var leaf = ReadType(value, false);
                         Require(leaf.ClassType is { IsStatic: false, IsValueType: false, GenericParameterNames.Count: 0 } ||
                             leaf.ImportedType is { IsValueType: false, GenericArity: 0 }, "composition requires nongeneric nominal reference bounds");
+                        if (intersectionBound)
+                            Require(leaf.ClassType is { } bound && !types[System.Array.IndexOf(signatureOwners, bound)].IsSealedClass,
+                                "intersection bounds require resolved interfaces or non-sealed reference classes");
                         return leaf;
                     }
                 }

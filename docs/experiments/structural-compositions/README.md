@@ -501,3 +501,25 @@ cross-dependency resolver support remain gaps. Native metadata/runtime owners mu
 retain matching verification before expanding compiler or backend admission.
 No Runtime Contract configuration, CLI bridge representation or release behavior
 changes. Website proposal wording remains accurate; no published capability changes.
+
+## Extendable intersection bounds — author clarification, 2026-10-14
+
+Intersection operands must be interfaces or non-sealed reference classes. The
+native reader and runtime reject sealed classes before normalization, including
+`Dog & Dog`, even if Dog already implements every other requested interface.
+`Animal & Quacks` is admissible when Animal is abstract or non-sealed and Quacks
+is an interface; `Dog & Barks` is rejected when Dog is sealed. This supersedes the
+earlier broader experimental admission. Value types remain excluded.
+
+Sealed concrete objects can still satisfy interface intersections, and sealed
+classes remain valid union alternatives. The rule constrains the written bounds,
+not the concrete object. It is an author-selected restriction beyond general set
+intersection semantics, which could otherwise express redundant or impossible
+sealed-class combinations; the benefit is keeping written bounds extendable, at
+the cost of rejecting those expressions. It does not introduce .NET/CLI signatures.
+
+The bounded host reader now fails closed on external intersection leaves whose
+extendability cannot be resolved during reading; cross-dependency admission needs
+a resolver-aware follow-up. Local raw metadata is checked before deduplication.
+Eleven focused runtime tests and the host composition-import probe pass, including
+sealed intersection rejection and accepted sealed union alternatives.
