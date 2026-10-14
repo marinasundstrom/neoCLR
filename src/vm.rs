@@ -1474,10 +1474,11 @@ fn check_type_context_seen(
     }
     if cfg!(feature = "experimental-compositions")
         && !crate::compositions::is_compound(ty)
+        && !matches!(ty, Type::Constructed { .. })
         && crate::compositions::contains(ty)
     {
         return Err(Fault::new(
-            "nested compound storage, generics and byrefs are not supported",
+            "compound wrappers other than constructed reference classes are not supported",
         ));
     }
     if !seen.insert(ty.clone()) {
@@ -1531,6 +1532,19 @@ fn check_type_context_seen(
             if def.generic_parameters.is_empty() || def.generic_parameters.len() != arguments.len()
             {
                 return Err(Fault::new("generic type argument count mismatch"));
+            }
+            if crate::compositions::contains(ty) {
+                crate::compositions::check_shape(ty)?;
+                if !def.is_reference_type || def.representation != Representation::Record {
+                    return Err(Fault::new(
+                        "composition arguments require a reference class wrapper",
+                    ));
+                }
+                // Validate storage after substitution too: a declaration's T[] or T&
+                // must not bypass the current compound array/byref restrictions.
+                for field in &def.fields {
+                    nested(&field.ty.substitute_type_parameters(arguments)?)?;
+                }
             }
             for argument in arguments {
                 nested(argument)?;

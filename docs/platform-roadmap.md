@@ -4597,3 +4597,8 @@ does not change active milestone sequencing or enable compositions on main.
 Follow-through: closed generic reference bounds now cross the native metadata
 adapter and Raven call emitter, with eight passing interpreter consumers. Generic
 argument composition/storage remains open; see the [call-integration checkpoint](experiments/structural-compositions/README.md#closed-generic-composition-call-integration--2026-10-14).
+
+The next bounded runtime slice stores closed reference compositions as arguments of
+reference-class wrappers, including nested payloads across GC. Host/compiler wrapper
+transport and owned calls remain open; this is not Task execution.
+[Checkpoint](experiments/structural-compositions/README.md#runtime-composition-argument-storage--2026-10-14).

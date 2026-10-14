@@ -33,14 +33,15 @@ pub(crate) fn check_shape(ty: &Type) -> Result<(), Fault> {
         ));
     }
     // Generic argument syntax is distinct from a composition operand: value arguments
-    // are allowed inside a reference construction, but open parameters and compound
-    // arguments still need context-aware validation in a later slice.
+    // are allowed inside a reference construction. Compound arguments retain the
+    // same reference-only operand rules; open parameters remain unsupported.
     fn argument(ty: &Type, depth: usize, nodes: &mut usize) -> Result<(), Fault> {
         if depth > 32 || *nodes == 0 {
             return Err(Fault::new("compound signature resource limit"));
         }
         *nodes -= 1;
         match ty {
+            Type::Union(_) | Type::Intersection(_) => visit(ty, depth, nodes),
             Type::Named(_) => Ok(()),
             Type::Constructed { arguments, .. } | Type::Scoped { arguments, .. } => {
                 if arguments.len() > 256 {
@@ -235,6 +236,9 @@ pub(crate) fn validate_surface(module: &Module) -> Result<(), Fault> {
                     return Err(Fault::new("compound argument addresses are not supported"));
                 }
                 Op::CastClass(_) | Op::IsInstance(_) => (),
+                Op::New(ty) if matches!(ty, Type::Constructed { .. }) && contains(ty) => {
+                    crate::vm::check_type(ty, module)?;
+                }
                 Op::Call(target)
                     if target.owner.is_none() && target.generic_arguments.is_empty() =>
                 {

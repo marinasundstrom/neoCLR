@@ -9582,3 +9582,12 @@ in imported free-function calls, with eight passing interpreter consumers. Gener
 argument mismatches reject at host and compiler. Runtime Contract and CLI encoding
 are unchanged; Task of a union still requires native generic-argument storage work.
 [Current profile and validation](experiments/structural-compositions/README.md#closed-generic-composition-call-integration--2026-10-14).
+
+
+### Runtime composition arguments — 2026-10-14
+
+The interpreter now stores reference composition arguments in closed reference-class
+wrappers through assembled neoIL, with substituted-field validation and GC coverage.
+The compiler/host transport and owned-call paths remain gated, so this does not yet
+execute the author's Task examples. Runtime Contract and CLI encoding are unchanged.
+[Current scope](experiments/structural-compositions/README.md#runtime-composition-argument-storage--2026-10-14).

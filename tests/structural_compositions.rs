@@ -387,3 +387,137 @@ fn generic_composition_rejects_invalid_arguments_and_sealed_bounds() {
         assert_eq!(assemble(&source).is_ok(), accepted, "{ty}");
     }
 }
+
+#[cfg(feature = "experimental-compositions")]
+#[test]
+fn reference_wrapper_stores_and_returns_composition_arguments() {
+    let source = format!(
+        r#"
+.module WrappedComposition
+.entry Main
+{TYPES}
+.type class Response<T>
+.field Value T
+.end
+.function Keep(Response<union<Left,Right>> value) -> Response<union<Right,Left>>
+ldarg value
+ret
+.end
+.function Main() -> Int32
+.local Response<union<Left,Right>> response
+ldc.i4 42
+newobj Both
+newobj Response<union<Left,Right>>
+call Keep(Response<union<Right,Left>>)
+stloc response
+ldloc response
+ldfld Response<union<Left,Right>>::Value
+castclass Left
+callvirt instance Left::Get()
+ret
+.end
+"#
+    );
+    for kind in ["union", "intersection"] {
+        let source = source.replace("union<", &format!("{kind}<"));
+        let module = assemble(&source).unwrap();
+        let module = neoclr::load(&serde_json::to_string(&module).unwrap()).unwrap();
+        let p = LoadedProgram::new(&module).unwrap();
+        p.verify().unwrap();
+        assert_eq!(p.run(Limits::default()).unwrap().value, Value::Int32(42));
+    }
+}
+
+#[cfg(feature = "experimental-compositions")]
+#[test]
+fn nested_reference_wrapper_preserves_union_payload_across_collection() {
+    let allocations = "newobj Neither\npop\n".repeat(8);
+    let source = format!(
+        r#"
+.module NestedComposition
+.entry Main
+{TYPES}
+.type class Response<T>
+.field Value T
+.end
+.type class Envelope<T>
+.field Value T
+.end
+.function Main() -> Int32
+.local Envelope<union<Response<Int32>,Left>> result
+ldc.i4 42
+newobj Response<Int32>
+newobj Envelope<union<Response<Int32>,Left>>
+stloc result
+{allocations}
+ldloc result
+ldfld Envelope<union<Response<Int32>,Left>>::Value
+castclass Response<Int32>
+ldfld Response<Int32>::Value
+ret
+.end
+"#
+    );
+    let module = assemble(&source).unwrap();
+    let p = LoadedProgram::new(&module).unwrap();
+    p.verify().unwrap();
+    let result = p
+        .run(Limits {
+            heap_objects: 3,
+            ..Limits::default()
+        })
+        .unwrap();
+    assert_eq!(result.value, Value::Int32(42));
+    assert!(result.heap.collections() > 1);
+    assert!(result.heap.reclaimed_objects() >= 8);
+}
+
+#[cfg(feature = "experimental-compositions")]
+#[test]
+fn composition_wrappers_reject_unsupported_storage_after_substitution() {
+    for (kind, field) in [("class", "arrayref<T>"), ("class", "T&"), ("", "T")] {
+        let source = format!(".module InvalidWrapper\n.entry Main\n{TYPES}\n.type {kind} Wrapper<T>\n.field Value {field}\n.end\n.function Main() -> Int32\n.local Wrapper<union<Left,Right>> value\nldc.i4 42\nret\n.end");
+        assert!(assemble(&source).is_err(), "{kind} {field}");
+    }
+}
+
+#[cfg(feature = "experimental-compositions")]
+#[test]
+fn composition_wrappers_preserve_invariance_and_validate_field_writes() {
+    for body in [
+        "ldc.i4 42\nnewobj Both\nnewobj Wrapper<union<Left,Right>>\ncall Need(Wrapper<intersection<Left,Right>>)\npop",
+        "ldc.i4 42\nnewobj Both\nnewobj Wrapper<union<Left,Right>>\nnewobj Neither\nstfld Wrapper<union<Left,Right>>::Value",
+    ] {
+        let source = format!(".module InvalidUse\n.entry Main\n{TYPES}\n.type class Wrapper<T>\n.field Value T\n.end\n.function Need(Wrapper<intersection<Left,Right>> value) -> Int32\nldc.i4 42\nret\n.end\n.function Main() -> Int32\n{body}\nldc.i4 42\nret\n.end");
+        let module = assemble(&source).unwrap();
+        let p = LoadedProgram::new(&module).unwrap();
+        assert!(p.verify().is_err(), "{body}");
+        assert!(p.run(Limits::default()).is_err(), "{body}");
+    }
+}
+
+#[test]
+fn serialized_wrapper_composition_retains_feature_gate() {
+    let mut module = assemble(&format!(
+        ".module WrappedRaw\n.entry Main\n{TYPES}\n.type class Wrapper<T>\n.field Value T\n.end\n.function Main() -> Int32\nldc.i4 42\nret\n.end"
+    )).unwrap();
+    module
+        .functions
+        .iter_mut()
+        .find(|f| f.name == "Main")
+        .unwrap()
+        .locals
+        .push(Type::Constructed {
+            definition: "Wrapper".into(),
+            arguments: vec![Type::Union(vec![
+                Type::from_name("Left"),
+                Type::from_name("Right"),
+            ])],
+        });
+    let result = neoclr::load(&serde_json::to_string(&module).unwrap());
+    assert_eq!(
+        result.is_ok(),
+        cfg!(feature = "experimental-compositions"),
+        "{result:?}"
+    );
+}
