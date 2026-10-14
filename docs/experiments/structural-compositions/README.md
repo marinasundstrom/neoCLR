@@ -469,3 +469,35 @@ in both directions and weakening) plus a rejected strengthening. All three retur
 now emits `ReducedCallsEquivalent.neox`, which returns 42 with
 `ReducedCallsProvider.neox`; its four earlier consumers and default/PE/storage
 controls still pass. No compiler semantic conversion rule changed.
+
+## Union and cross-kind call entailment — 2026-10-14
+
+The host's flat reference-composition call proof now follows the interpreter's
+existing conservative relation for all four outer-kind combinations. For a union
+source, every alternative must satisfy the target; for an intersection target,
+every bound must be guaranteed. Intersection-to-union needs one guaranteed source
+bound implying one target alternative. Nominal implication still uses scoped
+identity and the declared interface graph, including transitive interfaces.
+
+This admits `A | Both` to `A | B`, `A & B` to `A | Both`, and
+`Both | OtherBoth` to `A & B` when both classes implement A and B. Three new
+host-generated consumers return 42 in the feature-enabled interpreter. Focused
+negative cases reject reverse union narrowing, an intersection with no guaranteed
+union alternative, and a union where one alternative lacks a required intersection
+bound. Checks inspect contracts rather than the provider's known allocation.
+The existing host import/storage/CLI controls and Raven intersection call probe pass.
+
+Reproduce with `--composition-imports /tmp/neoclr-composition-import-check` as above;
+the new executable pairs are named `UnionWiden`, `IntersectionToUnion` and
+`UnionToIntersection`, each with `Consumer.neox` and `Provider.neox` suffixes.
+No signature bytes, runtime implementation or compiler semantic rules change.
+This extends the same-reference native composition experiment; .NET/CLI does not
+provide these first-class signatures. The benefit is forwarding values without
+carriers or erasure; the cost remains explicit opt-in and bounded proof support.
+
+Raven structural-union import is still closed. Authored storage, nominal/compound
+injection/projection, nested mixed-composition proofs, class-base traversal and
+cross-dependency resolver support remain gaps. Native metadata/runtime owners must
+retain matching verification before expanding compiler or backend admission.
+No Runtime Contract configuration, CLI bridge representation or release behavior
+changes. Website proposal wording remains accurate; no published capability changes.

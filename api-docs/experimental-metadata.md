@@ -8474,13 +8474,25 @@ No new public compound signature factory or authored storage capability is added
 The native writer serializes compound call operands with their imported nominal
 identities. Body validation retains the descriptor as a stack type: exact compound
 results can feed equivalent compound parameters, including reordered bounds.
-For call arguments only, flat nominal-reference intersections also admit a bounded
-proof: each required bound must equal a source bound or follow through its declared
-interface graph. Thus `A & Both` can feed `B & Both` or `A & B` when Both implements
-both interfaces. The reverse strengthening from `A & B` to `A & Both` rejects.
-Descriptors remain unchanged. This adds no nominal/compound injection/projection,
-class-base traversal, mixed-composition proof, storage or boxing conversion. A union result cannot
-be passed to an intersection parameter just because their bounds match.
+For call arguments only, flat nominal-reference compositions admit a bounded proof.
+A nominal bound implies another through identical scoped identity or its declared
+interface graph. The four composition cases are:
+
+| Source | Target | Required proof |
+| --- | --- | --- |
+| Union | Union | Every source alternative implies some target alternative. |
+| Union | Intersection | Every source alternative implies every target bound. |
+| Intersection | Union | Some guaranteed source bound implies some target alternative. |
+| Intersection | Intersection | Every target bound follows from some guaranteed source bound. |
+
+Thus `A & Both` can feed `B & Both` or `A & B` when Both implements both interfaces.
+`Both | OtherBoth` can feed `A & B` when both classes implement A and B. Merely
+matching the bounds of `A | B` and `A & B` is insufficient. Proof uses declared
+contracts, never the concrete allocation inside a producer body. Original
+composition kinds and bounds remain in emitted call descriptors.
+
+This adds no nominal/compound injection/projection, class-base traversal,
+nested mixed-composition proof, storage or boxing conversion.
 
 `AssemblyBuilder.Write()` and its reference-image path reject graphs containing
 compound callable imports with `InvalidDataException`. Compound declarations also

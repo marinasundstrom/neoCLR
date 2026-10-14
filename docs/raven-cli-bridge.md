@@ -56,7 +56,10 @@ preserves raw bounds and validates exact compound stack identity. Three emitted
 host consumers (union, intersection and redundant intersection) return 42 in the
 opt-in interpreter. Raven now builds on this through an explicit native call-only
 capability, preserving raw descriptors through shared lowering and import. No new
-CLI encoding is selected.
+CLI encoding is selected. The host additionally proves flat union/union and
+union/intersection call conversions using every-alternative/every-bound rules;
+Raven structural-union import remains closed. See the experiment record for
+positive execution and unsafe-narrowing rejection evidence.
 
 Raven's native emitters reject compound references by default (NEOMETA001).
 Raven `dc750c659` adds `NeoClrEmitOptions.AllowExperimentalIntersectionCalls` to opt native JSON emission

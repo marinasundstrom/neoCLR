@@ -20,6 +20,9 @@ internal static class ReferenceCompositionImportChecks
         produce.NewObject(ctor); produce.Return();
         var echo = provider.AddFunction("Echo", new MethodSignature(a, new SignatureType[] { a }));
         echo.LoadArgument(0); echo.Return();
+        var otherBoth = provider.AddClass("Example", "OtherBoth");
+        otherBoth.AddInterfaceImplementation(a); otherBoth.AddInterfaceImplementation(derivedB);
+        var otherCtor = otherBoth.AddConstructor(Array.Empty<PrimitiveType>()); otherCtor.Return();
         var source = JsonNode.Parse(provider.WriteNativeAssembly())!;
         JsonNode Bound(int index) => new JsonObject { ["Named"] = source["types"]![index]!["name"]!.DeepClone() };
         JsonNode Compound(string kind, bool reverse = false, int second = 1) => new JsonObject { [kind] = new JsonArray(Bound(reverse ? second : 0), Bound(reverse ? 0 : second)) };
@@ -70,16 +73,22 @@ internal static class ReferenceCompositionImportChecks
         }
         // Proof uses metadata guarantees, never the factory body's concrete allocation.
         foreach (var scenario in new[] {
-            (Name: "Equivalent", Source: new[] { 0, 2 }, Target: new[] { 1, 2 }, Accepted: true),
-            (Name: "EquivalentReverse", Source: new[] { 1, 2 }, Target: new[] { 0, 2 }, Accepted: true),
-            (Name: "Weaken", Source: new[] { 0, 2 }, Target: new[] { 0, 1 }, Accepted: true),
-            (Name: "Strengthen", Source: new[] { 0, 1 }, Target: new[] { 0, 2 }, Accepted: false) })
+            (Name: "Equivalent", SourceKind: "Intersection", TargetKind: "Intersection", Source: new[] { 0, 2 }, Target: new[] { 1, 2 }, Accepted: true),
+            (Name: "EquivalentReverse", SourceKind: "Intersection", TargetKind: "Intersection", Source: new[] { 1, 2 }, Target: new[] { 0, 2 }, Accepted: true),
+            (Name: "Weaken", SourceKind: "Intersection", TargetKind: "Intersection", Source: new[] { 0, 2 }, Target: new[] { 0, 1 }, Accepted: true),
+            (Name: "Strengthen", SourceKind: "Intersection", TargetKind: "Intersection", Source: new[] { 0, 1 }, Target: new[] { 0, 2 }, Accepted: false),
+            (Name: "UnionWiden", SourceKind: "Union", TargetKind: "Union", Source: new[] { 0, 2 }, Target: new[] { 0, 1 }, Accepted: true),
+            (Name: "UnionNarrow", SourceKind: "Union", TargetKind: "Union", Source: new[] { 0, 1 }, Target: new[] { 0, 2 }, Accepted: false),
+            (Name: "IntersectionToUnion", SourceKind: "Intersection", TargetKind: "Union", Source: new[] { 0, 1 }, Target: new[] { 0, 2 }, Accepted: true),
+            (Name: "IntersectionToUnionMissing", SourceKind: "Intersection", TargetKind: "Union", Source: new[] { 0, 1 }, Target: new[] { 2, 4 }, Accepted: false),
+            (Name: "UnionToIntersection", SourceKind: "Union", TargetKind: "Intersection", Source: new[] { 2, 4 }, Target: new[] { 0, 1 }, Accepted: true),
+            (Name: "UnionToIntersectionMissing", SourceKind: "Union", TargetKind: "Intersection", Source: new[] { 0, 2 }, Target: new[] { 0, 1 }, Accepted: false) })
         {
-            JsonNode Intersection(int[] indices) => new JsonObject { ["Intersection"] = new JsonArray(indices.Select(Bound).ToArray()) };
+            JsonNode Composition(string kind, int[] indices) => new JsonObject { [kind] = new JsonArray(indices.Select(Bound).ToArray()) };
             var root = source.DeepClone();
-            root["functions"]![0]!["returns"] = Intersection(scenario.Source);
-            root["functions"]![1]!["parameters"]![0] = Intersection(scenario.Target);
-            root["functions"]![1]!["returns"] = Intersection(scenario.Target);
+            root["functions"]![0]!["returns"] = Composition(scenario.SourceKind, scenario.Source);
+            root["functions"]![1]!["parameters"]![0] = Composition(scenario.TargetKind, scenario.Target);
+            root["functions"]![1]!["returns"] = Composition(scenario.TargetKind, scenario.Target);
             var image = NativeModuleContainer.WriteLibraryBinary(Encoding.UTF8.GetBytes(root.ToJsonString()));
             var snapshot = AssemblyDefinition.ReadNativeAssembly(image, true);
             var consumer = new AssemblyBuilder(new("Proof" + scenario.Name, new Version(1, 0, 0, 0)), core);
@@ -102,7 +111,7 @@ internal static class ReferenceCompositionImportChecks
         badMain.Call(bad.ImportExperimentalCompositionReference(mismatched.MainModule.Functions.Single(m => m.Name == "Echo"), core));
         badMain.Emit(OpCode.Pop); badMain.LoadConstant(42); badMain.Return();
         Reject(() => bad.WriteNativeAssembly());
-        Console.WriteLine("PASS experimental composition callable imports, native serialization, intersection call entailment and closed CLI/storage gates");
+        Console.WriteLine("PASS experimental composition callable imports, native serialization, union/intersection call entailment and closed CLI/storage gates");
     }
     private static void Check(bool condition, string message) { if (!condition) throw new Exception(message); }
     private static void Reject(Action action)

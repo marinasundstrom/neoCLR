@@ -17306,3 +17306,11 @@ open, not an approved complete implementation or a permanent roadmap reprioritiz
   TypeDef/TypeRef/TypeSpec projection from native TypeDef/Type expression storage,
   and separates executable branch features from the broader structural codec/design.
   No new representation or permanent feature priority is selected by this question.
+
+- **Union call proof follow-through:** the author requests continued integration of
+  structural unions and intersections. The assistant extends the bounded host
+  call proof to unions and cross-kind conversions using the interpreter's existing
+  reference relation. Three new host-generated consumers return 42, while missing
+  guarantees and unsafe narrowing reject. Raven's intersection call controls pass;
+  structural-union compiler import and broader storage remain open. No permanent
+  reprioritization or new representation is inferred from this continuation.

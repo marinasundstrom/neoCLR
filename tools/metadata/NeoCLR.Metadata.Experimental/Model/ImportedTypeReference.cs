@@ -53,18 +53,26 @@ public sealed partial class AssemblyBuilder
     private readonly Dictionary<(AssemblyIdentity, string, string, ImportedTypeReference?), ImportedTypeReference> importedNominalTypes = [];
     private readonly Dictionary<ImportedTypeReference, TypeDefinition> nativeImportedDefinitions = [];
     private readonly Dictionary<(ImportedTypeReference, ImportedTypeReference), bool> nativeInterfaceConversions = [];
-    // Call-only proof: every required bound must follow from one guaranteed bound.
-    // Keep descriptors intact; mixed compositions and nominal storage use separate rules.
-    internal bool HasExperimentalIntersectionCallConversion(ReferenceCompositionSignature actual, ReferenceCompositionSignature target)
+    // Call-only proof over flat reference compositions. Retain the original descriptors.
+    internal bool HasExperimentalCompositionCallConversion(ReferenceCompositionSignature actual, ReferenceCompositionSignature target)
     {
-        if (actual.Kind != ReferenceCompositionKind.Intersection || target.Kind != ReferenceCompositionKind.Intersection)
-            return false;
         bool Supported(SignatureType type) => type.ImportedType is { IsValueType: false, GenericArity: 0, TypeArguments.Count: 0 } imported &&
             ReferenceEquals(imported.Owner, this);
         if (!actual.Constituents.All(Supported) || !target.Constituents.All(Supported))
             return false;
-        return target.Constituents.All(required => actual.Constituents.Any(guaranteed =>
-            guaranteed == required || HasNativeInterfaceConversion(guaranteed.ImportedType!, required.ImportedType!)));
+        bool Nominal(SignatureType source, SignatureType destination) => source == destination ||
+            HasNativeInterfaceConversion(source.ImportedType!, destination.ImportedType!);
+        bool SatisfiesTarget(SignatureType source) => target.Kind == ReferenceCompositionKind.Intersection
+            ? target.Constituents.All(destination => Nominal(source, destination))
+            : target.Constituents.Any(destination => Nominal(source, destination));
+        // Every possible union alternative must satisfy the destination.
+        if (actual.Kind == ReferenceCompositionKind.Union)
+            return actual.Constituents.All(SatisfiesTarget);
+        // An intersection guarantees every source bound. Different bounds may prove
+        // different requirements of the destination intersection.
+        return target.Kind == ReferenceCompositionKind.Intersection
+            ? target.Constituents.All(destination => actual.Constituents.Any(source => Nominal(source, destination)))
+            : actual.Constituents.Any(SatisfiesTarget);
     }
     internal bool HasNativeInterfaceConversion(ImportedTypeReference actual, ImportedTypeReference target)
     {
