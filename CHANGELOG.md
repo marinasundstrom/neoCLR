@@ -8,7 +8,7 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-14
 
-- Begin the author-directed structural tuple migration with a native ordered signature node, JSON/binary roundtrips and nested generic/Self substitution. Add opt-in interpreter construction, positional reads/writes, managed element addresses and default initialization for closed scalar/nominal/nested tuple elements. Preserve value copies and reference identity; reject unsupported element forms and JIT/AOT use. Raven lowering, guest introspection and nominal Tuple removal remain pending.
+- Begin the author-directed structural tuple migration with a native ordered signature node, JSON/binary roundtrips and nested generic/Self substitution. Add opt-in interpreter construction, positional reads/writes, managed element addresses and default initialization for closed scalar/nominal/nested tuple elements. Preserve value copies and reference identity; reject unsupported element forms and JIT/AOT use. Add resolved host tuple identities and ordered element descriptors without nominal definition tokens, preserving nesting and multiplicity. Raven lowering, guest introspection and nominal Tuple removal remain pending.
 
 - Prepare a local structural-type VS Code test kit with explicit compiler/server selection and interpreter tasks for native Task unions, intersections and imported generic interface bounds. Include editable samples and a reproducible staging script; preserve nominal interface conformance.
 

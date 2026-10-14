@@ -7,6 +7,8 @@ use crate::{
 /// An identity within the resolved modules of one build, not a cross-build cache key.
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum TypeIdentity {
+    /// Ordered structural value identity, without a nominal definition.
+    Tuple(Vec<TypeIdentity>),
     /// Experimental union identity; constituents retain resolved definition keys.
     Union(Vec<TypeIdentity>),
     /// Experimental intersection identity; distinct from nominal inheritance.
@@ -43,6 +45,8 @@ pub struct TypeDescriptor {
     /// Direct structural union alternatives or intersection bounds, in normalized
     /// signature order. Empty for nominal, Function and other non-composition types.
     pub constituents: Vec<TypeDescriptor>,
+    /// Ordered tuple elements, preserving duplicates and nesting; empty otherwise.
+    pub tuple_elements: Vec<TypeDescriptor>,
     pub declaring_type: Option<TypeDefId>,
 }
 
@@ -69,7 +73,9 @@ fn describe_validated(module: &Module, normalized: &Type) -> Result<TypeDescript
     crate::vm::check_type(normalized, module)?;
     let identity = build(module, normalized)?;
     let name = match normalized {
-        Type::Function(_) | Type::Union(_) | Type::Intersection(_) => signature_name(normalized)?,
+        Type::Function(_) | Type::Union(_) | Type::Intersection(_) | Type::Tuple(_) => {
+            signature_name(normalized)?
+        }
         Type::ByRef(element) => reference_name(element, false)?,
         Type::ReadOnlyByRef(element) => reference_name(element, true)?,
         Type::Array(element) => format!("{}[]", signature_name(element)?),
@@ -102,6 +108,13 @@ fn describe_validated(module: &Module, normalized: &Type) -> Result<TypeDescript
             .collect::<Result<_, _>>()?,
         _ => vec![],
     };
+    let tuple_elements = match normalized {
+        Type::Tuple(parts) => parts
+            .iter()
+            .map(|part| describe_validated(module, part))
+            .collect::<Result<_, _>>()?,
+        _ => vec![],
+    };
     let declaring_type = module
         .type_definition(normalized)
         .and_then(|definition| declaring_definition(module, definition))
@@ -111,6 +124,7 @@ fn describe_validated(module: &Module, normalized: &Type) -> Result<TypeDescript
         name,
         generic_arguments,
         constituents,
+        tuple_elements,
         declaring_type,
     })
 }
@@ -124,6 +138,14 @@ pub(crate) fn signature_name(ty: &Type) -> Result<String, Fault> {
             } else {
                 "intersection"
             },
+            parts
+                .iter()
+                .map(signature_name)
+                .collect::<Result<Vec<_>, _>>()?
+                .join(",")
+        ),
+        Type::Tuple(parts) => format!(
+            "tuple<{}>",
             parts
                 .iter()
                 .map(signature_name)
@@ -204,6 +226,12 @@ pub(crate) fn resolve(module: &Module, ty: &Type) -> Result<TypeIdentity, Fault>
 fn build(module: &Module, ty: &Type) -> Result<TypeIdentity, Fault> {
     let nested = |ty: &Type| build(module, ty).map(Box::new);
     Ok(match ty {
+        Type::Tuple(parts) => TypeIdentity::Tuple(
+            parts
+                .iter()
+                .map(|t| build(module, t))
+                .collect::<Result<_, _>>()?,
+        ),
         Type::Union(parts) => TypeIdentity::Union(
             parts
                 .iter()
@@ -302,6 +330,7 @@ pub(crate) fn describe_definition(
                 name: name.clone().unwrap_or_else(|| format!("T{i}")),
                 generic_arguments: vec![],
                 constituents: vec![],
+                tuple_elements: vec![],
                 declaring_type: None,
             })
         })
@@ -317,6 +346,7 @@ pub(crate) fn describe_definition(
             .map_or_else(|| definition.name.clone(), |o| o.name.clone()),
         generic_arguments: arguments,
         constituents: vec![],
+        tuple_elements: vec![],
         declaring_type: declaring_definition(module, definition).and_then(|p| p.definition.clone()),
     })
 }
@@ -409,5 +439,97 @@ mod composition_tests {
             let other = crate::assemble(".module Identities\n.revision second\n.interface Left\n.end\n.interface Right\n.end\n").unwrap();
             assert!(crate::reflection::from_identity(&other, &identity).is_err());
         }
+    }
+}
+
+#[cfg(all(test, feature = "experimental-tuples"))]
+mod tuple_tests {
+    use super::*;
+
+    #[test]
+    fn tuple_elements_retain_nominal_module_revision_identity() {
+        let make = |revision| {
+            crate::assemble(&format!(".module TupleIdentity\n.revision {revision}\n.type class Cell\n.field Value Int32\n.end\n" )).unwrap()
+        };
+        let first = make("first");
+        let second = make("second");
+        let ty = Type::Tuple(vec![Type::from_name("Cell")]);
+        let first_identity = resolve(&first, &ty).unwrap();
+        assert_ne!(first_identity, resolve(&second, &ty).unwrap());
+        assert!(crate::reflection::from_identity(&second, &first_identity).is_err());
+    }
+
+    #[test]
+    fn tuple_identity_preserves_elements_without_definition_tokens() {
+        let source = crate::assemble(
+            ".module TupleIdentity\n.entry Main\n.function Main() -> Int32\nldc.i4 0\nret\n.end",
+        )
+        .unwrap();
+        let program = crate::LoadedProgram::new(&source).unwrap();
+        let linked = crate::library::link(&source, crate::library::system().unwrap()).unwrap();
+        let module = &linked;
+        let ty = Type::Tuple(vec![
+            Type::Int32,
+            Type::String,
+            Type::Tuple(vec![Type::Int32, Type::Int32]),
+        ]);
+        let descriptor = program.describe_type(&ty).unwrap();
+        assert_eq!(
+            descriptor.name,
+            "tuple<System.Int32,System.String,tuple<System.Int32,System.Int32>>"
+        );
+        assert_eq!(descriptor.tuple_elements.len(), 3);
+        assert_eq!(descriptor.tuple_elements[2].tuple_elements.len(), 2);
+        assert_eq!(
+            descriptor.tuple_elements[2].tuple_elements[0],
+            descriptor.tuple_elements[2].tuple_elements[1]
+        );
+        assert!(descriptor.generic_arguments.is_empty());
+        assert!(descriptor.constituents.is_empty());
+        assert!(descriptor.declaring_type.is_none());
+        assert_eq!(
+            descriptor.identity,
+            program.resolve_type_identity(&ty).unwrap()
+        );
+        assert_eq!(
+            crate::reflection::from_identity(module, &descriptor.identity).unwrap(),
+            ty
+        );
+        assert!(crate::metadata_tokens::definition(module, &descriptor.identity).is_none());
+        assert_eq!(
+            crate::metadata_tokens::type_token(module, &descriptor.identity).unwrap(),
+            0
+        );
+        for different in [
+            Type::Tuple(vec![
+                Type::String,
+                Type::Int32,
+                Type::Tuple(vec![Type::Int32, Type::Int32]),
+            ]),
+            Type::Tuple(vec![Type::Int32, Type::String, Type::Int32, Type::Int32]),
+            Type::Tuple(vec![
+                Type::Int32,
+                Type::String,
+                Type::Tuple(vec![Type::Int32]),
+            ]),
+        ] {
+            assert_ne!(
+                descriptor.identity,
+                program.resolve_type_identity(&different).unwrap()
+            );
+        }
+        assert_ne!(
+            program
+                .resolve_type_identity(&Type::Tuple(vec![Type::Int32]))
+                .unwrap(),
+            program.resolve_type_identity(&Type::Int32).unwrap()
+        );
+        assert!(
+            program
+                .describe_type(&Type::Int32)
+                .unwrap()
+                .tuple_elements
+                .is_empty()
+        );
     }
 }

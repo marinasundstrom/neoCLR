@@ -22,6 +22,10 @@
     {
       "command": "python3 scripts/build-api-docs.py --check",
       "exitCode": 0
+    },
+    {
+      "command": "cargo test --lib type_identity::tuple_tests --features experimental-tuples,experimental-compositions",
+      "passed": 2
     }
   ],
   "sampleSha256": "632d63ad1891e0e066cb5c07d843d4ca948806d0c3e9a66b095a24710763128e",

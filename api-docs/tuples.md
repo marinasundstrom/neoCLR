@@ -66,3 +66,20 @@ JIT/AOT and native layout remain unsupported. Open, byref, pointer, array, funct
 and composition direct elements are not admitted in this bounded slice. Existing nominal
 Tuple APIs remain available during migration; their removal is planned. No new Raven
 source syntax, CLI tuple projection or guest reflection member is shipped here.
+
+## Resolved host tuple descriptors (development)
+
+With `experimental-tuples`, `LoadedProgram::resolve_type_identity` returns
+`TypeIdentity::Tuple(Vec<TypeIdentity>)` for admitted closed tuple signatures.
+Element keys retain resolved nominal identities where applicable. Order, repeated
+elements and nesting contribute to identity; a one-element tuple differs from its
+element. The tuple has no TypeDef or nominal metadata token.
+
+`LoadedProgram::describe_type` returns a `TypeDescriptor` with ordered
+`tuple_elements: Vec<TypeDescriptor>` and a recursive `tuple<...>` name. Each element
+has its own descriptor. `generic_arguments` and `constituents` remain empty for a
+tuple; `tuple_elements` is empty for other shapes. These APIs use the same feature,
+closedness, arity and element-admission checks as executable tuples, returning
+`Fault` for unsupported signatures. Descriptor access does not grant layout or
+construction rights. This is host inspection; a guest `TupleTypeInfo` remains pending.
+Unlike .NET ValueTuple reflection, the tuple itself has no nominal generic definition.

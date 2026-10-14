@@ -2064,3 +2064,7 @@ value/element operations and synthesized host field views. These Rust APIs remai
 outside RavenDoc's guest assembly selection; no guest API signature or reference
 snapshot changes. Runtime TupleTypeInfo and nominal tuple removal remain
 pending rather than omitted shipped APIs.
+
+The Rust `TypeIdentity::Tuple` and `TypeDescriptor::tuple_elements` host surfaces
+are documented in [tuple descriptors](tuples.md#resolved-host-tuple-descriptors-development).
+They are outside RavenDoc's guest type selection; no guest API is added by this slice.

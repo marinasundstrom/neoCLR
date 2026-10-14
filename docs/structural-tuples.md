@@ -39,13 +39,14 @@ with the existing nominal tuple family.
    native JSON and schema-3/4 binary envelope roundtrips without nominal declarations.
    Type/method/Self substitution traverses elements and retains the depth budget.
    Scope binding preserves order, duplicates and nesting, with one to 256 elements.
-   This is metadata syntax, not yet a resolved runtime tuple descriptor.
+   The later host identity slice resolves admitted closed signatures.
 2. **Runtime values (bounded interpreter slice):** opt-in construction, positional
    reads/writes, managed element addresses, default initialization, copying and
    nested/reference elements now use structural signatures. Native memory layout,
    synthesized Deconstruct reflection and broader element forms remain pending.
-3. **Introspection and authoring:** native host signature authoring/import, resolved
-   tuple identity and `TupleTypeInfo`, synthesized members and generic substitution.
+3. **Introspection and authoring (host identity implemented):** resolved tuple
+   identities and ordered host element descriptors are available. Native C# signature
+   authoring/import, guest `TupleTypeInfo` and synthesized member reflection remain.
 4. **Raven:** carrier-independent tuple symbols and native lowering/import, preserving
    labels and .NET target behavior behind explicit capabilities. No CLI approximation
    should be mistaken for native tuple identity.
@@ -108,3 +109,18 @@ This is a native runtime example, not yet a Raven source sample.
 The interpreter [validation record](experiments/structural-tuples/results.json)
 records 12 opt-in tests, six default-gate tests, one native-selection rejection test
 and the example's expected exit code 42. API snapshot validation also passes.
+
+
+## Resolved host identity slice
+
+`TypeIdentity::Tuple` retains the ordered resolved keys of each element, preserving
+nested shape and repeated elements. It roundtrips to the native signature without a
+nominal definition or metadata token. `TypeDescriptor::tuple_elements` exposes the
+ordered element descriptors independently of generic arguments and union/intersection
+constituents. The existing executable admission gate applies to host resolution too.
+This prepares guest introspection without claiming a guest provider is implemented.
+
+Focused validation: the host identity unit test checks descriptor shape, recursive
+identity roundtrip, absent definition/token, reordered and flattened alternatives,
+repeated elements and the distinction between a single-element tuple and its element.
+The existing 12 structural tuple checks continue to pass with both experiment flags.

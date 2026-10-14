@@ -1241,6 +1241,12 @@ pub(crate) fn bound_function(
 pub(crate) fn from_identity(module: &Module, identity: &TypeIdentity) -> Result<Type, Fault> {
     let nested = |id| from_identity(module, id).map(Box::new);
     Ok(match identity {
+        TypeIdentity::Tuple(parts) => Type::Tuple(
+            parts
+                .iter()
+                .map(|t| from_identity(module, t))
+                .collect::<Result<_, _>>()?,
+        ),
         TypeIdentity::Union(parts) | TypeIdentity::Intersection(parts) => {
             let parts = parts
                 .iter()
