@@ -1,0 +1,65 @@
+{
+  "neoclr": {
+    "commit": "b4dceb7119440ece6b6c4e316144deb1f2c6d581",
+    "dirty": true,
+    "dirty_note": "Pending POC runner/documentation/report changes only; runtime and metadata implementation are committed at the recorded revision."
+  },
+  "raven": {
+    "commit": "aa542a6f534dd94a82d37dd5ba5f9032619b994a",
+    "dirty": false
+  },
+  "feature": "experimental-compositions",
+  "mode": "interpreter",
+  "programs": [
+    {
+      "name": "First",
+      "exit": 42,
+      "result": "Int32(42)",
+      "source": "func Main() -> int => Consume(AsUnion(AsIntersection(MakeFirst())))"
+    },
+    {
+      "name": "Second",
+      "exit": 42,
+      "result": "Int32(42)",
+      "source": "func Main() -> int => Consume(AsUnion(AsIntersection(MakeSecond())))"
+    },
+    {
+      "name": "Direct",
+      "exit": 42,
+      "result": "Int32(42)",
+      "source": "func Main() -> int => NeedBoth(MakeFirst())"
+    },
+    {
+      "name": "Discard",
+      "exit": 42,
+      "result": "Int32(42)",
+      "source": "func Main() -> int { AsUnion(AsIntersection(MakeSecond())); return 42 }"
+    }
+  ],
+  "artifacts": {
+    "CompositionPocProvider.neox": "632cf1dee5b5885208bc4d8552c865dd1ff37f20f3694d386d22757298cd091d",
+    "Direct.neox": "360e7282c7fac5af71845242fc93f8a9cf7e84a5be8109f7f6cc6438e4179009",
+    "Discard.neox": "944c215f547703574ed13c634aa5110b1786f93a0c13149af154ef20f88bd8e6",
+    "First.neox": "c2cb5b93c82fbab6049c810983d5540ef5e833dd7259c5caa913ca065a4c9ed0",
+    "Second.neox": "459a9cea66f305f07c5031d4027cf93ab3dae5847a3938c65bfff260ffe336fa"
+  },
+  "date": "2026-10-14",
+  "runner_sha256": "401145c5a60571b3c3d94bb52c7889eed78a45eebefd1f15c5c12f4cbb9243c0",
+  "focused_checks": {
+    "compiler_intersection_and_structural_union_tests": 79,
+    "runtime_structural_composition_tests": 11,
+    "host_composition_imports": "pass",
+    "raven_controls": [
+      "composition-calls",
+      "intersection-calls",
+      "intersection-symbols",
+      "nullable-symbols"
+    ],
+    "api_snapshot": "pass"
+  },
+  "limitations": [
+    "Native provider signatures are fixtures; consumers are Raven source.",
+    "Imported free-function call composition only; authored storage, native generic composition bounds, PE projection and JIT/AOT remain unsupported.",
+    "Full open/closed generic integration is the author-requested next step."
+  ]
+}

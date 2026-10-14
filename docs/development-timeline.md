@@ -17323,3 +17323,18 @@ open, not an approved complete implementation or a permanent roadmap reprioritiz
   validation before normalization and distinguishes written bounds from concrete
   objects satisfying them. Runtime and host rejection checks pass; compiler and
   reproducible POC validation are recorded in the subsequent slice.
+
+- **POC outcome and generic direction:** four Raven-generated consumers now return
+  42 through native union/intersection calls, covering both sealed concrete union
+  alternatives, direct membership conversion and discarded results. The author
+  asks for admission heuristics to manage complexity, then explicitly requests full
+  support for open and closed generic types in both compositions as the next step,
+  allowing it to remain outside this POC. The assistant records current flat/native
+  nongeneric limits as temporary gaps, adds closed-generic semantic tests, and
+  supplies a repeatable runner. Provider contracts are native fixtures; general
+  source compound storage and generic native execution remain open.
+
+  Final POC evidence: Raven `aa542a6f5` with neoCLR `b4dceb711`; four interpreter
+  consumers return 42, 79 focused compiler tests and 11 runtime tests pass, as do
+  host composition imports and prior compiler controls. See
+  [the validation record](experiments/structural-compositions/poc-validation-20261014.json).

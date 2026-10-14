@@ -1,16 +1,13 @@
 # neoCLR platform roadmap
 
 **Structural composition experiment (author direction, 2026-10-14):** isolated
-[union/intersection probes](experiments/structural-compositions/README.md) on
-`codex/structural-union-intersection` reuse metadata identity and runtime reference
-services. The companion Raven branch `codex/neoclr-union-intersection` now has
-semantic symbols/conversions, source generic-constraint conjunctions and opt-in
-native intersection call forwarding with bounded interface entailment. Five Raven-generated callers return 42 while
-preserving raw native descriptors; general authored compound storage remains
-pending. Host call verification additionally supports flat union and cross-kind
-composition entailment; Raven structural-union import remains pending. An explicit build feature admits reference-only compound signatures in
-the interpreter; JIT/AOT reject them. This does not change the active
-performance milestone.
+[union/intersection POC](experiments/structural-compositions/README.md) on
+`codex/structural-union-intersection` and Raven `codex/neoclr-union-intersection`
+now runs four Raven-generated union/intersection call consumers in the opt-in
+interpreter, preserving native descriptors. Written intersection bounds require
+interfaces/non-sealed reference classes. General authored storage and JIT/AOT
+remain closed. Full open/closed generic type integration is the author-requested
+next experimental step; this does not change the active performance milestone.
 
 **Preview 15 published (2026-10-14):** the composed JSON error carrier now fits a
 shared 256-lane native inline-value bound. GC and runtime-product qualification pass

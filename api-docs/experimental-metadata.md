@@ -8515,3 +8515,31 @@ This is host metadata API emission, not Raven source emission. Raven's experimen
 `AllowExperimentalIntersectionCalls` host option now preserves these original
 descriptors through lowering and native call encoding; it does not enable general
 storage or PE/CLI projection. See the experiment record for compiler validation.
+
+
+### Companion compiler composition POC APIs (2026-10-14 development)
+
+Raven's separate native compiler assembly now exposes
+`NeoClrMetadataReference.ReadExperimentalCompositionAssembly(image, bootstrap)`
+and `NeoClrEmitOptions(..., allowExperimentalCompositionCalls: true)`. The reader
+admits flat union/intersection free-function signatures; the option permits native
+call forwarding, preserving raw descriptors. Old/default readers and the narrower
+intersection-only option remain closed to unions. PE/CLI and authored storage
+remain unsupported. Rebuild compiler hosts for the new optional constructor
+parameter. Invalid native signatures/mixed nesting reject with `InvalidDataException`;
+unsupported emission reports diagnostics without output.
+
+Semantic APIs are `Compilation.CreateStructuralUnionTypeSymbol(params ITypeSymbol[])`,
+`IStructuralUnionTypeSymbol.ConstituentTypes`, `TypeKind.StructuralUnion` and
+`SymbolVisitor.VisitStructuralUnionType` (including the generic visitor). The
+factory flattens/deduplicates same-kind unions, collapses singletons and preserves
+presentation order, with order-independent identity/hash and no nominal carrier.
+Empty/unsupported input throws `ArgumentException`; null input/elements throw
+`ArgumentNullException`. Closed nominal references, including closed generic types,
+are supported semantically; open-type admission/substitution is a follow-up.
+Written intersection bounds now reject sealed classes/value types before reduction.
+Member merging is deferred. These are compiler host APIs, not guest RavenDoc APIs.
+
+[POC and commands](../docs/experiments/structural-compositions/README.md#working-raven-consumer-poc--2026-10-14)
+record four interpreter results and negative gates. Full open/closed generic native
+integration is explicitly next; no generic executable support is claimed here.

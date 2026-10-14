@@ -81,6 +81,14 @@ this and Raven must match it. External bounds unresolved by the bounded host rea
 fail closed pending resolver-aware admission. No Runtime Contract or CLI encoding
 changes. See the experiment record for the Animal/Quacks and Dog/Barks distinction.
 
+The working POC adds Raven's `ReadExperimentalCompositionAssembly` and
+`allowExperimentalCompositionCalls` host option for flat union/intersection calls.
+Four source consumers return 42, preserving descriptors and same-reference flow.
+The provider signatures are native fixtures. Default/PE emission, authored storage
+and JIT/AOT remain gated; the old intersection-only option still rejects union
+references. Full open/closed generics are the author-selected next step. See the
+experiment record and Raven compiler API docs for temporary admission limits.
+
 Replacement owners: Raven must preserve semantic symbols and diagnostics through
 an explicit native target capability; the neoCLR metadata library must supply the
 final resolved descriptor/encoding; runtime verification and codegen must agree on

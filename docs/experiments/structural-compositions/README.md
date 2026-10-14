@@ -523,3 +523,56 @@ extendability cannot be resolved during reading; cross-dependency admission need
 a resolver-aware follow-up. Local raw metadata is checked before deduplication.
 Eleven focused runtime tests and the host composition-import probe pass, including
 sealed intersection rejection and accepted sealed union alternatives.
+
+## Working Raven consumer POC — 2026-10-14
+
+Run the committed compiler probe and feature-enabled runtime together:
+
+```sh
+python3 docs/experiments/structural-compositions/verify-poc.py --raven /path/to/raven-union-intersection
+```
+
+The runner builds the runtime, invokes the compiler host against this checkout's
+metadata library, runs four consumers, and writes sources, native images and
+`validation.json` under `target/structural-composition-poc`. On the validation host,
+Xcode's selected linker and CommandLineTools SDK disagreed; selecting the matching
+SDK fixed linking without changing system settings:
+
+```sh
+SDKROOT=/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.2.sdk python3 docs/experiments/structural-compositions/verify-poc.py --raven /Users/robert/Projects/raven-union-intersection
+```
+
+The main source consumer is:
+
+```raven
+func Main() -> int => Consume(AsUnion(AsIntersection(MakeFirst())))
+```
+
+The provider declares two sealed concrete classes, each implementing A and B.
+MakeFirst/MakeSecond return `First | Second`; AsIntersection accepts that union and
+returns `A & B`; AsUnion accepts the intersection and returns `A | B`; Consume
+accepts that union and returns 42. The provider fixture amends native signatures,
+while every consumer is emitted from Raven source. Both concrete alternatives,
+a direct union-to-intersection call and a discarded union result execute successfully.
+
+Raven uses a distinct structural-union symbol, not the existing nominal System.Union
+carrier. The explicit composition reader and emit option preserve the original
+native descriptors. Default readers/emission, the narrower intersection-only option,
+PE projection, unsafe narrowing and inferred locals reject. All four programs
+return 42 in the interpreter. This is a working imported-call POC; source-authored
+compound declarations/storage and JIT/AOT are not implemented by it.
+
+Author direction: use understandable admission/normalization rules to control
+complexity. The POC admits flat, nongeneric nominal reference bounds; sealed union
+alternatives are valid, and written intersection bounds must be extendable.
+Duplicate removal and bounded nominal proofs are deterministic. Mixed nesting,
+wrappers and member merging remain unsupported at compiler call admission.
+**Full generic integration, including open and closed types in both unions and
+intersections, is the explicitly requested next step.** Closed generics already
+have semantic factory/conversion tests; native nongeneric limits and open-type
+restrictions are temporary gaps, not the intended final type system.
+
+Final evidence: [POC validation record](poc-validation-20261014.json) pins Raven
+`aa542a6f5` and neoCLR runtime/metadata `b4dceb711`, four program hashes/results,
+79 compiler tests, 11 runtime tests and passing host/import controls. The runtime
+checkout had only the pending runner/documentation/report changes during this run.
