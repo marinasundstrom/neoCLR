@@ -333,6 +333,7 @@ pub(crate) fn validate_linked(module: &Module) -> Result<(), Fault> {
 }
 
 fn validate_linked_indexed(module: &Module) -> Result<(), Fault> {
+    crate::compositions::validate_surface(module)?;
     crate::metadata_origin::validate(module)?;
     crate::object_root::validate(module)?;
     if module.name.is_empty() {
@@ -1261,8 +1262,14 @@ fn validate_linked_indexed(module: &Module) -> Result<(), Fault> {
                 }
                 Op::IsInstance(ty) | Op::CastClass(ty) => {
                     check(ty)?;
-                    if !matches!(ty, Type::ArrayRef(_) | Type::String | Type::Function(_))
-                        && crate::interfaces::interface_definition(module, ty).is_err()
+                    if !matches!(
+                        ty,
+                        Type::ArrayRef(_)
+                            | Type::String
+                            | Type::Function(_)
+                            | Type::Union(_)
+                            | Type::Intersection(_)
+                    ) && crate::interfaces::interface_definition(module, ty).is_err()
                     {
                         crate::inheritance::lineage(module, ty)?;
                     }
@@ -1465,11 +1472,20 @@ fn check_type_context_seen(
     if depth > 32 {
         return Err(Fault::new("type nesting exceeds 32"));
     }
+    if cfg!(feature = "experimental-compositions")
+        && !crate::compositions::is_compound(ty)
+        && crate::compositions::contains(ty)
+    {
+        return Err(Fault::new(
+            "nested compound storage, generics and byrefs are not supported",
+        ));
+    }
     if !seen.insert(ty.clone()) {
         return Ok(());
     }
     let mut nested = |ty: &Type| check_type_context_seen(ty, module, arity, depth + 1, seen);
     match ty {
+        Type::Union(_) | Type::Intersection(_) => crate::compositions::validate(module, ty),
         Type::Function(shape) => {
             shape.validate()?;
             for parameter in &shape.parameters {
@@ -3556,11 +3572,19 @@ fn interpret_instructions_with_dispatch(
                         if contract.receiver_byref {
                             return Err(Fault::new("interface receiver type or mode mismatch"));
                         }
-                        crate::interfaces::ensure_implementation(
-                            module,
-                            object.target(),
-                            interface,
-                        )?;
+                        if crate::compositions::is_compound(object.target()) {
+                            if !module.reference_assignable(object.target(), interface) {
+                                return Err(Fault::new(
+                                    "compound receiver requires narrowing before interface dispatch",
+                                ));
+                            }
+                        } else {
+                            crate::interfaces::ensure_implementation(
+                                module,
+                                object.target(),
+                                interface,
+                            )?;
+                        }
                         object.reference.assigned()?;
                         let callee = crate::interfaces::implementation(
                             module,
@@ -3766,13 +3790,19 @@ fn interpret_instructions_with_dispatch(
                     };
                     // Incompatible arrays fail this type test with null. The exact
                     // assignment rules still prevent mutable-array covariance.
-                    if concrete == *target
-                        || *target == Type::Named("System.Object".into())
-                        || module.reference_assignable(&concrete, target)
-                        || (crate::interfaces::interface_definition(module, target).is_ok()
-                            && crate::interfaces::ensure_implementation(module, &concrete, target)
+                    let compatible = if crate::compositions::is_compound(target) {
+                        crate::compositions::matches_object(module, &concrete, target)
+                    } else {
+                        concrete == *target
+                            || *target == Type::Named("System.Object".into())
+                            || module.reference_assignable(&concrete, target)
+                            || (crate::interfaces::interface_definition(module, target).is_ok()
+                                && crate::interfaces::ensure_implementation(
+                                    module, &concrete, target,
+                                )
                                 .is_ok())
-                    {
+                    };
+                    if compatible {
                         let result = match value {
                             Value::ObjectReference(object) if *target == Type::String => {
                                 object.reference.read()?
@@ -3828,7 +3858,17 @@ fn interpret_instructions_with_dispatch(
                             }
                             let concrete = &object.concrete_type();
                             crate::arrays::check_cast(concrete, target)?;
-                            if crate::interfaces::interface_definition(module, target).is_ok() {
+                            if crate::compositions::is_compound(target) {
+                                if !crate::compositions::matches_object(module, concrete, target) {
+                                    return Err(Fault::coded(
+                                        crate::FaultCode::InvalidCast,
+                                        "object does not satisfy compound reference",
+                                    ));
+                                }
+                                object.view = Some(target.clone());
+                            } else if crate::interfaces::interface_definition(module, target)
+                                .is_ok()
+                            {
                                 crate::interfaces::ensure_implementation(module, concrete, target)?;
                                 object.view = Some(target.clone());
                             } else if *target == Type::from_name("System.Object") {

@@ -2,6 +2,7 @@ mod arrays;
 pub mod assembler;
 pub mod cil;
 mod constraints;
+mod compositions;
 mod enums;
 pub mod metadata_container;
 mod native_binary;
@@ -215,3 +216,8 @@ mod name_resolution;
 #[cfg(feature = "native-metadata")]
 #[doc(hidden)]
 pub mod native_metadata;
+
+// Isolated branch experiment: never admits compound guest signatures in product builds.
+#[cfg(test)]
+#[path = "../docs/experiments/structural-compositions/runtime_probe.rs"]
+mod structural_compositions_probe;

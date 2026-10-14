@@ -1,0 +1,42 @@
+.module ReferenceCompositions
+.entry Main
+
+.interface Readable
+    .method instance Read() -> Int32
+    .end
+.end
+
+.interface Seekable
+.end
+
+.type class Device
+    .implements Readable
+    .implements Seekable
+    .field Position Int32
+
+    .method instance Read() -> Int32
+        ldarg this
+        ldfld Device::Position
+        ret
+    .end
+.end
+
+.function Keep(intersection<Readable,Seekable> value) -> intersection<Seekable,Readable>
+    ldarg value
+    ret
+.end
+
+.function Main() -> Int32
+    .local union<Readable,Seekable> source
+    .local intersection<Readable,Seekable> view
+    ldc.i4 42
+    newobj Device
+    stloc source
+    ldloc source
+    castclass intersection<Readable,Seekable>
+    call Keep(intersection<Seekable,Readable>)
+    stloc view
+    ldloc view
+    callvirt instance Readable::Read()
+    ret
+.end

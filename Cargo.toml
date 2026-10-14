@@ -38,6 +38,8 @@ libc = "0.2"
 windows-sys = { version = "=0.60.2", features = ["Win32_Networking_WinSock"] }
 
 [features]
+# Branch-only interpreter experiment; JIT/AOT reject compound signatures.
+experimental-compositions = []
 # Internal metadata support shared with the JIT/AOT backend; not a public Raven API.
 native-metadata = []
 

@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-14
 
+- Start structural union/intersection experiments on separate runtime/compiler branches. Reuse metadata identity and reference services; add opt-in interpreter signatures for reference locals, parameters, returns, casts and guaranteed interface dispatch. Preserve one object/GC root, enforce constituent access, and explicitly reject unsupported storage, reflection and JIT/AOT paths. Singleton normalization and null behavior are documented; boxed/intrinsic reference coverage and Raven emission remain gaps. Selectively reuse Raven semantic intersection symbols and reference conversions on its companion branch; source storage/native emission remain pending. Archive three superseded local experiment branch tips as dated tags before removing their branches. Default builds and published releases do not enable the feature.
+
 - Close the next-release union hover issue: carry separate Raven main display/selection fixes to the native compiler line and retain passing compiler, hover and real VS Code JSON-sample checks. Nominal alternatives show their own types; combined unions stay compact before and after edits. Preview 15 assets and the installed release are unchanged.
 
 - Record Preview 15 publication, all 11 verified asset hashes and successful website deployment. Live installation pages show the release and JSON/PostgreSQL source links resolve. SDK and extension are installed for author testing; the tagged release content remains unchanged.

@@ -56,3 +56,18 @@ consumers must use matching compiler/library artifacts and rebuild when that
 representation changes. No structural union type is being advertised as shipped.
 
 [All structural families](structural-types.md)
+
+
+## Branch-only reference experiment
+
+The unpublished `codex/structural-union-intersection` branch admits neoIL
+`union<A,B>` and `intersection<A,B>` behind the `experimental-compositions` build
+feature. It supports reference locals, free-function parameters/results, checked
+casts and guaranteed interface dispatch in the interpreter. This is not Raven
+source support or a replacement for published union carriers. There are no public
+compound reflection constructors or members to enumerate yet.
+
+Fields, generics, byrefs, arrays, boxed/intrinsic reference values and JIT/AOT remain
+unsupported. Typed nulls follow ordinary reference behavior; non-null membership
+preserves the same class allocation. These are experiment limits, not permanent
+platform contracts.

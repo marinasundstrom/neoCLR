@@ -1226,6 +1226,19 @@ pub fn parse_type(text: &str) -> Result<Type, Fault> {
             }
             parts.push(&args[start..]);
             return match (name.trim(), parts.as_slice()) {
+                ("union" | "intersection", parts) => {
+                    let parts = parts
+                        .iter()
+                        .map(|p| parse(p, depth + 1))
+                        .collect::<Result<Vec<_>, _>>()?;
+                    let ty = if name.trim() == "union" {
+                        Type::Union(parts)
+                    } else {
+                        Type::Intersection(parts)
+                    };
+                    crate::compositions::check_shape(&ty)?;
+                    Ok(ty)
+                }
                 ("fn", parts) => {
                     let (result, parameters) = parts
                         .split_last()

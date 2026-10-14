@@ -91,6 +91,19 @@ pub(crate) fn describe_loaded(module: &Module, normalized: &Type) -> Result<Type
 
 pub(crate) fn signature_name(ty: &Type) -> Result<String, Fault> {
     Ok(match ty {
+        Type::Union(parts) | Type::Intersection(parts) => format!(
+            "{}<{}>",
+            if matches!(ty, Type::Union(_)) {
+                "union"
+            } else {
+                "intersection"
+            },
+            parts
+                .iter()
+                .map(signature_name)
+                .collect::<Result<Vec<_>, _>>()?
+                .join(",")
+        ),
         Type::SelfType => "Self".into(),
         Type::Function(shape) => {
             let mut parts = shape
@@ -165,6 +178,11 @@ pub(crate) fn resolve(module: &Module, ty: &Type) -> Result<TypeIdentity, Fault>
 fn build(module: &Module, ty: &Type) -> Result<TypeIdentity, Fault> {
     let nested = |ty: &Type| build(module, ty).map(Box::new);
     Ok(match ty {
+        Type::Union(_) | Type::Intersection(_) => {
+            return Err(Fault::new(
+                "compound reflection identity is not supported in this slice",
+            ));
+        }
         Type::Function(shape) => TypeIdentity::Function {
             parameters: shape
                 .parameters

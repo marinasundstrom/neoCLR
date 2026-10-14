@@ -11,6 +11,25 @@ pub(crate) fn normalize_type(context: &Module, ty: &Type) -> Result<Type, Fault>
         }
         let nested = |ty: &Type| bind(context, ty, depth + 1);
         let normalized = match ty {
+            Type::Union(parts) | Type::Intersection(parts) => {
+                crate::compositions::check_shape(ty)?;
+                // Validate constituents before singleton collapse can conceal a value type.
+                let parts = parts.iter().map(nested).collect::<Result<Vec<_>, _>>()?;
+                let candidate = if matches!(ty, Type::Union(_)) {
+                    Type::Union(parts.clone())
+                } else {
+                    Type::Intersection(parts.clone())
+                };
+                // The assembler also binds field owners against a partial context.
+                // Preserve the expression until library/dependency definitions exist;
+                // otherwise singleton collapse could erase a later-invalid operand.
+                if crate::compositions::resolved(context, &candidate) {
+                    crate::compositions::validate(context, &candidate)?;
+                    crate::compositions::normalized(matches!(ty, Type::Union(_)), parts)
+                } else {
+                    candidate
+                }
+            }
             Type::Function(shape) => Type::Function(Box::new(shape.map_types(nested)?)),
             Type::Scoped {
                 module,

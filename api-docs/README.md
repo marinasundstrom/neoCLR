@@ -38,7 +38,9 @@ documents synthetic Invoke, optional declaration metadata and the dynamic invoca
 limit. The API browser now includes authored Array, Function, Tuple, Union and
 Intersection family pages through RavenDoc's existing table-of-contents support.
 Current nominal Tuple/union declarations and proposed structural forms are explicitly
-distinguished. Automatic extraction of arbitrary structural shape members remains
+distinguished. The branch-only compound interpreter experiment is noted on those manual family
+pages; it adds no guest members or RavenDoc type-selection/snapshot changes.
+Automatic extraction of arbitrary structural shape members remains
 future publisher work; the authored family member references cover current APIs.
 
 Development FunctionTypeInfo also exposes Parameters and ReturnType directly.

@@ -1180,7 +1180,14 @@ fn typed_effect(
                         && crate::interfaces::is_contract(module, &callee)
                         && !callee.receiver_byref =>
                 {
-                    crate::interfaces::ensure_implementation(module, actual, &interface)?;
+                    if crate::compositions::is_compound(actual) {
+                        require(
+                            module.reference_assignable(actual, &interface),
+                            "compound receiver requires narrowing before interface dispatch",
+                        )?;
+                    } else {
+                        crate::interfaces::ensure_implementation(module, actual, &interface)?;
+                    }
                 }
                 T::ByRef(actual)
                     if **actual == interface && !module.is_reference_type(&interface) => {}

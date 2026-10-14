@@ -241,6 +241,8 @@ impl Query {
                             !d.is_reference_type && d.representation != Representation::Interface
                         }),
                     Type::String
+                    | Type::Union(_)
+                    | Type::Intersection(_)
                     | Type::Function(_)
                     | Type::ByRef(_)
                     | Type::ReadOnlyByRef(_)

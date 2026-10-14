@@ -5,6 +5,40 @@
 
 # Raven CLI bridge
 
+## Structural reference composition experiment — 2026-10-14
+
+neoCLR branch `codex/structural-union-intersection` adds opt-in interpreter
+`union<A,B>`/`intersection<A,B>` signatures. Native intent is either/all nominal
+reference membership on one object, without a tagged carrier. The runtime owns
+normalization, admission, assignability, checked casts and GC-preserving reference
+views. See [scope and executable evidence](experiments/structural-compositions/README.md).
+
+Temporary transport: Rust `Type::Union`/`Type::Intersection` operand arrays in the
+existing JSON/CBOR native execution model. No new CLI encoding or Raven Runtime
+Contract option is selected. Ordinary Raven ad-hoc unions still use their existing
+carrier path. The companion Raven branch `codex/neoclr-union-intersection`, based
+on native `caa787a96`, selectively carries compiler-created intersection symbols,
+substitution/display and reference conversions from `02d669acd`/`c4d57d282`.
+Source binding and native emission remain disabled. Compiler normalization removes
+nominal supertypes as well as duplicate bounds; runtime syntax normalization does
+not. Reconcile descriptor identity before metadata import/export.
+Raven main and the native line remain separate; older structural/intersection work
+is an input for selective reuse, not a wholesale merge.
+
+Lost/restricted information: no compiler import/export, compound reflection
+construction, generic/value/intrinsic-reference composition, member merging or
+native backend layout. Non-null compound values currently require class allocations;
+boxed/intrinsic references can fail despite a compatible static Object/interface
+view. This is a temporary support gap, not the intended general semantics. Typed
+nulls follow existing reference cast/storage behavior. JIT/AOT explicitly reject
+compounds; default interpreter builds reject the opt-in signatures too.
+
+Replacement owners: Raven must preserve semantic symbols and diagnostics through
+an explicit native target capability; the neoCLR metadata library must supply the
+final resolved descriptor/encoding; runtime verification and codegen must agree on
+storage and checked projection before backend admission. Current validation is
+neoIL/interpreter and rejection evidence, not Raven-generated source execution.
+
 ## Forward async result declarations — 2026-10-12
 
 The extracted JSON preview exposed intermittent RAV2704 for a valid

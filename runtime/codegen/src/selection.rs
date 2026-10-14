@@ -839,6 +839,11 @@ fn retained_types(
     }
     while let Some(ty) = pending_types.pop() {
         match ty {
+            Type::Union(_) | Type::Intersection(_) => {
+                return Err(
+                    "compound reference signatures are interpreter-only in this experiment".into(),
+                );
+            }
             Type::Named(name) => {
                 let candidates: Vec<_> = input
                     .types
@@ -1181,4 +1186,27 @@ pub(super) fn reference_array_backings(report: &Value) -> Vec<usize> {
         .flatten()
         .filter_map(|r| r.as_u64().map(|i| i as usize))
         .collect()
+}
+
+#[cfg(test)]
+mod composition_admission_tests {
+    use super::*;
+
+    #[test]
+    fn compound_reference_storage_is_rejected_before_native_selection() {
+        let mut module = neoclr::assemble(
+            ".module CompoundNative\n.entry Main\n.interface Left\n.end\n.interface Right\n.end\n.function Main() -> Int32\nldc.i4 42\nret\n.end",
+        ).unwrap();
+        let main = module
+            .functions
+            .iter_mut()
+            .find(|f| f.name == "Main")
+            .unwrap();
+        main.locals.push(Type::Union(vec![
+            Type::from_name("Left"),
+            Type::from_name("Right"),
+        ]));
+        let error = prepare(&module, "Main").unwrap_err().to_string();
+        assert!(error.contains("compound"), "{error}");
+    }
 }

@@ -17146,3 +17146,87 @@ open, not an approved complete implementation or a permanent roadmap reprioritiz
   real-editor run passes individual and combined JSON union hovers before and
   after an edit. [Retained evidence](validation/union-hover-20261014/README.md).
   Preview 15 and the author's installed release remain unchanged.
+
+
+### 2026-10-14 — exploring structural unions and intersections
+
+- **Author:** is considering implementing structural union and intersection types
+  for neoCLR. This is exploratory interest, not an implementation instruction or
+  a change to the active performance milestone.
+- **Assistant proposal:** build on the existing [structural-types proposal](proposals/structural-types.md),
+  separating structural composition of nominal types from general member-shape
+  conformance. A union accepts values belonging to either constituent; an
+  intersection requires one value satisfying both. Start with reference/interface
+  constituents and specify canonical identity, assignability, narrowing, dispatch,
+  metadata and runtime enforcement before broader value-layout work.
+- **Comparison inputs:** Scala 3 documents [union types](https://docs.scala-lang.org/scala3/reference/new-types/union-types.html)
+  and [intersection types](https://docs.scala-lang.org/scala3/reference/new-types/intersection-types.html);
+  the [CLI specification](https://ecma-international.org/wp-content/uploads/ECMA-335_6th_edition_june_2012.pdf)
+  is the baseline for a later metadata/verification comparison. Retrieved
+  2026-10-14; these are initial research inputs, not a completed design review.
+- **Open:** overlap semantics versus tagged-carrier identity, member collisions,
+  nullability, mutable/by-reference storage, generics, reflection, GC layout and
+  interop. No runtime/compiler implementation or settled ABI is claimed.
+
+
+### 2026-10-14 — author starts the composition experiment
+
+- **Author:** directs commencing an experiment on a new branch and points out
+  existing Raven/neoCLR branches as possible sources of reusable work.
+- **Assistant action:** creates neoCLR `codex/structural-union-intersection` from
+  `e2b010683` and Raven `codex/neoclr-union-intersection` from the current native
+  compiler `caa787a96`. Inspects the older structural and intersection branches
+  without merging them. Keeps Raven's checkout and ordinary main separate.
+- **Outcome:** adds an executable host-side probe reusing neoCLR's existing metadata
+  codec/identity resolver. Local execution passes 181 assertions for signature
+  roundtrips, membership, reference-preserving projection, rejection and a finite
+  soundness matrix. Records the existing singleton-compound identity limitation.
+- **Open:** native admission, verifier/codegen/GC contracts and Raven integration;
+  no native execution is claimed. The [experiment record](experiments/structural-compositions/README.md)
+  pins inspected branches and defines the next bounded slice. The active platform
+  milestone is unchanged.
+
+- **Assistant follow-through:** extends the host probe to 187 passing assertions
+  with reference-table relocation and assembly-scope distinctions. Adds seven
+  passing test-only Rust cases using actual runtime nominal relations, interpreter
+  results, managed handles and collection. The assistant provisionally selects
+  singleton collapse in the experimental semantic layer while preserving the
+  shared metadata identity API. No author decision on the final ABI is inferred.
+  Guest compound signatures and Raven integration remain open.
+
+- **Executable follow-through:** on the experiment branch, the assistant adds the
+  `experimental-compositions` runtime build feature, native execution-model union/
+  intersection signatures, normalization, constrained storage/casts and guaranteed
+  interface dispatch. Ten interpreter integration cases pass, including NEOX
+  roundtrip and collection; the saved consumer returns 42. Seven earlier runtime
+  probes and 27 focused default-build controls pass. Backend admission remains an
+  explicit rejection rather than a layout implementation.
+- **Refinement and remaining gaps:** the assistant follows existing reference/null
+  behavior for executable slots, while preserving definite assignment; this extends
+  the earlier non-null membership probe rather than claiming that it tested nulls.
+  Boxed/intrinsic references remain a runtime completeness gap, even through a
+  compatible static Object/interface view. No general source type policy is inferred.
+- **Compiler record:** creates a separate Raven worktree for the already-created
+  `codex/neoclr-union-intersection` branch and records the handoff in its compiler
+  bridge documentation and changelog. The original Raven checkout is unchanged.
+  Compiler emission, public descriptor identity and JIT/AOT support remain open.
+
+- **Compiler API follow-through:** selectively reuses Raven `02d669acd` and
+  `c4d57d282`, without merging the old branch or enabling its parser/storage code.
+  Adds normalized symbols, substitution/display and reference conversions. The
+  build script and 89 focused compiler API tests pass. The pre-change overload
+  suite has one inaccessible metadata-fixture failure (414/415 pass), recorded
+  separately from the new intersection behavior. Native import/export, source
+  storage and compiler/runtime descriptor normalization remain open.
+- **Author cleanup direction:** says, “After work we can delete the old
+  experimental branches.” The assistant proposes retaining recoverable tips before
+  deleting superseded experiment branches, preserving the active experiment and
+  Raven main/native lines. This does not authorize a wholesale branch merge.
+
+- **Validation and cleanup outcome:** the post-change overload suite reproduces
+  the same 414 passes and one pre-existing failure. After focused validation, the
+  assistant removes three superseded local branches, preserving their exact tips
+  in annotated `archive/2026-10-14/*` tags: neoCLR `structural-types`, Raven
+  `intersection-constraints` and Raven `neoclr-structural-types`. The experiment
+  record lists recovery tags and revisions. Remote branches/tags are unchanged;
+  active experiment branches and Raven main/native lines remain separate.

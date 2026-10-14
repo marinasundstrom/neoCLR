@@ -238,6 +238,22 @@ impl Value {
         module: &crate::Module,
         ty: &Type,
     ) -> Result<Self, crate::Fault> {
+        if crate::compositions::is_compound(ty) {
+            match &self {
+                Self::NullObjectReference(_) => (),
+                Self::ObjectReference(object)
+                    if crate::compositions::matches_object(module, &object.concrete_type(), ty) =>
+                {
+                    ()
+                }
+                _ => {
+                    return Err(crate::Fault::coded(
+                        crate::FaultCode::InvalidCast,
+                        "value does not satisfy compound reference storage",
+                    ));
+                }
+            }
+        }
         if self.ty() != *ty && module.reference_assignable(&self.ty(), ty) {
             match self {
                 Self::ObjectReference(mut object) => {

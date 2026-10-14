@@ -1,5 +1,13 @@
 # neoCLR platform roadmap
 
+**Structural composition experiment (author direction, 2026-10-14):** isolated
+[union/intersection probes](experiments/structural-compositions/README.md) on
+`codex/structural-union-intersection` reuse metadata identity and runtime reference
+services. The companion Raven branch is `codex/neoclr-union-intersection`; compiler
+work remains pending. An explicit build feature now admits reference-only compound
+signatures in the interpreter; JIT/AOT reject them. This does not change the active
+performance milestone.
+
 **Preview 15 published (2026-10-14):** the composed JSON error carrier now fits a
 shared 256-lane native inline-value bound. GC and runtime-product qualification pass
 on macOS and Windows; local three-mode JSON and 132 HTTP checks pass. The
