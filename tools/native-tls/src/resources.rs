@@ -25,6 +25,8 @@ impl Context {
             return Err(RESOURCE_LIMIT);
         }
         // Never reuse an ID, even across contexts. Exhaustion fails closed.
+        // try_update is newer than the supported Rust 1.85 minimum.
+        #[allow(deprecated)]
         let id = NEXT_ID
             .fetch_update(Ordering::Relaxed, Ordering::Relaxed, |id| id.checked_add(1))
             .map_err(|_| RESOURCE_LIMIT)?;

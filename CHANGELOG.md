@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-14
 
+- Keep TLS resource-ID allocation compatible with Rust 1.85 while allowing newer toolchains to deprecate `fetch_update`: scope the compatibility allowance to that expression. Three resource lifetime/identity tests pass; allocation semantics are unchanged.
+
 - Generate named application reflection roots from the freshly compiled native artifact via `--reflection-type`, avoiding stale roots after project rebuilds. Add a packaged JSON/error-composition gate for interpreter, JIT and AOT; all three modes pass on macOS alongside 132 HTTP header checks. Include the JSON gate in Windows package qualification.
 
 - Admit inline native values and record-array elements up to 256 lanes, matching backend and GC validation, to support the 132-lane composed JSON error carrier. Preserve heap-object and root-frame bounds. Add final-lane value/copy and GC retention, uninitialized-element reclamation and oversized-layout rejection checks. Rebuild native helpers with the backend.
