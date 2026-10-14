@@ -9564,3 +9564,12 @@ covers source/imported nominal types and the real JSON sample. Native editor pro
 must build the server with `NeoClrMetadataProject`; a plain host cannot qualify a
 native project. Preview 15 is unchanged; the next SDK/extension must include these
 compiler/server revisions together.
+
+
+### Generic composition semantic/runtime slice — 2026-10-14
+
+The paired feature branches now validate open generic semantic substitution and
+closed constructed reference runtime bounds. The host adapter still exposes only
+the nongeneric call POC; Task of a union is semantic coverage, not native execution.
+Runtime Contract and CLI carrier encoding are unchanged. See the
+[scope, comparison, owners and validation](experiments/structural-compositions/README.md#generic-composition-first-slice--2026-10-14).

@@ -270,3 +270,120 @@ fn sealed_intersection_bounds_reject_before_normalization() {
     let source = format!(".module Good\n.entry Main\n{TYPES}\n.function Main() -> Int32\n.local union<Both,Left> value\nldc.i4 42\nret\n.end").replace(".type class Both", ".type class Both\n.sealed");
     assert!(assemble(&source).is_ok());
 }
+
+#[cfg(feature = "experimental-compositions")]
+const GENERIC_TYPES: &str = r#"
+.interface Read<T>
+.method instance Get() -> T
+.end
+.end
+.interface Marker<T>
+.end
+.type class Cell<T>
+.implements Read<T>
+.implements Marker<T>
+.field Value T
+.method instance .ctor(T value) -> noresult
+ldarg this
+ldarg value
+stfld Cell<T>::Value
+ret
+.end
+.method instance Get() -> T
+ldarg this
+ldfld Cell<T>::Value
+ret
+.end
+.end
+.type ValueCell<T>
+.field Value T
+.end
+"#;
+
+#[cfg(feature = "experimental-compositions")]
+#[test]
+fn closed_generic_intersection_preserves_arguments_and_interface_dispatch() {
+    let source = format!(
+        r#"
+.module GenericCompositions
+.entry Main
+{GENERIC_TYPES}
+.function Keep(intersection<Marker<Int32>,Read<Int32>> value) -> intersection<Read<Int32>,Marker<Int32>>
+ldarg value
+ret
+.end
+.function Main() -> Int32
+.local intersection<Read<Int32>,Marker<Int32>> view
+ldc.i4 42
+newobj instance Cell<Int32>::.ctor(Int32)
+stloc view
+ldloc view
+call Keep(intersection<Marker<Int32>,Read<Int32>>)
+callvirt instance Read<Int32>::Get()
+ret
+.end
+"#
+    );
+    let module = assemble(&source).unwrap();
+    let p = LoadedProgram::new(&module).unwrap();
+    p.verify().unwrap();
+    assert_eq!(p.run(Limits::default()).unwrap().value, Value::Int32(42));
+}
+
+#[cfg(feature = "experimental-compositions")]
+#[test]
+fn generic_union_casts_use_constructed_identity() {
+    for (target, succeeds) in [("Int32", true), ("Boolean", false)] {
+        let source = format!(
+            r#"
+.module GenericUnion
+.entry Main
+{GENERIC_TYPES}
+.function Main() -> Int32
+.local union<Read<Int32>,Read<Boolean>> value
+ldc.i4 42
+newobj instance Cell<Int32>::.ctor(Int32)
+stloc value
+ldloc value
+castclass intersection<Read<{target}>,Marker<{target}>>
+pop
+ldc.i4 42
+ret
+.end
+"#
+        );
+        let module = assemble(&source).unwrap();
+        let p = LoadedProgram::new(&module).unwrap();
+        p.verify().unwrap();
+        let result = p.run(Limits::default());
+        if succeeds {
+            assert_eq!(result.unwrap().value, Value::Int32(42));
+        } else {
+            assert!(result.is_err());
+        }
+    }
+}
+
+#[cfg(feature = "experimental-compositions")]
+#[test]
+fn generic_composition_rejects_invalid_arguments_and_sealed_bounds() {
+    for ty in [
+        "intersection<ValueCell<Int32>,Marker<Int32>>",
+        "union<Read<Void>,Marker<Int32>>",
+        "intersection<Read<Int32,Int32>,Marker<Int32>>",
+        "union<Read<union<Read<Int32>,Marker<Int32>>>,Marker<Int32>>",
+    ] {
+        let source = format!(".module InvalidGeneric\n.entry Main\n{GENERIC_TYPES}\n.function Main() -> Int32\n.local {ty} value\nldc.i4 42\nret\n.end");
+        assert!(assemble(&source).is_err(), "{ty}");
+    }
+    for (ty, accepted) in [
+        ("intersection<Cell<Int32>,Marker<Int32>>", false),
+        ("intersection<Cell<Int32>,Cell<Int32>>", false),
+        ("union<Cell<Int32>,Marker<Int32>>", true),
+        ("intersection<Read<Cell<Int32>>,Marker<Cell<Int32>>>", true),
+    ] {
+        let types = GENERIC_TYPES.replace(".type class Cell<T>", ".type class Cell<T>\n.sealed");
+        let source = format!(".module SealedGeneric\n.entry Main\n{types}\n.function Main() -> Int32\n.local {ty} value\nldc.i4 42\nret\n.end");
+        assert_eq!(assemble(&source).is_ok(), accepted, "{ty}");
+    }
+}

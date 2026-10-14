@@ -8535,11 +8535,16 @@ Semantic APIs are `Compilation.CreateStructuralUnionTypeSymbol(params ITypeSymbo
 factory flattens/deduplicates same-kind unions, collapses singletons and preserves
 presentation order, with order-independent identity/hash and no nominal carrier.
 Empty/unsupported input throws `ArgumentException`; null input/elements throw
-`ArgumentNullException`. Closed nominal references, including closed generic types,
-are supported semantically; open-type admission/substitution is a follow-up.
+`ArgumentNullException`. Nominal types (including value types and open/closed constructions) and bound
+type parameters are supported semantically. Unbound generic placeholders and Void
+are rejected. Owner/method substitution traverses union alternatives and generic
+arguments, deduplicating after substitution. IsReferenceType/IsValueType require
+all alternatives to have that category; neither selects a storage representation.
 Written intersection bounds now reject sealed classes/value types before reduction.
 Member merging is deferred. These are compiler host APIs, not guest RavenDoc APIs.
 
 [POC and commands](../docs/experiments/structural-compositions/README.md#working-raven-consumer-poc--2026-10-14)
 record four interpreter results and negative gates. Full open/closed generic native
-integration is explicitly next; no generic executable support is claimed here.
+integration remains incomplete; the adapter still admits nongeneric calls only.
+The runtime separately supports closed generic reference bounds; see the
+[generic slice](../docs/experiments/structural-compositions/README.md#generic-composition-first-slice--2026-10-14).

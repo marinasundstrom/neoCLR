@@ -32,6 +32,32 @@ pub(crate) fn check_shape(ty: &Type) -> Result<(), Fault> {
             "compound signatures require experimental-compositions",
         ));
     }
+    // Generic argument syntax is distinct from a composition operand: value arguments
+    // are allowed inside a reference construction, but open parameters and compound
+    // arguments still need context-aware validation in a later slice.
+    fn argument(ty: &Type, depth: usize, nodes: &mut usize) -> Result<(), Fault> {
+        if depth > 32 || *nodes == 0 {
+            return Err(Fault::new("compound signature resource limit"));
+        }
+        *nodes -= 1;
+        match ty {
+            Type::Named(_) => Ok(()),
+            Type::Constructed { arguments, .. } | Type::Scoped { arguments, .. } => {
+                if arguments.len() > 256 {
+                    return Err(Fault::new("too many compound generic arguments"));
+                }
+                for arg in arguments {
+                    argument(arg, depth + 1, nodes)?;
+                }
+                Ok(())
+            }
+            Type::ArrayRef(element) => argument(element, depth + 1, nodes),
+            _ if ty.is_primitive() && !matches!(ty, Type::Void) => Ok(()),
+            _ => Err(Fault::new(
+                "composition generic arguments must be closed storage types",
+            )),
+        }
+    }
     fn visit(ty: &Type, depth: usize, nodes: &mut usize) -> Result<(), Fault> {
         if depth > 32 || *nodes == 0 {
             return Err(Fault::new("compound signature resource limit"));
@@ -48,7 +74,15 @@ pub(crate) fn check_shape(ty: &Type) -> Result<(), Fault> {
                 Ok(())
             }
             Type::Named(_) => Ok(()),
-            Type::Scoped { arguments, .. } if arguments.is_empty() => Ok(()),
+            Type::Constructed { arguments, .. } | Type::Scoped { arguments, .. } => {
+                if arguments.len() > 256 {
+                    return Err(Fault::new("too many compound generic arguments"));
+                }
+                for arg in arguments {
+                    argument(arg, depth + 1, nodes)?;
+                }
+                Ok(())
+            }
             _ => Err(Fault::new(
                 "compound constituents must be closed nominal references",
             )),
@@ -81,7 +115,7 @@ pub(crate) fn normalized(union: bool, parts: Vec<Type>) -> Type {
 pub(crate) fn resolved(module: &Module, ty: &Type) -> bool {
     match ty {
         Type::Union(parts) | Type::Intersection(parts) => parts.iter().all(|t| resolved(module, t)),
-        Type::Named(_) => module.type_definition(ty).is_some(),
+        Type::Named(_) | Type::Constructed { .. } => module.type_definition(ty).is_some(),
         _ => false,
     }
 }
@@ -100,7 +134,7 @@ pub(crate) fn validate(module: &Module, ty: &Type) -> Result<(), Fault> {
                 }
                 Ok(())
             }
-            Type::Named(_) => {
+            Type::Named(_) | Type::Constructed { .. } => {
                 crate::vm::check_type(ty, module)?;
                 let def = module
                     .type_definition(ty)
@@ -130,7 +164,10 @@ pub(crate) fn assignable(module: &Module, source: &Type, target: &Type) -> bool 
     if source == target {
         return true;
     }
-    if is_compound(target) && !is_compound(source) && !matches!(source, Type::Named(_)) {
+    if is_compound(target)
+        && !is_compound(source)
+        && !matches!(source, Type::Named(_) | Type::Constructed { .. })
+    {
         return false;
     }
     match (source, target) {

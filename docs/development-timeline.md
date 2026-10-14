@@ -17338,3 +17338,18 @@ open, not an approved complete implementation or a permanent roadmap reprioritiz
   consumers return 42, 79 focused compiler tests and 11 runtime tests pass, as do
   host composition imports and prior compiler controls. See
   [the validation record](experiments/structural-compositions/poc-validation-20261014.json).
+
+
+### 2026-10-14 — Generic union nesting examples
+
+- Author supplied `T | HttpError | JsonError`, `Request<T> | HttpError | JsonError`,
+  `Task<T | HttpError | JsonError>` and then
+  `Task<Response<T> | HttpError | JsonError>` as intended valid forms. This extends
+  the earlier direction for eventual full open/closed generic composition support.
+- Assistant added semantic substitution coverage for all four forms, including
+  value alternatives and union deduplication, and implemented closed constructed
+  reference bounds in the experimental runtime. 88 focused compiler tests, 14
+  composition runtime tests and 13 generic-class controls pass.
+- Remaining: generic metadata adapter/compiler execution, composition arguments
+  and value union storage. Task examples currently establish semantic shape and
+  substitution only. [Scope/evidence](experiments/structural-compositions/README.md#generic-composition-first-slice--2026-10-14).

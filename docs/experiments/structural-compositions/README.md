@@ -576,3 +576,51 @@ Final evidence: [POC validation record](poc-validation-20261014.json) pins Raven
 `aa542a6f5` and neoCLR runtime/metadata `b4dceb711`, four program hashes/results,
 79 compiler tests, 11 runtime tests and passing host/import controls. The runtime
 checkout had only the pending runner/documentation/report changes during this run.
+
+
+## Generic composition first slice — 2026-10-14
+
+The compiler semantic factory now accepts bound type parameters, open constructed
+nominal types and value alternatives in structural unions. Owner and method generic
+substitution traverses unions, including unions nested inside generic arguments,
+and normalizes duplicate alternatives after substitution. Parameter identity includes
+its declaring binder. Unbound generic placeholders and Void are rejected. A union is
+reference-only/value-only only when all alternatives have that category; this does
+not select a runtime storage representation.
+
+The author examples covered by semantic tests are `T | HttpError | JsonError`,
+`Request<T> | HttpError | JsonError`, `Task<T | HttpError | JsonError>` and
+`Task<Response<T> | HttpError | JsonError>`. Tests close T over Int32 and exercise
+value error alternatives, nested substitution, and duplicate collapse where T itself
+is an alternative. Open constructed intersections retain substitution coverage;
+written sealed/value intersection bounds remain invalid.
+
+The feature-enabled runtime now admits closed constructed reference bounds in
+unions/intersections. It validates generic arity/arguments/constraints using ordinary
+runtime type validation, preserves constructed identity, and supports interface
+dispatch and runtime casts for those bounds. Value generic arguments are permitted
+inside a reference bound. Written sealed constructed intersection bounds are rejected
+before normalization, while sealed constructed union alternatives are permitted.
+
+Validation: 88 focused compiler tests, 14 runtime structural-composition tests and
+13 ordinary generic-class controls pass. Generic runtime cases are assembled neoIL
+consumers; they are not evidence of Raven generic source emission. The existing
+four-program Raven imported-call POC was rerun against this slice: First, Second,
+Direct and Discard all returned Int32(42).
+
+Compared with .NET, ordinary generic argument identity and substitution are reused;
+structural composition signature nodes remain a deliberate native extension because
+CLI signatures do not encode these unions/intersections. The benefit is preserving
+constituent contracts without carrier identity; the cost is new verifier/storage and
+compiler integration work. Runtime Contract configuration and the temporary CLI
+carrier representation are unchanged. Raven's existing source union binder continues
+to use that carrier. The compiler/native metadata adapter still admits only the
+nongeneric call POC. Runtime open parameters, value union storage, compositions as
+generic arguments (including Task of a union), and JIT/AOT remain follow-up work.
+These are implementation gaps, not final type-system restrictions. Runtime/compiler
+owners are the paired feature branches `codex/structural-union-intersection` and
+`codex/neoclr-union-intersection`; no main-branch capability is implied.
+
+Compiler slice: Raven `f277f2a47`; runtime slice is the commit containing this
+section and the closed-generic composition tests. Website proposal status remains
+accurate: this is isolated development work, not a published capability.

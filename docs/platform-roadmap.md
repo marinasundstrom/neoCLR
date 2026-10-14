@@ -4584,3 +4584,12 @@ union binding; the native branch carries it and fixes runtime-await residual-ret
 completion. See [review decisions](raven-error-api.md#review-existing-api-aggregation)
 and [focused validation](experiments/http-json-client/README.md). This author-directed
 slice does not change milestone sequencing or claim native structural union support.
+
+
+### Author-directed generic composition experiment (2026-10-14)
+
+The isolated composition branches now cover the author's nested generic union
+examples semantically and execute closed generic reference bounds in runtime tests.
+Full generic metadata/compiler/storage integration remains open. This experiment
+does not change active milestone sequencing or enable compositions on main.
+[Scope and focused evidence](experiments/structural-compositions/README.md#generic-composition-first-slice--2026-10-14).
