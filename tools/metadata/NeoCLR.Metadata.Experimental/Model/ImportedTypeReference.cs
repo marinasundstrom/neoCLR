@@ -80,8 +80,12 @@ public sealed partial class AssemblyBuilder
         }
         return nativeInterfaceConversions[(actual, target)] = Visit(actual);
     }
-    internal SignatureType ImportNativeSignatureType(SignatureType type, AssemblyIdentity core, IAssemblyResolver? resolver)
-        => type.Composition is not null ? throw new InvalidDataException("experimental composition callable import is unsupported") : type.PointerElement is not null ? type : type.ByReferenceElement is { } target ? SignatureType.ByReference(ImportNativeSignatureType(target, core, resolver))
+    internal SignatureType ImportNativeSignatureType(SignatureType type, AssemblyIdentity core, IAssemblyResolver? resolver, bool allowCompositions = false)
+        => type.Composition is { } composition
+            ? allowCompositions
+                ? SignatureType.FromComposition(composition.Kind, composition.Constituents.Select(t => ImportNativeSignatureType(t, core, resolver, true)))
+                : throw new InvalidDataException("experimental composition callable import requires explicit opt-in")
+            : type.PointerElement is not null ? type : type.ByReferenceElement is { } target ? SignatureType.ByReference(ImportNativeSignatureType(target, core, resolver))
             : type.ReferencedGenericInstance is { } constructed
             ? ImportReference(constructed.Definition.Resolve(resolver), core).MakeGenericInstance(constructed.TypeArguments.Select(t => ImportNativeSignatureType(t, core, resolver)).ToArray())
             : type.TypeParameterIndex is { } typeParameter ? SignatureType.TypeParameter(typeParameter)

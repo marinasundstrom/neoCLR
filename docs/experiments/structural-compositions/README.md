@@ -352,3 +352,42 @@ union/default-reader rejection and emitter output preservation. The existing
 `api-docs/reference/NeoCLR.CoreProbe.dll` and metadata checkpoint `97bbcf76b`.
 Native storage/call emission is the next capability; structural union symbols and
 receiver merging remain open. Runtime evidence above is unchanged.
+
+## Native callable import and emitted consumers — 2026-10-14
+
+The host builder now has a separate `ImportExperimentalCompositionReference` API
+for nongeneric native free functions. It preserves the original normalized bounds,
+including nominally redundant bounds, while importing their identities into the
+consumer. Native call serialization retains Union/Intersection operands. Stack
+validation supports exact compound identity (order-independent bounds), and rejects
+union-to-intersection mismatches. No new nominal/compound conversion proof rules
+are claimed for the host verifier. Ordinary import, authored storage and compound
+CLI declaration emission remain closed. This preserves the native contract rather
+than choosing a .NET carrier or an erased nominal signature.
+
+Reproduce the focused host check and interpreter executions:
+
+```sh
+dotnet run --project tools/metadata/NeoCLR.Metadata.Experimental.Tests -- --composition-imports /tmp/neoclr-composition-import-check
+cargo build --features experimental-compositions --bin neoclr
+for case in Union Intersection RedundantIntersection; do
+  target/debug/neoclr run /tmp/neoclr-composition-import-check/${case}Consumer.neox --module /tmp/neoclr-composition-import-check/${case}Provider.neox --execution interpreter --show-result
+  test "$?" = 42 || exit 1
+done
+```
+
+All three callers pass a live Both allocation through imported factory/identity
+functions and return `Int32(42)` (exit 42). The redundant intersection retains
+`A & Both`, rather than silently reducing its native callable contract to Both.
+The provider fixtures amend native signature JSON because general compound
+authoring remains closed; the consumers are emitted entirely through the host API.
+These results demonstrate native callable transport/execution, not Raven source
+emission. Raven's existing `--intersection-symbols` probe still passes and its
+reference-wide NEOMETA001 gate remains in place.
+
+The complete metadata harness reports 171/173 passing, adding the import case to
+the prior 170/172 result. The same pre-existing `Native Object root authoring` and
+`Int32 local ownership initialization and execution` failures remain. Focused
+reader/import checks, public XML documentation build and API snapshot check pass.
+The next compiler slice must preserve raw descriptors through lowering and call
+encoding before admitting executable source use.

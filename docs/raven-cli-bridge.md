@@ -39,7 +39,7 @@ Contract capability or emission mapping is enabled.
 
 The host declaration reader can now opt into read-only compound free-function
 signatures via `ReadNativeAssembly(image, true)`. Ordinary Raven project/CLI loading
-still uses the default reader. Native callable import and CLI projection remain explicitly rejected;
+still uses the default reader. Ordinary callable import and compound CLI projection remain explicitly rejected;
 loaded snapshots preserve original bytes without verifying bodies. See the
 [host API reference](../api-docs/experimental-metadata.md#read-only-reference-compositions-experiment-2026-10-14).
 
@@ -50,6 +50,14 @@ boxed/intrinsic references can fail despite a compatible static Object/interface
 view. This is a temporary support gap, not the intended general semantics. Typed
 nulls follow existing reference cast/storage behavior. JIT/AOT explicitly reject
 compounds; default interpreter builds reject the opt-in signatures too.
+
+The host metadata builder now admits a separate
+`ImportExperimentalCompositionReference` path for native free-function calls. It
+preserves raw bounds and validates exact compound stack identity. Three emitted
+host consumers (union, intersection and redundant intersection) return 42 in the
+opt-in interpreter. This is not Raven source emission: compiler lowering still
+needs an explicit capability and raw-descriptor call encoding before removing the
+guard below. No new CLI encoding is selected.
 
 Raven's native emitters reject compilations with any reference containing compound
 callables (NEOMETA001), including signatures normalized to a nominal compiler type.

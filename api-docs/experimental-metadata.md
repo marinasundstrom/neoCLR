@@ -8415,9 +8415,10 @@ precedes normalization, so collapsing duplicate bounds cannot hide an invalid le
 External leaves retain the reader's existing declared dependency identity rules;
 this slice does not resolve external assemblies or prove runtime inhabitation.
 
-The descriptor is intentionally read-only: builder ownership validation and native
-callable import reject it explicitly. CLI projection writers keep their default
-rejection. `AssemblyDefinition.Write()` copies the original image byte-for-byte;
+The descriptor is immutable: builder ownership validation and ordinary callable
+import reject it explicitly. The separate experimental callable-import API below
+admits a bounded native-only path. CLI projection of compound declarations remains
+rejected. `AssemblyDefinition.Write()` copies the original image byte-for-byte;
 it does not regenerate declarations or validate executable bodies. The native
 reader still treats bodies as opaque, and this API is not a runtime verifier.
 
@@ -8449,3 +8450,43 @@ Composition projection retains the reader's depth limit of 32. It adds no
 assignability, synthesized members, callable import or code generation. Existing
 non-composition projection limits remain unchanged. Raven's explicit experimental API now maps intersection views to semantic symbols;
 structural union import and native emission remain pending.
+
+## Experimental composition callable import (2026-10-14)
+
+`AssemblyBuilder.ImportExperimentalCompositionReference(MethodDefinition definition,
+AssemblyIdentity dependencyCoreLibrary, IAssemblyResolver? resolver = null)` returns
+an output-owned `ImportedMethodReference` for a nongeneric native free function.
+The definition must come from an immutable native snapshot; compositions require
+the reader opt-in above. Owned methods, generic functions and native/InternalCall
+implementations are rejected. Null definition/core arguments throw
+`ArgumentNullException`; unsupported declarations, incompatible core identities,
+missing/mismatched dependencies and normal import limits throw `InvalidDataException`.
+The optional resolver supplies exact nominal dependencies without implicit loading.
+
+The returned `Signature` preserves union/intersection kind and all normalized
+native bounds, imported into the output builder's identity scope. Same-kind
+flattening/deduplication remains unchanged; nominal-supertype reduction is not
+performed. Repeated imports reuse the callable. Ordinary `ImportReference` still
+rejects a compound contract, even after its experimental import has been cached.
+No new public compound signature factory or authored storage capability is added.
+
+The native writer serializes compound call operands with their imported nominal
+identities. Body validation retains the descriptor as a stack type: exact compound
+results can feed equivalent compound parameters, including reordered bounds.
+This slice adds no host-verifier proof rules for injection/projection between
+nominal and compound types or between different compounds. A union result cannot
+be passed to an intersection parameter just because their bounds match.
+
+`AssemblyBuilder.Write()` and its reference-image path reject graphs containing
+compound callable imports with `InvalidDataException`. Compound declarations also
+remain unsupported by CLI projection. A native caller whose declarations have no
+compounds may still be packaged by existing transports; its native body remains
+subject to runtime feature gates and verification. Authored locals, fields,
+parameters/results and wrapper types continue to fail ownership validation.
+Runtime interpretation requires `experimental-compositions`; JIT/AOT remain closed.
+
+Focused checks and three emitted native callers cover union, intersection and
+redundant `A & Both` bounds (Both implements A): all return 42 in the interpreter.
+This is host metadata API emission, not Raven source emission. Raven's experimental
+semantic importer retains its NEOMETA001 emission guard until a compiler capability
+can preserve these original descriptors through lowering and call encoding.

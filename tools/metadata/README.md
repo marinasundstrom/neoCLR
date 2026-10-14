@@ -324,8 +324,15 @@ Focused check: `dotnet run --project tools/metadata/NeoCLR.Metadata.Experimental
 `AssemblyDefinition.ReadNativeAssembly(image, allowExperimentalCompositions: true)`
 reads bounded native Union/Intersection free-function signatures as immutable
 `SignatureType.Composition` descriptors. The default overload remains unchanged;
-callable import, authored storage and CLI projection are rejected. This is a
-read-only prerequisite for Raven's native mapping. See the
+ordinary callable import, authored storage and compound CLI projection are rejected.
+`ImportExperimentalCompositionReference` now offers a separate native-only callable
+import path preserving exact descriptors and output-owned nominal identities.
+The host verifier supports equivalent compound stack values between calls; it does
+not yet prove nominal/compound conversions. Raven source emission remains gated. See the
 [manual API contract](../../api-docs/experimental-metadata.md#read-only-reference-compositions-experiment-2026-10-14)
 and run `dotnet run --project tools/metadata/NeoCLR.Metadata.Experimental.Tests -- --reference-compositions`
 from the repository root for the focused checks.
+
+Run `dotnet run --project tools/metadata/NeoCLR.Metadata.Experimental.Tests -- --composition-imports <output-directory>`
+to check the import/serialization gates and write three native provider/caller pairs
+for the opt-in interpreter. See the experiment's reproducible execution commands.

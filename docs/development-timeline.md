@@ -17272,3 +17272,11 @@ open, not an approved complete implementation or a permanent roadmap reprioritiz
   are rejected, and runnable Raven compound emission is still open. An unrelated
   cold assembly-symbol API setup failure is recorded in Raven's experiment notes
   as a deferred general-main candidate, not folded into this target slice.
+
+- **Native callable emission follow-through:** on continuation, the assistant adds
+  a separate host metadata API for importing compound free-function contracts and
+  serializing calls without nominal erasure. Stack checks retain exact compound
+  identity. Three generated callers (union, intersection, redundant intersection)
+  return 42 in the opt-in interpreter. The metadata harness adds one passing case
+  with its same two known failures; Raven's semantic-import/emission-gate probe
+  still passes. General authored storage and Raven source emission remain open.
