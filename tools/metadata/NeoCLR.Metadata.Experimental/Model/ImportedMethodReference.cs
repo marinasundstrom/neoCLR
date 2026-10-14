@@ -97,7 +97,23 @@ public sealed partial class AssemblyBuilder
         return ImportReferenceCore(definition, dependencyCoreLibrary, resolver, true, allowStructuralConstraints: true);
     }
 
-    private ImportedMethodReference ImportReferenceCore(MethodDefinition definition, AssemblyIdentity dependencyCoreLibrary, IAssemblyResolver? resolver, bool allowCompositions, bool allowStructuralConstraints = false)
+    /// <summary>Imports a nongeneric native free function while preserving closed structural tuple signatures.</summary>
+    /// <param name="definition">A nongeneric free function from an opt-in native snapshot.</param>
+    /// <param name="dependencyCoreLibrary">The matching explicit core identity.</param>
+    /// <param name="resolver">Optional resolver required for external nominal element definitions.</param>
+    /// <returns>An output-owned native callable reference with admitted tuple storage.</returns>
+    /// <exception cref="ArgumentNullException">Definition or core identity is null.</exception>
+    /// <remarks>Explicit native-only admission. Elements retain exact resolved nominal identities; dependencies require a matching resolver.</remarks>
+    /// <exception cref="InvalidDataException">Not a supported native free function or its signature/dependencies are invalid.</exception>
+    public ImportedMethodReference ImportExperimentalTupleReference(MethodDefinition definition, AssemblyIdentity dependencyCoreLibrary, IAssemblyResolver? resolver = null)
+    {
+        ArgumentNullException.ThrowIfNull(definition);
+        if (!definition.Module.Assembly.IsNative || definition.DeclaringType is not null || !definition.IsStatic || definition.GenericArity != 0 || definition.ImplementationAttributes != 0 || definition.NativeImport is not null)
+            throw new InvalidDataException("tuple import requires a nongeneric native free function");
+        return ImportReferenceCore(definition, dependencyCoreLibrary, resolver, false, allowTuples: true);
+    }
+
+    private ImportedMethodReference ImportReferenceCore(MethodDefinition definition, AssemblyIdentity dependencyCoreLibrary, IAssemblyResolver? resolver, bool allowCompositions, bool allowStructuralConstraints = false, bool allowTuples = false)
     {
         ArgumentNullException.ThrowIfNull(definition);
         if (!allowStructuralConstraints && definition.TypeConstraints.Count != 0) throw new NotSupportedException("imported method interface bounds require an explicit supported contract");
@@ -143,7 +159,7 @@ public sealed partial class AssemblyBuilder
             throw new InvalidDataException("invalid imported constructor contract");
         var declaringReference = !intrinsicPrimitiveOwner && type is not null && (!definition.IsStatic || type.GenericArity > 0)
             ? ImportReference(type, dependencyCoreLibrary) : null;
-        var signature = definition.DecodeImportedSignature(this, dependencyCoreLibrary, resolver, allowCompositions);
+        var signature = definition.DecodeImportedSignature(this, dependencyCoreLibrary, resolver, allowCompositions, allowTuples);
         if (nativeOverride && (!type!.IsValueType && type.GenericArity != 0 || !MethodDefinition.IsObjectOverride(definition.Name, signature, CoreLibrary, NativeObjectRoot, ExternalObjectRoot))) throw new InvalidDataException("unsupported native Object override");
         if (definition.Name == ".ctor" && (signature!.ReturnType != PrimitiveType.Void || signature.GenericParameterNames.Count != 0 || signature.ParameterTypes.Any(p => p.ByReferenceElement is not null)))
             throw new InvalidDataException("constructor requires a nongeneric void signature without byref parameters");

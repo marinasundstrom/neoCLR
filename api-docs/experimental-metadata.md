@@ -8933,3 +8933,37 @@ validates authored signatures and a native tuple type token.
 Run `dotnet run --project tools/metadata/NeoCLR.Metadata.Experimental.Tests --
 --authored-tuples target/authored-tuples`, then run the emitted `AuthoredTuples.neox`
 with the experimental interpreter (expected exit 42).
+
+
+## Reading and importing native tuples (2026-10-14 development)
+
+`AssemblyDefinition.ReadExperimentalTupleAssembly(ReadOnlySpan<byte> image,
+IAssemblyResolver? resolver = null)` returns an immutable native declaration
+snapshot. `TryGetSignature` preserves ordered `SignatureType.Tuple.ElementTypes`,
+including duplicate/nested elements and closed nominal generic elements. `Write()`
+on that snapshot retains the original native image; it does not project to CLI.
+Normal `ReadNativeAssembly` overloads, including composition-only opt-in, continue
+to reject tuple signatures. Tuple opt-in does not enable unions/intersections.
+Malformed shapes, empty/oversized tuples, open or unsupported elements fail with
+InvalidDataException. Authoring-profile element and nesting limits still apply.
+Bodies remain opaque and require runtime verification. A general C# introspection
+TupleTypeView is not added by this slice; inspect the retained method signature.
+
+`AssemblyBuilder.ImportExperimentalTupleReference(MethodDefinition definition,
+AssemblyIdentity dependencyCoreLibrary, IAssemblyResolver? resolver = null)` imports
+a nongeneric native free function with ordinary implementation metadata. It returns
+an output-owned callable reference and admits its tuple storage for native emission.
+Null definition/core arguments throw ArgumentNullException; invalid declarations,
+unsupported signatures and absent/mismatched dependencies throw InvalidDataException.
+Direct tuple signatures and tuples nested in supported closed nominal constructions
+are retained. Tuple-bearing array/byref/function callable signatures remain unsupported.
+External nominal element definitions require an explicit matching resolver; no implicit
+assembly loading occurs. Ordinary import rejects tuples even after an opt-in import
+has cached the same method. Consumers with admitted tuples reject CLI emission.
+
+Validation covers immutable-image preservation, nested/repeated shape roundtrip,
+closed generic nominal elements, separate consumer re-emission, missing/resolved
+external dependencies, default/composition-only rejection and malformed/open tuples.
+The separate native consumer returns 42 through an imported producer function and
+contains verified tuple-forwarding methods. Tuple values are not yet constructed by
+the C# builder in this fixture; construction/element APIs and Raven lowering remain.

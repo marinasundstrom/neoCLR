@@ -2082,3 +2082,9 @@ The C# host `TupleSignature`, `SignatureType.Tuple` and
 [authored structural tuples](experimental-metadata.md#authored-structural-tuple-signatures-2026-10-14-development).
 These tooling-only APIs are outside guest RavenDoc selection. The guest reference
 assembly and TupleTypeInfo contract are unchanged by this authoring slice.
+
+
+The host-only `ReadExperimentalTupleAssembly` and `ImportExperimentalTupleReference`
+APIs are documented in [native tuple reading/import](experimental-metadata.md#reading-and-importing-native-tuples-2026-10-14-development).
+They are excluded from guest RavenDoc selection because they belong to C# metadata
+tooling. Guest API signatures and reference snapshots are unchanged.

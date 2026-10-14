@@ -30,11 +30,23 @@ public sealed partial class AssemblyDefinition
     /// <returns>An immutable snapshot retaining the original image.</returns>
     /// <exception cref="InvalidDataException">Metadata is invalid, a dependency is absent/mismatched, or an intersection operand is final or a value type.</exception>
     public static AssemblyDefinition ReadNativeAssembly(ReadOnlySpan<byte> image, bool allowExperimentalCompositions, IAssemblyResolver? resolver)
+        => ReadNativeCore(image, allowExperimentalCompositions, resolver, false);
+
+    /// <summary>Reads native declarations with closed structural tuples enabled, without enabling reference compositions.</summary>
+    /// <param name="image">Complete native assembly container.</param>
+    /// <param name="resolver">Optional exact dependency snapshots; no implicit assembly loading.</param>
+    /// <returns>An immutable snapshot retaining ordered tuple shapes and the original image.</returns>
+    /// <remarks>Bodies remain opaque. Callable import requires its separate explicit API. Preserves ordered elements; applies the bounded authoring profile.</remarks>
+    /// <exception cref="InvalidDataException">The image or tuple signature is invalid or unsupported.</exception>
+    public static AssemblyDefinition ReadExperimentalTupleAssembly(ReadOnlySpan<byte> image, IAssemblyResolver? resolver = null)
+        => ReadNativeCore(image, false, resolver, true);
+
+    private static AssemblyDefinition ReadNativeCore(ReadOnlySpan<byte> image, bool allowExperimentalCompositions, IAssemblyResolver? resolver, bool allowExperimentalTuples)
     {
         if (image.Length > RuntimeAssemblyContainer.MaxLibraryImageSize) throw new InvalidDataException("image exceeds limit");
         var owned = image.ToArray();
         var native = NativeAssemblyDefinition.ReadLibraryAssembly(owned.AsSpan().StartsWith("NEOX"u8)
-            ? NativeModuleContainer.Read(owned) : RuntimeAssemblyContainer.Read(owned), allowExperimentalCompositions, resolver);
+            ? NativeModuleContainer.Read(owned) : RuntimeAssemblyContainer.Read(owned), allowExperimentalCompositions, resolver, allowExperimentalTuples);
         return native.MaterializeDeclarations(owned);
     }
 
@@ -49,7 +61,7 @@ public sealed partial class NativeAssemblyDefinition
     {
         static bool SupportedArgument(SignatureType type) => type.MethodParameterIndex is not null ||
             (type.ArrayElement is { } element ? SupportedArgument(element) : SupportedScalar(type));
-        static bool SupportedScalar(SignatureType type) => type.PointerElement is not null || type.FunctionSignature is { } function && SupportedArgument(function.ReturnType) && function.ParameterTypes.All(SupportedArgument) || type.IsSelf || type.GenericInstance is { } instance && instance.TypeArguments.All(SupportedArgument) || type.Primitive is not null || type.TypeParameterIndex is not null ||
+        static bool SupportedScalar(SignatureType type) => type.Tuple is { } tuple && tuple.ElementTypes.All(SupportedScalar) || type.PointerElement is not null || type.FunctionSignature is { } function && SupportedArgument(function.ReturnType) && function.ParameterTypes.All(SupportedArgument) || type.IsSelf || type.GenericInstance is { } instance && instance.TypeArguments.All(SupportedArgument) || type.Primitive is not null || type.TypeParameterIndex is not null ||
             type.ClassType is { IsStatic: false } ||
             type.ImportedType is { } imported &&
             imported.GenericArity == imported.TypeArguments.Count && imported.TypeArguments.All(SupportedArgument);
@@ -73,6 +85,7 @@ public sealed partial class NativeAssemblyDefinition
         var externalTokens = new Dictionary<(AssemblyIdentity, string, string, uint), uint>();
         AssemblyDefinition.NativeSignatureTypeRow Copy(SignatureType type)
         {
+            if (type.Tuple is { } tuple) return new(null, 0, TupleElements: tuple.ElementTypes.Select(Copy).ToArray());
             if (type.Composition is { } composition) return new(null, 0, CompositionKind: composition.Kind, Constituents: composition.Constituents.Select(Copy).ToArray());
             if (type.FunctionSignature is { } function) return new(null, 0, Function: new(Copy(function.ReturnType), function.ParameterTypes.Select(Copy).ToArray()));
             if (type.PointerElement is { } pointer) return new(null, 0, Copy(pointer), IsPointer: true);

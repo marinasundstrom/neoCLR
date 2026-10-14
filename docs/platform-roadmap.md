@@ -3923,7 +3923,8 @@ On 2026-10-14 the author directed replacing this nominal representation with
 substitution are implemented, followed by opt-in closed tuple values and positional
 access in the interpreter, resolved host identities and ordered element descriptors.
 Guest ordered element introspection is available through `TupleTypeInfo`, and
-native C# signature authoring emits ordered tuple shapes with CLI rejection;
+native C# signature authoring, opt-in snapshots and callable imports preserve ordered
+tuple shapes with CLI rejection;
 Raven migration, native layout/backends and
 nominal family removal remain staged follow-ups on the experimental branches.
 

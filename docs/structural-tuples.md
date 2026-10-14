@@ -170,3 +170,24 @@ stage 3, not the complete compiler path. See the manual host API reference for t
 [Authoring validation](experiments/structural-tuples/authored-results.json) records
 the native image and test-source hashes. Existing authored composition checks and
 the API snapshot check also pass. No website build is needed for this host API slice.
+
+
+## Native C# reader/import slice
+
+`ReadExperimentalTupleAssembly` preserves tuple shapes in immutable declaration
+snapshots without enabling compositions. `ImportExperimentalTupleReference` explicitly
+imports nongeneric native free functions, retaining ordered tuple signatures and
+closed generic nominal element identities. Ordinary read/import paths remain closed,
+including after import-cache population. External nominal definitions resolve through
+explicit matching snapshots. Malformed/open tuples reject; bodies stay opaque until
+runtime verification. Tuple-bearing array/byref/function imports remain unsupported.
+
+The separate consumer returns 42 through an imported producer method and includes
+native tuple-forwarding bodies. Host checks cover snapshot image preservation,
+nesting/multiplicity, re-emission, closed generic elements, missing/resolved dependencies
+and malformed/default-gate rejection. This is signature and linkage validation;
+C# tuple value construction/element operations and Raven source lowering remain next.
+
+The [import validation record](experiments/structural-tuples/import-results.json)
+contains the producer/consumer hashes and commands. Existing composition reader
+regressions and the API snapshot check pass.

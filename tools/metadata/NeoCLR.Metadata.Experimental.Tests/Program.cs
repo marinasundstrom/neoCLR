@@ -4,6 +4,8 @@ using System.Reflection.PortableExecutable;
 using NeoCLR.Metadata.Experimental.Model;
 using AssemblyDefinition = NeoCLR.Metadata.Experimental.Model.AssemblyDefinition;
 
+if (args is ["--tuple-imports", var tupleImportOutput]) { TupleImportChecks.Run(tupleImportOutput); return 0; }
+
 if (args is ["--authored-tuples", var tupleOutput]) { AuthoredTupleChecks.Run(tupleOutput); return 0; }
 
 if (args is ["--composition-imports", var compositionOutput]) { ReferenceCompositionImportChecks.Run(compositionOutput); return 0; }

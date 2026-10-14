@@ -57,10 +57,10 @@ public sealed partial class NativeAssemblyDefinition
     public static NativeAssemblyDefinition ReadAssembly(ReadOnlySpan<byte> image)
         => ReadCore(image, MetadataArtifactReader.MaxImageSize);
 
-    internal static NativeAssemblyDefinition ReadLibraryAssembly(ReadOnlySpan<byte> image, bool allowExperimentalCompositions = false, IAssemblyResolver? resolver = null)
-        => ReadCore(image, 32 * 1024 * 1024, allowExperimentalCompositions, resolver);
+    internal static NativeAssemblyDefinition ReadLibraryAssembly(ReadOnlySpan<byte> image, bool allowExperimentalCompositions = false, IAssemblyResolver? resolver = null, bool allowExperimentalTuples = false)
+        => ReadCore(image, 32 * 1024 * 1024, allowExperimentalCompositions, resolver, allowExperimentalTuples);
 
-    private static NativeAssemblyDefinition ReadCore(ReadOnlySpan<byte> image, int maxSize, bool allowExperimentalCompositions = false, IAssemblyResolver? resolver = null)
+    private static NativeAssemblyDefinition ReadCore(ReadOnlySpan<byte> image, int maxSize, bool allowExperimentalCompositions = false, IAssemblyResolver? resolver = null, bool allowExperimentalTuples = false)
     {
         var resolvedIntersections = new Dictionary<AssemblyIdentity, AssemblyDefinition>();
         bool ExtendableExternal(ImportedTypeReference external)
@@ -500,6 +500,11 @@ public sealed partial class NativeAssemblyDefinition
                     }
                     return ReadPrimitive(element.GetString(), allowVoid);
                 }
+                if (element.TryGetProperty("Tuple", out _))
+                {
+                    Require(allowExperimentalTuples && element.EnumerateObject().Count() == 1, "experimental tuple is disabled or malformed");
+                    return signatureGraph.CreateExperimentalTuple(Array(element, "Tuple", 256).Select(t => ReadType(t, false)).ToArray());
+                }
                 if (element.TryGetProperty("Union", out _) || element.TryGetProperty("Intersection", out _))
                 {
                     Require(allowExperimentalCompositions && allowComposition, "experimental composition is disabled or unsupported in this position");
@@ -697,7 +702,7 @@ public sealed partial class NativeAssemblyDefinition
             }
             signatureGraph.ValidateValueLayouts();
             typeArity = 0;
-            string TypeKey(SignatureType type) => type.Composition is { } composition ? composition.Kind + JsonSerializer.Serialize(composition.Constituents.Select(TypeKey).Order(StringComparer.Ordinal)) : type.IsSelf ? "self" : type.FunctionSignature is { } function ? "function:" + TypeKey(function.ReturnType) + "(" + string.Join(",", function.ParameterTypes.Select(TypeKey)) + ")" : type.ByReferenceElement is { } target ? "byref:" + TypeKey(target) : type.ImportedType is { } imported ? "external:" + JsonSerializer.Serialize(new { imported.AssemblyIdentity, imported.Namespace, imported.Name, Arguments = imported.TypeArguments.Select(TypeKey).ToArray() }) : type.GenericInstance is { } instance ? "constructed:" + System.Array.IndexOf(signatureOwners, instance.Definition) + "<" + string.Join(",", instance.TypeArguments.Select(TypeKey)) + ">" : type.TypeParameterIndex is { } ordinal ? "type:" + ordinal : type.MethodParameterIndex is { } index ? "method:" + index : type.ArrayElement is { } element ? "array:" + TypeKey(element)
+            string TypeKey(SignatureType type) => type.Tuple is { } tuple ? "tuple:" + JsonSerializer.Serialize(tuple.ElementTypes.Select(TypeKey)) : type.Composition is { } composition ? composition.Kind + JsonSerializer.Serialize(composition.Constituents.Select(TypeKey).Order(StringComparer.Ordinal)) : type.IsSelf ? "self" : type.FunctionSignature is { } function ? "function:" + TypeKey(function.ReturnType) + "(" + string.Join(",", function.ParameterTypes.Select(TypeKey)) + ")" : type.ByReferenceElement is { } target ? "byref:" + TypeKey(target) : type.ImportedType is { } imported ? "external:" + JsonSerializer.Serialize(new { imported.AssemblyIdentity, imported.Namespace, imported.Name, Arguments = imported.TypeArguments.Select(TypeKey).ToArray() }) : type.GenericInstance is { } instance ? "constructed:" + System.Array.IndexOf(signatureOwners, instance.Definition) + "<" + string.Join(",", instance.TypeArguments.Select(TypeKey)) + ">" : type.TypeParameterIndex is { } ordinal ? "type:" + ordinal : type.MethodParameterIndex is { } index ? "method:" + index : type.ArrayElement is { } element ? "array:" + TypeKey(element)
                 : type.ClassType is { } c ? "class:" + System.Array.IndexOf(signatureOwners, c) : "primitive:" + type.Primitive;
             var methods = new List<MethodRow>();
             var methodNames = new List<string>();

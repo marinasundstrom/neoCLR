@@ -104,25 +104,26 @@ public sealed partial class AssemblyBuilder
         }
         return nativeInterfaceConversions[(actual, target)] = Visit(actual);
     }
-    internal SignatureType ImportNativeSignatureType(SignatureType type, AssemblyIdentity core, IAssemblyResolver? resolver, bool allowCompositions = false)
-        => type.Composition is { } composition
+    internal SignatureType ImportNativeSignatureType(SignatureType type, AssemblyIdentity core, IAssemblyResolver? resolver, bool allowCompositions = false, bool allowTuples = false)
+        => type.Tuple is { } tuple ? allowTuples ? CreateExperimentalTuple(tuple.ElementTypes.Select(t => ImportNativeSignatureType(t, core, resolver, allowTuples: true)).ToArray()) : throw new InvalidDataException("tuple callable import requires explicit opt-in")
+            : type.Composition is { } composition
             ? allowCompositions
                 ? SignatureType.FromComposition(composition.Kind, composition.Constituents.Select(t => ImportNativeSignatureType(t, core, resolver, true)))
                 : throw new InvalidDataException("experimental composition callable import requires explicit opt-in")
             : type.PointerElement is not null ? type : type.ByReferenceElement is { } target ? SignatureType.ByReference(ImportNativeSignatureType(target, core, resolver))
             : type.ReferencedGenericInstance is { } constructed
-            ? ImportNativeConstruction(constructed, core, resolver, allowCompositions)
+            ? ImportNativeConstruction(constructed, core, resolver, allowCompositions, allowTuples)
             : type.TypeParameterIndex is { } typeParameter ? SignatureType.TypeParameter(typeParameter)
             : type.MethodParameterIndex is { } parameter ? SignatureType.MethodParameter(parameter)
             : type.ArrayElement is { } element ? SignatureType.ArrayOf(ImportNativeSignatureType(element, core, resolver))
             : type.Primitive is { } primitive ? primitive
             : type.ReferencedType is { } reference ? ImportNativeSignatureReference(reference, core, resolver)
             : throw new InvalidDataException("unsupported native signature type");
-    private ImportedTypeReference ImportNativeConstruction(ReferencedGenericType construction, AssemblyIdentity core, IAssemblyResolver? resolver, bool allowCompositions)
+    private ImportedTypeReference ImportNativeConstruction(ReferencedGenericType construction, AssemblyIdentity core, IAssemblyResolver? resolver, bool allowCompositions, bool allowTuples)
     {
         var definition = construction.Definition.Resolve(resolver);
         var imported = ImportReference(definition, core);
-        var arguments = construction.TypeArguments.Select(t => ImportNativeSignatureType(t, core, resolver, allowCompositions)).ToArray();
+        var arguments = construction.TypeArguments.Select(t => ImportNativeSignatureType(t, core, resolver, allowCompositions, allowTuples)).ToArray();
         if (!arguments.Any(t => t.ContainsComposition)) return imported.MakeGenericInstance(arguments);
         if (!allowCompositions || definition.IsValueType || (definition.Attributes & 0x20) != 0 ||
             arguments.Length != imported.GenericArity || arguments.Any(t => t.NestingDepth >= 16))
