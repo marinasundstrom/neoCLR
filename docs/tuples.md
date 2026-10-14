@@ -1,5 +1,13 @@
 # Value tuples (development)
 
+## Structural migration selected — 2026-10-14
+
+The author now directs structural tuple types and removal of the nominal tuple
+family. This supersedes the representation choice below, not value-copy semantics.
+The [migration plan](structural-tuples.md) records stages, compatibility and evidence.
+The existing nominal family remains executable during migration; its removal has
+not yet happened. The text below describes that existing implementation.
+
 Author direction, 2026-09-28: neoCLR calls its value-tuple family `System.Tuple`,
 corresponding to .NET's `System.ValueTuple`, rather than .NET's reference `System.Tuple`.
 This is an additive development API after Preview 11. Matching Raven, compiler

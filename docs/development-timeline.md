@@ -25,6 +25,22 @@ available original wording; other text is a summary.
 
 See the [changelog](../CHANGELOG.md) and linked design documents for technical status.
 
+## 2026-10-14 — Structural tuples replace nominal tuple direction
+
+- **Author:** “Let's continue with structural tuples, which means that we will have
+  to remove the nominal tuple types.” Subsequently directs continuing the work.
+- **Assistant:** identifies the existing nominal `System.Tuple<T...>` family and
+  Raven's dependence on its constructors/fields, plus an older structural-signature
+  codec that is not executable tuple support. Proposes preserving value copying and
+  treating labels as aliases, with native signatures, storage/access, reflection,
+  compiler migration and then removal in validated slices.
+- **Action:** adds the native ordered tuple signature and substitution foundation,
+  with explicit executable rejection while the storage path is incomplete.
+- **Open:** runtime values, TupleTypeInfo, host authoring, Raven carrier-independent
+  lowering and removal of nominal declarations. The staged timing and detailed
+  semantic defaults are assistant implementation choices, not additional author
+  replies. See [migration status](structural-tuples.md).
+
 ## 2026-10-14 — Release editor review and disappearing inlays
 
 - **Author:** asks to review the SDK and VS Code extension integrations before

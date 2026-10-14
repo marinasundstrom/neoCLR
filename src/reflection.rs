@@ -255,7 +255,8 @@ impl Query {
                     | Type::Boolean
                     | Type::Value
                     | Type::RuntimeTypeHandle
-                    | Type::Array(_) => true,
+                    | Type::Array(_)
+                    | Type::Tuple(_) => true,
                     Type::Named(_) | Type::Constructed { .. } | Type::Scoped { .. } => definition
                         .is_some_and(|d| {
                             !d.is_reference_type && d.representation != Representation::Interface

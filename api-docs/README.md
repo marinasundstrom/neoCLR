@@ -2057,3 +2057,9 @@ The native metadata reader overload accepting `IAssemblyResolver` for external
 intersection operands is host C# tooling, excluded from the guest RavenDoc selection
 and covered in the [manual metadata reference](experimental-metadata.md#resolved-external-intersection-bounds--2026-10-14-development).
 No guest public API or reference snapshot changes in this slice.
+
+The structural tuple migration's Rust `metadata::Type::Tuple(Vec<Type>)` node is
+covered by the [manual tuple reference](tuples.md). It is metadata-only in this
+slice and outside RavenDoc's guest assembly selection; no guest API signature or
+reference snapshot changes. Runtime TupleTypeInfo and nominal tuple removal remain
+pending rather than omitted shipped APIs.

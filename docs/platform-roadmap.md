@@ -3918,6 +3918,10 @@ The author selected [value tuple support](tuples.md) on 2026-09-28, using
 `System.Tuple` as the neoCLR name corresponding to .NET `System.ValueTuple`.
 This is a bounded author-directed addition; it does not replace the Web API direction.
 The [runtime tracker](tracking/runtime-language.md#value-tuples--2026-09-28) owns status.
+On 2026-10-14 the author directed replacing this nominal representation with
+[structural tuples](structural-tuples.md). Native tuple signature roundtrips and
+substitution are implemented; execution, introspection, Raven migration and nominal
+family removal remain staged follow-ups on the experimental branches.
 
 ## Theme trackers
 

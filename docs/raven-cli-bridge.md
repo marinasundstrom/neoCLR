@@ -9991,3 +9991,17 @@ against `target/composition-info-libraries-v2`, writing artifacts to
 existing source/import constraint checks pass. This reader-only follow-up does not
 change emitted code or runtime execution; the preceding external-intersection
 consumer result remains the runtime evidence.
+
+## Structural tuple migration — 2026-10-14 development
+
+The author directs replacing neoCLR's nominal Tuple family with structural tuples.
+The first native slice adds an ordered Tuple signature node, roundtrip preservation
+and nested generic/Self substitution. Executable structural tuples remain explicitly
+rejected. Raven still binds/emits existing tuples through nominal field/constructor
+mappings; ordinary .NET ValueTuple behavior and Runtime Contract configuration are
+unchanged. No temporary CLI encoding is introduced. The native replacement requires
+runtime storage and positional operations, TupleTypeInfo, host authoring/import and
+carrier-independent compiler lowering before removing nominal neoCLR declarations.
+The runtime owns the signature/value work; Raven owns binding/lowering and import.
+Focused Rust structural-tuple tests cover the metadata stage; existing source tuple
+consumers remain the evidence for the still-nominal executable path.

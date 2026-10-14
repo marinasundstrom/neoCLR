@@ -60,6 +60,9 @@ pub enum Type {
     InterfaceRef(Box<Type>),
     /// Fundamental unmanaged pointer signature; no ownership policy is implied.
     Ptr(Box<Type>),
+    /// Ordered structural value-tuple signature, independent of nominal declarations.
+    /// Metadata inspection only until native storage and element operations are admitted.
+    Tuple(Vec<Type>),
 }
 
 /// Canonical callable shape. Parameter labels and target identity are not type identity.
@@ -1163,7 +1166,9 @@ impl Type {
     pub fn contains_self(&self) -> bool {
         match self {
             Self::SelfType => true,
-            Self::Union(parts) | Self::Intersection(parts) => parts.iter().any(Self::contains_self),
+            Self::Union(parts) | Self::Intersection(parts) | Self::Tuple(parts) => {
+                parts.iter().any(Self::contains_self)
+            }
             Self::Constructed { arguments, .. } | Self::Scoped { arguments, .. } => {
                 arguments.iter().any(Self::contains_self)
             }
@@ -1206,6 +1211,9 @@ impl Type {
             }
             let nested = |ty: &Type| substitute(ty, types, methods, implementing_type, depth + 1);
             Ok(match ty {
+                Type::Tuple(parts) => {
+                    Type::Tuple(parts.iter().map(nested).collect::<Result<_, _>>()?)
+                }
                 Type::Union(parts) => {
                     Type::Union(parts.iter().map(nested).collect::<Result<_, _>>()?)
                 }

@@ -11,6 +11,12 @@ pub(crate) fn normalize_type(context: &Module, ty: &Type) -> Result<Type, Fault>
         }
         let nested = |ty: &Type| bind(context, ty, depth + 1);
         let normalized = match ty {
+            Type::Tuple(parts) => {
+                if parts.is_empty() || parts.len() > 256 {
+                    return Err(Fault::new("tuple signature requires one to 256 elements"));
+                }
+                Type::Tuple(parts.iter().map(nested).collect::<Result<_, _>>()?)
+            }
             Type::Union(parts) | Type::Intersection(parts) => {
                 crate::compositions::check_shape(ty)?;
                 // Validate constituents before singleton collapse can conceal a value type.

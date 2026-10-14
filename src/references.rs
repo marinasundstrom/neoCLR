@@ -58,7 +58,7 @@ pub(crate) fn check_type(linked: &Module, source: &Module, ty: &Type) -> Result<
         return Ok(());
     }
     match ty {
-        Type::Union(parts) | Type::Intersection(parts) => {
+        Type::Union(parts) | Type::Intersection(parts) | Type::Tuple(parts) => {
             for part in parts {
                 check_type(linked, source, part)?;
             }

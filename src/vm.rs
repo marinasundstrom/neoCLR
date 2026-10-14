@@ -1498,6 +1498,9 @@ fn check_type_context_seen(
     }
     let mut nested = |ty: &Type| check_type_context_seen(ty, module, arity, depth + 1, seen);
     match ty {
+        Type::Tuple(_) => Err(Fault::new(
+            "structural tuple execution is not yet supported",
+        )),
         Type::Union(_) | Type::Intersection(_) => crate::compositions::validate(module, ty),
         Type::Function(shape) => {
             shape.validate()?;

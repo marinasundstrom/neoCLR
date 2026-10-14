@@ -44,3 +44,19 @@ Future structural tuple identity and construction through introspection need the
 own contracts. Function's Object inheritance does not decide tuple inheritance.
 
 [All structural families](structural-types.md)
+
+## Structural migration: host metadata foundation
+
+The 2026-10-14 experimental runtime model adds
+`neoclr::metadata::Type::Tuple(Vec<Type>)`. Its ordered element signatures have no
+nominal definition name. JSON and native binary metadata decoding preserve that
+shape, and type/method/Self substitution traverses its elements. Signature equality
+preserves order, duplicates and nesting; it is not a claim of resolved runtime
+assignability. Missing substitution arguments and excessive substitution depth
+return a host Fault. Scope normalization rejects zero or more than 256 elements.
+
+This Rust host metadata node is not a guest TupleTypeInfo API. Executable loading
+rejects structural tuples until storage and element operations are implemented,
+including when the union/intersection experiment is enabled. Existing nominal
+Tuple APIs remain available during migration; their removal is planned. No new
+source syntax, CLI tuple projection or guest reflection member is shipped here.

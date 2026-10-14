@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-14
 
+- Begin the author-directed structural tuple migration with a native ordered signature node, JSON/binary roundtrips and nested generic/Self substitution. Keep executable admission explicitly closed until storage and element operations exist; nominal Tuple removal is planned after runtime/compiler replacement.
+
 - Prepare a local structural-type VS Code test kit with explicit compiler/server selection and interpreter tasks for native Task unions, intersections and imported generic interface bounds. Include editable samples and a reproducible staging script; preserve nominal interface conformance.
 
 - Admit resolved external intersection operands in native method constraints and add an explicit resolver overload for native metadata reads. Preserve nominal conformance, reject unresolved/final/value bounds, and keep Raven sealed hierarchies distinct from final classes. Wire opt-in Raven catalog resolution and closed generic interface conjunction emission; add host and separate-consumer checks. Add explicit dependency resolution to Raven’s intersection-only reader, preserving union-profile and missing-dependency rejection.
