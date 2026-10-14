@@ -10,7 +10,16 @@ func Check(condition: bool) {
     }
 }
 
-async func RoundTrip() -> Task<Result<unit, MappingError>> {
+// This orchestration preserves independent stream, JSON and mapping failures.
+// MappingError still owns the application's schema-specific cases.
+async func ReadReport(stream: MemoryStream) -> Task<Result<StationReport, StreamError | JsonError | MappingError>> {
+    _ = stream.Seek(0)?
+    let document = await JsonSerializer.DeserializeNode(stream)?
+    let report = DecodeReport(document)?
+    return Ok(report)
+}
+
+async func RoundTrip() -> Task<Result<unit, StreamError | JsonError | MappingError>> {
     let document = JsonSerializer.DeserializeNode("{\"station\":\"Café\"}")?
     let report = DecodeReport(document)?
     Check(report.Station == "Café")
@@ -22,9 +31,7 @@ async func RoundTrip() -> Task<Result<unit, MappingError>> {
     // Serializer borrows the stream; mapping remains a separate DOM operation.
     let stream = MemoryStream()
     _ = await JsonSerializer.SerializeNode(stream, mapped)?
-    _ = stream.Seek(0).MapError(error => MappingError.Schema("Seek failed"))?
-    let reread = await JsonSerializer.DeserializeNode(stream)?
-    let restored = DecodeReport(reread)?
+    let restored = await ReadReport(stream)?
     Check(restored.Station == report.Station)
     Check(restored.Assignments == 1)
     stream.Close()
@@ -37,8 +44,49 @@ async func RoundTrip() -> Task<Result<unit, MappingError>> {
     return Ok(())
 }
 
+async func ErrorAlternatives() -> Task<()> {
+    let closed = MemoryStream()
+    closed.Close()
+    let Error(streamFailure) = await ReadReport(closed) else {
+        System.Fail("Expected stream failure")
+    }
+    if streamFailure is StreamError error {
+        Check(error is StreamError.Closed)
+    } else {
+        System.Fail("Stream failure was relabeled")
+    }
+
+    let empty = MemoryStream()
+    let invalidJson = await ReadReport(empty)
+    empty.Close()
+    let Error(jsonFailure) = invalidJson else {
+        System.Fail("Expected JSON failure")
+    }
+    if jsonFailure is JsonError error {
+        Check(error is JsonError.Syntax(_))
+    } else {
+        System.Fail("JSON failure was relabeled")
+    }
+
+    let missingField = MemoryStream()
+    let Ok(_) = await JsonSerializer.SerializeNode(missingField, JsonObject()) else {
+        System.Fail("Could not prepare mapping fixture")
+    }
+    let invalidMapping = await ReadReport(missingField)
+    missingField.Close()
+    let Error(mappingFailure) = invalidMapping else {
+        System.Fail("Expected mapping failure")
+    }
+    if mappingFailure is MappingError error {
+        Check(error is MappingError.Json(JsonError.MissingField("station")))
+    } else {
+        System.Fail("Mapping failure lost its domain boundary")
+    }
+}
+
 async func Main() -> Task<()> {
     if let Ok(_) = await RoundTrip() {
+        await ErrorAlternatives()
         Console.WriteLine("JSON object mapping checks passed")
     } else {
         System.Fail("JSON object mapping failed")

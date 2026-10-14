@@ -1,0 +1,85 @@
+{
+  "passed": true,
+  "commands": [
+    {
+      "command": [
+        "dotnet",
+        "/Users/robert/Projects/neoclr/target/http-json-union-compiler-20261013b/rvnc.dll",
+        "neoclr",
+        "--project",
+        "/Users/robert/Projects/neoclr/target/sample-union-review-20261014/JsonMapping/JsonMapping.rvnproj"
+      ],
+      "exitCode": 0,
+      "stdout": "Native build output: /Users/robert/Projects/neoclr/target/sample-union-review-20261014/JsonMapping/bin/neoclr/JsonMapping.dll\n",
+      "stderr": "/Users/robert/Projects/neoclr/docs/experiments/json-object-mapping/Main.rvn(65,33): warning RAV0168: 'error' shadows a previous declaration.\n/Users/robert/Projects/neoclr/docs/experiments/json-object-mapping/Main.rvn(80,39): warning RAV0168: 'error' shadows a previous declaration.\n/Users/robert/Projects/neoclr/docs/experiments/json-object-mapping/Mapping.rvn(50,53): info RAV1506: Result propagation converts errors from 'JsonError' to 'MappingError' via implicit conversion 'static func implicit(error: JsonError) -> MappingError'.\n/Users/robert/Projects/neoclr/docs/experiments/json-object-mapping/Mapping.rvn(52,66): info RAV1506: Result propagation converts errors from 'ReflectionError' to 'MappingError' via implicit conversion 'static func implicit(error: ReflectionError) -> MappingError'.\n/Users/robert/Projects/neoclr/docs/experiments/json-object-mapping/Mapping.rvn(55,61): info RAV1506: Result propagation converts errors from 'ReflectionError' to 'MappingError' via implicit conversion 'static func implicit(error: ReflectionError) -> MappingError'.\n/Users/robert/Projects/neoclr/docs/experiments/json-object-mapping/Mapping.rvn(67,42): info RAV1506: Result propagation converts errors from 'ReflectionError' to 'MappingError' via implicit conversion 'static func implicit(error: ReflectionError) -> MappingError'.\n/Users/robert/Projects/neoclr/docs/experiments/json-object-mapping/Mapping.rvn(70,57): info RAV1506: Result propagation converts errors from 'JsonError' to 'MappingError' via implicit conversion 'static func implicit(error: JsonError) -> MappingError'.\n"
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/release/neoclr",
+        "verify",
+        "/Users/robert/Projects/neoclr/target/sample-union-review-20261014/JsonMapping/bin/neoclr/JsonMapping.dll",
+        "--system",
+        "/Users/robert/Projects/neoclr/target/http-json-adhoc-libraries-20261013d/System.runtime.neox",
+        "--object-root",
+        "/Users/robert/Projects/neoclr/target/http-json-adhoc-libraries-20261013d/System.Runtime.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/http-json-adhoc-libraries-20261013d/System.Runtime.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/http-json-adhoc-libraries-20261013d/System.Data.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/http-json-adhoc-libraries-20261013d/System.Networking.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/http-json-adhoc-libraries-20261013d/System.Web.dll"
+      ],
+      "exitCode": 0,
+      "stdout": "NeoMetadata_FCEBBAC3BA7D925D4A15EF34AF3C1ACC3CE1F4EA635221947C9C747ECF2AC149: typed-stack/control-flow verification passed (3361 IL functions; maximum stack 10; runtime value checks remain)\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/release/neoclr",
+        "run",
+        "/Users/robert/Projects/neoclr/target/sample-union-review-20261014/JsonMapping/bin/neoclr/JsonMapping.dll",
+        "--execution",
+        "interpreter",
+        "--instructions",
+        "100000000",
+        "--system",
+        "/Users/robert/Projects/neoclr/target/http-json-adhoc-libraries-20261013d/System.runtime.neox",
+        "--object-root",
+        "/Users/robert/Projects/neoclr/target/http-json-adhoc-libraries-20261013d/System.Runtime.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/http-json-adhoc-libraries-20261013d/System.Runtime.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/http-json-adhoc-libraries-20261013d/System.Data.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/http-json-adhoc-libraries-20261013d/System.Networking.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/http-json-adhoc-libraries-20261013d/System.Web.dll"
+      ],
+      "exitCode": 0,
+      "stdout": "JSON object mapping checks passed\n",
+      "stderr": ""
+    }
+  ],
+  "inputs": {
+    "/Users/robert/Projects/neoclr/docs/experiments/json-object-mapping/verify-native.py": "fcef7f4a866a28f0a8e5515d557dda306679bf2a44839ece1f23f595d638af09",
+    "/Users/robert/Projects/neoclr/target/http-json-union-compiler-20261013b/rvnc.dll": "f9b50cf90476382f71490c435dc63f12f1e2efc58e4187dc8dfecadf7c13b3dc",
+    "/Users/robert/Projects/neoclr/target/release/neoclr": "e5b372f7f3b41dc08887b584ef01a2fbe968db4061dade5b7b04ed770ac7a975",
+    "/Users/robert/Projects/neoclr/target/http-json-adhoc-libraries-20261013d/bundle.json": "f1a9a6d104f59f122352b631f35c88ac7ce3dae158d1692a79767ce9cae59130",
+    "/Users/robert/Projects/neoclr/target/http-json-adhoc-libraries-20261013d/System.runtime.neox": "98a1ae1da85387c87746957e83a4015eb59d0566539a915c69f168d2b511b190",
+    "/Users/robert/Projects/neoclr/target/http-json-adhoc-libraries-20261013d/NeoCLR.ClassLibrary.props": "4676969ee1e381f9bbe0cfce799cfe5503a1a7f77968a174782c35a24752e5b7",
+    "/Users/robert/Projects/neoclr/target/http-json-adhoc-libraries-20261013d/RuntimeAwait.rvn": "5a22359686ad1ffaec28b212e2821a1b09f08a2811393e31a07666a3703d161a",
+    "/Users/robert/Projects/neoclr/target/http-json-adhoc-libraries-20261013d/RuntimeGenerator.rvn": "ac1209d4d1e7ab7d7a8483a2451ecf09d460c00d217bb9ba2f3563f15cacc423",
+    "/Users/robert/Projects/neoclr/target/http-json-union-compiler-20261013b/Raven.CodeAnalysis.dll": "6e1fc137b7ce79f198be9ede2df17e3c31bc45e3e4dd88871bfe9e29a4837aa0",
+    "/Users/robert/Projects/neoclr/target/http-json-union-compiler-20261013b/Raven.CodeAnalysis.NeoClr.dll": "7c2b5840730f617f5380c119cb7430aeabcd92dd2901e9b7fcddb5a5d10afebf",
+    "/Users/robert/Projects/neoclr/target/http-json-adhoc-libraries-20261013d/System.Runtime.dll": "a9f6386f12c28bf328dfbd3753ef6be98dd1a548e41a28a774c5ddd4d568a577",
+    "/Users/robert/Projects/neoclr/target/http-json-adhoc-libraries-20261013d/System.Data.dll": "35e76128c0180212fcf99b48573ea550d236cfbebe65cf15a653f92b4c555a91",
+    "/Users/robert/Projects/neoclr/target/http-json-adhoc-libraries-20261013d/System.Networking.dll": "0dd0e8f046b6ed0dc62e9c4bfce3798133e7a5fe088bcefdedd1d464c9d4c8ea",
+    "/Users/robert/Projects/neoclr/target/http-json-adhoc-libraries-20261013d/System.Web.dll": "a4ef7102d0ba24a9251ed40ad50c7ec52a7a193b39241273e07167e72bf2f154",
+    "/Users/robert/Projects/neoclr/docs/experiments/json-object-mapping/Mapping.rvn": "b2fca0297552655c7a619c2c36dbc7c8673bfaf7917ef56593ea0792792158a2",
+    "/Users/robert/Projects/neoclr/docs/experiments/json-object-mapping/Main.rvn": "496a80a97935747aae632cd752a7ae0ac58230d8ab35e3182a5d749024b57e83",
+    "/Users/robert/Projects/neoclr/target/sample-union-review-20261014/JsonMapping/bin/neoclr/JsonMapping.dll": "1c08b93b912bee1c496b91cad2c0431a921dbda5574690405a8b6226748d1912"
+  },
+  "scope": "native metadata and interpreter JSON mapping error composition"
+}

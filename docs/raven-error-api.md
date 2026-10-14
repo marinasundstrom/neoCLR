@@ -72,3 +72,28 @@ contract, not HTTP status, decoding or cancellation semantics. The established
 alternatives and less forwarding code; costs are signature/pattern migration and
 exposing both dependencies in the public contract. Native structural unions remain
 planned; the temporary System.Union bridge and its limits are unchanged.
+
+
+### Remaining sample/test review — 2026-10-14
+
+Reviewed Raven sources in `docs/experiments`, `runtime/raven/tests`, and their
+embedded Python/C# fixtures for wrapper unions, implicit error converters and
+MapError/stringification at composition points. The strong current candidate is
+[JSON mapping orchestration](experiments/json-object-mapping/Main.rvn): independent
+stream, JSON and schema-mapping failures now propagate as an ad-hoc union, with
+executable checks for all three. MappingError retains its domain cases.
+
+| Reviewed area | Decision |
+| --- | --- |
+| JSON mapping RoundTrip/ReadReport | Preserve StreamError, JsonError and MappingError; remove the lossy seek-to-schema mapping. |
+| HTTP report AppError and mapping MappingError | Keep nominal schema/body rules and intentional domain conversion. |
+| RouteMappingError, BoundaryError, SelectionFailure and codec failures | Keep named validation states, context and distinct domain outcomes. |
+| HTTP status conversion/boxing and outcome-operator tests | Keep converters and mappings: those behaviors are the subjects under test. |
+| Runtime test framework TestFailure | Keep assertion descriptions and expected/actual values; an operational error is not an assertion result. |
+| Deferred async/union ABI and async-forward-return fixtures | Keep their nominal types: they test retention, representation or binding, not error aggregation. |
+| File-transformer and early JSON/byte-copy prototypes | Retain the older CLI checkpoint. File-transformer is a future modernization candidate, but changing its union signatures alone would break its legacy importer; its synchronous stream calls and sample-owned JSON API also predate current contracts. |
+
+Single-error pipelines do not need an ad-hoc union merely to replace a mapper with
+a larger type. Historical artifact reports and published samples are not rewritten
+as if they used the new representation. This is a sample/style change; existing
+.NET comparisons and the temporary native bridge contract remain unchanged.

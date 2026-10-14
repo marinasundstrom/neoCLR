@@ -428,8 +428,9 @@ no alias is needed. After extracting `Error(let error)`, narrow with a typed pat
 such as `error is FileReadError fileError`, then inspect the nominal error's cases.
 
 See the [configuration loader](experiments/adhoc-error-unions/Config.rvn), the
-[HTTP JSON implementation](../runtime/raven/src/System/Web/Http/Json/JsonClientOperations.rvn)
-and [async composition regression](experiments/http-json-client/PropagationChecks.rvn).
+[HTTP JSON implementation](../runtime/raven/src/System/Web/Http/Json/JsonClientOperations.rvn),
+the [async composition regression](experiments/http-json-client/PropagationChecks.rvn),
+and [JSON mapping orchestration](experiments/json-object-mapping/Main.rvn).
 HTTP JSON is a strong existing API example: it combines transport and serialization
 errors. The focused tests use those alternatives directly rather than reconstructing
 an aggregation-only wrapper.

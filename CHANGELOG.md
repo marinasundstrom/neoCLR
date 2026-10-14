@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-14
 
+- Review remaining Raven samples/tests for error composition. Preserve StreamError, JsonError and MappingError directly in the JSON mapping round trip, removing lossy seek-error relabeling. Keep nominal domain errors, assertion failures and conversion-specific fixtures; record the legacy file-transformer modernization boundary. Add a native sample gate and passing checks for success and all three error alternatives.
+
 - Restore GitHub declaration-file links in the native API snapshot by forwarding the website source-repository configuration into the audit renderer. Include provider sources so PostgreSQL pages link correctly. Refresh rendering without changing native library artifacts, refresh the aggregate reference from the current bridge, and reject missing type/member/generic/provider links before snapshot replacement. Add preservation tests for failed extraction; exact member-line provenance remains separate work. Rebuild the local website; no publication.
 
 - Mark native GC text/byte leaves directly instead of queueing payloads with no references. Preserve dependent/parked-root completion with a collection-local leaf counter and a reverse-ordered atomic-owner regression. All 35 macOS GC/root checks, 132 three-mode HTTP checks and native static-storage tests pass, with full diagnostic reclamation. Matched AOT HTTP timings improve 4.7% plain / 4.8% JSON; the atomic-buffer collector case improves 12.2%, with most graph controls within 1.1%. Retain evidence and development website notes; collection policy, interpreter behavior and runtime ABI are unchanged. Windows remains unqualified for this slice.

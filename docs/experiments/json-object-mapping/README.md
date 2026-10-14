@@ -3,8 +3,38 @@
 This directory retains the original application-owned mapping experiment and now
 also verifies public JsonSerializer object overloads. Mapping.rvn remains a useful
 explicit-schema comparison; the HTTP variant has moved to the library mapper.
-Use `--public` with verify.py for the integrated API, or omit it for the original
-application-owned experiment.
+Use the native gate below for the current application-owned sample. The older
+`verify.py --public` gate belongs to the retained CLI checkpoint.
+
+## Error composition review — 2026-10-14
+
+The round-trip orchestration and its borrowed-stream `ReadReport` helper return
+`StreamError | JsonError | MappingError`. Seeking, parsing and schema mapping are
+independent error sources, so `?` preserves each cause without converter-only
+aggregation. A seek failure is no longer relabeled `MappingError.Schema("Seek failed")`.
+MappingError itself remains nominal: its Schema cases describe application rules,
+and its Json/Reflection cases retain causes inside that intentional boundary.
+
+```sh
+python3 docs/experiments/json-object-mapping/verify-native.py \
+  --library /path/to/matching/bundle/lib \
+  --compiler /path/to/matching/rvnc.dll \
+  --runtime /path/to/neoclr \
+  --output /path/to/new/validation-directory
+```
+
+The gate compiles and verifies native metadata, then executes the original successful
+round trips and negative mapping checks plus all three composed alternatives: closed
+stream, malformed JSON and missing mapped field. See
+[retained validation](error-composition-validation-20261014.json). It uses Raven native
+`cb4721e7d` and the matching 2026-10-13 library bundle; artifact hashes are recorded.
+No library API, Runtime Contract or native representation changes are needed.
+This is interpreter evidence, not new JIT/AOT or network qualification.
+
+The older CLI verifier and its measurements below describe the previous checkpoint;
+that importer is not qualified for the sample's new System.Union signatures.
+
+## Mapping contract and earlier checkpoint
 
 `EncodeReport` finds StationReport.Station through TypeInfo.GetProperties and reads
 it through PropertyInfo.GetValue. `DecodeReport` validates the DOM, creates a report

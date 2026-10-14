@@ -17022,3 +17022,21 @@ open, not an approved complete implementation or a permanent roadmap reprioritiz
   author-directed work does not replace the broader runtime performance milestone.
 
 - **Assistant validation outcome:** the first static table retained slots for all selected types and regressed short AOT HTTP timings by 15–16%. Compacting it to static owners reduced that regression to about 4%. All 132 wire checks still pass; all four profiles reclaim every allocation. JSON saves two text allocations/request, plain allocations are unchanged, and each fixture retains 144 extra live bytes. This remaining cost is recorded for subsequent profiling, not presented as a throughput improvement. [Retained measurements](../benchmarks/http-server/header-static-names.md).
+
+
+### Remaining sample error-composition review — 2026-10-14
+
+- **Author request:** review remaining samples and tests, migrate strong ad-hoc
+  union candidates, retain meaningful nominal types and commit the work.
+- **Assistant action:** reviewed error wrappers, converters and error relabeling
+  across Raven experiment/test sources. Changed JSON mapping orchestration to
+  preserve StreamError, JsonError and MappingError, while keeping MappingError's
+  application-schema boundary. Added executable checks for each alternative.
+- **Retained/deferred:** kept domain validation and assertion errors, conversion and
+  ABI regression fixtures. The legacy file-transformer remains a modernization
+  candidate requiring current stream/JSON/toolchain contracts, rather than a
+  signature-only edit that its historical CLI importer cannot execute.
+- **Outcome:** the baseline and changed native sample compile, verify and execute
+  successfully with matching pinned artifacts. No platform API/compiler change or
+  new JIT/AOT claim. See [review decisions](raven-error-api.md)
+  and [validation](experiments/json-object-mapping/error-composition-validation-20261014.json).
