@@ -2015,3 +2015,8 @@ members without new public implementation types. The aggregate bridge and native
 rendered reference are refreshed together. See [introspection](introspection.md)
 for usage and [runtime semantics](../docs/design/type-relationships.md) for supported
 relationships, .NET differences and compiler qualification limits.
+
+The experimental Rust `TypeIdentity::Union`/`Intersection` variants are covered in
+the [manual runtime hosting reference](runtime-hosting.md#structural-composition-identity-keys-development-2026-10-14).
+They are host-only, outside the guest RavenDoc selection; guest composition
+descriptors remain gated and the guest API snapshot is unchanged.

@@ -7,6 +7,10 @@ use crate::{
 /// An identity within the resolved modules of one build, not a cross-build cache key.
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum TypeIdentity {
+    /// Experimental union identity; constituents retain resolved definition keys.
+    Union(Vec<TypeIdentity>),
+    /// Experimental intersection identity; distinct from nominal inheritance.
+    Intersection(Vec<TypeIdentity>),
     Function {
         parameters: Vec<TypeIdentity>,
         returns: Box<TypeIdentity>,
@@ -48,6 +52,13 @@ pub(crate) fn describe(module: &Module, ty: &Type) -> Result<TypeDescriptor, Fau
 // Introspection follows already validated metadata, including transitive signatures.
 // It does not grant permission to name those types in executable instructions.
 pub(crate) fn describe_loaded(module: &Module, normalized: &Type) -> Result<TypeDescriptor, Fault> {
+    // Identity resolution is supported first. Guest descriptors must not silently
+    // materialize compositions through the ordinary nominal/provider fallback.
+    if crate::compositions::contains(normalized) {
+        return Err(Fault::new(
+            "compound reflection descriptors are not supported in this slice",
+        ));
+    }
     crate::vm::check_type(normalized, module)?;
     let identity = build(module, normalized)?;
     let name = match normalized {
@@ -178,11 +189,18 @@ pub(crate) fn resolve(module: &Module, ty: &Type) -> Result<TypeIdentity, Fault>
 fn build(module: &Module, ty: &Type) -> Result<TypeIdentity, Fault> {
     let nested = |ty: &Type| build(module, ty).map(Box::new);
     Ok(match ty {
-        Type::Union(_) | Type::Intersection(_) => {
-            return Err(Fault::new(
-                "compound reflection identity is not supported in this slice",
-            ));
-        }
+        Type::Union(parts) => TypeIdentity::Union(
+            parts
+                .iter()
+                .map(|t| build(module, t))
+                .collect::<Result<_, _>>()?,
+        ),
+        Type::Intersection(parts) => TypeIdentity::Intersection(
+            parts
+                .iter()
+                .map(|t| build(module, t))
+                .collect::<Result<_, _>>()?,
+        ),
         Type::Function(shape) => TypeIdentity::Function {
             parameters: shape
                 .parameters
@@ -303,4 +321,34 @@ pub(crate) fn declaring_definition<'a>(
             p.assembly == origin.assembly && p.module == origin.module && p.token == token
         })
     })
+}
+
+#[cfg(all(test, feature = "experimental-compositions"))]
+mod composition_tests {
+    use super::*;
+
+    #[test]
+    fn composition_keys_roundtrip_without_definition_tokens() {
+        let module = crate::assemble(
+            ".module Identities\n.revision first\n.interface Left\n.end\n.interface Right\n.end\n",
+        )
+        .unwrap();
+        for ty in [
+            Type::Union(vec![Type::from_name("Left"), Type::from_name("Right")]),
+            Type::Intersection(vec![Type::from_name("Left"), Type::from_name("Right")]),
+        ] {
+            let identity = resolve(&module, &ty).unwrap();
+            assert_eq!(
+                crate::reflection::from_identity(&module, &identity).unwrap(),
+                ty
+            );
+            assert!(crate::metadata_tokens::definition(&module, &identity).is_none());
+            assert_eq!(
+                crate::metadata_tokens::type_token(&module, &identity).unwrap(),
+                0
+            );
+            let other = crate::assemble(".module Identities\n.revision second\n.interface Left\n.end\n.interface Right\n.end\n").unwrap();
+            assert!(crate::reflection::from_identity(&other, &identity).is_err());
+        }
+    }
 }

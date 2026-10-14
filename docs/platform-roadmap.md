@@ -4666,3 +4666,7 @@ for scope and validation; this does not change mainline milestone priorities.
 The experiment's shared reflection relationship core now preserves composition
 assignment guarantees and nominal-only strict ancestry; guest descriptors remain
 open. [Bounded relationship slice](experiments/structural-compositions/README.md#composition-relationship-core--2026-10-14).
+
+Resolved host composition identity keys now preserve constituents and generic
+arguments without nominal definition tokens. Guest descriptors remain pending.
+[Identity checkpoint](experiments/structural-compositions/README.md#resolved-composition-identities--2026-10-14).

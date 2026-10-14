@@ -1201,3 +1201,29 @@ Object widening, strict ancestry, invariant wrapper arguments, malformed nested
 signatures and the feature gate. Existing nominal, boxing, array and Function
 controls pass in both configurations. The already-qualified await and guest API
 snapshots are unaffected by this internal-only change.
+
+## Resolved composition identities — 2026-10-14
+
+The host runtime resolver now returns structural Union/Intersection identity keys
+without allocating nominal declarations. Constituent keys retain definition rows,
+module revisions and generic arguments, including within closed reference wrappers.
+Same-kind normalization is preserved; mixed nesting remains explicit. Internal
+identity-to-signature recovery validates constituents against the current load set.
+A composition does not borrow a constituent's metadata token.
+
+Compared with CLI nominal definitions, these keys describe native signature types
+directly, as the existing Function identity does. This preserves introspection
+identity without invented declarations; the cost is a native-only experimental
+contract and new Rust enum variants for exhaustive matches. No CLI bridge encoding
+or Raven Runtime Contract change. See the [host API reference](../../../api-docs/runtime-hosting.md#structural-composition-identity-keys-development-2026-10-14).
+
+Guest descriptors remain deliberately gated, including composition-bearing generic
+wrappers, until their shape can be exposed correctly. Identity resolution is not
+full guest reflection or JIT/AOT support. Website capability status remains unchanged.
+
+Focused identity validation passes seven integration tests with the feature enabled
+and seven with it disabled, plus an internal identity/signature round-trip and
+cross-revision rejection test. Five native descriptor-lowering tests and the API
+reference fingerprint check also pass. The existing Function, primitive, generic
+and definition-row controls are included in the identity suite.
+All 36 existing composition execution regressions also pass.

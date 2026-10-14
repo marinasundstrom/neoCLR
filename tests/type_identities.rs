@@ -174,3 +174,73 @@ fn legacy_rows_are_derived_in_their_original_modules() {
         expected
     );
 }
+
+#[cfg(feature = "experimental-compositions")]
+#[test]
+fn composition_keys_preserve_kind_constituents_and_generic_arguments() {
+    use neoclr::{LoadedProgram, assembler::parse_type};
+    let module = assemble(".module Compositions\n.revision first\n.interface Left\n.end\n.interface Right\n.end\n.type class Box<T>\n.end\n").unwrap();
+    let program = LoadedProgram::new(&module).unwrap();
+    let identity = |text| {
+        program
+            .resolve_type_identity(&parse_type(text).unwrap())
+            .unwrap()
+    };
+    let left = identity("Left");
+    let right = identity("Right");
+    let union = identity("union<Left,Right>");
+    let intersection = identity("intersection<Left,Right>");
+    assert_eq!(
+        union,
+        TypeIdentity::Union(vec![left.clone(), right.clone()])
+    );
+    assert_eq!(
+        intersection,
+        TypeIdentity::Intersection(vec![left.clone(), right.clone()])
+    );
+    assert_ne!(union, intersection);
+    assert_eq!(union, identity("union<Right,Left>"));
+    assert_eq!(union, identity("union<Left,union<Right,Left>>"));
+    assert_eq!(left, identity("union<Left,Left>"));
+    let TypeIdentity::Definition { arguments, .. } = identity("Box<union<Left,Right>>") else {
+        panic!("expected wrapper")
+    };
+    assert_eq!(arguments, vec![union.clone()]);
+    let mixed = identity("union<Left,intersection<Left,Right>>");
+    let TypeIdentity::Union(parts) = mixed else {
+        panic!("expected mixed union")
+    };
+    assert!(parts.contains(&left));
+    assert!(parts.contains(&intersection));
+    let other = assemble(".module Compositions\n.revision second\n.interface Left\n.end\n.interface Right\n.end\n.type class Box<T>\n.end\n").unwrap();
+    assert_ne!(
+        union,
+        resolve_type_identity(&other, &parse_type("union<Left,Right>").unwrap()).unwrap()
+    );
+    // Host keys do not accidentally open incomplete guest descriptor providers.
+    assert!(
+        program
+            .describe_type(&parse_type("union<Left,Right>").unwrap())
+            .is_err()
+    );
+    assert!(
+        program
+            .describe_type(&parse_type("Box<union<Left,Right>>").unwrap())
+            .is_err()
+    );
+    assert!(
+        program
+            .resolve_type_identity(&Type::Union(vec![Type::Int32, Type::from_name("Left")]))
+            .is_err()
+    );
+}
+
+#[cfg(not(feature = "experimental-compositions"))]
+#[test]
+fn composition_identity_resolution_stays_opt_in() {
+    let module =
+        assemble(".module Compositions\n.interface Left\n.end\n.interface Right\n.end\n").unwrap();
+    let parts = vec![Type::from_name("Left"), Type::from_name("Right")];
+    assert!(resolve_type_identity(&module, &Type::Union(parts.clone())).is_err());
+    assert!(resolve_type_identity(&module, &Type::Intersection(parts)).is_err());
+}

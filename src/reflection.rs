@@ -1205,6 +1205,19 @@ pub(crate) fn bound_function(
 pub(crate) fn from_identity(module: &Module, identity: &TypeIdentity) -> Result<Type, Fault> {
     let nested = |id| from_identity(module, id).map(Box::new);
     Ok(match identity {
+        TypeIdentity::Union(parts) | TypeIdentity::Intersection(parts) => {
+            let parts = parts
+                .iter()
+                .map(|t| from_identity(module, t))
+                .collect::<Result<Vec<_>, _>>()?;
+            let ty = if matches!(identity, TypeIdentity::Union(_)) {
+                Type::Union(parts)
+            } else {
+                Type::Intersection(parts)
+            };
+            crate::compositions::validate(module, &ty)?;
+            ty
+        }
         TypeIdentity::Function {
             parameters,
             returns,

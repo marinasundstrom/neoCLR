@@ -81,3 +81,35 @@ The matching revision and artifact-loading cases execute in
 `tests/object_root_identity.rs`. See the repository's `docs/loaded-program.md` for
 snapshot/execution lifetime and resource limits. This API does not authorize native
 P/Invoke; existing safe/unsafe execution boundaries remain unchanged.
+
+## Structural composition identity keys (development, 2026-10-14)
+
+On `codex/structural-union-intersection`, the Rust `TypeIdentity` enum adds:
+
+```rust
+Union(Vec<TypeIdentity>),
+Intersection(Vec<TypeIdentity>),
+```
+
+`LoadedProgram::resolve_type_identity(&Type) -> Result<TypeIdentity, Fault>`
+(and the existing free resolution helpers) resolve admitted composition signatures
+with the `experimental-compositions` feature. Each constituent preserves its
+resolved definition key, including module/revision, row and generic arguments.
+Union and intersection keys are distinct; same-kind flattening, sorting and
+deduplication follow existing signature normalization. Duplicate-only compositions
+resolve to the surviving type. Mixed nesting is preserved. This is structural
+signature identity, not equality inferred from assignment or nominal ancestry.
+
+Compositions nested inside admitted closed reference generic arguments retain their
+keys. Invalid, inaccessible, unresolved, open or disabled compositions return Fault;
+existing sealed-bound rules apply before intersection normalization. Keys belong to
+one resolved build and are not persistent cross-build identifiers. The new enum
+variants require downstream exhaustive Rust matches to be updated. No serialized
+metadata format or guest public API changes.
+
+A composition has no nominal definition row or declaring type. Internal definition
+token lookup returns no definition (token zero), never a constituent's token.
+`describe_type` and guest composition TypeInfo construction remain unsupported,
+including composition-bearing wrappers; identity resolution does not bypass those
+descriptor gates. Full guest introspection remains intended follow-up work. These
+host Rust APIs are excluded from the guest RavenDoc selection and documented here.
