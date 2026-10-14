@@ -12,15 +12,11 @@ internal class ObjectMapper {
     init() { }
 
     private static func IsNodeType(type: TypeInfo) -> bool {
-        return type.Equals(typeof(JsonValue)) || type.Equals(typeof(JsonObject)) ||
-               type.Equals(typeof(JsonArray)) || type.Equals(typeof(JsonString)) ||
-               type.Equals(typeof(JsonNumber)) || type.Equals(typeof(JsonBoolean)) ||
-               type.Equals(typeof(JsonNull))
+        return type.AssignableTo(typeof(JsonValue))
     }
 
     private static func MatchesNode(value: JsonValue, type: TypeInfo) -> bool {
-        let instance: Object = value
-        return type.Equals(typeof(JsonValue)) || instance.GetType().Equals(type)
+        return type.IsInstanceOfType(value)
     }
 
     private static func CheckType(type: TypeInfo) -> Result<unit, JsonError> {

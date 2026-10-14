@@ -1,0 +1,57 @@
+{
+  "passed": true,
+  "platform": "macOS ARM64",
+  "cases": [
+    {
+      "name": "json-nodes",
+      "mode": "aot",
+      "exitCode": 0,
+      "stdout": "{\"Name\":\"Caf\u00e9\",\"Count\":3,\"Active\":true}\n",
+      "stderr": "",
+      "passed": true
+    },
+    {
+      "name": "json-nodes",
+      "mode": "interpreter",
+      "exitCode": 0,
+      "stdout": "{\"Name\":\"Caf\u00e9\",\"Count\":3,\"Active\":true}\n",
+      "stderr": "",
+      "passed": true
+    },
+    {
+      "name": "json-nodes",
+      "mode": "jit",
+      "exitCode": 0,
+      "stdout": "{\"Name\":\"Caf\u00e9\",\"Count\":3,\"Active\":true}\n",
+      "stderr": "",
+      "passed": true
+    },
+    {
+      "name": "typed-construction",
+      "mode": "interpreter",
+      "exitCode": 0,
+      "stdout": "Typed construction relationship checks passed\n",
+      "stderr": "",
+      "passed": true
+    },
+    {
+      "name": "type-acquisition",
+      "mode": "interpreter",
+      "exitCode": 0,
+      "stdout": "Concrete class\nSystem.String\nSame type\nArray type\nSystem.Int32\nWidget\n",
+      "stderr": "",
+      "passed": true
+    }
+  ],
+  "sha256": {
+    "runtime/raven/src/System/Data/Json/ObjectMapper.rvn": "b7b9490052597a7c15057e226457be72351c63083d4fdbddaaeb4f16118f7b70",
+    "runtime/raven/src/System/Runtime/Reflection/ReflectionExtensions.rvn": "98f6a728e426389e2fc52b80d31585606d17f75a45dbf8ee8e74767da81ba8b0",
+    "docs/experiments/native-json/Main.rvn": "590843a0c668cb01c21ed6a9adf29fdf266f63081b9dbf1707a526d50a893bc9",
+    "docs/experiments/reflection-members/TypeRelationships.rvn": "f84d221d95bad9e7b7a807a7167b921a55fe3b55f47cff170e3783a48f19f379",
+    "docs/experiments/raven-target/samples/library-type-acquisition.rvn": "c3b8ae132508ebb12bcf6e1d540827d623e58944231abb9e6e2e0444e5a5dd15",
+    "target/type-relations-consumers-dev/bundle/manifest.json": "91a64c91419e77bcb820befe834a1c8e7ec86f999a8ce3fd1dea1d5fa0402c40",
+    "target/release/neoclr": "919237581aa34c42e50fd879138acce58dcc589221749e878bb2c3858c53a59b",
+    "target/debug/neoclr": "50d4fe3fa6c805585514a80c9f4f88d3e7799862943986bd9ab380929efdaeb3",
+    "target/debug/neoclr-codegen": "e865158afed653bd22eb81da252fffc87d3a9973329706bb162abee142e6c64b"
+  }
+}

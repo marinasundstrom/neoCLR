@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-14
 
+- Adopt the TypeInfo predicates in JSON node compatibility and generic reflection result guards; update acquisition/reflection samples and add a focused native-source constructor fixture. Keep exact scalar mapping checks unchanged. JSON passes interpreter/JIT/AOT; typed construction and acquisition pass interpreted execution. Retain qualification evidence and existing legacy-harness/native-display limits.
+
 - Add TypeInfo.AssignableTo/AssignableFrom with required non-null type arguments, plus strict IsSubclassOf and nullable-object IsInstanceOfType. All descriptor implementations share runtime relationship rules; interpreter, JIT and AOT pass six managed cases. Add runtime/lowering checks, document variance/compiler limits, and refresh both API references with source links.
 
 - Close the next-release union hover issue: carry separate Raven main display/selection fixes to the native compiler line and retain passing compiler, hover and real VS Code JSON-sample checks. Nominal alternatives show their own types; combined unions stay compact before and after edits. Preview 15 assets and the installed release are unchanged.

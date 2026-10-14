@@ -2,12 +2,21 @@ import System.*
 import System.Introspection.*
 import System.Runtime.*
 
-class Widget { }
+interface WidgetInfo {
+    val Name: string { get }
+}
+
+class Widget : WidgetInfo {
+    val Name: string => "widget"
+}
 
 func Main() {
     let widget: Object = Widget()
-    if widget.GetType().Equals(typeof(Widget)) {
+    if typeof(Widget).IsInstanceOfType(widget) {
         Console.WriteLine("Concrete class")
+    }
+    if !typeof(Widget).AssignableTo(typeof(Object)) {
+        System.Fail("Widget must be assignable to Object")
     }
     let text: Object = "Hello"
     let description = text.GetType()
@@ -22,7 +31,7 @@ func Main() {
     }
     let number: Object = 42
     Console.WriteLine(number.GetType().DisplayName)
-    let comparable: ComparableTo<int> = 42
-    let boxed: Object = comparable
+    let view: WidgetInfo = Widget()
+    let boxed: Object = view
     Console.WriteLine(boxed.GetType().DisplayName)
 }

@@ -44,7 +44,7 @@ public extension TypeReflectionExtensions for TypeInfo {
 
     func CreateInstance<T>(params arguments: Object?[]) -> Result<T, ReflectionError> {
         if self is RuntimeNominalTypeInfo implementation {
-            if !RuntimeServices.ReflectionAssignable(implementation.ExecutionHandle, RuntimeServices.TypeHandle<T>()) {
+            if !self.AssignableTo(typeof(T)) {
                 return Error(ReflectionError.InvalidResultType)
             }
             let instance = self.CreateInstance(arguments)?

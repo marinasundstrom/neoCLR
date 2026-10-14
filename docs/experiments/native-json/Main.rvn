@@ -120,6 +120,13 @@ func CheckCollections() -> Result<bool, JsonError> {
 }
 
 func CheckNodes() -> Result<bool, JsonError> {
+    // The mapper accepts node subtypes while rejecting a different concrete kind.
+    if !typeof(JsonValue).AssignableFrom(typeof(JsonObject)) ||
+       !typeof(JsonObject).IsSubclassOf(typeof(JsonValue)) ||
+       typeof(JsonObject).IsInstanceOfType(JsonArray()) ||
+       typeof(JsonValue).IsInstanceOfType(null) {
+        return Ok(false)
+    }
     let input = "{\"Payload\":{\"message\":\"Café\"},\"Details\":{\"number\":1.25e2},\"Items\":[true,null,{\"value\":1}]}"
     let value = JsonSerializer.Deserialize<NodeEnvelope>(input)?
     if value.Payload is not JsonObject || value.Items.Length != 3 ||
