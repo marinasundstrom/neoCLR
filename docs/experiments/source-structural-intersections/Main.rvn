@@ -1,0 +1,43 @@
+import System.*
+import System.Introspection.*
+
+open class Animal { }
+interface Quacks {
+    func Quack() -> int
+}
+class Duck : Animal, Quacks {
+    func Quack() -> int => 42
+}
+class Box<T> { }
+
+func Echo(value: Animal & Quacks) -> Animal & Quacks {
+    return value
+}
+
+func Main() -> int {
+    let duck = Duck()
+    let traits: Animal & Quacks = Echo(duck)
+    if traits.Quack() != 42 {
+        System.Fail("intersection dispatch")
+    }
+    let info = typeof(Animal & Quacks)
+    if info is IntersectionTypeInfo intersectionInfo {
+        var count = 0
+        for item in intersectionInfo.Types {
+            count += 1
+        }
+        if count != 2 {
+            System.Fail("intersection descriptor")
+        }
+    } else {
+        System.Fail("missing intersection descriptor")
+    }
+    if !typeof(Box<Animal & Quacks>).GetGenericArgument(0).Equals(info) {
+        System.Fail("intersection generic argument")
+    }
+    if !typeof(Animal & Quacks).IsInstanceOfType(duck) {
+        System.Fail("membership")
+    }
+    Console.WriteLine("Source structural intersection passed")
+    return 0
+}

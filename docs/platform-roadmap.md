@@ -4687,3 +4687,5 @@ preceding checkpoints. Member/hierarchy queries, source structural typeof emissi
 and backend support remain open. [Descriptor probe](experiments/composition-type-info/README.md).
 
 2026-10-14 author-directed experiment: companion Raven now emits opt-in source union signatures to standalone NEOX, with native Task result delivery and reflection validated. See [source union evidence](experiments/source-structural-unions/README.md). This does not enable published/default builds or JIT/AOT.
+
+2026-10-14 author-requested Raven intersection slice complete: direct source signatures, trait dispatch, reflection and cross-library consumers pass; [evidence](experiments/source-structural-intersections/README.md). Production/open-generic/backend support remains future work.

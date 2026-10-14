@@ -17572,3 +17572,5 @@ completed await alternatives and structural introspection. The temporary Wait<T>
 bridge is disabled for this experiment; generic method specialization remains open.
 Intersection source support is the next requested slice. See
 [source evidence](experiments/source-structural-unions/README.md).
+
+Outcome update: the requested Raven intersection slice now passes source trait dispatch, structural reflection and cross-library execution. The compiler retains the author’s distinction between Raven sealed hierarchies and CLR-final classes. See [intersection evidence](experiments/source-structural-intersections/README.md).

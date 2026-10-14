@@ -9787,3 +9787,24 @@ JIT/AOT composition execution remains gated. See the
 [probe](experiments/composition-type-info/README.md) for reproducible validation.
 
 2026-10-14 author-directed experiment: companion Raven now emits opt-in source union signatures to standalone NEOX, with native Task result delivery and reflection validated. See [source union evidence](experiments/source-structural-unions/README.md). This does not enable published/default builds or JIT/AOT.
+
+## Source union and intersection signatures — 2026-10-14
+
+The companion Raven branch now uses `RavenNeoClrStructuralCompositions=true` to
+emit ad hoc unions and intersection storage directly into native NEOX signatures.
+Declared unions stay nominal. Ordinary .NET and default native behavior stay intact;
+CLI projection is unavailable for this opt-in output. Unlike CLR signatures, native
+composition signatures retain runtime structural identity without carrier types.
+The cost is an experimental native-only interoperability contract.
+
+Source union Task delivery passes all three alternatives with native await state
+machines. Source intersections pass parameter/result/local trait dispatch and
+introspection, including closed wrapper generic identity. Both kinds round-trip
+through public source libraries and separately compiled consumers (result 42).
+Raven semantic validation passes 86 focused tests; closed/value intersection bounds
+reject while sealed hierarchies remain valid. Generic method specialization,
+open native generic compositions, mixed source nesting and JIT/AOT remain gated.
+Owners are `codex/neoclr-union-intersection` and `codex/structural-union-intersection`.
+Evidence: `docs/experiments/source-structural-unions` and
+`docs/experiments/source-structural-intersections`, including runners and hashes.
+This supersedes earlier source-authoring/type-token gaps, not other runtime limits.

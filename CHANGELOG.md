@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-14
 
+- Validate companion Raven source intersection parameters, returns, locals, trait dispatch, structural reflection and generic-wrapper identity. Retain executable source/evidence and document explicit native configuration, cross-library union/intersection consumers and remaining POC limitations.
+
 - Admit nongeneric static methods on nominal owners with composition parameters, retaining transitive body validation and generic/wrapper restrictions. Validate source-authored Task<Response | HttpError | JsonError> signatures, native awaits for all alternatives and structural reflection with the companion compiler.
 
 - Add explicit native reference composition authoring to the experimental metadata builder, including closed generic bounds, checked reference operations and finality revalidation. Reject CLI projection; document the host API and validate native signature roundtrip and invalid operands.
