@@ -26,6 +26,8 @@ A further [known-header byte matching slice](https://github.com/marinasundstrom/
 
 The subsequent [static catalog](https://github.com/marinasundstrom/neoclr/blob/main/benchmarks/http-server/header-static-names.md) shares 13 names across requests, with all 132 wire checks passing across execution modes and complete reclamation in separate profiles. JSON saves two more text allocations per request; plain-text allocations are unchanged. The matched stress-GC AOT runs are about 4% slower, so this is a functionality/allocation result, not a throughput improvement. These development results do not replace the released matrix below.
 
+A [collector follow-up](https://github.com/marinasundstrom/neoclr/blob/main/benchmarks/gc-index/README.md#direct-marking-of-atomic-payloads--2026-10-14) avoids tracing work for text/byte buffers with no references. Matched AOT runs improve 4.7% plain / 4.8% JSON against the static catalog, approximately recovering its measured cost. All 132 HTTP checks pass, with full reclamation in separate profiles. These remain short development measurements.
+
 ## Workload matrix
 
 Median successful requests per second across five rounds:

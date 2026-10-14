@@ -6,6 +6,26 @@ static void *allocate(neoclr_aot_context *c, uint64_t bytes, uint32_t kind) {
     void *p = NULL;
     return neoclr_gc_allocate_v1(&c->text, bytes, kind, &p) ? NULL : p;
 }
+/* A leaf discovered in the last dependent edge must activate earlier edges
+ * on another pass even though it never entered the tracing worklist. */
+static int atomic_dependent_chain(void) {
+    uint64_t buffer[128] = {0};
+    neoclr_aot_context c = {.text = {(unsigned char *)buffer, sizeof(buffer), 0}};
+    uint64_t *a = allocate(&c, 8, NEOCLR_GC_BYTES);
+    uint64_t *b = allocate(&c, 8, NEOCLR_GC_TEXT);
+    uint64_t *d = allocate(&c, 8, NEOCLR_GC_BYTES);
+    CHECK(a && b && d); *a = 1; *b = 2; *d = 3;
+    neoclr_gc_conditional_root edges[] = {{b, d, 0}, {a, b, 0}};
+    void *root = a;
+    neoclr_probe_storage slot = {&root, 8, 0};
+    neoclr_probe_frame frame = {.context = &c, .storage = &slot, .storage_count = 1};
+    CHECK(!neoclr_gc_collect_conditional_v1(&c, &frame, edges, 2));
+    CHECK(edges[0].retained && edges[1].retained && *a == 1 && *b == 2 && *d == 3);
+    root = NULL;
+    CHECK(!neoclr_gc_collect_conditional_v1(&c, &frame, edges, 2));
+    CHECK(!edges[0].retained && !edges[1].retained && !c.text.used);
+    return 0;
+}
 static void count_cleanup(void *state) { ++*(int *)state; }
 typedef struct { neoclr_gc_resource resource; int *cleaned; } owned_resource;
 static void free_cleanup(void *state) {
@@ -529,5 +549,7 @@ int main(void) {
     if (wide_status) return wide_status;
     int mixed_status = mixed_free_runs();
     if (mixed_status) return mixed_status;
+    int atomic_status = atomic_dependent_chain();
+    if (atomic_status) return atomic_status;
     return resource_owners();
 }

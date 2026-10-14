@@ -340,7 +340,7 @@ int32_t neoclr_gc_allocate_rooted_v1(neoclr_aot_context *context, const neoclr_p
  * No allocation, retained addresses or heap ABI change.
  * A bucket points to the block containing its first byte, including free spans.
  * Interior/tagged candidates still require the exact allocated payload bounds. */
-typedef struct { block **start; unsigned capacity, shift; uint64_t blocks; } block_index;
+typedef struct { block **start; unsigned capacity, shift; uint64_t blocks, atomic_marks; } block_index;
 static int build_index(neoclr_aot_text_arena *a, block_index *index) {
     if (!valid(a)) return 0;
     uint64_t blocks = 0;
@@ -378,21 +378,29 @@ static int indexed_live_base(neoclr_aot_text_arena *a, const block_index *index,
     block *b = indexed_block(a, index, (uintptr_t)value);
     return b && (b->state & ALLOCATED) && value == (void *)(b + 1);
 }
-static void mark(neoclr_aot_text_arena *a, const block_index *index, uint64_t word, block **pending) {
+static void mark(neoclr_aot_text_arena *a, block_index *index, uint64_t word, block **pending) {
     block *b = indexed_block(a, index, word);
     if (b && b->state && word >= (uintptr_t)(b + 1) &&
         word - (uintptr_t)(b + 1) < b->bytes && !(b->state & MARKED)) {
-        b->state = (uint64_t)(uintptr_t)*pending | ALLOCATED | MARKED;
-        *pending = b;
+        /* Atomic payloads have no children: retain them without worklist traffic.
+         * Count newly marked leaves so dependent/parked owners discovered late
+         * still drive the fixed point even when no tracing work was enqueued. */
+        if (b->kind == NEOCLR_GC_TEXT || b->kind == NEOCLR_GC_BYTES) {
+            b->state = ALLOCATED | MARKED | SCANNED;
+            index->atomic_marks++;
+        } else {
+            b->state = (uint64_t)(uintptr_t)*pending | ALLOCATED | MARKED;
+            *pending = b;
+        }
     }
 }
-static void mark_slots(neoclr_aot_text_arena *a, const block_index *index, const neoclr_probe_storage *slots, uint32_t count, block **pending) {
+static void mark_slots(neoclr_aot_text_arena *a, block_index *index, const neoclr_probe_storage *slots, uint32_t count, block **pending) {
     for (uint32_t i = 0; i < count; i++) {
         if (slots[i].read_bytes != 8) continue; /* 32-bit discriminators are not pointers. */
         uint64_t word; memcpy(&word, slots[i].address, 8); mark(a, index, word, pending);
     }
 }
-static void mark_frames(neoclr_aot_context *context, const block_index *index,
+static void mark_frames(neoclr_aot_context *context, block_index *index,
     const neoclr_probe_frame *head, block **pending) {
     for (const neoclr_probe_frame *f = head; f; f = f->previous) {
         if (f->context != context) continue;
@@ -449,9 +457,10 @@ static int32_t collect_indexed(neoclr_aot_context *context,
     mark_frames(context, &index, head, &pending);
     for (const neoclr_parked_roots *p = neoclr_roots_parked_v1(); p; p = p->next)
         if (!p->owner_context) mark_frames(context, &index, p->head, &pending);
-    /* Each newly marked allocation enters the intrusive worklist exactly once.
+    /* Each newly marked reference-bearing allocation enters the worklist once.
      * The sparse index bounds address searches to a bucket plus its crossing block. */
     for (;;) {
+        uint64_t atomic_before = index.atomic_marks;
         while (pending) {
             block *b = pending;
             pending = (block *)(uintptr_t)(b->state & ~UINT64_C(7));
@@ -514,7 +523,7 @@ static int32_t collect_indexed(neoclr_aot_context *context,
                 p->traced = 1;
                 mark_frames(context, &index, p->head, &pending);
             }
-        if (!pending) break;
+        if (!pending && atomic_before == index.atomic_marks) break;
     }
     for (neoclr_gc_resource **link = &resource_head; *link;) {
         neoclr_gc_resource *r = *link;

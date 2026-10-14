@@ -1,5 +1,12 @@
 # neoCLR platform roadmap
 
+**Atomic GC marking (2026-10-14):** [directly retaining leaf payloads](../benchmarks/gc-index/README.md#direct-marking-of-atomic-payloads--2026-10-14)
+removes empty tracing work while preserving dependent-owner completion. All 35 local
+GC/root and 132 HTTP checks pass. Matched stress-GC AOT HTTP runs improve 4.7%/4.8%
+plain/JSON, approximately recovering the static-catalog cost; isolated atomic-buffer
+collection improves 12.2%. This is local sequential evidence, not Windows or sustained
+load qualification. Continue profiling the integrated runtime against the milestone.
+
 **Static HTTP header catalog (author direction, 2026-10-14):** the internal static
 catalog now lazily shares 13 known names. Interpreter and native contexts own the
 static roots, including separate storage for closed generic types; Raven native

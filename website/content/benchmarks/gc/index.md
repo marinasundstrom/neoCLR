@@ -9,6 +9,20 @@ These are development measurements, not release guarantees. See
 [garbage collection](/features/gc/) for the runtime model. Each historical series
 retains its own conditions and raw evidence.
 
+## Direct leaf marking — 2026-10-14
+
+Text and byte buffers contain no references. The native collector now marks them
+without adding empty tracing work to its queue. Dependent-owner iteration still
+runs to completion, including chains whose owners are themselves leaf buffers.
+
+On macOS ARM64, five alternating collection-only pairs show **12.2% higher
+throughput** for 64 large atomic buffers. Most reference-graph controls stay within
+about 1.1%; one chain case improves 5.6%. All 35 shared GC/root checks pass.
+Matched short AOT HTTP runs improve **4.7% plain / 4.8% JSON**, with unchanged
+allocation counts and full reclamation in separate profiles. These stress-GC
+results do not establish sustained-load or Windows performance.
+[Method, tradeoffs and raw evidence](https://github.com/marinasundstrom/neoclr/blob/main/benchmarks/gc-index/README.md#direct-marking-of-atomic-payloads--2026-10-14).
+
 ## Host-handle admission — 2026-10-13
 
 Creating a native host root formerly validated the heap, then searched it again

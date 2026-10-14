@@ -194,3 +194,60 @@ The reversal and variability confirm that hosted macOS is unsuitable for resolvi
 this small effect precisely. Retain both attempts; use the stable local seven-pair
 macOS run and hosted Windows pairs for the bounded improvement claim. Neither
 platform run changes pacing defaults. Website content is updated locally only.
+
+## Direct marking of atomic payloads — 2026-10-14
+
+Following the static HTTP catalog, matched profiles identified collector overhead
+as the next target. The collector previously enqueued text and byte payloads, then
+popped them only to discover that they contained no references. It now marks those
+leaves directly. Reference-bearing objects, arrays and intern records still enter
+the worklist. An invocation-local counter of newly marked leaves keeps dependent
+and parked-root iteration running when a newly reachable owner creates no worklist
+entry. A reverse-ordered dependent chain of atomic owners tests this case explicitly.
+
+This is an internal optimization of the existing nonmoving collector, compared
+with the CLR implementation layers in [the GC design](../../docs/runtime-gc.md).
+It changes no managed contract, collection policy, object layout or runtime ABI.
+It adds a kind branch and a counter update for each newly marked leaf; the counter
+is local to a collection. Full heap validation, interior-pointer checks, corruption
+recovery, suspension roots and eventual reclamation remain required.
+
+Against `70155c01e`, seven alternating macOS ARM64 AOT HTTP rounds validate 1,024
+responses. Identical guest objects and host settings isolate the collector change:
+plain throughput is **156.17 → 163.50 requests/s (+4.7%)**, JSON
+**64.92 → 68.02 (+4.8%)**. Ranges do not overlap in this run. These short sequential
+stress-GC/state-machine measurements recover roughly the earlier static-catalog
+cost; they do not establish saturation throughput, runtime-await performance or
+Windows performance. Allocation counts remain 378 plain / 810 JSON per request.
+Separate diagnostic processes reclaim every allocation (12,120 plain; 25,948 JSON).
+Diagnostic timers ran with other validation work and are not timing comparisons.
+
+The collection-only matrix uses five alternating pairs at collection scale 3.
+Atomic-buffer throughput improves **12.2%**. Most reference-graph controls are
+within about 1.1%; the 4,096-node chain improves 5.6%, which is retained without
+attributing that control's change to eliminated leaf work. Graph survival and final
+reclamation pass in every worker. All 35 shared GC/root checks and all 132 HTTP
+wire checks pass; the wire suite uses runtime-await in interpreter/JIT/AOT. The
+native static-storage GC/non-GC tests also pass. Windows execution is not qualified
+by this local slice.
+
+Evidence: [collector matrix](leaf-mark-matrix-macos-20261014.json),
+[HTTP timings and exact relink commands](leaf-mark-http-macos-20261014.json),
+[shared GC contracts](leaf-mark-contracts-macos-20261014.json),
+[HTTP contracts](leaf-mark-http-contracts-macos-20261014.json),
+[plain allocation profile](leaf-mark-plain-profile-macos-20261014.json),
+[JSON allocation profile](leaf-mark-json-profile-macos-20261014.json).
+The HTTP candidate was built before a comment/read-only parameter-qualifier cleanup;
+source hashes identify the tested collector copies. No generated guest code changed.
+
+Reproduce the isolated graph test with:
+
+```sh
+python3 benchmarks/gc-index/benchmark.py --baseline 70155c01e \
+  --rounds 5 --collection-scale 3 --output NEW_DIRECTORY
+```
+
+HTTP evidence retains both link commands: relink the same static-catalog guest
+objects against the baseline and candidate collector copies, then use
+`benchmarks/http-server/compare-native-library.py`. Keep profiler instrumentation
+out of timing binaries.

@@ -86,6 +86,11 @@ Evidence: [wire checks](header-static-validation-20261014.json),
 [baseline JSON](header-static-baseline-json-20261014.json), and
 [candidate JSON](header-static-candidate-json-20261014.json).
 
+A [subsequent collector optimization](../gc-index/README.md#direct-marking-of-atomic-payloads--2026-10-14)
+removes empty tracing work for text/byte leaves. Matched HTTP runs improve about
+4.7–4.8% against this static-catalog implementation, approximately recovering its
+measured cost. The original results above remain the baseline evidence.
+
 ## Reproduction
 
 Use the controllers retained alongside this report:
