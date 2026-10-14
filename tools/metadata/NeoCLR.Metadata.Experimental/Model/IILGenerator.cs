@@ -272,9 +272,9 @@ public interface IILGenerator
     /// <exception cref="ArgumentException">Scope, bound, ownership or target category is unsupported.</exception>
     /// <remarks>Self substitutes the method parameter. Native structural bounds also admit instance calls with a managed reference to the parameter as receiver. Type-owner parameters and external targets remain unsupported by this overload.</remarks>
     void CallConstrained(SignatureType implementingType, MethodBuilder target);
-    /// <summary>Calls a completed external static interface contract through a bounded method parameter.</summary>
+    /// <summary>Calls a completed external interface contract through a bounded method parameter.</summary>
     /// <param name="implementingType">In-scope method parameter whose bounds admit the declaring interface.</param>
-    /// <param name="target">Output-owned nongeneric static abstract interface reference.</param>
+    /// <param name="target">Output-owned nongeneric abstract interface reference. Instance calls require structural bounds and a managed receiver address.</param>
     /// <exception cref="ArgumentNullException">An operand is null.</exception>
     /// <exception cref="ArgumentException">Foreign target, unsupported method or missing interface bound.</exception>
     void CallConstrained(SignatureType implementingType, ImportedMethodReference target);
@@ -288,7 +288,7 @@ public interface IILGenerator
     /// <summary>Emits a constructed constrained call: Call for static, Callvirt for instance contracts.</summary>
     void Emit(OpCode opCode, SignatureType implementingType, ImportedConstructedMethodReference target);
 
-    /// <summary>Emits Call through a bounded method parameter to an external static interface contract.</summary>
+    /// <summary>Emits Call through a bounded method parameter to an external interface contract.</summary>
     void Emit(OpCode opCode, SignatureType implementingType, ImportedMethodReference target);
 
     /// <summary>Emits an owned constrained call through an in-scope bounded method parameter.</summary>

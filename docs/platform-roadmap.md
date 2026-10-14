@@ -4716,3 +4716,8 @@ owner-parameter forwarding and generic-body traits remain separate gaps.
 owned nongeneric interface calls; the Raven intersection body returns 42. Union
 alternatives must all guarantee the requested trait. [Evidence](experiments/composition-constraints/README.md).
 Broader generic/target/backend support remains outside this experimental slice.
+
+2026-10-14 imported nongeneric trait targets now pass structural-guarantee admission:
+separate Raven library/consumer execution returns 42 using local intersection bounds
+that inherit imported interfaces. External bound authoring remains pending.
+[Evidence](experiments/composition-constraints/README.md).

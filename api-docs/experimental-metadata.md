@@ -8808,3 +8808,18 @@ This supersedes the blanket generic-body-trait gap above for owned nongeneric
 interface contracts. The APIs are host C# tooling; guest reflection APIs do not change.
 Compared with CLR constrained dispatch, this keeps the existing receiver/call behavior
 and extends only the native structural proof of the required interface.
+
+
+2026-10-14 imported trait dispatch checkpoint: the explicit native composition
+profile now admits completed imported nongeneric interface methods through a
+structurally constrained method parameter. The receiver remains a managed parameter
+reference, encoded with borrowed `callself`. Every union alternative must guarantee
+the requested interface; intersections can supply it through nominal inheritance.
+Nominal-only static calls retain their existing validation. The Raven
+`--structural-constraints` probe compiles `TraitLibrary.neox` separately, then emits
+`ExternalTraits.neox` whose local `LocalA & LocalB` bounds inherit the imported
+interfaces. Its two method calls return 40 + 2 = 42 in the native interpreter.
+This adds no CLI carrier or metadata schema: default composition rejection remains.
+Direct external structural-bound authoring, constructed interface targets under
+structural bounds and open bound operands remain pending. The host metadata emitter
+owns admission; Raven retains its existing imported-interface emission path.

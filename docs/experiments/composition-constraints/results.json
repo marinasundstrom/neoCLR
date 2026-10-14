@@ -179,5 +179,22 @@
       "tools/metadata/NeoCLR.Metadata.Experimental.Tests/AuthoredStructuralConstraintChecks.cs": "869e3c642f07db86dc304d0009c4fa7d4dbe606331131a9f82a3d930c7c19eab",
       "Raven/tools/NeoClrMetadataProbe/StructuralConstraintChecks.cs": "2c4568e5bda9abe382fe490be5bda4bbceb299597d1ec07e75a6ce4d9c4039c2"
     }
+  },
+  "importedGenericBodyTraits": {
+    "date": "2026-10-14",
+    "consumer": "ExternalTraits.neox",
+    "library": "TraitLibrary.neox",
+    "interpreterExitCode": 42,
+    "profile": "Local intersection bounds inherit imported nongeneric interface methods; direct external structural bounds remain unsupported.",
+    "sha256": {
+      "ExternalTraits.neox": "f2638ef10baebe1015083f81dff5f35c8ba9dbe901f4c5349448cb585a782f6b",
+      "TraitLibrary.neox": "21bf4071373f5a97bedd8670eb928a5bc1205d0999c8d4c22e0a276d64b6ac6d"
+    },
+    "validation": [
+      "Raven --structural-constraints probe",
+      "metadata --authored-structural-constraints (intersection admission, weak union and invalid ordinal rejection)",
+      "metadata --open-constrained-calls nominal regression",
+      "python3 scripts/build-api-docs.py --check"
+    ]
   }
 }

@@ -450,11 +450,13 @@ internal sealed class MethodILGenerator(MethodBuilder bodyBuilder) : IILGenerato
     internal static void ValidateExternalConstrainedOperands(MethodBuilder caller, SignatureType implementingType, ImportedMethodReference target)
     {
         ArgumentNullException.ThrowIfNull(implementingType); ArgumentNullException.ThrowIfNull(target);
-        if (!ReferenceEquals(target.Owner, caller.Assembly) || !target.IsStatic || !target.IsInterfaceMethod ||
+        if (!ReferenceEquals(target.Owner, caller.Assembly) || !target.IsInterfaceMethod ||
             target.Signature.GenericParameterNames.Count != 0 || target.DeclaringReference is not { GenericArity: 0 } owner ||
             implementingType.MethodParameterIndex is not { } index || index >= caller.Signature.GenericParameterNames.Count ||
-            !caller.InterfaceConstraints.Any(c => c.ParameterIndex == index && caller.Assembly.SatisfiesInterfaceBound(caller.Definition.ConstraintSignature(c.InterfaceType), owner)))
-            throw new ArgumentException("external constrained call requires a bounded method parameter and completed static interface target");
+            !(caller.Definition.AuthoredStructuralConstraints.Any(c => c.ParameterIndex == index)
+                ? caller.ForwardedBoundsSatisfy(caller, index, owner)
+                : target.IsStatic && caller.Definition.NominalInterfaceConstraints.Any(c => c.ParameterIndex == index && caller.Assembly.SatisfiesInterfaceBound(caller.Definition.ConstraintSignature(c.InterfaceType), owner))))
+            throw new ArgumentException("external constrained call requires a guaranteed completed nongeneric interface contract; instance calls require structural bounds");
         _ = caller.Assembly.ExternalInterfaceMethods(owner).ToArray();
     }
 
