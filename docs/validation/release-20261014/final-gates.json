@@ -68,7 +68,8 @@
       "passed": true
     }
   },
-  "pending": "Release and website publication.",
+  "pending": null,
   "windowsDeltaRun": 38547814472,
-  "windowsDeltaConclusion": "success"
+  "windowsDeltaConclusion": "success",
+  "publicationRecord": "publication.json"
 }

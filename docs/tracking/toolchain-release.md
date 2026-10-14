@@ -27,7 +27,7 @@ on Raven main, then carry and validate it on the neoCLR compiler line. Preserve
 ordinary named-union hover details when that union itself is the selected type.
 No implementation or compiler change is included in Preview 15 for this issue.
 
-## Current candidate qualification — 2026-10-14
+## Preview 15 qualification and publication — 2026-10-14
 
 The 132-lane JSON composed-error carrier is now admitted by the bounded 256-lane
 native value layout. Backend and native helper must be rebuilt together. The
@@ -67,7 +67,13 @@ requalification is required for those API/client changes.
 The website build validates 4,438 pages and checks real declaration source links,
 including new JSON members. The [new local installation](../local-preview-20261014.md)
 passes catalogue checks, all bundled sample builds, default-JIT collections/Tasks/JSON
-and the HTTP client/server checks. Release and website publication are next.
+and the HTTP client/server checks.
+
+[Preview 15](https://github.com/marinasundstrom/neoCLR/releases/tag/v0.1.0-preview.15)
+is published from `084fbf78be68e018f1bd73fbdaf3fa119defbf16`. All 11 uploaded asset
+hashes match the local artifacts. Website deployment 38549651640 passes; live
+home/download pages show Preview 15 and JSON/PostgreSQL API source links resolve.
+[Publication record](../validation/release-20261014/publication.json).
 
 The earlier [failed candidate](../validation/release-20261014/candidate.json) is
 retained for provenance. It is superseded by the inline-value fix, not rewritten.

@@ -1,0 +1,110 @@
+{
+  "assets": [
+    {
+      "name": "neoclr-preview15-osx-arm64.tar.gz",
+      "size": 54921138,
+      "digest": "sha256:ede5a18a29f5f4a8bcef20a13f40d349e110e7e7855f6883737ecd62f0709f86",
+      "url": "https://github.com/marinasundstrom/neoCLR/releases/download/v0.1.0-preview.15/neoclr-preview15-osx-arm64.tar.gz"
+    },
+    {
+      "name": "neoclr-preview15-qualified-source.tar",
+      "size": 165826560,
+      "digest": "sha256:4f851f8dcf61e927be692717201efc142aed53fcc9b60f451ab7d09c9fcdbaaa",
+      "url": "https://github.com/marinasundstrom/neoCLR/releases/download/v0.1.0-preview.15/neoclr-preview15-qualified-source.tar"
+    },
+    {
+      "name": "neoclr-preview15-win-x64.tar.gz",
+      "size": 54328193,
+      "digest": "sha256:3d727efb8dfa2805c0336c401a19f7ec5270c55be9931448e8d1ad908c1503a2",
+      "url": "https://github.com/marinasundstrom/neoCLR/releases/download/v0.1.0-preview.15/neoclr-preview15-win-x64.tar.gz"
+    },
+    {
+      "name": "preview-15-validation.json",
+      "size": 5556,
+      "digest": "sha256:e3aaf297d3c28248f053ea94c47b10b1e53eb63f9074caa146fc5ed613089cc1",
+      "url": "https://github.com/marinasundstrom/neoCLR/releases/download/v0.1.0-preview.15/preview-15-validation.json"
+    },
+    {
+      "name": "raven-0.1.15-neoclr.20261014.3-osx-arm64.vsix",
+      "size": 10758519,
+      "digest": "sha256:bd1002c3567293dc028e39dad64d806ec03b5f2ba44cc6c09279004e337b33dd",
+      "url": "https://github.com/marinasundstrom/neoCLR/releases/download/v0.1.0-preview.15/raven-0.1.15-neoclr.20261014.3-osx-arm64.vsix"
+    },
+    {
+      "name": "raven-0.1.15-neoclr.20261014.3-win-x64.vsix",
+      "size": 10783179,
+      "digest": "sha256:64f31079a2ac46076105f13e33de5fd8dba57c1c7a23fb1f424e2fc3b25c3555",
+      "url": "https://github.com/marinasundstrom/neoCLR/releases/download/v0.1.0-preview.15/raven-0.1.15-neoclr.20261014.3-win-x64.vsix"
+    },
+    {
+      "name": "raven-sdk-0.1.15-neoclr.20261014.2-osx-arm64.tar.gz",
+      "size": 32836221,
+      "digest": "sha256:bc7b38aa31687f3c388d2f54bb7009ca30eb8380a17ee178136c8eaa944eac07",
+      "url": "https://github.com/marinasundstrom/neoCLR/releases/download/v0.1.0-preview.15/raven-sdk-0.1.15-neoclr.20261014.2-osx-arm64.tar.gz"
+    },
+    {
+      "name": "raven-sdk-0.1.15-neoclr.20261014.2-win-x64.tar.gz",
+      "size": 32924546,
+      "digest": "sha256:da841a0f072346b61b6dc72a647440dda515c1aafd3915c46043540f35887b62",
+      "url": "https://github.com/marinasundstrom/neoCLR/releases/download/v0.1.0-preview.15/raven-sdk-0.1.15-neoclr.20261014.2-win-x64.tar.gz"
+    },
+    {
+      "name": "raven-tool-notices-osx-arm64.tar.gz",
+      "size": 154473,
+      "digest": "sha256:4b7f8891a6d6d6cdf0c2f3a438e155f27c1666b15b8a3f4b5d301404c9ba5a8e",
+      "url": "https://github.com/marinasundstrom/neoCLR/releases/download/v0.1.0-preview.15/raven-tool-notices-osx-arm64.tar.gz"
+    },
+    {
+      "name": "raven-tool-notices-win-x64.tar.gz",
+      "size": 152773,
+      "digest": "sha256:5ef539afa865c7c8972cd73c77422590c9b4c3f789a7c77de9edcc7e9ec16ea5",
+      "url": "https://github.com/marinasundstrom/neoCLR/releases/download/v0.1.0-preview.15/raven-tool-notices-win-x64.tar.gz"
+    },
+    {
+      "name": "SHA256SUMS",
+      "size": 1053,
+      "digest": "sha256:c7e23f6799eb16d659361d082f88ea0e2b8f47d8381d607b28f6f1140de5639c",
+      "url": "https://github.com/marinasundstrom/neoCLR/releases/download/v0.1.0-preview.15/SHA256SUMS"
+    }
+  ],
+  "isDraft": false,
+  "isPrerelease": true,
+  "publishedAt": "2026-10-14T10:27:02Z",
+  "tagName": "v0.1.0-preview.15",
+  "url": "https://github.com/marinasundstrom/neoCLR/releases/tag/v0.1.0-preview.15",
+  "sourceRevision": "084fbf78be68e018f1bd73fbdaf3fa119defbf16",
+  "allAssetHashesVerified": true,
+  "website": {
+    "run": 38549651640,
+    "status": "success",
+    "url": "https://marinasundstrom.github.io/neoCLR/",
+    "checks": {
+      "": {
+        "status": 200,
+        "release": "Preview 15"
+      },
+      "try/": {
+        "status": 200,
+        "release": "Preview 15"
+      },
+      "docs/api/System/Data/Json/JsonValue/method_ToJsonString.html": {
+        "status": 200,
+        "sourceLinks": [
+          "https://github.com/marinasundstrom/neoCLR/blob/main/runtime/raven/src/System/Data/Json/JsonValue.rvn"
+        ]
+      },
+      "docs/api/System/Data/Json/JsonSerializerOptions/index.html": {
+        "status": 200,
+        "sourceLinks": [
+          "https://github.com/marinasundstrom/neoCLR/blob/main/runtime/raven/src/System/Data/Json/JsonSerializerOptions.rvn"
+        ]
+      },
+      "docs/api/System/Data/PostgreSql/PostgresDatabase/index.html": {
+        "status": 200,
+        "sourceLinks": [
+          "https://github.com/marinasundstrom/neoCLR/blob/main/runtime/raven/providers/System.Data.PostgreSql/PostgresDatabase.rvn"
+        ]
+      }
+    }
+  }
+}

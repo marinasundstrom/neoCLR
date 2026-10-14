@@ -33,3 +33,11 @@ Both bundles include the four base native libraries. The macOS bundle additional
 includes PostgreSQL for local loopback/trust development. Runtime await is the
 default on both platforms. See the [release notes](../../preview-15-release-notes.md)
 for migration guidance and remaining platform limits.
+
+## Publication
+
+[Preview 15](https://github.com/marinasundstrom/neoCLR/releases/tag/v0.1.0-preview.15)
+is published from `084fbf78be68e018f1bd73fbdaf3fa119defbf16`. All 11 release assets
+match local SHA-256 hashes. [Website deployment](https://github.com/marinasundstrom/neoCLR/actions/runs/38549651640)
+passed, and live download/API pages were checked. See the [publication record](publication.json)
+and [installed preview instructions](../../local-preview-20261014.md).
