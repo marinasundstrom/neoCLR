@@ -17515,3 +17515,18 @@ open, not an approved complete implementation or a permanent roadmap reprioritiz
   **Outcome:** commits `c5e05ce40` and `682a377cc` were fast-forwarded into local
   main. The separate structural-composition checkout and its uncommitted work were
   untouched. No remote push, SDK installation or website publication was performed.
+
+### 2026-10-14 — carry main reflection improvements into the composition experiment
+
+- **Author:** reported reflection improvements on main and requested integration.
+- **Assistant action:** preserved the completed await slices (`a3f385e15` in neoCLR,
+  `f516d90bf` in Raven), then selectively carried main commits `c5e05ce40`,
+  `682a377cc` and `68a6f8c8e` onto `codex/structural-union-intersection`.
+  Documentation conflicts retain both experiment history and mainline API evidence.
+- **Scope:** shared TypeInfo assignment, strict subclass and instance predicates,
+  their JSON/reflection consumers and matching API references. No Raven compiler
+  change or branch merge was needed for this carry. Guest composition descriptors
+  and composition-aware reflection remain open; these nominal/Function APIs do
+  not by themselves complete structural union/intersection introspection.
+- **Validation:** see the integration checkpoint in the
+  [composition experiment](experiments/structural-compositions/README.md#main-reflection-integration--2026-10-14).

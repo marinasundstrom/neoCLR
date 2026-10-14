@@ -1147,3 +1147,37 @@ files to the pre-slice revision (4d34e3505); this is not reported as a passing c
 Its general readonly-receiver behavior is deferred for independent reproduction/fix on
 Raven main and deliberate carry-forward, outside this structural-type experiment.
 No website build was needed; published capability status remains unchanged.
+
+## Main reflection integration — 2026-10-14
+
+Author-directed selective carry of main `c5e05ce40`, `682a377cc` and `68a6f8c8e`
+onto the composition branch as `9e4a581a7`, `9e61bacc` and `a0cf137e`. The
+TypeInfo relationship APIs, JSON/reflection adoption and API snapshots are unchanged
+from main. Conflicts were documentation-only; both development histories remain.
+The preceding await slices are neoCLR `a3f385e15` and Raven `f516d90bf`.
+
+These APIs add shared nominal/Function assignment, strict subclass and instance
+queries. They do not yet expose union/intersection guest descriptors or make the
+relationship service composition-aware. The existing structural reflection and
+JIT/AOT gates remain; full introspection is still the intended type contract.
+No compiler/runtime-contract encoding change was required for this integration.
+
+Focused branch validation:
+
+- Three shared relationship unit tests and five native descriptor-lowering tests pass.
+- All 36 experimental structural composition tests pass.
+- The matching API reference/source fingerprint check passes.
+
+Main's existing JIT/AOT managed and JSON consumer evidence is retained in
+[the relationship qualification](../../validation/type-relationships-20261014/README.md);
+that prior evidence is not presented as a new cross-platform run of this branch.
+
+Fresh integration execution also passes all six managed TypeInfo cases in the
+interpreter using main's retained `type-relations-consumers-dev/bundle`, and all
+seven regenerated Task-union programs (local/copy plus completed and pending awaits
+for Response, HttpError and JsonError). The await matrix uses the retained
+`target/release-json-doc-audit-20261014/inputs` bundle, not the newer reflection bundle.
+This checks compatibility with the already-qualified Task contract; it does not
+claim composition reflection support. Local detailed reports are
+`target/reflection-integration-type-relations/report.json` and
+`target/task-composition-await-reflection/validation.json`.
