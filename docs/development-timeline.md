@@ -25,6 +25,23 @@ available original wording; other text is a summary.
 
 See the [changelog](../CHANGELOG.md) and linked design documents for technical status.
 
+## 2026-10-14 — Release editor review and disappearing inlays
+
+- **Author:** asks to review the SDK and VS Code extension integrations before
+  release, then reports that inlay hints appeared to flicker during acceptance.
+- **Assistant investigation:** the original candidate passes 26 editor checks and
+  its 87 shipped language-server files match the SDK, but those checks did not
+  cover inlay stability. A focused real-editor repro preserves hints across
+  comment edits and loses one hint when two visible ranges request concurrently.
+- **Assistant implementation:** fixes the extension's document-wide supersession
+  on Raven main `6a2c55db4`, independently carried to native compiler branch
+  `793219d85`. Requests now distinguish document version and range and release
+  tracking on completion. No runtime, compiler or metadata contract changes.
+- **Outcome:** the rebuilt `.2` VSIX passes 12 post-edit samples and eight
+  concurrent range responses on macOS. Full editor requalification and Windows
+  qualification remain release gates. This confirms one cause of disappearing
+  hints; it does not claim that every possible visual flicker is resolved.
+
 ## 2026-10-13 — Integrate SDK runtime-await and Windows suspension
 
 - **Author:** directs continuing SDK/runtime integration, including Windows

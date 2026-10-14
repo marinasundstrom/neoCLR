@@ -10,7 +10,7 @@ on:
       raven_revision:
         description: Exact Raven commit to qualify with this neoCLR revision
         required: true
-        default: fac4ac736024800151d6b285e68407ded864f655
+        default: 793219d855b17f01fb805e215968b78871eb3804
       bundle_run:
         description: Optional prior run whose packaged bundle should receive editor-only requalification
         required: false
@@ -23,7 +23,7 @@ jobs:
     timeout-minutes: 90
     env:
       PYTHONUTF8: '1'
-      PACKAGE_VERSION: 0.1.15-neoclr.20261014.1
+      PACKAGE_VERSION: 0.1.15-neoclr.20261014.2
     steps:
       - uses: actions/checkout@v4
         with:
@@ -32,7 +32,7 @@ jobs:
         if: ${{ !inputs.bundle_run }}
         with:
           repository: marinasundstrom/raven
-          ref: ${{ inputs.raven_revision || 'fac4ac736024800151d6b285e68407ded864f655' }}
+          ref: ${{ inputs.raven_revision || '793219d855b17f01fb805e215968b78871eb3804' }}
           path: raven
       - uses: dtolnay/rust-toolchain@stable
         if: ${{ !inputs.bundle_run }}
@@ -184,6 +184,14 @@ jobs:
           if (!(Test-Path $report)) { throw 'Timed out waiting for installed editor acceptance' }
           $acceptance = Get-Content $report | ConvertFrom-Json
           if (!$acceptance.passed) { throw 'Installed editor acceptance failed' }
+          & $code --new-window --user-data-dir $profile --extensions-dir $extensions --skip-welcome --skip-release-notes --disable-workspace-trust "--extensionDevelopmentPath=$installed" "--extensionTestsPath=$PWD/scripts/native-vscode-inlay-acceptance.cjs" "$PWD/target/editor-acceptance.code-workspace"
+          if ($LASTEXITCODE) { exit $LASTEXITCODE }
+          $report = 'target/editor-acceptance/vscode-inlay-acceptance.json'
+          $deadline = (Get-Date).AddMinutes(5)
+          while (!(Test-Path $report) -and (Get-Date) -lt $deadline) { Start-Sleep -Seconds 2 }
+          if (!(Test-Path $report)) { throw 'Timed out waiting for inlay acceptance' }
+          $acceptance = Get-Content $report | ConvertFrom-Json
+          if (!$acceptance.passed) { throw 'Installed inlay acceptance failed' }
       - uses: actions/upload-artifact@v4
         if: always()
         with:

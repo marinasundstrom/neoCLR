@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-14
 
+- Add packaged VS Code inlay stability checks for comment edits and concurrent visible ranges. The original candidate loses one concurrent range; Raven main 6a2c55db4 fixes range-scoped supersession, carried to the native branch as 793219d85. The rebuilt `.2` VSIX passes the focused macOS repro. Advance the Windows candidate pin and include the regression in editor acceptance; hosted validation remains required.
+
 - Select interpreter execution explicitly in collections, imported-init, JSON and retained-HTTP control runs. These fixtures must keep testing interpreter/native parity when ordinary execution defaults to JIT; the Windows collections failure was JIT rejecting interpreter-only limits. The complete local collections/imported-init gate passes; older introspection and retained-HTTP fixtures still stop at independent native-build gaps.
 
 - Apply the current GC cleanup/rooted-allocation export contract to the Windows TLS binding fixture as well. Windows cryptography now executes successfully; TLS linking exposed the same obsolete probe exports. Syntax validation passes; hosted TLS requalification remains required.
