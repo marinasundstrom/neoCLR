@@ -542,7 +542,8 @@ the snapshot is now regenerated from the merged Function bridge with System.Fail
 `NativeAssemblyDefinition`, `NativeLibraryDefinition`, `NativeFunctionDefinition`, `ModuleDefinition`, `TypeDefinition`, `TypeReference`, `AssemblyIdentity`,
 `AssemblyReference`, `IAssemblyResolver`, `MethodDefinition`, `MemberReference`, `ImportedMethodReference`, `AssemblyBuilder` (including native emission
 and top-level functions), `TypeBuilder` and
-`MethodBuilder`, `PrimitiveType`, `PrimitiveMethodSignature`, `MethodSignature`, `SignatureType`, `LocalDefinition`, `BranchLabel` and `OpCode` in that Model namespace,
+`MethodBuilder`, `PrimitiveType`, `PrimitiveMethodSignature`, `MethodSignature`, `SignatureType`,
+`ReferenceCompositionKind`, `ReferenceCompositionSignature`, `LocalDefinition`, `BranchLabel` and `OpCode` in that Model namespace,
 are .NET-host-only types in
 `tools/metadata/NeoCLR.Metadata.Experimental`, not types in NeoCLR.CoreProbe or the
 Raven guest library. They therefore cannot be added to that assembly's RavenDoc type

@@ -8387,3 +8387,44 @@ flags; ordinary native managed methods have neither. This follows .NET's inspect
 API without treating Unmanaged, Native, NoInlining or other flags as implemented neoCLR
 features. Abstract methods must still be identified through IsAbstract; the absence
 of a foreign descriptor does not imply an executable managed body.
+
+
+## Read-only reference compositions (experiment, 2026-10-14)
+
+Unpublished, on `codex/structural-union-intersection`. These .NET host APIs are in
+`NeoCLR.Metadata.Experimental.Model`; they are not guest reflection types and do
+not change the generated RavenDoc snapshot.
+
+| API | Contract |
+| --- | --- |
+| `AssemblyDefinition.ReadNativeAssembly(ReadOnlySpan<byte> image, bool allowExperimentalCompositions)` | Copies a PE/#Neo or standalone NEOX image into an immutable native declaration snapshot. `true` explicitly admits the subset below; `false` and the existing one-argument overload reject compositions. Invalid/unsupported declarations or exceeded bounds throw `InvalidDataException`. |
+| `SignatureType.Composition : ReferenceCompositionSignature?` | The read-only compound descriptor, or null for other signatures and normalized singleton results. No public compound factory is provided. |
+| `ReferenceCompositionSignature.Kind : ReferenceCompositionKind` | `Union` means either-membership; `Intersection` means all-membership. These compose nominal contracts, not matching member names. |
+| `ReferenceCompositionSignature.Constituents : IReadOnlyList<SignatureType>` | Immutable normalized bounds, in first-occurrence order, retaining snapshot-owned nominal references. Same-kind nesting is flattened, equal bounds are deduplicated and singletons collapse. Mixed nesting remains. Nominal subtype reduction is deliberately absent. |
+| `ReferenceCompositionSignature.Equals(ReferenceCompositionSignature? other)`, `Equals(object? obj)`, `GetHashCode()` | Equality/hashing ignore constituent order and retain nominal scope/ownership through existing signature identities. Different kinds remain distinct; null compares unequal. This is snapshot signature identity, not a cross-catalog canonical identity API. |
+| `ReferenceCompositionSignature.ToString()` | Diagnostic kind/bound display; not an encoding, parser contract or stable identity. |
+
+Only nongeneric, non-native free-function parameter/result signatures and local
+signature declarations admit compositions. Each encoded compound has 2–256
+operands, at most 4,096 nodes per root and a depth limit of 32; existing transport
+limits also apply and may reject an image earlier. Leaves must be nongeneric nominal
+reference classes/interfaces. Primitive/value, array, byref, generic parameter,
+Function and Self leaves are rejected, as are compositions nested inside those
+wrappers, fields, owned methods and native/InternalCall signatures. Validation
+precedes normalization, so collapsing duplicate bounds cannot hide an invalid leaf.
+External leaves retain the reader's existing declared dependency identity rules;
+this slice does not resolve external assemblies or prove runtime inhabitation.
+
+The descriptor is intentionally read-only: builder ownership validation and native
+callable import reject it explicitly. CLI projection writers keep their default
+rejection. `AssemblyDefinition.Write()` copies the original image byte-for-byte;
+it does not regenerate declarations or validate executable bodies. The native
+reader still treats bodies as opaque, and this API is not a runtime verifier.
+
+.NET/CLI has no equivalent first-class union/intersection signature. Reading the
+native shape preserves constituent information without inventing a carrier ABI;
+the cost is an explicit boundary before compiler import, authored storage and
+code generation. Raven's current adapter uses the default reader and therefore
+still rejects compound declarations. See the
+[experiment record](../docs/experiments/structural-compositions/README.md) for
+validation, remaining identity differences and the next compiler slice.

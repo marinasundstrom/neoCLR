@@ -17246,3 +17246,12 @@ open, not an approved complete implementation or a permanent roadmap reprioritiz
   documentation control batch is unchanged (91 passes/two failures). The assistant
   records ordinary .NET constraint behavior separately
   from native runtime support and keeps main/native lines separate.
+
+- **Native-metadata prerequisite:** on continuation, the assistant finds that the
+  host signature model cannot represent runtime compounds. Adds a separate opt-in
+  read-only declaration profile and normalized snapshot descriptors; keeps default
+  reads, callable imports and CLI projection closed to compound signatures.
+  This preserves native information without claiming source emission. The focused
+  checks pass; the metadata harness changes from 169/171 to 170/172 with the same
+  two pre-existing failures. Manual host API documentation and guest snapshot check
+  are updated; compiler storage/capability mapping remains the next slice.

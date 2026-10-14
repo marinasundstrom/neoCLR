@@ -28,6 +28,12 @@ not. Reconcile descriptor identity before metadata import/export.
 Raven main and the native line remain separate; older structural/intersection work
 is an input for selective reuse, not a wholesale merge.
 
+The host declaration reader can now opt into read-only compound free-function
+signatures via `ReadNativeAssembly(image, true)`. Raven still uses the default
+reader. Native callable import and CLI projection remain explicitly rejected;
+loaded snapshots preserve original bytes without verifying bodies. See the
+[host API reference](../api-docs/experimental-metadata.md#read-only-reference-compositions-experiment-2026-10-14).
+
 Lost/restricted information: no compiler import/export, compound reflection
 construction, generic/value/intrinsic-reference composition, member merging or
 native backend layout. Non-null compound values currently require class allocations;

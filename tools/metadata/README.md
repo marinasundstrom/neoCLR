@@ -317,3 +317,15 @@ readonly stores, static field addresses and custom attributes on static fields
 are rejected. See [runtime storage](../../docs/runtime-static-storage.md).
 
 Focused check: `dotnet run --project tools/metadata/NeoCLR.Metadata.Experimental.Tests -- --static-fields`.
+
+
+### Branch-only reference composition reads (2026-10-14)
+
+`AssemblyDefinition.ReadNativeAssembly(image, allowExperimentalCompositions: true)`
+reads bounded native Union/Intersection free-function signatures as immutable
+`SignatureType.Composition` descriptors. The default overload remains unchanged;
+callable import, authored storage and CLI projection are rejected. This is a
+read-only prerequisite for Raven's native mapping. See the
+[manual API contract](../../api-docs/experimental-metadata.md#read-only-reference-compositions-experiment-2026-10-14)
+and run `dotnet run --project tools/metadata/NeoCLR.Metadata.Experimental.Tests -- --reference-compositions`
+from the repository root for the focused checks.

@@ -12,11 +12,20 @@ public sealed partial class AssemblyDefinition
     /// Bodies remain opaque. Write copies the original image; editing remains pending. Supported method definitions can be imported for native calls.
     /// Mvid is empty because the native manifest declares none. Tokens retain module-local native origin identifiers.</remarks>
     public static AssemblyDefinition ReadNativeAssembly(ReadOnlySpan<byte> image)
+        => ReadNativeAssembly(image, allowExperimentalCompositions: false);
+
+    /// <summary>Reads native declarations with an explicit opt-in for read-only experimental reference compositions.</summary>
+    /// <param name="image">Complete PE/#Neo or standalone NEOX native assembly image.</param>
+    /// <param name="allowExperimentalCompositions">Explicitly admits bounded read-only Union/Intersection signatures; false preserves the default profile.</param>
+    /// <returns>An immutable declaration snapshot retaining the original image.</returns>
+    /// <remarks>Only nongeneric free-function signatures/locals admit compositions. Emission and callable import remain unsupported; bodies remain opaque.</remarks>
+    /// <exception cref="InvalidDataException">The image or composition is invalid or outside the admitted subset.</exception>
+    public static AssemblyDefinition ReadNativeAssembly(ReadOnlySpan<byte> image, bool allowExperimentalCompositions)
     {
         if (image.Length > RuntimeAssemblyContainer.MaxLibraryImageSize) throw new InvalidDataException("image exceeds limit");
         var owned = image.ToArray();
         var native = NativeAssemblyDefinition.ReadLibraryAssembly(owned.AsSpan().StartsWith("NEOX"u8)
-            ? NativeModuleContainer.Read(owned) : RuntimeAssemblyContainer.Read(owned));
+            ? NativeModuleContainer.Read(owned) : RuntimeAssemblyContainer.Read(owned), allowExperimentalCompositions);
         return native.MaterializeDeclarations(owned);
     }
 
@@ -35,7 +44,7 @@ public sealed partial class NativeAssemblyDefinition
             type.ClassType is { IsStatic: false } ||
             type.ImportedType is { } imported &&
             imported.GenericArity == imported.TypeArguments.Count && imported.TypeArguments.All(SupportedArgument);
-        static bool SupportedMethod(SignatureType type) => type.MethodParameterIndex is not null ||
+        static bool SupportedMethod(SignatureType type) => type.Composition is not null || type.MethodParameterIndex is not null ||
             type.ArrayElement is { } element && SupportedMethod(element) || Supported(type);
         static bool Supported(SignatureType type) => SupportedScalar(type) || type.ArrayElement is { } element && Supported(element);
         // Fail closed rather than returning a partial assembly with silently missing types.
@@ -53,6 +62,7 @@ public sealed partial class NativeAssemblyDefinition
         var externalTokens = new Dictionary<(AssemblyIdentity, string, string, uint), uint>();
         AssemblyDefinition.NativeSignatureTypeRow Copy(SignatureType type)
         {
+            if (type.Composition is { } composition) return new(null, 0, CompositionKind: composition.Kind, Constituents: composition.Constituents.Select(Copy).ToArray());
             if (type.FunctionSignature is { } function) return new(null, 0, Function: new(Copy(function.ReturnType), function.ParameterTypes.Select(Copy).ToArray()));
             if (type.PointerElement is { } pointer) return new(null, 0, Copy(pointer), IsPointer: true);
             if (type.ByReferenceElement is { } target) return new(null, 0, Copy(target), IsByReference: true);

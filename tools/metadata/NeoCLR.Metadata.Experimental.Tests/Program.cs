@@ -4,6 +4,8 @@ using System.Reflection.PortableExecutable;
 using NeoCLR.Metadata.Experimental.Model;
 using AssemblyDefinition = NeoCLR.Metadata.Experimental.Model.AssemblyDefinition;
 
+if (args is ["--reference-compositions"]) { ReferenceCompositionChecks.Run(); Console.WriteLine("PASS read-only reference compositions"); return 0; }
+
 if (args is ["--static-fields"]) { StaticFieldChecks.Run(); return 0; }
 
 if (args is ["--local-budget", var localOutput]) { LocalBudgetChecks.Run(localOutput); return 0; }
@@ -554,6 +556,7 @@ var tests = new (string Name, Action Body)[]
     ("Explicit nominal array backing", ArrayBackingChecks.Run),
     ("Core-marked namespace function binding", NamespaceBindingChecks.Run),
     ("Direct native definition materialization", NativeDefinitionChecks.Run),
+    ("Experimental native reference composition reads", ReferenceCompositionChecks.Run),
     ("Native generic static method definitions", NativeGenericMethodChecks.Run),
     ("Native generic class definitions", NativeGenericOwnerChecks.Run),
     ("External native generic signatures", ExternalGenericSignatureChecks.Run),

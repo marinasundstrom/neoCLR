@@ -284,3 +284,30 @@ execution cases returning 42. The broad pre-change baseline stops at two existin
 documentation-ID failures after 1,346 passes. Its 93-case failing batch reproduces
 the same 91 passes/two failures after the change; no full-green baseline is claimed.
 No runtime code changes were needed for this compiler-only slice.
+
+## Opt-in native declaration reader — 2026-10-14
+
+The host metadata reader now has an explicit `ReadNativeAssembly(image, true)`
+profile for bounded compound free-function signatures. The default reader remains
+closed to them. `SignatureType.Composition` preserves either/all membership and
+snapshot-owned bounds, flattens same-kind nesting, deduplicates operands and
+collapses singletons. It does not remove nominal supertypes, distribute mixed
+compositions or define a new cross-catalog identity. Bodies remain opaque.
+
+This is a prerequisite for the native compiler mapping, not that mapping itself.
+Authored builder signatures, callable import and CLI projection reject compounds;
+loaded `Write()` preserves original bytes. Raven still uses the default reader.
+The [manual host API reference](../../../api-docs/experimental-metadata.md#read-only-reference-compositions-experiment-2026-10-14)
+records public signatures, limits, errors and exclusions. No guest APIs or snapshot
+selection changed. Future native emitter admission needs an explicit capability,
+compiler/runtime normalization agreement and executable consumer validation.
+
+Validation: `dotnet run --project tools/metadata/NeoCLR.Metadata.Experimental.Tests -- --reference-compositions`
+passes schema-2/schema-3 NEOX reading, same/mixed nesting, order-independent
+equality/hash, snapshot identity, singleton collapse, immutable bounds, original
+image preservation, default/CLI/import rejection and malformed/over-budget inputs.
+The complete metadata harness reports 170/172 passing versus 169/171 before the
+change; the same two existing failures are `Native Object root authoring` and
+`Int32 local ownership initialization and execution`. No new failure is introduced.
+`python3 scripts/build-api-docs.py --check` passes. Runtime and Raven compiler
+behavior are unchanged, so their earlier executable evidence is retained.
