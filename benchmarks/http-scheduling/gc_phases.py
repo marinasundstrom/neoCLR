@@ -15,7 +15,7 @@ def instrument(root, out, command):
     hook = '    int32_t status = collect_conditional(context, head, conditional, count);'
     text = replace_once(text, hook, '    neoclr_gc_phase_begin(statistics.allocations);\n'+hook+'\n    neoclr_gc_phase_end(status);')
     for phase, marker in enumerate(['    neoclr_probe_storage fault[65];',
-        '    /* Each newly marked allocation enters the intrusive worklist exactly once.',
+        '    /* Each newly marked reference-bearing allocation enters the worklist once.',
         '    for (neoclr_gc_resource **link = &resource_head; *link;) {',
         '    /* Sweep and coalesce in one forward walk.'], 1):
         text = replace_once(text, marker, f'    neoclr_gc_phase_next({phase});\n'+marker)

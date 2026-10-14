@@ -16,13 +16,13 @@ pub const OBJECT_LANES: usize = 256;
 
 #[test]
 fn type_budget_matches_native_collector_contract() {
-    let header = include_str!("../../../docs/experiments/aot-console/text-arena.h");
+    let header = include_str!("../../native/memory/text-arena.h");
     assert!(header.contains(&format!("#define NEOCLR_NATIVE_TYPE_LIMIT {TYPES}")));
 }
 
 #[test]
 fn layout_budgets_match_native_allocator_contract() {
-    let header = include_str!("../../../docs/experiments/aot-console/text-arena.h");
+    let header = include_str!("../../native/memory/text-arena.h");
     assert!(header.contains(&format!(
         "#define NEOCLR_NATIVE_LAYOUT_LANES {INLINE_LANES}"
     )));

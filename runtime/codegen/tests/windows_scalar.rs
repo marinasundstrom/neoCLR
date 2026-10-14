@@ -197,8 +197,8 @@ fn windows_c_consumer_executes_calls_branches_faults_and_utf8() {
             "{}",
             String::from_utf8_lossy(&compiled.stderr)
         );
-        let host =
-            PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../native/windows-scalar-host.c");
+        let host = PathBuf::from(env!("CARGO_MANIFEST_DIR"))
+            .join("../../tools/native/windows-scalar-host.c");
         let linked = Command::new("cl")
             .current_dir(&dir.0)
             .args(["/nologo", "/W4", "/WX", "/std:c11", "/MT", "/Fe:app.exe"])
@@ -377,8 +377,8 @@ fn assert_windows_program(fixture: &[u8], marker: &str, expected_stdout: &[u8]) 
             "{}",
             String::from_utf8_lossy(&compiled.stderr)
         );
-        let host =
-            PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../native/windows-scalar-host.c");
+        let host = PathBuf::from(env!("CARGO_MANIFEST_DIR"))
+            .join("../../tools/native/windows-scalar-host.c");
         let linked = Command::new("cl")
             .current_dir(&dir.0)
             .args([
