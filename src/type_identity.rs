@@ -40,6 +40,9 @@ pub struct TypeDescriptor {
     pub identity: TypeIdentity,
     pub name: String,
     pub generic_arguments: Vec<TypeDescriptor>,
+    /// Direct structural union alternatives or intersection bounds, in normalized
+    /// signature order. Empty for nominal, Function and other non-composition types.
+    pub constituents: Vec<TypeDescriptor>,
     pub declaring_type: Option<TypeDefId>,
 }
 
@@ -49,20 +52,31 @@ pub(crate) fn describe(module: &Module, ty: &Type) -> Result<TypeDescriptor, Fau
     describe_loaded(module, &normalized)
 }
 
+/// Host inspection admits composition snapshots without creating guest TypeInfo.
+pub(crate) fn describe_host(module: &Module, ty: &Type) -> Result<TypeDescriptor, Fault> {
+    let normalized = crate::scope::normalize_type(module, ty)?;
+    resolve(module, &normalized)?;
+    describe_validated(module, &normalized)
+}
+
 // Introspection follows already validated metadata, including transitive signatures.
 // It does not grant permission to name those types in executable instructions.
 pub(crate) fn describe_loaded(module: &Module, normalized: &Type) -> Result<TypeDescriptor, Fault> {
-    // Identity resolution is supported first. Guest descriptors must not silently
-    // materialize compositions through the ordinary nominal/provider fallback.
+    // Host inspection supports compositions separately. Guest descriptors must not
+    // materialize them through the ordinary nominal/provider fallback.
     if crate::compositions::contains(normalized) {
         return Err(Fault::new(
             "compound reflection descriptors are not supported in this slice",
         ));
     }
+    describe_validated(module, normalized)
+}
+
+fn describe_validated(module: &Module, normalized: &Type) -> Result<TypeDescriptor, Fault> {
     crate::vm::check_type(normalized, module)?;
     let identity = build(module, normalized)?;
     let name = match normalized {
-        Type::Function(_) => signature_name(normalized)?,
+        Type::Function(_) | Type::Union(_) | Type::Intersection(_) => signature_name(normalized)?,
         Type::ByRef(element) => reference_name(element, false)?,
         Type::ReadOnlyByRef(element) => reference_name(element, true)?,
         Type::Array(element) => format!("{}[]", signature_name(element)?),
@@ -80,11 +94,18 @@ pub(crate) fn describe_loaded(module: &Module, normalized: &Type) -> Result<Type
         .map_or(name, |o| o.name.clone());
     let generic_arguments = match normalized {
         Type::ArrayRef(element) if module.type_definition(normalized).is_some() => {
-            vec![describe_loaded(module, element)?]
+            vec![describe_validated(module, element)?]
         }
         Type::Constructed { arguments, .. } => arguments
             .iter()
-            .map(|argument| describe_loaded(module, argument))
+            .map(|argument| describe_validated(module, argument))
+            .collect::<Result<_, _>>()?,
+        _ => vec![],
+    };
+    let constituents = match normalized {
+        Type::Union(parts) | Type::Intersection(parts) => parts
+            .iter()
+            .map(|part| describe_validated(module, part))
             .collect::<Result<_, _>>()?,
         _ => vec![],
     };
@@ -96,6 +117,7 @@ pub(crate) fn describe_loaded(module: &Module, normalized: &Type) -> Result<Type
         identity,
         name,
         generic_arguments,
+        constituents,
         declaring_type,
     })
 }
@@ -286,6 +308,7 @@ pub(crate) fn describe_definition(
                 },
                 name: name.clone().unwrap_or_else(|| format!("T{i}")),
                 generic_arguments: vec![],
+                constituents: vec![],
                 declaring_type: None,
             })
         })
@@ -300,6 +323,7 @@ pub(crate) fn describe_definition(
             .as_ref()
             .map_or_else(|| definition.name.clone(), |o| o.name.clone()),
         generic_arguments: arguments,
+        constituents: vec![],
         declaring_type: declaring_definition(module, definition).and_then(|p| p.definition.clone()),
     })
 }
@@ -337,6 +361,10 @@ mod composition_tests {
             Type::Union(vec![Type::from_name("Left"), Type::from_name("Right")]),
             Type::Intersection(vec![Type::from_name("Left"), Type::from_name("Right")]),
         ] {
+            // Guest handles/providers remain gated even though host snapshots work.
+            assert!(describe(&module, &ty).is_err());
+            assert!(describe_loaded(&module, &ty).is_err());
+            assert!(describe_host(&module, &ty).is_ok());
             let identity = resolve(&module, &ty).unwrap();
             assert_eq!(
                 crate::reflection::from_identity(&module, &identity).unwrap(),

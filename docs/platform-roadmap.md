@@ -4670,3 +4670,7 @@ open. [Bounded relationship slice](experiments/structural-compositions/README.md
 Resolved host composition identity keys now preserve constituents and generic
 arguments without nominal definition tokens. Guest descriptors remain pending.
 [Identity checkpoint](experiments/structural-compositions/README.md#resolved-composition-identities--2026-10-14).
+
+The experiment now exposes recursive host composition descriptors, including
+constituents within closed generic arguments; guest providers remain gated.
+[Host descriptor checkpoint](experiments/structural-compositions/README.md#host-composition-descriptors--2026-10-14).

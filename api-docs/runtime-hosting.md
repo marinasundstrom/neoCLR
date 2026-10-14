@@ -109,7 +109,34 @@ metadata format or guest public API changes.
 
 A composition has no nominal definition row or declaring type. Internal definition
 token lookup returns no definition (token zero), never a constituent's token.
-`describe_type` and guest composition TypeInfo construction remain unsupported,
-including composition-bearing wrappers; identity resolution does not bypass those
-descriptor gates. Full guest introspection remains intended follow-up work. These
-host Rust APIs are excluded from the guest RavenDoc selection and documented here.
+Guest composition TypeInfo construction remains unsupported, including
+composition-bearing wrappers. Host descriptors are supported as described below.
+Full guest introspection remains intended follow-up work. These host Rust APIs are
+excluded from the guest RavenDoc selection and documented here.
+
+### Host composition descriptors (development, 2026-10-14)
+
+`LoadedProgram::describe_type(&Type) -> Result<TypeDescriptor, Fault>` now supports
+admitted closed compositions with `experimental-compositions`. `TypeDescriptor`
+adds a public `constituents: Vec<TypeDescriptor>` field containing direct union
+alternatives or intersection bounds in normalized signature order. Other types
+return an empty vector. Inspect `identity` to distinguish Union from Intersection.
+
+Each constituent is a complete recursive host snapshot with its own identity, name,
+generic arguments and constituents. For `Box<union<Left,Right>>`, Box remains a
+nominal descriptor with one generic argument; that argument has two constituents.
+For `intersection<Box<Int32>,Left>`, the Box bound has its own Int32 generic argument.
+Constituents are never reported as generic arguments of the composition itself.
+Direct compositions have no declaring type. Their diagnostic names use
+`union<...>`/`intersection<...>`; names are not identity keys. Normalization can
+collapse a duplicate-only composition to its remaining nominal descriptor.
+
+Resolution checks visibility, feature admission and constituent validity before
+returning snapshots. Invalid inputs return Fault; inspecting snapshots neither
+executes guest code nor grants construction/invocation rights. Rust callers
+constructing TypeDescriptor literals must initialize the new field.
+
+Guest type-token and TypeInfo providers retain the existing gate. In particular,
+the Raven `TypeInfo.IsUnion` property still describes nominal union declarations;
+this host addition does not repurpose it for structural unions. The guest API
+snapshot, native metadata encoding and CLI bridge are unchanged.

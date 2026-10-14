@@ -1227,3 +1227,31 @@ cross-revision rejection test. Five native descriptor-lowering tests and the API
 reference fingerprint check also pass. The existing Function, primitive, generic
 and definition-row controls are included in the identity suite.
 All 36 existing composition execution regressions also pass.
+
+## Host composition descriptors — 2026-10-14
+
+`LoadedProgram::describe_type` now returns host snapshots for validated compositions.
+The new `TypeDescriptor.constituents` vector exposes direct alternatives/bounds,
+recursively preserving mixed nesting and closed generic arguments. Composition
+constituents and generic arguments remain distinct, and compositions have no nominal
+declaring type. Normalization and resolved identity use the existing rules.
+
+Host description is separated from guest handle/provider construction, which remains
+gated. The current Raven TypeInfo.IsUnion describes nominal union declarations;
+structural guest descriptors need their own explicit shape/constituent contract.
+This is a remaining implementation gap, not a change to the author's intended fully
+introspectable type model. No Raven compiler, Runtime Contract or CLI bridge changes
+are needed for this host-only slice. Website capability status remains unchanged.
+
+Compared with CLI reflection, the native signature snapshot exposes composition
+constituents without inventing TypeDef declarations or generic parameters. The cost
+is the experimental host contract and a source change for Rust descriptor literals.
+[API reference and examples](../../../api-docs/runtime-hosting.md#host-composition-descriptors-development-2026-10-14).
+
+Focused validation passes all 36 composition execution regressions, eight enabled
+identity/descriptor integration checks, the internal guest-gate/identity round-trip
+check, and all eleven ordinary reflection checks. Tests cover recursive constituent
+inspection, generic wrappers/bounds, canonicalization and invalid inputs; guest
+construction remains rejected while the same host snapshot succeeds. The guest API
+reference/source fingerprint check passes.
+All seven default-build identity checks also pass, including the disabled composition descriptor gate.
