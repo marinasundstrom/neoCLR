@@ -9048,6 +9048,7 @@ unsupported or excessive nesting fails with InvalidDataException. No nominal tup
 declaration, fields or constructors are synthesized in this host API.
 
 The view enables Raven's explicit native tuple import. It is distinct from guest
-`System.Introspection.TupleTypeInfo`, whose element-name query is still pending.
+`System.Introspection.TupleTypeInfo`, whose `ElementNames` query returns effective
+names with positional ItemN defaults rather than nullable declared-name entries.
 Focused tests cover nested views and distinct return/parameter names on equal types;
 the separate Raven consumer executes imported named tuples with result 42.

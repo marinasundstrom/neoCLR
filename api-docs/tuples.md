@@ -95,6 +95,13 @@ returns a snapshot in positional order, including repeated types and recursive
 elements are separate from `GetGenericArguments`. `IsValueType` is true and
 `IsUnion` is false. Element labels are not part of runtime identity.
 
+`ElementNames: Sequence<string>` returns a fresh snapshot of effective names in
+matching positional order. Declared native names are preserved; an unnamed position
+uses `ItemN` (one-based). Equal tuple types can expose different names because each
+signature retains its descriptive metadata. This query does not distinguish an
+explicit `ItemN` label from the same synthesized default; host signature APIs retain
+that distinction. Identity-only handles cannot recover declared names.
+
 Requires the `experimental-tuples` runtime and the matching native source library.
 There is no public constructor. The runtime selects this provider when a type handle
 contains an admitted structural tuple signature. The same arity, closedness and
@@ -104,8 +111,8 @@ field/constructor introspection, nominal module ownership, native layout and gen
 Raven tuple emission remain incomplete. Do not infer those APIs from ElementTypes.
 
 The executable [Raven consumer](../docs/experiments/structural-tuples/TypeInfo.rvn)
-checks ordered duplicates, a nested single-element tuple, value classification and
-repeated snapshot queries. A documented test fixture substitutes one native token;
+checks ordered duplicates, nested names, value classification, equal renamed types and
+repeated snapshot queries. A documented test fixture substitutes two native tokens;
 this validates guest introspection, not compiler tuple lowering.
 
 
@@ -145,8 +152,8 @@ declared names with the existing `ItemN` fallback.
 
 Unlike the CLR's ValueTuple/name-attribute representation, native names need no
 attribute decoding. The cost is an expanded signature payload and explicit separation
-of descriptive metadata from equality. This slice adds host inspection, not a new
-guest API: guest name queries, Raven tuple import and named assembler syntax remain follow-ups.
+of descriptive metadata from equality. Guest ElementNames and Raven tuple import
+now preserve these names; named assembler syntax remains a follow-up.
 C# authoring/reading/import and Raven native emission now preserve names; see
 [the C# contract](experimental-metadata.md#native-tuple-names-in-c-authoringimport-2026-10-14-development). Existing positional guest element
 queries and execution remain supported. Focused tests prove exact name roundtrips,

@@ -9,6 +9,7 @@ static class ReflectionBindings
         ("System.Runtime.Reflection.ArrayReflection", "GetLength", ["System.Object"], "Int32", true),
         ("System.Runtime.Reflection.ArrayReflection", "GetValue", ["System.Object", "Int32"], "System.Object", true),
         ("System.Runtime.Reflection.ArrayReflection", "Create", ["System.Introspection.TypeInfo", "System.Object[]"], "System.Object", true),
+        ("System.Introspection.TupleTypeInfo", "get_ElementNames", [], "System.Collections.Sequence<String>", false),
         ("System.Introspection.TupleTypeInfo", "get_ElementTypes", [], "System.Collections.Sequence<System.Introspection.TypeInfo>", false),
         ("System.Introspection.UnionTypeInfo", "get_Types", [], "System.Collections.Sequence<System.Introspection.TypeInfo>", false),
         ("System.Introspection.IntersectionTypeInfo", "get_Types", [], "System.Collections.Sequence<System.Introspection.TypeInfo>", false),
@@ -177,8 +178,8 @@ static class ReflectionBindings
         internal class Type { } // CLI custom-attribute type tokens only; no runtime API.
         namespace Runtime { public sealed class RuntimeContext { private RuntimeContext() { } public static RuntimeContext Current => default; public System.Introspection.AssemblyInfo ExecutingAssembly => default; public System.Introspection.TypeInfo GetTypeInfoFromHandle(System.RuntimeTypeHandle handle) => default; } }
         namespace Introspection { public interface FunctionTypeInfo : TypeInfo { System.Collections.Sequence<ParameterInfo> Parameters { get; } TypeInfo ReturnType { get; } MethodInfo InvokeMethod { get; } } }
-        namespace Introspection { public interface TupleTypeInfo : TypeInfo { System.Collections.Sequence<TypeInfo> ElementTypes { get; } } }
-        namespace Introspection { internal sealed class RuntimeTupleTypeInfo : RuntimeTypeInfo, TupleTypeInfo { public System.Collections.Sequence<TypeInfo> ElementTypes => default; internal static TypeInfo Create(System.RuntimeTypeHandle handle) => default; } }
+        namespace Introspection { public interface TupleTypeInfo : TypeInfo { System.Collections.Sequence<string> ElementNames { get; } System.Collections.Sequence<TypeInfo> ElementTypes { get; } } }
+        namespace Introspection { internal sealed class RuntimeTupleTypeInfo : RuntimeTypeInfo, TupleTypeInfo { public System.Collections.Sequence<string> ElementNames => default; public System.Collections.Sequence<TypeInfo> ElementTypes => default; internal static TypeInfo Create(System.RuntimeTypeHandle handle) => default; } }
         namespace Introspection { public interface UnionTypeInfo : TypeInfo { System.Collections.Sequence<TypeInfo> Types { get; } } public interface IntersectionTypeInfo : TypeInfo { System.Collections.Sequence<TypeInfo> Types { get; } } }
         namespace Introspection { internal sealed class RuntimeUnionTypeInfo : RuntimeTypeInfo, UnionTypeInfo { public System.Collections.Sequence<TypeInfo> Types => default; internal static TypeInfo Create(System.RuntimeTypeHandle handle) => default; } internal sealed class RuntimeIntersectionTypeInfo : RuntimeTypeInfo, IntersectionTypeInfo { public System.Collections.Sequence<TypeInfo> Types => default; internal static TypeInfo Create(System.RuntimeTypeHandle handle) => default; } }
         namespace Introspection { public interface NominalTypeInfo : TypeInfo, MemberInfo { bool IsUnionDeclaration { get; } string FullName { get; } string Namespace { get; } } }

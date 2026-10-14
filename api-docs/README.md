@@ -2113,3 +2113,11 @@ The C# `Introspection.TupleTypeInfo` view is covered in
 [tuple introspection views](experimental-metadata.md#c-tuple-introspection-views-2026-10-14-development).
 It is a host C# API excluded from the guest RavenDoc type selection. No guest
 reference assembly or API snapshot signatures change in this slice.
+
+### Guest tuple names — 2026-10-14
+
+`TupleTypeInfo.ElementNames` is included in the matching reference assembly, XML
+and snapshot. Its ordered effective-name snapshots retain per-signature metadata
+and supply ItemN for unnamed positions. The host nullable-name API remains distinct;
+see [tuple reference](tuples.md). Focused native query and guest reflection consumers
+validate renamed equal types and nested names.

@@ -470,6 +470,57 @@ mod tuple_tests {
     }
 
     #[test]
+    fn tuple_name_queries_preserve_signature_names_without_changing_identity() {
+        let source = crate::assemble(
+            ".module TupleNames\n.entry Main\n.function Main() -> Int32\nldc.i4 0\nret\n.end",
+        )
+        .unwrap();
+        let program = crate::LoadedProgram::new(&source).unwrap();
+        let module = crate::library::link(&source, crate::library::system().unwrap()).unwrap();
+        let describe = |name: &str| {
+            program
+                .describe_type(&Type::Tuple(
+                    crate::metadata::TupleSignature::new(
+                        vec![Type::Int32, Type::Int32],
+                        vec![Some(name.into()), None],
+                    )
+                    .unwrap(),
+                ))
+                .unwrap()
+        };
+        let left = describe("left");
+        let renamed = describe("x");
+        assert_eq!(left.identity, renamed.identity);
+        for (descriptor, expected) in [(left, "left"), (renamed, "x")] {
+            let args = [crate::Value::RuntimeTypeHandle(Box::new(descriptor))];
+            for _ in 0..2 {
+                let result = crate::reflection::Query::TupleNames
+                    .invoke(&module, &args, &crate::Limits::default())
+                    .unwrap();
+                let crate::Value::Array { elements, .. } = result else {
+                    panic!("missing tuple names")
+                };
+                assert_eq!(
+                    elements,
+                    vec![
+                        crate::Value::String(expected.into()),
+                        crate::Value::String("Item2".into())
+                    ]
+                );
+            }
+        }
+        let nominal =
+            crate::Value::RuntimeTypeHandle(Box::new(program.describe_type(&Type::Int32).unwrap()));
+        assert!(
+            crate::reflection::Query::TupleNames
+                .invoke(&module, &[nominal], &crate::Limits::default())
+                .unwrap_err()
+                .to_string()
+                .contains("requires a structural tuple")
+        );
+    }
+
+    #[test]
     fn tuple_identity_preserves_elements_without_definition_tokens() {
         let source = crate::assemble(
             ".module TupleIdentity\n.entry Main\n.function Main() -> Int32\nldc.i4 0\nret\n.end",

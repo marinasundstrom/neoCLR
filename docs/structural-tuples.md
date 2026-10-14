@@ -16,11 +16,12 @@ syntax for single-element tuples. Empty source `()` retains the existing unit ru
 The assistant initially proposed mutable positional elements and value copying,
 with labels excluded from identity. The author subsequently clarified that element
 names must be real native structural metadata, not attribute-based aliases. Native
-name storage and reflection are required follow-up work. The author selected
+name storage and reflection were required follow-up work, now implemented by the
+native name and guest query slices below. The author selected
 preserved names with positional type compatibility: renaming elements must not
 break compatibility or type equality. The author clarified that tuple type equality
 follows the ordered element structure; names are metadata, not part of that equality. The positional-only node at that point did not fulfill this contract; the native
-name slice below now stores names, with compiler/guest wiring still pending. Nominal interfaces still
+name slices below now preserve names through compiler emission/import and guest reflection. Nominal interfaces still
 require declared conformance; tuple shape does not implicitly implement arbitrary
 interfaces. Synthesized positional access and deconstruction are runtime operations,
 not proof of nominal interface conformance. Boxing, equality, interface contracts,
@@ -328,3 +329,29 @@ should be validated independently on Raven main before deliberate carry-over.
 
 [Import validation](experiments/structural-tuples/raven-import-results.json) records
 the separate consumer, fixture hashes and focused checks.
+
+### Guest tuple name reflection — 2026-10-14
+
+`System.Introspection.TupleTypeInfo.ElementNames: Sequence<string>` now exposes
+ordered effective native names, using ItemN for unnamed positions. The runtime
+queries the retained signature descriptor, not its name-free resolved identity.
+Consequently equal tuple types can report different names; nested descriptors keep
+their own names. Snapshots are independent. Identity-only reconstructed handles
+report positional defaults. Unlike .NET TupleElementNamesAttribute, these names
+live directly in native signature metadata; the cost is carrying descriptive data
+separately from canonical type identity. The effective-name guest API intentionally
+does not distinguish an explicit ItemN from its default; host APIs retain that detail.
+
+This requires `experimental-tuples` and matching rebuilt source libraries. It adds
+no Runtime Contract flag or CLI encoding; ordinary .NET output is unchanged. The
+native TypeTupleNames runtime service backs the source provider. CLI reference
+bindings exist only for compiler/documentation bootstrap. The guest fixture tests
+two equal renamed native tokens, nested names, unnamed defaults and 180 repeated
+queries per signature. The fixture isolates reflection from source tuple lowering.
+
+Validation uses `target/tuple-names-libraries-v2` built with compiler
+`793219d855b17f01fb805e215968b78871eb3804`, the existing explicit primitive bootstrap,
+and the structural runtime branch. See
+[guest name evidence](experiments/structural-tuples/name-info-results.json).
+Tuple mutation, carrier-independent Raven symbols and project/catalog opt-in remain
+separate follow-ups.

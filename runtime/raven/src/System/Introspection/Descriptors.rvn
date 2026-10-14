@@ -871,6 +871,8 @@ internal class RuntimeIntersectionTypeInfo : RuntimeTypeInfo, IntersectionTypeIn
 public sealed interface TupleTypeInfo : TypeInfo {
     /// Element types in positional order, preserving duplicates and nested tuples.
     val ElementTypes: Sequence<TypeInfo> { get }
+    /// Effective element names in positional order; unnamed positions use ItemN.
+    val ElementNames: Sequence<string> { get }
 }
 
 internal class RuntimeTupleTypeInfo : RuntimeTypeInfo, TupleTypeInfo {
@@ -881,6 +883,7 @@ internal class RuntimeTupleTypeInfo : RuntimeTypeInfo, TupleTypeInfo {
     }
 
     val ElementTypes: Sequence<TypeInfo> => RuntimeServices.TypeTupleElements(ExecutionHandle)
+    val ElementNames: Sequence<string> => RuntimeServices.TypeTupleNames(ExecutionHandle)
 }
 
 public sealed interface FunctionTypeInfo : TypeInfo {

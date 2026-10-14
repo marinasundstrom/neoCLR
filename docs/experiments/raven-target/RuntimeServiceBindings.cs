@@ -177,6 +177,7 @@ static partial class RuntimeServiceBindings
             ("TypeBaseType", ["System.RuntimeTypeHandle"], "System.Option<System.Introspection.TypeInfo>"),
             ("TypeElementType", ["System.RuntimeTypeHandle"], "System.Option<System.Introspection.TypeInfo>"),
             ("TypeInterfaces", ["System.RuntimeTypeHandle"], "arrayref<System.Introspection.TypeInfo>"),
+            ("TypeTupleNames", ["System.RuntimeTypeHandle"], "arrayref<String>"),
             ("TypeTupleElements", ["System.RuntimeTypeHandle"], "arrayref<System.Introspection.TypeInfo>"),
             ("TypeConstituents", ["System.RuntimeTypeHandle"], "arrayref<System.Introspection.TypeInfo>"),
             ("TypeGenericArguments", ["System.RuntimeTypeHandle"], "arrayref<System.Introspection.TypeInfo>"),

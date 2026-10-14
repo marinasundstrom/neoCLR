@@ -30,6 +30,7 @@ pub(crate) enum Query {
     GenericArguments,
     Constituents,
     TupleElements,
+    TupleNames,
     ElementType,
     BaseType,
     Shape,
@@ -70,6 +71,7 @@ impl Query {
                 "System.Introspection.PropertyInfo[]",
             ),
             "neoCLR.Runtime.TypeInterfaces" => (Self::Interfaces, false, "System.Type[]"),
+            "neoCLR.Runtime.TypeTupleNames" => (Self::TupleNames, false, "String[]"),
             "neoCLR.Runtime.TypeTupleElements" => (Self::TupleElements, false, "System.Type[]"),
             "neoCLR.Runtime.TypeConstituents" => (Self::Constituents, false, "System.Type[]"),
             "neoCLR.Runtime.TypeGenericArguments" => {
@@ -378,6 +380,23 @@ impl Query {
                     _ => None,
                 },
             ),
+            Self::TupleNames => {
+                if !matches!(ty, Type::Tuple(_)) {
+                    return Err(Fault::new("name query requires a structural tuple"));
+                }
+                array(
+                    "String",
+                    handle.tuple_elements.iter().enumerate().map(|(index, _)| {
+                        let name = handle
+                            .tuple_element_names
+                            .get(index)
+                            .and_then(|name| name.clone())
+                            .unwrap_or_else(|| format!("Item{}", index + 1));
+                        Ok(Value::String(name.into()))
+                    }),
+                    limits,
+                )
+            }
             Self::TupleElements => {
                 if !matches!(ty, Type::Tuple(_)) {
                     return Err(Fault::new("element query requires a structural tuple"));

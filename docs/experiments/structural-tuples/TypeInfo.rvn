@@ -2,17 +2,29 @@ import System.*
 import System.Introspection.*
 
 class TupleToken { }
+class RenamedTupleToken { }
 
-func Check(info: TypeInfo) {
+func Check(info: TypeInfo, firstName: string) {
     if info.IsUnion || !info.IsValueType || !info.Equals(info) {
         System.Fail("tuple classification")
     }
     if info is TupleTypeInfo tuple {
+        var nameCount = 0
+        for name in tuple.ElementNames {
+            if nameCount == 0 && name != firstName { System.Fail("signature name lost") }
+            if nameCount == 1 && name != "Item2" { System.Fail("unnamed position") }
+            if nameCount == 2 && name != "nested" { System.Fail("nested position name") }
+            nameCount += 1
+        }
+        if nameCount != 3 { System.Fail("name arity") }
         var count = 0
         for element in tuple.ElementTypes {
             if count < 2 {
                 if !element.Equals(typeof(int)) { System.Fail("ordered repeated element") }
             } else if element is TupleTypeInfo nested {
+                for name in nested.ElementNames {
+                    if name != "text" { System.Fail("nested element name") }
+                }
                 var nestedCount = 0
                 for nestedElement in nested.ElementTypes {
                     if !nestedElement.Equals(typeof(string)) { System.Fail("nested element") }
@@ -31,11 +43,14 @@ func Check(info: TypeInfo) {
 }
 
 func Main() {
-    // The fixture replaces this token with a structural signature; source emission is pending.
+    // The fixture isolates native token reflection from source tuple emission.
     let info = typeof(TupleToken)
+    let renamed = typeof(RenamedTupleToken)
+    if !info.Equals(renamed) { System.Fail("names changed positional identity") }
     var iteration = 0
     while iteration < 180 {
-        Check(info)
+        Check(info, "left")
+        Check(renamed, "x")
         iteration += 1
     }
     if typeof(int) is TupleTypeInfo { System.Fail("nominal descriptor classified as tuple") }

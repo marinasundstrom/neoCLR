@@ -29,7 +29,7 @@ for name in ['System.Runtime']:
 result = subprocess.run(command, capture_output=True, text=True, timeout=180)
 print(result.stdout + result.stderr, end='')
 report = dict(exitCode=result.returncode, stdout=result.stdout, stderr=result.stderr,
-              fixture='One native LoadTypeToken substitution; source tuple emission remains unsupported',
+              fixture='Two native LoadTypeToken substitutions isolate descriptor reflection from source emission',
               libraryHashes={name: digest for name, digest in catalog['files'].items() if name in ['Core.dll', 'System.Runtime.dll', 'System.runtime.neox', 'NeoCLR.ClassLibrary.props']},
               bundleManifestSha256=hashlib.sha256((lib / 'bundle.json').read_bytes()).hexdigest())
 report['sha256'] = {str(path.relative_to(ROOT)): hashlib.sha256(path.read_bytes()).hexdigest() for path in [ROOT / 'target/debug/neoclr', out / 'TupleInfo.neox', Path(__file__).with_name('TypeInfo.rvn')]}
