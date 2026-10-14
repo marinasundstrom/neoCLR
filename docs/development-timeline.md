@@ -17512,4 +17512,6 @@ open, not an approved complete implementation or a permanent roadmap reprioritiz
 - **Validation:** predicate suite passes in three execution modes. Consumer results
   and remaining unrelated compiler/backend limits are retained in the
   [qualification record](validation/type-relationships-20261014/README.md).
-  Main integration is recorded when performed; no publication is implied.
+  **Outcome:** commits `c5e05ce40` and `682a377cc` were fast-forwarded into local
+  main. The separate structural-composition checkout and its uncommitted work were
+  untouched. No remote push, SDK installation or website publication was performed.
