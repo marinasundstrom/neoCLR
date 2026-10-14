@@ -8470,8 +8470,10 @@ implementations are rejected. Null definition/core arguments throw
 missing/mismatched dependencies and normal import limits throw `InvalidDataException`.
 The optional resolver supplies exact nominal dependencies without implicit loading.
 
-Intersection bounds must be resolved interfaces or non-sealed reference classes;
-sealed bounds reject before normalization, including duplicate/singleton reduction.
+Intersection bounds must be resolved interfaces or reference classes that permit subclassing.
+CLR-final classes reject before normalization, including duplicate/singleton reduction.
+Raven sealed hierarchies (closed families with permitted subtypes) remain admissible;
+these are distinct from classes closed to extension.
 Value types remain excluded. Sealed union alternatives remain supported. The
 bounded reader rejects external intersection bounds whose extendability it cannot
 establish; resolving those dependencies during reading remains a gap. This narrows

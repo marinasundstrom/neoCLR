@@ -142,7 +142,7 @@ pub(crate) fn validate(module: &Module, ty: &Type) -> Result<(), Fault> {
                     .ok_or_else(|| Fault::new("unknown compound constituent"))?;
                 if intersection_bound && def.is_sealed {
                     return Err(Fault::new(
-                        "intersection bounds must be interfaces or non-sealed reference classes",
+                        "intersection bounds must be interfaces or reference classes that permit subclassing",
                     ));
                 }
                 if def.representation == Representation::Interface

@@ -954,3 +954,24 @@ fn branching_into_compound_initialization_cannot_retype_a_local() {
             .contains("pointer type mismatch")
     );
 }
+
+
+#[cfg(feature = "experimental-compositions")]
+#[test]
+fn closed_hierarchies_are_valid_intersection_bounds() {
+    let helpers = r#"
+.type class abstract Family
+.closedhierarchy
+.end
+.interface Trait
+.closedhierarchy
+.end
+.type class Member
+.extends Family
+.implements Trait
+.end
+"#;
+    let p = program(".local intersection<Family,Trait> value\nnewobj Member\nstloc value\nldloc value\ncastclass Family\npop\nldc.i4 42", helpers);
+    p.verify().unwrap();
+    assert_eq!(p.run(Limits::default()).unwrap().value, Value::Int32(42));
+}

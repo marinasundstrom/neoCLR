@@ -9613,3 +9613,15 @@ gates preserve ordinary readers, PE/CLI rejection and authored-storage restricti
 Runtime Contract configuration and CLI carriers are unchanged. Task/async, open
 parameters and native constraints remain pending.
 [Profile and evidence](experiments/structural-compositions/README.md#wrapped-composition-metadata-and-raven-calls--2026-10-14).
+
+
+### Intersection finality terminology — 2026-10-14
+
+Intersection bounds exclude classes closed to subclassing (CLR sealed/final), not
+Raven `sealed` hierarchies. Raven `IsClosed` and native `is_sealed` encode finality;
+`IsSealedHierarchy`/`is_closed_hierarchy` encode the separate permitted-subtype
+contract. Open and closed hierarchy roots and interfaces remain admissible; their
+normal inheritance restrictions remain in force. Regression tests cover this
+existing distinction. No Runtime Contract, CLI encoding or emission behavior changes.
+The paired composition branches remain experimental; this does not enable the
+feature on main or in published bundles.

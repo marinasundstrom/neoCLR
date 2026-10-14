@@ -17428,3 +17428,20 @@ open, not an approved complete implementation or a permanent roadmap reprioritiz
 - This is interpreter/native-IL evidence. Raven source-authored composition signatures,
   async/await integration and TaskOutcome carrier access remain open; no new published
   support is implied. [Scope and checks](experiments/structural-compositions/README.md#real-task-union-completion-and-result-delivery--2026-10-14).
+
+
+### 2026-10-14 — Intersection finality terminology clarified
+
+- Author clarified that “sealed” in the intersection restriction meant C#/.NET
+  non-inheritability, not Raven sealed hierarchies. Both open hierarchies and sealed
+  hierarchies with permitted subtypes should be allowed; classes closed to extension
+  should be rejected.
+- Assistant inspected the compiler, runtime and metadata reader. Their checks
+  already distinguish final classes from closed families. Added regression coverage
+  for Raven sealed class/interface roots and native closed hierarchies, and clarified
+  diagnostics/documentation without changing the acceptance rule. Existing leaf
+  rejection stays in place. This corrects terminology in earlier notes rather than
+  asserting the author intended to exclude Raven sealed hierarchies.
+- The next compiler-consumption prerequisite remains explicit local storage for
+  imported composition results; this clarification was addressed before opening it.
+  [Clarified contract](experiments/structural-compositions/README.md#clarification-final-classes-versus-sealed-hierarchies--2026-10-14).

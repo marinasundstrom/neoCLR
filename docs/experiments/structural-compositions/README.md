@@ -979,3 +979,26 @@ test was rerun separately and passed for all three alternatives. The preceding
 runtime slice also passed 34 composition checks, nine initialization controls and
 three default-off checks. No website build or public API snapshot update is required:
 this adds gated runtime admission and test evidence, with no public API changes.
+
+
+## Clarification: final classes versus sealed hierarchies — 2026-10-14
+
+The author clarified that the excluded intersection operands are classes sealed in
+the C#/.NET sense: classes closed to subclassing. Raven's `sealed` keyword instead
+creates a closed hierarchy with permitted subtypes, and such hierarchy roots remain
+valid operands, alongside open hierarchies. Sealed hierarchy interfaces are also
+valid bounds. Their existing permitted-subtype restrictions still apply; composition
+does not authorize otherwise prohibited inheritance.
+
+The implementation already distinguishes these concepts: Raven's intersection
+factory checks `IsClosed`, not `IsSealedHierarchy`; neoCLR checks `is_sealed`, not
+`is_closed_hierarchy`. The host reader similarly separates sealed-class metadata
+from closed-family metadata. No acceptance rule is changed by this clarification.
+New compiler/runtime coverage accepts closed hierarchy roots and still rejects
+non-inheritable leaves. Diagnostic wording now says “permit subclassing” to avoid
+confusing the Raven keyword with CLR finality. Earlier references to “non-sealed”
+in the experiment's intersection policy mean non-final in the CLR sense.
+
+Validation: 35 composition runtime tests and 12 Raven intersection symbol tests
+pass, including rejection of imported System.String as a CLR-final bound. The
+compiler build and API documentation snapshot checks also pass.
