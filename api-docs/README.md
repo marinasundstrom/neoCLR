@@ -2018,8 +2018,8 @@ relationships, .NET differences and compiler qualification limits.
 
 The experimental Rust `TypeIdentity::Union`/`Intersection` variants are covered in
 the [manual runtime hosting reference](runtime-hosting.md#structural-composition-identity-keys-development-2026-10-14).
-They are host-only, outside the guest RavenDoc selection; guest composition
-descriptors remain gated and the guest API snapshot is unchanged.
+They are host-only, outside the guest RavenDoc selection; guest composition descriptors are now covered by the experimental
+UnionTypeInfo and IntersectionTypeInfo reference entries.
 
 Host `TypeDescriptor.constituents` and composition-aware `LoadedProgram::describe_type`
 are documented in the [runtime hosting reference](runtime-hosting.md#host-composition-descriptors-development-2026-10-14).

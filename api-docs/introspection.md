@@ -255,8 +255,8 @@ openness. A closed family reports IsClosedHierarchy, while an ordinary leaf repo
 neither IsOpen nor IsClosedHierarchy. IsUnion is reserved for structural union
 identity. Nominal union declarations (including constructed Option/Result) are
 identified separately by NominalTypeInfo.IsUnionDeclaration; cases return false.
-This development change replaces the former nominal meaning of IsUnion. Guest
-structural descriptor construction remains gated on the experimental branch.
+This development change replaces the former nominal meaning of IsUnion. Guest structural descriptors are available in the experimental interpreter through
+UnionTypeInfo and IntersectionTypeInfo.
 ClosedHierarchy describes the direct family; permitted open subtypes may themselves
 have descendants. These are descriptive metadata queries, not added raw-IL enforcement.
 
@@ -456,3 +456,25 @@ This host-only helper supports AOT target selection and is not a guest reflectio
 member. AOT keeps direct base calls separate from virtual dispatch, matching CLR
 call/callvirt semantics. Native metadata's `TypeDef.is_sealed` now means the type
 cannot be inherited; verification checks all definitions, even unreachable ones.
+
+## Structural composition descriptors (experimental, 2026-10-14)
+
+`UnionTypeInfo : TypeInfo` and `IntersectionTypeInfo : TypeInfo` each expose
+`Types: Sequence<TypeInfo>`. This is a snapshot of the direct alternatives or bounds
+in normalized signature order. Mixed nested compositions retain their descriptor
+kind; closed generic constituents retain their generic arguments. Constituents are
+not generic arguments of the composition itself. Duplicate-only compositions
+normalize to the surviving type and consequently its ordinary descriptor.
+
+These interfaces extend neoCLR's signature-level introspection model; .NET has no
+corresponding structural union/intersection TypeInfo. They have structural identity,
+not a nominal declaration or definition token. Equality and assignment use the
+runtime's existing composition rules. IsUnion is true only for UnionTypeInfo;
+nominal declarations use NominalTypeInfo.IsUnionDeclaration.
+
+Availability requires `experimental-compositions` and the matching source-built
+System.Runtime library. The interpreter admits closed reference compositions;
+open generics and JIT/AOT composition execution remain outside this POC.
+Member, hierarchy and custom-attribute queries on direct compositions fault
+explicitly until their semantics are implemented. No fabricated nominal member set
+is returned. The obsolete CLI bootstrap remains unqualified for these providers.

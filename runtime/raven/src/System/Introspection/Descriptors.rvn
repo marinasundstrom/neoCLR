@@ -461,12 +461,12 @@ public sealed interface TypeInfo : EquatableTo<TypeInfo> {
     func GetProperties(flags: BindingFlags) -> Sequence<PropertyInfo>
 }
 
-internal class RuntimeTypeInfo : TypeInfo {
+internal open class RuntimeTypeInfo : TypeInfo {
     private field Handle: RuntimeTypeHandle
 
     internal val ExecutionHandle: RuntimeTypeHandle => Handle
 
-    private init(handle: RuntimeTypeHandle) {
+    protected init(handle: RuntimeTypeHandle) {
         Handle = handle
     }
 
@@ -476,6 +476,12 @@ internal class RuntimeTypeInfo : TypeInfo {
         }
         if RuntimeServices.TypeShape(handle, 13) {
             return RuntimeFunctionTypeInfo.FromHandle(handle)
+        }
+        if RuntimeServices.TypeShape(handle, 14) {
+            return RuntimeUnionTypeInfo.Create(handle)
+        }
+        if RuntimeServices.TypeShape(handle, 15) {
+            return RuntimeIntersectionTypeInfo.Create(handle)
         }
         return RuntimeTypeInfo(handle)
     }
@@ -824,6 +830,38 @@ public class CustomAttributeData {
         }
         return result
     }
+}
+
+/// A structural union, accepting any one of its constituent types.
+public sealed interface UnionTypeInfo : TypeInfo {
+    /// Direct constituent types in normalized signature order.
+    val Types: Sequence<TypeInfo> { get }
+}
+
+/// A structural intersection, requiring all of its constituent types.
+public sealed interface IntersectionTypeInfo : TypeInfo {
+    /// Direct constituent types in normalized signature order.
+    val Types: Sequence<TypeInfo> { get }
+}
+
+internal class RuntimeUnionTypeInfo : RuntimeTypeInfo, UnionTypeInfo {
+    private init(handle: RuntimeTypeHandle): base(handle) { }
+
+    internal static func Create(handle: RuntimeTypeHandle) -> TypeInfo {
+        return RuntimeUnionTypeInfo(handle)
+    }
+
+    val Types: Sequence<TypeInfo> => RuntimeServices.TypeConstituents(ExecutionHandle)
+}
+
+internal class RuntimeIntersectionTypeInfo : RuntimeTypeInfo, IntersectionTypeInfo {
+    private init(handle: RuntimeTypeHandle): base(handle) { }
+
+    internal static func Create(handle: RuntimeTypeHandle) -> TypeInfo {
+        return RuntimeIntersectionTypeInfo(handle)
+    }
+
+    val Types: Sequence<TypeInfo> => RuntimeServices.TypeConstituents(ExecutionHandle)
 }
 
 public sealed interface FunctionTypeInfo : TypeInfo {

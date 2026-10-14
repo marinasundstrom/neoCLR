@@ -104,14 +104,14 @@ Compositions nested inside admitted closed reference generic arguments retain th
 keys. Invalid, inaccessible, unresolved, open or disabled compositions return Fault;
 existing sealed-bound rules apply before intersection normalization. Keys belong to
 one resolved build and are not persistent cross-build identifiers. The new enum
-variants require downstream exhaustive Rust matches to be updated. No serialized
-metadata format or guest public API changes.
+variants require downstream exhaustive Rust matches to be updated. This identity change does not alter the serialized metadata format.
 
 A composition has no nominal definition row or declaring type. Internal definition
 token lookup returns no definition (token zero), never a constituent's token.
-Guest composition TypeInfo construction remains unsupported, including
-composition-bearing wrappers. Host descriptors are supported as described below.
-Full guest introspection remains intended follow-up work. These host Rust APIs are
+Guest construction now selects UnionTypeInfo/IntersectionTypeInfo in the experimental
+interpreter, including nested descriptors inside admitted generic wrappers. See the
+[guest contract](introspection.md#structural-composition-descriptors-experimental-2026-10-14).
+Member and hierarchy queries remain unsupported for direct compositions. These host Rust APIs are
 excluded from the guest RavenDoc selection and documented here.
 
 ### Host composition descriptors (development, 2026-10-14)

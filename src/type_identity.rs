@@ -62,13 +62,6 @@ pub(crate) fn describe_host(module: &Module, ty: &Type) -> Result<TypeDescriptor
 // Introspection follows already validated metadata, including transitive signatures.
 // It does not grant permission to name those types in executable instructions.
 pub(crate) fn describe_loaded(module: &Module, normalized: &Type) -> Result<TypeDescriptor, Fault> {
-    // Host inspection supports compositions separately. Guest descriptors must not
-    // materialize them through the ordinary nominal/provider fallback.
-    if crate::compositions::contains(normalized) {
-        return Err(Fault::new(
-            "compound reflection descriptors are not supported in this slice",
-        ));
-    }
     describe_validated(module, normalized)
 }
 
@@ -361,9 +354,9 @@ mod composition_tests {
             Type::Union(vec![Type::from_name("Left"), Type::from_name("Right")]),
             Type::Intersection(vec![Type::from_name("Left"), Type::from_name("Right")]),
         ] {
-            // Guest handles/providers remain gated even though host snapshots work.
-            assert!(describe(&module, &ty).is_err());
-            assert!(describe_loaded(&module, &ty).is_err());
+            // Host and guest handles preserve the same structural snapshot.
+            assert!(describe(&module, &ty).is_ok());
+            assert!(describe_loaded(&module, &ty).is_ok());
             assert!(describe_host(&module, &ty).is_ok());
             let descriptor = describe_host(&module, &ty).unwrap();
             let result = crate::reflection::Query::Shape
@@ -377,6 +370,32 @@ mod composition_tests {
                 )
                 .unwrap();
             assert_eq!(result, crate::Value::Boolean(matches!(ty, Type::Union(_))));
+            let descriptor = describe(&module, &ty).unwrap();
+            let args = [crate::Value::RuntimeTypeHandle(Box::new(
+                descriptor.clone(),
+            ))];
+            let constituents = crate::reflection::Query::Constituents
+                .invoke(&module, &args, &crate::Limits::default())
+                .unwrap();
+            let crate::Value::Array { elements, .. } = constituents else {
+                panic!("missing constituents")
+            };
+            assert_eq!(elements.len(), 2);
+            assert_eq!(descriptor.constituents.len(), 2);
+            assert!(descriptor.generic_arguments.is_empty());
+            for query in [
+                crate::reflection::Query::Fields,
+                crate::reflection::Query::Interfaces,
+                crate::reflection::Query::BaseType,
+            ] {
+                assert!(
+                    query
+                        .invoke(&module, &args, &crate::Limits::default())
+                        .unwrap_err()
+                        .to_string()
+                        .contains("composition member and hierarchy")
+                );
+            }
             let identity = resolve(&module, &ty).unwrap();
             assert_eq!(
                 crate::reflection::from_identity(&module, &identity).unwrap(),

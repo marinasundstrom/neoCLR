@@ -252,6 +252,9 @@ pub(crate) fn validate_surface(module: &Module) -> Result<(), Fault> {
         }
         for (index, op) in function.body.iter().enumerate() {
             match op {
+                Op::LoadTypeToken(ty) if contains(ty) => {
+                    crate::vm::check_type(ty, module)?;
+                }
                 Op::LocalAddress(i) if function.locals.get(*i).is_some_and(contains) => {
                     // Admit the compiler's immediate local-default idiom only.
                     // No instruction can retain or forward this transient address.

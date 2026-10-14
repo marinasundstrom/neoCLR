@@ -1,0 +1,64 @@
+import System.*
+import System.Collections.*
+import System.Introspection.*
+
+interface Left { }
+interface Right { }
+interface Third { }
+class UnionToken { }
+class IntersectionToken { }
+class NestedToken { }
+class Box<T> { }
+
+func Check(info: TypeInfo, unionType: bool) {
+    if info.IsUnion != unionType { System.Fail("classification") }
+    if info is UnionTypeInfo unionInfo {
+        CheckTypes(unionInfo.Types)
+    } else if info is IntersectionTypeInfo intersectionInfo {
+        CheckTypes(intersectionInfo.Types)
+    } else {
+        System.Fail("missing structural descriptor")
+    }
+    if !info.AssignableTo(info) || !info.Equals(info) {
+        System.Fail("composition identity")
+    }
+}
+
+func CheckTypes(types: Sequence<TypeInfo>) {
+    var count = 0
+    for item in types {
+        if !item.Equals(item) { System.Fail("constituent identity") }
+        count += 1
+    }
+    if count != 2 {
+        System.Fail("composition identity")
+    }
+}
+
+func Main() {
+    // The fixture replaces these placeholder type tokens with native compositions.
+    let unionInfo = typeof(UnionToken)
+    let intersectionInfo = typeof(IntersectionToken)
+    Check(unionInfo, true)
+    Check(intersectionInfo, false)
+    if !intersectionInfo.AssignableTo(unionInfo) { System.Fail("relationship") }
+    let nested = typeof(NestedToken)
+    Check(nested, true)
+    var nestedCount = 0
+    for item in ((UnionTypeInfo)nested).Types {
+        if item is IntersectionTypeInfo {
+            Check(item, false)
+            nestedCount += 1
+        }
+    }
+    if nestedCount != 1 { System.Fail("nested descriptor") }
+    let wrapper = typeof(Box<UnionToken>)
+    Check(wrapper.GetGenericArgument(0), true)
+    var index = 0
+    while index < 180 {
+        Check(unionInfo, true)
+        Check(intersectionInfo, false)
+        index += 1
+    }
+    Console.WriteLine("Composition descriptors passed")
+}

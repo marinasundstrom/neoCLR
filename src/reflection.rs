@@ -28,6 +28,7 @@ pub(crate) enum Query {
     Properties,
     Interfaces,
     GenericArguments,
+    Constituents,
     ElementType,
     BaseType,
     Shape,
@@ -68,6 +69,7 @@ impl Query {
                 "System.Introspection.PropertyInfo[]",
             ),
             "neoCLR.Runtime.TypeInterfaces" => (Self::Interfaces, false, "System.Type[]"),
+            "neoCLR.Runtime.TypeConstituents" => (Self::Constituents, false, "System.Type[]"),
             "neoCLR.Runtime.TypeGenericArguments" => {
                 (Self::GenericArguments, false, "System.Type[]")
             }
@@ -131,6 +133,22 @@ impl Query {
             return Err(Fault::new("reflection requires type handle"));
         };
         let ty = from_identity(module, &handle.identity)?;
+        if crate::compositions::is_compound(&ty)
+            && matches!(
+                self,
+                Self::Fields
+                    | Self::Methods
+                    | Self::Constructors
+                    | Self::Properties
+                    | Self::Interfaces
+                    | Self::BaseType
+                    | Self::CustomAttributes
+            )
+        {
+            return Err(Fault::new(
+                "composition member and hierarchy queries are not supported",
+            ));
+        }
         let argument = match args.get(1) {
             Some(Value::Int32(n)) => *n,
             None => 0,
@@ -200,6 +218,7 @@ impl Query {
                 12 => matches!(handle.identity, TypeIdentity::Definition { .. }),
                 13 => matches!(handle.identity, TypeIdentity::Function { .. }),
                 14 => matches!(handle.identity, TypeIdentity::Union(_)),
+                15 => matches!(handle.identity, TypeIdentity::Intersection(_)),
                 8 => definition.is_some_and(|d| {
                     (d.is_reference_type || d.representation == Representation::Interface)
                         && !d.is_sealed
@@ -355,6 +374,21 @@ impl Query {
                     _ => None,
                 },
             ),
+            Self::Constituents => {
+                if !crate::compositions::is_compound(&ty) {
+                    return Err(Fault::new(
+                        "constituent query requires a structural composition",
+                    ));
+                }
+                array(
+                    type_contract(module),
+                    handle
+                        .constituents
+                        .iter()
+                        .map(|d| Ok(snapshot_type(module, d.clone()))),
+                    limits,
+                )
+            }
             Self::GenericArguments => array(
                 type_contract(module),
                 handle
@@ -1438,6 +1472,12 @@ pub(crate) fn materialize(
                             } else if matches!(fields.first(), Some(Value::RuntimeTypeHandle(handle)) if matches!(handle.identity, TypeIdentity::Function { .. }))
                             {
                                 "System.Introspection.RuntimeFunctionTypeInfo"
+                            } else if matches!(fields.first(), Some(Value::RuntimeTypeHandle(handle)) if matches!(handle.identity, TypeIdentity::Union(_)))
+                            {
+                                "System.Introspection.RuntimeUnionTypeInfo"
+                            } else if matches!(fields.first(), Some(Value::RuntimeTypeHandle(handle)) if matches!(handle.identity, TypeIdentity::Intersection(_)))
+                            {
+                                "System.Introspection.RuntimeIntersectionTypeInfo"
                             } else {
                                 "System.Introspection.RuntimeTypeInfo"
                             }

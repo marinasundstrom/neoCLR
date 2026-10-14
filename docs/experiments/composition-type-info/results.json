@@ -1,0 +1,13 @@
+{
+  "exitCode": 0,
+  "stdout": "Composition descriptors passed\n",
+  "stderr": "",
+  "fixture": "Four native token substitutions; compiler source structural typeof pending",
+  "sha256": {
+    "target/debug/neoclr": "9fecdfb66cf6dc24077ae6f7c89ff7ee7d8b5a74e6f881cc8f6dda8f1275a2de",
+    "target/composition-info-consumer/CompositionInfo.neox": "88a5d8797c2b74b6fffd6c7f82f9f8367ca816ae8efdb42f0d1f0f25fb185c62",
+    "target/composition-info-libraries-v2/System.Runtime.dll": "f5c790a1aeb5f56d83a8b5903555a0889c1d84f19f9cc7158026531d6c2532c3",
+    "target/composition-info-libraries-v2/System.runtime.neox": "98a1ae1da85387c87746957e83a4015eb59d0566539a915c69f168d2b511b190",
+    "docs/experiments/composition-type-info/Main.rvn": "470fdda9ff85a06e7d62fdf998277b459e7313fba74d372b01a920b603028f40"
+  }
+}

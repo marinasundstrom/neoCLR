@@ -261,17 +261,17 @@ fn signature_name(ty: &Type) -> Result<String, Error> {
     })
 }
 
-fn shape(source: &neoclr::Module, ty: &Type) -> Result<[bool; 15], Error> {
+fn shape(source: &neoclr::Module, ty: &Type) -> Result<[bool; 16], Error> {
     use neoclr::metadata::Representation;
     let Some(d) = source.type_definition(ty) else {
         if matches!(ty, Type::Function(_)) {
-            let mut result = [false; 15];
+            let mut result = [false; 16];
             result[11] = visible(source, ty);
             result[13] = true;
             return Ok(result);
         }
         if matches!(ty, Type::ArrayRef(_)) {
-            let mut result = [false; 15];
+            let mut result = [false; 16];
             result[0] = true;
             result[11] = visible(source, ty);
             return Ok(result);
@@ -279,7 +279,7 @@ fn shape(source: &neoclr::Module, ty: &Type) -> Result<[bool; 15], Error> {
         return Err("native shape queries require source declaration".into());
     };
     let interface = d.representation == Representation::Interface;
-    let mut result = [false; 15];
+    let mut result = [false; 16];
     result[0] = matches!(ty, Type::ArrayRef(_));
     result[3] = interface;
     result[5] = d.is_abstract || interface;
@@ -447,7 +447,7 @@ pub fn bind_queries(
         {
             shape(source, &semantic_type)?
         } else {
-            [false; 15]
+            [false; 16]
         };
         let metadata_token = if queries
             .iter()
@@ -540,7 +540,7 @@ pub fn bind_queries(
                 Op::BranchFalse(5),
                 Op::Fault("unknown type shape query".into()),
                 Op::Arg(1),
-                Op::Int(15),
+                Op::Int(16),
                 Op::Less,
                 Op::BranchTrue(10),
                 Op::Fault("unknown type shape query".into()),

@@ -4679,3 +4679,9 @@ Author correction reserves TypeInfo.IsUnion for structural identity and separate
 nominal detection as NominalTypeInfo.IsUnionDeclaration. Existing nominal consumers
 are migrated; broader nominal-helper grouping and guest structural providers remain
 follow-up work. [Classification correction](experiments/structural-compositions/README.md#author-correction-structural-isunion--2026-10-14).
+
+
+Guest UnionTypeInfo and IntersectionTypeInfo now expose direct constituent snapshots
+in the experimental interpreter. This supersedes the guest-provider gates in the
+preceding checkpoints. Member/hierarchy queries, source structural typeof emission
+and backend support remain open. [Descriptor probe](experiments/composition-type-info/README.md).

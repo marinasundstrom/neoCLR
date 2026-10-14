@@ -17547,3 +17547,16 @@ open, not an approved complete implementation or a permanent roadmap reprioritiz
   structural/nominal checks and native lowering regression coverage. Retained
   [evidence](validation/union-classification-20261014/results.json) records artifact
   hashes and the separately blocked legacy CLI bootstrap.
+
+
+### 2026-10-14 — Dedicated structural descriptor interfaces
+
+- **Author:** requested “UnionTypeInfo and IntersectionTypeInfo”, following the
+  separation of structural IsUnion from nominal declaration checks.
+- **Assistant implementation:** add both TypeInfo subinterfaces with Types for
+  direct constituents, native snapshot providers and interpreter type tokens.
+  Preserve runtime structural identity and existing assignment semantics.
+- **Boundary:** member/hierarchy introspection remains explicit unsupported work;
+  Raven typeof still emits nominal union carriers, so the executable probe substitutes
+  native tokens explicitly. This is experimental runtime support, not full compiler
+  or backend completion. See [the probe](experiments/composition-type-info/README.md).

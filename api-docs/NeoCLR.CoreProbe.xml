@@ -1046,7 +1046,7 @@
     <member name="P:System.Introspection.TypeInfo.IsAbstract"><summary>Tests whether the represented type is abstract.</summary></member>
     <member name="P:System.Introspection.TypeInfo.IsOpen"><summary>Tests whether the represented class or interface permits unrestricted inheritance or implementation.</summary><remarks>False for non-inheritable leaves, declared closed families, values, arrays and reference/pointer type expressions. Describes retained declaration metadata, not accessibility or generic openness.</remarks></member>
     <member name="P:System.Introspection.TypeInfo.IsClosedHierarchy"><summary>Tests whether the represented declaration defines a closed family of direct derived types or implementations.</summary><remarks>Distinct from a non-inheritable leaf and from a nominal union. Does not enumerate permitted types or guarantee transitive closure through an open permitted subtype.</remarks></member>
-    <member name="P:System.Introspection.TypeInfo.IsUnion"><summary>Tests whether the represented type has structural union identity.</summary><remarks>Nominal union declarations and their cases return false. Guest structural composition descriptor construction remains experimental and gated.</remarks></member>
+    <member name="P:System.Introspection.TypeInfo.IsUnion"><summary>Tests whether the represented type has structural union identity.</summary><remarks>Nominal union declarations and their cases return false. Guest UnionTypeInfo and IntersectionTypeInfo construction requires the experimental interpreter and matching source library. Member and hierarchy queries remain unsupported.</remarks></member>
     <member name="P:System.Introspection.NominalTypeInfo.IsUnionDeclaration"><summary>Tests whether this nominal declaration carries the union metadata marker.</summary><remarks>Constructed generic types retain their declaration classification; individual union cases are not union declarations.</remarks></member>
     <member name="P:System.Introspection.TypeInfo.IsEnum"><summary>Tests whether this describes an enum.</summary></member>
     <member name="P:System.Introspection.TypeInfo.IsValueType"><summary>Tests whether the represented type has value semantics.</summary></member>
@@ -3575,5 +3575,9 @@ Connects only to 127.0.0.1. No TLS, password authentication, pooling or automati
     </member>
 
 <member name="M:System.Data.Json.JsonSerializerOptions.#ctor"><summary>Creates compact-output formatting options.</summary></member>
+    <member name="T:System.Introspection.UnionTypeInfo"><summary>A structural union accepting any of its constituent types.</summary><remarks>Experimental interpreter support; not a nominal union declaration.</remarks></member>
+    <member name="P:System.Introspection.UnionTypeInfo.Types"><summary>Returns a snapshot of the direct alternatives in normalized signature order.</summary><remarks>Nested intersections remain separate descriptors. Constituents are not generic arguments.</remarks></member>
+    <member name="T:System.Introspection.IntersectionTypeInfo"><summary>A structural intersection requiring all of its constituent types.</summary><remarks>Experimental interpreter support; bounds must be interfaces or reference classes open to subclassing.</remarks></member>
+    <member name="P:System.Introspection.IntersectionTypeInfo.Types"><summary>Returns a snapshot of the direct bounds in normalized signature order.</summary></member>
 </members>
 </doc>

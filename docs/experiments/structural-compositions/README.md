@@ -1288,3 +1288,12 @@ execution support is inferred from these tests.
 The migrated route mapper also executes successfully. Both consumer outputs and
 matching source/runtime/library hashes are retained in
 [the classification evidence](../../validation/union-classification-20261014/results.json).
+
+## Guest composition descriptors — 2026-10-14
+
+Superseding the host-only checkpoints above, experimental interpreter handles now
+construct UnionTypeInfo and IntersectionTypeInfo. Types returns normalized direct
+constituents, including nested descriptors; generic wrappers expose structural
+arguments through existing TypeInfo APIs. Member and hierarchy queries are still
+explicitly unsupported. The [native-source probe](../composition-type-info/README.md)
+separates runtime support from the remaining Raven structural typeof emission gap.

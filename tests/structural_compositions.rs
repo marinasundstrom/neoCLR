@@ -117,7 +117,6 @@ fn unsupported_shapes_and_address_operations_fail_admission() {
     }
     for body in [
         ".local union<Left,Right> value\nldloca value\npop",
-        "ldtoken union<Left,Right>\npop",
         "sizeof union<Left,Right>\npop",
         "ldc.i4 1\nnewarr union<Left,Right>\nldc.i4 0\nldelema union<Left,Right>\npop",
         "ldc.i4 1\narray.alloc union<Left,Right>\npop",
@@ -148,7 +147,7 @@ fn serialized_compound_feature_boundary_cannot_be_bypassed_by_parser_omission() 
     main.locals = vec![ty.clone()];
     if cfg!(feature = "experimental-compositions") {
         main.body = vec![
-            Instruction::LoadTypeToken(ty),
+            Instruction::SizeOf(ty),
             Instruction::Pop,
             Instruction::Int(0),
             Instruction::Return,
@@ -594,7 +593,7 @@ ret
 fn wrapper_method_substitution_checks_transitive_bodies() {
     for operation in [
         ".local T temporary\nldloca temporary\npop\n",
-        "ldtoken T\npop\n",
+        "sizeof T\npop\n",
     ] {
         let methods = WRAPPER_METHODS.replace(
             ".method instance Get() -> T\n",
@@ -1010,5 +1009,15 @@ fn reference_class_composition_fields_preserve_payload_and_reject_addresses() {
             assert!(bad.verify().is_err(), "{operation}");
             assert!(bad.run(Limits::default()).is_err(), "{operation}");
         }
+    }
+}
+
+#[cfg(feature = "experimental-compositions")]
+#[test]
+fn composition_type_tokens_are_runtime_known() {
+    for signature in ["union<Left,Right>", "intersection<Left,Right>"] {
+        let p = program(&format!("ldtoken {signature}\npop\nldc.i4 42"), "");
+        p.verify().unwrap();
+        assert_eq!(p.run(Limits::default()).unwrap().value, Value::Int32(42));
     }
 }

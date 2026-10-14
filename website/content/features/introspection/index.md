@@ -97,5 +97,7 @@ The tour covers type identity, modules, metadata tokens and member classificatio
 
 On the structural-type experimental branch, `TypeInfo.IsUnion` is reserved for
 structural unions. Use `NominalTypeInfo.IsUnionDeclaration` to detect nominal Raven
-union declarations. Guest structural descriptors remain under development; this
-change is not part of the published release.
+union declarations. Experimental UnionTypeInfo and IntersectionTypeInfo expose direct constituent
+snapshots in the interpreter. Member/hierarchy queries and compiler structural
+type-token emission remain under development. This is not part of the published
+release; see the [descriptor contract](/docs/introspection.html#structural-composition-descriptors-experimental-2026-10-14).

@@ -8,7 +8,14 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-14
 
-- Reserve TypeInfo.IsUnion for structural unions, following author clarification. Move nominal union-marker classification to NominalTypeInfo.IsUnionDeclaration and migrate nominal consumers. This changes the development API meaning of IsUnion; nominal callers must use the separate declaration helper. Resolve nominal markers through retained source identity after native linking. Guest structural descriptors remain gated.
+- Add experimental UnionTypeInfo and IntersectionTypeInfo with direct constituent
+  snapshots, shared identity/assignment behavior and native interpreter descriptor
+  construction. Keep direct composition member/hierarchy queries explicitly
+  unsupported; structural typeof source emission and JIT/AOT remain follow-up work.
+  Refresh API references and add a native-source descriptor probe.
+
+
+- Reserve TypeInfo.IsUnion for structural unions, following author clarification. Move nominal union-marker classification to NominalTypeInfo.IsUnionDeclaration and migrate nominal consumers. This changes the development API meaning of IsUnion; nominal callers must use the separate declaration helper. Resolve nominal markers through retained source identity after native linking. Guest structural descriptors are supplied by the subsequent descriptor slice above.
 
 - Connect the experimental shared type-relationship core to existing union/intersection assignment rules. Validate composition operands before identity/Object shortcuts, preserve generic wrapper invariance and keep strict subclass queries nominal. Guest composition descriptors and JIT/AOT support remain gated. Add opt-in resolved Union/Intersection identity keys with constituent module/revision/generic identity, normalization and no fabricated nominal definition token. Rust exhaustive matches must handle the new enum variants; guest descriptors remain unsupported. Add host composition descriptors with recursive constituents separate from generic arguments, including closed wrappers and generic bounds. TypeDescriptor literal constructors must initialize the new constituents field. Guest type-token/provider gates remain in place; nominal Raven IsUnion semantics are unchanged.
 

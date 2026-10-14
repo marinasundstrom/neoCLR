@@ -9766,3 +9766,22 @@ Type-versus-TypeInfo bootstrap mismatch, then missing ArrayReflection slice inpu
 and obsolete stream capability validation when tried with temporary adaptations.
 Those adaptations were reverted; no stale output is represented as freshly generated.
 Qualification uses matching source-built native libraries and migrated consumers.
+
+## Composition descriptor interfaces — 2026-10-14 experimental branch
+
+UnionTypeInfo and IntersectionTypeInfo extend TypeInfo with a Types sequence of
+direct constituent descriptors. The source providers share RuntimeTypeInfo's handle
+and relationship semantics. Internal TypeConstituents returns scoped TypeInfo array
+snapshots; shape slot 15 identifies intersections (14 remains structural union).
+Use matching native System.Runtime sources and the experimental interpreter.
+There is no carrier/token invention: compound handles retain signature identities.
+Member, hierarchy and attribute queries explicitly fault for direct compositions.
+
+The native consumer uses explicit placeholder-token substitution, because current
+Raven typeof(A | B) emits a nominal Union<A,B> token. This does not establish source
+authored structural typeof support. Native metadata/compiler token emission is the
+replacement; compiler and runtime maintainers own that integration. The ordinary
+.NET target remains unchanged. Legacy descriptor bootstrap remains blocked by the
+previously recorded stream/array/typeof bridge gaps; its providers are not qualified.
+JIT/AOT composition execution remains gated. See the
+[probe](experiments/composition-type-info/README.md) for reproducible validation.
