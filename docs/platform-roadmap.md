@@ -4721,3 +4721,7 @@ Broader generic/target/backend support remains outside this experimental slice.
 separate Raven library/consumer execution returns 42 using local intersection bounds
 that inherit imported interfaces. External bound authoring remains pending.
 [Evidence](experiments/composition-constraints/README.md).
+
+2026-10-14 closed constructed imported trait targets now pass native structural proof
+and Raven execution (42). Exact type arguments are required; weaker unions reject.
+See the [constraint evidence](experiments/composition-constraints/README.md).

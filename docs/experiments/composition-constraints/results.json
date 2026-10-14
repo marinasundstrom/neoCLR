@@ -196,5 +196,20 @@
       "metadata --open-constrained-calls nominal regression",
       "python3 scripts/build-api-docs.py --check"
     ]
+  },
+  "constructedGenericBodyTraits": {
+    "date": "2026-10-14",
+    "consumer": "ConstructedTraits.neox",
+    "interpreterExitCode": 42,
+    "checks": [
+      "metadata authoring: exact constructed guarantee, weak union rejection, mismatched type argument rejection",
+      "nominal open constrained call regression",
+      "Raven emission and separate native library execution",
+      "API snapshot check"
+    ],
+    "sha256": {
+      "target/source-constraints/ConstructedTraits.neox": "a90773fe1d25bc9bacf576bd5e407de17cf1f2ee93f38a56db90316af0c50040",
+      "target/source-constraints/TraitLibrary.neox": "44808cb8123a09cdbf159e0f2185b3544ebc9b3c87571c7fb64255766729e067"
+    }
   }
 }

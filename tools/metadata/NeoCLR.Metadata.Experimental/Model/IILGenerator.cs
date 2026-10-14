@@ -278,7 +278,7 @@ public interface IILGenerator
     /// <exception cref="ArgumentNullException">An operand is null.</exception>
     /// <exception cref="ArgumentException">Foreign target, unsupported method or missing interface bound.</exception>
     void CallConstrained(SignatureType implementingType, ImportedMethodReference target);
-    /// <summary>Calls a constructed external interface through a bounded method parameter; instance calls consume a managed receiver address.</summary>
+    /// <summary>Calls a constructed external interface through a bounded method parameter; structural bounds must guarantee the exact construction and instance calls consume a managed receiver address.</summary>
     /// <param name="implementingType">In-scope method parameter whose bounds admit the constructed interface.</param>
     /// <param name="target">Output-owned constructed static or instance abstract interface reference without method arguments.</param>
     /// <exception cref="ArgumentNullException">An operand is null.</exception>

@@ -441,7 +441,9 @@ internal sealed class MethodILGenerator(MethodBuilder bodyBuilder) : IILGenerato
         ArgumentNullException.ThrowIfNull(implementingType);
         if (!ReferenceEquals(target.Definition.Owner, caller.Assembly) || !target.Definition.IsInterfaceMethod || target.MethodArguments.Count != 0 ||
             implementingType.MethodParameterIndex is not { } index || index >= caller.Signature.GenericParameterNames.Count ||
-            !caller.InterfaceConstraints.Any(c => c.ParameterIndex == index && caller.Assembly.SatisfiesConstrainedBound(caller.Definition.ConstraintSignature(c.InterfaceType), target.DeclaringType, implementingType)))
+            !(caller.Definition.AuthoredStructuralConstraints.Any(c => c.ParameterIndex == index)
+                ? caller.ForwardedBoundsSatisfy(caller, index, target.DeclaringType)
+                : caller.Definition.NominalInterfaceConstraints.Any(c => c.ParameterIndex == index && caller.Assembly.SatisfiesConstrainedBound(caller.Definition.ConstraintSignature(c.InterfaceType), target.DeclaringType, implementingType))))
             throw new ArgumentException("constructed constrained call requires a matching method interface bound");
         foreach (var argument in target.DeclaringType.TypeArguments) argument.ValidateOwner(caller.Assembly, caller.Signature.GenericParameterNames.Count, caller.DeclaringType?.GenericParameterNames.Count ?? 0);
         _ = caller.Assembly.ExternalInterfaceMethods(target.DeclaringType).ToArray();

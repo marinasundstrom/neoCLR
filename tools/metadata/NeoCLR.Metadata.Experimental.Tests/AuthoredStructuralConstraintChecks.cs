@@ -7,6 +7,7 @@ internal static class AuthoredStructuralConstraintChecks
     {
         TraitCalls();
         ExternalTraitCalls();
+        ExternalConstructedTraitCalls();
         var graph = new AssemblyBuilder(new("AuthoredBounds", new Version(1, 0, 0, 0)), new("Core", new Version(1, 0, 0, 0)));
         var a = graph.AddInterface("Example", "A");
         var b = graph.AddInterface("Example", "B");
@@ -158,6 +159,32 @@ internal static class AuthoredStructuralConstraintChecks
         weak.AddExperimentalStructuralConstraint(0, ReferenceCompositionKind.Union, a, b);
         Reject(() => weak.GetILGenerator().CallConstrained(parameter, imported));
         Reject(() => il.CallConstrained(SignatureType.MethodParameter(1), imported));
+        weak.LoadConstant(0); weak.Return();
+        _ = graph.WriteNativeAssembly();
+        Reject(() => graph.Write());
+    }
+
+    private static void ExternalConstructedTraitCalls()
+    {
+        var core = new AssemblyIdentity("Core", new Version(1, 0, 0, 0));
+        var graph = new AssemblyBuilder(new("ConstructedTraitConsumer", new Version(1, 0, 0, 0)), core);
+        var owner = graph.CreateInterfaceReference(new("TraitLibrary", new Version(1, 0, 0, 0)), core, new string('A', 64), "Example", "Reads`1", 1);
+        var read = graph.CreateMethodReference(owner, "Read", new MethodSignature(SignatureType.TypeParameter(0), []));
+        graph.CompleteInterfaceReference(owner);
+        var a = graph.AddInterface("Example", "A");
+        a.AddBaseInterface(owner.MakeGenericInstance(PrimitiveType.Int32));
+        var b = graph.AddInterface("Example", "B");
+        var parameter = SignatureType.MethodParameter(0);
+        var strong = graph.AddFunction("Strong", new MethodSignature(PrimitiveType.Int32, [parameter], ["T"]));
+        strong.AddExperimentalStructuralConstraint(0, ReferenceCompositionKind.Intersection, a, b);
+        var il = strong.GetILGenerator();
+        il.LoadArgumentAddress(0);
+        il.CallConstrained(parameter, read.MakeConstructedReference([PrimitiveType.Int32]));
+        il.Return();
+        Reject(() => il.CallConstrained(parameter, read.MakeConstructedReference([PrimitiveType.String])));
+        var weak = graph.AddFunction("Weak", new MethodSignature(PrimitiveType.Int32, [parameter], ["T"]));
+        weak.AddExperimentalStructuralConstraint(0, ReferenceCompositionKind.Union, a, b);
+        Reject(() => weak.GetILGenerator().CallConstrained(parameter, read.MakeConstructedReference([PrimitiveType.Int32])));
         weak.LoadConstant(0); weak.Return();
         _ = graph.WriteNativeAssembly();
         Reject(() => graph.Write());
