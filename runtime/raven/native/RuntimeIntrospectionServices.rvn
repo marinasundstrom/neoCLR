@@ -163,6 +163,10 @@ internal extension IntrospectionRuntimeServices for RuntimeServices {
         return neoCLR.Runtime.TypeConstituents(arg0)
     }
 
+    static func TypeTupleElements(arg0: System.RuntimeTypeHandle) -> System.Introspection.TypeInfo[] {
+        return neoCLR.Runtime.TypeTupleElements(arg0)
+    }
+
     static func TypeGenericArguments(arg0: System.RuntimeTypeHandle) -> System.Introspection.TypeInfo[] {
         return neoCLR.Runtime.TypeGenericArguments(arg0)
     }

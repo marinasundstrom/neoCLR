@@ -2068,3 +2068,10 @@ pending rather than omitted shipped APIs.
 The Rust `TypeIdentity::Tuple` and `TypeDescriptor::tuple_elements` host surfaces
 are documented in [tuple descriptors](tuples.md#resolved-host-tuple-descriptors-development).
 They are outside RavenDoc's guest type selection; no guest API is added by this slice.
+
+
+Guest `System.Introspection.TupleTypeInfo` and `ElementTypes` are now included in
+RavenDoc's type selection, XML summaries and the refreshed matching reference bridge.
+The [tuple reference](tuples.md#tupletypeinfo-development) records experimental
+admission and remaining member/emission limitations. This supersedes the earlier
+pending guest descriptor note without changing the nominal tuple migration boundary.

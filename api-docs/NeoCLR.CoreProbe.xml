@@ -3579,5 +3579,7 @@ Connects only to 127.0.0.1. No TLS, password authentication, pooling or automati
     <member name="P:System.Introspection.UnionTypeInfo.Types"><summary>Returns a snapshot of the direct alternatives in normalized signature order.</summary><remarks>Nested intersections remain separate descriptors. Constituents are not generic arguments.</remarks></member>
     <member name="T:System.Introspection.IntersectionTypeInfo"><summary>A structural intersection requiring all of its constituent types.</summary><remarks>Experimental interpreter support; bounds must be interfaces or reference classes open to subclassing.</remarks></member>
     <member name="P:System.Introspection.IntersectionTypeInfo.Types"><summary>Returns a snapshot of the direct bounds in normalized signature order.</summary></member>
+    <member name="T:System.Introspection.TupleTypeInfo"><summary>A structural value tuple described by its ordered element types.</summary><remarks>Development interpreter API requiring experimental-tuples and a matching source library. No nominal tuple definition is implied.</remarks></member>
+    <member name="P:System.Introspection.TupleTypeInfo.ElementTypes"><summary>Gets a snapshot of element types in positional order.</summary><remarks>Preserves duplicates and nested tuple descriptors. Labels do not affect identity. Elements are not generic arguments.</remarks></member>
 </members>
 </doc>

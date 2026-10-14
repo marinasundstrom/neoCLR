@@ -1,0 +1,43 @@
+import System.*
+import System.Introspection.*
+
+class TupleToken { }
+
+func Check(info: TypeInfo) {
+    if info.IsUnion || !info.IsValueType || !info.Equals(info) {
+        System.Fail("tuple classification")
+    }
+    if info is TupleTypeInfo tuple {
+        var count = 0
+        for element in tuple.ElementTypes {
+            if count < 2 {
+                if !element.Equals(typeof(int)) { System.Fail("ordered repeated element") }
+            } else if element is TupleTypeInfo nested {
+                var nestedCount = 0
+                for nestedElement in nested.ElementTypes {
+                    if !nestedElement.Equals(typeof(string)) { System.Fail("nested element") }
+                    nestedCount += 1
+                }
+                if nestedCount != 1 { System.Fail("single-element tuple") }
+            } else {
+                System.Fail("nested tuple provider")
+            }
+            count += 1
+        }
+        if count != 3 { System.Fail("tuple arity") }
+    } else {
+        System.Fail("missing TupleTypeInfo")
+    }
+}
+
+func Main() {
+    // The fixture replaces this token with a structural signature; source emission is pending.
+    let info = typeof(TupleToken)
+    var iteration = 0
+    while iteration < 180 {
+        Check(info)
+        iteration += 1
+    }
+    if typeof(int) is TupleTypeInfo { System.Fail("nominal descriptor classified as tuple") }
+    Console.WriteLine("Tuple descriptors passed")
+}

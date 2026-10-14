@@ -483,6 +483,9 @@ internal open class RuntimeTypeInfo : TypeInfo {
         if RuntimeServices.TypeShape(handle, 15) {
             return RuntimeIntersectionTypeInfo.Create(handle)
         }
+        if RuntimeServices.TypeShape(handle, 16) {
+            return RuntimeTupleTypeInfo.Create(handle)
+        }
         return RuntimeTypeInfo(handle)
     }
 
@@ -862,6 +865,22 @@ internal class RuntimeIntersectionTypeInfo : RuntimeTypeInfo, IntersectionTypeIn
     }
 
     val Types: Sequence<TypeInfo> => RuntimeServices.TypeConstituents(ExecutionHandle)
+}
+
+/// A structural value tuple with ordered element types and no nominal definition.
+public sealed interface TupleTypeInfo : TypeInfo {
+    /// Element types in positional order, preserving duplicates and nested tuples.
+    val ElementTypes: Sequence<TypeInfo> { get }
+}
+
+internal class RuntimeTupleTypeInfo : RuntimeTypeInfo, TupleTypeInfo {
+    private init(handle: RuntimeTypeHandle): base(handle) { }
+
+    internal static func Create(handle: RuntimeTypeHandle) -> TypeInfo {
+        return RuntimeTupleTypeInfo(handle)
+    }
+
+    val ElementTypes: Sequence<TypeInfo> => RuntimeServices.TypeTupleElements(ExecutionHandle)
 }
 
 public sealed interface FunctionTypeInfo : TypeInfo {

@@ -29,6 +29,7 @@ pub(crate) enum Query {
     Interfaces,
     GenericArguments,
     Constituents,
+    TupleElements,
     ElementType,
     BaseType,
     Shape,
@@ -69,6 +70,7 @@ impl Query {
                 "System.Introspection.PropertyInfo[]",
             ),
             "neoCLR.Runtime.TypeInterfaces" => (Self::Interfaces, false, "System.Type[]"),
+            "neoCLR.Runtime.TypeTupleElements" => (Self::TupleElements, false, "System.Type[]"),
             "neoCLR.Runtime.TypeConstituents" => (Self::Constituents, false, "System.Type[]"),
             "neoCLR.Runtime.TypeGenericArguments" => {
                 (Self::GenericArguments, false, "System.Type[]")
@@ -219,6 +221,7 @@ impl Query {
                 13 => matches!(handle.identity, TypeIdentity::Function { .. }),
                 14 => matches!(handle.identity, TypeIdentity::Union(_)),
                 15 => matches!(handle.identity, TypeIdentity::Intersection(_)),
+                16 => matches!(handle.identity, TypeIdentity::Tuple(_)),
                 8 => definition.is_some_and(|d| {
                     (d.is_reference_type || d.representation == Representation::Interface)
                         && !d.is_sealed
@@ -375,6 +378,19 @@ impl Query {
                     _ => None,
                 },
             ),
+            Self::TupleElements => {
+                if !matches!(ty, Type::Tuple(_)) {
+                    return Err(Fault::new("element query requires a structural tuple"));
+                }
+                array(
+                    type_contract(module),
+                    handle
+                        .tuple_elements
+                        .iter()
+                        .map(|d| Ok(snapshot_type(module, d.clone()))),
+                    limits,
+                )
+            }
             Self::Constituents => {
                 if !crate::compositions::is_compound(&ty) {
                     return Err(Fault::new(
@@ -1485,6 +1501,9 @@ pub(crate) fn materialize(
                             } else if matches!(fields.first(), Some(Value::RuntimeTypeHandle(handle)) if matches!(handle.identity, TypeIdentity::Intersection(_)))
                             {
                                 "System.Introspection.RuntimeIntersectionTypeInfo"
+                            } else if matches!(fields.first(), Some(Value::RuntimeTypeHandle(handle)) if matches!(handle.identity, TypeIdentity::Tuple(_)))
+                            {
+                                "System.Introspection.RuntimeTupleTypeInfo"
                             } else {
                                 "System.Introspection.RuntimeTypeInfo"
                             }

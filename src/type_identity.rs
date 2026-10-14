@@ -479,6 +479,36 @@ mod tuple_tests {
             "tuple<System.Int32,System.String,tuple<System.Int32,System.Int32>>"
         );
         assert_eq!(descriptor.tuple_elements.len(), 3);
+        let args = [crate::Value::RuntimeTypeHandle(Box::new(
+            descriptor.clone(),
+        ))];
+        let elements = crate::reflection::Query::TupleElements
+            .invoke(module, &args, &crate::Limits::default())
+            .unwrap();
+        let crate::Value::Array { elements, .. } = elements else {
+            panic!("missing tuple elements")
+        };
+        assert_eq!(elements.len(), 3);
+        assert_eq!(
+            crate::reflection::Query::Shape
+                .invoke(
+                    module,
+                    &[args[0].clone(), crate::Value::Int32(16)],
+                    &crate::Limits::default()
+                )
+                .unwrap(),
+            crate::Value::Boolean(true)
+        );
+        let nominal =
+            crate::Value::RuntimeTypeHandle(Box::new(program.describe_type(&Type::Int32).unwrap()));
+        assert!(
+            crate::reflection::Query::TupleElements
+                .invoke(module, &[nominal], &crate::Limits::default())
+                .unwrap_err()
+                .to_string()
+                .contains("requires a structural tuple")
+        );
+
         assert_eq!(descriptor.tuple_elements[2].tuple_elements.len(), 2);
         assert_eq!(
             descriptor.tuple_elements[2].tuple_elements[0],

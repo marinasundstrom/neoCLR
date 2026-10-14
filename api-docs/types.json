@@ -193,6 +193,7 @@
   "System.Introspection.NominalTypeInfo",
   "System.Introspection.ParameterInfo",
   "System.Introspection.PropertyInfo",
+  "System.Introspection.TupleTypeInfo",
   "System.Introspection.TypeInfo",
   "System.Introspection.UnionTypeInfo",
   "System.InvalidRangeError",

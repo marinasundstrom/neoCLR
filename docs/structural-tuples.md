@@ -45,8 +45,8 @@ with the existing nominal tuple family.
    nested/reference elements now use structural signatures. Native memory layout,
    synthesized Deconstruct reflection and broader element forms remain pending.
 3. **Introspection and authoring (host identity implemented):** resolved tuple
-   identities and ordered host element descriptors are available. Native C# signature
-   authoring/import, guest `TupleTypeInfo` and synthesized member reflection remain.
+   identities and ordered host element descriptors are available. Guest `TupleTypeInfo.ElementTypes` exposes recursive ordered snapshots. Native C#
+   signature authoring/import and synthesized member reflection remain.
 4. **Raven:** carrier-independent tuple symbols and native lowering/import, preserving
    labels and .NET target behavior behind explicit capabilities. No CLI approximation
    should be mistaken for native tuple identity.
@@ -75,7 +75,7 @@ That configuration tests the default execution gate. With
 `--features experimental-tuples,experimental-compositions`, the same target also
 checks construction, nested fields, copy mutation, managed element addressing,
 reference-element survival across GC and invalid element/index/store rejection.
-Guest reflection, Raven lowering and nominal-family removal remain pending.
+The guest descriptor slice below adds element reflection; Raven lowering and nominal-family removal remain pending.
 
 Metadata foundation validation (2026-10-14): all six structural tuple tests pass
 with the composition feature enabled; the existing binary/JSON metadata equivalence test passes;
@@ -99,7 +99,7 @@ managed slot access enforces readonly borrowing. GC traces element values throug
 its existing aggregate traversal. Default initialization recursively initializes
 supported elements. The resource limits from the signature stage remain in force.
 JIT/AOT selection explicitly rejects tuple signatures, including nested uses. Native
-layout, guest TupleTypeInfo and compiler lowering are still separate work.
+layout and compiler lowering remain separate work; guest TupleTypeInfo is covered below.
 
 The [native value example](experiments/structural-tuples/values.neoil) constructs a
 pair, modifies a copy, and returns 42 from the original. Run it with a runtime built
@@ -124,3 +124,29 @@ Focused validation: the host identity unit test checks descriptor shape, recursi
 identity roundtrip, absent definition/token, reordered and flattened alternatives,
 repeated elements and the distinction between a single-element tuple and its element.
 The existing 12 structural tuple checks continue to pass with both experiment flags.
+
+
+## Guest descriptor slice
+
+The runtime selects `System.Introspection.TupleTypeInfo` for native tuple handles;
+`ElementTypes` returns ordered element snapshots, preserving duplicates and nesting.
+Shape query 16 identifies tuples internally, independently of nominal and composition
+classifications. Both source-backed and fallback descriptor-provider dispatch use
+`RuntimeTupleTypeInfo`. A nominal type cannot be passed to the tuple element query.
+
+The `verify-type-info.py` consumer runner builds Raven code, substitutes one explicit
+native tuple token, and checks recursive descriptor dispatch repeatedly. This is a
+fixture for runtime introspection; it does not implement Raven tuple emission.
+The source runtime library uses validated compiler revision
+`793219d855b17f01fb805e215968b78871eb3804`; the current experimental compiler rejects
+existing `(flags & flag)` gzip code as an intersection type. That parser regression
+is a deferred general candidate, not a tuple semantic restriction. The consumer uses
+the experimental branch compiler. All binaries must be rebuilt together.
+
+
+Validation (2026-10-14): the Raven consumer exits 0 with `Tuple descriptors passed`
+after 180 iterations; two host identity/query tests pass, including rejection of a
+nominal handle by the tuple element query. Six default-feature tests preserve
+explicit opt-in rejection. The matching API reference snapshot check
+passes. [Artifact hashes and results](experiments/structural-tuples/type-info-results.json)
+record the tested source-library bundle, runtime, fixture and consumer.

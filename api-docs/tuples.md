@@ -1,9 +1,10 @@
 # Tuple
 
-The structural Tuple family is a design direction. Today's runtime represents
-tuples with nominal generic value declarations, `System.Tuple<T1,...,TN>` for
-one through seven components. They remain nominal in introspection; this reference
-does not claim they have already become structural types.
+Raven source tuples currently use nominal generic value declarations,
+`System.Tuple<T1,...,TN>` for one through seven components. These remain nominal
+in introspection. The experimental native runtime also supports structural tuple
+signatures, values and `TupleTypeInfo` descriptors, documented below; source
+emission and nominal-family removal are still pending.
 
 ## Current representation
 
@@ -55,7 +56,7 @@ preserves order, duplicates and nesting; it is not a claim of resolved runtime
 assignability. Missing substitution arguments and excessive substitution depth
 return a host Fault. Scope normalization rejects zero or more than 256 elements.
 
-This Rust host metadata node is not a guest TupleTypeInfo API. The interpreter now
+The Rust metadata node is separate from the guest descriptor API below. The interpreter now
 admits closed scalar, nominal and nested tuple elements with `experimental-tuples`.
 The union/intersection feature alone does not enable tuple execution. Existing
 `Module::instantiated_fields` returns synthesized public `ItemN` views; these have
@@ -81,5 +82,28 @@ has its own descriptor. `generic_arguments` and `constituents` remain empty for 
 tuple; `tuple_elements` is empty for other shapes. These APIs use the same feature,
 closedness, arity and element-admission checks as executable tuples, returning
 `Fault` for unsupported signatures. Descriptor access does not grant layout or
-construction rights. This is host inspection; a guest `TupleTypeInfo` remains pending.
+construction rights. This host inspection underlies the guest `TupleTypeInfo` provider.
 Unlike .NET ValueTuple reflection, the tuple itself has no nominal generic definition.
+
+
+## TupleTypeInfo (development)
+
+[`System.Introspection.TupleTypeInfo`](xref:System.Introspection.TupleTypeInfo)
+extends `TypeInfo`. Its read-only `ElementTypes: Sequence<TypeInfo>` property
+returns a snapshot in positional order, including repeated types and recursive
+`TupleTypeInfo` descriptors for nested tuples. It is not a nominal generic type;
+elements are separate from `GetGenericArguments`. `IsValueType` is true and
+`IsUnion` is false. Element labels are not part of runtime identity.
+
+Requires the `experimental-tuples` runtime and the matching native source library.
+There is no public constructor. The runtime selects this provider when a type handle
+contains an admitted structural tuple signature. The same arity, closedness and
+element-admission limits apply as for tuple execution. Unsupported signatures fault.
+Nominal `System.Tuple<T...>` descriptors do not implement this interface. Synthesized
+field/constructor introspection, nominal module ownership, native layout and general
+Raven tuple emission remain incomplete. Do not infer those APIs from ElementTypes.
+
+The executable [Raven consumer](../docs/experiments/structural-tuples/TypeInfo.rvn)
+checks ordered duplicates, a nested single-element tuple, value classification and
+repeated snapshot queries. A documented test fixture substitutes one native token;
+this validates guest introspection, not compiler tuple lowering.
