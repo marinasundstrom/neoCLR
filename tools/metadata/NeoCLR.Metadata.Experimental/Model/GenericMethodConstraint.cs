@@ -119,6 +119,8 @@ public sealed partial class MethodBuilder
         Definition.AuthoredStructuralConstraints.Add(new(parameterIndex, bound));
     }
 
+    internal AssemblyBuilder? ConstraintOwner { get; set; }
+
     private bool SatisfiesStructuralBound(SignatureType actual, SignatureType bound, int depth = 0)
     {
         if (depth >= 64) return false;
@@ -131,6 +133,15 @@ public sealed partial class MethodBuilder
         if (actual.Composition is { Kind: ReferenceCompositionKind.Intersection } sourceIntersection)
             return sourceIntersection.Constituents.Any(t => SatisfiesStructuralBound(t, bound, depth + 1));
         if (actual == bound) return true;
+        if (bound.ImportedType is { } external)
+        {
+            var owner = ConstraintOwner ?? Assembly;
+            if (actual.ImportedType is { } imported)
+                return owner.HasNativeInterfaceConversion(imported, external) || owner.HasDeclaredClassBase(imported, external);
+            if (actual.ClassType is { } authored)
+                return authored.HasExternalBase(external) || authored.InheritedContracts().Any(c =>
+                    c == bound || c.ImportedType is { } contract && owner.HasNativeInterfaceConversion(contract, external));
+        }
         if (actual.GenericInstance is { } instance) return instance.ConformsTo(bound);
         if (actual.ClassType is not { } local) return false;
         return bound.ClassType is { } nominal ? nominal.IsInterface ? local.ConformsTo(nominal) : local.DerivesFrom(nominal)

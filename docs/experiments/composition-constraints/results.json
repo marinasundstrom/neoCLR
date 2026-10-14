@@ -69,5 +69,43 @@
       }
     ],
     "testSha256": "6f07f0cfa89ac89bd108941e27e97aca084f216cbe13ab3ed607e947b4615ffe"
+  },
+  "ravenNativeIntegration": {
+    "date": "2026-10-14",
+    "emissionCommit": "71601e6f4",
+    "scope": "Closed structural method bounds; native free-function imports and separate consumers; open/class/instance constraints remain pending",
+    "checks": [
+      {
+        "command": "dotnet run --project tools/NeoClrMetadataProbe -p:NeoClrMetadataProject=/Users/robert/Projects/neoclr/tools/metadata/NeoCLR.Metadata.Experimental/NeoCLR.Metadata.Experimental.csproj -p:UseRavenCoreReference=false -p:WarningLevel=0 -- --structural-constraints /Users/robert/Projects/neoclr/target/composition-info-libraries-v2 /Users/robert/Projects/neoclr/target/source-constraints",
+        "workingDirectory": "/Users/robert/Projects/raven-union-intersection",
+        "result": "pass; source/library emission, native constraint grouping, imported positives/negatives, closed generic bound, default gates"
+      },
+      {
+        "command": "target/debug/neoclr run target/source-constraints/ConstraintConsumer.neox --system target/composition-info-libraries-v2/System.runtime.neox --module target/composition-info-libraries-v2/System.Runtime.dll --module target/source-constraints/ConstraintLibrary.neox --object-root target/composition-info-libraries-v2/System.Runtime.dll --execution interpreter --instructions 100000000",
+        "exitCode": 42
+      },
+      {
+        "command": "target/debug/neoclr run target/authored-structural-constraints.neox.consumer.neox --module target/authored-structural-constraints.neox.library.neox --execution interpreter",
+        "exitCode": 42
+      },
+      {
+        "command": "--source-compositions (NeoClrMetadataProbe)",
+        "result": "pass"
+      },
+      {
+        "command": "--authored-structural-constraints, --structural-method-constraints, --composition-imports (metadata checks)",
+        "result": "pass"
+      },
+      {
+        "command": "python3 scripts/build-api-docs.py --check",
+        "result": "pass"
+      }
+    ],
+    "sha256": {
+      "target/source-constraints/ConstraintLibrary.neox": "fa6821e786c6e6c5b5bf5e65f0d9019471ec2979313e4d6f51a2a26faf5d2fdc",
+      "target/source-constraints/ConstraintConsumer.neox": "872e4d12d47f721fb3cfb465606044937838b38ce275ab08b5cd5d2fad2fbcd7",
+      "tools/metadata/NeoCLR.Metadata.Experimental.Tests/AuthoredStructuralConstraintChecks.cs": "a820a5a210a90dea4d1f99d6345f39484d3800204843ba30c60001a6f2bed83e",
+      "Raven/tools/NeoClrMetadataProbe/StructuralConstraintChecks.cs": "4522a00774e69e235f72af1e425ef2df1fd7dbcf5a41d07cf59c40927dc6862f"
+    }
   }
 }

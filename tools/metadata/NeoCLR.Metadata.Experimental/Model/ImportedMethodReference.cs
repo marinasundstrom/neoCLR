@@ -82,10 +82,25 @@ public sealed partial class AssemblyBuilder
         return ImportReferenceCore(definition, dependencyCoreLibrary, resolver, true);
     }
 
-    private ImportedMethodReference ImportReferenceCore(MethodDefinition definition, AssemblyIdentity dependencyCoreLibrary, IAssemblyResolver? resolver, bool allowCompositions)
+    /// <summary>Imports a native generic free function with closed structural type bounds and an ordinary executable signature.</summary>
+    /// <remarks>Explicit experimental contract; CLI projection and open forwarding remain unsupported. Dependencies must resolve to exact registered snapshots.</remarks>
+    /// <exception cref="InvalidDataException">Not a supported native generic function or its metadata/dependencies are invalid.</exception>
+    /// <exception cref="ArgumentNullException">Definition or core identity is null.</exception>
+    public ImportedMethodReference ImportExperimentalConstrainedReference(MethodDefinition definition, AssemblyIdentity dependencyCoreLibrary, IAssemblyResolver? resolver = null)
     {
         ArgumentNullException.ThrowIfNull(definition);
-        if (definition.InterfaceConstraints.Count != 0) throw new NotSupportedException("imported method interface bounds require an explicit supported contract");
+        if (!definition.Module.Assembly.IsNative || definition.DeclaringType is not null || !definition.IsStatic ||
+            definition.GenericArity == 0 || definition.ImplementationAttributes != 0 || definition.NativeImport is not null ||
+            !definition.TypeConstraints.Any(c => c.Bound.Composition is not null) ||
+            !definition.TryGetSignature(out var signature) || signature!.ParameterTypes.Append(signature.ReturnType).Any(t => t.ContainsComposition))
+            throw new InvalidDataException("experimental constrained import requires a native generic free function with closed structural bounds and an ordinary signature");
+        return ImportReferenceCore(definition, dependencyCoreLibrary, resolver, true, allowStructuralConstraints: true);
+    }
+
+    private ImportedMethodReference ImportReferenceCore(MethodDefinition definition, AssemblyIdentity dependencyCoreLibrary, IAssemblyResolver? resolver, bool allowCompositions, bool allowStructuralConstraints = false)
+    {
+        ArgumentNullException.ThrowIfNull(definition);
+        if (!allowStructuralConstraints && definition.TypeConstraints.Count != 0) throw new NotSupportedException("imported method interface bounds require an explicit supported contract");
         ArgumentNullException.ThrowIfNull(dependencyCoreLibrary);
         var identity = definition.Module.Assembly.Identity;
         var type = definition.DeclaringType;
@@ -167,6 +182,16 @@ public sealed partial class AssemblyBuilder
         {
             if (definition.GenericArity != 0) throw new InvalidDataException("generic internal-call imports are unsupported");
             reference.Target.SetInternalCall();
+        }
+        if (allowStructuralConstraints)
+        {
+            reference.Target.ConstraintOwner = this;
+            foreach (var constraint in definition.TypeConstraints)
+            {
+                var bound = ImportNativeSignatureType(constraint.Bound, dependencyCoreLibrary, resolver, true);
+                RegisterCompositionStorage(bound);
+                reference.Target.Definition.AuthoredStructuralConstraints.Add(new(constraint.ParameterIndex, bound));
+            }
         }
         reference.Target.IsInitOnlySetter = type?.Properties.Any(p => p.IsInitOnly && ReferenceEquals(p.SetMethod, definition)) == true;
         reference.Target.NativeImportPrimitiveOwner = type?.NativePrimitive;

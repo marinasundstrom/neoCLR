@@ -62,3 +62,21 @@ generic trait calls and Raven compiler emission/import remain unsupported. The
 `AuthoredStructuralConstraintChecks` fixture executes with result 42; focused authoring,
 inspection and nominal constraint regression checks pass. This completes the bounded
 host method-authoring step, not end-to-end Raven constraint compilation.
+
+Raven emission/import checkpoint: closed local method constraints now compile into
+native TypeBound signatures. Source conjunctions become intersection bounds. The
+native catalog exposes complete bounds to Raven symbols and detects compositions
+that occur only in constraints. Calls use the exact-snapshot constrained import API;
+unsupported symbol-only imports cannot erase bounds. The source probe emits a library
+and separate consumer, exercises union/intersection and `Response<A> | B` bounds,
+rejects invalid imported arguments and runs with interpreter result 42. The ordinary
+catalog/backend gates remain closed. This supersedes earlier pending method-emission
+and free-function-import notes, but does not implement open structural constraints,
+class-parameter constraints, constrained instance imports or generic-body trait use.
+
+Run the Raven `tools/NeoClrMetadataProbe` command `--structural-constraints` with
+`target/composition-info-libraries-v2` and `target/source-constraints` absolute paths.
+Run `ConstraintConsumer.neox` with `ConstraintLibrary.neox` as a module plus the
+matching System runtime seed/module/object root. See results.json for commands.
+The existing source composition probe and metadata nominal/composition regressions
+pass; there are no syntax or token classification changes in this wiring slice.

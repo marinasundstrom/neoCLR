@@ -9838,3 +9838,15 @@ metadata, invalid intersection arguments and the default backend gate. This requ
 the existing structural opt-in and native metadata library; no CLI projection or
 runtime bundle change is introduced. Native import and external/open bounds remain
 pending. See Raven's `tools/NeoClrMetadataProbe/StructuralConstraintChecks.cs`.
+
+Native constraint import follow-up, 2026-10-14: the metadata library explicitly
+imports constrained generic free functions from exact native snapshots, preserving
+all bounds and checking supplied arguments at construction, call emission and graph
+serialization. Raven maps complete bounds into symbols, includes constraint-only
+compositions in profile detection, and uses this native import contract. The
+symbol-only fallback rejects constrained calls instead of dropping their bounds.
+The source library/consumer probe returns 42, including closed `Response<A> | B`
+bounds; invalid imported arguments reject. The metadata-level consumer also returns
+42. Default/CLI gates remain closed, with no bridge approximation or new runtime
+bundle. Open operands/forwarding, generic-body trait calls, class-parameter constraints
+and constrained instance-method imports remain pending on these experimental branches.

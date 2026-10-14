@@ -8734,3 +8734,34 @@ The authored constraint fixture runs in the experimental interpreter with result
 Raven emission/import, external constraints, class constraint authoring and guest
 constraint reflection remain pending; this supersedes only the method-authoring gap
 in the preceding inspection section.
+
+### Importing structurally constrained native functions
+
+`AssemblyBuilder.ImportExperimentalConstrainedReference(MethodDefinition definition,
+AssemblyIdentity dependencyCoreLibrary, IAssemblyResolver? resolver = null)` imports
+an explicitly selected native generic free function with at least one structural
+method bound. It preserves all method bounds in the private call contract, importing
+constituents into the consumer's scope. The function must be static, have no declaring
+type, native import or special implementation flags, and use an ordinary executable
+parameter/result signature. Closed reference bounds follow the native reader profile;
+open structural operands remain unsupported. Dependencies must resolve through the
+supplied catalog to consistent snapshots. Invalid metadata/profile/core or snapshot
+mismatches throw `InvalidDataException`; null required inputs throw
+`ArgumentNullException`. Ordinary callable imports continue to reject constrained
+methods outside their supported profile.
+
+The returned `ImportedMethodReference.MakeGenericInstance` checks all imported bounds
+against consumer-scoped arguments. Call emission and serialization check them again.
+Interface conformance uses registered native definitions; class ancestry uses the
+existing explicit base contracts. Closed generic identity remains invariant. Source
+union arguments need complete coverage. Open method forwarding and generic-body trait
+calls remain unavailable. The import does not synthesize a nominal carrier or a CLI
+projection. Existing unconstrained imports retain their behavior. Native execution
+still requires the experimental runtime feature and runtime verification.
+
+Validation includes a separately written metadata producer/consumer (result 42),
+invalid arguments, incomplete union coverage, default import/CLI gates, nominal
+constraint regression checks and existing composition import checks. Companion Raven
+uses this API for opt-in native free-function calls; source and separately compiled
+consumers cover interface union/intersection bounds and a closed `Response<A> | B`
+bound. This supersedes the pending native import statements above only for this profile.

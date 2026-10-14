@@ -4701,3 +4701,8 @@ remain pending; [focused evidence](experiments/composition-constraints/README.md
 reference bounds, checked instantiation and interpreter result 42. Compiler wiring,
 external/open bounds and guest constraint reflection remain pending; see the
 [constraint evidence](experiments/composition-constraints/README.md).
+
+2026-10-14 native structural method constraints now pass Raven emission and separate
+library consumption, including a closed generic bound and interpreter result 42.
+Open bounds/forwarding, class constraints, generic-body traits and broader backends
+remain experimental gaps; [evidence](experiments/composition-constraints/README.md).

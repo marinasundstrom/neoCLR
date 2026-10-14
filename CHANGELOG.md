@@ -8,7 +8,7 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-14
 
-- Validate companion Raven emission of closed local structural method constraints, preserving union/intersection grouping and interpreter result 42. Document default rejection and the remaining native import/open-bound work.
+- Validate companion Raven emission of closed local structural method constraints, preserving union/intersection grouping and interpreter result 42. Wire explicit native constrained-function imports with complete bounds and repeated argument validation; companion Raven preserves imported constraints and rejects constraint-erasing fallbacks. Separate native consumers return 42, including a closed generic bound. Keep default/CLI rejection and open-bound limitations.
 
 - Preserve closed structural method constraints in opt-in native metadata snapshots and expose complete bound signatures/type views. Keep nominal-interface queries, CLI projection and unsupported imports from silently weakening the contract. Validate JSON/binary roundtrips, grouping, invalid bounds and nominal compatibility; native compiler emission remains pending. Add native method-bound authoring for closed local reference types, checked any-of/all-of instantiation and serialization revalidation; the authored interpreter fixture returns 42. External bounds and open forwarding remain unsupported.
 

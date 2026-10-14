@@ -2042,3 +2042,9 @@ or generated API snapshot changes in this slice. The snapshot check passes.
 `MethodBuilder.AddExperimentalStructuralConstraint` is a host-only C# tooling API,
 covered in the [native constraint authoring reference](experimental-metadata.md#native-structural-method-constraint-authoring).
 It is excluded from guest RavenDoc selection; the unchanged guest API snapshot check passes.
+
+Host-only `AssemblyBuilder.ImportExperimentalConstrainedReference` and the extended
+imported generic instantiation contract are documented in the
+[manual constrained import reference](experimental-metadata.md#importing-structurally-constrained-native-functions).
+These C# tooling APIs remain excluded from guest RavenDoc selection. Guest snapshot
+fingerprints are unchanged and validation passes.

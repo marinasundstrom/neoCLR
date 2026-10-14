@@ -214,6 +214,7 @@ internal sealed class MethodILGenerator(MethodBuilder bodyBuilder) : IILGenerato
         if (!ReferenceEquals(operand.Definition.Owner, Assembly)) throw new ArgumentException("reference belongs to another output builder", nameof(operand));
         foreach (var type in operand.TypeArguments)
             type.ValidateOwner(Assembly, Signature.GenericParameterNames.Count, DeclaringType?.GenericParameterNames.Count ?? 0);
+        operand.Target.Definition.ValidateMethodArguments(operand.TypeArguments, bodyBuilder);
         Append(new("call.generic", Target: operand.Target.Definition, GenericTarget: operand.Target));
     }
 
