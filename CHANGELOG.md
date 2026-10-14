@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-14
 
+- Make the unified runtime the headline of the next-preview notes: integrated interpreter/JIT execution, GC and scheduler/suspension, with native AOT as the publishing target and preserved component boundaries. Record the author's release direction; published notes remain unchanged.
+
 - Record the original Windows candidate passing three-mode JSON, 132 HTTP checks, 21 runtime-await cases, GC validation and all 26 editor checks. Keep the inlay-fixed `.2` candidate distinct and pending its own packaged qualification.
 
 - Match the Windows TLS prerequisite probe to the compiler’s earlier Windows-profile rejection. Continue requiring a failed compilation and no object output when arena/GC prerequisites are missing; TLS execution and GC contracts are unchanged.

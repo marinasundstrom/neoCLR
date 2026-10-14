@@ -17070,3 +17070,19 @@ open, not an approved complete implementation or a permanent roadmap reprioritiz
   but not on every implementation detail; those details belong in repo docs.
 - **Follow-up:** retained concise platform/HTTP/database scope in the draft notes
   and recorded the distinction in the website maintenance guide.
+
+## 2026-10-14 — Unified runtime as the release theme
+
+- **Author direction:** “The big theme for this release is that we have unified
+  the components that previously were separate experiments into the same runtime.”
+  The author described this as a more representative release, with additional
+  improvements since the previous release.
+- **Assistant action:** revised the [next-preview notes](next-preview-release-notes.md)
+  to lead with the integrated runtime: interpreter/JIT execution, garbage collection,
+  and scheduling with suspension/resumption, with AOT as the publishing target.
+  Kept modular boundaries explicit and presented HTTP, memory and tooling changes
+  as supporting improvements.
+- **Scope:** this records release positioning, not a new architecture or milestone
+  reprioritization. Qualification and installation remain tracked in the
+  [release tracker](tracking/toolchain-release.md); the draft does not announce
+  publication or assign a release version or date.

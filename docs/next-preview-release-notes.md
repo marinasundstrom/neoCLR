@@ -1,7 +1,19 @@
-# Next preview
+# Next preview: a unified runtime
 
-neoCLR brings together its interpreter, JIT, native compiler, scheduler and memory
-management. JIT is the default for development; AOT builds native applications.
+This preview brings the components developed as separate experiments into one
+integrated neoCLR runtime. It is the central change in this release, alongside
+improvements to HTTP processing, memory management and development tools.
+
+## One runtime, modular components
+
+Execution through the interpreter and JIT, garbage collection, and scheduling
+with suspension and resumption now form a shared runtime foundation. Native AOT
+is the publishing target, using that foundation in compiled applications.
+
+The components keep their own responsibilities and boundaries. Integration lets
+us develop, validate and optimize them together, and gives profiling and debugging
+tools a common runtime to observe. JIT is the default for development; AOT builds
+native applications. Interpreter execution remains supported.
 
 ## Runtime await
 
