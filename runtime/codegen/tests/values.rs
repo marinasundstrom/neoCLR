@@ -1682,7 +1682,7 @@ fn raven_generic_methods_compile_from_pe_and_neox_with_original_tokens_reported(
 
 #[test]
 fn generic_method_clones_are_bounded_and_keep_plain_callees_at_the_limit() {
-    for count in [1022, 1023] {
+    for count in [2046, 2047] {
         let mut source =
             String::from(".module MethodLimit\n.entry Main\n.function Main() -> Int32\n");
         for i in 0..count {
@@ -1702,12 +1702,12 @@ fn generic_method_clones_are_bounded_and_keep_plain_callees_at_the_limit() {
         );
         assert_eq!(
             result.status.success(),
-            count == 1022,
+            count == 2046,
             "{}",
             String::from_utf8_lossy(&result.stderr)
         );
-        if count == 1023 {
-            assert!(String::from_utf8_lossy(&result.stderr).contains("1024 selected functions"));
+        if count == 2047 {
+            assert!(String::from_utf8_lossy(&result.stderr).contains("2048 selected functions"));
             assert!(!temp.0.join("value.o").exists());
         }
     }
@@ -2069,8 +2069,8 @@ ret
 }
 
 #[test]
-fn expanded_value_function_budget_accepts_1024_and_rejects_1025() {
-    for count in [1024, 1025] {
+fn expanded_value_function_budget_accepts_2048_and_rejects_2049() {
+    for count in [2048, 2049] {
         let mut source = String::from(".module FunctionBudget\n.function Main() -> Int32\n");
         for n in 1..count {
             source.push_str(&format!("call F{n}()\npop\n"));
@@ -2090,11 +2090,11 @@ fn expanded_value_function_budget_accepts_1024_and_rejects_1025() {
         );
         assert_eq!(
             r.status.success(),
-            count == 1024,
+            count == 2048,
             "{}",
             String::from_utf8_lossy(&r.stderr)
         );
-        if count == 1025 {
+        if count == 2049 {
             assert!(!temp.0.join("value.o").exists());
             assert!(String::from_utf8_lossy(&r.stderr).contains("selected functions exceed"));
         }

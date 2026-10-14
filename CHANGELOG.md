@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-14
 
+- Update stale native value-function and generic-clone boundary tests to the existing 2,048-function budget, retaining rejection immediately above the limit. All 58 native value tests now pass on macOS; the runtime budget is unchanged.
+
 - Record passing wider-value runtime/GC qualification on hosted macOS and Windows, Windows native HTTP, local three-mode JSON and 132 HTTP wire checks, and extracted macOS default-JIT acceptance. Keep expanded Windows package/editor and canonical source gates open; retain the earlier failed candidate separately.
 
 - Add the installed ZIP executable directory explicitly to the Windows SDK packaging PATH. Hosted compilation completed but archive creation could not find ZIP; fail early if installation supplies no executable.
