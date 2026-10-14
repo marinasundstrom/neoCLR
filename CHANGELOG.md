@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-14
 
+- Export invocation-completion cleanup from the Windows cryptography test host, matching the current GC entry contract. JIT import errors now name the missing helper instead of only reporting GetProcAddress failure. The embedding/JIT hosting test passes; Windows cryptography requalification remains required.
+
 - Keep TLS resource-ID allocation compatible with Rust 1.85 while allowing newer toolchains to deprecate `fetch_update`: scope the compatibility allowance to that expression. Three resource lifetime/identity tests pass; allocation semantics are unchanged.
 
 - Generate named application reflection roots from the freshly compiled native artifact via `--reflection-type`, avoiding stale roots after project rebuilds. Add a packaged JSON/error-composition gate for interpreter, JIT and AOT; all three modes pass on macOS alongside 132 HTTP header checks. Include the JSON gate in Windows package qualification.

@@ -142,15 +142,11 @@ pub(super) fn execute_managed(
     // code runs; do not let default process-symbol lookup hide a host mismatch.
     for (_, declaration) in module.declarations().get_functions() {
         if declaration.linkage == cranelift_module::Linkage::Import {
-            let symbol: libloading::Symbol<*const u8> = unsafe {
-                library.get(
-                    declaration
-                        .name
-                        .as_ref()
-                        .ok_or("anonymous native import")?
-                        .as_bytes(),
-                )
-            }?;
+            let name = declaration.name.as_ref().ok_or("anonymous native import")?;
+            let symbol: libloading::Symbol<*const u8> = unsafe { library.get(name.as_bytes()) }
+                .map_err(|error| {
+                    format!("native host is missing required symbol {name}: {error}")
+                })?;
             let _ = *symbol;
         }
     }
