@@ -8,6 +8,17 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-14
 
+- Prepare the qualified Preview 15 source tag and publication assets; release and website publication are recorded separately once completed.
+
+## 0.1.0-preview.15 — 2026-10-14
+
+A unified runtime with integrated execution, memory management and scheduler/suspension,
+plus JSON formatting and editor stability improvements. See the
+[release notes](docs/preview-15-release-notes.md) and
+[qualification record](docs/validation/release-20261014/README.md).
+
+### 2026-10-14
+
 - Complete final Windows JSON/editor qualification and install SDK `0.1.15-neoclr.20261014.2` with extension `.3` in the dedicated author preview. Installed catalogue checks, sample builds and default-JIT JSON/HTTP execution pass; preserve exact component and report hashes.
 
 - Prepare Preview 15 release notes and download pages around the unified runtime, with runtime await on both supported hosts and linked qualification/source documentation.
