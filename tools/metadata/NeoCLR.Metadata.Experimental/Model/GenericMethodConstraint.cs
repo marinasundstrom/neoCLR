@@ -99,7 +99,7 @@ public sealed partial class MethodBuilder
     }
 
     /// <summary>Adds a native-only closed structural bound on a method type parameter.</summary>
-    /// <remarks>Constituents must be output-owned closed reference types. External constituents are supported in unions, but not beneath intersections. CLI emission and open structural operands are unsupported.</remarks>
+    /// <remarks>Constituents must be output-owned closed reference types. External intersection constituents require imported definition snapshots proving extension eligibility. CLI emission and open structural operands are unsupported.</remarks>
     /// <exception cref="ArgumentException">Invalid ordinal, kind, duplicate, foreign/open/value/final intersection operand or excessive constraints.</exception>
     /// <exception cref="ArgumentNullException">Constituents are null.</exception>
     public void AddExperimentalStructuralConstraint(int parameterIndex, ReferenceCompositionKind kind, params SignatureType[] constituents)
@@ -107,11 +107,6 @@ public sealed partial class MethodBuilder
         ArgumentNullException.ThrowIfNull(constituents);
         if (parameterIndex < 0 || parameterIndex >= Signature.GenericParameterNames.Count || Definition.TypeConstraints.Count >= 128)
             throw new ArgumentException("invalid method constraint ordinal or count");
-        bool Supported(SignatureType type, bool intersection) => type.Composition is { } c
-            ? c.Constituents.All(t => Supported(t, intersection || c.Kind == ReferenceCompositionKind.Intersection))
-            : type.ClassType is not null || type.GenericInstance is not null || !intersection && type.ImportedType is not null;
-        if (constituents.Any(t => t is null || !Supported(t, kind == ReferenceCompositionKind.Intersection)))
-            throw new ArgumentException("external structural method bounds are supported only outside intersections");
         var bound = Assembly.CreateExperimentalReferenceComposition(kind, constituents);
         if (bound.Composition is null)
             throw new ArgumentException("structural method bounds require at least two distinct constituents");

@@ -57,11 +57,28 @@ public sealed partial class NativeAssemblyDefinition
     public static NativeAssemblyDefinition ReadAssembly(ReadOnlySpan<byte> image)
         => ReadCore(image, MetadataArtifactReader.MaxImageSize);
 
-    internal static NativeAssemblyDefinition ReadLibraryAssembly(ReadOnlySpan<byte> image, bool allowExperimentalCompositions = false)
-        => ReadCore(image, 32 * 1024 * 1024, allowExperimentalCompositions);
+    internal static NativeAssemblyDefinition ReadLibraryAssembly(ReadOnlySpan<byte> image, bool allowExperimentalCompositions = false, IAssemblyResolver? resolver = null)
+        => ReadCore(image, 32 * 1024 * 1024, allowExperimentalCompositions, resolver);
 
-    private static NativeAssemblyDefinition ReadCore(ReadOnlySpan<byte> image, int maxSize, bool allowExperimentalCompositions = false)
+    private static NativeAssemblyDefinition ReadCore(ReadOnlySpan<byte> image, int maxSize, bool allowExperimentalCompositions = false, IAssemblyResolver? resolver = null)
     {
+        var resolvedIntersections = new Dictionary<AssemblyIdentity, AssemblyDefinition>();
+        bool ExtendableExternal(ImportedTypeReference external)
+        {
+            if (!resolvedIntersections.TryGetValue(external.AssemblyIdentity, out var dependency))
+            {
+                dependency = resolver?.Resolve(external.AssemblyIdentity);
+                if (dependency is null || !dependency.Identity.Equals(external.AssemblyIdentity))
+                    throw new InvalidDataException("external intersection requires an exact dependency snapshot: " + external.AssemblyIdentity.Name);
+                resolvedIntersections.Add(external.AssemblyIdentity, dependency);
+            }
+            static bool Matches(TypeDefinition type, ImportedTypeReference reference) =>
+                type.Namespace == reference.Namespace && type.Name == reference.Name && type.GenericArity == reference.GenericArity &&
+                (reference.DeclaringType is null ? type.DeclaringType is null
+                    : type.DeclaringType is { } parent && Matches(parent, reference.DeclaringType));
+            var matches = dependency.MainModule.Types.Where(t => Matches(t, external)).ToArray();
+            return matches.Length == 1 && !matches[0].IsValueType && (matches[0].Attributes & 0x100) == 0;
+        }
         if (image.Length > maxSize) throw new InvalidDataException("native image exceeds limit");
         try
         {
@@ -510,7 +527,8 @@ public sealed partial class NativeAssemblyDefinition
                         Require(localBound is { IsStatic: false, IsValueType: false } && ClosedArgument(leaf) ||
                             leaf.ImportedType is { IsValueType: false } && ClosedArgument(leaf), "composition requires closed nominal reference bounds");
                         if (intersectionBound)
-                            Require(localBound is { } bound && !types[System.Array.IndexOf(signatureOwners, bound)].IsSealedClass,
+                            Require(localBound is { } bound ? !types[System.Array.IndexOf(signatureOwners, bound)].IsSealedClass
+                                : leaf.ImportedType is { } external && ExtendableExternal(external),
                                 "intersection bounds require resolved interfaces or non-sealed reference classes");
                         return leaf;
                     }

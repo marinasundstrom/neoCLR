@@ -4733,3 +4733,11 @@ existing opt-in mapping now preserve imported closed reference alternatives,
 including constructed interfaces. A three-assembly consumer returns 42; shape-only,
 mismatched and partial-union arguments reject. External intersection-bound authoring
 and open operands remain gaps. See [evidence](experiments/composition-constraints/README.md#external-union-constraint-alternatives--2026-10-14-development).
+
+2026-10-14 external intersection-bound follow-up: imported closed interfaces and
+open reference classes now support method intersection authoring and resolved native
+inspection. Raven retains nominal conformance, resolves selected dependencies in any
+input order, and emits closed generic interface conjunctions. The three-assembly
+consumer returns 42, including an imported open-class bound. Host checks retain
+closed-hierarchy admission and reject CLR-final/value or unresolved/mismatched bounds.
+[Evidence](experiments/composition-constraints/README.md#resolved-external-intersection-bounds--2026-10-14-development).

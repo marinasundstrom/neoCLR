@@ -21,11 +21,20 @@ public sealed partial class AssemblyDefinition
     /// <remarks>The experimental profile admits closed reference compositions in nongeneric free-function and reference-class member signatures, locals and reference-class instance fields. Bodies remain opaque. Callable import and storage require their separate explicit APIs.</remarks>
     /// <exception cref="InvalidDataException">The image or composition is invalid or outside the admitted subset.</exception>
     public static AssemblyDefinition ReadNativeAssembly(ReadOnlySpan<byte> image, bool allowExperimentalCompositions)
+        => ReadNativeAssembly(image, allowExperimentalCompositions, null);
+
+    /// <summary>Reads native declarations and resolves external intersection operands against explicit dependency snapshots.</summary>
+    /// <param name="image">Complete native assembly image.</param>
+    /// <param name="allowExperimentalCompositions">Explicit native composition opt-in.</param>
+    /// <param name="resolver">Required for external intersection operands; no implicit assembly loading occurs.</param>
+    /// <returns>An immutable snapshot retaining the original image.</returns>
+    /// <exception cref="InvalidDataException">Metadata is invalid, a dependency is absent/mismatched, or an intersection operand is final or a value type.</exception>
+    public static AssemblyDefinition ReadNativeAssembly(ReadOnlySpan<byte> image, bool allowExperimentalCompositions, IAssemblyResolver? resolver)
     {
         if (image.Length > RuntimeAssemblyContainer.MaxLibraryImageSize) throw new InvalidDataException("image exceeds limit");
         var owned = image.ToArray();
         var native = NativeAssemblyDefinition.ReadLibraryAssembly(owned.AsSpan().StartsWith("NEOX"u8)
-            ? NativeModuleContainer.Read(owned) : RuntimeAssemblyContainer.Read(owned), allowExperimentalCompositions);
+            ? NativeModuleContainer.Read(owned) : RuntimeAssemblyContainer.Read(owned), allowExperimentalCompositions, resolver);
         return native.MaterializeDeclarations(owned);
     }
 

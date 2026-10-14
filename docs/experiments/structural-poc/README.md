@@ -73,7 +73,7 @@ acceptance evidence belongs in `results.json` alongside this document.
 - Open operands and complete recursive substitution, including `T | HttpError |
   JsonError`, `Request<T> | HttpError | JsonError`, and
   `Task<Response<T> | HttpError | JsonError>` in open generic definitions.
-- Direct external intersection-bound authoring, generic owner/type-parameter compiler
+- Generic owner/type-parameter compiler
   emission, broader constrained member imports and mixed source formulas.
 - Guest generic-constraint reflection, structural member/hierarchy/custom-attribute
   enumeration and unrestricted generic method specialization with structural arguments.
@@ -94,3 +94,8 @@ Follow-up: imported closed union alternatives are now admitted and the acceptanc
 runner also executes a separate consumer of such a constraint library. See the
 [external union checkpoint](../composition-constraints/README.md#external-union-constraint-alternatives--2026-10-14-development).
 The retained 20-check report above predates this additional consumer.
+
+Resolved closed external intersection bounds are also supported. Their native reads
+require an explicit dependency resolver; the Raven catalog supplies selected snapshots.
+The follow-up consumer checks nominal conformance and reverse dependency ordering.
+See the [resolved intersection checkpoint](../composition-constraints/README.md#resolved-external-intersection-bounds--2026-10-14-development).

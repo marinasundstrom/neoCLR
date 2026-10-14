@@ -2052,3 +2052,8 @@ fingerprints are unchanged and validation passes.
 The owned constrained-call API's native structural-instance extension is covered by
 [the manual metadata reference](experimental-metadata.md#interface-calls-guaranteed-by-structural-bounds).
 It remains a host C# API excluded from guest RavenDoc selection; guest snapshots are unchanged.
+
+The native metadata reader overload accepting `IAssemblyResolver` for external
+intersection operands is host C# tooling, excluded from the guest RavenDoc selection
+and covered in the [manual metadata reference](experimental-metadata.md#resolved-external-intersection-bounds--2026-10-14-development).
+No guest public API or reference snapshot changes in this slice.

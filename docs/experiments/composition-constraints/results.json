@@ -241,5 +241,47 @@
       "tools/metadata/NeoCLR.Metadata.Experimental.Tests/AuthoredStructuralConstraintChecks.cs": "1f9d35553c120e501c7302e792e863b797fdc04f4877bafc807a1751e4cee058",
       "/Users/robert/Projects/raven-union-intersection/tools/NeoClrMetadataProbe/StructuralConstraintChecks.cs": "70fe61a416e11d498273e7fa769c6553c5abce16ea627bb8ede2e28fdd02ee93"
     }
+  },
+  "externalIntersectionBounds": {
+    "date": "2026-10-14",
+    "scope": "Resolved imported closed method intersection operands; nominal conformance remains explicit",
+    "checks": [
+      {
+        "command": "dotnet run --project tools/metadata/NeoCLR.Metadata.Experimental.Tests -- --authored-structural-constraints target/authored-structural-constraints.neox",
+        "result": "pass: resolved external interfaces/generic interfaces/open classes/closed hierarchies; missing resolver, wrong identity, final/value replacement and CLI rejection"
+      },
+      {
+        "command": "dotnet run --project tools/metadata/NeoCLR.Metadata.Experimental.Tests --no-build -- --structural-method-constraints",
+        "result": "pass: existing structural and nominal constraint inspection"
+      },
+      {
+        "command": "Raven NeoClrMetadataProbe --structural-constraints target/composition-info-libraries-v2 target/external-intersection-constraints",
+        "result": "pass: reverse dependency order, three-assembly consumer, missing-dependency rejection and RAV0320 for shape-only implementation"
+      },
+      {
+        "command": "target/debug/neoclr run target/external-intersection-constraints/ExternalIntersectionConsumer.neox --system target/composition-info-libraries-v2/System.runtime.neox --module target/composition-info-libraries-v2/System.Runtime.dll --module target/external-intersection-constraints/TraitLibrary.neox --module target/external-intersection-constraints/ExternalIntersectionLibrary.neox --object-root target/composition-info-libraries-v2/System.Runtime.dll --execution interpreter --instructions 100000000",
+        "exitCode": 42
+      },
+      {
+        "command": "Raven NeoClrMetadataProbe --source-compositions target/composition-info-libraries-v2 target/external-intersection-regression",
+        "result": "pass: source signatures/catalog roundtrip and default gate regression"
+      },
+      {
+        "command": "python3 scripts/build-api-docs.py --check",
+        "result": "pass"
+      }
+    ],
+    "sha256": {
+      "target/external-intersection-constraints/TraitLibrary.neox": "a446bea3c56bf3a060bdf6800df18a427d80a67c6c522ba54cf932a3a8dad3c8",
+      "target/external-intersection-constraints/ExternalIntersectionLibrary.neox": "0d79d16b9cfbc276c5b722db9929e56ce6ddc08dee1fff4170415023b28da00e",
+      "target/external-intersection-constraints/ExternalIntersectionConsumer.neox": "a4a2481e3f90bee208ea4579e834c59432d5fb5b436fc1e319536e49b1ac284f",
+      "tools/metadata/NeoCLR.Metadata.Experimental.Tests/ExternalIntersectionConstraintChecks.cs": "3464c00f11c5594ff15ff2ab5b726e258c9c16ee55a0ed3ce0a4eee5d32f068a",
+      "/Users/robert/Projects/raven-union-intersection/tools/NeoClrMetadataProbe/StructuralConstraintChecks.cs": "95e111eb894f9926039c48026262ded6777b577ee078cdd7ad15a7fc34a121f0"
+    },
+    "limitations": [
+      "Open operands and generic owner constraint emission remain pending",
+      "External intersection dependency cycles that prevent snapshot validation fail closed",
+      "Guest constraint reflection and JIT/AOT remain pending"
+    ]
   }
 }
