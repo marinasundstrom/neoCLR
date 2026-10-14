@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-14
 
+- Admit imported closed reference alternatives in native method union constraints, preserving external identity and exact generic arguments. Retain explicit nominal conformance and whole-union coverage; external intersection operands and open bounds remain rejected. Add host roundtrip/negative checks and a three-assembly Raven integration probe.
+
 - Add a consolidated acceptance runner and delivery guide for the closed-reference structural POC, recording native/host/source checks and exact artifact hashes. Clarify that intersections compose explicitly implemented nominal interfaces rather than introducing Rust-style traits or structural member matching; add host/compiler regression checks rejecting member-only lookalikes. Update experimental roadmap and website status; retain explicit open-generic, external-bound, guest constraint-reflection and JIT/AOT gaps.
 
 - Extend the source structural Task example to queued delivery for every union alternative. All six completed/queued awaits check payload type and value through native async state machines; no signature rewriting or nominal carrier is used.

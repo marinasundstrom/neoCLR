@@ -8710,8 +8710,9 @@ native-only closed bound to a method parameter. The zero-based ordinal must exis
 constituents are normalized using the assembly composition factory and must retain
 at least two distinct constituents. Local reference
 classes/interfaces and closed local generic reference constructions are admitted.
-External constituents, open operands, value operands and final classes written in
-intersections reject. Null constituent arrays throw `ArgumentNullException`; invalid
+Imported closed reference constituents are also admitted in unions, including closed
+generic constructions. External constituents beneath intersections, open operands,
+value operands and final classes written in intersections reject. Null constituent arrays throw `ArgumentNullException`; invalid
 ordinals, duplicates, foreign/unsupported operands or a combined constraint count
 above 128 throw `ArgumentException`. Native output uses `GenericConstraint.TypeBound`;
 CLI output remains unavailable. `MethodDefinition.TypeConstraints` includes authored
@@ -8723,17 +8724,18 @@ all constituents, and source unions require complete alternative coverage. Nomin
 leaf checks use local inheritance/interface relationships and invariant closed
 construction identity. Closed classes can satisfy interface intersections. Forwarded method parameters are checked against the conjunction of the caller’s
 declared bounds at emission and serialization. Missing or weaker guarantees reject.
-Generic-body trait dispatch remains unsupported. Generic inherited class relationships
-beyond the existing local nominal model are not inferred. No conversions or variance
+Guaranteed nominal interface calls through method parameters are supported by the
+constrained-call overloads documented below. Generic inherited class relationships
+beyond the existing nominal model are not inferred. No conversions or variance
 are added by this API. Adding a bound after emitting a call cannot bypass validation.
 
 Example: `method.AddExperimentalStructuralConstraint(0,
 ReferenceCompositionKind.Union, responseType, errorType)` writes a structural bound
 for the first method parameter, without generating a nominal carrier.
 The authored constraint fixture runs in the experimental interpreter with result 42.
-Raven emission/import, external constraints, class constraint authoring and guest
-constraint reflection remain pending; this supersedes only the method-authoring gap
-in the preceding inspection section.
+Raven emits/imports this bounded native method profile. External intersection
+constraints, class constraint authoring and guest constraint reflection remain gaps.
+See the external union checkpoint below for three-assembly validation.
 
 ### Importing structurally constrained native functions
 
@@ -8833,3 +8835,29 @@ nominal/Self constrained calls retain their prior path. Raven's `ConstructedTrai
 probe inherits `ImportedReads<int>` through a local intersection constituent and
 calls it using the existing borrowed native dispatch. No CLI encoding is added.
 Direct external structural-bound authoring and open operands remain unsupported.
+
+
+## External union constraint alternatives — 2026-10-14 development
+
+The native `MethodBuilder.AddExperimentalStructuralConstraint` API now accepts
+output-owned imported closed reference alternatives in union bounds, including
+constructed interfaces such as `ImportedReads<int> | ImportedReadsB`. Constraint
+metadata retains the external type identity and exact generic arguments. Argument
+checks continue to require explicit nominal implementation/inheritance, with every
+source-union alternative covered. Matching member names are insufficient.
+
+Raven uses its existing explicit native structural-composition capability contract;
+no CLI carrier, schema change or new compiler switch is introduced. Its constraint
+probe emits `TraitLibrary.neox`, then `ExternalBoundLibrary.neox` with these bounds,
+then a separate `ExternalBoundConsumer.neox`. Import resolution requires both exact
+native dependencies. Host tests reject mismatched constructed arguments, partially
+covered unions and direct external intersection operands; source diagnostics reject
+nonimplementing lookalikes and arguments satisfying neither alternative.
+
+External bounds beneath any intersection remain rejected by this method-authoring
+API: the current snapshot reader cannot establish their extension eligibility
+without resolving external definitions. This is a reader/authoring gap, not a
+permanent type-system restriction. Local intersections and existing nominal/Self
+contracts are unchanged. Open operands, guest constraint reflection and JIT/AOT
+remain outside this slice. Compared with CLR constraints, the native signature
+preserves disjunction rather than changing it into a conjunctive nominal list.

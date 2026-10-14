@@ -4727,3 +4727,9 @@ that inherit imported interfaces. External bound authoring remains pending.
 2026-10-14 closed constructed imported trait targets now pass native structural proof
 and Raven execution (42). Exact type arguments are required; weaker unions reject.
 See the [constraint evidence](experiments/composition-constraints/README.md).
+
+2026-10-14 external union-bound follow-up: native method authoring and Raven's
+existing opt-in mapping now preserve imported closed reference alternatives,
+including constructed interfaces. A three-assembly consumer returns 42; shape-only,
+mismatched and partial-union arguments reject. External intersection-bound authoring
+and open operands remain gaps. See [evidence](experiments/composition-constraints/README.md#external-union-constraint-alternatives--2026-10-14-development).

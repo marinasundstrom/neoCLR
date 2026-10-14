@@ -68,6 +68,8 @@ def main():
             if dependency:
                 command += ['--module', output / 'constraints' / (dependency + '.neox')]
             run(consumer + ' execution', command, expected=42)
+        run('External union constraint consumer execution', [runtime, 'run', output / 'constraints/ExternalBoundConsumer.neox', *common,
+            '--module', output / 'constraints/ExternalBoundLibrary.neox', '--module', output / 'constraints/TraitLibrary.neox'], expected=42)
         for kind in ['Union', 'Intersection']:
             run(kind + ' separate consumer execution', [runtime, 'run', output / 'signatures' / f'Authored{kind}Consumer.neox', *common, '--module', output / 'signatures' / f'Authored{kind}.neox'], expected=42)
         run('Host-authored constraints execution', [runtime, 'run', output / 'Authored.neox', '--execution', 'interpreter'], expected=42)

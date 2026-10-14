@@ -73,7 +73,7 @@ acceptance evidence belongs in `results.json` alongside this document.
 - Open operands and complete recursive substitution, including `T | HttpError |
   JsonError`, `Request<T> | HttpError | JsonError`, and
   `Task<Response<T> | HttpError | JsonError>` in open generic definitions.
-- Direct external structural-bound authoring, generic owner/type-parameter compiler
+- Direct external intersection-bound authoring, generic owner/type-parameter compiler
   emission, broader constrained member imports and mixed source formulas.
 - Guest generic-constraint reflection, structural member/hierarchy/custom-attribute
   enumeration and unrestricted generic method specialization with structural arguments.
@@ -89,3 +89,8 @@ Earlier implementation checkpoints are retained under
 [structural constraints](../composition-constraints/README.md). Their pending-work
 statements describe their individual checkpoints; this document is the current
 bounded acceptance contract.
+
+Follow-up: imported closed union alternatives are now admitted and the acceptance
+runner also executes a separate consumer of such a constraint library. See the
+[external union checkpoint](../composition-constraints/README.md#external-union-constraint-alternatives--2026-10-14-development).
+The retained 20-check report above predates this additional consumer.

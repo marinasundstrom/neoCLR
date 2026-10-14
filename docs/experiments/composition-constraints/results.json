@@ -211,5 +211,35 @@
       "target/source-constraints/ConstructedTraits.neox": "a90773fe1d25bc9bacf576bd5e407de17cf1f2ee93f38a56db90316af0c50040",
       "target/source-constraints/TraitLibrary.neox": "44808cb8123a09cdbf159e0f2185b3544ebc9b3c87571c7fb64255766729e067"
     }
+  },
+  "externalUnionBounds": {
+    "date": "2026-10-14",
+    "scope": "Imported closed union alternatives; external intersection and open operands remain unsupported",
+    "checks": [
+      {
+        "command": "dotnet run --project tools/metadata/NeoCLR.Metadata.Experimental.Tests -- --authored-structural-constraints target/authored-structural-constraints.neox",
+        "result": "pass: native roundtrip, exact constructed argument, complete source-union coverage, invalid/external-intersection rejection"
+      },
+      {
+        "command": "Raven NeoClrMetadataProbe --structural-constraints target/composition-info-libraries-v2 target/external-union-constraints",
+        "result": "pass: three-assembly emission/import and invalid consumer diagnostics"
+      },
+      {
+        "command": "target/debug/neoclr run target/external-union-constraints/ExternalBoundConsumer.neox --system target/composition-info-libraries-v2/System.runtime.neox --module target/composition-info-libraries-v2/System.Runtime.dll --module target/external-union-constraints/TraitLibrary.neox --module target/external-union-constraints/ExternalBoundLibrary.neox --object-root target/composition-info-libraries-v2/System.Runtime.dll --execution interpreter --instructions 100000000",
+        "exitCode": 42
+      },
+      {
+        "command": "python3 scripts/build-api-docs.py --check",
+        "result": "pass"
+      }
+    ],
+    "sha256": {
+      "target/external-union-constraints/TraitLibrary.neox": "44808cb8123a09cdbf159e0f2185b3544ebc9b3c87571c7fb64255766729e067",
+      "target/external-union-constraints/ExternalBoundLibrary.neox": "17b2118eee4d926b989b8846122772024555ddc94a91234b2f0de46ac1f3c6b1",
+      "target/external-union-constraints/ExternalBoundConsumer.neox": "06a97a8c122ef5e08d359527387dcdadde8c56e3de64acb4bc297641599b1244",
+      "target/debug/neoclr": "a5a512335059ed78cf2768785c77b18c6efc4dbdd42908f81818058a03a70b2d",
+      "tools/metadata/NeoCLR.Metadata.Experimental.Tests/AuthoredStructuralConstraintChecks.cs": "1f9d35553c120e501c7302e792e863b797fdc04f4877bafc807a1751e4cee058",
+      "/Users/robert/Projects/raven-union-intersection/tools/NeoClrMetadataProbe/StructuralConstraintChecks.cs": "70fe61a416e11d498273e7fa769c6553c5abce16ea627bb8ede2e28fdd02ee93"
+    }
   }
 }

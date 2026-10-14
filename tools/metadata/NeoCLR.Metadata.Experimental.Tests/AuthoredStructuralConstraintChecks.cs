@@ -180,6 +180,15 @@ internal static class AuthoredStructuralConstraintChecks
         var a = graph.AddInterface("Example", "A");
         a.AddBaseInterface(owner.MakeGenericInstance(PrimitiveType.Int32));
         var b = graph.AddInterface("Example", "B");
+        var either = graph.AddFunction("Either", new MethodSignature(PrimitiveType.Int32, [], ["T"]));
+        either.AddExperimentalStructuralConstraint(0, ReferenceCompositionKind.Union, owner.MakeGenericInstance(PrimitiveType.Int32), b);
+        either.LoadConstant(42); either.Return();
+        _ = either.MakeGenericInstance(a);
+        _ = either.MakeGenericInstance(b);
+        _ = either.MakeGenericInstance(graph.CreateExperimentalReferenceComposition(ReferenceCompositionKind.Union, a, b));
+        Reject(() => either.MakeGenericInstance(owner.MakeGenericInstance(PrimitiveType.String)));
+        Reject(() => either.MakeGenericInstance(graph.CreateExperimentalReferenceComposition(ReferenceCompositionKind.Union, a, owner.MakeGenericInstance(PrimitiveType.String))));
+        Reject(() => either.AddExperimentalStructuralConstraint(0, ReferenceCompositionKind.Intersection, owner.MakeGenericInstance(PrimitiveType.Int32), b));
         var parameter = SignatureType.MethodParameter(0);
         var strong = graph.AddFunction("Strong", new MethodSignature(PrimitiveType.Int32, [parameter], ["T"]));
         strong.AddExperimentalStructuralConstraint(0, ReferenceCompositionKind.Intersection, a, b);
@@ -192,7 +201,10 @@ internal static class AuthoredStructuralConstraintChecks
         weak.AddExperimentalStructuralConstraint(0, ReferenceCompositionKind.Union, a, b);
         Reject(() => weak.GetILGenerator().CallConstrained(parameter, read.MakeConstructedReference([PrimitiveType.Int32])));
         weak.LoadConstant(0); weak.Return();
-        _ = graph.WriteNativeAssembly();
+        var snapshot = AssemblyDefinition.ReadNativeAssembly(NativeModuleContainer.WriteBinary(graph.WriteNativeAssembly()), true);
+        var bound = snapshot.MainModule.Functions.Single(m => m.Name == "Either").TypeConstraints.Single().Bound;
+        if (bound.Composition?.Kind != ReferenceCompositionKind.Union || !bound.Composition.Constituents.Any(t => t.ReferencedGenericInstance is { } c && c.TypeArguments.Single().Primitive == PrimitiveType.Int32))
+            throw new Exception("external union constraint identity lost");
         Reject(() => graph.Write());
     }
 
