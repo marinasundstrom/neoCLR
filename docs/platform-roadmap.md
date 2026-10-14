@@ -4691,3 +4691,8 @@ and backend support remain open. [Descriptor probe](experiments/composition-type
 2026-10-14 author-requested Raven intersection slice complete: direct source signatures, trait dispatch, reflection and cross-library consumers pass; [evidence](experiments/source-structural-intersections/README.md). Production/open-generic/backend support remains future work.
 
 2026-10-14 author-directed constraint work: [native constraint checks and companion compiler semantics](experiments/composition-constraints/README.md) implemented as a bounded experimental slice. Native Raven emission/reflection remain explicit follow-up work.
+
+2026-10-14 native metadata constraint follow-up: host inspection now preserves closed
+structural method bounds and exposes their complete type views. Native authoring,
+Raven emission/import, class constraint materialization and guest constraint reflection
+remain pending; [focused evidence](experiments/composition-constraints/README.md).

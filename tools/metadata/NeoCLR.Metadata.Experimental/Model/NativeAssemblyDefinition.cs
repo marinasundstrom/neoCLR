@@ -29,7 +29,7 @@ public sealed partial class NativeAssemblyDefinition
     }
     private sealed record AttributeRow(SignatureType Owner, CustomAttributeArgument[] Arguments) { internal CustomAttributeNamedArgument[] Named { get; init; } = []; }
     private sealed record FieldRow(string Name, JsonElement Type, FieldVisibility Visibility, bool IsReadOnly = false, SignatureType? Signature = null);
-    private sealed record MethodRow(string Namespace, string Name, int Owner, MethodSignature Signature, MethodVisibility Visibility, bool Instance, bool Override) { internal Dictionary<int, AttributeRow[]> ParameterAttributes { get; init; } = []; internal AttributeRow[] Attributes { get; init; } = []; internal bool ObjectSlot { get; init; } internal bool Virtual { get; init; } internal bool Abstract { get; init; } internal ushort ImplementationAttributes { get; init; } internal NativeImportDefinition? NativeImport { get; init; } internal int? ParameterArrayIndex { get; init; } internal Dictionary<int, NullableAnnotation> NullableAnnotations { get; init; } = []; internal (SignatureType Owner, string Name)[] ExplicitInterfaces { get; init; } = []; internal Dictionary<int, string> ParameterNames { get; init; } = []; internal (int Parameter, SignatureType Type, int Owner)[] InterfaceConstraints { get; init; } = []; }
+    private sealed record MethodRow(string Namespace, string Name, int Owner, MethodSignature Signature, MethodVisibility Visibility, bool Instance, bool Override) { internal Dictionary<int, AttributeRow[]> ParameterAttributes { get; init; } = []; internal AttributeRow[] Attributes { get; init; } = []; internal bool ObjectSlot { get; init; } internal bool Virtual { get; init; } internal bool Abstract { get; init; } internal ushort ImplementationAttributes { get; init; } internal NativeImportDefinition? NativeImport { get; init; } internal int? ParameterArrayIndex { get; init; } internal Dictionary<int, NullableAnnotation> NullableAnnotations { get; init; } = []; internal (SignatureType Owner, string Name)[] ExplicitInterfaces { get; init; } = []; internal Dictionary<int, string> ParameterNames { get; init; } = []; internal (int Parameter, SignatureType Type, int Owner, bool Structural)[] TypeConstraints { get; init; } = []; }
     private sealed record PropertyRow(int Owner, string Name, SignatureType Type, int Getter, int Setter, SignatureType[] Parameters, bool IsInitOnly);
     private sealed record NativeTypeAlias(string NativeName, AssemblyIdentity Assembly, string Namespace, string Name, int Arity, bool ValueType, string? Declaring, int DeclaringArity);
     private readonly Dictionary<(string Name, int Arity), NativeTypeAlias> nativeTypeAliases;
@@ -777,20 +777,23 @@ public sealed partial class NativeAssemblyDefinition
                     foreach (var local in Array(method, "locals", 1024)) _ = ReadType(local, false, allowComposition: allowComposition);
                 var parameters = Array(method, "parameters", 256);
                 var parameterTypes = parameters.Select(p => ReadType(p, false, allowByReference: true, allowSelf: ownerIndex >= 0 && types[ownerIndex].IsInterface, allowComposition: allowComposition)).ToArray();
-                var methodConstraints = new List<(int Parameter, SignatureType Type, int Owner)>();
+                var methodConstraints = new List<(int Parameter, SignatureType Type, int Owner, bool Structural)>();
                 if (method.TryGetProperty("generic_constraints", out _))
                     foreach (var constraint in Array(method, "generic_constraints", 128))
                     {
                         Shape(constraint, "parameter", "kind");
                         var parameter = constraint.GetProperty("parameter").GetInt32();
                         var kind = constraint.GetProperty("kind"); Shape(kind, "TypeBound");
-                        var bound = ReadType(kind.GetProperty("TypeBound"), false);
+                        var rawBound = kind.GetProperty("TypeBound");
+                        var structural = rawBound.ValueKind == JsonValueKind.Object &&
+                            (rawBound.TryGetProperty("Union", out _) || rawBound.TryGetProperty("Intersection", out _));
+                        var bound = ReadType(rawBound, false, allowComposition: structural);
                         var boundOwner = System.Array.IndexOf(signatureOwners, bound.ClassType);
                         Require(parameter >= 0 && parameter < genericArity &&
-                            (boundOwner >= 0 && types[boundOwner].IsInterface && types[boundOwner].GenericNames.Length == 0 ||
+                            (structural || boundOwner >= 0 && types[boundOwner].IsInterface && types[boundOwner].GenericNames.Length == 0 ||
                              bound.ImportedType is { GenericArity: 0, IsValueType: false, DeclaringType: null }) &&
-                            !methodConstraints.Any(c => c.Parameter == parameter && Equals(c.Type, bound)), "unsupported or duplicate method interface bound");
-                        methodConstraints.Add((parameter, bound, boundOwner));
+                            !methodConstraints.Any(c => c.Parameter == parameter && Equals(c.Type, bound)), "unsupported or duplicate method type bound");
+                        methodConstraints.Add((parameter, bound, boundOwner, structural));
                     }
                 var noResult = method.GetProperty("no_result").GetBoolean();
                 var resultType = ReadType(method.GetProperty("returns"), noResult, allowSelf: ownerIndex >= 0 && types[ownerIndex].IsInterface, allowComposition: allowComposition);
@@ -927,7 +930,7 @@ public sealed partial class NativeAssemblyDefinition
                     Require(!method.TryGetProperty("out_parameters", out var nativeOutputs) || nativeOutputs.GetArrayLength() == 0, "native imports do not infer output marshalling");
                     nativeImport.Validate(new(resultType, parameterTypes));
                 }
-                methods.Add(new(ns, name, ownerIndex, new(resultType, parameterTypes, genericNames, method.TryGetProperty("out_parameters", out _) ? Array(method, "out_parameters", 256).Select(p => p.GetInt32()) : []), visibility, instance, isOverride) { ParameterAttributes = parameterAttributes.ToDictionary(p => p.Key, p => p.Value.ToArray()), Attributes = methodAttributes.ToArray(), Virtual = isVirtual, Abstract = isAbstract, ObjectSlot = objectSlot, ImplementationAttributes = implementationAttributes, NativeImport = nativeImport, ParameterArrayIndex = parameterArray, NullableAnnotations = nullableAnnotations, ParameterNames = parameterNames, InterfaceConstraints = methodConstraints.ToArray(), ExplicitInterfaces = explicitMappings.ToArray() }); methodNames.Add(Text(method, "name"));
+                methods.Add(new(ns, name, ownerIndex, new(resultType, parameterTypes, genericNames, method.TryGetProperty("out_parameters", out _) ? Array(method, "out_parameters", 256).Select(p => p.GetInt32()) : []), visibility, instance, isOverride) { ParameterAttributes = parameterAttributes.ToDictionary(p => p.Key, p => p.Value.ToArray()), Attributes = methodAttributes.ToArray(), Virtual = isVirtual, Abstract = isAbstract, ObjectSlot = objectSlot, ImplementationAttributes = implementationAttributes, NativeImport = nativeImport, ParameterArrayIndex = parameterArray, NullableAnnotations = nullableAnnotations, ParameterNames = parameterNames, TypeConstraints = methodConstraints.ToArray(), ExplicitInterfaces = explicitMappings.ToArray() }); methodNames.Add(Text(method, "name"));
             }
             nativeTypeAliases.TryGetValue(("System.Object", 0), out var externalRootAlias);
             if (externalRootAlias is not null)
@@ -1130,8 +1133,9 @@ public sealed partial class NativeAssemblyDefinition
             foreach (var pair in method.NullableAnnotations) output.SetNullableAnnotation(pair.Key, pair.Value);
             foreach (var pair in method.ParameterNames) output.SetParameterName(pair.Key, pair.Value);
             // Reference emission supplies throwing bodies; do not invent executable native behavior.
-            foreach (var bound in method.InterfaceConstraints)
+            foreach (var bound in method.TypeConstraints)
             {
+                if (bound.Structural) throw new NotSupportedException("structural method bounds have no CLI projection");
                 if (bound.Owner < 0) throw new NotSupportedException("external method bounds require direct native import");
                 output.AddInterfaceConstraint(bound.Parameter, owners[bound.Owner]);
             }

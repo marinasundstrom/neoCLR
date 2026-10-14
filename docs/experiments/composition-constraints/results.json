@@ -23,5 +23,24 @@
   "sha256": {
     "docs/experiments/composition-constraints/native.neil": "bfec44e8cdd541ba881321445b8deaf89d79ab00811f2dacfd3cf83dfa133e4c",
     "tests/composition_constraints.rs": "471ebb807853b5d627b056c2a0029d4c013aafb9c87a072d461eddd81f2c330c"
+  },
+  "metadataInspection": {
+    "date": "2026-10-14",
+    "scope": "Host native method-bound materialization and introspection only; compiler emission/import and guest constraint reflection pending",
+    "checks": [
+      {
+        "command": "dotnet run --project tools/metadata/NeoCLR.Metadata.Experimental.Tests -- --structural-method-constraints",
+        "result": "pass; dedicated structural checks and existing GenericMethodConstraintChecks"
+      },
+      {
+        "command": "dotnet run --project tools/metadata/NeoCLR.Metadata.Experimental.Tests --no-build -- --reference-compositions",
+        "result": "pass"
+      },
+      {
+        "command": "python3 scripts/build-api-docs.py --check",
+        "result": "pass"
+      }
+    ],
+    "testSha256": "d1a578056b4f0494730740a34ed1f7b465835da3389ca5aa82365392e529d8c0"
   }
 }

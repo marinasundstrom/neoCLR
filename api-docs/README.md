@@ -2032,3 +2032,9 @@ and native API render are rebuilt from matching development library sources, wit
 XML migration notes. The existing nominal type selection covers the new member.
 
 The host-only [authored reference composition API](experimental-metadata.md#authored-reference-compositions-2026-10-14-development) is manually documented and excluded from guest RavenDoc selection.
+
+The host-only `GenericMethodTypeConstraint`, `MethodDefinition.TypeConstraints` and
+`MethodGenericParameterTypeInfo.GetTypeConstraints()` APIs are covered by the
+[manual structural constraint reference](experimental-metadata.md#structural-method-constraint-inspection-2026-10-14-development).
+They are C# tooling APIs, excluded from guest RavenDoc selection; no guest assembly
+or generated API snapshot changes in this slice. The snapshot check passes.

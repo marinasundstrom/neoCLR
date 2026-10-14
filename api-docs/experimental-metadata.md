@@ -8665,3 +8665,39 @@ intersection element type; no nominal carrier declaration is synthesized. Native
 interpreter execution requires experimental-compositions; JIT/AOT remain gated.
 Validation: the host test runner's `--authored-compositions` checks native roundtrip,
 normalization, ownership, unsupported bounds and finality mutation.
+
+## Structural method constraint inspection (2026-10-14, development)
+
+The host C# metadata library can read closed structural method bounds from native
+NEOX using `AssemblyDefinition.ReadNativeAssembly(image, allowExperimentalCompositions: true)`.
+This is native metadata inspection, not a CLI representation or guest runtime API.
+The ordinary reader rejects these bounds.
+
+- `GenericMethodTypeConstraint(int ParameterIndex, SignatureType Bound)` records a
+  zero-based method parameter ordinal and its complete bound signature.
+- `MethodDefinition.TypeConstraints` returns a read-only snapshot of all supported
+  nominal and structural method type bounds. Unsupported generic constraints throw
+  `InvalidDataException`; an incomplete bound set is never returned.
+- `MethodGenericParameterTypeInfo.GetTypeConstraints()` returns the corresponding
+  context-owned `TypeInfo` views, including `ReferenceCompositionTypeInfo` with its
+  kind and constituents. Repeated resolution shares canonical type-view identity.
+  Unsupported constraints or unresolved dependencies throw `InvalidDataException`.
+
+For example, enumerate `parameter.GetTypeConstraints()` and inspect a returned
+`ReferenceCompositionTypeInfo.Kind` and `.Constituents` to distinguish an any-of
+union from an all-of intersection. These queries do not check supplied generic
+arguments or execute the method. Bounds remain closed reference compositions;
+open operands and final intersection classes reject. Closed hierarchy roots remain
+valid. Normalization can collapse duplicate operands to a nominal signature.
+
+The older `InterfaceConstraints` and `GetInterfaceConstraints()` APIs are
+nominal-interface-only. They throw for a structurally encoded bound, including one
+collapsed by normalization, so existing consumers cannot silently erase its contract.
+CLI projection and callable import of structurally constrained methods remain
+unsupported. Type-parameter constraints on generic classes, authoring these bounds,
+Raven native emission and guest constraint reflection are separate pending work.
+Compared with CLR conjunctive nominal bounds, native signatures retain disjunction
+and explicit grouping; the cost is an opt-in native-only consumption contract.
+Validation: `--structural-method-constraints` in the metadata test executable covers
+JSON/binary roundtrip, context identity, mixed grouping, normalization, nominal
+compatibility, invalid bounds/ordinals/duplicates and unsupported consumer gates.

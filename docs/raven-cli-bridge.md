@@ -9810,3 +9810,13 @@ Evidence: `docs/experiments/source-structural-unions` and
 This supersedes earlier source-authoring/type-token gaps, not other runtime limits.
 
 Constraint follow-up, 2026-10-14: companion Raven checks structural union/intersection generic arguments and recursively substitutes bound parameters. The native interpreter accepts closed compound TypeBound metadata; the host adapter and Raven native emitter still reject these constraint declarations. No CLI weakening or carrier replacement is used. See [scope and validation](experiments/composition-constraints/README.md).
+
+Native metadata inspection follow-up, 2026-10-14: the host C# metadata library now
+preserves structural method bounds on explicitly opted-in native reads and exposes
+`MethodDefinition.TypeConstraints` / `MethodGenericParameterTypeInfo.GetTypeConstraints`.
+The previous nominal-interface queries fail explicitly for structural bounds.
+No CLI encoding or carrier is introduced. `RavenNeoClrStructuralCompositions`
+remains the compiler opt-in; compiler constraint emission/import still needs wiring.
+The host reader and introspection layers own this slice on the paired experimental
+branches; JSON/binary roundtrip, grouping, invalid operands and nominal compatibility
+pass focused metadata tests. No new runtime bundle is required or claimed.

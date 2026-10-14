@@ -6,6 +6,8 @@ using AssemblyDefinition = NeoCLR.Metadata.Experimental.Model.AssemblyDefinition
 
 if (args is ["--composition-imports", var compositionOutput]) { ReferenceCompositionImportChecks.Run(compositionOutput); return 0; }
 
+if (args is ["--structural-method-constraints"]) { StructuralMethodConstraintChecks.Run(); GenericMethodConstraintChecks.Run(); return 0; }
+
 if (args is ["--authored-compositions"]) { AuthoredCompositionChecks.Run(); return 0; }
 if (args is ["--reference-compositions"]) { ReferenceCompositionChecks.Run(); Console.WriteLine("PASS read-only reference compositions"); return 0; }
 
@@ -559,6 +561,7 @@ var tests = new (string Name, Action Body)[]
     ("Explicit nominal array backing", ArrayBackingChecks.Run),
     ("Core-marked namespace function binding", NamespaceBindingChecks.Run),
     ("Direct native definition materialization", NativeDefinitionChecks.Run),
+    ("Structural method constraint reads", StructuralMethodConstraintChecks.Run),
     ("Experimental native reference composition reads", ReferenceCompositionChecks.Run),
     ("Experimental native composition callable imports", () => ReferenceCompositionImportChecks.Run()),
     ("Native generic static method definitions", NativeGenericMethodChecks.Run),

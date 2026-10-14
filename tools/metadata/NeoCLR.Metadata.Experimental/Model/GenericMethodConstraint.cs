@@ -5,14 +5,31 @@ namespace NeoCLR.Metadata.Experimental.Model;
 /// <param name="InterfaceType">Nongeneric interface reference scoped to the declaring module.</param>
 public sealed record GenericMethodInterfaceConstraint(int ParameterIndex, TypeReference InterfaceType);
 
+/// <summary>A method type-parameter bound represented by its complete metadata signature.</summary>
+/// <param name="ParameterIndex">Zero-based method type parameter ordinal.</param>
+/// <param name="Bound">Nominal or explicitly admitted structural type signature.</param>
+public sealed record GenericMethodTypeConstraint(int ParameterIndex, SignatureType Bound);
+
 public sealed partial class MethodDefinition
 {
     private readonly List<GenericMethodInterfaceConstraint> authoredInterfaceConstraints = [];
     private AssemblyDefinition.MethodConstraintRow[] loadedInterfaceConstraints = [];
+    private AssemblyDefinition.StructuralMethodConstraintRow[] loadedStructuralConstraints = [];
+
+    /// <summary>Gets all supported method type bounds without losing structural grouping.</summary>
+    /// <remarks>Structural bounds require an explicitly opted-in native snapshot. This query does not validate type arguments.</remarks>
+    /// <exception cref="InvalidDataException">The method has unsupported generic constraints.</exception>
+    public IReadOnlyList<GenericMethodTypeConstraint> TypeConstraints => unsupportedGenericParameters
+        ? throw new InvalidDataException("method has unsupported generic parameter constraints")
+        : Array.AsReadOnly((AuthoredSignature is not null
+            ? authoredInterfaceConstraints.Select(c => new GenericMethodTypeConstraint(c.ParameterIndex, ConstraintSignature(c.InterfaceType)))
+            : loadedInterfaceConstraints.Select(c => new GenericMethodTypeConstraint(c.Parameter, Module.GetNativeSignatureType(c.Interface)))
+                .Concat(loadedStructuralConstraints.Select(c => new GenericMethodTypeConstraint(c.Parameter, c.Bound.Materialize(Module)))))
+            .ToArray());
     /// <summary>Gets method-scoped interface bounds, preserving parameter ordinals.</summary>
-    /// <remarks>The initial contract supports local or external nongeneric interfaces only.</remarks>
+    /// <remarks>Supports nominal nongeneric interfaces only; use TypeConstraints for structural bounds. A structural bound causes this query to throw rather than return an incomplete set.</remarks>
     /// <exception cref="InvalidDataException">Loaded metadata contains unsupported constraints; no partial constraint set is returned.</exception>
-    public IReadOnlyList<GenericMethodInterfaceConstraint> InterfaceConstraints => unsupportedGenericParameters
+    public IReadOnlyList<GenericMethodInterfaceConstraint> InterfaceConstraints => unsupportedGenericParameters || loadedStructuralConstraints.Length != 0
         ? throw new InvalidDataException("method has unsupported generic parameter constraints")
         : AuthoredSignature is not null
         ? authoredInterfaceConstraints.AsReadOnly()

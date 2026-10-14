@@ -17598,3 +17598,12 @@ expanded structural-only run passed 18 (overlapping evidence, not 61 unique test
 Native compiler emission, host adapter materialization and guest reflected grouping
 remain unfinished and are not claimed by this slice. See
 [constraint implementation scope](experiments/composition-constraints/README.md).
+
+Native direction clarification, 2026-10-14: the author asked about moving from the
+neoCLR to .NET adapter, then said they were unsure which boundary was meant. The
+assistant distinguished native neoCLR metadata, the C# library that reads/writes it,
+and the temporary CLI bridge. The author explicitly directed: “Yes, continue towards
+native neoCLR metadata”. The assistant implemented host inspection of structural
+method constraints without a CLI projection. This preserves signature-level grouping
+and type introspection; compiler emission/import and guest constraint reflection
+remain open. See the [metadata constraint reference](../api-docs/experimental-metadata.md#structural-method-constraint-inspection-2026-10-14-development).

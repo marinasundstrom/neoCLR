@@ -14,6 +14,7 @@ public sealed partial class MethodDefinition
     {
         Module = module;
         loadedInterfaceConstraints = row.InterfaceConstraints ?? [];
+        loadedStructuralConstraints = row.StructuralConstraints ?? [];
         MetadataToken = row.Token;
         Name = row.Name;
         declarationAttributes = row.Attributes;

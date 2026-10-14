@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-14
 
+- Preserve closed structural method constraints in opt-in native metadata snapshots and expose complete bound signatures/type views. Keep nominal-interface queries, CLI projection and unsupported imports from silently weakening the contract. Validate JSON/binary roundtrips, grouping, invalid bounds and nominal compatibility; native compiler emission remains pending.
+
 - Admit experimental closed structural TypeBound constraints on native generic types/methods, preserving any-of/all-of grouping and enforcing complete union-argument coverage at instantiation. Keep default rejection and open-bound/backend gates. Add native constraint execution and negative/roundtrip tests; companion Raven semantic checking is separate from pending native compiler emission.
 
 - Record renewed author direction for structural union/intersection type constraints, distinguishing existing conjunctive Raven constraints from pending native encoding, argument checking, substitution and reflection. Document proposed semantics without claiming implementation.
