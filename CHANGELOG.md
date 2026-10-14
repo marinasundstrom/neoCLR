@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-14
 
+- Document private TLS ABI safety requirements for context/session ownership, serialized access, buffers, output slots and callbacks. Strict all-target Clippy and the seven non-certificate TLS tests pass; no ABI or runtime behavior changes.
+
 - Repair integrated codegen license paths in the dependency notice inventory. The source notice audit passes with the runtime-owned Cranelift license; historical benchmark/provenance records remain unchanged.
 
 - Simplify next-preview notes to current behavior and migration guidance following author feedback. Move candidate provenance and pending qualification into internal release tracking; retain concise user-relevant limits and document the distinction from implementation caveats. Preserve published release records.

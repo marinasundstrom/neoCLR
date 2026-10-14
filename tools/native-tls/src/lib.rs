@@ -63,6 +63,9 @@ unsafe fn file(path: *const c_char) -> Option<Vec<u8>> {
     (data.len() <= LIMIT).then_some(data)
 }
 /// Input paths are NUL-terminated UTF-8. Returns null on invalid credentials.
+///
+/// # Safety
+/// Nonnull paths must point to readable NUL-terminated strings for the call.
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn neoclr_tls_config_new(
     cert: *const c_char,
@@ -94,6 +97,11 @@ unsafe fn bytes<'a>(data: *const u8, count: u32) -> Option<&'a [u8]> {
 
 /// Creates an owned configuration or returns a typed private status. Clears output
 /// before validation; the output slot must be writable and must not alias inputs.
+///
+/// # Safety
+/// All nonempty input buffers must be readable for their declared lengths for the call.
+/// They must not be mutated concurrently.
+/// A nonnull output slot must be aligned, writable, and disjoint from all inputs.
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn neoclr_tls_server_config_create_pem(
     cert: *const u8,
@@ -126,6 +134,11 @@ pub unsafe extern "C" fn neoclr_tls_server_config_create_pem(
 }
 
 /// Explicit trust anchors only; output and ownership follow the server constructor.
+///
+/// # Safety
+/// All nonempty input buffers must be readable for their declared lengths for the call.
+/// They must not be mutated concurrently.
+/// A nonnull output slot must be aligned, writable, and disjoint from all inputs.
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn neoclr_tls_client_config_create_pem(
     roots: *const u8,
@@ -155,6 +168,10 @@ pub unsafe extern "C" fn neoclr_tls_client_config_create_pem(
 }
 
 /// Compatibility entry point for existing hosts. Empty ALPN is protocol-neutral.
+///
+/// # Safety
+/// All nonempty input buffers must be readable for their declared lengths for the call.
+/// They must not be mutated concurrently.
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn neoclr_tls_server_config_from_pem(
     cert: *const u8,
@@ -179,6 +196,10 @@ pub unsafe extern "C" fn neoclr_tls_server_config_from_pem(
     output
 }
 
+///
+/// # Safety
+/// All nonempty input buffers must be readable for their declared lengths for the call.
+/// They must not be mutated concurrently.
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn neoclr_tls_client_config_from_pem(
     roots: *const u8,
@@ -193,6 +214,10 @@ pub unsafe extern "C" fn neoclr_tls_client_config_from_pem(
     output
 }
 
+///
+/// # Safety
+/// A nonnull config must be an owned client configuration from this adapter.
+/// Consume it exactly once, with no concurrent access.
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn neoclr_tls_client_config_free(config: *mut c_void) {
     if !config.is_null() {
@@ -201,6 +226,12 @@ pub unsafe extern "C" fn neoclr_tls_client_config_free(config: *mut c_void) {
 }
 
 /// The UTF-8 server name is verified, and is retained independently of this call.
+///
+/// # Safety
+/// A nonnull config must be a live client configuration from this adapter,
+/// which must not be freed during the call.
+/// All nonempty input buffers must be readable for their declared lengths for the call.
+/// They must not be mutated concurrently.
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn neoclr_tls_client_session_new(
     config: *mut c_void,
@@ -234,6 +265,10 @@ fn new_session(connection: Connection) -> *mut c_void {
     Box::into_raw(Box::new(make_session(connection))).cast()
 }
 
+///
+/// # Safety
+/// A nonnull config must be an owned server configuration from this adapter.
+/// Consume it exactly once, with no concurrent access.
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn neoclr_tls_config_free(config: *mut c_void) {
     if !config.is_null() {
@@ -246,6 +281,10 @@ struct Session {
     failed: bool,
     closing: bool,
 }
+///
+/// # Safety
+/// A nonnull config must be a live server configuration from this adapter,
+/// which must not be freed during the call.
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn neoclr_tls_session_new(config: *mut c_void) -> *mut c_void {
     if config.is_null() {
@@ -314,6 +353,14 @@ fn transfer(
 }
 /// Drives authentication without reading or writing application plaintext.
 /// Returns 0 authenticated, -1 pending, -2 terminal failure. Host serializes all polls.
+///
+/// # Safety
+/// The session must be a live session created by this adapter and exclusively
+/// accessible for the call.
+/// The callback must remain valid for the call and accept the supplied context.
+/// It must not unwind, retain buffer pointers, or reenter the session/context.
+/// For receives it may write only the supplied range; for sends it must not mutate it.
+/// Its nonnegative byte count must not exceed the supplied length.
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn neoclr_tls_handshake(
     session: *mut c_void,
@@ -362,6 +409,14 @@ pub unsafe extern "C" fn neoclr_tls_handshake(
 /// Flushes a close-notify without waiting for the peer or closing the transport.
 /// Returns 0 flushed, -1 pending, -2 terminal failure, -3 invalid operation state.
 /// Complete authentication and any pending write first; serialize all session calls.
+///
+/// # Safety
+/// The session must be a live session created by this adapter and exclusively
+/// accessible for the call.
+/// The callback must remain valid for the call and accept the supplied context.
+/// It must not unwind, retain buffer pointers, or reenter the session/context.
+/// For receives it may write only the supplied range; for sends it must not mutate it.
+/// Its nonnegative byte count must not exceed the supplied length.
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn neoclr_tls_shutdown(
     session: *mut c_void,
@@ -401,6 +456,16 @@ pub unsafe extern "C" fn neoclr_tls_shutdown(
 /// Returns -1 pending, -2 terminal transport/TLS failure, otherwise plaintext bytes.
 /// Returns -3 for a new send after local shutdown; reads remain available.
 /// A pending send must be retried with the same operation until completion or abort.
+///
+/// # Safety
+/// The session must be a live session created by this adapter and exclusively
+/// accessible for the call.
+/// Data must be nonnull even for zero length, writable for count bytes, and
+/// exclusively borrowed for the call, disjoint from session and callback state.
+/// The callback must remain valid for the call and accept the supplied context.
+/// It must not unwind, retain buffer pointers, or reenter the session/context.
+/// For receives it may write only the supplied range; for sends it must not mutate it.
+/// Its nonnegative byte count must not exceed the supplied length.
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn neoclr_tls_transfer(
     session: *mut c_void,
@@ -435,6 +500,9 @@ pub unsafe extern "C" fn neoclr_tls_transfer(
         }
     }
 }
+///
+/// # Safety
+/// A nonnull session must be a live session from this adapter, exclusively accessible.
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn neoclr_tls_abort(session: *mut c_void) {
     if !session.is_null() {
@@ -442,6 +510,14 @@ pub unsafe extern "C" fn neoclr_tls_abort(session: *mut c_void) {
     }
 }
 /// Synchronous teardown: best-effort close_notify, then drop; never waits for peer.
+///
+/// # Safety
+/// A nonnull session must be an owned session from this adapter.
+/// Consume it exactly once, with no concurrent access.
+/// The callback must remain valid for the call and accept the supplied context.
+/// It must not unwind, retain buffer pointers, or reenter the session/context.
+/// For receives it may write only the supplied range; for sends it must not mutate it.
+/// Its nonnegative byte count must not exceed the supplied length.
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn neoclr_tls_session_free(
     session: *mut c_void,

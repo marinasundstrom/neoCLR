@@ -74,12 +74,21 @@ pub extern "C" fn neoclr_tls_context_new(limit: u32) -> *mut c_void {
     .cast()
 }
 /// Deterministic abortive cleanup. Performs no I/O and does not retain callbacks.
+///
+/// # Safety
+/// A nonnull pointer must identify a live context returned by neoclr_tls_context_new.
+/// The caller must serialize access and prevent reentrant access to that context.
+/// Consume the context exactly once; no resources may be accessed afterward.
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn neoclr_tls_context_free(pointer: *mut c_void) {
     if !pointer.is_null() {
         drop(unsafe { Box::from_raw(pointer.cast::<Context>()) });
     }
 }
+///
+/// # Safety
+/// A nonnull pointer must identify a live context returned by neoclr_tls_context_new.
+/// The caller must serialize access and prevent reentrant access to that context.
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn neoclr_tls_context_release(pointer: *mut c_void, id: u64) -> i32 {
     let Ok(context) = (unsafe { context(pointer) }) else {
@@ -91,6 +100,13 @@ pub unsafe extern "C" fn neoclr_tls_context_release(pointer: *mut c_void, id: u6
         INVALID_HANDLE
     }
 }
+///
+/// # Safety
+/// A nonnull pointer must identify a live context returned by neoclr_tls_context_new.
+/// The caller must serialize access and prevent reentrant access to that context.
+/// All nonempty input buffers must be readable for their declared lengths for the call.
+/// They must not be mutated concurrently.
+/// A nonnull output slot must be aligned, writable, and disjoint from all inputs.
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn neoclr_tls_context_server_config(
     pointer: *mut c_void,
@@ -118,6 +134,13 @@ pub unsafe extern "C" fn neoclr_tls_context_server_config(
         })
     }
 }
+///
+/// # Safety
+/// A nonnull pointer must identify a live context returned by neoclr_tls_context_new.
+/// The caller must serialize access and prevent reentrant access to that context.
+/// All nonempty input buffers must be readable for their declared lengths for the call.
+/// They must not be mutated concurrently.
+/// A nonnull output slot must be aligned, writable, and disjoint from all inputs.
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn neoclr_tls_context_client_config(
     pointer: *mut c_void,
@@ -141,6 +164,13 @@ pub unsafe extern "C" fn neoclr_tls_context_client_config(
     }
 }
 /// Client configs require the verified UTF-8 peer name. Server configs require empty name.
+///
+/// # Safety
+/// A nonnull pointer must identify a live context returned by neoclr_tls_context_new.
+/// The caller must serialize access and prevent reentrant access to that context.
+/// All nonempty input buffers must be readable for their declared lengths for the call.
+/// They must not be mutated concurrently.
+/// A nonnull output slot must be aligned, writable, and disjoint from all inputs.
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn neoclr_tls_context_session(
     pointer: *mut c_void,
@@ -178,6 +208,14 @@ pub unsafe extern "C" fn neoclr_tls_context_session(
         })
     }
 }
+///
+/// # Safety
+/// A nonnull pointer must identify a live context returned by neoclr_tls_context_new.
+/// The caller must serialize access and prevent reentrant access to that context.
+/// The callback must remain valid for the call and accept the supplied context.
+/// It must not unwind, retain buffer pointers, or reenter the session/context.
+/// For receives it may write only the supplied range; for sends it must not mutate it.
+/// Its nonnegative byte count must not exceed the supplied length.
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn neoclr_tls_context_handshake(
     pointer: *mut c_void,
@@ -190,6 +228,14 @@ pub unsafe extern "C" fn neoclr_tls_context_handshake(
         Err(error) => error,
     }
 }
+///
+/// # Safety
+/// A nonnull pointer must identify a live context returned by neoclr_tls_context_new.
+/// The caller must serialize access and prevent reentrant access to that context.
+/// The callback must remain valid for the call and accept the supplied context.
+/// It must not unwind, retain buffer pointers, or reenter the session/context.
+/// For receives it may write only the supplied range; for sends it must not mutate it.
+/// Its nonnegative byte count must not exceed the supplied length.
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn neoclr_tls_context_shutdown(
     pointer: *mut c_void,
@@ -202,6 +248,10 @@ pub unsafe extern "C" fn neoclr_tls_context_shutdown(
         Err(error) => error,
     }
 }
+///
+/// # Safety
+/// A nonnull pointer must identify a live context returned by neoclr_tls_context_new.
+/// The caller must serialize access and prevent reentrant access to that context.
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn neoclr_tls_context_abort(pointer: *mut c_void, id: u64) -> i32 {
     match unsafe { context(pointer) }.and_then(|context| context.session(id)) {
@@ -212,6 +262,16 @@ pub unsafe extern "C" fn neoclr_tls_context_abort(pointer: *mut c_void, id: u64)
         Err(error) => error,
     }
 }
+///
+/// # Safety
+/// A nonnull pointer must identify a live context returned by neoclr_tls_context_new.
+/// The caller must serialize access and prevent reentrant access to that context.
+/// Nonempty data must be writable for count bytes and exclusively borrowed,
+/// disjoint from context and callback state.
+/// The callback must remain valid for the call and accept the supplied context.
+/// It must not unwind, retain buffer pointers, or reenter the session/context.
+/// For receives it may write only the supplied range; for sends it must not mutate it.
+/// Its nonnegative byte count must not exceed the supplied length.
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn neoclr_tls_context_transfer(
     pointer: *mut c_void,
@@ -371,6 +431,13 @@ fn overlap(a: (usize, usize), b: (usize, usize)) -> bool {
 /// nonempty ranges must be valid and pairwise disjoint. Host serializes context.
 /// Rejected null/overflow/length/overlap/operation inputs leave progress untouched.
 /// The host remains responsible for accessible, aligned memory and context lifetime.
+///
+/// # Safety
+/// A nonnull pointer must identify a live context returned by neoclr_tls_context_new.
+/// The caller must serialize access and prevent reentrant access to that context.
+/// Input must be readable; output and plaintext must be writable for their
+/// declared lengths. Progress must be aligned and writable. All ranges must be
+/// pairwise disjoint and disjoint from context-owned memory for the call.
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn neoclr_tls_context_pump_v1(
     pointer: *mut c_void,
