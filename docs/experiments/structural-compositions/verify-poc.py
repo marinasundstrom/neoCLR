@@ -32,6 +32,18 @@ for profile in ['', 'generic']:
         results.append({'name': label, 'exit': run.returncode, 'result': 'Int32(42)',
             'source': (directory / f'{name}.rvn').read_text().strip()})
         print(f'PASS {label}: Int32(42)')
+for kind in ['Union', 'Intersection']:
+    for producer in ['Host', 'Raven']:
+        name = f'{kind}{producer}'
+        directory = output / 'wrappers'
+        run = subprocess.run([str(ROOT / 'target/debug/neoclr'), 'run', str(directory / f'{name}.neox'),
+            '--module', str(directory / f'{kind}Provider.neox'), '--execution', 'interpreter', '--show-result'],
+            cwd=ROOT, capture_output=True, text=True)
+        if run.returncode != 42 or 'Int32(42)' not in run.stdout + run.stderr:
+            raise RuntimeError(f'wrappers/{name}: exit {run.returncode}\n{run.stdout}\n{run.stderr}')
+        results.append({'name': f'wrappers/{name}', 'exit': run.returncode, 'result': 'Int32(42)',
+            'producer': producer, 'contract': f'Wrapper<{kind}<A,B>>'})
+        print(f'PASS wrappers/{name}: Int32(42)')
 def revision(path):
     return {'commit': subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=path, text=True).strip(),
             'dirty': bool(subprocess.check_output(['git', 'status', '--porcelain'], cwd=path, text=True).strip())}

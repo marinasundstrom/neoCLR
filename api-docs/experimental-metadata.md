@@ -8410,10 +8410,13 @@ operands, at most 4,096 nodes per root and a depth limit of 32; existing transpo
 limits also apply and may reject an image earlier. Leaves must be closed nominal
 reference classes/interfaces, including constructed generic types. Generic arguments
 may be closed nominal/value types, non-Void primitives or vectors; arity and existing
-nominal construction validation apply. Open and composition arguments reject.
+nominal construction validation apply. Open arguments reject. Closed local unconstrained reference-class wrappers may
+contain composition arguments in the opt-in free-function profile; ordinary builder
+construction still rejects them.
 Primitive/value, array, byref, generic parameter,
-Function and Self leaves are rejected, as are compositions nested inside those
-wrappers, fields, owned methods and native/InternalCall signatures. Validation
+Function and Self leaves are rejected, as are compositions nested inside arrays,
+byrefs or function shapes, explicit fields, owned methods and native/InternalCall
+signatures. Validation
 precedes normalization, so collapsing duplicate bounds cannot hide an invalid leaf.
 External leaves retain the reader's existing declared dependency identity rules;
 this slice does not resolve external assemblies or prove runtime inhabitation.
@@ -8549,11 +8552,18 @@ Member merging is deferred. These are compiler host APIs, not guest RavenDoc API
 [POC and commands](../docs/experiments/structural-compositions/README.md#working-raven-consumer-poc--2026-10-14)
 record four interpreter results and negative gates. Full open/closed generic native
 integration remains incomplete; the adapter admits closed generic reference bounds
-in nongeneric free-function calls. Open parameters and compositions inside generic
-arguments remain unsupported.
+in nongeneric free-function calls. Open parameters remain unsupported. Closed reference-class wrappers now retain
+composition arguments in the imported free-function call profile.
 The runtime separately supports closed generic reference bounds; see the
 [generic slice](../docs/experiments/structural-compositions/README.md#generic-composition-first-slice--2026-10-14).
 
 
 Closed generic bound call integration is covered by eight Raven interpreter consumers
 and host/compiler mismatch rejection; see the [current profile and evidence](../docs/experiments/structural-compositions/README.md#closed-generic-composition-call-integration--2026-10-14).
+
+
+The wrapper profile retains invariant argument identity and recursively enforces
+native-only emission and ordinary-import/storage rejection. It requires local
+unconstrained reference-class definitions; value/interface wrappers and compositions
+inside a composition bound's generic arguments remain outside this reader profile.
+[Wrapped composition contracts and validation](../docs/experiments/structural-compositions/README.md#wrapped-composition-metadata-and-raven-calls--2026-10-14).

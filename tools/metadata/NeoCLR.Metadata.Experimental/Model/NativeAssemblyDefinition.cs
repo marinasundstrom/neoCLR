@@ -555,7 +555,20 @@ public sealed partial class NativeAssemblyDefinition
                 {
                     Shape(element, "Constructed"); Shape(construction, "definition", "arguments");
                     var definition = types.FindIndex(t => t.NativeName == Text(construction, "definition") && !t.IsStatic && t.GenericNames.Length > 0);
-                    var arguments = Array(construction, "arguments", 32).Select(a => ReadType(a, false, allowSelf: allowSelf)).ToArray();
+                    var arguments = Array(construction, "arguments", 32).Select(a => ReadType(a, false, allowSelf: allowSelf, allowComposition: allowComposition)).ToArray();
+                    if (arguments.Any(a => a.ContainsComposition))
+                    {
+                        // Read-only snapshot construction; ordinary builder construction
+                        // deliberately continues to reject composition storage.
+                        Require(allowExperimentalCompositions && allowComposition && definition >= 0,
+                            "composition wrappers require a resolved local reference class");
+                        var wrapper = signatureOwners[definition];
+                        Require(!wrapper.IsValueType && !wrapper.IsInterface && !wrapper.IsStatic &&
+                            wrapper.GenericParameterNames.Count == arguments.Length &&
+                            wrapper.GenericConstraints.Count == 0 && wrapper.SpecialConstraints.Count == 0 &&
+                            arguments.All(a => a.NestingDepth < 16), "unsupported composition wrapper construction");
+                        return new GenericTypeInstance(wrapper, arguments);
+                    }
                     return definition >= 0 ? signatureOwners[definition].MakeGenericInstance(arguments)
                         : ImportExternalType(signatureGraph, Text(construction, "definition"), arguments.Length, referenceIdentities, valueTypeReferences, nativeTypeAliases).MakeGenericInstance(arguments);
                 }

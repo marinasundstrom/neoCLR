@@ -111,13 +111,25 @@ public sealed partial class AssemblyBuilder
                 : throw new InvalidDataException("experimental composition callable import requires explicit opt-in")
             : type.PointerElement is not null ? type : type.ByReferenceElement is { } target ? SignatureType.ByReference(ImportNativeSignatureType(target, core, resolver))
             : type.ReferencedGenericInstance is { } constructed
-            ? ImportReference(constructed.Definition.Resolve(resolver), core).MakeGenericInstance(constructed.TypeArguments.Select(t => ImportNativeSignatureType(t, core, resolver)).ToArray())
+            ? ImportNativeConstruction(constructed, core, resolver, allowCompositions)
             : type.TypeParameterIndex is { } typeParameter ? SignatureType.TypeParameter(typeParameter)
             : type.MethodParameterIndex is { } parameter ? SignatureType.MethodParameter(parameter)
             : type.ArrayElement is { } element ? SignatureType.ArrayOf(ImportNativeSignatureType(element, core, resolver))
             : type.Primitive is { } primitive ? primitive
             : type.ReferencedType is { } reference ? ImportNativeSignatureReference(reference, core, resolver)
             : throw new InvalidDataException("unsupported native signature type");
+    private ImportedTypeReference ImportNativeConstruction(ReferencedGenericType construction, AssemblyIdentity core, IAssemblyResolver? resolver, bool allowCompositions)
+    {
+        var definition = construction.Definition.Resolve(resolver);
+        var imported = ImportReference(definition, core);
+        var arguments = construction.TypeArguments.Select(t => ImportNativeSignatureType(t, core, resolver, allowCompositions)).ToArray();
+        if (!arguments.Any(t => t.ContainsComposition)) return imported.MakeGenericInstance(arguments);
+        if (!allowCompositions || definition.IsValueType || (definition.Attributes & 0x20) != 0 ||
+            arguments.Length != imported.GenericArity || arguments.Any(t => t.NestingDepth >= 16))
+            throw new InvalidDataException("unsupported experimental composition wrapper import");
+        return new ImportedTypeReference(this, imported.AssemblyIdentity, imported.Namespace, imported.Name,
+            imported.GenericArity, arguments, imported.IsValueType, imported.DeclaringType);
+    }
     internal ImportedTypeReference ImportNativeSignatureReference(TypeReference reference, AssemblyIdentity core, IAssemblyResolver? resolver)
     {
         var definition = reference.Resolve(resolver);

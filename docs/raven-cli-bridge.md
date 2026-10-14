@@ -9602,3 +9602,14 @@ as generic constraints alongside intersections; disjunction must remain an any-o
 contract, not become separate conjunctive CLI constraints. Native constraint support
 is planned, not enabled. Runtime Contract/CLI encoding are unchanged.
 [Checkpoint and direction](experiments/structural-compositions/README.md#runtime-wrapper-constructormethod-calls--2026-10-14).
+
+
+### Wrapped composition call transport — 2026-10-14
+
+The experimental native reader/importer and Raven call emitter now preserve
+reference compositions inside closed reference-class wrappers. Twelve host/Raven
+consumers pass, including wrappers returned with intersection contracts. Recursive
+gates preserve ordinary readers, PE/CLI rejection and authored-storage restrictions.
+Runtime Contract configuration and CLI carriers are unchanged. Task/async, open
+parameters and native constraints remain pending.
+[Profile and evidence](experiments/structural-compositions/README.md#wrapped-composition-metadata-and-raven-calls--2026-10-14).

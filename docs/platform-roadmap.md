@@ -4609,3 +4609,9 @@ with intersections especially useful for inputs and constraints. Union disjuncti
 and intersection conjunction must remain distinct; native constraint integration
 is pending. This does not change milestone sequencing.
 [Checkpoint and direction](experiments/structural-compositions/README.md#runtime-wrapper-constructormethod-calls--2026-10-14).
+
+Wrapper signatures now cross the experimental metadata and Raven imported-call
+paths, with twelve executable host/Raven consumers. Native constraints, open
+parameters, source storage and real Task integration remain pending. Intersection
+use-site guidance does not restrict return types.
+[Checkpoint](experiments/structural-compositions/README.md#wrapped-composition-metadata-and-raven-calls--2026-10-14).

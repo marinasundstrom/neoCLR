@@ -17369,3 +17369,15 @@ open, not an approved complete implementation or a permanent roadmap reprioritiz
   exchange the runtime wrapper-call slice passed 24 composition tests and 13 generic
   controls; native constraints, host/compiler wrapper transport and Task execution
   remain unimplemented. [Details](experiments/structural-compositions/README.md#author-direction-value-positions-and-constraints--2026-10-14).
+
+
+### 2026-10-14 — Intersection traits and return contracts
+
+- Author clarified that intersections as inputs are guidance only: intersections
+  can describe return types and other signatures, especially API trait contracts,
+  despite being less common in everyday code.
+- Assistant agreed not to impose use-site bans and continued the POC with both
+  union-wrapper and intersection-wrapper returns. Metadata and Raven imported-call
+  probes now preserve both contracts; twelve executable consumers pass. This does
+  not establish real Task execution or source-authored compound storage.
+  [Evidence and remaining scope](experiments/structural-compositions/README.md#wrapped-composition-metadata-and-raven-calls--2026-10-14).

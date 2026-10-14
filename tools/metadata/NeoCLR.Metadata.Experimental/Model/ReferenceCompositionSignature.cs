@@ -41,6 +41,14 @@ public sealed partial record SignatureType
 {
     /// <summary>Gets the opt-in native reference composition, or null. Such signatures are read-only.</summary>
     public ReferenceCompositionSignature? Composition { get; }
+    internal bool ContainsComposition => Composition is not null ||
+        GenericInstance?.TypeArguments.Any(t => t.ContainsComposition) == true ||
+        ReferencedGenericInstance?.TypeArguments.Any(t => t.ContainsComposition) == true ||
+        ImportedType?.TypeArguments.Any(t => t.ContainsComposition) == true ||
+        ArrayElement?.ContainsComposition == true || ByReferenceElement?.ContainsComposition == true ||
+        PointerElement?.ContainsComposition == true || FunctionSignature is { } function &&
+        function.ParameterTypes.Append(function.ReturnType).Any(t => t.ContainsComposition);
+
     internal static SignatureType FromComposition(ReferenceCompositionKind kind, IEnumerable<SignatureType> types)
     {
         var flattened = types.SelectMany(t => t.Composition is { } c && c.Kind == kind ? c.Constituents : new[] { t }).Distinct().ToArray();

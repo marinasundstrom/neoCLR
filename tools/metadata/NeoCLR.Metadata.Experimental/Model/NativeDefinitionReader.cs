@@ -44,7 +44,8 @@ public sealed partial class NativeAssemblyDefinition
             type.ClassType is { IsStatic: false } ||
             type.ImportedType is { } imported &&
             imported.GenericArity == imported.TypeArguments.Count && imported.TypeArguments.All(SupportedArgument);
-        static bool SupportedMethod(SignatureType type) => type.Composition is not null || type.MethodParameterIndex is not null ||
+        static bool SupportedMethod(SignatureType type) => type.Composition is not null ||
+            type.GenericInstance is { } wrapper && wrapper.TypeArguments.All(SupportedMethod) || type.MethodParameterIndex is not null ||
             type.ArrayElement is { } element && SupportedMethod(element) || Supported(type);
         static bool Supported(SignatureType type) => SupportedScalar(type) || type.ArrayElement is { } element && Supported(element);
         // Fail closed rather than returning a partial assembly with silently missing types.

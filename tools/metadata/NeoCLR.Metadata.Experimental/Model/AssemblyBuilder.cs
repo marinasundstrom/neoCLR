@@ -350,7 +350,7 @@ public sealed partial class AssemblyBuilder
 
     private byte[] WriteImage(bool referenceOnly)
     {
-        if (importedReferences.Values.Any(reference => reference.Signature.ParameterTypes.Append(reference.Signature.ReturnType).Any(t => t.Composition is not null)))
+        if (importedReferences.Values.Any(reference => reference.Signature.ParameterTypes.Append(reference.Signature.ReturnType).Any(t => t.ContainsComposition)))
             throw new InvalidDataException("experimental composition callable imports require native emission without CLI projection");
         if (!referenceOnly && assemblyConstants.Count != 0)
             throw new InvalidDataException("assembly-level constants require native emission");
