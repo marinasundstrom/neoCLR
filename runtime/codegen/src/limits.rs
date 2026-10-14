@@ -23,6 +23,10 @@ fn type_budget_matches_native_collector_contract() {
 #[test]
 fn layout_budgets_match_native_allocator_contract() {
     let header = include_str!("../../../docs/experiments/aot-console/text-arena.h");
-    assert!(header.contains(&format!("#define NEOCLR_NATIVE_LAYOUT_LANES {INLINE_LANES}")));
-    assert!(header.contains(&format!("#define NEOCLR_NATIVE_OBJECT_LANES {OBJECT_LANES}")));
+    assert!(header.contains(&format!(
+        "#define NEOCLR_NATIVE_LAYOUT_LANES {INLINE_LANES}"
+    )));
+    assert!(header.contains(&format!(
+        "#define NEOCLR_NATIVE_OBJECT_LANES {OBJECT_LANES}"
+    )));
 }

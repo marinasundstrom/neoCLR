@@ -8,9 +8,20 @@ type Error = Box<dyn std::error::Error>;
 /// Pointer-free, single-lane elements in the private scalar-array layout.
 /// Byte retains its existing compact storage and native I/O contract.
 pub(crate) fn scalar_array_element(t: &Type) -> bool {
-    matches!(t, Type::Int32 | Type::UInt32 | Type::Int64 | Type::UInt64
-        | Type::SByte | Type::Int16 | Type::UInt16 | Type::Boolean | Type::Void
-        | Type::IntPtr | Type::UIntPtr)
+    matches!(
+        t,
+        Type::Int32
+            | Type::UInt32
+            | Type::Int64
+            | Type::UInt64
+            | Type::SByte
+            | Type::Int16
+            | Type::UInt16
+            | Type::Boolean
+            | Type::Void
+            | Type::IntPtr
+            | Type::UIntPtr
+    )
 }
 
 /// Metadata-only owner of static methods; never an executable reference value.
@@ -31,8 +42,14 @@ pub(crate) fn static_owner(t: &neoclr::metadata::TypeDef) -> bool {
 /// Shared preparation for native emission and read-only admission inspection.
 pub fn prepare(input: &neoclr::Module, root: &str) -> Result<(neoclr::Module, Value), Error> {
     validate_source(input, true)?;
-    if input.functions.iter().any(|f| object_dispatch_contract(f) || class_contract(input, f)) {
-        neoclr::LoadedProgram::new(input).and_then(|p| p.verify()).map_err(|e| e.to_string())?;
+    if input
+        .functions
+        .iter()
+        .any(|f| object_dispatch_contract(f) || class_contract(input, f))
+    {
+        neoclr::LoadedProgram::new(input)
+            .and_then(|p| p.verify())
+            .map_err(|e| e.to_string())?;
     }
     if input.types.iter().any(|t| !t.generic_parameters.is_empty())
         || input
@@ -41,9 +58,20 @@ pub fn prepare(input: &neoclr::Module, root: &str) -> Result<(neoclr::Module, Va
             .any(|f| !f.generic_parameters.is_empty())
     {
         let (expanded, specialization) = super::specialization::expand(input, root)?;
-        if input.types.iter().any(|t| (t.is_reference_type || t.representation == neoclr::metadata::Representation::Interface) && !t.generic_parameters.is_empty())
-            || specialization["methods"].as_array().unwrap().iter().any(|m| !m["arguments"].as_array().unwrap().is_empty())
-            || specialization["types"].as_array().unwrap().iter().any(|t| t["expandedIndex"].as_u64().unwrap() as usize >= input.types.len()) {
+        if input.types.iter().any(|t| {
+            (t.is_reference_type || t.representation == neoclr::metadata::Representation::Interface)
+                && !t.generic_parameters.is_empty()
+        }) || specialization["methods"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .any(|m| !m["arguments"].as_array().unwrap().is_empty())
+            || specialization["types"]
+                .as_array()
+                .unwrap()
+                .iter()
+                .any(|t| t["expandedIndex"].as_u64().unwrap() as usize >= input.types.len())
+        {
             // Cloning assigns private origin tokens. Verify originals first so this
             // cannot repair invalid source metadata or bypass generic contracts.
             neoclr::LoadedProgram::new(input)
@@ -51,7 +79,8 @@ pub fn prepare(input: &neoclr::Module, root: &str) -> Result<(neoclr::Module, Va
                 .map_err(|e| e.to_string())?;
         }
         let backings = reference_array_backings(&specialization);
-        let (selected, mut report) = select_inventory_with_host_roots(&expanded, root, true, &[], &backings)?;
+        let (selected, mut report) =
+            select_inventory_with_host_roots(&expanded, root, true, &[], &backings)?;
         super::specialization::restore_methods(&mut report, &specialization);
         report["specialization"] = specialization;
         Ok((selected, report))
@@ -62,7 +91,9 @@ pub fn prepare(input: &neoclr::Module, root: &str) -> Result<(neoclr::Module, Va
 
 pub(super) fn callable_invoke(target: &FunctionRef) -> Option<&neoclr::metadata::FunctionType> {
     match target.owner.as_ref() {
-        Some(Type::Function(shape)) if target.name == "$Function.Invoke" && target.instance => Some(shape),
+        Some(Type::Function(shape)) if target.name == "$Function.Invoke" && target.instance => {
+            Some(shape)
+        }
         _ => None,
     }
 }
@@ -91,27 +122,54 @@ pub(super) fn resolve(input: &neoclr::Module, target: &FunctionRef) -> Result<us
 }
 
 pub(super) fn interface_contract(input: &neoclr::Module, f: &neoclr::metadata::Function) -> bool {
-    f.owner.as_ref().and_then(|t| input.type_definition(t))
+    f.owner
+        .as_ref()
+        .and_then(|t| input.type_definition(t))
         .is_some_and(|t| t.representation == neoclr::metadata::Representation::Interface)
 }
 
 /// Sealing is descriptive metadata today: also check the complete loaded type set.
 /// Keep callvirt for its null check; only the private native projection loses slots.
 pub(super) fn class_contract(input: &neoclr::Module, f: &neoclr::metadata::Function) -> bool {
-    f.instance && !f.receiver_byref && f.is_virtual && f.generic_parameters.is_empty()
-        && !object_dispatch_contract(f) && !inherited_object_member(input, f)
-        && f.owner.as_ref().and_then(|t| input.type_definition(t)).is_some_and(|t|
-            t.is_reference_type && t.representation == neoclr::metadata::Representation::Record && t.generic_parameters.is_empty())
+    f.instance
+        && !f.receiver_byref
+        && f.is_virtual
+        && f.generic_parameters.is_empty()
+        && !object_dispatch_contract(f)
+        && !inherited_object_member(input, f)
+        && f.owner
+            .as_ref()
+            .and_then(|t| input.type_definition(t))
+            .is_some_and(|t| {
+                t.is_reference_type
+                    && t.representation == neoclr::metadata::Representation::Record
+                    && t.generic_parameters.is_empty()
+            })
 }
 
-pub(super) fn virtual_base_contracts(input: &neoclr::Module, f: &neoclr::metadata::Function) -> Vec<usize> {
-    if !class_contract(input, f) || !f.is_override { return vec![]; }
-    let mut parent = f.owner.as_ref().and_then(|t| input.type_definition(t)).and_then(|t| t.base.as_ref());
+pub(super) fn virtual_base_contracts(
+    input: &neoclr::Module,
+    f: &neoclr::metadata::Function,
+) -> Vec<usize> {
+    if !class_contract(input, f) || !f.is_override {
+        return vec![];
+    }
+    let mut parent = f
+        .owner
+        .as_ref()
+        .and_then(|t| input.type_definition(t))
+        .and_then(|t| t.base.as_ref());
     for _ in 0..64 {
-        let Some(owner) = parent else { break; };
-        if let Some((index, _)) = input.functions.iter().enumerate().find(|(_, candidate)|
-            candidate.owner.as_ref() == Some(owner) && candidate.instance && candidate.is_virtual
-                && candidate.name.rsplit('.').next() == f.name.rsplit('.').next() && candidate.parameters == f.parameters) {
+        let Some(owner) = parent else {
+            break;
+        };
+        if let Some((index, _)) = input.functions.iter().enumerate().find(|(_, candidate)| {
+            candidate.owner.as_ref() == Some(owner)
+                && candidate.instance
+                && candidate.is_virtual
+                && candidate.name.rsplit('.').next() == f.name.rsplit('.').next()
+                && candidate.parameters == f.parameters
+        }) {
             return vec![index];
         }
         parent = input.type_definition(owner).and_then(|t| t.base.as_ref());
@@ -119,40 +177,96 @@ pub(super) fn virtual_base_contracts(input: &neoclr::Module, f: &neoclr::metadat
     vec![]
 }
 
-pub(super) fn class_implementation(input: &neoclr::Module, concrete: &Type, contract: &neoclr::metadata::Function) -> Result<(usize, FunctionRef), Error> {
-    let method = neoclr::native_metadata::class_implementation(input, concrete, contract).map_err(|e| e.to_string())?;
-    let index = input.functions.iter().position(|f| f.definition == method.definition && f.name == method.name).ok_or("missing class virtual target")?;
-    Ok((index, FunctionRef { definition: method.definition, name: method.name, owner: method.owner,
-        instance: method.instance, generic_arguments: vec![], parameters: method.parameters }))
+pub(super) fn class_implementation(
+    input: &neoclr::Module,
+    concrete: &Type,
+    contract: &neoclr::metadata::Function,
+) -> Result<(usize, FunctionRef), Error> {
+    let method = neoclr::native_metadata::class_implementation(input, concrete, contract)
+        .map_err(|e| e.to_string())?;
+    let index = input
+        .functions
+        .iter()
+        .position(|f| f.definition == method.definition && f.name == method.name)
+        .ok_or("missing class virtual target")?;
+    Ok((
+        index,
+        FunctionRef {
+            definition: method.definition,
+            name: method.name,
+            owner: method.owner,
+            instance: method.instance,
+            generic_arguments: vec![],
+            parameters: method.parameters,
+        },
+    ))
 }
 
 pub(super) fn sealed_member(input: &neoclr::Module, f: &neoclr::metadata::Function) -> bool {
-    f.instance && !f.is_abstract && !f.receiver_byref && f.impl_flags == 0
-        && f.owner.as_ref().and_then(|t| input.type_definition(t))
-            .is_some_and(|t| t.is_reference_type && t.is_sealed
-                && t.representation != neoclr::metadata::Representation::Interface
-                && !input.types.iter().any(|candidate| candidate.base.as_ref()
-                    .and_then(Type::definition_name) == Some(t.name.as_str())))
+    f.instance
+        && !f.is_abstract
+        && !f.receiver_byref
+        && f.impl_flags == 0
+        && f.owner
+            .as_ref()
+            .and_then(|t| input.type_definition(t))
+            .is_some_and(|t| {
+                t.is_reference_type
+                    && t.is_sealed
+                    && t.representation != neoclr::metadata::Representation::Interface
+                    && !input.types.iter().any(|candidate| {
+                        candidate.base.as_ref().and_then(Type::definition_name)
+                            == Some(t.name.as_str())
+                    })
+            })
 }
 
 /// In a complete closed load set, an inherited Object override needs no runtime
 /// choice when every descendant retains that implementation. Reject any same-name
 /// descendant member conservatively, including new-slot and generic candidates.
-pub(super) fn inherited_object_member(input: &neoclr::Module, f: &neoclr::metadata::Function) -> bool {
-    if !f.instance || f.receiver_byref || !f.is_virtual || !f.is_override || f.is_abstract
-        || f.impl_flags != 0 || f.no_result || !f.generic_parameters.is_empty() || !f.generic_arguments.is_empty()
-        || !object_slot_shape(f) { return false; }
-    let Some(owner) = f.owner.as_ref().and_then(|t| input.type_definition(t)) else { return false; };
-    if !owner.is_reference_type || !owner.generic_parameters.is_empty() { return false; }
+pub(super) fn inherited_object_member(
+    input: &neoclr::Module,
+    f: &neoclr::metadata::Function,
+) -> bool {
+    if !f.instance
+        || f.receiver_byref
+        || !f.is_virtual
+        || !f.is_override
+        || f.is_abstract
+        || f.impl_flags != 0
+        || f.no_result
+        || !f.generic_parameters.is_empty()
+        || !f.generic_arguments.is_empty()
+        || !object_slot_shape(f)
+    {
+        return false;
+    }
+    let Some(owner) = f.owner.as_ref().and_then(|t| input.type_definition(t)) else {
+        return false;
+    };
+    if !owner.is_reference_type || !owner.generic_parameters.is_empty() {
+        return false;
+    }
     for candidate in &input.types {
-        if candidate.name == owner.name { continue; }
+        if candidate.name == owner.name {
+            continue;
+        }
         let mut base = candidate.base.as_ref();
         for _ in 0..input.types.len() {
-            let Some(ty) = base.and_then(|t| input.type_definition(t)) else { break; };
+            let Some(ty) = base.and_then(|t| input.type_definition(t)) else {
+                break;
+            };
             if ty.name == owner.name {
-                if !candidate.generic_parameters.is_empty() || input.functions.iter().any(|method|
-                    method.owner.as_ref().and_then(Type::definition_name) == Some(candidate.name.as_str())
-                    && method.instance && method.name.rsplit('.').next() == f.name.rsplit('.').next()) { return false; }
+                if !candidate.generic_parameters.is_empty()
+                    || input.functions.iter().any(|method| {
+                        method.owner.as_ref().and_then(Type::definition_name)
+                            == Some(candidate.name.as_str())
+                            && method.instance
+                            && method.name.rsplit('.').next() == f.name.rsplit('.').next()
+                    })
+                {
+                    return false;
+                }
                 break;
             }
             base = ty.base.as_ref();
@@ -165,17 +279,31 @@ fn object_slot_shape(f: &neoclr::metadata::Function) -> bool {
     match f.name.rsplit('.').next() {
         Some("ToString") => f.parameters.is_empty() && f.returns == Type::String,
         Some("GetHashCode") => f.parameters.is_empty() && f.returns == Type::Int32,
-        Some("Equals") => f.parameters == [Type::Named("System.Object".into())] && f.returns == Type::Boolean,
+        Some("Equals") => {
+            f.parameters == [Type::Named("System.Object".into())] && f.returns == Type::Boolean
+        }
         _ => false,
     }
 }
 
 pub(super) fn object_value_contract(f: &neoclr::metadata::Function) -> bool {
     f.owner == Some(Type::Named("System.Object".into()))
-        && matches!(f.name.as_str(), "System.Object.Equals" | "System.Object.GetHashCode")
-        && object_slot_shape(f) && f.instance && f.is_virtual && !f.is_override && !f.is_abstract
-        && !f.receiver_byref && !f.receiver_readonly && !f.no_result && f.impl_flags == 0
-        && f.generic_parameters.is_empty() && f.generic_arguments.is_empty() && f.generic_constraints.is_empty()
+        && matches!(
+            f.name.as_str(),
+            "System.Object.Equals" | "System.Object.GetHashCode"
+        )
+        && object_slot_shape(f)
+        && f.instance
+        && f.is_virtual
+        && !f.is_override
+        && !f.is_abstract
+        && !f.receiver_byref
+        && !f.receiver_readonly
+        && !f.no_result
+        && f.impl_flags == 0
+        && f.generic_parameters.is_empty()
+        && f.generic_arguments.is_empty()
+        && f.generic_constraints.is_empty()
 }
 
 pub(super) fn object_dispatch_contract(f: &neoclr::metadata::Function) -> bool {
@@ -183,35 +311,84 @@ pub(super) fn object_dispatch_contract(f: &neoclr::metadata::Function) -> bool {
 }
 
 pub(super) fn object_placeholder(f: &neoclr::metadata::Function) -> Vec<Op> {
-    vec![match f.returns { Type::Boolean => Op::Bool(false), Type::Int32 => Op::Int(0), _ => Op::String(String::new()) }, Op::Return]
+    vec![
+        match f.returns {
+            Type::Boolean => Op::Bool(false),
+            Type::Int32 => Op::Int(0),
+            _ => Op::String(String::new()),
+        },
+        Op::Return,
+    ]
 }
 
 /// Return a verified most-derived Object value override, or use identity semantics.
-pub(super) fn object_value_override(input: &neoclr::Module, concrete: &Type, contract: &neoclr::metadata::Function) -> Result<Option<(usize, FunctionRef)>, Error> {
+pub(super) fn object_value_override(
+    input: &neoclr::Module,
+    concrete: &Type,
+    contract: &neoclr::metadata::Function,
+) -> Result<Option<(usize, FunctionRef)>, Error> {
     let mut current = concrete.clone();
     for _ in 0..=input.types.len() {
-        if current == Type::Named("System.Object".into()) { return Ok(None); }
-        let definition = input.type_definition(&current).ok_or("Object value dispatch requires a local class")?;
-        if !definition.is_reference_type { return Err("Object value dispatch requires a class receiver".into()); }
-        let arguments = match &current { Type::Constructed { arguments, .. } => arguments.as_slice(), _ => &[] };
+        if current == Type::Named("System.Object".into()) {
+            return Ok(None);
+        }
+        let definition = input
+            .type_definition(&current)
+            .ok_or("Object value dispatch requires a local class")?;
+        if !definition.is_reference_type {
+            return Err("Object value dispatch requires a class receiver".into());
+        }
+        let arguments = match &current {
+            Type::Constructed { arguments, .. } => arguments.as_slice(),
+            _ => &[],
+        };
         let mut candidates = vec![];
         for (index, method) in input.functions.iter().enumerate() {
             if method.owner.as_ref().and_then(Type::definition_name) != current.definition_name()
-                || !method.instance || method.name.rsplit('.').next() != contract.name.rsplit('.').next() { continue; }
+                || !method.instance
+                || method.name.rsplit('.').next() != contract.name.rsplit('.').next()
+            {
+                continue;
+            }
             let method = closed_signature(method, arguments)?;
-            if method.parameters != contract.parameters || !method.generic_parameters.is_empty() { continue; }
+            if method.parameters != contract.parameters || !method.generic_parameters.is_empty() {
+                continue;
+            }
             // New-slot and ordinary hiding members do not replace the Object slot.
-            if !method.is_override { continue; }
-            if method.is_abstract || method.receiver_byref || method.returns != contract.returns || method.no_result {
+            if !method.is_override {
+                continue;
+            }
+            if method.is_abstract
+                || method.receiver_byref
+                || method.returns != contract.returns
+                || method.no_result
+            {
                 return Err("Object value dispatch requires a verified concrete override".into());
             }
-            candidates.push((index, FunctionRef { definition:method.definition.clone(), name:method.name.clone(),
-                owner:method.owner.clone(), instance:true, generic_arguments:vec![], parameters:method.parameters.clone() }));
+            candidates.push((
+                index,
+                FunctionRef {
+                    definition: method.definition.clone(),
+                    name: method.name.clone(),
+                    owner: method.owner.clone(),
+                    instance: true,
+                    generic_arguments: vec![],
+                    parameters: method.parameters.clone(),
+                },
+            ));
         }
-        if candidates.len() > 1 { return Err("ambiguous Object value override".into()); }
-        if let Some(found) = candidates.pop() { return Ok(Some(found)); }
-        let Some(base) = &definition.base else { return Ok(None); };
-        current = base.substitute_type_parameters(arguments).map_err(|e| e.to_string())?;
+        if candidates.len() > 1 {
+            return Err("ambiguous Object value override".into());
+        }
+        if let Some(found) = candidates.pop() {
+            return Ok(Some(found));
+        }
+        let Some(base) = &definition.base else {
+            return Ok(None);
+        };
+        current = base
+            .substitute_type_parameters(arguments)
+            .map_err(|e| e.to_string())?;
     }
     Err("cyclic Object value hierarchy".into())
 }
@@ -219,11 +396,20 @@ pub(super) fn object_value_override(input: &neoclr::Module, concrete: &Type, con
 /// Narrow class-virtual slice used by Console.WriteLine(Object). Original load-set
 /// verification supplies slot ancestry; a same-named ordinary member is never enough.
 pub(super) fn object_display_contract(f: &neoclr::metadata::Function) -> bool {
-    f.name == "System.Object.ToString" && f.owner == Some(Type::Named("System.Object".into()))
-        && f.instance && f.is_virtual && !f.is_override && !f.is_abstract
-        && !f.receiver_byref && !f.receiver_readonly && f.parameters.is_empty()
-        && f.returns == Type::String && !f.no_result && f.impl_flags == 0
-        && f.generic_parameters.is_empty() && f.generic_constraints.is_empty()
+    f.name == "System.Object.ToString"
+        && f.owner == Some(Type::Named("System.Object".into()))
+        && f.instance
+        && f.is_virtual
+        && !f.is_override
+        && !f.is_abstract
+        && !f.receiver_byref
+        && !f.receiver_readonly
+        && f.parameters.is_empty()
+        && f.returns == Type::String
+        && !f.no_result
+        && f.impl_flags == 0
+        && f.generic_parameters.is_empty()
+        && f.generic_constraints.is_empty()
 }
 
 /// Traverse verified class/interface inheritance with closed owner arguments.
@@ -231,65 +417,174 @@ pub(super) fn implements_interface(input: &neoclr::Module, concrete: &Type, targ
     let mut pending = vec![concrete.clone()];
     let mut seen = vec![];
     while let Some(current) = pending.pop() {
-        if &current == target { return true; }
-        if seen.contains(&current) { continue; }
-        if seen.len() >= 1024 { return false; }
+        if &current == target {
+            return true;
+        }
+        if seen.contains(&current) {
+            continue;
+        }
+        if seen.len() >= 1024 {
+            return false;
+        }
         seen.push(current.clone());
-        let Some(definition) = input.type_definition(&current) else { continue; };
-        let arguments = match &current { Type::Constructed { arguments, .. } => arguments.as_slice(), _ => &[] };
+        let Some(definition) = input.type_definition(&current) else {
+            continue;
+        };
+        let arguments = match &current {
+            Type::Constructed { arguments, .. } => arguments.as_slice(),
+            _ => &[],
+        };
         for interface in definition.base.iter().chain(&definition.implements) {
-            if let Ok(closed) = interface.substitute_type_parameters(arguments) { pending.push(closed); }
+            if let Ok(closed) = interface.substitute_type_parameters(arguments) {
+                pending.push(closed);
+            }
         }
     }
     false
 }
 
-pub(super) fn closed_signature(function: &neoclr::metadata::Function, arguments: &[Type]) -> Result<neoclr::metadata::Function, Error> {
+pub(super) fn closed_signature(
+    function: &neoclr::metadata::Function,
+    arguments: &[Type],
+) -> Result<neoclr::metadata::Function, Error> {
     let mut result = function.clone();
-    result.owner = function.owner.as_ref().map(|ty| ty.substitute_type_parameters(arguments)).transpose().map_err(|e| e.to_string())?;
-    result.parameters = function.parameters.iter().map(|ty| ty.substitute_type_parameters(arguments)).collect::<Result<_, _>>().map_err(|e| e.to_string())?;
-    result.returns = function.returns.substitute_type_parameters(arguments).map_err(|e| e.to_string())?;
+    result.owner = function
+        .owner
+        .as_ref()
+        .map(|ty| ty.substitute_type_parameters(arguments))
+        .transpose()
+        .map_err(|e| e.to_string())?;
+    result.parameters = function
+        .parameters
+        .iter()
+        .map(|ty| ty.substitute_type_parameters(arguments))
+        .collect::<Result<_, _>>()
+        .map_err(|e| e.to_string())?;
+    result.returns = function
+        .returns
+        .substitute_type_parameters(arguments)
+        .map_err(|e| e.to_string())?;
     Ok(result)
 }
 
-pub(super) fn implicit_implementation(input: &neoclr::Module, concrete: &Type, contract: &neoclr::metadata::Function) -> Result<(usize, FunctionRef), Error> {
-    if input.type_definition(concrete).is_some_and(|t| t.base.as_ref().is_some_and(|b| b.definition_name() != Some("System.Object"))) {
-        let method = neoclr::native_metadata::interface_implementation(input, concrete, contract).map_err(|e|e.to_string())?;
-        let index = input.functions.iter().position(|f| f.definition == method.definition && f.name == method.name).ok_or("missing inherited interface target")?;
-        return Ok((index,FunctionRef {definition:method.definition,name:method.name,owner:method.owner,instance:method.instance,generic_arguments:vec![],parameters:method.parameters}));
+pub(super) fn implicit_implementation(
+    input: &neoclr::Module,
+    concrete: &Type,
+    contract: &neoclr::metadata::Function,
+) -> Result<(usize, FunctionRef), Error> {
+    if input.type_definition(concrete).is_some_and(|t| {
+        t.base
+            .as_ref()
+            .is_some_and(|b| b.definition_name() != Some("System.Object"))
+    }) {
+        let method = neoclr::native_metadata::interface_implementation(input, concrete, contract)
+            .map_err(|e| e.to_string())?;
+        let index = input
+            .functions
+            .iter()
+            .position(|f| f.definition == method.definition && f.name == method.name)
+            .ok_or("missing inherited interface target")?;
+        return Ok((
+            index,
+            FunctionRef {
+                definition: method.definition,
+                name: method.name,
+                owner: method.owner,
+                instance: method.instance,
+                generic_arguments: vec![],
+                parameters: method.parameters,
+            },
+        ));
     }
-    let arguments = match concrete { Type::Constructed { arguments, .. } => arguments.as_slice(), _ => &[] };
-    let member_name = |m: &neoclr::metadata::Function| m.origin.as_ref().map(|o| o.name.clone())
-        .unwrap_or_else(|| m.name.rsplit('.').next().unwrap().to_owned());
+    let arguments = match concrete {
+        Type::Constructed { arguments, .. } => arguments.as_slice(),
+        _ => &[],
+    };
+    let member_name = |m: &neoclr::metadata::Function| {
+        m.origin
+            .as_ref()
+            .map(|o| o.name.clone())
+            .unwrap_or_else(|| m.name.rsplit('.').next().unwrap().to_owned())
+    };
     let name = member_name(contract);
     let mut candidates = vec![];
     let mut explicit = vec![];
     for (index, method) in input.functions.iter().enumerate() {
-        if method.owner.as_ref().and_then(Type::definition_name) != concrete.definition_name() { continue; }
-        let maps_contract = method.interface_implementations.iter().any(|target|
-            target.owner.as_ref().and_then(|t| t.substitute_type_parameters(arguments).ok()) == contract.owner
-            && target.instance == contract.instance
-            && target.parameters.iter().map(|t| t.substitute_type_parameters(arguments)).collect::<Result<Vec<_>, _>>().ok().as_ref() == Some(&contract.parameters)
-            && (target.definition.as_ref().is_some_and(|id| Some(id) == contract.definition.as_ref())
-                || target.definition.is_none() && target.name == contract.name));
-        if !maps_contract && member_name(method) != name { continue; }
+        if method.owner.as_ref().and_then(Type::definition_name) != concrete.definition_name() {
+            continue;
+        }
+        let maps_contract = method.interface_implementations.iter().any(|target| {
+            target
+                .owner
+                .as_ref()
+                .and_then(|t| t.substitute_type_parameters(arguments).ok())
+                == contract.owner
+                && target.instance == contract.instance
+                && target
+                    .parameters
+                    .iter()
+                    .map(|t| t.substitute_type_parameters(arguments))
+                    .collect::<Result<Vec<_>, _>>()
+                    .ok()
+                    .as_ref()
+                    == Some(&contract.parameters)
+                && (target
+                    .definition
+                    .as_ref()
+                    .is_some_and(|id| Some(id) == contract.definition.as_ref())
+                    || target.definition.is_none() && target.name == contract.name)
+        });
+        if !maps_contract && member_name(method) != name {
+            continue;
+        }
         // The first private shape reuses its template's definition name.
         // Unselected overloads still have an open owner; they are not methods
         // of the lowered nongeneric shape and cannot be closed with no arguments.
         if matches!(concrete, Type::Named(_))
-            && matches!(method.owner, Some(Type::Constructed { .. })) { continue; }
+            && matches!(method.owner, Some(Type::Constructed { .. }))
+        {
+            continue;
+        }
         let method = closed_signature(method, arguments)?;
-        if method.owner.as_ref() == Some(concrete) && method.instance == contract.instance
-            && method.parameters == contract.parameters && method.returns == contract.returns
-            && method.no_result == contract.no_result && method.out_parameters == contract.out_parameters
-            && method.generic_parameters.is_empty() {
-            let target = (index, FunctionRef { definition: method.definition.clone(), name: method.name.clone(), owner: method.owner.clone(), instance: method.instance, generic_arguments: vec![], parameters: method.parameters.clone() });
-            if maps_contract { explicit.push(target); }
-            else if member_name(&method) == name && method.visibility == neoclr::metadata::Visibility::Public && method.interface_implementations.is_empty() { candidates.push(target); }
+        if method.owner.as_ref() == Some(concrete)
+            && method.instance == contract.instance
+            && method.parameters == contract.parameters
+            && method.returns == contract.returns
+            && method.no_result == contract.no_result
+            && method.out_parameters == contract.out_parameters
+            && method.generic_parameters.is_empty()
+        {
+            let target = (
+                index,
+                FunctionRef {
+                    definition: method.definition.clone(),
+                    name: method.name.clone(),
+                    owner: method.owner.clone(),
+                    instance: method.instance,
+                    generic_arguments: vec![],
+                    parameters: method.parameters.clone(),
+                },
+            );
+            if maps_contract {
+                explicit.push(target);
+            } else if member_name(&method) == name
+                && method.visibility == neoclr::metadata::Visibility::Public
+                && method.interface_implementations.is_empty()
+            {
+                candidates.push(target);
+            }
         }
     }
-    if !explicit.is_empty() { candidates = explicit; }
-    let [target] = candidates.as_slice() else { return Err(format!("interface implementation is missing or ambiguous: {} on {concrete:?}", contract.name).into()); };
+    if !explicit.is_empty() {
+        candidates = explicit;
+    }
+    let [target] = candidates.as_slice() else {
+        return Err(format!(
+            "interface implementation is missing or ambiguous: {} on {concrete:?}",
+            contract.name
+        )
+        .into());
+    };
     Ok(target.clone())
 }
 
@@ -300,10 +595,19 @@ pub(super) fn byte_array_owner(input: &neoclr::Module) -> Option<Type> {
 }
 
 pub(super) fn array_owner(input: &neoclr::Module, element: &Type) -> Option<Type> {
-    let id = input.assemblies.iter().find_map(|a| a.array_backing.as_ref())?;
-    let t = input.types.iter().find(|t| t.definition.as_ref() == Some(id))?;
+    let id = input
+        .assemblies
+        .iter()
+        .find_map(|a| a.array_backing.as_ref())?;
+    let t = input
+        .types
+        .iter()
+        .find(|t| t.definition.as_ref() == Some(id))?;
     match t.generic_parameters.len() {
-        1 => Some(Type::Constructed { definition:t.name.clone(),arguments:vec![element.clone()] }),
+        1 => Some(Type::Constructed {
+            definition: t.name.clone(),
+            arguments: vec![element.clone()],
+        }),
         0 => Some(Type::Named(t.name.clone())),
         _ => None,
     }
@@ -313,78 +617,135 @@ pub(super) fn array_owner(input: &neoclr::Module, element: &Type) -> Option<Type
 fn string_dispatch_target(input: &neoclr::Module, contract: usize) -> Result<Option<usize>, Error> {
     let f = &input.functions[contract];
     if !interface_contract(input, f)
-        || !implements_interface(input, &Type::String, f.owner.as_ref().unwrap()) { return Ok(None); }
+        || !implements_interface(input, &Type::String, f.owner.as_ref().unwrap())
+    {
+        return Ok(None);
+    }
     Ok(Some(implicit_implementation(input, &Type::String, f)?.0))
 }
 
 /// Exact implicit implementations for classes constructed by the reachable program.
 /// Optional conformance types add verification-only roots; omit them for dispatch tables.
 /// Original conformance is verified before private projection; this is not a binder.
-pub(super) fn dispatch_targets_with_array(input: &neoclr::Module, contract: usize, reached: &BTreeSet<usize>, array_backing: Option<usize>, reference_backings: &[usize], conformance_types: Option<&BTreeSet<usize>>) -> Result<Vec<(usize, usize)>, Error> {
+pub(super) fn dispatch_targets_with_array(
+    input: &neoclr::Module,
+    contract: usize,
+    reached: &BTreeSet<usize>,
+    array_backing: Option<usize>,
+    reference_backings: &[usize],
+    conformance_types: Option<&BTreeSet<usize>>,
+) -> Result<Vec<(usize, usize)>, Error> {
     let f = &input.functions[contract];
     let display = object_dispatch_contract(f);
     let class = class_contract(input, f);
-    if !interface_contract(input, f) && !display && !class { return Ok(vec![]); }
-    if !f.instance || f.receiver_byref || (!display && !class && !f.body.is_empty()) || !f.generic_parameters.is_empty() {
+    if !interface_contract(input, f) && !display && !class {
+        return Ok(vec![]);
+    }
+    if !f.instance
+        || f.receiver_byref
+        || (!display && !class && !f.body.is_empty())
+        || !f.generic_parameters.is_empty()
+    {
         return Err("interface dispatch requires a bodyless nongeneric instance contract".into());
     }
     let mut constructed = BTreeSet::new();
     if !display {
         for &index in conformance_types.into_iter().flatten() {
             let ty = &input.types[index];
-            if ty.is_reference_type && ty.representation == neoclr::metadata::Representation::Record && !ty.is_abstract {
+            if ty.is_reference_type
+                && ty.representation == neoclr::metadata::Representation::Record
+                && !ty.is_abstract
+            {
                 constructed.insert(ty.name.as_str());
             }
         }
     }
-    let array_owner = array_backing.map(|i| Type::Named(input.types[i].name.clone())).or_else(|| byte_array_owner(input));
+    let array_owner = array_backing
+        .map(|i| Type::Named(input.types[i].name.clone()))
+        .or_else(|| byte_array_owner(input));
     for &i in reached {
         for &index in reference_backings {
-            if input.types[index].fields.first().is_some_and(|f| f.ty == input.functions[i].returns) {
+            if input.types[index]
+                .fields
+                .first()
+                .is_some_and(|f| f.ty == input.functions[i].returns)
+            {
                 constructed.insert(input.types[index].name.as_str());
             }
         }
         for op in &input.functions[i].body {
-            if object_display_contract(f) && matches!(op, Op::BoxValue(t) if !matches!(t, Type::Int32 | Type::String)) {
+            if object_display_contract(f)
+                && matches!(op, Op::BoxValue(t) if !matches!(t, Type::Int32 | Type::String))
+            {
                 return Err("Object display with boxing or arrays requires a later receiver/metadata profile".into());
             }
             if matches!(op, Op::NewArray(Type::Byte) | Op::ReserveArray(Type::Byte)) {
-                if let Some(Type::Named(name)) = &array_owner { constructed.insert(name.as_str()); }
+                if let Some(Type::Named(name)) = &array_owner {
+                    constructed.insert(name.as_str());
+                }
             }
             if let Op::NewArray(element) | Op::ReserveArray(element) = op {
                 for &index in reference_backings {
                     let ty = &input.types[index];
-                    if ty.fields.first().is_some_and(|f| f.ty == Type::ArrayRef(Box::new(element.clone()))) {
+                    if ty
+                        .fields
+                        .first()
+                        .is_some_and(|f| f.ty == Type::ArrayRef(Box::new(element.clone())))
+                    {
                         constructed.insert(ty.name.as_str());
                     }
                 }
             }
             if let Op::Construct(target) = op {
-                if let Some(Type::Named(name)) = &target.owner { constructed.insert(name.as_str()); }
+                if let Some(Type::Named(name)) = &target.owner {
+                    constructed.insert(name.as_str());
+                }
             }
         }
     }
     let mut targets = vec![];
     for (ti, t) in input.types.iter().enumerate() {
-        if !constructed.contains(t.name.as_str()) || (!display && !implements_interface(input, &Type::Named(t.name.clone()), f.owner.as_ref().unwrap())) { continue; }
+        if !constructed.contains(t.name.as_str())
+            || (!display
+                && !implements_interface(
+                    input,
+                    &Type::Named(t.name.clone()),
+                    f.owner.as_ref().unwrap(),
+                ))
+        {
+            continue;
+        }
         // A value constructor alone cannot contribute a reference dispatch target.
         // Unsupported boxes still reject above; interface dispatch is unchanged.
-        if display && !t.is_reference_type { continue; }
-        if !t.is_reference_type || !t.generic_parameters.is_empty() || t.representation != neoclr::metadata::Representation::Record {
+        if display && !t.is_reference_type {
+            continue;
+        }
+        if !t.is_reference_type
+            || !t.generic_parameters.is_empty()
+            || t.representation != neoclr::metadata::Representation::Record
+        {
             return Err("interface dispatch requires nongeneric constructed classes".into());
         }
         let (target, _) = if object_dispatch_contract(f) {
-            let Some(target) = object_value_override(input, &Type::Named(t.name.clone()), f)? else { continue; };
+            let Some(target) = object_value_override(input, &Type::Named(t.name.clone()), f)?
+            else {
+                continue;
+            };
             target
-        } else if class { class_implementation(input, &Type::Named(t.name.clone()), f)? }
-        else { implicit_implementation(input, &Type::Named(t.name.clone()), f)? };
+        } else if class {
+            class_implementation(input, &Type::Named(t.name.clone()), f)?
+        } else {
+            implicit_implementation(input, &Type::Named(t.name.clone()), f)?
+        };
         targets.push((ti, target));
     }
     Ok(targets)
 }
 
 pub(super) fn validate_source(input: &neoclr::Module, single_assembly: bool) -> Result<(), Error> {
-    if input.functions.len() > crate::limits::INPUT_FUNCTIONS || input.types.len() > crate::limits::INPUT_TYPES {
+    if input.functions.len() > crate::limits::INPUT_FUNCTIONS
+        || input.types.len() > crate::limits::INPUT_TYPES
+    {
         return Err("closed-world input inventory exceeds bounds".into());
     }
     if single_assembly && input.assemblies.len() > 1 {
@@ -430,26 +791,47 @@ pub(super) fn validate_source(input: &neoclr::Module, single_assembly: bool) -> 
 
 // Signature/storage-only classes still need implementations of retained interface
 // contracts in the private verification projection, even without a constructor.
-fn retained_types(input: &neoclr::Module, functions: &BTreeSet<usize>, reference_backings: &[usize]) -> Result<BTreeSet<usize>, Error> {
+fn retained_types(
+    input: &neoclr::Module,
+    functions: &BTreeSet<usize>,
+    reference_backings: &[usize],
+) -> Result<BTreeSet<usize>, Error> {
     let mut types = BTreeSet::new();
-    let mut pending_types = reference_backings.iter().map(|i| Type::Named(input.types[*i].name.clone())).collect::<Vec<_>>();
+    let mut pending_types = reference_backings
+        .iter()
+        .map(|i| Type::Named(input.types[*i].name.clone()))
+        .collect::<Vec<_>>();
     for &i in functions {
         let f = &input.functions[i];
         pending_types.extend(f.owner.iter().cloned());
         pending_types.extend(f.parameters.iter().chain(&f.locals).cloned());
         pending_types.push(f.returns.clone());
         for op in &f.body {
-            if let Op::StaticField { owner, .. } | Op::SetStaticField { owner, .. } = op { pending_types.push(owner.clone()); }
-            if matches!(op, Op::BoxValue(_)) { pending_types.push(Type::Named("System.Object".into())); }
-            if let Op::BindFunction { function_type, .. } = op { pending_types.push(function_type.clone()); }
+            if let Op::StaticField { owner, .. } | Op::SetStaticField { owner, .. } = op {
+                pending_types.push(owner.clone());
+            }
+            if matches!(op, Op::BoxValue(_)) {
+                pending_types.push(Type::Named("System.Object".into()));
+            }
+            if let Op::BindFunction { function_type, .. } = op {
+                pending_types.push(function_type.clone());
+            }
             if let Op::New(t)
             | Op::InitializeObject(t)
             | Op::LoadObject(t)
             | Op::StoreObject(t)
             | Op::PackValue(t)
             | Op::IsValue(t)
-            | Op::LoadTypeToken(t) | Op::UnpackValue(t) | Op::BoxValue(t) | Op::IsInstance(t) | Op::CastClass(t)
-            | Op::NewArray(t) | Op::ReserveArray(t) | Op::ArrayElement(t) | Op::StoreArrayElement(t) | Op::ArrayAddress(t) = op
+            | Op::LoadTypeToken(t)
+            | Op::UnpackValue(t)
+            | Op::BoxValue(t)
+            | Op::IsInstance(t)
+            | Op::CastClass(t)
+            | Op::NewArray(t)
+            | Op::ReserveArray(t)
+            | Op::ArrayElement(t)
+            | Op::StoreArrayElement(t)
+            | Op::ArrayAddress(t) = op
             {
                 pending_types.push(t.clone());
             }
@@ -494,15 +876,43 @@ fn retained_types(input: &neoclr::Module, functions: &BTreeSet<usize>, reference
                     ));
                 }
             }
-            Type::Function(shape) => { pending_types.extend(shape.parameters); pending_types.push(shape.returns); }
+            Type::Function(shape) => {
+                pending_types.extend(shape.parameters);
+                pending_types.push(shape.returns);
+            }
             Type::ByRef(t) => pending_types.push(*t),
             Type::Array(t) if matches!(*t, Type::Byte | Type::Char) => (),
-            Type::ArrayRef(t) if matches!(*t, Type::String | Type::Char) || scalar_array_element(&t) => (),
-            Type::ArrayRef(t) if matches!(*t, Type::Function(_) | Type::Named(_)) => pending_types.push(*t),
+            Type::ArrayRef(t)
+                if matches!(*t, Type::String | Type::Char) || scalar_array_element(&t) =>
+            {
+                ()
+            }
+            Type::ArrayRef(t) if matches!(*t, Type::Function(_) | Type::Named(_)) => {
+                pending_types.push(*t)
+            }
             Type::ArrayRef(t) if *t == Type::Byte => {
-                if let Some(owner) = byte_array_owner(input) { pending_types.push(owner); }
-            },
-            Type::Single | Type::Double | Type::Int32 | Type::Byte | Type::SByte | Type::Int16 | Type::UInt16 | Type::Boolean | Type::Void | Type::Value | Type::String | Type::Char | Type::UInt32 | Type::Int64 | Type::UInt64 | Type::IntPtr | Type::UIntPtr | Type::RuntimeTypeHandle => (),
+                if let Some(owner) = byte_array_owner(input) {
+                    pending_types.push(owner);
+                }
+            }
+            Type::Single
+            | Type::Double
+            | Type::Int32
+            | Type::Byte
+            | Type::SByte
+            | Type::Int16
+            | Type::UInt16
+            | Type::Boolean
+            | Type::Void
+            | Type::Value
+            | Type::String
+            | Type::Char
+            | Type::UInt32
+            | Type::Int64
+            | Type::UInt64
+            | Type::IntPtr
+            | Type::UIntPtr
+            | Type::RuntimeTypeHandle => (),
             _ => {
                 return Err(
                     "closed-world selection requires reference-free nongeneric value signatures"
@@ -526,10 +936,16 @@ pub(super) fn select_inventory(
     select_inventory_with_host_roots(input, root, single_assembly, &[], &[])
 }
 pub(super) fn select_inventory_with_host_roots(
-    input: &neoclr::Module, root: &str, single_assembly: bool, host_roots: &[usize], reference_backings: &[usize],
+    input: &neoclr::Module,
+    root: &str,
+    single_assembly: bool,
+    host_roots: &[usize],
+    reference_backings: &[usize],
 ) -> Result<(neoclr::Module, Value), Error> {
     validate_source(input, single_assembly)?;
-    if host_roots.iter().any(|i| *i >= input.functions.len()) { return Err("host root index out of range".into()); }
+    if host_roots.iter().any(|i| *i >= input.functions.len()) {
+        return Err("host root index out of range".into());
+    }
     let roots: Vec<_> = input
         .functions
         .iter()
@@ -552,15 +968,32 @@ pub(super) fn select_inventory_with_host_roots(
                 return Err("selected functions exceed the value profile limit".into());
             }
             pending.extend(virtual_base_contracts(input, &input.functions[i]));
-            if object_dispatch_contract(&input.functions[i]) { continue; }
+            if object_dispatch_contract(&input.functions[i]) {
+                continue;
+            }
             for op in &input.functions[i].body {
                 match op {
-                    Op::Call(target) | Op::CallVirtual(target) | Op::Construct(target) | Op::BindFunction { target, .. } => {
-                        if callable_invoke(target).is_some() { continue; }
+                    Op::Call(target)
+                    | Op::CallVirtual(target)
+                    | Op::Construct(target)
+                    | Op::BindFunction { target, .. } => {
+                        if callable_invoke(target).is_some() {
+                            continue;
+                        }
                         let callee = resolve(input, target)?;
                         let f = &input.functions[callee];
-                        if matches!(op, Op::CallVirtual(_)) && !interface_contract(input, f) && !class_contract(input, f) && !object_dispatch_contract(f) && !sealed_member(input, f) && !inherited_object_member(input, f) && (f.is_virtual || f.is_abstract || f.is_override) {
-                            return Err("virtual calls requiring dispatch need a later selection profile".into());
+                        if matches!(op, Op::CallVirtual(_))
+                            && !interface_contract(input, f)
+                            && !class_contract(input, f)
+                            && !object_dispatch_contract(f)
+                            && !sealed_member(input, f)
+                            && !inherited_object_member(input, f)
+                            && (f.is_virtual || f.is_abstract || f.is_override)
+                        {
+                            return Err(
+                                "virtual calls requiring dispatch need a later selection profile"
+                                    .into(),
+                            );
                         }
                         if matches!(op, Op::Call(_)) && object_dispatch_contract(f) {
                             return Err("direct Object.ToString/Equals/GetHashCode calls require base-call lowering".into());
@@ -574,13 +1007,26 @@ pub(super) fn select_inventory_with_host_roots(
         let conformance_types = retained_types(input, &functions, reference_backings)?;
         for &contract in &functions {
             if let Some(target) = string_dispatch_target(input, contract)? {
-                if !functions.contains(&target) { pending.push(target); }
+                if !functions.contains(&target) {
+                    pending.push(target);
+                }
             }
-            for (_, target) in dispatch_targets_with_array(input, contract, &functions, None, reference_backings, Some(&conformance_types))? {
-                if !functions.contains(&target) { pending.push(target); }
+            for (_, target) in dispatch_targets_with_array(
+                input,
+                contract,
+                &functions,
+                None,
+                reference_backings,
+                Some(&conformance_types),
+            )? {
+                if !functions.contains(&target) {
+                    pending.push(target);
+                }
             }
         }
-        if pending.is_empty() { break; }
+        if pending.is_empty() {
+            break;
+        }
     }
     let types = retained_types(input, &functions, reference_backings)?;
     let rows: Vec<_> = functions.iter().copied().collect();
@@ -610,7 +1056,8 @@ pub(super) fn select_inventory_with_host_roots(
     for (i, f) in projected.functions.iter_mut().enumerate() {
         if object_dispatch_contract(f) {
             f.body = object_placeholder(f);
-            f.locals.clear(); f.local_names.clear();
+            f.locals.clear();
+            f.local_names.clear();
         }
         f.custom_attributes.clear();
         f.definition = Some(MemberId {
@@ -619,8 +1066,14 @@ pub(super) fn select_inventory_with_host_roots(
             index: i as u32,
         });
         for op in &mut f.body {
-            if let Op::Call(target) | Op::CallVirtual(target) | Op::Construct(target) | Op::BindFunction { target, .. } = op {
-                if callable_invoke(target).is_some() { continue; }
+            if let Op::Call(target)
+            | Op::CallVirtual(target)
+            | Op::Construct(target)
+            | Op::BindFunction { target, .. } = op
+            {
+                if callable_invoke(target).is_some() {
+                    continue;
+                }
                 let old = resolve(input, target)?;
                 let new = rows.binary_search(&old).expect("selected call");
                 target.definition = Some(MemberId {
@@ -637,18 +1090,29 @@ pub(super) fn select_inventory_with_host_roots(
         let mut retained = vec![];
         let mut property_tokens = vec![];
         for (index, property) in t.properties.iter().enumerate().filter(|(_, p)| p.init_only) {
-            let setter = property.setter.as_ref().ok_or("init property lacks setter")?;
+            let setter = property
+                .setter
+                .as_ref()
+                .ok_or("init property lacks setter")?;
             let old = resolve(input, setter)?;
-            let Ok(new) = rows.binary_search(&old) else { continue; };
+            let Ok(new) = rows.binary_search(&old) else {
+                continue;
+            };
             let mut property = property.clone();
             property.getter = None;
             property.setter.as_mut().unwrap().definition = Some(MemberId {
-                module: input.name.clone(), revision: input.revision.clone(), index: new as u32,
+                module: input.name.clone(),
+                revision: input.revision.clone(),
+                index: new as u32,
             });
             retained.push(property);
-            if let Some(origin) = &t.origin { property_tokens.push(origin.property_tokens[index]); }
+            if let Some(origin) = &t.origin {
+                property_tokens.push(origin.property_tokens[index]);
+            }
         }
-        if let Some(origin) = &mut t.origin { origin.property_tokens = property_tokens; }
+        if let Some(origin) = &mut t.origin {
+            origin.property_tokens = property_tokens;
+        }
         t.custom_attributes.clear();
         t.properties = retained;
         t.definition = Some(TypeDefId {
@@ -673,8 +1137,21 @@ pub(super) fn select_inventory_with_host_roots(
         let display = object_dispatch_contract(&input.functions[*source]);
         let class = class_contract(input, &input.functions[*source]);
         if interface_contract(input, &input.functions[*source]) || display || class {
-            let targets = dispatch_targets_with_array(input, *source, &functions, None, reference_backings, None)?;
-            let inventory = if display { &mut object_dispatch } else if class { &mut class_dispatch } else { &mut dispatch };
+            let targets = dispatch_targets_with_array(
+                input,
+                *source,
+                &functions,
+                None,
+                reference_backings,
+                None,
+            )?;
+            let inventory = if display {
+                &mut object_dispatch
+            } else if class {
+                &mut class_dispatch
+            } else {
+                &mut dispatch
+            };
             inventory.push(json!({"contractCompiledIndex":compiled,"contractSourceIndex":source, "kind":input.functions[*source].name.rsplit('.').next(),
                 "targets":targets.iter().map(|(ty, method)| json!({"typeCompiledIndex":type_rows.binary_search(ty).unwrap(),"functionCompiledIndex":rows.binary_search(method).unwrap()})).collect::<Vec<_>>() }));
         }
@@ -698,6 +1175,10 @@ pub(super) fn select_inventory_with_host_roots(
 
 /// Private verified specialization evidence, never inferred from names or field shapes.
 pub(super) fn reference_array_backings(report: &Value) -> Vec<usize> {
-    report["referenceArrayBackings"].as_array().into_iter().flatten()
-        .filter_map(|r| r.as_u64().map(|i| i as usize)).collect()
+    report["referenceArrayBackings"]
+        .as_array()
+        .into_iter()
+        .flatten()
+        .filter_map(|r| r.as_u64().map(|i| i as usize))
+        .collect()
 }

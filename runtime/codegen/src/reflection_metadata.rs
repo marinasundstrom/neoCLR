@@ -159,40 +159,82 @@ fn visible(source: &neoclr::Module, ty: &Type) -> bool {
     }
 }
 
-pub(super) fn semantic_token(input: &neoclr::Module, report: &Value, token: &Type) -> Result<Type, Error> {
-    if token.is_primitive() { return Ok(token.clone()); }
+pub(super) fn semantic_token(
+    input: &neoclr::Module,
+    report: &Value,
+    token: &Type,
+) -> Result<Type, Error> {
+    if token.is_primitive() {
+        return Ok(token.clone());
+    }
     if let Type::Function(function) = token {
         let mut function = function.clone();
-        function.parameters = function.parameters.iter().map(|p| semantic_token(input, report, p)).collect::<Result<_, _>>()?;
+        function.parameters = function
+            .parameters
+            .iter()
+            .map(|p| semantic_token(input, report, p))
+            .collect::<Result<_, _>>()?;
         function.returns = semantic_token(input, report, &function.returns)?;
         return Ok(Type::Function(function));
     }
     if let Type::ArrayRef(element) = token {
-        return Ok(Type::ArrayRef(Box::new(semantic_token(input, report, element)?)));
+        return Ok(Type::ArrayRef(Box::new(semantic_token(
+            input, report, element,
+        )?)));
     }
-    let Type::Named(name) = token else { return Err("native semantic token requires a closed nominal or vector type".into()); };
-    let index = input.types.iter().position(|t| t.name == *name).ok_or("missing token type")?;
-    let row = report["sourceMetadata"]["types"].as_array().ok_or("missing source catalogue")?.iter()
-        .find(|r| r["compiledTypeIndex"] == index).ok_or("missing source token descriptor")?;
-    let definition = row["name"].as_str().ok_or("missing source type name")?.to_owned();
+    let Type::Named(name) = token else {
+        return Err("native semantic token requires a closed nominal or vector type".into());
+    };
+    let index = input
+        .types
+        .iter()
+        .position(|t| t.name == *name)
+        .ok_or("missing token type")?;
+    let row = report["sourceMetadata"]["types"]
+        .as_array()
+        .ok_or("missing source catalogue")?
+        .iter()
+        .find(|r| r["compiledTypeIndex"] == index)
+        .ok_or("missing source token descriptor")?;
+    let definition = row["name"]
+        .as_str()
+        .ok_or("missing source type name")?
+        .to_owned();
     let arguments: Vec<Type> = serde_json::from_value(row["typeArguments"].clone())?;
-    Ok(if arguments.is_empty() { Type::Named(definition) } else { Type::Constructed { definition, arguments } })
+    Ok(if arguments.is_empty() {
+        Type::Named(definition)
+    } else {
+        Type::Constructed {
+            definition,
+            arguments,
+        }
+    })
 }
 
 fn native_token(input: &neoclr::Module, report: &Value, semantic: &Type) -> Result<Type, Error> {
-    if semantic.is_primitive() { return Ok(semantic.clone()); }
+    if semantic.is_primitive() {
+        return Ok(semantic.clone());
+    }
     if let Type::Function(function) = semantic {
         let mut function = function.clone();
-        function.parameters = function.parameters.iter().map(|p| native_token(input, report, p)).collect::<Result<_, _>>()?;
+        function.parameters = function
+            .parameters
+            .iter()
+            .map(|p| native_token(input, report, p))
+            .collect::<Result<_, _>>()?;
         function.returns = native_token(input, report, &function.returns)?;
         return Ok(Type::Function(function));
     }
     if let Type::ArrayRef(element) = semantic {
-        return Ok(Type::ArrayRef(Box::new(native_token(input, report, element)?)));
+        return Ok(Type::ArrayRef(Box::new(native_token(
+            input, report, element,
+        )?)));
     }
     for t in &input.types {
         let token = Type::Named(t.name.clone());
-        if semantic_token(input, report, &token).ok().as_ref() == Some(semantic) { return Ok(token); }
+        if semantic_token(input, report, &token).ok().as_ref() == Some(semantic) {
+            return Ok(token);
+        }
     }
     Err(format!("generic argument type metadata was not retained: {semantic:?}").into())
 }
@@ -200,9 +242,22 @@ fn native_token(input: &neoclr::Module, report: &Value, semantic: &Type) -> Resu
 fn signature_name(ty: &Type) -> Result<String, Error> {
     Ok(match ty {
         Type::ArrayRef(element) => format!("arrayref<{}>", signature_name(element)?),
-        Type::Constructed { definition, arguments } => format!("{}<{}>", definition,
-            arguments.iter().map(signature_name).collect::<Result<Vec<_>, _>>()?.join(",")),
-        _ => ty.definition_name().ok_or("unsupported descriptor signature")?.to_owned(),
+        Type::Constructed {
+            definition,
+            arguments,
+        } => format!(
+            "{}<{}>",
+            definition,
+            arguments
+                .iter()
+                .map(signature_name)
+                .collect::<Result<Vec<_>, _>>()?
+                .join(",")
+        ),
+        _ => ty
+            .definition_name()
+            .ok_or("unsupported descriptor signature")?
+            .to_owned(),
     })
 }
 
@@ -229,7 +284,9 @@ fn shape(source: &neoclr::Module, ty: &Type) -> Result<[bool; 14], Error> {
     result[3] = interface;
     result[5] = d.is_abstract || interface;
     result[6] = d.enum_info.is_some();
-    result[7] = if matches!(ty, Type::ArrayRef(_)) { false } else if ty.is_primitive() {
+    result[7] = if matches!(ty, Type::ArrayRef(_)) {
+        false
+    } else if ty.is_primitive() {
         *ty != Type::String
     } else {
         !d.is_reference_type && !interface
@@ -288,7 +345,9 @@ pub fn bind_queries(
     // Argument queries produce more tokens; close this selected inventory before
     // generating any name/shape/argument dispatch. Unselected library bodies do
     // not contribute to retention.
-    let arguments_needed = queries.iter().any(|r| r["name"] == "neoCLR.Runtime.TypeArgument");
+    let arguments_needed = queries
+        .iter()
+        .any(|r| r["name"] == "neoCLR.Runtime.TypeArgument");
     let mut argument_rows = vec![];
     let mut next = 0;
     while next < tokens.len() {
@@ -296,9 +355,13 @@ pub fn bind_queries(
         let mut arguments = vec![];
         if arguments_needed {
             let semantic = semantic_token(input, report, &token)?;
-            for argument in neoclr::native_metadata::generic_arguments(source, &semantic).map_err(|e| e.to_string())? {
+            for argument in neoclr::native_metadata::generic_arguments(source, &semantic)
+                .map_err(|e| e.to_string())?
+            {
                 let lowered = native_token(input, report, &argument)?;
-                if !tokens.contains(&lowered) { tokens.push(lowered.clone()); }
+                if !tokens.contains(&lowered) {
+                    tokens.push(lowered.clone());
+                }
                 arguments.push(lowered);
             }
         }
@@ -351,8 +414,10 @@ pub fn bind_queries(
             (name.to_owned(), arguments.len(), semantic)
         } else if matches!(token, Type::Function(_)) {
             let semantic = semantic_token(input, report, token)?;
-            let neoclr::Value::String(name) = neoclr::native_metadata::display_name(source, &semantic)
-                .map_err(|e| e.to_string())? else {
+            let neoclr::Value::String(name) =
+                neoclr::native_metadata::display_name(source, &semantic)
+                    .map_err(|e| e.to_string())?
+            else {
                 return Err("function display name was not a string".into());
             };
             (name.to_string(), 0, semantic)
@@ -361,7 +426,9 @@ pub fn bind_queries(
             let declaration = source.type_definition(&semantic);
             let name = if let Some(origin) = declaration.and_then(|d| d.origin.as_ref()) {
                 origin.name.clone()
-            } else { signature_name(&semantic)? };
+            } else {
+                signature_name(&semantic)?
+            };
             (name, usize::from(declaration.is_some()), semantic)
         } else {
             return Err(format!("native type queries currently require primitive, closed nominal or vector tokens; found {token:?}").into());
@@ -374,9 +441,15 @@ pub fn bind_queries(
         } else {
             [false; 14]
         };
-        let metadata_token = if queries.iter().any(|r| r["name"] == "neoCLR.Runtime.TypeMetadataToken") {
-            neoclr::native_metadata::type_token(source, &semantic_type).map_err(|e| e.to_string())?
-        } else { 0 };
+        let metadata_token = if queries
+            .iter()
+            .any(|r| r["name"] == "neoCLR.Runtime.TypeMetadataToken")
+        {
+            neoclr::native_metadata::type_token(source, &semantic_type)
+                .map_err(|e| e.to_string())?
+        } else {
+            0
+        };
         descriptors.push((token.clone(), name, count, shapes, metadata_token));
     }
     let mut bindings = vec![];
@@ -430,12 +503,24 @@ pub fn bind_queries(
         // Emitting all fourteen Boolean branches exceeded the bounded backend's
         // method budget when HTTP and JSON retained more than ninety types.
         let mut body = if shapes {
-            vec![Op::Arg(1), Op::Int(0), Op::Less, Op::BranchFalse(5),
+            vec![
+                Op::Arg(1),
+                Op::Int(0),
+                Op::Less,
+                Op::BranchFalse(5),
                 Op::Fault("unknown type shape query".into()),
-                Op::Arg(1), Op::Int(14), Op::Less, Op::BranchTrue(10),
-                Op::Fault("unknown type shape query".into())]
-        } else { vec![] };
-        for (descriptor, (token, name, count, flags, metadata_token)) in descriptors.iter().enumerate() {
+                Op::Arg(1),
+                Op::Int(14),
+                Op::Less,
+                Op::BranchTrue(10),
+                Op::Fault("unknown type shape query".into()),
+            ]
+        } else {
+            vec![]
+        };
+        for (descriptor, (token, name, count, flags, metadata_token)) in
+            descriptors.iter().enumerate()
+        {
             let branch = body.len() + 3;
             body.extend([
                 Op::Arg(0),
@@ -446,13 +531,21 @@ pub fn bind_queries(
             if arguments {
                 for (index, token) in argument_rows[descriptor].iter().enumerate() {
                     let next = body.len() + 6;
-                    body.extend([Op::Arg(1), Op::Int(index as i32), Op::Equal,
-                        Op::BranchFalse(next), Op::LoadTypeToken(token.clone()), Op::Return]);
+                    body.extend([
+                        Op::Arg(1),
+                        Op::Int(index as i32),
+                        Op::Equal,
+                        Op::BranchFalse(next),
+                        Op::LoadTypeToken(token.clone()),
+                        Op::Return,
+                    ]);
                 }
                 body.push(Op::Fault("generic argument index out of range".into()));
             } else if shapes {
                 for (selector, value) in flags.iter().enumerate() {
-                    if !value { continue; }
+                    if !value {
+                        continue;
+                    }
                     let next = body.len() + 6;
                     body.extend([
                         Op::Arg(1),
@@ -542,7 +635,12 @@ mod tests {
         report["functions"][0]["name"] = json!("neoCLR.Runtime.TypeMetadataToken");
         let mut input = source.clone();
         bind_queries(&mut input, &source, &report).unwrap();
-        assert!(input.functions[0].body.iter().any(|op| matches!(op, Op::Int(0x0200002a))));
+        assert!(
+            input.functions[0]
+                .body
+                .iter()
+                .any(|op| matches!(op, Op::Int(0x0200002a)))
+        );
         input = source.clone();
         input.functions[0].returns = Type::RuntimeTypeHandle;
         assert!(bind_queries(&mut input, &source, &report).is_err());
@@ -627,28 +725,62 @@ mod shape_tests {
 /// source array types and must never escape as GetType results.
 pub fn bind_object_type(input: &mut neoclr::Module, report: &mut Value) -> Result<(), Error> {
     use neoclr::metadata::{Instruction as Op, Representation};
-    let rows: Vec<_> = report["functions"].as_array().into_iter().flatten()
-        .filter(|r| r["name"] == "neoCLR.Runtime.ObjectTypeHandle").cloned().collect();
-    if rows.is_empty() { return Ok(()); }
-    let root = report["objectBaseProjection"]["compiledIndex"].as_u64()
+    let rows: Vec<_> = report["functions"]
+        .as_array()
+        .into_iter()
+        .flatten()
+        .filter(|r| r["name"] == "neoCLR.Runtime.ObjectTypeHandle")
+        .cloned()
+        .collect();
+    if rows.is_empty() {
+        return Ok(());
+    }
+    let root = report["objectBaseProjection"]["compiledIndex"]
+        .as_u64()
         .ok_or("ObjectTypeHandle requires the verified Object base")? as usize;
     let object = Type::Named(input.types[root].name.clone());
-    let backings: Vec<_> = report["referenceArrayBackingProjections"].as_array().into_iter().flatten()
-        .filter_map(|r| r["compiledIndex"].as_u64()).collect();
+    let backings: Vec<_> = report["referenceArrayBackingProjections"]
+        .as_array()
+        .into_iter()
+        .flatten()
+        .filter_map(|r| r["compiledIndex"].as_u64())
+        .collect();
     let mut targets = vec![];
-    for row in report["sourceMetadata"]["types"].as_array().into_iter().flatten() {
-        let index = row["compiledTypeIndex"].as_u64().ok_or("missing object type index")? as usize;
+    for row in report["sourceMetadata"]["types"]
+        .as_array()
+        .into_iter()
+        .flatten()
+    {
+        let index = row["compiledTypeIndex"]
+            .as_u64()
+            .ok_or("missing object type index")? as usize;
         let t = &input.types[index];
-        if t.is_reference_type && !t.is_abstract && t.representation == Representation::Record
+        if t.is_reference_type
+            && !t.is_abstract
+            && t.representation == Representation::Record
             && !backings.contains(&(index as u64))
-            && report["arrayBackingProjection"]["compiledIndex"].as_u64() != Some(index as u64) {
+            && report["arrayBackingProjection"]["compiledIndex"].as_u64() != Some(index as u64)
+        {
             targets.push(json!({"typeCompiledIndex":index,"token":Type::Named(t.name.clone())}));
         }
     }
-    let vector_tokens: Vec<_> = input.functions.iter().flat_map(|f| &f.body).filter_map(|op| {
-        if let Op::LoadTypeToken(t @ Type::ArrayRef(_)) = op { Some(t.clone()) } else { None }
-    }).collect();
-    for index in backings.iter().copied().chain(report["arrayBackingProjection"]["compiledIndex"].as_u64()) {
+    let vector_tokens: Vec<_> = input
+        .functions
+        .iter()
+        .flat_map(|f| &f.body)
+        .filter_map(|op| {
+            if let Op::LoadTypeToken(t @ Type::ArrayRef(_)) = op {
+                Some(t.clone())
+            } else {
+                None
+            }
+        })
+        .collect();
+    for index in backings
+        .iter()
+        .copied()
+        .chain(report["arrayBackingProjection"]["compiledIndex"].as_u64())
+    {
         let index = index as usize;
         if let Some(field) = input.types[index].fields.first() {
             if vector_tokens.contains(&field.ty) {
@@ -656,35 +788,68 @@ pub fn bind_object_type(input: &mut neoclr::Module, report: &mut Value) -> Resul
             }
         }
     }
-    for (key, primitive) in [("int64Boxes", Some(Type::Int64)), ("int32Boxes", Some(Type::Int32)), ("booleanBoxes", Some(Type::Boolean)), ("emptyRecordBoxes", None)] {
+    for (key, primitive) in [
+        ("int64Boxes", Some(Type::Int64)),
+        ("int32Boxes", Some(Type::Int32)),
+        ("booleanBoxes", Some(Type::Boolean)),
+        ("emptyRecordBoxes", None),
+    ] {
         for row in report[key].as_array().into_iter().flatten() {
             let index = row["typeCompiledIndex"].as_u64().ok_or("missing box tag")? as usize;
-            let token = primitive.clone().unwrap_or_else(|| Type::Named(input.types[index].name.clone()));
+            let token = primitive
+                .clone()
+                .unwrap_or_else(|| Type::Named(input.types[index].name.clone()));
             targets.push(json!({"typeCompiledIndex":index,"token":token}));
         }
     }
     for row in rows {
-        let index = row["compiledIndex"].as_u64().ok_or("missing object query index")? as usize;
+        let index = row["compiledIndex"]
+            .as_u64()
+            .ok_or("missing object query index")? as usize;
         let f = &mut input.functions[index];
-        if f.name != "neoCLR.Runtime.ObjectTypeHandle" || f.owner.is_some() || f.instance
-            || f.parameters != vec![object.clone()] || f.returns != Type::RuntimeTypeHandle
-            || f.no_result || f.impl_flags != 0x1000 || f.pinvoke.is_some()
-            || !f.body.is_empty() || !f.locals.is_empty() || f.receiver_byref || f.receiver_readonly
-            || f.is_virtual || f.is_override || f.is_abstract || !f.generic_parameters.is_empty()
-            || !f.generic_arguments.is_empty() || !f.generic_constraints.is_empty()
-            || !f.interface_implementations.is_empty() || !f.out_parameters.is_empty()
-            || !f.out_when_true.is_empty() || !f.readonly_parameters.is_empty() {
-            return Err("ObjectTypeHandle requires the exact reserved InternalCall contract".into());
+        if f.name != "neoCLR.Runtime.ObjectTypeHandle"
+            || f.owner.is_some()
+            || f.instance
+            || f.parameters != vec![object.clone()]
+            || f.returns != Type::RuntimeTypeHandle
+            || f.no_result
+            || f.impl_flags != 0x1000
+            || f.pinvoke.is_some()
+            || !f.body.is_empty()
+            || !f.locals.is_empty()
+            || f.receiver_byref
+            || f.receiver_readonly
+            || f.is_virtual
+            || f.is_override
+            || f.is_abstract
+            || !f.generic_parameters.is_empty()
+            || !f.generic_arguments.is_empty()
+            || !f.generic_constraints.is_empty()
+            || !f.interface_implementations.is_empty()
+            || !f.out_parameters.is_empty()
+            || !f.out_when_true.is_empty()
+            || !f.readonly_parameters.is_empty()
+        {
+            return Err(
+                "ObjectTypeHandle requires the exact reserved InternalCall contract".into(),
+            );
         }
         f.impl_flags = 0;
         // Native body uses these diagnostic slots and enumerated token producers.
-        f.body = vec![Op::Fault("GetType requires a non-null instance".into()),
+        f.body = vec![
+            Op::Fault("GetType requires a non-null instance".into()),
             Op::Fault("native GetType does not yet admit this object shape".into()),
-            Op::LoadTypeToken(Type::String), Op::Pop];
+            Op::LoadTypeToken(Type::String),
+            Op::Pop,
+        ];
         for target in &targets {
-            f.body.extend([Op::LoadTypeToken(serde_json::from_value(target["token"].clone())?), Op::Pop]);
+            f.body.extend([
+                Op::LoadTypeToken(serde_json::from_value(target["token"].clone())?),
+                Op::Pop,
+            ]);
         }
-        f.body.push(Op::Fault("unreachable native object query body".into()));
+        f.body
+            .push(Op::Fault("unreachable native object query body".into()));
         report["nativeBindings"].as_array_mut().unwrap().push(json!({"compiledIndex":index,
             "name":row["name"],"implementation":"object-type-closed-v1", "targets":targets,
             "policy":"source class/box tags, intrinsic String and retained vector tokens; other compounds fail closed"}));
@@ -705,7 +870,10 @@ mod object_tests {
         let mut input = original.clone();
         let mut valid = report.clone();
         bind_object_type(&mut input, &mut valid).unwrap();
-        assert_eq!(valid["nativeBindings"][0]["targets"], json!([{"typeCompiledIndex":1,"token":Type::Named("Model".into())}]));
+        assert_eq!(
+            valid["nativeBindings"][0]["targets"],
+            json!([{"typeCompiledIndex":1,"token":Type::Named("Model".into())}])
+        );
         for change in 0..4 {
             let mut input = original.clone();
             let f = &mut input.functions[0];
@@ -713,9 +881,16 @@ mod object_tests {
                 0 => f.returns = Type::Int32,
                 1 => f.impl_flags = 0,
                 2 => f.locals.push(Type::Int32),
-                _ => f.body.push(neoclr::metadata::Instruction::Fault("body".into())),
+                _ => f
+                    .body
+                    .push(neoclr::metadata::Instruction::Fault("body".into())),
             }
-            assert!(bind_object_type(&mut input, &mut report.clone()).unwrap_err().to_string().contains("exact reserved"));
+            assert!(
+                bind_object_type(&mut input, &mut report.clone())
+                    .unwrap_err()
+                    .to_string()
+                    .contains("exact reserved")
+            );
         }
     }
 }

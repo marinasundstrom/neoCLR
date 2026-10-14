@@ -6,12 +6,19 @@ use super::{
 use neoclr::metadata::Instruction as Op;
 use serde_json::{Value, json};
 
-pub(super) fn native_body(p: &Profile<'_>, i: usize, details: Option<&crate::fault_details::Options>) -> bool {
+pub(super) fn native_body(
+    p: &Profile<'_>,
+    i: usize,
+    details: Option<&crate::fault_details::Options>,
+) -> bool {
     if p.dispatch.contains_key(&i) {
         return true;
     }
     details.is_some_and(|d| {
-        d.tls.contains_key(&i) || d.cryptography.contains_key(&i) || d.primitive_parsers.contains_key(&i) || d.object_type_queries.contains_key(&i)
+        d.tls.contains_key(&i)
+            || d.cryptography.contains_key(&i)
+            || d.primitive_parsers.contains_key(&i)
+            || d.object_type_queries.contains_key(&i)
             || d.scalar_box_queries.contains_key(&i)
             || d.int64_boxes.contains_key(&i)
             || d.int32_boxes.contains_key(&i)
@@ -107,15 +114,36 @@ pub(super) fn native_body(p: &Profile<'_>, i: usize, details: Option<&crate::fau
 
 pub(super) fn point(p: &Profile<'_>, op: &Op, stack: &[Ty]) -> Result<Option<Value>, Error> {
     let (consumed, kind, result, receiver) = match op {
-        Op::StaticField { owner, index } => (0, "static-storage", Some(p.static_field(owner, *index)?.1), None),
-        Op::SetStaticField { .. } => (1, "static-storage", None, None),
-        Op::BindFunction { function_type, target } => (
-            usize::from(target.instance), "callback-bind", Some(p.ty(function_type)?), None,
+        Op::StaticField { owner, index } => (
+            0,
+            "static-storage",
+            Some(p.static_field(owner, *index)?.1),
+            None,
         ),
-        Op::Call(target) | Op::CallVirtual(target) if crate::selection::callable_invoke(target).is_some() => {
+        Op::SetStaticField { .. } => (1, "static-storage", None, None),
+        Op::BindFunction {
+            function_type,
+            target,
+        } => (
+            usize::from(target.instance),
+            "callback-bind",
+            Some(p.ty(function_type)?),
+            None,
+        ),
+        Op::Call(target) | Op::CallVirtual(target)
+            if crate::selection::callable_invoke(target).is_some() =>
+        {
             let shape = crate::selection::callable_invoke(target).unwrap();
-            (shape.parameters.len() + 1, "callback-invoke",
-                if shape.no_result { None } else { Some(p.ty(&shape.returns)?) }, None)
+            (
+                shape.parameters.len() + 1,
+                "callback-invoke",
+                if shape.no_result {
+                    None
+                } else {
+                    Some(p.ty(&shape.returns)?)
+                },
+                None,
+            )
         }
         Op::Call(target) | Op::CallVirtual(target) | Op::Construct(target) => {
             let callee = p.callee(target)?;
@@ -180,8 +208,10 @@ pub(super) fn report(
     let mut functions = vec![];
     for (i, f) in p.input.functions.iter().enumerate() {
         if native_body(p, i, details) {
-            functions.push(json!({"index": i, "name": f.name, "coverage": "native-body-requires-separate-plan",
-                "diagnosticFrame": "typed-arguments-only", "serviceInternalRoots": "uncovered"}));
+            functions.push(
+                json!({"index": i, "name": f.name, "coverage": "native-body-requires-separate-plan",
+                "diagnosticFrame": "typed-arguments-only", "serviceInternalRoots": "uncovered"}),
+            );
             continue;
         }
         let shapes = p.analyze(i)?;
@@ -252,7 +282,13 @@ ret
             reference_arena: true,
             ..Default::default()
         };
-        super::super::compile(&module, "Main", Some(&details), crate::compiler::Target::MacosArm64).unwrap();
+        super::super::compile(
+            &module,
+            "Main",
+            Some(&details),
+            crate::compiler::Target::MacosArm64,
+        )
+        .unwrap();
         let p = Profile::new(&module, true, None, None, &[], None, None, None, false).unwrap();
         let report = report(&p, Some(&details)).unwrap();
         let functions = report["functions"].as_array().unwrap();

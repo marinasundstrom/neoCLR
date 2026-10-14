@@ -100,7 +100,9 @@ pub fn prepare(
             });
         }
         for (i, ty) in input.types.iter().enumerate() {
-            if ty.primitive_reference { continue; }
+            if ty.primitive_reference {
+                continue;
+            }
             types.push(TypeDefId {
                 module: input.name.clone(),
                 revision: input.revision.clone(),
@@ -108,7 +110,13 @@ pub fn prepare(
             });
         }
         joined.functions.extend(input.functions.iter().cloned());
-        joined.types.extend(input.types.iter().filter(|t| !t.primitive_reference).cloned());
+        joined.types.extend(
+            input
+                .types
+                .iter()
+                .filter(|t| !t.primitive_reference)
+                .cloned(),
+        );
         for assembly in &input.assemblies {
             if joined
                 .assemblies
@@ -122,8 +130,12 @@ pub fn prepare(
     }
     // Keep original scope identities and property associations before relocation.
     let mut source_metadata = joined.clone();
-    for (ty, id) in source_metadata.types.iter_mut().zip(&types) { ty.definition = Some(id.clone()); }
-    for (f, id) in source_metadata.functions.iter_mut().zip(&methods) { f.definition = Some(id.clone()); }
+    for (ty, id) in source_metadata.types.iter_mut().zip(&types) {
+        ty.definition = Some(id.clone());
+    }
+    for (f, id) in source_metadata.functions.iter_mut().zip(&methods) {
+        f.definition = Some(id.clone());
+    }
     let method_id = |i| MemberId {
         module: app.name.clone(),
         revision: app.revision.clone(),
@@ -139,20 +151,34 @@ pub fn prepare(
     // otherwise a source-owned service and its seed declaration become ambiguous.
     // Original loading/verification above remains the authority for access/registry
     // checks. This does not grant general name-based calls a local preference.
-    let local_services: Vec<_> = joined.functions.iter().enumerate()
+    let local_services: Vec<_> = joined
+        .functions
+        .iter()
+        .enumerate()
         .filter(|(_, f)| f.is_internal_call())
-        .map(|(i, f)| (i, f.clone())).collect();
+        .map(|(i, f)| (i, f.clone()))
+        .collect();
     for (i, function) in joined.functions.iter_mut().enumerate() {
         function.definition = Some(method_id(i));
         for op in &mut function.body {
-            if let Op::Call(target) | Op::CallVirtual(target) | Op::Construct(target) | Op::BindFunction { target, .. } = op {
+            if let Op::Call(target)
+            | Op::CallVirtual(target)
+            | Op::Construct(target)
+            | Op::BindFunction { target, .. } = op
+            {
                 if target.definition.is_none() {
-                    let matches: Vec<_> = local_services.iter().filter(|(index, f)| {
-                        methods[*index].module == methods[i].module
-                            && f.name == target.name && f.owner == target.owner
-                            && f.instance == target.instance && f.parameters == target.parameters
-                            && f.generic_parameters.is_empty() && target.generic_arguments.is_empty()
-                    }).collect();
+                    let matches: Vec<_> = local_services
+                        .iter()
+                        .filter(|(index, f)| {
+                            methods[*index].module == methods[i].module
+                                && f.name == target.name
+                                && f.owner == target.owner
+                                && f.instance == target.instance
+                                && f.parameters == target.parameters
+                                && f.generic_parameters.is_empty()
+                                && target.generic_arguments.is_empty()
+                        })
+                        .collect();
                     if let [candidate] = matches.as_slice() {
                         target.definition = Some(methods[candidate.0].clone());
                     }
@@ -180,30 +206,63 @@ pub fn prepare(
     // Retain the verified array-backing identity while canonicalizing the load set.
     for assembly in &mut joined.assemblies {
         if let Some(id) = &assembly.array_backing {
-            let index = types.iter().position(|candidate| candidate == id)
+            let index = types
+                .iter()
+                .position(|candidate| candidate == id)
                 .ok_or("array backing targets an unsupplied definition")?;
             assembly.array_backing = Some(type_id(index));
         }
     }
-    let mut reflection_retention = context.and_then(|c| c.reflection_roots.as_ref())
-        .map(|roots| super::reflection_construction::bind(&mut joined, &source_metadata, &types, &methods, roots)).transpose()?;
+    let mut reflection_retention = context
+        .and_then(|c| c.reflection_roots.as_ref())
+        .map(|roots| {
+            super::reflection_construction::bind(
+                &mut joined,
+                &source_metadata,
+                &types,
+                &methods,
+                roots,
+            )
+        })
+        .transpose()?;
     // Conformance was verified in original scopes. Metadata-only relationships
     // must not consume executable specialization shapes (Option and Result share
     // Propagatable with different arguments, including metadata-only Void).
-    let mut reflection_roots: Vec<usize> = reflection_retention.as_ref().and_then(|r| r["types"].as_array()).into_iter().flatten()
+    let mut reflection_roots: Vec<usize> = reflection_retention
+        .as_ref()
+        .and_then(|r| r["types"].as_array())
+        .into_iter()
+        .flatten()
         .filter(|r| r["construct"] == true && r["checkStatus"] == 0)
         .map(|r| -> Result<usize, Error> {
             let id: MemberId = serde_json::from_value(r["constructor"].clone())?;
-            methods.iter().position(|m| *m == id).ok_or_else(|| "missing retained constructor identity".into())
-        }).collect::<Result<_, _>>()?;
+            methods
+                .iter()
+                .position(|m| *m == id)
+                .ok_or_else(|| "missing retained constructor identity".into())
+        })
+        .collect::<Result<_, _>>()?;
     if let Some(retention) = reflection_retention.as_mut() {
-        reflection_roots.extend(super::reflection_properties::bind(&mut joined, &source_metadata, &types, &methods, retention)?);
+        reflection_roots.extend(super::reflection_properties::bind(
+            &mut joined,
+            &source_metadata,
+            &types,
+            &methods,
+            retention,
+        )?);
         super::reflection_collections::bind(&mut joined, &source_metadata, &types, retention)?;
         super::reflection_snapshots::bind(&mut joined, &source_metadata, &types, retention)?;
     } else if super::runtime_context::has_queries(&joined, &source_metadata)
-        || joined.functions.iter().any(|f| matches!(f.name.as_str(),
-            "neoCLR.Runtime.ReflectionPropertyGet" | "neoCLR.Runtime.ReflectionPropertyGetCheck"
-            | "neoCLR.Runtime.ReflectionPropertySet" | "neoCLR.Runtime.ReflectionPropertySetCheck")) {
+        || joined.functions.iter().any(|f| {
+            matches!(
+                f.name.as_str(),
+                "neoCLR.Runtime.ReflectionPropertyGet"
+                    | "neoCLR.Runtime.ReflectionPropertyGetCheck"
+                    | "neoCLR.Runtime.ReflectionPropertySet"
+                    | "neoCLR.Runtime.ReflectionPropertySetCheck"
+            )
+        })
+    {
         // APIs may contain reflection fallbacks without retaining any properties.
         // This internal plan is not admission of an empty user roots policy, and
         // grants neither a module catalog nor nominal type/member execution rights.
@@ -213,7 +272,13 @@ pub fn prepare(
         // Generic APIs may contain a reflection fallback even when their runtime
         // input is an intrinsic JSON node. Lower unretained property operations to
         // the existing explicit fault instead of leaving raw InternalCalls behind.
-        reflection_roots.extend(super::reflection_properties::bind(&mut joined, &source_metadata, &types, &methods, &mut retention)?);
+        reflection_roots.extend(super::reflection_properties::bind(
+            &mut joined,
+            &source_metadata,
+            &types,
+            &methods,
+            &mut retention,
+        )?);
         super::reflection_collections::bind(&mut joined, &source_metadata, &types, &mut retention)?;
         super::reflection_snapshots::bind(&mut joined, &source_metadata, &types, &mut retention)?;
         reflection_retention = Some(retention);
@@ -226,7 +291,11 @@ pub fn prepare(
             let relationships = ty.implements.clone();
             // Reference objects need their verified interface views at runtime.
             // Value-only conformance remains metadata-only in this profile.
-            if !context.is_some_and(|c| c.reference_arena) || (!ty.is_reference_type && ty.name != "System.String" && ty.representation != neoclr::metadata::Representation::Interface) {
+            if !context.is_some_and(|c| c.reference_arena)
+                || (!ty.is_reference_type
+                    && ty.name != "System.String"
+                    && ty.representation != neoclr::metadata::Representation::Interface)
+            {
                 ty.implements.clear();
             }
             relationships
@@ -241,68 +310,152 @@ pub fn prepare(
             .iter()
             .any(|f| !f.generic_parameters.is_empty())
     {
-        Some(super::specialization::expand_with_host_roots(&joined, root, &reflection_roots)?)
+        Some(super::specialization::expand_with_host_roots(
+            &joined,
+            root,
+            &reflection_roots,
+        )?)
     } else {
         None
     };
     let input = specialized.as_ref().map_or(&joined, |(module, _)| module);
-    let reference_backings = specialized.as_ref().map(|(_, r)| super::selection::reference_array_backings(r)).unwrap_or_default();
-    let (mut selected, mut report) = super::selection::select_inventory_with_host_roots(input, root, false, &reflection_roots, &reference_backings)?;
+    let reference_backings = specialized
+        .as_ref()
+        .map(|(_, r)| super::selection::reference_array_backings(r))
+        .unwrap_or_default();
+    let (mut selected, mut report) = super::selection::select_inventory_with_host_roots(
+        input,
+        root,
+        false,
+        &reflection_roots,
+        &reference_backings,
+    )?;
     if context.is_some_and(|c| c.bind_task_queue) {
         // Host pumping is an explicit additional reachability root, never a fake
         // call inserted into guest CIL. Only the verified source-owned queue type
         // already needed by the application may add this root.
         let mut host_roots = vec![];
         for (index, ty) in joined.types.iter().enumerate() {
-            let source_queue = ty.origin.as_ref().is_some_and(|o| o.name == "System.Concurrency.Tasks.TaskQueue")
-                || (ty.name == "System.Concurrency.Tasks.TaskQueue" && types[index].module == "System");
-            if !source_queue || !selected.types.iter().any(|t| t.name == ty.name) { continue; }
-            if !ty.is_reference_type || !ty.generic_parameters.is_empty() { return Err("host queue requires nongeneric source reference type".into()); }
-            let members: Vec<_> = joined.functions.iter().enumerate().filter(|(_, f)|
-                f.owner.as_ref() == Some(&neoclr::metadata::Type::Named(ty.name.clone()))
-                && f.origin.as_ref().map_or_else(|| f.name.rsplit('.').next().unwrap_or(""), |o| o.name.as_str()) == "Drain")
+            let source_queue = ty
+                .origin
+                .as_ref()
+                .is_some_and(|o| o.name == "System.Concurrency.Tasks.TaskQueue")
+                || (ty.name == "System.Concurrency.Tasks.TaskQueue"
+                    && types[index].module == "System");
+            if !source_queue || !selected.types.iter().any(|t| t.name == ty.name) {
+                continue;
+            }
+            if !ty.is_reference_type || !ty.generic_parameters.is_empty() {
+                return Err("host queue requires nongeneric source reference type".into());
+            }
+            let members: Vec<_> = joined
+                .functions
+                .iter()
+                .enumerate()
+                .filter(|(_, f)| {
+                    f.owner.as_ref() == Some(&neoclr::metadata::Type::Named(ty.name.clone()))
+                        && f.origin.as_ref().map_or_else(
+                            || f.name.rsplit('.').next().unwrap_or(""),
+                            |o| o.name.as_str(),
+                        ) == "Drain"
+                })
                 .collect();
-            let [(method, f)] = members.as_slice() else { return Err("host queue requires unique Drain member".into()); };
-            if !f.instance || !f.no_result || !f.parameters.is_empty() || !f.generic_parameters.is_empty()
-                || f.impl_flags != 0 || f.is_abstract || f.is_virtual || f.is_override {
+            let [(method, f)] = members.as_slice() else {
+                return Err("host queue requires unique Drain member".into());
+            };
+            if !f.instance
+                || !f.no_result
+                || !f.parameters.is_empty()
+                || !f.generic_parameters.is_empty()
+                || f.impl_flags != 0
+                || f.is_abstract
+                || f.is_virtual
+                || f.is_override
+            {
                 return Err("host queue requires ordinary instance Drain() with no result".into());
             }
             host_roots.push(*method);
         }
-        if host_roots.len() > 1 { return Err("host queue requires one TaskQueue type".into()); }
+        if host_roots.len() > 1 {
+            return Err("host queue requires one TaskQueue type".into());
+        }
         if !host_roots.is_empty() {
             host_roots.extend_from_slice(&reflection_roots);
-            specialized = Some(super::specialization::expand_with_host_roots(&joined, root, &host_roots)?);
+            specialized = Some(super::specialization::expand_with_host_roots(
+                &joined,
+                root,
+                &host_roots,
+            )?);
             let expanded = &specialized.as_ref().unwrap().0;
-            (selected, report) = super::selection::select_inventory_with_host_roots(expanded, root, false, &host_roots, &super::selection::reference_array_backings(&specialized.as_ref().unwrap().1))?;
+            (selected, report) = super::selection::select_inventory_with_host_roots(
+                expanded,
+                root,
+                false,
+                &host_roots,
+                &super::selection::reference_array_backings(&specialized.as_ref().unwrap().1),
+            )?;
         }
     }
     let array_handle_getter = if context.is_some_and(|c| c.reference_arena)
-        && selected.functions.iter().any(|f| f.name == "neoCLR.Runtime.ReflectionArrayCreate") {
+        && selected
+            .functions
+            .iter()
+            .any(|f| f.name == "neoCLR.Runtime.ReflectionArrayCreate")
+    {
         let getter = super::reflection_arrays::support_root(&joined)?;
-        let mut roots: Vec<_> = report["hostRoots"].as_array().unwrap().iter().map(|r| r["sourceIndex"].as_u64().unwrap() as usize).collect();
-        if !roots.contains(&getter) { roots.push(getter); }
-        specialized = Some(super::specialization::expand_with_host_roots(&joined, root, &roots)?);
+        let mut roots: Vec<_> = report["hostRoots"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .map(|r| r["sourceIndex"].as_u64().unwrap() as usize)
+            .collect();
+        if !roots.contains(&getter) {
+            roots.push(getter);
+        }
+        specialized = Some(super::specialization::expand_with_host_roots(
+            &joined, root, &roots,
+        )?);
         let expanded = &specialized.as_ref().unwrap().0;
-        (selected, report) = super::selection::select_inventory_with_host_roots(expanded, root, false, &roots, &super::selection::reference_array_backings(&specialized.as_ref().unwrap().1))?;
+        (selected, report) = super::selection::select_inventory_with_host_roots(
+            expanded,
+            root,
+            false,
+            &roots,
+            &super::selection::reference_array_backings(&specialized.as_ref().unwrap().1),
+        )?;
         Some(methods[getter].clone())
-    } else { None };
+    } else {
+        None
+    };
     let input = specialized.as_ref().map_or(&joined, |(module, _)| module);
     // Retain original closed String conformance before private specialization
     // erases interface arguments and primitive declarations leave the inventory.
     let mut string_interfaces = vec![];
     for row in report["types"].as_array().unwrap() {
         let source = row["sourceIndex"].as_u64().unwrap() as usize;
-        if input.types[source].representation != neoclr::metadata::Representation::Interface { continue; }
-        let shape = specialized.as_ref().and_then(|(_, data)| data["types"].as_array())
+        if input.types[source].representation != neoclr::metadata::Representation::Interface {
+            continue;
+        }
+        let shape = specialized
+            .as_ref()
+            .and_then(|(_, data)| data["types"].as_array())
             .and_then(|rows| rows.iter().find(|r| r["expandedIndex"] == source));
         let target = if let Some(shape) = shape {
             neoclr::metadata::Type::Constructed {
-                definition: shape["name"].as_str().ok_or("invalid String interface shape")?.to_owned(),
+                definition: shape["name"]
+                    .as_str()
+                    .ok_or("invalid String interface shape")?
+                    .to_owned(),
                 arguments: serde_json::from_value(shape["arguments"].clone())?,
             }
-        } else { neoclr::metadata::Type::Named(input.types[source].name.clone()) };
-        if super::selection::implements_interface(&source_conformance, &neoclr::metadata::Type::String, &target) {
+        } else {
+            neoclr::metadata::Type::Named(input.types[source].name.clone())
+        };
+        if super::selection::implements_interface(
+            &source_conformance,
+            &neoclr::metadata::Type::String,
+            &target,
+        ) {
             string_interfaces.push(row["compiledIndex"].clone());
         }
     }
@@ -327,20 +480,43 @@ pub fn prepare(
             row["definition"] = json!(types[row["sourceIndex"].as_u64().unwrap() as usize]);
         }
     }
-    report["sourceMetadata"] = super::reflection_metadata::catalogue(&source_metadata, &types, &methods, &report)?;
-    if let Some(retention) = reflection_retention { report["reflectionRetention"] = retention; }
+    report["sourceMetadata"] =
+        super::reflection_metadata::catalogue(&source_metadata, &types, &methods, &report)?;
+    if let Some(retention) = reflection_retention {
+        report["reflectionRetention"] = retention;
+    }
     report["reflectionArrayHandleGetterDefinition"] = json!(array_handle_getter);
     if let Some(index) = report["arrayBackingProjection"]["compiledIndex"].as_u64() {
-        if let Some(row) = report["types"].as_array().unwrap().iter().find(|r| r["compiledIndex"] == index).cloned() {
+        if let Some(row) = report["types"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .find(|r| r["compiledIndex"] == index)
+            .cloned()
+        {
             report["arrayBackingProjection"]["definition"] = row["definition"].clone();
             report["arrayBackingProjection"]["sourceName"] = row["name"].clone();
         }
     }
-    for (at, backing) in report["referenceArrayBackingProjections"].as_array().cloned().unwrap_or_default().iter().enumerate() {
-        if let Some(row) = report["types"].as_array().unwrap().iter().find(|r| r["compiledIndex"] == backing["compiledIndex"]).cloned() {
-            report["referenceArrayBackingProjections"][at]["definition"] = row["definition"].clone();
+    for (at, backing) in report["referenceArrayBackingProjections"]
+        .as_array()
+        .cloned()
+        .unwrap_or_default()
+        .iter()
+        .enumerate()
+    {
+        if let Some(row) = report["types"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .find(|r| r["compiledIndex"] == backing["compiledIndex"])
+            .cloned()
+        {
+            report["referenceArrayBackingProjections"][at]["definition"] =
+                row["definition"].clone();
             report["referenceArrayBackingProjections"][at]["sourceName"] = row["name"].clone();
-            report["referenceArrayBackingProjections"][at]["typeArguments"] = row["typeArguments"].clone();
+            report["referenceArrayBackingProjections"][at]["typeArguments"] =
+                row["typeArguments"].clone();
         }
     }
     let mut verified_relationships = vec![];
@@ -351,7 +527,10 @@ pub fn prepare(
         }
         let arguments: Vec<neoclr::metadata::Type> = report["specialization"]["types"]
             .as_array()
-            .and_then(|rows| rows.iter().find(|r| r["expandedIndex"] == row["expandedIndex"]))
+            .and_then(|rows| {
+                rows.iter()
+                    .find(|r| r["expandedIndex"] == row["expandedIndex"])
+            })
             .map(|r| serde_json::from_value(r["arguments"].clone()))
             .transpose()?
             .unwrap_or_default();
@@ -373,126 +552,200 @@ pub fn prepare(
     let bind_user_fault = context.is_some_and(|c| c.bind_user_fault);
     report["nativeBindings"] = if bind_user_fault {
         super::bindings::user_fault(&mut selected, &report)?
-    } else { json!([]) };
+    } else {
+        json!([])
+    };
     let bind_console_read_byte = context.is_some_and(|c| c.bind_console_read_byte);
     if bind_console_read_byte {
         let rows = super::bindings::console_read_byte(&mut selected, &report)?;
-        report["nativeBindings"].as_array_mut().unwrap().extend(rows);
+        report["nativeBindings"]
+            .as_array_mut()
+            .unwrap()
+            .extend(rows);
     }
     let bind_console_write_line = context.is_some_and(|c| c.bind_console_write_line);
     if bind_console_write_line {
         let rows = super::bindings::console_write_line(&mut selected, &report)?;
-        report["nativeBindings"].as_array_mut().unwrap().extend(rows);
+        report["nativeBindings"]
+            .as_array_mut()
+            .unwrap()
+            .extend(rows);
     }
     let bind_console_stream_output = context.is_some_and(|c| c.bind_console_stream_output);
     if bind_console_stream_output {
         let rows = super::bindings::console_stream_output(&mut selected, &report)?;
-        report["nativeBindings"].as_array_mut().unwrap().extend(rows);
+        report["nativeBindings"]
+            .as_array_mut()
+            .unwrap()
+            .extend(rows);
     }
     let bind_int32_to_string = context.is_some_and(|c| c.bind_int32_to_string);
     if bind_int32_to_string {
         let rows = super::bindings::int32_to_string(&mut selected, &report)?;
-        report["nativeBindings"].as_array_mut().unwrap().extend(rows);
+        report["nativeBindings"]
+            .as_array_mut()
+            .unwrap()
+            .extend(rows);
     }
     let bind_paths = context.is_some_and(|c| c.bind_paths);
     if bind_paths {
         let rows = super::bindings::paths(&mut selected, &report)?;
-        report["nativeBindings"].as_array_mut().unwrap().extend(rows);
+        report["nativeBindings"]
+            .as_array_mut()
+            .unwrap()
+            .extend(rows);
     }
     let bind_file_output = context.is_some_and(|c| c.bind_file_output);
     if bind_file_output {
         let rows = super::bindings::file_output(&mut selected, &report)?;
-        report["nativeBindings"].as_array_mut().unwrap().extend(rows);
+        report["nativeBindings"]
+            .as_array_mut()
+            .unwrap()
+            .extend(rows);
     }
     let bind_file_input = context.is_some_and(|c| c.bind_file_input);
     if bind_file_input {
         let rows = super::bindings::file_input(&mut selected, &report)?;
-        report["nativeBindings"].as_array_mut().unwrap().extend(rows);
+        report["nativeBindings"]
+            .as_array_mut()
+            .unwrap()
+            .extend(rows);
     }
     let bind_cryptography = context.is_some_and(|c| c.bind_cryptography);
     if bind_cryptography {
         let rows = super::bindings::cryptography(&mut selected, &report)?;
-        report["nativeBindings"].as_array_mut().unwrap().extend(rows);
+        report["nativeBindings"]
+            .as_array_mut()
+            .unwrap()
+            .extend(rows);
     }
     let bind_tls = context.is_some_and(|c| c.bind_tls);
     if bind_tls {
         let rows = super::bindings::tls(&mut selected, &report)?;
-        report["nativeBindings"].as_array_mut().unwrap().extend(rows);
+        report["nativeBindings"]
+            .as_array_mut()
+            .unwrap()
+            .extend(rows);
     }
     let bind_utf8_text = context.is_some_and(|c| c.bind_utf8_text);
     if bind_utf8_text {
         let rows = super::bindings::utf8_text(&mut selected, &report)?;
-        report["nativeBindings"].as_array_mut().unwrap().extend(rows);
+        report["nativeBindings"]
+            .as_array_mut()
+            .unwrap()
+            .extend(rows);
     }
     let bind_system_culture = context.is_some_and(|c| c.bind_system_culture);
     if bind_system_culture {
         let rows = super::bindings::system_culture(&mut selected, &report)?;
-        report["nativeBindings"].as_array_mut().unwrap().extend(rows);
+        report["nativeBindings"]
+            .as_array_mut()
+            .unwrap()
+            .extend(rows);
     }
     let bind_time_zone_rules = context.is_some_and(|c| c.bind_time_zone_rules);
     if bind_time_zone_rules {
         let rows = super::bindings::time_zone_rules(&mut selected, &report)?;
-        report["nativeBindings"].as_array_mut().unwrap().extend(rows);
+        report["nativeBindings"]
+            .as_array_mut()
+            .unwrap()
+            .extend(rows);
     }
     let bind_character_text = context.is_some_and(|c| c.bind_character_text);
     if bind_character_text {
         let rows = super::bindings::character_text(&mut selected, &report)?;
-        report["nativeBindings"].as_array_mut().unwrap().extend(rows);
+        report["nativeBindings"]
+            .as_array_mut()
+            .unwrap()
+            .extend(rows);
     }
     let bind_integer_text = context.is_some_and(|c| c.bind_integer_text);
     if bind_integer_text {
         let rows = super::bindings::integer_text(&mut selected, &report)?;
-        report["nativeBindings"].as_array_mut().unwrap().extend(rows);
+        report["nativeBindings"]
+            .as_array_mut()
+            .unwrap()
+            .extend(rows);
     }
     let bind_socket_listener = context.is_some_and(|c| c.bind_socket_listener);
     if bind_socket_listener {
         let rows = super::bindings::socket_listener(&mut selected, &report)?;
-        report["nativeBindings"].as_array_mut().unwrap().extend(rows);
+        report["nativeBindings"]
+            .as_array_mut()
+            .unwrap()
+            .extend(rows);
     }
     let bind_socket_accept = context.is_some_and(|c| c.bind_socket_accept);
     if bind_socket_accept {
         let rows = super::bindings::socket_accept(&mut selected, &report)?;
-        report["nativeBindings"].as_array_mut().unwrap().extend(rows);
+        report["nativeBindings"]
+            .as_array_mut()
+            .unwrap()
+            .extend(rows);
     }
     let bind_socket_client = context.is_some_and(|c| c.bind_socket_client);
     if bind_socket_client {
         let rows = super::bindings::socket_client(&mut selected, &report)?;
-        report["nativeBindings"].as_array_mut().unwrap().extend(rows);
+        report["nativeBindings"]
+            .as_array_mut()
+            .unwrap()
+            .extend(rows);
     }
     let bind_socket_transfer = context.is_some_and(|c| c.bind_socket_transfer);
     if bind_socket_transfer {
         let rows = super::bindings::socket_transfer(&mut selected, &report)?;
-        report["nativeBindings"].as_array_mut().unwrap().extend(rows);
+        report["nativeBindings"]
+            .as_array_mut()
+            .unwrap()
+            .extend(rows);
     }
     let bind_scheduler = context.is_some_and(|c| c.bind_scheduler);
     if bind_scheduler {
         let rows = super::bindings::scheduler(&mut selected, &report)?;
-        report["nativeBindings"].as_array_mut().unwrap().extend(rows);
+        report["nativeBindings"]
+            .as_array_mut()
+            .unwrap()
+            .extend(rows);
     }
     let bind_stack_trace = context.is_some_and(|c| c.bind_stack_trace);
     if bind_stack_trace {
         let rows = super::bindings::stack_trace(&mut selected, &report)?;
-        report["nativeBindings"].as_array_mut().unwrap().extend(rows);
+        report["nativeBindings"]
+            .as_array_mut()
+            .unwrap()
+            .extend(rows);
     }
     let bind_gc_collect = context.is_some_and(|c| c.bind_gc_collect);
     if bind_gc_collect {
         let rows = super::bindings::gc_collect(&mut selected, &report)?;
-        report["nativeBindings"].as_array_mut().unwrap().extend(rows);
+        report["nativeBindings"]
+            .as_array_mut()
+            .unwrap()
+            .extend(rows);
     }
     let bind_runtime_async = context.is_some_and(|c| c.bind_runtime_async);
     if bind_runtime_async {
         let rows = super::bindings::runtime_async(&mut selected, &report)?;
-        report["nativeBindings"].as_array_mut().unwrap().extend(rows);
+        report["nativeBindings"]
+            .as_array_mut()
+            .unwrap()
+            .extend(rows);
     }
     let bind_timers = context.is_some_and(|c| c.bind_timers);
     if bind_timers {
         let rows = super::bindings::timers(&mut selected, &report)?;
-        report["nativeBindings"].as_array_mut().unwrap().extend(rows);
+        report["nativeBindings"]
+            .as_array_mut()
+            .unwrap()
+            .extend(rows);
     }
     let bind_task_queue = context.is_some_and(|c| c.bind_task_queue);
     if bind_task_queue {
         let (rows, frames) = super::bindings::task_queue(&mut selected, &report, &joined)?;
-        report["nativeBindings"].as_array_mut().unwrap().extend(rows);
+        report["nativeBindings"]
+            .as_array_mut()
+            .unwrap()
+            .extend(rows);
         report["taskQueueFrames"] = frames;
     }
     let reference_arena = context.is_some_and(|c| c.reference_arena);
@@ -501,18 +754,34 @@ pub fn prepare(
         let rows: Vec<_> = report["functions"].as_array().unwrap().iter()
             .filter(|r| matches!(r["name"].as_str(), Some("neoCLR.Runtime.ReflectionConstructionCheck" | "neoCLR.Runtime.ReflectionConstruct")))
             .map(|r| json!({"compiledIndex":r["compiledIndex"],"name":r["name"],"implementation":"reflection-construction-retained-v1"})).collect();
-        report["nativeBindings"].as_array_mut().unwrap().extend(rows);
+        report["nativeBindings"]
+            .as_array_mut()
+            .unwrap()
+            .extend(rows);
         let rows: Vec<_> = report["functions"].as_array().unwrap().iter()
             .filter(|r| matches!(r["name"].as_str(),Some("neoCLR.Runtime.TypeProperties" | "neoCLR.Runtime.TypeElementType" | "neoCLR.Runtime.MemberCustomAttributes")))
             .map(|r| json!({"compiledIndex":r["compiledIndex"],"name":r["name"],"implementation":"reflection-snapshot-retained-v1"})).collect();
-        report["nativeBindings"].as_array_mut().unwrap().extend(rows);
+        report["nativeBindings"]
+            .as_array_mut()
+            .unwrap()
+            .extend(rows);
         let collection_rows: Vec<_> = report["functions"].as_array().unwrap().iter()
             .filter(|r| r["name"].as_str().is_some_and(|n|n.starts_with("neoCLR.Runtime.ReflectionCollection")))
             .map(|r| json!({"compiledIndex":r["compiledIndex"],"name":r["name"],"implementation":"reflection-collection-retained-v1"})).collect();
-        report["nativeBindings"].as_array_mut().unwrap().extend(collection_rows);
-        let bindings = report["reflectionRetention"]["propertyBindings"].as_array().unwrap().clone();
+        report["nativeBindings"]
+            .as_array_mut()
+            .unwrap()
+            .extend(collection_rows);
+        let bindings = report["reflectionRetention"]["propertyBindings"]
+            .as_array()
+            .unwrap()
+            .clone();
         for binding in bindings {
-            let row = report["functions"].as_array().unwrap().iter().find(|r| r["definition"] == binding["definition"]);
+            let row = report["functions"]
+                .as_array()
+                .unwrap()
+                .iter()
+                .find(|r| r["definition"] == binding["definition"]);
             if let Some(row) = row {
                 let entry = json!({"compiledIndex":row["compiledIndex"],"name":row["name"],"implementation":"reflection-property-retained-v1","instructionMap":binding["instructionMap"]});
                 report["nativeBindings"].as_array_mut().unwrap().push(entry);
@@ -522,25 +791,67 @@ pub fn prepare(
 
     if reference_arena {
         let rows = super::bindings::type_equals(&mut selected, &report)?;
-        report["nativeBindings"].as_array_mut().unwrap().extend(rows);
+        report["nativeBindings"]
+            .as_array_mut()
+            .unwrap()
+            .extend(rows);
         let rows = super::bindings::object_reference_equals(&mut selected, &report)?;
-        report["nativeBindings"].as_array_mut().unwrap().extend(rows);
+        report["nativeBindings"]
+            .as_array_mut()
+            .unwrap()
+            .extend(rows);
     }
     report["nativeAbi"] = if report["entryArguments"] == true {
         json!("process-arguments-v1")
-    } else if reference_arena || report["nativeBindings"].as_array().unwrap().iter()
-        .any(|r| matches!(r["implementation"].as_str(), Some("int32-to-string-v1" | "int64-to-string-v1" | "uint64-to-string-v1"))) {
+    } else if reference_arena
+        || report["nativeBindings"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .any(|r| {
+                matches!(
+                    r["implementation"].as_str(),
+                    Some("int32-to-string-v1" | "int64-to-string-v1" | "uint64-to-string-v1")
+                )
+            })
+    {
         json!("caller-owned-text-arena-v4")
-    } else { json!("no-text-arena") };
+    } else {
+        json!("no-text-arena")
+    };
     // Projected primitive members remain in their canonical System declaration
     // module after losing their type owner. An empty namespace would invent a
     // global module that native core assemblies need not declare.
     // Static primitive wrappers have no receiver/storage. Preserve their verified
     // source identity in the report, then use private free-function bodies: the
     // backend's bundled primitive declarations belong to a different verification module.
-    let primitive_static: std::collections::BTreeSet<_> = selected.functions.iter().enumerate()
-        .filter(|(_, f)| matches!(f.owner, Some(neoclr::metadata::Type::Single | neoclr::metadata::Type::Double | neoclr::metadata::Type::SByte | neoclr::metadata::Type::Byte | neoclr::metadata::Type::Int16 | neoclr::metadata::Type::UInt16 | neoclr::metadata::Type::UInt32 | neoclr::metadata::Type::Char | neoclr::metadata::Type::String | neoclr::metadata::Type::Int32 | neoclr::metadata::Type::Boolean | neoclr::metadata::Type::Int64 | neoclr::metadata::Type::UInt64)) && !f.instance && !f.receiver_byref)
-        .map(|(i, _)| i).collect();
+    let primitive_static: std::collections::BTreeSet<_> = selected
+        .functions
+        .iter()
+        .enumerate()
+        .filter(|(_, f)| {
+            matches!(
+                f.owner,
+                Some(
+                    neoclr::metadata::Type::Single
+                        | neoclr::metadata::Type::Double
+                        | neoclr::metadata::Type::SByte
+                        | neoclr::metadata::Type::Byte
+                        | neoclr::metadata::Type::Int16
+                        | neoclr::metadata::Type::UInt16
+                        | neoclr::metadata::Type::UInt32
+                        | neoclr::metadata::Type::Char
+                        | neoclr::metadata::Type::String
+                        | neoclr::metadata::Type::Int32
+                        | neoclr::metadata::Type::Boolean
+                        | neoclr::metadata::Type::Int64
+                        | neoclr::metadata::Type::UInt64
+                )
+            ) && !f.instance
+                && !f.receiver_byref
+        })
+        .map(|(i, _)| i)
+        .collect();
     report["staticPrimitiveOwners"] = json!(primitive_static.iter().map(|i| json!({
         "compiledIndex": i, "owner": selected.functions[*i].owner, "lowering": "verified static wrapper to private free function"
     })).collect::<Vec<_>>());
@@ -551,7 +862,11 @@ pub fn prepare(
         }
         for op in &mut f.body {
             if let Op::Call(target) = op {
-                if target.definition.as_ref().is_some_and(|id| primitive_static.contains(&(id.index as usize))) {
+                if target
+                    .definition
+                    .as_ref()
+                    .is_some_and(|id| primitive_static.contains(&(id.index as usize)))
+                {
                     target.owner = None;
                 }
             }
@@ -559,17 +874,41 @@ pub fn prepare(
     }
     // Preserve borrowed intrinsic storage when moving verified instance wrappers
     // to private free functions. No receiver copy or replacement CIL body.
-    let primitive_members: std::collections::BTreeMap<_, _> = selected.functions.iter().enumerate()
-        .filter(|(_, f)| matches!(f.owner, Some(neoclr::metadata::Type::Int32 | neoclr::metadata::Type::Boolean
-            | neoclr::metadata::Type::Int64 | neoclr::metadata::Type::UInt64 | neoclr::metadata::Type::Char)) && f.instance)
-        .map(|(i, f)| (i, f.owner.clone().unwrap())).collect();
+    let primitive_members: std::collections::BTreeMap<_, _> = selected
+        .functions
+        .iter()
+        .enumerate()
+        .filter(|(_, f)| {
+            matches!(
+                f.owner,
+                Some(
+                    neoclr::metadata::Type::Int32
+                        | neoclr::metadata::Type::Boolean
+                        | neoclr::metadata::Type::Int64
+                        | neoclr::metadata::Type::UInt64
+                        | neoclr::metadata::Type::Char
+                )
+            ) && f.instance
+        })
+        .map(|(i, f)| (i, f.owner.clone().unwrap()))
+        .collect();
     for &i in primitive_members.keys() {
         let f = &selected.functions[i];
-        if !reference_arena || !f.receiver_byref || f.receiver_readonly || f.is_virtual || f.is_override || f.is_abstract
-            || f.impl_flags != 0 || f.pinvoke.is_some() || !f.generic_parameters.is_empty()
-            || !f.generic_arguments.is_empty() || !f.generic_constraints.is_empty()
+        if !reference_arena
+            || !f.receiver_byref
+            || f.receiver_readonly
+            || f.is_virtual
+            || f.is_override
+            || f.is_abstract
+            || f.impl_flags != 0
+            || f.pinvoke.is_some()
+            || !f.generic_parameters.is_empty()
+            || !f.generic_arguments.is_empty()
+            || !f.generic_constraints.is_empty()
             || !f.interface_implementations.is_empty()
-            || f.visibility != neoclr::metadata::Visibility::Public || f.name.ends_with("..ctor") {
+            || f.visibility != neoclr::metadata::Visibility::Public
+            || f.name.ends_with("..ctor")
+        {
             return Err("primitive instance projection requires public nonvirtual ordinary byref wrappers and --reference-arena".into());
         }
     }
@@ -579,19 +918,37 @@ pub fn prepare(
             f.namespace = "System".into();
             f.instance = false;
             f.receiver_byref = false;
-            f.parameters.insert(0, neoclr::metadata::Type::ByRef(Box::new(owner.clone())));
-            if !f.parameter_names.is_empty() { f.parameter_names.insert(0, None); }
-            for index in &mut f.out_parameters { *index += 1; }
-            for index in &mut f.readonly_parameters { *index += 1; }
-            for index in &mut f.out_when_true { *index += 1; }
-            if let Some(origin) = &mut f.origin { origin.parameter_tokens.insert(0, 0); origin.nullable_annotations.clear(); }
+            f.parameters
+                .insert(0, neoclr::metadata::Type::ByRef(Box::new(owner.clone())));
+            if !f.parameter_names.is_empty() {
+                f.parameter_names.insert(0, None);
+            }
+            for index in &mut f.out_parameters {
+                *index += 1;
+            }
+            for index in &mut f.readonly_parameters {
+                *index += 1;
+            }
+            for index in &mut f.out_when_true {
+                *index += 1;
+            }
+            if let Some(origin) = &mut f.origin {
+                origin.parameter_tokens.insert(0, 0);
+                origin.nullable_annotations.clear();
+            }
         }
         for op in &mut f.body {
             if let Op::Call(target) = op {
-                if let Some(owner) = target.definition.as_ref().and_then(|id| primitive_members.get(&(id.index as usize))) {
+                if let Some(owner) = target
+                    .definition
+                    .as_ref()
+                    .and_then(|id| primitive_members.get(&(id.index as usize)))
+                {
                     target.owner = None;
                     target.instance = false;
-                    target.parameters.insert(0, neoclr::metadata::Type::ByRef(Box::new(owner.clone())));
+                    target
+                        .parameters
+                        .insert(0, neoclr::metadata::Type::ByRef(Box::new(owner.clone())));
                 }
             }
         }
@@ -609,14 +966,26 @@ pub fn prepare(
     // cannot be redeclared; lower verified nonvirtual instance wrappers and explicit interface implementations to
     // free functions with an explicit receiver, preserving the original CIL body.
     super::string_projection::constructors(&mut selected, &mut report)?;
-    let string_members: std::collections::BTreeSet<_> = selected.functions.iter().enumerate()
+    let string_members: std::collections::BTreeSet<_> = selected
+        .functions
+        .iter()
+        .enumerate()
         .filter(|(_, f)| f.owner == Some(neoclr::metadata::Type::String) && f.instance)
-        .map(|(i, _)| i).collect();
+        .map(|(i, _)| i)
+        .collect();
     for &i in &string_members {
         let f = &selected.functions[i];
-        if !reference_arena || f.receiver_byref || f.receiver_readonly || f.is_virtual || f.is_override
-            || f.is_abstract || !f.generic_parameters.is_empty()
-            || (f.visibility != neoclr::metadata::Visibility::Public && f.interface_implementations.is_empty()) || f.name.ends_with("..ctor") {
+        if !reference_arena
+            || f.receiver_byref
+            || f.receiver_readonly
+            || f.is_virtual
+            || f.is_override
+            || f.is_abstract
+            || !f.generic_parameters.is_empty()
+            || (f.visibility != neoclr::metadata::Visibility::Public
+                && f.interface_implementations.is_empty())
+            || f.name.ends_with("..ctor")
+        {
             return Err("String instance projection requires public or explicit-interface nonvirtual wrappers and --reference-arena".into());
         }
     }
@@ -625,23 +994,40 @@ pub fn prepare(
             if !f.interface_implementations.is_empty() {
                 f.interface_implementations.clear();
                 f.visibility = neoclr::metadata::Visibility::Internal;
-                if let Some(origin) = &mut f.origin { origin.member_access = Some(neoclr::metadata_origin::SourceAccess::Assembly); }
+                if let Some(origin) = &mut f.origin {
+                    origin.member_access = Some(neoclr::metadata_origin::SourceAccess::Assembly);
+                }
             }
             f.owner = None;
             f.namespace = "System".into();
             f.instance = false;
             f.parameters.insert(0, neoclr::metadata::Type::String);
-            if !f.parameter_names.is_empty() { f.parameter_names.insert(0, None); }
-            for index in &mut f.out_parameters { *index += 1; }
-            for index in &mut f.readonly_parameters { *index += 1; }
+            if !f.parameter_names.is_empty() {
+                f.parameter_names.insert(0, None);
+            }
+            for index in &mut f.out_parameters {
+                *index += 1;
+            }
+            for index in &mut f.readonly_parameters {
+                *index += 1;
+            }
             // These remain unsupported by the value profile; retain facts rather
             // than accidentally authorizing conditional-output methods.
-            for contract in &mut f.out_when_true { *contract += 1; }
-            if let Some(origin) = &mut f.origin { origin.parameter_tokens.insert(0, 0); origin.nullable_annotations.clear(); }
+            for contract in &mut f.out_when_true {
+                *contract += 1;
+            }
+            if let Some(origin) = &mut f.origin {
+                origin.parameter_tokens.insert(0, 0);
+                origin.nullable_annotations.clear();
+            }
         }
         for op in &mut f.body {
             if let Op::Call(target) = op {
-                if target.definition.as_ref().is_some_and(|id| string_members.contains(&(id.index as usize))) {
+                if target
+                    .definition
+                    .as_ref()
+                    .is_some_and(|id| string_members.contains(&(id.index as usize)))
+                {
                     target.owner = None;
                     target.instance = false;
                     target.parameters.insert(0, neoclr::metadata::Type::String);
@@ -652,9 +1038,15 @@ pub fn prepare(
     report["stringInstanceProjections"] = json!(string_members.iter().map(|i| json!({"compiledIndex":i,
         "policy":"verified public nonvirtual String wrapper; explicit receiver, unchanged CIL argument indices"})).collect::<Vec<_>>());
     if reference_arena {
-        if let Some(index) = selected.types.iter().position(|t| t.name == "System.Object") {
+        if let Some(index) = selected
+            .types
+            .iter()
+            .position(|t| t.name == "System.Object")
+        {
             let mut name = "$aot_ObjectBase".to_owned();
-            while selected.types.iter().any(|t| t.name == name) { name.push('_'); }
+            while selected.types.iter().any(|t| t.name == name) {
+                name.push('_');
+            }
             // Keep the ordinary empty base and constructor, but do not ask the
             // backend verifier to install a second runtime Object slot registry.
             // The complete original Object contract was verified above.
@@ -663,24 +1055,47 @@ pub fn prepare(
             report["objectBaseProjection"] = json!({"compiledIndex": index, "sourceName": "System.Object", "compiledName": name,
                 "policy": "verified empty Object base/ordinary constructor; private nominal base, no virtual Object slots"});
             for row in report["types"].as_array_mut().unwrap() {
-                if row["compiledIndex"] == index { row["compiledName"] = json!(name); }
+                if row["compiledIndex"] == index {
+                    row["compiledName"] = json!(name);
+                }
             }
         }
     }
-    if report["objectDisplayDispatch"].as_array().is_some_and(|rows| rows.iter().any(|row| row["kind"] == "ToString")) {
+    if report["objectDisplayDispatch"]
+        .as_array()
+        .is_some_and(|rows| rows.iter().any(|row| row["kind"] == "ToString"))
+    {
         let mut defaults = vec![];
         for (index, ty) in selected.types.iter().enumerate() {
-            if !ty.is_reference_type || ty.representation != neoclr::metadata::Representation::Record { continue; }
+            if !ty.is_reference_type
+                || ty.representation != neoclr::metadata::Representation::Record
+            {
+                continue;
+            }
             // The Object base has already received a private name; its abstract
             // definition can never be a concrete receiver.
-            if ty.is_abstract { continue; }
+            if ty.is_abstract {
+                continue;
+            }
             let backing = report["arrayBackingProjection"]["compiledIndex"] == index
-                || report["referenceArrayBackingProjections"].as_array().is_some_and(|rows| rows.iter().any(|r| r["compiledIndex"] == index));
+                || report["referenceArrayBackingProjections"]
+                    .as_array()
+                    .is_some_and(|rows| rows.iter().any(|r| r["compiledIndex"] == index));
             let native_type = if backing {
-                ty.fields.first().ok_or("array display requires backing storage")?.ty.clone()
-            } else { neoclr::metadata::Type::Named(ty.name.clone()) };
-            let token = super::reflection_metadata::semantic_token(&selected, &report, &native_type)?;
-            let neoclr::Value::String(name) = neoclr::native_metadata::display_name(&source_metadata, &token).map_err(|e| e.to_string())? else {
+                ty.fields
+                    .first()
+                    .ok_or("array display requires backing storage")?
+                    .ty
+                    .clone()
+            } else {
+                neoclr::metadata::Type::Named(ty.name.clone())
+            };
+            let token =
+                super::reflection_metadata::semantic_token(&selected, &report, &native_type)?;
+            let neoclr::Value::String(name) =
+                neoclr::native_metadata::display_name(&source_metadata, &token)
+                    .map_err(|e| e.to_string())?
+            else {
                 return Err("Object default display requires a String descriptor".into());
             };
             defaults.push(json!({"typeCompiledIndex":index,"name":name.to_string()}));
@@ -688,19 +1103,44 @@ pub fn prepare(
         report["objectDefaultDisplay"] = json!(defaults);
     }
     if let Some(rows) = report["objectDisplayDispatch"].as_array() {
-        if !rows.is_empty() && !reference_arena { return Err("Object display dispatch requires --reference-arena".into()); }
+        if !rows.is_empty() && !reference_arena {
+            return Err("Object display dispatch requires --reference-arena".into());
+        }
         for row in rows {
-            let contract = row["contractCompiledIndex"].as_u64().ok_or("invalid Object display contract")? as usize;
+            let contract = row["contractCompiledIndex"]
+                .as_u64()
+                .ok_or("invalid Object display contract")? as usize;
             // The original virtual slot and overrides were verified in the full
             // load set. Keep instance calling conventions and callvirt null checks;
             // native dispatch replaces only this private placeholder body.
             let mut suffix = format!("$aot_ObjectDisplay_{contract}");
-            while selected.functions.iter().any(|f| f.name.rsplit('.').next() == Some(suffix.as_str())) { suffix.push('_'); }
-            let name = format!("{}.{}", selected.functions[contract].owner.as_ref().unwrap().definition_name().unwrap(), suffix);
+            while selected
+                .functions
+                .iter()
+                .any(|f| f.name.rsplit('.').next() == Some(suffix.as_str()))
+            {
+                suffix.push('_');
+            }
+            let name = format!(
+                "{}.{}",
+                selected.functions[contract]
+                    .owner
+                    .as_ref()
+                    .unwrap()
+                    .definition_name()
+                    .unwrap(),
+                suffix
+            );
             for f in &mut selected.functions {
                 for op in &mut f.body {
                     if let Op::CallVirtual(target) = op {
-                        if target.definition.as_ref().is_some_and(|id| id.index as usize == contract) { target.name = name.clone(); }
+                        if target
+                            .definition
+                            .as_ref()
+                            .is_some_and(|id| id.index as usize == contract)
+                        {
+                            target.name = name.clone();
+                        }
                     }
                 }
             }
@@ -708,11 +1148,18 @@ pub fn prepare(
             // A distinct private slot name avoids creating a nonvirtual hiding
             // relationship when the original owner is a declared Object base.
             f.name = name;
-            f.is_virtual = false; f.is_override = false;
+            f.is_virtual = false;
+            f.is_override = false;
             f.body = super::selection::object_placeholder(f);
-            f.locals.clear(); f.local_names.clear();
-            for target in row["targets"].as_array().ok_or("invalid Object display targets")? {
-                let i = target["functionCompiledIndex"].as_u64().ok_or("invalid Object display target")? as usize;
+            f.locals.clear();
+            f.local_names.clear();
+            for target in row["targets"]
+                .as_array()
+                .ok_or("invalid Object display targets")?
+            {
+                let i = target["functionCompiledIndex"]
+                    .as_u64()
+                    .ok_or("invalid Object display target")? as usize;
                 selected.functions[i].is_virtual = false;
                 selected.functions[i].is_override = false;
             }
@@ -720,17 +1167,38 @@ pub fn prepare(
     }
     // Value receivers have no derived allocation type. Original-scope verification
     // has checked their Object.ToString override contract; retain its borrowed body.
-    let value_display: Vec<_> = selected.functions.iter().enumerate()
-        .filter(|(_, f)| f.instance && f.receiver_byref && !f.receiver_readonly
-            && f.is_virtual && f.is_override && !f.is_abstract && f.impl_flags == 0
-            && f.name.rsplit('.').next() == Some("ToString") && f.parameters.is_empty()
-            && f.returns == neoclr::metadata::Type::String && !f.no_result
-            && f.generic_parameters.is_empty() && f.generic_arguments.is_empty()
-            && f.generic_constraints.is_empty() && f.interface_implementations.is_empty()
-            && f.owner.as_ref().and_then(|t| selected.type_definition(t)).is_some_and(|t|
-                !t.is_reference_type && t.representation == neoclr::metadata::Representation::Record
-                && t.base.is_none() && t.generic_parameters.is_empty()))
-        .map(|(i, _)| i).collect();
+    let value_display: Vec<_> = selected
+        .functions
+        .iter()
+        .enumerate()
+        .filter(|(_, f)| {
+            f.instance
+                && f.receiver_byref
+                && !f.receiver_readonly
+                && f.is_virtual
+                && f.is_override
+                && !f.is_abstract
+                && f.impl_flags == 0
+                && f.name.rsplit('.').next() == Some("ToString")
+                && f.parameters.is_empty()
+                && f.returns == neoclr::metadata::Type::String
+                && !f.no_result
+                && f.generic_parameters.is_empty()
+                && f.generic_arguments.is_empty()
+                && f.generic_constraints.is_empty()
+                && f.interface_implementations.is_empty()
+                && f.owner
+                    .as_ref()
+                    .and_then(|t| selected.type_definition(t))
+                    .is_some_and(|t| {
+                        !t.is_reference_type
+                            && t.representation == neoclr::metadata::Representation::Record
+                            && t.base.is_none()
+                            && t.generic_parameters.is_empty()
+                    })
+        })
+        .map(|(i, _)| i)
+        .collect();
     for &i in &value_display {
         selected.functions[i].is_virtual = false;
         selected.functions[i].is_override = false;
@@ -738,59 +1206,106 @@ pub fn prepare(
     report["valueDisplayProjections"] = json!(value_display.iter().map(|i| json!({"compiledIndex":i,
         "policy":"verified value ToString override; preserve direct by-reference receiver and original CIL"})).collect::<Vec<_>>());
     super::class_dispatch::project(&mut selected, &mut report)?;
-    let sealed_members: Vec<_> = selected.functions.iter().enumerate()
-        .filter(|(_, f)| !super::selection::class_contract(&selected, f) && (f.is_virtual || f.is_override) && (super::selection::sealed_member(&selected, f) || super::selection::inherited_object_member(&selected, f)))
-        .map(|(i, _)| i).collect();
+    let sealed_members: Vec<_> = selected
+        .functions
+        .iter()
+        .enumerate()
+        .filter(|(_, f)| {
+            !super::selection::class_contract(&selected, f)
+                && (f.is_virtual || f.is_override)
+                && (super::selection::sealed_member(&selected, f)
+                    || super::selection::inherited_object_member(&selected, f))
+        })
+        .map(|(i, _)| i)
+        .collect();
     for &i in &sealed_members {
         selected.functions[i].is_virtual = false;
         selected.functions[i].is_override = false;
     }
     report["sealedMemberProjections"] = json!(sealed_members.iter().map(|i| json!({"compiledIndex":i,
         "policy":"verified sealed owner or inherited Object override with one loaded implementation; retain callvirt null checks and ordinary body"})).collect::<Vec<_>>());
-    if reference_arena { super::reflection_arrays::bind(&mut selected, &mut report)?; }
+    if reference_arena {
+        super::reflection_arrays::bind(&mut selected, &mut report)?;
+    }
     super::boxing::project(&mut selected, &mut report)?;
     super::boxing::project_scalar_queries(&mut selected, &mut report)?;
     super::boxing::project_char_tests(&mut selected, &mut report)?;
     if reference_arena {
         super::reflection_metadata::bind_object_type(&mut selected, &mut report)?;
-        let rows = super::reflection_metadata::bind_queries(&mut selected, &source_metadata, &report)?;
-        report["nativeBindings"].as_array_mut().unwrap().extend(rows);
+        let rows =
+            super::reflection_metadata::bind_queries(&mut selected, &source_metadata, &report)?;
+        report["nativeBindings"]
+            .as_array_mut()
+            .unwrap()
+            .extend(rows);
     }
-    let boxed_display = report["int32Boxes"].as_array().is_some_and(|r| !r.is_empty())
-        && report["objectDisplayDispatch"].as_array().is_some_and(|r| r.iter().any(|row| row["kind"] == "ToString"));
+    let boxed_display = report["int32Boxes"]
+        .as_array()
+        .is_some_and(|r| !r.is_empty())
+        && report["objectDisplayDispatch"]
+            .as_array()
+            .is_some_and(|r| r.iter().any(|row| row["kind"] == "ToString"));
     if boxed_display && !bind_int32_to_string {
         return Err("boxed Int32 display requires --bind-int32-to-string".into());
     }
     report["boxedInt32Display"] = json!(boxed_display);
-    if report["int64Boxes"].as_array().is_some_and(|r| !r.is_empty())
-        && report["objectDisplayDispatch"].as_array().is_some_and(|r| r.iter().any(|row| row["kind"] == "ToString")) {
+    if report["int64Boxes"]
+        .as_array()
+        .is_some_and(|r| !r.is_empty())
+        && report["objectDisplayDispatch"]
+            .as_array()
+            .is_some_and(|r| r.iter().any(|row| row["kind"] == "ToString"))
+    {
         return Err("boxed Int64 display is not yet admitted".into());
     }
-    if report["booleanBoxes"].as_array().is_some_and(|r| !r.is_empty())
-        && report["objectDisplayDispatch"].as_array().is_some_and(|r| r.iter().any(|row| row["kind"] == "ToString")) {
+    if report["booleanBoxes"]
+        .as_array()
+        .is_some_and(|r| !r.is_empty())
+        && report["objectDisplayDispatch"]
+            .as_array()
+            .is_some_and(|r| r.iter().any(|row| row["kind"] == "ToString"))
+    {
         return Err("boxed Boolean display is not yet admitted".into());
     }
     let system_type_names: std::collections::BTreeSet<_> = neoclr::library::system()
-        .map_err(|e| e.to_string())?.types.iter().map(|t| t.name.as_str()).collect();
+        .map_err(|e| e.to_string())?
+        .types
+        .iter()
+        .map(|t| t.name.as_str())
+        .collect();
     let mut static_projections = vec![];
     for index in 0..selected.types.len() {
         let ty = &selected.types[index];
         // The supplied compatibility seed represents Console as an empty value
         // owner rather than the source library's static class. Keep its shape.
-        let seed_console = ty.name == "System.Console" && !ty.is_reference_type
+        let seed_console = ty.name == "System.Console"
+            && !ty.is_reference_type
             && ty.representation == neoclr::metadata::Representation::Record
-            && ty.fields.is_empty() && ty.base.is_none() && ty.implements.is_empty()
-            && ty.generic_parameters.is_empty() && ty.generic_constraints.is_empty()
-            && ty.enum_info.is_none() && ty.packing.is_none() && ty.minimum_size.is_none();
-        if !(super::selection::static_owner(ty) || seed_console) || !system_type_names.contains(ty.name.as_str()) { continue; }
+            && ty.fields.is_empty()
+            && ty.base.is_none()
+            && ty.implements.is_empty()
+            && ty.generic_parameters.is_empty()
+            && ty.generic_constraints.is_empty()
+            && ty.enum_info.is_none()
+            && ty.packing.is_none()
+            && ty.minimum_size.is_none();
+        if !(super::selection::static_owner(ty) || seed_console)
+            || !system_type_names.contains(ty.name.as_str())
+        {
+            continue;
+        }
         let source = selected.types[index].name.clone();
         let mut name = format!("$aot_StaticOwner_{index}");
-        while selected.types.iter().any(|t| t.name == name) { name.push('_'); }
+        while selected.types.iter().any(|t| t.name == name) {
+            name.push('_');
+        }
         selected.types[index].name = name.clone();
         rename_nominal(&mut selected, &source, &name, root)?;
         static_projections.push(json!({"compiledIndex":index,"sourceName":source,"compiledName":name,"policy":"verified static/empty seed Console owner; private nominal name, original shape retained"}));
         for row in report["types"].as_array_mut().unwrap() {
-            if row["compiledIndex"] == index { row["compiledName"] = json!(name); }
+            if row["compiledIndex"] == index {
+                row["compiledName"] = json!(name);
+            }
         }
     }
     report["staticOwnerProjections"] = json!(static_projections);
@@ -798,7 +1313,11 @@ pub fn prepare(
     // Give selected seed/library members private names so originals such as
     // System.Fail cannot collide with that context. Exact definition IDs still bind calls.
     let system_names: std::collections::BTreeSet<_> = neoclr::library::system()
-        .map_err(|e| e.to_string())?.functions.iter().map(|f| f.name.as_str()).collect();
+        .map_err(|e| e.to_string())?
+        .functions
+        .iter()
+        .map(|f| f.name.as_str())
+        .collect();
     // An explicitly admitted service can also be declared independently by an
     // application and a provider without appearing in the bundled System seed
     // (for example the opt-in runtime-async adapter). After binding, its private
@@ -806,21 +1325,42 @@ pub fn prepare(
     // Preserve both definitions and their original identities in the report; only
     // exact, already-admitted free service bodies receive this private projection.
     let admitted_services: std::collections::BTreeSet<_> = report["nativeBindings"]
-        .as_array().into_iter().flatten()
+        .as_array()
+        .into_iter()
+        .flatten()
         .filter_map(|row| row["compiledIndex"].as_u64().map(|i| i as usize))
         .filter(|i| selected.functions[*i].owner.is_none())
         .collect();
-    let private_names: Vec<_> = selected.functions.iter().enumerate().map(|(i, f)| {
-        if f.name != root && (system_names.contains(f.name.as_str()) || admitted_services.contains(&i)) {
-            let mut name = format!("$aot_linked_{i}");
-            while selected.functions.iter().any(|candidate| candidate.name == name) { name.push('_'); }
-            name
-        } else { f.name.clone() }
-    }).collect();
+    let private_names: Vec<_> = selected
+        .functions
+        .iter()
+        .enumerate()
+        .map(|(i, f)| {
+            if f.name != root
+                && (system_names.contains(f.name.as_str()) || admitted_services.contains(&i))
+            {
+                let mut name = format!("$aot_linked_{i}");
+                while selected
+                    .functions
+                    .iter()
+                    .any(|candidate| candidate.name == name)
+                {
+                    name.push('_');
+                }
+                name
+            } else {
+                f.name.clone()
+            }
+        })
+        .collect();
     for (i, f) in selected.functions.iter_mut().enumerate() {
         f.name = private_names[i].clone();
         for op in &mut f.body {
-            if let Op::Call(target) | Op::CallVirtual(target) | Op::Construct(target) | Op::BindFunction { target, .. } = op {
+            if let Op::Call(target)
+            | Op::CallVirtual(target)
+            | Op::Construct(target)
+            | Op::BindFunction { target, .. } = op
+            {
                 if let Some(id) = &target.definition {
                     target.name = private_names[id.index as usize].clone();
                 }
@@ -829,7 +1369,9 @@ pub fn prepare(
     }
     for row in report["functions"].as_array_mut().unwrap() {
         let i = row["compiledIndex"].as_u64().unwrap() as usize;
-        if row["name"] != private_names[i] { row["compiledName"] = json!(private_names[i]); }
+        if row["name"] != private_names[i] {
+            row["compiledName"] = json!(private_names[i]);
+        }
     }
     report["loadSet"] = json!({"modules": inputs.iter().map(|m| json!({"name": m.name, "revision": m.revision})).collect::<Vec<_>>(),
         "validation": "all original bodies verified with runtime binder before private canonical projection",
@@ -840,21 +1382,36 @@ pub fn prepare(
 
 // Rename only structural nominal types and their owned method spellings. Source
 // strings, origins and definition identities remain intact for diagnostics/access.
-fn rename_nominal(module: &mut neoclr::Module, old: &str, new: &str, root: &str) -> Result<(), Error> {
+fn rename_nominal(
+    module: &mut neoclr::Module,
+    old: &str,
+    new: &str,
+    root: &str,
+) -> Result<(), Error> {
     fn rename(value: &mut Value, old: &str, new: &str, root: &str) {
         match value {
             Value::Object(object) => {
                 if object.get("owner") == Some(&json!({"Named":old})) {
                     if let Some(Value::String(member)) = object.get_mut("name") {
                         if member != root {
-                            if let Some(suffix) = member.strip_prefix(&format!("{old}.")) { *member = format!("{new}.{suffix}"); }
+                            if let Some(suffix) = member.strip_prefix(&format!("{old}.")) {
+                                *member = format!("{new}.{suffix}");
+                            }
                         }
                     }
                 }
-                if object.get("Named") == Some(&json!(old)) { object.insert("Named".into(), json!(new)); }
-                for child in object.values_mut() { rename(child, old, new, root); }
+                if object.get("Named") == Some(&json!(old)) {
+                    object.insert("Named".into(), json!(new));
+                }
+                for child in object.values_mut() {
+                    rename(child, old, new, root);
+                }
             }
-            Value::Array(values) => for child in values { rename(child, old, new, root); },
+            Value::Array(values) => {
+                for child in values {
+                    rename(child, old, new, root);
+                }
+            }
             _ => (),
         }
     }

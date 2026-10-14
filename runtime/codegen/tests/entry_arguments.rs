@@ -83,8 +83,9 @@ fn string_array_entry_emits_windows_abi_and_requires_gc() {
             .any(|s| s.name().ok() == Some("neoclr_entry_args_v1") && s.is_definition())
     );
     assert!(
-        obj.symbols()
-            .any(|s| s.name().ok() == Some("neoclr_process_arguments_rooted_v1") && s.is_undefined())
+        obj.symbols().any(
+            |s| s.name().ok() == Some("neoclr_process_arguments_rooted_v1") && s.is_undefined()
+        )
     );
     assert!(
         !obj.symbols()

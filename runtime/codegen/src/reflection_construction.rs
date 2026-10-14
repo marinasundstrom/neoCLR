@@ -19,7 +19,16 @@ pub fn bind(
         .get("schemaVersion")
         .and_then(Value::as_u64)
         .unwrap_or(0);
-    if config.len() != if version == 5 { 4 } else if version >= 4 { 3 } else { 2 } || !matches!(version, 1 | 2 | 3 | 4 | 5) {
+    if config.len()
+        != if version == 5 {
+            4
+        } else if version >= 4 {
+            3
+        } else {
+            2
+        }
+        || !matches!(version, 1 | 2 | 3 | 4 | 5)
+    {
         return Err("reflection roots require schemaVersion 1–3 and types, 4 with moduleCatalogs, or 5 with moduleCatalogs and moduleFunctions".into());
     }
     let roots = config
@@ -28,13 +37,17 @@ pub fn bind(
         .ok_or("reflection roots require types array")?;
     let mut catalogs = vec![];
     if version >= 4 {
-        let requested = config.get("moduleCatalogs").and_then(Value::as_array)
+        let requested = config
+            .get("moduleCatalogs")
+            .and_then(Value::as_array)
             .ok_or("moduleCatalogs must be an array of full assembly identities")?;
         if requested.len() > 64 {
             return Err("moduleCatalogs admits at most 64 assemblies".into());
         }
         for entry in requested {
-            let identity = entry.as_str().ok_or("moduleCatalogs requires String identities")?;
+            let identity = entry
+                .as_str()
+                .ok_or("moduleCatalogs requires String identities")?;
             if catalogs.contains(&identity) {
                 return Err("duplicate module catalog identity".into());
             }
@@ -45,17 +58,33 @@ pub fn bind(
     }
     let mut function_modules = vec![];
     if version == 5 {
-        let requested = config.get("moduleFunctions").and_then(Value::as_array)
+        let requested = config
+            .get("moduleFunctions")
+            .and_then(Value::as_array)
             .ok_or("moduleFunctions must be an array")?;
-        if requested.len() > 64 { return Err("moduleFunctions admits at most 64 modules".into()); }
+        if requested.len() > 64 {
+            return Err("moduleFunctions admits at most 64 modules".into());
+        }
         let mut seen = std::collections::HashSet::new();
         for entry in requested {
-            let fields = entry.as_object().ok_or("moduleFunctions entries must be objects")?;
-            if fields.len() != 3 { return Err("moduleFunctions requires assembly, name and customAttributes".into()); }
-            let assembly = entry["assembly"].as_str().ok_or("moduleFunctions requires full assembly identity")?;
-            let name = entry["name"].as_str().ok_or("moduleFunctions requires module name")?;
-            entry["customAttributes"].as_bool().ok_or("moduleFunctions requires Boolean customAttributes")?;
-            if !seen.insert((assembly, name)) { return Err("duplicate moduleFunctions scope".into()); }
+            let fields = entry
+                .as_object()
+                .ok_or("moduleFunctions entries must be objects")?;
+            if fields.len() != 3 {
+                return Err("moduleFunctions requires assembly, name and customAttributes".into());
+            }
+            let assembly = entry["assembly"]
+                .as_str()
+                .ok_or("moduleFunctions requires full assembly identity")?;
+            let name = entry["name"]
+                .as_str()
+                .ok_or("moduleFunctions requires module name")?;
+            entry["customAttributes"]
+                .as_bool()
+                .ok_or("moduleFunctions requires Boolean customAttributes")?;
+            if !seen.insert((assembly, name)) {
+                return Err("duplicate moduleFunctions scope".into());
+            }
             // Validate exact ownership and catalog membership without executing or
             // selecting bodies. Signature recipe admission happens in the binder.
             neoclr::native_metadata::module_function_definitions(source, assembly, name)
@@ -63,7 +92,8 @@ pub fn bind(
             function_modules.push(entry.clone());
         }
     }
-    if (roots.is_empty() && catalogs.is_empty() && function_modules.is_empty()) || roots.len() > 64 {
+    if (roots.is_empty() && catalogs.is_empty() && function_modules.is_empty()) || roots.len() > 64
+    {
         return Err("reflection roots require one to 64 types, an explicit module catalog or a function scope".into());
     }
     let mut selected = vec![];
@@ -267,7 +297,9 @@ pub fn bind(
     if version >= 4 {
         result["moduleCatalogs"] = json!(catalogs);
     }
-    if version == 5 { result["moduleFunctions"] = json!(function_modules); }
+    if version == 5 {
+        result["moduleFunctions"] = json!(function_modules);
+    }
     Ok(result)
 }
 
@@ -277,13 +309,17 @@ mod tests {
 
     #[test]
     fn function_retention_requires_exact_module_scope_and_attribute_policy() {
-        let mut source = neoclr::assemble(".module Functions\n.function Probe() -> Int32\nldc.i4 1\nret\n.end\n").unwrap();
+        let mut source = neoclr::assemble(
+            ".module Functions\n.function Probe() -> Int32\nldc.i4 1\nret\n.end\n",
+        )
+        .unwrap();
         source.assemblies = serde_json::from_value(json!([
             {"name":"One","full_name":"One","modules":["Functions"],"references":[],
              "declaration_modules":{"version":1,"names":["", "Empty"]}},
             {"name":"Two","full_name":"Two","modules":["Other"],"references":[],
              "declaration_modules":{"version":1,"names":[""]}}
-        ])).unwrap();
+        ]))
+        .unwrap();
         let valid = json!({"schemaVersion":5,"types":[],"moduleCatalogs":[],"moduleFunctions":[
             {"assembly":"One","name":"","customAttributes":true},
             {"assembly":"One","name":"Empty","customAttributes":false},
@@ -292,16 +328,24 @@ mod tests {
         let result = bind(&mut source.clone(), &source, &[], &[], &valid).unwrap();
         assert_eq!(result["moduleFunctions"], valid["moduleFunctions"]);
         assert_eq!(result["moduleCatalogs"], json!([]));
-        for rows in [json!([]), json!([{"assembly":"Missing","name":"","customAttributes":false}]),
+        for rows in [
+            json!([]),
+            json!([{"assembly":"Missing","name":"","customAttributes":false}]),
             json!([{"assembly":"One","name":"Missing","customAttributes":false}]),
             json!([{"assembly":"One","name":"","customAttributes":"true"}]),
             json!([{"assembly":"One","name":""}]),
-            json!([valid["moduleFunctions"][0].clone(),valid["moduleFunctions"][0].clone()]),
-            json!(true)] {
-            let mut config = valid.clone(); config["moduleFunctions"] = rows;
+            json!([
+                valid["moduleFunctions"][0].clone(),
+                valid["moduleFunctions"][0].clone()
+            ]),
+            json!(true),
+        ] {
+            let mut config = valid.clone();
+            config["moduleFunctions"] = rows;
             assert!(bind(&mut source.clone(), &source, &[], &[], &config).is_err());
         }
-        let mut config = valid.clone(); config["unexpected"] = json!(true);
+        let mut config = valid.clone();
+        config["unexpected"] = json!(true);
         assert!(bind(&mut source.clone(), &source, &[], &[], &config).is_err());
     }
 
@@ -314,13 +358,22 @@ mod tests {
             {"name":"Two","full_name":"Two","modules":["Two.dll"],"references":[],
              "declaration_modules":{"version":1,"names":[]}},
             {"name":"Legacy","full_name":"Legacy","modules":["Legacy.dll"],"references":[]}
-        ])).unwrap();
-        let valid = json!({"schemaVersion":4,"types":[],"moduleCatalogs":["One, Version=1.0.0.0","Two"]});
+        ]))
+        .unwrap();
+        let valid =
+            json!({"schemaVersion":4,"types":[],"moduleCatalogs":["One, Version=1.0.0.0","Two"]});
         let result = bind(&mut source.clone(), &source, &[], &[], &valid).unwrap();
         assert_eq!(result["moduleCatalogs"], valid["moduleCatalogs"]);
         assert_eq!(result["types"], json!([]));
-        for catalogs in [json!([]), json!(["One"]), json!(["Missing"]), json!(["Legacy"]),
-                         json!(["Two","Two"]), json!([7]), json!(true)] {
+        for catalogs in [
+            json!([]),
+            json!(["One"]),
+            json!(["Missing"]),
+            json!(["Legacy"]),
+            json!(["Two", "Two"]),
+            json!([7]),
+            json!(true),
+        ] {
             let mut config = valid.clone();
             config["moduleCatalogs"] = catalogs;
             assert!(bind(&mut source.clone(), &source, &[], &[], &config).is_err());

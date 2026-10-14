@@ -211,26 +211,54 @@ pub fn int32_to_string(input: &mut neoclr::Module, selection: &Value) -> Result<
 /// pinned Unicode segmentation dependency as the interpreter, statically linked.
 pub fn character_text(input: &mut neoclr::Module, selection: &Value) -> Result<Vec<Value>, Error> {
     let mut bindings = vec![];
-    for row in selection["functions"].as_array().ok_or("missing selection inventory")? {
+    for row in selection["functions"]
+        .as_array()
+        .ok_or("missing selection inventory")?
+    {
         let (parameter, result, implementation) = match row["name"].as_str() {
-            Some("neoCLR.Runtime.CharFromString") => (Type::String, Type::Char, "char-from-string-v1"),
+            Some("neoCLR.Runtime.CharFromString") => {
+                (Type::String, Type::Char, "char-from-string-v1")
+            }
             Some("neoCLR.Runtime.CharText") => (Type::Char, Type::String, "char-text-v1"),
             _ => continue,
         };
-        let f = &mut input.functions[row["compiledIndex"].as_u64().ok_or("missing compiled index")? as usize];
+        let f = &mut input.functions[row["compiledIndex"]
+            .as_u64()
+            .ok_or("missing compiled index")? as usize];
         if f.name != row["name"].as_str().unwrap()
-            || f.owner.is_some() || f.instance || f.receiver_byref || f.receiver_readonly
-            || f.parameters != [parameter] || f.returns != result || f.no_result
-            || f.impl_flags != 0x1000 || f.pinvoke.is_some() || !f.body.is_empty()
-            || !f.locals.is_empty() || f.is_virtual || f.is_override || f.is_abstract
-            || !f.generic_parameters.is_empty() || !f.generic_arguments.is_empty()
-            || !f.generic_constraints.is_empty() || !f.interface_implementations.is_empty()
-            || !f.out_parameters.is_empty() || !f.out_when_true.is_empty() || !f.readonly_parameters.is_empty()
-        { return Err("native character binding requires exact CharFromString(String) -> Char or CharText(Char) -> String InternalCall contract".into()); }
+            || f.owner.is_some()
+            || f.instance
+            || f.receiver_byref
+            || f.receiver_readonly
+            || f.parameters != [parameter]
+            || f.returns != result
+            || f.no_result
+            || f.impl_flags != 0x1000
+            || f.pinvoke.is_some()
+            || !f.body.is_empty()
+            || !f.locals.is_empty()
+            || f.is_virtual
+            || f.is_override
+            || f.is_abstract
+            || !f.generic_parameters.is_empty()
+            || !f.generic_arguments.is_empty()
+            || !f.generic_constraints.is_empty()
+            || !f.interface_implementations.is_empty()
+            || !f.out_parameters.is_empty()
+            || !f.out_when_true.is_empty()
+            || !f.readonly_parameters.is_empty()
+        {
+            return Err("native character binding requires exact CharFromString(String) -> Char or CharText(Char) -> String InternalCall contract".into());
+        }
         f.impl_flags = 0;
         if result == Type::Char {
             f.locals = vec![Type::Char];
-            f.body = vec![Op::LocalAddress(0), Op::InitializeObject(Type::Char), Op::Load(0), Op::Return];
+            f.body = vec![
+                Op::LocalAddress(0),
+                Op::InitializeObject(Type::Char),
+                Op::Load(0),
+                Op::Return,
+            ];
         } else {
             f.body = vec![Op::String(String::new()), Op::Return];
         }
@@ -245,7 +273,10 @@ pub fn character_text(input: &mut neoclr::Module, selection: &Value) -> Result<V
 /// Explicit primitive parsing, wide integer formatting and native-width conversion.
 pub fn integer_text(input: &mut neoclr::Module, selection: &Value) -> Result<Vec<Value>, Error> {
     let mut bindings = vec![];
-    for row in selection["functions"].as_array().ok_or("missing selection inventory")? {
+    for row in selection["functions"]
+        .as_array()
+        .ok_or("missing selection inventory")?
+    {
         let (parameter, result, implementation) = match row["name"].as_str() {
             Some("neoCLR.Runtime.ParseSByte") => (Type::String, Type::Value, "parse-sbyte-v1"),
             Some("neoCLR.Runtime.ParseByte") => (Type::String, Type::Value, "parse-byte-v1"),
@@ -258,22 +289,48 @@ pub fn integer_text(input: &mut neoclr::Module, selection: &Value) -> Result<Vec
             Some("neoCLR.Runtime.ParseBoolean") => (Type::String, Type::Value, "parse-boolean-v1"),
             Some("neoCLR.Runtime.ParseInt64") => (Type::String, Type::Value, "parse-int64-v1"),
             Some("neoCLR.Runtime.ParseInt32") => (Type::String, Type::Value, "parse-int32-v1"),
-            Some("neoCLR.Runtime.Int64ToString") => (Type::Int64, Type::String, "int64-to-string-v1"),
-            Some("neoCLR.Runtime.UInt64ToString") => (Type::UInt64, Type::String, "uint64-to-string-v1"),
-            Some("neoCLR.Runtime.IntPtrToInt64") => (Type::IntPtr, Type::Int64, "native-integer-to64-v1"),
-            Some("neoCLR.Runtime.UIntPtrToUInt64") => (Type::UIntPtr, Type::UInt64, "native-integer-to64-v1"),
+            Some("neoCLR.Runtime.Int64ToString") => {
+                (Type::Int64, Type::String, "int64-to-string-v1")
+            }
+            Some("neoCLR.Runtime.UInt64ToString") => {
+                (Type::UInt64, Type::String, "uint64-to-string-v1")
+            }
+            Some("neoCLR.Runtime.IntPtrToInt64") => {
+                (Type::IntPtr, Type::Int64, "native-integer-to64-v1")
+            }
+            Some("neoCLR.Runtime.UIntPtrToUInt64") => {
+                (Type::UIntPtr, Type::UInt64, "native-integer-to64-v1")
+            }
             _ => continue,
         };
-        let f = &mut input.functions[row["compiledIndex"].as_u64().ok_or("missing compiled index")? as usize];
+        let f = &mut input.functions[row["compiledIndex"]
+            .as_u64()
+            .ok_or("missing compiled index")? as usize];
         if f.name != row["name"].as_str().unwrap()
-            || f.owner.is_some() || f.instance || f.receiver_byref || f.receiver_readonly
-            || f.parameters != [parameter] || f.returns != result || f.no_result
-            || f.impl_flags != 0x1000 || f.pinvoke.is_some() || !f.body.is_empty()
-            || !f.locals.is_empty() || f.is_virtual || f.is_override || f.is_abstract
-            || !f.generic_parameters.is_empty() || !f.generic_arguments.is_empty()
-            || !f.generic_constraints.is_empty() || !f.interface_implementations.is_empty()
-            || !f.out_parameters.is_empty() || !f.out_when_true.is_empty() || !f.readonly_parameters.is_empty()
-        { return Err("native integer text binding requires exact reserved Int32/Int64 parsing or other primitive parsing, Int64/UInt64 formatting or native-integer conversion InternalCall contract".into()); }
+            || f.owner.is_some()
+            || f.instance
+            || f.receiver_byref
+            || f.receiver_readonly
+            || f.parameters != [parameter]
+            || f.returns != result
+            || f.no_result
+            || f.impl_flags != 0x1000
+            || f.pinvoke.is_some()
+            || !f.body.is_empty()
+            || !f.locals.is_empty()
+            || f.is_virtual
+            || f.is_override
+            || f.is_abstract
+            || !f.generic_parameters.is_empty()
+            || !f.generic_arguments.is_empty()
+            || !f.generic_constraints.is_empty()
+            || !f.interface_implementations.is_empty()
+            || !f.out_parameters.is_empty()
+            || !f.out_when_true.is_empty()
+            || !f.readonly_parameters.is_empty()
+        {
+            return Err("native integer text binding requires exact reserved Int32/Int64 parsing or other primitive parsing, Int64/UInt64 formatting or native-integer conversion InternalCall contract".into());
+        }
         f.impl_flags = 0;
         f.body = if result == Type::String {
             vec![Op::String(String::new()), Op::Return]
@@ -306,23 +363,60 @@ pub fn integer_text(input: &mut neoclr::Module, selection: &Value) -> Result<Vec
 }
 
 /// Raw stream services keep recoverable I/O/range errors in managed Result wrappers.
-pub fn console_stream_output(input: &mut neoclr::Module, selection: &Value) -> Result<Vec<Value>, Error> {
+pub fn console_stream_output(
+    input: &mut neoclr::Module,
+    selection: &Value,
+) -> Result<Vec<Value>, Error> {
     let mut bindings = vec![];
-    for row in selection["functions"].as_array().ok_or("missing selection inventory")? {
+    for row in selection["functions"]
+        .as_array()
+        .ok_or("missing selection inventory")?
+    {
         let name = row["name"].as_str().unwrap();
         let (parameters, implementation, symbol) = match name {
-            "neoCLR.Runtime.ConsoleWriteBytes" => (vec![Type::Boolean, Type::ArrayRef(Box::new(Type::Byte)), Type::Int32, Type::Int32], "console-write-bytes-v1", "neoclr_console_write_bytes_v1"),
-            "neoCLR.Runtime.ConsoleFlush" => (vec![Type::Boolean], "console-flush-v1", "neoclr_console_flush_v1"),
+            "neoCLR.Runtime.ConsoleWriteBytes" => (
+                vec![
+                    Type::Boolean,
+                    Type::ArrayRef(Box::new(Type::Byte)),
+                    Type::Int32,
+                    Type::Int32,
+                ],
+                "console-write-bytes-v1",
+                "neoclr_console_write_bytes_v1",
+            ),
+            "neoCLR.Runtime.ConsoleFlush" => (
+                vec![Type::Boolean],
+                "console-flush-v1",
+                "neoclr_console_flush_v1",
+            ),
             _ => continue,
         };
-        let f = &mut input.functions[row["compiledIndex"].as_u64().ok_or("missing compiled index")? as usize];
-        if f.name != name || f.owner.is_some() || f.instance || f.receiver_byref || f.receiver_readonly
-            || f.parameters != parameters || f.returns != Type::Value || f.no_result
-            || f.impl_flags != 0x1000 || f.pinvoke.is_some() || !f.body.is_empty() || !f.locals.is_empty()
-            || f.is_virtual || f.is_override || f.is_abstract || !f.generic_parameters.is_empty()
-            || !f.generic_arguments.is_empty() || !f.generic_constraints.is_empty()
-            || !f.interface_implementations.is_empty() || !f.out_parameters.is_empty()
-            || !f.out_when_true.is_empty() || !f.readonly_parameters.is_empty() {
+        let f = &mut input.functions[row["compiledIndex"]
+            .as_u64()
+            .ok_or("missing compiled index")? as usize];
+        if f.name != name
+            || f.owner.is_some()
+            || f.instance
+            || f.receiver_byref
+            || f.receiver_readonly
+            || f.parameters != parameters
+            || f.returns != Type::Value
+            || f.no_result
+            || f.impl_flags != 0x1000
+            || f.pinvoke.is_some()
+            || !f.body.is_empty()
+            || !f.locals.is_empty()
+            || f.is_virtual
+            || f.is_override
+            || f.is_abstract
+            || !f.generic_parameters.is_empty()
+            || !f.generic_arguments.is_empty()
+            || !f.generic_constraints.is_empty()
+            || !f.interface_implementations.is_empty()
+            || !f.out_parameters.is_empty()
+            || !f.out_when_true.is_empty()
+            || !f.readonly_parameters.is_empty()
+        {
             return Err("native stream output binding requires exact ConsoleWriteBytes(Boolean, arrayref<Byte>, Int32, Int32) or ConsoleFlush(Boolean) -> Value InternalCall contract".into());
         }
         f.impl_flags = 0;
@@ -336,20 +430,51 @@ pub fn console_stream_output(input: &mut neoclr::Module, selection: &Value) -> R
 /// Lexical paths for the current Unix native target; no filesystem access.
 pub fn paths(input: &mut neoclr::Module, selection: &Value) -> Result<Vec<Value>, Error> {
     let mut bindings = vec![];
-    for row in selection["functions"].as_array().ok_or("missing selection inventory")? {
+    for row in selection["functions"]
+        .as_array()
+        .ok_or("missing selection inventory")?
+    {
         let (name, arity, implementation, symbol) = match row["name"].as_str() {
-            Some("neoCLR.Runtime.PathCombine") => ("neoCLR.Runtime.PathCombine", 2, "path-combine-unix-v1", "neoclr_path_combine_unix_v1"),
-            Some("neoCLR.Runtime.PathGetFileName") => ("neoCLR.Runtime.PathGetFileName", 1, "path-file-name-unix-v1", "neoclr_path_file_name_unix_v1"),
+            Some("neoCLR.Runtime.PathCombine") => (
+                "neoCLR.Runtime.PathCombine",
+                2,
+                "path-combine-unix-v1",
+                "neoclr_path_combine_unix_v1",
+            ),
+            Some("neoCLR.Runtime.PathGetFileName") => (
+                "neoCLR.Runtime.PathGetFileName",
+                1,
+                "path-file-name-unix-v1",
+                "neoclr_path_file_name_unix_v1",
+            ),
             _ => continue,
         };
-        let f = &mut input.functions[row["compiledIndex"].as_u64().ok_or("missing compiled index")? as usize];
-        if f.name != name || f.owner.is_some() || f.instance || f.receiver_byref || f.receiver_readonly
-            || f.parameters != vec![Type::String; arity] || f.returns != Type::String || f.no_result
-            || f.impl_flags != 0x1000 || f.pinvoke.is_some() || !f.body.is_empty() || !f.locals.is_empty()
-            || f.is_virtual || f.is_override || f.is_abstract || !f.generic_parameters.is_empty()
-            || !f.generic_arguments.is_empty() || !f.generic_constraints.is_empty()
-            || !f.interface_implementations.is_empty() || !f.out_parameters.is_empty()
-            || !f.out_when_true.is_empty() || !f.readonly_parameters.is_empty() {
+        let f = &mut input.functions[row["compiledIndex"]
+            .as_u64()
+            .ok_or("missing compiled index")? as usize];
+        if f.name != name
+            || f.owner.is_some()
+            || f.instance
+            || f.receiver_byref
+            || f.receiver_readonly
+            || f.parameters != vec![Type::String; arity]
+            || f.returns != Type::String
+            || f.no_result
+            || f.impl_flags != 0x1000
+            || f.pinvoke.is_some()
+            || !f.body.is_empty()
+            || !f.locals.is_empty()
+            || f.is_virtual
+            || f.is_override
+            || f.is_abstract
+            || !f.generic_parameters.is_empty()
+            || !f.generic_arguments.is_empty()
+            || !f.generic_constraints.is_empty()
+            || !f.interface_implementations.is_empty()
+            || !f.out_parameters.is_empty()
+            || !f.out_when_true.is_empty()
+            || !f.readonly_parameters.is_empty()
+        {
             return Err("native paths require exact PathCombine(String, String) -> String or PathGetFileName(String) -> String InternalCall contracts".into());
         }
         f.impl_flags = 0;
@@ -363,17 +488,40 @@ pub fn paths(input: &mut neoclr::Module, selection: &Value) -> Result<Vec<Value>
 /// Explicit bounded file-output service; Result construction remains managed CIL.
 pub fn file_output(input: &mut neoclr::Module, selection: &Value) -> Result<Vec<Value>, Error> {
     let mut bindings = vec![];
-    for row in selection["functions"].as_array().ok_or("missing selection inventory")? {
-        if row["name"] != "neoCLR.Runtime.WriteAllText" { continue; }
+    for row in selection["functions"]
+        .as_array()
+        .ok_or("missing selection inventory")?
+    {
+        if row["name"] != "neoCLR.Runtime.WriteAllText" {
+            continue;
+        }
         let name = "neoCLR.Runtime.WriteAllText";
-        let f = &mut input.functions[row["compiledIndex"].as_u64().ok_or("missing compiled index")? as usize];
-        if f.name != name || f.owner.is_some() || f.instance || f.receiver_byref || f.receiver_readonly
-            || f.parameters != vec![Type::String, Type::String, Type::Int32] || f.returns != Type::Int32 || f.no_result
-            || f.impl_flags != 0x1000 || f.pinvoke.is_some() || !f.body.is_empty() || !f.locals.is_empty()
-            || f.is_virtual || f.is_override || f.is_abstract || !f.generic_parameters.is_empty()
-            || !f.generic_arguments.is_empty() || !f.generic_constraints.is_empty()
-            || !f.interface_implementations.is_empty() || !f.out_parameters.is_empty()
-            || !f.out_when_true.is_empty() || !f.readonly_parameters.is_empty() {
+        let f = &mut input.functions[row["compiledIndex"]
+            .as_u64()
+            .ok_or("missing compiled index")? as usize];
+        if f.name != name
+            || f.owner.is_some()
+            || f.instance
+            || f.receiver_byref
+            || f.receiver_readonly
+            || f.parameters != vec![Type::String, Type::String, Type::Int32]
+            || f.returns != Type::Int32
+            || f.no_result
+            || f.impl_flags != 0x1000
+            || f.pinvoke.is_some()
+            || !f.body.is_empty()
+            || !f.locals.is_empty()
+            || f.is_virtual
+            || f.is_override
+            || f.is_abstract
+            || !f.generic_parameters.is_empty()
+            || !f.generic_arguments.is_empty()
+            || !f.generic_constraints.is_empty()
+            || !f.interface_implementations.is_empty()
+            || !f.out_parameters.is_empty()
+            || !f.out_when_true.is_empty()
+            || !f.readonly_parameters.is_empty()
+        {
             return Err("native file output requires exact WriteAllText(String, String, Int32) -> Int32 InternalCall contract".into());
         }
         f.impl_flags = 0;
@@ -387,21 +535,48 @@ pub fn file_output(input: &mut neoclr::Module, selection: &Value) -> Result<Vec<
 /// Explicit bounded file input; decoding and public Result construction remain separate.
 pub fn file_input(input: &mut neoclr::Module, selection: &Value) -> Result<Vec<Value>, Error> {
     let mut bindings = vec![];
-    for row in selection["functions"].as_array().ok_or("missing selection inventory")? {
-        if row["name"] != "neoCLR.Runtime.ReadAllText" { continue; }
+    for row in selection["functions"]
+        .as_array()
+        .ok_or("missing selection inventory")?
+    {
+        if row["name"] != "neoCLR.Runtime.ReadAllText" {
+            continue;
+        }
         let name = "neoCLR.Runtime.ReadAllText";
-        let f = &mut input.functions[row["compiledIndex"].as_u64().ok_or("missing compiled index")? as usize];
-        if f.name != name || f.owner.is_some() || f.instance || f.receiver_byref || f.receiver_readonly
-            || f.parameters != vec![Type::String, Type::Int32] || f.returns != Type::Value || f.no_result
-            || f.impl_flags != 0x1000 || f.pinvoke.is_some() || !f.body.is_empty() || !f.locals.is_empty()
-            || f.is_virtual || f.is_override || f.is_abstract || !f.generic_parameters.is_empty()
-            || !f.generic_arguments.is_empty() || !f.generic_constraints.is_empty()
-            || !f.interface_implementations.is_empty() || !f.out_parameters.is_empty()
-            || !f.out_when_true.is_empty() || !f.readonly_parameters.is_empty() {
+        let f = &mut input.functions[row["compiledIndex"]
+            .as_u64()
+            .ok_or("missing compiled index")? as usize];
+        if f.name != name
+            || f.owner.is_some()
+            || f.instance
+            || f.receiver_byref
+            || f.receiver_readonly
+            || f.parameters != vec![Type::String, Type::Int32]
+            || f.returns != Type::Value
+            || f.no_result
+            || f.impl_flags != 0x1000
+            || f.pinvoke.is_some()
+            || !f.body.is_empty()
+            || !f.locals.is_empty()
+            || f.is_virtual
+            || f.is_override
+            || f.is_abstract
+            || !f.generic_parameters.is_empty()
+            || !f.generic_arguments.is_empty()
+            || !f.generic_constraints.is_empty()
+            || !f.interface_implementations.is_empty()
+            || !f.out_parameters.is_empty()
+            || !f.out_when_true.is_empty()
+            || !f.readonly_parameters.is_empty()
+        {
             return Err("native file input requires exact ReadAllText(String, Int32) -> Value InternalCall contract".into());
         }
         f.impl_flags = 0;
-        f.body = vec![Op::String(String::new()), Op::PackValue(Type::String), Op::Return];
+        f.body = vec![
+            Op::String(String::new()),
+            Op::PackValue(Type::String),
+            Op::Return,
+        ];
         bindings.push(json!({"definition":row["definition"],"name":row["name"],"compiledIndex":row["compiledIndex"],
             "implementation":"file-read-utf8-v1","symbol":"neoclr_file_read_utf8_v1","semantics":"bounded blocking UTF-8 file input; ordinary host permissions; preflight before open"}));
     }
@@ -411,24 +586,48 @@ pub fn file_input(input: &mut neoclr::Module, selection: &Value) -> Result<Vec<V
 /// Explicit host-preference binding; separate from pure UTF-8 operations.
 pub fn system_culture(input: &mut neoclr::Module, selection: &Value) -> Result<Vec<Value>, Error> {
     let mut bindings = vec![];
-    for row in selection["functions"].as_array().ok_or("missing selection inventory")? {
-        if row["name"] != "neoCLR.Runtime.SystemCultureName" { continue; }
-        let index = row["compiledIndex"].as_u64().ok_or("missing compiled index")? as usize;
+    for row in selection["functions"]
+        .as_array()
+        .ok_or("missing selection inventory")?
+    {
+        if row["name"] != "neoCLR.Runtime.SystemCultureName" {
+            continue;
+        }
+        let index = row["compiledIndex"]
+            .as_u64()
+            .ok_or("missing compiled index")? as usize;
         let f = &mut input.functions[index];
-        if f.name != "neoCLR.Runtime.SystemCultureName" || f.owner.is_some() || f.instance
-            || !f.parameters.is_empty() || f.returns != Type::String || f.no_result
-            || f.impl_flags != 0x1000 || !f.body.is_empty() || !f.locals.is_empty()
-            || f.pinvoke.is_some() || f.receiver_byref || f.receiver_readonly
-            || f.is_virtual || f.is_override || f.is_abstract
-            || !f.generic_parameters.is_empty() || !f.generic_arguments.is_empty()
-            || !f.generic_constraints.is_empty() || !f.interface_implementations.is_empty()
-            || !f.out_parameters.is_empty() || !f.out_when_true.is_empty() || !f.readonly_parameters.is_empty() {
+        if f.name != "neoCLR.Runtime.SystemCultureName"
+            || f.owner.is_some()
+            || f.instance
+            || !f.parameters.is_empty()
+            || f.returns != Type::String
+            || f.no_result
+            || f.impl_flags != 0x1000
+            || !f.body.is_empty()
+            || !f.locals.is_empty()
+            || f.pinvoke.is_some()
+            || f.receiver_byref
+            || f.receiver_readonly
+            || f.is_virtual
+            || f.is_override
+            || f.is_abstract
+            || !f.generic_parameters.is_empty()
+            || !f.generic_arguments.is_empty()
+            || !f.generic_constraints.is_empty()
+            || !f.interface_implementations.is_empty()
+            || !f.out_parameters.is_empty()
+            || !f.out_when_true.is_empty()
+            || !f.readonly_parameters.is_empty()
+        {
             return Err("native culture binding requires exact SystemCultureName() -> String InternalCall contract".into());
         }
         f.impl_flags = 0;
         f.body = vec![Op::String(String::new()), Op::Return];
-        bindings.push(json!({"definition":row["definition"],"name":row["name"],"compiledIndex":index,
-            "implementation":"system-culture-name-v1","symbol":"neoclr_system_culture_name_v1"}));
+        bindings.push(
+            json!({"definition":row["definition"],"name":row["name"],"compiledIndex":index,
+            "implementation":"system-culture-name-v1","symbol":"neoclr_system_culture_name_v1"}),
+        );
     }
     Ok(bindings)
 }
@@ -436,81 +635,276 @@ pub fn system_culture(input: &mut neoclr::Module, selection: &Value) -> Result<V
 /// Explicit pure pinned-rule bindings; no machine timezone or clock is consulted.
 pub fn time_zone_rules(input: &mut neoclr::Module, selection: &Value) -> Result<Vec<Value>, Error> {
     let mut bindings = vec![];
-    for row in selection["functions"].as_array().ok_or("missing selection inventory")? {
-        let (name, parameters, returns, symbol, implementation, placeholder) = match row["name"].as_str() {
-            Some("neoCLR.Runtime.TimeZoneExists") => ("neoCLR.Runtime.TimeZoneExists", vec![Type::String], Type::Boolean, "neoclr_time_zone_exists_v1", "time-zone-exists-v1", Op::Bool(false)),
-            Some("neoCLR.Runtime.TimeZoneOffset") => ("neoCLR.Runtime.TimeZoneOffset", vec![Type::String, Type::Int64], Type::Int32, "neoclr_time_zone_offset_v1", "time-zone-offset-v1", Op::Int(i32::MIN)),
-            Some("neoCLR.Runtime.TimeZoneDatabaseVersion") => ("neoCLR.Runtime.TimeZoneDatabaseVersion", vec![], Type::String, "neoclr_time_zone_version_v1", "time-zone-version-v1", Op::String(String::new())),
-            _ => continue,
-        };
-        let index = row["compiledIndex"].as_u64().ok_or("missing compiled index")? as usize;
+    for row in selection["functions"]
+        .as_array()
+        .ok_or("missing selection inventory")?
+    {
+        let (name, parameters, returns, symbol, implementation, placeholder) =
+            match row["name"].as_str() {
+                Some("neoCLR.Runtime.TimeZoneExists") => (
+                    "neoCLR.Runtime.TimeZoneExists",
+                    vec![Type::String],
+                    Type::Boolean,
+                    "neoclr_time_zone_exists_v1",
+                    "time-zone-exists-v1",
+                    Op::Bool(false),
+                ),
+                Some("neoCLR.Runtime.TimeZoneOffset") => (
+                    "neoCLR.Runtime.TimeZoneOffset",
+                    vec![Type::String, Type::Int64],
+                    Type::Int32,
+                    "neoclr_time_zone_offset_v1",
+                    "time-zone-offset-v1",
+                    Op::Int(i32::MIN),
+                ),
+                Some("neoCLR.Runtime.TimeZoneDatabaseVersion") => (
+                    "neoCLR.Runtime.TimeZoneDatabaseVersion",
+                    vec![],
+                    Type::String,
+                    "neoclr_time_zone_version_v1",
+                    "time-zone-version-v1",
+                    Op::String(String::new()),
+                ),
+                _ => continue,
+            };
+        let index = row["compiledIndex"]
+            .as_u64()
+            .ok_or("missing compiled index")? as usize;
         let f = &mut input.functions[index];
-        if f.name != name || f.owner.is_some() || f.instance
-            || f.parameters != parameters || f.returns != returns || f.no_result
-            || f.impl_flags != 0x1000 || !f.body.is_empty() || !f.locals.is_empty()
-            || f.pinvoke.is_some() || f.receiver_byref || f.receiver_readonly
-            || f.is_virtual || f.is_override || f.is_abstract
-            || !f.generic_parameters.is_empty() || !f.generic_arguments.is_empty()
-            || !f.generic_constraints.is_empty() || !f.interface_implementations.is_empty()
-            || !f.out_parameters.is_empty() || !f.out_when_true.is_empty() || !f.readonly_parameters.is_empty() {
+        if f.name != name
+            || f.owner.is_some()
+            || f.instance
+            || f.parameters != parameters
+            || f.returns != returns
+            || f.no_result
+            || f.impl_flags != 0x1000
+            || !f.body.is_empty()
+            || !f.locals.is_empty()
+            || f.pinvoke.is_some()
+            || f.receiver_byref
+            || f.receiver_readonly
+            || f.is_virtual
+            || f.is_override
+            || f.is_abstract
+            || !f.generic_parameters.is_empty()
+            || !f.generic_arguments.is_empty()
+            || !f.generic_constraints.is_empty()
+            || !f.interface_implementations.is_empty()
+            || !f.out_parameters.is_empty()
+            || !f.out_when_true.is_empty()
+            || !f.readonly_parameters.is_empty()
+        {
             return Err("native time-zone binding requires exact TimeZoneExists/TimeZoneOffset/TimeZoneDatabaseVersion InternalCall contracts".into());
         }
         f.impl_flags = 0;
         f.body = vec![placeholder, Op::Return];
-        bindings.push(json!({"definition":row["definition"],"name":row["name"],"compiledIndex":index,
-            "implementation":implementation,"symbol":symbol}));
+        bindings.push(
+            json!({"definition":row["definition"],"name":row["name"],"compiledIndex":index,
+            "implementation":implementation,"symbol":symbol}),
+        );
     }
     Ok(bindings)
 }
 
 pub fn utf8_text(input: &mut neoclr::Module, selection: &Value) -> Result<Vec<Value>, Error> {
     let mut bindings = vec![];
-    for row in selection["functions"].as_array().ok_or("missing selection inventory")? {
+    for row in selection["functions"]
+        .as_array()
+        .ok_or("missing selection inventory")?
+    {
         let name = row["name"].as_str().unwrap();
         let (parameters, result, implementation, symbol) = match name {
-            "neoCLR.Runtime.StringGraphemeCount" => (vec![Type::String], Type::Int32, "string-grapheme-count-v1", "neoclr_string_grapheme_count_v1"),
-            "neoCLR.Runtime.StringGraphemeAt" => (vec![Type::String, Type::Int32], Type::Char, "string-grapheme-at-v1", "neoclr_string_grapheme_at_v1"),
-            "neoCLR.Runtime.StringGraphemes" => (vec![Type::String], Type::Array(Box::new(Type::Char)), "string-graphemes-v1", "neoclr_string_graphemes_v1"),
-            "neoCLR.Runtime.StringScalars" => (vec![Type::String], Type::ArrayRef(Box::new(Type::UInt32)), "string-scalars-v1", "neoclr_string_scalars_v1"),
-            "neoCLR.Runtime.StringFromChars" => (vec![Type::ArrayRef(Box::new(Type::Char))], Type::String, "string-from-chars-v1", "neoclr_string_from_chars_v1"),
-            "neoCLR.Runtime.StringToUpperInvariant" => (vec![Type::String], Type::String, "string-upper-v1", "neoclr_string_upper_v1"),
-            "neoCLR.Runtime.StringToLowerInvariant" => (vec![Type::String], Type::String, "string-lower-v1", "neoclr_string_lower_v1"),
-            "neoCLR.Runtime.StringCompareOrdinalIgnoreCase" => (vec![Type::String, Type::String], Type::Int32, "string-compare-ignore-case-v1", "neoclr_string_compare_ignore_case_v1"),
-            "neoCLR.Runtime.StringHashOrdinal" => (vec![Type::String], Type::Int32, "string-hash-ordinal-v1", "neoclr_string_hash_ordinal_v1"),
-            "neoCLR.Runtime.StringHashOrdinalIgnoreCase" => (vec![Type::String], Type::Int32, "string-hash-ignore-case-v1", "neoclr_string_hash_ignore_case_v1"),
-            "neoCLR.Runtime.StringIntern" => (vec![Type::String], Type::String, "string-intern-v1", "neoclr_string_intern_v1"),
-            "neoCLR.Runtime.StringCompareOrdinal" => (vec![Type::String, Type::String], Type::Int32, "string-compare-ordinal-v1", "neoclr_string_compare_ordinal_v1"),
-            "neoCLR.Runtime.StringContainsOrdinal" => (vec![Type::String, Type::String], Type::Boolean, "string-contains-ordinal-v1", "neoclr_string_contains_ordinal_v1"),
-            "neoCLR.Runtime.StringStartsWithOrdinal" => (vec![Type::String, Type::String], Type::Boolean, "string-starts-with-ordinal-v1", "neoclr_string_starts_with_ordinal_v1"),
-            "neoCLR.Runtime.StringEndsWithOrdinal" => (vec![Type::String, Type::String], Type::Boolean, "string-ends-with-ordinal-v1", "neoclr_string_ends_with_ordinal_v1"),
-            "neoCLR.Runtime.StringJoinParts" => (vec![Type::ArrayRef(Box::new(Type::String)), Type::Int32, Type::String, Type::Int32], Type::String, "string-join-parts-v1", "neoclr_string_join_parts_v1"),
-            "neoCLR.Runtime.StringReplaceOrdinal" => (vec![Type::String, Type::String, Type::String], Type::String, "string-replace-ordinal-v1", "neoclr_string_replace_ordinal_v1"),
-            "neoCLR.Runtime.StringConcat" => (vec![Type::String, Type::String], Type::String, "string-concat-v1", "neoclr_string_concat_v1"),
-            "neoCLR.Runtime.Utf8Decode" => (vec![Type::ArrayRef(Box::new(Type::Byte))], Type::Value, "utf8-decode-v1", "neoclr_utf8_decode_v1"),
-            "neoCLR.Runtime.Utf8Encode" => (vec![Type::String], Type::Array(Box::new(Type::Byte)), "utf8-encode-v1", "neoclr_utf8_encode_v1"),
-            "neoCLR.Runtime.StringByteCount" => (vec![Type::String], Type::Int32, "string-byte-count-v1", "neoclr_string_byte_count_v1"),
-            "neoCLR.Runtime.StringSliceGraphemes" => (vec![Type::String, Type::Int32, Type::Int32], Type::String, "string-slice-graphemes-v1", "neoclr_string_slice_graphemes_v1"),
-            "neoCLR.Runtime.StringSliceUtf8" => (vec![Type::String, Type::Int32, Type::Int32], Type::Value, "string-slice-utf8-v1", "neoclr_string_slice_utf8_v1"),
+            "neoCLR.Runtime.StringGraphemeCount" => (
+                vec![Type::String],
+                Type::Int32,
+                "string-grapheme-count-v1",
+                "neoclr_string_grapheme_count_v1",
+            ),
+            "neoCLR.Runtime.StringGraphemeAt" => (
+                vec![Type::String, Type::Int32],
+                Type::Char,
+                "string-grapheme-at-v1",
+                "neoclr_string_grapheme_at_v1",
+            ),
+            "neoCLR.Runtime.StringGraphemes" => (
+                vec![Type::String],
+                Type::Array(Box::new(Type::Char)),
+                "string-graphemes-v1",
+                "neoclr_string_graphemes_v1",
+            ),
+            "neoCLR.Runtime.StringScalars" => (
+                vec![Type::String],
+                Type::ArrayRef(Box::new(Type::UInt32)),
+                "string-scalars-v1",
+                "neoclr_string_scalars_v1",
+            ),
+            "neoCLR.Runtime.StringFromChars" => (
+                vec![Type::ArrayRef(Box::new(Type::Char))],
+                Type::String,
+                "string-from-chars-v1",
+                "neoclr_string_from_chars_v1",
+            ),
+            "neoCLR.Runtime.StringToUpperInvariant" => (
+                vec![Type::String],
+                Type::String,
+                "string-upper-v1",
+                "neoclr_string_upper_v1",
+            ),
+            "neoCLR.Runtime.StringToLowerInvariant" => (
+                vec![Type::String],
+                Type::String,
+                "string-lower-v1",
+                "neoclr_string_lower_v1",
+            ),
+            "neoCLR.Runtime.StringCompareOrdinalIgnoreCase" => (
+                vec![Type::String, Type::String],
+                Type::Int32,
+                "string-compare-ignore-case-v1",
+                "neoclr_string_compare_ignore_case_v1",
+            ),
+            "neoCLR.Runtime.StringHashOrdinal" => (
+                vec![Type::String],
+                Type::Int32,
+                "string-hash-ordinal-v1",
+                "neoclr_string_hash_ordinal_v1",
+            ),
+            "neoCLR.Runtime.StringHashOrdinalIgnoreCase" => (
+                vec![Type::String],
+                Type::Int32,
+                "string-hash-ignore-case-v1",
+                "neoclr_string_hash_ignore_case_v1",
+            ),
+            "neoCLR.Runtime.StringIntern" => (
+                vec![Type::String],
+                Type::String,
+                "string-intern-v1",
+                "neoclr_string_intern_v1",
+            ),
+            "neoCLR.Runtime.StringCompareOrdinal" => (
+                vec![Type::String, Type::String],
+                Type::Int32,
+                "string-compare-ordinal-v1",
+                "neoclr_string_compare_ordinal_v1",
+            ),
+            "neoCLR.Runtime.StringContainsOrdinal" => (
+                vec![Type::String, Type::String],
+                Type::Boolean,
+                "string-contains-ordinal-v1",
+                "neoclr_string_contains_ordinal_v1",
+            ),
+            "neoCLR.Runtime.StringStartsWithOrdinal" => (
+                vec![Type::String, Type::String],
+                Type::Boolean,
+                "string-starts-with-ordinal-v1",
+                "neoclr_string_starts_with_ordinal_v1",
+            ),
+            "neoCLR.Runtime.StringEndsWithOrdinal" => (
+                vec![Type::String, Type::String],
+                Type::Boolean,
+                "string-ends-with-ordinal-v1",
+                "neoclr_string_ends_with_ordinal_v1",
+            ),
+            "neoCLR.Runtime.StringJoinParts" => (
+                vec![
+                    Type::ArrayRef(Box::new(Type::String)),
+                    Type::Int32,
+                    Type::String,
+                    Type::Int32,
+                ],
+                Type::String,
+                "string-join-parts-v1",
+                "neoclr_string_join_parts_v1",
+            ),
+            "neoCLR.Runtime.StringReplaceOrdinal" => (
+                vec![Type::String, Type::String, Type::String],
+                Type::String,
+                "string-replace-ordinal-v1",
+                "neoclr_string_replace_ordinal_v1",
+            ),
+            "neoCLR.Runtime.StringConcat" => (
+                vec![Type::String, Type::String],
+                Type::String,
+                "string-concat-v1",
+                "neoclr_string_concat_v1",
+            ),
+            "neoCLR.Runtime.Utf8Decode" => (
+                vec![Type::ArrayRef(Box::new(Type::Byte))],
+                Type::Value,
+                "utf8-decode-v1",
+                "neoclr_utf8_decode_v1",
+            ),
+            "neoCLR.Runtime.Utf8Encode" => (
+                vec![Type::String],
+                Type::Array(Box::new(Type::Byte)),
+                "utf8-encode-v1",
+                "neoclr_utf8_encode_v1",
+            ),
+            "neoCLR.Runtime.StringByteCount" => (
+                vec![Type::String],
+                Type::Int32,
+                "string-byte-count-v1",
+                "neoclr_string_byte_count_v1",
+            ),
+            "neoCLR.Runtime.StringSliceGraphemes" => (
+                vec![Type::String, Type::Int32, Type::Int32],
+                Type::String,
+                "string-slice-graphemes-v1",
+                "neoclr_string_slice_graphemes_v1",
+            ),
+            "neoCLR.Runtime.StringSliceUtf8" => (
+                vec![Type::String, Type::Int32, Type::Int32],
+                Type::Value,
+                "string-slice-utf8-v1",
+                "neoclr_string_slice_utf8_v1",
+            ),
             _ => continue,
         };
-        let f = &mut input.functions[row["compiledIndex"].as_u64().ok_or("missing compiled index")? as usize];
-        if f.name != name || f.owner.is_some() || f.instance || f.receiver_byref || f.receiver_readonly
-            || f.parameters != parameters || f.returns != result || f.no_result
-            || f.impl_flags != 0x1000 || f.pinvoke.is_some() || !f.body.is_empty() || !f.locals.is_empty()
-            || f.is_virtual || f.is_override || f.is_abstract || !f.generic_parameters.is_empty()
-            || !f.generic_arguments.is_empty() || !f.generic_constraints.is_empty()
-            || !f.interface_implementations.is_empty() || !f.out_parameters.is_empty()
-            || !f.out_when_true.is_empty() || !f.readonly_parameters.is_empty() {
+        let f = &mut input.functions[row["compiledIndex"]
+            .as_u64()
+            .ok_or("missing compiled index")? as usize];
+        if f.name != name
+            || f.owner.is_some()
+            || f.instance
+            || f.receiver_byref
+            || f.receiver_readonly
+            || f.parameters != parameters
+            || f.returns != result
+            || f.no_result
+            || f.impl_flags != 0x1000
+            || f.pinvoke.is_some()
+            || !f.body.is_empty()
+            || !f.locals.is_empty()
+            || f.is_virtual
+            || f.is_override
+            || f.is_abstract
+            || !f.generic_parameters.is_empty()
+            || !f.generic_arguments.is_empty()
+            || !f.generic_constraints.is_empty()
+            || !f.interface_implementations.is_empty()
+            || !f.out_parameters.is_empty()
+            || !f.out_when_true.is_empty()
+            || !f.readonly_parameters.is_empty()
+        {
             return Err("native UTF-8 binding requires exact StringByteCount(String) -> Int32 or StringSliceUtf8(String, Int32, Int32) -> Value or Utf8Encode(String) -> Byte[] or Utf8Decode(arrayref<Byte>) -> Value or StringConcat(String, String) -> String or StringCompareOrdinal(String, String) -> Int32 or StringReplaceOrdinal(String, String, String) -> String or ordinal String predicates(String, String) -> Boolean InternalCall contract".into());
         }
         f.impl_flags = 0;
         // A verifier-valid nonreturning placeholder needs no unsupported array
         // constructor; only the reported InternalCall is lowered to native code.
-        f.body = if matches!(result, Type::Array(_) | Type::ArrayRef(_) | Type::Char) { vec![Op::Branch(0)] }
-            else if result == Type::Boolean { vec![Op::Bool(false), Op::Return] }
-            else if result == Type::String { vec![Op::String(String::new()), Op::Return] }
-            else if result == Type::Value { vec![Op::String(String::new()), Op::PackValue(Type::String), Op::Return] }
-            else { vec![Op::Int(0), Op::Return] };
+        f.body = if matches!(result, Type::Array(_) | Type::ArrayRef(_) | Type::Char) {
+            vec![Op::Branch(0)]
+        } else if result == Type::Boolean {
+            vec![Op::Bool(false), Op::Return]
+        } else if result == Type::String {
+            vec![Op::String(String::new()), Op::Return]
+        } else if result == Type::Value {
+            vec![
+                Op::String(String::new()),
+                Op::PackValue(Type::String),
+                Op::Return,
+            ]
+        } else {
+            vec![Op::Int(0), Op::Return]
+        };
         bindings.push(json!({"definition":row["definition"],"name":row["name"],"compiledIndex":row["compiledIndex"],"implementation":implementation,"symbol":symbol}));
     }
     Ok(bindings)
@@ -519,23 +913,56 @@ pub fn utf8_text(input: &mut neoclr::Module, selection: &Value) -> Result<Vec<Va
 /// Bounded synchronous listener lifecycle, with resources owned by a host scope.
 pub fn socket_listener(input: &mut neoclr::Module, selection: &Value) -> Result<Vec<Value>, Error> {
     let mut bindings = vec![];
-    for row in selection["functions"].as_array().ok_or("missing selection inventory")? {
+    for row in selection["functions"]
+        .as_array()
+        .ok_or("missing selection inventory")?
+    {
         let (parameters, implementation, symbol) = match row["name"].as_str() {
-            Some("neoCLR.Runtime.SocketListen") => (vec![Type::String, Type::Int32, Type::Int32], "socket-listen-v1", "neoclr_socket_listen_v1"),
-            Some("neoCLR.Runtime.SocketLocalPort") => (vec![Type::Int64], "socket-local-port-v1", "neoclr_socket_local_port_v1"),
-            Some("neoCLR.Runtime.SocketClose") => (vec![Type::Int64], "socket-close-v1", "neoclr_socket_close_v1"),
+            Some("neoCLR.Runtime.SocketListen") => (
+                vec![Type::String, Type::Int32, Type::Int32],
+                "socket-listen-v1",
+                "neoclr_socket_listen_v1",
+            ),
+            Some("neoCLR.Runtime.SocketLocalPort") => (
+                vec![Type::Int64],
+                "socket-local-port-v1",
+                "neoclr_socket_local_port_v1",
+            ),
+            Some("neoCLR.Runtime.SocketClose") => (
+                vec![Type::Int64],
+                "socket-close-v1",
+                "neoclr_socket_close_v1",
+            ),
             _ => continue,
         };
-        let f = &mut input.functions[row["compiledIndex"].as_u64().ok_or("missing compiled index")? as usize];
+        let f = &mut input.functions[row["compiledIndex"]
+            .as_u64()
+            .ok_or("missing compiled index")? as usize];
         if f.name != row["name"].as_str().unwrap()
-            || f.owner.is_some() || f.instance || f.receiver_byref || f.receiver_readonly
-            || f.parameters != parameters || f.returns != Type::Value || f.no_result
-            || f.impl_flags != 0x1000 || f.pinvoke.is_some() || !f.body.is_empty()
-            || !f.locals.is_empty() || f.is_virtual || f.is_override || f.is_abstract
-            || !f.generic_parameters.is_empty() || !f.generic_arguments.is_empty()
-            || !f.generic_constraints.is_empty() || !f.interface_implementations.is_empty()
-            || !f.out_parameters.is_empty() || !f.out_when_true.is_empty() || !f.readonly_parameters.is_empty()
-        { return Err("native socket listener binding requires exact reserved SocketListen/SocketLocalPort/SocketClose InternalCall contract".into()); }
+            || f.owner.is_some()
+            || f.instance
+            || f.receiver_byref
+            || f.receiver_readonly
+            || f.parameters != parameters
+            || f.returns != Type::Value
+            || f.no_result
+            || f.impl_flags != 0x1000
+            || f.pinvoke.is_some()
+            || !f.body.is_empty()
+            || !f.locals.is_empty()
+            || f.is_virtual
+            || f.is_override
+            || f.is_abstract
+            || !f.generic_parameters.is_empty()
+            || !f.generic_arguments.is_empty()
+            || !f.generic_constraints.is_empty()
+            || !f.interface_implementations.is_empty()
+            || !f.out_parameters.is_empty()
+            || !f.out_when_true.is_empty()
+            || !f.readonly_parameters.is_empty()
+        {
+            return Err("native socket listener binding requires exact reserved SocketListen/SocketLocalPort/SocketClose InternalCall contract".into());
+        }
         f.impl_flags = 0;
         f.body = vec![Op::Void, Op::PackValue(Type::Void), Op::Return];
         bindings.push(json!({"definition": row["definition"], "name": row["name"],
@@ -547,26 +974,68 @@ pub fn socket_listener(input: &mut neoclr::Module, selection: &Value) -> Result<
 
 pub fn socket_accept(input: &mut neoclr::Module, selection: &Value) -> Result<Vec<Value>, Error> {
     let mut bindings = vec![];
-    for row in selection["functions"].as_array().ok_or("missing selection inventory")? {
+    for row in selection["functions"]
+        .as_array()
+        .ok_or("missing selection inventory")?
+    {
         let (parameters, result, implementation, symbol) = match row["name"].as_str() {
-            Some("neoCLR.Runtime.SocketAccept") => (vec![Type::Int64, neoclr::assembler::parse_type("fn<Void>").expect("fixed callback signature")], Type::Value, "socket-accept-v1", "neoclr_socket_accept_v1"),
-            Some("neoCLR.Runtime.SocketConnectResult") => (vec![Type::Int64], Type::Value, "socket-connect-result-v1", "neoclr_socket_connect_result_v1"),
-            Some("neoCLR.Runtime.SocketCancel") => (vec![Type::Int64], Type::Boolean, "socket-cancel-v1", "neoclr_socket_cancel_v1"),
+            Some("neoCLR.Runtime.SocketAccept") => (
+                vec![
+                    Type::Int64,
+                    neoclr::assembler::parse_type("fn<Void>").expect("fixed callback signature"),
+                ],
+                Type::Value,
+                "socket-accept-v1",
+                "neoclr_socket_accept_v1",
+            ),
+            Some("neoCLR.Runtime.SocketConnectResult") => (
+                vec![Type::Int64],
+                Type::Value,
+                "socket-connect-result-v1",
+                "neoclr_socket_connect_result_v1",
+            ),
+            Some("neoCLR.Runtime.SocketCancel") => (
+                vec![Type::Int64],
+                Type::Boolean,
+                "socket-cancel-v1",
+                "neoclr_socket_cancel_v1",
+            ),
             _ => continue,
         };
-        let f = &mut input.functions[row["compiledIndex"].as_u64().ok_or("missing compiled index")? as usize];
+        let f = &mut input.functions[row["compiledIndex"]
+            .as_u64()
+            .ok_or("missing compiled index")? as usize];
         if f.name != row["name"].as_str().unwrap()
-            || f.owner.is_some() || f.instance || f.receiver_byref || f.receiver_readonly
-            || f.parameters != parameters || f.returns != result || f.no_result
-            || f.impl_flags != 0x1000 || f.pinvoke.is_some() || !f.body.is_empty()
-            || !f.locals.is_empty() || f.is_virtual || f.is_override || f.is_abstract
-            || !f.generic_parameters.is_empty() || !f.generic_arguments.is_empty()
-            || !f.generic_constraints.is_empty() || !f.interface_implementations.is_empty()
-            || !f.out_parameters.is_empty() || !f.out_when_true.is_empty() || !f.readonly_parameters.is_empty()
-        { return Err("native socket accept binding requires exact reserved Accept/ConnectResult/Cancel InternalCall contract".into()); }
+            || f.owner.is_some()
+            || f.instance
+            || f.receiver_byref
+            || f.receiver_readonly
+            || f.parameters != parameters
+            || f.returns != result
+            || f.no_result
+            || f.impl_flags != 0x1000
+            || f.pinvoke.is_some()
+            || !f.body.is_empty()
+            || !f.locals.is_empty()
+            || f.is_virtual
+            || f.is_override
+            || f.is_abstract
+            || !f.generic_parameters.is_empty()
+            || !f.generic_arguments.is_empty()
+            || !f.generic_constraints.is_empty()
+            || !f.interface_implementations.is_empty()
+            || !f.out_parameters.is_empty()
+            || !f.out_when_true.is_empty()
+            || !f.readonly_parameters.is_empty()
+        {
+            return Err("native socket accept binding requires exact reserved Accept/ConnectResult/Cancel InternalCall contract".into());
+        }
         f.impl_flags = 0;
-        f.body = if result == Type::Boolean { vec![Op::Bool(false), Op::Return] }
-            else { vec![Op::Void, Op::PackValue(Type::Void), Op::Return] };
+        f.body = if result == Type::Boolean {
+            vec![Op::Bool(false), Op::Return]
+        } else {
+            vec![Op::Void, Op::PackValue(Type::Void), Op::Return]
+        };
         bindings.push(json!({"definition": row["definition"], "name": row["name"],
             "compiledIndex": row["compiledIndex"], "implementation": implementation, "symbol": symbol,
             "storage": "explicit host socket scope; 64 accept operations; rooted callbacks; owner-thread deferred polling"}));
@@ -577,32 +1046,109 @@ pub fn socket_accept(input: &mut neoclr::Module, selection: &Value) -> Result<Ve
 pub fn socket_client(input: &mut neoclr::Module, selection: &Value) -> Result<Vec<Value>, Error> {
     let mut bindings = vec![];
     let callback = neoclr::assembler::parse_type("fn<Void>").expect("fixed callback signature");
-    for row in selection["functions"].as_array().ok_or("missing selection inventory")? {
+    for row in selection["functions"]
+        .as_array()
+        .ok_or("missing selection inventory")?
+    {
         let (parameters, result, implementation, symbol) = match row["name"].as_str() {
-            Some("neoCLR.Runtime.DnsLookup") => (vec![Type::String, callback.clone()], Type::Value, "dns-lookup-v1", "neoclr_dns_lookup_v1"),
-            Some("neoCLR.Runtime.DnsLookupUntil") => (vec![Type::String, Type::Int64, callback.clone()], Type::Value, "dns-lookup-until-v1", "neoclr_dns_lookup_until_v1"),
-            Some("neoCLR.Runtime.DnsCancel") => (vec![Type::Int64], Type::Boolean, "dns-cancel-v1", "neoclr_dns_cancel_v1"),
-            Some("neoCLR.Runtime.DnsResult") => (vec![Type::Int64], Type::Value, "dns-result-v1", "neoclr_dns_result_v1"),
-            Some("neoCLR.Runtime.DnsAddresses") => (vec![Type::Value], Type::ArrayRef(Box::new(Type::String)), "dns-addresses-v1", "neoclr_dns_addresses_v1"),
-            Some("neoCLR.Runtime.SocketConnect") => (vec![Type::String, Type::Int32, callback.clone()], Type::Value, "socket-connect-v1", "neoclr_socket_connect_v1"),
-            Some("neoCLR.Runtime.SocketConnectAddresses") => (vec![Type::ArrayRef(Box::new(Type::String)), Type::Int32, callback.clone()], Type::Value, "socket-connect-addresses-v1", "neoclr_socket_connect_addresses_v1"),
-            Some("neoCLR.Runtime.SocketConnectAddressesUntil") => (vec![Type::ArrayRef(Box::new(Type::String)), Type::Int32, Type::Int64, callback.clone()], Type::Value, "socket-connect-addresses-until-v1", "neoclr_socket_connect_addresses_until_v1"),
+            Some("neoCLR.Runtime.DnsLookup") => (
+                vec![Type::String, callback.clone()],
+                Type::Value,
+                "dns-lookup-v1",
+                "neoclr_dns_lookup_v1",
+            ),
+            Some("neoCLR.Runtime.DnsLookupUntil") => (
+                vec![Type::String, Type::Int64, callback.clone()],
+                Type::Value,
+                "dns-lookup-until-v1",
+                "neoclr_dns_lookup_until_v1",
+            ),
+            Some("neoCLR.Runtime.DnsCancel") => (
+                vec![Type::Int64],
+                Type::Boolean,
+                "dns-cancel-v1",
+                "neoclr_dns_cancel_v1",
+            ),
+            Some("neoCLR.Runtime.DnsResult") => (
+                vec![Type::Int64],
+                Type::Value,
+                "dns-result-v1",
+                "neoclr_dns_result_v1",
+            ),
+            Some("neoCLR.Runtime.DnsAddresses") => (
+                vec![Type::Value],
+                Type::ArrayRef(Box::new(Type::String)),
+                "dns-addresses-v1",
+                "neoclr_dns_addresses_v1",
+            ),
+            Some("neoCLR.Runtime.SocketConnect") => (
+                vec![Type::String, Type::Int32, callback.clone()],
+                Type::Value,
+                "socket-connect-v1",
+                "neoclr_socket_connect_v1",
+            ),
+            Some("neoCLR.Runtime.SocketConnectAddresses") => (
+                vec![
+                    Type::ArrayRef(Box::new(Type::String)),
+                    Type::Int32,
+                    callback.clone(),
+                ],
+                Type::Value,
+                "socket-connect-addresses-v1",
+                "neoclr_socket_connect_addresses_v1",
+            ),
+            Some("neoCLR.Runtime.SocketConnectAddressesUntil") => (
+                vec![
+                    Type::ArrayRef(Box::new(Type::String)),
+                    Type::Int32,
+                    Type::Int64,
+                    callback.clone(),
+                ],
+                Type::Value,
+                "socket-connect-addresses-until-v1",
+                "neoclr_socket_connect_addresses_until_v1",
+            ),
             _ => continue,
         };
-        let f = &mut input.functions[row["compiledIndex"].as_u64().ok_or("missing compiled index")? as usize];
+        let f = &mut input.functions[row["compiledIndex"]
+            .as_u64()
+            .ok_or("missing compiled index")? as usize];
         if f.name != row["name"].as_str().unwrap()
-            || f.owner.is_some() || f.instance || f.receiver_byref || f.receiver_readonly
-            || f.parameters != parameters || f.returns != result || f.no_result
-            || f.impl_flags != 0x1000 || f.pinvoke.is_some() || !f.body.is_empty()
-            || !f.locals.is_empty() || f.is_virtual || f.is_override || f.is_abstract
-            || !f.generic_parameters.is_empty() || !f.generic_arguments.is_empty()
-            || !f.generic_constraints.is_empty() || !f.interface_implementations.is_empty()
-            || !f.out_parameters.is_empty() || !f.out_when_true.is_empty() || !f.readonly_parameters.is_empty()
-        { return Err("native client binding requires exact reserved DNS/connect InternalCall contract".into()); }
+            || f.owner.is_some()
+            || f.instance
+            || f.receiver_byref
+            || f.receiver_readonly
+            || f.parameters != parameters
+            || f.returns != result
+            || f.no_result
+            || f.impl_flags != 0x1000
+            || f.pinvoke.is_some()
+            || !f.body.is_empty()
+            || !f.locals.is_empty()
+            || f.is_virtual
+            || f.is_override
+            || f.is_abstract
+            || !f.generic_parameters.is_empty()
+            || !f.generic_arguments.is_empty()
+            || !f.generic_constraints.is_empty()
+            || !f.interface_implementations.is_empty()
+            || !f.out_parameters.is_empty()
+            || !f.out_when_true.is_empty()
+            || !f.readonly_parameters.is_empty()
+        {
+            return Err(
+                "native client binding requires exact reserved DNS/connect InternalCall contract"
+                    .into(),
+            );
+        }
         f.impl_flags = 0;
-        f.body = if result == Type::Boolean { vec![Op::Bool(false), Op::Return] }
-            else if matches!(result, Type::ArrayRef(_)) { vec![Op::Branch(0)] }
-            else { vec![Op::Void, Op::PackValue(Type::Void), Op::Return] };
+        f.body = if result == Type::Boolean {
+            vec![Op::Bool(false), Op::Return]
+        } else if matches!(result, Type::ArrayRef(_)) {
+            vec![Op::Branch(0)]
+        } else {
+            vec![Op::Void, Op::PackValue(Type::Void), Op::Return]
+        };
         bindings.push(json!({"definition": row["definition"], "name": row["name"],
             "compiledIndex": row["compiledIndex"], "implementation": implementation, "symbol": symbol,
             "storage": "bounded DNS workers own host data only; rooted callbacks and owner-thread nonblocking connect"}));
@@ -612,31 +1158,117 @@ pub fn socket_client(input: &mut neoclr::Module, selection: &Value) -> Result<Ve
 
 pub fn socket_transfer(input: &mut neoclr::Module, selection: &Value) -> Result<Vec<Value>, Error> {
     let mut bindings = vec![];
-    for row in selection["functions"].as_array().ok_or("missing selection inventory")? {
+    for row in selection["functions"]
+        .as_array()
+        .ok_or("missing selection inventory")?
+    {
         let (parameters, result, implementation, symbol) = match row["name"].as_str() {
-            Some("neoCLR.Runtime.SocketReceive") => (vec![Type::Int64, Type::ArrayRef(Box::new(Type::Byte)), Type::Int32, Type::Int32, neoclr::assembler::parse_type("fn<Void>").expect("fixed callback signature")], Type::Value, "socket-receive-v1", "neoclr_socket_receive_v1"),
-            Some("neoCLR.Runtime.SocketSend") => (vec![Type::Int64, Type::ArrayRef(Box::new(Type::Byte)), Type::Int32, Type::Int32, neoclr::assembler::parse_type("fn<Void>").expect("fixed callback signature")], Type::Value, "socket-send-v1", "neoclr_socket_send_v1"),
-            Some("neoCLR.Runtime.SocketTransferResult") => (vec![Type::Int64], Type::Value, "socket-transfer-result-v1", "neoclr_socket_transfer_result_v1"),
-            Some("neoCLR.Runtime.SocketDeadlineAfter") => (vec![Type::Int32], Type::Int64, "socket-deadline-after-v1", "neoclr_socket_deadline_after_v1"),
-            Some("neoCLR.Runtime.SocketDeadlineExpired") => (vec![Type::Int64], Type::Boolean, "socket-deadline-expired-v1", "neoclr_socket_deadline_expired_v1"),
-            Some("neoCLR.Runtime.SocketReceiveUntil") => (vec![Type::Int64, Type::ArrayRef(Box::new(Type::Byte)), Type::Int32, Type::Int32, Type::Int64, neoclr::assembler::parse_type("fn<Void>").expect("fixed callback signature")], Type::Value, "socket-receive-until-v1", "neoclr_socket_receive_until_v1"),
-            Some("neoCLR.Runtime.SocketSendUntil") => (vec![Type::Int64, Type::ArrayRef(Box::new(Type::Byte)), Type::Int32, Type::Int32, Type::Int64, neoclr::assembler::parse_type("fn<Void>").expect("fixed callback signature")], Type::Value, "socket-send-until-v1", "neoclr_socket_send_until_v1"),
+            Some("neoCLR.Runtime.SocketReceive") => (
+                vec![
+                    Type::Int64,
+                    Type::ArrayRef(Box::new(Type::Byte)),
+                    Type::Int32,
+                    Type::Int32,
+                    neoclr::assembler::parse_type("fn<Void>").expect("fixed callback signature"),
+                ],
+                Type::Value,
+                "socket-receive-v1",
+                "neoclr_socket_receive_v1",
+            ),
+            Some("neoCLR.Runtime.SocketSend") => (
+                vec![
+                    Type::Int64,
+                    Type::ArrayRef(Box::new(Type::Byte)),
+                    Type::Int32,
+                    Type::Int32,
+                    neoclr::assembler::parse_type("fn<Void>").expect("fixed callback signature"),
+                ],
+                Type::Value,
+                "socket-send-v1",
+                "neoclr_socket_send_v1",
+            ),
+            Some("neoCLR.Runtime.SocketTransferResult") => (
+                vec![Type::Int64],
+                Type::Value,
+                "socket-transfer-result-v1",
+                "neoclr_socket_transfer_result_v1",
+            ),
+            Some("neoCLR.Runtime.SocketDeadlineAfter") => (
+                vec![Type::Int32],
+                Type::Int64,
+                "socket-deadline-after-v1",
+                "neoclr_socket_deadline_after_v1",
+            ),
+            Some("neoCLR.Runtime.SocketDeadlineExpired") => (
+                vec![Type::Int64],
+                Type::Boolean,
+                "socket-deadline-expired-v1",
+                "neoclr_socket_deadline_expired_v1",
+            ),
+            Some("neoCLR.Runtime.SocketReceiveUntil") => (
+                vec![
+                    Type::Int64,
+                    Type::ArrayRef(Box::new(Type::Byte)),
+                    Type::Int32,
+                    Type::Int32,
+                    Type::Int64,
+                    neoclr::assembler::parse_type("fn<Void>").expect("fixed callback signature"),
+                ],
+                Type::Value,
+                "socket-receive-until-v1",
+                "neoclr_socket_receive_until_v1",
+            ),
+            Some("neoCLR.Runtime.SocketSendUntil") => (
+                vec![
+                    Type::Int64,
+                    Type::ArrayRef(Box::new(Type::Byte)),
+                    Type::Int32,
+                    Type::Int32,
+                    Type::Int64,
+                    neoclr::assembler::parse_type("fn<Void>").expect("fixed callback signature"),
+                ],
+                Type::Value,
+                "socket-send-until-v1",
+                "neoclr_socket_send_until_v1",
+            ),
             _ => continue,
         };
-        let f = &mut input.functions[row["compiledIndex"].as_u64().ok_or("missing compiled index")? as usize];
+        let f = &mut input.functions[row["compiledIndex"]
+            .as_u64()
+            .ok_or("missing compiled index")? as usize];
         if f.name != row["name"].as_str().unwrap()
-            || f.owner.is_some() || f.instance || f.receiver_byref || f.receiver_readonly
-            || f.parameters != parameters || f.returns != result || f.no_result
-            || f.impl_flags != 0x1000 || f.pinvoke.is_some() || !f.body.is_empty()
-            || !f.locals.is_empty() || f.is_virtual || f.is_override || f.is_abstract
-            || !f.generic_parameters.is_empty() || !f.generic_arguments.is_empty()
-            || !f.generic_constraints.is_empty() || !f.interface_implementations.is_empty()
-            || !f.out_parameters.is_empty() || !f.out_when_true.is_empty() || !f.readonly_parameters.is_empty()
-        { return Err("native socket transfer binding requires exact reserved Receive/Send/TransferResult InternalCall contract".into()); }
+            || f.owner.is_some()
+            || f.instance
+            || f.receiver_byref
+            || f.receiver_readonly
+            || f.parameters != parameters
+            || f.returns != result
+            || f.no_result
+            || f.impl_flags != 0x1000
+            || f.pinvoke.is_some()
+            || !f.body.is_empty()
+            || !f.locals.is_empty()
+            || f.is_virtual
+            || f.is_override
+            || f.is_abstract
+            || !f.generic_parameters.is_empty()
+            || !f.generic_arguments.is_empty()
+            || !f.generic_constraints.is_empty()
+            || !f.interface_implementations.is_empty()
+            || !f.out_parameters.is_empty()
+            || !f.out_when_true.is_empty()
+            || !f.readonly_parameters.is_empty()
+        {
+            return Err("native socket transfer binding requires exact reserved Receive/Send/TransferResult InternalCall contract".into());
+        }
         f.impl_flags = 0;
-        f.body = if result == Type::Boolean { vec![Op::Bool(false), Op::Return] }
-            else if result == Type::Int64 { vec![Op::Int64(0), Op::Return] }
-            else { vec![Op::Void, Op::PackValue(Type::Void), Op::Return] };
+        f.body = if result == Type::Boolean {
+            vec![Op::Bool(false), Op::Return]
+        } else if result == Type::Int64 {
+            vec![Op::Int64(0), Op::Return]
+        } else {
+            vec![Op::Void, Op::PackValue(Type::Void), Op::Return]
+        };
         bindings.push(json!({"definition": row["definition"], "name": row["name"],
             "compiledIndex": row["compiledIndex"], "implementation": implementation, "symbol": symbol,
             "storage": "explicit host socket scope; 64 shared socket operations; rooted callbacks; owner-thread deferred polling"}));
@@ -650,39 +1282,141 @@ pub fn timers(input: &mut neoclr::Module, selection: &Value) -> Result<Vec<Value
 pub fn scheduler(input: &mut neoclr::Module, selection: &Value) -> Result<Vec<Value>, Error> {
     completion_services(input, selection, true)
 }
-fn completion_services(input: &mut neoclr::Module, selection: &Value, submission: bool) -> Result<Vec<Value>, Error> {
+fn completion_services(
+    input: &mut neoclr::Module,
+    selection: &Value,
+    submission: bool,
+) -> Result<Vec<Value>, Error> {
     let mut bindings = vec![];
-    for row in selection["functions"].as_array().ok_or("missing selection inventory")? {
-        if row["name"].as_str().is_some_and(|name| name.starts_with("neoCLR.Runtime.Scheduler") || name == "neoCLR.Runtime.ScheduleTask") != submission { continue; }
+    for row in selection["functions"]
+        .as_array()
+        .ok_or("missing selection inventory")?
+    {
+        if row["name"].as_str().is_some_and(|name| {
+            name.starts_with("neoCLR.Runtime.Scheduler") || name == "neoCLR.Runtime.ScheduleTask"
+        }) != submission
+        {
+            continue;
+        }
         let (parameters, result, implementation, symbol) = match row["name"].as_str() {
-            Some("neoCLR.Runtime.SchedulerRegister") => (vec![Type::Int64, neoclr::assembler::parse_type("fn<Void>").expect("fixed scheduler callback signature")], Type::Int64, "scheduler-register-v1", "neoclr_scheduler_register_managed_v1"),
-            Some("neoCLR.Runtime.SchedulerActivate") => (vec![Type::Int64], Type::Boolean, "scheduler-activate-v1", "neoclr_scheduler_activate_managed_v1"),
-            Some("neoCLR.Runtime.SchedulerCancel") => (vec![Type::Int64], Type::Boolean, "scheduler-cancel-v1", "neoclr_scheduler_cancel_managed_v1"),
-            Some("neoCLR.Runtime.SchedulerCapture") => (vec![], Type::Int64, "scheduler-capture-v1", "neoclr_scheduler_capture_managed_v1"),
-            Some("neoCLR.Runtime.SchedulerSubmitTo") => (vec![Type::Int64, neoclr::assembler::parse_type("fn<Void>").expect("fixed scheduler callback signature")], Type::Int32, "scheduler-submit-to-v1", "neoclr_scheduler_submit_to_managed_v1"),
-            Some("neoCLR.Runtime.ScheduleTask") => (vec![neoclr::assembler::parse_type("fn<Void>").expect("fixed task callback signature")], Type::Void, "task-schedule-v1", "neoclr_schedule_task_managed_v1"),
-            Some("neoCLR.Runtime.SchedulerSubmit") => (vec![neoclr::assembler::parse_type("fn<Void>").expect("fixed scheduler callback signature")], Type::Int32, "scheduler-submit-v1", "neoclr_scheduler_submit_managed_v1"),
-            Some("neoCLR.Runtime.TimerStart") => (vec![Type::Int32, neoclr::assembler::parse_type("fn<Void>").expect("fixed timer callback signature")], Type::Int64, "timer-start-v1", "neoclr_timer_start_v1"),
-            Some("neoCLR.Runtime.TimerCancel") => (vec![Type::Int64], Type::Boolean, "timer-cancel-v1", "neoclr_timer_cancel_v1"),
+            Some("neoCLR.Runtime.SchedulerRegister") => (
+                vec![
+                    Type::Int64,
+                    neoclr::assembler::parse_type("fn<Void>")
+                        .expect("fixed scheduler callback signature"),
+                ],
+                Type::Int64,
+                "scheduler-register-v1",
+                "neoclr_scheduler_register_managed_v1",
+            ),
+            Some("neoCLR.Runtime.SchedulerActivate") => (
+                vec![Type::Int64],
+                Type::Boolean,
+                "scheduler-activate-v1",
+                "neoclr_scheduler_activate_managed_v1",
+            ),
+            Some("neoCLR.Runtime.SchedulerCancel") => (
+                vec![Type::Int64],
+                Type::Boolean,
+                "scheduler-cancel-v1",
+                "neoclr_scheduler_cancel_managed_v1",
+            ),
+            Some("neoCLR.Runtime.SchedulerCapture") => (
+                vec![],
+                Type::Int64,
+                "scheduler-capture-v1",
+                "neoclr_scheduler_capture_managed_v1",
+            ),
+            Some("neoCLR.Runtime.SchedulerSubmitTo") => (
+                vec![
+                    Type::Int64,
+                    neoclr::assembler::parse_type("fn<Void>")
+                        .expect("fixed scheduler callback signature"),
+                ],
+                Type::Int32,
+                "scheduler-submit-to-v1",
+                "neoclr_scheduler_submit_to_managed_v1",
+            ),
+            Some("neoCLR.Runtime.ScheduleTask") => (
+                vec![
+                    neoclr::assembler::parse_type("fn<Void>")
+                        .expect("fixed task callback signature"),
+                ],
+                Type::Void,
+                "task-schedule-v1",
+                "neoclr_schedule_task_managed_v1",
+            ),
+            Some("neoCLR.Runtime.SchedulerSubmit") => (
+                vec![
+                    neoclr::assembler::parse_type("fn<Void>")
+                        .expect("fixed scheduler callback signature"),
+                ],
+                Type::Int32,
+                "scheduler-submit-v1",
+                "neoclr_scheduler_submit_managed_v1",
+            ),
+            Some("neoCLR.Runtime.TimerStart") => (
+                vec![
+                    Type::Int32,
+                    neoclr::assembler::parse_type("fn<Void>")
+                        .expect("fixed timer callback signature"),
+                ],
+                Type::Int64,
+                "timer-start-v1",
+                "neoclr_timer_start_v1",
+            ),
+            Some("neoCLR.Runtime.TimerCancel") => (
+                vec![Type::Int64],
+                Type::Boolean,
+                "timer-cancel-v1",
+                "neoclr_timer_cancel_v1",
+            ),
             _ => continue,
         };
-        let f = &mut input.functions[row["compiledIndex"].as_u64().ok_or("missing compiled index")? as usize];
+        let f = &mut input.functions[row["compiledIndex"]
+            .as_u64()
+            .ok_or("missing compiled index")? as usize];
         if f.name != row["name"].as_str().unwrap()
-            || f.owner.is_some() || f.instance || f.receiver_byref || f.receiver_readonly
-            || (f.parameters != parameters && !(implementation == "task-schedule-v1"
-                && f.parameters == vec![neoclr::assembler::parse_type("fn<noresult Void>").expect("fixed no-result task callback signature")]))
-            || f.returns != result || f.no_result
-            || f.impl_flags != 0x1000 || f.pinvoke.is_some() || !f.body.is_empty()
-            || !f.locals.is_empty() || f.is_virtual || f.is_override || f.is_abstract
-            || !f.generic_parameters.is_empty() || !f.generic_arguments.is_empty()
-            || !f.generic_constraints.is_empty() || !f.interface_implementations.is_empty()
-            || !f.out_parameters.is_empty() || !f.out_when_true.is_empty() || !f.readonly_parameters.is_empty()
-        { return Err("native completion binding requires exact reserved TimerStart/TimerCancel/SchedulerSubmit InternalCall contract".into()); }
+            || f.owner.is_some()
+            || f.instance
+            || f.receiver_byref
+            || f.receiver_readonly
+            || (f.parameters != parameters
+                && !(implementation == "task-schedule-v1"
+                    && f.parameters
+                        == vec![
+                            neoclr::assembler::parse_type("fn<noresult Void>")
+                                .expect("fixed no-result task callback signature"),
+                        ]))
+            || f.returns != result
+            || f.no_result
+            || f.impl_flags != 0x1000
+            || f.pinvoke.is_some()
+            || !f.body.is_empty()
+            || !f.locals.is_empty()
+            || f.is_virtual
+            || f.is_override
+            || f.is_abstract
+            || !f.generic_parameters.is_empty()
+            || !f.generic_arguments.is_empty()
+            || !f.generic_constraints.is_empty()
+            || !f.interface_implementations.is_empty()
+            || !f.out_parameters.is_empty()
+            || !f.out_when_true.is_empty()
+            || !f.readonly_parameters.is_empty()
+        {
+            return Err("native completion binding requires exact reserved TimerStart/TimerCancel/SchedulerSubmit InternalCall contract".into());
+        }
         f.impl_flags = 0;
-        f.body = if result == Type::Void { vec![Op::Void, Op::Return] }
-            else if result == Type::Boolean { vec![Op::Bool(false), Op::Return] }
-            else if result == Type::Int64 { vec![Op::Int64(0), Op::Return] }
-            else { vec![Op::Int(0), Op::Return] };
+        f.body = if result == Type::Void {
+            vec![Op::Void, Op::Return]
+        } else if result == Type::Boolean {
+            vec![Op::Bool(false), Op::Return]
+        } else if result == Type::Int64 {
+            vec![Op::Int64(0), Op::Return]
+        } else {
+            vec![Op::Int(0), Op::Return]
+        };
         bindings.push(json!({"definition": row["definition"], "name": row["name"],
             "compiledIndex": row["compiledIndex"], "implementation": implementation, "symbol": symbol,
             "storage": "private polled host scope; bounded shared operation table; rooted one-shot callbacks"}));
@@ -692,17 +1426,43 @@ fn completion_services(input: &mut neoclr::Module, selection: &Value, submission
 
 pub fn stack_trace(input: &mut neoclr::Module, selection: &Value) -> Result<Vec<Value>, Error> {
     let mut bindings = vec![];
-    for row in selection["functions"].as_array().ok_or("missing selection inventory")? {
-        if row["name"] != "neoCLR.Runtime.StackTraceCapture" { continue; }
-        let f = &mut input.functions[row["compiledIndex"].as_u64().ok_or("missing compiled index")? as usize];
-        if f.name != "neoCLR.Runtime.StackTraceCapture" || f.owner.is_some() || f.instance
-            || f.parameters != [Type::Int32] || f.returns != Type::String || f.no_result
-            || f.impl_flags != 0x1000 || f.pinvoke.is_some() || !f.body.is_empty()
-            || !f.locals.is_empty() || !f.generic_parameters.is_empty() || !f.generic_arguments.is_empty()
-            || !f.generic_constraints.is_empty() || f.receiver_byref || f.receiver_readonly
-            || f.is_virtual || f.is_override || f.is_abstract || !f.interface_implementations.is_empty()
-            || !f.out_parameters.is_empty() || !f.out_when_true.is_empty() || !f.readonly_parameters.is_empty()
-        { return Err("stack capture binding requires exact reserved InternalCall contract".into()); }
+    for row in selection["functions"]
+        .as_array()
+        .ok_or("missing selection inventory")?
+    {
+        if row["name"] != "neoCLR.Runtime.StackTraceCapture" {
+            continue;
+        }
+        let f = &mut input.functions[row["compiledIndex"]
+            .as_u64()
+            .ok_or("missing compiled index")? as usize];
+        if f.name != "neoCLR.Runtime.StackTraceCapture"
+            || f.owner.is_some()
+            || f.instance
+            || f.parameters != [Type::Int32]
+            || f.returns != Type::String
+            || f.no_result
+            || f.impl_flags != 0x1000
+            || f.pinvoke.is_some()
+            || !f.body.is_empty()
+            || !f.locals.is_empty()
+            || !f.generic_parameters.is_empty()
+            || !f.generic_arguments.is_empty()
+            || !f.generic_constraints.is_empty()
+            || f.receiver_byref
+            || f.receiver_readonly
+            || f.is_virtual
+            || f.is_override
+            || f.is_abstract
+            || !f.interface_implementations.is_empty()
+            || !f.out_parameters.is_empty()
+            || !f.out_when_true.is_empty()
+            || !f.readonly_parameters.is_empty()
+        {
+            return Err(
+                "stack capture binding requires exact reserved InternalCall contract".into(),
+            );
+        }
         f.impl_flags = 0;
         f.body = vec![Op::Branch(0)];
         bindings.push(json!({"definition":row["definition"], "name":row["name"],
@@ -714,21 +1474,47 @@ pub fn stack_trace(input: &mut neoclr::Module, selection: &Value) -> Result<Vec<
 
 pub fn gc_collect(input: &mut neoclr::Module, selection: &Value) -> Result<Vec<Value>, Error> {
     let mut bindings = vec![];
-    for row in selection["functions"].as_array().ok_or("missing selection inventory")? {
+    for row in selection["functions"]
+        .as_array()
+        .ok_or("missing selection inventory")?
+    {
         let (parameters, result, implementation, symbol) = match row["name"].as_str() {
-            Some("neoCLR.Runtime.GCCollect") => (vec![], Type::Void, "gc-collect-v1", "neoclr_gc_collect_managed_v1"),
+            Some("neoCLR.Runtime.GCCollect") => (
+                vec![],
+                Type::Void,
+                "gc-collect-v1",
+                "neoclr_gc_collect_managed_v1",
+            ),
             _ => continue,
         };
-        let f = &mut input.functions[row["compiledIndex"].as_u64().ok_or("missing compiled index")? as usize];
+        let f = &mut input.functions[row["compiledIndex"]
+            .as_u64()
+            .ok_or("missing compiled index")? as usize];
         if f.name != row["name"].as_str().unwrap()
-            || f.owner.is_some() || f.instance || f.receiver_byref || f.receiver_readonly
-            || f.parameters != parameters || f.returns != result || f.no_result != (result == Type::Void)
-            || f.impl_flags != 0x1000 || f.pinvoke.is_some() || !f.body.is_empty()
-            || !f.locals.is_empty() || f.is_virtual || f.is_override || f.is_abstract
-            || !f.generic_parameters.is_empty() || !f.generic_arguments.is_empty()
-            || !f.generic_constraints.is_empty() || !f.interface_implementations.is_empty()
-            || !f.out_parameters.is_empty() || !f.out_when_true.is_empty() || !f.readonly_parameters.is_empty()
-        { return Err(format!("native GC binding requires exact reserved InternalCall contract: {} params {:?} returns {:?} no_result {}", f.name, f.parameters, f.returns, f.no_result).into()); }
+            || f.owner.is_some()
+            || f.instance
+            || f.receiver_byref
+            || f.receiver_readonly
+            || f.parameters != parameters
+            || f.returns != result
+            || f.no_result != (result == Type::Void)
+            || f.impl_flags != 0x1000
+            || f.pinvoke.is_some()
+            || !f.body.is_empty()
+            || !f.locals.is_empty()
+            || f.is_virtual
+            || f.is_override
+            || f.is_abstract
+            || !f.generic_parameters.is_empty()
+            || !f.generic_arguments.is_empty()
+            || !f.generic_constraints.is_empty()
+            || !f.interface_implementations.is_empty()
+            || !f.out_parameters.is_empty()
+            || !f.out_when_true.is_empty()
+            || !f.readonly_parameters.is_empty()
+        {
+            return Err(format!("native GC binding requires exact reserved InternalCall contract: {} params {:?} returns {:?} no_result {}", f.name, f.parameters, f.returns, f.no_result).into());
+        }
         f.impl_flags = 0;
         f.body = vec![Op::Return];
         bindings.push(json!({"definition": row["definition"], "name": row["name"],
@@ -740,35 +1526,117 @@ pub fn gc_collect(input: &mut neoclr::Module, selection: &Value) -> Result<Vec<V
 
 pub fn runtime_async(input: &mut neoclr::Module, selection: &Value) -> Result<Vec<Value>, Error> {
     let mut bindings = vec![];
-    for row in selection["functions"].as_array().ok_or("missing selection inventory")? {
+    for row in selection["functions"]
+        .as_array()
+        .ok_or("missing selection inventory")?
+    {
         let (parameters, result, implementation, symbol) = match row["name"].as_str() {
-            Some("neoCLR.Runtime.RuntimeAsyncStartManaged") => (vec![Type::Named("System.Object".into()), neoclr::assembler::parse_type("fn<Void>").expect("fixed callback shape")], Type::Int64, "runtime-async-startmanaged-v1", "neoclr_runtime_async_startmanaged_v1"),
-            Some("neoCLR.Runtime.RuntimeAsyncCreateOwned") => (vec![Type::Named("System.Object".into())], Type::Int64, "runtime-async-createowned-v1", "neoclr_runtime_async_createowned_v1"),
-            Some("neoCLR.Runtime.RuntimeAsyncCurrentOwner") => (vec![], Type::Named("System.Object".into()), "runtime-async-currentowner-v1", "neoclr_runtime_async_currentowner_v1"),
-            Some("neoCLR.Runtime.RuntimeAsyncCreate") => (vec![], Type::Int64, "runtime-async-create-v1", "neoclr_runtime_async_create_v1"),
-            Some("neoCLR.Runtime.RuntimeAsyncStart") => (vec![neoclr::assembler::parse_type("fn<Void>").expect("fixed runtime callback signature")], Type::Int64, "runtime-async-start-v1", "neoclr_runtime_async_start_v1"),
-            Some("neoCLR.Runtime.RuntimeAsyncCompleteUnit") => (vec![Type::Int64], Type::Boolean, "runtime-async-completeunit-v1", "neoclr_runtime_async_completeunit_v1"),
-            Some("neoCLR.Runtime.RuntimeAsyncAwaitUnit") => (vec![Type::Int64], Type::Void, "runtime-async-awaitunit-v1", "neoclr_runtime_async_awaitunit_v1"),
-            Some("neoCLR.Runtime.RuntimeAsyncRelease") => (vec![Type::Int64], Type::Boolean, "runtime-async-release-v1", "neoclr_runtime_async_release_v1"),
-            Some("neoCLR.Runtime.RuntimeAsyncIsCompleted") => (vec![Type::Int64], Type::Boolean, "runtime-async-iscompleted-v1", "neoclr_runtime_async_iscompleted_v1"),
-            Some("neoCLR.Runtime.RuntimeAsyncWaitCompletion") => (vec![Type::Int64], Type::Boolean, "runtime-async-waitcompletion-v1", "neoclr_runtime_async_waitcompletion_v1"),
+            Some("neoCLR.Runtime.RuntimeAsyncStartManaged") => (
+                vec![
+                    Type::Named("System.Object".into()),
+                    neoclr::assembler::parse_type("fn<Void>").expect("fixed callback shape"),
+                ],
+                Type::Int64,
+                "runtime-async-startmanaged-v1",
+                "neoclr_runtime_async_startmanaged_v1",
+            ),
+            Some("neoCLR.Runtime.RuntimeAsyncCreateOwned") => (
+                vec![Type::Named("System.Object".into())],
+                Type::Int64,
+                "runtime-async-createowned-v1",
+                "neoclr_runtime_async_createowned_v1",
+            ),
+            Some("neoCLR.Runtime.RuntimeAsyncCurrentOwner") => (
+                vec![],
+                Type::Named("System.Object".into()),
+                "runtime-async-currentowner-v1",
+                "neoclr_runtime_async_currentowner_v1",
+            ),
+            Some("neoCLR.Runtime.RuntimeAsyncCreate") => (
+                vec![],
+                Type::Int64,
+                "runtime-async-create-v1",
+                "neoclr_runtime_async_create_v1",
+            ),
+            Some("neoCLR.Runtime.RuntimeAsyncStart") => (
+                vec![
+                    neoclr::assembler::parse_type("fn<Void>")
+                        .expect("fixed runtime callback signature"),
+                ],
+                Type::Int64,
+                "runtime-async-start-v1",
+                "neoclr_runtime_async_start_v1",
+            ),
+            Some("neoCLR.Runtime.RuntimeAsyncCompleteUnit") => (
+                vec![Type::Int64],
+                Type::Boolean,
+                "runtime-async-completeunit-v1",
+                "neoclr_runtime_async_completeunit_v1",
+            ),
+            Some("neoCLR.Runtime.RuntimeAsyncAwaitUnit") => (
+                vec![Type::Int64],
+                Type::Void,
+                "runtime-async-awaitunit-v1",
+                "neoclr_runtime_async_awaitunit_v1",
+            ),
+            Some("neoCLR.Runtime.RuntimeAsyncRelease") => (
+                vec![Type::Int64],
+                Type::Boolean,
+                "runtime-async-release-v1",
+                "neoclr_runtime_async_release_v1",
+            ),
+            Some("neoCLR.Runtime.RuntimeAsyncIsCompleted") => (
+                vec![Type::Int64],
+                Type::Boolean,
+                "runtime-async-iscompleted-v1",
+                "neoclr_runtime_async_iscompleted_v1",
+            ),
+            Some("neoCLR.Runtime.RuntimeAsyncWaitCompletion") => (
+                vec![Type::Int64],
+                Type::Boolean,
+                "runtime-async-waitcompletion-v1",
+                "neoclr_runtime_async_waitcompletion_v1",
+            ),
             _ => continue,
         };
-        let f = &mut input.functions[row["compiledIndex"].as_u64().ok_or("missing compiled index")? as usize];
+        let f = &mut input.functions[row["compiledIndex"]
+            .as_u64()
+            .ok_or("missing compiled index")? as usize];
         if f.name != row["name"].as_str().unwrap()
-            || f.owner.is_some() || f.instance || f.receiver_byref || f.receiver_readonly
-            || f.parameters != parameters || f.returns != result || f.no_result != (result == Type::Void)
-            || f.impl_flags != 0x1000 || f.pinvoke.is_some() || !f.body.is_empty()
-            || !f.locals.is_empty() || f.is_virtual || f.is_override || f.is_abstract
-            || !f.generic_parameters.is_empty() || !f.generic_arguments.is_empty()
-            || !f.generic_constraints.is_empty() || !f.interface_implementations.is_empty()
-            || !f.out_parameters.is_empty() || !f.out_when_true.is_empty() || !f.readonly_parameters.is_empty()
-        { return Err(format!("native runtime-async binding requires exact reserved InternalCall contract: {} params {:?} returns {:?} no_result {}", f.name, f.parameters, f.returns, f.no_result).into()); }
+            || f.owner.is_some()
+            || f.instance
+            || f.receiver_byref
+            || f.receiver_readonly
+            || f.parameters != parameters
+            || f.returns != result
+            || f.no_result != (result == Type::Void)
+            || f.impl_flags != 0x1000
+            || f.pinvoke.is_some()
+            || !f.body.is_empty()
+            || !f.locals.is_empty()
+            || f.is_virtual
+            || f.is_override
+            || f.is_abstract
+            || !f.generic_parameters.is_empty()
+            || !f.generic_arguments.is_empty()
+            || !f.generic_constraints.is_empty()
+            || !f.interface_implementations.is_empty()
+            || !f.out_parameters.is_empty()
+            || !f.out_when_true.is_empty()
+            || !f.readonly_parameters.is_empty()
+        {
+            return Err(format!("native runtime-async binding requires exact reserved InternalCall contract: {} params {:?} returns {:?} no_result {}", f.name, f.parameters, f.returns, f.no_result).into());
+        }
         f.impl_flags = 0;
-        f.body = if result == Type::Boolean { vec![Op::Bool(false), Op::Return] }
-            else if result == Type::Int64 { vec![Op::Int64(0), Op::Return] }
-            else if result != Type::Void { vec![Op::Branch(0)] }
-            else { vec![Op::Return] };
+        f.body = if result == Type::Boolean {
+            vec![Op::Bool(false), Op::Return]
+        } else if result == Type::Int64 {
+            vec![Op::Int64(0), Op::Return]
+        } else if result != Type::Void {
+            vec![Op::Branch(0)]
+        } else {
+            vec![Op::Return]
+        };
         bindings.push(json!({"definition": row["definition"], "name": row["name"],
             "compiledIndex": row["compiledIndex"], "implementation": implementation, "symbol": symbol,
             "storage": "private polled host scope; bounded shared operation table; rooted one-shot callbacks"}));
@@ -777,21 +1645,47 @@ pub fn runtime_async(input: &mut neoclr::Module, selection: &Value) -> Result<Ve
 }
 
 /// Reference-arena identity uses the same verified primitive as CIL ref.equal.
-pub fn object_reference_equals(input: &mut neoclr::Module, selection: &Value) -> Result<Vec<Value>, Error> {
+pub fn object_reference_equals(
+    input: &mut neoclr::Module,
+    selection: &Value,
+) -> Result<Vec<Value>, Error> {
     let mut bindings = vec![];
-    for row in selection["functions"].as_array().ok_or("missing selection inventory")? {
-        if row["name"] != "neoCLR.Runtime.ObjectReferenceEquals" { continue; }
-        let f = &mut input.functions[row["compiledIndex"].as_u64().ok_or("missing compiled index")? as usize];
+    for row in selection["functions"]
+        .as_array()
+        .ok_or("missing selection inventory")?
+    {
+        if row["name"] != "neoCLR.Runtime.ObjectReferenceEquals" {
+            continue;
+        }
+        let f = &mut input.functions[row["compiledIndex"]
+            .as_u64()
+            .ok_or("missing compiled index")? as usize];
         let object = Type::Named("System.Object".into());
         if f.name != row["name"].as_str().unwrap()
-            || f.owner.is_some() || f.instance || f.receiver_byref || f.receiver_readonly
-            || f.parameters != [object.clone(), object] || f.returns != Type::Boolean || f.no_result
-            || f.impl_flags != 0x1000 || f.pinvoke.is_some() || !f.body.is_empty()
-            || !f.locals.is_empty() || f.is_virtual || f.is_override || f.is_abstract
-            || !f.generic_parameters.is_empty() || !f.generic_arguments.is_empty()
-            || !f.generic_constraints.is_empty() || !f.interface_implementations.is_empty()
-            || !f.out_parameters.is_empty() || !f.out_when_true.is_empty() || !f.readonly_parameters.is_empty()
-        { return Err("native identity binding requires exact ObjectReferenceEquals(Object,Object) -> Boolean InternalCall contract".into()); }
+            || f.owner.is_some()
+            || f.instance
+            || f.receiver_byref
+            || f.receiver_readonly
+            || f.parameters != [object.clone(), object]
+            || f.returns != Type::Boolean
+            || f.no_result
+            || f.impl_flags != 0x1000
+            || f.pinvoke.is_some()
+            || !f.body.is_empty()
+            || !f.locals.is_empty()
+            || f.is_virtual
+            || f.is_override
+            || f.is_abstract
+            || !f.generic_parameters.is_empty()
+            || !f.generic_arguments.is_empty()
+            || !f.generic_constraints.is_empty()
+            || !f.interface_implementations.is_empty()
+            || !f.out_parameters.is_empty()
+            || !f.out_when_true.is_empty()
+            || !f.readonly_parameters.is_empty()
+        {
+            return Err("native identity binding requires exact ObjectReferenceEquals(Object,Object) -> Boolean InternalCall contract".into());
+        }
         f.impl_flags = 0;
         f.body = vec![Op::Arg(0), Op::Arg(1), Op::ReferenceEqual, Op::Return];
         bindings.push(json!({"definition": row["definition"], "name": row["name"],
@@ -804,18 +1698,41 @@ pub fn object_reference_equals(input: &mut neoclr::Module, selection: &Value) ->
 /// Closed-image type identity shares the token equality primitive; no addresses escape.
 pub fn type_equals(input: &mut neoclr::Module, selection: &Value) -> Result<Vec<Value>, Error> {
     let mut bindings = vec![];
-    for row in selection["functions"].as_array().ok_or("missing selection inventory")? {
-        if row["name"] != "neoCLR.Runtime.TypeEquals" { continue; }
-        let f = &mut input.functions[row["compiledIndex"].as_u64().ok_or("missing compiled index")? as usize];
+    for row in selection["functions"]
+        .as_array()
+        .ok_or("missing selection inventory")?
+    {
+        if row["name"] != "neoCLR.Runtime.TypeEquals" {
+            continue;
+        }
+        let f = &mut input.functions[row["compiledIndex"]
+            .as_u64()
+            .ok_or("missing compiled index")? as usize];
         if f.name != row["name"].as_str().unwrap()
-            || f.owner.is_some() || f.instance || f.receiver_byref || f.receiver_readonly
-            || f.parameters != [Type::RuntimeTypeHandle, Type::RuntimeTypeHandle] || f.returns != Type::Boolean || f.no_result
-            || f.impl_flags != 0x1000 || f.pinvoke.is_some() || !f.body.is_empty()
-            || !f.locals.is_empty() || f.is_virtual || f.is_override || f.is_abstract
-            || !f.generic_parameters.is_empty() || !f.generic_arguments.is_empty()
-            || !f.generic_constraints.is_empty() || !f.interface_implementations.is_empty()
-            || !f.out_parameters.is_empty() || !f.out_when_true.is_empty() || !f.readonly_parameters.is_empty()
-        { return Err("native identity binding requires exact TypeEquals(RuntimeTypeHandle,RuntimeTypeHandle) -> Boolean InternalCall contract".into()); }
+            || f.owner.is_some()
+            || f.instance
+            || f.receiver_byref
+            || f.receiver_readonly
+            || f.parameters != [Type::RuntimeTypeHandle, Type::RuntimeTypeHandle]
+            || f.returns != Type::Boolean
+            || f.no_result
+            || f.impl_flags != 0x1000
+            || f.pinvoke.is_some()
+            || !f.body.is_empty()
+            || !f.locals.is_empty()
+            || f.is_virtual
+            || f.is_override
+            || f.is_abstract
+            || !f.generic_parameters.is_empty()
+            || !f.generic_arguments.is_empty()
+            || !f.generic_constraints.is_empty()
+            || !f.interface_implementations.is_empty()
+            || !f.out_parameters.is_empty()
+            || !f.out_when_true.is_empty()
+            || !f.readonly_parameters.is_empty()
+        {
+            return Err("native identity binding requires exact TypeEquals(RuntimeTypeHandle,RuntimeTypeHandle) -> Boolean InternalCall contract".into());
+        }
         f.impl_flags = 0;
         f.body = vec![Op::Arg(0), Op::Arg(1), Op::Equal, Op::Return];
         bindings.push(json!({"definition": row["definition"], "name": row["name"],
@@ -847,7 +1764,12 @@ mod identity_tests {
             }
             assert!(object_reference_equals(&mut input, &inventory).is_err());
         }
-        assert_eq!(object_reference_equals(&mut source, &inventory).unwrap().len(), 1);
+        assert_eq!(
+            object_reference_equals(&mut source, &inventory)
+                .unwrap()
+                .len(),
+            1
+        );
         assert_eq!(source.functions[0].impl_flags, 0);
         assert!(matches!(source.functions[0].body[2], Op::ReferenceEqual));
     }
@@ -863,20 +1785,42 @@ mod deadline_tests {
             ("ScheduleTask", "fn<noresult Void> callback) -> Void"),
             ("SchedulerSubmit", "fn<Void> callback) -> Int32"),
             ("SchedulerCapture", ") -> Int64"),
-            ("SchedulerRegister", "Int64 destination, fn<Void> callback) -> Int64"),
+            (
+                "SchedulerRegister",
+                "Int64 destination, fn<Void> callback) -> Int64",
+            ),
             ("SchedulerActivate", "Int64 registration) -> Boolean"),
             ("SchedulerCancel", "Int64 registration) -> Boolean"),
-            ("SchedulerSubmitTo", "Int64 destination, fn<Void> callback) -> Int32"),
-            ("TimerStart", "Int32 milliseconds, fn<Void> callback) -> Int64"),
+            (
+                "SchedulerSubmitTo",
+                "Int64 destination, fn<Void> callback) -> Int32",
+            ),
+            (
+                "TimerStart",
+                "Int32 milliseconds, fn<Void> callback) -> Int64",
+            ),
             ("TimerCancel", "Int64 handle) -> Boolean"),
             ("SocketDeadlineAfter", "Int32 milliseconds) -> Int64"),
             ("SocketDeadlineExpired", "Int64 deadline) -> Boolean"),
-            ("SocketReceiveUntil", "Int64 socket, arrayref<Byte> buffer, Int32 offset, Int32 count, Int64 deadline, fn<Void> callback) -> Value"),
-            ("SocketSendUntil", "Int64 socket, arrayref<Byte> buffer, Int32 offset, Int32 count, Int64 deadline, fn<Void> callback) -> Value"),
+            (
+                "SocketReceiveUntil",
+                "Int64 socket, arrayref<Byte> buffer, Int32 offset, Int32 count, Int64 deadline, fn<Void> callback) -> Value",
+            ),
+            (
+                "SocketSendUntil",
+                "Int64 socket, arrayref<Byte> buffer, Int32 offset, Int32 count, Int64 deadline, fn<Void> callback) -> Value",
+            ),
         ] {
             let source = neoclr::assemble(&format!(".module Contract\n.function neoCLR.Runtime.{name}({signature}\n.methodimpl InternalCall\n.end")).unwrap();
-            let inventory = json!({"functions":[{"name":format!("neoCLR.Runtime.{name}"),"compiledIndex":0}]});
-            let bind = if name.starts_with("Scheduler") || name == "ScheduleTask" { scheduler } else if name.starts_with("Timer") { timers } else { socket_transfer };
+            let inventory =
+                json!({"functions":[{"name":format!("neoCLR.Runtime.{name}"),"compiledIndex":0}]});
+            let bind = if name.starts_with("Scheduler") || name == "ScheduleTask" {
+                scheduler
+            } else if name.starts_with("Timer") {
+                timers
+            } else {
+                socket_transfer
+            };
             for change in 0..6 {
                 let mut input = source.clone();
                 match change {
@@ -888,12 +1832,15 @@ mod deadline_tests {
                         } else {
                             input.functions[0].parameters[0] = Type::String;
                         }
-                    },
+                    }
                     3 => input.functions[0].returns = Type::String,
                     4 => input.functions[0].no_result = true,
                     _ => input.functions[0].out_parameters = vec![0],
                 }
-                assert!(bind(&mut input, &inventory).is_err(), "{name}: mutation {change}");
+                assert!(
+                    bind(&mut input, &inventory).is_err(),
+                    "{name}: mutation {change}"
+                );
             }
             assert_eq!(bind(&mut source.clone(), &inventory).unwrap().len(), 1);
         }
@@ -901,68 +1848,182 @@ mod deadline_tests {
 }
 
 /// Match verified closed instantiations while retaining the source-owned queue contract.
-pub fn task_queue(input: &mut neoclr::Module, selection: &Value, source: &neoclr::Module) -> Result<(Vec<Value>, Value), Error> {
+pub fn task_queue(
+    input: &mut neoclr::Module,
+    selection: &Value,
+    source: &neoclr::Module,
+) -> Result<(Vec<Value>, Value), Error> {
     let mut rows = vec![];
     let mut queue_type = None;
-    for row in selection["functions"].as_array().ok_or("missing selection inventory")? {
+    for row in selection["functions"]
+        .as_array()
+        .ok_or("missing selection inventory")?
+    {
         let (register, implementation, symbol) = match row["name"].as_str() {
-            Some("neoCLR.Runtime.RegisterTaskQueue") => (true, "task-queue-register-v1", "neoclr_task_queue_register_v1"),
-            Some("neoCLR.Runtime.GetDefaultTaskQueue") => (false, "task-queue-default-v1", "neoclr_task_queue_default_v1"),
-            Some("neoCLR.Runtime.GetCurrentTaskQueue") => (false, "task-queue-current-v1", "neoclr_task_queue_current_v1"),
+            Some("neoCLR.Runtime.RegisterTaskQueue") => (
+                true,
+                "task-queue-register-v1",
+                "neoclr_task_queue_register_v1",
+            ),
+            Some("neoCLR.Runtime.GetDefaultTaskQueue") => (
+                false,
+                "task-queue-default-v1",
+                "neoclr_task_queue_default_v1",
+            ),
+            Some("neoCLR.Runtime.GetCurrentTaskQueue") => (
+                false,
+                "task-queue-current-v1",
+                "neoclr_task_queue_current_v1",
+            ),
             _ => continue,
         };
         let arguments: Vec<Type> = serde_json::from_value(row["methodArguments"].clone())?;
-        let [ty] = arguments.as_slice() else { return Err("task queue binding requires one closed type argument".into()); };
-        let definition = source.type_definition(ty).ok_or("missing source TaskQueue declaration")?;
-        let is_queue = definition.origin.as_ref().is_some_and(|o| o.name == "System.Concurrency.Tasks.TaskQueue")
-            || (definition.name == "System.Concurrency.Tasks.TaskQueue" && (definition.definition.as_ref().is_some_and(|d| d.module == "System")
-                || selection["types"].as_array().is_some_and(|types| types.iter().any(|row|
-                    row["name"] == definition.name && row["definition"]["module"] == "System"))));
-        if !is_queue || !definition.is_reference_type || !definition.generic_parameters.is_empty()
-            || queue_type.as_ref().is_some_and(|other| other != ty) {
-            return Err("native task queue binding requires one source-owned TaskQueue type".into());
+        let [ty] = arguments.as_slice() else {
+            return Err("task queue binding requires one closed type argument".into());
+        };
+        let definition = source
+            .type_definition(ty)
+            .ok_or("missing source TaskQueue declaration")?;
+        let is_queue = definition
+            .origin
+            .as_ref()
+            .is_some_and(|o| o.name == "System.Concurrency.Tasks.TaskQueue")
+            || (definition.name == "System.Concurrency.Tasks.TaskQueue"
+                && (definition
+                    .definition
+                    .as_ref()
+                    .is_some_and(|d| d.module == "System")
+                    || selection["types"].as_array().is_some_and(|types| {
+                        types.iter().any(|row| {
+                            row["name"] == definition.name
+                                && row["definition"]["module"] == "System"
+                        })
+                    })));
+        if !is_queue
+            || !definition.is_reference_type
+            || !definition.generic_parameters.is_empty()
+            || queue_type.as_ref().is_some_and(|other| other != ty)
+        {
+            return Err(
+                "native task queue binding requires one source-owned TaskQueue type".into(),
+            );
         }
-        let member = |f: &neoclr::metadata::Function| f.origin.as_ref().map_or_else(|| f.name.rsplit('.').next().unwrap_or(""), |o| o.name.as_str()).to_owned();
-        if source.functions.iter().filter(|f| f.owner.as_ref() == Some(ty) && f.instance && f.no_result
-            && f.parameters.is_empty() && f.generic_parameters.is_empty() && member(f) == "Drain").count() != 1 {
+        let member = |f: &neoclr::metadata::Function| {
+            f.origin
+                .as_ref()
+                .map_or_else(
+                    || f.name.rsplit('.').next().unwrap_or(""),
+                    |o| o.name.as_str(),
+                )
+                .to_owned()
+        };
+        if source
+            .functions
+            .iter()
+            .filter(|f| {
+                f.owner.as_ref() == Some(ty)
+                    && f.instance
+                    && f.no_result
+                    && f.parameters.is_empty()
+                    && f.generic_parameters.is_empty()
+                    && member(f) == "Drain"
+            })
+            .count()
+            != 1
+        {
             return Err("native task queue binding requires unique source Drain contract".into());
         }
         queue_type = Some(ty.clone());
-        let f = &mut input.functions[row["compiledIndex"].as_u64().ok_or("missing compiled index")? as usize];
-        if f.name != row["compiledName"].as_str().ok_or("missing compiled service name")?
-            || f.owner.is_some() || f.instance || f.receiver_byref || f.receiver_readonly
+        let f = &mut input.functions[row["compiledIndex"]
+            .as_u64()
+            .ok_or("missing compiled index")? as usize];
+        if f.name
+            != row["compiledName"]
+                .as_str()
+                .ok_or("missing compiled service name")?
+            || f.owner.is_some()
+            || f.instance
+            || f.receiver_byref
+            || f.receiver_readonly
             || f.parameters != if register { vec![ty.clone()] } else { vec![] }
             || f.returns != if register { Type::Void } else { ty.clone() }
-            || f.no_result || f.impl_flags != 0x1000 || f.pinvoke.is_some() || !f.body.is_empty()
-            || !f.locals.is_empty() || f.is_virtual || f.is_override || f.is_abstract
-            || !f.generic_parameters.is_empty() || !f.generic_arguments.is_empty() || !f.generic_constraints.is_empty()
-            || !f.interface_implementations.is_empty() || !f.out_parameters.is_empty()
-            || !f.out_when_true.is_empty() || !f.readonly_parameters.is_empty() {
-            return Err("native task queue binding requires exact closed InternalCall contract".into());
+            || f.no_result
+            || f.impl_flags != 0x1000
+            || f.pinvoke.is_some()
+            || !f.body.is_empty()
+            || !f.locals.is_empty()
+            || f.is_virtual
+            || f.is_override
+            || f.is_abstract
+            || !f.generic_parameters.is_empty()
+            || !f.generic_arguments.is_empty()
+            || !f.generic_constraints.is_empty()
+            || !f.interface_implementations.is_empty()
+            || !f.out_parameters.is_empty()
+            || !f.out_when_true.is_empty()
+            || !f.readonly_parameters.is_empty()
+        {
+            return Err(
+                "native task queue binding requires exact closed InternalCall contract".into(),
+            );
         }
         f.impl_flags = 0;
-        f.body = if register { vec![Op::Void, Op::Return] } else { vec![Op::Branch(0)] };
+        f.body = if register {
+            vec![Op::Void, Op::Return]
+        } else {
+            vec![Op::Branch(0)]
+        };
         rows.push(json!({"definition":row["definition"],"name":row["name"],"compiledIndex":row["compiledIndex"],
             "implementation":implementation,"symbol":symbol,"queueType":ty}));
     }
     for row in selection["functions"].as_array().unwrap() {
-        if row["name"] != "neoCLR.Runtime.DrainEntryTasks" { continue; }
-        let host_io = selection["functions"].as_array().unwrap().iter().any(|r|
-            r["name"].as_str().is_some_and(|n| n.starts_with("neoCLR.Runtime.Timer") || n.starts_with("neoCLR.Runtime.Dns") ||
-                (n.starts_with("neoCLR.Runtime.Socket") && !matches!(n,
-                    "neoCLR.Runtime.SocketListen" | "neoCLR.Runtime.SocketLocalPort" |
-                    "neoCLR.Runtime.SocketClose" | "neoCLR.Runtime.SocketDeadlineAfter" |
-                    "neoCLR.Runtime.SocketDeadlineExpired"))));
-        let f = &mut input.functions[row["compiledIndex"].as_u64().ok_or("missing compiled index")? as usize];
+        if row["name"] != "neoCLR.Runtime.DrainEntryTasks" {
+            continue;
+        }
+        let host_io = selection["functions"].as_array().unwrap().iter().any(|r| {
+            r["name"].as_str().is_some_and(|n| {
+                n.starts_with("neoCLR.Runtime.Timer")
+                    || n.starts_with("neoCLR.Runtime.Dns")
+                    || (n.starts_with("neoCLR.Runtime.Socket")
+                        && !matches!(
+                            n,
+                            "neoCLR.Runtime.SocketListen"
+                                | "neoCLR.Runtime.SocketLocalPort"
+                                | "neoCLR.Runtime.SocketClose"
+                                | "neoCLR.Runtime.SocketDeadlineAfter"
+                                | "neoCLR.Runtime.SocketDeadlineExpired"
+                        ))
+            })
+        });
+        let f = &mut input.functions[row["compiledIndex"]
+            .as_u64()
+            .ok_or("missing compiled index")? as usize];
         if f.name != "neoCLR.Runtime.DrainEntryTasks"
-            || f.owner.is_some() || f.instance || f.receiver_byref || f.receiver_readonly
-            || !f.parameters.is_empty() || f.returns != Type::Void || f.no_result
-            || f.impl_flags != 0x1000 || f.pinvoke.is_some() || !f.body.is_empty()
-            || !f.locals.is_empty() || f.is_virtual || f.is_override || f.is_abstract
-            || !f.generic_parameters.is_empty() || !f.generic_arguments.is_empty() || !f.generic_constraints.is_empty()
-            || !f.interface_implementations.is_empty() || !f.out_parameters.is_empty()
-            || !f.out_when_true.is_empty() || !f.readonly_parameters.is_empty()
-            || row["methodArguments"].as_array().is_some_and(|a| !a.is_empty()) {
+            || f.owner.is_some()
+            || f.instance
+            || f.receiver_byref
+            || f.receiver_readonly
+            || !f.parameters.is_empty()
+            || f.returns != Type::Void
+            || f.no_result
+            || f.impl_flags != 0x1000
+            || f.pinvoke.is_some()
+            || !f.body.is_empty()
+            || !f.locals.is_empty()
+            || f.is_virtual
+            || f.is_override
+            || f.is_abstract
+            || !f.generic_parameters.is_empty()
+            || !f.generic_arguments.is_empty()
+            || !f.generic_constraints.is_empty()
+            || !f.interface_implementations.is_empty()
+            || !f.out_parameters.is_empty()
+            || !f.out_when_true.is_empty()
+            || !f.readonly_parameters.is_empty()
+            || row["methodArguments"]
+                .as_array()
+                .is_some_and(|a| !a.is_empty())
+        {
             return Err("native entry drain binding requires exact DrainEntryTasks() -> Void InternalCall contract".into());
         }
         f.impl_flags = 0;
@@ -973,10 +2034,25 @@ pub fn task_queue(input: &mut neoclr::Module, selection: &Value, source: &neoclr
     let mut frames = json!({});
     if let Some(ty) = queue_type {
         for (index, f) in input.functions.iter().enumerate() {
-            if f.owner.as_ref() != Some(&ty) || !f.instance || !f.no_result || !f.generic_parameters.is_empty() { continue; }
-            let name = f.origin.as_ref().map_or_else(|| f.name.rsplit('.').next().unwrap_or(""), |o| o.name.as_str());
-            if (name == "Drain" && f.parameters.is_empty()) || (name == "Run" && f.parameters == [neoclr::assembler::parse_type("fn<Void>").expect("fixed signature")]) {
-                if !frames[name].is_null() { return Err("ambiguous TaskQueue execution member".into()); }
+            if f.owner.as_ref() != Some(&ty)
+                || !f.instance
+                || !f.no_result
+                || !f.generic_parameters.is_empty()
+            {
+                continue;
+            }
+            let name = f.origin.as_ref().map_or_else(
+                || f.name.rsplit('.').next().unwrap_or(""),
+                |o| o.name.as_str(),
+            );
+            if (name == "Drain" && f.parameters.is_empty())
+                || (name == "Run"
+                    && f.parameters
+                        == [neoclr::assembler::parse_type("fn<Void>").expect("fixed signature")])
+            {
+                if !frames[name].is_null() {
+                    return Err("ambiguous TaskQueue execution member".into());
+                }
                 frames[name] = json!(index);
             }
         }
@@ -992,7 +2068,8 @@ mod task_queue_tests {
         let mut source = neoclr::assemble(".module System\n.references ()\n.function neoCLR.Runtime.DrainEntryTasks() -> Void\nldvoid\nret\n.end").unwrap();
         source.functions[0].impl_flags = 0x1000;
         source.functions[0].body.clear();
-        let inventory = json!({"functions":[{"name":"neoCLR.Runtime.DrainEntryTasks","compiledIndex":0}]});
+        let inventory =
+            json!({"functions":[{"name":"neoCLR.Runtime.DrainEntryTasks","compiledIndex":0}]});
         let (rows, _) = task_queue(&mut source.clone(), &inventory, &source).unwrap();
         assert_eq!(rows[0]["implementation"], "entry-task-drain-v1");
         for change in 0..8 {
@@ -1007,21 +2084,48 @@ mod task_queue_tests {
                 6 => input.functions[0].generic_arguments.push(Type::Int32),
                 _ => input.functions[0].out_parameters.push(0),
             }
-            assert!(task_queue(&mut input, &inventory, &source).is_err(), "mutation {change}");
+            assert!(
+                task_queue(&mut input, &inventory, &source).is_err(),
+                "mutation {change}"
+            );
         }
-        for service in ["SocketAccept", "SocketReceive", "SocketSend", "SocketReceiveUntil", "SocketSendUntil", "SocketConnectResult", "DnsLookup", "DnsLookupUntil"] {
+        for service in [
+            "SocketAccept",
+            "SocketReceive",
+            "SocketSend",
+            "SocketReceiveUntil",
+            "SocketSendUntil",
+            "SocketConnectResult",
+            "DnsLookup",
+            "DnsLookupUntil",
+        ] {
             let mut selected = inventory.clone();
-            selected["functions"].as_array_mut().unwrap().push(json!({"name":format!("neoCLR.Runtime.{service}")}));
+            selected["functions"]
+                .as_array_mut()
+                .unwrap()
+                .push(json!({"name":format!("neoCLR.Runtime.{service}")}));
             let (rows, _) = task_queue(&mut source.clone(), &selected, &source).unwrap();
             assert_eq!(rows[0]["requiresHostIo"], true);
         }
     }
     #[test]
     fn queue_binding_preserves_closed_source_ownership_and_rejects_impostors() {
-        for service in ["RegisterTaskQueue", "GetDefaultTaskQueue", "GetCurrentTaskQueue"] {
+        for service in [
+            "RegisterTaskQueue",
+            "GetDefaultTaskQueue",
+            "GetCurrentTaskQueue",
+        ] {
             let register = service == "RegisterTaskQueue";
-            let parameters = if register { "System.Concurrency.Tasks.TaskQueue queue" } else { "" };
-            let returns = if register { "Void" } else { "System.Concurrency.Tasks.TaskQueue" };
+            let parameters = if register {
+                "System.Concurrency.Tasks.TaskQueue queue"
+            } else {
+                ""
+            };
+            let returns = if register {
+                "Void"
+            } else {
+                "System.Concurrency.Tasks.TaskQueue"
+            };
             let compiled = format!("neoCLR.Runtime.{service}$aot_method_1");
             let mut source = neoclr::assemble(&format!(".module System\n.references ()\n.type class System.Concurrency.Tasks.TaskQueue\n.method instance Drain() -> noresult\nret\n.end\n.end\n.function Stub({parameters}) -> {returns}\nAgain:\nbr Again\n.end")).unwrap();
             source.functions[1].name = compiled.clone();
@@ -1063,7 +2167,8 @@ mod type_identity_tests {
     #[test]
     fn type_equals_requires_exact_reserved_contract() {
         let source = neoclr::assemble(".module Identity\n.function neoCLR.Runtime.TypeEquals(RuntimeTypeHandle left, RuntimeTypeHandle right) -> Boolean\n.methodimpl InternalCall\n.end\n").unwrap();
-        let inventory = json!({"functions":[{"name":"neoCLR.Runtime.TypeEquals","compiledIndex":0}]});
+        let inventory =
+            json!({"functions":[{"name":"neoCLR.Runtime.TypeEquals","compiledIndex":0}]});
         for change in 0..8 {
             let mut input = source.clone();
             match change {
@@ -1086,7 +2191,8 @@ mod type_identity_tests {
     #[test]
     fn system_culture_requires_the_exact_internal_call_contract() {
         let source = neoclr::assemble(".module CultureBinding\n.function neoCLR.Runtime.SystemCultureName() -> String\n.methodimpl InternalCall\n.end\n").unwrap();
-        let inventory = json!({"functions":[{"compiledIndex":0,"name":"neoCLR.Runtime.SystemCultureName"}]});
+        let inventory =
+            json!({"functions":[{"compiledIndex":0,"name":"neoCLR.Runtime.SystemCultureName"}]});
         for variant in 0..6 {
             let mut input = source.clone();
             let f = &mut input.functions[0];
@@ -1109,12 +2215,28 @@ mod type_identity_tests {
     #[test]
     fn time_zone_rules_require_exact_internal_call_contracts() {
         for (name, signature, result, symbol) in [
-            ("TimeZoneExists", "String id", "Boolean", "neoclr_time_zone_exists_v1"),
-            ("TimeZoneOffset", "String id, Int64 ticks", "Int32", "neoclr_time_zone_offset_v1"),
-            ("TimeZoneDatabaseVersion", "", "String", "neoclr_time_zone_version_v1"),
+            (
+                "TimeZoneExists",
+                "String id",
+                "Boolean",
+                "neoclr_time_zone_exists_v1",
+            ),
+            (
+                "TimeZoneOffset",
+                "String id, Int64 ticks",
+                "Int32",
+                "neoclr_time_zone_offset_v1",
+            ),
+            (
+                "TimeZoneDatabaseVersion",
+                "",
+                "String",
+                "neoclr_time_zone_version_v1",
+            ),
         ] {
             let source = neoclr::assemble(&format!(".module ZoneBinding\n.function neoCLR.Runtime.{name}({signature}) -> {result}\n.methodimpl InternalCall\n.end\n")).unwrap();
-            let inventory = json!({"functions":[{"compiledIndex":0,"name":format!("neoCLR.Runtime.{name}")}]});
+            let inventory =
+                json!({"functions":[{"compiledIndex":0,"name":format!("neoCLR.Runtime.{name}")}]});
             for variant in 0..6 {
                 let mut input = source.clone();
                 let f = &mut input.functions[0];
@@ -1148,7 +2270,8 @@ mod type_identity_tests {
             ("GCCollect", "", "noresult"),
         ] {
             let source = neoclr::assemble(&format!(".module AsyncBinding\n.function neoCLR.Runtime.{name}({parameters}) -> {result}\n.methodimpl InternalCall\n.end\n")).unwrap();
-            let inventory = json!({"functions":[{"compiledIndex":0,"name":format!("neoCLR.Runtime.{name}")}]});
+            let inventory =
+                json!({"functions":[{"compiledIndex":0,"name":format!("neoCLR.Runtime.{name}")}]});
             for variant in 0..6 {
                 let mut input = source.clone();
                 let f = &mut input.functions[0];
@@ -1160,11 +2283,22 @@ mod type_identity_tests {
                     4 => f.no_result = !f.no_result,
                     _ => f.locals.push(Type::String),
                 }
-                let bind = if name == "GCCollect" { gc_collect } else { runtime_async };
-                assert!(bind(&mut input, &inventory).is_err(), "{name} variant {variant}");
+                let bind = if name == "GCCollect" {
+                    gc_collect
+                } else {
+                    runtime_async
+                };
+                assert!(
+                    bind(&mut input, &inventory).is_err(),
+                    "{name} variant {variant}"
+                );
             }
             let mut input = source;
-            let bind = if name == "GCCollect" { gc_collect } else { runtime_async };
+            let bind = if name == "GCCollect" {
+                gc_collect
+            } else {
+                runtime_async
+            };
             assert_eq!(bind(&mut input, &inventory).unwrap().len(), 1);
             assert_eq!(input.functions[0].impl_flags, 0);
         }
@@ -1173,7 +2307,8 @@ mod type_identity_tests {
     #[test]
     fn stack_trace_requires_exact_native_contract() {
         let source = neoclr::assemble(".module CaptureBinding\n.function neoCLR.Runtime.StackTraceCapture(Int32 skip) -> String\n.methodimpl InternalCall\n.end\n").unwrap();
-        let inventory = json!({"functions":[{"compiledIndex":0,"name":"neoCLR.Runtime.StackTraceCapture"}]});
+        let inventory =
+            json!({"functions":[{"compiledIndex":0,"name":"neoCLR.Runtime.StackTraceCapture"}]});
         for variant in 0..7 {
             let mut input = source.clone();
             let f = &mut input.functions[0];
@@ -1186,19 +2321,24 @@ mod type_identity_tests {
                 5 => f.locals.push(Type::String),
                 _ => f.instance = true,
             }
-            assert!(stack_trace(&mut input, &inventory).is_err(), "variant {variant}");
+            assert!(
+                stack_trace(&mut input, &inventory).is_err(),
+                "variant {variant}"
+            );
         }
         let mut input = source;
         assert_eq!(stack_trace(&mut input, &inventory).unwrap().len(), 1);
         assert_eq!(input.functions[0].impl_flags, 0);
     }
-
 }
 
 /// Private byte-array cryptography contracts; explicit host binding, no foreign lookup.
 pub fn cryptography(input: &mut neoclr::Module, selection: &Value) -> Result<Vec<Value>, Error> {
     let mut bindings = vec![];
-    for row in selection["functions"].as_array().ok_or("missing selection inventory")? {
+    for row in selection["functions"]
+        .as_array()
+        .ok_or("missing selection inventory")?
+    {
         let (operation, arity, result) = match row["name"].as_str() {
             Some("neoCLR.Runtime.CryptoSha256") => (1, 2, Type::Int32),
             Some("neoCLR.Runtime.CryptoHmacSha256") => (2, 3, Type::Int32),
@@ -1206,20 +2346,44 @@ pub fn cryptography(input: &mut neoclr::Module, selection: &Value) -> Result<Vec
             Some("neoCLR.Runtime.CryptoRandomFill") => (4, 1, Type::Int32),
             _ => continue,
         };
-        let index = row["compiledIndex"].as_u64().ok_or("missing compiled index")? as usize;
+        let index = row["compiledIndex"]
+            .as_u64()
+            .ok_or("missing compiled index")? as usize;
         let f = &mut input.functions[index];
-        if f.name != row["name"].as_str().unwrap() || f.owner.is_some() || f.instance
+        if f.name != row["name"].as_str().unwrap()
+            || f.owner.is_some()
+            || f.instance
             || f.parameters != vec![Type::ArrayRef(Box::new(Type::Byte)); arity]
-            || f.returns != result || f.no_result || f.impl_flags != 0x1000
-            || !f.body.is_empty() || !f.locals.is_empty() || f.pinvoke.is_some()
-            || f.receiver_byref || f.receiver_readonly || f.is_virtual || f.is_override || f.is_abstract
-            || !f.generic_parameters.is_empty() || !f.generic_arguments.is_empty()
-            || !f.generic_constraints.is_empty() || !f.interface_implementations.is_empty()
-            || !f.out_parameters.is_empty() || !f.out_when_true.is_empty() || !f.readonly_parameters.is_empty() {
+            || f.returns != result
+            || f.no_result
+            || f.impl_flags != 0x1000
+            || !f.body.is_empty()
+            || !f.locals.is_empty()
+            || f.pinvoke.is_some()
+            || f.receiver_byref
+            || f.receiver_readonly
+            || f.is_virtual
+            || f.is_override
+            || f.is_abstract
+            || !f.generic_parameters.is_empty()
+            || !f.generic_arguments.is_empty()
+            || !f.generic_constraints.is_empty()
+            || !f.interface_implementations.is_empty()
+            || !f.out_parameters.is_empty()
+            || !f.out_when_true.is_empty()
+            || !f.readonly_parameters.is_empty()
+        {
             return Err("native cryptography binding requires exact nongeneric byte-array InternalCall contracts".into());
         }
         f.impl_flags = 0;
-        f.body = vec![if result == Type::Boolean { Op::Bool(false) } else { Op::Int(0) }, Op::Return];
+        f.body = vec![
+            if result == Type::Boolean {
+                Op::Bool(false)
+            } else {
+                Op::Int(0)
+            },
+            Op::Return,
+        ];
         bindings.push(json!({"definition":row["definition"], "name":row["name"], "compiledIndex":index,
             "implementation":"cryptography-v1", "operation":operation, "symbol":"neoclr_cryptography_v1"}));
     }
@@ -1233,7 +2397,8 @@ mod cryptography_tests {
     fn crypto_binding_does_not_replace_managed_bodies_or_accept_changed_contracts() {
         let source = ".module Probe\n.function neoCLR.Runtime.CryptoSha256(arrayref<Byte> data,arrayref<Byte> output) -> Int32\n.methodimpl InternalCall\n.end";
         let original = neoclr::assemble(source).unwrap();
-        let selection = json!({"functions":[{"name":"neoCLR.Runtime.CryptoSha256","compiledIndex":0}]});
+        let selection =
+            json!({"functions":[{"name":"neoCLR.Runtime.CryptoSha256","compiledIndex":0}]});
         let mut valid = original.clone();
         let rows = cryptography(&mut valid, &selection).unwrap();
         assert_eq!(rows[0]["operation"], 1);
@@ -1242,7 +2407,10 @@ mod cryptography_tests {
             let mut bad = original.clone();
             let f = &mut bad.functions[0];
             match change {
-                0 => { f.impl_flags = 0; f.body = vec![Op::Int(42), Op::Return]; },
+                0 => {
+                    f.impl_flags = 0;
+                    f.body = vec![Op::Int(42), Op::Return];
+                }
                 1 => f.parameters[0] = Type::ArrayRef(Box::new(Type::Int32)),
                 2 => f.returns = Type::Boolean,
                 3 => f.generic_parameters.push(Some("T".into())),
@@ -1256,7 +2424,10 @@ mod cryptography_tests {
 /// Private byte-array tls contracts; explicit host binding, no foreign lookup.
 pub fn tls(input: &mut neoclr::Module, selection: &Value) -> Result<Vec<Value>, Error> {
     let mut bindings = vec![];
-    for row in selection["functions"].as_array().ok_or("missing selection inventory")? {
+    for row in selection["functions"]
+        .as_array()
+        .ok_or("missing selection inventory")?
+    {
         let (operation, arity, result) = match row["name"].as_str() {
             Some("neoCLR.Runtime.TlsCreateClient") => (1, 3, Type::Int32),
             Some("neoCLR.Runtime.TlsCreateServer") => (2, 4, Type::Int32),
@@ -1266,22 +2437,51 @@ pub fn tls(input: &mut neoclr::Module, selection: &Value) -> Result<Vec<Value>, 
             Some("neoCLR.Runtime.TlsPump") => (6, 5, Type::Int32),
             _ => continue,
         };
-        let index = row["compiledIndex"].as_u64().ok_or("missing compiled index")? as usize;
+        let index = row["compiledIndex"]
+            .as_u64()
+            .ok_or("missing compiled index")? as usize;
         let f = &mut input.functions[index];
-        if f.name != row["name"].as_str().unwrap() || f.owner.is_some() || f.instance
+        if f.name != row["name"].as_str().unwrap()
+            || f.owner.is_some()
+            || f.instance
             || f.parameters != vec![Type::ArrayRef(Box::new(Type::Byte)); arity]
-            || f.returns != result || f.no_result || f.impl_flags != 0x1000
-            || !f.body.is_empty() || !f.locals.is_empty() || f.pinvoke.is_some()
-            || f.receiver_byref || f.receiver_readonly || f.is_virtual || f.is_override || f.is_abstract
-            || !f.generic_parameters.is_empty() || !f.generic_arguments.is_empty()
-            || !f.generic_constraints.is_empty() || !f.interface_implementations.is_empty()
-            || !f.out_parameters.is_empty() || !f.out_when_true.is_empty() || !f.readonly_parameters.is_empty() {
-            return Err("native tls binding requires exact nongeneric byte-array InternalCall contracts".into());
+            || f.returns != result
+            || f.no_result
+            || f.impl_flags != 0x1000
+            || !f.body.is_empty()
+            || !f.locals.is_empty()
+            || f.pinvoke.is_some()
+            || f.receiver_byref
+            || f.receiver_readonly
+            || f.is_virtual
+            || f.is_override
+            || f.is_abstract
+            || !f.generic_parameters.is_empty()
+            || !f.generic_arguments.is_empty()
+            || !f.generic_constraints.is_empty()
+            || !f.interface_implementations.is_empty()
+            || !f.out_parameters.is_empty()
+            || !f.out_when_true.is_empty()
+            || !f.readonly_parameters.is_empty()
+        {
+            return Err(
+                "native tls binding requires exact nongeneric byte-array InternalCall contracts"
+                    .into(),
+            );
         }
         f.impl_flags = 0;
-        f.body = vec![if result == Type::Boolean { Op::Bool(false) } else { Op::Int(0) }, Op::Return];
-        bindings.push(json!({"definition":row["definition"], "name":row["name"], "compiledIndex":index,
-            "implementation":"tls-v1", "operation":operation, "symbol":"neoclr_tls_managed_v2"}));
+        f.body = vec![
+            if result == Type::Boolean {
+                Op::Bool(false)
+            } else {
+                Op::Int(0)
+            },
+            Op::Return,
+        ];
+        bindings.push(
+            json!({"definition":row["definition"], "name":row["name"], "compiledIndex":index,
+            "implementation":"tls-v1", "operation":operation, "symbol":"neoclr_tls_managed_v2"}),
+        );
     }
     Ok(bindings)
 }
@@ -1293,7 +2493,8 @@ mod tls_tests {
     fn tls_binding_does_not_replace_managed_bodies_or_accept_changed_contracts() {
         let source = ".module Probe\n.function neoCLR.Runtime.TlsCreateClient(arrayref<Byte> owner,arrayref<Byte> roots,arrayref<Byte> alpn) -> Int32\n.methodimpl InternalCall\n.end";
         let original = neoclr::assemble(source).unwrap();
-        let selection = json!({"functions":[{"name":"neoCLR.Runtime.TlsCreateClient","compiledIndex":0}]});
+        let selection =
+            json!({"functions":[{"name":"neoCLR.Runtime.TlsCreateClient","compiledIndex":0}]});
         let mut valid = original.clone();
         let rows = tls(&mut valid, &selection).unwrap();
         assert_eq!(rows[0]["operation"], 1);
@@ -1302,7 +2503,10 @@ mod tls_tests {
             let mut bad = original.clone();
             let f = &mut bad.functions[0];
             match change {
-                0 => { f.impl_flags = 0; f.body = vec![Op::Int(42), Op::Return]; },
+                0 => {
+                    f.impl_flags = 0;
+                    f.body = vec![Op::Int(42), Op::Return];
+                }
                 1 => f.parameters[0] = Type::ArrayRef(Box::new(Type::Int32)),
                 2 => f.returns = Type::Boolean,
                 3 => f.generic_parameters.push(Some("T".into())),

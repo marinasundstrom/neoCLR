@@ -140,10 +140,18 @@ pub struct Options {
 impl Options {
     pub fn from_report(report: Option<&serde_json::Value>) -> Self {
         Self {
-            class_dispatch_thunks: report.and_then(|r| r["classVirtualDispatch"].as_array()).into_iter().flatten()
-                .filter_map(|r| r["thunkCompiledIndex"].as_u64().map(|i| i as usize)).collect(),
-            primitive_receivers: report.and_then(|r| r["primitiveInstanceProjections"].as_array()).into_iter().flatten()
-                .filter_map(|r| r["compiledIndex"].as_u64().map(|i| i as usize)).collect(),
+            class_dispatch_thunks: report
+                .and_then(|r| r["classVirtualDispatch"].as_array())
+                .into_iter()
+                .flatten()
+                .filter_map(|r| r["thunkCompiledIndex"].as_u64().map(|i| i as usize))
+                .collect(),
+            primitive_receivers: report
+                .and_then(|r| r["primitiveInstanceProjections"].as_array())
+                .into_iter()
+                .flatten()
+                .filter_map(|r| r["compiledIndex"].as_u64().map(|i| i as usize))
+                .collect(),
             probe_stack_roots: false,
             native_gc: false,
             native_host_bootstrap: false,
@@ -152,48 +160,219 @@ impl Options {
             windows_heap_experiment: false,
             windows_console_experiment: false,
             windows_http_experiment: false,
-            string_dispatch: report.and_then(|r| r["stringInterfaceDispatch"].as_array()).into_iter().flatten()
-                .filter_map(|r| Some((r["contractCompiledIndex"].as_u64()? as usize, r["functionCompiledIndex"].as_u64()? as usize))).collect(),
-            string_interfaces: report.and_then(|r| r["stringInterfaceViews"].as_array())
-                .map(|rows| rows.iter().filter_map(|i| i.as_u64().map(|i| i as usize)).collect()),
-            object_value_kinds: report.and_then(|r| r["objectDisplayDispatch"].as_array()).into_iter().flatten()
+            string_dispatch: report
+                .and_then(|r| r["stringInterfaceDispatch"].as_array())
+                .into_iter()
+                .flatten()
+                .filter_map(|r| {
+                    Some((
+                        r["contractCompiledIndex"].as_u64()? as usize,
+                        r["functionCompiledIndex"].as_u64()? as usize,
+                    ))
+                })
+                .collect(),
+            string_interfaces: report
+                .and_then(|r| r["stringInterfaceViews"].as_array())
+                .map(|rows| {
+                    rows.iter()
+                        .filter_map(|i| i.as_u64().map(|i| i as usize))
+                        .collect()
+                }),
+            object_value_kinds: report
+                .and_then(|r| r["objectDisplayDispatch"].as_array())
+                .into_iter()
+                .flatten()
                 .filter(|r| matches!(r["kind"].as_str(), Some("Equals" | "GetHashCode")))
-                .filter_map(|r| Some((r["contractCompiledIndex"].as_u64()? as usize, r["kind"].as_str()?.to_owned()))).collect(),
-            object_display: report.and_then(|r| r["objectDisplayDispatch"].as_array()).into_iter().flatten()
-                .filter_map(|r| Some((r["contractCompiledIndex"].as_u64()? as usize, r["targets"].as_array()?.iter()
-                    .filter_map(|t| Some((t["typeCompiledIndex"].as_u64()? as usize, t["functionCompiledIndex"].as_u64()? as usize))).collect()))).collect(),
-            object_default_display: report.and_then(|r| r["objectDefaultDisplay"].as_array()).into_iter().flatten()
-                .filter_map(|r| Some((r["typeCompiledIndex"].as_u64()? as usize, r["name"].as_str()?.to_owned()))).collect(),
+                .filter_map(|r| {
+                    Some((
+                        r["contractCompiledIndex"].as_u64()? as usize,
+                        r["kind"].as_str()?.to_owned(),
+                    ))
+                })
+                .collect(),
+            object_display: report
+                .and_then(|r| r["objectDisplayDispatch"].as_array())
+                .into_iter()
+                .flatten()
+                .filter_map(|r| {
+                    Some((
+                        r["contractCompiledIndex"].as_u64()? as usize,
+                        r["targets"]
+                            .as_array()?
+                            .iter()
+                            .filter_map(|t| {
+                                Some((
+                                    t["typeCompiledIndex"].as_u64()? as usize,
+                                    t["functionCompiledIndex"].as_u64()? as usize,
+                                ))
+                            })
+                            .collect(),
+                    ))
+                })
+                .collect(),
+            object_default_display: report
+                .and_then(|r| r["objectDefaultDisplay"].as_array())
+                .into_iter()
+                .flatten()
+                .filter_map(|r| {
+                    Some((
+                        r["typeCompiledIndex"].as_u64()? as usize,
+                        r["name"].as_str()?.to_owned(),
+                    ))
+                })
+                .collect(),
             boxed_int32_display: report.is_some_and(|r| r["boxedInt32Display"] == true),
-            descriptor_queries: report.and_then(|r| r["nativeBindings"].as_array()).into_iter().flatten()
-                .filter(|r| matches!(r["implementation"].as_str(), Some("type-name-closed-v1" | "type-argument-count-closed-v1" | "type-argument-closed-v1" | "type-shape-closed-v1" | "reflection-construction-retained-v1" | "reflection-array-closed-v1" | "reflection-property-retained-v1" | "reflection-snapshot-retained-v1" | "reflection-collection-retained-v1")))
-                .filter_map(|r| r["compiledIndex"].as_u64().map(|i| i as usize)).collect(),
-            reflection_array_sites: report.and_then(|r| r["nativeBindings"].as_array()).into_iter().flatten()
-                .filter(|r| matches!(r["implementation"].as_str(), Some("reflection-array-closed-v1" | "reflection-property-retained-v1")))
-                .flat_map(|r| r["instructionMap"].as_array().unwrap().iter().map(move |s|
-                    ((r["compiledIndex"].as_u64().unwrap() as usize, s["instruction"].as_u64().unwrap() as usize),s["adapterInstruction"].as_u64().unwrap() as usize))).collect(),
-            reflection_construction: report.and_then(|r| r["nativeBindings"].as_array()).into_iter().flatten()
-                .filter(|r| r["implementation"] == "reflection-construction-retained-v1" && r["name"] == "neoCLR.Runtime.ReflectionConstruct")
-                .filter_map(|r| r["compiledIndex"].as_u64().map(|i| i as usize)).collect(),
-            object_type_queries: report.and_then(|r| r["nativeBindings"].as_array()).into_iter().flatten()
+            descriptor_queries: report
+                .and_then(|r| r["nativeBindings"].as_array())
+                .into_iter()
+                .flatten()
+                .filter(|r| {
+                    matches!(
+                        r["implementation"].as_str(),
+                        Some(
+                            "type-name-closed-v1"
+                                | "type-argument-count-closed-v1"
+                                | "type-argument-closed-v1"
+                                | "type-shape-closed-v1"
+                                | "reflection-construction-retained-v1"
+                                | "reflection-array-closed-v1"
+                                | "reflection-property-retained-v1"
+                                | "reflection-snapshot-retained-v1"
+                                | "reflection-collection-retained-v1"
+                        )
+                    )
+                })
+                .filter_map(|r| r["compiledIndex"].as_u64().map(|i| i as usize))
+                .collect(),
+            reflection_array_sites: report
+                .and_then(|r| r["nativeBindings"].as_array())
+                .into_iter()
+                .flatten()
+                .filter(|r| {
+                    matches!(
+                        r["implementation"].as_str(),
+                        Some("reflection-array-closed-v1" | "reflection-property-retained-v1")
+                    )
+                })
+                .flat_map(|r| {
+                    r["instructionMap"]
+                        .as_array()
+                        .unwrap()
+                        .iter()
+                        .map(move |s| {
+                            (
+                                (
+                                    r["compiledIndex"].as_u64().unwrap() as usize,
+                                    s["instruction"].as_u64().unwrap() as usize,
+                                ),
+                                s["adapterInstruction"].as_u64().unwrap() as usize,
+                            )
+                        })
+                })
+                .collect(),
+            reflection_construction: report
+                .and_then(|r| r["nativeBindings"].as_array())
+                .into_iter()
+                .flatten()
+                .filter(|r| {
+                    r["implementation"] == "reflection-construction-retained-v1"
+                        && r["name"] == "neoCLR.Runtime.ReflectionConstruct"
+                })
+                .filter_map(|r| r["compiledIndex"].as_u64().map(|i| i as usize))
+                .collect(),
+            object_type_queries: report
+                .and_then(|r| r["nativeBindings"].as_array())
+                .into_iter()
+                .flatten()
                 .filter(|r| r["implementation"] == "object-type-closed-v1")
-                .map(|r| (r["compiledIndex"].as_u64().unwrap() as usize, r["targets"].as_array().unwrap().iter()
-                    .map(|t| (t["typeCompiledIndex"].as_u64().unwrap() as usize, serde_json::from_value(t["token"].clone()).unwrap())).collect())).collect(),
-            scalar_box_queries: report.and_then(|r| r["scalarBoxQueries"].as_array()).into_iter().flatten()
-                .filter_map(|r| Some((r["helperCompiledIndex"].as_u64()? as usize, (r["typeCompiledIndex"].as_u64().map(|v| v as usize), r["unbox"].as_bool()?)))).collect(),
-            boolean_boxes: report.and_then(|r| r["booleanBoxes"].as_array()).into_iter().flatten()
-                .filter_map(|r| Some((r["helperCompiledIndex"].as_u64()? as usize, r["typeCompiledIndex"].as_u64()? as usize))).collect(),
-            int64_boxes: report.and_then(|r| r["int64Boxes"].as_array()).into_iter().flatten()
-                .filter_map(|r| Some((r["helperCompiledIndex"].as_u64()? as usize, r["typeCompiledIndex"].as_u64()? as usize))).collect(),
-            int32_boxes: report.and_then(|r| r["int32Boxes"].as_array()).into_iter().flatten()
-                .filter_map(|r| Some((r["helperCompiledIndex"].as_u64()? as usize, r["typeCompiledIndex"].as_u64()? as usize))).collect(),
-            empty_record_boxes: report.and_then(|r| r["emptyRecordBoxes"].as_array()).into_iter().flatten()
-                .filter_map(|r| Some((r["helperCompiledIndex"].as_u64()? as usize, r["typeCompiledIndex"].as_u64()? as usize))).collect(),
+                .map(|r| {
+                    (
+                        r["compiledIndex"].as_u64().unwrap() as usize,
+                        r["targets"]
+                            .as_array()
+                            .unwrap()
+                            .iter()
+                            .map(|t| {
+                                (
+                                    t["typeCompiledIndex"].as_u64().unwrap() as usize,
+                                    serde_json::from_value(t["token"].clone()).unwrap(),
+                                )
+                            })
+                            .collect(),
+                    )
+                })
+                .collect(),
+            scalar_box_queries: report
+                .and_then(|r| r["scalarBoxQueries"].as_array())
+                .into_iter()
+                .flatten()
+                .filter_map(|r| {
+                    Some((
+                        r["helperCompiledIndex"].as_u64()? as usize,
+                        (
+                            r["typeCompiledIndex"].as_u64().map(|v| v as usize),
+                            r["unbox"].as_bool()?,
+                        ),
+                    ))
+                })
+                .collect(),
+            boolean_boxes: report
+                .and_then(|r| r["booleanBoxes"].as_array())
+                .into_iter()
+                .flatten()
+                .filter_map(|r| {
+                    Some((
+                        r["helperCompiledIndex"].as_u64()? as usize,
+                        r["typeCompiledIndex"].as_u64()? as usize,
+                    ))
+                })
+                .collect(),
+            int64_boxes: report
+                .and_then(|r| r["int64Boxes"].as_array())
+                .into_iter()
+                .flatten()
+                .filter_map(|r| {
+                    Some((
+                        r["helperCompiledIndex"].as_u64()? as usize,
+                        r["typeCompiledIndex"].as_u64()? as usize,
+                    ))
+                })
+                .collect(),
+            int32_boxes: report
+                .and_then(|r| r["int32Boxes"].as_array())
+                .into_iter()
+                .flatten()
+                .filter_map(|r| {
+                    Some((
+                        r["helperCompiledIndex"].as_u64()? as usize,
+                        r["typeCompiledIndex"].as_u64()? as usize,
+                    ))
+                })
+                .collect(),
+            empty_record_boxes: report
+                .and_then(|r| r["emptyRecordBoxes"].as_array())
+                .into_iter()
+                .flatten()
+                .filter_map(|r| {
+                    Some((
+                        r["helperCompiledIndex"].as_u64()? as usize,
+                        r["typeCompiledIndex"].as_u64()? as usize,
+                    ))
+                })
+                .collect(),
             reference_arena: report.is_some_and(|r| r["referenceArena"] == true),
-            reference_array_backings: report.and_then(|r| r["referenceArrayBackingProjections"].as_array()).into_iter().flatten()
-                .filter_map(|r| r["compiledIndex"].as_u64().map(|i| i as usize)).collect(),
-            array_backing: report.and_then(|r| r["arrayBackingProjection"]["compiledIndex"].as_u64()).map(|i| i as usize),
-            object_base: report.and_then(|r| r["objectBaseProjection"]["compiledIndex"].as_u64()).map(|i| i as usize),
+            reference_array_backings: report
+                .and_then(|r| r["referenceArrayBackingProjections"].as_array())
+                .into_iter()
+                .flatten()
+                .filter_map(|r| r["compiledIndex"].as_u64().map(|i| i as usize))
+                .collect(),
+            array_backing: report
+                .and_then(|r| r["arrayBackingProjection"]["compiledIndex"].as_u64())
+                .map(|i| i as usize),
+            object_base: report
+                .and_then(|r| r["objectBaseProjection"]["compiledIndex"].as_u64())
+                .map(|i| i as usize),
             frame_names: report
                 .and_then(|r| r["functions"].as_array())
                 .into_iter()
@@ -205,328 +384,675 @@ impl Options {
                     ))
                 })
                 .collect(),
-            dns_lookup: report.and_then(|r| r["nativeBindings"].as_array()).into_iter().flatten()
+            dns_lookup: report
+                .and_then(|r| r["nativeBindings"].as_array())
+                .into_iter()
+                .flatten()
                 .filter(|r| r["implementation"] == "dns-lookup-v1")
-                .filter_map(|r| r["compiledIndex"].as_u64().map(|i| i as usize)).collect(),
-            dns_lookup_until: report.and_then(|r| r["nativeBindings"].as_array()).into_iter().flatten()
+                .filter_map(|r| r["compiledIndex"].as_u64().map(|i| i as usize))
+                .collect(),
+            dns_lookup_until: report
+                .and_then(|r| r["nativeBindings"].as_array())
+                .into_iter()
+                .flatten()
                 .filter(|r| r["implementation"] == "dns-lookup-until-v1")
-                .filter_map(|r| r["compiledIndex"].as_u64().map(|i| i as usize)).collect(),
-            dns_cancel: report.and_then(|r| r["nativeBindings"].as_array()).into_iter().flatten()
+                .filter_map(|r| r["compiledIndex"].as_u64().map(|i| i as usize))
+                .collect(),
+            dns_cancel: report
+                .and_then(|r| r["nativeBindings"].as_array())
+                .into_iter()
+                .flatten()
                 .filter(|r| r["implementation"] == "dns-cancel-v1")
-                .filter_map(|r| r["compiledIndex"].as_u64().map(|i| i as usize)).collect(),
-            dns_result: report.and_then(|r| r["nativeBindings"].as_array()).into_iter().flatten()
+                .filter_map(|r| r["compiledIndex"].as_u64().map(|i| i as usize))
+                .collect(),
+            dns_result: report
+                .and_then(|r| r["nativeBindings"].as_array())
+                .into_iter()
+                .flatten()
                 .filter(|r| r["implementation"] == "dns-result-v1")
-                .filter_map(|r| r["compiledIndex"].as_u64().map(|i| i as usize)).collect(),
-            dns_addresses: report.and_then(|r| r["nativeBindings"].as_array()).into_iter().flatten()
+                .filter_map(|r| r["compiledIndex"].as_u64().map(|i| i as usize))
+                .collect(),
+            dns_addresses: report
+                .and_then(|r| r["nativeBindings"].as_array())
+                .into_iter()
+                .flatten()
                 .filter(|r| r["implementation"] == "dns-addresses-v1")
-                .filter_map(|r| r["compiledIndex"].as_u64().map(|i| i as usize)).collect(),
-            socket_connect: report.and_then(|r| r["nativeBindings"].as_array()).into_iter().flatten()
+                .filter_map(|r| r["compiledIndex"].as_u64().map(|i| i as usize))
+                .collect(),
+            socket_connect: report
+                .and_then(|r| r["nativeBindings"].as_array())
+                .into_iter()
+                .flatten()
                 .filter(|r| r["implementation"] == "socket-connect-v1")
-                .filter_map(|r| r["compiledIndex"].as_u64().map(|i| i as usize)).collect(),
-            socket_connect_addresses: report.and_then(|r| r["nativeBindings"].as_array()).into_iter().flatten()
+                .filter_map(|r| r["compiledIndex"].as_u64().map(|i| i as usize))
+                .collect(),
+            socket_connect_addresses: report
+                .and_then(|r| r["nativeBindings"].as_array())
+                .into_iter()
+                .flatten()
                 .filter(|r| r["implementation"] == "socket-connect-addresses-v1")
-                .filter_map(|r| r["compiledIndex"].as_u64().map(|i| i as usize)).collect(),
-            socket_connect_addresses_until: report.and_then(|r| r["nativeBindings"].as_array()).into_iter().flatten()
+                .filter_map(|r| r["compiledIndex"].as_u64().map(|i| i as usize))
+                .collect(),
+            socket_connect_addresses_until: report
+                .and_then(|r| r["nativeBindings"].as_array())
+                .into_iter()
+                .flatten()
                 .filter(|r| r["implementation"] == "socket-connect-addresses-until-v1")
-                .filter_map(|r| r["compiledIndex"].as_u64().map(|i| i as usize)).collect(),
-            socket_accept: report.and_then(|r| r["nativeBindings"].as_array()).into_iter().flatten()
+                .filter_map(|r| r["compiledIndex"].as_u64().map(|i| i as usize))
+                .collect(),
+            socket_accept: report
+                .and_then(|r| r["nativeBindings"].as_array())
+                .into_iter()
+                .flatten()
                 .filter(|r| r["implementation"] == "socket-accept-v1")
-                .filter_map(|r| r["compiledIndex"].as_u64().map(|i| i as usize)).collect(),
-            socket_connect_result: report.and_then(|r| r["nativeBindings"].as_array()).into_iter().flatten()
+                .filter_map(|r| r["compiledIndex"].as_u64().map(|i| i as usize))
+                .collect(),
+            socket_connect_result: report
+                .and_then(|r| r["nativeBindings"].as_array())
+                .into_iter()
+                .flatten()
                 .filter(|r| r["implementation"] == "socket-connect-result-v1")
-                .filter_map(|r| r["compiledIndex"].as_u64().map(|i| i as usize)).collect(),
-            socket_cancel: report.and_then(|r| r["nativeBindings"].as_array()).into_iter().flatten()
+                .filter_map(|r| r["compiledIndex"].as_u64().map(|i| i as usize))
+                .collect(),
+            socket_cancel: report
+                .and_then(|r| r["nativeBindings"].as_array())
+                .into_iter()
+                .flatten()
                 .filter(|r| r["implementation"] == "socket-cancel-v1")
-                .filter_map(|r| r["compiledIndex"].as_u64().map(|i| i as usize)).collect(),
-            scheduler_register: report.and_then(|r| r["nativeBindings"].as_array()).into_iter().flatten()
+                .filter_map(|r| r["compiledIndex"].as_u64().map(|i| i as usize))
+                .collect(),
+            scheduler_register: report
+                .and_then(|r| r["nativeBindings"].as_array())
+                .into_iter()
+                .flatten()
                 .filter(|r| r["implementation"] == "scheduler-register-v1")
-                .filter_map(|r| r["compiledIndex"].as_u64().map(|i| i as usize)).collect(),
-            scheduler_activate: report.and_then(|r| r["nativeBindings"].as_array()).into_iter().flatten()
+                .filter_map(|r| r["compiledIndex"].as_u64().map(|i| i as usize))
+                .collect(),
+            scheduler_activate: report
+                .and_then(|r| r["nativeBindings"].as_array())
+                .into_iter()
+                .flatten()
                 .filter(|r| r["implementation"] == "scheduler-activate-v1")
-                .filter_map(|r| r["compiledIndex"].as_u64().map(|i| i as usize)).collect(),
-            scheduler_cancel: report.and_then(|r| r["nativeBindings"].as_array()).into_iter().flatten()
+                .filter_map(|r| r["compiledIndex"].as_u64().map(|i| i as usize))
+                .collect(),
+            scheduler_cancel: report
+                .and_then(|r| r["nativeBindings"].as_array())
+                .into_iter()
+                .flatten()
                 .filter(|r| r["implementation"] == "scheduler-cancel-v1")
-                .filter_map(|r| r["compiledIndex"].as_u64().map(|i| i as usize)).collect(),
-            scheduler_capture: report.and_then(|r| r["nativeBindings"].as_array()).into_iter().flatten()
+                .filter_map(|r| r["compiledIndex"].as_u64().map(|i| i as usize))
+                .collect(),
+            scheduler_capture: report
+                .and_then(|r| r["nativeBindings"].as_array())
+                .into_iter()
+                .flatten()
                 .filter(|r| r["implementation"] == "scheduler-capture-v1")
-                .filter_map(|r| r["compiledIndex"].as_u64().map(|i| i as usize)).collect(),
-            scheduler_submit_to: report.and_then(|r| r["nativeBindings"].as_array()).into_iter().flatten()
+                .filter_map(|r| r["compiledIndex"].as_u64().map(|i| i as usize))
+                .collect(),
+            scheduler_submit_to: report
+                .and_then(|r| r["nativeBindings"].as_array())
+                .into_iter()
+                .flatten()
                 .filter(|r| r["implementation"] == "scheduler-submit-to-v1")
-                .filter_map(|r| r["compiledIndex"].as_u64().map(|i| i as usize)).collect(),
-            task_schedule: report.and_then(|r| r["nativeBindings"].as_array()).into_iter().flatten()
+                .filter_map(|r| r["compiledIndex"].as_u64().map(|i| i as usize))
+                .collect(),
+            task_schedule: report
+                .and_then(|r| r["nativeBindings"].as_array())
+                .into_iter()
+                .flatten()
                 .filter(|r| r["implementation"] == "task-schedule-v1")
-                .filter_map(|r| r["compiledIndex"].as_u64().map(|i| i as usize)).collect(),
-            scheduler_submit: report.and_then(|r| r["nativeBindings"].as_array()).into_iter().flatten()
+                .filter_map(|r| r["compiledIndex"].as_u64().map(|i| i as usize))
+                .collect(),
+            scheduler_submit: report
+                .and_then(|r| r["nativeBindings"].as_array())
+                .into_iter()
+                .flatten()
                 .filter(|r| r["implementation"] == "scheduler-submit-v1")
-                .filter_map(|r| r["compiledIndex"].as_u64().map(|i| i as usize)).collect(),
-            stack_trace_capture: report.and_then(|r| r["nativeBindings"].as_array()).into_iter().flatten()
+                .filter_map(|r| r["compiledIndex"].as_u64().map(|i| i as usize))
+                .collect(),
+            stack_trace_capture: report
+                .and_then(|r| r["nativeBindings"].as_array())
+                .into_iter()
+                .flatten()
                 .filter(|r| r["implementation"] == "stack-trace-capture-v1")
-                .filter_map(|r| r["compiledIndex"].as_u64().map(|i| i as usize)).collect(),
-            gc_collect: report.and_then(|r| r["nativeBindings"].as_array()).into_iter().flatten()
+                .filter_map(|r| r["compiledIndex"].as_u64().map(|i| i as usize))
+                .collect(),
+            gc_collect: report
+                .and_then(|r| r["nativeBindings"].as_array())
+                .into_iter()
+                .flatten()
                 .filter(|b| b["implementation"] == "gc-collect-v1")
-                .filter_map(|b| b["compiledIndex"].as_u64().map(|v| v as usize)).collect(),
-            runtime_async_create: report.and_then(|r| r["nativeBindings"].as_array()).into_iter().flatten()
+                .filter_map(|b| b["compiledIndex"].as_u64().map(|v| v as usize))
+                .collect(),
+            runtime_async_create: report
+                .and_then(|r| r["nativeBindings"].as_array())
+                .into_iter()
+                .flatten()
                 .filter(|b| b["implementation"] == "runtime-async-create-v1")
-                .filter_map(|b| b["compiledIndex"].as_u64().map(|v| v as usize)).collect(),
-            runtime_async_startmanaged: report.and_then(|r| r["nativeBindings"].as_array()).into_iter().flatten()
+                .filter_map(|b| b["compiledIndex"].as_u64().map(|v| v as usize))
+                .collect(),
+            runtime_async_startmanaged: report
+                .and_then(|r| r["nativeBindings"].as_array())
+                .into_iter()
+                .flatten()
                 .filter(|b| b["implementation"] == "runtime-async-startmanaged-v1")
-                .filter_map(|b| b["compiledIndex"].as_u64().map(|v| v as usize)).collect(),
-            runtime_async_createowned: report.and_then(|r| r["nativeBindings"].as_array()).into_iter().flatten()
+                .filter_map(|b| b["compiledIndex"].as_u64().map(|v| v as usize))
+                .collect(),
+            runtime_async_createowned: report
+                .and_then(|r| r["nativeBindings"].as_array())
+                .into_iter()
+                .flatten()
                 .filter(|b| b["implementation"] == "runtime-async-createowned-v1")
-                .filter_map(|b| b["compiledIndex"].as_u64().map(|v| v as usize)).collect(),
-            runtime_async_currentowner: report.and_then(|r| r["nativeBindings"].as_array()).into_iter().flatten()
+                .filter_map(|b| b["compiledIndex"].as_u64().map(|v| v as usize))
+                .collect(),
+            runtime_async_currentowner: report
+                .and_then(|r| r["nativeBindings"].as_array())
+                .into_iter()
+                .flatten()
                 .filter(|b| b["implementation"] == "runtime-async-currentowner-v1")
-                .filter_map(|b| b["compiledIndex"].as_u64().map(|v| v as usize)).collect(),
-            runtime_async_start: report.and_then(|r| r["nativeBindings"].as_array()).into_iter().flatten()
+                .filter_map(|b| b["compiledIndex"].as_u64().map(|v| v as usize))
+                .collect(),
+            runtime_async_start: report
+                .and_then(|r| r["nativeBindings"].as_array())
+                .into_iter()
+                .flatten()
                 .filter(|b| b["implementation"] == "runtime-async-start-v1")
-                .filter_map(|b| b["compiledIndex"].as_u64().map(|v| v as usize)).collect(),
-            runtime_async_completeunit: report.and_then(|r| r["nativeBindings"].as_array()).into_iter().flatten()
+                .filter_map(|b| b["compiledIndex"].as_u64().map(|v| v as usize))
+                .collect(),
+            runtime_async_completeunit: report
+                .and_then(|r| r["nativeBindings"].as_array())
+                .into_iter()
+                .flatten()
                 .filter(|b| b["implementation"] == "runtime-async-completeunit-v1")
-                .filter_map(|b| b["compiledIndex"].as_u64().map(|v| v as usize)).collect(),
-            runtime_async_awaitunit: report.and_then(|r| r["nativeBindings"].as_array()).into_iter().flatten()
+                .filter_map(|b| b["compiledIndex"].as_u64().map(|v| v as usize))
+                .collect(),
+            runtime_async_awaitunit: report
+                .and_then(|r| r["nativeBindings"].as_array())
+                .into_iter()
+                .flatten()
                 .filter(|b| b["implementation"] == "runtime-async-awaitunit-v1")
-                .filter_map(|b| b["compiledIndex"].as_u64().map(|v| v as usize)).collect(),
-            runtime_async_release: report.and_then(|r| r["nativeBindings"].as_array()).into_iter().flatten()
+                .filter_map(|b| b["compiledIndex"].as_u64().map(|v| v as usize))
+                .collect(),
+            runtime_async_release: report
+                .and_then(|r| r["nativeBindings"].as_array())
+                .into_iter()
+                .flatten()
                 .filter(|b| b["implementation"] == "runtime-async-release-v1")
-                .filter_map(|b| b["compiledIndex"].as_u64().map(|v| v as usize)).collect(),
-            runtime_async_iscompleted: report.and_then(|r| r["nativeBindings"].as_array()).into_iter().flatten()
+                .filter_map(|b| b["compiledIndex"].as_u64().map(|v| v as usize))
+                .collect(),
+            runtime_async_iscompleted: report
+                .and_then(|r| r["nativeBindings"].as_array())
+                .into_iter()
+                .flatten()
                 .filter(|b| b["implementation"] == "runtime-async-iscompleted-v1")
-                .filter_map(|b| b["compiledIndex"].as_u64().map(|v| v as usize)).collect(),
-            runtime_async_waitcompletion: report.and_then(|r| r["nativeBindings"].as_array()).into_iter().flatten()
+                .filter_map(|b| b["compiledIndex"].as_u64().map(|v| v as usize))
+                .collect(),
+            runtime_async_waitcompletion: report
+                .and_then(|r| r["nativeBindings"].as_array())
+                .into_iter()
+                .flatten()
                 .filter(|b| b["implementation"] == "runtime-async-waitcompletion-v1")
-                .filter_map(|b| b["compiledIndex"].as_u64().map(|v| v as usize)).collect(),
-            timer_start: report.and_then(|r| r["nativeBindings"].as_array()).into_iter().flatten()
+                .filter_map(|b| b["compiledIndex"].as_u64().map(|v| v as usize))
+                .collect(),
+            timer_start: report
+                .and_then(|r| r["nativeBindings"].as_array())
+                .into_iter()
+                .flatten()
                 .filter(|r| r["implementation"] == "timer-start-v1")
-                .filter_map(|r| r["compiledIndex"].as_u64().map(|i| i as usize)).collect(),
-            timer_cancel: report.and_then(|r| r["nativeBindings"].as_array()).into_iter().flatten()
+                .filter_map(|r| r["compiledIndex"].as_u64().map(|i| i as usize))
+                .collect(),
+            timer_cancel: report
+                .and_then(|r| r["nativeBindings"].as_array())
+                .into_iter()
+                .flatten()
                 .filter(|r| r["implementation"] == "timer-cancel-v1")
-                .filter_map(|r| r["compiledIndex"].as_u64().map(|i| i as usize)).collect(),
-            socket_deadline_after: report.and_then(|r| r["nativeBindings"].as_array()).into_iter().flatten()
+                .filter_map(|r| r["compiledIndex"].as_u64().map(|i| i as usize))
+                .collect(),
+            socket_deadline_after: report
+                .and_then(|r| r["nativeBindings"].as_array())
+                .into_iter()
+                .flatten()
                 .filter(|r| r["implementation"] == "socket-deadline-after-v1")
-                .filter_map(|r| r["compiledIndex"].as_u64().map(|i| i as usize)).collect(),
-            socket_deadline_expired: report.and_then(|r| r["nativeBindings"].as_array()).into_iter().flatten()
+                .filter_map(|r| r["compiledIndex"].as_u64().map(|i| i as usize))
+                .collect(),
+            socket_deadline_expired: report
+                .and_then(|r| r["nativeBindings"].as_array())
+                .into_iter()
+                .flatten()
                 .filter(|r| r["implementation"] == "socket-deadline-expired-v1")
-                .filter_map(|r| r["compiledIndex"].as_u64().map(|i| i as usize)).collect(),
-            socket_receive_until: report.and_then(|r| r["nativeBindings"].as_array()).into_iter().flatten()
+                .filter_map(|r| r["compiledIndex"].as_u64().map(|i| i as usize))
+                .collect(),
+            socket_receive_until: report
+                .and_then(|r| r["nativeBindings"].as_array())
+                .into_iter()
+                .flatten()
                 .filter(|r| r["implementation"] == "socket-receive-until-v1")
-                .filter_map(|r| r["compiledIndex"].as_u64().map(|i| i as usize)).collect(),
-            socket_send_until: report.and_then(|r| r["nativeBindings"].as_array()).into_iter().flatten()
+                .filter_map(|r| r["compiledIndex"].as_u64().map(|i| i as usize))
+                .collect(),
+            socket_send_until: report
+                .and_then(|r| r["nativeBindings"].as_array())
+                .into_iter()
+                .flatten()
                 .filter(|r| r["implementation"] == "socket-send-until-v1")
-                .filter_map(|r| r["compiledIndex"].as_u64().map(|i| i as usize)).collect(),
-            socket_receive: report.and_then(|r| r["nativeBindings"].as_array()).into_iter().flatten()
+                .filter_map(|r| r["compiledIndex"].as_u64().map(|i| i as usize))
+                .collect(),
+            socket_receive: report
+                .and_then(|r| r["nativeBindings"].as_array())
+                .into_iter()
+                .flatten()
                 .filter(|r| r["implementation"] == "socket-receive-v1")
-                .filter_map(|r| r["compiledIndex"].as_u64().map(|i| i as usize)).collect(),
-            socket_transfer_result: report.and_then(|r| r["nativeBindings"].as_array()).into_iter().flatten()
+                .filter_map(|r| r["compiledIndex"].as_u64().map(|i| i as usize))
+                .collect(),
+            socket_transfer_result: report
+                .and_then(|r| r["nativeBindings"].as_array())
+                .into_iter()
+                .flatten()
                 .filter(|r| r["implementation"] == "socket-transfer-result-v1")
-                .filter_map(|r| r["compiledIndex"].as_u64().map(|i| i as usize)).collect(),
-            socket_send: report.and_then(|r| r["nativeBindings"].as_array()).into_iter().flatten()
+                .filter_map(|r| r["compiledIndex"].as_u64().map(|i| i as usize))
+                .collect(),
+            socket_send: report
+                .and_then(|r| r["nativeBindings"].as_array())
+                .into_iter()
+                .flatten()
                 .filter(|r| r["implementation"] == "socket-send-v1")
-                .filter_map(|r| r["compiledIndex"].as_u64().map(|i| i as usize)).collect(),
-            entry_host_io: report.and_then(|r| r["nativeBindings"].as_array()).is_some_and(|rows|
-                rows.iter().any(|r| r["implementation"] == "entry-task-drain-v1" && r["requiresHostIo"] == true)),
-            entry_task_drain: report.and_then(|r| r["nativeBindings"].as_array()).into_iter().flatten()
+                .filter_map(|r| r["compiledIndex"].as_u64().map(|i| i as usize))
+                .collect(),
+            entry_host_io: report
+                .and_then(|r| r["nativeBindings"].as_array())
+                .is_some_and(|rows| {
+                    rows.iter().any(|r| {
+                        r["implementation"] == "entry-task-drain-v1" && r["requiresHostIo"] == true
+                    })
+                }),
+            entry_task_drain: report
+                .and_then(|r| r["nativeBindings"].as_array())
+                .into_iter()
+                .flatten()
                 .filter(|r| r["implementation"] == "entry-task-drain-v1")
-                .filter_map(|r| r["compiledIndex"].as_u64().map(|i| i as usize)).collect(),
-            task_queue_register: report.and_then(|r| r["nativeBindings"].as_array()).into_iter().flatten()
+                .filter_map(|r| r["compiledIndex"].as_u64().map(|i| i as usize))
+                .collect(),
+            task_queue_register: report
+                .and_then(|r| r["nativeBindings"].as_array())
+                .into_iter()
+                .flatten()
                 .filter(|r| r["implementation"] == "task-queue-register-v1")
-                .filter_map(|r| r["compiledIndex"].as_u64().map(|i| i as usize)).collect(),
-            task_queue_default: report.and_then(|r| r["nativeBindings"].as_array()).into_iter().flatten()
+                .filter_map(|r| r["compiledIndex"].as_u64().map(|i| i as usize))
+                .collect(),
+            task_queue_default: report
+                .and_then(|r| r["nativeBindings"].as_array())
+                .into_iter()
+                .flatten()
                 .filter(|r| r["implementation"] == "task-queue-default-v1")
-                .filter_map(|r| r["compiledIndex"].as_u64().map(|i| i as usize)).collect(),
-            task_queue_current: report.and_then(|r| r["nativeBindings"].as_array()).into_iter().flatten()
+                .filter_map(|r| r["compiledIndex"].as_u64().map(|i| i as usize))
+                .collect(),
+            task_queue_current: report
+                .and_then(|r| r["nativeBindings"].as_array())
+                .into_iter()
+                .flatten()
                 .filter(|r| r["implementation"] == "task-queue-current-v1")
-                .filter_map(|r| r["compiledIndex"].as_u64().map(|i| i as usize)).collect(),
-            task_queue_run: report.and_then(|r| r["taskQueueFrames"]["Run"].as_u64()).map(|i| i as usize),
-            task_queue_drain: report.and_then(|r| r["taskQueueFrames"]["Drain"].as_u64()).map(|i| i as usize),
-            socket_listen: report.and_then(|r| r["nativeBindings"].as_array()).into_iter().flatten()
+                .filter_map(|r| r["compiledIndex"].as_u64().map(|i| i as usize))
+                .collect(),
+            task_queue_run: report
+                .and_then(|r| r["taskQueueFrames"]["Run"].as_u64())
+                .map(|i| i as usize),
+            task_queue_drain: report
+                .and_then(|r| r["taskQueueFrames"]["Drain"].as_u64())
+                .map(|i| i as usize),
+            socket_listen: report
+                .and_then(|r| r["nativeBindings"].as_array())
+                .into_iter()
+                .flatten()
                 .filter(|r| r["implementation"] == "socket-listen-v1")
-                .filter_map(|r| r["compiledIndex"].as_u64().map(|i| i as usize)).collect(),
-            socket_local_port: report.and_then(|r| r["nativeBindings"].as_array()).into_iter().flatten()
+                .filter_map(|r| r["compiledIndex"].as_u64().map(|i| i as usize))
+                .collect(),
+            socket_local_port: report
+                .and_then(|r| r["nativeBindings"].as_array())
+                .into_iter()
+                .flatten()
                 .filter(|r| r["implementation"] == "socket-local-port-v1")
-                .filter_map(|r| r["compiledIndex"].as_u64().map(|i| i as usize)).collect(),
-            socket_close: report.and_then(|r| r["nativeBindings"].as_array()).into_iter().flatten()
+                .filter_map(|r| r["compiledIndex"].as_u64().map(|i| i as usize))
+                .collect(),
+            socket_close: report
+                .and_then(|r| r["nativeBindings"].as_array())
+                .into_iter()
+                .flatten()
                 .filter(|r| r["implementation"] == "socket-close-v1")
-                .filter_map(|r| r["compiledIndex"].as_u64().map(|i| i as usize)).collect(),
+                .filter_map(|r| r["compiledIndex"].as_u64().map(|i| i as usize))
+                .collect(),
             console_write_line: report
                 .and_then(|r| r["nativeBindings"].as_array())
-                .into_iter().flatten()
+                .into_iter()
+                .flatten()
                 .filter(|r| r["implementation"] == "console-write-line-v1")
                 .filter_map(|r| r["compiledIndex"].as_u64().map(|i| i as usize))
                 .collect(),
             console_write_bytes: report
                 .and_then(|r| r["nativeBindings"].as_array())
-                .into_iter().flatten()
+                .into_iter()
+                .flatten()
                 .filter(|r| r["implementation"] == "console-write-bytes-v1")
                 .filter_map(|r| r["compiledIndex"].as_u64().map(|i| i as usize))
                 .collect(),
-            cryptography: report.and_then(|r| r["nativeBindings"].as_array()).into_iter().flatten()
+            cryptography: report
+                .and_then(|r| r["nativeBindings"].as_array())
+                .into_iter()
+                .flatten()
                 .filter(|r| r["implementation"] == "cryptography-v1")
-                .filter_map(|r| Some((r["compiledIndex"].as_u64()? as usize, r["operation"].as_i64()? as i32))).collect(),
-            tls: report.and_then(|r| r["nativeBindings"].as_array()).into_iter().flatten()
+                .filter_map(|r| {
+                    Some((
+                        r["compiledIndex"].as_u64()? as usize,
+                        r["operation"].as_i64()? as i32,
+                    ))
+                })
+                .collect(),
+            tls: report
+                .and_then(|r| r["nativeBindings"].as_array())
+                .into_iter()
+                .flatten()
                 .filter(|r| r["implementation"] == "tls-v1")
-                .filter_map(|r| Some((r["compiledIndex"].as_u64()? as usize, r["operation"].as_i64()? as i32))).collect(),
+                .filter_map(|r| {
+                    Some((
+                        r["compiledIndex"].as_u64()? as usize,
+                        r["operation"].as_i64()? as i32,
+                    ))
+                })
+                .collect(),
             console_flush: report
                 .and_then(|r| r["nativeBindings"].as_array())
-                .into_iter().flatten()
+                .into_iter()
+                .flatten()
                 .filter(|r| r["implementation"] == "console-flush-v1")
                 .filter_map(|r| r["compiledIndex"].as_u64().map(|i| i as usize))
                 .collect(),
             utf8_decode: report
                 .and_then(|r| r["nativeBindings"].as_array())
-                .into_iter().flatten()
+                .into_iter()
+                .flatten()
                 .filter(|r| r["implementation"] == "utf8-decode-v1")
                 .filter_map(|r| r["compiledIndex"].as_u64().map(|i| i as usize))
                 .collect(),
             utf8_encode: report
                 .and_then(|r| r["nativeBindings"].as_array())
-                .into_iter().flatten()
+                .into_iter()
+                .flatten()
                 .filter(|r| r["implementation"] == "utf8-encode-v1")
                 .filter_map(|r| r["compiledIndex"].as_u64().map(|i| i as usize))
                 .collect(),
-            file_output: report.and_then(|r| r["nativeBindings"].as_array()).into_iter().flatten()
+            file_output: report
+                .and_then(|r| r["nativeBindings"].as_array())
+                .into_iter()
+                .flatten()
                 .filter(|r| r["implementation"] == "file-write-utf8-v1")
-                .filter_map(|r| r["compiledIndex"].as_u64().map(|i| i as usize)).collect(),
-            file_input: report.and_then(|r| r["nativeBindings"].as_array()).into_iter().flatten()
+                .filter_map(|r| r["compiledIndex"].as_u64().map(|i| i as usize))
+                .collect(),
+            file_input: report
+                .and_then(|r| r["nativeBindings"].as_array())
+                .into_iter()
+                .flatten()
                 .filter(|r| r["implementation"] == "file-read-utf8-v1")
-                .filter_map(|r| r["compiledIndex"].as_u64().map(|i| i as usize)).collect(),
-            path_combine: report.and_then(|r| r["nativeBindings"].as_array()).into_iter().flatten()
+                .filter_map(|r| r["compiledIndex"].as_u64().map(|i| i as usize))
+                .collect(),
+            path_combine: report
+                .and_then(|r| r["nativeBindings"].as_array())
+                .into_iter()
+                .flatten()
                 .filter(|r| r["implementation"] == "path-combine-unix-v1")
-                .filter_map(|r| r["compiledIndex"].as_u64().map(|i| i as usize)).collect(),
-            path_file_name: report.and_then(|r| r["nativeBindings"].as_array()).into_iter().flatten()
+                .filter_map(|r| r["compiledIndex"].as_u64().map(|i| i as usize))
+                .collect(),
+            path_file_name: report
+                .and_then(|r| r["nativeBindings"].as_array())
+                .into_iter()
+                .flatten()
                 .filter(|r| r["implementation"] == "path-file-name-unix-v1")
-                .filter_map(|r| r["compiledIndex"].as_u64().map(|i| i as usize)).collect(),
-            string_compare_ordinal: report.and_then(|r| r["nativeBindings"].as_array()).into_iter().flatten()
+                .filter_map(|r| r["compiledIndex"].as_u64().map(|i| i as usize))
+                .collect(),
+            string_compare_ordinal: report
+                .and_then(|r| r["nativeBindings"].as_array())
+                .into_iter()
+                .flatten()
                 .filter(|r| r["implementation"] == "string-compare-ordinal-v1")
-                .filter_map(|r| r["compiledIndex"].as_u64().map(|i| i as usize)).collect(),
-            string_contains_ordinal: report.and_then(|r| r["nativeBindings"].as_array()).into_iter().flatten()
+                .filter_map(|r| r["compiledIndex"].as_u64().map(|i| i as usize))
+                .collect(),
+            string_contains_ordinal: report
+                .and_then(|r| r["nativeBindings"].as_array())
+                .into_iter()
+                .flatten()
                 .filter(|r| r["implementation"] == "string-contains-ordinal-v1")
-                .filter_map(|r| r["compiledIndex"].as_u64().map(|i| i as usize)).collect(),
-            string_starts_with_ordinal: report.and_then(|r| r["nativeBindings"].as_array()).into_iter().flatten()
+                .filter_map(|r| r["compiledIndex"].as_u64().map(|i| i as usize))
+                .collect(),
+            string_starts_with_ordinal: report
+                .and_then(|r| r["nativeBindings"].as_array())
+                .into_iter()
+                .flatten()
                 .filter(|r| r["implementation"] == "string-starts-with-ordinal-v1")
-                .filter_map(|r| r["compiledIndex"].as_u64().map(|i| i as usize)).collect(),
-            string_ends_with_ordinal: report.and_then(|r| r["nativeBindings"].as_array()).into_iter().flatten()
+                .filter_map(|r| r["compiledIndex"].as_u64().map(|i| i as usize))
+                .collect(),
+            string_ends_with_ordinal: report
+                .and_then(|r| r["nativeBindings"].as_array())
+                .into_iter()
+                .flatten()
                 .filter(|r| r["implementation"] == "string-ends-with-ordinal-v1")
-                .filter_map(|r| r["compiledIndex"].as_u64().map(|i| i as usize)).collect(),
-            string_join_parts: report.and_then(|r| r["nativeBindings"].as_array()).into_iter().flatten()
+                .filter_map(|r| r["compiledIndex"].as_u64().map(|i| i as usize))
+                .collect(),
+            string_join_parts: report
+                .and_then(|r| r["nativeBindings"].as_array())
+                .into_iter()
+                .flatten()
                 .filter(|r| r["implementation"] == "string-join-parts-v1")
-                .filter_map(|r| r["compiledIndex"].as_u64().map(|i| i as usize)).collect(),
-            string_replace_ordinal: report.and_then(|r| r["nativeBindings"].as_array()).into_iter().flatten()
+                .filter_map(|r| r["compiledIndex"].as_u64().map(|i| i as usize))
+                .collect(),
+            string_replace_ordinal: report
+                .and_then(|r| r["nativeBindings"].as_array())
+                .into_iter()
+                .flatten()
                 .filter(|r| r["implementation"] == "string-replace-ordinal-v1")
-                .filter_map(|r| r["compiledIndex"].as_u64().map(|i| i as usize)).collect(),
+                .filter_map(|r| r["compiledIndex"].as_u64().map(|i| i as usize))
+                .collect(),
             string_concat: report
                 .and_then(|r| r["nativeBindings"].as_array())
-                .into_iter().flatten()
+                .into_iter()
+                .flatten()
                 .filter(|r| r["implementation"] == "string-concat-v1")
                 .filter_map(|r| r["compiledIndex"].as_u64().map(|i| i as usize))
                 .collect(),
-            string_grapheme_count: report.and_then(|r| r["nativeBindings"].as_array()).into_iter().flatten()
+            string_grapheme_count: report
+                .and_then(|r| r["nativeBindings"].as_array())
+                .into_iter()
+                .flatten()
                 .filter(|r| r["implementation"] == "string-grapheme-count-v1")
-                .filter_map(|r| r["compiledIndex"].as_u64().map(|i| i as usize)).collect(),
-            string_grapheme_at: report.and_then(|r| r["nativeBindings"].as_array()).into_iter().flatten()
+                .filter_map(|r| r["compiledIndex"].as_u64().map(|i| i as usize))
+                .collect(),
+            string_grapheme_at: report
+                .and_then(|r| r["nativeBindings"].as_array())
+                .into_iter()
+                .flatten()
                 .filter(|r| r["implementation"] == "string-grapheme-at-v1")
-                .filter_map(|r| r["compiledIndex"].as_u64().map(|i| i as usize)).collect(),
-            string_graphemes: report.and_then(|r| r["nativeBindings"].as_array()).into_iter().flatten()
+                .filter_map(|r| r["compiledIndex"].as_u64().map(|i| i as usize))
+                .collect(),
+            string_graphemes: report
+                .and_then(|r| r["nativeBindings"].as_array())
+                .into_iter()
+                .flatten()
                 .filter(|r| r["implementation"] == "string-graphemes-v1")
-                .filter_map(|r| r["compiledIndex"].as_u64().map(|i| i as usize)).collect(),
-            system_culture: report.and_then(|r| r["nativeBindings"].as_array()).into_iter().flatten()
+                .filter_map(|r| r["compiledIndex"].as_u64().map(|i| i as usize))
+                .collect(),
+            system_culture: report
+                .and_then(|r| r["nativeBindings"].as_array())
+                .into_iter()
+                .flatten()
                 .filter(|r| r["implementation"] == "system-culture-name-v1")
-                .filter_map(|r| r["compiledIndex"].as_u64().map(|i| i as usize)).collect(),
-            time_zone_exists: report.and_then(|r| r["nativeBindings"].as_array()).into_iter().flatten()
+                .filter_map(|r| r["compiledIndex"].as_u64().map(|i| i as usize))
+                .collect(),
+            time_zone_exists: report
+                .and_then(|r| r["nativeBindings"].as_array())
+                .into_iter()
+                .flatten()
                 .filter(|r| r["implementation"] == "time-zone-exists-v1")
-                .filter_map(|r| r["compiledIndex"].as_u64().map(|i| i as usize)).collect(),
-            time_zone_offset: report.and_then(|r| r["nativeBindings"].as_array()).into_iter().flatten()
+                .filter_map(|r| r["compiledIndex"].as_u64().map(|i| i as usize))
+                .collect(),
+            time_zone_offset: report
+                .and_then(|r| r["nativeBindings"].as_array())
+                .into_iter()
+                .flatten()
                 .filter(|r| r["implementation"] == "time-zone-offset-v1")
-                .filter_map(|r| r["compiledIndex"].as_u64().map(|i| i as usize)).collect(),
-            time_zone_version: report.and_then(|r| r["nativeBindings"].as_array()).into_iter().flatten()
+                .filter_map(|r| r["compiledIndex"].as_u64().map(|i| i as usize))
+                .collect(),
+            time_zone_version: report
+                .and_then(|r| r["nativeBindings"].as_array())
+                .into_iter()
+                .flatten()
                 .filter(|r| r["implementation"] == "time-zone-version-v1")
-                .filter_map(|r| r["compiledIndex"].as_u64().map(|i| i as usize)).collect(),
-            string_scalars: report.and_then(|r| r["nativeBindings"].as_array()).into_iter().flatten()
+                .filter_map(|r| r["compiledIndex"].as_u64().map(|i| i as usize))
+                .collect(),
+            string_scalars: report
+                .and_then(|r| r["nativeBindings"].as_array())
+                .into_iter()
+                .flatten()
                 .filter(|r| r["implementation"] == "string-scalars-v1")
-                .filter_map(|r| r["compiledIndex"].as_u64().map(|i| i as usize)).collect(),
-            string_from_chars: report.and_then(|r| r["nativeBindings"].as_array()).into_iter().flatten()
+                .filter_map(|r| r["compiledIndex"].as_u64().map(|i| i as usize))
+                .collect(),
+            string_from_chars: report
+                .and_then(|r| r["nativeBindings"].as_array())
+                .into_iter()
+                .flatten()
                 .filter(|r| r["implementation"] == "string-from-chars-v1")
-                .filter_map(|r| r["compiledIndex"].as_u64().map(|i| i as usize)).collect(),
-            string_upper: report.and_then(|r| r["nativeBindings"].as_array()).into_iter().flatten()
+                .filter_map(|r| r["compiledIndex"].as_u64().map(|i| i as usize))
+                .collect(),
+            string_upper: report
+                .and_then(|r| r["nativeBindings"].as_array())
+                .into_iter()
+                .flatten()
                 .filter(|r| r["implementation"] == "string-upper-v1")
-                .filter_map(|r| r["compiledIndex"].as_u64().map(|i| i as usize)).collect(),
-            string_lower: report.and_then(|r| r["nativeBindings"].as_array()).into_iter().flatten()
+                .filter_map(|r| r["compiledIndex"].as_u64().map(|i| i as usize))
+                .collect(),
+            string_lower: report
+                .and_then(|r| r["nativeBindings"].as_array())
+                .into_iter()
+                .flatten()
                 .filter(|r| r["implementation"] == "string-lower-v1")
-                .filter_map(|r| r["compiledIndex"].as_u64().map(|i| i as usize)).collect(),
-            string_compare_ignore_case: report.and_then(|r| r["nativeBindings"].as_array()).into_iter().flatten()
+                .filter_map(|r| r["compiledIndex"].as_u64().map(|i| i as usize))
+                .collect(),
+            string_compare_ignore_case: report
+                .and_then(|r| r["nativeBindings"].as_array())
+                .into_iter()
+                .flatten()
                 .filter(|r| r["implementation"] == "string-compare-ignore-case-v1")
-                .filter_map(|r| r["compiledIndex"].as_u64().map(|i| i as usize)).collect(),
-            string_hash_ordinal: report.and_then(|r| r["nativeBindings"].as_array()).into_iter().flatten()
+                .filter_map(|r| r["compiledIndex"].as_u64().map(|i| i as usize))
+                .collect(),
+            string_hash_ordinal: report
+                .and_then(|r| r["nativeBindings"].as_array())
+                .into_iter()
+                .flatten()
                 .filter(|r| r["implementation"] == "string-hash-ordinal-v1")
-                .filter_map(|r| r["compiledIndex"].as_u64().map(|i| i as usize)).collect(),
-            string_hash_ignore_case: report.and_then(|r| r["nativeBindings"].as_array()).into_iter().flatten()
+                .filter_map(|r| r["compiledIndex"].as_u64().map(|i| i as usize))
+                .collect(),
+            string_hash_ignore_case: report
+                .and_then(|r| r["nativeBindings"].as_array())
+                .into_iter()
+                .flatten()
                 .filter(|r| r["implementation"] == "string-hash-ignore-case-v1")
-                .filter_map(|r| r["compiledIndex"].as_u64().map(|i| i as usize)).collect(),
-            string_intern: report.and_then(|r| r["nativeBindings"].as_array()).into_iter().flatten()
+                .filter_map(|r| r["compiledIndex"].as_u64().map(|i| i as usize))
+                .collect(),
+            string_intern: report
+                .and_then(|r| r["nativeBindings"].as_array())
+                .into_iter()
+                .flatten()
                 .filter(|r| r["implementation"] == "string-intern-v1")
-                .filter_map(|r| r["compiledIndex"].as_u64().map(|i| i as usize)).collect(),
+                .filter_map(|r| r["compiledIndex"].as_u64().map(|i| i as usize))
+                .collect(),
             string_byte_count: report
                 .and_then(|r| r["nativeBindings"].as_array())
-                .into_iter().flatten()
+                .into_iter()
+                .flatten()
                 .filter(|r| r["implementation"] == "string-byte-count-v1")
                 .filter_map(|r| r["compiledIndex"].as_u64().map(|i| i as usize))
                 .collect(),
-            string_slice_graphemes: report.and_then(|r| r["nativeBindings"].as_array()).into_iter().flatten()
+            string_slice_graphemes: report
+                .and_then(|r| r["nativeBindings"].as_array())
+                .into_iter()
+                .flatten()
                 .filter(|r| r["implementation"] == "string-slice-graphemes-v1")
-                .filter_map(|r| r["compiledIndex"].as_u64().map(|i| i as usize)).collect(),
+                .filter_map(|r| r["compiledIndex"].as_u64().map(|i| i as usize))
+                .collect(),
             string_slice_utf8: report
                 .and_then(|r| r["nativeBindings"].as_array())
-                .into_iter().flatten()
+                .into_iter()
+                .flatten()
                 .filter(|r| r["implementation"] == "string-slice-utf8-v1")
                 .filter_map(|r| r["compiledIndex"].as_u64().map(|i| i as usize))
                 .collect(),
-            parse_int32: report.and_then(|r| r["nativeBindings"].as_array()).into_iter().flatten()
+            parse_int32: report
+                .and_then(|r| r["nativeBindings"].as_array())
+                .into_iter()
+                .flatten()
                 .filter(|r| r["implementation"] == "parse-int32-v1")
-                .filter_map(|r| r["compiledIndex"].as_u64().map(|i| i as usize)).collect(),
-            primitive_parsers: report.and_then(|r| r["nativeBindings"].as_array()).into_iter().flatten()
+                .filter_map(|r| r["compiledIndex"].as_u64().map(|i| i as usize))
+                .collect(),
+            primitive_parsers: report
+                .and_then(|r| r["nativeBindings"].as_array())
+                .into_iter()
+                .flatten()
                 .filter(|r| r["nativePrimitiveParser"] == true)
-                .filter_map(|r| Some((r["compiledIndex"].as_u64()? as usize, r["symbol"].as_str()?.to_owned()))).collect(),
-            parse_int64: report.and_then(|r| r["nativeBindings"].as_array()).into_iter().flatten()
+                .filter_map(|r| {
+                    Some((
+                        r["compiledIndex"].as_u64()? as usize,
+                        r["symbol"].as_str()?.to_owned(),
+                    ))
+                })
+                .collect(),
+            parse_int64: report
+                .and_then(|r| r["nativeBindings"].as_array())
+                .into_iter()
+                .flatten()
                 .filter(|r| r["implementation"] == "parse-int64-v1")
-                .filter_map(|r| r["compiledIndex"].as_u64().map(|i| i as usize)).collect(),
+                .filter_map(|r| r["compiledIndex"].as_u64().map(|i| i as usize))
+                .collect(),
             int32_to_string: report
                 .and_then(|r| r["nativeBindings"].as_array())
-                .into_iter().flatten()
+                .into_iter()
+                .flatten()
                 .filter(|r| r["implementation"] == "int32-to-string-v1")
                 .filter_map(|r| r["compiledIndex"].as_u64().map(|i| i as usize))
                 .collect(),
             char_from_string: report
                 .and_then(|r| r["nativeBindings"].as_array())
-                .into_iter().flatten()
+                .into_iter()
+                .flatten()
                 .filter(|r| r["implementation"] == "char-from-string-v1")
                 .filter_map(|r| r["compiledIndex"].as_u64().map(|i| i as usize))
                 .collect(),
             char_text: report
                 .and_then(|r| r["nativeBindings"].as_array())
-                .into_iter().flatten()
+                .into_iter()
+                .flatten()
                 .filter(|r| r["implementation"] == "char-text-v1")
                 .filter_map(|r| r["compiledIndex"].as_u64().map(|i| i as usize))
                 .collect(),
             int64_to_string: report
                 .and_then(|r| r["nativeBindings"].as_array())
-                .into_iter().flatten()
+                .into_iter()
+                .flatten()
                 .filter(|r| r["implementation"] == "int64-to-string-v1")
                 .filter_map(|r| r["compiledIndex"].as_u64().map(|i| i as usize))
                 .collect(),
             uint64_to_string: report
                 .and_then(|r| r["nativeBindings"].as_array())
-                .into_iter().flatten()
+                .into_iter()
+                .flatten()
                 .filter(|r| r["implementation"] == "uint64-to-string-v1")
                 .filter_map(|r| r["compiledIndex"].as_u64().map(|i| i as usize))
                 .collect(),
             native_integer_to64: report
                 .and_then(|r| r["nativeBindings"].as_array())
-                .into_iter().flatten()
+                .into_iter()
+                .flatten()
                 .filter(|r| r["implementation"] == "native-integer-to64-v1")
                 .filter_map(|r| r["compiledIndex"].as_u64().map(|i| i as usize))
                 .collect(),
             console_read_byte: report
                 .and_then(|r| r["nativeBindings"].as_array())
-                .into_iter().flatten()
+                .into_iter()
+                .flatten()
                 .filter(|r| r["implementation"] == "console-read-byte-v1")
                 .filter_map(|r| r["compiledIndex"].as_u64().map(|i| i as usize))
                 .collect(),
@@ -566,10 +1092,16 @@ impl Data {
         let mut frames = vec![];
         let mut messages = HashMap::new();
         for (i, f) in input.functions.iter().enumerate() {
-            let name = f.origin.as_ref().and_then(|o| o.full_name.as_deref()).unwrap_or_else(|| options
-                .frame_names
-                .get(&i)
-                .map_or(f.name.as_str(), String::as_str));
+            let name = f
+                .origin
+                .as_ref()
+                .and_then(|o| o.full_name.as_deref())
+                .unwrap_or_else(|| {
+                    options
+                        .frame_names
+                        .get(&i)
+                        .map_or(f.name.as_str(), String::as_str)
+                });
             let name = neoclr::diagnostic_function_name(name);
             frames.push(literal(module, &format!("fault_frame_{i}"), &name)?);
             for (pc, op) in f.body.iter().enumerate() {
@@ -581,7 +1113,9 @@ impl Data {
                 }
             }
         }
-        let frame_table = if options.stack_trace_capture.is_empty() { None } else {
+        let frame_table = if options.stack_trace_capture.is_empty() {
+            None
+        } else {
             let id = module.declare_data("stack_trace_names", Linkage::Local, false, false)?;
             let mut data = DataDescription::new();
             data.define(vec![0; frames.len() * 8].into_boxed_slice());
@@ -611,13 +1145,44 @@ impl Data {
                 "fault_runtime",
                 neoclr::FaultCode::RuntimeError.standard_message().unwrap(),
             )?,
-            literal(module, "fault_native_memory",
-                neoclr::FaultCode::NativeMemoryLimitExceeded.standard_message().unwrap())?,
-            literal(module, "fault_null_reference", neoclr::FaultCode::NullReference.standard_message().unwrap())?,
-            literal(module, "fault_array_limit", neoclr::FaultCode::ArrayLimitExceeded.standard_message().unwrap())?,
-            literal(module, "fault_index", neoclr::FaultCode::IndexOutOfRange.standard_message().unwrap())?,
-            literal(module, "fault_stack", neoclr::FaultCode::StackOverflow.standard_message().unwrap())?,
-            literal(module, "fault_intern", neoclr::FaultCode::InternPoolLimitExceeded.standard_message().unwrap())?,
+            literal(
+                module,
+                "fault_native_memory",
+                neoclr::FaultCode::NativeMemoryLimitExceeded
+                    .standard_message()
+                    .unwrap(),
+            )?,
+            literal(
+                module,
+                "fault_null_reference",
+                neoclr::FaultCode::NullReference.standard_message().unwrap(),
+            )?,
+            literal(
+                module,
+                "fault_array_limit",
+                neoclr::FaultCode::ArrayLimitExceeded
+                    .standard_message()
+                    .unwrap(),
+            )?,
+            literal(
+                module,
+                "fault_index",
+                neoclr::FaultCode::IndexOutOfRange
+                    .standard_message()
+                    .unwrap(),
+            )?,
+            literal(
+                module,
+                "fault_stack",
+                neoclr::FaultCode::StackOverflow.standard_message().unwrap(),
+            )?,
+            literal(
+                module,
+                "fault_intern",
+                neoclr::FaultCode::InternPoolLimitExceeded
+                    .standard_message()
+                    .unwrap(),
+            )?,
         ];
         Ok(Self {
             hidden_frames: options.class_dispatch_thunks.clone(),
@@ -627,9 +1192,17 @@ impl Data {
             defaults,
         })
     }
-    pub fn stack_names(&self, module: &mut impl Module, b: &mut FunctionBuilder<'_>) -> [ir::Value; 2] {
-        let global = module.declare_data_in_func(self.frame_table.expect("stack capture name table"), b.func);
-        [b.ins().global_value(types::I64, global), b.ins().iconst(types::I32, self.frames.len() as i64)]
+    pub fn stack_names(
+        &self,
+        module: &mut impl Module,
+        b: &mut FunctionBuilder<'_>,
+    ) -> [ir::Value; 2] {
+        let global = module
+            .declare_data_in_func(self.frame_table.expect("stack capture name table"), b.func);
+        [
+            b.ins().global_value(types::I64, global),
+            b.ins().iconst(types::I32, self.frames.len() as i64),
+        ]
     }
     pub fn site(
         &self,
@@ -665,7 +1238,9 @@ pub struct Site {
     pub capture_frame: bool,
 }
 impl Site {
-    pub fn remap_instruction(&mut self, pc: usize) { self.pc = pc; }
+    pub fn remap_instruction(&mut self, pc: usize) {
+        self.pc = pc;
+    }
     pub fn record(&self, b: &mut FunctionBuilder<'_>, status: ir::Value) {
         let count = b.ins().load(types::I32, MemFlags::new(), self.context, 4);
         let previous = b.ins().load(types::I32, MemFlags::new(), self.context, 0);

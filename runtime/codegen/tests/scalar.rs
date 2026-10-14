@@ -82,12 +82,17 @@ fn unsupported_or_invalid_programs_never_emit_an_object() {
             "scalar profile",
         ),
         (
-            format!("{normalized}\n.function Unused() -> Int32\nldc.i4 1\nldc.i4 0\nxor\nret\n.end\n"),
+            format!(
+                "{normalized}\n.function Unused() -> Int32\nldc.i4 1\nldc.i4 0\nxor\nret\n.end\n"
+            ),
             "unsupported instruction",
         ),
     ];
     for (source, expected) in cases {
-        assert_ne!(source, normalized, "invalid case must alter the fixture: {expected}");
+        assert_ne!(
+            source, normalized,
+            "invalid case must alter the fixture: {expected}"
+        );
         let temp = Temp::new();
         let path = temp.0.join("rejected.o");
         let result = compile(&source, &path);
@@ -101,9 +106,15 @@ fn unsupported_or_invalid_programs_never_emit_an_object() {
         #[cfg(all(target_os = "macos", target_arch = "aarch64"))]
         {
             let jit = Command::new(env!("CARGO_BIN_EXE_neoclr-codegen"))
-                .arg("--jit-scalar").arg(path.with_extension("neoil"))
-                .args(["Calculate", "0"]).output().unwrap();
-            assert!(!jit.status.success(), "invalid input must not execute through JIT");
+                .arg("--jit-scalar")
+                .arg(path.with_extension("neoil"))
+                .args(["Calculate", "0"])
+                .output()
+                .unwrap();
+            assert!(
+                !jit.status.success(),
+                "invalid input must not execute through JIT"
+            );
             assert!(jit.stdout.is_empty());
         }
     }
@@ -208,9 +219,17 @@ fn assert_native_outcomes(source: &str, inputs: &[i32], oracle: Option<&dyn Fn(i
             .output()
             .unwrap();
         let jit = Command::new(env!("CARGO_BIN_EXE_neoclr-codegen"))
-            .arg("--jit-scalar").arg(object.with_extension("neoil"))
-            .arg("Calculate").arg(input.to_string()).output().unwrap();
-        assert!(jit.status.success(), "{}", String::from_utf8_lossy(&jit.stderr));
+            .arg("--jit-scalar")
+            .arg(object.with_extension("neoil"))
+            .arg("Calculate")
+            .arg(input.to_string())
+            .output()
+            .unwrap();
+        assert!(
+            jit.status.success(),
+            "{}",
+            String::from_utf8_lossy(&jit.stderr)
+        );
         assert!(jit.stderr.is_empty());
         let jit: serde_json::Value = serde_json::from_slice(&jit.stdout).unwrap();
         assert!(jit["compileAndFinalizeSeconds"].as_f64().unwrap() >= 0.0);
@@ -250,7 +269,9 @@ fn assert_native_outcomes(source: &str, inputs: &[i32], oracle: Option<&dyn Fn(i
                 assert!(jit["value"].is_null());
                 assert!(matches!(
                     fault.code,
-                    neoclr::FaultCode::DivideByZero | neoclr::FaultCode::ArithmeticOverflow | neoclr::FaultCode::UserFault
+                    neoclr::FaultCode::DivideByZero
+                        | neoclr::FaultCode::ArithmeticOverflow
+                        | neoclr::FaultCode::UserFault
                 ));
                 assert_eq!(
                     result.status.code(),
@@ -825,16 +846,27 @@ fn explicit_user_faults_match_interpreter_and_preserve_first_fault() {
     let source = include_str!("../../../docs/experiments/aot-scalar/user-fault.neoil");
     assert_native_outcomes(source, &[0, 1, -1], None);
     // A fault discards a live operand stack and needs no return/fallthrough.
-    assert_native_outcomes(".module UserFault\n.function Calculate(Int32 value) -> Int32\nldarg value\nfault \"stop\"\n.end", &[42], None);
+    assert_native_outcomes(
+        ".module UserFault\n.function Calculate(Int32 value) -> Int32\nldarg value\nfault \"stop\"\n.end",
+        &[42],
+        None,
+    );
     // A prior arithmetic fault must not be replaced by a subsequent UserFault.
-    assert_native_outcomes(".module FirstFault\n.function Calculate(Int32 value) -> Int32\nldc.i4 1\nldarg value\ndiv\nfault \"later\"\n.end", &[0, 1], None);
+    assert_native_outcomes(
+        ".module FirstFault\n.function Calculate(Int32 value) -> Int32\nldc.i4 1\nldarg value\ndiv\nfault \"later\"\n.end",
+        &[0, 1],
+        None,
+    );
 }
 
 #[test]
 fn fault_does_not_hide_unsupported_dead_instructions() {
     let temp = Temp::new();
     let object = temp.0.join("dead.o");
-    let result = compile(".module DeadFault\n.function Calculate(Int32 value) -> Int32\nfault \"stop\"\nldc.i4 1\nldc.i4 2\nxor\nret\n.end", &object);
+    let result = compile(
+        ".module DeadFault\n.function Calculate(Int32 value) -> Int32\nfault \"stop\"\nldc.i4 1\nldc.i4 2\nxor\nret\n.end",
+        &object,
+    );
     assert!(!result.status.success());
     assert!(String::from_utf8_lossy(&result.stderr).contains("unsupported instruction"));
     assert!(!object.exists());
@@ -876,27 +908,49 @@ fn scalar_boolean_values_do_not_become_int32_operands() {
 }
 
 #[test]
-#[cfg(any(all(target_os = "macos", target_arch = "aarch64"), all(target_os = "windows", target_arch = "x86_64")))]
+#[cfg(any(
+    all(target_os = "macos", target_arch = "aarch64"),
+    all(target_os = "windows", target_arch = "x86_64")
+))]
 fn jit_parameterless_entry_and_argument_validation() {
     let temp = Temp::new();
     let input = temp.0.join("main.neoil");
-    fs::write(&input, ".module Main\n.function Main() -> Int32\nldc.i4 42\nret\n.end\n").unwrap();
+    fs::write(
+        &input,
+        ".module Main\n.function Main() -> Int32\nldc.i4 42\nret\n.end\n",
+    )
+    .unwrap();
     let result = Command::new(env!("CARGO_BIN_EXE_neoclr-codegen"))
-        .arg("--jit-scalar").arg(&input).args(["Main", "99"]).output().unwrap();
-    assert!(result.status.success(), "{}", String::from_utf8_lossy(&result.stderr));
+        .arg("--jit-scalar")
+        .arg(&input)
+        .args(["Main", "99"])
+        .output()
+        .unwrap();
+    assert!(
+        result.status.success(),
+        "{}",
+        String::from_utf8_lossy(&result.stderr)
+    );
     let result: serde_json::Value = serde_json::from_slice(&result.stdout).unwrap();
     assert_eq!(result["status"], 0);
     assert_eq!(result["value"], 42);
     for argument in ["2147483648", "no", ""] {
         let result = Command::new(env!("CARGO_BIN_EXE_neoclr-codegen"))
-            .arg("--jit-scalar").arg(&input).args(["Main", argument]).output().unwrap();
+            .arg("--jit-scalar")
+            .arg(&input)
+            .args(["Main", argument])
+            .output()
+            .unwrap();
         assert!(!result.status.success());
         assert!(result.stdout.is_empty());
     }
 }
 
 #[test]
-#[cfg(any(all(target_os = "macos", target_arch = "aarch64"), all(target_os = "windows", target_arch = "x86_64")))]
+#[cfg(any(
+    all(target_os = "macos", target_arch = "aarch64"),
+    all(target_os = "windows", target_arch = "x86_64")
+))]
 fn jit_rejects_expanded_aot_features_and_external_services() {
     let temp = Temp::new();
     let input = temp.0.join("unsupported.neoil");
@@ -907,14 +961,21 @@ fn jit_rejects_expanded_aot_features_and_external_services() {
     ] {
         fs::write(&input, source).unwrap();
         let result = Command::new(env!("CARGO_BIN_EXE_neoclr-codegen"))
-            .arg("--jit-scalar").arg(&input).args(["Calculate", "0"]).output().unwrap();
+            .arg("--jit-scalar")
+            .arg(&input)
+            .args(["Calculate", "0"])
+            .output()
+            .unwrap();
         assert!(!result.status.success());
         assert!(result.stdout.is_empty());
     }
 }
 
 #[test]
-#[cfg(any(all(target_os = "macos", target_arch = "aarch64"), all(target_os = "windows", target_arch = "x86_64")))]
+#[cfg(any(
+    all(target_os = "macos", target_arch = "aarch64"),
+    all(target_os = "windows", target_arch = "x86_64")
+))]
 fn jit_native_container_matches_source_and_rejects_corruption() {
     let temp = Temp::new();
     let input = temp.0.join("scalar.neox");
@@ -922,29 +983,51 @@ fn jit_native_container_matches_source_and_rejects_corruption() {
     let bytes = neoclr::metadata_container::write_module(&module).unwrap();
     fs::write(&input, &bytes).unwrap();
     let result = Command::new(env!("CARGO_BIN_EXE_neoclr-codegen"))
-        .arg("--jit-scalar").arg(&input).args(["Calculate", "20"]).output().unwrap();
-    assert!(result.status.success(), "{}", String::from_utf8_lossy(&result.stderr));
+        .arg("--jit-scalar")
+        .arg(&input)
+        .args(["Calculate", "20"])
+        .output()
+        .unwrap();
+    assert!(
+        result.status.success(),
+        "{}",
+        String::from_utf8_lossy(&result.stderr)
+    );
     let result: serde_json::Value = serde_json::from_slice(&result.stdout).unwrap();
     assert_eq!(result["status"], 0);
     assert_eq!(result["value"], 42);
     fs::write(&input, &bytes[..bytes.len() - 1]).unwrap();
     let result = Command::new(env!("CARGO_BIN_EXE_neoclr-codegen"))
-        .arg("--jit-scalar").arg(&input).args(["Calculate", "20"]).output().unwrap();
+        .arg("--jit-scalar")
+        .arg(&input)
+        .args(["Calculate", "20"])
+        .output()
+        .unwrap();
     assert!(!result.status.success());
     assert!(result.stdout.is_empty());
 }
 
 #[test]
-#[cfg(any(all(target_os = "macos", target_arch = "aarch64"), all(target_os = "windows", target_arch = "x86_64")))]
+#[cfg(any(
+    all(target_os = "macos", target_arch = "aarch64"),
+    all(target_os = "windows", target_arch = "x86_64")
+))]
 fn jit_reuses_owned_code_for_successful_and_faulting_invocations() {
     let temp = Temp::new();
     let input = temp.0.join("repeat.neoil");
     fs::write(&input, ".module Repeat\n.function Calculate(Int32 value) -> Int32\nldc.i4 12\nldarg value\ndiv\nret\n.end\n").unwrap();
     for (argument, status, value) in [("4", 0, Some(3)), ("0", 1, None)] {
         let result = Command::new(env!("CARGO_BIN_EXE_neoclr-codegen"))
-            .arg("--jit-scalar").arg(&input)
-            .args(["Calculate", argument, "--repetitions", "3"]).output().unwrap();
-        assert!(result.status.success(), "{}", String::from_utf8_lossy(&result.stderr));
+            .arg("--jit-scalar")
+            .arg(&input)
+            .args(["Calculate", argument, "--repetitions", "3"])
+            .output()
+            .unwrap();
+        assert!(
+            result.status.success(),
+            "{}",
+            String::from_utf8_lossy(&result.stderr)
+        );
         let report: serde_json::Value = serde_json::from_slice(&result.stdout).unwrap();
         let calls = report["invocations"].as_array().unwrap();
         assert_eq!(calls.len(), 3);
@@ -955,8 +1038,11 @@ fn jit_reuses_owned_code_for_successful_and_faulting_invocations() {
     }
     for repetitions in ["0", "1001"] {
         let result = Command::new(env!("CARGO_BIN_EXE_neoclr-codegen"))
-            .arg("--jit-scalar").arg(&input)
-            .args(["Calculate", "4", "--repetitions", repetitions]).output().unwrap();
+            .arg("--jit-scalar")
+            .arg(&input)
+            .args(["Calculate", "4", "--repetitions", repetitions])
+            .output()
+            .unwrap();
         assert!(!result.status.success());
         assert!(result.stdout.is_empty());
         assert!(String::from_utf8_lossy(&result.stderr).contains("repetitions must be"));
@@ -964,13 +1050,32 @@ fn jit_reuses_owned_code_for_successful_and_faulting_invocations() {
 }
 
 #[test]
-#[cfg(any(all(target_os = "macos", target_arch = "aarch64"), all(target_os = "windows", target_arch = "x86_64")))]
+#[cfg(any(
+    all(target_os = "macos", target_arch = "aarch64"),
+    all(target_os = "windows", target_arch = "x86_64")
+))]
 fn jit_rejects_a_foreign_target_before_loading_inputs() {
-    let target = if cfg!(windows) { "aarch64-apple-darwin" } else { "x86_64-pc-windows-msvc" };
+    let target = if cfg!(windows) {
+        "aarch64-apple-darwin"
+    } else {
+        "x86_64-pc-windows-msvc"
+    };
     let output = Command::new(env!("CARGO_BIN_EXE_neoclr-codegen"))
-        .args(["--jit-managed", "--target", target, "--closed-world", "missing.dll", "@entry", "missing-host"])
-        .output().unwrap();
+        .args([
+            "--jit-managed",
+            "--target",
+            target,
+            "--closed-world",
+            "missing.dll",
+            "@entry",
+            "missing-host",
+        ])
+        .output()
+        .unwrap();
     assert!(!output.status.success());
     assert!(output.stdout.is_empty());
-    assert!(String::from_utf8_lossy(&output.stderr).contains("JIT target must match the executing host"));
+    assert!(
+        String::from_utf8_lossy(&output.stderr)
+            .contains("JIT target must match the executing host")
+    );
 }

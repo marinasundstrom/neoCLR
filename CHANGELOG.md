@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-14
 
+- Apply canonical Rust formatting to the integrated codegen component and runtime module ordering so the workspace formatting gate passes. This is a formatting-only slice; strict Clippy additionally exposed missing TLS ABI safety documentation, tracked for the next qualification fix.
+
 - Extend Windows package qualification to the current Raven static-field compiler, extracted SDK runtime-await and HTTP header contracts. Include static-storage lifetime checks in the portable GC/arena gate; local macOS validation passes. Reserve a fresh experimental package version; hosted execution and release publication remain pending.
 
 - Review remaining Raven samples/tests for error composition. Preserve StreamError, JsonError and MappingError directly in the JSON mapping round trip, removing lossy seek-error relabeling. Keep nominal domain errors, assertion failures and conversion-specific fixtures; record the legacy file-transformer modernization boundary. Add a native sample gate and passing checks for success and all three error alternatives.

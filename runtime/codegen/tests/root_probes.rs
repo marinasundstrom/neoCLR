@@ -389,7 +389,9 @@ fn published_frame_function_bound_matches_native_selection() {
     let dir = Temp(std::env::temp_dir().join(format!("neoclr-root-bound-{}", std::process::id())));
     fs::create_dir(&dir.0).unwrap();
     let base = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../docs/experiments/aot-console");
-    fs::write(dir.0.join("bound.c"), r#"
+    fs::write(
+        dir.0.join("bound.c"),
+        r#"
 #include "native-gc.h"
 #include <sys/resource.h>
 int main(int argc, char **argv) {
@@ -404,18 +406,40 @@ int main(int argc, char **argv) {
     neoclr_probe_leave_v1(&frame);
     return neoclr_root_probe_depth_v1() != 0;
 }
-"#).unwrap();
+"#,
+    )
+    .unwrap();
     for gc in [false, true] {
         let binary = dir.0.join(if gc { "gc" } else { "probe" });
         let mut command = Command::new("clang");
-        command.args(["-arch", "arm64", "-std=c11", "-Wall", "-Wextra", "-Werror", "-fsanitize=undefined,bounds", "-I"])
-            .arg(&base).arg(dir.0.join("bound.c")).arg(base.join("root-probe.c"));
-        if gc { command.arg("-DNEOCLR_NATIVE_GC").arg(base.join("native-gc.c")); }
+        command
+            .args([
+                "-arch",
+                "arm64",
+                "-std=c11",
+                "-Wall",
+                "-Wextra",
+                "-Werror",
+                "-fsanitize=undefined,bounds",
+                "-I",
+            ])
+            .arg(&base)
+            .arg(dir.0.join("bound.c"))
+            .arg(base.join("root-probe.c"));
+        if gc {
+            command
+                .arg("-DNEOCLR_NATIVE_GC")
+                .arg(base.join("native-gc.c"));
+        }
         let r = command.arg("-o").arg(&binary).output().unwrap();
         assert!(r.status.success(), "{}", String::from_utf8_lossy(&r.stderr));
         let r = Command::new(&binary).output().unwrap();
         assert!(r.status.success(), "{r:?}");
         let r = Command::new(&binary).arg("invalid").output().unwrap();
-        assert_eq!(r.status.signal(), Some(6), "out-of-range frame must abort: {r:?}");
+        assert_eq!(
+            r.status.signal(),
+            Some(6),
+            "out-of-range frame must abort: {r:?}"
+        );
     }
 }

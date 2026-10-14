@@ -8,17 +8,31 @@ fn bounded_nonmoving_heap_reclaims_cycles_and_preserves_interior_and_fault_roots
     let base = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../docs/experiments/aot-console");
     let binary = dir.join("heap");
     let r = Command::new("xcrun")
-        .args(["--sdk", "macosx", "clang", "-DNEOCLR_NATIVE_GC", "-arch", "arm64", "-std=c11", "-Wall", "-Wextra", "-Werror", "-fsanitize=undefined,bounds"])
+        .args([
+            "--sdk",
+            "macosx",
+            "clang",
+            "-DNEOCLR_NATIVE_GC",
+            "-arch",
+            "arm64",
+            "-std=c11",
+            "-Wall",
+            "-Wextra",
+            "-Werror",
+            "-fsanitize=undefined,bounds",
+        ])
         .arg(base.join("native-gc-test.c"))
         .arg(base.join("native-gc.c"))
         .arg(base.join("root-probe.c"))
-        .arg("-o").arg(&binary).output().unwrap();
+        .arg("-o")
+        .arg(&binary)
+        .output()
+        .unwrap();
     assert!(r.status.success(), "{}", String::from_utf8_lossy(&r.stderr));
     let r = Command::new(binary).output().unwrap();
     assert!(r.status.success(), "{r:?}");
     fs::remove_dir_all(dir).unwrap();
 }
-
 
 #[test]
 fn native_gc_requires_explicit_heap_contract_and_distinct_mode() {
@@ -31,10 +45,17 @@ fn native_gc_requires_explicit_heap_contract_and_distinct_mode() {
         vec!["--native-gc", "--reference-arena"],
     ] {
         let r = Command::new(env!("CARGO_BIN_EXE_neoclr-codegen"))
-            .args(flags).output().unwrap();
+            .args(flags)
+            .output()
+            .unwrap();
         assert!(!r.status.success());
         let error = String::from_utf8_lossy(&r.stderr);
-        assert!(error.contains("requires") || error.contains("duplicate") || error.contains("distinct modes"), "{error}");
+        assert!(
+            error.contains("requires")
+                || error.contains("duplicate")
+                || error.contains("distinct modes"),
+            "{error}"
+        );
     }
 }
 
@@ -47,9 +68,24 @@ fn reserved_record_array_kernel_validates_extents_and_traces_initialized_element
     for gc in [false, true] {
         let binary = dir.join(if gc { "gc" } else { "arena" });
         let mut command = Command::new("clang");
-        command.args(["-arch", "arm64", "-std=c11", "-Wall", "-Wextra", "-Werror", "-fsanitize=undefined,bounds"])
-            .arg(base.join("record-array-test.c")).arg(base.join("text-arena.c"));
-        if gc { command.arg("-DNEOCLR_NATIVE_GC").arg(base.join("native-gc.c")).arg(base.join("root-probe.c")); }
+        command
+            .args([
+                "-arch",
+                "arm64",
+                "-std=c11",
+                "-Wall",
+                "-Wextra",
+                "-Werror",
+                "-fsanitize=undefined,bounds",
+            ])
+            .arg(base.join("record-array-test.c"))
+            .arg(base.join("text-arena.c"));
+        if gc {
+            command
+                .arg("-DNEOCLR_NATIVE_GC")
+                .arg(base.join("native-gc.c"))
+                .arg(base.join("root-probe.c"));
+        }
         let r = command.arg("-o").arg(&binary).output().unwrap();
         assert!(r.status.success(), "{}", String::from_utf8_lossy(&r.stderr));
         let r = Command::new(binary).output().unwrap();
@@ -67,9 +103,24 @@ fn scalar_array_kernel_keeps_numeric_payload_atomic_and_failure_output_unchanged
     for gc in [false, true] {
         let binary = dir.join(if gc { "gc" } else { "arena" });
         let mut command = Command::new("clang");
-        command.args(["-arch", "arm64", "-std=c11", "-Wall", "-Wextra", "-Werror", "-fsanitize=undefined,bounds"])
-            .arg(base.join("scalar-array-test.c")).arg(base.join("text-arena.c"));
-        if gc { command.arg("-DNEOCLR_NATIVE_GC").arg(base.join("native-gc.c")).arg(base.join("root-probe.c")); }
+        command
+            .args([
+                "-arch",
+                "arm64",
+                "-std=c11",
+                "-Wall",
+                "-Wextra",
+                "-Werror",
+                "-fsanitize=undefined,bounds",
+            ])
+            .arg(base.join("scalar-array-test.c"))
+            .arg(base.join("text-arena.c"));
+        if gc {
+            command
+                .arg("-DNEOCLR_NATIVE_GC")
+                .arg(base.join("native-gc.c"))
+                .arg(base.join("root-probe.c"));
+        }
         let r = command.arg("-o").arg(&binary).output().unwrap();
         assert!(r.status.success(), "{}", String::from_utf8_lossy(&r.stderr));
         let r = Command::new(binary).output().unwrap();
@@ -87,9 +138,24 @@ fn string_join_kernel_validates_separators_and_atomic_failure() {
     for gc in [false, true] {
         let binary = dir.join(if gc { "gc" } else { "arena" });
         let mut command = Command::new("clang");
-        command.args(["-arch", "arm64", "-std=c11", "-Wall", "-Wextra", "-Werror", "-fsanitize=undefined,bounds"])
-            .arg(base.join("join-parts-test.c")).arg(base.join("text-arena.c"));
-        if gc { command.arg("-DNEOCLR_NATIVE_GC").arg(base.join("native-gc.c")).arg(base.join("root-probe.c")); }
+        command
+            .args([
+                "-arch",
+                "arm64",
+                "-std=c11",
+                "-Wall",
+                "-Wextra",
+                "-Werror",
+                "-fsanitize=undefined,bounds",
+            ])
+            .arg(base.join("join-parts-test.c"))
+            .arg(base.join("text-arena.c"));
+        if gc {
+            command
+                .arg("-DNEOCLR_NATIVE_GC")
+                .arg(base.join("native-gc.c"))
+                .arg(base.join("root-probe.c"));
+        }
         let r = command.arg("-o").arg(&binary).output().unwrap();
         assert!(r.status.success(), "{}", String::from_utf8_lossy(&r.stderr));
         let r = Command::new(binary).output().unwrap();
@@ -106,11 +172,23 @@ fn host_roots_retain_release_and_validate_context_thread_and_quota() {
     let base = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../docs/experiments/aot-console");
     let binary = dir.join("heap");
     let r = Command::new("clang")
-        .args(["-DNEOCLR_NATIVE_GC", "-arch", "arm64", "-std=c11", "-Wall", "-Wextra", "-Werror", "-fsanitize=undefined,bounds"])
+        .args([
+            "-DNEOCLR_NATIVE_GC",
+            "-arch",
+            "arm64",
+            "-std=c11",
+            "-Wall",
+            "-Wextra",
+            "-Werror",
+            "-fsanitize=undefined,bounds",
+        ])
         .arg(base.join("host-roots-test.c"))
         .arg(base.join("native-gc.c"))
         .arg(base.join("root-probe.c"))
-        .arg("-o").arg(&binary).output().unwrap();
+        .arg("-o")
+        .arg(&binary)
+        .output()
+        .unwrap();
     assert!(r.status.success(), "{}", String::from_utf8_lossy(&r.stderr));
     let r = Command::new(binary).output().unwrap();
     assert!(r.status.success(), "{r:?}");
@@ -125,13 +203,25 @@ fn native_accept_defers_delivery_and_releases_completion_roots() {
     let base = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../docs/experiments/aot-console");
     let binary = dir.join("heap");
     let r = Command::new("clang")
-        .args(["-DNEOCLR_NATIVE_GC", "-arch", "arm64", "-std=c11", "-Wall", "-Wextra", "-Werror", "-fsanitize=undefined,bounds"])
+        .args([
+            "-DNEOCLR_NATIVE_GC",
+            "-arch",
+            "arm64",
+            "-std=c11",
+            "-Wall",
+            "-Wextra",
+            "-Werror",
+            "-fsanitize=undefined,bounds",
+        ])
         .arg(base.join("socket-accept-test.c"))
         .arg(base.join("socket-listener.c"))
         .arg(base.join("text-arena.c"))
         .arg(base.join("native-gc.c"))
         .arg(base.join("root-probe.c"))
-        .arg("-o").arg(&binary).output().unwrap();
+        .arg("-o")
+        .arg(&binary)
+        .output()
+        .unwrap();
     assert!(r.status.success(), "{}", String::from_utf8_lossy(&r.stderr));
     let r = Command::new(binary).output().unwrap();
     assert!(r.status.success(), "{r:?}");
@@ -146,13 +236,25 @@ fn native_transfer_snapshots_sends_and_initializes_only_received_bytes() {
     let base = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../docs/experiments/aot-console");
     let binary = dir.join("heap");
     let r = Command::new("clang")
-        .args(["-DNEOCLR_NATIVE_GC", "-arch", "arm64", "-std=c11", "-Wall", "-Wextra", "-Werror", "-fsanitize=undefined,bounds"])
+        .args([
+            "-DNEOCLR_NATIVE_GC",
+            "-arch",
+            "arm64",
+            "-std=c11",
+            "-Wall",
+            "-Wextra",
+            "-Werror",
+            "-fsanitize=undefined,bounds",
+        ])
         .arg(base.join("socket-transfer-test.c"))
         .arg(base.join("socket-listener.c"))
         .arg(base.join("text-arena.c"))
         .arg(base.join("native-gc.c"))
         .arg(base.join("root-probe.c"))
-        .arg("-o").arg(&binary).output().unwrap();
+        .arg("-o")
+        .arg(&binary)
+        .output()
+        .unwrap();
     assert!(r.status.success(), "{}", String::from_utf8_lossy(&r.stderr));
     let r = Command::new(binary).output().unwrap();
     assert!(r.status.success(), "{r:?}");
@@ -167,13 +269,25 @@ fn native_task_scope_preserves_default_and_active_queue_ownership() {
     let base = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../docs/experiments/aot-console");
     let binary = dir.join("heap");
     let r = Command::new("clang")
-        .args(["-DNEOCLR_NATIVE_GC", "-arch", "arm64", "-std=c11", "-Wall", "-Wextra", "-Werror", "-fsanitize=undefined,bounds"])
+        .args([
+            "-DNEOCLR_NATIVE_GC",
+            "-arch",
+            "arm64",
+            "-std=c11",
+            "-Wall",
+            "-Wextra",
+            "-Werror",
+            "-fsanitize=undefined,bounds",
+        ])
         .arg(base.join("task-queue-test.c"))
         .arg(base.join("task-queue.c"))
         .arg(base.join("text-arena.c"))
         .arg(base.join("native-gc.c"))
         .arg(base.join("root-probe.c"))
-        .arg("-o").arg(&binary).output().unwrap();
+        .arg("-o")
+        .arg(&binary)
+        .output()
+        .unwrap();
     assert!(r.status.success(), "{}", String::from_utf8_lossy(&r.stderr));
     let r = Command::new(binary).output().unwrap();
     assert!(r.status.success(), "{r:?}");
@@ -189,9 +303,22 @@ fn native_stack_probe_respects_worker_stack_bounds_and_unwinds() {
     for optimization in ["-O0", "-O2"] {
         let binary = dir.join(optimization);
         let r = Command::new("clang")
-            .args(["-arch", "arm64", "-std=c11", "-Wall", "-Wextra", "-Werror", "-fsanitize=undefined,bounds", optimization])
-            .arg(base.join("native-stack-test.c")).arg(base.join("native-stack.c"))
-            .arg("-o").arg(&binary).output().unwrap();
+            .args([
+                "-arch",
+                "arm64",
+                "-std=c11",
+                "-Wall",
+                "-Wextra",
+                "-Werror",
+                "-fsanitize=undefined,bounds",
+                optimization,
+            ])
+            .arg(base.join("native-stack-test.c"))
+            .arg(base.join("native-stack.c"))
+            .arg("-o")
+            .arg(&binary)
+            .output()
+            .unwrap();
         assert!(r.status.success(), "{}", String::from_utf8_lossy(&r.stderr));
         let r = Command::new(binary).output().unwrap();
         assert!(r.status.success(), "{r:?}");
@@ -207,9 +334,23 @@ fn native_gc_sparse_index_preserves_interior_roots_and_rejects_header_padding() 
     let base = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../docs/experiments/aot-console");
     let binary = dir.join("heap");
     let r = Command::new("clang")
-        .args(["-arch", "arm64", "-std=c11", "-O2", "-Wall", "-Wextra", "-Werror", "-fsanitize=undefined,bounds"])
-        .arg(base.join("native-gc-index-test.c")).arg(base.join("native-gc.c")).arg(base.join("root-probe.c"))
-        .arg("-o").arg(&binary).output().unwrap();
+        .args([
+            "-arch",
+            "arm64",
+            "-std=c11",
+            "-O2",
+            "-Wall",
+            "-Wextra",
+            "-Werror",
+            "-fsanitize=undefined,bounds",
+        ])
+        .arg(base.join("native-gc-index-test.c"))
+        .arg(base.join("native-gc.c"))
+        .arg(base.join("root-probe.c"))
+        .arg("-o")
+        .arg(&binary)
+        .output()
+        .unwrap();
     assert!(r.status.success(), "{}", String::from_utf8_lossy(&r.stderr));
     let r = Command::new(binary).output().unwrap();
     assert!(r.status.success(), "{r:?}");
@@ -225,9 +366,24 @@ fn lexical_path_kernel_preserves_failure_outputs_and_owned_utf8() {
     for gc in [false, true] {
         let binary = dir.join(if gc { "gc" } else { "arena" });
         let mut command = Command::new("clang");
-        command.args(["-arch", "arm64", "-std=c11", "-Wall", "-Wextra", "-Werror", "-fsanitize=undefined,bounds"])
-            .arg(base.join("path-text-test.c")).arg(base.join("text-arena.c"));
-        if gc { command.arg("-DNEOCLR_NATIVE_GC").arg(base.join("native-gc.c")).arg(base.join("root-probe.c")); }
+        command
+            .args([
+                "-arch",
+                "arm64",
+                "-std=c11",
+                "-Wall",
+                "-Wextra",
+                "-Werror",
+                "-fsanitize=undefined,bounds",
+            ])
+            .arg(base.join("path-text-test.c"))
+            .arg(base.join("text-arena.c"));
+        if gc {
+            command
+                .arg("-DNEOCLR_NATIVE_GC")
+                .arg(base.join("native-gc.c"))
+                .arg(base.join("root-probe.c"));
+        }
         let r = command.arg("-o").arg(&binary).output().unwrap();
         assert!(r.status.success(), "{}", String::from_utf8_lossy(&r.stderr));
         let r = Command::new(binary).output().unwrap();

@@ -51,16 +51,29 @@ impl Target {
     }
 }
 
-pub(super) fn trace_layout(input: &neoclr::Module, details: Option<&crate::fault_details::Options>) -> Result<serde_json::Value, Error> {
+pub(super) fn trace_layout(
+    input: &neoclr::Module,
+    details: Option<&crate::fault_details::Options>,
+) -> Result<serde_json::Value, Error> {
     values::trace_layout(input, details)
 }
 
-
-pub(super) fn compile(input: &neoclr::Module, root: &str, console: bool, details: Option<&crate::fault_details::Options>) -> Result<Vec<u8>, Error> {
+pub(super) fn compile(
+    input: &neoclr::Module,
+    root: &str,
+    console: bool,
+    details: Option<&crate::fault_details::Options>,
+) -> Result<Vec<u8>, Error> {
     compile_for_target(input, root, console, details, Target::MacosArm64)
 }
 
-pub(super) fn compile_for_target(input: &neoclr::Module, root: &str, console: bool, details: Option<&crate::fault_details::Options>, target: Target) -> Result<Vec<u8>, Error> {
+pub(super) fn compile_for_target(
+    input: &neoclr::Module,
+    root: &str,
+    console: bool,
+    details: Option<&crate::fault_details::Options>,
+    target: Target,
+) -> Result<Vec<u8>, Error> {
     if details.is_some() || !input.types.is_empty()
         || input.functions.iter().any(|f| {
             f.parameters
@@ -106,9 +119,7 @@ pub(super) fn compile_for_target(input: &neoclr::Module, root: &str, console: bo
         }
         return values::compile(input, root, details, target);
     }
-    let target = target.triple()
-        .parse()
-        .expect("fixed valid target triple");
+    let target = target.triple().parse().expect("fixed valid target triple");
     let mut settings = settings::builder();
     settings.set("is_pic", "true")?;
     let isa = isa::lookup(target)?.finish(settings::Flags::new(settings))?;
@@ -315,7 +326,9 @@ pub(super) fn compile_scalar<M: Module>(
                             blocks[pc],
                             match kind {
                                 flow::Kind::Literal => types::I64,
-                                flow::Kind::Int32 | flow::Kind::Boolean | flow::Kind::Unit => types::I32,
+                                flow::Kind::Int32 | flow::Kind::Boolean | flow::Kind::Unit => {
+                                    types::I32
+                                }
                             },
                         );
                     }
@@ -567,12 +580,19 @@ fn return_if(builder: &mut FunctionBuilder<'_>, failed: ir::Value, status: ir::V
     return_if_detailed(builder, failed, status, None);
 }
 
-fn return_if_detailed(builder: &mut FunctionBuilder<'_>, failed: ir::Value, status: ir::Value, site: Option<&crate::fault_details::Site>) {
+fn return_if_detailed(
+    builder: &mut FunctionBuilder<'_>,
+    failed: ir::Value,
+    status: ir::Value,
+    site: Option<&crate::fault_details::Site>,
+) {
     let fault = builder.create_block();
     let next = builder.create_block();
     builder.ins().brif(failed, fault, &[], next, &[]);
     builder.switch_to_block(fault);
-    if let Some(site) = site { site.record(builder, status); }
+    if let Some(site) = site {
+        site.record(builder, status);
+    }
     builder.ins().return_(&[status]);
     builder.switch_to_block(next);
 }
@@ -598,9 +618,7 @@ fn checked_arithmetic(
             } else {
                 i64::from(i32::MIN)
             };
-            let min = builder
-                .ins()
-                .icmp_imm(IntCC::Equal, left, minimum);
+            let min = builder.ins().icmp_imm(IntCC::Equal, left, minimum);
             let negative_one = builder.ins().icmp_imm(IntCC::Equal, right, -1);
             let overflow = builder.ins().band(min, negative_one);
             return_if_detailed(builder, overflow, overflow_status, site);

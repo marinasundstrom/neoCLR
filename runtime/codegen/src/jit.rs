@@ -55,7 +55,8 @@ pub(super) fn execute(
     settings.set("is_pic", "false")?;
     settings.set("use_colocated_libcalls", "false")?;
     target.configure_stack(&mut settings)?;
-    let isa = isa::lookup(target.triple().parse().expect("fixed target triple"))?.finish(settings::Flags::new(settings))?;
+    let isa = isa::lookup(target.triple().parse().expect("fixed target triple"))?
+        .finish(settings::Flags::new(settings))?;
     let builder = JITBuilder::with_isa(isa, cranelift_module::default_libcall_names());
     // Shared scalar validation rejects all external calls before finalization.
     let mut owner = CodeOwner(Some(JITModule::new(builder)));
@@ -112,10 +113,7 @@ pub(super) fn execute_managed(
         || !details.native_stack_budget
         || details.native_host_bootstrap
     {
-        return Err(
-            "managed JIT requires a GC/stack host without bootstrap services"
-                .into(),
-        );
+        return Err("managed JIT requires a GC/stack host without bootstrap services".into());
     }
     let started = Instant::now();
     // SAFETY: this explicit development host path is trusted native code, like a
@@ -139,14 +137,7 @@ pub(super) fn execute_managed(
     }));
     let mut owner = CodeOwner(Some(JITModule::new(builder)));
     let module = owner.0.as_mut().expect("owned module");
-    crate::compiler::values::compile_into(
-        input,
-        root,
-        Some(details),
-        target,
-        module,
-        true,
-    )?;
+    crate::compiler::values::compile_into(input, root, Some(details), target, module, true)?;
     // Bind every declared import explicitly. Missing helpers fail before any guest
     // code runs; do not let default process-symbol lookup hide a host mismatch.
     for (_, declaration) in module.declarations().get_functions() {
@@ -176,7 +167,8 @@ pub(super) fn execute_managed(
     // The Windows AOT argument helper consumes UTF-16; other hosts consume UTF-8.
     // Keep backing storage alive through the synchronous host invocation.
     #[cfg(windows)]
-    let wide_arguments: Vec<Vec<u16>> = arguments.iter()
+    let wide_arguments: Vec<Vec<u16>> = arguments
+        .iter()
         .map(|arg| Ok(arg.to_str()?.encode_utf16().chain([0]).collect()))
         .collect::<Result<_, std::str::Utf8Error>>()?;
     #[cfg(windows)]

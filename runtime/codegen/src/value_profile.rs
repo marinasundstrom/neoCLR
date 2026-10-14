@@ -14,25 +14,25 @@ pub(super) enum Ty {
     Unit,
     Erased,
     Character, // One validated extended grapheme, stored as immutable UTF-8 text.
-    Literal, // Immutable image/explicit invocation-arena UTF-8; not a general managed String.
+    Literal,   // Immutable image/explicit invocation-arena UTF-8; not a general managed String.
     Record(usize),
     Reference(usize),
     Interface(usize),
     ByteArray,
-    CharacterArray, // Same pointer-slot layout, distinct element identity.
-    StringArray, // Invocation-owned pointer slots; verified nominal backing enables views.
+    CharacterArray,  // Same pointer-slot layout, distinct element identity.
+    StringArray,     // Invocation-owned pointer slots; verified nominal backing enables views.
     CharacterValues, // Immutable grapheme snapshot; distinct from mutable character arrays.
-    ByteValues, // Immutable native-produced value-array snapshot; no element addresses.
+    ByteValues,      // Immutable native-produced value-array snapshot; no element addresses.
     Size,
     TypeToken, // Image-local opaque type identity, never a native address.
     Wide,
     Double,
     Single,
     ReferenceArray(usize), // Default-null or reserved slots retaining nominal object identity.
-    RecordArray(usize), // Checked reserved snapshots of a closed value record.
-    ScalarArray(Type), // Atomic one-lane slots; exact element identity retained.
-    CallableArray(Type), // Initialized/reserved pointer slots of one exact Function shape.
-    Callable(Type), // Managed descriptor: target identity and strong heap receiver.
+    RecordArray(usize),    // Checked reserved snapshots of a closed value record.
+    ScalarArray(Type),     // Atomic one-lane slots; exact element identity retained.
+    CallableArray(Type),   // Initialized/reserved pointer slots of one exact Function shape.
+    Callable(Type),        // Managed descriptor: target identity and strong heap receiver.
     Address(Box<Ty>),
 }
 impl Ty {
@@ -77,28 +77,64 @@ pub(super) fn erased_tag(ty: &Type) -> Result<i64, Error> {
 }
 
 fn object_base_shape(t: &neoclr::metadata::TypeDef) -> bool {
-    t.is_reference_type && t.is_abstract
-        && t.representation == Representation::Record && t.fields.is_empty()
-        && t.base.is_none() && t.generic_parameters.is_empty() && t.implements.is_empty()
+    t.is_reference_type
+        && t.is_abstract
+        && t.representation == Representation::Record
+        && t.fields.is_empty()
+        && t.base.is_none()
+        && t.generic_parameters.is_empty()
+        && t.implements.is_empty()
 }
 
 impl<'a> Profile<'a> {
-    pub fn new(input: &'a neoclr::Module, references: bool, object_base: Option<usize>, array_backing: Option<usize>, reference_backings: &[usize], object_display: Option<&HashMap<usize, Vec<(usize, usize)>>>, string_dispatch: Option<&HashMap<usize, usize>>, primitive_receivers: Option<&[usize]>, native_stack_budget: bool) -> Result<Self, Error> {
-        if input.name == "System" || input.types.len() > crate::limits::TYPES || input.functions.len() > crate::limits::FUNCTIONS {
-            return Err(
-                format!("value profile requires an application with at most {} types and {} functions", crate::limits::TYPES, crate::limits::FUNCTIONS).into(),
-            );
+    pub fn new(
+        input: &'a neoclr::Module,
+        references: bool,
+        object_base: Option<usize>,
+        array_backing: Option<usize>,
+        reference_backings: &[usize],
+        object_display: Option<&HashMap<usize, Vec<(usize, usize)>>>,
+        string_dispatch: Option<&HashMap<usize, usize>>,
+        primitive_receivers: Option<&[usize]>,
+        native_stack_budget: bool,
+    ) -> Result<Self, Error> {
+        if input.name == "System"
+            || input.types.len() > crate::limits::TYPES
+            || input.functions.len() > crate::limits::FUNCTIONS
+        {
+            return Err(format!(
+                "value profile requires an application with at most {} types and {} functions",
+                crate::limits::TYPES,
+                crate::limits::FUNCTIONS
+            )
+            .into());
         }
-        if input.functions.iter().any(|f| f.body.iter().any(|op| matches!(op, Op::ReserveArray(_))))
-            && input.functions.iter().any(|f| f.body.iter().any(|op| matches!(op, Op::ArrayAddress(_)))) {
+        if input
+            .functions
+            .iter()
+            .any(|f| f.body.iter().any(|op| matches!(op, Op::ReserveArray(_))))
+            && input
+                .functions
+                .iter()
+                .any(|f| f.body.iter().any(|op| matches!(op, Op::ArrayAddress(_))))
+        {
             return Err("reserved byte arrays require indexed access; element borrows need initialization-aware addresses".into());
         }
-        if object_base.is_some_and(|i| !references || input.types.get(i).is_none_or(|t| !object_base_shape(t))) {
+        if object_base.is_some_and(|i| {
+            !references || input.types.get(i).is_none_or(|t| !object_base_shape(t))
+        }) {
             return Err("invalid private Object base projection".into());
         }
-        if array_backing.is_some_and(|i| !references || input.types.get(i).is_none_or(|t|
-            !t.is_reference_type || t.representation != Representation::Record || t.fields.len()!=1
-            || t.fields[0].ty != Type::ArrayRef(Box::new(Type::Byte)) || !t.generic_parameters.is_empty())) {
+        if array_backing.is_some_and(|i| {
+            !references
+                || input.types.get(i).is_none_or(|t| {
+                    !t.is_reference_type
+                        || t.representation != Representation::Record
+                        || t.fields.len() != 1
+                        || t.fields[0].ty != Type::ArrayRef(Box::new(Type::Byte))
+                        || !t.generic_parameters.is_empty()
+                })
+        }) {
             return Err("invalid private byte-array backing projection".into());
         }
         for &i in reference_backings {
@@ -106,27 +142,58 @@ impl<'a> Profile<'a> {
                 && t.representation == Representation::Record && t.fields.len() == 1
                 && t.generic_parameters.is_empty()
                 && matches!(&t.fields[0].ty, Type::ArrayRef(element) if matches!(**element, Type::String | Type::Char) || crate::selection::scalar_array_element(element) || input.type_definition(element).is_some_and(|e| (e.is_reference_type && e.representation == Representation::Record) || e.representation == Representation::Interface)));
-            if !references || !valid { return Err("invalid private reference-array backing projection".into()); }
+            if !references || !valid {
+                return Err("invalid private reference-array backing projection".into());
+            }
         }
         for t in &input.types {
             if references && t.representation == Representation::Interface {
-                if !t.fields.is_empty() || t.base.is_some() || t.implements.iter().any(|parent| input.type_definition(parent).is_none_or(|p| p.representation != Representation::Interface))
-                    || !t.generic_parameters.is_empty() || !t.generic_constraints.is_empty()
-                    || t.enum_info.is_some() || t.packing.is_some() || t.minimum_size.is_some() {
-                    return Err("interface views require fieldless closed interface contracts".into());
+                if !t.fields.is_empty()
+                    || t.base.is_some()
+                    || t.implements.iter().any(|parent| {
+                        input
+                            .type_definition(parent)
+                            .is_none_or(|p| p.representation != Representation::Interface)
+                    })
+                    || !t.generic_parameters.is_empty()
+                    || !t.generic_constraints.is_empty()
+                    || t.enum_info.is_some()
+                    || t.packing.is_some()
+                    || t.minimum_size.is_some()
+                {
+                    return Err(
+                        "interface views require fieldless closed interface contracts".into(),
+                    );
                 }
                 continue;
             }
-            if !t.implements.is_empty() && (!references || !t.is_reference_type || t.implements.iter().any(|interface| {
-                !matches!(interface, Type::Named(_)) || input.type_definition(interface)
-                    .is_none_or(|t| t.representation != Representation::Interface || !t.generic_parameters.is_empty())
-            })) {
-                return Err(format!("{}: only reference-arena nongeneric interface views are supported", t.name).into());
+            if !t.implements.is_empty()
+                && (!references
+                    || !t.is_reference_type
+                    || t.implements.iter().any(|interface| {
+                        !matches!(interface, Type::Named(_))
+                            || input.type_definition(interface).is_none_or(|t| {
+                                t.representation != Representation::Interface
+                                    || !t.generic_parameters.is_empty()
+                            })
+                    }))
+            {
+                return Err(format!(
+                    "{}: only reference-arena nongeneric interface views are supported",
+                    t.name
+                )
+                .into());
             }
             let static_owner = crate::selection::static_owner(t);
-            let reference_base = references && t.is_reference_type && t.base.as_ref()
-                .is_some_and(|base| input.type_definition(base).is_some_and(|b| b.is_reference_type
-                    && b.representation == Representation::Record && b.generic_parameters.is_empty()));
+            let reference_base = references
+                && t.is_reference_type
+                && t.base.as_ref().is_some_and(|base| {
+                    input.type_definition(base).is_some_and(|b| {
+                        b.is_reference_type
+                            && b.representation == Representation::Record
+                            && b.generic_parameters.is_empty()
+                    })
+                });
             if (t.is_reference_type && !static_owner && !references)
                 || t.representation != Representation::Record
                 || t.enum_info.as_ref().is_some_and(|info| info.underlying != Type::Int32
@@ -177,7 +244,9 @@ impl<'a> Profile<'a> {
             let fields = p.input.types[i].fields.clone();
             let mut width = 0;
             if let Some(base) = &p.input.types[i].base {
-                let Ty::Reference(parent) = p.ty(base)? else { return Err("reference base must be a class".into()); };
+                let Ty::Reference(parent) = p.ty(base)? else {
+                    return Err("reference base must be a class".into());
+                };
                 layout(p, parent, states)?;
                 width = p.widths[parent];
                 p.layouts[i] = p.layouts[parent].clone();
@@ -190,7 +259,12 @@ impl<'a> Profile<'a> {
                 p.layouts[i].push(width);
                 width += p.lanes(&ty);
                 if !p.input.types[i].is_reference_type && width > crate::limits::INLINE_LANES {
-                    return Err(format!("{}: value layout exceeds {} flattened lanes ({width})", p.input.types[i].name, crate::limits::INLINE_LANES).into());
+                    return Err(format!(
+                        "{}: value layout exceeds {} flattened lanes ({width})",
+                        p.input.types[i].name,
+                        crate::limits::INLINE_LANES
+                    )
+                    .into());
                 }
             }
             if p.input.types[i].is_reference_type && width > crate::limits::OBJECT_LANES {
@@ -212,7 +286,17 @@ impl<'a> Profile<'a> {
             let interface = references && crate::selection::interface_contract(input, f);
             if interface {
                 let reached = (0..input.functions.len()).collect();
-                p.dispatch.insert(i, crate::selection::dispatch_targets_with_array(input, i, &reached, array_backing, reference_backings, None)?);
+                p.dispatch.insert(
+                    i,
+                    crate::selection::dispatch_targets_with_array(
+                        input,
+                        i,
+                        &reached,
+                        array_backing,
+                        reference_backings,
+                        None,
+                    )?,
+                );
             }
             let class = references && crate::selection::class_contract(input, f);
             if ((f.is_virtual || f.is_abstract) && !interface && !class)
@@ -248,13 +332,24 @@ impl<'a> Profile<'a> {
                 } else {
                     let ty = p.ty(owner)?;
                     if !matches!(ty, Ty::Record(_) | Ty::Reference(_) | Ty::Interface(_)) {
-                        return Err(format!("{}: value member requires a local record owner ({owner:?})", f.name).into());
+                        return Err(format!(
+                            "{}: value member requires a local record owner ({owner:?})",
+                            f.name
+                        )
+                        .into());
                     }
                     if f.instance {
                         match ty {
-                            Ty::Reference(_) | Ty::Interface(_) if !f.receiver_byref => args.push(ty),
+                            Ty::Reference(_) | Ty::Interface(_) if !f.receiver_byref => {
+                                args.push(ty)
+                            }
                             Ty::Record(_) if f.receiver_byref => args.push(ty.address()),
-                            _ => return Err("receiver representation does not match value/reference owner".into()),
+                            _ => {
+                                return Err(
+                                    "receiver representation does not match value/reference owner"
+                                        .into(),
+                                );
+                            }
                         }
                     } else if f.receiver_byref {
                         return Err("static member cannot have a by-reference receiver".into());
@@ -265,7 +360,11 @@ impl<'a> Profile<'a> {
             }
             for (index, t) in f.parameters.iter().enumerate() {
                 if let Type::ByRef(target) = t {
-                    let projected_receiver = index == 0 && matches!(**target, Type::Int32 | Type::Boolean | Type::Int64 | Type::UInt64 | Type::Char)
+                    let projected_receiver = index == 0
+                        && matches!(
+                            **target,
+                            Type::Int32 | Type::Boolean | Type::Int64 | Type::UInt64 | Type::Char
+                        )
                         && primitive_receivers.is_some_and(|indices| indices.contains(&i));
                     if !f.out_parameters.contains(&index) && !projected_receiver {
                         return Err(
@@ -297,22 +396,38 @@ impl<'a> Profile<'a> {
         let mut edges = vec![vec![]; input.functions.len()];
         for (i, f) in input.functions.iter().enumerate() {
             let owner = f.owner.as_ref().and_then(|t| input.type_definition(t));
-            let reference_constructor = f.instance && f.name.ends_with("..ctor") && owner.is_some_and(|t| t.is_reference_type);
+            let reference_constructor = f.instance
+                && f.name.ends_with("..ctor")
+                && owner.is_some_and(|t| t.is_reference_type);
             // Only an unconditional prefix forwarding receiver/arguments to the
             // direct base initializer is admitted; original verification checked types.
             let base_initializer = if reference_constructor && owner.unwrap().base.is_some() {
                 let base = owner.unwrap().base.as_ref().unwrap();
-                let prefix = f.body.iter().take_while(|op| matches!(op, Op::Arg(_))).count();
-                if !matches!(f.body.first(), Some(Op::Arg(0))) || !matches!(f.body.get(prefix), Some(Op::Call(target))
+                let prefix = f
+                    .body
+                    .iter()
+                    .take_while(|op| matches!(op, Op::Arg(_)))
+                    .count();
+                if !matches!(f.body.first(), Some(Op::Arg(0)))
+                    || !matches!(f.body.get(prefix), Some(Op::Call(target))
                     if target.instance && target.owner.as_ref() == Some(base) && target.name.ends_with("..ctor")
-                    && prefix == target.parameters.len() + 1) {
+                    && prefix == target.parameters.len() + 1)
+                {
                     return Err("reference constructor requires an unconditional leading base constructor call with forwarded arguments".into());
                 }
                 Some(prefix)
-            } else { None };
+            } else {
+                None
+            };
             for (pc, op) in f.body.iter().enumerate() {
-                if let Op::BindFunction { function_type, target } = op {
-                    if !f.out_parameters.is_empty() { return Err("native callback binding in output-parameter methods requires a later profile".into()); }
+                if let Op::BindFunction {
+                    function_type,
+                    target,
+                } = op
+                {
+                    if !f.out_parameters.is_empty() {
+                        return Err("native callback binding in output-parameter methods requires a later profile".into());
+                    }
                     p.ty(function_type)?;
                     let callee = p.callee(target)?;
                     let bound = &input.functions[callee];
@@ -321,12 +436,24 @@ impl<'a> Profile<'a> {
                     // descriptor retains that same object, not an interface snapshot.
                     let interface_callback = crate::selection::interface_contract(input, bound)
                         && !string_dispatch.is_some_and(|targets| targets.contains_key(&callee))
-                        && p.dispatch.get(&callee).is_some_and(|targets| !targets.is_empty()
-                            && targets.iter().all(|(owner, implementation)| !p.is_array_backing(*owner)
-                                && matches!(p.args[*implementation].first(), Some(Ty::Reference(_)))));
-                    if ((!interface_callback && (bound.is_virtual || bound.is_abstract)) || bound.is_override)
-                        || bound.receiver_byref || bound.impl_flags != 0
-                        || (bound.instance && !matches!(p.args[callee].first(), Some(Ty::Reference(_))) && !interface_callback) {
+                        && p.dispatch.get(&callee).is_some_and(|targets| {
+                            !targets.is_empty()
+                                && targets.iter().all(|(owner, implementation)| {
+                                    !p.is_array_backing(*owner)
+                                        && matches!(
+                                            p.args[*implementation].first(),
+                                            Some(Ty::Reference(_))
+                                        )
+                                })
+                        });
+                    if ((!interface_callback && (bound.is_virtual || bound.is_abstract))
+                        || bound.is_override)
+                        || bound.receiver_byref
+                        || bound.impl_flags != 0
+                        || (bound.instance
+                            && !matches!(p.args[callee].first(), Some(Ty::Reference(_)))
+                            && !interface_callback)
+                    {
                         return Err(format!("native callback binding requires a static function, nonvirtual heap class receiver or closed class-interface dispatch: target {}, receiver {:?}, byref={}, virtual={}, override={}, abstract={}",
                             bound.name, p.args[callee].first(), bound.receiver_byref,
                             bound.is_virtual, bound.is_override, bound.is_abstract).into());
@@ -334,30 +461,53 @@ impl<'a> Profile<'a> {
                 }
                 if let Op::Call(target) | Op::CallVirtual(target) | Op::Construct(target) = op {
                     if let Some(shape) = crate::selection::callable_invoke(target) {
-                        if !f.out_parameters.is_empty() { return Err("native callback invocation in output-parameter methods requires a later profile".into()); }
+                        if !f.out_parameters.is_empty() {
+                            return Err("native callback invocation in output-parameter methods requires a later profile".into());
+                        }
                         p.ty(target.owner.as_ref().unwrap())?;
-                        edges[i].extend(p.callable_targets(&Type::Function(Box::new(shape.clone())))?);
+                        edges[i]
+                            .extend(p.callable_targets(&Type::Function(Box::new(shape.clone())))?);
                         continue;
                     }
                     let callee = p.callee(target)?;
                     let c = &input.functions[callee];
-                    if !matches!(op, Op::Construct(_)) && c.instance && c.name.ends_with("..ctor")
-                        && c.owner.as_ref().and_then(|t| input.type_definition(t)).is_some_and(|t| t.is_reference_type)
-                        && !(matches!(op, Op::Call(_)) && reference_constructor && Some(pc) == base_initializer
-                            && matches!(f.body.first(), Some(Op::Arg(0))) && owner.unwrap().base == c.owner) {
+                    if !matches!(op, Op::Construct(_))
+                        && c.instance
+                        && c.name.ends_with("..ctor")
+                        && c.owner
+                            .as_ref()
+                            .and_then(|t| input.type_definition(t))
+                            .is_some_and(|t| t.is_reference_type)
+                        && !(matches!(op, Op::Call(_))
+                            && reference_constructor
+                            && Some(pc) == base_initializer
+                            && matches!(f.body.first(), Some(Op::Arg(0)))
+                            && owner.unwrap().base == c.owner)
+                    {
                         return Err(format!("reference constructor calls require newobj.ctor or the single leading base initializer: {} at {pc} calls {}", f.name, c.name).into());
                     }
                     if p.dispatch.contains_key(&callee) && !matches!(op, Op::CallVirtual(_)) {
                         return Err("interface contracts require callvirt".into());
                     }
-                    if matches!(op, Op::CallVirtual(_)) &&
-                        (!references || !input.functions[callee].instance ||
-                         !matches!(p.args[callee].first(), Some(Ty::Reference(_) | Ty::Interface(_)))) {
-                        return Err("callvirt requires an admitted nonvirtual reference member".into());
+                    if matches!(op, Op::CallVirtual(_))
+                        && (!references
+                            || !input.functions[callee].instance
+                            || !matches!(
+                                p.args[callee].first(),
+                                Some(Ty::Reference(_) | Ty::Interface(_))
+                            ))
+                    {
+                        return Err(
+                            "callvirt requires an admitted nonvirtual reference member".into()
+                        );
                     }
                     if matches!(op, Op::Construct(_)) {
                         let c = &input.functions[callee];
-                        if c.owner.as_ref().is_some_and(|owner| input.types.iter().enumerate().any(|(i, t)| p.is_array_backing(i) && *owner == Type::Named(t.name.clone()))) {
+                        if c.owner.as_ref().is_some_and(|owner| {
+                            input.types.iter().enumerate().any(|(i, t)| {
+                                p.is_array_backing(i) && *owner == Type::Named(t.name.clone())
+                            })
+                        }) {
                             return Err("nominal arrays require newarr/array.reserve, not class construction".into());
                         }
                         if !c.instance || !c.name.ends_with("..ctor") || !c.no_result {
@@ -373,36 +523,76 @@ impl<'a> Profile<'a> {
         }
         for (&contract, &target) in string_dispatch.into_iter().flatten() {
             let f = &input.functions[target];
-            let expected = std::iter::once(Ty::Literal).chain(p.args[contract].iter().skip(1).cloned()).collect::<Vec<_>>();
-            if !p.dispatch.contains_key(&contract) || f.instance || f.owner.is_some()
-                || p.args[target] != expected || p.results[target] != p.results[contract] {
+            let expected = std::iter::once(Ty::Literal)
+                .chain(p.args[contract].iter().skip(1).cloned())
+                .collect::<Vec<_>>();
+            if !p.dispatch.contains_key(&contract)
+                || f.instance
+                || f.owner.is_some()
+                || p.args[target] != expected
+                || p.results[target] != p.results[contract]
+            {
                 return Err("String interface target must preserve the projected receiver and contract signature".into());
             }
             edges[contract].push(target);
         }
-        fn visit(i: usize, edges: &[Vec<usize>], states: &mut [u8], path: &mut Vec<usize>, input: &neoclr::Module) -> Result<(), Error> {
+        fn visit(
+            i: usize,
+            edges: &[Vec<usize>],
+            states: &mut [u8],
+            path: &mut Vec<usize>,
+            input: &neoclr::Module,
+        ) -> Result<(), Error> {
             if states[i] == 1 {
                 let start = path.iter().position(|n| *n == i).unwrap_or(0);
-                let cycle = path[start..].iter().copied().chain([i]).map(|n| {
-                    let f = &input.functions[n];
-                    let name = f.origin.as_ref().map_or(f.name.as_str(), |o| o.name.as_str());
-                    let owner = f.owner.as_ref().and_then(|ty| input.type_definition(ty))
-                        .map(|ty| ty.origin.as_ref().map_or(ty.name.as_str(), |o| o.name.as_str()));
-                    match owner { Some(owner) => format!("{owner}::{name} [#{n}]"), None => format!("{name} [#{n}]") }
-                }).collect::<Vec<_>>().join(" -> ");
-                return Err(format!("recursive calls require a native stack-budget contract: {cycle}").into());
+                let cycle = path[start..]
+                    .iter()
+                    .copied()
+                    .chain([i])
+                    .map(|n| {
+                        let f = &input.functions[n];
+                        let name = f
+                            .origin
+                            .as_ref()
+                            .map_or(f.name.as_str(), |o| o.name.as_str());
+                        let owner = f
+                            .owner
+                            .as_ref()
+                            .and_then(|ty| input.type_definition(ty))
+                            .map(|ty| {
+                                ty.origin
+                                    .as_ref()
+                                    .map_or(ty.name.as_str(), |o| o.name.as_str())
+                            });
+                        match owner {
+                            Some(owner) => format!("{owner}::{name} [#{n}]"),
+                            None => format!("{name} [#{n}]"),
+                        }
+                    })
+                    .collect::<Vec<_>>()
+                    .join(" -> ");
+                return Err(format!(
+                    "recursive calls require a native stack-budget contract: {cycle}"
+                )
+                .into());
             }
-            if states[i] == 2 { return Ok(()); }
+            if states[i] == 2 {
+                return Ok(());
+            }
             states[i] = 1;
             path.push(i);
-            for &next in &edges[i] { visit(next, edges, states, path, input)?; }
+            for &next in &edges[i] {
+                visit(next, edges, states, path, input)?;
+            }
             path.pop();
             states[i] = 2;
             Ok(())
         }
         let mut states = vec![0; edges.len()];
         if !native_stack_budget {
-            for i in 0..edges.len() { visit(i, &edges, &mut states, &mut vec![], input)?; }
+            for i in 0..edges.len() {
+                visit(i, &edges, &mut states, &mut vec![], input)?;
+            }
         }
         Ok(p)
     }
@@ -410,10 +600,16 @@ impl<'a> Profile<'a> {
         let mut targets = vec![];
         for f in &self.input.functions {
             for op in &f.body {
-                if let Op::BindFunction { function_type, target } = op {
+                if let Op::BindFunction {
+                    function_type,
+                    target,
+                } = op
+                {
                     if function_type == shape {
                         let c = self.callee(target)?;
-                        if !targets.contains(&c) { targets.push(c); }
+                        if !targets.contains(&c) {
+                            targets.push(c);
+                        }
                     }
                 }
             }
@@ -434,14 +630,26 @@ impl<'a> Profile<'a> {
             Type::Void => Ty::Unit,
             Type::Value => Ty::Erased,
             Type::Function(shape) if self.references => {
-                if !shape.out_parameters.is_empty() || !shape.out_when_true.is_empty()
-                    || shape.parameters.iter().chain([&shape.returns]).any(|t| matches!(t, Type::ByRef(_) | Type::ReadOnlyByRef(_))) {
-                    return Err("native callbacks do not yet admit borrowed/output signature slots".into());
+                if !shape.out_parameters.is_empty()
+                    || !shape.out_when_true.is_empty()
+                    || shape
+                        .parameters
+                        .iter()
+                        .chain([&shape.returns])
+                        .any(|t| matches!(t, Type::ByRef(_) | Type::ReadOnlyByRef(_)))
+                {
+                    return Err(
+                        "native callbacks do not yet admit borrowed/output signature slots".into(),
+                    );
                 }
-                for t in shape.parameters.iter().chain([&shape.returns]) { self.ty(t)?; }
+                for t in shape.parameters.iter().chain([&shape.returns]) {
+                    self.ty(t)?;
+                }
                 Ty::Callable(t.clone())
             }
-            Type::ArrayRef(t) if self.references && crate::selection::scalar_array_element(t) => Ty::ScalarArray(t.as_ref().clone()),
+            Type::ArrayRef(t) if self.references && crate::selection::scalar_array_element(t) => {
+                Ty::ScalarArray(t.as_ref().clone())
+            }
             Type::ArrayRef(t) if self.references && matches!(**t, Type::Function(_)) => {
                 self.ty(t)?;
                 Ty::CallableArray(t.as_ref().clone())
@@ -473,10 +681,19 @@ impl<'a> Profile<'a> {
                     .position(|t| &t.name == name)
                     .ok_or("value profile requires a local named record")?;
                 if crate::selection::static_owner(&self.input.types[i]) {
-                    return Err("static owners cannot be used as values or instance receivers".into());
+                    return Err(
+                        "static owners cannot be used as values or instance receivers".into(),
+                    );
                 }
-                if self.input.types[i].representation == Representation::Interface && self.references { Ty::Interface(i) }
-                else if self.input.types[i].is_reference_type { Ty::Reference(i) } else { Ty::Record(i) }
+                if self.input.types[i].representation == Representation::Interface
+                    && self.references
+                {
+                    Ty::Interface(i)
+                } else if self.input.types[i].is_reference_type {
+                    Ty::Reference(i)
+                } else {
+                    Ty::Record(i)
+                }
             }
             _ => {
                 return Err(
@@ -492,7 +709,11 @@ impl<'a> Profile<'a> {
         self.ty(t)
     }
     pub fn stack_type(t: &Ty) -> Ty {
-        if matches!(t, Ty::Byte | Ty::SByte | Ty::Short | Ty::UShort) { Ty::Int } else { t.clone() }
+        if matches!(t, Ty::Byte | Ty::SByte | Ty::Short | Ty::UShort) {
+            Ty::Int
+        } else {
+            t.clone()
+        }
     }
     pub fn narrow_lanes(&self, t: &Ty) -> Vec<Option<(u8, bool)>> {
         match t {
@@ -511,9 +732,29 @@ impl<'a> Profile<'a> {
     pub fn pointer_lanes(&self, t: &Ty) -> Vec<bool> {
         match t {
             Ty::Erased => vec![false, true],
-            Ty::ScalarArray(_) | Ty::ReferenceArray(_) | Ty::RecordArray(_) | Ty::CallableArray(_) | Ty::Callable(_) | Ty::Literal | Ty::Character | Ty::Address(_) | Ty::Reference(_) | Ty::Interface(_) | Ty::ByteArray | Ty::CharacterArray | Ty::StringArray | Ty::CharacterValues | Ty::ByteValues | Ty::Size | Ty::Wide | Ty::TypeToken => vec![true],
+            Ty::ScalarArray(_)
+            | Ty::ReferenceArray(_)
+            | Ty::RecordArray(_)
+            | Ty::CallableArray(_)
+            | Ty::Callable(_)
+            | Ty::Literal
+            | Ty::Character
+            | Ty::Address(_)
+            | Ty::Reference(_)
+            | Ty::Interface(_)
+            | Ty::ByteArray
+            | Ty::CharacterArray
+            | Ty::StringArray
+            | Ty::CharacterValues
+            | Ty::ByteValues
+            | Ty::Size
+            | Ty::Wide
+            | Ty::TypeToken => vec![true],
             Ty::Record(i) if !self.input.types[*i].fields.is_empty() => self.input.types[*i]
-                .fields.iter().flat_map(|f| self.pointer_lanes(&self.ty(&f.ty).expect("admitted field"))).collect(),
+                .fields
+                .iter()
+                .flat_map(|f| self.pointer_lanes(&self.ty(&f.ty).expect("admitted field")))
+                .collect(),
             _ => vec![false; self.lanes(t)],
         }
     }
@@ -537,15 +778,26 @@ impl<'a> Profile<'a> {
         self.array_backing == Some(index) || self.reference_array_backings.contains(&index)
     }
     pub fn backing_for_array(&self, ty: &Ty) -> Option<usize> {
-        if *ty == Ty::ByteArray { return self.array_backing; }
-        self.reference_array_backings.iter().copied().find(|i| self.ty(&self.input.types[*i].fields[0].ty).ok().as_ref() == Some(ty))
+        if *ty == Ty::ByteArray {
+            return self.array_backing;
+        }
+        self.reference_array_backings
+            .iter()
+            .copied()
+            .find(|i| self.ty(&self.input.types[*i].fields[0].ty).ok().as_ref() == Some(ty))
     }
     fn derives_from(&self, actual: usize, expected: usize) -> bool {
         let mut index = actual;
         for _ in 0..self.input.types.len() {
-            if index == expected { return true; }
-            let Some(base) = &self.input.types[index].base else { return false; };
-            let Ok(Ty::Reference(parent)) = self.ty(base) else { return false; };
+            if index == expected {
+                return true;
+            }
+            let Some(base) = &self.input.types[index].base else {
+                return false;
+            };
+            let Ok(Ty::Reference(parent)) = self.ty(base) else {
+                return false;
+            };
             index = parent;
         }
         false
@@ -555,55 +807,131 @@ impl<'a> Profile<'a> {
             // Interface views retain the original object reference. Every managed
             // interface reference is assignable to the verified Object base, but
             // not to arbitrary concrete classes without an explicit cast.
-            (Ty::Interface(_), Ty::Reference(expected)) if self.object_base == Some(*expected) => true,
-            (Ty::ByteArray | Ty::ReferenceArray(_) | Ty::ScalarArray(_) | Ty::StringArray | Ty::CharacterArray, Ty::Reference(i)) if self.backing_for_array(actual) == Some(*i) => true,
-            (Ty::ByteArray | Ty::ReferenceArray(_) | Ty::ScalarArray(_) | Ty::StringArray | Ty::CharacterArray, _) if self.backing_for_array(actual).is_some() => self.reference_assignable(&Ty::Reference(self.backing_for_array(actual).unwrap()), expected),
-            (Ty::Reference(actual) | Ty::Interface(actual), Ty::Interface(expected)) =>
-                crate::selection::implements_interface(self.input, &Type::Named(self.input.types[*actual].name.clone()), &Type::Named(self.input.types[*expected].name.clone())),
-            (Ty::Reference(actual), Ty::Reference(expected)) => self.derives_from(*actual, *expected),
+            (Ty::Interface(_), Ty::Reference(expected)) if self.object_base == Some(*expected) => {
+                true
+            }
+            (
+                Ty::ByteArray
+                | Ty::ReferenceArray(_)
+                | Ty::ScalarArray(_)
+                | Ty::StringArray
+                | Ty::CharacterArray,
+                Ty::Reference(i),
+            ) if self.backing_for_array(actual) == Some(*i) => true,
+            (
+                Ty::ByteArray
+                | Ty::ReferenceArray(_)
+                | Ty::ScalarArray(_)
+                | Ty::StringArray
+                | Ty::CharacterArray,
+                _,
+            ) if self.backing_for_array(actual).is_some() => self.reference_assignable(
+                &Ty::Reference(self.backing_for_array(actual).unwrap()),
+                expected,
+            ),
+            (Ty::Reference(actual) | Ty::Interface(actual), Ty::Interface(expected)) => {
+                crate::selection::implements_interface(
+                    self.input,
+                    &Type::Named(self.input.types[*actual].name.clone()),
+                    &Type::Named(self.input.types[*expected].name.clone()),
+                )
+            }
+            (Ty::Reference(actual), Ty::Reference(expected)) => {
+                self.derives_from(*actual, *expected)
+            }
             _ => false,
         }
     }
     pub fn cast_targets(&self, target: &Ty) -> Vec<usize> {
         match target {
-            Ty::ByteArray | Ty::ReferenceArray(_) | Ty::ScalarArray(_) | Ty::StringArray | Ty::CharacterArray => self.backing_for_array(target).into_iter().collect(),
-            Ty::Reference(i) if self.object_base == Some(*i) => self.input.types.iter().enumerate()
+            Ty::ByteArray
+            | Ty::ReferenceArray(_)
+            | Ty::ScalarArray(_)
+            | Ty::StringArray
+            | Ty::CharacterArray => self.backing_for_array(target).into_iter().collect(),
+            Ty::Reference(i) if self.object_base == Some(*i) => self
+                .input
+                .types
+                .iter()
+                .enumerate()
                 .filter(|(_, t)| t.representation == Representation::Record && !t.is_abstract)
-                .map(|(i, _)| i).collect(),
-            Ty::Reference(i) => self.input.types.iter().enumerate()
+                .map(|(i, _)| i)
+                .collect(),
+            Ty::Reference(i) => self
+                .input
+                .types
+                .iter()
+                .enumerate()
                 .filter(|(n, t)| t.is_reference_type && !t.is_abstract && self.derives_from(*n, *i))
-                .map(|(n, _)| n).collect(),
+                .map(|(n, _)| n)
+                .collect(),
             Ty::Interface(i) => {
                 let target = Type::Named(self.input.types[*i].name.clone());
-                self.input.types.iter().enumerate()
-                    .filter(|(_, t)| t.is_reference_type && t.representation == Representation::Record && crate::selection::implements_interface(self.input, &Type::Named(t.name.clone()), &target))
-                    .map(|(i, _)| i).collect()
+                self.input
+                    .types
+                    .iter()
+                    .enumerate()
+                    .filter(|(_, t)| {
+                        t.is_reference_type
+                            && t.representation == Representation::Record
+                            && crate::selection::implements_interface(
+                                self.input,
+                                &Type::Named(t.name.clone()),
+                                &target,
+                            )
+                    })
+                    .map(|(i, _)| i)
+                    .collect()
             }
             _ => unreachable!("admitted reference target"),
         }
     }
-    pub fn object_bytes(&self, index: usize) -> u32 { 8 + self.widths[index] as u32 * 8 }
-    pub fn static_field(&self, owner: &Type, index: usize) -> Result<(usize, Ty, usize, usize), Error> {
-        let i = self.input.types.iter().position(|t| Some(t.name.as_str()) == owner.definition_name()).ok_or("missing closed static owner")?;
+    pub fn object_bytes(&self, index: usize) -> u32 {
+        8 + self.widths[index] as u32 * 8
+    }
+    pub fn static_field(
+        &self,
+        owner: &Type,
+        index: usize,
+    ) -> Result<(usize, Ty, usize, usize), Error> {
+        let i = self
+            .input
+            .types
+            .iter()
+            .position(|t| Some(t.name.as_str()) == owner.definition_name())
+            .ok_or("missing closed static owner")?;
         let fields = &self.input.types[i].static_fields;
-        let mut offset = 0; let mut selected = None;
+        let mut offset = 0;
+        let mut selected = None;
         for (n, field) in fields.iter().enumerate() {
             let ty = self.ty(&field.ty)?;
             fn zero_initializable(p: &Profile<'_>, ty: &Ty) -> bool {
                 match ty {
-                    Ty::Record(i) => p.input.types[*i].fields.iter().all(|f|
-                        p.ty(&f.ty).is_ok_and(|t| zero_initializable(p, &t))),
-                    Ty::Erased | Ty::ByteValues | Ty::CharacterValues | Ty::Character | Ty::Unit | Ty::TypeToken | Ty::Address(_) => false,
+                    Ty::Record(i) => p.input.types[*i]
+                        .fields
+                        .iter()
+                        .all(|f| p.ty(&f.ty).is_ok_and(|t| zero_initializable(p, &t))),
+                    Ty::Erased
+                    | Ty::ByteValues
+                    | Ty::CharacterValues
+                    | Ty::Character
+                    | Ty::Unit
+                    | Ty::TypeToken
+                    | Ty::Address(_) => false,
                     _ => true,
                 }
             }
             if !zero_initializable(self, &ty) {
                 return Err("native static storage requires a zero-initializable field".into());
             }
-            if n == index { selected = Some((ty.clone(), offset)); }
+            if n == index {
+                selected = Some((ty.clone(), offset));
+            }
             offset += self.lanes(&ty);
         }
-        if offset > 256 { return Err("native static storage exceeds object lane limit".into()); }
+        if offset > 256 {
+            return Err("native static storage exceeds object lane limit".into());
+        }
         let (ty, slot) = selected.ok_or("static field index out of range")?;
         Ok((i, ty, 8 + slot * 8, 8 + offset * 8))
     }
@@ -634,12 +962,21 @@ impl<'a> Profile<'a> {
         let mut index = index;
         for _ in 0..self.input.types.len() {
             if let Some(base) = &self.input.types[owner].base {
-                let Ty::Reference(parent) = self.ty(base)? else { return Err("invalid reference base".into()); };
+                let Ty::Reference(parent) = self.ty(base)? else {
+                    return Err("invalid reference base".into());
+                };
                 let inherited = self.layouts[parent].len();
-                if index < inherited { owner = parent; continue; }
+                if index < inherited {
+                    owner = parent;
+                    continue;
+                }
                 index -= inherited;
             }
-            return self.ty(&self.input.types[owner].fields.get(index).ok_or("field index out of range")?.ty);
+            return self.ty(&self.input.types[owner]
+                .fields
+                .get(index)
+                .ok_or("field index out of range")?
+                .ty);
         }
         Err("cyclic reference field hierarchy".into())
     }
@@ -680,14 +1017,21 @@ impl<'a> Profile<'a> {
             let valid = matches!(&f.returns, Type::Function(shape) if shape.parameters.is_empty()
                 && shape.returns == Type::Void
                 && shape.out_parameters.is_empty() && shape.out_when_true.is_empty());
-            if f.instance || f.no_result || !f.out_parameters.is_empty() || !valid || !(self.args[i].is_empty() || self.args[i] == [Ty::Int]) {
+            if f.instance
+                || f.no_result
+                || !f.out_parameters.is_empty()
+                || !valid
+                || !(self.args[i].is_empty() || self.args[i] == [Ty::Int])
+            {
                 return Err("native host bootstrap must be static with zero arguments or one Int32 argument and a zero-argument unit callback result".into());
             }
             return Ok(i);
         }
         if f.instance
             || !matches!(self.results[i], None | Some(Ty::Int | Ty::Unit))
-            || !(self.args[i].is_empty() || self.args[i] == [Ty::Int] || self.args[i] == [Ty::StringArray])
+            || !(self.args[i].is_empty()
+                || self.args[i] == [Ty::Int]
+                || self.args[i] == [Ty::StringArray])
             || !f.out_parameters.is_empty()
         {
             return Err("value root must be static with zero arguments, one Int32 or one String[] argument and Int32, Void or no result".into());
@@ -735,9 +1079,30 @@ impl<'a> Profile<'a> {
                     n.checked_sub(offset)
                         .filter(|n| f.out_parameters.contains(n)),
                 ),
-                Op::ConvertFloat32 | Op::ConvertFloat64 | Op::ConvertFloatUnsigned | Op::ConvertInt32 | Op::ConvertUInt32 | Op::ConvertUInt8 | Op::ConvertInt8 | Op::ConvertInt16 | Op::ConvertUInt16 | Op::ConvertInt64 | Op::ConvertUInt64 | Op::ConvertNativeInt | Op::ConvertNativeUInt => (),
-                Op::Negate | Op::BitNot | Op::PackValue(_) | Op::IsValue(_) | Op::UnpackValue(_)
-                | Op::IsInstance(_) | Op::CastClass(_) | Op::ReferenceIsNull | Op::NewArray(_) | Op::ReserveArray(_) | Op::ArrayLength => {
+                Op::ConvertFloat32
+                | Op::ConvertFloat64
+                | Op::ConvertFloatUnsigned
+                | Op::ConvertInt32
+                | Op::ConvertUInt32
+                | Op::ConvertUInt8
+                | Op::ConvertInt8
+                | Op::ConvertInt16
+                | Op::ConvertUInt16
+                | Op::ConvertInt64
+                | Op::ConvertUInt64
+                | Op::ConvertNativeInt
+                | Op::ConvertNativeUInt => (),
+                Op::Negate
+                | Op::BitNot
+                | Op::PackValue(_)
+                | Op::IsValue(_)
+                | Op::UnpackValue(_)
+                | Op::IsInstance(_)
+                | Op::CastClass(_)
+                | Op::ReferenceIsNull
+                | Op::NewArray(_)
+                | Op::ReserveArray(_)
+                | Op::ArrayLength => {
                     readable(state.stack.pop().unwrap(), &state.assigned)?;
                     state.stack.push(None);
                 }
@@ -754,7 +1119,9 @@ impl<'a> Profile<'a> {
                     }
                 }
                 Op::StaticField { .. } => state.stack.push(None),
-                Op::SetStaticField { .. } => { readable(state.stack.pop().unwrap(), &state.assigned)?; }
+                Op::SetStaticField { .. } => {
+                    readable(state.stack.pop().unwrap(), &state.assigned)?;
+                }
                 Op::Field(_) | Op::FieldAddress(_) | Op::LoadObject(_) => {
                     readable(state.stack.pop().unwrap(), &state.assigned)?;
                     state.stack.push(None);
@@ -764,13 +1131,19 @@ impl<'a> Profile<'a> {
                     // Partial construction is deliberately outside this proof.
                     readable(state.stack.pop().unwrap(), &state.assigned)?;
                     let shape = shapes[pc].as_ref().unwrap();
-                    if !matches!(shape[shape.len() - 2], Ty::Reference(_)) { state.stack.push(None); }
+                    if !matches!(shape[shape.len() - 2], Ty::Reference(_)) {
+                        state.stack.push(None);
+                    }
                 }
                 Op::ArrayElement(_) | Op::ArrayAddress(_) | Op::StoreArrayElement(_) => {
-                    if matches!(op, Op::StoreArrayElement(_)) { state.stack.pop(); }
+                    if matches!(op, Op::StoreArrayElement(_)) {
+                        state.stack.pop();
+                    }
                     state.stack.pop();
                     readable(state.stack.pop().unwrap(), &state.assigned)?;
-                    if !matches!(op, Op::StoreArrayElement(_)) { state.stack.push(None); }
+                    if !matches!(op, Op::StoreArrayElement(_)) {
+                        state.stack.push(None);
+                    }
                 }
                 Op::Call(target) | Op::CallVirtual(target) | Op::Construct(target) => {
                     let c = self.callee(target)?;
@@ -877,7 +1250,9 @@ impl<'a> Profile<'a> {
         let f = &self.input.functions[i];
         let fail =
             |pc, message| -> Error { format!("{} instruction {pc}: {message}", f.name).into() };
-        if self.dispatch.contains_key(&i) { return Ok(vec![]); }
+        if self.dispatch.contains_key(&i) {
+            return Ok(vec![]);
+        }
         if f.body.is_empty() {
             return Err(fail(0, "empty body"));
         }
@@ -935,8 +1310,14 @@ impl<'a> Profile<'a> {
                 | Op::Less
                 | Op::GreaterUnsigned
                 | Op::LessUnsigned
-                | Op::BitAnd | Op::BitOr | Op::BitXor | Op::BitNot | Op::Negate
-                | Op::ShiftLeft | Op::ShiftRight | Op::ShiftRightUnsigned
+                | Op::BitAnd
+                | Op::BitOr
+                | Op::BitXor
+                | Op::BitNot
+                | Op::Negate
+                | Op::ShiftLeft
+                | Op::ShiftRight
+                | Op::ShiftRightUnsigned
                 | Op::Add
                 | Op::Sub
                 | Op::Mul
@@ -951,27 +1332,81 @@ impl<'a> Profile<'a> {
                 | Op::Remainder
                 | Op::RemainderUnsigned => (),
                 Op::BindFunction { .. } if self.references => (),
-                Op::IsInstance(Type::String) | Op::CastClass(Type::String) | Op::ReferenceIsNull | Op::ReferenceEqual => (),
-                Op::IsInstance(t @ Type::ArrayRef(_)) | Op::CastClass(t @ Type::ArrayRef(_)) if self.backing_for_array(&self.ty(t)?).is_none() => {
+                Op::IsInstance(Type::String)
+                | Op::CastClass(Type::String)
+                | Op::ReferenceIsNull
+                | Op::ReferenceEqual => (),
+                Op::IsInstance(t @ Type::ArrayRef(_)) | Op::CastClass(t @ Type::ArrayRef(_))
+                    if self.backing_for_array(&self.ty(t)?).is_none() =>
+                {
                     return Err(fail(pc, "array casts require verified backing"));
                 }
-                Op::IsInstance(t) | Op::CastClass(t) if self.references && (matches!(self.ty(t)?, Ty::Reference(_) | Ty::Interface(_))
-                    || self.backing_for_array(&self.ty(t)?).is_some()) => (),
-                Op::NewArray(t) | Op::ReserveArray(t) | Op::ArrayElement(t) | Op::StoreArrayElement(t)
-                    if self.references && crate::selection::scalar_array_element(t) => (),
-                Op::NewArray(Type::String | Type::Char) | Op::ReserveArray(Type::String | Type::Char) | Op::ArrayElement(Type::String | Type::Char) | Op::StoreArrayElement(Type::String | Type::Char) if self.references => (),
-                Op::NewArray(t) | Op::ReserveArray(t) | Op::ArrayElement(t) | Op::StoreArrayElement(t)
-                    if self.references && matches!(t, Type::Function(_)) => { self.ty(t)?; },
-                Op::NewArray(Type::Byte) | Op::ReserveArray(Type::Byte) | Op::ArrayElement(Type::Byte) | Op::StoreArrayElement(Type::Byte) | Op::ArrayAddress(Type::Byte) | Op::ArrayLength if self.references => (),
-                Op::NewArray(t) if self.references && matches!(t, Type::Named(_))
-                    && matches!(self.ty(t)?, Ty::Reference(_) | Ty::Interface(_)) => (),
+                Op::IsInstance(t) | Op::CastClass(t)
+                    if self.references
+                        && (matches!(self.ty(t)?, Ty::Reference(_) | Ty::Interface(_))
+                            || self.backing_for_array(&self.ty(t)?).is_some()) =>
+                {
+                    ()
+                }
+                Op::NewArray(t)
+                | Op::ReserveArray(t)
+                | Op::ArrayElement(t)
+                | Op::StoreArrayElement(t)
+                    if self.references && crate::selection::scalar_array_element(t) =>
+                {
+                    ()
+                }
+                Op::NewArray(Type::String | Type::Char)
+                | Op::ReserveArray(Type::String | Type::Char)
+                | Op::ArrayElement(Type::String | Type::Char)
+                | Op::StoreArrayElement(Type::String | Type::Char)
+                    if self.references =>
+                {
+                    ()
+                }
+                Op::NewArray(t)
+                | Op::ReserveArray(t)
+                | Op::ArrayElement(t)
+                | Op::StoreArrayElement(t)
+                    if self.references && matches!(t, Type::Function(_)) =>
+                {
+                    self.ty(t)?;
+                }
+                Op::NewArray(Type::Byte)
+                | Op::ReserveArray(Type::Byte)
+                | Op::ArrayElement(Type::Byte)
+                | Op::StoreArrayElement(Type::Byte)
+                | Op::ArrayAddress(Type::Byte)
+                | Op::ArrayLength
+                    if self.references =>
+                {
+                    ()
+                }
+                Op::NewArray(t)
+                    if self.references
+                        && matches!(t, Type::Named(_))
+                        && matches!(self.ty(t)?, Ty::Reference(_) | Ty::Interface(_)) =>
+                {
+                    ()
+                }
                 Op::ReserveArray(t) | Op::ArrayElement(t) | Op::StoreArrayElement(t)
-                    if self.references && matches!(t, Type::Named(_)) && matches!(self.ty(t)?, Ty::Record(_) | Ty::Reference(_) | Ty::Interface(_)) => (),
+                    if self.references
+                        && matches!(t, Type::Named(_))
+                        && matches!(
+                            self.ty(t)?,
+                            Ty::Record(_) | Ty::Reference(_) | Ty::Interface(_)
+                        ) =>
+                {
+                    ()
+                }
                 Op::PackValue(t) | Op::IsValue(t) | Op::UnpackValue(t) => {
                     erased_tag(t)?;
                 }
                 Op::InitializeObject(Type::Array(t)) if **t == Type::Byte => {
-                    return Err(fail(pc, "byte value arrays require an explicit native producer; default initialization is unsupported"));
+                    return Err(fail(
+                        pc,
+                        "byte value arrays require an explicit native producer; default initialization is unsupported",
+                    ));
                 }
                 Op::InitializeObject(Type::Value) => {
                     return Err(fail(pc, "Value has no default initialization"));
@@ -1005,17 +1440,40 @@ impl<'a> Profile<'a> {
                 Op::Float32 { .. } => stack.push(Ty::Single),
                 Op::ConvertFloat32 | Op::ConvertFloat64 | Op::ConvertFloatUnsigned => {
                     let source = pop(&mut stack)?;
-                    if !matches!(source, Ty::Int | Ty::Wide | Ty::Size | Ty::Single | Ty::Double)
-                        || matches!(op, Op::ConvertFloatUnsigned) && matches!(source, Ty::Single | Ty::Double) {
+                    if !matches!(
+                        source,
+                        Ty::Int | Ty::Wide | Ty::Size | Ty::Single | Ty::Double
+                    ) || matches!(op, Op::ConvertFloatUnsigned)
+                        && matches!(source, Ty::Single | Ty::Double)
+                    {
                         return Err(fail(pc, "floating conversion requires a numeric operand"));
                     }
-                    stack.push(if matches!(op, Op::ConvertFloat32) { Ty::Single } else { Ty::Double });
+                    stack.push(if matches!(op, Op::ConvertFloat32) {
+                        Ty::Single
+                    } else {
+                        Ty::Double
+                    });
                 }
                 Op::String(_) => stack.push(Ty::Literal),
-                Op::ConvertInt32 | Op::ConvertUInt32 | Op::ConvertUInt8 | Op::ConvertInt8 | Op::ConvertInt16 | Op::ConvertUInt16 | Op::ConvertInt64 | Op::ConvertUInt64 | Op::ConvertNativeInt | Op::ConvertNativeUInt => {
+                Op::ConvertInt32
+                | Op::ConvertUInt32
+                | Op::ConvertUInt8
+                | Op::ConvertInt8
+                | Op::ConvertInt16
+                | Op::ConvertUInt16
+                | Op::ConvertInt64
+                | Op::ConvertUInt64
+                | Op::ConvertNativeInt
+                | Op::ConvertNativeUInt => {
                     let source = pop(&mut stack)?;
-                    let enum_storage = matches!(op, Op::ConvertInt32) && matches!(source, Ty::Record(n) if self.input.types[n].enum_info.is_some());
-                    if !matches!(source, Ty::Int | Ty::Size | Ty::Wide) && !enum_storage { return Err(fail(pc, "conversion requires an integer stack category or enum-to-Int32")); }
+                    let enum_storage = matches!(op, Op::ConvertInt32)
+                        && matches!(source, Ty::Record(n) if self.input.types[n].enum_info.is_some());
+                    if !matches!(source, Ty::Int | Ty::Size | Ty::Wide) && !enum_storage {
+                        return Err(fail(
+                            pc,
+                            "conversion requires an integer stack category or enum-to-Int32",
+                        ));
+                    }
                     stack.push(match op {
                         Op::ConvertInt64 | Op::ConvertUInt64 => Ty::Wide,
                         Op::ConvertNativeInt | Op::ConvertNativeUInt => Ty::Size,
@@ -1077,20 +1535,51 @@ impl<'a> Profile<'a> {
                 }
                 Op::IsInstance(Type::String) | Op::CastClass(Type::String) => {
                     let source = pop(&mut stack)?;
-                    if source != Ty::Literal && !(self.references && matches!(source, Ty::Reference(_) | Ty::Interface(_) | Ty::ByteArray | Ty::ReferenceArray(_) | Ty::ScalarArray(_) | Ty::StringArray | Ty::CharacterArray)) {
+                    if source != Ty::Literal
+                        && !(self.references
+                            && matches!(
+                                source,
+                                Ty::Reference(_)
+                                    | Ty::Interface(_)
+                                    | Ty::ByteArray
+                                    | Ty::ReferenceArray(_)
+                                    | Ty::ScalarArray(_)
+                                    | Ty::StringArray
+                                    | Ty::CharacterArray
+                            ))
+                    {
                         return Err(fail(pc, "String casts require text or managed references"));
                     }
                     stack.push(Ty::Literal);
                 }
                 Op::IsInstance(t) | Op::CastClass(t) => {
                     let source = pop(&mut stack)?;
-                    if !matches!(source, Ty::Reference(_) | Ty::Interface(_)) && !(source == Ty::Literal && self.references) && self.backing_for_array(&source).is_none() {
-                        return Err(fail(pc, "reference casts require a class, interface or verified array view"));
+                    if !matches!(source, Ty::Reference(_) | Ty::Interface(_))
+                        && !(source == Ty::Literal && self.references)
+                        && self.backing_for_array(&source).is_none()
+                    {
+                        return Err(fail(
+                            pc,
+                            "reference casts require a class, interface or verified array view",
+                        ));
                     }
                     stack.push(self.ty(t)?);
                 }
                 Op::ReferenceIsNull => {
-                    if !matches!(pop(&mut stack)?, Ty::ScalarArray(_) | Ty::ReferenceArray(_) | Ty::RecordArray(_) | Ty::Callable(_) | Ty::CallableArray(_) | Ty::Literal | Ty::Reference(_) | Ty::Interface(_) | Ty::ByteArray | Ty::CharacterArray | Ty::StringArray) {
+                    if !matches!(
+                        pop(&mut stack)?,
+                        Ty::ScalarArray(_)
+                            | Ty::ReferenceArray(_)
+                            | Ty::RecordArray(_)
+                            | Ty::Callable(_)
+                            | Ty::CallableArray(_)
+                            | Ty::Literal
+                            | Ty::Reference(_)
+                            | Ty::Interface(_)
+                            | Ty::ByteArray
+                            | Ty::CharacterArray
+                            | Ty::StringArray
+                    ) {
                         return Err(fail(pc, "null test requires text or reference"));
                     }
                     stack.push(Ty::Bool);
@@ -1098,13 +1587,28 @@ impl<'a> Profile<'a> {
                 Op::ReferenceEqual => {
                     for _ in 0..2 {
                         let ty = pop(&mut stack)?;
-                        if !matches!(ty, Ty::ScalarArray(_) | Ty::ReferenceArray(_) | Ty::Reference(_) | Ty::Interface(_) | Ty::ByteArray | Ty::CharacterArray | Ty::StringArray) && !(ty == Ty::Literal && self.references) {
-                            return Err(fail(pc, "identity requires managed references; text requires --reference-arena"));
+                        if !matches!(
+                            ty,
+                            Ty::ScalarArray(_)
+                                | Ty::ReferenceArray(_)
+                                | Ty::Reference(_)
+                                | Ty::Interface(_)
+                                | Ty::ByteArray
+                                | Ty::CharacterArray
+                                | Ty::StringArray
+                        ) && !(ty == Ty::Literal && self.references)
+                        {
+                            return Err(fail(
+                                pc,
+                                "identity requires managed references; text requires --reference-arena",
+                            ));
                         }
                     }
                     stack.push(Ty::Bool);
                 }
-                Op::NewArray(t) | Op::ReserveArray(t) if crate::selection::scalar_array_element(t) => {
+                Op::NewArray(t) | Op::ReserveArray(t)
+                    if crate::selection::scalar_array_element(t) =>
+                {
                     take(&mut stack, &Ty::Int)?;
                     stack.push(self.ty(&Type::ArrayRef(Box::new(t.clone())))?);
                 }
@@ -1112,12 +1616,16 @@ impl<'a> Profile<'a> {
                     take(&mut stack, &Ty::Int)?;
                     stack.push(self.ty(&Type::ArrayRef(Box::new(t.clone())))?);
                 }
-                Op::ArrayElement(t) if matches!(t, Type::Named(_)) || crate::selection::scalar_array_element(t) => {
+                Op::ArrayElement(t)
+                    if matches!(t, Type::Named(_)) || crate::selection::scalar_array_element(t) =>
+                {
                     take(&mut stack, &Ty::Int)?;
                     take(&mut stack, &self.ty(&Type::ArrayRef(Box::new(t.clone())))?)?;
                     stack.push(Self::stack_type(&self.ty(t)?));
                 }
-                Op::StoreArrayElement(t) if matches!(t, Type::Named(_)) || crate::selection::scalar_array_element(t) => {
+                Op::StoreArrayElement(t)
+                    if matches!(t, Type::Named(_)) || crate::selection::scalar_array_element(t) =>
+                {
                     take(&mut stack, &self.ty(t)?)?;
                     take(&mut stack, &Ty::Int)?;
                     take(&mut stack, &self.ty(&Type::ArrayRef(Box::new(t.clone())))?)?;
@@ -1136,15 +1644,17 @@ impl<'a> Profile<'a> {
                     take(&mut stack, &Ty::Int)?;
                     take(&mut stack, &Ty::CallableArray(t.clone()))?;
                 }
-                Op::NewArray(t @ (Type::String | Type::Char)) | Op::ReserveArray(t @ (Type::String | Type::Char)) => {
+                Op::NewArray(t @ (Type::String | Type::Char))
+                | Op::ReserveArray(t @ (Type::String | Type::Char)) => {
                     take(&mut stack, &Ty::Int)?;
                     stack.push(self.ty(&Type::ArrayRef(Box::new(t.clone())))?);
                 }
                 Op::ArrayElement(t @ (Type::String | Type::Char)) => {
                     take(&mut stack, &Ty::Int)?;
                     let array = pop(&mut stack)?;
-                    if array != self.ty(&Type::ArrayRef(Box::new(t.clone())))? &&
-                        !(t == &Type::Char && array == Ty::CharacterValues) {
+                    if array != self.ty(&Type::ArrayRef(Box::new(t.clone())))?
+                        && !(t == &Type::Char && array == Ty::CharacterValues)
+                    {
                         return Err(fail(pc, "character value arrays permit indexed reads only"));
                     }
                     stack.push(self.ty(t)?);
@@ -1159,18 +1669,41 @@ impl<'a> Profile<'a> {
                     stack.push(Ty::ByteArray);
                 }
                 Op::ArrayLength => {
-                    if !matches!(pop(&mut stack)?, Ty::ScalarArray(_) | Ty::ReferenceArray(_) | Ty::RecordArray(_) | Ty::CallableArray(_) | Ty::ByteArray | Ty::CharacterArray | Ty::StringArray | Ty::CharacterValues | Ty::ByteValues) {
-                        return Err(fail(pc, "array length requires a byte array or immutable byte values"));
+                    if !matches!(
+                        pop(&mut stack)?,
+                        Ty::ScalarArray(_)
+                            | Ty::ReferenceArray(_)
+                            | Ty::RecordArray(_)
+                            | Ty::CallableArray(_)
+                            | Ty::ByteArray
+                            | Ty::CharacterArray
+                            | Ty::StringArray
+                            | Ty::CharacterValues
+                            | Ty::ByteValues
+                    ) {
+                        return Err(fail(
+                            pc,
+                            "array length requires a byte array or immutable byte values",
+                        ));
                     }
                     stack.push(Ty::Size);
                 }
                 Op::ArrayElement(Type::Byte) | Op::ArrayAddress(Type::Byte) => {
                     take(&mut stack, &Ty::Int)?;
                     let array = pop(&mut stack)?;
-                    if array != Ty::ByteArray && !(array == Ty::ByteValues && matches!(op, Op::ArrayElement(_))) {
-                        return Err(fail(pc, "byte value arrays permit only indexed reads; mutable borrows are unsupported"));
+                    if array != Ty::ByteArray
+                        && !(array == Ty::ByteValues && matches!(op, Op::ArrayElement(_)))
+                    {
+                        return Err(fail(
+                            pc,
+                            "byte value arrays permit only indexed reads; mutable borrows are unsupported",
+                        ));
                     }
-                    stack.push(if matches!(op, Op::ArrayAddress(_)) { Ty::Byte.address() } else { Ty::Int });
+                    stack.push(if matches!(op, Op::ArrayAddress(_)) {
+                        Ty::Byte.address()
+                    } else {
+                        Ty::Int
+                    });
                 }
                 Op::StoreArrayElement(Type::Byte) => {
                     take(&mut stack, &Ty::Int)?;
@@ -1184,12 +1717,16 @@ impl<'a> Profile<'a> {
                     let (_, ty, _, _) = self.static_field(owner, *index)?;
                     let value = pop(&mut stack)?;
                     let expected = Self::stack_type(&ty);
-                    if expected != value && !self.reference_assignable(&value, &expected) { return Err(fail(pc, "static field store type mismatch")); }
+                    if expected != value && !self.reference_assignable(&value, &expected) {
+                        return Err(fail(pc, "static field store type mismatch"));
+                    }
                 }
                 Op::Field(n) | Op::FieldAddress(n) => {
                     let owner = pop(&mut stack)?;
                     let t = self.field(&owner, *n)?;
-                    if matches!(owner, Ty::Reference(i) if self.is_array_backing(i)) && matches!(op, Op::FieldAddress(_)) {
+                    if matches!(owner, Ty::Reference(i) if self.is_array_backing(i))
+                        && matches!(op, Op::FieldAddress(_))
+                    {
                         return Err(fail(pc, "nominal array storage field cannot be borrowed"));
                     }
                     if matches!(op, Op::FieldAddress(_)) {
@@ -1212,19 +1749,32 @@ impl<'a> Profile<'a> {
                         return Err(fail(pc, "field store type mismatch"));
                     }
                     if !matches!(owner, Ty::Reference(_)) {
-                        stack.push(if matches!(owner, Ty::Address(_)) { Ty::Unit } else { owner });
+                        stack.push(if matches!(owner, Ty::Address(_)) {
+                            Ty::Unit
+                        } else {
+                            owner
+                        });
                     }
                 }
-                Op::BindFunction { function_type, target } => {
+                Op::BindFunction {
+                    function_type,
+                    target,
+                } => {
                     let c = self.callee(target)?;
-                    if target.instance { take(&mut stack, &self.args[c][0])?; }
+                    if target.instance {
+                        take(&mut stack, &self.args[c][0])?;
+                    }
                     stack.push(self.ty(function_type)?);
                 }
                 Op::Call(target) | Op::CallVirtual(target) | Op::Construct(target) => {
                     if let Some(signature) = crate::selection::callable_invoke(target) {
-                        for t in signature.parameters.iter().rev() { take(&mut stack, &self.ty(t)?)?; }
+                        for t in signature.parameters.iter().rev() {
+                            take(&mut stack, &self.ty(t)?)?;
+                        }
                         take(&mut stack, &self.ty(target.owner.as_ref().unwrap())?)?;
-                        if !signature.no_result { stack.push(Self::stack_type(&self.ty(&signature.returns)?)); }
+                        if !signature.no_result {
+                            stack.push(Self::stack_type(&self.ty(&signature.returns)?));
+                        }
                     } else {
                         let c = self.callee(target)?;
                         let construct = matches!(op, Op::Construct(_));
@@ -1278,22 +1828,44 @@ impl<'a> Profile<'a> {
                 }
                 Op::Add | Op::Sub | Op::Mul => {
                     let t = pop(&mut stack)?;
-                    if !matches!(t, Ty::Int | Ty::Wide | Ty::Single | Ty::Double) { return Err(fail(pc, "arithmetic requires Int32, Int64, Single or Double")); }
+                    if !matches!(t, Ty::Int | Ty::Wide | Ty::Single | Ty::Double) {
+                        return Err(fail(
+                            pc,
+                            "arithmetic requires Int32, Int64, Single or Double",
+                        ));
+                    }
                     take(&mut stack, &t)?;
                     stack.push(t);
                 }
                 Op::Divide | Op::DivideUnsigned | Op::Remainder | Op::RemainderUnsigned => {
                     let t = pop(&mut stack)?;
-                    if !matches!(t, Ty::Int | Ty::Wide) && !(matches!(t, Ty::Single | Ty::Double) && matches!(op, Op::Divide)) {
-                        return Err(fail(pc, "division requires matching integer operands or floating div"));
+                    if !matches!(t, Ty::Int | Ty::Wide)
+                        && !(matches!(t, Ty::Single | Ty::Double) && matches!(op, Op::Divide))
+                    {
+                        return Err(fail(
+                            pc,
+                            "division requires matching integer operands or floating div",
+                        ));
                     }
                     take(&mut stack, &t)?;
                     stack.push(t);
                 }
                 Op::Equal => {
                     let t = pop(&mut stack)?;
-                    if !matches!(t, Ty::Int | Ty::Wide | Ty::Single | Ty::Double | Ty::Bool | Ty::Literal | Ty::TypeToken) {
-                        return Err(fail(pc, "equality requires Int32, Int64/UInt64, Single/Double, Boolean, String or RuntimeTypeHandle"));
+                    if !matches!(
+                        t,
+                        Ty::Int
+                            | Ty::Wide
+                            | Ty::Single
+                            | Ty::Double
+                            | Ty::Bool
+                            | Ty::Literal
+                            | Ty::TypeToken
+                    ) {
+                        return Err(fail(
+                            pc,
+                            "equality requires Int32, Int64/UInt64, Single/Double, Boolean, String or RuntimeTypeHandle",
+                        ));
                     }
                     take(&mut stack, &t)?;
                     stack.push(Ty::Bool);
@@ -1301,7 +1873,10 @@ impl<'a> Profile<'a> {
                 Op::Greater | Op::Less | Op::GreaterUnsigned | Op::LessUnsigned => {
                     let t = pop(&mut stack)?;
                     if !matches!(t, Ty::Int | Ty::Wide | Ty::Single | Ty::Double) {
-                        return Err(fail(pc, "ordering requires matching integer or floating operands"));
+                        return Err(fail(
+                            pc,
+                            "ordering requires matching integer or floating operands",
+                        ));
                     }
                     take(&mut stack, &t)?;
                     stack.push(Ty::Bool);
@@ -1309,7 +1884,10 @@ impl<'a> Profile<'a> {
                 _ if flow::comparison(op).is_some() => {
                     let t = pop(&mut stack)?;
                     if !matches!(t, Ty::Int | Ty::Wide | Ty::Single | Ty::Double) {
-                        return Err(fail(pc, "comparison branch requires matching integer or floating operands"));
+                        return Err(fail(
+                            pc,
+                            "comparison branch requires matching integer or floating operands",
+                        ));
                     }
                     take(&mut stack, &t)?;
                 }
@@ -1368,7 +1946,20 @@ mod object_assignment_tests {
         let index = |name: &str| input.types.iter().position(|t| t.name == name).unwrap();
         let root = index("Root");
         let view = Ty::Interface(index("View"));
-        let make = |object_base| Profile::new(&input, true, object_base, None, &[], None, None, None, false).unwrap();
+        let make = |object_base| {
+            Profile::new(
+                &input,
+                true,
+                object_base,
+                None,
+                &[],
+                None,
+                None,
+                None,
+                false,
+            )
+            .unwrap()
+        };
         let profile = make(Some(root));
         assert!(profile.reference_assignable(&view, &Ty::Reference(root)));
         assert!(!profile.reference_assignable(&view, &Ty::Reference(index("Other"))));

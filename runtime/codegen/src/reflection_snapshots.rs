@@ -270,8 +270,9 @@ impl Factory<'_> {
                         "System.Introspection.ParameterInfo" => {
                             (false, Some("StoredMemberIdentity"))
                         }
-                        "System.Introspection.ModuleInfo"
-                        | "System.Introspection.AssemblyInfo" => (false, None),
+                        "System.Introspection.ModuleInfo" | "System.Introspection.AssemblyInfo" => {
+                            (false, None)
+                        }
                         _ => {
                             return Err(
                                 format!("unsupported native snapshot provider {logical}").into()
@@ -325,19 +326,37 @@ impl Factory<'_> {
                         // managed provider can derive its module. Install only the
                         // runtime-owned metadata field, never execute the target.
                         let field = layout.get(3).ok_or("missing method module slot")?;
-                        if field.name != "StoredModule" { return Err("invalid method module slot".into()); }
+                        if field.name != "StoredModule" {
+                            return Err("invalid method module slot".into());
+                        }
                         let mut declaration = owner.clone();
                         loop {
-                            let index = self.input.types.iter().position(|t| Some(t.name.as_str()) == declaration.definition_name())
+                            let index = self
+                                .input
+                                .types
+                                .iter()
+                                .position(|t| {
+                                    Some(t.name.as_str()) == declaration.definition_name()
+                                })
                                 .ok_or("missing module field owner")?;
-                            if let Some(slot) = self.input.types[index].fields.iter_mut().find(|f| f.name == "StoredModule") {
-                                if slot.ty != field.ty { return Err("invalid method module field contract".into()); }
+                            if let Some(slot) = self.input.types[index]
+                                .fields
+                                .iter_mut()
+                                .find(|f| f.name == "StoredModule")
+                            {
+                                if slot.ty != field.ty {
+                                    return Err("invalid method module field contract".into());
+                                }
                                 slot.visibility = Visibility::Internal;
                                 break;
                             }
-                            declaration = self.input.types[index].base.clone().ok_or("missing inherited module field")?;
+                            declaration = self.input.types[index]
+                                .base
+                                .clone()
+                                .ok_or("missing inherited module field")?;
                         }
-                        self.trusted.push(json!({"moduleField":"StoredModule","owner":declaration}));
+                        self.trusted
+                            .push(json!({"moduleField":"StoredModule","owner":declaration}));
                         self.body.push(Op::Dup);
                         self.emit(&fields[3], &field.ty)?;
                         self.body.push(Op::SetField(3));
@@ -346,9 +365,10 @@ impl Factory<'_> {
                 }
             }
             _ => {
-                return Err(
-                    format!("unsupported native snapshot value {value:?} for {expected:?}").into(),
-                );
+                return Err(format!(
+                    "unsupported native snapshot value {value:?} for {expected:?}"
+                )
+                .into());
             }
         }
         Ok(())
@@ -393,7 +413,9 @@ pub fn bind(
                 vectors(element, tokens);
             }
             Type::Constructed { arguments, .. } => {
-                for argument in arguments { vectors(argument, tokens); }
+                for argument in arguments {
+                    vectors(argument, tokens);
+                }
             }
             _ => {}
         }
@@ -402,18 +424,29 @@ pub fn bind(
     for op in input.functions.iter().flat_map(|f| &f.body) {
         match op {
             Op::LoadTypeToken(t) => vectors(t, &mut tokens),
-            Op::Call(target) | Op::CallVirtual(target) | Op::Construct(target)
+            Op::Call(target)
+            | Op::CallVirtual(target)
+            | Op::Construct(target)
             | Op::BindFunction { target, .. } => {
-                for argument in &target.generic_arguments { vectors(argument, &mut tokens); }
+                for argument in &target.generic_arguments {
+                    vectors(argument, &mut tokens);
+                }
             }
             _ => {}
         }
     }
     for row in retention["types"].as_array().unwrap() {
-        if row["properties"] != true { continue; }
+        if row["properties"] != true {
+            continue;
+        }
         let id: TypeDefId = serde_json::from_value(row["definition"].clone())?;
-        let ti = definitions.iter().position(|d| *d == id).ok_or("missing snapshot root")?;
-        for property in &source.types[ti].properties { vectors(&property.ty, &mut tokens); }
+        let ti = definitions
+            .iter()
+            .position(|d| *d == id)
+            .ok_or("missing snapshot root")?;
+        for property in &source.types[ti].properties {
+            vectors(&property.ty, &mut tokens);
+        }
     }
     let context_queries = super::runtime_context::prepare(input, source)?;
     // Catalog retention is descriptive only: it roots all declared names, not their types.
@@ -429,16 +462,25 @@ pub fn bind(
         retained_modules.extend(elements.iter().cloned());
         catalogs.push((identity, recipe));
     }
-    if services.iter().any(|index| matches!(input.functions[*index].name.as_str(),
-        "neoCLR.Runtime.ModuleAssembly" | "neoCLR.Runtime.AssemblyName"))
-    {
+    if services.iter().any(|index| {
+        matches!(
+            input.functions[*index].name.as_str(),
+            "neoCLR.Runtime.ModuleAssembly" | "neoCLR.Runtime.AssemblyName"
+        )
+    }) {
         for row in retention["types"].as_array().unwrap() {
             let id: TypeDefId = serde_json::from_value(row["definition"].clone())?;
-            let ti = definitions.iter().position(|definition| *definition == id)
+            let ti = definitions
+                .iter()
+                .position(|definition| *definition == id)
                 .ok_or("missing module snapshot root")?;
-            retained_modules.push(neoclr::native_metadata::type_module(
-                source, &Type::Named(source.types[ti].name.clone()),
-            ).map_err(|error| error.to_string())?);
+            retained_modules.push(
+                neoclr::native_metadata::type_module(
+                    source,
+                    &Type::Named(source.types[ti].name.clone()),
+                )
+                .map_err(|error| error.to_string())?,
+            );
         }
     }
     let mut projections = vec![];
@@ -505,38 +547,96 @@ pub fn bind(
             let Type::ArrayRef(element) = &expected else {
                 return Err("module member query requires a vector result".into());
             };
-            let logical = if module_attributes { "System.Introspection.CustomAttributeData" }
-                else { "System.Introspection.MethodInfo" };
+            let logical = if module_attributes {
+                "System.Introspection.CustomAttributeData"
+            } else {
+                "System.Introspection.MethodInfo"
+            };
             if name(source, element) != Some(logical) {
                 return Err(format!("module member query requires scoped {logical}").into());
             }
-            for row in retention["moduleFunctions"].as_array().into_iter().flatten() {
-                if module_attributes && row["customAttributes"] != true { continue; }
-                let identity = row["assembly"].as_str().ok_or("invalid retained function assembly")?;
-                let module_name = row["name"].as_str().ok_or("invalid retained function module")?;
+            for row in retention["moduleFunctions"]
+                .as_array()
+                .into_iter()
+                .flatten()
+            {
+                if module_attributes && row["customAttributes"] != true {
+                    continue;
+                }
+                let identity = row["assembly"]
+                    .as_str()
+                    .ok_or("invalid retained function assembly")?;
+                let module_name = row["name"]
+                    .as_str()
+                    .ok_or("invalid retained function module")?;
                 let first = factory.body.len() + 3;
-                factory.body.extend([Op::Arg(0), Op::String(identity.into()), Op::Equal, Op::BranchFalse(0)]);
+                factory.body.extend([
+                    Op::Arg(0),
+                    Op::String(identity.into()),
+                    Op::Equal,
+                    Op::BranchFalse(0),
+                ]);
                 let second = factory.body.len() + 3;
-                factory.body.extend([Op::Arg(1), Op::String(module_name.into()), Op::Equal, Op::BranchFalse(0)]);
-                let definitions = neoclr::native_metadata::module_function_definitions(source, identity, module_name)
-                    .map_err(|error| error.to_string())?;
+                factory.body.extend([
+                    Op::Arg(1),
+                    Op::String(module_name.into()),
+                    Op::Equal,
+                    Op::BranchFalse(0),
+                ]);
+                let definitions = neoclr::native_metadata::module_function_definitions(
+                    source,
+                    identity,
+                    module_name,
+                )
+                .map_err(|error| error.to_string())?;
                 if module_functions {
-                    let elements = definitions.iter().map(|id|
-                        neoclr::native_metadata::module_function_snapshot(source, identity, module_name, id)
-                            .map_err(|error| error.to_string()))
+                    let elements = definitions
+                        .iter()
+                        .map(|id| {
+                            neoclr::native_metadata::module_function_snapshot(
+                                source,
+                                identity,
+                                module_name,
+                                id,
+                            )
+                            .map_err(|error| error.to_string())
+                        })
                         .collect::<Result<Vec<_>, _>>()?;
-                    factory.emit(&V::Array { element: Type::Named(logical.into()), elements }, &expected)?;
+                    factory.emit(
+                        &V::Array {
+                            element: Type::Named(logical.into()),
+                            elements,
+                        },
+                        &expected,
+                    )?;
                     factory.body.push(Op::Return);
                 } else {
                     for id in definitions {
-                        let target = source.functions.iter().find(|f| f.definition.as_ref() == Some(&id))
+                        let target = source
+                            .functions
+                            .iter()
+                            .find(|f| f.definition.as_ref() == Some(&id))
                             .ok_or("missing retained module function")?;
-                        let token = target.origin.as_ref().ok_or("module attributes require source token")?.token;
+                        let token = target
+                            .origin
+                            .as_ref()
+                            .ok_or("module attributes require source token")?
+                            .token;
                         let token: i32 = token.try_into()?;
                         let skip = factory.body.len() + 3;
-                        factory.body.extend([Op::Arg(2), Op::Int(token), Op::Equal, Op::BranchFalse(0)]);
-                        let recipe = neoclr::native_metadata::module_function_attributes(source, identity, module_name, &id)
-                            .map_err(|error| error.to_string())?;
+                        factory.body.extend([
+                            Op::Arg(2),
+                            Op::Int(token),
+                            Op::Equal,
+                            Op::BranchFalse(0),
+                        ]);
+                        let recipe = neoclr::native_metadata::module_function_attributes(
+                            source,
+                            identity,
+                            module_name,
+                            &id,
+                        )
+                        .map_err(|error| error.to_string())?;
                         factory.emit(&recipe, &expected)?;
                         factory.body.push(Op::Return);
                         factory.body[skip] = Op::BranchFalse(factory.body.len());
@@ -560,15 +660,21 @@ pub fn bind(
             for (identity, recipe) in &catalogs {
                 let skip = factory.body.len() + 3;
                 factory.body.extend([
-                    Op::Arg(0), Op::String((*identity).into()), Op::Equal, Op::BranchFalse(0),
+                    Op::Arg(0),
+                    Op::String((*identity).into()),
+                    Op::Equal,
+                    Op::BranchFalse(0),
                 ]);
                 factory.emit(recipe, &expected)?;
                 factory.body.push(Op::Return);
                 factory.body[skip] = Op::BranchFalse(factory.body.len());
             }
-            factory.body.push(Op::Fault("native assembly module catalog was not retained".into()));
+            factory.body.push(Op::Fault(
+                "native assembly module catalog was not retained".into(),
+            ));
         } else if module_assembly || assembly_name {
-            if module_assembly && name(source, &expected) != Some("System.Introspection.AssemblyInfo")
+            if module_assembly
+                && name(source, &expected) != Some("System.Introspection.AssemblyInfo")
                 || assembly_name && expected != Type::String
             {
                 return Err("assembly snapshot query requires exact result contract".into());
@@ -587,8 +693,12 @@ pub fn bind(
             // An assembly can have an explicit empty catalog without a global module.
             if assembly_name {
                 owners.extend(catalogs.iter().map(|(identity, _)| (*identity, None)));
-                owners.extend(context_queries.iter().flat_map(|query| query.assemblies.iter())
-                    .map(|(identity, _)| (identity.as_str(), None)));
+                owners.extend(
+                    context_queries
+                        .iter()
+                        .flat_map(|query| query.assemblies.iter())
+                        .map(|(identity, _)| (identity.as_str(), None)),
+                );
             }
             for (identity, module_name) in owners {
                 let key = (identity, if module_assembly { module_name } else { None });
@@ -596,10 +706,9 @@ pub fn bind(
                     continue;
                 }
                 let mut skips = vec![];
-                let arguments = std::iter::once(identity)
-                    .chain(module_name.filter(|_| module_assembly));
-                for (argument, value) in arguments.enumerate()
-                {
+                let arguments =
+                    std::iter::once(identity).chain(module_name.filter(|_| module_assembly));
+                for (argument, value) in arguments.enumerate() {
                     factory.body.extend([
                         Op::Arg(argument),
                         Op::String(value.to_string()),
@@ -610,7 +719,9 @@ pub fn bind(
                 }
                 let value = if module_assembly {
                     neoclr::native_metadata::module_assembly(
-                        source, identity, module_name.ok_or("missing retained module name")?,
+                        source,
+                        identity,
+                        module_name.ok_or("missing retained module name")?,
                     )
                 } else {
                     neoclr::native_metadata::assembly_name(source, identity)
@@ -629,8 +740,10 @@ pub fn bind(
             let Type::Constructed { arguments, .. } = &expected else {
                 return Err("TypeDeclaringType requires scoped Option<TypeInfo>".into());
             };
-            if !matches!(name(source, &expected), Some("System.Option" | "System.Option`1"))
-                || arguments.len() != 1
+            if !matches!(
+                name(source, &expected),
+                Some("System.Option" | "System.Option`1")
+            ) || arguments.len() != 1
                 || name(source, &arguments[0]) != Some("System.Introspection.TypeInfo")
             {
                 return Err("TypeDeclaringType requires scoped Option<TypeInfo>".into());
@@ -644,7 +757,10 @@ pub fn bind(
                 let owner = Type::Named(source.types[ti].name.clone());
                 let branch = factory.body.len() + 3;
                 factory.body.extend([
-                    Op::Arg(0), Op::LoadTypeToken(owner.clone()), Op::Equal, Op::BranchFalse(0),
+                    Op::Arg(0),
+                    Op::LoadTypeToken(owner.clone()),
+                    Op::Equal,
+                    Op::BranchFalse(0),
                 ]);
                 let recipe = neoclr::native_metadata::declaring_type(source, &owner)
                     .map_err(|error| error.to_string())?;
@@ -652,23 +768,39 @@ pub fn bind(
                 factory.body.push(Op::Return);
                 factory.body[branch] = Op::BranchFalse(factory.body.len());
             }
-            factory.body.push(Op::Fault("native declaring-type metadata was not retained; configure --reflection-roots".into()));
+            factory.body.push(Op::Fault(
+                "native declaring-type metadata was not retained; configure --reflection-roots"
+                    .into(),
+            ));
         } else if modules {
             if name(source, &expected) != Some("System.Introspection.ModuleInfo") {
                 return Err("TypeModule requires scoped ModuleInfo".into());
             }
             for row in retention["types"].as_array().unwrap() {
                 let id: TypeDefId = serde_json::from_value(row["definition"].clone())?;
-                let ti = definitions.iter().position(|definition| *definition == id)
+                let ti = definitions
+                    .iter()
+                    .position(|definition| *definition == id)
                     .ok_or("missing module snapshot root")?;
                 let owner = Type::Named(source.types[ti].name.clone());
                 let skip = factory.body.len() + 3;
-                factory.body.extend([Op::Arg(0), Op::LoadTypeToken(owner.clone()), Op::Equal, Op::BranchFalse(0)]);
-                factory.emit(&neoclr::native_metadata::type_module(source, &owner).map_err(|e| e.to_string())?, &expected)?;
+                factory.body.extend([
+                    Op::Arg(0),
+                    Op::LoadTypeToken(owner.clone()),
+                    Op::Equal,
+                    Op::BranchFalse(0),
+                ]);
+                factory.emit(
+                    &neoclr::native_metadata::type_module(source, &owner)
+                        .map_err(|e| e.to_string())?,
+                    &expected,
+                )?;
                 factory.body.push(Op::Return);
                 factory.body[skip] = Op::BranchFalse(factory.body.len());
             }
-            factory.body.push(Op::Fault("native logical module metadata was not retained".into()));
+            factory.body.push(Op::Fault(
+                "native logical module metadata was not retained".into(),
+            ));
         } else if properties {
             let Type::ArrayRef(element) = &expected else {
                 return Err("TypeProperties requires PropertyInfo vector".into());
@@ -841,15 +973,28 @@ pub fn bind(
     let mut caller_rows = vec![];
     for query in context_queries {
         let expected = input.functions[query.getter].returns.clone();
-        let mut factory = Factory { input, source, body: vec![], locals: vec![], trusted: vec![] };
+        let mut factory = Factory {
+            input,
+            source,
+            body: vec![],
+            locals: vec![],
+            trusted: vec![],
+        };
         for (identity, recipe) in &query.assemblies {
             let skip = factory.body.len() + 3;
-            factory.body.extend([Op::Arg(1), Op::String(identity.clone()), Op::Equal, Op::BranchFalse(0)]);
+            factory.body.extend([
+                Op::Arg(1),
+                Op::String(identity.clone()),
+                Op::Equal,
+                Op::BranchFalse(0),
+            ]);
             factory.emit(recipe, &expected)?;
             factory.body.push(Op::Return);
             factory.body[skip] = Op::BranchFalse(factory.body.len());
         }
-        factory.body.push(Op::Fault("native executing assembly caller was not admitted".into()));
+        factory.body.push(Op::Fault(
+            "native executing assembly caller was not admitted".into(),
+        ));
         projections.extend(factory.trusted);
         let getter = &mut factory.input.functions[query.getter];
         getter.body = factory.body;
@@ -1029,17 +1174,44 @@ mod catalog_tests {
         source.assemblies = serde_json::from_value(json!([
             {"name":"One","full_name":"One","modules":["Functions"],"references":[],
              "declaration_modules":{"version":1,"names":["Empty"]}}
-        ])).unwrap();
+        ]))
+        .unwrap();
         let mut retention = json!({"types":[],"moduleFunctions":[{"assembly":"One","name":"Empty","customAttributes":false}]});
         let mut input = source.clone();
         bind(&mut input, &source, &[], &mut retention).unwrap();
-        assert!(input.functions[0].body.iter().any(|op| matches!(op, Op::ReserveArray(_))));
-        assert!(matches!(input.functions[0].body.last(), Some(Op::Fault(message)) if message.contains("module function metadata was not retained")));
-        assert_eq!(input.functions[0].body.iter().filter(|op| matches!(op, Op::BranchFalse(_))).count(), 2);
-        let mut invalid = source.clone(); invalid.functions[0].parameters[1] = Type::Int32;
-        assert!(bind(&mut invalid, &source, &[], &mut retention).unwrap_err().to_string().contains("exact reserved InternalCall contract"));
-        let mut invalid = source.clone(); invalid.functions[0].returns = Type::ArrayRef(Box::new(Type::Int32));
-        assert!(bind(&mut invalid, &source, &[], &mut retention).unwrap_err().to_string().contains("scoped System.Introspection.MethodInfo"));
+        assert!(
+            input.functions[0]
+                .body
+                .iter()
+                .any(|op| matches!(op, Op::ReserveArray(_)))
+        );
+        assert!(
+            matches!(input.functions[0].body.last(), Some(Op::Fault(message)) if message.contains("module function metadata was not retained"))
+        );
+        assert_eq!(
+            input.functions[0]
+                .body
+                .iter()
+                .filter(|op| matches!(op, Op::BranchFalse(_)))
+                .count(),
+            2
+        );
+        let mut invalid = source.clone();
+        invalid.functions[0].parameters[1] = Type::Int32;
+        assert!(
+            bind(&mut invalid, &source, &[], &mut retention)
+                .unwrap_err()
+                .to_string()
+                .contains("exact reserved InternalCall contract")
+        );
+        let mut invalid = source.clone();
+        invalid.functions[0].returns = Type::ArrayRef(Box::new(Type::Int32));
+        assert!(
+            bind(&mut invalid, &source, &[], &mut retention)
+                .unwrap_err()
+                .to_string()
+                .contains("scoped System.Introspection.MethodInfo")
+        );
     }
 
     #[test]
@@ -1048,13 +1220,26 @@ mod catalog_tests {
         let mut retention = json!({"types":[]});
         let mut input = source.clone();
         bind(&mut input, &source, &[], &mut retention).unwrap();
-        assert!(matches!(&input.functions[0].body[..], [Op::Fault(message)] if message.contains("declaring-type metadata was not retained")));
+        assert!(
+            matches!(&input.functions[0].body[..], [Op::Fault(message)] if message.contains("declaring-type metadata was not retained"))
+        );
         let mut invalid = source.clone();
         invalid.functions[0].parameters[0] = Type::Int32;
-        assert!(bind(&mut invalid, &source, &[], &mut retention).unwrap_err().to_string().contains("exact reserved InternalCall contract"));
+        assert!(
+            bind(&mut invalid, &source, &[], &mut retention)
+                .unwrap_err()
+                .to_string()
+                .contains("exact reserved InternalCall contract")
+        );
         let mut invalid = source.clone();
-        invalid.functions[0].returns = neoclr::assembler::parse_type("System.Option<Int32>").unwrap();
-        assert!(bind(&mut invalid, &source, &[], &mut retention).unwrap_err().to_string().contains("Option<TypeInfo>"));
+        invalid.functions[0].returns =
+            neoclr::assembler::parse_type("System.Option<Int32>").unwrap();
+        assert!(
+            bind(&mut invalid, &source, &[], &mut retention)
+                .unwrap_err()
+                .to_string()
+                .contains("Option<TypeInfo>")
+        );
     }
 
     #[test]
@@ -1064,14 +1249,26 @@ mod catalog_tests {
         let mut input = source.clone();
         bind(&mut input, &source, &[], &mut retention).unwrap();
         assert_eq!(input.functions[0].impl_flags, 0);
-        assert!(matches!(&input.functions[0].body[..], [Op::Fault(message)] if message.contains("module-member custom attribute metadata was not retained")));
+        assert!(
+            matches!(&input.functions[0].body[..], [Op::Fault(message)] if message.contains("module-member custom attribute metadata was not retained"))
+        );
         assert_eq!(retention["snapshotFactories"], json!([]));
         let mut invalid = source.clone();
         invalid.functions[0].parameters[2] = Type::String;
-        assert!(bind(&mut invalid, &source, &[], &mut retention).unwrap_err().to_string().contains("exact reserved InternalCall contract"));
+        assert!(
+            bind(&mut invalid, &source, &[], &mut retention)
+                .unwrap_err()
+                .to_string()
+                .contains("exact reserved InternalCall contract")
+        );
         let mut invalid = source.clone();
         invalid.functions[0].returns = Type::ArrayRef(Box::new(Type::Int32));
-        assert!(bind(&mut invalid, &source, &[], &mut retention).unwrap_err().to_string().contains("scoped System.Introspection.CustomAttributeData"));
+        assert!(
+            bind(&mut invalid, &source, &[], &mut retention)
+                .unwrap_err()
+                .to_string()
+                .contains("scoped System.Introspection.CustomAttributeData")
+        );
     }
 
     #[test]

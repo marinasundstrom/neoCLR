@@ -895,14 +895,32 @@ add
 ret
 .end
 "#;
-    for (ty, conversion) in [("Byte", "conv.u1"), ("SByte", "conv.i1"), ("Int16", "conv.i2"), ("UInt16", "conv.u2")] {
+    for (ty, conversion) in [
+        ("Byte", "conv.u1"),
+        ("SByte", "conv.i1"),
+        ("Int16", "conv.i2"),
+        ("UInt16", "conv.u2"),
+    ] {
         let source = source.replace("Byte", ty).replace("conv.u1", conversion);
         let m = neoclr::assemble(&source).unwrap();
         let program = neoclr::LoadedProgram::new(&m).unwrap();
         let entry = program
             .resolve_function(&neoclr::assembler::parse_function_ref("Main(Int32)").unwrap())
             .unwrap();
-        for input in [-1, 0, 127, 128, 255, 256, 32767, 32768, 65535, 65536, i32::MIN, i32::MAX] {
+        for input in [
+            -1,
+            0,
+            127,
+            128,
+            255,
+            256,
+            32767,
+            32768,
+            65535,
+            65536,
+            i32::MIN,
+            i32::MAX,
+        ] {
             let narrowed = match ty {
                 "Byte" => input as u8 as i32,
                 "SByte" => input as i8 as i32,
@@ -1407,7 +1425,10 @@ fn specialization_rejects_unsupported_shapes_and_preserves_verification() {
         if case < 2 {
             // Multi-shape token cloning requires original-scope verification. This
             // old single-artifact fixture omits its declared Raven dependency.
-            assert!(error.contains("missing referenced module"), "case {case}: {error}");
+            assert!(
+                error.contains("missing referenced module"),
+                "case {case}: {error}"
+            );
         }
         assert!(
             !result.status.success(),
@@ -1690,24 +1711,40 @@ Done:
     let m = neoclr::assemble(source).unwrap();
     let program = neoclr::LoadedProgram::new(&m).unwrap();
     program.verify().unwrap();
-    let method = program.resolve_function(&neoclr::assembler::parse_function_ref("Main(Int32)").unwrap()).unwrap();
-    let fault = method.invoke(vec![neoclr::Value::Int32(1)], neoclr::Limits::default()).unwrap_err();
+    let method = program
+        .resolve_function(&neoclr::assembler::parse_function_ref("Main(Int32)").unwrap())
+        .unwrap();
+    let fault = method
+        .invoke(vec![neoclr::Value::Int32(1)], neoclr::Limits::default())
+        .unwrap_err();
     assert_eq!(fault.code, neoclr::FaultCode::UserFault);
     assert!(fault.message.contains("output rejected"));
     let bytes = neoclr::metadata_container::write_module(&m).unwrap();
     for closed in [false, true] {
         let temp = Temp::new();
         let result = compile_mode(&bytes, &temp, "Main", closed);
-        assert!(result.status.success(), "{}", String::from_utf8_lossy(&result.stderr));
-        #[cfg(all(target_os = "macos", target_arch = "aarch64"))] {
+        assert!(
+            result.status.success(),
+            "{}",
+            String::from_utf8_lossy(&result.stderr)
+        );
+        #[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+        {
             native_mode(&bytes, 1, 4, 12345, "Main", closed);
             native_mode(&bytes, 0, 0, 42, "Main", closed);
         }
     }
     // A normal return still has to assign the output, even beside a fault path.
-    let bad = neoclr::assemble(&source.replace("    ldarg value\n    ldc.i4 42\n    stobj Int32\n", "")).unwrap();
+    let bad =
+        neoclr::assemble(&source.replace("    ldarg value\n    ldc.i4 42\n    stobj Int32\n", ""))
+            .unwrap();
     let temp = Temp::new();
-    let result = compile_mode(&neoclr::metadata_container::write_module(&bad).unwrap(), &temp, "Main", true);
+    let result = compile_mode(
+        &neoclr::metadata_container::write_module(&bad).unwrap(),
+        &temp,
+        "Main",
+        true,
+    );
     assert!(!result.status.success());
     assert!(!temp.0.join("value.o").exists());
     assert!(String::from_utf8_lossy(&result.stderr).contains("definite whole-slot assignment"));
@@ -1733,15 +1770,26 @@ fn immutable_utf8_literals_cross_locals_outputs_calls_and_joins() {
     let m = neoclr::assemble(source).unwrap();
     let program = neoclr::LoadedProgram::new(&m).unwrap();
     program.verify().unwrap();
-    let main = program.resolve_function(&neoclr::assembler::parse_function_ref("Main(Int32)").unwrap()).unwrap();
+    let main = program
+        .resolve_function(&neoclr::assembler::parse_function_ref("Main(Int32)").unwrap())
+        .unwrap();
     for input in [0, 1] {
-        assert_eq!(main.invoke(vec![neoclr::Value::Int32(input)], neoclr::Limits::default()).unwrap().value, neoclr::Value::Int32(42));
+        assert_eq!(
+            main.invoke(vec![neoclr::Value::Int32(input)], neoclr::Limits::default())
+                .unwrap()
+                .value,
+            neoclr::Value::Int32(42)
+        );
     }
     let bytes = neoclr::metadata_container::write_module(&m).unwrap();
     for closed in [false, true] {
         let temp = Temp::new();
         let result = compile_mode(&bytes, &temp, "Main", closed);
-        assert!(result.status.success(), "{}", String::from_utf8_lossy(&result.stderr));
+        assert!(
+            result.status.success(),
+            "{}",
+            String::from_utf8_lossy(&result.stderr)
+        );
         let object = fs::read(temp.0.join("value.o")).unwrap();
         for text in ["Hej, världen 🌍", "embedded\0null", ""] {
             let mut payload = (text.len() as u64).to_le_bytes().to_vec();
@@ -1759,12 +1807,19 @@ fn immutable_utf8_literals_cross_locals_outputs_calls_and_joins() {
 fn raven_literal_transport_compiles_from_pe_and_neox() {
     let pe = include_bytes!("../../../docs/experiments/aot-input/Literals.pe");
     let m = module(pe);
-    assert_eq!(neoclr::run(&m, neoclr::Limits::default()).unwrap().value, neoclr::Value::Int32(42));
+    assert_eq!(
+        neoclr::run(&m, neoclr::Limits::default()).unwrap().value,
+        neoclr::Value::Int32(42)
+    );
     let neox = neoclr::metadata_container::write_module(&m).unwrap();
     for bytes in [pe.as_slice(), neox.as_slice()] {
         let temp = Temp::new();
         let result = compile_mode(bytes, &temp, "@entry", true);
-        assert!(result.status.success(), "{}", String::from_utf8_lossy(&result.stderr));
+        assert!(
+            result.status.success(),
+            "{}",
+            String::from_utf8_lossy(&result.stderr)
+        );
         #[cfg(all(target_os = "macos", target_arch = "aarch64"))]
         native_mode(bytes, 0, 0, 42, "@entry", true);
     }
@@ -1776,7 +1831,10 @@ fn text_profile_rejects_uninitialized_and_mistyped_copies() {
         (".local String text", "ldloc text\npop\nldc.i4 0\nret"),
         (".local String text", "ldc.i4 0\nstloc text\nldc.i4 0\nret"),
     ] {
-        let m = neoclr::assemble(&format!(".module InvalidLiteral\n.function Main() -> Int32\n{declarations}\n{body}\n.end")).unwrap();
+        let m = neoclr::assemble(&format!(
+            ".module InvalidLiteral\n.function Main() -> Int32\n{declarations}\n{body}\n.end"
+        ))
+        .unwrap();
         let bytes = neoclr::metadata_container::write_module(&m).unwrap();
         let temp = Temp::new();
         let result = compile_mode(&bytes, &temp, "Main", true);
@@ -1784,7 +1842,6 @@ fn text_profile_rejects_uninitialized_and_mistyped_copies() {
         assert!(!temp.0.join("value.o").exists());
         assert!(!String::from_utf8_lossy(&result.stderr).contains("panicked"));
     }
-
 }
 
 #[test]
@@ -1841,58 +1898,81 @@ ret
     let m = neoclr::assemble(source).unwrap();
     let bytes = neoclr::metadata_container::write_module(&m).unwrap();
     let program = neoclr::LoadedProgram::new(&m).unwrap();
-    let main = program.resolve_function(&neoclr::assembler::parse_function_ref("Main(Int32)").unwrap()).unwrap();
-    for input in [0,1,2] {
-        let reference = main.invoke(vec![neoclr::Value::Int32(input)],neoclr::Limits::default());
+    let main = program
+        .resolve_function(&neoclr::assembler::parse_function_ref("Main(Int32)").unwrap())
+        .unwrap();
+    for input in [0, 1, 2] {
+        let reference = main.invoke(vec![neoclr::Value::Int32(input)], neoclr::Limits::default());
         if input == 0 {
-            assert_eq!(reference.unwrap().value,neoclr::Value::Int32(42));
-            native_mode(&bytes,input,0,42,"Main",true);
+            assert_eq!(reference.unwrap().value, neoclr::Value::Int32(42));
+            native_mode(&bytes, input, 0, 42, "Main", true);
         } else {
-            assert_eq!(reference.unwrap_err().code,neoclr::FaultCode::UserFault);
-            native_mode(&bytes,input,4,12345,"Main",true);
+            assert_eq!(reference.unwrap_err().code, neoclr::FaultCode::UserFault);
+            native_mode(&bytes, input, 4, 12345, "Main", true);
         }
     }
     let temp = Temp::new();
-    let r = compile_mode(&bytes,&temp,"Main",true);
-    assert!(r.status.success(),"{}",String::from_utf8_lossy(&r.stderr));
+    let r = compile_mode(&bytes, &temp, "Main", true);
+    assert!(r.status.success(), "{}", String::from_utf8_lossy(&r.stderr));
     let report: serde_json::Value = serde_json::from_slice(&r.stdout).unwrap();
     let shapes = report["types"].as_array().unwrap();
-    assert_eq!(shapes.len(),2);
-    assert_eq!(shapes[0]["definition"],shapes[1]["definition"]);
-    assert_ne!(shapes[0]["compiledName"],shapes[1]["compiledName"]);
-    assert_ne!(shapes[0]["typeArguments"],shapes[1]["typeArguments"]);
-    for name in ["Box.Get","Box.Fail"] {
-        let rows: Vec<_> = report["functions"].as_array().unwrap().iter().filter(|r| r["name"] == name).collect();
-        assert_eq!(rows.len(),2);
-        assert_eq!(rows[0]["definition"],rows[1]["definition"]);
-        assert_ne!(rows[0]["compiledIndex"],rows[1]["compiledIndex"]);
-        assert_ne!(rows[0]["typeArguments"],rows[1]["typeArguments"]);
+    assert_eq!(shapes.len(), 2);
+    assert_eq!(shapes[0]["definition"], shapes[1]["definition"]);
+    assert_ne!(shapes[0]["compiledName"], shapes[1]["compiledName"]);
+    assert_ne!(shapes[0]["typeArguments"], shapes[1]["typeArguments"]);
+    for name in ["Box.Get", "Box.Fail"] {
+        let rows: Vec<_> = report["functions"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .filter(|r| r["name"] == name)
+            .collect();
+        assert_eq!(rows.len(), 2);
+        assert_eq!(rows[0]["definition"], rows[1]["definition"]);
+        assert_ne!(rows[0]["compiledIndex"], rows[1]["compiledIndex"]);
+        assert_ne!(rows[0]["typeArguments"], rows[1]["typeArguments"]);
     }
 }
 
 #[test]
 fn multiple_value_shape_discovery_stays_bounded() {
-    for count in [512,513] {
-    let mut source = String::from(".module ManyShapes\n.type Box<T>\n.field Value T\n.end\n");
-    for n in 0..count { source.push_str(&format!(".type Leaf{n}\n.end\n")); }
-    source.push_str(".function Main() -> Int32\n");
-    for n in 0..count { source.push_str(&format!(".local Box<Leaf{n}> item{n}\n")); }
-    source.push_str("ldc.i4 0\nret\n.end\n");
-    let m = neoclr::assemble(&source).unwrap();
-    let temp = Temp::new();
-    let r = compile_mode(&neoclr::metadata_container::write_module(&m).unwrap(),&temp,"Main",true);
-    assert_eq!(r.status.success(),count==512,"{}",String::from_utf8_lossy(&r.stderr));
-    if count==513 {
-    assert!(!temp.0.join("value.o").exists());
-    assert!(String::from_utf8_lossy(&r.stderr).contains("specialized type count exceeds 1024"));
-    }
+    for count in [512, 513] {
+        let mut source = String::from(".module ManyShapes\n.type Box<T>\n.field Value T\n.end\n");
+        for n in 0..count {
+            source.push_str(&format!(".type Leaf{n}\n.end\n"));
+        }
+        source.push_str(".function Main() -> Int32\n");
+        for n in 0..count {
+            source.push_str(&format!(".local Box<Leaf{n}> item{n}\n"));
+        }
+        source.push_str("ldc.i4 0\nret\n.end\n");
+        let m = neoclr::assemble(&source).unwrap();
+        let temp = Temp::new();
+        let r = compile_mode(
+            &neoclr::metadata_container::write_module(&m).unwrap(),
+            &temp,
+            "Main",
+            true,
+        );
+        assert_eq!(
+            r.status.success(),
+            count == 512,
+            "{}",
+            String::from_utf8_lossy(&r.stderr)
+        );
+        if count == 513 {
+            assert!(!temp.0.join("value.o").exists());
+            assert!(
+                String::from_utf8_lossy(&r.stderr).contains("specialized type count exceeds 1024")
+            );
+        }
     }
 }
 
 #[test]
 #[cfg(all(target_os = "macos", target_arch = "aarch64"))]
 fn unit_payloads_and_output_borrows_preserve_adjacent_fields() {
-    let source=r#"
+    let source = r#"
 .module UnitStorage
 .entry Main
 .type Box<T>
@@ -1930,24 +2010,48 @@ ldfld Box<Void>::Neighbor
 ret
 .end
 "#;
-    let m=neoclr::assemble(source).unwrap();
-    assert_eq!(neoclr::run(&m,neoclr::Limits::default()).unwrap().value,neoclr::Value::Int32(42));
-    native_mode(&neoclr::metadata_container::write_module(&m).unwrap(),0,0,42,"Main",true);
+    let m = neoclr::assemble(source).unwrap();
+    assert_eq!(
+        neoclr::run(&m, neoclr::Limits::default()).unwrap().value,
+        neoclr::Value::Int32(42)
+    );
+    native_mode(
+        &neoclr::metadata_container::write_module(&m).unwrap(),
+        0,
+        0,
+        42,
+        "Main",
+        true,
+    );
 }
 
 #[test]
 fn expanded_value_function_budget_accepts_1024_and_rejects_1025() {
-    for count in [1024,1025] {
-        let mut source=String::from(".module FunctionBudget\n.function Main() -> Int32\n");
-        for n in 1..count { source.push_str(&format!("call F{n}()\npop\n")); }
+    for count in [1024, 1025] {
+        let mut source = String::from(".module FunctionBudget\n.function Main() -> Int32\n");
+        for n in 1..count {
+            source.push_str(&format!("call F{n}()\npop\n"));
+        }
         source.push_str("ldc.i4 42\nret\n.end\n");
-        for n in 1..count { source.push_str(&format!(".function F{n}() -> Int32\nldc.i4 0\nret\n.end\n")); }
+        for n in 1..count {
+            source.push_str(&format!(".function F{n}() -> Int32\nldc.i4 0\nret\n.end\n"));
+        }
         source.push_str(".function Unselected() -> Int32\nldc.i4 0\nret\n.end\n");
-        let module=neoclr::assemble(&source).unwrap();
-        let temp=Temp::new();
-        let r=compile_mode(&neoclr::metadata_container::write_module(&module).unwrap(),&temp,"Main",true);
-        assert_eq!(r.status.success(),count==1024,"{}",String::from_utf8_lossy(&r.stderr));
-        if count==1025 {
+        let module = neoclr::assemble(&source).unwrap();
+        let temp = Temp::new();
+        let r = compile_mode(
+            &neoclr::metadata_container::write_module(&module).unwrap(),
+            &temp,
+            "Main",
+            true,
+        );
+        assert_eq!(
+            r.status.success(),
+            count == 1024,
+            "{}",
+            String::from_utf8_lossy(&r.stderr)
+        );
+        if count == 1025 {
             assert!(!temp.0.join("value.o").exists());
             assert!(String::from_utf8_lossy(&r.stderr).contains("selected functions exceed"));
         }
@@ -1957,44 +2061,104 @@ fn expanded_value_function_budget_accepts_1024_and_rejects_1025() {
 #[test]
 #[cfg(all(target_os = "macos", target_arch = "aarch64"))]
 fn thirty_two_lane_nested_record_crosses_call_boundary() {
-    let fields=(0..16).map(|i| format!(".field F{i} Pair\n")).collect::<String>();
-    let values=(0..16).map(|i| format!("ldc.i4 {i}\nldc.i4 {}\nnewobj Pair\n",i+1)).collect::<String>();
-    let source=format!(".module Wide\n.type Pair\n.field X Int32\n.field Y Int32\n.end\n.type Wide\n{fields}.end\n.function Echo(Wide value) -> Wide\nldarg value\nret\n.end\n.function Main() -> Int32\n{values}newobj Wide\ncall Echo(Wide)\nldfld 15\nldfld 1\nret\n.end\n");
-    let m=neoclr::assemble(&source).unwrap();
-    native_mode(&neoclr::metadata_container::write_module(&m).unwrap(),0,0,16,"Main",true);
+    let fields = (0..16)
+        .map(|i| format!(".field F{i} Pair\n"))
+        .collect::<String>();
+    let values = (0..16)
+        .map(|i| format!("ldc.i4 {i}\nldc.i4 {}\nnewobj Pair\n", i + 1))
+        .collect::<String>();
+    let source = format!(
+        ".module Wide\n.type Pair\n.field X Int32\n.field Y Int32\n.end\n.type Wide\n{fields}.end\n.function Echo(Wide value) -> Wide\nldarg value\nret\n.end\n.function Main() -> Int32\n{values}newobj Wide\ncall Echo(Wide)\nldfld 15\nldfld 1\nret\n.end\n"
+    );
+    let m = neoclr::assemble(&source).unwrap();
+    native_mode(
+        &neoclr::metadata_container::write_module(&m).unwrap(),
+        0,
+        0,
+        16,
+        "Main",
+        true,
+    );
 }
 
 #[test]
 #[cfg(all(target_os = "macos", target_arch = "aarch64"))]
 fn sixty_four_lane_nested_record_crosses_call_boundary() {
-    let fields=(0..16).map(|i| format!(".field F{i} Pair\n")).collect::<String>();
-    let values=(0..16).map(|i| format!("ldc.i4 {i}\nldc.i4 {}\nldc.i4 41\nldc.i4 42\nnewobj Pair\n",i+1)).collect::<String>();
-    let source=format!(".module Wide\n.type Pair\n.field X Int32\n.field Y Int32\n.field Z Int32\n.field W Int32\n.end\n.type Wide\n{fields}.end\n.function Echo(Wide value) -> Wide\nldarg value\nret\n.end\n.function Main() -> Int32\n{values}newobj Wide\ncall Echo(Wide)\nldfld 15\nldfld 3\nret\n.end\n");
-    let m=neoclr::assemble(&source).unwrap();
-    native_mode(&neoclr::metadata_container::write_module(&m).unwrap(),0,0,42,"Main",true);
+    let fields = (0..16)
+        .map(|i| format!(".field F{i} Pair\n"))
+        .collect::<String>();
+    let values = (0..16)
+        .map(|i| {
+            format!(
+                "ldc.i4 {i}\nldc.i4 {}\nldc.i4 41\nldc.i4 42\nnewobj Pair\n",
+                i + 1
+            )
+        })
+        .collect::<String>();
+    let source = format!(
+        ".module Wide\n.type Pair\n.field X Int32\n.field Y Int32\n.field Z Int32\n.field W Int32\n.end\n.type Wide\n{fields}.end\n.function Echo(Wide value) -> Wide\nldarg value\nret\n.end\n.function Main() -> Int32\n{values}newobj Wide\ncall Echo(Wide)\nldfld 15\nldfld 3\nret\n.end\n"
+    );
+    let m = neoclr::assemble(&source).unwrap();
+    native_mode(
+        &neoclr::metadata_container::write_module(&m).unwrap(),
+        0,
+        0,
+        42,
+        "Main",
+        true,
+    );
 }
 
 #[test]
 fn erased_wide_integers_preserve_bits_and_nominal_tags_through_generic_calls() {
-    let mut source = String::from(".module ErasedWide\n.entry Main\n.type Box<T>\n.field Item T\n.end\n.function Copy<T>(!!0 value) -> !!0\nldarg value\nret\n.end\n.function Unpack<T>(Value value) -> !!0\nldarg value\nvalue.unpack !!0\nret\n.end\n.function Main() -> Int32\n.local Value item\n");
-    for (kind, bits) in [("Int64", i64::MIN), ("Int64", i64::MAX), ("Int64", 0x1234567887654321), ("UInt64", -1), ("UInt64", i64::MIN), ("UInt64", 0)] {
+    let mut source = String::from(
+        ".module ErasedWide\n.entry Main\n.type Box<T>\n.field Item T\n.end\n.function Copy<T>(!!0 value) -> !!0\nldarg value\nret\n.end\n.function Unpack<T>(Value value) -> !!0\nldarg value\nvalue.unpack !!0\nret\n.end\n.function Main() -> Int32\n.local Value item\n",
+    );
+    for (kind, bits) in [
+        ("Int64", i64::MIN),
+        ("Int64", i64::MAX),
+        ("Int64", 0x1234567887654321),
+        ("UInt64", -1),
+        ("UInt64", i64::MIN),
+        ("UInt64", 0),
+    ] {
         let conversion = if kind == "UInt64" { "conv.u8\n" } else { "" };
-        source += &format!("ldc.i8 {bits}\n{conversion}call Copy<{kind}>({kind})\nnewobj Box<{kind}>\nldfld 0\nvalue.pack {kind}\nstloc item\n");
+        source += &format!(
+            "ldc.i8 {bits}\n{conversion}call Copy<{kind}>({kind})\nnewobj Box<{kind}>\nldfld 0\nvalue.pack {kind}\nstloc item\n"
+        );
         for target in ["Int32", "Int64", "UInt64", "String"] {
-            source += &format!("ldloc item\nvalue.is {target}\n{} fail\n", if kind == target { "brfalse" } else { "brtrue" });
+            source += &format!(
+                "ldloc item\nvalue.is {target}\n{} fail\n",
+                if kind == target { "brfalse" } else { "brtrue" }
+            );
         }
-        source += &format!("ldloc item\ncall Unpack<{kind}>(Value)\nldc.i8 {bits}\n{conversion}ceq\nbrfalse fail\n");
+        source += &format!(
+            "ldloc item\ncall Unpack<{kind}>(Value)\nldc.i8 {bits}\n{conversion}ceq\nbrfalse fail\n"
+        );
         // Differences only above bit 31 must not disappear during erased transport.
         let different = bits ^ (1_i64 << 40);
-        source += &format!("ldloc item\ncall Unpack<{kind}>(Value)\nldc.i8 {different}\n{conversion}ceq\nbrtrue fail\n");
+        source += &format!(
+            "ldloc item\ncall Unpack<{kind}>(Value)\nldc.i8 {different}\n{conversion}ceq\nbrtrue fail\n"
+        );
     }
     source += "ldc.i4 42\nret\nfail:\nldc.i4 -1\nret\n.end\n";
     let m = neoclr::assemble(&source).unwrap();
-    assert_eq!(neoclr::LoadedProgram::new(&m).unwrap().run(neoclr::Limits::default()).unwrap().value, neoclr::Value::Int32(42));
+    assert_eq!(
+        neoclr::LoadedProgram::new(&m)
+            .unwrap()
+            .run(neoclr::Limits::default())
+            .unwrap()
+            .value,
+        neoclr::Value::Int32(42)
+    );
     let bytes = neoclr::metadata_container::write_module(&m).unwrap();
     let temp = Temp::new();
     let compiled = compile_mode(&bytes, &temp, "@entry", true);
-    assert!(compiled.status.success(), "{}", String::from_utf8_lossy(&compiled.stderr));
+    assert!(
+        compiled.status.success(),
+        "{}",
+        String::from_utf8_lossy(&compiled.stderr)
+    );
     #[cfg(all(target_os = "macos", target_arch = "aarch64"))]
     native_mode(&bytes, 0, 0, 42, "@entry", true);
 }
@@ -2003,14 +2167,26 @@ fn erased_wide_integers_preserve_bits_and_nominal_tags_through_generic_calls() {
 fn erased_wide_integer_mismatch_faults_without_publishing_result() {
     for (packed, unpacked) in [("Int64", "UInt64"), ("UInt64", "Int64"), ("Int64", "Int32")] {
         let conversion = if packed == "UInt64" { "conv.u8\n" } else { "" };
-        let source = format!(".module WrongWide\n.entry Main\n.function Main() -> Int32\nldc.i8 -1\n{conversion}value.pack {packed}\nvalue.unpack {unpacked}\npop\nldc.i4 42\nret\n.end");
+        let source = format!(
+            ".module WrongWide\n.entry Main\n.function Main() -> Int32\nldc.i8 -1\n{conversion}value.pack {packed}\nvalue.unpack {unpacked}\npop\nldc.i4 42\nret\n.end"
+        );
         let m = neoclr::assemble(&source).unwrap();
-        let error = neoclr::LoadedProgram::new(&m).unwrap().run(neoclr::Limits::default()).unwrap_err();
-        assert!(error.to_string().contains("erased value contains"), "{error}");
+        let error = neoclr::LoadedProgram::new(&m)
+            .unwrap()
+            .run(neoclr::Limits::default())
+            .unwrap_err();
+        assert!(
+            error.to_string().contains("erased value contains"),
+            "{error}"
+        );
         let bytes = neoclr::metadata_container::write_module(&m).unwrap();
         let temp = Temp::new();
         let compiled = compile_mode(&bytes, &temp, "@entry", true);
-        assert!(compiled.status.success(), "{}", String::from_utf8_lossy(&compiled.stderr));
+        assert!(
+            compiled.status.success(),
+            "{}",
+            String::from_utf8_lossy(&compiled.stderr)
+        );
         #[cfg(all(target_os = "macos", target_arch = "aarch64"))]
         native_mode(&bytes, 0, 3, 12345, "@entry", true);
     }
@@ -2025,15 +2201,30 @@ fn selected_value_type_budget_accepts_1024_and_rejects_1025() {
         }
         source += "ldc.i4 42\nret\n.end\n";
         for index in 0..count {
-            source += &format!(".type T{index}\n.field Value Int32\n.end\n.function Make{index}() -> T{index}\nldc.i4 1\nnewobj T{index}\nret\n.end\n");
+            source += &format!(
+                ".type T{index}\n.field Value Int32\n.end\n.function Make{index}() -> T{index}\nldc.i4 1\nnewobj T{index}\nret\n.end\n"
+            );
         }
         let module = neoclr::assemble(&source).unwrap();
         let temp = Temp::new();
-        let result = compile_mode(&neoclr::metadata_container::write_module(&module).unwrap(), &temp, "Main", true);
-        assert_eq!(result.status.success(), count == 1024, "{}", String::from_utf8_lossy(&result.stderr));
+        let result = compile_mode(
+            &neoclr::metadata_container::write_module(&module).unwrap(),
+            &temp,
+            "Main",
+            true,
+        );
+        assert_eq!(
+            result.status.success(),
+            count == 1024,
+            "{}",
+            String::from_utf8_lossy(&result.stderr)
+        );
         if count == 1025 {
             assert!(!temp.0.join("value.o").exists());
-            assert!(String::from_utf8_lossy(&result.stderr).contains("closed-world input inventory exceeds bounds"));
+            assert!(
+                String::from_utf8_lossy(&result.stderr)
+                    .contains("closed-world input inventory exceeds bounds")
+            );
         }
     }
 }
@@ -2043,9 +2234,17 @@ fn ordinary_int32_borrow_is_not_authorized_by_a_primitive_like_name() {
     let source = ".module BorrowedInput\n.function System.Int32.ToString(Int32& value) -> Int32\nldarg value\nldobj Int32\nret\n.end\n.function Main() -> Int32\n.local Int32 value\nldc.i4 42\nstloc value\nldloca value\ncall System.Int32.ToString(Int32&)\nret\n.end\n";
     let module = neoclr::assemble(source).unwrap();
     let temp = Temp::new();
-    let result = compile_mode(&neoclr::metadata_container::write_module(&module).unwrap(), &temp, "Main", true);
+    let result = compile_mode(
+        &neoclr::metadata_container::write_module(&module).unwrap(),
+        &temp,
+        "Main",
+        true,
+    );
     assert!(!result.status.success());
-    assert!(String::from_utf8_lossy(&result.stderr).contains("explicit borrowed parameters require an output contract"));
+    assert!(
+        String::from_utf8_lossy(&result.stderr)
+            .contains("explicit borrowed parameters require an output contract")
+    );
     assert!(!temp.0.join("value.o").exists());
 }
 
@@ -2056,7 +2255,10 @@ fn double_arithmetic_comparisons_and_storage_match_interpreter() {
         ("ldc.r8 1\nneg\nldc.r8 -1\nceq", true),
         ("ldc.r8 7.5\nldc.r8 2\nadd\nldc.r8 9.5\nceq", true),
         ("ldc.r8 7.5\nldc.r8 2\nsub\nldc.r8 5.5\nceq", true),
-        ("ldc.r8 3.141592653589793\nldc.r8 2\nmul\nldc.r8 6.283185307179586\nceq", true),
+        (
+            "ldc.r8 3.141592653589793\nldc.r8 2\nmul\nldc.r8 6.283185307179586\nceq",
+            true,
+        ),
         ("ldc.r8 7.5\nldc.r8 2\ndiv\nldc.r8 3.75\nceq", true),
         ("ldc.r8 1\nldc.r8 -0.0\ndiv\nldc.r8 -inf\nceq", true),
         ("ldc.r8 1e308\nldc.r8 2\nmul\nldc.r8 inf\nceq", true),
@@ -2066,17 +2268,33 @@ fn double_arithmetic_comparisons_and_storage_match_interpreter() {
     for (body, expected) in cases {
         double_check(body, expected);
     }
-    for (op, ordered, unordered) in [("ceq", false, false), ("cgt", true, false),
-        ("clt", false, false), ("cgt.un", true, true), ("clt.un", false, true)] {
+    for (op, ordered, unordered) in [
+        ("ceq", false, false),
+        ("cgt", true, false),
+        ("clt", false, false),
+        ("cgt.un", true, true),
+        ("clt.un", false, true),
+    ] {
         double_check(&format!("ldc.r8 2\nldc.r8 1\n{op}"), ordered);
         for (left, right) in [("nan", "1"), ("1", "nan"), ("nan", "nan")] {
             double_check(&format!("ldc.r8 {left}\nldc.r8 {right}\n{op}"), unordered);
         }
     }
-    for (op, expected) in [("beq", false), ("bne.un", true), ("bgt", false),
-        ("blt", false), ("bge", false), ("ble", false), ("bgt.un", true),
-        ("blt.un", true), ("bge.un", true), ("ble.un", true)] {
-        let source = format!(".module DoubleBranch\n.entry Main\n.function Main() -> Int32\nldc.r8 nan\nldc.r8 1\n{op} yes\nldc.i4 0\nret\nyes:\nldc.i4 1\nret\n.end");
+    for (op, expected) in [
+        ("beq", false),
+        ("bne.un", true),
+        ("bgt", false),
+        ("blt", false),
+        ("bge", false),
+        ("ble", false),
+        ("bgt.un", true),
+        ("blt.un", true),
+        ("bge.un", true),
+        ("ble.un", true),
+    ] {
+        let source = format!(
+            ".module DoubleBranch\n.entry Main\n.function Main() -> Int32\nldc.r8 nan\nldc.r8 1\n{op} yes\nldc.i4 0\nret\nyes:\nldc.i4 1\nret\n.end"
+        );
         double_program(&source, i32::from(expected));
     }
     // A nested record, local and call return exercise mixed F64/I32 ABI lanes.
@@ -2088,26 +2306,48 @@ fn double_arithmetic_comparisons_and_storage_match_interpreter() {
 
 #[cfg(all(target_os = "macos", target_arch = "aarch64"))]
 fn double_check(body: &str, expected: bool) {
-    let source = format!(".module DoubleCheck\n.entry Main\n.function Main() -> Int32\n{body}\nbrtrue yes\nldc.i4 0\nret\nyes:\nldc.i4 1\nret\n.end");
+    let source = format!(
+        ".module DoubleCheck\n.entry Main\n.function Main() -> Int32\n{body}\nbrtrue yes\nldc.i4 0\nret\nyes:\nldc.i4 1\nret\n.end"
+    );
     double_program(&source, i32::from(expected));
 }
 
 #[cfg(all(target_os = "macos", target_arch = "aarch64"))]
 fn double_program(source: &str, expected: i32) {
     let m = neoclr::assemble(source).unwrap();
-    assert_eq!(neoclr::LoadedProgram::new(&m).unwrap().run(neoclr::Limits::default()).unwrap().value,
-        neoclr::Value::Int32(expected), "{source}");
-    native(&neoclr::metadata_container::write_module(&m).unwrap(), 0, expected);
+    assert_eq!(
+        neoclr::LoadedProgram::new(&m)
+            .unwrap()
+            .run(neoclr::Limits::default())
+            .unwrap()
+            .value,
+        neoclr::Value::Int32(expected),
+        "{source}"
+    );
+    native(
+        &neoclr::metadata_container::write_module(&m).unwrap(),
+        0,
+        expected,
+    );
 }
 
 #[test]
 fn double_profile_rejects_unsupported_operations_before_codegen() {
     for body in ["ldc.r8 1\nldc.r8 2\nrem", "ldc.r8 1\nconv.i4"] {
-        let result_type = if body.ends_with("conv.i4") { "Int32" } else { "Double" };
-        let source = format!(".module RejectedDouble\n.entry Main\n.function Work() -> {result_type}\n{body}\nret\n.end\n.function Main() -> Int32\ncall Work()\npop\nldc.i4 0\nret\n.end");
+        let result_type = if body.ends_with("conv.i4") {
+            "Int32"
+        } else {
+            "Double"
+        };
+        let source = format!(
+            ".module RejectedDouble\n.entry Main\n.function Work() -> {result_type}\n{body}\nret\n.end\n.function Main() -> Int32\ncall Work()\npop\nldc.i4 0\nret\n.end"
+        );
         let m = neoclr::assemble(&source).unwrap();
         let temp = Temp::new();
-        let result = compile(&neoclr::metadata_container::write_module(&m).unwrap(), &temp);
+        let result = compile(
+            &neoclr::metadata_container::write_module(&m).unwrap(),
+            &temp,
+        );
         assert!(!result.status.success());
         assert!(!temp.0.join("value.o").exists());
         assert!(!String::from_utf8_lossy(&result.stderr).contains("panicked"));
@@ -2125,17 +2365,37 @@ fn erased_primitive_scalars_preserve_tags_and_values_through_generics() {
         ("Single", "ldc.r4 1.25"),
         ("Double", "ldc.r8 1.0000000000000002"),
     ] {
-        let mut source = format!(".module ScalarTransport\n.entry Main\n.type Box<T>\n.field Item T\n.end\n.function Copy<T>(!!0 value) -> !!0\nldarg value\nret\n.end\n.function Main() -> Int32\n.local Value erased\n{value}\ncall Copy<{kind}>({kind})\nnewobj Box<{kind}>\nldfld 0\nvalue.pack {kind}\nstloc erased\n");
-        for target in ["SByte", "Byte", "Int16", "UInt16", "Int32", "UInt32", "Single", "Double", "Boolean"] {
-            source += &format!("ldloc erased\nvalue.is {target}\n{} fail\n", if target == kind { "brfalse" } else { "brtrue" });
+        let mut source = format!(
+            ".module ScalarTransport\n.entry Main\n.type Box<T>\n.field Item T\n.end\n.function Copy<T>(!!0 value) -> !!0\nldarg value\nret\n.end\n.function Main() -> Int32\n.local Value erased\n{value}\ncall Copy<{kind}>({kind})\nnewobj Box<{kind}>\nldfld 0\nvalue.pack {kind}\nstloc erased\n"
+        );
+        for target in [
+            "SByte", "Byte", "Int16", "UInt16", "Int32", "UInt32", "Single", "Double", "Boolean",
+        ] {
+            source += &format!(
+                "ldloc erased\nvalue.is {target}\n{} fail\n",
+                if target == kind { "brfalse" } else { "brtrue" }
+            );
         }
-        source += &format!("ldloc erased\nvalue.unpack {kind}\n{value}\nceq\nbrfalse fail\nldc.i4 42\nret\nfail:\nldc.i4 -1\nret\n.end");
+        source += &format!(
+            "ldloc erased\nvalue.unpack {kind}\n{value}\nceq\nbrfalse fail\nldc.i4 42\nret\nfail:\nldc.i4 -1\nret\n.end"
+        );
         let m = neoclr::assemble(&source).unwrap();
-        assert_eq!(neoclr::LoadedProgram::new(&m).unwrap().run(neoclr::Limits::default()).unwrap().value, neoclr::Value::Int32(42));
+        assert_eq!(
+            neoclr::LoadedProgram::new(&m)
+                .unwrap()
+                .run(neoclr::Limits::default())
+                .unwrap()
+                .value,
+            neoclr::Value::Int32(42)
+        );
         let bytes = neoclr::metadata_container::write_module(&m).unwrap();
         let temp = Temp::new();
         let compiled = compile_mode(&bytes, &temp, "@entry", true);
-        assert!(compiled.status.success(), "{kind}: {}", String::from_utf8_lossy(&compiled.stderr));
+        assert!(
+            compiled.status.success(),
+            "{kind}: {}",
+            String::from_utf8_lossy(&compiled.stderr)
+        );
         #[cfg(all(target_os = "macos", target_arch = "aarch64"))]
         native_mode(&bytes, 0, 0, 42, "@entry", true);
     }
@@ -2144,13 +2404,26 @@ fn erased_primitive_scalars_preserve_tags_and_values_through_generics() {
 #[test]
 fn erased_floating_transport_preserves_nan_and_signed_zero() {
     for (kind, load) in [("Single", "ldc.r4"), ("Double", "ldc.r8")] {
-        let source = format!(".module FloatingTransport\n.entry Main\n.function Main() -> Int32\n{load} nan\nvalue.pack {kind}\nvalue.unpack {kind}\ndup\nceq\nbrtrue fail\n{load} 1\n{load} -0.0\nvalue.pack {kind}\nvalue.unpack {kind}\ndiv\n{load} -inf\nceq\nbrfalse fail\nldc.i4 42\nret\nfail:\nldc.i4 -1\nret\n.end");
+        let source = format!(
+            ".module FloatingTransport\n.entry Main\n.function Main() -> Int32\n{load} nan\nvalue.pack {kind}\nvalue.unpack {kind}\ndup\nceq\nbrtrue fail\n{load} 1\n{load} -0.0\nvalue.pack {kind}\nvalue.unpack {kind}\ndiv\n{load} -inf\nceq\nbrfalse fail\nldc.i4 42\nret\nfail:\nldc.i4 -1\nret\n.end"
+        );
         let m = neoclr::assemble(&source).unwrap();
-        assert_eq!(neoclr::LoadedProgram::new(&m).unwrap().run(neoclr::Limits::default()).unwrap().value, neoclr::Value::Int32(42));
+        assert_eq!(
+            neoclr::LoadedProgram::new(&m)
+                .unwrap()
+                .run(neoclr::Limits::default())
+                .unwrap()
+                .value,
+            neoclr::Value::Int32(42)
+        );
         let bytes = neoclr::metadata_container::write_module(&m).unwrap();
         let temp = Temp::new();
         let compiled = compile_mode(&bytes, &temp, "@entry", true);
-        assert!(compiled.status.success(), "{kind}: {}", String::from_utf8_lossy(&compiled.stderr));
+        assert!(
+            compiled.status.success(),
+            "{kind}: {}",
+            String::from_utf8_lossy(&compiled.stderr)
+        );
         #[cfg(all(target_os = "macos", target_arch = "aarch64"))]
         native_mode(&bytes, 0, 0, 42, "@entry", true);
     }
@@ -2165,7 +2438,9 @@ fn floating_conversions_preserve_rounding_and_unsigned_range() {
         "ldc.r4 1.25\nconv.r8\nldc.r8 1.25\nceq",
         "ldc.i4 -1\nconv.r.un\nldc.r8 4294967295\nceq",
         "ldc.i8 -1\nconv.r.un\nldc.r8 18446744073709551616\nceq",
-    ] { double_check(body, true); }
+    ] {
+        double_check(body, true);
+    }
 }
 
 #[test]
@@ -2176,11 +2451,22 @@ fn integer_shifts_match_interpreter_at_width_boundaries() {
             let masked = (count as u32) & (width as u32 - 1);
             for op in ["shl", "shr", "shr.un"] {
                 let expected = if width == 32 {
-                    match op { "shl" => (-3i32).wrapping_shl(masked) as i64, "shr" => (-3i32 >> masked) as i64, _ => ((-3i32 as u32) >> masked) as i32 as i64 }
+                    match op {
+                        "shl" => (-3i32).wrapping_shl(masked) as i64,
+                        "shr" => (-3i32 >> masked) as i64,
+                        _ => ((-3i32 as u32) >> masked) as i32 as i64,
+                    }
                 } else {
-                    match op { "shl" => (-3i64).wrapping_shl(masked), "shr" => -3i64 >> masked, _ => ((-3i64 as u64) >> masked) as i64 }
+                    match op {
+                        "shl" => (-3i64).wrapping_shl(masked),
+                        "shr" => -3i64 >> masked,
+                        _ => ((-3i64 as u64) >> masked) as i64,
+                    }
                 };
-                double_check(&format!("{load} -3\nldc.i4 {count}\n{op}\n{equal} {expected}\nceq"), true);
+                double_check(
+                    &format!("{load} -3\nldc.i4 {count}\n{op}\n{equal} {expected}\nceq"),
+                    true,
+                );
             }
         }
     }
@@ -2190,9 +2476,13 @@ fn integer_shifts_match_interpreter_at_width_boundaries() {
 #[test]
 fn wide_inline_boundary_preserves_calls_copies_and_nested_addresses() {
     let mut source = String::from(".module WideInline\n.entry Main\n.type Chunk\n");
-    for i in 0..16 { source += &format!(".field F{i} Int32\n"); }
+    for i in 0..16 {
+        source += &format!(".field F{i} Int32\n");
+    }
     source += ".end\n.type Wide\n";
-    for i in 0..8 { source += &format!(".field C{i} Chunk\n"); }
+    for i in 0..8 {
+        source += &format!(".field C{i} Chunk\n");
+    }
     source += r#".end
 .function Copy(Wide value) -> Wide
 ldarg value
@@ -2229,6 +2519,13 @@ ret
 .end
 "#;
     let m = neoclr::assemble(&source).unwrap();
-    assert_eq!(neoclr::run(&m, neoclr::Limits::default()).unwrap().value, neoclr::Value::Int32(42));
-    native(&neoclr::metadata_container::write_module(&m).unwrap(), 0, 42);
+    assert_eq!(
+        neoclr::run(&m, neoclr::Limits::default()).unwrap().value,
+        neoclr::Value::Int32(42)
+    );
+    native(
+        &neoclr::metadata_container::write_module(&m).unwrap(),
+        0,
+        42,
+    );
 }

@@ -25,7 +25,6 @@ fn inspect(bytes: &[u8]) -> serde_json::Value {
     inspect_mode(bytes, false)
 }
 fn inspect_mode(bytes: &[u8], closed: bool) -> serde_json::Value {
-
     let dir = Temp::new();
     let input = dir.0.join("input.pe");
     fs::write(&input, bytes).unwrap();
@@ -53,8 +52,16 @@ fn admitted_values_report_exact_overload_identity_without_artifacts() {
     let bytes = include_bytes!("../../../docs/experiments/aot-values/Overloads.pe");
     let report = inspect(bytes);
     assert_eq!(report["admission"]["accepted"], true);
-    assert_eq!(report["traceLayout"]["schema"], "neoclr-native-trace-layout-v1");
-    assert!(!report["traceLayout"]["functions"].as_array().unwrap().is_empty());
+    assert_eq!(
+        report["traceLayout"]["schema"],
+        "neoclr-native-trace-layout-v1"
+    );
+    assert!(
+        !report["traceLayout"]["functions"]
+            .as_array()
+            .unwrap()
+            .is_empty()
+    );
     assert_eq!(report, inspect(bytes), "report must be deterministic");
     let original = neoclr::metadata_container::decode(bytes).unwrap();
     assert_eq!(
@@ -186,7 +193,10 @@ fn closed_world_inspection_distinguishes_selection_and_body_failures() {
         ".module Array\n.entry Main\n.function Main() -> Int32\nldc.i4 1\nnewarr Int32\nldlen\nconv.i4\nret\n.end",
     )
     .unwrap();
-    neoclr::LoadedProgram::new(&module).unwrap().verify().unwrap();
+    neoclr::LoadedProgram::new(&module)
+        .unwrap()
+        .verify()
+        .unwrap();
     let report = inspect_mode(
         &neoclr::metadata_container::write_module(&module).unwrap(),
         true,
@@ -229,10 +239,16 @@ ret
     let module = neoclr::assemble(std::str::from_utf8(source).unwrap()).unwrap();
     let report = inspect(&neoclr::metadata_container::write_module(&module).unwrap());
     assert_eq!(report["admission"]["accepted"], true, "{report}");
-    let functions = report["traceLayout"]["preOperationPlans"]["functions"].as_array().unwrap();
+    let functions = report["traceLayout"]["preOperationPlans"]["functions"]
+        .as_array()
+        .unwrap();
     let main = functions.iter().find(|f| f["name"] == "Main").unwrap();
     let points = main["points"].as_array().unwrap();
-    assert_eq!(points.len(), 3, "dead literal must not introduce a root boundary");
+    assert_eq!(
+        points.len(),
+        3,
+        "dead literal must not introduce a root boundary"
+    );
     let call = points.iter().find(|p| p["kind"] == "call").unwrap();
     assert_eq!(call["stackValues"], 2);
     assert_eq!(call["stackLanes"], 3);
@@ -242,7 +258,10 @@ ret
     assert_eq!(call["roots"][0]["laneBase"], 0);
     assert_eq!(call["roots"][1]["role"], "pending-operand");
     assert_eq!(call["roots"][1]["laneBase"], 1);
-    assert_eq!(call["roots"][1]["layout"]["traceSlots"][0]["trace"]["tagLane"], 0);
+    assert_eq!(
+        call["roots"][1]["layout"]["traceSlots"][0]["trace"]["tagLane"],
+        0
+    );
     assert_eq!(call["resultActiveBeforeOperation"], false);
     assert_eq!(call["resultAfterSuccess"]["lanes"], 2);
     assert!(call["constructorReceiverBeforeCall"].is_null());

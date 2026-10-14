@@ -73,9 +73,7 @@ pub fn bind(
                     inventory(t, &mut candidates);
                 }
             }
-            Op::Call(t)
-            | Op::CallVirtual(t)
-            | Op::BindFunction { target: t, .. } => {
+            Op::Call(t) | Op::CallVirtual(t) | Op::BindFunction { target: t, .. } => {
                 for t in &t.generic_arguments {
                     inventory(t, &mut candidates);
                 }

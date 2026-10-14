@@ -54,8 +54,15 @@ impl Probes {
             ]
             .map(AbiParam::new),
         );
-        let callback =
-            module.declare_function(if gc { "neoclr_gc_stack_roots_v1" } else { "neoclr_probe_stack_roots_v2" }, Linkage::Import, &sig)?;
+        let callback = module.declare_function(
+            if gc {
+                "neoclr_gc_stack_roots_v1"
+            } else {
+                "neoclr_probe_stack_roots_v2"
+            },
+            Linkage::Import,
+            &sig,
+        )?;
         let mut enter_sig = module.make_signature();
         enter_sig.params.extend(
             [
@@ -69,12 +76,26 @@ impl Probes {
             ]
             .map(AbiParam::new),
         );
-        let enter =
-            module.declare_function(if gc { "neoclr_gc_enter_v1" } else { "neoclr_probe_enter_v3" }, Linkage::Import, &enter_sig)?;
+        let enter = module.declare_function(
+            if gc {
+                "neoclr_gc_enter_v1"
+            } else {
+                "neoclr_probe_enter_v3"
+            },
+            Linkage::Import,
+            &enter_sig,
+        )?;
         let mut leave_sig = module.make_signature();
         leave_sig.params.push(AbiParam::new(types::I64));
-        let leave =
-            module.declare_function(if gc { "neoclr_gc_leave_v1" } else { "neoclr_probe_leave_v1" }, Linkage::Import, &leave_sig)?;
+        let leave = module.declare_function(
+            if gc {
+                "neoclr_gc_leave_v1"
+            } else {
+                "neoclr_probe_leave_v1"
+            },
+            Linkage::Import,
+            &leave_sig,
+        )?;
         let mut sig = module.make_signature();
         sig.params.extend(
             [
@@ -87,8 +108,15 @@ impl Probes {
             ]
             .map(AbiParam::new),
         );
-        let publish =
-            module.declare_function(if gc { "neoclr_gc_transient_v1" } else { "neoclr_probe_transient_v2" }, Linkage::Import, &sig)?;
+        let publish = module.declare_function(
+            if gc {
+                "neoclr_gc_transient_v1"
+            } else {
+                "neoclr_probe_transient_v2"
+            },
+            Linkage::Import,
+            &sig,
+        )?;
         let mut transient = HashMap::new();
         let mut points = HashMap::new();
         let mut storage = HashMap::new();
@@ -156,9 +184,13 @@ impl Probes {
                         let ty = p.ty(target.owner.as_ref().unwrap())?;
                         vec![(1, ty.clone()), (2, ty)]
                     }
-                    Op::Call(target) | Op::CallVirtual(target) if crate::selection::callable_invoke(target).is_some() => {
+                    Op::Call(target) | Op::CallVirtual(target)
+                        if crate::selection::callable_invoke(target).is_some() =>
+                    {
                         let shape = crate::selection::callable_invoke(target).unwrap();
-                        if shape.no_result { vec![] } else {
+                        if shape.no_result {
+                            vec![]
+                        } else {
                             let t = p.ty(&shape.returns)?;
                             vec![(3, t.clone()), (2, t)]
                         }
