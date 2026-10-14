@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-14
 
+- Record passing wider-value runtime/GC qualification on hosted macOS and Windows, Windows native HTTP, local three-mode JSON and 132 HTTP wire checks, and extracted macOS default-JIT acceptance. Keep expanded Windows package/editor and canonical source gates open; retain the earlier failed candidate separately.
+
 - Add the installed ZIP executable directory explicitly to the Windows SDK packaging PATH. Hosted compilation completed but archive creation could not find ZIP; fail early if installation supplies no executable.
 
 - Export invocation-completion cleanup from the Windows cryptography test host, matching the current GC entry contract. JIT import errors now name the missing helper instead of only reporting GetProcAddress failure. The embedding/JIT hosting test passes; Windows cryptography requalification remains required.

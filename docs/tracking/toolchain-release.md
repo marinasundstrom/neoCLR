@@ -7,26 +7,28 @@ maintain a second HTTP completion checklist here.
 
 ## Current candidate qualification — 2026-10-14
 
-Candidate SDK/VSIX build: `0.1.15-neoclr.20261014.1`; Raven native compiler:
-`fac4ac736024800151d6b285e68407ded864f655`. Preview 14 remains published.
-The macOS SDK, matching-server VSIX, five libraries and runtime/backend are built.
-[Candidate evidence and asset hashes](../validation/release-20261014/candidate.json)
-record extraction to a path containing spaces and the failed package gate:
-collections and async tasks pass in default JIT, but JSON's composed error carrier
-requires 132 inline lanes against the current 128-lane limit. The same JSON
-sample passes in the interpreter. Fix native value-layout admission before
-installation; do not substitute an interpreter-only acceptance result.
+The 132-lane JSON composed-error carrier is now admitted by the bounded 256-lane
+native value layout. Backend and native helper must be rebuilt together. The
+[validation record](../validation/release-20261014/inline-validation.json) links
+passing macOS three-mode JSON, 132 HTTP wire checks and extracted default-JIT
+package acceptance, including the HTTP client/server pair. Runtime-product and
+GC qualification pass on hosted macOS and Windows; Windows native HTTP also passes.
 
-Local GC/static-storage, formatting, strict Clippy, notice audit, certificate-backed
-TLS and native lifetime checks pass. Hosted qualification exposed stale license
-paths, test-host paths, a GC instrumentation marker, old HTTP compiler pins and
-cryptography host exports. Repairs are committed separately and require hosted
-requalification. The package run on `aff7c001b` is retained as an earlier candidate,
-not evidence for later source fixes. Follow the [validation procedure](../next-preview-validation.md).
+The native project builder can derive reflection roots from the freshly compiled
+artifact using `--reflection-type`. This avoids retaining the wrong artifact's
+reflection identity when the project is rebuilt during AOT qualification.
 
-No new installation, release tag or website publication has occurred. Detailed
-implementation gaps remain in their technical records; reader-facing notes retain
-only practical usage and scope information.
+SDK/VSIX `0.1.15-neoclr.20261014.1` uses Raven native compiler
+`fac4ac736024800151d6b285e68407ded864f655`. The
+[expanded Windows package gate](https://github.com/marinasundstrom/neoCLR/actions/runs/38539514281)
+is still required for three-mode JSON, runtime-await, HTTP and editor acceptance.
+Earlier package attempts exposed a missing ZIP PATH; the workflow now exports
+the installed executable directory explicitly. Canonical source checks and other
+hosted qualification repairs remain under review. Preview 14 remains published;
+no new installation or release has occurred.
+
+The earlier [failed candidate](../validation/release-20261014/candidate.json) is
+retained for provenance. It is superseded by the inline-value fix, not rewritten.
 
 ## Release preflight — 2026-10-13
 

@@ -1,5 +1,12 @@
 # neoCLR platform roadmap
 
+**Release qualification (2026-10-14):** the composed JSON error carrier now fits a
+shared 256-lane native inline-value bound. GC and runtime-product qualification pass
+on macOS and Windows; local three-mode JSON and 132 HTTP checks pass. The
+[release tracker](tracking/toolchain-release.md) owns remaining extracted Windows
+package/editor and source gates. This author-directed release fix does not change
+the performance milestone or promise unbounded native value layouts.
+
 **Atomic GC marking (2026-10-14):** [directly retaining leaf payloads](../benchmarks/gc-index/README.md#direct-marking-of-atomic-payloads--2026-10-14)
 removes empty tracing work while preserving dependent-owner completion. All 35 local
 GC/root and 132 HTTP checks pass. Matched stress-GC AOT HTTP runs improve 4.7%/4.8%
