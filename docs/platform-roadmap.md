@@ -4628,3 +4628,9 @@ allowing the real Task/Promise/ArrayList construction path for the nested union
 example. Completion remains blocked by substituted managed-local initialization;
 interface dispatch and compiler transport remain separate work.
 [Task construction checkpoint](experiments/structural-compositions/README.md#generic-interface-composition-arguments-and-task-construction--2026-10-14).
+
+
+The composition interpreter now admits exact, immediate managed-local default
+initialization after substitution, removing the observed ArrayList/Task completion
+blocker while retaining general byref gates.
+[Initialization checkpoint](experiments/structural-compositions/README.md#immediate-compound-local-initialization--2026-10-14).

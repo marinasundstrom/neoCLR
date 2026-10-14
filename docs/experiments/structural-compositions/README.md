@@ -908,3 +908,32 @@ The nested interface-bound admission assertion is also checked separately after
 moving that formerly unsupported shape to positive coverage.
 
 All three default-off serialized composition checks also pass.
+
+
+## Immediate compound local initialization — 2026-10-14
+
+The interpreter admits the compiler's adjacent ldloca/initobj idiom for a local
+whose type contains a reference composition. Both instructions must refer to the
+exact same local type, and initobj must immediately consume that local address.
+This initializes typed null defaults for compositions, reference arrays and nominal
+reference wrappers using existing managed initialization. It does not admit general
+compound byrefs, address escape, argument/element addresses or indirect reads/writes.
+The verifier and interpreter still check the address target type, including a branch
+that enters initobj with an incompatible address rather than executing its preceding
+ldloca. Generic body admission applies the same checks after substitution.
+
+This retains the .NET-style managed local initialization idiom already emitted by
+Raven; it changes experimental admission, not the CLI bridge or public API. The
+bounded allowance avoids requiring a second compiler lowering for reference defaults.
+Its cost is a deliberately restricted instruction pattern, to revisit with general
+managed-reference support. Runtime Contract and compiler feature gates are unchanged.
+This removes the local initialization blocker encountered by ArrayList<T>.Add in the
+Task completion path; dedicated real-library delivery evidence follows separately.
+
+Validation: 34 feature-enabled composition tests, nine managed-initialization
+controls and three default-off serialized-signature checks pass. Commands:
+
+```sh
+cargo test --features experimental-compositions --test structural_compositions --test managed_initialization
+cargo test --test structural_compositions
+```

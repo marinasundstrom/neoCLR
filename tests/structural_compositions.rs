@@ -908,3 +908,49 @@ fn composition_argument_interface_calls_remain_gated() {
     let error = assemble(&source).unwrap_err().to_string();
     assert!(error.contains("interface dispatch"), "{error}");
 }
+
+#[cfg(feature = "experimental-compositions")]
+#[test]
+fn compound_local_defaults_only_admit_immediate_initialization() {
+    for ty in [
+        "union<Left,Right>",
+        "intersection<Left,Right>",
+        "arrayref<union<Left,Right>>",
+    ] {
+        let p = program(
+            &format!(
+                ".local {ty} value\nldloca value\ninitobj {ty}\nldloc value\nref.isnull\nbrtrue Good\nfault \"Expected null default\"\nGood:\nldc.i4 42"
+            ),
+            "",
+        );
+        p.verify().unwrap();
+        assert_eq!(p.run(Limits::default()).unwrap().value, Value::Int32(42));
+    }
+    for body in [
+        "ldloca value\ndup\ninitobj union<Left,Right>\npop",
+        "ldloca value\ninitobj intersection<Left,Right>",
+        "ldloca value\npop",
+        "initobj union<Left,Right>",
+    ] {
+        let source = format!(
+            ".module BadDefault\n.entry Main\n{TYPES}\n.function Main() -> Int32\n.local union<Left,Right> value\n{body}\nldc.i4 42\nret\n.end"
+        );
+        assert!(assemble(&source).is_err(), "{body}");
+    }
+}
+
+#[cfg(feature = "experimental-compositions")]
+#[test]
+fn branching_into_compound_initialization_cannot_retype_a_local() {
+    let p = program(
+        ".local union<Left,Right> view\n.local Both other\nldloca other\nbr initialize\nldloca view\ninitialize:\ninitobj union<Left,Right>\nldc.i4 42",
+        "",
+    );
+    assert!(p.verify().is_err());
+    assert!(
+        p.run(Limits::default())
+            .unwrap_err()
+            .to_string()
+            .contains("pointer type mismatch")
+    );
+}

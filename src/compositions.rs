@@ -1,7 +1,7 @@
 //! Branch-only reference compositions. No value layout, byref or backend ABI.
 use crate::{
-    metadata::{Representation, Type},
     Fault, Module,
+    metadata::{Representation, Type},
 };
 
 pub(crate) fn is_compound(ty: &Type) -> bool {
@@ -241,13 +241,32 @@ pub(crate) fn validate_surface(module: &Module) -> Result<(), Fault> {
                 Ok(ty.clone())
             })?;
         }
-        for op in &function.body {
+        for (index, op) in function.body.iter().enumerate() {
             match op {
                 Op::LocalAddress(i) if function.locals.get(*i).is_some_and(contains) => {
-                    return Err(Fault::new("compound local addresses are not supported"));
+                    // Admit the compiler's immediate local-default idiom only.
+                    // No instruction can retain or forward this transient address.
+                    if !matches!(function.body.get(index + 1), Some(Op::InitializeObject(ty))
+                        if function.locals.get(*i) == Some(ty))
+                    {
+                        return Err(Fault::new(
+                            "compound local addresses require immediate initialization",
+                        ));
+                    }
                 }
                 Op::ArgumentAddress(i) if function.parameters.get(*i).is_some_and(contains) => {
                     return Err(Fault::new("compound argument addresses are not supported"));
+                }
+                Op::InitializeObject(ty) if contains(ty) => {
+                    if !matches!(index.checked_sub(1).and_then(|i| function.body.get(i)),
+                        Some(Op::LocalAddress(local)) if function.locals.get(*local) == Some(ty))
+                    {
+                        return Err(Fault::new(
+                            "compound initialization requires an immediate local address",
+                        ));
+                    }
+                    crate::vm::check_type(ty, module)?;
+                    crate::initialization::default_value(module, ty)?;
                 }
                 Op::CastClass(_) | Op::IsInstance(_) => (),
                 Op::NewArray(ty)
