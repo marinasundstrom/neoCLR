@@ -579,18 +579,61 @@ ret
     );
 }
 
+fn wide_inline_source(lanes: usize) -> String {
+    let mut source = String::from(".module Wide\n.entry Main\n.type Leaf\n");
+    for i in 0..16 {
+        source += &format!(".field F{i} Int32\n");
+    }
+    source += ".end\n.type Wide\n";
+    for i in 0..(lanes / 16) {
+        source += &format!(".field F{i} Leaf\n");
+    }
+    source += ".end\n";
+    if lanes > 256 {
+        source += ".type Overflow\n.field Value Wide\n.field Extra Int32\n.end\n";
+    }
+    source += ".function Echo(Wide value) -> Wide\nldarg value\nret\n.end\n.function Main() -> Int32\n.local Wide value\nldloca value\ninitobj Wide\nldloca value\nldflda Wide::F15\nldflda Leaf::F15\nldc.i4 73\nstobj Int32\nldloc value\ncall Echo(Wide)\nldfld Wide::F15\nldfld Leaf::F15\nldc.i4 42\nadd\nret\n.end\n";
+    source
+}
+
 #[test]
-fn cyclic_unknown_and_oversized_inline_layouts_never_emit() {
+fn inline_layout_boundary_is_admitted_and_overflow_rejected() {
+    let m = neoclr::assemble(&wide_inline_source(256)).unwrap();
+    assert_eq!(
+        neoclr::run(&m, neoclr::Limits::default()).unwrap().value,
+        neoclr::Value::Int32(115)
+    );
+    let bytes = neoclr::metadata_container::write_module(&m).unwrap();
+    let temp = Temp::new();
+    let result = compile(&bytes, &temp);
+    assert!(
+        result.status.success(),
+        "{}",
+        String::from_utf8_lossy(&result.stderr)
+    );
+    #[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+    native(&bytes, 0, 115);
+    let m = neoclr::assemble(&wide_inline_source(257)).unwrap();
+    let result = compile(
+        &neoclr::metadata_container::write_module(&m).unwrap(),
+        &temp,
+    );
+    assert!(!result.status.success());
+    assert!(
+        String::from_utf8_lossy(&result.stderr).contains("256 flattened lanes (257)"),
+        "{}",
+        String::from_utf8_lossy(&result.stderr)
+    );
+}
+
+#[test]
+fn cyclic_and_unknown_inline_layouts_never_emit() {
     for (fields, diagnostic) in [
         (
             ".type A\n.field Child B\n.end\n.type B\n.field Child A\n.end",
             "recursive inline",
         ),
         (".type A\n.field Child Int32\n.end", "local named record"),
-        (
-            ".type A\n.field X Int32\n.field Y Int32\n.field Z Int32\n.field U Int32\n.field V Int32\n.field W Int32\n.field Extra0 Int32\n.field Extra1 Int32\n.field Extra2 Int32\n.field Extra3 Int32\n.field Extra4 Int32\n.field Extra5 Int32\n.end\n.type B\n.field X A\n.field Y A\n.field Z A\n.field U A\n.field V A\n.field W A\n.field A0 A\n.field A1 A\n.field A2 A\n.field A3 A\n.field A4 A\n.end",
-            "128 flattened lanes",
-        ),
     ] {
         let source = format!(
             ".module Invalid\n.entry Main\n{fields}\n.function Main() -> Int32\nldc.i4 0\nret\n.end\n"

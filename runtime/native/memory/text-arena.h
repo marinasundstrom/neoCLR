@@ -5,7 +5,7 @@
 #define NEOCLR_NATIVE_BYTE_ARRAY_LIMIT 65536
 #endif
 _Static_assert(NEOCLR_NATIVE_BYTE_ARRAY_LIMIT > 0 && NEOCLR_NATIVE_BYTE_ARRAY_LIMIT <= INT32_MAX, "byte array budget");
-#define NEOCLR_NATIVE_LAYOUT_LANES 128
+#define NEOCLR_NATIVE_LAYOUT_LANES 256
 /* Heap payloads do not expand inline-value or record-array ABI lanes. */
 #define NEOCLR_NATIVE_OBJECT_LANES 256
 /* Shared with the selected-type budget in runtime/codegen/src/limits.rs. */

@@ -48,6 +48,7 @@ def main():
         run('build', ['cargo', 'build', '--locked', '--workspace'])
         run('cli', ['cargo', 'test', '--locked', '-p', 'neoclr', '--test', 'cli', 'cli_execution_selection'])
         run('hosting', ['cargo', 'test', '--locked', '-p', 'neoclr-codegen', '--test', 'hosting'])
+        run('inline-values', ['cargo', 'test', '--locked', '-p', 'neoclr-codegen', '--test', 'values', 'inline_layout'])
         run('execution', ['cargo', 'test', '--locked', '-p', 'neoclr-codegen', '--test', 'scalar'])
         if platform.system() == 'Windows':
             run('windows-aot-execution', ['cargo', 'test', '--locked', '-p', 'neoclr-codegen', '--test', 'windows_scalar', 'windows_c_consumer_executes_calls_branches_faults_and_utf8'])

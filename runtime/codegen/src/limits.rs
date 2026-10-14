@@ -8,7 +8,7 @@ pub const FUNCTION_CLONES: usize = FUNCTIONS;
 pub const INPUT_TYPES: usize = 1024;
 pub const INPUT_FUNCTIONS: usize = 8192;
 // Match NEOCLR_NATIVE_LAYOUT_LANES in the native host header.
-pub const INLINE_LANES: usize = 128;
+pub const INLINE_LANES: usize = 256;
 // Heap objects use pointer ABI lanes regardless of payload size. Keep their
 // allocation budget separate from inline values and record-array elements.
 // Match NEOCLR_NATIVE_OBJECT_LANES in the native host header.

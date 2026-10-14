@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-14
 
+- Admit inline native values and record-array elements up to 256 lanes, matching backend and GC validation, to support the 132-lane composed JSON error carrier. Preserve heap-object and root-frame bounds. Add final-lane value/copy and GC retention, uninitialized-element reclamation and oversized-layout rejection checks. Rebuild native helpers with the backend.
+
 - Retain fresh macOS candidate hashes and failed extracted-package evidence: collections/tasks pass default JIT, but composed JSON errors exceed the 128-lane native inline limit at 132 lanes. Interpreter JSON passes. Record the release blocker without installing or publishing the candidate.
 
 - Update integrated runtime validation to read the owned allocator header, locate Windows scalar hosts after the codegen move, and instrument the current leaf-marking phase. Both native layout-budget tests and the relocated/instrumented GC test pass locally; Windows scalar execution is queued for requalification.

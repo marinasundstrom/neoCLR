@@ -86,3 +86,26 @@ HTTP runs through its sample runners after repairing repeatable reflection prepa
 This closes the 204-lane object-size installation blocker; the earlier failing reports
 above remain historical evidence. SDK/VSIX 0.1.13-neoclr.20261012.2 is installed for
 local macOS ARM64 testing. No publication or fresh Windows qualification occurred.
+
+## Composed-error inline layouts — 2026-10-14
+
+The release JSON sample's `StreamError | JsonError | MappingError` carrier has
+132 flattened lanes. It is valid managed metadata and passes the interpreter,
+but the native profile previously stopped at 128. The native backend and
+record-array allocator/collector now share a 256-lane inline bound. Heap object
+bounds, root-frame limits, metadata and context layout are unchanged. Rebuild the
+backend and native helper together: an older collector rejects wider record arrays.
+
+This is a bounded admission fix, not a new managed-language limit or an optimized
+union representation. Compared with CLR value-type storage, this backend still
+flattens nested values into native call lanes. Wider values can increase stack,
+copying and scanning costs; existing heap and root-frame budgets still apply. A
+future indirect aggregate ABI or overlapping union payload representation should
+be evaluated separately, including precise reference tracing.
+
+Validation covers a 256-lane value passed/returned and modified at its final lane,
+257-lane rejection, and record-array final-lane referent retention across repeated
+collections. Uninitialized elements do not retain stale pointers; invalid widths
+are rejected and roots can be released for complete reclamation. The shared native
+GC gate runs the same record-array checks on macOS and Windows. Candidate JSON and
+HTTP qualification is tracked in the release record.

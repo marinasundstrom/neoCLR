@@ -7,7 +7,44 @@ static int32_t allocate(int mode, int rooted, neoclr_aot_text_arena *arena, int3
     if (mode == 2) return rooted ? neoclr_allocate_references_rooted_v1(arena, length, out) : neoclr_allocate_references_v1(arena, length, out);
     return rooted ? neoclr_reserve_records_rooted_v1(arena, length, 1, out) : neoclr_reserve_records_v1(arena, length, 1, out);
 }
+static int wide_records(void) {
+    uint64_t heap[2048] = {0};
+    neoclr_aot_context c = {.text = {(unsigned char *)heap, sizeof(heap), 0}};
+    void *array = NULL, *leaf = NULL;
+    CHECK(!neoclr_gc_allocate_v1(&c.text, 16, NEOCLR_GC_BYTES, &leaf));
+    CHECK(!neoclr_reserve_records_v1(&c.text, 1, NEOCLR_NATIVE_LAYOUT_LANES, &array));
+    unsigned char *data = array;
+    memcpy(data + 24 + (NEOCLR_NATIVE_LAYOUT_LANES - 1) * 8, &leaf, sizeof(leaf));
+    data[24 + NEOCLR_NATIVE_LAYOUT_LANES * 8] = 1;
+    neoclr_probe_storage slot = {&array, 8, 0};
+    neoclr_probe_frame frame;
+    neoclr_probe_enter_v3(&frame, &c, 0, &slot, 1, "{}", 2);
+    for (int i = 0; i < 3; i++) {
+        CHECK(!neoclr_gc_collect_v1(&c, &frame));
+        uint64_t bytes = 0; uint32_t kind = 0;
+        CHECK(!neoclr_gc_allocation_info_v1(&c, leaf, &bytes, &kind));
+        CHECK(bytes == 16 && kind == NEOCLR_GC_BYTES);
+    }
+    void *rejected = (void *)(uintptr_t)123;
+    CHECK(neoclr_reserve_records_v1(&c.text, 1, NEOCLR_NATIVE_LAYOUT_LANES + 1, &rejected) == 3);
+    CHECK(rejected == (void *)(uintptr_t)123);
+    uint64_t invalid = NEOCLR_NATIVE_LAYOUT_LANES + 1, valid = NEOCLR_NATIVE_LAYOUT_LANES;
+    memcpy(data + 16, &invalid, 8);
+    CHECK(neoclr_gc_collect_v1(&c, &frame) == 3);
+    memcpy(data + 16, &valid, 8);
+    CHECK(!neoclr_gc_collect_v1(&c, &frame));
+    /* Uninitialized elements must not retain their stale reference lanes. */
+    data[24 + NEOCLR_NATIVE_LAYOUT_LANES * 8] = 0;
+    CHECK(!neoclr_gc_collect_v1(&c, &frame));
+    uint64_t bytes = 0; uint32_t kind = 0;
+    CHECK(neoclr_gc_allocation_info_v1(&c, leaf, &bytes, &kind) != 0);
+    neoclr_probe_leave_v1(&frame);
+    CHECK(!neoclr_gc_collect_v1(&c, NULL) && !c.text.used);
+    CHECK(!neoclr_gc_entry_check_v1(&c));
+    return 0;
+}
 int main(void) {
+    CHECK(!wide_records());
     for (int mode = 0; mode < 4; mode++) {
         uint64_t heap[16] = {0}, foreign_heap[16] = {0};
         neoclr_aot_context c = {.text = {(unsigned char *)heap, sizeof(heap), 0}};
