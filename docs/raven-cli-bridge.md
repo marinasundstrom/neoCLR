@@ -9829,3 +9829,12 @@ The host metadata library owns this step. There is no CLI encoding; external bou
 open forwarding and compiler emission/import remain pending. The existing explicit
 Raven structural Runtime Contract switch and paired experimental branches remain
 unchanged. No runtime library bundle change is required.
+
+Raven emission follow-up, 2026-10-14: the companion experimental branch now calls
+the native method-bound authoring API for closed local structural source constraints.
+Union bounds retain any-of grouping; multiple local conjunctive bounds become an
+intersection signature. The source probe executes with result 42 and checks native
+metadata, invalid intersection arguments and the default backend gate. This requires
+the existing structural opt-in and native metadata library; no CLI projection or
+runtime bundle change is introduced. Native import and external/open bounds remain
+pending. See Raven's `tools/NeoClrMetadataProbe/StructuralConstraintChecks.cs`.
