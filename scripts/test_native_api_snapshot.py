@@ -5,7 +5,7 @@ import tempfile
 import unittest
 import zipfile
 
-from native_api_snapshot import extract_snapshot
+from native_api_snapshot import extract_snapshot, validate_source_links, SOURCE_LINK_CHECKS
 
 
 class NativeApiSnapshot(unittest.TestCase):
@@ -19,6 +19,36 @@ class NativeApiSnapshot(unittest.TestCase):
         manifest.write_text(json.dumps(dict(format=1, archive=archive.name,
             sha256=hashlib.sha256(archive.read_bytes()).hexdigest())))
         return manifest
+
+    def test_type_and_member_source_links_are_required(self):
+        repository = dict(url='https://github.com/example/runtime', revision='main')
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            for page, source in SOURCE_LINK_CHECKS.items():
+                path = root / page
+                path.parent.mkdir(parents=True, exist_ok=True)
+                path.write_text(f'<a href="https://github.com/example/runtime/blob/main/{source}">Source</a>')
+            validate_source_links(root, repository)
+            member = root / 'System/Object/method_GetHashCode.html'
+            for content in ['No source', '<a href="https://github.com/example/runtime">Repository</a>',
+                            '<a href="https://github.com/example/runtime/blob/main/wrong.rvn">Source</a>']:
+                member.write_text(content)
+                with self.assertRaisesRegex(ValueError, 'method_GetHashCode'):
+                    validate_source_links(root, repository)
+
+    def test_missing_source_links_preserve_previous_snapshot(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            destination = root / 'output'
+            destination.mkdir()
+            (destination / 'previous').write_text('keep')
+            manifest = self.fixture(root)
+            data = json.loads(manifest.read_text())
+            data['sourceRepository'] = dict(url='https://github.com/example/runtime', revision='main')
+            manifest.write_text(json.dumps(data))
+            with self.assertRaisesRegex(ValueError, 'source link'):
+                extract_snapshot(manifest, destination)
+            self.assertEqual((destination / 'previous').read_text(), 'keep')
 
     def test_checked_archive_replaces_previous_snapshot(self):
         with tempfile.TemporaryDirectory() as temporary:

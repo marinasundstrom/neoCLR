@@ -5,6 +5,7 @@ import hashlib
 import json
 from pathlib import Path
 import zipfile
+from native_api_snapshot import validate_source_links
 
 ROOT = Path(__file__).resolve().parent.parent
 
@@ -33,6 +34,8 @@ def main():
                      'System/Linq/Operators/index.html', 'api-navigation.html'):
         if not (source / relative).is_file():
             raise ValueError('Incomplete native reference: ' + relative)
+    repository = json.loads((ROOT / 'website/site.json').read_text())['sourceRepository']
+    validate_source_links(source, repository)
     archive = ROOT / 'api-docs/native-reference.zip'
     with zipfile.ZipFile(archive, 'w', compression=zipfile.ZIP_DEFLATED) as output:
         for path in sorted(source.rglob('*')):
@@ -42,6 +45,7 @@ def main():
                 info.external_attr = 0o100644 << 16
                 output.writestr(info, path.read_bytes())
     manifest = dict(format=1, archive=archive.name,
+                    sourceRepository={key: repository[key] for key in ('url', 'revision')},
                     sha256=hashlib.sha256(archive.read_bytes()).hexdigest(),
                     librarySourceRevision=build['sourceRevision'],
                     compilerRevision=build['compilerRevision'],

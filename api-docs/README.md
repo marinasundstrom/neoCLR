@@ -1966,3 +1966,19 @@ wrapper is retained for explicit contracts; earlier validation remains historica
 See the current HTTP JSON consumer and the Raven error API review for scope and
 validation. The API reference snapshot includes the new generic System.Union shape;
 legacy CLI execution of these helpers is not qualified for that representation.
+
+### Restored native snapshot source links (2026-10-14)
+
+The native audit now carries `website/site.json`'s `sourceRepository` into RavenDoc,
+including its root relative to the website configuration. Previously the themed
+native snapshot copied presentation settings but lost this setting, and replaced
+the normal reference's linked pages with unlinked ones. Source paths include both
+`runtime/raven/src` and `runtime/raven/providers`, covering PostgreSQL.
+
+The refreshed snapshot keeps the same native library artifact hashes. The publisher
+resolves configured declaration files and links type/member pages to those files;
+it does not claim exact declaration lines or immutable artifact-matched provenance.
+Those richer source-map contracts remain the separate work described above.
+Snapshot packaging and extraction now require representative links for ordinary and
+generic types, members and the provider. A failing extraction preserves the previous
+snapshot. The complete local site is rebuilt and checked; publication remains manual.

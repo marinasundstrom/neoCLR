@@ -1,14 +1,18 @@
 {
   "format": 1,
   "archive": "native-reference.zip",
-  "sha256": "812a5b6f1b8577f072756c02ecbc578df7c6811fcff1c86ed91c3f8f6a61ffbd",
+  "sourceRepository": {
+    "url": "https://github.com/marinasundstrom/neoCLR",
+    "revision": "main"
+  },
+  "sha256": "afbc956a8f6a95e769cb56445a96a97ba6e6eb3574646579465b3c6a7c8a0f43",
   "librarySourceRevision": "http-source-sha256:12db0b8ec8134678817ea8809e9f1bc4ee9c80092513e4df538cca16dc4de035",
   "compilerRevision": "binary-sha256:c56bf5da468c40afcd302c186465a83f6374c65d029ee8f6b2157884964d8319",
   "libraryBuildEvidence": {
     "file": "http-foundation-build.json",
     "sha256": "61b1d88df8a6b4db4712cfbd84d48d31c752700cfd517490efcbb19099d24a43"
   },
-  "rendererRevision": "6b5e052ce3648f9247ac76aba275587a3a5a1bb4",
+  "rendererRevision": "fac4ac736024800151d6b285e68407ded864f655",
   "libraryArtifacts": {
     "Core.dll": "3d4a676d379067c18a65a9beb8257ed40bf3196fc643a9ba1d559c619ec73fad",
     "System.Data.PostgreSql.dll": "fa12626ce72cb597d44c30fb39970c19b2db6888c9ded996fdaea1a18f6fa3c2",
@@ -19,8 +23,8 @@
     "System.runtime.neox": "98a1ae1da85387c87746957e83a4015eb59d0566539a915c69f168d2b511b190"
   },
   "renderingEvidence": {
-    "normalized-sidecars.json": "de735bd74c411b438905e94cef02c3f113b1b72dd8a23f2187dcde721c69f5b6",
-    "restored-xml-comments.json": "fb15ea8fea7eef25d376d4c0857906a1e89f97da8c8796033e2105cd4e22fd00"
+    "normalized-sidecars.json": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+    "restored-xml-comments.json": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
   },
   "scope": "Reviewed native API rendering; legacy coverage gaps remain explicitly marked by the website overlay."
 }

@@ -114,3 +114,12 @@ continues to supply signatures. See the tracked gap in
 The historical sidecar normalizer also accepts a plain-text summary followed by
 XML parameter/return/remark tags (Encoding.Decode). It converts those contracts
 to Markdown directives before rendering; malformed or nested XML still fails.
+
+### Declaration source links
+
+The themed audit forwards `sourceRepository` from `website/site.json`, resolving
+its root against the website directory exactly as the normal site builder does.
+Keep the declaration paths inclusive of provider libraries. Snapshot packaging
+checks type/member/generic/provider links before replacing the publication archive;
+extraction repeats those checks when provenance settings are present in the manifest.
+These are configured declaration-file links, not exact member-span source maps.

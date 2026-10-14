@@ -64,7 +64,8 @@
     "revision": "main",
     "root": "..",
     "paths": [
-      "runtime/raven/src"
+      "runtime/raven/src",
+      "runtime/raven/providers"
     ]
   },
   "moduleTerminology": true,

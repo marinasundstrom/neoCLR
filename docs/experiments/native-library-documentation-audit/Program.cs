@@ -159,6 +159,11 @@ if (args.Length == 3)
             Directory.CreateDirectory(Path.GetDirectoryName(destination)!);
             File.Copy(file, destination, overwrite: true);
         }
+    var sourceRepository = theme.TryGetProperty("sourceRepository", out var sourceSettings)
+        ? sourceSettings.Deserialize<DocumentationSourceRepository>(new JsonSerializerOptions { PropertyNameCaseInsensitive = true })
+        : null;
+    if (sourceRepository is not null)
+        sourceRepository = sourceRepository with { Root = Path.GetFullPath(sourceRepository.Root, websiteRoot) };
     options = options with
     {
         Links = links,
@@ -176,7 +181,8 @@ if (args.Length == 3)
         NamespaceNavigation = Setting("namespaceNavigation") ?? "flat",
         SharedApiNavigation = true,
         ModuleTerminology = true,
-        ApiContent = apiContent
+        ApiContent = apiContent,
+        SourceRepository = sourceRepository
     };
 }
 // Audit harness only: invoke the existing internal combined renderer in the host tool.

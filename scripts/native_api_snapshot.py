@@ -1,4 +1,6 @@
 """Read a reviewed, checksum-pinned native API rendering for website publication."""
+from html.parser import HTMLParser
+from urllib.parse import quote
 import hashlib
 import json
 from pathlib import Path, PurePosixPath
@@ -6,6 +8,36 @@ import shutil
 import stat
 import tempfile
 import zipfile
+
+
+SOURCE_LINK_CHECKS = {
+    'System/Concurrency/Tasks/Task`1/index.html': 'runtime/raven/src/System/Concurrency/Tasks/Tasks.rvn',
+    'System/Data/PostgreSql/PostgresDatabase/index.html': 'runtime/raven/providers/System.Data.PostgreSql/PostgresDatabase.rvn',
+    'System/Object/index.html': 'runtime/raven/src/System/Object.rvn',
+    'System/Object/method_GetHashCode.html': 'runtime/raven/src/System/Object.rvn',
+    'System/Web/Http/HttpClient/index.html': 'runtime/raven/src/System/Web/Http/HttpClient.rvn',
+    'System/Web/Http/HttpClient/method_Send.html': 'runtime/raven/src/System/Web/Http/HttpClient.rvn',
+}
+
+
+def validate_source_links(source, repository):
+    """Guard real declaration-file links on both type and member pages."""
+    class Links(HTMLParser):
+        def __init__(self):
+            super().__init__()
+            self.hrefs = []
+        def handle_starttag(self, tag, attrs):
+            if tag == 'a':
+                self.hrefs.extend(value for key, value in attrs if key == 'href')
+    base = repository['url'].rstrip('/') + '/blob/' + quote(repository.get('revision', 'main'), safe='') + '/'
+    for relative, declaration in SOURCE_LINK_CHECKS.items():
+        page = source / relative
+        links = Links()
+        if page.is_file():
+            links.feed(page.read_text())
+        expected = base + declaration
+        if not any(href and href.split('#', 1)[0] == expected for href in links.hrefs):
+            raise ValueError('Native API declaration source link missing or incorrect: ' + relative)
 
 
 def extract_snapshot(manifest_path, destination):
@@ -35,6 +67,8 @@ def extract_snapshot(manifest_path, destination):
             files.extractall(staging)
         if not (staging / 'site/docs/api/System/Object/index.html').is_file():
             raise ValueError('Native API snapshot is missing Object')
+        if manifest.get('sourceRepository'):
+            validate_source_links(staging / 'site/docs/api', manifest['sourceRepository'])
         shutil.rmtree(destination, ignore_errors=True)
         staging.rename(destination)
     return destination
