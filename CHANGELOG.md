@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-14
 
+- Add the installed ZIP executable directory explicitly to the Windows SDK packaging PATH. Hosted compilation completed but archive creation could not find ZIP; fail early if installation supplies no executable.
+
 - Export invocation-completion cleanup from the Windows cryptography test host, matching the current GC entry contract. JIT import errors now name the missing helper instead of only reporting GetProcAddress failure. The embedding/JIT hosting test passes; Windows cryptography requalification remains required.
 
 - Keep TLS resource-ID allocation compatible with Rust 1.85 while allowing newer toolchains to deprecate `fetch_update`: scope the compatibility allowance to that expression. Three resource lifetime/identity tests pass; allocation semantics are unchanged.

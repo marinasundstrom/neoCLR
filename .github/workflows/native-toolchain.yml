@@ -48,8 +48,15 @@ jobs:
         if: ${{ !inputs.bundle_run }}
         with:
           node-version: '22'
-      - run: choco install zip --no-progress -y
+      - name: Install ZIP for SDK packaging
         if: ${{ !inputs.bundle_run }}
+        shell: pwsh
+        run: |
+          choco install zip --no-progress -y
+          if ($LASTEXITCODE) { exit $LASTEXITCODE }
+          $zip = Get-ChildItem "$env:ChocolateyInstall/lib/zip" -Recurse -Filter zip.exe | Select-Object -First 1
+          if (!$zip) { throw 'ZIP executable not found after installation' }
+          $zip.DirectoryName | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
       - name: Build runtime and test portable HTTP readiness
         if: ${{ !inputs.bundle_run }}
         working-directory: neoclr
