@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-14
 
+- Add focused release-delta qualification using the already-qualified Windows SDK/runtime: rebuild changed libraries and check JSON plus configuration recovery, member hover and inlays. Preserve the optional PostgreSQL library when refreshing a bundle. Raven main 2aa6c7388 adds explicit props/targets watching, carried as 507f35571; three local recovery cycles and Find hover through four edits pass.
+
 - Bind runtime async for retained HTTP bootstrap hosts, retain each exchange Task, pump suspension/resumption and shut down async execution before session teardown. Check terminal fault identity and handler frames without obsolete state-machine wrapper assumptions. All three macOS native/interpreter wire and cleanup cases pass; Windows requalification remains pending.
 
 - Make the unified runtime the headline of the next-preview notes: integrated interpreter/JIT execution, GC and scheduler/suspension, with native AOT as the publishing target and preserved component boundaries. Record the author's release direction; published notes remain unchanged.

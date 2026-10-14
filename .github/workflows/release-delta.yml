@@ -1,0 +1,110 @@
+name: Focused release delta qualification
+on:
+  workflow_dispatch:
+    inputs:
+      bundle_run:
+        description: Successful native-toolchain run supplying the qualified Windows bundle
+        required: true
+        default: '38542979837'
+permissions:
+  contents: read
+  actions: read
+jobs:
+  windows:
+    runs-on: windows-latest
+    timeout-minutes: 30
+    env:
+      PYTHONUTF8: '1'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          path: neoclr
+      - uses: actions/checkout@v4
+        with:
+          repository: marinasundstrom/raven
+          ref: 507f35571ea40076df49193433d0b242a462cea7
+          path: raven
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: |
+            10.0.x
+            11.0.100-rc.1.26425.128
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - uses: actions/download-artifact@v4
+        with:
+          github-token: ${{ github.token }}
+          run-id: ${{ inputs.bundle_run }}
+          name: windows-native-qualification
+          path: neoclr/target/reused
+      - name: Rebuild changed libraries with the qualified compiler
+        shell: pwsh
+        working-directory: neoclr
+        run: |
+          $archive = (Get-ChildItem target/reused -Recurse -Filter neoclr-native-poc.tar.gz | Select-Object -First 1).FullName
+          if (!$archive) { throw 'Qualified bundle not found' }
+          New-Item -ItemType Directory target/extracted
+          tar -xzf $archive -C target/extracted
+          if ($LASTEXITCODE) { exit $LASTEXITCODE }
+          python scripts/prepare-native-development-bundle.py --bundle target/extracted/neoclr-native-poc --output target/delta --compiler-revision 793219d855b17f01fb805e215968b78871eb3804
+          if ($LASTEXITCODE) { exit $LASTEXITCODE }
+      - name: Check changed JSON APIs in all execution modes
+        shell: pwsh
+        working-directory: neoclr
+        run: |
+          $vs = & "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\vswhere.exe" -latest -products '*' -requires Microsoft.VisualStudio.Component.VC.Tools.x86.x64 -property installationPath
+          if (!$vs) { throw 'MSVC not found' }
+          cmd /c "`"$vs\VC\Auxiliary\Build\vcvars64.bat`" && python scripts/test-runtime-library.py --bundle target/delta/bundle --suite json-dom --suite json-streams --mode interpreter --mode jit --mode native --output target/delta-tests"
+          if ($LASTEXITCODE) { exit $LASTEXITCODE }
+      - name: Package updated editor client with qualified server
+        shell: pwsh
+        working-directory: raven/src/Raven.VSCode
+        run: |
+          npm ci
+          if ($LASTEXITCODE) { exit $LASTEXITCODE }
+          npm run package:extension
+          if ($LASTEXITCODE) { exit $LASTEXITCODE }
+          if (Test-Path server) { Remove-Item server -Recurse -Force }
+          Copy-Item "$env:GITHUB_WORKSPACE/neoclr/target/delta/bundle/sdk/tools/language-server" server -Recurse
+          npx --no-install vsce package 0.1.15-neoclr.20261014.3 --no-update-package-json --no-dependencies --out "$env:GITHUB_WORKSPACE/neoclr/target/raven-vscode.vsix"
+          if ($LASTEXITCODE) { exit $LASTEXITCODE }
+          git rev-parse HEAD | Out-File "$env:GITHUB_WORKSPACE/neoclr/target/editor-source-revision.txt"
+      - name: Check configuration recovery and member hover with packaged extension
+        shell: pwsh
+        working-directory: neoclr
+        run: |
+          $bundle = "$PWD/target/delta/bundle"
+          python scripts/prepare-native-editor.py --sdk "$bundle/sdk" --bundle "$bundle/lib" --runtime "$bundle/bin/neoclr.exe" --installed-editor --output target/editor-delta
+          if ($LASTEXITCODE) { exit $LASTEXITCODE }
+          Invoke-WebRequest https://update.code.visualstudio.com/latest/win32-x64-archive/stable -OutFile target/vscode.zip
+          Expand-Archive target/vscode.zip target/vscode
+          $code = "$PWD/target/vscode/bin/code.cmd"
+          $profile = "$PWD/target/editor-profile"
+          $extensions = "$PWD/target/editor-extensions"
+          & $code --user-data-dir $profile --extensions-dir $extensions --install-extension "$PWD/target/raven-vscode.vsix" --force
+          if ($LASTEXITCODE) { exit $LASTEXITCODE }
+          $installed = (Get-ChildItem $extensions -Directory -Filter 'raven.raven-vscode-*' | Select-Object -First 1).FullName
+          foreach ($kind in @('configuration', 'member-hover', 'inlay')) {
+            & $code --new-window --user-data-dir $profile --extensions-dir $extensions --skip-welcome --skip-release-notes --disable-workspace-trust "--extensionDevelopmentPath=$installed" "--extensionTestsPath=$PWD/scripts/native-vscode-$kind-acceptance.cjs" "$PWD/target/editor-delta.code-workspace"
+            if ($LASTEXITCODE) { exit $LASTEXITCODE }
+            $report = "target/editor-delta/vscode-$kind-acceptance.json"
+            $deadline = (Get-Date).AddMinutes(5)
+            while (!(Test-Path $report) -and (Get-Date) -lt $deadline) { Start-Sleep -Seconds 2 }
+            if (!(Test-Path $report) -or !(Get-Content $report | ConvertFrom-Json).passed) { throw "$kind acceptance failed" }
+          }
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: release-delta-windows
+          path: |
+            neoclr/target/delta-tests/**
+            neoclr/target/editor-delta/vscode-*.json
+            neoclr/target/editor-profile/logs/**
+            neoclr/target/editor-source-revision.txt
+            neoclr/target/delta/preparation.json
+            neoclr/target/delta/libraries/build-evidence.json
+            neoclr/target/raven-vscode.vsix

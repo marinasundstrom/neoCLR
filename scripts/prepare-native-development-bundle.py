@@ -81,7 +81,8 @@ def main():
     # The library evidence retains compiler binaries as well as its declared revision.
     run([sys.executable, ROOT / 'scripts/build-native-class-library.py', '--compiler', compiler,
          '--core', out / 'bootstrap/Core.dll', '--bootstrap-directory', out / 'bootstrap', '--translator', translator,
-         '--output', out / 'libraries', '--compiler-revision', args.compiler_revision])
+         '--output', out / 'libraries', '--compiler-revision', args.compiler_revision,
+         *(['--with-postgresql'] if 'lib/System.Data.PostgreSql.dll' in manifest['modules'] else [])])
     bundle = out / 'bundle'
     shutil.copytree(original, bundle, ignore=lambda directory, names: [n for n in names if Path(directory) == original and n in ('lib', 'manifest.json')])
     shutil.copytree(out / 'libraries', bundle / 'lib')
