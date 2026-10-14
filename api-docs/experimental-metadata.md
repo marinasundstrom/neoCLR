@@ -8427,7 +8427,8 @@ native shape preserves constituent information without inventing a carrier ABI;
 the cost is an explicit boundary before compiler import, authored storage and
 code generation. Raven's default adapter still rejects compound declarations. Its separate
 experimental intersection API now supports semantic inspection while rejecting
-structural unions and keeping native emission gated. See the
+structural unions and keeping native emission gated by default. An explicit host
+option now admits native-only forwarding between imported intersection calls. See the
 [experiment record](../docs/experiments/structural-compositions/README.md) for
 validation, remaining identity differences and the next compiler slice.
 
@@ -8487,6 +8488,7 @@ Runtime interpretation requires `experimental-compositions`; JIT/AOT remain clos
 
 Focused checks and three emitted native callers cover union, intersection and
 redundant `A & Both` bounds (Both implements A): all return 42 in the interpreter.
-This is host metadata API emission, not Raven source emission. Raven's experimental
-semantic importer retains its NEOMETA001 emission guard until a compiler capability
-can preserve these original descriptors through lowering and call encoding.
+This is host metadata API emission, not Raven source emission. Raven's experimental importer retains its default NEOMETA001 guard. The explicit
+`AllowExperimentalIntersectionCalls` host option now preserves these original
+descriptors through lowering and native call encoding; it does not enable general
+storage or PE/CLI projection. See the experiment record for compiler validation.

@@ -17280,3 +17280,14 @@ open, not an approved complete implementation or a permanent roadmap reprioritiz
   return 42 in the opt-in interpreter. The metadata harness adds one passing case
   with its same two known failures; Raven's semantic-import/emission-gate probe
   still passes. General authored storage and Raven source emission remain open.
+
+- **First Raven-generated call execution:** on continuation, the assistant adds an
+  explicit native emit option for direct imported intersection calls (Raven
+  `dc750c659`, against neoCLR `930ddf60`). Shared
+  lowering carries call-only intersection shapes; native emission selects original
+  metadata descriptors by token/snapshot rather than reconstructing normalized
+  types. Four generated consumers return 42 in the opt-in interpreter, covering
+  nested/discarded calls and redundant bounds. Distinct raw contracts with the same
+  normalized nominal type reject before output. The 24 focused compiler tests and
+  existing native import/nullable controls pass. Default and PE emission remain
+  gated; authored storage, broader conversions and JIT/AOT remain open.

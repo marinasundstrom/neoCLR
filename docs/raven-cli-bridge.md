@@ -21,7 +21,7 @@ on native `caa787a96`, selectively carries compiler-created intersection symbols
 substitution/display and reference conversions from `02d669acd`/`c4d57d282`.
 Source conjunctions now bind in generic constraints, retaining ordinary nominal
 bounds. Explicit intersection value syntax is rejected with RAV0363; native compound emission remains
-disabled. This uses archived parser/constraint changes `08b53d8c4`, `41b684e3f` and
+disabled by default. A native call-only option is described below. This uses archived parser/constraint changes `08b53d8c4`, `41b684e3f` and
 `c6a303f0d`, with no new Runtime Contract switch. Compiler normalization removes
 nominal supertypes as well as duplicate bounds; runtime syntax normalization does
 not. Experimental semantic import retains native descriptors separately; native export still requires descriptor agreement.
@@ -31,11 +31,10 @@ is an input for selective reuse, not a wholesale merge.
 The metadata facade exposes admitted descriptors as canonical
 `ReferenceCompositionTypeInfo` views, including function results and parameters.
 This preserves kind and nominal identity. Raven `50037e711` now maps intersection views through
-an explicit semantic-only `ReadExperimentalIntersectionAssembly(image, bootstrap)`
+an explicit semantic-import `ReadExperimentalIntersectionAssembly(image, bootstrap)`
 API; default readers remain closed. The compiler retains native descriptors
 separately from symbols, whose normalization can remove nominal supertypes.
-Normalized structural unions, including nested unions, are rejected. No Runtime
-Contract capability or emission mapping is enabled.
+Normalized structural unions, including nested unions, are rejected. No Runtime Contract setting or general storage mapping is enabled.
 
 The host declaration reader can now opt into read-only compound free-function
 signatures via `ReadNativeAssembly(image, true)`. Ordinary Raven project/CLI loading
@@ -43,7 +42,7 @@ still uses the default reader. Ordinary callable import and compound CLI project
 loaded snapshots preserve original bytes without verifying bodies. See the
 [host API reference](../api-docs/experimental-metadata.md#read-only-reference-compositions-experiment-2026-10-14).
 
-Lost/restricted information: no structural-union compiler import or compound export, compound reflection
+Lost/restricted information: no structural-union compiler import or compound declaration export, compound reflection
 construction, generic/value/intrinsic-reference composition, member merging or
 native backend layout. Non-null compound values currently require class allocations;
 boxed/intrinsic references can fail despite a compatible static Object/interface
@@ -55,23 +54,29 @@ The host metadata builder now admits a separate
 `ImportExperimentalCompositionReference` path for native free-function calls. It
 preserves raw bounds and validates exact compound stack identity. Three emitted
 host consumers (union, intersection and redundant intersection) return 42 in the
-opt-in interpreter. This is not Raven source emission: compiler lowering still
-needs an explicit capability and raw-descriptor call encoding before removing the
-guard below. No new CLI encoding is selected.
+opt-in interpreter. Raven now builds on this through an explicit native call-only
+capability, preserving raw descriptors through shared lowering and import. No new
+CLI encoding is selected.
 
-Raven's native emitters reject compilations with any reference containing compound
-callables (NEOMETA001), including signatures normalized to a nominal compiler type.
-This conservative reference-wide gate prevents silent signature erasure. Both
+Raven's native emitters reject compound references by default (NEOMETA001).
+Raven `dc750c659` adds `NeoClrEmitOptions.AllowExperimentalIntersectionCalls` to opt native JSON emission
+into direct imported call forwarding. Calls resolve the original metadata token
+and descriptor, including when a signature simplifies to a nominal compiler type.
+PE/#Neo and general authored storage remain gated. Different raw compound stack
+contracts are rejected with NEOMETA003 rather than silently erased. Both
 metadata schemas pass cold/warm symbol/type queries, reduction/retention checks,
 union/default-reader rejection and emission rejection without changing output.
 The existing native nullable-symbol control also passes. These checks add semantic
-import evidence, not Raven-generated compound execution.
+import evidence. Four Raven-generated native call-only programs additionally return
+42 in the interpreter: nested calls and discarded results, with distinct and
+redundant bounds. See the linked experiment for commands and remaining limits.
 
 Replacement owners: Raven must preserve semantic symbols and diagnostics through
 an explicit native target capability; the neoCLR metadata library must supply the
 final resolved descriptor/encoding; runtime verification and codegen must agree on
 storage and checked projection before backend admission. Current validation is
-neoIL/interpreter and rejection evidence, not Raven-generated source execution.
+neoIL/interpreter, bounded Raven-generated call execution and rejection evidence;
+general storage and backend admission remain open.
 
 ## Forward async result declarations — 2026-10-12
 

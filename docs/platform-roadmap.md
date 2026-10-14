@@ -4,9 +4,11 @@
 [union/intersection probes](experiments/structural-compositions/README.md) on
 `codex/structural-union-intersection` reuse metadata identity and runtime reference
 services. The companion Raven branch `codex/neoclr-union-intersection` now has
-semantic symbols/conversions and source generic-constraint conjunctions; native
-compound storage/emission remains pending. An explicit build feature now admits reference-only compound
-signatures in the interpreter; JIT/AOT reject them. This does not change the active
+semantic symbols/conversions, source generic-constraint conjunctions and opt-in
+native intersection call forwarding. Four Raven-generated callers return 42 while
+preserving raw native descriptors; general authored compound storage remains
+pending. An explicit build feature admits reference-only compound signatures in
+the interpreter; JIT/AOT reject them. This does not change the active
 performance milestone.
 
 **Preview 15 published (2026-10-14):** the composed JSON error carrier now fits a

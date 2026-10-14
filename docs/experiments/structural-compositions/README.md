@@ -1,8 +1,9 @@
 # Structural union/intersection experiment
 
 Status: branch-only interpreter signatures behind `experimental-compositions`,
-2026-10-14. Raven source support, JIT/AOT storage, public reflection APIs and a stable
-ABI remain unavailable. The earlier probes below retain their narrower evidence.
+2026-10-14. Raven supports explicit native call-only intersection consumers; general
+authored compound storage, JIT/AOT storage, public reflection APIs and a stable ABI
+remain unavailable. The earlier probes below retain their narrower evidence.
 
 ## Branches and reused work
 
@@ -391,3 +392,54 @@ the prior 170/172 result. The same pre-existing `Native Object root authoring` a
 reader/import checks, public XML documentation build and API snapshot check pass.
 The next compiler slice must preserve raw descriptors through lowering and call
 encoding before admitting executable source use.
+
+## Raven-generated native call consumers — 2026-10-14
+
+Raven `dc750c659`, validated against neoCLR `930ddf60`, now offers
+`NeoClrEmitOptions(..., allowExperimentalIntersectionCalls: true)`
+for native JSON emission through `NeoClrCompilationEmitter.Emit`. Combined with
+`ReadExperimentalIntersectionAssembly`, it admits direct calls such as:
+
+```raven
+func Main() -> int => Consume(Echo(Produce()))
+```
+
+Produce/Echo/Consume are imported nongeneric free functions with matching native
+intersection contracts. The portable call plan carries semantic intersections
+without allowing them as general storage types. The native adapter selects the
+original callable by token within its exact semantic snapshot and imports the raw
+signature. Both artifact-only and explicit snapshot dependency bindings work.
+Redundant `A & Both` bounds remain in call operands after compiler normalization.
+
+Four generated programs (nested calls and discarded results, each with ordinary or
+redundant bounds) return `Int32(42)` in the opt-in interpreter. The compiler fixture
+also verifies default and PE/#Neo rejection, inferred-local rejection, unchanged
+output on failure, and rejection when two different raw contracts simplify to the
+same nominal compiler type. That last case reports NEOMETA003 because the host
+verifier currently requires exact compound stack identity; this is an incomplete
+conversion proof, not a restriction on the intended reference semantics.
+
+From the Raven companion worktree, generate the programs with:
+
+```sh
+dotnet run --project tools/NeoClrMetadataProbe -p:NeoClrMetadataProject=/Users/robert/Projects/neoclr/tools/metadata/NeoCLR.Metadata.Experimental/NeoCLR.Metadata.Experimental.csproj -p:WarningLevel=0 -- --intersection-calls /Users/robert/Projects/neoclr/api-docs/reference/NeoCLR.CoreProbe.dll /tmp/raven-intersection-calls
+```
+
+Using the feature-enabled runtime built in the preceding section, run from neoCLR:
+
+```sh
+for name in IntersectionCallsConsumer ReducedCalls; do
+  for suffix in '' Discard; do
+    target/debug/neoclr run /tmp/raven-intersection-calls/${name}${suffix}.neox --module /tmp/raven-intersection-calls/${name}Provider.neox --execution interpreter --show-result
+    test "$?" = 42 || exit 1
+  done
+done
+```
+
+The existing Raven `--intersection-symbols` and `--nullable-symbols` controls pass,
+as do 24 intersection symbol/conversion tests against the rebuilt net11.0 compiler.
+No CLI carrier or erasure is introduced. The option defaults off, is not exposed
+as a project/CLI switch or Runtime Contract setting, and does not enable PE output,
+locals/spills, authored compound signatures, structural unions or JIT/AOT. Imported
+cross-dependency bounds requiring a resolver and broader reference conversions
+remain follow-up work. Default .NET behavior and milestone sequencing are unchanged.
