@@ -143,5 +143,41 @@
       "target/source-constraints/ConstraintLibrary.neox": "5a7cb536ff4bc8e477dc1b770bcca6c2608cc097823bd69d5f1de17f2e36773e",
       "Raven/tools/NeoClrMetadataProbe/StructuralConstraintChecks.cs": "5624fe108748d0822bf8fedb67b4d9a216a53ef2e121ce802c0acbc76b130a51"
     }
+  },
+  "genericBodyTraits": {
+    "date": "2026-10-14",
+    "scope": "Owned nongeneric interface calls through structurally constrained method parameters; external/constructed target authoring remains limited",
+    "checks": [
+      {
+        "command": "cargo test -p neoclr --features experimental-compositions --test composition_constraints --test self_types --test generic_bounds",
+        "passed": 34
+      },
+      {
+        "command": "cargo test -p neoclr --test composition_constraints",
+        "passed": 1
+      },
+      {
+        "command": "NeoClrMetadataProbe --structural-constraints",
+        "result": "pass, including TraitSource emission"
+      },
+      {
+        "command": "target/debug/neoclr run target/source-constraints/TraitSource.neox --system target/composition-info-libraries-v2/System.runtime.neox --module target/composition-info-libraries-v2/System.Runtime.dll --object-root target/composition-info-libraries-v2/System.Runtime.dll --execution interpreter --instructions 100000000",
+        "exitCode": 42
+      },
+      {
+        "command": "metadata checks --authored-structural-constraints and --open-constrained-calls",
+        "result": "pass"
+      },
+      {
+        "command": "python3 scripts/build-api-docs.py --check",
+        "result": "pass"
+      }
+    ],
+    "sha256": {
+      "target/source-constraints/TraitSource.neox": "70c77c2d922ef5dd5d1ef0003b8abec712f97b6b0796188c090a98c18c312223",
+      "tests/composition_constraints.rs": "f5045db51647ecc87b892ead70a63c95ce6c82c5a2235c452ab46f48e903125b",
+      "tools/metadata/NeoCLR.Metadata.Experimental.Tests/AuthoredStructuralConstraintChecks.cs": "869e3c642f07db86dc304d0009c4fa7d4dbe606331131a9f82a3d930c7c19eab",
+      "Raven/tools/NeoClrMetadataProbe/StructuralConstraintChecks.cs": "2c4568e5bda9abe382fe490be5bda4bbceb299597d1ec07e75a6ce4d9c4039c2"
+    }
   }
 }

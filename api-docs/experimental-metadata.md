@@ -8782,3 +8782,29 @@ authoring, generic-body trait calls and owner/type-parameter forwarding remain
 unsupported. The metadata fixture and the Raven source/library-consumer fixture
 execute through forwarded generic calls with result 42. Earlier blanket statements
 that method forwarding is unsupported are superseded by this bounded profile.
+
+### Interface calls guaranteed by structural bounds
+
+The owned-target `IILGenerator.CallConstrained(SignatureType implementingType,
+MethodBuilder target)` overload now admits nongeneric abstract instance interface
+methods when the method parameter has an explicit structural bound that guarantees
+the target interface. Push a managed reference to that parameter (for example with
+`LoadArgumentAddress`) before the call. Native encoding uses existing borrowed
+`callself`; no schema or CLI representation is added. The raw `Emit` overload retains
+its existing `OpCode.Call` spelling. Operand validation and serialization reject
+insufficient guarantees or an incompatible receiver stack. Existing nominal-only
+static calls retain their earlier admission and Self substitution behavior.
+
+An intersection guarantees each constituent trait. A union guarantees a target trait
+only if every alternative does; partial overlap is insufficient. The runtime verifier
+uses the same distinction when authorizing an interface/base view of a constrained
+parameter, retaining nominal inheritance and Self substitution at the leaves. Concrete
+execution still resolves and checks the actual implementation. Default builds do not
+admit structural bounds. External/constructed interface call authoring and owner-parameter
+support are not expanded by this slice. Raven’s tested source case uses a local
+intersection-constrained generic body calling two interface methods and returns 42.
+
+This supersedes the blanket generic-body-trait gap above for owned nongeneric
+interface contracts. The APIs are host C# tooling; guest reflection APIs do not change.
+Compared with CLR constrained dispatch, this keeps the existing receiver/call behavior
+and extends only the native structural proof of the required interface.

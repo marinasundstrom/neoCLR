@@ -265,12 +265,12 @@ public interface IILGenerator
     /// <exception cref="ArgumentNullException">A required operand is null.</exception>
     void Emit(OpCode opCode, TypeBuilder receiverType, MethodBuilder target);
 
-    /// <summary>Calls an owned static interface contract through a bounded method type parameter.</summary>
+    /// <summary>Calls an owned interface contract through a bounded method type parameter.</summary>
     /// <param name="implementingType">An in-scope method type parameter with the required local interface bound.</param>
-    /// <param name="target">Owned nongeneric static abstract interface method.</param>
+    /// <param name="target">Owned nongeneric abstract interface method. Instance calls require an explicit structural guarantee.</param>
     /// <exception cref="ArgumentNullException">An operand is null.</exception>
     /// <exception cref="ArgumentException">Scope, bound, ownership or target category is unsupported.</exception>
-    /// <remarks>Self substitutes the method parameter. Type-owner parameters, instance calls and external targets remain unsupported.</remarks>
+    /// <remarks>Self substitutes the method parameter. Native structural bounds also admit instance calls with a managed reference to the parameter as receiver. Type-owner parameters and external targets remain unsupported by this overload.</remarks>
     void CallConstrained(SignatureType implementingType, MethodBuilder target);
     /// <summary>Calls a completed external static interface contract through a bounded method parameter.</summary>
     /// <param name="implementingType">In-scope method parameter whose bounds admit the declaring interface.</param>
@@ -291,10 +291,10 @@ public interface IILGenerator
     /// <summary>Emits Call through a bounded method parameter to an external static interface contract.</summary>
     void Emit(OpCode opCode, SignatureType implementingType, ImportedMethodReference target);
 
-    /// <summary>Emits a static constrained call through an in-scope bounded method parameter.</summary>
+    /// <summary>Emits an owned constrained call through an in-scope bounded method parameter.</summary>
     /// <param name="opCode">Call only.</param>
     /// <param name="implementingType">See CallConstrained(SignatureType, MethodBuilder).</param>
-    /// <param name="target">Owned nongeneric static abstract interface method.</param>
+    /// <param name="target">Owned nongeneric abstract interface method. Instance calls require an explicit structural guarantee.</param>
     /// <exception cref="ArgumentException">Opcode or operands are unsupported.</exception>
     /// <exception cref="ArgumentNullException">An operand is null.</exception>
     void Emit(OpCode opCode, SignatureType implementingType, MethodBuilder target);

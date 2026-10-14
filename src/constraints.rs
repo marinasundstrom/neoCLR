@@ -408,14 +408,35 @@ pub(crate) fn permits_view(
         let ConstraintKind::TypeBound(bound) = &constraint.kind else {
             return false;
         };
-        if interface {
-            crate::interfaces::closure(module, bound).is_ok_and(|types| {
-                types
-                    .iter()
-                    .any(|ty| ty.substitute_self(source).is_ok_and(|ty| &ty == target))
-            })
-        } else {
-            crate::inheritance::require_base(module, bound, target).is_ok()
+        fn guarantees(
+            module: &crate::Module,
+            bound: &Type,
+            source: &Type,
+            target: &Type,
+            interface: bool,
+        ) -> bool {
+            match bound {
+                Type::Union(parts) => {
+                    cfg!(feature = "experimental-compositions")
+                        && !parts.is_empty()
+                        && parts
+                            .iter()
+                            .all(|part| guarantees(module, part, source, target, interface))
+                }
+                Type::Intersection(parts) => {
+                    cfg!(feature = "experimental-compositions")
+                        && parts
+                            .iter()
+                            .any(|part| guarantees(module, part, source, target, interface))
+                }
+                _ if interface => crate::interfaces::closure(module, bound).is_ok_and(|types| {
+                    types
+                        .iter()
+                        .any(|ty| ty.substitute_self(source).is_ok_and(|ty| &ty == target))
+                }),
+                _ => crate::inheritance::require_base(module, bound, target).is_ok(),
+            }
         }
+        guarantees(module, bound, source, target, interface)
     })
 }

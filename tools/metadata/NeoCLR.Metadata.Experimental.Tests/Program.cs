@@ -8,6 +8,8 @@ if (args is ["--composition-imports", var compositionOutput]) { ReferenceComposi
 
 if (args is ["--authored-structural-constraints", var constraintOutput]) { AuthoredStructuralConstraintChecks.Run(constraintOutput); return 0; }
 
+if (args is ["--open-constrained-calls"]) { OpenConstrainedCallChecks.Run(); return 0; }
+
 if (args is ["--structural-method-constraints"]) { StructuralMethodConstraintChecks.Run(); GenericMethodConstraintChecks.Run(); return 0; }
 
 if (args is ["--authored-compositions"]) { AuthoredCompositionChecks.Run(); return 0; }

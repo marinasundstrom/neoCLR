@@ -463,10 +463,12 @@ internal sealed class MethodILGenerator(MethodBuilder bodyBuilder) : IILGenerato
         ArgumentNullException.ThrowIfNull(implementingType);
         ArgumentNullException.ThrowIfNull(target);
         if (implementingType.MethodParameterIndex is not { } index || index >= caller.Signature.GenericParameterNames.Count ||
-            !ReferenceEquals(target.Assembly, caller.Assembly) || !target.IsStatic || !target.IsAbstract ||
+            !ReferenceEquals(target.Assembly, caller.Assembly) || !target.IsAbstract ||
             target.Signature.GenericParameterNames.Count != 0 || target.DeclaringType is not { IsInterface: true, GenericParameterNames.Count: 0 } owner ||
-            !caller.InterfaceConstraints.Any(c => c.ParameterIndex == index && caller.Definition.ConstraintSignature(c.InterfaceType).ClassType is { } bound && bound.ConformsTo(owner)))
-            throw new ArgumentException("open constrained call requires a method parameter with an owned interface bound and a static nongeneric contract");
+            !(caller.Definition.AuthoredStructuralConstraints.Any(c => c.ParameterIndex == index)
+                ? caller.ForwardedBoundsSatisfy(caller, index, owner)
+                : target.IsStatic && caller.Definition.NominalInterfaceConstraints.Any(c => c.ParameterIndex == index && caller.Definition.ConstraintSignature(c.InterfaceType).ClassType is { } bound && bound.ConformsTo(owner))))
+            throw new ArgumentException("open constrained call requires a guaranteed owned nongeneric interface contract; instance calls require structural bounds");
     }
 
     internal static SignatureType SubstituteConstrainedSelf(SignatureType type, SignatureType implementingType) => type.IsSelf ? implementingType

@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-14
 
+- Admit owned nongeneric interface calls through structurally constrained method parameters. Prove intersection traits and union-wide guarantees in the metadata builder/runtime verifier, retaining borrowed dispatch and nominal Self semantics. Add Raven execution and native positive/negative tests; external/constructed targets and open operands remain limited.
+
 - Prove forwarded generic method arguments from closed structural caller bounds, combining conjunctive nominal guarantees and preserving whole-union coverage. Reject absent/weaker bounds at emission and serialization; validate native and Raven wrapper execution. Open bound operands and owner-parameter forwarding remain unsupported.
 
 - Validate companion Raven emission of closed local structural method constraints, preserving union/intersection grouping and interpreter result 42. Wire explicit native constrained-function imports with complete bounds and repeated argument validation; companion Raven preserves imported constraints and rejects constraint-erasing fallbacks. Separate native consumers return 42, including a closed generic bound. Keep default/CLI rejection and open-bound limitations.

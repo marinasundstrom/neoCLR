@@ -5,6 +5,7 @@ internal static class AuthoredStructuralConstraintChecks
 {
     internal static void Run(string? output = null)
     {
+        TraitCalls();
         var graph = new AssemblyBuilder(new("AuthoredBounds", new Version(1, 0, 0, 0)), new("Core", new Version(1, 0, 0, 0)));
         var a = graph.AddInterface("Example", "A");
         var b = graph.AddInterface("Example", "B");
@@ -110,6 +111,27 @@ internal static class AuthoredStructuralConstraintChecks
         Reject(() => graph.WriteNativeAssembly());
         Console.WriteLine("PASS authored structural method constraints");
     }
+    private static void TraitCalls()
+    {
+        var graph = new AssemblyBuilder(new("TraitContracts", new Version(1, 0, 0, 0)), new("Core", new Version(1, 0, 0, 0)));
+        var a = graph.AddInterface("Example", "A");
+        var b = graph.AddInterface("Example", "B");
+        var read = a.AddInterfaceMethod("Read", new MethodSignature(PrimitiveType.Int32, []));
+        var parameter = SignatureType.MethodParameter(0);
+        var strong = graph.AddFunction("Strong", new MethodSignature(PrimitiveType.Int32, [parameter], ["T"]));
+        strong.AddExperimentalStructuralConstraint(0, ReferenceCompositionKind.Intersection, a, b);
+        var il = strong.GetILGenerator();
+        il.LoadArgumentAddress(0);
+        il.CallConstrained(parameter, read);
+        il.Return();
+        var weak = graph.AddFunction("Weak", new MethodSignature(PrimitiveType.Int32, [parameter], ["T"]));
+        weak.AddExperimentalStructuralConstraint(0, ReferenceCompositionKind.Union, a, b);
+        Reject(() => weak.GetILGenerator().CallConstrained(parameter, read));
+        weak.LoadConstant(0); weak.Return();
+        _ = graph.WriteNativeAssembly();
+        Reject(() => graph.Write());
+    }
+
     private static void Reject(Action action)
     {
         try { action(); }

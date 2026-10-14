@@ -147,3 +147,78 @@ fn documented_native_constraint_consumer_executes() {
         Value::Int32(42)
     );
 }
+
+#[cfg(feature = "experimental-compositions")]
+#[test]
+fn generic_bodies_use_only_interfaces_guaranteed_by_structural_bounds() {
+    let source = r#"
+.module TraitBounds
+.entry Main
+.interface A
+.method instance ReadA() -> Int32
+.end
+.end
+.interface B
+.method instance ReadB() -> Int32
+.end
+.end
+.type class Both
+.sealed
+.implements A
+.implements B
+.method instance .ctor() -> noresult
+ret
+.end
+.method instance ReadA() -> Int32
+ldc.i4 40
+ret
+.end
+.method instance ReadB() -> Int32
+ldc.i4 2
+ret
+.end
+.end
+.type class OnlyA
+.implements A
+.method instance ReadA() -> Int32
+ldc.i4 40
+ret
+.end
+.end
+.function Read<T>(T value) -> Int32
+.constraint T intersection<A,B>
+ldarga value
+callself borrow T = instance A::ReadA()
+ldarga value
+callself borrow T = instance B::ReadB()
+add
+ret
+.end
+.function Main() -> Int32
+newobj instance Both::.ctor()
+call Read<Both>(Both)
+ret
+.end
+"#;
+    for bound in ["intersection<A,B>", "union<Both,intersection<A,B>>"] {
+        let source = source.replace(
+            ".constraint T intersection<A,B>",
+            &format!(".constraint T {bound}"),
+        );
+        let module = assemble(&source).unwrap();
+        let program = LoadedProgram::new(&module).unwrap();
+        program.verify().unwrap();
+        assert_eq!(
+            program.run(Limits::default()).unwrap().value,
+            Value::Int32(42)
+        );
+    }
+    for bound in ["union<A,B>", "union<Both,OnlyA>"] {
+        let source = source.replace(
+            ".constraint T intersection<A,B>",
+            &format!(".constraint T {bound}"),
+        );
+        let result = assemble(&source).and_then(|module| LoadedProgram::new(&module)?.verify());
+        assert!(result.is_err(), "{bound}");
+    }
+}

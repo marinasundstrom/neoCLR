@@ -2048,3 +2048,7 @@ imported generic instantiation contract are documented in the
 [manual constrained import reference](experimental-metadata.md#importing-structurally-constrained-native-functions).
 These C# tooling APIs remain excluded from guest RavenDoc selection. Guest snapshot
 fingerprints are unchanged and validation passes.
+
+The owned constrained-call API's native structural-instance extension is covered by
+[the manual metadata reference](experimental-metadata.md#interface-calls-guaranteed-by-structural-bounds).
+It remains a host C# API excluded from guest RavenDoc selection; guest snapshots are unchanged.

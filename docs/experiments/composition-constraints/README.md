@@ -90,3 +90,12 @@ unless a structural caller requires structural entailment. The metadata fixture
 and Raven exported wrappers execute with result 42. This supersedes the blanket
 method-forwarding gap above, while open bound operands, owner parameters, external
 bound authoring and generic-body trait calls remain outside this profile.
+
+Generic-body interface use checkpoint: an owned nongeneric interface contract may
+now be invoked through a method parameter whose structural bound guarantees it.
+Raven’s local intersection fixture calls both interface methods and returns 42;
+the native test also accepts a union whose every alternative guarantees both traits
+and rejects partial-coverage unions. Existing borrowed callself handles the receiver;
+nominal leaf/Self checks remain intact. This supersedes the generic-body-trait gap
+for this profile only. External/constructed targets, owner-parameter authoring and
+open structural bound operands are not expanded by this change.

@@ -4711,3 +4711,8 @@ remain experimental gaps; [evidence](experiments/composition-constraints/README.
 bounds imply the callee’s requirements. Native and Raven library-consumer execution
 return 42; [evidence](experiments/composition-constraints/README.md). Open operands,
 owner-parameter forwarding and generic-body traits remain separate gaps.
+
+2026-10-14 bounded generic-body trait use: structural method bounds now authorize
+owned nongeneric interface calls; the Raven intersection body returns 42. Union
+alternatives must all guarantee the requested trait. [Evidence](experiments/composition-constraints/README.md).
+Broader generic/target/backend support remains outside this experimental slice.

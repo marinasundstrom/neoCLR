@@ -148,7 +148,7 @@ public sealed partial class MethodBuilder
             : bound.GenericInstance is { Definition.IsInterface: true } constructed && local.ConformsTo(constructed);
     }
 
-    private bool ForwardedBoundsSatisfy(MethodBuilder? caller, int parameter, SignatureType required)
+    internal bool ForwardedBoundsSatisfy(MethodBuilder? caller, int parameter, SignatureType required)
     {
         if (caller is null || parameter < 0 || parameter >= caller.Signature.GenericParameterNames.Count) return false;
         var bounds = caller.Definition.TypeConstraints.Where(c => c.ParameterIndex == parameter).Select(c => c.Bound).ToArray();

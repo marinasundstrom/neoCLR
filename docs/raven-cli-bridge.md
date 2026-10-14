@@ -9859,3 +9859,12 @@ emission and serialization; no CLI encoding or new Runtime Contract switch is ad
 The metadata and Raven forwarding fixtures return 42, including a separately
 compiled consumer invoking the exported wrappers. This does not admit open bound
 operands, owner-parameter forwarding, external-bound authoring or generic-body traits.
+
+Generic-body trait follow-up, 2026-10-14: Raven’s local intersection-constrained
+method bodies can call owned nongeneric instance interface contracts. The metadata
+builder proves the trait from the structural bound, and the runtime verifier admits
+it using intersection-any/union-all guarantees before existing borrowed callself
+dispatch. A Raven body calling both constituent interfaces returns 42. No syntax,
+Runtime Contract switch, CLI encoding or runtime bundle change is introduced. Default
+profiles retain rejection. External/constructed constrained targets, owner-parameter
+authoring and more general open bounds remain outside this bounded slice.
