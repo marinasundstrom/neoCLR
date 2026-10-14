@@ -100,5 +100,7 @@ structural unions. Use `NominalTypeInfo.IsUnionDeclaration` to detect nominal Ra
 union declarations. Experimental UnionTypeInfo and IntersectionTypeInfo expose direct constituent
 snapshots in the interpreter. The companion experimental Raven contract now emits
 source union/intersection type tokens and signatures, including closed generic
-arguments. Member/hierarchy queries and JIT/AOT remain under development. This is not part of the published
+arguments. Experimental native generic constraints now retain union/intersection
+bounds; Raven native constraint emission and guest constraint reflection remain
+pending. Member/hierarchy queries and JIT/AOT remain under development. This is not part of the published
 release; see the [descriptor contract](/docs/introspection.html#structural-composition-descriptors-experimental-2026-10-14).

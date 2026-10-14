@@ -1353,3 +1353,5 @@ roundtrip/reflection and argument satisfaction together, with positive and negat
 any-of/all-of checks, then compiler generic-body use and substitution. Reuse existing
 relationship research and the CLR comparison above. Keep default/unsupported backend
 rejection explicit; do not weaken constraints to Object or nominal carriers.
+
+Constraint progress (2026-10-14): the [native runtime and Raven semantic slice](../composition-constraints/README.md) now checks closed structural bounds. Host adapter/compiler emission and guest constraint reflection remain pending; earlier blanket native-runtime rejection statements are superseded only for this bounded profile.

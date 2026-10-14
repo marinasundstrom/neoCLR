@@ -1,0 +1,34 @@
+.module CompositionConstraints
+.entry Main
+.interface A
+.end
+.interface B
+.end
+.type class OnlyA
+.implements A
+.end
+.type class Both
+.sealed
+.implements A
+.implements B
+.end
+.type class EitherBox<T>
+.constraint T union<A,B>
+.field Value T
+.end
+.function Either<T>() -> Int32
+.constraint T union<A,B>
+ldc.i4 21
+ret
+.end
+.function All<T>() -> Int32
+.constraint T intersection<A,B>
+ldc.i4 21
+ret
+.end
+.function Main() -> Int32
+call Either<OnlyA>()
+call All<Both>()
+add
+ret
+.end

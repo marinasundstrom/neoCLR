@@ -197,10 +197,9 @@ pub(crate) fn validate_surface(module: &Module) -> Result<(), Fault> {
     for def in &module.types {
         if def.static_fields.iter().any(|f| contains(&f.ty))
             || def.base.iter().chain(&def.implements).any(contains)
-            || crate::constraints::bounds(&def.generic_constraints).any(contains)
         {
             return Err(Fault::new(
-                "compound static fields, inheritance and constraints are not supported",
+                "compound static fields and inheritance are not supported",
             ));
         }
         for field in &def.fields {
@@ -224,7 +223,11 @@ pub(crate) fn validate_surface(module: &Module) -> Result<(), Fault> {
     let mut visited = std::collections::HashSet::new();
     while let Some((function, instantiated)) = pending.pop_front() {
         let mut has_compound = false;
-        function.map_types(|ty| {
+        // Bounds constrain instantiation; they do not introduce compound storage
+        // into an otherwise ordinary generic method body.
+        let mut executable = function.as_ref().clone();
+        executable.generic_constraints.clear();
+        executable.map_types(|ty| {
             has_compound |= contains(ty);
             Ok(ty.clone())
         })?;

@@ -88,6 +88,7 @@ fn symbolic(ty: &Type) -> bool {
         Type::Constructed { arguments, .. } | Type::Scoped { arguments, .. } => {
             arguments.iter().any(symbolic)
         }
+        Type::Union(parts) | Type::Intersection(parts) => parts.iter().any(symbolic),
         Type::ByRef(t)
         | Type::ReadOnlyByRef(t)
         | Type::InterfaceRef(t)
@@ -105,6 +106,10 @@ pub(crate) fn validate_bounds(
     let mut bases = std::collections::HashSet::new();
     for constraint in constraints {
         if let ConstraintKind::TypeBound(bound) = &constraint.kind {
+            if crate::compositions::is_compound(bound) {
+                crate::compositions::validate(module, bound)?;
+                continue;
+            }
             let definition = module
                 .type_definition(bound)
                 .filter(|_| matches!(bound, Type::Named(_) | Type::Constructed { .. }))
@@ -203,6 +208,22 @@ pub(crate) fn check(
                 if symbolic(concrete) || symbolic(bound) {
                     continue;
                 }
+                if crate::compositions::is_compound(bound)
+                    || crate::compositions::is_compound(concrete)
+                {
+                    if !cfg!(feature = "experimental-compositions") {
+                        return Err(Fault::new(
+                            "compound constraints require experimental-compositions",
+                        ));
+                    }
+                    if !satisfies_composition_bound(module, concrete, bound) {
+                        return Err(Fault::new(format!(
+                            "generic argument {argument:?} violates {bound:?} constraint on parameter {}",
+                            constraint.parameter
+                        )));
+                    }
+                    continue;
+                }
                 // Partial frontend probes cannot decide application-type conformance.
                 // Complete linking validates all referenced types and repeats these checks.
                 let Some(definition) = module.type_definition(bound) else {
@@ -234,6 +255,35 @@ pub(crate) fn check(
         }
     }
     Ok(())
+}
+
+// Constraint membership never performs a value conversion. Preserve each union
+// alternative and each intersection requirement, including nominal Self contracts.
+fn satisfies_composition_bound(module: &crate::Module, argument: &Type, bound: &Type) -> bool {
+    match (argument, bound) {
+        (Type::Union(parts), _) => parts
+            .iter()
+            .all(|part| satisfies_composition_bound(module, part, bound)),
+        (_, Type::Intersection(parts)) => parts
+            .iter()
+            .all(|part| satisfies_composition_bound(module, argument, part)),
+        (_, Type::Union(parts)) => parts
+            .iter()
+            .any(|part| satisfies_composition_bound(module, argument, part)),
+        (Type::Intersection(parts), _) => parts
+            .iter()
+            .any(|part| satisfies_composition_bound(module, part, bound)),
+        _ => module.type_definition(bound).is_some_and(|definition| {
+            if definition.representation == crate::metadata::Representation::Interface {
+                crate::interfaces::closure(module, argument)
+                    .is_ok_and(|types| types.contains(bound))
+                    && crate::interfaces::satisfies_self_bound(module, argument, bound)
+                        .unwrap_or(false)
+            } else {
+                crate::inheritance::require_base(module, argument, bound).is_ok()
+            }
+        }),
+    }
 }
 
 pub(crate) fn check_type_arguments(

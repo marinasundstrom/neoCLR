@@ -1,0 +1,27 @@
+{
+  "date": "2026-10-14",
+  "scope": "Native closed structural bounds and Raven semantic checks; native Raven emission and guest constraint reflection pending",
+  "ravenCommit": "9bb265ed5",
+  "checks": [
+    {
+      "command": "cargo test -p neoclr --features experimental-compositions --test composition_constraints",
+      "passed": 4
+    },
+    {
+      "command": "cargo test -p neoclr --test composition_constraints",
+      "passed": 1
+    },
+    {
+      "command": "cargo test -p neoclr --features experimental-compositions --test structural_compositions --test generic_bounds --test generic_constraints",
+      "passed": 60
+    },
+    {
+      "command": "dotnet test test/Raven.CodeAnalysis.Tests/Raven.CodeAnalysis.Tests.csproj -p:BuildProjectReferences=false --filter FullyQualifiedName~StructuralConstraintTests",
+      "passed": 18
+    }
+  ],
+  "sha256": {
+    "docs/experiments/composition-constraints/native.neil": "bfec44e8cdd541ba881321445b8deaf89d79ab00811f2dacfd3cf83dfa133e4c",
+    "tests/composition_constraints.rs": "471ebb807853b5d627b056c2a0029d4c013aafb9c87a072d461eddd81f2c330c"
+  }
+}

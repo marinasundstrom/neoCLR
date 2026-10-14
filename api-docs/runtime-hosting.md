@@ -141,3 +141,15 @@ the Raven `TypeInfo.IsUnion` property is now reserved for structural unions, whi
 `NominalTypeInfo.IsUnionDeclaration` checks nominal metadata. Host description does
 not by itself enable guest structural descriptors. The guest API
 snapshot, native metadata encoding and CLI bridge are unchanged.
+
+### Experimental structural generic bounds (2026-10-14)
+
+With experimental-compositions, metadata GenericConstraint.kind may hold
+TypeBound(Type::Union(...)) or TypeBound(Type::Intersection(...)) with the existing
+closed reference composition rules. Module::instantiated_fields and loaded generic
+method resolution enforce any-of/all-of membership after substitution, including
+full coverage of union arguments. Invalid arguments fault; bypassing verification
+does not bypass method constraint checks. Default builds reject structural bounds.
+The metadata preserves the structural bound, not multiple conjunctive nominal rows.
+No new guest constraint reflection API is introduced. See
+[validation and limits](../docs/experiments/composition-constraints/README.md).

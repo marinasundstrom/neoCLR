@@ -9808,3 +9808,5 @@ Owners are `codex/neoclr-union-intersection` and `codex/structural-union-interse
 Evidence: `docs/experiments/source-structural-unions` and
 `docs/experiments/source-structural-intersections`, including runners and hashes.
 This supersedes earlier source-authoring/type-token gaps, not other runtime limits.
+
+Constraint follow-up, 2026-10-14: companion Raven checks structural union/intersection generic arguments and recursively substitutes bound parameters. The native interpreter accepts closed compound TypeBound metadata; the host adapter and Raven native emitter still reject these constraint declarations. No CLI weakening or carrier replacement is used. See [scope and validation](experiments/composition-constraints/README.md).

@@ -17586,3 +17586,15 @@ union arguments, generic substitution and reflected grouping, and recorded the
 next bounded implementation sequence. These are design proposals and pending work,
 not a claim of implementation or author approval of every detail. See the
 [constraint follow-up](experiments/structural-compositions/README.md#constraint-position-follow-up-after-source-storage--2026-10-14).
+
+
+Constraint implementation update, 2026-10-14: following the author's continuation,
+the assistant added native closed structural TypeBound validation and argument
+membership checks, with nominal method-specialization checks independent of
+verification. Compiler inspection found that an unhandled structural constraint
+could fall through as satisfied; Raven commit 9bb265ed5 adds explicit checking and
+owner/method substitution. The first focused compiler run passed 43 tests, and the
+expanded structural-only run passed 18 (overlapping evidence, not 61 unique tests).
+Native compiler emission, host adapter materialization and guest reflected grouping
+remain unfinished and are not claimed by this slice. See
+[constraint implementation scope](experiments/composition-constraints/README.md).
