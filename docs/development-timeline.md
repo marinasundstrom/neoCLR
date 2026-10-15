@@ -18143,3 +18143,28 @@ conversion, range-pattern support and overflow-safe integer advancement remain n
 - **Evidence:** the [variance design](design/interface-variance.md) and focused
   `--interface-variance` SDK checks pass, including existing native-definition and
   projection regression checks. The API snapshot check also passes.
+
+
+## 2026-10-15 — Recommended variance safety boundary
+
+- **Author:** asked candidly for the best variance solution for neoCLR and how to
+  make it safe.
+- **Assistant recommendation (not an adopted author decision):** retain explicit
+  declaration-site nominal interface variance with identity/reference conversions;
+  separate it from explicit value mapping. Keep mutable slots and containers
+  invariant, compose nested signature polarity, validate metadata independently of
+  Raven, and preserve the original implementation signature during dispatch.
+- **Sliceable consequence:** while Result remains invariant, keep Sliceable
+  invariant and use explicit result mapping or a nominal adapter/explicit second
+  interface implementation when a wider result view is needed. An adapter may
+  allocate and a result conversion may copy; neither should be disguised as a
+  cost-free reference reinterpretation. This recommendation defers automatic
+  value-result widening without rejecting its future investigation.
+- **Priority proposed:** finish and validate the same bounded reference contract
+  through interpreter, AOT/JIT and compiler integration before expanding variance.
+  Existing metadata inspection does not establish end-to-end support. Require
+  negative aliasing/conversion checks, separate-compilation consumers, deterministic
+  dispatch, GC retention and allocation evidence. Structural work remains parked.
+- **Research:** rechecked the [C# variance safety/conversion specification](https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/language-specification/interfaces#1923-variant-type-parameter-lists)
+  and [.NET generic variance guide](https://learn.microsoft.com/en-us/dotnet/standard/generics/covariance-and-contravariance).
+  No implementation or user acceptance of this recommendation is claimed.
