@@ -98,6 +98,10 @@ passes seven scalar/reference inputs in interpreter and AOT, allocating only its
 explicit Response object. Nominal-value and intrinsic String alternatives remain
 native layout gaps.
 
+An [artifact-only mixed library consumer](experiments/native-structural-types/mixed-import-project/README.md)
+also passes imported union returns/parameters and Response property access with
+only the explicit object allocation.
+
 The current interpreter admits a null/default union payload. Native bounded
 storage preserves that behavior. It is not a separate named union case and is not
 evidence that every alternative is nullable. See the [union contract](../api-docs/unions.md)

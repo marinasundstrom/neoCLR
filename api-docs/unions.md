@@ -128,6 +128,8 @@ slots (tag, numeric bits, reference), tracing only the reference slot. AOT check
 cover copies, calls, replacement, null and failed casts with only explicit object
 allocations. A fresh Raven `int | long | bool | Response` match consumer returns
 42 in interpreter and AOT, using 16 arena bytes only for its explicit Response.
+A separate artifact-only library consumer also passes mixed union returns and
+parameters with reordered alternatives and the same explicit-object allocation.
 Object/scalar-interface views requiring boxing, nominal-value and
 intrinsic String alternatives remain unsupported by this native lowering. Whole-union boxing is also rejected pending structural boxed identity;
 it must not silently become a cast of the payload to Object. Native union descriptor

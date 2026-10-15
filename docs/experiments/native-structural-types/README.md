@@ -217,3 +217,10 @@ the explicit Response object; exact arena use is 16 bytes, without scalar boxes 
 union carriers. [Artifact evidence](raven-mixed-pattern-results.json) identifies
 the compiler, native tools, consumer and retained v3 bundle. Imported mixed calls
 and broader native application qualification remain next.
+
+The [imported mixed consumer](mixed-import-project/README.md) also passes all seven
+inputs through separately emitted library returns and reordered union parameters.
+It imports Response for its typed pattern/property call and allocates only that
+explicit object (16 bytes). [Imported evidence](raven-mixed-import-results.json)
+records both artifacts against the retained bundle. General payload layouts,
+managed JIT/GC, boxing and full Task qualification remain open.

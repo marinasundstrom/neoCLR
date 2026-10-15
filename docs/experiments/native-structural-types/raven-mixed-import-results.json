@@ -1,0 +1,182 @@
+{
+  "importedLibrary": true,
+  "mixedPayloads": true,
+  "nativeImports": [
+    "_neoclr_allocate_object_v1"
+  ],
+  "compilerCheckoutRevision": "53a52bb24312d1646f3d017b19bf712af2462b58",
+  "runtimeRevision": "870076a11e9a65788892cad9ddef34e9f589a559",
+  "platform": "macOS-27.0-arm64-arm-64bit",
+  "bundleEvidence": {
+    "compilerRevision": "a45392480-working-function-mapping",
+    "sourceRevision": "795d21243afc3b567d6f87cc375d5aa9f1a847ff"
+  },
+  "hashes": {
+    "/Users/robert/Projects/neoclr/docs/experiments/native-structural-types/verify-raven-scalar-patterns.py": "9c04454fc6728a2c95e029beca3fb37f54cca0deeb69d837a40c5ec0494fa20a",
+    "/Users/robert/Projects/neoclr/target/raven-mixed-import-final/host.c": "629a233262694744fdf9b9df060678d849074337b8cb97a74f63926fc1f00195",
+    "/Users/robert/Projects/raven-union-intersection/src/Raven.Compiler/bin/Debug/net11.0/rvnc.dll": "2f475cc443a7210f462638428cbdd582346a9817e8a83797f4b3c477513f382b",
+    "/Users/robert/Projects/neoclr/target/debug/neoclr": "892d1f61459565d9a3c1076ec1be06fcd622c0e736f8b1759bd6ce7640eab68a",
+    "/Users/robert/Projects/neoclr/target/debug/neoclr-codegen": "781c869ef11f790ae05e9cb43cdd960c217459e204fbcdb90baa62d74edceee4",
+    "/Users/robert/Projects/neoclr/docs/experiments/native-structural-types/mixed-import-project/Main.rvn": "a74fdf3557c3fa2044ea0bc6c074ec7e996c415e06e09bad8ebe2125d86cab4f",
+    "/Users/robert/Projects/neoclr/docs/experiments/native-structural-types/mixed-import-project/App.rvnproj": "c00553bbdbf89e9516bdf8098fc8976336f6cd669db0d69057538aae8d5a1f8c",
+    "/Users/robert/Projects/neoclr/docs/experiments/native-structural-types/mixed-import-project/bin/neoclr/StructuralScalarPatterns.dll": "35e1e3b4ff4cbfc85d3ab4d4fe367a5ef642da8f8fd12d36a998bbd6c178e8c3",
+    "/Users/robert/Projects/neoclr/target/raven-mixed-import-final/consumer.o": "db0034767db2311cae9a8b2a6d8d1daad6e08aef97061c4a99bbc51a52cf9793",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-console/text-arena.c": "20f3dbed6b0ede89ad9ca7206f1c74986ef70453c1ee08c52d65d94a4b943925",
+    "/Users/robert/Projects/neoclr/docs/experiments/native-structural-types/mixed-import-library/Library.rvnproj": "c735269eb0d73359992c43ef6a3b17bc453f93efeabd4aec7ae1f51312ebaa8c",
+    "/Users/robert/Projects/neoclr/docs/experiments/native-structural-types/mixed-import-library/Main.rvn": "276775b3bc10d308f0d9f79f5fd7b607a3f68089cc4aafc7b552d3d3b3ec2a88",
+    "/Users/robert/Projects/neoclr/docs/experiments/native-structural-types/mixed-import-library/bin/neoclr/StructuralMixedLibrary.dll": "e9da99ebd7edb8ba624a51c1a0b31470a05db648e19b40317e07c6829c20c28b",
+    "/Users/robert/Projects/neoclr/target/structural-integrated-libraries-v3/Core.dll": "3f7cfa9db7c4feb551e2e97b0edb89c4dcf4c64d8eccf01bd006848dcacfd3f4",
+    "/Users/robert/Projects/neoclr/target/structural-integrated-libraries-v3/System.Data.dll": "a13b89d9c3d87be3ab08a8c7e8fb4c3af75402e7fe7b0598204b241832014704",
+    "/Users/robert/Projects/neoclr/target/structural-integrated-libraries-v3/System.Networking.dll": "1384940280b54680c217c951964af3f2dde01fc6acf19a927f59ede3336d09ca",
+    "/Users/robert/Projects/neoclr/target/structural-integrated-libraries-v3/System.Runtime.dll": "c3cba0050fa2e4e4161c9e55266cc92da9a86034badccd98c2e804000b5bf735",
+    "/Users/robert/Projects/neoclr/target/structural-integrated-libraries-v3/System.Web.dll": "f29d93809d033ca36c00c4034f6cbf920d1ba8dae7291ef18222d8e9cfbc7ae6",
+    "/Users/robert/Projects/neoclr/target/structural-integrated-libraries-v3/System.runtime.neox": "98a1ae1da85387c87746957e83a4015eb59d0566539a915c69f168d2b511b190",
+    "/Users/robert/Projects/neoclr/target/structural-integrated-libraries-v3/NeoCLR.ClassLibrary.props": "4676969ee1e381f9bbe0cfce799cfe5503a1a7f77968a174782c35a24752e5b7",
+    "/Users/robert/Projects/neoclr/target/structural-integrated-libraries-v3/ownership.json": "691bc51df44e8c11d62a8ac814cab45b43e48423719a91efd5c3bbc951c65419",
+    "/Users/robert/Projects/raven-union-intersection/src/Raven.Compiler/bin/Debug/net11.0/Raven.CodeAnalysis.Console.dll": "d332a7b8fb51f244c3632737293fed554ccc53f0e3073f22bf676729a95085cf",
+    "/Users/robert/Projects/raven-union-intersection/src/Raven.Compiler/bin/Debug/net11.0/Raven.CodeAnalysis.NeoClr.dll": "659ebeeaae789b6f082427cda22299d469ffdd8f4bd8af2fffc0308141d34f64",
+    "/Users/robert/Projects/raven-union-intersection/src/Raven.Compiler/bin/Debug/net11.0/Raven.CodeAnalysis.dll": "3b1121cd65a8de71679175f550262d2488b5278cfd3b431a4518886c364c2178",
+    "/Users/robert/Projects/raven-union-intersection/src/Raven.Compiler/bin/Debug/net11.0/Raven.Core.dll": "2c8f7b9c8b45eb83789e6d06ab0f93005f1b4b22f804fc00f66b4bba6866d026",
+    "/Users/robert/Projects/raven-union-intersection/src/Raven.Compiler/bin/Debug/net11.0/RavenDoc.dll": "f3757d3dcc9599614a16289a92ce6430c6fc1ae7d1932dcd15476e5781a556fd",
+    "/Users/robert/Projects/raven-union-intersection/src/Raven.Compiler/bin/Debug/net11.0/NeoCLR.Metadata.Experimental.dll": "8f55e7380038a8415c2eaa7094b2683badc544fb007df9b1fe6b280c46df62ee"
+  },
+  "commands": [
+    {
+      "label": "raven-library",
+      "command": [
+        "dotnet",
+        "/Users/robert/Projects/raven-union-intersection/src/Raven.Compiler/bin/Debug/net11.0/rvnc.dll",
+        "neoclr",
+        "--project",
+        "/Users/robert/Projects/neoclr/docs/experiments/native-structural-types/mixed-import-library/Library.rvnproj"
+      ],
+      "exitCode": 0
+    },
+    {
+      "label": "raven-build",
+      "command": [
+        "dotnet",
+        "/Users/robert/Projects/raven-union-intersection/src/Raven.Compiler/bin/Debug/net11.0/rvnc.dll",
+        "neoclr",
+        "--project",
+        "/Users/robert/Projects/neoclr/docs/experiments/native-structural-types/mixed-import-project/App.rvnproj"
+      ],
+      "exitCode": 0
+    },
+    {
+      "label": "interpreter",
+      "command": [
+        "/Users/robert/Projects/neoclr/target/debug/neoclr",
+        "run",
+        "/Users/robert/Projects/neoclr/docs/experiments/native-structural-types/mixed-import-project/bin/neoclr/StructuralScalarPatterns.dll",
+        "--execution",
+        "interpreter",
+        "--system",
+        "/Users/robert/Projects/neoclr/target/structural-integrated-libraries-v3/System.runtime.neox",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/structural-integrated-libraries-v3/System.Runtime.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/structural-integrated-libraries-v3/System.Data.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/structural-integrated-libraries-v3/System.Networking.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/structural-integrated-libraries-v3/System.Web.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/docs/experiments/native-structural-types/mixed-import-library/bin/neoclr/StructuralMixedLibrary.dll",
+        "--object-root",
+        "/Users/robert/Projects/neoclr/target/structural-integrated-libraries-v3/System.Runtime.dll"
+      ],
+      "exitCode": 42
+    },
+    {
+      "label": "disassemble",
+      "command": [
+        "/Users/robert/Projects/neoclr/target/debug/neoclr",
+        "disassemble",
+        "/Users/robert/Projects/neoclr/docs/experiments/native-structural-types/mixed-import-project/bin/neoclr/StructuralScalarPatterns.dll",
+        "/Users/robert/Projects/neoclr/target/raven-mixed-import-final/consumer.neoil"
+      ],
+      "exitCode": 0
+    },
+    {
+      "label": "aot",
+      "command": [
+        "/Users/robert/Projects/neoclr/target/debug/neoclr-codegen",
+        "--closed-world",
+        "/Users/robert/Projects/neoclr/docs/experiments/native-structural-types/mixed-import-project/bin/neoclr/StructuralScalarPatterns.dll",
+        "@entry",
+        "/Users/robert/Projects/neoclr/target/raven-mixed-import-final/consumer.o",
+        "--compile-system",
+        "--reference-arena",
+        "--system",
+        "/Users/robert/Projects/neoclr/target/structural-integrated-libraries-v3/System.runtime.neox",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/structural-integrated-libraries-v3/System.Runtime.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/structural-integrated-libraries-v3/System.Data.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/structural-integrated-libraries-v3/System.Networking.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/structural-integrated-libraries-v3/System.Web.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/docs/experiments/native-structural-types/mixed-import-library/bin/neoclr/StructuralMixedLibrary.dll",
+        "--object-root",
+        "/Users/robert/Projects/neoclr/target/structural-integrated-libraries-v3/System.Runtime.dll"
+      ],
+      "exitCode": 0
+    },
+    {
+      "label": "imports",
+      "command": [
+        "nm",
+        "-u",
+        "/Users/robert/Projects/neoclr/target/raven-mixed-import-final/consumer.o"
+      ],
+      "exitCode": 0
+    },
+    {
+      "label": "link",
+      "command": [
+        "clang",
+        "-arch",
+        "arm64",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-I",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console",
+        "/Users/robert/Projects/neoclr/target/raven-mixed-import-final/host.c",
+        "/Users/robert/Projects/neoclr/target/raven-mixed-import-final/consumer.o",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/text-arena.c",
+        "-o",
+        "/Users/robert/Projects/neoclr/target/raven-mixed-import-final/consumer"
+      ],
+      "exitCode": 0
+    },
+    {
+      "label": "native",
+      "command": [
+        "/Users/robert/Projects/neoclr/target/raven-mixed-import-final/consumer"
+      ],
+      "exitCode": 0
+    }
+  ],
+  "native": "status=0 result=42 arenaBytes=16 fault=0",
+  "checks": [
+    "native union signature preserved",
+    "six guarded/fallback scalar match inputs return expected values",
+    "two exact tests and extractions per scalar in fresh Raven output",
+    "interpreter exit 42",
+    "AOT result 42",
+    "exact native import allowlist",
+    "arena bytes: 16",
+    "nominal reference alternative through a typed match arm",
+    "artifact-only library union returns and parameters with reordered alternatives"
+  ],
+  "limitations": [
+    "one macOS ARM64 consumer",
+    "retained v3 bundle, not freshly rebuilt libraries",
+    "no JIT or collector stress",
+    "no throughput claim"
+  ]
+}

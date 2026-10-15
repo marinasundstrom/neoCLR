@@ -19,15 +19,15 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--compiler', required=True, type=Path)
     parser.add_argument('--output', required=True, type=Path)
-    mode = parser.add_mutually_exclusive_group()
-    mode.add_argument('--imported', action='store_true', help='Build and consume an artifact-only scalar union library')
-    mode.add_argument('--mixed', action='store_true', help='Include a nominal reference alternative')
+    parser.add_argument('--imported', action='store_true', help='Build and consume an artifact-only union library')
+    parser.add_argument('--mixed', action='store_true', help='Include a nominal reference alternative')
     args = parser.parse_args()
     project = PROJECT.parent / 'scalar-import-project' if args.imported else PROJECT
     if args.mixed:
-        project = PROJECT.parent / 'mixed-pattern-project'
-    library = PROJECT.parent / 'scalar-import-library'
-    library_artifact = library / 'bin/neoclr/StructuralScalarLibrary.dll'
+        project = PROJECT.parent / ('mixed-import-project' if args.imported else 'mixed-pattern-project')
+    library = PROJECT.parent / ('mixed-import-library' if args.mixed else 'scalar-import-library')
+    library_name = 'StructuralMixedLibrary' if args.mixed else 'StructuralScalarLibrary'
+    library_artifact = library / f'bin/neoclr/{library_name}.dll'
     if (platform.system(), platform.machine()) != ('Darwin', 'arm64'):
         parser.error('This AOT qualification requires macOS ARM64')
     output = args.output.resolve()
@@ -76,7 +76,7 @@ def main():
         calls = [json.loads(line.split('call ', 1)[1]) for line in body.splitlines() if ': call ' in line]
         for name in ['Produce', 'Echo']:
             suffix = '.F_' + name.encode().hex().upper()
-            assert sum(call['name'].endswith(suffix) for call in calls) == 6, name
+            assert sum(call['name'].endswith(suffix) for call in calls) == (7 if args.mixed else 6), name
     obj = output / 'consumer.o'
     run('aot', [codegen, '--closed-world', artifact, '@entry', obj,
                 '--compile-system', '--reference-arena', *context])
