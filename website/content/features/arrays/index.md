@@ -106,3 +106,10 @@ grapheme boundaries. [Sequences and lists](../collections/) also support indexin
 and slicing. Borrowed views remain future work.
 
 [Array API reference →](../../docs/api/System/Array%601/index.html)
+
+
+Development compiler note: signed int/long range patterns in conditions and match
+arms now use the same exclusive `..` and inclusive `..=` endpoints on the native
+target. This predicate support does not yet enable inclusive stored/sliced Range
+construction. Bounds for a long subject currently require long literals, such as
+`1L..=3L`.

@@ -1,0 +1,75 @@
+import System.*
+
+func Classify(value: int) -> int => value match {
+    ..0 => 1
+    0..3 => 2
+    3..=5 => 3
+    6.. => 4
+}
+
+func Contains(value: long) -> bool => value is 1L..=3L
+
+func Main() -> int {
+    var count = 0
+    if ({
+        count += 1
+        3
+    }) is 1..3 {
+        return 1
+    }
+    if count != 1 {
+        return 2
+    }
+    if !(({
+        count += 1
+        3
+    }) is 1..=3) {
+        return 3
+    }
+    if count != 2 {
+        return 4
+    }
+    if ({
+        count += 1
+        0
+    }) is 1..=3 {
+        return 5
+    }
+    if count != 3 {
+        return 6
+    }
+    if Classify(-1) != 1 || Classify(0) != 2 || Classify(2) != 2 {
+        return 7
+    }
+    if Classify(3) != 3 || Classify(5) != 3 || Classify(6) != 4 {
+        return 8
+    }
+    let wide: long = 4294967297
+    if wide is 1L..=3L {
+        return 9
+    }
+    if !(wide is 4294967296..4294967298) {
+        return 10
+    }
+    let edge: long = 4294967298
+    if edge is 4294967296..4294967298 {
+        return 11
+    }
+    if !(edge is 4294967296..=4294967298) {
+        return 12
+    }
+    if 2 is 3..1 {
+        return 13
+    }
+    let maximum: long = 9223372036854775807
+    if !(maximum is 0L..=9223372036854775807) {
+        return 14
+    }
+    if maximum is 0L..9223372036854775807 {
+        return 15
+    }
+    if !Contains(3L) || Contains(4L) || Contains(4294967297L) {
+        return 16
+    }
+    return 42
+}

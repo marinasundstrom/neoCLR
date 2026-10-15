@@ -44,8 +44,9 @@ qualification; this does not claim every historical experiment was rerun.
 1. Implement native checked inclusive Index conversion with once-only source-order
    evaluation and native Fault transport. Keep negative distances, `^0`, `^1` and
    integer overflow consistent with the shared language rule.
-2. Support native range patterns: current lowering produces BoundAndPattern and
-   BoundComparisonPattern, which the portable backend rejects explicitly.
+2. Signed int/long native range patterns are now covered by the
+   [predicate follow-up](../range-patterns/README.md); other numeric domains remain
+   outside that qualification.
 3. Implement overflow-safe integer advancement and then generic ordering/stepping
    capabilities. Existing loop arithmetic at integer limits is not qualified here.
 

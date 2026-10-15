@@ -4828,3 +4828,9 @@ input order, and emits closed generic interface conjunctions. The three-assembly
 consumer returns 42, including an imported open-class bound. Host checks retain
 closed-hierarchy admission and reject CLR-final/value or unresolved/mismatched bounds.
 [Evidence](experiments/composition-constraints/README.md#resolved-external-intersection-bounds--2026-10-14-development).
+
+
+**Author-directed range follow-up (2026-10-15):** signed int/long native range
+predicates now have a bounded [qualification record](validation/range-patterns/README.md).
+Checked inclusive Range conversion, safe iteration and generic capability design
+remain subsequent work; this does not reprioritize the platform milestones.

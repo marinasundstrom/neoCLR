@@ -11089,3 +11089,14 @@ stored/sliced Range construction rejects explicitly until checked conversion exi
 native range patterns also currently reject. These replace the pending-carry status
 above without implying completed native semantic parity. No runtime metadata or
 library API changes are introduced.
+
+
+### Native signed range-predicate follow-up (2026-10-15)
+
+Signed int/long range patterns now lower in Raven's native backend to existing
+signed comparisons, preserving once-only subject evaluation, short-circuiting and
+inclusive endpoints without successor arithmetic. Conditions and match arms are
+qualified; other numeric domains are not. No Runtime Contract setting, bridge encoding, library ABI or runtime opcode
+changes. This supersedes the blanket native-pattern rejection recorded above;
+inclusive stored/sliced Range conversion and safe loop advancement remain open.
+See [contracts, limits and executable evidence](validation/range-patterns/README.md).

@@ -198,3 +198,11 @@ iterator/no indexed reads for the fallback, List dispatch/no iterator on the fas
 path, independent copies, generic metadata import, writes and compound assignment.
 They establish behavior and algorithm shape, not comparative throughput. Windows
 execution remains pending; existing collections CI uses the matching compiler pin.
+
+
+### Signed range predicates (2026-10-15)
+
+The native compiler now lowers signed int/long range patterns in conditions and
+match arms using existing comparisons, including an inclusive maximum endpoint.
+This follows ordinary Raven/.NET semantics without changing System.Range's ABI.
+See [qualification and remaining limits](../validation/range-patterns/README.md).
