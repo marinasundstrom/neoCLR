@@ -470,6 +470,17 @@ internal open class RuntimeTypeInfo : TypeInfo {
         Handle = handle
     }
 
+    internal static func GenericArgumentsFromHandle(handle: RuntimeTypeHandle) -> Sequence<TypeInfo> {
+        let count = RuntimeServices.TypeArgumentCount(handle)
+        let result = CheckedStorage.Reserve<TypeInfo>(count)
+        var index = 0
+        while index < count {
+            result[index] = FromHandle(RuntimeServices.TypeArgument(handle, index))
+            index += 1
+        }
+        return result
+    }
+
     internal static func FromHandle(handle: RuntimeTypeHandle) -> TypeInfo {
         if RuntimeServices.TypeShape(handle, 17) {
             return RuntimeGenericParameterTypeInfo.Create(handle)
@@ -612,7 +623,7 @@ internal open class RuntimeTypeInfo : TypeInfo {
 
 
     func GetGenericArguments() -> Sequence<TypeInfo> {
-        return RuntimeServices.TypeGenericArguments(Handle)
+        return RuntimeTypeInfo.GenericArgumentsFromHandle(Handle)
     }
 
     func GetElementType() -> Option<TypeInfo> {
@@ -764,7 +775,7 @@ internal class RuntimeNominalTypeInfo : NominalTypeInfo {
 
 
     func GetGenericArguments() -> Sequence<TypeInfo> {
-        return RuntimeServices.TypeGenericArguments(Handle)
+        return RuntimeTypeInfo.GenericArgumentsFromHandle(Handle)
     }
 
     func GetElementType() -> Option<TypeInfo> {
@@ -1049,7 +1060,7 @@ internal class RuntimeFunctionTypeInfo : FunctionTypeInfo {
 
 
     func GetGenericArguments() -> Sequence<TypeInfo> {
-        return RuntimeServices.TypeGenericArguments(Handle)
+        return RuntimeTypeInfo.GenericArgumentsFromHandle(Handle)
     }
 
     func GetElementType() -> Option<TypeInfo> {

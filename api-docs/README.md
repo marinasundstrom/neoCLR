@@ -2179,3 +2179,15 @@ focused documentation/display checks pass. The refreshed native snapshot uses
 qualifiers checked in rendered pages and four snapshot checks passing. The
 [variance reference](interface-variance.md) remains a concise annotation/limits
 index. No public type/member is excluded; the renderer omission is closed.
+
+### Generic argument sequences (2026-10-16)
+
+The native snapshot now matches `target/variance-argument-sequence-20261016`, built
+with compiler `eef1ed456`, and the production audit at
+`target/variance-argument-sequence-docs-20261016`. TypeInfo's sequence query is
+implemented through its count/indexed primitives; signatures remain unchanged.
+The CLI reference/fingerprint snapshot is refreshed from `variance-argument-core.dll`.
+Closed sequence/indexed parity passes interpreter/AOT/JIT, open parameter variance
+passes the interpreter, and four native snapshot checks pass. Native open-definition
+discovery remains a separate implementation gap. See the
+[reference contract](reflection.md#generic-argument-sequences-development).

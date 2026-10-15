@@ -1,0 +1,41 @@
+{
+  "passed": true,
+  "commands": [
+    {
+      "command": [
+        "dotnet",
+        "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+        "neoclr",
+        "--project",
+        "/Users/robert/Projects/neoclr/target/variance-open-sequence-qualified/App.rvnproj"
+      ],
+      "exitCode": 0,
+      "output": "Native build output: /Users/robert/Projects/neoclr/target/variance-open-sequence-qualified/bin/neoclr/VarianceIntrospection.dll\n"
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/target/debug/neoclr",
+        "run",
+        "/Users/robert/Projects/neoclr/target/variance-open-sequence-qualified/bin/neoclr/VarianceIntrospection.dll",
+        "--execution",
+        "interpreter",
+        "--system",
+        "/Users/robert/Projects/neoclr/target/variance-argument-sequence-20261016/System.runtime.neox",
+        "--object-root",
+        "/Users/robert/Projects/neoclr/target/variance-argument-sequence-20261016/System.Runtime.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/variance-argument-sequence-20261016/System.Runtime.dll"
+      ],
+      "exitCode": 42,
+      "output": ""
+    }
+  ],
+  "files": {
+    "/Users/robert/Projects/neoclr/docs/validation/interface-variance/introspection/Main.rvn": "5275ee5cc6880f0d8a3209100bb02586d0a9c7f5e19d00016b7e589ccc2fab25",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll": "f1431a3369e999abdc6e6842e219189cb61cce67c32d40c1ab795fea2f7d9253",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/Raven.CodeAnalysis.dll": "43c52d2c82827d0d85ff01a3b23b1c29e00c6eba7fab25821f791ade2770a29d",
+    "/Users/robert/Projects/neoclr/target/variance-argument-sequence-20261016/bundle.json": "f5ccbe51120cb2e9b9344c84d5c64e34f4446885c888889fee20ac2b39cc9b8a",
+    "/Users/robert/Projects/neoclr/target/variance-argument-sequence-20261016/System.Runtime.dll": "e044f551656da1f49cc3ce25a130309b67e45276e805325d9735417d8793916b",
+    "/Users/robert/Projects/neoclr/target/debug/neoclr": "ddb5b04d3b30a52368a57c2c6cc6f025151b5ed575b0775bd1adcaf9bd6c59fb"
+  }
+}

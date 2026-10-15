@@ -11182,3 +11182,12 @@ bundle with this renderer; all eleven declaration qualifiers are checked. No
 Runtime Contract, CLI encoding, native metadata or language conversion changes
 are involved. This closes the presentation gap, not the native open-definition
 introspection or intrinsic String conversion gaps.
+
+### Generic argument sequence lowering (2026-10-16)
+
+The native class library builds `TypeInfo.GetGenericArguments()` with
+TypeArgumentCount/TypeArgument and RuntimeTypeInfo.FromHandle. Raven compiles the
+ordinary bounded array-fill loop; no compiler mapping, Runtime Contract setting
+or new CLI/native encoding is required. The existing public sequence contract is
+unchanged. This closes the closed-type native snapshot-binding gap while leaving
+open-definition discovery explicitly unsupported by the native profile.

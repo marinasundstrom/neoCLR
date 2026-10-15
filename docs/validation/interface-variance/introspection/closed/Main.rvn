@@ -23,5 +23,16 @@ func Main() -> int {
     if numbers.GetGenericArgument(0) is GenericParameterTypeInfo || text.GetGenericArgument(0) is GenericParameterTypeInfo {
         return 5
     }
+    let numberArguments = numbers.GetGenericArguments()
+    let textArguments = text.GetGenericArguments()
+    if numberArguments.Count != 1 || textArguments.Count != 1 {
+        return 6
+    }
+    if !numberArguments[0].Equals(numbers.GetGenericArgument(0)) || !textArguments[0].Equals(text.GetGenericArgument(0)) {
+        return 7
+    }
+    if typeof(int).GetGenericArguments().Count != 0 {
+        return 8
+    }
     return 42
 }

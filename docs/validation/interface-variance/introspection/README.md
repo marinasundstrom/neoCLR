@@ -21,3 +21,7 @@ complete runtime reflection support.
 
 The [closed-construction consumer](closed/README.md) separately qualifies indexed
 argument queries and identity across interpreter, AOT and managed JIT.
+
+`sequence-results.json` records the open-definition interpreter regression against
+the fresh class library after moving sequence construction to the shared count
+and indexed queries.

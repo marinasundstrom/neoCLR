@@ -318,3 +318,15 @@ completion. The assembly-enumeration consumer still fails native preparation at
 needs metadata-only, owner-bound handles for definitions and their parameters,
 separate from executable layouts, plus explicit discovery retention. The .NET-like
 requirement to preserve observable generic metadata remains unchanged.
+
+### Class-library generic argument sequences (2026-10-16)
+
+All TypeInfo providers now build `GetGenericArguments()` using the existing count,
+indexed handle and FromHandle operations. This preserves the same parameter
+classification while removing the separate native TypeGenericArguments binding
+requirement from the class-library path. One result array is reserved and filled;
+no extra list or adapter is introduced. Public signatures and Runtime Contract
+configuration are unchanged. The closed consumer checks indexed/sequence parity
+and a nongeneric empty result; the open-definition interpreter consumer checks
+all three variance annotations. Native open-definition discovery still needs the
+metadata-only handle model described above.

@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-16
 
+- Implement TypeInfo.GetGenericArguments in the class library through the shared count/indexed handle queries, reserving one result array. Qualify sequence/indexed parity and nongeneric empty results in interpreter/AOT/JIT against a fresh bundle; open generic parameter variance still passes in the interpreter. Refresh matching API references. Native open-definition discovery and intrinsic String variance remain separate gaps.
+
 - Refresh native API documentation with RavenDoc interface variance qualifiers. All eleven annotated declarations now render in/out correctly; remove the recorded renderer omission while retaining the annotation/limits reference. The general fix was validated on Raven main and carried separately to codex/neoclr; production native rendering and snapshot checks pass.
 
 - Qualify closed generic introspection for two constructions of the same nominal definition against the annotated native bundle. One Raven image preserves concrete arguments and distinct/repeated type identity in interpreter, AOT and managed JIT, with native fault/GC cleanup checks. Retain the consumer and reproducible runner; open-definition enumeration and sequence-returning argument queries are not covered.

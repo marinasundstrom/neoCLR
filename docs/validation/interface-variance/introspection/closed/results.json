@@ -8,32 +8,32 @@
         "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
         "neoclr",
         "--project",
-        "/Users/robert/Projects/neoclr/target/variance-closed-introspection-qualified/project/App.rvnproj"
+        "/Users/robert/Projects/neoclr/target/variance-argument-sequence-qualified/project/App.rvnproj"
       ],
       "exitCode": 0,
-      "logSha256": "44900e9b45cdf22cdfa693a6d56a5062ab8541761e6b9dc6d1008c370056a94f",
-      "output": "Native build output: /Users/robert/Projects/neoclr/target/variance-closed-introspection-qualified/project/bin/neoclr/ClosedGenericIntrospection.dll\n"
+      "logSha256": "8f28ae647ec65da9b7abbce111bc352fbe7448c961c8535efa2b67ae6eec90be",
+      "output": "Native build output: /Users/robert/Projects/neoclr/target/variance-argument-sequence-qualified/project/bin/neoclr/ClosedGenericIntrospection.dll\n"
     },
     {
       "label": "interpreter",
       "command": [
         "/Users/robert/Projects/neoclr/target/debug/neoclr",
         "run",
-        "/Users/robert/Projects/neoclr/target/variance-closed-introspection-qualified/project/bin/neoclr/ClosedGenericIntrospection.dll",
+        "/Users/robert/Projects/neoclr/target/variance-argument-sequence-qualified/project/bin/neoclr/ClosedGenericIntrospection.dll",
         "--execution",
         "interpreter",
         "--system",
-        "/Users/robert/Projects/neoclr/target/variance-libraries-20261016-final/System.runtime.neox",
+        "/Users/robert/Projects/neoclr/target/variance-argument-sequence-20261016/System.runtime.neox",
         "--object-root",
-        "/Users/robert/Projects/neoclr/target/variance-libraries-20261016-final/System.Runtime.dll",
+        "/Users/robert/Projects/neoclr/target/variance-argument-sequence-20261016/System.Runtime.dll",
         "--module",
-        "/Users/robert/Projects/neoclr/target/variance-libraries-20261016-final/System.Runtime.dll",
+        "/Users/robert/Projects/neoclr/target/variance-argument-sequence-20261016/System.Runtime.dll",
         "--module",
-        "/Users/robert/Projects/neoclr/target/variance-libraries-20261016-final/System.Data.dll",
+        "/Users/robert/Projects/neoclr/target/variance-argument-sequence-20261016/System.Data.dll",
         "--module",
-        "/Users/robert/Projects/neoclr/target/variance-libraries-20261016-final/System.Networking.dll",
+        "/Users/robert/Projects/neoclr/target/variance-argument-sequence-20261016/System.Networking.dll",
         "--module",
-        "/Users/robert/Projects/neoclr/target/variance-libraries-20261016-final/System.Web.dll"
+        "/Users/robert/Projects/neoclr/target/variance-argument-sequence-20261016/System.Web.dll"
       ],
       "exitCode": 42,
       "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
@@ -44,21 +44,21 @@
       "command": [
         "/Users/robert/Projects/neoclr/target/debug/neoclr-codegen",
         "--closed-world",
-        "/Users/robert/Projects/neoclr/target/variance-closed-introspection-qualified/project/bin/neoclr/ClosedGenericIntrospection.dll",
+        "/Users/robert/Projects/neoclr/target/variance-argument-sequence-qualified/project/bin/neoclr/ClosedGenericIntrospection.dll",
         "@entry",
-        "/Users/robert/Projects/neoclr/target/variance-closed-introspection-qualified/app.o",
+        "/Users/robert/Projects/neoclr/target/variance-argument-sequence-qualified/app.o",
         "--system",
-        "/Users/robert/Projects/neoclr/target/variance-libraries-20261016-final/System.runtime.neox",
+        "/Users/robert/Projects/neoclr/target/variance-argument-sequence-20261016/System.runtime.neox",
         "--object-root",
-        "/Users/robert/Projects/neoclr/target/variance-libraries-20261016-final/System.Runtime.dll",
+        "/Users/robert/Projects/neoclr/target/variance-argument-sequence-20261016/System.Runtime.dll",
         "--module",
-        "/Users/robert/Projects/neoclr/target/variance-libraries-20261016-final/System.Runtime.dll",
+        "/Users/robert/Projects/neoclr/target/variance-argument-sequence-20261016/System.Runtime.dll",
         "--module",
-        "/Users/robert/Projects/neoclr/target/variance-libraries-20261016-final/System.Data.dll",
+        "/Users/robert/Projects/neoclr/target/variance-argument-sequence-20261016/System.Data.dll",
         "--module",
-        "/Users/robert/Projects/neoclr/target/variance-libraries-20261016-final/System.Networking.dll",
+        "/Users/robert/Projects/neoclr/target/variance-argument-sequence-20261016/System.Networking.dll",
         "--module",
-        "/Users/robert/Projects/neoclr/target/variance-libraries-20261016-final/System.Web.dll",
+        "/Users/robert/Projects/neoclr/target/variance-argument-sequence-20261016/System.Web.dll",
         "--compile-system",
         "--reference-arena",
         "--bind-user-fault",
@@ -66,7 +66,7 @@
         "--native-stack-budget"
       ],
       "exitCode": 0,
-      "logSha256": "cee4633a231ff4f44d9e098eacb5c4b0410cf69cbbcecbb39313e085a700971d",
+      "logSha256": "bbc05a2d29427078e08698f10c772acec8e2aa4a2e43ff93a1e395e01d52e1c9",
       "output": "(selection manifest in local aot.log)"
     },
     {
@@ -87,14 +87,14 @@
         "-DNEOCLR_NATIVE_GC",
         "-fsanitize=undefined,bounds",
         "/Users/robert/Projects/neoclr/docs/validation/interface-variance/native-host.c",
-        "/Users/robert/Projects/neoclr/target/variance-closed-introspection-qualified/app.o",
+        "/Users/robert/Projects/neoclr/target/variance-argument-sequence-qualified/app.o",
         "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-gc.c",
         "/Users/robert/Projects/neoclr/docs/experiments/aot-console/root-probe.c",
         "/Users/robert/Projects/neoclr/docs/experiments/aot-console/text-arena.c",
         "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-stack.c",
         "/Users/robert/Projects/neoclr/docs/experiments/aot-fault-details/render.c",
         "-o",
-        "/Users/robert/Projects/neoclr/target/variance-closed-introspection-qualified/app"
+        "/Users/robert/Projects/neoclr/target/variance-argument-sequence-qualified/app"
       ],
       "exitCode": 0,
       "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
@@ -103,7 +103,7 @@
     {
       "label": "execute-aot",
       "command": [
-        "/Users/robert/Projects/neoclr/target/variance-closed-introspection-qualified/app"
+        "/Users/robert/Projects/neoclr/target/variance-argument-sequence-qualified/app"
       ],
       "exitCode": 42,
       "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
@@ -134,7 +134,7 @@
         "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-stack.c",
         "/Users/robert/Projects/neoclr/docs/experiments/aot-fault-details/render.c",
         "-o",
-        "/Users/robert/Projects/neoclr/target/variance-closed-introspection-qualified/host.dylib"
+        "/Users/robert/Projects/neoclr/target/variance-argument-sequence-qualified/host.dylib"
       ],
       "exitCode": 0,
       "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
@@ -146,21 +146,21 @@
         "/Users/robert/Projects/neoclr/target/debug/neoclr-codegen",
         "--jit-managed",
         "--closed-world",
-        "/Users/robert/Projects/neoclr/target/variance-closed-introspection-qualified/project/bin/neoclr/ClosedGenericIntrospection.dll",
+        "/Users/robert/Projects/neoclr/target/variance-argument-sequence-qualified/project/bin/neoclr/ClosedGenericIntrospection.dll",
         "@entry",
-        "/Users/robert/Projects/neoclr/target/variance-closed-introspection-qualified/host.dylib",
+        "/Users/robert/Projects/neoclr/target/variance-argument-sequence-qualified/host.dylib",
         "--system",
-        "/Users/robert/Projects/neoclr/target/variance-libraries-20261016-final/System.runtime.neox",
+        "/Users/robert/Projects/neoclr/target/variance-argument-sequence-20261016/System.runtime.neox",
         "--object-root",
-        "/Users/robert/Projects/neoclr/target/variance-libraries-20261016-final/System.Runtime.dll",
+        "/Users/robert/Projects/neoclr/target/variance-argument-sequence-20261016/System.Runtime.dll",
         "--module",
-        "/Users/robert/Projects/neoclr/target/variance-libraries-20261016-final/System.Runtime.dll",
+        "/Users/robert/Projects/neoclr/target/variance-argument-sequence-20261016/System.Runtime.dll",
         "--module",
-        "/Users/robert/Projects/neoclr/target/variance-libraries-20261016-final/System.Data.dll",
+        "/Users/robert/Projects/neoclr/target/variance-argument-sequence-20261016/System.Data.dll",
         "--module",
-        "/Users/robert/Projects/neoclr/target/variance-libraries-20261016-final/System.Networking.dll",
+        "/Users/robert/Projects/neoclr/target/variance-argument-sequence-20261016/System.Networking.dll",
         "--module",
-        "/Users/robert/Projects/neoclr/target/variance-libraries-20261016-final/System.Web.dll",
+        "/Users/robert/Projects/neoclr/target/variance-argument-sequence-20261016/System.Web.dll",
         "--compile-system",
         "--reference-arena",
         "--bind-user-fault",
@@ -168,26 +168,26 @@
         "--native-stack-budget"
       ],
       "exitCode": 0,
-      "logSha256": "a6276d1ddd9e818662659b4f65354a5b78f7841267f0c998776b4de46c7f70e3",
-      "output": "JIT_RESULT {\"compileAndFinalizeSeconds\":0.885028917,\"guestExitCode\":42,\"invocationSeconds\":0.00011125,\"metadataLoadSeconds\":0.623377125,\"profile\":\"macos-arm64-jit-managed-v1\",\"selectionAndVerificationSeconds\":14.236431834}\n"
+      "logSha256": "c1b7af5b28072b430555cc0457a04eee834748845a7a9d37a08ffe66496da23f",
+      "output": "JIT_RESULT {\"compileAndFinalizeSeconds\":1.067112958,\"guestExitCode\":42,\"invocationSeconds\":0.000154167,\"metadataLoadSeconds\":0.591373208,\"profile\":\"macos-arm64-jit-managed-v1\",\"selectionAndVerificationSeconds\":13.615994042}\n"
     }
   ],
   "jit": {
-    "compileAndFinalizeSeconds": 0.885028917,
+    "compileAndFinalizeSeconds": 1.067112958,
     "guestExitCode": 42,
-    "invocationSeconds": 0.00011125,
-    "metadataLoadSeconds": 0.623377125,
+    "invocationSeconds": 0.000154167,
+    "metadataLoadSeconds": 0.591373208,
     "profile": "macos-arm64-jit-managed-v1",
-    "selectionAndVerificationSeconds": 14.236431834
+    "selectionAndVerificationSeconds": 13.615994042
   },
   "files": {
-    "/Users/robert/Projects/neoclr/docs/validation/interface-variance/introspection/closed/Main.rvn": "f1ed2b113f747aa816bc01dde65f14537a09f4d9e66e20c3c85cf9388adb6359",
+    "/Users/robert/Projects/neoclr/docs/validation/interface-variance/introspection/closed/Main.rvn": "c99514e83825e1acebd2d778c9fe910959ed7bf71fb8e286284b552e5296d229",
     "/Users/robert/Projects/neoclr/docs/validation/interface-variance/native-host.c": "04a248b7ba4bba159f7ff143db709e8c93297cec917d5a4ddfe83d03cb9a5ddf",
     "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll": "f1431a3369e999abdc6e6842e219189cb61cce67c32d40c1ab795fea2f7d9253",
     "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/Raven.CodeAnalysis.dll": "43c52d2c82827d0d85ff01a3b23b1c29e00c6eba7fab25821f791ade2770a29d",
     "/Users/robert/Projects/neoclr/target/debug/neoclr-codegen": "26a532d24b80e9bd64296cc5c1ddcda6dc3c0fdc1648f1ff7a7e1b69efd57788",
     "/Users/robert/Projects/neoclr/target/debug/neoclr": "ddb5b04d3b30a52368a57c2c6cc6f025151b5ed575b0775bd1adcaf9bd6c59fb",
-    "/Users/robert/Projects/neoclr/target/variance-closed-introspection-qualified/project/bin/neoclr/ClosedGenericIntrospection.dll": "50d89e966bc81b234b677d42b865c38a0afcfd89015a43b76b4ac53ad7545215",
-    "/Users/robert/Projects/neoclr/target/variance-libraries-20261016-final/bundle.json": "5fd3c5ddd501c2b213aa71698039d5fef29ca40834f2f7c44ed23caf459013c1"
+    "/Users/robert/Projects/neoclr/target/variance-argument-sequence-qualified/project/bin/neoclr/ClosedGenericIntrospection.dll": "7c6d9064125c4c80c84d3997104afc29d44a6cef468b454b2dc643d586527bd1",
+    "/Users/robert/Projects/neoclr/target/variance-argument-sequence-20261016/bundle.json": "f5ccbe51120cb2e9b9344c84d5c64e34f4446885c888889fee20ac2b39cc9b8a"
   }
 }

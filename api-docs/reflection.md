@@ -172,3 +172,20 @@ flags. It does not add method generic-definition discovery. Open definition
 inventory is currently an interpreter reflection capability; the native closed-world
 reflection profile still requires closed types. Native interface variance execution
 is supported independently of that existing reflection restriction.
+
+### Generic argument sequences (development)
+
+`TypeInfo.GetGenericArguments()` returns a freshly populated sequence in declaration
+order, using the same count and indexed handle queries as `GenericArgumentCount`
+and `GetGenericArgument(index)`. Nongeneric types return an empty sequence. Argument
+descriptors retain concrete type identity for constructions and owner/ordinal
+identity for open parameters; this follows .NET's distinction between a generic
+definition's parameters and a construction's actual arguments.
+
+The class-library implementation reserves one result array and fills it through
+`RuntimeTypeInfo.FromHandle`; it no longer depends on a separate native snapshot
+binding for this operation. Closed nominal constructions are qualified in
+interpreter, AOT and managed JIT by the
+[consumer](https://github.com/marinasundstrom/neoclr/blob/main/docs/validation/interface-variance/introspection/closed/Main.rvn).
+Open-definition discovery remains interpreter-only. This change does not grant
+additional discovery, construction or reflective invocation rights.

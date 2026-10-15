@@ -3,8 +3,9 @@
 This consumer checks that `Container<int>` and `Container<string>` remain distinct
 runtime types, repeated tokens compare equal, both expose exactly one generic
 argument, and those arguments retain their concrete identities rather than becoming
-generic parameter descriptors. It exercises the existing indexed query contract;
-it does not establish open-definition discovery or the sequence-returning API.
+generic parameter descriptors. It compares indexed and sequence-returning queries for both constructions and
+checks the empty sequence for a nongeneric type. It does not establish native
+open-definition discovery.
 
 Run on macOS ARM64:
 
