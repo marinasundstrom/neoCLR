@@ -8,7 +8,7 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-15
 
-- Propose generic bounds and target-consistent Raven endpoint semantics, followed by overflow-safe integer iteration. Record the author’s compatibility clarification and parked structural work; no language/runtime behavior changes in this design slice.
+- Propose generic bounds and target-consistent Raven endpoint semantics, followed by overflow-safe integer iteration. Record the author’s compatibility clarification, explicit ordering/stepping capabilities and parked structural work, with Raven-main syntax integration first; no language/runtime behavior changes in this design slice.
 
 - Integrate the validated structural-type branch into main, preserving mainline TypeInfo relationships. Runtime/compiler/reader flags and nominal Union/Tuple carriers are removed; Raven integration targets its neoCLR line separately from Raven main. Record 175/175 metadata checks and fresh carrier-free Task union AOT/JIT/GC qualification, with unsupported combinations explicitly tracked. This is development integration, not a release.
 

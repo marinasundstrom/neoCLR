@@ -101,6 +101,33 @@ library representation. Interface conversion/boxing and union-carrier allocation
 be measured, not assumed absent. The Int32 iteration fast path need not allocate a
 Bound union or box an enumerator.
 
+## Explicit capabilities (author clarification, 2026-10-15)
+
+The author wants types to distinguish their supported qualities through explicit
+interfaces and generic contracts, without adding every capability to every type.
+Use nominal conformance, not incidental member-name matching. Bound<T> storage
+alone requires no ordering or stepping capability.
+
+neoCLR already has ComparableTo<T>.CompareTo and Collections.Comparer<T>.Compare.
+The .NET adapters use IComparable<T>/IComparer<T> where appropriate. A default
+Contains operation should require supported ordering conformance; an overload taking
+an explicit comparer can work with externally owned types without changing them.
+These are two explicit capability sources, not a runtime guess that all types compare.
+
+Iteration needs an additional stepping contract, provisionally a generic stepper
+strategy supplied explicitly or by a type's declared supported capability. It must
+report whether a successor exists, obey the requested direction and avoid wrapping.
+An addition operator alone proves none of these properties. Keep step magnitude/type
+separate from element type so future date/duration operations need not invent date
+addition to another date. Do not publish final interface names before compiler
+support for the required generic/static members is checked.
+
+Marker interfaces are suitable for an assertion of a property; operations that need
+behavior must also have a usable member/provider contract. Do not mark all comparable
+types as iterable, give all types Count, or infer a stepping capability through duck
+typing. The initial integer fast path implements the same contract without per-element
+interface dispatch. No performance equivalence is claimed before measurement.
+
 ## Syntax, inference and slicing
 
 | Form | Proposed meaning |
@@ -170,6 +197,13 @@ Floating-point/decimal/char loops already exist in Raven: migrate their endpoint
 with the language change, but retain their own stepping contracts pending separate
 review of rounding, non-progress, overflow and Unicode domains. Do not claim the
 integer termination proof covers them.
+
+## Author-directed sequencing clarification
+
+The first implementation task is Raven syntax/semantics on main, including owned
+consumers and range syntax slot names; integrate that before neoCLR-specific semantics.
+Integer advancement and generic capability APIs follow this foundation. A preliminary
+integer-overflow patch was set aside rather than promoted ahead of this direction.
 
 ## Delivery and validation
 

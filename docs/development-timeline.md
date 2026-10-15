@@ -17980,3 +17980,16 @@ Time, alternatives, provisional API/inference choices and validation steps. The
 endpoint spelling is an assistant recommendation, not a recorded final author choice.
 No compiler/runtime behavior changed in this slice; structural development remains
 parked.
+
+The author subsequently clarified that interfaces/generics should describe explicitly
+supported qualities and capabilities, without adding them to all types. The assistant
+separated ordering, external comparer provision and stepping; incidental method names
+or an addition operator do not establish iteration support. The design now records
+these requirements with provisional stepping API names.
+
+The author corrected the delivery order: fix Raven syntax and semantics on main,
+integrate that change, then add neoCLR semantics. The author also requested migration
+of existing Raven-repository consumers and renaming the range token slots, including
+patterns. The assistant set aside an uncommitted integer-overflow prototype and began
+the main-based syntax migration, using optional EqualsToken for expressions/patterns.
+Implementation/validation is in progress; no main integration is claimed here.
