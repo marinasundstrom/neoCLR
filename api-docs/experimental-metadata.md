@@ -9128,3 +9128,17 @@ rejection, the Raven open-generic consumer (42), and 58 structural interpreter t
 No guest API selection or generated signature changes are required. CLI projection,
 JIT/AOT representation and arbitrary symbolic structural constraints remain outside
 this validated surface.
+
+### Callable composition authoring (development, 2026-10-15)
+
+`CreateExperimentalReferenceComposition(Union, types)` now admits function
+alternatives with recursively checked parameter/result signatures, including a
+function whose result is another union. `CastReference` accepts the callable
+reference category for exact union injection/narrowing; the graph stack verifier
+and native reader agree. Ownership, generic scope and composition limits still
+apply. Function intersection bounds remain rejected, and tuple/byref/pointer
+components retain the current composition admission limits. CLI carrier projection
+is unchanged. `--authored-compositions` verifies native round-trip and checked-cast
+authoring; `--reference-compositions` verifies reader admission, including existing
+generic-method support. Runtime/backend limits remain separately documented in
+[structural operations](../docs/structural-runtime-operations.md#function-values).

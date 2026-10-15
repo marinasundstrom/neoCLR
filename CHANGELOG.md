@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-15
 
+- Align host metadata callable-union authoring, native reading and reference-cast verification with runtime admission; preserve nested union-valued function signatures and reject callable intersections. Add round-trip/cast tests and correct an inherited reader test that still rejected already-supported generic composition methods. Runtime Contract and CLI encoding are unchanged.
+
 - Add bounded native callable union alternatives with exact tagged injection/narrowing and separate callable tracing slots. Validate AOT/interpreter agreement, receiver retention under eager/paced collection, null/scalar replacement, wrong-signature faults and exact allocations without a union carrier. Native Object widening, JIT lifetime and Raven source qualification remain open.
 
 - Admit function alternatives in interpreter structural unions, retaining callable identity and receiver across union storage, copies and checked narrowing. Validate metadata round-trips, calls, collection and invalid use; preserve explicit narrowing and reject callable intersection bounds. Native callable-union layout and Raven source qualification remain open; no Runtime Contract or CLI encoding change.

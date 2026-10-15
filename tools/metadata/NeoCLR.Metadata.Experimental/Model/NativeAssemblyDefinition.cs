@@ -530,8 +530,11 @@ public sealed partial class NativeAssemblyDefinition
                             return SignatureType.FromComposition(key == "Union" ? ReferenceCompositionKind.Union : ReferenceCompositionKind.Intersection,
                                 operands.Select(child => ReadComposition(child, depth + 1, intersectionBound || key == "Intersection")).ToArray());
                         }
-                        var leaf = ReadType(value, false);
-                        bool SupportedCompositionArgument(SignatureType argument) => argument.MethodParameterIndex is not null || argument.TypeParameterIndex is not null || (argument.Primitive is { } primitive ? primitive != PrimitiveType.Void
+                        var leaf = ReadType(value, false, allowComposition: true);
+                        bool SupportedCompositionArgument(SignatureType argument) => argument.MethodParameterIndex is not null || argument.TypeParameterIndex is not null || (argument.Composition is { } nestedComposition ? nestedComposition.Constituents.All(SupportedCompositionArgument)
+                            : argument.FunctionSignature is { } function ? function.ParameterTypes.All(SupportedCompositionArgument)
+                                && (function.ReturnType.Primitive == PrimitiveType.Void || SupportedCompositionArgument(function.ReturnType))
+                            : argument.Primitive is { } primitive ? primitive != PrimitiveType.Void
                             : argument.ArrayElement is { } element ? SupportedCompositionArgument(element)
                             : argument.GenericInstance is { } generic ? generic.TypeArguments.All(SupportedCompositionArgument)
                             : argument.ClassType is { GenericParameterNames.Count: 0 }
@@ -540,7 +543,7 @@ public sealed partial class NativeAssemblyDefinition
                         var scalar = leaf.Primitive is { } primitive && primitive is not (PrimitiveType.Void or PrimitiveType.Value or PrimitiveType.RuntimeTypeHandle or PrimitiveType.String);
                         Require(SupportedCompositionArgument(leaf) && (intersectionBound
                             ? localBound is { IsStatic: false, IsValueType: false } || leaf.ImportedType is { IsValueType: false }
-                            : scalar || localBound is { IsStatic: false } || leaf.ImportedType is not null),
+                            : scalar || leaf.FunctionSignature is not null || localBound is { IsStatic: false } || leaf.ImportedType is not null),
                             "unsupported composition alternative; intersections require nominal references");
                         if (intersectionBound)
                             Require(localBound is { } bound ? !types[System.Array.IndexOf(signatureOwners, bound)].IsSealedClass

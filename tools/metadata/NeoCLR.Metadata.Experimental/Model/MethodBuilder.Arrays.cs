@@ -10,11 +10,11 @@ public sealed partial class MethodBuilder
     /// <exception cref="InvalidDataException">Instruction limit exceeded; stack validation occurs on write.</exception>
     public void Emit(OpCode opCode, SignatureType elementType) => GetILGenerator().Emit(opCode, elementType);
 
-    internal static bool IsReferenceSignature(SignatureType type) => type.Composition is not null || type.Primitive == PrimitiveType.String || type.ArrayElement is not null ||
+    internal static bool IsReferenceSignature(SignatureType type) => type.Composition is not null || type.FunctionSignature is not null || type.Primitive == PrimitiveType.String || type.ArrayElement is not null ||
         type.ClassType is { IsValueType: false, IsStatic: false } || type.GenericInstance?.Definition is { IsValueType: false, IsStatic: false } ||
         type.ImportedType is { IsValueType: false };
     /// <summary>Consumes a reference and pushes the same object through a checked target reference signature.</summary>
-    /// <param name="target">Owned or imported nominal reference, String or vector type.</param>
+    /// <param name="target">Owned or imported nominal reference, String, vector, Function or admitted composition type.</param>
     /// <exception cref="ArgumentNullException">Target is null.</exception>
     /// <exception cref="ArgumentException">Target is not a supported reference or belongs to another assembly.</exception>
     /// <exception cref="InvalidDataException">Instruction limit exceeded; input stack validation occurs on write.</exception>

@@ -10899,3 +10899,19 @@ unchanged. The runtime owns native layout/tracing; Raven source qualification,
 native Object widening and JIT lifetime remain open. See neoCLR's
 `docs/experiments/native-structural-types/README.md` for the executable fixture,
 limits and reproduction. These are feature-branch results, not main support.
+
+## 2026-10-15 — Host metadata callable-union parity
+
+The C# metadata builder and native reader now admit function alternatives in
+unions, including nested structural callable results. Reference-cast stack
+validation recognizes callable values. This closes the NEOMETA003 authoring
+blocker found by a Raven callable-union library repro. Host authoring/reader tests
+cover round-trip and narrowing; native source-consumer qualification continues
+separately. No Runtime Contract or CLI encoding change is introduced. The runtime
+and compiler remain on their structural feature branches.
+
+Validation for the host-metadata slice: authored-composition and reference-reader
+checks pass. The broader host suite reports 169/175 versus 168/175 on an untouched
+copy of the prior branch. The six remaining inherited failures cover Object-root
+expectations, local-contract expectations and custom-attribute fixtures; they are
+not reported as passing or as callable-union regressions.

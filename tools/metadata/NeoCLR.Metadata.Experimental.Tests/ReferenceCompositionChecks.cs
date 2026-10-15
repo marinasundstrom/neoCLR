@@ -98,7 +98,10 @@ internal static class ReferenceCompositionChecks
             Reject(() => AssemblyDefinition.ReadNativeAssembly(Image(SetSignature(wide)), true));
             var generic = SetSignature(bound);
             generic["functions"]![0]!["generic_parameters"] = new JsonArray("T");
-            Reject(() => AssemblyDefinition.ReadNativeAssembly(Image(generic), true));
+            var genericRead = AssemblyDefinition.ReadNativeAssembly(Image(generic), true);
+            Check(genericRead.MainModule.Functions[0].TryGetSignature(out var genericSignature) &&
+                genericSignature!.GenericParameterNames.SequenceEqual(new[] { "T" }) &&
+                genericSignature.ReturnType.Composition is not null, "generic method retains structural signature");
             var local = source.DeepClone();
             local["functions"]![0]!["locals"] = new JsonArray(bound.DeepClone());
             _ = AssemblyDefinition.ReadNativeAssembly(Image(local), true);

@@ -66,6 +66,15 @@ internal static class AuthoredCompositionChecks
             throw new Exception("owner argument did not substitute inside union");
         var closedEcho = builder.AddFunction("ClosedEcho", new MethodSignature(closedUnion, [closedUnion]));
         closedEcho.LoadArgument(0); closedEcho.Call(openEcho.MakeGenericInstance(PrimitiveType.Int32)); closedEcho.Return();
+        var callableUnion = builder.CreateExperimentalReferenceComposition(ReferenceCompositionKind.Union,
+            callbackType, PrimitiveType.Int32);
+        var callableUnionEcho = builder.AddFunction("CallableUnionEcho", new MethodSignature(callableUnion, [callableUnion]));
+        callableUnionEcho.LoadArgument(0); callableUnionEcho.Return();
+        var functionWiden = builder.AddFunction("FunctionWiden", new MethodSignature(callableUnion, [callbackType]));
+        functionWiden.LoadArgument(0); functionWiden.CastReference(callableUnion); functionWiden.Return();
+        var functionNarrow = builder.AddFunction("FunctionNarrow", new MethodSignature(callbackType, [callableUnion]));
+        functionNarrow.LoadArgument(0); functionNarrow.CastReference(callbackType); functionNarrow.Return();
+        Reject(() => builder.CreateExperimentalReferenceComposition(ReferenceCompositionKind.Intersection, callbackType, left));
         var valueImage = NativeModuleContainer.WriteLibraryBinary(builder);
         var valueSnapshot = AssemblyDefinition.ReadNativeAssembly(valueImage, true);
         if (!valueSnapshot.MainModule.Functions.Single(f => f.Name == "ValueEcho").TryGetSignature(out var valueSignature) ||
@@ -85,6 +94,10 @@ internal static class AuthoredCompositionChecks
             openSignature!.ReturnType.Composition!.Constituents.Single(t => t.ReferencedGenericInstance is not null)
                 .ReferencedGenericInstance!.TypeArguments[0].MethodParameterIndex != 0)
             throw new Exception("open nominal union constituent lost method scope");
+        if (!valueSnapshot.MainModule.Functions.Single(f => f.Name == "CallableUnionEcho").TryGetSignature(out var callableUnionSignature) ||
+            callableUnionSignature!.ReturnType.Composition!.Constituents.Single(t => t.FunctionSignature is not null)
+                .FunctionSignature!.ReturnType.Composition?.Kind != ReferenceCompositionKind.Union)
+            throw new Exception("union callable alternative or its union return lost");
         Reject(() => AssemblyDefinition.ReadNativeAssembly(valueImage));
         Reject(() => builder.CreateExperimentalReferenceComposition(ReferenceCompositionKind.Intersection, left, PrimitiveType.Int32));
         Reject(() => builder.CreateExperimentalReferenceComposition(ReferenceCompositionKind.Union, left, SignatureType.TypeParameter(0)));

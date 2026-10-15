@@ -64,7 +64,7 @@ public sealed partial class AssemblyBuilder
     /// <param name="types">Two to 256 output-owned constituents; copied and normalized.</param>
     /// <returns>The structural signature, or the surviving constituent after duplicate normalization.</returns>
     /// <exception cref="ArgumentException">A constituent is foreign, unsupported, a bare generic parameter, or a final intersection bound.</exception>
-    /// <remarks>Native-only; CLI projection remains disabled. Union value alternatives use explicit boxing; intersections exclude values. Scoped parameters inside nominal generic constituents are checked at use sites. Pointer and function bounds are not admitted.</remarks>
+    /// <remarks>Native-only; CLI projection remains disabled. Union value alternatives use explicit boxing; intersections exclude values. Scoped parameters inside nominal generic constituents are checked at use sites. Function alternatives are admitted in unions with recursively checked signatures; function intersection bounds and pointer alternatives are not admitted.</remarks>
     public SignatureType CreateExperimentalReferenceComposition(ReferenceCompositionKind kind, params SignatureType[] types)
     {
         ArgumentNullException.ThrowIfNull(types);
@@ -72,6 +72,8 @@ public sealed partial class AssemblyBuilder
             throw new ArgumentException("composition requires a supported kind and two to 256 constituents", nameof(types));
         var nodes = 0;
         bool SupportedArgument(SignatureType type) => type.MethodParameterIndex is not null || type.TypeParameterIndex is not null || (type.Composition is { } composition ? composition.Constituents.All(SupportedArgument)
+            : type.FunctionSignature is { } function ? function.ParameterTypes.All(SupportedArgument)
+                && (function.ReturnType.Primitive == PrimitiveType.Void || SupportedArgument(function.ReturnType))
             : type.Primitive is { } primitive ? primitive != PrimitiveType.Void
             : type.ArrayElement is { } element ? SupportedArgument(element)
             : type.GenericInstance is { } instance ? instance.TypeArguments.All(SupportedArgument)
@@ -80,7 +82,7 @@ public sealed partial class AssemblyBuilder
         void Validate(SignatureType type, bool intersection, int depth)
         {
             if (type is null || ++nodes > 4096 || depth > 32 || !SupportedArgument(type))
-                throw new ArgumentException("composition requires bounded nominal or scalar constituents", nameof(types));
+                throw new ArgumentException("composition requires bounded nominal, function or scalar constituents", nameof(types));
             type.ValidateOwner(this, 32, 32);
             if (type.Composition is { } composition)
             {
@@ -92,7 +94,7 @@ public sealed partial class AssemblyBuilder
             var scalar = type.Primitive is { } primitive && primitive is not (PrimitiveType.Void or PrimitiveType.Value or PrimitiveType.RuntimeTypeHandle or PrimitiveType.String);
             if (intersection
                 ? local is not { IsStatic: false, IsValueType: false } && type.ImportedType is not { IsValueType: false }
-                : !scalar && local is not { IsStatic: false } && type.ImportedType is null)
+                : !scalar && type.FunctionSignature is null && local is not { IsStatic: false } && type.ImportedType is null)
                 throw new ArgumentException("unsupported composition alternative; intersections require nominal references", nameof(types));
             if (intersection)
             {
@@ -148,6 +150,8 @@ public sealed partial class AssemblyBuilder
             experimentalStorageCompositions.Add(composition);
             foreach (var bound in composition.Constituents) RegisterCompositionStorage(bound);
         }
+        if (type.FunctionSignature is { } function)
+            foreach (var part in function.ParameterTypes.Append(function.ReturnType)) RegisterCompositionStorage(part);
         if (type.ImportedType is { } imported) foreach (var argument in imported.TypeArguments) RegisterCompositionStorage(argument);
         if (type.GenericInstance is { } instance) foreach (var argument in instance.TypeArguments) RegisterCompositionStorage(argument);
     }
