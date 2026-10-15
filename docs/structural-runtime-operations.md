@@ -91,7 +91,9 @@ also validates typed bindings, guarded/fallback arms and a result join against t
 interpreter and AOT. A separate [artifact-only library consumer](experiments/native-structural-types/scalar-import-project/README.md)
 qualifies union returns and parameters with reordered alternatives and the same
 zero-arena result. This does not qualify every match or arbitrary stack producer.
-Mixed reference/value and nominal-value alternatives remain native layout gaps.
+Mixed Int32/Int64/Boolean plus nominal reference alternatives now use a separate
+reference slot alongside tag/numeric payload; see the [mixed storage qualification](experiments/native-structural-types/README.md#mixed-scalarreference-union-storage-2026-10-15).
+Nominal-value and intrinsic String alternatives remain native layout gaps.
 
 The current interpreter admits a null/default union payload. Native bounded
 storage preserves that behavior. It is not a separate named union case and is not

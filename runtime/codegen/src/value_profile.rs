@@ -22,6 +22,7 @@ pub(super) enum Ty {
     Intersection(Vec<Ty>),
     ReferenceUnion(Vec<Ty>),
     ScalarUnion(Vec<Type>),
+    MixedUnion(Vec<Ty>), // Tag, numeric bits, and a separate nullable reference slot.
     PendingUnionScalar(Type),
     ScalarUnionTest, // Ephemeral non-null discriminator, consumed only by ref.isnull.
     ByteArray,
@@ -647,7 +648,10 @@ impl<'a> Profile<'a> {
             Type::Intersection(parts) if self.references => {
                 Ty::Intersection(parts.iter().map(|t| self.ty(t)).collect::<Result<_, _>>()?)
             }
-            Type::Union(parts) if crate::scalar_unions::supported(t) => {
+            Type::Union(parts)
+                if !parts.is_empty()
+                    && parts.iter().all(|t| crate::scalar_unions::tag(t).is_some()) =>
+            {
                 Ty::ScalarUnion(parts.clone())
             }
             Type::Union(parts) if self.references => {
@@ -655,6 +659,22 @@ impl<'a> Profile<'a> {
                     .iter()
                     .map(|t| self.ty(t))
                     .collect::<Result<Vec<_>, _>>()?;
+                if parts
+                    .iter()
+                    .any(|t| matches!(t, Ty::Int | Ty::Wide | Ty::Bool))
+                    && parts
+                        .iter()
+                        .any(|t| matches!(t, Ty::Reference(_) | Ty::Interface(_)))
+                    && parts.iter().all(|t| {
+                        matches!(
+                            t,
+                            Ty::Int | Ty::Wide | Ty::Bool | Ty::Reference(_) | Ty::Interface(_)
+                        )
+                    })
+                    && crate::scalar_unions::supported(t)
+                {
+                    return Ok(Ty::MixedUnion(parts));
+                }
                 if !parts
                     .iter()
                     .all(|t| matches!(t, Ty::Reference(_) | Ty::Interface(_)))
@@ -784,6 +804,7 @@ impl<'a> Profile<'a> {
     pub fn pointer_lanes(&self, t: &Ty) -> Vec<bool> {
         match t {
             Ty::Erased | Ty::ScalarUnion(_) => vec![false, true],
+            Ty::MixedUnion(_) => vec![false, true, true],
             Ty::PendingUnionScalar(t) => {
                 self.pointer_lanes(&self.ty(t).expect("admitted union scalar"))
             }
@@ -821,6 +842,7 @@ impl<'a> Profile<'a> {
             Ty::Record(i) => self.widths[*i],
             Ty::Tuple(parts) => parts.iter().map(|t| self.lanes(t)).sum(),
             Ty::Erased | Ty::ScalarUnion(_) => 2,
+            Ty::MixedUnion(_) => 3,
             _ => 1,
         }
     }
@@ -927,6 +949,7 @@ impl<'a> Profile<'a> {
     }
     pub fn cast_targets(&self, target: &Ty) -> Vec<usize> {
         match target {
+            Ty::MixedUnion(parts) => self.cast_targets(&Ty::ReferenceUnion(parts.clone())),
             Ty::ReferenceUnion(_) => self
                 .input
                 .types
@@ -1574,8 +1597,32 @@ impl<'a> Profile<'a> {
                 }
                 Op::CastClass(t @ Type::Union(parts)) if crate::scalar_unions::supported(t) => {
                     let source = pop(&mut stack)?;
+                    if matches!(self.ty(t)?, Ty::MixedUnion(_)) && self.is_object_base(&source) {
+                        return Err(fail(
+                            pc,
+                            "mixed union injection from Object requires boxed-payload classification",
+                        ));
+                    }
+                    if let Ty::Interface(index) = &source {
+                        let view = Type::Named(self.input.types[*index].name.clone());
+                        if parts
+                            .iter()
+                            .filter(|part| crate::scalar_unions::tag(part).is_some())
+                            .any(|part| {
+                                neoclr::native_metadata::assignable(self.input, part, &view)
+                                    .unwrap_or(true)
+                            })
+                        {
+                            return Err(fail(
+                                pc,
+                                "mixed union injection from a scalar interface requires boxed-payload classification",
+                            ));
+                        }
+                    }
                     if !matches!(&source, Ty::PendingUnionScalar(scalar) if parts.contains(scalar))
                         && source != self.ty(t)?
+                        && !(matches!(self.ty(t)?, Ty::MixedUnion(_))
+                            && matches!(source, Ty::Reference(_) | Ty::Interface(_)))
                     {
                         return Err(fail(
                             pc,
@@ -1585,7 +1632,7 @@ impl<'a> Profile<'a> {
                     stack.push(self.ty(t)?);
                 }
                 Op::IsInstance(t) if crate::scalar_unions::tag(t).is_some() => {
-                    if !matches!(pop(&mut stack)?, Ty::ScalarUnion(_))
+                    if !matches!(pop(&mut stack)?, Ty::ScalarUnion(_) | Ty::MixedUnion(_))
                         || !matches!(f.body.get(pc + 1), Some(Op::ReferenceIsNull))
                     {
                         return Err(fail(
@@ -1596,7 +1643,7 @@ impl<'a> Profile<'a> {
                     stack.push(Ty::ScalarUnionTest);
                 }
                 Op::UnboxAny(t) => {
-                    if !matches!(pop(&mut stack)?, Ty::ScalarUnion(_)) {
+                    if !matches!(pop(&mut stack)?, Ty::ScalarUnion(_) | Ty::MixedUnion(_)) {
                         return Err(fail(pc, "inline union extraction requires a scalar union"));
                     }
                     stack.push(self.ty(t)?);
@@ -1729,9 +1776,39 @@ impl<'a> Profile<'a> {
                 }
                 Op::IsInstance(t) | Op::CastClass(t) => {
                     let source = pop(&mut stack)?;
+                    if let Ty::MixedUnion(parts) = &source {
+                        let needs_box = self.is_object_base(&self.ty(t)?)
+                            || parts
+                                .iter()
+                                .filter_map(|part| match part {
+                                    Ty::Int => Some(Type::Int32),
+                                    Ty::Wide => Some(Type::Int64),
+                                    Ty::Bool => Some(Type::Boolean),
+                                    _ => None,
+                                })
+                                .any(|scalar| {
+                                    neoclr::native_metadata::assignable(self.input, &scalar, t)
+                                        .unwrap_or(true)
+                                });
+                        if needs_box {
+                            return Err(fail(
+                                pc,
+                                "mixed union Object or scalar-interface views require boxing",
+                            ));
+                        }
+                    }
+                    if matches!(source, Ty::MixedUnion(_))
+                        && !matches!(self.ty(t)?, Ty::Reference(_) | Ty::Interface(_))
+                    {
+                        return Err(fail(
+                            pc,
+                            "mixed union extraction requires a nominal reference view",
+                        ));
+                    }
                     if !matches!(
                         source,
-                        Ty::Reference(_)
+                        Ty::MixedUnion(_)
+                            | Ty::Reference(_)
                             | Ty::Interface(_)
                             | Ty::Intersection(_)
                             | Ty::ReferenceUnion(_)
@@ -1749,6 +1826,7 @@ impl<'a> Profile<'a> {
                     if !matches!(
                         pop(&mut stack)?,
                         Ty::ScalarUnion(_)
+                            | Ty::MixedUnion(_)
                             | Ty::ScalarUnionTest
                             | Ty::ScalarArray(_)
                             | Ty::ReferenceArray(_)

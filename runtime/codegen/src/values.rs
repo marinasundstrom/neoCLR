@@ -2667,7 +2667,13 @@ pub(crate) fn compile_into(
                         // The adjacent admitted union cast consumes this scalar;
                         // no Object box exists or escapes in the native program.
                     }
-                    Op::CastClass(target) if crate::scalar_unions::supported(target) => {
+                    Op::CastClass(target)
+                        if crate::scalar_unions::supported(target)
+                            && (matches!(
+                                top(),
+                                Ty::PendingUnionScalar(_) | Ty::ScalarUnion(_)
+                            ) || *top() == p.ty(target)?) =>
+                    {
                         if let Ty::PendingUnionScalar(scalar) = top() {
                             let value = pop(&mut stack);
                             let payload = if b.func.dfg.value_type(value) == types::I64 {
@@ -2680,9 +2686,15 @@ pub(crate) fn compile_into(
                                     .iconst(types::I32, crate::scalar_unions::tag(scalar).unwrap()),
                             );
                             stack.push(payload);
+                            if matches!(p.ty(target)?, Ty::MixedUnion(_)) {
+                                stack.push(b.ins().iconst(types::I64, 0));
+                            }
                         }
                     }
                     Op::IsInstance(target) if crate::scalar_unions::tag(target).is_some() => {
+                        if matches!(top(), Ty::MixedUnion(_)) {
+                            pop(&mut stack);
+                        }
                         pop(&mut stack); // Numeric payload is not needed for the test.
                         let tag = pop(&mut stack);
                         let matched = b.ins().icmp_imm(
@@ -2693,6 +2705,9 @@ pub(crate) fn compile_into(
                         stack.push(b.ins().uextend(types::I32, matched));
                     }
                     Op::UnboxAny(target) => {
+                        if matches!(top(), Ty::MixedUnion(_)) {
+                            pop(&mut stack);
+                        }
                         let payload = pop(&mut stack);
                         let tag = pop(&mut stack);
                         let null = b.ins().icmp_imm(IntCC::Equal, tag, 0);
@@ -2713,6 +2728,12 @@ pub(crate) fn compile_into(
                     }
                     Op::IsInstance(target) | Op::CastClass(target) => {
                         let value = pop(&mut stack);
+                        let source_tag = if matches!(top(), Ty::MixedUnion(_)) {
+                            pop(&mut stack); // Scalar bits never become an object address.
+                            Some(pop(&mut stack))
+                        } else {
+                            None
+                        };
                         let probe = b.create_block();
                         let joined = b.create_block();
                         b.append_block_param(joined, types::I64);
@@ -2764,22 +2785,35 @@ pub(crate) fn compile_into(
                         let result = b.block_params(joined)[0];
                         if matches!(op, Op::CastClass(_)) {
                             let absent = b.ins().icmp_imm(IntCC::Equal, result, 0);
-                            let present = b.ins().icmp_imm(IntCC::NotEqual, value, 0);
+                            let present =
+                                b.ins()
+                                    .icmp_imm(IntCC::NotEqual, source_tag.unwrap_or(value), 0);
                             let invalid = b.ins().band(absent, present);
-                            let code =
-                                if matches!(target_ty, Ty::Intersection(_) | Ty::ReferenceUnion(_))
-                                {
-                                    11
-                                } else {
-                                    3
-                                };
+                            let code = if matches!(
+                                target_ty,
+                                Ty::Intersection(_) | Ty::ReferenceUnion(_) | Ty::MixedUnion(_)
+                            ) {
+                                11
+                            } else {
+                                3
+                            };
                             let status = b.ins().iconst(types::I32, code);
                             return_if_detailed(&mut b, invalid, status, site.as_ref());
+                        }
+                        if matches!(target_ty, Ty::MixedUnion(_)) {
+                            let present = b.ins().icmp_imm(IntCC::NotEqual, result, 0);
+                            let reference_tag = b.ins().iconst(types::I32, 4);
+                            let null_tag = b.ins().iconst(types::I32, 0);
+                            stack.push(b.ins().select(present, reference_tag, null_tag));
+                            stack.push(b.ins().iconst(types::I64, 0));
                         }
                         stack.push(result);
                     }
                     Op::ReferenceIsNull => {
-                        if matches!(top(), Ty::ScalarUnion(_)) {
+                        if matches!(top(), Ty::MixedUnion(_)) {
+                            pop(&mut stack);
+                        }
+                        if matches!(top(), Ty::ScalarUnion(_) | Ty::MixedUnion(_)) {
                             pop(&mut stack);
                         }
                         let value = pop(&mut stack);

@@ -1185,7 +1185,7 @@ fn structural_union_reference_payloads_accept_either_nominal_bound() {
     );
     assert!(!denied.status.success());
     assert!(
-        String::from_utf8_lossy(&denied.stderr).contains("tagged inline storage"),
+        String::from_utf8_lossy(&denied.stderr).contains("instance tests require tagged conversion lowering"),
         "{}",
         String::from_utf8_lossy(&denied.stderr)
     );
@@ -1194,6 +1194,10 @@ fn structural_union_reference_payloads_accept_either_nominal_bound() {
 
 #[cfg(all(target_os = "macos", target_arch = "aarch64"))]
 fn verify_reference_views(source: &str) {
+    verify_reference_views_with_arena(source, None);
+}
+
+fn verify_reference_views_with_arena(source: &str, arena_bytes: Option<[u64; 8]>) {
     let dir = Temp::new();
     let seed = neoclr::assemble(".module System\n.references ()\n").unwrap();
     let denied = compile_source(&dir, &seed, source, &["--compile-system"], false);
@@ -1218,7 +1222,7 @@ int main(int argc, char **argv) {
     int32_t result=-99;
     int status=neoclr_entry_v4(argc>1 ? atoi(argv[1]) : 0,&result,&ctx);
     if (status) {
-        if ((status!=3 && status!=11) || result!=-99 || ctx.fault.code!=(uint32_t)status) return 92;
+        if ((status!=3 && status!=6 && status!=11) || result!=-99 || ctx.fault.code!=(uint32_t)status) return 92;
         neoclr_aot_render_fault(stderr,&ctx.fault);return 1;
     }
     printf("%d\n",result);return 0;
@@ -1226,6 +1230,15 @@ int main(int argc, char **argv) {
 "#,
     )
     .unwrap();
+    if let Some(bytes) = arena_bytes {
+        let host = dir.0.join("host.c");
+        let expected = bytes.iter().map(u64::to_string).collect::<Vec<_>>().join(",");
+        let text = fs::read_to_string(&host).unwrap().replace(
+            "    if (status) {",
+            &format!("    uint64_t expected[8] = {{{expected}}};\n    if (ctx.text.used != expected[argc>1 ? atoi(argv[1]) : 0]) return 93;\n    if (status) {{"),
+        );
+        fs::write(host, text).unwrap();
+    }
     let r = Command::new("clang")
         .args([
             "-arch", "arm64", "-std=c11", "-Wall", "-Wextra", "-Werror", "-I",
@@ -11873,4 +11886,41 @@ int main(void) {
             .value,
         neoclr::Value::Int32(42)
     );
+}
+
+#[test]
+#[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+fn structural_mixed_union_keeps_numeric_bits_separate_from_references() {
+    let source = include_str!(
+        "../../../docs/experiments/native-structural-types/mixed-union.neoil"
+    );
+    verify_reference_views_with_arena(source, Some([16, 16, 16, 16, 16, 16, 0, 16]));
+    let interface = source
+        .replace(".type class Cell", ".interface View\n.end\n.type class Cell\n.implements View")
+        .replace("union<Int32,Int64,Boolean,Cell>", "union<Int32,Int64,Boolean,View>");
+    verify_reference_views_with_arena(&interface, Some([16, 16, 16, 16, 16, 16, 0, 16]));
+    let null_scalar = source.replace(
+        "ldloc value\ncastclass Cell\nref.isnull\nbrtrue Yes",
+        "ldloc value\nunbox.any Int32\npop\nbr Bad",
+    );
+    verify_reference_views_with_arena(&null_scalar, Some([16, 16, 16, 16, 16, 16, 0, 16]));
+    // A boxed scalar's Object view must not silently become a null reference.
+    let dir = Temp::new();
+    let seed = neoclr::assemble(".module System\n.references ()\n").unwrap();
+    let denied = compile_source(
+        &dir, &seed, &source.replace("isinst Cell", "isinst System.Object"),
+        &["--compile-system", "--reference-arena"], false,
+    );
+    assert!(!denied.status.success());
+    assert!(String::from_utf8_lossy(&denied.stderr).contains("views require boxing"), "{}", String::from_utf8_lossy(&denied.stderr));
+    assert!(!dir.0.join("app.o").exists());
+    let denied = compile_source(
+        &dir, &seed,
+        &source.replace("ldc.i4 42\nnewobj.ctor instance Cell::.ctor(Int32)",
+            "ldc.i4 42\nnewobj.ctor instance Cell::.ctor(Int32)\ncastclass System.Object"),
+        &["--compile-system", "--reference-arena"], false,
+    );
+    assert!(!denied.status.success());
+    assert!(String::from_utf8_lossy(&denied.stderr).contains("boxed-payload classification"), "{}", String::from_utf8_lossy(&denied.stderr));
+    assert!(!dir.0.join("app.o").exists());
 }

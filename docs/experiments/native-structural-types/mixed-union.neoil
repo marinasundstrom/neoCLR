@@ -1,0 +1,142 @@
+.module MixedUnion
+.type class abstract System.Object
+.end
+.type class Cell
+.field Value Int32
+.method instance .ctor(Int32 value) -> noresult
+ldarg this
+ldarg value
+stfld Cell::Value
+ret
+.end
+.end
+.type class Other
+.method instance .ctor() -> noresult
+ret
+.end
+.end
+.function Echo(union<Int32,Int64,Boolean,Cell> value) -> union<Int32,Int64,Boolean,Cell>
+ldarg value
+ret
+.end
+.function Copy(union<Int32,Int64,Boolean,Cell> value, out union<Int32,Int64,Boolean,Cell>& result) -> Void
+ldarg result
+ldarg value
+stobj union<Int32,Int64,Boolean,Cell>
+ldvoid
+ret
+.end
+.function Calculate(Int32 mode) -> Int32
+.local union<Int32,Int64,Boolean,Cell> value
+.local union<Int32,Int64,Boolean,Cell> copy
+ldarg mode
+ldc.i4 7
+beq WrongAdmission
+ldarg mode
+ldc.i4 6
+beq Null
+ldc.i4 42
+newobj.ctor instance Cell::.ctor(Int32)
+castclass union<Int32,Int64,Boolean,Cell>
+call Echo(union<Int32,Int64,Boolean,Cell>)
+stloc value
+ldarg mode
+ldc.i4 0
+beq Reference
+ldarg mode
+ldc.i4 5
+beq WrongScalar
+ldarg mode
+ldc.i4 2
+beq Wide
+ldarg mode
+ldc.i4 3
+beq Boolean
+ldc.i4 -42
+box Int32
+castclass union<Int32,Int64,Boolean,Cell>
+call Echo(union<Int32,Int64,Boolean,Cell>)
+stloc value
+ldarg mode
+ldc.i4 4
+beq WrongReference
+ldloc value
+ref.isnull
+brtrue Bad
+ldloc value
+isinst Cell
+ref.isnull
+brfalse Bad
+ldloc value
+isinst Int32
+ref.isnull
+brtrue Bad
+ldloc value
+unbox.any Int32
+ldc.i4 -42
+ceq
+brtrue Yes
+br Bad
+Reference:
+ldloc value
+ldloca copy
+call Copy(union<Int32,Int64,Boolean,Cell>,union<Int32,Int64,Boolean,Cell>&)
+pop
+ldloc copy
+isinst Int32
+ref.isnull
+brfalse Bad
+ldloc copy
+castclass Cell
+ldfld Cell::Value
+ret
+Wide:
+ldc.i8 4294967338
+box Int64
+castclass union<Int32,Int64,Boolean,Cell>
+stloc value
+ldloc value
+unbox.any Int64
+ldc.i8 4294967338
+ceq
+brtrue Yes
+br Bad
+Boolean:
+ldc.bool false
+box Boolean
+castclass union<Int32,Int64,Boolean,Cell>
+stloc value
+ldloc value
+unbox.any Boolean
+brfalse Yes
+br Bad
+WrongReference:
+ldloc value
+castclass Cell
+pop
+br Bad
+WrongScalar:
+ldloc value
+unbox.any Int32
+pop
+br Bad
+WrongAdmission:
+newobj.ctor instance Other::.ctor()
+castclass union<Int32,Int64,Boolean,Cell>
+pop
+br Bad
+Null:
+ldloca value
+initobj union<Int32,Int64,Boolean,Cell>
+ldloc value
+castclass Cell
+ref.isnull
+brtrue Yes
+br Bad
+Yes:
+ldc.i4 42
+ret
+Bad:
+ldc.i4 -1
+ret
+.end

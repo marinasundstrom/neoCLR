@@ -46,6 +46,12 @@ fn slots(p: &Profile<'_>, ty: &Ty) -> Vec<Slot> {
         Ty::Interface(i) => Trace::Interface(*i),
         Ty::Intersection(_) => Trace::Intersection,
         Ty::ReferenceUnion(_) => Trace::UnionReferencePayload,
+        Ty::MixedUnion(_) => {
+            return vec![Slot {
+                lane: 2,
+                trace: Trace::UnionReferencePayload,
+            }];
+        }
         Ty::ByteArray => Trace::ByteArray,
         Ty::StringArray | Ty::CharacterArray | Ty::CharacterValues => Trace::StringArray,
         Ty::ByteValues => Trace::ByteValues,
@@ -230,6 +236,30 @@ mod tests {
             }]
         );
     }
+    #[test]
+    fn mixed_union_traces_only_its_separate_reference_lane() {
+        let module = module();
+        let p = profile(&module);
+        let ty = Ty::MixedUnion(vec![Ty::Int, Ty::Interface(0)]);
+        assert_eq!(p.lanes(&ty), 3);
+        assert_eq!(seed_lanes(&p, &ty), vec![2]);
+        assert_eq!(
+            slots(&p, &ty),
+            vec![Slot {
+                lane: 2,
+                trace: Trace::UnionReferencePayload
+            }]
+        );
+        let nested = Ty::Tuple(vec![Ty::Wide, ty]);
+        assert_eq!(
+            slots(&p, &nested),
+            vec![Slot {
+                lane: 3,
+                trace: Trace::UnionReferencePayload
+            }]
+        );
+    }
+
     #[test]
     fn union_reference_payload_uses_one_strong_slot_without_a_carrier() {
         let module = module();

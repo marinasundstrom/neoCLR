@@ -1,4 +1,4 @@
-//! Bounded scalar union storage. Tags are private backend values, not metadata tokens.
+//! Bounded scalar and mixed union storage. Tags are private backend values, not metadata tokens.
 use neoclr::metadata::{Function, Instruction as Op, Type};
 
 pub(crate) fn tag(ty: &Type) -> Option<i64> {
@@ -10,8 +10,11 @@ pub(crate) fn tag(ty: &Type) -> Option<i64> {
     }
 }
 
+// Named alternatives are candidates here; Profile checks that they are nominal
+// references before admitting a mixed layout. Nominal value records stay gated.
 pub(crate) fn supported(ty: &Type) -> bool {
-    matches!(ty, Type::Union(parts) if !parts.is_empty() && parts.iter().all(|t| tag(t).is_some()))
+    matches!(ty, Type::Union(parts) if !parts.is_empty() && parts.iter().any(|t| tag(t).is_some())
+        && parts.iter().all(|t| tag(t).is_some() || matches!(t, Type::Named(_))))
 }
 
 // Preserve both original instructions and their diagnostic positions. The native

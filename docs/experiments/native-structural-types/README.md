@@ -104,17 +104,15 @@ parameter. It compares eight modes for each of
 four implementation sets: both bounds, just the first, just the second and neither.
 The cases cover identity-preserving copies, calls, output slots, nulls, accepted and
 rejected casts and missing membership. A mixed Int32/interface signature is rejected
-before object emission with a tagged-storage diagnostic. A separate projection test
+before object emission when using an unsupported compound instance-test target. A separate projection test
 ensures whole-union boxing cannot be rewritten into an Object payload cast.
 
 This extends CLR-style reference casts with a structural union value contract. The
 benefit for reference-only unions is a single slot with no carrier allocation; the
-cost is runtime membership checks when static guarantees are insufficient. Mixed
-reference/value and nominal value alternatives still require additional tagged
-inline storage and conversions. Existing scalar-box projection happens before typed aggregate
-lowering, so simply enabling mixed unions would preserve avoidable heap allocation
-or lose union identity. That pipeline must be addressed before the mixed path is
-admitted. Native reflection, array elements, JIT/collector stress and full Task
+cost is runtime membership checks when static guarantees are insufficient. The
+mixed scalar/reference path described below now preserves adjacent scalar
+box/cast pairs through early projection and gives them tagged inline storage.
+Nominal value alternatives still require additional layouts and conversions. Native reflection, array elements, JIT/collector stress and full Task
 consumer qualification remain open. No general performance claim follows from the
 single-slot layout test.
 
@@ -138,8 +136,8 @@ payloads cannot become roots. These checks establish allocation elision in these
 closed workloads, not a general throughput or managed-GC performance result.
 
 Extraction currently accepts an immediate union local/argument load or union cast
-before `unbox.any`. More general stack producers, compound-union `isinst` targets, mixed
-scalar/reference unions and nominal value alternatives remain gated. Whole-union
+before `unbox.any`. More general stack producers, compound-union `isinst` targets
+and nominal value alternatives remain gated; bounded mixed storage is described below. Whole-union
 boxing, native descriptors, arrays, dedicated JIT/GC stress and full Raven Task
 consumers still block integration. The codegen qualification uses closed-world
 selection, `--compile-system` and `--reference-arena` to admit the source
@@ -182,3 +180,35 @@ all six inputs through a separately emitted library return and echo parameter,
 including reordered source alternatives. Interpreter and AOT return 42 with no
 native imports or arena use. [Imported evidence](raven-scalar-import-results.json)
 records both fresh artifacts against the retained v3 bundle.
+
+## Mixed scalar/reference union storage (2026-10-15)
+
+The native backend now admits unions combining Int32, Int64 or Boolean with
+selected nominal class/interface references. The union remains a structural
+value. Its private layout uses three eight-byte storage slots: discriminator,
+numeric bits and reference. Scalar injection clears the reference slot; reference
+injection clears the numeric slot. Copies and calls preserve all three slots,
+and only the reference slot participates in tracing recipes, including nested
+tuple offsets. This deliberately spends one extra slot compared with scalar-only
+unions to avoid interpreting arbitrary numeric bits as managed addresses.
+
+The adjacent scalar `box; castclass union` sequence still omits the box. Reference
+admission checks nominal conformance. Exact scalar tests/extraction use the tag;
+nominal reference tests/extraction inspect only the separate reference slot.
+Default/null, failed admission and extraction retain interpreter behavior.
+Injection from Object or scalar-interface views needs boxed-payload classification.
+Object views or interfaces implemented by scalar alternatives require boxing and
+are rejected before native emission; a scalar must not silently become a null
+Object view. Compound test targets, nominal value alternatives, intrinsic String
+alternatives and general union-to-union conversions remain gated.
+
+The `mixed-union.neoil` fixture exercises eight interpreter/AOT paths, repeated
+with an explicit nominal interface alternative and a null-unboxing variant, including
+wide Int64, false Boolean, copies through out parameters, returns, reference-to-
+scalar replacement, null and failures. The host checks exact arena use: only the
+explicit Cell/Other allocation, with no union carrier or scalar box allocation.
+Tracing recipes are tested independently; they are not managed collector stress.
+Reproduce with `cargo test -p neoclr-codegen --lib --test console mixed_union`.
+This is macOS ARM64 qualification, without a throughput or managed-JIT claim.
+Raven's Runtime Contract and emitted metadata/instructions are unchanged; a fresh
+mixed Raven consumer and broader native application qualification remain next.
