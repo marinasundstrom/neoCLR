@@ -1220,3 +1220,32 @@ fn managed_value_wrapper_replacement_preserves_prior_copy() {
     p.verify().unwrap();
     assert_eq!(p.run(Limits::default()).unwrap().value, Value::Int32(42));
 }
+
+#[cfg(feature = "experimental-compositions")]
+#[test]
+fn union_object_extraction_checks_payload_membership() {
+    for (payload, extract) in [
+        ("ldc.i4 42\nbox Int32", "unbox.any Int32"),
+        (
+            "ldc.i4 42\nnewobj Both",
+            "castclass Both\ncallvirt instance Left::Get()",
+        ),
+    ] {
+        let p = program(
+            &format!("{payload}\ncastclass System.Object\nunbox.any union<Int32,Both>\n{extract}"),
+            "",
+        );
+        p.verify().unwrap();
+        assert_eq!(p.run(Limits::default()).unwrap().value, Value::Int32(42));
+    }
+    let p = program(
+        "newobj Neither\ncastclass System.Object\nunbox.any union<Int32,Both>\npop\nldc.i4 0",
+        "",
+    );
+    p.verify().unwrap();
+    assert!(p
+        .run(Limits::default())
+        .unwrap_err()
+        .to_string()
+        .contains("does not satisfy"));
+}

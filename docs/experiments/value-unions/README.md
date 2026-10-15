@@ -4,6 +4,9 @@ The runtime and companion Raven compiler keep structural unions as values, wheth
 an alternative contains a value or an object reference.
 
 - `project/`: boxing/extraction and ref/out writeback, exit 42.
+- `task-project/`: awaited `Task<Result<Response, HttpError | JsonError>>` with
+  completed/queued success and both imported error alternatives, exit 42.
+  `task-results.json` records the command and artifact hashes.
 - `callback-project/`: an exact callback returning a structural union, exit 42.
 - `fresh-bundle-qualification.json`: the HTTP-header consumer compiled and executed
   against the fresh v3 Runtime/Data/Networking/Web bundle, exit 0, plus invalid
@@ -19,3 +22,14 @@ Reproduce qualification with `scripts/verify-native-library-project.py`, using t
 paths and compiler revision recorded in the evidence and a new output directory.
 These are development feature-branch artifacts. This result does not qualify every
 HTTP endpoint, all open structural operands, or JIT/AOT execution.
+
+Run the task sample against the same v3 bundle with:
+
+```sh
+dotnet /path/to/rvnc.dll neoclr --project docs/experiments/value-unions/task-project/App.rvnproj --run /path/to/neoclr
+```
+
+An exit status of 42 means all six checks passed. The sample uses native union
+extraction from a nominal Result carrier. Explicit whole-union boxing and final
+boxed identity remain unqualified; see the integration document for the temporary
+interpreter representation.

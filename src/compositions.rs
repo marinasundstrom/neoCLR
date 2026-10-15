@@ -339,6 +339,12 @@ pub(crate) fn validate_surface(module: &Module) -> Result<(), Fault> {
                     check(ty)?;
                 }
                 Op::CastClass(_) | Op::IsInstance(_) => (),
+                Op::UnboxAny(ty) if matches!(ty, Type::Union(_)) => {
+                    // The interpreter carries a union through its checked payload
+                    // handle. Extraction from nominal generic carriers checks
+                    // membership before restoring the union view.
+                    check(ty)?;
+                }
                 Op::NewArray(ty)
                 | Op::ReserveArray(ty)
                 | Op::ArrayElement(ty)

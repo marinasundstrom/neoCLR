@@ -117,3 +117,5 @@ retain nominal interface and extendable-reference bounds.
 Development follow-up (2026-10-15): exact native callbacks can return a structural union value; the executable callback sample returns 42. All four source libraries now generate, with full bundle execution still requiring qualification.
 
 Development qualification (2026-10-15): a consumer now compiles and executes HTTP-header checks against the fresh Runtime/Data/Networking/Web bundle. Focused checks cover structural arguments in nominal value wrappers and generic callback substitution; this does not establish all endpoint or backend combinations.
+
+Development qualification (2026-10-15): a fresh-bundle sample awaits `Task<Result<Response, HttpError | JsonError>>` through completed and queued tasks, checking success and both imported error alternatives. Native union extraction from the nominal result carrier is validated; whole-union boxing and final native layout remain incomplete.

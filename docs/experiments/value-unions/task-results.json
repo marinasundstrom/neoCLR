@@ -1,0 +1,52 @@
+{
+  "date": "2026-10-15",
+  "runtimeBaseRevision": "e3de9ecc9e16b27b4e8f2af2c2aa551b54c0f547",
+  "runtimeChanges": "Union UnboxAny admission in the commit containing this evidence; source hashes below identify tested content.",
+  "compilerRevision": "26a182186c1dc5d15aab1cbc73e637eec3839d8f",
+  "command": [
+    "dotnet",
+    "/Users/robert/Projects/raven-union-intersection/src/Raven.Compiler/bin/Debug/net11.0/rvnc.dll",
+    "neoclr",
+    "--project",
+    "docs/experiments/value-unions/task-project/App.rvnproj",
+    "--run",
+    "/Users/robert/Projects/neoclr/target/debug/neoclr"
+  ],
+  "exitCode": 42,
+  "output": "Native build output: /Users/robert/Projects/neoclr/docs/experiments/value-unions/task-project/bin/neoclr/StructuralTaskResult.dll\n",
+  "checks": [
+    "completed success",
+    "completed HTTP TimedOut",
+    "completed JSON InvalidIndex(42)",
+    "queued success",
+    "queued HTTP TimedOut",
+    "queued JSON InvalidIndex(42)"
+  ],
+  "runtimeTests": {
+    "command": "cargo test --test structural_compositions",
+    "passed": 54,
+    "failed": 0
+  },
+  "limitations": [
+    "Interpreter only; temporary payload handles",
+    "Explicit whole-union boxing and exact boxed-union identity remain unqualified",
+    "Closed composition operands; not all generic or library endpoints qualified"
+  ],
+  "sha256": {
+    "/Users/robert/Projects/raven-union-intersection/src/Raven.Compiler/bin/Debug/net11.0/rvnc.dll": "02022f349c7eb7b83b81e24b40118e37c6f19bca7d98268932d75cefad71c5a9",
+    "target/debug/neoclr": "8fd72ae686ca991b6db60489776b4ef040bb0535ef25d7ccc88530e277d33d12",
+    "src/compositions.rs": "54b470b9ff2d34a349afb3fde452978c768cc6737aab5d4bd6471f5d6f50f1aa",
+    "tests/structural_compositions.rs": "94729a897dc26a5bf2a4f7e1acd8310471792b43cd30fe9b2010b6eb457cdabd",
+    "docs/experiments/value-unions/task-project/Main.rvn": "9f30c7038c8e6d6b464356bc6329c79dea8def0b802779e6f380b2a9d6e25e2b",
+    "docs/experiments/value-unions/task-project/App.rvnproj": "6f5904563201b8f5e2ae878407be21692a62104d3b7cc4f392d51821c294a360",
+    "docs/experiments/value-unions/task-project/bin/neoclr/StructuralTaskResult.dll": "8ad657025f18955e1fb5baec9a693b64753c44747beba62c826393be9abe9450",
+    "target/structural-integrated-libraries-v3/Core.dll": "3f7cfa9db7c4feb551e2e97b0edb89c4dcf4c64d8eccf01bd006848dcacfd3f4",
+    "target/structural-integrated-libraries-v3/System.Runtime.dll": "c3cba0050fa2e4e4161c9e55266cc92da9a86034badccd98c2e804000b5bf735",
+    "target/structural-integrated-libraries-v3/System.Data.dll": "a13b89d9c3d87be3ab08a8c7e8fb4c3af75402e7fe7b0598204b241832014704",
+    "target/structural-integrated-libraries-v3/System.Networking.dll": "1384940280b54680c217c951964af3f2dde01fc6acf19a927f59ede3336d09ca",
+    "target/structural-integrated-libraries-v3/System.Web.dll": "f29d93809d033ca36c00c4034f6cbf920d1ba8dae7291ef18222d8e9cfbc7ae6",
+    "target/structural-integrated-libraries-v3/System.runtime.neox": "98a1ae1da85387c87746957e83a4015eb59d0566539a915c69f168d2b511b190",
+    "target/structural-integrated-libraries-v3/NeoCLR.ClassLibrary.props": "4676969ee1e381f9bbe0cfce799cfe5503a1a7f77968a174782c35a24752e5b7",
+    "target/structural-integrated-libraries-v3/ownership.json": "691bc51df44e8c11d62a8ac814cab45b43e48423719a91efd5c3bbc951c65419"
+  }
+}
