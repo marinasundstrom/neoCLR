@@ -21,12 +21,19 @@ def main():
     parser.add_argument('--output', required=True, type=Path)
     parser.add_argument('--imported', action='store_true', help='Build and consume an artifact-only union library')
     parser.add_argument('--mixed', action='store_true', help='Include a nominal reference alternative')
+    parser.add_argument('--generic', action='store_true', help='Use an imported Response<int> with generic payload storage')
     args = parser.parse_args()
+    if args.generic and not (args.mixed and args.imported):
+        parser.error('--generic requires --mixed --imported')
     project = PROJECT.parent / 'scalar-import-project' if args.imported else PROJECT
     if args.mixed:
         project = PROJECT.parent / ('mixed-import-project' if args.imported else 'mixed-pattern-project')
     library = PROJECT.parent / ('mixed-import-library' if args.mixed else 'scalar-import-library')
     library_name = 'StructuralMixedLibrary' if args.mixed else 'StructuralScalarLibrary'
+    if args.generic:
+        project = PROJECT.parent / 'generic-mixed-import-project'
+        library = PROJECT.parent / 'generic-mixed-import-library'
+        library_name = 'StructuralGenericMixedLibrary'
     library_artifact = library / f'bin/neoclr/{library_name}.dll'
     if (platform.system(), platform.machine()) != ('Darwin', 'arm64'):
         parser.error('This AOT qualification requires macOS ARM64')
@@ -66,7 +73,7 @@ def main():
         unions = [json.JSONDecoder().raw_decode(body[match.end():].lstrip())[0]
                   for match in re.finditer(r'"Union":', body)]
         assert any(len(parts) == 4 and all(t in parts for t in ['Int32', 'Int64', 'Boolean'])
-                   and any(isinstance(t, dict) and 'Named' in t for t in parts) for parts in unions), "Missing native mixed union signature"
+                   and any(isinstance(t, dict) and ('Constructed' in t if args.generic else 'Named' in t) for t in parts) for parts in unions), "Missing native mixed union signature"
     else:
         assert '"Union":["Int32","Int64","Boolean"]' in body, "Missing native union signature"
     for scalar in ['Int32', 'Int64', 'Boolean']:
@@ -116,6 +123,7 @@ int main(void) {
     report = {
         'importedLibrary': args.imported,
         'mixedPayloads': args.mixed,
+        'genericPayload': args.generic,
         'nativeImports': imports.splitlines(),
         'compilerCheckoutRevision': compiler_revision.stdout.strip() if compiler_revision.returncode == 0 else None,
         'runtimeRevision': subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=ROOT, text=True).strip(),
@@ -132,6 +140,8 @@ int main(void) {
                         'no JIT or collector stress',
                         'no throughput claim'],
     }
+    if args.generic:
+        report['checks'].append('imported Response<int> preserves its generic field payload')
     if args.mixed:
         report['checks'].append('nominal reference alternative through a typed match arm')
     else:

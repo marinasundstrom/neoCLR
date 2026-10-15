@@ -100,7 +100,8 @@ native layout gaps.
 
 An [artifact-only mixed library consumer](experiments/native-structural-types/mixed-import-project/README.md)
 also passes imported union returns/parameters and Response property access with
-only the explicit object allocation.
+only the explicit object allocation. The [closed-generic imported variant](experiments/native-structural-types/generic-mixed-import-project/README.md)
+also preserves a stored Response<int> payload through mixed union calls.
 
 The current interpreter admits a null/default union payload. Native bounded
 storage preserves that behavior. It is not a separate named union case and is not

@@ -25,7 +25,8 @@ A [fresh mixed-pattern consumer](experiments/native-structural-types/mixed-patte
 passes seven scalar/reference inputs with only its explicit Response allocation.
 An [artifact-only mixed library consumer](experiments/native-structural-types/mixed-import-project/README.md)
 also passes imported union returns/parameters and Response property access with
-only the explicit object allocation.
+only the explicit object allocation. The [closed-generic imported variant](experiments/native-structural-types/generic-mixed-import-project/README.md)
+also preserves a stored Response<int> payload through mixed union calls.
 
 
 **Type relationships (author direction, 2026-10-14):** TypeInfo assignment, subclass

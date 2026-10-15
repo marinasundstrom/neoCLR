@@ -224,3 +224,11 @@ It imports Response for its typed pattern/property call and allocates only that
 explicit object (16 bytes). [Imported evidence](raven-mixed-import-results.json)
 records both artifacts against the retained bundle. General payload layouts,
 managed JIT/GC, boxing and full Task qualification remain open.
+
+The [imported closed-generic consumer](generic-mixed-import-project/README.md)
+also passes `int | long | bool | Response<int>` through the library boundary.
+Response<T> stores a T field; the consumer reads the instantiated Int32 value and
+uses a distinct reference-arm result. Exact arena use remains 16 bytes for the
+explicit object. [Generic evidence](raven-generic-mixed-import-results.json)
+records both artifacts. This does not qualify bare generic alternatives or all
+open generic methods/constraints.

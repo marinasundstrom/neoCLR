@@ -1,0 +1,33 @@
+public class Response<T> {
+    val Number: T
+
+    init(number: T) {
+        Number = number
+    }
+}
+
+public func Produce(choice: int) -> int | long | bool | Response<int> {
+    if choice == 0 {
+        return -1
+    }
+    if choice == 1 {
+        return 42
+    }
+    if choice == 2 {
+        return 4294967338L
+    }
+    if choice == 3 {
+        return 42L
+    }
+    if choice == 4 {
+        return true
+    }
+    if choice == 5 {
+        return false
+    }
+    return Response<int>(42)
+}
+
+public func Echo(value: Response<int> | bool | long | int) -> int | Response<int> | bool | long {
+    return value
+}
