@@ -11111,3 +11111,12 @@ inside expressions with pending operands. No library ABI, opcode, metadata-forma
 or ordinary .NET conversion change. Raven owns conversion; Index and the runtime
 own validation/failure. See [positive and fault qualification](validation/checked-range/README.md).
 This closes the inclusive-conversion gap above; signed iteration is qualified separately.
+
+
+### Signed integer overflow carry (2026-10-15)
+
+Raven main cf7d7c52b is carried deliberately to codex/neoclr with native portable
+loop guards. Signed int/long progression terminates before out-of-domain addition,
+including overshooting and minimum-valued steps. No native opcode, Runtime Contract,
+metadata-format or library API changes. See [validation and scope](validation/range-iteration/README.md).
+Generic bounds/steppers and the nominal safe-slicing API remain separate follow-ups.

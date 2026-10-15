@@ -4834,3 +4834,11 @@ closed-hierarchy admission and reject CLR-final/value or unresolved/mismatched b
 predicates now have a bounded [qualification record](validation/range-patterns/README.md).
 Checked inclusive Range conversion, safe iteration and generic capability design
 remain subsequent work; this does not reprioritize the platform milestones.
+
+
+The range correctness follow-up now includes [checked inclusive conversion](validation/checked-range/README.md)
+and [signed integer domain termination](validation/range-iteration/README.md), with
+main-first compiler work carried separately to the native line. The author's
+[approved capability direction](design/slicing-capabilities.md) separates Result-based
+safe slicing, optional faulting indexers, bounds and explicit enumerable progressions.
+Public capability APIs and other numeric-domain stepping are not yet implemented.

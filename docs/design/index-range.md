@@ -2,8 +2,9 @@
 
 The [generic bounds review](generic-bounds.md) separates endpoint syntax from generic
 capabilities. Raven main c16fca24c and the deliberate codex/neoclr carry bf5e0abe8
-use exclusive `..` and inclusive `..=`. Native stored/sliced inclusive Range values
-and range patterns still reject pending native lowering support; see the
+use exclusive `..` and inclusive `..=`. Native inclusive Range construction,
+signed range patterns and signed integer overflow-safe progression now have
+separate follow-up qualifications linked from the
 [qualification record](../validation/range-endpoints/README.md).
 
 Author direction (2026-10-10): supply runtime types for Raven's existing indexing

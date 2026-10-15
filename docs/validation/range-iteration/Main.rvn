@@ -1,0 +1,114 @@
+import System.*
+
+func Main() -> int {
+    var count = 0
+    count = 0
+    for value in 2147483646..=2147483647 {
+        count += 1
+        if count > 3 {
+            return 1
+        }
+        continue
+    }
+    if count != 2 {
+        return 11
+    }
+    count = 0
+    for value in 2147483646..=2147483647 by 2 {
+        count += 1
+        if count > 3 {
+            return 2
+        }
+        continue
+    }
+    if count != 1 {
+        return 12
+    }
+    count = 0
+    for value in -2147483647..=-2147483648 by -1 {
+        count += 1
+        if count > 3 {
+            return 3
+        }
+        continue
+    }
+    if count != 2 {
+        return 13
+    }
+    count = 0
+    for value in 0..=-2147483648 by -2147483648 {
+        count += 1
+        if count > 3 {
+            return 4
+        }
+        continue
+    }
+    if count != 2 {
+        return 14
+    }
+    count = 0
+    for value in 9223372036854775806L..=9223372036854775807L {
+        count += 1
+        if count > 3 {
+            return 5
+        }
+        continue
+    }
+    if count != 2 {
+        return 15
+    }
+    count = 0
+    for value in 9223372036854775806L..=9223372036854775807L by 2L {
+        count += 1
+        if count > 3 {
+            return 6
+        }
+        continue
+    }
+    if count != 1 {
+        return 16
+    }
+    count = 0
+    for value in -9223372036854775807L..=-9223372036854775808L by -1L {
+        count += 1
+        if count > 3 {
+            return 7
+        }
+        continue
+    }
+    if count != 2 {
+        return 17
+    }
+    count = 0
+    for value in 0L..=-9223372036854775808L by -9223372036854775808L {
+        count += 1
+        if count > 3 {
+            return 8
+        }
+        continue
+    }
+    if count != 2 {
+        return 18
+    }
+    var order = 0
+    count = 0
+    for value in ({
+        order = order * 10 + 1
+        2147483646
+    })..=({
+        order = order * 10 + 2
+        2147483647
+    }) by ({
+        order = order * 10 + 3
+        1
+    }) {
+        count += 1
+    }
+    if order != 123 || count != 2 {
+        return 30
+    }
+    for value in 2147483647..=2147483647 {
+        break
+    }
+    return 42
+}

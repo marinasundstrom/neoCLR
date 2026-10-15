@@ -112,3 +112,9 @@ Development compiler note: signed int/long range patterns in conditions and matc
 arms now use the same exclusive `..` and inclusive `..=` endpoints on the native
 target. Checked inclusive Range construction is also supported. Bounds for a long subject currently require long literals, such as
 `1L..=3L`.
+
+
+Development signed int/long range loops and comprehensions now stop before
+advancement would overflow, including an inclusive maximum endpoint. Other numeric
+stepping domains retain their existing behavior. Nominal safe-slicing capabilities
+and explicit Interval progressions remain design work, not published APIs.

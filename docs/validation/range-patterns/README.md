@@ -42,9 +42,9 @@ This is correctness evidence, not a throughput claim or cross-platform matrix.
   remain unqualified.
 - The shared binder requires matching endpoint types: use `1L..=3L` for a long
   subject. This is an existing binder rule, not a native-specific restriction.
-- Inclusive stored/sliced System.Range construction still requires checked Index
-  conversion and native Fault transport. Integer loop advancement still needs
-  overflow qualification. Neither gap is closed by pattern comparisons.
+- Inclusive Range construction and signed iteration were separate gaps in this
+  predicate slice. They are now covered by [checked conversion](../checked-range/README.md)
+  and [integer advancement](../range-iteration/README.md) follow-ups.
 
 The initial regression fixture omitted the existing pattern capability, so it
 rejected pattern expressions. Enabling the actual target capability qualifies both

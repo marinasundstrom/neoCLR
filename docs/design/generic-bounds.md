@@ -2,8 +2,9 @@
 
 Status: generic capability/library proposal, 2026-10-15. Raven main now includes
 the general endpoint/terminology migration at `c16fca24c`, carried deliberately to
-`codex/neoclr` as `bf5e0abe8`. Native loops/stored half-open bounds are qualified;
-inclusive Range construction, range patterns and generic library APIs remain pending. The author requested generic bounds and consistent endpoint semantics,
+`codex/neoclr` as `bf5e0abe8`. Native inclusive Range construction, signed range
+patterns and signed integer overflow-safe advancement are now qualified in follow-ups.
+Generic library APIs remain proposed. The author requested generic bounds and consistent endpoint semantics,
 followed by integer iteration, and explicitly parked structural-type work. The
 author then clarified that all known Raven consumers are owned by the project and
 compatibility is not a concern. A coordinated source migration is appropriate;
@@ -261,3 +262,11 @@ The author subsequently approved this separation direction and added safe method
 returning Result versus faulting indexers. See the [concrete contract proposal](slicing-capabilities.md)
 for nominal generic shapes, argument-construction boundaries, receiver ownership,
 .NET/Rust comparisons and validation steps. Names and public APIs are not yet shipped.
+
+
+Signed int/long loop-domain termination is now implemented and
+[qualified](../validation/range-iteration/README.md). The implementation uses
+sign-selected pre-addition checks for both widths rather than widening Int32;
+it preserves the proposed no-wrap/no-extra-item behavior. This does not implement
+stored Interval enumeration or change the current zero-step policy, which remains
+a separate migration from the earlier design proposal.
