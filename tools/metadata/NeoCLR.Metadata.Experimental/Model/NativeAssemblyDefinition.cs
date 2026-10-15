@@ -553,9 +553,9 @@ public sealed partial class NativeAssemblyDefinition
                 {
                     Shape(element, "Function"); Shape(function, "parameters", "returns", "no_result");
                     bool noResult = function.GetProperty("no_result").GetBoolean();
-                    var returns = ReadType(function.GetProperty("returns"), noResult);
+                    var returns = ReadType(function.GetProperty("returns"), noResult, allowComposition: allowComposition);
                     Require(noResult == (returns.Primitive == PrimitiveType.Void), "function result convention mismatch");
-                    return SignatureType.Function(new MethodSignature(returns, Array(function, "parameters", 16).Select(p => ReadType(p, false))));
+                    return SignatureType.Function(new MethodSignature(returns, Array(function, "parameters", 16).Select(p => ReadType(p, false, allowComposition: allowComposition))));
                 }
                 if (element.TryGetProperty("Ptr", out var pointer))
                 {

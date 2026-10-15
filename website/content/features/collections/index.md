@@ -113,3 +113,5 @@ Development follow-up: structural unions are intended for both value and referen
 alternatives. The interpreter now has explicit boxed scalar/nominal value storage
 and copied extraction; native compiler exact conversions and metadata host authoring now support these bounded alternatives. Direct native ref/out slots now support replacement and reads; generic value-wrapper integration is still incomplete. Intersections
 retain nominal interface and extendable-reference bounds.
+
+Development follow-up (2026-10-15): exact native callbacks can return a structural union value; the executable callback sample returns 42. All four source libraries now generate, with full bundle execution still requiring qualification.

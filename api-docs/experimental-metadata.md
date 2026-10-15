@@ -9097,3 +9097,13 @@ reads are enabled; default reads and CLI projection reject it. Nested compositio
 wrapper targets remain rejected by authoring. `IILGenerator.LoadObject` and
 `StoreObject` use the exact structural element signature; writes must satisfy that
 slot's type. These are managed interpreter slots, not native pointer/ABI support.
+
+### Structural callback element reads (2026-10-15 development)
+
+With composition reading enabled, native `SignatureType.Function` parameter and
+result shapes preserve admitted composition elements through declaration
+materialization. Default reads still reject structural compositions. The host
+roundtrip covers a callback accepting and returning a union. Interpreter execution
+is bounded to exact nongeneric callback targets without composition-bearing owners;
+CLI projection of these shapes is unsupported. No nominal delegate or union type
+is synthesized.

@@ -41,6 +41,9 @@ internal static class AuthoredCompositionChecks
         var replace = builder.AddFunction("Replace", new MethodSignature(PrimitiveType.Void, [SignatureType.ByReference(values), values]));
         replace.LoadArgument(0); replace.LoadArgument(1);
         replace.GetILGenerator().StoreObject(values); replace.Return();
+        var callbackType = SignatureType.Function(new MethodSignature(values, [values]));
+        var callbackEcho = builder.AddFunction("CallbackEcho", new MethodSignature(callbackType, [callbackType]));
+        callbackEcho.LoadArgument(0); callbackEcho.Return();
         var valueImage = NativeModuleContainer.WriteLibraryBinary(builder);
         var valueSnapshot = AssemblyDefinition.ReadNativeAssembly(valueImage, true);
         if (!valueSnapshot.MainModule.Functions.Single(f => f.Name == "ValueEcho").TryGetSignature(out var valueSignature) ||
@@ -49,6 +52,9 @@ internal static class AuthoredCompositionChecks
         if (!valueSnapshot.MainModule.Functions.Single(f => f.Name == "Replace").TryGetSignature(out var replaceSignature) ||
             replaceSignature!.ParameterTypes[0].ByReferenceElement?.Composition?.Kind != ReferenceCompositionKind.Union)
             throw new Exception("managed union parameter lost");
+        if (!valueSnapshot.MainModule.Functions.Single(f => f.Name == "CallbackEcho").TryGetSignature(out var callbackSignature) ||
+            callbackSignature!.ReturnType.FunctionSignature?.ReturnType.Composition?.Kind != ReferenceCompositionKind.Union)
+            throw new Exception("callback union result lost");
         Reject(() => AssemblyDefinition.ReadNativeAssembly(valueImage));
         Reject(() => builder.CreateExperimentalReferenceComposition(ReferenceCompositionKind.Intersection, left, PrimitiveType.Int32));
         Reject(() => builder.CreateExperimentalReferenceComposition(ReferenceCompositionKind.Union, left, SignatureType.TypeParameter(0)));

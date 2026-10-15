@@ -317,6 +317,24 @@ pub(crate) fn validate_surface(module: &Module) -> Result<(), Fault> {
                     // element identity. Element addresses/value arrays stay gated.
                     crate::vm::check_type(&Type::ArrayRef(Box::new(ty.clone())), module)?;
                 }
+                Op::BindFunction {
+                    function_type,
+                    target,
+                } if contains(function_type) => {
+                    crate::vm::check_type(function_type, module)?;
+                    if !target.generic_arguments.is_empty()
+                        || target.owner.as_ref().is_some_and(contains)
+                    {
+                        return Err(Fault::new(
+                            "composition callbacks require nongeneric targets without composition owners",
+                        ));
+                    }
+                }
+                Op::Call(target) | Op::CallVirtual(target)
+                    if matches!(&target.owner, Some(Type::Function(_))) =>
+                {
+                    crate::vm::check_type(target.owner.as_ref().unwrap(), module)?;
+                }
                 Op::New(ty) if matches!(ty, Type::Constructed { .. }) && contains(ty) => {
                     crate::vm::check_type(ty, module)?;
                 }

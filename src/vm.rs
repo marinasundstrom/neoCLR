@@ -1500,7 +1500,7 @@ fn check_type_context_seen(
     }
     if cfg!(feature = "experimental-compositions")
         && !crate::compositions::is_compound(ty)
-        && !matches!(ty, Type::Constructed { .. } | Type::ArrayRef(_))
+        && !matches!(ty, Type::Constructed { .. } | Type::ArrayRef(_) | Type::Function(_))
         && !matches!(ty, Type::ByRef(target) | Type::ReadOnlyByRef(target) if crate::compositions::is_compound(target))
         && crate::compositions::contains(ty)
     {

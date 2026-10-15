@@ -107,7 +107,6 @@ fn unsupported_shapes_and_address_operations_fail_admission() {
         "union<Missing,Left>",
         "union<Left>",
         "arrayref<union<Left,Right>>&",
-        "fn<union<Left,Right>,Int32>",
     ] {
         let source = format!(
             ".module Bad\n.entry Main\n{TYPES}\n.function Main() -> Int32\n.local {ty} value\nldc.i4 0\nret\n.end"
@@ -1116,4 +1115,22 @@ fn intersection_managed_parameter_preserves_nominal_dispatch() {
     );
     p.verify().unwrap();
     assert_eq!(p.run(Limits::default()).unwrap().value, Value::Int32(42));
+}
+
+#[cfg(feature = "experimental-compositions")]
+#[test]
+fn callback_roundtrips_union_value_payload() {
+    let p = program(
+        "function.bind fn<Int32,union<Int32,Both>> = Wrap(Int32)\nldc.i4 42\ncall instance fn<Int32,union<Int32,Both>>::Invoke(Int32)\nunbox.any Int32",
+        ".function Wrap(Int32 value) -> union<Int32,Both>\nldarg value\nbox Int32\ncastclass union<Int32,Both>\nret\n.end",
+    );
+    p.verify().unwrap();
+    assert_eq!(p.run(Limits::default()).unwrap().value, Value::Int32(42));
+}
+
+#[cfg(feature = "experimental-compositions")]
+#[test]
+fn callback_union_signature_requires_exact_target() {
+    let source = format!(".module BadCallback\n.entry Main\n{TYPES}\n.function Wrong(Int32 value) -> Int32\nldarg value\nret\n.end\n.function Main() -> Int32\nfunction.bind fn<Int32,union<Int32,Both>> = Wrong(Int32)\npop\nldc.i4 0\nret\n.end");
+    assert!(assemble(&source).is_err());
 }

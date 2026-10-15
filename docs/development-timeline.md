@@ -17732,3 +17732,13 @@ Host authoring and compiler conversions now admit bounded value alternatives.
 Focused validation passes; the full host harness has six unresolved failures.
 System.Web reaches an out-parameter emission boundary; integration remains on the
 feature branches. See the integration notes for evidence and remaining scope.
+
+## 2026-10-15 — Reference alternatives do not make a union a reference
+
+The author clarified: “The union is in itself a value,” even when one or more
+variants contain references. The assistant confirmed that copying a reference
+payload preserves object identity while the union has value semantics. This
+reinforces the existing category correction; it does not select a boxed native ABI.
+The next validated slice preserves structural callback signatures and executes a
+callback returning a union (42). All four native source libraries now generate;
+bundle execution and generic value-wrapper support remain distinct validation work.
