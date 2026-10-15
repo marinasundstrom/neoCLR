@@ -18,7 +18,7 @@ public sealed partial class AssemblyDefinition
     /// <param name="image">Complete PE/#Neo or standalone NEOX native assembly image.</param>
     /// <param name="allowExperimentalCompositions">Explicitly admits bounded read-only Union/Intersection signatures; false preserves the default profile.</param>
     /// <returns>An immutable declaration snapshot retaining the original image.</returns>
-    /// <remarks>The experimental profile admits closed reference compositions in nongeneric free-function and reference-class member signatures, locals and reference-class instance fields. Bodies remain opaque. Callable import and storage require their separate explicit APIs.</remarks>
+    /// <remarks>The experimental profile admits closed reference compositions in nongeneric free-function and reference-class member signatures, locals and record instance fields. Bodies remain opaque. Callable import and storage require their separate explicit APIs.</remarks>
     /// <exception cref="InvalidDataException">The image or composition is invalid or outside the admitted subset.</exception>
     public static AssemblyDefinition ReadNativeAssembly(ReadOnlySpan<byte> image, bool allowExperimentalCompositions)
         => ReadNativeAssembly(image, allowExperimentalCompositions, null);

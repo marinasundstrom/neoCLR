@@ -1151,7 +1151,7 @@ fn structural_intersection_views_require_every_nominal_bound() {
 fn structural_intersection_generic_transport_preserves_conformance_and_identity() {
     let source = include_str!("../../../docs/experiments/native-structural-types/intersection-views.neoil")
         .replace("stloc view", "call Forward<intersection<View,Marker>>(intersection<View,Marker>)\nstloc view");
-    let source = format!("{source}\n.function Forward<T>(!!0 value) -> !!0\nldarg value\nret\n.end\n");
+    let source = format!("{source}\n.type Wrapper<T>\n.field Item T\n.end\n.function Forward<T>(!!0 value) -> !!0\nldarg value\nnewobj Wrapper<!!0>\nldfld 0\nret\n.end\n");
     verify_reference_views(&source);
     verify_reference_views(&source.replace(".implements Marker\n", ""));
 }
@@ -12209,4 +12209,18 @@ fn structural_arrays_reject_default_allocation_and_element_borrows() {
             assert!(!String::from_utf8_lossy(&result.stderr).contains("panicked"));
         }
     }
+}
+
+#[test]
+#[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+fn structural_union_record_fields_retain_callable_receivers() {
+    let source = include_str!("../../../docs/experiments/native-structural-types/callable-union-gc.neoil")
+        .replace(".function Make()", ".type Holder\n.field Value union<fn<Int32>,Int32>\n.end\n.function Make()")
+        .replace(".function Pressure(union<fn<Int32>,Int32> value) -> union<fn<Int32>,Int32>", ".function Pressure(Holder value) -> Holder")
+        .replace(".local union<fn<Int32>,Int32> value", ".local Holder value")
+        .replace("call Make()", "call Make()\nnewobj Holder")
+        .replace("call Pressure(union<fn<Int32>,Int32>)", "call Pressure(Holder)")
+        .replace("ldloc value\nisinst", "ldloc value\nldfld Holder::Value\nisinst")
+        .replace("ldloc value\ncastclass", "ldloc value\nldfld Holder::Value\ncastclass");
+    verify_structural_union_gc(&[(&source, 0)], 656);
 }

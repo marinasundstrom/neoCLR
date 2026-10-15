@@ -219,7 +219,7 @@ impl<'a> Profile<'a> {
                 || t.fields.iter().any(|f| {
                     f.deferred
                         || !(matches!(f.ty, Type::Single | Type::Double | Type::Int32 | Type::Byte | Type::SByte | Type::Int16 | Type::UInt16 | Type::UInt32 | Type::Int64 | Type::UInt64 | Type::IntPtr | Type::UIntPtr | Type::RuntimeTypeHandle | Type::Boolean | Type::Void | Type::String | Type::Char | Type::Named(_) | Type::Tuple(_))
-                            || (references && matches!(&f.ty, Type::Function(_)))
+                            || (references && matches!(&f.ty, Type::Function(_) | Type::Union(_) | Type::Intersection(_)))
                             || (references && matches!(&f.ty, Type::ArrayRef(t) if matches!(**t, Type::Byte | Type::String | Type::Char | Type::Function(_) | Type::Named(_) | Type::Tuple(_) | Type::Union(_) | Type::Intersection(_)) || crate::selection::scalar_array_element(t))))
                 })
             {

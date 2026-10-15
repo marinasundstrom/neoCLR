@@ -266,9 +266,9 @@ pub(crate) fn validate_surface(module: &Module) -> Result<(), Fault> {
                         "compound managed-reference fields are not supported",
                     ));
                 }
-                if !def.is_reference_type || def.representation != Representation::Record {
+                if def.representation != Representation::Record {
                     return Err(Fault::new(
-                        "compound fields require reference-class storage",
+                        "compound fields require record storage",
                     ));
                 }
                 crate::vm::check_type(&field.ty, module)?;

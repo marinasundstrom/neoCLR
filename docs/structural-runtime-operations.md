@@ -282,3 +282,8 @@ is copied; loads reject null, out-of-range and unwritten slots. Native ordinary
 default allocation, element borrows and nominal Array<T> views remain gated.
 The collector reuses conservative initialized-snapshot scanning, not precise
 per-alternative tracing. See the native structural experiment for qualification.
+
+Direct nominal value-record fields may now contain unions/intersections, matching
+closed generic wrapper storage. Record copies copy structural value storage and
+preserve sharing of embedded references. Static composition fields and borrowed
+fields remain gated; see the native experiment for metadata and collector tests.

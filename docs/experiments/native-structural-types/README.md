@@ -501,3 +501,28 @@ The fresh Task union consumer now passes structural-array selection and reaches 
 next gate: the specialized nominal `TaskOutcome<T>.Completed` record contains a
 structural union field, which the native record profile rejects. Full Task AOT/JIT
 execution remains unqualified.
+
+### Structural fields in nominal value records (2026-10-15)
+
+Direct union/intersection record fields now follow the same checked runtime storage
+as closed generic wrappers. This removes a declaration-vs-specialization mismatch:
+`Holder<union<...>>` could execute in the interpreter while its equivalent closed
+record declaration was rejected. Copying the record preserves a value snapshot;
+embedded references still share their referenced objects. No carrier allocation is
+added. Static composition fields and managed-reference fields remain gated.
+
+The native backend recursively lays out and traces these fields. The host metadata
+builder and opted-in reader now admit/preserve them too. Relative to CLR record-field
+semantics, copy and reference-sharing obligations are the same; the field signature
+itself is a neoCLR structural extension. Native checked layouts remain bounded.
+
+Validation: 64 interpreter composition tests, host authored-composition round trips,
+and 13 native structural console tests pass. A callable union inside a record retains
+its receiver through allocating calls under eager/paced collection, with exact
+allocation/reclamation counts and sanitizer-backed cleanup. Intersection generic
+transport now goes through a nominal value wrapper while preserving conformance
+and identity. Full native Task execution remains a separate qualification gate.
+
+The fresh Task consumer now passes record field layout with the standard user-fault
+host binding, and next reaches the runtime's managed value-type method composition
+signature gate. That gate must be aligned before native application qualification.

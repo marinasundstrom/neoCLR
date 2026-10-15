@@ -3031,7 +3031,7 @@ ret
 
 #[test]
 #[cfg(all(target_os = "macos", target_arch = "aarch64"))]
-fn structural_arguments_specialize_generic_methods_and_tuple_fields() {
+fn structural_arguments_specialize_generic_methods_and_record_fields() {
     for (shape, make, extract) in [
         (
             "tuple<Int32,Int64>",
@@ -3049,11 +3049,7 @@ fn structural_arguments_specialize_generic_methods_and_tuple_fields() {
             "ref.isnull\nbrfalse bad\nldc.i4 42\nret\nbad:\nldc.i4 0",
         ),
     ] {
-        let field_roundtrip = if shape.starts_with("tuple") {
-            format!("newobj Box<{shape}>\nldfld 0\n")
-        } else {
-            String::new()
-        };
+        let field_roundtrip = format!("newobj Box<{shape}>\nldfld 0\n");
         let source = format!(
             ".module StructuralGeneric\n.type class abstract System.Object\n.end\n.interface View\n.end\n.interface Marker\n.end\n.type Box<T>\n.field Item T\n.end\n.function Copy<T>(!!0 value) -> !!0\nldarg value\nret\n.end\n.entry Main\n.function Main() -> Int32\n.local {shape} value\n{make}\ncall Copy<{shape}>({shape})\n{field_roundtrip}{extract}\nret\n.end"
         );

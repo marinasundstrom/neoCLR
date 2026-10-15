@@ -124,7 +124,7 @@ fn unsupported_shapes_and_address_operations_fail_admission() {
         assert!(assemble(&source).is_err(), "{body}");
     }
     let source = format!(
-        ".module Bad\n.entry Main\n{TYPES}\n.type Holder\n.field Value union<Left,Right>\n.end\n.function Main() -> Int32\nldc.i4 0\nret\n.end"
+        ".module Bad\n.entry Main\n{TYPES}\n.type Holder\n.field Value union<Left,Right>&\n.end\n.function Main() -> Int32\nldc.i4 0\nret\n.end"
     );
     assert!(assemble(&source).is_err());
 }
@@ -1381,6 +1381,17 @@ fn callable_union_can_contain_a_union_returning_function() {
     let p = program(
         "function.bind fn<Int32,union<Int32,Both>> = Wrap(Int32)\ncastclass union<fn<Int32,union<Int32,Both>>,fn<Int32>>\ncastclass fn<Int32,union<Int32,Both>>\nldc.i4 42\ncall instance fn<Int32,union<Int32,Both>>::Invoke(Int32)\nunbox.any Int32",
         ".function Wrap(Int32 value) -> union<Int32,Both>\nldarg value\nbox Int32\ncastclass union<Int32,Both>\nret\n.end",
+    );
+    p.verify().unwrap();
+    assert_eq!(p.run(Limits::default()).unwrap().value, Value::Int32(42));
+}
+
+#[cfg(feature = "experimental-compositions")]
+#[test]
+fn direct_record_union_fields_preserve_copies_on_replacement() {
+    let p = program(
+        ".local Holder value\n.local Holder before\nldc.i4 1\nbox Int32\ncastclass union<Int32,Both>\nnewobj Holder\nstloc value\nldloc value\nstloc before\nldloca value\ncall Replace(Holder&)\nldloc value\nldfld Holder::Value\nunbox.any Int32\nldloc before\nldfld Holder::Value\nunbox.any Int32\nadd",
+        ".type Holder\n.field Value union<Int32,Both>\n.end\n.function Replace(Holder& value) -> void\nldarg value\nldc.i4 41\nbox Int32\ncastclass union<Int32,Both>\nnewobj Holder\nstobj Holder\nret\n.end",
     );
     p.verify().unwrap();
     assert_eq!(p.run(Limits::default()).unwrap().value, Value::Int32(42));

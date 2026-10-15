@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-15
 
+- Admit structural union/intersection instance fields in nominal value records, aligning direct declarations with already-supported generic wrappers. Preserve copied storage, explicit nominal conformance and collector roots; align native metadata authoring/reading. Static composition fields and managed-reference fields remain rejected.
+
 - Add checked native reserved arrays for structural tuple, union and intersection elements, reusing inline snapshot storage and initialization checks without element boxing. Default allocation, element borrows and nominal array views remain gated; collection retains the existing conservative array scan.
 
 - Admit closed structural generic arguments in native specialization and inline tuple fields in nominal records, retaining recursive layout bounds. Qualify scalar-union, tuple and intersection generic method transport; native Task union delivery still requires structural array support.

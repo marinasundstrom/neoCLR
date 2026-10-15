@@ -698,7 +698,7 @@ public sealed partial class NativeAssemblyDefinition
                 for (int fieldIndex = 0; fieldIndex < type.Fields.Length; fieldIndex++)
                 {
                     var field = type.Fields[fieldIndex];
-                    var storage = ReadType(field.Type, false, allowComposition: allowExperimentalCompositions && !type.IsValueType && !type.IsInterface);
+                    var storage = ReadType(field.Type, false, allowComposition: allowExperimentalCompositions && !type.IsInterface);
                     if (storage.ContainsComposition) signatureGraph.RegisterCompositionStorage(storage);
                     type.Fields[fieldIndex] = field with { Signature = storage };
                     if (type.EnumMembers is null) signatureOwners[typeIndex].AddField(field.Name, storage, field.Visibility, field.IsReadOnly);

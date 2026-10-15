@@ -12,8 +12,9 @@ consumer now passes on freshly rebuilt libraries in interpreter, AOT and managed
 JIT, including eager/paced collection and cleanup before code release. Broader
 conversions and async retention remain open. Closed structural generic arguments
 now pass specialization. Checked structural array storage has collector/fault
-qualification; fresh native Task union compilation next reaches a structural field
-in the nominal TaskOutcome<T>.Completed record. This remains an integration blocker. Written intersection bounds require interfaces or classes open to extension;
+qualification, and structural fields in nominal value records now pass metadata,
+copy and collector checks. Fresh native Task union compilation next reaches the
+managed value-type method signature gate. Full Task qualification remains open. Written intersection bounds require interfaces or classes open to extension;
 Raven sealed hierarchies remain valid. Full open-generic integration, broader
 constraint authoring/reflection and broad JIT/AOT support remain follow-up work.
 Bounded native tuple storage now passes macOS ARM64 AOT copy/call/address and

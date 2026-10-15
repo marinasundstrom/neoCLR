@@ -78,8 +78,19 @@ internal static class AuthoredCompositionChecks
         functionTest.LoadArgument(0); functionTest.Emit(OpCode.Isinst, callbackType);
         functionTest.GetILGenerator().IsNull(); functionTest.Return();
         Reject(() => builder.CreateExperimentalReferenceComposition(ReferenceCompositionKind.Intersection, callbackType, left));
+        var record = builder.AddValueType("Example", "StructuralFields");
+        record.AddField("Union", values);
+        record.AddField("Intersection", intersection);
+        Reject(() => record.AddField("StaticUnion", values, isStatic: true));
         var valueImage = NativeModuleContainer.WriteLibraryBinary(builder);
         var valueSnapshot = AssemblyDefinition.ReadNativeAssembly(valueImage, true);
+        var importedRecord = valueSnapshot.MainModule.Types.Single(t => t.Name == "StructuralFields");
+        if (importedRecord.Fields.Count != 2 ||
+            !importedRecord.Fields.Single(f => f.Name == "Union").TryGetSignature(out var unionField) ||
+            unionField?.Composition?.Kind != ReferenceCompositionKind.Union ||
+            !importedRecord.Fields.Single(f => f.Name == "Intersection").TryGetSignature(out var intersectionField) ||
+            intersectionField?.Composition?.Kind != ReferenceCompositionKind.Intersection)
+            throw new Exception("structural record fields lost");
         if (!valueSnapshot.MainModule.Functions.Single(f => f.Name == "ValueEcho").TryGetSignature(out var valueSignature) ||
             valueSignature!.ReturnType.Composition!.Constituents.All(t => t.Primitive != PrimitiveType.Int32))
             throw new Exception("scalar union alternative lost");

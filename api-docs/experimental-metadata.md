@@ -9148,3 +9148,13 @@ Function constituents now recursively import into consumer ownership through
 `Emit(OpCode.Isinst, functionType)`/`IsInstance(functionType)` accept function shapes;
 ordinary stack verification still requires a reference-compatible input. The host
 regression covers import ownership, type-test emission and nested union results.
+
+### Structural record instance fields (2026-10-15 development)
+
+`TypeBuilder.AddField` now accepts experimental union/intersection signatures in
+value-record instance fields as well as reference classes. The opted-in native
+reader preserves those field signatures; use `FieldDefinition.TryGetSignature`
+to inspect them. Static composition fields and interface instance storage remain
+rejected. Authored signatures retain ownership checks; this does not enable CLI
+projection of structural types. Generic wrappers and direct record declarations
+now follow the same runtime storage rule. The matching runtime/backend is required.
