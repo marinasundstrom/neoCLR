@@ -18,6 +18,8 @@ implementation limits are separate from those semantic contracts.
 | Union | Structural value admitting any listed alternative, including values and references | [Union](unions.md) |
 | Intersection | Structural view requiring every listed nominal contract; interface conformance stays explicit | [Intersection](intersections.md) |
 
+See the [runtime operation guide](https://github.com/marinasundstrom/neoCLR/blob/codex/structural-union-intersection/docs/structural-runtime-operations.md) for union tests/extraction, tuple operations, intersections and callable binding/invocation.
+
 ## Availability
 
 Native unions, intersections and tuples are implemented on the structural feature

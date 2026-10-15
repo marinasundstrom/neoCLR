@@ -1299,9 +1299,13 @@ pub(crate) fn compile_into(
         }) || input
             .types
             .iter()
-            .any(|t| t.is_reference_type && !crate::selection::static_owner(t))
-            || details.is_some_and(|d| !d.empty_record_boxes.is_empty()))
-    {
+            .any(|t| t.is_reference_type && !t.is_abstract && !crate::selection::static_owner(t))
+            || details.is_some_and(|d| {
+                !d.empty_record_boxes.is_empty()
+                    || !d.int32_boxes.is_empty()
+                    || !d.int64_boxes.is_empty()
+                    || !d.boolean_boxes.is_empty()
+            })) {
         let mut sig = module.make_signature();
         sig.params.extend([
             AbiParam::new(types::I64),
@@ -2659,6 +2663,44 @@ pub(crate) fn compile_into(
                     {
                         ()
                     }
+                    Op::BoxValue(_) => {
+                        // The adjacent admitted union cast consumes this scalar;
+                        // no Object box exists or escapes in the native program.
+                    }
+                    Op::CastClass(target) if crate::scalar_unions::supported(target) => {
+                        if let Ty::PendingUnionScalar(scalar) = top() {
+                            let value = pop(&mut stack);
+                            let payload = if b.func.dfg.value_type(value) == types::I64 {
+                                value
+                            } else {
+                                b.ins().uextend(types::I64, value)
+                            };
+                            stack.push(
+                                b.ins()
+                                    .iconst(types::I32, crate::scalar_unions::tag(scalar).unwrap()),
+                            );
+                            stack.push(payload);
+                        }
+                    }
+                    Op::UnboxAny(target) => {
+                        let payload = pop(&mut stack);
+                        let tag = pop(&mut stack);
+                        let null = b.ins().icmp_imm(IntCC::Equal, tag, 0);
+                        let null_status = b.ins().iconst(types::I32, 6);
+                        return_if_detailed(&mut b, null, null_status, site.as_ref());
+                        let mismatch = b.ins().icmp_imm(
+                            IntCC::NotEqual,
+                            tag,
+                            crate::scalar_unions::tag(target).unwrap(),
+                        );
+                        let cast_status = b.ins().iconst(types::I32, 11);
+                        return_if_detailed(&mut b, mismatch, cast_status, site.as_ref());
+                        stack.push(if *target == neoclr::metadata::Type::Int64 {
+                            payload
+                        } else {
+                            b.ins().ireduce(types::I32, payload)
+                        });
+                    }
                     Op::IsInstance(target) | Op::CastClass(target) => {
                         let value = pop(&mut stack);
                         let probe = b.create_block();
@@ -2727,6 +2769,9 @@ pub(crate) fn compile_into(
                         stack.push(result);
                     }
                     Op::ReferenceIsNull => {
+                        if matches!(top(), Ty::ScalarUnion(_)) {
+                            pop(&mut stack);
+                        }
                         let value = pop(&mut stack);
                         let is_null = b.ins().icmp_imm(IntCC::Equal, value, 0);
                         stack.push(b.ins().uextend(types::I32, is_null));

@@ -85,7 +85,7 @@ A closed-to-extension class bound is rejected before emitting an object file.
 Tracing recipes retain one strong reference; collector-stress and dedicated JIT
 intersection execution still need qualification. The failed-cast path uses native
 InvalidCast status 11 and its standard message; legacy nominal cast behavior stays
-unchanged. Native structural union storage remains unsupported.
+unchanged. The subsequent union slices below extend native storage.
 
 ## Native reference-alternative union storage
 
@@ -109,11 +109,39 @@ ensures whole-union boxing cannot be rewritten into an Object payload cast.
 
 This extends CLR-style reference casts with a structural union value contract. The
 benefit for reference-only unions is a single slot with no carrier allocation; the
-cost is runtime membership checks when static guarantees are insufficient. Numeric
-or nominal value alternatives require tagged inline storage and conversions, still
-unimplemented. Existing scalar-box projection happens before typed aggregate
+cost is runtime membership checks when static guarantees are insufficient. Mixed
+reference/value and nominal value alternatives still require additional tagged
+inline storage and conversions. Existing scalar-box projection happens before typed aggregate
 lowering, so simply enabling mixed unions would preserve avoidable heap allocation
 or lose union identity. That pipeline must be addressed before the mixed path is
 admitted. Native reflection, array elements, JIT/collector stress and full Task
 consumer qualification remain open. No general performance claim follows from the
 single-slot layout test.
+
+## Native scalar unions
+
+Unions containing only Int32, Int64 and Boolean now use a private discriminator
+plus a 64-bit numeric payload (two eight-byte backend slots). Neither slot is a
+GC root. An exact adjacent `box T; castclass union<...>` pair retains the scalar
+without allocating an Object box; the original instructions remain available to
+verification and diagnostic positioning. Ordinary Object boxing is unchanged.
+Compared with the current CLR-style boxed source conversion, this avoids an
+allocation and indirection, at the cost of a two-slot copy and exact tag checks.
+This is backend storage, not a stable public union ABI.
+
+The focused `structural_scalar_union` AOT tests compare interpreter execution for
+negative Int32, wide Int64 and Boolean values through local copies and calls/results,
+output replacement, default null tests and failed extraction. The emitted objects
+must have no allocator/runtime imports (C memory intrinsics are permitted).
+A GC-layout test checks that numeric
+payloads cannot become roots. These checks establish allocation elision in these
+closed workloads, not a general throughput or managed-GC performance result.
+
+Extraction currently accepts an immediate union local/argument load or union cast
+before `unbox.any`. More general stack producers, scalar union `isinst`, mixed
+scalar/reference unions and nominal value alternatives remain gated. Whole-union
+boxing, native descriptors, arrays, dedicated JIT/GC stress and full Raven Task
+consumers still block integration. The codegen qualification uses closed-world
+selection, `--compile-system` and `--reference-arena` to admit the source
+System.Object declaration;
+no arena allocation is needed for the scalar payload.

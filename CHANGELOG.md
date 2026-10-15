@@ -8,6 +8,10 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-15
 
+- Document structural runtime operations and record the companion Raven lowering guide, particularly union pattern tests/extraction, nominal case helpers, tuple access and callable binding/invocation; distinguish interpreter evidence from native backend gaps.
+
+- Add bounded native scalar-union tag/payload storage, eliding adjacent exact scalar box/union-cast allocation. Validate copies, calls, output replacement, null and wrong extraction; exclude numeric payloads from GC roots. Mixed payloads and full backend qualification remain open.
+
 - Add bounded native reference-alternative unions as structural values with one copied payload-reference slot and no carrier allocation. AOT/interpreter checks cover either/both/neither nominal conformance, extraction, identity, nulls and output slots. Reject value alternatives pending tagged inline storage, and reject whole-union boxing before it can lose structural identity. Broader native union qualification remains incomplete.
 
 - Add bounded native intersection reference views with all-bound nominal conformance, checked casts, interface dispatch and one-slot tracing. AOT/interpreter checks cover identity, nulls, managed output slots, missing bounds and extendable class bounds; final classes remain rejected. Emit the matching InvalidCast diagnostic for failed intersections and supply its standard native message. Native unions and broader integration qualification remain open.

@@ -103,6 +103,32 @@ pub(super) fn verify(p: &Profile<'_>, flows: &[Stacks]) -> Result<(), Error> {
         }
         f.body = body;
     }
+    // Scalar-union box/cast elision keeps the original box instruction for
+    // verification. Linking renamed the Object root to a private backend name;
+    // the VM verifier still requires its canonical declaration for that opcode.
+    if p.input.functions.iter().any(|f| {
+        f.body
+            .iter()
+            .enumerate()
+            .any(|(pc, _)| crate::scalar_unions::box_pair(f, pc))
+    }) && !p.input.types.iter().any(|t| t.name == "System.Object")
+    {
+        let mut object = p
+            .input
+            .types
+            .iter()
+            .enumerate()
+            .find(|(i, _)| p.is_object_base(&Ty::Reference(*i)))
+            .map(|(_, t)| t.clone())
+            .ok_or("scalar union verification requires the explicit Object root")?;
+        object.name = "System.Object".into();
+        object.definition = None;
+        object.origin = None;
+        projected
+            .get_or_insert_with(|| p.input.clone())
+            .types
+            .push(object);
+    }
     // This copy is only a verification artifact. Code generation, GC plans and
     // diagnostic instruction offsets continue to use the original admitted body.
     neoclr::LoadedProgram::new(projected.as_ref().unwrap_or(p.input))

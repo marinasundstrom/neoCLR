@@ -21,6 +21,8 @@ pub(super) enum Ty {
     Interface(usize),
     Intersection(Vec<Ty>),
     ReferenceUnion(Vec<Ty>),
+    ScalarUnion(Vec<Type>),
+    PendingUnionScalar(Type),
     ByteArray,
     CharacterArray,  // Same pointer-slot layout, distinct element identity.
     StringArray,     // Invocation-owned pointer slots; verified nominal backing enables views.
@@ -644,6 +646,9 @@ impl<'a> Profile<'a> {
             Type::Intersection(parts) if self.references => {
                 Ty::Intersection(parts.iter().map(|t| self.ty(t)).collect::<Result<_, _>>()?)
             }
+            Type::Union(parts) if crate::scalar_unions::supported(t) => {
+                Ty::ScalarUnion(parts.clone())
+            }
             Type::Union(parts) if self.references => {
                 let parts = parts
                     .iter()
@@ -777,7 +782,10 @@ impl<'a> Profile<'a> {
     }
     pub fn pointer_lanes(&self, t: &Ty) -> Vec<bool> {
         match t {
-            Ty::Erased => vec![false, true],
+            Ty::Erased | Ty::ScalarUnion(_) => vec![false, true],
+            Ty::PendingUnionScalar(t) => {
+                self.pointer_lanes(&self.ty(t).expect("admitted union scalar"))
+            }
             Ty::ScalarArray(_)
             | Ty::ReferenceArray(_)
             | Ty::RecordArray(_)
@@ -811,7 +819,7 @@ impl<'a> Profile<'a> {
         match t {
             Ty::Record(i) => self.widths[*i],
             Ty::Tuple(parts) => parts.iter().map(|t| self.lanes(t)).sum(),
-            Ty::Erased => 2,
+            Ty::Erased | Ty::ScalarUnion(_) => 2,
             _ => 1,
         }
     }
@@ -1206,6 +1214,8 @@ impl<'a> Profile<'a> {
                 | Op::ConvertNativeUInt => (),
                 Op::Negate
                 | Op::BitNot
+                | Op::BoxValue(_)
+                | Op::UnboxAny(_)
                 | Op::PackValue(_)
                 | Op::IsValue(_)
                 | Op::UnpackValue(_)
@@ -1371,6 +1381,12 @@ impl<'a> Profile<'a> {
         // Admission is independent of reachability. Never silently trim unsupported IL.
         for (pc, op) in f.body.iter().enumerate() {
             match op {
+                Op::IsInstance(t) if crate::scalar_unions::supported(t) => {
+                    return Err(format!("{} instruction {pc}: scalar union instance tests require tagged conversion lowering", f.name).into());
+                }
+                Op::BoxValue(_) if crate::scalar_unions::box_pair(f, pc) => (),
+                Op::UnboxAny(t) if crate::scalar_unions::tag(t).is_some() => (),
+                Op::CastClass(t) if crate::scalar_unions::supported(t) => (),
                 Op::Arg(n) | Op::ArgumentAddress(n) | Op::StoreArg(n)
                     if *n < self.args[i].len() =>
                 {
@@ -1551,6 +1567,28 @@ impl<'a> Profile<'a> {
                 Ok(())
             };
             match op {
+                Op::BoxValue(t) => {
+                    take(&mut stack, &self.ty(t)?)?;
+                    stack.push(Ty::PendingUnionScalar(t.clone()));
+                }
+                Op::CastClass(t @ Type::Union(parts)) if crate::scalar_unions::supported(t) => {
+                    let source = pop(&mut stack)?;
+                    if !matches!(&source, Ty::PendingUnionScalar(scalar) if parts.contains(scalar))
+                        && source != self.ty(t)?
+                    {
+                        return Err(fail(
+                            pc,
+                            "scalar union injection requires an exact adjacent scalar box or the same union",
+                        ));
+                    }
+                    stack.push(self.ty(t)?);
+                }
+                Op::UnboxAny(t) => {
+                    if !matches!(pop(&mut stack)?, Ty::ScalarUnion(_)) {
+                        return Err(fail(pc, "inline union extraction requires a scalar union"));
+                    }
+                    stack.push(self.ty(t)?);
+                }
                 Op::Int(_) => stack.push(Ty::Int),
                 Op::Int64(_) => stack.push(Ty::Wide),
                 Op::Float64 { .. } => stack.push(Ty::Double),
@@ -1698,7 +1736,8 @@ impl<'a> Profile<'a> {
                 Op::ReferenceIsNull => {
                     if !matches!(
                         pop(&mut stack)?,
-                        Ty::ScalarArray(_)
+                        Ty::ScalarUnion(_)
+                            | Ty::ScalarArray(_)
                             | Ty::ReferenceArray(_)
                             | Ty::RecordArray(_)
                             | Ty::Callable(_)

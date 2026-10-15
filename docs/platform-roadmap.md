@@ -13,7 +13,8 @@ Bounded native tuple storage now passes macOS ARM64 AOT copy/call/address and
 acceptance runner records the exact tested artifacts. This author-directed
 experiment does not change the active performance milestone. Bounded intersection
 reference views and reference-alternative union payloads now have AOT/interpreter
-differential checks; native mixed-value union storage,
+differential checks. Scalar-only Int32/Int64/Boolean unions now have tagged
+inline storage and exact adjacent box/cast elision; native mixed-value union storage,
 managed stress and complete application qualification still block integration.
 
 **Type relationships (author direction, 2026-10-14):** TypeInfo assignment, subclass

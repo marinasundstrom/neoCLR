@@ -94,7 +94,9 @@ The legacy CLI bridge backs two through five alternatives with nominal
 `System.Union` carriers. The native structural feature branches instead emit union
 signatures and support interpreter execution, including value and reference
 alternatives. These are different representations and require matching compiler
-and library artifacts. Native AOT/JIT support remains incomplete.
+and library artifacts. Bounded native AOT checks now cover reference-only unions
+and tagged Int32/Int64/Boolean unions without carrier allocation. Mixed payloads
+and complete AOT/JIT qualification remain open.
 
 [Union API and bridge limits](../../docs/unions.html) ·
 [Tested configuration loader and validation](https://github.com/marinasundstrom/neoCLR/tree/main/docs/experiments/adhoc-error-unions)

@@ -12,6 +12,9 @@ pub fn project(input: &mut neoclr::Module, report: &mut Value) -> Result<(), Err
         .flat_map(|(i, f)| {
             f.body.iter().enumerate().filter_map(move |(pc, op)| {
                 if let Op::BoxValue(ty) = op {
+                    if crate::scalar_unions::box_pair(f, pc) {
+                        return None;
+                    }
                     Some((i, pc, ty.clone()))
                 } else {
                     None
@@ -284,7 +287,9 @@ pub fn project_scalar_queries(input: &mut neoclr::Module, report: &mut Value) ->
                     Op::IsInstance(t @ (Type::Int32 | Type::Int64 | Type::Boolean)) => {
                         Some((i, pc, t.clone(), false))
                     }
-                    Op::UnboxAny(t @ (Type::Int32 | Type::Int64 | Type::Boolean)) => {
+                    Op::UnboxAny(t @ (Type::Int32 | Type::Int64 | Type::Boolean))
+                        if !crate::scalar_unions::query(f, pc) =>
+                    {
                         Some((i, pc, t.clone(), true))
                     }
                     _ => None,

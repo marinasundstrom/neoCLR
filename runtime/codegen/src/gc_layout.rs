@@ -89,6 +89,7 @@ fn slots(p: &Profile<'_>, ty: &Ty) -> Vec<Slot> {
             }
             return result;
         }
+        Ty::ScalarUnion(_) | Ty::PendingUnionScalar(_) => return vec![],
         Ty::Int
         | Ty::Byte
         | Ty::SByte
@@ -382,6 +383,20 @@ mod tests {
             Trace::ByteValues
         ));
     }
+    #[test]
+    fn scalar_union_payloads_are_numeric_and_never_roots() {
+        let module = module();
+        let p = profile(&module);
+        let ty = Ty::ScalarUnion(vec![
+            neoclr::metadata::Type::Int32,
+            neoclr::metadata::Type::Int64,
+        ]);
+        assert_eq!(p.lanes(&ty), 2);
+        assert_eq!(p.bytes(&ty), 16);
+        assert!(slots(&p, &ty).is_empty());
+        assert!(seed_lanes(&p, &ty).is_empty());
+    }
+
     #[test]
     fn local_seeding_clears_erased_tags_and_roots_but_not_integer_lanes() {
         let mut module = module();

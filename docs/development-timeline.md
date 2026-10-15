@@ -17823,3 +17823,21 @@ through nominal `Array<T>`. The assistant distinguished the runtime shape from i
 nominal API representation, preserving one array value contract. The author requested
 that the structural-type website pages remain current; the assistant began reviewing
 those pages against the implemented feature-branch state.
+
+
+## 2026-10-15 — Raven structural lowering and pattern documentation
+
+The author asked for Raven documentation showing exactly how structural source
+types map to runtime types, then emphasized patterns over structural unions.
+The assistant traced the shared match lowerer, portable PatternValue lowering and
+native instruction builder, and added Raven's `docs/compiler/neoclr-structural-lowering.md`.
+It distinguishes source type identity, native signatures, runtime storage and
+nominal union case helpers. The inspection also identifies a remaining native
+scalar-pattern gap: `isinst T` needs tagged scalar-union lowering in addition to
+exact payload extraction. That work is not reported as complete.
+
+The author subsequently requested corresponding runtime details in the neoCLR
+branch, specifically function-type use and testing structural union alternatives.
+The assistant added `docs/structural-runtime-operations.md`, linked from the family
+reference and integration record, covering signatures, operations and backend
+qualification separately.
