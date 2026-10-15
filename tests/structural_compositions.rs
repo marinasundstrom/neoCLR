@@ -367,7 +367,7 @@ ret
 fn generic_composition_rejects_invalid_arguments_and_sealed_bounds() {
     for ty in [
         "intersection<ValueCell<Int32>,Marker<Int32>>",
-        "union<Read<Void>,Marker<Int32>>",
+        "union<Read<Missing>,Marker<Int32>>",
         "intersection<Read<Int32,Int32>,Marker<Int32>>",
     ] {
         let source = format!(".module InvalidGeneric\n.entry Main\n{GENERIC_TYPES}\n.function Main() -> Int32\n.local {ty} value\nldc.i4 42\nret\n.end");
@@ -377,6 +377,7 @@ fn generic_composition_rejects_invalid_arguments_and_sealed_bounds() {
         ("intersection<Cell<Int32>,Marker<Int32>>", false),
         ("intersection<Cell<Int32>,Cell<Int32>>", false),
         ("union<Cell<Int32>,Marker<Int32>>", true),
+        ("union<Read<Void>,Marker<Int32>>", true),
         ("union<Read<union<Read<Int32>,Marker<Int32>>>,Marker<Int32>>", true),
         ("intersection<Read<Cell<Int32>>,Marker<Cell<Int32>>>", true),
     ] {
@@ -473,7 +474,7 @@ ret
 #[cfg(feature = "experimental-compositions")]
 #[test]
 fn composition_wrappers_reject_unsupported_storage_after_substitution() {
-    for (kind, field) in [("class", "T&"), ("", "T")] {
+    for (kind, field) in [("class", "T&"), ("", "T*")] {
         let source = format!(".module InvalidWrapper\n.entry Main\n{TYPES}\n.type {kind} Wrapper<T>\n.field Value {field}\n.end\n.function Main() -> Int32\n.local Wrapper<union<Left,Right>> value\nldc.i4 42\nret\n.end");
         assert!(assemble(&source).is_err(), "{kind} {field}");
     }
@@ -1133,4 +1134,89 @@ fn callback_roundtrips_union_value_payload() {
 fn callback_union_signature_requires_exact_target() {
     let source = format!(".module BadCallback\n.entry Main\n{TYPES}\n.function Wrong(Int32 value) -> Int32\nldarg value\nret\n.end\n.function Main() -> Int32\nfunction.bind fn<Int32,union<Int32,Both>> = Wrong(Int32)\npop\nldc.i4 0\nret\n.end");
     assert!(assemble(&source).is_err());
+}
+
+#[cfg(feature = "experimental-compositions")]
+#[test]
+fn generic_value_wrapper_retains_union_payload() {
+    let p = program(
+        "ldc.i4 42\nbox Int32\ncastclass union<Int32,Both>\nnewobj Holder<union<Int32,Both>>\ncall Echo<Int32>(Holder<union<Int32,Both>>)\nldfld Holder<union<Int32,Both>>::Value\nunbox.any Int32",
+        ".type Holder<T>\n.field Value T\n.end\n.function Echo<T>(Holder<union<Int32,Both>> value) -> Holder<union<Int32,Both>>\nldarg value\nret\n.end",
+    );
+    p.verify().unwrap();
+    assert_eq!(p.run(Limits::default()).unwrap().value, Value::Int32(42));
+}
+
+#[cfg(feature = "experimental-compositions")]
+#[test]
+fn generic_value_factory_preserves_callers_parameter_scope() {
+    let p = program(
+        "ldc.i4 42\nbox Int32\ncastclass union<Int32,Both>\ncall Make<Int32>(union<Int32,Both>)\nldfld Holder<Int32,union<Int32,Both>>::Value\nunbox.any Int32",
+        ".type Holder<T,E>\n.field Value E\n.method static Create(E value) -> Holder<T,E>\nldarg value\nnewobj Holder<T,E>\nret\n.end\n.end\n.function Make<T>(union<Int32,Both> value) -> Holder<T,union<Int32,Both>>\nldarg value\ncall Holder<T,union<Int32,Both>>::Create(union<Int32,Both>)\nret\n.end",
+    );
+    p.verify().unwrap();
+    assert_eq!(p.run(Limits::default()).unwrap().value, Value::Int32(42));
+}
+
+#[cfg(feature = "experimental-compositions")]
+#[test]
+fn generic_callback_preserves_union_payload() {
+    let p = program(
+        "function.bind fn<union<Int32,Both>,union<Int32,Both>> = Echo<Int32>(union<Int32,Both>)\nldc.i4 42\nbox Int32\ncastclass union<Int32,Both>\ncall instance fn<union<Int32,Both>,union<Int32,Both>>::Invoke(union<Int32,Both>)\nunbox.any Int32",
+        ".function Echo<T>(union<Int32,Both> value) -> union<Int32,Both>\nldarg value\nret\n.end",
+    );
+    p.verify().unwrap();
+    assert_eq!(p.run(Limits::default()).unwrap().value, Value::Int32(42));
+}
+
+#[cfg(feature = "experimental-compositions")]
+#[test]
+fn callback_owner_substitution_checks_body_even_when_shape_has_no_union() {
+    for invalid in [false, true] {
+        let operation = if invalid { "sizeof T\npop\n" } else { "" };
+        let source = format!(
+            ".module CallbackOwner\n.entry Main\n{TYPES}\n.type class CallbackBox<T>\n.field Value T\n.method instance Read() -> Int32\n{operation}ldc.i4 42\nret\n.end\n.end\n.function Main() -> Int32\nldc.i4 1\nbox Int32\ncastclass union<Int32,Both>\nnewobj CallbackBox<union<Int32,Both>>\nfunction.bind fn<Int32> = instance CallbackBox<union<Int32,Both>>::Read()\ncall instance fn<Int32>::Invoke()\nret\n.end"
+        );
+        if invalid {
+            assert!(assemble(&source).is_err());
+        } else {
+            let module = assemble(&source).unwrap();
+            let p = LoadedProgram::new(&module).unwrap();
+            p.verify().unwrap();
+            assert_eq!(p.run(Limits::default()).unwrap().value, Value::Int32(42));
+        }
+    }
+}
+
+#[cfg(feature = "experimental-compositions")]
+#[test]
+fn function_with_union_signature_can_be_a_nominal_generic_argument() {
+    let p = program(
+        "function.bind fn<union<Int32,Both>,union<Int32,Both>> = Echo(union<Int32,Both>)\nnewobj CallbackBox<fn<union<Int32,Both>,union<Int32,Both>>>\nldfld CallbackBox<fn<union<Int32,Both>,union<Int32,Both>>>::Value\nldc.i4 42\nbox Int32\ncastclass union<Int32,Both>\ncall instance fn<union<Int32,Both>,union<Int32,Both>>::Invoke(union<Int32,Both>)\nunbox.any Int32",
+        ".type class CallbackBox<T>\n.field Value T\n.end\n.function Echo(union<Int32,Both> value) -> union<Int32,Both>\nldarg value\nret\n.end",
+    );
+    p.verify().unwrap();
+    assert_eq!(p.run(Limits::default()).unwrap().value, Value::Int32(42));
+}
+
+#[cfg(feature = "experimental-compositions")]
+#[test]
+fn inhabited_unit_argument_coexists_with_union_storage() {
+    let p = program(
+        "ldc.i4 42\nbox Int32\ncastclass union<Int32,Both>\nnewobj Holder<Void,union<Int32,Both>>\nldfld Holder<Void,union<Int32,Both>>::Value\nunbox.any Int32",
+        ".type Holder<T,E>\n.field Value E\n.end",
+    );
+    p.verify().unwrap();
+    assert_eq!(p.run(Limits::default()).unwrap().value, Value::Int32(42));
+}
+
+#[cfg(feature = "experimental-compositions")]
+#[test]
+fn managed_value_wrapper_replacement_preserves_prior_copy() {
+    let p = program(
+        ".local Holder<union<Int32,Both>> value\n.local Holder<union<Int32,Both>> before\nldc.i4 1\nbox Int32\ncastclass union<Int32,Both>\nnewobj Holder<union<Int32,Both>>\nstloc value\nldloc value\nstloc before\nldloca value\ncall Replace(Holder<union<Int32,Both>>&)\nldloc value\nldfld Holder<union<Int32,Both>>::Value\nunbox.any Int32\nldloc before\nldfld Holder<union<Int32,Both>>::Value\nunbox.any Int32\nadd",
+        ".type Holder<T>\n.field Value T\n.end\n.function Replace(Holder<union<Int32,Both>>& value) -> void\nldarg value\nldc.i4 41\nbox Int32\ncastclass union<Int32,Both>\nnewobj Holder<union<Int32,Both>>\nstobj Holder<union<Int32,Both>>\nret\n.end",
+    );
+    p.verify().unwrap();
+    assert_eq!(p.run(Limits::default()).unwrap().value, Value::Int32(42));
 }

@@ -115,3 +115,5 @@ and copied extraction; native compiler exact conversions and metadata host autho
 retain nominal interface and extendable-reference bounds.
 
 Development follow-up (2026-10-15): exact native callbacks can return a structural union value; the executable callback sample returns 42. All four source libraries now generate, with full bundle execution still requiring qualification.
+
+Development qualification (2026-10-15): a consumer now compiles and executes HTTP-header checks against the fresh Runtime/Data/Networking/Web bundle. Focused checks cover structural arguments in nominal value wrappers and generic callback substitution; this does not establish all endpoint or backend combinations.

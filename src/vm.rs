@@ -1472,7 +1472,7 @@ pub(crate) fn check_type(ty: &Type, module: &Module) -> Result<(), Fault> {
     check_type_context(ty, module, 0, 0)
 }
 
-fn check_type_context(
+pub(crate) fn check_type_context(
     ty: &Type,
     module: &Module,
     arity: impl Into<SignatureContext>,
@@ -1501,7 +1501,7 @@ fn check_type_context_seen(
     if cfg!(feature = "experimental-compositions")
         && !crate::compositions::is_compound(ty)
         && !matches!(ty, Type::Constructed { .. } | Type::ArrayRef(_) | Type::Function(_))
-        && !matches!(ty, Type::ByRef(target) | Type::ReadOnlyByRef(target) if crate::compositions::is_compound(target))
+        && !matches!(ty, Type::ByRef(target) | Type::ReadOnlyByRef(target) if crate::compositions::is_compound(target) || matches!(target.as_ref(), Type::Constructed { .. }))
         && crate::compositions::contains(ty)
     {
         return Err(Fault::new(
@@ -1588,11 +1588,10 @@ fn check_type_context_seen(
             }
             if crate::compositions::contains(ty) {
                 crate::compositions::check_shape(ty)?;
-                if def.representation != Representation::Interface
-                    && (!def.is_reference_type || def.representation != Representation::Record)
+                if !matches!(def.representation, Representation::Interface | Representation::Record)
                 {
                     return Err(Fault::new(
-                        "composition arguments require a reference class or interface wrapper",
+                        "composition arguments require a record or interface wrapper",
                     ));
                 }
                 // Validate storage after substitution too: a declaration's T[] or T&
