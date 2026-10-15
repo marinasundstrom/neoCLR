@@ -278,3 +278,27 @@ arguments are retained in the current native source catalogue; a build-time repo
 alone is not runtime introspection support. The current open-definition native
 reflection restriction remains a correctness/coverage gap to close, not intended
 neoCLR semantics. This requirement does not resume structural experiments.
+
+## Class-library annotations (2026-10-16)
+
+The following nominal interfaces opt in after signature-polarity validation:
+
+| Annotation | Interfaces |
+| --- | --- |
+| `out T` | Iterator, Iterable, Collection, Sequence, AsyncIterator, AsyncIterable, ConvertibleInto |
+| `in T` | Comparer, EqualityComparer, ComparableTo, EquatableTo |
+
+These roles correspond to .NET's producer/enumerator/read-only collection and
+comparison variance. AsyncIterator's tasks contain bool or unit, not T; only its
+Current getter exposes T. Concrete classes remain invariant, but their declared
+interfaces can supply compatible reference views. Array element storage stays
+invariant. MutableSequence/List, Set/MutableSet, Map/MutableMap, Stack/Queue,
+Sliceable, Closable and Propagatable remain invariant because they consume and
+produce parameters, use invariant value wrappers, or rely on static/Self contracts.
+Result/Option remain invariant nominal values. No result mapping or boxing is
+implied by the annotations; `Sliceable<int[]>` does not thereby become
+`Sliceable<Iterable<int>>`.
+
+The retained [library consumer](../validation/interface-variance/library/Main.rvn)
+exercises imported read-only views and comparison/conversion contracts. Generic
+metadata is retained independently of executable specialization.

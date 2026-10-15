@@ -1,5 +1,5 @@
 module System
 
-public interface ConvertibleInto<T> {
+public interface ConvertibleInto<out T> {
     func Convert() -> T
 }

@@ -132,14 +132,15 @@ incomplete.
 [Tuple contract](../../docs/tuples.html) · [Union contract](../../docs/unions.html) ·
 [Intersection contract](../../docs/intersections.html)
 
-## Interface variance investigation
+## Interface variance (development)
 
-Development runtime work now validates variance metadata and supports bounded
-nominal reference conversions in the interpreter. Native specialization explicitly
-rejects variant interfaces until its dispatch support is ready. Raven interfaces
-remain invariant; this does not yet permit widening Sliceable through its Result
-return type. Writable collections and array elements keep invariant contracts.
+`Iterable<out T>`, `Iterator<out T>`, `Collection<out T>` and `Sequence<out T>`
+permit compatible reference views. AsyncIterable and AsyncIterator also declare
+`out T`. `Comparer<in T>` and `EqualityComparer<in T>` consume compatible reference
+arguments. A mutable collection can expose a wider read-only interface while its
+writable interface stays invariant.
 
-The development metadata SDK can inspect interface variance annotations and preserve
-native snapshots. Authoring through Raven and native AOT/JIT execution remain
-pending; this does not enable implicit Sliceable or Result widening.
+Raven imports and emits these annotations into native metadata. The runtime keeps
+nominal conformance explicit; variance does not box elements or widen Result values.
+Sliceable, mutable collections and array storage remain invariant. Generic metadata
+must remain available independently of native executable specialization.

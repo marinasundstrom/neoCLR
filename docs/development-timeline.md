@@ -18211,3 +18211,24 @@ conversion, range-pattern support and overflow-safe integer advancement remain n
   clear their generic parameter list. That build-time catalogue alone does not
   establish full runtime reflection parity. Runtime generic-definition discovery
   still needs qualification beyond the current closed-token native profile.
+
+## 2026-10-16 — Annotate existing library contracts
+
+- **Author:** directed continuing with variance annotations on existing class-library
+  types after clarifying generic metadata retention.
+- **Assistant action:** audited all generic interfaces; annotated seven output-only
+  and four input-only contracts. Kept concrete classes, mutable containers and
+  invariant wrappers unchanged. Updated matching compiler reference and API pages.
+- **Discovered issues:** imported library qualification exposed native renaming
+  discarding private variance facts, and Raven accepting boxing inside variance.
+  Fixed native preservation with an executable regression; fixed Raven on main
+  (`aefd5d4ed`) then carried it to codex/neoclr (`1e6771d5f`). Thirteen focused
+  semantic tests pass on each line.
+- **Outcome:** all eleven annotation checks and five rejection cases pass. The
+  separately compiled library consumer returns 42 in interpreter, AOT and managed
+  JIT; native fault/root/collection checks pass. Async interfaces are tested as
+  reference views and through acquisition, not asynchronous advancement.
+- **Remaining gaps:** native generic-definition introspection and intrinsic String
+  materialization in differing variant arguments remain documented support gaps;
+  no generic-erasure policy or structural work is authorized by these changes.
+  [Retained evidence](validation/interface-variance/library/README.md).

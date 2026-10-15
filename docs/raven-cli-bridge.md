@@ -11155,3 +11155,19 @@ selectors 17/18/19 identify generic parameters/covariance/contravariance; use a
 matching runtime/library bundle. Existing Runtime Contract configuration is unchanged.
 Native closed-world queries return false for these selectors on closed types;
 open-definition inventory remains an interpreter reflection capability.
+
+### Class-library variance annotations (2026-10-16)
+
+Native metadata now declares `out T` on Iterator, Iterable, Collection, Sequence,
+AsyncIterator, AsyncIterable and ConvertibleInto, and `in T` on Comparer,
+EqualityComparer, ComparableTo and EquatableTo. Matching CLI reference declarations
+preserve those flags. Raven imports the native annotation; no Runtime Contract
+option or runtime wrapper is introduced. Concrete classes, mutable collections,
+arrays, Result and Sliceable remain invariant. A generic class may still supply
+wider read-only interface views through its explicit implementations.
+
+General boxing-in-variance rejection was fixed on Raven main (`aefd5d4ed`) and
+carried deliberately to `codex/neoclr` (`1e6771d5f`); thirteen focused tests pass on
+both lines. Native nominal renaming preserves private variance facts instead of
+losing them through metadata serialization. This is a preservation bug fix, not a
+change to the reified generic model. See the retained library qualification.

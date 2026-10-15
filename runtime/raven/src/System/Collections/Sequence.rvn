@@ -1,5 +1,5 @@
 module System.Collections
 
-public interface Sequence<T> : Collection<T> {
+public interface Sequence<out T> : Collection<T> {
     val self[index: int]: T { get }
 }

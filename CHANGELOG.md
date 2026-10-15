@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-16
 
+- Annotate eleven class-library interfaces for reference variance: Iterator/Iterable/Collection/Sequence, async iterator/source and ConvertibleInto are covariant; comparison/equality interfaces are contravariant. Keep concrete classes, mutable collections, array storage, Sliceable and Result invariant. Qualify native imported calls and async reference views in interpreter/AOT/JIT, all eleven metadata annotations, five rejected conversions and native GC cleanup. Refresh matching CLI and native API references. Raven's boxing-in-variance fix is validated on main and deliberately carried to codex/neoclr.
+
 - Preserve native interface variance and contract-slot facts across private nominal renaming. A row-preserving rewrite now remaps retained argument types rather than losing compiler metadata during serialization; a focused executable regression covers variant dispatch after an unrelated nominal rewrite.
 
 - Expose guest `GenericParameterTypeInfo.Variance` and `GenericVariance` for open type-definition arguments, preserving ordinary method `ParameterInfo.IsOut` semantics. Update both native/source snapshot providers, matching CLI reference and native API documentation. A fresh Raven consumer returns 42 for all three annotations and concrete closed arguments; focused query and native closed-shape tests pass. Native open-definition reflection remains a support gap, not permission to erase generic metadata; record the author's .NET-aligned preservation requirement.

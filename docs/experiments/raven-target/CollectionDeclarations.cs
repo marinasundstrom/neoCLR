@@ -105,20 +105,20 @@ static class CollectionDeclarations
                 public void Set(K key, V value) { }
                 public Iterator<KeyValuePair<K, V>> GetIterator() => default;
             }
-            public interface AsyncIterable<T> { AsyncIterator<T> GetAsyncIterator(); }
-            public interface AsyncIterator<T> : AsyncDisposable {
+            public interface AsyncIterable<out T> { AsyncIterator<T> GetAsyncIterator(); }
+            public interface AsyncIterator<out T> : AsyncDisposable {
                 Concurrency.Tasks.Task<bool> MoveNextAsync();
                 T Current { get; }
             }
-            public interface Iterable<T> { Iterator<T> GetIterator(); }
-            public interface Iterator<T> : Disposable {
+            public interface Iterable<out T> { Iterator<T> GetIterator(); }
+            public interface Iterator<out T> : Disposable {
                 bool MoveNext();
                 T Current { get; }
             }
-            public interface Collection<T> : Iterable<T> {
+            public interface Collection<out T> : Iterable<T> {
                 int Count { get; }
             }
-            public interface Sequence<T> : Collection<T> {
+            public interface Sequence<out T> : Collection<T> {
                 T this[int index] { get; }
             }
             public interface MutableSequence<T> : Sequence<T> {

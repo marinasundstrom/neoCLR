@@ -1,0 +1,13 @@
+import System.*
+import System.Collections.*
+
+interface Animal { }
+class Dog : Animal { }
+
+func ReverseProducer(value: Sequence<Animal>) -> Sequence<Dog> => value
+func ReverseConsumer(value: Comparer<Dog>) -> Comparer<Animal> => value
+func MutableAlias(value: MutableSequence<Dog>) -> MutableSequence<Animal> => value
+func ImplicitBoxing(value: Iterable<int>) -> Iterable<Object> => value
+func SliceResultWidening(value: Sliceable<Dog[]>) -> Sliceable<Animal[]> => value
+
+func Main() -> int => 42

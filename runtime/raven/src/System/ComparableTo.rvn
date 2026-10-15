@@ -1,5 +1,5 @@
 module System
 
-public interface ComparableTo<T> {
+public interface ComparableTo<in T> {
     func CompareTo(other: T) -> int
 }

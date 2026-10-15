@@ -1,6 +1,6 @@
 module System.Collections
 
-public interface Iterator<T> : System.Disposable {
+public interface Iterator<out T> : System.Disposable {
     func MoveNext() -> bool
     val Current: T { get }
 }

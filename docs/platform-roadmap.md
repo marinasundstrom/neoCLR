@@ -4854,6 +4854,6 @@ restrictions that protect writable state and validate nested parameter positions
 The [research and staged plan](design/interface-variance.md) now has validated
 runtime metadata and bounded interpreter reference conversions, with a
 [retained consumer](validation/interface-variance/README.md). Native specialization now retains verified interface/slot identities; the separately compiled Raven consumer passes interpreter, AOT and managed JIT. SDK annotation authoring, inspection, CLI/native projection and snapshot round trips
-are supported. Raven annotation transport and native dispatch qualification are validated; library annotations and guest introspection remain. The current author-directed scope is minimal
-reference-only interface variance; result-value widening is deferred. Standard library interfaces and Result remain invariant. This does not resume
+are supported. Raven annotation transport and native dispatch qualification are validated; guest generic-parameter introspection and eleven audited library annotations are qualified. Native open-definition reflection and intrinsic String variance materialization remain explicit gaps. The current author-directed scope is minimal
+reference-only interface variance; result-value widening is deferred. Read-only producer/comparison interfaces opt into variance; mutable contracts, Result and Sliceable remain invariant. This does not resume
 structural-type work or change unrelated milestone priorities.

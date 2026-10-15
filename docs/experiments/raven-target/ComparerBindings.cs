@@ -8,8 +8,8 @@ static class ComparerBindings
     static readonly string[] Kinds = ["Comparer", "EqualityComparer", "FunctionComparer", "FunctionEqualityComparer"];
     public const string Declarations = """
         namespace Collections {
-            public interface Comparer<T> { int Compare(T left, T right); }
-            public interface EqualityComparer<T> { bool Equals(T left, T right); int GetHashCode(T value); }
+            public interface Comparer<in T> { int Compare(T left, T right); }
+            public interface EqualityComparer<in T> { bool Equals(T left, T right); int GetHashCode(T value); }
             public sealed class FunctionComparer<T> : Comparer<T> {
                 public FunctionComparer(Func<T,T,int> compare) { }
                 public int Compare(T left, T right) => default;

@@ -1,0 +1,226 @@
+{
+  "passed": true,
+  "commands": [
+    {
+      "label": "metadata",
+      "command": [
+        "dotnet",
+        "run",
+        "--project",
+        "/Users/robert/Projects/neoclr/docs/validation/interface-variance/library/MetadataCheck.csproj",
+        "-p:WarningLevel=0",
+        "--",
+        "/Users/robert/Projects/neoclr/target/variance-libraries-20261016-final/System.Runtime.dll"
+      ],
+      "exitCode": 0,
+      "logSha256": "87d926b3b6f1a5e57691d4e96e7a702979ef27443bb1fd6227d47f4d710ef243",
+      "output": "{\n  \"ArrayList\": [\n    \"Invariant\"\n  ],\n  \"Result\": [\n    \"Invariant\",\n    \"Invariant\"\n  ],\n  \"Array\": [\n    \"Invariant\"\n  ],\n  \"Sliceable\": [\n    \"Invariant\"\n  ],\n  \"ConvertibleInto\": [\n    \"Covariant\"\n  ],\n  \"Set\": [\n    \"Invariant\"\n  ],\n  \"List\": [\n    \"Invariant\"\n  ],\n  \"Map\": [\n    \"Invariant\",\n    \"Invariant\"\n  ],\n  \"Iterator\": [\n    \"Covariant\"\n  ],\n  \"AsyncIterable\": [\n    \"Covariant\"\n  ],\n  \"EqualityComparer\": [\n    \"Contravariant\"\n  ],\n  \"AsyncIterator\": [\n    \"Covariant\"\n  ],\n  \"Collection\": [\n    \"Covariant\"\n  ],\n  \"Comparer\": [\n    \"Contravariant\"\n  ],\n  \"Iterable\": [\n    \"Covariant\"\n  ],\n  \"MutableSequence\": [\n    \"Invariant\"\n  ],\n  \"ComparableTo\": [\n    \"Contravariant\"\n  ],\n  \"EquatableTo\": [\n    \"Contravariant\"\n  ],\n  \"Sequence\": [\n    \"Covariant\"\n  ]\n}\n"
+    },
+    {
+      "label": "rejected",
+      "command": [
+        "dotnet",
+        "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+        "neoclr",
+        "--project",
+        "/Users/robert/Projects/neoclr/target/variance-library-final/rejected/App.rvnproj"
+      ],
+      "exitCode": 1,
+      "logSha256": "18e85a46fc7e62e46234a01c8e37c9ea2997392aa9343f74b2504d0554ca8b58",
+      "output": "/Users/robert/Projects/neoclr/target/variance-library-final/rejected/Main.rvn(7,67): error RAV1503: Cannot convert from 'Sequence<Animal>' to 'Sequence<Dog>'\n/Users/robert/Projects/neoclr/target/variance-library-final/rejected/Main.rvn(8,67): error RAV1503: Cannot convert from 'Comparer<Dog>' to 'Comparer<Animal>'\n/Users/robert/Projects/neoclr/target/variance-library-final/rejected/Main.rvn(9,78): error RAV1503: Cannot convert from 'MutableSequence<Dog>' to 'MutableSequence<Animal>'\n/Users/robert/Projects/neoclr/target/variance-library-final/rejected/Main.rvn(10,66): error RAV1503: Cannot convert from 'Iterable<int>' to 'Iterable<object>'\n/Users/robert/Projects/neoclr/target/variance-library-final/rejected/Main.rvn(11,77): error RAV1503: Cannot convert from 'Sliceable<Dog[]>' to 'Sliceable<Animal[]>'\n"
+    },
+    {
+      "label": "compile",
+      "command": [
+        "dotnet",
+        "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+        "neoclr",
+        "--project",
+        "/Users/robert/Projects/neoclr/target/variance-library-final/project/App.rvnproj"
+      ],
+      "exitCode": 0,
+      "logSha256": "d8d898304fb59d062b34e82e55c6f7553cdb1d910515b5abb8274e466b836cc9",
+      "output": "Native build output: /Users/robert/Projects/neoclr/target/variance-library-final/project/bin/neoclr/LibraryVarianceConsumer.dll\n"
+    },
+    {
+      "label": "interpreter",
+      "command": [
+        "/Users/robert/Projects/neoclr/target/debug/neoclr",
+        "run",
+        "/Users/robert/Projects/neoclr/target/variance-library-final/project/bin/neoclr/LibraryVarianceConsumer.dll",
+        "--execution",
+        "interpreter",
+        "--system",
+        "/Users/robert/Projects/neoclr/target/variance-libraries-20261016-final/System.runtime.neox",
+        "--object-root",
+        "/Users/robert/Projects/neoclr/target/variance-libraries-20261016-final/System.Runtime.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/variance-libraries-20261016-final/System.Runtime.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/variance-libraries-20261016-final/System.Data.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/variance-libraries-20261016-final/System.Networking.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/variance-libraries-20261016-final/System.Web.dll"
+      ],
+      "exitCode": 42,
+      "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "output": ""
+    },
+    {
+      "label": "aot",
+      "command": [
+        "/Users/robert/Projects/neoclr/target/debug/neoclr-codegen",
+        "--closed-world",
+        "/Users/robert/Projects/neoclr/target/variance-library-final/project/bin/neoclr/LibraryVarianceConsumer.dll",
+        "@entry",
+        "/Users/robert/Projects/neoclr/target/variance-library-final/app.o",
+        "--system",
+        "/Users/robert/Projects/neoclr/target/variance-libraries-20261016-final/System.runtime.neox",
+        "--object-root",
+        "/Users/robert/Projects/neoclr/target/variance-libraries-20261016-final/System.Runtime.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/variance-libraries-20261016-final/System.Runtime.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/variance-libraries-20261016-final/System.Data.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/variance-libraries-20261016-final/System.Networking.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/variance-libraries-20261016-final/System.Web.dll",
+        "--compile-system",
+        "--reference-arena",
+        "--bind-user-fault",
+        "--native-gc",
+        "--native-stack-budget"
+      ],
+      "exitCode": 0,
+      "logSha256": "0e2845d28ac08ca87ae0b0c105166c41a60af6e27641791dc19e9c1f3201d98c",
+      "output": "(selection manifest in local aot.log)"
+    },
+    {
+      "label": "link-aot",
+      "command": [
+        "clang",
+        "-isysroot",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.2.sdk",
+        "-arch",
+        "arm64",
+        "-std=c11",
+        "-O2",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-I",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console",
+        "-DNEOCLR_NATIVE_GC",
+        "-fsanitize=undefined,bounds",
+        "/Users/robert/Projects/neoclr/docs/validation/interface-variance/native-host.c",
+        "/Users/robert/Projects/neoclr/target/variance-library-final/app.o",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-gc.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/root-probe.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/text-arena.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-stack.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-fault-details/render.c",
+        "-o",
+        "/Users/robert/Projects/neoclr/target/variance-library-final/app"
+      ],
+      "exitCode": 0,
+      "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "output": ""
+    },
+    {
+      "label": "execute-aot",
+      "command": [
+        "/Users/robert/Projects/neoclr/target/variance-library-final/app"
+      ],
+      "exitCode": 42,
+      "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "output": ""
+    },
+    {
+      "label": "link-jit",
+      "command": [
+        "clang",
+        "-isysroot",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.2.sdk",
+        "-arch",
+        "arm64",
+        "-std=c11",
+        "-O2",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-I",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console",
+        "-DNEOCLR_NATIVE_GC",
+        "-DJIT_HOST",
+        "-dynamiclib",
+        "/Users/robert/Projects/neoclr/docs/validation/interface-variance/native-host.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-gc.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/root-probe.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/text-arena.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-stack.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-fault-details/render.c",
+        "-o",
+        "/Users/robert/Projects/neoclr/target/variance-library-final/host.dylib"
+      ],
+      "exitCode": 0,
+      "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "output": ""
+    },
+    {
+      "label": "jit",
+      "command": [
+        "/Users/robert/Projects/neoclr/target/debug/neoclr-codegen",
+        "--jit-managed",
+        "--closed-world",
+        "/Users/robert/Projects/neoclr/target/variance-library-final/project/bin/neoclr/LibraryVarianceConsumer.dll",
+        "@entry",
+        "/Users/robert/Projects/neoclr/target/variance-library-final/host.dylib",
+        "--system",
+        "/Users/robert/Projects/neoclr/target/variance-libraries-20261016-final/System.runtime.neox",
+        "--object-root",
+        "/Users/robert/Projects/neoclr/target/variance-libraries-20261016-final/System.Runtime.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/variance-libraries-20261016-final/System.Runtime.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/variance-libraries-20261016-final/System.Data.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/variance-libraries-20261016-final/System.Networking.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/variance-libraries-20261016-final/System.Web.dll",
+        "--compile-system",
+        "--reference-arena",
+        "--bind-user-fault",
+        "--native-gc",
+        "--native-stack-budget"
+      ],
+      "exitCode": 0,
+      "logSha256": "8c7545f316952f6dffc514bf4397b4297f3823eea9fd90fc4157ded274b8a78a",
+      "output": "JIT_RESULT {\"compileAndFinalizeSeconds\":0.986237334,\"guestExitCode\":42,\"invocationSeconds\":0.0001025,\"metadataLoadSeconds\":0.596822458,\"profile\":\"macos-arm64-jit-managed-v1\",\"selectionAndVerificationSeconds\":14.905411875}\n"
+    }
+  ],
+  "jit": {
+    "compileAndFinalizeSeconds": 0.986237334,
+    "guestExitCode": 42,
+    "invocationSeconds": 0.0001025,
+    "metadataLoadSeconds": 0.596822458,
+    "profile": "macos-arm64-jit-managed-v1",
+    "selectionAndVerificationSeconds": 14.905411875
+  },
+  "files": {
+    "/Users/robert/Projects/neoclr/docs/validation/interface-variance/library/Main.rvn": "3f907a4bc123efcf7ee5f61ad68d6365aa33f8706a477e8ed04264c14c3d7e70",
+    "/Users/robert/Projects/neoclr/docs/validation/interface-variance/library/Rejected.rvn": "4b7c9d4a1463ee173ae53dad04c38f5e983a65ddfb7876820550222cf36aee3c",
+    "/Users/robert/Projects/neoclr/docs/validation/interface-variance/library/MetadataCheck.cs": "a3a78494c39370de2b75bfaa5104c59d2bfaf8b9b001c84706df64257b21e0b8",
+    "/Users/robert/Projects/neoclr/docs/validation/interface-variance/native-host.c": "04a248b7ba4bba159f7ff143db709e8c93297cec917d5a4ddfe83d03cb9a5ddf",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll": "f1431a3369e999abdc6e6842e219189cb61cce67c32d40c1ab795fea2f7d9253",
+    "/Users/robert/Projects/Raven/src/Raven.Compiler/bin/Debug/net10.0/Raven.CodeAnalysis.dll": "43c52d2c82827d0d85ff01a3b23b1c29e00c6eba7fab25821f791ade2770a29d",
+    "/Users/robert/Projects/neoclr/target/debug/neoclr-codegen": "26a532d24b80e9bd64296cc5c1ddcda6dc3c0fdc1648f1ff7a7e1b69efd57788",
+    "/Users/robert/Projects/neoclr/target/debug/neoclr": "ddb5b04d3b30a52368a57c2c6cc6f025151b5ed575b0775bd1adcaf9bd6c59fb",
+    "/Users/robert/Projects/neoclr/target/variance-library-final/project/bin/neoclr/LibraryVarianceConsumer.dll": "02c746364059ce539a6263c77f9c5d5e83bacf260299496b96345db706770acc",
+    "/Users/robert/Projects/neoclr/target/variance-libraries-20261016-final/bundle.json": "5fd3c5ddd501c2b213aa71698039d5fef29ca40834f2f7c44ed23caf459013c1"
+  },
+  "ravenRevision": "1e6771d5f",
+  "runtimeBaseRevision": "229cc95ff",
+  "scope": "Eleven library interface annotations; reference views, async acquisition, five unsafe conversion rejections; interpreter/AOT/JIT and native GC cleanup"
+}

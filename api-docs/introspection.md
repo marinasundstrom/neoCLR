@@ -76,9 +76,11 @@ typeof(List<int>).AssignableFrom(list)
 typeof(Object).IsInstanceOfType(42)
 ```
 
-Closed generic arguments and array elements remain invariant in the current runtime.
-Function shapes compare by identity and are assignable to Object. Generic variance,
-array covariance and open-generic constraint queries are not supported yet.
+Declared nominal interface variance admits compatible reference conversions between
+closed generic arguments; value arguments remain exact. Concrete generic classes
+and mutable array elements remain invariant. Function shapes compare by identity
+and are assignable to Object. Array covariance and open-generic constraint queries
+are not supported yet.
 These queries inspect types available in the loaded program; they do not load types
 or authorize reflective construction or invocation.
 

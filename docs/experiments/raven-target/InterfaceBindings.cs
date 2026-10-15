@@ -4,10 +4,10 @@ static class InterfaceBindings
 {
     public const string Declarations = "\n" + """
         #nullable enable annotations
-        public interface EquatableTo<T> { bool Equals(T other); }
+        public interface EquatableTo<in T> { bool Equals(T other); }
         #nullable restore annotations
-        public interface ComparableTo<T> { int CompareTo(T other); }
-        public interface ConvertibleInto<T> { T Convert(); }
+        public interface ComparableTo<in T> { int CompareTo(T other); }
+        public interface ConvertibleInto<out T> { T Convert(); }
         public interface Clonable { object Clone(); }
         public interface Closable<E> { Result<PropagationUnit,E> Close(); }
         """;

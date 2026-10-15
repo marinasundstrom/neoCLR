@@ -3,7 +3,7 @@ module System.Collections
 import System.Concurrency.Tasks.*
 
 /// A single-consumer asynchronous cursor. Do not overlap advancement or disposal.
-public interface AsyncIterator<T> : System.AsyncDisposable {
+public interface AsyncIterator<out T> : System.AsyncDisposable {
     /// Advances to the next item, completing with false at the end of the source.
     /// Await completion before reading Current or starting another operation.
     func MoveNextAsync() -> Task<bool>

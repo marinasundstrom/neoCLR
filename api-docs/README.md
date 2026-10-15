@@ -2162,3 +2162,18 @@ namespace reference. The descriptor reflects declaration annotations; ordinary
 method ParameterInfo flags remain separate. See [reflection](reflection.md).
 The native open-definition discovery gap remains explicit and is not an intentional
 generic erasure policy.
+
+### Annotated library variance (2026-10-16)
+
+The eleven producer/comparison interface declarations now expose their variance in
+both the CLI reference and native API snapshot. The fresh five-library bundle is
+`target/variance-libraries-20261016-final`, compiled with Raven `1e6771d5f`.
+Mutable/class/value-wrapper contracts remain invariant. The matching native audit
+retains all namespace pages and updates TypeInfo assignment documentation for
+supported reference variance. See the [qualification](../docs/validation/interface-variance/library/README.md).
+
+RavenDoc currently omits `in`/`out` from interface signature headings. The
+[manual variance reference](interface-variance.md), linked from the API landing page,
+records all eleven exact declarations; generated remarks also state the annotation.
+No public type/member is excluded. Fixing the renderer qualifier omission is a
+separate documentation-tooling gap; metadata retention and compilation are tested.

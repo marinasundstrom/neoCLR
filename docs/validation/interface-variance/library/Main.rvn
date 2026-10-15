@@ -1,0 +1,74 @@
+import System.*
+import System.Collections.*
+import System.Concurrency.Tasks.*
+
+interface Animal {
+    val Value: int { get }
+}
+
+class Dog : Animal {
+    val Value: int => 42
+}
+
+class AnimalPolicy : Comparer<Animal>, EqualityComparer<Animal>, ComparableTo<Animal>, EquatableTo<Animal> {
+    func Compare(left: Animal, right: Animal) -> int => left.Value - right.Value
+    func Equals(left: Animal, right: Animal) -> bool => left.Value == right.Value
+    func GetHashCode(value: Animal) -> int => value.Value
+    func CompareTo(other: Animal) -> int => other.Value
+    func Equals(other: Animal) -> bool => other.Value == 42
+}
+
+class DogSource : ConvertibleInto<Dog> {
+    func Convert() -> Dog => Dog()
+}
+
+class DogAsyncCursor : AsyncIterator<Dog> {
+    func MoveNextAsync() -> Task<bool> => Task.FromResult(true)
+    val Current: Dog => Dog()
+    func DisposeAsync() -> Task<()> => Task.CompletedTask
+}
+
+class DogAsyncSource : AsyncIterable<Dog> {
+    func GetAsyncIterator() -> AsyncIterator<Dog> => DogAsyncCursor()
+}
+
+func Main() -> int {
+    let dog = Dog()
+    let dogs = ArrayList<Dog>()
+    dogs.Add(dog)
+    let sequence: Sequence<Animal> = dogs
+    let collection: Collection<Animal> = dogs
+    let iterable: Iterable<Animal> = dogs
+    if sequence[0].Value != 42 || collection.Count != 1 {
+        return 1
+    }
+    let cursor: Iterator<Animal> = dogs.GetIterator()
+    if !cursor.MoveNext() || cursor.Current.Value != 42 {
+        return 2
+    }
+    cursor.Dispose()
+    for animal in iterable {
+        if animal.Value != 42 {
+            return 3
+        }
+    }
+    let policy = AnimalPolicy()
+    let comparer: Comparer<Dog> = policy
+    let equality: EqualityComparer<Dog> = policy
+    let comparable: ComparableTo<Dog> = policy
+    let equatable: EquatableTo<Dog> = policy
+    if comparer.Compare(dog, dog) != 0 || !equality.Equals(dog, dog) {
+        return 4
+    }
+    if equality.GetHashCode(dog) != 42 || comparable.CompareTo(dog) != 42 || !equatable.Equals(dog) {
+        return 5
+    }
+    // This checks reference-view conversion and acquisition, not asynchronous advancement.
+    let asyncSource: AsyncIterable<Animal> = DogAsyncSource()
+    let asyncCursor: AsyncIterator<Animal> = asyncSource.GetAsyncIterator()
+    if !(asyncCursor is AsyncIterator<Dog>) {
+        return 6
+    }
+    let source: ConvertibleInto<Animal> = DogSource()
+    return source.Convert().Value
+}

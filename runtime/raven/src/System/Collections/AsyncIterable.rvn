@@ -1,7 +1,7 @@
 module System.Collections
 
 /// A pull-based asynchronous source. Each iterator has an independent lifetime.
-public interface AsyncIterable<T> {
+public interface AsyncIterable<out T> {
     /// Acquires an iterator. The consumer must await its disposal after use.
     /// Cancellation policy belongs to the source; acquisition itself is synchronous.
     func GetAsyncIterator() -> AsyncIterator<T>

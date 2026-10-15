@@ -1,5 +1,5 @@
 module System
 
-public interface EquatableTo<T> {
+public interface EquatableTo<in T> {
     func Equals(other: T) -> bool
 }
