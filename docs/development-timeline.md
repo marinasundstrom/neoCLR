@@ -18090,3 +18090,20 @@ conversion, range-pattern support and overflow-safe integer advancement remain n
   finish this slicing slice first, then assess variance separately. This is an
   investigation direction, not a decision to introduce variance or change mutable
   collection contracts. Structural work remains parked.
+
+- **Author refinements:** supplied `Sliceable<int[]>` versus
+  `Sliceable<Iterable<int>>`, observed that .NET is limiting, then said “Yes, we
+  should go further.” Subsequently cautioned “Some limits might still be useful,
+  perhaps” and linked Microsoft's covariance/contravariance guide.
+- **Assistant assessment:** the array itself is a reference implementing the
+  iterable contract; the integer element is not the variance obstacle. The outer
+  Result conversion requires separate support. Proposed keeping writable aliases
+  invariant and validating nested input/output roles, while exploring nominal
+  result-value conversion and interface call adapters. Recorded primary sources,
+  current invariant metadata APIs, Result's propagation/out-parameter complications,
+  alternatives and staged acceptance in [the variance investigation](design/interface-variance.md).
+  No variance behavior or annotation is implemented by this design record.
+- **Completed slicing outcome:** commit `4fa617ee7` adds the nominal capability;
+  positive/error/fault consumers pass interpreter, AOT and JIT, with native
+  post-call collection checks. `d51531378` separately repairs stale API links;
+  the complete website check passes 4,333 pages. Structural implementation stays parked.

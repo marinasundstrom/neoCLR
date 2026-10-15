@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-15
 
+- Record the author-directed variance investigation: use Sliceable<int[]> to Sliceable<Iterable<int>> as an acceptance case, compare .NET and Scala, retain mutable-slot invariance and distinguish interface reference views from Result value conversions. Document metadata, propagation/output-slot, dispatch, backend and performance requirements; no variance implementation is claimed.
+
 - Repair API reference links left behind by nominal carrier retirement: remove retired Union carrier xrefs, format generic names as code and link repository-only qualification documents to their source pages. Website validation passes all 4,333 pages; runtime behavior is unchanged.
 
 - Record the author-approved separation of bounds, nominal slicing and explicit progression enumeration. Propose a Result-returning Sliceable method and optional faulting range indexer with shared validation, explicit copy/view ownership and a .NET/Rust comparison. Implement System.Sliceable<TSlice> using the existing InvalidRangeError, with explicit Array<T>/ArrayList<T> conformance and independent shallow copies. ArrayList bounds use Count, not Capacity; declared range indexers delegate to the safe method, and intrinsic array slicing shares Range.TryGetOffsetAndLength through its faulting wrapper. Validate fresh native libraries and consumers in interpreter/AOT/JIT, including invalid-bound faults and native collector cleanup. Refresh the CLI documentation reference and on-site API contract; the regenerated reference also drops previously retired extra Union scaffold arities. Interval/progression APIs remain proposals.

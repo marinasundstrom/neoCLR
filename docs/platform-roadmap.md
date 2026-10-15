@@ -4845,3 +4845,13 @@ System.Sliceable<TSlice> now provides the nominal safe slicing capability, with
 Array<T>/ArrayList<T> implementations and faulting range indexers sharing Range
 validation; see [native qualification](validation/sliceable/README.md). Generic
 Interval/progression APIs and other numeric-domain stepping remain unimplemented.
+
+
+**Variance follow-up (author direction, 2026-10-15):** investigate nominal interface
+variance and safe result-value conversion beyond .NET's reference-only model,
+using Sliceable<int[]> to Sliceable<Iterable<int>> as an acceptance case. Retain
+restrictions that protect writable state and validate nested parameter positions.
+The [research and staged plan](design/interface-variance.md) is a proposal; native
+interfaces and Result remain invariant today. Start with metadata/conversion
+inventory and a bounded reference-only interface proof. This does not resume
+structural-type work or change unrelated milestone priorities.
