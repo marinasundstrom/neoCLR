@@ -132,8 +132,14 @@ A separate artifact-only library consumer also passes mixed union returns and
 parameters with reordered alternatives and the same explicit-object allocation.
 An imported Response<int> alternative also preserves its generic field value
 through the union return, parameter and typed pattern.
-Object/scalar-interface views requiring boxing, nominal-value and
-intrinsic String alternatives remain unsupported by this native lowering. Whole-union boxing is also rejected pending structural boxed identity;
+Closed nominal value records, optionally combined with Int32/Int64/Boolean, now
+use a tag and disjoint inline payload regions, with inactive regions zeroed.
+Tests cover exact nominal identity, field snapshots and embedded reference
+identity with no payload-box allocation. The total layout is limited to 256 lanes;
+its size is the sum of alternatives, so overlapping-storage optimization remains
+future work. Records combined with direct reference alternatives, enums,
+Object/scalar-interface views requiring boxing and intrinsic String alternatives
+remain unsupported by this native lowering. Whole-union boxing is also rejected pending structural boxed identity;
 it must not silently become a cast of the payload to Object. Native union descriptor
 reflection, array elements, dedicated JIT/collector stress and full Task application
 qualification remain open. These are implementation gaps, not restrictions on the

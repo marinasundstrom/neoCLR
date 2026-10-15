@@ -5,6 +5,7 @@ use serde_json::{Value, json};
 type Error = Box<dyn std::error::Error>;
 
 pub fn project(input: &mut neoclr::Module, report: &mut Value) -> Result<(), Error> {
+    let module: &neoclr::Module = input;
     let sites: Vec<_> = input
         .functions
         .iter()
@@ -12,7 +13,7 @@ pub fn project(input: &mut neoclr::Module, report: &mut Value) -> Result<(), Err
         .flat_map(|(i, f)| {
             f.body.iter().enumerate().filter_map(move |(pc, op)| {
                 if let Op::BoxValue(ty) = op {
-                    if crate::scalar_unions::box_pair(f, pc) {
+                    if crate::scalar_unions::box_pair(module, f, pc) {
                         return None;
                     }
                     Some((i, pc, ty.clone()))
@@ -275,6 +276,7 @@ pub fn project_char_tests(input: &mut neoclr::Module, report: &mut Value) -> Res
 /// Checked scalar box queries. A missing producer is a nonmatching type, never a
 /// permission to reinterpret a different box payload.
 pub fn project_scalar_queries(input: &mut neoclr::Module, report: &mut Value) -> Result<(), Error> {
+    let module: &neoclr::Module = input;
     let sites: Vec<_> = input
         .functions
         .iter()
@@ -285,12 +287,12 @@ pub fn project_scalar_queries(input: &mut neoclr::Module, report: &mut Value) ->
                 .enumerate()
                 .filter_map(move |(pc, op)| match op {
                     Op::IsInstance(t @ (Type::Int32 | Type::Int64 | Type::Boolean))
-                        if !crate::scalar_unions::query(f, pc) =>
+                        if !crate::scalar_unions::query(module, f, pc) =>
                     {
                         Some((i, pc, t.clone(), false))
                     }
                     Op::UnboxAny(t @ (Type::Int32 | Type::Int64 | Type::Boolean))
-                        if !crate::scalar_unions::query(f, pc) =>
+                        if !crate::scalar_unions::query(module, f, pc) =>
                     {
                         Some((i, pc, t.clone(), true))
                     }

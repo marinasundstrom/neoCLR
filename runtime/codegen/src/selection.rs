@@ -810,8 +810,8 @@ fn retained_types(
             if let Op::StaticField { owner, .. } | Op::SetStaticField { owner, .. } = op {
                 pending_types.push(owner.clone());
             }
-            if matches!(op, Op::BoxValue(_))
-                || matches!(op, Op::IsInstance(t) if crate::scalar_unions::tag(t).is_some() && crate::scalar_unions::query(f, pc))
+            if matches!(op, Op::BoxValue(_) | Op::UnboxAny(_))
+                || matches!(op, Op::IsInstance(t) if (crate::scalar_unions::tag(t).is_some() || crate::scalar_unions::record(input, t)) && crate::scalar_unions::query(input, f, pc))
             {
                 // The VM verification view of scalar tests returns Object even
                 // when this native union never allocates a boxed payload.

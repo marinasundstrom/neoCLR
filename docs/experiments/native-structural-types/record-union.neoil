@@ -1,0 +1,141 @@
+.module RecordUnion
+.type class abstract System.Object
+.end
+.type Pair
+.field Left Int32
+.field Right Int64
+.end
+.type Twin
+.field Left Int32
+.field Right Int64
+.end
+.type Measure
+.field Number Double
+.end
+.entry Main
+.function Echo(union<Pair,Twin,Measure,Int32> value) -> union<Pair,Twin,Measure,Int32>
+ldarg value
+ret
+.end
+.function Copy(union<Pair,Twin,Measure,Int32> value, out union<Pair,Twin,Measure,Int32>& result) -> Void
+ldarg result
+ldarg value
+stobj union<Pair,Twin,Measure,Int32>
+ldvoid
+ret
+.end
+.function Main() -> Int32
+.local Pair original
+.local Pair result
+.local Measure measurement
+.local union<Pair,Twin,Measure,Int32> value
+.local union<Pair,Twin,Measure,Int32> copy
+ldloca original
+initobj Pair
+ldloca original
+ldc.i4 -42
+stfld Pair::Left
+pop
+ldloca original
+ldc.i8 4294967338
+stfld Pair::Right
+pop
+ldloc original
+box Pair
+castclass union<Pair,Twin,Measure,Int32>
+call Echo(union<Pair,Twin,Measure,Int32>)
+stloc value
+ldloc value
+ldloca copy
+call Copy(union<Pair,Twin,Measure,Int32>,union<Pair,Twin,Measure,Int32>&)
+pop
+ldloca original
+ldc.i4 99
+stfld Pair::Left
+pop
+ldloc copy
+isinst Twin
+ref.isnull
+brfalse Bad
+ldloc copy
+isinst Pair
+ref.isnull
+brtrue Bad
+ldloc copy
+unbox.any Pair
+stloc result
+ldloc result
+ldfld Pair::Left
+ldc.i4 -42
+ceq
+brfalse Bad
+ldloc result
+ldfld Pair::Right
+ldc.i8 4294967338
+ceq
+brfalse Bad
+ldc.i4 42
+box Int32
+castclass union<Pair,Twin,Measure,Int32>
+stloc value
+ldloc value
+isinst Pair
+ref.isnull
+brfalse Bad
+ldloc value
+unbox.any Int32
+ldc.i4 42
+ceq
+brfalse Bad
+ldloca measurement
+initobj Measure
+ldloca measurement
+ldc.r8 1.25
+stfld Measure::Number
+pop
+ldloc measurement
+box Measure
+castclass union<Pair,Twin,Measure,Int32>
+stloc value
+ldloc value
+unbox.any Measure
+ldfld Measure::Number
+ldc.r8 1.25
+ceq
+brfalse Bad
+ldloca value
+initobj union<Pair,Twin,Measure,Int32>
+ldloc value
+ref.isnull
+brfalse Bad
+ldc.i4 42
+ret
+Bad:
+ldc.i4 -1
+ret
+.end
+.function Wrong() -> Int32
+.local Pair pair
+.local union<Pair,Twin,Measure,Int32> value
+ldloca pair
+initobj Pair
+ldloc pair
+box Pair
+castclass union<Pair,Twin,Measure,Int32>
+stloc value
+ldloc value
+unbox.any Twin
+pop
+ldc.i4 -1
+ret
+.end
+.function Null() -> Int32
+.local union<Pair,Twin,Measure,Int32> value
+ldloca value
+initobj union<Pair,Twin,Measure,Int32>
+ldloc value
+unbox.any Pair
+pop
+ldc.i4 -1
+ret
+.end

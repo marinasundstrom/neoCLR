@@ -232,3 +232,49 @@ uses a distinct reference-arm result. Exact arena use remains 16 bytes for the
 explicit object. [Generic evidence](raven-generic-mixed-import-results.json)
 records both artifacts. This does not qualify bare generic alternatives or all
 open generic methods/constraints.
+
+## Nominal value-record union alternatives (2026-10-15)
+
+The native backend now admits unions of closed nominal value records, optionally
+with Int32, Int64 and Boolean alternatives. These unions remain structural values;
+the record alternatives retain their nominal identity. Equal field layouts do
+not make two different record declarations the same alternative.
+
+The private representation is one discriminator slot followed by one inline
+payload region per alternative. Injection copies the active record and zeroes
+every inactive region. Extraction checks the exact nominal discriminator before
+returning a field snapshot. Calls, out copies and local replacement use the full
+layout. References inside a record keep their usual identity; copying a record
+does not clone the objects it references. Recursive tracing recipes preserve each
+region's field offsets and exclude numeric fields. A pending record injection
+also retains its reference tracing. These recipes are not collector stress tests.
+
+This extends the CLR-style `box; castclass union`/`unbox.any` instruction sequence:
+the exact adjacent injection pair avoids allocating a box or union carrier.
+Ordinary Object boxing is unchanged. The tradeoff is that storage uses the sum of
+alternative sizes plus a tag, rather than overlapping their fields. Inactive
+reference regions are unambiguously null, at the cost of extra copy/zero work.
+The existing 256-lane inline limit includes the union tag and every payload;
+254 payload lanes plus one scalar and tag fit, while 255 exceed the limit.
+Overlapping storage requires separate GC and performance qualification before it
+can replace this layout. No throughput improvement or stable external ABI is claimed.
+
+`record-union.neoil` checks numeric/floating fields, snapshot independence, out
+copies, returns, exact nominal tests, replacement and null/wrong extraction.
+`record-reference-union.neoil` checks embedded object identity, mutation visibility,
+null fields and extraction failures against the interpreter. Its eight native
+paths allocate only the explicit Cell object where present (16 bytes); the union
+and record payload add no allocation. A separate record-only test checks unions
+without scalar alternatives. Reproduce with:
+
+```sh
+cargo test -p neoclr-codegen --lib value_union
+cargo test -p neoclr-codegen --test values --test console structural_record_union
+```
+
+Qualification is macOS ARM64 with the existing native fixture hosts. Native
+verification also retains/restores Object for unbox-only entry points, preserving
+the VM verifier contract without emitting an Object allocation. A fresh Raven
+record-union consumer, records combined with direct reference alternatives, enums,
+whole-union boxing, managed JIT/GC and full Task/throughput qualification remain
+open. Compiler emission and Runtime Contract configuration are unchanged.

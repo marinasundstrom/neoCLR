@@ -11924,3 +11924,12 @@ fn structural_mixed_union_keeps_numeric_bits_separate_from_references() {
     assert!(String::from_utf8_lossy(&denied.stderr).contains("boxed-payload classification"), "{}", String::from_utf8_lossy(&denied.stderr));
     assert!(!dir.0.join("app.o").exists());
 }
+
+#[test]
+#[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+fn structural_record_union_preserves_embedded_reference_identity() {
+    verify_reference_views_with_arena(
+        include_str!("../../../docs/experiments/native-structural-types/record-reference-union.neoil"),
+        Some([16, 16, 0, 0, 16, 0, 16, 16]),
+    );
+}

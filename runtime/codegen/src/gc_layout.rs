@@ -64,9 +64,9 @@ fn slots(p: &Profile<'_>, ty: &Ty) -> Vec<Slot> {
                 trace: Trace::ErasedText { tag_lane: 0 },
             }];
         }
-        Ty::Tuple(parts) => {
+        Ty::Tuple(parts) | Ty::ValueUnion(parts) => {
             let mut result = vec![];
-            let mut offset = 0;
+            let mut offset = usize::from(matches!(ty, Ty::ValueUnion(_)));
             for ty in parts {
                 for mut slot in slots(p, ty) {
                     slot.lane += offset;
@@ -95,7 +95,8 @@ fn slots(p: &Profile<'_>, ty: &Ty) -> Vec<Slot> {
             }
             return result;
         }
-        Ty::ScalarUnion(_) | Ty::PendingUnionScalar(_) | Ty::ScalarUnionTest => return vec![],
+        Ty::PendingUnionScalar(t) => return slots(p, &p.ty(t).expect("admitted union payload")),
+        Ty::ScalarUnion(_) | Ty::ScalarUnionTest => return vec![],
         Ty::Int
         | Ty::Byte
         | Ty::SByte
@@ -413,6 +414,98 @@ mod tests {
             Trace::ByteValues
         ));
     }
+    #[test]
+    fn value_union_payload_regions_preserve_record_roots_and_bounds() {
+        use neoclr::metadata::Type;
+        let mut module = module();
+        let mut cell = module.types[0].clone();
+        cell.name = "Cell".into();
+        cell.is_reference_type = true;
+        cell.fields.clear();
+        let mut payload = module.types[0].clone();
+        payload.name = "Payload".into();
+        let mut number = payload.fields[0].clone();
+        number.name = "Number".into();
+        number.ty = Type::Int64;
+        let mut reference = number.clone();
+        reference.name = "Reference".into();
+        reference.ty = Type::Named("Cell".into());
+        payload.fields = vec![number.clone(), reference];
+        let mut other = payload.clone();
+        other.name = "OtherPayload".into();
+        module.types = vec![cell, payload, other];
+        module.functions.clear();
+        let p = profile(&module);
+        let union = p
+            .ty(&Type::Union(vec![
+                Type::Int32,
+                Type::Named("Payload".into()),
+                Type::Named("OtherPayload".into()),
+            ]))
+            .unwrap();
+        assert_eq!(p.lanes(&union), 6);
+        assert_eq!(seed_lanes(&p, &union), vec![3, 5]);
+        assert_eq!(
+            slots(&p, &union),
+            vec![
+                Slot {
+                    lane: 3,
+                    trace: Trace::Object(0)
+                },
+                Slot {
+                    lane: 5,
+                    trace: Trace::Object(0)
+                }
+            ]
+        );
+        assert_eq!(
+            seed_lanes(&p, &Ty::Tuple(vec![Ty::Wide, union])),
+            vec![4, 6]
+        );
+        assert_eq!(
+            slots(&p, &Ty::PendingUnionScalar(Type::Named("Payload".into()))),
+            vec![Slot {
+                lane: 1,
+                trace: Trace::Object(0)
+            }]
+        );
+        for fields in [14, 15] {
+            let mut chunk = module.types[1].clone();
+            chunk.name = "Chunk".into();
+            chunk.fields = (0..16)
+                .map(|i| {
+                    let mut field = number.clone();
+                    field.name = format!("F{i}");
+                    field
+                })
+                .collect();
+            let mut tail = chunk.clone();
+            tail.name = "Tail".into();
+            tail.fields.truncate(fields);
+            module.types.truncate(3);
+            module.types.push(chunk);
+            module.types.push(tail);
+            module.types[1].fields = (0..16)
+                .map(|i| {
+                    let mut field = number.clone();
+                    field.name = format!("F{i}");
+                    field.ty = Type::Named(if i == 15 { "Tail" } else { "Chunk" }.into());
+                    field
+                })
+                .collect();
+            let p = profile(&module);
+            let union = p.ty(&Type::Union(vec![
+                Type::Int32,
+                Type::Named("Payload".into()),
+            ]));
+            if fields == 14 {
+                assert_eq!(p.lanes(&union.unwrap()), 256);
+            } else {
+                assert!(union.unwrap_err().to_string().contains("inline lane limit"));
+            }
+        }
+    }
+
     #[test]
     fn scalar_union_payloads_are_numeric_and_never_roots() {
         let module = module();

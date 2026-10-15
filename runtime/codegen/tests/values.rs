@@ -2968,3 +2968,62 @@ fn structural_scalar_union_pattern_tests_preserve_exact_types_and_null() {
         );
     }
 }
+
+#[test]
+#[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+fn structural_record_union_snapshots_calls_and_exact_extraction() {
+    let source = include_str!("../../../docs/experiments/native-structural-types/record-union.neoil");
+    for (entry, status, fault) in [
+        ("Main", 0, None),
+        ("Wrong", 11, Some(neoclr::FaultCode::InvalidCast)),
+        ("Null", 6, Some(neoclr::FaultCode::NullReference)),
+    ] {
+        let m = neoclr::assemble(&source.replace(".entry Main", &format!(".entry {entry}"))).unwrap();
+        let reference = neoclr::run(&m, neoclr::Limits::default());
+        if let Some(fault) = fault { assert_eq!(reference.unwrap_err().code, fault); }
+        else { assert_eq!(reference.unwrap().value, neoclr::Value::Int32(42)); }
+        native_mode_flags(&neoclr::metadata_container::write_module(&m).unwrap(), 0,
+            status, if status == 0 { 42 } else { 12345 }, "@entry", true,
+            &["--compile-system", "--reference-arena"]);
+    }
+}
+
+#[test]
+#[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+fn structural_record_union_without_scalar_alternatives() {
+    let source = r#"
+.module RecordOnly
+.type class abstract System.Object
+.end
+.type First
+.field Value Int32
+.end
+.type Second
+.field Value Int32
+.end
+.entry Main
+.function Main() -> Int32
+.local union<First,Second> value
+ldc.i4 42
+newobj First
+box First
+castclass union<First,Second>
+stloc value
+ldloc value
+isinst Second
+ref.isnull
+brfalse Bad
+ldloc value
+unbox.any First
+ldfld First::Value
+ret
+Bad:
+ldc.i4 -1
+ret
+.end
+"#;
+    let m = neoclr::assemble(source).unwrap();
+    assert_eq!(neoclr::run(&m, neoclr::Limits::default()).unwrap().value, neoclr::Value::Int32(42));
+    native_mode_flags(&neoclr::metadata_container::write_module(&m).unwrap(), 0, 0, 42,
+        "@entry", true, &["--compile-system", "--reference-arena"]);
+}

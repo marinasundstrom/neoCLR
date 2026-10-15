@@ -46,6 +46,10 @@ use profile::{Profile, Ty};
 fn lanes(p: &Profile<'_>, t: &Ty) -> Vec<ir::Type> {
     match t {
         Ty::Tuple(parts) => parts.iter().flat_map(|t| lanes(p, t)).collect(),
+        Ty::ValueUnion(parts) => std::iter::once(types::I32)
+            .chain(parts.iter().flat_map(|t| lanes(p, t)))
+            .collect(),
+        Ty::PendingUnionScalar(t) => lanes(p, &p.ty(t).expect("admitted union payload")),
         Ty::Double => vec![types::F64],
         Ty::Single => vec![types::F32],
         Ty::Record(i) if !p.input.types[*i].fields.is_empty() => p.input.types[*i]
@@ -2667,6 +2671,66 @@ pub(crate) fn compile_into(
                         // The adjacent admitted union cast consumes this scalar;
                         // no Object box exists or escapes in the native program.
                     }
+                    Op::CastClass(target) if matches!(p.ty(target)?, Ty::ValueUnion(_)) => {
+                        if let Ty::PendingUnionScalar(payload_type) = top() {
+                            let payload_type = p.ty(payload_type)?;
+                            let Ty::ValueUnion(parts) = p.ty(target)? else {
+                                unreachable!()
+                            };
+                            let payload = stack.split_off(stack.len() - p.lanes(&payload_type));
+                            let active = parts
+                                .iter()
+                                .position(|part| *part == payload_type)
+                                .expect("admitted exact payload");
+                            stack.push(b.ins().iconst(types::I32, active as i64 + 1));
+                            for (index, part) in parts.iter().enumerate() {
+                                if index == active {
+                                    stack.extend(payload.iter().copied());
+                                } else {
+                                    stack.extend(
+                                        lanes(&p, part).into_iter().map(|ty| zero(&mut b, ty)),
+                                    );
+                                }
+                            }
+                        }
+                    }
+                    Op::IsInstance(target) | Op::UnboxAny(target)
+                        if matches!(top(), Ty::ValueUnion(_)) =>
+                    {
+                        let Ty::ValueUnion(parts) = top() else {
+                            unreachable!()
+                        };
+                        let values = stack.split_off(stack.len() - p.lanes(top()));
+                        let target_type = p.ty(target)?;
+                        let active = parts.iter().position(|part| *part == target_type);
+                        let expected = active.map_or(-1, |i| i as i64 + 1);
+                        if matches!(op, Op::IsInstance(_)) {
+                            let matched = b.ins().icmp_imm(IntCC::Equal, values[0], expected);
+                            stack.push(b.ins().uextend(types::I32, matched));
+                        } else {
+                            let null = b.ins().icmp_imm(IntCC::Equal, values[0], 0);
+                            let status = b.ins().iconst(types::I32, 6);
+                            return_if_detailed(&mut b, null, status, site.as_ref());
+                            let mismatch = b.ins().icmp_imm(IntCC::NotEqual, values[0], expected);
+                            let status = b.ins().iconst(types::I32, 11);
+                            return_if_detailed(&mut b, mismatch, status, site.as_ref());
+                            if let Some(index) = active {
+                                let offset = 1 + parts[..index]
+                                    .iter()
+                                    .map(|part| p.lanes(part))
+                                    .sum::<usize>();
+                                stack.extend_from_slice(
+                                    &values[offset..offset + p.lanes(&target_type)],
+                                );
+                            } else {
+                                stack.extend(
+                                    lanes(&p, &target_type)
+                                        .into_iter()
+                                        .map(|ty| zero(&mut b, ty)),
+                                );
+                            }
+                        }
+                    }
                     Op::CastClass(target)
                         if crate::scalar_unions::supported(target)
                             && (matches!(
@@ -2810,6 +2874,9 @@ pub(crate) fn compile_into(
                         stack.push(result);
                     }
                     Op::ReferenceIsNull => {
+                        if matches!(top(), Ty::ValueUnion(_)) {
+                            stack.truncate(stack.len() - p.lanes(top()) + 1);
+                        }
                         if matches!(top(), Ty::MixedUnion(_)) {
                             pop(&mut stack);
                         }

@@ -95,8 +95,10 @@ Mixed Int32/Int64/Boolean plus nominal reference alternatives now use a separate
 reference slot alongside tag/numeric payload; see the [mixed storage qualification](experiments/native-structural-types/README.md#mixed-scalarreference-union-storage-2026-10-15).
 A [fresh mixed Raven consumer](experiments/native-structural-types/mixed-pattern-project/README.md)
 passes seven scalar/reference inputs in interpreter and AOT, allocating only its
-explicit Response object. Nominal-value and intrinsic String alternatives remain
-native layout gaps.
+explicit Response object. Closed nominal value-record alternatives now have bounded inline storage with
+exact identity tests and copied field snapshots; see the [record-union qualification](experiments/native-structural-types/README.md#nominal-value-record-union-alternatives-2026-10-15).
+Combining records with direct reference alternatives and intrinsic String alternatives
+remain native layout gaps.
 
 An [artifact-only mixed library consumer](experiments/native-structural-types/mixed-import-project/README.md)
 also passes imported union returns/parameters and Response property access with

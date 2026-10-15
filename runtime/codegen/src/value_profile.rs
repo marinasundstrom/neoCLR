@@ -22,6 +22,7 @@ pub(super) enum Ty {
     Intersection(Vec<Ty>),
     ReferenceUnion(Vec<Ty>),
     ScalarUnion(Vec<Type>),
+    ValueUnion(Vec<Ty>), // Discriminator plus disjoint, zeroed inactive payload regions.
     MixedUnion(Vec<Ty>), // Tag, numeric bits, and a separate nullable reference slot.
     PendingUnionScalar(Type),
     ScalarUnionTest, // Ephemeral non-null discriminator, consumed only by ref.isnull.
@@ -267,7 +268,7 @@ impl<'a> Profile<'a> {
                 ) -> Result<(), Error> {
                     match ty {
                         Ty::Record(child) => layout(p, *child, states)?,
-                        Ty::Tuple(parts) => {
+                        Ty::Tuple(parts) | Ty::ValueUnion(parts) => {
                             for part in parts {
                                 dependencies(p, part, states)?;
                             }
@@ -277,6 +278,9 @@ impl<'a> Profile<'a> {
                     Ok(())
                 }
                 dependencies(p, &ty, states)?;
+                if matches!(ty, Ty::ValueUnion(_)) && p.lanes(&ty) > crate::limits::INLINE_LANES {
+                    return Err("value union exceeds flattened inline lane limit".into());
+                }
                 p.layouts[i].push(width);
                 width += p.lanes(&ty);
                 if !p.input.types[i].is_reference_type && width > crate::limits::INLINE_LANES {
@@ -654,6 +658,17 @@ impl<'a> Profile<'a> {
             {
                 Ty::ScalarUnion(parts.clone())
             }
+            Type::Union(parts) if crate::scalar_unions::records(self.input, t) => {
+                let parts = parts
+                    .iter()
+                    .map(|t| self.ty(t))
+                    .collect::<Result<Vec<_>, _>>()?;
+                let ty = Ty::ValueUnion(parts);
+                if self.lanes(&ty) > crate::limits::INLINE_LANES {
+                    return Err("value union exceeds flattened inline lane limit".into());
+                }
+                ty
+            }
             Type::Union(parts) if self.references => {
                 let parts = parts
                     .iter()
@@ -671,7 +686,7 @@ impl<'a> Profile<'a> {
                             Ty::Int | Ty::Wide | Ty::Bool | Ty::Reference(_) | Ty::Interface(_)
                         )
                     })
-                    && crate::scalar_unions::supported(t)
+                    && crate::scalar_unions::inline(self.input, t)
                 {
                     return Ok(Ty::MixedUnion(parts));
                 }
@@ -793,6 +808,9 @@ impl<'a> Profile<'a> {
             Ty::Short => vec![Some((16, true))],
             Ty::UShort => vec![Some((16, false))],
             Ty::Tuple(parts) => parts.iter().flat_map(|t| self.narrow_lanes(t)).collect(),
+            Ty::ValueUnion(parts) => std::iter::once(None)
+                .chain(parts.iter().flat_map(|t| self.narrow_lanes(t)))
+                .collect(),
             Ty::Record(i) if !self.input.types[*i].fields.is_empty() => self.input.types[*i]
                 .fields
                 .iter()
@@ -805,6 +823,9 @@ impl<'a> Profile<'a> {
         match t {
             Ty::Erased | Ty::ScalarUnion(_) => vec![false, true],
             Ty::MixedUnion(_) => vec![false, true, true],
+            Ty::ValueUnion(parts) => std::iter::once(false)
+                .chain(parts.iter().flat_map(|t| self.pointer_lanes(t)))
+                .collect(),
             Ty::PendingUnionScalar(t) => {
                 self.pointer_lanes(&self.ty(t).expect("admitted union scalar"))
             }
@@ -840,9 +861,11 @@ impl<'a> Profile<'a> {
     pub fn lanes(&self, t: &Ty) -> usize {
         match t {
             Ty::Record(i) => self.widths[*i],
+            Ty::PendingUnionScalar(t) => self.lanes(&self.ty(t).expect("admitted union payload")),
             Ty::Tuple(parts) => parts.iter().map(|t| self.lanes(t)).sum(),
             Ty::Erased | Ty::ScalarUnion(_) => 2,
             Ty::MixedUnion(_) => 3,
+            Ty::ValueUnion(parts) => 1 + parts.iter().map(|t| self.lanes(t)).sum::<usize>(),
             _ => 1,
         }
     }
@@ -1405,12 +1428,17 @@ impl<'a> Profile<'a> {
         // Admission is independent of reachability. Never silently trim unsupported IL.
         for (pc, op) in f.body.iter().enumerate() {
             match op {
-                Op::IsInstance(t) if crate::scalar_unions::supported(t) => {
+                Op::IsInstance(t) if crate::scalar_unions::inline(self.input, t) => {
                     return Err(format!("{} instruction {pc}: scalar union instance tests require tagged conversion lowering", f.name).into());
                 }
-                Op::BoxValue(_) if crate::scalar_unions::box_pair(f, pc) => (),
-                Op::UnboxAny(t) | Op::IsInstance(t) if crate::scalar_unions::tag(t).is_some() => (),
-                Op::CastClass(t) if crate::scalar_unions::supported(t) => (),
+                Op::BoxValue(_) if crate::scalar_unions::box_pair(self.input, f, pc) => (),
+                Op::UnboxAny(t) | Op::IsInstance(t)
+                    if crate::scalar_unions::tag(t).is_some()
+                        || crate::scalar_unions::record(self.input, t) =>
+                {
+                    ()
+                }
+                Op::CastClass(t) if crate::scalar_unions::inline(self.input, t) => (),
                 Op::Arg(n) | Op::ArgumentAddress(n) | Op::StoreArg(n)
                     if *n < self.args[i].len() =>
                 {
@@ -1595,7 +1623,9 @@ impl<'a> Profile<'a> {
                     take(&mut stack, &self.ty(t)?)?;
                     stack.push(Ty::PendingUnionScalar(t.clone()));
                 }
-                Op::CastClass(t @ Type::Union(parts)) if crate::scalar_unions::supported(t) => {
+                Op::CastClass(t @ Type::Union(parts))
+                    if crate::scalar_unions::inline(self.input, t) =>
+                {
                     let source = pop(&mut stack)?;
                     if matches!(self.ty(t)?, Ty::MixedUnion(_)) && self.is_object_base(&source) {
                         return Err(fail(
@@ -1631,9 +1661,22 @@ impl<'a> Profile<'a> {
                     }
                     stack.push(self.ty(t)?);
                 }
-                Op::IsInstance(t) if crate::scalar_unions::tag(t).is_some() => {
-                    if !matches!(pop(&mut stack)?, Ty::ScalarUnion(_) | Ty::MixedUnion(_))
-                        || !matches!(f.body.get(pc + 1), Some(Op::ReferenceIsNull))
+                Op::IsInstance(t)
+                    if crate::scalar_unions::tag(t).is_some()
+                        || crate::scalar_unions::record(self.input, t) =>
+                {
+                    if crate::scalar_unions::record(self.input, t)
+                        && !matches!(stack.last(), Some(Ty::ValueUnion(_)))
+                    {
+                        return Err(fail(
+                            pc,
+                            "nominal value query requires an inline value union",
+                        ));
+                    }
+                    if !matches!(
+                        pop(&mut stack)?,
+                        Ty::ScalarUnion(_) | Ty::MixedUnion(_) | Ty::ValueUnion(_)
+                    ) || !matches!(f.body.get(pc + 1), Some(Op::ReferenceIsNull))
                     {
                         return Err(fail(
                             pc,
@@ -1643,7 +1686,18 @@ impl<'a> Profile<'a> {
                     stack.push(Ty::ScalarUnionTest);
                 }
                 Op::UnboxAny(t) => {
-                    if !matches!(pop(&mut stack)?, Ty::ScalarUnion(_) | Ty::MixedUnion(_)) {
+                    if crate::scalar_unions::record(self.input, t)
+                        && !matches!(stack.last(), Some(Ty::ValueUnion(_)))
+                    {
+                        return Err(fail(
+                            pc,
+                            "nominal value query requires an inline value union",
+                        ));
+                    }
+                    if !matches!(
+                        pop(&mut stack)?,
+                        Ty::ScalarUnion(_) | Ty::MixedUnion(_) | Ty::ValueUnion(_)
+                    ) {
                         return Err(fail(pc, "inline union extraction requires a scalar union"));
                     }
                     stack.push(self.ty(t)?);
@@ -1826,6 +1880,7 @@ impl<'a> Profile<'a> {
                     if !matches!(
                         pop(&mut stack)?,
                         Ty::ScalarUnion(_)
+                            | Ty::ValueUnion(_)
                             | Ty::MixedUnion(_)
                             | Ty::ScalarUnionTest
                             | Ty::ScalarArray(_)
