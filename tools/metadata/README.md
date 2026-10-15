@@ -342,10 +342,11 @@ for the opt-in interpreter. See the experiment's reproducible execution commands
 
 Native snapshots expose `TypeDefinition.GenericParameterVariance` and
 `GenericParameterTypeInfo.Variance`. Missing native annotations normalize to invariant;
-CLI/authored metadata is not materialized by this API. Snapshot writes preserve the
-original bytes. Emission imports and CLI projections reject variant declarations
-until those paths preserve the contract. Use NeoIL for runtime authoring; this slice
-adds no SDK assignment conversions. See the [manual API reference](../../api-docs/experimental-metadata.md#read-only-variance-api--development).
+CLI snapshots and authored generic definitions retain annotations too. Snapshot writes
+preserve original bytes. `TypeBuilder.SetVariance` enables explicit annotations, with
+write-time polarity validation and native/CLI emission. Emission imports and CLI
+projections preserve annotations; native bindings reject conflicting declarations.
+Call-site conversions remain a separate validation layer. See the [manual API reference](../../api-docs/experimental-metadata.md#read-only-variance-api--development).
 
 Run the bounded checks with
 `dotnet run --project tools/metadata/NeoCLR.Metadata.Experimental.Tests -- --interface-variance`.

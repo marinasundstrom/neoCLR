@@ -38,9 +38,11 @@ internal static class InterfaceVarianceChecks
         var context = new MetadataLoadContext([loaded]);
         var parameters = context.Resolve(loaded.Identity).GetTypes().Single().GetGenericArguments().Cast<GenericParameterTypeInfo>();
         Check(parameters.Select(p => p.Variance).SequenceEqual(expected), "introspection variance");
-        Reject<NotSupportedException>(() => NativeAssemblyDefinition.ReadAssembly(Bytes(json)).CreateReferenceAssembly(core));
+        var projection = NativeAssemblyDefinition.ReadAssembly(Bytes(json)).CreateReferenceAssembly(core);
+        var projected = AssemblyDefinition.ReadAssembly(projection, expectedExtended: false);
+        Check(projected.MainModule.Types.Single(t => t.Name == "Transform`3").GenericParameterVariance!.SequenceEqual(expected), "CLI projection preserves variance");
         var consumer = new AssemblyBuilder(new("Consumer", new(1, 0, 0, 0)), core);
-        Reject<InvalidDataException>(() => consumer.ImportReference(type, core));
+        _ = consumer.ImportReference(type, core);
         foreach (var invalid in new JsonArray[] { new("covariant"), new("out", "invariant", "invariant"), new(1, 0, 0) })
         {
             var changed = json.DeepClone(); changed["types"]![0]!["generic_variance"] = invalid;
@@ -49,8 +51,31 @@ internal static class InterfaceVarianceChecks
         var noninterface = json.DeepClone(); noninterface["types"]![0]!.AsObject().Remove("representation");
         Reject<InvalidDataException>(() => Read(noninterface));
         var cli = AssemblyDefinition.ReadAssembly(graph.Write(), expectedExtended: false);
-        Check(cli.MainModule.Types.Single(t => t.Name == "Transform`3").GenericParameterVariance is null, "CLI support is not inferred");
-        Console.WriteLine("PASS native interface variance metadata, immutable snapshots and erasure guards");
+        Check(cli.MainModule.Types.Single(t => t.Name == "Transform`3").GenericParameterVariance!.All(v => v == GenericVariance.Invariant), "CLI invariant metadata");
+        contract.SetVariance(0, GenericVariance.Covariant);
+        contract.SetVariance(1, GenericVariance.Contravariant);
+        var authored = graph.WriteNativeAssembly();
+        var authoredSnapshot = AssemblyDefinition.ReadNativeAssembly(NativeModuleContainer.WriteBinary(authored));
+        Check(authoredSnapshot.MainModule.Types.Single().GenericParameterVariance!.SequenceEqual(expected), "authored native variance");
+        var emitted = System.Reflection.Assembly.Load(graph.Write()).GetType("Example.Transform`3")!;
+        Check(emitted.GetGenericArguments().Select(p => (int)(p.GenericParameterAttributes & System.Reflection.GenericParameterAttributes.VarianceMask)).SequenceEqual(new[] { 1, 2, 0 }), "CLR annotation emission");
+        Reject<ArgumentException>(() => contract.SetVariance(3, GenericVariance.Covariant));
+        Reject<ArgumentException>(() => contract.SetVariance(0, (GenericVariance)99));
+        var ordinary = graph.AddGenericClass("Example", "Box", ["T"]);
+        Reject<ArgumentException>(() => ordinary.SetVariance(0, GenericVariance.Covariant));
+        contract.SetVariance(0, GenericVariance.Contravariant);
+        Reject<InvalidDataException>(() => graph.WriteNativeAssembly());
+        Reject<InvalidDataException>(() => graph.Write());
+        contract.SetVariance(0, GenericVariance.Covariant);
+        var nested = graph.AddGenericInterface("Example", "Nested", ["T"]);
+        nested.SetVariance(0, GenericVariance.Covariant);
+        nested.AddInterfaceMethod("Get", new(contract.MakeGenericInstance(SignatureType.TypeParameter(0), PrimitiveType.Int32, PrimitiveType.Int32), []));
+        _ = graph.WriteNativeAssembly();
+        nested.AddInterfaceMethod("BadArray", new(SignatureType.ArrayOf(SignatureType.TypeParameter(0)), []));
+        Reject<InvalidDataException>(() => graph.WriteNativeAssembly());
+        if (Environment.GetEnvironmentVariable("NEOCLR_VARIANCE_ARTIFACT") is { } output)
+            File.WriteAllBytes(output, NativeModuleContainer.WriteBinary(authored));
+        Console.WriteLine("PASS native interface variance metadata, authoring, projection, immutable snapshots and polarity checks");
     }
     private static void Check(bool condition, string message) { if (!condition) throw new Exception(message); }
     private static void Reject<T>(Action action) where T : Exception

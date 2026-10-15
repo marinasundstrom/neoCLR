@@ -11,7 +11,7 @@ public sealed partial class AssemblyBuilder
     public TypeBuilder AddInterface(string @namespace, string name, TypeVisibility visibility = TypeVisibility.Public)
         => AddTypeCore(@namespace, name, visibility, false, isInterface: true);
 
-    /// <summary>Adds an invariant generic interface declaration.</summary>
+    /// <summary>Adds a generic interface declaration, invariant by default; use SetVariance for explicit annotations.</summary>
     /// <param name="namespace">Namespace, possibly empty.</param>
     /// <param name="name">Simple name without an arity suffix.</param>
     /// <param name="genericParameterNames">One through 32 distinct names, copied.</param>

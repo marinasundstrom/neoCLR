@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-15
 
+- Enable explicit SDK interface variance authoring with `SetVariance`, write-time nested polarity checks, native and CLI annotations, variance-preserving projection/import metadata and reference/runtime binding checks. Supersedes the read-only SDK projection/import restrictions below. Focused SDK variance and native-reader/projection regressions pass; an authored NEOX returns 42 in the interpreter. Native dispatch, Raven integration and library annotations are subsequent slices.
+
 - Record the variance safety recommendation: finish nominal reference-only variance across execution backends before expanding the contract, and keep Result mapping explicit while Sliceable remains invariant. This is a recommendation, not newly implemented behavior or an adopted author decision.
 
 - Add read-only native interface variance metadata to the experimental SDK through `TypeDefinition.GenericParameterVariance` and `GenericParameterTypeInfo.Variance`, with immutable ordinal-aligned defaults and byte-preserving snapshot round trips. Reject malformed annotations and emission import/CLI projection that would lose variance; SDK authoring, Raven emission and native execution remain pending. Focused variance, existing native-reader/projection regressions and API snapshot checks pass. Keep the current scope reference-only, with Result/Sliceable widening deferred and structural work parked.

@@ -100,7 +100,7 @@ public sealed partial class AssemblyBuilder
         {
             foreach (var type in types)
             {
-                type.ValidateEnum(); type.ValidatePrimitiveRepresentation(); type.ValidateClassSlots();
+                type.ValidateEnum(); type.ValidatePrimitiveRepresentation(); type.ValidateClassSlots(); type.ValidateVariance();
                 if (type.Definition.IsNativeObjectRoot) type.Definition.ValidateNativeObjectRoot();
                 if (type.IsClosedHierarchy && (!(IsOrdinaryBase(type) || type.IsInterface && type.GenericParameterNames.Count == 0 && type.Definition.DeclaringType is null) || !type.IsAbstract))
                     throw new InvalidDataException("closed families require nongeneric top-level abstract class or interface owners");
@@ -982,6 +982,8 @@ public sealed partial class AssemblyBuilder
             for (int i = 0; i < row.Names.Count; i++)
             {
                 var attributes = row.Owner.Kind == HandleKind.TypeDefinition ? (GenericParameterAttributes)types[MetadataTokens.GetRowNumber(row.Owner) - 2].SpecialConstraints.GetValueOrDefault(i) : GenericParameterAttributes.None;
+                if (row.Owner.Kind == HandleKind.TypeDefinition)
+                    attributes |= (GenericParameterAttributes)(types[MetadataTokens.GetRowNumber(row.Owner) - 2].Definition.GenericParameterVariance?[i] ?? GenericVariance.Invariant);
                 var parameter = metadata.AddGenericParameter(row.Owner, attributes, metadata.GetOrAddString(row.Names[i]), i);
                 if (row.Owner.Kind == HandleKind.TypeDefinition)
                 {

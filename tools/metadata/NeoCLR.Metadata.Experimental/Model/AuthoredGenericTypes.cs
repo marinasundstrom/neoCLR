@@ -31,6 +31,7 @@ public sealed partial class TypeDefinition
     {
         GenericParameterNames = identity.Parameters;
         GenericArity = identity.Parameters.Count;
+        GenericParameterVariance = Array.AsReadOnly(new GenericVariance[GenericArity]);
     }
     private static (string, IReadOnlyList<string>) GenericIdentity(string name, IEnumerable<string> parameters)
     {

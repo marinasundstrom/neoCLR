@@ -116,6 +116,17 @@ internal sealed class NativeImportBinding(AssemblyDefinition reference, NativeLi
         if (matches.Length != 1) throw new InvalidDataException("native type missing or ambiguous: " + name);
         var native = matches[0];
         if (!NativeLibraryDefinition.IsPublic(native)) throw new InvalidDataException("native type is not public: " + name);
+        var variance = native.TryGetProperty("generic_variance", out var flags)
+            ? flags.EnumerateArray().Select(v => v.GetString() switch
+            {
+                "invariant" => GenericVariance.Invariant,
+                "covariant" => GenericVariance.Covariant,
+                "contravariant" => GenericVariance.Contravariant,
+                _ => throw new InvalidDataException("unknown native variance")
+            }).ToArray() : [];
+        if (variance.Length == 0) variance = new GenericVariance[type.GenericArity];
+        if (variance.Length != type.GenericArity || !variance.SequenceEqual(type.GenericParameterVariance ?? new GenericVariance[type.GenericArity]))
+            throw new InvalidDataException("native type variance mismatch: " + name);
         var contract = (type.Attributes & 0x20) != 0;
         var nativeInterface = native.TryGetProperty("representation", out var kind) && kind.GetString() == "Interface";
         if (contract != nativeInterface || !contract && !intrinsicStringOwner && (type.Attributes & 0x180) != 0x180 && type.IsValueType == Flag(native, "is_reference_type"))

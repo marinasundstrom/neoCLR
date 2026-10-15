@@ -18168,3 +18168,18 @@ conversion, range-pattern support and overflow-safe integer advancement remain n
 - **Research:** rechecked the [C# variance safety/conversion specification](https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/language-specification/interfaces#1923-variant-type-parameter-lists)
   and [.NET generic variance guide](https://learn.microsoft.com/en-us/dotnet/standard/generics/covariance-and-contravariance).
   No implementation or user acceptance of this recommendation is claimed.
+
+
+## 2026-10-15 — Authorize end-to-end opt-in variance and library annotations
+
+- **Author:** directed implementing the runtime and Raven-on-neoCLR language feature,
+  then explicitly requested annotating interfaces that should support variance.
+- **Assistant scope:** invariance by default; explicit `in`/`out` on nominal
+  interfaces, reference-only conversions, matching interpreter/AOT/JIT behavior,
+  separate-compilation validation and an audit before library annotation. No automatic
+  Result/Sliceable value widening or structural work.
+- **First slice:** SDK declaration authoring, polarity validation, native/CLI
+  annotation preservation and reference/runtime binding agreement. This replaces
+  the previous deliberately blocked SDK projection/import paths. Native-reader and
+  projection regressions pass; an SDK-authored NEOX returns 42 in the interpreter.
+- **Outstanding:** compiler wiring, native dispatch and library annotation/qualification.

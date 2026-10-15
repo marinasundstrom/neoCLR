@@ -9201,8 +9201,8 @@ The runtime TypeDef JSON schema accepts an optional `generic_variance` vector:
 `invariant`, `covariant`, `contravariant`, aligned with `generic_parameters`.
 An absent/empty vector preserves invariance. The loader rejects arity mismatch,
 unknown values, variant class/value declarations and unsafe interface signature
-positions. This does not add variance authoring to the C# metadata builder or Raven compiler.
-The SDK read-only API below preserves the declarations without enabling conversions.
+positions. The SDK supports explicit interface annotations and native/CLI metadata round trips.
+Raven integration and native execution qualification are tracked separately.
 
 Interpreter reference conversion now uses the verified annotations for nominal
 interface views and calls, retaining receiver identity. Native specialization
@@ -9221,8 +9221,8 @@ assembly does not include the experimental C# SDK.
 - `Model.TypeDefinition.GenericParameterVariance: IReadOnlyList<GenericVariance>?`:
   immutable native annotations in parameter order, with exactly `GenericArity`
   entries. Missing/empty native annotations yield invariant entries; nongeneric
-  native declarations yield an empty list. CLI snapshots and authored definitions
-  return null because this slice does not materialize their annotations.
+  native declarations yield an empty list. CLI snapshots and authored generic definitions also expose their annotations.
+  Null means the declaration does not materialize this fact.
 - `Introspection.GenericParameterTypeInfo.Variance: GenericVariance`: the native
   annotation for `Position`. Throws `NotSupportedException` when the declaration's
   variance list is unavailable. Parameter identity remains owner plus position.
@@ -9231,12 +9231,30 @@ assembly does not include the experimental C# SDK.
 mismatches and non-invariant annotations on noninterfaces with `InvalidDataException`.
 Runtime loading additionally verifies signature polarity. `AssemblyDefinition.Write`
 copies the original native image, including annotations. `AssemblyBuilder.ImportReference`
-rejects variant definitions with `InvalidDataException`; `NativeAssemblyDefinition.CreateReferenceAssembly`
-rejects annotated variant assemblies with `NotSupportedException` until emission
-can preserve variance. Invariant input retains its existing behavior.
+retains variant interface declarations; `NativeAssemblyDefinition.CreateReferenceAssembly`
+preserves annotations as CLI generic-parameter flags. Native binding checks reject
+a mismatch between reference and runtime annotations. Invariant input retains its existing behavior.
 
 For a native `Producer<T>` declaring `covariant`, inspect
 `definition.GenericParameterVariance[0] == GenericVariance.Covariant` after checking
 that the list is available. This is metadata inspection, not an SDK conversion test.
 The [focused SDK checks](../tools/metadata/NeoCLR.Metadata.Experimental.Tests/InterfaceVarianceChecks.cs)
 exercise native round trips, defaults, introspection and erasure guards.
+
+
+### Explicit interface variance authoring — development
+
+`TypeBuilder.SetVariance(int parameterIndex, GenericVariance variance)` sets one
+interface parameter annotation. Parameters are invariant by default. Invalid ordinals,
+unknown enum values and noninterface variant owners throw `ArgumentException`.
+A write revalidates the complete declaration and throws `InvalidDataException` for
+unsafe positions, including varying parameters inside invariant wrappers or writable
+arrays/byrefs. Nested annotated interfaces compose polarity. Static contracts, Self
+and generic interface methods remain outside the current variant profile.
+
+For a producer, call `producer.SetVariance(0, GenericVariance.Covariant)` and declare
+an instance method returning `SignatureType.TypeParameter(0)`. A consumer instead uses
+`Contravariant` and consumes that parameter. The focused SDK fixture below the
+read-only API section exercises both native and CLI emission and runtime loading.
+`SetVariance` does not make arbitrary value arguments convertible or provide Result
+mapping; declaration validation and call-site reference conversions are separate.

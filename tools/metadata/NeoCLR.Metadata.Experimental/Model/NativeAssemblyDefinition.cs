@@ -1091,8 +1091,6 @@ public sealed partial class NativeAssemblyDefinition
     /// This is compiler reference metadata, never an executable replacement for the native artifact. Per-call MVIDs may differ.</remarks>
     public byte[] CreateReferenceAssembly(AssemblyIdentity coreLibrary)
     {
-        if (types.Any(type => type.Variance.Any(v => v != GenericVariance.Invariant)))
-            throw new NotSupportedException("variant interface CLI projection requires variance-preserving emission");
         if (assemblyConstants.Length != 0)
             throw new NotSupportedException("standalone CLI projection of assembly-level constants is not implemented");
         if (types.Any(type => type.BaseName is not null))
@@ -1244,6 +1242,8 @@ public sealed partial class NativeAssemblyDefinition
             result[i] = type.DeclaringType < 0 ? DefineType(graph, type) : type.IsValueType
                 ? type.GenericNames.Length == 0 ? result[type.DeclaringType].AddNestedValueType(type.Name, type.Visibility) : result[type.DeclaringType].AddNestedGenericValueType(type.Name[..type.Name.LastIndexOf('`')], type.GenericNames, type.Visibility)
                 : type.GenericNames.Length == 0 ? result[type.DeclaringType].AddNestedClass(type.Name, type.Visibility) : result[type.DeclaringType].AddNestedGenericClass(type.Name[..type.Name.LastIndexOf('`')], type.GenericNames, type.Visibility);
+            for (int parameter = 0; parameter < type.Variance.Length; parameter++)
+                result[i].SetVariance(parameter, type.Variance[parameter]);
             if (type.IsSealedClass) result[i].SetSealedClass();
             if (type.IsAbstractClass && !type.IsObjectRoot && !type.IsClosedHierarchy) result[i].SetAbstractClass();
         }

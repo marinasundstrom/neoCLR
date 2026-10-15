@@ -1,8 +1,8 @@
 # Interface variance and result-value conversion
 
 Status: runtime metadata and bounded interpreter reference conversions implemented
-in development, 2026-10-15. Raven syntax/SDK authoring and native execution are not
-yet supported; read-only SDK metadata inspection is available. The wider Result
+in development, 2026-10-15. SDK annotation authoring, inspection and CLI/native metadata transport are implemented.
+Raven native integration and AOT/JIT execution are being completed. The wider Result
 proposal remains unimplemented. Structural-type work stays parked. This follows the
 [implemented slicing contract](slicing-capabilities.md).
 
@@ -228,3 +228,19 @@ Checks cover all three annotations, absent/empty defaults, immutable copied
 snapshots, introspection, byte-preserving round trips, malformed metadata and
 projection/import rejection. AOT/JIT qualification and frontend authoring remain
 required before advertising general end-to-end variance support.
+
+
+## Explicit SDK annotations (2026-10-15)
+
+The author subsequently directed completing runtime and Raven-on-neoCLR variance,
+and annotating eligible library interfaces. The SDK now provides `SetVariance`,
+validates nested declaration polarity at write time, emits native annotations and
+CLI generic-parameter flags, and retains annotations through native/CLI readers and
+reference projection. This supersedes the earlier read-only slice's projection/import
+rejection. Imported annotation facts are retained without inventing them for manually
+created references; native bindings compare reference and runtime variance.
+
+Validation uses the focused SDK variance and existing declaration/projection checks.
+An SDK-authored NEOX loads and returns 42 in the interpreter. Call-site conversion,
+Raven integration and AOT/JIT work are separate slices; metadata transport alone is
+not end-to-end qualification. Structural work and automatic Result mapping stay parked.
