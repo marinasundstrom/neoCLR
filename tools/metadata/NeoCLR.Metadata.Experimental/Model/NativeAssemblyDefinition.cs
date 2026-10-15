@@ -11,6 +11,7 @@ public sealed partial class NativeAssemblyDefinition
 {
     private sealed record TypeRow(string Namespace, string Name, string NativeName, TypeVisibility Visibility, bool IsStatic, bool IsInterface, bool IsValueType, JsonElement[] BaseInterfaces, FieldRow[] Fields, string[] GenericNames, (int Parameter, string Bound)[] Constraints, Dictionary<int, TypeParameterConstraints> SpecialConstraints, int DeclaringType)
     {
+        internal GenericVariance[] Variance { get; init; } = [];
         internal FieldRow[] StaticFields { get; init; } = [];
         internal (string Name, int Value)[]? EnumMembers { get; init; }
         internal bool IsClosedHierarchy { get; init; }
@@ -209,6 +210,17 @@ public sealed partial class NativeAssemblyDefinition
                 if (type.TryGetProperty("base", out _)) typeFields.Add("base");
                 var typeNames = type.TryGetProperty("generic_parameters", out _) ? Array(type, "generic_parameters", 32).Select(p => p.GetString() ?? throw new InvalidDataException("null type parameter name")).ToArray() : [];
                 if (type.TryGetProperty("generic_parameters", out _)) typeFields.Add("generic_parameters");
+                var variance = type.TryGetProperty("generic_variance", out _)
+                    ? Array(type, "generic_variance", 32).Select(value => value.GetString() switch
+                    {
+                        "invariant" => GenericVariance.Invariant,
+                        "covariant" => GenericVariance.Covariant,
+                        "contravariant" => GenericVariance.Contravariant,
+                        _ => throw new InvalidDataException("unknown generic variance")
+                    }).ToArray() : [];
+                if (type.TryGetProperty("generic_variance", out _)) typeFields.Add("generic_variance");
+                Require(variance.Length == 0 || variance.Length == typeNames.Length, "variance must align with generic parameters");
+                if (variance.Length == 0) variance = new GenericVariance[typeNames.Length];
                 var constraints = new List<(int Parameter, string Bound)>();
                 var specialConstraints = new Dictionary<int, TypeParameterConstraints>();
                 if (type.TryGetProperty("generic_constraints", out _))
@@ -251,6 +263,7 @@ public sealed partial class NativeAssemblyDefinition
                 if (type.TryGetProperty("primitive_reference", out _)) typeFields.Add("primitive_reference");
                 bool hasRepresentation = type.TryGetProperty("representation", out var representation);
                 bool isInterface = hasRepresentation && representation.GetString() == "Interface";
+                Require(isInterface || variance.All(v => v == GenericVariance.Invariant), "variance requires an interface declaration");
                 bool isPrimitive = hasRepresentation && representation.GetString() == "Runtime";
                 if (hasRepresentation) { typeFields.Add("representation"); Require(isInterface || isPrimitive, "unsupported native representation"); }
                 Require(!primitiveReference || isPrimitive, "primitive reference requires runtime representation");
@@ -391,7 +404,7 @@ public sealed partial class NativeAssemblyDefinition
                 nextFieldToken += fieldRows.Count + staticRows.Length + (enumMembers?.Length ?? 0);
                 Origin(origin, identityText, identity, ns.Length == 0 ? name : ns + "." + name, 0x02000002 + types.Count);
                 Require(origin.GetProperty("publicly_visible").GetBoolean() == (visibility == TypeVisibility.Public), "native type visibility mismatch");
-                types.Add(new(ns, name, nativeName, visibility, isStatic, isInterface, isValueType, baseInterfaces, fieldRows.ToArray(), typeNames, constraints.ToArray(), specialConstraints, declaringType) { StaticFields = staticRows, IsAbstractClass = isAbstractClass, IsObjectRoot = isObjectRoot, IsSealedClass = !isStatic && !isValueType && !isInterface && type.GetProperty("is_sealed").GetBoolean(), IsClosedHierarchy = closedHierarchy, BaseName = type.TryGetProperty("base", out var baseNode) ? ReadBaseName(baseNode) : null, NativePrimitive = primitive, PrimitiveReference = primitiveReference, NativeGrapheme = isPrimitive && name == "Char", EnumMembers = enumMembers, IsFlagsEnum = enumFlags, AttributeTargets = new[] { "field_tokens", "property_tokens" }.SelectMany(key => origin.TryGetProperty(key, out _) ? Array(origin, key, 256).Select(token => token.GetUInt32()) : []).ToArray(), RawAttributes = type.TryGetProperty("custom_attributes", out _) ? Array(type, "custom_attributes", 4096).Select(a => a.Clone()).ToArray() : [] });
+                types.Add(new(ns, name, nativeName, visibility, isStatic, isInterface, isValueType, baseInterfaces, fieldRows.ToArray(), typeNames, constraints.ToArray(), specialConstraints, declaringType) { Variance = variance, StaticFields = staticRows, IsAbstractClass = isAbstractClass, IsObjectRoot = isObjectRoot, IsSealedClass = !isStatic && !isValueType && !isInterface && type.GetProperty("is_sealed").GetBoolean(), IsClosedHierarchy = closedHierarchy, BaseName = type.TryGetProperty("base", out var baseNode) ? ReadBaseName(baseNode) : null, NativePrimitive = primitive, PrimitiveReference = primitiveReference, NativeGrapheme = isPrimitive && name == "Char", EnumMembers = enumMembers, IsFlagsEnum = enumFlags, AttributeTargets = new[] { "field_tokens", "property_tokens" }.SelectMany(key => origin.TryGetProperty(key, out _) ? Array(origin, key, 256).Select(token => token.GetUInt32()) : []).ToArray(), RawAttributes = type.TryGetProperty("custom_attributes", out _) ? Array(type, "custom_attributes", 4096).Select(a => a.Clone()).ToArray() : [] });
             }
             for (int i = 0; i < types.Count; i++)
             {
@@ -1073,10 +1086,13 @@ public sealed partial class NativeAssemblyDefinition
     /// <returns>Owned PE bytes containing declarations, a ReferenceAssemblyAttribute and throwing placeholder bodies for concrete methods; abstract interface methods remain bodyless.</returns>
     /// <exception cref="ArgumentNullException">Core identity is null.</exception>
     /// <exception cref="InvalidDataException">Projection exceeds writer limits.</exception>
+    /// <exception cref="NotSupportedException">The assembly includes variance or other declarations the CLI projection cannot preserve.</exception>
     /// <remarks>No native body is translated. Entry points and body-only dependencies are not projected. External signature references retain their exact assembly scope.
     /// This is compiler reference metadata, never an executable replacement for the native artifact. Per-call MVIDs may differ.</remarks>
     public byte[] CreateReferenceAssembly(AssemblyIdentity coreLibrary)
     {
+        if (types.Any(type => type.Variance.Any(v => v != GenericVariance.Invariant)))
+            throw new NotSupportedException("variant interface CLI projection requires variance-preserving emission");
         if (assemblyConstants.Length != 0)
             throw new NotSupportedException("standalone CLI projection of assembly-level constants is not implemented");
         if (types.Any(type => type.BaseName is not null))

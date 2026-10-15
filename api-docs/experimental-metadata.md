@@ -9201,12 +9201,42 @@ The runtime TypeDef JSON schema accepts an optional `generic_variance` vector:
 `invariant`, `covariant`, `contravariant`, aligned with `generic_parameters`.
 An absent/empty vector preserves invariance. The loader rejects arity mismatch,
 unknown values, variant class/value declarations and unsafe interface signature
-positions. This does not add variance to the C# metadata builder or Raven compiler;
-the SDK reader continues to reject unsupported fields instead of silently dropping
-them. No new managed API is introduced by this metadata slice.
+positions. This does not add variance authoring to the C# metadata builder or Raven compiler.
+The SDK read-only API below preserves the declarations without enabling conversions.
 
 Interpreter reference conversion now uses the verified annotations for nominal
 interface views and calls, retaining receiver identity. Native specialization
 explicitly rejects used variant interfaces before erasing generic identity. These
 are low-level runtime capabilities; existing Raven public interfaces, including
 Sliceable, remain invariant, and Result payload conversion is not implemented.
+
+
+### Read-only variance API — development
+
+These host metadata APIs are documented here because RavenDoc's guest reference
+assembly does not include the experimental C# SDK.
+
+- `Model.GenericVariance`: `Invariant`, `Covariant`, `Contravariant`, describing
+  declaration intent without proving signature safety or assignability.
+- `Model.TypeDefinition.GenericParameterVariance: IReadOnlyList<GenericVariance>?`:
+  immutable native annotations in parameter order, with exactly `GenericArity`
+  entries. Missing/empty native annotations yield invariant entries; nongeneric
+  native declarations yield an empty list. CLI snapshots and authored definitions
+  return null because this slice does not materialize their annotations.
+- `Introspection.GenericParameterTypeInfo.Variance: GenericVariance`: the native
+  annotation for `Position`. Throws `NotSupportedException` when the declaration's
+  variance list is unavailable. Parameter identity remains owner plus position.
+
+`AssemblyDefinition.ReadNativeAssembly` rejects unknown annotation values, arity
+mismatches and non-invariant annotations on noninterfaces with `InvalidDataException`.
+Runtime loading additionally verifies signature polarity. `AssemblyDefinition.Write`
+copies the original native image, including annotations. `AssemblyBuilder.ImportReference`
+rejects variant definitions with `InvalidDataException`; `NativeAssemblyDefinition.CreateReferenceAssembly`
+rejects annotated variant assemblies with `NotSupportedException` until emission
+can preserve variance. Invariant input retains its existing behavior.
+
+For a native `Producer<T>` declaring `covariant`, inspect
+`definition.GenericParameterVariance[0] == GenericVariance.Covariant` after checking
+that the list is available. This is metadata inspection, not an SDK conversion test.
+The [focused SDK checks](../tools/metadata/NeoCLR.Metadata.Experimental.Tests/InterfaceVarianceChecks.cs)
+exercise native round trips, defaults, introspection and erasure guards.

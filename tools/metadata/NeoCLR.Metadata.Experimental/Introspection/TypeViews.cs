@@ -82,6 +82,11 @@ public sealed class GenericParameterTypeInfo : TypeInfo
     /// <remarks>The name is descriptive; identity remains the declaring type and ordinal.</remarks>
     public string Name => DeclaringType.Definition.GenericParameterNames is { } names
         ? names[Position] : throw new NotSupportedException("generic parameter names are not materialized for this snapshot");
+    /// <summary>Gets the declared native interface variance of this parameter.</summary>
+    /// <exception cref="NotSupportedException">Variance is not materialized for this snapshot format.</exception>
+    /// <remarks>This is metadata inspection; it does not enable assignment conversions in the host SDK.</remarks>
+    public GenericVariance Variance => DeclaringType.Definition.GenericParameterVariance is { } variance
+        ? variance[Position] : throw new NotSupportedException("generic variance is not materialized for this snapshot");
     /// <inheritdoc/>
     public override string DisplayName => "!" + Position;
     /// <inheritdoc/>

@@ -1,8 +1,9 @@
 # Interface variance and result-value conversion
 
 Status: runtime metadata and bounded interpreter reference conversions implemented
-in development, 2026-10-15. Raven syntax/SDK transport and native execution are not
-yet supported; the wider Result proposal remains unimplemented. Structural-type work stays parked. This follows the
+in development, 2026-10-15. Raven syntax/SDK authoring and native execution are not
+yet supported; read-only SDK metadata inspection is available. The wider Result
+proposal remains unimplemented. Structural-type work stays parked. This follows the
 [implemented slicing contract](slicing-capabilities.md).
 
 ## Concrete requirement
@@ -140,8 +141,8 @@ Native runtime TypeDef metadata now accepts `generic_variance`, either omitted/
 empty (all invariant) or an arity-aligned vector of `invariant`, `covariant`, and
 `contravariant`. NeoIL authors can write `.variance out in invariant` inside a
 corresponding interface declaration. This is runtime metadata, not new Raven syntax
-or an SDK builder API. The existing C# native-metadata SDK rejects the new field
-until its importer/writer support is deliberately added; it does not erase it.
+or an SDK builder API. The first slice left the C# native-metadata SDK rejecting this field. The later
+read-only SDK slice below exposes it without enabling authoring or emission import.
 
 Existing artifacts omit the field and retain invariance. Older schema readers
 reject annotated artifacts rather than silently erase their variance. The loader
@@ -189,11 +190,41 @@ explicitly boxed receiver reuses its box; variance never inserts a box.
 Native specialization currently rejects used variant interfaces with a specific
 conversion-aware-dispatch diagnostic before erasing their generic identity. A
 focused backend test enforces that boundary. There is no claim of AOT/JIT support.
-The C# SDK continues to reject unsupported variance fields; Raven does not emit
-these annotations. Existing invariant APIs, including Sliceable and Result, retain
+The C# SDK now reads variance annotations but rejects their emission import and
+CLI projection; Raven does not emit these annotations. Existing invariant APIs, including Sliceable and Result, retain
 their current contracts. General .NET behavior is unchanged.
 
 Next: retain variance and its concrete implementation mapping through native
 specialization, qualify AOT/JIT reference calls and GC, then wire the metadata SDK
 and Raven native importer/emitter. Only after those layers agree should standard
 interfaces be annotated. Result-value conversion remains a separate stage.
+
+
+## Minimal current scope and SDK inspection (2026-10-15)
+
+The author requested implementing only the minimum variance needed now. The current
+bounded scope remains declared nominal interface variance with reference-only
+conversions. Result-value widening, output-slot adapters, automatic Sliceable
+widening and structural changes remain deferred. This is a scope reduction for the
+current work, not a decision to remove the earlier acceptance case.
+
+The SDK now reads `generic_variance` and exposes an immutable, ordinal-aligned
+`TypeDefinition.GenericParameterVariance` list. Missing/empty native annotations
+normalize to invariant. `GenericParameterTypeInfo.Variance` exposes the same fact
+for introspection. This corresponds to the variance component of .NET generic
+parameter attributes; it does not claim CLR conversion or backend parity.
+CLI snapshots and authored definitions return null for the list, and introspection
+throws when the fact is unavailable, rather than inventing invariant annotations.
+
+Snapshot `Write()` preserves the original image. Importing a variant definition for
+emission and projecting an annotated native assembly to CLI both reject explicitly,
+since those paths still assume invariance. NeoIL remains the authoring path. The SDK
+checks annotation shape, arity and interface ownership; the runtime remains
+responsible for signature polarity, verification and executable conversions. No new
+SDK assignability algorithm or Raven contract is introduced.
+
+Focused validation: `dotnet run --project tools/metadata/NeoCLR.Metadata.Experimental.Tests -- --interface-variance`.
+Checks cover all three annotations, absent/empty defaults, immutable copied
+snapshots, introspection, byte-preserving round trips, malformed metadata and
+projection/import rejection. AOT/JIT qualification and frontend authoring remain
+required before advertising general end-to-end variance support.

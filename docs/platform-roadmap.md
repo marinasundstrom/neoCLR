@@ -4854,6 +4854,8 @@ restrictions that protect writable state and validate nested parameter positions
 The [research and staged plan](design/interface-variance.md) now has validated
 runtime metadata and bounded interpreter reference conversions, with a
 [retained consumer](validation/interface-variance/README.md). Native specialization
-rejects used variant interfaces pending dispatch adaptation; SDK/Raven transport
-is not implemented. Standard library interfaces and Result remain invariant. This does not resume
+rejects used variant interfaces pending dispatch adaptation. SDK read-only annotation
+inspection and snapshot round trips are supported; SDK authoring/emission import
+and Raven transport remain pending. The current author-directed scope is minimal
+reference-only interface variance; result-value widening is deferred. Standard library interfaces and Result remain invariant. This does not resume
 structural-type work or change unrelated milestone priorities.

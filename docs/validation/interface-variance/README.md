@@ -51,6 +51,7 @@ support and remains excluded. Borrowed slot/pointer view conversion remains exac
 
 Native specialization rejects used variant interfaces before dropping their
 annotations. The test verifies the explicit diagnostic; it does not claim native
-execution. AOT/JIT dispatch adaptation, SDK metadata transport and Raven emission
-are next stages. Sliceable and Result remain invariant. Structural compositions
+execution. The SDK now inspects annotations and preserves native snapshots; its
+authoring/emission import, AOT/JIT dispatch adaptation and Raven emission remain
+next stages. Sliceable and Result remain invariant. Structural compositions
 containing variant interfaces have not been qualified by this slice.

@@ -777,4 +777,6 @@ The interpreter admits reference-only variant interface assignment/casts and cal
 Exact implementations win; multiple non-exact compatible views are ambiguous.
 Value-argument changes, intrinsic String widening, borrowed views and mutable-array
 covariance are excluded. Native specialization rejects used variant declarations
-until conversion-aware dispatch is implemented; Raven/SDK transport remains pending.
+until conversion-aware dispatch is implemented. The SDK can inspect native variance
+annotations and preserve snapshots; SDK authoring/emission import and Raven transport
+remain pending.

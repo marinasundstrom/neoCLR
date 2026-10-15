@@ -2145,3 +2145,9 @@ bundle and is retained for historical documentation tooling; its source-input
 fingerprints are refreshed without claiming new CLI signatures. The manual tuple
 and union family pages describe the current native forms. Full retirement of the
 legacy bridge remains separate from removing native runtime carrier declarations.
+
+
+The experimental C# metadata SDK is outside the guest RavenDoc reference assembly.
+Its native generic variance enum, definition list and generic-parameter introspection
+property are covered in the [manual SDK reference](experimental-metadata.md#read-only-variance-api--development).
+No guest API selection or reference assembly change is required for this host-only slice.

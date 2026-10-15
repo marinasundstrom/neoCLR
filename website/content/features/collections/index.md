@@ -139,3 +139,7 @@ nominal reference conversions in the interpreter. Native specialization explicit
 rejects variant interfaces until its dispatch support is ready. Raven interfaces
 remain invariant; this does not yet permit widening Sliceable through its Result
 return type. Writable collections and array elements keep invariant contracts.
+
+The development metadata SDK can inspect interface variance annotations and preserve
+native snapshots. Authoring through Raven and native AOT/JIT execution remain
+pending; this does not enable implicit Sliceable or Result widening.

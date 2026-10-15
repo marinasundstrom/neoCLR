@@ -18127,3 +18127,19 @@ conversion, range-pattern support and overflow-safe integer advancement remain n
   retains the NEOX consumer and focused checks. SDK/Raven transport and AOT/JIT
   dispatch remain subsequent slices. Sliceable's Result conversion is still a
   separate unresolved capability; structural implementation work was not resumed.
+
+
+## 2026-10-15 — Keep variance implementation minimal
+
+- **Author:** “Let's implement the minimal we need for variance at this moment.”
+- **Assistant interpretation:** keep nominal reference-only interface variance as
+  the bounded scope; defer Result-value conversion and automatic Sliceable widening.
+  Structural work stays parked. This does not infer cancellation of the earlier
+  broader design exploration.
+- **Action:** add SDK native annotation inspection and byte-preserving snapshot
+  round trips, while rejecting emission import and CLI projection that would erase
+  variance. NeoIL authoring and interpreter behavior remain the existing executable
+  path. SDK builder/Raven authoring and AOT/JIT support are still outstanding.
+- **Evidence:** the [variance design](design/interface-variance.md) and focused
+  `--interface-variance` SDK checks pass, including existing native-definition and
+  projection regression checks. The API snapshot check also passes.
