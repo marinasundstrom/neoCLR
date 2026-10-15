@@ -299,13 +299,13 @@ pub(crate) fn validate_surface(module: &Module) -> Result<(), Fault> {
         if function.owner.as_ref().is_some_and(|owner| {
             inherited_context.is_none()
                 && !module.type_definition(owner).is_some_and(|def| {
-                    def.is_reference_type && def.representation == Representation::Record
+                    def.representation == Representation::Record
                 })
         }) || function.is_internal_call()
             || function.pinvoke.is_some()
         {
             return Err(Fault::new(
-                "compound signatures require managed free functions or reference-class methods",
+                "compound signatures require managed free functions or record methods",
             ));
         }
         let context = inherited_context.unwrap_or(crate::vm::SignatureContext {

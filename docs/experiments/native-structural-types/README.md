@@ -526,3 +526,15 @@ and identity. Full native Task execution remains a separate qualification gate.
 The fresh Task consumer now passes record field layout with the standard user-fault
 host binding, and next reaches the runtime's managed value-type method composition
 signature gate. That gate must be aligned before native application qualification.
+
+### Managed value-record methods (2026-10-15)
+
+Managed record methods now admit structural parameter/return signatures, matching
+free functions and class methods. Normal value receivers remain borrowed; internal
+calls and native imports remain rejected by the composition surface guard. The
+new interpreter mutation test preserves an earlier copy after replacing a union
+field. Native specialization transports tuple, union and intersection results through
+closed value-record instance methods (42 for each). The remaining 64 interpreter
+composition tests also pass. A direct Raven record sample built against v4 returns
+42 in interpreter/AOT without native allocation. Full Task evidence is being retained
+separately; these changes do not claim complete integration readiness.

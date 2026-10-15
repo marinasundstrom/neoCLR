@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-15
 
+- Admit structural signatures on managed nominal value-record methods, preserving normal borrowed receivers and rejecting native/internal imports. Validate mutation/copy isolation and generic value-member transport. Record union overload resolution as general Raven work for main and deliberate carry to the neoCLR line.
+
 - Admit structural union/intersection instance fields in nominal value records, aligning direct declarations with already-supported generic wrappers. Preserve copied storage, explicit nominal conformance and collector roots; align native metadata authoring/reading. Static composition fields and managed-reference fields remain rejected.
 
 - Add checked native reserved arrays for structural tuple, union and intersection elements, reusing inline snapshot storage and initialization checks without element boxing. Default allocation, element borrows and nominal array views remain gated; collection retains the existing conservative array scan.

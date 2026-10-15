@@ -1396,3 +1396,14 @@ fn direct_record_union_fields_preserve_copies_on_replacement() {
     p.verify().unwrap();
     assert_eq!(p.run(Limits::default()).unwrap().value, Value::Int32(42));
 }
+
+#[cfg(feature = "experimental-compositions")]
+#[test]
+fn direct_record_methods_transport_and_replace_union_fields() {
+    let p = program(
+        ".local Holder value\n.local Holder before\nldc.i4 1\nbox Int32\ncastclass union<Int32,Both>\nnewobj Holder\nstloc value\nldloc value\nstloc before\nldloca value\nldc.i4 41\nbox Int32\ncastclass union<Int32,Both>\ncall instance Holder::Replace(union<Int32,Both>)\nldloca value\ncall instance Holder::Read()\nunbox.any Int32\nldloca before\ncall instance Holder::Read()\nunbox.any Int32\nadd",
+        ".type Holder\n.field Value union<Int32,Both>\n.method instance byref Read() -> union<Int32,Both>\nldarg this\nldfld Holder::Value\nret\n.end\n.method instance byref Replace(union<Int32,Both> value) -> noresult\nldarg this\nldarg value\nstfld Holder::Value\npop\nret\n.end\n.end",
+    );
+    p.verify().unwrap();
+    assert_eq!(p.run(Limits::default()).unwrap().value, Value::Int32(42));
+}

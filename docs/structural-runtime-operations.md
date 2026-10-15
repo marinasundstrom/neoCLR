@@ -287,3 +287,9 @@ Direct nominal value-record fields may now contain unions/intersections, matchin
 closed generic wrapper storage. Record copies copy structural value storage and
 preserve sharing of embedded references. Static composition fields and borrowed
 fields remain gated; see the native experiment for metadata and collector tests.
+
+Managed nominal record methods may transport structural signatures through their
+ordinary borrowed value receiver. Static fields, native imports and internal calls
+retain separate composition gates. Union overload applicability and ambiguity are
+Raven frontend concerns shared with its ordinary .NET target; native lowering does
+not choose overloads or erase the selected structural parameter type.

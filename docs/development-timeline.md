@@ -25,6 +25,21 @@ available original wording; other text is a summary.
 
 See the [changelog](../CHANGELOG.md) and linked design documents for technical status.
 
+## 2026-10-15 — Union overload resolution belongs in Raven
+
+- **Author:** notes that union-typed method parameters affect overload resolution
+  and can introduce ambiguity, then clarifies: “That is a general Raven issue. Even
+  for main, I believe”.
+- **Assistant:** agrees this belongs in Raven's frontend and should be developed
+  on a main-based line, then deliberately carried to neoCLR. Proposes requiring
+  every source union alternative to convert for applicability, and diagnosing
+  ambiguity when no applicable overload is better; these are proposed criteria,
+  not a report that all existing behavior has been verified.
+- **Inspection:** Raven already has `UnionArgument_UsesCommonDenominatorForOverloadResolution`
+  covering Base versus Object. Union-parameter overlap and general ambiguity
+  coverage still need investigation. Native metadata preserves the compiler's
+  selected type; no overload fix or main integration is claimed here.
+
 ## 2026-10-15 — Structural integration quality gate
 
 - **Author:** directs keeping structural-type website pages current, then working
