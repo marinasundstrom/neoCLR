@@ -11100,3 +11100,14 @@ qualified; other numeric domains are not. No Runtime Contract setting, bridge en
 changes. This supersedes the blanket native-pattern rejection recorded above;
 inclusive stored/sliced Range conversion and safe loop advancement remain open.
 See [contracts, limits and executable evidence](validation/range-patterns/README.md).
+
+
+### Checked inclusive native Range conversion (2026-10-15)
+
+Native inclusive Range ends now validate and save the original Index, reject
+Int32.MaxValue/^0 before arithmetic and construct the translated exclusive Index.
+The existing RuntimeFailureContract propagates terminal faults through a call even
+inside expressions with pending operands. No library ABI, opcode, metadata-format
+or ordinary .NET conversion change. Raven owns conversion; Index and the runtime
+own validation/failure. See [positive and fault qualification](validation/checked-range/README.md).
+This closes the inclusive-conversion gap above; signed iteration is qualified separately.

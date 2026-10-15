@@ -1,0 +1,32 @@
+import System.*
+
+func Main() -> int {
+    var order = 0
+    let bounds = ({
+        order = order * 10 + 1
+        1
+    })..=({
+        order = order * 10 + 2
+        3
+    })
+    if order != 12 || bounds.Start.Value != 1 || bounds.End.Value != 4 {
+        return 1
+    }
+    let tail = ..=^1
+    if !tail.End.IsFromEnd || tail.End.Value != 0 {
+        return 2
+    }
+    let middle = ^3..=^2
+    if middle.Start.Value != 3 || middle.End.Value != 1 || !middle.End.IsFromEnd {
+        return 3
+    }
+    let edge = 0..=2147483646
+    if edge.End.Value != 2147483647 {
+        return 4
+    }
+    let resolved = bounds.GetOffsetAndLength(5)
+    if resolved.Offset != 1 || resolved.Length != 3 {
+        return 5
+    }
+    return 42
+}

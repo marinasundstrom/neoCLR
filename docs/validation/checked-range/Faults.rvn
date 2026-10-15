@@ -1,0 +1,18 @@
+import System.*
+
+func Main(args: string[]) -> int {
+    if args.Length == 1 {
+        let selection1 = 0..=^0
+        return selection1.End.Value
+    }
+    if args.Length == 2 {
+        let selection2 = 0..=2147483647
+        return selection2.End.Value
+    }
+    if args.Length == 3 {
+        let selection3 = 0..=-1
+        return selection3.End.Value
+    }
+    let selection4 = 0..=^-1
+    return selection4.End.Value
+}

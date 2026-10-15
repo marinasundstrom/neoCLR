@@ -206,3 +206,9 @@ The native compiler now lowers signed int/long range patterns in conditions and
 match arms using existing comparisons, including an inclusive maximum endpoint.
 This follows ordinary Raven/.NET semantics without changing System.Range's ABI.
 See [qualification and remaining limits](../validation/range-patterns/README.md).
+
+
+Inclusive native Range conversion is now [qualified](../validation/checked-range/README.md)
+with terminal-fault checks. Nominal safe slicing methods and optional faulting
+indexers follow the [separate capability design](slicing-capabilities.md); these
+interfaces are not yet implemented.

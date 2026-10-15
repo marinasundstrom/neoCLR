@@ -96,9 +96,9 @@ Index and Range describe positions and boundaries; applying them determines vali
 
 The development Raven compiler now uses `..` for an exclusive end and `..=` for an
 inclusive end. Existing half-open slices retain `..`; the former `..<` spelling is
-removed. Native stored/sliced inclusive Range values currently reject pending
-checked Index conversion support. This gap does not change the half-open Range
-library contract. The new compiler carry is qualified on macOS ARM64.
+removed. Native inclusive Range values now use checked Index conversion, rejecting
+unrepresentable ends before arithmetic while retaining the half-open Range library
+contract. The native compiler work is qualified on macOS ARM64.
 
 The array contract is tested in interpreter and macOS native AOT; the Windows JIT
 framework checks also cover array and string Index/Range operations. String range support is available in the matching development libraries, using
@@ -110,6 +110,5 @@ and slicing. Borrowed views remain future work.
 
 Development compiler note: signed int/long range patterns in conditions and match
 arms now use the same exclusive `..` and inclusive `..=` endpoints on the native
-target. This predicate support does not yet enable inclusive stored/sliced Range
-construction. Bounds for a long subject currently require long literals, such as
+target. Checked inclusive Range construction is also supported. Bounds for a long subject currently require long literals, such as
 `1L..=3L`.

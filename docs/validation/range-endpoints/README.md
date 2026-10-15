@@ -41,9 +41,9 @@ qualification; this does not claim every historical experiment was rerun.
 
 ## Remaining work
 
-1. Implement native checked inclusive Index conversion with once-only source-order
-   evaluation and native Fault transport. Keep negative distances, `^0`, `^1` and
-   integer overflow consistent with the shared language rule.
+1. Native checked inclusive Index conversion is now
+   [qualified](../checked-range/README.md), including once-only source-order
+   evaluation and native faults for invalid/unrepresentable ends.
 2. Signed int/long native range patterns are now covered by the
    [predicate follow-up](../range-patterns/README.md); other numeric domains remain
    outside that qualification.
