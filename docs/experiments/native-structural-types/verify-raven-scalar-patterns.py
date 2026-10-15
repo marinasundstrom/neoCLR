@@ -25,7 +25,10 @@ def main():
     parser.add_argument('--record', action='store_true', help='Use an imported nominal value-record payload')
     parser.add_argument('--record-reference', action='store_true', help='Include a direct HttpError reference beside the value record')
     parser.add_argument('--reference-generic', action='store_true', help='Include Response<Cell> with a shared mutable reference field')
+    parser.add_argument('--native-gc', action='store_true', help='Run the reference-generic consumer repeatedly under native collection')
     args = parser.parse_args()
+    if args.native_gc and not args.reference_generic:
+        parser.error('--native-gc requires --reference-generic')
     if args.reference_generic and not (args.record_reference and args.generic):
         parser.error('--reference-generic requires --record-reference --generic')
     if args.record_reference and not args.record:
@@ -115,9 +118,11 @@ def main():
             assert sum(call['name'].endswith(suffix) for call in calls) == input_count, name
     obj = output / 'consumer.o'
     run('aot', [codegen, '--closed-world', artifact, '@entry', obj,
-                '--compile-system', '--reference-arena', *context])
+                '--compile-system', '--reference-arena', *(['--native-gc'] if args.native_gc else []), *context])
     imports = run('imports', ['nm', '-u', obj])
     expected_imports = ['_neoclr_allocate_object_v1'] if reference_payload else []
+    if args.native_gc:
+        expected_imports = ['_neoclr_allocate_object_rooted_v1', '_neoclr_gc_callback_read_v1', '_neoclr_gc_complete_invocation_v1', '_neoclr_gc_enter_v1', '_neoclr_gc_entry_check_v1', '_neoclr_gc_leave_v1', '_neoclr_gc_stack_roots_v1', '_neoclr_gc_transient_v1']
     assert imports.split() == expected_imports, f'Unexpected native imports: {imports}'
     host = output / 'host.c'
     host.write_text('''#include "text-arena.h"
@@ -135,16 +140,49 @@ int main(void) {
         host.write_text(host.read_text().replace('neoclr_aot_context ctx = {0};',
             'uint64_t storage[32] = {0};\n    neoclr_aot_context ctx = {.text = {(unsigned char*)storage, sizeof(storage), 0}};')
             .replace('|| ctx.text.used ||', f'|| ctx.text.used != {arena_bytes} ||'))
-    executable = output / 'consumer'
-    run('link', ['clang', '-arch', 'arm64', '-Wall', '-Wextra', '-Werror',
-                 '-I', ROOT / 'docs/experiments/aot-console', host, obj, *([ROOT / 'docs/experiments/aot-console/text-arena.c'] if reference_payload else []), '-o', executable])
-    native = run('native', [executable]).strip()
-    assert native == f'status=0 result=42 arenaBytes={arena_bytes} fault=0', native
+    gc_sources = [ROOT / 'docs/experiments/aot-console' / name for name in ['native-gc.c', 'root-probe.c']]
+    if args.native_gc:
+        host.write_text(r'''#include "native-gc.h"
+#include <stdio.h>
+int main(void) {
+    uint64_t storage[256] = {0};
+    neoclr_aot_context ctx = {.text = {(unsigned char*)storage, sizeof(storage), 0}};
+    for (int run = 0; run < 32; run++) {
+        int32_t result = -1;
+        int status = neoclr_entry_v4(0, &result, &ctx);
+        if (status || result != 42 || ctx.fault.code || neoclr_root_probe_head_v1()) return 1;
+        if (neoclr_gc_collect_v1(&ctx, NULL) || ctx.text.used || neoclr_gc_entry_check_v1(&ctx)) return 2;
+    }
+    neoclr_gc_statistics stats = neoclr_gc_statistics_v1();
+    if (stats.allocations != 64 || stats.reclaimed_allocations != 64 || stats.collections < 32) return 3;
+    printf("status=0 result=42 iterations=32 allocations=64 reclaimed=64 arenaBytes=0 collections=%llu\n",
+           (unsigned long long)stats.collections);
+    return 0;
+}
+''')
+    native_runs = []
+    for paced in ([False, True] if args.native_gc else [False]):
+        label = 'paced' if paced else 'native'
+        executable = output / label
+        run('link-' + label, ['clang', '-arch', 'arm64', '-Wall', '-Wextra', '-Werror',
+             *(['-DNEOCLR_NATIVE_GC', '-fsanitize=undefined,bounds'] if args.native_gc else []),
+             *(['-DNEOCLR_GC_PACED'] if paced else []),
+             '-I', ROOT / 'docs/experiments/aot-console', host, obj,
+             *([ROOT / 'docs/experiments/aot-console/text-arena.c'] if reference_payload else []),
+             *(gc_sources if args.native_gc else []), '-o', executable])
+        native = run(label, [executable]).strip()
+        if args.native_gc:
+            assert re.fullmatch(r'status=0 result=42 iterations=32 allocations=64 reclaimed=64 arenaBytes=0 collections=\d+', native), native
+        else:
+            assert native == f'status=0 result=42 arenaBytes={arena_bytes} fault=0', native
+        native_runs.append({'paced': paced, 'result': native})
     files = [Path(__file__).resolve(), host, compiler, runtime, codegen, project / 'Main.rvn', project / 'App.rvnproj', artifact, obj]
     if reference_payload:
         files += [ROOT / 'docs/experiments/aot-console/text-arena.c']
     if args.imported:
         files += [library / 'Library.rvnproj', library / 'Main.rvn', library_artifact]
+    if args.native_gc:
+        files += gc_sources + list((ROOT / 'runtime/native/gc').glob('*.[ch]')) + list((ROOT / 'runtime/native/memory').glob('*.[ch]'))
     files += sorted(bundle.glob('*.dll')) + [bundle / 'System.runtime.neox', bundle / 'NeoCLR.ClassLibrary.props', bundle / 'ownership.json']
     files += sorted(compiler.parent.glob('Raven*.dll')) + sorted(compiler.parent.glob('NeoCLR*.dll'))
     compiler_revision = subprocess.run(['git', '-C', str(compiler.parent), 'rev-parse', 'HEAD'], capture_output=True, text=True)
@@ -164,6 +202,8 @@ int main(void) {
         'hashes': {str(path): digest(path) for path in files},
         'commands': commands,
         'native': native,
+        'nativeRuns': native_runs,
+        'nativeGC': args.native_gc,
         'checks': ['native union signature preserved', 'six guarded/fallback scalar match inputs return expected values',
                    'two exact tests and extractions per scalar in fresh Raven output',
                    'interpreter exit 42', 'AOT result 42', 'exact native import allowlist', f'arena bytes: {arena_bytes}'],
@@ -171,6 +211,11 @@ int main(void) {
                         'no JIT or collector stress',
                         'no throughput claim'],
     }
+    if args.native_gc:
+        report['checks'].remove(f'arena bytes: {arena_bytes}')
+        report['checks'].append('32 invocations per eager/paced collector mode; exactly 64 explicit allocations reclaimed and empty roots/heap after every invocation')
+        report['limitations'].remove('no JIT or collector stress')
+        report['limitations'].append('nonmoving AOT collector only; no JIT, async retention or general structural-shape qualification')
     if args.reference_generic:
         report['checks'].append('Response<Cell> preserves substituted reference field and shared mutation across record copy')
     if args.record_reference:

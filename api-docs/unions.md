@@ -152,7 +152,9 @@ also preserves shared mutation through copied Response<Cell> records; ten inputs
 allocate only the two explicit objects (32 bytes). This is not collector stress. Separate
 [native collector tests](../docs/experiments/native-structural-types/README.md#native-collector-stress-for-union-roots-2026-10-15)
 now cover record/reference/scalar payloads across calls and fault unwind with
-eager/paced nonmoving AOT collection and complete post-entry reclamation. Enums,
+eager/paced nonmoving AOT collection and complete post-entry reclamation. The
+[fresh Raven consumer](../docs/experiments/native-structural-types/reference-generic-record-import-project/README.md#native-collection-run)
+also passes 32 invocations per collector mode, reclaiming all explicit objects. Enums,
 Object/scalar-interface views requiring boxing and intrinsic String alternatives
 remain unsupported by this native lowering. Whole-union boxing is also rejected pending structural boxed identity;
 it must not silently become a cast of the payload to Object. Native union descriptor

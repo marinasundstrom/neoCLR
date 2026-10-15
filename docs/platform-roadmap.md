@@ -27,7 +27,9 @@ general Raven pattern comparison fix. A
 also preserves shared Cell mutation through copied records with exactly the two
 explicit allocations. [Bounded native collector stress](experiments/native-structural-types/README.md#native-collector-stress-for-union-roots-2026-10-15)
 now preserves union-held objects through eager/paced AOT collection and fault
-unwind; broader managed JIT/async/application qualification still blocks integration. A
+unwind. The imported Response<Cell> consumer also passes repeated eager/paced
+nonmoving collection with full reclamation; broader JIT/async/application
+qualification still blocks integration. A
 [fresh Raven scalar-pattern consumer](experiments/native-structural-types/scalar-pattern-project/README.md)
 now passes guarded/fallback arms and result joins in interpreter and macOS ARM64 AOT.
 An [artifact-only library consumer](experiments/native-structural-types/scalar-import-project/README.md)

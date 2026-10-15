@@ -387,3 +387,17 @@ async retention or the fresh Raven application under collection. No new Runtime
 Contract, metadata representation or collector algorithm was introduced. Like CLR
 value storage, copying a structural value must preserve the reachability of its
 embedded references; this test checks that obligation in neoCLR's private ABI.
+
+
+### Fresh Raven consumer under native collection (2026-10-15)
+
+The reference-valued generic consumer also passes with `--native-gc`: all ten
+inputs run 32 times per collector mode with root publication enabled. Eager mode
+records 1792 collections; paced mode records 64. Both allocate and reclaim exactly
+64 explicit objects and leave empty roots/heap after every invocation. Native
+bounds/undefined-behavior sanitizers pass. See the [GC evidence](raven-reference-generic-gc-results.json)
+and [reproduction](reference-generic-record-import-project/README.md#native-collection-run).
+This qualifies the imported scalar/closed-generic record/direct-reference consumer
+under nonmoving AOT collection. Runtime hooks are explicitly allowlisted; no layout,
+compiler emission or Runtime Contract change was needed. JIT lifetime, async
+retention, broader structural combinations and throughput remain open.

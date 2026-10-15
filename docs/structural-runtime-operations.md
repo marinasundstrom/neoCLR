@@ -112,7 +112,9 @@ inputs pass with only the two explicit object allocations (32 bytes). This arena
 host is not collector stress. Separate [native collector stress](experiments/native-structural-types/README.md#native-collector-stress-for-union-roots-2026-10-15)
 now covers record/reference/scalar union roots across calls and fault unwind under
 eager and paced nonmoving collection in a small heap. This is bounded AOT
-qualification; JIT and async retention remain open. Intrinsic String alternatives
+qualification. The [fresh imported Raven consumer](experiments/native-structural-types/reference-generic-record-import-project/README.md#native-collection-run)
+also passes 32 invocations in each eager/paced nonmoving collector mode, with
+all explicit objects reclaimed. JIT and async retention remain open. Intrinsic String alternatives
 remain a native layout gap.
 
 An [artifact-only mixed library consumer](experiments/native-structural-types/mixed-import-project/README.md)
@@ -166,6 +168,18 @@ cover copies, nested mutation, calls/results and layout limits. Tuple arrays,
 boxing and complete managed JIT/collector qualification remain separate work.
 
 ## Function values
+
+Composition support must be checked in both directions. Functions can describe
+structural parameter/result types; the union callback tests below qualify that
+path in the interpreter. Tuple elements can describe function types, but combined
+native execution/GC coverage is not implied by each individual feature's support.
+A function directly used as a union alternative is currently rejected by the
+compound-constituent validator. This is a composition support gap. Function
+intersections would instead describe a callable satisfying multiple signatures;
+that overload-like contract is outside the current nominal intersection bounds
+(interfaces and extendable reference classes). It must not be confused with a
+function whose parameter or result is an ordinary interface intersection.
+
 
 A function type describes a callable signature; a function value retains a checked
 target and, where applicable, a bound receiver/environment. In the simple notation,

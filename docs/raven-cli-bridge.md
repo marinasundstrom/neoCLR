@@ -10865,3 +10865,12 @@ reference behavior is checked with the interpreter. This uses eager/paced
 nonmoving AOT collection, without changing Raven emission, metadata or Runtime
 Contract. Fresh Raven consumers still have arena-only evidence; JIT and async
 retention remain separate qualification work.
+
+
+The [fresh reference-generic Raven consumer](experiments/native-structural-types/reference-generic-record-import-project/README.md#native-collection-run)
+now also passes collection-enabled AOT: 32 invocations in each eager/paced mode,
+1792/64 collections respectively, exactly 64 explicit allocations reclaimed per
+mode, and empty root chains/heaps after each return. The runner hashes native GC
+sources and uses an explicit hook allowlist. The class-library bundle is retained;
+compiler emission, metadata and Runtime Contract are unchanged. JIT lifetime,
+async retention and broader structural compositions remain unqualified.

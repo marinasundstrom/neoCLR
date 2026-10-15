@@ -17872,3 +17872,17 @@ main-based branch and the selectively updated native branch. The native consumer
 then passed interpreter/AOT with distinct closed identities and substituted
 fields. See [qualification](experiments/native-structural-types/README.md#closed-generic-record-identity-2026-10-15).
 This is an observed correctness repair, not completion of generic/JIT/GC support.
+
+
+## 2026-10-15 — Function types inside other structural types
+
+The author asked what happens when function types occur inside other structural
+types and vice versa. The assistant distinguished tuple-held callables, functions
+with structural parameter/result types, unions of callable shapes, and callable
+intersections. Code inspection found interpreter evidence for union-valued callback
+signatures, but the current compound validator rejects a function directly as a
+union alternative. Tuple/function signature representation does not establish
+combined native execution/GC qualification. The assistant described function
+intersections as an overload-like contract outside the existing nominal bounds,
+not an implicitly supported extension. No user decision to change intersection
+rules was made. See [runtime composition limits](structural-runtime-operations.md#function-values).

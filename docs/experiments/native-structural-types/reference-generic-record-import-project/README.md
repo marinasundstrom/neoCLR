@@ -34,3 +34,19 @@ Runtime Contract or native layout change was needed. This is reference identity
 and allocation qualification, not managed collector stress: the arena host does
 not collect or move objects. Open generic execution, broader substitutions,
 JIT/GC, boxing, throughput and full Task qualification remain open.
+
+
+## Native collection run
+
+Add `--native-gc` to the command above to enable collection. This compiles with
+native root publication and runs the same ten-case entry 32 times in each of eager
+and paced collector modes, with a 2048-byte heap and native bounds/undefined-behavior
+sanitizers. Every invocation must return 42, leave no root frames and permit full
+heap reclamation. Exactly 64 explicit allocations per mode must be reclaimed.
+The fresh run recorded 1792 eager collections and 64 paced collections. The
+[GC evidence](../raven-reference-generic-gc-results.json) includes the explicit
+runtime-hook import allowlist, both host results and collector source hashes.
+
+This adds nonmoving AOT collection qualification for this fresh Raven consumer.
+It does not establish JIT lifetime, async retention, moving collection or all
+structural combinations. The retained class-library bundle was not rebuilt.
