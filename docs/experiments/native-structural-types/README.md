@@ -658,3 +658,20 @@ two existing String owners; there is no union carrier allocation. AOT runs with
 undefined/bounds sanitizers; the JIT host is not sanitizer-instrumented. All 67
 interpreter composition tests pass. The type-first String/integer patterns and the
 updated widening sample compile with the paired Raven compiler.
+
+### Floating-point union alternatives (2026-10-15)
+
+Single and Double now use distinct inline numeric payload regions in native unions.
+The alternative identities remain exact: testing a Single as Double fails, and
+extracting the wrong floating alternative reports InvalidCast. Widening repacks
+the tag and payload without numeric conversion or boxing; inactive regions remain
+zeroed and numeric lanes are not collector roots. This reuses the existing native
+floating representation rather than introducing another numeric contract.
+
+Focused interpreter/AOT tests cover negative fractional Single and a Double larger
+than Int32, reordered/wider union calls, type tests and wrong extraction. The native
+host verifies zero arena use. All 13 structural value backend tests pass. Primitive
+unboxing now uses the existing normalized evaluation-stack representation in both
+interpreter and verifier; all 11 boxed-interface tests pass, including seven
+primitive regression cases. This does not yet qualify every primitive/enum union,
+NaN payload preservation, floating throughput or every backend/platform.

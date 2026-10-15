@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-15
 
+- Add native Single/Double union alternatives in distinct inline numeric payload regions. Preserve exact type tests, checked extraction, copies/calls and widening without boxes or arena allocation; 13 focused native structural tests pass. Other primitive/enum alternatives and wider floating workloads remain unqualified.
+
 - Normalize `unbox.any` results to the existing evaluation-stack types in execution and verification, retaining exact boxed storage identity. Single loads as Double, small/unsigned integer storage uses its normal stack representation; all 11 boxed-interface tests pass, including seven primitive cases.
 
 - Admit intrinsic String alternatives in structural unions across interpreter, native metadata and native inline storage. Preserve text identity and traced owners without a union carrier; check UTF-8 payloads, scalar replacement and failed extraction under collection. String intersection bounds remain rejected. A fresh type-first Raven pattern consumer passes interpreter/AOT/JIT with exactly two String owners and full cleanup; retain evidence and the author’s match-arm style preference.

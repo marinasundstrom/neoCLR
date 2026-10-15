@@ -11,6 +11,12 @@ pub(crate) fn tag(ty: &Type) -> Option<i64> {
     }
 }
 
+// Floating alternatives retain their own numeric lanes rather than converting to
+// the compact integer payload. Single and Double remain distinct alternatives.
+pub(crate) fn bank_scalar(ty: &Type) -> bool {
+    matches!(ty, Type::Single | Type::Double)
+}
+
 // Named alternatives are candidates here; Profile checks their exact storage
 // family before admitting a mixed or record-union layout.
 pub(crate) fn supported(ty: &Type) -> bool {
@@ -26,8 +32,8 @@ pub(crate) fn record(module: &Module, ty: &Type) -> bool {
 
 // Records and callable descriptors use disjoint, independently traced payload regions.
 pub(crate) fn payloads(module: &Module, ty: &Type) -> bool {
-    matches!(ty, Type::Union(parts) if parts.iter().any(|t| record(module, t) || matches!(t, Type::Function(_) | Type::String))
-        && parts.iter().all(|t| tag(t).is_some() || record(module, t) || matches!(t, Type::Function(_) | Type::String)
+    matches!(ty, Type::Union(parts) if parts.iter().any(|t| record(module, t) || bank_scalar(t) || matches!(t, Type::Function(_) | Type::String))
+        && parts.iter().all(|t| tag(t).is_some() || record(module, t) || bank_scalar(t) || matches!(t, Type::Function(_) | Type::String)
             || module.type_definition(t).is_some_and(|d| d.is_reference_type || d.representation == Representation::Interface)))
 }
 
@@ -40,7 +46,7 @@ pub(crate) fn inline(module: &Module, ty: &Type) -> bool {
 pub(crate) fn box_pair(module: &Module, f: &Function, pc: usize) -> bool {
     matches!((f.body.get(pc), f.body.get(pc + 1)),
         (Some(Op::BoxValue(t)), Some(Op::CastClass(union @ Type::Union(parts))))
-        if (tag(t).is_some() || record(module, t)) && inline(module, union) && parts.contains(t))
+        if (tag(t).is_some() || bank_scalar(t) || record(module, t)) && inline(module, union) && parts.contains(t))
 }
 
 // Only bypass nominal unboxing projection when the immediate producer declares

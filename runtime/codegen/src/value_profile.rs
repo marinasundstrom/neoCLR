@@ -1467,6 +1467,7 @@ impl<'a> Profile<'a> {
                 Op::BoxValue(_) if crate::scalar_unions::box_pair(self.input, f, pc) => (),
                 Op::UnboxAny(t) | Op::IsInstance(t)
                     if crate::scalar_unions::tag(t).is_some()
+                        || crate::scalar_unions::bank_scalar(t)
                         || crate::scalar_unions::record(self.input, t) =>
                 {
                     ()
@@ -1680,6 +1681,7 @@ impl<'a> Profile<'a> {
                             .iter()
                             .filter(|part| {
                                 crate::scalar_unions::tag(part).is_some()
+                                    || crate::scalar_unions::bank_scalar(part)
                                     || crate::scalar_unions::record(self.input, part)
                             })
                             .any(|part| {
@@ -1718,9 +1720,11 @@ impl<'a> Profile<'a> {
                 }
                 Op::IsInstance(t)
                     if crate::scalar_unions::tag(t).is_some()
+                        || crate::scalar_unions::bank_scalar(t)
                         || crate::scalar_unions::record(self.input, t) =>
                 {
-                    if crate::scalar_unions::record(self.input, t)
+                    if (crate::scalar_unions::record(self.input, t)
+                        || crate::scalar_unions::bank_scalar(t))
                         && !matches!(stack.last(), Some(Ty::ValueUnion(_)))
                     {
                         return Err(fail(
@@ -1741,7 +1745,8 @@ impl<'a> Profile<'a> {
                     stack.push(Ty::ScalarUnionTest);
                 }
                 Op::UnboxAny(t) => {
-                    if crate::scalar_unions::record(self.input, t)
+                    if (crate::scalar_unions::record(self.input, t)
+                        || crate::scalar_unions::bank_scalar(t))
                         && !matches!(stack.last(), Some(Ty::ValueUnion(_)))
                     {
                         return Err(fail(

@@ -2852,6 +2852,7 @@ pub(crate) fn compile_into(
                     Op::IsInstance(target) | Op::UnboxAny(target)
                         if matches!(top(), Ty::ValueUnion(_))
                             && (crate::scalar_unions::tag(target).is_some()
+                                || crate::scalar_unions::bank_scalar(target)
                                 || crate::scalar_unions::record(input, target)) =>
                     {
                         let Ty::ValueUnion(parts) = top() else {

@@ -168,3 +168,7 @@ On the structural feature branches, intrinsic `string` alternatives now have
 native metadata and collector checks alongside integer alternatives. String
 owners remain traced references inside a structural union value. This remains
 development work; see the [union API and limits](../../docs/unions.html).
+
+Development native unions also admit Single/Double payloads with exact alternative
+identity and inline numeric storage; focused interpreter/AOT checks cover calls,
+widening and incorrect extraction without carrier allocation.

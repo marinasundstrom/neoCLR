@@ -231,3 +231,8 @@ and managed JIT each return 42 with zero arena use. AOT has no native imports an
 passes undefined/bounds sanitizers. JIT uses the required GC/stack host and checks
 roots/heap cleanup before returning; its host is not sanitizer-built. No Runtime
 Contract or metadata encoding change is introduced.
+
+Native Single/Double union alternatives now use distinct inline numeric regions,
+with exact tests/extraction and allocation-free widening. Interpreter/AOT
+qualification covers calls, fractional values and wrong extraction; other
+primitive/enum alternatives and broader floating workloads remain open.

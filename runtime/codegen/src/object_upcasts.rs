@@ -112,7 +112,7 @@ pub(super) fn verify(p: &Profile<'_>, flows: &[Stacks]) -> Result<(), Error> {
             .iter()
             .enumerate()
             .any(|(pc, op)| crate::scalar_unions::box_pair(p.input, f, pc) ||
-                matches!(op, Op::IsInstance(t) | Op::UnboxAny(t) if (crate::scalar_unions::tag(t).is_some() || crate::scalar_unions::record(p.input, t)) && crate::scalar_unions::query(p.input, f, pc)))
+                matches!(op, Op::IsInstance(t) | Op::UnboxAny(t) if (crate::scalar_unions::tag(t).is_some() || crate::scalar_unions::bank_scalar(t) || crate::scalar_unions::record(p.input, t)) && crate::scalar_unions::query(p.input, f, pc)))
     }) && !p.input.types.iter().any(|t| t.name == "System.Object")
     {
         let mut object = p

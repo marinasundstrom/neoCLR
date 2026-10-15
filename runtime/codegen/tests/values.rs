@@ -3266,3 +3266,97 @@ ret
     assert!(error.contains("union injection"), "{error}");
     assert!(!error.contains("panicked"));
 }
+
+#[test]
+#[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+fn structural_floating_union_preserves_exact_payloads_and_widening() {
+    for (ty, constant, other) in [
+        ("Single", "ldc.r4 -1.25", "Double"),
+        ("Double", "ldc.r8 4294967338.25", "Single"),
+    ] {
+        let source = format!(
+            r#"
+.module FloatUnion
+.type class abstract System.Object
+.end
+.entry Main
+.function Echo(union<Single,Double> value) -> union<Int32,Double,Single>
+ldarg value
+castclass union<Int32,Double,Single>
+ret
+.end
+.function Main() -> Int32
+.local union<Int32,Double,Single> value
+{constant}
+box {ty}
+castclass union<Single,Double>
+call Echo(union<Single,Double>)
+stloc value
+ldloc value
+isinst {other}
+ref.isnull
+brfalse Bad
+ldloc value
+isinst {ty}
+ref.isnull
+brtrue Bad
+ldloc value
+unbox.any {ty}
+{constant}
+ceq
+brfalse Bad
+ldc.i4 42
+ret
+Bad:
+ldc.i4 -1
+ret
+.end
+"#
+        );
+        let module = neoclr::assemble(&source).unwrap();
+        assert_eq!(
+            neoclr::run(&module, neoclr::Limits::default())
+                .unwrap()
+                .value,
+            neoclr::Value::Int32(42)
+        );
+        native_mode_flags(
+            &neoclr::metadata_container::write_module(&module).unwrap(),
+            0,
+            0,
+            42,
+            "@entry",
+            true,
+            &["--compile-system", "--reference-arena"],
+        );
+        let wrong = source
+            .replace(&format!("unbox.any {ty}"), &format!("unbox.any {other}"))
+            .replace(
+                &format!("{constant}\nceq"),
+                &format!(
+                    "{}\nceq",
+                    if other == "Double" {
+                        "ldc.r8 0"
+                    } else {
+                        "ldc.r4 0"
+                    }
+                ),
+            );
+        let module = neoclr::assemble(&wrong).unwrap();
+        assert_eq!(
+            neoclr::run(&module, neoclr::Limits::default())
+                .unwrap_err()
+                .code,
+            neoclr::FaultCode::InvalidCast
+        );
+        native_mode_flags(
+            &neoclr::metadata_container::write_module(&module).unwrap(),
+            0,
+            11,
+            12345,
+            "@entry",
+            true,
+            &["--compile-system", "--reference-arena"],
+        );
+    }
+}
