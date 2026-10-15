@@ -1664,6 +1664,7 @@ Public static host class in `NeoCLR.Metadata.Experimental`:
 byte[] NativeModuleContainer.WriteBinary(ReadOnlySpan<byte> nativeImage);
 byte[] NativeModuleContainer.Read(ReadOnlySpan<byte> image);
 byte[] NativeModuleContainer.WriteLibraryBinary(ReadOnlySpan<byte> nativeImage);
+byte[] NativeModuleContainer.WriteLibraryBinary(AssemblyBuilder assembly);
 ```
 
 `WriteBinary` translates existing format-5 JSON values to a standalone NEOX envelope
@@ -9063,3 +9064,13 @@ unresolved signatures fail validation; this does not enable CLI projection.
 The default remains tuple-only for existing host callers. Native Raven projects
 explicitly select combined admission. This host metadata API is documented here,
 not in the guest RavenDoc type selection.
+
+### Authored standalone libraries (2026-10-15 development)
+
+`NativeModuleContainer.WriteLibraryBinary(AssemblyBuilder assembly)` validates
+the authored graph with its explicit dependency contracts and serializes native
+JSON under the existing 32 MiB library budget, then writes schema 3/4 standalone
+NEOX bounded to 16 MiB. It preserves native structural signatures without a CLI
+projection. Null throws `ArgumentNullException`; invalid graphs or exceeded
+bounds throw `InvalidDataException`. Application writer budgets are unchanged.
+This host API is covered by this manual reference, outside guest RavenDoc.

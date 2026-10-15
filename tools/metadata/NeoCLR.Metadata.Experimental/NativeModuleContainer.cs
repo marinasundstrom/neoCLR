@@ -35,6 +35,19 @@ public static class NativeModuleContainer
             new Dictionary<ushort, ushort> { [256] = schema }, limit);
     }
 
+    /// <summary>Encodes an authored graph as a standalone native library without CLI projection.</summary>
+    /// <param name="assembly">Complete authored graph, including explicit dependency contracts.</param>
+    /// <returns>Owned schema-3/4 NEOX bytes, bounded to 16 MiB.</returns>
+    /// <exception cref="ArgumentNullException">The graph is null.</exception>
+    /// <exception cref="InvalidDataException">The graph, native encoding or library bounds are invalid.</exception>
+    /// <remarks>Validates the graph and uses the 32 MiB library JSON budget before binary encoding.
+    /// Structural signatures remain native; this overload never creates a CLI reference image.</remarks>
+    public static byte[] WriteLibraryBinary(Model.AssemblyBuilder assembly)
+    {
+        ArgumentNullException.ThrowIfNull(assembly);
+        return WriteLibraryBinary(assembly.WriteNativeLibraryAssembly());
+    }
+
     /// <summary>Validates transport and the module header, then reconstructs owned native JSON values.</summary>
     /// <param name="image">Complete standalone NEOX image: schema 2 up to 1 MiB, schema 3 up to 8 MiB, or schema 4 up to 16 MiB.</param>
     /// <returns>Equivalent JSON values; original whitespace and lexical spellings are not retained.</returns>

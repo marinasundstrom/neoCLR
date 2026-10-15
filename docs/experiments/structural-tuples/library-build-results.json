@@ -1,0 +1,93 @@
+{
+  "compilerBase": "4a1b091f4",
+  "compilerChanges": "NativeModuleContainer.WriteLibraryBinary(AssemblyBuilder) wiring",
+  "runtimeBase": "358c75e9c",
+  "results": [
+    {
+      "command": [
+        "dotnet",
+        "/Users/robert/Projects/raven-union-intersection/src/Raven.Compiler/bin/Debug/net11.0/rvnc.dll",
+        "neoclr",
+        "--project",
+        "/Users/robert/Projects/neoclr/runtime/raven/projects/System.Runtime/System.Runtime.rvnproj"
+      ],
+      "exitCode": 0,
+      "errors": []
+    },
+    {
+      "command": [
+        "dotnet",
+        "/Users/robert/Projects/neoclr/tools/metadata/NeoCLR.Metadata.Translate/bin/Release/net10.0/NeoCLR.Metadata.Translate.dll",
+        "/Users/robert/Projects/neoclr/target/tuple-info-bootstrap/System.retained.json",
+        "/Users/robert/Projects/neoclr/target/structural-integrated-libraries-v2/System.runtime.neox",
+        "--reference",
+        "/Users/robert/Projects/neoclr/runtime/raven/projects/System.Runtime/bin/neoclr/System.Runtime.dll"
+      ],
+      "exitCode": 0,
+      "errors": []
+    },
+    {
+      "command": [
+        "dotnet",
+        "/Users/robert/Projects/raven-union-intersection/src/Raven.Compiler/bin/Debug/net11.0/rvnc.dll",
+        "neoclr",
+        "--project",
+        "/Users/robert/Projects/neoclr/runtime/raven/projects/System.Data/System.Data.rvnproj",
+        "--no-build-references"
+      ],
+      "exitCode": 0,
+      "errors": []
+    },
+    {
+      "command": [
+        "dotnet",
+        "/Users/robert/Projects/raven-union-intersection/src/Raven.Compiler/bin/Debug/net11.0/rvnc.dll",
+        "neoclr",
+        "--project",
+        "/Users/robert/Projects/neoclr/runtime/raven/projects/System.Networking/System.Networking.rvnproj",
+        "--no-build-references"
+      ],
+      "exitCode": 0,
+      "errors": []
+    },
+    {
+      "command": [
+        "dotnet",
+        "/Users/robert/Projects/raven-union-intersection/src/Raven.Compiler/bin/Debug/net11.0/rvnc.dll",
+        "neoclr",
+        "--project",
+        "/Users/robert/Projects/neoclr/runtime/raven/projects/System.Web/System.Web.rvnproj",
+        "--no-build-references"
+      ],
+      "exitCode": 1,
+      "errors": [
+        "/Users/robert/Projects/neoclr/runtime/raven/src/System/Web/Http/Json/JsonClientOperations.rvn(20,30): error RAV1503: Cannot convert from 'HttpError' to 'HttpError | JsonError'",
+        "/Users/robert/Projects/neoclr/runtime/raven/src/System/Web/Http/Json/JsonClientOperations.rvn(39,33): error RAV1503: Cannot convert from 'Result<T, JsonError>' to 'Result<HttpResponse, HttpError | JsonError>'",
+        "/Users/robert/Projects/neoclr/runtime/raven/src/System/Web/Http/Json/JsonClientOperations.rvn(60,33): error RAV1503: Cannot convert from 'Result<T, JsonError>' to 'Result<HttpResponse, HttpError | JsonError>'",
+        "/Users/robert/Projects/neoclr/runtime/raven/src/System/Web/Http/Json/JsonClientOperations.rvn(74,30): error RAV1503: Cannot convert from 'HttpError' to 'HttpError | JsonError'",
+        "/Users/robert/Projects/neoclr/runtime/raven/src/System/Web/Http/Json/JsonClientOperations.rvn(76,20): error RAV1503: Cannot convert from 'Result<T, HttpError>' to 'Result<object, HttpError | JsonError>'",
+        "/Users/robert/Projects/neoclr/runtime/raven/src/System/Web/Http/Json/JsonClientOperations.rvn(78,61): error RAV1503: Cannot convert from 'JsonError' to 'HttpError | JsonError'"
+      ]
+    }
+  ],
+  "artifacts": {
+    "System.Runtime": {
+      "size": 6888939,
+      "sha256": "44c21c6f51b7526cf265f360b16f0e97e1c7dd2317998f1dc87fb68a1f29c818"
+    },
+    "System.Data": {
+      "size": 1769474,
+      "sha256": "cc4e73cad271ccd4af6118f932f13ea041ba649e740509013bf7c2ec432e39b9"
+    },
+    "System.Networking": {
+      "size": 1457297,
+      "sha256": "d04ca603935866d8529c43d5e09f8514a49a5efbacb73efb8af462d572c6321c"
+    }
+  },
+  "acceptance": {
+    "combinedSampleExitCode": 42,
+    "disabledTupleProfile": "rejected; prior app output unchanged",
+    "malformedTupleProfile": "rejected; prior app output unchanged",
+    "bundle": "target/tuple-names-libraries-v2"
+  }
+}

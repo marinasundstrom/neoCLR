@@ -17,7 +17,7 @@ The runtime is the repository's `target/debug/neoclr`. Language-server diagnosti
 require a matching native Raven server; the tasks select only the compiler.
 
 The bundle was built with compiler 793219d855b17f01fb805e215968b78871eb3804.
-The intersection parser blocker is fixed. Fresh source-library rebuilding now
-reaches native emission but exceeds the 4 MiB application JSON writer limit;
-wiring the existing library-sized writer remains pending.
+The intersection parser and library writer blockers are fixed. Fresh Runtime,
+Data and Networking builds pass; Web still fails structural-union conversions
+in Result error propagation/case construction. A complete new bundle is pending.
 The default native project runner uses the interpreter; JIT/AOT are unsupported.
