@@ -103,6 +103,9 @@ arena use and no native imports. Records can also combine with direct nominal re
 reference region stores the object, and casts/tests check its actual nominal
 conformance. A [fresh imported record/reference consumer](experiments/native-structural-types/record-reference-import-project/README.md)
 passes eight inputs with only its explicit HttpError allocation (16 bytes).
+A [closed generic record consumer](experiments/native-structural-types/generic-record-reference-import-project/README.md)
+also preserves distinct Response<int>/Response<long> identities and substituted
+fields across nine imported inputs, with the same allocation bound.
 Intrinsic String alternatives remain a native layout gap.
 
 An [artifact-only mixed library consumer](experiments/native-structural-types/mixed-import-project/README.md)

@@ -19,7 +19,10 @@ separate traced reference slot. Closed nominal value-record unions now have boun
 reference checks. A [fresh imported Raven struct consumer](experiments/native-structural-types/record-import-project/README.md)
 passes seven cases with no native imports or arena use. Record/reference mixtures now have bounded native checks and a
 [fresh imported Raven consumer](experiments/native-structural-types/record-reference-import-project/README.md)
-with eight inputs and only the explicit object allocation; managed
+with eight inputs and only the explicit object allocation. A
+[closed-generic record variant](experiments/native-structural-types/generic-record-reference-import-project/README.md)
+also preserves Response<int>/Response<long> identity through nine inputs after a
+general Raven pattern comparison fix; managed
 stress and complete application qualification still block integration. A
 [fresh Raven scalar-pattern consumer](experiments/native-structural-types/scalar-pattern-project/README.md)
 now passes guarded/fallback arms and result joins in interpreter and macOS ARM64 AOT.

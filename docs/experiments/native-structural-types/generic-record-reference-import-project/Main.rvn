@@ -1,0 +1,64 @@
+func IsResponseValid(value: Response<int>) -> bool {
+    return value.Wide == 4294967338L
+}
+
+func IsLongResponseValid(value: Response<long>) -> bool {
+    return value.Number == 4294967341L && value.Wide == 42L
+}
+
+func IsNegative(value: int) -> bool {
+    return value < 0
+}
+
+func IsWide(value: long) -> bool {
+    return value > 4294967295L
+}
+
+func Inspect(value: int | long | bool | Response<int> | Response<long> | HttpError) -> int {
+    let result = match value {
+        let number: int when IsNegative(number) => 11
+        let number: int => number
+        let number: long when IsWide(number) => 13
+        let number: long => 17
+        let flag: bool when flag => 19
+        let flag: bool => 23
+        let response: Response<int> when IsResponseValid(response) => response.Number + 1
+        let response: Response<int> => -2
+        let response: Response<long> when IsLongResponseValid(response) => 45
+        let response: Response<long> => -3
+        let error: HttpError => error.Code
+        _ => -1
+    }
+    return result
+}
+
+func Main() -> int {
+    if Inspect(Echo(Produce(0))) != 11 {
+        return 1
+    }
+    if Inspect(Echo(Produce(1))) != 42 {
+        return 2
+    }
+    if Inspect(Echo(Produce(2))) != 13 {
+        return 3
+    }
+    if Inspect(Echo(Produce(3))) != 17 {
+        return 4
+    }
+    if Inspect(Echo(Produce(4))) != 19 {
+        return 5
+    }
+    if Inspect(Echo(Produce(5))) != 23 {
+        return 6
+    }
+    if Inspect(Echo(Produce(6))) != 43 {
+        return 7
+    }
+    if Inspect(Echo(Produce(7))) != 44 {
+        return 8
+    }
+    if Inspect(Echo(Produce(8))) != 45 {
+        return 9
+    }
+    return 42
+}

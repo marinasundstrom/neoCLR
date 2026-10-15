@@ -316,3 +316,28 @@ arena use is exactly 16 bytes for HttpError. Sources, artifacts, tools and retai
 v3 bundle are fingerprinted in the [evidence](raven-record-reference-import-results.json).
 The bundle itself was not rebuilt. Compiler emission and Runtime Contract
 configuration are unchanged; this adds no managed JIT/GC or throughput claim.
+
+
+### Closed generic record identity (2026-10-15)
+
+The [closed generic record/reference consumer](generic-record-reference-import-project/README.md)
+qualifies `int | long | bool | Response<int> | Response<long> | HttpError` across
+artifact-only imports. Nine inputs preserve scalar guards, both closed record
+identities and their substituted fields, plus the direct class payload. Both
+records have two native field lanes; layout similarity does not make them the
+same type. Interpreter and AOT return 42 with only the explicit HttpError
+allocation (16 bytes). [Evidence](raven-generic-record-reference-import-results.json)
+fingerprints the rebuilt compiler, fresh library/consumer and retained v3 bundle.
+
+The reproducer first exposed a general Raven reachability bug: Response<long>
+was incorrectly marked unreachable after Response<int> because pattern comparison
+erased generic arguments. Main-based Raven commit f7a4bc5a4 replaces that helper
+with the shared symbol comparer; native-branch carry df02f07ad has its own 195-test
+validation. The main-based regression run first failed four distinct-type cases
+(class, struct, nested and imported), while the identical-type rejection passed;
+after repair all 195 match/identity tests passed. The main branch itself was not
+merged or advanced. Runtime Contract configuration and native emission are unchanged.
+
+This is closed Int32/Int64 substitution coverage, not qualification of every open
+generic or reference-valued T. Managed JIT/GC, boxing, compact layout performance
+and full Task application execution remain open.

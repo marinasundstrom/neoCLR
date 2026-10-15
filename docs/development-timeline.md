@@ -17861,3 +17861,14 @@ substitution and assignability rules must remain consistent across source,
 metadata and runtime operations. It used the overlapping-interface test as a
 concrete example: a private storage discriminator must not suppress a held
 object's nominal relationships. Optimization must preserve those rules.
+
+
+Follow-up implementation evidence: the nine-input closed-generic record consumer
+exposed a Raven reachability comparison that erased generic arguments and marked
+Response<long> unreachable after Response<int>. The assistant reproduced this
+independently on a branch from Raven main (four failing regressions), replaced the
+comparison with the shared symbol comparer, and validated 195 tests on both the
+main-based branch and the selectively updated native branch. The native consumer
+then passed interpreter/AOT with distinct closed identities and substituted
+fields. See [qualification](experiments/native-structural-types/README.md#closed-generic-record-identity-2026-10-15).
+This is an observed correctness repair, not completion of generic/JIT/GC support.

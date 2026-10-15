@@ -10827,3 +10827,16 @@ now passes eight imported inputs in interpreter and AOT with only the explicit
 HttpError object allocation (16 bytes). It uses the unchanged native Runtime
 Contract and compiler emission with a retained v3 bundle; the result does not
 qualify managed JIT/GC or full Task execution. Evidence fingerprints all inputs.
+
+
+### Closed generic record pattern identity (2026-10-15)
+
+The [closed-generic record/reference consumer](experiments/native-structural-types/generic-record-reference-import-project/README.md)
+now passes nine imported inputs in interpreter and AOT, preserving distinct
+Response<int>/Response<long> identities and substituted fields with only the
+explicit HttpError allocation (16 bytes). It exposed a general Raven reachability
+bug fixed on the main-based branch in f7a4bc5a4 and carried to the native compiler
+as df02f07ad; each line passed 195 match/identity tests. The native compiler was
+rebuilt, but the v3 class-library bundle was retained. Runtime Contract and
+emission are unchanged. Open generics, managed JIT/GC and throughput remain
+unqualified by this consumer; the native layout is still private and bounded.
