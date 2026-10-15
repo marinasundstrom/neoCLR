@@ -139,7 +139,8 @@ identity with no payload-box allocation. A fresh artifact-only Raven struct
 consumer also preserves Int32/Int64 fields through seven union-call/pattern checks,
 returning 42 in interpreter/AOT with no native imports or arena allocation. The total layout is limited to 256 lanes;
 its size is the sum of alternatives, so overlapping-storage optimization remains
-future work. Records combined with direct reference alternatives, enums,
+future work. Direct nominal reference alternatives can accompany records; their
+shared reference region uses actual nominal conformance for tests and casts. Enums,
 Object/scalar-interface views requiring boxing and intrinsic String alternatives
 remain unsupported by this native lowering. Whole-union boxing is also rejected pending structural boxed identity;
 it must not silently become a cast of the payload to Object. Native union descriptor

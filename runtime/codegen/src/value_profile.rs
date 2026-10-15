@@ -972,7 +972,9 @@ impl<'a> Profile<'a> {
     }
     pub fn cast_targets(&self, target: &Ty) -> Vec<usize> {
         match target {
-            Ty::MixedUnion(parts) => self.cast_targets(&Ty::ReferenceUnion(parts.clone())),
+            Ty::MixedUnion(parts) | Ty::ValueUnion(parts) => {
+                self.cast_targets(&Ty::ReferenceUnion(parts.clone()))
+            }
             Ty::ReferenceUnion(_) => self
                 .input
                 .types
@@ -1627,7 +1629,9 @@ impl<'a> Profile<'a> {
                     if crate::scalar_unions::inline(self.input, t) =>
                 {
                     let source = pop(&mut stack)?;
-                    if matches!(self.ty(t)?, Ty::MixedUnion(_)) && self.is_object_base(&source) {
+                    if matches!(self.ty(t)?, Ty::MixedUnion(_) | Ty::ValueUnion(_))
+                        && self.is_object_base(&source)
+                    {
                         return Err(fail(
                             pc,
                             "mixed union injection from Object requires boxed-payload classification",
@@ -1637,7 +1641,10 @@ impl<'a> Profile<'a> {
                         let view = Type::Named(self.input.types[*index].name.clone());
                         if parts
                             .iter()
-                            .filter(|part| crate::scalar_unions::tag(part).is_some())
+                            .filter(|part| {
+                                crate::scalar_unions::tag(part).is_some()
+                                    || crate::scalar_unions::record(self.input, part)
+                            })
                             .any(|part| {
                                 neoclr::native_metadata::assignable(self.input, part, &view)
                                     .unwrap_or(true)
@@ -1651,8 +1658,14 @@ impl<'a> Profile<'a> {
                     }
                     if !matches!(&source, Ty::PendingUnionScalar(scalar) if parts.contains(scalar))
                         && source != self.ty(t)?
-                        && !(matches!(self.ty(t)?, Ty::MixedUnion(_))
-                            && matches!(source, Ty::Reference(_) | Ty::Interface(_)))
+                        && !(matches!(self.ty(t)?, Ty::MixedUnion(_) | Ty::ValueUnion(_))
+                            && matches!(source, Ty::Reference(_) | Ty::Interface(_))
+                            && parts.iter().any(|part| {
+                                self.input.type_definition(part).is_some_and(|d| {
+                                    d.is_reference_type
+                                        || d.representation == Representation::Interface
+                                })
+                            }))
                     {
                         return Err(fail(
                             pc,
@@ -1829,8 +1842,11 @@ impl<'a> Profile<'a> {
                     stack.push(Ty::Literal);
                 }
                 Op::IsInstance(t) | Op::CastClass(t) => {
+                    if matches!(op, Op::IsInstance(_)) && matches!(self.ty(t)?, Ty::ValueUnion(_)) {
+                        return Err(fail(pc, "value union target tests require structural result lowering"));
+                    }
                     let source = pop(&mut stack)?;
-                    if let Ty::MixedUnion(parts) = &source {
+                    if let Ty::MixedUnion(parts) | Ty::ValueUnion(parts) = &source {
                         let needs_box = self.is_object_base(&self.ty(t)?)
                             || parts
                                 .iter()
@@ -1838,6 +1854,9 @@ impl<'a> Profile<'a> {
                                     Ty::Int => Some(Type::Int32),
                                     Ty::Wide => Some(Type::Int64),
                                     Ty::Bool => Some(Type::Boolean),
+                                    Ty::Record(index) => {
+                                        Some(Type::Named(self.input.types[*index].name.clone()))
+                                    }
                                     _ => None,
                                 })
                                 .any(|scalar| {
@@ -1851,7 +1870,7 @@ impl<'a> Profile<'a> {
                             ));
                         }
                     }
-                    if matches!(source, Ty::MixedUnion(_))
+                    if matches!(source, Ty::MixedUnion(_) | Ty::ValueUnion(_))
                         && !matches!(self.ty(t)?, Ty::Reference(_) | Ty::Interface(_))
                     {
                         return Err(fail(
@@ -1861,7 +1880,8 @@ impl<'a> Profile<'a> {
                     }
                     if !matches!(
                         source,
-                        Ty::MixedUnion(_)
+                        Ty::ValueUnion(_)
+                            | Ty::MixedUnion(_)
                             | Ty::Reference(_)
                             | Ty::Interface(_)
                             | Ty::Intersection(_)

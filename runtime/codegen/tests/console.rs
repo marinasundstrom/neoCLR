@@ -11933,3 +11933,42 @@ fn structural_record_union_preserves_embedded_reference_identity() {
         Some([16, 16, 0, 0, 16, 0, 16, 16]),
     );
 }
+
+#[test]
+#[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+fn structural_record_union_accepts_direct_reference_alternatives() {
+    let source = include_str!(
+        "../../../docs/experiments/native-structural-types/record-reference-union.neoil"
+    )
+    .replace("union<Payload,Int32>", "union<Payload,Int32,Cell>");
+    verify_reference_views_with_arena(&source, Some([16, 16, 0, 0, 16, 0, 16, 16]));
+    let direct = source.replace(
+        "ldloc value\nstloc copy",
+        "ldloc cell\ncastclass union<Payload,Int32,Cell>\ncall Echo(union<Payload,Int32,Cell>)\nstloc copy",
+    ).replace(
+        "ldloc copy\nunbox.any Payload\nldfld Payload::Number\nldc.i8 4294967338\nceq\nbrfalse Bad",
+        "ldloc copy\nisinst Cell\nref.isnull\nbrtrue Bad\nldloc copy\nisinst Payload\nref.isnull\nbrfalse Bad",
+    ).replace(
+        "ldloc copy\nunbox.any Payload\nldfld Payload::Reference",
+        "ldloc copy\ncastclass Cell",
+    );
+    verify_reference_views_with_arena(&direct, Some([16, 16, 0, 0, 16, 0, 16, 16]));
+    let reference_faults = direct.replace(
+        "Extract:\nldloc value\nunbox.any Payload",
+        "Extract:\nldloc value\ncastclass Cell",
+    );
+    verify_reference_views_with_arena(&reference_faults, Some([16, 16, 0, 0, 16, 0, 16, 16]));
+
+}
+
+#[test]
+#[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+fn structural_record_union_reference_alternatives_use_nominal_conformance() {
+    let source = include_str!("../../../docs/experiments/native-structural-types/record-reference-union.neoil")
+        .replace(".type class Cell", ".interface Marker\n.end\n.interface View\n.end\n.type class Cell\n.implements Marker\n.implements View")
+        .replace("union<Payload,Int32>", "union<Payload,Int32,Marker,View>")
+        .replace("ldloc value\nstloc copy", "ldloc cell\ncastclass union<Payload,Int32,Marker,View>\ncall Echo(union<Payload,Int32,Marker,View>)\nstloc copy")
+        .replace("ldloc copy\nunbox.any Payload\nldfld Payload::Number\nldc.i8 4294967338\nceq\nbrfalse Bad", "ldloc copy\nisinst Marker\nref.isnull\nbrtrue Bad\nldloc copy\nisinst View\nref.isnull\nbrtrue Bad")
+        .replace("ldloc copy\nunbox.any Payload\nldfld Payload::Reference", "ldloc copy\ncastclass Cell");
+    verify_reference_views_with_arena(&source, Some([16, 16, 0, 0, 16, 0, 16, 16]));
+}

@@ -274,7 +274,7 @@ cargo test -p neoclr-codegen --test values --test console structural_record_unio
 
 Qualification is macOS ARM64 with the existing native fixture hosts. Native
 verification also retains/restores Object for unbox-only entry points, preserving
-the VM verifier contract without emitting an Object allocation. Records combined with direct reference alternatives, enums,
+the VM verifier contract without emitting an Object allocation. Enums,
 whole-union boxing, managed JIT/GC and full Task/throughput qualification remain
 open. Compiler emission and Runtime Contract configuration are unchanged.
 
@@ -285,3 +285,23 @@ parameters/results and the wide payload; interpreter and AOT return 42 with no
 native imports and zero arena use. [Record consumer evidence](raven-record-import-results.json)
 records both fresh artifacts and the retained v3 bundle. No throughput claim follows
 from eliminating boxing in this bounded consumer.
+
+### Direct reference alternatives beside records (2026-10-15)
+
+The bounded value-union layout also admits nominal reference alternatives. The
+first reference alternative's region holds any admitted reference payload; other
+reference regions remain zero. This private storage choice does not select an
+exclusive nominal case: casts and tests inspect the actual object's conformance,
+including an object implementing multiple interface alternatives. GC recipes mark
+these regions as union-reference payloads rather than asserting the first bound.
+Record/scalar injection still clears every inactive region and allocates no box.
+
+The console tests `structural_record_union_accepts_direct_reference_alternatives`
+and `structural_record_union_reference_alternatives_use_nominal_conformance`
+compare copies, calls, reference identity/mutation, type tests, replacement and
+null/wrong extraction against the interpreter. Arena checks permit only the
+explicit Cell allocation (16 bytes). Object and value-interface projections that
+would require boxing remain gated. Testing against an entire value-union target
+(`isinst union<...>`) also remains gated; testing individual alternatives is
+qualified here. The sum-of-regions size and 256-lane cap remain;
+this is not a compact-layout or managed collector qualification.

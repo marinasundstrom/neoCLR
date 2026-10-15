@@ -10811,3 +10811,12 @@ both artifact hashes and the retained v3 bundle labels. The private disjoint
 layout still trades copy/storage costs for simple tracing; throughput, direct
 reference alternatives alongside records, enums, boxing, managed JIT/GC and full
 Task qualification remain open.
+
+### Native record/reference union storage (2026-10-15)
+
+The structural experiment backend now admits direct nominal reference alternatives
+beside inline value records. Native signature emission and Runtime Contract
+configuration are unchanged. Checked reference views use actual nominal
+conformance; scalar/record queries retain exact identity. See the
+[native qualification](experiments/native-structural-types/README.md#direct-reference-alternatives-beside-records-2026-10-15).
+Boxing projections, compact layouts and managed JIT/GC qualification remain open.

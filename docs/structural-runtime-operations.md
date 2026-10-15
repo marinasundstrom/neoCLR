@@ -99,8 +99,9 @@ explicit Response object. Closed nominal value-record alternatives now have boun
 exact identity tests and copied field snapshots; see the [record-union qualification](experiments/native-structural-types/README.md#nominal-value-record-union-alternatives-2026-10-15).
 A [fresh imported Raven struct consumer](experiments/native-structural-types/record-import-project/README.md)
 also preserves Int32/Int64 fields through union calls and patterns with zero
-arena use and no native imports. Combining records with direct reference alternatives and intrinsic String alternatives
-remain native layout gaps.
+arena use and no native imports. Records can also combine with direct nominal reference alternatives: the first
+reference region stores the object, and casts/tests check its actual nominal
+conformance. Intrinsic String alternatives remain a native layout gap.
 
 An [artifact-only mixed library consumer](experiments/native-structural-types/mixed-import-project/README.md)
 also passes imported union returns/parameters and Response property access with

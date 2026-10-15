@@ -2671,7 +2671,11 @@ pub(crate) fn compile_into(
                         // The adjacent admitted union cast consumes this scalar;
                         // no Object box exists or escapes in the native program.
                     }
-                    Op::CastClass(target) if matches!(p.ty(target)?, Ty::ValueUnion(_)) => {
+                    Op::CastClass(target)
+                        if matches!(p.ty(target)?, Ty::ValueUnion(_))
+                            && (matches!(top(), Ty::PendingUnionScalar(_))
+                                || *top() == p.ty(target)?) =>
+                    {
                         if let Ty::PendingUnionScalar(payload_type) = top() {
                             let payload_type = p.ty(payload_type)?;
                             let Ty::ValueUnion(parts) = p.ty(target)? else {
@@ -2695,7 +2699,9 @@ pub(crate) fn compile_into(
                         }
                     }
                     Op::IsInstance(target) | Op::UnboxAny(target)
-                        if matches!(top(), Ty::ValueUnion(_)) =>
+                        if matches!(top(), Ty::ValueUnion(_))
+                            && (crate::scalar_unions::tag(target).is_some()
+                                || crate::scalar_unions::record(input, target)) =>
                     {
                         let Ty::ValueUnion(parts) = top() else {
                             unreachable!()
@@ -2791,12 +2797,25 @@ pub(crate) fn compile_into(
                         });
                     }
                     Op::IsInstance(target) | Op::CastClass(target) => {
-                        let value = pop(&mut stack);
+                        let (value, record_tag) = if let Ty::ValueUnion(parts) = top() {
+                            let values = stack.split_off(stack.len() - p.lanes(top()));
+                            let mut reference = b.ins().iconst(types::I64, 0);
+                            let mut offset = 1;
+                            for part in parts {
+                                if matches!(part, Ty::Reference(_) | Ty::Interface(_)) {
+                                    reference = b.ins().bor(reference, values[offset]);
+                                }
+                                offset += p.lanes(part);
+                            }
+                            (reference, Some(values[0]))
+                        } else {
+                            (pop(&mut stack), None)
+                        };
                         let source_tag = if matches!(top(), Ty::MixedUnion(_)) {
                             pop(&mut stack); // Scalar bits never become an object address.
                             Some(pop(&mut stack))
                         } else {
-                            None
+                            record_tag
                         };
                         let probe = b.create_block();
                         let joined = b.create_block();
@@ -2804,13 +2823,13 @@ pub(crate) fn compile_into(
                         let null = b.ins().icmp_imm(IntCC::Equal, value, 0);
                         b.ins().brif(null, joined, &[value.into()], probe, &[]);
                         b.switch_to_block(probe);
-                        let zero = b.ins().iconst(types::I64, 0);
+                        let null_reference = b.ins().iconst(types::I64, 0);
                         let target_ty = p.ty(target)?;
                         let cast = if *top() == Ty::Literal {
                             if string_view(&target_ty) {
                                 text_object_view(&mut b, value)
                             } else {
-                                zero
+                                null_reference
                             }
                         } else {
                             let text = b.create_block();
@@ -2825,12 +2844,12 @@ pub(crate) fn compile_into(
                             } else if string_view(&target_ty) {
                                 value
                             } else {
-                                zero
+                                null_reference
                             };
                             b.ins().jump(merged, &[result.into()]);
                             b.switch_to_block(object);
                             let result = if target_ty == Ty::Literal {
-                                zero
+                                null_reference
                             } else {
                                 let tag = b.ins().load(types::I64, MemFlags::new(), value, 0);
                                 let mut matches = b.ins().iconst(types::I8, 0);
@@ -2838,7 +2857,7 @@ pub(crate) fn compile_into(
                                     let matched = matches_type(&mut b, &p, tag, index);
                                     matches = b.ins().bor(matches, matched);
                                 }
-                                b.ins().select(matches, value, zero)
+                                b.ins().select(matches, value, null_reference)
                             };
                             b.ins().jump(merged, &[result.into()]);
                             b.switch_to_block(merged);
@@ -2855,7 +2874,10 @@ pub(crate) fn compile_into(
                             let invalid = b.ins().band(absent, present);
                             let code = if matches!(
                                 target_ty,
-                                Ty::Intersection(_) | Ty::ReferenceUnion(_) | Ty::MixedUnion(_)
+                                Ty::Intersection(_)
+                                    | Ty::ReferenceUnion(_)
+                                    | Ty::MixedUnion(_)
+                                    | Ty::ValueUnion(_)
                             ) {
                                 11
                             } else {
@@ -2871,7 +2893,31 @@ pub(crate) fn compile_into(
                             stack.push(b.ins().select(present, reference_tag, null_tag));
                             stack.push(b.ins().iconst(types::I64, 0));
                         }
-                        stack.push(result);
+                        if let Ty::ValueUnion(parts) = &target_ty {
+                            // All reference alternatives share the first reference bank;
+                            // nominal membership is checked against the actual object.
+                            let active = parts
+                                .iter()
+                                .position(|part| {
+                                    matches!(part, Ty::Reference(_) | Ty::Interface(_))
+                                })
+                                .expect("reference alternative");
+                            let present = b.ins().icmp_imm(IntCC::NotEqual, result, 0);
+                            let tag = b.ins().iconst(types::I32, active as i64 + 1);
+                            let null = b.ins().iconst(types::I32, 0);
+                            stack.push(b.ins().select(present, tag, null));
+                            for (index, part) in parts.iter().enumerate() {
+                                if index == active {
+                                    stack.push(result);
+                                } else {
+                                    stack.extend(
+                                        lanes(&p, part).into_iter().map(|ty| zero(&mut b, ty)),
+                                    );
+                                }
+                            }
+                        } else {
+                            stack.push(result);
+                        }
                     }
                     Op::ReferenceIsNull => {
                         if matches!(top(), Ty::ValueUnion(_)) {

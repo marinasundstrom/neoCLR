@@ -17841,3 +17841,23 @@ branch, specifically function-type use and testing structural union alternatives
 The assistant added `docs/structural-runtime-operations.md`, linked from the family
 reference and integration record, covering signatures, operations and backend
 qualification separately.
+
+## 2026-10-15 — Reassessing structural union complexity
+
+During native record/reference work, the author asked whether structural unions
+remain sound and worth retaining, or add unnecessary complexity. The assistant
+recommended keeping the feature for data composition while retaining strict
+integration criteria. It distinguished coherent value semantics from implementation
+costs in layout, tracing, calls, boxing and generic specialization. It explicitly
+identified the current sum-of-alternative-regions layout as correctness-first,
+with performance still to be qualified. This was an assistant assessment, not a
+new author decision to relax the integration criteria. Native JIT/AOT, managed GC,
+full application behavior and measured costs remain qualification work.
+
+The author then clarified: “The challenge is correctness, to be able to use the
+type system in a consistent way even within these structural constructs.” The
+assistant agreed that existing identity, explicit nominal conformance, generic
+substitution and assignability rules must remain consistent across source,
+metadata and runtime operations. It used the overlapping-interface test as a
+concrete example: a private storage discriminator must not suppress a held
+object's nominal relationships. Optimization must preserve those rules.

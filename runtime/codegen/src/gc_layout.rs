@@ -67,15 +67,24 @@ fn slots(p: &Profile<'_>, ty: &Ty) -> Vec<Slot> {
         Ty::Tuple(parts) | Ty::ValueUnion(parts) => {
             let mut result = vec![];
             let mut offset = usize::from(matches!(ty, Ty::ValueUnion(_)));
-            for ty in parts {
-                for mut slot in slots(p, ty) {
+            for part in parts {
+                let mut part_slots = slots(p, part);
+                if matches!(ty, Ty::ValueUnion(_))
+                    && matches!(part, Ty::Reference(_) | Ty::Interface(_))
+                {
+                    part_slots = vec![Slot {
+                        lane: 0,
+                        trace: Trace::UnionReferencePayload,
+                    }];
+                }
+                for mut slot in part_slots {
                     slot.lane += offset;
                     if let Trace::ErasedText { tag_lane } = &mut slot.trace {
                         *tag_lane += offset;
                     }
                     result.push(slot);
                 }
-                offset += p.lanes(ty);
+                offset += p.lanes(part);
             }
             return result;
         }
@@ -468,6 +477,26 @@ mod tests {
                 lane: 1,
                 trace: Trace::Object(0)
             }]
+        );
+        let mixed = p
+            .ty(&Type::Union(vec![
+                Type::Named("Payload".into()),
+                Type::Named("Cell".into()),
+            ]))
+            .unwrap();
+        assert_eq!(p.lanes(&mixed), 4);
+        assert_eq!(
+            slots(&p, &mixed),
+            vec![
+                Slot {
+                    lane: 2,
+                    trace: Trace::Object(0)
+                },
+                Slot {
+                    lane: 3,
+                    trace: Trace::UnionReferencePayload
+                }
+            ]
         );
         for fields in [14, 15] {
             let mut chunk = module.types[1].clone();
