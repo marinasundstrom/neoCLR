@@ -538,3 +538,36 @@ closed value-record instance methods (42 for each). The remaining 64 interpreter
 composition tests also pass. A direct Raven record sample built against v4 returns
 42 in interpreter/AOT without native allocation. Full Task evidence is being retained
 separately; these changes do not claim complete integration readiness.
+
+### Fresh Task union native qualification (2026-10-15)
+
+Both `Task<Response | HttpError | JsonError>` and
+`Task<Response<int> | HttpError | JsonError>` now pass fresh Raven compilation,
+interpreter execution, macOS ARM64 AOT and managed JIT against the rebuilt v4
+class libraries. Each entry checks ten completed, queued and async-forwarded
+alternative/identity paths and returns 42. For each consumer, eager and paced
+collector policies each pass eight AOT entries with undefined/bounds sanitizers
+and one managed JIT entry. The 64 KiB host checks task/socket scopes, roots and
+heap cleanup before generated code release.
+
+This closes the bounded Task delivery gate after structural generic arguments,
+reserved arrays, record fields and managed record methods were admitted. It does
+not qualify escaped callbacks, unrestricted open generics, other architectures,
+exact allocation counts or union throughput. The JIT host is not sanitizer-built.
+Runtime Contract configuration and native signature encoding are unchanged; no
+CLI carrier replacement is introduced. Runtime/storage owns the newly admitted
+operations; Raven continues emitting native structural signatures.
+
+Retained evidence: [direct Task](task-unions-v4-results.json) and
+[closed generic Task](generic-task-unions-v4-results.json), including command lines,
+source/tool/library hashes and tested revisions. Reproduce with a fresh output
+directory for each run:
+
+```sh
+python3 docs/experiments/native-structural-types/verify-raven-task-unions.py \
+  --compiler /path/to/rvnc.dll --bundle target/structural-integration-libraries-v4 \
+  --output target/task-unions-check
+# Add --closed-generic for Response<int> and choose another output directory.
+```
+
+Set `SDKROOT` to the matching macOS SDK when required by the installed toolchain.
