@@ -806,11 +806,15 @@ fn retained_types(
         pending_types.extend(f.owner.iter().cloned());
         pending_types.extend(f.parameters.iter().chain(&f.locals).cloned());
         pending_types.push(f.returns.clone());
-        for op in &f.body {
+        for (pc, op) in f.body.iter().enumerate() {
             if let Op::StaticField { owner, .. } | Op::SetStaticField { owner, .. } = op {
                 pending_types.push(owner.clone());
             }
-            if matches!(op, Op::BoxValue(_)) {
+            if matches!(op, Op::BoxValue(_) | Op::UnboxAny(_))
+                || matches!(op, Op::IsInstance(t) if (crate::scalar_unions::tag(t).is_some() || crate::scalar_unions::bank_scalar(t) || crate::scalar_unions::record(input, t)) && crate::scalar_unions::query(input, f, pc))
+            {
+                // The VM verification view of scalar tests returns Object even
+                // when this native union never allocates a boxed payload.
                 pending_types.push(Type::Named("System.Object".into()));
             }
             if let Op::BindFunction { function_type, .. } = op {
@@ -839,6 +843,9 @@ fn retained_types(
     }
     while let Some(ty) = pending_types.pop() {
         match ty {
+            Type::Tuple(parts) => pending_types.extend(parts.iter().cloned()),
+            Type::Intersection(parts) => pending_types.extend(parts),
+            Type::Union(parts) => pending_types.extend(parts),
             Type::Named(name) => {
                 let candidates: Vec<_> = input
                     .types
@@ -887,7 +894,7 @@ fn retained_types(
             {
                 ()
             }
-            Type::ArrayRef(t) if matches!(*t, Type::Function(_) | Type::Named(_)) => {
+            Type::ArrayRef(t) if matches!(*t, Type::Function(_) | Type::Named(_) | Type::Tuple(_) | Type::Union(_) | Type::Intersection(_)) => {
                 pending_types.push(*t)
             }
             Type::ArrayRef(t) if *t == Type::Byte => {
@@ -1181,4 +1188,38 @@ pub(super) fn reference_array_backings(report: &Value) -> Vec<usize> {
         .flatten()
         .filter_map(|r| r.as_u64().map(|i| i as usize))
         .collect()
+}
+
+#[cfg(test)]
+mod composition_admission_tests {
+    use super::*;
+
+    #[test]
+    fn structural_tuple_storage_is_selected_without_nominal_carriers() {
+        let mut module = neoclr::assemble(
+            ".module TupleNative\n.entry Main\n.function Main() -> Int32\nldc.i4 42\nret\n.end",
+        )
+        .unwrap();
+        module.functions[0]
+            .locals
+            .push(Type::Tuple(vec![Type::Int32, Type::String].into()));
+        prepare(&module, "Main").unwrap();
+    }
+
+    #[test]
+    fn structural_union_signatures_are_selected_without_nominal_carriers() {
+        let mut module = neoclr::assemble(
+            ".module CompoundNative\n.entry Main\n.interface Left\n.end\n.interface Right\n.end\n.function Main() -> Int32\nldc.i4 42\nret\n.end",
+        ).unwrap();
+        let main = module
+            .functions
+            .iter_mut()
+            .find(|f| f.name == "Main")
+            .unwrap();
+        main.locals.push(Type::Union(vec![
+            Type::from_name("Left"),
+            Type::from_name("Right"),
+        ]));
+        prepare(&module, "Main").unwrap();
+    }
 }

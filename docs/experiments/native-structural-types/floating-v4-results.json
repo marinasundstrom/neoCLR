@@ -1,0 +1,232 @@
+{
+  "schemaVersion": 1,
+  "runtimeRevision": "936a7784671fc3eff2c0f44be5f49afbf6bbe087",
+  "compilerRevision": "b0b0f5d330cf4b3b5456deab649926252e6efe19",
+  "runtimeDiffSha256": "927f6a7c576c18549c80bb37bb8dc057a8a21edc8c71cbbba7a28cd562e0a92a",
+  "compilerDiffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "platform": "macOS-27.0-arm64-arm-64bit",
+  "commands": [
+    {
+      "label": "compile",
+      "command": [
+        "dotnet",
+        "/Users/robert/Projects/raven-union-intersection/src/Raven.Compiler/bin/Debug/net11.0/rvnc.dll",
+        "neoclr",
+        "--project",
+        "/Users/robert/Projects/neoclr/target/structural-floating-v4/project/App.rvnproj"
+      ],
+      "exitCode": 0
+    },
+    {
+      "label": "interpreter",
+      "command": [
+        "/Users/robert/Projects/neoclr/target/debug/neoclr",
+        "run",
+        "/Users/robert/Projects/neoclr/target/structural-floating-v4/project/bin/neoclr/StructuralFloatingUnion.dll",
+        "--execution",
+        "interpreter",
+        "--system",
+        "/Users/robert/Projects/neoclr/target/structural-integration-libraries-v4/System.runtime.neox",
+        "--object-root",
+        "/Users/robert/Projects/neoclr/target/structural-integration-libraries-v4/System.Runtime.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/structural-integration-libraries-v4/System.Runtime.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/structural-integration-libraries-v4/System.Data.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/structural-integration-libraries-v4/System.Networking.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/structural-integration-libraries-v4/System.Web.dll"
+      ],
+      "exitCode": 42
+    },
+    {
+      "label": "aot",
+      "command": [
+        "/Users/robert/Projects/neoclr/target/debug/neoclr-codegen",
+        "--closed-world",
+        "/Users/robert/Projects/neoclr/target/structural-floating-v4/project/bin/neoclr/StructuralFloatingUnion.dll",
+        "@entry",
+        "/Users/robert/Projects/neoclr/target/structural-floating-v4/app.o",
+        "--system",
+        "/Users/robert/Projects/neoclr/target/structural-integration-libraries-v4/System.runtime.neox",
+        "--object-root",
+        "/Users/robert/Projects/neoclr/target/structural-integration-libraries-v4/System.Runtime.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/structural-integration-libraries-v4/System.Runtime.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/structural-integration-libraries-v4/System.Data.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/structural-integration-libraries-v4/System.Networking.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/structural-integration-libraries-v4/System.Web.dll",
+        "--compile-system",
+        "--reference-arena"
+      ],
+      "exitCode": 0
+    },
+    {
+      "label": "imports",
+      "command": [
+        "nm",
+        "-u",
+        "/Users/robert/Projects/neoclr/target/structural-floating-v4/app.o"
+      ],
+      "exitCode": 0
+    },
+    {
+      "label": "link-aot",
+      "command": [
+        "clang",
+        "-isysroot",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.2.sdk",
+        "-arch",
+        "arm64",
+        "-std=c11",
+        "-O2",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-I",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console",
+        "-fsanitize=undefined,bounds",
+        "/Users/robert/Projects/neoclr/target/structural-floating-v4/host.c",
+        "/Users/robert/Projects/neoclr/target/structural-floating-v4/app.o",
+        "-o",
+        "/Users/robert/Projects/neoclr/target/structural-floating-v4/app"
+      ],
+      "exitCode": 0
+    },
+    {
+      "label": "execute-aot",
+      "command": [
+        "/Users/robert/Projects/neoclr/target/structural-floating-v4/app"
+      ],
+      "exitCode": 42
+    },
+    {
+      "label": "link-jit",
+      "command": [
+        "clang",
+        "-isysroot",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.2.sdk",
+        "-arch",
+        "arm64",
+        "-std=c11",
+        "-O2",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-I",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console",
+        "-DJIT_HOST",
+        "-DNEOCLR_NATIVE_GC",
+        "-dynamiclib",
+        "/Users/robert/Projects/neoclr/target/structural-floating-v4/host.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-gc.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/root-probe.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/text-arena.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-stack.c",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-fault-details/render.c",
+        "-o",
+        "/Users/robert/Projects/neoclr/target/structural-floating-v4/host.dylib"
+      ],
+      "exitCode": 0
+    },
+    {
+      "label": "jit",
+      "command": [
+        "/Users/robert/Projects/neoclr/target/debug/neoclr-codegen",
+        "--jit-managed",
+        "--closed-world",
+        "/Users/robert/Projects/neoclr/target/structural-floating-v4/project/bin/neoclr/StructuralFloatingUnion.dll",
+        "@entry",
+        "/Users/robert/Projects/neoclr/target/structural-floating-v4/host.dylib",
+        "--system",
+        "/Users/robert/Projects/neoclr/target/structural-integration-libraries-v4/System.runtime.neox",
+        "--object-root",
+        "/Users/robert/Projects/neoclr/target/structural-integration-libraries-v4/System.Runtime.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/structural-integration-libraries-v4/System.Runtime.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/structural-integration-libraries-v4/System.Data.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/structural-integration-libraries-v4/System.Networking.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/structural-integration-libraries-v4/System.Web.dll",
+        "--compile-system",
+        "--reference-arena",
+        "--native-gc",
+        "--native-stack-budget"
+      ],
+      "exitCode": 0
+    }
+  ],
+  "imports": [],
+  "jit": {
+    "compileAndFinalizeSeconds": 0.413958583,
+    "guestExitCode": 42,
+    "invocationSeconds": 4.25e-05,
+    "metadataLoadSeconds": 0.609555916,
+    "profile": "macos-arm64-jit-managed-v1",
+    "selectionAndVerificationSeconds": 13.423321417
+  },
+  "checks": [
+    "Single/Double exact patterns and widening",
+    "integer alternative",
+    "interpreter/AOT/JIT return 42",
+    "no native imports and zero arena use",
+    "AOT undefined/bounds sanitizers"
+  ],
+  "limitations": [
+    "macOS ARM64 only",
+    "JIT host not sanitizer-instrumented",
+    "no throughput claim"
+  ],
+  "files": {
+    "/Users/robert/Projects/neoclr/docs/experiments/native-structural-types/verify-raven-union-widening.py": "24f6b6df030d1d3086f41b7b2bf0f2fae4f450984bddfd88a5c2792783ed3c6b",
+    "/Users/robert/Projects/raven-union-intersection/src/Raven.Compiler/bin/Debug/net11.0/rvnc.dll": "6354b8372e3b8f8cac43106ba47cdcb8f68aeeca1fbe2fc354e2b1be69f891b2",
+    "/Users/robert/Projects/neoclr/target/debug/neoclr": "0458efc86723c85b388025be108129fa7798aa3bf077d7c819cea7466f85da03",
+    "/Users/robert/Projects/neoclr/target/debug/neoclr-codegen": "edfd872bc810356a6036fbbb61c7a8361eb10550910176fd666002383ed9ab4f",
+    "/Users/robert/Projects/neoclr/target/structural-floating-v4/project/App.rvnproj": "d1294e8248c903867393f0f3bb395d41943860203b1aa00f135b8beea2230cc3",
+    "/Users/robert/Projects/neoclr/target/structural-floating-v4/project/Main.rvn": "8c38ea7ea6ec117eea4d099d0df77c31f26e8b55d948b757101bb0c07c056852",
+    "/Users/robert/Projects/neoclr/target/structural-floating-v4/project/bin/neoclr/StructuralFloatingUnion.dll": "8a4ba5467c8aef9e6f024ce2878a4c6debafbdf5cd187e8aebb47c10d03bb565",
+    "/Users/robert/Projects/neoclr/target/structural-floating-v4/app.o": "af625d98ec5ff61231e4ad51e4309fe91466c6bac0283007d8dd3d0caf41b6ab",
+    "/Users/robert/Projects/neoclr/target/structural-floating-v4/host.c": "3026db2741608aca7e8140fbb64810b1edc25e5d121cef081ac612e44ed19395",
+    "/Users/robert/Projects/neoclr/target/structural-floating-v4/app": "f1a92cc166cfe46c4531f250d5b8024cb6e4bdd805b06349b1471d187bdb90f6",
+    "/Users/robert/Projects/neoclr/target/structural-floating-v4/host.dylib": "9f44c98fec6639a91062d71d637a24368b79c771ae857738ce34182cf4b78340",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-console/text-arena.h": "3840086fc3cffb71d2053c225f95526519ec81d76d3375425fd4d62bf8f0fb05",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-gc.c": "1c718951ea0eb822b0f648f6192d2d9f9686e6a93613dadeecb1b78078d1f4b6",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-console/root-probe.c": "2863b5f63849e9d78185909b893e8ed8e452dec7d1cc8693bd7a77813944310d",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-console/text-arena.c": "20f3dbed6b0ede89ad9ca7206f1c74986ef70453c1ee08c52d65d94a4b943925",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-stack.c": "8bf08bed38457c8a48dcb6fecf784c764651dd75f192a9a8cb4d340b3d638121",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-fault-details/render.c": "aabf93f7a23a9f76b7e328e4c6c3b3842a0fa14c7ddfa701a84c69f99a1bc0be",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-console/console.h": "1f5be96a30639c5e63781637d95d1abb28ab605962caee50ae91a5a0d5bd8068",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-console/entry-arguments.h": "36b1f4b8942ac05e5aa3d072a23aaa380b3df7938aad1dbc7ffb0e533db3b44a",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-console/file-input.h": "77f9f1259bc76c2e9e21c292d9c188e9cc167256e1055591c35eac5d11a64b7d",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-console/file-output.h": "f13171699f402f05ea2ab0e4e1686f227bbe48d65c8b48a62e5f94200605e88e",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-gc.h": "e995832d18f5f4b2cedeef0fc03f4841db5c48c0e37e8a9d483fd1ac65db1a06",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-session.h": "b221dc77da887518e90210bbbfb8ac6ffd6d14416c41faa199ecd2fb43bef7bd",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-console/native-stack.h": "d4b1bbc542c3c8b3338d186a64554e5a0c0d4bc3a94d6b6a48900c49f2da0d13",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-console/root-probe.h": "deabdaa930d39c16ad67b8a0efbbe9b4305daf6fe04861dd217462bd1ebff4ce",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-console/socket-client-internal.h": "e2771ecbe8b74c0e696af297651cd5158755c8ed6e6cc25b1d9bde837a57dddb",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-console/socket-listener.h": "bc0eb3833ec803ba9acdff4887e73f9837b5ceeb3a9c4ff90f56f7085d9e0912",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-console/socket-os.h": "a01419c62fa8a1d3d9131282c5af182f200ba149a440d52c81104e2a156f7ef0",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-console/string-unicode.h": "7ccafd8e775f6e2e2feb570daf40b24bd219856a0c5188c15de9d1511da8165b",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-console/task-queue.h": "cf7d1ded7df30016c353fbb24bb40cb4771bb1c735352bd6bb56d5dea78fa738",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-console/tls-managed.h": "073b109a56895fc15fcb49dfea061cae4ebc228bfe42fcd11f9f2f1041b4eade",
+    "/Users/robert/Projects/neoclr/target/structural-integration-libraries-v4/Core.dll": "3f7cfa9db7c4feb551e2e97b0edb89c4dcf4c64d8eccf01bd006848dcacfd3f4",
+    "/Users/robert/Projects/neoclr/target/structural-integration-libraries-v4/System.Data.dll": "35b984d0dba0ef44de6ee9d8fded7f6f285c240ed2a8ab91f4f31e439bf151ac",
+    "/Users/robert/Projects/neoclr/target/structural-integration-libraries-v4/System.Networking.dll": "49a0b7c742b3a32f44175a3ad9566cd8a797d099f2ab1b98818744b77f695596",
+    "/Users/robert/Projects/neoclr/target/structural-integration-libraries-v4/System.Runtime.dll": "0b97603afef83a96b35ab0bd15a371b48c8dacab2f886200d94fc438bb117538",
+    "/Users/robert/Projects/neoclr/target/structural-integration-libraries-v4/System.Web.dll": "1426e9b66e9fd9f2159327acbb2f3e1d40bd2df1b9a7ed83c5a8e8490dfe4c47",
+    "/Users/robert/Projects/neoclr/target/structural-integration-libraries-v4/System.runtime.neox": "98a1ae1da85387c87746957e83a4015eb59d0566539a915c69f168d2b511b190",
+    "/Users/robert/Projects/neoclr/target/structural-integration-libraries-v4/build-evidence.json": "66e660ea85fb7b1d2eca3e41de564ebfa0638ccc77aa7def37235ca9e14f4b79",
+    "/Users/robert/Projects/raven-union-intersection/src/Raven.Compiler/bin/Debug/net11.0/Raven.CodeAnalysis.Console.dll": "0d02fd6bb8462ade28a22cbd355f5d0dbbb22235c85af76e86475b8b1aebaeab",
+    "/Users/robert/Projects/raven-union-intersection/src/Raven.Compiler/bin/Debug/net11.0/Raven.CodeAnalysis.NeoClr.dll": "a86781568ecd6d24eb50004dcc44428db965c1063f277b11f2959e2ff1fe8d7f",
+    "/Users/robert/Projects/raven-union-intersection/src/Raven.Compiler/bin/Debug/net11.0/Raven.CodeAnalysis.dll": "9e82a69ad025b8a092fb8b37bf274f1c3d4aeb7b9f7a3f17dccbd9910fb6faf1",
+    "/Users/robert/Projects/raven-union-intersection/src/Raven.Compiler/bin/Debug/net11.0/Raven.Core.dll": "638446176e0eda7a7767279c917591109ea113c2094627301af459f60700db31",
+    "/Users/robert/Projects/raven-union-intersection/src/Raven.Compiler/bin/Debug/net11.0/RavenDoc.dll": "e90165a7817fceb784789e9afe8fbbb2d06dabb6d90ac42cdfb42480e51611f1",
+    "/Users/robert/Projects/raven-union-intersection/src/Raven.Compiler/bin/Debug/net11.0/NeoCLR.Metadata.Experimental.dll": "65fdbab829f20d2c5dcef05edc72209253d24ab6eef39c9f89059fe9c96c6223"
+  }
+}

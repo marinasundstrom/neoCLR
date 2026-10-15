@@ -5,6 +5,7 @@ use serde_json::{Value, json};
 type Error = Box<dyn std::error::Error>;
 
 pub fn project(input: &mut neoclr::Module, report: &mut Value) -> Result<(), Error> {
+    let module: &neoclr::Module = input;
     let sites: Vec<_> = input
         .functions
         .iter()
@@ -12,6 +13,9 @@ pub fn project(input: &mut neoclr::Module, report: &mut Value) -> Result<(), Err
         .flat_map(|(i, f)| {
             f.body.iter().enumerate().filter_map(move |(pc, op)| {
                 if let Op::BoxValue(ty) = op {
+                    if crate::scalar_unions::box_pair(module, f, pc) {
+                        return None;
+                    }
                     Some((i, pc, ty.clone()))
                 } else {
                     None
@@ -21,6 +25,9 @@ pub fn project(input: &mut neoclr::Module, report: &mut Value) -> Result<(), Err
         .collect();
     if sites.is_empty() {
         return Ok(());
+    }
+    if sites.iter().any(|(_, _, ty)| matches!(ty, Type::Union(_))) {
+        return Err("native whole-union boxing requires structural boxed identity".into());
     }
     if report["referenceArena"] != true {
         return Err("record boxing requires --reference-arena".into());
@@ -269,6 +276,7 @@ pub fn project_char_tests(input: &mut neoclr::Module, report: &mut Value) -> Res
 /// Checked scalar box queries. A missing producer is a nonmatching type, never a
 /// permission to reinterpret a different box payload.
 pub fn project_scalar_queries(input: &mut neoclr::Module, report: &mut Value) -> Result<(), Error> {
+    let module: &neoclr::Module = input;
     let sites: Vec<_> = input
         .functions
         .iter()
@@ -278,10 +286,14 @@ pub fn project_scalar_queries(input: &mut neoclr::Module, report: &mut Value) ->
                 .iter()
                 .enumerate()
                 .filter_map(move |(pc, op)| match op {
-                    Op::IsInstance(t @ (Type::Int32 | Type::Int64 | Type::Boolean)) => {
+                    Op::IsInstance(t @ (Type::Int32 | Type::Int64 | Type::Boolean))
+                        if !crate::scalar_unions::query(module, f, pc) =>
+                    {
                         Some((i, pc, t.clone(), false))
                     }
-                    Op::UnboxAny(t @ (Type::Int32 | Type::Int64 | Type::Boolean)) => {
+                    Op::UnboxAny(t @ (Type::Int32 | Type::Int64 | Type::Boolean))
+                        if !crate::scalar_unions::query(module, f, pc) =>
+                    {
                         Some((i, pc, t.clone(), true))
                     }
                     _ => None,
@@ -376,4 +388,26 @@ pub fn project_scalar_queries(input: &mut neoclr::Module, report: &mut Value) ->
     }
     report["scalarBoxQueries"] = json!(queries);
     Ok(())
+}
+
+#[cfg(test)]
+mod structural_union_tests {
+    use super::*;
+
+    #[test]
+    fn whole_union_box_is_not_projected_to_a_payload_reference_cast() {
+        let mut input =
+            neoclr::assemble(".module UnionBox\n.function Main() -> Int32\nldc.i4 42\nret\n.end")
+                .unwrap();
+        let op = Op::BoxValue(Type::Union(vec![
+            Type::Named("Left".into()),
+            Type::Named("Right".into()),
+        ]));
+        input.functions[0].body.insert(0, op.clone());
+        let error = project(&mut input, &mut json!({"referenceArena":true})).unwrap_err();
+        assert!(error.to_string().contains("structural boxed identity"));
+        assert!(
+            matches!(&input.functions[0].body[0], Op::BoxValue(Type::Union(parts)) if parts.len() == 2)
+        );
+    }
 }

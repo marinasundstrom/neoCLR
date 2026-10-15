@@ -81,11 +81,11 @@ pub(super) fn compile_for_target(
                 .chain(&f.locals)
                 .chain([&f.returns])
                 .any(|t| {
-                    matches!(t, Type::Value | Type::String | Type::Single | Type::Double | Type::RuntimeTypeHandle)
-                        || matches!(t, Type::ByRef(inner) if matches!(**inner, Type::Value | Type::String))
+                    matches!(t, Type::Value | Type::String | Type::Single | Type::Double | Type::RuntimeTypeHandle | Type::Tuple(_) | Type::Union(_))
+                        || matches!(t, Type::ByRef(inner) if matches!(**inner, Type::Value | Type::String | Type::Tuple(_) | Type::Union(_)))
                 })
                 || f.body.iter().any(|op| {
-                    matches!(op, Op::ShiftLeft | Op::ShiftRight | Op::ShiftRightUnsigned | Op::LoadTypeToken(_) | Op::Float32 { .. } | Op::Float64 { .. } | Op::PackValue(_) | Op::IsValue(_) | Op::UnpackValue(_))
+                    matches!(op, Op::New(Type::Tuple(_)) | Op::CastClass(Type::Union(_)) | Op::ShiftLeft | Op::ShiftRight | Op::ShiftRightUnsigned | Op::LoadTypeToken(_) | Op::Float32 { .. } | Op::Float64 { .. } | Op::PackValue(_) | Op::IsValue(_) | Op::UnpackValue(_))
                         || matches!(op, Op::Call(target) if target.definition.is_some())
                 })
         })

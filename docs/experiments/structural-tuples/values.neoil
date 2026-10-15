@@ -1,0 +1,19 @@
+.module StructuralTupleValues
+.entry Main
+.function Main() -> Int32
+.local tuple<Int32,Int32> original
+ldc.i4 40
+ldc.i4 2
+newobj tuple<Int32,Int32>
+stloc original
+ldloc original
+ldc.i4 7
+stfld 0
+pop
+ldloc original
+ldfld tuple<Int32,Int32>::Item1
+ldloc original
+ldfld tuple<Int32,Int32>::Item2
+add
+ret
+.end

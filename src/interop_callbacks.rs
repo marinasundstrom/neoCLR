@@ -29,7 +29,7 @@ pub(super) fn contexts<'a, 'r, 'e>(
             let Value::Function(binding) = value else {
                 return Err(Fault::new("native callback requires a non-null Function"));
             };
-            if binding.object_view || binding.ty != function.parameters[index] {
+            if binding.view.is_some() || binding.ty != function.parameters[index] {
                 return Err(Fault::new("native callback Function signature mismatch"));
             }
             Ok(Context {
@@ -258,7 +258,7 @@ mod tests {
         let ty = crate::assembler::parse_type("fn<Int32,Int32>").unwrap();
         let value = Value::Function(crate::function_objects::FunctionObject {
             ty: ty.clone(),
-            object_view: false,
+            view: None,
             identity: std::sync::Arc::new(()),
             target: None,
             native: None,

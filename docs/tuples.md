@@ -1,4 +1,17 @@
+> Superseded for the native target on 2026-10-15: nominal Tuple carriers and the
+> generated Tuple runtime slice have been removed. See the [current tuple API](../api-docs/tuples.md)
+> and native structural consumer evidence. The nominal design and commands below
+> record the earlier experiment and require its historical revision.
+
 # Value tuples (development)
+
+## Structural migration selected — 2026-10-14
+
+The author now directs structural tuple types and removal of the nominal tuple
+family. This supersedes the representation choice below, not value-copy semantics.
+The [migration plan](structural-tuples.md) records stages, compatibility and evidence.
+The existing nominal family remains executable during migration; its removal has
+not yet happened. The text below describes that existing implementation.
 
 Author direction, 2026-09-28: neoCLR calls its value-tuple family `System.Tuple`,
 corresponding to .NET's `System.ValueTuple`, rather than .NET's reference `System.Tuple`.

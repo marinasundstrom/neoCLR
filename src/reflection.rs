@@ -28,6 +28,9 @@ pub(crate) enum Query {
     Properties,
     Interfaces,
     GenericArguments,
+    Constituents,
+    TupleElements,
+    TupleNames,
     ElementType,
     BaseType,
     Shape,
@@ -68,6 +71,9 @@ impl Query {
                 "System.Introspection.PropertyInfo[]",
             ),
             "neoCLR.Runtime.TypeInterfaces" => (Self::Interfaces, false, "System.Type[]"),
+            "neoCLR.Runtime.TypeTupleNames" => (Self::TupleNames, false, "String[]"),
+            "neoCLR.Runtime.TypeTupleElements" => (Self::TupleElements, false, "System.Type[]"),
+            "neoCLR.Runtime.TypeConstituents" => (Self::Constituents, false, "System.Type[]"),
             "neoCLR.Runtime.TypeGenericArguments" => {
                 (Self::GenericArguments, false, "System.Type[]")
             }
@@ -131,6 +137,22 @@ impl Query {
             return Err(Fault::new("reflection requires type handle"));
         };
         let ty = from_identity(module, &handle.identity)?;
+        if crate::compositions::is_compound(&ty)
+            && matches!(
+                self,
+                Self::Fields
+                    | Self::Methods
+                    | Self::Constructors
+                    | Self::Properties
+                    | Self::Interfaces
+                    | Self::BaseType
+                    | Self::CustomAttributes
+            )
+        {
+            return Err(Fault::new(
+                "composition member and hierarchy queries are not supported",
+            ));
+        }
         let argument = match args.get(1) {
             Some(Value::Int32(n)) => *n,
             None => 0,
@@ -199,6 +221,9 @@ impl Query {
             Self::Shape => Ok(Value::Boolean(match argument {
                 12 => matches!(handle.identity, TypeIdentity::Definition { .. }),
                 13 => matches!(handle.identity, TypeIdentity::Function { .. }),
+                14 => matches!(handle.identity, TypeIdentity::Union(_)),
+                15 => matches!(handle.identity, TypeIdentity::Intersection(_)),
+                16 => matches!(handle.identity, TypeIdentity::Tuple(_)),
                 8 => definition.is_some_and(|d| {
                     (d.is_reference_type || d.representation == Representation::Interface)
                         && !d.is_sealed
@@ -212,7 +237,7 @@ impl Query {
                                 .constructor
                                 .owner
                                 .as_ref()
-                                .and_then(Type::definition_name)
+                                .and_then(|owner| crate::reflection_source::name(module, owner))
                                 == Some("System.Runtime.CompilerServices.UnionAttribute")
                     })
                 }),
@@ -235,12 +260,15 @@ impl Query {
                     | Type::Boolean
                     | Type::Value
                     | Type::RuntimeTypeHandle
-                    | Type::Array(_) => true,
+                    | Type::Array(_)
+                    | Type::Tuple(_)
+                    | Type::Union(_) => true,
                     Type::Named(_) | Type::Constructed { .. } | Type::Scoped { .. } => definition
                         .is_some_and(|d| {
                             !d.is_reference_type && d.representation != Representation::Interface
                         }),
                     Type::String
+                    | Type::Intersection(_)
                     | Type::Function(_)
                     | Type::ByRef(_)
                     | Type::ReadOnlyByRef(_)
@@ -352,6 +380,51 @@ impl Query {
                     _ => None,
                 },
             ),
+            Self::TupleNames => {
+                if !matches!(ty, Type::Tuple(_)) {
+                    return Err(Fault::new("name query requires a structural tuple"));
+                }
+                array(
+                    "String",
+                    handle.tuple_elements.iter().enumerate().map(|(index, _)| {
+                        let name = handle
+                            .tuple_element_names
+                            .get(index)
+                            .and_then(|name| name.clone())
+                            .unwrap_or_else(|| format!("Item{}", index + 1));
+                        Ok(Value::String(name.into()))
+                    }),
+                    limits,
+                )
+            }
+            Self::TupleElements => {
+                if !matches!(ty, Type::Tuple(_)) {
+                    return Err(Fault::new("element query requires a structural tuple"));
+                }
+                array(
+                    type_contract(module),
+                    handle
+                        .tuple_elements
+                        .iter()
+                        .map(|d| Ok(snapshot_type(module, d.clone()))),
+                    limits,
+                )
+            }
+            Self::Constituents => {
+                if !crate::compositions::is_compound(&ty) {
+                    return Err(Fault::new(
+                        "constituent query requires a structural composition",
+                    ));
+                }
+                array(
+                    type_contract(module),
+                    handle
+                        .constituents
+                        .iter()
+                        .map(|d| Ok(snapshot_type(module, d.clone()))),
+                    limits,
+                )
+            }
             Self::GenericArguments => array(
                 type_contract(module),
                 handle
@@ -1203,6 +1276,26 @@ pub(crate) fn bound_function(
 pub(crate) fn from_identity(module: &Module, identity: &TypeIdentity) -> Result<Type, Fault> {
     let nested = |id| from_identity(module, id).map(Box::new);
     Ok(match identity {
+        TypeIdentity::Tuple(parts) => Type::Tuple(
+            parts
+                .iter()
+                .map(|t| from_identity(module, t))
+                .collect::<Result<Vec<_>, _>>()?
+                .into(),
+        ),
+        TypeIdentity::Union(parts) | TypeIdentity::Intersection(parts) => {
+            let parts = parts
+                .iter()
+                .map(|t| from_identity(module, t))
+                .collect::<Result<Vec<_>, _>>()?;
+            let ty = if matches!(identity, TypeIdentity::Union(_)) {
+                Type::Union(parts)
+            } else {
+                Type::Intersection(parts)
+            };
+            crate::compositions::validate(module, &ty)?;
+            ty
+        }
         TypeIdentity::Function {
             parameters,
             returns,
@@ -1422,6 +1515,15 @@ pub(crate) fn materialize(
                             } else if matches!(fields.first(), Some(Value::RuntimeTypeHandle(handle)) if matches!(handle.identity, TypeIdentity::Function { .. }))
                             {
                                 "System.Introspection.RuntimeFunctionTypeInfo"
+                            } else if matches!(fields.first(), Some(Value::RuntimeTypeHandle(handle)) if matches!(handle.identity, TypeIdentity::Union(_)))
+                            {
+                                "System.Introspection.RuntimeUnionTypeInfo"
+                            } else if matches!(fields.first(), Some(Value::RuntimeTypeHandle(handle)) if matches!(handle.identity, TypeIdentity::Intersection(_)))
+                            {
+                                "System.Introspection.RuntimeIntersectionTypeInfo"
+                            } else if matches!(fields.first(), Some(Value::RuntimeTypeHandle(handle)) if matches!(handle.identity, TypeIdentity::Tuple(_)))
+                            {
+                                "System.Introspection.RuntimeTupleTypeInfo"
                             } else {
                                 "System.Introspection.RuntimeTypeInfo"
                             }
@@ -1554,6 +1656,31 @@ fn publicly_visible(module: &Module, ty: &Type) -> bool {
 #[cfg(test)]
 mod visibility_tests {
     use super::*;
+
+    #[test]
+    fn nominal_union_marker_uses_source_identity_and_is_not_structural() {
+        let mut module = crate::assemble(
+            ".module Flags\n.type class Choice\n.end\n.type class InternalMarker\n.end\n",
+        )
+        .unwrap();
+        module.types[1].origin = Some(serde_json::from_value(serde_json::json!({"assembly":"Runtime","module":"Runtime.dll","name":"System.Runtime.CompilerServices.UnionAttribute","token":33554433})).unwrap());
+        module.types[0].custom_attributes.push(serde_json::from_value(serde_json::json!({"constructor":{"name":".ctor","owner":{"Named":"InternalMarker"},"instance":true,"parameters":[]}})).unwrap());
+        let descriptor =
+            crate::type_identity::describe_host(&module, &Type::from_name("Choice")).unwrap();
+        for (selector, expected) in [(10, true), (14, false)] {
+            let result = Query::Shape
+                .invoke(
+                    &module,
+                    &[
+                        Value::RuntimeTypeHandle(Box::new(descriptor.clone())),
+                        Value::Int32(selector),
+                    ],
+                    &Limits::default(),
+                )
+                .unwrap();
+            assert_eq!(result, Value::Boolean(expected));
+        }
+    }
 
     #[test]
     fn visibility_respects_source_nesting_and_compound_types() {

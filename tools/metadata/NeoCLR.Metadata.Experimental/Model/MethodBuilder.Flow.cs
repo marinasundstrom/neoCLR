@@ -34,11 +34,11 @@ public sealed partial class MethodBuilder
         => Instructions.Select((instruction, index) => (instruction, index)).Where(p => p.instruction.Op == "label")
             .ToDictionary(p => p.instruction.Value, p => p.index);
 
-    private readonly record struct BodyValueType(PrimitiveType Primitive, TypeBuilder? Class = null, SignatureType? ArrayElement = null, bool NativeLength = false, int? MethodParameter = null, int? AddressedLocal = null, int? TypeParameter = null, GenericTypeInstance? GenericInstance = null, ImportedTypeReference? ImportedType = null, SignatureType? ByReferenceElement = null, int? AddressedParameter = null, bool ConstructionReceiver = false, FunctionSignature? Function = null, SignatureType? PointerElement = null)
+    private readonly record struct BodyValueType(PrimitiveType Primitive, TypeBuilder? Class = null, SignatureType? ArrayElement = null, bool NativeLength = false, int? MethodParameter = null, int? AddressedLocal = null, int? TypeParameter = null, GenericTypeInstance? GenericInstance = null, ImportedTypeReference? ImportedType = null, SignatureType? ByReferenceElement = null, int? AddressedParameter = null, bool ConstructionReceiver = false, FunctionSignature? Function = null, SignatureType? PointerElement = null, ReferenceCompositionSignature? Composition = null, TupleSignature? Tuple = null)
     {
         internal static BodyValueType Receiver(TypeBuilder owner) => owner.IsValueType ? SignatureType.ByReference(owner.OpenSignature) : owner.OpenSignature;
         public static implicit operator BodyValueType(PrimitiveType type) => new(type switch { PrimitiveType.SByte or PrimitiveType.Byte or PrimitiveType.Int16 or PrimitiveType.UInt16 or PrimitiveType.UInt32 => PrimitiveType.Int32, PrimitiveType.UInt64 => PrimitiveType.Int64, _ => type });
-        public static implicit operator BodyValueType(SignatureType type) => type.ClassType?.NativePrimitive == PrimitiveType.Void ? new(PrimitiveType.Void) : type.ClassType?.NativePrimitive == PrimitiveType.Value || type.ImportedType is { } erased && NativeImportBinding.IsErasedValue(erased) ? new(PrimitiveType.Value) : type.PointerElement is { } pointer ? new(PrimitiveType.Void, PointerElement: pointer) : type.FunctionSignature is { } function ? new(PrimitiveType.Void, Function: function) : type.ByReferenceElement is { } target ? new(PrimitiveType.Void, ByReferenceElement: target) : type.ImportedType is { } imported ? new(PrimitiveType.Void, ImportedType: imported) : type.GenericInstance is { } instance ? new(PrimitiveType.Void, GenericInstance: instance) : type.TypeParameterIndex is { } ordinal ? new(PrimitiveType.Void, TypeParameter: ordinal) : type.MethodParameterIndex is { } index ? new(PrimitiveType.Void, MethodParameter: index) : type.ArrayElement is { } element ? new(PrimitiveType.Void, ArrayElement: element) : type.ClassType is { } c ? new(PrimitiveType.Void, c) : (BodyValueType)type.Primitive!.Value;
+        public static implicit operator BodyValueType(SignatureType type) => type.Tuple is { } tuple ? new(PrimitiveType.Void, Tuple: tuple) : type.Composition is { } composition ? new(PrimitiveType.Void, Composition: composition) : type.ClassType?.NativePrimitive == PrimitiveType.Void ? new(PrimitiveType.Void) : type.ClassType?.NativePrimitive == PrimitiveType.Value || type.ImportedType is { } erased && NativeImportBinding.IsErasedValue(erased) ? new(PrimitiveType.Value) : type.PointerElement is { } pointer ? new(PrimitiveType.Void, PointerElement: pointer) : type.FunctionSignature is { } function ? new(PrimitiveType.Void, Function: function) : type.ByReferenceElement is { } target ? new(PrimitiveType.Void, ByReferenceElement: target) : type.ImportedType is { } imported ? new(PrimitiveType.Void, ImportedType: imported) : type.GenericInstance is { } instance ? new(PrimitiveType.Void, GenericInstance: instance) : type.TypeParameterIndex is { } ordinal ? new(PrimitiveType.Void, TypeParameter: ordinal) : type.MethodParameterIndex is { } index ? new(PrimitiveType.Void, MethodParameter: index) : type.ArrayElement is { } element ? new(PrimitiveType.Void, ArrayElement: element) : type.ClassType is { } c ? new(PrimitiveType.Void, c) : (BodyValueType)type.Primitive!.Value;
     }
     private BodyValueType ArgumentType(int index)
     {
@@ -82,7 +82,7 @@ public sealed partial class MethodBuilder
             var stack = state.Stack.ToList(); var assigned = (bool[])state.Assigned.Clone();
             var instruction = Instructions[index];
             // Preserve native primitive identity across stack operations and joins.
-            void Pop(BodyValueType type, bool output = false)
+            void Pop(BodyValueType type, bool output = false, bool compositionCall = false)
             {
                 if (stack.Count > 0 && stack[^1].ConstructionReceiver)
                     throw new InvalidDataException("construction receiver cannot escape or be used for ordinary access");
@@ -103,6 +103,9 @@ public sealed partial class MethodBuilder
                      type.ImportedType is { } externalInterface && instance.ConformsTo(externalInterface));
                 var importedConformance = stack.Count > 0 && stack[^1].ImportedType is { } importedActual && type.ImportedType is { } importedTarget &&
                     (Assembly.HasNativeInterfaceConversion(importedActual, importedTarget) || Assembly.HasDeclaredClassBase(importedActual, importedTarget));
+                var compositionConformance = compositionCall && stack.Count > 0 &&
+                    stack[^1].Composition is { } actualComposition && type.Composition is { } targetComposition &&
+                    Assembly.HasExperimentalCompositionCallConversion(actualComposition, targetComposition);
                 var externalRootConformance = stack.Count > 0 && Assembly.ExternalObjectRoot is { } selectedRoot &&
                     Equals(type.ImportedType, selectedRoot) &&
                     (stack[^1].Class is { IsValueType: false, IsStatic: false } ||
@@ -113,7 +116,7 @@ public sealed partial class MethodBuilder
                 if (stack.Count > 0 && (stack[^1].Class?.IsValueType == true || stack[^1].GenericInstance?.Definition.IsValueType == true || stack[^1].ImportedType?.IsValueType == true) &&
                     (type.Class?.IsInterface == true || type.GenericInstance?.Definition.IsInterface == true || type.ImportedType is { IsValueType: false }))
                     throw new InvalidDataException("value-to-interface conversion requires explicit boxing or constrained dispatch");
-                if (stack.Count == 0 || stack[^1] != type && !(stack[^1].Class is { } derived && type.Class is { } ancestor && derived.DerivesFrom(ancestor)) && !externalRootConformance && !importedConformance && !constructedConformance && !localExternalConformance && !(type.Class is { IsInterface: true } contract && stack[^1].Class is { } actual && actual.ConformsTo(contract)) && !(type.GenericInstance is { Definition.IsInterface: true } constructed && stack[^1].Class is { } concrete && concrete.ConformsTo(constructed))) throw new InvalidDataException($"evaluation stack type mismatch or underflow at {index} ({instruction.Op}): expected {type}, actual {(stack.Count == 0 ? "<empty>" : stack[^1].ToString())}");
+                if (stack.Count == 0 || stack[^1] != type && !(stack[^1].Class is { } derived && type.Class is { } ancestor && derived.DerivesFrom(ancestor)) && !compositionConformance && !externalRootConformance && !importedConformance && !constructedConformance && !localExternalConformance && !(type.Class is { IsInterface: true } contract && stack[^1].Class is { } actual && actual.ConformsTo(contract)) && !(type.GenericInstance is { Definition.IsInterface: true } constructed && stack[^1].Class is { } concrete && concrete.ConformsTo(constructed))) throw new InvalidDataException($"evaluation stack type mismatch or underflow at {index} ({instruction.Op}): expected {type}, actual {(stack.Count == 0 ? "<empty>" : stack[^1].ToString())}");
                 stack.RemoveAt(stack.Count - 1);
             }
             switch (instruction.Op)
@@ -199,6 +202,15 @@ public sealed partial class MethodBuilder
                     if (instruction.Op == "field.load") stack.Add(instruction.ConstructedField?.FieldType ?? instruction.Field!.FieldType);
                     if (instruction.Op == "field.address") stack.Add(SignatureType.ByReference(instruction.ConstructedField?.FieldType ?? instruction.Field!.FieldType));
                     break;
+                case "tuple.new":
+                    foreach (var element in instruction.Type!.Tuple!.ElementTypes.Reverse()) Pop(element);
+                    stack.Add(instruction.Type); break;
+                case "tuple.load":
+                case "tuple.store":
+                    var tupleElement = instruction.Type!.Tuple!.ElementTypes[instruction.Value];
+                    if (instruction.Op == "tuple.store") Pop(tupleElement);
+                    Pop(instruction.Type);
+                    stack.Add(instruction.Op == "tuple.load" ? tupleElement : instruction.Type); break;
                 case "array.new":
                 case "array.reserve":
                     Pop(PrimitiveType.Int32); stack.Add(SignatureType.ArrayOf(instruction.Type!)); break;
@@ -353,7 +365,7 @@ public sealed partial class MethodBuilder
                 case "reference.cast":
                 case "object.unbox":
                     if (stack.Count == 0 || stack[^1] is not { ConstructionReceiver: false, ByReferenceElement: null, AddressedLocal: null, AddressedParameter: null } value ||
-                        !(value.Primitive == PrimitiveType.String || value.ArrayElement is not null || value.Class is { IsValueType: false, IsStatic: false } || value.GenericInstance?.Definition is { IsValueType: false, IsStatic: false } || value.ImportedType is { IsValueType: false }))
+                        !(value.Composition is not null || value.Function is not null || value.Primitive == PrimitiveType.String || value.ArrayElement is not null || value.Class is { IsValueType: false, IsStatic: false } || value.GenericInstance?.Definition is { IsValueType: false, IsStatic: false } || value.ImportedType is { IsValueType: false }))
                         throw new InvalidDataException("reference operation requires a reference value");
                     if (instruction.Op == "reference.isnull") MaxStack = Math.Max(MaxStack, stack.Count + 1);
                     stack.RemoveAt(stack.Count - 1);
@@ -393,7 +405,7 @@ public sealed partial class MethodBuilder
                             if (stack[^1].AddressedLocal is { } slot) outputs.Add(slot);
                             if (stack[^1].AddressedParameter is { } parameter) outputs.Add(locals.Count + parameter);
                         }
-                        Pop(callSignature.ParameterTypes[i], output);
+                        Pop(callSignature.ParameterTypes[i], output, compositionCall: true);
                     }
                     if (instruction.Target.IsConstructor)
                     {

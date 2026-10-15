@@ -93,6 +93,19 @@ internal sealed class MethodILGenerator(MethodBuilder bodyBuilder) : IILGenerato
 
     public void ClearBody() => Definition.Body.ClearInstructions();
 
+    public void NewTuple(SignatureType type) => TupleOperation(type, null, "tuple.new");
+    public void LoadTupleElement(SignatureType type, int index) => TupleOperation(type, index, "tuple.load");
+    public void StoreTupleElement(SignatureType type, int index) => TupleOperation(type, index, "tuple.store");
+    private void TupleOperation(SignatureType type, int? index, string operation)
+    {
+        ArgumentNullException.ThrowIfNull(type);
+        type.ValidateOwner(Assembly);
+        if (type.Tuple is not { } tuple) throw new ArgumentException("requires an admitted tuple", nameof(type));
+        if (index is { } position && (position < 0 || position >= tuple.ElementTypes.Count))
+            throw new ArgumentOutOfRangeException(nameof(index));
+        Append(new(operation, Value: index ?? 0, Type: type));
+    }
+
     private void Append(Operation operation)
     {
         if (Instructions.Count >= 4096) throw new InvalidDataException("method instruction limit exceeded");
@@ -214,6 +227,7 @@ internal sealed class MethodILGenerator(MethodBuilder bodyBuilder) : IILGenerato
         if (!ReferenceEquals(operand.Definition.Owner, Assembly)) throw new ArgumentException("reference belongs to another output builder", nameof(operand));
         foreach (var type in operand.TypeArguments)
             type.ValidateOwner(Assembly, Signature.GenericParameterNames.Count, DeclaringType?.GenericParameterNames.Count ?? 0);
+        operand.Target.Definition.ValidateMethodArguments(operand.TypeArguments, bodyBuilder);
         Append(new("call.generic", Target: operand.Target.Definition, GenericTarget: operand.Target));
     }
 
@@ -233,7 +247,7 @@ internal sealed class MethodILGenerator(MethodBuilder bodyBuilder) : IILGenerato
         }
         if (opCode == OpCode.Isinst)
         {
-            if (elementType.Primitive is PrimitiveType.Void || elementType.ByReferenceElement is not null || elementType.IsSelf || elementType.FunctionSignature is not null)
+            if (elementType.Primitive is PrimitiveType.Void || elementType.ByReferenceElement is not null || elementType.IsSelf)
                 throw new ArgumentException("Isinst requires a storage type or scoped generic parameter", nameof(elementType));
             elementType.ValidateOwner(Assembly, Signature.GenericParameterNames.Count, DeclaringType?.GenericParameterNames.Count ?? 0);
             if (!IsReferenceSignature(elementType)) _ = Assembly.ObjectType;
@@ -440,7 +454,9 @@ internal sealed class MethodILGenerator(MethodBuilder bodyBuilder) : IILGenerato
         ArgumentNullException.ThrowIfNull(implementingType);
         if (!ReferenceEquals(target.Definition.Owner, caller.Assembly) || !target.Definition.IsInterfaceMethod || target.MethodArguments.Count != 0 ||
             implementingType.MethodParameterIndex is not { } index || index >= caller.Signature.GenericParameterNames.Count ||
-            !caller.InterfaceConstraints.Any(c => c.ParameterIndex == index && caller.Assembly.SatisfiesConstrainedBound(caller.Definition.ConstraintSignature(c.InterfaceType), target.DeclaringType, implementingType)))
+            !(caller.Definition.AuthoredStructuralConstraints.Any(c => c.ParameterIndex == index)
+                ? caller.ForwardedBoundsSatisfy(caller, index, target.DeclaringType)
+                : caller.Definition.NominalInterfaceConstraints.Any(c => c.ParameterIndex == index && caller.Assembly.SatisfiesConstrainedBound(caller.Definition.ConstraintSignature(c.InterfaceType), target.DeclaringType, implementingType))))
             throw new ArgumentException("constructed constrained call requires a matching method interface bound");
         foreach (var argument in target.DeclaringType.TypeArguments) argument.ValidateOwner(caller.Assembly, caller.Signature.GenericParameterNames.Count, caller.DeclaringType?.GenericParameterNames.Count ?? 0);
         _ = caller.Assembly.ExternalInterfaceMethods(target.DeclaringType).ToArray();
@@ -449,11 +465,13 @@ internal sealed class MethodILGenerator(MethodBuilder bodyBuilder) : IILGenerato
     internal static void ValidateExternalConstrainedOperands(MethodBuilder caller, SignatureType implementingType, ImportedMethodReference target)
     {
         ArgumentNullException.ThrowIfNull(implementingType); ArgumentNullException.ThrowIfNull(target);
-        if (!ReferenceEquals(target.Owner, caller.Assembly) || !target.IsStatic || !target.IsInterfaceMethod ||
+        if (!ReferenceEquals(target.Owner, caller.Assembly) || !target.IsInterfaceMethod ||
             target.Signature.GenericParameterNames.Count != 0 || target.DeclaringReference is not { GenericArity: 0 } owner ||
             implementingType.MethodParameterIndex is not { } index || index >= caller.Signature.GenericParameterNames.Count ||
-            !caller.InterfaceConstraints.Any(c => c.ParameterIndex == index && caller.Assembly.SatisfiesInterfaceBound(caller.Definition.ConstraintSignature(c.InterfaceType), owner)))
-            throw new ArgumentException("external constrained call requires a bounded method parameter and completed static interface target");
+            !(caller.Definition.AuthoredStructuralConstraints.Any(c => c.ParameterIndex == index)
+                ? caller.ForwardedBoundsSatisfy(caller, index, owner)
+                : target.IsStatic && caller.Definition.NominalInterfaceConstraints.Any(c => c.ParameterIndex == index && caller.Assembly.SatisfiesInterfaceBound(caller.Definition.ConstraintSignature(c.InterfaceType), owner))))
+            throw new ArgumentException("external constrained call requires a guaranteed completed nongeneric interface contract; instance calls require structural bounds");
         _ = caller.Assembly.ExternalInterfaceMethods(owner).ToArray();
     }
 
@@ -462,10 +480,12 @@ internal sealed class MethodILGenerator(MethodBuilder bodyBuilder) : IILGenerato
         ArgumentNullException.ThrowIfNull(implementingType);
         ArgumentNullException.ThrowIfNull(target);
         if (implementingType.MethodParameterIndex is not { } index || index >= caller.Signature.GenericParameterNames.Count ||
-            !ReferenceEquals(target.Assembly, caller.Assembly) || !target.IsStatic || !target.IsAbstract ||
+            !ReferenceEquals(target.Assembly, caller.Assembly) || !target.IsAbstract ||
             target.Signature.GenericParameterNames.Count != 0 || target.DeclaringType is not { IsInterface: true, GenericParameterNames.Count: 0 } owner ||
-            !caller.InterfaceConstraints.Any(c => c.ParameterIndex == index && caller.Definition.ConstraintSignature(c.InterfaceType).ClassType is { } bound && bound.ConformsTo(owner)))
-            throw new ArgumentException("open constrained call requires a method parameter with an owned interface bound and a static nongeneric contract");
+            !(caller.Definition.AuthoredStructuralConstraints.Any(c => c.ParameterIndex == index)
+                ? caller.ForwardedBoundsSatisfy(caller, index, owner)
+                : target.IsStatic && caller.Definition.NominalInterfaceConstraints.Any(c => c.ParameterIndex == index && caller.Definition.ConstraintSignature(c.InterfaceType).ClassType is { } bound && bound.ConformsTo(owner))))
+            throw new ArgumentException("open constrained call requires a guaranteed owned nongeneric interface contract; instance calls require structural bounds");
     }
 
     internal static SignatureType SubstituteConstrainedSelf(SignatureType type, SignatureType implementingType) => type.IsSelf ? implementingType

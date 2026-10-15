@@ -53,6 +53,30 @@ public sealed partial class AssemblyBuilder
     private readonly Dictionary<(AssemblyIdentity, string, string, ImportedTypeReference?), ImportedTypeReference> importedNominalTypes = [];
     private readonly Dictionary<ImportedTypeReference, TypeDefinition> nativeImportedDefinitions = [];
     private readonly Dictionary<(ImportedTypeReference, ImportedTypeReference), bool> nativeInterfaceConversions = [];
+    // Call-only proof over flat reference compositions. Retain the original descriptors.
+    internal bool HasExperimentalCompositionCallConversion(ReferenceCompositionSignature actual, ReferenceCompositionSignature target)
+    {
+        bool Closed(SignatureType type) => type.Primitive is { } primitive ? primitive != PrimitiveType.Void
+            : type.ArrayElement is { } element ? Closed(element)
+            : type.ImportedType is { } imported && ReferenceEquals(imported.Owner, this) &&
+                imported.TypeArguments.Count == imported.GenericArity && imported.TypeArguments.All(Closed);
+        bool Supported(SignatureType type) => type.ImportedType is { IsValueType: false } && Closed(type);
+        if (!actual.Constituents.All(Supported) || !target.Constituents.All(Supported))
+            return false;
+        bool Nominal(SignatureType source, SignatureType destination) => source == destination ||
+            HasNativeInterfaceConversion(source.ImportedType!, destination.ImportedType!);
+        bool SatisfiesTarget(SignatureType source) => target.Kind == ReferenceCompositionKind.Intersection
+            ? target.Constituents.All(destination => Nominal(source, destination))
+            : target.Constituents.Any(destination => Nominal(source, destination));
+        // Every possible union alternative must satisfy the destination.
+        if (actual.Kind == ReferenceCompositionKind.Union)
+            return actual.Constituents.All(SatisfiesTarget);
+        // An intersection guarantees every source bound. Different bounds may prove
+        // different requirements of the destination intersection.
+        return target.Kind == ReferenceCompositionKind.Intersection
+            ? target.Constituents.All(destination => actual.Constituents.Any(source => Nominal(source, destination)))
+            : actual.Constituents.Any(SatisfiesTarget);
+    }
     internal bool HasNativeInterfaceConversion(ImportedTypeReference actual, ImportedTypeReference target)
     {
         if (IsAuthoredInterface(target) && HasAuthoredInterfaceConversion(actual, target)) return true;
@@ -80,16 +104,36 @@ public sealed partial class AssemblyBuilder
         }
         return nativeInterfaceConversions[(actual, target)] = Visit(actual);
     }
-    internal SignatureType ImportNativeSignatureType(SignatureType type, AssemblyIdentity core, IAssemblyResolver? resolver)
-        => type.PointerElement is not null ? type : type.ByReferenceElement is { } target ? SignatureType.ByReference(ImportNativeSignatureType(target, core, resolver))
+    internal SignatureType ImportNativeSignatureType(SignatureType type, AssemblyIdentity core, IAssemblyResolver? resolver, bool allowCompositions = false, bool allowTuples = false)
+        => type.Tuple is { } tuple ? allowTuples ? CreateExperimentalTuple(tuple.ElementTypes.Select(t => ImportNativeSignatureType(t, core, resolver, allowTuples: true)).ToArray(), tuple.ElementNames.ToArray()) : throw new InvalidDataException("tuple callable import requires explicit opt-in")
+            : type.Composition is { } composition
+            ? allowCompositions
+                ? SignatureType.FromComposition(composition.Kind, composition.Constituents.Select(t => ImportNativeSignatureType(t, core, resolver, true)))
+                : throw new InvalidDataException("experimental composition callable import requires explicit opt-in")
+            : type.FunctionSignature is { } function ? SignatureType.Function(new MethodSignature(
+                ImportNativeSignatureType(function.ReturnType, core, resolver, allowCompositions, allowTuples),
+                function.ParameterTypes.Select(t => ImportNativeSignatureType(t, core, resolver, allowCompositions, allowTuples))))
+            : type.PointerElement is not null ? type : type.ByReferenceElement is { } target ? SignatureType.ByReference(ImportNativeSignatureType(target, core, resolver))
             : type.ReferencedGenericInstance is { } constructed
-            ? ImportReference(constructed.Definition.Resolve(resolver), core).MakeGenericInstance(constructed.TypeArguments.Select(t => ImportNativeSignatureType(t, core, resolver)).ToArray())
+            ? ImportNativeConstruction(constructed, core, resolver, allowCompositions, allowTuples)
             : type.TypeParameterIndex is { } typeParameter ? SignatureType.TypeParameter(typeParameter)
             : type.MethodParameterIndex is { } parameter ? SignatureType.MethodParameter(parameter)
             : type.ArrayElement is { } element ? SignatureType.ArrayOf(ImportNativeSignatureType(element, core, resolver))
             : type.Primitive is { } primitive ? primitive
             : type.ReferencedType is { } reference ? ImportNativeSignatureReference(reference, core, resolver)
             : throw new InvalidDataException("unsupported native signature type");
+    private ImportedTypeReference ImportNativeConstruction(ReferencedGenericType construction, AssemblyIdentity core, IAssemblyResolver? resolver, bool allowCompositions, bool allowTuples)
+    {
+        var definition = construction.Definition.Resolve(resolver);
+        var imported = ImportReference(definition, core);
+        var arguments = construction.TypeArguments.Select(t => ImportNativeSignatureType(t, core, resolver, allowCompositions, allowTuples)).ToArray();
+        if (!arguments.Any(t => t.ContainsComposition)) return imported.MakeGenericInstance(arguments);
+        if (!allowCompositions || definition.IsValueType || (definition.Attributes & 0x20) != 0 ||
+            arguments.Length != imported.GenericArity || arguments.Any(t => t.NestingDepth >= 16))
+            throw new InvalidDataException("unsupported experimental composition wrapper import");
+        return new ImportedTypeReference(this, imported.AssemblyIdentity, imported.Namespace, imported.Name,
+            imported.GenericArity, arguments, imported.IsValueType, imported.DeclaringType);
+    }
     internal ImportedTypeReference ImportNativeSignatureReference(TypeReference reference, AssemblyIdentity core, IAssemblyResolver? resolver)
     {
         var definition = reference.Resolve(resolver);

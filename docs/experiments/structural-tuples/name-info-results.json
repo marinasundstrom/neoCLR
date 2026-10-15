@@ -1,0 +1,29 @@
+{
+  "exitCode": 0,
+  "stdout": "Tuple descriptors passed\n",
+  "stderr": "",
+  "fixture": "Two native LoadTypeToken substitutions isolate descriptor reflection from source emission",
+  "libraryHashes": {
+    "System.Runtime.dll": "4903656b9e0abac7be3b949ce853344fe481a5b41d76a27506b1132b59f61a51",
+    "System.runtime.neox": "98a1ae1da85387c87746957e83a4015eb59d0566539a915c69f168d2b511b190",
+    "Core.dll": "3f7cfa9db7c4feb551e2e97b0edb89c4dcf4c64d8eccf01bd006848dcacfd3f4",
+    "NeoCLR.ClassLibrary.props": "4676969ee1e381f9bbe0cfce799cfe5503a1a7f77968a174782c35a24752e5b7"
+  },
+  "bundleManifestSha256": "dcc790800b658db19d7dd820d6db0c6f264765f920173660535d04397e6ac11f",
+  "sha256": {
+    "target/debug/neoclr": "cd5ab9bf16065b27a12509bb339bf405aff504af52f43e32ef2ea0ba378c27b4",
+    "target/tuple-names-info/TupleInfo.neox": "ff811fa5e1d7bd56a7dd98db82ee6202dcd6da38e58db3d9446f469022d7061e",
+    "docs/experiments/structural-tuples/TypeInfo.rvn": "ae368ad61455068b16ea6ea9df78f7dbb19ca9f4cde6b33fecc3d0a4cc74e860",
+    "examples/tuple_info_fixture.rs": "719d34a4835a30a73d087144a10a2427f3cf74732219d4fe763b68dece40f071",
+    "src/reflection.rs": "6c22b3667f9e7601fb8c0fd136590cc08af94a8428a11f07df479bba562cb10e",
+    "runtime/raven/src/System/Introspection/Descriptors.rvn": "08e0f3b831296a9ae928c853215563bb903f445ee8d9a7a7ebb826c413d6c573",
+    "target/tuple-names-libraries-v2/build-evidence.json": "2bf62fdf68df5f297561c5b6535e4e4b933c3ac04c737f2b98b8e49defd0dc9a"
+  },
+  "validation": {
+    "nativeQueryTest": "cargo test --features experimental-tuples,experimental-compositions --lib tuple_name_queries (1 passed)",
+    "apiSnapshot": "python3 scripts/build-api-docs.py --check (passed)",
+    "compilerRevision": "793219d855b17f01fb805e215968b78871eb3804",
+    "guestIterationsPerSignature": 180,
+    "command": "SDKROOT=/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.2.sdk python3 docs/experiments/structural-tuples/verify-type-info.py --compiler target/preview15-extracted-macos/neoclr-native-poc/sdk/tools/rvnc/rvnc.dll --library target/tuple-names-libraries-v2 --output target/tuple-names-info"
+  }
+}

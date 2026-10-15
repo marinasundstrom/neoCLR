@@ -344,3 +344,25 @@ ret
         );
     }
 }
+
+#[test]
+fn unboxed_primitives_use_normalized_evaluation_stack_types() {
+    for (ty, literal) in [
+        ("Single", "ldc.r4 1.25"),
+        ("Byte", "ldc.i4 42"),
+        ("SByte", "ldc.i4 -42"),
+        ("Int16", "ldc.i4 -42"),
+        ("UInt16", "ldc.i4 42"),
+        ("UInt32", "ldc.i4 42"),
+        ("UInt64", "ldc.i8 42"),
+    ] {
+        let m = module(&format!(
+            ".function Main() -> Boolean\n{literal}\nbox {ty}\nunbox.any {ty}\n{literal}\nceq\nret\n.end"
+        ));
+        verify(&m).unwrap();
+        assert_eq!(
+            run(&m, Limits::default()).unwrap().value,
+            Value::Boolean(true)
+        );
+    }
+}

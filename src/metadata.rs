@@ -1,3 +1,4 @@
+pub use crate::tuple_signature::TupleSignature;
 use serde::{Deserialize, Serialize};
 
 /// Signature types; nominal storage semantics are declared by TypeDef.
@@ -27,6 +28,10 @@ pub enum Type {
     RuntimeTypeHandle,
     /// Structural managed invocation contract, independent of any named declaration.
     Function(Box<FunctionType>),
+    /// Experimental reference union; requires explicit runtime feature admission.
+    Union(Vec<Type>),
+    /// Experimental reference intersection; requires explicit runtime feature admission.
+    Intersection(Vec<Type>),
     Named(String),
     /// An explicit source-module scope, checked and bound during preparation.
     Scoped {
@@ -56,6 +61,8 @@ pub enum Type {
     InterfaceRef(Box<Type>),
     /// Fundamental unmanaged pointer signature; no ownership policy is implied.
     Ptr(Box<Type>),
+    /// Ordered structural value-tuple signature, independent of nominal declarations.
+    Tuple(TupleSignature),
 }
 
 /// Canonical callable shape. Parameter labels and target identity are not type identity.
@@ -1006,7 +1013,7 @@ impl Module {
     /// Reference storage defaults, including intrinsic String and nominal interface views.
     /// String retains its intrinsic payload and receiver ABI rather than a record layout.
     pub fn is_object_reference_type(&self, ty: &Type) -> bool {
-        matches!(ty, Type::String)
+        matches!(ty, Type::String | Type::Union(_) | Type::Intersection(_))
             || self.is_reference_type(ty)
             || self
                 .type_definition(ty)
@@ -1015,6 +1022,10 @@ impl Module {
 
     /// Implicit ordinary-reference upcast; byrefs and array covariance are excluded.
     pub(crate) fn reference_assignable(&self, source: &Type, target: &Type) -> bool {
+        if crate::compositions::is_compound(source) || crate::compositions::is_compound(target) {
+            return self.is_object_reference_type(source)
+                && crate::compositions::assignable(self, source, target);
+        }
         self.is_object_reference_type(source)
             && ((self.array_nominal(source).as_ref() == Some(target))
                 || (*target == Type::from_name("System.Object") && self.is_reference_type(target))
@@ -1156,6 +1167,8 @@ impl Type {
     pub fn contains_self(&self) -> bool {
         match self {
             Self::SelfType => true,
+            Self::Tuple(parts) => parts.iter().any(Self::contains_self),
+            Self::Union(parts) | Self::Intersection(parts) => parts.iter().any(Self::contains_self),
             Self::Constructed { arguments, .. } | Self::Scoped { arguments, .. } => {
                 arguments.iter().any(Self::contains_self)
             }
@@ -1198,6 +1211,13 @@ impl Type {
             }
             let nested = |ty: &Type| substitute(ty, types, methods, implementing_type, depth + 1);
             Ok(match ty {
+                Type::Tuple(parts) => Type::Tuple(parts.map_types(nested)?),
+                Type::Union(parts) => {
+                    Type::Union(parts.iter().map(nested).collect::<Result<_, _>>()?)
+                }
+                Type::Intersection(parts) => {
+                    Type::Intersection(parts.iter().map(nested).collect::<Result<_, _>>()?)
+                }
                 Type::SelfType if implementing_type.is_some() => implementing_type.unwrap().clone(),
                 Type::Function(shape) => Type::Function(Box::new(shape.map_types(nested)?)),
                 Type::TypeParameter(index) if types.is_some() => types

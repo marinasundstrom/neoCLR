@@ -56,7 +56,7 @@ internal static class LocalChecks
         Reject<InvalidDataException>(() => assembly.Write());
         main.ClearBody(); main.StoreLocal(local); main.LoadLocal(local); main.Return();
         Reject<InvalidDataException>(() => assembly.WriteNativeAssembly());
-        for (int i = main.Locals.Count; i < 256; i++) main.DeclareInt32Local();
+        for (int i = main.Locals.Count; i < 1024; i++) main.DeclareInt32Local();
         Reject<InvalidDataException>(() => main.DeclareInt32Local());
     }
     private static void Reject<T>(Action action) where T : Exception

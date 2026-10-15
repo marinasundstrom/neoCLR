@@ -6,7 +6,7 @@ using System.Text.Json;
 namespace NeoCLR.Metadata.Experimental.Model;
 
 /// <summary>Read-only declaration snapshot of the bounded metadata writer's native format-5 output.</summary>
-/// <remarks>Reads metadata only. Native bodies are opaque and must still be verified by neoCLR. General format-5 assemblies and structural types are unsupported.</remarks>
+/// <remarks>Reads metadata only. Native bodies are opaque and must still be verified by neoCLR. Structural signatures use the native admission rules; unsupported shapes reject.</remarks>
 public sealed partial class NativeAssemblyDefinition
 {
     private sealed record TypeRow(string Namespace, string Name, string NativeName, TypeVisibility Visibility, bool IsStatic, bool IsInterface, bool IsValueType, JsonElement[] BaseInterfaces, FieldRow[] Fields, string[] GenericNames, (int Parameter, string Bound)[] Constraints, Dictionary<int, TypeParameterConstraints> SpecialConstraints, int DeclaringType)
@@ -29,7 +29,7 @@ public sealed partial class NativeAssemblyDefinition
     }
     private sealed record AttributeRow(SignatureType Owner, CustomAttributeArgument[] Arguments) { internal CustomAttributeNamedArgument[] Named { get; init; } = []; }
     private sealed record FieldRow(string Name, JsonElement Type, FieldVisibility Visibility, bool IsReadOnly = false, SignatureType? Signature = null);
-    private sealed record MethodRow(string Namespace, string Name, int Owner, MethodSignature Signature, MethodVisibility Visibility, bool Instance, bool Override) { internal Dictionary<int, AttributeRow[]> ParameterAttributes { get; init; } = []; internal AttributeRow[] Attributes { get; init; } = []; internal bool ObjectSlot { get; init; } internal bool Virtual { get; init; } internal bool Abstract { get; init; } internal ushort ImplementationAttributes { get; init; } internal NativeImportDefinition? NativeImport { get; init; } internal int? ParameterArrayIndex { get; init; } internal Dictionary<int, NullableAnnotation> NullableAnnotations { get; init; } = []; internal (SignatureType Owner, string Name)[] ExplicitInterfaces { get; init; } = []; internal Dictionary<int, string> ParameterNames { get; init; } = []; internal (int Parameter, SignatureType Type, int Owner)[] InterfaceConstraints { get; init; } = []; }
+    private sealed record MethodRow(string Namespace, string Name, int Owner, MethodSignature Signature, MethodVisibility Visibility, bool Instance, bool Override) { internal Dictionary<int, AttributeRow[]> ParameterAttributes { get; init; } = []; internal AttributeRow[] Attributes { get; init; } = []; internal bool ObjectSlot { get; init; } internal bool Virtual { get; init; } internal bool Abstract { get; init; } internal ushort ImplementationAttributes { get; init; } internal NativeImportDefinition? NativeImport { get; init; } internal int? ParameterArrayIndex { get; init; } internal Dictionary<int, NullableAnnotation> NullableAnnotations { get; init; } = []; internal (SignatureType Owner, string Name)[] ExplicitInterfaces { get; init; } = []; internal Dictionary<int, string> ParameterNames { get; init; } = []; internal (int Parameter, SignatureType Type, int Owner, bool Structural)[] TypeConstraints { get; init; } = []; }
     private sealed record PropertyRow(int Owner, string Name, SignatureType Type, int Getter, int Setter, SignatureType[] Parameters, bool IsInitOnly);
     private sealed record NativeTypeAlias(string NativeName, AssemblyIdentity Assembly, string Namespace, string Name, int Arity, bool ValueType, string? Declaring, int DeclaringArity);
     private readonly Dictionary<(string Name, int Arity), NativeTypeAlias> nativeTypeAliases;
@@ -57,11 +57,28 @@ public sealed partial class NativeAssemblyDefinition
     public static NativeAssemblyDefinition ReadAssembly(ReadOnlySpan<byte> image)
         => ReadCore(image, MetadataArtifactReader.MaxImageSize);
 
-    internal static NativeAssemblyDefinition ReadLibraryAssembly(ReadOnlySpan<byte> image)
-        => ReadCore(image, 32 * 1024 * 1024);
+    internal static NativeAssemblyDefinition ReadLibraryAssembly(ReadOnlySpan<byte> image, IAssemblyResolver? resolver = null)
+        => ReadCore(image, 32 * 1024 * 1024, resolver);
 
-    private static NativeAssemblyDefinition ReadCore(ReadOnlySpan<byte> image, int maxSize)
+    private static NativeAssemblyDefinition ReadCore(ReadOnlySpan<byte> image, int maxSize, IAssemblyResolver? resolver = null)
     {
+        var resolvedIntersections = new Dictionary<AssemblyIdentity, AssemblyDefinition>();
+        bool ExtendableExternal(ImportedTypeReference external)
+        {
+            if (!resolvedIntersections.TryGetValue(external.AssemblyIdentity, out var dependency))
+            {
+                dependency = resolver?.Resolve(external.AssemblyIdentity);
+                if (dependency is null || !dependency.Identity.Equals(external.AssemblyIdentity))
+                    throw new InvalidDataException("external intersection requires an exact dependency snapshot: " + external.AssemblyIdentity.Name);
+                resolvedIntersections.Add(external.AssemblyIdentity, dependency);
+            }
+            static bool Matches(TypeDefinition type, ImportedTypeReference reference) =>
+                type.Namespace == reference.Namespace && type.Name == reference.Name && type.GenericArity == reference.GenericArity &&
+                (reference.DeclaringType is null ? type.DeclaringType is null
+                    : type.DeclaringType is { } parent && Matches(parent, reference.DeclaringType));
+            var matches = dependency.MainModule.Types.Where(t => Matches(t, external)).ToArray();
+            return matches.Length == 1 && !matches[0].IsValueType && (matches[0].Attributes & 0x100) == 0;
+        }
         if (image.Length > maxSize) throw new InvalidDataException("native image exceeds limit");
         try
         {
@@ -454,7 +471,7 @@ public sealed partial class NativeAssemblyDefinition
                 }
             for (int i = 0; i < types.Count; i++)
                 foreach (var (parameter, flags) in types[i].SpecialConstraints) signatureOwners[i].SetSpecialConstraints(parameter, flags);
-            SignatureType ReadType(JsonElement element, bool allowVoid, bool allowArray = true, bool allowByReference = false, bool allowSelf = false)
+            SignatureType ReadType(JsonElement element, bool allowVoid, bool allowArray = true, bool allowByReference = false, bool allowSelf = false, bool allowComposition = false)
             {
                 if (element.ValueKind == JsonValueKind.String)
                 {
@@ -483,13 +500,65 @@ public sealed partial class NativeAssemblyDefinition
                     }
                     return ReadPrimitive(element.GetString(), allowVoid);
                 }
+                if (element.TryGetProperty("Tuple", out var tupleShape))
+                {
+                    Require(element.EnumerateObject().Count() == 1, "malformed structural tuple");
+                    if (tupleShape.ValueKind == JsonValueKind.Array)
+                        return signatureGraph.CreateExperimentalTuple(Array(element, "Tuple", 256).Select(t => ReadType(t, false)).ToArray());
+                    Require(tupleShape.ValueKind == JsonValueKind.Object && tupleShape.EnumerateObject().Count() == 2 && tupleShape.TryGetProperty("elements", out _) && tupleShape.TryGetProperty("names", out _), "malformed named tuple");
+                    var tupleNames = Array(tupleShape, "names", 256).Select(n =>
+                    {
+                        Require(n.ValueKind is JsonValueKind.String or JsonValueKind.Null, "invalid tuple name");
+                        return n.ValueKind == JsonValueKind.Null ? null : n.GetString();
+                    }).ToArray();
+                    return signatureGraph.CreateExperimentalTuple(Array(tupleShape, "elements", 256).Select(t => ReadType(t, false)).ToArray(), tupleNames);
+                }
+                if (element.TryGetProperty("Union", out _) || element.TryGetProperty("Intersection", out _))
+                {
+                    Require(allowComposition, "unsupported structural composition in this position");
+                    var nodes = 0;
+                    return ReadComposition(element, 0, false);
+                    SignatureType ReadComposition(JsonElement value, int depth, bool intersectionBound)
+                    {
+                        Require(++nodes <= 4096 && depth <= 32, "composition exceeds signature budget");
+                        if (value.ValueKind == JsonValueKind.Object && (value.TryGetProperty("Union", out _) || value.TryGetProperty("Intersection", out _)))
+                        {
+                            var key = value.TryGetProperty("Union", out _) ? "Union" : "Intersection";
+                            Shape(value, key);
+                            var operands = Array(value, key, 256);
+                            Require(operands.Length >= 2, "composition requires at least two operands");
+                            return SignatureType.FromComposition(key == "Union" ? ReferenceCompositionKind.Union : ReferenceCompositionKind.Intersection,
+                                operands.Select(child => ReadComposition(child, depth + 1, intersectionBound || key == "Intersection")).ToArray());
+                        }
+                        var leaf = ReadType(value, false, allowComposition: true);
+                        bool SupportedCompositionArgument(SignatureType argument) => argument.MethodParameterIndex is not null || argument.TypeParameterIndex is not null || (argument.Composition is { } nestedComposition ? nestedComposition.Constituents.All(SupportedCompositionArgument)
+                            : argument.FunctionSignature is { } function ? function.ParameterTypes.All(SupportedCompositionArgument)
+                                && (function.ReturnType.Primitive == PrimitiveType.Void || SupportedCompositionArgument(function.ReturnType))
+                            : argument.Primitive is { } primitive ? primitive != PrimitiveType.Void
+                            : argument.ArrayElement is { } element ? SupportedCompositionArgument(element)
+                            : argument.GenericInstance is { } generic ? generic.TypeArguments.All(SupportedCompositionArgument)
+                            : argument.ClassType is { GenericParameterNames.Count: 0 }
+                            || argument.ImportedType is { } imported && imported.TypeArguments.Count == imported.GenericArity && imported.TypeArguments.All(SupportedCompositionArgument));
+                        var localBound = leaf.ClassType ?? leaf.GenericInstance?.Definition;
+                        var scalar = leaf.Primitive is { } primitive && primitive is not (PrimitiveType.Void or PrimitiveType.Value or PrimitiveType.RuntimeTypeHandle or PrimitiveType.String);
+                        Require(SupportedCompositionArgument(leaf) && (intersectionBound
+                            ? localBound is { IsStatic: false, IsValueType: false } || leaf.ImportedType is { IsValueType: false }
+                            : scalar || leaf.Primitive == PrimitiveType.String || leaf.FunctionSignature is not null || localBound is { IsStatic: false } || leaf.ImportedType is not null),
+                            "unsupported composition alternative; intersections require nominal references");
+                        if (intersectionBound)
+                            Require(localBound is { } bound ? !types[System.Array.IndexOf(signatureOwners, bound)].IsSealedClass
+                                : leaf.ImportedType is { } external && ExtendableExternal(external),
+                                "intersection bounds require resolved interfaces or non-sealed reference classes");
+                        return leaf;
+                    }
+                }
                 if (element.TryGetProperty("Function", out var function))
                 {
                     Shape(element, "Function"); Shape(function, "parameters", "returns", "no_result");
                     bool noResult = function.GetProperty("no_result").GetBoolean();
-                    var returns = ReadType(function.GetProperty("returns"), noResult);
+                    var returns = ReadType(function.GetProperty("returns"), noResult, allowComposition: allowComposition);
                     Require(noResult == (returns.Primitive == PrimitiveType.Void), "function result convention mismatch");
-                    return SignatureType.Function(new MethodSignature(returns, Array(function, "parameters", 16).Select(p => ReadType(p, false))));
+                    return SignatureType.Function(new MethodSignature(returns, Array(function, "parameters", 16).Select(p => ReadType(p, false, allowComposition: allowComposition))));
                 }
                 if (element.TryGetProperty("Ptr", out var pointer))
                 {
@@ -500,7 +569,7 @@ public sealed partial class NativeAssemblyDefinition
                 {
                     Require(allowByReference, "byref only supported in method parameters");
                     Shape(element, "ByRef");
-                    return SignatureType.ByReference(ReadType(target, false, allowSelf: allowSelf));
+                    return SignatureType.ByReference(ReadType(target, false, allowSelf: allowSelf, allowComposition: allowComposition));
                 }
                 if (element.TryGetProperty("TypeParameter", out var typeParameter))
                 {
@@ -523,7 +592,31 @@ public sealed partial class NativeAssemblyDefinition
                 {
                     Shape(element, "Constructed"); Shape(construction, "definition", "arguments");
                     var definition = types.FindIndex(t => t.NativeName == Text(construction, "definition") && !t.IsStatic && t.GenericNames.Length > 0);
-                    var arguments = Array(construction, "arguments", 32).Select(a => ReadType(a, false, allowSelf: allowSelf)).ToArray();
+                    var arguments = Array(construction, "arguments", 32).Select(a => ReadType(a, false, allowSelf: allowSelf, allowComposition: allowComposition)).ToArray();
+                    if (arguments.Any(a => a.ContainsComposition))
+                    {
+                        // Read-only snapshot construction; ordinary builder construction
+                        // deliberately continues to reject composition storage.
+                        Require(allowComposition,
+                            "composition wrapper is unsupported in this signature position");
+                        if (definition < 0)
+                        {
+                            var external = ImportExternalType(signatureGraph, Text(construction, "definition"), arguments.Length,
+                                referenceIdentities, valueTypeReferences, nativeTypeAliases);
+                            Require(arguments.All(a => a.NestingDepth < 16),
+                                "composition wrapper nesting exceeds limit");
+                            // Declaration kind and constraints are checked against the exact resolved
+                            // dependency before callable import. The reader retains its identity only.
+                            return new ImportedTypeReference(signatureGraph, external.AssemblyIdentity, external.Namespace,
+                                external.Name, external.GenericArity, arguments, external.IsValueType, external.DeclaringType);
+                        }
+                        var wrapper = signatureOwners[definition];
+                        Require(!wrapper.IsInterface && !wrapper.IsStatic &&
+                            wrapper.GenericParameterNames.Count == arguments.Length &&
+                            wrapper.GenericConstraints.Count == 0 && wrapper.SpecialConstraints.Count == 0 &&
+                            arguments.All(a => a.NestingDepth < 16), "unsupported composition wrapper construction");
+                        return new GenericTypeInstance(wrapper, arguments);
+                    }
                     return definition >= 0 ? signatureOwners[definition].MakeGenericInstance(arguments)
                         : ImportExternalType(signatureGraph, Text(construction, "definition"), arguments.Length, referenceIdentities, valueTypeReferences, nativeTypeAliases).MakeGenericInstance(arguments);
                 }
@@ -605,7 +698,8 @@ public sealed partial class NativeAssemblyDefinition
                 for (int fieldIndex = 0; fieldIndex < type.Fields.Length; fieldIndex++)
                 {
                     var field = type.Fields[fieldIndex];
-                    var storage = ReadType(field.Type, false);
+                    var storage = ReadType(field.Type, false, allowComposition: !type.IsInterface);
+                    if (storage.ContainsComposition) signatureGraph.RegisterCompositionStorage(storage);
                     type.Fields[fieldIndex] = field with { Signature = storage };
                     if (type.EnumMembers is null) signatureOwners[typeIndex].AddField(field.Name, storage, field.Visibility, field.IsReadOnly);
                 }
@@ -622,7 +716,7 @@ public sealed partial class NativeAssemblyDefinition
             }
             signatureGraph.ValidateValueLayouts();
             typeArity = 0;
-            string TypeKey(SignatureType type) => type.IsSelf ? "self" : type.FunctionSignature is { } function ? "function:" + TypeKey(function.ReturnType) + "(" + string.Join(",", function.ParameterTypes.Select(TypeKey)) + ")" : type.ByReferenceElement is { } target ? "byref:" + TypeKey(target) : type.ImportedType is { } imported ? "external:" + JsonSerializer.Serialize(new { imported.AssemblyIdentity, imported.Namespace, imported.Name, Arguments = imported.TypeArguments.Select(TypeKey).ToArray() }) : type.GenericInstance is { } instance ? "constructed:" + System.Array.IndexOf(signatureOwners, instance.Definition) + "<" + string.Join(",", instance.TypeArguments.Select(TypeKey)) + ">" : type.TypeParameterIndex is { } ordinal ? "type:" + ordinal : type.MethodParameterIndex is { } index ? "method:" + index : type.ArrayElement is { } element ? "array:" + TypeKey(element)
+            string TypeKey(SignatureType type) => type.Tuple is { } tuple ? "tuple:" + JsonSerializer.Serialize(tuple.ElementTypes.Select(TypeKey)) : type.Composition is { } composition ? composition.Kind + JsonSerializer.Serialize(composition.Constituents.Select(TypeKey).Order(StringComparer.Ordinal)) : type.IsSelf ? "self" : type.FunctionSignature is { } function ? "function:" + TypeKey(function.ReturnType) + "(" + string.Join(",", function.ParameterTypes.Select(TypeKey)) + ")" : type.ByReferenceElement is { } target ? "byref:" + TypeKey(target) : type.ImportedType is { } imported ? "external:" + JsonSerializer.Serialize(new { imported.AssemblyIdentity, imported.Namespace, imported.Name, Arguments = imported.TypeArguments.Select(TypeKey).ToArray() }) : type.GenericInstance is { } instance ? "constructed:" + System.Array.IndexOf(signatureOwners, instance.Definition) + "<" + string.Join(",", instance.TypeArguments.Select(TypeKey)) + ">" : type.TypeParameterIndex is { } ordinal ? "type:" + ordinal : type.MethodParameterIndex is { } index ? "method:" + index : type.ArrayElement is { } element ? "array:" + TypeKey(element)
                 : type.ClassType is { } c ? "class:" + System.Array.IndexOf(signatureOwners, c) : "primitive:" + type.Primitive;
             var methods = new List<MethodRow>();
             var methodNames = new List<string>();
@@ -714,27 +808,32 @@ public sealed partial class NativeAssemblyDefinition
                 else Require(methods.All(m => m.Owner < 0), "global functions must precede type methods");
                 Require(methods.Count == 0 || methods[^1].Owner <= ownerIndex, "native owner declaration order mismatch");
                 typeArity = ownerIndex < 0 ? 0 : types[ownerIndex].GenericNames.Length;
+                // Declaration reads preserve structural signatures independently of execution support.
+                var allowComposition = implementationAttributes == 0 && nativeImport is null;
                 if (method.TryGetProperty("locals", out _))
-                    foreach (var local in Array(method, "locals", 1024)) _ = ReadType(local, false);
+                    foreach (var local in Array(method, "locals", 1024)) _ = ReadType(local, false, allowComposition: allowComposition);
                 var parameters = Array(method, "parameters", 256);
-                var parameterTypes = parameters.Select(p => ReadType(p, false, allowByReference: true, allowSelf: ownerIndex >= 0 && types[ownerIndex].IsInterface)).ToArray();
-                var methodConstraints = new List<(int Parameter, SignatureType Type, int Owner)>();
+                var parameterTypes = parameters.Select(p => ReadType(p, false, allowByReference: true, allowSelf: ownerIndex >= 0 && types[ownerIndex].IsInterface, allowComposition: allowComposition)).ToArray();
+                var methodConstraints = new List<(int Parameter, SignatureType Type, int Owner, bool Structural)>();
                 if (method.TryGetProperty("generic_constraints", out _))
                     foreach (var constraint in Array(method, "generic_constraints", 128))
                     {
                         Shape(constraint, "parameter", "kind");
                         var parameter = constraint.GetProperty("parameter").GetInt32();
                         var kind = constraint.GetProperty("kind"); Shape(kind, "TypeBound");
-                        var bound = ReadType(kind.GetProperty("TypeBound"), false);
+                        var rawBound = kind.GetProperty("TypeBound");
+                        var structural = rawBound.ValueKind == JsonValueKind.Object &&
+                            (rawBound.TryGetProperty("Union", out _) || rawBound.TryGetProperty("Intersection", out _));
+                        var bound = ReadType(rawBound, false, allowComposition: structural);
                         var boundOwner = System.Array.IndexOf(signatureOwners, bound.ClassType);
                         Require(parameter >= 0 && parameter < genericArity &&
-                            (boundOwner >= 0 && types[boundOwner].IsInterface && types[boundOwner].GenericNames.Length == 0 ||
+                            (structural || boundOwner >= 0 && types[boundOwner].IsInterface && types[boundOwner].GenericNames.Length == 0 ||
                              bound.ImportedType is { GenericArity: 0, IsValueType: false, DeclaringType: null }) &&
-                            !methodConstraints.Any(c => c.Parameter == parameter && Equals(c.Type, bound)), "unsupported or duplicate method interface bound");
-                        methodConstraints.Add((parameter, bound, boundOwner));
+                            !methodConstraints.Any(c => c.Parameter == parameter && Equals(c.Type, bound)), "unsupported or duplicate method type bound");
+                        methodConstraints.Add((parameter, bound, boundOwner, structural));
                     }
                 var noResult = method.GetProperty("no_result").GetBoolean();
-                var resultType = ReadType(method.GetProperty("returns"), noResult, allowSelf: ownerIndex >= 0 && types[ownerIndex].IsInterface);
+                var resultType = ReadType(method.GetProperty("returns"), noResult, allowSelf: ownerIndex >= 0 && types[ownerIndex].IsInterface, allowComposition: allowComposition);
                 Require(noResult == (resultType == PrimitiveType.Void), "inconsistent native result");
                 Require(ownerIndex < 0 || ns.Length == 0, "type method cannot declare a function namespace");
                 Require(!instance || ownerIndex >= 0 && !types[ownerIndex].IsStatic, "instance method requires a nonstatic owner");
@@ -868,7 +967,7 @@ public sealed partial class NativeAssemblyDefinition
                     Require(!method.TryGetProperty("out_parameters", out var nativeOutputs) || nativeOutputs.GetArrayLength() == 0, "native imports do not infer output marshalling");
                     nativeImport.Validate(new(resultType, parameterTypes));
                 }
-                methods.Add(new(ns, name, ownerIndex, new(resultType, parameterTypes, genericNames, method.TryGetProperty("out_parameters", out _) ? Array(method, "out_parameters", 256).Select(p => p.GetInt32()) : []), visibility, instance, isOverride) { ParameterAttributes = parameterAttributes.ToDictionary(p => p.Key, p => p.Value.ToArray()), Attributes = methodAttributes.ToArray(), Virtual = isVirtual, Abstract = isAbstract, ObjectSlot = objectSlot, ImplementationAttributes = implementationAttributes, NativeImport = nativeImport, ParameterArrayIndex = parameterArray, NullableAnnotations = nullableAnnotations, ParameterNames = parameterNames, InterfaceConstraints = methodConstraints.ToArray(), ExplicitInterfaces = explicitMappings.ToArray() }); methodNames.Add(Text(method, "name"));
+                methods.Add(new(ns, name, ownerIndex, new(resultType, parameterTypes, genericNames, method.TryGetProperty("out_parameters", out _) ? Array(method, "out_parameters", 256).Select(p => p.GetInt32()) : []), visibility, instance, isOverride) { ParameterAttributes = parameterAttributes.ToDictionary(p => p.Key, p => p.Value.ToArray()), Attributes = methodAttributes.ToArray(), Virtual = isVirtual, Abstract = isAbstract, ObjectSlot = objectSlot, ImplementationAttributes = implementationAttributes, NativeImport = nativeImport, ParameterArrayIndex = parameterArray, NullableAnnotations = nullableAnnotations, ParameterNames = parameterNames, TypeConstraints = methodConstraints.ToArray(), ExplicitInterfaces = explicitMappings.ToArray() }); methodNames.Add(Text(method, "name"));
             }
             nativeTypeAliases.TryGetValue(("System.Object", 0), out var externalRootAlias);
             if (externalRootAlias is not null)
@@ -1071,8 +1170,9 @@ public sealed partial class NativeAssemblyDefinition
             foreach (var pair in method.NullableAnnotations) output.SetNullableAnnotation(pair.Key, pair.Value);
             foreach (var pair in method.ParameterNames) output.SetParameterName(pair.Key, pair.Value);
             // Reference emission supplies throwing bodies; do not invent executable native behavior.
-            foreach (var bound in method.InterfaceConstraints)
+            foreach (var bound in method.TypeConstraints)
             {
+                if (bound.Structural) throw new NotSupportedException("structural method bounds have no CLI projection");
                 if (bound.Owner < 0) throw new NotSupportedException("external method bounds require direct native import");
                 output.AddInterfaceConstraint(bound.Parameter, owners[bound.Owner]);
             }

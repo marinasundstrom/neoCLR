@@ -1,0 +1,28 @@
+{
+  "date": "2026-10-14",
+  "profile": "Explicit native tuple declaration snapshots and nongeneric free-function imports",
+  "checks": [
+    "Authored tuple signatures pass",
+    "Tuple snapshots/imports pass",
+    "Composition reader regressions pass",
+    "API snapshot check passes"
+  ],
+  "expectedExitCode": 42,
+  "exitCode": 42,
+  "commands": [
+    "dotnet run --project tools/metadata/NeoCLR.Metadata.Experimental.Tests -- --tuple-imports target/tuple-imports",
+    "target/debug/neoclr run target/tuple-imports/TupleConsumer.neox --module target/tuple-imports/TupleProducer.neox --execution interpreter",
+    "dotnet run --no-build --project tools/metadata/NeoCLR.Metadata.Experimental.Tests -- --reference-compositions",
+    "python3 scripts/build-api-docs.py --check"
+  ],
+  "sha256": {
+    "target/tuple-imports/TupleProducer.neox": "23921988cb65dbe264ab2c77ee2ecf46d8905896c4785bc993db3f89045a6435",
+    "target/tuple-imports/TupleConsumer.neox": "49d0aeb2d22acb4eb44bb2e95f5ab4d6319eaf1e569de399d04e1a629e2f6327",
+    "tools/metadata/NeoCLR.Metadata.Experimental.Tests/TupleImportChecks.cs": "ee6f73349315fc834e03c8eb468034b1a990c62525f6dd2aeedcb2cd3944784d"
+  },
+  "limitations": [
+    "Tuple forwarding methods verified; no C# tuple construction in this fixture",
+    "Tuple-bearing array/byref/function callable signatures not admitted",
+    "Raven tuple lowering pending"
+  ]
+}

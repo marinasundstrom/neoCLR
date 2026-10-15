@@ -25,5 +25,16 @@
   "T:System.Func`2": "CLI compiler transport scaffold only; the importer creates unnamed structural Function shapes. See /docs/functions.html for the Function family and Invoke member contract.",
   "T:System.Func`3": "CLI compiler transport scaffold only; the importer creates unnamed structural Function shapes. See /docs/functions.html for the Function family and Invoke member contract.",
   "T:System.Func`4": "CLI compiler transport scaffold only; the importer creates unnamed structural Function shapes. See /docs/functions.html for the Function family and Invoke member contract.",
-  "T:System.Func`5": "CLI compiler transport scaffold only; the importer creates unnamed structural Function shapes. See /docs/functions.html for the Function family and Invoke member contract."
+  "T:System.Func`5": "CLI compiler transport scaffold only; the importer creates unnamed structural Function shapes. See /docs/functions.html for the Function family and Invoke member contract.",
+  "T:System.Tuple`1": "Retired nominal Tuple carrier retained only in the historical CLI documentation bridge. Native libraries expose structural signatures instead; see /docs/tuples.html.",
+  "T:System.Tuple`2": "Retired nominal Tuple carrier retained only in the historical CLI documentation bridge. Native libraries expose structural signatures instead; see /docs/tuples.html.",
+  "T:System.Tuple`3": "Retired nominal Tuple carrier retained only in the historical CLI documentation bridge. Native libraries expose structural signatures instead; see /docs/tuples.html.",
+  "T:System.Tuple`4": "Retired nominal Tuple carrier retained only in the historical CLI documentation bridge. Native libraries expose structural signatures instead; see /docs/tuples.html.",
+  "T:System.Tuple`5": "Retired nominal Tuple carrier retained only in the historical CLI documentation bridge. Native libraries expose structural signatures instead; see /docs/tuples.html.",
+  "T:System.Tuple`6": "Retired nominal Tuple carrier retained only in the historical CLI documentation bridge. Native libraries expose structural signatures instead; see /docs/tuples.html.",
+  "T:System.Tuple`7": "Retired nominal Tuple carrier retained only in the historical CLI documentation bridge. Native libraries expose structural signatures instead; see /docs/tuples.html.",
+  "T:System.Union`2": "Retired nominal Union carrier retained only in the historical CLI documentation bridge. Native libraries expose structural signatures instead; see /docs/unions.html.",
+  "T:System.Union`3": "Retired nominal Union carrier retained only in the historical CLI documentation bridge. Native libraries expose structural signatures instead; see /docs/unions.html.",
+  "T:System.Union`4": "Retired nominal Union carrier retained only in the historical CLI documentation bridge. Native libraries expose structural signatures instead; see /docs/unions.html.",
+  "T:System.Union`5": "Retired nominal Union carrier retained only in the historical CLI documentation bridge. Native libraries expose structural signatures instead; see /docs/unions.html."
 }

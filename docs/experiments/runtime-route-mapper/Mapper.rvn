@@ -69,10 +69,13 @@ public class RouteUnionMapper {
     }
 
     static func Create(type: TypeInfo) -> Result<RouteUnionMapper, string> {
-        if !type.IsVisible || !type.IsUnion || !type.IsValueType || type.IsOpen || type.GenericArgumentCount != 0 {
+        if !type.IsVisible || !type.IsNominalType || !type.IsValueType || type.IsOpen || type.GenericArgumentCount != 0 {
             return Error("Expected a public nongeneric value union")
         }
         let nominal = (NominalTypeInfo)type
+        if !nominal.IsUnionDeclaration {
+            return Error("Expected a nominal union declaration")
+        }
         let prepared = ArrayList<BoundRoute>()
         let carriers = type.GetConstructors()
         if let Some(module) = nominal.Module {

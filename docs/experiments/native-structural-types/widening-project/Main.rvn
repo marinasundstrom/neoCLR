@@ -1,0 +1,61 @@
+struct Response {
+    val Value: int
+
+    init(value: int) {
+        Value = value
+    }
+}
+
+func Select(value: int | long) -> int {
+    return 42
+}
+
+func Select(value: int | long | bool) -> int {
+    return -1
+}
+
+func Extend(value: int | long) -> Response | int | long {
+    return value
+}
+
+func Echo(value: Response | int) -> bool | int | Response {
+    return value
+}
+
+func ReadResponse(value: bool | int | Response) -> int {
+    return match value {
+        Response { Value: let payload } => payload
+        _ => -3
+    }
+}
+
+func IsAnswer(value: bool | int | Response) -> bool {
+    return match value {
+        Response { Value: 42 } => true
+        _ => false
+    }
+}
+
+func Main() -> int {
+    let narrow: int | long = 42
+    if Select(narrow) != 42 {
+        return -1
+    }
+
+    let scalar = match Extend(narrow) {
+        int number => number
+        _ => -1
+    }
+    if scalar != 42 {
+        return -2
+    }
+
+    let response: Response | int = Response(42)
+    if ReadResponse(1) != -3 || ReadResponse(false) != -3 {
+        return -4
+    }
+    if IsAnswer(Response(21)) || IsAnswer(42) || !IsAnswer(Response(42)) {
+        return -5
+    }
+    return ReadResponse(Echo(response))
+}

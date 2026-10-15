@@ -24,3 +24,8 @@ means a closed direct family, not necessarily a transitively closed descendant s
 Validation on 2026-09-24: the compiled sample passes, with 390 allocations, seven
 collections and zero live managed objects. The public API snapshot check and combined
 575-page website build also pass.
+
+Development migration (2026-10-14): the source sample now checks nominal unions via
+NominalTypeInfo.IsUnionDeclaration and requires IsUnion to be false for all nominal
+cases. The historical CLI harness above has an obsolete bootstrap; current native
+consumer qualification is recorded in the structural-composition experiment.

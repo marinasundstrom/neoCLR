@@ -26,7 +26,22 @@ fn object(module: &Module, ty: &Type) -> bool {
     definition.name == "System.Object" && definition.is_reference_type
 }
 
+// Validate before identity/Object shortcuts: neither may admit malformed or disabled
+// experimental signatures, including compositions nested in generic arguments.
+fn validate_compositions(module: &Module, source: &Type, target: &Type) -> Result<(), Fault> {
+    for ty in [source, target] {
+        if crate::compositions::contains(ty) {
+            crate::vm::check_type(ty, module)?;
+        }
+    }
+    Ok(())
+}
+
 pub(crate) fn assignable(module: &Module, source: &Type, target: &Type) -> Result<bool, Fault> {
+    validate_compositions(module, source, target)?;
+    if crate::compositions::is_compound(source) || crate::compositions::is_compound(target) {
+        return Ok(crate::compositions::assignable(module, source, target));
+    }
     if source == target {
         return Ok(true);
     }
@@ -51,6 +66,11 @@ pub(crate) fn assignable(module: &Module, source: &Type, target: &Type) -> Resul
 }
 
 pub(crate) fn subclass(module: &Module, source: &Type, target: &Type) -> Result<bool, Fault> {
+    validate_compositions(module, source, target)?;
+    // A structural guarantee is an assignment relationship, not a declared base.
+    if crate::compositions::is_compound(source) || crate::compositions::is_compound(target) {
+        return Ok(false);
+    }
     if source == target
         || indirect(source)
         || indirect(target)
@@ -84,6 +104,64 @@ mod tests {
 
     fn model() -> Module {
         crate::assemble(".module Relations\n.type class abstract System.Object\n.end\n.interface Named\n.end\n.interface Tagged\n.implements Named\n.end\n.type class Parent\n.implements Tagged\n.end\n.type class Child\n.extends Parent\n.end\n.type class Box<T>\n.end\n").unwrap()
+    }
+
+    #[test]
+    fn compositions_use_assignment_guarantees_without_inventing_ancestry() {
+        let m = model();
+        let parent = Type::from_name("Parent");
+        let child = Type::from_name("Child");
+        let named = Type::from_name("Named");
+        let tagged = Type::from_name("Tagged");
+        let object = Type::from_name("System.Object");
+        let union = Type::Union(vec![parent.clone(), child.clone()]);
+        let intersection = Type::Intersection(vec![named.clone(), tagged.clone()]);
+        let mixed = Type::Union(vec![intersection.clone(), child.clone()]);
+        for (source, target, expected) in [
+            (&child, &union, true),
+            (&union, &parent, true),
+            (&union, &child, false),
+            (&union, &intersection, true),
+            (&intersection, &named, true),
+            (&named, &intersection, false),
+            (&intersection, &union, false),
+            (&mixed, &named, true),
+            (&mixed, &parent, false),
+            (&union, &object, true),
+            (&intersection, &object, true),
+        ] {
+            assert_eq!(
+                assignable(&m, source, target).unwrap(),
+                expected,
+                "{source:?} -> {target:?}"
+            );
+            assert!(!subclass(&m, source, target).unwrap());
+        }
+        let wrapper = |t| Type::Constructed {
+            definition: "Box".into(),
+            arguments: vec![t],
+        };
+        let wide = wrapper(union);
+        let narrow = wrapper(child);
+        assert!(assignable(&m, &wide, &wide).unwrap());
+        assert!(!assignable(&m, &narrow, &wide).unwrap());
+        assert!(!assignable(&m, &wide, &narrow).unwrap());
+    }
+
+    #[test]
+    fn composition_validation_precedes_identity_and_object_shortcuts() {
+        let m = model();
+        let object = Type::from_name("System.Object");
+        let invalid = Type::Intersection(vec![Type::Int32, Type::from_name("Named")]);
+        let wrapper = Type::Constructed {
+            definition: "Box".into(),
+            arguments: vec![invalid.clone()],
+        };
+        for ty in [&invalid, &wrapper] {
+            assert!(assignable(&m, ty, ty).is_err());
+            assert!(assignable(&m, ty, &object).is_err());
+            assert!(subclass(&m, ty, &object).is_err());
+        }
     }
 
     #[test]

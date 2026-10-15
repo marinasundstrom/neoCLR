@@ -167,7 +167,12 @@ internal static class ObjectRootChecks
             var loaded = AssemblyDefinition.ReadNativeAssembly(RuntimeAssemblyContainer.WriteLibraryBinary(graph));
             if (loaded.MainModule.Types.Single().Methods.Single().Name != "Equals")
                 throw new Exception("external Object override lost on roundtrip");
-            Reject<ArgumentException>(() => method.GetILGenerator().Emit(OpCode.Call, slot));
+            // CLR-style direct base calls to public concrete virtual methods are admitted.
+            var direct = graph.AddFunction("DirectRootDisplay", new(PrimitiveType.String, [root]));
+            direct.LoadArgument(0);
+            direct.GetILGenerator().Emit(OpCode.Call, slot);
+            direct.Return();
+            _ = graph.WriteNativeAssembly();
             Reject<InvalidDataException>(() => graph.Write());
             Reject<InvalidOperationException>(() => graph.AddNativeObjectRoot());
             Reject<InvalidOperationException>(() => graph.SetNativeObjectRoot(graph.CoreObjectType));

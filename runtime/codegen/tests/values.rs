@@ -30,6 +30,15 @@ fn compile_root(bytes: &[u8], temp: &Temp, root: &str) -> std::process::Output {
     compile_mode(bytes, temp, root, false)
 }
 fn compile_mode(bytes: &[u8], temp: &Temp, root: &str, closed: bool) -> std::process::Output {
+    compile_mode_flags(bytes, temp, root, closed, &[])
+}
+fn compile_mode_flags(
+    bytes: &[u8],
+    temp: &Temp,
+    root: &str,
+    closed: bool,
+    flags: &[&str],
+) -> std::process::Output {
     let input = temp.0.join("input.bin");
     fs::write(&input, bytes).unwrap();
     let mut command = Command::new(env!("CARGO_BIN_EXE_neoclr-codegen"));
@@ -37,11 +46,22 @@ fn compile_mode(bytes: &[u8], temp: &Temp, root: &str, closed: bool) -> std::pro
         command.arg("--closed-world");
     }
     command
+        .args(flags)
         .arg(input)
         .arg(root)
-        .arg(temp.0.join("value.o"))
-        .output()
-        .unwrap()
+        .arg(temp.0.join("value.o"));
+    if flags.contains(&"--compile-system") {
+        let seed = temp.0.join("system.neoil");
+        let dependency = temp.0.join("dependency.neoil");
+        fs::write(&seed, ".module System\n.references ()\n").unwrap();
+        fs::write(&dependency, ".module Dependency\n.references ()\n").unwrap();
+        command
+            .arg("--system")
+            .arg(seed)
+            .arg("--module")
+            .arg(dependency);
+    }
+    command.output().unwrap()
 }
 fn module(bytes: &[u8]) -> neoclr::Module {
     neoclr::metadata_container::decode(bytes).unwrap()
@@ -66,8 +86,28 @@ fn native_mode(
     root: &str,
     closed: bool,
 ) {
+    native_mode_flags(
+        bytes,
+        input,
+        expected_status,
+        expected_value,
+        root,
+        closed,
+        &[],
+    );
+}
+#[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+fn native_mode_flags(
+    bytes: &[u8],
+    input: i32,
+    expected_status: i32,
+    expected_value: i32,
+    root: &str,
+    closed: bool,
+    flags: &[&str],
+) {
     let temp = Temp::new();
-    let result = compile_mode(bytes, &temp, root, closed);
+    let result = compile_mode_flags(bytes, &temp, root, closed, flags);
     assert!(
         result.status.success(),
         "{}",
@@ -94,9 +134,21 @@ int main(void) {{
         ),
     )
     .unwrap();
+    if flags.contains(&"--compile-system") {
+        let text = fs::read_to_string(&host).unwrap()
+            .replace("extern int32_t neoclr_entry_v2(int32_t, int32_t *);", "#include \"text-arena.h\"")
+            .replace("    int32_t value = 12345;", "    neoclr_aot_context ctx = {0};\n    int32_t value = 12345;")
+            .replace("neoclr_entry_v2(", "neoclr_entry_v4(")
+            .replace(", &value);", ", &value, &ctx);\n    if (ctx.text.used != 0 || ctx.fault.code != (uint32_t)status) return 2;");
+        fs::write(&host, text).unwrap();
+    }
     let binary = temp.0.join("values");
     let result = Command::new("clang")
-        .args(["-arch", "arm64", "-Wall", "-Wextra", "-Werror"])
+        .args(["-arch", "arm64", "-Wall", "-Wextra", "-Werror", "-I"])
+        .arg(
+            std::path::Path::new(env!("CARGO_MANIFEST_DIR"))
+                .join("../../docs/experiments/aot-console"),
+        )
         .arg(host)
         .arg(temp.0.join("value.o"))
         .arg("-o")
@@ -114,9 +166,13 @@ int main(void) {{
         .output()
         .unwrap();
     assert!(imports.status.success());
+    let symbols = String::from_utf8_lossy(&imports.stdout);
     assert!(
-        imports.stdout.is_empty(),
-        "no runtime/interpreter imports allowed"
+        symbols
+            .lines()
+            .all(|symbol| flags.contains(&"--compile-system")
+                && matches!(symbol.trim(), "_memset" | "_memcpy")),
+        "no allocator/runtime/interpreter imports allowed: {symbols}"
     );
     let listing = Command::new("otool")
         .arg("-L")
@@ -634,6 +690,7 @@ fn cyclic_and_unknown_inline_layouts_never_emit() {
             "recursive inline",
         ),
         (".type A\n.field Child Int32\n.end", "local named record"),
+        (".type A\n.field Child tuple<Int32,A>\n.end", "recursive inline"),
     ] {
         let source = format!(
             ".module Invalid\n.entry Main\n{fields}\n.function Main() -> Int32\nldc.i4 0\nret\n.end\n"
@@ -2571,4 +2628,842 @@ ret
         0,
         42,
     );
+}
+
+#[test]
+#[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+fn structural_tuple_native_copies_nested_elements_and_call_results() {
+    let source = r#"
+.module StructuralTupleNative
+.entry Main
+.function Echo(tuple<Int32,tuple<Int32,Double>> value) -> tuple<Int32,tuple<Int32,Double>>
+ldarg value
+ret
+.end
+.function Main() -> Int32
+.local tuple<Int32,tuple<Int32,Double>> original
+.local tuple<Int32,tuple<Int32,Double>> copy
+ldc.i4 40
+ldc.i4 2
+ldc.r8 3.5
+newobj tuple<Int32,Double>
+newobj tuple<Int32,tuple<Int32,Double>>
+call Echo(tuple<Int32,tuple<Int32,Double>>)
+stloc original
+ldloc original
+stloc copy
+ldloca copy
+ldflda 1
+ldc.i4 99
+stfld 0
+pop
+ldloc original
+ldfld 0
+ldloc original
+ldfld 1
+ldfld 0
+add
+ldloc copy
+ldfld 1
+ldfld 0
+ldc.i4 99
+sub
+add
+ldloc original
+ldfld 1
+ldfld 1
+ldc.r8 3.5
+ceq
+brfalse bad
+ret
+bad:
+pop
+ldc.i4 0
+ret
+.end
+"#;
+    let m = neoclr::assemble(source).unwrap();
+    let execution = neoclr::LoadedProgram::new(&m)
+        .unwrap()
+        .run(neoclr::Limits::default())
+        .unwrap();
+    assert_eq!(execution.value, neoclr::Value::Int32(42));
+    let bytes = neoclr::metadata_container::write_module(&m).unwrap();
+    native(&bytes, 0, 42);
+    native_mode(&bytes, 0, 0, 42, "@entry", true);
+}
+
+#[test]
+fn structural_tuple_inline_layout_boundary_and_large_return_buffer() {
+    let leaf = format!("tuple<{}>", vec!["Int32"; 16].join(","));
+    for count in [16, 17] {
+        let wide = format!("tuple<{}>", vec![leaf.as_str(); count].join(","));
+        let source = format!(
+            ".module WideTuple\n.entry Main\n.function Echo({wide} value) -> {wide}\nldarg value\nret\n.end\n.function Main() -> Int32\n.local {wide} value\nldloca value\ninitobj {wide}\nldloca value\nldflda 15\nldflda 15\nldc.i4 42\nstobj Int32\nldloc value\ncall Echo({wide})\nldfld 15\nldfld 15\nret\n.end"
+        );
+        let m = neoclr::assemble(&source).unwrap();
+        let bytes = neoclr::metadata_container::write_module(&m).unwrap();
+        let temp = Temp::new();
+        let result = compile(&bytes, &temp);
+        if count == 16 {
+            assert!(
+                result.status.success(),
+                "{}",
+                String::from_utf8_lossy(&result.stderr)
+            );
+            #[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+            native(&bytes, 0, 42);
+        } else {
+            assert!(!result.status.success());
+            assert!(
+                String::from_utf8_lossy(&result.stderr).contains("flattened inline lane limit")
+            );
+        }
+    }
+}
+
+#[test]
+#[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+fn structural_scalar_union_copies_calls_and_exact_extraction() {
+    for (ty, constant) in [
+        ("Int32", "ldc.i4 -42"),
+        ("Int64", "ldc.i8 4294967338"),
+        ("Boolean", "ldc.bool true"),
+    ] {
+        let source = format!(
+            r#"
+.module ScalarUnion
+.type class abstract System.Object
+.end
+.entry Main
+.function Echo(union<Int32,Int64,Boolean> value) -> union<Int32,Int64,Boolean>
+ldarg value
+ret
+.end
+.function Main() -> Int32
+.local union<Int32,Int64,Boolean> value
+.local union<Int32,Int64,Boolean> copy
+{constant}
+box {ty}
+castclass union<Int32,Int64,Boolean>
+call Echo(union<Int32,Int64,Boolean>)
+stloc value
+ldloc value
+stloc copy
+ldloc copy
+unbox.any {ty}
+{constant}
+ceq
+brfalse bad
+ldc.i4 42
+ret
+bad:
+ldc.i4 0
+ret
+.end
+"#
+        );
+        let m = neoclr::assemble(&source).unwrap();
+        assert_eq!(
+            neoclr::run(&m, neoclr::Limits::default()).unwrap().value,
+            neoclr::Value::Int32(42)
+        );
+        let bytes = neoclr::metadata_container::write_module(&m).unwrap();
+        native_mode_flags(
+            &bytes,
+            0,
+            0,
+            42,
+            "@entry",
+            true,
+            &["--compile-system", "--reference-arena"],
+        );
+    }
+}
+
+#[test]
+#[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+fn structural_scalar_union_rejects_wrong_extraction() {
+    let source = r#"
+.module WrongScalar
+.type class abstract System.Object
+.end
+.entry Main
+.function Main() -> Int32
+.local union<Int32,Int64> value
+ldc.i8 42
+box Int64
+castclass union<Int32,Int64>
+stloc value
+ldloc value
+unbox.any Int32
+ret
+.end
+"#;
+    let m = neoclr::assemble(source).unwrap();
+    assert_eq!(
+        neoclr::run(&m, neoclr::Limits::default()).unwrap_err().code,
+        neoclr::FaultCode::InvalidCast
+    );
+    native_mode_flags(
+        &neoclr::metadata_container::write_module(&m).unwrap(),
+        0,
+        11,
+        12345,
+        "@entry",
+        true,
+        &["--compile-system", "--reference-arena"],
+    );
+    let unsupported = source.replace(
+        "unbox.any Int32",
+        "isinst union<Int32,Int64>\nref.isnull\npop\nldc.i4 42",
+    );
+    let m = neoclr::assemble(&unsupported).unwrap();
+    let temp = Temp::new();
+    let result = compile_mode_flags(
+        &neoclr::metadata_container::write_module(&m).unwrap(),
+        &temp,
+        "@entry",
+        true,
+        &["--compile-system", "--reference-arena"],
+    );
+    assert!(!result.status.success());
+    assert!(
+        String::from_utf8_lossy(&result.stderr)
+            .contains("scalar union instance tests require tagged conversion lowering")
+    );
+    assert!(!temp.0.join("value.o").exists());
+}
+
+#[test]
+#[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+fn structural_scalar_union_output_replacement_and_default() {
+    let source = r#"
+.module ScalarOutput
+.type class abstract System.Object
+.end
+.entry Main
+.function Replace(out union<Int32,Int64>& output) -> Void
+ldarg output
+ldc.i4 42
+box Int32
+castclass union<Int32,Int64>
+stobj union<Int32,Int64>
+ldvoid
+ret
+.end
+.function Main() -> Int32
+.local union<Int32,Int64> value
+ldloca value
+initobj union<Int32,Int64>
+ldloc value
+ref.isnull
+brfalse bad
+ldloca value
+call Replace(union<Int32,Int64>&)
+pop
+ldloc value
+unbox.any Int32
+ret
+bad:
+ldc.i4 0
+ret
+.end
+"#;
+    let m = neoclr::assemble(source).unwrap();
+    assert_eq!(
+        neoclr::run(&m, neoclr::Limits::default()).unwrap().value,
+        neoclr::Value::Int32(42)
+    );
+    native_mode_flags(
+        &neoclr::metadata_container::write_module(&m).unwrap(),
+        0,
+        0,
+        42,
+        "@entry",
+        true,
+        &["--compile-system", "--reference-arena"],
+    );
+    let source = source.replace(
+        "ldloc value\nref.isnull",
+        "ldloc value\nunbox.any Int32\npop\nldloc value\nref.isnull",
+    );
+    let m = neoclr::assemble(&source).unwrap();
+    assert_eq!(
+        neoclr::run(&m, neoclr::Limits::default()).unwrap_err().code,
+        neoclr::FaultCode::NullReference
+    );
+    native_mode_flags(
+        &neoclr::metadata_container::write_module(&m).unwrap(),
+        0,
+        6,
+        12345,
+        "@entry",
+        true,
+        &["--compile-system", "--reference-arena"],
+    );
+}
+
+#[test]
+#[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+fn structural_scalar_union_pattern_tests_preserve_exact_types_and_null() {
+    let cases = [
+        ("Int32", "ldc.i4 -42"),
+        ("Int64", "ldc.i8 4294967338"),
+        ("Boolean", "ldc.bool false"),
+    ];
+    for active in 0..=cases.len() {
+        let init = if active == cases.len() {
+            "ldloca value\ninitobj union<Int32,Int64,Boolean>".to_owned()
+        } else {
+            format!(
+                "{}\nbox {}\ncastclass union<Int32,Int64,Boolean>\nstloc value",
+                cases[active].1, cases[active].0
+            )
+        };
+        let mut checks = String::new();
+        for (i, (ty, constant)) in cases.iter().enumerate() {
+            checks += &format!(
+                "ldarg value\nisinst {ty}\nref.isnull\nldc.bool false\nceq\n{} bad\n",
+                if active == i { "brfalse" } else { "brtrue" }
+            );
+            if active == i {
+                checks += &format!("ldarg value\nunbox.any {ty}\n{constant}\nceq\nbrfalse bad\n");
+            }
+        }
+        let source = format!(
+            ".module ScalarPatterns\n.type class abstract System.Object\n.end\n.entry Main\n.function Check(union<Int32,Int64,Boolean> value) -> Int32\n{checks}ldc.i4 42\nret\nbad:\nldc.i4 0\nret\n.end\n.function Main() -> Int32\n.local union<Int32,Int64,Boolean> value\n{init}\nldloc value\ncall Check(union<Int32,Int64,Boolean>)\nret\n.end"
+        );
+        if active == 0 {
+            let escaped = source.replacen(
+                "isinst Int32\nref.isnull",
+                "isinst Int32\ndup\npop\nref.isnull",
+                1,
+            );
+            let m = neoclr::assemble(&escaped).unwrap();
+            let temp = Temp::new();
+            let result = compile_mode_flags(
+                &neoclr::metadata_container::write_module(&m).unwrap(),
+                &temp,
+                "@entry",
+                true,
+                &["--compile-system", "--reference-arena"],
+            );
+            assert!(!result.status.success());
+            assert!(String::from_utf8_lossy(&result.stderr).contains("immediate null test"));
+            assert!(!temp.0.join("value.o").exists());
+        }
+        let m = neoclr::assemble(&source).unwrap();
+        assert_eq!(
+            neoclr::run(&m, neoclr::Limits::default()).unwrap().value,
+            neoclr::Value::Int32(42)
+        );
+        native_mode_flags(
+            &neoclr::metadata_container::write_module(&m).unwrap(),
+            0,
+            0,
+            42,
+            "@entry",
+            true,
+            &["--compile-system", "--reference-arena"],
+        );
+    }
+}
+
+#[test]
+#[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+fn structural_record_union_snapshots_calls_and_exact_extraction() {
+    let source = include_str!("../../../docs/experiments/native-structural-types/record-union.neoil");
+    for (entry, status, fault) in [
+        ("Main", 0, None),
+        ("Wrong", 11, Some(neoclr::FaultCode::InvalidCast)),
+        ("Null", 6, Some(neoclr::FaultCode::NullReference)),
+    ] {
+        let m = neoclr::assemble(&source.replace(".entry Main", &format!(".entry {entry}"))).unwrap();
+        let reference = neoclr::run(&m, neoclr::Limits::default());
+        if let Some(fault) = fault { assert_eq!(reference.unwrap_err().code, fault); }
+        else { assert_eq!(reference.unwrap().value, neoclr::Value::Int32(42)); }
+        native_mode_flags(&neoclr::metadata_container::write_module(&m).unwrap(), 0,
+            status, if status == 0 { 42 } else { 12345 }, "@entry", true,
+            &["--compile-system", "--reference-arena"]);
+    }
+}
+
+#[test]
+#[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+fn structural_record_union_without_scalar_alternatives() {
+    let source = r#"
+.module RecordOnly
+.type class abstract System.Object
+.end
+.type First
+.field Value Int32
+.end
+.type Second
+.field Value Int32
+.end
+.entry Main
+.function Main() -> Int32
+.local union<First,Second> value
+ldc.i4 42
+newobj First
+box First
+castclass union<First,Second>
+stloc value
+ldloc value
+isinst Second
+ref.isnull
+brfalse Bad
+ldloc value
+unbox.any First
+ldfld First::Value
+ret
+Bad:
+ldc.i4 -1
+ret
+.end
+"#;
+    let m = neoclr::assemble(source).unwrap();
+    assert_eq!(neoclr::run(&m, neoclr::Limits::default()).unwrap().value, neoclr::Value::Int32(42));
+    native_mode_flags(&neoclr::metadata_container::write_module(&m).unwrap(), 0, 0, 42,
+        "@entry", true, &["--compile-system", "--reference-arena"]);
+}
+
+#[test]
+#[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+fn structural_arguments_specialize_generic_methods_and_record_fields() {
+    for (shape, make, extract) in [
+        (
+            "tuple<Int32,Int64>",
+            "ldc.i4 42\nldc.i8 99\nnewobj tuple<Int32,Int64>",
+            "ldfld 0",
+        ),
+        (
+            "union<Int32,Int64>",
+            "ldc.i4 42\nbox Int32\ncastclass union<Int32,Int64>",
+            "stloc value\nldloc value\nunbox.any Int32",
+        ),
+        (
+            "intersection<View,Marker>",
+            "ldloca value\ninitobj intersection<View,Marker>\nldloc value",
+            "ref.isnull\nbrfalse bad\nldc.i4 42\nret\nbad:\nldc.i4 0",
+        ),
+    ] {
+        let field_roundtrip = format!("newobj Box<{shape}>\nstloc box\nldloca box\ncall instance Box<{shape}>::Read()\n");
+        let source = format!(
+            ".module StructuralGeneric\n.type class abstract System.Object\n.end\n.interface View\n.end\n.interface Marker\n.end\n.type Box<T>\n.field Item T\n.method instance byref Read() -> T\nldarg this\nldfld Box<T>::Item\nret\n.end\n.end\n.function Copy<T>(!!0 value) -> !!0\nldarg value\nret\n.end\n.entry Main\n.function Main() -> Int32\n.local {shape} value\n.local Box<{shape}> box\n{make}\ncall Copy<{shape}>({shape})\n{field_roundtrip}{extract}\nret\n.end"
+        );
+        let m = neoclr::assemble(&source).unwrap();
+        assert_eq!(
+            neoclr::LoadedProgram::new(&m)
+                .unwrap()
+                .run(neoclr::Limits::default())
+                .unwrap()
+                .value,
+            neoclr::Value::Int32(42)
+        );
+        native_mode_flags(
+            &neoclr::metadata_container::write_module(&m).unwrap(),
+            0,
+            0,
+            42,
+            "@entry",
+            true,
+            &["--compile-system", "--reference-arena"],
+        );
+    }
+}
+
+#[test]
+#[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+fn structural_union_widening_repacks_exact_alternatives() {
+    for (source, target, payload, create, extract) in [
+        (
+            "Int32,Int64",
+            "Boolean,Int64,Int32",
+            "Int32",
+            "ldc.i4 -42",
+            "ldc.i4 -42",
+        ),
+        (
+            "Int32,Int64",
+            "Cell,Int32,Int64",
+            "Int64",
+            "ldc.i8 4294967338",
+            "ldc.i8 4294967338",
+        ),
+        (
+            "Int32,Int64",
+            "Pair,Int64,Int32",
+            "Int32",
+            "ldc.i4 -42",
+            "ldc.i4 -42",
+        ),
+        (
+            "Int32,Pair",
+            "Boolean,Pair,Int32",
+            "Pair",
+            "ldc.i4 42\nnewobj Pair",
+            "ldfld 0\nldc.i4 42",
+        ),
+        (
+            "Pair,Int32",
+            "Int32,Boolean,Pair",
+            "Int32",
+            "ldc.i4 42",
+            "ldc.i4 42",
+        ),
+        (
+            "Cell,Int32",
+            "Pair,Int32,Cell",
+            "Int32",
+            "ldc.i4 42",
+            "ldc.i4 42",
+        ),
+    ] {
+        let text = format!(
+            r#"
+.module WidenUnion
+.type class abstract System.Object
+.end
+.type class abstract Cell
+.field Number Int32
+.end
+.type Pair
+.field Number Int32
+.end
+.entry Main
+.function Widen(union<{source}> value) -> union<{target}>
+ldarg value
+castclass union<{target}>
+ret
+.end
+.function Main() -> Int32
+.local union<{target}> value
+{create}
+box {payload}
+castclass union<{source}>
+call Widen(union<{source}>)
+stloc value
+ldloc value
+unbox.any {payload}
+{extract}
+ceq
+brfalse bad
+ldc.i4 42
+ret
+bad:
+ldc.i4 0
+ret
+.end
+"#
+        );
+        let module = neoclr::assemble(&text).unwrap();
+        assert_eq!(
+            neoclr::run(&module, neoclr::Limits::default())
+                .unwrap()
+                .value,
+            neoclr::Value::Int32(42)
+        );
+        let bytes = neoclr::metadata_container::write_module(&module).unwrap();
+        native_mode_flags(
+            &bytes,
+            0,
+            0,
+            42,
+            "@entry",
+            true,
+            &["--compile-system", "--reference-arena"],
+        );
+    }
+}
+
+#[test]
+#[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+fn structural_union_widening_preserves_inactive_values() {
+    for (source, target) in [
+        ("Int32,Int64", "Pair,Int64,Int32"),
+        ("Int32,Cell", "Pair,Int32,Cell"),
+        ("Int32,Pair", "Pair,Boolean,Int32"),
+    ] {
+        let text = format!(
+            r#"
+.module EmptyWidening
+.type class abstract System.Object
+.end
+.type class abstract Cell
+.end
+.type Pair
+.field Number Int32
+.end
+.entry Main
+.function Main() -> Int32
+.local union<{source}> empty
+ldloca empty
+initobj union<{source}>
+ldloc empty
+castclass union<{target}>
+ref.isnull
+brfalse bad
+ldc.i4 42
+ret
+bad:
+ldc.i4 0
+ret
+.end
+"#
+        );
+        let module = neoclr::assemble(&text).unwrap();
+        assert_eq!(
+            neoclr::run(&module, neoclr::Limits::default())
+                .unwrap()
+                .value,
+            neoclr::Value::Int32(42)
+        );
+        let bytes = neoclr::metadata_container::write_module(&module).unwrap();
+        native_mode_flags(
+            &bytes,
+            0,
+            0,
+            42,
+            "@entry",
+            true,
+            &["--compile-system", "--reference-arena"],
+        );
+    }
+}
+
+#[test]
+fn structural_union_widening_rejects_missing_alternatives() {
+    let source = r#"
+.module MissingAlternative
+.type class abstract System.Object
+.end
+.entry Main
+.function Main() -> Int32
+ldc.i4 42
+box Int32
+castclass union<Int32,Int64>
+castclass union<Int32,Boolean>
+pop
+ldc.i4 42
+ret
+.end
+"#;
+    let module = neoclr::assemble(source).unwrap();
+    let bytes = neoclr::metadata_container::write_module(&module).unwrap();
+    let dir = Temp::new();
+    let result = compile_mode_flags(
+        &bytes,
+        &dir,
+        "@entry",
+        true,
+        &["--compile-system", "--reference-arena"],
+    );
+    assert!(!result.status.success());
+    assert!(!dir.0.join("value.o").exists());
+    let error = String::from_utf8_lossy(&result.stderr);
+    assert!(error.contains("union injection"), "{error}");
+    assert!(!error.contains("panicked"));
+}
+
+#[test]
+#[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+fn structural_floating_union_preserves_exact_payloads_and_widening() {
+    for (ty, constant, other) in [
+        ("Single", "ldc.r4 -1.25", "Double"),
+        ("Double", "ldc.r8 4294967338.25", "Single"),
+    ] {
+        let source = format!(
+            r#"
+.module FloatUnion
+.type class abstract System.Object
+.end
+.entry Main
+.function Echo(union<Single,Double> value) -> union<Int32,Double,Single>
+ldarg value
+castclass union<Int32,Double,Single>
+ret
+.end
+.function Main() -> Int32
+.local union<Int32,Double,Single> value
+{constant}
+box {ty}
+castclass union<Single,Double>
+call Echo(union<Single,Double>)
+stloc value
+ldloc value
+isinst {other}
+ref.isnull
+brfalse Bad
+ldloc value
+isinst {ty}
+ref.isnull
+brtrue Bad
+ldloc value
+unbox.any {ty}
+{constant}
+ceq
+brfalse Bad
+ldc.i4 42
+ret
+Bad:
+ldc.i4 -1
+ret
+.end
+"#
+        );
+        let module = neoclr::assemble(&source).unwrap();
+        assert_eq!(
+            neoclr::run(&module, neoclr::Limits::default())
+                .unwrap()
+                .value,
+            neoclr::Value::Int32(42)
+        );
+        native_mode_flags(
+            &neoclr::metadata_container::write_module(&module).unwrap(),
+            0,
+            0,
+            42,
+            "@entry",
+            true,
+            &["--compile-system", "--reference-arena"],
+        );
+        let wrong = source
+            .replace(&format!("unbox.any {ty}"), &format!("unbox.any {other}"))
+            .replace(
+                &format!("{constant}\nceq"),
+                &format!(
+                    "{}\nceq",
+                    if other == "Double" {
+                        "ldc.r8 0"
+                    } else {
+                        "ldc.r4 0"
+                    }
+                ),
+            );
+        let module = neoclr::assemble(&wrong).unwrap();
+        assert_eq!(
+            neoclr::run(&module, neoclr::Limits::default())
+                .unwrap_err()
+                .code,
+            neoclr::FaultCode::InvalidCast
+        );
+        native_mode_flags(
+            &neoclr::metadata_container::write_module(&module).unwrap(),
+            0,
+            11,
+            12345,
+            "@entry",
+            true,
+            &["--compile-system", "--reference-arena"],
+        );
+    }
+}
+
+#[test]
+#[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+fn structural_enum_union_preserves_nominal_identity() {
+    let source = r#"
+.module EnumUnion
+.type class abstract System.Object
+.end
+.type First
+.enum Int32
+.field private Bits Int32
+.method instance byref Read() -> Int32
+ldarg this
+ldfld First::Bits
+ret
+.end
+.end
+.type Second
+.enum Int32
+.field private Bits Int32
+.end
+.entry Main
+.function Echo(union<First,Second> value) -> union<Int32,Second,First>
+ldarg value
+castclass union<Int32,Second,First>
+ret
+.end
+.function Main() -> Int32
+.local union<Int32,Second,First> value
+.local First extracted
+ldc.i4 42
+newobj First
+box First
+castclass union<First,Second>
+call Echo(union<First,Second>)
+stloc value
+ldloc value
+isinst Second
+ref.isnull
+brfalse Bad
+ldloc value
+isinst Int32
+ref.isnull
+brfalse Bad
+ldloc value
+unbox.any First
+stloc extracted
+ldloca extracted
+call instance First::Read()
+ret
+Bad:
+ldc.i4 -1
+ret
+.end
+"#;
+    for source in [
+        source.to_string(),
+        source
+            .replace("First", "Temporary")
+            .replace("Second", "First")
+            .replace("Temporary", "Second"),
+    ] {
+        let module = neoclr::assemble(&source).unwrap();
+        assert_eq!(
+            neoclr::run(&module, neoclr::Limits::default())
+                .unwrap()
+                .value,
+            neoclr::Value::Int32(42)
+        );
+        native_mode_flags(
+            &neoclr::metadata_container::write_module(&module).unwrap(),
+            0,
+            0,
+            42,
+            "@entry",
+            true,
+            &["--compile-system", "--reference-arena"],
+        );
+        let wrong = if source.contains("unbox.any First") {
+            source.replace(
+                "unbox.any First\nstloc extracted\nldloca extracted\ncall instance First::Read()",
+                "unbox.any Second\npop\nldc.i4 42",
+            )
+        } else {
+            source.replace(
+                "unbox.any Second\nstloc extracted\nldloca extracted\ncall instance Second::Read()",
+                "unbox.any First\npop\nldc.i4 42",
+            )
+        };
+        let module = neoclr::assemble(&wrong).unwrap();
+        assert_eq!(
+            neoclr::run(&module, neoclr::Limits::default())
+                .unwrap_err()
+                .code,
+            neoclr::FaultCode::InvalidCast
+        );
+        native_mode_flags(
+            &neoclr::metadata_container::write_module(&module).unwrap(),
+            0,
+            11,
+            12345,
+            "@entry",
+            true,
+            &["--compile-system", "--reference-arena"],
+        );
+    }
 }

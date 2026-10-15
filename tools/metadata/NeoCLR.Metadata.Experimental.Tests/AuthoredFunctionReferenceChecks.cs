@@ -23,6 +23,19 @@ internal static class AuthoredFunctionReferenceChecks
         Reject<InvalidDataException>(() => app.CreateTypeReference(dependency, core, hash, "Example", "Box", 1));
         Reject<InvalidDataException>(() => app.CreateTypeReference(dependency, new("OtherCore", new Version(1, 0, 0, 0)), hash, "Example", "Item"));
         Reject<InvalidDataException>(() => app.CreateTypeReference(app.Identity, core, hash, "Example", "Item"));
+        var tupleApp = new AssemblyBuilder(new("TupleApp", new Version(1, 0, 0, 0)), core);
+        var tupleBox = tupleApp.CreateTypeReference(dependency, core, hash, "Example", "Box`1", 1);
+        var range = tupleApp.CreateValueTypeReference(dependency, core, hash, "Example", "Range");
+        var tuple = tupleApp.CreateExperimentalTuple([PrimitiveType.Int32, PrimitiveType.Int32], ["Offset", "Length"]);
+        var tupleMethod = tupleApp.CreateMethodReference(range, "Bounds", new MethodSignature(tuple, [PrimitiveType.Int32]));
+        if (tupleMethod.Signature.ReturnType != tuple ||
+            !tupleMethod.Signature.ReturnType.Tuple!.ElementNames.SequenceEqual(new[] { "Offset", "Length" }))
+            throw new Exception("imported value method lost structural tuple shape or names");
+        var tupleResult = tupleBox.MakeGenericInstance(tuple);
+        var wrappedTupleMethod = tupleApp.CreateMethodReference(range, "TryBounds", new MethodSignature(tupleResult, []));
+        if (wrappedTupleMethod.Signature.ReturnType.ImportedType!.TypeArguments[0] != tuple)
+            throw new Exception("imported method lost nested structural tuple");
+        Reject<InvalidDataException>(() => tupleApp.Write());
         var getterSignature = new MethodSignature(SignatureType.TypeParameter(0), []);
         var getter = app.CreateMethodReference(box, "Get", getterSignature);
         if (!ReferenceEquals(getter, app.CreateMethodReference(box, "Get", getterSignature))) throw new Exception("method interning");

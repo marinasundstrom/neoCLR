@@ -5,6 +5,11 @@ Function object is an instance of that shape, holding a checked method target an
 any bound receiver or captured environment. This page documents the structural
 family; “Function” is a documentation label, not a nominal type declaration.
 
+Function types are another data-composition family: their structure is the callable
+signature rather than a nominal declaration. They retain their own Object and
+invocation contract; that does not impose reference semantics on tuples or unions.
+See [all structural families](structural-types.md).
+
 ## Members
 
 | Member | Contract |

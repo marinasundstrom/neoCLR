@@ -84,9 +84,10 @@ and `IsValueType`. These classify the represented type, not the descriptor provi
 - `IsClosedHierarchy` identifies a declared closed family of direct subtypes or
   implementations. A leaf alone is not a closed hierarchy. An admitted open subtype
   can still allow further descendants; this flag does not promise transitive closure.
-- `IsUnion` identifies a nominal union by its retained UnionAttribute, including
-  constructed Option/Result types. It does not identify individual cases or ad-hoc
-  union type expressions and does not imply an inheritance-based closed hierarchy.
+- `IsUnion` is reserved for structural union identity (author correction, 2026-10-14).
+  `NominalTypeInfo.IsUnionDeclaration` separately identifies retained UnionAttribute
+  metadata, including constructed Option/Result declarations but not cases.
+  Guest structural descriptor construction remains gated.
 - `IsEnum` and `IsValueType` retain their existing type-category behavior; enums are
   value types. These predicates are independent rather than mutually exclusive.
 
@@ -102,7 +103,8 @@ existing importer checks.
 
 Rebuild the matching bridge, reference and runtime library for the three added
 properties. Runtime Contract configuration is unchanged; private TypeShape selectors
-8, 9 and 10 provide IsOpen, IsClosedHierarchy and IsUnion respectively. The broader
+8, 9 and 10 provide IsOpen, IsClosedHierarchy and nominal IsUnionDeclaration;
+14 tests structural IsUnion identity. The broader
 [capability-oriented hierarchy](proposals/introspection-model.md) remains future work.
 The [compiled flags case](experiments/introspection-flags/README.md) exercises the
 public properties through the actual source/import/runtime path.

@@ -81,13 +81,15 @@ pub(crate) fn bounds(constraints: &[GenericConstraint]) -> impl Iterator<Item = 
     })
 }
 
-fn symbolic(ty: &Type) -> bool {
+pub(crate) fn symbolic(ty: &Type) -> bool {
     match ty {
         Type::Function(shape) => shape.parameters.iter().any(symbolic) || symbolic(&shape.returns),
         Type::TypeParameter(_) | Type::MethodTypeParameter(_) | Type::SelfType => true,
         Type::Constructed { arguments, .. } | Type::Scoped { arguments, .. } => {
             arguments.iter().any(symbolic)
         }
+        Type::Tuple(parts) => parts.iter().any(symbolic),
+        Type::Union(parts) | Type::Intersection(parts) => parts.iter().any(symbolic),
         Type::ByRef(t)
         | Type::ReadOnlyByRef(t)
         | Type::InterfaceRef(t)
@@ -105,6 +107,10 @@ pub(crate) fn validate_bounds(
     let mut bases = std::collections::HashSet::new();
     for constraint in constraints {
         if let ConstraintKind::TypeBound(bound) = &constraint.kind {
+            if crate::compositions::is_compound(bound) {
+                crate::compositions::validate(module, bound)?;
+                continue;
+            }
             let definition = module
                 .type_definition(bound)
                 .filter(|_| matches!(bound, Type::Named(_) | Type::Constructed { .. }))
@@ -203,6 +209,17 @@ pub(crate) fn check(
                 if symbolic(concrete) || symbolic(bound) {
                     continue;
                 }
+                if crate::compositions::is_compound(bound)
+                    || crate::compositions::is_compound(concrete)
+                {
+                    if !satisfies_composition_bound(module, concrete, bound) {
+                        return Err(Fault::new(format!(
+                            "generic argument {argument:?} violates {bound:?} constraint on parameter {}",
+                            constraint.parameter
+                        )));
+                    }
+                    continue;
+                }
                 // Partial frontend probes cannot decide application-type conformance.
                 // Complete linking validates all referenced types and repeats these checks.
                 let Some(definition) = module.type_definition(bound) else {
@@ -234,6 +251,38 @@ pub(crate) fn check(
         }
     }
     Ok(())
+}
+
+// Constraint membership never performs a value conversion. Preserve each union
+// alternative and each intersection requirement, including nominal Self contracts.
+fn satisfies_composition_bound(module: &crate::Module, argument: &Type, bound: &Type) -> bool {
+    if argument == bound && argument.is_primitive() {
+        return true;
+    }
+    match (argument, bound) {
+        (Type::Union(parts), _) => parts
+            .iter()
+            .all(|part| satisfies_composition_bound(module, part, bound)),
+        (_, Type::Intersection(parts)) => parts
+            .iter()
+            .all(|part| satisfies_composition_bound(module, argument, part)),
+        (_, Type::Union(parts)) => parts
+            .iter()
+            .any(|part| satisfies_composition_bound(module, argument, part)),
+        (Type::Intersection(parts), _) => parts
+            .iter()
+            .any(|part| satisfies_composition_bound(module, part, bound)),
+        _ => module.type_definition(bound).is_some_and(|definition| {
+            if definition.representation == crate::metadata::Representation::Interface {
+                crate::interfaces::closure(module, argument)
+                    .is_ok_and(|types| types.contains(bound))
+                    && crate::interfaces::satisfies_self_bound(module, argument, bound)
+                        .unwrap_or(false)
+            } else {
+                crate::inheritance::require_base(module, argument, bound).is_ok()
+            }
+        }),
+    }
 }
 
 pub(crate) fn check_type_arguments(
@@ -292,6 +341,11 @@ fn check_known_type_seen(
         return Err(Fault::new("type nesting exceeds 32"));
     }
     match ty {
+        Type::Tuple(parts) => {
+            for part in parts {
+                check_known_type_seen(module, part, depth + 1, seen)?;
+            }
+        }
         Type::Function(shape) => {
             for part in shape
                 .parameters
@@ -358,14 +412,31 @@ pub(crate) fn permits_view(
         let ConstraintKind::TypeBound(bound) = &constraint.kind else {
             return false;
         };
-        if interface {
-            crate::interfaces::closure(module, bound).is_ok_and(|types| {
-                types
+        fn guarantees(
+            module: &crate::Module,
+            bound: &Type,
+            source: &Type,
+            target: &Type,
+            interface: bool,
+        ) -> bool {
+            match bound {
+                Type::Union(parts) => {
+                    !parts.is_empty()
+                        && parts
+                            .iter()
+                            .all(|part| guarantees(module, part, source, target, interface))
+                }
+                Type::Intersection(parts) => parts
                     .iter()
-                    .any(|ty| ty.substitute_self(source).is_ok_and(|ty| &ty == target))
-            })
-        } else {
-            crate::inheritance::require_base(module, bound, target).is_ok()
+                    .any(|part| guarantees(module, part, source, target, interface)),
+                _ if interface => crate::interfaces::closure(module, bound).is_ok_and(|types| {
+                    types
+                        .iter()
+                        .any(|ty| ty.substitute_self(source).is_ok_and(|ty| &ty == target))
+                }),
+                _ => crate::inheritance::require_base(module, bound, target).is_ok(),
+            }
         }
+        guarantees(module, bound, source, target, interface)
     })
 }

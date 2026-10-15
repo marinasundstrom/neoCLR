@@ -1,0 +1,43 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Build native tuple projects",
+      "type": "process",
+      "command": "dotnet",
+      "args": [
+        "${input:compiler}",
+        "neoclr",
+        "--project",
+        "${workspaceFolder}/App/App.rvnproj"
+      ],
+      "problemMatcher": [],
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      }
+    },
+    {
+      "label": "Run native tuples",
+      "type": "process",
+      "command": "dotnet",
+      "args": [
+        "${input:compiler}",
+        "neoclr",
+        "--project",
+        "${workspaceFolder}/App/App.rvnproj",
+        "--run",
+        "${workspaceFolder}/../../../../target/debug/neoclr"
+      ],
+      "problemMatcher": []
+    }
+  ],
+  "inputs": [
+    {
+      "id": "compiler",
+      "type": "promptString",
+      "description": "Absolute path to the structural Raven rvnc.dll",
+      "default": "/Users/robert/Projects/raven-union-intersection/src/Raven.Compiler/bin/Debug/net11.0/rvnc.dll"
+    }
+  ]
+}

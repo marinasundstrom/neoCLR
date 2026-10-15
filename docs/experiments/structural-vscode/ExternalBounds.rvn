@@ -1,0 +1,19 @@
+import System.*
+
+class Answer : Reads<int>, Adds {
+    func Read() -> int => 40
+    func Extra() -> int => 2
+}
+
+func Combine<T>(value: T) -> int where T: Reads<int> & Adds {
+    return value.Read() + value.Extra()
+}
+
+func Main() -> int {
+    let answer = Combine<Answer>(Answer())
+    if answer != 42 {
+        System.Fail("external intersection dispatch")
+    }
+    Console.WriteLine("External intersection bound passed: 42")
+    return 0
+}

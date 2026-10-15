@@ -6,6 +6,32 @@ using NeoCLR.Metadata.Experimental.Introspection;
 
 internal static class CustomAttributeChecks
 {
+    private static void AttributeRowBudget()
+    {
+        static byte[] Image(int count)
+        {
+            var assembly = new System.Reflection.Emit.PersistedAssemblyBuilder(
+                new System.Reflection.AssemblyName("AttributeBudget"), typeof(object).Assembly);
+            var module = assembly.DefineDynamicModule("AttributeBudget");
+            var marker = new System.Reflection.Emit.CustomAttributeBuilder(
+                typeof(ObsoleteAttribute).GetConstructor(Type.EmptyTypes)!, []);
+            for (var index = 0; count > 0; index++)
+            {
+                var owner = module.DefineType("Budget.Owner" + index, System.Reflection.TypeAttributes.Public);
+                var attributes = Math.Min(256, count);
+                for (var row = 0; row < attributes; row++) owner.SetCustomAttribute(marker);
+                count -= attributes;
+                owner.CreateType();
+            }
+            using var stream = new MemoryStream();
+            assembly.Save(stream);
+            return stream.ToArray();
+        }
+        var accepted = AssemblyDefinition.ReadAssembly(Image(8192), false);
+        Check(accepted.MainModule.Types.Sum(t => t.CustomAttributes.Count) == 8192, "attribute row budget lost data");
+        Reject<InvalidDataException>(() => AssemblyDefinition.ReadAssembly(Image(8193), false));
+    }
+
     internal static void Run()
     {
         var host = typeof(object).Assembly.GetName();
@@ -39,6 +65,7 @@ internal static class CustomAttributeChecks
         Check(view.Name == "ObsoleteAttribute", "attribute facade name");
         Reject<InvalidDataException>(() => view.GetAttributeType());
         Check(Equals(view.GetArguments()[1].Value, true), "argument inspection does not load dependencies");
+        AttributeRowBudget();
         NativeRoundtrip();
     }
     internal static (byte[] Library, byte[] App) NativeRoundtrip()

@@ -1,0 +1,17 @@
+{
+  "date": "2026-10-14",
+  "profile": "Native tuple signature authoring; no C# reader/import or source lowering",
+  "authoringChecks": "PASS authored structural tuple signatures",
+  "interpreterExitCode": 42,
+  "expectedExitCode": 42,
+  "sha256": {
+    "target/authored-tuples/AuthoredTuples.neox": "12af220e15dc17fca9abdf00e63d7c45a97add4ec2bf73a75bad0ed9cca1575c",
+    "tools/metadata/NeoCLR.Metadata.Experimental.Tests/AuthoredTupleChecks.cs": "c44a4588681e8ce9b7c97da7634650a95e3c7f787d3e153ae77e242ed818b8a0"
+  },
+  "commands": [
+    "dotnet run --project tools/metadata/NeoCLR.Metadata.Experimental.Tests -- --authored-tuples target/authored-tuples",
+    "target/debug/neoclr run target/authored-tuples/AuthoredTuples.neox --execution interpreter",
+    "dotnet run --no-build --project tools/metadata/NeoCLR.Metadata.Experimental.Tests -- --authored-compositions",
+    "python3 scripts/build-api-docs.py --check"
+  ]
+}

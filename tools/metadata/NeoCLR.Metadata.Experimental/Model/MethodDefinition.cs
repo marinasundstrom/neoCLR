@@ -14,6 +14,7 @@ public sealed partial class MethodDefinition
     {
         Module = module;
         loadedInterfaceConstraints = row.InterfaceConstraints ?? [];
+        loadedStructuralConstraints = row.StructuralConstraints ?? [];
         MetadataToken = row.Token;
         Name = row.Name;
         declarationAttributes = row.Attributes;
@@ -132,14 +133,14 @@ public sealed partial class MethodDefinition
         catch (ArgumentException) { decoded = null; return false; }
     }
 
-    internal MethodSignature DecodeImportedSignature(AssemblyBuilder consumer, AssemblyIdentity core, IAssemblyResolver? resolver = null)
+    internal MethodSignature DecodeImportedSignature(AssemblyBuilder consumer, AssemblyIdentity core, IAssemblyResolver? resolver = null, bool allowCompositions = false, bool allowTuples = false)
     {
         if (nativeSignature is not null)
         {
             if (!IsStatic && (DeclaringType is null || GenericArity != 0))
                 throw new InvalidDataException("unsupported native callable import");
-            return new MethodSignature(consumer.ImportNativeSignatureType(nativeSignature.ReturnType, core, resolver),
-                nativeSignature.ParameterTypes.Select(type => consumer.ImportNativeSignatureType(type, core, resolver)), nativeSignature.GenericParameterNames, nativeSignature.OutParameters);
+            return new MethodSignature(consumer.ImportNativeSignatureType(nativeSignature.ReturnType, core, resolver, allowCompositions, allowTuples),
+                nativeSignature.ParameterTypes.Select(type => consumer.ImportNativeSignatureType(type, core, resolver, allowCompositions, allowTuples)), nativeSignature.GenericParameterNames, nativeSignature.OutParameters);
         }
         if (unsupportedParameterModes || unsupportedGenericParameters || GenericArity is < 0 or > 32)
             throw new InvalidDataException("unsupported imported method declaration");

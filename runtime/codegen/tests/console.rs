@@ -1117,9 +1117,99 @@ int main(int argc, char **argv) {
 #[test]
 #[cfg(all(target_os = "macos", target_arch = "aarch64"))]
 fn interface_views_preserve_identity_nulls_and_invalid_cast_faults() {
+    verify_reference_views(include_str!(
+        "../../../docs/experiments/aot-console/interface-views.neoil"
+    ));
+}
+
+#[test]
+#[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+fn structural_intersection_views_require_every_nominal_bound() {
+    let source =
+        include_str!("../../../docs/experiments/native-structural-types/intersection-views.neoil");
+    verify_reference_views(source);
+    // Matching one interface is insufficient; remove the second explicit conformance.
+    verify_reference_views(&source.replace(".implements Marker\n", ""));
+    let class_bound = source.replace("intersection<View,Marker>", "intersection<Cell,View>");
+    verify_reference_views(&class_bound);
+    let final_bound = class_bound.replace(".type class Cell\n", ".type class Cell\n.sealed\n");
     let dir = Temp::new();
     let seed = neoclr::assemble(".module System\n.references ()\n").unwrap();
-    let source = include_str!("../../../docs/experiments/aot-console/interface-views.neoil");
+    let denied = compile_source(
+        &dir,
+        &seed,
+        &final_bound,
+        &["--compile-system", "--reference-arena"],
+        false,
+    );
+    assert!(!denied.status.success());
+    assert!(!dir.0.join("app.o").exists());
+}
+
+#[test]
+#[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+fn structural_intersection_generic_transport_preserves_conformance_and_identity() {
+    let source = include_str!("../../../docs/experiments/native-structural-types/intersection-views.neoil")
+        .replace("stloc view", "call Forward<intersection<View,Marker>>(intersection<View,Marker>)\nstloc view");
+    let source = format!("{source}\n.type Wrapper<T>\n.field Item T\n.end\n.function Forward<T>(!!0 value) -> !!0\nldarg value\nnewobj Wrapper<!!0>\nldfld 0\nret\n.end\n");
+    verify_reference_views(&source);
+    verify_reference_views(&source.replace(".implements Marker\n", ""));
+}
+
+#[test]
+#[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+fn structural_union_reference_payloads_accept_either_nominal_bound() {
+    let source =
+        include_str!("../../../docs/experiments/native-structural-types/intersection-views.neoil")
+            .replace("intersection<View,Marker>", "union<View,Marker>")
+            .replace(
+                "ldloc view\ncallvirt instance View::Get()",
+                "ldloc view\ncastclass View\ncallvirt instance View::Get()",
+            );
+    let source = source.replace(
+        "castclass union<View,Marker>\nstloc view",
+        "castclass union<View,Marker>\ncall Echo(union<View,Marker>)\nstloc view",
+    ) + "\n.function Echo(union<View,Marker> value) -> union<View,Marker>\nldarg value\nret\n.end\n";
+    verify_reference_views(&source);
+    verify_reference_views(&source.replacen(
+        "castclass union<View,Marker>\ncall Echo",
+        "call Echo",
+        1,
+    ));
+    verify_reference_views(&source.replace(".implements Marker\n", ""));
+    verify_reference_views(&source.replace(".implements View\n", ""));
+    verify_reference_views(
+        &source
+            .replace(".implements View\n", "")
+            .replace(".implements Marker\n", ""),
+    );
+    let mixed = source.replace("union<View,Marker>", "union<Int32,View>");
+    let dir = Temp::new();
+    let seed = neoclr::assemble(".module System\n.references ()\n").unwrap();
+    let denied = compile_source(
+        &dir,
+        &seed,
+        &mixed,
+        &["--compile-system", "--reference-arena"],
+        false,
+    );
+    assert!(!denied.status.success());
+    assert!(
+        String::from_utf8_lossy(&denied.stderr).contains("instance tests require tagged conversion lowering"),
+        "{}",
+        String::from_utf8_lossy(&denied.stderr)
+    );
+    assert!(!dir.0.join("app.o").exists());
+}
+
+#[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+fn verify_reference_views(source: &str) {
+    verify_reference_views_with_arena(source, None);
+}
+
+fn verify_reference_views_with_arena(source: &str, arena_bytes: Option<[u64; 8]>) {
+    let dir = Temp::new();
+    let seed = neoclr::assemble(".module System\n.references ()\n").unwrap();
     let denied = compile_source(&dir, &seed, source, &["--compile-system"], false);
     assert!(!denied.status.success() && !dir.0.join("app.o").exists());
     let r = compile_source(
@@ -1142,7 +1232,7 @@ int main(int argc, char **argv) {
     int32_t result=-99;
     int status=neoclr_entry_v4(argc>1 ? atoi(argv[1]) : 0,&result,&ctx);
     if (status) {
-        if (status!=3 || result!=-99 || ctx.fault.code!=3) return 92;
+        if ((status!=3 && status!=6 && status!=11) || result!=-99 || ctx.fault.code!=(uint32_t)status) return 92;
         neoclr_aot_render_fault(stderr,&ctx.fault);return 1;
     }
     printf("%d\n",result);return 0;
@@ -1150,6 +1240,15 @@ int main(int argc, char **argv) {
 "#,
     )
     .unwrap();
+    if let Some(bytes) = arena_bytes {
+        let host = dir.0.join("host.c");
+        let expected = bytes.iter().map(u64::to_string).collect::<Vec<_>>().join(",");
+        let text = fs::read_to_string(&host).unwrap().replace(
+            "    if (status) {",
+            &format!("    uint64_t expected[8] = {{{expected}}};\n    if (ctx.text.used != expected[argc>1 ? atoi(argv[1]) : 0]) return 93;\n    if (status) {{"),
+        );
+        fs::write(host, text).unwrap();
+    }
     let r = Command::new("clang")
         .args([
             "-arch", "arm64", "-std=c11", "-Wall", "-Wextra", "-Werror", "-I",
@@ -11797,4 +11896,435 @@ int main(void) {
             .value,
         neoclr::Value::Int32(42)
     );
+}
+
+#[test]
+#[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+fn structural_mixed_union_keeps_numeric_bits_separate_from_references() {
+    let source = include_str!(
+        "../../../docs/experiments/native-structural-types/mixed-union.neoil"
+    );
+    verify_reference_views_with_arena(source, Some([16, 16, 16, 16, 16, 16, 0, 16]));
+    let interface = source
+        .replace(".type class Cell", ".interface View\n.end\n.type class Cell\n.implements View")
+        .replace("union<Int32,Int64,Boolean,Cell>", "union<Int32,Int64,Boolean,View>");
+    verify_reference_views_with_arena(&interface, Some([16, 16, 16, 16, 16, 16, 0, 16]));
+    let null_scalar = source.replace(
+        "ldloc value\ncastclass Cell\nref.isnull\nbrtrue Yes",
+        "ldloc value\nunbox.any Int32\npop\nbr Bad",
+    );
+    verify_reference_views_with_arena(&null_scalar, Some([16, 16, 16, 16, 16, 16, 0, 16]));
+    // A boxed scalar's Object view must not silently become a null reference.
+    let dir = Temp::new();
+    let seed = neoclr::assemble(".module System\n.references ()\n").unwrap();
+    let denied = compile_source(
+        &dir, &seed, &source.replace("isinst Cell", "isinst System.Object"),
+        &["--compile-system", "--reference-arena"], false,
+    );
+    assert!(!denied.status.success());
+    assert!(String::from_utf8_lossy(&denied.stderr).contains("views require boxing"), "{}", String::from_utf8_lossy(&denied.stderr));
+    assert!(!dir.0.join("app.o").exists());
+    let denied = compile_source(
+        &dir, &seed,
+        &source.replace("ldc.i4 42\nnewobj.ctor instance Cell::.ctor(Int32)",
+            "ldc.i4 42\nnewobj.ctor instance Cell::.ctor(Int32)\ncastclass System.Object"),
+        &["--compile-system", "--reference-arena"], false,
+    );
+    assert!(!denied.status.success());
+    assert!(String::from_utf8_lossy(&denied.stderr).contains("boxed-payload classification"), "{}", String::from_utf8_lossy(&denied.stderr));
+    assert!(!dir.0.join("app.o").exists());
+}
+
+#[test]
+#[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+fn structural_record_union_preserves_embedded_reference_identity() {
+    verify_reference_views_with_arena(
+        include_str!("../../../docs/experiments/native-structural-types/record-reference-union.neoil"),
+        Some([16, 16, 0, 0, 16, 0, 16, 16]),
+    );
+}
+
+#[test]
+#[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+fn structural_record_union_accepts_direct_reference_alternatives() {
+    let source = include_str!(
+        "../../../docs/experiments/native-structural-types/record-reference-union.neoil"
+    )
+    .replace("union<Payload,Int32>", "union<Payload,Int32,Cell>");
+    verify_reference_views_with_arena(&source, Some([16, 16, 0, 0, 16, 0, 16, 16]));
+    let direct = source.replace(
+        "ldloc value\nstloc copy",
+        "ldloc cell\ncastclass union<Payload,Int32,Cell>\ncall Echo(union<Payload,Int32,Cell>)\nstloc copy",
+    ).replace(
+        "ldloc copy\nunbox.any Payload\nldfld Payload::Number\nldc.i8 4294967338\nceq\nbrfalse Bad",
+        "ldloc copy\nisinst Cell\nref.isnull\nbrtrue Bad\nldloc copy\nisinst Payload\nref.isnull\nbrfalse Bad",
+    ).replace(
+        "ldloc copy\nunbox.any Payload\nldfld Payload::Reference",
+        "ldloc copy\ncastclass Cell",
+    );
+    verify_reference_views_with_arena(&direct, Some([16, 16, 0, 0, 16, 0, 16, 16]));
+    let reference_faults = direct.replace(
+        "Extract:\nldloc value\nunbox.any Payload",
+        "Extract:\nldloc value\ncastclass Cell",
+    );
+    verify_reference_views_with_arena(&reference_faults, Some([16, 16, 0, 0, 16, 0, 16, 16]));
+
+}
+
+#[test]
+#[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+fn structural_record_union_reference_alternatives_use_nominal_conformance() {
+    let source = include_str!("../../../docs/experiments/native-structural-types/record-reference-union.neoil")
+        .replace(".type class Cell", ".interface Marker\n.end\n.interface View\n.end\n.type class Cell\n.implements Marker\n.implements View")
+        .replace("union<Payload,Int32>", "union<Payload,Int32,Marker,View>")
+        .replace("ldloc value\nstloc copy", "ldloc cell\ncastclass union<Payload,Int32,Marker,View>\ncall Echo(union<Payload,Int32,Marker,View>)\nstloc copy")
+        .replace("ldloc copy\nunbox.any Payload\nldfld Payload::Number\nldc.i8 4294967338\nceq\nbrfalse Bad", "ldloc copy\nisinst Marker\nref.isnull\nbrtrue Bad\nldloc copy\nisinst View\nref.isnull\nbrtrue Bad")
+        .replace("ldloc copy\nunbox.any Payload\nldfld Payload::Reference", "ldloc copy\ncastclass Cell");
+    verify_reference_views_with_arena(&source, Some([16, 16, 0, 0, 16, 0, 16, 16]));
+}
+
+#[test]
+#[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+fn structural_union_roots_survive_native_collection_and_unwind() {
+    let record = include_str!("../../../docs/experiments/native-structural-types/union-gc.neoil");
+    let direct = record.replace(
+        "ldloc payload\nbox Payload",
+        "ldloc payload\nldfld Payload::Reference",
+    ).replace(
+        "ldloc value\nunbox.any Payload\nldfld Payload::Wide\nldc.i8 4294967338\nceq\nbrfalse Bad\n",
+        "",
+    ).replace("unbox.any Payload\nldfld Payload::Reference", "castclass Cell");
+    let scalar = record.replace("ldloc payload\nbox Payload", "ldc.i4 42\nbox Int32")
+        .replace("ldloc value\nunbox.any Payload\nldfld Payload::Wide\nldc.i8 4294967338\nceq\nbrfalse Bad\n", "")
+        .replace("unbox.any Payload\nldfld Payload::Reference\nldfld Cell::Value", "unbox.any Int32");
+    let fault = record.replace(
+        "ldloc value\nunbox.any Payload\nldfld Payload::Wide",
+        "ldloc value\nunbox.any Int32\nconv.i8",
+    );
+    verify_structural_union_gc(
+        &[
+            (record, 0),
+            (direct.as_str(), 0),
+            (scalar.as_str(), 0),
+            (fault.as_str(), 11),
+        ],
+        648,
+    );
+}
+
+#[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+fn verify_structural_union_gc(cases: &[(&str, i32)], expected_allocations: u64) {
+    let seed = neoclr::assemble(".module System\n.references ()\n").unwrap();
+    for &(source, expected_status) in cases {
+        let app = neoclr::assemble(source).unwrap();
+        let program = neoclr::LoadedProgram::with_library(&app, &seed).unwrap();
+        let method = program
+            .resolve_function(&neoclr::assembler::parse_function_ref("Calculate()").unwrap())
+            .unwrap();
+        let reference = method.invoke(vec![], neoclr::Limits::default());
+        if expected_status == 0 {
+            assert_eq!(reference.unwrap().value, neoclr::Value::Int32(42));
+        } else {
+            let expected = match expected_status {
+                3 => neoclr::FaultCode::RuntimeError,
+                8 => neoclr::FaultCode::IndexOutOfRange,
+                11 => neoclr::FaultCode::InvalidCast,
+                _ => panic!("unexpected native status {expected_status}"),
+            };
+            assert_eq!(reference.unwrap_err().code, expected);
+        }
+        for paced in [false, true] {
+            let dir = Temp::new();
+            let r = compile_source(
+                &dir,
+                &seed,
+                source,
+                &["--compile-system", "--reference-arena", "--native-gc"],
+                false,
+            );
+            assert!(r.status.success(), "{}", String::from_utf8_lossy(&r.stderr));
+            let base = PathBuf::from(env!("CARGO_MANIFEST_DIR"))
+                .join("../../docs/experiments/aot-console");
+            fs::write(dir.0.join("host.c"), format!(r#"
+#include "native-gc.h"
+int main(void) {{
+    uint64_t heap[128]={{0}};
+    neoclr_aot_context ctx={{.text={{(unsigned char*)heap,sizeof(heap),0}}}};
+    for (int run=0;run<8;run++) {{
+        int32_t result=-1;
+        int status=neoclr_entry_v4(0,&result,&ctx);
+        if(status!={expected_status}) {{neoclr_aot_render_fault(stderr,&ctx.fault);return 1;}}
+        if((!status && result!=42) || (status && (result!=-1 || ctx.fault.code!=(uint32_t)status)))return 2;
+        if(neoclr_root_probe_head_v1())return 3;
+        ctx.fault=(neoclr_aot_fault){{0}};
+        if(neoclr_gc_collect_v1(&ctx,NULL) || ctx.text.used)return 4;
+        if(neoclr_gc_entry_check_v1(&ctx))return 5;
+    }}
+    neoclr_gc_statistics stats=neoclr_gc_statistics_v1();
+    if(stats.collections<16 || stats.allocations!={expected_allocations} || stats.reclaimed_allocations!={expected_allocations})return 6;
+    return 0;
+}}
+"#)).unwrap();
+            let mut command = Command::new("clang");
+            command
+                .args([
+                    "-std=c11",
+                    "-Wall",
+                    "-Wextra",
+                    "-Werror",
+                    "-fsanitize=undefined,bounds",
+                    "-DNEOCLR_NATIVE_GC",
+                    "-I",
+                ])
+                .arg(&base);
+            if paced {
+                command.arg("-DNEOCLR_GC_PACED");
+            }
+            let r = command
+                .arg(dir.0.join("host.c"))
+                .arg(base.join("native-gc.c"))
+                .arg(base.join("root-probe.c"))
+                .arg(base.join("text-arena.c"))
+                .arg(base.join("../aot-fault-details/render.c"))
+                .arg(dir.0.join("app.o"))
+                .arg("-o")
+                .arg(dir.0.join("host"))
+                .output()
+                .unwrap();
+            assert!(r.status.success(), "{}", String::from_utf8_lossy(&r.stderr));
+            let r = Command::new(dir.0.join("host")).output().unwrap();
+            assert!(
+                r.status.success(),
+                "paced={paced} status={expected_status}: {r:?}"
+            );
+        }
+    }
+}
+
+#[test]
+#[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+fn structural_callable_union_roots_survive_native_collection() {
+    let source =
+        include_str!("../../../docs/experiments/native-structural-types/callable-union-gc.neoil");
+    let expanded = source.replace(
+        "union<fn<Int32>,Int32>",
+        "union<fn<Int32>,fn<Int32,Int32>,Payload,Int32>",
+    );
+    let fault = expanded.replace(
+        "castclass fn<Int32>\ncall instance fn<Int32>::Invoke()",
+        "castclass fn<Int32,Int32>\nldc.i4 1\ncall instance fn<Int32,Int32>::Invoke(Int32)",
+    );
+    let scalar = source.replace("castclass union<fn<Int32>,Int32>\nret", "pop\nldc.i4 42\nbox Int32\ncastclass union<fn<Int32>,Int32>\nret")
+        .replace("ldloc value\nisinst fn<Int32>\nref.isnull\nbrtrue Bad\nldloc value\ncastclass fn<Int32>\ncall instance fn<Int32>::Invoke()", "ldloc value\nisinst fn<Int32>\nref.isnull\nbrfalse Bad\nldloc value\nunbox.any Int32");
+    let null = source.replace(".function Make() -> union<fn<Int32>,Int32>", ".function Make() -> union<fn<Int32>,Int32>\n.local fn<Int32> empty").replace("castclass union<fn<Int32>,Int32>\nret", "pop\nldloca empty\ninitobj fn<Int32>\nldloc empty\ncastclass union<fn<Int32>,Int32>\nret")
+        .replace("ldloc value\nisinst fn<Int32>\nref.isnull\nbrtrue Bad\nldloc value\ncastclass fn<Int32>\ncall instance fn<Int32>::Invoke()", "ldloc value\ncastclass fn<Int32>\nref.isnull\nbrfalse Bad\nldc.i4 42");
+    verify_structural_union_gc(
+        &[
+            (source, 0),
+            (&expanded, 0),
+            (&fault, 11),
+            (&scalar, 0),
+            (&null, 0),
+        ],
+        656,
+    );
+}
+
+#[test]
+#[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+fn structural_union_reserved_arrays_retain_callable_receivers() {
+    let prefix = include_str!("../../../docs/experiments/native-structural-types/callable-union-gc.neoil")
+        .split(".function Pressure").next().unwrap();
+    let source = format!("{prefix}{}", r#"
+.function MakeArray() -> arrayref<union<fn<Int32>,Int32>>
+.local arrayref<union<fn<Int32>,Int32>> items
+ldc.i4 1
+array.reserve union<fn<Int32>,Int32>
+stloc items
+ldloc items
+ldc.i4 0
+call Make()
+stelem union<fn<Int32>,Int32>
+ldloc items
+ret
+.end
+.function Pressure(arrayref<union<fn<Int32>,Int32>> items) -> union<fn<Int32>,Int32>
+.local Int32 remaining
+ldc.i4 80
+stloc remaining
+Loop:
+ldc.i4 128
+newarr Byte
+pop
+ldloc remaining
+ldc.i4 1
+sub
+stloc remaining
+ldloc remaining
+brtrue Loop
+ldarg items
+ldc.i4 0
+ldelem union<fn<Int32>,Int32>
+ret
+.end
+.function Calculate() -> Int32
+.local union<fn<Int32>,Int32> value
+call MakeArray()
+call Pressure(arrayref<union<fn<Int32>,Int32>>)
+stloc value
+ldloc value
+castclass fn<Int32>
+call instance fn<Int32>::Invoke()
+ret
+.end
+"#);
+    let uninitialized = source.replace("stelem union<fn<Int32>,Int32>", "pop\npop\npop");
+    let outside = source.replace("ldarg items\nldc.i4 0\nldelem", "ldarg items\nldc.i4 1\nldelem");
+    verify_structural_union_gc(&[(&source, 0), (&uninitialized, 3), (&outside, 8)], 664);
+}
+
+#[test]
+#[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+fn structural_reserved_arrays_copy_initialized_tuple_and_scalar_elements() {
+    for (shape, make, extract) in [
+        ("tuple<Int32,Int64>", "ldc.i4 42\nldc.i8 99\nnewobj tuple<Int32,Int64>", "ldfld 0"),
+        ("union<Int32,Int64>", "ldc.i4 42\nbox Int32\ncastclass union<Int32,Int64>", "stloc value\nldloc value\nunbox.any Int32"),
+        ("intersection<View,Marker>", "ldloca value\ninitobj intersection<View,Marker>\nldloc value", "ref.isnull\nbrfalse Bad\nldc.i4 42\nret\nBad:\nldc.i4 -1"),
+    ] {
+        let source = format!(".module StructuralArrays\n.type class abstract System.Object\n.end\n.interface View\n.end\n.interface Marker\n.end\n.function Calculate() -> Int32\n.local arrayref<{shape}> items\n.local {shape} value\n.local Int32 remaining\nldc.i4 1\narray.reserve {shape}\nstloc items\nldloc items\nldc.i4 0\n{make}\nstelem {shape}\nldc.i4 80\nstloc remaining\nLoop:\nldc.i4 128\nnewarr Byte\npop\nldloc remaining\nldc.i4 1\nsub\nstloc remaining\nldloc remaining\nbrtrue Loop\nldloc items\nldc.i4 0\nldelem {shape}\n{extract}\nret\n.end");
+        verify_structural_union_gc(&[(&source, 0)], 648);
+    }
+}
+
+#[test]
+fn structural_arrays_reject_default_allocation_and_element_borrows() {
+    let seed = neoclr::assemble(".module System\n.references ()\n").unwrap();
+    for shape in ["tuple<Int32,Int64>", "union<Int32,Int64>"] {
+        for body in [format!("ldc.i4 1\nnewarr {shape}\npop"), format!("ldc.i4 1\narray.reserve {shape}\nldc.i4 0\nldelema {shape}\npop")] {
+            let source = format!(".module InvalidStructuralArray\n.function Calculate() -> Int32\n{body}\nldc.i4 0\nret\n.end");
+            let dir = Temp::new();
+            let result = compile_source(&dir, &seed, &source, &["--compile-system", "--reference-arena"], false);
+            assert!(!result.status.success());
+            assert!(!dir.0.join("app.o").exists());
+            assert!(!String::from_utf8_lossy(&result.stderr).contains("panicked"));
+        }
+    }
+}
+
+#[test]
+#[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+fn structural_union_record_fields_retain_callable_receivers() {
+    let source = include_str!("../../../docs/experiments/native-structural-types/callable-union-gc.neoil")
+        .replace(".function Make()", ".type Holder\n.field Value union<fn<Int32>,Int32>\n.end\n.function Make()")
+        .replace(".function Pressure(union<fn<Int32>,Int32> value) -> union<fn<Int32>,Int32>", ".function Pressure(Holder value) -> Holder")
+        .replace(".local union<fn<Int32>,Int32> value", ".local Holder value")
+        .replace("call Make()", "call Make()\nnewobj Holder")
+        .replace("call Pressure(union<fn<Int32>,Int32>)", "call Pressure(Holder)")
+        .replace("ldloc value\nisinst", "ldloc value\nldfld Holder::Value\nisinst")
+        .replace("ldloc value\ncastclass", "ldloc value\nldfld Holder::Value\ncastclass");
+    verify_structural_union_gc(&[(&source, 0)], 656);
+}
+
+#[test]
+#[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+fn structural_union_widening_preserves_collector_roots() {
+    let original =
+        include_str!("../../../docs/experiments/native-structural-types/callable-union-gc.neoil");
+    let source = original
+        .replace("union<fn<Int32>,Int32>", "union<Payload,Int32,fn<Int32>>")
+        .replacen(
+            ".function Make() -> union<Payload,Int32,fn<Int32>>",
+            ".function Make() -> union<fn<Int32>,Int32>",
+            1,
+        )
+        .replacen(
+            "castclass union<Payload,Int32,fn<Int32>>",
+            "castclass union<fn<Int32>,Int32>",
+            1,
+        )
+        .replace(
+            "call Make()",
+            "call Make()\ncastclass union<Payload,Int32,fn<Int32>>",
+        );
+    verify_structural_union_gc(&[(&source, 0)], 656);
+    let reference = source
+        .replace("function.bind fn<Int32> = instance Cell::Read()\n", "")
+        .replace("fn<Int32>", "Cell")
+        .replace("call instance Cell::Invoke()", "call instance Cell::Read()");
+    verify_structural_union_gc(&[(&reference, 0)], 648);
+    let reference_only = reference
+        .replace(
+            ".function Make() -> union<Cell,Int32>",
+            ".function Make() -> union<Cell,System.Object>",
+        )
+        .replace(
+            "castclass union<Cell,Int32>",
+            "castclass union<Cell,System.Object>",
+        )
+        .replace(
+            "union<Payload,Int32,Cell>",
+            "union<Payload,Int32,Cell,System.Object>",
+        );
+    verify_structural_union_gc(&[(&reference_only, 0)], 648);
+}
+
+#[test]
+#[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+fn structural_string_union_payload_survives_native_collection() {
+    let source = r#"
+.module StringUnionGC
+.type class abstract System.Object
+.end
+.function Make() -> union<String,Int32>
+ldstr "hé🙂\u0000z"
+castclass union<String,Int32>
+ret
+.end
+.function Pressure(union<String,Int32> value) -> union<String,Int32>
+.local Int32 remaining
+ldc.i4 40
+stloc remaining
+Loop:
+ldc.i4 128
+newarr Byte
+pop
+ldloc remaining
+ldc.i4 1
+sub
+stloc remaining
+ldloc remaining
+brtrue Loop
+ldarg value
+ret
+.end
+.function Calculate() -> Int32
+.local union<String,Int32> value
+call Make()
+call Pressure(union<String,Int32>)
+stloc value
+ldloc value
+call Pressure(union<String,Int32>)
+stloc value
+ldloc value
+isinst String
+ref.isnull
+brtrue Bad
+ldloc value
+castclass String
+ldstr "hé🙂\u0000z"
+ceq
+brfalse Bad
+ldc.i4 42
+ret
+Bad:
+ldc.i4 -1
+ret
+.end
+"#;
+    verify_structural_union_gc(&[(source, 0)], 656);
+    let scalar = source.replace("ldstr \"hé🙂\\u0000z\"\ncastclass union<String,Int32>", "ldc.i4 42\nbox Int32\ncastclass union<String,Int32>")
+        .replace("brtrue Bad\nldloc value\ncastclass String\nldstr \"hé🙂\\u0000z\"\nceq\nbrfalse Bad\nldc.i4 42", "brfalse Bad\nldloc value\nunbox.any Int32");
+    verify_structural_union_gc(&[(&scalar, 0)], 640);
+    let wrong = scalar.replace("unbox.any Int32", "castclass String\npop\nldc.i4 42");
+    verify_structural_union_gc(&[(&wrong, 11)], 640);
 }

@@ -81,3 +81,75 @@ The matching revision and artifact-loading cases execute in
 `tests/object_root_identity.rs`. See the repository's `docs/loaded-program.md` for
 snapshot/execution lifetime and resource limits. This API does not authorize native
 P/Invoke; existing safe/unsafe execution boundaries remain unchanged.
+
+## Structural composition identity keys (development, 2026-10-14)
+
+On `codex/structural-union-intersection`, the Rust `TypeIdentity` enum adds:
+
+```rust
+Union(Vec<TypeIdentity>),
+Intersection(Vec<TypeIdentity>),
+```
+
+`LoadedProgram::resolve_type_identity(&Type) -> Result<TypeIdentity, Fault>`
+(and the existing free resolution helpers) resolve admitted composition signatures
+in the standard runtime. Each constituent preserves its
+resolved definition key, including module/revision, row and generic arguments.
+Union and intersection keys are distinct; same-kind flattening, sorting and
+deduplication follow existing signature normalization. Duplicate-only compositions
+resolve to the surviving type. Mixed nesting is preserved. This is structural
+signature identity, not equality inferred from assignment or nominal ancestry.
+
+Compositions nested inside admitted closed reference generic arguments retain their
+keys. Invalid, inaccessible, unresolved, open or disabled compositions return Fault;
+existing sealed-bound rules apply before intersection normalization. Keys belong to
+one resolved build and are not persistent cross-build identifiers. The new enum
+variants require downstream exhaustive Rust matches to be updated. This identity change does not alter the serialized metadata format.
+
+A composition has no nominal definition row or declaring type. Internal definition
+token lookup returns no definition (token zero), never a constituent's token.
+Guest construction now selects UnionTypeInfo/IntersectionTypeInfo in the experimental
+interpreter, including nested descriptors inside admitted generic wrappers. See the
+[guest contract](introspection.md#structural-composition-descriptors-experimental-2026-10-14).
+Member and hierarchy queries remain unsupported for direct compositions. These host Rust APIs are
+excluded from the guest RavenDoc selection and documented here.
+
+### Host composition descriptors (development, 2026-10-14)
+
+`LoadedProgram::describe_type(&Type) -> Result<TypeDescriptor, Fault>` now supports
+admitted closed compositions in the standard runtime. `TypeDescriptor`
+adds a public `constituents: Vec<TypeDescriptor>` field containing direct union
+alternatives or intersection bounds in normalized signature order. Other types
+return an empty vector. Inspect `identity` to distinguish Union from Intersection.
+
+Each constituent is a complete recursive host snapshot with its own identity, name,
+generic arguments and constituents. For `Box<union<Left,Right>>`, Box remains a
+nominal descriptor with one generic argument; that argument has two constituents.
+For `intersection<Box<Int32>,Left>`, the Box bound has its own Int32 generic argument.
+Constituents are never reported as generic arguments of the composition itself.
+Direct compositions have no declaring type. Their diagnostic names use
+`union<...>`/`intersection<...>`; names are not identity keys. Normalization can
+collapse a duplicate-only composition to its remaining nominal descriptor.
+
+Resolution checks visibility, feature admission and constituent validity before
+returning snapshots. Invalid inputs return Fault; inspecting snapshots neither
+executes guest code nor grants construction/invocation rights. Rust callers
+constructing TypeDescriptor literals must initialize the new field.
+
+Guest type-token and TypeInfo providers retain the existing gate. In particular,
+the Raven `TypeInfo.IsUnion` property is now reserved for structural unions, while
+`NominalTypeInfo.IsUnionDeclaration` checks nominal metadata. Host description does
+not by itself enable guest structural descriptors. The guest API
+snapshot, native metadata encoding and CLI bridge are unchanged.
+
+### Experimental structural generic bounds (2026-10-14)
+
+In the standard runtime, metadata GenericConstraint.kind may hold
+TypeBound(Type::Union(...)) or TypeBound(Type::Intersection(...)) with the existing
+closed reference composition rules. Module::instantiated_fields and loaded generic
+method resolution enforce any-of/all-of membership after substitution, including
+full coverage of union arguments. Invalid arguments fault; bypassing verification
+does not bypass method constraint checks. Default builds reject structural bounds.
+The metadata preserves the structural bound, not multiple conjunctive nominal rows.
+No new guest constraint reflection API is introduced. See
+[validation and limits](https://github.com/marinasundstrom/neoCLR/blob/codex/structural-union-intersection/docs/experiments/composition-constraints/README.md).

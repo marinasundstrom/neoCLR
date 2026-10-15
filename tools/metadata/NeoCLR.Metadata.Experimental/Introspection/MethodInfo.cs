@@ -145,6 +145,12 @@ public sealed class MethodGenericParameterTypeInfo : TypeInfo
     /// <remarks>Inference, language conversions and generic argument admission belong to the caller.</remarks>
     public IReadOnlyList<NominalTypeInfo> GetInterfaceConstraints() => Array.AsReadOnly(DeclaringMethod.Definition.InterfaceConstraints
         .Where(c => c.ParameterIndex == Position).Select(c => ResolveInterfaceBound(c.InterfaceType)).ToArray());
+    /// <summary>Resolves all supported method bounds, preserving native union/intersection grouping.</summary>
+    /// <remarks>Returns context-owned type views. Argument admission and open structural bounds are not provided by this query.</remarks>
+    /// <exception cref="InvalidDataException">Constraints or dependencies cannot be resolved.</exception>
+    public IReadOnlyList<TypeInfo> GetTypeConstraints() => Array.AsReadOnly(DeclaringMethod.Definition.TypeConstraints
+        .Where(c => c.ParameterIndex == Position).Select(c => Context.ResolveSignature(c.Bound)).ToArray());
+
     private NominalTypeInfo ResolveInterfaceBound(TypeReference reference)
     {
         var type = Context.Resolve(reference);

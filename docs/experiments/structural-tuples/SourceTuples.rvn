@@ -1,0 +1,16 @@
+func Echo(value: (left: int, right: int)) -> (left: int, right: int) {
+    return value
+}
+func Nested(value: ((int, int), int)) -> ((int, int), int) {
+    return value
+}
+func Rename(value: (left: int, right: int)) -> (x: int, y: int) {
+    return value
+}
+func Main() -> int {
+    let pair = Echo((40, 2))
+    let renamed = Rename(pair)
+    let nested = Nested((pair, 0))
+    let copy = nested
+    return renamed.x + renamed.y + pair.left - pair.left + copy.Item1.Item1 - nested.Item1.Item1 + copy.Item2
+}

@@ -174,3 +174,112 @@ fn legacy_rows_are_derived_in_their_original_modules() {
         expected
     );
 }
+
+#[test]
+fn composition_keys_preserve_kind_constituents_and_generic_arguments() {
+    use neoclr::{LoadedProgram, assembler::parse_type};
+    let module = assemble(".module Compositions\n.revision first\n.interface Left\n.end\n.interface Right\n.end\n.type class Box<T>\n.end\n").unwrap();
+    let program = LoadedProgram::new(&module).unwrap();
+    let identity = |text| {
+        program
+            .resolve_type_identity(&parse_type(text).unwrap())
+            .unwrap()
+    };
+    let left = identity("Left");
+    let right = identity("Right");
+    let union = identity("union<Left,Right>");
+    let intersection = identity("intersection<Left,Right>");
+    assert_eq!(
+        union,
+        TypeIdentity::Union(vec![left.clone(), right.clone()])
+    );
+    assert_eq!(
+        intersection,
+        TypeIdentity::Intersection(vec![left.clone(), right.clone()])
+    );
+    assert_ne!(union, intersection);
+    assert_eq!(union, identity("union<Right,Left>"));
+    assert_eq!(union, identity("union<Left,union<Right,Left>>"));
+    assert_eq!(left, identity("union<Left,Left>"));
+    let TypeIdentity::Definition { arguments, .. } = identity("Box<union<Left,Right>>") else {
+        panic!("expected wrapper")
+    };
+    assert_eq!(arguments, vec![union.clone()]);
+    let TypeIdentity::Union(value_parts) = identity("union<Int32,Left>") else {
+        panic!("expected value/reference union")
+    };
+    assert!(value_parts.contains(&identity("Int32")));
+    assert!(value_parts.contains(&left));
+    let mixed = identity("union<Left,intersection<Left,Right>>");
+    let TypeIdentity::Union(parts) = mixed else {
+        panic!("expected mixed union")
+    };
+    assert!(parts.contains(&left));
+    assert!(parts.contains(&intersection));
+    let other = assemble(".module Compositions\n.revision second\n.interface Left\n.end\n.interface Right\n.end\n.type class Box<T>\n.end\n").unwrap();
+    assert_ne!(
+        union,
+        resolve_type_identity(&other, &parse_type("union<Left,Right>").unwrap()).unwrap()
+    );
+    assert!(
+        program
+            .resolve_type_identity(&Type::Intersection(vec![Type::Int32, Type::from_name("Left")]))
+            .is_err()
+    );
+}
+
+#[test]
+fn composition_descriptors_expose_recursive_constituents_separately_from_arguments() {
+    use neoclr::{LoadedProgram, assembler::parse_type};
+    let module = assemble(
+        ".module Shapes\n.interface Left\n.end\n.interface Right\n.end\n.type class Box<T>\n.end\n",
+    )
+    .unwrap();
+    let program = LoadedProgram::new(&module).unwrap();
+    let describe = |text| program.describe_type(&parse_type(text).unwrap()).unwrap();
+    for (text, union) in [
+        ("union<Left,Right>", true),
+        ("intersection<Left,Right>", false),
+    ] {
+        let descriptor = describe(text);
+        assert_eq!(descriptor.name, text);
+        assert_eq!(matches!(descriptor.identity, TypeIdentity::Union(_)), union);
+        assert!(descriptor.declaring_type.is_none());
+        assert!(descriptor.generic_arguments.is_empty());
+        assert_eq!(
+            descriptor.constituents,
+            vec![describe("Left"), describe("Right")]
+        );
+    }
+    let wrapper = describe("Box<union<Left,intersection<Left,Right>>>");
+    assert!(matches!(wrapper.identity, TypeIdentity::Definition { .. }));
+    assert!(wrapper.constituents.is_empty());
+    assert_eq!(wrapper.generic_arguments.len(), 1);
+    let argument = &wrapper.generic_arguments[0];
+    assert!(matches!(argument.identity, TypeIdentity::Union(_)));
+    assert_eq!(argument.constituents.len(), 2);
+    assert!(argument.constituents.contains(&describe("Left")));
+    assert!(
+        argument
+            .constituents
+            .contains(&describe("intersection<Left,Right>"))
+    );
+    let value_union = describe("union<Int32,Left>");
+    assert!(value_union.constituents.contains(&describe("Int32")));
+    assert!(value_union.constituents.contains(&describe("Left")));
+    let generic_bound = describe("intersection<Box<Int32>,Left>");
+    let bound = generic_bound
+        .constituents
+        .iter()
+        .find(|p| p.name == "Box")
+        .unwrap();
+    assert_eq!(bound.generic_arguments, vec![describe("Int32")]);
+    assert_eq!(describe("union<Left,Left>"), describe("Left"));
+    assert_eq!(describe("union<Right,Left>"), describe("union<Left,Right>"));
+    assert!(describe("Left").constituents.is_empty());
+    assert!(
+        program
+            .describe_type(&Type::Intersection(vec![Type::Int32, Type::from_name("Left")]))
+            .is_err()
+    );
+}

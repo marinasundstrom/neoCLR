@@ -1,0 +1,17 @@
+func Inspect(value: (() -> int) | int) -> int {
+    return match value {
+        let callback: () -> int => callback()
+        let number: int => number
+        _ => -1
+    }
+}
+
+func Main() -> int {
+    if Inspect(Echo(Produce(0))) != 42 {
+        return 1
+    }
+    if Inspect(Echo(Produce(1))) != 43 {
+        return 2
+    }
+    return 42
+}

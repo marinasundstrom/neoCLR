@@ -1,0 +1,24 @@
+{
+  "date": "2026-10-14",
+  "profile": "Native tuple construction, reads and updated-copy stores through imported echo",
+  "exitCode": 42,
+  "expectedExitCode": 42,
+  "checks": [
+    "Tuple authoring, snapshots/imports and value-operation checks pass",
+    "Invalid constructor/receiver/store types rejected",
+    "Non-tuple/foreign signatures and invalid indices rejected",
+    "Authored composition regression passes",
+    "API snapshot check passes"
+  ],
+  "commands": [
+    "dotnet run --project tools/metadata/NeoCLR.Metadata.Experimental.Tests -- --tuple-imports target/tuple-operations",
+    "target/debug/neoclr run target/tuple-operations/TupleConsumer.neox --module target/tuple-operations/TupleProducer.neox --execution interpreter",
+    "dotnet run --no-build --project tools/metadata/NeoCLR.Metadata.Experimental.Tests -- --authored-compositions",
+    "python3 scripts/build-api-docs.py --check"
+  ],
+  "sha256": {
+    "target/tuple-operations/TupleProducer.neox": "23921988cb65dbe264ab2c77ee2ecf46d8905896c4785bc993db3f89045a6435",
+    "target/tuple-operations/TupleConsumer.neox": "46427b2c5591e174fb4f28ebcdc580144e89d182761cb20fca09245ec9376039",
+    "tools/metadata/NeoCLR.Metadata.Experimental.Tests/TupleImportChecks.cs": "725789a8f54668a57ba96c3321da918704765f3ad9fe3592f05ec5f8f530d884"
+  }
+}

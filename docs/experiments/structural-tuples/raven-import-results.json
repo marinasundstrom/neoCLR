@@ -1,0 +1,33 @@
+{
+  "date": "2026-10-14",
+  "profile": "Explicit Raven native named tuple reference import",
+  "runtimeBase": "8ef387ef3",
+  "result": 42,
+  "checks": [
+    "C# tuple introspection views retain nested names",
+    "Separate Raven producer/consumer emits and executes named/nested/string tuples",
+    "Imported parameter/result names differ while compiler structural equality holds",
+    "Ordinary generic function in same library retains normal import path",
+    "Default reader and disabled tuple emitter reject",
+    "API snapshot check passes"
+  ],
+  "commands": [
+    "dotnet run --project tools/metadata/NeoCLR.Metadata.Experimental.Tests -- --tuple-imports target/tuple-view-import",
+    "dotnet run --project tools/NeoClrMetadataProbe -p:NeoClrMetadataProject=/Users/robert/Projects/neoclr/tools/metadata/NeoCLR.Metadata.Experimental/NeoCLR.Metadata.Experimental.csproj -- --source-tuples /Users/robert/Projects/neoclr/target/tuple-info-libraries-v2 /Users/robert/Projects/neoclr/target/raven-tuple-import",
+    "target/debug/neoclr run target/raven-tuple-import/TupleImportConsumer.neox --module target/raven-tuple-import/TupleLibrary.neox --system target/tuple-info-libraries-v2/System.runtime.neox --object-root target/tuple-info-libraries-v2/System.Runtime.dll --module target/tuple-info-libraries-v2/System.Runtime.dll --execution interpreter --instructions 100000000",
+    "python3 scripts/build-api-docs.py --check"
+  ],
+  "sha256": {
+    "target/raven-tuple-import/TupleLibrary.neox": "78bc158a6444e06ef02f5395d4e1a696eb882d7029f632198c089b5ceb4318a3",
+    "target/raven-tuple-import/TupleImportConsumer.neox": "17ca7d251b3a347a4e7cf76f09148c24330a78cdaf66743b54f2d485f82fa6df",
+    "tools/metadata/NeoCLR.Metadata.Experimental/Introspection/TypeViews.cs": "23b5e86f2f7271d284fde2c91e6760a739c0afd9a3d88518584568ece95bee46",
+    "tools/metadata/NeoCLR.Metadata.Experimental.Tests/TupleImportChecks.cs": "9196875becf54021832dc8c95dfa05936da9e218536ab3356215587c9b00377e",
+    "Raven/tools/NeoClrMetadataProbe/SourceTupleChecks.cs": "6f86b650e9538989bc18fae914bc857ffc59e76633cb95f36404c19f9885cf5a"
+  },
+  "limitations": [
+    "Host API opt-in only; project/catalog tuple option pending",
+    "Nominal tuple family still required for binding",
+    "Guest reflection name queries pending",
+    "Cold GetAssemblyOrModuleSymbol initialization issue deferred as a general candidate"
+  ]
+}

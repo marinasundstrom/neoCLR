@@ -11,8 +11,13 @@ sealed class Root { }
 class Child : Root { }
 
 func CheckFlags(info: TypeInfo, abstractType: bool, openType: bool, closedHierarchy: bool, unionType: bool, enumType: bool, valueType: bool) {
-    if info.IsAbstract != abstractType || info.IsOpen != openType ||
-        info.IsClosedHierarchy != closedHierarchy || info.IsUnion != unionType ||
+    let nominalUnion = if info is NominalTypeInfo nominal {
+        nominal.IsUnionDeclaration
+    } else {
+        false
+    }
+    if info.IsUnion || info.IsAbstract != abstractType || info.IsOpen != openType ||
+        info.IsClosedHierarchy != closedHierarchy || nominalUnion != unionType ||
         info.IsEnum != enumType || info.IsValueType != valueType {
         System.Fail(info.DisplayName)
     }

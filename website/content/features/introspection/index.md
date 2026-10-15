@@ -92,3 +92,19 @@ The tour covers type identity, modules, metadata tokens and member classificatio
 <a id="feedback"></a>
 
 <a id="development-case-inspecting-route-declarations-at-startup"></a>
+
+### Development: union classification
+
+On the structural-type experimental branch, `TypeInfo.IsUnion` is reserved for
+structural unions. Use `NominalTypeInfo.IsUnionDeclaration` to detect nominal Raven
+union declarations. Experimental UnionTypeInfo and IntersectionTypeInfo expose direct constituent
+snapshots in the interpreter. The composition is structural; its interface
+constituents remain nominal and require explicit implementation. This does not
+introduce implicit member-shape conformance or Rust-style traits. The companion experimental Raven contract now emits
+source union/intersection type tokens and signatures, including closed generic
+arguments. Experimental native generic constraints now retain union/intersection
+bounds. The paired Raven branch emits and imports closed structural method bounds,
+including generic-body trait calls. Host tools expose their complete signatures;
+guest constraint reflection remains pending. Member/hierarchy queries and JIT/AOT
+remain under development. This is not part of the published
+release; see the [descriptor contract](/docs/introspection.html#structural-composition-descriptors-experimental-2026-10-14).

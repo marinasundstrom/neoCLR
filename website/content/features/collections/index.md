@@ -86,3 +86,39 @@ and hashing. Avoid changing a key in ways that affect equality while it is store
 <a id="comparer-policies-development"></a>
 
 <a id="value-tuples-development"></a>
+
+
+## Structural data composition
+
+Use structural types when data needs a shape but not a new nominal declaration.
+Tuples combine values, unions represent alternatives, and intersections describe
+simultaneous nominal contracts. They remain real types with native metadata and
+introspection; interface implementation stays explicit.
+
+The structural feature branches support native Raven tuples with ordered elements,
+value copies and local mutation. Element names are stored in the signature and
+preserved by reflection, while identity and compatibility remain positional.
+Native binding requires no nominal tuple carrier. Development runtime libraries
+now remove `System.Tuple` and `System.Union`; rebuild consumers with the matching
+compiler. `Range` returns a named structural offset/length pair.
+
+Structural unions support both value and reference alternatives, including scoped
+nominal constituents such as `Response<T> | HttpError | JsonError`. Tested task
+consumers deliver all alternatives with `Response` and `Response<int>`; a generic
+method with `Response<T>` also executes. Copying a reference payload preserves its
+object identity. Arrays retain their structural runtime shape and nominal
+`Array<T>` representation.
+
+This work requires matching feature-branch artifacts. Interpreter execution is
+validated, and bounded tuple storage also runs through macOS ARM64 AOT using inline
+slots without a heap carrier. Bounded intersection views also have AOT checks and
+retain one object reference. Native reference-alternative unions likewise copy a
+payload reference without a carrier while remaining structural value types. Native
+value alternatives and broader AOT/JIT support are still being developed;
+the temporary boxed union storage is not the intended final performance model.
+Bare generic-parameter union alternatives and unrestricted combinations remain
+incomplete.
+
+[Structural families](../../docs/structural-types.html) ·
+[Tuple contract](../../docs/tuples.html) · [Union contract](../../docs/unions.html) ·
+[Intersection contract](../../docs/intersections.html)

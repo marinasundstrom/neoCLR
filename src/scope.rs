@@ -11,6 +11,42 @@ pub(crate) fn normalize_type(context: &Module, ty: &Type) -> Result<Type, Fault>
         }
         let nested = |ty: &Type| bind(context, ty, depth + 1);
         let normalized = match ty {
+            Type::Tuple(parts) => {
+                if parts.is_empty() || parts.len() > 256 {
+                    return Err(Fault::new("tuple signature requires one to 256 elements"));
+                }
+                Type::Tuple(parts.map_types(nested)?)
+            }
+            Type::Union(parts) | Type::Intersection(parts) => {
+                crate::compositions::check_shape(ty)?;
+                // Validate constituents before singleton collapse can conceal a value type.
+                let parts = parts.iter().map(nested).collect::<Result<Vec<_>, _>>()?;
+                let candidate = if matches!(ty, Type::Union(_)) {
+                    Type::Union(parts.clone())
+                } else {
+                    Type::Intersection(parts.clone())
+                };
+                // The assembler also binds field owners against a partial context.
+                // Preserve the expression until library/dependency definitions exist;
+                // otherwise singleton collapse could erase a later-invalid operand.
+                if crate::compositions::resolved(context, &candidate) {
+                    // Binding has not reached the owning signature yet. As with
+                    // nominal generic construction, retain scoped arguments here;
+                    // signature validation checks their actual owner arity later.
+                    crate::compositions::validate_in_context(
+                        context,
+                        &candidate,
+                        crate::vm::SignatureContext {
+                            types: u16::MAX as usize + 1,
+                            methods: u16::MAX as usize + 1,
+                            allow_self: false,
+                        },
+                    )?;
+                    crate::compositions::normalized(matches!(ty, Type::Union(_)), parts)
+                } else {
+                    candidate
+                }
+            }
             Type::Function(shape) => Type::Function(Box::new(shape.map_types(nested)?)),
             Type::Scoped {
                 module,

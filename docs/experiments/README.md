@@ -6,6 +6,7 @@ Executable probes and local validation support design decisions; their presence
 does not imply a shipped runtime capability. Read each experiment's status and
 reproduction instructions before using its output.
 
+- [Structural union/intersection membership probe](structural-compositions/README.md)
 - [ARM64 AOT Hello World: first standalone executable](aot-hello/README.md)
 - [AOT flat value types/members: Raven samples and native validation](aot-values/README.md)
 - [ARM64 scalar AOT: native object and C consumer](aot-scalar/README.md)

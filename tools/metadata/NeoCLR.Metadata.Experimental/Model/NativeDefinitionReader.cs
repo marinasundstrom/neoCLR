@@ -4,19 +4,21 @@ public sealed partial class AssemblyDefinition
 {
     /// <summary>Reads authoritative native assembly-level-function and bounded class/value/interface declarations directly from PE/#Neo or standalone NEOX.</summary>
     /// <param name="image">Complete schema-1/2/3 PE runtime container or schema-2/3 standalone NEOX with an assembly manifest.</param>
+    /// <param name="resolver">Explicit dependency snapshots for external structural bounds; no implicit loading.</param>
     /// <returns>An owned immutable declaration snapshot, without generating or importing a CLI projection.</returns>
     /// <exception cref="InvalidDataException">Invalid container or unsupported declarations, including constrained and generic static owners and generic instance methods, unsupported field types and signatures beyond the bounded native profile.</exception>
     /// <remarks>This materialization profile admits nongeneric methods and static generic methods/functions with supported nongeneric interface bounds and scoped method/type parameters, primitive, nominal value/reference, local or external generic construction, vector or bounded function signatures, interface-scoped Self member signatures, and unconstrained classes, values and interfaces (including supported nested declarations under generic or nongeneric owners) with primitive, nominal value/reference or vector fields/properties and exact dependency identities.
+    /// Admits supported union, intersection and named tuple signatures without opt-in. External intersection operands require exact resolver snapshots.
     /// Public value-type ToString overrides retain their inherited CLI slot flags and native call name.
     /// Writable ref/out parameters retain their element signature and output indices; readonly modes and byref constructors remain unsupported.
     /// Bodies remain opaque. Write copies the original image; editing remains pending. Supported method definitions can be imported for native calls.
     /// Mvid is empty because the native manifest declares none. Tokens retain module-local native origin identifiers.</remarks>
-    public static AssemblyDefinition ReadNativeAssembly(ReadOnlySpan<byte> image)
+    public static AssemblyDefinition ReadNativeAssembly(ReadOnlySpan<byte> image, IAssemblyResolver? resolver = null)
     {
         if (image.Length > RuntimeAssemblyContainer.MaxLibraryImageSize) throw new InvalidDataException("image exceeds limit");
         var owned = image.ToArray();
         var native = NativeAssemblyDefinition.ReadLibraryAssembly(owned.AsSpan().StartsWith("NEOX"u8)
-            ? NativeModuleContainer.Read(owned) : RuntimeAssemblyContainer.Read(owned));
+            ? NativeModuleContainer.Read(owned) : RuntimeAssemblyContainer.Read(owned), resolver);
         return native.MaterializeDeclarations(owned);
     }
 
@@ -31,15 +33,18 @@ public sealed partial class NativeAssemblyDefinition
     {
         static bool SupportedArgument(SignatureType type) => type.MethodParameterIndex is not null ||
             (type.ArrayElement is { } element ? SupportedArgument(element) : SupportedScalar(type));
-        static bool SupportedScalar(SignatureType type) => type.PointerElement is not null || type.FunctionSignature is { } function && SupportedArgument(function.ReturnType) && function.ParameterTypes.All(SupportedArgument) || type.IsSelf || type.GenericInstance is { } instance && instance.TypeArguments.All(SupportedArgument) || type.Primitive is not null || type.TypeParameterIndex is not null ||
+        static bool SupportedScalar(SignatureType type) => type.Tuple is { } tuple && tuple.ElementTypes.All(SupportedScalar) || type.PointerElement is not null || type.FunctionSignature is { } function && SupportedArgument(function.ReturnType) && function.ParameterTypes.All(SupportedArgument) || type.IsSelf || type.GenericInstance is { } instance && instance.TypeArguments.All(SupportedArgument) || type.Primitive is not null || type.TypeParameterIndex is not null ||
             type.ClassType is { IsStatic: false } ||
             type.ImportedType is { } imported &&
             imported.GenericArity == imported.TypeArguments.Count && imported.TypeArguments.All(SupportedArgument);
-        static bool SupportedMethod(SignatureType type) => type.MethodParameterIndex is not null ||
+        static bool SupportedMethod(SignatureType type) => type.Composition is not null ||
+            type.FunctionSignature is { } function && SupportedMethod(function.ReturnType) && function.ParameterTypes.All(SupportedMethod) ||
+            type.ImportedType is { } external && external.TypeArguments.All(SupportedMethod) ||
+            type.GenericInstance is { } wrapper && wrapper.TypeArguments.All(SupportedMethod) || type.MethodParameterIndex is not null ||
             type.ArrayElement is { } element && SupportedMethod(element) || Supported(type);
         static bool Supported(SignatureType type) => SupportedScalar(type) || type.ArrayElement is { } element && Supported(element);
         // Fail closed rather than returning a partial assembly with silently missing types.
-        if (properties.Any(p => p.Parameters.Any(parameter => !Supported(parameter)) || !Supported(p.Type)) || types.Any(t => t.Fields.Concat(t.StaticFields).Any(f => !Supported(f.Signature!)) || t.InterfaceSignatures.Any(i => !Supported(i)) || t.Constraints.Length != 0 || t.SpecialConstraints.Count != 0) ||
+        if (properties.Any(p => p.Parameters.Any(parameter => !Supported(parameter)) || !Supported(p.Type)) || types.Any(t => t.Fields.Concat(t.StaticFields).Any(f => !SupportedMethod(f.Signature!)) || t.InterfaceSignatures.Any(i => !Supported(i)) || t.Constraints.Length != 0 || t.SpecialConstraints.Count != 0) ||
             methods.Any(m => (m.Owner < 0 && m.Visibility is not (MethodVisibility.Public or MethodVisibility.Internal)) ||
             (m.Name == ".ctor" && m.Signature.ParameterTypes.Any(p => p.ByReferenceElement is not null)) ||
             (m.Instance && m.Signature.GenericParameterNames.Count != 0) || !SupportedMethod(m.Signature.ReturnType) ||
@@ -53,6 +58,8 @@ public sealed partial class NativeAssemblyDefinition
         var externalTokens = new Dictionary<(AssemblyIdentity, string, string, uint), uint>();
         AssemblyDefinition.NativeSignatureTypeRow Copy(SignatureType type)
         {
+            if (type.Tuple is { } tuple) return new(null, 0, TupleElements: tuple.ElementTypes.Select(Copy).ToArray(), TupleNames: tuple.ElementNames.ToArray());
+            if (type.Composition is { } composition) return new(null, 0, CompositionKind: composition.Kind, Constituents: composition.Constituents.Select(Copy).ToArray());
             if (type.FunctionSignature is { } function) return new(null, 0, Function: new(Copy(function.ReturnType), function.ParameterTypes.Select(Copy).ToArray()));
             if (type.PointerElement is { } pointer) return new(null, 0, Copy(pointer), IsPointer: true);
             if (type.ByReferenceElement is { } target) return new(null, 0, Copy(target), IsByReference: true);
@@ -99,7 +106,7 @@ public sealed partial class NativeAssemblyDefinition
         var rows = methods.Select((method, index) => new AssemblyDefinition.MethodRow(
             0x06000001u + (uint)index, method.Owner < 0 ? 0 : 0x02000002u + (uint)method.Owner, method.Name,
             (ushort)((method.ExplicitInterfaces.Length != 0 ? 0x160 : 0) | (method.Override ? 0xc0 : method.Abstract ? 0x5c0 : method.Virtual ? 0x1c0 : 0) | (method.Owner >= 0 && types[method.Owner].IsInterface ? 0x5c0 : 0) | (accessors.Contains(index) ? 0x800 : 0) | (method.Instance ? 0 : 0x10) | (method.Instance && method.Name == ".ctor" ? 0x1800 : 0) | (method.Visibility == MethodVisibility.Public ? 6 : method.Visibility == MethodVisibility.Internal ? 3 : method.Visibility == MethodVisibility.Protected ? 4 : 1)), method.ImplementationAttributes, method.Signature.GenericParameterNames.Count, [], false, [],
-            new AssemblyDefinition.NativeMethodSignatureRow(Copy(method.Signature.ReturnType), method.Signature.ParameterTypes.Select(Copy).ToArray(), method.Signature.GenericParameterNames.ToArray(), method.Signature.OutParameters.ToArray()), method.Namespace, NativeImport: method.NativeImport, ParameterNames: method.ParameterNames, NullableAnnotations: method.NullableAnnotations, ParameterArrayIndex: method.ParameterArrayIndex, InterfaceConstraints: method.InterfaceConstraints.Select(c => new AssemblyDefinition.MethodConstraintRow(c.Parameter, Copy(c.Type).TypeToken)).ToArray())).ToArray();
+            new AssemblyDefinition.NativeMethodSignatureRow(Copy(method.Signature.ReturnType), method.Signature.ParameterTypes.Select(Copy).ToArray(), method.Signature.GenericParameterNames.ToArray(), method.Signature.OutParameters.ToArray()), method.Namespace, NativeImport: method.NativeImport, ParameterNames: method.ParameterNames, NullableAnnotations: method.NullableAnnotations, ParameterArrayIndex: method.ParameterArrayIndex, InterfaceConstraints: method.TypeConstraints.Where(c => !c.Structural).Select(c => new AssemblyDefinition.MethodConstraintRow(c.Parameter, Copy(c.Type).TypeToken)).ToArray(), StructuralConstraints: method.TypeConstraints.Where(c => c.Structural).Select(c => new AssemblyDefinition.StructuralMethodConstraintRow(c.Parameter, Copy(c.Type))).ToArray())).ToArray();
         var propertyRows = properties.Select((property, index) => new AssemblyDefinition.PropertyRow(
             0x17000001u + (uint)index, 0x02000002u + (uint)property.Owner, property.Name, 0, [],
             property.Getter < 0 ? 0 : 0x06000001u + (uint)property.Getter,

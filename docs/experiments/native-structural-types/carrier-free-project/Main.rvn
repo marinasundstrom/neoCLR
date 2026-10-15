@@ -1,0 +1,27 @@
+import System.*
+import System.Result.*
+
+func Echo(value: (offset: int, length: int)) -> (x: int, y: int) {
+    return value
+}
+
+func Main() -> int {
+    let bounds = Range(Index(2), Index(44)).GetOffsetAndLength(50)
+    if bounds.Offset != 2 || bounds.Length != 42 {
+        return -1
+    }
+    let checked = Range(Index(2), Index(44)).TryGetOffsetAndLength(50)
+    let length = match checked {
+        Ok(let pair) => pair.Length
+        Error => -2
+    }
+    if length != 42 {
+        return -3
+    }
+    let renamed = Echo((bounds.Offset, bounds.Length))
+    let value: int | bool = renamed.y
+    return match value {
+        int length => length
+        _ => -4
+    }
+}

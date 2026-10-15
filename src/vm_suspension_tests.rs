@@ -399,7 +399,7 @@ ret
             view: None,
         });
         let callback = Value::Function(crate::Function {
-            object_view: false,
+            view: None,
             identity: std::sync::Arc::new(()),
             ty: crate::assembler::parse_type("fn<Void>").unwrap(),
             target: Some(

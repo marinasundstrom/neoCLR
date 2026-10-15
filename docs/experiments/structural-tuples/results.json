@@ -1,0 +1,38 @@
+{
+  "date": "2026-10-14",
+  "profile": "Closed structural tuple interpreter values; no nominal tuple declaration",
+  "checks": [
+    {
+      "command": "cargo test --test structural_tuples --features experimental-tuples,experimental-compositions",
+      "passed": 12
+    },
+    {
+      "command": "cargo test --test structural_tuples --features experimental-compositions",
+      "passed": 6
+    },
+    {
+      "command": "cargo test -p neoclr-codegen --lib structural_tuple_storage_is_rejected_before_native_selection --features neoclr/experimental-tuples",
+      "passed": 1
+    },
+    {
+      "command": "cargo run --features experimental-tuples,experimental-compositions -- run docs/experiments/structural-tuples/values.neoil --execution interpreter",
+      "exitCode": 42,
+      "expectedExitCode": 42
+    },
+    {
+      "command": "python3 scripts/build-api-docs.py --check",
+      "exitCode": 0
+    },
+    {
+      "command": "cargo test --lib type_identity::tuple_tests --features experimental-tuples,experimental-compositions",
+      "passed": 2
+    }
+  ],
+  "sampleSha256": "632d63ad1891e0e066cb5c07d843d4ca948806d0c3e9a66b095a24710763128e",
+  "limitations": [
+    "Raven source emission still nominal",
+    "No guest TupleTypeInfo or host tuple authoring API yet",
+    "No open or byref/pointer/array/function/composition direct elements",
+    "No native layout or JIT/AOT support"
+  ]
+}

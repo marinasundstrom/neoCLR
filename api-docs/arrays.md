@@ -4,6 +4,9 @@ An array shape `T[]` has an element type and fixed length. Array values can be
 passed as Object. Its shape has no nominal declaration name; the library's
 [Array&lt;T&gt; member contract](xref:System.Array`1) supplies the operations below.
 The named library contract and an individual array shape are distinct descriptors.
+`T[]` and `Array<T>` represent the same intrinsic array contract: the nominal
+spelling does not add a wrapper or copy. Arrays therefore combine runtime structural
+shape with a nominal API representation.
 
 ## Members
 

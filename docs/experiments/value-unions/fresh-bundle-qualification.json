@@ -1,0 +1,59 @@
+{
+  "compilerRevision": "991022cdc",
+  "sourceRevision": "fa166f649e7e52edac9bc16ba2eef1e91c9652af",
+  "commands": [
+    {
+      "command": [
+        "dotnet",
+        "/Users/robert/Projects/raven-union-intersection/src/Raven.Compiler/bin/Debug/net11.0/rvnc.dll",
+        "neoclr",
+        "--project",
+        "/Users/robert/Projects/neoclr/target/structural-integrated-libraries-v3-qualified/Headers.rvnproj",
+        "--run",
+        "/Users/robert/Projects/neoclr/target/debug/neoclr"
+      ],
+      "exitCode": 0,
+      "stdout": "Native build output: /Users/robert/Projects/neoclr/target/structural-integrated-libraries-v3-qualified/bin/neoclr/Headers.dll\nHTTP header lookup checks passed\n",
+      "stderr": "/Users/robert/Projects/neoclr/target/structural-integrated-libraries-v3-qualified/Main.rvn(44,9): warning RAV0162: Unreachable code\n/Users/robert/Projects/neoclr/target/structural-integrated-libraries-v3-qualified/Main.rvn(51,9): warning RAV0162: Unreachable code\n"
+    },
+    {
+      "command": [
+        "dotnet",
+        "/Users/robert/Projects/raven-union-intersection/src/Raven.Compiler/bin/Debug/net11.0/rvnc.dll",
+        "neoclr",
+        "--project",
+        "/Users/robert/Projects/neoclr/target/structural-integrated-libraries-v3-qualified/Headers.rvnproj"
+      ],
+      "exitCode": 1,
+      "stdout": "",
+      "stderr": "neoCLR project: Object library must select exactly one registered native reference: Missing.Owner\n"
+    }
+  ],
+  "hashes": {
+    "/Users/robert/Projects/neoclr/scripts/verify-native-library-project.py": "f2cc1726012ce8016d2425b5934e9a4c48f5da39504d73234a20756c809d7342",
+    "/Users/robert/Projects/neoclr/docs/experiments/http-headers/Main.rvn": "6a6bc829818dc4c9e091112e71f5e71a4be268ea4bb564631f4ec2467f1590f8",
+    "/Users/robert/Projects/neoclr/target/structural-integrated-libraries-v3-qualified/Headers.rvnproj": "973d9e91785f6718fcdbdefa06331769cf22c7040596d7b6f0362c5344c8d20f",
+    "/Users/robert/Projects/neoclr/target/structural-integrated-libraries-v3-qualified/bin/neoclr/Headers.dll": "95b14d79a1de91c9774824a5033fb5e24eb405ceb86586a76b00e9814a282d06",
+    "/Users/robert/Projects/raven-union-intersection/src/Raven.Compiler/bin/Debug/net11.0/rvnc.dll": "02022f349c7eb7b83b81e24b40118e37c6f19bca7d98268932d75cefad71c5a9",
+    "/Users/robert/Projects/neoclr/target/structural-integrated-libraries-v3/Core.dll": "3f7cfa9db7c4feb551e2e97b0edb89c4dcf4c64d8eccf01bd006848dcacfd3f4",
+    "/Users/robert/Projects/neoclr/target/debug/neoclr": "0084116888e759707646d1363bf871a6b4abdfb06ad4215e0b38e254f41577cd",
+    "/Users/robert/Projects/neoclr/target/structural-integrated-libraries-v3/System.runtime.neox": "98a1ae1da85387c87746957e83a4015eb59d0566539a915c69f168d2b511b190",
+    "/Users/robert/Projects/neoclr/target/structural-integrated-libraries-v3/ownership.json": "691bc51df44e8c11d62a8ac814cab45b43e48423719a91efd5c3bbc951c65419",
+    "/Users/robert/Projects/neoclr/target/structural-integrated-libraries-v3/System.Runtime.dll": "c3cba0050fa2e4e4161c9e55266cc92da9a86034badccd98c2e804000b5bf735",
+    "/Users/robert/Projects/neoclr/target/structural-integrated-libraries-v3/System.Data.dll": "a13b89d9c3d87be3ab08a8c7e8fb4c3af75402e7fe7b0598204b241832014704",
+    "/Users/robert/Projects/neoclr/target/structural-integrated-libraries-v3/System.Networking.dll": "1384940280b54680c217c951964af3f2dde01fc6acf19a927f59ede3336d09ca",
+    "/Users/robert/Projects/neoclr/target/structural-integrated-libraries-v3/System.Web.dll": "f29d93809d033ca36c00c4034f6cbf920d1ba8dae7291ef18222d8e9cfbc7ae6",
+    "/Users/robert/Projects/raven-union-intersection/src/Raven.Compiler/bin/Debug/net11.0/Raven.CodeAnalysis.dll": "7584083dc858a8d6a1908bc84591a4f764eb1df4f73b52509a44a513add3c13b",
+    "/Users/robert/Projects/raven-union-intersection/src/Raven.Compiler/bin/Debug/net11.0/Raven.CodeAnalysis.NeoClr.dll": "aa396ea673807bf96754c9d07d968f1150967ea316a78e74e32c2d9d4b06a97f",
+    "/Users/robert/Projects/raven-union-intersection/src/Raven.Compiler/bin/Debug/net11.0/NeoCLR.Metadata.Experimental.dll": "906a7ef7b929d0b33c8d00cf6f93e240e2156c6c2ce559c2c0b6dfc7d407df36"
+  },
+  "date": "2026-10-15",
+  "runtime_base": "fa166f649",
+  "runtime_changes": "generic composition wrapper/callback validation committed with this evidence",
+  "structural_runtime_tests": {
+    "passed": 53,
+    "failed": 0
+  },
+  "metadata_authored_roundtrip": "passed",
+  "qualification": "consumer exit 0 and invalid Object ownership rejected without output replacement"
+}

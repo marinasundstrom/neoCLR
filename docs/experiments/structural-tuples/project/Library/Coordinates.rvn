@@ -1,0 +1,15 @@
+public interface Named {}
+public interface Located {}
+public class Place : Named, Located {}
+
+public func Coordinates() -> (x: int, y: int) {
+    return (40, 2)
+}
+
+public func Choose(value: Named | Located) -> Named | Located {
+    return value
+}
+
+public func Traits(value: Named & Located) -> Named & Located {
+    return value
+}

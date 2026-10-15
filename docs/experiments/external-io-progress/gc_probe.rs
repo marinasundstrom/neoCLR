@@ -244,7 +244,7 @@ fn callback(heap: &mut ManagedHeap, captured: Value) -> Value {
         },
     );
     Value::Function(crate::Function {
-        object_view: false,
+        view: None,
         identity: std::sync::Arc::new(()),
         ty: crate::assembler::parse_type("fn<Int32,Void>").unwrap(),
         target: Some(

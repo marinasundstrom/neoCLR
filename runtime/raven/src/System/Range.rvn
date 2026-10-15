@@ -25,7 +25,7 @@ public struct Range : EquatableTo<Range> {
     static func EndAt(end: Index) -> Range => Range(Index.Start, end)
 
     /// Resolves a validated offset and count; negative lengths, reversed or out-of-bounds ranges fault.
-    func GetOffsetAndLength(length: int) -> Tuple<int, int> {
+    func GetOffsetAndLength(length: int) -> (Offset: int, Length: int) {
         if length < 0 {
             Fail("Range length must be nonnegative")
         }
@@ -42,11 +42,11 @@ public struct Range : EquatableTo<Range> {
         if limit > length {
             Fail("Range is outside the value")
         }
-        return Tuple<int, int>(offset, limit - offset)
+        return (offset, limit - offset)
     }
 
     /// Resolves offset and count, returning InvalidRangeError for invalid bounds or a negative length.
-    func TryGetOffsetAndLength(length: int) -> Result<Tuple<int, int>, InvalidRangeError> {
+    func TryGetOffsetAndLength(length: int) -> Result<(Offset: int, Length: int), InvalidRangeError> {
         if length < 0 {
             return Error(InvalidRangeError())
         }
@@ -61,7 +61,7 @@ public struct Range : EquatableTo<Range> {
         if limit > length {
             return Error(InvalidRangeError())
         }
-        return Ok(Tuple<int, int>(offset, limit - offset))
+        return Ok((offset, limit - offset))
     }
 
     /// Compares the two boundary indexes, independently of a collection length.

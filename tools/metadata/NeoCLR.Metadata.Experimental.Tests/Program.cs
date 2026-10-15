@@ -4,6 +4,21 @@ using System.Reflection.PortableExecutable;
 using NeoCLR.Metadata.Experimental.Model;
 using AssemblyDefinition = NeoCLR.Metadata.Experimental.Model.AssemblyDefinition;
 
+if (args is ["--tuple-imports", var tupleImportOutput]) { TupleImportChecks.Run(tupleImportOutput); return 0; }
+
+if (args is ["--authored-tuples", var tupleOutput]) { AuthoredTupleChecks.Run(tupleOutput); return 0; }
+
+if (args is ["--composition-imports", var compositionOutput]) { ReferenceCompositionImportChecks.Run(compositionOutput); return 0; }
+
+if (args is ["--authored-structural-constraints", var constraintOutput]) { AuthoredStructuralConstraintChecks.Run(constraintOutput); ExternalIntersectionConstraintChecks.Run(); return 0; }
+
+if (args is ["--open-constrained-calls"]) { OpenConstrainedCallChecks.Run(); return 0; }
+
+if (args is ["--structural-method-constraints"]) { StructuralMethodConstraintChecks.Run(); GenericMethodConstraintChecks.Run(); return 0; }
+
+if (args is ["--authored-compositions"]) { AuthoredCompositionChecks.Run(); return 0; }
+if (args is ["--reference-compositions"]) { ReferenceCompositionChecks.Run(); Console.WriteLine("PASS read-only reference compositions"); return 0; }
+
 if (args is ["--static-fields"]) { StaticFieldChecks.Run(); return 0; }
 
 if (args is ["--local-budget", var localOutput]) { LocalBudgetChecks.Run(localOutput); return 0; }
@@ -554,6 +569,10 @@ var tests = new (string Name, Action Body)[]
     ("Explicit nominal array backing", ArrayBackingChecks.Run),
     ("Core-marked namespace function binding", NamespaceBindingChecks.Run),
     ("Direct native definition materialization", NativeDefinitionChecks.Run),
+    ("Authored structural method constraints", () => AuthoredStructuralConstraintChecks.Run()),
+    ("Structural method constraint reads", StructuralMethodConstraintChecks.Run),
+    ("Experimental native reference composition reads", ReferenceCompositionChecks.Run),
+    ("Experimental native composition callable imports", () => ReferenceCompositionImportChecks.Run()),
     ("Native generic static method definitions", NativeGenericMethodChecks.Run),
     ("Native generic class definitions", NativeGenericOwnerChecks.Run),
     ("External native generic signatures", ExternalGenericSignatureChecks.Run),

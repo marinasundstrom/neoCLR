@@ -38,7 +38,9 @@ documents synthetic Invoke, optional declaration metadata and the dynamic invoca
 limit. The API browser now includes authored Array, Function, Tuple, Union and
 Intersection family pages through RavenDoc's existing table-of-contents support.
 Current nominal Tuple/union declarations and proposed structural forms are explicitly
-distinguished. Automatic extraction of arbitrary structural shape members remains
+distinguished. The branch-only compound interpreter experiment is noted on those manual family
+pages; it adds no guest members or RavenDoc type-selection/snapshot changes.
+Automatic extraction of arbitrary structural shape members remains
 future publisher work; the authored family member references cover current APIs.
 
 Development FunctionTypeInfo also exposes Parameters and ReturnType directly.
@@ -540,7 +542,9 @@ the snapshot is now regenerated from the merged Function bridge with System.Fail
 `NativeAssemblyDefinition`, `NativeLibraryDefinition`, `NativeFunctionDefinition`, `ModuleDefinition`, `TypeDefinition`, `TypeReference`, `AssemblyIdentity`,
 `AssemblyReference`, `IAssemblyResolver`, `MethodDefinition`, `MemberReference`, `ImportedMethodReference`, `AssemblyBuilder` (including native emission
 and top-level functions), `TypeBuilder` and
-`MethodBuilder`, `PrimitiveType`, `PrimitiveMethodSignature`, `MethodSignature`, `SignatureType`, `LocalDefinition`, `BranchLabel` and `OpCode` in that Model namespace,
+`MethodBuilder`, `PrimitiveType`, `PrimitiveMethodSignature`, `MethodSignature`, `SignatureType`,
+`ReferenceCompositionKind`, `ReferenceCompositionSignature`, `LocalDefinition`, `BranchLabel` and `OpCode` in that Model namespace,
+along with `NeoCLR.Metadata.Experimental.Introspection.ReferenceCompositionTypeInfo`,
 are .NET-host-only types in
 `tools/metadata/NeoCLR.Metadata.Experimental`, not types in NeoCLR.CoreProbe or the
 Raven guest library. They therefore cannot be added to that assembly's RavenDoc type
@@ -1994,6 +1998,14 @@ cover the JsonValue type/member and options type/property, in addition to existi
 Tasks, Object, HTTP and PostgreSQL declaration links. Compiler-generated private
 backing fields are not public API documentation entries.
 
+
+The host-only `MethodBuilder.DeclareExperimentalCompositionResultLocal` API is
+covered by the [manual result-local reference](experimental-metadata.md#imported-composition-result-locals-2026-10-14-development)
+under the existing host metadata exclusion. It does not add a guest reference type;
+the guest snapshot and assembly remain unchanged.
+
+The host-only [composition storage admission API](experimental-metadata.md#imported-composition-storage-admission-2026-10-14-development) is manually documented; it remains outside the guest RavenDoc assembly selection.
+
 ### Type relationship queries (development, 2026-10-14)
 
 TypeInfo now includes AssignableTo, AssignableFrom, IsSubclassOf and IsInstanceOfType.
@@ -2003,3 +2015,133 @@ members without new public implementation types. The aggregate bridge and native
 rendered reference are refreshed together. See [introspection](introspection.md)
 for usage and [runtime semantics](../docs/design/type-relationships.md) for supported
 relationships, .NET differences and compiler qualification limits.
+
+The experimental Rust `TypeIdentity::Union`/`Intersection` variants are covered in
+the [manual runtime hosting reference](runtime-hosting.md#structural-composition-identity-keys-development-2026-10-14).
+They are host-only, outside the guest RavenDoc selection; guest composition descriptors are now covered by the experimental
+UnionTypeInfo and IntersectionTypeInfo reference entries.
+
+Host `TypeDescriptor.constituents` and composition-aware `LoadedProgram::describe_type`
+are documented in the [runtime hosting reference](runtime-hosting.md#host-composition-descriptors-development-2026-10-14).
+They remain outside the guest RavenDoc selection; guest descriptor gates and the
+matching guest API snapshot are unchanged.
+
+Union classification correction (2026-10-14): TypeInfo.IsUnion is structural-only;
+NominalTypeInfo.IsUnionDeclaration covers nominal markers. The aggregate reference
+and native API render are rebuilt from matching development library sources, with
+XML migration notes. The existing nominal type selection covers the new member.
+
+The host-only [authored reference composition API](experimental-metadata.md#authored-reference-compositions-2026-10-14-development) is manually documented and excluded from guest RavenDoc selection.
+
+The host-only `GenericMethodTypeConstraint`, `MethodDefinition.TypeConstraints` and
+`MethodGenericParameterTypeInfo.GetTypeConstraints()` APIs are covered by the
+[manual structural constraint reference](experimental-metadata.md#structural-method-constraint-inspection-2026-10-14-development).
+They are C# tooling APIs, excluded from guest RavenDoc selection; no guest assembly
+or generated API snapshot changes in this slice. The snapshot check passes.
+
+`MethodBuilder.AddExperimentalStructuralConstraint` is a host-only C# tooling API,
+covered in the [native constraint authoring reference](experimental-metadata.md#native-structural-method-constraint-authoring).
+It is excluded from guest RavenDoc selection; the unchanged guest API snapshot check passes.
+
+Host-only `AssemblyBuilder.ImportExperimentalConstrainedReference` and the extended
+imported generic instantiation contract are documented in the
+[manual constrained import reference](experimental-metadata.md#importing-structurally-constrained-native-functions).
+These C# tooling APIs remain excluded from guest RavenDoc selection. Guest snapshot
+fingerprints are unchanged and validation passes.
+
+The owned constrained-call API's native structural-instance extension is covered by
+[the manual metadata reference](experimental-metadata.md#interface-calls-guaranteed-by-structural-bounds).
+It remains a host C# API excluded from guest RavenDoc selection; guest snapshots are unchanged.
+
+The native metadata reader overload accepting `IAssemblyResolver` for external
+intersection operands is host C# tooling, excluded from the guest RavenDoc selection
+and covered in the [manual metadata reference](experimental-metadata.md#resolved-external-intersection-bounds--2026-10-14-development).
+No guest public API or reference snapshot changes in this slice.
+
+The structural tuple migration's Rust `metadata::Type::Tuple(TupleSignature)` node is
+covered by the [manual tuple reference](tuples.md), including the opt-in interpreter
+value/element operations and synthesized host field views. These Rust APIs remain
+outside RavenDoc's guest assembly selection; no guest API signature or reference
+snapshot changes. Runtime TupleTypeInfo and nominal tuple removal remain
+pending rather than omitted shipped APIs.
+
+The Rust `TypeIdentity::Tuple` and `TypeDescriptor::tuple_elements` host surfaces
+are documented in [tuple descriptors](tuples.md#resolved-host-tuple-descriptors-development).
+They are outside RavenDoc's guest type selection; no guest API is added by this slice.
+
+
+Guest `System.Introspection.TupleTypeInfo` and `ElementTypes` are now included in
+RavenDoc's type selection, XML summaries and the refreshed matching reference bridge.
+The [tuple reference](tuples.md#tupletypeinfo-development) records experimental
+admission and remaining member/emission limitations. This supersedes the earlier
+pending guest descriptor note without changing the nominal tuple migration boundary.
+
+
+The C# host `TupleSignature`, `SignatureType.Tuple` and
+`AssemblyBuilder.CreateExperimentalTuple` APIs are manually documented in
+[authored structural tuples](experimental-metadata.md#authored-structural-tuple-signatures-2026-10-14-development).
+These tooling-only APIs are outside guest RavenDoc selection. The guest reference
+assembly and TupleTypeInfo contract are unchanged by this authoring slice.
+
+
+The host-only `ReadExperimentalTupleAssembly` and `ImportExperimentalTupleReference`
+APIs are documented in [native tuple reading/import](experimental-metadata.md#reading-and-importing-native-tuples-2026-10-14-development).
+They are excluded from guest RavenDoc selection because they belong to C# metadata
+tooling. Guest API signatures and reference snapshots are unchanged.
+
+
+Host `IILGenerator.NewTuple`, `LoadTupleElement` and `StoreTupleElement` are documented
+in [native tuple value operations](experimental-metadata.md#native-tuple-value-operations-2026-10-14-development).
+These C# tooling members are outside guest RavenDoc selection. No guest public API or
+reference snapshot changes in this slice.
+
+
+The Rust host `metadata::TupleSignature` constructor/accessors and
+`TypeDescriptor::tuple_element_names` are covered in the
+[tuple reference](tuples.md#native-tuple-element-names-2026-10-14-development).
+They are excluded from RavenDoc because they are Rust host APIs, not guest Raven
+types. No guest reference assembly or snapshot signatures change in this slice.
+
+
+The C# named `CreateExperimentalTuple` overload and `TupleSignature.ElementNames`
+are covered in [native tuple names](experimental-metadata.md#native-tuple-names-in-c-authoringimport-2026-10-14-development).
+They remain host metadata APIs outside RavenDoc's guest reference assembly; no
+guest API snapshot signatures change in this slice.
+
+
+The C# `Introspection.TupleTypeInfo` view is covered in
+[tuple introspection views](experimental-metadata.md#c-tuple-introspection-views-2026-10-14-development).
+It is a host C# API excluded from the guest RavenDoc type selection. No guest
+reference assembly or API snapshot signatures change in this slice.
+
+### Guest tuple names — 2026-10-14
+
+`TupleTypeInfo.ElementNames` is included in the matching reference assembly, XML
+and snapshot. Its ordered effective-name snapshots retain per-signature metadata
+and supply ItemN for unnamed positions. The host nullable-name API remains distinct;
+see [tuple reference](tuples.md). Focused native query and guest reflection consumers
+validate renamed equal types and nested names.
+
+### Native compiler tuple binding — 2026-10-14
+
+The compiler-host `MetadataImportOptions.UseStructuralTuples` and
+`WithStructuralTuples(bool)` contract is documented manually in [tuples](tuples.md),
+with its emission gate and symbol semantics. These Raven APIs are not guest
+class-library types and are not selected for the neoCLR RavenDoc reference. No
+guest API/reference snapshot changed; the existing snapshot check still passes.
+
+## Carrier retirement (2026-10-15 development)
+
+The native Runtime library no longer declares `System.Tuple<T...>` or
+`System.Union<T...>`. The refreshed native API snapshot uses all five freshly built
+libraries, including PostgreSQL. `Range` now returns `(Offset: int, Length: int)`
+and `Result<(Offset: int, Length: int), InvalidRangeError>`; these methods remain
+in the native member reference. TupleTypeInfo/UnionTypeInfo remain public.
+
+The aggregate historical CLI bridge still describes the old carriers. Exact type
+exclusions for `System.Tuple` arities 1–7 and `System.Union` arities 2–5 prevent
+presenting those scaffolds as executable native APIs. Its DLL is not a native
+bundle and is retained for historical documentation tooling; its source-input
+fingerprints are refreshed without claiming new CLI signatures. The manual tuple
+and union family pages describe the current native forms. Full retirement of the
+legacy bridge remains separate from removing native runtime carrier declarations.

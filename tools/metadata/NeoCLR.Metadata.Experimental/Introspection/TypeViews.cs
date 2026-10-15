@@ -14,6 +14,47 @@ public sealed class PrimitiveTypeInfo : TypeInfo
     public override bool IsNominalType => false;
 }
 
+/// <summary>A read-only native reference union or intersection in one metadata context.</summary>
+/// <remarks>Identity is order-independent within the context. Bounds retain nominal identity;
+/// no subtype reduction, assignability, member synthesis or runtime loading is performed.</remarks>
+public sealed class ReferenceCompositionTypeInfo : TypeInfo
+{
+    internal ReferenceCompositionTypeInfo(MetadataLoadContext context, ReferenceCompositionKind kind, TypeInfo[] constituents) : base(context)
+    {
+        Kind = kind;
+        Constituents = Array.AsReadOnly((TypeInfo[])constituents.Clone());
+    }
+    /// <summary>Gets whether the signature requires either or all constituent contracts.</summary>
+    public ReferenceCompositionKind Kind { get; }
+    /// <summary>Gets immutable canonical bounds in the first projected signature's order.</summary>
+    public IReadOnlyList<TypeInfo> Constituents { get; }
+    internal override int Depth => 1 + Constituents.Max(t => t.Depth);
+    /// <inheritdoc/>
+    public override string DisplayName => Kind + "<" + string.Join(", ", Constituents.Select(t => t.DisplayName)) + ">";
+    /// <inheritdoc/>
+    public override bool IsNominalType => false;
+}
+
+/// <summary>A native structural tuple signature with ordered element types and native names.</summary>
+/// <remarks>This descriptive view is per signature; differently named views may describe the same structural type. No nominal declaration or member synthesis is introduced.</remarks>
+public sealed class TupleTypeInfo : TypeInfo
+{
+    internal TupleTypeInfo(MetadataLoadContext context, TypeInfo[] elements, IReadOnlyList<string?> names) : base(context)
+    {
+        ElementTypes = Array.AsReadOnly(elements.ToArray());
+        ElementNames = Array.AsReadOnly(Enumerable.Range(0, elements.Length).Select(i => names.Count == 0 ? null : names[i]).ToArray());
+    }
+    /// <summary>Gets ordered element views, preserving duplicates and nesting.</summary>
+    public IReadOnlyList<TypeInfo> ElementTypes { get; }
+    /// <summary>Gets one optional native name per element. Names do not define structural identity.</summary>
+    public IReadOnlyList<string?> ElementNames { get; }
+    internal override int Depth => 1 + ElementTypes.Max(t => t.Depth);
+    /// <inheritdoc/>
+    public override string DisplayName => "tuple<" + string.Join(", ", ElementTypes.Select(t => t.DisplayName)) + ">";
+    /// <inheritdoc/>
+    public override bool IsNominalType => false;
+}
+
 /// <summary>A single-dimensional metadata vector view.</summary>
 public sealed class ArrayTypeInfo : TypeInfo
 {
@@ -154,12 +195,13 @@ public sealed partial class MetadataLoadContext
 {
     private readonly Dictionary<TypeInfo, PointerTypeInfo> pointers = [];
     private readonly Dictionary<FunctionKey, FunctionTypeInfo> functions = [];
+    private readonly Dictionary<CompositionKey, ReferenceCompositionTypeInfo> compositions = [];
     private readonly Dictionary<TypeInfo, SelfTypeInfo> selfTypes = [];
     private readonly Dictionary<PrimitiveType, PrimitiveTypeInfo> primitives = [];
     private readonly Dictionary<TypeInfo, ArrayTypeInfo> arrays = [];
     private readonly Dictionary<ConstructionKey, ConstructedTypeInfo> constructions = [];
 
-    /// <summary>Projects a loaded primitive/nominal/vector/construction/function signature using explicit owner arguments.</summary>
+    /// <summary>Projects a loaded signature, including opt-in native reference compositions, using explicit owner arguments.</summary>
     /// <param name="signature">Reader signature; output-builder operands are not accepted.</param>
     /// <param name="typeArguments">Owner arguments or scoped parameter views; copied before traversal.</param>
     /// <returns>A canonical context-owned type view.</returns>
@@ -192,6 +234,22 @@ public sealed partial class MetadataLoadContext
 
     private TypeInfo Project(SignatureType signature, IReadOnlyList<TypeInfo> arguments, IReadOnlyList<TypeInfo> methods, TypeInfo? selfOwner = null)
     {
+        if (signature.Tuple is { } tuple)
+        {
+            var elements = tuple.ElementTypes.Select(t => Project(t, arguments, methods, selfOwner)).ToArray();
+            if (elements.Any(t => t.Depth >= 16)) throw new InvalidDataException("metadata tuple nesting exceeds limit");
+            return new TupleTypeInfo(this, elements, tuple.ElementNames);
+        }
+        if (signature.Composition is { } composition)
+        {
+            var bounds = composition.Constituents.Select(t => Project(t, arguments, methods, selfOwner)).Distinct().ToArray();
+            if (bounds.Any(t => t.Depth >= 32)) throw new InvalidDataException("metadata composition nesting exceeds limit");
+            if (bounds.Length == 1) return bounds[0];
+            var key = new CompositionKey(composition.Kind, bounds);
+            if (!compositions.TryGetValue(key, out var view))
+                compositions.Add(key, view = new ReferenceCompositionTypeInfo(this, composition.Kind, bounds));
+            return view;
+        }
         if (signature.FunctionSignature is { } function)
         {
             var result = Project(function.ReturnType, arguments, methods, selfOwner);
@@ -257,6 +315,18 @@ public sealed partial class MetadataLoadContext
             if (!field.TryGetSignature(out var signature)) throw new InvalidDataException("unsupported field metadata signature: " + field.Name);
             return new FieldInfo(field, owner, ResolveSignature(signature!, arguments));
         }).ToArray());
+
+    private sealed record CompositionKey(ReferenceCompositionKind Kind, TypeInfo[] Bounds)
+    {
+        public bool Equals(CompositionKey? other) => other is not null && Kind == other.Kind &&
+            Bounds.Length == other.Bounds.Length && Bounds.All(other.Bounds.Contains);
+        public override int GetHashCode()
+        {
+            var sum = 0;
+            foreach (var bound in Bounds) sum = unchecked(sum + bound.GetHashCode());
+            return HashCode.Combine(Kind, Bounds.Length, sum);
+        }
+    }
 
     private sealed record FunctionKey(TypeInfo Result, TypeInfo[] Parameters, bool NoResult)
     {

@@ -1,0 +1,26 @@
+{
+  "passed": true,
+  "samples": [
+    {
+      "name": "Unions",
+      "hover": [
+        "```raven\nfunc Main() -> Task<int>\n```\n\nFunction"
+      ],
+      "errors": []
+    },
+    {
+      "name": "Intersections",
+      "hover": [
+        "```raven\nfunc Main() -> int\n```\n\nFunction"
+      ],
+      "errors": []
+    },
+    {
+      "name": "ExternalBounds",
+      "hover": [
+        "```raven\nfunc Main() -> int\n```\n\nFunction"
+      ],
+      "errors": []
+    }
+  ]
+}

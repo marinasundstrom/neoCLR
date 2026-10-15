@@ -1,0 +1,21 @@
+import System.*
+import System.Web.Http.*
+import System.Data.Json.*
+
+class Response<T> {
+    val Number: T
+
+    init(number: T) {
+        Number = number
+    }
+}
+
+func Echo<T>(value: Response<T> | HttpError | JsonError) -> Response<T> | HttpError | JsonError {
+    return value
+}
+
+func Main() -> int {
+    let result = Echo<int>(Response<int>(42))
+    let response = (Response<int>)result
+    return response.Number
+}

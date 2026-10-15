@@ -245,6 +245,20 @@ pub(crate) fn record_fields(
     let nominal = module.array_nominal(ty);
     let ty = nominal.as_ref().unwrap_or(ty);
     check_type_context(ty, module, arity, 0)?;
+    if let Type::Tuple(elements) = ty {
+        return Ok(elements
+            .iter()
+            .enumerate()
+            .map(|(index, ty)| crate::metadata::Field {
+                name: elements
+                    .element_name(index)
+                    .expect("valid tuple element index"),
+                ty: ty.clone(),
+                visibility: crate::metadata::Visibility::Public,
+                deferred: false,
+            })
+            .collect());
+    }
     let (name, arguments): (&str, &[Type]) = match ty {
         Type::Named(name) => (name, &[]),
         Type::Constructed {
@@ -333,6 +347,7 @@ pub(crate) fn validate_linked(module: &Module) -> Result<(), Fault> {
 }
 
 fn validate_linked_indexed(module: &Module) -> Result<(), Fault> {
+    crate::compositions::validate_surface(module)?;
     crate::metadata_origin::validate(module)?;
     crate::object_root::validate(module)?;
     if module.name.is_empty() {
@@ -1197,7 +1212,19 @@ fn validate_linked_indexed(module: &Module) -> Result<(), Fault> {
                 | Op::ArrayElement(ty)
                 | Op::StoreArrayElement(ty)
                 | Op::ArrayAddress(ty) => {
-                    check(&Type::Array(Box::new(ty.clone())))?;
+                    if crate::compositions::contains(ty)
+                        && matches!(
+                            op,
+                            Op::NewArray(_)
+                                | Op::ReserveArray(_)
+                                | Op::ArrayElement(_)
+                                | Op::StoreArrayElement(_)
+                        )
+                    {
+                        check(&Type::ArrayRef(Box::new(ty.clone())))?;
+                    } else {
+                        check(&Type::Array(Box::new(ty.clone())))?;
+                    }
                     if matches!(op, Op::ArrayAddress(_))
                         && matches!(ty, Type::ByRef(_) | Type::ReadOnlyByRef(_))
                     {
@@ -1261,8 +1288,14 @@ fn validate_linked_indexed(module: &Module) -> Result<(), Fault> {
                 }
                 Op::IsInstance(ty) | Op::CastClass(ty) => {
                     check(ty)?;
-                    if !matches!(ty, Type::ArrayRef(_) | Type::String | Type::Function(_))
-                        && crate::interfaces::interface_definition(module, ty).is_err()
+                    if !matches!(
+                        ty,
+                        Type::ArrayRef(_)
+                            | Type::String
+                            | Type::Function(_)
+                            | Type::Union(_)
+                            | Type::Intersection(_)
+                    ) && crate::interfaces::interface_definition(module, ty).is_err()
                     {
                         crate::inheritance::lineage(module, ty)?;
                     }
@@ -1439,7 +1472,7 @@ pub(crate) fn check_type(ty: &Type, module: &Module) -> Result<(), Fault> {
     check_type_context(ty, module, 0, 0)
 }
 
-fn check_type_context(
+pub(crate) fn check_type_context(
     ty: &Type,
     module: &Module,
     arity: impl Into<SignatureContext>,
@@ -1465,11 +1498,47 @@ fn check_type_context_seen(
     if depth > 32 {
         return Err(Fault::new("type nesting exceeds 32"));
     }
+    if !crate::compositions::is_compound(ty)
+        && !matches!(
+            ty,
+            Type::Constructed { .. } | Type::ArrayRef(_) | Type::Function(_)
+        )
+        && !matches!(ty, Type::ByRef(target) | Type::ReadOnlyByRef(target) if crate::compositions::is_compound(target) || matches!(target.as_ref(), Type::Constructed { .. }))
+        && crate::compositions::contains(ty)
+    {
+        return Err(Fault::new(
+            "compound wrappers require constructed reference classes or reference arrays",
+        ));
+    }
     if !seen.insert(ty.clone()) {
         return Ok(());
     }
     let mut nested = |ty: &Type| check_type_context_seen(ty, module, arity, depth + 1, seen);
     match ty {
+        Type::Tuple(parts) => {
+            if parts.is_empty() || parts.len() > 256 {
+                return Err(Fault::new("tuple signature requires one to 256 elements"));
+            }
+            for part in parts {
+                if crate::constraints::symbolic(part)
+                    || matches!(part, Type::Void | Type::Value | Type::RuntimeTypeHandle)
+                    || !(part.is_primitive()
+                        || matches!(
+                            part,
+                            Type::Tuple(_) | Type::Named(_) | Type::Constructed { .. }
+                        ))
+                {
+                    return Err(Fault::new(
+                        "tuple elements require closed scalar, nominal or tuple types",
+                    ));
+                }
+                nested(part)?;
+            }
+            Ok(())
+        }
+        Type::Union(_) | Type::Intersection(_) => {
+            crate::compositions::validate_in_context(module, ty, arity)
+        }
         Type::Function(shape) => {
             shape.validate()?;
             for parameter in &shape.parameters {
@@ -1515,6 +1584,26 @@ fn check_type_context_seen(
             if def.generic_parameters.is_empty() || def.generic_parameters.len() != arguments.len()
             {
                 return Err(Fault::new("generic type argument count mismatch"));
+            }
+            if crate::compositions::contains(ty) {
+                crate::compositions::check_shape(ty)?;
+                if !matches!(def.representation, Representation::Interface | Representation::Record)
+                {
+                    return Err(Fault::new(
+                        "composition arguments require a record or interface wrapper",
+                    ));
+                }
+                // Validate storage after substitution too: a declaration's T[] or T&
+                // must not bypass the current compound value-array/byref restrictions.
+                for field in &def.fields {
+                    let storage = field.ty.substitute_type_parameters(arguments)?;
+                    if matches!(&storage, Type::ByRef(t) | Type::ReadOnlyByRef(t) if crate::compositions::contains(t)) {
+                        return Err(Fault::new(
+                            "compound managed-reference fields are not supported",
+                        ));
+                    }
+                    nested(&storage)?;
+                }
             }
             for argument in arguments {
                 nested(argument)?;
@@ -3556,11 +3645,19 @@ fn interpret_instructions_with_dispatch(
                         if contract.receiver_byref {
                             return Err(Fault::new("interface receiver type or mode mismatch"));
                         }
-                        crate::interfaces::ensure_implementation(
-                            module,
-                            object.target(),
-                            interface,
-                        )?;
+                        if crate::compositions::is_compound(object.target()) {
+                            if !module.reference_assignable(object.target(), interface) {
+                                return Err(Fault::new(
+                                    "compound receiver requires narrowing before interface dispatch",
+                                ));
+                            }
+                        } else {
+                            crate::interfaces::ensure_implementation(
+                                module,
+                                object.target(),
+                                interface,
+                            )?;
+                        }
                         object.reference.assigned()?;
                         let callee = crate::interfaces::implementation(
                             module,
@@ -3718,7 +3815,7 @@ fn interpret_instructions_with_dispatch(
                             ));
                         }
                         Value::ObjectReference(object) if object.concrete_type() == *target => {
-                            frame.stack.push(object.reference.read()?);
+                            frame.stack.push(object.reference.read()?.on_stack());
                         }
                         _ => {
                             return Err(Fault::coded(
@@ -3766,13 +3863,19 @@ fn interpret_instructions_with_dispatch(
                     };
                     // Incompatible arrays fail this type test with null. The exact
                     // assignment rules still prevent mutable-array covariance.
-                    if concrete == *target
-                        || *target == Type::Named("System.Object".into())
-                        || module.reference_assignable(&concrete, target)
-                        || (crate::interfaces::interface_definition(module, target).is_ok()
-                            && crate::interfaces::ensure_implementation(module, &concrete, target)
+                    let compatible = if crate::compositions::is_compound(target) {
+                        crate::compositions::matches_object(module, &concrete, target)
+                    } else {
+                        concrete == *target
+                            || *target == Type::Named("System.Object".into())
+                            || module.reference_assignable(&concrete, target)
+                            || (crate::interfaces::interface_definition(module, target).is_ok()
+                                && crate::interfaces::ensure_implementation(
+                                    module, &concrete, target,
+                                )
                                 .is_ok())
-                    {
+                    };
+                    if compatible {
                         let result = match value {
                             Value::ObjectReference(object) if *target == Type::String => {
                                 object.reference.read()?
@@ -3782,7 +3885,7 @@ fn interpret_instructions_with_dispatch(
                                 Value::ObjectReference(object)
                             }
                             Value::Function(mut binding) => {
-                                binding.object_view = *target == Type::from_name("System.Object");
+                                binding.view = (*target != binding.ty).then(|| target.clone());
                                 Value::Function(binding)
                             }
                             value if *target == Type::String => value,
@@ -3810,14 +3913,17 @@ fn interpret_instructions_with_dispatch(
                     crate::arrays::check_cast(&source.ty(), target)?;
                     let value = match source {
                         Value::Function(mut binding) => {
-                            if *target != binding.ty && *target != Type::from_name("System.Object")
+                            if *target != binding.ty
+                                && *target != Type::from_name("System.Object")
+                                && !(crate::compositions::is_compound(target)
+                                    && crate::compositions::matches_object(module, &binding.ty, target))
                             {
                                 return Err(Fault::coded(
                                     crate::FaultCode::InvalidCast,
                                     "invalid Function reference cast",
                                 ));
                             }
-                            binding.object_view = *target == Type::from_name("System.Object");
+                            binding.view = (*target != binding.ty).then(|| target.clone());
                             Value::Function(binding)
                         }
                         Value::ObjectReference(mut object) => {
@@ -3828,7 +3934,17 @@ fn interpret_instructions_with_dispatch(
                             }
                             let concrete = &object.concrete_type();
                             crate::arrays::check_cast(concrete, target)?;
-                            if crate::interfaces::interface_definition(module, target).is_ok() {
+                            if crate::compositions::is_compound(target) {
+                                if !crate::compositions::matches_object(module, concrete, target) {
+                                    return Err(Fault::coded(
+                                        crate::FaultCode::InvalidCast,
+                                        "object does not satisfy compound reference",
+                                    ));
+                                }
+                                object.view = Some(target.clone());
+                            } else if crate::interfaces::interface_definition(module, target)
+                                .is_ok()
+                            {
                                 crate::interfaces::ensure_implementation(module, concrete, target)?;
                                 object.view = Some(target.clone());
                             } else if *target == Type::from_name("System.Object") {
@@ -3850,18 +3966,34 @@ fn interpret_instructions_with_dispatch(
                             {
                                 object.view = Some(target.clone());
                             } else {
-                                return Err(Fault::new("invalid object reference cast"));
+                                return Err(Fault::coded(
+                                    crate::FaultCode::InvalidCast,
+                                    "invalid object reference cast",
+                                ));
                             }
                             object.reference.assigned()?;
                             Value::ObjectReference(object)
                         }
                         value @ Value::String(_) if *target == Type::String => value,
                         value @ Value::String(_)
-                            if crate::interfaces::interface_definition(module, target).is_ok()
+                            if crate::compositions::is_compound(target)
+                                || crate::interfaces::interface_definition(module, target)
+                                    .is_ok()
                                 || (*target == Type::from_name("System.Object")
                                     && module.is_reference_type(target)) =>
                         {
-                            if !(*target == Type::from_name("System.Object")
+                            if crate::compositions::is_compound(target) {
+                                if !crate::compositions::matches_object(
+                                    module,
+                                    &Type::String,
+                                    target,
+                                ) {
+                                    return Err(Fault::coded(
+                                        crate::FaultCode::InvalidCast,
+                                        "String does not satisfy compound reference",
+                                    ));
+                                }
+                            } else if !(*target == Type::from_name("System.Object")
                                 && module.is_reference_type(target))
                             {
                                 crate::interfaces::ensure_implementation(
@@ -5427,6 +5559,9 @@ fn interpret_instructions_with_dispatch(
                             .ok_or_else(|| Fault::new("field index out of range"))?
                             .ty
                             .clone();
+                        if crate::compositions::contains(&target) {
+                            return Err(Fault::new("compound field addresses are not supported"));
+                        }
                         let mut reference = object.reference.field(*index, target)?;
                         if crate::access::field_is_readonly(
                             module,
@@ -5448,6 +5583,9 @@ fn interpret_instructions_with_dispatch(
                             .ok_or_else(|| Fault::new("field index out of range"))?
                             .ty
                             .clone();
+                        if crate::compositions::contains(&target) {
+                            return Err(Fault::new("compound field addresses are not supported"));
+                        }
                         let readonly = crate::access::field_is_readonly(
                             module,
                             &function,

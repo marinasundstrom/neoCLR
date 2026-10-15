@@ -79,6 +79,32 @@ impl Specializer<'_> {
             | Type::RuntimeTypeHandle => {
                 return Ok(ty.clone());
             }
+            Type::Union(parts) => {
+                return Ok(Type::Union(
+                    parts
+                        .iter()
+                        .map(|t| self.lower(t))
+                        .collect::<Result<_, _>>()?,
+                ));
+            }
+            Type::Intersection(parts) => {
+                return Ok(Type::Intersection(
+                    parts
+                        .iter()
+                        .map(|t| self.lower(t))
+                        .collect::<Result<_, _>>()?,
+                ));
+            }
+            Type::Tuple(parts) => {
+                let elements = parts
+                    .iter()
+                    .map(|t| self.lower(t))
+                    .collect::<Result<_, _>>()?;
+                return Ok(Type::Tuple(
+                    neoclr::metadata::TupleSignature::new(elements, parts.names().to_vec())
+                        .map_err(|e| e.to_string())?,
+                ));
+            }
             Type::Function(shape) => {
                 let mut shape = shape.as_ref().clone();
                 shape.parameters = shape
@@ -103,7 +129,7 @@ impl Specializer<'_> {
             Type::ArrayRef(t)
                 if matches!(
                     **t,
-                    Type::Function(_) | Type::Named(_) | Type::Constructed { .. }
+                    Type::Function(_) | Type::Named(_) | Type::Constructed { .. } | Type::Tuple(_) | Type::Union(_) | Type::Intersection(_)
                 ) =>
             {
                 let lowered = self.lower(t)?;
@@ -304,13 +330,16 @@ impl Specializer<'_> {
                     | Type::Int64
                     | Type::UInt64
                     | Type::Function(_)
+                    | Type::Tuple(_)
+                    | Type::Union(_)
+                    | Type::Intersection(_)
                     | Type::Named(_)
                     | Type::Constructed { .. }
                     | Type::ArrayRef(_)
             )
         }) {
             return Err(
-                format!("generic method arguments require primitive, Function, vector or closed nominal shapes: {} {:?}", target.name, target.generic_arguments).into(),
+                format!("generic method arguments require supported closed shapes: {} {:?}", target.name, target.generic_arguments).into(),
             );
         }
         let arguments = match &target.owner {
@@ -633,7 +662,15 @@ fn validate_argument(ty: &Type, depth: usize) -> Result<(), Error> {
             }
             Ok(())
         }
-        Type::Constructed { arguments, .. } => {
+        Type::Tuple(elements) => {
+            for element in elements.iter() {
+                validate_argument(element, depth + 1)?;
+            }
+            Ok(())
+        }
+        Type::Union(arguments)
+        | Type::Intersection(arguments)
+        | Type::Constructed { arguments, .. } => {
             for arg in arguments {
                 validate_argument(arg, depth + 1)?;
             }

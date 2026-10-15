@@ -1,0 +1,44 @@
+class Other {}
+
+func Keep(value: int | Other) -> int | Other {
+    return value
+}
+
+func Set(out value: int | Other) {
+    value = 41
+}
+
+func Increment(ref value: int | Other) {
+    value = (int)value + 1
+}
+
+func Main() -> int {
+    let failure = CheckFailure()
+    var stored = Keep(1)
+    let before = stored
+    Set(out stored)
+    Increment(ref stored)
+    if (int)before != 1 {
+        return 2
+    }
+    let reference = Keep(Other())
+    if reference is Other {
+        return match failure {
+            Failure.Rejected(let code) => (int)stored + code - 42
+        }
+    }
+    return 1
+}
+
+union Failure {
+    case Rejected(code: int)
+}
+
+func KeepFailure(value: Failure | Other) -> Failure | Other {
+    return value
+}
+
+func CheckFailure() -> Failure {
+    let stored = KeepFailure(Failure.Rejected(42))
+    return (Failure)stored
+}

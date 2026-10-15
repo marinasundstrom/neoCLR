@@ -11,9 +11,12 @@ enum Trace {
     CallableArray,
     ReferenceArray(usize),
     RecordArray(usize),
+    StructuralArray(neoclr::metadata::Type),
     ScalarArray(neoclr::metadata::Type),
     Object(usize),
     Interface(usize),
+    Intersection,
+    UnionReferencePayload,
     ByteArray,
     StringArray,
     ByteValues,
@@ -31,6 +34,7 @@ fn slots(p: &Profile<'_>, ty: &Ty) -> Vec<Slot> {
         Ty::CallableArray(_) => Trace::CallableArray,
         Ty::ReferenceArray(i) => Trace::ReferenceArray(*i),
         Ty::RecordArray(i) => Trace::RecordArray(*i),
+        Ty::StructuralArray(t) => Trace::StructuralArray(t.clone()),
         Ty::ScalarArray(t) => Trace::ScalarArray(t.clone()),
         Ty::Literal | Ty::Character => Trace::Text,
         Ty::Reference(i) if p.is_array_backing(*i) => {
@@ -42,6 +46,14 @@ fn slots(p: &Profile<'_>, ty: &Ty) -> Vec<Slot> {
         }
         Ty::Reference(i) => Trace::Object(*i),
         Ty::Interface(i) => Trace::Interface(*i),
+        Ty::Intersection(_) => Trace::Intersection,
+        Ty::ReferenceUnion(_) => Trace::UnionReferencePayload,
+        Ty::MixedUnion(_) => {
+            return vec![Slot {
+                lane: 2,
+                trace: Trace::UnionReferencePayload,
+            }];
+        }
         Ty::ByteArray => Trace::ByteArray,
         Ty::StringArray | Ty::CharacterArray | Ty::CharacterValues => Trace::StringArray,
         Ty::ByteValues => Trace::ByteValues,
@@ -53,6 +65,30 @@ fn slots(p: &Profile<'_>, ty: &Ty) -> Vec<Slot> {
                 lane: 1,
                 trace: Trace::ErasedText { tag_lane: 0 },
             }];
+        }
+        Ty::Tuple(parts) | Ty::ValueUnion(parts) => {
+            let mut result = vec![];
+            let mut offset = usize::from(matches!(ty, Ty::ValueUnion(_)));
+            for part in parts {
+                let mut part_slots = slots(p, part);
+                if matches!(ty, Ty::ValueUnion(_))
+                    && matches!(part, Ty::Reference(_) | Ty::Interface(_))
+                {
+                    part_slots = vec![Slot {
+                        lane: 0,
+                        trace: Trace::UnionReferencePayload,
+                    }];
+                }
+                for mut slot in part_slots {
+                    slot.lane += offset;
+                    if let Trace::ErasedText { tag_lane } = &mut slot.trace {
+                        *tag_lane += offset;
+                    }
+                    result.push(slot);
+                }
+                offset += p.lanes(part);
+            }
+            return result;
         }
         Ty::Record(i) => {
             let mut result = vec![];
@@ -70,6 +106,8 @@ fn slots(p: &Profile<'_>, ty: &Ty) -> Vec<Slot> {
             }
             return result;
         }
+        Ty::PendingUnionScalar(t) => return slots(p, &p.ty(t).expect("admitted union payload")),
+        Ty::ScalarUnion(_) | Ty::ScalarUnionTest => return vec![],
         Ty::Int
         | Ty::Byte
         | Ty::SByte
@@ -104,11 +142,14 @@ fn encode(slots: Vec<Slot>) -> Vec<Value> {
         let recipe = match slot.trace {
             Trace::ReferenceArray(i) => json!({"kind": "reference-array", "typeIndex": i, "elements": "initialized-strong-reference-slots"}),
             Trace::RecordArray(i) => json!({"kind": "record-array", "typeIndex": i, "elements": "initialized-value-snapshots"}),
+            Trace::StructuralArray(t) => json!({"kind": "structural-array", "elementType": t, "elements": "initialized-value-snapshots"}),
             Trace::ScalarArray(t) => json!({"kind": "scalar-array", "elementType": t, "elements": "atomic-initialized-scalars"}),
             Trace::CallableArray => json!({"kind": "callable-array", "elements": "initialized-callback-slots"}),
             Trace::Callable => json!({"kind": "callable", "receiver": "strong-heap-owner"}),
             Trace::Text => json!({"kind": "text", "storage": "image-or-arena"}),
             Trace::Object(i) => json!({"kind": "object-view", "typeIndex": i, "stringTagMask": 1}),
+            Trace::UnionReferencePayload => json!({"kind": "union-reference-payload", "stringTagMask": 1}),
+            Trace::Intersection => json!({"kind": "intersection-view", "stringTagMask": 1}),
             Trace::Interface(i) => json!({"kind": "interface-view", "typeIndex": i, "stringTagMask": 1}),
             Trace::ByteArray => json!({"kind": "byte-array"}),
             Trace::StringArray => json!({"kind": "string-array", "elements": "initialized-text-slots"}),
@@ -209,6 +250,85 @@ mod tests {
         );
     }
     #[test]
+    fn mixed_union_traces_only_its_separate_reference_lane() {
+        let module = module();
+        let p = profile(&module);
+        let ty = Ty::MixedUnion(vec![Ty::Int, Ty::Interface(0)]);
+        assert_eq!(p.lanes(&ty), 3);
+        assert_eq!(seed_lanes(&p, &ty), vec![2]);
+        assert_eq!(
+            slots(&p, &ty),
+            vec![Slot {
+                lane: 2,
+                trace: Trace::UnionReferencePayload
+            }]
+        );
+        let nested = Ty::Tuple(vec![Ty::Wide, ty]);
+        assert_eq!(
+            slots(&p, &nested),
+            vec![Slot {
+                lane: 3,
+                trace: Trace::UnionReferencePayload
+            }]
+        );
+    }
+
+    #[test]
+    fn union_reference_payload_uses_one_strong_slot_without_a_carrier() {
+        let module = module();
+        let p = profile(&module);
+        let ty = Ty::ReferenceUnion(vec![Ty::Interface(0), Ty::Interface(1)]);
+        assert_eq!(p.lanes(&ty), 1);
+        assert_eq!(p.bytes(&ty), 8);
+        assert_eq!(seed_lanes(&p, &ty), vec![0]);
+        assert_eq!(
+            slots(&p, &ty),
+            vec![Slot {
+                lane: 0,
+                trace: Trace::UnionReferencePayload
+            }]
+        );
+    }
+
+    #[test]
+    fn intersection_views_use_one_strong_reference_slot() {
+        let module = module();
+        let p = profile(&module);
+        let ty = Ty::Intersection(vec![Ty::Interface(0), Ty::Interface(1)]);
+        assert_eq!(p.lanes(&ty), 1);
+        assert_eq!(p.bytes(&ty), 8);
+        assert_eq!(seed_lanes(&p, &ty), vec![0]);
+        assert_eq!(
+            slots(&p, &ty),
+            vec![Slot {
+                lane: 0,
+                trace: Trace::Intersection
+            }]
+        );
+    }
+
+    #[test]
+    fn structural_tuple_tracing_preserves_nested_offsets_and_excludes_numeric_lanes() {
+        let module = module();
+        let p = profile(&module);
+        let ty = Ty::Tuple(vec![
+            Ty::Wide,
+            Ty::Tuple(vec![Ty::Double, Ty::Literal]),
+            Ty::Int,
+        ]);
+        assert_eq!(
+            slots(&p, &ty),
+            vec![Slot {
+                lane: 2,
+                trace: Trace::Text
+            }]
+        );
+        assert_eq!(seed_lanes(&p, &ty), vec![2]);
+        assert_eq!(p.lanes(&ty), 4);
+        assert_eq!(p.bytes(&ty), 32);
+    }
+
+    #[test]
     fn nested_records_preserve_reference_offsets_and_stop_at_reference_edges() {
         let mut module = module();
         let mut leaf = module.types[0].clone();
@@ -306,6 +426,134 @@ mod tests {
             Trace::ByteValues
         ));
     }
+    #[test]
+    fn value_union_payload_regions_preserve_record_roots_and_bounds() {
+        use neoclr::metadata::Type;
+        let mut module = module();
+        let mut cell = module.types[0].clone();
+        cell.name = "Cell".into();
+        cell.is_reference_type = true;
+        cell.fields.clear();
+        let mut payload = module.types[0].clone();
+        payload.name = "Payload".into();
+        let mut number = payload.fields[0].clone();
+        number.name = "Number".into();
+        number.ty = Type::Int64;
+        let mut reference = number.clone();
+        reference.name = "Reference".into();
+        reference.ty = Type::Named("Cell".into());
+        payload.fields = vec![number.clone(), reference];
+        let mut other = payload.clone();
+        other.name = "OtherPayload".into();
+        module.types = vec![cell, payload, other];
+        module.functions.clear();
+        let p = profile(&module);
+        let union = p
+            .ty(&Type::Union(vec![
+                Type::Int32,
+                Type::Named("Payload".into()),
+                Type::Named("OtherPayload".into()),
+            ]))
+            .unwrap();
+        assert_eq!(p.lanes(&union), 6);
+        assert_eq!(seed_lanes(&p, &union), vec![3, 5]);
+        assert_eq!(
+            slots(&p, &union),
+            vec![
+                Slot {
+                    lane: 3,
+                    trace: Trace::Object(0)
+                },
+                Slot {
+                    lane: 5,
+                    trace: Trace::Object(0)
+                }
+            ]
+        );
+        assert_eq!(
+            seed_lanes(&p, &Ty::Tuple(vec![Ty::Wide, union])),
+            vec![4, 6]
+        );
+        assert_eq!(
+            slots(&p, &Ty::PendingUnionScalar(Type::Named("Payload".into()))),
+            vec![Slot {
+                lane: 1,
+                trace: Trace::Object(0)
+            }]
+        );
+        let mixed = p
+            .ty(&Type::Union(vec![
+                Type::Named("Payload".into()),
+                Type::Named("Cell".into()),
+            ]))
+            .unwrap();
+        assert_eq!(p.lanes(&mixed), 4);
+        assert_eq!(
+            slots(&p, &mixed),
+            vec![
+                Slot {
+                    lane: 2,
+                    trace: Trace::Object(0)
+                },
+                Slot {
+                    lane: 3,
+                    trace: Trace::UnionReferencePayload
+                }
+            ]
+        );
+        for fields in [14, 15] {
+            let mut chunk = module.types[1].clone();
+            chunk.name = "Chunk".into();
+            chunk.fields = (0..16)
+                .map(|i| {
+                    let mut field = number.clone();
+                    field.name = format!("F{i}");
+                    field
+                })
+                .collect();
+            let mut tail = chunk.clone();
+            tail.name = "Tail".into();
+            tail.fields.truncate(fields);
+            module.types.truncate(3);
+            module.types.push(chunk);
+            module.types.push(tail);
+            module.types[1].fields = (0..16)
+                .map(|i| {
+                    let mut field = number.clone();
+                    field.name = format!("F{i}");
+                    field.ty = Type::Named(if i == 15 { "Tail" } else { "Chunk" }.into());
+                    field
+                })
+                .collect();
+            let p = profile(&module);
+            let union = p.ty(&Type::Union(vec![
+                Type::Int32,
+                Type::Named("Payload".into()),
+            ]));
+            if fields == 14 {
+                assert_eq!(p.lanes(&union.unwrap()), 256);
+            } else {
+                assert!(union.unwrap_err().to_string().contains("inline lane limit"));
+            }
+        }
+    }
+
+    #[test]
+    fn scalar_union_payloads_are_numeric_and_never_roots() {
+        let module = module();
+        let p = profile(&module);
+        let ty = Ty::ScalarUnion(vec![
+            neoclr::metadata::Type::Int32,
+            neoclr::metadata::Type::Int64,
+        ]);
+        assert!(slots(&p, &Ty::ScalarUnionTest).is_empty());
+        assert_eq!(p.lanes(&Ty::ScalarUnionTest), 1);
+        assert_eq!(p.lanes(&ty), 2);
+        assert_eq!(p.bytes(&ty), 16);
+        assert!(slots(&p, &ty).is_empty());
+        assert!(seed_lanes(&p, &ty).is_empty());
+    }
+
     #[test]
     fn local_seeding_clears_erased_tags_and_roots_but_not_integer_lanes() {
         let mut module = module();

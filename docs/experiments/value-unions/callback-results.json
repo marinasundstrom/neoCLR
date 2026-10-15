@@ -1,0 +1,91 @@
+{
+  "date": "2026-10-15",
+  "runtime_base": "795d21243",
+  "compiler_base": "a45392480",
+  "revision_note": "Bases plus companion callback mapping/read/interpreter changes committed with this evidence",
+  "runtime_structural_tests": 46,
+  "host_callback_roundtrip": "pass",
+  "native_compiler_build": "pass",
+  "callback_exit": 42,
+  "api_snapshot": "pass",
+  "bundle_build_commands": [
+    {
+      "command": [
+        "dotnet",
+        "/Users/robert/Projects/raven-union-intersection/src/Raven.Compiler/bin/Debug/net11.0/rvnc.dll",
+        "neoclr",
+        "--project",
+        "/Users/robert/Projects/neoclr/runtime/raven/projects/System.Runtime/System.Runtime.rvnproj"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "dotnet",
+        "/Users/robert/Projects/neoclr/tools/metadata/NeoCLR.Metadata.Translate/bin/Release/net10.0/NeoCLR.Metadata.Translate.dll",
+        "/Users/robert/Projects/neoclr/target/tuple-info-bootstrap/System.retained.json",
+        "/Users/robert/Projects/neoclr/target/structural-integrated-libraries-v3/System.runtime.neox",
+        "--reference",
+        "/Users/robert/Projects/neoclr/runtime/raven/projects/System.Runtime/bin/neoclr/System.Runtime.dll"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "dotnet",
+        "/Users/robert/Projects/raven-union-intersection/src/Raven.Compiler/bin/Debug/net11.0/rvnc.dll",
+        "neoclr",
+        "--project",
+        "/Users/robert/Projects/neoclr/runtime/raven/projects/System.Data/System.Data.rvnproj",
+        "--no-build-references"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "dotnet",
+        "/Users/robert/Projects/raven-union-intersection/src/Raven.Compiler/bin/Debug/net11.0/rvnc.dll",
+        "neoclr",
+        "--project",
+        "/Users/robert/Projects/neoclr/runtime/raven/projects/System.Networking/System.Networking.rvnproj",
+        "--no-build-references"
+      ],
+      "exitCode": 0
+    },
+    {
+      "command": [
+        "dotnet",
+        "/Users/robert/Projects/raven-union-intersection/src/Raven.Compiler/bin/Debug/net11.0/rvnc.dll",
+        "neoclr",
+        "--project",
+        "/Users/robert/Projects/neoclr/runtime/raven/projects/System.Web/System.Web.rvnproj",
+        "--no-build-references"
+      ],
+      "exitCode": 0
+    }
+  ],
+  "bundle_qualification": [
+    {
+      "command": [
+        "dotnet",
+        "/Users/robert/Projects/raven-union-intersection/src/Raven.Compiler/bin/Debug/net11.0/rvnc.dll",
+        "neoclr",
+        "--project",
+        "/Users/robert/Projects/neoclr/target/structural-integrated-libraries-v3-qualification/Headers.rvnproj",
+        "--run",
+        "/Users/robert/Projects/neoclr/target/debug/neoclr"
+      ],
+      "exitCode": 1,
+      "stdout": "",
+      "stderr": "neoCLR project: Selected native metadata cannot be resolved; an image is invalid or a structural signature dependency is missing or cyclic.\n"
+    }
+  ],
+  "sha256": {
+    "docs/experiments/value-unions/callback-project/Main.rvn": "85fbdc1778159b75bcf75671a05d29730c90cae68f5ab4e302780bb247f486ff",
+    "docs/experiments/value-unions/callback-project/bin/neoclr/UnionCallbackSource.dll": "6e7a5d0bbf5bf3d951adb23612bde36f1911f737df39e2c64c07b02f49a572a7",
+    "target/structural-integrated-libraries-v3/System.Runtime.dll": "c3cba0050fa2e4e4161c9e55266cc92da9a86034badccd98c2e804000b5bf735",
+    "target/structural-integrated-libraries-v3/System.Data.dll": "a13b89d9c3d87be3ab08a8c7e8fb4c3af75402e7fe7b0598204b241832014704",
+    "target/structural-integrated-libraries-v3/System.Networking.dll": "1384940280b54680c217c951964af3f2dde01fc6acf19a927f59ede3336d09ca",
+    "target/structural-integrated-libraries-v3/System.Web.dll": "f29d93809d033ca36c00c4034f6cbf920d1ba8dae7291ef18222d8e9cfbc7ae6"
+  }
+}

@@ -7,6 +7,16 @@ CLI-derived direction and unresolved representation choices.
 
 ![PE, NEOX, execution schema and semantic model layers](../website/metadata-format.svg)
 
+## Branch-only reference compositions
+
+On `codex/structural-union-intersection`, the optional Cargo feature
+`experimental-compositions` admits `Union`/`Intersection` arrays of closed nominal
+reference signatures in the format-5 execution model. Existing JSON and CBOR/NEOX
+transport carry them; no published encoding/version is reassigned. Default builds
+reject admission. This is separate from the experimental structural signature
+library's wire tags and from Raven's CLI union carriers. See the
+[interpreter contract and limits](experiments/structural-compositions/README.md#opt-in-interpreter-signatures).
+
 ## Four different version and identity boundaries
 
 | Layer | Current contract |

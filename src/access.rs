@@ -107,6 +107,14 @@ pub(crate) fn check_field(
     owner: &Type,
     index: usize,
 ) -> Result<(), Fault> {
+    if let Type::Tuple(elements) = owner {
+        crate::vm::check_type(owner, module)?;
+        check_type(module, scope(caller), owner)?;
+        return elements
+            .get(index)
+            .map(|_| ())
+            .ok_or_else(|| Fault::new("tuple element index out of range"));
+    }
     check_owner(module, scope(caller), owner)?;
     let (declaring_owner, index) = crate::inheritance::field_owner(module, owner, index)?;
     let definition = record_definition(module, &declaring_owner)?;
@@ -160,6 +168,10 @@ pub(crate) fn field_is_readonly(
     owner: &Type,
     index: usize,
 ) -> Result<bool, Fault> {
+    if matches!(owner, Type::Tuple(_)) {
+        check_field(module, caller, owner, index)?;
+        return Ok(false);
+    }
     let (declaring_owner, index) = crate::inheritance::field_owner(module, owner, index)?;
     let definition = record_definition(module, &declaring_owner)?;
     let readonly = definition
@@ -214,6 +226,10 @@ pub(crate) fn check_construction(
     caller: &Function,
     owner: &Type,
 ) -> Result<(), Fault> {
+    if matches!(owner, Type::Tuple(_)) {
+        crate::vm::check_type(owner, module)?;
+        return check_type(module, scope(caller), owner);
+    }
     check_owner(module, scope(caller), owner)?;
     crate::inheritance::require_concrete(module, owner)?;
     // A validated enum has exactly one Int32 payload and admits every bit pattern.
@@ -278,6 +294,16 @@ fn check_type(module: &Module, source: Scope<'_>, ty: &Type) -> Result<(), Fault
         }
         let nested = |ty| visit(module, source, ty, depth + 1);
         match ty {
+            Type::Tuple(parts) => {
+                for part in parts {
+                    nested(part)?;
+                }
+            }
+            Type::Union(parts) | Type::Intersection(parts) => {
+                for part in parts {
+                    nested(part)?;
+                }
+            }
             Type::Function(shape) => {
                 for part in shape
                     .parameters

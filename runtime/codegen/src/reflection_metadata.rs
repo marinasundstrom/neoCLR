@@ -261,17 +261,17 @@ fn signature_name(ty: &Type) -> Result<String, Error> {
     })
 }
 
-fn shape(source: &neoclr::Module, ty: &Type) -> Result<[bool; 14], Error> {
+fn shape(source: &neoclr::Module, ty: &Type) -> Result<[bool; 16], Error> {
     use neoclr::metadata::Representation;
     let Some(d) = source.type_definition(ty) else {
         if matches!(ty, Type::Function(_)) {
-            let mut result = [false; 14];
+            let mut result = [false; 16];
             result[11] = visible(source, ty);
             result[13] = true;
             return Ok(result);
         }
         if matches!(ty, Type::ArrayRef(_)) {
-            let mut result = [false; 14];
+            let mut result = [false; 16];
             result[0] = true;
             result[11] = visible(source, ty);
             return Ok(result);
@@ -279,7 +279,7 @@ fn shape(source: &neoclr::Module, ty: &Type) -> Result<[bool; 14], Error> {
         return Err("native shape queries require source declaration".into());
     };
     let interface = d.representation == Representation::Interface;
-    let mut result = [false; 14];
+    let mut result = [false; 16];
     result[0] = matches!(ty, Type::ArrayRef(_));
     result[3] = interface;
     result[5] = d.is_abstract || interface;
@@ -295,8 +295,13 @@ fn shape(source: &neoclr::Module, ty: &Type) -> Result<[bool; 14], Error> {
     result[9] = d.is_closed_hierarchy;
     result[10] = d.custom_attributes.iter().any(|a| {
         a.target_token.is_none()
-            && a.constructor.owner.as_ref().and_then(Type::definition_name)
-                == Some("System.Runtime.CompilerServices.UnionAttribute")
+            && a.constructor.owner.as_ref().and_then(|owner| {
+                source
+                    .type_definition(owner)
+                    .and_then(|d| d.origin.as_ref())
+                    .map(|origin| origin.name.as_str())
+                    .or_else(|| owner.definition_name())
+            }) == Some("System.Runtime.CompilerServices.UnionAttribute")
     });
     result[11] = visible(source, ty);
     result[12] = !matches!(ty, Type::ArrayRef(_));
@@ -442,7 +447,7 @@ pub fn bind_queries(
         {
             shape(source, &semantic_type)?
         } else {
-            [false; 14]
+            [false; 16]
         };
         let metadata_token = if queries
             .iter()
@@ -535,7 +540,7 @@ pub fn bind_queries(
                 Op::BranchFalse(5),
                 Op::Fault("unknown type shape query".into()),
                 Op::Arg(1),
-                Op::Int(14),
+                Op::Int(16),
                 Op::Less,
                 Op::BranchTrue(10),
                 Op::Fault("unknown type shape query".into()),
@@ -784,12 +789,24 @@ mod shape_tests {
         let flags = shape(&source, &ty).unwrap();
         assert!(!flags[8]);
         assert!(flags[9] && flags[10] && flags[11]);
+        assert!(!flags[14], "nominal unions are not structural unions");
         source.types[0].origin = Some(serde_json::from_value(json!({"assembly":"Source","module":"Source.dll","name":"Outer/Choice","token":33554433})).unwrap());
         assert!(!shape(&source, &ty).unwrap()[11]);
         source.types[0].origin.as_mut().unwrap().publicly_visible = Some(true);
         assert!(shape(&source, &ty).unwrap()[11]);
         source.types[0].custom_attributes[0].target_token = Some(33554433);
         assert!(!shape(&source, &ty).unwrap()[10]);
+        let mut marker = neoclr::assemble(".module Marker\n.type class InternalMarker\n.end\n")
+            .unwrap()
+            .types
+            .remove(0);
+        marker.origin = Some(serde_json::from_value(json!({"assembly":"Runtime","module":"Runtime.dll","name":"System.Runtime.CompilerServices.UnionAttribute","token":33554433})).unwrap());
+        source.types.push(marker);
+        source.types[0].custom_attributes[0].target_token = None;
+        source.types[0].custom_attributes[0].constructor.owner =
+            Some(Type::from_name("InternalMarker"));
+        assert!(shape(&source, &ty).unwrap()[10]);
+        assert!(!shape(&source, &ty).unwrap()[14]);
     }
 }
 

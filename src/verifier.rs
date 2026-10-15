@@ -1028,7 +1028,7 @@ fn typed_effect(
                 module.is_object_reference_type(exact(&values[0])?),
                 "unbox.any requires an object reference",
             )?;
-            one(target.clone())
+            Result::Ok(vec![loaded(target)])
         }
         IsInstance(target) => {
             if !module.is_object_reference_type(target) {
@@ -1180,7 +1180,14 @@ fn typed_effect(
                         && crate::interfaces::is_contract(module, &callee)
                         && !callee.receiver_byref =>
                 {
-                    crate::interfaces::ensure_implementation(module, actual, &interface)?;
+                    if crate::compositions::is_compound(actual) {
+                        require(
+                            module.reference_assignable(actual, &interface),
+                            "compound receiver requires narrowing before interface dispatch",
+                        )?;
+                    } else {
+                        crate::interfaces::ensure_implementation(module, actual, &interface)?;
+                    }
                 }
                 T::ByRef(actual)
                     if **actual == interface && !module.is_reference_type(&interface) => {}
@@ -1332,7 +1339,13 @@ fn typed_effect(
         }
         FieldAddress(index) => match exact(&values[0])? {
             owner if module.is_reference_type(owner) => {
-                let ty = T::ByRef(Box::new(field(owner, *index)?));
+                let field_type = field(owner, *index)?;
+                if crate::compositions::contains(&field_type) {
+                    return Err(crate::Fault::new(
+                        "compound field addresses are not supported",
+                    ));
+                }
+                let ty = T::ByRef(Box::new(field_type));
                 if crate::access::field_is_readonly(module, function, owner, *index)? {
                     Ok(vec![StackType::Readonly(ty)])
                 } else {
@@ -1340,7 +1353,13 @@ fn typed_effect(
                 }
             }
             T::ByRef(owner) => {
-                let ty = T::ByRef(Box::new(field(owner, *index)?));
+                let field_type = field(owner, *index)?;
+                if crate::compositions::contains(&field_type) {
+                    return Err(crate::Fault::new(
+                        "compound field addresses are not supported",
+                    ));
+                }
+                let ty = T::ByRef(Box::new(field_type));
                 if matches!(values[0], StackType::Readonly(_))
                     || crate::access::field_is_readonly(module, function, owner, *index)?
                 {

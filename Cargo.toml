@@ -38,6 +38,8 @@ libc = "0.2"
 windows-sys = { version = "=0.60.2", features = ["Win32_Networking_WinSock"] }
 
 [features]
+# Structural signatures are part of the runtime, including reduced builds.
+default = []
 # Internal metadata support shared with the JIT/AOT backend; not a public Raven API.
 native-metadata = []
 

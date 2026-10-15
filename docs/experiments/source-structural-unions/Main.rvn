@@ -1,0 +1,77 @@
+import System.*
+import System.Introspection.*
+import System.Concurrency.Tasks.*
+
+class Response { val Code: int => 42 }
+class HttpError { val Code: int => 43 }
+class JsonError { val Code: int => 44 }
+
+func Echo(value: Response | HttpError | JsonError) -> Response | HttpError | JsonError {
+    return value
+}
+
+func Complete(value: Response | HttpError | JsonError) -> Task<Response | HttpError | JsonError> {
+    let promise = Promise<Response | HttpError | JsonError>()
+    _ = promise.Complete(value)
+    return promise.Task
+}
+
+func Pending(value: Response | HttpError | JsonError) -> Task<Response | HttpError | JsonError> {
+    let promise = Promise<Response | HttpError | JsonError>()
+    TaskQueue.Default.Post(() => {
+        _ = promise.Complete(value)
+    })
+    return promise.Task
+}
+
+async func Main() -> Task<int> {
+    let info = typeof(Response | HttpError | JsonError)
+    if info is UnionTypeInfo unionInfo {
+        var count = 0
+        for item in unionInfo.Types {
+            count += 1
+        }
+        if count != 3 || !info.IsUnion { System.Fail("union descriptor") }
+    } else { System.Fail("missing union descriptor") }
+    let taskInfo = typeof(Task<Response | HttpError | JsonError>)
+    if !taskInfo.GetGenericArgument(0).Equals(info) { System.Fail("generic union") }
+    let local: Response | HttpError | JsonError = Echo(Response())
+    let response = await Complete(local)
+    if response is Response result {
+        if result.Code != 42 { System.Fail("response payload") }
+    } else { System.Fail("response alternative") }
+    let http = await Complete(HttpError())
+    if http is HttpError httpResult {
+        if httpResult.Code != 43 { System.Fail("http payload") }
+    } else { System.Fail("http alternative") }
+    let json = await Complete(JsonError())
+    if json is JsonError jsonResult {
+        if jsonResult.Code != 44 { System.Fail("json payload") }
+    } else { System.Fail("json alternative") }
+    let pendingResponse = await Pending(Response())
+    if pendingResponse is Response pendingResponseResult {
+        if pendingResponseResult.Code != 42 {
+            System.Fail("pending response payload")
+        }
+    } else {
+        System.Fail("pending response alternative")
+    }
+    let pendingHttp = await Pending(HttpError())
+    if pendingHttp is HttpError pendingHttpResult {
+        if pendingHttpResult.Code != 43 {
+            System.Fail("pending http payload")
+        }
+    } else {
+        System.Fail("pending http alternative")
+    }
+    let pendingJson = await Pending(JsonError())
+    if pendingJson is JsonError pendingJsonResult {
+        if pendingJsonResult.Code != 44 {
+            System.Fail("pending json payload")
+        }
+    } else {
+        System.Fail("pending json alternative")
+    }
+    Console.WriteLine("Source structural union Task delivery passed")
+    return 0
+}

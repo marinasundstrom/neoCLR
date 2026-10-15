@@ -1,0 +1,145 @@
+.module RecordReferenceUnion
+.type class abstract System.Object
+.end
+.type class Cell
+.field Value Int32
+.method instance .ctor(Int32 value) -> noresult
+ldarg this
+ldarg value
+stfld Cell::Value
+ret
+.end
+.end
+.type Payload
+.field Number Int64
+.field Reference Cell
+.end
+.function Echo(union<Payload,Int32> value) -> union<Payload,Int32>
+ldarg value
+ret
+.end
+.function Calculate(Int32 mode) -> Int32
+.local Cell cell
+.local Payload payload
+.local union<Payload,Int32> value
+.local union<Payload,Int32> copy
+ldarg mode
+ldc.i4 2
+beq Null
+ldarg mode
+ldc.i4 3
+beq NullExtract
+ldarg mode
+ldc.i4 5
+beq NullField
+ldc.i4 42
+newobj.ctor instance Cell::.ctor(Int32)
+stloc cell
+ldloca payload
+initobj Payload
+ldloca payload
+ldc.i8 4294967338
+stfld Payload::Number
+pop
+ldloca payload
+ldloc cell
+stfld Payload::Reference
+pop
+ldloc payload
+box Payload
+castclass union<Payload,Int32>
+call Echo(union<Payload,Int32>)
+stloc value
+ldloc value
+stloc copy
+ldarg mode
+ldc.i4 1
+beq Scalar
+ldarg mode
+ldc.i4 4
+beq Scalar
+ldarg mode
+ldc.i4 6
+beq Identity
+ldarg mode
+ldc.i4 7
+beq Mutate
+ldloc copy
+unbox.any Payload
+ldfld Payload::Number
+ldc.i8 4294967338
+ceq
+brfalse Bad
+ldloc copy
+unbox.any Payload
+ldfld Payload::Reference
+ldfld Cell::Value
+ret
+Scalar:
+ldc.i4 42
+box Int32
+castclass union<Payload,Int32>
+stloc value
+ldarg mode
+ldc.i4 4
+beq Extract
+ldloc value
+isinst Payload
+ref.isnull
+brfalse Bad
+ldloc value
+unbox.any Int32
+ret
+Extract:
+ldloc value
+unbox.any Payload
+pop
+br Bad
+Identity:
+ldloc copy
+unbox.any Payload
+ldfld Payload::Reference
+ldloc cell
+ref.eq
+brtrue Yes
+br Bad
+Mutate:
+ldloc copy
+unbox.any Payload
+ldfld Payload::Reference
+ldc.i4 99
+stfld Cell::Value
+ldloc cell
+ldfld Cell::Value
+ret
+Null:
+ldloca value
+initobj union<Payload,Int32>
+ldloc value
+ref.isnull
+brtrue Yes
+br Bad
+NullExtract:
+ldloca value
+initobj union<Payload,Int32>
+br Extract
+NullField:
+ldloca payload
+initobj Payload
+ldloc payload
+box Payload
+castclass union<Payload,Int32>
+stloc value
+ldloc value
+unbox.any Payload
+ldfld Payload::Reference
+ref.isnull
+brtrue Yes
+br Bad
+Yes:
+ldc.i4 42
+ret
+Bad:
+ldc.i4 -1
+ret
+.end

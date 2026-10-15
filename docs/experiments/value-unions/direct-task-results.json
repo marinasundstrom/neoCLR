@@ -1,0 +1,103 @@
+{
+  "date": "2026-10-15",
+  "runtimeBaseRevision": "5cac084a7af32818342dd7ca458317276fb91aab",
+  "compilerBaseRevision": "d1e61bda94332026f54dba98fe8b8d0f94a197bb",
+  "changes": "Tested source and binary hashes identify the fixes committed with this evidence: explicit reference extraction and parameterless nominal generic call admission.",
+  "results": {
+    "direct-task-project": {
+      "command": [
+        "dotnet",
+        "/Users/robert/Projects/raven-union-intersection/src/Raven.Compiler/bin/Debug/net11.0/rvnc.dll",
+        "neoclr",
+        "--project",
+        "docs/experiments/value-unions/direct-task-project/App.rvnproj",
+        "--run",
+        "/Users/robert/Projects/neoclr/target/debug/neoclr"
+      ],
+      "exitCode": 42,
+      "stdout": "Native build output: /Users/robert/Projects/neoclr/docs/experiments/value-unions/direct-task-project/bin/neoclr/StructuralDirectTask.dll\n",
+      "stderr": ""
+    },
+    "closed-generic-task-project": {
+      "command": [
+        "dotnet",
+        "/Users/robert/Projects/raven-union-intersection/src/Raven.Compiler/bin/Debug/net11.0/rvnc.dll",
+        "neoclr",
+        "--project",
+        "docs/experiments/value-unions/closed-generic-task-project/App.rvnproj",
+        "--run",
+        "/Users/robert/Projects/neoclr/target/debug/neoclr"
+      ],
+      "exitCode": 42,
+      "stdout": "Native build output: /Users/robert/Projects/neoclr/docs/experiments/value-unions/closed-generic-task-project/bin/neoclr/StructuralClosedGenericTask.dll\n",
+      "stderr": ""
+    },
+    "open-generic-project": {
+      "command": [
+        "dotnet",
+        "/Users/robert/Projects/raven-union-intersection/src/Raven.Compiler/bin/Debug/net11.0/rvnc.dll",
+        "neoclr",
+        "--project",
+        "docs/experiments/value-unions/open-generic-project/App.rvnproj",
+        "--run",
+        "/Users/robert/Projects/neoclr/target/debug/neoclr"
+      ],
+      "exitCode": 1,
+      "stdout": "",
+      "stderr": "error NEOMETA003: Native metadata encoding failed: composition requires bounded closed constituents (Parameter 'types').\n"
+    }
+  },
+  "successfulChecksPerTaskConsumer": [
+    "completed success",
+    "completed HTTP error",
+    "completed JSON error",
+    "queued success",
+    "queued HTTP error",
+    "queued JSON error",
+    "async-forwarded success",
+    "async-forwarded HTTP error",
+    "async-forwarded JSON error",
+    "reference identity after queued union delivery"
+  ],
+  "compilerTests": {
+    "passed": 21,
+    "failed": 0,
+    "filter": "StructuralUnionTypeSymbolTests|SourceStructuralUnionTests|IntersectionConversionTests"
+  },
+  "runtimeTests": {
+    "passed": 55,
+    "failed": 0,
+    "command": "cargo test --test structural_compositions"
+  },
+  "limitations": [
+    "Open Response<T> constituent rejected at native metadata encoding",
+    "Direct closure capture of a union local not supported",
+    "Whole-union boxing and exact boxed identity remain unqualified",
+    "Interpreter only; final native layout remains pending"
+  ],
+  "sha256": {
+    "src/compositions.rs": "c81446d1d9c82efd0bd7fa1d8860371c6fe79abc1be7c2dbad85a790cb8853f5",
+    "tests/structural_compositions.rs": "21743112edb4565afe1a41499bbc8307d27414ed207cc2c9b7b8a402a8caa5e4",
+    "target/debug/neoclr": "f1f46d3d49b660af1f618f47836f00a0b29112b400f429fe15e67c400db39a05",
+    "/Users/robert/Projects/raven-union-intersection/src/Raven.CodeAnalysis/Compilation.IntersectionConversions.cs": "7b596e6634431cd87511749edfa23f946f9dc29d33a631d949028d2292540b2c",
+    "/Users/robert/Projects/raven-union-intersection/src/Raven.Compiler/bin/Debug/net11.0/rvnc.dll": "9b3066630e88bb2b25abd98136ef3c9ce9b64092feba4799524b9faa57c0cd4b",
+    "/Users/robert/Projects/raven-union-intersection/src/Raven.Compiler/bin/Debug/net11.0/Raven.CodeAnalysis.dll": "f269b343219a62b3c233504bc06c2aedad0613bc4a6989e067424585aa9ab8a5",
+    "/Users/robert/Projects/raven-union-intersection/src/Raven.Compiler/bin/Debug/net11.0/NeoCLR.Metadata.Experimental.dll": "32a480234655efa9773fd8c9d3c290302e0f74b38b1d8435bff2b3f7e76bc4d9",
+    "docs/experiments/value-unions/direct-task-project/Main.rvn": "1b3a9489fe56b19774b7590d35e8fb7c616422bb2919f93cd8edbfb6e9e09dd1",
+    "docs/experiments/value-unions/direct-task-project/App.rvnproj": "67f9a89de4fb3f3a6e6bfdf380eabdf930582adc333c7019dd9ba0974fd0c492",
+    "docs/experiments/value-unions/closed-generic-task-project/Main.rvn": "ee5c2b8c3f2af18228e8b5e2a194e50620c85fdcb27723b6945c4c0ef3a301bd",
+    "docs/experiments/value-unions/closed-generic-task-project/App.rvnproj": "3450b5ffce11cea1998c150aa33a0588add2d7975fe089af255fae0c903f2d33",
+    "docs/experiments/value-unions/open-generic-project/Main.rvn": "592fd27f6dab4c95fa9323ae0a721ad99345dd75fcfe1ec39005da767108035f",
+    "docs/experiments/value-unions/open-generic-project/App.rvnproj": "785278a9fc463656783131fd9576423b828fddcb2bc218219dd55e53a7a5281a",
+    "docs/experiments/value-unions/direct-task-project/bin/neoclr/StructuralDirectTask.dll": "e86b461ba8a2b8030b8b5a11edcabe731ef636d427069a6cf27c2695af3ebded",
+    "docs/experiments/value-unions/closed-generic-task-project/bin/neoclr/StructuralClosedGenericTask.dll": "8bf1587d658fb2fbc519387b9bd48ca947cc9ba4478fb2c1e399438fff24643a",
+    "target/structural-integrated-libraries-v3/Core.dll": "3f7cfa9db7c4feb551e2e97b0edb89c4dcf4c64d8eccf01bd006848dcacfd3f4",
+    "target/structural-integrated-libraries-v3/System.Runtime.dll": "c3cba0050fa2e4e4161c9e55266cc92da9a86034badccd98c2e804000b5bf735",
+    "target/structural-integrated-libraries-v3/System.Data.dll": "a13b89d9c3d87be3ab08a8c7e8fb4c3af75402e7fe7b0598204b241832014704",
+    "target/structural-integrated-libraries-v3/System.Networking.dll": "1384940280b54680c217c951964af3f2dde01fc6acf19a927f59ede3336d09ca",
+    "target/structural-integrated-libraries-v3/System.Web.dll": "f29d93809d033ca36c00c4034f6cbf920d1ba8dae7291ef18222d8e9cfbc7ae6",
+    "target/structural-integrated-libraries-v3/System.runtime.neox": "98a1ae1da85387c87746957e83a4015eb59d0566539a915c69f168d2b511b190",
+    "target/structural-integrated-libraries-v3/NeoCLR.ClassLibrary.props": "4676969ee1e381f9bbe0cfce799cfe5503a1a7f77968a174782c35a24752e5b7",
+    "target/structural-integrated-libraries-v3/ownership.json": "691bc51df44e8c11d62a8ac814cab45b43e48423719a91efd5c3bbc951c65419"
+  }
+}

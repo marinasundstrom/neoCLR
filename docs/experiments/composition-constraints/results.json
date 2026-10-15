@@ -1,0 +1,287 @@
+{
+  "date": "2026-10-14",
+  "scope": "Native closed structural bounds and Raven semantic checks; native Raven emission and guest constraint reflection pending",
+  "ravenCommit": "9bb265ed5",
+  "checks": [
+    {
+      "command": "cargo test -p neoclr --features experimental-compositions --test composition_constraints",
+      "passed": 4
+    },
+    {
+      "command": "cargo test -p neoclr --test composition_constraints",
+      "passed": 1
+    },
+    {
+      "command": "cargo test -p neoclr --features experimental-compositions --test structural_compositions --test generic_bounds --test generic_constraints",
+      "passed": 60
+    },
+    {
+      "command": "dotnet test test/Raven.CodeAnalysis.Tests/Raven.CodeAnalysis.Tests.csproj -p:BuildProjectReferences=false --filter FullyQualifiedName~StructuralConstraintTests",
+      "passed": 18
+    }
+  ],
+  "sha256": {
+    "docs/experiments/composition-constraints/native.neil": "bfec44e8cdd541ba881321445b8deaf89d79ab00811f2dacfd3cf83dfa133e4c",
+    "tests/composition_constraints.rs": "471ebb807853b5d627b056c2a0029d4c013aafb9c87a072d461eddd81f2c330c"
+  },
+  "metadataInspection": {
+    "date": "2026-10-14",
+    "scope": "Host native method-bound materialization and introspection only; compiler emission/import and guest constraint reflection pending",
+    "checks": [
+      {
+        "command": "dotnet run --project tools/metadata/NeoCLR.Metadata.Experimental.Tests -- --structural-method-constraints",
+        "result": "pass; dedicated structural checks and existing GenericMethodConstraintChecks"
+      },
+      {
+        "command": "dotnet run --project tools/metadata/NeoCLR.Metadata.Experimental.Tests --no-build -- --reference-compositions",
+        "result": "pass"
+      },
+      {
+        "command": "python3 scripts/build-api-docs.py --check",
+        "result": "pass"
+      }
+    ],
+    "testSha256": "d1a578056b4f0494730740a34ed1f7b465835da3389ca5aa82365392e529d8c0"
+  },
+  "metadataAuthoring": {
+    "date": "2026-10-14",
+    "scope": "Local closed native method bounds; compiler wiring and external/open bounds pending",
+    "checks": [
+      {
+        "command": "dotnet run --project tools/metadata/NeoCLR.Metadata.Experimental.Tests -- --authored-structural-constraints target/authored-structural-constraints.neox",
+        "result": "pass"
+      },
+      {
+        "command": "target/debug/neoclr run target/authored-structural-constraints.neox --execution interpreter",
+        "exitCode": 42
+      },
+      {
+        "command": "dotnet run --project tools/metadata/NeoCLR.Metadata.Experimental.Tests --no-build -- --structural-method-constraints",
+        "result": "pass, including nominal constraint regressions"
+      },
+      {
+        "command": "dotnet run --project tools/metadata/NeoCLR.Metadata.Experimental.Tests --no-build -- --authored-compositions",
+        "result": "pass"
+      },
+      {
+        "command": "python3 scripts/build-api-docs.py --check",
+        "result": "pass"
+      }
+    ],
+    "testSha256": "6f07f0cfa89ac89bd108941e27e97aca084f216cbe13ab3ed607e947b4615ffe"
+  },
+  "ravenNativeIntegration": {
+    "date": "2026-10-14",
+    "emissionCommit": "71601e6f4",
+    "scope": "Closed structural method bounds; native free-function imports and separate consumers; open/class/instance constraints remain pending",
+    "checks": [
+      {
+        "command": "dotnet run --project tools/NeoClrMetadataProbe -p:NeoClrMetadataProject=/Users/robert/Projects/neoclr/tools/metadata/NeoCLR.Metadata.Experimental/NeoCLR.Metadata.Experimental.csproj -p:UseRavenCoreReference=false -p:WarningLevel=0 -- --structural-constraints /Users/robert/Projects/neoclr/target/composition-info-libraries-v2 /Users/robert/Projects/neoclr/target/source-constraints",
+        "workingDirectory": "/Users/robert/Projects/raven-union-intersection",
+        "result": "pass; source/library emission, native constraint grouping, imported positives/negatives, closed generic bound, default gates"
+      },
+      {
+        "command": "target/debug/neoclr run target/source-constraints/ConstraintConsumer.neox --system target/composition-info-libraries-v2/System.runtime.neox --module target/composition-info-libraries-v2/System.Runtime.dll --module target/source-constraints/ConstraintLibrary.neox --object-root target/composition-info-libraries-v2/System.Runtime.dll --execution interpreter --instructions 100000000",
+        "exitCode": 42
+      },
+      {
+        "command": "target/debug/neoclr run target/authored-structural-constraints.neox.consumer.neox --module target/authored-structural-constraints.neox.library.neox --execution interpreter",
+        "exitCode": 42
+      },
+      {
+        "command": "--source-compositions (NeoClrMetadataProbe)",
+        "result": "pass"
+      },
+      {
+        "command": "--authored-structural-constraints, --structural-method-constraints, --composition-imports (metadata checks)",
+        "result": "pass"
+      },
+      {
+        "command": "python3 scripts/build-api-docs.py --check",
+        "result": "pass"
+      }
+    ],
+    "sha256": {
+      "target/source-constraints/ConstraintLibrary.neox": "fa6821e786c6e6c5b5bf5e65f0d9019471ec2979313e4d6f51a2a26faf5d2fdc",
+      "target/source-constraints/ConstraintConsumer.neox": "872e4d12d47f721fb3cfb465606044937838b38ce275ab08b5cd5d2fad2fbcd7",
+      "tools/metadata/NeoCLR.Metadata.Experimental.Tests/AuthoredStructuralConstraintChecks.cs": "a820a5a210a90dea4d1f99d6345f39484d3800204843ba30c60001a6f2bed83e",
+      "Raven/tools/NeoClrMetadataProbe/StructuralConstraintChecks.cs": "4522a00774e69e235f72af1e425ef2df1fd7dbcf5a41d07cf59c40927dc6862f"
+    }
+  },
+  "closedBoundForwarding": {
+    "date": "2026-10-14",
+    "scope": "Method parameters whose declared closed bounds imply callee bounds; owner parameters and open bound operands remain unsupported",
+    "checks": [
+      {
+        "command": "metadata checks --authored-structural-constraints",
+        "result": "pass; union/intersection forwarding, combined nominal guarantees, nominal target, weak/unbounded rejection and late revalidation"
+      },
+      {
+        "command": "metadata checks --structural-method-constraints",
+        "result": "pass, including nominal regressions"
+      },
+      {
+        "command": "NeoClrMetadataProbe --structural-constraints",
+        "result": "pass; exported forwarding wrappers, invalid weakening, library/consumer emission"
+      },
+      {
+        "command": "target/debug/neoclr run target/source-constraints/ConstraintConsumer.neox --system target/composition-info-libraries-v2/System.runtime.neox --module target/composition-info-libraries-v2/System.Runtime.dll --module target/source-constraints/ConstraintLibrary.neox --object-root target/composition-info-libraries-v2/System.Runtime.dll --execution interpreter --instructions 100000000",
+        "exitCode": 42
+      },
+      {
+        "command": "target/debug/neoclr run target/authored-structural-constraints.neox --execution interpreter",
+        "exitCode": 42
+      },
+      {
+        "command": "python3 scripts/build-api-docs.py --check",
+        "result": "pass"
+      }
+    ],
+    "sha256": {
+      "tools/metadata/NeoCLR.Metadata.Experimental.Tests/AuthoredStructuralConstraintChecks.cs": "e55c90b12f6005d0e7f1982c454d9a03998a8bfb6816cc1f21cbf80f0a537608",
+      "target/source-constraints/ConstraintConsumer.neox": "66841f860aa7d80e214795c2c79e84e87bcd900583b579706d3b28691b1918b8",
+      "target/source-constraints/ConstraintLibrary.neox": "5a7cb536ff4bc8e477dc1b770bcca6c2608cc097823bd69d5f1de17f2e36773e",
+      "Raven/tools/NeoClrMetadataProbe/StructuralConstraintChecks.cs": "5624fe108748d0822bf8fedb67b4d9a216a53ef2e121ce802c0acbc76b130a51"
+    }
+  },
+  "genericBodyTraits": {
+    "date": "2026-10-14",
+    "scope": "Owned nongeneric interface calls through structurally constrained method parameters; external/constructed target authoring remains limited",
+    "checks": [
+      {
+        "command": "cargo test -p neoclr --features experimental-compositions --test composition_constraints --test self_types --test generic_bounds",
+        "passed": 34
+      },
+      {
+        "command": "cargo test -p neoclr --test composition_constraints",
+        "passed": 1
+      },
+      {
+        "command": "NeoClrMetadataProbe --structural-constraints",
+        "result": "pass, including TraitSource emission"
+      },
+      {
+        "command": "target/debug/neoclr run target/source-constraints/TraitSource.neox --system target/composition-info-libraries-v2/System.runtime.neox --module target/composition-info-libraries-v2/System.Runtime.dll --object-root target/composition-info-libraries-v2/System.Runtime.dll --execution interpreter --instructions 100000000",
+        "exitCode": 42
+      },
+      {
+        "command": "metadata checks --authored-structural-constraints and --open-constrained-calls",
+        "result": "pass"
+      },
+      {
+        "command": "python3 scripts/build-api-docs.py --check",
+        "result": "pass"
+      }
+    ],
+    "sha256": {
+      "target/source-constraints/TraitSource.neox": "70c77c2d922ef5dd5d1ef0003b8abec712f97b6b0796188c090a98c18c312223",
+      "tests/composition_constraints.rs": "f5045db51647ecc87b892ead70a63c95ce6c82c5a2235c452ab46f48e903125b",
+      "tools/metadata/NeoCLR.Metadata.Experimental.Tests/AuthoredStructuralConstraintChecks.cs": "869e3c642f07db86dc304d0009c4fa7d4dbe606331131a9f82a3d930c7c19eab",
+      "Raven/tools/NeoClrMetadataProbe/StructuralConstraintChecks.cs": "2c4568e5bda9abe382fe490be5bda4bbceb299597d1ec07e75a6ce4d9c4039c2"
+    }
+  },
+  "importedGenericBodyTraits": {
+    "date": "2026-10-14",
+    "consumer": "ExternalTraits.neox",
+    "library": "TraitLibrary.neox",
+    "interpreterExitCode": 42,
+    "profile": "Local intersection bounds inherit imported nongeneric interface methods; direct external structural bounds remain unsupported.",
+    "sha256": {
+      "ExternalTraits.neox": "f2638ef10baebe1015083f81dff5f35c8ba9dbe901f4c5349448cb585a782f6b",
+      "TraitLibrary.neox": "21bf4071373f5a97bedd8670eb928a5bc1205d0999c8d4c22e0a276d64b6ac6d"
+    },
+    "validation": [
+      "Raven --structural-constraints probe",
+      "metadata --authored-structural-constraints (intersection admission, weak union and invalid ordinal rejection)",
+      "metadata --open-constrained-calls nominal regression",
+      "python3 scripts/build-api-docs.py --check"
+    ]
+  },
+  "constructedGenericBodyTraits": {
+    "date": "2026-10-14",
+    "consumer": "ConstructedTraits.neox",
+    "interpreterExitCode": 42,
+    "checks": [
+      "metadata authoring: exact constructed guarantee, weak union rejection, mismatched type argument rejection",
+      "nominal open constrained call regression",
+      "Raven emission and separate native library execution",
+      "API snapshot check"
+    ],
+    "sha256": {
+      "target/source-constraints/ConstructedTraits.neox": "a90773fe1d25bc9bacf576bd5e407de17cf1f2ee93f38a56db90316af0c50040",
+      "target/source-constraints/TraitLibrary.neox": "44808cb8123a09cdbf159e0f2185b3544ebc9b3c87571c7fb64255766729e067"
+    }
+  },
+  "externalUnionBounds": {
+    "date": "2026-10-14",
+    "scope": "Imported closed union alternatives; external intersection and open operands remain unsupported",
+    "checks": [
+      {
+        "command": "dotnet run --project tools/metadata/NeoCLR.Metadata.Experimental.Tests -- --authored-structural-constraints target/authored-structural-constraints.neox",
+        "result": "pass: native roundtrip, exact constructed argument, complete source-union coverage, invalid/external-intersection rejection"
+      },
+      {
+        "command": "Raven NeoClrMetadataProbe --structural-constraints target/composition-info-libraries-v2 target/external-union-constraints",
+        "result": "pass: three-assembly emission/import and invalid consumer diagnostics"
+      },
+      {
+        "command": "target/debug/neoclr run target/external-union-constraints/ExternalBoundConsumer.neox --system target/composition-info-libraries-v2/System.runtime.neox --module target/composition-info-libraries-v2/System.Runtime.dll --module target/external-union-constraints/TraitLibrary.neox --module target/external-union-constraints/ExternalBoundLibrary.neox --object-root target/composition-info-libraries-v2/System.Runtime.dll --execution interpreter --instructions 100000000",
+        "exitCode": 42
+      },
+      {
+        "command": "python3 scripts/build-api-docs.py --check",
+        "result": "pass"
+      }
+    ],
+    "sha256": {
+      "target/external-union-constraints/TraitLibrary.neox": "44808cb8123a09cdbf159e0f2185b3544ebc9b3c87571c7fb64255766729e067",
+      "target/external-union-constraints/ExternalBoundLibrary.neox": "17b2118eee4d926b989b8846122772024555ddc94a91234b2f0de46ac1f3c6b1",
+      "target/external-union-constraints/ExternalBoundConsumer.neox": "06a97a8c122ef5e08d359527387dcdadde8c56e3de64acb4bc297641599b1244",
+      "target/debug/neoclr": "a5a512335059ed78cf2768785c77b18c6efc4dbdd42908f81818058a03a70b2d",
+      "tools/metadata/NeoCLR.Metadata.Experimental.Tests/AuthoredStructuralConstraintChecks.cs": "1f9d35553c120e501c7302e792e863b797fdc04f4877bafc807a1751e4cee058",
+      "/Users/robert/Projects/raven-union-intersection/tools/NeoClrMetadataProbe/StructuralConstraintChecks.cs": "70fe61a416e11d498273e7fa769c6553c5abce16ea627bb8ede2e28fdd02ee93"
+    }
+  },
+  "externalIntersectionBounds": {
+    "date": "2026-10-14",
+    "scope": "Resolved imported closed method intersection operands; nominal conformance remains explicit",
+    "checks": [
+      {
+        "command": "dotnet run --project tools/metadata/NeoCLR.Metadata.Experimental.Tests -- --authored-structural-constraints target/authored-structural-constraints.neox",
+        "result": "pass: resolved external interfaces/generic interfaces/open classes/closed hierarchies; missing resolver, wrong identity, final/value replacement and CLI rejection"
+      },
+      {
+        "command": "dotnet run --project tools/metadata/NeoCLR.Metadata.Experimental.Tests --no-build -- --structural-method-constraints",
+        "result": "pass: existing structural and nominal constraint inspection"
+      },
+      {
+        "command": "Raven NeoClrMetadataProbe --structural-constraints target/composition-info-libraries-v2 target/external-intersection-constraints",
+        "result": "pass: reverse dependency order, three-assembly consumer, missing-dependency rejection and RAV0320 for shape-only implementation"
+      },
+      {
+        "command": "target/debug/neoclr run target/external-intersection-constraints/ExternalIntersectionConsumer.neox --system target/composition-info-libraries-v2/System.runtime.neox --module target/composition-info-libraries-v2/System.Runtime.dll --module target/external-intersection-constraints/TraitLibrary.neox --module target/external-intersection-constraints/ExternalIntersectionLibrary.neox --object-root target/composition-info-libraries-v2/System.Runtime.dll --execution interpreter --instructions 100000000",
+        "exitCode": 42
+      },
+      {
+        "command": "Raven NeoClrMetadataProbe --source-compositions target/composition-info-libraries-v2 target/external-intersection-regression",
+        "result": "pass: source signatures/catalog roundtrip and default gate regression"
+      },
+      {
+        "command": "python3 scripts/build-api-docs.py --check",
+        "result": "pass"
+      }
+    ],
+    "sha256": {
+      "target/external-intersection-constraints/TraitLibrary.neox": "a446bea3c56bf3a060bdf6800df18a427d80a67c6c522ba54cf932a3a8dad3c8",
+      "target/external-intersection-constraints/ExternalIntersectionLibrary.neox": "0d79d16b9cfbc276c5b722db9929e56ce6ddc08dee1fff4170415023b28da00e",
+      "target/external-intersection-constraints/ExternalIntersectionConsumer.neox": "a4a2481e3f90bee208ea4579e834c59432d5fb5b436fc1e319536e49b1ac284f",
+      "tools/metadata/NeoCLR.Metadata.Experimental.Tests/ExternalIntersectionConstraintChecks.cs": "3464c00f11c5594ff15ff2ab5b726e258c9c16ee55a0ed3ce0a4eee5d32f068a",
+      "/Users/robert/Projects/raven-union-intersection/tools/NeoClrMetadataProbe/StructuralConstraintChecks.cs": "95e111eb894f9926039c48026262ded6777b577ee078cdd7ad15a7fc34a121f0"
+    },
+    "limitations": [
+      "Open operands and generic owner constraint emission remain pending",
+      "External intersection dependency cycles that prevent snapshot validation fail closed",
+      "Guest constraint reflection and JIT/AOT remain pending"
+    ]
+  }
+}

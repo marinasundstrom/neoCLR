@@ -16,8 +16,16 @@ pub(super) enum Ty {
     Character, // One validated extended grapheme, stored as immutable UTF-8 text.
     Literal,   // Immutable image/explicit invocation-arena UTF-8; not a general managed String.
     Record(usize),
+    Tuple(Vec<Ty>),
     Reference(usize),
     Interface(usize),
+    Intersection(Vec<Ty>),
+    ReferenceUnion(Vec<Ty>),
+    ScalarUnion(Vec<Type>),
+    ValueUnion(Vec<Ty>), // Discriminator plus disjoint, zeroed inactive payload regions.
+    MixedUnion(Vec<Ty>), // Tag, numeric bits, and a separate nullable reference slot.
+    PendingUnionScalar(Type),
+    ScalarUnionTest, // Ephemeral non-null discriminator, consumed only by ref.isnull.
     ByteArray,
     CharacterArray,  // Same pointer-slot layout, distinct element identity.
     StringArray,     // Invocation-owned pointer slots; verified nominal backing enables views.
@@ -29,6 +37,7 @@ pub(super) enum Ty {
     Double,
     Single,
     ReferenceArray(usize), // Default-null or reserved slots retaining nominal object identity.
+    StructuralArray(Type), // Checked snapshots of signature-native value/view storage.
     RecordArray(usize),    // Checked reserved snapshots of a closed value record.
     ScalarArray(Type),     // Atomic one-lane slots; exact element identity retained.
     CallableArray(Type),   // Initialized/reserved pointer slots of one exact Function shape.
@@ -209,9 +218,9 @@ impl<'a> Profile<'a> {
                 || (!t.is_reference_type && t.fields.len() > 16)
                 || t.fields.iter().any(|f| {
                     f.deferred
-                        || !(matches!(f.ty, Type::Single | Type::Double | Type::Int32 | Type::Byte | Type::SByte | Type::Int16 | Type::UInt16 | Type::UInt32 | Type::Int64 | Type::UInt64 | Type::IntPtr | Type::UIntPtr | Type::RuntimeTypeHandle | Type::Boolean | Type::Void | Type::String | Type::Char | Type::Named(_))
-                            || (references && matches!(&f.ty, Type::Function(_)))
-                            || (references && matches!(&f.ty, Type::ArrayRef(t) if matches!(**t, Type::Byte | Type::String | Type::Char | Type::Function(_) | Type::Named(_)) || crate::selection::scalar_array_element(t))))
+                        || !(matches!(f.ty, Type::Single | Type::Double | Type::Int32 | Type::Byte | Type::SByte | Type::Int16 | Type::UInt16 | Type::UInt32 | Type::Int64 | Type::UInt64 | Type::IntPtr | Type::UIntPtr | Type::RuntimeTypeHandle | Type::Boolean | Type::Void | Type::String | Type::Char | Type::Named(_) | Type::Tuple(_))
+                            || (references && matches!(&f.ty, Type::Function(_) | Type::Union(_) | Type::Intersection(_)))
+                            || (references && matches!(&f.ty, Type::ArrayRef(t) if matches!(**t, Type::Byte | Type::String | Type::Char | Type::Function(_) | Type::Named(_) | Type::Tuple(_) | Type::Union(_) | Type::Intersection(_)) || crate::selection::scalar_array_element(t))))
                 })
             {
                 return Err(format!("{}: value profile requires supported closed records (inline values have at most sixteen fields)", t.name).into());
@@ -253,8 +262,25 @@ impl<'a> Profile<'a> {
             }
             for field in fields {
                 let ty = p.stored(&field.ty)?;
-                if let Ty::Record(child) = ty {
-                    layout(p, child, states)?;
+                fn dependencies(
+                    p: &mut Profile<'_>,
+                    ty: &Ty,
+                    states: &mut [u8],
+                ) -> Result<(), Error> {
+                    match ty {
+                        Ty::Record(child) => layout(p, *child, states)?,
+                        Ty::Tuple(parts) | Ty::ValueUnion(parts) => {
+                            for part in parts {
+                                dependencies(p, part, states)?;
+                            }
+                        }
+                        _ => (),
+                    }
+                    Ok(())
+                }
+                dependencies(p, &ty, states)?;
+                if matches!(ty, Ty::ValueUnion(_)) && p.lanes(&ty) > crate::limits::INLINE_LANES {
+                    return Err("value union exceeds flattened inline lane limit".into());
                 }
                 p.layouts[i].push(width);
                 width += p.lanes(&ty);
@@ -389,7 +415,7 @@ impl<'a> Profile<'a> {
                 }
                 None
             } else {
-                Some(p.ty(&f.returns)?)
+                Some(p.stored(&f.returns)?)
             });
         }
         // Resolve all calls (even dead ones) and reject recursive native call graphs.
@@ -619,8 +645,87 @@ impl<'a> Profile<'a> {
         // otherwise valid async/TLS programs merely by sharing a signature.
         Ok(targets)
     }
+    pub fn union_parts(&self, t: &Ty) -> Option<Vec<Ty>> {
+        match t {
+            Ty::ScalarUnion(parts) => Some(
+                parts
+                    .iter()
+                    .map(|t| self.ty(t).expect("scalar alternative"))
+                    .collect(),
+            ),
+            Ty::MixedUnion(parts) | Ty::ValueUnion(parts) | Ty::ReferenceUnion(parts) => {
+                Some(parts.clone())
+            }
+            _ => None,
+        }
+    }
+
+    pub fn widens_union(&self, source: &Ty, target: &Ty) -> bool {
+        match (self.union_parts(source), self.union_parts(target)) {
+            (Some(from), Some(to)) => from.iter().all(|part| to.contains(part)),
+            _ => false,
+        }
+    }
+
     pub fn ty(&self, t: &Type) -> Result<Ty, Error> {
         Ok(match t {
+            Type::Tuple(parts) => {
+                Ty::Tuple(parts.iter().map(|t| self.ty(t)).collect::<Result<_, _>>()?)
+            }
+            Type::Intersection(parts) if self.references => {
+                Ty::Intersection(parts.iter().map(|t| self.ty(t)).collect::<Result<_, _>>()?)
+            }
+            Type::Union(parts)
+                if !parts.is_empty()
+                    && parts.iter().all(|t| crate::scalar_unions::tag(t).is_some()) =>
+            {
+                Ty::ScalarUnion(parts.clone())
+            }
+            Type::Union(parts) if crate::scalar_unions::payloads(self.input, t) => {
+                let parts = parts
+                    .iter()
+                    .map(|t| self.ty(t))
+                    .collect::<Result<Vec<_>, _>>()?;
+                let ty = Ty::ValueUnion(parts);
+                if self.lanes(&ty) > crate::limits::INLINE_LANES {
+                    return Err("value union exceeds flattened inline lane limit".into());
+                }
+                ty
+            }
+            Type::Union(parts) if self.references => {
+                let parts = parts
+                    .iter()
+                    .map(|t| self.ty(t))
+                    .collect::<Result<Vec<_>, _>>()?;
+                if parts
+                    .iter()
+                    .any(|t| matches!(t, Ty::Int | Ty::Wide | Ty::Bool))
+                    && parts
+                        .iter()
+                        .any(|t| matches!(t, Ty::Reference(_) | Ty::Interface(_)))
+                    && parts.iter().all(|t| {
+                        matches!(
+                            t,
+                            Ty::Int | Ty::Wide | Ty::Bool | Ty::Reference(_) | Ty::Interface(_)
+                        )
+                    })
+                    && crate::scalar_unions::inline(self.input, t)
+                {
+                    return Ok(Ty::MixedUnion(parts));
+                }
+                if !parts
+                    .iter()
+                    .all(|t| matches!(t, Ty::Reference(_) | Ty::Interface(_)))
+                {
+                    return Err(
+                        "native union payload requires tagged inline storage or intrinsic-reference lowering".into(),
+                    );
+                }
+                Ty::ReferenceUnion(parts)
+            }
+            Type::Union(_) | Type::Intersection(_) => {
+                return Err("structural reference payloads require --reference-arena".into());
+            }
             Type::Int32 | Type::UInt32 => Ty::Int,
             Type::Byte => Ty::Byte,
             Type::SByte => Ty::SByte,
@@ -653,6 +758,13 @@ impl<'a> Profile<'a> {
             Type::ArrayRef(t) if self.references && matches!(**t, Type::Function(_)) => {
                 self.ty(t)?;
                 Ty::CallableArray(t.as_ref().clone())
+            }
+            Type::ArrayRef(t) if self.references && matches!(**t, Type::Tuple(_) | Type::Union(_) | Type::Intersection(_)) => {
+                let element = self.ty(t)?;
+                if self.lanes(&element) > crate::limits::INLINE_LANES {
+                    return Err("structural array element exceeds flattened inline lane limit".into());
+                }
+                Ty::StructuralArray(t.as_ref().clone())
             }
             Type::ArrayRef(t) if self.references && matches!(**t, Type::Named(_)) => {
                 match self.ty(t)? {
@@ -706,7 +818,11 @@ impl<'a> Profile<'a> {
         matches!(t, Ty::Reference(i) if self.object_base == Some(*i))
     }
     fn stored(&self, t: &Type) -> Result<Ty, Error> {
-        self.ty(t)
+        let ty = self.ty(t)?;
+        if matches!(ty, Ty::Tuple(_)) && self.lanes(&ty) > crate::limits::INLINE_LANES {
+            return Err("structural tuple exceeds flattened inline lane limit".into());
+        }
+        Ok(ty)
     }
     pub fn stack_type(t: &Ty) -> Ty {
         if matches!(t, Ty::Byte | Ty::SByte | Ty::Short | Ty::UShort) {
@@ -721,6 +837,10 @@ impl<'a> Profile<'a> {
             Ty::SByte => vec![Some((8, true))],
             Ty::Short => vec![Some((16, true))],
             Ty::UShort => vec![Some((16, false))],
+            Ty::Tuple(parts) => parts.iter().flat_map(|t| self.narrow_lanes(t)).collect(),
+            Ty::ValueUnion(parts) => std::iter::once(None)
+                .chain(parts.iter().flat_map(|t| self.narrow_lanes(t)))
+                .collect(),
             Ty::Record(i) if !self.input.types[*i].fields.is_empty() => self.input.types[*i]
                 .fields
                 .iter()
@@ -731,10 +851,18 @@ impl<'a> Profile<'a> {
     }
     pub fn pointer_lanes(&self, t: &Ty) -> Vec<bool> {
         match t {
-            Ty::Erased => vec![false, true],
+            Ty::Erased | Ty::ScalarUnion(_) => vec![false, true],
+            Ty::MixedUnion(_) => vec![false, true, true],
+            Ty::ValueUnion(parts) => std::iter::once(false)
+                .chain(parts.iter().flat_map(|t| self.pointer_lanes(t)))
+                .collect(),
+            Ty::PendingUnionScalar(t) => {
+                self.pointer_lanes(&self.ty(t).expect("admitted union scalar"))
+            }
             Ty::ScalarArray(_)
             | Ty::ReferenceArray(_)
             | Ty::RecordArray(_)
+            | Ty::StructuralArray(_)
             | Ty::CallableArray(_)
             | Ty::Callable(_)
             | Ty::Literal
@@ -742,6 +870,8 @@ impl<'a> Profile<'a> {
             | Ty::Address(_)
             | Ty::Reference(_)
             | Ty::Interface(_)
+            | Ty::Intersection(_)
+            | Ty::ReferenceUnion(_)
             | Ty::ByteArray
             | Ty::CharacterArray
             | Ty::StringArray
@@ -750,6 +880,7 @@ impl<'a> Profile<'a> {
             | Ty::Size
             | Ty::Wide
             | Ty::TypeToken => vec![true],
+            Ty::Tuple(parts) => parts.iter().flat_map(|t| self.pointer_lanes(t)).collect(),
             Ty::Record(i) if !self.input.types[*i].fields.is_empty() => self.input.types[*i]
                 .fields
                 .iter()
@@ -761,12 +892,25 @@ impl<'a> Profile<'a> {
     pub fn lanes(&self, t: &Ty) -> usize {
         match t {
             Ty::Record(i) => self.widths[*i],
-            Ty::Erased => 2,
+            Ty::PendingUnionScalar(t) => self.lanes(&self.ty(t).expect("admitted union payload")),
+            Ty::Tuple(parts) => parts.iter().map(|t| self.lanes(t)).sum(),
+            Ty::Erased | Ty::ScalarUnion(_) => 2,
+            Ty::MixedUnion(_) => 3,
+            Ty::ValueUnion(parts) => 1 + parts.iter().map(|t| self.lanes(t)).sum::<usize>(),
             _ => 1,
         }
     }
     pub fn call_result_bytes(&self) -> u32 {
-        (self.widths.iter().copied().max().unwrap_or(1) * 8).max(256) as u32
+        (self
+            .results
+            .iter()
+            .flatten()
+            .map(|t| self.lanes(t))
+            .chain(self.widths.iter().copied())
+            .max()
+            .unwrap_or(1)
+            * 8)
+        .max(256) as u32
     }
 
     pub fn bytes(&self, t: &Ty) -> u32 {
@@ -803,7 +947,22 @@ impl<'a> Profile<'a> {
         false
     }
     fn reference_assignable(&self, actual: &Ty, expected: &Ty) -> bool {
+        if actual == expected {
+            return true;
+        }
         match (actual, expected) {
+            (Ty::ReferenceUnion(parts), _) => parts
+                .iter()
+                .all(|part| self.reference_assignable(part, expected)),
+            (_, Ty::ReferenceUnion(parts)) => parts
+                .iter()
+                .any(|part| self.reference_assignable(actual, part)),
+            (_, Ty::Intersection(parts)) => parts
+                .iter()
+                .all(|part| self.reference_assignable(actual, part)),
+            (Ty::Intersection(parts), _) => parts
+                .iter()
+                .any(|part| self.reference_assignable(part, expected)),
             // Interface views retain the original object reference. Every managed
             // interface reference is assignable to the verified Object base, but
             // not to arbitrary concrete classes without an explicit cast.
@@ -844,6 +1003,37 @@ impl<'a> Profile<'a> {
     }
     pub fn cast_targets(&self, target: &Ty) -> Vec<usize> {
         match target {
+            Ty::MixedUnion(parts) | Ty::ValueUnion(parts) => {
+                self.cast_targets(&Ty::ReferenceUnion(parts.clone()))
+            }
+            Ty::ReferenceUnion(_) => self
+                .input
+                .types
+                .iter()
+                .enumerate()
+                .filter(|(index, t)| {
+                    t.is_reference_type
+                        && t.representation == Representation::Record
+                        && !t.is_abstract
+                        && self.reference_assignable(&Ty::Reference(*index), target)
+                })
+                .map(|(index, _)| index)
+                .collect(),
+            Ty::Intersection(parts) => self
+                .input
+                .types
+                .iter()
+                .enumerate()
+                .filter(|(index, t)| {
+                    t.is_reference_type
+                        && t.representation == Representation::Record
+                        && !t.is_abstract
+                        && parts
+                            .iter()
+                            .all(|part| self.reference_assignable(&Ty::Reference(*index), part))
+                })
+                .map(|(index, _)| index)
+                .collect(),
             Ty::ByteArray
             | Ty::ReferenceArray(_)
             | Ty::ScalarArray(_)
@@ -907,6 +1097,7 @@ impl<'a> Profile<'a> {
             let ty = self.ty(&field.ty)?;
             fn zero_initializable(p: &Profile<'_>, ty: &Ty) -> bool {
                 match ty {
+                    Ty::Tuple(parts) => parts.iter().all(|t| zero_initializable(p, t)),
                     Ty::Record(i) => p.input.types[*i]
                         .fields
                         .iter()
@@ -941,6 +1132,9 @@ impl<'a> Profile<'a> {
         } else {
             t
         };
+        if let Ty::Tuple(parts) = t {
+            return parts[..index].iter().map(|t| self.lanes(t)).sum();
+        }
         let (Ty::Record(owner) | Ty::Reference(owner)) = t else {
             unreachable!("checked field owner")
         };
@@ -955,6 +1149,12 @@ impl<'a> Profile<'a> {
         } else {
             t
         };
+        if let Ty::Tuple(parts) = t {
+            return parts
+                .get(index)
+                .cloned()
+                .ok_or_else(|| "tuple element index out of range".into());
+        }
         let (Ty::Record(owner) | Ty::Reference(owner)) = t else {
             return Err("field access requires a value record".into());
         };
@@ -1094,6 +1294,8 @@ impl<'a> Profile<'a> {
                 | Op::ConvertNativeUInt => (),
                 Op::Negate
                 | Op::BitNot
+                | Op::BoxValue(_)
+                | Op::UnboxAny(_)
                 | Op::PackValue(_)
                 | Op::IsValue(_)
                 | Op::UnpackValue(_)
@@ -1177,12 +1379,12 @@ impl<'a> Profile<'a> {
                     continue;
                 }
                 Op::New(t) => {
-                    let Ty::Record(owner) = self.ty(t)? else {
-                        unreachable!()
+                    let count = match self.ty(t)? {
+                        Ty::Record(owner) => self.input.types[owner].fields.len(),
+                        Ty::Tuple(parts) => parts.len(),
+                        _ => unreachable!(),
                     };
-                    state
-                        .stack
-                        .truncate(state.stack.len() - self.input.types[owner].fields.len());
+                    state.stack.truncate(state.stack.len() - count);
                     state.stack.push(None);
                 }
                 Op::Pop
@@ -1259,6 +1461,18 @@ impl<'a> Profile<'a> {
         // Admission is independent of reachability. Never silently trim unsupported IL.
         for (pc, op) in f.body.iter().enumerate() {
             match op {
+                Op::IsInstance(t) if crate::scalar_unions::inline(self.input, t) => {
+                    return Err(format!("{} instruction {pc}: scalar union instance tests require tagged conversion lowering", f.name).into());
+                }
+                Op::BoxValue(_) if crate::scalar_unions::box_pair(self.input, f, pc) => (),
+                Op::UnboxAny(t) | Op::IsInstance(t)
+                    if crate::scalar_unions::tag(t).is_some()
+                        || crate::scalar_unions::bank_scalar(t)
+                        || crate::scalar_unions::record(self.input, t) =>
+                {
+                    ()
+                }
+                Op::CastClass(t) if crate::scalar_unions::inline(self.input, t) => (),
                 Op::Arg(n) | Op::ArgumentAddress(n) | Op::StoreArg(n)
                     if *n < self.args[i].len() =>
                 {
@@ -1343,8 +1557,14 @@ impl<'a> Profile<'a> {
                 }
                 Op::IsInstance(t) | Op::CastClass(t)
                     if self.references
-                        && (matches!(self.ty(t)?, Ty::Reference(_) | Ty::Interface(_))
-                            || self.backing_for_array(&self.ty(t)?).is_some()) =>
+                        && (matches!(
+                            self.ty(t)?,
+                            Ty::Reference(_)
+                                | Ty::Interface(_)
+                                | Ty::Intersection(_)
+                                | Ty::ReferenceUnion(_)
+                                | Ty::Callable(_)
+                        ) || self.backing_for_array(&self.ty(t)?).is_some()) =>
                 {
                     ()
                 }
@@ -1399,6 +1619,11 @@ impl<'a> Profile<'a> {
                 {
                     ()
                 }
+                Op::ReserveArray(t) | Op::ArrayElement(t) | Op::StoreArrayElement(t)
+                    if self.references && matches!(t, Type::Tuple(_) | Type::Union(_) | Type::Intersection(_)) =>
+                {
+                    self.ty(&Type::ArrayRef(Box::new(t.clone())))?;
+                }
                 Op::PackValue(t) | Op::IsValue(t) | Op::UnpackValue(t) => {
                     erased_tag(t)?;
                 }
@@ -1434,6 +1659,109 @@ impl<'a> Profile<'a> {
                 Ok(())
             };
             match op {
+                Op::BoxValue(t) => {
+                    take(&mut stack, &self.ty(t)?)?;
+                    stack.push(Ty::PendingUnionScalar(t.clone()));
+                }
+                Op::CastClass(t @ Type::Union(parts))
+                    if crate::scalar_unions::inline(self.input, t) =>
+                {
+                    let source = pop(&mut stack)?;
+                    if matches!(self.ty(t)?, Ty::MixedUnion(_) | Ty::ValueUnion(_))
+                        && self.is_object_base(&source)
+                    {
+                        return Err(fail(
+                            pc,
+                            "mixed union injection from Object requires boxed-payload classification",
+                        ));
+                    }
+                    if let Ty::Interface(index) = &source {
+                        let view = Type::Named(self.input.types[*index].name.clone());
+                        if parts
+                            .iter()
+                            .filter(|part| {
+                                crate::scalar_unions::tag(part).is_some()
+                                    || crate::scalar_unions::bank_scalar(part)
+                                    || crate::scalar_unions::record(self.input, part)
+                            })
+                            .any(|part| {
+                                neoclr::native_metadata::assignable(self.input, part, &view)
+                                    .unwrap_or(true)
+                            })
+                        {
+                            return Err(fail(
+                                pc,
+                                "mixed union injection from a scalar interface requires boxed-payload classification",
+                            ));
+                        }
+                    }
+                    if !matches!(&source, Ty::PendingUnionScalar(scalar) if parts.contains(scalar))
+                        && source != self.ty(t)?
+                        && !self.widens_union(&source, &self.ty(t)?)
+                        && !(matches!(source, Ty::Callable(_) | Ty::Literal)
+                            && parts
+                                .iter()
+                                .any(|part| self.ty(part).ok().as_ref() == Some(&source)))
+                        && !(matches!(self.ty(t)?, Ty::MixedUnion(_) | Ty::ValueUnion(_))
+                            && matches!(source, Ty::Reference(_) | Ty::Interface(_))
+                            && parts.iter().any(|part| {
+                                self.input.type_definition(part).is_some_and(|d| {
+                                    d.is_reference_type
+                                        || d.representation == Representation::Interface
+                                })
+                            }))
+                    {
+                        return Err(fail(
+                            pc,
+                            "scalar union injection requires an exact adjacent scalar box or the same union",
+                        ));
+                    }
+                    stack.push(self.ty(t)?);
+                }
+                Op::IsInstance(t)
+                    if crate::scalar_unions::tag(t).is_some()
+                        || crate::scalar_unions::bank_scalar(t)
+                        || crate::scalar_unions::record(self.input, t) =>
+                {
+                    if (crate::scalar_unions::record(self.input, t)
+                        || crate::scalar_unions::bank_scalar(t))
+                        && !matches!(stack.last(), Some(Ty::ValueUnion(_)))
+                    {
+                        return Err(fail(
+                            pc,
+                            "nominal value query requires an inline value union",
+                        ));
+                    }
+                    if !matches!(
+                        pop(&mut stack)?,
+                        Ty::ScalarUnion(_) | Ty::MixedUnion(_) | Ty::ValueUnion(_)
+                    ) || !matches!(f.body.get(pc + 1), Some(Op::ReferenceIsNull))
+                    {
+                        return Err(fail(
+                            pc,
+                            "scalar union type test requires an inline union and immediate null test",
+                        ));
+                    }
+                    stack.push(Ty::ScalarUnionTest);
+                }
+                Op::UnboxAny(t) => {
+                    if (crate::scalar_unions::record(self.input, t)
+                        || crate::scalar_unions::bank_scalar(t))
+                        && !matches!(stack.last(), Some(Ty::ValueUnion(_)))
+                    {
+                        return Err(fail(
+                            pc,
+                            "nominal value query requires an inline value union",
+                        ));
+                    }
+                    if !matches!(
+                        pop(&mut stack)?,
+                        Ty::ScalarUnion(_) | Ty::MixedUnion(_) | Ty::ValueUnion(_)
+                    ) {
+                        return Err(fail(pc, "inline union extraction requires a scalar union"));
+                    }
+                    stack.push(self.ty(t)?);
+                }
                 Op::Int(_) => stack.push(Ty::Int),
                 Op::Int64(_) => stack.push(Ty::Wide),
                 Op::Float64 { .. } => stack.push(Ty::Double),
@@ -1525,22 +1853,31 @@ impl<'a> Profile<'a> {
                 }
                 Op::New(t) => {
                     let t = self.ty(t)?;
-                    let Ty::Record(owner) = t else {
-                        return Err(fail(pc, "reference allocation requires a constructor"));
+                    let fields = match &t {
+                        Ty::Record(owner) => self.input.types[*owner]
+                            .fields
+                            .iter()
+                            .map(|f| self.ty(&f.ty))
+                            .collect::<Result<Vec<_>, _>>()?,
+                        Ty::Tuple(parts) => parts.clone(),
+                        _ => return Err(fail(pc, "reference allocation requires a constructor")),
                     };
-                    for f in self.input.types[owner].fields.iter().rev() {
-                        take(&mut stack, &self.ty(&f.ty)?)?;
+                    for field in fields.iter().rev() {
+                        take(&mut stack, field)?;
                     }
                     stack.push(t);
                 }
                 Op::IsInstance(Type::String) | Op::CastClass(Type::String) => {
                     let source = pop(&mut stack)?;
                     if source != Ty::Literal
+                        && !matches!(source, Ty::ValueUnion(_))
                         && !(self.references
                             && matches!(
                                 source,
                                 Ty::Reference(_)
                                     | Ty::Interface(_)
+                                    | Ty::Intersection(_)
+                                    | Ty::ReferenceUnion(_)
                                     | Ty::ByteArray
                                     | Ty::ReferenceArray(_)
                                     | Ty::ScalarArray(_)
@@ -1552,10 +1889,58 @@ impl<'a> Profile<'a> {
                     }
                     stack.push(Ty::Literal);
                 }
+                Op::IsInstance(t @ Type::Function(_)) | Op::CastClass(t @ Type::Function(_))
+                    if matches!(stack.last(), Some(Ty::ValueUnion(_))) =>
+                {
+                    pop(&mut stack)?;
+                    stack.push(self.ty(t)?);
+                }
                 Op::IsInstance(t) | Op::CastClass(t) => {
+                    if matches!(op, Op::IsInstance(_)) && matches!(self.ty(t)?, Ty::ValueUnion(_)) {
+                        return Err(fail(pc, "value union target tests require structural result lowering"));
+                    }
                     let source = pop(&mut stack)?;
-                    if !matches!(source, Ty::Reference(_) | Ty::Interface(_))
-                        && !(source == Ty::Literal && self.references)
+                    if let Ty::MixedUnion(parts) | Ty::ValueUnion(parts) = &source {
+                        let needs_box = self.is_object_base(&self.ty(t)?)
+                            || parts
+                                .iter()
+                                .filter_map(|part| match part {
+                                    Ty::Int => Some(Type::Int32),
+                                    Ty::Wide => Some(Type::Int64),
+                                    Ty::Bool => Some(Type::Boolean),
+                                    Ty::Record(index) => {
+                                        Some(Type::Named(self.input.types[*index].name.clone()))
+                                    }
+                                    _ => None,
+                                })
+                                .any(|scalar| {
+                                    neoclr::native_metadata::assignable(self.input, &scalar, t)
+                                        .unwrap_or(true)
+                                });
+                        if needs_box {
+                            return Err(fail(
+                                pc,
+                                "mixed union Object or scalar-interface views require boxing",
+                            ));
+                        }
+                    }
+                    if matches!(source, Ty::MixedUnion(_) | Ty::ValueUnion(_))
+                        && !matches!(self.ty(t)?, Ty::Reference(_) | Ty::Interface(_))
+                    {
+                        return Err(fail(
+                            pc,
+                            "mixed union extraction requires a nominal reference view",
+                        ));
+                    }
+                    if !matches!(
+                        source,
+                        Ty::ValueUnion(_)
+                            | Ty::MixedUnion(_)
+                            | Ty::Reference(_)
+                            | Ty::Interface(_)
+                            | Ty::Intersection(_)
+                            | Ty::ReferenceUnion(_)
+                    ) && !(source == Ty::Literal && self.references)
                         && self.backing_for_array(&source).is_none()
                     {
                         return Err(fail(
@@ -1568,14 +1953,21 @@ impl<'a> Profile<'a> {
                 Op::ReferenceIsNull => {
                     if !matches!(
                         pop(&mut stack)?,
-                        Ty::ScalarArray(_)
+                        Ty::ScalarUnion(_)
+                            | Ty::ValueUnion(_)
+                            | Ty::MixedUnion(_)
+                            | Ty::ScalarUnionTest
+                            | Ty::ScalarArray(_)
                             | Ty::ReferenceArray(_)
                             | Ty::RecordArray(_)
+                            | Ty::StructuralArray(_)
                             | Ty::Callable(_)
                             | Ty::CallableArray(_)
                             | Ty::Literal
                             | Ty::Reference(_)
                             | Ty::Interface(_)
+                            | Ty::Intersection(_)
+                            | Ty::ReferenceUnion(_)
                             | Ty::ByteArray
                             | Ty::CharacterArray
                             | Ty::StringArray
@@ -1593,6 +1985,8 @@ impl<'a> Profile<'a> {
                                 | Ty::ReferenceArray(_)
                                 | Ty::Reference(_)
                                 | Ty::Interface(_)
+                                | Ty::Intersection(_)
+                                | Ty::ReferenceUnion(_)
                                 | Ty::ByteArray
                                 | Ty::CharacterArray
                                 | Ty::StringArray
@@ -1612,19 +2006,23 @@ impl<'a> Profile<'a> {
                     take(&mut stack, &Ty::Int)?;
                     stack.push(self.ty(&Type::ArrayRef(Box::new(t.clone())))?);
                 }
+                Op::ReserveArray(t) if matches!(t, Type::Tuple(_) | Type::Union(_) | Type::Intersection(_)) => {
+                    take(&mut stack, &Ty::Int)?;
+                    stack.push(self.ty(&Type::ArrayRef(Box::new(t.clone())))?);
+                }
                 Op::NewArray(t) | Op::ReserveArray(t) if matches!(t, Type::Named(_)) => {
                     take(&mut stack, &Ty::Int)?;
                     stack.push(self.ty(&Type::ArrayRef(Box::new(t.clone())))?);
                 }
                 Op::ArrayElement(t)
-                    if matches!(t, Type::Named(_)) || crate::selection::scalar_array_element(t) =>
+                    if matches!(t, Type::Named(_) | Type::Tuple(_) | Type::Union(_) | Type::Intersection(_)) || crate::selection::scalar_array_element(t) =>
                 {
                     take(&mut stack, &Ty::Int)?;
                     take(&mut stack, &self.ty(&Type::ArrayRef(Box::new(t.clone())))?)?;
                     stack.push(Self::stack_type(&self.ty(t)?));
                 }
                 Op::StoreArrayElement(t)
-                    if matches!(t, Type::Named(_)) || crate::selection::scalar_array_element(t) =>
+                    if matches!(t, Type::Named(_) | Type::Tuple(_) | Type::Union(_) | Type::Intersection(_)) || crate::selection::scalar_array_element(t) =>
                 {
                     take(&mut stack, &self.ty(t)?)?;
                     take(&mut stack, &Ty::Int)?;
@@ -1674,6 +2072,7 @@ impl<'a> Profile<'a> {
                         Ty::ScalarArray(_)
                             | Ty::ReferenceArray(_)
                             | Ty::RecordArray(_)
+                            | Ty::StructuralArray(_)
                             | Ty::CallableArray(_)
                             | Ty::ByteArray
                             | Ty::CharacterArray

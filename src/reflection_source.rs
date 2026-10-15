@@ -66,6 +66,9 @@ pub(crate) fn provider(module: &Module, contract: &Type, fields: &[Value]) -> Re
             Some(Value::RuntimeTypeHandle(handle)) => match &handle.identity {
                 TypeIdentity::Definition { .. } => "RuntimeNominalTypeInfo",
                 TypeIdentity::Function { .. } => "RuntimeFunctionTypeInfo",
+                TypeIdentity::Union(_) => "RuntimeUnionTypeInfo",
+                TypeIdentity::Intersection(_) => "RuntimeIntersectionTypeInfo",
+                TypeIdentity::Tuple(_) => "RuntimeTupleTypeInfo",
                 _ => "RuntimeTypeInfo",
             },
             _ => return Err(Fault::new("missing source TypeInfo handle")),

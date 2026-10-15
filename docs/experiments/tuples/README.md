@@ -1,3 +1,8 @@
+> Superseded for the native target on 2026-10-15: nominal Tuple carriers and the
+> generated Tuple runtime slice have been removed. See the [current tuple API](../../../api-docs/tuples.md)
+> and native structural consumer evidence. The nominal design and commands below
+> record the earlier experiment and require its historical revision.
+
 # Tuple support (development, 2026-09-28)
 
 The [contract](../../tuples.md) records `System.Tuple` as neoCLR's value tuple name.

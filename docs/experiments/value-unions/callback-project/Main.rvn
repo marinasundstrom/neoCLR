@@ -1,0 +1,10 @@
+class Other {}
+
+func Wrap(value: int) -> int | Other {
+    return value
+}
+
+func Main() -> int {
+    let callback: (int) -> (int | Other) = Wrap
+    return (int)callback(42)
+}

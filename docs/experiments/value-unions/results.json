@@ -1,0 +1,27 @@
+{
+  "date": "2026-10-15",
+  "runtime_base": "5cdcdf78e",
+  "compiler_base": "06d8523d3",
+  "revision_note": "Bases plus companion working changes committed with this evidence",
+  "source_consumer_exit": 42,
+  "combined_structural_consumer_exit": 42,
+  "compiler_focused_tests": 4,
+  "host_full_harness": "169/175; six unresolved failures, baseline attribution unknown",
+  "api_snapshot": "passed",
+  "system_web_blocker": "TryGetResidual(out HttpError | JsonError) native invocation emission",
+  "sha256": {
+    "docs/experiments/value-unions/project/Main.rvn": "530bc822b0fa4ee90dc1d5282158684dd7e3c56afc7df4b2a6ace8a5bda6164f",
+    "docs/experiments/value-unions/project/bin/neoclr/ValueUnionSource.dll": "c409b35f46c9918bc795b0db9bf847c2c625b3bc1838eaf4736846dbe8716772",
+    "/Users/robert/Projects/raven-union-intersection/src/Raven.Compiler/bin/Debug/net11.0/rvnc.dll": "1502100530e758c5b7e4d137446e0e2b4d6ee2965e2f7f311c13f7a5a9d39a6e",
+    "target/debug/neoclr": "6bfa493b109ba02f2241bc1aea3774992b2d82dd61445a784550fc06ed457f85"
+  },
+  "managed_parameter_slice": {
+    "runtime_base": "3bd7c5ac7",
+    "compiler_base": "317a2bd82",
+    "note": "bases plus this companion committed slice",
+    "runtime_tests": 44,
+    "host_authored_roundtrip": "pass",
+    "source_out_ref_exit": 42,
+    "system_web_blocker": "KeyNotFoundException resolving delegate T0 -> TResult in Int32Emitter"
+  }
+}

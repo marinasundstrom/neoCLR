@@ -1,0 +1,22 @@
+func Echo(value: string | int) -> int | string {
+    return value
+}
+
+func Read(value: int | string) -> int {
+    return match value {
+        int number => number
+        string text => if text == "hé🙂" {
+            42
+        } else {
+            -1
+        }
+        _ => -3
+    }
+}
+
+func Main() -> int {
+    if Read(Echo(42)) != 42 {
+        return -2
+    }
+    return Read(Echo("hé🙂"))
+}

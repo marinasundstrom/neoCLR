@@ -5,6 +5,115 @@
 
 # Raven CLI bridge
 
+## Standard structural compiler contract (2026-10-15)
+
+The paired Raven neoCLR branch now binds and emits structural unions, intersections
+and tuples by target contract, without semantic/emitter, project or driver opt-ins.
+Native metadata output uses NEOX. Remove `WithStructuralCompositions`,
+`WithStructuralTuples`, experimental emission options, `--structural-tuples` and
+`RavenNeoClrStructuralCompositions` / `RavenNeoClrStructuralTuples` settings from
+callers. Ordinary .NET target representations and declared nominal unions remain
+unchanged. Native reader profiles and nominal carrier retirement are the next
+integration slices; branches have not yet merged. Dated experiment notes below
+record their original configuration.
+
+Validation: 50 focused compiler symbol/constraint/pattern checks pass. A fresh
+mixed-union consumer against v4 libraries returns 42 with interpreter, macOS ARM64
+AOT and managed JIT and zero arena allocations.
+
+See [structural runtime operations](structural-runtime-operations.md) for signatures, payload tests, extraction, tuples and callable invocation.
+
+## Structural reference composition experiment — 2026-10-14
+
+neoCLR branch `codex/structural-union-intersection` adds opt-in interpreter
+`union<A,B>`/`intersection<A,B>` signatures. Native intent is either/all nominal
+reference membership on one object, without a tagged carrier. The runtime owns
+normalization, admission, assignability, checked casts and GC-preserving reference
+views. See [scope and executable evidence](experiments/structural-compositions/README.md).
+
+Temporary transport: Rust `Type::Union`/`Type::Intersection` operand arrays in the
+existing JSON/CBOR native execution model. No new CLI encoding or Raven Runtime
+Contract option is selected. Ordinary Raven ad-hoc unions still use their existing
+carrier path. The companion Raven branch `codex/neoclr-union-intersection`, based
+on native `caa787a96`, selectively carries compiler-created intersection symbols,
+substitution/display and reference conversions from `02d669acd`/`c4d57d282`.
+Source conjunctions now bind in generic constraints, retaining ordinary nominal
+bounds. Explicit intersection value syntax is rejected with RAV0363; native compound emission remains
+disabled by default. A native call-only option is described below. This uses archived parser/constraint changes `08b53d8c4`, `41b684e3f` and
+`c6a303f0d`, with no new Runtime Contract switch. Compiler normalization removes
+nominal supertypes as well as duplicate bounds; runtime syntax normalization does
+not. Experimental semantic import retains native descriptors separately; native export still requires descriptor agreement.
+Raven main and the native line remain separate; older structural/intersection work
+is an input for selective reuse, not a wholesale merge.
+
+The metadata facade exposes admitted descriptors as canonical
+`ReferenceCompositionTypeInfo` views, including function results and parameters.
+This preserves kind and nominal identity. Raven `50037e711` now maps intersection views through
+an explicit semantic-import `ReadExperimentalIntersectionAssembly(image, bootstrap)`
+API; default readers remain closed. The compiler retains native descriptors
+separately from symbols, whose normalization can remove nominal supertypes.
+Normalized structural unions, including nested unions, are rejected. No Runtime Contract setting or general storage mapping is enabled.
+
+The host declaration reader can now opt into read-only compound free-function
+signatures via `ReadNativeAssembly(image, true)`. Ordinary Raven project/CLI loading
+still uses the default reader. Ordinary callable import and compound CLI projection remain explicitly rejected;
+loaded snapshots preserve original bytes without verifying bodies. See the
+[host API reference](../api-docs/experimental-metadata.md#read-only-reference-compositions-experiment-2026-10-14).
+
+Lost/restricted information: no structural-union compiler import or compound declaration export, compound reflection
+construction, generic/value/intrinsic-reference composition, member merging or
+native backend layout. Non-null compound values currently require class allocations;
+boxed/intrinsic references can fail despite a compatible static Object/interface
+view. This is a temporary support gap, not the intended general semantics. Typed
+nulls follow existing reference cast/storage behavior. JIT/AOT explicitly reject
+compounds; default interpreter builds reject the opt-in signatures too.
+
+The host metadata builder now admits a separate
+`ImportExperimentalCompositionReference` path for native free-function calls. It
+preserves raw bounds and validates exact compound stack identity. Three emitted
+host consumers (union, intersection and redundant intersection) return 42 in the
+opt-in interpreter. Raven now builds on this through an explicit native call-only
+capability, preserving raw descriptors through shared lowering and import. No new
+CLI encoding is selected. The host additionally proves flat union/union and
+union/intersection call conversions using every-alternative/every-bound rules;
+Raven structural-union import remains closed. See the experiment record for
+positive execution and unsafe-narrowing rejection evidence.
+
+Raven's native emitters reject compound references by default (NEOMETA001).
+Raven `dc750c659` adds `NeoClrEmitOptions.AllowExperimentalIntersectionCalls` to opt native JSON emission
+into direct imported call forwarding. Calls resolve the original metadata token
+and descriptor, including when a signature simplifies to a nominal compiler type.
+PE/#Neo and general authored storage remain gated. Flat intersection call arguments now use a bounded nominal-interface proof while
+preserving both raw contracts; unsatisfied bounds still reject before output. Both
+metadata schemas pass cold/warm symbol/type queries, reduction/retention checks,
+union/default-reader rejection and emission rejection without changing output.
+The existing native nullable-symbol control also passes. These checks add semantic
+import evidence. Four Raven-generated native call-only programs additionally return
+42 in the interpreter: nested calls and discarded results, with distinct and
+redundant bounds. See the linked experiment for commands and remaining limits.
+
+Author clarification (2026-10-14): written intersection bounds must be interfaces
+or non-sealed reference classes. Sealed classes reject before normalization;
+sealed objects can still satisfy interface bounds. Runtime/host validation enforces
+this and Raven must match it. External bounds unresolved by the bounded host reader
+fail closed pending resolver-aware admission. No Runtime Contract or CLI encoding
+changes. See the experiment record for the Animal/Quacks and Dog/Barks distinction.
+
+The working POC adds Raven's `ReadExperimentalCompositionAssembly` and
+`allowExperimentalCompositionCalls` host option for flat union/intersection calls.
+Four source consumers return 42, preserving descriptors and same-reference flow.
+The provider signatures are native fixtures. Default/PE emission, authored storage
+and JIT/AOT remain gated; the old intersection-only option still rejects union
+references. Full open/closed generics are the author-selected next step. See the
+experiment record and Raven compiler API docs for temporary admission limits.
+
+Replacement owners: Raven must preserve semantic symbols and diagnostics through
+an explicit native target capability; the neoCLR metadata library must supply the
+final resolved descriptor/encoding; runtime verification and codegen must agree on
+storage and checked projection before backend admission. Current validation is
+neoIL/interpreter, bounded Raven-generated call execution and rejection evidence;
+general storage and backend admission remain open.
+
 ## Forward async result declarations — 2026-10-12
 
 The extracted JSON preview exposed intermittent RAV2704 for a valid
@@ -9473,3 +9582,1471 @@ covers source/imported nominal types and the real JSON sample. Native editor pro
 must build the server with `NeoClrMetadataProject`; a plain host cannot qualify a
 native project. Preview 15 is unchanged; the next SDK/extension must include these
 compiler/server revisions together.
+
+
+### Generic composition semantic/runtime slice — 2026-10-14
+
+The paired feature branches now validate open generic semantic substitution and
+closed constructed reference runtime bounds. The host adapter still exposes only
+the nongeneric call POC; Task of a union is semantic coverage, not native execution.
+Runtime Contract and CLI carrier encoding are unchanged. See the
+[scope, comparison, owners and validation](experiments/structural-compositions/README.md#generic-composition-first-slice--2026-10-14).
+
+
+### Closed generic composition calls — 2026-10-14
+
+The experimental adapter/compiler now preserves closed constructed reference bounds
+in imported free-function calls, with eight passing interpreter consumers. Generic
+argument mismatches reject at host and compiler. Runtime Contract and CLI encoding
+are unchanged; Task of a union still requires native generic-argument storage work.
+[Current profile and validation](experiments/structural-compositions/README.md#closed-generic-composition-call-integration--2026-10-14).
+
+
+### Runtime composition arguments — 2026-10-14
+
+The interpreter now stores reference composition arguments in closed reference-class
+wrappers through assembled neoIL, with substituted-field validation and GC coverage.
+The compiler/host transport and owned-call paths remain gated, so this does not yet
+execute the author's Task examples. Runtime Contract and CLI encoding are unchanged.
+[Current scope](experiments/structural-compositions/README.md#runtime-composition-argument-storage--2026-10-14).
+
+
+### Wrapper calls and constraint direction — 2026-10-14
+
+The runtime now supports closed composition-wrapper instance constructors and
+nonvirtual methods, inspecting substituted transitive bodies. Host/compiler wrapper
+transport and Task execution remain pending. The author additionally requires unions
+as generic constraints alongside intersections; disjunction must remain an any-of
+contract, not become separate conjunctive CLI constraints. Native constraint support
+is planned, not enabled. Runtime Contract/CLI encoding are unchanged.
+[Checkpoint and direction](experiments/structural-compositions/README.md#runtime-wrapper-constructormethod-calls--2026-10-14).
+
+
+### Wrapped composition call transport — 2026-10-14
+
+The experimental native reader/importer and Raven call emitter now preserve
+reference compositions inside closed reference-class wrappers. Twelve host/Raven
+consumers pass, including wrappers returned with intersection contracts. Recursive
+gates preserve ordinary readers, PE/CLI rejection and authored-storage restrictions.
+Runtime Contract configuration and CLI carriers are unchanged. Task/async, open
+parameters and native constraints remain pending.
+[Profile and evidence](experiments/structural-compositions/README.md#wrapped-composition-metadata-and-raven-calls--2026-10-14).
+
+
+### Intersection finality terminology — 2026-10-14
+
+Intersection bounds exclude classes closed to subclassing (CLR sealed/final), not
+Raven `sealed` hierarchies. Raven `IsClosed` and native `is_sealed` encode finality;
+`IsSealedHierarchy`/`is_closed_hierarchy` encode the separate permitted-subtype
+contract. Open and closed hierarchy roots and interfaces remain admissible; their
+normal inheritance restrictions remain in force. Regression tests cover this
+existing distinction. No Runtime Contract, CLI encoding or emission behavior changes.
+The paired composition branches remain experimental; this does not enable the
+feature on main or in published bundles.
+
+
+### Host composition result locals — 2026-10-14
+
+`MethodBuilder.DeclareExperimentalCompositionResultLocal(producer)` retains an
+output-owned imported callable's exact result type in a native local, including
+composition wrappers. Host wrapper consumers store/reload before forwarding; all
+twelve paired consumers pass. Ordinary builder locals, CLI projection and Raven
+source-local emission remain gated. Runtime Contract and bridge encoding do not
+change; this is preparation for compiler storage support on the experimental branches.
+
+The author clarified that structural types are fully introspectable runtime types
+in the intended model, represented through signatures rather than separate nominal
+declarations: tuples (later), unions, intersections and functions. Arrays retain
+Array<T> backing. Present opt-in/storage/reflection restrictions are implementation
+gaps rather than limits on the meaning of a structural type.
+
+
+### Imported composition source locals — 2026-10-14
+
+The experimental composition-call option now admits initialized Raven locals and
+local copies whose exact type comes from an imported composition-producing function.
+Portable lowering retains the producer symbol; the native adapter allocates the
+local from its original metadata result descriptor, avoiding nominal normalization.
+Flat unions/intersections, closed generic bounds and reference wrappers execute.
+Unsafe union narrowing, default emission and PE projection still reject before output.
+General authored structural storage, instance bodies and async state-machine fields
+are not enabled by this slice. Runtime Contract settings and CLI encoding are unchanged.
+This follows ordinary typed-local/definite-assignment semantics with a native structural
+signature; it does not introduce a CLI carrier. Existing semantic type/hover identity
+is reused, so syntax and TextMate grammar need no changes.
+
+Validation: the paired runner passes fourteen interpreter consumers, including flat
+and generic local/copy cases and both wrapper kinds. Wrapper fixture output identity
+now matches its compilation, so its local check reaches the intended emission path.
+
+
+### Cross-assembly Task composition transport — 2026-10-14
+
+The experimental native reader now retains closed composition arguments on external
+reference wrappers. Callable import resolves the wrapper against an explicit exact
+snapshot catalog and validates its declaration; no ambient dependency loading occurs.
+Raven supplies that catalog from registered metadata dependencies. Ordinary readers
+and CLI projection remain closed. This extends the existing native signature model,
+without a bridge carrier or Runtime Contract change.
+
+The new Task probe compiles a nominal provider using the real System.Runtime
+Task/Promise implementation, then constructs an experimental native signature fixture
+for Task<Response | HttpError | JsonError>. A Raven source-local/copy consumer executes
+and returns 42. The nominal control selects the library's Object and async identities
+explicitly. An async Main binds its await and reaches the separate generated-field
+storage boundary; this checkpoint does not claim await execution. Runtime calls and
+state-machine field storage are the next slice. Existing host composition controls
+and API snapshot checks pass. Website proposal status remains accurate.
+
+Run `verify-task-await.py --raven <companion> --inputs <matching-native-bundle>` from
+the structural-compositions experiment directory (or use its full path). Build the
+runtime with experimental-compositions first. Validation records input hashes and
+both source revisions; the development bundle is an explicit input, not a published
+capability claim.
+
+
+### Raven composition await delivery — 2026-10-14
+
+The experimental compiler now retains an imported composition contract through source
+locals, constructed Task calls and heap async-state-machine fields. Storage is enabled
+only from exact output-owned imported result signatures; a semantic symbol cannot
+invent a new native composition or silently replace a different raw descriptor after
+nominal normalization. The option also applies to synthesized declaration/body plans.
+Default compilation and CLI projection remain rejected without publishing output.
+Reader gating now inspects fields and owned methods as well as free functions.
+
+The host's explicit EnableExperimentalCompositionStorage(producer) registers the closed
+reference compositions in that imported result. Registered descriptors can be used for
+instance fields of reference classes, locals, native signatures and generic substitution.
+Value-type/static composition fields, compound managed-reference parameters and arbitrary
+unregistered composition authoring remain rejected. The experimental native reader
+round-trips reference-class fields and nongeneric owned signatures; unresolved external
+intersection bounds still reject because finality cannot be established by that reader.
+
+The runtime admits direct composition fields on reference classes and nongeneric managed
+reference-class methods/constructors. It reuses existing typed stores, object tracing and
+heap async lowering, as ordinary nominal Task<T> does. Compound field addresses reject
+both in verification and unchecked execution. No scheduler, Task implementation, boxing
+carrier, metadata schema or CLI bridge encoding is introduced. This extends the earlier
+research-backed native signature design; unlike CLR metadata, the field/argument type
+can retain a structural union directly. The cost is an experimental compiler/metadata/
+runtime contract that portable CLI tools cannot consume.
+
+The real Task provider is built from nominal Raven code and transformed into a native
+composition-signature fixture. Consumers are compiled directly from Raven using inferred
+locals and await; no post-emission consumer rewriting occurs. Tests cover completed and
+queued pending delivery of Response, HttpError and JsonError. Each keeps its result alive
+across a second pending await, then verifies the concrete alternative. Error alternatives
+are successful Task payloads, not Task faults. Source-authored structural Task return
+syntax, full open generic composition support, guest reflection and JIT/AOT remain outside
+this checkpoint. Runtime Contract selection explicitly names System.Runtime for Object
+and async ownership; no defaults or published bundles change.
+
+Normalized nominal symbols that no longer uniquely retain the raw composition are
+rejected for synthesized storage; their existing exact-descriptor call transport
+remains available. This avoids treating normalization as permission to erase bounds.
+
+
+Validation for the await slice: all seven Task transport/delivery programs return 42;
+all six await programs reject null payloads and verify the expected concrete alternative.
+All fourteen earlier POC consumers remain byte-identical after final recompilation, so
+their executable evidence is reused. Thirty-six composition runtime tests, ten Task
+controls, three default-off checks, the host composition-import checks, twenty-seven
+async-lowering tests and the API documentation snapshot check pass. The runner records
+exact Core/System/runtime and generated-artifact hashes in validation.json.
+
+A separate .NET control, PortableDefaultReceiverTests.ReadOnlyFieldReceiverUsesDefensiveCopy,
+returns 3 instead of 2. It also fails after restoring the two shared portable compiler
+files to the pre-slice revision (4d34e3505); this is not reported as a passing control.
+Its general readonly-receiver behavior is deferred for independent reproduction/fix on
+Raven main and deliberate carry-forward, outside this structural-type experiment.
+No website build was needed; published capability status remains unchanged.
+
+### Union classification split (2026-10-14, experimental branch)
+
+Author direction reserves TypeInfo.IsUnion for structural unions. NominalTypeInfo
+now exposes IsUnionDeclaration for UnionAttribute-based declaration classification.
+Nominal callers must obtain the nominal view and use that helper; Option/Result
+declarations and their cases are not structural unions. Other nominal-helper
+reorganization remains separate work.
+
+The existing TypeShape runtime service keeps nominal marker slot 10 and adds
+structural identity slot 14. Native lowering admits the extra slot but continues to
+reject composition metadata; its currently admitted nominal/Function shapes return
+false for slot 14. Match the new source library to this runtime/backend. There is
+no CLI signature encoding or compiler Runtime Contract selection change. Guest
+composition handle creation remains gated independently of the predicate semantics.
+
+The aggregate CLI assembly is only the temporary compiler/documentation reference.
+Both that reference and native rendered API snapshots are regenerated. The obsolete
+CLI runtime-slice generator cannot refresh Descriptors: it encounters the existing
+Type-versus-TypeInfo bootstrap mismatch, then missing ArrayReflection slice input
+and obsolete stream capability validation when tried with temporary adaptations.
+Those adaptations were reverted; no stale output is represented as freshly generated.
+Qualification uses matching source-built native libraries and migrated consumers.
+
+## Composition descriptor interfaces — 2026-10-14 experimental branch
+
+UnionTypeInfo and IntersectionTypeInfo extend TypeInfo with a Types sequence of
+direct constituent descriptors. The source providers share RuntimeTypeInfo's handle
+and relationship semantics. Internal TypeConstituents returns scoped TypeInfo array
+snapshots; shape slot 15 identifies intersections (14 remains structural union).
+Use matching native System.Runtime sources and the experimental interpreter.
+There is no carrier/token invention: compound handles retain signature identities.
+Member, hierarchy and attribute queries explicitly fault for direct compositions.
+
+The native consumer uses explicit placeholder-token substitution, because current
+Raven typeof(A | B) emits a nominal Union<A,B> token. This does not establish source
+authored structural typeof support. Native metadata/compiler token emission is the
+replacement; compiler and runtime maintainers own that integration. The ordinary
+.NET target remains unchanged. Legacy descriptor bootstrap remains blocked by the
+previously recorded stream/array/typeof bridge gaps; its providers are not qualified.
+JIT/AOT composition execution remains gated. See the
+[probe](experiments/composition-type-info/README.md) for reproducible validation.
+
+2026-10-14 author-directed experiment: companion Raven now emits opt-in source union signatures to standalone NEOX, with native Task result delivery and reflection validated. See [source union evidence](experiments/source-structural-unions/README.md). This does not enable published/default builds or JIT/AOT.
+
+## Source union and intersection signatures — 2026-10-14
+
+The companion Raven branch now uses `RavenNeoClrStructuralCompositions=true` to
+emit ad hoc unions and intersection storage directly into native NEOX signatures.
+Declared unions stay nominal. Ordinary .NET and default native behavior stay intact;
+CLI projection is unavailable for this opt-in output. Unlike CLR signatures, native
+composition signatures retain runtime structural identity without carrier types.
+The cost is an experimental native-only interoperability contract.
+
+Source union Task delivery passes all three alternatives with native await state
+machines. Source intersections pass parameter/result/local trait dispatch and
+introspection, including closed wrapper generic identity. Both kinds round-trip
+through public source libraries and separately compiled consumers (result 42).
+Raven semantic validation passes 86 focused tests; closed/value intersection bounds
+reject while sealed hierarchies remain valid. Generic method specialization,
+open native generic compositions, mixed source nesting and JIT/AOT remain gated.
+Owners are `codex/neoclr-union-intersection` and `codex/structural-union-intersection`.
+Evidence: `docs/experiments/source-structural-unions` and
+`docs/experiments/source-structural-intersections`, including runners and hashes.
+This supersedes earlier source-authoring/type-token gaps, not other runtime limits.
+
+Constraint follow-up, 2026-10-14: companion Raven checks structural union/intersection generic arguments and recursively substitutes bound parameters. The native interpreter accepts closed compound TypeBound metadata; the host adapter and Raven native emitter still reject these constraint declarations. No CLI weakening or carrier replacement is used. See [scope and validation](experiments/composition-constraints/README.md).
+
+Native metadata inspection follow-up, 2026-10-14: the host C# metadata library now
+preserves structural method bounds on explicitly opted-in native reads and exposes
+`MethodDefinition.TypeConstraints` / `MethodGenericParameterTypeInfo.GetTypeConstraints`.
+The previous nominal-interface queries fail explicitly for structural bounds.
+No CLI encoding or carrier is introduced. `RavenNeoClrStructuralCompositions`
+remains the compiler opt-in; compiler constraint emission/import still needs wiring.
+The host reader and introspection layers own this slice on the paired experimental
+branches; JSON/binary roundtrip, grouping, invalid operands and nominal compatibility
+pass focused metadata tests. No new runtime bundle is required or claimed.
+
+Native authoring follow-up, 2026-10-14: `MethodBuilder.AddExperimentalStructuralConstraint`
+writes closed local method bounds directly to native TypeBound signatures. Native
+interpreter execution of the authored fixture returns 42; focused checks cover
+full union coverage, intersections, closed generics and late-bound revalidation.
+The host metadata library owns this step. There is no CLI encoding; external bounds,
+open forwarding and compiler emission/import remain pending. The existing explicit
+Raven structural Runtime Contract switch and paired experimental branches remain
+unchanged. No runtime library bundle change is required.
+
+Raven emission follow-up, 2026-10-14: the companion experimental branch now calls
+the native method-bound authoring API for closed local structural source constraints.
+Union bounds retain any-of grouping; multiple local conjunctive bounds become an
+intersection signature. The source probe executes with result 42 and checks native
+metadata, invalid intersection arguments and the default backend gate. This requires
+the existing structural opt-in and native metadata library; no CLI projection or
+runtime bundle change is introduced. Native import and external/open bounds remain
+pending. See Raven's `tools/NeoClrMetadataProbe/StructuralConstraintChecks.cs`.
+
+Native constraint import follow-up, 2026-10-14: the metadata library explicitly
+imports constrained generic free functions from exact native snapshots, preserving
+all bounds and checking supplied arguments at construction, call emission and graph
+serialization. Raven maps complete bounds into symbols, includes constraint-only
+compositions in profile detection, and uses this native import contract. The
+symbol-only fallback rejects constrained calls instead of dropping their bounds.
+The source library/consumer probe returns 42, including closed `Response<A> | B`
+bounds; invalid imported arguments reject. The metadata-level consumer also returns
+42. Default/CLI gates remain closed, with no bridge approximation or new runtime
+bundle. Open operands/forwarding, generic-body trait calls, class-parameter constraints
+and constrained instance-method imports remain pending on these experimental branches.
+
+Closed-bound forwarding follow-up, 2026-10-14: the native metadata checker now proves
+forwarded method arguments from all recorded caller bounds. This admits local Raven
+generic wrappers over union/intersection constraints and nominal-to-intersection
+forwarding when all traits are guaranteed. Missing/weak guarantees reject at call
+emission and serialization; no CLI encoding or new Runtime Contract switch is added.
+The metadata and Raven forwarding fixtures return 42, including a separately
+compiled consumer invoking the exported wrappers. This does not admit open bound
+operands, owner-parameter forwarding, external-bound authoring or generic-body traits.
+
+Generic-body trait follow-up, 2026-10-14: Raven’s local intersection-constrained
+method bodies can call owned nongeneric instance interface contracts. The metadata
+builder proves the trait from the structural bound, and the runtime verifier admits
+it using intersection-any/union-all guarantees before existing borrowed callself
+dispatch. A Raven body calling both constituent interfaces returns 42. No syntax,
+Runtime Contract switch, CLI encoding or runtime bundle change is introduced. Default
+profiles retain rejection. External/constructed constrained targets, owner-parameter
+authoring and more general open bounds remain outside this bounded slice.
+
+
+2026-10-14 imported trait dispatch checkpoint: the explicit native composition
+profile now admits completed imported nongeneric interface methods through a
+structurally constrained method parameter. The receiver remains a managed parameter
+reference, encoded with borrowed `callself`. Every union alternative must guarantee
+the requested interface; intersections can supply it through nominal inheritance.
+Nominal-only static calls retain their existing validation. The Raven
+`--structural-constraints` probe compiles `TraitLibrary.neox` separately, then emits
+`ExternalTraits.neox` whose local `LocalA & LocalB` bounds inherit the imported
+interfaces. Its two method calls return 40 + 2 = 42 in the native interpreter.
+This adds no CLI carrier or metadata schema: default composition rejection remains.
+Direct external structural-bound authoring, constructed interface targets under
+structural bounds and open bound operands remain pending. The host metadata emitter
+owns admission; Raven retains its existing imported-interface emission path.
+
+
+Closed constructed trait targets (2026-10-14): native structural method bounds now
+also authorize imported constructed interface calls when their closed guarantees
+prove the exact target construction. `Reads<int>` does not prove `Reads<string>`;
+every source-union alternative must prove the requested construction. Existing
+nominal/Self constrained calls retain their prior path. Raven's `ConstructedTraits`
+probe inherits `ImportedReads<int>` through a local intersection constituent and
+calls it using the existing borrowed native dispatch. No CLI encoding is added.
+Direct external structural-bound authoring and open operands remain unsupported.
+
+
+The [closed-reference POC acceptance runner](experiments/structural-poc/README.md)
+consolidates the current feature-branch contract and records compiler/runtime/library
+hashes. Source Task delivery now includes both completed and queued union results;
+all alternatives are checked after native `await`. No temporary CLI representation
+is introduced. The acceptance contract separates implemented method constraints
+and host inspection from pending guest constraint reflection and full open generics.
+
+
+Nominal interface contract (author clarification, 2026-10-14): intersections make
+existing nominal interfaces composable. Types must explicitly implement those
+interfaces, directly or through declared inheritance. Structural identity belongs
+to the union/intersection signature; it does not introduce member-shape matching,
+implicit conformance or Rust-style traits. References to “traits” in earlier probe
+notes describe guaranteed interface capabilities, not a separate runtime trait
+system. A future compiler-level feature simulating trait characteristics is an
+exploratory possibility, not an implementation commitment or a runtime contract.
+
+
+## External union constraint alternatives — 2026-10-14 development
+
+The native `MethodBuilder.AddExperimentalStructuralConstraint` API now accepts
+output-owned imported closed reference alternatives in union bounds, including
+constructed interfaces such as `ImportedReads<int> | ImportedReadsB`. Constraint
+metadata retains the external type identity and exact generic arguments. Argument
+checks continue to require explicit nominal implementation/inheritance, with every
+source-union alternative covered. Matching member names are insufficient.
+
+Raven uses its existing explicit native structural-composition capability contract;
+no CLI carrier, schema change or new compiler switch is introduced. Its constraint
+probe emits `TraitLibrary.neox`, then `ExternalBoundLibrary.neox` with these bounds,
+then a separate `ExternalBoundConsumer.neox`. Import resolution requires both exact
+native dependencies. Host tests reject mismatched constructed arguments, partially
+covered unions and direct external intersection operands; source diagnostics reject
+nonimplementing lookalikes and arguments satisfying neither alternative.
+
+External bounds beneath any intersection remain rejected by this method-authoring
+API: the current snapshot reader cannot establish their extension eligibility
+without resolving external definitions. This is a reader/authoring gap, not a
+permanent type-system restriction. Local intersections and existing nominal/Self
+contracts are unchanged. Open operands, guest constraint reflection and JIT/AOT
+remain outside this slice. Compared with CLR constraints, the native signature
+preserves disjunction rather than changing it into a conjunctive nominal list.
+
+
+## Resolved external intersection bounds — 2026-10-14 development
+
+Native method intersection bounds now admit imported closed reference types after
+importing their definition snapshots. The composition factory checks CLR-style
+finality and reference/value classification; a Raven closed hierarchy remains a
+valid bound because its hierarchy flag is distinct from finality. Interfaces remain
+nominal and require explicit implementation or declared interface inheritance.
+Matching member shape does not establish conformance.
+
+`AssemblyDefinition.ReadNativeAssembly(image, allowExperimentalCompositions,
+IAssemblyResolver? resolver)` resolves each external intersection operand against an
+explicit exact-identity assembly snapshot. It checks the named definition, enclosing
+scope and generic arity, rejects final/value definitions, and caches resolved
+snapshots for the duration of the read. The two existing overloads remain available;
+without a resolver, external intersections fail closed. Default composition opt-in
+and native runtime verification are still required. Bodies remain opaque; this API
+does not load executable assemblies or infer interface implementation from members.
+
+Raven's experimental catalog snapshots only the selected paths, then retries
+unresolved images as selected dependency snapshots become available. Returned
+references retain host input order. Missing dependencies, invalid metadata and cycles
+that prevent external-intersection validation fail explicitly; ordinary nominal
+cycles do not acquire a new resolver requirement. No adjacent assembly search occurs.
+The explicit native composition capability now admits closed conjunctive interface
+constructions in method bounds. Only intersection operands request definition-backed
+admission; ordinary .NET and nominal emission remain unchanged.
+
+The probe builds an interface library, a constraint library with
+`T: ImportedReads<int> & ImportedReadsB`, and a separate consumer. Its generic body
+calls both interfaces. The catalog is supplied in reverse dependency order, and the
+negative consumer has matching methods but omits one required interface declaration.
+This replaces the earlier external-intersection authoring restriction for the closed
+profile. Open operands, generic owner constraint emission, guest constraint reflection
+and JIT/AOT qualification remain follow-up work. Like CLR nominal interfaces, declared
+relationships govern membership; unlike a CLR constraint list, native metadata also
+retains structural grouping and an introspectable intersection signature.
+
+The intersection-only Raven reader also provides
+`ReadExperimentalIntersectionAssembly(image, bootstrap, resolver)` for callers that
+supply dependency snapshots directly instead of using a catalog. It uses the same
+external-operand eligibility checks and preserves method-bound grouping, while still
+rejecting unions in exposed signatures or bounds. Its existing overload remains
+available and rejects unresolved external intersections. The structural-constraint
+probe checks the direct reader, missing-resolver rejection and union-profile rejection.
+No Runtime Contract setting, CLI encoding or nominal conformance rule changes.
+
+Validated with Raven `9f06b4ecb`: `NeoClrMetadataProbe --structural-constraints`
+against `target/composition-info-libraries-v2`, writing artifacts to
+`target/intersection-reader-constraints`. The direct-reader profile checks and
+existing source/import constraint checks pass. This reader-only follow-up does not
+change emitted code or runtime execution; the preceding external-intersection
+consumer result remains the runtime evidence.
+
+## Structural tuple migration — 2026-10-14 development
+
+The author directs replacing neoCLR's nominal Tuple family with structural tuples.
+The first native slice adds an ordered Tuple signature node, roundtrip preservation
+and nested generic/Self substitution. That initial metadata-only slice rejected
+executable structural tuples; the follow-up below adds opt-in interpreter values.
+Raven still binds/emits existing tuples through nominal field/constructor
+mappings; ordinary .NET ValueTuple behavior and Runtime Contract configuration are
+unchanged. No temporary CLI encoding is introduced. The native replacement requires
+runtime storage and positional operations, TupleTypeInfo, host authoring/import and
+carrier-independent compiler lowering before removing nominal neoCLR declarations.
+The runtime owns the signature/value work; Raven owns binding/lowering and import.
+Focused Rust structural-tuple tests cover the metadata stage; existing source tuple
+consumers remain the evidence for the still-nominal executable path.
+
+The next runtime slice admits closed structural tuple values only with the explicit
+`experimental-tuples` Cargo feature. Native aggregate construction and positional
+field operations use synthesized ItemN members and existing value storage, preserving
+copying and reference-element lifetimes without a nominal tuple declaration. Default
+runtime and JIT/AOT paths reject these signatures. Runtime Contract settings and
+Raven source emission remain unchanged; compiler wiring must follow native host
+signature authoring/import and tuple introspection. This is not a CLI bridge encoding.
+
+
+### Structural tuple guest descriptors — 2026-10-14
+
+The native runtime now provides `System.Introspection.TupleTypeInfo.ElementTypes`
+through a dedicated TypeTupleElements service and provider dispatch. Ordered element
+snapshots preserve duplicates and nested tuples. This requires `experimental-tuples`
+and matching reference/source-library artifacts. Runtime Contract configuration and
+ordinary .NET tuple lowering are unchanged; no CLI carrier encodes this identity.
+The Raven consumer uses one explicit native type-token fixture, so this is guest
+reflection validation, not structural tuple source emission. Native C# authoring/import,
+Raven lowering and nominal Tuple removal remain follow-ups owned by the runtime and
+compiler integration work.
+
+Runtime-library validation uses compiler revision
+`793219d855b17f01fb805e215968b78871eb3804`; the experimental branch currently misparses
+existing `(flags & flag)` in GZipDecoder as an intersection type. Record this as a
+deferred general parser candidate; do not change valid bitwise source to hide it.
+
+
+### Native tuple signature authoring — 2026-10-14
+
+The companion metadata builder exposes `CreateExperimentalTuple` and an immutable
+ordered `SignatureType.Tuple` descriptor. Native writing preserves nested/repeated
+positions without a nominal Tuple definition; typed echo signatures and tuple tokens
+are validated by an interpreter fixture returning 42. CLI projection rejects these
+outputs. Runtime Contract settings and ordinary .NET tuple behavior are unchanged.
+Native C# reading/import, positional-operation authoring and Raven tuple lowering
+remain subsequent integration slices; the compiler does not call this factory yet.
+
+
+### Native tuple snapshot/import boundary — 2026-10-14
+
+The companion C# metadata layer now exposes `ReadExperimentalTupleAssembly` and
+`ImportExperimentalTupleReference`. Ordered tuple signatures survive snapshots,
+callable import and native consumer emission, including closed nominal generic
+elements. External definitions use explicit exact-identity resolution. Ordinary and
+composition-only readers/importers remain unchanged and reject tuple contracts.
+CLI projection remains rejected; Runtime Contract settings are unchanged. The separate
+native consumer returns 42 and verifies tuple-forwarding signatures. This does not
+claim Raven tuple lowering or C# tuple value-construction/element APIs are implemented.
+
+
+### Native tuple value authoring — 2026-10-14
+
+The companion metadata `IILGenerator` adds `NewTuple`, `LoadTupleElement` and
+`StoreTupleElement`. They emit structural aggregate creation and indexed elements,
+with exact stack typing and owned signature/index checks. Store returns an updated
+copy: Raven lowering must assign that value explicitly when replacing a local.
+The separate consumer executes nested construction, imported echo, reads and copy
+update with result 42. No nominal carrier, constructor or FieldDef is introduced.
+Runtime Contract configuration and ordinary .NET lowering are unchanged; CLI output
+still rejects tuple admission. Managed-address authoring and Raven lowering remain.
+
+
+### Source-local tuple lowering — 2026-10-14
+
+The experimental Raven host option `NeoClrEmitOptions.AllowExperimentalTuples`
+(default false) admits tuple literals, parameters/results, locals/copies and named
+or positional reads for scalar and nested tuple elements. Native output uses Tuple
+signatures, aggregate construction and positional loads, without a nominal tuple
+TypeDef/constructor/field. The tuple capability does not enable composition calls.
+There is no new CLI/project property; Runtime Contract configuration is unchanged.
+Ordinary .NET ValueTuple emission is unchanged. Unlike .NET's nominal carrier and
+name attributes, the intended neoCLR contract stores names directly in native
+metadata while preserving positional type equality and compatibility.
+
+This slice still binds through the configured nominal tuple family. Source-local
+names work, but the current native Tuple node stores element types only: preserving
+names across metadata import and reflection is required follow-up work, not completed
+by this slice. Do not remove the nominal family yet. Native compiler imports,
+element mutation/address lowering, non-scalar elements, tuple arrays/byref parameters
+and open generic tuple elements remain outside this compiler profile.
+
+Validation: `NeoClrMetadataProbe --source-tuples <bundle> <output>` emits a nested
+tuple consumer using named reads and copies; the matching experimental interpreter
+returns 42. The probe checks ordered native signatures, absence of a local nominal
+tuple declaration, default rejection, and atomic rejection of mutation/open tuples.
+The source composition regression also passes. The runtime library fixture is
+`target/tuple-info-libraries-v2` from compiler
+`793219d855b17f01fb805e215968b78871eb3804`; the emitting compiler is the dedicated
+`codex/neoclr-union-intersection` branch, runtime `codex/structural-union-intersection`.
+
+
+### Native tuple names: runtime boundary — 2026-10-14
+
+The companion Rust runtime now stores optional names directly in native tuple
+signatures and exposes them through per-signature host descriptors. Native metadata
+roundtrips and generic/Self substitution preserve names; structural equality, hash
+and resolved type identity remain positional. Renamed parameter signatures execute
+with result 42. Unnamed tuples retain the original array encoding; named shapes use
+an object payload with `elements` and `names`, requiring matching readers.
+
+Raven's current source-local tuple slice still emits unnamed shapes. C# builder/reader
+name support, Raven emission/import and guest name queries remain pending. Runtime
+Contract settings, CLI projection and ordinary .NET behavior are unchanged. Avoid
+losing descriptive names by interning signatures solely on structural identity.
+
+
+### Native tuple names: C# and Raven emission — 2026-10-14
+
+The C# tuple builder now accepts ordered optional names; native writing, experimental
+reading and callable import preserve them recursively. Names remain excluded from
+SignatureType/TupleSignature equality and hashing. Per-signature descriptors retain
+different names on structurally equal parameters and results; admission sets do not
+intern away those names. Unnamed encoding remains compatible, and the explicit
+experimental reader/CLI-output gates remain in place.
+
+Raven's existing `NeoClrEmitOptions.AllowExperimentalTuples` host opt-in now emits
+element names directly in native Tuple payloads. It emits each bound element's
+effective name, including default `ItemN` names. A parameter `(left: int, right: int)`
+and result `(x: int, y: int)` retain their respective names and remain type-equal.
+No name attributes or nominal carriers are emitted. Runtime Contract settings and
+ordinary .NET behavior are unchanged; no CLI/project option is added.
+
+The C# separate producer/consumer and Raven source-local consumer both execute with
+result 42 on the matching `experimental-tuples` runtime. Checks cover recursive name
+preservation, rename equality/hash, immutable input, invalid names/serialized shapes,
+ordinary-reader rejection and unsupported-source gates. Raven native tuple import
+and guest name queries still require separate implementation. Nominal tuple symbols
+remain a binding dependency; tuple mutation/open elements remain outside this
+compiler profile. The tested library bundle remains `target/tuple-info-libraries-v2`
+from compiler `793219d855b17f01fb805e215968b78871eb3804`; emitting compiler and runtime
+remain on their dedicated structural feature branches.
+
+
+### Raven native tuple import — 2026-10-14
+
+`NeoClrMetadataReference.ReadExperimentalTupleAssembly(image, bootstrap, resolver)`
+now reads named native tuple contracts for semantic import. Register the reference,
+its matching primitive bootstrap and dependencies explicitly; this does not add a
+project/catalog flag or admit compositions. Default native readers still reject
+tuples. Emission of this reference requires `AllowExperimentalTuples`; without it
+the emitter reports NEOMETA001 before output. Imported nongeneric tuple-bearing free functions use the exact
+reader snapshot through `ImportExperimentalTupleReference`, preserving names and
+preventing a signature-erasing fallback.
+
+C# `Introspection.TupleTypeInfo` projects ordered element types and names into Raven
+tuple symbols. Parameters `(left: int, right: int)` and results `(x: int, y: int)`
+retain different names but compare structurally equal. A separate native producer
+and consumer exercise nested named tuples, string elements, local reads and calls;
+the interpreter returns 42. Ordinary-reader and disabled-emitter rejection are
+covered, alongside an ordinary generic function in the same library. Runtime Contract settings and ordinary .NET behavior remain unchanged.
+
+The bounded compiler profile supports scalar/nested tuples with the configured
+nominal tuple family still supplying binding symbols. Open elements, tuple mutation,
+carrier-independent symbols, project/catalog integration and guest reflection name
+queries remain follow-ups. The matching fixture uses `target/tuple-info-libraries-v2`
+from compiler `793219d855b17f01fb805e215968b78871eb3804`, with the current structural
+feature branches for emitter and runtime.
+
+Deferred general candidate: calling `Compilation.GetAssemblyOrModuleSymbol` on a
+new compilation before reference initialization exposed a NullReferenceException.
+This slice reads that symbol after the emit pipeline has initialized references;
+it does not claim to fix or validate the cold assembly-query API. A general fix
+should be validated independently on Raven main before deliberate carry-over.
+
+### Guest tuple name reflection — 2026-10-14
+
+`System.Introspection.TupleTypeInfo.ElementNames: Sequence<string>` now exposes
+ordered effective native names, using ItemN for unnamed positions. The runtime
+queries the retained signature descriptor, not its name-free resolved identity.
+Consequently equal tuple types can report different names; nested descriptors keep
+their own names. Snapshots are independent. Identity-only reconstructed handles
+report positional defaults. Unlike .NET TupleElementNamesAttribute, these names
+live directly in native signature metadata; the cost is carrying descriptive data
+separately from canonical type identity. The effective-name guest API intentionally
+does not distinguish an explicit ItemN from its default; host APIs retain that detail.
+
+This requires `experimental-tuples` and matching rebuilt source libraries. It adds
+no Runtime Contract flag or CLI encoding; ordinary .NET output is unchanged. The
+native TypeTupleNames runtime service backs the source provider. CLI reference
+bindings exist only for compiler/documentation bootstrap. The guest fixture tests
+two equal renamed native tokens, nested names, unnamed defaults and 180 repeated
+queries per signature. The fixture isolates reflection from source tuple lowering.
+
+Validation uses `target/tuple-names-libraries-v2` built with compiler
+`793219d855b17f01fb805e215968b78871eb3804`, the existing explicit primitive bootstrap,
+and the structural runtime branch. See
+[guest name evidence](experiments/structural-tuples/name-info-results.json).
+Tuple mutation, carrier-independent Raven symbols and project/catalog opt-in remain
+separate follow-ups.
+
+### Native local tuple mutation — 2026-10-14
+
+With `AllowExperimentalTuples`, assignments to named or positional elements of a
+local tuple now lower to native updated-copy stores. Nested paths rebuild each
+containing tuple and write back the root local; earlier copies remain unchanged.
+The RHS is evaluated once before reading the root for reconstruction, preserving
+any RHS changes to sibling elements. Ordinary .NET emission is unchanged. This
+uses native Tuple signatures and StoreTupleElement, with no CLI carrier encoding.
+
+The bounded profile accepts local-rooted paths. Parameter/field/property/array-rooted
+mutation, managed element addresses and open elements remain unsupported and fail
+before publishing output. Binder mutability rules still apply. Runtime Contract
+settings are unchanged; the existing explicit experimental emitter gate is required.
+
+Validation: `NeoClrMetadataProbe --source-tuples` covers direct and nested writes,
+named/positional reads, preserved copies and unsupported parameter mutation. The
+TupleMutation consumer returns 42 in the interpreter with `tuple-names-libraries-v2`
+(compiler `793219d855b17f01fb805e215968b78871eb3804`). The pre-change source tuple probe
+passes; focused .NET tuple semantic/emission checks guard the ordinary target.
+
+### Native tuple binding without nominal carriers — 2026-10-14
+
+The explicit neoCLR Runtime Contract now offers
+`MetadataImportOptions.UseStructuralTuples` (default false) and immutable
+`WithStructuralTuples(bool enabled = true)`. With this option, tuple syntax and
+native tuple imports produce structural symbols directly; they never look up or
+construct System.Tuple. Native tuple emission now requires both this binding option
+and `NeoClrEmitOptions.AllowExperimentalTuples`. Existing experimental hosts must
+add `WithStructuralTuples()` to their metadata import options. Non-neoCLR targets
+reject this option; CLI emission rejects the structural profile before output.
+There is no project/catalog switch yet. Ordinary .NET and the legacy CLI bridge
+keep their existing nominal tuple representation.
+
+The native symbol has TypeKind.Tuple, no UnderlyingTupleType, assembly ownership,
+metadata declaration name, constructors, inherited nominal members or interfaces.
+Ordered TupleElements carry native names; ItemN aliases remain available for source
+access. TypeArguments is empty: elements are not generic carrier arguments. Tuple
+identity/hash uses ordered recursive element types, ignores names, and remains
+distinct from nominal tuples. Substitution preserves the native shape and names.
+Semantic lookup/display uses these fields directly; no syntax or TextMate change
+is needed. This is the semantic counterpart of the existing native signature API,
+not a new CLI transport.
+
+Compared with .NET ValueTuple, the benefit is no arity-specific declaration or
+attribute-name dependency. The cost is a dedicated structural symbol and explicit
+identity/substitution handling. Native mutation requires a mutable local root;
+immutable let roots and nonlocal roots reject before output. A general review of
+value-type field writes through immutable bindings belongs on Raven main; this
+slice enforces the native writeback boundary without changing .NET policy.
+
+Validation covers carrier-free factory construction with no references, positional
+identity/hash (including nested/repeated types), type-parameter substitution, member
+names/display, target rejection, CLI rejection, source/import symbols, and separate
+interpreter consumers. A nine-element tuple executes and mutates without any
+System.Tuple`9 declaration; it returns 42. Nested mutation/copy and imported tuple
+consumers also return 42 using `tuple-names-libraries-v2`. Focused ordinary .NET
+tuple tests retain the existing carrier behavior.
+
+This removes Raven's nominal backing dependency for the native structural profile.
+It does not delete the old tuple declarations from the runtime library or CLI
+bootstrap: those remain for existing bridge consumers pending bundle migration.
+Open-element emission, nonlocal mutation, managed element addresses and broader
+backend support remain separate work.
+
+[Carrier-free symbol validation](experiments/structural-tuples/symbol-results.json) records the focused tests and executable consumers.
+
+## Native project integration — 2026-10-15 development
+
+On the structural feature branches, ordinary `rvnc neoclr --project` builds now
+enable unions, intersections and structural tuples together. Catalog loading,
+project-reference identity checks, semantic imports and native emission preserve
+all three in the same library. `RavenNeoClrStructuralCompositions` and
+`RavenNeoClrStructuralTuples` default to true; explicit false retains reduced
+profiles, and malformed values fail. Ordinary .NET compilation is unchanged.
+Low-level host APIs retain explicit admission switches; direct source CLI tuple
+compilation uses `--structural-tuples`.
+
+The default neoCLR Cargo build includes both structural feature flags. Their
+legacy experimental names remain available for reduced-profile validation with
+`--no-default-features`. Native project `--run` selects the interpreter when the
+tuple profile is enabled. JIT/AOT support is still absent; this is development
+integration, not a claim of complete backend or open-generic support.
+
+Names remain native tuple metadata and do not affect positional compatibility.
+Intersections still require explicit nominal conformance. Unlike CLR ValueTuple
+and attribute-based names, this profile uses native signature nodes without a
+nominal tuple carrier. This requires coordinated compiler/runtime versions and
+has no CLI projection. Legacy runtime tuple declarations remain for older consumers.
+
+Validation: the separate library/app sample in neoCLR
+`docs/experiments/structural-tuples/project` imports and calls union/intersection
+functions and mutates a named tuple while preserving its earlier copy (exit 42).
+Default-feature Rust tuple, composition and constraint tests pass (16 + 38 + 5).
+The sample currently uses the matching `target/tuple-names-libraries-v2` bundle,
+whose source-library compiler revision is
+`793219d855b17f01fb805e215968b78871eb3804`. Rebuilding that bundle with the current
+compiler remains blocked by the recorded bitwise/intersection parser regression.
+Full source-library migration, nonlocal tuple mutation and broader element forms
+remain follow-ups; this slice does not remove those limits.
+
+### Intersection parser correction — 2026-10-15
+
+The feature-branch parser now distinguishes `(flags & flag) != 0` (and
+arithmetic/member-access continuations) from `(Named & Located)value`.
+The correction applies only to intersection cast candidates, preserving nominal
+cast behavior. Seventeen intersection syntax tests pass, including seven new
+regressions. No Runtime Contract setting changes in this slice.
+
+A fresh source-library rebuild passes the previous syntax failure and reaches
+native emission, then fails with `output image exceeds limit`. The structural
+emitter currently calls the 4 MiB application JSON writer before library binary
+encoding. It needs the bounded 32 MiB library writer path; the existing validated
+bundle remains the sample dependency. This supersedes the parser-blocked status
+in the preceding integration entry, without claiming a successful fresh bundle.
+
+### Native structural library writer — 2026-10-15
+
+Structural emission now calls the new authored-graph overload of
+`NativeModuleContainer.WriteLibraryBinary`, preserving graph validation while
+using the existing 32 MiB library JSON budget and 16 MiB binary bound.
+Application limits are unchanged. No CLI projection is introduced.
+The default Runtime Contract profile remains the same as the preceding slice.
+
+A fresh build with the corrected compiler passes System.Runtime, System.Data and
+System.Networking, including retained runtime-seed generation. System.Web fails
+semantic conversion checks in JsonClientOperations: HttpError/JsonError widening
+and Result case/error propagation involving a structural error union. A complete
+new bundle has **not** been produced. The sample continues using the known older
+bundle; full source-library migration cannot be declared complete. See neoCLR
+`docs/experiments/structural-tuples/library-build-results.json` for commands,
+artifact hashes and exact failing diagnostics. These results supersede the writer
+size blocker above.
+
+### Value and reference union alternatives — 2026-10-15 development
+
+The author explicitly requires unions to support value and reference alternatives;
+reference-only admission was a POC limitation, not the language contract.
+Intersections retain their explicit nominal interface/extendable-reference rules.
+The Web build's HttpError and JsonError declarations are nominal **value** unions,
+so a conversion-only fix would not suffice. The source compiler has not been
+relaxed to accept values it cannot yet emit.
+
+The first runtime slice admits closed nominal records and scalar value alternatives
+in structural unions. Explicit `box` followed by checked `castclass union<...>`
+retains the native union signature and payload identity; `unbox.any` checks the
+exact value type and returns a copy. Reference alternatives keep their existing
+reference behavior. Direct unboxed stores remain invalid. Mixed union constraints
+recognize exact scalar alternatives; whole-union coverage remains required.
+Value types remain invalid intersection operands.
+
+This is an interpreter representation choice, not a nominal Union declaration or
+a new inheritance relationship. It reuses existing heap/GC/boxing support. Like
+[CLR boxing](https://learn.microsoft.com/en-us/dotnet/csharp/programming-guide/types/boxing-and-unboxing),
+boxing copies a value into heap storage and unboxing copies it out. The benefit
+is reuse of checked payload identity and GC traversal; the cost is allocation and
+unboxing, so this is not a claim of an optimal layout. Inline tagged storage is a
+possible future backend choice, with copy/identity semantics to preserve.
+
+This slice does not complete Raven authoring/import/conversion, generic value
+wrappers such as Result, intrinsic String/array/function alternatives, tuple
+alternatives, open types or JIT/AOT. It retains the current reference-container
+null/default behavior; a general union default-value policy remains to be settled.
+The fresh System.Web bundle remains blocked until compiler/host and generic
+value-wrapper integration are completed.
+
+Formatting remains a separate design question. The author proposed duck-typed
+ToString because a union has no nominal declaration for an override. The assistant
+proposed dispatching to the actual payload's ordinary ToString as the default;
+no formatting rule or duck-typing feature is implemented by this slice.
+
+Validation: `cargo test --test structural_compositions --test composition_constraints`
+passes 41 composition and five constraint tests with the default feature profile.
+The three new runtime tests cover mixed alternatives, copy-preserving extraction,
+wrong boxed membership, explicit boxing requirements and invalid value intersections.
+Existing constraint tests now cover scalar alternatives and reject incomplete unions.
+
+## Value union source integration — 2026-10-15 development
+
+Structural unions are value types regardless of their alternatives, with no nominal
+base type. Guest reflection and Raven symbols now report that classification.
+The native metadata host admits closed scalar and nominal value alternatives,
+including imported values, alongside reference alternatives. Intersections retain
+nominal reference/interface operands and explicit interface conformance.
+
+Raven native conversion lowering boxes exact value alternatives and explicitly
+unboxes on extraction. Reference alternatives preserve their references. Pattern
+lowering distinguishes semantic value classification from the current interpreter
+payload storage. Native projects use their existing structural composition
+capability; ordinary CLI encoding is unchanged and has no structural carrier.
+The runtime owns payload storage, the metadata host owns signature validation,
+and the compiler owns conversion and pattern lowering.
+
+This boxed interpreter representation is provisional. It incurs allocation for
+value payloads and does not define the future native ABI. Inline tagged storage,
+GC scanning, copy costs and specialization require measurement and design. A
+method does not require a body per active alternative; generic specialization can
+depend on the complete instantiated type, not merely its size.
+
+Validation: four structural union symbol/conversion tests, focused host authored
+composition/read/constraint checks, runtime value-category reflection, and the
+combined union/intersection/tuple consumer pass. The full metadata harness reports
+169/175: Object-root authoring, Int32 local ownership and four custom-attribute
+checks remain failing and have not been attributed to a baseline. System.Web now
+passes the earlier conversions but stops at native emission of
+`TryGetResidual(out HttpError | JsonError)`. Generic value-wrapper/byref integration,
+open alternatives and native JIT/AOT remain incomplete; no fresh full library bundle
+is delivered by this slice.
+
+## Direct structural managed parameters — 2026-10-15 development
+
+Native Raven calls now preserve managed-reference wrappers around direct structural
+union/intersection parameters. Admission requires both structural composition calls
+and managed references in the target capability contract. The metadata host validates
+owned direct composition targets and preserves them through native read/write;
+ordinary CLI projection remains rejected. This follows .NET ref/out slot semantics
+while extending their element types to native structural signatures.
+
+The interpreter permits local addresses and exact indirect reads/writes of these
+slots. Replacing a union payload leaves a previous union copy unchanged, and invalid
+payload writes fail verification and execution. Nominal interface conformance still
+controls intersection views. Managed-reference composition fields, nested wrapper
+addresses, argument-address emission, JIT/AOT and generic value wrappers remain
+outside this slice. This is interpreter storage support, not a finalized native ABI.
+
+Validation: all 44 structural composition runtime tests pass, including union
+replacement/copy preservation, invalid-write rejection and intersection dispatch.
+The host authored-composition roundtrip passes and default reads reject the signature.
+The native compiler build passes; the editable value-union sample tests out/ref
+writeback and returns 42. System.Web passes its former TryGetResidual(out union)
+emission boundary but now fails resolving `delegate T0 -> TResult` in Int32Emitter;
+a full fresh library build remains incomplete. The earlier full metadata harness
+result (169/175) is unchanged evidence, not a rerun for this slice.
+
+## Structural callback mapping — 2026-10-15 development
+
+Native callback mapping now preserves structural elements already admitted by the
+selected compilation capability profile. Previously, body planning admitted these
+shapes but the mapper retried the narrower shared profile, treating the callback
+as a nominal delegate and failing dictionary lookup. The native mapper now uses
+its structural mapping surface; admission remains owned by planning and explicit
+target options. Ordinary CLI emission is unchanged. Compared with CLR delegate
+transport, neoCLR retains its structural Function signature without introducing a
+nominal delegate declaration.
+
+Native host reads/materialization preserve union/intersection elements inside
+Function signatures when composition reading is enabled. The interpreter admits
+exact nongeneric callback bindings without composition-bearing owners and validates
+function parameter/result storage. A direct callback returning `int | Other`
+executes with result 42. The union itself remains a value; a reference alternative
+carries a reference. The current boxing representation does not change that contract.
+
+Validation: 46 structural runtime tests pass, including exact-target rejection;
+the host callback signature roundtrip and native compiler build pass. The editable
+callback sample returns 42. A fresh source build now produces Runtime, Data,
+Networking and Web in `target/structural-integrated-libraries-v3`; its build evidence
+records the compiler working revision and bootstrap inputs. Building the four
+libraries does not establish execution of generic value wrappers or a release-ready
+bundle. Callback variance/adapters, generic composition callback targets and native
+JIT/AOT remain unvalidated or restricted. See the value-union experiment evidence
+for the separate bundle qualification result.
+
+Fresh bundle qualification: the HTTP-header consumer rejects the selected native
+metadata graph before emission with “Selected native metadata cannot be resolved;
+an image is invalid or a structural signature dependency is missing or cyclic.”
+The underlying invalid image/dependency is not yet isolated. This is the next
+integration blocker; successful library generation is not execution evidence.
+
+## Generic structural declaration reads — 2026-10-15 development
+
+Native declaration reads now preserve bounded structural arguments inside nominal
+value wrappers and managed generic method signatures. The former reader gate
+confused declaration introspection with the narrower execution profile and rejected
+System.Web's Result<T, HttpError | JsonError> signatures. Open union constituents
+remain rejected; a scoped parameter in a nominal wrapper is preserved as before.
+Execution and callable import still apply their own validation. Default reads and
+CLI projection remain restricted. This extends native signature metadata beyond CLR
+signatures while retaining nominal generic definition identity.
+
+The catalog now reports the path and reader error for each unresolved selected
+image without searching for dependencies. Focused authored metadata tests preserve
+a generic method's scoped parameter and structural argument in a value wrapper.
+The fresh v3 bundle HTTP-header consumer now emits; execution next rejects generic
+composition methods at the runtime surface gate. No runtime support is claimed by
+this reader slice.
+
+## Fresh bundle consumer qualification — 2026-10-15 development
+
+The interpreter now admits nominal value wrappers containing structural arguments,
+including scoped generic parameters outside the closed union/intersection operands.
+Structural admission follows static/instance generic calls and callback targets
+through substitution with the caller's parameter scope, retaining a bounded,
+deduplicated call graph. Function signatures and the runtime's existing inhabited
+Void value can be nominal generic arguments. Void remains invalid as a direct
+union alternative; this is neoCLR's existing unit-value contract, unlike CLR void.
+
+Managed local addresses and exact indirect operations support constructed wrappers.
+Replacement preserves earlier value copies. Callback owner substitutions are checked
+even when the callback's own parameter/result shape has no composition. Unsupported
+instructions introduced by substitution still reject. Nominal interface conformance,
+sealed-class intersection rules, field-address restrictions and native JIT/AOT gates
+remain unchanged. Union containers remain values independently of payload category.
+
+The fresh v3 Runtime/Data/Networking/Web bundle now compiles and executes the
+HTTP-header consumer, printing `HTTP header lookup checks passed` with exit 0.
+The reproducible project qualification also rejects invalid Object ownership before
+replacing the successful output. This qualifies that consumer against all four
+libraries, not every Web endpoint or every generic structural type form. Focused
+runtime checks cover value-wrapper copies, generic factories, callbacks, nested
+function arguments, inhabited unit arguments and rejection after substitution.
+Evidence and artifact hashes are saved in
+`docs/experiments/value-unions/fresh-bundle-qualification.json`.
+
+## Awaited structural error results — 2026-10-15 development
+
+The fresh v3 bundle consumer in `docs/experiments/value-unions/task-project`
+awaits `Task<Result<Response, HttpError | JsonError>>`. It covers success, imported
+HTTP errors and imported JSON errors through both `Task.FromResult` and queued
+`Task.Run`, then extracts and checks each payload. All six paths return the
+expected value; the application exits 42. Runtime Contract configuration comes
+from the v3 bundle's `NeoCLR.ClassLibrary.props`.
+
+Native emission already produces `unbox.any` with a union signature when a
+nominal generic carrier exposes its Object-stored payload. The interpreter now
+admits this instruction for validated closed unions, reusing its concrete payload
+membership check. Focused tests cover boxed scalar and reference alternatives and
+reject an unrelated object. The structural runtime suite passes 54 tests.
+
+Unlike CLR `unbox.any` on a nominal value, this experimental union extraction
+restores a structural view after checking membership. Its benefit is working
+nominal generic carriers with native structural signatures; its cost is reliance
+on the interpreter's temporary boxed payload representation. It does not establish
+an exact boxed-union identity or final ABI. Explicit `box union<...>` remains gated;
+JIT/AOT layout and native boxing remain follow-ups owned by the runtime/backend
+work. Nominal interface conformance remains explicit. No compiler mapping or
+ordinary .NET behavior changes in this slice. Evidence is recorded in neoCLR's
+`docs/experiments/value-unions/task-results.json`.
+
+## Direct task union reference extraction — 2026-10-15 development
+
+The native structural conversion classifier now allows an explicit cast from a
+union to an exact reference alternative. Previously it allowed exact value
+extraction but rejected `Response | HttpError | JsonError` to `Response`.
+Conversions guaranteed by every alternative remain implicit; an unrelated
+reference destination remains rejected. Source diagnostics and the public
+conversion model share this decision. No syntax or editor grammar changes are
+needed. Native lowering uses the existing checked reference conversion, preserving
+the payload reference; the union itself remains a value.
+
+This applies to structural symbols selected by the neoCLR Runtime Contract and
+`WithStructuralCompositions` capability. Ordinary .NET union carriers are not
+changed. The .NET comparison is a checked explicit reference cast, but its source
+here is a native structural signature rather than a nominal base reference.
+The compiler owns classification/emission; the runtime owns membership checks and
+its temporary boxed payload storage. Whole-union boxing, exact boxed-union identity
+and final native JIT/AOT layout remain separate work.
+
+The interpreter also follows structural method arguments on nominal calls with no
+structural owner or value parameter, such as the generated await bridge's
+`Cancel<T>()`. It validates the substituted nonvirtual managed body using the
+existing bounded call graph. This does not bypass unsupported operations introduced
+by substitution.
+
+Open `Response<T> | HttpError | JsonError` inside a generic declaration remains
+rejected by native metadata encoding: `composition requires bounded closed
+constituents`. The editable negative probe is `open-generic-project` under neoCLR's
+`docs/experiments/value-unions`. Closed instantiation at a call site does not make
+that open declaration supported. Open composition operands require a coordinated
+metadata, compiler and runtime substitution slice. Direct closure capture of a
+union local also remains unsupported by native emission; capturing a nominal
+reference and constructing the union in the callback is a separately tested path.
+
+Validation: 21 focused compiler conversion/source tests and 55 structural runtime
+tests pass. The fresh v3 direct `Task<Response | HttpError | JsonError>` and closed
+`Task<Response<int> | HttpError | JsonError>` consumers both exit 42. Each checks
+completed, queued and async-forwarded success/HTTP/JSON alternatives, plus reference
+identity after queued delivery. The open-generic probe fails with the documented
+metadata diagnostic. Commands, revisions and hashes are saved in neoCLR's
+`docs/experiments/value-unions/direct-task-results.json`; all three editable projects
+use the v3 bundle props. These results do not qualify all library endpoints or
+open composition forms.
+
+## Scoped nominal constituents — 2026-10-15 development
+
+Native signatures now admit scoped generic parameters inside nominal union and
+intersection constituents, such as `Response<T> | HttpError | JsonError`. The host
+checks ownership and bounded argument forms when constructing the signature, then
+checks the actual method/type parameter scope at its use site. Native reads retain
+those indices. Owned and imported generic-method call signatures use recursive
+composition substitution; constructed-owner call signatures substitute owner and
+method parameters. The assembler binds parameters recursively through compositions,
+and runtime validation retains the declaring signature context rather than treating
+an open nominal constituent as closed.
+
+This extends the existing Runtime Contract structural capability; no temporary CLI
+carrier or ordinary .NET behavior changes. Relative to CLR generic nominal signatures,
+parameter scope/substitution remains familiar, but the enclosing union/intersection
+is a native structural type. Interface conformance and extendable intersection
+bounds remain nominal. Bare `T | Error` operands, symbolic structural constraints,
+closure capture of union locals and final boxing/layout remain separate work.
+
+The former negative `open-generic-project` now compiles and returns 42 against the
+fresh v3 bundle. The host authoring/roundtrip checks and 58 structural runtime tests
+pass, including wrong-scope rejection, method/owner substitution and generic
+intersection execution. Evidence is in neoCLR's
+`docs/experiments/value-unions/open-generic-results.json`. The earlier rejection in
+`direct-task-results.json` is historical evidence. This slice validates interpreter
+execution; AOT/JIT support is not implied.
+
+## Native tuple backend qualification (2026-10-15)
+
+The companion runtime structural branch now lowers admitted tuple signatures to
+inline native slots without a nominal carrier. Runtime commit `4fe78429b` adds
+macOS ARM64 AOT copying, nested element mutation/addresses, default initialization,
+call/return handling and reference tracing recipes, bounded to 256 flattened slots.
+Subsequent direct JIT tests execute two- and sixteen-integer copy/call workloads.
+Both AOT workloads generate byte-identical code to equivalent nominal records;
+measured direct JIT costs are also comparable. Evidence and exact tool hashes live
+in neoCLR's `docs/experiments/native-structural-types/`.
+
+Runtime Contract structural tuple configuration, native metadata names and Raven
+emission/import semantics are unchanged. Ordinary .NET continues to use its normal
+nominal ValueTuple mapping; the legacy neoCLR CLI carrier remains a temporary
+compatibility path. No new bridge encoding is introduced. The backend can consume
+structural tuple signatures directly, but full compiler-produced managed applications,
+collector stress, tuple boxing/reflection and Windows still need qualification.
+Native union and intersection backend support remains incomplete. These runtime
+results do not qualify every matching Raven bundle or authorize merging the
+experimental branches into their main tracks.
+
+## Native intersection reference views (2026-10-15)
+
+The companion runtime backend admits bounded intersection signatures as one
+reference slot. All bounds retain explicit nominal conformance; checked casts and
+interface dispatch preserve the original object. AOT/interpreter comparisons cover
+identity, nulls, managed output slots, missing bounds and extendable class/interface
+bounds, with final-class rejection before native emission. Failed intersections
+report InvalidCast consistently. See neoCLR's native-structural-types experiment
+for the exact source and qualification scope.
+
+Runtime Contract settings and Raven native signature emission/import are unchanged;
+no CLI carrier or duck-typed member matching is introduced. Dedicated intersection
+JIT/collector stress, native reflection and full compiler-produced applications
+still need validation. Native union storage remains a backend blocker.
+
+## Native reference-alternative unions (2026-10-15)
+
+The companion runtime backend now admits unions of nominal reference alternatives
+as structural values carried in one payload reference slot. Native selection and
+specialization preserve the union signature; membership accepts any alternative,
+while implicit extraction requires every possible alternative to fit the target.
+Copies preserve payload identity and allocate no union carrier. This physical slot
+does not make the union a nominal reference type.
+
+Runtime Contract configuration and Raven emission/import are unchanged. AOT tests
+compare calls/results, managed outputs, nulls and casts against interpretation with
+both, either or neither interface explicitly implemented. Whole-union boxing is
+rejected before payload-reference projection could erase structural identity.
+Native mixed-value alternatives still need tagged storage and a conversion path
+that avoids the existing early scalar-box projection. Native reflection, arrays,
+JIT/collector stress and complete Task consumers are not qualified by this slice.
+See neoCLR's `docs/experiments/native-structural-types/` for sources and boundaries.
+
+## Native scalar-union allocation elision (2026-10-15)
+
+The structural runtime feature branch now lowers unions containing only Int32,
+Int64 and Boolean to a private tag plus numeric payload. An exact adjacent scalar
+box/union-cast pair avoids allocating a box. Copies, calls/results, output slots,
+default null checks and exact extraction are covered by focused macOS ARM64 AOT
+checks against the interpreter; numeric lanes are excluded from tracing and these
+closed objects have no allocator/runtime imports (C memory intrinsics are permitted).
+
+No Runtime Contract setting, Raven syntax or metadata encoding changes. Ordinary
+Object boxing retains its existing behavior. The runtime backend owns this native
+replacement of the bounded boxed source conversion; immediate union local/argument
+loads or casts are supported extraction producers. Mixed reference/value unions,
+nominal value alternatives, scalar-union instance tests and general extraction
+producers remain gated. Whole-union boxing, native reflection, JIT/GC stress and
+full Task consumer qualification are still required before main-track integration.
+See neoCLR's native structural experiment for scope and reproduction tests. The
+private two-slot representation is not a published ABI or a general timing claim.
+
+## Native scalar-union pattern test sequence (2026-10-15)
+
+The structural runtime backend now lowers an immediate union load/cast followed
+by `isinst Int32`, `Int64` or `Boolean` and `ref.isnull` to an inline tag comparison.
+Raven's existing TypeTest emission already has this shape; compiler metadata and
+Runtime Contract settings are unchanged. The temporary test token cannot escape,
+be duplicated or become a GC root. Nominal Object queries still use their boxed
+path. Focused AOT/interpreter tests cover all three alternatives, false Boolean,
+wide Int64, mismatches and null, with no allocator imports or arena use.
+This qualifies the runtime instruction sequence, not a fresh full Raven pattern
+application. Mixed payloads, compound test targets and broader producers remain
+open. See the structural lowering/runtime operations guides for the current map.
+
+## Raven-produced scalar-union pattern consumer (2026-10-15)
+
+A fresh consumer of the retained structural-integrated-libraries-v3 bundle now
+emits real `int | long | bool` signatures and typed match arms with guards,
+same-type fallbacks and a result join. The interpreter and macOS ARM64 AOT both
+return 42 after six checks, including wide Int64 and false Boolean. Disassembly
+confirms the expected scalar type tests/extractions; the native object has no
+undefined imports and the host reports no fault or arena use. Compiler/runtime
+hashes, checkout revisions, bundle labels and reproducible commands are retained
+in neoCLR's `docs/experiments/native-structural-types/` consumer/evidence.
+No Runtime Contract or compiler emission change was needed for this slice. This
+qualifies one source-local consumer, not mixed payloads, imported union-returning
+calls, JIT/GC stress or full integration. A direct less-than comparison guard
+followed by a later greater-than guard exposed a separate parser candidate; the
+consumer uses named guard functions. Independent Raven
+main reproduction remains deferred; this is not a new structural-type restriction.
+
+## Imported scalar-union consumer (2026-10-15)
+
+A separately emitted native Raven library now qualifies `int | long | bool`
+returns and echo parameters against an artifact-only consumer. Reordered source
+alternatives retain compatible structural identity. Six inputs cover both Boolean
+values, wide/small Int64 and negative/positive Int32 before guarded matching.
+Interpreter and macOS ARM64 closed-world AOT return 42, with no undefined native
+imports, faults or arena use. No compiler emission or Runtime Contract change
+was necessary. The native layout remains private, not an external C ABI.
+Reproduction and artifact hashes are recorded in neoCLR's
+`docs/experiments/native-structural-types/scalar-import-project/README.md` and
+`raven-scalar-import-results.json`. The v3 library bundle is retained, not freshly
+rebuilt; mixed payloads, JIT/collector stress and full Task applications remain open.
+
+## Mixed scalar/reference native unions (2026-10-15)
+
+The runtime now admits bounded Int32/Int64/Boolean unions with selected nominal
+reference alternatives, using separate tag, numeric and reference slots. Scalar
+injection clears the traced reference slot; exact scalar patterns avoid boxing.
+Nominal reference admission/extraction, calls, out copies, replacement and null
+are checked against the interpreter. The native fixture's arena contains only
+explicit objects, without union carriers or scalar boxes. Object views requiring
+scalar boxing, and injection from Object requiring payload classification, remain
+rejected, as do intrinsic String and nominal-value payloads.
+Runtime Contract settings and Raven emission/import are unchanged. The companion
+`docs/experiments/native-structural-types/mixed-union.neoil` and focused
+`mixed_union` tests document the private layout and its tradeoff: an extra slot
+for unambiguous reference tracing. Fresh mixed Raven application, JIT/collector
+stress and throughput qualification remain open; this is not an external C ABI.
+
+## Raven mixed-pattern consumer (2026-10-15)
+
+A fresh Raven `int | long | bool | Response` parameter and typed match now qualify
+against the retained v3 library bundle. Six scalar inputs exercise guards and
+fallbacks; the reference input reads Response.Code. Interpreter and macOS ARM64
+AOT return 42. The native object imports only `neoclr_allocate_object_v1`, and the
+host observes exactly 16 arena bytes for the explicit Response, with no scalar
+boxes or union carriers. No compiler emission or Runtime Contract change was
+needed. neoCLR's `docs/experiments/native-structural-types/mixed-pattern-project/`
+and `raven-mixed-pattern-results.json` retain reproduction and artifact evidence.
+The bundle is retained, not rebuilt. Imported mixed calls, nominal value payloads,
+managed JIT/collector stress and full Task/throughput qualification remain open.
+
+## Imported mixed-union qualification (2026-10-15)
+
+The fresh mixed Raven consumer now also crosses an artifact-only library boundary:
+seven calls each to Produce and Echo preserve scalar/reference alternatives,
+including reordered parameter/result signatures. Response and its Code property
+are imported from the library artifact. Interpreter and macOS ARM64 AOT return
+42 with exactly 16 arena bytes for the explicit Response allocation; the only
+native import is the object allocator. Compiler emission and Runtime Contract
+configuration are unchanged. neoCLR's mixed-import-project and
+raven-mixed-import-results.json retain reproduction and both artifact hashes.
+The v3 bundle remains retained. General payload layouts, managed JIT/collector,
+boxing, throughput and full Task qualification remain open.
+
+## Imported closed-generic mixed union (2026-10-15)
+
+A separately emitted Response<T> class with a stored Number: T property now
+qualifies as Response<int> inside an imported `int | long | bool | Response<int>`
+union. Produce/Echo calls preserve all seven inputs and reordered alternatives.
+The consumer's reference arm reads 42 from the generic field and adds one, making
+its expected 43 distinct from scalar 42. Interpreter and macOS ARM64 AOT finish
+with 42 and exactly 16 arena bytes for the explicit object. No emission, import
+or Runtime Contract change was necessary. neoCLR's generic-mixed-import-project
+and raven-generic-mixed-import-results.json record sources, commands and artifact
+hashes against the retained v3 bundle. This qualifies a closed generic reference
+alternative, not bare T alternatives, all open generic methods/constraints,
+nominal-value payloads, boxed views, managed JIT/GC or full Task/throughput work.
+
+## Native nominal value-record unions (2026-10-15)
+
+The runtime now lowers closed nominal value-record unions, optionally including
+Int32/Int64/Boolean, to a tag plus disjoint inline payload regions. Exact adjacent
+box/cast injection copies the active payload and clears inactive regions without
+allocating a box. Extraction and type tests use exact nominal identity; record
+copies preserve embedded reference identity and recursive tracing offsets. The
+sum-of-alternatives layout includes the tag in its 256-lane limit. This increases
+copy/storage costs compared with overlapping regions; no throughput claim is made.
+Interpreter/macOS AOT fixtures cover copies, returns, out parameters, floating and
+wide fields, null/wrong extraction and embedded object identity with only explicit
+object allocation. Object restoration now also covers unbox-only verification.
+Compiler emission and Runtime Contract configuration are unchanged. neoCLR's
+native-structural-types record-union and record-reference-union fixtures document
+the tests and boundaries. Fresh Raven record-union consumers, direct reference
+alternatives alongside records, enums, boxing, managed JIT/GC and full Task
+qualification remain open.
+
+## Imported Raven value-record union consumer (2026-10-15)
+
+A separately compiled Response struct with stored Int32/Int64 fields now qualifies
+inside `int | long | bool | Response`. The artifact-only consumer makes seven
+calls each to Produce and Echo, preserving reordered alternatives, wide payload
+bits and a distinct guarded record-pattern result. Interpreter and macOS ARM64
+AOT return 42; the native object has no undefined imports, and arena use/faults
+are zero. No compiler emission or Runtime Contract change was required. neoCLR's
+record-import-project and raven-record-import-results.json retain reproduction,
+both artifact hashes and the retained v3 bundle labels. The private disjoint
+layout still trades copy/storage costs for simple tracing; throughput, direct
+reference alternatives alongside records, enums, boxing, managed JIT/GC and full
+Task qualification remain open.
+
+### Native record/reference union storage (2026-10-15)
+
+The structural experiment backend now admits direct nominal reference alternatives
+beside inline value records. Native signature emission and Runtime Contract
+configuration are unchanged. Checked reference views use actual nominal
+conformance; scalar/record queries retain exact identity. See the
+[native qualification](experiments/native-structural-types/README.md#direct-reference-alternatives-beside-records-2026-10-15).
+Boxing projections, compact layouts and managed JIT/GC qualification remain open.
+
+
+The [fresh Raven record/reference consumer](experiments/native-structural-types/record-reference-import-project/README.md)
+now passes eight imported inputs in interpreter and AOT with only the explicit
+HttpError object allocation (16 bytes). It uses the unchanged native Runtime
+Contract and compiler emission with a retained v3 bundle; the result does not
+qualify managed JIT/GC or full Task execution. Evidence fingerprints all inputs.
+
+
+### Closed generic record pattern identity (2026-10-15)
+
+The [closed-generic record/reference consumer](experiments/native-structural-types/generic-record-reference-import-project/README.md)
+now passes nine imported inputs in interpreter and AOT, preserving distinct
+Response<int>/Response<long> identities and substituted fields with only the
+explicit HttpError allocation (16 bytes). It exposed a general Raven reachability
+bug fixed on the main-based branch in f7a4bc5a4 and carried to the native compiler
+as df02f07ad; each line passed 195 match/identity tests. The native compiler was
+rebuilt, but the v3 class-library bundle was retained. Runtime Contract and
+emission are unchanged. Open generics, managed JIT/GC and throughput remain
+unqualified by this consumer; the native layout is still private and bounded.
+
+
+### Reference-valued generic record alternative (2026-10-15)
+
+The [Response<Cell> imported consumer](experiments/native-structural-types/reference-generic-record-import-project/README.md)
+passes ten inputs through the seven-alternative native union. Copying the record
+preserves shared mutation of its embedded Cell. Interpreter/AOT agree (42) and
+only explicit HttpError/Cell objects allocate (32 bytes). Native signatures,
+Runtime Contract and compiler emission are unchanged; no temporary encoding was
+added. Tools, fresh library/consumer artifacts and retained v3 bundle are hashed.
+The arena does not collect objects, so managed JIT/GC and broader open generic
+qualification remain separate blockers.
+
+
+### Bounded native union collector stress (2026-10-15)
+
+[Native collector stress](experiments/native-structural-types/README.md#native-collector-stress-for-union-roots-2026-10-15)
+now exercises the backend's union root publication with record-held references,
+direct reference alternatives and scalars across calls and fault unwind. Eight
+invocations per case/pacing mode run in a 1024-byte heap, retain only the union
+path to the live object, and require full reclamation after frame removal. The
+reference behavior is checked with the interpreter. This uses eager/paced
+nonmoving AOT collection, without changing Raven emission, metadata or Runtime
+Contract. Fresh Raven consumers still have arena-only evidence; JIT and async
+retention remain separate qualification work.
+
+
+The [fresh reference-generic Raven consumer](experiments/native-structural-types/reference-generic-record-import-project/README.md#native-collection-run)
+now also passes collection-enabled AOT: 32 invocations in each eager/paced mode,
+1792/64 collections respectively, exactly 64 explicit allocations reclaimed per
+mode, and empty root chains/heaps after each return. The runner hashes native GC
+sources and uses an explicit hook allowlist. The class-library bundle is retained;
+compiler emission, metadata and Runtime Contract are unchanged. JIT lifetime,
+async retention and broader structural compositions remain unqualified.
+
+## 2026-10-15 — Callable alternatives in structural unions
+
+The runtime interpreter now admits function signatures as union alternatives and
+retains an explicit union view on callable values. Exact narrowing restores the
+callable signature without rebinding or losing its receiver. Focused runtime tests
+cover metadata round-trip, calls/returns/locals, receiver collection, null and wrong
+shape checks; invocation without narrowing and callable intersection bounds remain
+rejected. This extends native metadata interpretation, not the CLI carrier bridge.
+Runtime Contract configuration and Raven emission are unchanged. The runtime owns
+admission/storage; Raven source qualification and native JIT/AOT layout/tracing are
+still required before advertising this combination as integrated compiler support.
+
+## 2026-10-15 — Native callable union storage
+
+The runtime's native backend now stores bounded function alternatives in tagged
+value-union regions with callable-specific tracing. AOT tests compare interpreter
+results for calls/copies, receiver retention under eager/paced collection, null,
+scalar replacement and wrong signatures. Exact allocation counts exclude a union
+carrier allocation. Function binding still allocates its standard descriptor.
+Runtime Contract configuration, Raven mapping and CLI carrier encoding are
+unchanged. The runtime owns native layout/tracing; Raven source qualification,
+native Object widening and JIT lifetime remain open. See neoCLR's
+`docs/experiments/native-structural-types/README.md` for the executable fixture,
+limits and reproduction. These are feature-branch results, not main support.
+
+## 2026-10-15 — Host metadata callable-union parity
+
+The C# metadata builder and native reader now admit function alternatives in
+unions, including nested structural callable results. Reference-cast stack
+validation recognizes callable values. This closes the NEOMETA003 authoring
+blocker found by a Raven callable-union library repro. Host authoring/reader tests
+cover round-trip and narrowing; native source-consumer qualification continues
+separately. No Runtime Contract or CLI encoding change is introduced. The runtime
+and compiler remain on their structural feature branches.
+
+Validation for the host-metadata slice: authored-composition and reference-reader
+checks pass. The broader host suite reports 169/175 versus 168/175 on an untouched
+copy of the prior branch. The six remaining inherited failures cover Object-root
+expectations, local-contract expectations and custom-attribute fixtures; they are
+not reported as passing or as callable-union regressions.
+
+## 2026-10-15 — Imported Raven callable-union patterns
+
+A separately compiled Raven library/consumer now passes callable/scalar union typed
+patterns, invocation and AOT collection. Host metadata recursively imports callable
+constituents into consumer ownership and admits function IsInstance targets. Raven's
+shared planner permits typed callable patterns only with AllowsFunctionValues;
+ordinary .NET defaults are unchanged. Native signatures remain Union/Function;
+there is no CLI-carrier or Runtime Contract change. Validation: host authoring/import
+checks, 78 focused compiler tests, interpreter exit 42 and 32 AOT invocations per
+eager/paced collector mode with exact allocation counts and sanitizers. The retained
+v3 libraries are not a fresh bundle; JIT and bundle qualification follow separately.
+See `docs/experiments/native-structural-types/callable-import-project/README.md`.
+
+### Fresh Task union native qualification (2026-10-15)
+
+Both `Task<Response | HttpError | JsonError>` and
+`Task<Response<int> | HttpError | JsonError>` now pass fresh Raven compilation,
+interpreter execution, macOS ARM64 AOT and managed JIT against the rebuilt v4
+class libraries. Each entry checks ten completed, queued and async-forwarded
+alternative/identity paths and returns 42. For each consumer, eager and paced
+collector policies each pass eight AOT entries with undefined/bounds sanitizers
+and one managed JIT entry. The 64 KiB host checks task/socket scopes, roots and
+heap cleanup before generated code release.
+
+This closes the bounded Task delivery gate after structural generic arguments,
+reserved arrays, record fields and managed record methods were admitted. It does
+not qualify escaped callbacks, unrestricted open generics, other architectures,
+exact allocation counts or union throughput. The JIT host is not sanitizer-built.
+Runtime Contract configuration and native signature encoding are unchanged; no
+CLI carrier replacement is introduced. Runtime/storage owns the newly admitted
+operations; Raven continues emitting native structural signatures.
+
+Evidence and reproducer: [native structural experiments](experiments/native-structural-types/README.md).
+
+### Structural overload lookup identity (2026-10-15)
+
+Native structural union/intersection signatures now contribute recursively encoded,
+order-independent constituent identities to method/property lookup keys. Structural
+tuples contribute ordered element identities and ignore element names. Nested
+compositions inside nominal generic arguments retain those distinctions. Previously
+these signatures could share an empty nominal metadata name, causing lookup to
+silently discard an overload before ranking. Incomparable union overloads now
+remain candidates and report ambiguity in either declaration order; exact and
+strict-subset overloads retain normal preference.
+
+The semantic tests use native structural symbols with host reference assemblies;
+they establish lookup/ranking, not native execution. Generic and tuple identity
+checks cover reordered unions/intersections, distinct closed arguments and renamed
+versus reordered tuple elements. Two inherited assertions were updated to the
+established contract that a union is always a value, including reference variants.
+This changes compiler lookup only: Runtime Contract configuration and emitted native
+signature encoding are unchanged. Main's ordinary .NET carrier widening was fixed
+independently in `41abd72ea` and deliberately carried in `a854f086e`.
+
+### Exact native union widening (2026-10-15)
+
+Native unions now widen when every source alternative occurs exactly in the target.
+Raven emits an explicit structural conversion instead of treating union widening as
+an implicit no-op. AOT/JIT preserve compatible layouts directly and otherwise
+repack the tag and active payload into the destination's private layout. Numeric
+bits remain separate from traced reference slots, inactive banks stay zero, and
+inactive/default values remain inactive. No union carrier or box is allocated.
+This does not add payload-transforming conversions or general checked narrowing;
+unsupported alternative sets remain rejected before object emission.
+
+Validation covers scalar-to-scalar/mixed/record-union layouts, reordered record
+payloads and inactive values. Callable, mixed-reference and reference-only sources
+also widen across allocating calls under eager/paced collection. The collector
+fixtures reclaim exactly 656 allocations for callable cases and 648 for object
+cases per policy (eight entries), entirely from the existing explicit objects and
+pressure allocations. They add no allocation for widening.
+
+A fresh Raven consumer checks exact-over-wider overload selection, scalar-to-record
+union widening and record union widening/reordering. Interpreter, macOS ARM64 AOT
+and managed JIT each return 42 with zero arena use. AOT has no native imports and
+passes undefined/bounds sanitizers. JIT uses the required GC/stack host and checks
+roots/heap cleanup before returning; its host is not sanitizer-built. No Runtime
+Contract or metadata encoding change is introduced.
+
+## Nominal composition carrier retirement (2026-10-15)
+
+The Runtime source and ownership manifest remove `System.Union` arities 2–5 and
+`System.Tuple` arities 1–7. The generated nominal Tuple runtime slice is removed.
+Named Raven unions, their UnionValue protocol and UnionAttribute remain supported.
+Range returns named structural tuples, directly and in Result; consumers must be
+rebuilt because native signatures change. The paired Raven emitter maps imported
+structural tuple method results without nominal-owner lookup, and the C# metadata
+host admits tuple-bearing method references recursively. CLI projection remains
+rejected. Legacy reference-bridge fixtures are not native runtime declarations.
+
+The fresh five-library bundle builds, and an imported Range/Result consumer passes
+interpreter, macOS ARM64 AOT and managed JIT with zero arena allocation and AOT
+undefined/bounds sanitizers. Host authored-reference regressions pass. Tuple
+alternatives inside structural unions are still rejected by the authoring profile;
+this is an integration gap, not a permanent type-system rule.
+
+## Unified native metadata reads (2026-10-15)
+
+`AssemblyDefinition.ReadNativeAssembly(image, resolver)` and Raven's
+`NeoClrMetadataReference.ReadAssembly(image, bootstrap, resolver)` now read admitted
+nominal, union, intersection and tuple signatures together. The composition Boolean
+and separate experimental reader entry points are removed. `NeoClrReferenceCatalog.Read`
+and `ReadNative` no longer accept composition/tuple flags. Migrate callers to these
+normal APIs. Selected dependency resolution remains explicit and order-independent;
+missing, mismatched or non-extendable intersection bounds still reject. CLI projection
+remains a separate restricted contract, not a substitute native representation.
+
+Focused checks cover tuple authoring/import, union/intersection authoring/import,
+external structural constraints, source tuple mutation and source constrained library
+consumers. The legacy full metadata suite has six pre-existing failures around host
+core attribute limits and stale Object/local-budget expectations; these do not qualify
+as passing coverage and are tracked for integration cleanup.
+
+The metadata integration cleanup now passes all 175 host contract tests. The CLI
+reader's attribute row budget is 8,192 (boundary-tested); it accommodates the
+4,217-row valid test assembly without relaxing member or blob limits. Local-budget
+and direct-base-call tests now match existing behavior. This supersedes the earlier
+six-failure status above; native structural encoding and Runtime Contract are unchanged.

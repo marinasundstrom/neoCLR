@@ -1,0 +1,51 @@
+.module PairCost
+.type Pair
+.field F0 Int32
+.field F1 Int32
+.field F2 Int32
+.field F3 Int32
+.field F4 Int32
+.field F5 Int32
+.field F6 Int32
+.field F7 Int32
+.field F8 Int32
+.field F9 Int32
+.field F10 Int32
+.field F11 Int32
+.field F12 Int32
+.field F13 Int32
+.field F14 Int32
+.field F15 Int32
+.end
+.function Echo(Pair value) -> Pair
+ldarg value
+ret
+.end
+.function Main(Int32 value) -> Int32
+.local Pair pair
+ldarg value
+ldc.i4 0
+ldc.i4 0
+ldc.i4 0
+ldc.i4 0
+ldc.i4 0
+ldc.i4 0
+ldc.i4 0
+ldc.i4 0
+ldc.i4 0
+ldc.i4 0
+ldc.i4 0
+ldc.i4 0
+ldc.i4 0
+ldc.i4 0
+ldc.i4 2
+newobj Pair
+call Echo(Pair)
+stloc pair
+ldloc pair
+ldfld 0
+ldloc pair
+ldfld 15
+add
+ret
+.end

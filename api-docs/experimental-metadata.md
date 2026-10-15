@@ -1664,6 +1664,7 @@ Public static host class in `NeoCLR.Metadata.Experimental`:
 byte[] NativeModuleContainer.WriteBinary(ReadOnlySpan<byte> nativeImage);
 byte[] NativeModuleContainer.Read(ReadOnlySpan<byte> image);
 byte[] NativeModuleContainer.WriteLibraryBinary(ReadOnlySpan<byte> nativeImage);
+byte[] NativeModuleContainer.WriteLibraryBinary(AssemblyBuilder assembly);
 ```
 
 `WriteBinary` translates existing format-5 JSON values to a standalone NEOX envelope
@@ -8387,3 +8388,809 @@ flags; ordinary native managed methods have neither. This follows .NET's inspect
 API without treating Unmanaged, Native, NoInlining or other flags as implemented neoCLR
 features. Abstract methods must still be identified through IsAbstract; the absence
 of a foreign descriptor does not imply an executable managed body.
+
+
+## Read-only reference compositions (experiment, 2026-10-14)
+
+Unpublished, on `codex/structural-union-intersection`. These .NET host APIs are in
+`NeoCLR.Metadata.Experimental.Model`; they are not guest reflection types and do
+not change the generated RavenDoc snapshot.
+
+| API | Contract |
+| --- | --- |
+| `AssemblyDefinition.ReadNativeAssembly(ReadOnlySpan<byte> image, bool allowExperimentalCompositions)` | Copies a PE/#Neo or standalone NEOX image into an immutable native declaration snapshot. `true` explicitly admits the subset below; `false` and the existing one-argument overload reject compositions. Invalid/unsupported declarations or exceeded bounds throw `InvalidDataException`. |
+| `SignatureType.Composition : ReferenceCompositionSignature?` | The read-only compound descriptor, or null for other signatures and normalized singleton results. No public compound factory is provided. |
+| `ReferenceCompositionSignature.Kind : ReferenceCompositionKind` | `Union` means either-membership; `Intersection` means all-membership. These compose nominal contracts, not matching member names. |
+| `ReferenceCompositionSignature.Constituents : IReadOnlyList<SignatureType>` | Immutable normalized bounds, in first-occurrence order, retaining snapshot-owned nominal references. Same-kind nesting is flattened, equal bounds are deduplicated and singletons collapse. Mixed nesting remains. Nominal subtype reduction is deliberately absent. |
+| `ReferenceCompositionSignature.Equals(ReferenceCompositionSignature? other)`, `Equals(object? obj)`, `GetHashCode()` | Equality/hashing ignore constituent order and retain nominal scope/ownership through existing signature identities. Different kinds remain distinct; null compares unequal. This is snapshot signature identity, not a cross-catalog canonical identity API. |
+| `ReferenceCompositionSignature.ToString()` | Diagnostic kind/bound display; not an encoding, parser contract or stable identity. |
+
+Only nongeneric, non-native free-function parameter/result signatures and local
+signature declarations admit compositions. Each encoded compound has 2–256
+operands, at most 4,096 nodes per root and a depth limit of 32; existing transport
+limits also apply and may reject an image earlier. Leaves must be closed nominal
+reference classes/interfaces, including constructed generic types. Generic arguments
+may be closed nominal/value types, non-Void primitives or vectors; arity and existing
+nominal construction validation apply. Open arguments reject. Closed local unconstrained reference-class wrappers may
+contain composition arguments in the opt-in free-function profile; ordinary builder
+construction still rejects them.
+Primitive/value, array, byref, generic parameter,
+Function and Self leaves are rejected, as are compositions nested inside arrays,
+byrefs or function shapes, explicit fields, owned methods and native/InternalCall
+signatures. Validation
+precedes normalization, so collapsing duplicate bounds cannot hide an invalid leaf.
+External leaves retain the reader's existing declared dependency identity rules;
+this slice does not resolve external assemblies or prove runtime inhabitation.
+
+The descriptor is immutable: builder ownership validation and ordinary callable
+import reject it explicitly. The separate experimental callable-import API below
+admits a bounded native-only path. CLI projection of compound declarations remains
+rejected. `AssemblyDefinition.Write()` copies the original image byte-for-byte;
+it does not regenerate declarations or validate executable bodies. The native
+reader still treats bodies as opaque, and this API is not a runtime verifier.
+
+.NET/CLI has no equivalent first-class union/intersection signature. Reading the
+native shape preserves constituent information without inventing a carrier ABI;
+the cost is an explicit boundary before compiler import, authored storage and
+code generation. Raven's default adapter still rejects compound declarations. Its separate
+experimental intersection API now supports semantic inspection while rejecting
+structural unions and keeping native emission gated by default. An explicit host
+option now admits native-only forwarding between imported intersection calls. See the
+[experiment record](https://github.com/marinasundstrom/neoCLR/blob/codex/structural-union-intersection/docs/experiments/structural-compositions/README.md) for
+validation, remaining identity differences and the next compiler slice.
+
+The `NeoCLR.Metadata.Experimental.Introspection` facade exposes these loaded
+signatures through `MetadataLoadContext.ResolveSignature` and function result/
+parameter discovery. It performs catalog resolution without loading or executing
+assemblies. Missing dependencies or foreign snapshots throw `InvalidDataException`.
+The reader opt-in remains the admission boundary; no second switch is needed to
+inspect an already admitted immutable snapshot.
+
+| API | Contract |
+| --- | --- |
+| `ReferenceCompositionTypeInfo : TypeInfo` | Context-owned, read-only view; no public constructor. Reference equality is canonical within one context, including reordered bounds. Separate contexts remain distinct. |
+| `ReferenceCompositionTypeInfo.Kind : ReferenceCompositionKind` | Preserves union versus intersection, including mixed nesting. |
+| `ReferenceCompositionTypeInfo.Constituents : IReadOnlyList<TypeInfo>` | Immutable canonical nominal/composition bounds, in the first projected signature's order. Resolved duplicate bounds collapse; a singleton resolves directly to its constituent view. No nominal subtype reduction or distributive rewriting. |
+| `ReferenceCompositionTypeInfo.DisplayName : string` | Diagnostic kind/bound display; not a binding identity or stable serialization. |
+| `ReferenceCompositionTypeInfo.IsNominalType : bool` | Always `false`; the composition does not invent a nominal declaration. |
+
+Composition projection retains the reader's depth limit of 32. It adds no
+assignability, synthesized members, callable import or code generation. Existing
+non-composition projection limits remain unchanged. Raven's explicit experimental API now maps intersection views to semantic symbols;
+structural union import and native emission remain pending.
+
+## Experimental composition callable import (2026-10-14)
+
+`AssemblyBuilder.ImportExperimentalCompositionReference(MethodDefinition definition,
+AssemblyIdentity dependencyCoreLibrary, IAssemblyResolver? resolver = null)` returns
+an output-owned `ImportedMethodReference` for a nongeneric native free function.
+The definition must come from an immutable native snapshot; compositions require
+the reader opt-in above. Owned methods, generic functions and native/InternalCall
+implementations are rejected. Null definition/core arguments throw
+`ArgumentNullException`; unsupported declarations, incompatible core identities,
+missing/mismatched dependencies and normal import limits throw `InvalidDataException`.
+The optional resolver supplies exact nominal dependencies without implicit loading.
+
+Intersection bounds must be resolved interfaces or reference classes that permit subclassing.
+CLR-final classes reject before normalization, including duplicate/singleton reduction.
+Raven sealed hierarchies (closed families with permitted subtypes) remain admissible;
+these are distinct from classes closed to extension.
+Value types remain excluded. Sealed union alternatives remain supported. The
+bounded reader rejects external intersection bounds whose extendability it cannot
+establish; resolving those dependencies during reading remains a gap. This narrows
+the unpublished experimental profile following the author's 2026-10-14 clarification.
+
+The returned `Signature` preserves union/intersection kind and all normalized
+native bounds, imported into the output builder's identity scope. Same-kind
+flattening/deduplication remains unchanged; nominal-supertype reduction is not
+performed. Repeated imports reuse the callable. Ordinary `ImportReference` still
+rejects a compound contract, even after its experimental import has been cached.
+No new public compound signature factory or authored storage capability is added.
+
+The native writer serializes compound call operands with their imported nominal
+identities. Body validation retains the descriptor as a stack type: exact compound
+results can feed equivalent compound parameters, including reordered bounds.
+For call arguments only, flat nominal-reference compositions admit a bounded proof.
+A nominal bound implies another through identical scoped identity or its declared
+interface graph. The four composition cases are:
+
+| Source | Target | Required proof |
+| --- | --- | --- |
+| Union | Union | Every source alternative implies some target alternative. |
+| Union | Intersection | Every source alternative implies every target bound. |
+| Intersection | Union | Some guaranteed source bound implies some target alternative. |
+| Intersection | Intersection | Every target bound follows from some guaranteed source bound. |
+
+Thus `A & Both` can feed `B & Both` or `A & B` when Both implements both interfaces.
+`Both | OtherBoth` can feed `A & B` when both classes implement A and B. Merely
+matching the bounds of `A | B` and `A & B` is insufficient. Proof uses declared
+contracts, never the concrete allocation inside a producer body. Original
+composition kinds and bounds remain in emitted call descriptors.
+
+This adds no nominal/compound injection/projection, class-base traversal,
+nested mixed-composition proof, storage or boxing conversion.
+
+`AssemblyBuilder.Write()` and its reference-image path reject graphs containing
+compound callable imports with `InvalidDataException`. Compound declarations also
+remain unsupported by CLI projection. A native caller whose declarations have no
+compounds may still be packaged by existing transports; its native body remains
+subject to runtime feature gates and verification. Authored locals, fields,
+parameters/results and wrapper types continue to fail ownership validation.
+Runtime interpretation requires `experimental-compositions`; JIT/AOT remain closed.
+
+Focused checks and three emitted native callers cover union, intersection and
+redundant `A & Both` bounds (Both implements A): all return 42 in the interpreter.
+This is host metadata API emission, not Raven source emission. Raven's experimental importer retains its default NEOMETA001 guard. The explicit
+`AllowExperimentalIntersectionCalls` host option now preserves these original
+descriptors through lowering and native call encoding; it does not enable general
+storage or PE/CLI projection. See the experiment record for compiler validation.
+
+
+### Companion compiler composition POC APIs (2026-10-14 development)
+
+Raven's separate native compiler assembly now exposes
+`NeoClrMetadataReference.ReadExperimentalCompositionAssembly(image, bootstrap)`
+and `NeoClrEmitOptions(..., allowExperimentalCompositionCalls: true)`. The reader
+admits flat union/intersection free-function signatures; the option permits native
+call forwarding, preserving raw descriptors. Old/default readers and the narrower
+intersection-only option remain closed to unions. PE/CLI and authored storage
+remain unsupported. Rebuild compiler hosts for the new optional constructor
+parameter. Invalid native signatures/mixed nesting reject with `InvalidDataException`;
+unsupported emission reports diagnostics without output.
+
+Semantic APIs are `Compilation.CreateStructuralUnionTypeSymbol(params ITypeSymbol[])`,
+`IStructuralUnionTypeSymbol.ConstituentTypes`, `TypeKind.StructuralUnion` and
+`SymbolVisitor.VisitStructuralUnionType` (including the generic visitor). The
+factory flattens/deduplicates same-kind unions, collapses singletons and preserves
+presentation order, with order-independent identity/hash and no nominal carrier.
+Empty/unsupported input throws `ArgumentException`; null input/elements throw
+`ArgumentNullException`. Nominal types (including value types and open/closed constructions) and bound
+type parameters are supported semantically. Unbound generic placeholders and Void
+are rejected. Owner/method substitution traverses union alternatives and generic
+arguments, deduplicating after substitution. IsReferenceType/IsValueType require
+all alternatives to have that category; neither selects a storage representation.
+Written intersection bounds now reject sealed classes/value types before reduction.
+Member merging is deferred. These are compiler host APIs, not guest RavenDoc APIs.
+
+[POC and commands](https://github.com/marinasundstrom/neoCLR/blob/codex/structural-union-intersection/docs/experiments/structural-compositions/README.md#working-raven-consumer-poc--2026-10-14)
+record four interpreter results and negative gates. Full open/closed generic native
+integration remains incomplete; the adapter admits closed generic reference bounds
+in nongeneric free-function calls. Open parameters remain unsupported. Closed reference-class wrappers now retain
+composition arguments in the imported free-function call profile.
+The runtime separately supports closed generic reference bounds; see the
+[generic slice](https://github.com/marinasundstrom/neoCLR/blob/codex/structural-union-intersection/docs/experiments/structural-compositions/README.md#generic-composition-first-slice--2026-10-14).
+
+
+Closed generic bound call integration is covered by eight Raven interpreter consumers
+and host/compiler mismatch rejection; see the [current profile and evidence](https://github.com/marinasundstrom/neoCLR/blob/codex/structural-union-intersection/docs/experiments/structural-compositions/README.md#closed-generic-composition-call-integration--2026-10-14).
+
+
+The wrapper profile retains invariant argument identity and recursively enforces
+native-only emission and ordinary-import/storage rejection. It requires local
+unconstrained reference-class definitions; value/interface wrappers and compositions
+inside a composition bound's generic arguments remain outside this reader profile.
+[Wrapped composition contracts and validation](https://github.com/marinasundstrom/neoCLR/blob/codex/structural-union-intersection/docs/experiments/structural-compositions/README.md#wrapped-composition-metadata-and-raven-calls--2026-10-14).
+
+
+### Imported composition result locals (2026-10-14 development)
+
+```csharp
+public LocalDefinition MethodBuilder.DeclareExperimentalCompositionResultLocal(
+    ImportedMethodReference producer);
+```
+
+Declares a local with exactly `producer.Signature.ReturnType`, including a closed
+reference wrapper containing union/intersection arguments. The producer must belong
+to the current output assembly and have been imported through the experimental native
+composition callable profile. Its result must contain a composition; an ordinary
+scalar result is rejected. The declaring body must be a nongeneric free function.
+The returned local belongs to that method, keeps its zero-based slot index, and
+retains the exact imported descriptor without nominal subtype reduction.
+
+Null producers throw `ArgumentNullException`; foreign producers, non-composition
+results and unsupported body owners throw `ArgumentException`. The existing 1024
+local limit throws `InvalidDataException`. Use `StoreLocal` before `LoadLocal` on
+every reachable path; wrong-value stores and uninitialized reads fail native body
+validation. Taking the local's address is rejected when writing. `ClearBody` retains
+locals but does not retain definite initialization. Ordinary `DeclareLocal`, authored
+composition signatures/fields and CLI projection stay gated. Runtime execution
+requires the experimental-compositions interpreter profile.
+
+```csharp
+var producer = output.ImportExperimentalCompositionReference(factoryDefinition, core);
+var slot = main.DeclareExperimentalCompositionResultLocal(producer);
+main.Call(producer);
+main.StoreLocal(slot);
+main.LoadLocal(slot);
+main.Call(output.ImportExperimentalCompositionReference(echoDefinition, core));
+main.Emit(OpCode.Pop);
+main.LoadConstant(42);
+main.Return();
+```
+
+The compiled host checks exercise union, intersection, redundant intersection and
+wrapper result locals; Raven source-local emission is not enabled by this host API.
+The API adds controlled storage of an existing type contract, not a distinct kind of
+type or a restriction on structural types' eventual introspection support.
+
+
+External reference wrappers with closed composition arguments can now be read in the
+experimental profile. ImportExperimentalCompositionReference requires an explicit
+IAssemblyResolver for their dependencies; the exact resolved definition must be an
+unconstrained reference class. Missing or incompatible definitions fail import.
+Default readers and CLI output remain rejected.
+
+
+### Imported composition storage admission (2026-10-14 development)
+
+```csharp
+public void AssemblyBuilder.EnableExperimentalCompositionStorage(ImportedMethodReference producer);
+```
+
+Registers the exact closed reference compositions reachable through an imported
+result, including its constructed reference-wrapper arguments, for this output only.
+The producer must belong to this assembly and its return must contain a composition.
+Null throws ArgumentNullException; foreign or non-composition producers throw
+ArgumentException. Repeated registration is idempotent. This does not construct new
+compositions, reduce nominal bounds or admit open composition operands.
+
+After registration, those descriptors work with ordinary DeclareLocal, reference-class
+instance AddField, MethodSignature and generic construction/substitution. Native body
+validation checks stores and reads. Compound byref parameters, value/static composition
+fields and CLI projection remain rejected. Runtime field addresses also reject, with
+or without verification. Use the experimental-compositions interpreter profile.
+
+The experimental native reader now admits composition reference-class fields and
+nongeneric owned method signatures; the default reader remains closed. External
+intersection bounds still require finality resolution unavailable in this reader profile.
+Raven's generated async state machines use this storage admission with the exact imported
+Task result contract. See the linked composition experiment for executable evidence.
+
+### Authored reference compositions (2026-10-14 development)
+
+`AssemblyBuilder.CreateExperimentalReferenceComposition(ReferenceCompositionKind kind,
+params SignatureType[] types)` returns an output-owned structural signature. Supply
+2–256 closed nominal reference bounds; same-kind nesting flattens, duplicates collapse
+and a singleton becomes its remaining type. Closed generic reference bounds and
+composition arguments in closed reference wrappers are supported. Intersection bounds
+must be interfaces or classes open to extension (CLR final is rejected, including a
+local class made final after signature creation). Open, value, pointer and function
+bounds are outside this profile. Foreign or invalid operands throw ArgumentException;
+invalid graph mutations fail emission. Input arrays are copied.
+
+The returned signature is admitted for native parameters, returns, locals, reference
+casts and type tokens. Emit with WriteNativeAssembly and optionally the NEOX binary
+container. CLI and PE reference projection reject admitted compositions. This is an
+explicit experimental extension to CLR signatures, which have no native union or
+intersection element type; no nominal carrier declaration is synthesized. Native
+interpreter execution requires experimental-compositions; JIT/AOT remain gated.
+Validation: the host test runner's `--authored-compositions` checks native roundtrip,
+normalization, ownership, unsupported bounds and finality mutation.
+
+## Structural method constraint inspection (2026-10-14, development)
+
+The host C# metadata library can read closed structural method bounds from native
+NEOX using `AssemblyDefinition.ReadNativeAssembly(image, allowExperimentalCompositions: true)`.
+This is native metadata inspection, not a CLI representation or guest runtime API.
+The ordinary reader rejects these bounds.
+
+- `GenericMethodTypeConstraint(int ParameterIndex, SignatureType Bound)` records a
+  zero-based method parameter ordinal and its complete bound signature.
+- `MethodDefinition.TypeConstraints` returns a read-only snapshot of all supported
+  nominal and structural method type bounds. Unsupported generic constraints throw
+  `InvalidDataException`; an incomplete bound set is never returned.
+- `MethodGenericParameterTypeInfo.GetTypeConstraints()` returns the corresponding
+  context-owned `TypeInfo` views, including `ReferenceCompositionTypeInfo` with its
+  kind and constituents. Repeated resolution shares canonical type-view identity.
+  Unsupported constraints or unresolved dependencies throw `InvalidDataException`.
+
+For example, enumerate `parameter.GetTypeConstraints()` and inspect a returned
+`ReferenceCompositionTypeInfo.Kind` and `.Constituents` to distinguish an any-of
+union from an all-of intersection. These queries do not check supplied generic
+arguments or execute the method. Bounds remain closed reference compositions;
+open operands and final intersection classes reject. Closed hierarchy roots remain
+valid. Normalization can collapse duplicate operands to a nominal signature.
+
+The older `InterfaceConstraints` and `GetInterfaceConstraints()` APIs are
+nominal-interface-only. They throw for a structurally encoded bound, including one
+collapsed by normalization, so existing consumers cannot silently erase its contract.
+CLI projection and callable import of structurally constrained methods remain
+unsupported. Type-parameter constraints on generic classes, authoring these bounds,
+Raven native emission and guest constraint reflection are separate pending work.
+Compared with CLR conjunctive nominal bounds, native signatures retain disjunction
+and explicit grouping; the cost is an opt-in native-only consumption contract.
+Validation: `--structural-method-constraints` in the metadata test executable covers
+JSON/binary roundtrip, context identity, mixed grouping, normalization, nominal
+compatibility, invalid bounds/ordinals/duplicates and unsupported consumer gates.
+
+### Native structural method constraint authoring
+
+`MethodBuilder.AddExperimentalStructuralConstraint(int parameterIndex,
+ReferenceCompositionKind kind, params SignatureType[] constituents)` adds a
+native-only closed bound to a method parameter. The zero-based ordinal must exist;
+constituents are normalized using the assembly composition factory and must retain
+at least two distinct constituents. Local reference
+classes/interfaces and closed local generic reference constructions are admitted.
+Imported closed reference constituents are also admitted in unions, including closed
+generic constructions. External intersection operands additionally require imported
+definition snapshots proving they are extendable reference types. Open operands,
+value operands and final classes written in intersections reject. Null constituent arrays throw `ArgumentNullException`; invalid
+ordinals, duplicates, foreign/unsupported operands or a combined constraint count
+above 128 throw `ArgumentException`. Native output uses `GenericConstraint.TypeBound`;
+CLI output remains unavailable. `MethodDefinition.TypeConstraints` includes authored
+bounds, while the nominal-interface query rejects methods containing these bounds.
+
+`MakeGenericInstance` checks structural bounds, and calls are rechecked on emission
+and graph serialization. Target unions require any alternative, target intersections
+all constituents, and source unions require complete alternative coverage. Nominal
+leaf checks use local inheritance/interface relationships and invariant closed
+construction identity. Closed classes can satisfy interface intersections. Forwarded method parameters are checked against the conjunction of the caller’s
+declared bounds at emission and serialization. Missing or weaker guarantees reject.
+Guaranteed nominal interface calls through method parameters are supported by the
+constrained-call overloads documented below. Generic inherited class relationships
+beyond the existing nominal model are not inferred. No conversions or variance
+are added by this API. Adding a bound after emitting a call cannot bypass validation.
+
+Example: `method.AddExperimentalStructuralConstraint(0,
+ReferenceCompositionKind.Union, responseType, errorType)` writes a structural bound
+for the first method parameter, without generating a nominal carrier.
+The authored constraint fixture runs in the experimental interpreter with result 42.
+Raven emits/imports this bounded native method profile, including resolved external
+intersections. Generic owner constraint authoring and guest constraint reflection remain gaps.
+See the external union checkpoint below for three-assembly validation.
+
+### Importing structurally constrained native functions
+
+`AssemblyBuilder.ImportExperimentalConstrainedReference(MethodDefinition definition,
+AssemblyIdentity dependencyCoreLibrary, IAssemblyResolver? resolver = null)` imports
+an explicitly selected native generic free function with at least one structural
+method bound. It preserves all method bounds in the private call contract, importing
+constituents into the consumer's scope. The function must be static, have no declaring
+type, native import or special implementation flags, and use an ordinary executable
+parameter/result signature. Closed reference bounds follow the native reader profile;
+open structural operands remain unsupported. Dependencies must resolve through the
+supplied catalog to consistent snapshots. Invalid metadata/profile/core or snapshot
+mismatches throw `InvalidDataException`; null required inputs throw
+`ArgumentNullException`. Ordinary callable imports continue to reject constrained
+methods outside their supported profile.
+
+The returned `ImportedMethodReference.MakeGenericInstance` checks all imported bounds
+against consumer-scoped arguments. Call emission and serialization check them again.
+Interface conformance uses registered native definitions; class ancestry uses the
+existing explicit base contracts. Closed generic identity remains invariant. Source
+union arguments need complete coverage. Forwarded method parameters require sufficient declared caller bounds; generic-body
+trait calls remain unavailable. The import does not synthesize a nominal carrier or a CLI
+projection. Existing unconstrained imports retain their behavior. Native execution
+still requires the experimental runtime feature and runtime verification.
+
+Validation includes a separately written metadata producer/consumer (result 42),
+invalid arguments, incomplete union coverage, default import/CLI gates, nominal
+constraint regression checks and existing composition import checks. Companion Raven
+uses this API for opt-in native free-function calls; source and separately compiled
+consumers cover interface union/intersection bounds and a closed `Response<A> | B`
+bound. This supersedes the pending native import statements above only for this profile.
+
+### Forwarding method parameters with closed structural bounds
+
+A method whose parameter is constrained by `A | B` can forward that parameter to
+another method requiring `A | B`. A caller guaranteeing `A & B` can forward to a
+callee requiring both traits or a single guaranteed interface. Separate nominal
+bounds are considered together as a conjunction. A union guarantee does not imply
+an intersection; an unconstrained parameter does not imply either guarantee.
+
+This uses bounded structural entailment over the existing closed bound signatures;
+it does not admit open operands such as `Response<T> | Error`. Provisional method
+references can carry caller parameters, but emission and serialization must prove
+those parameters from the caller’s recorded constraints. External-bound source
+authoring, generic-body trait calls and owner/type-parameter forwarding remain
+unsupported. The metadata fixture and the Raven source/library-consumer fixture
+execute through forwarded generic calls with result 42. Earlier blanket statements
+that method forwarding is unsupported are superseded by this bounded profile.
+
+### Interface calls guaranteed by structural bounds
+
+The owned-target `IILGenerator.CallConstrained(SignatureType implementingType,
+MethodBuilder target)` overload now admits nongeneric abstract instance interface
+methods when the method parameter has an explicit structural bound that guarantees
+the target interface. Push a managed reference to that parameter (for example with
+`LoadArgumentAddress`) before the call. Native encoding uses existing borrowed
+`callself`; no schema or CLI representation is added. The raw `Emit` overload retains
+its existing `OpCode.Call` spelling. Operand validation and serialization reject
+insufficient guarantees or an incompatible receiver stack. Existing nominal-only
+static calls retain their earlier admission and Self substitution behavior.
+
+An intersection guarantees each constituent trait. A union guarantees a target trait
+only if every alternative does; partial overlap is insufficient. The runtime verifier
+uses the same distinction when authorizing an interface/base view of a constrained
+parameter, retaining nominal inheritance and Self substitution at the leaves. Concrete
+execution still resolves and checks the actual implementation. Default builds do not
+admit structural bounds. External/constructed interface call authoring and owner-parameter
+support are not expanded by this slice. Raven’s tested source case uses a local
+intersection-constrained generic body calling two interface methods and returns 42.
+
+This supersedes the blanket generic-body-trait gap above for owned nongeneric
+interface contracts. The APIs are host C# tooling; guest reflection APIs do not change.
+Compared with CLR constrained dispatch, this keeps the existing receiver/call behavior
+and extends only the native structural proof of the required interface.
+
+
+2026-10-14 imported trait dispatch checkpoint: the explicit native composition
+profile now admits completed imported nongeneric interface methods through a
+structurally constrained method parameter. The receiver remains a managed parameter
+reference, encoded with borrowed `callself`. Every union alternative must guarantee
+the requested interface; intersections can supply it through nominal inheritance.
+Nominal-only static calls retain their existing validation. The Raven
+`--structural-constraints` probe compiles `TraitLibrary.neox` separately, then emits
+`ExternalTraits.neox` whose local `LocalA & LocalB` bounds inherit the imported
+interfaces. Its two method calls return 40 + 2 = 42 in the native interpreter.
+This adds no CLI carrier or metadata schema: default composition rejection remains.
+Direct external structural-bound authoring, constructed interface targets under
+structural bounds and open bound operands remain pending. The host metadata emitter
+owns admission; Raven retains its existing imported-interface emission path.
+
+
+Closed constructed trait targets (2026-10-14): native structural method bounds now
+also authorize imported constructed interface calls when their closed guarantees
+prove the exact target construction. `Reads<int>` does not prove `Reads<string>`;
+every source-union alternative must prove the requested construction. Existing
+nominal/Self constrained calls retain their prior path. Raven's `ConstructedTraits`
+probe inherits `ImportedReads<int>` through a local intersection constituent and
+calls it using the existing borrowed native dispatch. No CLI encoding is added.
+Direct external structural-bound authoring and open operands remain unsupported.
+
+
+## External union constraint alternatives — 2026-10-14 development
+
+The native `MethodBuilder.AddExperimentalStructuralConstraint` API now accepts
+output-owned imported closed reference alternatives in union bounds, including
+constructed interfaces such as `ImportedReads<int> | ImportedReadsB`. Constraint
+metadata retains the external type identity and exact generic arguments. Argument
+checks continue to require explicit nominal implementation/inheritance, with every
+source-union alternative covered. Matching member names are insufficient.
+
+Raven uses its existing explicit native structural-composition capability contract;
+no CLI carrier, schema change or new compiler switch is introduced. Its constraint
+probe emits `TraitLibrary.neox`, then `ExternalBoundLibrary.neox` with these bounds,
+then a separate `ExternalBoundConsumer.neox`. Import resolution requires both exact
+native dependencies. Host tests reject mismatched constructed arguments, partially
+covered unions and direct external intersection operands; source diagnostics reject
+nonimplementing lookalikes and arguments satisfying neither alternative.
+
+External bounds beneath any intersection remain rejected by this method-authoring
+API: the current snapshot reader cannot establish their extension eligibility
+without resolving external definitions. This is a reader/authoring gap, not a
+permanent type-system restriction. Local intersections and existing nominal/Self
+contracts are unchanged. Open operands, guest constraint reflection and JIT/AOT
+remain outside this slice. Compared with CLR constraints, the native signature
+preserves disjunction rather than changing it into a conjunctive nominal list.
+
+
+## Resolved external intersection bounds — 2026-10-14 development
+
+Native method intersection bounds now admit imported closed reference types after
+importing their definition snapshots. The composition factory checks CLR-style
+finality and reference/value classification; a Raven closed hierarchy remains a
+valid bound because its hierarchy flag is distinct from finality. Interfaces remain
+nominal and require explicit implementation or declared interface inheritance.
+Matching member shape does not establish conformance.
+
+`AssemblyDefinition.ReadNativeAssembly(image, allowExperimentalCompositions,
+IAssemblyResolver? resolver)` resolves each external intersection operand against an
+explicit exact-identity assembly snapshot. It checks the named definition, enclosing
+scope and generic arity, rejects final/value definitions, and caches resolved
+snapshots for the duration of the read. The two existing overloads remain available;
+without a resolver, external intersections fail closed. Default composition opt-in
+and native runtime verification are still required. Bodies remain opaque; this API
+does not load executable assemblies or infer interface implementation from members.
+
+Raven's experimental catalog snapshots only the selected paths, then retries
+unresolved images as selected dependency snapshots become available. Returned
+references retain host input order. Missing dependencies, invalid metadata and cycles
+that prevent external-intersection validation fail explicitly; ordinary nominal
+cycles do not acquire a new resolver requirement. No adjacent assembly search occurs.
+The explicit native composition capability now admits closed conjunctive interface
+constructions in method bounds. Only intersection operands request definition-backed
+admission; ordinary .NET and nominal emission remain unchanged.
+
+The probe builds an interface library, a constraint library with
+`T: ImportedReads<int> & ImportedReadsB`, and a separate consumer. Its generic body
+calls both interfaces. The catalog is supplied in reverse dependency order, and the
+negative consumer has matching methods but omits one required interface declaration.
+This replaces the earlier external-intersection authoring restriction for the closed
+profile. Open operands, generic owner constraint emission, guest constraint reflection
+and JIT/AOT qualification remain follow-up work. Like CLR nominal interfaces, declared
+relationships govern membership; unlike a CLR constraint list, native metadata also
+retains structural grouping and an introspectable intersection signature.
+
+
+## Authored structural tuple signatures (2026-10-14 development)
+
+`AssemblyBuilder.CreateExperimentalTuple(params SignatureType[] elements)` returns
+an owned, opt-in native `SignatureType`. Its `Tuple` property is a `TupleSignature`
+with read-only `ElementTypes: IReadOnlyList<SignatureType>`. Other signature kinds
+have a null `Tuple`. The builder copies inputs; callers cannot mutate the shape.
+`TupleSignature.Equals`, `GetHashCode` and enclosing signature equality preserve
+position, duplicates and nesting. `ToString()` is diagnostic, not serialized identity.
+
+The factory accepts one through 256 elements: supported scalars, owned/imported closed
+nominal signatures and already admitted nested tuples. Open parameters, Void, erased
+Value, RuntimeTypeHandle, arrays, borrows, pointers, functions and compositions are
+rejected as elements and as nested nominal type arguments in this bounded factory.
+This tooling profile has a 16-level nesting bound and a 4096-node
+validation budget. Null arrays throw ArgumentNullException; invalid/foreign elements
+and resource violations throw ArgumentException. Graph validation rechecks admission
+before serialization, including nominal owners whose metadata changed after creation.
+
+`WriteNativeAssembly()` writes the ordered native `Tuple` signature node, without a
+Tuple TypeDef. Parameters, returns and locals retain exact tuple identity through
+body checking; reordered shapes do not implicitly convert. `Write()` and reference
+CLI projection reject an output that has admitted tuples with InvalidDataException.
+Unlike .NET ValueTuple authoring, this does not construct a generic nominal carrier.
+Use a runtime built with `experimental-tuples`. Native C# reader/import support and
+Raven lowering are not implemented by this authoring slice. Tuple constructor and
+positional-operation builder APIs also remain follow-ups; the executable fixture
+validates authored signatures and a native tuple type token.
+
+Run `dotnet run --project tools/metadata/NeoCLR.Metadata.Experimental.Tests --
+--authored-tuples target/authored-tuples`, then run the emitted `AuthoredTuples.neox`
+with the experimental interpreter (expected exit 42).
+
+
+## Reading and importing native tuples (2026-10-14 development)
+
+`AssemblyDefinition.ReadExperimentalTupleAssembly(ReadOnlySpan<byte> image,
+IAssemblyResolver? resolver = null)` returns an immutable native declaration
+snapshot. `TryGetSignature` preserves ordered `SignatureType.Tuple.ElementTypes`,
+including duplicate/nested elements and closed nominal generic elements. `Write()`
+on that snapshot retains the original native image; it does not project to CLI.
+Normal `ReadNativeAssembly` overloads, including composition-only opt-in, continue
+to reject tuple signatures. Tuple opt-in does not enable unions/intersections.
+Malformed shapes, empty/oversized tuples, open or unsupported elements fail with
+InvalidDataException. Authoring-profile element and nesting limits still apply.
+Bodies remain opaque and require runtime verification. A general C# introspection
+TupleTypeView is not added by this slice; inspect the retained method signature.
+
+`AssemblyBuilder.ImportExperimentalTupleReference(MethodDefinition definition,
+AssemblyIdentity dependencyCoreLibrary, IAssemblyResolver? resolver = null)` imports
+a nongeneric native free function with ordinary implementation metadata. It returns
+an output-owned callable reference and admits its tuple storage for native emission.
+Null definition/core arguments throw ArgumentNullException; invalid declarations,
+unsupported signatures and absent/mismatched dependencies throw InvalidDataException.
+Direct tuple signatures and tuples nested in supported closed nominal constructions
+are retained. Tuple-bearing array/byref/function callable signatures remain unsupported.
+External nominal element definitions require an explicit matching resolver; no implicit
+assembly loading occurs. Ordinary import rejects tuples even after an opt-in import
+has cached the same method. Consumers with admitted tuples reject CLI emission.
+
+Validation covers immutable-image preservation, nested/repeated shape roundtrip,
+closed generic nominal elements, separate consumer re-emission, missing/resolved
+external dependencies, default/composition-only rejection and malformed/open tuples.
+The separate native consumer returns 42 through an imported producer function and
+contains verified tuple-forwarding methods. Tuple values are not yet constructed by
+the C# builder in this fixture; construction/element APIs and Raven lowering remain.
+
+
+## Native tuple value operations (2026-10-14 development)
+
+`MethodBuilder.GetILGenerator()` now exposes these native-only operations:
+
+- `NewTuple(SignatureType type)` consumes one value per element, pushed in declaration
+  order, and pushes the structural tuple value.
+- `LoadTupleElement(SignatureType type, int index)` consumes an exact tuple value and
+  pushes its element at the zero-based index.
+- `StoreTupleElement(SignatureType type, int index)` consumes a tuple followed by a new
+  element value and pushes the updated tuple copy. It does not write the original
+  local; store the result explicitly to replace that local.
+
+All three require an explicitly admitted, output-owned tuple signature. Null signatures
+throw ArgumentNullException; non-tuples/foreign signatures throw ArgumentException;
+out-of-range positions throw ArgumentOutOfRangeException. Instruction-budget and
+stack/type mismatches throw InvalidDataException (stack checks occur on native write).
+Exact receiver and element identity are enforced by the existing typed body checker.
+
+Native encoding uses aggregate `newobj` and indexed `ldfld`/`stfld`, without nominal
+constructors or FieldDefs. The updated-copy store is a deliberate authoring contract:
+unlike CLR ValueTuple field mutation through an address, it returns the replacement
+value. It preserves value copying but requires explicit assignment by the caller.
+Managed element-address authoring is not added here. CLI projection still rejects
+outputs with admitted tuples; runtime execution requires `experimental-tuples`.
+
+The separate producer/consumer fixture now executes nested tuple construction,
+imported echo, element reads and copy update, returning 42 only when the original
+local remains unchanged. Negative checks reject malformed operand signatures,
+indices, receivers, constructor elements and replacement values. This supersedes the
+earlier fixture limitation that only tuple-forwarding signatures were verified.
+Raven lowering remains a subsequent compiler slice.
+
+
+## Native tuple names in C# authoring/import (2026-10-14 development)
+
+`AssemblyBuilder.CreateExperimentalTuple(SignatureType[] elements, string?[] elementNames)`
+copies both arrays and preserves native element names. `TupleSignature.ElementNames`
+is an immutable ordered `IReadOnlyList<string?>`; empty means all elements are unnamed.
+The original `params SignatureType[]` overload remains supported and emits the original
+unnamed array payload. The named overload uses the native `{ elements, names }` payload.
+
+A nonempty name array must match element count. Each present name must be nonempty,
+NUL-free, valid UTF-16 representable as UTF-8, at most 1024 UTF-8 bytes and unique among
+effective names (unnamed positions use `ItemN`). Invalid names/counts throw
+ArgumentException; null arrays throw ArgumentNullException. Existing element
+ownership, closedness, nesting and node-budget rules still apply.
+
+Names do not affect TupleSignature or SignatureType equality/hashing. Named and
+unnamed tuples of the same ordered element types remain equal. The builder preserves
+each descriptive signature independently; callers must not use type equality to
+assert that names survived a round trip. `ReadExperimentalTupleAssembly` and
+`ImportExperimentalTupleReference` preserve names recursively, including differently
+named parameters/results with equal structural types. Native snapshots expose names
+through `MethodDefinition.TryGetSignature`. Invalid named shapes are rejected;
+ordinary readers and CLI output continue rejecting tuple contracts.
+
+Compared with CLR ValueTuple plus TupleElementNamesAttribute, this stores names in
+the signature itself. New named payloads need matching tools; old unnamed payloads
+remain readable. Guest reflection name APIs and Raven native tuple import are not
+added here. The C# imported-call consumer returns 42 with named nested tuple values.
+
+
+## C# tuple introspection views (2026-10-14 development)
+
+`NeoCLR.Metadata.Experimental.Introspection.TupleTypeInfo` is a read-only,
+non-nominal signature view returned by `MetadataLoadContext.ResolveSignature` and
+method parameter/result inspection. `ElementTypes: IReadOnlyList<TypeInfo>` keeps
+order, duplicates and nesting. `ElementNames: IReadOnlyList<string?>` has one entry
+per element, including null for unnamed elements. Both lists are immutable copies.
+`DisplayName` is `tuple<...>` using element displays; `IsNominalType` is false.
+
+Views retain descriptive names for each signature rather than interning by structural
+equality. Reference equality of these views is not a structural-type equality API;
+SignatureType equality and runtime TypeIdentity remain positional. Projection uses
+this metadata context's explicit dependency catalog and owner/method substitutions;
+unsupported or excessive nesting fails with InvalidDataException. No nominal tuple
+declaration, fields or constructors are synthesized in this host API.
+
+The view enables Raven's explicit native tuple import. It is distinct from guest
+`System.Introspection.TupleTypeInfo`, whose `ElementNames` query returns effective
+names with positional ItemN defaults rather than nullable declared-name entries.
+Focused tests cover nested views and distinct return/parameter names on equal types;
+the separate Raven consumer executes imported named tuples with result 42.
+
+## Combined structural reads (2026-10-15 development)
+
+`AssemblyDefinition.ReadExperimentalTupleAssembly(ReadOnlySpan<byte> image,
+IAssemblyResolver? resolver = null, bool allowExperimentalCompositions = false)`
+reads native tuple signatures, optionally admitting union/intersection signatures
+in the same image. Supply a resolver for external definitions. Invalid or
+unresolved signatures fail validation; this does not enable CLI projection.
+The default remains tuple-only for existing host callers. Native Raven projects
+explicitly select combined admission. This host metadata API is documented here,
+not in the guest RavenDoc type selection.
+
+### Authored standalone libraries (2026-10-15 development)
+
+`NativeModuleContainer.WriteLibraryBinary(AssemblyBuilder assembly)` validates
+the authored graph with its explicit dependency contracts and serializes native
+JSON under the existing 32 MiB library budget, then writes schema 3/4 standalone
+NEOX bounded to 16 MiB. It preserves native structural signatures without a CLI
+projection. Null throws `ArgumentNullException`; invalid graphs or exceeded
+bounds throw `InvalidDataException`. Application writer budgets are unchanged.
+This host API is covered by this manual reference, outside guest RavenDoc.
+
+### Closed value union alternatives (2026-10-15 development)
+
+`CreateExperimentalReferenceComposition` retains its legacy API name but now
+admits closed scalar and nominal value alternatives for `Union`, including imported
+value definitions. Native reads apply the same rule. `Intersection` continues to
+reject value operands. Void, erased Value, RuntimeTypeHandle, intrinsic String,
+open types and structural tuple alternatives remain outside this bounded factory.
+Value payload construction requires explicit boxing and extraction copies through
+explicit unboxing; this does not give the union a nominal Object/ValueType base.
+The native signature is preserved and CLI projection remains unsupported.
+See the [integration contract](https://github.com/marinasundstrom/neoCLR/blob/codex/structural-union-intersection/docs/raven-cli-bridge.md) for validation and
+remaining generic wrapper/byref limitations.
+
+### Managed structural parameter signatures (2026-10-15 development)
+
+`SignatureType.ByReference(elementType)` may target a direct admitted union or
+intersection in a method parameter. Ownership and structural storage admission
+remain required. Native readers preserve the wrapper when experimental composition
+reads are enabled; default reads and CLI projection reject it. Nested composition
+wrapper targets remain rejected by authoring. `IILGenerator.LoadObject` and
+`StoreObject` use the exact structural element signature; writes must satisfy that
+slot's type. These are managed interpreter slots, not native pointer/ABI support.
+
+### Structural callback element reads (2026-10-15 development)
+
+With composition reading enabled, native `SignatureType.Function` parameter and
+result shapes preserve admitted composition elements through declaration
+materialization. Default reads still reject structural compositions. The host
+roundtrip covers a callback accepting and returning a union. Interpreter execution
+is bounded to exact nongeneric callback targets without composition-bearing owners;
+CLI projection of these shapes is unsupported. No nominal delegate or union type
+is synthesized.
+
+Composition-enabled native declaration reads preserve generic method scope and structural arguments in nominal value wrappers. This is metadata introspection support; callable import and runtime execution have separate admission rules. Open union constituents remain unsupported.
+
+### Scoped generic composition constituents (development, 2026-10-15)
+
+`AssemblyBuilder.CreateExperimentalReferenceComposition(kind, types)` now accepts
+method/type parameters inside owned or imported nominal generic constituents.
+For example, a union may contain `Response<SignatureType.MethodParameter(0)>`.
+The factory checks ownership and bounded shape; the containing signature checks
+actual parameter scope through existing owner validation. Wrong-scope uses throw
+`ArgumentException`. A bare generic parameter is still not an admitted constituent.
+Unions retain value alternatives; intersections retain nominal extendable reference
+bounds. Native opt-in reads preserve scoped indices. `GenericMethodInstance.Signature`
+and `ConstructedMethodReference.Signature` now substitute inside compositions.
+Normalization remains order-independent without nominal subtype reduction.
+
+Validation: authored native roundtrips, method/owner substitutions, wrong-scope
+rejection, the Raven open-generic consumer (42), and 58 structural interpreter tests.
+No guest API selection or generated signature changes are required. CLI projection,
+JIT/AOT representation and arbitrary symbolic structural constraints remain outside
+this validated surface.
+
+### Callable composition authoring (development, 2026-10-15)
+
+`CreateExperimentalReferenceComposition(Union, types)` now admits function
+alternatives with recursively checked parameter/result signatures, including a
+function whose result is another union. `CastReference` accepts the callable
+reference category for exact union injection/narrowing; the graph stack verifier
+and native reader agree. Ownership, generic scope and composition limits still
+apply. Function intersection bounds remain rejected, and tuple/byref/pointer
+components retain the current composition admission limits. CLI carrier projection
+is unchanged. `--authored-compositions` verifies native round-trip and checked-cast
+authoring; `--reference-compositions` verifies reader admission, including existing
+generic-method support. Runtime/backend limits remain separately documented in
+[structural operations](../docs/structural-runtime-operations.md#function-values).
+
+Function constituents now recursively import into consumer ownership through
+`ImportExperimentalCompositionReference`, retaining the existing composition opt-in.
+`Emit(OpCode.Isinst, functionType)`/`IsInstance(functionType)` accept function shapes;
+ordinary stack verification still requires a reference-compatible input. The host
+regression covers import ownership, type-test emission and nested union results.
+
+### Structural record instance fields (2026-10-15 development)
+
+`TypeBuilder.AddField` now accepts experimental union/intersection signatures in
+value-record instance fields as well as reference classes. The opted-in native
+reader preserves those field signatures; use `FieldDefinition.TryGetSignature`
+to inspect them. Static composition fields and interface instance storage remain
+rejected. Authored signatures retain ownership checks; this does not enable CLI
+projection of structural types. Generic wrappers and direct record declarations
+now follow the same runtime storage rule. The matching runtime/backend is required.
+
+### Structural tuple method references (2026-10-15)
+
+`AssemblyBuilder.CreateMethodReference` accepts ordered structural tuple parameters
+and results, including tuples nested in imported generic arguments. Names remain
+in the signature and do not affect identity. Ownership, parameter scope and
+constructor validation still apply. These references require native output;
+`Write`/CLI projection rejects structural tuples. The imported Range consumer
+validates direct and Result-wrapped tuple results across an assembly boundary.
+
+## Unified native metadata reads (2026-10-15)
+
+`AssemblyDefinition.ReadNativeAssembly(image, resolver)` and Raven's
+`NeoClrMetadataReference.ReadAssembly(image, bootstrap, resolver)` now read admitted
+nominal, union, intersection and tuple signatures together. The composition Boolean
+and separate experimental reader entry points are removed. `NeoClrReferenceCatalog.Read`
+and `ReadNative` no longer accept composition/tuple flags. Migrate callers to these
+normal APIs. Selected dependency resolution remains explicit and order-independent;
+missing, mismatched or non-extendable intersection bounds still reject. CLI projection
+remains a separate restricted contract, not a substitute native representation.
+
+Focused checks cover tuple authoring/import, union/intersection authoring/import,
+external structural constraints, source tuple mutation and source constrained library
+consumers. The legacy full metadata suite has six pre-existing failures around host
+core attribute limits and stale Object/local-budget expectations; these do not qualify
+as passing coverage and are tracked for integration cleanup.
+
+### Metadata reader integration qualification (2026-10-15)
+
+The CLI declaration reader accepts at most 8,192 custom-attribute rows, increased
+from 4,096 because the valid tooling test assembly now has 4,217 rows. Per-member
+256-attribute limits, image/signature/blob budgets and structural validation remain
+unchanged. Boundary tests accept 8,192 and reject 8,193 attributes in persisted CLR
+metadata. This is a bounded tooling capacity change, not a native type-system limit.
+The full host metadata suite now passes 175/175, including corrected expectations
+for the existing 1,024-local limit and concrete public virtual direct calls.

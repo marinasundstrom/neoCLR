@@ -1,0 +1,49 @@
+{
+  "date": "2026-10-15",
+  "runtimeBaseRevision": "3f933d2bd8509d68bf95e677e21a9b07ee7b4a02",
+  "compilerRevision": "9087c9913a23abb76cf4028768f6c7d69688a3d7",
+  "changes": "Companion metadata host and runtime changes in the commit containing this evidence; validated with the final runtime build.",
+  "command": [
+    "dotnet",
+    "/Users/robert/Projects/raven-union-intersection/src/Raven.Compiler/bin/Debug/net11.0/rvnc.dll",
+    "neoclr",
+    "--project",
+    "docs/experiments/value-unions/open-generic-project/App.rvnproj",
+    "--run",
+    "/Users/robert/Projects/neoclr/target/debug/neoclr"
+  ],
+  "exitCode": 42,
+  "output": "Native build output: /Users/robert/Projects/neoclr/docs/experiments/value-unions/open-generic-project/bin/neoclr/StructuralOpenGeneric.dll\n",
+  "validation": [
+    "authored compositions: native roundtrip, owner/method substitution, wrong/out-of-scope rejection",
+    "58 structural runtime tests passed, including open nominal union/intersection operands and declaring-type scope",
+    "API snapshot check passed"
+  ],
+  "limitations": [
+    "Bare T constituents remain unsupported",
+    "Generic constraints with symbolic structural bounds are not qualified by this slice",
+    "Union-local closure capture, whole-union boxing, JIT/AOT representation remain incomplete"
+  ],
+  "sha256": {
+    "src/compositions.rs": "92faa1e74f2f423be44f8868b89e4faaebf161f26a3e8694d0e30545b5ad910a",
+    "src/scope.rs": "7a40a6abcd7a0ff2c22465509b5524af62fee659ec6b9c67f9f39e5d322cc5df",
+    "src/assembler.rs": "af1bc40042e212798451be66c6e20430b191de1ca6c34f2d3d5f22c5dc88f088",
+    "src/vm.rs": "1fdd4ee61713682c256a7f79890c50a9d885e730f3ccff64997f03687282e209",
+    "tests/structural_compositions.rs": "fdc2408dae07d8f73b6a0d521384def36b357e81f37ebb9e5423d60ac8ce3ddf",
+    "target/debug/neoclr": "892d1f61459565d9a3c1076ec1be06fcd622c0e736f8b1759bd6ce7640eab68a",
+    "tools/metadata/NeoCLR.Metadata.Experimental/Model/ReferenceCompositionSignature.cs": "bb962c42dba24b8234a45868caca52323eee89914fb681d6ffb49131aec26fb3",
+    "/Users/robert/Projects/raven-union-intersection/src/Raven.Compiler/bin/Debug/net11.0/rvnc.dll": "e8be6527dd99e3de31b636c92840f62293acefe816bbcb7369d8d021477b649f",
+    "/Users/robert/Projects/raven-union-intersection/src/Raven.Compiler/bin/Debug/net11.0/Raven.CodeAnalysis.dll": "4b22f8577057a08c0ae37583dc788ec37cdffb2584735a1c9204459b9a062f16",
+    "/Users/robert/Projects/raven-union-intersection/src/Raven.Compiler/bin/Debug/net11.0/NeoCLR.Metadata.Experimental.dll": "97e053cfa04da3440db2e92bf81da5c28c05337a777724b0917ca204ffd02189",
+    "docs/experiments/value-unions/open-generic-project/Main.rvn": "592fd27f6dab4c95fa9323ae0a721ad99345dd75fcfe1ec39005da767108035f",
+    "docs/experiments/value-unions/open-generic-project/App.rvnproj": "785278a9fc463656783131fd9576423b828fddcb2bc218219dd55e53a7a5281a",
+    "docs/experiments/value-unions/open-generic-project/bin/neoclr/StructuralOpenGeneric.dll": "5fb83a9400bbf6e3429fc497227e82d3e8ee09f6dfd9fa06fb6882598b3868c8",
+    "target/structural-integrated-libraries-v3/Core.dll": "3f7cfa9db7c4feb551e2e97b0edb89c4dcf4c64d8eccf01bd006848dcacfd3f4",
+    "target/structural-integrated-libraries-v3/System.Runtime.dll": "c3cba0050fa2e4e4161c9e55266cc92da9a86034badccd98c2e804000b5bf735",
+    "target/structural-integrated-libraries-v3/System.Data.dll": "a13b89d9c3d87be3ab08a8c7e8fb4c3af75402e7fe7b0598204b241832014704",
+    "target/structural-integrated-libraries-v3/System.Networking.dll": "1384940280b54680c217c951964af3f2dde01fc6acf19a927f59ede3336d09ca",
+    "target/structural-integrated-libraries-v3/System.Web.dll": "f29d93809d033ca36c00c4034f6cbf920d1ba8dae7291ef18222d8e9cfbc7ae6",
+    "target/structural-integrated-libraries-v3/System.runtime.neox": "98a1ae1da85387c87746957e83a4015eb59d0566539a915c69f168d2b511b190",
+    "target/structural-integrated-libraries-v3/NeoCLR.ClassLibrary.props": "4676969ee1e381f9bbe0cfce799cfe5503a1a7f77968a174782c35a24752e5b7"
+  }
+}

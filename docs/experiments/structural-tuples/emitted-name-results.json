@@ -1,0 +1,32 @@
+{
+  "date": "2026-10-14",
+  "profile": "C# tuple name authoring/read/import and Raven native name emission",
+  "runtimeBase": "6ee7b5bde",
+  "results": {
+    "csharpProducerConsumer": 42,
+    "ravenSourceConsumer": 42,
+    "metadataChecks": "passed",
+    "sourceChecks": "passed",
+    "apiSnapshot": "passed"
+  },
+  "commands": [
+    "dotnet run --project tools/metadata/NeoCLR.Metadata.Experimental.Tests -- --tuple-imports target/tuple-names-import",
+    "target/debug/neoclr run target/tuple-names-import/TupleConsumer.neox --module target/tuple-names-import/TupleProducer.neox --execution interpreter",
+    "dotnet run --project tools/NeoClrMetadataProbe -p:NeoClrMetadataProject=/Users/robert/Projects/neoclr/tools/metadata/NeoCLR.Metadata.Experimental/NeoCLR.Metadata.Experimental.csproj -- --source-tuples /Users/robert/Projects/neoclr/target/tuple-info-libraries-v2 /Users/robert/Projects/neoclr/target/raven-named-tuples",
+    "target/debug/neoclr run target/raven-named-tuples/SourceTuple.neox --system target/tuple-info-libraries-v2/System.runtime.neox --object-root target/tuple-info-libraries-v2/System.Runtime.dll --module target/tuple-info-libraries-v2/System.Runtime.dll --execution interpreter --instructions 100000000",
+    "python3 scripts/build-api-docs.py --check"
+  ],
+  "sha256": {
+    "target/tuple-names-import/TupleProducer.neox": "7c6a2ed6d47e972ea5518aea07df3bbfd391811284708fd6e62156ae9b8e3bea",
+    "target/tuple-names-import/TupleConsumer.neox": "4b3a4f4303a3127eb9caf4955be2791c2b1403dfe9d4b907cb8ebc2c692fd805",
+    "target/raven-named-tuples/SourceTuple.neox": "d821d552f8f21c09cd7c3a1e8a03c9c950bae38ac22729a80497f65dfc2be19e",
+    "tools/metadata/NeoCLR.Metadata.Experimental.Tests/TupleImportChecks.cs": "efbbb568c0c8dd5b34aae545b45c55c9ca45e4c32340b716b8af0fa9ab56d754",
+    "tools/metadata/NeoCLR.Metadata.Experimental.Tests/AuthoredTupleChecks.cs": "f445afe78cf417de2524ea5232472a60daca9dc92b9f606086d89af0fe28c965",
+    "Raven/tools/NeoClrMetadataProbe/SourceTupleChecks.cs": "2678722bf42e0e12ae33628115c9055b4f6e9abdf12b83da7609878bf397ea86"
+  },
+  "limitations": [
+    "Raven native tuple import not implemented",
+    "Guest reflection name-query API pending",
+    "Nominal tuple family remains required for source binding"
+  ]
+}

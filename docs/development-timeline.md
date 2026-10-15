@@ -25,6 +25,54 @@ available original wording; other text is a summary.
 
 See the [changelog](../CHANGELOG.md) and linked design documents for technical status.
 
+## 2026-10-15 — Union overload resolution belongs in Raven
+
+- **Author:** notes that union-typed method parameters affect overload resolution
+  and can introduce ambiguity, then clarifies: “That is a general Raven issue. Even
+  for main, I believe”.
+- **Assistant:** agrees this belongs in Raven's frontend and should be developed
+  on a main-based line, then deliberately carried to neoCLR. Proposes requiring
+  every source union alternative to convert for applicability, and diagnosing
+  ambiguity when no applicable overload is better; these are proposed criteria,
+  not a report that all existing behavior has been verified.
+- **Inspection:** Raven already has `UnionArgument_UsesCommonDenominatorForOverloadResolution`
+  covering Base versus Object. Union-parameter overlap and general ambiguity
+  coverage still need investigation. Native metadata preserves the compiler's
+  selected type; no overload fix or main integration is claimed here.
+
+## 2026-10-15 — Structural integration quality gate
+
+- **Author:** directs keeping structural-type website pages current, then working
+  toward integration into neoCLR main and Raven's neoCLR track. Explicitly rejects
+  half-completed or inefficient integration and requests separate commits per slice.
+- **Assistant:** treats AOT/JIT execution, correct managed-reference tracing, value
+  layout costs, metadata/reflection and compiler interoperability as integration
+  obligations. Interpreter success alone is insufficient evidence for integration.
+- **Author follow-up:** requests performance measurements of structural types to
+  identify optimization opportunities. The assistant compares equivalent structural
+  tuples and nominal records under AOT, separating emission from execution time;
+  [raw evidence](experiments/native-structural-types/README.md) records the bounded result.
+- **Action:** refreshes website descriptions of data composition, structural value
+  semantics, explicit nominal intersection conformance and Array<T> representation.
+  Native backend qualification and implementation remain in progress; no merge or
+  publication is claimed.
+
+## 2026-10-14 — Structural tuples replace nominal tuple direction
+
+- **Author:** “Let's continue with structural tuples, which means that we will have
+  to remove the nominal tuple types.” Subsequently directs continuing the work.
+- **Assistant:** identifies the existing nominal `System.Tuple<T...>` family and
+  Raven's dependence on its constructors/fields, plus an older structural-signature
+  codec that is not executable tuple support. Proposes preserving value copying and
+  treating labels as aliases, with native signatures, storage/access, reflection,
+  compiler migration and then removal in validated slices.
+- **Action:** adds the native ordered tuple signature and substitution foundation,
+  with explicit executable rejection while the storage path is incomplete.
+- **Open:** runtime values, TupleTypeInfo, host authoring, Raven carrier-independent
+  lowering and removal of nominal declarations. The staged timing and detailed
+  semantic defaults are assistant implementation choices, not additional author
+  replies. See [migration status](structural-tuples.md).
+
 ## 2026-10-14 — Release editor review and disappearing inlays
 
 - **Author:** asks to review the SDK and VS Code extension integrations before
@@ -17147,6 +17195,343 @@ open, not an approved complete implementation or a permanent roadmap reprioritiz
   after an edit. [Retained evidence](validation/union-hover-20261014/README.md).
   Preview 15 and the author's installed release remain unchanged.
 
+
+### 2026-10-14 — exploring structural unions and intersections
+
+- **Author:** is considering implementing structural union and intersection types
+  for neoCLR. This is exploratory interest, not an implementation instruction or
+  a change to the active performance milestone.
+- **Assistant proposal:** build on the existing [structural-types proposal](proposals/structural-types.md),
+  separating structural composition of nominal types from general member-shape
+  conformance. A union accepts values belonging to either constituent; an
+  intersection requires one value satisfying both. Start with reference/interface
+  constituents and specify canonical identity, assignability, narrowing, dispatch,
+  metadata and runtime enforcement before broader value-layout work.
+- **Comparison inputs:** Scala 3 documents [union types](https://docs.scala-lang.org/scala3/reference/new-types/union-types.html)
+  and [intersection types](https://docs.scala-lang.org/scala3/reference/new-types/intersection-types.html);
+  the [CLI specification](https://ecma-international.org/wp-content/uploads/ECMA-335_6th_edition_june_2012.pdf)
+  is the baseline for a later metadata/verification comparison. Retrieved
+  2026-10-14; these are initial research inputs, not a completed design review.
+- **Open:** overlap semantics versus tagged-carrier identity, member collisions,
+  nullability, mutable/by-reference storage, generics, reflection, GC layout and
+  interop. No runtime/compiler implementation or settled ABI is claimed.
+
+
+### 2026-10-14 — author starts the composition experiment
+
+- **Author:** directs commencing an experiment on a new branch and points out
+  existing Raven/neoCLR branches as possible sources of reusable work.
+- **Assistant action:** creates neoCLR `codex/structural-union-intersection` from
+  `e2b010683` and Raven `codex/neoclr-union-intersection` from the current native
+  compiler `caa787a96`. Inspects the older structural and intersection branches
+  without merging them. Keeps Raven's checkout and ordinary main separate.
+- **Outcome:** adds an executable host-side probe reusing neoCLR's existing metadata
+  codec/identity resolver. Local execution passes 181 assertions for signature
+  roundtrips, membership, reference-preserving projection, rejection and a finite
+  soundness matrix. Records the existing singleton-compound identity limitation.
+- **Open:** native admission, verifier/codegen/GC contracts and Raven integration;
+  no native execution is claimed. The [experiment record](experiments/structural-compositions/README.md)
+  pins inspected branches and defines the next bounded slice. The active platform
+  milestone is unchanged.
+
+- **Assistant follow-through:** extends the host probe to 187 passing assertions
+  with reference-table relocation and assembly-scope distinctions. Adds seven
+  passing test-only Rust cases using actual runtime nominal relations, interpreter
+  results, managed handles and collection. The assistant provisionally selects
+  singleton collapse in the experimental semantic layer while preserving the
+  shared metadata identity API. No author decision on the final ABI is inferred.
+  Guest compound signatures and Raven integration remain open.
+
+- **Executable follow-through:** on the experiment branch, the assistant adds the
+  `experimental-compositions` runtime build feature, native execution-model union/
+  intersection signatures, normalization, constrained storage/casts and guaranteed
+  interface dispatch. Ten interpreter integration cases pass, including NEOX
+  roundtrip and collection; the saved consumer returns 42. Seven earlier runtime
+  probes and 27 focused default-build controls pass. Backend admission remains an
+  explicit rejection rather than a layout implementation.
+- **Refinement and remaining gaps:** the assistant follows existing reference/null
+  behavior for executable slots, while preserving definite assignment; this extends
+  the earlier non-null membership probe rather than claiming that it tested nulls.
+  Boxed/intrinsic references remain a runtime completeness gap, even through a
+  compatible static Object/interface view. No general source type policy is inferred.
+- **Compiler record:** creates a separate Raven worktree for the already-created
+  `codex/neoclr-union-intersection` branch and records the handoff in its compiler
+  bridge documentation and changelog. The original Raven checkout is unchanged.
+  Compiler emission, public descriptor identity and JIT/AOT support remain open.
+
+- **Compiler API follow-through:** selectively reuses Raven `02d669acd` and
+  `c4d57d282`, without merging the old branch or enabling its parser/storage code.
+  Adds normalized symbols, substitution/display and reference conversions. The
+  build script and 89 focused compiler API tests pass. The pre-change overload
+  suite has one inaccessible metadata-fixture failure (414/415 pass), recorded
+  separately from the new intersection behavior. Native import/export, source
+  storage and compiler/runtime descriptor normalization remain open.
+- **Author cleanup direction:** says, “After work we can delete the old
+  experimental branches.” The assistant proposes retaining recoverable tips before
+  deleting superseded experiment branches, preserving the active experiment and
+  Raven main/native lines. This does not authorize a wholesale branch merge.
+
+- **Validation and cleanup outcome:** the post-change overload suite reproduces
+  the same 414 passes and one pre-existing failure. After focused validation, the
+  assistant removes three superseded local branches, preserving their exact tips
+  in annotated `archive/2026-10-14/*` tags: neoCLR `structural-types`, Raven
+  `intersection-constraints` and Raven `neoclr-structural-types`. The experiment
+  record lists recovery tags and revisions. Remote branches/tags are unchanged;
+  active experiment branches and Raven main/native lines remain separate.
+
+- **Author workflow direction:** asks, “Commit each slice.” The assistant commits
+  the completed runtime experiment as `3d61b17b6` and Raven semantic foundation as
+  `f4d6f0681`, then proceeds with a separately validated source-constraint slice.
+  The broader pre-change baseline stops at two existing documentation-ID failures
+  after 1,346 passes; this is recorded rather than presented as a green baseline.
+
+- **Source-constraint outcome:** selectively carries archived parser/constraint
+  commits `08b53d8c4`, `41b684e3f` and `c6a303f0d` to the native experiment.
+  The build script and 1,199 focused tests pass, including .NET metadata/consumer
+  execution and incremental parser recovery. Source intersections bind only as
+  generic-constraint conjunctions; runtime value storage/native compound emission
+  remain gated. Commits this source slice as Raven `620695e16`; the failing
+  documentation control batch is unchanged (91 passes/two failures). The assistant
+  records ordinary .NET constraint behavior separately
+  from native runtime support and keeps main/native lines separate.
+
+- **Native-metadata prerequisite:** on continuation, the assistant finds that the
+  host signature model cannot represent runtime compounds. Adds a separate opt-in
+  read-only declaration profile and normalized snapshot descriptors; keeps default
+  reads, callable imports and CLI projection closed to compound signatures.
+  This preserves native information without claiming source emission. The focused
+  checks pass; the metadata harness changes from 169/171 to 170/172 with the same
+  two pre-existing failures. Manual host API documentation and guest snapshot check
+  are updated; compiler storage/capability mapping remains the next slice.
+
+- **Metadata inspection follow-through:** on continuation, the assistant adds
+  canonical read-only union/intersection views to the metadata facade, exposing
+  admitted signatures through function discovery. Focused checks cover reordered
+  identity, context isolation, immutable bounds and mixed nesting. This is another
+  native compiler prerequisite; Raven import and emission remain unimplemented.
+
+- **Native semantic import follow-through:** on continuation, the assistant adds
+  Raven's explicit experimental intersection-reference API (`50037e711`) and canonical view-to-
+  symbol mapping. The probe finds that nominal-supertype reduction could let a
+  compound signature reach emission as a nominal signature; a reference-wide
+  NEOMETA001 guard now prevents that erasure. Both schema variants pass cold/warm
+  queries, descriptor-retention and emission/no-output checks; the existing nullable
+  control passes before/after. Default loading remains closed, structural unions
+  are rejected, and runnable Raven compound emission is still open. An unrelated
+  cold assembly-symbol API setup failure is recorded in Raven's experiment notes
+  as a deferred general-main candidate, not folded into this target slice.
+
+- **Native callable emission follow-through:** on continuation, the assistant adds
+  a separate host metadata API for importing compound free-function contracts and
+  serializing calls without nominal erasure. Stack checks retain exact compound
+  identity. Three generated callers (union, intersection, redundant intersection)
+  return 42 in the opt-in interpreter. The metadata harness adds one passing case
+  with its same two known failures; Raven's semantic-import/emission-gate probe
+  still passes. General authored storage and Raven source emission remain open.
+
+- **First Raven-generated call execution:** on continuation, the assistant adds an
+  explicit native emit option for direct imported intersection calls (Raven
+  `dc750c659`, against neoCLR `930ddf60`). Shared
+  lowering carries call-only intersection shapes; native emission selects original
+  metadata descriptors by token/snapshot rather than reconstructing normalized
+  types. Four generated consumers return 42 in the opt-in interpreter, covering
+  nested/discarded calls and redundant bounds. Distinct raw contracts with the same
+  normalized nominal type reject before output. The 24 focused compiler tests and
+  existing native import/nullable controls pass. Default and PE emission remain
+  gated; authored storage, broader conversions and JIT/AOT remain open.
+
+- **Intersection argument proof follow-through:** on continuation, the assistant
+  closes the exact-identity gap for flat native intersection call arguments using
+  scoped nominal identity and declared interface relationships. Three additional
+  host consumers and Raven's equivalent-contract consumer return 42; strengthening
+  without a guaranteed bound still rejects. Original descriptors and storage/PE
+  gates remain intact. Class-base traversal and broader composition conversions
+  remain open; this does not reprioritize the active platform milestone.
+
+- **Metadata model question:** the author asks how definitions and specifications
+  are stored and which extensions neoCLR adds. The assistant explains the separate
+  nominal declaration/reference and recursive signature layers, distinguishes CLI
+  TypeDef/TypeRef/TypeSpec projection from native TypeDef/Type expression storage,
+  and separates executable branch features from the broader structural codec/design.
+  No new representation or permanent feature priority is selected by this question.
+
+- **Union call proof follow-through:** the author requests continued integration of
+  structural unions and intersections. The assistant extends the bounded host
+  call proof to unions and cross-kind conversions using the interpreter's existing
+  reference relation. Three new host-generated consumers return 42, while missing
+  guarantees and unsafe narrowing reject. Raven's intersection call controls pass;
+  structural-union compiler import and broader storage remain open. No permanent
+  reprioritization or new representation is inferred from this continuation.
+
+- **Working POC and bound restriction:** the author requests continuing until a
+  working union/intersection POC, then clarifies that intersections may contain
+  interfaces and extendable reference types, not sealed classes or value types.
+  The concrete examples are Animal (abstract/non-sealed) & Quacks (interface),
+  accepted, and Dog (sealed) & Barks (interface), rejected. The assistant applies
+  validation before normalization and distinguishes written bounds from concrete
+  objects satisfying them. Runtime and host rejection checks pass; compiler and
+  reproducible POC validation are recorded in the subsequent slice.
+
+- **POC outcome and generic direction:** four Raven-generated consumers now return
+  42 through native union/intersection calls, covering both sealed concrete union
+  alternatives, direct membership conversion and discarded results. The author
+  asks for admission heuristics to manage complexity, then explicitly requests full
+  support for open and closed generic types in both compositions as the next step,
+  allowing it to remain outside this POC. The assistant records current flat/native
+  nongeneric limits as temporary gaps, adds closed-generic semantic tests, and
+  supplies a repeatable runner. Provider contracts are native fixtures; general
+  source compound storage and generic native execution remain open.
+
+  Final POC evidence: Raven `aa542a6f5` with neoCLR `b4dceb711`; four interpreter
+  consumers return 42, 79 focused compiler tests and 11 runtime tests pass, as do
+  host composition imports and prior compiler controls. See
+  [the validation record](experiments/structural-compositions/poc-validation-20261014.json).
+
+
+### 2026-10-14 — Generic union nesting examples
+
+- Author supplied `T | HttpError | JsonError`, `Request<T> | HttpError | JsonError`,
+  `Task<T | HttpError | JsonError>` and then
+  `Task<Response<T> | HttpError | JsonError>` as intended valid forms. This extends
+  the earlier direction for eventual full open/closed generic composition support.
+- Assistant added semantic substitution coverage for all four forms, including
+  value alternatives and union deduplication, and implemented closed constructed
+  reference bounds in the experimental runtime. 88 focused compiler tests, 14
+  composition runtime tests and 13 generic-class controls pass.
+- Remaining: generic metadata adapter/compiler execution, composition arguments
+  and value union storage. Task examples currently establish semantic shape and
+  substitution only. [Scope/evidence](experiments/structural-compositions/README.md#generic-composition-first-slice--2026-10-14).
+
+
+### 2026-10-14 — Composition use sites and generic constraints
+
+- Author said structural unions can be used in more places than intersections,
+  describing intersections as usually inputs such as parameters and type constraints,
+  and explicitly included unions as constraints too.
+- Assistant interpreted “usually” as guidance rather than banning intersection
+  outputs. Proposed any-of union constraints and all-of intersection constraints,
+  preserving disjunction instead of emitting separate conjunctive CLI bounds. The
+  author has not separately confirmed concrete syntax or member-conflict rules.
+- Action: recorded union constraints as required follow-up work and distinguished
+  constraint semantics from value storage and current backend limits. During this
+  exchange the runtime wrapper-call slice passed 24 composition tests and 13 generic
+  controls; native constraints, host/compiler wrapper transport and Task execution
+  remain unimplemented. [Details](experiments/structural-compositions/README.md#author-direction-value-positions-and-constraints--2026-10-14).
+
+
+### 2026-10-14 — Intersection traits and return contracts
+
+- Author clarified that intersections as inputs are guidance only: intersections
+  can describe return types and other signatures, especially API trait contracts,
+  despite being less common in everyday code.
+- Assistant agreed not to impose use-site bans and continued the POC with both
+  union-wrapper and intersection-wrapper returns. Metadata and Raven imported-call
+  probes now preserve both contracts; twelve executable consumers pass. This does
+  not establish real Task execution or source-authored compound storage.
+  [Evidence and remaining scope](experiments/structural-compositions/README.md#wrapped-composition-metadata-and-raven-calls--2026-10-14).
+
+
+### 2026-10-14 — Assessment of native composition direction
+
+- Author asked whether the direction is sound and whether neoCLR should support
+  unions and intersections. Assistant recommends continuing both as native type
+  specifications with conservative, explicit rules. This is a recommendation,
+  not a newly approved production contract or a formal soundness result.
+- Rationale: preserve alternatives and combined trait requirements across assembly
+  and generic boundaries. Scala provides established language precedents for
+  [unions](https://docs.scala-lang.org/scala3/reference/new-types/union-types.html)
+  and [intersections](https://docs.scala-lang.org/scala3/reference/new-types/intersection-types.html);
+  [.NET generic constraints](https://learn.microsoft.com/en-us/dotnet/csharp/programming-guide/generics/constraints-on-type-parameters)
+  already express conjunctions of interfaces, while the proposed compositions
+  extend the available signature contracts. Language precedents alone do not
+  establish the need for native runtime support; cross-language preservation is
+  the intended benefit, with added loader, verifier, reflection and backend cost.
+- Assistant cautions: overlapping union alternatives do not preserve a selected
+  case (for example, substituting HttpError for T); use tagged unions when case
+  identity matters. The author's sealed-bound restriction is a simplification
+  policy, not a mathematical requirement, and does not alone exclude impossible
+  intersections of unrelated classes. Intersection returns remain valid.
+- Recommended next evidence: executable Task<Response<T> | HttpError | JsonError>
+  paths, substitution/constraint rejection tests, and closure of representation
+  gaps before stabilizing metadata/ABI. Existing bounded interpreter consumers
+  demonstrate feasibility, not production completeness; value storage, nullability,
+  member conflicts, variance, reflection and JIT/AOT still need specified coverage.
+  [Current POC evidence](experiments/structural-compositions/README.md).
+
+
+### 2026-10-14 — Task union completion and result delivery
+
+- Author directed continued work toward completion and result delivery for
+  `Task<Response | HttpError | JsonError>`, with each slice committed.
+- Assistant traced the remaining blocker to the existing compiler's immediate
+  local-address/default-initialization idiom in instantiated ArrayList code. Added
+  a bounded admission rule with exact-type, adjacency and address-escape checks;
+  committed the runtime slice as `3e83c870a`.
+- Real-library native consumers complete each union alternative, recover payload
+  identity/value, retain the first result after repeated completion, and check
+  pending/cancelled reads and invalid-payload rejection without verification.
+  The error alternatives are successful Task payload values, separate from lifecycle
+  cancellation or faults. GC-retention coverage clears the caller's payload reference
+  before collection and reads it again through the Task.
+- This is interpreter/native-IL evidence. Raven source-authored composition signatures,
+  async/await integration and TaskOutcome carrier access remain open; no new published
+  support is implied. [Scope and checks](experiments/structural-compositions/README.md#real-task-union-completion-and-result-delivery--2026-10-14).
+
+
+### 2026-10-14 — Intersection finality terminology clarified
+
+- Author clarified that “sealed” in the intersection restriction meant C#/.NET
+  non-inheritability, not Raven sealed hierarchies. Both open hierarchies and sealed
+  hierarchies with permitted subtypes should be allowed; classes closed to extension
+  should be rejected.
+- Assistant inspected the compiler, runtime and metadata reader. Their checks
+  already distinguish final classes from closed families. Added regression coverage
+  for Raven sealed class/interface roots and native closed hierarchies, and clarified
+  diagnostics/documentation without changing the acceptance rule. Existing leaf
+  rejection stays in place. This corrects terminology in earlier notes rather than
+  asserting the author intended to exclude Raven sealed hierarchies.
+- The next compiler-consumption prerequisite remains explicit local storage for
+  imported composition results; this clarification was addressed before opening it.
+  [Clarified contract](experiments/structural-compositions/README.md#clarification-final-classes-versus-sealed-hierarchies--2026-10-14).
+
+
+### 2026-10-14 — Structural types are runtime types
+
+- Author emphasized that structural and nominal types are both types and can be
+  fully introspected. Structural types live at the metadata signature level without
+  their own nominal declaration, but remain known by the runtime and expose type
+  information. Author then identified tuples (later), unions, intersections and
+  function types, with arrays special because they remain backed by Array<T>.
+- Assistant agreed and distinguished this intended model from the POC's temporary
+  import/storage/reflection limitations. Existing host TypeInfo views are partial
+  implementation evidence, not completion of full runtime introspection or tuples.
+- During the exchange, the explicit imported-result local API passed host checks,
+  three flat executable consumers and the twelve-consumer paired POC, including
+  host wrapper locals. Raven source-local emission remains the next integration
+  step. [Model and evidence](experiments/structural-compositions/README.md#structural-runtime-type-model--author-clarification-2026-10-14).
+
+
+### 2026-10-14 — Raven locals and real Task union awaits
+
+- Author requested continued Raven source-local and await integration for
+  Task<Response | HttpError | JsonError>, with each slice committed.
+- Assistant implemented and committed imported-result local/copy transport
+  (Raven cba00f2a0, neoCLR 16ce9d006), then exact cross-assembly wrapper imports
+  (Raven 4d34e3505, neoCLR 43c7ff034). Fourteen composition consumers and a real
+  Task local consumer passed. The await probe first reached generated-field storage.
+- The subsequent working implementation retains imported composition descriptors in
+  reference-class state fields and Task calls. Six completed/pending await consumers
+  deliver all three alternatives, keep the payload across another pending await, and
+  check its concrete type. The provider is a native signature fixture using the real
+  Task library; consumer code is ordinary Raven with inferred locals and await.
+- Source-authored structural return syntax, full open generic support, guest reflection
+  and JIT/AOT remain open. This outcome does not reprioritize the mainline roadmap.
+  [Implementation and repeatable evidence](experiments/structural-compositions/README.md#raven-composition-await-delivery--2026-10-14).
+
+- Validation also exposed a .NET readonly-receiver control returning 3 rather than 2;
+  the assistant reproduced it with pre-slice shared compiler files and recorded it as
+  a separate general Raven candidate instead of attributing it to composition support.
+
 ## 2026-10-14 — Type relationship queries and explicit argument presence
 
 - **Author:** requested a worktree from main, `AssignableTo`/`AssignableFrom` on
@@ -17178,3 +17563,402 @@ open, not an approved complete implementation or a permanent roadmap reprioritiz
   **Outcome:** commits `c5e05ce40` and `682a377cc` were fast-forwarded into local
   main. The separate structural-composition checkout and its uncommitted work were
   untouched. No remote push, SDK installation or website publication was performed.
+
+### 2026-10-14 — carry main reflection improvements into the composition experiment
+
+- **Author:** reported reflection improvements on main and requested integration.
+- **Assistant action:** preserved the completed await slices (`a3f385e15` in neoCLR,
+  `f516d90bf` in Raven), then selectively carried main commits `c5e05ce40`,
+  `682a377cc` and `68a6f8c8e` onto `codex/structural-union-intersection`.
+  Documentation conflicts retain both experiment history and mainline API evidence.
+- **Scope:** shared TypeInfo assignment, strict subclass and instance predicates,
+  their JSON/reflection consumers and matching API references. No Raven compiler
+  change or branch merge was needed for this carry. Guest composition descriptors
+  and composition-aware reflection remain open; these nominal/Function APIs do
+  not by themselves complete structural union/intersection introspection.
+- **Validation:** see the integration checkpoint in the
+  [composition experiment](experiments/structural-compositions/README.md#main-reflection-integration--2026-10-14).
+
+### 2026-10-14 — separate structural union identity from nominal classification
+
+- **Author:** clarified that IsUnion should be reserved for structural unions, with
+  nominal structure/rule checks in a separate group of helpers ("East Union" was
+  interpreted in context as IsUnion).
+- **Assistant correction:** the earlier decision to retain nominal IsUnion semantics
+  was provisional and is superseded. Reserve TypeInfo.IsUnion for structural identity;
+  move marker-based union detection to NominalTypeInfo.IsUnionDeclaration. Other
+  nominal-helper grouping remains follow-up work, not a completed API reorganization.
+- **Action:** update runtime classification, the native lowering table, source
+  descriptors, bridge declarations and nominal consumers; refresh API documentation.
+  Guest structural descriptor construction remains independently gated.
+- **Outcome:** both migrated native consumers pass in the interpreter, with direct
+  structural/nominal checks and native lowering regression coverage. Retained
+  [evidence](validation/union-classification-20261014/results.json) records artifact
+  hashes and the separately blocked legacy CLI bootstrap.
+
+
+### 2026-10-14 — Dedicated structural descriptor interfaces
+
+- **Author:** requested “UnionTypeInfo and IntersectionTypeInfo”, following the
+  separation of structural IsUnion from nominal declaration checks.
+- **Assistant implementation:** add both TypeInfo subinterfaces with Types for
+  direct constituents, native snapshot providers and interpreter type tokens.
+  Preserve runtime structural identity and existing assignment semantics.
+- **Boundary:** member/hierarchy introspection remains explicit unsupported work;
+  Raven typeof still emits nominal union carriers, so the executable probe substitutes
+  native tokens explicitly. This is experimental runtime support, not full compiler
+  or backend completion. See [the probe](experiments/composition-type-info/README.md).
+
+### 2026-10-14 — Source structural signatures and Raven intersections
+
+The author requested replacing ad hoc nominal union carriers with real structural
+metadata types, then adding intersection support in Raven. The assistant implemented
+an explicit native source contract, preserving declared nominal unions and ordinary
+.NET behavior, and committed the metadata authoring and compiler union slices.
+A source-only Task<Response | HttpError | JsonError> consumer now passes all three
+completed await alternatives and structural introspection. The temporary Wait<T>
+bridge is disabled for this experiment; generic method specialization remains open.
+Intersection source support is the next requested slice. See
+[source evidence](experiments/source-structural-unions/README.md).
+
+Outcome update: the requested Raven intersection slice now passes source trait dispatch, structural reflection and cross-library execution. The compiler retains the author’s distinction between Raven sealed hierarchies and CLR-final classes. See [intersection evidence](experiments/source-structural-intersections/README.md).
+
+### 2026-10-14 — Renewed structural constraint-position requirement
+
+The author said, “We also need to consider unions and intersections in type
+constraint position”. The assistant inspected Raven's constraint analyzer and tests:
+existing intersection syntax flattens into conjunctive nominal bounds; the new
+source-storage work does not supply native structural constraint support. The
+assistant proposed preserving any-of/all-of semantics, full-argument coverage for
+union arguments, generic substitution and reflected grouping, and recorded the
+next bounded implementation sequence. These are design proposals and pending work,
+not a claim of implementation or author approval of every detail. See the
+[constraint follow-up](experiments/structural-compositions/README.md#constraint-position-follow-up-after-source-storage--2026-10-14).
+
+
+Constraint implementation update, 2026-10-14: following the author's continuation,
+the assistant added native closed structural TypeBound validation and argument
+membership checks, with nominal method-specialization checks independent of
+verification. Compiler inspection found that an unhandled structural constraint
+could fall through as satisfied; Raven commit 9bb265ed5 adds explicit checking and
+owner/method substitution. The first focused compiler run passed 43 tests, and the
+expanded structural-only run passed 18 (overlapping evidence, not 61 unique tests).
+Native compiler emission, host adapter materialization and guest reflected grouping
+remain unfinished and are not claimed by this slice. See
+[constraint implementation scope](experiments/composition-constraints/README.md).
+
+Native direction clarification, 2026-10-14: the author asked about moving from the
+neoCLR to .NET adapter, then said they were unsure which boundary was meant. The
+assistant distinguished native neoCLR metadata, the C# library that reads/writes it,
+and the temporary CLI bridge. The author explicitly directed: “Yes, continue towards
+native neoCLR metadata”. The assistant implemented host inspection of structural
+method constraints without a CLI projection. This preserves signature-level grouping
+and type introspection; compiler emission/import and guest constraint reflection
+remain open. See the [metadata constraint reference](../api-docs/experimental-metadata.md#structural-method-constraint-inspection-2026-10-14-development).
+
+### 2026-10-14 — Structural POC acceptance and delivery
+
+The author directed, “Continue until you have reached completion”. The assistant
+used the earlier author distinction between a working POC and subsequent full
+open-generic support to define a closed-reference interpreter acceptance contract;
+this scope choice is the assistant's interpretation, not a new author approval of
+every remaining restriction. The assistant extended structural generic-body calls
+to closed constructed imported interfaces (neoCLR `1ca161542`, Raven `c3363e9e0`),
+rejecting mismatched constructions and weak union guarantees. The separate native
+consumer returned 42. It then added source-authored queued Task union delivery
+(neoCLR `a82c9d289`): all three alternatives pass completed and queued awaits with
+payload checks, without signature rewriting.
+
+The [consolidated acceptance contract](experiments/structural-poc/README.md) records
+the runnable command, feature-branch ownership and exact boundaries. Full open
+generics, direct external structural-bound authoring, guest constraint reflection
+and JIT/AOT remain implementation/qualification work; completion of the bounded
+POC must not be read as completion of those capabilities or a roadmap milestone.
+The linked acceptance report records the performed checks and their outcome.
+
+
+During acceptance the author clarified that neoCLR is “not really creating Rust-like
+traits”; intersections make nominal interfaces more useful while types still
+implement them explicitly. The author mentioned possible compiler-level simulation
+of trait characteristics as a future possibility. The assistant confirmed that the
+current implementation checks declared nominal interface relationships and treats
+only their composition as structural. Documentation now states this distinction;
+no implicit member-shape conformance or runtime trait feature was added or promised.
+
+Acceptance outcome: all 20 consolidated checks passed, including 72 experimental
+native tests and the default-profile rejection test. Additional host and Raven
+regressions reject matching-member classes without the required interface declaration.
+The [retained report](experiments/structural-poc/results.json) distinguishes the main
+acceptance run from this clarification follow-up.
+
+
+### 2026-10-14 — Native tuple element names
+
+The author said, “You should still be able to name tuple elements.” The assistant
+validated source-local named member access but described names as aliases outside
+structural identity. The author corrected that framing: “But structural types can
+actually set real names and not just fake them by attributes”. The assistant agreed
+that names belong directly in native tuple metadata and reflection, without
+`TupleElementNamesAttribute` or a nominal carrier. It asked whether names should
+participate in identity or retain positional compatibility. The author selected:
+“No, preserve names but keep positional type compatibility”. Names must survive
+native import/reflection, while renaming elements must not break compatibility.
+The author further clarified that tuples are equal because they have the same
+structure and names are not part of structure in that sense. The assistant
+confirmed ordered element types determine type equality; names are native metadata
+for member access, tooling and reflection.
+The existing positional runtime node and source-local lowering are groundwork, not
+completion of this named-element requirement. See [the migration](structural-tuples.md).
+
+
+Follow-up outcome: after committing source-local Raven lowering, the author directed
+continuing to the next slice. The assistant implemented native Rust tuple name
+metadata and per-signature host names, preserving positional equality/hash and
+identity. Tests verify named roundtrips, substitution, equal identities with distinct
+descriptive names and renamed parameter execution (42). C#/Raven name wiring and
+guest name queries are still pending; no attribute encoding was introduced.
+
+## 2026-10-15 — Integrating all three structural forms
+
+The author clarified that the goal is confidence sufficient to integrate the
+experiment into neoCLR and its Raven compiler version, and explicitly included
+intersections alongside unions and tuples. The assistant narrowed this slice to
+default native project/runtime admission and a combined library/consumer test,
+rather than treating broader generic support as a prerequisite. The sample
+returns 42; default runtime tests pass. Integration remains on feature branches,
+with source-library rebuild and backend limitations recorded in
+[the integration contract](raven-cli-bridge.md#native-project-integration--2026-10-15-development).
+No merge or deletion of old branches has been performed.
+
+## 2026-10-15 — Union value alternatives and formatting
+
+The author clarified: “Unions have to support both value types and reference
+variant types,” contrasting intersections as mostly reference/interface views.
+The assistant identified the real Web integration gap: declared HttpError and
+JsonError unions are value types. An attempted unsupported-value diagnostic was
+discarded before commit; it must not become the permanent source contract.
+The assistant began runtime admission through existing explicit boxing and exact
+unboxing, retaining native structural signatures and leaving compiler integration
+pending. This is a provisional implementation representation, not an author
+choice of a permanent boxed ABI.
+
+The author then raised string representation and proposed duck-typed ToString.
+The assistant proposed normal dispatch on the current payload, keeping duck typing
+as a separate possible compiler feature. No subsequent author decision on that
+proposal is available. Neither approach is implemented for union formatting here.
+See [the integration notes](raven-cli-bridge.md#value-and-reference-union-alternatives--2026-10-15-development).
+
+## 2026-10-15 — Structural value classification and boxing cost
+
+The author clarified that structural unions and tuples remain value types outside
+the nominal inheritance hierarchy. The assistant corrected union compiler symbols
+and guest reflection, while preserving the interpreter's payload representation.
+The author asked whether mixed union alternatives require method variants by value
+size, then asked about boxing performance. The assistant explained that one union
+representation can serve all active alternatives, and identified allocation, GC,
+indirection and copying costs in the current implementation. Inline tagged storage
+was proposed as a future option, not selected as a finalized ABI. The author said
+“Ok continue”; no layout or formatting policy was thereby finalized.
+
+Host authoring and compiler conversions now admit bounded value alternatives.
+Focused validation passes; the full host harness has six unresolved failures.
+System.Web reaches an out-parameter emission boundary; integration remains on the
+feature branches. See the integration notes for evidence and remaining scope.
+
+## 2026-10-15 — Reference alternatives do not make a union a reference
+
+The author clarified: “The union is in itself a value,” even when one or more
+variants contain references. The assistant confirmed that copying a reference
+payload preserves object identity while the union has value semantics. This
+reinforces the existing category correction; it does not select a boxed native ABI.
+The next validated slice preserves structural callback signatures and executes a
+callback returning a union (42). All four native source libraries now generate;
+bundle execution and generic value-wrapper support remain distinct validation work.
+
+## 2026-10-15 — Structural type direction and language precedents
+
+The author asked: “Is this direction with structural types still sound? Is there
+any language that has done similar?” The assistant assessed the architecture as
+coherent, while distinguishing that judgment from a formal type-safety proof or
+completion of the runtime ABI. Structural composition of nominal types does not
+require implicit interface conformance or duck typing.
+
+Primary-source comparisons reviewed by the assistant:
+
+- [Scala 3 unions](https://docs.scala-lang.org/scala3/reference/new-types/union-types.html)
+  and [intersections](https://docs.scala-lang.org/scala3/reference/new-types/intersection-types.html)
+  demonstrate anonymous composition of class/trait types, including generic
+  intersection bounds. They are language-semantic precedents, not evidence for
+  neoCLR's particular value-container representation or reflection contract.
+- [Julia types](https://docs.julialang.org/en/v1/manual/types/#Type-Unions) combine
+  nominal/parametric types with runtime union types. Its
+  [isbits union optimization](https://docs.julialang.org/en/v1/devdocs/isbitsunionarrays/)
+  demonstrates inline payload storage with type tags for eligible unions.
+  Julia's dynamic type model and union types are not the same as neoCLR's proposed
+  distinct union value containers; this does not select neoCLR's ABI.
+- [TypeScript compatibility](https://www.typescriptlang.org/docs/handbook/type-compatibility)
+  and [compositions](https://www.typescriptlang.org/docs/handbook/unions-and-intersections.html)
+  provide an ergonomic comparison. Its structural object compatibility differs
+  from neoCLR's explicitly implemented nominal interfaces.
+
+The assistant recommended maintaining separate contracts for type identity,
+assignability, payload/boxing identity and physical layout. Open generic
+substitution, overlapping union alternatives, variance, reflection and GC/layout
+remain validation obligations. The no-final-class intersection rule is a
+conservative project restriction, not a mathematical necessity: a final class
+already implementing an interface can have a meaningful, redundant intersection.
+No change to that author-selected restriction was made or inferred.
+
+Existing evidence remains the direct/closed generic task consumers and focused
+checks in [the qualification record](experiments/value-unions/direct-task-results.json).
+The open Response<T> probe still rejects. This discussion adds research and
+assessment only; no new implementation commitment or author response is recorded.
+
+## 2026-10-15 — Structural data computation and backend requirements
+
+The author directed that AOT must support structural types and that both JIT and
+AOT must know about their distinct handling. Runtime optimization is desirable,
+but at least AOT support is required. The assistant distinguished interpreter
+validation from layout, GC and calling-convention support, and proposed completing
+the validated open-generic slice before inspecting AOT.
+
+The author clarified that these types primarily represent compositions of data in
+computation, not necessarily public APIs, and should be efficient when nominal
+types are unnecessary: “But they are still types, just not nominal.” The assistant
+agreed to treat identity, metadata and introspection as real type contracts, even
+where optimized execution eliminates storage. The boxed interpreter representation
+remains provisional. No specific native ABI, layout or optimization was selected.
+
+The open nominal-constituent slice now passes a Raven generic-method consumer (42)
+and 58 runtime tests; [evidence](experiments/value-unions/open-generic-results.json).
+Backend work remains to be performed and does not inherit interpreter qualification.
+
+The author also clarified that arrays are structural at runtime while representable
+through nominal `Array<T>`. The assistant distinguished the runtime shape from its
+nominal API representation, preserving one array value contract. The author requested
+that the structural-type website pages remain current; the assistant began reviewing
+those pages against the implemented feature-branch state.
+
+
+## 2026-10-15 — Raven structural lowering and pattern documentation
+
+The author asked for Raven documentation showing exactly how structural source
+types map to runtime types, then emphasized patterns over structural unions.
+The assistant traced the shared match lowerer, portable PatternValue lowering and
+native instruction builder, and added Raven's `docs/compiler/neoclr-structural-lowering.md`.
+It distinguishes source type identity, native signatures, runtime storage and
+nominal union case helpers. The inspection also identifies a remaining native
+scalar-pattern gap: `isinst T` needs tagged scalar-union lowering in addition to
+exact payload extraction. That work is not reported as complete.
+
+The author subsequently requested corresponding runtime details in the neoCLR
+branch, specifically function-type use and testing structural union alternatives.
+The assistant added `docs/structural-runtime-operations.md`, linked from the family
+reference and integration record, covering signatures, operations and backend
+qualification separately.
+
+## 2026-10-15 — Reassessing structural union complexity
+
+During native record/reference work, the author asked whether structural unions
+remain sound and worth retaining, or add unnecessary complexity. The assistant
+recommended keeping the feature for data composition while retaining strict
+integration criteria. It distinguished coherent value semantics from implementation
+costs in layout, tracing, calls, boxing and generic specialization. It explicitly
+identified the current sum-of-alternative-regions layout as correctness-first,
+with performance still to be qualified. This was an assistant assessment, not a
+new author decision to relax the integration criteria. Native JIT/AOT, managed GC,
+full application behavior and measured costs remain qualification work.
+
+The author then clarified: “The challenge is correctness, to be able to use the
+type system in a consistent way even within these structural constructs.” The
+assistant agreed that existing identity, explicit nominal conformance, generic
+substitution and assignability rules must remain consistent across source,
+metadata and runtime operations. It used the overlapping-interface test as a
+concrete example: a private storage discriminator must not suppress a held
+object's nominal relationships. Optimization must preserve those rules.
+
+
+Follow-up implementation evidence: the nine-input closed-generic record consumer
+exposed a Raven reachability comparison that erased generic arguments and marked
+Response<long> unreachable after Response<int>. The assistant reproduced this
+independently on a branch from Raven main (four failing regressions), replaced the
+comparison with the shared symbol comparer, and validated 195 tests on both the
+main-based branch and the selectively updated native branch. The native consumer
+then passed interpreter/AOT with distinct closed identities and substituted
+fields. See [qualification](experiments/native-structural-types/README.md#closed-generic-record-identity-2026-10-15).
+This is an observed correctness repair, not completion of generic/JIT/GC support.
+
+
+## 2026-10-15 — Function types inside other structural types
+
+The author asked what happens when function types occur inside other structural
+types and vice versa. The assistant distinguished tuple-held callables, functions
+with structural parameter/result types, unions of callable shapes, and callable
+intersections. Code inspection found interpreter evidence for union-valued callback
+signatures, but the current compound validator rejects a function directly as a
+union alternative. Tuple/function signature representation does not establish
+combined native execution/GC qualification. The assistant described function
+intersections as an overload-like contract outside the existing nominal bounds,
+not an implicitly supported extension. No user decision to change intersection
+rules was made. See [runtime composition limits](structural-runtime-operations.md#function-values).
+
+
+## 2026-10-15 — Type-first union pattern examples
+
+While reviewing structural union samples, the author clarified that Raven supports
+both `Type obj => ...` and `let obj: Type => ...`, and finds the type-first form
+more intuitive in match arms. The assistant adopted that form in the String and
+widening samples, retaining compilation checks. This is a presentation preference;
+no parser or pattern semantics change was requested.
+
+
+## 2026-10-15 — Capture and destructure according to the arm's needs
+
+The author clarified that member-only match arms can use supported positional or
+property destructuring, while a type-only pattern (`int => ...`, `() => ...`) and
+whole-value capture (`int no => ...`, `Foo foo => ...`) remain appropriate for
+other arms. The assistant treated these as styles rather than semantic changes.
+Compiling a property pattern over a value-record union alternative exposed a
+native Raven emission gap. The assistant extended checked extraction/getter
+lowering and validated 12 focused compiler tests plus a fresh interpreter/AOT/JIT
+consumer. See the [property-pattern checkpoint](experiments/native-structural-types/README.md#value-record-property-pattern-consumer-2026-10-15).
+
+
+## 2026-10-15 — Integrate structural types and retire nominal carriers
+
+The author asked to stabilize and integrate the experimental work, corrected the
+scope from structural unions to structural types as a whole, and directed:
+“The work that is in our experimental branches should be integrated and flags
+removed. The Union and Tuple classes removed.” The assistant accepted this as an
+integration/migration task covering runtime, native Raven binding/emission,
+reflection, libraries, samples and documentation. Declared nominal unions and
+ordinary .NET-target behavior remain distinct from the neoCLR ad-hoc carriers.
+
+Work began by removing the Rust structural feature gates and making their tests
+unconditional, including reduced builds. The carrier audit found Range APIs using
+nominal Tuple<int, int>, which must migrate together with consumers and generated
+library artifacts. Compiler/metadata option removal, carrier removal, refreshed
+bundle qualification and integration into the destination branches remain pending;
+this entry records direction and work underway, not completed integration.
+
+The next validated slices made Raven structural binding/emission unconditional
+for the neoCLR target and removed the runtime Union/Tuple carriers. The assistant
+migrated Range's result signatures and fixed imported tuple member mapping and
+metadata method-reference admission. A fresh five-library build and imported
+Range/Result consumer pass interpreter/AOT/JIT; the native API reference was refreshed.
+A broader attempted tuple-as-union-alternative consumer still rejects during metadata
+authoring and remains an explicit gap. Destination-branch integration and reader
+profile removal have not yet been performed. See the
+[carrier-free evidence](experiments/native-structural-types/carrier-free-results.json).
+
+### Structural integration delivery — 2026-10-15
+
+Following the author's explicit integration/carrier-removal direction, the assistant
+removed runtime, compiler and reader opt-ins, retired runtime Union/Tuple declarations,
+and migrated Range results and imported tuple method contracts. Fresh five-library
+builds, Range/Result and direct/closed-generic Task consumers passed the recorded
+interpreter/AOT/JIT and collection checks. The host metadata suite is now 175/175.
+The assistant integrated the tested tree into neoCLR main and advanced the Raven
+neoCLR line separately from Raven main. Remaining unsupported forms are documented
+as gaps rather than claimed complete. See the
+[integration record](validation/structural-integration-20261015.md).

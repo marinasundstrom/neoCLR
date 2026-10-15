@@ -15,7 +15,6 @@
     <EmbeddedResource Include="../../../runtime/raven/src/System/Security/Cryptography/CryptographyError.rvn" LogicalName="NeoCLR.CryptographyError.rvn" />
     <EmbeddedResource Include="../../../runtime/raven/src/System/Concurrency/Tasks/TaskOutcome.rvn" LogicalName="NeoCLR.TaskOutcome.rvn" />
     <EmbeddedResource Include="../../../runtime/raven/src/System/Option.rvn" LogicalName="NeoCLR.Option.rvn" />
-    <EmbeddedResource Include="../../../runtime/raven/src/System/Union.rvn" LogicalName="NeoCLR.Union.rvn" />
     <EmbeddedResource Include="../../../runtime/raven/src/System/Result.rvn" LogicalName="NeoCLR.Result.rvn" />
     <EmbeddedResource Include="../../../runtime/raven/src/System/Web/Http/HttpError.rvn" LogicalName="NeoCLR.HttpError.rvn" />
     <EmbeddedResource Include="../../../runtime/raven/src/System/Networking/Sockets/SocketError.rvn" LogicalName="NeoCLR.SocketError.rvn" />

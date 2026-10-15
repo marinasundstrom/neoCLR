@@ -1,0 +1,13 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <Import Project="../../../../target/structural-integrated-libraries-v3/NeoCLR.ClassLibrary.props" />
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <OutputType>Exe</OutputType>
+    <AssemblyName>StructuralCallableConsumer</AssemblyName>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="StructuralCallableLibrary">
+      <HintPath>../callable-import-library/bin/neoclr/StructuralCallableLibrary.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+</Project>

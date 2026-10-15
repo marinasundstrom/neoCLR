@@ -90,10 +90,12 @@ and serialization errors directly. This replaces their HttpJsonError return type
 rebuild consumers and update wrapper patterns. HttpError and JsonError keep their
 meaningful nominal cases. See [HTTP JSON APIs](../../docs/json.html).
 
-The matching development library temporarily backs two through five alternatives
-with nominal `System.Union` carriers. Native structural union values are planned;
-this bridge does not implement structural identity or normalization. Existing SDKs
-need rebuilding with the matching compiler/library changes.
+Development neoCLR removes the nominal `System.Union` runtime carriers and emits union
+signatures and support interpreter execution, including value and reference
+alternatives. These are different representations and require matching compiler
+and library artifacts. Bounded native AOT checks now cover reference-only unions
+and tagged Int32/Int64/Boolean unions without carrier allocation. Mixed payloads
+and complete AOT/JIT qualification remain open.
 
 [Union API and bridge limits](../../docs/unions.html) ·
 [Tested configuration loader and validation](https://github.com/marinasundstrom/neoCLR/tree/main/docs/experiments/adhoc-error-unions)
@@ -160,3 +162,24 @@ Capture is bounded to 64 frames and 64 KiB with explicit truncation. Source line
 structured frame access and suspended async caller history remain incomplete.
 Faults remain terminal; capturing a stack does not introduce recovery.
 [StackTrace API and example](../../docs/stack-trace.html).
+
+On the structural feature branches, intrinsic `string` alternatives now have
+native metadata and collector checks alongside integer alternatives. String
+owners remain traced references inside a structural union value. This remains
+development work; see the [union API and limits](../../docs/unions.html).
+
+Development native unions also admit Single/Double payloads with exact alternative
+identity and inline numeric storage; focused interpreter/AOT checks cover calls,
+widening and incorrect extraction without carrier allocation.
+
+A fresh Raven float/double/int consumer also passes interpreter, AOT and managed
+JIT checks on macOS ARM64 with zero arena allocation. This remains feature-branch
+qualification, not a published platform-wide capability.
+
+Int32-backed nominal enum alternatives also have focused native union checks.
+Equal underlying bits do not erase distinct enum identities; other enum widths
+remain subject to the existing native backend limits.
+
+Structural runtime admission no longer requires the experimental Cargo features,
+including in reduced builds. Compiler/metadata switches and nominal Union/Tuple
+carriers are removed on the integrated development line; publication remains separate.

@@ -1,0 +1,27 @@
+{
+  "exitCode": 0,
+  "stdout": "Tuple descriptors passed\n",
+  "stderr": "",
+  "fixture": "One native LoadTypeToken substitution; source tuple emission remains unsupported",
+  "libraryHashes": {
+    "System.Runtime.dll": "deb2198044a184d87c2925ab76ec96c9d785cab3a20638f8b579b74513769811",
+    "System.runtime.neox": "98a1ae1da85387c87746957e83a4015eb59d0566539a915c69f168d2b511b190",
+    "Core.dll": "3f7cfa9db7c4feb551e2e97b0edb89c4dcf4c64d8eccf01bd006848dcacfd3f4",
+    "NeoCLR.ClassLibrary.props": "4676969ee1e381f9bbe0cfce799cfe5503a1a7f77968a174782c35a24752e5b7"
+  },
+  "bundleManifestSha256": "425cb383fbeae61cfdc084b1eb04d002752c2c0342bbfe684f9dc63002c668b9",
+  "sha256": {
+    "target/debug/neoclr": "21f18382cdde9acac3503e8d454fd13cbd89b4f2d1bd2188d8d7d1690b0efd01",
+    "target/tuple-info-consumer/TupleInfo.neox": "c03f51a7f91db55d2d1543e0d32f5a8ac43d1b0cf998f205642ba07a5728b96e",
+    "docs/experiments/structural-tuples/TypeInfo.rvn": "f268480cce8e6dccf7e2a28220abecd2bf7e05136f27d0a98cba6f26396bd619"
+  },
+  "date": "2026-10-14",
+  "runtimeLibraryCompilerRevision": "793219d855b17f01fb805e215968b78871eb3804",
+  "consumerCompilerRevision": "1ad442db1",
+  "checks": [
+    "180 recursive guest descriptor iterations",
+    "2 host identity/query tests",
+    "API reference snapshot check",
+    "6 default-feature tuple tests"
+  ]
+}

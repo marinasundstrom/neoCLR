@@ -1,5 +1,79 @@
 # neoCLR platform roadmap
 
+**Structural type integration (author direction, 2026-10-15):** stabilize and
+integrate the experimental structural type work, remove experimental opt-in flags,
+and retire the nominal System.Union/System.Tuple ad-hoc carriers. Migrate dependent
+library APIs, native Raven mappings, generated metadata and documentation together.
+Declared nominal unions and ordinary .NET target behavior remain distinct. The validated implementation is integrated into neoCLR main and Raven’s neoCLR
+line. Runtime/compiler/reader opt-ins and nominal carriers are removed. The
+[qualification record](validation/structural-integration-20261015.md) distinguishes
+validated behavior from remaining unsupported forms. This integration does not
+reprioritize unrelated roadmap milestones or declare a release.
+
+
+**Structural composition experiment (author direction, 2026-10-14):** the isolated
+[closed-reference POC](experiments/structural-poc/README.md) on
+`codex/structural-union-intersection` and Raven `codex/neoclr-union-intersection`
+covers source native signatures, structural descriptors, Task union delivery,
+intersection trait calls and closed method constraints with separate consumers.
+Interpreter callable union alternatives now have focused storage/narrowing and
+receiver-collection checks; bounded native callable-union storage now has AOT
+receiver-retention and exact allocation checks. The artifact-only Raven callable
+consumer now passes on freshly rebuilt libraries in interpreter, AOT and managed
+JIT, including eager/paced collection and cleanup before code release. Broader
+conversions and escaped async retention remain open. Closed structural generic arguments
+now pass specialization. Checked structural array storage has collector/fault
+qualification, and structural fields in nominal value records now pass metadata,
+copy and collector checks. Managed value-record methods now admit structural signatures. Fresh direct and
+closed-generic Task union consumers pass interpreter, AOT and managed JIT with
+eager/paced collection and cleanup; see the [retained Task evidence](experiments/native-structural-types/README.md#fresh-task-union-native-qualification-2026-10-15).
+Single/Double union alternatives now pass focused interpreter/AOT exact-type and widening
+checks plus a fresh Raven interpreter/AOT/JIT consumer without arena allocation. Int32-backed nominal enum alternatives also have focused interpreter/AOT identity,
+payload and widening checks. Broader primitive/enum qualification remains open.
+Intrinsic String union alternatives now have metadata, interpreter and native collector checks
+with separate traced text slots; see the [String checkpoint](experiments/native-structural-types/README.md#intrinsic-string-union-alternatives-2026-10-15).
+Exact-alternative union widening now repacks differing native layouts without a
+carrier allocation and passes a fresh interpreter/AOT/JIT consumer plus collector
+checks. A bounded scalar-union microbenchmark measures about 5.3% higher median call cost
+than an explicit nominal tagged record on Apple M1, with no native imports or
+arena allocation; mixed/async throughput remains open. Written intersection bounds require interfaces or classes open to extension;
+Raven sealed hierarchies remain valid. Full open-generic integration, broader
+constraint authoring/reflection and broad JIT/AOT support remain follow-up work.
+Bounded native tuple storage now passes macOS ARM64 AOT copy/call/address and
+256-slot boundary checks; see [native tuple progress](structural-tuples.md#native-inline-storage--2026-10-15). The consolidated
+acceptance runner records the exact tested artifacts. This author-directed
+experiment does not change the active performance milestone. Bounded intersection
+reference views and reference-alternative union payloads now have AOT/interpreter
+differential checks. Scalar-only Int32/Int64/Boolean unions now have tagged
+inline storage, exact adjacent box/cast elision and bounded scalar type tests; bounded mixed scalar/reference storage now has interpreter/AOT checks with a
+separate traced reference slot. Closed nominal value-record unions now have bounded copy/extraction and embedded
+reference checks. A [fresh imported Raven struct consumer](experiments/native-structural-types/record-import-project/README.md)
+passes seven cases with no native imports or arena use. Record/reference mixtures now have bounded native checks and a
+[fresh imported Raven consumer](experiments/native-structural-types/record-reference-import-project/README.md)
+with eight inputs and only the explicit object allocation. A
+[closed-generic record variant](experiments/native-structural-types/generic-record-reference-import-project/README.md)
+also preserves Response<int>/Response<long> identity through nine inputs after a
+general Raven pattern comparison fix. A
+[reference-valued substitution](experiments/native-structural-types/reference-generic-record-import-project/README.md)
+also preserves shared Cell mutation through copied records with exactly the two
+explicit allocations. [Bounded native collector stress](experiments/native-structural-types/README.md#native-collector-stress-for-union-roots-2026-10-15)
+now preserves union-held objects through eager/paced AOT collection and fault
+unwind. The imported Response<Cell> consumer also passes repeated eager/paced
+nonmoving collection with full reclamation; broader JIT/async/application
+qualification was pending at that checkpoint; the integration record above supersedes
+that status for the tested workloads. A
+[fresh Raven scalar-pattern consumer](experiments/native-structural-types/scalar-pattern-project/README.md)
+now passes guarded/fallback arms and result joins in interpreter and macOS ARM64 AOT.
+An [artifact-only library consumer](experiments/native-structural-types/scalar-import-project/README.md)
+also passes union returns/parameters with reordered alternatives and zero arena use.
+A [fresh mixed-pattern consumer](experiments/native-structural-types/mixed-pattern-project/README.md)
+passes seven scalar/reference inputs with only its explicit Response allocation.
+An [artifact-only mixed library consumer](experiments/native-structural-types/mixed-import-project/README.md)
+also passes imported union returns/parameters and Response property access with
+only the explicit object allocation. The [closed-generic imported variant](experiments/native-structural-types/generic-mixed-import-project/README.md)
+also preserves a stored Response<int> payload through mixed union calls.
+
+
 **Type relationships (author direction, 2026-10-14):** TypeInfo assignment, subclass
 and instance predicates share runtime semantics across interpreter/JIT/AOT. The
 [focused qualification](validation/type-relationships-20261014/README.md) records
@@ -3907,6 +3981,21 @@ The author selected [value tuple support](tuples.md) on 2026-09-28, using
 `System.Tuple` as the neoCLR name corresponding to .NET `System.ValueTuple`.
 This is a bounded author-directed addition; it does not replace the Web API direction.
 The [runtime tracker](tracking/runtime-language.md#value-tuples--2026-09-28) owns status.
+On 2026-10-14 the author directed replacing this nominal representation with
+[structural tuples](structural-tuples.md). Native tuple signature roundtrips and
+substitution are implemented, followed by opt-in closed tuple values and positional
+access in the interpreter, resolved host identities and ordered element descriptors.
+Guest ordered element introspection is available through `TupleTypeInfo`, and
+native C# signature authoring, opt-in snapshots and callable imports preserve ordered
+tuple shapes with CLI rejection. C# construction/element operations execute nested
+tuples across imported calls with copy semantics;
+Raven source-local scalar/nested tuple lowering executes named/positional reads
+and copies (42). Native Rust signatures and host descriptors now preserve names
+without changing structural equality. C# authoring/import and Raven emission retain
+native names, and explicit Raven tuple imports execute across libraries (42). Guest
+name queries now preserve per-signature names with positional defaults. Raven local tuple mutation now preserves copies through nested writeback (42). Native structural binding now removes nominal carrier lookup, including nine-element execution (42). Native projects now enable all three structural forms together, with a separate-library sample returning 42 and default interpreter feature admission (2026-10-15). Fresh Runtime, Data and Networking library builds pass; Web still exposes structural-union conversions in Result error propagation/case construction: its alternatives are nominal value unions. Author direction includes value and reference alternatives. Interpreter boxed value-alternative admission, host authoring/reads and compiler exact conversions are validated. Direct structural ref/out slots are validated (44 runtime checks and source consumer 42). Structural callback mapping now clears the delegate-resolution failure; all four source libraries generate in the v3 bundle. Direct callback execution returns 42. Bounded generic value-wrapper and callback paths are now validated (53 runtime checks); broader generic forms remain incomplete. The v3 consumer now resolves metadata, executes HTTP-header checks and preserves prior output on an invalid configuration. Generic wrapper/callback substitutions are covered by focused tests. The fresh-bundle awaited Task<Result<Response, HttpError | JsonError>> consumer also passes completed/queued success and both imported error alternatives (42), with 54 structural tests; see `docs/experiments/value-unions/task-results.json`. Direct Task<Response | HttpError | JsonError> and Task<Response<int> | HttpError | JsonError> consumers now pass completed/queued/async-forwarded alternatives and reference identity (42), with 21 compiler and 55 runtime checks; see `docs/experiments/value-unions/direct-task-results.json`. Scoped nominal constituents now preserve method/type parameters through native metadata and runtime substitution; the Response<T> generic-method consumer returns 42 and 58 runtime checks pass (`docs/experiments/value-unions/open-generic-results.json`). Bare parameter operands and symbolic constraint coverage remain incomplete. Author direction (2026-10-15): prioritize correct AOT structural data representation, with JIT awareness and efficiency as first-class requirements; interpreter success is not backend completion. Union-local closure capture, whole-union boxing and broader endpoint/backend coverage remain open. Nonlocal mutation,
+native layout/backends and removal of legacy runtime tuple declarations
+remain staged follow-ups on the experimental branches.
 
 ## Theme trackers
 
@@ -4581,3 +4670,152 @@ union binding; the native branch carries it and fixes runtime-await residual-ret
 completion. See [review decisions](raven-error-api.md#review-existing-api-aggregation)
 and [focused validation](experiments/http-json-client/README.md). This author-directed
 slice does not change milestone sequencing or claim native structural union support.
+
+
+### Author-directed generic composition experiment (2026-10-14)
+
+The isolated composition branches now cover the author's nested generic union
+examples semantically and execute closed generic reference bounds in runtime tests.
+Full generic metadata/compiler/storage integration remains open. This experiment
+does not change active milestone sequencing or enable compositions on main.
+[Scope and focused evidence](experiments/structural-compositions/README.md#generic-composition-first-slice--2026-10-14).
+
+Follow-through: closed generic reference bounds now cross the native metadata
+adapter and Raven call emitter, with eight passing interpreter consumers. Generic
+argument composition/storage remains open; see the [call-integration checkpoint](experiments/structural-compositions/README.md#closed-generic-composition-call-integration--2026-10-14).
+
+The next bounded runtime slice stores closed reference compositions as arguments of
+reference-class wrappers, including nested payloads across GC. Host/compiler wrapper
+transport and owned calls remain open; this is not Task execution.
+[Checkpoint](experiments/structural-compositions/README.md#runtime-composition-argument-storage--2026-10-14).
+
+Runtime wrapper constructors/nonvirtual methods now pass focused execution and
+substituted-body checks. The author also explicitly requires union constraints,
+with intersections especially useful for inputs and constraints. Union disjunction
+and intersection conjunction must remain distinct; native constraint integration
+is pending. This does not change milestone sequencing.
+[Checkpoint and direction](experiments/structural-compositions/README.md#runtime-wrapper-constructormethod-calls--2026-10-14).
+
+Wrapper signatures now cross the experimental metadata and Raven imported-call
+paths, with twelve executable host/Raven consumers. Native constraints, open
+parameters, source storage and real Task integration remain pending. Intersection
+use-site guidance does not restrict return types.
+[Checkpoint](experiments/structural-compositions/README.md#wrapped-composition-metadata-and-raven-calls--2026-10-14).
+
+
+The isolated composition interpreter now admits checked reference-array payloads
+and substituted generic array fields, a prerequisite for Task's ArrayList-backed
+result slot. Compiler/host array transport and actual Task execution remain open.
+[Runtime array checkpoint](experiments/structural-compositions/README.md#runtime-reference-array-storage--2026-10-14).
+
+
+The interpreter now admits composition arguments in generic interface identities,
+allowing the real Task/Promise/ArrayList construction path for the nested union
+example. Completion remains blocked by substituted managed-local initialization;
+interface dispatch and compiler transport remain separate work.
+[Task construction checkpoint](experiments/structural-compositions/README.md#generic-interface-composition-arguments-and-task-construction--2026-10-14).
+
+
+The composition interpreter now admits exact, immediate managed-local default
+initialization after substitution, removing the observed ArrayList/Task completion
+blocker while retaining general byref gates.
+[Initialization checkpoint](experiments/structural-compositions/README.md#immediate-compound-local-initialization--2026-10-14).
+
+
+The real Task/Promise/ArrayList interpreter consumer now completes and reads each
+alternative of Task<Response | HttpError | JsonError>, preserving payload identity,
+first-completion semantics and GC retention. Pending/cancelled reads and out-of-union
+payloads remain rejected. Raven source/await integration is still a separate step.
+[Task delivery evidence](experiments/structural-compositions/README.md#real-task-union-completion-and-result-delivery--2026-10-14).
+
+
+Explicit imported-result locals now preserve native composition signatures in the
+host builder; Raven source-local/await integration remains pending. Structural types
+are intended as fully introspectable runtime types: tuples (later), unions,
+intersections and functions, with arrays retaining Array<T> backing.
+[Result-local evidence and type model](experiments/structural-compositions/README.md#imported-composition-result-locals--2026-10-14).
+
+The companion compiler now executes imported-result source locals/copies; fourteen
+paired consumers pass. Await/state-machine composition storage remains the next slice.
+
+The author-directed composition experiment now integrates Raven await lowering with
+imported Task union contracts and native reference-class state storage. See
+[await delivery](experiments/structural-compositions/README.md#raven-composition-await-delivery--2026-10-14)
+for scope and validation; this does not change mainline milestone priorities.
+
+The experiment's shared reflection relationship core now preserves composition
+assignment guarantees and nominal-only strict ancestry; guest descriptors remain
+open. [Bounded relationship slice](experiments/structural-compositions/README.md#composition-relationship-core--2026-10-14).
+
+Resolved host composition identity keys now preserve constituents and generic
+arguments without nominal definition tokens. Guest descriptors remain pending.
+[Identity checkpoint](experiments/structural-compositions/README.md#resolved-composition-identities--2026-10-14).
+
+The experiment now exposes recursive host composition descriptors, including
+constituents within closed generic arguments; guest providers remain gated.
+[Host descriptor checkpoint](experiments/structural-compositions/README.md#host-composition-descriptors--2026-10-14).
+
+Author correction reserves TypeInfo.IsUnion for structural identity and separates
+nominal detection as NominalTypeInfo.IsUnionDeclaration. Existing nominal consumers
+are migrated; broader nominal-helper grouping and guest structural providers remain
+follow-up work. [Classification correction](experiments/structural-compositions/README.md#author-correction-structural-isunion--2026-10-14).
+
+
+Guest UnionTypeInfo and IntersectionTypeInfo now expose direct constituent snapshots
+in the experimental interpreter. This supersedes the guest-provider gates in the
+preceding checkpoints. Member/hierarchy queries, source structural typeof emission
+and backend support remain open. [Descriptor probe](experiments/composition-type-info/README.md).
+
+2026-10-14 author-directed experiment: companion Raven now emits opt-in source union signatures to standalone NEOX, with native Task result delivery and reflection validated. See [source union evidence](experiments/source-structural-unions/README.md). This does not enable published/default builds or JIT/AOT.
+
+2026-10-14 author-requested Raven intersection slice complete: direct source signatures, trait dispatch, reflection and cross-library consumers pass; [evidence](experiments/source-structural-intersections/README.md). Production/open-generic/backend support remains future work.
+
+2026-10-14 author-directed constraint work: [native constraint checks and companion compiler semantics](experiments/composition-constraints/README.md) implemented as a bounded experimental slice. Native Raven emission/reflection remain explicit follow-up work.
+
+2026-10-14 native metadata constraint follow-up: host inspection now preserves closed
+structural method bounds and exposes their complete type views. Native authoring,
+Raven emission/import, class constraint materialization and guest constraint reflection
+remain pending; [focused evidence](experiments/composition-constraints/README.md).
+
+2026-10-14 bounded native method constraint authoring is implemented with local closed
+reference bounds, checked instantiation and interpreter result 42. Compiler wiring,
+external/open bounds and guest constraint reflection remain pending; see the
+[constraint evidence](experiments/composition-constraints/README.md).
+
+2026-10-14 native structural method constraints now pass Raven emission and separate
+library consumption, including a closed generic bound and interpreter result 42.
+Open bounds/forwarding, class constraints, generic-body traits and broader backends
+remain experimental gaps; [evidence](experiments/composition-constraints/README.md).
+
+2026-10-14 constrained method wrappers now forward parameters when their closed
+bounds imply the callee’s requirements. Native and Raven library-consumer execution
+return 42; [evidence](experiments/composition-constraints/README.md). Open operands,
+owner-parameter forwarding and generic-body traits remain separate gaps.
+
+2026-10-14 bounded generic-body trait use: structural method bounds now authorize
+owned nongeneric interface calls; the Raven intersection body returns 42. Union
+alternatives must all guarantee the requested trait. [Evidence](experiments/composition-constraints/README.md).
+Broader generic/target/backend support remains outside this experimental slice.
+
+2026-10-14 imported nongeneric trait targets now pass structural-guarantee admission:
+separate Raven library/consumer execution returns 42 using local intersection bounds
+that inherit imported interfaces. External bound authoring remains pending.
+[Evidence](experiments/composition-constraints/README.md).
+
+2026-10-14 closed constructed imported trait targets now pass native structural proof
+and Raven execution (42). Exact type arguments are required; weaker unions reject.
+See the [constraint evidence](experiments/composition-constraints/README.md).
+
+2026-10-14 external union-bound follow-up: native method authoring and Raven's
+existing opt-in mapping now preserve imported closed reference alternatives,
+including constructed interfaces. A three-assembly consumer returns 42; shape-only,
+mismatched and partial-union arguments reject. External intersection-bound authoring
+and open operands remain gaps. See [evidence](experiments/composition-constraints/README.md#external-union-constraint-alternatives--2026-10-14-development).
+
+2026-10-14 external intersection-bound follow-up: imported closed interfaces and
+open reference classes now support method intersection authoring and resolved native
+inspection. Raven retains nominal conformance, resolves selected dependencies in any
+input order, and emits closed generic interface conjunctions. The three-assembly
+consumer returns 42, including an imported open-class bound. Host checks retain
+closed-hierarchy admission and reject CLR-final/value or unresolved/mismatched bounds.
+[Evidence](experiments/composition-constraints/README.md#resolved-external-intersection-bounds--2026-10-14-development).
