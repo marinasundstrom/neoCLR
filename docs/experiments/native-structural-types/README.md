@@ -164,3 +164,15 @@ existing helper checks no allocator imports and zero arena usage. This extends
 the CLR-style test/null-check instruction contract to inline union tags; its cost
 is a tag comparison instead of payload allocation. General escaping test results,
 compound targets and full Raven-produced pattern applications remain unqualified.
+
+
+### Raven-produced scalar patterns
+
+The [source consumer](scalar-pattern-project/README.md) now qualifies typed scalar
+bindings, true/false guards, fallback arms and a match-result join from actual
+Raven output. Six checks return 42 in the interpreter and macOS ARM64 AOT. The
+native object has no undefined imports and the host observes zero arena use.
+The [runner](verify-raven-scalar-patterns.py) retains fresh disassembly and the
+selection report; [compact evidence](raven-scalar-pattern-results.json) identifies
+compiler/runtime artifacts and the retained v3 bundle. This is one consumer,
+not full mixed-union, imported-call, JIT/collector or application qualification.

@@ -8,6 +8,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-15
 
+- Qualify a fresh Raven scalar-union match consumer with typed bindings, guards, fallbacks and result joins against interpreter and macOS ARM64 AOT. Retain reproduction and artifact hashes; native execution returns 42 with no allocator imports or arena use. Broader mixed/imported/JIT coverage remains open.
+
 - Lower scalar-union type-test/null-test pairs to inline tag comparisons without boxing; validate exact alternatives, false Boolean, null and non-escaping test results against the interpreter. Update runtime and pattern documentation; full Raven application qualification remains open.
 
 - Document structural runtime operations and record the companion Raven lowering guide, particularly union pattern tests/extraction, nominal case helpers, tuple access and callable binding/invocation; distinguish interpreter evidence from native backend gaps.

@@ -15,7 +15,9 @@ experiment does not change the active performance milestone. Bounded intersectio
 reference views and reference-alternative union payloads now have AOT/interpreter
 differential checks. Scalar-only Int32/Int64/Boolean unions now have tagged
 inline storage, exact adjacent box/cast elision and bounded scalar type tests; native mixed-value union storage,
-managed stress and complete application qualification still block integration.
+managed stress and complete application qualification still block integration. A
+[fresh Raven scalar-pattern consumer](experiments/native-structural-types/scalar-pattern-project/README.md)
+now passes guarded/fallback arms and result joins in interpreter and macOS ARM64 AOT.
 
 **Type relationships (author direction, 2026-10-14):** TypeInfo assignment, subclass
 and instance predicates share runtime semantics across interpreter/JIT/AOT. The

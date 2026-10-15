@@ -86,8 +86,9 @@ numeric payload for Int32, Int64 and Boolean. An adjacent exact scalar box/union
 cast can omit the box allocation. Native `isinst Int32`, `Int64` and `Boolean` followed immediately by `ref.isnull`
 now compare the inline discriminator, without boxing. Tests cover each alternative
 and default null against the interpreter. The temporary test result cannot escape
-or be duplicated. This qualifies the instruction sequence, not every Raven match
-expression or arbitrary stack producer.
+or be duplicated. A [Raven-produced consumer](experiments/native-structural-types/scalar-pattern-project/README.md)
+also validates typed bindings, guarded/fallback arms and a result join against the
+interpreter and AOT. This does not qualify every match or arbitrary stack producer.
 Mixed reference/value and nominal-value alternatives remain native layout gaps.
 
 The current interpreter admits a null/default union payload. Native bounded
