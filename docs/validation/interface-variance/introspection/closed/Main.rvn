@@ -1,0 +1,27 @@
+module ClosedGenericIntrospection
+
+import System.*
+import System.Introspection.*
+
+class Container<T> { }
+
+func Main() -> int {
+    let numbers = typeof(Container<int>)
+    let text = typeof(Container<string>)
+    if numbers.Equals(text) || !numbers.Equals(typeof(Container<int>)) {
+        return 1
+    }
+    if numbers.GenericArgumentCount != 1 || text.GenericArgumentCount != 1 {
+        return 2
+    }
+    if !numbers.GetGenericArgument(0).Equals(typeof(int)) {
+        return 3
+    }
+    if !text.GetGenericArgument(0).Equals(typeof(string)) {
+        return 4
+    }
+    if numbers.GetGenericArgument(0) is GenericParameterTypeInfo || text.GetGenericArgument(0) is GenericParameterTypeInfo {
+        return 5
+    }
+    return 42
+}

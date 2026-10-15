@@ -18,3 +18,6 @@ Native open-definition discovery is an existing reflection gap. AOT/JIT interfac
 variance calls are independently qualified in the parent directory. Reified generic
 metadata remains required, matching .NET; build-time catalogues alone do not prove
 complete runtime reflection support.
+
+The [closed-construction consumer](closed/README.md) separately qualifies indexed
+argument queries and identity across interpreter, AOT and managed JIT.
